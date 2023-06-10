@@ -83,8 +83,8 @@ namespace TEN::Collision::Attractors
 		auto attracProx = GetProximityData(refPoint);
 
 		// Derive segment origin and target.
-		const auto& origin = Points[attracProx.SegmentIndex];
-		const auto& target = Points[attracProx.SegmentIndex + 1];
+		const auto& origin = Points[attracProx.SegmentID];
+		const auto& target = Points[attracProx.SegmentID + 1];
 
 		// Calculate angles.
 		auto attracOrient = (Points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
@@ -96,8 +96,9 @@ namespace TEN::Collision::Attractors
 		bool isFacingForward = (abs(Geometry::GetShortestAngle(headingAngle, orient.y)) <= FORWARD_FACING_ANGLE_THRESHOLD);
 		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.Point, orient);
 
-		// Create and return attractor collision data.
+		// Create attractor collision data.
 		auto attracColl = AttractorCollisionData{};
+
 		attracColl.AttracPtr = this;
 		attracColl.Proximity = attracProx;
 		attracColl.HeadingAngle = headingAngle;
@@ -105,13 +106,15 @@ namespace TEN::Collision::Attractors
 		attracColl.IsIntersected = isIntersected;
 		attracColl.IsFacingForward = isFacingForward;
 		attracColl.IsInFront = isInFront;
+
+		// Return attractor collision data.
 		return attracColl;
 	}
 
 	AttractorProximityData Attractor::GetProximityData(const Vector3& refPoint) const
 	{
 		auto attracProx = AttractorProximityData{ Points.front(), INFINITY, 0.0f, 0 };
-		float lineDistFromLastClosestPoint = 0.0f;
+		float lineDistTravelled = 0.0f;
 
 		// Single point exists; return simple proximity data.
 		if (Points.size() == 1)
@@ -119,7 +122,7 @@ namespace TEN::Collision::Attractors
 			attracProx.Point = Points.front();
 			attracProx.Distance = Vector3::Distance(refPoint, Points.front());
 			attracProx.LineDistance = 0.0f;
-			attracProx.SegmentIndex = 0;
+			attracProx.SegmentID = 0;
 			return attracProx;
 		}
 
@@ -135,20 +138,21 @@ namespace TEN::Collision::Attractors
 			// Found new closest point; update proximity data.
 			if (dist < attracProx.Distance)
 			{
-				lineDistFromLastClosestPoint += Vector3::Distance(origin, closestPoint);
+				lineDistTravelled += Vector3::Distance(origin, closestPoint);
 
 				attracProx.Point = closestPoint;
 				attracProx.Distance = dist;
-				attracProx.LineDistance += lineDistFromLastClosestPoint;
-				attracProx.SegmentIndex = i;
+				attracProx.LineDistance += lineDistTravelled;
+				attracProx.SegmentID = i;
 
 				// Restart line distance accumulation since last closest point.
-				lineDistFromLastClosestPoint = Vector3::Distance(closestPoint, target);
+				lineDistTravelled = Vector3::Distance(closestPoint, target);
 				continue;
 			}
 
 			// Accumulate line distance since last closest point.
-			lineDistFromLastClosestPoint += Vector3::Distance(origin, target);
+			float segmentLength = Vector3::Distance(origin, target);
+			lineDistTravelled += segmentLength;
 		}
 
 		// Return proximity data.
@@ -198,7 +202,7 @@ namespace TEN::Collision::Attractors
 		return Points.back();
 	}
 
-	unsigned int Attractor::GetSegmentIndexAtDistance(float lineDist) const
+	unsigned int Attractor::GetSegmentIDAtDistance(float lineDist) const
 	{
 		// Single segment exists; return index 0.
 		if (Points.size() <= 2)
@@ -218,14 +222,14 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Find segment at distance along attractor.
-		float distTravelled = 0.0f;
+		float lineDistTravelled = 0.0f;
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
 			const auto& origin = Points[i];
 			const auto& target = Points[i + 1];
 
-			distTravelled += Vector3::Distance(origin, target);
-			if (distTravelled >= lineDist)
+			lineDistTravelled += Vector3::Distance(origin, target);
+			if (lineDistTravelled >= lineDist)
 				return i;
 		}
 
@@ -244,7 +248,7 @@ namespace TEN::Collision::Attractors
 		if (Points.size() <= 2)
 			return false;
 
-		// Test if start and end points occupy roughly the same position.
+		// Test if start and end points occupy roughly same position.
 		return (Vector3::Distance(Points.front(), Points.back()) <= EPSILON);
 	}
 
@@ -322,15 +326,16 @@ namespace TEN::Collision::Attractors
 				orient.y += ANGLE(90.0f);
 				auto direction = orient.ToDirection();
 
-				// Draw indicator lines.
+				// Draw facing indicator lines.
 				g_Renderer.AddLine3D(origin, Points[i] + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 				g_Renderer.AddLine3D(target, target + (direction * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
 				auto labelPos = ((origin + target) / 2) + LABEL_OFFSET;
-				auto labelPos2D = g_Renderer.GetScreenSpacePosition(labelPos);
+				auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
 
 				// Draw label.
-				g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, PRINTSTRING_OUTLINE);
+				if (labelPos2D.has_value())
+					g_Renderer.AddString(labelString, labelPos2D.value(), Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, PRINTSTRING_OUTLINE);
 			}
 
 			g_Renderer.AddLine3D(Points.front(), Points.front() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
@@ -338,11 +343,12 @@ namespace TEN::Collision::Attractors
 		}
 		else if (Points.size() == 1)
 		{
-			auto labelPos2D = g_Renderer.GetScreenSpacePosition(Points.front());
+			auto labelPos2D = g_Renderer.Get2DPosition(Points.front());
 
 			// Draw sphere and label.
 			g_Renderer.AddSphere(Points.front(), SPHERE_SCALE, COLOR_YELLOW);
-			g_Renderer.AddString(labelString, labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, PRINTSTRING_OUTLINE);
+			if (labelPos2D.has_value())
+				g_Renderer.AddString(labelString, labelPos2D.value(), Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, PRINTSTRING_OUTLINE);
 		}
 	}
 
@@ -415,7 +421,7 @@ namespace TEN::Collision::Attractors
 
 		// TODO: Check if it actually has search depth of 2.
 		// Get attractors in neighboring rooms (search depth of 2).
-		for (const int& subRoomNumber : room.neighbors)
+		for (int subRoomNumber : room.neighbors)
 		{
 			const auto& subRoom = g_Level.Rooms[subRoomNumber];
 			for (const auto& attrac : subRoom.Attractors)
@@ -439,7 +445,7 @@ namespace TEN::Collision::Attractors
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 		nearbyAttracPtrs.reserve(COUNT_MAX);
 
-		// Move attractor pointers into capped vector.
+		// Move attractor pointers to capped vector.
 		auto it = nearbyAttracPtrMap.begin();
 		for (int i = 0; i < COUNT_MAX && it != nearbyAttracPtrMap.end(); i++, it++)
 			nearbyAttracPtrs.push_back(std::move(it->second));

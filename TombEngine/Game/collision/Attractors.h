@@ -11,7 +11,7 @@ namespace TEN::Collision::Attractors
 	enum class AttractorType
 	{
 		Edge,
-		/*VerticalPole, // """Polerope""".
+		/*VerticalPole, // """""""""Polerope"""""""""
 		HorizontalPole, // TODO: AOD pipe shimmy + pipe crawl.
 		SwingPole,
 		ZipLine,
@@ -24,16 +24,16 @@ namespace TEN::Collision::Attractors
 		Vector3		 Point		  = Vector3::Zero;
 		float		 Distance	  = 0.0f;
 		float		 LineDistance = 0.0f;
-		unsigned int SegmentIndex = 0;
+		unsigned int SegmentID	  = 0;
 	};
 
 	struct AttractorCollisionData
 	{
 		const Attractor* AttracPtr = nullptr;
 
-		AttractorProximityData Proximity	= {};
-		short				   HeadingAngle	= 0;
-		short				   SlopeAngle	= 0;
+		AttractorProximityData Proximity = {};
+		short HeadingAngle = 0;
+		short SlopeAngle   = 0;
 
 		bool IsIntersected	 = false;
 		bool IsFacingForward = false;
@@ -62,15 +62,15 @@ namespace TEN::Collision::Attractors
 
 		// Getters
 		AttractorType				GetType() const;
-		const std::vector<Vector3>& GetPoints() const;
 		int							GetRoomNumber() const;
 		float						GetLength() const;
+		const std::vector<Vector3>& GetPoints() const;
 
 		// Utilities
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
 		AttractorProximityData GetProximityData(const Vector3& refPoint) const;
 		Vector3				   GetPointAtLineDistance(float lineDist) const;
-		unsigned int		   GetSegmentIndexAtDistance(float lineDist) const;
+		unsigned int		   GetSegmentIDAtDistance(float lineDist) const;
 
 		// Inquirers
 		bool IsEdge() const;
