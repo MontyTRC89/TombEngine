@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSkeleton(short itemNumber);
+	void InitializeSkeleton(short itemNumber);
 	void SkeletonControl(short itemNumber);
 }

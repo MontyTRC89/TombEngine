@@ -21,7 +21,7 @@
 
 namespace TEN::Entities::Doors
 {
-	void InitialiseSteelDoor(short itemNumber)
+	void InitializeSteelDoor(short itemNumber)
 	{
 		auto* doorItem = &g_Level.Items[itemNumber];
 

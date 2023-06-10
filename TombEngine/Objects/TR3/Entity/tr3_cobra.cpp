@@ -9,8 +9,8 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -24,7 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto COBRA_DISTURBANCE_VELOCITY = 15.0f;
 	constexpr auto COBRA_SLEEP_FRAME = 45;
 
-	const auto CobraBite = BiteInfo(Vector3::Zero, 13);
+	const auto CobraBite = CreatureBiteInfo(Vector3i::Zero, 13);
 	const auto CobraAttackJoints = std::vector<unsigned int>{ 13 };
 
 	enum CobraState
@@ -45,11 +45,11 @@ namespace TEN::Entities::Creatures::TR3
 		COBRA_ANIM_DEATH = 4
 	};
 
-	void InitialiseCobra(short itemNumber)
+	void InitializeCobra(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, COBRA_ANIM_IDLE_TO_SLEEP, COBRA_SLEEP_FRAME);
 		item->ItemFlags[2] = item->HitStatus;
 	}

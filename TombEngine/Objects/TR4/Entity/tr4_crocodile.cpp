@@ -11,9 +11,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 	constexpr auto CROC_STATE_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
 	constexpr auto CROC_STATE_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto CrocodileBite = BiteInfo(Vector3(0.0f, -100.0f, 500.0f), 9);
+	const auto CrocodileBite = CreatureBiteInfo(Vector3i(0, -100, 500), 9);
 	const auto CrocodileBiteAttackJoints = std::vector<unsigned int>{ 8, 9 };
 
 	enum CrocodileState
@@ -74,11 +74,11 @@ namespace TEN::Entities::TR4
 		CROC_ANIM_WATER_TO_LAND = 18
 	};
 
-	void InitialiseCrocodile(short itemNumber)
+	void InitializeCrocodile(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item))
 			SetAnimation(item, CROC_ANIM_SWIM_FORWARD);
@@ -116,9 +116,12 @@ namespace TEN::Entities::TR4
 		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
+		short headingAngle = 0;
 		short boneAngle = 0;
-		AI_INFO AI;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
+
+		AI_INFO ai;
 
 		if (item->HitPoints <= 0)
 		{
@@ -150,15 +153,15 @@ namespace TEN::Entities::TR4
 			else if (creature->HurtByLara)
 				creature->Enemy = LaraItem; // TODO: Deal with LaraItem global.
 
-			CreatureAIInfo(item, &AI);
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			CreatureAIInfo(item, &ai);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
-			boneAngle = angle;
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
+			boneAngle = headingAngle;
 
-			if ((item->HitStatus || AI.distance < CROC_ALERT_RANGE) ||
-				(TargetVisible(item, &AI) && AI.distance < CROC_VISIBILITY_RANGE))
+			if ((item->HitStatus || ai.distance < CROC_ALERT_RANGE) ||
+				(TargetVisible(item, &ai) && ai.distance < CROC_VISIBILITY_RANGE))
 			{
 				if (!creature->Alerted)
 					creature->Alerted = true;
@@ -179,21 +182,27 @@ namespace TEN::Entities::TR4
 					if (Random::TestProbability(1 / 30.0f))
 					{
 						if (Random::TestProbability(1 / 2.0f))
+						{
 							item->ItemFlags[1] = 0;
+						}
 						else
 						{
 							if (Random::TestProbability(1 / 2.0f))
+							{
 								item->ItemFlags[1] = 12;
+							}
 							else
+							{
 								item->ItemFlags[1] = -12;
+							}
 						}
 					}
 
 					item->ItemFlags[0] = std::clamp<short>(item->ItemFlags[0], -1024, 1024);
 				}
-				else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < CROC_ATTACK_RANGE)
 					item->Animation.TargetState = CROC_STATE_BITE_ATTACK;
-				else if(AI.ahead && AI.distance < CROC_STATE_RUN_RANGE)
+				else if(ai.ahead && ai.distance < CROC_STATE_RUN_RANGE)
 					item->Animation.TargetState = CROC_STATE_WALK_FORWARD;
 				else
 					item->Animation.TargetState = CROC_STATE_RUN_FORWARD;
@@ -212,9 +221,9 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < CROC_ATTACK_RANGE)
 					item->Animation.TargetState = CROC_STATE_IDLE;
-				else if (!AI.ahead || AI.distance > CROC_MAXRUN_RANGE)
+				else if (!ai.ahead || ai.distance > CROC_MAXRUN_RANGE)
 					item->Animation.TargetState = CROC_STATE_RUN_FORWARD;
 
 				break;
@@ -232,18 +241,18 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < CROC_ATTACK_RANGE)
 					item->Animation.TargetState = CROC_STATE_IDLE;
-				else if (AI.ahead && AI.distance < CROC_STATE_RUN_RANGE)
+				else if (ai.ahead && ai.distance < CROC_STATE_RUN_RANGE)
 					item->Animation.TargetState = CROC_STATE_WALK_FORWARD;
 
 				break;
 
 			case CROC_STATE_BITE_ATTACK:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 					item->Animation.RequiredState = NO_STATE;
 
-				if (AI.bite &&
+				if (ai.bite &&
 					item->TouchBits.Test(CrocodileBiteAttackJoints))
 				{
 					if (item->Animation.RequiredState == NO_STATE)
@@ -270,7 +279,7 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite)
+				else if (ai.bite)
 				{
 					if (item->TouchBits.Test(CrocodileBiteAttackJoints))
 						item->Animation.TargetState = CROC_STATE_WATER_BITE_ATTACK;
@@ -279,10 +288,10 @@ namespace TEN::Entities::TR4
 				break;
 
 			case CROC_STATE_WATER_BITE_ATTACK:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 					item->Animation.RequiredState = NO_STATE;
 
-				if (AI.bite && item->TouchBits.Test(CrocodileBiteAttackJoints))
+				if (ai.bite && item->TouchBits.Test(CrocodileBiteAttackJoints))
 				{
 					if (item->Animation.RequiredState == NO_STATE)
 					{
@@ -298,29 +307,27 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		OBJECT_BONES boneRot;
 		if (item->Animation.ActiveState == CROC_STATE_IDLE || item->Animation.ActiveState == CROC_STATE_BITE_ATTACK || item->Animation.ActiveState == CROC_STATE_WATER_BITE_ATTACK)
 		{
-			boneRot.bone0 = AI.angle / 3;
-			boneRot.bone1 = AI.angle / 2;
-			boneRot.bone2 = 0;
-			boneRot.bone3 = 0;
+			extraHeadRot.y = ai.angle / 3;
+			extraHeadRot.x = ai.angle / 2;
+			extraTorsoRot.y = 0;
+			extraTorsoRot.x = 0;
 		}
 		else
 		{
-			boneRot.bone0 = boneAngle;
-			boneRot.bone1 = boneAngle;
-			boneRot.bone2 = -boneAngle;
-			boneRot.bone3 = -boneAngle;
+			extraHeadRot.y = boneAngle;
+			extraHeadRot.x = boneAngle;
+			extraTorsoRot.y = -boneAngle;
+			extraTorsoRot.x = -boneAngle;
 		}
 
 		CreatureTilt(item, 0);
-		CreatureJoint(item, 0, boneRot.bone0);
-		CreatureJoint(item, 1, boneRot.bone1);
-		CreatureJoint(item, 2, boneRot.bone2);
-		CreatureJoint(item, 3, boneRot.bone3);
-
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureJoint(item, 0, extraHeadRot.y);
+		CreatureJoint(item, 1, extraHeadRot.x);
+		CreatureJoint(item, 2, extraTorsoRot.y);
+		CreatureJoint(item, 3, extraTorsoRot.x);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 
 		if (item->Animation.ActiveState < CROC_STATE_SWIM_FORWARD)
 		{
@@ -329,8 +336,12 @@ namespace TEN::Entities::TR4
 		}
 
 		if (item->Animation.ActiveState >= CROC_STATE_SWIM_FORWARD && item->Animation.ActiveState <= CROC_STATE_WATER_DEATH)
+		{
 			CreatureUnderwater(item, CLICK(1));
+		}
 		else
+		{
 			CreatureUnderwater(item, 0);
+		}
 	}
 }

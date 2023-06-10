@@ -44,12 +44,12 @@ enum ItemStatus
 
 enum ItemFlags
 {
-	IFLAG_TRIGGERED       = (1 << 5),
-	IFLAG_CLEAR_BODY	  = (1 << 7),
-	IFLAG_INVISIBLE		  = (1 << 8),
-	IFLAG_ACTIVATION_MASK = 0x3E00, // Bits 9-13 (IFLAG_CODEBITS)
-	IFLAG_REVERSE		  = (1 << 14),
-	IFLAG_KILLED		  = (1 << 15)
+	IFLAG_TRIGGERED       = (1    << 5),
+	IFLAG_CLEAR_BODY	  = (1    << 7),
+	IFLAG_INVISIBLE		  = (1    << 8),
+	IFLAG_ACTIVATION_MASK = (0x1F << 9), // Bits 9-13 (IFLAG_CODEBITS)
+	IFLAG_REVERSE		  = (1    << 14),
+	IFLAG_KILLED		  = (1    << 15)
 };
 
 enum class EffectType
@@ -179,11 +179,11 @@ short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
 void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
-void InitialiseFXArray(int allocateMemory);
+void InitializeFXArray(int allocateMemory);
 short CreateNewEffect(short roomNumber);
 void KillEffect(short fxNumber);
-void InitialiseItem(short itemNumber);
-void InitialiseItemArray(int totalItems);
+void InitializeItem(short itemNumber);
+void InitializeItemArray(int totalItems);
 void KillItem(short itemNumber);
 bool UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
@@ -196,3 +196,4 @@ int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
+short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber);

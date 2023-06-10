@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	void InitialiseLion(short itemNumber);
+	void InitializeLion(short itemNumber);
 	void LionControl(short itemNumber);
 }

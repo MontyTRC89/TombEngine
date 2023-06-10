@@ -208,6 +208,10 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
+	// 174-188 reserved for "true" ladders. -- Sezz 2023.04.16
+
+	LS_REMOVE_PUZZLE = 189,
+
 	NUM_LARA_STATES
 };
 
@@ -504,7 +508,7 @@ enum LaraAnim
 	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
 	LA_CRAWL_BACK = 276,											// Crawl back (looped)
 	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Unused.
+	LA_REMOVE_PUZZLE = 278,											// Remove puzzle item > idle
 	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Crawl back > crawl idle, left foot first
 	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Unused.
 	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
@@ -811,11 +815,12 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
+	// 569-598 reserved for "true" ladders. -- Sezz 2023.04.16
+
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 102
-	// 273, 274, 278, 280,
+	// 280,
 	// 343, 345,
 	// 364, 366, 368, 370,
 };
@@ -954,16 +959,14 @@ enum class JumpDirection
 
 struct Ammo
 {
-	using CountType = unsigned short;
-
 private:
-	CountType Count		 = 0;
-	bool	  IsInfinite = false;
+	unsigned int Count		= 0;
+	bool		 IsInfinite = false;
 
 public:
-	static CountType Clamp(int value)
+	static unsigned int Clamp(long value)
 	{
-		return std::clamp(value, 0, (int)std::numeric_limits<CountType>::max());
+		return std::clamp<unsigned int>(value, 0, UINT_MAX);
 	}
 
 	bool HasInfinite() const
@@ -971,7 +974,7 @@ public:
 		return IsInfinite;
 	}
 
-	CountType GetCount() const
+	unsigned int GetCount() const
 	{
 		return Count;
 	}
@@ -1008,15 +1011,15 @@ public:
 		return temp;
 	}
 
-	Ammo& operator =(size_t value)
+	Ammo& operator =(unsigned int value)
 	{
-		Count = Clamp(value);
+		Count = value;
 		return *this;
 	}
 
-	bool operator ==(size_t value)
+	bool operator ==(unsigned int value)
 	{
-		return (Count == Clamp(value));
+		return (Count == value);
 	}
 
 	Ammo& operator =(Ammo& ammo)
@@ -1026,30 +1029,30 @@ public:
 		return *this;
 	}
 
-	Ammo operator +(size_t value)
+	Ammo operator +(unsigned int value)
 	{
 		auto temp = *this;
 		temp += value;
 		return temp;
 	}
 
-	Ammo operator -(size_t value)
+	Ammo operator -(unsigned int value)
 	{
 		auto temp = *this;
 		temp -= value;
 		return temp;
 	}
 
-	Ammo& operator +=(size_t value)
+	Ammo& operator +=(unsigned int value)
 	{
-		int temp = Count + value;
+		long temp = Count + value;
 		Count = Clamp(temp);
 		return *this;
 	}
 
-	Ammo& operator -=(size_t value)
+	Ammo& operator -=(unsigned int value)
 	{
-		int temp = Count - value;
+		long temp = Count - value;
 		Count = Clamp(temp);
 		return *this;
 	}
@@ -1215,19 +1218,12 @@ struct RopeControlData
 };
 
 // TODO: Give tightrope a property for difficulty?
-// TODO: Remove old tightrope functionality.
 struct TightropeControlData
 {
-#if NEW_TIGHTROPE
 	short		 TightropeItem	 = 0;
 	bool		 CanDismount	 = false;
 	float		 Balance		 = 0.0f;
 	unsigned int TimeOnTightrope = 0;
-#else // !NEW_TIGHTROPE
-	unsigned int OnCount;
-	byte Off;
-	byte Fall;
-#endif
 };
 
 struct SubsuitControlData
@@ -1302,6 +1298,8 @@ struct PlayerEffectData
 
 struct LaraInfo
 {
+	static constexpr auto TARGET_COUNT_MAX = 8;
+
 	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
 
 	LaraControlData	  Control	= {};
@@ -1314,12 +1312,15 @@ struct LaraInfo
 	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
 
-	EulerAngles ExtraHeadRot	= {};
-	EulerAngles ExtraTorsoRot	= {};
+	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
+	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
+	EulerAngles TargetArmOrient = EulerAngles::Zero;
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
-	EulerAngles TargetArmOrient = EulerAngles::Zero;
-	ItemInfo*	TargetEntity	= nullptr; // TargetEntityPtr. Should use item number instead?
+
+	ItemInfo* TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
+	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	 = {};
+	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets	 = {};
 
 	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
 	int		 HitFrame	  = 0;		 // Frame index.

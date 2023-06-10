@@ -126,6 +126,7 @@ namespace TEN::Gui
 		int OptionCount;
 		int SelectedSaveSlot;
 
+		float TimeInMenu = 0.0f;
 		SettingsData CurrentSettings;
 
 		// Inventory variables
@@ -150,7 +151,6 @@ namespace TEN::Gui
 		short NormalRingFadeVal;
 		short NormalRingFadeDir;
 		unsigned char AmmoActive;
-		int OBJLIST_SPACING;
 		MenuOption CurrentOptions[3];
 		InventoryMode InvMode;
 		int InventoryItemChosen;
@@ -161,6 +161,7 @@ namespace TEN::Gui
 	public:
 		int CompassNeedleAngle;
 
+		bool CallPause();
 		bool CallInventory(ItemInfo* item, bool resetMode);
 		InventoryResult TitleOptions(ItemInfo* item);
 		InventoryResult DoPauseMenu(ItemInfo* item);
@@ -199,7 +200,7 @@ namespace TEN::Gui
 		void HandleOptionsInput();
 		void BackupOptions();
 		bool DoObjectsCombine(int objectNumber1, int objectNumber2);
-		void InitialiseInventory(ItemInfo* item);
+		void InitializeInventory(ItemInfo* item);
 		void FillDisplayOptions();
 		bool IsItemCurrentlyCombinable(int objectNumber);
 		bool IsItemInInventory(int objectNumber);

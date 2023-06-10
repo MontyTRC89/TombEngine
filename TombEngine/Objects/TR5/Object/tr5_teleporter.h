@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseTeleporter(short itemNumber);
+void InitializeTeleporter(short itemNumber);
 void ControlTeleporter(short itemNumber);

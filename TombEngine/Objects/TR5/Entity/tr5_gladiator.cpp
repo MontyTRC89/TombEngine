@@ -10,10 +10,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -23,7 +23,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	// TODO: Ranges.
 
-	const auto GladiatorBite = BiteInfo(Vector3::Zero, 16);
+	const auto GladiatorBite = CreatureBiteInfo(Vector3i::Zero, 16);
 	const auto GladiatorAttackJoints = std::vector<unsigned int>{ 13, 14 };
 
 	enum GladiatorState
@@ -68,11 +68,11 @@ namespace TEN::Entities::Creatures::TR5
 		GLADIATOR_ANIM_WALK_SWORD_ATTACK = 22
 	};
 
-	void InitialiseGladiator(short itemNumber)
+	void InitializeGladiator(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, GLADIATOR_ANIM_IDLE);
 
 		if (item->TriggerFlags == 1)
@@ -330,7 +330,7 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y += AI.angle;
 
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
+				if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 10)
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 

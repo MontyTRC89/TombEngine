@@ -36,6 +36,14 @@ with a call to @{ShowString}, or this function will have no effect.
 */
 	table_strings.set_function(ScriptReserved_HideString, [this](DisplayString const& s) {ShowString(s, 0.0f); });
 
+/***
+Checks if the string is shown
+@function IsStringDisplaying
+@tparam DisplayString str the string object to be checked
+@treturn bool true if it is shown, false if it is hidden
+*/
+	table_strings.set_function(ScriptReserved_IsStringDisplaying, &StringsHandler::IsStringDisplaying, this);
+
 	DisplayString::Register(table_strings);
 	DisplayString::SetCallbacks(
 		[this](auto && ... param) {return SetDisplayString(std::forward<decltype(param)>(param)...); },
@@ -70,16 +78,23 @@ void StringsHandler::SetCallbackDrawString(CallbackDrawString cb)
 	m_callbackDrawSring = cb;
 }
 
-bool StringsHandler::SetDisplayString(DisplayStringIDType id, UserDisplayString const & ds)
+bool StringsHandler::SetDisplayString(DisplayStringIDType id, const UserDisplayString& displayString)
 {
-	return m_userDisplayStrings.insert_or_assign(id, ds).second;
+	return m_userDisplayStrings.insert_or_assign(id, displayString).second;
 }
 
-void StringsHandler::ShowString(DisplayString const & str, sol::optional<float> nSeconds)
+void StringsHandler::ShowString(const DisplayString& str, sol::optional<float> numSeconds)
 {
 	auto it = m_userDisplayStrings.find(str.GetID());
-	it->second.m_timeRemaining = nSeconds.value_or(0.0f);
-	it->second.m_isInfinite = !nSeconds.has_value();
+	it->second.m_timeRemaining = numSeconds.value_or(0.0f);
+	it->second.m_isInfinite = !numSeconds.has_value();
+}
+
+bool StringsHandler::IsStringDisplaying(const DisplayString& displayString)
+{
+	auto it = m_userDisplayStrings.find(displayString.GetID());
+	bool isAtEndOfLife = (0.0f >= it->second.m_timeRemaining);
+	return (it->second.m_isInfinite ? isAtEndOfLife : !isAtEndOfLife);
 }
 
 void StringsHandler::ProcessDisplayStrings(float deltaTime)
@@ -121,5 +136,3 @@ void StringsHandler::ClearDisplayStrings()
 {
 	m_userDisplayStrings.clear();
 }
-
-

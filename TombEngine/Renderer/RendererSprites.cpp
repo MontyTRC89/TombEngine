@@ -5,7 +5,7 @@
 namespace TEN::Renderer 
 {
 	void Renderer11::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
-										Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view)
+										Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (m_Locked)
 			return;
@@ -32,13 +32,14 @@ namespace TEN::Renderer
 		spr.c3 = color;
 		spr.c4 = color;
 		spr.color = color;
+		spr.renderType = renderType;
 
-		view.spritesToDraw.push_back(spr);
+		view.SpritesToDraw.push_back(spr);
 	}
 
 	void Renderer11::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4 &color, float orient2D,
 												   float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& constrainAxis,
-												   bool softParticles, RenderView& view)
+												   bool softParticles, RenderView& view, SpriteRenderType renderType)
 	{
 		if (m_Locked)
 			return;
@@ -66,13 +67,14 @@ namespace TEN::Renderer
 		spr.c3 = color;
 		spr.c4 = color;
 		spr.color = color;
+		spr.renderType = renderType;
 
-		view.spritesToDraw.push_back(spr);
+		view.SpritesToDraw.push_back(spr);
 	}
 
 	void Renderer11::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
 														 float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& lookAtAxis,
-														 bool isSoftParticle, RenderView& view)
+														 bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (m_Locked)
 			return;
@@ -100,20 +102,21 @@ namespace TEN::Renderer
 		spr.c3 = color;
 		spr.c4 = color;
 		spr.color = color;
+		spr.renderType = renderType;
 
-		view.spritesToDraw.push_back(spr);
+		view.SpritesToDraw.push_back(spr);
 	}
 
 	void Renderer11::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							 const Vector4 color, float orient2D, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles,
 							 RenderView& view)
 	{
-		AddQuad(sprite, vertex0, vertex1, vertex2, vertex3, color, color, color, color, orient2D, scale, size, blendMode, softParticles, view);
+		AddQuad(sprite, vertex0, vertex1, vertex2, vertex3, color, color, color, color, orient2D, scale, size, blendMode, softParticles, view, SpriteRenderType::Default);
 	}
 
 	void Renderer11::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							 const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
-							 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view)
+							 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (m_Locked)
 			return;
@@ -143,19 +146,20 @@ namespace TEN::Renderer
 		spr.BlendMode = blendMode;
 		spr.pos = (vertex0 + vertex1 + vertex2 + vertex3) / 4.0f;
 		spr.SoftParticle = isSoftParticle;
+		spr.renderType = renderType;
 
-		view.spritesToDraw.push_back(spr);
+		view.SpritesToDraw.push_back(spr);
 	}
 
 	void Renderer11::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 									const Vector4& color, BLEND_MODES blendMode, RenderView& view)
 	{
-		AddColoredQuad(vertex0, vertex1, vertex2, vertex3, color, color, color, color, blendMode, view);
+		AddColoredQuad(vertex0, vertex1, vertex2, vertex3, color, color, color, color, blendMode, view, SpriteRenderType::Default);
 	}
 
 	void Renderer11::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 									const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
-									BLEND_MODES blendMode, RenderView& view)
+									BLEND_MODES blendMode, RenderView& view, SpriteRenderType renderType)
 	{
 		if (m_Locked)
 			return;
@@ -175,8 +179,9 @@ namespace TEN::Renderer
 		sprite.BlendMode = blendMode;
 		sprite.pos = (vertex0 + vertex1 + vertex2 + vertex3) / 4.0f;
 		sprite.SoftParticle = false;
+		sprite.renderType = renderType;
 
-		view.spritesToDraw.push_back(sprite);
+		view.SpritesToDraw.push_back(sprite);
 	}
 }
 

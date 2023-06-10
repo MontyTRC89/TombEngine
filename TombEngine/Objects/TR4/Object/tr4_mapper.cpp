@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::TR4
 {
-    void InitialiseMapper(short itemNumber)
+    void InitializeMapper(short itemNumber)
     {
         g_Level.Items[itemNumber].MeshBits = -3;
     }
@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
         if (!TriggerActive(item))
             return;
 
-        if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase >= 200)
+        if (item->Animation.FrameNumber - GetAnimData(item).frameBase >= 200)
         {
             SoundEffect(SFX_TR4_MAPPER_LASER, &item->Pose);
 

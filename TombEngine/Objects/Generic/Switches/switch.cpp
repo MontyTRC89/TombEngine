@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Game/items.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/sphere.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
-#include "Objects/Generic/Object/objects.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/animation.h"
-#include "Game/collision/sphere.h"
-#include "Game/camera.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
+#include "Objects/Generic/Object/objects.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 #include "Sound/sound.h"
@@ -24,7 +25,7 @@ void ProcessExplodingSwitchType8(ItemInfo* item)
 	item->MeshBits |= 1 << ((Objects[item->ObjectNumber].nmeshes & 0xFF) - 2);
 }
 
-void InitialiseShootSwitch(short itemNumber)
+void InitializeShootSwitch(short itemNumber)
 {
 	auto* switchItem = &g_Level.Items[itemNumber];
 

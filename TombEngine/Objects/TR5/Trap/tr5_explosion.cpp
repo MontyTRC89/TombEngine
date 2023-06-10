@@ -14,17 +14,16 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_fire.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Objects/Generic/Traps/traps.h"
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
-void InitialiseExplosion(short itemNumber)
+void InitializeExplosion(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

@@ -144,13 +144,20 @@ void DisplayString::Register(sol::table& parent)
 		// @tparam table table the new table with display flags options
 		// @usage
 		// local varDisplayString = DisplayString('example string', 0, 0, Color(255, 255, 255), false)
+		// possible values:
 		// varDisplayString:SetFlags({})
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW })
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.CENTER })
 		// varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW, TEN.Strings.DisplayStringOption.CENTER })
 		// -- When passing a table to a function, you can omit the parentheses
 		// varDisplayString:SetFlags{ TEN.Strings.DisplayStringOption.CENTER }
-		ScriptReserved_SetFlags, &DisplayString::SetFlags
+		ScriptReserved_SetFlags, &DisplayString::SetFlags,
+
+		/// Set translated parameter of the string
+		// @function DisplayString:SetTranslated
+		// @tparam bool shouldTranslate if true, the string's key will be used as the key for the translation that will be displayed.
+		// If false, the key itself will be displayed
+		ScriptReserved_SetTranslated, &DisplayString::SetTranslated
 	);
 }
 
@@ -161,21 +168,21 @@ DisplayStringIDType DisplayString::GetID() const
 
 void DisplayString::SetPos(int x, int y)
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	s.m_x = x;
-	s.m_y = y;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	displayString.m_x = x;
+	displayString.m_y = y;
 }
 
 std::tuple<int, int> DisplayString::GetPos() const
 {	
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	return std::make_tuple(s.m_x, s.m_y);
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	return std::make_tuple(displayString.m_x, displayString.m_y);
 }
 	
 void DisplayString::SetCol(const ScriptColor& color)
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	s.m_color = color;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	displayString.m_color = color;
 	//todo maybe change getItemCallback to return a ref instead? or move its
 	//todo UserDisplayString object? and then move back?
 	//s_addItemCallback(m_id, s);
@@ -189,28 +196,35 @@ ScriptColor DisplayString::GetCol()
 
 void DisplayString::SetKey(const std::string& key)
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	s.m_key = key;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	displayString.m_key = key;
 }
 
 std::string DisplayString::GetKey() const
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	return s.m_key;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	return displayString.m_key;
 }
 
 void DisplayString::SetFlags(const sol::table& flags) 
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
 
-	FlagArray f{};
+	auto flagArray = FlagArray {};
 	for (const auto& val : flags)
 	{
 		auto i = val.second.as<size_t>();
-		f[i] = true;
+		flagArray[i] = true;
 	}
 
-	s.m_flags = f;
+	displayString.m_flags = flagArray;
+}
+
+void DisplayString::SetTranslated(bool isTranslated)
+{
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	TENLog(isTranslated ? "Translated string " : "Untranslated string " + std::to_string(isTranslated), LogLevel::Info);
+	displayString.m_isTranslated = isTranslated;
 }
 
 SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)

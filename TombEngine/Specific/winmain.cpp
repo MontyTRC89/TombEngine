@@ -36,7 +36,7 @@ bool DebugMode = false;
 HWND WindowsHandle;
 DWORD MainThreadID;
 
-// Indicates to hybrid graphics systems to prefer the discrete part by default
+// Indicates to hybrid graphics systems to prefer discrete part by default.
 extern "C"
 {
 	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
@@ -142,9 +142,11 @@ void WinProcMsg()
 
 void CALLBACK HandleWmCommand(unsigned short wParam)
 {
-	if (wParam == 8)
+	if (wParam == WM_KILLFOCUS)
 	{
-		if (!IsLevelLoading)
+		// make sure we suspend the game (if focus is removed) only if the level is not being loaded
+		
+		if (!LevelLoadTask.valid())
 		{
 			SuspendThread((HANDLE)ThreadHandle);
 			g_Renderer.ToggleFullScreen();
@@ -152,7 +154,7 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 
 			if (g_Renderer.IsFullsScreen())
 			{
-				SetCursor(0);
+				SetCursor(nullptr);
 				ShowCursor(false);
 			}
 			else
@@ -210,7 +212,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
-				ResumeAllSounds();
+				ResumeAllSounds(SoundPauseMode::Global);
 			}
 
 			return 0;
@@ -225,7 +227,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
-			PauseAllSounds();
+			PauseAllSounds(SoundPauseMode::Global);
 		}
 	}
 
@@ -239,14 +241,15 @@ int main()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	// Process command line arguments
+	// Process command line arguments.
 	bool setup = false;
 	std::string levelFile = {};
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	std::string gameDir{};
 
-	// Parse command line arguments
+	// Parse command line arguments.
 	for (int i = 1; i < argc; i++)
 	{
 		if (ArgEquals(argv[i], "setup"))
@@ -265,36 +268,47 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			SystemNameHash = std::stoul(std::wstring(argv[i + 1]));
 		}
+		else if (ArgEquals(argv[i], "gamedir") && argc > (i + 1))
+		{
+			gameDir = TEN::Utils::ToString(argv[i + 1]);
+		}
 	}
 	LocalFree(argv);
 
-	// Hide console window if mode isn't debug
+	// Construct asset directory.
+	gameDir = ConstructAssetDirectory(gameDir);
+
+	// Hide console window if mode isn't debug.
 #ifndef _DEBUG
 	if (!DebugMode)
 		ShowWindow(GetConsoleWindow(), 0);
 #endif
 
-	// Clear Application Structure
+	// Clear application structure.
 	memset(&App, 0, sizeof(WINAPP));
 	
-	// Initialise logging
-	InitTENLog();
+	// Initialize logging.
+	InitTENLog(gameDir);
 
-	// Indicate version
+	// Indicate version.
 	auto ver = GetProductOrFileVersion(false);
 	auto windowName = (std::string("Starting TombEngine version ") +
 					   std::to_string(ver[0]) + "." +
 					   std::to_string(ver[1]) + "." +
-					   std::to_string(ver[2]));
+					   std::to_string(ver[2]) + " " +
+#ifdef _WIN64
+					   "(64-bit)"
+#else
+					   "(32-bit)"
+#endif
+					   );
 	TENLog(windowName, LogLevel::Info);
 
-	// Collect numbered tracks
-	EnumerateLegacyTracks();
+	// Initialize savegame and scripting systems.
+	SaveGame::Init(gameDir);
+	ScriptInterfaceState::Init(gameDir);
 
-	// Initialise the new scripting system
-	ScriptInterfaceState::Init();
-
-	// Initialise scripting
+	// Initialize scripting.
 	try 
 	{
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
@@ -314,6 +328,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//should be moved to LogicHandler or vice versa to make this stuff
 		//less fragile (squidshire, 16/09/22)
 		g_GameScript->ShortenTENCalls();
+		g_GameFlow->SetGameDir(gameDir);
 		g_GameFlow->LoadFlowScript();
 	}
 	catch (TENScriptException const& e)
@@ -324,16 +339,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
-	// Disable DPI scaling on Windows 8.1+ systems
+	// Disable DPI scaling on Windows 8.1+ systems.
 	DisableDpiAwareness();
 
-	// Setup main window
+	// Set up main window.
 	INITCOMMONCONTROLSEX commCtrlInit;
 	commCtrlInit.dwSize = sizeof(INITCOMMONCONTROLSEX);
 	commCtrlInit.dwICC = ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES;
 	InitCommonControlsEx(&commCtrlInit);
 
-	// Initialise main window
+	// Initialize main window.
 	App.hInstance = hInstance;
 	App.WindowClass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	App.WindowClass.lpszMenuName = NULL;
@@ -346,17 +361,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowClass.cbWndExtra = 0;
 	App.WindowClass.hCursor = LoadCursor(App.hInstance, IDC_ARROW);
 
-	// Register main window
+	// Register main window.
 	if (!RegisterClass(&App.WindowClass))
 	{
 		TENLog("Unable To Register Window Class", LogLevel::Error);
 		return 0;
 	}
 
-	// Create the renderer and enumerate adapters and video modes
+	// Create renderer and enumerate adapters and video modes.
 	g_Renderer.Create();
 
-	// Load configuration and optionally show the setup dialog
+	// Load configuration and optionally show setup dialog.
 	InitDefaultConfiguration();
 	if (setup || !LoadConfiguration())
 	{
@@ -369,7 +384,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		LoadConfiguration();
 	}
 
-	// Setup window dimensions
+	// Set up window dimensions.
 	RECT Rect;
 	Rect.left = 0;
 	Rect.top = 0;
@@ -377,13 +392,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Rect.bottom = g_Configuration.Height;
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
-	// Make window handle
+	// Make window handle.
 	App.WindowHandle = CreateWindowEx(
 		0,
 		"TombEngine",
 		g_GameFlow->GetString(STRING_WINDOW_TITLE),
 		WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX,
-		CW_USEDEFAULT, // TODO: change this to center of screen !!!
+		CW_USEDEFAULT, // TODO: change this to center of screen!
 		CW_USEDEFAULT,
 		Rect.right - Rect.left,
 		Rect.bottom - Rect.top,
@@ -397,35 +412,46 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!App.WindowHandle)
 	{
 		TENLog("Unable To Create Window. Error: " + std::to_string(GetLastError()), LogLevel::Error);
-		return false;
+		return 0;
 	}
 	else
+	{
 		WindowsHandle = App.WindowHandle;
+	}
 
-	// Unlike CoInitialize(), this line prevents event spamming if one of dll fails
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	try
+	{
+		// Unlike CoInitialize(), this line prevents event spamming if one of dll fails
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
-	// Initialise the renderer
-	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
+		// Initialize the renderer
+		g_Renderer.Initialize(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
 
-	// Initialise audio
-	Sound_Init();
+		// Initialize audio
+		Sound_Init(gameDir);
 
-	// Initialise input
-	InitialiseInput(App.WindowHandle);
+		// Initialize input
+		InitializeInput(App.WindowHandle);
 
-	// Load level if specified in command line
-	CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
-	
-	App.bNoFocus = false;
-	App.isInScene = false;
+		// Load level if specified in command line
+		CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
 
-	UpdateWindow(WindowsHandle);
-	ShowWindow(WindowsHandle, nShowCmd);
+		App.bNoFocus = false;
+		App.isInScene = false;
 
-	SetCursor(NULL);
-	ShowCursor(FALSE);
-	hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
+		UpdateWindow(WindowsHandle);
+		ShowWindow(WindowsHandle, nShowCmd);
+
+		SetCursor(NULL);
+		ShowCursor(FALSE);
+		hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
+	}
+	catch (std::exception& ex)
+	{
+		TENLog("Error during game initialization: " + std::string(ex.what()), LogLevel::Error);
+		WinClose();
+		exit(EXIT_FAILURE);
+	}
 
 	DoTheGame = true;
 
@@ -453,7 +479,7 @@ void WinClose()
 	DestroyAcceleratorTable(hAccTable);
 
 	Sound_DeInit();
-	DeinitialiseInput();
+	DeinitializeInput();
 
 	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	

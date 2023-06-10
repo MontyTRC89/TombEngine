@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto PulleyPos = Vector3i(0, 0, -148);
 
-	void InitialisePulleySwitch(short itemNumber)
+	void InitializePulleySwitch(short itemNumber)
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
 
@@ -73,7 +73,7 @@ namespace TEN::Entities::Switches
 				{
 					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
 					laraItem->Animation.ActiveState = LS_PULLEY;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 
 					AddActiveItem(itemNumber);
 
