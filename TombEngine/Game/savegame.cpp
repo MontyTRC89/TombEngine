@@ -678,6 +678,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_after_death(itemToSerialize.AfterDeath);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
+		serializedItem.add_anim_object_id(itemToSerialize.Animation.AnimObjectID);
 		serializedItem.add_active_state(itemToSerialize.Animation.ActiveState);
 		serializedItem.add_flags(itemToSerialize.Flags);
 		serializedItem.add_floor(itemToSerialize.Floor);
@@ -1537,6 +1538,7 @@ bool SaveGame::Load(int slot)
 		item->BoxNumber = savedItem->box_number();
 
 		// Animations
+		item->Animation.AnimObjectID = GAME_OBJECT_ID(savedItem->anim_object_id());
 		item->Animation.ActiveState = savedItem->active_state();
 		item->Animation.RequiredState = savedItem->required_state();
 		item->Animation.TargetState = savedItem->target_state();
