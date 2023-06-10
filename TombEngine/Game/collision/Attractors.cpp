@@ -409,22 +409,12 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Get attractors in current room.
-		auto& room = g_Level.Rooms[roomNumber];
+		const auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
 			float dist = attrac.GetProximityData(refPoint).Distance;
 			if (dist <= range)
 				nearbyAttracPtrMap.insert({ dist, &attrac });
-		}
-
-		for (auto& floor : room.floor)
-		{
-			for (int bridgeID : floor.BridgeItemNumbers)
-			{
-				auto& bridge = g_Level.Items[bridgeID];
-
-				g_Level.BridgeAttractors.insert{{}}
-			}
 		}
 
 		// TODO: Check if it actually has search depth of 2.
@@ -441,17 +431,8 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Get bridge attractors.
-		for (auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
+		for (const auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
 		{
-			const auto& bridge = g_Level.Items[bridgeID];
-
-			float bridgeDist = Vector3::Distance(bridge.Pose.Position.ToVector3(), refPoint);
-			if (bridgeDist > range)
-				continue;
-
-			// Update bridge attractor.
-			attrac = GenerateBridgeAttractor(bridge);
-
 			float dist = attrac.GetProximityData(refPoint).Distance;
 			if (dist <= range)
 				nearbyAttracPtrMap.insert({ dist, &attrac });
