@@ -482,7 +482,7 @@ namespace TEN::Collision::Attractors
 		return Attractor(type, points, roomNumber);
 	}
 
-	Attractor GenerateBridgeAttractor(const ItemInfo& bridge)
+	static Attractor GenerateBridgeAttractor(const ItemInfo& bridge)
 	{
 		constexpr auto TILT_STEP = CLICK(1);
 

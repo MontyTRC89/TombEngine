@@ -62,9 +62,9 @@ namespace TEN::Collision::Attractors
 
 		// Getters
 		AttractorType				GetType() const;
+		const std::vector<Vector3>& GetPoints() const;
 		int							GetRoomNumber() const;
 		float						GetLength() const;
-		const std::vector<Vector3>& GetPoints() const;
 
 		// Utilities
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
@@ -94,6 +94,5 @@ namespace TEN::Collision::Attractors
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float range);
 
 	Attractor				 GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop = true);
-	Attractor				 GenerateBridgeAttractor(const ItemInfo& bridge);
 	std::optional<Attractor> GenerateSectorAttractor(const CollisionResult& pointColl);
 }
