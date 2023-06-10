@@ -224,9 +224,6 @@ namespace TEN::Entities::Vehicles
 
 	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		// FireHarpoon(*laraItem, nullptr);
-		// GianC.- Use this if the code misbehaves. It shoots the harpoon from pos 0 (under Lara)
-
 		auto& upv = *GetUPVInfo(UPVItem);
 
 		auto harpoonPose = Pose(GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((upv.HarpoonLeft ? 22 : -22), 24, 230)));
