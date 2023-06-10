@@ -59,7 +59,8 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* object = &Objects[item->ObjectNumber];
-	item->Data = CreatureInfo();
+	if (!item->Data)
+		item->Data = CreatureInfo();
 	auto* creature = GetCreatureInfo(item);
 
 	InitializeLOTarray(itemNumber);
