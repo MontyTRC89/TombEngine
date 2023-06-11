@@ -450,7 +450,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Objects\Sink.h" />
     <ClInclude Include="Objects\TR1\Entity\Cowboy.h" />
-    <ClInclude Include="Objects\TR1\Entity\SkateboardKidInfo.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_ape.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bear.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_big_rat.h" />

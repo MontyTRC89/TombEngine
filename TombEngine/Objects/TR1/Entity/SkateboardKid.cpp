@@ -48,12 +48,7 @@ namespace TEN::Entities::Creatures::TR1
         KID_ANIM_DEATH
     };
 
-    static SkateboardKidInfo* GetSkateboardKidInfo(ItemInfo* item)
-    {
-        return (SkateboardKidInfo*)item->Data;
-    }
-
-    static void CreateSkateboard(ItemInfo* item, SkateboardKidInfo* skateboardKid)
+    static void CreateSkateboard(ItemInfo* item)
     {
         short skateboardNumber = CreateItem();
         if (skateboardNumber != NO_ITEM)
@@ -69,7 +64,7 @@ namespace TEN::Entities::Creatures::TR1
             AddActiveItem(skateboardNumber);
             skate->Active = false;
             skate->Status |= ITEM_INVISIBLE;
-            skateboardKid->skateboardItemNumber = skateboardNumber;
+            item->ItemFlags[0] = skateboardNumber;
         }
     }
 
@@ -77,31 +72,23 @@ namespace TEN::Entities::Creatures::TR1
     {
         auto* item = &g_Level.Items[itemNumber];
         InitializeCreature(itemNumber);
-
-        // Enable the SkateboardKidInfo(), initialise the LOT info and add the creature to the targeting list !
-        item->Data = SkateboardKidInfo();
-        InitializeSlot(itemNumber, false);
-        auto* kidInfo = GetSkateboardKidInfo(item);
-        ActiveCreatures.push_back(&kidInfo->creature);
-
-        // Now create the skateboard !
-        CreateSkateboard(item, kidInfo);
+        CreateSkateboard(item);
     }
 
-    static void SkateboardKidShoot(ItemInfo& item, AI_INFO& ai, short head, SkateboardKidInfo* kidInfo, short damage)
+    static void SkateboardKidShoot(ItemInfo& item, AI_INFO& ai, short head, CreatureInfo& creature, short damage)
     {
-        if (kidInfo->creature.Flags == 0 && Targetable(&item, &ai))
+        if (creature.Flags == 0 && Targetable(&item, &ai))
         {
             ShotLara(&item, &ai, kidGunLeft, head, damage);
-            kidInfo->creature.MuzzleFlash[0].Bite = kidGunLeft;
-            kidInfo->creature.MuzzleFlash[0].Delay = 2;
+            creature.MuzzleFlash[0].Bite = kidGunLeft;
+            creature.MuzzleFlash[0].Delay = 2;
             ShotLara(&item, &ai, kidGunRight, head, damage);
-            kidInfo->creature.MuzzleFlash[1].Bite = kidGunRight;
-            kidInfo->creature.MuzzleFlash[1].Delay = 2;
-            kidInfo->creature.Flags = 1;
+            creature.MuzzleFlash[1].Bite = kidGunRight;
+            creature.MuzzleFlash[1].Delay = 2;
+            creature.Flags = 1;
         }
 
-        if (kidInfo->creature.Mood == MoodType::Escape || ai.distance < SKATEKID_TOOCLOSE_RANGE)
+        if (creature.Mood == MoodType::Escape || ai.distance < SKATEKID_TOOCLOSE_RANGE)
             item.Animation.RequiredState = KID_STATE_SKATE;
     }
 
@@ -111,46 +98,44 @@ namespace TEN::Entities::Creatures::TR1
             return;
 
         auto& item = g_Level.Items[itemNumber];
-        auto* kidInfo = GetSkateboardKidInfo(&item);
-        auto& skateboard = g_Level.Items[kidInfo->skateboardItemNumber];
+        auto& creature = *GetCreatureInfo(&item);
+        auto& skateboard = g_Level.Items[item.ItemFlags[0]];
         if (skateboard.Status & ITEM_INVISIBLE)
         {
             skateboard.Active = false;
             skateboard.Status &= ~(ITEM_INVISIBLE);
         }
-        short angle = 0, head = 0, torsoY = 0, torsoX = 0;
+        short angle = 0, headY = 0, torsoY = 0, torsoX = 0;
 
-        if (kidInfo->creature.MuzzleFlash[0].Delay != 0)
-            kidInfo->creature.MuzzleFlash[0].Delay--;
-        if (kidInfo->creature.MuzzleFlash[1].Delay != 0)
-            kidInfo->creature.MuzzleFlash[1].Delay--;
+        if (creature.MuzzleFlash[0].Delay != 0)
+            creature.MuzzleFlash[0].Delay--;
+        if (creature.MuzzleFlash[1].Delay != 0)
+            creature.MuzzleFlash[1].Delay--;
 
         if (item.HitPoints <= 0 && item.Animation.ActiveState != KID_STATE_DEATH)
         {
-            kidInfo->creature.MaxTurn = 0;
+            creature.MaxTurn = 0;
             SetAnimation(item, KID_ANIM_DEATH);
         }
         else
         {
             AI_INFO ai;
             CreatureAIInfo(&item, &ai);
-            
-            GetCreatureMood(&item, &ai, false);
-            CreatureMood(&item, &ai, false);
-            angle = CreatureTurn(&item, kidInfo->creature.MaxTurn);
-
             if (ai.ahead)
             {
-                head = ai.angle;
+                headY = ai.angle / 2;
                 torsoY = ai.angle / 2;
-                torsoX = ai.xAngle;
+                torsoX = ai.xAngle / 2;
             }
+            GetCreatureMood(&item, &ai, false);
+            CreatureMood(&item, &ai, false);
+            angle = CreatureTurn(&item, creature.MaxTurn);
 
             switch (item.Animation.ActiveState)
             {
             case KID_STATE_STOP:
-                kidInfo->creature.Flags = 0;
-                kidInfo->creature.MaxTurn = SKATEKID_TURN_RATE;
+                creature.Flags = 0;
+                creature.MaxTurn = SKATEKID_TURN_RATE;
                 if (item.Animation.RequiredState != -1)
                     item.Animation.TargetState = item.Animation.RequiredState;
                 else if (Targetable(&item, &ai))
@@ -159,14 +144,14 @@ namespace TEN::Entities::Creatures::TR1
                     item.Animation.TargetState = KID_STATE_SKATE;
                 break;
             case KID_STATE_SKATE:
-                kidInfo->creature.Flags = 0;
+                creature.Flags = 0;
                 if (GetRandomControl() < SKATEKID_PUSH_CHANCE)
                 {
                     item.Animation.TargetState = KID_STATE_PUSH;
                 }
                 else if (Targetable(&item, &ai))
                 {
-                    if (ai.distance > SKATEKID_DONTSTOP_RANGE && ai.distance < SKATEKID_STOP_RANGE && kidInfo->creature.Mood != MoodType::Escape)
+                    if (ai.distance > SKATEKID_DONTSTOP_RANGE && ai.distance < SKATEKID_STOP_RANGE && creature.Mood != MoodType::Escape)
                         item.Animation.TargetState = KID_STATE_STOP;
                     else
                         item.Animation.TargetState = KID_STATE_SHOOT2;
@@ -177,10 +162,10 @@ namespace TEN::Entities::Creatures::TR1
                     item.Animation.TargetState = KID_STATE_SKATE;
                 break;
             case KID_STATE_SHOOT:
-                SkateboardKidShoot(item, ai, head, kidInfo, SKATEKID_STOP_SHOT_DAMAGE);
+                SkateboardKidShoot(item, ai, headY, creature, SKATEKID_STOP_SHOT_DAMAGE);
                 break;
             case KID_STATE_SHOOT2:
-                SkateboardKidShoot(item, ai, head, kidInfo, SKATEKID_SKATE_SHOT_DAMAGE);
+                SkateboardKidShoot(item, ai, headY, creature, SKATEKID_SKATE_SHOT_DAMAGE);
                 break;
             }
         }
@@ -191,10 +176,9 @@ namespace TEN::Entities::Creatures::TR1
         skateboard.Pose.Orientation = item.Pose.Orientation;
         AnimateItem(&skateboard);
 
-        //TODO: CreatureJoint seem to not work ? maybe the item.Data structure is affecting it ?
-        //CreatureJoint(&item, 0, torsoY);
-        //CreatureJoint(&item, 1, torsoX);
-        //CreatureJoint(&item, 2, head);
+        CreatureJoint(&item, 0, headY);
+        CreatureJoint(&item, 1, torsoX);
+        CreatureJoint(&item, 2, torsoY);
         CreatureAnimation(itemNumber, angle, 0);
     }
 }

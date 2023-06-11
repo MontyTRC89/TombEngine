@@ -20,7 +20,6 @@
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
-#include "Objects/TR1/Entity/SkateboardKidInfo.h"
 #include "Objects/TR5/Light/tr5_light_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
@@ -70,8 +69,7 @@ class ItemData
 		SpeedboatInfo,
 		RubberBoatInfo,
 		MinecartInfo,
-		ElectricalLightInfo,
-		SkateboardKidInfo
+		ElectricalLightInfo
 	> data;
 	public:
 	ItemData();

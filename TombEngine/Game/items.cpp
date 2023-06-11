@@ -143,7 +143,7 @@ bool ItemInfo::IsLara() const
 
 bool ItemInfo::IsCreature() const
 {
-	return this->Data.is<CreatureInfo>() || this->Data.is<SkateboardKidInfo>();
+	return this->Data.is<CreatureInfo>();
 }
 
 void ItemInfo::ResetModelToDefault()
@@ -191,9 +191,7 @@ void KillItem(short const itemNumber)
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNumber | 0x8000;
 		ItemNewRoomNo++;
 	}
-	// TODO: Temp fix to avoid crash when the skateboard kid is killed and KillMoveItems() is called,
-	// this will result (if the fix is removed, itemNumber will return 32767 (0x7FFF) which crash since g_Level.Items.size() won't have that many item!), TokyoSU: 10/06/2023
-	else if (itemNumber >= 0 && itemNumber < g_Level.Items.size())
+	else
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

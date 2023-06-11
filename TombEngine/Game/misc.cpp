@@ -12,16 +12,7 @@ using std::vector;
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item)
 {
-	if (item->Data.is<CreatureInfo>())
-		return (CreatureInfo*)item->Data;
-
-	if (item->Data.is<SkateboardKidInfo>())
-	{
-		auto* kidInfo = (SkateboardKidInfo*)item->Data;
-		return &kidInfo->creature;
-	}
-
-    return nullptr;
+	return (CreatureInfo*)item->Data;
 }
 
 void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
