@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR1
 {
-    void InitialiseSkateboardKid(short itemNumber);
-    void SkateboardKidControl(short itemNumber);
+    void InitializeSkateboardKid(short itemNumber);
+    void ControlSkateboardKid(short itemNumber);
 }

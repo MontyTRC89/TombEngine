@@ -187,8 +187,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SKATEBOARD_KID];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitialiseSkateboardKid;
-		obj->control = SkateboardKidControl;
+		obj->Initialize = InitializeSkateboardKid;
+		obj->control = ControlSkateboardKid;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 0;

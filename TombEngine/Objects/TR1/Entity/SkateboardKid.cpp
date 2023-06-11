@@ -1,184 +1,225 @@
 #include "framework.h"
 #include "Objects/TR1/Entity/SkateboardKid.h"
+
 #include "Game/control/box.h"
+#include "Game/control/lot.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Game/control/lot.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
-    constexpr auto SKATEKID_TURN_RATE = ANGLE(4.0f);
-    constexpr auto SKATEKID_TOOCLOSE_RANGE = SQUARE(BLOCK(1));
-    constexpr auto SKATEKID_DONTSTOP_RANGE = SQUARE(BLOCK(2.5f));
-    constexpr auto SKATEKID_STOP_RANGE = SQUARE(BLOCK(4));
-    constexpr auto SKATEKID_PUSH_CHANCE = 512;
-    constexpr auto SKATEKID_SKATE_CHANCE = 1024;
-    constexpr auto SKATEKID_STOP_SHOT_DAMAGE = 50;
-    constexpr auto SKATEKID_SKATE_SHOT_DAMAGE = 40;
+	constexpr auto KID_IDLE_SHOT_DAMAGE	  = 50;
+	constexpr auto KID_MOVING_SHOT_DAMAGE = 40;
 
-    const auto kidGunRight = CreatureBiteInfo(Vector3i(0, 170, 34), 7);
-    const auto kidGunLeft = CreatureBiteInfo(Vector3i(0, 170, 37), 4);
+	constexpr auto KID_CLOSE_RANGE = SQUARE(BLOCK(1));
+	constexpr auto KID_MOVE_RANGE  = SQUARE(BLOCK(2.5f));
+	constexpr auto KID_IDLE_RANGE  = SQUARE(BLOCK(4));
 
-    enum SkateKidState
-    {
-        KID_STATE_STOP = 0,
-        KID_STATE_SHOOT,
-        KID_STATE_SKATE,
-        KID_STATE_PUSH,
-        KID_STATE_SHOOT2,
-        KID_STATE_DEATH
-    };
+	constexpr auto KID_PUSH_CHANCE = 1 / 128.0f;
 
-    enum SkateKidAnim
-    {
-        KID_ANIM_START_MOVING_1,
-        KID_ANIM_START_MOVING_2,
-        KID_ANIM_SKATE_MORESPEED_END,
-        KID_ANIM_SKATE_MORESPEED,
-        KID_ANIM_STOP_SKATING_1,
-        KID_ANIM_STOP_SKATING_2,
-        KID_ANIM_STOP_SKATING_FINISH,
-        KID_ANIM_IDLE,
-        KID_ANIM_SKATE_MORESPEED_START,
-        KID_ANIM_IDLE_START_SKATE,
-        KID_ANIM_IDLE_SHOOT,
-        KID_ANIM_SKATE_SHOOT,
-        KID_ANIM_SKATE_AIM,
-        KID_ANIM_DEATH
-    };
+	constexpr auto KID_TURN_RATE_MAX = ANGLE(4.0f);
 
-    static void CreateSkateboard(ItemInfo* item)
-    {
-        short skateboardNumber = CreateItem();
-        if (skateboardNumber != NO_ITEM)
-        {
-            auto* skate = &g_Level.Items[skateboardNumber];
-            skate->ObjectNumber = ID_SKATEBOARD;
-            skate->Pose.Position = item->Pose.Position;
-            skate->Pose.Orientation = item->Pose.Orientation;
-            skate->StartPose = item->StartPose;
-            skate->Model.Color = item->Model.Color;
-            skate->Collidable = true;
-            InitializeItem(skateboardNumber);
-            AddActiveItem(skateboardNumber);
-            skate->Active = false;
-            skate->Status |= ITEM_INVISIBLE;
-            item->ItemFlags[0] = skateboardNumber;
-        }
-    }
+	const auto KidGunBiteRight = CreatureBiteInfo(Vector3i(0, 170, 34), 7);
+	const auto KidGunBiteLeft  = CreatureBiteInfo(Vector3i(0, 170, 37), 4);
 
-    void InitialiseSkateboardKid(short itemNumber)
-    {
-        auto* item = &g_Level.Items[itemNumber];
-        InitializeCreature(itemNumber);
-        CreateSkateboard(item);
-    }
+	enum SkateKidState
+	{
+		KID_STATE_IDLE = 0,
+		KID_STATE_SHOOT = 1,
+		KID_STATE_SKATE = 2,
+		KID_STATE_PUSH = 3,
+		KID_STATE_SHOOT_2 = 4,
+		KID_STATE_DEATH = 5
+	};
 
-    static void SkateboardKidShoot(ItemInfo& item, AI_INFO& ai, short head, CreatureInfo& creature, short damage)
-    {
-        if (creature.Flags == 0 && Targetable(&item, &ai))
-        {
-            ShotLara(&item, &ai, kidGunLeft, head, damage);
-            creature.MuzzleFlash[0].Bite = kidGunLeft;
-            creature.MuzzleFlash[0].Delay = 2;
-            ShotLara(&item, &ai, kidGunRight, head, damage);
-            creature.MuzzleFlash[1].Bite = kidGunRight;
-            creature.MuzzleFlash[1].Delay = 2;
-            creature.Flags = 1;
-        }
+	// TODO: Inspect names.
+	enum SkateKidAnim
+	{
+		KID_ANIM_START_MOVING_1 = 0,
+		KID_ANIM_START_MOVING_2 = 1,
+		KID_ANIM_SKATE_MORESPEED_END = 2,
+		KID_ANIM_SKATE_MORESPEED = 3,
+		KID_ANIM_STOP_SKATING_1 = 4,
+		KID_ANIM_STOP_SKATING_2 = 5,
+		KID_ANIM_STOP_SKATING_FINISH = 6,
+		KID_ANIM_IDLE = 7,
+		KID_ANIM_SKATE_MORESPEED_START = 8,
+		KID_ANIM_IDLE_START_SKATE = 9,
+		KID_ANIM_IDLE_SHOOT = 10,
+		KID_ANIM_SKATE_SHOOT = 11,
+		KID_ANIM_SKATE_AIM = 12,
+		KID_ANIM_DEATH = 13
+	};
 
-        if (creature.Mood == MoodType::Escape || ai.distance < SKATEKID_TOOCLOSE_RANGE)
-            item.Animation.RequiredState = KID_STATE_SKATE;
-    }
+	static void SpawnSkateboard(ItemInfo& item)
+	{
+		int skateItemNumber = CreateItem();
+		if (skateItemNumber == NO_ITEM)
+			return;
 
-    void SkateboardKidControl(short itemNumber)
-    {
-        if (!CreatureActive(itemNumber))
-            return;
+		auto& skate = g_Level.Items[skateItemNumber];
 
-        auto& item = g_Level.Items[itemNumber];
-        auto& creature = *GetCreatureInfo(&item);
-        auto& skateboard = g_Level.Items[item.ItemFlags[0]];
-        if (skateboard.Status & ITEM_INVISIBLE)
-        {
-            skateboard.Active = false;
-            skateboard.Status &= ~(ITEM_INVISIBLE);
-        }
-        short angle = 0, headY = 0, torsoY = 0, torsoX = 0;
+		skate.ObjectNumber = ID_SKATEBOARD;
+		skate.Pose.Position = item.Pose.Position;
+		skate.Pose.Orientation = item.Pose.Orientation;
+		skate.StartPose = item.StartPose;
+		skate.Model.Color = item.Model.Color;
+		skate.Collidable = true;
 
-        if (creature.MuzzleFlash[0].Delay != 0)
-            creature.MuzzleFlash[0].Delay--;
-        if (creature.MuzzleFlash[1].Delay != 0)
-            creature.MuzzleFlash[1].Delay--;
+		InitializeItem(skateItemNumber);
+		AddActiveItem(skateItemNumber);
 
-        if (item.HitPoints <= 0 && item.Animation.ActiveState != KID_STATE_DEATH)
-        {
-            creature.MaxTurn = 0;
-            SetAnimation(item, KID_ANIM_DEATH);
-        }
-        else
-        {
-            AI_INFO ai;
-            CreatureAIInfo(&item, &ai);
-            if (ai.ahead)
-            {
-                headY = ai.angle / 2;
-                torsoY = ai.angle / 2;
-                torsoX = ai.xAngle / 2;
-            }
-            GetCreatureMood(&item, &ai, false);
-            CreatureMood(&item, &ai, false);
-            angle = CreatureTurn(&item, creature.MaxTurn);
+		skate.Active = false;
+		skate.Status |= ITEM_INVISIBLE;
+		item.ItemFlags[0] = skateItemNumber;
+	}
 
-            switch (item.Animation.ActiveState)
-            {
-            case KID_STATE_STOP:
-                creature.Flags = 0;
-                creature.MaxTurn = SKATEKID_TURN_RATE;
-                if (item.Animation.RequiredState != -1)
-                    item.Animation.TargetState = item.Animation.RequiredState;
-                else if (Targetable(&item, &ai))
-                    item.Animation.TargetState = KID_STATE_SHOOT;
-                else
-                    item.Animation.TargetState = KID_STATE_SKATE;
-                break;
-            case KID_STATE_SKATE:
-                creature.Flags = 0;
-                if (GetRandomControl() < SKATEKID_PUSH_CHANCE)
-                {
-                    item.Animation.TargetState = KID_STATE_PUSH;
-                }
-                else if (Targetable(&item, &ai))
-                {
-                    if (ai.distance > SKATEKID_DONTSTOP_RANGE && ai.distance < SKATEKID_STOP_RANGE && creature.Mood != MoodType::Escape)
-                        item.Animation.TargetState = KID_STATE_STOP;
-                    else
-                        item.Animation.TargetState = KID_STATE_SHOOT2;
-                }
-                break;
-            case KID_STATE_PUSH:
-                if (GetRandomControl() < SKATEKID_SKATE_CHANCE)
-                    item.Animation.TargetState = KID_STATE_SKATE;
-                break;
-            case KID_STATE_SHOOT:
-                SkateboardKidShoot(item, ai, headY, creature, SKATEKID_STOP_SHOT_DAMAGE);
-                break;
-            case KID_STATE_SHOOT2:
-                SkateboardKidShoot(item, ai, headY, creature, SKATEKID_SKATE_SHOT_DAMAGE);
-                break;
-            }
-        }
+	void InitializeSkateboardKid(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
 
-        skateboard.Animation.AnimNumber = Objects[ID_SKATEBOARD].animIndex + (item.Animation.AnimNumber - Objects[ID_SKATEBOARD_KID].animIndex);
-        skateboard.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase + (item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase);
-        skateboard.Pose.Position = item.Pose.Position;
-        skateboard.Pose.Orientation = item.Pose.Orientation;
-        AnimateItem(&skateboard);
+		InitializeCreature(itemNumber);
+		SpawnSkateboard(item);
+	}
 
-        CreatureJoint(&item, 0, headY);
-        CreatureJoint(&item, 1, torsoX);
-        CreatureJoint(&item, 2, torsoY);
-        CreatureAnimation(itemNumber, angle, 0);
-    }
+	static void SkateboardKidShoot(ItemInfo& item, AI_INFO& ai, short headingAngle, int damage)
+	{
+		auto& creature = *GetCreatureInfo(&item);
+
+		if (creature.Flags == 0 && Targetable(&item, &ai))
+		{
+			ShotLara(&item, &ai, KidGunBiteLeft, headingAngle, damage);
+			creature.MuzzleFlash[0].Bite = KidGunBiteLeft;
+			creature.MuzzleFlash[0].Delay = 2;
+
+			ShotLara(&item, &ai, KidGunBiteRight, headingAngle, damage);
+			creature.MuzzleFlash[1].Bite = KidGunBiteRight;
+			creature.MuzzleFlash[1].Delay = 2;
+			creature.Flags = 1;
+		}
+
+		if (creature.Mood == MoodType::Escape || ai.distance < KID_CLOSE_RANGE)
+			item.Animation.RequiredState = KID_STATE_SKATE;
+	}
+
+	void ControlSkateboardKid(short itemNumber)
+	{
+		if (!CreatureActive(itemNumber))
+			return;
+
+		auto& item = g_Level.Items[itemNumber];
+		auto& creature = *GetCreatureInfo(&item);
+		auto& skateItem = g_Level.Items[item.ItemFlags[0]];
+
+		if (skateItem.Status & ITEM_INVISIBLE)
+		{
+			skateItem.Active = false;
+			skateItem.Status &= ~(ITEM_INVISIBLE);
+		}
+
+		short headingAngle = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
+
+		if (creature.MuzzleFlash[0].Delay != 0)
+			creature.MuzzleFlash[0].Delay--;
+
+		if (creature.MuzzleFlash[1].Delay != 0)
+			creature.MuzzleFlash[1].Delay--;
+
+		if (item.HitPoints <= 0 && item.Animation.ActiveState != KID_STATE_DEATH)
+		{
+			creature.MaxTurn = 0;
+			SetAnimation(item, KID_ANIM_DEATH);
+		}
+		else
+		{
+			AI_INFO ai;
+			CreatureAIInfo(&item, &ai);
+			if (ai.ahead)
+			{
+				extraHeadRot.y = ai.angle / 2;
+				extraTorsoRot.x = ai.xAngle / 2;
+				extraTorsoRot.y = ai.angle / 2;
+			}
+
+			GetCreatureMood(&item, &ai, false);
+			CreatureMood(&item, &ai, false);
+
+			headingAngle = CreatureTurn(&item, creature.MaxTurn);
+
+			switch (item.Animation.ActiveState)
+			{
+			case KID_STATE_IDLE:
+				creature.MaxTurn = KID_TURN_RATE_MAX;
+				creature.Flags = 0;
+
+				if (item.Animation.RequiredState != -1)
+				{
+					item.Animation.TargetState = item.Animation.RequiredState;
+				}
+				else if (Targetable(&item, &ai))
+				{
+					item.Animation.TargetState = KID_STATE_SHOOT;
+				}
+				else
+				{
+					item.Animation.TargetState = KID_STATE_SKATE;
+				}
+
+				break;
+
+			case KID_STATE_SKATE:
+				creature.Flags = 0;
+
+				if (Random::TestProbability(KID_PUSH_CHANCE))
+				{
+					item.Animation.TargetState = KID_STATE_PUSH;
+				}
+				else if (Targetable(&item, &ai))
+				{
+					if (ai.distance > KID_MOVE_RANGE && ai.distance < KID_IDLE_RANGE &&
+						creature.Mood != MoodType::Escape)
+					{
+						item.Animation.TargetState = KID_STATE_IDLE;
+					}
+					else
+					{
+						item.Animation.TargetState = KID_STATE_SHOOT_2;
+					}
+				}
+
+				break;
+
+			case KID_STATE_PUSH:
+				if (Random::TestProbability(KID_PUSH_CHANCE))
+					item.Animation.TargetState = KID_STATE_SKATE;
+
+				break;
+
+			case KID_STATE_SHOOT:
+				SkateboardKidShoot(item, ai, extraHeadRot.y, KID_IDLE_SHOT_DAMAGE);
+				break;
+
+			case KID_STATE_SHOOT_2:
+				SkateboardKidShoot(item, ai, extraHeadRot.y, KID_MOVING_SHOT_DAMAGE);
+				break;
+			}
+		}
+
+		skateItem.Animation.AnimNumber = Objects[ID_SKATEBOARD].animIndex + (item.Animation.AnimNumber - Objects[ID_SKATEBOARD_KID].animIndex);
+		skateItem.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase + (item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase);
+		skateItem.Pose.Position = item.Pose.Position;
+		skateItem.Pose.Orientation = item.Pose.Orientation;
+		AnimateItem(&skateItem);
+
+		CreatureJoint(&item, 0, extraHeadRot.y);
+		CreatureJoint(&item, 1, extraTorsoRot.x);
+		CreatureJoint(&item, 2, extraTorsoRot.y);
+		CreatureAnimation(itemNumber, headingAngle, 0);
+	}
 }
