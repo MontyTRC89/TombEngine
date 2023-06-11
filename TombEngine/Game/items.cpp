@@ -191,7 +191,7 @@ void KillItem(short const itemNumber)
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNumber | 0x8000;
 		ItemNewRoomNo++;
 	}
-	else
+	else// if (NextItemActive != NO_ITEM)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
