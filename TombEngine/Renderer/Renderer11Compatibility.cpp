@@ -808,6 +808,13 @@ namespace TEN::Renderer
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
 			STATIC_INFO *obj = &StaticObjects[StaticObjectsIds[i]];
+
+			if (StaticObjectsIds[i] > MAX_STATICS)
+			{
+				TENLog("Static with ID " + std::to_string(StaticObjectsIds[i]) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ".", LogLevel::Warning);
+				continue;
+			}
+
 			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
 			RendererObject &staticObject = *m_staticObjects[StaticObjectsIds[i]];
 			staticObject.Type = 1;
