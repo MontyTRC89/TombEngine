@@ -10,6 +10,11 @@ Version 1.0.10
 * Fix clockwork beetle activation crashing the game.
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
+* Fix winged mutant:
+- Zone detection which now allow him to fly correctly.
+- Spawn point for the dart and bomb.
+- Damage being in continue.
+- Damage detection more consistant.
 
 Version 1.0.9
 =============
