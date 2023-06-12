@@ -10,6 +10,7 @@
 
 // Creatures
 #include "Objects/TR1/Entity/Cowboy.h" // OK
+#include "Objects/TR1/Entity/Kold.h" // OK
 #include "Objects/TR1/Entity/tr1_ape.h" // OK
 #include "Objects/TR1/Entity/tr1_bear.h" // OK
 #include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
@@ -180,6 +181,20 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_KOLD];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeKold;
+		obj->control = KoldControl;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->HitPoints = 150;
+		obj->intelligent = true;
 		obj->SetupHitEffect();
 	}
 }
