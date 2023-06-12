@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR1/Entity/SkateboardKid.h"
 
+#include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/misc.h"
@@ -125,11 +126,11 @@ namespace TEN::Entities::Creatures::TR1
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
 
-		if (creature.MuzzleFlash[0].Delay != 0)
-			creature.MuzzleFlash[0].Delay--;
-
-		if (creature.MuzzleFlash[1].Delay != 0)
-			creature.MuzzleFlash[1].Delay--;
+		for (auto& flash : creature.MuzzleFlash)
+		{
+			if (flash.Delay != 0)
+				flash.Delay--;
+		}
 
 		if (item.HitPoints <= 0 && item.Animation.ActiveState != KID_STATE_DEATH)
 		{
@@ -140,6 +141,7 @@ namespace TEN::Entities::Creatures::TR1
 		{
 			AI_INFO ai;
 			CreatureAIInfo(&item, &ai);
+
 			if (ai.ahead)
 			{
 				extraHeadRot.y = ai.angle / 2;
@@ -158,7 +160,7 @@ namespace TEN::Entities::Creatures::TR1
 				creature.MaxTurn = KID_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState != -1)
+				if (item.Animation.RequiredState != NO_STATE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
