@@ -159,7 +159,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 150;
 		obj->radius = BLOCK(1 / 3.0f);
-		obj->HitPoints = 1;
+		obj->HitPoints = 50;
 		obj->intelligent = true;
 		obj->LotType = LotType::Flyer;
 		obj->SetBoneRotationFlags(1, ROT_Y);
