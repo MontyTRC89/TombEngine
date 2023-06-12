@@ -4,6 +4,8 @@
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "tr5_missile.h"
+#include "Game/Lara/lara.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/effects/tomb4fx.h"
@@ -13,6 +15,18 @@ using namespace TEN::Math::Random;
 
 constexpr int BODY_PART_LIFE = 64;
 constexpr int BOUNCE_FALLSPEED = 32;
+constexpr auto BODY_PART_EXPLODE_DAMAGE = 50;
+constexpr auto BODY_PART_EXPLODE_DAMAGE_RANGE = CLICK(3.0f);
+
+// TODO: Remove the LaraItem global - TokyoSU: 12/6/2023
+static void BodyPartExplode(FX_INFO* fx)
+{
+	TriggerExplosionSparks(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 3, -2, 0, fx->roomNumber);
+	TriggerExplosionSparks(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 3, -1, 0, fx->roomNumber);
+	TriggerShockwave(&fx->pos, 48, 304, (GetRandomControl() & 0x1F) + 112, 128, 32, 32, 32, EulerAngles(2048.0f, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+	if (ItemNearLara(fx->pos.Position, BODY_PART_EXPLODE_DAMAGE_RANGE))
+		DoDamage(LaraItem, BODY_PART_EXPLODE_DAMAGE);
+}
 
 void ControlBodyPart(short fxNumber)
 {
@@ -54,11 +68,11 @@ void ControlBodyPart(short fxNumber)
 	fx->pos.Position.y += fallspeed;
 	fx->pos.Position.z += speed * phd_cos(fx->pos.Orientation.y);
 
-	if ((fx->flag2 & BODY_EXPLODE) &&
+	if ((fx->flag2 & BODY_EXPLODE) && !(fx->flag2 & BODY_NOFLAME) &&
 		!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
 	{
 		if (GenerateInt(0, 10) > (abs(fx->fallspeed) > 0 ? 5 : 8))
-			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, FlameType::Big);
+			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, FlameType::Medium);
 	}
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
@@ -80,11 +94,17 @@ void ControlBodyPart(short fxNumber)
 				fx->pos.Position.y = y;
 				fx->pos.Position.z = z;
 
-				if (fx->flag2 & BODY_NO_BOUNCE_ALT)
-					ExplodeFX(fx, -2, 32);
-				else
-					ExplodeFX(fx, -1, 32);
-
+				if (!(fx->flag2 & BODY_NOSHATTEREFFECT))
+				{
+					if (fx->flag2 & BODY_NO_BOUNCE_ALT)
+						ExplodeFX(fx, -2, 32);
+					else
+						ExplodeFX(fx, -1, 32);
+				}
+				
+				// Remove the part if it touched the floor (no bounce mode)
+				if (fx->flag2 & BODY_PART_EXPLODE)
+					BodyPartExplode(fx);
 				KillEffect(fxNumber);
 
 				if (fx->flag2 & BODY_STONE_SOUND)
@@ -95,6 +115,12 @@ void ControlBodyPart(short fxNumber)
 
 			if (y <= probe.Position.Floor)
 			{
+				// Remove the part if it touched the floor (no bounce mode)
+				if (fx->flag2 & BODY_PART_EXPLODE)
+				{
+					BodyPartExplode(fx);
+					KillEffect(fxNumber);
+				}
 				if (fx->fallspeed <= BOUNCE_FALLSPEED)
 					fx->fallspeed = 0;
 				else
@@ -125,14 +151,19 @@ void ControlBodyPart(short fxNumber)
 
 		if (!fx->speed && ++fx->flag1 > BODY_PART_LIFE)
 		{
-			for (int i = 0; i < 6; i++)
+			if (!(fx->flag2 & BODY_NOSMOKE))
 			{
-				TriggerFlashSmoke(fx->pos.Position.x + GenerateInt(-16, 16), 
-								  fx->pos.Position.y + GenerateInt( 16, 32),
-								  fx->pos.Position.z + GenerateInt(-16, 16), fx->roomNumber);
+				for (int i = 0; i < 6; i++)
+				{
+					TriggerFlashSmoke(fx->pos.Position.x + GenerateInt(-16, 16),
+						fx->pos.Position.y + GenerateInt(16, 32),
+						fx->pos.Position.z + GenerateInt(-16, 16), fx->roomNumber);
+				}
 			}
-
-			ExplodeFX(fx, -1, 32);
+			if (fx->flag2 & BODY_PART_EXPLODE)
+				BodyPartExplode(fx);
+			if (!(fx->flag2 & BODY_NOSHATTEREFFECT))
+				ExplodeFX(fx, -1, 32);
 			KillEffect(fxNumber);
 			return;
 		}
@@ -164,6 +195,11 @@ void ControlBodyPart(short fxNumber)
 			SplashSetup.splashPower = fx->fallspeed;
 			SplashSetup.innerRadius = 48;
 			SetupSplash(&SplashSetup, probe.RoomNumber);
+			if (fx->flag2 & BODY_PART_EXPLODE) // Remove the part if it touched water !
+			{
+				BodyPartExplode(fx);
+				KillEffect(fxNumber);
+			}
 		}
 
 		EffectNewRoom(fxNumber, probe.RoomNumber);

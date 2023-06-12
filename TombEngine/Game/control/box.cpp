@@ -790,33 +790,42 @@ void CreatureHealth(ItemInfo* item)
 
 void CreatureDie(short itemNumber, bool explode)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	auto* object = &Objects[item->ObjectNumber];
+	short flags = 0;
+	if (explode)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		auto& object = Objects[item.ObjectNumber];
+		switch (object.hitEffect)
+		{
+		case HitEffect::Blood:
+			flags |= BODY_EXPLODE | BODY_GIBS;
+			break;
+		case HitEffect::Smoke:
+			flags |= BODY_EXPLODE | BODY_NO_BOUNCE;
+			break;
+		default:
+			flags |= BODY_EXPLODE;
+			break;
+		}
+	}
+	CreatureDie(itemNumber, explode, flags);
+}
 
+void CreatureDie(short itemNumber, bool explode, short flags)
+{
+	auto* item = &g_Level.Items[itemNumber];
 	item->HitPoints = NOT_TARGETABLE;
 	item->Collidable = false;
 
 	if (explode)
 	{
-		switch (object->hitEffect)
-		{
-		case HitEffect::Blood:
-			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_GIBS);
-			break;
-
-		case HitEffect::Smoke:
-			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
-			break;
-
-		default:
-			ExplodingDeath(itemNumber, BODY_EXPLODE);
-			break;
-		}
-
+		ExplodingDeath(itemNumber, flags);
 		KillItem(itemNumber);
 	}
 	else
+	{
 		RemoveActiveItem(itemNumber);
+	}
 
 	DisableEntityAI(itemNumber);
 	item->Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;

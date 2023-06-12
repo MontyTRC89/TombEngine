@@ -99,6 +99,7 @@ void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle =
 void CreatureTilt(ItemInfo* item, short angle);
 short CreatureTurn(ItemInfo* item, short maxTurn);
 void CreatureDie(short itemNumber, bool explode);
+void CreatureDie(short itemNumber, bool explode, short flags);
 bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
 int CreatureCreature(short itemNumber);
 bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber);

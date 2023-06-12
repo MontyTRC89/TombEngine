@@ -15,6 +15,8 @@ Version 1.0.10
 - Spawn point for the dart and bomb.
 - Damage being in continue.
 - Damage detection more consistant.
+- Explosion effect being like TR4 now.
+- Body part now can explode and damage lara.
 
 Version 1.0.9
 =============

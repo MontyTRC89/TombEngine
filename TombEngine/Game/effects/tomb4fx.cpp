@@ -30,6 +30,9 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
+// NOTE: This fix the body part exploding instantly if the creature (or item) is on ground.
+constexpr auto BODY_PART_SPAWN_Y_ADDER = CLICK(1);
+
 char LaserSightActive = 0;
 char LaserSightCol = 0;
 int NextGunshell = 0;
@@ -1192,6 +1195,10 @@ void ExplodingDeath(short itemNumber, short flags)
 	
 	auto world = item->Pose.Orientation.ToRotationMatrix();
 
+	// If by a small chance only the BODY_PART_EXPLODE flags exist but not BODY_EXPLODE, add it because it's required !
+	if ((flags & BODY_PART_EXPLODE) && !(flags & BODY_EXPLODE))
+		flags |= BODY_EXPLODE;
+
 	for (int i = 0; i < obj->nmeshes; i++)
 	{
 		Matrix boneMatrix;
@@ -1211,26 +1218,26 @@ void ExplodingDeath(short itemNumber, short flags)
 				FX_INFO* fx = &EffectList[fxNumber];
 
 				fx->pos.Position.x = boneMatrix.Translation().x;
-				fx->pos.Position.y = boneMatrix.Translation().y;
+				fx->pos.Position.y = boneMatrix.Translation().y - BODY_PART_SPAWN_Y_ADDER;
 				fx->pos.Position.z = boneMatrix.Translation().z;
 
 				fx->roomNumber = item->RoomNumber;
 				fx->pos.Orientation.x = 0;
-				fx->pos.Orientation.y = GetRandomControl() * 2;
+				fx->pos.Orientation.y = Random::GenerateAngle();
 
-				if (!(flags & 0x10))
+				if (!(flags & BODY_NORANDSPEED))
 				{
-					if (flags & 0x20)
+					if (flags & BODY_MORERANDSPEED)
 						fx->speed = GetRandomControl() >> 12;
 					else
 						fx->speed = GetRandomControl() >> 8;
 				}
 
-				if (flags & 0x40)
+				if (flags & BODY_NOFALLSPEED)
 					fx->fallspeed = 0;
 				else
 				{
-					if ((flags & 0x80) == 0)
+					if (flags & BODY_LESSIMPULSE)
 						fx->fallspeed = -(GetRandomControl() >> 8);
 					else
 						fx->fallspeed = -(GetRandomControl() >> 12);

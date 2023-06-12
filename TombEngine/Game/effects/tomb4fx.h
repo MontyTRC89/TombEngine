@@ -10,11 +10,19 @@ struct ItemInfo;
 
 enum BodyPartFlags
 {
-	BODY_NO_BOUNCE	   = (1 << 0),
-	BODY_GIBS		   = (1 << 1),
-	BODY_EXPLODE	   = (1 << 8),
-	BODY_NO_BOUNCE_ALT = (1 << 9),
-	BODY_STONE_SOUND   = (1 << 11)
+	BODY_NO_BOUNCE			= (1 << 0), // No more bounce for the part.
+	BODY_GIBS				= (1 << 1), // Add blood to the body part, also add the SFX_TR4_LARA_THUD when colliding on floor.
+	BODY_PART_EXPLODE		= (1 << 2), // TR1 atlantean effect (body part will explode upon impact). (BODY_EXPLODE is required !)
+	BODY_NOFLAME			= (1 << 3), // Remove the flame on the body part.
+	BODY_NORANDSPEED		= (1 << 4), // Remove the random speed.
+	BODY_MORERANDSPEED		= (1 << 5), // Add more random for speed.
+	BODY_NOFALLSPEED		= (1 << 6), // Remove the fallspeed.
+	BODY_LESSIMPULSE		= (1 << 7), // Add less fallspeed than normal.
+	BODY_EXPLODE			= (1 << 8), // Do the body explode ?
+	BODY_NO_BOUNCE_ALT		= (1 << 9), // Same as no bounce, but it's not shattered right away, it wait some time before disappearing.
+	BODY_STONE_SOUND		= (1 << 11), // Do the impact for the body part is stone instead of nothing ? (PS: BODY_GIBS also add sound, but this one is prioritary)
+	BODY_NOSMOKE			= (1 << 12),  // Remove the smoke when the body part die or shatter.
+	BODY_NOSHATTEREFFECT	= (1 << 13), // Remove the shatter effect when the body part die.
 };
 
 struct Matrix3D
@@ -254,7 +262,7 @@ int GetFreeGunshell();
 void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
-void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
+void ExplodingDeath(short itemNumber, short flags); // BODY_ flags
 int GetFreeShockwave();
 void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);

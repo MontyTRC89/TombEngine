@@ -40,8 +40,8 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	= ANGLE(6.0f);
 
-	const auto WingedMutantBiteLeftHand		= CreatureBiteInfo(Vector3i(-35, 98, 0), 7);
-	const auto WingedMutantBiteRightHand	= CreatureBiteInfo(Vector3i(35, 98, 0), 10);
+	const auto WingedMutantBiteLeftHand		= CreatureBiteInfo(Vector3i(0, 0, 0), 7);
+	const auto WingedMutantBiteRightHand	= CreatureBiteInfo(Vector3i(0, 0, 0), 10);
 	const auto WingedMutantRocketBite		= CreatureBiteInfo(Vector3i(0, 200, 20), 6);
 	const auto WingedMutantShardBite		= CreatureBiteInfo(Vector3i(0, 200, 20), 9);
 	const auto WingedMutantHeadJoints		= std::vector<unsigned int>{ 3 };
@@ -131,7 +131,7 @@ namespace TEN::Entities::Creatures::TR1
 		WMUTANT_CONF_DISABLE_BOMB_WEAPON
 	};
 
-	void SwitchPathfinding(CreatureInfo* creature, WingedMutantPathFinding path)
+	static void SwitchPathfinding(CreatureInfo* creature, WingedMutantPathFinding path)
 	{
 		switch (path)
 		{
@@ -151,7 +151,7 @@ namespace TEN::Entities::Creatures::TR1
 		}
 	}
 
-	WingedMutantProjectileType CanTargetLara(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
+	static WingedMutantProjectileType CanTargetLara(ItemInfo* item, CreatureInfo* creature, AI_INFO* AI)
 	{
 		if (Targetable(item, AI) && (AI->zoneNumber != AI->enemyZone || AI->distance > WINGED_MUTANT_RANGED_ATTACK_RANGE))
 		{
@@ -171,7 +171,7 @@ namespace TEN::Entities::Creatures::TR1
 		return WMUTANT_PROJ_NONE;
 	}
 
-	void WingedInitOCB(ItemInfo* item, CreatureInfo* creature)
+	static void WingedInitOCB(ItemInfo* item, CreatureInfo* creature)
 	{
 		if (item->TestOcb(WMUTANT_OCB_START_AERIAL))
 		{
@@ -250,7 +250,12 @@ namespace TEN::Entities::Creatures::TR1
 
 		if (item->HitPoints <= 0)
 		{
-			CreatureDie(itemNumber, true);
+			CreatureDie(itemNumber, true, BODY_EXPLODE | BODY_PART_EXPLODE | BODY_NOSMOKE | BODY_NOSHATTEREFFECT);
+			auto pos = item->Pose;
+			pos.Position.y -= CLICK(3);
+			TriggerExplosionSparks(pos.Position.x, pos.Position.y, pos.Position.z, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(pos.Position.x, pos.Position.y, pos.Position.z, 3, -1, 0, item->RoomNumber);
+			TriggerShockwave(&pos, 48, 304, (GetRandomControl() & 0x1F) + 112, 128, 32, 32, 32, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 			SoundEffect(SFX_TR1_ATLANTEAN_EXPLODE, &item->Pose);
 			return;
 		}
@@ -300,16 +305,16 @@ namespace TEN::Entities::Creatures::TR1
 					item->SetFlagField(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_AERIAL);
 					item->Animation.TargetState = WMUTANT_STATE_FLY;
 				}
-				else if (shootType == WMUTANT_PROJ_DART)
-					item->Animation.TargetState = WMUTANT_STATE_AIM_DART;
-				else if (shootType == WMUTANT_PROJ_BOMB)
-					item->Animation.TargetState = WMUTANT_STATE_AIM_BOMB;
 				else if (item->TouchBits.Test(WingedMutantHeadJoints))
 					item->Animation.TargetState = WMUTANT_STATE_SWIPE_ATTACK;
 				else if (AI.bite && AI.distance < WINGED_MUTANT_IDLE_JUMP_ATTACK_RANGE)
 					item->Animation.TargetState = WMUTANT_STATE_IDLE_JUMP_ATTACK;
 				else if (AI.bite && AI.distance < WINGED_MUTANT_SWIPE_ATTACK_RANGE)
 					item->Animation.TargetState = WMUTANT_STATE_SWIPE_ATTACK;
+				else if (shootType == WMUTANT_PROJ_DART)
+					item->Animation.TargetState = WMUTANT_STATE_AIM_DART;
+				else if (shootType == WMUTANT_PROJ_BOMB)
+					item->Animation.TargetState = WMUTANT_STATE_AIM_BOMB;
 				else if (creature->Mood == MoodType::Bored ||
 					(creature->Mood == MoodType::Stalk && AI.distance < WINGED_MUTANT_POSE_RANGE))
 				{
@@ -481,6 +486,7 @@ namespace TEN::Entities::Creatures::TR1
 			case WMUTANT_STATE_FLY:
 				if (creature->Mood != MoodType::Escape && sameZoneInGroundMode)
 				{
+					item->Pose.Position.y = item->Floor;
 					item->SetFlagField(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_GROUND);
 					item->Animation.TargetState = WMUTANT_STATE_IDLE; // Switch to ground mode.
 				}
