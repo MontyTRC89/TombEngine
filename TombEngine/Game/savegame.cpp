@@ -291,7 +291,6 @@ bool SaveGame::Save(int slot)
 	leftArm.add_anim_number(Lara.LeftArm.AnimNumber);
 	leftArm.add_gun_flash(Lara.LeftArm.GunFlash);
 	leftArm.add_gun_smoke(Lara.LeftArm.GunSmoke);
-	leftArm.add_frame_base(Lara.LeftArm.FrameBase);
 	leftArm.add_frame_number(Lara.LeftArm.FrameNumber);
 	leftArm.add_locked(Lara.LeftArm.Locked);
 	leftArm.add_rotation(&FromVector3(Lara.LeftArm.Orientation));
@@ -301,7 +300,6 @@ bool SaveGame::Save(int slot)
 	rightArm.add_anim_number(Lara.RightArm.AnimNumber);
 	rightArm.add_gun_flash(Lara.RightArm.GunFlash);
 	rightArm.add_gun_smoke(Lara.RightArm.GunSmoke);
-	rightArm.add_frame_base(Lara.RightArm.FrameBase);
 	rightArm.add_frame_number(Lara.RightArm.FrameNumber);
 	rightArm.add_locked(Lara.RightArm.Locked);
 	rightArm.add_rotation(&FromVector3(Lara.RightArm.Orientation));
@@ -1958,7 +1956,6 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
 	Lara.LeftArm.GunFlash = s->lara()->left_arm()->gun_flash();
 	Lara.LeftArm.GunSmoke = s->lara()->left_arm()->gun_smoke();
-	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
 	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
@@ -1969,7 +1966,6 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
 	Lara.RightArm.GunSmoke = s->lara()->right_arm()->gun_smoke();
-	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
 	Lara.RightArm.Orientation = ToEulerAngles(s->lara()->right_arm()->rotation());

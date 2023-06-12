@@ -301,8 +301,8 @@ void SetFlareArm(ItemInfo& laraItem, int armFrame)
 		flareAnimNumber = 1;
 	}
 
+	player.LeftArm.AnimObjectID = animObjectID;
 	player.LeftArm.AnimNumber = flareAnimNumber;
-	player.LeftArm.FrameBase = GetAnimData(animObjectID, flareAnimNumber).FramePtr;
 }
 
 void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
@@ -315,6 +315,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 
 	auto& flareItem = g_Level.Items[itemNumber];
 
+	flareItem.Animation.AnimObjectID = flareItem.ObjectNumber;
 	flareItem.ObjectNumber = objectID;
 	flareItem.RoomNumber = laraItem.RoomNumber;
 

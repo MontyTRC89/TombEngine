@@ -171,7 +171,7 @@ namespace TEN::Entities::Generic
 		if (lara->Flare.ControlLeft)
 			lara->Control.HandStatus = HandStatus::WeaponReady;
 
-		lara->LeftArm.FrameBase = GetAnimData(animObject, lara->LeftArm.AnimNumber).FramePtr;
+		lara->LeftArm.AnimObjectID = ID_LARA_TORCH_ANIM;
 
 		if (lara->Torch.IsLit)
 		{
@@ -200,10 +200,9 @@ namespace TEN::Entities::Generic
 		lara->Flare.ControlLeft = true;
 		lara->LeftArm.Locked = false;
 		lara->LeftArm.AnimObjectID = ID_LARA_TORCH_ANIM;
+		lara->LeftArm.AnimObjectID = ID_LARA_TORCH_ANIM;
 		lara->LeftArm.AnimNumber = 0;
 		lara->LeftArm.FrameNumber = 0;
-		lara->LeftArm.FrameBase = GetAnimData(animObject, lara->LeftArm.AnimNumber).FramePtr;
-
 		laraItem->Model.MeshIndex[LM_LHAND] = animObject.meshIndex + LM_LHAND;
 	}
 

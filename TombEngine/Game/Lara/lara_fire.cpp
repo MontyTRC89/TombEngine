@@ -302,9 +302,6 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 	{
 	case LaraWeaponType::Pistol:
 	case LaraWeaponType::Uzi:
-		player.LeftArm.FrameBase =
-		player.RightArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-
 		if (player.Control.HandStatus != HandStatus::Free)
 			DrawPistolMeshes(laraItem, player.Control.Weapon.GunType);
 
@@ -316,26 +313,18 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 	case LaraWeaponType::GrenadeLauncher:
 	case LaraWeaponType::HarpoonGun:
 	case LaraWeaponType::RocketLauncher:
-		player.LeftArm.FrameBase =
-		player.RightArm.FrameBase = Objects[GetWeaponObjectID(player.Control.Weapon.GunType)].frameBase;
-
 		if (player.Control.HandStatus != HandStatus::Free)
 			DrawShotgunMeshes(laraItem, player.Control.Weapon.GunType);
 
 		break;
 
 	case LaraWeaponType::Flare:
-		player.LeftArm.FrameBase =
-		player.RightArm.FrameBase = Objects[ID_FLARE_ANIM].frameBase;
-
 		if (player.Control.HandStatus != HandStatus::Free)
 			DrawFlareMeshes(laraItem);
 
 		break;
 
 	default:
-		player.LeftArm.FrameBase =
-		player.RightArm.FrameBase = GetAnimData(laraItem).FramePtr;
 		break;
 	}
 }

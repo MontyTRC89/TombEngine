@@ -133,10 +133,10 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		}
 
 		auto& leftArmAnim = GetAnimData(Lara.LeftArm.AnimObjectID, Lara.LeftArm.AnimNumber);
-		auto& leftArmFrame = g_Level.Frames[(Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber) - leftArmAnim.frameBase];
-		
+		auto& leftArmFrame = g_Level.Frames[(leftArmAnim.FramePtr + Lara.LeftArm.FrameNumber) - leftArmAnim.frameBase];
+
 		auto& rightArmAnim = GetAnimData(Lara.RightArm.AnimObjectID, Lara.RightArm.AnimNumber);
-		auto& rightArmFrame = g_Level.Frames[(Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber) - rightArmAnim.frameBase];
+		auto& rightArmFrame = g_Level.Frames[(rightArmAnim.FramePtr + Lara.RightArm.FrameNumber) - rightArmAnim.frameBase];
 
 		// HACK: Back guns are handled differently.
 		switch (Lara.Control.Weapon.GunType)
@@ -154,7 +154,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			const auto& frameLeft = g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
+			const auto& frameLeft = g_Level.Frames[leftArmAnim.FramePtr + Lara.LeftArm.FrameNumber];
 			auto frameDataLeft = AnimFrameInterpData(frameLeft, frameLeft, 0.0f);
 			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
 
@@ -163,7 +163,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			const auto& frameRight = g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
+			const auto& frameRight = g_Level.Frames[rightArmAnim.FramePtr + Lara.RightArm.FrameNumber];
 			auto frameDataRight = AnimFrameInterpData(frameRight, frameRight, 0.0f);
 			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
 		}
