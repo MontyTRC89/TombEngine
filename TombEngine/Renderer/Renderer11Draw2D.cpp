@@ -309,9 +309,58 @@ namespace TEN::Renderer
 		m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
 		m_context->ClearRenderTargetView(target, Colors::Black);
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		m_context->OMSetRenderTargets(1, &target, depthTarget);
+		m_context->OMSetRenderTargets(1, m_tempRT.RenderTargetView.GetAddressOf(), depthTarget);
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
+
+		m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
+		m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
+		m_toneMap->SetExposure(-1.5f);
+		m_toneMap->SetHDRSourceTexture(m_renderTarget.ShaderResourceView.Get());
+		m_toneMap->Process(m_context.Get());
+
+		// Pass 1 (scene->blur1)
+		m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
+		m_basicPostProcess->SetBloomExtractParameter(0.25f);
+
+		auto blurRT1 = m_blur1RT.RenderTargetView.Get();
+		m_context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+		m_basicPostProcess->SetSourceTexture(m_tempRT.ShaderResourceView.Get());
+		m_basicPostProcess->Process(m_context.Get());
+
+		// Pass 2 (blur1 -> blur2)
+		m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
+		m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
+
+		auto blurRT2 = m_blur2RT.RenderTargetView.Get();
+		m_context->OMSetRenderTargets(1, &blurRT2, nullptr);
+
+		m_basicPostProcess->SetSourceTexture(m_blur1RT.ShaderResourceView.Get());
+		m_basicPostProcess->Process(m_context.Get());
+
+		// Pass 3 (blur2 -> blur1)
+		m_basicPostProcess->SetBloomBlurParameters(false, 4.f, 1.f);
+
+		ID3D11ShaderResourceView* nullsrv[] = { nullptr, nullptr };
+		m_context->PSSetShaderResources(0, 2, nullsrv);
+
+		m_context->OMSetRenderTargets(1, &blurRT1, nullptr);
+
+		m_basicPostProcess->SetSourceTexture(m_blur2RT.ShaderResourceView.Get());
+		m_basicPostProcess->Process(m_context.Get());
+
+		// Pass 4 (scene+blur1 -> rt)
+		m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
+		m_dualPostProcess->SetBloomCombineParameters(1.25f, 1.f, 1.f, 1.f);
+
+		m_context->OMSetRenderTargets(1, &target, nullptr);
+
+		m_dualPostProcess->SetSourceTexture(m_tempRT.ShaderResourceView.Get());
+		m_dualPostProcess->SetSourceTexture2(m_blur1RT.ShaderResourceView.Get());
+		m_dualPostProcess->Process(m_context.Get());
+
+		return;
 
 		RendererVertex vertices[4];
 

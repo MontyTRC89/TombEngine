@@ -18,7 +18,7 @@ float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
 			float3 reflectDir = reflect(lightDir, n);
 
 			float3 color = light.Color.xyz;
-			float intensity = saturate(light.Intensity);
+			float intensity = (light.Intensity);
 			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
 			float attenuation = (radius - dist) / radius;
 
@@ -37,7 +37,7 @@ float3 DoSpecularSun(float3 n, ShaderLight light, float strength)
 		float3 reflectDir = reflect(lightDir, n);
 
 		float3 color = light.Color.xyz;
-		float intensity = saturate(light.Intensity);
+		float intensity = (light.Intensity);
 		float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
 
 		return spec * color * intensity;
@@ -62,7 +62,7 @@ float3 DoSpecularSpot(float3 pos, float3 n, ShaderLight light, float strength)
 			float3 reflectDir = reflect(lightDir, n);
 
 			float3 color = light.Color.xyz;
-			float intensity = saturate(light.Intensity);
+			float intensity = (light.Intensity);
 			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
 			float attenuation = (radius - dist) / radius;
 
@@ -75,7 +75,7 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 lightPos = light.Position.xyz;
 	float3 color = light.Color.xyz;
-	float intensity = saturate(light.Intensity);
+	float intensity = (light.Intensity);
 
 	float3 lightVec = (lightPos - pos);
 	float distance = length(lightVec);
@@ -91,7 +91,7 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 		if (distance > light.In)
 			attenuation = 1.0f - saturate((distance - light.In) / (light.Out - light.In));
 
-		return saturate(color * intensity * attenuation * d);
+		return (color * intensity * attenuation * d);
 	}
 }
 
@@ -155,12 +155,12 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 			float minCosineOut = cos(coneOut * (PI / 180.0f));
 			float attenuationOut = max((cosine - minCosineOut), 0.0f) / (1.0f - minCosineOut);
 
-			float attenuation = saturate(attenuationIn * 2.0f + attenuationOut);
+			float attenuation = (attenuationIn * 2.0f + attenuationOut);
 			
 			if (attenuation > 0.0f)
 			{
 				float falloff = saturate((outerRange - distance) / (outerRange - innerRange + 1.0f));
-				return saturate(color * intensity * attenuation * falloff * d);
+				return (color * intensity * attenuation * falloff * d);
 			}
 			else
 				return float3(0, 0, 0);

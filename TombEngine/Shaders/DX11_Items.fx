@@ -111,7 +111,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 			input.FogBulbs.w) :
 		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
-	output.Color = saturate(float4(color, tex.w));
+	output.Color = (float4(color, tex.w));
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 

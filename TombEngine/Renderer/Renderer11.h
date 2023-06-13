@@ -4,6 +4,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+#include <PostProcess.h>
 
 #include "Math/Math.h"
 #include "Game/control/box.h"
@@ -491,6 +492,14 @@ namespace TEN::Renderer
 
 		int m_numCheckPortalCalls;
 		int m_numGetVisibleRoomsCalls;
+
+		// Post processng
+		std::unique_ptr<ToneMapPostProcess> m_toneMap;
+		std::unique_ptr< BasicPostProcess> m_basicPostProcess;
+		std::unique_ptr< DualPostProcess> m_dualPostProcess;
+		RenderTarget2D m_blur1RT;
+		RenderTarget2D m_blur2RT;
+		RenderTarget2D m_tempRT;
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
