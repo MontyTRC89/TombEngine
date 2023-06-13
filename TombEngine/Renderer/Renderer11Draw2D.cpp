@@ -309,13 +309,13 @@ namespace TEN::Renderer
 		m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
 		m_context->ClearRenderTargetView(target, Colors::Black);
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		m_context->OMSetRenderTargets(1, m_tempRT.RenderTargetView.GetAddressOf(), depthTarget);
+		m_context->OMSetRenderTargets(1, m_tempRT.RenderTargetView.GetAddressOf(), nullptr);
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
 		m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
 		m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
-		m_toneMap->SetExposure(-1.5f);
+		m_toneMap->SetExposure(-1.0f);
 		m_toneMap->SetHDRSourceTexture(m_renderTarget.ShaderResourceView.Get());
 		m_toneMap->Process(m_context.Get());
 
