@@ -23,16 +23,16 @@ namespace TEN::Entities::Creatures::TR1
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
 			auto* currentItem = &g_Level.Items[i];
-			if (currentItem->ObjectNumber == objectNumber && currentItem->RoomNumber == item->RoomNumber)
+			if (currentItem->ObjectNumber == objectNumber && item->TriggerFlags == currentItem->TriggerFlags)
 			{
 				itemNumber = i;
 				found = true;
+				break;
 			}
 		}
 
 		if (!found)
 			itemNumber = NO_ITEM;
-
 		return (itemNumber == NO_ITEM ? nullptr : &g_Level.Items[itemNumber]);
 	}
 
@@ -80,7 +80,6 @@ namespace TEN::Entities::Creatures::TR1
 			item->Pose.Orientation.x = LaraItem->Pose.Orientation.x;
 			item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - ANGLE(180.0f);
 			item->Pose.Orientation.z = LaraItem->Pose.Orientation.z;
-			ItemNewRoom(itemNumber, LaraItem->RoomNumber);
 
 			// Compare floor heights.
 			if (item->Floor >= (laraFloorHeight + SECTOR(1) + 1) && // Add 1 to avoid bacon Lara dying when exiting water.
@@ -97,9 +96,7 @@ namespace TEN::Entities::Creatures::TR1
 
 		if (item->Data)
 		{
-			AnimateItem(item);
 			TestTriggers(item, true);
-
 			item->Floor = GetCollision(item).Position.Floor;
 			if (item->Pose.Position.y >= item->Floor)
 			{
@@ -112,6 +109,9 @@ namespace TEN::Entities::Creatures::TR1
 				item->Animation.Velocity.y = 0.0f;
 			}
 		}
+
+		ItemNewRoom(itemNumber, LaraItem->RoomNumber);
+		AnimateItem(item);
 	}
 
 	// TODO: DrawLara not exist ! use Renderer11.cpp DrawLara instead or create DrawLara() function with old behaviour.
