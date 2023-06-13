@@ -30,8 +30,8 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
-// NOTE: This fix the body part exploding instantly if the creature (or item) is on ground.
-constexpr auto BODY_PART_SPAWN_Y_ADDER = CLICK(1);
+// NOTE: This fixes body part exploding instantly if entity is on ground.
+constexpr auto BODY_PART_SPAWN_VERTICAL_OFFSET = CLICK(1);
 
 char LaserSightActive = 0;
 char LaserSightCol = 0;
@@ -1171,7 +1171,7 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	ExplodingDeath(lara->Context.Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
+	ExplodingDeath(lara->Context.Vehicle, BODY_DO_EXPLOSION | BODY_STONE_SOUND);
 	KillItem(lara->Context.Vehicle);
 	vehicle->Status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
@@ -1195,9 +1195,9 @@ void ExplodingDeath(short itemNumber, short flags)
 	
 	auto world = item->Pose.Orientation.ToRotationMatrix();
 
-	// If by a small chance only the BODY_PART_EXPLODE flags exist but not BODY_EXPLODE, add it because it's required !
-	if ((flags & BODY_PART_EXPLODE) && !(flags & BODY_EXPLODE))
-		flags |= BODY_EXPLODE;
+	// If only BODY_PART_EXPLODE flag exists but not BODY_EXPLODE, add it.
+	if ((flags & BODY_PART_EXPLODE) && !(flags & BODY_DO_EXPLOSION))
+		flags |= BODY_DO_EXPLOSION;
 
 	for (int i = 0; i < obj->nmeshes; i++)
 	{
@@ -1210,7 +1210,7 @@ void ExplodingDeath(short itemNumber, short flags)
 
 		item->MeshBits.Clear(i);
 
-		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_EXPLODE)))
+		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_DO_EXPLOSION)))
 		{
 			short fxNumber = CreateNewEffect(item->RoomNumber);
 			if (fxNumber != NO_ITEM)
@@ -1218,26 +1218,26 @@ void ExplodingDeath(short itemNumber, short flags)
 				FX_INFO* fx = &EffectList[fxNumber];
 
 				fx->pos.Position.x = boneMatrix.Translation().x;
-				fx->pos.Position.y = boneMatrix.Translation().y - BODY_PART_SPAWN_Y_ADDER;
+				fx->pos.Position.y = boneMatrix.Translation().y - BODY_PART_SPAWN_VERTICAL_OFFSET;
 				fx->pos.Position.z = boneMatrix.Translation().z;
 
 				fx->roomNumber = item->RoomNumber;
 				fx->pos.Orientation.x = 0;
 				fx->pos.Orientation.y = Random::GenerateAngle();
 
-				if (!(flags & BODY_NORANDSPEED))
+				if (!(flags & BODY_NO_RAND_VELOCITY))
 				{
-					if (flags & BODY_MORERANDSPEED)
+					if (flags & BODY_MORE_RAND_VELOCITY)
 						fx->speed = GetRandomControl() >> 12;
 					else
 						fx->speed = GetRandomControl() >> 8;
 				}
 
-				if (flags & BODY_NOFALLSPEED)
+				if (flags & BODY_NO_VERTICAL_VELOCITY)
 					fx->fallspeed = 0;
 				else
 				{
-					if (flags & BODY_LESSIMPULSE)
+					if (flags & BODY_LESS_IMPULSE)
 						fx->fallspeed = -(GetRandomControl() >> 8);
 					else
 						fx->fallspeed = -(GetRandomControl() >> 12);

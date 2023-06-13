@@ -629,7 +629,7 @@ void HarpoonBoltControl(short itemNumber)
 		}
 		else
 		{
-			ExplodeItemNode(&harpoonItem, 0, 0, BODY_EXPLODE);
+			ExplodeItemNode(&harpoonItem, 0, 0, BODY_DO_EXPLOSION);
 			KillItem(itemNumber);
 		}
 
@@ -1648,7 +1648,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 	}
 	else if (doShatter)
 	{
-		ExplodeItemNode(&projectile, 0, 0, BODY_EXPLODE);
+		ExplodeItemNode(&projectile, 0, 0, BODY_DO_EXPLOSION);
 	}
 
 	switch (type)
