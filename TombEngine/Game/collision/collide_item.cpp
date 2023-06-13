@@ -828,6 +828,39 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	return true;
 }
 
+void CollideBridgeItems(CollisionResult& collResult, CollisionInfo& coll)
+{
+	// Store an offset for a bridge item into shifts, if exists.
+	if (coll.LastBridgeItemIndex == collResult.Position.Bridge && coll.LastBridgeItemIndex != NO_ITEM)
+	{
+		coll.Shift.Position = g_Level.Items[collResult.Position.Bridge].Pose.Position - coll.LastBridgeItemPose.Position;
+		coll.Shift.Orientation = g_Level.Items[collResult.Position.Bridge].Pose.Orientation - coll.LastBridgeItemPose.Orientation;
+
+		auto& bridgePos = g_Level.Items[collResult.Position.Bridge].Pose.Position;
+		auto distance = (coll.Setup.OldPosition - bridgePos).ToVector3();
+
+		float sin = phd_sin(coll.Shift.Orientation.y);
+		float cos = phd_cos(coll.Shift.Orientation.y);
+		auto x = distance.x * cos - distance.z * sin + bridgePos.x;
+		auto z = distance.x * sin + distance.z * cos + bridgePos.z;
+
+		coll.Shift.Position.x += round((float)coll.Setup.OldPosition.x - x);
+		coll.Shift.Position.z += round((float)coll.Setup.OldPosition.z - z);
+
+		// Speed too high (possibly bridge object teleported), don't update the shifts.
+		if (coll.Shift.Position.ToVector3().Length() > coll.Setup.Radius)
+			coll.Shift = {};
+
+		coll.LastBridgeItemPose = g_Level.Items[collResult.Position.Bridge].Pose;
+	}
+	else
+	{
+		coll.LastBridgeItemPose = {};
+	}
+
+	coll.LastBridgeItemIndex = collResult.Position.Bridge;
+}
+
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->HitTallObject = false;
@@ -1057,20 +1090,20 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	case NORTH:
 		if (rawShift.x > coll->Setup.Radius || rawShift.x < -coll->Setup.Radius)
 		{
-			coll->Shift.z = rawShift.z;
-			coll->Shift.x = ox - x;
+			coll->Shift.Position.z = rawShift.z;
+			coll->Shift.Position.x = ox - x;
 			coll->CollisionType = CT_FRONT;
 		}
 		else if (rawShift.x > 0 && rawShift.x <= coll->Setup.Radius)
 		{
-			coll->Shift.x = rawShift.x;
-			coll->Shift.z = 0;
+			coll->Shift.Position.x = rawShift.x;
+			coll->Shift.Position.z = 0;
 			coll->CollisionType = CT_LEFT;
 		}
 		else if (rawShift.x < 0 && rawShift.x >= -coll->Setup.Radius)
 		{
-			coll->Shift.x = rawShift.x;
-			coll->Shift.z = 0;
+			coll->Shift.Position.x = rawShift.x;
+			coll->Shift.Position.z = 0;
 			coll->CollisionType = CT_RIGHT;
 		}
 
@@ -1079,20 +1112,20 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	case SOUTH:
 		if (rawShift.x > coll->Setup.Radius || rawShift.x < -coll->Setup.Radius)
 		{
-			coll->Shift.z = rawShift.z;
-			coll->Shift.x = ox - x;
+			coll->Shift.Position.z = rawShift.z;
+			coll->Shift.Position.x = ox - x;
 			coll->CollisionType = CT_FRONT;
 		}
 		else if (rawShift.x > 0 && rawShift.x <= coll->Setup.Radius)
 		{
-			coll->Shift.x = rawShift.x;
-			coll->Shift.z = 0;
+			coll->Shift.Position.x = rawShift.x;
+			coll->Shift.Position.z = 0;
 			coll->CollisionType = CT_RIGHT;
 		}
 		else if (rawShift.x < 0 && rawShift.x >= -coll->Setup.Radius)
 		{
-			coll->Shift.x = rawShift.x;
-			coll->Shift.z = 0;
+			coll->Shift.Position.x = rawShift.x;
+			coll->Shift.Position.z = 0;
 			coll->CollisionType = CT_LEFT;
 		}
 
@@ -1101,20 +1134,20 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	case EAST:
 		if (rawShift.z > coll->Setup.Radius || rawShift.z < -coll->Setup.Radius)
 		{
-			coll->Shift.x = rawShift.x;
-			coll->Shift.z = oz - z;
+			coll->Shift.Position.x = rawShift.x;
+			coll->Shift.Position.z = oz - z;
 			coll->CollisionType = CT_FRONT;
 		}
 		else if (rawShift.z > 0 && rawShift.z <= coll->Setup.Radius)
 		{
-			coll->Shift.z = rawShift.z;
-			coll->Shift.x = 0;
+			coll->Shift.Position.z = rawShift.z;
+			coll->Shift.Position.x = 0;
 			coll->CollisionType = CT_RIGHT;
 		}
 		else if (rawShift.z < 0 && rawShift.z >= -coll->Setup.Radius)
 		{
-			coll->Shift.z = rawShift.z;
-			coll->Shift.x = 0;
+			coll->Shift.Position.z = rawShift.z;
+			coll->Shift.Position.x = 0;
 			coll->CollisionType = CT_LEFT;
 		}
 
@@ -1123,20 +1156,20 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	case WEST:
 		if (rawShift.z > coll->Setup.Radius || rawShift.z < -coll->Setup.Radius)
 		{
-			coll->Shift.x = rawShift.x;
-			coll->Shift.z = oz - z;
+			coll->Shift.Position.x = rawShift.x;
+			coll->Shift.Position.z = oz - z;
 			coll->CollisionType = CT_FRONT;
 		}
 		else if (rawShift.z > 0 && rawShift.z <= coll->Setup.Radius)
 		{
-			coll->Shift.z = rawShift.z;
-			coll->Shift.x = 0;
+			coll->Shift.Position.z = rawShift.z;
+			coll->Shift.Position.x = 0;
 			coll->CollisionType = CT_LEFT;
 		}
 		else if (rawShift.z < 0 && rawShift.z >= -coll->Setup.Radius)
 		{
-			coll->Shift.z = rawShift.z;
-			coll->Shift.x = 0;
+			coll->Shift.Position.z = rawShift.z;
+			coll->Shift.Position.x = 0;
 			coll->CollisionType = CT_RIGHT;
 		}
 
@@ -1144,15 +1177,15 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	}
 
 	// Determine final shifts orientation/distance.
-	distance = Vector3(x + coll->Shift.x, y, z + coll->Shift.z) - pose.Position.ToVector3();
+	distance = Vector3(x + coll->Shift.Position.x, y, z + coll->Shift.Position.z) - pose.Position.ToVector3();
 	sinY = phd_sin(-pose.Orientation.y);
 	cosY = phd_cos(-pose.Orientation.y);
 
 	// Calculate final shifts orientation/distance.
-	coll->Shift.x = (round((distance.x * cosY) - (distance.z * sinY)) + pose.Position.x) - item->Pose.Position.x;
-	coll->Shift.z = (round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z) - item->Pose.Position.z;
+	coll->Shift.Position.x = (round((distance.x * cosY) - (distance.z * sinY)) + pose.Position.x) - item->Pose.Position.x;
+	coll->Shift.Position.z = (round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z) - item->Pose.Position.z;
 
-	if (coll->Shift.x == 0 && coll->Shift.z == 0)
+	if (coll->Shift.Position.x == 0 && coll->Shift.Position.z == 0)
 		coll->CollisionType = CT_NONE; // Paranoid.
 
 	// Set splat state flag if item is Lara and bounds are taller than Lara's headroom.

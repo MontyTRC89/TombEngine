@@ -1,6 +1,7 @@
 #include "framework.h"
 
 #include "Game/items.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/item_fx.h"
@@ -576,6 +577,9 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 				SetRoomNumber(potentialNewRoom);
 		}
 	}
+
+	if (Objects[m_item->ObjectNumber].floor != nullptr || Objects[m_item->ObjectNumber].ceiling != nullptr)
+		TEN::Collision::Floordata::UpdateBridgeItem((int)m_item->Index);
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -603,6 +607,9 @@ void Moveable::SetRot(Rotation const& rot)
 	m_item->Pose.Orientation.x = ANGLE(rot.x);
 	m_item->Pose.Orientation.y = ANGLE(rot.y);
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
+
+	if (Objects[m_item->ObjectNumber].floor != nullptr || Objects[m_item->ObjectNumber].ceiling != nullptr)
+		TEN::Collision::Floordata::UpdateBridgeItem(m_item->Index);
 }
 
 /// Get current HP (hit points/health points)

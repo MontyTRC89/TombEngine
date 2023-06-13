@@ -5,6 +5,7 @@ using std::pair;
 
 class FloorInfo;
 struct CollisionInfo;
+struct CollisionResult;
 struct ItemInfo;
 struct MESH_INFO;
 
@@ -44,6 +45,7 @@ bool ItemPushStatic(ItemInfo* laraItem, const MESH_INFO& mesh, CollisionInfo* co
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
+void CollideBridgeItems(CollisionResult& collResult, CollisionInfo& coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void ObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
