@@ -833,23 +833,26 @@ void CollideBridgeItems(CollisionResult& collResult, CollisionInfo& coll)
 	// Store an offset for a bridge item into shifts, if exists.
 	if (coll.LastBridgeItemIndex == collResult.Position.Bridge && coll.LastBridgeItemIndex != NO_ITEM)
 	{
-		coll.Shift.Position = g_Level.Items[collResult.Position.Bridge].Pose.Position - coll.LastBridgeItemPose.Position;
-		coll.Shift.Orientation = g_Level.Items[collResult.Position.Bridge].Pose.Orientation - coll.LastBridgeItemPose.Orientation;
+		auto deltaPose = Pose(g_Level.Items[collResult.Position.Bridge].Pose.Position - coll.LastBridgeItemPose.Position,
+							  g_Level.Items[collResult.Position.Bridge].Pose.Orientation - coll.LastBridgeItemPose.Orientation);
 
-		auto& bridgePos = g_Level.Items[collResult.Position.Bridge].Pose.Position;
-		auto distance = (coll.Setup.OldPosition - bridgePos).ToVector3();
+		if (deltaPose.Position != Vector3i::Zero || deltaPose.Orientation != EulerAngles::Zero)
+		{
+			auto& bridgePos = g_Level.Items[collResult.Position.Bridge].Pose.Position;
+			auto distance = (coll.Setup.OldPosition - bridgePos).ToVector3();
 
-		float sin = phd_sin(coll.Shift.Orientation.y);
-		float cos = phd_cos(coll.Shift.Orientation.y);
-		auto x = distance.x * cos - distance.z * sin + bridgePos.x;
-		auto z = distance.x * sin + distance.z * cos + bridgePos.z;
+			float sin = phd_sin(deltaPose.Orientation.y);
+			float cos = phd_cos(deltaPose.Orientation.y);
+			auto x = distance.x * cos - distance.z * sin + bridgePos.x;
+			auto z = distance.x * sin + distance.z * cos + bridgePos.z;
 
-		coll.Shift.Position.x += round((float)coll.Setup.OldPosition.x - x);
-		coll.Shift.Position.z += round((float)coll.Setup.OldPosition.z - z);
-
-		// Speed too high (possibly bridge object teleported), don't update the shifts.
-		if (coll.Shift.Position.ToVector3().Length() > coll.Setup.Radius)
-			coll.Shift = {};
+			deltaPose.Position.x += round((float)coll.Setup.OldPosition.x - x);
+			deltaPose.Position.z += round((float)coll.Setup.OldPosition.z - z);
+		   
+			// Don't update the shifts if difference is too big (possibly bridge was teleported or just entered bridge).
+			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius)
+				coll.Shift = deltaPose;
+		}
 
 		coll.LastBridgeItemPose = g_Level.Items[collResult.Position.Bridge].Pose;
 	}
