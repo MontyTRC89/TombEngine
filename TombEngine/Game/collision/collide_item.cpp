@@ -835,25 +835,24 @@ void CollideBridgeItems(const CollisionResult& collResult, CollisionInfo& coll)
 	{
 		const auto& bridgeItem = g_Level.Items[collResult.Position.Bridge];
 
-		auto deltaPose = Pose(bridgeItem.Pose.Position - coll.LastBridgeItemPose.Position,
-							  bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation);
+		auto deltaPos = bridgeItem.Pose.Position - coll.LastBridgeItemPose.Position;
+		auto deltaOrient = bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation;
+		auto deltaPose = Pose(deltaPos, deltaOrient);
 
-		auto heightDelta = coll.Setup.OldPosition.y - coll.LastBridgeItemPose.Position.y;
+		int deltaHeight = coll.Setup.OldPosition.y - coll.LastBridgeItemPose.Position.y;
 
-		if (heightDelta >= 0 && (deltaPose.Position != Vector3i::Zero || deltaPose.Orientation != EulerAngles::Zero))
+		if (deltaHeight >= 0 && deltaPose != Pose::Zero)
 		{
-			auto& bridgePos = bridgeItem.Pose.Position;
-			auto distance = (coll.Setup.OldPosition - bridgePos).ToVector3();
+			const auto& bridgePos = bridgeItem.Pose.Position;
 
-			float sin = phd_sin(deltaPose.Orientation.y);
-			float cos = phd_cos(deltaPose.Orientation.y);
-			auto x = distance.x * cos - distance.z * sin + bridgePos.x;
-			auto z = distance.x * sin + distance.z * cos + bridgePos.z;
+			// Calculate offset.
+			auto relOffset = (coll.Setup.OldPosition - bridgePos).ToVector3();
+			auto rotMatrix = deltaPose.Orientation.ToRotationMatrix();
+			auto offset = bridgePos.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
 
-			deltaPose.Position.x += round((float)coll.Setup.OldPosition.x - x);
-			deltaPose.Position.z += round((float)coll.Setup.OldPosition.z - z);
+			deltaPose.Position -= coll.Setup.OldPosition - Vector3i(offset);
 		   
-			// Don't update the shifts if difference is too big (possibly bridge was teleported or just entered bridge).
+			// Don't update shifts if difference is too big (possibly bridge was teleported or just entered bridge).
 			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius)
 				coll.Shift = deltaPose;
 		}
@@ -862,7 +861,7 @@ void CollideBridgeItems(const CollisionResult& collResult, CollisionInfo& coll)
 	}
 	else
 	{
-		coll.LastBridgeItemPose = {};
+		coll.LastBridgeItemPose = Pose::Zero;
 	}
 
 	coll.LastBridgeItemNumber = collResult.Position.Bridge;
