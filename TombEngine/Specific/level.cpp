@@ -187,8 +187,17 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		for (int i = 0; i < g_Level.NumItems; i++)
-			InitializeItem(i);
+		// Initialize all bridges first.
+		// It is needed because some other items need final floor height to init properly.
+
+		for (int isFloor = 0; isFloor <= 1; isFloor++)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if ((Objects[g_Level.Items[i].ObjectNumber].floor == nullptr) == (bool)isFloor)
+					InitializeItem(i);
+			}
+		}
 	}
 }
 
