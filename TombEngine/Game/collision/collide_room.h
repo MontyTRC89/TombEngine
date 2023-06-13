@@ -112,7 +112,7 @@ struct CollisionInfo
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
 
-	int  LastBridgeItemNumber = 0;
+	int  LastBridgeItemNumber = NO_ITEM;
 	Pose LastBridgeItemPose	  = Pose::Zero;
 
 	bool HitStatic;
