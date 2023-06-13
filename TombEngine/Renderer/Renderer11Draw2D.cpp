@@ -307,8 +307,6 @@ namespace TEN::Renderer
 		SetBlendMode(BLENDMODE_OPAQUE);
 
 		m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
-		m_context->ClearRenderTargetView(target, Colors::Black);
-		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, m_tempRT.RenderTargetView.GetAddressOf(), nullptr);
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
@@ -351,18 +349,17 @@ namespace TEN::Renderer
 		m_basicPostProcess->Process(m_context.Get());
 
 		// Pass 4 (scene+blur1 -> rt)
+		m_context->ClearRenderTargetView(target, Colors::Black);
+		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_context->OMSetRenderTargets(1, &target, depthTarget);
+
 		m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
 		m_dualPostProcess->SetBloomCombineParameters(1.25f, 1.f, 1.f, 1.f);
-
-		m_context->OMSetRenderTargets(1, &target, nullptr);
-
 		m_dualPostProcess->SetSourceTexture(m_tempRT.ShaderResourceView.Get());
 		m_dualPostProcess->SetSourceTexture2(m_blur1RT.ShaderResourceView.Get());
 		m_dualPostProcess->Process(m_context.Get());
 
-		return;
-
-		RendererVertex vertices[4];
+		/*RendererVertex vertices[4];
 
 		vertices[0].Position.x = -1.0f;
 		vertices[0].Position.y = 1.0f;
@@ -410,7 +407,7 @@ namespace TEN::Renderer
 
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
-		m_primitiveBatch->End();
+		m_primitiveBatch->End();*/
 	}
 
 	void Renderer11::DrawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target,
