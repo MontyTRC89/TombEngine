@@ -1,6 +1,7 @@
 Version 1.0.10
 ==============
 
+* Automatically move and rotate Lara together with dynamic bridge objects.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Fix crash on loading if static meshes with IDs above maximum are present.
