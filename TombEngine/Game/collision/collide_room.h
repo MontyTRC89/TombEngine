@@ -4,7 +4,6 @@
 #include "Objects/game_object_ids.h"
 
 struct ItemInfo;
-struct CollisionInfo;
 class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
