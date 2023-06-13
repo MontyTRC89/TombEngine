@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 
@@ -112,8 +113,8 @@ struct CollisionInfo
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
 
-	int  LastBridgeItemNumber = NO_ITEM;
-	Pose LastBridgeItemPose	  = Pose::Zero;
+	int  LastBridgeItemNumber;
+	Pose LastBridgeItemPose;
 
 	bool HitStatic;
 	bool HitTallObject;
