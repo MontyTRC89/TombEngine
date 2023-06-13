@@ -4,6 +4,7 @@
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
 #include "Game/missile.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
@@ -124,14 +125,19 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DOPPELGANGER];
 	if (obj->loaded)
 	{
-		obj->animIndex = Objects[ID_LARA].animIndex; // NOTE: lara is obviously loaded by default.
+		// NOTE: lara is obviously loaded by default.
+		auto& laraObj = Objects[ID_LARA];
+		obj->animIndex = laraObj.animIndex;
+		obj->frameBase = laraObj.frameBase;
 		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
 		obj->shadowType = ShadowMode::All;
-		obj->HitPoints = 1000;
+		obj->HitPoints = LARA_HEALTH_MAX;
 		obj->radius = 102;
-		obj->SetupHitEffect(true);
+		obj->intelligent = true;
+		obj->nonLot = true;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_CENTAUR_MUTANT];

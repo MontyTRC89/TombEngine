@@ -4,22 +4,19 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
+#include "Game/control/lot.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
 
-// TODO:
-// - Bacon Lara cannot be targeted.
-// - Bacon Lara cannot move like Lara.
-
 namespace TEN::Entities::Creatures::TR1
 {
 	ItemInfo* FindReference(ItemInfo* item, short objectNumber)
 	{
 		bool found = false;
-		int itemNumber;
+		int itemNumber = NO_ITEM;
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
 			auto* currentItem = &g_Level.Items[i];
@@ -30,21 +27,20 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 			}
 		}
-
-		if (!found)
-			itemNumber = NO_ITEM;
 		return (itemNumber == NO_ITEM ? nullptr : &g_Level.Items[itemNumber]);
 	}
 
 	short GetWeaponDamage(LaraWeaponType weaponType)
 	{
-		return short(Weapons[(int)weaponType].Damage) * 25;
+		return short(Weapons[(int)weaponType].Damage) * 10;
 	}
 
 	void DoppelgangerControl(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		if (!CreatureActive(itemNumber))
+			return;
 
+		auto* item = &g_Level.Items[itemNumber];
 		if (item->HitPoints < LARA_HEALTH_MAX)
 		{
 			item->HitPoints = LARA_HEALTH_MAX;
@@ -52,26 +48,21 @@ namespace TEN::Entities::Creatures::TR1
 		}
 
 		auto* reference = FindReference(item, ID_BACON_REFERENCE);
-
-		if (!item->Data)
+		if (reference == nullptr)
 		{
-			Vector3i pos;
-			if (reference == nullptr)
-			{
-				pos.x = item->Pose.Position.x;
-				pos.y = LaraItem->Pose.Position.y;
-				pos.z = item->Pose.Position.z;
-			}
-			else
-			{
-				pos.x = 2 * reference->Pose.Position.x - LaraItem->Pose.Position.x;
-				pos.y = LaraItem->Pose.Position.y;
-				pos.z = 2 * reference->Pose.Position.z - LaraItem->Pose.Position.z;
-			}
+			TENLog("Doppelganger require ID_BACON_REFERENCE to be placed on the center (on floor) of the room to be used !", LogLevel::Warning);
+			return;
+		}
+
+		switch (item->ItemFlags[7])
+		{
+		case 0:
+		{
+			int laraFloorHeight = GetCollision(LaraItem).Position.Floor;
 
 			// Get floor heights for comparison.
-			item->Floor = GetCollision(item).Position.Floor;
-			int laraFloorHeight = GetCollision(LaraItem).Position.Floor;
+			Vector3i pos(2 * reference->Pose.Position.x - LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, 2 * reference->Pose.Position.z - LaraItem->Pose.Position.z);
+			item->Floor = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber).Position.Floor;
 
 			// Animate bacon Lara, mirroring Lara's position.
 			item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
@@ -80,58 +71,54 @@ namespace TEN::Entities::Creatures::TR1
 			item->Pose.Orientation.x = LaraItem->Pose.Orientation.x;
 			item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - ANGLE(180.0f);
 			item->Pose.Orientation.z = LaraItem->Pose.Orientation.z;
+			item->Animation.IsAirborne = LaraItem->Animation.IsAirborne;
 
 			// Compare floor heights.
-			if (item->Floor >= (laraFloorHeight + SECTOR(1) + 1) && // Add 1 to avoid bacon Lara dying when exiting water.
-				!LaraItem->Animation.IsAirborne)
+			if (item->Floor >= (laraFloorHeight + SECTOR(1) + 1) && !LaraItem->Animation.IsAirborne)
 			{
-				SetAnimation(item, LA_JUMP_WALL_SMASH_START);
+				SetAnimation(item, LA_FREEFALL);
 				item->Animation.IsAirborne = true;
-				item->Animation.Velocity.y = 0.0f;
-				item->Animation.Velocity.z = 0.0f;
-				item->Pose.Position.y += 50;
-				item->Data = -1;
+				item->Pose.Position.y += 64;
+				item->ItemFlags[7] = 1;
 			}
+			break;
 		}
+		case 1:
+			if (item->Animation.Velocity.x > 0.0f)
+				item->Animation.Velocity.x -= 2;
+			else if (item->Animation.Velocity.x < 0.0f)
+				item->Animation.Velocity.x += 2;
+			else
+				item->Animation.Velocity.x = 0.0f;
 
-		if (item->Data)
-		{
+			if (item->Animation.Velocity.z > 0.0f)
+				item->Animation.Velocity.z -= 2;
+			else if (item->Animation.Velocity.z < 0.0f)
+				item->Animation.Velocity.z += 2;
+			else
+				item->Animation.Velocity.z = 0.0f;
+
 			TestTriggers(item, true);
 			item->Floor = GetCollision(item).Position.Floor;
 			if (item->Pose.Position.y >= item->Floor)
 			{
 				item->Pose.Position.y = item->Floor;
 				TestTriggers(item, true);
-
-				item->Animation.TargetState = LS_DEATH;
-				item->Animation.RequiredState = LS_DEATH;
+				SetAnimation(item, LA_FREEFALL_DEATH);
 				item->Animation.IsAirborne = false;
 				item->Animation.Velocity.y = 0.0f;
+				if (item->Animation.FrameNumber >= GetFrameCount(LA_FREEFALL_DEATH)-1)
+					item->ItemFlags[7] = 2;
 			}
+			break;
+		case 2:
+			DisableEntityAI(itemNumber);
+			RemoveActiveItem(itemNumber);
+			item->Collidable = FALSE;
+			break;
 		}
 
-		ItemNewRoom(itemNumber, LaraItem->RoomNumber);
+		ItemNewRoom(itemNumber, GetCollision(item).RoomNumber);
 		AnimateItem(item);
-	}
-
-	// TODO: DrawLara not exist ! use Renderer11.cpp DrawLara instead or create DrawLara() function with old behaviour.
-	void DrawEvilLara(ItemInfo* item)
-	{
-		/*
-		short* meshstore[15];
-		short** meshpp;
-		int i;
-
-		meshpp = &Meshes[Objects[item->objectNumber].meshIndex];           	// Save Laras Mesh Pointers
-		for (i = 0; i < 15; i++)
-		{
-			meshstore[i] = Lara.meshPtrs[i];
-			Lara.meshPtrs[i] = *(meshpp++);
-		}
-
-		DrawLara(item);
-
-		for (i = 0; i < 15; i++)
-			Lara.meshPtrs[i] = meshstore[i];*/
 	}
 }
