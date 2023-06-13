@@ -836,7 +836,9 @@ void CollideBridgeItems(CollisionResult& collResult, CollisionInfo& coll)
 		auto deltaPose = Pose(g_Level.Items[collResult.Position.Bridge].Pose.Position - coll.LastBridgeItemPose.Position,
 							  g_Level.Items[collResult.Position.Bridge].Pose.Orientation - coll.LastBridgeItemPose.Orientation);
 
-		if (deltaPose.Position != Vector3i::Zero || deltaPose.Orientation != EulerAngles::Zero)
+		auto heightDelta = coll.Setup.OldPosition.y - coll.LastBridgeItemPose.Position.y;
+
+		if (heightDelta >= 0 && (deltaPose.Position != Vector3i::Zero || deltaPose.Orientation != EulerAngles::Zero))
 		{
 			auto& bridgePos = g_Level.Items[collResult.Position.Bridge].Pose.Position;
 			auto distance = (coll.Setup.OldPosition - bridgePos).ToVector3();
