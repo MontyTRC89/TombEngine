@@ -188,7 +188,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeKold;
-		obj->control = KoldControl;
+		obj->control = ControlKold;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 0;
