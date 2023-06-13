@@ -839,7 +839,7 @@ void CollideBridgeItems(const CollisionResult& collResult, CollisionInfo& coll)
 		auto deltaOrient = bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation;
 		auto deltaPose = Pose(deltaPos, deltaOrient);
 
-		int deltaHeight = coll.Setup.OldPosition.y - coll.LastBridgeItemPose.Position.y;
+		int deltaHeight = coll.Setup.OldPosition.y - collResult.Position.Floor;
 
 		if (deltaHeight >= 0 && deltaPose != Pose::Zero)
 		{
