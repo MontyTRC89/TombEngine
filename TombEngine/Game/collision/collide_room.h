@@ -105,15 +105,15 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	Pose Shift;
+	Pose Shift = Pose::Zero;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
 
-	int  LastBridgeItemIndex;
-	Pose LastBridgeItemPose;
+	int  LastBridgeItemNumber = 0;
+	Pose LastBridgeItemPose	  = Pose::Zero;
 
 	bool HitStatic;
 	bool HitTallObject;

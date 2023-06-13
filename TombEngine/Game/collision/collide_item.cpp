@@ -828,19 +828,21 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	return true;
 }
 
-void CollideBridgeItems(CollisionResult& collResult, CollisionInfo& coll)
+void CollideBridgeItems(const CollisionResult& collResult, CollisionInfo& coll)
 {
 	// Store an offset for a bridge item into shifts, if exists.
-	if (coll.LastBridgeItemIndex == collResult.Position.Bridge && coll.LastBridgeItemIndex != NO_ITEM)
+	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_ITEM)
 	{
-		auto deltaPose = Pose(g_Level.Items[collResult.Position.Bridge].Pose.Position - coll.LastBridgeItemPose.Position,
-							  g_Level.Items[collResult.Position.Bridge].Pose.Orientation - coll.LastBridgeItemPose.Orientation);
+		const auto& bridgeItem = g_Level.Items[collResult.Position.Bridge];
+
+		auto deltaPose = Pose(bridgeItem.Pose.Position - coll.LastBridgeItemPose.Position,
+							  bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation);
 
 		auto heightDelta = coll.Setup.OldPosition.y - coll.LastBridgeItemPose.Position.y;
 
 		if (heightDelta >= 0 && (deltaPose.Position != Vector3i::Zero || deltaPose.Orientation != EulerAngles::Zero))
 		{
-			auto& bridgePos = g_Level.Items[collResult.Position.Bridge].Pose.Position;
+			auto& bridgePos = bridgeItem.Pose.Position;
 			auto distance = (coll.Setup.OldPosition - bridgePos).ToVector3();
 
 			float sin = phd_sin(deltaPose.Orientation.y);
@@ -856,14 +858,14 @@ void CollideBridgeItems(CollisionResult& collResult, CollisionInfo& coll)
 				coll.Shift = deltaPose;
 		}
 
-		coll.LastBridgeItemPose = g_Level.Items[collResult.Position.Bridge].Pose;
+		coll.LastBridgeItemPose = bridgeItem.Pose;
 	}
 	else
 	{
 		coll.LastBridgeItemPose = {};
 	}
 
-	coll.LastBridgeItemIndex = collResult.Position.Bridge;
+	coll.LastBridgeItemNumber = collResult.Position.Bridge;
 }
 
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
