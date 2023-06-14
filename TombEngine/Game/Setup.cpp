@@ -110,11 +110,11 @@ void InitializeObjects()
 
 	InitializeEffectsObjects();
 	InitializeGenericObjects(); // Generic objects
+	InitializeTR5Objects(); // Standard TR5 objects (NOTE: lara need to be loaded first, so entity like doppelganger can use this animIndex !)
 	InitializeTR1Objects(); // Standard TR1 objects
 	InitializeTR2Objects(); // Standard TR2 objects
 	InitializeTR3Objects(); // Standard TR3 objects
 	InitializeTR4Objects(); // Standard TR4 objects
-	InitializeTR5Objects(); // Standard TR5 objects
 
 	// User defined objects
 	CustomObjects();

@@ -10,6 +10,9 @@ Version 1.0.10
 * Fix clockwork beetle activation crashing the game.
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
+* Fix doppelganger being limited to be in a single room.
+* Improve doppelganger beacon detection, now if the doppel have ocb 1,
+it will use the beacon reference with ocb 1 for the mirror position.
 
 Version 1.0.9
 =============
