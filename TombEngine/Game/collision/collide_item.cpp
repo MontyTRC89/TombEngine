@@ -753,6 +753,54 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	return true;
 }
 
+// Simplified version of ItemPushItem for basic pushes.
+bool ItemPushItem(ItemInfo* item, ItemInfo* item2)
+{
+	float sinY = phd_sin(item->Pose.Orientation.y);
+	float cosY = phd_cos(item->Pose.Orientation.y);
+
+	// Get direction vector from item to player.
+	auto direction = item2->Pose.Position - item->Pose.Position;
+
+	// Rotate Lara vector into item frame.
+	int rx = (direction.x * cosY) - (direction.z * sinY);
+	int rz = (direction.z * cosY) + (direction.x * sinY);
+
+	const auto& bounds = GetBestFrame(*item).BoundingBox;
+
+	int minX = bounds.X1;
+	int maxX = bounds.X2;
+	int minZ = bounds.Z1;
+	int maxZ = bounds.Z2;
+
+	// Big enemies
+	if (abs(direction.x) > BLOCK(4.5f) || abs(direction.z) > BLOCK(4.5f) ||
+		rx <= minX || rx >= maxX ||
+		rz <= minZ || rz >= maxZ)
+	{
+		return false;
+	}
+
+	int left = rx - minX;
+	int top = maxZ - rz;
+	int bottom = rz - minZ;
+	int right = maxX - rx;
+
+	if (right <= left && right <= top && right <= bottom)
+		rx += right;
+	else if (left <= right && left <= top && left <= bottom)
+		rx -= left;
+	else if (top <= left && top <= right && top <= bottom)
+		rz += top;
+	else
+		rz -= bottom;
+
+	item2->Pose.Position.x = item->Pose.Position.x + (rx * cosY) + (rz * sinY);
+	item2->Pose.Position.z = item->Pose.Position.z + (rz * cosY) - (rx * sinY);
+
+	return true;
+}
+
 // NOTE: Previously ItemPushLaraStatic().
 bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 {
@@ -841,7 +889,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionResult& collResult, CollisionIn
 	// Store an offset for a bridge item into shifts, if exists.
 	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_ITEM)
 	{
-		const auto& bridgeItem = g_Level.Items[collResult.Position.Bridge];
+		auto& bridgeItem = g_Level.Items[collResult.Position.Bridge];
 
 		auto deltaPos = bridgeItem.Pose.Position - coll.LastBridgeItemPose.Position;
 		auto deltaOrient = bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation;
@@ -864,12 +912,18 @@ void CollideBridgeItems(ItemInfo& item, CollisionResult& collResult, CollisionIn
 			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius)
 				coll.Shift = deltaPose;
 		}
+		else if (deltaPos.ToVector3().Length() <= coll.Setup.Radius && deltaHeight > 0 && 
+				(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Zero))
+		{
+			ItemPushItem(&bridgeItem, &item);
+		}
 
 		coll.LastBridgeItemPose = bridgeItem.Pose;
 	}
 	else
 	{
 		coll.LastBridgeItemPose = Pose::Zero;
+		coll.LastBridgeItemNumber = NO_ITEM;
 	}
 
 	coll.LastBridgeItemNumber = collResult.Position.Bridge;
@@ -1885,7 +1939,7 @@ void ObjectCollision(const short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		if (TestCollision(item, laraItem))
 		{
 			if (coll->Setup.EnableObjectPush)
-				ItemPushItem(item, laraItem, coll, false, true);
+				ItemPushItem(item, laraItem, coll, false, 1);
 		}
 	}
 }

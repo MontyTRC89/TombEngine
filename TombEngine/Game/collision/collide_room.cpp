@@ -316,9 +316,6 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->CeilingTilt = collResult.CeilingTilt;
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
-	// Additionally calculate bridge shifts, if present.
-	CollideBridgeItems(*item, collResult, *coll);
-
 	// Debug angle and distance
 	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
 	// g_Renderer.PrintDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
@@ -351,6 +348,9 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->Middle = collResult.Position;
 	coll->Middle.Floor = height;
 	coll->Middle.Ceiling = ceiling;
+
+	// Additionally calculate bridge shifts, if present.
+	CollideBridgeItems(*item, collResult, *coll);
 
 	// TEST 3: FRONTAL PROBE
 

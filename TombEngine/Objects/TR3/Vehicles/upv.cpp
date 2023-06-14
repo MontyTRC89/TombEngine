@@ -184,7 +184,7 @@ namespace TEN::Entities::Vehicles
 		{
 			// HACK: Collision in water behaves differently? @Sezz 2022.06.28
 			if (TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) && TestCollision(UPVItem, laraItem))
-				ItemPushItem(UPVItem, laraItem, coll, false, false);
+				ItemPushItem(UPVItem, laraItem, coll, false, 0);
 		}
 		else
 		{
