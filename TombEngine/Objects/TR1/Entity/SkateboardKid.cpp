@@ -13,14 +13,17 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
+	// NOTES:
+	// ItemFlags[0] = skateboard ID.
+
 	constexpr auto KID_IDLE_SHOT_DAMAGE	  = 50;
-	constexpr auto KID_MOVING_SHOT_DAMAGE = 40;
+	constexpr auto KID_SKATE_SHOT_DAMAGE = 40;
 
 	constexpr auto KID_CLOSE_RANGE = SQUARE(BLOCK(1));
-	constexpr auto KID_MOVE_RANGE  = SQUARE(BLOCK(2.5f));
+	constexpr auto KID_SKATE_RANGE = SQUARE(BLOCK(2.5f));
 	constexpr auto KID_IDLE_RANGE  = SQUARE(BLOCK(4));
 
-	constexpr auto KID_PUSH_CHANCE = 1 / 128.0f;
+	constexpr auto KID_ACCEL_CHANCE = 1 / 128.0f;
 
 	constexpr auto KID_TURN_RATE_MAX = ANGLE(4.0f);
 
@@ -30,29 +33,28 @@ namespace TEN::Entities::Creatures::TR1
 	enum SkateKidState
 	{
 		KID_STATE_IDLE = 0,
-		KID_STATE_SHOOT = 1,
+		KID_STATE_SHOOT_IDLE = 1,
 		KID_STATE_SKATE = 2,
-		KID_STATE_PUSH = 3,
-		KID_STATE_SHOOT_2 = 4,
+		KID_STATE_SKATE_ACCEL = 3,
+		KID_STATE_SKATE_SHOOT = 4,
 		KID_STATE_DEATH = 5
 	};
 
-	// TODO: Inspect names.
 	enum SkateKidAnim
 	{
-		KID_ANIM_START_MOVING_1 = 0,
-		KID_ANIM_START_MOVING_2 = 1,
-		KID_ANIM_SKATE_MORESPEED_END = 2,
-		KID_ANIM_SKATE_MORESPEED = 3,
-		KID_ANIM_STOP_SKATING_1 = 4,
-		KID_ANIM_STOP_SKATING_2 = 5,
-		KID_ANIM_STOP_SKATING_FINISH = 6,
+		KID_ANIM_IDLE_TO_SKATE_CONT = 0,
+		KID_ANIM_IDLE_TO_SKATE_END = 1,
+		KID_ANIM_SKATE_ACCEL_END = 2,
+		KID_ANIM_SKATE_ACCEL_CONT = 3,
+		KID_ANIM_SKATE_TO_IDLE_START = 4,
+		KID_ANIM_SKATE_TO_IDLE_CONT = 5,
+		KID_ANIM_SKATE_TO_IDLE_END = 6,
 		KID_ANIM_IDLE = 7,
-		KID_ANIM_SKATE_MORESPEED_START = 8,
-		KID_ANIM_IDLE_START_SKATE = 9,
+		KID_ANIM_SKATE_ACCEL_START = 8,
+		KID_ANIM_IDLE_TO_SKATE_START = 9, // Unused.
 		KID_ANIM_IDLE_SHOOT = 10,
 		KID_ANIM_SKATE_SHOOT = 11,
-		KID_ANIM_SKATE_AIM = 12,
+		KID_ANIM_SKATE = 12,
 		KID_ANIM_DEATH = 13
 	};
 
@@ -166,7 +168,7 @@ namespace TEN::Entities::Creatures::TR1
 				}
 				else if (Targetable(&item, &ai))
 				{
-					item.Animation.TargetState = KID_STATE_SHOOT;
+					item.Animation.TargetState = KID_STATE_SHOOT_IDLE;
 				}
 				else
 				{
@@ -178,37 +180,37 @@ namespace TEN::Entities::Creatures::TR1
 			case KID_STATE_SKATE:
 				creature.Flags = 0;
 
-				if (Random::TestProbability(KID_PUSH_CHANCE))
+				if (Random::TestProbability(KID_ACCEL_CHANCE))
 				{
-					item.Animation.TargetState = KID_STATE_PUSH;
+					item.Animation.TargetState = KID_STATE_SKATE_ACCEL;
 				}
 				else if (Targetable(&item, &ai))
 				{
-					if (ai.distance > KID_MOVE_RANGE && ai.distance < KID_IDLE_RANGE &&
+					if (ai.distance > KID_SKATE_RANGE && ai.distance < KID_IDLE_RANGE &&
 						creature.Mood != MoodType::Escape)
 					{
 						item.Animation.TargetState = KID_STATE_IDLE;
 					}
 					else
 					{
-						item.Animation.TargetState = KID_STATE_SHOOT_2;
+						item.Animation.TargetState = KID_STATE_SKATE_SHOOT;
 					}
 				}
 
 				break;
 
-			case KID_STATE_PUSH:
-				if (Random::TestProbability(KID_PUSH_CHANCE))
+			case KID_STATE_SKATE_ACCEL:
+				if (Random::TestProbability(KID_ACCEL_CHANCE))
 					item.Animation.TargetState = KID_STATE_SKATE;
 
 				break;
 
-			case KID_STATE_SHOOT:
+			case KID_STATE_SHOOT_IDLE:
 				SkateboardKidShoot(item, ai, extraHeadRot.y, KID_IDLE_SHOT_DAMAGE);
 				break;
 
-			case KID_STATE_SHOOT_2:
-				SkateboardKidShoot(item, ai, extraHeadRot.y, KID_MOVING_SHOT_DAMAGE);
+			case KID_STATE_SKATE_SHOOT:
+				SkateboardKidShoot(item, ai, extraHeadRot.y, KID_SKATE_SHOT_DAMAGE);
 				break;
 			}
 		}
