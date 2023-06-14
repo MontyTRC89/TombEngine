@@ -895,10 +895,11 @@ void CollideBridgeItems(ItemInfo& item, CollisionResult& collResult, CollisionIn
 		auto deltaOrient = bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation;
 		auto deltaPose = Pose(deltaPos, deltaOrient);
 
-		int deltaHeight1 = item.Pose.Position.y - collResult.Position.Floor;
-		int deltaHeight2 = deltaHeight1 + GameBoundingBox(&item).Y2;
+		int absDeltaHeight = item.Pose.Position.y - collResult.Position.Floor;
+		int relDeltaHeight = absDeltaHeight + GameBoundingBox(&item).Y2;
 
-		if (deltaPose != Pose::Zero && (abs(deltaHeight1) <= CLICK(1 / 8.0f) || abs(deltaHeight2) <= CLICK(1 / 8.0f)))
+		if (deltaPose != Pose::Zero && 
+			(abs(absDeltaHeight) <= CLICK(1 / 8.0f) || abs(relDeltaHeight) <= CLICK(1 / 8.0f)))
 		{
 			const auto& bridgePos = bridgeItem.Pose.Position;
 
@@ -913,9 +914,10 @@ void CollideBridgeItems(ItemInfo& item, CollisionResult& collResult, CollisionIn
 			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius)
 				coll.Shift = deltaPose;
 		}
-		else if (deltaPos.ToVector3().Length() <= coll.Setup.Radius && deltaHeight2 > 0 && 
+		else if (deltaPos.ToVector3().Length() <= coll.Setup.Radius && relDeltaHeight > 0 &&
 				(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Zero))
 		{
+			// Push item away if not directly above bridge, and bridge position was changed.
 			ItemPushItem(&bridgeItem, &item);
 		}
 
