@@ -626,7 +626,7 @@ void FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 
 	AddActiveItem(itemNumber);
 
-	harpoonItem.ItemFlags[0] = (int)ProjectileType::Normal;
+	harpoonItem.ItemFlags[0] = (int)ProjectileType::Harpoon;
 
 	Rumble(0.2f, 0.1f);
 
