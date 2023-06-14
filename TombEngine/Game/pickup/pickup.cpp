@@ -1062,7 +1062,8 @@ void InitializePickup(short itemNumber)
 
 	item->Data = CollisionInfo();
 	auto* coll = (CollisionInfo*)item->Data;
-	coll->Setup.Radius = coll->Setup.Height = CLICK(1 /8.0f);
+	coll->Setup.Radius = std::max(bounds.GetWidth(), bounds.GetDepth());
+	coll->Setup.Height = bounds.GetHeight();
 
 	short triggerFlags = item->TriggerFlags & 0x3F;
 	if (triggerFlags == 5)
