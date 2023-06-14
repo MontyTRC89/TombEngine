@@ -828,7 +828,15 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	return true;
 }
 
-void CollideBridgeItems(const CollisionResult& collResult, CollisionInfo& coll)
+void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
+{
+	coll.Setup.ForwardAngle = item.Pose.Orientation.y;
+	coll.Setup.OldPosition = item.Pose.Position;
+	GetCollisionInfo(&coll, &item);
+	ShiftItem(&item, &coll);
+}
+
+void CollideBridgeItems(ItemInfo& item, CollisionResult& collResult, CollisionInfo& coll)
 {
 	// Store an offset for a bridge item into shifts, if exists.
 	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_ITEM)
@@ -839,18 +847,18 @@ void CollideBridgeItems(const CollisionResult& collResult, CollisionInfo& coll)
 		auto deltaOrient = bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation;
 		auto deltaPose = Pose(deltaPos, deltaOrient);
 
-		int deltaHeight = coll.Setup.OldPosition.y - collResult.Position.Floor;
+		int deltaHeight = (item.Pose.Position.y + GameBoundingBox(&item).Y2) - collResult.Position.Floor;
 
-		if (deltaHeight >= 0 && deltaPose != Pose::Zero)
+		if (abs(deltaHeight) <= CLICK(1 / 4.0f) && deltaPose != Pose::Zero)
 		{
 			const auto& bridgePos = bridgeItem.Pose.Position;
 
 			// Calculate offset.
-			auto relOffset = (coll.Setup.OldPosition - bridgePos).ToVector3();
+			auto relOffset = (item.Pose.Position - bridgePos).ToVector3();
 			auto rotMatrix = deltaPose.Orientation.ToRotationMatrix();
 			auto offset = bridgePos.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
 
-			deltaPose.Position -= coll.Setup.OldPosition - Vector3i(offset);
+			deltaPose.Position -= item.Pose.Position - Vector3i(offset);
 		   
 			// Don't update shifts if difference is too big (possibly bridge was teleported or just entered bridge).
 			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius)

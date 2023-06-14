@@ -42,10 +42,11 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius);
 bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool enableSpasm, char bigPush);
 bool ItemPushStatic(ItemInfo* laraItem, const MESH_INFO& mesh, CollisionInfo* coll);
+void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
-void CollideBridgeItems(const CollisionResult& collResult, CollisionInfo& coll);
+void CollideBridgeItems(ItemInfo& item, CollisionResult& collResult, CollisionInfo& coll);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void ObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

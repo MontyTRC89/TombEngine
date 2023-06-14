@@ -317,7 +317,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Additionally calculate bridge shifts, if present.
-	CollideBridgeItems(collResult, *coll);
+	CollideBridgeItems(*item, collResult, *coll);
 
 	// Debug angle and distance
 	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
