@@ -14,9 +14,9 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR1
 {
 	// NOTES:
-	// ItemFlags[0] = skateboard ID.
+	// ItemFlags[0] = skateboard entity ID.
 
-	constexpr auto KID_IDLE_SHOT_DAMAGE	  = 50;
+	constexpr auto KID_IDLE_SHOT_DAMAGE	 = 50;
 	constexpr auto KID_SKATE_SHOT_DAMAGE = 40;
 
 	constexpr auto KID_CLOSE_RANGE = SQUARE(BLOCK(1));
