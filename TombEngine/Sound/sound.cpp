@@ -11,6 +11,7 @@
 #include "Game/Setup.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 HSAMPLE BASS_SamplePointer[SOUND_MAX_SAMPLES];
@@ -231,17 +232,17 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 		break;
 
 	case SoundPlayMode::Wait:
-		if (existingChannel != -1) // Don't play until stopped
+		if (existingChannel != SOUND_NO_CHANNEL) // Don't play until stopped
 			return false;
 		break;
 
 	case SoundPlayMode::Restart:
-		if (existingChannel != -1) // Stop existing and continue
+		if (existingChannel != SOUND_NO_CHANNEL) // Stop existing and continue
 			Sound_FreeSlot(existingChannel, SOUND_XFADETIME_CUTSOUND); 
 		break;
 
 	case SoundPlayMode::Looped:
-		if (existingChannel != -1) // Just update parameters and return, if already playing
+		if (existingChannel != SOUND_NO_CHANNEL) // Just update parameters and return, if already playing
 		{
 			Sound_UpdateEffectPosition(existingChannel, position);
 			Sound_UpdateEffectAttributes(existingChannel, pitch, volume);
@@ -261,7 +262,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 
 	// Get free channel to play sample
 	int freeSlot = Sound_GetFreeSlot();
-	if (freeSlot == -1)
+	if (freeSlot == SOUND_NO_CHANNEL)
 	{
 		TENLog("No free channel slot available!", LogLevel::Warning);
 		return false;
@@ -318,11 +319,12 @@ void PauseAllSounds(SoundPauseMode mode)
 			BASS_ChannelPause(slot.Channel);
 	}
 
-	if (mode == SoundPauseMode::Inventory)
-		return;
-
-	for (auto& slot : SoundtrackSlot)
+	for (int i = 0; i < (int)SoundTrackType::Count; i++)
 	{
+		if (mode == SoundPauseMode::Inventory && (SoundTrackType)i != SoundTrackType::Voice)
+			continue;
+
+		auto& slot = SoundtrackSlot[i];
 		if ((slot.Channel != NULL) && (BASS_ChannelIsActive(slot.Channel) == BASS_ACTIVE_PLAYING))
 			BASS_ChannelPause(slot.Channel);
 	}
@@ -418,6 +420,20 @@ void EnumerateLegacyTracks()
 
 }
 
+float GetSoundTrackLoudness(SoundTrackType mode)
+{
+	float result = 0.0f;
+
+	if (!g_Configuration.EnableSound)
+		return result;
+
+	if (!BASS_ChannelIsActive(SoundtrackSlot[(int)mode].Channel))
+		return result;
+
+	BASS_ChannelGetLevelEx(SoundtrackSlot[(int)mode].Channel, &result, 0.1f, BASS_LEVEL_MONO | BASS_LEVEL_RMS);
+	return result;
+}
+
 void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 {
 	if (!g_Configuration.EnableSound)
@@ -443,6 +459,7 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	switch (mode)
 	{
 	case SoundTrackType::OneShot:
+	case SoundTrackType::Voice:
 		crossfadeTime = SOUND_XFADETIME_ONESHOT;
 		break;
 
@@ -561,8 +578,8 @@ void PlaySoundTrack(int index, short mask)
 
 void StopSoundTracks()
 {
-	StopSoundTrack(SoundTrackType::OneShot, SOUND_XFADETIME_ONESHOT);
-	StopSoundTrack(SoundTrackType::BGM, SOUND_XFADETIME_ONESHOT);
+	for (int i = 0; i < (int)SoundTrackType::Count; i++)
+		StopSoundTrack((SoundTrackType)i, SOUND_XFADETIME_ONESHOT);
 }
 
 void StopSoundTrack(SoundTrackType mode, int fadeoutTime)
@@ -622,7 +639,7 @@ int Sound_GetFreeSlot()
 	// No free slots, hijack now.
 
 	float minDistance = 0;
-	int farSlot = -1;
+	int farSlot = SOUND_NO_CHANNEL;
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
@@ -637,6 +654,25 @@ int Sound_GetFreeSlot()
 	TENLog("Hijacking sound effect slot " + std::to_string(farSlot), LogLevel::Info);
 	Sound_FreeSlot(farSlot, SOUND_XFADETIME_HIJACKSOUND);
 	return farSlot;
+}
+
+int Sound_TrackIsPlaying(const std::string& fileName)
+{
+	for (int i = 0; i < (int)SoundTrackType::Count; i++)
+	{
+		const auto& slot = SoundtrackSlot[i];
+
+		if (!BASS_ChannelIsActive(slot.Channel))
+			continue;
+
+		const auto name1 = TEN::Utils::ToLower(slot.Track);
+		const auto name2 = TEN::Utils::ToLower(fileName);
+
+		if (name1.compare(name2) == 0)
+			return true;
+	}
+
+	return false;
 }
 
 // Returns slot ID in which effect is playing, if found. If not found, returns -1.
@@ -671,17 +707,8 @@ int Sound_EffectIsPlaying(int effectID, Pose *position)
 				SoundSlot[i].Channel = NULL; // WTF, let's clean this up
 		}
 	}
-	return -1;
-}
 
-bool IsSoundEffectPlaying(int effectID)
-{
-	int channelIndex = Sound_EffectIsPlaying(effectID, nullptr);
-
-	if (channelIndex == -1)
-		return false;
-
-	return (SoundSlot[channelIndex].EffectID == effectID);
+	return SOUND_NO_CHANNEL;
 }
 
 // Gets the distance to the source.
@@ -725,7 +752,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 	SoundSlot[index].Channel = NULL;
 	SoundSlot[index].State = SoundState::Idle;
-	SoundSlot[index].EffectID = -1;
+	SoundSlot[index].EffectID = SOUND_NO_CHANNEL;
 }
 
 // Update sound position in a level.
@@ -893,7 +920,6 @@ void Sound_Init(const std::string& gameDirectory)
 		return;
 
 	// Initialize channels and tracks array
-	ZeroMemory(SoundtrackSlot, (sizeof(HSTREAM) * (int)SoundTrackType::Count));
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 
 	// Attach reverb effect to 3D channel
