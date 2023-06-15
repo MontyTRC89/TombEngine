@@ -1,6 +1,7 @@
 Version 1.1.0
 ==============
 
+* Fix enemies shooting Lara through static meshes and moveables.
 * Fix crash on loading if static meshes with IDs above maximum are present.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
