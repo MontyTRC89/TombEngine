@@ -536,13 +536,13 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 			UndrawShotgunMeshes(laraItem, weaponType);
 		}
 	}
-
+	
 	player.LeftArm.AnimObjectID =
 	player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
 	player.RightArm.AnimNumber =
 	player.LeftArm.AnimNumber = player.RightArm.AnimNumber;
 	player.RightArm.FrameNumber =
-	player.LeftArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+	player.LeftArm.FrameNumber = item.Animation.FrameNumber;
 }
 
 void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)
