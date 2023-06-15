@@ -12,8 +12,11 @@ Version 1.0.10
 * Fix doppelganger being limited to be in a single room.
 * Link bacon Lara reference to a bacon Lara with the same OCB.
 * Implement separate audio track channel for playing voiceovers.
+* Allow for multiple doppelgangers each separated with OCB.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
+* Add TR1 skateboard kid.
+* Add TR1 Kold guy.
 
 Lua API changes:
 * Add function Misc::GetAudioTrackLoudness().
