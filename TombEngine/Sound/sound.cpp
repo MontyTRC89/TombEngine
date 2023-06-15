@@ -437,33 +437,28 @@ float GetSoundTrackLoudness(SoundTrackType mode)
 	return std::clamp(result * 2.0f, 0.0f, 1.0f);
 }
 
-std::string GetCurrentSubtitle()
+std::optional<std::string> GetCurrentSubtitle()
 {
-	std::string result = {};
-
 	if (!g_Configuration.EnableSound)
-		return result;
+		return std::nullopt;
 
 	auto channel = SoundtrackSlot[(int)SoundTrackType::Voice].Channel;
 
 	if (!BASS_ChannelIsActive(channel))
-		return result;
+		return std::nullopt;
 
 	if (Subtitles.empty())
-		return result;
+		return std::nullopt;
 
 	long time = long(BASS_ChannelBytes2Seconds(channel, BASS_ChannelGetPosition(channel, BASS_POS_BYTE)) * 1000);
 
 	for (auto string : Subtitles)
 	{
 		if (time >= string->getStartTime() && time <= string->getEndTime())
-		{
-			result = string->getText();
-			break;
-		}
+			return string->getText();
 	}
 
-	return result;
+	return std::nullopt;
 }
 
 void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)

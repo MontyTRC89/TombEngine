@@ -188,12 +188,17 @@ namespace Misc
 
 	///Get current subtitle string for a voice track currently playing.
 	//Subtitle file must be in .srt format and must have same filename as voice track, and placed in same directory as voice track.
-	//Returns empty string if invalid.
+	//Returns nil if no voice track is playing or no subtitle present.
 	//@function GetCurrentSubtitle
 	//@treturn string current subtitle string
-	static std::string GetCurrentVoiceTrackSubtitle()
+	static TypeOrNil<std::string> GetCurrentVoiceTrackSubtitle()
 	{
-		return GetCurrentSubtitle();
+		auto& result = GetCurrentSubtitle();
+
+		if (result.has_value())
+			return result.value();
+		else
+			return sol::nil;
 	}
 
 	/// Play sound effect
