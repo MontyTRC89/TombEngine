@@ -457,6 +457,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR1\Entity\tr1_doppelganger.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_natla.h" />
+    <ClInclude Include="Objects\TR1\Entity\SkateboardKid.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
@@ -905,6 +906,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR1\Entity\tr1_doppelganger.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_giant_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_natla.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\SkateboardKid.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_winged_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
