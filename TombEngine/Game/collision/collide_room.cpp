@@ -350,7 +350,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->Middle.Ceiling = ceiling;
 
 	// Additionally calculate bridge shifts, if present.
-	CollideBridgeItems(*item, collResult, *coll);
+	CollideBridgeItems(*item, *coll, collResult);
 
 	// TEST 3: FRONTAL PROBE
 
