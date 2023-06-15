@@ -10,7 +10,7 @@ Version 1.1.0
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
 * Fix doppelganger being limited to be in a single room.
-* 	- Add multiple doppelgangers' by using the same OCB for the origin nullmesh and doppelganger.
+* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Add TR1 skateboard kid.
