@@ -171,6 +171,7 @@ void ClearSoundTrackMasks();
 void PlaySecretTrack();
 void EnumerateLegacyTracks();
 float GetSoundTrackLoudness(SoundTrackType mode);
+std::string GetCurrentSubtitle();
 
 std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SoundTrackType type);
 

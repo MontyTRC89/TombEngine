@@ -186,6 +186,16 @@ namespace Misc
 		return GetSoundTrackLoudness(playMode);
 	}
 
+	///Get current subtitle string for a voice track currently playing.
+	//Subtitle file must be in .srt format and must have same filename as voice track, and placed in same directory as voice track.
+	//Returns empty string if invalid.
+	//@function GetCurrentSubtitle
+	//@treturn string current subtitle string
+	static std::string GetCurrentVoiceTrackSubtitle()
+	{
+		return GetCurrentSubtitle();
+	}
+
 	/// Play sound effect
 	//@function PlaySound
 	//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
@@ -401,7 +411,8 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
 		tableMisc.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
 		tableMisc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
-		tableMisc.set_function(ScriptReserved_GetAudioTrackLoudness, &GetAudioTrackLoudness);
+		tableMisc.set_function(ScriptReserved_GetAudioTrackLoudness, &GetAudioTrackLoudness); 
+		tableMisc.set_function(ScriptReserved_GetCurrentSubtitle, &GetCurrentVoiceTrackSubtitle);
 
 		tableMisc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 		tableMisc.set_function(ScriptReserved_IsSoundPlaying, &IsSoundPlaying);

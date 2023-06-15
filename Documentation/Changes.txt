@@ -11,7 +11,7 @@ Version 1.0.10
 * Fix default ambience overlapping current one when loading a savegame.
 * Fix doppelganger being limited to be in a single room.
 * Link bacon Lara reference to a bacon Lara with the same OCB.
-* Implement separate audio track channel for playing voiceovers.
+* Implement separate audio track channel for playing voiceovers with subtitles.
 * Allow for multiple doppelgangers each separated with OCB.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
@@ -19,8 +19,10 @@ Version 1.0.10
 * Add TR1 Kold guy.
 
 Lua API changes:
-* Add function Misc::GetAudioTrackLoudness().
-* Add function Misc::IsAudioTrackPlaying().
+* Add soundtrack functions:
+  - Misc::GetAudioTrackLoudness() for getting current loudness of a given track type.
+  - Misc::IsAudioTrackPlaying() for checking if a given track type is playing.
+  - Misc::GetCurrentSubtitle() for getting current subtitle string for the voice track.
 
 Version 1.0.9
 =============

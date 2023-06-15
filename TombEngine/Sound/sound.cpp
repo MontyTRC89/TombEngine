@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <regex>
+#include <srtparser.h>
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -36,7 +37,9 @@ static std::string FullAudioDirectory;
 
 std::map<std::string, int> SoundTrackMap;
 std::unordered_map<int, SoundTrackInfo> SoundTracks;
-int SecretSoundIndex = 5;
+std::vector<SubtitleItem*> Subtitles;
+
+static int SecretSoundIndex = 5;
 constexpr int LegacyLoopingTrackMin = 98;
 constexpr int LegacyLoopingTrackMax = 111;
 
@@ -434,6 +437,35 @@ float GetSoundTrackLoudness(SoundTrackType mode)
 	return std::clamp(result * 2.0f, 0.0f, 1.0f);
 }
 
+std::string GetCurrentSubtitle()
+{
+	std::string result = {};
+
+	if (!g_Configuration.EnableSound)
+		return result;
+
+	auto channel = SoundtrackSlot[(int)SoundTrackType::Voice].Channel;
+
+	if (!BASS_ChannelIsActive(channel))
+		return result;
+
+	if (Subtitles.empty())
+		return result;
+
+	long time = long(BASS_ChannelBytes2Seconds(channel, BASS_ChannelGetPosition(channel, BASS_POS_BYTE)) * 1000);
+
+	for (auto string : Subtitles)
+	{
+		if (time >= string->getStartTime() && time <= string->getEndTime())
+		{
+			result = string->getText();
+			break;
+		}
+	}
+
+	return result;
+}
+
 void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 {
 	if (!g_Configuration.EnableSound)
@@ -535,6 +567,21 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 
 	SoundtrackSlot[(int)mode].Channel = stream;
 	SoundtrackSlot[(int)mode].Track = track;
+
+	// Additionally attempt to load subtitle file, if exists.
+
+	if (mode != SoundTrackType::Voice)
+		return;
+
+	auto subtitleName = FullAudioDirectory + track + ".srt";
+
+	if (!std::filesystem::is_regular_file(subtitleName))
+		return;
+
+	auto factory = new SubtitleParserFactory(subtitleName);
+	auto parser  = factory->getParser();
+	Subtitles    = parser->getSubtitles();
+	delete factory;
 }
 
 void PlaySoundTrack(std::string track, short mask)
