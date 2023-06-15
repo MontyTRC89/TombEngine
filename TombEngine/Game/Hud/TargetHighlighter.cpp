@@ -135,7 +135,7 @@ namespace TEN::Hud
 			segment.PosOffset2D = Get2DPositionOffset(segment.OrientOffset2D);
 	}
 
-	void TargetHighlighterController::Update(std::vector<int> entityIds)
+	void TargetHighlighterController::Update(const std::vector<int>& entityIds)
 	{
 		constexpr auto TARGET_BONE_ID = 0;
 
@@ -169,8 +169,7 @@ namespace TEN::Hud
 		for (auto& [entityID, crosshair] : Crosshairs)
 		{
 			// Find crosshairs at absent entity ID keys.
-			auto it = std::find(entityIds.begin(), entityIds.end(), entityID);
-			if (it != entityIds.end())
+			if (Contains(entityIds, entityID))
 				continue;
 
 			const auto& item = g_Level.Items[entityID];

@@ -50,7 +50,7 @@ namespace TEN::Hud
 
 	public:
 		// Utilities
-		void Update(std::vector<int> entityIds);
+		void Update(const std::vector<int>& entityIds);
 		void Update(const ItemInfo& playerItem);
 		void Draw() const;
 		void Clear();

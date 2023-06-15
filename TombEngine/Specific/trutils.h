@@ -18,4 +18,14 @@ namespace TEN::Utils
 	Vector2 ConvertNDCTo2DPosition(const Vector2& ndc);
 
 	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion);
+
+	template <typename TElement>
+	bool Contains(const std::vector<TElement>& vector, const TElement& element)
+	{
+		auto it = std::find(vector.begin(), vector.end(), element);
+		if (it == vector.end())
+			return false;
+
+		return true;
+	}
 }
