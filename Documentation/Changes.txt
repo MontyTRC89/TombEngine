@@ -13,6 +13,7 @@ Version 1.1.0
 * Fix doppelganger being limited to be in a single room.
 * Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Implement separate audio track channel for playing voiceovers with subtitles.
+* Don't stop ambience when Lara dies.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Add TR1 skateboard kid.

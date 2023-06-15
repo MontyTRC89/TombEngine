@@ -629,10 +629,16 @@ void PlaySoundTrack(int index, short mask)
 	PlaySoundTrack(SoundTracks[index].Name, SoundTracks[index].Mode);
 }
 
-void StopSoundTracks()
+void StopSoundTracks(bool excludeAmbience)
 {
 	for (int i = 0; i < (int)SoundTrackType::Count; i++)
+	{
+		auto mode = (SoundTrackType)i;
+		if (excludeAmbience && mode == SoundTrackType::BGM)
+			continue;
+
 		StopSoundTrack((SoundTrackType)i, SOUND_XFADETIME_ONESHOT);
+	}
 }
 
 void StopSoundTrack(SoundTrackType mode, int fadeoutTime)
