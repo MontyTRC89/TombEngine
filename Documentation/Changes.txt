@@ -9,7 +9,7 @@ Version 1.0.10
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
 * Fix doppelganger being limited to be in a single room.
-* Allow for multiple doppelgangers each separated with OCB.
+* Link bacon Lara reference to a bacon Lara with the same OCB.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Add TR1 skateboard kid.
