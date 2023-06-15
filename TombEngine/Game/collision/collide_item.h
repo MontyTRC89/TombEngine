@@ -1,8 +1,6 @@
 #pragma once
 #include "Math/Math.h"
 
-using std::pair;
-
 class FloorInfo;
 struct CollisionInfo;
 struct CollisionResult;
@@ -20,8 +18,8 @@ extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 struct ObjectCollisionBounds
 {
-	GameBoundingBox				   BoundingBox		= GameBoundingBox::Zero;
-	pair<EulerAngles, EulerAngles> OrientConstraint = {};
+	GameBoundingBox						BoundingBox		 = GameBoundingBox::Zero;
+	std::pair<EulerAngles, EulerAngles> OrientConstraint = {};
 };
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
@@ -47,7 +45,7 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
-void CollideBridgeItems(ItemInfo& item, CollisionResult& collResult, CollisionInfo& coll);
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void ObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

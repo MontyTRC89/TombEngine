@@ -884,7 +884,7 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
 	ShiftItem(&item, &coll);
 }
 
-void CollideBridgeItems(ItemInfo& item, CollisionResult& collResult, CollisionInfo& coll)
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult)
 {
 	// Store an offset for a bridge item into shifts, if exists.
 	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_ITEM)
