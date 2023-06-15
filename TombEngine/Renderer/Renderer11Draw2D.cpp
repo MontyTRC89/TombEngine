@@ -313,7 +313,7 @@ namespace TEN::Renderer
 
 		m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
 		m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
-		m_toneMap->SetExposure(-1.0f);
+		m_toneMap->SetExposure(-1.3f);
 		m_toneMap->SetHDRSourceTexture(m_renderTarget.ShaderResourceView.Get());
 		m_toneMap->Process(m_context.Get());
 
@@ -348,18 +348,17 @@ namespace TEN::Renderer
 		m_basicPostProcess->SetSourceTexture(m_blur2RT.ShaderResourceView.Get());
 		m_basicPostProcess->Process(m_context.Get());
 
-		// Pass 4 (scene+blur1 -> rt)
-		m_context->ClearRenderTargetView(target, Colors::Black);
-		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		m_context->OMSetRenderTargets(1, &target, depthTarget);
-
+		// Pass 4 (scene+blur1 -> temp)
+		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), depthTarget);
+		
 		m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
 		m_dualPostProcess->SetBloomCombineParameters(1.25f, 1.f, 1.f, 1.f);
 		m_dualPostProcess->SetSourceTexture(m_tempRT.ShaderResourceView.Get());
 		m_dualPostProcess->SetSourceTexture2(m_blur1RT.ShaderResourceView.Get());
 		m_dualPostProcess->Process(m_context.Get());
 
-		/*RendererVertex vertices[4];
+		// Final step (AA, cinematic bars, fade...)
+		RendererVertex vertices[4];
 
 		vertices[0].Position.x = -1.0f;
 		vertices[0].Position.y = 1.0f;
@@ -389,6 +388,10 @@ namespace TEN::Renderer
 		vertices[3].UV.y = 1.0f;
 		vertices[3].Color = Vector4::One;
 
+		m_context->ClearRenderTargetView(target, Colors::Black);
+		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_context->OMSetRenderTargets(1, &target, depthTarget);
+
 		m_context->VSSetShader(m_vsFinalPass.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psFinalPass.Get(), nullptr, 0);
 
@@ -407,7 +410,7 @@ namespace TEN::Renderer
 
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
-		m_primitiveBatch->End();*/
+		m_primitiveBatch->End();
 	}
 
 	void Renderer11::DrawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target,
