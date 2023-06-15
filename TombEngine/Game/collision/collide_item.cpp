@@ -911,7 +911,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 			deltaPose.Position -= item.Pose.Position - Vector3i(offset);
 		   
 			// Don't update shifts if difference is too big (possibly bridge was teleported or just entered bridge).
-			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius)
+			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius * 2)
 				coll.Shift = deltaPose;
 		}
 		else if (deltaPos.ToVector3().Length() <= coll.Setup.Radius && relDeltaHeight > 0 &&
