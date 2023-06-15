@@ -196,7 +196,6 @@ void KillItem(short const itemNumber)
 		auto* item = &g_Level.Items[itemNumber];
 
 		DetatchSpark(itemNumber, SP_ITEM);
-
 		item->Active = false;
 
 		if (NextItemActive == itemNumber)
