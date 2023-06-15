@@ -4,6 +4,7 @@
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
 #include "Game/missile.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
@@ -20,6 +21,7 @@
 #include "Objects/TR1/Entity/tr1_big_rat.h" // OK
 #include "Objects/TR1/Entity/tr1_centaur.h" // OK
 #include "Objects/TR1/Entity/tr1_winged_mutant.h" // OK
+#include "Objects/TR1/Entity/SkateboardKid.h" // OK
 #include "Objects/Utils/object_helper.h"
 
 // Traps
@@ -125,14 +127,19 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DOPPELGANGER];
 	if (obj->loaded)
 	{
-		obj->animIndex = Objects[ID_LARA].animIndex; // NOTE: lara is obviously loaded by default.
+		// NOTE: lara is obviously loaded by default.
+		auto& laraObj = Objects[ID_LARA];
+		obj->animIndex = laraObj.animIndex;
+		obj->frameBase = laraObj.frameBase;
 		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
 		obj->shadowType = ShadowMode::All;
-		obj->HitPoints = 1000;
+		obj->HitPoints = LARA_HEALTH_MAX;
 		obj->radius = 102;
-		obj->SetupHitEffect(true);
+		obj->intelligent = true;
+		obj->nonLot = true;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_CENTAUR_MUTANT];
@@ -197,6 +204,22 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_SKATEBOARD_KID];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeSkateboardKid;
+		obj->control = ControlSkateboardKid;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->HitPoints = 125;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(7, ROT_Y); // Head.
+		obj->SetBoneRotationFlags(0, ROT_Y | ROT_X); // Torso.
 		obj->SetupHitEffect();
 	}
 }
