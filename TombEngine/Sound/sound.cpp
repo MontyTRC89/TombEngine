@@ -431,7 +431,7 @@ float GetSoundTrackLoudness(SoundTrackType mode)
 		return result;
 
 	BASS_ChannelGetLevelEx(SoundtrackSlot[(int)mode].Channel, &result, 0.1f, BASS_LEVEL_MONO | BASS_LEVEL_RMS);
-	return result;
+	return std::clamp(result * 2.0f, 0.0f, 1.0f);
 }
 
 void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
