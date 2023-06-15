@@ -461,7 +461,7 @@ std::optional<std::string> GetCurrentSubtitle()
 	return std::nullopt;
 }
 
-void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
+void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD position)
 {
 	if (!g_Configuration.EnableSound)
 		return;
@@ -569,17 +569,24 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 		return;
 
 	auto subtitleName = FullAudioDirectory + track + ".srt";
+	LoadSubtitles(subtitleName);
+}
 
-	if (!std::filesystem::is_regular_file(subtitleName))
+void LoadSubtitles(const std::string& path)
+{
+	if (!std::filesystem::is_regular_file(path))
 		return;
 
-	auto factory = new SubtitleParserFactory(subtitleName);
+	auto factory = new SubtitleParserFactory(path);
 	auto parser  = factory->getParser();
 	Subtitles    = parser->getSubtitles();
 	delete factory;
+
+	for (auto& sub : Subtitles)
+		sub->setText(ReplaceNewLineSymbols(sub->getText()));
 }
 
-void PlaySoundTrack(std::string track, short mask)
+void PlaySoundTrack(const std::string& track, short mask)
 {
 	// If track name was included in script, play it as registered track and take mask into account.
 	// Otherwise, play it once without registering anywhere.
