@@ -536,13 +536,26 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 			UndrawShotgunMeshes(laraItem, weaponType);
 		}
 	}
+
+	// HACK: Get reholstering animation number.
+	int animNumber = 0;
+	switch (weaponType)
+	{
+	case LaraWeaponType::GrenadeLauncher:
+		animNumber = 5;
+		break;
+
+	default:
+		animNumber = 3;
+		break;
+	}
 	
 	player.LeftArm.AnimObjectID =
 	player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
 	player.RightArm.AnimNumber =
-	player.LeftArm.AnimNumber = player.RightArm.AnimNumber;
+	player.LeftArm.AnimNumber = animNumber;
 	player.RightArm.FrameNumber =
-	player.LeftArm.FrameNumber = item.Animation.FrameNumber;
+	player.LeftArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 }
 
 void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)
