@@ -13,6 +13,7 @@ Version 1.0.10
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Add TR1 skateboard kid.
+* Add TR1 Mr. T guy.
 
 Version 1.0.9
 =============
