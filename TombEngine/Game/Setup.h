@@ -58,7 +58,6 @@ struct ObjectInfo
 	int nmeshes; // BoneCount
 	int meshIndex; // Base index in g_Level.Meshes.
 	int boneIndex; // Base index in g_Level.Bones.
-	int frameBase; // Base index in g_Level.Frames.
 
 	LotType LotType;
 	HitEffect hitEffect;

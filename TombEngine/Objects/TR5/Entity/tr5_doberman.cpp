@@ -74,7 +74,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->Animation.ActiveState = DOBERMAN_STATE_STAND_IDLE;
 		}
 
-		item->Animation.FrameNumber = GetAnimData(item).frameBase;
+		item->Animation.FrameNumber = 0;
 	}
 
 	void DobermanControl(short itemNumber)
@@ -263,7 +263,7 @@ namespace TEN::Entities::Creatures::TR5
 		else if (item->Animation.ActiveState != DOBERMAN_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = DOBERMAN_ANIM_DEATH;
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.FrameNumber = 0;
 			item->Animation.ActiveState = DOBERMAN_STATE_DEATH;
 		}
 

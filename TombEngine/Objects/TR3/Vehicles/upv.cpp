@@ -527,7 +527,7 @@ namespace TEN::Entities::Vehicles
 
 		TestUPVDismount(UPVItem, laraItem);
 
-		int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
+		int frame = laraItem->Animation.FrameNumber;
 
 		switch (laraItem->Animation.ActiveState)
 		{

@@ -56,7 +56,7 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = SECTOR(1);
 
-	if (item->Animation.FrameNumber == (GetAnimData(*item).frameEnd - 1))
+	if (item->Animation.FrameNumber == (GetAnimData(*item).Keyframes.size() - 2))
 		lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -149,7 +149,7 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 	{
 		item->Animation.ActiveState = LS_MISC_CONTROL;
 		item->Animation.AnimNumber = item->ItemFlags[0];
-		item->Animation.FrameNumber = GetAnimData(*item).frameBase;
+		item->Animation.FrameNumber = 0;
 	}
 }
 
@@ -218,7 +218,7 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_IDLE;
 
 	if (item->Animation.AnimNumber == LA_PULLEY_PULL &&
-		item->Animation.FrameNumber == GetAnimData(*item).frameBase + 44)
+		item->Animation.FrameNumber == 44)
 	{
 		if (pulleyItem->TriggerFlags)
 		{
@@ -248,7 +248,7 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (item->Animation.AnimNumber == LA_PULLEY_RELEASE &&
-		item->Animation.FrameNumber == GetAnimData(*item).frameEnd - 1)
+		item->Animation.FrameNumber == (GetAnimData(*item).Keyframes.size() - 2))
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 	}
@@ -286,7 +286,7 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.IsAirborne = true;
 
-	if (item->Animation.FrameNumber == GetAnimData(*item).frameBase)
+	if (item->Animation.FrameNumber == 0)
 	{
 		int distance = 0;
 		if (item->Pose.Orientation.y == barItem.Pose.Orientation.y)
@@ -476,7 +476,7 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_SPRINT)
 		{
 			item->Animation.TargetState = LS_ROPE_SWING;
-			lara->Control.Rope.DFrame = (GetAnimData(*item, LA_ROPE_SWING).frameBase + 32) << 8;
+			lara->Control.Rope.DFrame = 32 << 8;
 			lara->Control.Rope.Frame = lara->Control.Rope.DFrame;
 		}
 		else if (TrInput & IN_FORWARD && lara->Control.Rope.Segment > 4)
@@ -540,21 +540,23 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.FrameNumber = lara->Control.Rope.Frame >> 8;
 
 		if (!(TrInput & IN_SPRINT) &&
-			item->Animation.FrameNumber == GetAnimData(*item, LA_ROPE_SWING).frameBase + 32 &&
+			item->Animation.FrameNumber == 32 &&
 			lara->Control.Rope.MaxXBackward < 6750 &&
 			lara->Control.Rope.MaxXForward < 6750)
 		{
 			item->Animation.TargetState = LS_ROPE_IDLE;
 			item->Animation.ActiveState = LS_ROPE_IDLE;
 			item->Animation.AnimNumber = LA_JUMP_UP_TO_ROPE_END;
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.FrameNumber = 0;
 		}
 
 		if (TrInput & IN_JUMP)
 			JumpOffRope(item);
 	}
-	else if (item->Animation.FrameNumber == GetAnimData(*item, LA_ROPE_IDLE_TO_SWING).frameBase + 15)
+	else if (item->Animation.FrameNumber == 15)
+	{
 		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Pose.Orientation.y, 128);
+	}
 }
 
 // State:	LS_ROPE_UP (112)
@@ -564,14 +566,16 @@ void lara_as_rope_up(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_ROLL)
+	{
 		FallFromRope(item);
+	}
 	else
 	{
 		Camera.targetAngle = ANGLE(30.0f);
 
-		if (GetAnimData(*item).frameEnd == item->Animation.FrameNumber)
+		if (TestLastFrame(item))
 		{
-			item->Animation.FrameNumber = GetAnimData(*item).frameBase;
+			item->Animation.FrameNumber = 0;
 			lara->Control.Rope.Segment -= 2;
 		}
 

@@ -39,7 +39,7 @@ namespace TEN::Entities::TR4
 		item->Animation.TargetState = JEAN_YVES_STATE_HANDS_BEHIND_HEAD;
 		item->Animation.ActiveState = JEAN_YVES_STATE_HANDS_BEHIND_HEAD;
 		item->Animation.AnimNumber = 0;
-		item->Animation.FrameNumber = GetAnimData(item).frameBase;
+		item->Animation.FrameNumber = 0;
 	}
 
 	void JeanYvesControl(short itemNumber)
@@ -68,7 +68,7 @@ namespace TEN::Entities::TR4
 			state++;
 
 			item->Animation.AnimNumber = animNumber;
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.FrameNumber = 0;
 			item->Animation.ActiveState = state;
 			item->Animation.TargetState = state;
 			item->TriggerFlags = Lara.HighestLocation;

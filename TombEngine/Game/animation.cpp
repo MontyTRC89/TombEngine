@@ -26,17 +26,28 @@ AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
 	// Normalize frame number into keyframe range.
 	float keyframeNumber = frameNumber / (float)Interpolation;
 
-	// Determine keyframe numbers defining interpolated frame and get references to them.
+	// Determine keyframe numbers defining interpolated frame.
 	int keyframeNumber0 = (int)floor(keyframeNumber);
 	int keyframeNumber1 = (int)ceil(keyframeNumber);
-	const auto& keyframe0 = g_Level.Frames[FramePtr + keyframeNumber0];
-	const auto& keyframe1 = g_Level.Frames[FramePtr + keyframeNumber1];
+
+	keyframeNumber0 = std::clamp(keyframeNumber0, 0, (int)Keyframes.size() - 1);
+	keyframeNumber1 = std::clamp(keyframeNumber1, 0, (int)Keyframes.size() - 1);
 
 	// Calculate interpolation alpha between keyframes.
 	float alpha = (1.0f / Interpolation) * (frameNumber % Interpolation);
 
 	// Return frame interpolation data.
-	return AnimFrameInterpData(keyframe0, keyframe1, alpha);
+	return AnimFrameInterpData(Keyframes[keyframeNumber0], Keyframes[keyframeNumber1], alpha);
+}
+
+const Keyframe& AnimData::GetKeyframe(int frameNumber) const
+{
+	static const auto DUMMY_KEYFRAME = Keyframe{};
+
+	if (frameNumber < 0 || frameNumber >= Keyframes.size())
+		return DUMMY_KEYFRAME;
+
+	return Keyframes[frameNumber];
 }
 
 const Keyframe& AnimData::GetClosestKeyframe(int frameNumber) const
@@ -48,7 +59,7 @@ const Keyframe& AnimData::GetClosestKeyframe(int frameNumber) const
 // NOTE: 0 frames counts as 1.
 static unsigned int GetNonZeroFrameCount(const AnimData& anim)
 {
-	unsigned int frameCount = anim.frameEnd - anim.frameBase;
+	unsigned int frameCount = anim.Keyframes.size() / anim.Interpolation;
 	return ((frameCount > 0) ? frameCount : 1);
 }
 
@@ -86,7 +97,7 @@ void AnimateItem(ItemInfo* item)
 		}
 	}
 
-	if (item->Animation.FrameNumber > animPtr->frameEnd)
+	if (item->Animation.FrameNumber >= (animPtr->Keyframes.size() * animPtr->Interpolation))
 	{
 		ExecuteAnimCommands(*item, false);
 
@@ -112,7 +123,7 @@ void AnimateItem(ItemInfo* item)
 	}
 
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
-	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
+	int currentFrame = item->Animation.FrameNumber;
 
 	if (item->Animation.IsAirborne)
 	{
@@ -231,21 +242,19 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 		return false;
 
 	const auto& anim = GetAnimData(item->Animation.AnimObjectID, animNumber.value());
-	return (item->Animation.FrameNumber >= anim.frameEnd);
+	return (item->Animation.FrameNumber >= (anim.Keyframes.size() * anim.Interpolation));
 }
 
+// Deprecated.
 bool TestAnimFrame(const ItemInfo& item, int frameStart)
 {
-	const auto& anim = GetAnimData(item);
-	return (item.Animation.FrameNumber == (anim.frameBase + frameStart));
+	return (item.Animation.FrameNumber == frameStart);
 }
 
-// NOTE: Parameters are relative frame numbers.
 bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd)
 {
-	const auto& anim = GetAnimData(item);
-	return (item.Animation.FrameNumber >= (anim.frameBase + frameStart) &&
-			item.Animation.FrameNumber <= (anim.frameBase + frameEnd));
+	return (item.Animation.FrameNumber >= frameStart &&
+			item.Animation.FrameNumber <= frameEnd);
 }
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
@@ -265,18 +274,16 @@ void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
 
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 {
-	const auto& animObject = Objects[animObjectID];
-	const auto& anim = GetAnimData(animObject, animNumber);
-
-	int frameIndex = anim.frameBase + frameNumber;
-
 	// Animation already set; return early.
 	if (item.Animation.AnimObjectID == animObjectID &&
 		item.Animation.AnimNumber == animNumber &&
-		item.Animation.FrameNumber == frameIndex)
+		item.Animation.FrameNumber == frameNumber)
 	{
 		return;
 	}
+
+	const auto& animObject = Objects[animObjectID];
+	const auto& anim = GetAnimData(animObject, animNumber);
 
 	// Animation missing; return early.
 	if (animNumber < 0 || animNumber >= animObject.Animations.size())
@@ -292,7 +299,7 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 
 	item.Animation.AnimObjectID = animObjectID;
 	item.Animation.AnimNumber = animNumber;
-	item.Animation.FrameNumber = frameIndex;
+	item.Animation.FrameNumber = frameNumber;
 	item.Animation.ActiveState =
 	item.Animation.TargetState = anim.ActiveState;
 }
@@ -349,7 +356,7 @@ const Keyframe& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNu
 	const auto& anim = GetAnimData(objectID, animNumber);
 
 	// Get and clamp frame count.
-	unsigned int frameCount = anim.frameEnd - anim.frameBase;
+	unsigned int frameCount = anim.Keyframes.size() * anim.Interpolation;
 	if (frameNumber > frameCount)
 		frameNumber = frameCount;
 
@@ -378,10 +385,10 @@ const Keyframe& GetClosestKeyframe(const ItemInfo& item)
 	return anim.GetClosestKeyframe(frameNumber);
 }
 
+// Deprecated. Got relative.
 int GetFrameNumber(const ItemInfo& item)
 {
-	const auto& anim = GetAnimData(item);
-	return (item.Animation.FrameNumber - anim.frameBase);
+	return item.Animation.FrameNumber;
 }
 
 int GetFrameIndex(ItemInfo* item, int frameNumber)
@@ -390,16 +397,16 @@ int GetFrameIndex(ItemInfo* item, int frameNumber)
 	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameNumber);
 }
 
+// Deprecated. Got absolute.
 int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 {
-	const auto& anim = GetAnimData(objectID, animNumber);
-	return (anim.frameBase + frameNumber);
+	return frameNumber;
 }
 
 int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
 {
 	const auto& anim = GetAnimData(objectID, animNumber);
-	return (anim.frameEnd - anim.frameBase);
+	return anim.Keyframes.size() * anim.Interpolation;
 }
 
 int GetFrameCount(const ItemInfo& item)

@@ -87,7 +87,7 @@ namespace TEN::Entities::Switches
 						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;
 						laraItem->Animation.TargetState = LS_COGWHEEL;
 						laraItem->Animation.ActiveState = LS_COGWHEEL;
-						laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+						laraItem->Animation.FrameNumber = 0;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 						lara->Context.InteractedItem = targetItemNum;
@@ -137,7 +137,7 @@ namespace TEN::Entities::Switches
 
 			if (LaraItem->Animation.AnimNumber == LA_COGWHEEL_PULL)
 			{
-				if (LaraItem->Animation.FrameNumber == GetAnimData(LaraItem).frameBase + 10)
+				if (LaraItem->Animation.FrameNumber == 10)
 				{
 					if (!switchItem->TriggerFlags)
 					{
@@ -149,8 +149,8 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if ((switchItem->Animation.FrameNumber == GetAnimData(switchItem).frameEnd)
-				&& (LaraItem->Animation.AnimNumber == LA_COGWHEEL_RELEASE))
+			if (TestLastFrame(switchItem) &&
+				LaraItem->Animation.AnimNumber == LA_COGWHEEL_RELEASE)
 			{
 				switchItem->Animation.ActiveState = SWITCH_OFF;
 				switchItem->Status = ITEM_NOT_ACTIVE;

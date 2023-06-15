@@ -300,7 +300,7 @@ namespace TEN::Entities::TR4
 				if (canJump)
 				{
 					if (item->Animation.AnimNumber == SETH_ANIM_POUNCE_ATTACK_START &&
-						item->Animation.FrameNumber == GetAnimData(item).frameBase)
+						item->Animation.FrameNumber == 0)
 					{
 						creature.MaxTurn = 0;
 						creature.ReachedGoal = true;
@@ -340,7 +340,7 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_HARD_RECOIL:
 				if (item->Animation.AnimNumber == SETH_ANIM_HARD_RECOIL_START &&
-					item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+					TestLastFrame(item))
 				{
 					if (Random::TestProbability(SETH_HARD_RECOIL_RECOVER_CHANCE))
 						item->Animation.RequiredState = SETH_STATE_HARD_RECOIL_RECOVER;
@@ -367,8 +367,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.TestAny())
 					{
-						if (item->Animation.FrameNumber > (GetAnimData(item).frameBase + SETH_ANIM_POUNCE_ATTACK_START) &&
-							item->Animation.FrameNumber < (GetAnimData(item).frameBase + SETH_ANIM_IDLE_TO_HOVER))
+						if (item->Animation.FrameNumber > SETH_ANIM_POUNCE_ATTACK_START &&
+							item->Animation.FrameNumber < SETH_ANIM_IDLE_TO_HOVER)
 						{
 							DoDamage(creature.Enemy, SETH_KILL_ATTACK_DAMAGE);
 							CreatureEffect2(item, SethBite1, 25, -1, DoBloodSplat);

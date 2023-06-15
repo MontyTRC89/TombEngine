@@ -274,7 +274,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = HORSEMAN_ANIM_DEATH;
 					item->Animation.ActiveState = HORSEMAN_STATE_DEATH;
-					item->Animation.FrameNumber = GetAnimData(item).frameBase;
+					item->Animation.FrameNumber = 0;
 
 					if (item->ItemFlags[0])
 					{
@@ -289,7 +289,7 @@ namespace TEN::Entities::TR4
 				item->AIBits = 0;
 				item->ItemFlags[1] = 0;
 				item->Animation.AnimNumber =HORSEMAN_ANIM_FALL_OFF_HORSE_START;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = HORSEMAN_STATE_FALL_OFF_HORSE;
 				creature->Enemy = nullptr;
 
@@ -523,10 +523,10 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_REAR:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+				if (item->Animation.FrameNumber == 0)
 				{
 					horseItem->Animation.AnimNumber = HORSE_ANIM_REAR;
-					horseItem->Animation.FrameNumber = GetAnimData(horseItem).frameBase;
+					horseItem->Animation.FrameNumber = 0;
 					horseItem->Animation.ActiveState = HORSE_STATE_REAR;
 				}
 
@@ -609,7 +609,7 @@ namespace TEN::Entities::TR4
 					creature->Enemy = nullptr;
 
 					item->Animation.AnimNumber = HORSEMAN_ANIM_MOUNT_HORSE;
-					item->Animation.FrameNumber = GetAnimData(item).frameBase;
+					item->Animation.FrameNumber = 0;
 					item->Animation.ActiveState = HORSEMAN_STATE_MOUNT_HORSE;
 
 					creature->MaxTurn = 0;
@@ -716,10 +716,10 @@ namespace TEN::Entities::TR4
 				}
 
 				if (item->Animation.AnimNumber == HORSEMAN_ANIM_MOUNTED_SPRINT &&
-					item->Animation.FrameNumber == GetAnimData(item).frameBase)
+					item->Animation.FrameNumber == 0)
 				{
 					horseItem->Animation.AnimNumber = HORSE_ANIM_SPRINT;
-					horseItem->Animation.FrameNumber = GetAnimData(horseItem).frameBase;
+					horseItem->Animation.FrameNumber = 0;
 				}
 
 				if (laraAI.distance > pow(SECTOR(4), 2) || creature->ReachedGoal)

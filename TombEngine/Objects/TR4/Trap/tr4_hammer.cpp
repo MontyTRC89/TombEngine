@@ -44,7 +44,7 @@ namespace TEN::Entities::TR4
     void HammerControl(short itemNumber)
     {
         auto* item = &g_Level.Items[itemNumber];
-        int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+        int frameNumber = item->Animation.FrameNumber;
         item->ItemFlags[3] = HAMMER_HIT_DAMAGE;
 
         if (!TriggerActive(item))
@@ -79,7 +79,7 @@ namespace TEN::Entities::TR4
             else
             {
                 item->Animation.AnimNumber = HAMMER_ANIM_ACTIVATED;
-                item->Animation.FrameNumber = GetAnimData(item).frameBase;
+                item->Animation.FrameNumber = 0;
                 item->Animation.ActiveState = HAMMER_STATE_ACTIVE;
                 item->Animation.TargetState = HAMMER_STATE_ACTIVE;
                 item->ItemFlags[2] = HAMMER_OCB4_INTERVAL;

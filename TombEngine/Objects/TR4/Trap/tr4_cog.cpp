@@ -28,7 +28,7 @@ namespace TEN::Entities::TR4
                 
                 //Shouldnt this be TR4_LIBRARY_COG_LOOP? Changed. Rollback if incorrect. Stranger1992 06/06/22
 
-                if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+                if (TestLastFrame(item))
                     item->Flags &= 0xC1;
             }
         }

@@ -21,6 +21,6 @@ namespace TEN::Entities::TR4
             AnimateItem(item);
         }
         else
-            item->Animation.FrameNumber = GetAnimData(item).frameBase;
+            item->Animation.FrameNumber = 0;
     }
 }

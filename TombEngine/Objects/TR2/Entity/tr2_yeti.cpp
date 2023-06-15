@@ -61,7 +61,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != 8)
 			{
 				item->Animation.AnimNumber = 31;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = 8;
 			}
 		}
@@ -290,25 +290,25 @@ namespace TEN::Entities::Creatures::TR2
 			{
 			case 2:
 				item->Animation.AnimNumber = 34;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = 10;
 				break;
 
 			case 3:
 				item->Animation.AnimNumber = 33;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = 11;
 				break;
 
 			case 4:
 				item->Animation.AnimNumber = 32;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = 12;
 				break;
 
 			case -4:
 				item->Animation.AnimNumber = 35;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = 13;
 				break;
 			}

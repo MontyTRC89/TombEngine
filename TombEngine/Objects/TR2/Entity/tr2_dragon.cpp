@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR2
 				int angle = laraItem->Pose.Orientation.y - item->Pose.Orientation.y;
 
 				int anim = item->Animation.AnimNumber;
-				int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+				int frame = item->Animation.FrameNumber;
 
 				if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 					TrInput & IN_ACTION &&
@@ -438,7 +438,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		back->Animation.ActiveState = item->Animation.ActiveState;
 		back->Animation.AnimNumber = item->Animation.AnimNumber;
-		back->Animation.FrameNumber =  GetAnimData(back).frameBase + (item->Animation.FrameNumber - GetAnimData(item).frameBase);
+		back->Animation.FrameNumber = item->Animation.FrameNumber;
 		back->Pose = item->Pose;
 
 		if (back->RoomNumber != item->RoomNumber)

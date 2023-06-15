@@ -210,7 +210,7 @@ namespace TEN::Entities::Vehicles
 			SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_MOUNT_JUMP);
 			break;
 		} 
-		laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+		laraItem->Animation.FrameNumber = 0;
 
 		if (laraItem->RoomNumber != speedboatItem->RoomNumber)
 			ItemNewRoom(lara->ItemNumber, speedboatItem->RoomNumber);

@@ -217,7 +217,7 @@ namespace TEN::Entities::TR4
 
 		if (animNumber == DEMIGOD2_ANIM_SINGLE_PROJECTILE_ATTACK)
 		{
-			if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+			if (item->Animation.FrameNumber == 0)
 			{
 				auto origin = GetJointPosition(item, 16, Vector3i(-544, 96, 0));
 				auto target = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
@@ -232,7 +232,7 @@ namespace TEN::Entities::TR4
 		}
 		else if (animNumber == DEMIGOD3_ANIM_SINGLE_PROJECTILE_ATTACK)
 		{
-			if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+			if (item->Animation.FrameNumber == 0)
 			{
 				auto pos1 = GetJointPosition(item,  16, Vector3i(-544, 96, 0));
 				auto pos2 = GetJointPosition(item, 16, Vector3i(-900, 96, 0));
@@ -247,7 +247,7 @@ namespace TEN::Entities::TR4
 		}
 		else if (animNumber == DEMIGOD3_ANIM_RADIAL_PROJECTILE_ATTACK)
 		{
-			int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+			int frameNumber = item->Animation.FrameNumber;
 
 			if (frameNumber >= 8 && frameNumber <= 64)
 			{
@@ -360,13 +360,13 @@ namespace TEN::Entities::TR4
 					item->Animation.ActiveState == DEMIGOD_STATE_RUN_FORWARD)
 				{
 					item->Animation.AnimNumber = DEMIGOD_ANIM_RUN_OVER_DEATH;
-					item->Animation.FrameNumber = GetAnimData(item).frameBase;
+					item->Animation.FrameNumber = 0;
 					item->Animation.ActiveState = DEMIGOD_STATE_RUN_OVER_DEATH;
 				}
 				else
 				{
 					item->Animation.AnimNumber = DEMIGOD_ANIM_DEATH;
-					item->Animation.FrameNumber = GetAnimData(item).frameBase;
+					item->Animation.FrameNumber = 0;
 					item->Animation.ActiveState = DEMIGOD_STATE_DEATH;
 				}
 			}
@@ -694,7 +694,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DEMIGOD1_STATE_HAMMER_ATTACK:
-				if ((item->Animation.FrameNumber - GetAnimData(item).frameBase) == DEMIGOD_ANIM_RUN_TO_IDLE)
+				if (item->Animation.FrameNumber == DEMIGOD_ANIM_RUN_TO_IDLE)
 				{
 					auto pos = GetJointPosition(item, 17, Vector3i(80, -8, -40));
 

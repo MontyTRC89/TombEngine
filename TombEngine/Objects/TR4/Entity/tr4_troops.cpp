@@ -64,7 +64,7 @@ namespace TEN::Entities::TR4
 			item->Animation.AnimNumber = 12;
 		}
 
-		item->Animation.FrameNumber = GetAnimData(item).frameBase;
+		item->Animation.FrameNumber = 0;
 	}
 
 	void TroopsControl(short itemNumber)
@@ -104,9 +104,9 @@ namespace TEN::Entities::TR4
 						item->Animation.AnimNumber = 23;
 
 						if (item->Animation.ActiveState == TROOP_STATE_ATTACKED_BY_SCORPION)
-							item->Animation.FrameNumber = GetAnimData(item).frameBase + 37;
+							item->Animation.FrameNumber = 37;
 						else
-							item->Animation.FrameNumber = GetAnimData(item).frameBase;
+							item->Animation.FrameNumber = 0;
 
 						item->Animation.ActiveState = TROOP_STATE_KILLED_BY_SCORPION;
 						item->Animation.TargetState = TROOP_STATE_KILLED_BY_SCORPION;
@@ -128,7 +128,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = 19;
 					item->Animation.ActiveState = TROOP_STATE_DEATH;
-					item->Animation.FrameNumber = GetAnimData(item).frameBase;
+					item->Animation.FrameNumber = 0;
 				}
 			}
 		}
@@ -460,7 +460,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = 28;
 					item->Animation.ActiveState = TROOP_STATE_FLASHED;
-					item->Animation.FrameNumber = GetAnimData(item).frameBase + (GetRandomControl() & 7);
+					item->Animation.FrameNumber = (GetRandomControl() & 7);
 					creature->MaxTurn = 0;
 				}
 			}

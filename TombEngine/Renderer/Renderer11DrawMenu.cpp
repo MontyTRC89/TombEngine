@@ -570,8 +570,8 @@ namespace TEN::Renderer
 		if (!object.Animations.empty())
 		{
 			auto frameData = AnimFrameInterpData(
-				g_Level.Frames[GetAnimData(object, 0).FramePtr],
-				g_Level.Frames[GetAnimData(object, 0).FramePtr],
+				GetAnimData(object, 0).Keyframes[0],
+				GetAnimData(object, 0).Keyframes[0],
 				0.0f);
 			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
 		}

@@ -126,7 +126,7 @@ void UndrawFlare(ItemInfo& laraItem)
 		if (laraItem.Animation.AnimNumber == LA_STAND_IDLE)
 		{
 			laraItem.Animation.AnimNumber = LA_DISCARD_FLARE;
-			flareFrame = armFrame + GetAnimData(laraItem).frameBase;
+			flareFrame = armFrame;
 			laraItem.Animation.FrameNumber = flareFrame;
 			player.Flare.Frame = flareFrame;
 		}
@@ -135,7 +135,7 @@ void UndrawFlare(ItemInfo& laraItem)
 		{
 			player.Flare.ControlLeft = false;
 
-			if (flareFrame >= (GetAnimData(laraItem).frameBase + 31)) // 31 = Last frame.
+			if (flareFrame >= 31) // 31 = Last frame.
 			{
 				player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 				player.Control.Weapon.GunType = player.Control.Weapon.LastGunType;
@@ -147,7 +147,7 @@ void UndrawFlare(ItemInfo& laraItem)
 				player.LeftArm.Locked =
 				player.RightArm.Locked = false;
 				SetAnimation(laraItem, LA_STAND_IDLE);
-				player.Flare.Frame = GetAnimData(laraItem).frameBase;
+				player.Flare.Frame = 0;
 				return;
 			}
 

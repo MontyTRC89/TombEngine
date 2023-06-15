@@ -326,7 +326,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 			}
 
-			int frameEnd =  GetAnimData(object, PUNA_ANIM_DEATH).frameEnd;
+			int frameEnd = GetAnimData(object, PUNA_ANIM_DEATH).Keyframes.size() - 1;
 			if (item.Animation.FrameNumber >= frameEnd)
 			{
 				// Avoid having the object stop working.

@@ -180,10 +180,10 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void SpawnMutantPlasmaLight(ItemInfo& item)
 	{
-		int bright = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+		int bright = item.Animation.FrameNumber;
 		if (bright > 16)
 		{
-			bright = GetAnimData(item).frameBase + 28 + 16 - item.Animation.FrameNumber;
+			bright = 28 + 16 - item.Animation.FrameNumber;
 			if (bright > 16)
 				bright = 16;
 		}
@@ -310,7 +310,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.Animation.ActiveState != CLAW_MUTANT_STATE_DEATH)
 				SetAnimation(&item, CLAW_MUTANT_ANIM_DEATH);
 
-			int frameEnd = GetAnimData(item, CLAW_MUTANT_ANIM_DEATH).frameEnd;
+			int frameEnd = GetAnimData(item, CLAW_MUTANT_ANIM_DEATH).Keyframes.size() - 1;
 			if (item.Animation.FrameNumber >= frameEnd)
 				CreatureDie(itemNumber, true);
 		}

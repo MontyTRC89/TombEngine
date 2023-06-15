@@ -323,7 +323,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += AI.angle;
 				}
 				
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+				if (item->Animation.FrameNumber == 0)
 				{
 					if (item->ObjectNumber == ID_PIERRE)
 					{
@@ -356,7 +356,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			// When Larson dies, it activates trigger at start position
 			if (item->ObjectNumber == ID_LARSON &&
-				item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+				TestLastFrame(item))
 			{
 				short roomNumber = item->ItemFlags[2] & 0xFF;
 				short floorHeight = item->ItemFlags[2] & 0xFF00;
@@ -380,7 +380,7 @@ namespace TEN::Entities::Creatures::TR5
 			else
 				item->Animation.AnimNumber = ANIMATION_TR5_LARSON_DIE;
 
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.FrameNumber = 0;
 			item->Animation.ActiveState = STATE_TR5_LARSON_DIE;
 		}
 

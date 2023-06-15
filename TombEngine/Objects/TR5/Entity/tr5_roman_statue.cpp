@@ -417,7 +417,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				pos = Vector3i((pos1.x + pos2.x) / 2, (pos1.y + pos2.y) / 2, (pos1.z + pos2.z) / 2);
 
-				deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+				deltaFrame = item->Animation.FrameNumber;
 
 				if (deltaFrame > 68 && deltaFrame < 130)
 				{
@@ -537,7 +537,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += ai.angle;
 				}
 
-				if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 10)
+				if (item->Animation.FrameNumber > 10)
 				{
 					pos = GetJointPosition(item, 16);
 
@@ -582,7 +582,7 @@ namespace TEN::Entities::Creatures::TR5
 						pos1 = GetJointPosition(item, 14, Vector3i(-40, 64, 360));
 						pos1.y = item->Pose.Position.y - 64;
 
-						if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 34 && item->Animation.ActiveState == 3)
+						if (item->Animation.FrameNumber == 34 && item->Animation.ActiveState == 3)
 						{
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
@@ -593,8 +593,8 @@ namespace TEN::Entities::Creatures::TR5
 							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 						}
 
-						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
-						int deltaFrame2 = GetAnimData(item).frameEnd - item->Animation.FrameNumber;
+						deltaFrame = item->Animation.FrameNumber;
+						int deltaFrame2 = item->Animation.FrameNumber;
 
 						if (deltaFrame2 >= 16)
 						{
@@ -672,7 +672,7 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item->Pose.Orientation.y += ANGLE(2.0f);
 
-				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+				if (TestLastFrame(item))
 					item->Pose.Orientation.y += -ANGLE(180.0f);
 
 				break;
@@ -688,7 +688,7 @@ namespace TEN::Entities::Creatures::TR5
 					TriggerDynamicLight(RomanStatueData.Position.x, RomanStatueData.Position.y, RomanStatueData.Position.z, 16, 0, color, color / 2);
 				}
 
-				deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+				deltaFrame = item->Animation.FrameNumber;
 
 				if (deltaFrame == 34)
 				{

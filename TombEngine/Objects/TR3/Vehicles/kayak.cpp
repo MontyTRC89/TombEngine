@@ -618,7 +618,7 @@ namespace TEN::Entities::Vehicles
 			SetAnimation(*laraItem, ID_KAYAK_LARA_ANIMS, KAYAK_ANIM_IDLE_DEATH);
 		}
 
-		int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
+		int frame = laraItem->Animation.FrameNumber;
 
 		switch (laraItem->Animation.ActiveState)
 		{

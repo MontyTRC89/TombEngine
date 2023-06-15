@@ -41,13 +41,13 @@ namespace TEN::Entities::Creatures::TR2
 		if (item->ObjectNumber == ID_CROW)
 		{
 			item->Animation.AnimNumber = 14;
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.FrameNumber = 0;
 			item->Animation.ActiveState = item->Animation.TargetState = 7;
 		}
 		else
 		{
 			item->Animation.AnimNumber = 5;
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.FrameNumber = 0;
 			item->Animation.ActiveState = item->Animation.TargetState = 2;
 		}
 	}
@@ -88,7 +88,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					item->Animation.AnimNumber = 8;
 
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = 4;
 				item->Animation.Velocity.z = 0;
 				item->Animation.IsAirborne = true;

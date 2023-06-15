@@ -127,7 +127,7 @@ namespace TEN::Entities::TR4
 			item.Animation.TargetState = item.Animation.ActiveState = 4;
 		}
 
-		item.Animation.FrameNumber = GetAnimData(item).frameBase;
+		item.Animation.FrameNumber = 0;
 	}
 
 	void SasControl(short itemNumber)
@@ -474,7 +474,7 @@ namespace TEN::Entities::TR4
 					angle2 = 0;
 				}
 
-				if (item.Animation.FrameNumber == (GetAnimData(item).frameBase + 20))
+				if (item.Animation.FrameNumber == 20)
 				{
 					if (!creature.Enemy->Animation.Velocity.z)
 					{

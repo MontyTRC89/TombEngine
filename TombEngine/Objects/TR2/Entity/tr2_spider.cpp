@@ -222,7 +222,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != 7)
 			{
 				item->Animation.AnimNumber = 2;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = 7;
 			}
 		}

@@ -16,15 +16,13 @@ void ClockworkBeetleControl(short itemNumber)
 
 	if (LaraItem->Animation.AnimNumber == LA_MECHANICAL_BEETLE_USE)
 	{
-		short fb = GetAnimData(ID_LARA, LA_MECHANICAL_BEETLE_USE).frameBase;
-
-		if (LaraItem->Animation.FrameNumber < fb + 14)
+		if (LaraItem->Animation.FrameNumber < 14)
 		{
 			beetle->Status = ITEM_INVISIBLE;
 			return;
 		}
 
-		if (LaraItem->Animation.FrameNumber < fb + 104)
+		if (LaraItem->Animation.FrameNumber < 104)
 		{
 			auto pos = GetJointPosition(LaraItem, LM_RHAND, Vector3i(0, 0, -32));
 
@@ -35,7 +33,7 @@ void ClockworkBeetleControl(short itemNumber)
 			return;
 		}
 
-		if (LaraItem->Animation.FrameNumber == fb + 104)
+		if (LaraItem->Animation.FrameNumber == 104)
 		{
 			short roomNumber = beetle->RoomNumber;
 			FloorInfo* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, &roomNumber);

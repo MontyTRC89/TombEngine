@@ -230,10 +230,14 @@ void WreckingBallControl(short itemNumber)
 	else if (item->ItemFlags[1] == 1)
 	{
 		if (!item->TriggerFlags)
+		{
 			--item->TriggerFlags;
+		}
 		else if (!item->Animation.ActiveState)
+		{
 			item->Animation.TargetState = 1;
-		else if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+		}
+		else if (TestLastFrame(item))
 		{
 			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose);
 			++item->ItemFlags[1];

@@ -319,7 +319,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TRIBESMAN_STATE_RUN_AXE_ATTACK_HIGH:
 				item->ItemFlags[0] = 1;
 				creature->MaxTurn = ANGLE(4.0f);
-				creature->Flags = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+				creature->Flags = item->Animation.FrameNumber;
 
 				if (creature->Enemy->IsLara())
 				{
@@ -655,7 +655,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Pose.Orientation.y += ANGLE(2.0f);
 				}
 
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 15)
+				if (item->Animation.FrameNumber == 15)
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 					TribesmanShotDart(item);

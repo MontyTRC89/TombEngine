@@ -84,10 +84,10 @@ namespace TEN::Entities::Creatures::TR3
 			if (item->Animation.ActiveState != 13)
 			{
 				item->Animation.AnimNumber = 14;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = 13;
 			}
-			else if (Random::TestProbability(0.25f) && item->Animation.FrameNumber == GetAnimData(item).frameBase + 1)
+			else if (Random::TestProbability(0.25f) && item->Animation.FrameNumber == 1)
 			{
 				CreatureAIInfo(item, &AI);
 
@@ -348,7 +348,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (item->Animation.AnimNumber == 12 ||
 					(item->Animation.AnimNumber == 1 &&
-						item->Animation.FrameNumber == GetAnimData(item).frameBase + 10))
+						item->Animation.FrameNumber == 10))
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.RequiredState = MPGUN_STATE_WAIT;
@@ -386,7 +386,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+				if (item->Animation.FrameNumber == 0)
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WAIT;
@@ -410,8 +410,8 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase ||
-					item->Animation.FrameNumber == GetAnimData(item).frameBase + 11)
+				if (item->Animation.FrameNumber == 0 ||
+					item->Animation.FrameNumber == 11)
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WAIT;
@@ -435,9 +435,9 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				if ((item->Animation.AnimNumber == 18 &&
-						item->Animation.FrameNumber == GetAnimData(item).frameBase + 17) ||
+						item->Animation.FrameNumber == 17) ||
 					(item->Animation.AnimNumber == 19 &&
-						item->Animation.FrameNumber == GetAnimData(item).frameBase + 6))
+						item->Animation.FrameNumber == 6))
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.RequiredState = MPGUN_STATE_WALK;
@@ -467,7 +467,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->Animation.RequiredState == MPGUN_STATE_WALK)
 					item->Animation.TargetState = MPGUN_STATE_WALK;
 
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 16)
+				if (item->Animation.FrameNumber == 16)
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32))
 						item->Animation.TargetState = MPGUN_STATE_WALK;
@@ -523,7 +523,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (AI.ahead)
 					extraTorsoRot.y = AI.angle;
 
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+				if (item->Animation.FrameNumber == 0)
 				{
 					if (!ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32) || Random::TestProbability(1 / 8.0f))
 						item->Animation.TargetState = MPGUN_STATE_CROUCHED;

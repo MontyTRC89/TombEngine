@@ -12,15 +12,19 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		if (!TriggerActive(item))
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+		{
+			item->Animation.FrameNumber = 0;
+		}
 		else
 		{
-			int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
-
-			if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+			if (TestLastFrame(item))
+			{
 				item->ItemFlags[3] = 0;
+			}
 			else
+			{
 				item->ItemFlags[3] = 200;
+			}
 
 			AnimateItem(item);
 		}

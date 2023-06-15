@@ -298,29 +298,29 @@ void LoadObjects()
 		object.nmeshes = ReadInt32();
 		object.meshIndex = ReadInt32();
 		object.boneIndex = ReadInt32();
-		object.frameBase = ReadInt32();
+		int frameBase = ReadInt32(); // TODO: Remove from compiler.
 
 		// Load animations.
 		int animCount = ReadInt32();
 		object.Animations.resize(animCount);
 		for (auto& anim : object.Animations)
 		{
-			anim.FramePtr = ReadInt32();
+			// TODO: Remove frame stuff from compiler.
+			int framePtr = ReadInt32();
 			anim.Interpolation = ReadInt32();
 			anim.ActiveState = ReadInt32();
 			anim.VelocityStart = ReadVector3();
 			anim.VelocityEnd = ReadVector3();
-			anim.frameBase = ReadInt32();
-			anim.frameEnd = ReadInt32();
+			int frameBase = ReadInt32();
+			int frameEnd = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
-			anim.NextFrameNumber = ReadInt32();
+			anim.NextFrameNumber = ReadInt32() - frameBase;
 
 			// Load keyframes.
 			int frameCount = ReadInt32();
-			for (int i = 0; i < frameCount; i++)
+			anim.Keyframes.resize(frameCount);
+			for (auto& keyframe : anim.Keyframes)
 			{
-				auto keyframe = Keyframe{};
-
 				keyframe.BoundingBox.X1 = ReadInt32();
 				keyframe.BoundingBox.X2 = ReadInt32();
 				keyframe.BoundingBox.Y1 = ReadInt32();
@@ -339,9 +339,6 @@ void LoadObjects()
 					orient.z = ReadFloat();
 					orient.w = ReadFloat();
 				}
-
-				// TODO: Remove g_Level.Frames in animation refactors tier 5 and store keyframes inside AnimData.
-				g_Level.Frames.push_back(keyframe);
 			}
 
 			// Load state dispatches.
@@ -900,7 +897,6 @@ void FreeLevel()
 	MoveablesIds.resize(0);
 	g_Level.Boxes.resize(0);
 	g_Level.Overlaps.resize(0);
-	g_Level.Frames.resize(0);
 	g_Level.Sprites.resize(0);
 	g_Level.SoundDetails.resize(0);
 	g_Level.SoundMap.resize(0);

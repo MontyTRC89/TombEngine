@@ -220,7 +220,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case SPHINX_STATE_COLLIDE:
-			if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+			if (item->Animation.FrameNumber == 0)
 			{
 				TestTriggers(item, true);
 

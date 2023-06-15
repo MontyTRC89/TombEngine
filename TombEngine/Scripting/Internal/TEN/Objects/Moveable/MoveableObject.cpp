@@ -814,7 +814,7 @@ void Moveable::SetAnimNumber(int animNumber)
 
 int Moveable::GetFrameNumber() const
 {
-	return (m_item->Animation.FrameNumber - GetAnimData(*m_item).frameBase);
+	return m_item->Animation.FrameNumber;
 }
 
 Vec3 Moveable::GetVelocity() const
@@ -837,13 +837,13 @@ void Moveable::SetFrameNumber(int frameNumber)
 {
 	const auto& anim = GetAnimData(*m_item);
 
-	unsigned int frameCount = anim.frameEnd - anim.frameBase;
+	unsigned int frameCount = anim.Keyframes.size();
 	
 	bool cond = frameNumber < frameCount;
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
 	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount-1))
 	{
-		m_item->Animation.FrameNumber = frameNumber + anim.frameBase;
+		m_item->Animation.FrameNumber = frameNumber;
 	}
 	else
 	{
@@ -1181,6 +1181,6 @@ void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int state
 	m_item->Animation.AnimObjectID = objectID;
 	m_item->Animation.AnimNumber = animNumber;
 	m_item->Animation.ActiveState = stateID;
-	m_item->Animation.FrameNumber = GetAnimData(*m_item).frameBase;
+	m_item->Animation.FrameNumber = 0;
 	AnimateItem(m_item);
 }

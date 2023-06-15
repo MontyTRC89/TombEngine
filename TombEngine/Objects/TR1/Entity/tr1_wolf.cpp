@@ -83,7 +83,7 @@ namespace TEN::Entities::Creatures::TR1
 			if (item->Animation.ActiveState != WOLF_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = WOLF_ANIM_DEATH + short(GetRandomControl() / 11000);
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = WOLF_STATE_DEATH;
 			}
 		}

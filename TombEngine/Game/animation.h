@@ -38,22 +38,21 @@ struct AnimData
 	int ActiveState		= 0;
 	int Interpolation	= 0;
 	int NextAnimNumber	= 0;
-	int NextFrameNumber = 0; // g_Level.Frames index. TODO: Use relative frame number in animation refactors tier 5.
+	int NextFrameNumber = 0;
 
 	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 	Vector3 VelocityStart = Vector3::Zero;
 	Vector3 VelocityEnd	  = Vector3::Zero;
 
-	// TODO: Remove in animation refactors tier 5.
-	int FramePtr  = 0; // g_Level.Frames base index?
-	int frameBase = 0; // g_Level.Frames start index.
-	int frameEnd  = 0; // g_Level.Frames end index.
-
-	//std::vector<Keyframe>		   Keyframes  = {}; // TODO: Animation refactors tier 5.
+	// TODO: Make private.
+	std::vector<Keyframe>		   Keyframes  = {};
 	std::vector<StateDispatchData> Dispatches = {};
 	std::vector<AnimCommandPtr>	   Commands	  = {};
 	
+	unsigned int		GetFrameCount() const;
+	int					GetLastFrameNumber() const;
 	AnimFrameInterpData GetFrameInterpData(int frameNumber) const;
+	const Keyframe&		GetKeyframe(int frameNumber) const; // TODO: Must adopt.
 	const Keyframe&		GetClosestKeyframe(int frameNumber) const;
 };
 
@@ -88,7 +87,7 @@ void AnimateItem(ItemInfo* item);
 
 // Inquirers
 bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState = std::nullopt);
-bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt);
+bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Maybe replace with GetLastFrame() and do comparisons?
 bool TestAnimFrame(const ItemInfo& item, int frameStart);
 bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd);
 

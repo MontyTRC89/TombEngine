@@ -68,7 +68,7 @@ void InitializePuzzleDone(short itemNumber)
 	const auto& anim = GetAnimData(receptacleItem);
 
 	receptacleItem.Animation.RequiredState = NO_STATE;
-	receptacleItem.Animation.FrameNumber = anim.frameBase + anim.frameEnd;
+	receptacleItem.Animation.FrameNumber = anim.Keyframes.size();
 }
 
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -175,7 +175,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 			ResetPlayerFlex(laraItem);
-			laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+			laraItem->Animation.FrameNumber = 0;
 			player.Control.IsMoving = false;
 			player.Control.HandStatus = HandStatus::Busy;
 			player.Context.InteractedItem = itemNumber;
@@ -292,7 +292,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			receptacleItem.ItemFlags[0] = 1;
 
 			ResetPlayerFlex(laraItem);
-			laraItem->Animation.FrameNumber = GetAnimData(*laraItem, laraItem->Animation.AnimNumber).frameBase;
+			laraItem->Animation.FrameNumber = 0;
 			player.Control.IsMoving = false;
 			player.Control.HandStatus = HandStatus::Busy;
 			player.Context.InteractedItem = itemNumber;
@@ -346,7 +346,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 	{
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		item->Animation.AnimNumber = 0;
-		item->Animation.FrameNumber = GetAnimData(item).frameBase;
+		item->Animation.FrameNumber = 0;
 		item->Animation.ActiveState = GetAnimData(item).ActiveState;
 		item->Animation.TargetState = GetAnimData(item).ActiveState;
 		item->Animation.RequiredState = NO_STATE;
@@ -503,7 +503,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				}
 				
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				laraItem->Animation.FrameNumber = 0;
 				player->Control.IsMoving = false;
 				ResetPlayerFlex(laraItem);
 				player->Control.HandStatus = HandStatus::Busy;
