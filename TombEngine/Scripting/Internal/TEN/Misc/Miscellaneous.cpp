@@ -179,6 +179,7 @@ namespace Misc
 	///Get current loudness level for specified track type
 	//@function GetAudioTrackLoudness
 	//@tparam Misc.SoundTrackType type of the audio track
+	//@treturn float current loudness of a specified audio track
 	static float GetAudioTrackLoudness(TypeOrNil<SoundTrackType> mode)
 	{
 		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);

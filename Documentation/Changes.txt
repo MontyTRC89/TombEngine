@@ -1,9 +1,11 @@
 Version 1.0.10
 ==============
 
+* Implement separate audio track channel for playing voiceovers.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Fix crash on loading if static meshes with IDs above maximum are present.
+* Fix random crashes when playing audio tracks with names longer than 15 symbols.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix electricity effect crashing 64-bit version of the engine.
@@ -13,6 +15,10 @@ Version 1.0.10
 * Fix doppelganger being limited to be in a single room.
 * Improve doppelganger beacon detection, now if the doppel have ocb 1,
 it will use the beacon reference with ocb 1 for the mirror position.
+
+Lua API changes:
+* Add function Misc::GetAudioTrackLoudness().
+* Add function Misc::IsAudioTrackPlaying().
 
 Version 1.0.9
 =============
