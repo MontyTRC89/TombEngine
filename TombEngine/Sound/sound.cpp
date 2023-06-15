@@ -564,20 +564,24 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD positio
 	SoundtrackSlot[(int)mode].Track = track;
 
 	// Additionally attempt to load subtitle file, if exists.
+	if (mode == SoundTrackType::Voice)
+		LoadSubtitles(track);
 
-	if (mode != SoundTrackType::Voice)
-		return;
-
-	auto subtitleName = FullAudioDirectory + track + ".srt";
-	LoadSubtitles(subtitleName);
 }
 
-void LoadSubtitles(const std::string& path)
+void LoadSubtitles(const std::string& name)
 {
-	if (!std::filesystem::is_regular_file(path))
+	Subtitles.clear();
+
+	auto subtitleName = FullAudioDirectory + name + ".srt";
+
+	if (!std::filesystem::is_regular_file(subtitleName))
+		subtitleName = FullAudioDirectory + "/subtitles/" + name + ".srt";
+
+	if (!std::filesystem::is_regular_file(subtitleName))
 		return;
 
-	auto factory = new SubtitleParserFactory(path);
+	auto factory = new SubtitleParserFactory(subtitleName);
 	auto parser  = factory->getParser();
 	Subtitles    = parser->getSubtitles();
 	delete factory;
