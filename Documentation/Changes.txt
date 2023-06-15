@@ -1,12 +1,17 @@
 Version 1.0.10
 ==============
 
+* Fix crash on loading if static meshes with IDs above maximum are present.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix electricity effect crashing 64-bit version of the engine.
 * Fix clockwork beetle activation crashing the game.
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
+* Fix doppelganger being limited to be in a single room.
+* Link bacon Lara reference to a bacon Lara with the same OCB.
+* Pause all sounds when entering inventory or pause menu.
+* Improve deflection against slopes.
 
 Version 1.0.9
 =============
