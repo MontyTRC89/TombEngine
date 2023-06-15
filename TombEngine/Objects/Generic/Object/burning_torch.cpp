@@ -181,7 +181,7 @@ namespace TEN::Entities::Generic
 			if (!(Wibble & 7))
 				TriggerTorchFlame(laraItem - g_Level.Items.data(), 0);
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (Pose*)&pos);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &Pose(pos));
 		}
 	}
 
@@ -199,7 +199,6 @@ namespace TEN::Entities::Generic
 		lara->Control.Weapon.GunType = LaraWeaponType::Torch;
 		lara->Flare.ControlLeft = true;
 		lara->LeftArm.Locked = false;
-		lara->LeftArm.AnimObjectID = ID_LARA_TORCH_ANIM;
 		lara->LeftArm.AnimObjectID = ID_LARA_TORCH_ANIM;
 		lara->LeftArm.AnimNumber = 0;
 		lara->LeftArm.FrameNumber = 0;

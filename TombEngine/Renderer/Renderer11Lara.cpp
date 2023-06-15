@@ -68,6 +68,7 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 			return false;
 		}
 	}
+
 	break;
 
 	default:

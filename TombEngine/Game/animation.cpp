@@ -19,6 +19,8 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
+// TODO: Arm anim object in samegame.
+
 AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
 {
 	// Normalize frame number into keyframe range.

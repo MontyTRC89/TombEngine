@@ -281,7 +281,7 @@ void DrawFlare(ItemInfo& laraItem)
 void SetFlareArm(ItemInfo& laraItem, int armFrame)
 {
 	auto& player = *GetLaraInfo(&laraItem);
-	auto animObjectID = GetWeaponObjectID(player.Control.Weapon.GunType);;
+	auto animObjectID = GetWeaponObjectID(player.Control.Weapon.GunType);
 
 	int flareAnimNumber = 0;
 	if (armFrame >= 95)
