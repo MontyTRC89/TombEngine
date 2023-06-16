@@ -638,6 +638,19 @@ void HarpoonBoltControl(short itemNumber)
 {
 	auto& harpoonItem = g_Level.Items[itemNumber];
 
+	if (harpoonItem.HitPoints < HARPOON_TIME)
+	{
+		harpoonItem.HitPoints--;
+
+		if (harpoonItem.HitPoints == 0)
+		{
+			ExplodeItemNode(&harpoonItem, 0, 0, BODY_EXPLODE);
+			KillItem(itemNumber);
+		}
+
+		return;
+	}
+
 	if (TestEnvironment(ENV_FLAG_WATER, &harpoonItem))
 	{
 		if (harpoonItem.Animation.Velocity.z > 64.0f)
@@ -651,7 +664,6 @@ void HarpoonBoltControl(short itemNumber)
 	TranslateItem(&harpoonItem, harpoonItem.Pose.Orientation, harpoonItem.Animation.Velocity.z);
 
 	int damage = Weapons[(int)LaraWeaponType::HarpoonGun].Damage;
-
 	HandleProjectile(harpoonItem, *LaraItem, prevPos, (ProjectileType)harpoonItem.ItemFlags[0], damage);
 }
 
@@ -1474,7 +1486,6 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		if (pointColl.Position.Floor < projectile.Pose.Position.y ||
 			pointColl.Position.Ceiling > projectile.Pose.Position.y)
 		{
-			projectile.Pose.Position = prevPos;
 			hasHit =
 			hasHitNotByEmitter = true;
 		}
