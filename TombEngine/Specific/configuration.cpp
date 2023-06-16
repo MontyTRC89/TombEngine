@@ -259,6 +259,12 @@ bool SaveConfiguration()
 		return false;
 	}
 
+	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
 	if (SetBoolRegKey(rootKey, REGKEY_AUTOTARGET, g_Configuration.AutoTarget) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
@@ -293,6 +299,7 @@ void InitDefaultConfiguration()
 
 	auto currentScreenResolution = GetScreenResolution();
 
+	g_Configuration.EnableSubtitles = true;
 	g_Configuration.AutoTarget = true;
 	g_Configuration.SoundDevice = 1;
 	g_Configuration.EnableReverb = true;
@@ -422,8 +429,15 @@ bool LoadConfiguration()
 		return false;
 	}
 
-	bool autoTarget = false;
+	bool autoTarget = true;
 	if (GetBoolRegKey(rootKey, REGKEY_AUTOTARGET, &autoTarget, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool enableSubtitles = true;
+	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -464,6 +478,7 @@ bool LoadConfiguration()
 	g_Configuration.AutoTarget = autoTarget;
 	g_Configuration.EnableRumble = enableRumble;
 	g_Configuration.EnableThumbstickCameraControl = enableThumbstickCamera;
+	g_Configuration.EnableSubtitles = enableSubtitles;
 
 	// Set legacy variables
 	SetVolumeMusic(musicVolume);

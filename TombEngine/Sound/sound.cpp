@@ -439,7 +439,7 @@ float GetSoundTrackLoudness(SoundTrackType mode)
 
 std::optional<std::string> GetCurrentSubtitle()
 {
-	if (!g_Configuration.EnableSound)
+	if (!g_Configuration.EnableSound || !g_Configuration.EnableSubtitles)
 		return std::nullopt;
 
 	auto channel = SoundtrackSlot[(int)SoundTrackType::Voice].Channel;
