@@ -260,7 +260,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->radius = 170;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::ExplosivesOnly;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
 		}
@@ -277,7 +277,7 @@ namespace TEN::Entities
 			obj->radius = 128;
 			obj->explodableMeshbits = 0xA00;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::ExplosivesOnly;
 			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect();
 		}
@@ -293,7 +293,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_Y);
 			obj->SetupHitEffect();
@@ -310,7 +310,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
-			obj->undead = false;
 			obj->LotType = LotType::Flyer;
 			obj->SetupHitEffect();
 		}
@@ -326,7 +325,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect(true);
 		}
@@ -342,7 +341,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
 			obj->SetBoneRotationFlags(20, ROT_Y);
 			obj->SetupHitEffect(true);
@@ -413,7 +412,7 @@ namespace TEN::Entities
 			obj->control = SentryGunControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->HitPoints = 30;
 			obj->pivotLength = 50;
 			obj->radius = 204;
@@ -489,7 +488,7 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetupHitEffect();
 		}
 
@@ -571,7 +570,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -634,7 +633,7 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->undead = true; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
+			obj->damageType = DamageMode::None; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
 			obj->LotType = LotType::HumanPlusJumpAndMonkey;
 			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);

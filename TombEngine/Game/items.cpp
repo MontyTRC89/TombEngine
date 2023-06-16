@@ -821,7 +821,8 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
-	if (!object.undead || isExplosive)
+	if ((object.damageType == DamageMode::AnyWeapon) ||
+		(object.damageType == DamageMode::ExplosivesOnly && isExplosive))
 	{
 		if (target->HitPoints > 0)
 		{
