@@ -21,6 +21,17 @@ using TEN::Renderer::g_Renderer;
 
 // TODO: Arm anim object in samegame.
 
+unsigned int AnimData::GetFrameCount(bool isNonZero) const
+{
+	unsigned int frameCount = (Keyframes.size() - 1) * Interpolation;
+	return ((isNonZero && frameCount <= 0) ? 1 : frameCount);
+}
+
+int AnimData::GetLastFrameNumber() const
+{
+	return (Keyframes.size() - 1); // TODO: What if empty?
+}
+
 AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
 {
 	// Normalize frame number into keyframe range.
@@ -29,9 +40,6 @@ AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
 	// Determine keyframe numbers defining interpolated frame.
 	int keyframeNumber0 = (int)floor(keyframeNumber);
 	int keyframeNumber1 = (int)ceil(keyframeNumber);
-
-	keyframeNumber0 = std::clamp(keyframeNumber0, 0, (int)Keyframes.size() - 1);
-	keyframeNumber1 = std::clamp(keyframeNumber1, 0, (int)Keyframes.size() - 1);
 
 	// Calculate interpolation alpha between keyframes.
 	float alpha = (1.0f / Interpolation) * (frameNumber % Interpolation);
@@ -44,7 +52,7 @@ const Keyframe& AnimData::GetKeyframe(int frameNumber) const
 {
 	static const auto DUMMY_KEYFRAME = Keyframe{};
 
-	if (frameNumber < 0 || frameNumber >= Keyframes.size())
+	if (frameNumber < 0 || frameNumber >= Keyframes.size() || Keyframes.empty())
 		return DUMMY_KEYFRAME;
 
 	return Keyframes[frameNumber];
@@ -59,7 +67,7 @@ const Keyframe& AnimData::GetClosestKeyframe(int frameNumber) const
 // NOTE: 0 frames counts as 1.
 static unsigned int GetNonZeroFrameCount(const AnimData& anim)
 {
-	unsigned int frameCount = anim.Keyframes.size() / anim.Interpolation;
+	unsigned int frameCount = (anim.Keyframes.size() - 1) * anim.Interpolation;
 	return ((frameCount > 0) ? frameCount : 1);
 }
 
@@ -97,7 +105,7 @@ void AnimateItem(ItemInfo* item)
 		}
 	}
 
-	if (item->Animation.FrameNumber >= (animPtr->Keyframes.size() * animPtr->Interpolation))
+	if (item->Animation.FrameNumber > ((animPtr->Keyframes.size() - 1) * animPtr->Interpolation))
 	{
 		ExecuteAnimCommands(*item, false);
 
@@ -242,7 +250,7 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 		return false;
 
 	const auto& anim = GetAnimData(item->Animation.AnimObjectID, animNumber.value());
-	return (item->Animation.FrameNumber >= (anim.Keyframes.size() * anim.Interpolation));
+	return (item->Animation.FrameNumber >= ((anim.Keyframes.size() - 1) * anim.Interpolation));
 }
 
 // Deprecated.

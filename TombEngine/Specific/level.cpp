@@ -298,23 +298,18 @@ void LoadObjects()
 		object.nmeshes = ReadInt32();
 		object.meshIndex = ReadInt32();
 		object.boneIndex = ReadInt32();
-		int frameBase = ReadInt32(); // TODO: Remove from compiler.
 
 		// Load animations.
 		int animCount = ReadInt32();
 		object.Animations.resize(animCount);
 		for (auto& anim : object.Animations)
 		{
-			// TODO: Remove frame stuff from compiler.
-			int framePtr = ReadInt32();
 			anim.Interpolation = ReadInt32();
 			anim.ActiveState = ReadInt32();
 			anim.VelocityStart = ReadVector3();
 			anim.VelocityEnd = ReadVector3();
-			int frameBase = ReadInt32();
-			int frameEnd = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
-			anim.NextFrameNumber = ReadInt32() - frameBase;
+			anim.NextFrameNumber = ReadInt32();
 
 			// Load keyframes.
 			int frameCount = ReadInt32();

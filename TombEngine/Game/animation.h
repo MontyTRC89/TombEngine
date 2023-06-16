@@ -36,9 +36,9 @@ struct AnimData
 	using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 
 	int ActiveState		= 0;
-	int Interpolation	= 0;
 	int NextAnimNumber	= 0;
 	int NextFrameNumber = 0;
+	int Interpolation	= 0;
 
 	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 	Vector3 VelocityStart = Vector3::Zero;
@@ -49,7 +49,7 @@ struct AnimData
 	std::vector<StateDispatchData> Dispatches = {};
 	std::vector<AnimCommandPtr>	   Commands	  = {};
 	
-	unsigned int		GetFrameCount() const;
+	unsigned int		GetFrameCount(bool isNonZero = false) const;
 	int					GetLastFrameNumber() const;
 	AnimFrameInterpData GetFrameInterpData(int frameNumber) const;
 	const Keyframe&		GetKeyframe(int frameNumber) const; // TODO: Must adopt.
