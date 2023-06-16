@@ -21,15 +21,15 @@ using TEN::Renderer::g_Renderer;
 
 // TODO: Arm anim object in samegame.
 
-unsigned int AnimData::GetFrameCount(bool isNonZero) const
+unsigned int AnimData::GetFrameCount() const
 {
-	unsigned int frameCount = (Keyframes.size() - 1) * Interpolation;
-	return ((isNonZero && frameCount <= 0) ? 1 : frameCount);
+	return EndFrameNumber; // Check.
 }
 
 int AnimData::GetLastFrameNumber() const
 {
-	return (Keyframes.size() - 1); // TODO: What if empty?
+	assertion(!Keyframes.empty(), "AnimData::GetLastFrameNumber() called on animation with 0 frames.");
+	return (Keyframes.size() - 1);
 }
 
 AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
@@ -64,13 +64,6 @@ const Keyframe& AnimData::GetClosestKeyframe(int frameNumber) const
 	return ((frameData.Alpha <= 0.5f) ? frameData.Keyframe0 : frameData.Keyframe1);
 }
 
-// NOTE: 0 frames counts as 1.
-static unsigned int GetNonZeroFrameCount(const AnimData& anim)
-{
-	unsigned int frameCount = (anim.Keyframes.size() - 1) * anim.Interpolation;
-	return ((frameCount > 0) ? frameCount : 1);
-}
-
 static void ExecuteAnimCommands(ItemInfo& item, bool isFrameBased)
 {
 	const auto& anim = GetAnimData(item);
@@ -96,7 +89,7 @@ void AnimateItem(ItemInfo* item)
 	{
 		animPtr = &GetAnimData(*item);
 
-		item->Animation.ActiveState = animPtr->ActiveState;
+		item->Animation.ActiveState = animPtr->State;
 
 		if (!item->IsLara())
 		{
@@ -105,7 +98,7 @@ void AnimateItem(ItemInfo* item)
 		}
 	}
 
-	if (item->Animation.FrameNumber > ((animPtr->Keyframes.size() - 1) * animPtr->Interpolation))
+	if (item->Animation.FrameNumber > animPtr->EndFrameNumber)
 	{
 		ExecuteAnimCommands(*item, false);
 
@@ -114,10 +107,10 @@ void AnimateItem(ItemInfo* item)
 
 		animPtr = &GetAnimData(*item);
 		
-		if (item->Animation.ActiveState != animPtr->ActiveState)
+		if (item->Animation.ActiveState != animPtr->State)
 		{
 			item->Animation.ActiveState =
-			item->Animation.TargetState = animPtr->ActiveState;
+			item->Animation.TargetState = animPtr->State;
 
 			// NOTE: Legacy code only set TargetState for the player.
 			// Remove this comment if no issues arise with new generic behaviour. -- Sezz 2023.06.07
@@ -130,8 +123,12 @@ void AnimateItem(ItemInfo* item)
 		}
 	}
 
-	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
-	int currentFrame = item->Animation.FrameNumber;
+	// NOTE: Must use non-zero frame count in this edge case.
+	unsigned int frameCount = animPtr->GetFrameCount();
+	if (frameCount == 0)
+		frameCount = 1;
+
+	int currentFrameNumber = item->Animation.FrameNumber;
 
 	if (item->Animation.IsAirborne)
 	{
@@ -175,14 +172,14 @@ void AnimateItem(ItemInfo* item)
 			const auto& player = *GetLaraInfo(item);
 
 			if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-				item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame) / 4);
+				item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrameNumber) / 4);
 			else
-				item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+				item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrameNumber);
 		}
 		else
 		{
-			item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
-			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+			item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrameNumber);
+			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrameNumber);
 		}
 	}
 	
@@ -190,7 +187,7 @@ void AnimateItem(ItemInfo* item)
 	{
 		const auto& player = *GetLaraInfo(item);
 
-		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
+		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrameNumber);
 
 		if (player.Control.Rope.Ptr != -1)
 			DelAlignLaraToRope(item);
@@ -250,7 +247,7 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 		return false;
 
 	const auto& anim = GetAnimData(item->Animation.AnimObjectID, animNumber.value());
-	return (item->Animation.FrameNumber >= ((anim.Keyframes.size() - 1) * anim.Interpolation));
+	return (item->Animation.FrameNumber == anim.EndFrameNumber);
 }
 
 // Deprecated.
@@ -259,10 +256,10 @@ bool TestAnimFrame(const ItemInfo& item, int frameStart)
 	return (item.Animation.FrameNumber == frameStart);
 }
 
-bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd)
+bool TestAnimFrameRange(const ItemInfo& item, int frameNumber0, int frameNumber1)
 {
-	return (item.Animation.FrameNumber >= frameStart &&
-			item.Animation.FrameNumber <= frameEnd);
+	return (item.Animation.FrameNumber >= frameNumber0 &&
+			item.Animation.FrameNumber <= frameNumber1);
 }
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
@@ -309,7 +306,7 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 	item.Animation.AnimNumber = animNumber;
 	item.Animation.FrameNumber = frameNumber;
 	item.Animation.ActiveState =
-	item.Animation.TargetState = anim.ActiveState;
+	item.Animation.TargetState = anim.State;
 }
 
 void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
@@ -364,7 +361,7 @@ const Keyframe& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNu
 	const auto& anim = GetAnimData(objectID, animNumber);
 
 	// Get and clamp frame count.
-	unsigned int frameCount = anim.Keyframes.size() * anim.Interpolation;
+	unsigned int frameCount = anim.EndFrameNumber; // Check.
 	if (frameNumber > frameCount)
 		frameNumber = frameCount;
 
@@ -414,7 +411,7 @@ int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
 {
 	const auto& anim = GetAnimData(objectID, animNumber);
-	return anim.Keyframes.size() * anim.Interpolation;
+	return anim.EndFrameNumber; // Check.
 }
 
 int GetFrameCount(const ItemInfo& item)
@@ -432,7 +429,7 @@ int GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber)
 	const auto& anim = GetAnimData(objectID, animNumber);
 	const auto& nextAnim = GetAnimData(objectID, anim.NextAnimNumber);
 
-	return nextAnim.ActiveState;
+	return nextAnim.State;
 }
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)

@@ -304,12 +304,13 @@ void LoadObjects()
 		object.Animations.resize(animCount);
 		for (auto& anim : object.Animations)
 		{
-			anim.Interpolation = ReadInt32();
-			anim.ActiveState = ReadInt32();
-			anim.VelocityStart = ReadVector3();
-			anim.VelocityEnd = ReadVector3();
+			anim.State = ReadInt32();
+			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
+			anim.Interpolation = ReadInt32();
+			anim.VelocityStart = ReadVector3();
+			anim.VelocityEnd = ReadVector3();
 
 			// Load keyframes.
 			int frameCount = ReadInt32();
@@ -827,15 +828,14 @@ void ReadRooms()
 
 			volume.Type = (VolumeType)ReadInt32();
 
-			// NOTE: Braces are necessary to ensure correct value init order.
-			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
-			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
-			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
-
+			auto pos = ReadVector3();
+			auto orient = ReadVector4();
+			auto scale = ReadVector3();
+			
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Box    = BoundingOrientedBox(pos, scale, orient);
+			volume.Box = BoundingOrientedBox(pos, scale, orient);
 			volume.Sphere = BoundingSphere(pos, scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);

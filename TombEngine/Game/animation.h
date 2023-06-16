@@ -35,7 +35,8 @@ struct AnimData
 {
 	using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 
-	int ActiveState		= 0;
+	int State			= 0;
+	int EndFrameNumber	= 0;
 	int NextAnimNumber	= 0;
 	int NextFrameNumber = 0;
 	int Interpolation	= 0;
@@ -49,7 +50,7 @@ struct AnimData
 	std::vector<StateDispatchData> Dispatches = {};
 	std::vector<AnimCommandPtr>	   Commands	  = {};
 	
-	unsigned int		GetFrameCount(bool isNonZero = false) const;
+	unsigned int		GetFrameCount() const;
 	int					GetLastFrameNumber() const;
 	AnimFrameInterpData GetFrameInterpData(int frameNumber) const;
 	const Keyframe&		GetKeyframe(int frameNumber) const; // TODO: Must adopt.
@@ -89,7 +90,7 @@ void AnimateItem(ItemInfo* item);
 bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState = std::nullopt);
 bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Maybe replace with GetLastFrame() and do comparisons?
 bool TestAnimFrame(const ItemInfo& item, int frameStart);
-bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd);
+bool TestAnimFrameRange(const ItemInfo& item, int frameNumber0, int frameNumber1);
 
 // Entity translation
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
