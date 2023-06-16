@@ -935,7 +935,7 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 	if (verbose || bassError)
 	{
 		va_start(argptr, verbose);
-		int32_t written = vsprintf(data, (char*)message, argptr);	// @TODO: replace with debug/console/message output later...
+		int written = vsprintf(data, (char*)message, argptr);	// @TODO: replace with debug/console/message output later...
 		va_end(argptr);
 		snprintf(data + written, sizeof(data) - written, bassError ? ": error #%d" : ": success", bassError);
 		TENLog(data, bassError ? LogLevel::Error : LogLevel::Info);

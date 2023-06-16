@@ -15,19 +15,15 @@ namespace TEN::Entities::Creatures::TR1
 {
 	ItemInfo* FindReference(ItemInfo* item, short objectNumber)
 	{
-		bool found = false;
-		int itemNumber = NO_ITEM;
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
 			auto* currentItem = &g_Level.Items[i];
 			if (currentItem->ObjectNumber == objectNumber && item->TriggerFlags == currentItem->TriggerFlags)
 			{
-				itemNumber = i;
-				found = true;
-				break;
+				return currentItem;
 			}
 		}
-		return (itemNumber == NO_ITEM ? nullptr : &g_Level.Items[itemNumber]);
+		return nullptr;
 	}
 
 	short GetWeaponDamage(LaraWeaponType weaponType)

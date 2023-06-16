@@ -299,8 +299,6 @@ namespace TEN::Effects::Environment
 				p.CollisionCheckDelay--;
 			}
 
-			auto& r = g_Level.Rooms[p.Room];
-
 			// Check if particle got out of room bounds
 
 			if (!IsPointInRoom(p.Position, p.Room))

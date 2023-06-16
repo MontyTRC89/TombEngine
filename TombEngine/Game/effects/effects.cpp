@@ -1169,7 +1169,6 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	auto endColor   = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * scale;
-	int steps = int((width / 2) / step);
 	int currentStep = 0;
 
 	while (true)
@@ -1663,7 +1662,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 				spark->sLife = spark->life >> 2;
 			}
 
-			spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
+			spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 48;
 		}
 	}
 	else
