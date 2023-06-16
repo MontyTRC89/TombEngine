@@ -266,7 +266,6 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 	}
 
 	const auto& animObject = Objects[animObjectID];
-	const auto& anim = GetAnimData(animObject, animNumber);
 
 	// Animation missing; return early.
 	if (animNumber < 0 || animNumber >= animObject.Animations.size())
@@ -279,6 +278,8 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 
 		return;
 	}
+
+	const auto& anim = GetAnimData(animObject, animNumber);
 
 	// Frame missing; return early.
 	if (frameNumber < 0 || frameNumber > anim.EndFrameNumber)
@@ -311,12 +312,6 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 {
-	if (animNumber < 0 || animNumber >= object.Animations.size())
-	{
-		TENLog("Attempted to fetch missing animation.", LogLevel::Warning);
-		return object.Animations.front();
-	}
-
 	return object.Animations[animNumber];
 }
 
