@@ -155,9 +155,13 @@ void AnimateItem(ItemInfo* item)
 			const auto& player = *GetLaraInfo(item);
 
 			if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
+			{
 				item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrameNumber) / 4);
+			}
 			else
+			{
 				item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrameNumber);
+			}
 		}
 		else
 		{
