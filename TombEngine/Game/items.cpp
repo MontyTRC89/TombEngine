@@ -7,6 +7,7 @@
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
@@ -858,7 +859,7 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, -5);
+			TriggerShatterSmoke(pos.value().x, pos.value().y, pos.value().z);
 			break;
 		}
 	}
