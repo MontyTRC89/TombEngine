@@ -67,7 +67,7 @@ void AnimateItem(ItemInfo* item)
 
 	const auto* animPtr = &GetAnimData(*item);
 
-	if (!animPtr->Dispatches.empty() && GetStateDispatch(item, *animPtr))
+	if (GetStateDispatch(item, *animPtr))
 	{
 		animPtr = &GetAnimData(*item);
 
@@ -75,6 +75,7 @@ void AnimateItem(ItemInfo* item)
 
 		if (!item->IsLara())
 		{
+			// Reset RequiredState if already reached.
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
 				item->Animation.RequiredState = NO_STATE;
 		}
@@ -82,6 +83,9 @@ void AnimateItem(ItemInfo* item)
 
 	if (item->Animation.FrameNumber > animPtr->EndFrameNumber)
 	{
+		// FAILSAFE: Ensure current frame number remains valid.
+		item->Animation.FrameNumber = animPtr->EndFrameNumber;
+
 		ExecuteAnimCommands(*item, false);
 
 		item->Animation.AnimNumber = animPtr->NextAnimNumber;
@@ -94,7 +98,7 @@ void AnimateItem(ItemInfo* item)
 			item->Animation.ActiveState =
 			item->Animation.TargetState = animPtr->State;
 
-			// NOTE: Legacy code only set TargetState for the player.
+			// NOTE: Legacy code only set TargetState for player.
 			// Remove this comment if no issues arise with new generic behaviour. -- Sezz 2023.06.07
 		}
 
@@ -404,12 +408,12 @@ int GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber)
 
 bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 {
-	// Active and target states already match; return early.
-	if (item->Animation.ActiveState == item->Animation.TargetState)
-		return false;
-
 	// No dispatches; return early.
 	if (anim.Dispatches.empty())
+		return false;
+
+	// Active and target states already match; return early.
+	if (item->Animation.ActiveState == item->Animation.TargetState)
 		return false;
 
 	// Iterate over state dispatches.
