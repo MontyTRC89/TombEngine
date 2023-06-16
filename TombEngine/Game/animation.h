@@ -85,8 +85,8 @@ void AnimateItem(ItemInfo* item);
 
 // Inquirers
 bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState = std::nullopt);
-bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Maybe replace with GetLastFrame() and do comparisons?
-bool TestAnimFrame(const ItemInfo& item, int frameStart);
+bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Maybe do comparisons with EndFrameNumber instead?
+bool TestAnimFrame(const ItemInfo& item, int frameStart); // Deprecated.
 bool TestAnimFrameRange(const ItemInfo& item, int frameNumber0, int frameNumber1);
 
 // Entity translation
@@ -103,7 +103,6 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Depre
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
-const AnimData& GetAnimData(const ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Deprecated.
 
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
 const KeyframeData&	GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
@@ -112,9 +111,9 @@ const KeyframeData&	GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);
 const KeyframeData&	GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber);
 const KeyframeData&	GetClosestKeyframe(const ItemInfo& item);
 
-int GetFrameNumber(const ItemInfo& item);
-int GetFrameIndex(ItemInfo* item, int frameNumber);
-int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
+int GetFrameNumber(const ItemInfo& item); // Deprecated.
+int GetFrameIndex(ItemInfo* item, int frameNumber); // Deprecated.
+int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber); // Deprecated.
 int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber);
 int GetFrameCount(const ItemInfo& item);
 

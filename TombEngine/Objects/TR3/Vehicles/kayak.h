@@ -11,8 +11,6 @@ namespace TEN::Entities::Vehicles
 	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoKayakMount(ItemInfo* kayakItem, ItemInfo* laraItem, VehicleMountType mountType);
 
-	void KayakDraw(ItemInfo* kayakItem);
-
 	void KayakDoRipple(ItemInfo* kayakItem, int xOffset, int zOffset);
 
 	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff);

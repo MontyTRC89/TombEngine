@@ -23,7 +23,7 @@ using TEN::Renderer::g_Renderer;
 
 AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
 {
-	// Clamp frame number.
+	// FAILSAFE: Clamp frame number.
 	frameNumber = std::clamp(frameNumber, 0, EndFrameNumber);
 
 	// Normalize frame number into keyframe range.
@@ -49,7 +49,7 @@ const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 static void ExecuteAnimCommands(ItemInfo& item, bool isFrameBased)
 {
 	const auto& anim = GetAnimData(item);
-	
+
 	for (const auto& command : anim.Commands)
 		command->Execute(item, isFrameBased);
 }
@@ -197,23 +197,20 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 	if (anim.Dispatches.empty())
 		return false;
 
-	// If input target state not set, use entity's target state.
+	// Use entity's target state if no targetState argument passed.
 	if (!targetState.has_value())
 		targetState = item->Animation.TargetState;
 
-	// Iterate over animation's state dispatches.
+	// Iterate over state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
-		// Target states don't match; continue.
+		// State doesn't match; continue.
 		if (dispatch.State != targetState.value())
 			continue;
 
-		// Check if current frame is within dispatch range.
-		if (item->Animation.FrameNumber >= dispatch.FrameNumberRange.first &&
-			item->Animation.FrameNumber <= dispatch.FrameNumberRange.second)
-		{
+		// Test if current frame is within dispatch range.
+		if (TestAnimFrameRange(*item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
 			return true;
-		}
 	}
 
 	return false;
@@ -232,7 +229,6 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 	return (item->Animation.FrameNumber == anim.EndFrameNumber);
 }
 
-// Deprecated.
 bool TestAnimFrame(const ItemInfo& item, int frameStart)
 {
 	return (item.Animation.FrameNumber == frameStart);
@@ -284,6 +280,18 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 		return;
 	}
 
+	// Frame missing; return early.
+	if (frameNumber < 0 || frameNumber > anim.EndFrameNumber)
+	{
+		TENLog(
+			"Attempted to set missing frame " + std::to_string(frameNumber) + " from animation " + std::to_string(animNumber) +
+			((animObjectID == item.ObjectNumber) ? "" : (" from object " + GetObjectName(animObjectID))) +
+			" for object " + GetObjectName(item.ObjectNumber),
+			LogLevel::Warning);
+
+		return;
+	}
+
 	item.Animation.AnimObjectID = animObjectID;
 	item.Animation.AnimNumber = animNumber;
 	item.Animation.FrameNumber = frameNumber;
@@ -326,16 +334,10 @@ const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber)
 	return GetAnimData(item.Animation.AnimObjectID, animNumber.value());
 }
 
-const AnimData& GetAnimData(const ItemInfo* item, std::optional<int> animNumber)
-{
-	return GetAnimData(*item, animNumber);
-}
-
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
-	int frameNumber = GetFrameNumber(item);
-	return anim.GetFrameInterpData(frameNumber);
+	return anim.GetFrameInterpData(item.Animation.FrameNumber);
 }
 
 const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
@@ -362,11 +364,9 @@ const KeyframeData& GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber)
 const KeyframeData& GetClosestKeyframe(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
-	int frameNumber = GetFrameNumber(item);
-	return anim.GetClosestKeyframe(frameNumber);
+	return anim.GetClosestKeyframe(item.Animation.FrameNumber);
 }
 
-// Deprecated. Got relative.
 int GetFrameNumber(const ItemInfo& item)
 {
 	return item.Animation.FrameNumber;
@@ -378,7 +378,6 @@ int GetFrameIndex(ItemInfo* item, int frameNumber)
 	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameNumber);
 }
 
-// Deprecated. Got absolute.
 int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 {
 	return frameNumber;
@@ -418,16 +417,15 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	if (anim.Dispatches.empty())
 		return false;
 
-	// Iterate over animation's state dispatches.
+	// Iterate over state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
-		// Target states don't match; continue.
+		// State doesn't match; continue.
 		if (dispatch.State != item->Animation.TargetState)
 			continue;
 
 		// Set new animation if current frame number is within dispatch range.
-		if (item->Animation.FrameNumber >= dispatch.FrameNumberRange.first &&
-			item->Animation.FrameNumber <= dispatch.FrameNumberRange.second)
+		if (TestAnimFrameRange(*item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
 		{
 			item->Animation.AnimNumber = dispatch.NextAnimNumber;
 			item->Animation.FrameNumber = dispatch.NextFrameNumber;

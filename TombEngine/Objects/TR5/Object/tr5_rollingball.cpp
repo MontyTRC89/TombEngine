@@ -467,6 +467,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->Pose.Position.x = old->x;
 			item->Pose.Position.y = old->y;
 			item->Pose.Position.z = old->z;
+
 			if (item->RoomNumber != old->RoomNumber)
 			{
 				RemoveDrawnItem(itemNum);
@@ -475,12 +476,11 @@ void ClassicRollingBallControl(short itemNum)
 				r->itemNumber = itemNum;
 				item->RoomNumber = old->RoomNumber;
 			}
-			item->Animation.ActiveState = 0;
-			item->Animation.TargetState = 0;
+
 			item->Animation.AnimNumber = 0;
 			item->Animation.FrameNumber = 0;
-			item->Animation.ActiveState = GetAnimData(item).State; 
-			item->Animation.TargetState = GetAnimData(item).State;
+			item->Animation.ActiveState =
+			item->Animation.TargetState = GetAnimData(*item).State;
 			item->Animation.RequiredState = NO_STATE;
 			RemoveActiveItem(itemNum);
 		}

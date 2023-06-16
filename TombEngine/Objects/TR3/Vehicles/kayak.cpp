@@ -208,11 +208,6 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 	}
 
-	void KayakDraw(ItemInfo* kayakItem)
-	{
-		DrawAnimatingItem(kayakItem);
-	}
-
 	void KayakDoRipple(ItemInfo* kayakItem, int xOffset, int zOffset)
 	{
 		float sinY = phd_sin(kayakItem->Pose.Orientation.y);

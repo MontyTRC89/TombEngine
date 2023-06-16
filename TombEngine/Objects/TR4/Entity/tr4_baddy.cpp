@@ -940,7 +940,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (item->Animation.FrameNumber == (GetAnimData(item).Keyframes.size() - 2))
+				if (item->Animation.FrameNumber == GetAnimData(*item).EndFrameNumber)
 					currentCreature->Flags = 0;
 
 				break;

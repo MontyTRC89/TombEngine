@@ -347,8 +347,8 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		item->Animation.AnimNumber = 0;
 		item->Animation.FrameNumber = 0;
-		item->Animation.ActiveState = GetAnimData(item).State;
-		item->Animation.TargetState = GetAnimData(item).State;
+		item->Animation.ActiveState =
+		item->Animation.TargetState = GetAnimData(*item).State;
 		item->Animation.RequiredState = NO_STATE;
 		item->ResetModelToDefault();
 
