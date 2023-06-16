@@ -97,9 +97,6 @@ void AnimateItem(ItemInfo* item)
 		{
 			item->Animation.ActiveState =
 			item->Animation.TargetState = animPtr->State;
-
-			// NOTE: Legacy code only set TargetState for player.
-			// Remove this comment if no issues arise with new generic behaviour. -- Sezz 2023.06.07
 		}
 
 		if (!item->IsLara())
