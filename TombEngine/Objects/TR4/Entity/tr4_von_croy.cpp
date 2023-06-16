@@ -152,7 +152,6 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* creature = GetCreatureInfo(item);
-		auto* object = &Objects[item->ObjectNumber];
 
 		short angle = 0;
 		short tilt = 0;

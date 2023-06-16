@@ -132,7 +132,14 @@ bool Targetable(ItemInfo* item, AI_INFO* ai)
 		enemy->Pose.Position.y + ((boundsTarget.Y2 + 3 * boundsTarget.Y1) / 4),
 		enemy->Pose.Position.z,
 		enemy->RoomNumber); // TODO: Check why this line didn't exist in the first place. -- TokyoSU 2022.08.05
-	return LOS(&origin, &target);
+
+	MESH_INFO* mesh = nullptr;
+	Vector3i vector = {};
+	int losItemIndex = ObjectOnLOS2(&origin, &target, &vector, &mesh);
+	if (losItemIndex == item->Index)
+		losItemIndex = NO_LOS_ITEM; // Don't find itself
+
+	return (LOS(&origin, &target) && losItemIndex == NO_LOS_ITEM && mesh == nullptr);
 }
 
 bool TargetVisible(ItemInfo* item, AI_INFO* ai, float maxAngleInDegrees)

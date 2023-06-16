@@ -13,11 +13,12 @@
 #include "Specific/level.h"
 #include "Specific/winmain.h"
 
+HSAMPLE BASS_SamplePointer[SOUND_MAX_SAMPLES];
 HSTREAM BASS_3D_Mixdown;
-HFX BASS_FXHandler[(int)SoundFilter::Count];
-SoundTrackSlot BASS_Soundtrack[(int)SoundTrackType::Count];
-HSAMPLE SamplePointer[SOUND_MAX_SAMPLES];
+HFX     BASS_FXHandler[(int)SoundFilter::Count];
+
 SoundEffectSlot SoundSlot[SOUND_MAX_CHANNELS];
+SoundTrackSlot  SoundtrackSlot[(int)SoundTrackType::Count];
 
 const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)ReverbType::Count] =    // Reverb presets
 
@@ -46,13 +47,13 @@ void SetVolumeMusic(int vol)
 	GlobalMusicVolume = vol;
 
 	float fVol = static_cast<float>(vol) / 100.0f;
-	if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel))
+	if (BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::BGM].Channel))
 	{
-		BASS_ChannelSetAttribute(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL, fVol);
+		BASS_ChannelSetAttribute(SoundtrackSlot[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL, fVol);
 	}
-	if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SoundTrackType::OneShot].Channel))
+	if (BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::OneShot].Channel))
 	{
-		BASS_ChannelSetAttribute(BASS_Soundtrack[(int)SoundTrackType::OneShot].Channel, BASS_ATTRIB_VOL, fVol);
+		BASS_ChannelSetAttribute(SoundtrackSlot[(int)SoundTrackType::OneShot].Channel, BASS_ATTRIB_VOL, fVol);
 	}
 }
 
@@ -136,7 +137,7 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 	*(DWORD*)(uncompBuffer + 40) = cleanLength;
 
 	// Create actual sample
-	SamplePointer[index] = BASS_SampleLoad(true, uncompBuffer, 0, cleanLength + 44, 65535, SOUND_SAMPLE_FLAGS | BASS_SAMPLE_3D);
+	BASS_SamplePointer[index] = BASS_SampleLoad(true, uncompBuffer, 0, cleanLength + 44, 65535, SOUND_SAMPLE_FLAGS | BASS_SAMPLE_3D);
 	delete[] uncompBuffer;
 
 	return true;
@@ -267,7 +268,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	}
 
 	// Create sample's stream and reset buffer back to normal value.
-	HSTREAM channel = BASS_SampleGetChannel(SamplePointer[sampleToPlay], true);
+	HSTREAM channel = BASS_SampleGetChannel(BASS_SamplePointer[sampleToPlay], true);
 
 	if (Sound_CheckBASSError("Trying to create channel for sample %d", false, sampleToPlay))
 		return false;
@@ -303,14 +304,49 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	return true;
 }
 
-void PauseAllSounds()
+void PauseAllSounds(SoundPauseMode mode)
 {
-	BASS_Pause();
+	if (mode == SoundPauseMode::Global)
+	{
+		BASS_Pause();
+		return;
+	}
+
+	for (auto& slot : SoundSlot)
+	{
+		if ((slot.Channel != NULL) && (BASS_ChannelIsActive(slot.Channel) == BASS_ACTIVE_PLAYING))
+			BASS_ChannelPause(slot.Channel);
+	}
+
+	if (mode == SoundPauseMode::Inventory)
+		return;
+
+	for (auto& slot : SoundtrackSlot)
+	{
+		if ((slot.Channel != NULL) && (BASS_ChannelIsActive(slot.Channel) == BASS_ACTIVE_PLAYING))
+			BASS_ChannelPause(slot.Channel);
+	}
 }
 
-void ResumeAllSounds()
+void ResumeAllSounds(SoundPauseMode mode)
 {
-	BASS_Start();
+	if (mode == SoundPauseMode::Global)
+		BASS_Start();
+
+	for (auto& slot : SoundtrackSlot)
+	{
+		if ((slot.Channel != NULL) && (BASS_ChannelIsActive(slot.Channel) == BASS_ACTIVE_PAUSED))
+			BASS_ChannelStart(slot.Channel);
+	}
+
+	if (mode == SoundPauseMode::Global)
+		return;
+
+	for (auto& slot : SoundSlot)
+	{
+		if ((slot.Channel != NULL) && (BASS_ChannelIsActive(slot.Channel) == BASS_ACTIVE_PAUSED))
+			BASS_ChannelStart(slot.Channel);
+	}
 }
 
 void StopSoundEffect(short effectID)
@@ -394,11 +430,11 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	DWORD crossfadeTime = 0;
 	DWORD flags = BASS_STREAM_AUTOFREE | BASS_SAMPLE_FLOAT | BASS_ASYNCFILE;
 
-	bool channelActive = BASS_ChannelIsActive(BASS_Soundtrack[(int)mode].Channel);
-	if (channelActive && BASS_Soundtrack[(int)mode].Track.compare(track) == 0)
+	bool channelActive = BASS_ChannelIsActive(SoundtrackSlot[(int)mode].Channel);
+	if (channelActive && SoundtrackSlot[(int)mode].Track.compare(track) == 0)
 	{
 		// Same track is incoming with different playhead, set it to a new position.
-		auto stream = BASS_Soundtrack[(int)mode].Channel;
+		auto stream = SoundtrackSlot[(int)mode].Channel;
 		if (position && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position))
 			BASS_ChannelSetPosition(stream, position, BASS_POS_BYTE);
 		return;
@@ -433,7 +469,7 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	}
 
 	if (channelActive)
-		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
+		BASS_ChannelSlideAttribute(SoundtrackSlot[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName.c_str(), 0, 0, flags);
 
@@ -446,15 +482,15 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 
 	if (mode == SoundTrackType::OneShot)
 	{
-		if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel))
-			BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL, masterVolume * SOUND_BGM_DAMP_COEFFICIENT, SOUND_XFADETIME_BGM_START);
+		if (BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::BGM].Channel))
+			BASS_ChannelSlideAttribute(SoundtrackSlot[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL, masterVolume * SOUND_BGM_DAMP_COEFFICIENT, SOUND_XFADETIME_BGM_START);
 		BASS_ChannelSetSync(stream, BASS_SYNC_FREE | BASS_SYNC_ONETIME | BASS_SYNC_MIXTIME, 0, Sound_FinishOneshotTrack, NULL);
 	}
 
 	// BGM tracks are crossfaded, and additionally shuffled a bit to make things more natural.
 	// Think everybody are fed up with same start-up sounds of Caves ambience...
 
-	if (crossfade && BASS_ChannelIsActive(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel))
+	if (crossfade && BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::BGM].Channel))
 	{		
 		// Crossfade...
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.0f);
@@ -480,8 +516,8 @@ void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 	if (Sound_CheckBASSError("Playing soundtrack '%s'", true, fullTrackName.c_str()))
 		return;
 
-	BASS_Soundtrack[(int)mode].Channel = stream;
-	BASS_Soundtrack[(int)mode].Track = track;
+	SoundtrackSlot[(int)mode].Channel = stream;
+	SoundtrackSlot[(int)mode].Track = track;
 }
 
 void PlaySoundTrack(std::string track, short mask)
@@ -532,10 +568,10 @@ void StopSoundTracks()
 void StopSoundTrack(SoundTrackType mode, int fadeoutTime)
 {
 	// Do fadeout.
-	BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, fadeoutTime);
+	BASS_ChannelSlideAttribute(SoundtrackSlot[(int)mode].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, fadeoutTime);
 
-	BASS_Soundtrack[(int)mode].Track = {};
-	BASS_Soundtrack[(int)mode].Channel = NULL;
+	SoundtrackSlot[(int)mode].Track = {};
+	SoundtrackSlot[(int)mode].Channel = NULL;
 }
 
 void ClearSoundTrackMasks()
@@ -548,7 +584,7 @@ void ClearSoundTrackMasks()
 
 std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SoundTrackType type)
 {
-	auto track = BASS_Soundtrack[(int)type];
+	auto track = SoundtrackSlot[(int)type];
 
 	if (track.Track.empty() || !BASS_ChannelIsActive(track.Channel))
 		return std::pair<std::string, QWORD>();
@@ -559,16 +595,16 @@ std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SoundTrackType type)
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData)
 {
-	if (BASS_ChannelIsActive(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel))
-		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL, (float)GlobalMusicVolume / 100.0f, SOUND_XFADETIME_BGM_START);
+	if (BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::BGM].Channel))
+		BASS_ChannelSlideAttribute(SoundtrackSlot[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL, (float)GlobalMusicVolume / 100.0f, SOUND_XFADETIME_BGM_START);
 }
 
 void Sound_FreeSample(int index)
 {
-	if (SamplePointer[index] != NULL)
+	if (BASS_SamplePointer[index] != NULL)
 	{
-		BASS_SampleFree(SamplePointer[index]);
-		SamplePointer[index] = NULL;
+		BASS_SampleFree(BASS_SamplePointer[index]);
+		BASS_SamplePointer[index] = NULL;
 	}
 }
 
@@ -676,7 +712,7 @@ float Sound_Attenuate(float gain, float distance, float radius)
 
 void Sound_FreeSlot(int index, unsigned int fadeout)
 {
-	if (index > SOUND_MAX_CHANNELS || index < 0)
+	if (index >= SOUND_MAX_CHANNELS || index < 0)
 		return;
 
 	if (SoundSlot[index].Channel != NULL && BASS_ChannelIsActive(SoundSlot[index].Channel))
@@ -696,7 +732,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 bool Sound_UpdateEffectPosition(int index, Pose *position, bool force)
 {
-	if (index > SOUND_MAX_CHANNELS || index < 0)
+	if (index >= SOUND_MAX_CHANNELS || index < 0)
 		return false;
 
 	if (position)
@@ -726,7 +762,7 @@ bool Sound_UpdateEffectPosition(int index, Pose *position, bool force)
 // Update gain and pitch.
 bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain)
 {
-	if (index > SOUND_MAX_CHANNELS || index < 0)
+	if (index >= SOUND_MAX_CHANNELS || index < 0)
 		return false;
 
 	BASS_ChannelSetAttribute(SoundSlot[index].Channel, BASS_ATTRIB_FREQ, 22050.0f * pitch);
@@ -857,7 +893,7 @@ void Sound_Init(const std::string& gameDirectory)
 		return;
 
 	// Initialize channels and tracks array
-	ZeroMemory(BASS_Soundtrack, (sizeof(HSTREAM) * (int)SoundTrackType::Count));
+	ZeroMemory(SoundtrackSlot, (sizeof(HSTREAM) * (int)SoundTrackType::Count));
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 
 	// Attach reverb effect to 3D channel
@@ -899,7 +935,7 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 	if (verbose || bassError)
 	{
 		va_start(argptr, verbose);
-		int32_t written = vsprintf(data, (char*)message, argptr);	// @TODO: replace with debug/console/message output later...
+		int written = vsprintf(data, (char*)message, argptr);	// @TODO: replace with debug/console/message output later...
 		va_end(argptr);
 		snprintf(data + written, sizeof(data) - written, bassError ? ": error #%d" : ": success", bassError);
 		TENLog(data, bassError ? LogLevel::Error : LogLevel::Info);
@@ -947,6 +983,9 @@ void PlaySoundSources()
 		const auto& sound = g_Level.SoundSources[i];
 
 		int group = sound.Flags & 0x1FFF;
+
+		if (group >= MAX_FLIPMAP)
+			continue;
 
 		if (!FlipStats[group] && (sound.Flags & PLAY_FLIP_ROOM))
 			continue;

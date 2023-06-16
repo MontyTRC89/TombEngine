@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Flow/Animations/Animations.h"
+#include "Scripting/Internal/TEN/Flow/Animations/Animations.h"
 
 /***
 New custom animations which Lara can perform.

@@ -2,9 +2,9 @@
 
 // Last generated on 18/11/2022
 
-#include "game_object_ids.h"
 #include <unordered_map>
 #include <string>
+#include "Objects/game_object_ids.h"
 
 /***
 Constants for object IDs.
@@ -238,6 +238,8 @@ The following constants are inside ObjID.
 	BOSS_EXPLOSION_RING
 	CLAW_MUTANT
 	WASP_MUTANT
+	SKATEBOARD
+	SKATEBOARD_KID
 	SPRINGBOARD
 	ROLLING_SPINDLE
 	DISK_SHOOTER
@@ -1411,6 +1413,8 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "BOSS_EXPLOSION_RING", ID_BOSS_EXPLOSION_RING },
 	{ "CLAW_MUTANT", ID_CLAW_MUTANT },
 	{ "WASP_MUTANT", ID_WASP_MUTANT },
+	{ "SKATEBOARD", ID_SKATEBOARD },
+	{ "SKATEBOARD_KID", ID_SKATEBOARD_KID },
 	{ "SPRINGBOARD", ID_SPRINGBOARD },
 	{ "ROLLING_SPINDLE", ID_ROLLING_SPINDLE },
 	{ "DISK_SHOOTER", ID_DISK_SHOOTER },
