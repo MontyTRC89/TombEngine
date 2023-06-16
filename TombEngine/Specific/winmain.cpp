@@ -212,7 +212,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
-				ResumeAllSounds();
+				ResumeAllSounds(SoundPauseMode::Global);
 			}
 
 			return 0;
@@ -227,7 +227,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
-			PauseAllSounds();
+			PauseAllSounds(SoundPauseMode::Global);
 		}
 	}
 

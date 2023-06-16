@@ -1,9 +1,20 @@
-Version 1.0.10
+Version 1.1.0
 ==============
 
+* Fix enemies shooting Lara through static meshes and moveables.
+* Fix crash on loading if static meshes with IDs above maximum are present.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix electricity effect crashing 64-bit version of the engine.
+* Fix clockwork beetle activation crashing the game.
+* Fix corrupted vehicle positions after savegame reload.
+* Fix default ambience overlapping current one when loading a savegame.
+* Fix doppelganger being limited to be in a single room.
+* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
+* Pause all sounds when entering inventory or pause menu.
+* Improve deflection against slopes.
+* Add TR1 skateboard kid.
+* Add TR1 Kold.
 
 Version 1.0.9
 =============

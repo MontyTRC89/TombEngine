@@ -14,6 +14,7 @@ table Room {
 }
 
 table Item {
+	anim_object_id: int32;
 	active_state: int32;
 	anim_number: int32;
 	frame_number: int32;
