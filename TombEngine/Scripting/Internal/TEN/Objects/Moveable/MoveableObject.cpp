@@ -777,7 +777,7 @@ aiBitsType Moveable::GetAIBits() const
 	aiBitsArray ret{};
 	for (size_t i = 0; i < ret.size(); ++i)
 	{
-		uint8_t isSet = m_item->AIBits & (1 << i);
+		unsigned char isSet = m_item->AIBits & (1 << i);
 		ret[i] = static_cast<int>( isSet > 0);
 	}
 
@@ -797,7 +797,7 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 	for (size_t i = 0; i < bits.value().size(); ++i)
 	{
 		m_item->AIBits &= ~(1 << i);
-		uint8_t isSet = bits.value()[i] > 0;
+		unsigned char isSet = bits.value()[i] > 0;
 		m_item->AIBits |= isSet << i;
 	}
 }

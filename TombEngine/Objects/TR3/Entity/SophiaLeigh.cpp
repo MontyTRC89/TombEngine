@@ -11,16 +11,16 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
+#include "Game/misc.h"
+#include "Game/setup.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/people.h"
+#include "Game/effects/spark.h"
 #include "Objects/Effects/Boss.h"
 #include "Objects/Effects/enemy_missile.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "misc.h"
-#include "setup.h"
-#include "lara_helpers.h"
-#include "tomb4fx.h"
-#include "people.h"
-#include "Game/effects/spark.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Entities::Effects;
