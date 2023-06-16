@@ -234,7 +234,7 @@ inline void SubRipParser::parse(std::string fileName)      //srt parser
             else
             {
                 if (completeLine != "")
-                    completeLine += " ";
+                    completeLine += "\n";
 
                 completeLine += line;
             }
