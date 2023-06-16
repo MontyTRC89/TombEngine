@@ -1,6 +1,6 @@
 #pragma once
 #include "framework.h"
-#include "ScriptAssert.h"
+#include "Scripting/Internal/ScriptAssert.h"
 
 class LuaHandler {
 protected:

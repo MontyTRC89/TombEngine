@@ -2,9 +2,9 @@
 
 // Last generated on 18/11/2022
 
-#include "game_object_ids.h"
 #include <unordered_map>
 #include <string>
+#include "Objects/game_object_ids.h"
 
 /***
 Constants for object IDs.
