@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Objects/NamedBase.h"
-#include "Objects/Room/RoomObject.h"
-#include "Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/NamedBase.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
 struct LevelCameraInfo;
 
