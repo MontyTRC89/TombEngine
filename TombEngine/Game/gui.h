@@ -161,6 +161,7 @@ namespace TEN::Gui
 	public:
 		int CompassNeedleAngle;
 
+		bool CallPause();
 		bool CallInventory(ItemInfo* item, bool resetMode);
 		InventoryResult TitleOptions(ItemInfo* item);
 		InventoryResult DoPauseMenu(ItemInfo* item);

@@ -31,6 +31,13 @@ constexpr auto SOUND_BGM_DAMP_COEFFICIENT    = 0.5f;
 constexpr auto SOUND_MIN_PARAM_MULTIPLIER    = 0.05f;
 constexpr auto SOUND_MAX_PARAM_MULTIPLIER    = 5.0f;
 
+enum class SoundPauseMode
+{
+	Global,
+	Inventory,
+	Pause
+};
+
 enum class SoundTrackType
 {
 	OneShot,
@@ -149,8 +156,8 @@ void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();
 void StopAllSounds();
-void PauseAllSounds();
-void ResumeAllSounds();
+void PauseAllSounds(SoundPauseMode mode);
+void ResumeAllSounds(SoundPauseMode mode);
 
 void PlaySoundTrack(std::string trackName, SoundTrackType mode, QWORD position = 0);
 void PlaySoundTrack(std::string trackName, short mask = 0);
@@ -171,7 +178,7 @@ static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD
 void  SetVolumeMusic(int vol);
 void  SetVolumeFX(int vol);
 
-void  Sound_Init();
+void  Sound_Init(const std::string& gameDirectory);
 void  Sound_DeInit();
 bool  Sound_CheckBASSError(const char* message, bool verbose, ...);
 void  Sound_UpdateScene();

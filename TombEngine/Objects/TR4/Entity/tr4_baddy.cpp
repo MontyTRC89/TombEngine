@@ -1158,9 +1158,9 @@ namespace TEN::Entities::TR4
 
 				if (!ShotLara(item, &AI, BaddyGunBite, joint1, 15))
 					item->Animation.TargetState = BADDY_STATE_IDLE;
+
 				creature->MuzzleFlash[0].Bite = BaddyGunBite;
 				creature->MuzzleFlash[0].Delay = 2;
-
 				break;
 
 			default:

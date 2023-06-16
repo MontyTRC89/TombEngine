@@ -215,12 +215,22 @@ FlowHandler::~FlowHandler()
 		delete lev;
 }
 
+std::string FlowHandler::GetGameDir()
+{
+	return m_gameDir;
+}
+
+void FlowHandler::SetGameDir(const std::string& assetDir)
+{
+	m_gameDir = assetDir;
+}
+
 void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
 {
 	m_languageNames = std::move(src);
 }
 
-void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src)
+void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
 	m_translationsMap = std::move(src);
 }
@@ -240,12 +250,12 @@ void FlowHandler::AddLevel(Level const& level)
 	Levels.push_back(new Level{ level });
 }
 
-void FlowHandler::SetIntroImagePath(std::string const& path)
+void FlowHandler::SetIntroImagePath(const std::string& path)
 {
 	IntroImagePath = path;
 }
 
-void FlowHandler::SetTitleScreenImagePath(std::string const& path)
+void FlowHandler::SetTitleScreenImagePath(const std::string& path)
 {
 	TitleScreenImagePath = path;
 }
@@ -257,9 +267,9 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 
 void FlowHandler::LoadFlowScript()
 {
-	m_handler.ExecuteScript("Scripts/Gameflow.lua");
-	m_handler.ExecuteScript("Scripts/Strings.lua");
-	m_handler.ExecuteScript("Scripts/Settings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua");
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
@@ -303,24 +313,56 @@ Level* FlowHandler::GetCurrentLevel()
 
 int	FlowHandler::GetNumLevels() const
 {
-	return Levels.size();
+	return (int)Levels.size();
 }
 
-int FlowHandler::GetLevelNumber(std::string const& fileName)
+int FlowHandler::GetLevelNumber(const std::string& fileName)
 {
 	if (fileName.empty())
 		return -1;
 
-	auto lcFilename = TEN::Utils::ToLower(fileName);
+	auto fileNameWithForwardSlashes = fileName;
+	std::replace(fileNameWithForwardSlashes.begin(), fileNameWithForwardSlashes.end(), '\\', '/');
 
-	for (int i = 0; i < Levels.size(); i++)
+	auto requestedPath = std::filesystem::path{ fileName };
+	bool isAbsolute = requestedPath.is_absolute();
+	if (!isAbsolute)
+		requestedPath = std::filesystem::path{ GetGameDir() + fileName };
+
+	if (std::filesystem::is_regular_file(requestedPath))
 	{
-		auto level = TEN::Utils::ToLower(this->GetLevel(i)->FileName);
-		if (level == lcFilename && std::filesystem::exists(fileName))
-			return i;
+		auto lcFileName = TEN::Utils::ToLower(fileNameWithForwardSlashes);
+
+		if (isAbsolute)
+		{
+			for (int i = 0; i < Levels.size(); i++)
+			{
+				auto lcFullLevelPathFromFlow = TEN::Utils::ToLower(GetGameDir() + GetLevel(i)->FileName);
+				std::replace(lcFullLevelPathFromFlow.begin(), lcFullLevelPathFromFlow.end(), '\\', '/');
+
+				if (lcFullLevelPathFromFlow == lcFileName)
+					return i;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < Levels.size(); i++)
+			{
+				auto lcLevelNameFromFlow = TEN::Utils::ToLower(GetLevel(i)->FileName);
+				std::replace(lcLevelNameFromFlow.begin(), lcLevelNameFromFlow.end(), '\\', '/');
+
+				if (lcLevelNameFromFlow == lcFileName)
+					return i;
+			}
+		}
+	}
+	else
+	{
+		TENLog("Provided -level arg \"" + fileName + "\" does not exist.");
+		return -1;
 	}
 
-	TENLog("Specified level filename was not found in script. Level won't be loaded. Please edit level filename in gameflow.lua.");
+	TENLog("Provided -level arg \"" + fileName + "\" was not found in gameflow.lua.");
 	return -1;
 }
 

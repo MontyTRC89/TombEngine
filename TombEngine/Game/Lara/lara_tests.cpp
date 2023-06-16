@@ -2301,7 +2301,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll).Success)
 			crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
 
 		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
@@ -2314,7 +2314,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_WALK)
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_FLIP;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
 
 		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);

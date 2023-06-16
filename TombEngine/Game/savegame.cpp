@@ -50,24 +50,25 @@ const std::string SAVEGAME_PATH = "Save//";
 GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
-FileStream* SaveGame::m_stream;
+FileStream* SaveGame::StreamPtr;
+std::string SaveGame::FullSaveDirectory;
 int SaveGame::LastSaveGame;
 
-void LoadSavegameInfos()
+void SaveGame::LoadSavegameInfos()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 		SavegameInfos[i].Present = false;
 
-	if (!std::filesystem::exists(SAVEGAME_PATH))
+	if (!std::filesystem::is_directory(FullSaveDirectory))
 		return;
 
-	// try to load the savegame
+	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(i);
+		auto fileName = FullSaveDirectory + "savegame." + std::to_string(i);
 		auto savegamePtr = fopen(fileName.c_str(), "rb");
 
-		if (savegamePtr == NULL)
+		if (savegamePtr == nullptr)
 			continue;
 
 		fclose(savegamePtr);
@@ -167,9 +168,14 @@ Vector4 ToVector4(const Save::Vector4* vec)
 				auto vecOffset = vtb.Finish(); \
 				putDataInVec(UnionType, vecOffset);
 
+void SaveGame::Init(const std::string& gameDirectory)
+{
+	FullSaveDirectory = gameDirectory + SAVEGAME_PATH;
+}
+
 bool SaveGame::Save(int slot)
 {
-	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
+	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
@@ -482,7 +488,7 @@ bool SaveGame::Save(int slot)
 	lara.add_status(statusOffset);
 	lara.add_target_facing_angle(Lara.Context.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
-	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
+	lara.add_target_entity_number(Lara.TargetEntity == nullptr ? -1 : Lara.TargetEntity->Index);
 	lara.add_torch(torchOffset);
 	lara.add_vehicle(Lara.Context.Vehicle);
 	lara.add_water_current_active(Lara.Context.WaterCurrentActive);
@@ -550,7 +556,7 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_alerted(creature->Alerted);
 			creatureBuilder.add_can_jump(creature->LOT.CanJump);
 			creatureBuilder.add_can_monkey(creature->LOT.CanMonkey);
-			creatureBuilder.add_enemy(creature->Enemy - g_Level.Items.data());
+			creatureBuilder.add_enemy(creature->Enemy == nullptr ? -1 : creature->Enemy->Index);
 			creatureBuilder.add_flags(creature->Flags);
 			creatureBuilder.add_friendly(creature->Friendly);
 			creatureBuilder.add_head_left(creature->HeadLeft);
@@ -672,6 +678,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_after_death(itemToSerialize.AfterDeath);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
+		serializedItem.add_anim_object_id(itemToSerialize.Animation.AnimObjectID);
 		serializedItem.add_active_state(itemToSerialize.Animation.ActiveState);
 		serializedItem.add_flags(itemToSerialize.Flags);
 		serializedItem.add_floor(itemToSerialize.Floor);
@@ -1315,8 +1322,8 @@ bool SaveGame::Save(int slot)
 	auto bufferToSerialize = fbb.GetBufferPointer();
 	auto bufferSize = fbb.GetSize();
 
-	if (!std::filesystem::exists(SAVEGAME_PATH))
-		std::filesystem::create_directory(SAVEGAME_PATH);
+	if (!std::filesystem::is_directory(FullSaveDirectory))
+		std::filesystem::create_directory(FullSaveDirectory);
 
 	std::ofstream fileOut{};
 	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
@@ -1328,7 +1335,7 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
+	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
@@ -1531,6 +1538,7 @@ bool SaveGame::Load(int slot)
 		item->BoxNumber = savedItem->box_number();
 
 		// Animations
+		item->Animation.AnimObjectID = GAME_OBJECT_ID(savedItem->anim_object_id());
 		item->Animation.ActiveState = savedItem->active_state();
 		item->Animation.RequiredState = savedItem->required_state();
 		item->Animation.TargetState = savedItem->target_state();
@@ -2158,7 +2166,7 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	auto fileName = SAVEGAME_PATH + "savegame." + std::to_string(slot);
+	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);

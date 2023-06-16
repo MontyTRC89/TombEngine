@@ -45,11 +45,8 @@ void DoAlphaTest(float4 inputColor)
 	}
 }
 
-float4 DoFog(float4 sourceColor, float4 fogColor, float value)
+float4 DoDistanceFogForPixel(float4 sourceColor, float4 fogColor, float value)
 {
-	if (FogMaxDistance == 0)
-		return sourceColor;
-
 	switch (BlendMode)
 	{
 	case BLENDMODE_ADDITIVE:
@@ -75,6 +72,40 @@ float4 DoFog(float4 sourceColor, float4 fogColor, float value)
 		fogColor.w = sourceColor.w;
 
 	float4 result = lerp(sourceColor, fogColor, value);
+	return result;
+}
+
+float4 DoFogBulbsForPixel(float4 sourceColor, float4 fogColor)
+{
+	switch (BlendMode)
+	{
+	case BLENDMODE_ADDITIVE:
+	case BLENDMODE_SCREEN:
+	case BLENDMODE_LIGHTEN:
+		fogColor.xyz *= Luma(sourceColor);
+		break;
+
+	case BLENDMODE_SUBTRACTIVE:
+	case BLENDMODE_EXCLUDE:
+		fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
+		break;
+
+	case BLENDMODE_ALPHABLEND:
+		fogColor.w = sourceColor.w;
+		break;
+
+	default:
+		break;
+
+	}
+
+	if (fogColor.w > sourceColor.w)
+		fogColor.w = sourceColor.w;
+
+	float4 result = sourceColor;
+
+	result.xyz += saturate(fogColor.xyz);
+
 	return result;
 }
 

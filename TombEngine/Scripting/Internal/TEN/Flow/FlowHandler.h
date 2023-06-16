@@ -1,4 +1,7 @@
 #pragma once
+
+#include <string_view>
+
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/TEN/Logic/LogicHandler.h"
@@ -19,6 +22,8 @@ private:
 
 	std::map<short, short>			m_itemsMap;
 
+	std::string m_gameDir;
+
 	LuaHandler m_handler;
 
 public:
@@ -35,36 +40,38 @@ public:
 
 	std::vector<Level*>	Levels;
 
-	FlowHandler(sol::state* lua, sol::table & parent);
+	FlowHandler(sol::state* lua, sol::table& parent);
 	~FlowHandler() override;
 
-	void				AddLevel(Level const& level);
-	void				LoadFlowScript();
-	char const*			GetString(const char* id) const;
-	void				SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>> && src);
-	void				SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src);
-	void				SetAnimations(Animations const & src);
-	void				SetSettings(Settings const & src);
-	Settings*			GetSettings();
-	Level*				GetLevel(int id);
-	Level*				GetCurrentLevel();
-	int					GetLevelNumber(std::string const& flieName);
-	int					GetNumLevels() const;
-	void				EndLevel(std::optional<int> nextLevel);
-	int					GetSecretCount() const;
-	void				SetSecretCount(int secretsNum);
-	void				AddSecret(int levelSecretIndex);
-	void				SetIntroImagePath(std::string const& path);
-	void				SetTitleScreenImagePath(std::string const& path);
-	void				SetTotalSecretCount(int secretsNumber);
-	bool				IsFlyCheatEnabled() const;
-	void				EnableFlyCheat(bool flyCheat);
-	bool				IsMassPickupEnabled() const; 
-	void				EnableMassPickup(bool massPickup);
-	bool				IsLaraInTitleEnabled() const;
-	void				EnableLaraInTitle(bool laraInTitle);
-	bool				IsLevelSelectEnabled() const;
-	void				EnableLevelSelect(bool laraInTitle);
+	std::string	GetGameDir() override;
+	void		SetGameDir(const std::string& assetDir) override;
+	void		AddLevel(Level const& level);
+	void		LoadFlowScript();
+	char const*	GetString(const char* id) const;
+	void		SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src);
+	void		SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src);
+	void		SetAnimations(const Animations& src);
+	void		SetSettings(const Settings& src);
+	Settings*	GetSettings();
+	Level*		GetLevel(int id);
+	Level*		GetCurrentLevel();
+	int			GetLevelNumber(const std::string& flieName);
+	int			GetNumLevels() const;
+	void		EndLevel(std::optional<int> nextLevel);
+	int			GetSecretCount() const;
+	void		SetSecretCount(int secretsNum);
+	void		AddSecret(int levelSecretIndex);
+	void		SetIntroImagePath(const std::string& path);
+	void		SetTitleScreenImagePath(const std::string& path);
+	void		SetTotalSecretCount(int secretsNumber);
+	bool		IsFlyCheatEnabled() const;
+	void		EnableFlyCheat(bool flyCheat);
+	bool		IsMassPickupEnabled() const; 
+	void		EnableMassPickup(bool massPickup);
+	bool		IsLaraInTitleEnabled() const;
+	void		EnableLaraInTitle(bool laraInTitle);
+	bool		IsLevelSelectEnabled() const;
+	void		EnableLevelSelect(bool laraInTitle);
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }

@@ -452,7 +452,7 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	// Run level script if it exists.
 	if (!level->ScriptFileName.empty())
 	{
-		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
+		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level->ScriptFileName);
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
@@ -464,7 +464,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	}
 
 	// Play default background music.
-	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
+	if (!loadGame)
+		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
@@ -634,22 +635,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 	else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
 			 g_Gui.GetInventoryMode() != InventoryMode::Pause)
 	{
-		g_Renderer.DumpGameScene();
-		g_Gui.SetInventoryMode(InventoryMode::Pause);
-		g_Gui.SetMenuToDisplay(Menu::Pause);
-		g_Gui.SetSelectedOption(0);
-
-		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
-		{
-			g_Gui.DrawInventory();
-			g_Renderer.Synchronize();
-
-			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
-			{
-				result = GameStatus::ExitToTitle;
-				break;
-			}
-		}
+		if (g_Gui.CallPause())
+			result = GameStatus::ExitToTitle;
 	}
 	else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
 			 LaraItem->HitPoints > 0 && !BinocularOn)

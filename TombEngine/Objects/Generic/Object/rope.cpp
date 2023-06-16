@@ -189,8 +189,8 @@ namespace TEN::Entities::Generic
 				{
 					laraItem->Animation.AnimNumber = LA_REACH_TO_ROPE_SWING;
 					laraItem->Animation.ActiveState = LS_ROPE_SWING;
-					laraInfo->Control.Rope.Frame = GetAnimData(*laraItem, LA_ROPE_SWING).frameBase + 32 << 8;
-					laraInfo->Control.Rope.DFrame = GetAnimData(*laraItem, LA_ROPE_SWING).frameBase + 60 << 8;
+					laraInfo->Control.Rope.Frame  = (GetAnimData(*laraItem, LA_ROPE_SWING).frameBase + 32) << 8;
+					laraInfo->Control.Rope.DFrame = (GetAnimData(*laraItem, LA_ROPE_SWING).frameBase + 60) << 8;
 				}
 				else
 				{
@@ -526,7 +526,7 @@ namespace TEN::Entities::Generic
 				Lara.Control.Rope.ArcFront = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 0;
 				Lara.Control.Rope.MaxXBackward = 0;
-				int frame = 15 * Lara.Control.Rope.MaxXForward / 18000 + GetAnimData(*item, LA_ROPE_SWING).frameBase + 47 << 8;
+				int frame = (15 * Lara.Control.Rope.MaxXForward / 18000 + GetAnimData(*item, LA_ROPE_SWING).frameBase + 47) << 8;
 
 				if (frame > Lara.Control.Rope.DFrame)
 				{
@@ -541,7 +541,7 @@ namespace TEN::Entities::Generic
 			else if (Lara.Control.Rope.LastX < 0 && Lara.Control.Rope.Frame == Lara.Control.Rope.DFrame)
 			{
 				RopeSwing = 0;
-				Lara.Control.Rope.DFrame = 15 * Lara.Control.Rope.MaxXBackward / 18000 + GetAnimData(*item, LA_ROPE_SWING).frameBase + 47 << 8;
+				Lara.Control.Rope.DFrame = (15 * Lara.Control.Rope.MaxXBackward / 18000 + GetAnimData(*item, LA_ROPE_SWING).frameBase + 47) << 8;
 				Lara.Control.Rope.FrameRate = 15 * Lara.Control.Rope.MaxXBackward / 9000 + 1;
 			}
 			else if (Lara.Control.Rope.FrameRate < 512)
@@ -558,7 +558,7 @@ namespace TEN::Entities::Generic
 				Lara.Control.Rope.Direction = 1;
 				Lara.Control.Rope.MaxXForward = 0;
 
-				int frame = GetAnimData(*item, LA_ROPE_SWING).frameBase - 15 * Lara.Control.Rope.MaxXBackward / 18000 + 17 << 8;
+				int frame = (GetAnimData(*item, LA_ROPE_SWING).frameBase - 15 * Lara.Control.Rope.MaxXBackward / 18000 + 17) << 8;
 				if (frame < Lara.Control.Rope.DFrame)
 				{
 					Lara.Control.Rope.DFrame = frame;
@@ -572,7 +572,7 @@ namespace TEN::Entities::Generic
 			else if (Lara.Control.Rope.LastX > 0 && Lara.Control.Rope.Frame == Lara.Control.Rope.DFrame)
 			{
 				RopeSwing = 0;
-				Lara.Control.Rope.DFrame = GetAnimData(*item, LA_ROPE_SWING).frameBase - 15 * Lara.Control.Rope.MaxXForward / 18000 + 17 << 8;
+				Lara.Control.Rope.DFrame = (GetAnimData(*item, LA_ROPE_SWING).frameBase - 15 * Lara.Control.Rope.MaxXForward / 18000 + 17) << 8;
 				Lara.Control.Rope.FrameRate = 15 * Lara.Control.Rope.MaxXForward / 9000 + 1;
 			}
 			else if (Lara.Control.Rope.FrameRate < 512)
@@ -657,7 +657,7 @@ namespace TEN::Entities::Generic
 
 	void FallFromRope(ItemInfo* item, bool stumble)
 	{
-		item->Animation.Velocity.z = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
+		item->Animation.Velocity.z = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) / 2;
 		item->Pose.Orientation.x = 0;
 		item->Pose.Position.y += 320;
 
@@ -742,12 +742,12 @@ namespace TEN::Entities::Generic
 		ropeY = Lara.Control.Rope.Y - ANGLE(90.0f);
 		rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + offset.y, &pos.x, &pos.y, &pos.z);
-		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + offset.y - 192, &pos2.x, &pos2.y, &pos2.z);
+		GetRopePos(rope, ((Lara.Control.Rope.Segment - 1) << 7) + offset.y, &pos.x, &pos.y, &pos.z);
+		GetRopePos(rope, ((Lara.Control.Rope.Segment - 1) << 7) + offset.y - 192, &pos2.x, &pos2.y, &pos2.z);
 
-		diff.x = pos.x - pos2.x << 16;
-		diff.y = pos.y - pos2.y << 16;
-		diff.z = pos.z - pos2.z << 16;
+		diff.x = (pos.x - pos2.x) << 16;
+		diff.y = (pos.y - pos2.y) << 16;
+		diff.z = (pos.z - pos2.z) << 16;
 		NormaliseRopeVector(&diff);
 		diff.x >>= 2;
 		diff.y >>= 2;
@@ -778,9 +778,9 @@ namespace TEN::Entities::Generic
 		diff2.y += vec3.y;
 		diff2.z += vec3.z;
 
-		vec2.x = diff2.x + vec4.x << 16;
-		vec2.y = diff2.y + vec4.y << 16;
-		vec2.z = diff2.z + vec4.z << 16;
+		vec2.x = (diff2.x + vec4.x) << 16;
+		vec2.y = (diff2.y + vec4.y) << 16;
+		vec2.z = (diff2.z + vec4.z) << 16;
 		NormaliseRopeVector(&vec2);
 		vec2.x >>= 2;
 		vec2.y >>= 2;

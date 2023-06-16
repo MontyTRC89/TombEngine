@@ -154,9 +154,10 @@ void DisplayString::Register(sol::table& parent)
 		ScriptReserved_SetFlags, &DisplayString::SetFlags,
 
 		/// Set translated parameter of the string
-		// @tparam bool shouldTranslate if true this will be the string key for the translation that will be displayed.
-		// If false, this will be the string that's displayed
-		ScriptReserved_SetTranslated, & DisplayString::SetTranslated
+		// @function DisplayString:SetTranslated
+		// @tparam bool shouldTranslate if true, the string's key will be used as the key for the translation that will be displayed.
+		// If false, the key itself will be displayed
+		ScriptReserved_SetTranslated, &DisplayString::SetTranslated
 	);
 }
 

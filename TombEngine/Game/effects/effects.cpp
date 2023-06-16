@@ -1766,9 +1766,9 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vecto
 			spark->gravity = -8 - (r >> 3 & 3);
 			spark->scalar = 2;
 			spark->maxYvel = -4 - (r >> 6 & 3);
-			spark->sSize = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->size = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->dSize = ((r >> 8) & 0xF) + 24;
+			spark->sSize = (((r >> 8) & 0xF) + 24) >> 3;
+			spark->size  = (((r >> 8) & 0xF) + 24) >> 3;
+			spark->dSize =  ((r >> 8) & 0xF) + 24;
 		}
 	}
 }

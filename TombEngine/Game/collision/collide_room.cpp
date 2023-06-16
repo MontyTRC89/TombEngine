@@ -148,8 +148,6 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	auto point = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
-
-	Random::TestProbability(1 / 2.0f);
 }
 
 // Overload used as a universal wrapper across collisional code to replace
@@ -221,6 +219,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom)
 {
+	constexpr auto ASPECT_ANGLE_DELTA_MAX = ANGLE(90.0f);
+
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
 	bool doPlayerCollision = item->IsLara();
@@ -401,17 +401,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (height != NO_HEIGHT)
 		height -= (doPlayerCollision ? entityPos.y : probePos.y);
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->Front.FloorSlope && 
-		coll->Front.Floor < coll->Middle.Floor && 
-		coll->Front.Floor < 0 &&
-		height < coll->Front.Floor)
+	auto floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	short aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->Front.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->Front.FloorSlope && 
-		coll->Front.Floor > coll->Middle.Floor)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->Front.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->Front.Floor = STOP_SIZE;
 	}
@@ -438,7 +440,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xLeft;
 	probePos.z = entityPos.z + zLeft;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
 
 	collResult = GetCollision(probePos.x, probePos.y, probePos.z, item->RoomNumber);
 
@@ -466,15 +468,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->MiddleLeft.FloorSlope && 
-		coll->MiddleLeft.Floor < 0)
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->MiddleLeft.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->MiddleLeft.FloorSlope && 
-		coll->MiddleLeft.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->MiddleLeft.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
@@ -523,15 +529,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->FrontLeft.FloorSlope && 
-		coll->FrontLeft.Floor < 0)
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->FrontLeft.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->FrontLeft.FloorSlope && 
-		coll->FrontLeft.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->FrontLeft.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
@@ -585,15 +595,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->MiddleRight.FloorSlope && 
-		coll->MiddleRight.Floor < 0)
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->MiddleRight.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->MiddleRight.FloorSlope && 
-		coll->MiddleRight.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->MiddleRight.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
@@ -642,15 +656,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 
-	if (coll->Setup.BlockFloorSlopeUp && 
-		coll->FrontRight.FloorSlope && 
-		coll->FrontRight.Floor < 0)
+	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
+	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
+
+	if (coll->Setup.BlockFloorSlopeUp &&
+		coll->FrontRight.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
-	else if (coll->Setup.BlockFloorSlopeDown && 
-		coll->FrontRight.FloorSlope && 
-		coll->FrontRight.Floor > 0)
+	else if (coll->Setup.BlockFloorSlopeDown &&
+		coll->FrontRight.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
@@ -900,13 +918,13 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 	// Get item bounds and current rotation.
 	auto bounds = GameBoundingBox(item);
-	auto c = phd_cos(coll->Setup.ForwardAngle);
-	auto s = phd_sin(coll->Setup.ForwardAngle);
+	float cosForwardAngle = phd_cos(coll->Setup.ForwardAngle);
+	float sinForwardAngle = phd_sin(coll->Setup.ForwardAngle);
 
 	// Origin test position should be slightly in front of origin, because otherwise misfire may occur near block corners for split angles.
 	auto frontalOffset = coll->Setup.Radius * 0.3f;
-	auto x = item->Pose.Position.x + frontalOffset * s;
-	auto z = item->Pose.Position.z + frontalOffset * c;
+	auto x = item->Pose.Position.x + frontalOffset * sinForwardAngle;
+	auto z = item->Pose.Position.z + frontalOffset * cosForwardAngle;
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
@@ -921,7 +939,6 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 	// Do a two-pass surface test for all possible planes in a block.
 	// Two-pass test is needed to resolve different scissor cases with diagonal geometry.
-
 	for (int h = 0; h < 2; h++)
 	{
 		// Use either bottom or top Y point to test.
@@ -940,7 +957,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 		for (int p = 0; p < 3; p++)
 		{
 			// Prepare test data.
-			float distance = 0.0f;
+			float dist = 0.0f;
 
 			// Determine horizontal probe coordinates.
 			auto eX = x;
@@ -963,8 +980,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// Determine front floor probe offset.
 			// It is needed to identify if there is bridge or ceiling split in front.
 			auto frontFloorProbeOffset = coll->Setup.Radius * 1.5f;
-			auto ffpX = eX + frontFloorProbeOffset * s;
-			auto ffpZ = eZ + frontFloorProbeOffset * c;
+			auto ffpX = eX + frontFloorProbeOffset * sinForwardAngle;
+			auto ffpZ = eZ + frontFloorProbeOffset * cosForwardAngle;
 
 			// Calculate block min/max points to filter out out-of-bounds checks.
 			float minX = floor(ffpX / BLOCK(1)) * BLOCK(1) - 1.0f;
@@ -996,8 +1013,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// Determine floor probe offset.
 			// This must be slightly in front of own coll radius so no bridge misfires occur.
 			auto floorProbeOffset = coll->Setup.Radius * 0.3f;
-			auto fpX = eX + floorProbeOffset * s;
-			auto fpZ = eZ + floorProbeOffset * c;
+			auto fpX = eX + floorProbeOffset * sinForwardAngle;
+			auto fpZ = eZ + floorProbeOffset * cosForwardAngle;
 
 			// Debug probe point.
 			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
@@ -1044,14 +1061,14 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				for (int i = 0; i < 4; i++)
 				{
 					// No plane intersection, quickly discard.
-					if (!ray.Intersects(plane[i], distance))
+					if (!ray.Intersects(plane[i], dist))
 						continue;
 
 					// Process plane intersection only if distance is smaller than already found minimum.
-					if (distance < closestDistance[p])
+					if (dist < closestDistance[p])
 					{
 						closestPlane[p] = plane[i];
-						closestDistance[p] = distance;
+						closestDistance[p] = dist;
 						auto normal = closestPlane[p].Normal();
 						result[p] = FROM_RAD(atan2(normal.x, normal.z));
 						hitBridge = true;
@@ -1096,18 +1113,18 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				for (int i = 0; i < (useSplitAngle ? 5 : 4); i++)
 				{
 					// No plane intersection, quickly discard.
-					if (!ray.Intersects(plane[i], distance))
+					if (!ray.Intersects(plane[i], dist))
 						continue;
 
 					// Intersection point is out of block bounds, discard.
-					auto cPoint = ray.position + ray.direction * distance;
+					auto cPoint = ray.position + ray.direction * dist;
 					if (cPoint.x < minX || cPoint.x > maxX || cPoint.z < minZ || cPoint.z > maxZ)
 						continue;
 
 					// Process plane intersection only if distance is smaller than already found minimum.
-					if (distance < closestDistance[p])
+					if (dist < closestDistance[p])
 					{
-						closestDistance[p] = distance;
+						closestDistance[p] = dist;
 						closestPlane[p] = plane[i];
 
 						// Store according rotation.

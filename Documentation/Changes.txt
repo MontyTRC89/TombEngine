@@ -1,3 +1,21 @@
+Version 1.1.0
+==============
+
+* Fix enemies shooting Lara through static meshes and moveables.
+* Fix crash on loading if static meshes with IDs above maximum are present.
+* Fix sprint value going below zero.
+* Fix fog bulb density formula.
+* Fix electricity effect crashing 64-bit version of the engine.
+* Fix clockwork beetle activation crashing the game.
+* Fix corrupted vehicle positions after savegame reload.
+* Fix default ambience overlapping current one when loading a savegame.
+* Fix doppelganger being limited to be in a single room.
+* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
+* Pause all sounds when entering inventory or pause menu.
+* Improve deflection against slopes.
+* Add TR1 skateboard kid.
+* Add TR1 Kold.
+
 Version 1.0.9
 =============
 
@@ -7,35 +25,49 @@ Version 1.0.9
 * Fix gunflash rendering and position for entities.
 * Fix snowmobile driver crashing the game.
 * Fix knifethrower not throwing knife.
+* Fix classic rollingball rolling in place into some closed doors.
+* Fix zipline not working properly.
+* Fix missing heavytrigger checks for node events activated from classic triggers.
+* Fix death flag burning enemies underwater.
+* Fix pickups and object collision not working properly in flipped rooms without portals.
 * Fix footprints not being cleared after level change.
 * Fix thumbstick camera option sometimes producing jerky camera movements during object interaction.
+* Fix soundtrack position not restoring if same track is already playing.
 * Fix inventory input interference when entering inventory via puzzle.
 * Fix gamepad still vibrating if Lara was poisoned prior to death.
+* Fix flare brightness.
+* Fix grenade firing angle.
+* Fix rendering for static meshes with custom blending modes and alpha transparency.
+* Fix inconsistent multiline string spacing on different display modes.
+* Remove search object 4 hardcoded meshswap activated with a flipmap.
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
 * Add TR3 claw mutant.
-* Add TR5 lasers
+* Add TR5 lasers:
 	- Choose colour for the lasers via tint menu.
 	- Laser OCB means width of the laser in sectors.
 	- Negative OCB laser will trigger heavy trigger.
 	- Positive OCB kills Lara.
-* Add removable puzzles from puzzle holes and puzzle dones.
+* Add removable puzzles from puzzle holes and puzzle dones:
 	- Employed by setting the trigger type as "Switch" for either puzzle hole or puzzle done.
 	- Can be mixed with puzzle done and puzzle holes of the same or different type.
-* Add reusable keys for key holes.
+* Add reusable keys for key holes:
 	- Employed by setting the trigger type as "Switch" for key hole.
-* Allow key hole animation to be played via OCB number.
+* Allow key hole animation to be played via OCB number:
 	- Default OCB 0 will play Lara use key animation. 
 	- Any positive OCB number will play the animation according to the OCB number.
+* Reimplement fog bulbs.
 * Add missing gunflash for some entities, also include dynamic light and smoke to all gunflashes.
+* Add ability to pick up a single inactive flare as an inventory item.
 * Add log reports if title level or other levels don't exist.
 * Add better error handling for missing font, sprites or shaders.
 * Add "Reset to defaults" entry to controls menu and automatically bind XBOX gamepad profile if connected.
+* Add 64-bit executable and place both 32-bit and 64-bit versions into /Bin subdirectory.
 
 Lua API changes:
 * Add Vec2 class.
-* Add function String::SetTranslated()
-* Add function Misc::IsStringDisplaying()
+* Add function String::SetTranslated().
+* Add function Misc::IsStringDisplaying().
 * Add the following for use in AddCallback and RemoveCallback:
 	- PRESTART, POSTSTART
 	- PREEND, POSTEND

@@ -5,6 +5,7 @@
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
 
+#include "Math/Math.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/animation.h"
@@ -16,6 +17,8 @@
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Renderer/Structures/RendererLight.h"
+#include "RenderView/RenderView.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
 #include "Renderer/ConstantBuffers/MiscBuffer.h"
@@ -32,7 +35,6 @@
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "Renderer/RenderTargetCube/RenderTargetCube.h"
-#include "RenderView/RenderView.h"
 #include "Specific/level.h"
 #include "ConstantBuffer/ConstantBuffer.h"
 #include "RenderTargetCubeArray/RenderTargetCubeArray.h"
@@ -42,7 +44,6 @@
 #include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
 #include "Renderer/Structures/RendererBone.h"
-#include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
 #include "Renderer/VertexBuffer/VertexBuffer.h"
@@ -50,7 +51,9 @@
 #include "Renderer/Texture2D/Texture2D.h"
 #include "Renderer/RenderTarget2D/RenderTarget2D.h"
 #include "Renderer/Structures/RendererDoor.h"
+#include "Renderer/ConstantBuffers/SkyBuffer.h"
 
+enum GAME_OBJECT_ID : short;
 class EulerAngles;
 struct AnimFrameInterpData;
 struct CAMERA_INFO;
@@ -365,6 +368,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CBlendingBuffer> m_cbBlending;
 		CInstancedStaticMeshBuffer m_stInstancedStaticMeshBuffer;
 		ConstantBuffer<CInstancedStaticMeshBuffer> m_cbInstancedStaticMeshBuffer;
+		CSkyBuffer m_stSky;
+		ConstantBuffer<CSkyBuffer> m_cbSky;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
@@ -405,6 +410,9 @@ namespace TEN::Renderer
 		std::vector<RendererVertex> m_transparentFacesVertices;
 		fast_vector<int> m_transparentFacesIndices;
 		std::vector<RendererTransparentFace> m_transparentFaces;
+
+		VertexBuffer m_skyVertexBuffer;
+		IndexBuffer m_skyIndexBuffer;
 
 		std::vector<RendererRoom> m_rooms;
 		bool m_invalidateCache;
@@ -516,6 +524,7 @@ namespace TEN::Renderer
 		void InitializeCommonTextures();
 		void InitializeGameBars();
 		void InitializeMenuBars(int y);
+		void InitializeSky();
 
 		void DrawAllStrings();
 		void DrawLaserBarriers(RenderView& view);
@@ -726,9 +735,12 @@ namespace TEN::Renderer
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
 
-		Vector2i GetScreenResolution() const;
-		Vector2	 GetScreenSpacePosition(const Vector3& pos) const;
-		Vector3	 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+		Vector2i			   GetScreenResolution() const;
+		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
+		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+
+		void DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
+								 const Vector4& color, const Vector2& size);
 	};
 
 	extern Renderer11 g_Renderer;

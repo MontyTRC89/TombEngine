@@ -101,6 +101,7 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 		{
 			ScriptAssert(false, "Variable has an unsupported type.", ErrorMode::Terminate);
 		}
+
 		key.pop();
 	};
 
@@ -113,6 +114,7 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 	case sol::type::table:
 		PutVar(tab, key, value);
 		break;
+
 	case sol::type::userdata:
 	{
 		if (value.is<Vec2>() ||
@@ -127,7 +129,8 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 			UnsupportedValue(tab, key);
 		}
 	}
-	break;
+		break;
+
 	default:
 		UnsupportedValue(tab, key);
 	}
@@ -180,13 +183,12 @@ void LogicHandler::ResetGameTables()
 @advancedDesc
 This is intended for module/library developers who want their modules to do
 stuff during level start/load/end/save/control phase, but don't want the level
-designer to add calls to OnStart, OnLoad, etc. in their level script.
+designer to add calls to `OnStart`, `OnLoad`, etc. in their level script.
 
 Possible values for CallbackPoint:
 	-- These take functions which accept no arguments
 	PRESTART -- will be called immediately before OnStart
 	POSTSTART -- will be called immediately after OnStart
-
 
 	PRESAVE -- will be called immediately before OnSave
 	POSTSAVE -- will be called immediately after OnSave
@@ -209,7 +211,7 @@ Any returned value will be discarded.
 
 @function AddCallback
 @tparam point CallbackPoint When should the callback be called?
-@tparam function func The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+@tparam function func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
 @usage
 	LevelFuncs.MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
@@ -269,34 +271,34 @@ bool LogicHandler::SetLevelFuncsMember(sol::table tab, const std::string& name, 
 	}
 	else if (sol::type::function == value.get_type())
 	{
-		// Add the name to the table of names
+		// Add name to table of names.
 		auto partName = tab.raw_get<std::string>(strKey);
 		auto fullName = partName + "." + name;
 		auto& parentNameTab = m_levelFuncs_tablesOfNames[partName];
 		parentNameTab.insert_or_assign(name, fullName);
 
-		// Create a LevelFunc userdata and add that too
+		// Create LevelFunc userdata and add that too.
 		LevelFunc levelFuncObject;
 		levelFuncObject.m_funcName = fullName;
 		levelFuncObject.m_handler = this;
 		m_levelFuncs_levelFuncObjects[fullName] = levelFuncObject;
 
-		// Add the function itself
+		// Add function itself.
 		m_levelFuncs_luaFunctions[fullName] = value;
 	}
 	else if (sol::type::table == value.get_type())
 	{
-		// Create and add a new name map
+		// Create and add new name map.
 		std::unordered_map<std::string, std::string> newNameMap;
 		auto fullName = tab.raw_get<std::string>(strKey) + "." + name;
 		m_levelFuncs_tablesOfNames.insert_or_assign(fullName, newNameMap);
 
-		// Create a new table to put in the LevelFuncs hierarchy
+		// Create new table to put in the LevelFuncs hierarchy.
 		auto newLevelFuncsTab = MakeSpecialTable(m_handler.GetState(), name, &LogicHandler::GetLevelFuncsMember, &LogicHandler::SetLevelFuncsMember, this);
 		newLevelFuncsTab.raw_set(strKey, fullName);
 		tab.raw_set(name, newLevelFuncsTab);
 
-		// "populate" the new table. This will trigger the __newindex metafunction and will
+		// "Populate" new table. This will trigger the __newindex metafunction and will
 		// thus call this function recursively, handling all subtables and functions.
 		for (auto& [key, val] : value.as<sol::table>())
 			newLevelFuncsTab[key] = val;
@@ -369,15 +371,15 @@ void LogicHandler::FreeLevelScripts()
 	m_handler.GetState()->collect_garbage();
 }
 
-//Used when loading
-void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
+// Used when loading.
+void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 {
 	ResetGameTables();
 	ResetLevelTables();
 
 	std::unordered_map<uint32_t, sol::table> solTables;
 
-	for(std::size_t i = 0; i < vars.size(); ++i)
+	for(int i = 0; i < vars.size(); ++i)
 	{
 		if (std::holds_alternative<IndexTable>(vars[i]))
 		{
@@ -452,14 +454,12 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 
 	sol::table gameVars = rootTable[ScriptReserved_GameVars];
 	for (auto& [first, second] : gameVars)
-	{
 		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
-	}
 }
 
-template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int32_t Handle(TypeFrom & var, MapType & varsMap, size_t & nVars, std::vector<SavedVar> & vars)
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int32_t Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
 {
-	auto [first, second] = varsMap.insert(std::make_pair(&var, nVars));
+	auto [first, second] = varsMap.insert(std::make_pair(&var, (int)numVars));
 
 	if (second)
 	{
@@ -467,7 +467,7 @@ template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename Map
 		TypeTo varTo = (TypeTo)var;
 		savedVar.emplace<(int)TypeEnum>(varTo);
 		vars.push_back(varTo);
-		++nVars;
+		++numVars;
 	}
 
 	return first->second;
@@ -487,21 +487,17 @@ std::string LogicHandler::GetRequestedPath() const
 		{
 			auto part = std::get<std::string>(key);
 			if (i > 0)
-			{
 				path += "." + part;
-			}
 			else
-			{
 				path += part;
-			};
 		}
 	}
 
 	return path;
 }
 
-// Used when saving
-void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
+// Used when saving.
+void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 {
 	sol::table tab{ *m_handler.GetState(), sol::create };
 	tab[ScriptReserved_LevelVars] = (*m_handler.GetState())[ScriptReserved_LevelVars];
@@ -511,7 +507,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 	std::unordered_map<double, uint32_t> numMap;
 	std::unordered_map<bool, uint32_t> boolMap;
 
-	size_t nVars = 0;
+	size_t numVars = 0;
 
 	// The following functions will all try to put their values in a map. If it succeeds
 	// then the value was not already in the map, so we can put it into the var vector.
@@ -523,51 +519,51 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 
 	auto handleNum = [&](auto num, auto map)
 	{
-		auto [first, second] = map.insert(std::make_pair(num, nVars));
+		auto [first, second] = map.insert(std::make_pair(num, (int)numVars));
 
 		if (second)
 		{
 			vars.push_back(num);
-			++nVars;
+			++numVars;
 		}
 
 		return first->second;
 	};
 
-	auto handleStr = [&](sol::object const& obj)
+	auto handleStr = [&](const sol::object& obj)
 	{
 		auto str = obj.as<sol::string_view>();
-		auto [first, second] = varsMap.insert(std::make_pair(str.data(), nVars));
+		auto [first, second] = varsMap.insert(std::make_pair(str.data(), (int)numVars));
 
 		if (second)
 		{
 			vars.push_back(std::string{ str.data() });
-			++nVars;
+			++numVars;
 		}
 
 		return first->second;
 	};
 
-	auto handleFuncName = [&](LevelFunc const& fnh)
+	auto handleFuncName = [&](const LevelFunc& fnh)
 	{
-		auto [first, second] = varsMap.insert(std::make_pair(&fnh, nVars));
+		auto [first, second] = varsMap.insert(std::make_pair(&fnh, (int)numVars));
 
 		if (second)
 		{
 			vars.push_back(FuncName{ std::string{ fnh.m_funcName } });
-			++nVars;
+			++numVars;
 		}
 
 		return first->second;
 	};
 
-	std::function<uint32_t(const sol::table&)> populate = [&](const sol::table& obj) 
+	std::function<uint32_t(const sol::table&)> populate = [&](const sol::table& obj)
 	{
-		auto [first, second] = varsMap.insert(std::make_pair(obj.pointer(), nVars));
+		auto [first, second] = varsMap.insert(std::make_pair(obj.pointer(), (int)numVars));
 
 		if(second)
 		{
-			++nVars;
+			++numVars;
 			auto id = first->second;
 
 			vars.push_back(IndexTable{});
@@ -577,7 +573,8 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 				bool validKey = true;
 				uint32_t keyIndex = 0;
 				std::variant<std::string, uint32_t> key{uint32_t(0)};
-				// Strings and numbers can be keys AND values
+
+				// Strings and numbers can be keys AND values.
 				switch (first.get_type())
 				{
 				case sol::type::string:
@@ -639,19 +636,19 @@ void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 				{
 					if (second.is<Vec2>())
 					{
-						putInVars(Handle<SavedVarType::Vec2, Vector2i>(second.as<Vec2>(), varsMap, nVars, vars));
+						putInVars(Handle<SavedVarType::Vec2, Vector2i>(second.as<Vec2>(), varsMap, numVars, vars));
 					}
 					else if (second.is<Vec3>())
 					{
-						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, nVars, vars));
+						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, numVars, vars));
 					}
 					else if (second.is<Rotation>())
 					{
-						putInVars(Handle<SavedVarType::Rotation, Vector3>(second.as<Rotation>(), varsMap, nVars, vars));
+						putInVars(Handle<SavedVarType::Rotation, Vector3>(second.as<Rotation>(), varsMap, numVars, vars));
 					}
 					else if (second.is<ScriptColor>())
 					{
-						putInVars(Handle<SavedVarType::Color, D3DCOLOR>(second.as<ScriptColor>(), varsMap, nVars, vars));
+						putInVars(Handle<SavedVarType::Color, D3DCOLOR>(second.as<ScriptColor>(), varsMap, numVars, vars));
 					}
 					else if (second.is<LevelFunc>())
 					{
@@ -883,12 +880,15 @@ void LogicHandler::OnEnd(GameStatus reason)
 	case GameStatus::LaraDead:
 		endReason = LevelEndReason::Death;
 		break;
+
 	case GameStatus::LevelComplete:
 		endReason = LevelEndReason::LevelComplete;
 		break;
+
 	case GameStatus::ExitToTitle:
 		endReason = LevelEndReason::ExitToTitle;
 		break;
+
 	case GameStatus::LoadGame:
 		endReason = LevelEndReason::LoadGame;
 		break;
