@@ -290,11 +290,11 @@ namespace TEN::Entities::Creatures::TR3
 				item->ItemFlags[3] = 1;
 			}
 
-			int frameEnd = GetAnimData(object, SHIVA_ANIM_DEATH).Keyframes.size() - 2;
-			if (item->Animation.FrameNumber >= frameEnd)
+			if (TestLastFrame(item))
 			{
+				// TODO: Find another way.
 				// Block frame until mesh is swapped.
-				item->Animation.FrameNumber = frameEnd;
+				//item->Animation.FrameNumber = frameEnd;
 
 				if (DoShivaSwapMesh(*item, true))
 					CreatureDie(itemNumber, false);
