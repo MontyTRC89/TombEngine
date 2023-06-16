@@ -21,19 +21,11 @@ using TEN::Renderer::g_Renderer;
 
 // TODO: Arm anim object in samegame.
 
-unsigned int AnimData::GetFrameCount() const
-{
-	return EndFrameNumber; // Check.
-}
-
-int AnimData::GetLastFrameNumber() const
-{
-	assertion(!Keyframes.empty(), "AnimData::GetLastFrameNumber() called on animation with 0 frames.");
-	return (Keyframes.size() - 1);
-}
-
 AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
 {
+	// Clamp frame number.
+	frameNumber = std::clamp(frameNumber, 0, EndFrameNumber);
+
 	// Normalize frame number into keyframe range.
 	float keyframeNumber = frameNumber / (float)Interpolation;
 
@@ -48,17 +40,7 @@ AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
 	return AnimFrameInterpData(Keyframes[keyframeNumber0], Keyframes[keyframeNumber1], alpha);
 }
 
-const Keyframe& AnimData::GetKeyframe(int frameNumber) const
-{
-	static const auto DUMMY_KEYFRAME = Keyframe{};
-
-	if (frameNumber < 0 || frameNumber >= Keyframes.size() || Keyframes.empty())
-		return DUMMY_KEYFRAME;
-
-	return Keyframes[frameNumber];
-}
-
-const Keyframe& AnimData::GetClosestKeyframe(int frameNumber) const
+const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 {
 	auto frameData = GetFrameInterpData(frameNumber);
 	return ((frameData.Alpha <= 0.5f) ? frameData.Keyframe0 : frameData.Keyframe1);
@@ -124,7 +106,7 @@ void AnimateItem(ItemInfo* item)
 	}
 
 	// NOTE: Must use non-zero frame count in this edge case.
-	unsigned int frameCount = animPtr->GetFrameCount();
+	unsigned int frameCount = animPtr->EndFrameNumber;
 	if (frameCount == 0)
 		frameCount = 1;
 
@@ -223,12 +205,12 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 	for (const auto& dispatch : anim.Dispatches)
 	{
 		// Target states don't match; continue.
-		if (dispatch.TargetState != targetState.value())
+		if (dispatch.State != targetState.value())
 			continue;
 
 		// Check if current frame is within dispatch range.
-		if (item->Animation.FrameNumber >= dispatch.FrameRange.first &&
-			item->Animation.FrameNumber <= dispatch.FrameRange.second)
+		if (item->Animation.FrameNumber >= dispatch.FrameNumberRange.first &&
+			item->Animation.FrameNumber <= dispatch.FrameNumberRange.second)
 		{
 			return true;
 		}
@@ -242,7 +224,7 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 	if (!animNumber.has_value())
 		animNumber = item->Animation.AnimNumber;
 
-	// Animation to test doesn't match; return early.
+	// Animation doesn't match; return early.
 	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
@@ -356,34 +338,28 @@ AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
 	return anim.GetFrameInterpData(frameNumber);
 }
 
-const Keyframe& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
+const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 {
 	const auto& anim = GetAnimData(objectID, animNumber);
-
-	// Get and clamp frame count.
-	unsigned int frameCount = anim.EndFrameNumber; // Check.
-	if (frameNumber > frameCount)
-		frameNumber = frameCount;
-
 	return anim.GetClosestKeyframe(frameNumber);
 }
 
-const Keyframe& GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber)
+const KeyframeData& GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber)
 {
 	return GetKeyframe(item.ObjectNumber, animNumber, frameNumber);
 }
 
-const Keyframe& GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber)
+const KeyframeData& GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber)
 {
 	return GetKeyframe(objectID, animNumber, 0);
 }
 
-const Keyframe& GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber)
+const KeyframeData& GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber)
 {
 	return GetKeyframe(objectID, animNumber, INT_MAX);
 }
 
-const Keyframe& GetClosestKeyframe(const ItemInfo& item)
+const KeyframeData& GetClosestKeyframe(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
 	int frameNumber = GetFrameNumber(item);
@@ -411,7 +387,7 @@ int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
 {
 	const auto& anim = GetAnimData(objectID, animNumber);
-	return anim.EndFrameNumber; // Check.
+	return anim.EndFrameNumber;
 }
 
 int GetFrameCount(const ItemInfo& item)
@@ -446,12 +422,12 @@ bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
 	for (const auto& dispatch : anim.Dispatches)
 	{
 		// Target states don't match; continue.
-		if (dispatch.TargetState != item->Animation.TargetState)
+		if (dispatch.State != item->Animation.TargetState)
 			continue;
 
-		// Set new animation if current frame is within dispatch range.
-		if (item->Animation.FrameNumber >= dispatch.FrameRange.first &&
-			item->Animation.FrameNumber <= dispatch.FrameRange.second)
+		// Set new animation if current frame number is within dispatch range.
+		if (item->Animation.FrameNumber >= dispatch.FrameNumberRange.first &&
+			item->Animation.FrameNumber <= dispatch.FrameNumberRange.second)
 		{
 			item->Animation.AnimNumber = dispatch.NextAnimNumber;
 			item->Animation.FrameNumber = dispatch.NextFrameNumber;

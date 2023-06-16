@@ -342,11 +342,11 @@ void LoadObjects()
 			anim.Dispatches.resize(dispatchCount);
 			for (auto& dispatch : anim.Dispatches)
 			{
-				dispatch.TargetState = ReadInt32();
+				dispatch.State = ReadInt32();
 				dispatch.NextAnimNumber = ReadInt32();
 				dispatch.NextFrameNumber = ReadInt32();
-				dispatch.FrameRange.first = ReadInt32();
-				dispatch.FrameRange.second = ReadInt32();
+				dispatch.FrameNumberRange.first = ReadInt32();
+				dispatch.FrameNumberRange.second = ReadInt32();
 			}
 
 			int commandCount = ReadInt32();

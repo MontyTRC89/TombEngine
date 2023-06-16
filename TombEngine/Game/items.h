@@ -67,14 +67,14 @@ struct EntityAnimationData
 {
 	GAME_OBJECT_ID AnimObjectID = ID_NO_OBJECT;
 
-	int AnimNumber	  = 0; // g_Level.Anims index.
-	int FrameNumber	  = 0; // g_Level.Frames index.
+	int AnimNumber	  = 0;
+	int FrameNumber	  = 0;
 	int ActiveState	  = 0;
 	int TargetState	  = 0;
 	int RequiredState = NO_STATE;
 
 	bool	IsAirborne = false;
-	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward
+	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 };
 
 struct EntityModelData
