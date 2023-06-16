@@ -1128,7 +1128,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Pose.Orientation.z = kayakItem->Pose.Orientation.z / 2;
 
 			AnimateItem(laraItem);
-			SyncVehicleAnimation(*kayakItem, *laraItem);
+			SyncVehicleAnim(*kayakItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(30.0f);
 			Camera.targetDistance = CLICK(8);
