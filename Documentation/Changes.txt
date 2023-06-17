@@ -5,6 +5,7 @@ Version 1.1.0
 * Fix skeletons and mummies not affected by explosive weapons.
 * Fix crash on loading if static meshes with IDs above maximum are present.
 * Fix random crashes when playing audio tracks with names longer than 15 symbols.
+* Fix possible crashes when killing some enemies on 64-bit build.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix electricity effect crashing 64-bit version of the engine.

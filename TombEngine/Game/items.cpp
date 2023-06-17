@@ -239,6 +239,8 @@ void KillItem(short const itemNumber)
 		if (item == Lara.TargetEntity)
 			Lara.TargetEntity = nullptr;
 
+		// AI target generation uses a hack with making a dummy item without ObjectNumber.
+		// Therefore, a check should be done here to prevent access violation.
 		if (item->ObjectNumber != NO_ITEM && Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
