@@ -239,7 +239,7 @@ void KillItem(short const itemNumber)
 		if (item == Lara.TargetEntity)
 			Lara.TargetEntity = nullptr;
 
-		if (Objects[item->ObjectNumber].floor != nullptr)
+		if (item->ObjectNumber != NO_ITEM && Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
 		GameScriptHandleKilled(itemNumber, true);
