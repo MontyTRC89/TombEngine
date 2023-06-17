@@ -106,17 +106,17 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			GlobalCollisionBounds.Z1 = -256;
 			GlobalCollisionBounds.Z2 = 384;
 
-			ItemPushItem(item, laraItem, coll, 0, 2);
+			ItemPushItem(item, laraItem, coll, false, 2);
 
 			GlobalCollisionBounds.X1 = -256;
 			GlobalCollisionBounds.X2 = 256;
 
-			ItemPushItem(item, laraItem, coll, 0, 2);
+			ItemPushItem(item, laraItem, coll, false, 2);
 
 			GlobalCollisionBounds.X1 = -1280;
 			GlobalCollisionBounds.X2 = -640;
 
-			ItemPushItem(item, laraItem, coll, 0, 2);
+			ItemPushItem(item, laraItem, coll, false, 2);
 		}
 		else
 		{

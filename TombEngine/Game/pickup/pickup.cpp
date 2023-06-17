@@ -958,6 +958,8 @@ void DropPickups(ItemInfo* item)
 void PickupControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
+	
+	ItemPushBridge(*item, *(CollisionInfo*)item->Data);
 
 	short roomNumber;
 	short triggerFlags = item->TriggerFlags & 0x3F;
@@ -1056,8 +1058,12 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 void InitializePickup(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-
 	auto bounds = GameBoundingBox(item);
+
+	item->Data = CollisionInfo();
+	auto* coll = (CollisionInfo*)item->Data;
+	coll->Setup.Radius = std::max(bounds.GetWidth(), bounds.GetDepth());
+	coll->Setup.Height = bounds.GetHeight();
 
 	short triggerFlags = item->TriggerFlags & 0x3F;
 	if (triggerFlags == 5)

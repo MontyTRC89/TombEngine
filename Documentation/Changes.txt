@@ -14,6 +14,8 @@ Version 1.1.0
 * Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
+* Move and rotate Lara together with dynamic bridge objects.
+* Move and rotate activated pickups together with dynamic bridge objects.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
 
