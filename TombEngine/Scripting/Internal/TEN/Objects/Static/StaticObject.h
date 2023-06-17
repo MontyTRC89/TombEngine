@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Objects/NamedBase.h"
+#include "Scripting/Internal/TEN/Objects/NamedBase.h"
 #include "Game/room.h"
 
 namespace sol {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Objects/NamedBase.h"
-#include "Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Objects/NamedBase.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Specific/level.h"
 
 namespace sol {

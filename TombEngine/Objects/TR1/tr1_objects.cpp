@@ -11,6 +11,7 @@
 
 // Creatures
 #include "Objects/TR1/Entity/Cowboy.h" // OK
+#include "Objects/TR1/Entity/Kold.h" // OK
 #include "Objects/TR1/Entity/tr1_ape.h" // OK
 #include "Objects/TR1/Entity/tr1_bear.h" // OK
 #include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
@@ -20,6 +21,7 @@
 #include "Objects/TR1/Entity/tr1_big_rat.h" // OK
 #include "Objects/TR1/Entity/tr1_centaur.h" // OK
 #include "Objects/TR1/Entity/tr1_winged_mutant.h" // OK
+#include "Objects/TR1/Entity/SkateboardKid.h" // OK
 #include "Objects/Utils/object_helper.h"
 
 // Traps
@@ -186,6 +188,38 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_KOLD];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeKold;
+		obj->control = ControlKold;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->HitPoints = 1;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(1, ROT_Y);
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_SKATEBOARD_KID];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeSkateboardKid;
+		obj->control = ControlSkateboardKid;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->HitPoints = 125;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(7, ROT_Y); // Head.
+		obj->SetBoneRotationFlags(0, ROT_Y | ROT_X); // Torso.
 		obj->SetupHitEffect();
 	}
 }

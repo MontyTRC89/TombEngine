@@ -1478,6 +1478,7 @@ namespace TEN::Renderer
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		extern std::vector<DebrisFragment> DebrisFragments;
+
 		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;

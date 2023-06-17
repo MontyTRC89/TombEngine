@@ -30,6 +30,7 @@
 #include "Specific/level.h"
 #include "Specific/winmain.h"
 
+using namespace std::chrono;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 
@@ -37,8 +38,6 @@ extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
 {
-	using namespace std::chrono;
-
 	void Renderer11::RenderBlobShadows(RenderView& renderView)
 	{
 		auto nearestSpheres = std::vector<Sphere>{};
@@ -283,7 +282,6 @@ namespace TEN::Renderer
 
 		if (gunShellsCount > 0)
 		{
-			auto* object = &Objects[objectNumber];
 			auto& moveableObject = *m_moveableObjects[objectNumber];
 
 			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
@@ -498,7 +496,6 @@ namespace TEN::Renderer
 
 		if (Objects[ID_RATS_EMITTER].loaded)
 		{
-			ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
 			RendererObject& moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
 
 			m_stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
@@ -545,8 +542,6 @@ namespace TEN::Renderer
 			return;
 		}
 
-		ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
-		RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
 		RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 
 		int batsCount = 0;
@@ -619,8 +614,6 @@ namespace TEN::Renderer
 			return;
 		}
 
-		ObjectInfo* obj = &Objects[ID_LITTLE_BEETLE];
-		RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
 		RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 
 		int littleBeetlesCount = 0;
@@ -1564,8 +1557,6 @@ namespace TEN::Renderer
 	void Renderer11::RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 	                                   RenderView& view)
 	{
-		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
-
 		CollectRooms(view, true);
 		// Draw shadow map
 
@@ -1741,7 +1732,6 @@ namespace TEN::Renderer
 		ItemInfo* nativeItem = &g_Level.Items[info->item->ItemNumber];
 		RendererRoom& room = m_rooms[nativeItem->RoomNumber];
 		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
-		ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
 
 		// Set shaders
 		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
@@ -1822,7 +1812,6 @@ namespace TEN::Renderer
 
 		for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 		{
-			int staticObjectNumber = it->first;
 			std::vector<RendererStatic*> statics = it->second;
 
 			RendererStatic* refStatic = statics[0];
@@ -2139,7 +2128,6 @@ namespace TEN::Renderer
 										break;
 									}
 
-									auto& tex = set.Textures[j];
 									m_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
 									m_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
 									m_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];

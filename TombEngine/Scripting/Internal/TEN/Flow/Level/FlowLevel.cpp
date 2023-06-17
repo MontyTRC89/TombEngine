@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "FlowLevel.h"
-#include "ScriptAssert.h"
+#include "Scripting/Internal/ScriptAssert.h"
 
 /***
 Stores level metadata.

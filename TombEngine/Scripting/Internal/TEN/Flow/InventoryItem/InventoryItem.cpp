@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "InventoryItem.h"
-#include "ScriptAssert.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 #include <string>
 
 /***
