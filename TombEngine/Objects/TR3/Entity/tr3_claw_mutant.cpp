@@ -310,8 +310,8 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.Animation.ActiveState != CLAW_MUTANT_STATE_DEATH)
 				SetAnimation(&item, CLAW_MUTANT_ANIM_DEATH);
 
-			int frameEnd = GetAnimData(item, CLAW_MUTANT_ANIM_DEATH).Keyframes.size() - 1;
-			if (item.Animation.FrameNumber >= frameEnd)
+			int endFrameNumber = GetAnimData(item, CLAW_MUTANT_ANIM_DEATH).EndFrameNumber;
+			if (item.Animation.FrameNumber >= endFrameNumber)
 				CreatureDie(itemNumber, true);
 		}
 		else

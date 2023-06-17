@@ -68,7 +68,7 @@ void InitializePuzzleDone(short itemNumber)
 	const auto& anim = GetAnimData(receptacleItem);
 
 	receptacleItem.Animation.RequiredState = NO_STATE;
-	receptacleItem.Animation.FrameNumber = anim.Keyframes.size();
+	receptacleItem.Animation.FrameNumber = anim.EndFrameNumber;
 }
 
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

@@ -837,11 +837,12 @@ void Moveable::SetFrameNumber(int frameNumber)
 {
 	const auto& anim = GetAnimData(*m_item);
 
-	unsigned int frameCount = anim.Keyframes.size();
+	unsigned int endFrameNumber = anim.EndFrameNumber;
 	
-	bool cond = frameNumber < frameCount;
+	bool cond = (frameNumber < endFrameNumber);
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
-	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount-1))
+
+	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, endFrameNumber - 1))
 	{
 		m_item->Animation.FrameNumber = frameNumber;
 	}

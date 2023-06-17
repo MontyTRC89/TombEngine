@@ -502,11 +502,11 @@ namespace TEN::Entities::Creatures::TR3
 			if (item->Animation.ActiveState != TONY_STATE_DEATH)
 				SetAnimation(item, TONY_ANIM_DEATH);
 
-			int frameEnd = GetAnimData(*object, TONY_ANIM_DEATH).Keyframes.size() - 1;
-			if (item->Animation.FrameNumber >= frameEnd)
+			int endFrameNumber = GetAnimData(*object, TONY_ANIM_DEATH).EndFrameNumber;
+			if (item->Animation.FrameNumber >= endFrameNumber)
 			{
 				// Avoid having the object stop working.
-				item->Animation.FrameNumber = frameEnd;
+				item->Animation.FrameNumber = endFrameNumber;
 				item->MeshBits.ClearAll();
 
 				if (item->ItemFlags[7] < TONY_EXPLOSION_COUNT_MAX)

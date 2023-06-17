@@ -326,11 +326,11 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 			}
 
-			int frameEnd = GetAnimData(object, PUNA_ANIM_DEATH).Keyframes.size() - 1;
-			if (item.Animation.FrameNumber >= frameEnd)
+			int endFrameNumber = GetAnimData(object, PUNA_ANIM_DEATH).EndFrameNumber;
+			if (item.Animation.FrameNumber >= endFrameNumber)
 			{
 				// Avoid having the object stop working.
-				item.Animation.FrameNumber = frameEnd;
+				item.Animation.FrameNumber = endFrameNumber;
 				item.MeshBits.ClearAll();
 
 				if (item.GetFlagField((int)BossItemFlags::ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
