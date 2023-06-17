@@ -716,7 +716,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		item->HitPoints = -1;
 
 		if (lara->Control.Count.Death == 0)
-			StopSoundTracks();
+			StopSoundTracks(true);
 
 		lara->Control.Count.Death++;
 		if ((item->Flags & IFLAG_INVISIBLE))
