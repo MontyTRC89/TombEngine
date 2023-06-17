@@ -239,10 +239,10 @@ bool TestAnimFrame(const ItemInfo& item, int frameStart)
 	return (item.Animation.FrameNumber == frameStart);
 }
 
-bool TestAnimFrameRange(const ItemInfo& item, int frameNumber0, int frameNumber1)
+bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber)
 {
-	return (item.Animation.FrameNumber >= frameNumber0 &&
-			item.Animation.FrameNumber <= frameNumber1);
+	return (item.Animation.FrameNumber >= lowFrameNumber &&
+			item.Animation.FrameNumber <= highFrameNumber);
 }
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
@@ -290,7 +290,8 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 	if (frameNumber < 0 || frameNumber > anim.EndFrameNumber)
 	{
 		TENLog(
-			"Attempted to set missing frame " + std::to_string(frameNumber) + " from animation " + std::to_string(animNumber) +
+			"Attempted to set missing frame " + std::to_string(frameNumber) +
+			" from animation " + std::to_string(animNumber) +
 			((animObjectID == item.ObjectNumber) ? "" : (" from object " + GetObjectName(animObjectID))) +
 			" for object " + GetObjectName(item.ObjectNumber),
 			LogLevel::Warning);
