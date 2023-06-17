@@ -42,7 +42,7 @@ namespace TEN::Renderer
 	// Vertical menu positioning templates
 	constexpr auto MenuVerticalTop = 11;
 	constexpr auto MenuVerticalDisplaySettings = 200;
-	constexpr auto MenuVerticalOtherSettings = 150;
+	constexpr auto MenuVerticalOtherSettings = 130;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
