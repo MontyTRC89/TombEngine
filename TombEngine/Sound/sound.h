@@ -21,6 +21,7 @@ constexpr auto SOUND_MAX_PITCH_CHANGE        = 0.09f;
 constexpr auto SOUND_MAX_GAIN_CHANGE         = 0.0625f;
 constexpr auto SOUND_32BIT_SILENCE_LEVEL     = 4.9e-04f;
 constexpr auto SOUND_SAMPLE_FLAGS            = (BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT);
+constexpr auto SOUND_MILLISECONDS_IN_SECOND  = 1000.0f;
 constexpr auto SOUND_XFADETIME_BGM           = 5000;
 constexpr auto SOUND_XFADETIME_BGM_START     = 1500;
 constexpr auto SOUND_XFADETIME_ONESHOT       = 200;
