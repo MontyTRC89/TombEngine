@@ -73,7 +73,6 @@ namespace TEN::Entities::TR4
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-		auto* object = &Objects[item->ObjectNumber];
 
 		int x = item->Pose.Position.x + 614 * phd_sin(item->Pose.Orientation.y);
 		int y = item->Pose.Position.y;

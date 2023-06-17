@@ -254,7 +254,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 		spark->fxObj = fxObject;
 		spark->scalar = 2;
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 96;
 		spark->dSize = spark->size / 4;
 	}
 

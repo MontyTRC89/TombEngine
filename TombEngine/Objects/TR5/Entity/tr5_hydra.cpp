@@ -114,7 +114,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->gravity = 0;
 		spark->maxYvel = 0;
 		spark->scalar = 1;
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 96;
 		spark->dSize = spark->size / 4;
 	}
 

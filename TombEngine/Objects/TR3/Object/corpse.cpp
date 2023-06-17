@@ -144,7 +144,6 @@ namespace TEN::Entities::TR3
 
 	void CorpseHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		const auto& object = Objects[target.ObjectNumber];
 		const auto& player = *GetLaraInfo(&source);
 
 		if (pos.has_value() && (player.Control.Weapon.GunType == LaraWeaponType::Pistol ||

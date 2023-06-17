@@ -230,15 +230,14 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	auto& player = GetLaraInfo(*laraItem);
 
 	// NOTE: Only execute code below if Triggertype is switch trigger.
-	auto triggerIndex = GetTriggerIndex(&receptacleItem);
-
-	if (triggerIndex == nullptr)
+	short* triggerIndexPtr = GetTriggerIndex(&receptacleItem);
+	if (triggerIndexPtr == nullptr)
 		return;
 
-	int triggerType = (*(triggerIndex++) >> 8) & TRIGGER_BITS;
-
+	int triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 	if (triggerType != TRIGGER_TYPES::SWITCH)
 		return;
+
 	AnimateItem(&receptacleItem);
 
 	// Start level with correct object when loading game.
@@ -330,8 +329,8 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 void PuzzleDone(ItemInfo* item, short itemNumber)
 {
-	auto triggerIndex = GetTriggerIndex(item);
-	short triggerType = (triggerIndex != nullptr) ? (*(triggerIndex++) >> 8) & TRIGGER_BITS : TRIGGER_TYPES::TRIGGER;
+	short* triggerIndexPtr = GetTriggerIndex(item);
+	short triggerType = (triggerIndexPtr != nullptr) ? (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS : TRIGGER_TYPES::TRIGGER;
 
 	if (triggerType == TRIGGER_TYPES::SWITCH)
 	{

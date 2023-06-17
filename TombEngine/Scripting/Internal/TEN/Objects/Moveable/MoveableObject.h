@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ScriptUtil.h"
-#include "Objects/Room/RoomObject.h"
-#include "Objects/NamedBase.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Objects/NamedBase.h"
 
 class LevelFunc;
 

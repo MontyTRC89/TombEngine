@@ -15,8 +15,8 @@
 #include "Objects/Sink.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Input;
 
@@ -47,6 +47,10 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 		item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+	}
+	else if (coll->LastBridgeItemNumber != NO_ITEM)
+	{
+		ShiftItem(item, coll);
 	}
 
 	return false;
@@ -202,8 +206,8 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 {
 	// HACK
-	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
-		coll->Shift.y = 0;
+	if (coll->Shift.Position.y >= 0 && coll->Shift.Position.y <= CLICK(1.25f))
+		coll->Shift.Position.y = 0;
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT ||
 		coll->HitTallObject)

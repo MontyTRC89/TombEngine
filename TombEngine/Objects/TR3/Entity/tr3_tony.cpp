@@ -492,7 +492,6 @@ namespace TEN::Entities::Creatures::TR3
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
-		short tiltAngle = 0;
 		short headAngle = 0;
 		short torsoX = 0;
 		short torsoY = 0;

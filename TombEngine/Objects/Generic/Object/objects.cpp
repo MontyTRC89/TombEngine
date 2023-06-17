@@ -294,7 +294,7 @@ void HighObject2Control(short itemNumber)
 		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 		spark->maxYvel = 0;
 		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 32;
 		spark->dSize = spark->size / 4;
 
 		if (GetRandomControl() & 3)

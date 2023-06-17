@@ -61,7 +61,7 @@ namespace TEN::Entities::TR4
                 spark->zVel = (GetRandomControl() & 0x3FF) - 512;
                 spark->friction = 4;
                 spark->scalar = 2;
-                spark->sSize = spark->size = (GetRandomControl() & 0xF) + 16;
+                spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 16;
                 spark->dSize = (GetRandomControl() & 1) + 3;
                 spark->maxYvel = 0;
                 spark->gravity = (GetRandomControl() & 0x1F) + 32;

@@ -1628,20 +1628,23 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				if (isExplosive)
 				{
 					doExplosion = isExplosive;
-					if (type != ProjectileType::FlashGrenade && !currentObject.undead)
+					if (type != ProjectileType::FlashGrenade && currentObject.damageType != DamageMode::None)
 						DoExplosiveDamage(emitter, *itemPtr, projectile, damage);
 				}
-				else if (type == ProjectileType::Poison)
+				else if (currentObject.damageType == DamageMode::AnyWeapon)
 				{
-					if (itemPtr->IsCreature())
-						GetCreatureInfo(itemPtr)->Poisoned = true;
+					if (type == ProjectileType::Poison)
+					{
+						if (itemPtr->IsCreature())
+							GetCreatureInfo(itemPtr)->Poisoned = true;
 
-					if (itemPtr->IsLara())
-						GetLaraInfo(itemPtr)->Status.Poison += 5;
-				}
-				else if (!currentObject.undead)
-				{
-					DoDamage(itemPtr, damage);
+						if (itemPtr->IsLara())
+							GetLaraInfo(itemPtr)->Status.Poison += 5;
+					}
+					else
+					{
+						DoDamage(itemPtr, damage);
+					}
 				}
 
 			}

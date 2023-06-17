@@ -1,6 +1,7 @@
 #include "framework.h"
 
 #include "Game/items.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/item_fx.h"
@@ -21,6 +22,7 @@
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 
 /***
@@ -576,6 +578,10 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 				SetRoomNumber(potentialNewRoom);
 		}
 	}
+
+	const auto& object = Objects[m_item->ObjectNumber];
+	if (object.floor != nullptr || object.ceiling != nullptr)
+		UpdateBridgeItem((int)m_item->Index);
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -598,11 +604,15 @@ Rotation Moveable::GetRot() const
 	};
 }
 
-void Moveable::SetRot(Rotation const& rot)
+void Moveable::SetRot(const Rotation& rot)
 {
 	m_item->Pose.Orientation.x = ANGLE(rot.x);
 	m_item->Pose.Orientation.y = ANGLE(rot.y);
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
+
+	const auto& object = Objects[m_item->ObjectNumber];
+	if (object.floor != nullptr || object.ceiling != nullptr)
+		UpdateBridgeItem(m_item->Index);
 }
 
 /// Get current HP (hit points/health points)
@@ -767,7 +777,7 @@ aiBitsType Moveable::GetAIBits() const
 	aiBitsArray ret{};
 	for (size_t i = 0; i < ret.size(); ++i)
 	{
-		uint8_t isSet = m_item->AIBits & (1 << i);
+		unsigned char isSet = m_item->AIBits & (1 << i);
 		ret[i] = static_cast<int>( isSet > 0);
 	}
 
@@ -787,7 +797,7 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 	for (size_t i = 0; i < bits.value().size(); ++i)
 	{
 		m_item->AIBits &= ~(1 << i);
-		uint8_t isSet = bits.value()[i] > 0;
+		unsigned char isSet = bits.value()[i] > 0;
 		m_item->AIBits |= isSet << i;
 	}
 }

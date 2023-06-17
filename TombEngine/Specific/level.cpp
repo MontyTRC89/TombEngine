@@ -186,8 +186,17 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		for (int i = 0; i < g_Level.NumItems; i++)
-			InitializeItem(i);
+		// Initialize all bridges first.
+		// It is needed because some other items need final floor height to init properly.
+
+		for (int isFloor = 0; isFloor <= 1; isFloor++)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if ((Objects[g_Level.Items[i].ObjectNumber].floor == nullptr) == (bool)isFloor)
+					InitializeItem(i);
+			}
+		}
 	}
 }
 
@@ -418,6 +427,15 @@ void LoadObjects()
 	for (int i = 0; i < numStatics; i++)
 	{
 		int meshID = ReadInt32();
+
+		if (meshID >= MAX_STATICS)
+		{
+			TENLog("Static with ID " + std::to_string(meshID) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ". " +
+				   "Change static mesh ID in WadTool to a value below maximum.", LogLevel::Warning);
+			
+			meshID = 0;
+		}
+
 		StaticObjectsIds.push_back(meshID);
 
 		StaticObjects[meshID].meshNumber = (short)ReadInt32();

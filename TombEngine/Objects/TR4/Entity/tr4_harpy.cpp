@@ -178,7 +178,6 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;

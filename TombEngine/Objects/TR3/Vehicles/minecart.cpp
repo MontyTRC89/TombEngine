@@ -169,7 +169,6 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* minecartItem = &g_Level.Items[itemNumber];
 		minecartItem->Data = MinecartInfo();
-		auto* minecart = GetMinecartInfo(minecartItem);
 	}
 
 	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
