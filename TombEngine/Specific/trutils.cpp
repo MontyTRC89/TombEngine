@@ -120,7 +120,7 @@ namespace TEN::Utils
 
 	std::string ReplaceNewLineSymbols(const std::string& string)
 	{
-		std::string result = string;
+		auto result = string;
 		std::string::size_type index = 0;
 
 		while ((index = result.find("\\n", index)) != std::string::npos) 

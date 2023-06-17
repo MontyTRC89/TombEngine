@@ -16,8 +16,8 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Misc/ActionIDs.h"
 #include "Scripting/Internal/TEN/Misc/CameraTypes.h"
-#include "Scripting/Internal/TEN/Misc/SoundTrackTypes.h"
 #include "Scripting/Internal/TEN/Misc/LevelLog.h"
+#include "Scripting/Internal/TEN/Misc/SoundTrackTypes.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -187,7 +187,7 @@ namespace Misc
 	}
 
 	///Get current subtitle string for a voice track currently playing.
-	//Subtitle file must be in .srt format and must have same filename as voice track, and placed in same directory as voice track.
+	//Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
 	//Returns nil if no voice track is playing or no subtitle present.
 	//@function GetCurrentSubtitle
 	//@treturn string current subtitle string
@@ -196,9 +196,13 @@ namespace Misc
 		auto& result = GetCurrentSubtitle();
 
 		if (result.has_value())
+		{
 			return result.value();
+		}
 		else
+		{
 			return sol::nil;
+		}
 	}
 
 	/// Play sound effect
