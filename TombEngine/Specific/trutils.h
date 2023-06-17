@@ -4,6 +4,7 @@ namespace TEN::Utils
 {
 	// String utilities
 	std::string ConstructAssetDirectory(std::string customDirectory);
+	std::string ReplaceNewLineSymbols(const std::string& string);
 	std::string ToUpper(std::string string);
 	std::string ToLower(std::string string);
 	std::string ToString(const std::wstring& wString);
@@ -23,9 +24,6 @@ namespace TEN::Utils
 	bool Contains(const std::vector<TElement>& vector, const TElement& element)
 	{
 		auto it = std::find(vector.begin(), vector.end(), element);
-		if (it == vector.end())
-			return false;
-
-		return true;
+		return (it != vector.end());
 	}
 }

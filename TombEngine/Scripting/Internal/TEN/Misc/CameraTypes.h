@@ -27,10 +27,10 @@ The following constants are inside CameraType.
 
 static const std::unordered_map<std::string, CameraType> CAMERA_TYPE
 {
-	{ "Chase", CameraType::Chase },
-	{ "Fixed", CameraType::Fixed },
-	{ "Look", CameraType::Look },
-	{ "Combat", CameraType::Combat },
-	{ "Heavy", CameraType::Heavy },
-	{ "Object", CameraType::Object }
+	{ "CHASE", CameraType::Chase },
+	{ "FIXED", CameraType::Fixed },
+	{ "LOOK", CameraType::Look },
+	{ "COMBAT", CameraType::Combat },
+	{ "HEAVY", CameraType::Heavy },
+	{ "OBJECT", CameraType::Object }
 };

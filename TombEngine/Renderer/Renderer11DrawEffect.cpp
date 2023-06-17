@@ -1464,7 +1464,6 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
-		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;

@@ -726,6 +726,7 @@ namespace TEN::Gui
 			Reverb,
 			MusicVolume,
 			SfxVolume,
+			Subtitles,
 			AutoTarget,
 			ToggleRumble,
 			ThumbstickCameraControl,
@@ -733,7 +734,7 @@ namespace TEN::Gui
 			Cancel
 		};
 
-		static const int numOtherSettingsOptions = 7;
+		static const int numOtherSettingsOptions = 8;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -771,6 +772,11 @@ namespace TEN::Gui
 			case OtherSettingsOption::ThumbstickCameraControl:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableThumbstickCameraControl = !CurrentSettings.Configuration.EnableThumbstickCameraControl;
+				break;
+
+			case OtherSettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
 				break;
 			}
 		}
@@ -2931,6 +2937,38 @@ namespace TEN::Gui
 		}
 	}
 
+	bool GuiController::CallPause()
+	{
+		g_Renderer.DumpGameScene();
+		PauseAllSounds(SoundPauseMode::Pause);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
+		g_Gui.SetInventoryMode(InventoryMode::Pause);
+		g_Gui.SetMenuToDisplay(Menu::Pause);
+		g_Gui.SetSelectedOption(0);
+
+		bool doExitToTitle = false;
+
+		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
+		{
+			g_Gui.DrawInventory();
+			g_Renderer.Synchronize();
+
+			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+			{
+				doExitToTitle = true;
+				break;
+			}
+		}
+
+		if (doExitToTitle)
+			StopAllSounds();
+		else
+			ResumeAllSounds(SoundPauseMode::Pause);
+
+		return doExitToTitle;
+	}
+
 	bool GuiController::CallInventory(ItemInfo* item, bool resetMode)
 	{
 		auto* lara = GetLaraInfo(item);
@@ -2941,7 +2979,10 @@ namespace TEN::Gui
 
 		Rings[(int)RingTypes::Inventory] = &PCRing1;
 		Rings[(int)RingTypes::Ammo] = &PCRing2;
+
 		g_Renderer.DumpGameScene();
+		PauseAllSounds(SoundPauseMode::Inventory);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 		if (resetMode)
 			SetInventoryMode(InventoryMode::InGame);
@@ -3035,6 +3076,7 @@ namespace TEN::Gui
 			UseCurrentItem(item);
 
 		AlterFOV(LastFOV);
+		ResumeAllSounds(SoundPauseMode::Inventory);
 
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;
 		SetInventoryMode(InventoryMode::None);

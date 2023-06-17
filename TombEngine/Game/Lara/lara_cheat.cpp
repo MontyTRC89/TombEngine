@@ -3,7 +3,7 @@
 
 #include <OISKeyboard.h>
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/GuiObjects.h"

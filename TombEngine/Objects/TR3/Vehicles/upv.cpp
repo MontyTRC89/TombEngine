@@ -184,7 +184,7 @@ namespace TEN::Entities::Vehicles
 		{
 			// HACK: Collision in water behaves differently? @Sezz 2022.06.28
 			if (TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) && TestCollision(UPVItem, laraItem))
-				ItemPushItem(UPVItem, laraItem, coll, false, false);
+				ItemPushItem(UPVItem, laraItem, coll, false, 0);
 		}
 		else
 		{
@@ -942,7 +942,7 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
 		{
-			int waterHeight = GetWaterHeight(UPVItem);
+			waterHeight = GetWaterHeight(UPVItem);
 			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
 		}
 

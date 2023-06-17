@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <variant>
 
+#include "Game/collision/collide_room.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/itemdata/door_data.h"
 #include "Game/Lara/lara_struct.h"
@@ -56,6 +57,7 @@ class ItemData
 		PushableInfo,
 		ItemInfo*,
 		LaraInfo*,
+		CollisionInfo,
 		CreatureInfo,
 		WraithInfo,
 		GuardianInfo,
