@@ -349,36 +349,26 @@ void LoadObjects()
 				dispatch.FrameNumberRange.second = ReadInt32();
 			}
 
-			int commandCount = ReadInt32();
-			int commandDataSize = ReadInt32();
-
 			// Load commands.
+			int commandCount = ReadInt32();
 			if (commandCount != 0)
 			{
 				anim.Commands.reserve(commandCount);
 
-				auto commandData = std::vector<int>{};
-				commandData.resize(commandDataSize);
-				ReadBytes(commandData.data(), sizeof(int) * commandDataSize);
-
 				// Interpret raw command data.
-				int* commandDataPtr = &commandData.front();
 				for (int i = 0; i < commandCount; i++)
 				{
-					auto animCommand = (AnimCommandType)commandDataPtr[0];
-					commandDataPtr++;
+					auto animCommand = (AnimCommandType)ReadInt32();
 
 					auto command = AnimData::AnimCommandPtr{};
 					switch (animCommand)
 					{
 					case AnimCommandType::MoveOrigin:
-						command = std::make_unique<MoveOriginCommand>(Vector3(commandDataPtr[0], commandDataPtr[1], commandDataPtr[2]));
-						commandDataPtr += 3;
+						command = std::make_unique<MoveOriginCommand>(ReadVector3());
 						break;
 
 					case AnimCommandType::JumpVelocity:
-						command = std::make_unique<JumpVelocityCommand>(Vector3(0.0f, commandDataPtr[0], commandDataPtr[1]));
-						commandDataPtr += 2;
+						command = std::make_unique<JumpVelocityCommand>(ReadVector3());
 						break;
 
 					case AnimCommandType::AttackReady:
@@ -390,13 +380,21 @@ void LoadObjects()
 						break;
 
 					case AnimCommandType::SoundEffect:
-						command = std::make_unique<SoundEffectCommand>(commandDataPtr[1], commandDataPtr[0]);
-						commandDataPtr += 2;
+						{
+							int soundID = ReadInt32();
+							int frameNumber = ReadInt32();
+
+							command = std::make_unique<SoundEffectCommand>(soundID, frameNumber);
+						}
 						break;
 
 					case AnimCommandType::Flipeffect:
-						command = std::make_unique<FlipeffectCommand>(commandDataPtr[1], commandDataPtr[0]);
-						commandDataPtr += 2;
+						{
+							int flipeffectID = ReadInt32();
+							int frameNumber = ReadInt32();
+
+							command = std::make_unique<FlipeffectCommand>(flipeffectID, frameNumber);
+						}
 						break;
 
 					default:
