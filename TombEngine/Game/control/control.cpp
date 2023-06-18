@@ -218,7 +218,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		UpdateSimpleParticles();
-		UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
