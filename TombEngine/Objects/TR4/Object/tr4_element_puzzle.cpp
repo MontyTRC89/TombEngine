@@ -152,7 +152,7 @@ namespace TEN::Entities::TR4
 			if (TestCollision(item, laraItem))
 			{
 				if (coll->Setup.EnableObjectPush)
-					ItemPushItem(item, laraItem, coll, 0, 0);
+					ItemPushItem(item, laraItem, coll, false, 0);
 			}
 		}
 	}

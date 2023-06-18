@@ -253,7 +253,7 @@ namespace TEN::Entities::Doors
 					if (!(doorItem->ObjectNumber >= ID_LIFT_DOORS1 &&
 						doorItem->ObjectNumber <= ID_LIFT_DOORS2) || doorItem->ItemFlags[0])
 					{
-						ItemPushItem(doorItem, laraItem, coll, FALSE, TRUE);
+						ItemPushItem(doorItem, laraItem, coll, false, 1);
 					}
 				}
 			}

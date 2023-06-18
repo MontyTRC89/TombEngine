@@ -44,6 +44,13 @@ enum class HitEffect
     Max
 };
 
+enum class DamageMode
+{
+	AnyWeapon,
+	ExplosivesOnly,
+	None
+};
+
 enum ShatterType
 {
 	SHT_NONE,
@@ -63,6 +70,7 @@ struct ObjectInfo
 
 	LotType LotType;
 	HitEffect hitEffect;
+	DamageMode damageType;
 	ShadowMode shadowType;
 
 	int meshSwapSlot;
@@ -72,7 +80,6 @@ struct ObjectInfo
 	int HitPoints;
 	bool intelligent;	// IsIntelligent
 	bool waterCreature; // IsWaterCreature
-	bool undead;		// IsUndead
 	bool nonLot;		// IsNonLot
 	bool isPickup;		// IsPickup
 	bool isPuzzleHole;	// IsReceptacle
@@ -115,11 +122,11 @@ struct ObjectInfo
 			{
 				hitEffect = HitEffect::Richochet;
 			}
-			else if ((undead && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+			else if ((damageType != DamageMode::AnyWeapon && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
 			{
 				hitEffect = HitEffect::Smoke;
 			}
-			else if (!undead && HitPoints > 0)
+			else if (damageType == DamageMode::AnyWeapon && HitPoints > 0)
 			{
 				hitEffect = HitEffect::Blood;
 			}

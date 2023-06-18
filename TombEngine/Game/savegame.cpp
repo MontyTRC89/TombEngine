@@ -806,8 +806,10 @@ bool SaveGame::Save(int slot)
 	// Soundtrack playheads
 	auto bgmTrackData = GetSoundTrackNameAndPosition(SoundTrackType::BGM);
 	auto oneshotTrackData = GetSoundTrackNameAndPosition(SoundTrackType::OneShot);
+	auto voiceTrackData = GetSoundTrackNameAndPosition(SoundTrackType::Voice);
 	auto bgmTrackOffset = fbb.CreateString(bgmTrackData.first);
 	auto oneshotTrackOffset = fbb.CreateString(oneshotTrackData.first);
+	auto voiceTrackOffset = fbb.CreateString(voiceTrackData.first);
 
 	// Legacy soundtrack map
 	std::vector<int> soundTrackMap;
@@ -1272,6 +1274,8 @@ bool SaveGame::Save(int slot)
 	sgb.add_ambient_position(bgmTrackData.second);
 	sgb.add_oneshot_track(oneshotTrackOffset);
 	sgb.add_oneshot_position(oneshotTrackData.second);
+	sgb.add_voice_track(voiceTrackOffset);
+	sgb.add_voice_position(voiceTrackData.second);
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -1456,6 +1460,7 @@ bool SaveGame::Load(int slot)
 	// Restore soundtracks
 	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
 	PlaySoundTrack(s->oneshot_track()->str(), SoundTrackType::OneShot, s->oneshot_position());
+	PlaySoundTrack(s->voice_track()->str(), SoundTrackType::Voice, s->voice_position());
 
 	// Legacy soundtrack map
 	for (int i = 0; i < s->cd_flags()->size(); i++)

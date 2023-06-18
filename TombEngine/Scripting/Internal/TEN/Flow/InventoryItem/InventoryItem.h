@@ -3,7 +3,8 @@
 #include <string>
 
 #include "Game/Gui.h"
-#include "Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+
 using namespace TEN::Gui;
 
 enum GAME_OBJECT_ID : short;
