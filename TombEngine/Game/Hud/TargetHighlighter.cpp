@@ -136,53 +136,6 @@ namespace TEN::Hud
 			segment.PosOffset2D = Get2DPositionOffset(segment.OrientOffset2D);
 	}
 
-	void TargetHighlighterController::Update(const std::vector<int>& entityIds)
-	{
-		constexpr auto TARGET_BONE_ID = 0;
-
-		// No crosshairs to update; return early.
-		if (Crosshairs.empty() && entityIds.empty())
-			return;
-
-		// Update active crosshairs.
-		for (int entityID : entityIds)
-		{
-			const auto& item = g_Level.Items[entityID];
-			auto pos = GetJointPosition(item, TARGET_BONE_ID).ToVector3();
-
-			// Update existing active crosshair.
-			auto it = Crosshairs.find(entityID);
-			if (it != Crosshairs.end())
-			{
-				auto& crosshair = it->second;
-				if (crosshair.IsActive)
-				{
-					crosshair.Update(pos, item.HitStatus, true);
-					continue;
-				}
-			}
-
-			// Add new active crosshair.
-			AddCrosshair(entityID, pos);
-		}
-
-		// Update inactive crosshairs.
-		for (auto& [entityID, crosshair] : Crosshairs)
-		{
-			// Find crosshairs at absent entity ID keys.
-			if (Contains(entityIds, entityID))
-				continue;
-
-			const auto& item = g_Level.Items[entityID];
-			auto pos = GetJointPosition(item, 0).ToVector3();
-
-			// Update inactive crosshair.
-			crosshair.Update(pos, item.HitStatus, false);
-		}
-
-		ClearInactiveCrosshairs();
-	}
-
 	void TargetHighlighterController::Update(const ItemInfo& playerItem)
 	{
 		// Check if target highlighter is enabled.
@@ -264,6 +217,53 @@ namespace TEN::Hud
 	void TargetHighlighterController::Clear()
 	{
 		*this = {};
+	}
+
+	void TargetHighlighterController::Update(const std::vector<int>& entityIds)
+	{
+		constexpr auto TARGET_BONE_ID = 0;
+
+		// No crosshairs to update; return early.
+		if (Crosshairs.empty() && entityIds.empty())
+			return;
+
+		// Update active crosshairs.
+		for (int entityID : entityIds)
+		{
+			const auto& item = g_Level.Items[entityID];
+			auto pos = GetJointPosition(item, TARGET_BONE_ID).ToVector3();
+
+			// Update existing active crosshair.
+			auto it = Crosshairs.find(entityID);
+			if (it != Crosshairs.end())
+			{
+				auto& crosshair = it->second;
+				if (crosshair.IsActive)
+				{
+					crosshair.Update(pos, item.HitStatus, true);
+					continue;
+				}
+			}
+
+			// Add new active crosshair.
+			AddCrosshair(entityID, pos);
+		}
+
+		// Update inactive crosshairs.
+		for (auto& [entityID, crosshair] : Crosshairs)
+		{
+			// Find crosshairs at absent entity ID keys.
+			if (Contains(entityIds, entityID))
+				continue;
+
+			const auto& item = g_Level.Items[entityID];
+			auto pos = GetJointPosition(item, 0).ToVector3();
+
+			// Update inactive crosshair.
+			crosshair.Update(pos, item.HitStatus, false);
+		}
+
+		ClearInactiveCrosshairs();
 	}
 
 	CrosshairData& TargetHighlighterController::GetNewCrosshair(int entityID)

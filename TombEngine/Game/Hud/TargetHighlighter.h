@@ -50,13 +50,15 @@ namespace TEN::Hud
 
 	public:
 		// Utilities
-		void Update(const std::vector<int>& entityIds);
 		void Update(const ItemInfo& playerItem);
 		void Draw() const;
 		void Clear();
 
 	private:
-		// Helpers
+		// Update helpers
+		void Update(const std::vector<int>& entityIds);
+
+		// Misc. helpers
 		CrosshairData& GetNewCrosshair(int entityID);
 		void		   AddCrosshair(int entityID, const Vector3& pos);
 		void		   ClearInactiveCrosshairs();
