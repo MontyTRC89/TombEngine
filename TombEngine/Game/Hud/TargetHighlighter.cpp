@@ -60,7 +60,7 @@ namespace TEN::Hud
 	{
 		constexpr auto RANGE			  = BLOCK(10);
 		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.15f;
-		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 4;
+		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 3;
 
 		auto alpha = cameraDist / RANGE;
 		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, alpha);
