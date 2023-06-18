@@ -26,6 +26,7 @@ using namespace TEN::Math;
 #define REGKEY_ENABLE_THUMBSTICK_CAMERA	"EnableThumbstickCamera"
 #define REGKEY_ENABLE_SUBTITLES			"EnableSubtitles"
 
+#define REGKEY_TARGET_HIGHLIGHTER		"EnableTargetHighlighter"
 #define REGKEY_AUTOTARGET				"AutoTarget"
 
 struct GameConfiguration 
@@ -46,10 +47,12 @@ struct GameConfiguration
 	int ShadowMapSize = 1024;
 	int ShadowMaxBlobs = 16;
 
-	bool EnableSubtitles;
-	bool AutoTarget;
-	bool EnableRumble;
-	bool EnableThumbstickCameraControl;
+	bool EnableSubtitles			   = false;
+	bool EnableAutoTargeting			   = false;
+	bool EnableTargetHighlighter	   = false;
+	bool EnableRumble				   = false;
+	bool EnableThumbstickCameraControl = false;
+
 	short KeyboardLayout[TEN::Input::KEY_COUNT];
 
 	std::vector<Vector2i> SupportedScreenResolutions;

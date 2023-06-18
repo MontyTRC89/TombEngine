@@ -5,10 +5,9 @@ corresponding to languages in the table at the end of this file.
 
 local strings =
 {
-	window_title = { "TombEngine" },
 	all = { "All" },
 	apply = { "Apply" },
-	auto_target = { "Automatic Targeting" },
+	automatic_targeting = { "Automatic Targeting" },
 	back = { "Back" },
 	binoculars = { "Binoculars" },
 	close = { "Close" },
@@ -110,6 +109,7 @@ local strings =
 	thumbstick_camera = { "Thumbstick Camera" },
 	time_taken = { "Time Taken" },
 	statistics = { "Statistics" },
+	target_highlighter = { "Target Highlighter" },
 	torch = { "Torch" },
 	empty = { "Empty" },
 	use = { "Use" },
@@ -126,6 +126,7 @@ local strings =
 	windowed = { "Windowed" },
 	load_game = { "Load Game" },
 	test_level = { "Test Level" },
+	torch2 = { "Torch 2" },
 	waterskin_small_empty = { "Small Waterskin (Empty)" },
 	waterskin_small_1l = { "Small Waterskin (1L)" },
 	waterskin_small_2l = { "Small Waterskin (2L)" },
@@ -136,7 +137,7 @@ local strings =
 	waterskin_large_3l = { "Large Waterskin (3L)" },
 	waterskin_large_4l = { "Large Waterskin (4L)" },
 	waterskin_large_5l = { "Large Waterskin (5L)" },
-	torch2 = { "Torch 2" },
+	window_title = { "TombEngine" },
 	mechanical_scarab = { "Mechanical Scarab With Winding Key" },
 	mechanical_scarab_1 = { "Mechanical Scarab (No Winding Key)" },
 	mechanical_scarab_2 = { "Mechanical Scarab Winding Key" },

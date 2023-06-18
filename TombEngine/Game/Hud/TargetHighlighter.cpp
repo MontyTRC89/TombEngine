@@ -7,6 +7,7 @@
 #include "Game/lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
+#include "Specific/configuration.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Math;
@@ -184,6 +185,15 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Update(const ItemInfo& playerItem)
 	{
+		// Check if target highlighter is enabled.
+		if (!g_Configuration.EnableTargetHighlighter)
+		{
+			if (!Crosshairs.empty())
+				Crosshairs.clear();
+
+			return;
+		}
+
 		const auto& player = GetLaraInfo(playerItem);
 
 		// Loop over player targets.
@@ -346,6 +356,7 @@ namespace TEN::Hud
 		}
 
 		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
+		g_Renderer.PrintDebugMessage("Enabled: ", g_Configuration.EnableTargetHighlighter ? "Yes" : "No");
 		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
 		g_Renderer.PrintDebugMessage("Visible crosshairs: %d", peripheralCount);

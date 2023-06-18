@@ -84,7 +84,8 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		LoadSoundDevicesInCombobox(handle);
 
 		// Set some default values
-		g_Configuration.AutoTarget = true;
+		g_Configuration.EnableAutoTargeting = true;
+		g_Configuration.EnableTargetHighlighter = true;
 
 		g_Configuration.Antialiasing = AntialiasingMode::Low;
 		SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_SETCHECK, 1, 0);
@@ -265,12 +266,18 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if (SetBoolRegKey(rootKey, REGKEY_AUTOTARGET, g_Configuration.AutoTarget) != ERROR_SUCCESS)
+	if (SetBoolRegKey(rootKey, REGKEY_AUTOTARGET, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
 	}
 
+	if (SetBoolRegKey(rootKey, REGKEY_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+	
 	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		char buffer[6];
@@ -300,7 +307,8 @@ void InitDefaultConfiguration()
 	auto currentScreenResolution = GetScreenResolution();
 
 	g_Configuration.EnableSubtitles = true;
-	g_Configuration.AutoTarget = true;
+	g_Configuration.EnableAutoTargeting = true;
+	g_Configuration.EnableTargetHighlighter = true;
 	g_Configuration.SoundDevice = 1;
 	g_Configuration.EnableReverb = true;
 	g_Configuration.EnableCaustics = true;
@@ -435,6 +443,13 @@ bool LoadConfiguration()
 		RegCloseKey(rootKey);
 		return false;
 	}
+	
+	bool enableTargetHighlighter = true;
+	if (GetBoolRegKey(rootKey, REGKEY_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
 
 	bool enableSubtitles = true;
 	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS)
@@ -475,7 +490,8 @@ bool LoadConfiguration()
 	g_Configuration.SfxVolume = sfxVolume;
 	g_Configuration.SoundDevice = soundDevice;
 
-	g_Configuration.AutoTarget = autoTarget;
+	g_Configuration.EnableAutoTargeting = autoTarget;
+	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
 	g_Configuration.EnableRumble = enableRumble;
 	g_Configuration.EnableThumbstickCameraControl = enableThumbstickCamera;
 	g_Configuration.EnableSubtitles = enableSubtitles;
