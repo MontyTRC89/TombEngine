@@ -36,8 +36,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto PUNA_EXPLOSION_MAIN_COLOR   = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
 	constexpr auto PUNA_EXPLOSION_SECOND_COLOR = Vector4(0.1f, 0.3f, 0.7f, 0.5f);
 
-	const auto PunaBossHeadBite = CreatureBiteInfo(Vector3i::Zero, 8);
-	const auto PunaBossHandBite = CreatureBiteInfo(Vector3i::Zero, 14);
+	const auto PunaBossHeadBite = CreatureBiteInfo(Vector3::Zero, 8);
+	const auto PunaBossHandBite = CreatureBiteInfo(Vector3::Zero, 14);
 
 	enum PunaState
 	{

@@ -35,9 +35,9 @@ namespace TEN::Entities::TR4
 	constexpr auto AHMET_VIEW_ANGLE				 = ANGLE(45.0f);
 	constexpr auto AHMET_ENEMY_ANGLE			 = ANGLE(90.0f);
 	
-	const auto AhmetBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 16);
-	const auto AhmetBiteRight = CreatureBiteInfo(Vector3i::Zero, 22);
-	const auto AhmetBiteJaw	  = CreatureBiteInfo(Vector3i::Zero, 11);
+	const auto AhmetBiteLeft  = CreatureBiteInfo(Vector3::Zero, 16);
+	const auto AhmetBiteRight = CreatureBiteInfo(Vector3::Zero, 22);
+	const auto AhmetBiteJaw	  = CreatureBiteInfo(Vector3::Zero, 11);
 	const auto AhmetSwipeAttackLeftJoints  = std::vector<unsigned int>{ 14, 15, 16, 17 };
 	const auto AhmetSwipeAttackRightJoints = std::vector<unsigned int>{ 20, 21, 22, 23 };
 

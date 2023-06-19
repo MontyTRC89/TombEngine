@@ -35,7 +35,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
 
-	const auto ApeBite = CreatureBiteInfo(Vector3i(0, -19, 75), 15);
+	const auto ApeBite = CreatureBiteInfo(Vector3(0, -19, 75), 15);
 	const auto ApeAttackJoints = std::vector<unsigned int>{ 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	enum ApeState

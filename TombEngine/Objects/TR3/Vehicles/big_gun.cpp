@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
-	const auto BigGunBite = CreatureBiteInfo(Vector3i(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
+	const auto BigGunBite = CreatureBiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{

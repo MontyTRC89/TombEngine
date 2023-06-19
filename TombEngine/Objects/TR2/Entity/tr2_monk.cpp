@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto MonkBite = CreatureBiteInfo(Vector3i(-23, 16, 265), 14);
+	const auto MonkBite = CreatureBiteInfo(Vector3(-23, 16, 265), 14);
 
 	bool MonksAttackLara;
 

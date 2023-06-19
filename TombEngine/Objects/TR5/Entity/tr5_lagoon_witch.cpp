@@ -18,7 +18,7 @@ namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto LAGOON_WITCH_ATTACK_DAMAGE = 100;
 
-	const auto LagoonWitchBite = CreatureBiteInfo(Vector3i::Zero, 7);
+	const auto LagoonWitchBite = CreatureBiteInfo(Vector3::Zero, 7);
 	const auto LagoonWitchAttackJoints = std::vector<unsigned int>{ 6, 7, 8, 9, 14, 15, 16, 17 };
 
 	enum LagoonWitchState

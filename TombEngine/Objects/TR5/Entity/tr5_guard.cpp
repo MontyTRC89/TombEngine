@@ -32,11 +32,11 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto GUARD_NO_WEAPON_ON_HAND_SWAPFLAG = 0x2000;
 	constexpr auto GUARD_HEAD_MESH = 14;
 
-	const auto SwatGunBite				= CreatureBiteInfo(Vector3i(16, 240, 90), 13);
-	const auto MafiaGunBite				= CreatureBiteInfo(Vector3i(16, 270, 90), 13);
-	const auto SniperGunBite			= CreatureBiteInfo(Vector3i(0, 480, 110), 13);
-	const auto ArmedMafia2GunLeftBite	= CreatureBiteInfo(Vector3i(-16, 200, 60), 10);
-	const auto ArmedMafia2GunRightBite	= CreatureBiteInfo(Vector3i(16, 200, 60), 13);
+	const auto SwatGunBite				= CreatureBiteInfo(Vector3(16, 240, 90), 13);
+	const auto MafiaGunBite				= CreatureBiteInfo(Vector3(16, 270, 90), 13);
+	const auto SniperGunBite			= CreatureBiteInfo(Vector3(0, 480, 110), 13);
+	const auto ArmedMafia2GunLeftBite	= CreatureBiteInfo(Vector3(-16, 200, 60), 10);
+	const auto ArmedMafia2GunRightBite	= CreatureBiteInfo(Vector3(16, 200, 60), 13);
 
 	// TODO: Revise names of enum elements.
 

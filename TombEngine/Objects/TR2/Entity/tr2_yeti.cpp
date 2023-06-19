@@ -16,8 +16,8 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3i(12, 101, 19), 13);
-	const auto YetiBiteRight = CreatureBiteInfo(Vector3i(12, 101, 19), 10);
+	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3(12, 101, 19), 13);
+	const auto YetiBiteRight = CreatureBiteInfo(Vector3(12, 101, 19), 10);
 	const auto YetiAttackJoints1 = std::vector<unsigned int>{ 10, 12 }; // TODO: Rename.
 	const auto YetiAttackJoints2 = std::vector<unsigned int>{ 8, 9, 10 };
 

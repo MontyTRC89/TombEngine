@@ -54,8 +54,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BADDY_UZI_AMMO = 24;
 
-	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3i(-5, 200, 50), 11);
-	const auto BaddySwordBite = CreatureBiteInfo(Vector3i::Zero, 15);
+	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3(-5, 200, 50), 11);
+	const auto BaddySwordBite = CreatureBiteInfo(Vector3::Zero, 15);
 	const auto BaddySwordAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 
 	enum BaddyState

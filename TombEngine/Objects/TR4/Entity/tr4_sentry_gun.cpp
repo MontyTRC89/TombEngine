@@ -21,7 +21,7 @@ using namespace TEN::Gui;
 namespace TEN::Entities::TR4
 {
 	const auto SentryGunFlameOffset = Vector3i(-140, 0, 0);
-	const auto SentryGunBite = CreatureBiteInfo(Vector3i::Zero, 8);
+	const auto SentryGunBite = CreatureBiteInfo(Vector3::Zero, 8);
 
 	void InitializeSentryGun(short itemNumber)
 	{

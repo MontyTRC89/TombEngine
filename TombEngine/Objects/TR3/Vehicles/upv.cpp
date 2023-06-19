@@ -86,12 +86,12 @@ namespace TEN::Entities::Vehicles
 
 	const CreatureBiteInfo UPVBites[6] =
 	{
-		CreatureBiteInfo(Vector3i(0, 0, 0), 3),
-		CreatureBiteInfo(Vector3i(0, 96, 256), 0),
-		CreatureBiteInfo(Vector3i(-128, 0, 64), 1),
-		CreatureBiteInfo(Vector3i(0, 0, -64), 1),
-		CreatureBiteInfo(Vector3i(128, 0, 64), 2),
-		CreatureBiteInfo(Vector3i(0, 0, -64), 2)
+		CreatureBiteInfo(Vector3(0, 0, 0), 3),
+		CreatureBiteInfo(Vector3(0, 96, 256), 0),
+		CreatureBiteInfo(Vector3(-128, 0, 64), 1),
+		CreatureBiteInfo(Vector3(0, 0, -64), 1),
+		CreatureBiteInfo(Vector3(128, 0, 64), 2),
+		CreatureBiteInfo(Vector3(0, 0, -64), 2)
 	};
 
 	const std::vector<VehicleMountType> UPVMountTypes =

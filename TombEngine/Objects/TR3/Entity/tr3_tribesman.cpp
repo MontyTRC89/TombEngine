@@ -24,9 +24,9 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto TRIBESMAN_DART_DAMAGE = -25; // NOTE: Negative value gives poison.
 
-	const auto TribesmanAxeBite	  = CreatureBiteInfo(Vector3i(0, 56, 265), 13);
-	const auto TribesmanDartBite1 = CreatureBiteInfo(Vector3i(0, 0, -200), 13);
-	const auto TribesmanDartBite2 = CreatureBiteInfo(Vector3i(8, 40, -248), 13);
+	const auto TribesmanAxeBite	  = CreatureBiteInfo(Vector3(0, 56, 265), 13);
+	const auto TribesmanDartBite1 = CreatureBiteInfo(Vector3(0, 0, -200), 13);
+	const auto TribesmanDartBite2 = CreatureBiteInfo(Vector3(8, 40, -248), 13);
 	const auto TribesmanAxeAttackJoints	 = std::vector<unsigned int>{ 13 };
 	const auto TribesmanDartAttackJoints = std::vector<unsigned int>{ 10, 13 }; // TODO: Check.
 

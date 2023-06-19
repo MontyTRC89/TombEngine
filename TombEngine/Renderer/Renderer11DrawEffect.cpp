@@ -1004,7 +1004,7 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[0].Bite.Position.ToVector3());
+						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[0].Bite.Position);
 						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
@@ -1043,15 +1043,15 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[1].Bite.Position.ToVector3());
-						auto rtoMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[1].Bite.Position);
+						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
 						auto worldMatrix = rItemPtr->AnimationTransforms[creature.MuzzleFlash[1].Bite.BoneID] * rItemPtr->World;
 						worldMatrix = tMatrix * worldMatrix;
 
 						if (creature.MuzzleFlash[1].ApplyXRotation)
-							worldMatrix = rtoMatrixX * worldMatrix;
+							worldMatrix = rotMatrixX * worldMatrix;
 
 						if (creature.MuzzleFlash[1].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;

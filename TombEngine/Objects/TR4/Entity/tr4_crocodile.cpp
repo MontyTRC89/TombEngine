@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 	constexpr auto CROC_STATE_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
 	constexpr auto CROC_STATE_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto CrocodileBite = CreatureBiteInfo(Vector3i(0, -100, 500), 9);
+	const auto CrocodileBite = CreatureBiteInfo(Vector3(0, -100, 500), 9);
 	const auto CrocodileBiteAttackJoints = std::vector<unsigned int>{ 8, 9 };
 
 	enum CrocodileState
