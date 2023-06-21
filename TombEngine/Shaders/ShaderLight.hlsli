@@ -1,4 +1,5 @@
 #include "./Math.hlsli"
+#include "./LightStructs.hlsli"
 
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
 {

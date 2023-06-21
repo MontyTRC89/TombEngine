@@ -500,6 +500,8 @@ namespace TEN::Renderer
 		RenderTarget2D m_blur1RT;
 		RenderTarget2D m_blur2RT;
 		RenderTarget2D m_tempRT;
+		bool m_HDR;
+		POST_PROCESS_COLOR_TONE m_colorTone;
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
@@ -746,6 +748,8 @@ namespace TEN::Renderer
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
+		void SetHDR(bool enabled);
+		void SetPostProcessColorTone(POST_PROCESS_COLOR_TONE colorTone);
 
 		Vector2i			   GetScreenResolution() const;
 		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;

@@ -81,29 +81,16 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_psFullScreenQuad = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "PS", "ps_4_0", nullptr, blob);
 	m_vsShadowMap = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "VS", "vs_4_0", nullptr, blob);
 	m_psShadowMap = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsHUD = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_VS_HUD.hlsl"), "VS", "vs_4_0", nullptr, blob);
-	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSColored", "ps_4_0", nullptr, blob);
-	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
-	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
 	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "VS", "vs_4_0", nullptr, blob);
 	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "PS", "ps_4_0", nullptr, blob);
 	m_vsInstancedStaticMeshes = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "VS", "vs_4_0", nullptr, blob);
 	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_4_0", nullptr, blob);
 	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "VS", "vs_4_0", nullptr, blob);
 	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_4_0", nullptr, blob);
-
-	// Initialize input layout using the first vertex
-	/*D3D11_INPUT_ELEMENT_DESC inputLayoutSprites[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
-		{"WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-		{"WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-		{"WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
-	};
-	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayoutSprites, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayoutSprites));*/
+	m_vsHUD = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_VS_HUD.hlsl"), "VS", "vs_4_0", nullptr, blob);
+	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_PS_HUD.hlsl"), "PSColored", "ps_4_0", nullptr, blob);
+	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_PS_HUD.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
+	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_PS_HUDBar.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
 
 	// Initialize constant buffers
 	m_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
@@ -237,6 +224,10 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_toneMap = std::make_unique<ToneMapPostProcess>(m_device.Get());
 	m_basicPostProcess = std::make_unique<BasicPostProcess>(m_device.Get());
 	m_dualPostProcess = std::make_unique<DualPostProcess>(m_device.Get());
+
+	// TEST: replace with LUA
+	SetHDR(true);
+	//SetPostProcessColorTone(TONE_SEPIA);
 }
 
 void TEN::Renderer::Renderer11::InitializeSky()

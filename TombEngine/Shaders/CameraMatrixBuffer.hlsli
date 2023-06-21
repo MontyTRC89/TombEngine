@@ -1,4 +1,4 @@
-#include "./Math.hlsli"
+#include "./LightStructs.hlsli"
 
 cbuffer CameraMatrixBuffer : register(b0)
 {
@@ -13,6 +13,7 @@ cbuffer CameraMatrixBuffer : register(b0)
 	unsigned int Frame;
 	unsigned int RoomNumber;
 	unsigned int CameraUnderwater;
+	float SaturateMaxValue;
 	float4 FogColor;
 	int FogMinDistance;
 	int FogMaxDistance;

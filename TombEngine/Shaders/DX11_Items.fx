@@ -1,5 +1,5 @@
-#include "./Math.hlsli"
 #include "./CameraMatrixBuffer.hlsli"
+#include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./VertexEffects.hlsli"
 #include "./VertexInput.hlsli"

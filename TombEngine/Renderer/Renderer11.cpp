@@ -558,4 +558,14 @@ namespace TEN::Renderer
 
 		m_context->RSSetScissorRects(1, rects);
 	}
+
+	void Renderer11::SetHDR(bool enabled)
+	{
+		m_HDR = enabled;
+	}
+
+	void Renderer11::SetPostProcessColorTone(POST_PROCESS_COLOR_TONE colorTone)
+	{
+		m_colorTone = colorTone;
+	}
 }

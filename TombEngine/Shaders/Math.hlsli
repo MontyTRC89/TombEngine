@@ -5,41 +5,6 @@
 #define PI2		6.2831853071795864769252867665590057683943387987502116419498891846
 #define OCTAVES 6
 
-#define LT_SUN		0
-#define LT_POINT	1
-#define LT_SPOT		2
-#define LT_SHADOW	3
-
-#define MAX_LIGHTS_PER_ROOM	48
-#define MAX_LIGHTS_PER_ITEM	8
-#define MAX_FOG_BULBS	32
-#define SPEC_FACTOR 64
-
-struct ShaderLight
-{
-	float3 Position;
-	unsigned int Type;
-	float3 Color;
-	float Intensity;
-	float3 Direction;
-	float In;
-	float Out;
-	float InRange;
-	float OutRange;
-	float Padding;
-};
-
-struct ShaderFogBulb
-{
-	float3 Position;
-	float Density;
-	float3 Color;
-	float SquaredRadius;
-	float3 FogBulbToCameraVector;
-	float SquaredCameraToFogBulbDistance;
-	float4 Padding2;
-};
-
 float Luma(float3 color)
 {
 	// Use Rec.709 trichromat formula to get perceptive luma value.
@@ -315,4 +280,25 @@ float3 NormalNoise(float3 v, float3 i, float3 n)
 	// Return perturbed pixel based on reference pixel and resulting vector with threshold c attenuated by 2/5 times.
 	return lerp(v, r, c * 0.3f);
 }
+
+float2 SaturateFloat2(float2 value)
+{
+	return clamp(value, float2(0.0f, 0.0f), float2(SaturateMaxValue, SaturateMaxValue));
+}
+
+float3 SaturateFloat3(float3 value)
+{
+	return clamp(value, float3(0.0f, 0.0f, 0.0f), float3(SaturateMaxValue, SaturateMaxValue, SaturateMaxValue));
+}
+
+float4 SaturateFloat4(float4 value)
+{
+	return clamp(value, float4(0.0f, 0.0f, 0.0f, 0.0f), float4(SaturateMaxValue, SaturateMaxValue, SaturateMaxValue, SaturateMaxValue));
+}
+
+float SaturateFloat(float value)
+{
+	return clamp(value, 0.0f, SaturateMaxValue);
+}
+
 #endif // MATH

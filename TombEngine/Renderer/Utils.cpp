@@ -49,6 +49,8 @@ namespace TEN::Renderer::Utils
 
 	ComPtr<ID3D11VertexShader> compileVertexShader(ID3D11Device* device, const std::wstring& fileName, const std::string& function, const std::string& model, const D3D_SHADER_MACRO * defines, ComPtr<ID3D10Blob>& bytecode) 
 	{
+		TENLog("Compiling shader: " + TEN::Utils::ToString(fileName.c_str()), LogLevel::Info);
+
 		ComPtr<ID3D10Blob> errors;
 		HRESULT res = (D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(),errors.GetAddressOf()));
 		if (FAILED(res))
@@ -82,9 +84,27 @@ namespace TEN::Renderer::Utils
 
 	ComPtr<ID3D11PixelShader> compilePixelShader(ID3D11Device* device, const wstring& fileName, const string& function, const string& model, const D3D_SHADER_MACRO* defines, ComPtr<ID3D10Blob>& bytecode)
 	{
+		TENLog("Compiling shader: " + TEN::Utils::ToString(fileName.c_str()), LogLevel::Info);
+
 		ComPtr<ID3D10Blob> errors;
 		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
-		throwIfFailed(D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(), errors.GetAddressOf()));
+		HRESULT res = (D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(), errors.GetAddressOf()));
+		if (FAILED(res))
+		{
+			ID3D10Blob* errorObj = errors.Get();
+			if (errorObj != nullptr)
+			{
+				auto error = std::string((char*)errorObj->GetBufferPointer());
+				TENLog(error, LogLevel::Error);
+				throw std::runtime_error(error);
+			}
+			else
+			{
+				TENLog("Error while compiling shader: " + TEN::Utils::ToString(fileName.c_str()), LogLevel::Error);
+				throwIfFailed(res);
+			}
+		}
+
 		ComPtr<ID3D11PixelShader> shader;
 		throwIfFailed(device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
 		

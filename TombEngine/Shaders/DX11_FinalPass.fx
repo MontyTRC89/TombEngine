@@ -1,5 +1,6 @@
-#include "./VertexInput.hlsli"
+#include "./CameraMatrixBuffer.hlsli"
 #include "./Math.hlsli"
+#include "./VertexInput.hlsli"
 
 #define FXAA_SPAN_MAX	8.0
 #define FXAA_REDUCE_MUL 1.0/4.0
