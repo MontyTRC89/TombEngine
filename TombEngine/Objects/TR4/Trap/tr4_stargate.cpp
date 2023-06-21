@@ -57,7 +57,7 @@ namespace TEN::Entities::Traps
 			GlobalCollisionBounds.Z1 = bounds.z;
 
 			if (TestWithGlobalCollisionBounds(item, laraItem, coll))
-				ItemPushItem(item, laraItem, coll, 0, 2);
+				ItemPushItem(item, laraItem, coll, false, 2);
 		}*/
 
 		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))

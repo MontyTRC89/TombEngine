@@ -1,9 +1,9 @@
 #pragma once
+
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 
 struct ItemInfo;
-struct CollisionInfo;
 class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
@@ -105,12 +105,15 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	Vector3i Shift;
+	Pose Shift = Pose::Zero;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
+
+	int  LastBridgeItemNumber;
+	Pose LastBridgeItemPose;
 
 	bool HitStatic;
 	bool HitTallObject;

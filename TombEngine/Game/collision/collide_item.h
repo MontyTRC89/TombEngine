@@ -1,10 +1,9 @@
 #pragma once
 #include "Math/Math.h"
 
-using std::pair;
-
 class FloorInfo;
 struct CollisionInfo;
+struct CollisionResult;
 struct ItemInfo;
 struct MESH_INFO;
 
@@ -19,8 +18,8 @@ extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 struct ObjectCollisionBounds
 {
-	GameBoundingBox				   BoundingBox		= GameBoundingBox::Zero;
-	pair<EulerAngles, EulerAngles> OrientConstraint = {};
+	GameBoundingBox						BoundingBox		 = GameBoundingBox::Zero;
+	std::pair<EulerAngles, EulerAngles> OrientConstraint = {};
 };
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
@@ -40,10 +39,13 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius);
 bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool enableSpasm, char bigPush);
+bool ItemPushItem(ItemInfo* item, ItemInfo* item2);
 bool ItemPushStatic(ItemInfo* laraItem, const MESH_INFO& mesh, CollisionInfo* coll);
+void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void ObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

@@ -140,8 +140,8 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item);
 	
 	// HACK: Prevent ShiftItem() from causing an instantaneous snap, thereby interfering with DoLaraMonkeyStep(), when going down a step. @Sezz 2022.01.28
-	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
-		coll->Shift.y = 0;
+	if (coll->Shift.Position.y >= 0 && coll->Shift.Position.y <= CLICK(1.25f))
+		coll->Shift.Position.y = 0;
 	ShiftItem(item, coll);
 
 	if (TestLaraMonkeyFall(item, coll))

@@ -90,6 +90,7 @@ local strings =
 	rocket_launcher_ammo = { "Rocket Launcher Ammo" },
 	rocket_launcher = { "Rocket Launcher" },
 	rumble = { "Rumble" },
+	subtitles = { "Subtitles" },
 	save_game = { "Save Game" },
 	savegame_timestamp = { "%02d Days %02d:%02d:%02d" },
 	screen_resolution = { "Screen Resolution" },

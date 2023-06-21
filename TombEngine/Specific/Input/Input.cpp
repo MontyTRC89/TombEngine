@@ -777,7 +777,8 @@ namespace TEN::Input
 		}
 
 		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
-		if (vendor.find("xbox") != string::npos || vendor.find("xinput") != string::npos)
+
+		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
 		{
 			ApplyBindings(XInputBindings);
 

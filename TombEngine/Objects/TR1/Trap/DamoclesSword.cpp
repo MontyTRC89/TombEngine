@@ -112,7 +112,7 @@ namespace TEN::Entities::Traps::TR1
 			return;
 
 		if (coll->Setup.EnableObjectPush)
-			ItemPushItem(&item, laraItem, coll, false, true);
+			ItemPushItem(&item, laraItem, coll, false, 1);
 
 		if (item.Animation.IsAirborne)
 		{
