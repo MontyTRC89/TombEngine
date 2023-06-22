@@ -86,7 +86,6 @@ void AnimateItem(ItemInfo* item);
 // Inquirers
 bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState = std::nullopt);
 bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Maybe do comparisons with EndFrameNumber instead?
-bool TestAnimFrame(const ItemInfo& item, int frameStart); // Deprecated.
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
 
 // Entity translation

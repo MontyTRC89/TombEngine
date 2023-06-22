@@ -231,11 +231,6 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 	return (item->Animation.FrameNumber == anim.EndFrameNumber);
 }
 
-bool TestAnimFrame(const ItemInfo& item, int frameStart)
-{
-	return (item.Animation.FrameNumber == frameStart);
-}
-
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber)
 {
 	return (item.Animation.FrameNumber >= lowFrameNumber &&

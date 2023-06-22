@@ -328,7 +328,7 @@ namespace TEN::Entities::Creatures::TR3
 						SpawnLizardGas(itemNumber, LizardGasBite, (GetRandomControl() & 15) + 8);
 				}
 
-				if (TestAnimFrame(item, 28))
+				if (item.Animation.FrameNumber == 28)
 					creature.Flags = 0;
 
 				break;
