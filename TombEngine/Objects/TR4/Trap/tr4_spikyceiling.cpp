@@ -9,40 +9,46 @@
 #include "Game/effects/effects.h"
 #include "Game/animation.h"
 
+void InitializeSpikyCeiling(short itemNumber)
+{
+	auto& item = g_Level.Items[itemNumber];
+
+	item.ItemFlags[0] = item.TriggerFlags;
+}
+
 void ControlSpikyCeiling(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
+	// Move wall.
+	if (TriggerActive(&item) && item.Status != ITEM_DEACTIVATED)
 	{
-		int y = item->Pose.Position.y + ((item->ItemFlags[0] == 1) ? 10 : 5);
-		auto probe = GetCollision(item->Pose.Position.x, y, item->Pose.Position.z, item->RoomNumber);
+		auto pos = Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation.y, 0.0f, item.ItemFlags[0]);
+		auto pointColl = GetCollision(pos.x, pos.y, pos.z, item.RoomNumber);
 
-		if (probe.Position.Floor < (y + SECTOR(1)))
+		if ((item.ItemFlags[0] > 0 && pointColl.Position.Floor < (pos.y + SECTOR(1))) ||
+			(item.ItemFlags[0] < 0 && pointColl.Position.Ceiling > (pos.y )))
 		{
-			item->Status = ITEM_DEACTIVATED;
+			item.Status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_TR4_ROLLING_BALL);
 		}
 		else
 		{
-			item->Pose.Position.y = y;
+			item.Pose.Position.y = pos.y;
 
-			if (probe.RoomNumber != item->RoomNumber)
-				ItemNewRoom(itemNumber, probe.RoomNumber);
+			if (pointColl.RoomNumber != item.RoomNumber)
+				ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
-			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose);
+			SoundEffect(SFX_TR4_ROLLING_BALL, &item.Pose);
 		}
 	}
 
-	if (item->TouchBits.TestAny())
+	if (item.TouchBits.TestAny())
 	{
-		DoDamage(LaraItem, 20);
-		DoLotsOfBlood(LaraItem->Pose.Position.x, item->Pose.Position.y + CLICK(3), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
-		item->TouchBits.ClearAll();
+		DoDamage(LaraItem, 15);
+		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y + CLICK(3), LaraItem->Pose.Position.z, 4, item.Pose.Orientation.y, LaraItem->RoomNumber, 3);
+		item.TouchBits.ClearAll();
 
-		SoundEffect(SFX_TR4_LARA_GRABFEET, &item->Pose);
+		SoundEffect(SFX_TR4_LARA_GRABFEET, &item.Pose);
 	}
-
-	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED && item->ItemFlags[0] == 1)
-		AnimateItem(item);
 }

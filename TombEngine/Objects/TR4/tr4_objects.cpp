@@ -907,6 +907,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SPIKY_CEILING];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializeSpikyCeiling;
 			obj->control = ControlSpikyCeiling;
 			obj->collision = TrapCollision;
 			obj->SetupHitEffect(true);
