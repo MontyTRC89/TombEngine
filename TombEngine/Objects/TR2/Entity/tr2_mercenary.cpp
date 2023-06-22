@@ -196,7 +196,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (item->Animation.FrameNumber == 0)
 				{
 					if (!ShotLara(item, &ai, MercenaryUziBite, extraTorsoRot.y, 8))
 						item->Animation.TargetState = 1;
@@ -218,7 +218,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (item->Animation.FrameNumber == 0)
 				{
 					if (!ShotLara(item, &ai, MercenaryUziBite, extraTorsoRot.y, 8))
 						item->Animation.TargetState = 1;

@@ -603,7 +603,7 @@ namespace TEN::Entities::Creatures::TR3
 					torsoY = ai.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 40))
+				if (item->Animation.FrameNumber == 40)
 				{
 					TriggerFireBall(item, TonyFlameType::CeilingLeftHand, nullptr, item->RoomNumber, 0, 0);
 					TriggerFireBall(item, TonyFlameType::CeilingRightHand, nullptr, item->RoomNumber, 0, 0);
@@ -620,7 +620,7 @@ namespace TEN::Entities::Creatures::TR3
 					torsoY = ai.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 28))
+				if (item->Animation.FrameNumber == 28)
 					TriggerFireBall(item, TonyFlameType::InFront, nullptr, item->RoomNumber, item->Pose.Orientation.y, 0);
 
 				break;
@@ -628,7 +628,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TONY_STATE_FLIPMAP:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 56))
+				if (item->Animation.FrameNumber == 56)
 				{
 					item->ItemFlags[3] = 2;
 					SpawnShockwaveExplosion(*item, TONY_EFFECT_COLOR);
@@ -642,7 +642,7 @@ namespace TEN::Entities::Creatures::TR3
 			item->Animation.ActiveState == TONY_STATE_SHOOT_RIGHT_HAND ||
 			item->Animation.ActiveState == TONY_STATE_FLIPMAP)
 		{
-			int bright = GetFrameNumber(*item);
+			int bright = item->Animation.FrameNumber;
 			if (bright > 16)
 				bright = 16;
 

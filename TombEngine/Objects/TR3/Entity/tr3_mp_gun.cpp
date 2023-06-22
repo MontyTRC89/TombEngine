@@ -368,7 +368,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (item->Animation.FrameNumber == 0)
 				{
 					creature->MuzzleFlash[0].Bite = MPGunBite;
 					creature->MuzzleFlash[0].Delay = 1;

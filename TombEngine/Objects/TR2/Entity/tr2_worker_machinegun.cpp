@@ -255,21 +255,21 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (item->Animation.AnimNumber == 2)
 				{
-					if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+					if (item->Animation.FrameNumber == 0)
 					{
 						ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 					}
-					else if (item->Animation.FrameNumber == GetFrameIndex(item, 6))
+					else if (item->Animation.FrameNumber == 6)
 					{
 						ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 					}
-					else if (item->Animation.FrameNumber == GetFrameIndex(item, 12))
+					else if (item->Animation.FrameNumber == 12)
 					{
 						ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 					}
 				}
 				else if (item->Animation.AnimNumber == 21 &&
-					item->Animation.FrameNumber == GetFrameIndex(item, 0))
+					item->Animation.FrameNumber == 0)
 				{
 					ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 				}
@@ -289,19 +289,19 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (item->Animation.FrameNumber == 0)
 				{
 					ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 				}
-				else if (item->Animation.FrameNumber == GetFrameIndex(item, 2))
+				else if (item->Animation.FrameNumber == 2)
 				{
 					ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 				}
-				else if (item->Animation.FrameNumber == GetFrameIndex(item, 6))
+				else if (item->Animation.FrameNumber == 6)
 				{
 					ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 				}
-				else if (item->Animation.FrameNumber == GetFrameIndex(item, 12))
+				else if (item->Animation.FrameNumber == 12)
 				{
 					ShootWorkerMachineGun(*item, ai, extraTorsoRot);
 				}

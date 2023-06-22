@@ -365,21 +365,6 @@ const KeyframeData& GetClosestKeyframe(const ItemInfo& item)
 	return anim.GetClosestKeyframe(item.Animation.FrameNumber);
 }
 
-int GetFrameNumber(const ItemInfo& item)
-{
-	return item.Animation.FrameNumber;
-}
-
-int GetFrameIndex(ItemInfo* item, int frameNumber)
-{
-	return frameNumber;
-}
-
-int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
-{
-	return frameNumber;
-}
-
 int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
 {
 	const auto& anim = GetAnimData(objectID, animNumber);

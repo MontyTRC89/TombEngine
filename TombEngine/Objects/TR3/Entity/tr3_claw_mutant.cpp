@@ -484,14 +484,14 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0) && Random::TestProbability(1 / 4.0f) == 0)
+				if (item.Animation.FrameNumber == 0 && Random::TestProbability(1 / 4.0f) == 0)
 					item.ItemFlags[0] = 1;
 
-				if (item.Animation.FrameNumber < GetFrameIndex(&item, 28))
+				if (item.Animation.FrameNumber < 28)
 				{
 					SpawnClawMutantPlasma(itemNumber);
 				}
-				else if (item.Animation.FrameNumber == GetFrameIndex(&item, 28))
+				else if (item.Animation.FrameNumber == 28)
 				{
 					SpawnClawMutantPlasmaBall(item);
 				}

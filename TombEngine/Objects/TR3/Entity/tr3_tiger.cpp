@@ -211,9 +211,9 @@ namespace TEN::Entities::Creatures::TR3
 				if (!creature->Flags && item->TouchBits.Test(TigerBiteAttackJoints))
 				{
 					if ((item->Animation.AnimNumber == TIGER_ANIM_BITE_ATTACK &&
-							item->Animation.FrameNumber > GetFrameIndex(item, 4)) ||
+							item->Animation.FrameNumber > 4) ||
 						(item->Animation.AnimNumber == TIGER_ANIM_POUNCE_ATTACK_START &&
-							item->Animation.FrameNumber > GetFrameIndex(item, 12)))
+							item->Animation.FrameNumber > 12))
 					{
 						DoDamage(creature->Enemy, TIGER_BITE_ATTACK_DAMAGE);
 						CreatureEffect(item, TigerBite, DoBloodSplat);

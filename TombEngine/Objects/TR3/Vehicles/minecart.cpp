@@ -751,7 +751,7 @@ namespace TEN::Entities::Vehicles
 		case MINECART_STATE_DISMOUNT:
 			if (laraItem->Animation.AnimNumber == MINECART_ANIM_PUT_DOWN_WRENCH)
 			{
-				if (laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME) &&
+				if (laraItem->Animation.FrameNumber == MINECART_WRENCH_MESH_TOGGLE_FRAME &&
 					minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 				{
 					laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
@@ -801,7 +801,7 @@ namespace TEN::Entities::Vehicles
 				!minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 			{
 				if (!(minecart->Flags & MINECART_FLAG_WRENCH_MESH) &&
-					laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME))
+					laraItem->Animation.FrameNumber == MINECART_WRENCH_MESH_TOGGLE_FRAME)
 				{
 					laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 					minecart->Flags |= MINECART_FLAG_WRENCH_MESH;
@@ -839,11 +839,12 @@ namespace TEN::Entities::Vehicles
 
 			break;
 
+		// TODO: Ckech frames.
 		case MINECART_STATE_HIT:
 			if (laraItem->HitPoints <= 0 &&
-				laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, 34) + 28)
+				laraItem->Animation.FrameNumber == 62)
 			{
-				laraItem->Animation.FrameNumber = GetFrameIndex(minecartItem, 34) + 28;
+				laraItem->Animation.FrameNumber = 62;
 				minecartItem->Animation.Velocity.z = 0.0f;
 				minecart->Velocity = 0;
 				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_NO_ANIM;
@@ -851,11 +852,12 @@ namespace TEN::Entities::Vehicles
 
 			break;
 
+		// TODO: Ckech frames.
 		case MINECART_STATE_DEATH:
 			if (laraItem->HitPoints <= 0 &&
-				laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, 34) + 28)
+				laraItem->Animation.FrameNumber == 62)
 			{
-				laraItem->Animation.FrameNumber = GetFrameIndex(minecartItem, 34) + 28;
+				laraItem->Animation.FrameNumber = 62;
 				minecartItem->Animation.Velocity.z = 0.0f;
 				minecart->Velocity = 0;
 				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD;

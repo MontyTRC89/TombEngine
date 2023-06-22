@@ -1349,7 +1349,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Pose.Orientation.y += ai.angle;
 				}
 			
-				if (!(creature->Flags & 1) && item->Animation.FrameNumber == GetFrameIndex(item, 2))
+				if (!(creature->Flags & 1) && item->Animation.FrameNumber == 2)
 				{
 					ShotLara(item, &ai, ArmedMafia2GunRightBite, laraAI.angle / 2, 25);
 					creature->MuzzleFlash[1].Bite = ArmedMafia2GunRightBite;
@@ -1357,7 +1357,7 @@ namespace TEN::Entities::Creatures::TR5
 					creature->Flags |= 1;
 				}
 
-				if (!(creature->Flags & 2) && item->Animation.FrameNumber == GetFrameIndex(item, 6))
+				if (!(creature->Flags & 2) && item->Animation.FrameNumber == 6)
 				{
 					ShotLara(item, &ai, ArmedMafia2GunLeftBite, laraAI.angle / 2, 25);
 					creature->MuzzleFlash[0].Bite = ArmedMafia2GunLeftBite;

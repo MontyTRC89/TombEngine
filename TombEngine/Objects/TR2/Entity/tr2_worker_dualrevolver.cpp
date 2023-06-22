@@ -323,7 +323,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (creature->Flags == 0 && item->Animation.FrameNumber == GetFrameIndex(item, 0))
+				if (creature->Flags == 0 && item->Animation.FrameNumber == 0)
 				{
 					ShotLara(item, &ai, WorkerDualGunBiteLeft, extraTorsoRot.y, 50);
 					ShotLara(item, &ai, WorkerDualGunBiteRight, extraTorsoRot.y, 50);
