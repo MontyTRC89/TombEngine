@@ -189,7 +189,7 @@ namespace TEN::Entities::TR4
 		spark->gravity = -4 - (GetRandomControl() & 3);
 		spark->scalar = 3;
 		spark->maxYvel = -4 - (GetRandomControl() & 3);
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 8;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 8;
 		spark->dSize = spark->size * 4;
 	}
 

@@ -232,7 +232,6 @@ FileStream::FileStream(char* fileName, bool read, bool write)
 		mode |= ofstream::binary | fstream::out | fstream::trunc;
 
 	m_stream.open(fileName, mode);
-	bool opened = m_stream.is_open();
 }
 
 FileStream::~FileStream()

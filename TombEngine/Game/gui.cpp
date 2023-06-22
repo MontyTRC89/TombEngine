@@ -726,6 +726,7 @@ namespace TEN::Gui
 			Reverb,
 			MusicVolume,
 			SfxVolume,
+			Subtitles,
 			AutoTarget,
 			ToggleRumble,
 			ThumbstickCameraControl,
@@ -733,7 +734,7 @@ namespace TEN::Gui
 			Cancel
 		};
 
-		static const int numOtherSettingsOptions = 7;
+		static const int numOtherSettingsOptions = 8;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -771,6 +772,11 @@ namespace TEN::Gui
 			case OtherSettingsOption::ThumbstickCameraControl:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableThumbstickCameraControl = !CurrentSettings.Configuration.EnableThumbstickCameraControl;
+				break;
+
+			case OtherSettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
 				break;
 			}
 		}

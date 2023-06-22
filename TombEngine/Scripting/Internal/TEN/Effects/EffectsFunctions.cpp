@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 
-#include "Effects/BlendIDs.h"
+#include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
