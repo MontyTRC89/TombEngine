@@ -332,18 +332,12 @@ void LoadObjects()
 				keyframe.BoundingBox.Y2 = ReadInt32();
 				keyframe.BoundingBox.Z1 = ReadInt32();
 				keyframe.BoundingBox.Z2 = ReadInt32();
-
 				keyframe.Offset = ReadVector3();
 
 				int boneCount = ReadInt32();
 				keyframe.BoneOrientations.resize(boneCount);
 				for (auto& orient : keyframe.BoneOrientations)
-				{
-					orient.x = ReadFloat();
-					orient.y = ReadFloat();
-					orient.z = ReadFloat();
-					orient.w = ReadFloat();
-				}
+					orient = ReadVector4();
 			}
 
 			// Load state dispatches.
