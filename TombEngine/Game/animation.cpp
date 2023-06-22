@@ -21,7 +21,7 @@ using TEN::Renderer::g_Renderer;
 
 // TODO: Arm anim object in samegame.
 
-AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
+KeyframeInterpData AnimData::GetKeyframeInterpData(int frameNumber) const
 {
 	// FAILSAFE: Clamp frame number.
 	frameNumber = std::clamp(frameNumber, 0, EndFrameNumber);
@@ -36,13 +36,13 @@ AnimFrameInterpData AnimData::GetFrameInterpData(int frameNumber) const
 	// Calculate interpolation alpha between keyframes.
 	float alpha = (1.0f / Interpolation) * (frameNumber % Interpolation);
 
-	// Return frame interpolation data.
-	return AnimFrameInterpData(Keyframes[keyframeNumber0], Keyframes[keyframeNumber1], alpha);
+	// Return keyframe interpolation data.
+	return KeyframeInterpData(Keyframes[keyframeNumber0], Keyframes[keyframeNumber1], alpha);
 }
 
 const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 {
-	auto frameData = GetFrameInterpData(frameNumber);
+	auto frameData = GetKeyframeInterpData(frameNumber);
 	return ((frameData.Alpha <= 0.5f) ? frameData.Keyframe0 : frameData.Keyframe1);
 }
 
@@ -332,10 +332,10 @@ const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber)
 	return GetAnimData(item.Animation.AnimObjectID, animNumber.value());
 }
 
-AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
+KeyframeInterpData GetFrameInterpData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
-	return anim.GetFrameInterpData(item.Animation.FrameNumber);
+	return anim.GetKeyframeInterpData(item.Animation.FrameNumber);
 }
 
 const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)

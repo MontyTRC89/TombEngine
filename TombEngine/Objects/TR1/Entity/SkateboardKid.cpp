@@ -215,8 +215,8 @@ namespace TEN::Entities::Creatures::TR1
 			}
 		}
 
-		skateItem.Animation.AnimNumber = Objects[ID_SKATEBOARD].animIndex + (item.Animation.AnimNumber - Objects[ID_SKATEBOARD_KID].animIndex);
-		skateItem.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase + (item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase);
+		skateItem.Animation.AnimNumber = item.Animation.AnimNumber;
+		skateItem.Animation.FrameNumber = item.Animation.FrameNumber;
 		skateItem.Pose.Position = item.Pose.Position;
 		skateItem.Pose.Orientation = item.Pose.Orientation;
 		AnimateItem(&skateItem);

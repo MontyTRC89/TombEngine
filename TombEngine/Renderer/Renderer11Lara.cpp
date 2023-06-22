@@ -160,8 +160,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			const auto& frameLeft = leftArmAnim.Keyframes[Lara.LeftArm.FrameNumber];
-			auto frameDataLeft = AnimFrameInterpData(frameLeft, frameLeft, 0.0f);
-			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
+			auto interpDataLeft = KeyframeInterpData(frameLeft, frameLeft, 0.0f);
+			UpdateAnimation(&rItem, playerObject, interpDataLeft, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
@@ -169,8 +169,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			const auto& frameRight = rightArmAnim.Keyframes[Lara.RightArm.FrameNumber];
-			auto frameDataRight = AnimFrameInterpData(frameRight, frameRight, 0.0f);
-			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
+			auto interpDataRight = KeyframeInterpData(frameRight, frameRight, 0.0f);
+			UpdateAnimation(&rItem, playerObject, interpDataRight, mask);
 		}
 
 		break;
@@ -179,12 +179,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		{
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			auto frameDataLeft = AnimFrameInterpData(leftArmFrame, leftArmFrame, 0.0f);
+			auto frameDataLeft = KeyframeInterpData(leftArmFrame, leftArmFrame, 0.0f);
 			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			auto frameDataRight = AnimFrameInterpData(rightArmFrame, rightArmFrame, 0.0f);
+			auto frameDataRight = KeyframeInterpData(rightArmFrame, rightArmFrame, 0.0f);
 			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
 		}
 
@@ -197,18 +197,18 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			auto frameDataLeft = AnimFrameInterpData(leftArmFrame, leftArmFrame, 0.0f);
+			auto interpDataLeft = KeyframeInterpData(leftArmFrame, leftArmFrame, 0.0f);
 
-			UpdateAnimation(&rItem, playerObject, frameDataLeft, upperArmMask, true);
-			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
+			UpdateAnimation(&rItem, playerObject, interpDataLeft, upperArmMask, true);
+			UpdateAnimation(&rItem, playerObject, interpDataLeft, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			auto frameDataRight = AnimFrameInterpData(rightArmFrame, rightArmFrame, 0.0f);
+			auto interpDataRight = KeyframeInterpData(rightArmFrame, rightArmFrame, 0.0f);
 			
-			UpdateAnimation(&rItem, playerObject, frameDataRight, upperArmMask, true);
-			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
+			UpdateAnimation(&rItem, playerObject, interpDataRight, upperArmMask, true);
+			UpdateAnimation(&rItem, playerObject, interpDataRight, mask);
 		}
 
 		break;

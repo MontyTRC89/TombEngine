@@ -9,9 +9,9 @@ enum GAME_OBJECT_ID : short;
 class EulerAngles;
 class Pose;
 class Vector3i;
-struct AnimFrameInterpData;
 struct CreatureBiteInfo;
 struct ItemInfo;
+struct KeyframeInterpData;
 struct ObjectInfo;
 
 constexpr auto NO_STATE = -1;
@@ -50,17 +50,17 @@ struct AnimData
 	std::vector<StateDispatchData> Dispatches = {};
 	std::vector<AnimCommandPtr>	   Commands	  = {};
 	
-	AnimFrameInterpData GetFrameInterpData(int frameNumber) const;
+	KeyframeInterpData	GetKeyframeInterpData(int frameNumber) const;
 	const KeyframeData& GetClosestKeyframe(int frameNumber) const;
 };
 
-struct AnimFrameInterpData
+struct KeyframeInterpData
 {
 	const KeyframeData& Keyframe0;
 	const KeyframeData& Keyframe1;
 	float Alpha = 0.0f;
 
-	AnimFrameInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) : Keyframe0(keyframe0), Keyframe1(keyframe1)
+	KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) : Keyframe0(keyframe0), Keyframe1(keyframe1)
 	{
 		Alpha = alpha;
 	}
@@ -104,7 +104,7 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
 
-AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
+KeyframeInterpData GetFrameInterpData(const ItemInfo& item);
 const KeyframeData&	GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
 const KeyframeData&	GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber = 0);
 const KeyframeData&	GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);

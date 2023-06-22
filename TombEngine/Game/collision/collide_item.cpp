@@ -766,7 +766,9 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2)
 	int rx = (direction.x * cosY) - (direction.z * sinY);
 	int rz = (direction.z * cosY) + (direction.x * sinY);
 
-	const auto& bounds = GetBestFrame(*item).BoundingBox;
+	const auto& anim = GetAnimData(*item);
+	const auto& keyframe = anim.GetClosestKeyframe(item->Animation.FrameNumber);
+	const auto& bounds = keyframe.BoundingBox;
 
 	int minX = bounds.X1;
 	int maxX = bounds.X2;
