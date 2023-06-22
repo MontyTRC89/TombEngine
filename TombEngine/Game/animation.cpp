@@ -83,9 +83,6 @@ void AnimateItem(ItemInfo* item)
 
 	if (item->Animation.FrameNumber > animPtr->EndFrameNumber)
 	{
-		// FAILSAFE: Ensure current frame number remains valid.
-		item->Animation.FrameNumber = animPtr->EndFrameNumber;
-
 		ExecuteAnimCommands(*item, false);
 
 		item->Animation.AnimNumber = animPtr->NextAnimNumber;
@@ -375,8 +372,7 @@ int GetFrameNumber(const ItemInfo& item)
 
 int GetFrameIndex(ItemInfo* item, int frameNumber)
 {
-	int animNumber = item->Animation.AnimNumber;
-	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameNumber);
+	return frameNumber;
 }
 
 int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)

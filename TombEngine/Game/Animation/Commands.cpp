@@ -1,8 +1,8 @@
 #include "framework.h"
 #include "Game/Animation/Commands.h"
 
-#include "control/flipeffect.h"
 #include "Game/camera.h"
+#include "Game/control/flipeffect.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/lara/lara.h"
@@ -20,6 +20,7 @@ namespace TEN::Animation
 
 		if (item.IsLara())
 		{
+			// NOTE: Always clamped to last frame when getting bounding box to avoid errors.
 			auto bounds = GameBoundingBox(&item);
 			UpdateLaraRoom(&item, -bounds.GetHeight() / 2, -RelOffset.x, -RelOffset.z);
 		}
