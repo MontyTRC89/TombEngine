@@ -367,11 +367,17 @@ void LoadObjects()
 					switch (animCommand)
 					{
 					case AnimCommandType::MoveOrigin:
-						command = std::make_unique<MoveOriginCommand>(ReadVector3());
+						{
+							auto relOffset = ReadVector3();
+							command = std::make_unique<MoveOriginCommand>(relOffset);
+						}
 						break;
 
 					case AnimCommandType::JumpVelocity:
-						command = std::make_unique<JumpVelocityCommand>(ReadVector3());
+						{
+							auto jumpVel = ReadVector3();
+							command = std::make_unique<JumpVelocityCommand>(jumpVel);
+						}
 						break;
 
 					case AnimCommandType::AttackReady:
