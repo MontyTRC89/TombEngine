@@ -13,21 +13,22 @@
 
 namespace TEN::Entities::Creatures::TR1
 {
-	std::optional<ItemInfo&> FindDoppelgangerReference(const ItemInfo& item, int objectNumber)
+	ItemInfo* FindReference(ItemInfo* item, short objectNumber)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			auto& currentItem = g_Level.Items[i];
-			if (currentItem.ObjectNumber == objectNumber && item.TriggerFlags == currentItem.TriggerFlags)
+			auto* currentItem = &g_Level.Items[i];
+			if (currentItem->ObjectNumber == objectNumber && item->TriggerFlags == currentItem->TriggerFlags)
+			{
 				return currentItem;
+			}
 		}
-
-		return std::nullopt;
+		return nullptr;
 	}
 
-	int GetWeaponDamage(LaraWeaponType weaponType)
+	short GetWeaponDamage(LaraWeaponType weaponType)
 	{
-		return (Weapons[(int)weaponType].Damage * 10);
+		return short(Weapons[(int)weaponType].Damage) * 10;
 	}
 
 	void DoppelgangerControl(short itemNumber)
@@ -42,10 +43,10 @@ namespace TEN::Entities::Creatures::TR1
 			DoDamage(LaraItem, GetWeaponDamage(Lara.Control.Weapon.GunType));
 		}
 
-		auto reference = FindDoppelgangerReference(*item, ID_BACON_REFERENCE);
-		if (!reference.has_value())
+		auto* reference = FindReference(item, ID_BACON_REFERENCE);
+		if (reference == nullptr)
 		{
-			TENLog("Doppelganger requires ID_DOPPELGANGER_REFERENCE to be placed in room center.", LogLevel::Warning);
+			TENLog("Doppelganger require ID_BACON_REFERENCE to be placed on the center (on floor) of the room to be used !", LogLevel::Warning);
 			return;
 		}
 
@@ -56,13 +57,10 @@ namespace TEN::Entities::Creatures::TR1
 			int laraFloorHeight = GetCollision(LaraItem).Position.Floor;
 
 			// Get floor heights for comparison.
-			auto pos = Vector3i(
-				(reference->Pose.Position.x * 2) - LaraItem->Pose.Position.x,
-				LaraItem->Pose.Position.y,
-				(reference->Pose.Position.z * 2) - LaraItem->Pose.Position.z);
+			Vector3i pos(2 * reference->Pose.Position.x - LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, 2 * reference->Pose.Position.z - LaraItem->Pose.Position.z);
 			item->Floor = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber).Position.Floor;
 
-			// Animate doppelganger, mirroring player's position.
+			// Animate bacon Lara, mirroring Lara's position.
 			item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
 			item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
 			item->Pose.Position = pos;
@@ -79,45 +77,30 @@ namespace TEN::Entities::Creatures::TR1
 				item->Pose.Position.y += 64;
 				item->ItemFlags[7] = 1;
 			}
-
 			break;
 		}
 		case 1:
 			if (item->Animation.Velocity.x > 0.0f)
-			{
 				item->Animation.Velocity.x -= 2;
-			}
 			else if (item->Animation.Velocity.x < 0.0f)
-			{
 				item->Animation.Velocity.x += 2;
-			}
 			else
-			{
 				item->Animation.Velocity.x = 0.0f;
-			}
 
 			if (item->Animation.Velocity.z > 0.0f)
-			{
 				item->Animation.Velocity.z -= 2;
-			}
 			else if (item->Animation.Velocity.z < 0.0f)
-			{
 				item->Animation.Velocity.z += 2;
-			}
 			else
-			{
 				item->Animation.Velocity.z = 0.0f;
-			}
 
 			TestTriggers(item, true);
 			item->Floor = GetCollision(item).Position.Floor;
-
 			if (item->Pose.Position.y >= item->Floor)
 			{
 				item->Pose.Position.y = item->Floor;
 
 				TestTriggers(item, true);
-
 				SetAnimation(item, LA_FREEFALL_DEATH);
 
 				item->Animation.IsAirborne = false;
@@ -128,13 +111,11 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.FrameNumber >= anim.EndFrameNumber) // TODO: Check.
 					item->ItemFlags[7] = 2;
 			}
-
 			break;
-
 		case 2:
 			DisableEntityAI(itemNumber);
 			RemoveActiveItem(itemNumber);
-			item->Collidable = false;
+			item->Collidable = FALSE;
 			break;
 		}
 
