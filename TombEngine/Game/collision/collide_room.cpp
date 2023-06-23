@@ -419,7 +419,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->Front.FloorSlope &&
 		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
-		coll->Front.Floor = STOP_SIZE;
+		coll->Front.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
 		coll->Front.CeilingSlope)
@@ -430,7 +430,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->Front.Floor >= CLICK(0.5f) &&
 		collResult.BottomBlock->Flags.Death)
 	{
-		coll->Front.Floor = STOP_SIZE;
+		coll->Front.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge)			
 	{
@@ -486,7 +486,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->MiddleLeft.FloorSlope &&
 		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
-		coll->MiddleLeft.Floor = STOP_SIZE;
+		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
 		coll->MiddleLeft.CeilingSlope)
@@ -497,7 +497,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->MiddleLeft.Floor >= CLICK(0.5f) &&
 		collResult.BottomBlock->Flags.Death)
 	{
-		coll->MiddleLeft.Floor = STOP_SIZE;
+		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
 		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
@@ -547,7 +547,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->FrontLeft.FloorSlope &&
 		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
-		coll->FrontLeft.Floor = STOP_SIZE;
+		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
 		coll->FrontLeft.CeilingSlope)
@@ -558,7 +558,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->FrontLeft.Floor >= CLICK(0.5f) &&
 		collResult.BottomBlock->Flags.Death)
 	{
-		coll->FrontLeft.Floor = STOP_SIZE;
+		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
 		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
@@ -613,7 +613,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->MiddleRight.FloorSlope &&
 		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
-		coll->MiddleRight.Floor = STOP_SIZE;
+		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
 		coll->MiddleRight.CeilingSlope)
@@ -624,7 +624,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->MiddleRight.Floor >= CLICK(0.5f) &&
 		collResult.BottomBlock->Flags.Death)
 	{
-		coll->MiddleRight.Floor = STOP_SIZE;
+		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
 		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
@@ -674,7 +674,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->FrontRight.FloorSlope &&
 		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
-		coll->FrontRight.Floor = STOP_SIZE;
+		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockCeilingSlope &&
 		coll->FrontRight.CeilingSlope)
@@ -685,7 +685,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->FrontRight.Floor >= CLICK(0.5f) &&
 		collResult.BottomBlock->Flags.Death)
 	{
-		coll->FrontRight.Floor = STOP_SIZE;
+		coll->FrontRight.Floor = MAX_HEIGHT;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
 		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
