@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR4/Trap/tr4_spikyceiling.h"
+#include "Objects/TR4/Trap/SpikyCeiling.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
