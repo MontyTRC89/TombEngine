@@ -59,7 +59,7 @@ namespace TEN::Entities::Creatures::TR3
 		tRexItem->Animation.TargetState = TREX_STATE_KILL;
 
 		if (laraItem->RoomNumber != tRexItem->RoomNumber)
-			ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, tRexItem->RoomNumber);
 
 		laraItem->Pose = Pose(
 			tRexItem->Pose.Position,

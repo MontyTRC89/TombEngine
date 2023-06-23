@@ -200,7 +200,7 @@ namespace TEN::Entities::Creatures::TR2
 					laraItem->Animation.Velocity.z = 0.0f;
 
 					if (item->RoomNumber != laraItem->RoomNumber)
-						ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
+						ItemNewRoom(laraItem->Index, item->RoomNumber);
 
 					AnimateItem(LaraItem);
 

@@ -931,7 +931,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber, &coll->Setup);
+	TestVolumes(item->Index, &coll->Setup);
 
 	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }
@@ -1005,7 +1005,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(item->Index);
 }
 
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
@@ -1094,7 +1094,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(item->Index);
 }
 
 void LaraCheat(ItemInfo* item, CollisionInfo* coll)

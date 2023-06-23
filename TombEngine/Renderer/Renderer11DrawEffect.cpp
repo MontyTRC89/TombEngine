@@ -847,7 +847,7 @@ namespace TEN::Renderer
 			return true;
 
 		const auto& room = m_rooms[LaraItem->RoomNumber];
-		auto* itemPtr = &m_items[Lara.ItemNumber];
+		auto* itemPtr = &m_items[LaraItem->Index];
 
 		m_stStatic.Color = Vector4::One;
 		m_stStatic.AmbientLight = room.AmbientLight;

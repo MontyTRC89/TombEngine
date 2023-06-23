@@ -479,7 +479,6 @@ bool SaveGame::Save(int slot)
 	lara.add_hit_frame(Lara.HitFrame);
 	lara.add_interacted_item(Lara.Context.InteractedItem);
 	lara.add_inventory(inventoryOffset);
-	lara.add_item_number(Lara.ItemNumber);
 	lara.add_left_arm(leftArmOffset);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
@@ -1532,7 +1531,6 @@ bool SaveGame::Load(int slot)
 		if (item->ObjectNumber == ID_LARA && !dynamicItem)
 		{
 			LaraItem->Data = nullptr;
-			Lara.ItemNumber = i;
 			LaraItem = item;
 			LaraItem->Location.roomNumber = savedItem->room_number();
 			LaraItem->Location.yNumber = item->Pose.Orientation.y;
@@ -1959,7 +1957,6 @@ bool SaveGame::Load(int slot)
 	Lara.Inventory.TotalFlares = s->lara()->inventory()->total_flares();
 	Lara.Inventory.TotalLargeMedipacks = s->lara()->inventory()->total_large_medipacks();
 	Lara.Inventory.TotalSmallMedipacks = s->lara()->inventory()->total_small_medipacks();
-	Lara.ItemNumber = s->lara()->item_number();
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
 	Lara.LeftArm.GunFlash = s->lara()->left_arm()->gun_flash();
 	Lara.LeftArm.GunSmoke = s->lara()->left_arm()->gun_smoke();

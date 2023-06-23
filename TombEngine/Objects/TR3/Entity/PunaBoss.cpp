@@ -260,7 +260,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			auto hitPos = Vector3i::Zero;
 			MESH_INFO* mesh = nullptr;
-			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
+			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == creature.Enemy->Index)
 			{
 				if (creature.Enemy->HitPoints <= PUNA_LIGHTNING_DAMAGE)
 				{

@@ -193,7 +193,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (laraItem->RoomNumber != kayakItem->RoomNumber)
-			ItemNewRoom(lara->ItemNumber, kayakItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, kayakItem->RoomNumber);
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = kayakItem->Pose.Position;
@@ -1119,7 +1119,7 @@ namespace TEN::Entities::Vehicles
 			if (kayakItem->RoomNumber != probe.RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose.Position = kayakItem->Pose.Position;

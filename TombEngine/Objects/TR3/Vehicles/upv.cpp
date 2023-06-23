@@ -967,7 +967,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != UPVItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose = UPVItem->Pose;
