@@ -109,9 +109,9 @@ namespace TEN::Entities::TR4
 
 		InitializeCreature(itemNumber);
 		SetAnimation(item, AHMET_ANIM_IDLE);
-		item->ItemFlags[0] = item->Pose.Position.x / SECTOR(1);
-		item->ItemFlags[1] = (item->Pose.Position.y * 4) / SECTOR(1);
-		item->ItemFlags[2] = item->Pose.Position.z / SECTOR(1);
+		item->ItemFlags[0] = item->Pose.Position.x / BLOCK(1);
+		item->ItemFlags[1] = (item->Pose.Position.y * 4) / BLOCK(1);
+		item->ItemFlags[2] = item->Pose.Position.z / BLOCK(1);
 	}
 
 	void AhmetControl(short itemNumber)
@@ -391,9 +391,9 @@ namespace TEN::Entities::TR4
 
 		Weather.Flash(255, 64, 0, 0.03f);
 
-		item->Pose.Position.x = (item->ItemFlags[0] * SECTOR(1)) + CLICK(2);
+		item->Pose.Position.x = (item->ItemFlags[0] * BLOCK(1)) + CLICK(2);
 		item->Pose.Position.y = (item->ItemFlags[1] * CLICK(1));
-		item->Pose.Position.z = (item->ItemFlags[2] * SECTOR(1)) + CLICK(2);
+		item->Pose.Position.z = (item->ItemFlags[2] * BLOCK(1)) + CLICK(2);
 
 		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 		if (item->RoomNumber != outsideRoom)

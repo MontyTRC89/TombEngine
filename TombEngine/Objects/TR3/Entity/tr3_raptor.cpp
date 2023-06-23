@@ -114,7 +114,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (nearestItem != nullptr &&
 					(nearestItem->ObjectNumber != ID_RAPTOR ||
-						(Random::TestProbability(1 / 30.0f) && minDistance < SQUARE(SECTOR(2)))))
+						(Random::TestProbability(1 / 30.0f) && minDistance < SQUARE(BLOCK(2)))))
 				{
 					creature->Enemy = nearestItem;
 				}
@@ -249,7 +249,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
@@ -286,7 +286,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
@@ -322,7 +322,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;

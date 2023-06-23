@@ -165,11 +165,11 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.TargetState = WOLF_STATE_RUN;
 				else if (AI.distance < pow(345, 2) && AI.bite)
 					item->Animation.TargetState = WOLF_STATE_BITE;
-				else if (AI.distance > pow(SECTOR(3), 2))
+				else if (AI.distance > pow(BLOCK(3), 2))
 					item->Animation.TargetState = WOLF_STATE_RUN;
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2) ||
+					if (!AI.ahead || AI.distance > pow(BLOCK(1.5f), 2) ||
 						(AI.enemyFacing < FRONT_ARC && AI.enemyFacing > -FRONT_ARC))
 					{
 						item->Animation.TargetState = WOLF_STATE_RUN;

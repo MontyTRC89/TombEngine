@@ -81,7 +81,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (Targetable(item, &ai))
 					{
-						if (ai.distance <= pow(SECTOR(3), 2))
+						if (ai.distance <= pow(BLOCK(3), 2))
 						{
 							item->Animation.TargetState = 9;
 						}
@@ -95,7 +95,7 @@ namespace TEN::Entities::Creatures::TR2
 						switch (creature->Mood)
 						{
 						case MoodType::Attack:
-							if (ai.distance > pow(SECTOR(20), 2) || !ai.ahead)
+							if (ai.distance > pow(BLOCK(20), 2) || !ai.ahead)
 							{
 								item->Animation.TargetState = 4;
 							}
@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (Targetable(item, &ai))
 				{
-					if (ai.distance < pow(SECTOR(3), 2) || ai.zoneNumber != ai.enemyZone)
+					if (ai.distance < pow(BLOCK(3), 2) || ai.zoneNumber != ai.enemyZone)
 					{
 						item->Animation.TargetState = 1;
 					}
@@ -163,7 +163,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else if (creature->Mood == MoodType::Attack || creature->Mood == MoodType::Stalk)
 				{
-					if (ai.distance > pow(SECTOR(20), 2) || !ai.ahead)
+					if (ai.distance > pow(BLOCK(20), 2) || !ai.ahead)
 						item->Animation.TargetState = 4;
 				}
 				else if (LaraItem->HitPoints > 0)
@@ -208,7 +208,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (ai.ahead && ai.distance < pow(SECTOR(20), 2))
+					if (ai.ahead && ai.distance < pow(BLOCK(20), 2))
 						item->Animation.TargetState = 3;
 				}
 				else if (LaraItem->HitPoints > 0)

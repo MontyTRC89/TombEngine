@@ -79,16 +79,16 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 2;
 				else if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = 3;
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					if (GetRandomControl() < 0x7000)
 						item->Animation.TargetState = 4;
 					else
 						item->Animation.TargetState = 11;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = 7;
-				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(2), 2))
 					item->Animation.TargetState = 2;
 				else
 					item->Animation.TargetState = 3;
@@ -104,7 +104,7 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 2;
 				else if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = 3;
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					auto random = GetRandomControl();
 					if (random < 0x3000)
@@ -114,7 +114,7 @@ namespace TEN::Entities::Creatures::TR2
 					else
 						item->Animation.TargetState = 1;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(2), 2))
 					item->Animation.TargetState = 2;
 				else
 					item->Animation.TargetState = 3;
@@ -136,14 +136,14 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = 3;
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					if (GetRandomControl() < 0x4000)
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 11;
 				}
-				else if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
+				else if (!AI.ahead || AI.distance > pow(BLOCK(2), 2))
 					item->Animation.TargetState = 3;
 
 				break;
@@ -160,16 +160,16 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 1;
 				else if (creature->Mood == MoodType::Escape)
 					break;
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					if (GetRandomControl() < 0x4000)
 						item->Animation.TargetState = 1;
 					else
 						item->Animation.TargetState = 11;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(3), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(3), 2))
 					item->Animation.TargetState = 10;
-				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(2), 2))
 				{
 					if (GetRandomControl() < 0x4000)
 						item->Animation.TargetState = 1;
@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case 8:
-				if (!AI.ahead || AI.distance > pow(SECTOR(0.5f), 2))
+				if (!AI.ahead || AI.distance > pow(BLOCK(0.5f), 2))
 					item->Animation.TargetState = 11;
 				else
 					item->Animation.TargetState = 6;

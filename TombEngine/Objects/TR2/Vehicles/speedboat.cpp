@@ -28,7 +28,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SLIP = 10;
 	constexpr auto SPEEDBOAT_SLIP_SIDE = 30;
 	constexpr auto SPEEDBOAT_MOUNT_DISTANCE = CLICK(2.25f);
-	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
+	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = BLOCK(1);
 
 	constexpr auto SPEEDBOAT_VELOCITY_ACCEL = 5;
 	constexpr auto SPEEDBOAT_VELOCITY_DECEL = 1;
@@ -42,7 +42,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_REVERSE_VELOCITY_MAX = 20;
 
 	constexpr auto SPEEDBOAT_STEP_HEIGHT_MAX = CLICK(1); // Unused.
-	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
+	constexpr auto SPEEDBOAT_SOUND_CEILING = BLOCK(5); // Unused.
 	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
 
 	constexpr auto SPEEDBOAT_WAKE_OFFSET = Vector3(SPEEDBOAT_SIDE * 1.2f, 0.0f, SPEEDBOAT_FRONT / 8);
@@ -328,11 +328,11 @@ namespace TEN::Entities::Vehicles
 
 	short SpeedboatDoShift(ItemInfo* speedboatItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
 
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
+		int xOld = old->x / BLOCK(1);
+		int zOld = old->z / BLOCK(1);
 
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
@@ -351,7 +351,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				speedboatItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				speedboatItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (speedboatItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -364,7 +364,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				speedboatItem->Pose.Position.x += SECTOR(1) - shiftX;
+				speedboatItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - speedboatItem->Pose.Position.z);
 			}
 		}
@@ -379,7 +379,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, speedboatItem->RoomNumber);
@@ -388,7 +388,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)
@@ -913,7 +913,7 @@ namespace TEN::Entities::Vehicles
 				SyncVehicleAnimation(*speedboatItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(20.0f);
-			Camera.targetDistance = SECTOR(2);
+			Camera.targetDistance = BLOCK(2);
 
 			auto pitch = speedboatItem->Animation.Velocity.z;
 			speedboat->Pitch += (pitch - speedboat->Pitch) / 4;

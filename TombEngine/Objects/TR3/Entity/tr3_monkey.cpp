@@ -244,7 +244,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 				else if ((item->AIBits & FOLLOW) &&
-					(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+					(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 				{
 					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
@@ -305,7 +305,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 				else if (item->AIBits & FOLLOW &&
-					(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+					(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 				{
 					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
@@ -333,7 +333,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item->Animation.TargetState = MONKEY_STATE_BITE_ATTACK;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD_ROLL;
 				else
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD;
@@ -448,7 +448,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 				}
 				else if ((item->AIBits & FOLLOW) &&
-					(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+					(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 				{
 					item->Animation.TargetState = MONKEY_STATE_IDLE;
 				}
@@ -456,7 +456,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD_ROLL;
 				else if (AI.distance < pow(682, 2))
 					item->Animation.TargetState = MONKEY_STATE_IDLE;
-				else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD_ROLL;
 
 				break;

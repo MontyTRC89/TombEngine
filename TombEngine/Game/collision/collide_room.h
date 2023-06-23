@@ -11,7 +11,7 @@ enum RoomEnvFlags;
 
 constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
-constexpr auto COLLISION_CHECK_DISTANCE = SECTOR(8);
+constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
 enum CollisionType
 {

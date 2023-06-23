@@ -194,8 +194,8 @@ namespace TEN::Entities::Creatures::TR1
 				if (!(creature->Flags & NATLA_FLYMODE))
 					CreatureMood(item, &AI, true);
 
-				creature->LOT.Step = SECTOR(20);
-				creature->LOT.Drop = -SECTOR(20);
+				creature->LOT.Step = BLOCK(20);
+				creature->LOT.Drop = -BLOCK(20);
 				creature->LOT.Fly = CLICK(0.25f) / 2;
 
 				CreatureAIInfo(item, &AI);

@@ -192,8 +192,8 @@ namespace TEN::Entities::TR4
 				{
 					for (auto& mesh : room.mesh)
 					{
-						if (abs(pos.x - mesh.pos.Position.x) < SECTOR(1) &&
-							abs(pos.z - mesh.pos.Position.z) < SECTOR(1) &&
+						if (abs(pos.x - mesh.pos.Position.x) < BLOCK(1) &&
+							abs(pos.z - mesh.pos.Position.z) < BLOCK(1) &&
 							StaticObjects[mesh.staticNumber].shatterType == SHT_NONE)
 						{
 							ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);

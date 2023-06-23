@@ -165,7 +165,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + SECTOR(0.5f);
+			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + BLOCK(0.5f);
 
 			switch (item->Animation.ActiveState)
 			{

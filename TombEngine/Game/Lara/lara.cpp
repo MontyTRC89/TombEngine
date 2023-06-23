@@ -588,7 +588,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
 						item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						item->Pose.Position.y = waterHeight + (SECTOR(1) - 24);
+						item->Pose.Position.y = waterHeight + (BLOCK(1) - 24);
 					}
 
 					SetAnimation(item, LA_WADE);

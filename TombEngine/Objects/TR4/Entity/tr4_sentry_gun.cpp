@@ -78,11 +78,11 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &AI))
 				{
-					if (AI.distance < pow(SECTOR(9), 2))
+					if (AI.distance < pow(BLOCK(9), 2))
 					{
 						if (!g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->ItemFlags[0])
 						{
-							if (AI.distance <= pow(SECTOR(2), 2))
+							if (AI.distance <= pow(BLOCK(2), 2))
 							{
 								// Throw fire
 								ThrowFire(itemNumber, 7, SentryGunFlameOffset, SentryGunFlameOffset);

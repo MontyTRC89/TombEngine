@@ -117,8 +117,8 @@ namespace TEN::Entities::Creatures::TR3
 					dx = target->Pose.Position.x - item->Pose.Position.x;
 					dz = target->Pose.Position.z - item->Pose.Position.z;
 
-					if (dz > SECTOR(31.25f) || dz < -SECTOR(31.25f) ||
-						dx > SECTOR(31.25f) || dx < -SECTOR(31.25f))
+					if (dz > BLOCK(31.25f) || dz < -BLOCK(31.25f) ||
+						dx > BLOCK(31.25f) || dx < -BLOCK(31.25f))
 					{
 						continue;
 					}
@@ -156,8 +156,8 @@ namespace TEN::Entities::Creatures::TR3
 			auto* enemy = creature->Enemy;
 			creature->Enemy = LaraItem;
 
-			if (item->HitStatus || ((laraAI.distance < pow(SECTOR(1), 2) ||
-				TargetVisible(item, &laraAI)) && abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(1)))
+			if (item->HitStatus || ((laraAI.distance < pow(BLOCK(1), 2) ||
+				TargetVisible(item, &laraAI)) && abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < BLOCK(1)))
 			{
 				if (!creature->Alerted)
 					SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose);
@@ -205,7 +205,7 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = MPSTICK_STATE_RUN;
 				}
 				else if (creature->Mood == MoodType::Bored ||
-					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
+					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2))))
 				{
 					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
@@ -214,11 +214,11 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item->Animation.TargetState = MPSTICK_STATE_RUN;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(0.5f), 2))
 					item->Animation.TargetState = MPSTICK_STATE_AIM0;
-				else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = MPSTICK_STATE_AIM1;
-				else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = MPSTICK_STATE_WALK;
 				else
 					item->Animation.TargetState = MPSTICK_STATE_RUN;
@@ -245,11 +245,11 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = MPSTICK_STATE_STOP;
 					}
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2) && AI.xAngle < 0)
+				else if (AI.bite && AI.distance < pow(BLOCK(1.5f), 2) && AI.xAngle < 0)
 					item->Animation.TargetState = MPSTICK_STATE_KICK;
-				else if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(0.5f), 2))
 					item->Animation.TargetState = MPSTICK_STATE_STOP;
-				else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(1.25f), 2))
 					item->Animation.TargetState = MPSTICK_STATE_AIM2;
 				else
 					item->Animation.TargetState = MPSTICK_STATE_RUN;
@@ -272,11 +272,11 @@ namespace TEN::Entities::Creatures::TR3
 
 					break;
 				}
-				else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+				else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 					item->Animation.TargetState = MPSTICK_STATE_STOP;
 				else if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = MPSTICK_STATE_WALK;
-				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = MPSTICK_STATE_WALK;
 
 				break;
@@ -291,7 +291,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				if (AI.bite && AI.distance < pow(BLOCK(0.5f), 2))
 					item->Animation.TargetState = MPSTICK_STATE_PUNCH0;
 				else
 					item->Animation.TargetState = MPSTICK_STATE_STOP;
@@ -308,7 +308,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				if (AI.ahead && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = MPSTICK_STATE_PUNCH1;
 				else
 					item->Animation.TargetState = MPSTICK_STATE_STOP;
@@ -325,7 +325,7 @@ namespace TEN::Entities::Creatures::TR3
 					extraTorsoRot.y = AI.angle;
 				}
 
-				if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
+				if (AI.bite && AI.distance < pow(BLOCK(1.25f), 2))
 					item->Animation.TargetState = MPSTICK_STATE_PUNCH2;
 				else
 					item->Animation.TargetState = MPSTICK_STATE_WALK;
@@ -355,7 +355,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!creature->Flags && enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.25f))
 						{
 							DoDamage(enemy, 5);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
@@ -390,7 +390,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!creature->Flags && creature->Enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.25f))
 						{
 							DoDamage(creature->Enemy, 5);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
@@ -400,7 +400,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 
-				if (AI.ahead && AI.distance > pow(SECTOR(1), 2) && AI.distance < pow(SECTOR(1.25f), 2))
+				if (AI.ahead && AI.distance > pow(BLOCK(1), 2) && AI.distance < pow(BLOCK(1.25f), 2))
 					item->Animation.TargetState = MPSTICK_STATE_PUNCH2;
 
 				break;
@@ -428,7 +428,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Flags != 2 && creature->Enemy)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.25f))
 						{
 							DoDamage(creature->Enemy, 6);
 							CreatureEffect(item, MPStickBite1, DoBloodSplat);
@@ -462,7 +462,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (!creature->Flags != 1 && creature->Enemy &&
 						item->Animation.FrameNumber > GetAnimData(item).frameBase + 8)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.25f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.25f))
 						{
 							DoDamage(creature->Enemy, 9);
 							CreatureEffect(item, MPStickBite2, DoBloodSplat);
