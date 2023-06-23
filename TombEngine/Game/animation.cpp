@@ -67,7 +67,7 @@ void AnimateItem(ItemInfo* item)
 
 	const auto* animPtr = &GetAnimData(*item);
 
-	if (GetStateDispatch(item, *animPtr))
+	if (GetStateDispatch(*item, *animPtr))
 	{
 		animPtr = &GetAnimData(*item);
 
@@ -384,28 +384,28 @@ int GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber)
 	return nextAnim.State;
 }
 
-bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
+bool GetStateDispatch(ItemInfo& item, const AnimData& anim)
 {
 	// No dispatches; return early.
 	if (anim.Dispatches.empty())
 		return false;
 
 	// Active and target states already match; return early.
-	if (item->Animation.ActiveState == item->Animation.TargetState)
+	if (item.Animation.ActiveState == item.Animation.TargetState)
 		return false;
 
 	// Iterate over state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
 		// State doesn't match; continue.
-		if (dispatch.State != item->Animation.TargetState)
+		if (dispatch.State != item.Animation.TargetState)
 			continue;
 
 		// Set new animation if current frame number is within dispatch range.
-		if (TestAnimFrameRange(*item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
+		if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
 		{
-			item->Animation.AnimNumber = dispatch.NextAnimNumber;
-			item->Animation.FrameNumber = dispatch.NextFrameNumber;
+			item.Animation.AnimNumber = dispatch.NextAnimNumber;
+			item.Animation.FrameNumber = dispatch.NextFrameNumber;
 			return true;
 		}
 	}

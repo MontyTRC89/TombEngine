@@ -115,7 +115,7 @@ int GetFrameCount(const ItemInfo& item);
 
 int	 GetNextAnimState(const ItemInfo& item);
 int	 GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
-bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
+bool GetStateDispatch(ItemInfo& item, const AnimData& anim);
 
 void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);

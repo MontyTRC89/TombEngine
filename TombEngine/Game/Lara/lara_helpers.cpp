@@ -289,7 +289,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraStepUp(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
-			if (GetStateDispatch(item, GetAnimData(*item)))
+			if (GetStateDispatch(*item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -298,7 +298,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		else if (TestLaraStepDown(item, coll))
 		{
 			item->Animation.TargetState = LS_STEP_DOWN;
-			if (GetStateDispatch(item, GetAnimData(*item)))
+			if (GetStateDispatch(*item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
