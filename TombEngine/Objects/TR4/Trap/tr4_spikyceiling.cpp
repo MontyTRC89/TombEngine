@@ -28,8 +28,6 @@ namespace TEN::Entities::Traps
 
 	void ControlSpikyCeiling(short itemNumber)
 	{
-		constexpr auto IMPALE_DEPTH = BLOCK(0.5f);
-
 		auto& item = g_Level.Items[itemNumber];
 
 		if (!TriggerActive(&item) || item.Status == ITEM_DEACTIVATED)
