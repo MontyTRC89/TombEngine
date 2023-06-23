@@ -909,7 +909,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeSpikyCeiling;
 			obj->control = ControlSpikyCeiling;
-			obj->collision = TrapCollision;
+			obj->collision = CollideSpikyCeiling;
 			obj->SetupHitEffect(true);
 		}
 

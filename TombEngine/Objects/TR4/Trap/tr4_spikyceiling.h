@@ -1,4 +1,11 @@
 #pragma once
 
-void ControlSpikyCeiling(short itemNumber);
-void InitializeSpikyCeiling(short itemNumber);
+struct CollisionInfo;
+struct ItemInfo;
+
+namespace TEN::Entities::Traps
+{
+	void InitializeSpikyCeiling(short itemNumber);
+	void ControlSpikyCeiling(short itemNumber);
+	void CollideSpikyCeiling(short itemNumber, ItemInfo* item, CollisionInfo* coll);
+}

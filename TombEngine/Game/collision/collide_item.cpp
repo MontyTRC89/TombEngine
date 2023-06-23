@@ -2002,5 +2002,7 @@ void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		TestCollision(item, laraItem);
 	}
 	else if (item->Status != ITEM_INVISIBLE)
+	{
 		ObjectCollision(itemNumber, laraItem, coll);
+	}
 }
