@@ -42,8 +42,8 @@ KeyframeInterpData AnimData::GetKeyframeInterpData(int frameNumber) const
 
 const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 {
-	auto frameData = GetKeyframeInterpData(frameNumber);
-	return ((frameData.Alpha <= 0.5f) ? frameData.Keyframe0 : frameData.Keyframe1);
+	auto interpData = GetKeyframeInterpData(frameNumber);
+	return ((interpData.Alpha <= 0.5f) ? interpData.Keyframe0 : interpData.Keyframe1);
 }
 
 static void ExecuteAnimCommands(ItemInfo& item, bool isFrameBased)
