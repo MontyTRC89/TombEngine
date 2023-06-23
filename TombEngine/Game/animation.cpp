@@ -191,9 +191,9 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
+bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetState)
 {
-	const auto& anim = GetAnimData(*item);
+	const auto& anim = GetAnimData(item);
 
 	// No dispatches; return early.
 	if (anim.Dispatches.empty())
@@ -201,7 +201,7 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 
 	// Use entity's target state if no targetState argument passed.
 	if (!targetState.has_value())
-		targetState = item->Animation.TargetState;
+		targetState = item.Animation.TargetState;
 
 	// Iterate over state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
@@ -211,7 +211,7 @@ bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState)
 			continue;
 
 		// Test if current frame is within dispatch range.
-		if (TestAnimFrameRange(*item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
+		if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
 			return true;
 	}
 

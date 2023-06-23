@@ -2278,7 +2278,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 		else if (TrInput & IN_SPRINT && lara->Control.Count.Run >= LARA_SPRINT_JUMP_TIME &&
-			TestLaraRunJumpForward(item, coll) && HasStateDispatch(item, LS_JUMP_FORWARD))
+			TestLaraRunJumpForward(item, coll) && HasStateDispatch(*item, LS_JUMP_FORWARD))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;

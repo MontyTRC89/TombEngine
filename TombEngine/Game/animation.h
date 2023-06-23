@@ -84,7 +84,7 @@ struct BoneMutator
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
-bool HasStateDispatch(ItemInfo* item, std::optional<int> targetState = std::nullopt);
+bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetState = std::nullopt);
 bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Maybe do comparisons with EndFrameNumber instead?
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
 
