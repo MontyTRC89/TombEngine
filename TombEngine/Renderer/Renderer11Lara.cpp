@@ -88,8 +88,8 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	auto& playerObject = *m_moveableObjects[ID_LARA];
 
 	// Clear extra rotations.
-	for (auto& bone : playerObject.LinearizedBones)
-		bone->ExtraRotation = Quaternion::Identity;
+	for (auto* bonePtr : playerObject.LinearizedBones)
+		bonePtr->ExtraRotation = Quaternion::Identity;
 
 	// Player world matrix.
 	auto tMatrix = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
