@@ -349,7 +349,7 @@ namespace TEN::Renderer
 			
 			m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
 			m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
-			m_toneMap->SetExposure(-1.3f);
+			m_toneMap->SetExposure(-1.6f);
 			m_toneMap->SetHDRSourceTexture(m_postProcessRenderTarget.ShaderResourceView.Get());
 			m_toneMap->Process(m_context.Get());
 
