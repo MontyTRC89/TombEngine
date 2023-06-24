@@ -7,7 +7,7 @@ namespace TEN::Renderer
 {
 	using TEN::Renderer::Utils::throwIfFailed;
 
-	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat)
+	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, bool allowMultisampled, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat)
 	{
 		 // Check if antialiasing quality is available, and set it if it is.
 		
@@ -16,7 +16,7 @@ namespace TEN::Renderer
 		D3D11_RTV_DIMENSION rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		int sampleCount = 1;
 
-		if (g_Configuration.Antialiasing > AntialiasingMode::Low)
+		if (g_Configuration.Antialiasing > AntialiasingMode::Low && allowMultisampled)
 		{
 			int potentialSampleCount = (g_Configuration.Antialiasing == AntialiasingMode::Medium) ? 2 : 4;
 			unsigned int qualityLevels = 0;

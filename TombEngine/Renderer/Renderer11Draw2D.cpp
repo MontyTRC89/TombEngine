@@ -309,6 +309,18 @@ namespace TEN::Renderer
 		m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
+
+		if (g_Configuration.Antialiasing > AntialiasingMode::Low)
+		{
+			m_context->ResolveSubresource(m_postProcessRenderTarget.Texture.Get(), 0, m_renderTarget.Texture.Get(), 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		}
+		else
+		{
+			m_context->OMSetRenderTargets(1, m_postProcessRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
+			m_basicPostProcess->SetEffect(BasicPostProcess::Copy);
+			m_basicPostProcess->SetSourceTexture(m_renderTarget.ShaderResourceView.Get());
+			m_basicPostProcess->Process(m_context.Get());
+		}
    
 		if (m_colorTone != TONE_NORMAL)
 		{
@@ -322,23 +334,23 @@ namespace TEN::Renderer
 			{
 				m_basicPostProcess->SetEffect(BasicPostProcess::Sepia);
 			}
-			m_basicPostProcess->SetSourceTexture(m_renderTarget.ShaderResourceView.Get());
+			m_basicPostProcess->SetSourceTexture(m_postProcessRenderTarget.ShaderResourceView.Get());
 			m_basicPostProcess->Process(m_context.Get());
 
-			m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), nullptr);
+			m_context->OMSetRenderTargets(1, m_postProcessRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 			m_basicPostProcess->SetEffect(BasicPostProcess::Copy);
 			m_basicPostProcess->SetSourceTexture(m_tempRT.ShaderResourceView.Get());
 			m_basicPostProcess->Process(m_context.Get());
 		}
 
-		if (m_HDR)
+		if (g_Configuration.EnableHDR)
 		{
 			m_context->OMSetRenderTargets(1, m_tempRT.RenderTargetView.GetAddressOf(), nullptr);
 			
 			m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
 			m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
 			m_toneMap->SetExposure(-1.3f);
-			m_toneMap->SetHDRSourceTexture(m_renderTarget.ShaderResourceView.Get());
+			m_toneMap->SetHDRSourceTexture(m_postProcessRenderTarget.ShaderResourceView.Get());
 			m_toneMap->Process(m_context.Get());
 
 			// Pass 1 (scene->blur1)
@@ -373,7 +385,7 @@ namespace TEN::Renderer
 			m_basicPostProcess->Process(m_context.Get());
 
 			// Pass 4 (scene+blur1 -> temp)
-			m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), depthTarget);
+			m_context->OMSetRenderTargets(1, m_postProcessRenderTarget.RenderTargetView.GetAddressOf(), depthTarget);
 
 			m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
 			m_dualPostProcess->SetBloomCombineParameters(1.25f, 1.f, 1.f, 1.f);
@@ -431,7 +443,7 @@ namespace TEN::Renderer
 		m_cbPostProcessBuffer.updateData(m_stPostProcessBuffer, m_context.Get());
 		BindConstantBufferPS(CB_POSTPROCESS, m_cbPostProcessBuffer.get());
 
-		BindTexture(TEXTURE_COLOR_MAP, &m_renderTarget, SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TEXTURE_COLOR_MAP, &m_postProcessRenderTarget, SAMPLER_ANISOTROPIC_CLAMP);
 
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);

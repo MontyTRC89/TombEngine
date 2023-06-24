@@ -15,6 +15,8 @@ using namespace TEN::Math;
 #define REGKEY_SHADOW_BLOBS				"ShadowBlobs"
 #define REGKEY_CAUSTICS					"Caustics"
 #define REGKEY_ANTIALIASING				"Antialiasing"
+#define REGKEY_HDR						"HDR"
+#define REGKEY_VOLUMETRIC_FOG			"VolumetricFog"
 
 #define REGKEY_SOUND_DEVICE				"SoundDevice"
 #define REGKEY_ENABLE_SOUND				"EnableSound"
@@ -45,6 +47,8 @@ struct GameConfiguration
 	ShadowMode ShadowType;
 	int ShadowMapSize = 1024;
 	int ShadowMaxBlobs = 16;
+	bool EnableHDR;
+	bool EnableVolumetricFog;
 
 	bool EnableSubtitles;
 	bool AutoTarget;

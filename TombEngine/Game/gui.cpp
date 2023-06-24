@@ -396,13 +396,14 @@ namespace TEN::Gui
 			ShadowType,
 			Caustics,
 			Antialiasing,
+			HDR,
+			VolumetricFog,
 			Save,
-			Cancel
+			Cancel,
+			NumDisplaySettingsOptions
 		};
 
-		static const int numDisplaySettingsOptions = 6;
-
-		OptionCount = numDisplaySettingsOptions;
+		OptionCount = NumDisplaySettingsOptions;
 
 		if (GuiIsDeselected())
 		{
@@ -452,6 +453,17 @@ namespace TEN::Gui
 					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) - 1);
 
 				break;
+
+			case DisplaySettingsOption::HDR:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableHDR = !CurrentSettings.Configuration.EnableHDR;
+				break;
+
+			case DisplaySettingsOption::VolumetricFog:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableVolumetricFog = !CurrentSettings.Configuration.EnableVolumetricFog;
+				break;
+
 			}
 		}
 
@@ -493,6 +505,17 @@ namespace TEN::Gui
 					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) + 1);
 
 				break;
+
+			case DisplaySettingsOption::HDR:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableHDR = !CurrentSettings.Configuration.EnableHDR;
+				break;
+
+			case DisplaySettingsOption::VolumetricFog:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableVolumetricFog = !CurrentSettings.Configuration.EnableVolumetricFog;
+				break;
+
 			}
 		}
 

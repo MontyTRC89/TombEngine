@@ -1431,8 +1431,8 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		ID3D11RenderTargetView* m_pRenderViews[2]; 
-		m_pRenderViews[0] = m_renderTarget.RenderTargetView.Get(); 
-		m_pRenderViews[1] = m_depthMap.RenderTargetView.Get(); 
+		m_pRenderViews[0] = m_renderTarget.RenderTargetView.Get();
+		m_pRenderViews[1] = m_depthMap.RenderTargetView.Get();
 		m_context->OMSetRenderTargets(2, &m_pRenderViews[0], m_renderTarget.DepthStencilView.Get());
 
 		m_context->RSSetViewports(1, &view.Viewport);
@@ -1458,19 +1458,26 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
-		cameraConstantBuffer.NumFogBulbs = (int)view.FogBulbsToDraw.size();
-
-		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
+		if (g_Configuration.EnableVolumetricFog)
 		{
-			cameraConstantBuffer.FogBulbs[i].Position = view.FogBulbsToDraw[i].Position;
-			cameraConstantBuffer.FogBulbs[i].Density = view.FogBulbsToDraw[i].Density * (CLICK(1) / view.FogBulbsToDraw[i].Radius);
-			cameraConstantBuffer.FogBulbs[i].SquaredRadius = SQUARE(view.FogBulbsToDraw[i].Radius);
-			cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
-			cameraConstantBuffer.FogBulbs[i].SquaredCameraToFogBulbDistance = SQUARE(view.FogBulbsToDraw[i].Distance);
-			cameraConstantBuffer.FogBulbs[i].FogBulbToCameraVector = view.FogBulbsToDraw[i].FogBulbToCameraVector;
+			cameraConstantBuffer.NumFogBulbs = (int)view.FogBulbsToDraw.size();
+
+			for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
+			{
+				cameraConstantBuffer.FogBulbs[i].Position = view.FogBulbsToDraw[i].Position;
+				cameraConstantBuffer.FogBulbs[i].Density = view.FogBulbsToDraw[i].Density * (CLICK(1) / view.FogBulbsToDraw[i].Radius);
+				cameraConstantBuffer.FogBulbs[i].SquaredRadius = SQUARE(view.FogBulbsToDraw[i].Radius);
+				cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
+				cameraConstantBuffer.FogBulbs[i].SquaredCameraToFogBulbDistance = SQUARE(view.FogBulbsToDraw[i].Distance);
+				cameraConstantBuffer.FogBulbs[i].FogBulbToCameraVector = view.FogBulbsToDraw[i].FogBulbToCameraVector;
+			}
+		}
+		else
+		{
+			cameraConstantBuffer.NumFogBulbs = 0;
 		}
 
-		cameraConstantBuffer.SaturateMaxValue = m_HDR ? 1000.0f : 1.0f;
+		cameraConstantBuffer.SaturateMaxValue = g_Configuration.EnableHDR ? 1000.0f : 1.0f;
 		
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());

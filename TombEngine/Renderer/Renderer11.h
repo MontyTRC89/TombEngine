@@ -298,8 +298,10 @@ namespace TEN::Renderer
 
 		RenderTarget2D m_dumpScreenRenderTarget;
 		RenderTarget2D m_renderTarget;
+		RenderTarget2D m_postProcessRenderTarget;
 		RenderTarget2D m_currentRenderTarget;
 		RenderTarget2D m_depthMap;
+		RenderTarget2D m_resolvedDepthMap;
 		RenderTargetCube m_reflectionCubemap;
 
 		Texture2DArray m_shadowMap;

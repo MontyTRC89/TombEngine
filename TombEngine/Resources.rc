@@ -3,19 +3,10 @@
 #pragma code_page(65001)
 
 #include "resource.h"
-
-#define APSTUDIO_READONLY_SYMBOLS
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 2 resource.
-//
-#include "winres.h"
+#include <windows.h>
 
 /////////////////////////////////////////////////////////////////////////////
-#undef APSTUDIO_READONLY_SYMBOLS
-
-/////////////////////////////////////////////////////////////////////////////
-// English resources
+// Inglese (neutro) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
@@ -57,6 +48,7 @@ BEGIN
     END
 END
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
@@ -77,21 +69,23 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
 CAPTION "TombEngine"
 FONT 8, "Segoe UI", 400, 0, 0xCC
 BEGIN
-    COMBOBOX        IDC_GFXADAPTER,13,23,308,71,CBS_DROPDOWNLIST | WS_TABSTOP
-    COMBOBOX        IDC_RESOLUTION,21,79,117,84,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "TXT_Windowed",IDC_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,103,115,10
-    CONTROL         "TXT Shadows",IDC_SHADOWS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,79,159,10
-    CONTROL         "TXT Caustics",IDC_CAUSTICS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,94,160,10
-    CONTROL         "TXT Antialiasing",IDC_ANTIALIASING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,109,160,10
+    COMBOBOX        IDC_GFXADAPTER,15,19,308,71,CBS_DROPDOWNLIST | WS_TABSTOP
+    COMBOBOX        IDC_RESOLUTION,21,57,117,84,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "TXT_Windowed",IDC_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,69,115,10
+    CONTROL         "TXT Shadows",IDC_SHADOWS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,57,159,10
+    CONTROL         "TXT Caustics",IDC_CAUSTICS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,69,160,10
+    CONTROL         "TXT Antialiasing",IDC_ANTIALIASING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,93,160,10
     GROUPBOX        "Txt_Sound",IDC_GROUP_SOUND,7,151,320,33
     CONTROL         "TXT_Enable",IDC_ENABLE_SOUNDS,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,254,150,67,10
     COMBOBOX        IDC_SNDADAPTER,13,164,308,71,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,109,189,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,175,189,50,14
-    GROUPBOX        "Txt_GraphicsAdapter",IDC_GROUP_GFXADAPTER,7,7,320,39
-    GROUPBOX        "Txt_OutputSettings",IDC_GROUP_OUTPUT_SETTINGS,7,51,320,94
-    GROUPBOX        "TXT_Resolution",IDC_GROUP_RESOLUTION,15,66,128,62
-    GROUPBOX        "TXT_Render Options",IDC_GROUP_RENDER_OPTIONS,148,66,173,62
+    GROUPBOX        "Txt_GraphicsAdapter",IDC_GROUP_GFXADAPTER,7,7,320,26
+    GROUPBOX        "Txt_OutputSettings",IDC_GROUP_OUTPUT_SETTINGS,7,37,320,108
+    GROUPBOX        "TXT_Resolution",IDC_GROUP_RESOLUTION,15,45,128,65
+    GROUPBOX        "TXT_Render Options",IDC_GROUP_RENDER_OPTIONS,148,45,173,95
+    CONTROL         "TXT HDR",IDC_HDR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,106,160,10
+    CONTROL         "TXT Volumetric fog",IDC_VOLUMEFOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,81,160,10
 END
 
 
@@ -111,6 +105,7 @@ BEGIN
         VERTGUIDE, 21
         VERTGUIDE, 148
         VERTGUIDE, 155
+        HORZGUIDE, 45
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -126,8 +121,43 @@ BEGIN
     0
 END
 
-#endif    // English resources
+#endif    // Inglese (neutro) resources
 /////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Italiano (Italia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ITA)
+LANGUAGE LANG_ITALIAN, SUBLANG_ITALIAN
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Italiano (Italia) resources
+/////////////////////////////////////////////////////////////////////////////
+
 
 
 #ifndef APSTUDIO_INVOKED

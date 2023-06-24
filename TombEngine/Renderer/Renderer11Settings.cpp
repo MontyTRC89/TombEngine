@@ -17,6 +17,7 @@ namespace TEN::Renderer
 		m_backBufferRTV->Release();
 		m_depthStencilView->Release();
 		m_depthStencilTexture->Release();
+
 		m_context->Flush();
 		m_context->ClearState();
 

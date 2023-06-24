@@ -58,48 +58,51 @@ namespace TEN::Renderer
 			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
 		} 
 
-		// Collect fog bulbs
-		vector<RendererFogBulb> tempFogBulbs;
-		tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
-
-		for (auto& room : m_rooms)     
+		if (g_Configuration.EnableVolumetricFog)
 		{
-			if (!g_Level.Rooms[room.RoomNumber].Active())
-				continue;
+			// Collect fog bulbs
+			vector<RendererFogBulb> tempFogBulbs;
+			tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
 
-			for (auto& light : room.Lights)
+			for (auto& room : m_rooms)
 			{
-				if (light.Type != LIGHT_TYPE_FOG_BULB)
+				if (!g_Level.Rooms[room.RoomNumber].Active())
 					continue;
 
-				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f)) /* Test a bigger radius for avoiding bad clipping */
+				for (auto& light : room.Lights)
 				{
-					RendererFogBulb bulb;
-					
-					bulb.Position = light.Position;
-					bulb.Density = light.Intensity;
-					bulb.Color = light.Color;
-					bulb.Radius = light.Out;
-					bulb.FogBulbToCameraVector = bulb.Position - renderView.Camera.WorldPosition;
-					bulb.Distance = bulb.FogBulbToCameraVector.Length();
+					if (light.Type != LIGHT_TYPE_FOG_BULB)
+						continue;
 
-					tempFogBulbs.push_back(bulb);
+					if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f)) /* Test a bigger radius for avoiding bad clipping */
+					{
+						RendererFogBulb bulb;
+
+						bulb.Position = light.Position;
+						bulb.Density = light.Intensity;
+						bulb.Color = light.Color;
+						bulb.Radius = light.Out;
+						bulb.FogBulbToCameraVector = bulb.Position - renderView.Camera.WorldPosition;
+						bulb.Distance = bulb.FogBulbToCameraVector.Length();
+
+						tempFogBulbs.push_back(bulb);
+					}
 				}
 			}
-		}
-		
-		std::sort(
-			tempFogBulbs.begin(),
-			tempFogBulbs.end(),
-			[](RendererFogBulb a, RendererFogBulb b)
-			{
-				return a.Distance < b.Distance;
-			}
-		);
 
-		for (int i = 0; i < std::min(MAX_FOG_BULBS_DRAW, (int)tempFogBulbs.size()); i++)
-		{
-			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
+			std::sort(
+				tempFogBulbs.begin(),
+				tempFogBulbs.end(),
+				[](RendererFogBulb a, RendererFogBulb b)
+				{
+					return a.Distance < b.Distance;
+				}
+			);
+
+			for (int i = 0; i < std::min(MAX_FOG_BULBS_DRAW, (int)tempFogBulbs.size()); i++)
+			{
+				renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
+			}
 		}
 	}
 

@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by Resources.rc
+// File di inclusione generato con Microsoft Visual C++.
+// Utilizzato da Resources.rc
 //
 #define IDD_SETUP                       103
 #define IDI_ICON1                       108
@@ -22,12 +22,10 @@
 #define IDC_LOWBUMP                     1035
 #define IDC_BUMPMAP                     1036
 #define IDC_SNDADAPTERTXT               1037
-#define IDC_BANNER                      1037
-#define IDC_NOSOUND                     1038
 #define IDC_ENABLE_SOUNDS               1038
 #define IDC_RENDEROPTIONS               1043
 #define IDC_WINDOWED                    1045
-#define IDC_VOLUMEFOG                   1049
+#define IDC_VOLUMEFOG                   1046
 #define IDC_SHADOWS                     1049
 #define IDC_NOFMV                       1050
 #define IDC_GROUP_RENDER_OPTIONS        1060
@@ -35,6 +33,7 @@
 #define IDC_GROUP_OUTPUT_SETTINGS       1063
 #define IDC_GROUP_GFXADAPTER            1064
 #define IDC_GROUP_SOUND                 1065
+#define IDC_HDR                         1066
 
 // Next default values for new objects
 // 

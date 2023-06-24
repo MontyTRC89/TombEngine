@@ -79,6 +79,8 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		SendMessageA(GetDlgItem(handle, IDC_SHADOWS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_SHADOWS));
 		SendMessageA(GetDlgItem(handle, IDC_CAUSTICS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_CAUSTICS));
 		SendMessageA(GetDlgItem(handle, IDC_ANTIALIASING), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_ANTIALIASING));
+		SendMessageA(GetDlgItem(handle, IDC_HDR), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_HDR));
+		SendMessageA(GetDlgItem(handle, IDC_VOLUMEFOG), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_VOLUMETRIC_FOG));
 
 		LoadResolutionsInCombobox(handle);
 		LoadSoundDevicesInCombobox(handle);
@@ -118,6 +120,9 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
 				g_Configuration.Antialiasing = (AntialiasingMode)(SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
+				g_Configuration.EnableHDR = (SendDlgItemMessage(handle, IDC_HDR, BM_GETCHECK, 0, 0));
+				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_VOLUMEFOG, BM_GETCHECK, 0, 0));
+
 				selectedMode = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
 				mode = g_Configuration.SupportedScreenResolutions[selectedMode];
 				g_Configuration.Width = mode.x;
@@ -216,6 +221,18 @@ bool SaveConfiguration()
 		return false;
 	}
 
+	if (SetBoolRegKey(rootKey, REGKEY_HDR, g_Configuration.EnableHDR) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_VOLUMETRIC_FOG, g_Configuration.EnableVolumetricFog) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
 	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_SOUND, g_Configuration.EnableSound) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
@@ -306,6 +323,8 @@ void InitDefaultConfiguration()
 	g_Configuration.EnableCaustics = true;
 	g_Configuration.ShadowType = ShadowMode::Lara;
 	g_Configuration.EnableSound = true;
+	g_Configuration.EnableHDR = false;
+	g_Configuration.EnableVolumetricFog = false;
 	g_Configuration.Antialiasing = AntialiasingMode::Low;
 	g_Configuration.MusicVolume = 100;
 	g_Configuration.SfxVolume = 100;
@@ -354,6 +373,20 @@ bool LoadConfiguration()
 
 	DWORD antialiasing = 1;
 	if (GetDWORDRegKey(rootKey, REGKEY_ANTIALIASING, &antialiasing, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	DWORD hdr = 1;
+	if (GetDWORDRegKey(rootKey, REGKEY_HDR, &hdr, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	DWORD volumetricFog = 1;
+	if (GetDWORDRegKey(rootKey, REGKEY_VOLUMETRIC_FOG, &volumetricFog, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -468,6 +501,7 @@ bool LoadConfiguration()
 	g_Configuration.EnableCaustics = caustics;
 	g_Configuration.Antialiasing = AntialiasingMode(antialiasing);
 	g_Configuration.ShadowMapSize = shadowMapSize;
+	g_Configuration.EnableHDR = hdr;
 
 	g_Configuration.EnableSound = enableSound;
 	g_Configuration.EnableReverb = enableReverb;
