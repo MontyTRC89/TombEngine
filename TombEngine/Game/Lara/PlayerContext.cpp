@@ -996,7 +996,7 @@ namespace TEN::Player
 
 		auto pointColl = GetCollision(&item);
 
-		if (player.Control.Tightrope.CanDismount &&			   // Dismount is allowed.
+		if (player.Control.Tightrope.CanDismount &&			  // Dismount is allowed.
 			pointColl.Position.Floor == item.Pose.Position.y) // Floor is level with player.
 		{
 			return true;
