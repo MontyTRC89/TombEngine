@@ -37,7 +37,7 @@ table Item {
 	carried_item: int32;
 	after_death: int32;
 	item_flags: [int32];
-	pose: Position;
+	pose: Pose;
 	next_item: int32;
 	next_item_active: int32;
 	active: bool;
@@ -65,7 +65,7 @@ table Item {
 }
 
 table FXInfo {
-	pose : Position;
+	pose : Pose;
 	room_number: int32;
 	object_number: int32;
 	next_fx: int32;
@@ -112,7 +112,7 @@ table ArmInfo {
 	frame_number: int32;
 	frame_base: int32;
 	locked: bool;
-	rotation: Vector3;
+	rotation: EulerAngles;
 	gun_flash: int32;
 	gun_smoke: int32;
 }
@@ -256,9 +256,9 @@ table PlayerStatusData {
 table PlayerContextData {
 	calc_jump_velocity: int32;
 	interacted_item_number: int32;
-	next_corner_pose: Position;
+	next_corner_pose: Pose;
 	projected_floor_height: int32;
-	target_facing_angle: int32;
+	target_orient: EulerAngles;
 	vehicle_item_number: int32;
 	water_current_active: int32;
 	water_current_pull: Vector3;
@@ -270,8 +270,8 @@ table Lara {
 	control: LaraControlData;
 	effect: PlayerEffectData;
 	extra_anim: int32;
-	extra_head_rot: Vector3;
-	extra_torso_rot: Vector3;
+	extra_head_rot: EulerAngles;
+	extra_torso_rot: EulerAngles;
 	flare: FlareData;
 	highest_location: int32;
 	hit_direction: int32;
@@ -282,7 +282,7 @@ table Lara {
 	location_pad: int32;
 	right_arm: ArmInfo;
 	status: PlayerStatusData;
-	target_arm_orient: [int32];
+	target_arm_orient: EulerAngles;
 	target_entity_number: int32;
 	torch: TorchData;
 	weapons: [CarriedWeaponInfo];
@@ -303,7 +303,7 @@ table Sink {
 table StaticMeshInfo {
 	number: int32;
 	room_number: int32;
-	pose: Position;
+	pose: Pose;
 	scale: float;
 	color: Vector4;
 	hit_points: int32;
@@ -352,7 +352,7 @@ table ParticleInfo {
 
 table SwarmObjectInfo {
 	on: bool;
-	pose: Position;
+	pose: Pose;
 	room_number: int32;
 	flags: int32;
 }

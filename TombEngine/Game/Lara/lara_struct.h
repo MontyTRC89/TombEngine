@@ -1280,7 +1280,7 @@ struct PlayerContextData
 	int			ProjectedFloorHeight = 0;
 	float		CalcJumpVelocity	 = 0;
 	Pose		NextCornerPos		 = Pose::Zero;
-	EulerAngles TargetOrientation	 = EulerAngles::Zero;
+	EulerAngles TargetOrientation	 = EulerAngles::Zero; // TargetOrient
 
 	int		 WaterSurfaceDist	= 0;
 	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
