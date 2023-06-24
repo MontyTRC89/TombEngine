@@ -146,7 +146,6 @@ void InitializeLaraAnims(ItemInfo* item)
 
 void InitializeLaraLoad(short itemNumber)
 {
-	LaraItem->Index = itemNumber;
 	LaraItem = &g_Level.Items[itemNumber];
 }
 
