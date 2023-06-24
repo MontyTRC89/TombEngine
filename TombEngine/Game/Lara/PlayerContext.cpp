@@ -64,7 +64,7 @@ namespace TEN::Player
 
 		// Assess point collision.
 		if (relFloorHeight <= LOWER_FLOOR_BOUND && // Floor height is above lower floor bound.
-			relFloorHeight >= UPPER_FLOOR_BOUND)   // Floor height is below than upper floor bound.
+			relFloorHeight >= UPPER_FLOOR_BOUND)   // Floor height is below upper floor bound.
 		{
 			return true;
 		}
@@ -163,7 +163,7 @@ namespace TEN::Player
 		return false;
 	}
 
-	static bool TestGroundMovementSetup(const ItemInfo& item, const CollisionInfo& coll, const GroundMovementSetupData& setupData, bool isCrawling = false)
+	static bool TestGroundMovementSetup(const ItemInfo& item, const CollisionInfo& coll, const GroundMovementSetupData& setup, bool isCrawling = false)
 	{
 		// HACK: coll.Setup.Radius and coll.Setup.Height are set only in lara_col functions and then reset by LaraAboveWater() to defaults.
 		// This means they will store the wrong values for any context assessment functions called in crouch/crawl lara_as routines.
@@ -172,13 +172,13 @@ namespace TEN::Player
 		int playerHeight = isCrawling ? LARA_HEIGHT_CRAWL : coll.Setup.Height;
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, setupData.HeadingAngle, OFFSET_RADIUS(playerRadius), -playerHeight);
+		auto pointColl = GetCollision(&item, setup.HeadingAngle, OFFSET_RADIUS(playerRadius), -playerHeight);
 		int vPos = item.Pose.Position.y;
 		int vPosTop = vPos - playerHeight;
 
-		bool isSlipperySlopeDown = setupData.TestSlipperySlopeBelow ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor > vPos)) : false;
-		bool isSlipperySlopeUp	 = setupData.TestSlipperySlopeAbove ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor < vPos)) : false;
-		bool isDeathFloor		 = setupData.TestDeathFloor			? pointColl.Block->Flags.Death										   : false;
+		bool isSlipperySlopeDown = setup.TestSlipperySlopeBelow ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor > vPos)) : false;
+		bool isSlipperySlopeUp	 = setup.TestSlipperySlopeAbove ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor < vPos)) : false;
+		bool isDeathFloor		 = setup.TestDeathFloor			? pointColl.Block->Flags.Death										   : false;
 
 		// 2) Check for slippery floor slope or death floor (if applicable).
 		if (isSlipperySlopeDown || isSlipperySlopeUp || isDeathFloor)
@@ -187,12 +187,12 @@ namespace TEN::Player
 		// Raycast setup at upper floor bound.
 		auto origin0 = GameVector(
 			item.Pose.Position.x,
-			(vPos + setupData.UpperFloorBound) - 1,
+			(vPos + setup.UpperFloorBound) - 1,
 			item.Pose.Position.z,
 			item.RoomNumber);
 		auto target0 = GameVector(
 			pointColl.Coordinates.x,
-			(vPos + setupData.UpperFloorBound) - 1,
+			(vPos + setup.UpperFloorBound) - 1,
 			pointColl.Coordinates.z,
 			item.RoomNumber);
 
@@ -219,10 +219,10 @@ namespace TEN::Player
 		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
 		// 4) Assess point collision.
-		if (relFloorHeight <= setupData.LowerFloorBound && // Floor height is above lower floor bound.
-			relFloorHeight >= setupData.UpperFloorBound && // Floor height is below upper floor bound.
-			relCeilHeight < -playerHeight &&			   // Ceiling height is above player height.
-			floorToCeilHeight > playerHeight)			   // Floor-to-ceiling height isn't too narrow.
+		if (relFloorHeight <= setup.LowerFloorBound && // Floor height is above lower floor bound.
+			relFloorHeight >= setup.UpperFloorBound && // Floor height is below upper floor bound.
+			relCeilHeight < -playerHeight &&		   // Ceiling height is above player height.
+			floorToCeilHeight > playerHeight)		   // Floor-to-ceiling height isn't too narrow.
 		{
 			return true;
 		}
@@ -245,60 +245,60 @@ namespace TEN::Player
 
 	bool CanRunForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = GroundMovementSetupData
+		auto setup = GroundMovementSetupData
 		{
 			item.Pose.Orientation.y,
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by run forward state.
 			false, true, false
 		};
 
-		return TestGroundMovementSetup(item, coll, setupData);
+		return TestGroundMovementSetup(item, coll, setup);
 	}
 
 	bool CanRunBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = GroundMovementSetupData
+		auto setup = GroundMovementSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by run backward state.
 			false, false, false
 		};
 
-		return TestGroundMovementSetup(item, coll, setupData);
+		return TestGroundMovementSetup(item, coll, setup);
 	}
 
 	bool CanWalkForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = GroundMovementSetupData
+		auto setup = GroundMovementSetupData
 		{
 			item.Pose.Orientation.y,
 			STEPUP_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by walk forward state.
 		};
 
-		return TestGroundMovementSetup(item, coll, setupData);
+		return TestGroundMovementSetup(item, coll, setup);
 	}
 
 	bool CanWalkBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = GroundMovementSetupData
+		auto setup = GroundMovementSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			STEPUP_HEIGHT, -STEPUP_HEIGHT // NOTE: Bounds defined by walk backward state.
 		};
 
-		return TestGroundMovementSetup(item, coll, setupData);
+		return TestGroundMovementSetup(item, coll, setup);
 	}
 
 	static bool TestSidestep(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
 	{
 		const auto& player = GetLaraInfo(item);
 
-		auto setupData = GroundMovementSetupData{};
+		auto setup = GroundMovementSetupData{};
 
 		// Wade case.
 		if (player.Control.WaterStatus == WaterStatus::Wade)
 		{
-			setupData = GroundMovementSetupData
+			setup = GroundMovementSetupData
 			{
 				short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 				-MAX_HEIGHT, -(int)CLICK(1.25f), // NOTE: Upper bound defined by sidestep left/right states.
@@ -308,14 +308,14 @@ namespace TEN::Player
 		// Regular case.
 		else
 		{
-			setupData = GroundMovementSetupData
+			setup = GroundMovementSetupData
 			{
 				short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 				(int)CLICK(1.25f), -(int)CLICK(1.25f) // NOTE: Bounds defined by sidestep left/right states.
 			};
 		}
 
-		return TestGroundMovementSetup(item, coll, setupData);
+		return TestGroundMovementSetup(item, coll, setup);
 	}
 
 	bool CanSidestepLeft(const ItemInfo& item, const CollisionInfo& coll)
@@ -336,7 +336,7 @@ namespace TEN::Player
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		auto setupData = GroundMovementSetupData
+		auto setup = GroundMovementSetupData
 		{
 			item.Pose.Orientation.y,
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by wade forward state.
@@ -344,7 +344,7 @@ namespace TEN::Player
 		};
 
 		// 2) Assess context.
-		return TestGroundMovementSetup(item, coll, setupData);
+		return TestGroundMovementSetup(item, coll, setup);
 	}
 
 	bool CanWadeBackward(const ItemInfo& item, const CollisionInfo& coll)
@@ -355,7 +355,7 @@ namespace TEN::Player
 		if (player.Control.WaterStatus != WaterStatus::Wade)
 			return false;
 
-		auto setupData = GroundMovementSetupData
+		auto setup = GroundMovementSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by walk backward state.
@@ -363,7 +363,7 @@ namespace TEN::Player
 		};
 
 		// 2) Assess context.
-		return TestGroundMovementSetup(item, coll, setupData);
+		return TestGroundMovementSetup(item, coll, setup);
 	}
 
 	bool CanSlide(const ItemInfo& item, const CollisionInfo& coll)
@@ -441,8 +441,8 @@ namespace TEN::Player
 
 		// Assess back point collision.
 		if (relFloorHeightBack <= CRAWL_STEPUP_HEIGHT && // Floor is within upper/lower floor bounds.
-			floorToCeilHeightBack < LARA_HEIGHT &&		  // Floor-to-ceiling height isn't too wide.
-			floorToCeilHeightBack > LARA_HEIGHT_CRAWL)	  // Floor-to-ceiling height isn't too narrow.
+			floorToCeilHeightBack < LARA_HEIGHT &&		 // Floor-to-ceiling height isn't too wide.
+			floorToCeilHeightBack > LARA_HEIGHT_CRAWL)	 // Floor-to-ceiling height isn't too narrow.
 		{
 			return true;
 		}
@@ -455,8 +455,8 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Assess player status.
-		if (player.Control.WaterStatus != WaterStatus::Wade &&			 // Player is wading.
-			(player.Control.HandStatus == HandStatus::Free ||			 // Player hands are free.
+		if (player.Control.WaterStatus != WaterStatus::Wade &&			  // Player is wading.
+			(player.Control.HandStatus == HandStatus::Free ||			  // Player hands are free.
 				!IsStandingWeapon(&item, player.Control.Weapon.GunType))) // OR player is wielding a non-standing weapon.
 		{
 			return true;
@@ -472,7 +472,7 @@ namespace TEN::Player
 		// Assess player status.
 		if (!(IsHeld(In::Flare) || IsHeld(In::DrawWeapon)) &&		   // Avoid unsightly concurrent actions.
 			player.Control.HandStatus == HandStatus::Free &&		   // Hands are free.
-			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare. TODO: Should be allowed, but the flare animation bugs out right now. -- Sezz 2022.03.18
+			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare. TODO: Should be allowed, but flare animation bugs out. -- Sezz 2022.03.18
 				player.Flare.Life))
 		{
 			return true;
@@ -500,15 +500,15 @@ namespace TEN::Player
 			return false;
 
 		// TODO: Extend point collision struct to also find water depths.
-		float distance = 0.0f;
+		float dist = 0.0f;
 		auto pointColl0 = GetCollision(&item);
 
 		// 3) Test continuity of path.
-		while (distance < PROBE_DIST_MAX)
+		while (dist < PROBE_DIST_MAX)
 		{
 			// Get point collision.
-			distance += STEP_DIST;
-			auto pointColl1 = GetCollision(&item, item.Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
+			dist += STEP_DIST;
+			auto pointColl1 = GetCollision(&item, item.Pose.Orientation.y, dist, -LARA_HEIGHT_CRAWL);
 
 			int floorHeightDelta = abs(pointColl0.Position.Floor - pointColl1.Position.Floor);
 			int floorToCeilHeight = abs(pointColl1.Position.Ceiling - pointColl1.Position.Floor);
@@ -529,24 +529,24 @@ namespace TEN::Player
 
 	bool CanCrawlForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = GroundMovementSetupData
+		auto setup = GroundMovementSetupData
 		{
 			item.Pose.Orientation.y,
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Bounds defined by crawl forward state.
 		};
 
-		return TestGroundMovementSetup(item, coll, setupData, true);
+		return TestGroundMovementSetup(item, coll, setup, true);
 	}
 
 	bool CanCrawlBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = GroundMovementSetupData
+		auto setup = GroundMovementSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Bounds defined by crawl backward state.
 		};
 
-		return TestGroundMovementSetup(item, coll, setupData, true);
+		return TestGroundMovementSetup(item, coll, setup, true);
 	}
 
 	bool CanPerformMonkeyStep(const ItemInfo& item, const CollisionInfo& coll)
@@ -627,13 +627,13 @@ namespace TEN::Player
 		return false;
 	}
 
-	static bool TestMonkeySwingSetup(const ItemInfo& item, const CollisionInfo& coll, const MonkeySwingSetupData& setupData)
+	static bool TestMonkeySwingSetup(const ItemInfo& item, const CollisionInfo& coll, const MonkeySwingSetupData& setup)
 	{
 		// HACK: Have to make the height explicit for now. -- Sezz 2022.07.28
 		constexpr auto PLAYER_HEIGHT = LARA_HEIGHT_MONKEY;
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, setupData.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius));
+		auto pointColl = GetCollision(&item, setup.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius));
 
 		// 1) Test if ceiling is monkey swing.
 		if (!pointColl.BottomBlock->Flags.Monkeyswing)
@@ -661,12 +661,12 @@ namespace TEN::Player
 		// Raycast setup at lower ceiling bound.
 		auto origin1 = GameVector(
 			item.Pose.Position.x,
-			(vPosTop + setupData.LowerCeilingBound) + 1,
+			(vPosTop + setup.LowerCeilingBound) + 1,
 			item.Pose.Position.z,
 			item.RoomNumber);
 		auto target1 = GameVector(
 			pointColl.Coordinates.x,
-			(vPosTop + setupData.LowerCeilingBound) + 1,
+			(vPosTop + setup.LowerCeilingBound) + 1,
 			pointColl.Coordinates.z,
 			item.RoomNumber);
 
@@ -681,10 +681,10 @@ namespace TEN::Player
 		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
 		// 4) Assess point collision.
-		if (relFloorHeight > 0 &&							// Floor is within highest floor bound (player base).
-			relCeilHeight <= setupData.LowerCeilingBound && // Ceiling is within lower ceiling bound.
-			relCeilHeight >= setupData.UpperCeilingBound && // Ceiling is within upper ceiling bound.
-			floorToCeilHeight > PLAYER_HEIGHT)				// Space is not too narrow.
+		if (relFloorHeight > 0 &&						// Floor is within highest floor bound (player base).
+			relCeilHeight <= setup.LowerCeilingBound && // Ceiling is within lower ceiling bound.
+			relCeilHeight >= setup.UpperCeilingBound && // Ceiling is within upper ceiling bound.
+			floorToCeilHeight > PLAYER_HEIGHT)			// Space is not too narrow.
 		{
 			return true;
 		}
@@ -694,35 +694,35 @@ namespace TEN::Player
 
 	bool CanMonkeyForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = MonkeySwingSetupData
+		auto setup = MonkeySwingSetupData
 		{
 			item.Pose.Orientation.y,
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey forward state.
 		};
 
-		return TestMonkeySwingSetup(item, coll, setupData);
+		return TestMonkeySwingSetup(item, coll, setup);
 	}
 
 	bool CanMonkeyBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setupData = MonkeySwingSetupData
+		auto setup = MonkeySwingSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey backward state.
 		};
 
-		return TestMonkeySwingSetup(item, coll, setupData);
+		return TestMonkeySwingSetup(item, coll, setup);
 	}
 
 	static bool TestMonkeyShimmy(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
 	{
-		auto setupData = MonkeySwingSetupData
+		auto setup = MonkeySwingSetupData
 		{
 			short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 			CLICK(0.5f), -CLICK(0.5f) // NOTE: Bounds defined by monkey shimmy left/right states.
 		};
 
-		return TestMonkeySwingSetup(item, coll, setupData);
+		return TestMonkeySwingSetup(item, coll, setup);
 	}
 
 	bool CanMonkeyShimmyLeft(const ItemInfo& item, const CollisionInfo& coll)
@@ -781,11 +781,11 @@ namespace TEN::Player
 		return !TestEnvironment(ENV_FLAG_SWAMP, &item);
 	}
 
-	static bool TestJumpSetup(const ItemInfo& item, const CollisionInfo& coll, const JumpSetupData& setupData)
+	static bool TestJumpSetup(const ItemInfo& item, const CollisionInfo& coll, const JumpSetupData& setup)
 	{
 		const auto& player = GetLaraInfo(item);
 
-		bool isWading = setupData.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
+		bool isWading = setup.TestWadeStatus ? (player.Control.WaterStatus == WaterStatus::Wade) : false;
 		bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
 
 		// 1) Check for swamp or wade status (if applicable).
@@ -793,11 +793,11 @@ namespace TEN::Player
 			return false;
 
 		// 2) Check for corner.
-		if (TestLaraFacingCorner(&item, setupData.HeadingAngle, setupData.Distance))
+		if (TestLaraFacingCorner(&item, setup.HeadingAngle, setup.Distance))
 			return false;
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, setupData.HeadingAngle, setupData.Distance, -coll.Setup.Height);
+		auto pointColl = GetCollision(&item, setup.HeadingAngle, setup.Distance, -coll.Setup.Height);
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
 
@@ -815,14 +815,14 @@ namespace TEN::Player
 
 	bool CanJumpUp(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto setupData = JumpSetupData
+		constexpr auto setup = JumpSetupData
 		{
 			0,
 			0.0f,
 			false
 		};
 
-		return TestJumpSetup(item, coll, setupData);
+		return TestJumpSetup(item, coll, setup);
 	}
 
 	static bool TestDirectionalStandingJump(const ItemInfo& item, const CollisionInfo& coll, short relHeadingAngle)
@@ -831,13 +831,13 @@ namespace TEN::Player
 		if (TestEnvironment(ENV_FLAG_SWAMP, &item))
 			return false;
 
-		auto setupData = JumpSetupData
+		auto setup = JumpSetupData
 		{
 			short(item.Pose.Orientation.y + relHeadingAngle),
 			CLICK(0.85f)
 		};
 
-		return TestJumpSetup(item, coll, setupData);
+		return TestJumpSetup(item, coll, setup);
 	}
 
 	bool CanJumpForward(const ItemInfo& item, const CollisionInfo& coll)
@@ -896,13 +896,13 @@ namespace TEN::Player
 		if (player.Control.Count.Run < PLAYER_RUN_JUMP_TIME)
 			return false;
 
-		auto setupData = JumpSetupData
+		auto setup = JumpSetupData
 		{
 			item.Pose.Orientation.y,
 			CLICK(3 / 2.0f)
 		};
 
-		return TestJumpSetup(item, coll, setupData);
+		return TestJumpSetup(item, coll, setup);
 	}
 
 	bool CanSprintJumpForward(const ItemInfo& item, const CollisionInfo& coll)
@@ -921,14 +921,14 @@ namespace TEN::Player
 		if (player.Control.Count.Run < PLAYER_SPRINT_JUMP_TIME)
 			return false;
 
-		auto setupData = JumpSetupData
+		auto setup = JumpSetupData
 		{
 			item.Pose.Orientation.y,
 			CLICK(1.8f)
 		};
 
 		// 4) Assess context.
-		return TestJumpSetup(item, coll, setupData);
+		return TestJumpSetup(item, coll, setup);
 	}
 
 	bool CanPerformSlideJump(const ItemInfo& item, const CollisionInfo& coll)
