@@ -218,10 +218,48 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
 	GetCollisionInfo(coll, item, Vector3i::Zero, resetRoom);
 }
 
-void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom)
+static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSetup& collSetup, const CollisionResult& pointColl,
+							 const Vector3i& probePos, int realRoomNumber)
 {
 	constexpr auto ASPECT_ANGLE_DELTA_MAX = ANGLE(90.0f);
 
+	auto floorNormal = GetSurfaceNormal(pointColl.FloorTilt, true);
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+	short aspectAngleDelta = Geometry::GetShortestAngle(collSetup.ForwardAngle, aspectAngle);
+
+	if (collSetup.BlockFloorSlopeUp &&
+		sectorAttribs.FloorSlope &&
+		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
+	{
+		sectorAttribs.Floor = MAX_HEIGHT;
+	}
+	else if (collSetup.BlockFloorSlopeDown &&
+		sectorAttribs.FloorSlope &&
+		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
+	{
+		sectorAttribs.Floor = MAX_HEIGHT;
+	}
+	else if (collSetup.BlockCeilingSlope &&
+		sectorAttribs.CeilingSlope)
+	{
+		sectorAttribs.Floor = MAX_HEIGHT;
+	}
+	else if (collSetup.BlockDeathFloorDown &&
+		sectorAttribs.Floor >= CLICK(0.5f) &&
+		pointColl.BottomBlock->Flags.Death)
+	{
+		sectorAttribs.Floor = MAX_HEIGHT;
+	}
+	else if (collSetup.BlockMonkeySwingEdge)
+	{
+		auto monkeyPointColl = GetCollision(probePos.x, probePos.y + collSetup.Height, probePos.z, realRoomNumber);
+		if (!monkeyPointColl.BottomBlock->Flags.Monkeyswing)
+			sectorAttribs.Floor = MAX_HEIGHT;
+	}
+}
+
+void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom)
+{
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
 	bool doPlayerCollision = item->IsLara();
@@ -405,39 +443,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (height != NO_HEIGHT)
 		height -= (doPlayerCollision ? entityPos.y : probePos.y);
 
-	auto floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
-	short aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
-
-	if (coll->Setup.BlockFloorSlopeUp &&
-		coll->Front.FloorSlope &&
-		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->Front.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockFloorSlopeDown &&
-		coll->Front.FloorSlope &&
-		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->Front.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockCeilingSlope &&
-		coll->Front.CeilingSlope)
-	{
-		coll->Front.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockDeathFloorDown &&
-		coll->Front.Floor >= CLICK(0.5f) &&
-		collResult.BottomBlock->Flags.Death)
-	{
-		coll->Front.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockMonkeySwingEdge)
-	{
-		auto monkeyProbe = GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, realRoomNumber);
-		if (!monkeyProbe.BottomBlock->Flags.Monkeyswing)
-			coll->Front.Floor = MAX_HEIGHT;
-	}
+	SetSectorAttribs(coll->Front, coll->Setup, collResult, probePos, realRoomNumber);
 
 	// TEST 4: MIDDLE-LEFT PROBE
 
@@ -472,38 +478,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 
-	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
-	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
-	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
-
-	if (coll->Setup.BlockFloorSlopeUp &&
-		coll->MiddleLeft.FloorSlope &&
-		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->MiddleLeft.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockFloorSlopeDown &&
-		coll->MiddleLeft.FloorSlope &&
-		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->MiddleLeft.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockCeilingSlope &&
-		coll->MiddleLeft.CeilingSlope)
-	{
-		coll->MiddleLeft.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockDeathFloorDown &&
-		coll->MiddleLeft.Floor >= CLICK(0.5f) &&
-		collResult.BottomBlock->Flags.Death)
-	{
-		coll->MiddleLeft.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockMonkeySwingEdge &&
-		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
-	{
-		coll->MiddleLeft.Floor = MAX_HEIGHT;
-	}
+	SetSectorAttribs(coll->MiddleLeft, coll->Setup, collResult, probePos, realRoomNumber);
 
 	// TEST 5: FRONT-LEFT PROBE
 
@@ -533,38 +508,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 
-	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
-	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
-	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
-
-	if (coll->Setup.BlockFloorSlopeUp &&
-		coll->FrontLeft.FloorSlope &&
-		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->FrontLeft.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockFloorSlopeDown &&
-		coll->FrontLeft.FloorSlope &&
-		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->FrontLeft.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockCeilingSlope &&
-		coll->FrontLeft.CeilingSlope)
-	{
-		coll->FrontLeft.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockDeathFloorDown &&
-		coll->FrontLeft.Floor >= CLICK(0.5f) &&
-		collResult.BottomBlock->Flags.Death)
-	{
-		coll->FrontLeft.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockMonkeySwingEdge &&
-		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
-	{
-		coll->FrontLeft.Floor = MAX_HEIGHT;
-	}
+	SetSectorAttribs(coll->FrontLeft, coll->Setup, collResult, probePos, realRoomNumber);
 
 	// TEST 6: MIDDLE-RIGHT PROBE
 
@@ -599,38 +543,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 
-	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
-	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
-	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
-
-	if (coll->Setup.BlockFloorSlopeUp &&
-		coll->MiddleRight.FloorSlope &&
-		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->MiddleRight.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockFloorSlopeDown &&
-		coll->MiddleRight.FloorSlope &&
-		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->MiddleRight.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockCeilingSlope &&
-		coll->MiddleRight.CeilingSlope)
-	{
-		coll->MiddleRight.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockDeathFloorDown &&
-		coll->MiddleRight.Floor >= CLICK(0.5f) &&
-		collResult.BottomBlock->Flags.Death)
-	{
-		coll->MiddleRight.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockMonkeySwingEdge &&
-		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
-	{
-		coll->MiddleRight.Floor = MAX_HEIGHT;
-	}
+	SetSectorAttribs(coll->MiddleRight, coll->Setup, collResult, probePos, realRoomNumber);
 
 	// TEST 7: FRONT-RIGHT PROBE
 
@@ -660,38 +573,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 
-	floorNormal = GetSurfaceNormal(collResult.FloorTilt, true);
-	aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
-	aspectAngleDelta = Geometry::GetShortestAngle(coll->Setup.ForwardAngle, aspectAngle);
-
-	if (coll->Setup.BlockFloorSlopeUp &&
-		coll->FrontRight.FloorSlope &&
-		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->FrontRight.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockFloorSlopeDown &&
-		coll->FrontRight.FloorSlope &&
-		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
-	{
-		coll->FrontRight.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockCeilingSlope &&
-		coll->FrontRight.CeilingSlope)
-	{
-		coll->FrontRight.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockDeathFloorDown &&
-		coll->FrontRight.Floor >= CLICK(0.5f) &&
-		collResult.BottomBlock->Flags.Death)
-	{
-		coll->FrontRight.Floor = MAX_HEIGHT;
-	}
-	else if (coll->Setup.BlockMonkeySwingEdge &&
-		!GetCollision(probePos.x, probePos.y + coll->Setup.Height, probePos.z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
-	{
-		coll->FrontRight.Floor = MAX_HEIGHT;
-	}
+	SetSectorAttribs(coll->FrontRight, coll->Setup, collResult, probePos, realRoomNumber);
 
 	// TEST 8: SOLID STATIC MESHES
 
