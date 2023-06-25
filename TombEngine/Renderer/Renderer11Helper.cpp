@@ -416,18 +416,25 @@ namespace TEN::Renderer
 
 		if (!itemToDraw->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
+			{
 				UpdateLaraAnimations(false);
+			}
 			else
+			{
 				UpdateItemAnimations(itemNumber, false);
+			}
 		}
 
-		Matrix world;
-
+		auto world = Matrix::Identity;
 		if (worldSpace & SPHERES_SPACE_WORLD)
+		{
 			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+		}
 		else
+		{
 			world = Matrix::Identity * local;
+		}
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
@@ -455,7 +462,7 @@ namespace TEN::Renderer
 
 	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
 	{
-		if (itemNumber == Lara.ItemNumber)
+		if (itemNumber == LaraItem->Index)
 		{
 			auto& object = *m_moveableObjects[ID_LARA];
 			*outMatrix = object.AnimationTransforms[jointIndex] * m_LaraWorldMatrix;
@@ -549,7 +556,7 @@ namespace TEN::Renderer
 
 		if (!rendererItem->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
 				UpdateLaraAnimations(false);
 			else
 				UpdateItemAnimations(itemNumber, false);

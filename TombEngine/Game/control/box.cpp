@@ -566,7 +566,7 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 	playerItem.Animation.Velocity = Vector3::Zero;
 
 	if (creatureItem->RoomNumber != playerItem.RoomNumber)
-		ItemNewRoom(player.ItemNumber, creatureItem->RoomNumber);
+		ItemNewRoom(playerItem.Index, creatureItem->RoomNumber);
 
 	AnimateItem(&playerItem);
 

@@ -247,7 +247,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawGunShells(RenderView& view)
 	{
 		auto& room = m_rooms[LaraItem->RoomNumber];
-		auto* item = &m_items[Lara.ItemNumber];
+		auto* item = &m_items[LaraItem->Index];
 
 		int gunShellsCount = 0;
 		short objectNumber = 0;

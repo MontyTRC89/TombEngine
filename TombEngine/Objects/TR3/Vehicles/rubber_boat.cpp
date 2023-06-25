@@ -161,7 +161,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (laraItem->RoomNumber != rBoatItem->RoomNumber)
-			ItemNewRoom(lara->ItemNumber, rBoatItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, rBoatItem->RoomNumber);
 
 		laraItem->Pose.Position = rBoatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
@@ -793,7 +793,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Position.z = z;
 
 				if (probe.RoomNumber != laraItem->RoomNumber)
-					ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+					ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 			laraItem->Pose.Position.y = y;
 
@@ -898,7 +898,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != rBoatItem->RoomNumber)
 			{
 				ItemNewRoom(itemNumber, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;

@@ -213,7 +213,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 
 		if (laraItem->RoomNumber != speedboatItem->RoomNumber)
-			ItemNewRoom(lara->ItemNumber, speedboatItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, speedboatItem->RoomNumber);
 
 		laraItem->Pose.Position = speedboatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
@@ -289,7 +289,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Position.z = z;
 
 				if (probe.RoomNumber != laraItem->RoomNumber)
-					ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+					ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 			laraItem->Pose.Position.y = y;
 
@@ -901,7 +901,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != speedboatItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose = speedboatItem->Pose;

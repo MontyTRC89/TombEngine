@@ -37,7 +37,7 @@ table Item {
 	carried_item: int32;
 	after_death: int32;
 	item_flags: [int32];
-	pose: Position;
+	pose: Pose;
 	next_item: int32;
 	next_item_active: int32;
 	active: bool;
@@ -65,7 +65,7 @@ table Item {
 }
 
 table FXInfo {
-	pose : Position;
+	pose : Pose;
 	room_number: int32;
 	object_number: int32;
 	next_fx: int32;
@@ -112,7 +112,7 @@ table ArmInfo {
 	frame_number: int32;
 	frame_base: int32;
 	locked: bool;
-	rotation: Vector3;
+	rotation: EulerAngles;
 	gun_flash: int32;
 	gun_smoke: int32;
 }
@@ -222,7 +222,6 @@ table SubsuitControlData {
 table LaraControlData {
 	move_angle: int32;
 	turn_rate: int32;
-	calculated_jump_velocity: int32;
 	jump_direction: int32;
 	hand_status: int32;
 	water_status: int32;
@@ -254,40 +253,39 @@ table PlayerStatusData {
 	stamina: int32;
 }
 
-table Lara {
-	effect: PlayerEffectData;
-	status: PlayerStatusData;
-	item_number: int32;
-	control: LaraControlData;
-	inventory: LaraInventoryData;
-	weapons: [CarriedWeaponInfo];
-	flare: FlareData;
-	torch: TorchData;
-	extra_head_rot: Vector3;
-	extra_torso_rot: Vector3;
+table PlayerContextData {
+	calc_jump_velocity: int32;
+	interacted_item_number: int32;
+	next_corner_pose: Pose;
+	projected_floor_height: int32;
+	target_orient: EulerAngles;
+	vehicle_item_number: int32;
 	water_current_active: int32;
 	water_current_pull: Vector3;
-	left_arm: ArmInfo;
-	right_arm: ArmInfo;
-	target_arm_angles: [int32];
-	target_entity_number: int32;
-	vehicle: int32;
-	extra_anim: int32;
-	hit_frame: int32;
-	hit_direction: int32;
-	projected_floor_height: int32;
-	target_facing_angle: int32;
 	water_surface_dist: int32;
-	interacted_item: int32;
-	next_corner_pose: Position;
-	burn_type: int32;
-	burn_count: uint32;
-	burn: bool;
-	burn_blue: int32;
-	burn_smoke: bool;
-	location: int32;
+}
+
+table Lara {
+	context: PlayerContextData;
+	control: LaraControlData;
+	effect: PlayerEffectData;
+	extra_anim: int32;
+	extra_head_rot: EulerAngles;
+	extra_torso_rot: EulerAngles;
+	flare: FlareData;
 	highest_location: int32;
+	hit_direction: int32;
+	hit_frame: int32;
+	inventory: LaraInventoryData;
+	left_arm: ArmInfo;
+	location: int32;
 	location_pad: int32;
+	right_arm: ArmInfo;
+	status: PlayerStatusData;
+	target_arm_orient: EulerAngles;
+	target_entity_number: int32;
+	torch: TorchData;
+	weapons: [CarriedWeaponInfo];
 }
 
 table FixedCamera {
@@ -305,7 +303,7 @@ table Sink {
 table StaticMeshInfo {
 	number: int32;
 	room_number: int32;
-	pose: Position;
+	pose: Pose;
 	scale: float;
 	color: Vector4;
 	hit_points: int32;
@@ -354,7 +352,7 @@ table ParticleInfo {
 
 table SwarmObjectInfo {
 	on: bool;
-	pose: Position;
+	pose: Pose;
 	room_number: int32;
 	flags: int32;
 }
