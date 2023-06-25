@@ -200,7 +200,7 @@ void ObjectsHandler::TestCollidingObjects()
 
 void ObjectsHandler::AssignLara()
 {
-	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, true));
+	m_table_objects.set(ScriptReserved_Lara, LaraObject(LaraItem->Index, true));
 }
 
 bool ObjectsHandler::NotifyKilled(ItemInfo* key)

@@ -361,7 +361,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 		if (GetClimbFlags(probeUp.BottomBlock) & slopeData.ClimbOrient &&
 			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, CLICK(3), CLICK(4)))
 		{
-			if (GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= (SECTOR(1.5f) - 80))  // Check if a wall is actually there.
+			if (GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= (BLOCK(1.5f) - 80))  // Check if a wall is actually there.
 			{
 				AlignToEdge(item, FORWARD_ALIGNMENT);
 				SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONVEX_START);
@@ -451,7 +451,7 @@ void lara_as_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	Camera.targetElevation = -ANGLE(16.75f);
-	Camera.targetDistance = SECTOR(1.75f);
+	Camera.targetDistance = BLOCK(1.75f);
 	Camera.speed = 15;
 }
 
@@ -470,7 +470,7 @@ void lara_as_slopefall(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	Camera.targetElevation = -ANGLE(16.75f);
-	Camera.targetDistance = SECTOR(1.75f);
+	Camera.targetDistance = BLOCK(1.75f);
 	Camera.speed = 15;
 }
 
@@ -547,7 +547,7 @@ void lara_as_slopehang(ItemInfo* item, CollisionInfo* coll)
 	if (Camera.type != CameraType::Chase)
 		return;
 
-	Camera.targetElevation = -SECTOR(1);
+	Camera.targetElevation = -BLOCK(1);
 	Camera.targetDistance = CLICK(6.5f);
 	Camera.speed = 15;
 }
@@ -604,7 +604,7 @@ void lara_as_slopeshimmy(ItemInfo* item, CollisionInfo* coll)
 	if (Camera.type != CameraType::Chase)
 		return;
 
-	Camera.targetElevation = -SECTOR(1);
+	Camera.targetElevation = -BLOCK(1);
 	Camera.targetDistance = CLICK(6.5f);
 	Camera.speed = 15;
 
@@ -634,7 +634,7 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 	if (Camera.type != CameraType::Chase)
 		return; // If camera mode isn't chase (0) then don't change camera angles.
 
-	Camera.targetElevation = SECTOR(2);
+	Camera.targetElevation = BLOCK(2);
 	Camera.targetDistance = CLICK(7);
 	Camera.speed = 15;
 
@@ -697,12 +697,12 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 
 		Camera.flags = CF_FOLLOW_CENTER;
 
-		int distance = TestLaraWall(item, 0, SECTOR(1.5f), 0) ? SECTOR(1) : CLICK(6.5f);
+		int distance = TestLaraWall(item, 0, BLOCK(1.5f), 0) ? BLOCK(1) : CLICK(6.5f);
 
 		if (item->Animation.FrameNumber < GetAnimData(item).frameEnd)
 		{
 			Camera.targetDistance = distance;
-			Camera.targetElevation = int(SECTOR(3) * frac);
+			Camera.targetElevation = int(BLOCK(3) * frac);
 			Camera.targetAngle = int(-ANGLE(180.0f) * frac);
 			Camera.targetspeed = 15;
 		}
@@ -710,7 +710,7 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 		{
 
 			Camera.targetDistance = distance;
-			Camera.targetElevation = SECTOR(3);
+			Camera.targetElevation = BLOCK(3);
 			Camera.targetAngle = 0;
 			Camera.targetspeed = 15;
 		}
@@ -757,13 +757,13 @@ void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 		{
 			
 			Camera.targetAngle = (short)(-ANGLE(90.0f) * frac);
-			Camera.targetDistance = SECTOR(1.75f) - int(CLICK(2) * frac);
+			Camera.targetDistance = BLOCK(1.75f) - int(CLICK(2) * frac);
 			Camera.targetspeed = 15;
 		}
 		else
 		{
 			Camera.targetAngle = ANGLE(90.0f);
-			Camera.targetDistance = SECTOR(1.25f);
+			Camera.targetDistance = BLOCK(1.25f);
 			Camera.targetspeed = 15;
 		}
 	}

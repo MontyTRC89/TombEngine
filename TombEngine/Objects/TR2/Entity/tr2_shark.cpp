@@ -15,7 +15,7 @@ namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SHARK_BITE_ATTACK_DAMAGE = 400;
 
-	const auto SharkBite = CreatureBiteInfo(Vector3i(17, -22, 344), 12);
+	const auto SharkBite = CreatureBiteInfo(Vector3(17, -22, 344), 12);
 	const auto SharkBiteAttackJoints = std::vector<unsigned int>{ 10, 12, 13 };
 
 	void SharkControl(short itemNumber)
@@ -52,7 +52,7 @@ namespace TEN::Entities::Creatures::TR2
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.ahead && AI.distance < pow(SECTOR(0.75f), 2) && AI.zoneNumber == AI.enemyZone)
+				if (AI.ahead && AI.distance < pow(BLOCK(0.75f), 2) && AI.zoneNumber == AI.enemyZone)
 					item->Animation.TargetState = 3;
 				else
 					item->Animation.TargetState = 1;
@@ -64,9 +64,9 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Mood == MoodType::Bored)
 					break;
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.75f), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(0.75f), 2))
 					item->Animation.TargetState = 0;
-				else if (creature->Mood == MoodType::Escape || AI.distance > pow(SECTOR(3), 2) || !AI.ahead)
+				else if (creature->Mood == MoodType::Escape || AI.distance > pow(BLOCK(3), 2) || !AI.ahead)
 					item->Animation.TargetState = 2;
 
 				break;
@@ -83,7 +83,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (GetRandomControl() < 0x800)
 						item->Animation.TargetState = 0;
-					else if (AI.distance < pow(SECTOR(0.75f), 2))
+					else if (AI.distance < pow(BLOCK(0.75f), 2))
 						item->Animation.TargetState = 4;
 				}
 

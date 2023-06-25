@@ -588,7 +588,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
 						item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						item->Pose.Position.y = waterHeight + (SECTOR(1) - 24);
+						item->Pose.Position.y = waterHeight + (BLOCK(1) - 24);
 					}
 
 					SetAnimation(item, LA_WADE);
@@ -931,7 +931,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber, &coll->Setup);
+	TestVolumes(item->Index, &coll->Setup);
 
 	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }
@@ -1005,7 +1005,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(item->Index);
 }
 
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
@@ -1094,7 +1094,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(item->Index);
 }
 
 void LaraCheat(ItemInfo* item, CollisionInfo* coll)

@@ -23,7 +23,7 @@ ObjectCollisionBounds ScalesBounds =
 	GameBoundingBox(
 		-CLICK(5.5f), -CLICK(5.5f),
 		0, 0,
-		-SECTOR(0.5f), SECTOR(0.5f)),
+		-BLOCK(0.5f), BLOCK(0.5f)),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
 		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))

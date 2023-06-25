@@ -74,13 +74,13 @@ void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
 
 int FindGridShift(int x, int z)
 {
-	if ((x / SECTOR(1)) == (z / SECTOR(1)))
+	if ((x / BLOCK(1)) == (z / BLOCK(1)))
 		return 0;
 
-	if ((z / SECTOR(1)) <= (x / SECTOR(1)))
+	if ((z / BLOCK(1)) <= (x / BLOCK(1)))
 		return (-1 - (x & WALL_MASK));
 	else
-		return ((SECTOR(1) + 1) - (x & WALL_MASK));
+		return ((BLOCK(1) + 1) - (x & WALL_MASK));
 }
 
 // Test if the axis-aligned bounding box collides with geometry at all.
@@ -1086,17 +1086,17 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				auto splitAngle = (useCeilingLedge ? block->CeilingCollision.SplitAngle : block->FloorCollision.SplitAngle);
 
 				// Get horizontal block corner coordinates.
-				auto fX = floor(eX / SECTOR(1)) * SECTOR(1) - 1;
-				auto fZ = floor(eZ / SECTOR(1)) * SECTOR(1) - 1;
-				auto cX = fX + SECTOR(1) + 1;
-				auto cZ = fZ + SECTOR(1) + 1;
+				auto fX = floor(eX / BLOCK(1)) * BLOCK(1) - 1;
+				auto fZ = floor(eZ / BLOCK(1)) * BLOCK(1) - 1;
+				auto cX = fX + BLOCK(1) + 1;
+				auto cZ = fZ + BLOCK(1) + 1;
 
 				// Debug used block
 				// g_Renderer.AddDebugSphere(Vector3(round(eX / WALL_SIZE) * WALL_SIZE + 512, y, round(eZ / WALL_SIZE) * WALL_SIZE + 512), 16, Vector4(1, 1, 1, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
 
 				// Get split angle coordinates.
-				auto sX = fX + 1 + SECTOR(0.5f);
-				auto sZ = fZ + 1 + SECTOR(0.5f);
+				auto sX = fX + 1 + BLOCK(0.5f);
+				auto sZ = fZ + 1 + BLOCK(0.5f);
 				auto sShiftX = coll->Setup.Radius * sin(splitAngle);
 				auto sShiftZ = coll->Setup.Radius * cos(splitAngle);
 
@@ -1267,7 +1267,7 @@ void AlterFloorHeight(ItemInfo* item, int height)
 
 	short roomNumber = item->RoomNumber;
 	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	FloorInfo* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - SECTOR(1), item->Pose.Position.z, &roomNumber);
+	FloorInfo* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - BLOCK(1), item->Pose.Position.z, &roomNumber);
 
 	floor->FloorCollision.Planes[0].z += height;
 	floor->FloorCollision.Planes[1].z += height;
@@ -1328,8 +1328,8 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	short roomIndex = NO_ROOM;
 	do
 	{
-		int zFloor = (z - room->z) / SECTOR(1);
-		int xFloor = (x - room->x) / SECTOR(1);
+		int zFloor = (z - room->z) / BLOCK(1);
+		int xFloor = (x - room->x) / BLOCK(1);
 
 		if (zFloor <= 0)
 		{
@@ -1416,8 +1416,8 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	short adjoiningRoom = NO_ROOM;
 	do
 	{
-		int xBlock = (x - room->x) / SECTOR(1);
-		int zBlock = (z - room->z) / SECTOR(1);
+		int xBlock = (x - room->x) / BLOCK(1);
+		int zBlock = (z - room->z) / BLOCK(1);
 
 		if (zBlock <= 0)
 		{

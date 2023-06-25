@@ -223,10 +223,10 @@ namespace TEN::Entities::Vehicles
 
 	static int DoJeepShift(ItemInfo* jeepItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int oldX = old->x / BLOCK(1);
+		int oldZ = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -1395,7 +1395,7 @@ namespace TEN::Entities::Vehicles
 			if (roomNumber != jeepItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, roomNumber);
-				ItemNewRoom(lara->ItemNumber, roomNumber);
+				ItemNewRoom(laraItem->Index, roomNumber);
 			}
 
 			laraItem->Pose = jeepItem->Pose;
@@ -1405,7 +1405,7 @@ namespace TEN::Entities::Vehicles
 			SyncVehicleAnimation(*jeepItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(30.0f);
-			Camera.targetDistance = SECTOR(2);
+			Camera.targetDistance = BLOCK(2);
 
 			if (jeep->Gear == 1)
 				jeep->CameraElevation += ((32578 - jeep->CameraElevation) / 8);

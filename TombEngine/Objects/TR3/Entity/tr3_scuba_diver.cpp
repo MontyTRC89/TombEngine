@@ -18,7 +18,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SCUBA_DIVER_ATTACK_DAMAGE = 50;
 	constexpr auto SCUBA_DIVER_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto ScubaGunBite = CreatureBiteInfo(Vector3i(17, 164, 44), 18);
+	const auto ScubaGunBite = CreatureBiteInfo(Vector3(17, 164, 44), 18);
 
 	enum ScubaDiverState
 	{
@@ -165,7 +165,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + SECTOR(0.5f);
+			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + BLOCK(0.5f);
 
 			switch (item->Animation.ActiveState)
 			{
