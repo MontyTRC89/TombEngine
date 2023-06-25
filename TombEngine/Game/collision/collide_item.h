@@ -8,7 +8,7 @@ struct ItemInfo;
 struct MESH_INFO;
 
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
-constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
+constexpr auto ITEM_RADIUS_YMAX = BLOCK(3);
 
 constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
 

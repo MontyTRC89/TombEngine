@@ -96,7 +96,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (creature->Mood == MoodType::Attack)
 				{
-					if (distance <= pow(SECTOR(1), 2))
+					if (distance <= pow(BLOCK(1), 2))
 					{
 						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = 4;
@@ -115,7 +115,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			case 2:
 			case 3:
-				if (distance < pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack)
+				if (distance < pow(BLOCK(1), 2) || creature->Mood != MoodType::Attack)
 					item->Animation.TargetState = 1;
 
 				SoundEffect(SFX_TR5_IMP_BARREL_ROLL, &item->Pose);

@@ -633,8 +633,8 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 		const auto& sink = g_Level.Sinks[lara->Context.WaterCurrentActive - 1];
 
 		short headingAngle = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), sink.Position).y;
-		lara->Context.WaterCurrentPull.x += ((sink.Strength * SECTOR(1) * phd_sin(headingAngle)) - lara->Context.WaterCurrentPull.x) / 16;
-		lara->Context.WaterCurrentPull.z += ((sink.Strength * SECTOR(1) * phd_cos(headingAngle)) - lara->Context.WaterCurrentPull.z) / 16;
+		lara->Context.WaterCurrentPull.x += ((sink.Strength * BLOCK(1) * phd_sin(headingAngle)) - lara->Context.WaterCurrentPull.x) / 16;
+		lara->Context.WaterCurrentPull.z += ((sink.Strength * BLOCK(1) * phd_cos(headingAngle)) - lara->Context.WaterCurrentPull.z) / 16;
 
 		item->Pose.Position.y += (sink.Position.y - item->Pose.Position.y) / 16;
 	}

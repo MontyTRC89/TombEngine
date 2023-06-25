@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 			angle = CreatureTurn(item, creature->MaxTurn);
 			joint0 = angle * 4;
 
-			if (creature->HurtByLara || distance < pow(SECTOR(3), 2) && !(item->AIBits & MODIFY))
+			if (creature->HurtByLara || distance < pow(BLOCK(3), 2) && !(item->AIBits & MODIFY))
 			{
 				AlertAllGuards(itemNumber);
 				item->AIBits &= ~MODIFY;
@@ -297,7 +297,7 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.bite && AI.distance < DOG_JUMP_ATTACK_RANGE)
 						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
-					else if (AI.distance < pow(SECTOR(1.5f), 2))
+					else if (AI.distance < pow(BLOCK(1.5f), 2))
 					{
 						item->Animation.TargetState = DOG_STATE_STALK_IDLE;
 						item->Animation.RequiredState = DOG_STATE_STALK;
@@ -320,7 +320,7 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = DOG_STATE_BITE_ATTACK;
 						item->Animation.RequiredState = DOG_STATE_STALK;
 					}
-					else if (AI.distance > pow(SECTOR(1.5f), 2) || item->HitStatus)
+					else if (AI.distance > pow(BLOCK(1.5f), 2) || item->HitStatus)
 						item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
 				}
 				else

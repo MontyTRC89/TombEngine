@@ -138,8 +138,8 @@ namespace TEN::Entities::Creatures::TR1
 			break;
 
 		case WMUTANT_PATH_AERIAL:
-			creature->LOT.Step = SECTOR(30);
-			creature->LOT.Drop = -SECTOR(30);
+			creature->LOT.Step = BLOCK(30);
+			creature->LOT.Drop = -BLOCK(30);
 			creature->LOT.Fly = (int)round(WINGED_MUTANT_FLY_VELOCITY);
 			break;
 		}

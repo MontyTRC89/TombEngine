@@ -324,7 +324,7 @@ namespace TEN::Entities::TR4
 			if (item->HitStatus &&
 				laraAI.angle < ANGLE(67.5f) &&
 				laraAI.angle > -ANGLE(67.5f) &&
-				laraAI.distance < pow(SECTOR(2), 2))
+				laraAI.distance < pow(BLOCK(2), 2))
 			{
 				if (item->Animation.ActiveState != HORSEMAN_STATE_SHIELD)
 				{
@@ -388,7 +388,7 @@ namespace TEN::Entities::TR4
 					creature->Flags ||
 					creature->ReachedGoal)
 				{
-					if (laraAI.distance > pow(SECTOR(4), 2) ||
+					if (laraAI.distance > pow(BLOCK(4), 2) ||
 						creature->ReachedGoal)
 					{
 						creature->Enemy = LaraItem;
@@ -408,16 +408,16 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (AI.distance >= pow(SECTOR(1), 2))
+				if (AI.distance >= pow(BLOCK(1), 2))
 				{
 					if (AI.bite)
 					{
 						if (AI.angle >= -ANGLE(10.0f) ||
-							(AI.distance >= pow(SECTOR(1), 2) &&
+							(AI.distance >= pow(BLOCK(1), 2) &&
 							(AI.distance >= pow(1365, 2) || AI.angle <= -ANGLE(20.0f))))
 						{
 							if (AI.angle > ANGLE(10.0f) &&
-								(AI.distance < pow(SECTOR(1), 2) ||
+								(AI.distance < pow(BLOCK(1), 2) ||
 									(AI.distance < pow(1365, 2) && AI.angle < ANGLE(20.0f))))
 							{
 								item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_ATTACK_RIGHT;
@@ -439,11 +439,11 @@ namespace TEN::Entities::TR4
 						if (AI.bite)
 						{
 							if (AI.angle >= -ANGLE(10.0f) ||
-								(AI.distance >= pow(SECTOR(1), 2) &&
+								(AI.distance >= pow(BLOCK(1), 2) &&
 								(AI.distance >= pow(1365, 2) || AI.angle <= -ANGLE(20.0f))))
 							{
 								if (AI.angle > ANGLE(10.0f) &&
-									(AI.distance < pow(SECTOR(1), 2) ||
+									(AI.distance < pow(BLOCK(1), 2) ||
 										AI.distance < pow(1365, 2) &&
 										AI.angle < ANGLE(20.0f)))
 								{
@@ -465,7 +465,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(1.5f);
 
-				if (laraAI.distance > pow(SECTOR(4), 2) || creature->ReachedGoal || creature->Enemy->IsLara())
+				if (laraAI.distance > pow(BLOCK(4), 2) || creature->ReachedGoal || creature->Enemy->IsLara())
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 					creature->ReachedGoal = false;
@@ -497,7 +497,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->ReachedGoal ||
 					!horseItem->Flags &&
-					AI.distance < pow(SECTOR(1), 2) &&
+					AI.distance < pow(BLOCK(1), 2) &&
 					AI.bite &&
 					AI.angle < ANGLE(10.0f) &&
 					AI.angle > -ANGLE(10.0f))
@@ -584,7 +584,7 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.bite && AI.distance < pow(682,2))
 						item->Animation.TargetState = HORSEMAN_STATE_IDLE_ATTACK;
-					else if (AI.distance < pow(SECTOR(6), 2) && AI.distance > pow(682, 2))
+					else if (AI.distance < pow(BLOCK(6), 2) && AI.distance > pow(682, 2))
 						item->Animation.TargetState = HORSEMAN_STATE_WALK_FORWARD;
 				}
 				else
@@ -625,7 +625,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Animation.TargetState = HORSEMAN_STATE_IDLE;
 				}
-				else if (AI.distance < pow(SECTOR(5), 2) && AI.distance > pow(1365, 2))
+				else if (AI.distance < pow(BLOCK(5), 2) && AI.distance > pow(1365, 2))
 					item->Animation.TargetState = HORSEMAN_STATE_RUN_FORWARD;
 
 				break;
@@ -720,7 +720,7 @@ namespace TEN::Entities::TR4
 					horseItem->Animation.FrameNumber = GetAnimData(horseItem).frameBase;
 				}
 
-				if (laraAI.distance > pow(SECTOR(4), 2) || creature->ReachedGoal)
+				if (laraAI.distance > pow(BLOCK(4), 2) || creature->ReachedGoal)
 				{
 					creature->ReachedGoal = false;
 					creature->Enemy = LaraItem;

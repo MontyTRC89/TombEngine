@@ -40,10 +40,10 @@ namespace TEN::Entities::Vehicles
 {
 	constexpr auto UPV_RADIUS = 300;
 	constexpr auto UPV_HEIGHT = 400;
-	constexpr auto UPV_LENGTH = SECTOR(1);
+	constexpr auto UPV_LENGTH = BLOCK(1);
 	constexpr auto UPV_WATER_SURFACE_DISTANCE = 210;
 	constexpr auto UPV_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto UPV_DISMOUNT_DISTANCE = SECTOR(1);
+	constexpr auto UPV_DISMOUNT_DISTANCE = BLOCK(1);
 
 	constexpr int UPV_VELOCITY_ACCEL = 4 * VEHICLE_VELOCITY_SCALE;
 	constexpr int UPV_VELOCITY_FRICTION_DECEL = 1.5f * VEHICLE_VELOCITY_SCALE;
@@ -420,8 +420,8 @@ namespace TEN::Entities::Vehicles
 			int dz = target.z - laraItem->Pose.Position.z;
 
 			int velocity = g_Level.Sinks[sinkVal].Strength;
-			dx = phd_sin(angle * 16) * velocity * SECTOR(1);
-			dz = phd_cos(angle * 16) * velocity * SECTOR(1);
+			dx = phd_sin(angle * 16) * velocity * BLOCK(1);
+			dz = phd_cos(angle * 16) * velocity * BLOCK(1);
 
 			lara->Context.WaterCurrentPull.x += ((dx - lara->Context.WaterCurrentPull.x) / 16);
 			lara->Context.WaterCurrentPull.z += ((dz - lara->Context.WaterCurrentPull.z) / 16);

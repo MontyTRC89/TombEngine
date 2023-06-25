@@ -151,7 +151,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BOAR_STATE_RUN_FORWARD:
-				if (AI.distance >= pow(SECTOR(2), 2))
+				if (AI.distance >= pow(BLOCK(2), 2))
 				{
 					creature->MaxTurn = ANGLE(6.0f);
 					item->Flags = 0;

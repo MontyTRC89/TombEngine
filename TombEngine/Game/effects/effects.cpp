@@ -1146,7 +1146,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	if (item.TriggerFlags != 0)
 	{
 		size = item.TriggerFlags % 100;
-		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, SECTOR(8));
+		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, BLOCK(8));
 	}
 
 	float cos = phd_cos(angle);

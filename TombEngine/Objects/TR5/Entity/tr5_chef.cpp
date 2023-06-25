@@ -115,8 +115,8 @@ namespace TEN::Entities::Creatures::TR5
 			switch (item->Animation.ActiveState)
 			{
 			case CHEF_STATE_COOKING:
-				if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(1) &&
-					ai.distance < pow(SECTOR(1.5f), 2) &&
+				if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < BLOCK(1) &&
+					ai.distance < pow(BLOCK(1.5f), 2) &&
 					(item->TouchBits.TestAny() ||
 						item->HitStatus ||
 						LaraItem->Animation.Velocity.z > 15 ||

@@ -491,23 +491,23 @@ namespace TEN::Entities::TR4
 					auto pos = Vector3i::Zero;
 					if (item->Pose.Orientation.y == ANGLE(270.0f))
 					{
-						pos.x = item->Pose.Position.x - SECTOR(1);
+						pos.x = item->Pose.Position.x - BLOCK(1);
 						pos.z = item->Pose.Position.z;
 					}
 					else if (item->Pose.Orientation.y == ANGLE(90.0f))
 					{
-						pos.x = item->Pose.Position.x + SECTOR(1);
+						pos.x = item->Pose.Position.x + BLOCK(1);
 						pos.z = item->Pose.Position.z;
 					}
 					else if (item->Pose.Orientation.y == ANGLE(0.0f))
 					{
 						pos.x = item->Pose.Position.x;
-						pos.z = item->Pose.Position.z + SECTOR(1);
+						pos.z = item->Pose.Position.z + BLOCK(1);
 					}
 					else if (item->Pose.Orientation.y == ANGLE(180.0f))
 					{
 						pos.x = item->Pose.Position.x;
-						pos.z = item->Pose.Position.z - SECTOR(1);
+						pos.z = item->Pose.Position.z - BLOCK(1);
 					}
 
 					pos.y = item->Pose.Position.y;

@@ -92,7 +92,7 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
 
-		if (AI.distance >= pow(SECTOR(1.5f), 2))
+		if (AI.distance >= pow(BLOCK(1.5f), 2))
 		{
 			item->AfterDeath = 125;
 			item->ItemFlags[0] = 0;

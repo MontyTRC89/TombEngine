@@ -106,7 +106,7 @@ namespace TEN::Entities::Creatures::TR5
 			case WITCH_STATE_SWIM:
 				creature->MaxTurn = ANGLE(4.0f);
 
-				if (AI.distance < pow(SECTOR(1), 2))
+				if (AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = WITCH_STATE_IDLE;
 
 				break;
@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (AI.distance < pow(CLICK(3), 2))
 					item->Animation.TargetState = WITCH_STATE_ATTACK;
-				else if (AI.distance > pow(SECTOR(1), 2))
+				else if (AI.distance > pow(BLOCK(1), 2))
 					item->Animation.TargetState = WITCH_STATE_SWIM;
 				else
 					item->Animation.TargetState = WITCH_STATE_IDLE;
