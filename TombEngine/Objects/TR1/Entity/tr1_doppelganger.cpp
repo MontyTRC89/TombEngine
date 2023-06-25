@@ -13,16 +13,16 @@
 
 namespace TEN::Entities::Creatures::TR1
 {
-	std::optional<ItemInfo&> FindDoppelgangerReference(const ItemInfo& item, int objectNumber)
+	ItemInfo* FindDoppelgangerReference(const ItemInfo& item, int objectNumber)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
 			auto& currentItem = g_Level.Items[i];
 			if (currentItem.ObjectNumber == objectNumber && item.TriggerFlags == currentItem.TriggerFlags)
-				return currentItem;
+				return &currentItem;
 		}
 
-		return std::nullopt;
+		return nullptr;
 	}
 
 	int GetWeaponDamage(LaraWeaponType weaponType)
@@ -35,21 +35,21 @@ namespace TEN::Entities::Creatures::TR1
 		if (!CreatureActive(itemNumber))
 			return;
 
-		auto* item = &g_Level.Items[itemNumber];
-		if (item->HitPoints < LARA_HEALTH_MAX)
+		auto& item = g_Level.Items[itemNumber];
+		if (item.HitPoints < LARA_HEALTH_MAX)
 		{
-			item->HitPoints = LARA_HEALTH_MAX;
+			item.HitPoints = LARA_HEALTH_MAX;
 			DoDamage(LaraItem, GetWeaponDamage(Lara.Control.Weapon.GunType));
 		}
 
-		auto reference = FindDoppelgangerReference(*item, ID_BACON_REFERENCE);
-		if (!reference.has_value())
+		auto* referencePtr = FindDoppelgangerReference(item, ID_BACON_REFERENCE);
+		if (referencePtr == nullptr)
 		{
 			TENLog("Doppelganger requires ID_DOPPELGANGER_REFERENCE to be placed in room center.", LogLevel::Warning);
 			return;
 		}
 
-		switch (item->ItemFlags[7])
+		switch (item.ItemFlags[7])
 		{
 		case 0:
 		{
@@ -57,72 +57,72 @@ namespace TEN::Entities::Creatures::TR1
 
 			// Get floor heights for comparison.
 			auto pos = Vector3i(
-				(reference->Pose.Position.x * 2) - LaraItem->Pose.Position.x,
+				(referencePtr->Pose.Position.x * 2) - LaraItem->Pose.Position.x,
 				LaraItem->Pose.Position.y,
-				(reference->Pose.Position.z * 2) - LaraItem->Pose.Position.z);
-			item->Floor = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber).Position.Floor;
+				(referencePtr->Pose.Position.z * 2) - LaraItem->Pose.Position.z);
+			item.Floor = GetCollision(pos.x, pos.y, pos.z, item.RoomNumber).Position.Floor;
 
 			// Animate doppelganger, mirroring player's position.
-			item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
-			item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
-			item->Pose.Position = pos;
-			item->Pose.Orientation.x = LaraItem->Pose.Orientation.x;
-			item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - ANGLE(180.0f);
-			item->Pose.Orientation.z = LaraItem->Pose.Orientation.z;
-			item->Animation.IsAirborne = LaraItem->Animation.IsAirborne;
+			item.Animation.AnimNumber = LaraItem->Animation.AnimNumber;
+			item.Animation.FrameNumber = LaraItem->Animation.FrameNumber;
+			item.Pose.Position = pos;
+			item.Pose.Orientation.x = LaraItem->Pose.Orientation.x;
+			item.Pose.Orientation.y = LaraItem->Pose.Orientation.y - ANGLE(180.0f);
+			item.Pose.Orientation.z = LaraItem->Pose.Orientation.z;
+			item.Animation.IsAirborne = LaraItem->Animation.IsAirborne;
 
 			// Compare floor heights.
-			if (item->Floor >= (laraFloorHeight + BLOCK(1) + 1) && !LaraItem->Animation.IsAirborne)
+			if (item.Floor >= (laraFloorHeight + BLOCK(1) + 1) && !LaraItem->Animation.IsAirborne)
 			{
 				SetAnimation(item, LA_FREEFALL);
-				item->Animation.IsAirborne = true;
-				item->Pose.Position.y += 64;
-				item->ItemFlags[7] = 1;
+				item.Animation.IsAirborne = true;
+				item.Pose.Position.y += 64;
+				item.ItemFlags[7] = 1;
 			}
 
 			break;
 		}
 		case 1:
-			if (item->Animation.Velocity.x > 0.0f)
+			if (item.Animation.Velocity.x > 0.0f)
 			{
-				item->Animation.Velocity.x -= 2;
+				item.Animation.Velocity.x -= 2;
 			}
-			else if (item->Animation.Velocity.x < 0.0f)
+			else if (item.Animation.Velocity.x < 0.0f)
 			{
-				item->Animation.Velocity.x += 2;
-			}
-			else
-			{
-				item->Animation.Velocity.x = 0.0f;
-			}
-
-			if (item->Animation.Velocity.z > 0.0f)
-			{
-				item->Animation.Velocity.z -= 2;
-			}
-			else if (item->Animation.Velocity.z < 0.0f)
-			{
-				item->Animation.Velocity.z += 2;
+				item.Animation.Velocity.x += 2;
 			}
 			else
 			{
-				item->Animation.Velocity.z = 0.0f;
+				item.Animation.Velocity.x = 0.0f;
 			}
 
-			TestTriggers(item, true);
-			item->Floor = GetCollision(item).Position.Floor;
-
-			if (item->Pose.Position.y >= item->Floor)
+			if (item.Animation.Velocity.z > 0.0f)
 			{
-				item->Pose.Position.y = item->Floor;
-				TestTriggers(item, true);
+				item.Animation.Velocity.z -= 2;
+			}
+			else if (item.Animation.Velocity.z < 0.0f)
+			{
+				item.Animation.Velocity.z += 2;
+			}
+			else
+			{
+				item.Animation.Velocity.z = 0.0f;
+			}
+
+			TestTriggers(&item, true);
+			item.Floor = GetCollision(&item).Position.Floor;
+
+			if (item.Pose.Position.y >= item.Floor)
+			{
+				item.Pose.Position.y = item.Floor;
+				TestTriggers(&item, true);
 
 				SetAnimation(item, LA_FREEFALL_DEATH);
-				item->Animation.IsAirborne = false;
-				item->Animation.Velocity.y = 0.0f;
+				item.Animation.IsAirborne = false;
+				item.Animation.Velocity.y = 0.0f;
 
-				if (item->Animation.FrameNumber >= GetFrameCount(LA_FREEFALL_DEATH) - 1)
-					item->ItemFlags[7] = 2;
+				if (item.Animation.FrameNumber >= GetFrameCount(LA_FREEFALL_DEATH) - 1)
+					item.ItemFlags[7] = 2;
 			}
 
 			break;
@@ -130,11 +130,11 @@ namespace TEN::Entities::Creatures::TR1
 		case 2:
 			DisableEntityAI(itemNumber);
 			RemoveActiveItem(itemNumber);
-			item->Collidable = false;
+			item.Collidable = false;
 			break;
 		}
 
-		ItemNewRoom(itemNumber, GetCollision(item).RoomNumber);
-		AnimateItem(item);
+		ItemNewRoom(itemNumber, GetCollision(&item).RoomNumber);
+		AnimateItem(&item);
 	}
 }
