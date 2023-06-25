@@ -70,7 +70,7 @@ namespace TEN::Entities::Creatures::TR1
 			item->Animation.IsAirborne = LaraItem->Animation.IsAirborne;
 
 			// Compare floor heights.
-			if (item->Floor >= (laraFloorHeight + SECTOR(1) + 1) && !LaraItem->Animation.IsAirborne)
+			if (item->Floor >= (laraFloorHeight + BLOCK(1) + 1) && !LaraItem->Animation.IsAirborne)
 			{
 				SetAnimation(item, LA_FREEFALL);
 				item->Animation.IsAirborne = true;

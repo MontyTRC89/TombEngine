@@ -216,10 +216,10 @@ namespace TEN::Entities::Vehicles
 
 	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int oldX = old->x / BLOCK(1);
+		int oldZ = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -237,7 +237,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				motorbikeItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				motorbikeItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (motorbikeItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -250,7 +250,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				motorbikeItem->Pose.Position.x += SECTOR(1) - shiftX;
+				motorbikeItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - motorbikeItem->Pose.Position.z);
 			}
 		}
@@ -265,7 +265,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			floorHeight = GetCollision(pos->x, pos->y, old->z, motorbikeItem->RoomNumber).Position.Floor;
@@ -274,7 +274,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)
@@ -577,7 +577,7 @@ namespace TEN::Entities::Vehicles
 
 			motorbikeItem->Pose.Orientation.y += motorbike->TurnRate + motorbike->ExtraRotation;
 			rotation = motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle;
-			momentum = MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN - ((2 * motorbike->Velocity) / SECTOR(1));
+			momentum = MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN - ((2 * motorbike->Velocity) / BLOCK(1));
 
 			if (!(TrInput & VEHICLE_IN_ACCELERATE) && motorbike->Velocity > 0)
 				momentum += momentum / 2;

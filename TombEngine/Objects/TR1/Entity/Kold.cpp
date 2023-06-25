@@ -17,7 +17,7 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto KOLD_SHOTGUN_SHELL_COUNT = 6;
 
-	const auto KoldGunBite = CreatureBiteInfo(Vector3i(-20, 440, 20), 9);
+	const auto KoldGunBite = CreatureBiteInfo(Vector3(-20, 440, 20), 9);
 
 	enum KoldState
 	{

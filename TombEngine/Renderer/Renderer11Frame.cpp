@@ -489,7 +489,7 @@ namespace TEN::Renderer
 				SQUARE(position.z - light.Position.z);
 
 			// Collect only lights nearer than 20 sectors
-			if (distanceSquared >= SQUARE(SECTOR(20)))
+			if (distanceSquared >= SQUARE(BLOCK(20)))
 			{
 				continue;
 			}
@@ -543,7 +543,7 @@ namespace TEN::Renderer
 							SQUARE(position.z - light->Position.z);
 
 						// Collect only lights nearer than 20 sectors
-						if (distanceSquared >= SQUARE(SECTOR(20)))
+						if (distanceSquared >= SQUARE(BLOCK(20)))
 						{
 							continue;
 						}
@@ -579,7 +579,7 @@ namespace TEN::Renderer
 							SQUARE(position.z - light->Position.z);
 
 						// Collect only lights nearer than 20 sectors
-						if (distanceSquared >= SQUARE(SECTOR(20)))
+						if (distanceSquared >= SQUARE(BLOCK(20)))
 						{
 							continue;
 						}

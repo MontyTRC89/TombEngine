@@ -37,7 +37,7 @@ void lara_as_pickup(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	if (TestLastFrame(item))
 		item->Animation.TargetState = GetNextAnimState(item);
@@ -54,7 +54,7 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	if (item->Animation.FrameNumber == (GetAnimData(*item).frameEnd - 1))
 		lara->Control.HandStatus = HandStatus::Free;
@@ -75,7 +75,7 @@ void lara_as_switch_on(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 	Camera.speed = 6;
 }
 
@@ -90,7 +90,7 @@ void lara_as_switch_off(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 	Camera.speed = 6;
 }
 
@@ -129,7 +129,7 @@ void lara_as_use_key(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 }
 
 // State:		LS_USE_PUZZLE (43)
@@ -143,7 +143,7 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	if (TestLastFrame(item) && item->ItemFlags[0])
 	{
@@ -502,7 +502,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	Camera.targetDistance = SECTOR(2);
+	Camera.targetDistance = BLOCK(2);
 
 	UpdateRopeSwing(item);
 	RopeSwingCollision(item, coll, true);

@@ -29,8 +29,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TONY_EXPLOSION_COUNT_MAX = 60;
 	constexpr auto TONY_EFFECT_COLOR = Vector4(0.8f, 0.4f, 0.0f, 0.5f);
 
-	const auto TonyLeftHandBite	 = CreatureBiteInfo(Vector3i::Zero, 10);
-	const auto TonyRightHandBite = CreatureBiteInfo(Vector3i::Zero, 13);
+	const auto TonyLeftHandBite	 = CreatureBiteInfo(Vector3::Zero, 10);
+	const auto TonyRightHandBite = CreatureBiteInfo(Vector3::Zero, 13);
 
 	// I can't set it to the TonyFlame struct since the control of the
 	// flame use fxNumber as argument or that FX_INFO have no void* to hold custom data.
