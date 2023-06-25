@@ -29,12 +29,12 @@ namespace TEN::Entities::Vehicles
 {
 	const CreatureBiteInfo QuadBikeEffectsPositions[6] =
 	{
-		CreatureBiteInfo(Vector3i(-56, -32, -380), 0),
-		CreatureBiteInfo(Vector3i(56, -32, -380), 0),
-		CreatureBiteInfo(Vector3i(-8, 180, -48), 3),
-		CreatureBiteInfo(Vector3i(8, 180, -48), 4),
-		CreatureBiteInfo(Vector3i(90, 180, -32), 6),
-		CreatureBiteInfo(Vector3i(-90, 180, -32), 7)
+		CreatureBiteInfo(Vector3(-56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(-8, 180, -48), 3),
+		CreatureBiteInfo(Vector3(8, 180, -48), 4),
+		CreatureBiteInfo(Vector3(90, 180, -32), 6),
+		CreatureBiteInfo(Vector3(-90, 180, -32), 7)
 	};
 
 	const std::vector<VehicleMountType> QuadBikeMountTypes =

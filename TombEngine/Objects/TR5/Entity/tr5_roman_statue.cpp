@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER = 2.0f;
 	constexpr auto ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF	   = 2.0f;
 
-	const auto RomanStatueBite = CreatureBiteInfo(Vector3i::Zero, 15);
+	const auto RomanStatueBite = CreatureBiteInfo(Vector3::Zero, 15);
 
 	struct RomanStatueInfo
 	{

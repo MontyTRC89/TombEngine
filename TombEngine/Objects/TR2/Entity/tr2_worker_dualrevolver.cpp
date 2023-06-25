@@ -12,8 +12,8 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerDualGunBiteLeft  = CreatureBiteInfo(Vector3i(-2, 340, 23), 6);
-	const auto WorkerDualGunBiteRight = CreatureBiteInfo(Vector3i(2, 340, 23), 10);
+	const auto WorkerDualGunBiteLeft  = CreatureBiteInfo(Vector3(-2, 340, 23), 6);
+	const auto WorkerDualGunBiteRight = CreatureBiteInfo(Vector3(2, 340, 23), 10);
 
 	// TODO
 	enum WorkerDualGunState

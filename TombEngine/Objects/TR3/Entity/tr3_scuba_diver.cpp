@@ -18,7 +18,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SCUBA_DIVER_ATTACK_DAMAGE = 50;
 	constexpr auto SCUBA_DIVER_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto ScubaGunBite = CreatureBiteInfo(Vector3i(17, 164, 44), 18);
+	const auto ScubaGunBite = CreatureBiteInfo(Vector3(17, 164, 44), 18);
 
 	enum ScubaDiverState
 	{

@@ -31,9 +31,9 @@ namespace TEN::Entities::Creatures::TR5
 
 	#define TR5_LARSON_MIN_HP 40
 
-	const auto LarsonGun	  = CreatureBiteInfo(Vector3i(-55, 200, 5), 14);
-	const auto PierreGunLeft  = CreatureBiteInfo(Vector3i(45, 200, 0), 11);
-	const auto PierreGunRight = CreatureBiteInfo(Vector3i(-40, 200, 0), 14);
+	const auto LarsonGun	  = CreatureBiteInfo(Vector3(-55, 200, 5), 14);
+	const auto PierreGunLeft  = CreatureBiteInfo(Vector3(45, 200, 0), 11);
+	const auto PierreGunRight = CreatureBiteInfo(Vector3(-40, 200, 0), 14);
 
 	void InitializeLarson(short itemNumber)
 	{

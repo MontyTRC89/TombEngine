@@ -15,7 +15,7 @@
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto ChefBite = CreatureBiteInfo(Vector3i(0, 200, 0), 13);
+	const auto ChefBite = CreatureBiteInfo(Vector3(0, 200, 0), 13);
 
 	// TODO
 	enum ChefState

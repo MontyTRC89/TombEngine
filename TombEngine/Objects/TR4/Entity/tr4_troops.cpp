@@ -20,7 +20,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	const auto TroopsBite1 = CreatureBiteInfo(Vector3i(0, 270, 40), 7);
+	const auto TroopsBite1 = CreatureBiteInfo(Vector3(0, 270, 40), 7);
 
 	enum TroopState
 	{

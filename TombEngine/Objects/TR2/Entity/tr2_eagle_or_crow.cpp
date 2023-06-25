@@ -13,8 +13,8 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto EagleBite = CreatureBiteInfo(Vector3i(15, 46, 21), 6);
-	const auto CrowBite	 = CreatureBiteInfo(Vector3i(2, 10, 60), 14);
+	const auto EagleBite = CreatureBiteInfo(Vector3(15, 46, 21), 6);
+	const auto CrowBite	 = CreatureBiteInfo(Vector3(2, 10, 60), 14);
 
 	enum EagleOrCrowState
 	{

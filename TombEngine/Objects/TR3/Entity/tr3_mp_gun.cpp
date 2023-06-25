@@ -21,7 +21,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto MPGunBite = CreatureBiteInfo(Vector3i(0, 225, 50), 13);
+	const auto MPGunBite = CreatureBiteInfo(Vector3(0, 225, 50), 13);
 
 	enum MPGunState
 	{

@@ -22,7 +22,7 @@ namespace TEN::Entities::TR4
 	constexpr auto DOG_BITE_ATTACK_RANGE = SQUARE(BLOCK(0.55));
 	constexpr auto DOG_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1));
 	
-	const auto DogBite = CreatureBiteInfo(Vector3i(0, 0, 100), 3);
+	const auto DogBite = CreatureBiteInfo(Vector3(0, 0, 100), 3);
 	const auto DogJumpAttackJoints = std::vector<unsigned int>{ 3, 6, 9, 10, 13, 14 };
 	const auto DogBiteAttackJoints = std::vector<unsigned int>{ 3, 6 };
 
