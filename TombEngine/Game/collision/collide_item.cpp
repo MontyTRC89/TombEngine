@@ -1990,19 +1990,19 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 	}
 }
 
-void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (item->Status == ITEM_ACTIVE)
+	if (item.Status == ITEM_ACTIVE)
 	{
-		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-		TestCollision(item, laraItem);
+		TestCollision(&item, playerItem);
 	}
-	else if (item->Status != ITEM_INVISIBLE)
+	else if (item.Status != ITEM_INVISIBLE)
 	{
-		ObjectCollision(itemNumber, laraItem, coll);
+		ObjectCollision(itemNumber, playerItem, coll);
 	}
 }
