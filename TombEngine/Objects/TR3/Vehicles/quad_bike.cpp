@@ -1176,7 +1176,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != quadBikeItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose = quadBikeItem->Pose;

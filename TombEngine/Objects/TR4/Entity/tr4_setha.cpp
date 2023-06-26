@@ -667,7 +667,7 @@ namespace TEN::Entities::TR4
 		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
 
 		if (item->RoomNumber != laraItem->RoomNumber)
-			ItemNewRoom(lara.ItemNumber, item->RoomNumber);
+			ItemNewRoom(laraItem->Index, item->RoomNumber);
 
 		AnimateItem(laraItem);
 		laraItem->HitPoints = -1;

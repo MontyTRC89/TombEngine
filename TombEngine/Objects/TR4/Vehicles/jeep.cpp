@@ -1395,7 +1395,7 @@ namespace TEN::Entities::Vehicles
 			if (roomNumber != jeepItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, roomNumber);
-				ItemNewRoom(lara->ItemNumber, roomNumber);
+				ItemNewRoom(laraItem->Index, roomNumber);
 			}
 
 			laraItem->Pose = jeepItem->Pose;

@@ -64,29 +64,31 @@ namespace TEN::Entities::Traps
 		}
 	}
 
-	void CollideSpikyCeiling(short itemNumber, ItemInfo* item, CollisionInfo* coll)
+	void CollideSpikyCeiling(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
+		auto& item = g_Level.Items[itemNumber];
+
 		// Collide with objects.
-		if (item->Status == ITEM_ACTIVE)
+		if (item.Status == ITEM_ACTIVE)
 		{
-			if (!TestBoundsCollide(item, item, coll->Setup.Radius))
+			if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 				return;
 
-			TestCollision(item, item);
+			TestCollision(&item, playerItem);
 		}
-		else if (item->Status != ITEM_INVISIBLE)
+		else if (item.Status != ITEM_INVISIBLE)
 		{
-			ObjectCollision(itemNumber, item, coll);
+			ObjectCollision(itemNumber, playerItem, coll);
 		}
 
 		// Damage entity.
-		if (item->TouchBits.TestAny())
+		if (playerItem->TouchBits.TestAny())
 		{
-			DoDamage(item, SPIKY_CEILING_HARM_DAMAGE);
-			DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y + CLICK(3), item->Pose.Position.z, 4, item->Pose.Orientation.y, item->RoomNumber, 3);
-			item->TouchBits.ClearAll();
+			DoDamage(playerItem, SPIKY_CEILING_HARM_DAMAGE);
+			DoLotsOfBlood(playerItem->Pose.Position.x, playerItem->Pose.Position.y + CLICK(3), playerItem->Pose.Position.z, 4, playerItem->Pose.Orientation.y, playerItem->RoomNumber, 3);
+			playerItem->TouchBits.ClearAll();
 
-			SoundEffect(SFX_TR4_LARA_GRABFEET, &item->Pose);
+			SoundEffect(SFX_TR4_LARA_GRABFEET, &playerItem->Pose);
 		}
 	}
 }
