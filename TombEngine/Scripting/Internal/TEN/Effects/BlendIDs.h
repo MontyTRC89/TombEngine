@@ -35,7 +35,7 @@ The following constants are inside BlendID.
 */
 
 
-static const std::unordered_map<std::string, BLEND_MODES> kBlendIDs
+static const std::unordered_map<std::string, BLEND_MODES> BLEND_IDS
 {
 	{"OPAQUE", BLENDMODE_OPAQUE},
 	{"ALPHATEST", BLENDMODE_ALPHATEST},

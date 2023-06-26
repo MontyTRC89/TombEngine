@@ -30,9 +30,9 @@ namespace TEN::Entities::Switches
 	const ObjectCollisionBounds TurnSwitchBoundsA = 
 	{
 		GameBoundingBox(
-			SECTOR(0.5f), CLICK(3.5f),
+			BLOCK(0.5f), CLICK(3.5f),
 			0, 0,
-			-SECTOR(0.5f), 0
+			-BLOCK(0.5f), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -42,9 +42,9 @@ namespace TEN::Entities::Switches
 	const ObjectCollisionBounds TurnSwitchBoundsC =
 	{
 		GameBoundingBox(
-			SECTOR(0.5f), CLICK(3.5f),
+			BLOCK(0.5f), CLICK(3.5f),
 			0, 0,
-			0, SECTOR(0.5f)
+			0, BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),

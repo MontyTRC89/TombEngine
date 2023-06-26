@@ -17,15 +17,6 @@ enum BodyPartFlags
 	BODY_STONE_SOUND   = (1 << 11)
 };
 
-struct Matrix3D
-{
-	short m00, m01, m02;
-	short m10, m11, m12;
-	short m20, m21, m22;
-	short pad;
-	int tx, ty, tz;
-};
-
 struct SMOKE_SPARKS
 {
 	int x;
@@ -57,12 +48,6 @@ struct SMOKE_SPARKS
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;
-};
-
-struct GUNFLASH_STRUCT
-{
-	Matrix3D matrix;
-	short on;
 };
 
 struct SHOCKWAVE_STRUCT
@@ -219,7 +204,6 @@ constexpr auto MAX_GUNFLASH = 4;
 constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_SHOCKWAVE = 16;
 
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];

@@ -49,7 +49,6 @@ extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
@@ -850,7 +849,7 @@ namespace TEN::Renderer
 			return true;
 
 		const auto& room = m_rooms[LaraItem->RoomNumber];
-		auto* itemPtr = &m_items[Lara.ItemNumber];
+		auto* itemPtr = &m_items[LaraItem->Index];
 
 		m_stStatic.Color = Vector4::One;
 		m_stStatic.AmbientLight = room.AmbientLight;
@@ -1010,7 +1009,7 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[0].Bite.Position.ToVector3());
+						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[0].Bite.Position);
 						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
@@ -1049,15 +1048,15 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[1].Bite.Position.ToVector3());
-						auto rtoMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[1].Bite.Position);
+						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
 						auto worldMatrix = rItemPtr->AnimationTransforms[creature.MuzzleFlash[1].Bite.BoneID] * rItemPtr->World;
 						worldMatrix = tMatrix * worldMatrix;
 
 						if (creature.MuzzleFlash[1].ApplyXRotation)
-							worldMatrix = rtoMatrixX * worldMatrix;
+							worldMatrix = rotMatrixX * worldMatrix;
 
 						if (creature.MuzzleFlash[1].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;

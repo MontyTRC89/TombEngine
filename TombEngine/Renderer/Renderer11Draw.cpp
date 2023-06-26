@@ -175,7 +175,7 @@ namespace TEN::Renderer
 			if (m_shadowLight->Type == LIGHT_TYPE_POINT)
 			{
 				view = Matrix::CreateLookAt(m_shadowLight->Position, m_shadowLight->Position +
-					RenderTargetCube::forwardVectors[step] * SECTOR(10),
+					RenderTargetCube::forwardVectors[step] * BLOCK(10),
 					RenderTargetCube::upVectors[step]);
 
 				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, m_shadowLight->Out);
@@ -184,7 +184,7 @@ namespace TEN::Renderer
 			else if (m_shadowLight->Type == LIGHT_TYPE_SPOT)
 			{
 				view = Matrix::CreateLookAt(m_shadowLight->Position,
-					m_shadowLight->Position - m_shadowLight->Direction * SECTOR(10),
+					m_shadowLight->Position - m_shadowLight->Direction * BLOCK(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
 				// Vertex lighting fades out in 1024-steps. increase angle artificially for a bigger blend radius.
@@ -247,7 +247,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawGunShells(RenderView& view)
 	{
 		auto& room = m_rooms[LaraItem->RoomNumber];
-		auto* item = &m_items[Lara.ItemNumber];
+		auto* item = &m_items[LaraItem->Index];
 
 		int gunShellsCount = 0;
 		short objectNumber = 0;

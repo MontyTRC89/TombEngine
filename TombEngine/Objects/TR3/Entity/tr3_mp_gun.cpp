@@ -21,7 +21,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	const auto MPGunBite = CreatureBiteInfo(Vector3i(0, 225, 50), 13);
+	const auto MPGunBite = CreatureBiteInfo(Vector3(0, 225, 50), 13);
 
 	enum MPGunState
 	{
@@ -159,17 +159,17 @@ namespace TEN::Entities::Creatures::TR3
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			int x = item->Pose.Position.x + SECTOR(1) * phd_sin(item->Pose.Orientation.y + laraAI.angle);
+			int x = item->Pose.Position.x + BLOCK(1) * phd_sin(item->Pose.Orientation.y + laraAI.angle);
 			int y = item->Pose.Position.y;
-			int z = item->Pose.Position.z + SECTOR(1) * phd_cos(item->Pose.Orientation.y + laraAI.angle);
+			int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + laraAI.angle);
 
 			int height = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
-			bool cover = (item->Pose.Position.y > (height + CLICK(3)) && item->Pose.Position.y < (height + CLICK(4.5f)) && laraAI.distance > pow(SECTOR(1), 2));
+			bool cover = (item->Pose.Position.y > (height + CLICK(3)) && item->Pose.Position.y < (height + CLICK(4.5f)) && laraAI.distance > pow(BLOCK(1), 2));
 
 			auto* enemy = creature->Enemy;
 			creature->Enemy = LaraItem;
 
-			if (laraAI.distance < pow(SECTOR(1), 2) || item->HitStatus || TargetVisible(item, &laraAI))
+			if (laraAI.distance < pow(BLOCK(1), 2) || item->HitStatus || TargetVisible(item, &laraAI))
 			{
 				if (!creature->Alerted)
 					SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose);
@@ -242,7 +242,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 				else if (creature->Mood == MoodType::Bored ||
-					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
+					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2))))
 				{
 					if (AI.ahead)
 					{
@@ -328,7 +328,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 				}
 				else if (Targetable(item, &AI) ||
-					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2))))
+					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2))))
 				{
 					item->Animation.TargetState = MPGUN_STATE_WAIT;
 				}
@@ -451,7 +451,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MPGUN_STATE_WAIT;
 				}
 
-				if (AI.distance < pow(SECTOR(1.5f), 2))
+				if (AI.distance < pow(BLOCK(1.5f), 2))
 					item->Animation.RequiredState = MPGUN_STATE_WALK;
 
 				break;
@@ -476,7 +476,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature->MuzzleFlash[0].Delay = 2;
 				}
 
-				if (AI.distance < pow(SECTOR(1.5f), 2))
+				if (AI.distance < pow(BLOCK(1.5f), 2))
 					item->Animation.TargetState = MPGUN_STATE_WALK;
 
 				break;

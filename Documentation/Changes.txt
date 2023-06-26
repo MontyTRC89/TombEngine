@@ -15,6 +15,7 @@ Version 1.1.0
 * Fix doppelganger being limited to be in a single room.
 * Fix bat AI, damage value, and incorrect collision after death.
 * Fix regeneration for pickups with OCB 128.
+* Fix Spiky ceiling. Also improve, and add new OCB to Spiky ceiling.
 * Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Implement separate audio track channel for playing voiceovers with subtitles.
 * Don't stop ambience when Lara dies.

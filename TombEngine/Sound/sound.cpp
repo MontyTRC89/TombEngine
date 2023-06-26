@@ -214,7 +214,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f) * SOUND_MAX_PITCH_CHANGE * 2.0f;
 
 	// Calculate sound radius and distance to sound
-	float radius = (float)(sampleInfo->Radius) * SECTOR(1);
+	float radius = (float)(sampleInfo->Radius) * BLOCK(1);
 	float distance = Sound_DistanceToListener(position);
 
 	// Don't play sound if it's too far from listener's position.

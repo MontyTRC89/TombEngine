@@ -33,7 +33,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto NATLA_FLY_ANGLE_SPEED = ANGLE(5.0f);
 	constexpr auto NATLA_SHOOT_ANGLE = ANGLE(30.0f);
 
-	const auto NatlaGunBite = CreatureBiteInfo(Vector3i(5, 220, 7), 4);
+	const auto NatlaGunBite = CreatureBiteInfo(Vector3(5, 220, 7), 4);
 
 	enum NatlaState
 	{
@@ -194,8 +194,8 @@ namespace TEN::Entities::Creatures::TR1
 				if (!(creature->Flags & NATLA_FLYMODE))
 					CreatureMood(item, &AI, true);
 
-				creature->LOT.Step = SECTOR(20);
-				creature->LOT.Drop = -SECTOR(20);
+				creature->LOT.Step = BLOCK(20);
+				creature->LOT.Drop = -BLOCK(20);
 				creature->LOT.Fly = CLICK(0.25f) / 2;
 
 				CreatureAIInfo(item, &AI);

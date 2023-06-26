@@ -29,12 +29,12 @@ namespace TEN::Entities::Vehicles
 {
 	const CreatureBiteInfo QuadBikeEffectsPositions[6] =
 	{
-		CreatureBiteInfo(Vector3i(-56, -32, -380), 0),
-		CreatureBiteInfo(Vector3i(56, -32, -380), 0),
-		CreatureBiteInfo(Vector3i(-8, 180, -48), 3),
-		CreatureBiteInfo(Vector3i(8, 180, -48), 4),
-		CreatureBiteInfo(Vector3i(90, 180, -32), 6),
-		CreatureBiteInfo(Vector3i(-90, 180, -32), 7)
+		CreatureBiteInfo(Vector3(-56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(-8, 180, -48), 3),
+		CreatureBiteInfo(Vector3(8, 180, -48), 4),
+		CreatureBiteInfo(Vector3(90, 180, -32), 6),
+		CreatureBiteInfo(Vector3(-90, 180, -32), 7)
 	};
 
 	const std::vector<VehicleMountType> QuadBikeMountTypes =
@@ -344,10 +344,10 @@ namespace TEN::Entities::Vehicles
 	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3i* pos, Vector3i* old)
 	{
 		CollisionResult probe;
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int oldX = old->x / BLOCK(1);
+		int oldZ = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -365,7 +365,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				quadBikeItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				quadBikeItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (quadBikeItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -378,7 +378,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				quadBikeItem->Pose.Position.x += SECTOR(1) - shiftX;
+				quadBikeItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - quadBikeItem->Pose.Position.z);
 			}
 		}
@@ -393,7 +393,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, quadBikeItem->RoomNumber);
@@ -402,7 +402,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)
@@ -1176,7 +1176,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != quadBikeItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose = quadBikeItem->Pose;
