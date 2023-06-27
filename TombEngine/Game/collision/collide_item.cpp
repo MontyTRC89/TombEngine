@@ -879,7 +879,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
 {
 	coll.Setup.ForwardAngle = item.Pose.Orientation.y;
-	coll.Setup.OldPosition = item.Pose.Position;
+	coll.Setup.PrevPosition = item.Pose.Position;
 	GetCollisionInfo(&coll, &item);
 	ShiftItem(&item, &coll);
 }

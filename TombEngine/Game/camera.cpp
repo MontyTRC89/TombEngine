@@ -227,16 +227,16 @@ static float GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionIn
 
 void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 {
-	const auto& player = GetLaraInfo(item);
-
 	constexpr auto POS_LERP_ALPHA = 0.25f;
 	constexpr auto COLL_PUSH	  = BLOCK(0.25f) - BLOCK(1 / 16.0f);
 
-	float verticalOffset = GetLookCameraVerticalOffset(item, coll);
-	auto pivotPosOffset = Vector3(0.0f, verticalOffset, 0.0f);
+	const auto& player = GetLaraInfo(item);
 
-	float idealPosDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(0.75f));
-	float lookAtPosDist = BLOCK(0.5f);
+	float verticalOffset = GetLookCameraVerticalOffset(item, coll);
+	auto pivotOffset = Vector3(0.0f, verticalOffset, 0.0f);
+
+	float idealDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(0.75f));
+	float lookAtDist = BLOCK(0.5f);
 
 	// Define absolute camera orientation.
 	auto orient = player.Control.Look.Orientation +
@@ -244,7 +244,7 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 		EulerAngles(0, Camera.targetAngle, 0);
 	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 
-	// TODO: Goes to the centre in swamps for some reason.
+	// TODO: Goes to centre in swamps for some reason.
 	// Determine base position.
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
 	auto basePos = isInSwamp ?
@@ -252,13 +252,13 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 		item.Pose.Position;
 
 	// Define landmarks.
-	auto pivotPos = Geometry::TranslatePoint(basePos, item.Pose.Orientation.y, pivotPosOffset);
-	auto idealPos = Geometry::TranslatePoint(pivotPos, orient, idealPosDist);
-	auto lookAtPos = Geometry::TranslatePoint(pivotPos, orient, lookAtPosDist);
+	auto pivotPos = Geometry::TranslatePoint(basePos, item.Pose.Orientation.y, pivotOffset);
+	auto idealPos = Geometry::TranslatePoint(pivotPos, orient, idealDist);
+	auto lookAtPos = Geometry::TranslatePoint(pivotPos, orient, lookAtDist);
 
 	// Determine best position.
-	auto origin = GameVector(pivotPos, GetCollision(&item, item.Pose.Orientation.y, pivotPosOffset.z, pivotPosOffset.y).RoomNumber);
-	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, idealPosDist).RoomNumber);
+	auto origin = GameVector(pivotPos, GetCollision(&item, item.Pose.Orientation.y, pivotOffset.z, pivotOffset.y).RoomNumber);
+	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, idealDist).RoomNumber);
 
 	// Handle room and object collisions.
 	LOSAndReturnTarget(&origin, &target, 0);
@@ -270,7 +270,7 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * POS_LERP_ALPHA, item.RoomNumber);
 
 	LookAt(&Camera, 0);
-	UpdateMikePos(&item);
+	UpdateMikePos(item);
 	Camera.oldType = Camera.type;
 }
 
@@ -484,7 +484,7 @@ void MoveCamera(GameVector* ideal, int speed)
 
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-	UpdateMikePos(LaraItem);
+	UpdateMikePos(*LaraItem);
 	Camera.oldType = Camera.type;
 }
 
@@ -1110,7 +1110,7 @@ void BinocularCamera(ItemInfo* item)
 
 	Camera.target.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.RoomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-	UpdateMikePos(item);
+	UpdateMikePos(*item);
 	Camera.oldType = Camera.type;
 
 	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
@@ -1629,16 +1629,16 @@ void ItemsCollideCamera()
 	staticList.clear();
 }
 
-void UpdateMikePos(ItemInfo* item)
+void UpdateMikePos(const ItemInfo& item)
 {
 	if (Camera.mikeAtLara)
 	{
-		Camera.mikePos = item->Pose.Position;
-		Camera.actualAngle = item->Pose.Orientation.y;
+		Camera.mikePos = item.Pose.Position;
+		Camera.actualAngle = item.Pose.Orientation.y;
 
-		if (item->IsLara())
+		if (item.IsLara())
 		{
-			auto& player = *GetLaraInfo(item);
+			const auto& player = GetLaraInfo(item);
 			Camera.actualAngle += player.ExtraHeadRot.y + player.ExtraTorsoRot.y;
 		}
 	}

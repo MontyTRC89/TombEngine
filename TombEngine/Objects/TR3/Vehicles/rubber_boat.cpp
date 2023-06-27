@@ -582,10 +582,7 @@ namespace TEN::Entities::Vehicles
 				else
 					rBoatItem->Animation.Velocity.z = 0;
 
-				if (rBoatItem->Animation.Velocity.z)
-					lara->Control.Look.Mode = LookMode::Free;
-				else
-					lara->Control.Look.Mode = LookMode::Horizontal;
+				lara->Control.Look.Mode = (rBoatItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 			}
 		}
 

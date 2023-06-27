@@ -989,10 +989,7 @@ namespace TEN::Entities::Vehicles
 
 		if (motorbikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
-			if (motorbikeItem->Animation.Velocity.z != 0.0f)
-				lara->Control.Look.Mode = LookMode::Free;
-			else
-				lara->Control.Look.Mode = LookMode::Horizontal;
+			lara->Control.Look.Mode = (motorbikeItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 
 			// Moving forward.
 			if (motorbike->Velocity > 0)

@@ -388,7 +388,6 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState == LS_CROUCH_IDLE)
 		return;
 
-	auto* lara = GetLaraInfo(item);
 	lara->Control.HandStatus = HandStatus::Busy;
 
 	if (item->HitPoints <= 0)
