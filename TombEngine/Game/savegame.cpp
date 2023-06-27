@@ -1927,7 +1927,6 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Weapon.Fired = s->lara()->control()->weapon()->fired();
 	Lara.Control.Weapon.LastGunType = (LaraWeaponType)s->lara()->control()->weapon()->last_gun_type();
 	Lara.Control.Weapon.RequestGunType = (LaraWeaponType)s->lara()->control()->weapon()->request_gun_type();
-	Lara.Control.Weapon.WeaponItem = s->lara()->control()->weapon()->weapon_item();
 	Lara.Control.Weapon.HolsterInfo.BackHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->back_holster();
 	Lara.Control.Weapon.HolsterInfo.LeftHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->left_holster();
 	Lara.Control.Weapon.HolsterInfo.RightHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->right_holster();
@@ -1935,6 +1934,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Weapon.Timer = s->lara()->control()->weapon()->timer();
 	Lara.Control.Weapon.UziLeft = s->lara()->control()->weapon()->uzi_left();
 	Lara.Control.Weapon.UziRight = s->lara()->control()->weapon()->uzi_right();
+	Lara.Control.Weapon.WeaponItem = s->lara()->control()->weapon()->weapon_item();
 	Lara.ExtraAnim = s->lara()->extra_anim();
 	Lara.ExtraHeadRot = ToEulerAngles(s->lara()->extra_head_rot());
 	Lara.ExtraTorsoRot = ToEulerAngles(s->lara()->extra_torso_rot());

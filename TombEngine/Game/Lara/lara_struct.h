@@ -1113,8 +1113,8 @@ struct FlareData
 
 struct TorchData
 {
-	TorchState State = TorchState::Holding;
 	bool	   IsLit = false;
+	TorchState State = TorchState::Holding;
 };
 
 // TODO: Troye's abandoned dairy feature.
@@ -1304,8 +1304,8 @@ struct PlayerContextData
 	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
 	Vector3i WaterCurrentPull	= Vector3i::Zero;
 
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
+	int InteractedItem = 0; // InteractedItemNumber
+	int Vehicle		   = 0; // VehicleItemNumber
 };
 
 struct PlayerEffectData
@@ -1324,9 +1324,10 @@ struct LaraInfo
 	PlayerEffectData  Effect	= {};
 	LaraInventoryData Inventory = {};
 
+	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};
 	TorchData		  Torch = {};
-	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
 
 	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
 	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
@@ -1342,7 +1343,8 @@ struct LaraInfo
 	int HitFrame	 = 0; // Frame index.
 	int HitDirection = 0; // Cardinal direction.
 
-	int ExtraAnim = 0; // Item number? Only ever set to NO_ITEM or 1.
+	// Item number? Only ever set to NO_ITEM or 1. Probably anim object ID. Might not be needed since AnimObjectID is kept in item.Animation.
+	int ExtraAnim = 0;
 
 	signed char Location		= 0;
 	signed char HighestLocation = 0;
