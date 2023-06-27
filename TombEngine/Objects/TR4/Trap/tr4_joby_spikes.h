@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseJobySpikes(short itemNumber);
+	void InitializeJobySpikes(short itemNumber);
 	void JobySpikesControl(short itemNumber);
 }

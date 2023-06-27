@@ -10,6 +10,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/Utils/VehicleHelpers.h"
@@ -17,7 +18,6 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Input;
@@ -102,7 +102,7 @@ namespace TEN::Entities::Vehicles
 		return (RubberBoatInfo*)rBoatItem->Data;
 	}
 
-	void InitialiseRubberBoat(short itemNumber)
+	void InitializeRubberBoat(short itemNumber)
 	{
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		rBoatItem->Data = RubberBoatInfo();
@@ -161,7 +161,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (laraItem->RoomNumber != rBoatItem->RoomNumber)
-			ItemNewRoom(lara->ItemNumber, rBoatItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, rBoatItem->RoomNumber);
 
 		laraItem->Pose.Position = rBoatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
@@ -217,11 +217,11 @@ namespace TEN::Entities::Vehicles
 
 	static int DoRubberBoatShift2(ItemInfo* rBoatItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
 
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
+		int xOld = old->x / BLOCK(1);
+		int zOld = old->z / BLOCK(1);
 
 		int xShift = pos->x & WALL_MASK;
 		int zShift = pos->z & WALL_MASK;
@@ -240,7 +240,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				rBoatItem->Pose.Position.z += SECTOR(1) - zShift;
+				rBoatItem->Pose.Position.z += BLOCK(1) - zShift;
 				return (rBoatItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -253,7 +253,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				rBoatItem->Pose.Position.x += SECTOR(1) - xShift;
+				rBoatItem->Pose.Position.x += BLOCK(1) - xShift;
 				return (pos->z - rBoatItem->Pose.Position.z);
 			}
 		}
@@ -268,7 +268,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -zShift - 1;
 				else
-					z = SECTOR(1) - zShift;
+					z = BLOCK(1) - zShift;
 			}
 
 			height = GetCollision(pos->x, pos->y, old->z, rBoatItem->RoomNumber).Position.Floor;
@@ -277,7 +277,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -xShift - 1;
 				else
-					x = SECTOR(1) - xShift;
+					x = BLOCK(1) - xShift;
 			}
 
 			if (x && z)
@@ -603,9 +603,9 @@ namespace TEN::Entities::Vehicles
 		else
 			angle = sBoatItem->Pose.Orientation.y + ANGLE(90.0f);
 
-		int x = sBoatItem->Pose.Position.x + SECTOR(1) * phd_sin(angle);
+		int x = sBoatItem->Pose.Position.x + BLOCK(1) * phd_sin(angle);
 		int y = sBoatItem->Pose.Position.y;
-		int z = sBoatItem->Pose.Position.z + SECTOR(1) * phd_cos(angle);
+		int z = sBoatItem->Pose.Position.z + BLOCK(1) * phd_cos(angle);
 
 		auto collResult = GetCollision(x, y, z, sBoatItem->RoomNumber);
 
@@ -796,7 +796,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Position.z = z;
 
 				if (probe.RoomNumber != laraItem->RoomNumber)
-					ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+					ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 			laraItem->Pose.Position.y = y;
 
@@ -901,7 +901,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != rBoatItem->RoomNumber)
 			{
 				ItemNewRoom(itemNumber, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;
@@ -913,7 +913,7 @@ namespace TEN::Entities::Vehicles
 				SyncVehicleAnimation(*rBoatItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(20.0f);
-			Camera.targetDistance = SECTOR(2);
+			Camera.targetDistance = BLOCK(2);
 		}
 		else
 		{

@@ -1,9 +1,10 @@
 #include "framework.h"
+#include <filesystem>
+#include <codecvt>
+
 #include "Renderer/Renderer11.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
-#include <filesystem>
-#include <codecvt>
 
 namespace TEN::Renderer 
 {
@@ -43,7 +44,7 @@ namespace TEN::Renderer
 		m_screenHeight = height;
 		m_windowed = windowed;
 
-		InitialiseScreen(width, height, WindowsHandle, true);
+		InitializeScreen(width, height, WindowsHandle, true);
 	}
 
 	std::string Renderer11::GetDefaultAdapterName()
@@ -67,7 +68,7 @@ namespace TEN::Renderer
 	{
 		texture = Texture2D();
 
-		if (std::filesystem::exists(path))
+		if (std::filesystem::is_regular_file(path))
 			texture = Texture2D(m_device.Get(), path);
 		else
 		{

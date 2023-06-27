@@ -16,6 +16,7 @@
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Objects/Sink.h"
@@ -26,7 +27,6 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 #include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
@@ -35,8 +35,6 @@ using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 
 char* LevelDataPtr;
-bool IsLevelLoading;
-bool LoadedSuccessfully;
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
 LEVEL g_Level;
@@ -161,7 +159,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitialiseItemArray(NUM_ITEMS);
+	InitializeItemArray(NUM_ITEMS);
 
 	if (g_Level.NumItems > 0)
 	{
@@ -189,8 +187,17 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		for (int i = 0; i < g_Level.NumItems; i++)
-			InitialiseItem(i);
+		// Initialize all bridges first.
+		// It is needed because some other items need final floor height to init properly.
+
+		for (int isFloor = 0; isFloor <= 1; isFloor++)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if ((Objects[g_Level.Items[i].ObjectNumber].floor == nullptr) == (bool)isFloor)
+					InitializeItem(i);
+			}
+		}
 	}
 }
 
@@ -368,7 +375,7 @@ void LoadObjects()
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
-	InitialiseObjects();
+	InitializeObjects();
 
 	int numStatics = ReadInt32();
 	TENLog("Num statics: " + std::to_string(numStatics), LogLevel::Info);
@@ -376,6 +383,15 @@ void LoadObjects()
 	for (int i = 0; i < numStatics; i++)
 	{
 		int meshID = ReadInt32();
+
+		if (meshID >= MAX_STATICS)
+		{
+			TENLog("Static with ID " + std::to_string(meshID) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ". " +
+				   "Change static mesh ID in WadTool to a value below maximum.", LogLevel::Warning);
+			
+			meshID = 0;
+		}
+
 		StaticObjectsIds.push_back(meshID);
 
 		StaticObjects[meshID].meshNumber = (short)ReadInt32();
@@ -1021,33 +1037,35 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 		inflateEnd(&strm);
 		return true;
 	}
-	else
-		return false;
+
+	return false;
 }
 
-unsigned int _stdcall LoadLevel(void* data)
+bool LoadLevel(int levelIndex)
 {
-	const int levelIndex = (int)reinterpret_cast<size_t>(data);
-
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
-	TENLog("Loading level file: " + level->FileName, LogLevel::Info);
+	auto assetDir = g_GameFlow->GetGameDir();
+	auto levelPath = assetDir + level->FileName;
+	TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
 	LevelDataPtr = nullptr;
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
+	bool LoadedSuccessfully;
 
-	g_Renderer.SetLoadingScreen(TEN::Utils::ToWString(level->LoadScreenFileName.c_str()));
+	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
+	g_Renderer.SetLoadingScreen(loadingScreenPath);
 
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);
 
 	try
 	{
-		filePtr = FileOpen(level->FileName.c_str());
+		filePtr = FileOpen(levelPath.c_str());
 
 		if (!filePtr)
-			throw std::exception((std::string("Unable to read level file: ") + level->FileName).c_str());
+			throw std::exception{ (std::string{ "Unable to read level file: " } + levelPath).c_str() };
 
 		char header[4];
 		unsigned char version[4];
@@ -1063,8 +1081,8 @@ unsigned int _stdcall LoadLevel(void* data)
 		// Check file header
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
-		else
-			TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+		
+		TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
 		// Check if level version is higher than engine version
 		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
@@ -1083,7 +1101,7 @@ unsigned int _stdcall LoadLevel(void* data)
 			if (SystemNameHash != systemHash)
 				throw std::exception("An attempt was made to use level debug feature on a different system.");
 
-			InitialiseGame = true;
+			InitializeGame = true;
 			SystemNameHash = 0;
 		}
 
@@ -1121,7 +1139,7 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		LoadBoxes();
 
-		//InitialiseLOTarray(true);
+		//InitializeLOTarray(true);
 
 		LoadAnimatedTextures();
 		g_Renderer.UpdateProgress(70);
@@ -1136,9 +1154,9 @@ unsigned int _stdcall LoadLevel(void* data)
 
 		TENLog("Initializing level...", LogLevel::Info);
 
-		// Initialise the game
-		InitialiseGameFlags();
-		InitialiseLara(!(InitialiseGame || CurrentLevel <= 1));
+		// Initialize the game
+		InitializeGameFlags();
+		InitializeLara(!(InitializeGame || CurrentLevel <= 1));
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
@@ -1175,9 +1193,6 @@ unsigned int _stdcall LoadLevel(void* data)
 		dataPtr = LevelDataPtr = nullptr;
 	}
 
-	// Level loaded
-	IsLevelLoading = false;
-	_endthreadex(1);
 	return LoadedSuccessfully;
 }
 
@@ -1269,27 +1284,16 @@ void LoadBoxes()
 	}
 }
 
-int LoadLevelFile(int levelIndex)
+bool LoadLevelFile(int levelIndex)
 {
 	TENLog("Loading level file...", LogLevel::Info);
 
 	CleanUp();
 	FreeLevel();
 	
-	// Loading level is done is two threads, one for loading level and one for drawing loading screen
-	IsLevelLoading = true;
+	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelIndex);
 
-	_beginthreadex(
-		nullptr,
-		0, 
-		LoadLevel, 
-		reinterpret_cast<void*>((size_t)levelIndex), 
-		0, 
-		nullptr);
-
-	while (IsLevelLoading);
-
-	return LoadedSuccessfully;
+	return LevelLoadTask.get();
 }
 
 void LoadSprites()
@@ -1380,7 +1384,7 @@ void GetAIPickups()
 					object->roomNumber == item->RoomNumber &&
 					object->objectNumber < ID_AI_PATROL2)
 				{
-					item->AIBits = (1 << object->objectNumber - ID_AI_GUARD) & 0x1F;
+					item->AIBits = (1 << (object->objectNumber - ID_AI_GUARD)) & 0x1F;
 					item->ItemFlags[3] = object->triggerFlags;
 
 					if (object->objectNumber != ID_AI_GUARD)
@@ -1409,8 +1413,8 @@ void BuildOutsideRoomsTable()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		int rx = (room->x / SECTOR(1));
-		int rz = (room->z / SECTOR(1));
+		int rx = (room->x / BLOCK(1));
+		int rz = (room->z / BLOCK(1));
 
 		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{

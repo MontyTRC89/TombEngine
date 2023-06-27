@@ -179,11 +179,7 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_tightrope_fall,//122
 	lara_as_tightrope_fall,//123
 	lara_as_null,//124
-#ifdef NEW_TIGHTROPE
 	lara_as_tightrope_dismount,//125
-#else // !NEW_TIGHTROPE
-	lara_as_null,//125
-#endif
 	lara_as_switch_on,//126
 	lara_as_null,//127
 	lara_as_horizontal_bar_swing,//128
@@ -592,7 +588,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
 						item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						item->Pose.Position.y = waterHeight + (SECTOR(1) - 24);
+						item->Pose.Position.y = waterHeight + (BLOCK(1) - 24);
 					}
 
 					SetAnimation(item, LA_WADE);
@@ -720,7 +716,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		item->HitPoints = -1;
 
 		if (lara->Control.Count.Death == 0)
-			StopSoundTracks();
+			StopSoundTracks(true);
 
 		lara->Control.Count.Death++;
 		if ((item->Flags & IFLAG_INVISIBLE))
@@ -933,7 +929,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber, &coll->Setup);
+	TestVolumes(item->Index, &coll->Setup);
 
 	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }
@@ -1010,7 +1006,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(item->Index);
 }
 
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
@@ -1102,7 +1098,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(item->Index);
 }
 
 void LaraCheat(ItemInfo* item, CollisionInfo* coll)
@@ -1134,7 +1130,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 			lara->Control.WaterStatus = WaterStatus::Dry;
 		}
 
-		InitialiseLaraMeshes(item);
+		InitializeLaraMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
 		lara->Control.HandStatus = HandStatus::Free;
 	}

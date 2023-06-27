@@ -7,8 +7,8 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
@@ -16,15 +16,15 @@
 int SlotsUsed;
 std::vector<CreatureInfo*> ActiveCreatures;
 
-void InitialiseLOTarray(int itemNumber)
+void InitializeLOTarray(int itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	if (!creature->LOT.Initialised)
+	if (!creature->LOT.Initialized)
 	{
 		creature->LOT.Node = std::vector<BoxNode>(g_Level.Boxes.size(), BoxNode{});
-		creature->LOT.Initialised = true;
+		creature->LOT.Initialized = true;
 	}
 }
 
@@ -35,7 +35,7 @@ bool EnableEntityAI(short itemNum, bool always, bool makeTarget)
 	if (item->IsCreature())
 		return true;
 
-	InitialiseSlot(itemNum, makeTarget);
+	InitializeSlot(itemNum, makeTarget);
 	ActiveCreatures.push_back(item->Data);
 
 	return item->IsCreature();
@@ -55,14 +55,14 @@ void DisableEntityAI(short itemNumber)
 	item->Data = nullptr;
 }
 
-void InitialiseSlot(short itemNumber, bool makeTarget)
+void InitializeSlot(short itemNumber, bool makeTarget)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* object = &Objects[item->ObjectNumber];
 	item->Data = CreatureInfo();
 	auto* creature = GetCreatureInfo(item);
 
-	InitialiseLOTarray(itemNumber);
+	InitializeLOTarray(itemNumber);
 	creature->ItemNumber = itemNumber;
 	creature->Mood = MoodType::Bored;
 	creature->JointRotation[0] = 0;
@@ -117,16 +117,16 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 
 		// Can fly.
 		case LotType::Flyer:
-			creature->LOT.Step = SECTOR(20);
-			creature->LOT.Drop = -SECTOR(20);
+			creature->LOT.Step = BLOCK(20);
+			creature->LOT.Drop = -BLOCK(20);
 			creature->LOT.Fly = DEFAULT_FLY_UPDOWN_SPEED;
 			creature->LOT.Zone = ZoneType::Flyer;
 			break;
 
 		// Can swim.
 		case LotType::Water:
-			creature->LOT.Step = SECTOR(20);
-			creature->LOT.Drop = -SECTOR(20);
+			creature->LOT.Step = BLOCK(20);
+			creature->LOT.Drop = -BLOCK(20);
 			creature->LOT.Zone = ZoneType::Water;
 
 			if (item->ObjectNumber == ID_CROCODILE)
@@ -144,6 +144,12 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 				creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED;
 			}
 
+			break;
+
+		case LotType::SnowmobileGun:
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -BLOCK(1);
+			creature->LOT.Zone = ZoneType::Human;
 			break;
 
 		// Can climb.
@@ -191,7 +197,7 @@ void InitialiseSlot(short itemNumber, bool makeTarget)
 	}
 
 	ClearLOT(&creature->LOT);
-	if (itemNumber != Lara.ItemNumber)
+	if (itemNumber != LaraItem->Index)
 		CreateZone(item);
 
 	SlotsUsed++;
@@ -219,7 +225,7 @@ void ClearLOT(LOTInfo* LOT)
 	LOT->RequiredBox = NO_BOX;
 
 	auto* node = LOT->Node.data();
-	for(auto& node : LOT->Node) 
+	for (auto& node : LOT->Node) 
 	{
 		node.exitBox = NO_BOX;
 		node.nextExpansion = NO_BOX;
@@ -239,7 +245,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (size_t i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.Boxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -257,7 +263,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (size_t i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.Boxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

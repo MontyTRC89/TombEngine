@@ -13,12 +13,12 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
+#include "Game/Setup.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
-	const auto BigGunBite = BiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
+	const auto BigGunBite = CreatureBiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -78,7 +78,7 @@ namespace TEN::Entities::Vehicles
 		return (BigGunInfo*)bigGunItem->Data;
 	}
 
-	void BigGunInitialise(short itemNumber)
+	void BigGunInitialize(short itemNumber)
 	{
 		auto* bigGunItem = &g_Level.Items[itemNumber];
 		bigGunItem->Data = BigGunInfo();
@@ -105,7 +105,7 @@ namespace TEN::Entities::Vehicles
 		int z = laraItem->Pose.Position.z - bigGunItem->Pose.Position.z;
 
 		int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
-		if (distance > SECTOR(30))
+		if (distance > BLOCK(30))
 			return false;
 
 		short deltaAngle = abs(laraItem->Pose.Orientation.y - bigGunItem->Pose.Orientation.y);
@@ -125,7 +125,7 @@ namespace TEN::Entities::Vehicles
 
 		auto* projectileItem = &g_Level.Items[itemNumber];
 		projectileItem->ObjectNumber = ID_ROCKET;
-		auto pos = GetJointPosition(bigGunItem, BigGunBite.meshNum, BigGunBite.Position);
+		auto pos = GetJointPosition(bigGunItem, BigGunBite);
 		auto probe = GetCollision(pos.x, pos.y, pos.z, bigGunItem->RoomNumber);
 		projectileItem->RoomNumber = probe.RoomNumber;
 		projectileItem->Pose.Position = pos;
@@ -134,7 +134,7 @@ namespace TEN::Entities::Vehicles
 			bigGunItem->Pose.Orientation.y,
 			0
 		);
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		projectileItem->Animation.Velocity.z = BGUN_ROCKET_VELOCITY;
 		projectileItem->HitPoints = BGUN_ROCKET_TIMER; // NOTE: Time before it explode, TR5 use it, if 0, it will explode by default.

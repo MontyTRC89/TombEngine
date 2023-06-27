@@ -5,6 +5,7 @@
 #include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
+struct CreatureBiteInfo;
 struct ItemInfo;
 
 enum BodyPartFlags
@@ -14,15 +15,6 @@ enum BodyPartFlags
 	BODY_EXPLODE	   = (1 << 8),
 	BODY_NO_BOUNCE_ALT = (1 << 9),
 	BODY_STONE_SOUND   = (1 << 11)
-};
-
-struct Matrix3D
-{
-	short m00, m01, m02;
-	short m10, m11, m12;
-	short m20, m21, m22;
-	short pad;
-	int tx, ty, tz;
 };
 
 struct SMOKE_SPARKS
@@ -56,12 +48,6 @@ struct SMOKE_SPARKS
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;
-};
-
-struct GUNFLASH_STRUCT
-{
-	Matrix3D matrix;
-	short on;
 };
 
 struct SHOCKWAVE_STRUCT
@@ -218,7 +204,6 @@ constexpr auto MAX_GUNFLASH = 4;
 constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_SHOCKWAVE = 16;
 
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
@@ -232,9 +217,11 @@ int GetFreeFireSpark();
 void TriggerGlobalStaticFlame();
 void TriggerGlobalFireSmoke();
 void TriggerGlobalFireFlame();
-void TriggerPilotFlame(int itemNum, int nodeIndex);
-void ThrowFire(int itemNum, int meshIndex, Vector3i offset, Vector3i speed);
-void ThrowPoison(int itemNum, int meshIndex, Vector3i offset, Vector3i speed, Vector3 color);
+void TriggerPilotFlame(int itemNumber, int nodeIndex);
+void ThrowFire(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel);
+void ThrowFire(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel);
+void ThrowPoison(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel, const Vector3& color);
+void ThrowPoison(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel, const Vector3& color);
 void UpdateFireProgress();
 void ClearFires();
 void AddFire(int x, int y, int z, short roomNum, float size, short fade);

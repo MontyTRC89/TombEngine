@@ -1,26 +1,27 @@
 #include "framework.h"
 
 #include "Game/items.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Objects/objectslist.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Logic/LevelFunc.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Math/Math.h"
 
-#include "ScriptAssert.h"
-#include "MoveableObject.h"
-#include "ScriptUtil.h"
-#include "Objects/ObjectsHandler.h"
-#include "ReservedScriptNames.h"
-#include "Color/Color.h"
-#include "Logic/LevelFunc.h"
-#include "Rotation/Rotation.h"
-#include "Vec3/Vec3.h"
-
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 
 /***
@@ -38,18 +39,16 @@ static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
 static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
 
-Moveable::Moveable(short num, bool alreadyInitialised) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ alreadyInitialised }
+Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialized{ alreadyInitialized }
 {
-	if (alreadyInitialised)
-	{
+	if (alreadyInitialized)
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
-	}
 };
 
 Moveable::Moveable(Moveable&& other) noexcept : 
 	m_item{ std::exchange(other.m_item, nullptr) },
 	m_num{ std::exchange(other.m_num, NO_ITEM) },
-	m_initialised{ std::exchange(other.m_initialised, false) }
+	m_initialized{ std::exchange(other.m_initialized, false) }
 {
 	if (GetValid())
 	{
@@ -58,14 +57,13 @@ Moveable::Moveable(Moveable&& other) noexcept :
 	}
 }
 
-
 Moveable::~Moveable()
 {
 	if (m_item && g_GameScriptEntities) 
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 }
 
-bool operator==(Moveable const& first, Moveable const& second)
+bool operator ==(const Moveable& first, const Moveable& second)
 {
 	return first.m_item == second.m_item;
 }
@@ -94,15 +92,15 @@ most can just be ignored (see usage).
 	*/
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
-	std::string const & name,
-	Vec3 const & pos,
-	TypeOrNil<Rotation> const & rot,
+	const std::string& name,
+	const Vec3& pos,
+	const TypeOrNil<Rotation>& rot,
 	TypeOrNil<short> room,
 	TypeOrNil<int> animNumber,
 	TypeOrNil<int> frameNumber,
 	TypeOrNil<short> hp,
 	TypeOrNil<short> ocb,
-	TypeOrNil<aiBitsType> const & aiBits
+	const TypeOrNil<aiBitsType>& aiBits
 )
 {
 	short num = CreateItem();
@@ -110,14 +108,17 @@ static std::unique_ptr<Moveable> Create(
 
 	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
 	{
-		ItemInfo* item = &g_Level.Items[num];
+		auto* item = &g_Level.Items[num];
+
 		if (std::holds_alternative<short>(room))
 		{
 			ptr->SetPos(pos, false);
 			ptr->SetRoomNumber(std::get<short>(room));
 		}
 		else
+		{
 			ptr->SetPos(pos, true);
+		}
 
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
 		ptr->SetObjectID(objID);
@@ -135,10 +136,11 @@ static std::unique_ptr<Moveable> Create(
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
 		// add to name map too?
 	}
+
 	return ptr;
 }
 
-void Moveable::Register(sol::table & parent)
+void Moveable::Register(sol::table& parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		sol::call_constructor, Create,
@@ -395,7 +397,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @treturn bool valid true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
 
-/// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
+/// Destroy the moveable. This will mean it can no longer be used, except to re-initialize it with another object.
 // @function Moveable:Destroy
 	ScriptReserved_Destroy, &Moveable::Destroy,
 
@@ -418,15 +420,18 @@ void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
+
 	if (!ScriptAssertF(cond, err, m_item->Name))
 	{
-		ScriptWarn("Resetting to the center of the room.");
+		ScriptWarn("Resetting to room center.");
 		auto center = GetRoomCenter(m_item->RoomNumber);
-		// reset position but not rotation
+
+		// Reset position, but not orientation.
 		m_item->Pose.Position = center;
 	}
-	InitialiseItem(m_num);
-	m_initialised = true;
+
+	InitializeItem(m_num);
+	m_initialized = true;
 }
 
 GAME_OBJECT_ID Moveable::GetObjectID() const
@@ -440,7 +445,7 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 	m_item->ResetModelToDefault();
 }
 
-void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)
+void SetLevelFuncCallback(const TypeOrNil<LevelFunc>& cb, const std::string& callerName, Moveable& mov, std::string& toModify)
 {
 	if (std::holds_alternative<LevelFunc>(cb))
 	{
@@ -454,7 +459,8 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 	}
 	else
 	{
-		ScriptAssert(false, "Tried giving " + mov.m_item->Name
+		ScriptAssert(
+			false, "Tried giving " + mov.m_item->Name
 			+ " a non-LevelFunc object as an arg to "
 			+ callerName);
 	}
@@ -466,12 +472,12 @@ short Moveable::GetIndex() const
 	return m_num;
 }
 
-void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnHit(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
 }
 
-void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnKilled(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
@@ -484,7 +490,7 @@ void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 //     print(obj1:GetName() .. " collided with " .. obj2:GetName())
 // end
 // baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
-void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnCollidedWithObject(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
@@ -497,7 +503,7 @@ void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 //     print(obj:GetName() .. " collided with room geometry")
 // end
 // baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
-void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnCollidedWithRoom(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
 }
@@ -507,20 +513,19 @@ std::string Moveable::GetName() const
 	return m_item->Name;
 }
 
-bool Moveable::SetName(std::string const & id) 
+bool Moveable::SetName(const std::string& id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
-	{
 		return false;
-	}
 
 	if (s_callbackSetName(id, m_num))
 	{
-		// remove the old name if we have one
+		// Remove old name if it exists.
 		if (id != m_item->Name)
 		{
-			if(!m_item->Name.empty())
+			if (!m_item->Name.empty())
 				s_callbackRemoveName(m_item->Name);
+
 			m_item->Name = id;
 		}
 	}
@@ -531,6 +536,7 @@ bool Moveable::SetName(std::string const & id)
 
 		return false;
 	}
+
 	return true;
 }
 
@@ -549,26 +555,19 @@ Vec3 Moveable::GetPos() const
 // @function Moveable:SetPosition
 // @tparam Vec3 position the new position of the moveable 
 // @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
-void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
+void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	auto prevPos = m_item->Pose.Position.ToVector3();
 	pos.StoreInPose(m_item->Pose);
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
-	if (m_initialised && willUpdate)
+	if (m_initialized && willUpdate)
 	{
-		bool roomUpdated = false;
+		bool isRoomUpdated = m_item->IsLara() ? UpdateLaraRoom(m_item, pos.y) : UpdateItemRoom(m_item->Index);
 
-		if (m_item->IsLara())
-			roomUpdated = UpdateLaraRoom(m_item, pos.y);
-		else
-			roomUpdated = UpdateItemRoom(m_item->Index);
-
-		// In case direct portal room update didn't happen, and distance between old and new
-		// points is significant, do a predictive room update.
-
-		if (!roomUpdated && 
+		// In case direct portal room update didn't happen and distance between old and new points is significant, do predictive room update.
+		if (!isRoomUpdated && 
 			(willUpdate || Vector3::Distance(prevPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
@@ -576,6 +575,10 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 				SetRoomNumber(potentialNewRoom);
 		}
 	}
+
+	const auto& object = Objects[m_item->ObjectNumber];
+	if (object.floor != nullptr || object.ceiling != nullptr)
+		UpdateBridgeItem((int)m_item->Index);
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -598,11 +601,15 @@ Rotation Moveable::GetRot() const
 	};
 }
 
-void Moveable::SetRot(Rotation const& rot)
+void Moveable::SetRot(const Rotation& rot)
 {
 	m_item->Pose.Orientation.x = ANGLE(rot.x);
 	m_item->Pose.Orientation.y = ANGLE(rot.y);
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
+
+	const auto& object = Objects[m_item->ObjectNumber];
+	if (object.floor != nullptr || object.ceiling != nullptr)
+		UpdateBridgeItem(m_item->Index);
 }
 
 /// Get current HP (hit points/health points)
@@ -619,7 +626,7 @@ short Moveable::GetHP() const
 // @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
-	if(Objects[m_item->ObjectNumber].intelligent && hp < 0)
+	if (Objects[m_item->ObjectNumber].intelligent && hp < 0)
 	{
 		if (hp != NOT_TARGETABLE)
 		{
@@ -716,7 +723,7 @@ short Moveable::GetLocationAI() const
 		return creature->LocationAI;
 	}
 
-	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
+	TENLog("Trying to get LocationAI value from non-creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
 	return 0;
 }
 
@@ -767,7 +774,7 @@ aiBitsType Moveable::GetAIBits() const
 	aiBitsArray ret{};
 	for (size_t i = 0; i < ret.size(); ++i)
 	{
-		uint8_t isSet = m_item->AIBits & (1 << i);
+		unsigned char isSet = m_item->AIBits & (1 << i);
 		ret[i] = static_cast<int>( isSet > 0);
 	}
 
@@ -787,7 +794,7 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 	for (size_t i = 0; i < bits.value().size(); ++i)
 	{
 		m_item->AIBits &= ~(1 << i);
-		uint8_t isSet = bits.value()[i] > 0;
+		unsigned char isSet = bits.value()[i] > 0;
 		m_item->AIBits |= isSet << i;
 	}
 }
@@ -814,7 +821,7 @@ void Moveable::SetAnimNumber(int animNumber)
 
 int Moveable::GetFrameNumber() const
 {
-	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	return (m_item->Animation.FrameNumber - GetAnimData(*m_item).frameBase);
 }
 
 Vec3 Moveable::GetVelocity() const
@@ -835,15 +842,15 @@ void Moveable::SetVelocity(Vec3 velocity)
 
 void Moveable::SetFrameNumber(int frameNumber)
 {
-	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
-	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
-	auto frameCount = fEnd - fBase;
+	const auto& anim = GetAnimData(*m_item);
+
+	unsigned int frameCount = anim.frameEnd - anim.frameBase;
 	
 	bool cond = frameNumber < frameCount;
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
 	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount-1))
 	{
-		m_item->Animation.FrameNumber = frameNumber + fBase;
+		m_item->Animation.FrameNumber = frameNumber + anim.frameBase;
 	}
 	else
 	{
@@ -900,7 +907,7 @@ void Moveable::SetRoomNumber(int roomNumber)
 		return;
 	}
 
-	if (!m_initialised)
+	if (!m_initialized)
 	{
 		m_item->RoomNumber = roomNumber;
 	}
@@ -1134,10 +1141,9 @@ void Moveable::SetVisible(bool isVisible)
 
 void Moveable::Invalidate()
 {
-	// keep m_item as it is so that we can properly remove it from the moveables set when
-	// its destructor is called
+	// Keep m_item as-is so it can be properly removed from moveables set when destructor is called.
 	m_num = NO_ITEM;
-	m_initialised = false;
+	m_initialized = false;
 }
 
 bool Moveable::GetValid() const
@@ -1168,18 +1174,19 @@ bool Moveable::MeshExists(int index) const
 	return true;
 }
 
-//Attach camera and camera target to a mesh of an object.
+// Attach camera and camera target to object mesh.
 void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
 	if ((m_item->Active || m_item->IsLara()) && (mov.m_item->Active || mov.m_item->IsLara()))
 		ObjCamera(m_item, camMeshId, mov.m_item, targetMeshId, true);
 }
 
-//Borrow an animtaion and state id from an object.
-void Moveable::AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID)
+// Borrow animtaion and state ID from object.
+void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int stateID)
 {
-	m_item->Animation.AnimNumber = Objects[object].animIndex + animNumber;
+	m_item->Animation.AnimObjectID = objectID;
+	m_item->Animation.AnimNumber = Objects[objectID].animIndex + animNumber;
 	m_item->Animation.ActiveState = stateID;
-	m_item->Animation.FrameNumber = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	m_item->Animation.FrameNumber = GetAnimData(*m_item).frameBase;
 	AnimateItem(m_item);
 }

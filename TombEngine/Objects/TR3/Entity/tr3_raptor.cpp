@@ -9,9 +9,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -30,7 +30,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto RAPTOR_RUN_TURN_RATE_MAX	   = ANGLE(2.0f);
 	constexpr auto RAPTOR_ATTACK_TURN_RATE_MAX = ANGLE(2.0f);
 
-	const auto RaptorBite = BiteInfo(Vector3(0.0f, 66.0f, 318.0f), 22);
+	const auto RaptorBite = CreatureBiteInfo(Vector3(0, 66, 318), 22);
 	const auto RaptorAttackJoints = std::vector<unsigned int>{ 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23 };
 
 	enum RaptorState
@@ -88,7 +88,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != RAPTOR_STATE_DEATH)
-				SetAnimation(item, RaptorDeathAnims[Random::GenerateInt(0, RaptorDeathAnims.size() - 1)]);
+				SetAnimation(item, RaptorDeathAnims[Random::GenerateInt(0, (int)RaptorDeathAnims.size() - 1)]);
 		}
 		else
 		{
@@ -114,7 +114,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (nearestItem != nullptr &&
 					(nearestItem->ObjectNumber != ID_RAPTOR ||
-						(Random::TestProbability(1 / 30.0f) && minDistance < SQUARE(SECTOR(2)))))
+						(Random::TestProbability(1 / 30.0f) && minDistance < SQUARE(BLOCK(2)))))
 				{
 					creature->Enemy = nearestItem;
 				}
@@ -249,7 +249,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
@@ -286,7 +286,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
@@ -322,7 +322,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;

@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-	void InitialiseCompsognathus(short itemNumber);
+	void InitializeCompsognathus(short itemNumber);
 	void CompsognathusControl(short itemNumber);
 }

@@ -7,17 +7,18 @@
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 
 using namespace TEN::Control::Volumes;
@@ -106,17 +107,21 @@ bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 
 void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 {
-	bool isMeshSwapPresent = Objects[ObjectNumber].meshSwapSlot != -1 && 
-							 Objects[Objects[ObjectNumber].meshSwapSlot].loaded;
+	bool isMeshSwapPresent = (Objects[ObjectNumber].meshSwapSlot != -1 && 
+							  Objects[Objects[ObjectNumber].meshSwapSlot].loaded);
 
-	for (size_t i = 0; i < Model.MeshIndex.size(); i++)
+	for (int i = 0; i < Model.MeshIndex.size(); i++)
 	{
 		if (isMeshSwapPresent && (flags & (1 << i)))
 		{
 			if (clear)
+			{
 				Model.MeshIndex[i] = Model.BaseMesh + i;
+			}
 			else
+			{
 				Model.MeshIndex[i] = Objects[Objects[ObjectNumber].meshSwapSlot].meshIndex + i;
+			}
 		}
 		else
 		{
@@ -192,7 +197,6 @@ void KillItem(short const itemNumber)
 		auto* item = &g_Level.Items[itemNumber];
 
 		DetatchSpark(itemNumber, SP_ITEM);
-
 		item->Active = false;
 
 		if (NextItemActive == itemNumber)
@@ -235,7 +239,9 @@ void KillItem(short const itemNumber)
 		if (item == Lara.TargetEntity)
 			Lara.TargetEntity = nullptr;
 
-		if (Objects[item->ObjectNumber].floor != nullptr)
+		// AI target generation uses a hack with making a dummy item without ObjectNumber.
+		// Therefore, a check should be done here to prevent access violation.
+		if (item->ObjectNumber != NO_ITEM && Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
 		GameScriptHandleKilled(itemNumber, true);
@@ -428,7 +434,7 @@ short CreateNewEffect(short roomNumber)
 	return fxNumber;
 }
 
-void InitialiseFXArray(int allocateMemory)
+void InitializeFXArray(int allocateMemory)
 {
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
@@ -488,7 +494,7 @@ void RemoveActiveItem(short itemNumber, bool killed)
 	}
 }
 
-void InitialiseItem(short itemNumber) 
+void InitializeItem(short itemNumber) 
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -564,8 +570,8 @@ void InitialiseItem(short itemNumber)
 		item->Model.MeshIndex.clear();
 	}
 
-	if (Objects[item->ObjectNumber].initialise != nullptr)
-		Objects[item->ObjectNumber].initialise(itemNumber);
+	if (Objects[item->ObjectNumber].Initialize != nullptr)
+		Objects[item->ObjectNumber].Initialize(itemNumber);
 }
 
 short CreateItem()
@@ -580,7 +586,7 @@ short CreateItem()
 	return itemNumber;
 }
 
-void InitialiseItemArray(int totalItem)
+void InitializeItemArray(int totalItem)
 {
 	g_Level.Items.clear();
 	g_Level.Items.resize(totalItem);
@@ -616,7 +622,7 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 		spawn->RoomNumber = item->RoomNumber;
 		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
 
-		InitialiseItem(itemNumber);
+		InitializeItem(itemNumber);
 
 		spawn->Status = ITEM_NOT_ACTIVE;
 		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -706,7 +712,7 @@ ItemInfo* FindItem(GAME_OBJECT_ID objectID)
 int FindItem(ItemInfo* item)
 {
 	if (item == LaraItem)
-		return Lara.ItemNumber;
+		return item->Index;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 		if (item == &g_Level.Items[i])
@@ -818,7 +824,8 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
-	if (!object.undead || isExplosive)
+	if ((object.damageType == DamageMode::AnyWeapon) ||
+		(object.damageType == DamageMode::ExplosivesOnly && isExplosive))
 	{
 		if (target->HitPoints > 0)
 		{
@@ -854,7 +861,7 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, -5);
+			TriggerShatterSmoke(pos.value().x, pos.value().y, pos.value().z);
 			break;
 		}
 	}

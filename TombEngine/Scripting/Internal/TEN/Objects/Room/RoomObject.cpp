@@ -102,7 +102,7 @@ void Room::SetName(const std::string& name)
 	if (!ScriptAssert(!name.empty(), "Unable to set name. Name cannot be blank."))
 		return;
 
-	// Remove the old name if we have one.
+	// Remove old name if it already exists.
 	if (s_callbackSetName(name, m_room))
 	{
 		s_callbackRemoveName(m_room.name);
@@ -123,9 +123,13 @@ bool Room::GetFlag(RoomEnvFlags flag) const
 void Room::SetFlag(RoomEnvFlags flag, bool value)
 {
 	if (value)
+	{
 		m_room.flags |= flag;
+	}
 	else
+	{
 		m_room.flags &= ~flag;
+	}
 }
 
 bool Room::IsTagPresent(const std::string& tag) const
@@ -133,6 +137,7 @@ bool Room::IsTagPresent(const std::string& tag) const
 	if (m_room.tags.empty())
 		return false;
 
-	return std::any_of(m_room.tags.begin(), m_room.tags.end(),
+	return std::any_of(
+		m_room.tags.begin(), m_room.tags.end(),
 		[&tag](const std::string& value) { return (value == tag); });
 }

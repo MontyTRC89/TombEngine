@@ -14,29 +14,30 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {
-	BiteInfo QuadBikeEffectsPositions[6] =
+	const CreatureBiteInfo QuadBikeEffectsPositions[6] =
 	{
-		{ -56, -32, -380, 0	},
-		{ 56, -32, -380, 0 },
-		{ -8, 180, -48, 3 },
-		{ 8, 180, -48, 4 },
-		{ 90, 180, -32, 6 },
-		{ -90, 180, -32, 7 }
+		CreatureBiteInfo(Vector3(-56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(-8, 180, -48), 3),
+		CreatureBiteInfo(Vector3(8, 180, -48), 4),
+		CreatureBiteInfo(Vector3(90, 180, -32), 6),
+		CreatureBiteInfo(Vector3(-90, 180, -32), 7)
 	};
-	const vector<VehicleMountType> QuadBikeMountTypes =
+
+	const std::vector<VehicleMountType> QuadBikeMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
@@ -163,7 +164,7 @@ namespace TEN::Entities::Vehicles
 		return (QuadBikeInfo*)quadBikeItem->Data;
 	}
 
-	void InitialiseQuadBike(short itemNumber)
+	void InitializeQuadBike(short itemNumber)
 	{
 		auto* quadBikeItem = &g_Level.Items[itemNumber];
 		quadBikeItem->Data = QuadBikeInfo();
@@ -175,7 +176,6 @@ namespace TEN::Entities::Vehicles
 	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* quadBikeItem = &g_Level.Items[itemNumber];
-		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
@@ -344,10 +344,10 @@ namespace TEN::Entities::Vehicles
 	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3i* pos, Vector3i* old)
 	{
 		CollisionResult probe;
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int oldX = old->x / BLOCK(1);
+		int oldZ = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -365,7 +365,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				quadBikeItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				quadBikeItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (quadBikeItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -378,7 +378,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				quadBikeItem->Pose.Position.x += SECTOR(1) - shiftX;
+				quadBikeItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - quadBikeItem->Pose.Position.z);
 			}
 		}
@@ -393,7 +393,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, quadBikeItem->RoomNumber);
@@ -402,7 +402,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)
@@ -1179,7 +1179,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != quadBikeItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose = quadBikeItem->Pose;
@@ -1210,9 +1210,9 @@ namespace TEN::Entities::Vehicles
 
 			for (int i = 0; i < 2; i++)
 			{
-				auto pos = GetJointPosition(quadBikeItem, QuadBikeEffectsPositions[i].meshNum, Vector3i(QuadBikeEffectsPositions[i].Position));
-
+				auto pos = GetJointPosition(quadBikeItem, QuadBikeEffectsPositions[i]);
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
+
 				if (quadBikeItem->Animation.Velocity.z > 32)
 				{
 					if (quadBikeItem->Animation.Velocity.z < 64)

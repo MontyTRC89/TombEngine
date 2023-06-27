@@ -11,7 +11,7 @@
 
 using namespace TEN::Entities::Switches;
 
-void InitialiseRaisingCog(short itemNumber)
+void InitializeRaisingCog(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -91,7 +91,7 @@ void RaisingCogControl(short itemNumber)
 			{
 				if (!item->ItemFlags[2])
 				{
-					InitialiseSpotCam(item->ItemFlags[2]);
+					InitializeSpotCam(item->ItemFlags[2]);
 					UseSpotCam = true;
 				}
 

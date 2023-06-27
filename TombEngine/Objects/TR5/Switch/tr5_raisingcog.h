@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseRaisingCog(short itemNumber);
+void InitializeRaisingCog(short itemNumber);
 void RaisingCogControl(short itemNumber);

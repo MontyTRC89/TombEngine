@@ -1,5 +1,6 @@
 #include "framework.h"
-#include "Color.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+
 #include <cmath>
 
 /***
@@ -10,10 +11,11 @@ Components are specified in bytes; all values are clamped to [0, 255].
 @pragma nostrip
 */
 
-void ScriptColor::Register(sol::table & parent)
+void ScriptColor::Register(sol::table& parent)
 {
 	using ctors = sol::constructors<ScriptColor(byte, byte, byte), ScriptColor(byte, byte, byte, byte)>;
-	parent.new_usertype<ScriptColor>("Color",
+	parent.new_usertype<ScriptColor>(
+		"Color",
 		ctors(),
 		sol::call_constructor, ctors(),	
 		sol::meta_function::to_string, &ScriptColor::ToString,
@@ -30,7 +32,7 @@ void ScriptColor::Register(sol::table & parent)
 //@mem b
 		"b", sol::property(&ScriptColor::GetB, &ScriptColor::SetB),
 
-/// (int) alpha component (255 is opaque, 0 is invisible)
+/// (int) alpha component (255 = opaque, 0 = invisible)
 //@mem a
 		"a", sol::property(&ScriptColor::GetA, &ScriptColor::SetA)
 	);
@@ -61,18 +63,18 @@ ScriptColor::ScriptColor(byte r, byte g, byte b, byte a) : ScriptColor(r, g, b)
 	SetA(a);
 }
 
-ScriptColor::ScriptColor(Vector3 const& col) :
-	m_color(col)
+ScriptColor::ScriptColor(const Vector3& color) :
+	m_color(color)
 {
 }
 
-ScriptColor::ScriptColor(Vector4 const& col) :
-	m_color(col)
+ScriptColor::ScriptColor(const Vector4& color) :
+	m_color(color)
 {
 }
 
-ScriptColor::ScriptColor(D3DCOLOR col) : 
-	m_color(col)
+ScriptColor::ScriptColor(D3DCOLOR color) : 
+	m_color(color)
 {
 }
 
@@ -102,9 +104,9 @@ byte ScriptColor::GetR() const
 	return m_color.GetR();
 }
 
-void ScriptColor::SetR(byte v)
+void ScriptColor::SetR(byte value)
 {
-	m_color.SetR(v);
+	m_color.SetR(value);
 }
 
 byte ScriptColor::GetG() const
@@ -112,9 +114,9 @@ byte ScriptColor::GetG() const
 	return m_color.GetG();
 }
 
-void ScriptColor::SetG(byte v)
+void ScriptColor::SetG(byte value)
 {
-	m_color.SetG(v);
+	m_color.SetG(value);
 }
 
 byte ScriptColor::GetB() const
@@ -122,9 +124,9 @@ byte ScriptColor::GetB() const
 	return m_color.GetB();
 }
 
-void ScriptColor::SetB(byte v)
+void ScriptColor::SetB(byte value)
 {
-	m_color.SetB(v);
+	m_color.SetB(value);
 }
 
 byte ScriptColor::GetA() const
@@ -132,9 +134,9 @@ byte ScriptColor::GetA() const
 	return m_color.GetA();
 }
 
-void ScriptColor::SetA(byte v)
+void ScriptColor::SetA(byte value)
 {
-	m_color.SetA(v);
+	m_color.SetA(value);
 }
 
 /***
@@ -144,5 +146,5 @@ void ScriptColor::SetA(byte v)
 */
 std::string ScriptColor::ToString() const
 {
-	return "{" + std::to_string(GetR()) + ", " + std::to_string(GetG()) + ", " + std::to_string(GetB()) +  ", " + std::to_string(GetA()) + "}";
+	return "{" + std::to_string(GetR()) + ", " + std::to_string(GetG()) + ", " + std::to_string(GetB()) + ", " + std::to_string(GetA()) + "}";
 }

@@ -2,6 +2,7 @@
 
 //#define _XM_NO_INTRINSICS_ 1
 
+#include <future>
 #include <algorithm>
 #include <array>
 #include <d3d11.h>

@@ -1,25 +1,26 @@
 #include "framework.h"
-#include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
-#include "Objects/Utils/VehicleHelpers.h"
+#include "Objects/TR4/Vehicles/motorbike_info.h"
+
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/simple_particle.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/Gui.h"
+#include "Game/Hud/Hud.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Gui.h"
-#include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_one_gun.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/items.h"
-#include "Game/effects/simple_particle.h"
-#include "Game/Hud/Hud.h"
-#include "Game/camera.h"
-#include "Game/animation.h"
+#include "Game/Setup.h"
 #include "Math/Random.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
+#include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
+#include "Specific/level.h"
 
 using std::vector;
 using namespace TEN::Input;
@@ -139,7 +140,7 @@ namespace TEN::Entities::Vehicles
 		return (MotorbikeInfo*)motorbikeItem->Data;
 	}
 
-	void InitialiseMotorbike(short itemNumber)
+	void InitializeMotorbike(short itemNumber)
 	{
 		auto* motorbikeItem = &g_Level.Items[itemNumber];
 		motorbikeItem->Data = MotorbikeInfo();
@@ -215,10 +216,10 @@ namespace TEN::Entities::Vehicles
 
 	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int oldX = old->x / BLOCK(1);
+		int oldZ = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -236,7 +237,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				motorbikeItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				motorbikeItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (motorbikeItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -249,7 +250,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				motorbikeItem->Pose.Position.x += SECTOR(1) - shiftX;
+				motorbikeItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - motorbikeItem->Pose.Position.z);
 			}
 		}
@@ -264,7 +265,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			floorHeight = GetCollision(pos->x, pos->y, old->z, motorbikeItem->RoomNumber).Position.Floor;
@@ -273,7 +274,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)
@@ -576,7 +577,7 @@ namespace TEN::Entities::Vehicles
 
 			motorbikeItem->Pose.Orientation.y += motorbike->TurnRate + motorbike->ExtraRotation;
 			rotation = motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle;
-			momentum = MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN - ((2 * motorbike->Velocity) / SECTOR(1));
+			momentum = MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN - ((2 * motorbike->Velocity) / BLOCK(1));
 
 			if (!(TrInput & VEHICLE_IN_ACCELERATE) && motorbike->Velocity > 0)
 				momentum += momentum / 2;
@@ -1097,7 +1098,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.ActiveState == MOTORBIKE_STATE_MOVING_BACK)
 			{
 				int currentFrame = laraItem->Animation.FrameNumber;
-				int frameBase = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				int frameBase = GetAnimData(laraItem).frameBase;
 
 				if (currentFrame >= frameBase + 24 &&
 					currentFrame <= frameBase + 29)
@@ -1145,7 +1146,7 @@ namespace TEN::Entities::Vehicles
 		SetAnimation(*motorbikeItem, GetAnimNumber(*laraItem), GetFrameNumber(laraItem));
 
 		motorbikeItem->HitPoints = 1;
-		motorbikeItem->Flags = short(IFLAG_KILLED); // hmm... maybe wrong name (it can be IFLAG_CODEBITS)?
+		motorbikeItem->Flags = IFLAG_KILLED; // hmm... maybe wrong name (it can be IFLAG_CODEBITS)?
 		motorbike->Revs = 0;
 	}
 
@@ -1270,7 +1271,7 @@ namespace TEN::Entities::Vehicles
 		if (probe.RoomNumber != motorbikeItem->RoomNumber)
 		{
 			ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+			ItemNewRoom(laraItem->Index, probe.RoomNumber);
 		}
 
 		laraItem->Pose = motorbikeItem->Pose;

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_sword_guardian.h"
 
-#include "collision/collide_room.h"
+#include "Game/collision/collide_room.h"
 #include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -11,10 +11,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Objects/TR2/Entity/tr2_spear_guardian.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto SWORD_GUARDIAN_MESH_SWAP_TIME = 3;
 
-	const auto SwordBite = BiteInfo(Vector3(0.0f, 37.0f, 550.0f), 15);
+	const auto SwordBite = CreatureBiteInfo(Vector3(0, 37, 550), 15);
 
 	enum SwordGuardianState
 	{
@@ -167,12 +167,12 @@ namespace TEN::Entities::Creatures::TR2
 		SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose);
 	}
 
-	void InitialiseSwordGuardian(short itemNumber)
+	void InitializeSwordGuardian(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SWORD_GUARDIAN_ANIM_AWAKE);
 		item.Status &= ~ITEM_INVISIBLE;
 
@@ -352,7 +352,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraTorsoRot.y = ai.angle;
 				}
 
-				if (!creature->Flags && item->TouchBits.Test(SwordBite.meshNum))
+				if (!creature->Flags && item->TouchBits.Test(SwordBite.BoneID))
 				{
 					DoDamage(creature->Enemy, SWORD_GUARDIAN_ATTACK_DAMAGE);
 					CreatureEffect(item, SwordBite, DoBloodSplat);

@@ -33,8 +33,8 @@ numbers, this will be less accurate at smaller lengths.
 For example, if you have the vector (100, 600, 700) and set it to
 the length of 1, the vector SHOULD become approximately (0.11, 0.65, 0.75).
 However, this function would return it as (0, 1, 1).
-@tparam int length the new length to set the vector to.
-@function Vec3:GetNormalised
+@tparam float length the new length to set the vector to.
+@function Vec3:ToLength
 */
 		ScriptReserved_ToLength, &Vec3::ToLength,
 
@@ -121,7 +121,7 @@ Vec3 UnaryMinusVec3(const Vec3& vector)
 	return Vec3(vector.x * -1, vector.y * -1, vector.z * -1);
 }
 
-void Vec3::ToLength(int newLength)
+void Vec3::ToLength(float newLength)
 {
 	float length = sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
 	x = (int)round((x / length) * newLength);

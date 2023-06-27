@@ -3,5 +3,5 @@
 namespace TEN::Entities
 {
 	void AllocTR4Objects();
-	void InitialiseTR4Objects();
+	void InitializeTR4Objects();
 }

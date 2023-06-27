@@ -18,13 +18,13 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Objects/Sink.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
@@ -40,10 +40,10 @@ namespace TEN::Entities::Vehicles
 {
 	constexpr auto UPV_RADIUS = 300;
 	constexpr auto UPV_HEIGHT = 400;
-	constexpr auto UPV_LENGTH = SECTOR(1);
+	constexpr auto UPV_LENGTH = BLOCK(1);
 	constexpr auto UPV_WATER_SURFACE_DISTANCE = 210;
 	constexpr auto UPV_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto UPV_DISMOUNT_DISTANCE = SECTOR(1);
+	constexpr auto UPV_DISMOUNT_DISTANCE = BLOCK(1);
 
 	constexpr int UPV_VELOCITY_ACCEL = 4 * VEHICLE_VELOCITY_SCALE;
 	constexpr int UPV_VELOCITY_FRICTION_DECEL = 1.5f * VEHICLE_VELOCITY_SCALE;
@@ -84,15 +84,16 @@ namespace TEN::Entities::Vehicles
 	#define UPV_LEAN_RATE ANGLE(0.6f)
 	#define UPV_LEAN_MAX  ANGLE(10.0f)
 
-	BiteInfo UPVBites[6] =
+	const CreatureBiteInfo UPVBites[6] =
 	{
-		{ 0, 0, 0, 3 },
-		{ 0, 96, 256, 0 },
-		{ -128, 0, 64, 1 },
-		{ 0, 0, -64, 1 },
-		{ 128, 0, 64, 2 },
-		{ 0, 0, -64, 2 }
+		CreatureBiteInfo(Vector3(0, 0, 0), 3),
+		CreatureBiteInfo(Vector3(0, 96, 256), 0),
+		CreatureBiteInfo(Vector3(-128, 0, 64), 1),
+		CreatureBiteInfo(Vector3(0, 0, -64), 1),
+		CreatureBiteInfo(Vector3(128, 0, 64), 2),
+		CreatureBiteInfo(Vector3(0, 0, -64), 2)
 	};
+
 	const std::vector<VehicleMountType> UPVMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -161,7 +162,7 @@ namespace TEN::Entities::Vehicles
 		return (UPVInfo*)UPVItem->Data;
 	}
 
-	void UPVInitialise(short itemNumber)
+	void UPVInitialize(short itemNumber)
 	{
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		UPVItem->Data = UPVInfo();
@@ -183,7 +184,7 @@ namespace TEN::Entities::Vehicles
 		{
 			// HACK: Collision in water behaves differently? @Sezz 2022.06.28
 			if (TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) && TestCollision(UPVItem, laraItem))
-				ItemPushItem(UPVItem, laraItem, coll, false, false);
+				ItemPushItem(UPVItem, laraItem, coll, false, 0);
 		}
 		else
 		{
@@ -304,7 +305,7 @@ namespace TEN::Entities::Vehicles
 
 			if (UPV->Velocity)
 			{
-				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE].meshNum, Vector3i(UPVBites[UPV_BITE_TURBINE].Position)).ToVector3();
+				auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_TURBINE]).ToVector3();
 				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / VEHICLE_VELOCITY_SCALE, UPVItem->Pose.Orientation.y + ANGLE(180.0f));
 
 				auto sphere = BoundingSphere(pos, BLOCK(1 / 32.0f));
@@ -322,7 +323,7 @@ namespace TEN::Entities::Vehicles
 		for (int lp = 0; lp < 2; lp++)
 		{
 			int random = 31 - (GetRandomControl() & 3);
-			auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_FRONT_LIGHT].meshNum, Vector3i(
+			auto pos = GetJointPosition(UPVItem, UPVBites[UPV_BITE_FRONT_LIGHT].BoneID, Vector3i(
 				UPVBites[UPV_BITE_FRONT_LIGHT].Position.x,
 				UPVBites[UPV_BITE_FRONT_LIGHT].Position.y,
 				(int)UPVBites[UPV_BITE_FRONT_LIGHT].Position.z << (lp * 6)
@@ -419,8 +420,8 @@ namespace TEN::Entities::Vehicles
 			int dz = target.z - laraItem->Pose.Position.z;
 
 			int velocity = g_Level.Sinks[sinkVal].Strength;
-			dx = phd_sin(angle * 16) * velocity * SECTOR(1);
-			dz = phd_cos(angle * 16) * velocity * SECTOR(1);
+			dx = phd_sin(angle * 16) * velocity * BLOCK(1);
+			dz = phd_cos(angle * 16) * velocity * BLOCK(1);
 
 			lara->Context.WaterCurrentPull.x += ((dx - lara->Context.WaterCurrentPull.x) / 16);
 			lara->Context.WaterCurrentPull.z += ((dz - lara->Context.WaterCurrentPull.z) / 16);
@@ -526,7 +527,7 @@ namespace TEN::Entities::Vehicles
 
 		TestUPVDismount(UPVItem, laraItem);
 
-		int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
 
 		switch (laraItem->Animation.ActiveState)
 		{
@@ -941,7 +942,7 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
 		{
-			int waterHeight = GetWaterHeight(UPVItem);
+			waterHeight = GetWaterHeight(UPVItem);
 			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
 		}
 
@@ -966,7 +967,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != UPVItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose = UPVItem->Pose;

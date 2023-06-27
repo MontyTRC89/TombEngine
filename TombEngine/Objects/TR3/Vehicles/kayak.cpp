@@ -11,12 +11,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Objects/Sink.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -140,7 +140,7 @@ namespace TEN::Entities::Vehicles
 		return (KayakInfo*)kayakItem->Data;
 	}
 
-	void InitialiseKayak(short itemNumber)
+	void InitializeKayak(short itemNumber)
 	{
 		auto* kayakItem = &g_Level.Items[itemNumber];
 		kayakItem->Data = KayakInfo();
@@ -193,7 +193,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (laraItem->RoomNumber != kayakItem->RoomNumber)
-			ItemNewRoom(lara->ItemNumber, kayakItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, kayakItem->RoomNumber);
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = kayakItem->Pose.Position;
@@ -364,11 +364,11 @@ namespace TEN::Entities::Vehicles
 
 	int KayakDoShift(ItemInfo* kayakItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
 
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
+		int xOld = old->x / BLOCK(1);
+		int zOld = old->z / BLOCK(1);
 
 		int xShift = pos->x & WALL_MASK;
 		int zShift = pos->z & WALL_MASK;
@@ -389,7 +389,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				kayakItem->Pose.Position.z += SECTOR(1) - zShift;
+				kayakItem->Pose.Position.z += BLOCK(1) - zShift;
 				return (kayakItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -405,7 +405,7 @@ namespace TEN::Entities::Vehicles
 
 			else
 			{
-				kayakItem->Pose.Position.x += SECTOR(1) - xShift;
+				kayakItem->Pose.Position.x += BLOCK(1) - xShift;
 				return (pos->z - kayakItem->Pose.Position.z);
 			}
 		}
@@ -420,7 +420,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -zShift - 1;
 				else
-					z = SECTOR(1) - zShift;
+					z = BLOCK(1) - zShift;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, kayakItem->RoomNumber);
@@ -429,7 +429,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -xShift - 1;
 				else
-					x = SECTOR(1) - xShift;
+					x = BLOCK(1) - xShift;
 			}
 
 			if (x && z)
@@ -618,7 +618,7 @@ namespace TEN::Entities::Vehicles
 			SetAnimation(*laraItem, ID_KAYAK_LARA_ANIMS, KAYAK_ANIM_IDLE_DEATH);
 		}
 
-		int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
 
 		switch (laraItem->Animation.ActiveState)
 		{
@@ -1118,7 +1118,7 @@ namespace TEN::Entities::Vehicles
 			if (kayakItem->RoomNumber != probe.RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose.Position = kayakItem->Pose.Position;

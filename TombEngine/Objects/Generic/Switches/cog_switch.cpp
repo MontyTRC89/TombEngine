@@ -20,9 +20,9 @@ namespace TEN::Entities::Switches
 	const ObjectCollisionBounds CogSwitchBounds =
 	{
 		GameBoundingBox(
-			-SECTOR(0.5f), SECTOR(0.5f),
+			-BLOCK(0.5f), BLOCK(0.5f),
 			0, 0,
-			-SECTOR(1.5f), -SECTOR(0.5f)
+			-BLOCK(1.5f), -BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -87,7 +87,7 @@ namespace TEN::Entities::Switches
 						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;
 						laraItem->Animation.TargetState = LS_COGWHEEL;
 						laraItem->Animation.ActiveState = LS_COGWHEEL;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+						laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 						lara->Context.InteractedItem = targetItemNum;
@@ -137,7 +137,7 @@ namespace TEN::Entities::Switches
 
 			if (LaraItem->Animation.AnimNumber == LA_COGWHEEL_PULL)
 			{
-				if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase + 10)
+				if (LaraItem->Animation.FrameNumber == GetAnimData(LaraItem).frameBase + 10)
 				{
 					if (!switchItem->TriggerFlags)
 					{
@@ -149,7 +149,7 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if ((switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
+			if ((switchItem->Animation.FrameNumber == GetAnimData(switchItem).frameEnd)
 				&& (LaraItem->Animation.AnimNumber == LA_COGWHEEL_RELEASE))
 			{
 				switchItem->Animation.ActiveState = SWITCH_OFF;

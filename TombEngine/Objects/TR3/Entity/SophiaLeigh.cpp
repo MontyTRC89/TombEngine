@@ -10,17 +10,17 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
+#include "Game/misc.h"
+#include "Game/setup.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/people.h"
+#include "Game/effects/spark.h"
 #include "Objects/Effects/Boss.h"
 #include "Objects/Effects/enemy_missile.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
-#include "misc.h"
-#include "setup.h"
-#include "lara_helpers.h"
-#include "tomb4fx.h"
-#include "people.h"
-#include "Game/effects/spark.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Entities::Effects;
@@ -63,9 +63,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
 
-	const auto SophiaLeighStaffBite = BiteInfo(Vector3(-28.0f, 56.0f, 356.0f), 10);
-	const auto SophiaLeighLeftBite	= BiteInfo(Vector3(-72.0f, 48.0f, 356.0f), 10);
-	const auto SophiaLeighRightBite = BiteInfo(Vector3(16.0f, 48.0f, 304.0f), 10);
+	const auto SophiaLeighStaffBite = CreatureBiteInfo(Vector3(-28, 56, 356), 10);
+	const auto SophiaLeighLeftBite	= CreatureBiteInfo(Vector3(-72, 48, 356), 10);
+	const auto SophiaLeighRightBite = CreatureBiteInfo(Vector3(16, 48, 304), 10);
 
 	struct SophiaData
 	{
@@ -243,7 +243,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const BiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
+	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const CreatureBiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber);
 		if (fxNumber == NO_ITEM)
@@ -253,7 +253,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto boltType = isBoltLarge ? (short)MissileType::SophiaLeighLarge : (short)MissileType::SophiaLeighNormal;
 
-		fx.pos.Position = GetJointPosition(&item, bite.meshNum, bite.Position);
+		fx.pos.Position = GetJointPosition(&item, bite);
 		fx.pos.Orientation.x = item.Pose.Orientation.x + data->torsoXAngle;
 
 		if (enemy->IsLara())
@@ -692,11 +692,11 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void InitialiseSophiaLeigh(short itemNumber)
+	void InitializeSophiaLeigh(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		CheckForRequiredObjects(item);						// ItemFlags[0] is used.
 		item.ItemFlags[1] = 0;								// Light timer (for smoothing).
 		item.ItemFlags[4] = 0;								// Charged state (true or false).
@@ -721,7 +721,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.Animation.ActiveState != SOPHIALEIGH_STATE_DEATH)
 				SetAnimation(&item, SOPHIALEIGH_ANIM_DEATH);
 
-			int frameEnd = g_Level.Anims[object.animIndex + SOPHIALEIGH_ANIM_DEATH].frameEnd;
+			int frameEnd = GetAnimData(object, SOPHIALEIGH_ANIM_DEATH).frameEnd;
 			if (item.Animation.FrameNumber >= frameEnd)
 			{
 				// Avoid having the object stop working.

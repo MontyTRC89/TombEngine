@@ -20,7 +20,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0,
-			-SECTOR(0.5f), SECTOR(0.5f)
+			-BLOCK(0.5f), BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto PulleyPos = Vector3i(0, 0, -148);
 
-	void InitialisePulleySwitch(short itemNumber)
+	void InitializePulleySwitch(short itemNumber)
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
 
@@ -73,7 +73,7 @@ namespace TEN::Entities::Switches
 				{
 					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
 					laraItem->Animation.ActiveState = LS_PULLEY;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 
 					AddActiveItem(itemNumber);
 

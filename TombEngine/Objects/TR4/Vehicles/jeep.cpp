@@ -2,8 +2,6 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 
 #include "Game/animation.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
@@ -11,16 +9,18 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/Gui.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/Renderer11Enums.h"
-#include "Specific/Input/Input.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -142,7 +142,7 @@ namespace TEN::Entities::Vehicles
 		return (JeepInfo*)jeepItem->Data;
 	}
 
-	void InitialiseJeep(short itemNumber)
+	void InitializeJeep(short itemNumber)
 	{
 		auto* jeepItem = &g_Level.Items[itemNumber];
 		jeepItem->Data = JeepInfo();
@@ -223,10 +223,10 @@ namespace TEN::Entities::Vehicles
 
 	static int DoJeepShift(ItemInfo* jeepItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int oldX = old->x / BLOCK(1);
+		int oldZ = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -1395,7 +1395,7 @@ namespace TEN::Entities::Vehicles
 			if (roomNumber != jeepItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, roomNumber);
-				ItemNewRoom(lara->ItemNumber, roomNumber);
+				ItemNewRoom(laraItem->Index, roomNumber);
 			}
 
 			laraItem->Pose = jeepItem->Pose;
@@ -1405,7 +1405,7 @@ namespace TEN::Entities::Vehicles
 			SyncVehicleAnimation(*jeepItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(30.0f);
-			Camera.targetDistance = SECTOR(2);
+			Camera.targetDistance = BLOCK(2);
 
 			if (jeep->Gear == 1)
 				jeep->CameraElevation += ((32578 - jeep->CameraElevation) / 8);

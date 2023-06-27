@@ -8,11 +8,11 @@
 #include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
@@ -36,13 +36,13 @@ namespace TEN::Renderer
 
 	// Vertical spacing templates
 	constexpr auto MenuVerticalLineSpacing = 30;
-	constexpr auto MenuVerticalNarrowLineSpacing = 25;
+	constexpr auto MenuVerticalNarrowLineSpacing = 24;
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalTop = 15;
+	constexpr auto MenuVerticalTop = 11;
 	constexpr auto MenuVerticalDisplaySettings = 200;
-	constexpr auto MenuVerticalOtherSettings = 150;
+	constexpr auto MenuVerticalOtherSettings = 130;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
@@ -74,7 +74,7 @@ namespace TEN::Renderer
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
 	TEN::Renderer::RendererHudBar* g_SFXVolumeBar	= nullptr;
 
-	void Renderer11::InitialiseMenuBars(int y)
+	void Renderer11::InitializeMenuBars(int y)
 	{
 		static const auto soundSettingColors = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
@@ -205,9 +205,9 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
-			// Initialise bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
+			// Initialize bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
 			if (g_MusicVolumeBar == nullptr)
-				InitialiseMenuBars(y);
+				InitializeMenuBars(y);
 
 			// Music volume
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
@@ -219,29 +219,32 @@ namespace TEN::Renderer
 			DrawBar(g_Gui.GetCurrentSettings().Configuration.SfxVolume / 100.0f, *g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
+			// Subtitles
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			GetNextLinePosition(&y);
 
 			// Auto targeting
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
 			GetNextLinePosition(&y);
 
 			// Vibration
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(title_option == 5));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
 			GetNextLinePosition(&y);
 
 			// Thumbstick camera
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(title_option == 5));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(title_option == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 6));
 			GetNextBlockPosition(&y);
 
-
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 6));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 7));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 7));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 8));
 			break;
 
 		case Menu::Controls:
@@ -272,12 +275,16 @@ namespace TEN::Renderer
 					GetNextBlockPosition(&y);
 			}
 
+			// Defaults
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+			GetNextLinePosition(&y);
+
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 19));
 			break;
 		}
 	}
@@ -398,7 +405,7 @@ namespace TEN::Renderer
 		int y = MenuVerticalLineSpacing;
 		short selection = g_Gui.GetLoadSaveSelection();
 		char stringBuffer[255];
-		LoadSavegameInfos();
+		SaveGame::LoadSavegameInfos();
 
 		// Title
 		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
@@ -567,8 +574,8 @@ namespace TEN::Renderer
 		{
 			auto frameData = AnimFrameInterpData
 			{
-				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
-				&g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr],
+				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
+				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
 				0.0f
 			};
 			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
@@ -840,7 +847,7 @@ namespace TEN::Renderer
 
 	void Renderer11::SetLoadingScreen(std::wstring& fileName)
 	{
-		SetTextureOrDefault(loadingScreenTexture, fileName);
+		SetTextureOrDefault(m_loadingScreenTexture, fileName);
 	}
 
 	void Renderer11::RenderLoadingScreen(float percentage)
@@ -861,9 +868,9 @@ namespace TEN::Renderer
 			ResetScissor();
 
 			// Draw the full screen background
-			if (loadingScreenTexture.Texture)
+			if (m_loadingScreenTexture.Texture)
 				DrawFullScreenQuad(
-					loadingScreenTexture.ShaderResourceView.Get(),
+					m_loadingScreenTexture.ShaderResourceView.Get(),
 					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
 
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
@@ -928,7 +935,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    Statics: %d", m_numStaticsDrawCalls);
 				PrintDebugMessage("    Sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Triangles: %d", m_numPolygons);
-				PrintDebugMessage("Sprites: %d", view.spritesToDraw.size());
+				PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    Rooms: %d", m_numRoomsTransparentDrawCalls);
 				PrintDebugMessage("    Movables: %d", m_numMoveablesTransparentDrawCalls);
@@ -936,7 +943,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    Sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Transparent room polys: %d", m_numRoomsTransparentPolygons);
-				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
 				PrintDebugMessage("    Dot products: %d", m_dotProducts);

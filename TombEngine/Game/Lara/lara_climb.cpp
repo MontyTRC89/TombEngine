@@ -617,8 +617,8 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 
 	if (angle && angle != SOUTH)
 	{
-		x = (item->Pose.Position.x & -SECTOR(1)) - (item->Pose.Position.z % SECTOR(1)) + SECTOR(1);
-		z = (item->Pose.Position.z & -SECTOR(1)) - (item->Pose.Position.x % SECTOR(1)) + SECTOR(1);
+		x = (item->Pose.Position.x & -BLOCK(1)) - (item->Pose.Position.z % BLOCK(1)) + BLOCK(1);
+		z = (item->Pose.Position.z & -BLOCK(1)) - (item->Pose.Position.x % BLOCK(1)) + BLOCK(1);
 	}
 	else
 	{
@@ -647,24 +647,24 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 		switch (angle)
 		{
 		case NORTH:
-			x = ((item->Pose.Position.x + SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.z % SECTOR(1)) + SECTOR(1);
-			z = ((item->Pose.Position.z + SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.x % SECTOR(1)) + SECTOR(1);
+			x = ((item->Pose.Position.x + BLOCK(1)) & -BLOCK(1)) - (item->Pose.Position.z % BLOCK(1)) + BLOCK(1);
+			z = ((item->Pose.Position.z + BLOCK(1)) & -BLOCK(1)) - (item->Pose.Position.x % BLOCK(1)) + BLOCK(1);
 			break;
 
 		case SOUTH:
-			x = ((item->Pose.Position.x - SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.z % SECTOR(1)) + SECTOR(1);
-			z = ((item->Pose.Position.z - SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.x % SECTOR(1)) + SECTOR(1);
+			x = ((item->Pose.Position.x - BLOCK(1)) & -BLOCK(1)) - (item->Pose.Position.z % BLOCK(1)) + BLOCK(1);
+			z = ((item->Pose.Position.z - BLOCK(1)) & -BLOCK(1)) - (item->Pose.Position.x % BLOCK(1)) + BLOCK(1);
 			break;
 
 		case EAST:
-			x = ((item->Pose.Position.z ^ item->Pose.Position.x) % SECTOR(1)) ^ (item->Pose.Position.x + SECTOR(1));
-			z = (item->Pose.Position.z ^ ((item->Pose.Position.z ^ item->Pose.Position.x) % SECTOR(1))) - SECTOR(1);
+			x = ((item->Pose.Position.z ^ item->Pose.Position.x) % BLOCK(1)) ^ (item->Pose.Position.x + BLOCK(1));
+			z = (item->Pose.Position.z ^ ((item->Pose.Position.z ^ item->Pose.Position.x) % BLOCK(1))) - BLOCK(1);
 			break;
 
 		case WEST:
 		default:
-			x = (item->Pose.Position.x ^ (item->Pose.Position.z ^ item->Pose.Position.x) % SECTOR(1)) - SECTOR(1);
-			z = ((item->Pose.Position.z ^ item->Pose.Position.x) % SECTOR(1)) ^ (item->Pose.Position.z + SECTOR(1));
+			x = (item->Pose.Position.x ^ (item->Pose.Position.z ^ item->Pose.Position.x) % BLOCK(1)) - BLOCK(1);
+			z = ((item->Pose.Position.z ^ item->Pose.Position.x) % BLOCK(1)) ^ (item->Pose.Position.z + BLOCK(1));
 			break;
 
 		}
@@ -711,8 +711,8 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 	}
 	else
 	{
-		x = (item->Pose.Position.x & -SECTOR(1)) - (item->Pose.Position.z & WALL_MASK) + SECTOR(1);
-		z = (item->Pose.Position.z & -SECTOR(1)) - (item->Pose.Position.x & WALL_MASK) + SECTOR(1);
+		x = (item->Pose.Position.x & -BLOCK(1)) - (item->Pose.Position.z & WALL_MASK) + BLOCK(1);
+		z = (item->Pose.Position.z & -BLOCK(1)) - (item->Pose.Position.x & WALL_MASK) + BLOCK(1);
 	}
 
 	int shift = 0;
@@ -736,24 +736,24 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 		switch (angle)
 		{
 		case NORTH:
-			x = (item->Pose.Position.x ^ ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK)) - SECTOR(1);
-			z = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.z + SECTOR(1));
+			x = (item->Pose.Position.x ^ ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK)) - BLOCK(1);
+			z = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.z + BLOCK(1));
 			break;
 
 		case SOUTH:
-			x = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.x + SECTOR(1));
-			z = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.z - SECTOR(1));
+			x = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.x + BLOCK(1));
+			z = ((item->Pose.Position.z ^ item->Pose.Position.x) & WALL_MASK) ^ (item->Pose.Position.z - BLOCK(1));
 			break;
 
 		case EAST:
-			x = ((item->Pose.Position.x + SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.z & WALL_MASK) + SECTOR(1);
-			z = ((item->Pose.Position.z + SECTOR(1)) & -SECTOR(1)) - (item->Pose.Position.x & WALL_MASK) + SECTOR(1);
+			x = ((item->Pose.Position.x + BLOCK(1)) & -BLOCK(1)) - (item->Pose.Position.z & WALL_MASK) + BLOCK(1);
+			z = ((item->Pose.Position.z + BLOCK(1)) & -BLOCK(1)) - (item->Pose.Position.x & WALL_MASK) + BLOCK(1);
 			break;
 
 		case WEST:
 		default:
-			x = (item->Pose.Position.x & -SECTOR(1)) - (item->Pose.Position.z & WALL_MASK);
-			z = (item->Pose.Position.z & -SECTOR(1)) - (item->Pose.Position.x & WALL_MASK);
+			x = (item->Pose.Position.x & -BLOCK(1)) - (item->Pose.Position.z & WALL_MASK);
+			z = (item->Pose.Position.z & -BLOCK(1)) - (item->Pose.Position.x & WALL_MASK);
 			break;
 		}
 

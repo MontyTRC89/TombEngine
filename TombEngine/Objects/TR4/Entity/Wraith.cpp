@@ -13,7 +13,6 @@
 #include "Game/people.h"
 #include "Game/room.h"
 #include "Math/Math.h"
-#include "Objects/Generic/Traps/traps.h"
 #include "Objects/TR4/Entity/WraithInfo.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
@@ -178,7 +177,7 @@ namespace TEN::Entities::TR4
 		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
 	}
 
-	void InitialiseWraith(short itemNumber)
+	void InitializeWraith(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -504,7 +503,7 @@ namespace TEN::Entities::TR4
 					SpawnWraithExplosion(item, Vector3(48.0f), 48.0f);
 
 					if (target->TriggerFlags > 0)
-						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].frameBase;
+						target->Animation.FrameNumber = GetAnimData(target).frameBase;
 
 					target->ItemFlags[6] = 0;
 					DoDamage(target, INT_MAX);

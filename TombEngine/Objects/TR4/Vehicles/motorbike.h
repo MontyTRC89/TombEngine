@@ -6,7 +6,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	void InitialiseMotorbike(short itemNumber);
+	void InitializeMotorbike(short itemNumber);
 
 	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoMotorbikeMount(ItemInfo* motorbikeItem, ItemInfo* laraItem, VehicleMountType mountType);

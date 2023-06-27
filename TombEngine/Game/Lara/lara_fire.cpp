@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_fire.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -18,26 +18,21 @@
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "ScriptInterfaceGame.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
-
-constexpr auto TARGET_COUNT_MAX = 8;
-
-std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets = {};
-std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	= {};
 
 int FlashGrenadeAftershockTimer = 0;
 
@@ -280,14 +275,14 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		BLOCK(8),
 		3,
 		0,
-		0,
+		2,
 		0,
 		SFX_TR4_UZI_FIRE,
 		0
 	}
 };
 
-void InitialiseNewWeapon(ItemInfo& laraItem)
+void InitializeNewWeapon(ItemInfo& laraItem)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 
@@ -337,8 +332,8 @@ void InitialiseNewWeapon(ItemInfo& laraItem)
 		break;
 
 	default:
-		player.RightArm.FrameBase = g_Level.Anims[laraItem.Animation.AnimNumber].FramePtr;
-		player.LeftArm.FrameBase = g_Level.Anims[laraItem.Animation.AnimNumber].FramePtr;
+		player.RightArm.FrameBase = GetAnimData(laraItem).FramePtr;
+		player.LeftArm.FrameBase = GetAnimData(laraItem).FramePtr;
 		break;
 	}
 }
@@ -517,7 +512,10 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
-				if (!player.LeftArm.FrameNumber)
+				// NOTE: Original engines for some reason do this check, but it introduces a bug when player
+				// can't drop a flare underwater after it was dropped and picked up again once. -- Lwmte, 20/05/23
+
+				//if (!player.LeftArm.FrameNumber)
 				{
 					player.Control.HandStatus = HandStatus::WeaponUndraw;
 				}
@@ -558,7 +556,7 @@ void HandleWeapon(ItemInfo& laraItem)
 				}
 
 				player.Control.Weapon.GunType = player.Control.Weapon.RequestGunType;
-				InitialiseNewWeapon(laraItem);
+				InitializeNewWeapon(laraItem);
 				player.RightArm.FrameNumber = 0;
 				player.LeftArm.FrameNumber = 0;
 				player.Control.HandStatus = HandStatus::WeaponDraw;
@@ -781,6 +779,7 @@ void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 	arm.Orientation.InterpolateConstant(targetArmOrient, weaponInfo.AimSpeed);
 }
 
+// TODO: Include snowmobile gun in GetAmmo(), otherwise the player won't be able to shoot while controlling it. -- TokyoSU 2023.04.21
 FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, ItemInfo& laraItem, const EulerAngles& armOrient)
 {
 	auto& player = *GetLaraInfo(&laraItem);
@@ -909,7 +908,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			orient.x <= weaponInfo.LockOrientConstraint.second.x &&
 			orient.y <= weaponInfo.LockOrientConstraint.second.y)
 		{
-			TargetList[targetCount] = &item;
+			player.TargetList[targetCount] = &item;
 			++targetCount;
 
 			if (distance < closestDistance &&
@@ -922,14 +921,14 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 		}
 	}
 
-	TargetList[targetCount] = nullptr;
-	if (TargetList[0] == nullptr)
+	player.TargetList[targetCount] = nullptr;
+	if (player.TargetList[0] == nullptr)
 	{
 		player.TargetEntity = nullptr;
 	}
 	else
 	{
-		for (const auto* targetPtr : TargetList)
+		for (const auto* targetPtr : player.TargetList)
 		{
 			if (targetPtr == nullptr)
 				player.TargetEntity = nullptr;
@@ -943,17 +942,17 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			if (player.TargetEntity == nullptr)
 			{
 				player.TargetEntity = closestEntityPtr;
-				LastTargets[0] = nullptr;
+				player.LastTargets[0] = nullptr;
 			}
 			else if (IsClicked(In::SwitchTarget))
 			{
 				player.TargetEntity = nullptr;
 				bool flag = true;
 
-				for (const auto& targetPtr : TargetList)
+				for (const auto& targetPtr : player.TargetList)
 				{
 					bool doLoop = false;
-					for (const auto* lastTargetPtr : LastTargets)
+					for (const auto* lastTargetPtr : player.LastTargets)
 					{
 						if (lastTargetPtr == targetPtr)
 						{
@@ -975,18 +974,18 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 				if (flag)
 				{
 					player.TargetEntity = closestEntityPtr;
-					LastTargets[0] = nullptr;
+					player.LastTargets[0] = nullptr;
 				}
 			}
 		}
 	}
 
-	if (player.TargetEntity != LastTargets[0])
+	if (player.TargetEntity != player.LastTargets[0])
 	{
-		for (int slot = TARGET_COUNT_MAX - 1; slot > 0; --slot)
-			LastTargets[slot] = LastTargets[slot - 1];
+		for (int slot = LaraInfo::TARGET_COUNT_MAX - 1; slot > 0; --slot)
+			player.LastTargets[slot] =  player.LastTargets[slot - 1];
 		
-		LastTargets[0] = player.TargetEntity;
+		player.LastTargets[0] = player.TargetEntity;
 	}
 
 	LaraTargetInfo(laraItem, weaponInfo);

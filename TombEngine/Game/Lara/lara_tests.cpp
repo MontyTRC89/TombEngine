@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_tests.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
@@ -71,7 +71,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 		return false;
 
 	// Determine allowed slope difference for a given collision radius
-	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)SECTOR(1)) * (coll->Setup.Radius * 2);
+	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)BLOCK(1)) * (coll->Setup.Radius * 2);
 
 	// Discard if there is a slope beyond tolerance delta
 	if (abs(left - right) >= slopeDelta)
@@ -250,9 +250,9 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		else // Death, incorrect ledge or ACTION release
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
-			item->Pose.Position.x += coll->Shift.x;
+			item->Pose.Position.x += coll->Shift.Position.x;
 			item->Pose.Position.y += GameBoundingBox(item).Y2 * 1.8f;
-			item->Pose.Position.z += coll->Shift.z;
+			item->Pose.Position.z += coll->Shift.Position.z;
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.z = 2;
 			item->Animation.Velocity.y = 1;
@@ -472,12 +472,12 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 	{
 	case NORTH:
 	case SOUTH:
-		item->Pose.Position.z += coll2.Shift.z;
+		item->Pose.Position.z += coll2.Shift.Position.z;
 		break;
 
 	case EAST:
 	case WEST:
-		item->Pose.Position.x += coll2.Shift.x;
+		item->Pose.Position.x += coll2.Shift.Position.x;
 		break;
 
 	default:
@@ -773,24 +773,16 @@ bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
 	return !res;
 }
 
-bool TestLaraWall(ItemInfo* item, int distance, int height, int side)
+bool TestLaraWall(ItemInfo* item, float dist, float height)
 {
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
-
-	auto start = GameVector(
-		item->Pose.Position.x + (side * c),
-		item->Pose.Position.y + height,
-		item->Pose.Position.z + (-side * s),
+	auto origin = GameVector(
+		Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, 0.0f, height),
+		item->RoomNumber);
+	auto target = GameVector(
+		Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, dist, height),
 		item->RoomNumber);
 
-	auto end = GameVector(
-		item->Pose.Position.x + (distance * s) + (side * c),
-		item->Pose.Position.y + height,
-		item->Pose.Position.z + (distance * c) + (-side * s),
-		item->RoomNumber);
-
-	return !LOS(&start, &end);
+	return !LOS(&origin, &target);
 }
 
 bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance)
@@ -1046,11 +1038,11 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 		break;
 
 	case SOUTH:
-		item->Pose.Position.z = (item->Pose.Position.z & -SECTOR(1)) + LARA_RADIUS + 1;
+		item->Pose.Position.z = (item->Pose.Position.z & -BLOCK(1)) + LARA_RADIUS + 1;
 		break;
 
 	case WEST:
-		item->Pose.Position.x = (item->Pose.Position.x & -SECTOR(1)) + LARA_RADIUS + 1;
+		item->Pose.Position.x = (item->Pose.Position.x & -BLOCK(1)) + LARA_RADIUS + 1;
 		break;
 	}
 
@@ -1098,19 +1090,6 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.WaterStatus = WaterStatus::Wade;
 	}
 }
-
-#ifndef NEW_TIGHTROPE
-void GetTightropeFallOff(ItemInfo* item, int regularity)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (item->HitPoints <= 0 || item->HitStatus)
-		SetAnimation(item, LA_TIGHTROPE_FALL_LEFT);
-
-	if (!lara->Control.Tightrope.Fall && !(GetRandomControl() & regularity))
-		lara->Control.Tightrope.Fall = 2 - ((GetRandomControl() & 0xF) != 0);
-}
-#endif
 
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList)
 {
@@ -1651,7 +1630,7 @@ bool TestLaraCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 	// Assess continuity of path.
 	int distance = 0;
 	auto probeA = GetCollision(item);
-	while (distance < SECTOR(1))
+	while (distance < BLOCK(1))
 	{
 		distance += CLICK(1);
 		auto probeB = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
@@ -2314,7 +2293,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_CROUCH && TestLaraCrawlDownStep(item, coll).Success)
 			crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
 
 		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
@@ -2327,7 +2306,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_WALK)
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_FLIP;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
 
 		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
@@ -2551,7 +2530,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 
 	bool atLeastOnePoleCollided = false;
 
-	if (GetCollidedObjects(item, SECTOR(1), true, CollidedItems, nullptr, false) &&
+	if (GetCollidedObjects(item, BLOCK(1), true, CollidedItems, nullptr, false) &&
 		CollidedItems[0] != nullptr)
 	{
 		auto laraBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);

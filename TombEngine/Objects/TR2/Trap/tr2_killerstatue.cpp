@@ -6,15 +6,15 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
-void InitialiseKillerStatue(short itemNumber)
+void InitializeKillerStatue(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.FrameNumber = GetAnimData(item).frameBase;
 	item->Animation.ActiveState = 1;
 }
 
@@ -31,10 +31,10 @@ void KillerStatueControl(short itemNumber)
 	{
 		DoDamage(LaraItem, 20);
 
-		int x = LaraItem->Pose.Position.x + (GetRandomControl() - SECTOR(16)) / CLICK(1);
-		int z = LaraItem->Pose.Position.z + (GetRandomControl() - SECTOR(16)) / CLICK(1);
+		int x = LaraItem->Pose.Position.x + (GetRandomControl() - BLOCK(16)) / CLICK(1);
+		int z = LaraItem->Pose.Position.z + (GetRandomControl() - BLOCK(16)) / CLICK(1);
 		int y = LaraItem->Pose.Position.y - GetRandomControl() / 44;
-		int d = (GetRandomControl() - SECTOR(16)) / 8 + LaraItem->Pose.Orientation.y;
+		int d = (GetRandomControl() - BLOCK(16)) / 8 + LaraItem->Pose.Orientation.y;
 
 		DoBloodSplat(x, y, z, LaraItem->Animation.Velocity.z, d, LaraItem->RoomNumber);
 	}

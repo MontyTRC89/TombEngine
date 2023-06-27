@@ -13,13 +13,13 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -185,8 +185,11 @@ void DoThumbstickCamera()
 			AxisMap[InputAxis::CameraHorizontal],
 			AxisMap[InputAxis::CameraVertical]);
 
-		Camera.targetAngle = VERTICAL_CONSTRAINT_ANGLE * axisCoeff.y;
-		Camera.targetElevation = ANGLE(-10.0f) + (HORIZONTAL_CONSTRAINT_ANGLE * axisCoeff.x);
+		if (abs(axisCoeff.x) > EPSILON)
+			Camera.targetElevation = ANGLE(-10.0f + (HORIZONTAL_CONSTRAINT_ANGLE * axisCoeff.x));
+
+		if (abs(axisCoeff.y) > EPSILON && abs(Camera.targetAngle) == 0)
+			Camera.targetAngle = ANGLE(VERTICAL_CONSTRAINT_ANGLE * axisCoeff.y);
 	}
 }
 
@@ -302,7 +305,8 @@ inline void RumbleFromBounce()
 	Rumble(std::clamp((float)abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
 }
 
-void InitialiseCamera()
+
+void InitializeCamera()
 {
 	Camera.shift = LaraItem->Pose.Position.y - BLOCK(1);
 

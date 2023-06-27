@@ -1,9 +1,9 @@
 #pragma once
+
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 
 struct ItemInfo;
-struct CollisionInfo;
 class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
@@ -11,7 +11,7 @@ enum RoomEnvFlags;
 
 constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
-constexpr auto COLLISION_CHECK_DISTANCE = SECTOR(8);
+constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
 enum CollisionType
 {
@@ -105,12 +105,15 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	Vector3i Shift;
+	Pose Shift = Pose::Zero;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
+
+	int  LastBridgeItemNumber;
+	Pose LastBridgeItemPose;
 
 	bool HitStatic;
 	bool HitTallObject;

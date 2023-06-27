@@ -1,15 +1,16 @@
 #include "framework.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
-#include "Specific/level.h"
+
 #include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
-#include "Specific/setup.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
-#include "Sound/sound.h"
-#include "Game/Lara/lara.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Setup.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 using namespace TEN::Effects::Ripple;
 
@@ -99,7 +100,7 @@ void ClearRats()
 	}
 }
 
-void InitialiseLittleRats(short itemNumber)
+void InitializeLittleRats(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -170,7 +171,7 @@ void UpdateRats()
 				if (rat->Flags & 1)
 				{
 					// if rat is very near
-					if (abs(dz) + abs(dx) <= SECTOR(1))
+					if (abs(dz) + abs(dx) <= BLOCK(1))
 					{
 						if (rat->Velocity & 1)
 							rat->Pose.Orientation.y += ANGLE(2.8f);

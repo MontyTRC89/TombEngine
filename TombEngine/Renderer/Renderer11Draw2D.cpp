@@ -5,8 +5,11 @@
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/effects/weather.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
+#include "Objects/game_object_ids.h"
+#include "Objects/Utils/object_helper.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
@@ -19,7 +22,7 @@ TEN::Renderer::RendererHudBar* g_LoadingBar;
 
 namespace TEN::Renderer
 {
-	void Renderer11::InitialiseGameBars()
+	void Renderer11::InitializeGameBars()
 	{
 		constexpr auto AIR_BAR_POS		= Vector2(630.0f, 30.0f);
 		constexpr auto EXPOSURE_BAR_POS = Vector2(630.0f, 70.0f);
@@ -106,6 +109,9 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
+		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering"))
+			return;
+
 		unsigned int strides = sizeof(RendererVertex);
 		unsigned int offset = 0;
 	
@@ -184,7 +190,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_NONE);
 
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
-		BindTexture(TEXTURE_HUD, &loadingBarBorder, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TEXTURE_HUD, &m_loadingBarBorder, SAMPLER_LINEAR_CLAMP);
 
 		m_stHUDBar.BarStartUV = Vector2::Zero;
 		m_stHUDBar.BarScale = Vector2::One;
@@ -211,7 +217,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_HUD_BAR, m_cbHUDBar.get());
 		BindConstantBufferPS(CB_HUD_BAR, m_cbHUDBar.get());
 
-		BindTexture(TEXTURE_HUD, &loadingBarInner, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TEXTURE_HUD, &m_loadingBarInner, SAMPLER_LINEAR_CLAMP);
 
 		DrawIndexedTriangles(12, 0, 0);
 	}
@@ -280,8 +286,8 @@ namespace TEN::Renderer
 			vertices[3].UV.y = 1.0f;
 			vertices[3].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
-			m_context->VSSetShader(m_vsFullScreenQuad.Get(), NULL, 0);
-			m_context->PSSetShader(m_psFullScreenQuad.Get(), NULL, 0);
+			m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
+			m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
 			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			m_context->IASetInputLayout(m_inputLayout.Get());
@@ -304,7 +310,7 @@ namespace TEN::Renderer
 		m_context->ClearRenderTargetView(target, Colors::Black);
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
-		m_context->RSSetViewports(1, &view.viewport);
+		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
 		RendererVertex vertices[4];
@@ -369,20 +375,87 @@ namespace TEN::Renderer
 		m_context->RSSetViewports(1, &m_viewport);
 		ResetScissor();
 
-		DrawFullScreenQuad(texture, Vector3(fade, fade, fade), true);
+		DrawFullScreenQuad(texture, Vector3(fade), true);
 	}
 
-	void Renderer11::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool fit)
+	void Renderer11::DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
+										 const Vector4& color, const Vector2& size)
 	{
-		Vector2 uvStart = { 0.0f, 0.0f };
-		Vector2 uvEnd   = { 1.0f, 1.0f };
+		constexpr auto VERTEX_COUNT	  = 4;
+		constexpr auto UV_CONSTRAINTS = std::array<Vector2, VERTEX_COUNT>
+		{
+			Vector2(0.0f),
+			Vector2(1.0f, 0.0f),
+			Vector2(1.0f),
+			Vector2(0.0f, 1.0f)
+		};
+
+		// Calculate vertex base.
+		auto halfSize = size / 2;
+		auto vertexPoints = std::array<Vector2, VERTEX_COUNT>
+		{
+			halfSize,
+			Vector2(-halfSize.x, halfSize.y),
+			-halfSize,
+			Vector2(halfSize.x, -halfSize.y)
+		};
+
+		// Transform vertices.
+		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D + ANGLE(180.0f))); // NOTE: +Y is down.
+		for (auto& vertexPoint : vertexPoints)
+		{
+			// Rotate.
+			vertexPoint = Vector2::Transform(vertexPoint, rotMatrix);
+
+			// Adjust for aspect ratio and convert to NDC.
+			vertexPoint = TEN::Utils::GetAspectCorrect2DPosition(vertexPoint);
+			vertexPoint += pos2D;
+			vertexPoint = TEN::Utils::Convert2DPositionToNDC(vertexPoint);
+		}
+
+		// Define renderer vertices.
+		auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			vertices[i].Position = Vector3(vertexPoints[i]);
+			vertices[i].UV = UV_CONSTRAINTS[i];
+			vertices[i].Color = color;
+		}
+
+		SetBlendMode(BLENDMODE_ALPHABLEND);
+
+		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
+
+		const auto& spritePtr = m_sprites[Objects[spriteID].meshIndex + spriteIndex];
+		auto* texturePtr = spritePtr.Texture->ShaderResourceView.Get();
+		m_context->PSSetShaderResources(0, 1, &texturePtr);
+
+		auto* sampler = m_states->AnisotropicClamp();
+		m_context->PSSetSamplers(0, 1, &sampler);
+
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		m_primitiveBatch->End();
+	}
+
+	void Renderer11::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit)
+	{
+		constexpr auto VERTEX_COUNT = 4;
+		constexpr auto UV_RANGE		= std::pair<Vector2, Vector2>(Vector2(0.0f), Vector2(1.0f));
+
+		auto uvStart = Vector2::Zero;
+		auto uvEnd	 = Vector2::One;
 
 		if (fit)
 		{
 			ID3D11Texture2D* texture2D;
 			texture->GetResource(reinterpret_cast<ID3D11Resource**>(&texture2D));
 
-			D3D11_TEXTURE2D_DESC desc;
+			auto desc = D3D11_TEXTURE2D_DESC();
 			texture2D->GetDesc(&desc);
 
 			float screenAspect = float(m_screenWidth) / float(m_screenHeight);
@@ -390,53 +463,47 @@ namespace TEN::Renderer
 
 			if (screenAspect > imageAspect)
 			{
-				float diff = (screenAspect - imageAspect) / screenAspect / 2;
+				float diff = ((screenAspect - imageAspect) / screenAspect) / 2;
 				uvStart.y += diff;
-				uvEnd.y   -= diff;
+				uvEnd.y -= diff;
 			}
 			else
 			{
-				float diff = (imageAspect - screenAspect) / imageAspect / 2;
+				float diff = ((imageAspect - screenAspect) / imageAspect) / 2;
 				uvStart.x += diff;
-				uvEnd.x   -= diff;
+				uvEnd.x -= diff;
 			}
 		}
 
-		RendererVertex vertices[4];
+		auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
+		auto colorVec4 = Vector4(color.x, color.y, color.z, 1.0f);
 
-		vertices[0].Position.x = -1.0f;
-		vertices[0].Position.y = 1.0f;
-		vertices[0].Position.z = 0.0f;
+		vertices[0].Position = Vector3(-1.0f, 1.0f, 0.0f);
 		vertices[0].UV.x = uvStart.x;
 		vertices[0].UV.y = uvStart.y;
-		vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
+		vertices[0].Color = colorVec4;
 
-		vertices[1].Position.x = 1.0f;
-		vertices[1].Position.y = 1.0f;
-		vertices[1].Position.z = 0.0f;
+		vertices[1].Position = Vector3(1.0f, 1.0f, 0.0f);
 		vertices[1].UV.x = uvEnd.x;
 		vertices[1].UV.y = uvStart.y;
-		vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
+		vertices[1].Color = colorVec4;
 
-		vertices[2].Position.x = 1.0f;
-		vertices[2].Position.y = -1.0f;
-		vertices[2].Position.z = 0.0f;
+		vertices[2].Position = Vector3(1.0f, -1.0f, 0.0f);
 		vertices[2].UV.x = uvEnd.x;
 		vertices[2].UV.y = uvEnd.y;
-		vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
+		vertices[2].Color = colorVec4;
 
-		vertices[3].Position.x = -1.0f;
-		vertices[3].Position.y = -1.0f;
-		vertices[3].Position.z = 0.0f;
+		vertices[3].Position = Vector3(-1.0f, -1.0f, 0.0f);
 		vertices[3].UV.x = uvStart.x;
 		vertices[3].UV.y = uvEnd.y;
-		vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
+		vertices[3].Color = colorVec4;
 
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
 		m_context->PSSetShaderResources(0, 1, &texture);
-		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+
+		auto* sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_helpers.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
@@ -13,13 +13,13 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 #include "Objects/TR2/Vehicles/skidoo.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
@@ -609,16 +609,16 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	else if (lara->Control.TurnRate < 0)
 		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate);
 
-	if (lara->Control.Subsuit.Velocity[0] > SECTOR(1.5f))
-		lara->Control.Subsuit.Velocity[0] = SECTOR(1.5f);
+	if (lara->Control.Subsuit.Velocity[0] > BLOCK(1.5f))
+		lara->Control.Subsuit.Velocity[0] = BLOCK(1.5f);
 
-	if (lara->Control.Subsuit.Velocity[1] > SECTOR(1.5f))
-		lara->Control.Subsuit.Velocity[1] = SECTOR(1.5f);
+	if (lara->Control.Subsuit.Velocity[1] > BLOCK(1.5f))
+		lara->Control.Subsuit.Velocity[1] = BLOCK(1.5f);
 
 	if (lara->Control.Subsuit.Velocity[0] != 0 || lara->Control.Subsuit.Velocity[1] != 0)
 	{
-		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / SECTOR(8);
-		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / SECTOR(8);
+		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / BLOCK(8);
+		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / BLOCK(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
 		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
 	}
@@ -737,7 +737,7 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Pose.Position.y;
-	int distance = SECTOR(1);
+	int distance = BLOCK(1);
 	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
@@ -996,6 +996,9 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 	const auto& player = GetLaraInfo(*item);
 
 	if (item->HitPoints > LARA_HEALTH_CRITICAL && player.Status.Poison == 0)
+		return;
+
+	if (item->HitPoints == 0)
 		return;
 
 	bool doPulse = ((GlobalCounter & 0x0F) % 0x0F == 1);

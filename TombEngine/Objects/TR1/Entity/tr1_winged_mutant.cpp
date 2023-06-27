@@ -39,9 +39,9 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_WALK_FORWARD_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto WINGED_MUTANT_RUN_FORWARD_TURN_RATE_MAX	= ANGLE(6.0f);
 
-	const auto WingedMutantBite		  = BiteInfo(Vector3(-27.0f, 98.0f, 0.0f), 10);
-	const auto WingedMutantRocketBite = BiteInfo(Vector3(51.0f, 213.0f, 0.0f), 14);
-	const auto WingedMutantShardBite  = BiteInfo(Vector3(-35.0f, 269.0f, 0.0f), 9);
+	const auto WingedMutantBite		  = CreatureBiteInfo(Vector3(-27, 98, 0), 10);
+	const auto WingedMutantRocketBite = CreatureBiteInfo(Vector3(51, 213, 0), 14);
+	const auto WingedMutantShardBite  = CreatureBiteInfo(Vector3(-35, 269, 0), 9);
 	const auto WingedMutantJoints = std::vector<unsigned int>{ 9, 10, 14 };
 
 	enum WingedMutantState
@@ -138,8 +138,8 @@ namespace TEN::Entities::Creatures::TR1
 			break;
 
 		case WMUTANT_PATH_AERIAL:
-			creature->LOT.Step = SECTOR(30);
-			creature->LOT.Drop = -SECTOR(30);
+			creature->LOT.Step = BLOCK(30);
+			creature->LOT.Drop = -BLOCK(30);
 			creature->LOT.Fly = (int)round(WINGED_MUTANT_FLY_VELOCITY);
 			break;
 		}
@@ -196,11 +196,11 @@ namespace TEN::Entities::Creatures::TR1
 	}
 
 	// NOTE: Doesn't exist in the original game. -- TokyoSU 5/8/2022
-	void InitialiseWingedMutant(short itemNumber)
+	void InitializeWingedMutant(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		item->SetFlagField(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_GROUND);
 		item->SetFlagField(WMUTANT_CONF_PROJECTILE_MODE, WMUTANT_PROJ_NONE);
 

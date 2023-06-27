@@ -24,7 +24,7 @@ enum class LogConfig
 
 void TENLog(std::string_view str, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::All, bool allowSpam = false);
 void ShutdownTENLog();
-void InitTENLog();
+void InitTENLog(const std::string& logDirContainingDir);
 
 class TENScriptException : public std::runtime_error
 {

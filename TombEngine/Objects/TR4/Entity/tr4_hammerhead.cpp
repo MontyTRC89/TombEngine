@@ -8,15 +8,15 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
 	constexpr auto HAMMERHEAD_ATTACK_RANGE = SQUARE(BLOCK(0.66f));
 
-	const auto HammerheadBite = BiteInfo(Vector3::Zero, 12);
+	const auto HammerheadBite = CreatureBiteInfo(Vector3::Zero, 12);
 	const auto HammerheadBiteAttackJoints = std::vector<unsigned int>{ 10, 12, 13 };
 
 	enum HammerheadState
@@ -54,11 +54,11 @@ namespace TEN::Entities::TR4
 		HAMMERHEAD_ANIM_KILL = 19
 	};
 
-	void InitialiseHammerhead(short itemNumber)
+	void InitializeHammerhead(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, HAMMERHEAD_ANIM_IDLE);
 	}
 
@@ -106,7 +106,7 @@ namespace TEN::Entities::TR4
 			case HAMMERHEAD_STATE_SWIM_SLOW:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (AI.distance <= pow(SECTOR(1), 2))
+				if (AI.distance <= pow(BLOCK(1), 2))
 				{
 					if (AI.distance < HAMMERHEAD_ATTACK_RANGE)
 						item->Animation.TargetState = HAMMERHEAD_STATE_IDLE_BITE_ATTACK;
@@ -117,7 +117,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case HAMMERHEAD_STATE_SWIM_FAST:
-				if (AI.distance < pow(SECTOR(1), 2))
+				if (AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = HAMMERHEAD_STATE_SWIM_SLOW;
 
 				break;

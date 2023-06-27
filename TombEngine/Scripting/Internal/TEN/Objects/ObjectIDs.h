@@ -2,9 +2,9 @@
 
 // Last generated on 18/11/2022
 
-#include "game_object_ids.h"
 #include <unordered_map>
 #include <string>
+#include "Objects/game_object_ids.h"
 
 /***
 Constants for object IDs.
@@ -183,6 +183,7 @@ The following constants are inside ObjID.
 	SPHERE_OF_DOOM
 	SPHERE_OF_DOOM2
 	SPHERE_OF_DOOM3
+	COWBOY
 	SPEAR_GUARDIAN
 	SPEAR_GUARDIAN_STATUE
 	SWORD_GUARDIAN
@@ -237,6 +238,8 @@ The following constants are inside ObjID.
 	BOSS_EXPLOSION_RING
 	CLAW_MUTANT
 	WASP_MUTANT
+	SKATEBOARD
+	SKATEBOARD_KID
 	SPRINGBOARD
 	ROLLING_SPINDLE
 	DISK_SHOOTER
@@ -1355,6 +1358,7 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "SPHERE_OF_DOOM", ID_SPHERE_OF_DOOM },
 	{ "SPHERE_OF_DOOM2", ID_SPHERE_OF_DOOM2 },
 	{ "SPHERE_OF_DOOM3", ID_SPHERE_OF_DOOM3 },
+	{ "COWBOY", ID_COWBOY },
 	{ "SPEAR_GUARDIAN", ID_SPEAR_GUARDIAN },
 	{ "SPEAR_GUARDIAN_STATUE", ID_SPEAR_GUARDIAN_STATUE },
 	{ "SWORD_GUARDIAN", ID_SWORD_GUARDIAN },
@@ -1409,6 +1413,8 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "BOSS_EXPLOSION_RING", ID_BOSS_EXPLOSION_RING },
 	{ "CLAW_MUTANT", ID_CLAW_MUTANT },
 	{ "WASP_MUTANT", ID_WASP_MUTANT },
+	{ "SKATEBOARD", ID_SKATEBOARD },
+	{ "SKATEBOARD_KID", ID_SKATEBOARD_KID },
 	{ "SPRINGBOARD", ID_SPRINGBOARD },
 	{ "ROLLING_SPINDLE", ID_ROLLING_SPINDLE },
 	{ "DISK_SHOOTER", ID_DISK_SHOOTER },
@@ -1936,7 +1942,7 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "LARA_START_POS", ID_LARA_START_POS },
 	{ "TELEPORTER", ID_TELEPORTER },
 	{ "LIFT_TELEPORTER", ID_LIFT_TELEPORTER },
-	{ "LASERS", ID_LASERS },
+	{ "LASER_BARRIER", ID_LASER_BARRIER },
 	{ "STEAM_LASERS", ID_STEAM_LASERS },
 	{ "FLOOR_LASERS", ID_FLOOR_LASERS },
 	{ "KILL_ALL_TRIGGERS", ID_KILL_ALL_TRIGGERS },

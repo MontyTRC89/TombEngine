@@ -44,7 +44,7 @@ namespace TEN::Input
 		return ((Value != 0.0f) && (TimeActive >= delayInFrameTime));
 	}
 
-	// NOTE: To avoid a stutter on the second pulse, ensure initialDelayInSec is a multiple of delayInSec.
+	// NOTE: To avoid stutter on second pulse, ensure initialDelayInSec is multiple of delayInSec.
 	bool InputAction::IsPulsed(float delayInSec, float initialDelayInSec) const
 	{
 		if (IsClicked())
@@ -77,7 +77,7 @@ namespace TEN::Input
 
 	void InputAction::Update(bool value)
 	{
-		value ? Update(1.0f) : Update(0.0f);
+		Update(value ? 1.0f : 0.0f);
 	}
 
 	void InputAction::Update(float value)
@@ -87,31 +87,31 @@ namespace TEN::Input
 		// TODO: Because our delta time is a placeholder constant and we cannot properly account for time drift,
 		// count whole frames instead of actual time passed for now to avoid occasional stutter.
 		// Inquiry methods take this into account. -- Sezz 2022.10.01
-		static constexpr float frameTime = 1.0f;
+		constexpr auto FRAME_TIME = 1.0f;
 
 		if (IsClicked())
 		{
 			PrevTimeActive = 0.0f;
 			TimeActive = 0.0f;
-			TimeInactive += frameTime;// DELTA_TIME;
+			TimeInactive += FRAME_TIME;// DELTA_TIME;
 		}
 		else if (IsReleased())
 		{
 			PrevTimeActive = TimeActive;
-			TimeActive += frameTime;// DELTA_TIME;
+			TimeActive += FRAME_TIME;// DELTA_TIME;
 			TimeInactive = 0.0f;
 		}
 		else if (IsHeld())
 		{
 			PrevTimeActive = TimeActive;
-			TimeActive += frameTime;// DELTA_TIME;
+			TimeActive += FRAME_TIME;// DELTA_TIME;
 			TimeInactive = 0.0f;
 		}
 		else
 		{
 			PrevTimeActive = 0.0f;
 			TimeActive = 0.0f;
-			TimeInactive += frameTime;// DELTA_TIME;
+			TimeInactive += FRAME_TIME;// DELTA_TIME;
 		}
 	}
 
@@ -124,7 +124,7 @@ namespace TEN::Input
 		TimeInactive = 0.0f;
 	}
 
-	void InputAction::PrintDebugInfo() const
+	void InputAction::DrawDebug() const
 	{
 		g_Renderer.PrintDebugMessage("ID: %d", (int)ID);
 		g_Renderer.PrintDebugMessage("IsClicked: %d", IsClicked());

@@ -9,10 +9,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
@@ -29,7 +29,7 @@ namespace TEN::Effects::Hair
 
 		// Get world matrix from head bone.
 		auto worldMatrix = Matrix::Identity;
-		g_Renderer.GetBoneMatrix(player.ItemNumber, LM_HEAD, &worldMatrix);
+		g_Renderer.GetBoneMatrix(item.Index, LM_HEAD, &worldMatrix);
 
 		// Apply base offset to world matrix.
 		auto relOffset = GetRelBaseOffset(hairUnitIndex, isYoung);

@@ -1,3 +1,3 @@
 #pragma once
 
-void InitialiseRomeHammer(short itemNumber);
+void InitializeRomeHammer(short itemNumber);

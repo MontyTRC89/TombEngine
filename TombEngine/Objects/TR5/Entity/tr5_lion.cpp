@@ -10,9 +10,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -34,8 +34,8 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto LION_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
 	constexpr auto LION_ATTACK_TURN_RATE_MAX = ANGLE(1.0f);
 
-	const auto LionBite1 = BiteInfo(Vector3(2.0f, -10.0f, 250.0f), 21);
-	const auto LionBite2 = BiteInfo(Vector3(-2.0f, -10.0f, 132.0f), 21);
+	const auto LionBite1 = CreatureBiteInfo(Vector3(2, -10, 250), 21);
+	const auto LionBite2 = CreatureBiteInfo(Vector3(-2, -10, 132), 21);
 	const auto LionAttackJoints = std::vector<unsigned int>{ 3, 6, 21 };
 
 	enum LionState
@@ -69,11 +69,11 @@ namespace TEN::Entities::Creatures::TR5
 
 	const std::array LionDeathAnims = { LION_ANIM_DEATH_1, LION_ANIM_DEATH_2 };
 
-	void InitialiseLion(short itemNumber)
+	void InitializeLion(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, LION_ANIM_IDLE);
 	}
 
@@ -98,7 +98,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->HitPoints = 0;
 
 			if (item->Animation.ActiveState != LION_STATE_DEATH)
-				SetAnimation(item, LionDeathAnims[Random::GenerateInt(0, LionDeathAnims.size() - 1)]);
+				SetAnimation(item, LionDeathAnims[Random::GenerateInt(0, (int)LionDeathAnims.size() - 1)]);
 		}
 		else
 		{

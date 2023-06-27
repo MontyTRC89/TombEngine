@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 
@@ -41,12 +41,13 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->Animation.TargetState == LS_PICKUP)
+	if (item->Animation.TargetState == LS_PICKUP ||
+		item->Animation.TargetState == LS_PICKUP_FLARE)
 		return;
 
 	if (item->HitPoints <= 0)
@@ -154,7 +155,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -228,7 +229,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -283,7 +284,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -338,7 +339,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -376,16 +377,19 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.Look.Mode = LookMode::Free;
-	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->Animation.TargetState == LS_PICKUP)
+	if (item->Animation.TargetState == LS_PICKUP ||
+		item->Animation.TargetState == LS_CROUCH_IDLE)
 		return;
+
+	auto* lara = GetLaraInfo(item);
+	lara->Control.HandStatus = HandStatus::Busy;
 
 	if (item->HitPoints <= 0)
 	{
@@ -524,7 +528,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -620,7 +624,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -708,7 +712,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -770,7 +774,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -830,7 +834,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -859,7 +863,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	ResetPlayerLean(item, 1 / 6.0f);
 
