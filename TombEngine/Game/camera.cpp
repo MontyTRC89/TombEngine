@@ -193,7 +193,7 @@ void DoThumbstickCamera()
 	}
 }
 
-static float GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionInfo& coll)
+static int GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(1 / 16.0f);
 	constexpr auto VERTICAL_OFFSET_SWAMP		  = BLOCK(0.4f);
@@ -204,25 +204,31 @@ static float GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionIn
 
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
 
-	float verticalOffset = -coll.Setup.Height;
+	// Determine contextual vertical offset.
+	float verticalOffset = coll.Setup.Height;
 	if (player.Control.IsMonkeySwinging)
 	{
-		verticalOffset += VERTICAL_OFFSET_MONKEY_SWING;
+		verticalOffset -= VERTICAL_OFFSET_MONKEY_SWING;
 	}
 	else if (player.Control.WaterStatus == WaterStatus::TreadWater)
 	{
-		verticalOffset += VERTICAL_OFFSET_TREADING_WATER;
+		verticalOffset -= VERTICAL_OFFSET_TREADING_WATER;
 	}
 	else if (isInSwamp)
 	{
-		verticalOffset = -VERTICAL_OFFSET_SWAMP;
+		verticalOffset = VERTICAL_OFFSET_SWAMP;
 	}
 	else
 	{
-		verticalOffset += VERTICAL_OFFSET_DEFAULT;
+		verticalOffset -= VERTICAL_OFFSET_DEFAULT;
 	}
 
-	return verticalOffset;
+	// Get floor-to-ceiling height.
+	auto pointColl = GetCollision(item);
+	int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+
+	// Return appropriate vertical offset.
+	return -((verticalOffset < floorToCeilHeight) ? verticalOffset : floorToCeilHeight);
 }
 
 void LookCamera(ItemInfo& item, const CollisionInfo& coll)
@@ -232,8 +238,8 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 
 	const auto& player = GetLaraInfo(item);
 
-	float verticalOffset = GetLookCameraVerticalOffset(item, coll);
-	auto pivotOffset = Vector3(0.0f, verticalOffset, 0.0f);
+	int verticalOffset = GetLookCameraVerticalOffset(item, coll);
+	auto pivotOffset = Vector3i(0, verticalOffset, 0);
 
 	float idealDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(0.75f));
 	float lookAtDist = BLOCK(0.5f);

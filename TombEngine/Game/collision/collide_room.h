@@ -126,7 +126,8 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
-CollisionResult GetCollision(ItemInfo* item);
+CollisionResult GetCollision(const ItemInfo& item);
+CollisionResult GetCollision(ItemInfo* item); // Deprecated.
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float up = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(Vector3i pos, int roomNumber, short angle, float forward, float up = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(Vector3i pos, int roomNumber, EulerAngles orient, float distance);
