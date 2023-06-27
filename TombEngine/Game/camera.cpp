@@ -235,6 +235,7 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto POS_LERP_ALPHA = 0.25f;
 	constexpr auto COLL_PUSH	  = BLOCK(0.25f) - BLOCK(1 / 16.0f);
+	constexpr auto LOOK_AT_DIST	  = BLOCK(0.5f);
 
 	const auto& player = GetLaraInfo(item);
 
@@ -242,7 +243,6 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 	auto pivotOffset = Vector3i(0, verticalOffset, 0);
 
 	float idealDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(0.75f));
-	float lookAtDist = BLOCK(0.5f);
 
 	// Define absolute camera orientation.
 	auto orient = player.Control.Look.Orientation +
@@ -250,17 +250,17 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 		EulerAngles(0, Camera.targetAngle, 0);
 	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 
-	// TODO: Goes to centre in swamps for some reason.
 	// Determine base position.
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
-	auto basePos = isInSwamp ?
-		Vector3i(item.Pose.Position.x, g_Level.Rooms[item.RoomNumber].maxceiling, item.Pose.Position.z) :
-		item.Pose.Position;
+	auto basePos = Vector3i(
+		item.Pose.Position.x,
+		isInSwamp ? g_Level.Rooms[item.RoomNumber].maxceiling : item.Pose.Position.y,
+		item.Pose.Position.z);
 
 	// Define landmarks.
 	auto pivotPos = Geometry::TranslatePoint(basePos, item.Pose.Orientation.y, pivotOffset);
 	auto idealPos = Geometry::TranslatePoint(pivotPos, orient, idealDist);
-	auto lookAtPos = Geometry::TranslatePoint(pivotPos, orient, lookAtDist);
+	auto lookAtPos = Geometry::TranslatePoint(pivotPos, orient, LOOK_AT_DIST);
 
 	// Determine best position.
 	auto origin = GameVector(pivotPos, GetCollision(&item, item.Pose.Orientation.y, pivotOffset.z, pivotOffset.y).RoomNumber);
