@@ -498,5 +498,4 @@ void WinClose()
 	ShutdownTENLog();
 
 	CoUninitialize();
-
 }

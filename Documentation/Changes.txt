@@ -7,6 +7,7 @@ Version 1.1.0
 * Fix random crashes when playing audio tracks with names longer than 15 symbols.
 * Fix possible crashes when killing some enemies in 64-bit version.
 * Fix possible crashes when loading savegame in 64-bit version.
+* Fix possible crashes when trying to play .wav soundtracks on some Windows 11 systems.
 * Fix electricity effect crashing in 64-bit version.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
