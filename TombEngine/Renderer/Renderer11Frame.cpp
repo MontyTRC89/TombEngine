@@ -225,7 +225,7 @@ namespace TEN::Renderer
 		{
 			if (m_visitedRoomsStack[i] == to)
 			{
-				TENLog("Circle detected! Room " + std::to_string(to));
+				TENLog("Circle detected! Room " + std::to_string(to), LogLevel::Warning, LogConfig::Debug);
 				return;
 			}
 		}
