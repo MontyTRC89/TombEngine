@@ -300,8 +300,8 @@ namespace TEN::Renderer
 		RenderTarget2D m_renderTarget;
 		RenderTarget2D m_postProcessRenderTarget;
 		RenderTarget2D m_currentRenderTarget;
-		RenderTarget2D m_normalsAndDepthMap;
-		RenderTarget2D m_resolvedNormalsAndDepthMap;
+		RenderTarget2D m_normalsAndDepthMapRenderTarget;
+		RenderTarget2D m_resolvedNormalsAndDepthMapRenderTarget;
 		RenderTargetCube m_reflectionCubemap;
 
 		Texture2DArray m_shadowMap;
@@ -499,9 +499,9 @@ namespace TEN::Renderer
 		std::unique_ptr<ToneMapPostProcess> m_toneMap;
 		std::unique_ptr< BasicPostProcess> m_basicPostProcess;
 		std::unique_ptr< DualPostProcess> m_dualPostProcess;
-		RenderTarget2D m_blur1RT;
-		RenderTarget2D m_blur2RT;
-		RenderTarget2D m_tempRT;
+		RenderTarget2D m_blur1RenderTarget;
+		RenderTarget2D m_blur2RenderTarget;
+		RenderTarget2D m_tempRenderTarget;
 		bool m_HDR;
 		POST_PROCESS_COLOR_TONE m_colorTone;
 

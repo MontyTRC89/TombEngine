@@ -324,7 +324,7 @@ namespace TEN::Renderer
    
 		if (m_colorTone != TONE_NORMAL)
 		{
-			m_context->OMSetRenderTargets(1, m_tempRT.RenderTargetView.GetAddressOf(), nullptr);
+			m_context->OMSetRenderTargets(1, m_tempRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 			 
 			if (m_colorTone == TONE_BW)
 			{
@@ -339,13 +339,13 @@ namespace TEN::Renderer
 
 			m_context->OMSetRenderTargets(1, m_postProcessRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 			m_basicPostProcess->SetEffect(BasicPostProcess::Copy);
-			m_basicPostProcess->SetSourceTexture(m_tempRT.ShaderResourceView.Get());
+			m_basicPostProcess->SetSourceTexture(m_tempRenderTarget.ShaderResourceView.Get());
 			m_basicPostProcess->Process(m_context.Get());
 		}
 
 		if (g_Configuration.EnableHDR)
 		{
-			m_context->OMSetRenderTargets(1, m_tempRT.RenderTargetView.GetAddressOf(), nullptr);
+			m_context->OMSetRenderTargets(1, m_tempRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 			
 			m_toneMap->SetOperator(ToneMapPostProcess::ACESFilmic);
 			m_toneMap->SetTransferFunction(ToneMapPostProcess::SRGB);
@@ -357,20 +357,20 @@ namespace TEN::Renderer
 			m_basicPostProcess->SetEffect(BasicPostProcess::BloomExtract);
 			m_basicPostProcess->SetBloomExtractParameter(0.25f);
 
-			auto blurRT1 = m_blur1RT.RenderTargetView.Get();
+			auto blurRT1 = m_blur1RenderTarget.RenderTargetView.Get();
 			m_context->OMSetRenderTargets(1, &blurRT1, nullptr);
 
-			m_basicPostProcess->SetSourceTexture(m_tempRT.ShaderResourceView.Get());
+			m_basicPostProcess->SetSourceTexture(m_tempRenderTarget.ShaderResourceView.Get());
 			m_basicPostProcess->Process(m_context.Get());
 
 			// Pass 2 (blur1 -> blur2)
 			m_basicPostProcess->SetEffect(BasicPostProcess::BloomBlur);
 			m_basicPostProcess->SetBloomBlurParameters(true, 4.f, 1.f);
 
-			auto blurRT2 = m_blur2RT.RenderTargetView.Get();
+			auto blurRT2 = m_blur2RenderTarget.RenderTargetView.Get();
 			m_context->OMSetRenderTargets(1, &blurRT2, nullptr);
 
-			m_basicPostProcess->SetSourceTexture(m_blur1RT.ShaderResourceView.Get());
+			m_basicPostProcess->SetSourceTexture(m_blur1RenderTarget.ShaderResourceView.Get());
 			m_basicPostProcess->Process(m_context.Get());
 
 			// Pass 3 (blur2 -> blur1)
@@ -381,7 +381,7 @@ namespace TEN::Renderer
 
 			m_context->OMSetRenderTargets(1, &blurRT1, nullptr);
 
-			m_basicPostProcess->SetSourceTexture(m_blur2RT.ShaderResourceView.Get());
+			m_basicPostProcess->SetSourceTexture(m_blur2RenderTarget.ShaderResourceView.Get());
 			m_basicPostProcess->Process(m_context.Get());
 
 			// Pass 4 (scene+blur1 -> temp)
@@ -389,8 +389,8 @@ namespace TEN::Renderer
 
 			m_dualPostProcess->SetEffect(DualPostProcess::BloomCombine);
 			m_dualPostProcess->SetBloomCombineParameters(1.25f, 1.f, 1.f, 1.f);
-			m_dualPostProcess->SetSourceTexture(m_tempRT.ShaderResourceView.Get());
-			m_dualPostProcess->SetSourceTexture2(m_blur1RT.ShaderResourceView.Get());
+			m_dualPostProcess->SetSourceTexture(m_tempRenderTarget.ShaderResourceView.Get());
+			m_dualPostProcess->SetSourceTexture2(m_blur1RenderTarget.ShaderResourceView.Get());
 			m_dualPostProcess->Process(m_context.Get());
 		}
 

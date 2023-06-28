@@ -1224,12 +1224,12 @@ namespace TEN::Renderer
 
 		if (g_Configuration.Antialiasing > AntialiasingMode::Low)
 		{
-			m_context->ResolveSubresource(m_resolvedNormalsAndDepthMap.Texture.Get(), 0, m_normalsAndDepthMap.Texture.Get(), 0, DXGI_FORMAT_R32_FLOAT);
-			BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_resolvedNormalsAndDepthMap, SAMPLER_LINEAR_CLAMP);
+			m_context->ResolveSubresource(m_resolvedNormalsAndDepthMapRenderTarget.Texture.Get(), 0, m_normalsAndDepthMapRenderTarget.Texture.Get(), 0, DXGI_FORMAT_R32_FLOAT);
+			BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_resolvedNormalsAndDepthMapRenderTarget, SAMPLER_LINEAR_CLAMP);
 		}
 		else
 		{
-			BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_normalsAndDepthMap, SAMPLER_LINEAR_CLAMP);
+			BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_normalsAndDepthMapRenderTarget, SAMPLER_LINEAR_CLAMP);
 		}
 
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);

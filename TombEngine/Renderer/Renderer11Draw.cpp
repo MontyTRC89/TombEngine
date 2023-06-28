@@ -1427,12 +1427,12 @@ namespace TEN::Renderer
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
 		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		m_context->ClearRenderTargetView(m_normalsAndDepthMap.RenderTargetView.Get(), Colors::White);
-		m_context->ClearDepthStencilView(m_normalsAndDepthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_context->ClearRenderTargetView(m_normalsAndDepthMapRenderTarget.RenderTargetView.Get(), Colors::White);
+		m_context->ClearDepthStencilView(m_normalsAndDepthMapRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		ID3D11RenderTargetView* m_pRenderViews[2]; 
 		m_pRenderViews[0] = m_renderTarget.RenderTargetView.Get();
-		m_pRenderViews[1] = m_normalsAndDepthMap.RenderTargetView.Get();
+		m_pRenderViews[1] = m_normalsAndDepthMapRenderTarget.RenderTargetView.Get();
 		m_context->OMSetRenderTargets(2, &m_pRenderViews[0], m_renderTarget.DepthStencilView.Get());
 
 		m_context->RSSetViewports(1, &view.Viewport);
