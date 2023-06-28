@@ -788,39 +788,53 @@ void CreatureHealth(ItemInfo* item)
 	}
 }
 
-void CreatureDie(short itemNumber, bool explode)
+void CreatureDie(int itemNumber, bool doExplosion)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	auto* object = &Objects[item->ObjectNumber];
-
-	item->HitPoints = NOT_TARGETABLE;
-	item->Collidable = false;
-
-	if (explode)
+	int flags = 0;
+	if (doExplosion)
 	{
-		switch (object->hitEffect)
+		const auto& item = g_Level.Items[itemNumber];
+		const auto& object = Objects[item.ObjectNumber];
+
+		switch (object.hitEffect)
 		{
 		case HitEffect::Blood:
-			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_GIBS);
+			flags |= BODY_DO_EXPLOSION | BODY_GIBS;
 			break;
 
 		case HitEffect::Smoke:
-			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
+			flags |= BODY_DO_EXPLOSION | BODY_NO_BOUNCE;
 			break;
 
 		default:
-			ExplodingDeath(itemNumber, BODY_EXPLODE);
+			flags |= BODY_DO_EXPLOSION;
 			break;
 		}
+	}
 
+	CreatureDie(itemNumber, doExplosion, flags);
+}
+
+void CreatureDie(int itemNumber, bool doExplosion, int flags)
+{
+	auto& item = g_Level.Items[itemNumber];
+
+	item.HitPoints = NOT_TARGETABLE;
+	item.Collidable = false;
+
+	if (doExplosion)
+	{
+		ExplodingDeath(itemNumber, flags);
 		KillItem(itemNumber);
 	}
 	else
+	{
 		RemoveActiveItem(itemNumber);
+	}
 
 	DisableEntityAI(itemNumber);
-	item->Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;
-	DropPickups(item);
+	item.Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;
+	DropPickups(&item);
 }
 
 bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT)

@@ -10,11 +10,19 @@ struct ItemInfo;
 
 enum BodyPartFlags
 {
-	BODY_NO_BOUNCE	   = (1 << 0),
-	BODY_GIBS		   = (1 << 1),
-	BODY_EXPLODE	   = (1 << 8),
-	BODY_NO_BOUNCE_ALT = (1 << 9),
-	BODY_STONE_SOUND   = (1 << 11)
+	BODY_NO_BOUNCE			  = (1 << 0), // No bounce.
+	BODY_GIBS				  = (1 << 1), // Add blood and SFX_TR4_LARA_THUD upon floor collision.
+	BODY_PART_EXPLODE		  = (1 << 2), // Explode upon impact. Requires BODY_EXPLODE flag.
+	BODY_NO_FLAME			  = (1 << 3), // No flame.
+	BODY_NO_RAND_VELOCITY	  = (1 << 4), // No random velocity.
+	BODY_MORE_RAND_VELOCITY	  = (1 << 5), // Add more randomness to velocity.
+	BODY_NO_VERTICAL_VELOCITY = (1 << 6), // No vertical velocity.
+	BODY_LESS_IMPULSE		  = (1 << 7), // Add less vertical velocity than normal. TODO: Weird name.
+	BODY_DO_EXPLOSION		  = (1 << 8), // Explode.
+	BODY_NO_BOUNCE_ALT		  = (1 << 9), // Same as BODY_NO_BOUNCE, but with delay before despawning.
+	BODY_STONE_SOUND		  = (1 << 11), // Do impact sound if stone. NOTE: BODY_GIBS also add sound, but this one is prioritary.
+	BODY_NO_SMOKE			  = (1 << 12),  // Remove smoke upon despawn or shatter.
+	BODY_NO_SHATTER_EFFECT	  = (1 << 13), // Remove shatter effect upon despawn.
 };
 
 struct SMOKE_SPARKS
@@ -238,7 +246,7 @@ int GetFreeGunshell();
 void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
-void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
+void ExplodingDeath(short itemNumber, short flags); // BODY_ flags
 int GetFreeShockwave();
 void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);

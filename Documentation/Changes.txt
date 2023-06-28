@@ -24,6 +24,13 @@ Version 1.1.0
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
+* Fix winged mutant:
+- Zone detection which now allow him to fly correctly.
+- Spawn point for the dart and bomb.
+- Damage being in continue.
+- Damage detection more consistant.
+- Explosion effect being like TR4 now.
+- Body part now can explode and damage lara.
 
 Lua API changes:
 * Add soundtrack functions:
