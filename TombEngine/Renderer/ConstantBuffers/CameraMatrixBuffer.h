@@ -18,6 +18,8 @@ struct alignas(16) CCameraMatrixBuffer
 	//--
 	alignas(16) Matrix InverseProjection;
 	//--
+	alignas(16) Matrix InverseTransposeView;
+	//--
 	alignas(16) Vector4 CamPositionWS;
 	//--
 	alignas(16) Vector4 CamDirectionWS;

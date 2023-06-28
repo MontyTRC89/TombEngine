@@ -382,8 +382,8 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, true, DXGI_FORMAT_R16G16B16A16_FLOAT);
 	m_postProcessRenderTarget = RenderTarget2D(m_device.Get(), w, h, false, DXGI_FORMAT_R16G16B16A16_FLOAT);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, false, DXGI_FORMAT_R10G10B10A2_UNORM);
-	m_depthMap = RenderTarget2D(m_device.Get(), w, h, true, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
-	m_resolvedDepthMap = RenderTarget2D(m_device.Get(), w, h, false, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
+	m_normalsAndDepthMap = RenderTarget2D(m_device.Get(), w, h, true, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_D16_UNORM);
+	m_resolvedNormalsAndDepthMap = RenderTarget2D(m_device.Get(), w, h, false, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
 	m_shadowMap = Texture2DArray(m_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_D16_UNORM);
 	m_blur1RT = RenderTarget2D(m_device.Get(), w, h, false, DXGI_FORMAT_R16G16B16A16_FLOAT);
 	m_blur2RT = RenderTarget2D(m_device.Get(), w, h, false, DXGI_FORMAT_R16G16B16A16_FLOAT);

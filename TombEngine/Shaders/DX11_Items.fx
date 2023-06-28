@@ -33,12 +33,13 @@ struct PixelShaderInput
 	float4 FogBulbs : TEXCOORD3;
 	float DistanceFog : FOG;
 	unsigned int Bone: BONE;
+	float3 NormalVS: TEXCOORD4;
 };
 
 struct PixelShaderOutput
 {
 	float4 Color: SV_TARGET0;
-	float4 Depth: SV_TARGET1;
+	float4 NormalsAndDepth: SV_TARGET1;
 };
 
 Texture2D Texture : register(t0);
@@ -77,6 +78,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.PositionCopy = output.Position;
     output.Sheen = input.Effects.w;
 	output.Bone = input.Bone;
+	output.NormalVS = mul(float4(input.Normal, 1.0f), InverseTransposeView).xyz;
 
 	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
 	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
@@ -115,7 +117,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 
-	output.Depth = tex.w > 0.0f ?
+	input.NormalVS = normalize(input.NormalVS);
+	output.NormalsAndDepth.xyz = input.NormalVS;
+	output.NormalsAndDepth.w = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 

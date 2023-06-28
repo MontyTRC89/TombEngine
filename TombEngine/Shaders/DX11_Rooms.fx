@@ -30,6 +30,7 @@ struct PixelShaderInput
 	float4 PositionCopy : TEXCOORD1;
 	float4 FogBulbs : TEXCOORD2;
 	float DistanceFog : FOG;
+	float3 NormalVS: TEXCOORD4;
 };
 
 Texture2D Texture : register(t0);
@@ -44,7 +45,7 @@ SamplerState CausticsTextureSampler : register(s2);
 struct PixelShaderOutput
 {
 	float4 Color: SV_TARGET0;
-	float4 Depth: SV_TARGET1;
+	float4 NormalsAndDepth: SV_TARGET1;
 };
 
 PixelShaderInput VS(VertexShaderInput input)
@@ -77,6 +78,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Normal = input.Normal;
 	output.Color = float4(col, input.Color.w);
 	output.PositionCopy = screenPos;
+	output.NormalVS = mul(float4(input.Normal, 1.0f), InverseTransposeView).xyz;
 
 #ifdef ANIMATED
 
@@ -185,13 +187,14 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}
-	
-	output.Depth = output.Color.w > 0.0f ?
+
+	input.NormalVS = normalize(input.NormalVS);
+	output.NormalsAndDepth.xyz = input.NormalVS;
+	output.NormalsAndDepth.w = output.Color.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
-	//lighting = saturate(lighting);
 	output.Color.xyz = output.Color.xyz * lighting;
 
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
