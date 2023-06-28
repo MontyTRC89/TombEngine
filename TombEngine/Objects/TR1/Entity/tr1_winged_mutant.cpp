@@ -40,10 +40,10 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WINGED_MUTANT_WALK_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto WINGED_MUTANT_RUN_TURN_RATE_MAX	= ANGLE(6.0f);
 
-	const auto WingedMutantBiteLeftHand	 = CreatureBiteInfo(Vector3i(0, 0, 0), 7);
-	const auto WingedMutantBiteRightHand = CreatureBiteInfo(Vector3i(0, 0, 0), 10);
-	const auto WingedMutantRocketBite	 = CreatureBiteInfo(Vector3i(0, 200, 20), 6);
-	const auto WingedMutantShardBite	 = CreatureBiteInfo(Vector3i(0, 200, 20), 9);
+	const auto WingedMutantBiteLeftHand	 = CreatureBiteInfo(Vector3(0, 0, 0), 7);
+	const auto WingedMutantBiteRightHand = CreatureBiteInfo(Vector3(0, 0, 0), 10);
+	const auto WingedMutantRocketBite	 = CreatureBiteInfo(Vector3(0, 200, 20), 6);
+	const auto WingedMutantShardBite	 = CreatureBiteInfo(Vector3(0, 200, 20), 9);
 	const auto WingedMutantHeadJoints	 = std::vector<unsigned int>{ 3 };
 	const auto WingedMutantHandsJoints	 = std::vector<unsigned int>{ 7, 10 };
 	const auto WingedMutantWingsJoints	 = std::vector<unsigned int>{ 15, 16, 17, 18, 19, 20 };
