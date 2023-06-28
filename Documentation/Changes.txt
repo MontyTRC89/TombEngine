@@ -16,6 +16,11 @@ Version 1.1.0
 * Fix bat AI, damage value, and incorrect collision after death.
 * Fix regeneration for pickups with OCB 128.
 * Fix Spiky ceiling. Also improve, and add new OCB to Spiky ceiling.
+* Fix TR1 winged mutant:
+  - Fix Zone detection which now allow him to fly correctly.
+  - Fix OCB for dart and bomb version.
+  - Fix damage being in continue, and make Damage detection more consistent.
+  - Explosion effect is now like TR4 effect, also body parts now can explode and damage lara.
 * Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Implement separate audio track channel for playing voiceovers with subtitles.
 * Don't stop ambience when Lara dies.
@@ -24,13 +29,6 @@ Version 1.1.0
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
-* Fix winged mutant:
-- Zone detection which now allow him to fly correctly.
-- Spawn point for the dart and bomb.
-- Damage being in continue.
-- Damage detection more consistant.
-- Explosion effect being like TR4 now.
-- Body part now can explode and damage lara.
 
 Lua API changes:
 * Add soundtrack functions:
