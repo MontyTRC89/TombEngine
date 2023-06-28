@@ -697,7 +697,7 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 
 		Camera.flags = CF_FOLLOW_CENTER;
 
-		int distance = TestLaraWall(item, 0, BLOCK(1.5f), 0) ? BLOCK(1) : CLICK(6.5f);
+		int distance = TestLaraWall(item, 0, BLOCK(1.5f)) ? BLOCK(1) : CLICK(6.5f);
 
 		if (item->Animation.FrameNumber < GetAnimData(item).frameEnd)
 		{

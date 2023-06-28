@@ -27,11 +27,11 @@ The following constants are inside RoomReverb.
 @table CONSTANT_STRING_HERE
 */
 
-static const std::unordered_map<std::string, ReverbType> kRoomReverbTypes
+static const std::unordered_map<std::string, ReverbType> ROOM_REVERB_TYPES
 {
-	{"OUTSIDE", ReverbType::Outside},
-	{"SMALL", ReverbType::Small},
-	{"MEDIUM", ReverbType::Medium},
-	{"LARGE", ReverbType::Large},
-	{"PIPE", ReverbType::Pipe}
+	{ "OUTSIDE", ReverbType::Outside },
+	{ "SMALL", ReverbType::Small },
+	{ "MEDIUM", ReverbType::Medium },
+	{ "LARGE", ReverbType::Large },
+	{ "PIPE", ReverbType::Pipe }
 };
