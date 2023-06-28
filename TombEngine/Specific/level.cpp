@@ -1413,8 +1413,8 @@ void BuildOutsideRoomsTable()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		int rx = (room->x / SECTOR(1));
-		int rz = (room->z / SECTOR(1));
+		int rx = (room->x / BLOCK(1));
+		int rz = (room->z / BLOCK(1));
 
 		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{

@@ -21,7 +21,7 @@ using namespace TEN::Gui;
 namespace TEN::Entities::TR4
 {
 	const auto SentryGunFlameOffset = Vector3i(-140, 0, 0);
-	const auto SentryGunBite = CreatureBiteInfo(Vector3i::Zero, 8);
+	const auto SentryGunBite = CreatureBiteInfo(Vector3::Zero, 8);
 
 	void InitializeSentryGun(short itemNumber)
 	{
@@ -78,11 +78,11 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &AI))
 				{
-					if (AI.distance < pow(SECTOR(9), 2))
+					if (AI.distance < pow(BLOCK(9), 2))
 					{
 						if (!g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->ItemFlags[0])
 						{
-							if (AI.distance <= pow(SECTOR(2), 2))
+							if (AI.distance <= pow(BLOCK(2), 2))
 							{
 								// Throw fire
 								ThrowFire(itemNumber, 7, SentryGunFlameOffset, SentryGunFlameOffset);

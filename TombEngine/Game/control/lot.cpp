@@ -117,16 +117,16 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 
 		// Can fly.
 		case LotType::Flyer:
-			creature->LOT.Step = SECTOR(20);
-			creature->LOT.Drop = -SECTOR(20);
+			creature->LOT.Step = BLOCK(20);
+			creature->LOT.Drop = -BLOCK(20);
 			creature->LOT.Fly = DEFAULT_FLY_UPDOWN_SPEED;
 			creature->LOT.Zone = ZoneType::Flyer;
 			break;
 
 		// Can swim.
 		case LotType::Water:
-			creature->LOT.Step = SECTOR(20);
-			creature->LOT.Drop = -SECTOR(20);
+			creature->LOT.Step = BLOCK(20);
+			creature->LOT.Drop = -BLOCK(20);
 			creature->LOT.Zone = ZoneType::Water;
 
 			if (item->ObjectNumber == ID_CROCODILE)
@@ -197,7 +197,7 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 	}
 
 	ClearLOT(&creature->LOT);
-	if (itemNumber != Lara.ItemNumber)
+	if (itemNumber != LaraItem->Index)
 		CreateZone(item);
 
 	SlotsUsed++;

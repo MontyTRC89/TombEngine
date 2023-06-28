@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto SWORD_GUARDIAN_MESH_SWAP_TIME = 3;
 
-	const auto SwordBite = CreatureBiteInfo(Vector3i(0, 37, 550), 15);
+	const auto SwordBite = CreatureBiteInfo(Vector3(0, 37, 550), 15);
 
 	enum SwordGuardianState
 	{

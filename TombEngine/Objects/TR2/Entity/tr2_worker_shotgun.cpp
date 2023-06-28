@@ -16,7 +16,7 @@ namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto WORKER_SHOTGUN_NUM_SHOTS = 6;
 
-	const auto WorkerShotgunBite = CreatureBiteInfo(Vector3i(0, 350, 40), 9);
+	const auto WorkerShotgunBite = CreatureBiteInfo(Vector3(0, 350, 40), 9);
 
 	// TODO
 	enum ShotgunWorkerState

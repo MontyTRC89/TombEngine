@@ -21,10 +21,10 @@ namespace TEN::Entities::TR4
 	constexpr auto BAT_UNFURL_HEIGHT_RANGE = BLOCK(0.87f);
 	constexpr auto BAT_ATTACK_RANGE		   = SQUARE(BLOCK(1 / 4.0f));
 	constexpr auto BAT_AWARE_RANGE		   = SQUARE(BLOCK(5));
-	
+
 	constexpr auto BAT_ANGLE = ANGLE(20.0f);
 
-	const auto BatBite = CreatureBiteInfo(Vector3i(0, 16, 45), 4);
+	const auto BatBite = CreatureBiteInfo(Vector3(0, 16, 45), 4);
 
 	enum BatState
 	{
@@ -47,18 +47,26 @@ namespace TEN::Entities::TR4
 		BAT_ANIM_IDLE = 5 // NOTE: TR1 bat don't have this animation, which bug the bat, you need to add the animation manually - TokyoSU: 18/6/2023
 	};
 
-	static bool BatCanAttackTarget(ItemInfo& item, AI_INFO& ai)
-	{
-		auto& creature = *GetCreatureInfo(&item);
-		return item.TouchBits.TestAny() || (ai.distance < BAT_ATTACK_RANGE && ai.ahead &&
-			abs(item.Pose.Position.y - creature.Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE);
-	}
-
 	void InitializeBat(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+
 		InitializeCreature(itemNumber);
 		SetAnimation(item, BAT_ANIM_IDLE);
+	}
+
+	static bool BatCanAttackTarget(ItemInfo& item, const AI_INFO& ai)
+	{
+		const auto& creature = *GetCreatureInfo(&item);
+
+		int deltaHeight = abs(item.Pose.Position.y - creature.Enemy->Pose.Position.y);
+		if (item.TouchBits.TestAny() ||
+			(ai.distance < BAT_ATTACK_RANGE && ai.ahead && deltaHeight < BAT_UNFURL_HEIGHT_RANGE))
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	void BatControl(short itemNumber)
@@ -68,7 +76,8 @@ namespace TEN::Entities::TR4
 
 		auto& item = g_Level.Items[itemNumber];
 		auto& creature = *GetCreatureInfo(&item);
-		short angle = 0;
+
+		short headingAngle = 0;
 
 		if (item.HitPoints <= 0)
 		{
@@ -90,33 +99,35 @@ namespace TEN::Entities::TR4
 			if (item.AIBits)
 				GetAITarget(&creature);
 
-			AI_INFO AI;
-			CreatureAIInfo(&item, &AI);
-			GetCreatureMood(&item, &AI, false);
+			AI_INFO ai;
+			CreatureAIInfo(&item, &ai);
+			GetCreatureMood(&item, &ai, false);
+
 			if (creature.Flags != 0)
 				creature.Mood = MoodType::Escape;
-			CreatureMood(&item, &AI, false);
-			angle = CreatureTurn(&item, BAT_ANGLE);
+
+			CreatureMood(&item, &ai, false);
+			headingAngle = CreatureTurn(&item, BAT_ANGLE);
 
 			switch (item.Animation.ActiveState)
 			{
 			case BAT_STATE_IDLE:
-				if (AI.distance < BAT_AWARE_RANGE || item.HitStatus || creature.HurtByLara)
+				if (ai.distance < BAT_AWARE_RANGE || item.HitStatus || creature.HurtByLara)
 					item.Animation.TargetState = BAT_STATE_DROP_FROM_CEILING;
 
 				break;
 
 			case BAT_STATE_FLY:
-				if (AI.distance < BAT_ATTACK_RANGE || Random::TestProbability(1 / 64.0f))
+				if (ai.distance < BAT_ATTACK_RANGE || Random::TestProbability(1 / 64.0f))
 					creature.Flags = 0;
 
-				if (creature.Flags == 0 && BatCanAttackTarget(item, AI))
+				if (creature.Flags == 0 && BatCanAttackTarget(item, ai))
 					item.Animation.TargetState = BAT_STATE_ATTACK;
 
 				break;
 
 			case BAT_STATE_ATTACK:
-				if (creature.Flags == 0 && BatCanAttackTarget(item, AI))
+				if (creature.Flags == 0 && BatCanAttackTarget(item, ai))
 				{
 					DoDamage(creature.Enemy, BAT_ATTACK_DAMAGE);
 					CreatureEffect(&item, BatBite, DoBloodSplat);
@@ -132,6 +143,6 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }

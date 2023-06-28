@@ -33,8 +33,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SHIVA_SWAPMESH_TIME	   = 3;
 	constexpr auto PLAYER_ANIM_SHIVA_DEATH = 7; // TODO: Move to LaraExtraAnims enum.
 
-	const auto ShivaBiteLeft  = CreatureBiteInfo(Vector3i(0, 0, 920), 13);
-	const auto ShivaBiteRight = CreatureBiteInfo(Vector3i(0, 0, 920), 22);
+	const auto ShivaBiteLeft  = CreatureBiteInfo(Vector3(0, 0, 920), 13);
+	const auto ShivaBiteRight = CreatureBiteInfo(Vector3(0, 0, 920), 22);
 	const auto ShivaAttackLeftJoints  = std::vector<unsigned int>{ 10, 13 };
 	const auto ShivaAttackRightJoints = std::vector<unsigned int>{ 22, 25 };
 

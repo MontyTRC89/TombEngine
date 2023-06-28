@@ -712,7 +712,7 @@ ItemInfo* FindItem(GAME_OBJECT_ID objectID)
 int FindItem(ItemInfo* item)
 {
 	if (item == LaraItem)
-		return Lara.ItemNumber;
+		return item->Index;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 		if (item == &g_Level.Items[i])

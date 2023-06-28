@@ -60,7 +60,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			item->Pose.Orientation.x = -ANGLE(67.5f);
 			CreatureAnimation(itemNumber, angle, 0);
-			CreatureUnderwater(item, SECTOR(1));
+			CreatureUnderwater(item, BLOCK(1));
 		}
 	}
 }
