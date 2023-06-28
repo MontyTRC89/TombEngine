@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_helpers.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
@@ -609,16 +609,16 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	else if (lara->Control.TurnRate < 0)
 		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate);
 
-	if (lara->Control.Subsuit.Velocity[0] > SECTOR(1.5f))
-		lara->Control.Subsuit.Velocity[0] = SECTOR(1.5f);
+	if (lara->Control.Subsuit.Velocity[0] > BLOCK(1.5f))
+		lara->Control.Subsuit.Velocity[0] = BLOCK(1.5f);
 
-	if (lara->Control.Subsuit.Velocity[1] > SECTOR(1.5f))
-		lara->Control.Subsuit.Velocity[1] = SECTOR(1.5f);
+	if (lara->Control.Subsuit.Velocity[1] > BLOCK(1.5f))
+		lara->Control.Subsuit.Velocity[1] = BLOCK(1.5f);
 
 	if (lara->Control.Subsuit.Velocity[0] != 0 || lara->Control.Subsuit.Velocity[1] != 0)
 	{
-		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / SECTOR(8);
-		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / SECTOR(8);
+		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / BLOCK(8);
+		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / BLOCK(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
 		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
 	}
@@ -737,7 +737,7 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Pose.Position.y;
-	int distance = SECTOR(1);
+	int distance = BLOCK(1);
 	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...

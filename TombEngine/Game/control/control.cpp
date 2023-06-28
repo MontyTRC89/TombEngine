@@ -218,7 +218,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		UpdateSimpleParticles();
-		UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
@@ -635,22 +634,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 	else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
 			 g_Gui.GetInventoryMode() != InventoryMode::Pause)
 	{
-		g_Renderer.DumpGameScene();
-		g_Gui.SetInventoryMode(InventoryMode::Pause);
-		g_Gui.SetMenuToDisplay(Menu::Pause);
-		g_Gui.SetSelectedOption(0);
-
-		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
-		{
-			g_Gui.DrawInventory();
-			g_Renderer.Synchronize();
-
-			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
-			{
-				result = GameStatus::ExitToTitle;
-				break;
-			}
-		}
+		if (g_Gui.CallPause())
+			result = GameStatus::ExitToTitle;
 	}
 	else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
 			 LaraItem->HitPoints > 0 && !BinocularOn)

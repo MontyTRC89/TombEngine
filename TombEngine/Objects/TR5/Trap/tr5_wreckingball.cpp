@@ -12,10 +12,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
+#include "Objects/TR5/Light/tr5_light.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "tr5_light.h"
 
 using namespace TEN::Effects::Environment;
 
@@ -96,10 +96,10 @@ void WreckingBallControl(short itemNumber)
 
 	bool test = true;
 
-	if ((LaraItem->Pose.Position.x >= SECTOR(44) &&
-		LaraItem->Pose.Position.x <= SECTOR(56)&&
-		LaraItem->Pose.Position.z >= SECTOR(26) &&
-		LaraItem->Pose.Position.z <= SECTOR(42)) ||
+	if ((LaraItem->Pose.Position.x >= BLOCK(44) &&
+		LaraItem->Pose.Position.x <= BLOCK(56)&&
+		LaraItem->Pose.Position.z >= BLOCK(26) &&
+		LaraItem->Pose.Position.z <= BLOCK(42)) ||
 		item->ItemFlags[2] < 900)
 	{
 		if (item->ItemFlags[2] < 900)

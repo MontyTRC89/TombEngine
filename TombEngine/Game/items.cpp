@@ -7,12 +7,13 @@
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -196,7 +197,6 @@ void KillItem(short const itemNumber)
 		auto* item = &g_Level.Items[itemNumber];
 
 		DetatchSpark(itemNumber, SP_ITEM);
-
 		item->Active = false;
 
 		if (NextItemActive == itemNumber)
@@ -239,7 +239,9 @@ void KillItem(short const itemNumber)
 		if (item == Lara.TargetEntity)
 			Lara.TargetEntity = nullptr;
 
-		if (Objects[item->ObjectNumber].floor != nullptr)
+		// AI target generation uses a hack with making a dummy item without ObjectNumber.
+		// Therefore, a check should be done here to prevent access violation.
+		if (item->ObjectNumber != NO_ITEM && Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
 		GameScriptHandleKilled(itemNumber, true);
@@ -710,7 +712,7 @@ ItemInfo* FindItem(GAME_OBJECT_ID objectID)
 int FindItem(ItemInfo* item)
 {
 	if (item == LaraItem)
-		return Lara.ItemNumber;
+		return item->Index;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 		if (item == &g_Level.Items[i])
@@ -822,7 +824,8 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
-	if (!object.undead || isExplosive)
+	if ((object.damageType == DamageMode::AnyWeapon) ||
+		(object.damageType == DamageMode::ExplosivesOnly && isExplosive))
 	{
 		if (target->HitPoints > 0)
 		{
@@ -858,7 +861,7 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, -5);
+			TriggerShatterSmoke(pos.value().x, pos.value().y, pos.value().z);
 			break;
 		}
 	}

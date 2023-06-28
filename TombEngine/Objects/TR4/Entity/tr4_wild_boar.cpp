@@ -20,7 +20,7 @@ namespace TEN::Entities::TR4
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
 	constexpr auto WILD_BOAR_ATTACK_RANGE = SQUARE(CLICK(1));
 
-	const auto WildBoarBite = CreatureBiteInfo(Vector3i::Zero, 14);
+	const auto WildBoarBite = CreatureBiteInfo(Vector3::Zero, 14);
 
 	enum WildBoarState
 	{
@@ -61,10 +61,8 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short tilt = 0;
-		short head = 0;
-		short neck = 0;
+		short angle  = 0;
+		short head   = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -153,7 +151,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BOAR_STATE_RUN_FORWARD:
-				if (AI.distance >= pow(SECTOR(2), 2))
+				if (AI.distance >= pow(BLOCK(2), 2))
 				{
 					creature->MaxTurn = ANGLE(6.0f);
 					item->Flags = 0;

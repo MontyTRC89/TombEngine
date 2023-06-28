@@ -184,9 +184,9 @@ void ClockworkBeetleControl(short itemNumber)
 								int dy = beetle->Pose.Position.y - item->Pose.Position.y;
 								int dz = beetle->Pose.Position.z - item->Pose.Position.z;
 
-								if (dx > -SECTOR(1) && dx < SECTOR(1) &&
-									dz > -SECTOR(1) && dz < SECTOR(1) &&
-									dy > -SECTOR(1) && dy < SECTOR(1))
+								if (dx > -BLOCK(1) && dx < BLOCK(1) &&
+									dz > -BLOCK(1) && dz < BLOCK(1) &&
+									dy > -BLOCK(1) && dy < BLOCK(1))
 								{
 									break;
 								}
@@ -350,9 +350,9 @@ void UseClockworkBeetle(short flag)
 							int dy = item->Pose.Position.y - item2->Pose.Position.y;
 							int dz = item->Pose.Position.z - item2->Pose.Position.z;
 
-							if (dx > -SECTOR(1) && dx < SECTOR(1) &&
-								dz > -SECTOR(1) && dz < SECTOR(1) &&
-								dy > -SECTOR(1) && dy < SECTOR(1))
+							if (dx > -BLOCK(1) && dx < BLOCK(1) &&
+								dz > -BLOCK(1) && dz < BLOCK(1) &&
+								dy > -BLOCK(1) && dy < BLOCK(1))
 							{
 								break;
 							}

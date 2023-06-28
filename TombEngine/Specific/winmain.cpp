@@ -15,9 +15,9 @@
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
-#include "LanguageScript.h"
-#include "ScriptInterfaceState.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Internal/LanguageScript.h"
+#include "Scripting/Include/ScriptInterfaceState.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
@@ -212,7 +212,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
-				ResumeAllSounds();
+				ResumeAllSounds(SoundPauseMode::Global);
 			}
 
 			return 0;
@@ -227,7 +227,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
-			PauseAllSounds();
+			PauseAllSounds(SoundPauseMode::Global);
 		}
 	}
 
@@ -498,5 +498,4 @@ void WinClose()
 	ShutdownTENLog();
 
 	CoUninitialize();
-
 }

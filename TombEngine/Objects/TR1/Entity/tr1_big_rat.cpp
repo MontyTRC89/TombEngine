@@ -33,7 +33,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto BIG_RAT_RUN_TURN_RATE_MAX  = ANGLE(6.0f);
 	constexpr auto BIG_RAT_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto BigRatBite = CreatureBiteInfo(Vector3i(0, -11, 108), 3);
+	const auto BigRatBite = CreatureBiteInfo(Vector3(0, -11, 108), 3);
 
 	enum BigRatState
 	{

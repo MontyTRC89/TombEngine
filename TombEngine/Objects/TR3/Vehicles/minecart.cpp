@@ -169,7 +169,6 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* minecartItem = &g_Level.Items[itemNumber];
 		minecartItem->Data = MinecartInfo();
-		auto* minecart = GetMinecartInfo(minecartItem);
 	}
 
 	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -976,7 +975,7 @@ namespace TEN::Entities::Vehicles
 		if (probedRoomNumber != minecartItem->RoomNumber)
 		{
 			ItemNewRoom(lara->Context.Vehicle, probedRoomNumber);
-			ItemNewRoom(lara->ItemNumber, probedRoomNumber);
+			ItemNewRoom(laraItem->Index, probedRoomNumber);
 		}
 
 		TestTriggers(minecartItem, false);

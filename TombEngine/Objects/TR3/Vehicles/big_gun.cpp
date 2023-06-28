@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
-	const auto BigGunBite = CreatureBiteInfo(Vector3i(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
+	const auto BigGunBite = CreatureBiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -105,7 +105,7 @@ namespace TEN::Entities::Vehicles
 		int z = laraItem->Pose.Position.z - bigGunItem->Pose.Position.z;
 
 		int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
-		if (distance > SECTOR(30))
+		if (distance > BLOCK(30))
 			return false;
 
 		short deltaAngle = abs(laraItem->Pose.Orientation.y - bigGunItem->Pose.Orientation.y);

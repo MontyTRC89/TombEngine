@@ -24,6 +24,7 @@ using namespace TEN::Math;
 
 #define REGKEY_ENABLE_RUMBLE			"EnableRumble"
 #define REGKEY_ENABLE_THUMBSTICK_CAMERA	"EnableThumbstickCamera"
+#define REGKEY_ENABLE_SUBTITLES			"EnableSubtitles"
 
 #define REGKEY_AUTOTARGET				"AutoTarget"
 
@@ -45,6 +46,7 @@ struct GameConfiguration
 	int ShadowMapSize = 1024;
 	int ShadowMaxBlobs = 16;
 
+	bool EnableSubtitles;
 	bool AutoTarget;
 	bool EnableRumble;
 	bool EnableThumbstickCameraControl;
