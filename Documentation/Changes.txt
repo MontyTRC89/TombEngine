@@ -17,6 +17,7 @@ Version 1.1.0
 * Fix doppelganger being limited to be in a single room.
 * Fix bat AI, damage value, and incorrect collision after death.
 * Fix regeneration for pickups with OCB 128.
+* Fix raising blocks still shaking without OCB.
 * Fix spiky ceiling and add new OCBs for it.
 * Fix TR1 winged mutant pathfinding and damage issues and add new OCB for it.
 * Implement separate audio track channel for playing voiceovers with subtitles.
