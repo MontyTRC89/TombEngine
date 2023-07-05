@@ -580,7 +580,7 @@ namespace TEN::Renderer
 
 		time(&rawtime);
 		auto time = localtime(&rawtime);
-		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.png", time);
+		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.bmp", time);
 
 		auto screenPath = g_GameFlow->GetGameDir() + "Screenshots";
 
@@ -588,6 +588,7 @@ namespace TEN::Renderer
 			std::filesystem::create_directory(screenPath);
 
 		screenPath += buffer;
-		SaveWICTextureToFile(m_context.Get(), m_backBufferTexture, GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str());
+		SaveWICTextureToFile(m_context.Get(), m_backBufferTexture, GUID_ContainerFormatBmp, TEN::Utils::ToWString(screenPath).c_str(),
+			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
 }
