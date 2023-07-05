@@ -608,7 +608,7 @@ namespace TEN::Input
 		static bool dbScreenshot = true;
 		if (KeyMap[KC_SYSRQ] && dbScreenshot)
 			g_Renderer.SaveScreenshot();
-		dbScreenshot = KeyMap[KC_TAB] ? false : true;
+		dbScreenshot = KeyMap[KC_SYSRQ] ? false : true;
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;
