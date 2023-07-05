@@ -1,6 +1,10 @@
 #include "framework.h"
 
 #include <algorithm>
+#include <ctime>
+#include <filesystem>
+#include <ScreenGrab.h>
+#include <wincodec.h>
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
@@ -567,5 +571,23 @@ namespace TEN::Renderer
 
 		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
+	}
+
+	void Renderer11::SaveScreenshot()
+	{
+		char buffer[64];
+		time_t rawtime;
+
+		time(&rawtime);
+		auto time = localtime(&rawtime);
+		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.png", time);
+
+		auto screenPath = g_GameFlow->GetGameDir() + "Screenshots";
+
+		if (!std::filesystem::is_directory(screenPath))
+			std::filesystem::create_directory(screenPath);
+
+		screenPath += buffer;
+		SaveWICTextureToFile(m_context.Get(), m_backBufferTexture, GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str());
 	}
 }
