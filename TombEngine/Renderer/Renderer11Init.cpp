@@ -40,16 +40,17 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
 	const D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
 
-	m_vsRooms = Utils::compileVertexShader(m_device.Get(),GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", nullptr, blob);
-
+	m_vsRooms = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", nullptr, blob);
+  
 	// Initialize input layout using the first vertex shader
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
-	{ 
+	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"ANIMATIONFRAMEOFFSET", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"EFFECTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -57,12 +58,10 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 		{"DRAWINDEX", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"HASH", 0, DXGI_FORMAT_R32_SINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
-	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
+	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 12, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
 
-	// TODO: If shader loading moves to a less hardcoded system we should take the opportunity to apply GetAssetPath more gracefully - squidshire 13/05/2023
 	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
 	m_psRooms = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_4_1", nullptr, blob);
-	m_psRooms_ShadowMap = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_4_1", &roomDefinesShadowMap[0], blob);
 	m_vsItems = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "VS", "vs_4_0", nullptr, blob);
 	m_psItems = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_4_0", nullptr, blob);
 	m_vsStatics = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "VS", "vs_4_0", nullptr, blob);
@@ -91,20 +90,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_4_0", nullptr, blob);
 	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "VS", "vs_4_0", nullptr, blob);
 	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_4_0", nullptr, blob);
-
-	// Initialize input layout using the first vertex
-	/*D3D11_INPUT_ELEMENT_DESC inputLayoutSprites[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
-		{"WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-		{"WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-		{"WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1}
-	};
-	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayoutSprites, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayoutSprites));*/
-
+ 
 	// Initialize constant buffers
 	m_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
 	m_cbItem = CreateConstantBuffer<CItemBuffer>();
@@ -116,7 +102,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_cbAnimated = CreateConstantBuffer<CAnimatedBuffer>();
 	m_cbPostProcessBuffer = CreateConstantBuffer<CPostProcessBuffer>();
 	m_cbBlending = CreateConstantBuffer<CBlendingBuffer>();
-	m_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
+	m_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();      
 	m_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
 	m_cbSky = CreateConstantBuffer<CSkyBuffer>();
 

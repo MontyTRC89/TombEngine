@@ -178,7 +178,7 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 
 	//the scalar representing the line from the direction
 	//to the normal n
-	float d = max(dot(direction,n), .0f);
+	float d = max(dot(direction, n), .0f);
 
 	if (d > 0.f)
 	{

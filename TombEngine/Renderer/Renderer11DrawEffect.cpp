@@ -1219,7 +1219,7 @@ namespace TEN::Renderer
 				currentSpriteBucket.SpritesToDraw.push_back(rDrawSprite);
 			}
 		}
-
+		     
 		spriteBuckets.push_back(currentSpriteBucket);
 
 		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
@@ -1473,13 +1473,10 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-<<<<<<< HEAD
-=======
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		extern std::vector<DebrisFragment> DebrisFragments;
->>>>>>> b32754b92 (Fixed black debris)
 		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;

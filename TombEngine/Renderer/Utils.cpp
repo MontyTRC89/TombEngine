@@ -62,7 +62,7 @@ namespace TEN::Renderer::Utils
 			} 
 			else
 			{
-				TENLog("Error while compiling shader: " + TEN::Utils::ToString(fileName.c_str()), LogLevel::Error);
+				TENLog("Error while compiling VS shader: " + TEN::Utils::ToString(fileName.c_str()), LogLevel::Error);
 				throwIfFailed(res);
 			}
 		}
@@ -83,12 +83,27 @@ namespace TEN::Renderer::Utils
 	ComPtr<ID3D11PixelShader> compilePixelShader(ID3D11Device* device, const wstring& fileName, const string& function, const string& model, const D3D_SHADER_MACRO* defines, ComPtr<ID3D10Blob>& bytecode)
 	{
 		ComPtr<ID3D10Blob> errors;
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR | D3DCOMPILE_SKIP_OPTIMIZATION;
-		throwIfFailed(D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(), errors.GetAddressOf()));
+		HRESULT res = (D3DCompileFromFile(fileName.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, function.c_str(), model.c_str(), GetShaderFlags(), 0, bytecode.GetAddressOf(), errors.GetAddressOf()));
+		if (FAILED(res))
+		{
+			ID3D10Blob* errorObj = errors.Get();
+			if (errorObj != nullptr)
+			{
+				auto error = std::string((char*)errorObj->GetBufferPointer());
+				TENLog(error, LogLevel::Error);
+				throw std::runtime_error(error);
+			}
+			else
+			{
+				TENLog("Error while compiling PS shader: " + TEN::Utils::ToString(fileName.c_str()), LogLevel::Error);
+				throwIfFailed(res);
+			}
+		}
+
 		ComPtr<ID3D11PixelShader> shader;
 		throwIfFailed(device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
-		
-		if constexpr(DebugBuild)
+
+		if constexpr (DebugBuild)
 		{
 			char buffer[100];
 			unsigned int size = (unsigned int)std::wcstombs(buffer, fileName.c_str(), 100);
