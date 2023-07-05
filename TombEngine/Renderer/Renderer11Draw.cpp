@@ -1977,14 +1977,7 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Bind pixel shaders
-		if (m_shadowLight != nullptr)
-		{
-			m_context->PSSetShader(m_psRooms_ShadowMap.Get(), nullptr, 0);
-		}
-		else
-		{
-			m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
-		}
+		m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
 
 		BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 		BindConstantBufferPS(CB_ROOM, m_cbRoom.get());

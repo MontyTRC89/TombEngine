@@ -60,7 +60,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	{
 		float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
 		input.PositionCopy.xy /= input.PositionCopy.w;
-		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
+		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1.0f);
 		float sceneDepth = NormalsAndDepthMap.Sample(NormalsAndDepthMapSampler, texCoord).w;
 
 		sceneDepth = LinearizeDepth(sceneDepth, NearPlane, FarPlane);

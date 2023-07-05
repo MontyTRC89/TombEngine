@@ -1219,14 +1219,14 @@ namespace TEN::Renderer
 				currentSpriteBucket.SpritesToDraw.push_back(rDrawSprite);
 			}
 		}
-
+		     
 		spriteBuckets.push_back(currentSpriteBucket);
 
 		if (g_Configuration.Antialiasing > AntialiasingMode::Low)
 		{
-			m_context->ResolveSubresource(m_resolvedNormalsAndDepthMapRenderTarget.Texture.Get(), 0, m_normalsAndDepthMapRenderTarget.Texture.Get(), 0, DXGI_FORMAT_R32_FLOAT);
+			m_context->ResolveSubresource(m_resolvedNormalsAndDepthMapRenderTarget.Texture.Get(), 0, m_normalsAndDepthMapRenderTarget.Texture.Get(), 0, DXGI_FORMAT_R32G32B32A32_FLOAT); 
 			BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_resolvedNormalsAndDepthMapRenderTarget, SAMPLER_LINEAR_CLAMP);
-		}
+		} 
 		else
 		{
 			BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_normalsAndDepthMapRenderTarget, SAMPLER_LINEAR_CLAMP);

@@ -26,7 +26,6 @@ struct PixelShaderInput
 	float4 PositionCopy: TEXCOORD2;
 	float4 FogBulbs : TEXCOORD3;
 	float DistanceFog : FOG;
-	float3 NormalVS: TEXCOORD4;
 };
 
 struct PixelShaderOutput
@@ -61,7 +60,6 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	output.PositionCopy = output.Position;
     output.Sheen = input.Effects.w;
-	output.NormalVS = mul(float4(input.Normal, 1.0f), InverseTransposeView).xyz;
 
 	return output;
 }
@@ -73,13 +71,15 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float4 tex = Texture.Sample(Sampler, input.UV);
     DoAlphaTest(tex);
 
+	float3 normal = normalize(input.Normal);
+
 	float3 color = (LightType == 0) ?
 		CombineLights(
 			AmbientLight.xyz, 
 			input.Color.xyz, 
 			tex.xyz, 
 			input.WorldPosition, 
-			normalize(input.Normal), 
+			normal, 
 			input.Sheen, 
 			StaticLights, 
 			NumStaticLights,
@@ -90,11 +90,8 @@ PixelShaderOutput PS(PixelShaderInput input)
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 
-	input.NormalVS = normalize(input.NormalVS);
-	output.NormalsAndDepth.xyz = input.NormalVS;
-	output.NormalsAndDepth.w = tex.w > 0.0f ?
-		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
-		float4(0.0f, 0.0f, 0.0f, 0.0f);
+	output.NormalsAndDepth.xyz = (normal + 1.0f) / 2.0f;
+	output.NormalsAndDepth.w = output.Color.w > 0.0f ? input.PositionCopy.z / input.PositionCopy.w : 0.0f;
 
 	return output;
 }

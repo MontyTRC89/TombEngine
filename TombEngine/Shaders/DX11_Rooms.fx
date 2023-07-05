@@ -26,11 +26,12 @@ struct PixelShaderInput
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
-	float3x3 TBN : TBN;
 	float4 PositionCopy : TEXCOORD1;
 	float4 FogBulbs : TEXCOORD2;
 	float DistanceFog : FOG;
 	float3 NormalVS: TEXCOORD4;
+	float3 Tangent: TANGENT;
+	float3 Binormal: BINORMAL;
 };
 
 Texture2D Texture : register(t0);
@@ -78,7 +79,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Normal = input.Normal;
 	output.Color = float4(col, input.Color.w);
 	output.PositionCopy = screenPos;
-	output.NormalVS = mul(float4(input.Normal, 1.0f), InverseTransposeView).xyz;
 
 #ifdef ANIMATED
 
@@ -91,23 +91,13 @@ PixelShaderInput VS(VertexShaderInput input)
 #endif
 	
 	output.WorldPosition = input.Position.xyz;
-
-    float3x3 TBN = float3x3(input.Tangent, cross(input.Normal,input.Tangent), input.Normal);
-	output.TBN = TBN;
+	output.Tangent = input.Tangent;
+	output.Binormal = input.Binormal;
 
 	output.FogBulbs = DoFogBulbsForVertex(output.WorldPosition);
 	output.DistanceFog = DoDistanceFogForVertex(output.WorldPosition);
 
 	return output;
-}
-
-float3 UnpackNormalMap(float3 compressedNormalMap)
-{
-	float2 normalXY = compressedNormalMap.rg;
-
-	normalXY = normalXY * float2(2.0f, 2.0f) - float2(1.0f, 1.0f);
-	float normalZ = sqrt(saturate(1.0f - dot(normalXY, normalXY)));
-	return float3(normalXY.xy, normalZ);
 }
 
 PixelShaderOutput PS(PixelShaderInput input)
@@ -118,13 +108,14 @@ PixelShaderOutput PS(PixelShaderInput input)
 	
 	DoAlphaTest(output.Color);
 
-	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV).rgb);
-	normal = normalize(mul(normal, input.TBN));
+	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
+	float3 normal = NormalTexture.Sample(NormalTextureSampler, input.UV).rgb;
+	normal = normal * 2.0f - 1.0f;
+	normal = normalize(mul(normal, TBN));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
 
-#ifdef SHADOW_MAP
 	if (CastShadows)
 	{
         if (Light.Type == LT_POINT)
@@ -137,7 +128,6 @@ PixelShaderOutput PS(PixelShaderInput input)
             DoSpotLightShadow(input.WorldPosition, lighting);
         }
 	}
-#endif
 
     DoBlobShadows(input.WorldPosition, lighting);
 
@@ -155,7 +145,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 				continue;
 
 			lightVec = normalize(lightVec);
-			float d = saturate(dot(normal, -lightVec ));
+			float d = saturate(dot(normal, lightVec ));
 			if (d < 0)
 				continue;
 			
@@ -187,12 +177,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}
-
-	input.NormalVS = normalize(input.NormalVS);
-	output.NormalsAndDepth.xyz = input.NormalVS;
-	output.NormalsAndDepth.w = output.Color.w > 0.0f ?
-		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
-		float4(0.0f, 0.0f, 0.0f, 0.0f);
+	 
+	output.NormalsAndDepth.xyz = (normal + 1.0f) / 2.0f;
+	output.NormalsAndDepth.w = output.Color.w > 0.0f ? input.PositionCopy.z / input.PositionCopy.w : 0.0f;
 
 	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
 	output.Color.xyz = output.Color.xyz * lighting;

@@ -33,7 +33,6 @@ struct PixelShaderInput
 	float4 FogBulbs : TEXCOORD3;
 	float DistanceFog : FOG;
 	uint InstanceID : SV_InstanceID;
-	float3 NormalVS: TEXCOORD4;
 };
 
 struct PixelShaderOutput
@@ -65,7 +64,6 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.PositionCopy = output.Position;
 	output.Sheen = input.Effects.w;
 	output.InstanceID = InstanceID;
-	output.NormalVS = mul(float4(input.Normal, 1.0f), InverseTransposeView).xyz;
 
 	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
 	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
@@ -83,13 +81,15 @@ PixelShaderOutput PS(PixelShaderInput input)
 	uint mode = StaticMeshes[input.InstanceID].LightInfo.y;
 	uint numLights = StaticMeshes[input.InstanceID].LightInfo.x;
 
+	float3 normal = normalize(input.Normal);
+
 	float3 color = (mode == 0) ?
 		CombineLights(
 			StaticMeshes[input.InstanceID].AmbientLight.xyz,
 			input.Color.xyz,
 			tex.xyz, 
 			input.WorldPosition, 
-			normalize(input.Normal), 
+			normal, 
 			input.Sheen,
 			StaticMeshes[input.InstanceID].InstancedStaticLights,
 			numLights,
@@ -100,11 +100,8 @@ PixelShaderOutput PS(PixelShaderInput input)
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 	
-	input.NormalVS = normalize(input.NormalVS);
-	output.NormalsAndDepth.xyz = input.NormalVS;
-	output.NormalsAndDepth.w = tex.w > 0.0f ?
-		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
-		float4(0.0f, 0.0f, 0.0f, 0.0f);
+	output.NormalsAndDepth.xyz = (normal + 1.0f) / 2.0f;
+	output.NormalsAndDepth.w = output.Color.w > 0.0f ? input.PositionCopy.z / input.PositionCopy.w : 0.0f;
 
 	return output;
 }
