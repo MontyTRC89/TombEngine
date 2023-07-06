@@ -21,7 +21,7 @@ Version 1.1.0
 * Fix spiky ceiling and add new OCBs for it.
 * Fix TR1 winged mutant pathfinding and damage issues and add new OCB for it.
 * Fix last inventory item not properly changed when loading, saving and restarting game.
-* Make screenshot file in "Screenshots" subfolder by pressing print screen.
+* Make screenshot file in "Screenshots" subfolder by pressing print screen key.
 * Implement separate audio track channel for playing voiceovers with subtitles.
 * Don't stop ambience when Lara dies.
 * Pause all sounds when entering inventory or pause menu.
