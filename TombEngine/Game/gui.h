@@ -77,7 +77,7 @@ namespace TEN::Gui
 		Options,
 		Display,
 		GeneralControls,
-		ItemHotkeys,
+		QuickActions,
 		OtherSettings
 	};
 

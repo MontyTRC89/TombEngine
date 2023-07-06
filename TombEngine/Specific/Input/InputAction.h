@@ -22,7 +22,6 @@ namespace TEN::Input
 		Pause, // Move to Menu control section.
 		LeftStep,
 		RightStep,
-		SayNo,
 
 		// Vehicle control
 		/*Accelerate,
@@ -49,6 +48,7 @@ namespace TEN::Input
 		Weapon8,
 		Weapon9,
 		Weapon10,
+		SayNo,
 
 		// Menu control
 		/*Option,

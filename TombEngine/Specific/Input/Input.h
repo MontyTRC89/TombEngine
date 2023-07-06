@@ -65,7 +65,6 @@ namespace TEN::Input
 		KEY_PAUSE,
 		KEY_LSTEP,
 		KEY_RSTEP,
-		KEY_SAY_NO,
 
 		/*KEY_ACCELERATE,
 		KEY_REVERSE,
@@ -88,6 +87,7 @@ namespace TEN::Input
 		KEY_WEAPON_8,
 		KEY_WEAPON_9,
 		KEY_WEAPON_10,
+		KEY_SAY_NO,
 
 		KEY_COUNT
 	};
@@ -114,7 +114,6 @@ namespace TEN::Input
 		IN_PAUSE	  = (1 << KEY_PAUSE),
 		IN_LSTEP	  = (1 << KEY_LSTEP),
 		IN_RSTEP	  = (1 << KEY_RSTEP),
-		IN_SAY_NO	  = (1 << KEY_SAY_NO),
 
 		/*IN_ACCELERATE = (1 << KEY_ACCELERATE),
 		IN_REVERSE	  = (1 << KEY_REVERSE),
@@ -138,6 +137,7 @@ namespace TEN::Input
 		IN_WEAPON_8		   = (1 << KEY_WEAPON_8),
 		IN_WEAPON_9		   = (1 << KEY_WEAPON_9),
 		IN_WEAPON_10	   = (1 << KEY_WEAPON_10),
+		IN_SAY_NO	  = (1 << KEY_SAY_NO),
 
 		// Additional input actions without direct key relation
 		/*IN_SAVE		  = (1 << (KEY_COUNT + 0)),

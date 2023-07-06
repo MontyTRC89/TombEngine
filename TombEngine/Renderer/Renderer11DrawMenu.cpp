@@ -292,7 +292,7 @@ namespace TEN::Renderer
 				break;
 			}
 
-		case Menu::ItemHotkeys:
+		case Menu::QuickActions:
 			{
 				// Setup needed parameters.
 				y = MenuVerticalTop;
@@ -397,7 +397,7 @@ namespace TEN::Renderer
 
 		case Menu::Options:
 		case Menu::GeneralControls:
-		case Menu::ItemHotkeys:
+		case Menu::QuickActions:
 		case Menu::Display:
 		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
@@ -439,7 +439,7 @@ namespace TEN::Renderer
 
 		case Menu::Options:
 		case Menu::GeneralControls:
-		case Menu::ItemHotkeys:
+		case Menu::QuickActions:
 		case Menu::Display:
 		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsPause);
