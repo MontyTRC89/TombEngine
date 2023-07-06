@@ -29,6 +29,7 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
+#include "Game/effects/hair.h"
 
 using namespace std::chrono;
 using namespace TEN::Entities::Generic;
@@ -117,6 +118,8 @@ namespace TEN::Renderer
 			1.0f, 0);
 		}
 	}
+
+	using namespace TEN::Effects::Hair;
 
 	void Renderer11::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
@@ -237,9 +240,9 @@ namespace TEN::Renderer
 			{
 				RendererRoom& room = m_rooms[item->RoomNumber];
 
-				DrawLaraHolsters(item, &room, false);
-				DrawLaraJoints(item, &room, false);
-				DrawLaraHair(item, &room, false);
+				DrawLaraHolsters(item, &room, RP_SHADOW_MAP);
+				DrawLaraJoints(item, &room, RP_SHADOW_MAP);
+				DrawLaraHair(item, &room, RP_SHADOW_MAP);
 			}
 		}
 	}
@@ -1487,17 +1490,17 @@ namespace TEN::Renderer
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
 		
 		// Draw opaque and alpha test faces
-		DrawRooms(view, false);
-		DrawItems(view, false);
-		DrawStatics(view, false);
-		DrawEffects(view, false);
+		DrawRooms(view, RP_OPAQUE);
+		DrawItems(view, RP_OPAQUE);
+		DrawStatics(view, RP_OPAQUE);
+		DrawEffects(view, RP_OPAQUE);
 		DrawGunShells(view);
 		DrawBats(view);
 		DrawRats(view);
 		DrawSpiders(view);
 		DrawScarabs(view);
 		DrawLocusts(view);
-		DrawDebris(view, false);
+		DrawDebris(view, RP_OPAQUE);
 
 		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(),
 			m_renderTarget.DepthStencilView.Get());
@@ -1531,11 +1534,11 @@ namespace TEN::Renderer
 		DrawLines3D(view);
 
 		// Draw immediately additive and unsorted blended faces, and collect all sorted blend modes faces for later
-		DrawRooms(view, true);
-		DrawItems(view, true);
-		DrawStatics(view, true);
-		DrawEffects(view, true);
-		DrawDebris(view, true);
+		DrawRooms(view, RP_TRANSPARENT);
+		DrawItems(view, RP_TRANSPARENT);
+		DrawStatics(view, RP_TRANSPARENT);
+		DrawEffects(view, RP_TRANSPARENT);
+		DrawDebris(view, RP_TRANSPARENT);
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
@@ -1592,7 +1595,7 @@ namespace TEN::Renderer
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		DrawHorizonAndSky(view, depthTarget);
-		DrawRooms(view, false);
+		DrawRooms(view, RP_OPAQUE);
 	}
 
 	void Renderer11::DumpGameScene()
@@ -1601,7 +1604,7 @@ namespace TEN::Renderer
 		            gameCamera);
 	}
 
-	void Renderer11::DrawItems(RenderView& view, bool transparent)
+	void Renderer11::DrawItems(RenderView& view, RENDERER_PASS rendererPass)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1622,7 +1625,7 @@ namespace TEN::Renderer
 				switch (itemToDraw->ObjectNumber)
 				{
 				case ID_LARA:
-					DrawLara(view, transparent);
+					DrawLara(view, rendererPass);
 					break;
 
 				case ID_WATERFALL1:
@@ -1633,11 +1636,11 @@ namespace TEN::Renderer
 				case ID_WATERFALL6:
 				case ID_WATERFALLSS1:
 				case ID_WATERFALLSS2:
-					DrawWaterfalls(itemToDraw, view, 10, transparent);
+					DrawWaterfalls(itemToDraw, view, 10, rendererPass);
 					continue;
 
 				default:
-					DrawAnimatingItem(itemToDraw, view, transparent);
+					DrawAnimatingItem(itemToDraw, view, rendererPass);
 					break;
 				}
 			}
@@ -1656,7 +1659,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawWaterfalls(RendererItem* item, RenderView& view, int fps, bool transparent)
+	void Renderer11::DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RENDERER_PASS rendererPass)
 	{
 		// Extremely hacky function to get first rendered face of a waterfall object mesh, calculate
 		// its texture height and scroll all the textures according to that height.
@@ -1693,14 +1696,14 @@ namespace TEN::Renderer
 		m_cbAnimated.updateData(m_stAnimated, m_context.Get());
 		BindConstantBufferPS(CB_ANIMATED_TEXTURES, m_cbAnimated.get());
 
-		DrawAnimatingItem(item, view, transparent);
+		DrawAnimatingItem(item, view, rendererPass);
 
 		// Reset animated buffer after rendering just in case
 		m_stAnimated.Fps = m_stAnimated.NumFrames = m_stAnimated.Type = 0;
 		m_cbAnimated.updateData(m_stAnimated, m_context.Get());
 	}
 
-	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
+	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, RENDERER_PASS rendererPass)
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &m_rooms[item->RoomNumber];
@@ -1725,7 +1728,7 @@ namespace TEN::Renderer
 			if (!(nativeItem->MeshBits & (1 << k)))
 				continue;
 
-			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, transparent);
+			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, rendererPass);
 		}
 	}
 
@@ -1794,7 +1797,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawStatics(RenderView& view, bool transparent)
+	void Renderer11::DrawStatics(RenderView& view, RENDERER_PASS rendererPass)
 	{
 		if (m_staticsTextures.size() == 0 || view.SortedStaticsToDraw.size() == 0)
 		{
@@ -1857,7 +1860,7 @@ namespace TEN::Renderer
 
 				for (auto& bucket : refMesh->Buckets)
 				{
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RP_TRANSPARENT)))
 					{
 						continue;
 					}
@@ -1905,7 +1908,7 @@ namespace TEN::Renderer
 		}
 
 		// Collect sorted blend modes faces ordered by room, if transparent pass
-		if (transparent)
+		if (rendererPass == RP_TRANSPARENT)
 		{
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -1921,7 +1924,7 @@ namespace TEN::Renderer
 
 						for (auto& bucket : mesh->Buckets)
 						{
-							if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+							if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RP_TRANSPARENT)))
 							{
 								continue;
 							}
@@ -1965,7 +1968,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawRooms(RenderView& view, bool transparent)
+	void Renderer11::DrawRooms(RenderView& view, RENDERER_PASS rendererPass)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -2052,7 +2055,7 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RP_TRANSPARENT)))
 					{
 						continue;
 					}
@@ -2276,13 +2279,13 @@ namespace TEN::Renderer
 		m_swapChain->Present(1, 0);
 	}
 
-	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent)
+	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RENDERER_PASS rendererPass)
 	{
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 		for (auto& bucket : mesh->Buckets)
 		{
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RP_TRANSPARENT)))
 			{
 				continue;
 			}
@@ -2292,7 +2295,16 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			if (DoesBlendModeRequireSorting(bucket.BlendMode))
+			if (rendererPass == RP_SHADOW_MAP)
+			{
+				SetBlendMode(BLENDMODE_OPAQUE);
+				SetAlphaTest(ALPHA_TEST_NONE, ALPHA_TEST_THRESHOLD);
+
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+				m_numMoveablesDrawCalls++;
+			}
+			else if (DoesBlendModeRequireSorting(bucket.BlendMode))
 			{
 				// Collect transparent faces
 				for (int j = 0; j < bucket.Polygons.size(); j++)
