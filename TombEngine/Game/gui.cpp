@@ -293,7 +293,7 @@ namespace TEN::Gui
 			return inventoryResult;
 
 		case Menu::GeneralControls:
-		case Menu::ItemHotkeys:
+		case Menu::QuickActions:
 			HandleControlSettingsInput(item, false);
 			return inventoryResult;
 
@@ -588,7 +588,7 @@ namespace TEN::Gui
 			numControlSettingsOptions = (int)GeneralControlStrings.size() + 2;
 			break;
 
-		case Menu::ItemHotkeys:
+		case Menu::QuickActions:
 			numControlSettingsOptions = (int)QuickActionStrings.size() + 2;
 			break;
 		}
@@ -601,12 +601,12 @@ namespace TEN::Gui
 		{
 			if ((int)MenuToDisplay == (int)Menu::GeneralControls)
 			{
-				MenuToDisplay = Menu::ItemHotkeys;
+				MenuToDisplay = Menu::QuickActions;
 				SelectedOption = 0;
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				return;
 			}
-			else if ((int)MenuToDisplay == (int)Menu::ItemHotkeys)
+			else if ((int)MenuToDisplay == (int)Menu::QuickActions)
 			{
 				MenuToDisplay = Menu::GeneralControls;
 				SelectedOption = 0;
@@ -994,7 +994,7 @@ namespace TEN::Gui
 			return InventoryResult::None;
 
 		case Menu::GeneralControls:
-		case Menu::ItemHotkeys:
+		case Menu::QuickActions:
 			HandleControlSettingsInput(item, true);
 			return InventoryResult::None;
 
