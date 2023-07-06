@@ -230,5 +230,5 @@ namespace TEN::Gui
 	extern std::vector<const char*> OptionStrings;
 	extern std::vector<const char*> GeneralControlStrings;
 	extern std::vector<const char*> VehicleControlStrings;
-	extern std::vector<const char*> ItemHotkeyStrings;
+	extern std::vector<const char*> QuickActionStrings;
 }

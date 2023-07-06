@@ -37,8 +37,8 @@ namespace TEN::Input
 		Binoculars,*/
 		SmallMedipack,
 		LargeMedipack,
-		NextWeapon,
 		PreviousWeapon,
+		NextWeapon,
 		Weapon1,
 		Weapon2,
 		Weapon3,

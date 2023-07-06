@@ -298,16 +298,16 @@ namespace TEN::Renderer
 				y = MenuVerticalTop;
 
 				// Title.
-				auto titleString = "< " + std::string(g_GameFlow->GetString(STRING_ITEM_HOTKEYS));
+				auto titleString = "< " + std::string(g_GameFlow->GetString(STRING_QUICK_ACTIONS));
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
 				int baseIndex = KEY_SMALL_MEDIPACK;
 
 				// Item hotkey listing.
-				for (int k = 0; k < ItemHotkeyStrings.size(); k++)
+				for (int k = 0; k < QuickActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(ItemHotkeyStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
 					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
 					{
@@ -319,7 +319,7 @@ namespace TEN::Renderer
 						AddString(MenuRightSideEntry, y, (char*)g_KeyNames[index], PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
-					if (k < ItemHotkeyStrings.size())
+					if (k < QuickActionStrings.size())
 					{
 						GetNextNarrowLinePosition(&y);
 					}
@@ -334,11 +334,11 @@ namespace TEN::Renderer
 				GetNextLinePosition(&y);
 
 				// Apply.
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (ItemHotkeyStrings.size() + 1)));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (QuickActionStrings.size() + 1)));
 				GetNextLinePosition(&y);
 
 				// Cancel.
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (ItemHotkeyStrings.size() + 2)));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (QuickActionStrings.size() + 2)));
 				break;
 			}
 		}
