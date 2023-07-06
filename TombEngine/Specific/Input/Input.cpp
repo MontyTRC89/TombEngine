@@ -8,12 +8,10 @@
 #include <OISKeyboard.h>
 
 #include "Game/items.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_tests.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
@@ -498,122 +496,14 @@ namespace TEN::Input
 		}
 	}
 
-	void HandlePlayerHotkeys(ItemInfo* item)
+	static void HandleHotkeys()
 	{
-		static const auto UNAVAILABLE_FLARE_STATES = std::vector<int>
-		{
-			LS_CRAWL_FORWARD,
-			LS_CRAWL_TURN_LEFT,
-			LS_CRAWL_TURN_RIGHT,
-			LS_CRAWL_BACK,
-			LS_CRAWL_TO_HANG,
-			LS_CRAWL_TURN_180
-		};
-
-		auto& lara = *GetLaraInfo(item);
-
-		// Handle hardcoded action-to-key mappings.
+		// TODO: Hardcoding.
+		// Handle hardcoded menu action mappings.
 		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? true : false);
 		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? true : false);
 		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? true : false);
 		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? true : false);
-
-		// Handle target switch when locked on to an entity.
-		if (lara.Control.HandStatus == HandStatus::WeaponReady &&
-			lara.TargetEntity != nullptr)
-		{
-			if (IsClicked(In::Look))
-			{
-				ActionMap[(int)In::SwitchTarget].Update(true);
-				//ActionMap[(int)In::Look].Clear();
-			}
-			else
-			{
-				ClearAction(In::SwitchTarget);
-			}
-		}
-		else
-		{
-			ClearAction(In::SwitchTarget);
-		}
-
-		// Handle flares.
-		if (IsClicked(In::Flare))
-		{
-			if (TestState(item->Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
-				SayNo();
-		}
-
-		// Handle weapon hotkeys.
-		if (IsClicked(In::Weapon1) && lara.Weapons[(int)LaraWeaponType::Pistol].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
-
-		if (IsClicked(In::Weapon2) && lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
-
-		if (IsClicked(In::Weapon3) && lara.Weapons[(int)LaraWeaponType::Uzi].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
-
-		if (IsClicked(In::Weapon4) && lara.Weapons[(int)LaraWeaponType::Revolver].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
-
-		if (IsClicked(In::Weapon5) && lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
-
-		if (IsClicked(In::Weapon6) && lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
-
-		if (IsClicked(In::Weapon7) && lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
-
-		if (IsClicked(In::Weapon8) && lara.Weapons[(int)LaraWeaponType::HK].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
-
-		if (IsClicked(In::Weapon9) && lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
-		
-		// TODO: 10th possible weapon, probably grapple.
-		/*if (IsClicked(In::Weapon1) && lara.Weapons[(int)LaraWeaponType::].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::;*/
-
-		// Handle medipack hotkeys.
-		if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
-		{
-			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
-				lara.Status.Poison)
-			{
-				bool hasUsedMedipack = false;
-
-				if (IsClicked(In::SmallMedipack) &&
-					lara.Inventory.TotalSmallMedipacks != 0)
-				{
-					hasUsedMedipack = true;
-
-					item->HitPoints += LARA_HEALTH_MAX / 2;
-					if (item->HitPoints > LARA_HEALTH_MAX)
-						item->HitPoints = LARA_HEALTH_MAX;
-
-					if (lara.Inventory.TotalSmallMedipacks != -1)
-						lara.Inventory.TotalSmallMedipacks--;
-				}
-				else if (IsClicked(In::LargeMedipack) &&
-					lara.Inventory.TotalLargeMedipacks != 0)
-				{
-					hasUsedMedipack = true;
-					item->HitPoints = LARA_HEALTH_MAX;
-
-					if (lara.Inventory.TotalLargeMedipacks != -1)
-						lara.Inventory.TotalLargeMedipacks--;
-				}
-
-				if (hasUsedMedipack)
-				{
-					lara.Status.Poison = 0;
-					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					Statistics.Game.HealthUsed++;
-				}
-			}
-		}
 
 		// Save screenshot.
 		static bool dbScreenshot = true;
@@ -641,7 +531,7 @@ namespace TEN::Input
 		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? false : true;
 	}
 
-	void UpdateRumble()
+	static void UpdateRumble()
 	{
 		if (!OisRumble || !OisEffect || !RumbleInfo.Power)
 			return;
@@ -708,7 +598,7 @@ namespace TEN::Input
 			ApplyActionQueue();
 
 		// Additional handling.
-		HandlePlayerHotkeys(item);
+		HandleHotkeys();
 		SolveActionCollisions();
 
 		// Port actions back to legacy bit fields.

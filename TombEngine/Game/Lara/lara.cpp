@@ -38,6 +38,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
@@ -440,6 +441,122 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_default_col,//189
 };
 
+static void HandlePlayerQuickActions(ItemInfo& item)
+{
+	static const auto UNAVAILABLE_FLARE_STATES = std::vector<int>
+	{
+		LS_CRAWL_FORWARD,
+		LS_CRAWL_TURN_LEFT,
+		LS_CRAWL_TURN_RIGHT,
+		LS_CRAWL_BACK,
+		LS_CRAWL_TO_HANG,
+		LS_CRAWL_TURN_180
+	};
+
+	auto& player = GetLaraInfo(item);
+
+	// Handle saying no.
+	if (IsClicked(In::SayNo))
+		SayNo();
+
+	// Handle flare no.
+	if (IsClicked(In::Flare))
+	{
+		if (TestState(item.Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
+			SayNo();
+	}
+
+	// Handle target switch when locked on to an entity.
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.TargetEntity != nullptr)
+	{
+		if (IsClicked(In::Look))
+		{
+			ActionMap[(int)In::SwitchTarget].Update(true);
+			//ActionMap[(int)In::Look].Clear();
+		}
+		else
+		{
+			ClearAction(In::SwitchTarget);
+		}
+	}
+	else
+	{
+		ClearAction(In::SwitchTarget);
+	}
+
+	// Handle weapon hotkeys.
+	if (IsClicked(In::Weapon1) && player.Weapons[(int)LaraWeaponType::Pistol].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+
+	if (IsClicked(In::Weapon2) && player.Weapons[(int)LaraWeaponType::Shotgun].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+
+	if (IsClicked(In::Weapon3) && player.Weapons[(int)LaraWeaponType::Uzi].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+
+	if (IsClicked(In::Weapon4) && player.Weapons[(int)LaraWeaponType::Revolver].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+
+	if (IsClicked(In::Weapon5) && player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+
+	if (IsClicked(In::Weapon6) && player.Weapons[(int)LaraWeaponType::Crossbow].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
+
+	if (IsClicked(In::Weapon7) && player.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+
+	if (IsClicked(In::Weapon8) && player.Weapons[(int)LaraWeaponType::HK].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+
+	if (IsClicked(In::Weapon9) && player.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+
+	// TODO: 10th possible weapon, probably grapple gun.
+	/*if (IsClicked(In::Weapon1) && player.Weapons[(int)LaraWeaponType::].Present)
+	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
+
+	// Handle medipack hotkeys.
+	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
+	{
+		if ((item.HitPoints > 0 && item.HitPoints < LARA_HEALTH_MAX) ||
+			player.Status.Poison)
+		{
+			bool hasUsedMedipack = false;
+
+			if (IsClicked(In::SmallMedipack) &&
+				player.Inventory.TotalSmallMedipacks != 0)
+			{
+				hasUsedMedipack = true;
+
+				item.HitPoints += LARA_HEALTH_MAX / 2;
+				if (item.HitPoints > LARA_HEALTH_MAX)
+					item.HitPoints = LARA_HEALTH_MAX;
+
+				if (player.Inventory.TotalSmallMedipacks != -1)
+					player.Inventory.TotalSmallMedipacks--;
+			}
+			else if (IsClicked(In::LargeMedipack) &&
+				player.Inventory.TotalLargeMedipacks != 0)
+			{
+				hasUsedMedipack = true;
+				item.HitPoints = LARA_HEALTH_MAX;
+
+				if (player.Inventory.TotalLargeMedipacks != -1)
+					player.Inventory.TotalLargeMedipacks--;
+			}
+
+			if (hasUsedMedipack)
+			{
+				player.Status.Poison = 0;
+				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+				Statistics.Game.HealthUsed++;
+			}
+		}
+	}
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -491,6 +608,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Status.Stamina < LARA_STAMINA_MAX && item->Animation.ActiveState != LS_SPRINT)
 		lara->Status.Stamina++;
 
+	HandlePlayerQuickActions(*item);
 	RumbleLaraHealthCondition(item);
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
@@ -707,9 +825,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
-	{
 		item->HitPoints--;
-	}
 
 	if (item->HitPoints <= 0)
 	{
