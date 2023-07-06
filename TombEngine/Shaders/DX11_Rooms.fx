@@ -100,6 +100,13 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
+float3 UnpackNormalMap(float4 n)
+{
+	n = n * 2.0f - 1.0f;
+	n.z = saturate(1.0f - dot(n.xy, n.xy));
+	return n.xyz;
+}
+
 PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
@@ -109,8 +116,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	DoAlphaTest(output.Color);
 
 	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
-	float3 normal = NormalTexture.Sample(NormalTextureSampler, input.UV).rgb;
-	normal = normal * 2.0f - 1.0f;
+	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
 	normal = normalize(mul(normal, TBN));
 
 	float3 lighting = input.Color.xyz;
