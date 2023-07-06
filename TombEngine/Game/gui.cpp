@@ -41,7 +41,7 @@ namespace TEN::Gui
 
 	GuiController g_Gui;
 
-	const char* OptionStrings[] =
+	std::vector<const char*> OptionStrings = std::vector<const char*>
 	{
 		STRING_USE,
 		STRING_CHOOSE_AMMO,
@@ -58,12 +58,12 @@ namespace TEN::Gui
 	//	STRING_READ_DIARY
 	};
 
-	const char* ControlStrings[] =
+	std::vector<const char*> GeneralControlStrings =
 	{
-		STRING_CONTROLS_MOVE_FORWARD,
-		STRING_CONTROLS_MOVE_BACKWARD,
-		STRING_CONTROLS_MOVE_LEFT,
-		STRING_CONTROLS_MOVE_RIGHT,
+		STRING_CONTROLS_FORWARD,
+		STRING_CONTROLS_BACKWARD,
+		STRING_CONTROLS_LEFT,
+		STRING_CONTROLS_RIGHT,
 		STRING_CONTROLS_CROUCH,
 		STRING_CONTROLS_SPRINT,
 		STRING_CONTROLS_WALK,
@@ -77,6 +77,11 @@ namespace TEN::Gui
 		STRING_CONTROLS_PAUSE,
 		STRING_CONTROLS_STEP_LEFT,
 		STRING_CONTROLS_STEP_RIGHT,
+		STRING_CONTROLS_SAY_NO
+	};
+
+	std::vector<const char*> VehicleControlStrings =
+	{
 		STRING_CONTROLS_V_ACCELERATE,
 		STRING_CONTROLS_V_REVERSE,
 		STRING_CONTROLS_V_SPEED,
@@ -85,12 +90,31 @@ namespace TEN::Gui
 		STRING_CONTROLS_V_FIRE
 	};
 
+	std::vector<const char*> ItemHotkeyStrings =
+	{
+		STRING_HOTKEYS_SMALL_MEDIPACK,
+		STRING_HOTKEYS_LARGE_MEDIPACK,
+		STRING_HOTKEYS_PREVIOUS_WEAPON,
+		STRING_HOTKEYS_NEXT_WEAPON,
+		STRING_HOTKEYS_WEAPON_1,
+		STRING_HOTKEYS_WEAPON_2,
+		STRING_HOTKEYS_WEAPON_3,
+		STRING_HOTKEYS_WEAPON_4,
+		STRING_HOTKEYS_WEAPON_5,
+		STRING_HOTKEYS_WEAPON_6,
+		STRING_HOTKEYS_WEAPON_7,
+		STRING_HOTKEYS_WEAPON_8,
+		STRING_HOTKEYS_WEAPON_9,
+		STRING_HOTKEYS_WEAPON_10
+	};
+
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
 	{
 		constexpr auto DELAY		 = 0.1f;
 		constexpr auto INITIAL_DELAY = 0.4f;
 
-		auto oppositeAction = In::None;
+		// Pulse only directional inputs.
+		auto oppositeAction = std::optional<ActionID>(std::nullopt);
 		switch (actionID)
 		{
 		case In::Forward:
@@ -108,9 +132,12 @@ namespace TEN::Gui
 		case In::Right:
 			oppositeAction = In::Left;
 			break;
+
+		default:
+			break;
 		}
 
-		bool isActionLocked = (oppositeAction == In::None) ? false : IsHeld(oppositeAction);
+		bool isActionLocked = oppositeAction.has_value() ? IsHeld(*oppositeAction) : false;
 		return (IsPulsed(actionID, DELAY, INITIAL_DELAY) && !isActionLocked);
 	}
 
@@ -265,7 +292,8 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(false);
 			return inventoryResult;
 
-		case Menu::Controls:
+		case Menu::GeneralControls:
+		case Menu::ItemHotkeys:
 			HandleControlSettingsInput(item, false);
 			return inventoryResult;
 
@@ -552,10 +580,40 @@ namespace TEN::Gui
 
 	void GuiController::HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu)
 	{
-		static const int numControlSettingsOptions = KEY_COUNT + 2;
+		unsigned int numControlSettingsOptions = 0;
+		switch (MenuToDisplay)
+		{
+		default:
+		case Menu::GeneralControls:
+			numControlSettingsOptions = GeneralControlStrings.size() + 2;
+			break;
+
+		case Menu::ItemHotkeys:
+			numControlSettingsOptions = ItemHotkeyStrings.size() + 2;
+			break;
+		}
 
 		OptionCount = numControlSettingsOptions;
 		CurrentSettings.WaitingForKey = false;
+
+		// Hacky menu screen scroll
+		if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
+		{
+			if ((int)MenuToDisplay == (int)Menu::GeneralControls)
+			{
+				MenuToDisplay = Menu::ItemHotkeys;
+				SelectedOption = 0;
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				return;
+			}
+			else if ((int)MenuToDisplay < (int)Menu::ItemHotkeys)
+			{
+				MenuToDisplay = Menu::GeneralControls;
+				SelectedOption = 0;
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				return;
+			}
+		}
 
 		if (CurrentSettings.IgnoreInput)
 		{
@@ -718,7 +776,7 @@ namespace TEN::Gui
 
 		case OptionsOption::Controls:
 			BackupOptions();
-			MenuToDisplay = Menu::Controls;
+			MenuToDisplay = Menu::GeneralControls;
 			SelectedOption = 0;
 			break;
 		}
@@ -935,7 +993,8 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(true);
 			return InventoryResult::None;
 
-		case Menu::Controls:
+		case Menu::GeneralControls:
+		case Menu::ItemHotkeys:
 			HandleControlSettingsInput(item, true);
 			return InventoryResult::None;
 

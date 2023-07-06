@@ -45,6 +45,7 @@ namespace TEN::Input
 		XB_DPAD_RIGHT
 	};
 
+	// Deprecated
 	enum InputKey
 	{
 		KEY_FORWARD,
@@ -64,6 +65,8 @@ namespace TEN::Input
 		KEY_PAUSE,
 		KEY_LSTEP,
 		KEY_RSTEP,
+		KEY_SAY_NO,
+
 		/*KEY_ACCELERATE,
 		KEY_REVERSE,
 		KEY_SPEED,
@@ -71,12 +74,29 @@ namespace TEN::Input
 		KEY_BRAKE,
 		KEY_FIRE,*/
 
+		KEY_SMALL_MEDIPACK,
+		KEY_LARGE_MEDIPACK,
+		KEY_PREVIOUS_WEAPON,
+		KEY_NEXT_WEAPON,
+		KEY_WEAPON_1,
+		KEY_WEAPON_2,
+		KEY_WEAPON_3,
+		KEY_WEAPON_4,
+		KEY_WEAPON_5,
+		KEY_WEAPON_6,
+		KEY_WEAPON_7,
+		KEY_WEAPON_8,
+		KEY_WEAPON_9,
+		KEY_WEAPON_10,
+
 		KEY_COUNT
 	};
 
+	// Deprecated
 	enum InputActions
 	{
 		IN_NONE		  = 0,
+
 		IN_FORWARD	  = (1 << KEY_FORWARD),
 		IN_BACK		  = (1 << KEY_BACK),
 		IN_LEFT		  = (1 << KEY_LEFT),
@@ -94,6 +114,8 @@ namespace TEN::Input
 		IN_PAUSE	  = (1 << KEY_PAUSE),
 		IN_LSTEP	  = (1 << KEY_LSTEP),
 		IN_RSTEP	  = (1 << KEY_RSTEP),
+		IN_SAY_NO	  = (1 << KEY_SAY_NO),
+
 		/*IN_ACCELERATE = (1 << KEY_ACCELERATE),
 		IN_REVERSE	  = (1 << KEY_REVERSE),
 		IN_SPEED	  = (1 << KEY_SPEED),
@@ -101,13 +123,28 @@ namespace TEN::Input
 		IN_BRAKE	  = (1 << KEY_BRAKE),
 		IN_FIRE		  = (1 << KEY_FIRE),*/
 
-		// Additional input actions without direct key relation
+		// NOTE: TrInput/DbInput are deprecated, therefore these are not needed.
+		IN_SMALL_MEDIPACK  = (1 << KEY_SMALL_MEDIPACK),
+		IN_LARGE_MEDIPACK  = (1 << KEY_LARGE_MEDIPACK),
+		IN_NEXT_WEAPON	   = (1 << KEY_NEXT_WEAPON),
+		IN_PREVIOUS_WEAPON = (1 << KEY_PREVIOUS_WEAPON),
+		IN_WEAPON_1		   = (1 << KEY_WEAPON_1),
+		IN_WEAPON_2		   = (1 << KEY_WEAPON_2),
+		IN_WEAPON_3		   = (1 << KEY_WEAPON_3),
+		IN_WEAPON_4		   = (1 << KEY_WEAPON_4),
+		IN_WEAPON_5		   = (1 << KEY_WEAPON_5),
+		IN_WEAPON_6		   = (1 << KEY_WEAPON_6),
+		IN_WEAPON_7		   = (1 << KEY_WEAPON_7),
+		IN_WEAPON_8		   = (1 << KEY_WEAPON_8),
+		IN_WEAPON_9		   = (1 << KEY_WEAPON_9),
+		IN_WEAPON_10	   = (1 << KEY_WEAPON_10),
 
-		IN_SAVE		  = (1 << (KEY_COUNT + 0)),
+		// Additional input actions without direct key relation
+		/*IN_SAVE		  = (1 << (KEY_COUNT + 0)),
 		IN_LOAD		  = (1 << (KEY_COUNT + 1)),
 		IN_SELECT	  = (1 << (KEY_COUNT + 2)),
 		IN_DESELECT   = (1 << (KEY_COUNT + 3)),
-		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))
+		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))*/
 	};
 	
 	// Temporary input constants for use with vehicles:
