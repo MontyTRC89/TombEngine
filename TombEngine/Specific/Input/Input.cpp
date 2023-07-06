@@ -545,43 +545,46 @@ namespace TEN::Input
 		}
 
 		// Handle weapon hotkeys.
-		if (KeyMap[KC_1] && lara.Weapons[(int)LaraWeaponType::Pistol].Present)
+		if (IsClicked(In::Weapon1) && lara.Weapons[(int)LaraWeaponType::Pistol].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
 
-		if (KeyMap[KC_2] && lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
+		if (IsClicked(In::Weapon2) && lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
-		if (KeyMap[KC_3] && lara.Weapons[(int)LaraWeaponType::Uzi].Present)
+		if (IsClicked(In::Weapon3) && lara.Weapons[(int)LaraWeaponType::Uzi].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
-		if (KeyMap[KC_4] && lara.Weapons[(int)LaraWeaponType::Revolver].Present)
+		if (IsClicked(In::Weapon4) && lara.Weapons[(int)LaraWeaponType::Revolver].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
 
-		if (KeyMap[KC_5] && lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+		if (IsClicked(In::Weapon5) && lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
-		if (KeyMap[KC_6] && lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
+		if (IsClicked(In::Weapon6) && lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
 
-		if (KeyMap[KC_7] && lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+		if (IsClicked(In::Weapon7) && lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
-		if (KeyMap[KC_8] && lara.Weapons[(int)LaraWeaponType::HK].Present)
+		if (IsClicked(In::Weapon8) && lara.Weapons[(int)LaraWeaponType::HK].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
-		if (KeyMap[KC_9] && lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+		if (IsClicked(In::Weapon9) && lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
 			lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+		
+		// TODO: 10th possible weapon, probably grapple.
+		/*if (IsClicked(In::Weapon1) && lara.Weapons[(int)LaraWeaponType::].Present)
+			lara.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 
 		// Handle medipack hotkeys.
-		static bool dbMedipack = true;
-		if ((KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) && dbMedipack)
+		if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
 		{
 			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
 				lara.Status.Poison)
 			{
 				bool hasUsedMedipack = false;
 
-				if (KeyMap[KC_MINUS] &&
+				if (IsClicked(In::SmallMedipack) &&
 					lara.Inventory.TotalSmallMedipacks != 0)
 				{
 					hasUsedMedipack = true;
@@ -593,7 +596,7 @@ namespace TEN::Input
 					if (lara.Inventory.TotalSmallMedipacks != -1)
 						lara.Inventory.TotalSmallMedipacks--;
 				}
-				else if (KeyMap[KC_EQUALS] &&
+				else if (IsClicked(In::LargeMedipack) &&
 					lara.Inventory.TotalLargeMedipacks != 0)
 				{
 					hasUsedMedipack = true;
@@ -611,7 +614,6 @@ namespace TEN::Input
 				}
 			}
 		}
-		dbMedipack = (KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) ? false : true;
 
 		// Save screenshot.
 		static bool dbScreenshot = true;
