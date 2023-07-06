@@ -585,11 +585,11 @@ namespace TEN::Gui
 		{
 		default:
 		case Menu::GeneralControls:
-			numControlSettingsOptions = GeneralControlStrings.size() + 2;
+			numControlSettingsOptions = (int)GeneralControlStrings.size() + 2;
 			break;
 
 		case Menu::ItemHotkeys:
-			numControlSettingsOptions = ItemHotkeyStrings.size() + 2;
+			numControlSettingsOptions = (int)ItemHotkeyStrings.size() + 2;
 			break;
 		}
 
@@ -606,7 +606,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				return;
 			}
-			else if ((int)MenuToDisplay < (int)Menu::ItemHotkeys)
+			else if ((int)MenuToDisplay == (int)Menu::ItemHotkeys)
 			{
 				MenuToDisplay = Menu::GeneralControls;
 				SelectedOption = 0;
