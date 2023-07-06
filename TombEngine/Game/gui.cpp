@@ -211,9 +211,9 @@ namespace TEN::Gui
 		return LastInvItem;
 	}
 
-	void GuiController::SetLastInventoryItem(int item)
+	void GuiController::SetLastInventoryItem(int itemNumber)
 	{
-		LastInvItem = item;
+		LastInvItem = itemNumber;
 	}
 
 	void GuiController::DrawInventory()

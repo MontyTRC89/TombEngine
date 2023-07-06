@@ -191,7 +191,7 @@ namespace TEN::Gui
 		void SetInventoryMode(InventoryMode mode);
 		void SetEnterInventory(int number);
 		void SetInventoryItemChosen(int number);
-		void SetLastInventoryItem(int item);
+		void SetLastInventoryItem(int itemNumber);
 
 	private:
 		void HandleDisplaySettingsInput(bool fromPauseMenu);
