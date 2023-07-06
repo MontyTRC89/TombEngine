@@ -266,13 +266,13 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_FORWARD)
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
-		}
-		else if (TrInput & IN_BACK || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+		 if (TrInput & IN_BACK || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_TURN;
+		}
+		else if (TrInput & IN_FORWARD)
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
 		}
 		else
 		{
@@ -297,7 +297,11 @@ void lara_as_horizontal_bar_swing_stop(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_FORWARD)
+		if (TrInput & IN_BACK || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN;
+		}
+		else if (TrInput & IN_FORWARD)
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
 		}
@@ -305,11 +309,11 @@ void lara_as_horizontal_bar_swing_stop(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.HandStatus = HandStatus::Busy;
 		return;
 	}
-	/*else
+	else
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 		item->Animation.TargetState = LS_JUMP_BACK;
-	}*/
+	}
 }
 
 // State:		LS_HORIZONTAL_BAR_IDLE (191)
@@ -320,14 +324,17 @@ void lara_as_horizontal_bar_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_FORWARD)
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
-		}
+
 		if (TrInput & IN_BACK)
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN;
 		}
+		else if (TrInput & IN_FORWARD)
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
+		}
+
+	
 
 		lara->Control.HandStatus = HandStatus::Busy;
 		return;
@@ -375,6 +382,7 @@ void lara_as_horizontal_bar_idle_turn(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		lara->Control.HandStatus = HandStatus::Busy;
+		item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE;
 		return;
 	}
 	else
