@@ -11,6 +11,7 @@ Version 1.1.0
 * Fix electricity effect crashing in 64-bit version.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
+* Fix shatter debris ambient colour.
 * Fix clockwork beetle activation crashing the game.
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
