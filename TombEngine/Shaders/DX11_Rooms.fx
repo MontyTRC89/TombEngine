@@ -168,7 +168,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;
 		float fracZ = position.z - floor(position.z / 2048.0f) * 2048.0f;
 
-		float attenuation = saturate(dot(float3(0.0f, 1.0f, 0.0f), normal));
+		float attenuation = saturate(dot(float3(0.0f, -1.0f, 0.0f), normal));
 
 		float3 blending = abs(normal);
 		blending = normalize(max(blending, 0.00001f));
