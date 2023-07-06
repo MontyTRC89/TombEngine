@@ -9,9 +9,6 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 #include "Objects/objectslist.h"
-#include "Specific/level.h"
-#include "Math/Math.h"
-
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -21,6 +18,8 @@
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Specific/level.h"
+#include "Math/Math.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
@@ -43,9 +42,7 @@ static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialized{ alreadyInitialized }
 {
 	if (alreadyInitialized)
-	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
-	}
 };
 
 Moveable::Moveable(Moveable&& other) noexcept : 
@@ -60,14 +57,13 @@ Moveable::Moveable(Moveable&& other) noexcept :
 	}
 }
 
-
 Moveable::~Moveable()
 {
 	if (m_item && g_GameScriptEntities) 
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 }
 
-bool operator==(Moveable const& first, Moveable const& second)
+bool operator ==(const Moveable& first, const Moveable& second)
 {
 	return first.m_item == second.m_item;
 }
@@ -96,15 +92,15 @@ most can just be ignored (see usage).
 	*/
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
-	std::string const & name,
-	Vec3 const & pos,
-	TypeOrNil<Rotation> const & rot,
+	const std::string& name,
+	const Vec3& pos,
+	const TypeOrNil<Rotation>& rot,
 	TypeOrNil<short> room,
 	TypeOrNil<int> animNumber,
 	TypeOrNil<int> frameNumber,
 	TypeOrNil<short> hp,
 	TypeOrNil<short> ocb,
-	TypeOrNil<aiBitsType> const & aiBits
+	const TypeOrNil<aiBitsType>& aiBits
 )
 {
 	short num = CreateItem();
@@ -112,14 +108,17 @@ static std::unique_ptr<Moveable> Create(
 
 	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
 	{
-		ItemInfo* item = &g_Level.Items[num];
+		auto* item = &g_Level.Items[num];
+
 		if (std::holds_alternative<short>(room))
 		{
 			ptr->SetPos(pos, false);
 			ptr->SetRoomNumber(std::get<short>(room));
 		}
 		else
+		{
 			ptr->SetPos(pos, true);
+		}
 
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
 		ptr->SetObjectID(objID);
@@ -137,10 +136,11 @@ static std::unique_ptr<Moveable> Create(
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
 		// add to name map too?
 	}
+
 	return ptr;
 }
 
-void Moveable::Register(sol::table & parent)
+void Moveable::Register(sol::table& parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		sol::call_constructor, Create,
@@ -420,13 +420,16 @@ void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
+
 	if (!ScriptAssertF(cond, err, m_item->Name))
 	{
-		ScriptWarn("Resetting to the center of the room.");
+		ScriptWarn("Resetting to room center.");
 		auto center = GetRoomCenter(m_item->RoomNumber);
-		// reset position but not rotation
+
+		// Reset position, but not orientation.
 		m_item->Pose.Position = center;
 	}
+
 	InitializeItem(m_num);
 	m_initialized = true;
 }
@@ -442,7 +445,7 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 	m_item->ResetModelToDefault();
 }
 
-void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)
+void SetLevelFuncCallback(const TypeOrNil<LevelFunc>& cb, const std::string& callerName, Moveable& mov, std::string& toModify)
 {
 	if (std::holds_alternative<LevelFunc>(cb))
 	{
@@ -456,7 +459,8 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 	}
 	else
 	{
-		ScriptAssert(false, "Tried giving " + mov.m_item->Name
+		ScriptAssert(
+			false, "Tried giving " + mov.m_item->Name
 			+ " a non-LevelFunc object as an arg to "
 			+ callerName);
 	}
@@ -468,12 +472,12 @@ short Moveable::GetIndex() const
 	return m_num;
 }
 
-void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnHit(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
 }
 
-void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnKilled(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
@@ -486,7 +490,7 @@ void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
 //     print(obj1:GetName() .. " collided with " .. obj2:GetName())
 // end
 // baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
-void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnCollidedWithObject(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
@@ -499,7 +503,7 @@ void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
 //     print(obj:GetName() .. " collided with room geometry")
 // end
 // baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
-void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnCollidedWithRoom(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
 }
@@ -509,20 +513,19 @@ std::string Moveable::GetName() const
 	return m_item->Name;
 }
 
-bool Moveable::SetName(std::string const & id) 
+bool Moveable::SetName(const std::string& id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
-	{
 		return false;
-	}
 
 	if (s_callbackSetName(id, m_num))
 	{
-		// remove the old name if we have one
+		// Remove old name if it exists.
 		if (id != m_item->Name)
 		{
-			if(!m_item->Name.empty())
+			if (!m_item->Name.empty())
 				s_callbackRemoveName(m_item->Name);
+
 			m_item->Name = id;
 		}
 	}
@@ -533,6 +536,7 @@ bool Moveable::SetName(std::string const & id)
 
 		return false;
 	}
+
 	return true;
 }
 
@@ -551,7 +555,7 @@ Vec3 Moveable::GetPos() const
 // @function Moveable:SetPosition
 // @tparam Vec3 position the new position of the moveable 
 // @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
-void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
+void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	auto prevPos = m_item->Pose.Position.ToVector3();
 	pos.StoreInPose(m_item->Pose);
@@ -560,17 +564,10 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 
 	if (m_initialized && willUpdate)
 	{
-		bool roomUpdated = false;
+		bool isRoomUpdated = m_item->IsLara() ? UpdateLaraRoom(m_item, pos.y) : UpdateItemRoom(m_item->Index);
 
-		if (m_item->IsLara())
-			roomUpdated = UpdateLaraRoom(m_item, pos.y);
-		else
-			roomUpdated = UpdateItemRoom(m_item->Index);
-
-		// In case direct portal room update didn't happen, and distance between old and new
-		// points is significant, do a predictive room update.
-
-		if (!roomUpdated && 
+		// In case direct portal room update didn't happen and distance between old and new points is significant, do predictive room update.
+		if (!isRoomUpdated && 
 			(willUpdate || Vector3::Distance(prevPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
@@ -629,7 +626,7 @@ short Moveable::GetHP() const
 // @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
-	if(Objects[m_item->ObjectNumber].intelligent && hp < 0)
+	if (Objects[m_item->ObjectNumber].intelligent && hp < 0)
 	{
 		if (hp != NOT_TARGETABLE)
 		{
@@ -726,7 +723,7 @@ short Moveable::GetLocationAI() const
 		return creature->LocationAI;
 	}
 
-	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
+	TENLog("Trying to get LocationAI value from non-creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
 	return 0;
 }
 
@@ -1144,8 +1141,7 @@ void Moveable::SetVisible(bool isVisible)
 
 void Moveable::Invalidate()
 {
-	// keep m_item as it is so that we can properly remove it from the moveables set when
-	// its destructor is called
+	// Keep m_item as-is so it can be properly removed from moveables set when destructor is called.
 	m_num = NO_ITEM;
 	m_initialized = false;
 }

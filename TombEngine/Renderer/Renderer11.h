@@ -701,6 +701,7 @@ namespace TEN::Renderer
 		void RenderInventory();
 		void RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		void ClearScene();
+		void SaveScreenshot();
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);

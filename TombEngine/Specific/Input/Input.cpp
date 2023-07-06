@@ -604,11 +604,11 @@ namespace TEN::Input
 		}
 		dbMedipack = (KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) ? false : true;
 
-		// Handle saying "no".
-		static bool dbNo = true;
-		if (KeyMap[KC_N] && dbNo)
-			SayNo();
-		dbNo = KeyMap[KC_N] ? false : true;
+		// Save screenshot.
+		static bool dbScreenshot = true;
+		if (KeyMap[KC_SYSRQ] && dbScreenshot)
+			g_Renderer.SaveScreenshot();
+		dbScreenshot = KeyMap[KC_SYSRQ] ? false : true;
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;

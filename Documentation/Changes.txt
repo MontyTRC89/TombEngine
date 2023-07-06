@@ -6,7 +6,9 @@ Version 1.1.0
 * Fix crash on loading if static meshes with IDs above maximum are present.
 * Fix random crashes when playing audio tracks with names longer than 15 symbols.
 * Fix possible crashes when killing some enemies in 64-bit version.
+* Fix possible crashes when loading savegame in 64-bit version.
 * Fix electricity effect crashing in 64-bit version.
+* Fix crashes when trying to play .wav soundtracks on some Windows 11 systems.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix clockwork beetle activation crashing the game.
@@ -15,13 +17,17 @@ Version 1.1.0
 * Fix doppelganger being limited to be in a single room.
 * Fix bat AI, damage value, and incorrect collision after death.
 * Fix regeneration for pickups with OCB 128.
-* Fix Spiky ceiling. Also improve, and add new OCB to Spiky ceiling.
-* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
+* Fix raising blocks still shaking without OCB.
+* Fix spiky ceiling and add new OCBs for it.
+* Fix TR1 winged mutant pathfinding and damage issues and add new OCB for it.
+* Fix last inventory item not properly changed when loading, saving and restarting game.
+* Make screenshot file in "Screenshots" subfolder by pressing print screen key.
 * Implement separate audio track channel for playing voiceovers with subtitles.
 * Don't stop ambience when Lara dies.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
+* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
 

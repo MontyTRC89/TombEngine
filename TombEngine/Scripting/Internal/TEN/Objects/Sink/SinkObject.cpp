@@ -17,7 +17,7 @@ Sink
 static auto index_error = index_error_maker(Sink, ScriptReserved_Sink);
 static auto newindex_error = newindex_error_maker(Sink, ScriptReserved_Sink);
 
-Sink::Sink(SinkInfo & ref) : m_sink{ref}
+Sink::Sink(SinkInfo& ref) : m_sink{ref}
 {};
 
 void Sink::Register(sol::table& parent)
