@@ -70,11 +70,8 @@ namespace TEN::Gui
 		STRING_CONTROLS_JUMP,
 		STRING_CONTROLS_ACTION,
 		STRING_CONTROLS_DRAW_WEAPON,
-		STRING_CONTROLS_USE_FLARE,
 		STRING_CONTROLS_LOOK,
 		STRING_CONTROLS_ROLL,
-		STRING_CONTROLS_INVENTORY,
-		STRING_CONTROLS_PAUSE,
 		STRING_CONTROLS_STEP_LEFT,
 		STRING_CONTROLS_STEP_RIGHT,
 	};
@@ -91,6 +88,7 @@ namespace TEN::Gui
 
 	std::vector<const char*> QuickActionStrings =
 	{
+		STRING_QUICK_ACTIONS_LIGHT,
 		STRING_QUICK_ACTIONS_SMALL_MEDIPACK,
 		STRING_QUICK_ACTIONS_LARGE_MEDIPACK,
 		STRING_QUICK_ACTIONS_PREVIOUS_WEAPON,
@@ -106,6 +104,12 @@ namespace TEN::Gui
 		STRING_QUICK_ACTIONS_WEAPON_9,
 		STRING_QUICK_ACTIONS_WEAPON_10,
 		STRING_QUICK_ACTIONS_SAY_NO
+	};
+
+	std::vector<const char*> MenuControlStrings =
+	{
+		STRING_CONTROLS_INVENTORY,
+		STRING_CONTROLS_PAUSE,
 	};
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
@@ -294,6 +298,7 @@ namespace TEN::Gui
 
 		case Menu::GeneralControls:
 		case Menu::QuickActions:
+		case Menu::MenuControls:
 			HandleControlSettingsInput(item, false);
 			return inventoryResult;
 
@@ -340,8 +345,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GuiIsDeselected() &&
-				MenuToDisplay != Menu::Title)
+			if (GuiIsDeselected() && MenuToDisplay != Menu::Title)
 			{
 				MenuToDisplay = Menu::Title;
 				SelectedOption = selectedOptionBackup;
@@ -591,29 +595,14 @@ namespace TEN::Gui
 		case Menu::QuickActions:
 			numControlSettingsOptions = (int)QuickActionStrings.size() + 2;
 			break;
+
+		case Menu::MenuControls:
+			numControlSettingsOptions = (int)MenuControlStrings.size() + 2;
+			break;
 		}
 
 		OptionCount = numControlSettingsOptions;
 		CurrentSettings.WaitingForKey = false;
-
-		// Hacky menu screen scroll
-		if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
-		{
-			if ((int)MenuToDisplay == (int)Menu::GeneralControls)
-			{
-				MenuToDisplay = Menu::QuickActions;
-				SelectedOption = 0;
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				return;
-			}
-			else if ((int)MenuToDisplay == (int)Menu::QuickActions)
-			{
-				MenuToDisplay = Menu::GeneralControls;
-				SelectedOption = 0;
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				return;
-			}
-		}
 
 		if (CurrentSettings.IgnoreInput)
 		{
@@ -701,6 +690,43 @@ namespace TEN::Gui
 					SelectedOption -= OptionCount;
 
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			}
+
+			// HACK: Menu screen scroll.
+			if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
+			{
+				auto menu = std::optional<Menu>(std::nullopt);
+
+				if (GuiIsPulsed(In::Left))
+				{
+					if ((int)MenuToDisplay == (int)Menu::GeneralControls)
+					{
+						menu = Menu::MenuControls;
+					}
+					else
+					{
+						menu = Menu((int)MenuToDisplay - 1);
+					}
+				}
+				else if (GuiIsPulsed(In::Right))
+				{
+					if ((int)MenuToDisplay == (int)Menu::MenuControls)
+					{
+						menu = Menu::GeneralControls;
+					}
+					else
+					{
+						menu = Menu((int)MenuToDisplay + 1);
+					}
+				}
+
+				if (menu.has_value())
+				{
+					MenuToDisplay = *menu;
+					SelectedOption = 0;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					return;
+				}
 			}
 
 			if (GuiIsSelected())
@@ -995,6 +1021,7 @@ namespace TEN::Gui
 
 		case Menu::GeneralControls:
 		case Menu::QuickActions:
+		case Menu::MenuControls:
 			HandleControlSettingsInput(item, true);
 			return InventoryResult::None;
 

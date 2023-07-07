@@ -4,7 +4,7 @@ namespace TEN::Input
 {
 	typedef enum class ActionID
 	{
-		// Basic control
+		// Basic controls
 		Forward,
 		Back,
 		Left,
@@ -15,15 +15,12 @@ namespace TEN::Input
 		Jump,
 		Action,
 		DrawWeapon,
-		Flare, // Convert to generic Light button under Hotkeys section.
 		Look,
 		Roll,
-		Option, // Move to Menu  control section.
-		Pause, // Move to Menu control section.
 		LeftStep,
 		RightStep,
 
-		// Vehicle control
+		// Vehicle controls
 		/*Accelerate,
 		Reverse,
 		Speed,
@@ -31,9 +28,9 @@ namespace TEN::Input
 		Brake,
 		Fire,*/
 
-		// Hotkeys
-		/*Light, // Generic light button may be used for flare, flashlight, or PDA.
-		Binoculars,*/
+		// Quick actions
+		Flare, // Light
+		/*Binoculars,*/
 		SmallMedipack,
 		LargeMedipack,
 		PreviousWeapon,
@@ -50,9 +47,9 @@ namespace TEN::Input
 		Weapon10,
 		SayNo,
 
-		// Menu control
-		/*Option,
-		Pause,*/
+		// Menu controls
+		Option,
+		Pause,
 		Save,
 		Load,
 		Select,

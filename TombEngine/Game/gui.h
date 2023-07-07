@@ -78,6 +78,7 @@ namespace TEN::Gui
 		Display,
 		GeneralControls,
 		QuickActions,
+		MenuControls,
 		OtherSettings
 	};
 
@@ -231,4 +232,5 @@ namespace TEN::Gui
 	extern std::vector<const char*> GeneralControlStrings;
 	extern std::vector<const char*> VehicleControlStrings;
 	extern std::vector<const char*> QuickActionStrings;
+	extern std::vector<const char*> MenuControlStrings;
 }

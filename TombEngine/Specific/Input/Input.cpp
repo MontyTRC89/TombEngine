@@ -87,23 +87,23 @@ namespace TEN::Input
 	int TrInput = 0;
 
 	// Rows:
-	// 1. General controls + inventory/select
+	// 1. General controls
 	// 2. Vehicle controls (TODO)
-	// 3. Item hotkeys
-	// 4. Menu controls + target switch
+	// 4. Quick actions
+	// 3. Menu controls + target switch
 	auto DefaultBindings = std::vector<int>
 	{
-		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
+		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_NUMPAD0, KC_END, KC_PGUP, KC_PGDOWN,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
-		KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
-		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+		KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+		KC_ESCAPE, KC_P, KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
 	};
 	auto XInputBindings = std::vector<int>
 	{
-		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_AXIS_LTRIGGER_NEG, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_A, XB_Y, XB_DPAD_DOWN, XB_LSHIFT, XB_B, XB_SELECT, XB_START, XB_LSTICK, XB_RSTICK,
+		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_AXIS_LTRIGGER_NEG, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_A, XB_Y, XB_LSHIFT, XB_B, XB_LSTICK, XB_RSTICK,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
-		KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
-		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+		XB_DPAD_DOWN, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+		XB_SELECT, XB_START, KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
 	};
 
 	// Input bindings. These are primitive mappings to actions.
@@ -111,14 +111,16 @@ namespace TEN::Input
 	short KeyboardLayout[2][KEY_COUNT] =
 	{
 		{
-			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/ // TODO: Dedicated vehicle actions.
-			KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_NUMPAD0, KC_END, KC_PGUP, KC_PGDOWN,
+			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+			KC_ESCAPE, KC_P,
 		},
 		{
-			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/ // TODO: Dedicated vehicle actions.
-			KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_NUMPAD0, KC_END, KC_PGUP, KC_PGDOWN,
+			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+			KC_ESCAPE, KC_P,
 		}
 	};
 
@@ -161,9 +163,13 @@ namespace TEN::Input
 			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
+			{
 				TENLog("Keyboard not found!", LogLevel::Warning);
+			}
 			else
+			{
 				OisKeyboard = (Keyboard*)OisInputManager->createInputObject(OISKeyboard, true);
+			}
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -276,7 +282,7 @@ namespace TEN::Input
 
 	int WrapSimilarKeys(int source)
 	{
-		// Merge right/left Ctrl, Shift, and Alt.
+		// Merge right/left Ctrl, Shift, Alt.
 
 		switch (source)
 		{
@@ -317,13 +323,21 @@ namespace TEN::Input
 		for (int layout = 0; layout <= 1; layout++)
 		{
 			if (KeyboardLayout[layout][KEY_FORWARD] == index)
+			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
+			}
 			else if (KeyboardLayout[layout][KEY_BACK] == index)
+			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
+			}
 			else if (KeyboardLayout[layout][KEY_LEFT] == index)
+			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
+			}
 			else if (KeyboardLayout[layout][KEY_RIGHT] == index)
+			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
+			}
 		}
 	}
 
@@ -377,13 +391,21 @@ namespace TEN::Input
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
 				if (KeyboardLayout[1][KEY_FORWARD] == usedIndex)
+				{
 					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
+				}
 				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
+				{
 					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
+				}
 				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
+				{
 					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
+				}
 				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
+				{
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
+				}
 				else if (!LayoutContainsIndex(usedIndex))
 				{
 					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2,

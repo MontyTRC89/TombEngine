@@ -419,7 +419,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
-			(TrInput & (IN_DRAW | IN_FLARE) &&
+			((IsHeld(In::DrawWeapon) || IsHeld(In::Flare)) &&
 			!IsStandingWeapon(item, lara->Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
