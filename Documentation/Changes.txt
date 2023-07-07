@@ -12,6 +12,10 @@ Version 1.1.0
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix shatter debris ambient colour.
+* Fix room collector freezing the game occassionally.
+* Fix spot and sun bulb direction.
+* Fix normal mapping.
+* Fix Lara's shadow casting only her joints on some occassions.
 * Fix clockwork beetle activation crashing the game.
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
@@ -27,6 +31,8 @@ Version 1.1.0
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
+* Implement HDR.
+* Allow multiple suns affecting objects in a single room.
 * Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
