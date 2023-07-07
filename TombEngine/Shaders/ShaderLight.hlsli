@@ -128,27 +128,25 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 	float3 lightPos = light.Position.xyz;
 	float3 color = light.Color.xyz;
 	float intensity = saturate(light.Intensity);
-	float3 direction = -light.Direction.xyz;
+	float3 direction = light.Direction.xyz;
 	float innerRange = light.In;
 	float outerRange = light.Out;
 	float coneIn = light.InRange;
 	float coneOut = light.OutRange;
 
-	float3 lightVec = (lightPos - pos);
+	float3 lightVec = normalize(pos - lightPos);
 	float distance = length(lightVec);
 
 	if (distance > outerRange)
 		return float3(0, 0, 0);
 	else
 	{
-		lightVec = normalize(lightVec);
-		
-		float d = saturate(dot(n, lightVec));
+		float d = saturate(dot(n, -lightVec));
 		if (d < 0)
 			return float3(0, 0, 0);
 		else
 		{
-			float cosine = dot(-lightVec, direction);
+			float cosine = dot(lightVec, direction);
 
 			float minCosineIn = cos(coneIn * (PI / 180.0f));
 			float attenuationIn = max((cosine - minCosineIn), 0.0f) / (1.0f - minCosineIn);
@@ -173,18 +171,15 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 color = light.Color.xyz;
 	float3 intensity = light.Intensity;
-	float3 direction = light.Direction.xyz;
+	float3 direction = -light.Direction.xyz;
 
-	direction = normalize(direction+pos);
-
-	//the scalar representing the line from the direction
-	//to the normal n
 	float d = max(dot(direction, n), .0f);
 
 	if (d > 0.f)
 	{
-		return (color*intensity*d);
+		return (color * intensity * d);
 	}
+
 	return float3(0, 0, 0);
 }
 
