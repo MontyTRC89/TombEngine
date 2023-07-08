@@ -659,10 +659,6 @@ namespace TEN::Gui
 						unsigned int baseIndex = 0;
 						switch (MenuToDisplay)
 						{
-						case Menu::GeneralControls:
-							baseIndex = (int)GeneralControlStrings.size();
-							break;
-
 						/*case Menu::VehicleControls:
 						numControlSettingsOptions = (unsigned int)GeneralControlStrings.size();
 						break;*/
