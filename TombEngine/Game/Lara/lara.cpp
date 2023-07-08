@@ -455,13 +455,12 @@ static std::optional<LaraWeaponType> GetScrolledWeaponType(const ItemInfo& item,
 		LaraWeaponType::HK,
 		LaraWeaponType::RocketLauncher,
 	};
-	static const auto SCROLL_WEAPON_TYPE_COUNT = (unsigned int)SCROLL_WEAPON_TYPES.size();
 
 	auto& player = GetLaraInfo(item);
 
-	// Get current vector index for current weapon type.
+	// Get vector index for current weapon type.
 	auto currentIndex = std::optional<unsigned int>(std::nullopt);
-	for (int i = 0; i < SCROLL_WEAPON_TYPE_COUNT; i++)
+	for (int i = 0; i < SCROLL_WEAPON_TYPES.size(); i++)
 	{
 		if (SCROLL_WEAPON_TYPES[i] == currentWeaponType)
 		{
@@ -477,15 +476,14 @@ static std::optional<LaraWeaponType> GetScrolledWeaponType(const ItemInfo& item,
 	// Next index getter.
 	auto calculateNextIndex = [getPrev](unsigned int index)
 	{
-		return (index + (getPrev ? (SCROLL_WEAPON_TYPE_COUNT - 1) : 1)) % SCROLL_WEAPON_TYPE_COUNT;
+		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
 	};
 
 	// Get next valid weapon type in sequence.
 	unsigned int nextIndex = calculateNextIndex(*currentIndex);
 	while (nextIndex != *currentIndex)
 	{
-		const auto& nextWeaponType = SCROLL_WEAPON_TYPES[nextIndex];
-
+		auto nextWeaponType = SCROLL_WEAPON_TYPES[nextIndex];
 		if (player.Weapons[(int)nextWeaponType].Present)
 			return nextWeaponType;
 
@@ -591,7 +589,8 @@ static void HandlePlayerQuickActions(ItemInfo& item)
 	/*if (IsClicked(In::Weapon1) && player.Weapons[(int)LaraWeaponType::].Present)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 
-	// Handle target switch when locked on to an entity.
+	// TODO: Could theoretically remove SwitchTarget and instead do unique behaviour handling using only Look. -- Sezz 2023.07.08
+	// HACK: Handle target switch when locked on to an entity.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
