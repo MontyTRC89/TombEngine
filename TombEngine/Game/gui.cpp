@@ -668,11 +668,11 @@ namespace TEN::Gui
 						break;*/
 
 						case Menu::QuickActions:
-							baseIndex = unsigned int(GeneralControlStrings.size() + QuickActionStrings.size());
+							baseIndex = unsigned int(GeneralControlStrings.size());
 							break;
 
 						case Menu::MenuControls:
-							baseIndex = unsigned int(GeneralControlStrings.size() + QuickActionStrings.size() + MenuControlStrings.size());
+							baseIndex = unsigned int(GeneralControlStrings.size() + QuickActionStrings.size());
 							break;
 
 						default:
