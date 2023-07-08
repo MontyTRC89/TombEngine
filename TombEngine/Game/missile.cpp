@@ -168,10 +168,11 @@ void ControlNatlaGun(short fxNumber)
 
 short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	short fxNumber = CreateNewEffect(roomNumber);
+	int fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != NO_ITEM)
 	{
 		auto& fx = EffectList[fxNumber];
+
 		fx.pos.Position = Vector3i(x, y, z);
 		fx.pos.Orientation = EulerAngles(0, yRot, 0);
 		fx.roomNumber = roomNumber;
@@ -187,10 +188,11 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 
 short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	short fxNumber = CreateNewEffect(roomNumber);
+	int fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != NO_ITEM)
 	{
 		auto& fx = EffectList[fxNumber];
+
 		fx.pos.Position = Vector3i(x, y, z);
 		fx.pos.Orientation = EulerAngles(0, yRot, 0);
 		fx.roomNumber = roomNumber;
