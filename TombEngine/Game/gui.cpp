@@ -656,7 +656,30 @@ namespace TEN::Gui
 
 					if (selectedKey && !g_KeyNames[selectedKey].empty())
 					{
-						KeyboardLayout[1][SelectedOption] = selectedKey;
+						unsigned int baseIndex = 0;
+						switch (MenuToDisplay)
+						{
+						case Menu::GeneralControls:
+							baseIndex = (int)GeneralControlStrings.size();
+							break;
+
+						/*case Menu::VehicleControls:
+						numControlSettingsOptions = (unsigned int)GeneralControlStrings.size();
+						break;*/
+
+						case Menu::QuickActions:
+							baseIndex = unsigned int(GeneralControlStrings.size() + QuickActionStrings.size());
+							break;
+
+						case Menu::MenuControls:
+							baseIndex = unsigned int(GeneralControlStrings.size() + QuickActionStrings.size() + MenuControlStrings.size());
+							break;
+
+						default:
+							break;
+						}
+
+						KeyboardLayout[1][baseIndex + SelectedOption] = selectedKey;
 						DefaultConflict();
 
 						CurrentSettings.WaitingForKey = false;
