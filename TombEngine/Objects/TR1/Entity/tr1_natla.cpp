@@ -322,8 +322,8 @@ namespace TEN::Entities::Creatures::TR1
 				if (item->Animation.RequiredState == NO_STATE && ai.ahead)
 				{
 					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle, BombGun);
-					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle + (GetRandomControl() - ANGLE(45)) / 4, BombGun);
-					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle + (GetRandomControl() - ANGLE(45)) / 4, BombGun);
+					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle + (GetRandomControl() - ANGLE(45.0f)) / 4, BombGun);
+					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle + (GetRandomControl() - ANGLE(45.0f)) / 4, BombGun);
 					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &item->Pose);
 
 					item->Animation.RequiredState = NATLA_STATE_IDLE;
