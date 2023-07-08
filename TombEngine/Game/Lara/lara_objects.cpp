@@ -258,103 +258,94 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 // HORIZONTAL BAR
 // --------------
 
-// State:		LS_HORIZONTAL_BAR_SWING (128)
-// Collision:	lara_default_col()
+// State:	  LS_HORIZONTAL_BAR_SWING (128)
+// Collision: lara_default_col()
 void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		 if (TrInput & IN_BACK || (TrInput & IN_FORWARD && TrInput & IN_BACK))
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_TURN;
-		}
-		else if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
+		}
+		else if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_TURN_180;
 		}
 		else
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_STOP;
 		}
 
-		lara->Control.HandStatus = HandStatus::Busy;
+		player.Control.HandStatus = HandStatus::Busy;
 		return;
 	}
-	else
-	{
-		lara->Control.HandStatus = HandStatus::Free;
-		item->Animation.TargetState = LS_JUMP_BACK;
-	}
+
+	player.Control.HandStatus = HandStatus::Free;
+	item->Animation.TargetState = LS_JUMP_BACK;
 }
 
-// State:		LS_HORIZONTAL_BAR_SWING_STOP (190)
-// Collision:	lara_default_col()
+// State:	  LS_HORIZONTAL_BAR_SWING_STOP (190)
+// Collision: lara_default_col()
 void lara_as_horizontal_bar_swing_stop(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_BACK || (TrInput & IN_FORWARD && TrInput & IN_BACK))
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN;
-		}
-		else if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
 		}
+		else if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
+		}
 
-		lara->Control.HandStatus = HandStatus::Busy;
+		player.Control.HandStatus = HandStatus::Busy;
 		return;
 	}
-	else
-	{
-		lara->Control.HandStatus = HandStatus::Free;
-		item->Animation.TargetState = LS_JUMP_BACK;
-	}
+
+	player.Control.HandStatus = HandStatus::Free;
+	item->Animation.TargetState = LS_JUMP_BACK;
 }
 
-// State:		LS_HORIZONTAL_BAR_IDLE (191)
-// Collision:	lara_default_col()
+// State:	  LS_HORIZONTAL_BAR_IDLE (191)
+// Collision: lara_default_col()
 void lara_as_horizontal_bar_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-
-		if (TrInput & IN_BACK)
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN;
-		}
-		else if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
 		}
+		else if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
+		}
 
-	
-
-		lara->Control.HandStatus = HandStatus::Busy;
+		player.Control.HandStatus = HandStatus::Busy;
 		return;
 	}
-	else
-	{
-		lara->Control.HandStatus = HandStatus::Free;
-		item->Animation.TargetState = LS_JUMP_BACK;
-	}
+
+	player.Control.HandStatus = HandStatus::Free;
+	item->Animation.TargetState = LS_JUMP_BACK;
 }
 
-// State:		LS_HORIZONTAL_BAR_SWING_START (192)
-// Collision:	lara_default_col()
+// State:	  LS_HORIZONTAL_BAR_SWING_START (192)
+// Collision: lara_default_col()
 void lara_as_horizontal_bar_swing_start(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
 		}
@@ -363,66 +354,65 @@ void lara_as_horizontal_bar_swing_start(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_STOP;
 		}
 
-		lara->Control.HandStatus = HandStatus::Busy;
+		player.Control.HandStatus = HandStatus::Busy;
 		return;
 	}
-	else
-	{
-		lara->Control.HandStatus = HandStatus::Free;
-		item->Animation.TargetState = LS_JUMP_BACK;
-	}
+
+	player.Control.HandStatus = HandStatus::Free;
+	item->Animation.TargetState = LS_JUMP_BACK;
 }
 
-// State:		LS_HORIZONTAL_BAR_IDLE_TURN (193)
-// Collision:	lara_default_col()
-void lara_as_horizontal_bar_idle_turn(ItemInfo* item, CollisionInfo* coll)
+// State:	  LS_HORIZONTAL_BAR_IDLE_TURN_180 (193)
+// Collision: lara_default_col()
+void lara_as_horizontal_bar_idle_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		lara->Control.HandStatus = HandStatus::Busy;
+		player.Control.HandStatus = HandStatus::Busy;
 		item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE;
 		return;
 	}
-	else
-	{
-		lara->Control.HandStatus = HandStatus::Free;
-		item->Animation.TargetState = LS_JUMP_BACK;
-	}
+
+	player.Control.HandStatus = HandStatus::Free;
+	item->Animation.TargetState = LS_JUMP_BACK;
 }
 
-// State:		LS_HORIZONTAL_BAR_SWING_TURN (194)
-// Collision:	lara_default_col()
-void lara_as_horizontal_bar_swing_turn(ItemInfo* item, CollisionInfo* coll)
+// State:	  LS_HORIZONTAL_BAR_SWING_TURN_180 (194)
+// Collision: lara_default_col()
+void lara_as_horizontal_bar_swing_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HandStatus = HandStatus::Busy;
-	
+	player.Control.HandStatus = HandStatus::Busy;
 }
 
-// State:		LS_HORIZONTAL_BAR_LEAP (129)
-// Collision:	lara_default_col()
-void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
+// State:	  LS_HORIZONTAL_BAR_JUMP (129)
+// Collision: lara_default_col()
+void lara_as_horizontal_bar_jump(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-	const auto& barItem = g_Level.Items[lara->Context.InteractedItem];
+	auto& player = GetLaraInfo(*item);
+	const auto& barItem = g_Level.Items[player.Context.InteractedItem];
 
 	item->Animation.IsAirborne = true;
 
 	if (item->Animation.FrameNumber == GetAnimData(*item).frameBase)
 	{
-		int distance = 0;
+		int dist = 0;
 		if (item->Pose.Orientation.y == barItem.Pose.Orientation.y)
-			distance = (barItem.TriggerFlags / 100) - 2;
+		{
+			dist = (barItem.TriggerFlags / 100) - 2;
+		}
 		else
-			distance = (barItem.TriggerFlags % 100) - 2;
+		{
+			dist = (barItem.TriggerFlags % 100) - 2;
+		}
 
-		lara->Control.HandStatus = HandStatus::Free;
+		player.Control.HandStatus = HandStatus::Free;
 
-		item->Animation.Velocity.z = (20 * distance) + 58;
-		item->Animation.Velocity.y = -(20 * distance + 64);
+		item->Animation.Velocity.z = (20 * dist) + 58;
+		item->Animation.Velocity.y = -(20 * dist + 64);
 	}
 
 	if (TestLastFrame(item))

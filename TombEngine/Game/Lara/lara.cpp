@@ -183,7 +183,7 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_switch_on,//126
 	lara_as_null,//127
 	lara_as_horizontal_bar_swing,//128
-	lara_as_horizontal_bar_leap,//129
+	lara_as_horizontal_bar_jump,//129
 	lara_as_null,//130
 	lara_as_controlled_no_look,//131
 	lara_as_controlled_no_look,//132
@@ -247,8 +247,8 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_horizontal_bar_swing_stop,//190
 	lara_as_horizontal_bar_idle,//191
 	lara_as_horizontal_bar_swing_start,//192
-	lara_as_horizontal_bar_idle_turn,//193
-	lara_as_horizontal_bar_swing_turn,//194
+	lara_as_horizontal_bar_idle_turn_180,//193
+	lara_as_horizontal_bar_swing_turn_180,//194
 };
 
 std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
