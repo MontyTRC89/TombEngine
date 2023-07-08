@@ -518,13 +518,13 @@ namespace TEN::Input
 		}
 	}
 
-	static void HandleHotkeys()
+	static void HandleHotkeyActions()
 	{
 		// Save screenshot.
 		static bool dbScreenshot = true;
 		if (KeyMap[KC_SYSRQ] && dbScreenshot)
 			g_Renderer.SaveScreenshot();
-		dbScreenshot = KeyMap[KC_SYSRQ] ? false : true;
+		dbScreenshot = !KeyMap[KC_SYSRQ];
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;
@@ -534,7 +534,7 @@ namespace TEN::Input
 			SaveConfiguration();
 			g_Renderer.ToggleFullScreen();
 		}
-		dbFullscreen = ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]) ? false : true;
+		dbFullscreen = !((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]);
 
 		if (!DebugMode)
 			return;
@@ -543,7 +543,7 @@ namespace TEN::Input
 		static bool dbDebugPage = true;
 		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
 			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? false : true;
+		dbDebugPage = !(KeyMap[KC_F10] || KeyMap[KC_F11]);
 	}
 
 	static void UpdateRumble()
@@ -613,7 +613,7 @@ namespace TEN::Input
 			ApplyActionQueue();
 
 		// Additional handling.
-		HandleHotkeys();
+		HandleHotkeyActions();
 		SolveActionCollisions();
 
 		// Port actions back to legacy bit fields.
