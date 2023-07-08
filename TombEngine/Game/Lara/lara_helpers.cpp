@@ -72,8 +72,6 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
 		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
-		g_Renderer.PrintDebugMessage("wiriw");
-
 		ResetPlayerLean(item, 1 / 6.0f);
 	}
 
