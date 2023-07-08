@@ -24,7 +24,7 @@ namespace TEN::Input
 {
 	constexpr int AXIS_DEADZONE = 8000;
 
-	const char* g_KeyNames[] =
+	std::vector<std::string> g_KeyNames =
 	{
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
 			"7",			"8",			"9",			"0",			"-",			"+",			"Back",			"Tab",
@@ -37,30 +37,30 @@ namespace TEN::Input
 
 			"F6",			"F7",			"F8",			"F9",			"F10",			"Num Lock",		"Scroll Lock",	"Pad 7",
 			"Pad 8",		"Pad 9",		"Pad -",		"Pad 4",		"Pad 5",		"Pad 6",		"Pad +",		"Pad 1",
-			"Pad 2",		"Pad 3",		"Pad 0",		"Pad.",			NULL,			NULL,			"\\",			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
+			"Pad 2",		"Pad 3",		"Pad 0",		"Pad.",			"",				"",				"\\",			"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
 
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			"Pad Enter",	"Ctrl",			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			"Shift",		NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			"Pad /",		NULL,			NULL,
-			"Alt",			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			"Home",
-			"Up",			"Page Up",		NULL,			"Left",			NULL,			"Right",		NULL,			"End",
-			"Down",			"Page Down",	"Insert",		"Del",			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"Pad Enter",	"Ctrl",			"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"Shift",		"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"Pad /",		"",				"",
+			"Alt",			"",				"",				"",				"",				"",				"",				"",
+			
+			"",				"",				"",				"",				"",				"",				"",				"Home",
+			"Up",			"Page Up",		"",				"Left",			"",				"Right",		"",				"End",
+			"Down",			"Page Down",	"Insert",		"Del",			"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
+			"",				"",				"",				"",				"",				"",				"",				"",
 
 			"Joy 1", 		"Joy 2",		"Joy 3",		"Joy 4", 		"Joy 5",		"Joy 6", 		"Joy 7",		"Joy 8",
 			"Joy 9",		"Joy 10",		"Joy 11",		"Joy 12",		"Joy 13",		"Joy 14",		"Joy 15",		"Joy 16",
@@ -108,7 +108,7 @@ namespace TEN::Input
 
 	// Input bindings. These are primitive mappings to actions.
 	bool ConflictingKeys[KEY_COUNT];
-	int KeyboardLayout[2][KEY_COUNT] =
+	short KeyboardLayout[2][KEY_COUNT] =
 	{
 		{
 			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_NUMPAD0, KC_END, KC_PGUP, KC_PGDOWN,

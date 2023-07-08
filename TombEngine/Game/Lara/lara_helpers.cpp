@@ -69,7 +69,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
-	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) &&
+	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
 		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
 		ResetPlayerLean(item, 1 / 6.0f);
@@ -77,14 +77,14 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
-		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(TrInput & (IN_LEFT | IN_RIGHT)))))
+		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(IsHeld(In::Left) || IsHeld(In::Right)))))
 	{
 		ResetPlayerFlex(item, 0.1f);
 	}
 
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
 		lara->Control.TurnRate = 0;
 
 	lara->Control.IsLow = false;
@@ -191,8 +191,8 @@ void HandlePlayerQuickActions(ItemInfo& item)
 			if (hasUsedMedipack)
 			{
 				player.Status.Poison = 0;
-				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 				Statistics.Game.HealthUsed++;
+				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 			}
 		}
 	}

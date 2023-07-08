@@ -266,7 +266,7 @@ namespace TEN::Renderer
 					else
 					{
 						int index = KeyboardLayout[1][k] ? KeyboardLayout[1][k] : KeyboardLayout[0][k];
-						AddString(MenuRightSideEntry, y, (char*)g_KeyNames[index], PRINTSTRING_COLOR_ORANGE, SF(false));
+						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (GeneralControlStrings.size() - 1))
@@ -321,7 +321,7 @@ namespace TEN::Renderer
 					else
 					{
 						int index = KeyboardLayout[1][baseIndex + k] ? KeyboardLayout[1][baseIndex + k] : KeyboardLayout[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, (char*)g_KeyNames[index], PRINTSTRING_COLOR_ORANGE, SF(false));
+						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (QuickActionStrings.size() - 1))
@@ -371,7 +371,7 @@ namespace TEN::Renderer
 					else
 					{
 						int index = KeyboardLayout[1][baseIndex + k] ? KeyboardLayout[1][baseIndex + k] : KeyboardLayout[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, (char*)g_KeyNames[index], PRINTSTRING_COLOR_ORANGE, SF(false));
+						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (MenuControlStrings.size() - 1))

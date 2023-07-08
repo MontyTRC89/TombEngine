@@ -108,7 +108,7 @@ namespace TEN::Input
 		IN_LOOK	   = (1 << KEY_LOOK),
 		IN_ROLL	   = (1 << KEY_ROLL),
 		IN_LSTEP   = (1 << KEY_LSTEP),
-		IN_RSTEP   = (1 << KEY_RSTEP),
+		IN_RSTEP   = (1 << KEY_RSTEP)
 	};
 	
 	// Temporary input constants for use with vehicles:
@@ -161,7 +161,7 @@ namespace TEN::Input
 		float	   FadeSpeed = 0.0f;
 	};
 
-	extern const char* g_KeyNames[];
+	extern std::vector<std::string> g_KeyNames;
 
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<QueueState>	ActionQueue;
@@ -172,7 +172,7 @@ namespace TEN::Input
 	extern int DbInput; // Debounce input.
 	extern int TrInput; // Throttle input.
 
-	extern int KeyboardLayout[2][KEY_COUNT];
+	extern short KeyboardLayout[2][KEY_COUNT];
 
 	void InitializeInput(HWND handle);
 	void DeinitializeInput();

@@ -246,7 +246,6 @@ bool SaveConfiguration()
 		return false;
 	}
 
-
 	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
