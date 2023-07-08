@@ -155,7 +155,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 		LS_CRAWL_TO_HANG,
 		LS_CRAWL_TURN_180
 	};
-
+	
 	auto& player = GetLaraInfo(item);
 
 	// Handle medipacks.

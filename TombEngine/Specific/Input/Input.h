@@ -52,16 +52,16 @@ namespace TEN::Input
 		KEY_BACK,
 		KEY_LEFT,
 		KEY_RIGHT,
-		KEY_CROUCH,
-		KEY_SPRINT,
-		KEY_WALK,
-		KEY_JUMP,
-		KEY_ACTION,
-		KEY_DRAW,
-		KEY_LOOK,
-		KEY_ROLL,
 		KEY_LSTEP,
 		KEY_RSTEP,
+		KEY_ACTION,
+		KEY_JUMP,
+		KEY_WALK,
+		KEY_SPRINT,
+		KEY_CROUCH,
+		KEY_ROLL,
+		KEY_DRAW,
+		KEY_LOOK,
 
 		KEY_LIGHT,
 		KEY_SMALL_MEDIPACK,
@@ -80,12 +80,12 @@ namespace TEN::Input
 		KEY_WEAPON_10,
 		KEY_SAY_NO,
 
+		KEY_SELECT,
+		KEY_DESELECT,
 		KEY_OPTION,
 		KEY_PAUSE,
 		KEY_SAVE,
 		KEY_LOAD,
-		KEY_SELECT,
-		KEY_DESELECT,
 
 		KEY_COUNT
 	};
@@ -99,16 +99,16 @@ namespace TEN::Input
 		IN_BACK	   = (1 << KEY_BACK),
 		IN_LEFT	   = (1 << KEY_LEFT),
 		IN_RIGHT   = (1 << KEY_RIGHT),
-		IN_CROUCH  = (1 << KEY_CROUCH),
-		IN_SPRINT  = (1 << KEY_SPRINT),
-		IN_WALK	   = (1 << KEY_WALK),
-		IN_JUMP	   = (1 << KEY_JUMP),
-		IN_ACTION  = (1 << KEY_ACTION),
-		IN_DRAW	   = (1 << KEY_DRAW),
-		IN_LOOK	   = (1 << KEY_LOOK),
-		IN_ROLL	   = (1 << KEY_ROLL),
 		IN_LSTEP   = (1 << KEY_LSTEP),
-		IN_RSTEP   = (1 << KEY_RSTEP)
+		IN_RSTEP   = (1 << KEY_RSTEP),
+		IN_ACTION  = (1 << KEY_ACTION),
+		IN_JUMP	   = (1 << KEY_JUMP),
+		IN_WALK	   = (1 << KEY_WALK),
+		IN_SPRINT  = (1 << KEY_SPRINT),
+		IN_CROUCH  = (1 << KEY_CROUCH),
+		IN_ROLL	   = (1 << KEY_ROLL),
+		IN_DRAW	   = (1 << KEY_DRAW),
+		IN_LOOK	   = (1 << KEY_LOOK)
 	};
 	
 	// Temporary input constants for use with vehicles:

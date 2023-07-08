@@ -4,21 +4,21 @@ namespace TEN::Input
 {
 	typedef enum class ActionID
 	{
-		// Basic controls
+		// General controls
 		Forward,
 		Back,
 		Left,
 		Right,
-		Crouch,
-		Sprint,
-		Walk,
-		Jump,
+		StepLeft,
+		StepRight,
 		Action,
-		DrawWeapon,
-		Look,
+		Jump,
+		Walk,
+		Sprint,
+		Crouch,
 		Roll,
-		LeftStep,
-		RightStep,
+		Draw,
+		Look,
 
 		// Vehicle controls
 		/*Accelerate,
@@ -48,12 +48,12 @@ namespace TEN::Input
 		SayNo,
 
 		// Menu controls
+		Select,
+		Deselect,
 		Option,
 		Pause,
 		Save,
 		Load,
-		Select,
-		Deselect,
 		SwitchTarget, // TODO: Look -> SwitchTarget conversion must be handled differently.
 
 		Count

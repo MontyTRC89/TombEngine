@@ -418,8 +418,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (!IsHeld(In::Jump) || isSwamp) // JUMP locks orientation outside swamps.
 	{
 		// Sidestep locks orientation.
-		if ((IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
-			(IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right))))
+		if ((IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
+			(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))))
 		{
 			ModulateLaraTurnRateY(item, 0, 0, 0);
 		}
@@ -508,7 +508,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)))
+	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 	{
 		if (TestLaraStepLeft(item, coll))
 			item->Animation.TargetState = LS_STEP_LEFT;
@@ -517,7 +517,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)))
+	else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 	{
 		if (TestLaraStepRight(item, coll))
 			item->Animation.TargetState = LS_STEP_RIGHT;

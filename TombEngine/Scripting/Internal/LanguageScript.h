@@ -92,7 +92,7 @@
 #define STRING_CONTROLS_WALK			"controls_walk"
 #define STRING_CONTROLS_JUMP			"controls_jump"
 #define STRING_CONTROLS_ACTION			"controls_action"
-#define STRING_CONTROLS_DRAW_WEAPON		"controls_draw_weapon"
+#define STRING_CONTROLS_DRAW			"controls_draw"
 #define STRING_CONTROLS_LOOK			"controls_look"
 #define STRING_CONTROLS_ROLL			"controls_roll"
 #define STRING_CONTROLS_INVENTORY		"controls_inventory"

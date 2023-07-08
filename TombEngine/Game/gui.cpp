@@ -64,16 +64,16 @@ namespace TEN::Gui
 		STRING_CONTROLS_BACKWARD,
 		STRING_CONTROLS_LEFT,
 		STRING_CONTROLS_RIGHT,
-		STRING_CONTROLS_CROUCH,
-		STRING_CONTROLS_SPRINT,
-		STRING_CONTROLS_WALK,
-		STRING_CONTROLS_JUMP,
-		STRING_CONTROLS_ACTION,
-		STRING_CONTROLS_DRAW_WEAPON,
-		STRING_CONTROLS_LOOK,
-		STRING_CONTROLS_ROLL,
 		STRING_CONTROLS_STEP_LEFT,
 		STRING_CONTROLS_STEP_RIGHT,
+		STRING_CONTROLS_ACTION,
+		STRING_CONTROLS_JUMP,
+		STRING_CONTROLS_WALK,
+		STRING_CONTROLS_SPRINT,
+		STRING_CONTROLS_CROUCH,
+		STRING_CONTROLS_ROLL,
+		STRING_CONTROLS_DRAW,
+		STRING_CONTROLS_LOOK
 	};
 
 	std::vector<const char*> VehicleControlStrings =
@@ -108,12 +108,12 @@ namespace TEN::Gui
 
 	std::vector<const char*> MenuControlStrings =
 	{
+		STRING_CONTROLS_SELECT,
+		STRING_CONTROLS_DESELECT
 		STRING_CONTROLS_INVENTORY,
 		STRING_CONTROLS_PAUSE,
 		STRING_CONTROLS_SAVE,
 		STRING_CONTROLS_LOAD,
-		STRING_CONTROLS_SELECT,
-		STRING_CONTROLS_DESELECT
 	};
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
@@ -156,7 +156,7 @@ namespace TEN::Gui
 	
 	bool GuiController::GuiIsDeselected() const
 	{
-		return ((IsClicked(In::Deselect) || IsClicked(In::DrawWeapon)) && CanDeselect());
+		return ((IsClicked(In::Deselect) || IsClicked(In::Draw)) && CanDeselect());
 	}
 
 	bool GuiController::CanSelect() const
