@@ -110,6 +110,10 @@ namespace TEN::Gui
 	{
 		STRING_CONTROLS_INVENTORY,
 		STRING_CONTROLS_PAUSE,
+		STRING_CONTROLS_SAVE,
+		STRING_CONTROLS_LOAD,
+		STRING_CONTROLS_SELECT,
+		STRING_CONTROLS_DESELECT
 	};
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
@@ -152,7 +156,7 @@ namespace TEN::Gui
 	
 	bool GuiController::GuiIsDeselected() const
 	{
-		return (IsClicked(In::Deselect) && CanDeselect());
+		return ((IsClicked(In::Deselect) || IsClicked(In::DrawWeapon)) && CanDeselect());
 	}
 
 	bool GuiController::CanSelect() const
@@ -297,6 +301,7 @@ namespace TEN::Gui
 			return inventoryResult;
 
 		case Menu::GeneralControls:
+		//case Menu::VehicleControls:
 		case Menu::QuickActions:
 		case Menu::MenuControls:
 			HandleControlSettingsInput(item, false);
@@ -591,6 +596,10 @@ namespace TEN::Gui
 		case Menu::GeneralControls:
 			numControlSettingsOptions = (int)GeneralControlStrings.size() + 2;
 			break;
+
+		/*case Menu::VehicleControls:
+			numControlSettingsOptions = (int)VehicleControlStrings.size() + 2;
+			break;*/
 
 		case Menu::QuickActions:
 			numControlSettingsOptions = (int)QuickActionStrings.size() + 2;
@@ -1020,6 +1029,7 @@ namespace TEN::Gui
 			return InventoryResult::None;
 
 		case Menu::GeneralControls:
+		//case Menu::VehicleControls:
 		case Menu::QuickActions:
 		case Menu::MenuControls:
 			HandleControlSettingsInput(item, true);

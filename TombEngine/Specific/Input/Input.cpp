@@ -33,9 +33,9 @@ namespace TEN::Input
 			"D",			"F",			"G",			"H",			"J",			"K",			"L",			";",
 			"'",			"`",			"Shift",		"#",			"Z",			"X",			"C",			"V",
 			"B",			"N",			"M",			",",			".",			"/",			"Shift",		"Pad X",
-			"Alt",			"Space",		"Caps Lock",	NULL,			NULL,			NULL,			NULL,			NULL,
+			"Alt",			"Space",		"Caps Lock",	"F1",			"F2",			"F3",			"F4",			"F5",
 
-			NULL,			NULL,			NULL,			NULL,			NULL,			"Num Lock",		"Scroll Lock",	"Pad 7",
+			"F6",			"F7",			"F8",			"F9",			"F10",			"Num Lock",		"Scroll Lock",	"Pad 7",
 			"Pad 8",		"Pad 9",		"Pad -",		"Pad 4",		"Pad 5",		"Pad 6",		"Pad +",		"Pad 1",
 			"Pad 2",		"Pad 3",		"Pad 0",		"Pad.",			NULL,			NULL,			"\\",			NULL,
 			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
@@ -89,8 +89,8 @@ namespace TEN::Input
 	// Rows:
 	// 1. General controls
 	// 2. Vehicle controls (TODO)
-	// 4. Quick actions
-	// 3. Menu controls + target switch
+	// 3. Quick actions
+	// 4. Menu controls + target switch
 	auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_NUMPAD0, KC_END, KC_PGUP, KC_PGDOWN,
@@ -108,19 +108,19 @@ namespace TEN::Input
 
 	// Input bindings. These are primitive mappings to actions.
 	bool ConflictingKeys[KEY_COUNT];
-	short KeyboardLayout[2][KEY_COUNT] =
+	int KeyboardLayout[2][KEY_COUNT] =
 	{
 		{
 			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_NUMPAD0, KC_END, KC_PGUP, KC_PGDOWN,
 			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
 			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
-			KC_ESCAPE, KC_P,
+			KC_ESCAPE, KC_P, KC_F5, KC_F6, KC_RETURN, KC_ESCAPE
 		},
 		{
 			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_NUMPAD0, KC_END, KC_PGUP, KC_PGDOWN,
 			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
 			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
-			KC_ESCAPE, KC_P,
+			KC_ESCAPE, KC_P, KC_F5, KC_F6, KC_RETURN, KC_ESCAPE
 		}
 	};
 
@@ -520,13 +520,6 @@ namespace TEN::Input
 
 	static void HandleHotkeys()
 	{
-		// TODO: Hardcoding.
-		// Handle hardcoded menu action mappings.
-		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? true : false);
-		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? true : false);
-		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? true : false);
-		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? true : false);
-
 		// Save screenshot.
 		static bool dbScreenshot = true;
 		if (KeyMap[KC_SYSRQ] && dbScreenshot)
@@ -546,7 +539,7 @@ namespace TEN::Input
 		if (!DebugMode)
 			return;
 
-		// Handle debug page switch.
+		// Switch debug page.
 		static bool dbDebugPage = true;
 		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
 			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);

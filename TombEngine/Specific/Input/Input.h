@@ -12,7 +12,7 @@ namespace TEN::Input
 
 	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
 
-	enum XInputButtons
+	enum XInputButton
 	{
 		XB_START = MAX_KEYBOARD_KEYS,
 		XB_SELECT,
@@ -82,6 +82,10 @@ namespace TEN::Input
 
 		KEY_OPTION,
 		KEY_PAUSE,
+		KEY_SAVE,
+		KEY_LOAD,
+		KEY_SELECT,
+		KEY_DESELECT,
 
 		KEY_COUNT
 	};
@@ -168,7 +172,7 @@ namespace TEN::Input
 	extern int DbInput; // Debounce input.
 	extern int TrInput; // Throttle input.
 
-	extern short KeyboardLayout[2][KEY_COUNT];
+	extern int KeyboardLayout[2][KEY_COUNT];
 
 	void InitializeInput(HWND handle);
 	void DeinitializeInput();

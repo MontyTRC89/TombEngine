@@ -292,6 +292,11 @@ namespace TEN::Renderer
 				break;
 			}
 
+		/*case Menu::VehicleControls:
+		{
+			break;
+		}*/
+
 		case Menu::QuickActions:
 			{
 				// Set up needed parameters.
@@ -447,6 +452,7 @@ namespace TEN::Renderer
 
 		case Menu::Options:
 		case Menu::GeneralControls:
+		//case Menu::VehicleControls:
 		case Menu::QuickActions:
 		case Menu::MenuControls:
 		case Menu::Display:
@@ -490,6 +496,7 @@ namespace TEN::Renderer
 
 		case Menu::Options:
 		case Menu::GeneralControls:
+		//case Menu::VehicleControls:
 		case Menu::QuickActions:
 		case Menu::MenuControls:
 		case Menu::Display:

@@ -77,6 +77,7 @@ namespace TEN::Gui
 		Options,
 		Display,
 		GeneralControls,
+		//VehicleControls,
 		QuickActions,
 		MenuControls,
 		OtherSettings
