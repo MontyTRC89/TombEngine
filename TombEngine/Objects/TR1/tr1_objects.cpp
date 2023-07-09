@@ -105,7 +105,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 400;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
+		obj->LotType = LotType::Flyer;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y); // Torso
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y); // Head
 		obj->SetupHitEffect();
 	}
 
