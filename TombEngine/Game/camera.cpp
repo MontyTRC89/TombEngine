@@ -218,7 +218,7 @@ void MoveCamera(GameVector* ideal, int speed)
 		if (Camera.bounce <= 0)
 		{
 			int bounce = -Camera.bounce;
-			int bounce2 = -Camera.bounce / 2;
+			int bounce2 = bounce / 2;
 			Camera.target.x += GetRandomControl() % bounce - bounce2;
 			Camera.target.y += GetRandomControl() % bounce - bounce2;
 			Camera.target.z += GetRandomControl() % bounce - bounce2;
