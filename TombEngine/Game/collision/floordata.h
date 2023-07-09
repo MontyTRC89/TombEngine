@@ -189,4 +189,6 @@ namespace TEN::Collision::Floordata
 	void			   UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materialList);
+	
+	void DrawNearbyTileFlags(const ItemInfo& item);
 }
