@@ -135,9 +135,7 @@ namespace TEN::Gui
 		bool UseItem;
 		char SeperateTypeFlag;
 		char CombineTypeFlag;
-		InventoryRing PCRing1;
-		InventoryRing PCRing2;
-		InventoryRing* Rings[2];
+		InventoryRing Rings[2];
 		int CurrentSelectedOption;
 		bool MenuActive;
 		char AmmoSelectorFlag;
@@ -161,6 +159,7 @@ namespace TEN::Gui
 	public:
 		int CompassNeedleAngle;
 
+		void Initialize();
 		bool CallPause();
 		bool CallInventory(ItemInfo* item, bool resetMode);
 		InventoryResult TitleOptions(ItemInfo* item);
@@ -192,6 +191,7 @@ namespace TEN::Gui
 		void SetInventoryMode(InventoryMode mode);
 		void SetEnterInventory(int number);
 		void SetInventoryItemChosen(int number);
+		void SetLastInventoryItem(int itemNumber);
 
 	private:
 		void HandleDisplaySettingsInput(bool fromPauseMenu);

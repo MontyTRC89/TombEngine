@@ -149,7 +149,7 @@ namespace TEN::Gui
 
 	InventoryRing* GuiController::GetRings(int ringIndex)
 	{
-		return Rings[ringIndex];
+		return &Rings[ringIndex];
 	}
 
 	short GuiController::GetSelectedOption()
@@ -209,6 +209,11 @@ namespace TEN::Gui
 	int GuiController::GetLastInventoryItem()
 	{
 		return LastInvItem;
+	}
+
+	void GuiController::SetLastInventoryItem(int itemNumber)
+	{
+		LastInvItem = itemNumber;
 	}
 
 	void GuiController::DrawInventory()
@@ -1111,7 +1116,7 @@ namespace TEN::Gui
 	{
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
-			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == objectNumber)
+			if (Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem == objectNumber)
 				return true;
 		}
 
@@ -1156,8 +1161,8 @@ namespace TEN::Gui
 	{
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
-			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == newObjectNumber)
-				Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
+			if (Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem == newObjectNumber)
+				Rings[(int)RingTypes::Inventory].CurrentObjectInList = i;
 		}
 	}
 
@@ -1171,11 +1176,11 @@ namespace TEN::Gui
 	void GuiController::SetupAmmoSelector()
 	{
 		int number = 0;
-		unsigned __int64 options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
+		unsigned __int64 options = InventoryObjectTable[Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem].Options;
 		AmmoSelectorFlag = 0;
 		NumAmmoSlots = 0;
 
-		if (Rings[(int)RingTypes::Ammo]->RingActive)
+		if (Rings[(int)RingTypes::Ammo].RingActive)
 			return;
 	
 		AmmoObjectList[0].Orientation = EulerAngles::Zero;
@@ -1295,10 +1300,10 @@ namespace TEN::Gui
 
 	void GuiController::InsertObjectIntoList(int objectNumber)
 	{
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].InventoryItem = objectNumber;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].Orientation = EulerAngles::Zero;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].Bright = 32;
-		Rings[(int)RingTypes::Inventory]->NumObjectsInList++;
+		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].InventoryItem = objectNumber;
+		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Orientation = EulerAngles::Zero;
+		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Bright = 32;
+		Rings[(int)RingTypes::Inventory].NumObjectsInList++;
 	}
 
 	void GuiController::InsertObjectIntoList_v2(int objectNumber)
@@ -1307,11 +1312,11 @@ namespace TEN::Gui
 
 		if (options & (OPT_COMBINABLE | OPT_ALWAYS_COMBINE))
 		{
-			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem != objectNumber)
+			if (Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem != objectNumber)
 			{
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].InventoryItem = objectNumber;
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].Orientation = EulerAngles::Zero;
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList++].Bright = 32;
+				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].InventoryItem = objectNumber;
+				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].Orientation = EulerAngles::Zero;
+				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList++].Bright = 32;
 			}
 		}
 	}
@@ -1320,10 +1325,10 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		Rings[(int)RingTypes::Inventory]->NumObjectsInList = 0;
+		Rings[(int)RingTypes::Inventory].NumObjectsInList = 0;
 
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-			Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem = NO_ITEM;
+			Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 		Ammo.CurrentPistolsAmmoType = 0;
 		Ammo.CurrentUziAmmoType = 0;
@@ -1542,12 +1547,12 @@ namespace TEN::Gui
 			InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
 		}
 
-		Rings[(int)RingTypes::Inventory]->ObjectListMovement = 0;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Inventory]->RingActive = true;
-		Rings[(int)RingTypes::Ammo]->ObjectListMovement = 0;
-		Rings[(int)RingTypes::Ammo]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Ammo]->RingActive = false;
+		Rings[(int)RingTypes::Inventory].ObjectListMovement = 0;
+		Rings[(int)RingTypes::Inventory].CurrentObjectInList = 0;
+		Rings[(int)RingTypes::Inventory].RingActive = true;
+		Rings[(int)RingTypes::Ammo].ObjectListMovement = 0;
+		Rings[(int)RingTypes::Ammo].CurrentObjectInList = 0;
+		Rings[(int)RingTypes::Ammo].RingActive = false;
 		HandleObjectChangeover((int)RingTypes::Inventory);
 		AmmoActive = 0;
 	}
@@ -1556,10 +1561,10 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		Rings[(int)RingTypes::Ammo]->NumObjectsInList = 0;
+		Rings[(int)RingTypes::Ammo].NumObjectsInList = 0;
 
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-			Rings[(int)RingTypes::Ammo]->CurrentObjectList[i].InventoryItem = NO_ITEM;
+			Rings[(int)RingTypes::Ammo].CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 		if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 		{
@@ -1633,9 +1638,16 @@ namespace TEN::Gui
 				InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 		}
 
-		Rings[(int)RingTypes::Ammo]->ObjectListMovement = 0;
-		Rings[(int)RingTypes::Ammo]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Ammo]->RingActive = false;
+		Rings[(int)RingTypes::Ammo].ObjectListMovement = 0;
+		Rings[(int)RingTypes::Ammo].CurrentObjectInList = 0;
+		Rings[(int)RingTypes::Ammo].RingActive = false;
+	}
+
+	void GuiController::Initialize()
+	{
+		g_Gui.SetMenuToDisplay(Menu::Title);
+		g_Gui.SetSelectedOption(0);
+		g_Gui.SetLastInventoryItem(NO_ITEM);
 	}
 
 	void GuiController::InitializeInventory(ItemInfo* item)
@@ -1713,9 +1725,11 @@ namespace TEN::Gui
 							}
 						}
 					}
+					else
+					{
+						LastInvItem = NO_ITEM;
+					}
 				}
-
-				LastInvItem = NO_ITEM;
 			}
 		}
 		else
@@ -1746,8 +1760,8 @@ namespace TEN::Gui
 	{
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
-			if (InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem].ObjectNumber == newObjectNumber)
-				Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
+			if (InventoryObjectTable[Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem].ObjectNumber == newObjectNumber)
+				Rings[(int)RingTypes::Inventory].CurrentObjectInList = i;
 		}
 	}
 
@@ -1769,7 +1783,7 @@ namespace TEN::Gui
 
 	void GuiController::FadeAmmoSelector()
 	{
-		if (Rings[(int)RingTypes::Inventory]->RingActive)
+		if (Rings[(int)RingTypes::Inventory].RingActive)
 			AmmoSelectorFadeVal = 0;
 		else if (AmmoSelectorFadeDir == 1)
 		{
@@ -1818,7 +1832,7 @@ namespace TEN::Gui
 		auto* lara = GetLaraInfo(item);
 
 		int prevBinocularRange = BinocularRange;
-		short inventoryObject = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+		short inventoryObject = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 		short gameObject = InventoryObjectTable[inventoryObject].ObjectNumber;
 
 		item->MeshBits = ALL_JOINT_BITS;
@@ -2078,21 +2092,21 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		if (Rings[(int)RingTypes::Ammo]->RingActive)
+		if (Rings[(int)RingTypes::Ammo].RingActive)
 		{
 			auto optionString = g_GameFlow->GetString(OptionStrings[5]);
 			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
-			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
+			if (Rings[(int)RingTypes::Inventory].ObjectListMovement)
 				return;
 
-			if (Rings[(int)RingTypes::Ammo]->ObjectListMovement)
+			if (Rings[(int)RingTypes::Ammo].ObjectListMovement)
 				return;
 
 			if (GuiIsSelected())
 			{
-				short invItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
-				short ammoItem = Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->CurrentObjectInList].InventoryItem;
+				short invItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
+				short ammoItem = Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].CurrentObjectInList].InventoryItem;
 
 				if (DoObjectsCombine(invItem, ammoItem))
 				{
@@ -2151,7 +2165,7 @@ namespace TEN::Gui
 		}
 		else
 		{
-			int num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+			int num = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 
 			for (int i = 0; i < 3; i++)
 			{
@@ -2163,7 +2177,7 @@ namespace TEN::Gui
 			unsigned long options;
 			if (!AmmoActive)
 			{
-				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
+				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem].Options;
 
 				if (options & OPT_LOAD)
 				{
@@ -2253,7 +2267,7 @@ namespace TEN::Gui
 				CurrentOptions[1].Text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[1].InventoryItem].ObjectName);
 				n = 2;
 
-				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
+				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem].Options;
 
 				if (options & (OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN | OPT_CHOOSE_AMMO_HK))
 				{
@@ -2292,8 +2306,8 @@ namespace TEN::Gui
 			}
 
 			if (MenuActive &&
-				!Rings[(int)RingTypes::Inventory]->ObjectListMovement &&
-				!Rings[(int)RingTypes::Ammo]->ObjectListMovement)
+				!Rings[(int)RingTypes::Inventory].ObjectListMovement &&
+				!Rings[(int)RingTypes::Ammo].ObjectListMovement)
 			{
 				if (AmmoActive)
 				{
@@ -2349,7 +2363,7 @@ namespace TEN::Gui
 					switch (CurrentOptions[CurrentSelectedOption].Type)
 					{
 					case MenuType::ChooseAmmo:
-						Rings[(int)RingTypes::Inventory]->RingActive = false;
+						Rings[(int)RingTypes::Inventory].RingActive = false;
 						AmmoActive = 1;
 						Ammo.StashedCurrentSelectedOption = CurrentSelectedOption;
 						Ammo.StashedCurrentPistolsAmmoType = Ammo.CurrentPistolsAmmoType;
@@ -2385,14 +2399,14 @@ namespace TEN::Gui
 					case MenuType::Ammo2:
 					case MenuType::Ammo3:
 						AmmoActive = 0;
-						Rings[(int)RingTypes::Inventory]->RingActive = true;
+						Rings[(int)RingTypes::Inventory].RingActive = true;
 						CurrentSelectedOption = 0;
 						break;
 
 					case MenuType::Combine:
 						ConstructCombineObjectList(item);
-						Rings[(int)RingTypes::Inventory]->RingActive = false;
-						Rings[(int)RingTypes::Ammo]->RingActive = true;
+						Rings[(int)RingTypes::Inventory].RingActive = false;
+						Rings[(int)RingTypes::Ammo].RingActive = true;
 						AmmoSelectorFlag = 0;
 						MenuActive = false;
 						CombineRingFadeDir = 1;
@@ -2420,7 +2434,7 @@ namespace TEN::Gui
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					AmmoActive = 0;
-					Rings[(int)RingTypes::Inventory]->RingActive = true;
+					Rings[(int)RingTypes::Inventory].RingActive = true;
 					Ammo.CurrentPistolsAmmoType = Ammo.StashedCurrentPistolsAmmoType;
 					Ammo.CurrentUziAmmoType = Ammo.StashedCurrentUziAmmoType;
 					Ammo.CurrentRevolverAmmoType = Ammo.StashedCurrentRevolverAmmoType;
@@ -2560,7 +2574,7 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		if (Rings[ringIndex]->CurrentObjectList <= 0)
+		if (Rings[ringIndex].CurrentObjectList <= 0)
 			return;
 
 		if (ringIndex == (int)RingTypes::Ammo)
@@ -2592,13 +2606,13 @@ namespace TEN::Gui
 						NormalRingFadeDir = 2;
 					else
 					{
-						Rings[(int)RingTypes::Inventory]->RingActive = true;
+						Rings[(int)RingTypes::Inventory].RingActive = true;
 						MenuActive = true;
-						Rings[(int)RingTypes::Ammo]->RingActive = false;
+						Rings[(int)RingTypes::Ammo].RingActive = false;
 						HandleObjectChangeover((int)RingTypes::Inventory);
 					}
 
-					Rings[(int)RingTypes::Ammo]->RingActive = false;
+					Rings[(int)RingTypes::Ammo].RingActive = false;
 				}
 			}
 		}
@@ -2611,7 +2625,7 @@ namespace TEN::Gui
 			{
 				NormalRingFadeVal = 128;
 				NormalRingFadeDir = 0;
-				Rings[(int)RingTypes::Inventory]->RingActive = true;
+				Rings[(int)RingTypes::Inventory].RingActive = true;
 				MenuActive = true;
 			}
 
@@ -2637,7 +2651,7 @@ namespace TEN::Gui
 					SetupObjectListStartPosition(CombineObject1);
 				}
 				else if (SeperateTypeFlag)
-					SeparateObject(item, Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem);
+					SeparateObject(item, Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem);
 
 				HandleObjectChangeover((int)RingTypes::Inventory);
 			}
@@ -2648,34 +2662,34 @@ namespace TEN::Gui
 		int xOffset = 0;
 		int n = 0;
 
-		if (Rings[ringIndex]->NumObjectsInList != 1)
-			xOffset = (OBJLIST_SPACING * Rings[ringIndex]->ObjectListMovement) >> 16;
+		if (Rings[ringIndex].NumObjectsInList != 1)
+			xOffset = (OBJLIST_SPACING * Rings[ringIndex].ObjectListMovement) >> 16;
 
-		if (Rings[ringIndex]->NumObjectsInList == 2)
+		if (Rings[ringIndex].NumObjectsInList == 2)
 		{
 			minObj = -1;
 			maxObj = 0;
-			n = Rings[ringIndex]->CurrentObjectInList - 1;
+			n = Rings[ringIndex].CurrentObjectInList - 1;
 		}
 
-		if (Rings[ringIndex]->NumObjectsInList == 3 || Rings[ringIndex]->NumObjectsInList == 4)
+		if (Rings[ringIndex].NumObjectsInList == 3 || Rings[ringIndex].NumObjectsInList == 4)
 		{
 			minObj = -2;
 			maxObj = 1;
-			n = Rings[ringIndex]->CurrentObjectInList - 2;
+			n = Rings[ringIndex].CurrentObjectInList - 2;
 		}
 
-		if (Rings[ringIndex]->NumObjectsInList >= 5)
+		if (Rings[ringIndex].NumObjectsInList >= 5)
 		{
 			minObj = -3;
 			maxObj = 2;
-			n = Rings[ringIndex]->CurrentObjectInList - 3;
+			n = Rings[ringIndex].CurrentObjectInList - 3;
 		}
 
 		if (n < 0)
-			n += Rings[ringIndex]->NumObjectsInList;
+			n += Rings[ringIndex].NumObjectsInList;
 
-		if (Rings[ringIndex]->ObjectListMovement < 0)
+		if (Rings[ringIndex].ObjectListMovement < 0)
 			maxObj++;
 
 		if (minObj <= maxObj)
@@ -2686,10 +2700,10 @@ namespace TEN::Gui
 
 				if (minObj == i)
 				{
-					if (Rings[ringIndex]->ObjectListMovement < 0)
+					if (Rings[ringIndex].ObjectListMovement < 0)
 						shade = 0;
 					else
-						shade = Rings[ringIndex]->ObjectListMovement >> 9;
+						shade = Rings[ringIndex].ObjectListMovement >> 9;
 				}
 				else if (i != minObj + 1 || maxObj == minObj + 1)
 				{
@@ -2697,16 +2711,16 @@ namespace TEN::Gui
 						shade = 128;
 					else
 					{
-						if (Rings[ringIndex]->ObjectListMovement < 0)
-							shade = (-128 * Rings[ringIndex]->ObjectListMovement) >> 16;
+						if (Rings[ringIndex].ObjectListMovement < 0)
+							shade = (-128 * Rings[ringIndex].ObjectListMovement) >> 16;
 						else
-							shade = 128 - short(Rings[ringIndex]->ObjectListMovement >> 9);
+							shade = 128 - short(Rings[ringIndex].ObjectListMovement >> 9);
 					}
 				}
 				else
 				{
-					if (Rings[ringIndex]->ObjectListMovement < 0)
-						shade = 128 - ((-128 * Rings[ringIndex]->ObjectListMovement) >> 16);
+					if (Rings[ringIndex].ObjectListMovement < 0)
+						shade = 128 - ((-128 * Rings[ringIndex].ObjectListMovement) >> 16);
 					else
 						shade = 128;
 				}
@@ -2725,7 +2739,7 @@ namespace TEN::Gui
 					int count = 0;
 					char textBufferMe[128];
 
-					switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber)
+					switch (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber)
 					{
 					case ID_BIGMEDI_ITEM:
 						numItems = lara->Inventory.TotalLargeMedipacks;
@@ -2740,10 +2754,10 @@ namespace TEN::Gui
 						break;
 
 					default:
-						if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
-							InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
+						if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
+							InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
 						{
-							switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber)
+							switch (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber)
 							{
 							case ID_SHOTGUN_AMMO1_ITEM:
 								numItems = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
@@ -2806,29 +2820,29 @@ namespace TEN::Gui
 						}
 						else
 						{
-							numItems = lara->Inventory.Puzzles[InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber - ID_PUZZLE_ITEM1];
+							numItems = lara->Inventory.Puzzles[InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber - ID_PUZZLE_ITEM1];
 
 							if (numItems <= 1)
-								sprintf(textBufferMe, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+								sprintf(textBufferMe, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 							else
-								sprintf(textBufferMe, "%d x %s", numItems, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+								sprintf(textBufferMe, "%d x %s", numItems, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 						}
 
 						break;
 					}
 
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
-						InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
+					if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
+						InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
 					{
 						if (numItems)
 						{
 							if (numItems == -1)
-								sprintf(textBufferMe, "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+								sprintf(textBufferMe, "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 							else
-								sprintf(textBufferMe, "%d x %s", numItems, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+								sprintf(textBufferMe, "%d x %s", numItems, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 						}
 						else
-							sprintf(textBufferMe, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+							sprintf(textBufferMe, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 					}
 
 					int objectNumber;
@@ -2840,24 +2854,24 @@ namespace TEN::Gui
 					g_Renderer.AddString(PHD_CENTER_X, objectNumber, textBufferMe, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				}
 
-				if (!i && !Rings[ringIndex]->ObjectListMovement)
+				if (!i && !Rings[ringIndex].ObjectListMovement)
 				{
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_X)
-						Rings[ringIndex]->CurrentObjectList[n].Orientation.x += ANGLE(5.0f);
+					if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_X)
+						Rings[ringIndex].CurrentObjectList[n].Orientation.x += ANGLE(5.0f);
 
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Y)
-						Rings[ringIndex]->CurrentObjectList[n].Orientation.y += ANGLE(5.0f);
+					if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Y)
+						Rings[ringIndex].CurrentObjectList[n].Orientation.y += ANGLE(5.0f);
 
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Z)
-						Rings[ringIndex]->CurrentObjectList[n].Orientation.z += ANGLE(5.0f);
+					if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Z)
+						Rings[ringIndex].CurrentObjectList[n].Orientation.z += ANGLE(5.0f);
 				}
 				else
-					SpinBack(Rings[ringIndex]->CurrentObjectList[n].Orientation);
+					SpinBack(Rings[ringIndex].CurrentObjectList[n].Orientation);
 
 				int activeNum = 0;
-				if (Rings[ringIndex]->ObjectListMovement)
+				if (Rings[ringIndex].ObjectListMovement)
 				{
-					if (Rings[ringIndex]->ObjectListMovement > 0)
+					if (Rings[ringIndex].ObjectListMovement > 0)
 						activeNum = -1;
 					else
 						activeNum = 1;
@@ -2865,51 +2879,51 @@ namespace TEN::Gui
 
 				if (i == activeNum)
 				{
-					if (Rings[ringIndex]->CurrentObjectList[n].Bright < 160)
-						Rings[ringIndex]->CurrentObjectList[n].Bright += 16;
+					if (Rings[ringIndex].CurrentObjectList[n].Bright < 160)
+						Rings[ringIndex].CurrentObjectList[n].Bright += 16;
 
-					if (Rings[ringIndex]->CurrentObjectList[n].Bright > 160)
-						Rings[ringIndex]->CurrentObjectList[n].Bright = 160;
+					if (Rings[ringIndex].CurrentObjectList[n].Bright > 160)
+						Rings[ringIndex].CurrentObjectList[n].Bright = 160;
 				}
 				else
 				{
-					if (Rings[ringIndex]->CurrentObjectList[n].Bright > 32)
-						Rings[ringIndex]->CurrentObjectList[n].Bright -= 16;
+					if (Rings[ringIndex].CurrentObjectList[n].Bright > 32)
+						Rings[ringIndex].CurrentObjectList[n].Bright -= 16;
 
-					if (Rings[ringIndex]->CurrentObjectList[n].Bright < 32)
-						Rings[ringIndex]->CurrentObjectList[n].Bright = 32;
+					if (Rings[ringIndex].CurrentObjectList[n].Bright < 32)
+						Rings[ringIndex].CurrentObjectList[n].Bright = 32;
 				}
 
 				int x = 400 + xOffset + i * OBJLIST_SPACING;
 				int y = 150;
 				int y2 = 480; // Combine.
-				short objectNumber = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
-				float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
-				auto& orientation = Rings[ringIndex]->CurrentObjectList[n].Orientation;
-				int bits = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].MeshBits;
+				short objectNumber = ConvertInventoryItemToObject(Rings[ringIndex].CurrentObjectList[n].InventoryItem);
+				float scaler = InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].Scale1;
+				auto& orientation = Rings[ringIndex].CurrentObjectList[n].Orientation;
+				int bits = InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].MeshBits;
 
 				g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, (ringIndex == (int)RingTypes::Inventory) ? y : y2), orientation, scaler, 1.0f, bits);
 
-				if (++n >= Rings[ringIndex]->NumObjectsInList)
+				if (++n >= Rings[ringIndex].NumObjectsInList)
 					n = 0;
 			}
 
-			if (Rings[ringIndex]->RingActive)
+			if (Rings[ringIndex].RingActive)
 			{
-				if (Rings[ringIndex]->NumObjectsInList != 1 && (ringIndex != 1 || CombineRingFadeVal == 128))
+				if (Rings[ringIndex].NumObjectsInList != 1 && (ringIndex != 1 || CombineRingFadeVal == 128))
 				{
-					if (Rings[ringIndex]->ObjectListMovement > 0)
-						Rings[ringIndex]->ObjectListMovement += ANGLE(45.0f);
+					if (Rings[ringIndex].ObjectListMovement > 0)
+						Rings[ringIndex].ObjectListMovement += ANGLE(45.0f);
 
-					if (Rings[ringIndex]->ObjectListMovement < 0)
-						Rings[ringIndex]->ObjectListMovement -= ANGLE(45.0f);
+					if (Rings[ringIndex].ObjectListMovement < 0)
+						Rings[ringIndex].ObjectListMovement -= ANGLE(45.0f);
 
 					if (IsHeld(In::Left))
 					{
-						if (!Rings[ringIndex]->ObjectListMovement)
+						if (!Rings[ringIndex].ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							Rings[ringIndex]->ObjectListMovement += ANGLE(45.0f);
+							Rings[ringIndex].ObjectListMovement += ANGLE(45.0f);
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -2918,26 +2932,26 @@ namespace TEN::Gui
 
 					if (IsHeld(In::Right))
 					{
-						if (!Rings[ringIndex]->ObjectListMovement)
+						if (!Rings[ringIndex].ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							Rings[ringIndex]->ObjectListMovement -= ANGLE(45.0f);
+							Rings[ringIndex].ObjectListMovement -= ANGLE(45.0f);
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
 						}
 					}
 
-					if (Rings[ringIndex]->ObjectListMovement < 65536)
+					if (Rings[ringIndex].ObjectListMovement < 65536)
 					{
-						if (Rings[ringIndex]->ObjectListMovement < -65535)
+						if (Rings[ringIndex].ObjectListMovement < -65535)
 						{
-							Rings[ringIndex]->CurrentObjectInList++;
+							Rings[ringIndex].CurrentObjectInList++;
 
-							if (Rings[ringIndex]->CurrentObjectInList >= Rings[ringIndex]->NumObjectsInList)
-								Rings[ringIndex]->CurrentObjectInList = 0;
+							if (Rings[ringIndex].CurrentObjectInList >= Rings[ringIndex].NumObjectsInList)
+								Rings[ringIndex].CurrentObjectInList = 0;
 
-							Rings[ringIndex]->ObjectListMovement = 0;
+							Rings[ringIndex].ObjectListMovement = 0;
 
 							if (ringIndex == (int)RingTypes::Inventory)
 								HandleObjectChangeover(0);
@@ -2945,12 +2959,12 @@ namespace TEN::Gui
 					}
 					else
 					{
-						Rings[ringIndex]->CurrentObjectInList--;
+						Rings[ringIndex].CurrentObjectInList--;
 
-						if (Rings[ringIndex]->CurrentObjectInList < 0)
-							Rings[ringIndex]->CurrentObjectInList = Rings[ringIndex]->NumObjectsInList - 1;
+						if (Rings[ringIndex].CurrentObjectInList < 0)
+							Rings[ringIndex].CurrentObjectInList = Rings[ringIndex].NumObjectsInList - 1;
 
-						Rings[ringIndex]->ObjectListMovement = 0;
+						Rings[ringIndex].ObjectListMovement = 0;
 
 						if (ringIndex == (int)RingTypes::Inventory)
 							HandleObjectChangeover(0);
@@ -2999,9 +3013,6 @@ namespace TEN::Gui
 		bool doLoad = false;
 
 		lara->Inventory.OldBusy = lara->Inventory.IsBusy;
-
-		Rings[(int)RingTypes::Inventory] = &PCRing1;
-		Rings[(int)RingTypes::Ammo] = &PCRing2;
 
 		g_Renderer.DumpGameScene();
 		PauseAllSounds(SoundPauseMode::Inventory);
@@ -3092,7 +3103,7 @@ namespace TEN::Gui
 			Camera.numberFrames = g_Renderer.Synchronize();
 		}
 
-		LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);
 
 		if (UseItem)
