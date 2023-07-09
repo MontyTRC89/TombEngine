@@ -266,13 +266,13 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Action))
 	{
-		if (IsHeld(In::Forward))
+		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+		{
+		item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_TURN_180;
+		}
+		else if (IsHeld(In::Forward))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
-		}
-		else if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_TURN_180;
 		}
 		else
 		{
@@ -299,7 +299,7 @@ void lara_as_horizontal_bar_swing_stop(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
 		}
-		else if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+		else if (IsHeld(In::Roll) || IsHeld(In::Back))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
 		}
@@ -324,7 +324,7 @@ void lara_as_horizontal_bar_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
 		}
-		else if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+		else if (IsHeld(In::Roll) || IsHeld(In::Back))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
 		}
