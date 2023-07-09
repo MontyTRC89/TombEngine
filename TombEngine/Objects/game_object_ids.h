@@ -157,15 +157,15 @@ enum GAME_OBJECT_ID : short
 	ID_CHEF,
 
 	ID_KOLD = 219,
-	ID_WINGED_MUMMY,
-	ID_CENTAUR_MUTANT,
-	ID_DOPPELGANGER,
-	ID_NATLA,
-	ID_WINGED_NATLA, // NOTE: not used (using ID_NATLA instead). TokyoSU: 08/07/2023
-	ID_GIANT_MUTANT,
-	ID_PROJ_NATLA, // NOTE: not used (using ID_PROJ_BOMB instead). TokyoSU: 08/07/2023
-	ID_PROJ_SHARD,
-	ID_PROJ_BOMB,
+	ID_WINGED_MUMMY, 
+	ID_CENTAUR_MUTANT,  
+	ID_DOPPELGANGER,       
+	ID_NATLA,                 
+	// 224
+	ID_GIANT_MUTANT = 225,
+	// 226
+	ID_PROJ_SHARD = 227,
+	ID_PROJ_BOMB,                                                                                 
 	ID_YETI,
 	ID_BIRDMONSTER,
 	ID_MARCO_BARTOLI,
