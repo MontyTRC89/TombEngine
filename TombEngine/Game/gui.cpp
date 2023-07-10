@@ -32,10 +32,10 @@ using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
-	constexpr auto LINE_HEIGHT	   = 25;
-	constexpr auto PHD_CENTER_X	   = SCREEN_SPACE_RES.x / 2;
-	constexpr auto PHD_CENTER_Y	   = SCREEN_SPACE_RES.y / 2;
-	constexpr auto OBJLIST_SPACING = PHD_CENTER_X / 2;
+	constexpr int LINE_HEIGHT	  = 25;
+	constexpr int PHD_CENTER_X	  = SCREEN_SPACE_RES.x / 2;
+	constexpr int PHD_CENTER_Y	  = SCREEN_SPACE_RES.y / 2;
+	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
 
 	constexpr auto VOLUME_MAX = 100;
 	constexpr auto MOUSE_SENSITIVITY_MIN = 1;
