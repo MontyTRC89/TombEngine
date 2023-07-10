@@ -68,6 +68,9 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
+		if (item.ObjectNumber != ID_SPIKY_CEILING)
+			return;
+
 		// Collide with objects.
 		if (item.Status == ITEM_ACTIVE)
 		{
@@ -80,9 +83,9 @@ namespace TEN::Entities::Traps
 		{
 			ObjectCollision(itemNumber, playerItem, coll);
 		}
-
+		
 		// Damage entity.
-		if (playerItem->TouchBits.TestAny())
+		if (TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 		{
 			DoDamage(playerItem, SPIKY_CEILING_HARM_DAMAGE);
 			DoLotsOfBlood(playerItem->Pose.Position.x, playerItem->Pose.Position.y + CLICK(3), playerItem->Pose.Position.z, 4, playerItem->Pose.Orientation.y, playerItem->RoomNumber, 3);
