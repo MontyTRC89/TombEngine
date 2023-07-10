@@ -228,7 +228,7 @@ static void StartEntity(ObjectInfo* obj)
 
 static void StartObject(ObjectInfo* obj)
 {
-	obj = &Objects[ID_BACON_REFERENCE];
+	obj = &Objects[ID_DOPPELGANGER_ORIGIN];
 	if (obj->loaded)
 	{
 		obj->collision = AIPickupCollision;
@@ -262,7 +262,7 @@ static void StartTrap(ObjectInfo* obj)
 static void StartProjectiles(ObjectInfo* obj)
 {
 	InitProjectile(obj, ControlMissile, ID_PROJ_SHARD);
-	InitProjectile(obj, ControlMissile, ID_PROJ_NATLA);
+	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 }
 
