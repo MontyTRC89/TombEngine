@@ -26,6 +26,7 @@ Version 1.1.0
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
+* Change camera bounce to be more accurate to TR4 camera bounce.
 * Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
