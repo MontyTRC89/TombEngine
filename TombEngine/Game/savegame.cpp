@@ -1510,7 +1510,7 @@ bool SaveGame::Load(int slot)
 		item->NextItem = savedItem->next_item();
 		item->NextActive = savedItem->next_item_active();
 
-		if (item->ObjectNumber == NO_ITEM)
+		if (item->ObjectNumber == ID_NO_OBJECT)
 			continue;
 
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
