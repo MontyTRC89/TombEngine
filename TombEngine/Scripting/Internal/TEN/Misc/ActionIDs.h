@@ -79,5 +79,5 @@ static const std::unordered_map<std::string, ActionID> ACTION_IDS
 	{ "INVENTORY", ActionID::Option },
 	{ "PAUSE", ActionID::Pause },
 	{ "SAVE", ActionID::Save },
-	{ "LOAD", ActionID::Load },
+	{ "LOAD", ActionID::Load }
 };

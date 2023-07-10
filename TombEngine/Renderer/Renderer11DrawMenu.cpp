@@ -335,7 +335,7 @@ namespace TEN::Renderer
 				}
 
 				// Reset to defaults
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == GeneralControlStrings.size()));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == QuickActionStrings.size()));
 				GetNextLinePosition(&y);
 
 				// Apply

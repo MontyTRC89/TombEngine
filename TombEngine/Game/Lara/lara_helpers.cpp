@@ -103,7 +103,7 @@ static std::optional<LaraWeaponType> GetScrolledWeaponType(const ItemInfo& item,
 		LaraWeaponType::Crossbow,
 		LaraWeaponType::HarpoonGun,
 		LaraWeaponType::HK,
-		LaraWeaponType::RocketLauncher,
+		LaraWeaponType::RocketLauncher
 	};
 
 	auto& player = GetLaraInfo(item);
