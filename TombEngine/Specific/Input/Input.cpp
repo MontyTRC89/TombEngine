@@ -352,16 +352,13 @@ namespace TEN::Input
 			{
 				AxisMap[(int)InputAxis::Move].y = 1.0f;
 			}
-			}
 			else if (KeyboardLayout[layout][KEY_BACK] == index)
 			{
 				AxisMap[(int)InputAxis::Move].y = -1.0f;
 			}
-			}
 			else if (KeyboardLayout[layout][KEY_LEFT] == index)
 			{
 				AxisMap[(int)InputAxis::Move].x = -1.0f;
-			}
 			}
 			else if (KeyboardLayout[layout][KEY_RIGHT] == index)
 			{
@@ -528,28 +525,28 @@ namespace TEN::Input
 				{
 					AxisMap[(int)InputAxis::Move].y = abs(scaledValue);
 				}
-				}
 				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
 				{
 					AxisMap[(int)InputAxis::Move].y = -abs(scaledValue);
-				}
 				}
 				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
 				{
 					AxisMap[(int)InputAxis::Move].x = -abs(scaledValue);
 				}
-				}
 				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
 				{
 					AxisMap[(int)InputAxis::Move].x = abs(scaledValue);
 				}
-				}
 				else if (!LayoutContainsIndex(usedIndex))
 				{
 					if ((axis % 2) == 0)
+					{
 						AxisMap[(int)InputAxis::Camera].y = normalizedValue;
+					}
 					else
+					{
 						AxisMap[(int)InputAxis::Camera].x = normalizedValue;
+					}
 				}
 			}
 
