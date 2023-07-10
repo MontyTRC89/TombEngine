@@ -5,9 +5,7 @@ Version 1.1.0
 * Fix skeletons and mummies not affected by explosive weapons.
 * Fix crash on loading if static meshes with IDs above maximum are present.
 * Fix random crashes when playing audio tracks with names longer than 15 symbols.
-* Fix possible crashes when killing some enemies in 64-bit version.
-* Fix possible crashes when loading savegame in 64-bit version.
-* Fix electricity effect crashing in 64-bit version.
+* Fix various crashes specific to 64-bit build.
 * Fix crashes when trying to play .wav soundtracks on some Windows 11 systems.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
@@ -18,8 +16,9 @@ Version 1.1.0
 * Fix bat AI, damage value, and incorrect collision after death.
 * Fix regeneration for pickups with OCB 128.
 * Fix raising blocks still shaking without OCB.
-* Fix spiky ceiling and add new OCBs for it.
+* Fix spiky ceiling, allow any size of it, and add new OCBs for it.
 * Fix TR1 winged mutant pathfinding and damage issues and add new OCB for it.
+* Fix TR1 natla facing angle, bomb and shard, also this shooting anim in the second phase not playing.
 * Fix last inventory item not properly changed when loading, saving and restarting game.
 * Make screenshot file in "Screenshots" subfolder by pressing print screen key.
 * Implement separate audio track channel for playing voiceovers with subtitles.
@@ -27,6 +26,7 @@ Version 1.1.0
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
+* Change camera bounce to be more accurate to TR4 camera bounce.
 * Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
