@@ -18,6 +18,7 @@
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace OIS;
@@ -95,7 +96,7 @@ namespace TEN::Input
 	// Globals
 	RumbleData				 RumbleInfo  = {};
 	std::vector<InputAction> ActionMap	 = {};
-	vector<QueueState>		 ActionQueue = {};
+	std::vector<QueueState>	 ActionQueue = {};
 	std::vector<bool>		 KeyMap		 = {};
 	std::vector<Vector2>	 AxisMap	 = {};
 
@@ -105,7 +106,13 @@ namespace TEN::Input
 	auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/ // TODO: Dedicated vehicle actions.
+		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+	};
+	auto XInputBindings = std::vector<int>
+	{
+		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_AXIS_LTRIGGER_NEG, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_A, XB_Y, XB_DPAD_DOWN, XB_LSHIFT, XB_B, XB_SELECT, XB_START, XB_LSTICK, XB_RSTICK,
+		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/ // TODO: Dedicated vehicle actions.
 		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
 	};
 
@@ -115,15 +122,15 @@ namespace TEN::Input
 	{
 		{
 			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/
+			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/ // TODO: Dedicated vehicle actions.
 		},
 		{
 			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/
+			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/ // TODO: Dedicated vehicle actions.
 		}
 	};
 
-	void InitialiseEffect()
+	void InitializeEffect()
 	{
 		OisEffect = new Effect(Effect::ConstantForce, Effect::Constant);
 		OisEffect->direction = Effect::North;
@@ -141,7 +148,7 @@ namespace TEN::Input
 		pConstForce.envelope.fadeLevel = 0;
 	}
 
-	void InitialiseInput(HWND handle)
+	void InitializeInput(HWND handle)
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
@@ -187,12 +194,20 @@ namespace TEN::Input
 				OisGamepad = (JoyStick*)OisInputManager->createInputObject(OISJoyStick, true);
 				TENLog("Using '" + OisGamepad->vendor() + "' device for input.", LogLevel::Info);
 
-				// Try initializing vibration interface.
+				// Try to initialize vibration interface.
 				OisRumble = (ForceFeedback*)OisGamepad->queryInterface(Interface::ForceFeedback);
 				if (OisRumble != nullptr)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
-					InitialiseEffect();
+					InitializeEffect();
+				}
+
+				// If controller is XInput and default bindings were successfully assigned, save configuration.
+				if (ApplyDefaultXInputBindings())
+				{
+					g_Configuration.EnableRumble = (OisRumble != nullptr);
+					g_Configuration.EnableThumbstickCameraControl = true;
+					SaveConfiguration();
 				}
 			}
 			catch (OIS::Exception& ex)
@@ -202,7 +217,7 @@ namespace TEN::Input
 		}
 	}
 
-	void DeinitialiseInput()
+	void DeinitializeInput()
 	{
 		if (OisKeyboard != nullptr)
 			OisInputManager->destroyInputObject(OisKeyboard);
@@ -581,7 +596,7 @@ namespace TEN::Input
 
 	void SolveActionCollisions()
 	{
-		// Block simultaneous LEFT+RIGHT actions.
+		// Block simultaneous Left+Right actions.
 		if (IsHeld(In::Left) && IsHeld(In::Right))
 		{
 			ClearAction(In::Left);
@@ -591,7 +606,7 @@ namespace TEN::Input
 
 	void HandlePlayerHotkeys(ItemInfo* item)
 	{
-		static const vector<int> unavailableFlareStates =
+		static const auto UNAVAILABLE_FLARE_STATES = std::vector<int>
 		{
 			LS_CRAWL_FORWARD,
 			LS_CRAWL_TURN_LEFT,
@@ -631,7 +646,7 @@ namespace TEN::Input
 		// Handle flares.
 		if (IsClicked(In::Flare))
 		{
-			if (TestState(item->Animation.ActiveState, unavailableFlareStates))
+			if (TestState(item->Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
 				SayNo();
 		}
 
@@ -704,11 +719,11 @@ namespace TEN::Input
 		}
 		dbMedipack = (KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) ? false : true;
 
-		// Handle saying "no".
-		static bool dbNo = true;
-		if (KeyMap[KC_N] && dbNo)
-			SayNo();
-		dbNo = KeyMap[KC_N] ? false : true;
+		// Save screenshot.
+		static bool dbScreenshot = true;
+		if (KeyMap[KC_SYSRQ] && dbScreenshot)
+			g_Renderer.SaveScreenshot();
+		dbScreenshot = KeyMap[KC_SYSRQ] ? false : true;
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;
@@ -857,6 +872,54 @@ namespace TEN::Input
 		}
 
 		RumbleInfo = {};
+	}
+
+	static void ApplyBindings(const std::vector<int>& bindings)
+	{
+		for (int i = 0; i < bindings.size(); i++)
+		{
+			if (i >= KEY_COUNT)
+				break;
+
+			KeyboardLayout[1][i] = bindings[i];
+		}
+	}
+
+	void ApplyDefaultBindings()
+	{
+		ApplyBindings(DefaultBindings);
+		ApplyDefaultXInputBindings();
+	}
+
+	bool ApplyDefaultXInputBindings()
+	{
+		if (!OisGamepad)
+			return false;
+
+		for (int i = 0; i < KEY_COUNT; i++)
+		{
+			if (KeyboardLayout[1][i] != KC_UNASSIGNED && KeyboardLayout[1][i] != KeyboardLayout[0][i])
+				return false;
+		}
+
+		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
+
+		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
+		{
+			ApplyBindings(XInputBindings);
+
+			for (int i = 0; i < KEY_COUNT; i++)
+				g_Configuration.KeyboardLayout[i] = KeyboardLayout[1][i];
+
+			// Additionally turn on thumbstick camera and vibration.
+			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCameraControl = true;
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	void ClearAction(ActionID actionID)

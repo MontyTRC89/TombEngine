@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseScorpion(short itemNumber);
+	void InitializeScorpion(short itemNumber);
 	void ScorpionControl(short itemNumber);
 }

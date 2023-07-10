@@ -15,11 +15,11 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
@@ -53,7 +53,7 @@ namespace TEN::Entities::Creatures::TR5
 		return (GuardianInfo&)item.Data;
 	}
 
-	void InitialiseGuardian(short itemNumber)
+	void InitializeGuardian(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = GuardianInfo();
@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					origin = GameVector(GetJointPosition(item, 0, Vector3i(0, 168, 248)), item->RoomNumber);
 					origin.RoomNumber = item->RoomNumber;
-					target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i(0, 0, 0)), LaraItem->RoomNumber);
+					target = GameVector(GetJointPosition(LaraItem, LM_HEAD), LaraItem->RoomNumber);
 					target.RoomNumber = LaraItem->RoomNumber;
 
 					if (LOS(&origin, &target))
@@ -164,7 +164,7 @@ namespace TEN::Entities::Creatures::TR5
 			if (item->ItemFlags[0] == 1)
 			{
 				// Get player head position.
-				target = GameVector(GetJointPosition(LaraItem, LM_HEAD, Vector3i::Zero), LaraItem->RoomNumber);
+				target = GameVector(GetJointPosition(LaraItem, LM_HEAD), LaraItem->RoomNumber);
 				target.RoomNumber = LaraItem->RoomNumber;
 
 				// Calculate distance between guardian and player.
@@ -322,13 +322,13 @@ namespace TEN::Entities::Creatures::TR5
 							}
 							else
 							{
-								GameVector origin1 = GetJointPosition(item, GuardianEyeJoints[i], Vector3i::Zero);
+								auto origin1 = GameVector(GetJointPosition(item, GuardianEyeJoints[i]));
 								origin1.RoomNumber = item->RoomNumber;
-								GameVector eye = GameVector::Zero;
+								auto eye = GameVector::Zero;
 								eye.RoomNumber = item->RoomNumber;
 
-								int cosX = MAX_VISIBILITY_DISTANCE * phd_cos(targetOrient.x);
-
+								int cosX = MAX_VISIBILITY_DISTANCE * phd_cos(targetOrient.x - ANGLE(23.45f));
+								
 								eye.x = origin1.x + (cosX * phd_sin(item->Pose.Orientation.y));
 								eye.y = origin1.y + (MAX_VISIBILITY_DISTANCE * phd_sin(-(targetOrient.x - GUARDIAN_ORIENT_OFFSET.x)));
 								eye.z = origin1.z + (cosX * phd_cos(item->Pose.Orientation.y));
@@ -337,9 +337,9 @@ namespace TEN::Entities::Creatures::TR5
 								{
 									// Eye is already firing.
 									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
-									guardian->fireArcs[i]->pos1.x =  origin1.x;
-									guardian->fireArcs[i]->pos1.y =  origin1.y;
-									guardian->fireArcs[i]->pos1.z =  origin1.z;
+									guardian->fireArcs[i]->pos1.x = origin1.x;
+									guardian->fireArcs[i]->pos1.y = origin1.y;
+									guardian->fireArcs[i]->pos1.z = origin1.z;
 
 									// Reset fireArcs and let head follow player.
 									if (guardian->fireArcs[i]->life > 0)
@@ -399,14 +399,14 @@ namespace TEN::Entities::Creatures::TR5
 										if (adx < 280 && ady < 280 && adz < 280)
 											farAway = 2;
 
-										Vector3i hitPos;
+										auto hitPos = Vector3i::Zero;
 										MESH_INFO* hitMesh = nullptr;
 
-										GameVector start = GameVector(guardian->fireArcs[i]->pos1.x, guardian->fireArcs[i]->pos1.y, guardian->fireArcs[i]->pos1.z);
+										auto start = GameVector(guardian->fireArcs[i]->pos1.x, guardian->fireArcs[i]->pos1.y, guardian->fireArcs[i]->pos1.z);
 										start.RoomNumber = item->RoomNumber;
-										GameVector end = GameVector(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, 0);
+										auto end = GameVector(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, 0);
 
-										if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(LaraItem)->ItemNumber)
+										if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == LaraItem->Index)
 										{
 											if (LaraItem->Effect.Type != EffectType::Smoke)
 											{

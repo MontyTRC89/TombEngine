@@ -11,7 +11,7 @@
 
 namespace TEN::Entities::TR4
 {
-    void InitialiseJobySpikes(short itemNumber)
+    void InitializeJobySpikes(short itemNumber)
     {
         auto* item = &g_Level.Items[itemNumber];
 

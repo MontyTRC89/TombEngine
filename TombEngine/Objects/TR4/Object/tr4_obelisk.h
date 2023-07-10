@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseObelisk(short itemNumber);
+void InitializeObelisk(short itemNumber);
 void ObeliskControl(short itemNumber);

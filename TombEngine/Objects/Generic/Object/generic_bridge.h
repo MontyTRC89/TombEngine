@@ -4,9 +4,9 @@
 #include "Game/items.h"
 #include "Game/collision/floordata.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
-void InitialiseBridge(short itemNumber);
+void InitializeBridge(short itemNumber);
 int GetOffset(short angle, int x, int z);
 
 template <int tilt>
@@ -17,7 +17,7 @@ std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)
 
 	if (bboxHeight.has_value() && tilt != 0)
 	{
-		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + SECTOR(1) / 8);
+		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + BLOCK(1) / 8);
 		return std::optional{ height };
 	}
 
@@ -32,7 +32,7 @@ std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
 
 	if (bboxHeight.has_value() && tilt != 0)
 	{
-		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + SECTOR(1) / 8);
+		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + BLOCK(1) / 8);
 		return std::optional{ height + CLICK(1) }; // To be customized with Lua
 	}
 	return bboxHeight;

@@ -21,13 +21,13 @@ using namespace TEN::Gui;
 namespace TEN::Entities::TR4
 {
 	const auto SentryGunFlameOffset = Vector3i(-140, 0, 0);
-	const auto SentryGunBite = BiteInfo(Vector3::Zero, 8);
+	const auto SentryGunBite = CreatureBiteInfo(Vector3::Zero, 8);
 
-	void InitialiseSentryGun(short itemNumber)
+	void InitializeSentryGun(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[1] = 768;
 		item->ItemFlags[2] = 0;
@@ -51,7 +51,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item->ItemFlags[0])
 			{
-				auto pos = GetJointPosition(item, SentryGunBite.meshNum, Vector3i(SentryGunBite.Position));
+				auto pos = GetJointPosition(item, SentryGunBite);
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->ItemFlags[0] + 12, 24, 16, 4);
 				item->ItemFlags[0]--;
 			}
@@ -78,11 +78,11 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &AI))
 				{
-					if (AI.distance < pow(SECTOR(9), 2))
+					if (AI.distance < pow(BLOCK(9), 2))
 					{
 						if (!g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->ItemFlags[0])
 						{
-							if (AI.distance <= pow(SECTOR(2), 2))
+							if (AI.distance <= pow(BLOCK(2), 2))
 							{
 								// Throw fire
 								ThrowFire(itemNumber, 7, SentryGunFlameOffset, SentryGunFlameOffset);
@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
+			ExplodingDeath(itemNumber, BODY_DO_EXPLOSION | BODY_NO_BOUNCE);
 			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
 

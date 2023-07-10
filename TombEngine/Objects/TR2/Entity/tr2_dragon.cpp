@@ -12,10 +12,10 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -24,14 +24,14 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
-	const auto DragonMouthBite = BiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
+	const auto DragonMouthBite = CreatureBiteInfo(Vector3(35, 171, 1168), 12);
 	const auto DragonSwipeAttackJointsLeft  = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
 
 	// TODO: Organise.
 	#define DRAGON_LIVE_TIME (30 * 11)
-	#define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
-	#define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
+	#define DRAGON_CLOSE_RANGE pow(BLOCK(3), 2)
+	#define DRAGON_STATE_IDLE_RANGE pow(BLOCK(6), 2)
 	#define DRAGON_FLAME_SPEED 200
 
 	#define DRAGON_ALMOST_LIVE 100
@@ -39,7 +39,7 @@ namespace TEN::Entities::Creatures::TR2
 	#define BOOM_TIME_MIDDLE 140
 	#define BOOM_TIME_END 150
 
-	#define BARTOLI_RANGE SECTOR(9)
+	#define BARTOLI_RANGE BLOCK(9)
 	#define DRAGON_CLOSE 900
 	#define DRAGON_FAR 2300
 	#define DRAGON_MID ((DRAGON_CLOSE + DRAGON_FAR) / 2)
@@ -115,7 +115,7 @@ namespace TEN::Entities::Creatures::TR2
 			explosionItem->Animation.Velocity.y = 0.0f;
 			explosionItem->Animation.Velocity.z = 0.0f;
 
-			InitialiseItem(ExplosionIndex);
+			InitializeItem(ExplosionIndex);
 			AddActiveItem(ExplosionIndex);
 
 			explosionItem->Status = ITEM_ACTIVE;
@@ -138,7 +138,7 @@ namespace TEN::Entities::Creatures::TR2
 			dragonBack->Pose.Orientation.z = 0;
 			dragonBack->RoomNumber = item->RoomNumber;
 
-			InitialiseItem(boneBack);
+			InitializeItem(boneBack);
 
 			auto* dragonFront = &g_Level.Items[boneFront];
 
@@ -148,7 +148,7 @@ namespace TEN::Entities::Creatures::TR2
 			dragonFront->Pose.Orientation.z = 0;
 			dragonFront->RoomNumber = item->RoomNumber;
 
-			InitialiseItem(boneFront);
+			InitializeItem(boneFront);
 
 			dragonFront->MeshBits = 0xFF3FFFFF;
 		}
@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR2
 				int angle = laraItem->Pose.Orientation.y - item->Pose.Orientation.y;
 
 				int anim = item->Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
-				int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 				if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 					TrInput & IN_ACTION &&
@@ -193,18 +193,14 @@ namespace TEN::Entities::Creatures::TR2
 					angle >(ANGLE(45.0f) - ANGLE(30.0f)) &&
 					angle < (ANGLE(45.0f) + ANGLE(30.0f)))
 				{
-					laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = 0;
-					laraItem->Animation.TargetState = 7;
-
+					SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
 					laraItem->Pose = item->Pose;
 					laraItem->Animation.IsAirborne = false;
 					laraItem->Animation.Velocity.y = 0.0f;
 					laraItem->Animation.Velocity.z = 0.0f;
 
 					if (item->RoomNumber != laraItem->RoomNumber)
-						ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
+						ItemNewRoom(laraItem->Index, item->RoomNumber);
 
 					AnimateItem(LaraItem);
 
@@ -442,14 +438,14 @@ namespace TEN::Entities::Creatures::TR2
 
 		back->Animation.ActiveState = item->Animation.ActiveState;
 		back->Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item->Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
-		back->Animation.FrameNumber = g_Level.Anims[back->Animation.AnimNumber].frameBase + (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
+		back->Animation.FrameNumber =  GetAnimData(back).frameBase + (item->Animation.FrameNumber - GetAnimData(item).frameBase);
 		back->Pose = item->Pose;
 
 		if (back->RoomNumber != item->RoomNumber)
 			ItemNewRoom(backItemNumber, item->RoomNumber);
 	}
 
-	void InitialiseBartoli(short itemNumber)
+	void InitializeBartoli(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -469,7 +465,7 @@ namespace TEN::Entities::Creatures::TR2
 			back->Status = ITEM_INVISIBLE;
 			back->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			InitialiseItem(backItem);
+			InitializeItem(backItem);
 			back->MeshBits = 0x1FFFFF;
 
 			item->Data = backItem;
@@ -483,7 +479,7 @@ namespace TEN::Entities::Creatures::TR2
 			front->Status = ITEM_INVISIBLE;
 			front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-			InitialiseItem(frontItem);
+			InitializeItem(frontItem);
 
 			back->Data = frontItem;
 
@@ -530,7 +526,7 @@ namespace TEN::Entities::Creatures::TR2
 					front->RoomNumber = item->RoomNumber;
 					front->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-					InitialiseItem(frontItem);
+					InitializeItem(frontItem);
 					AddActiveItem(frontItem);
 					front->Status = ITEM_ACTIVE;
 				}

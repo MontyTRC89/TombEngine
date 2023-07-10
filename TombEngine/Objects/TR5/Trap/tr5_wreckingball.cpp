@@ -12,16 +12,16 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
+#include "Objects/TR5/Light/tr5_light.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "tr5_light.h"
 
 using namespace TEN::Effects::Environment;
 
 static short WreckingBallData[2] = { 0, 0 };
 
-void InitialiseWreckingBall(short itemNumber)
+void InitializeWreckingBall(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -96,10 +96,10 @@ void WreckingBallControl(short itemNumber)
 
 	bool test = true;
 
-	if ((LaraItem->Pose.Position.x >= SECTOR(44) &&
-		LaraItem->Pose.Position.x <= SECTOR(56)&&
-		LaraItem->Pose.Position.z >= SECTOR(26) &&
-		LaraItem->Pose.Position.z <= SECTOR(42)) ||
+	if ((LaraItem->Pose.Position.x >= BLOCK(44) &&
+		LaraItem->Pose.Position.x <= BLOCK(56)&&
+		LaraItem->Pose.Position.z >= BLOCK(26) &&
+		LaraItem->Pose.Position.z <= BLOCK(42)) ||
 		item->ItemFlags[2] < 900)
 	{
 		if (item->ItemFlags[2] < 900)
@@ -233,7 +233,7 @@ void WreckingBallControl(short itemNumber)
 			--item->TriggerFlags;
 		else if (!item->Animation.ActiveState)
 			item->Animation.TargetState = 1;
-		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		else if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 		{
 			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose);
 			++item->ItemFlags[1];

@@ -10,16 +10,16 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::TR4
 {
 	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
 
-	const auto GuideBite1 = BiteInfo(Vector3(0.0f, 20.0f, 180.0f), 18);
-	const auto GuideBite2 = BiteInfo(Vector3(30.0f, 80.0f, 50.0f), 15);
+	const auto GuideBite1 = CreatureBiteInfo(Vector3(0, 20, 180), 18);
+	const auto GuideBite2 = CreatureBiteInfo(Vector3(30, 80, 50), 15);
 	const auto GuideLeftFingerSwapJoints = std::vector<unsigned int>{ 15 };
 	const auto GuideRightHandSwapJoints	 = std::vector<unsigned int>{ 18 };
 	const auto GuideHeadSwapJoints		 = std::vector<unsigned int>{ 21 };
@@ -92,11 +92,11 @@ namespace TEN::Entities::TR4
 		GUIDE_ANIM_ACTIVATE_TRAP_CROUCHING = 69
 	};
 
-	void InitialiseGuide(short itemNumber)
+	void InitializeGuide(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, GUIDE_ANIM_IDLE);
 		item->SetMeshSwapFlags(GuideRightHandSwapJoints);
 	}
@@ -119,7 +119,7 @@ namespace TEN::Entities::TR4
 		// Ignite torch.
 		if (item->ItemFlags[1] == 2)
 		{
-			auto pos = GetJointPosition(item, GuideBite1.meshNum, Vector3i(GuideBite1.Position));
+			auto pos = GetJointPosition(item, GuideBite1);
 			TriggerFireFlame(pos.x, pos.y - 20, pos.z, FlameType::Trail);
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
@@ -133,8 +133,8 @@ namespace TEN::Entities::TR4
 
 			if (item->Animation.AnimNumber == (object->animIndex + GUIDE_ANIM_LIGHTING_TORCH))
 			{
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 32 &&
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
+				if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 32 &&
+					item->Animation.FrameNumber < GetAnimData(item).frameBase + 42)
 				{
 					TriggerFireFlame(
 						(random & 0x3F) + pos.x - 32,
@@ -479,8 +479,8 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_IGNITE_TORCH:
-			pos1 = GetJointPosition(item, GuideBite2.meshNum, Vector3i(GuideBite2.Position));
-			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			pos1 = GetJointPosition(item, GuideBite2);
+			frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 			random = GetRandomControl();
 
 			if (frameNumber == 32)
@@ -588,8 +588,8 @@ namespace TEN::Entities::TR4
 			{
 				if (enemy)
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
-						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
+					if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 15 &&
+						item->Animation.FrameNumber < GetAnimData(item).frameBase + 26)
 					{
 						float distance = Vector3i::Distance(item->Pose.Position, enemy->Pose.Position);
 						if (distance <= CLICK(2))
@@ -631,7 +631,7 @@ namespace TEN::Entities::TR4
 			else
 			{
 				if (item->Animation.AnimNumber != (object->animIndex + GUIDE_ANIM_IDLE_CROUCH) &&
-					item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameEnd - 20))
+					item->Animation.FrameNumber == (GetAnimData(item).frameEnd - 20))
 				{
 					TestTriggers(item, true);
 
@@ -647,12 +647,12 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_PICK_UP_TORCH:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 			{
 				someFlag = true;
 				item->Pose = enemy->Pose;
 			}
-			else if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 35))
+			else if (item->Animation.FrameNumber == (GetAnimData(item).frameBase + 35))
 			{
 				item->SetMeshSwapFlags(GuideRightHandSwapJoints, true);
 
@@ -692,11 +692,11 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_LIGHT_TORCHES:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+			if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				item->Pose.Position = enemy->Pose.Position;
 			else
 			{
-				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 42))
+				if (item->Animation.FrameNumber == (GetAnimData(item).frameBase + 42))
 				{
 					TestTriggers(item, true);
 
@@ -707,7 +707,7 @@ namespace TEN::Entities::TR4
 					creature->Enemy = nullptr;
 					break;
 				}
-				else if (item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + 42))
+				else if (item->Animation.FrameNumber < (GetAnimData(item).frameBase + 42))
 				{
 					if ((enemy->Pose.Orientation.y - item->Pose.Orientation.y) <= ANGLE(2.0f))
 					{
@@ -722,9 +722,9 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_READ_INSCRIPTION:
-			if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
+			if (item->Animation.FrameNumber >= GetAnimData(item).frameBase + 20)
 			{
-				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 20))
+				if (item->Animation.FrameNumber == (GetAnimData(item).frameBase + 20))
 				{
 					item->Animation.TargetState = GUIDE_STATE_IDLE;
 
@@ -737,14 +737,14 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 70) &&
+				if (item->Animation.FrameNumber == (GetAnimData(item).frameBase + 70) &&
 					flagScaryInscription)
 				{
 					item->Animation.RequiredState = GUIDE_STATE_RUN_FORWARD;
 					item->SetMeshSwapFlags(GuideHeadSwapJoints);
 					SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose);
 				}
-				if (item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 185) &&
+				if (item->Animation.FrameNumber == (GetAnimData(item).frameBase + 185) &&
 					flagScaryInscription)
 				{
 					item->ItemFlags[2] &= ~(1 << 4); // Turn off 4th bit for flagScaryInscription.

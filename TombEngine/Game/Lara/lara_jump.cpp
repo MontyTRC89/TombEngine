@@ -10,11 +10,11 @@
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_slide.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Game/Setup.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -126,7 +126,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_freefall()
 void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Velocity.z = item->Animation.Velocity.z * 0.95f;
+	item->Animation.Velocity.z *= 0.95f;
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 

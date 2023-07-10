@@ -1,8 +1,8 @@
 #pragma once
 #include "Game/control/volumeactivator.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Renderer/Renderer11.h"
-#include "Specific/setup.h"
 
 struct CollisionSetup;
 
@@ -44,7 +44,7 @@ namespace TEN::Control::Volumes
 	void TestVolumes(CAMERA_INFO* camera);
 
 	void HandleEvent(VolumeEvent& event, VolumeActivator& activator);
-	void InitialiseNodeScripts();
+	void InitializeNodeScripts();
 }
 
 // TODO: Move into namespace and deal with errors.

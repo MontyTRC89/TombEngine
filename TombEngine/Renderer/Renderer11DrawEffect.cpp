@@ -24,11 +24,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Quad/RenderQuad.h"
+#include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/Utils/object_helper.h"
 #include "Renderer/RendererSprites.h"
+#include "Renderer/Quad/RenderQuad.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -40,33 +42,15 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Math;
+using namespace TEN::Traps::TR5;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
-
-// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions.
-
-BiteInfo EnemyBites[12] =
-{
-	{ 20, -95, 240, 13 },
-	{ 48, 0, 180, -11 },
-	{ -48, 0, 180, 14 },
-	{ -48, 5, 225, 14 },
-	{ 15, -60, 195, 13 },
-	{ -30, -65, 250, 18 },
-	{ 0, -110, 480, 13 },
-	{ -20, -80, 190, -10 },
-	{ 10, -60, 200, 13 },
-	{ 10, -60, 200, 11 }, // Baddy 2
-	{ 20, -60, 400, 7 },  // SAS
-	{ 0, -64, 250, 7 }	  // Troops
-};
 
 namespace TEN::Renderer 
 {
@@ -77,9 +61,31 @@ namespace TEN::Renderer
 		RendererSprite* Sprite;
 		BLEND_MODES BlendMode;
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
-		bool IsBillboard;
-		bool IsSoftParticle;
+
+		bool IsBillboard	= false;
+		bool IsSoftParticle = false;
+
+		SpriteRenderType RenderType;
 	};
+	
+	void Renderer11::DrawLaserBarriers(RenderView& view)
+	{
+		if (LaserBarriers.empty())
+			return;
+
+		for (const auto& [entityID, barrier] : LaserBarriers)
+		{
+			for (const auto& beam : barrier.Beams)
+			{
+				AddColoredQuad(
+					beam.VertexPoints[0], beam.VertexPoints[1],
+					beam.VertexPoints[2], beam.VertexPoints[3],
+					barrier.Color, barrier.Color,
+					barrier.Color, barrier.Color,
+					BLENDMODE_ADDITIVE, view, SpriteRenderType::LaserBarrier);
+			}
+		}
+	}
 
 	void Renderer11::DrawStreamers(RenderView& view)
 	{
@@ -142,6 +148,9 @@ namespace TEN::Renderer
 		if (HelicalLasers.empty())
 			return;
 
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Helical lasers rendering"))
+			return;
+
 		for (const auto& laser : HelicalLasers)
 		{
 			if (laser.Life <= 0.0f)
@@ -190,13 +199,19 @@ namespace TEN::Renderer
 		if (ElectricityArcs.empty())
 			return;
 
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Electricity rendering"))
+			return;
+
 		for (const auto& arc : ElectricityArcs)
 		{
 			if (arc.life <= 0)
 				continue;
 
 			ElectricityKnots[0] = arc.pos1;
-			memcpy(&ElectricityKnots[1], &arc, 96); // TODO: What? Copying 94 / 4 = 24 floats, or 24 / 3 = 8 Vector3 objects, but that doesn't fit. Does it spill into the buffer?
+			ElectricityKnots[1] = arc.pos1;
+			ElectricityKnots[2] = arc.pos2;
+			ElectricityKnots[3] = arc.pos3;
+			ElectricityKnots[4] = arc.pos4;
 			ElectricityKnots[5] = arc.pos4;
 
 			for (int j = 0; j < ElectricityKnots.size(); j++)
@@ -380,6 +395,9 @@ namespace TEN::Renderer
 			}
 			else
 			{
+				if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering"))
+					continue;
+
 				auto pos = Vector3(particle.x, particle.y, particle.z);
 				auto axis = Vector3(particle.xVel, particle.yVel, particle.zVel);
 				axis.Normalize();
@@ -403,59 +421,62 @@ namespace TEN::Renderer
 		{
 			auto& splash = Splashes[i];
 
-			if (splash.isActive) 
+			if (!splash.isActive)
+				continue;
+
+			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Splashes rendering"))
+				return;
+
+			constexpr float alpha = 360 / NUM_POINTS;
+			byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
+
+			if (!splash.isRipple) 
 			{
-				constexpr float alpha = 360 / NUM_POINTS;
-				byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
-
-				if (!splash.isRipple) 
+				if (splash.heightSpeed < 0 && splash.height < 1024) 
 				{
-					if (splash.heightSpeed < 0 && splash.height < 1024) 
-					{
-						float multiplier = splash.height / 1024.0f;
-						color = (float)color * multiplier;
-					}
+					float multiplier = splash.height / 1024.0f;
+					color = (float)color * multiplier;
 				}
+			}
 
-				float innerRadius = splash.innerRad;
-				float outerRadius = splash.outerRad;
-				float xInner;
-				float zInner;
-				float xOuter;
-				float zOuter;
-				float x2Inner;
-				float z2Inner;
-				float x2Outer;
-				float z2Outer;
-				float yInner = splash.y;
-				float yOuter = splash.y - splash.height;
+			float innerRadius = splash.innerRad;
+			float outerRadius = splash.outerRad;
+			float xInner;
+			float zInner;
+			float xOuter;
+			float zOuter;
+			float x2Inner;
+			float z2Inner;
+			float x2Outer;
+			float z2Outer;
+			float yInner = splash.y;
+			float yOuter = splash.y - splash.height;
 
-				for (int i = 0; i < NUM_POINTS; i++) 
-				{
-					xInner = innerRadius * sin(alpha * i * PI / 180);
-					zInner = innerRadius * cos(alpha * i * PI / 180);
-					xOuter = outerRadius * sin(alpha * i * PI / 180);
-					zOuter = outerRadius * cos(alpha * i * PI / 180);
-					xInner += splash.x;
-					zInner += splash.z;
-					xOuter += splash.x;
-					zOuter += splash.z;
-					int j = (i + 1) % NUM_POINTS;
-					x2Inner = innerRadius * sin(alpha * j * PI / 180);
-					x2Inner += splash.x;
-					z2Inner = innerRadius * cos(alpha * j * PI / 180);
-					z2Inner += splash.z;
-					x2Outer = outerRadius * sin(alpha * j * PI / 180);
-					x2Outer += splash.x;
-					z2Outer = outerRadius * cos(alpha * j * PI / 180);
-					z2Outer += splash.z;
-					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
-								Vector3(xOuter, yOuter, zOuter), 
-								Vector3(x2Outer, yOuter, z2Outer), 
-								Vector3(x2Inner, yInner, z2Inner), 
-								Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
-								0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
-				}
+			for (int i = 0; i < NUM_POINTS; i++) 
+			{
+				xInner = innerRadius * sin(alpha * i * PI / 180);
+				zInner = innerRadius * cos(alpha * i * PI / 180);
+				xOuter = outerRadius * sin(alpha * i * PI / 180);
+				zOuter = outerRadius * cos(alpha * i * PI / 180);
+				xInner += splash.x;
+				zInner += splash.z;
+				xOuter += splash.x;
+				zOuter += splash.z;
+				int j = (i + 1) % NUM_POINTS;
+				x2Inner = innerRadius * sin(alpha * j * PI / 180);
+				x2Inner += splash.x;
+				z2Inner = innerRadius * cos(alpha * j * PI / 180);
+				z2Inner += splash.z;
+				x2Outer = outerRadius * sin(alpha * j * PI / 180);
+				x2Outer += splash.x;
+				z2Outer = outerRadius * cos(alpha * j * PI / 180);
+				z2Outer += splash.z;
+				AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
+							Vector3(xOuter, yOuter, zOuter), 
+							Vector3(x2Outer, yOuter, z2Outer), 
+							Vector3(x2Inner, yInner, z2Inner), 
+							Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
+							0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
 			}
 		}
 	}
@@ -463,6 +484,9 @@ namespace TEN::Renderer
 	void Renderer11::DrawBubbles(RenderView& view) 
 	{
 		if (Bubbles.empty())
+			return;
+
+		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Bubbles rendering"))
 			return;
 
 		for (const auto& bubble : Bubbles)
@@ -480,6 +504,9 @@ namespace TEN::Renderer
 	void Renderer11::DrawDrips(RenderView& view)
 	{
 		if (Drips.empty())
+			return;
+
+		if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Drips rendering"))
 			return;
 
 		for (const auto& drip : Drips)
@@ -559,163 +586,164 @@ namespace TEN::Renderer
 		{
 			SHOCKWAVE_STRUCT* shockwave = &ShockWaves[i];
 
-			if (shockwave->life)
+			if (!shockwave->life)
+				continue;
+
+			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Shockwaves rendering"))
+				return;
+
+			byte color = shockwave->life * 8;
+
+			shockwave->yRot += shockwave->yRot / FPS;
+
+			auto rotMatrix =
+				Matrix::CreateRotationY(shockwave->yRot / 4) *
+				Matrix::CreateRotationZ(shockwave->zRot) *
+				Matrix::CreateRotationX(shockwave->xRot);
+
+			auto pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
+
+			// Inner circle
+			if (shockwave->style == (int)ShockwaveStyle::Normal)
 			{
-				byte color = shockwave->life * 8;
+				angle = PI / 32.0f;
+				c = cos(angle);
+				s = sin(angle);
+				angle -= PI / 8.0f;
+			}
+			else
+			{
+				angle = PI / 16.0f;
+				c = cos(angle);
+				s = sin(angle);
+				angle -= PI / 4.0f;
+			}
 
-				//int dl = shockwave->outerRad - shockwave->innerRad;
+			float x1 = (shockwave->innerRad * c);
+			float z1 = (shockwave->innerRad * s);
+			float x4 = (shockwave->outerRad * c);
+			float z4 = (shockwave->outerRad * s);
 
-				shockwave->yRot += shockwave->yRot / FPS;
+			auto p1 = Vector3(x1, 0, z1);
+			auto p4 = Vector3(x4, 0, z4);
 
-				auto rotMatrix =
-					Matrix::CreateRotationY(shockwave->yRot / 4) *
-					Matrix::CreateRotationZ(shockwave->zRot) *
-					Matrix::CreateRotationX(shockwave->xRot);
+			p1 = Vector3::Transform(p1, rotMatrix);
+			p4 = Vector3::Transform(p4, rotMatrix);
 
-				auto pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
-
-				// Inner circle
-				if (shockwave->style == (int)ShockwaveStyle::Normal)
+			if (shockwave->fadeIn == true)
+			{
+				if (shockwave->sr < shockwave->r)
 				{
-					angle = PI / 32.0f;
-					c = cos(angle);
-					s = sin(angle);
-					angle -= PI / 8.0f;
-				}
-				else
-				{
-					angle = PI / 16.0f;
-					c = cos(angle);
-					s = sin(angle);
-					angle -= PI / 4.0f;
-				}
-
-				float x1 = (shockwave->innerRad * c);
-				float z1 = (shockwave->innerRad * s);
-				float x4 = (shockwave->outerRad * c);
-				float z4 = (shockwave->outerRad * s);
-
-				auto p1 = Vector3(x1, 0, z1);
-				auto p4 = Vector3(x4, 0, z4);
-
-				p1 = Vector3::Transform(p1, rotMatrix);
-				p4 = Vector3::Transform(p4, rotMatrix);
-
-				if (shockwave->fadeIn == true)
-				{
-					if (shockwave->sr < shockwave->r)
-					{
-						shockwave->sr += shockwave->r / 18;
-						r = shockwave->sr * shockwave->life / 255.0f;
-					}
-					else
-					{
-						r = shockwave->r * shockwave->life / 255.0f;
-					}
-
-
-					if (shockwave->sg < shockwave->g)
-					{
-						shockwave->sg += shockwave->g / 18;
-						g = shockwave->sg * shockwave->life / 255.0f;
-					}
-					else
-					{
-						g = shockwave->g * shockwave->life / 255.0f;
-					}
-
-
-					if (shockwave->sb < shockwave->b)
-					{
-						shockwave->sb += shockwave->b / 18;
-						b = shockwave->sb * shockwave->life / 255.0f;
-					}
-					else
-					{
-						b = shockwave->b * shockwave->life / 255.0f;
-					}
-
-					if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
-						shockwave->fadeIn = false;
-
+					shockwave->sr += shockwave->r / 18;
+					r = shockwave->sr * shockwave->life / 255.0f;
 				}
 				else
 				{
 					r = shockwave->r * shockwave->life / 255.0f;
+				}
+
+
+				if (shockwave->sg < shockwave->g)
+				{
+					shockwave->sg += shockwave->g / 18;
+					g = shockwave->sg * shockwave->life / 255.0f;
+				}
+				else
+				{
 					g = shockwave->g * shockwave->life / 255.0f;
+				}
+
+
+				if (shockwave->sb < shockwave->b)
+				{
+					shockwave->sb += shockwave->b / 18;
+					b = shockwave->sb * shockwave->life / 255.0f;
+				}
+				else
+				{
 					b = shockwave->b * shockwave->life / 255.0f;
 				}
 
-				for (int j = 0; j < 16; j++)
+				if (r == shockwave->r && g == shockwave->g && b == shockwave->b)
+					shockwave->fadeIn = false;
+
+			}
+			else
+			{
+				r = shockwave->r * shockwave->life / 255.0f;
+				g = shockwave->g * shockwave->life / 255.0f;
+				b = shockwave->b * shockwave->life / 255.0f;
+			}
+
+			for (int j = 0; j < 16; j++)
+			{
+				c = cos(angle);
+				s = sin(angle);
+
+				float x2 = (shockwave->innerRad * c);
+				float z2 = (shockwave->innerRad * s);
+
+				float x3 = (shockwave->outerRad * c);
+				float z3 = (shockwave->outerRad * s);
+
+				auto p2 = Vector3(x2, 0, z2);
+				auto p3 = Vector3(x3, 0, z3);
+
+				p2 = Vector3::Transform(p2, rotMatrix);
+				p3 = Vector3::Transform(p3, rotMatrix);
+
+				if (shockwave->style == (int)ShockwaveStyle::Normal)
 				{
-					c = cos(angle);
-					s = sin(angle);
+					angle -= PI / 8.0f;
 
-					float x2 = (shockwave->innerRad * c);
-					float z2 = (shockwave->innerRad * s);
-
-					float x3 = (shockwave->outerRad * c);
-					float z3 = (shockwave->outerRad * s);
-
-					auto p2 = Vector3(x2, 0, z2);
-					auto p3 = Vector3(x3, 0, z3);
-
-					p2 = Vector3::Transform(p2, rotMatrix);
-					p3 = Vector3::Transform(p3, rotMatrix);
-
-					if (shockwave->style == (int)ShockwaveStyle::Normal)
-					{
-						angle -= PI / 8.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
-							pos + p1,
-							pos + p2,
-							pos + p3,
-							pos + p4,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, false, view);
-					}
-					else if (shockwave->style == (int)ShockwaveStyle::Sophia)
-					{
-						angle -= PI / 4.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
-							pos + p1,
-							pos + p2,
-							pos + p3,
-							pos + p4,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
-
-					}
-					else if (shockwave->style == (int)ShockwaveStyle::Knockback)
-					{
-						angle -= PI / 4.0f;
-
-						AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
-							pos + p4,
-							pos + p3,
-							pos + p2,
-							pos + p1,
-							Vector4(
-								r / 16.0f,
-								g / 16.0f,
-								b / 16.0f,
-								1.0f),
-							0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
-					}
-
-					p1 = p2;
-					p4 = p3;
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+						pos + p1,
+						pos + p2,
+						pos + p3,
+						pos + p4,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, false, view);
 				}
+				else if (shockwave->style == (int)ShockwaveStyle::Sophia)
+				{
+					angle -= PI / 4.0f;
+
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						pos + p1,
+						pos + p2,
+						pos + p3,
+						pos + p4,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+
+				}
+				else if (shockwave->style == (int)ShockwaveStyle::Knockback)
+				{
+					angle -= PI / 4.0f;
+
+					AddQuad(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH3],
+						pos + p4,
+						pos + p3,
+						pos + p2,
+						pos + p1,
+						Vector4(
+							r / 16.0f,
+							g / 16.0f,
+							b / 16.0f,
+							1.0f),
+						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+				}
+
+				p1 = p2;
+				p4 = p3;
 			}
 		}
 	}
@@ -728,6 +756,9 @@ namespace TEN::Renderer
 
 			if (blood->on) 
 			{
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Blood rendering"))
+					return;
+
 				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
@@ -749,6 +780,10 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::None:
+
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Underwater dust rendering"))
+					return;
+
 				AddSpriteBillboard(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
@@ -759,6 +794,10 @@ namespace TEN::Renderer
 				break;
 
 			case WeatherType::Snow:
+
+				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Snow rendering"))
+					return;
+
 				AddSpriteBillboard(
 					&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
@@ -769,6 +808,10 @@ namespace TEN::Renderer
 				break;
 
 			case WeatherType::Rain:
+
+				if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Rain rendering"))
+					return;
+
 				Vector3 v;
 				p.Velocity.Normalize(v);
 
@@ -802,13 +845,13 @@ namespace TEN::Renderer
 		if (BinocularRange > 0)
 			return true;
 
-		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
-		RendererItem* item = &m_items[Lara.ItemNumber];
+		const auto& room = m_rooms[LaraItem->RoomNumber];
+		auto* itemPtr = &m_items[LaraItem->Index];
 
 		m_stStatic.Color = Vector4::One;
 		m_stStatic.AmbientLight = room.AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
-		BindStaticLights(item->LightsToDraw);
+		BindStaticLights(itemPtr->LightsToDraw);
 
 		short length = 0;
 		short zOffset = 0;
@@ -849,7 +892,7 @@ namespace TEN::Renderer
 				break;
 			}
 
-			// Use MP5 flash if available
+			// Use MP5 flash if available.
 			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
 			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
 			{
@@ -858,11 +901,10 @@ namespace TEN::Renderer
 				zOffset += 10;
 			}
 
-			ObjectInfo* flashObj = &Objects[gunflash];
-			RendererObject& flashMoveable = *m_moveableObjects[gunflash];
-			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
+			const auto& flashMoveable = *m_moveableObjects[gunflash];
+			const auto& flashMesh = *flashMoveable.ObjectMeshes[0];
 
-			for (auto& flashBucket : flashMesh->Buckets) 
+			for (const auto& flashBucket : flashMesh.Buckets) 
 			{
 				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
@@ -872,18 +914,17 @@ namespace TEN::Renderer
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-				Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
-				Matrix rotation = Matrix::CreateRotationX(TO_RAD(rotationX));
+				auto tMatrix = Matrix::CreateTranslation(0, length, zOffset);
+				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(rotationX));
 
-				Matrix world;
-
+				auto worldMatrix = Matrix::Identity;
 				if (Lara.LeftArm.GunFlash)
 				{
-					world = item->AnimationTransforms[LM_LHAND] * item->World;
-					world = offset * world;
-					world = rotation * world;
+					worldMatrix = itemPtr->AnimationTransforms[LM_LHAND] * itemPtr->World;
+					worldMatrix = tMatrix * worldMatrix;
+					worldMatrix = rotMatrix * worldMatrix;
 
-					m_stStatic.World = world;
+					m_stStatic.World = worldMatrix;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 					BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -893,11 +934,11 @@ namespace TEN::Renderer
 
 				if (Lara.RightArm.GunFlash)
 				{
-					world = item->AnimationTransforms[LM_RHAND] * item->World;
-					world = offset * world;
-					world = rotation * world;
+					worldMatrix = itemPtr->AnimationTransforms[LM_RHAND] * itemPtr->World;
+					worldMatrix = tMatrix * worldMatrix;
+					worldMatrix = rotMatrix * worldMatrix;
 
-					m_stStatic.World = world;
+					m_stStatic.World = worldMatrix;
 					m_cbStatic.updateData(m_stStatic, m_context.Get());
 					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 					BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -908,7 +949,6 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(BLENDMODE_OPAQUE);
-
 		return true;
 	}
 
@@ -925,52 +965,35 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto room : view.roomsToDraw)
+		for (auto* rRoomPtr : view.RoomsToDraw)
 		{
-			for (auto item : room->ItemsToDraw)
+			for (auto* rItemPtr : rRoomPtr->ItemsToDraw)
 			{
-				// Does the item need gunflash?
-				ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-				ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
+				auto& nativeItem = g_Level.Items[rItemPtr->ItemNumber];
 
-				if (obj->biteOffset == -1)
+				if (!nativeItem.IsCreature())
 					continue;
 
-				if (nativeItem->Data.is<CreatureInfo>())
-				{
-					auto* creature = GetCreatureInfo(nativeItem);
-					if (!creature->FiredWeapon)
-						continue;
-				}
-				else
-					continue;
-
-				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
-				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
+				auto& creature = *GetCreatureInfo(&nativeItem);
+				const auto& rRoom = m_rooms[nativeItem.RoomNumber];
 
 				m_stStatic.Color = Vector4::One;
-				m_stStatic.AmbientLight = room.AmbientLight;
+				m_stStatic.AmbientLight = rRoom.AmbientLight;
 				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
-				BindStaticLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
-				 
+
+				BindStaticLights(rItemPtr->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 				SetBlendMode(BLENDMODE_ADDITIVE);
-				
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-				BiteInfo* bites[2] = {
-					&EnemyBites[obj->biteOffset],
-					&EnemyBites[obj->biteOffset + 1]
-				};
-
-				int numBites = (bites[0]->meshNum < 0) + 1;
-
-				for (int k = 0; k < numBites; k++)
+				if (creature.MuzzleFlash[0].Delay != 0 && creature.MuzzleFlash[0].Bite.BoneID != -1)
 				{
-					int joint = abs(bites[k]->meshNum);
+					auto flashObjectID = creature.MuzzleFlash[0].SwitchToMuzzle2 ?
+						m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH :
+						ID_GUN_FLASH;
 
-					RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
-
-					for (auto& flashBucket : flashMesh->Buckets)
+					const auto& flashMoveable = *m_moveableObjects[flashObjectID]->ObjectMeshes.at(0);
+					
+					for (const auto& flashBucket : flashMoveable.Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
@@ -980,19 +1003,62 @@ namespace TEN::Renderer
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-						Matrix offset = Matrix::CreateTranslation(bites[k]->Position);
-						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
-						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[0].Bite.Position);
+						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						Matrix world = item->AnimationTransforms[joint] * item->World;
-						world = rotationX * world;
-						world = offset * world;
-						world = rotationZ * world;
+						auto worldMatrix = rItemPtr->AnimationTransforms[creature.MuzzleFlash[0].Bite.BoneID] * rItemPtr->World;
+						worldMatrix = tMatrix * worldMatrix;
 
-						m_stStatic.World = world;
+						if (creature.MuzzleFlash[0].ApplyXRotation)
+							worldMatrix = rotMatrixX * worldMatrix;
+
+						if (creature.MuzzleFlash[0].ApplyZRotation)
+							worldMatrix = rotMatrixZ * worldMatrix;
+
+						m_stStatic.World = worldMatrix;
 						m_cbStatic.updateData(m_stStatic, m_context.Get());
 						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+					}
+				}
 
+				if (creature.MuzzleFlash[1].Delay != 0 && creature.MuzzleFlash[1].Bite.BoneID != -1)
+				{
+					auto flashObjectID = creature.MuzzleFlash[1].SwitchToMuzzle2 ?
+						m_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH :
+						ID_GUN_FLASH;
+
+					const auto& flashMoveable = *m_moveableObjects[flashObjectID]->ObjectMeshes.at(0);
+					
+					for (auto& flashBucket : flashMoveable.Buckets)
+					{
+						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
+							continue;
+
+						if (flashBucket.Polygons.size() == 0)
+							continue;
+
+						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+
+						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[1].Bite.Position);
+						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+
+						auto worldMatrix = rItemPtr->AnimationTransforms[creature.MuzzleFlash[1].Bite.BoneID] * rItemPtr->World;
+						worldMatrix = tMatrix * worldMatrix;
+
+						if (creature.MuzzleFlash[1].ApplyXRotation)
+							worldMatrix = rotMatrixX * worldMatrix;
+
+						if (creature.MuzzleFlash[1].ApplyZRotation)
+							worldMatrix = rotMatrixZ * worldMatrix;
+
+						m_stStatic.World = worldMatrix;
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+						BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
@@ -1000,7 +1066,6 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(BLENDMODE_OPAQUE);
-
 	}
 
 	Texture2D Renderer11::CreateDefaultNormalTexture() 
@@ -1020,36 +1085,44 @@ namespace TEN::Renderer
 		}
 	}
 
-	Matrix Renderer11::GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view)
+	Matrix Renderer11::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)
 	{
-		Matrix spriteMatrix;
-		Matrix scale = Matrix::CreateScale((spr->Width) * spr->Scale, (spr->Height) * spr->Scale, spr->Scale);
+		auto spriteMatrix = Matrix::Identity;
+		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
 
-		if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
+		switch (sprite->Type)
 		{
-			Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
-			spriteMatrix = scale * Matrix::CreateRotationZ(spr->Rotation) * Matrix::CreateBillboard(spr->pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD:
+		{
+			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(sprite->pos, Camera.pos.ToVector3(), cameraUp);
 		}
-		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
+		break;
+
+		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM:
 		{
-			Matrix rotation = Matrix::CreateRotationY(spr->Rotation);
-			Vector3 quadForward = Vector3(0, 0, 1);
-			spriteMatrix = scale * Matrix::CreateConstrainedBillboard(
-				spr->pos,
-				Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
-				spr->ConstrainAxis,
+			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
+			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
+			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
+				sprite->pos,
+				Camera.pos.ToVector3(),
+				sprite->ConstrainAxis,
 				nullptr,
 				&quadForward);
 		}
-		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
+		break;
+
+		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT:
 		{
-			Matrix translation = Matrix::CreateTranslation(spr->pos);
-			Matrix rotation = Matrix::CreateRotationZ(spr->Rotation) * Matrix::CreateLookAt(Vector3::Zero, spr->LookAtAxis, Vector3::UnitZ);
-			spriteMatrix = scale * rotation * translation;
+			auto tMatrix = Matrix::CreateTranslation(sprite->pos);
+			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
+			spriteMatrix = scaleMatrix * rotMatrix * tMatrix;
 		}
-		else if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
-		{
-			spriteMatrix = Matrix::Identity;
+		break;
+
+		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D:
+		default:
+			break;
 		}
 
 		return spriteMatrix;
@@ -1057,13 +1130,13 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawSprites(RenderView& view)
 	{
-		if (view.spritesToDraw.empty())
+		if (view.SpritesToDraw.empty())
 			return;
 
 		// Sort sprites by sprite and blend mode for faster batching.
 		std::sort(
-			view.spritesToDraw.begin(),
-			view.spritesToDraw.end(),
+			view.SpritesToDraw.begin(),
+			view.SpritesToDraw.end(),
 			[](RendererSpriteToDraw& rDrawSprite0, RendererSpriteToDraw& rDrawSprite1)
 			{
 				if (rDrawSprite0.Sprite != rDrawSprite1.Sprite)
@@ -1085,18 +1158,20 @@ namespace TEN::Renderer
 		std::vector<RendererSpriteBucket> spriteBuckets;
 		RendererSpriteBucket currentSpriteBucket;
 
-		currentSpriteBucket.Sprite = view.spritesToDraw[0].Sprite;
-		currentSpriteBucket.BlendMode = view.spritesToDraw[0].BlendMode;
-		currentSpriteBucket.IsBillboard = view.spritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
-		currentSpriteBucket.IsSoftParticle = view.spritesToDraw[0].SoftParticle;
+		currentSpriteBucket.Sprite = view.SpritesToDraw[0].Sprite;
+		currentSpriteBucket.BlendMode = view.SpritesToDraw[0].BlendMode;
+		currentSpriteBucket.IsBillboard = view.SpritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+		currentSpriteBucket.IsSoftParticle = view.SpritesToDraw[0].SoftParticle;
+		currentSpriteBucket.RenderType = view.SpritesToDraw[0].renderType;
 
-		for (auto& rDrawSprite : view.spritesToDraw)
+		for (auto& rDrawSprite : view.SpritesToDraw)
 		{
 			bool isBillboard = rDrawSprite.Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
 
 			if (rDrawSprite.Sprite != currentSpriteBucket.Sprite || 
 				rDrawSprite.BlendMode != currentSpriteBucket.BlendMode ||
 				rDrawSprite.SoftParticle != currentSpriteBucket.IsSoftParticle ||
+				rDrawSprite.renderType != currentSpriteBucket.RenderType ||
 				currentSpriteBucket.SpritesToDraw.size() == INSTANCED_SPRITES_BUCKET_SIZE || 
 				isBillboard != currentSpriteBucket.IsBillboard)
 			{
@@ -1106,13 +1181,15 @@ namespace TEN::Renderer
 				currentSpriteBucket.BlendMode = rDrawSprite.BlendMode;
 				currentSpriteBucket.IsBillboard = isBillboard;
 				currentSpriteBucket.IsSoftParticle = rDrawSprite.SoftParticle;
+				currentSpriteBucket.RenderType = rDrawSprite.renderType;
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 				 
-			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode))
+			//HACK: prevent sprites like Explosionsmoke which have blendmode_subtractive from having laser effects
+			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType)
 			{
 				// If blend mode requires sorting, save sprite for later.
-				int distance = (rDrawSprite.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
+				int distance = (rDrawSprite.pos - Camera.pos.ToVector3()).Length();
 				RendererTransparentFace face;
 				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
 				face.info.sprite = &rDrawSprite;
@@ -1120,12 +1197,12 @@ namespace TEN::Renderer
 				face.info.world = GetWorldMatrixForSprite(&rDrawSprite, view);
 				face.info.blendMode = rDrawSprite.BlendMode;
 
-				for (int j = 0; j < view.roomsToDraw.size(); j++)
+				for (int j = 0; j < view.RoomsToDraw.size(); j++)
 				{
-					short roomNumber = view.roomsToDraw[j]->RoomNumber;
+					short roomNumber = view.RoomsToDraw[j]->RoomNumber;
 					if (g_Level.Rooms[roomNumber].Active() && IsPointInRoom(Vector3i(rDrawSprite.pos), roomNumber))
 					{
-						view.roomsToDraw[j]->TransparentFacesToDraw.push_back(face);
+						view.RoomsToDraw[j]->TransparentFacesToDraw.push_back(face);
 						break;
 					}
 				}
@@ -1184,16 +1261,20 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+			{
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+			}
 			else
+			{
 				SetAlphaTest(ALPHA_TEST_NONE, 0);
+			}
 
 			m_cbInstancedSpriteBuffer.updateData(m_stInstancedSpriteBuffer, m_context.Get());
 			BindConstantBufferVS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 			BindConstantBufferPS(CB_INSTANCED_SPRITES, m_cbInstancedSpriteBuffer.get());
 
 			// Draw sprites with instancing.
-			DrawInstancedTriangles(4, spriteBucket.SpritesToDraw.size(), 0);
+			DrawInstancedTriangles(4, (unsigned int)spriteBucket.SpritesToDraw.size(), 0);
 
 			m_numSpritesDrawCalls++;
 		}
@@ -1217,6 +1298,8 @@ namespace TEN::Renderer
 				continue;
 
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
+			m_stSprite.RenderType = spriteBucket.RenderType;
+
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
@@ -1225,9 +1308,13 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+			{
 				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+			}
 			else
+			{
 				SetAlphaTest(ALPHA_TEST_NONE, 0);
+			}
 
 			m_primitiveBatch->Begin();
 
@@ -1272,7 +1359,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
+		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, (int)m_transparentFacesVertices.size());
 		  
 		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1281,6 +1368,8 @@ namespace TEN::Renderer
 		if (resetPipeline)
 		{
 			m_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
+			m_stSprite.RenderType = SpriteRenderType::Default;
+
 			m_cbSprite.updateData(m_stSprite, m_context.Get());
 			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
@@ -1293,7 +1382,7 @@ namespace TEN::Renderer
 
 		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
-		DrawTriangles(m_transparentFacesVertices.size(), 0);
+		DrawTriangles((int)m_transparentFacesVertices.size(), 0);
 
 		m_numTransparentDrawCalls++;
 		m_numSpritesTransparentDrawCalls++;
@@ -1357,7 +1446,7 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto room : view.roomsToDraw)
+		for (auto room : view.RoomsToDraw)
 		{
 			for (auto effect : room->EffectsToDraw)
 			{
@@ -1375,7 +1464,6 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
@@ -1461,6 +1549,9 @@ namespace TEN::Renderer
 			if (!smoke.active)
 				continue;
 
+			if (!CheckIfSlotExists(ID_SMOKE_SPRITES, "Smoke rendering"))
+				return;
+
 			AddSpriteBillboard(
 				&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
 				smoke.position,
@@ -1479,6 +1570,10 @@ namespace TEN::Renderer
 		{
 			SparkParticle& s = SparkParticles[i];
 			if (!s.active) continue;
+
+			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Spark particle rendering"))
+				return;
+
 			Vector3 v;
 			s.velocity.Normalize(v);
 
@@ -1499,7 +1594,12 @@ namespace TEN::Renderer
 		{
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
-			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE, true, view);
+
+			if (!CheckIfSlotExists(ID_EXPLOSION_SPRITES, "Explosion particles rendering"))
+				return;
+
+			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], 
+				e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE, true, view);
 		}
 	}
 
@@ -1507,9 +1607,13 @@ namespace TEN::Renderer
 	{
 		using namespace TEN::Effects;
 
-		for(SimpleParticle& s : simpleParticles)
+		for (SimpleParticle& s : simpleParticles)
 		{
-			if(!s.active) continue;
+			if (!s.active) continue;
+
+			if (!CheckIfSlotExists(s.sequence, "Particle rendering"))
+				continue;
+
 			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND, true, view);
 		}
 	}

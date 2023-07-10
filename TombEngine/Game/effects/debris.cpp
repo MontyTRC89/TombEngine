@@ -2,11 +2,11 @@
 #include "Game/effects/debris.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 #include "Math/Random.h"
-#include "Specific/setup.h"
 #include "Math/Math.h"
-#include <Game/effects/tomb4fx.h>
 
 using std::vector;
 using namespace TEN::Renderer;
@@ -24,7 +24,7 @@ bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 	if (1 << node & item->MeshBits.ToPackedBits())
 	{
 		int number = bits;
-		if (number == BODY_EXPLODE)
+		if (number == BODY_DO_EXPLOSION)
 			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);

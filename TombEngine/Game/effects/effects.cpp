@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/effects/effects.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/Blood.h"
@@ -17,13 +17,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -52,7 +52,7 @@ int SplashCount = 0;
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
 {
-	{ -16, 40, 160, -LM_LHAND, false }, // TR5 offset 0, TODO: This mesh is invalid as it can't be negative. -- TokyoSU 23.02.20
+	{ -16, 40, 160, 13, false },		// TR5 offset 0
 	{ -16, -8, 160, 0, false },			// TR5 offset 1
 	{ 0, 0, 256, 8, false },			// TR5 offset 2
 	{ 0, 0, 256, 17, false },			// TR5 offset 3
@@ -741,7 +741,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
@@ -1146,7 +1146,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	if (item.TriggerFlags != 0)
 	{
 		size = item.TriggerFlags % 100;
-		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, SECTOR(8));
+		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, BLOCK(8));
 	}
 
 	float cos = phd_cos(angle);
@@ -1169,7 +1169,6 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	auto endColor   = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * scale;
-	int steps = int((width / 2) / step);
 	int currentStep = 0;
 
 	while (true)
@@ -1663,7 +1662,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 				spark->sLife = spark->life >> 2;
 			}
 
-			spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
+			spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 48;
 		}
 	}
 	else
@@ -1766,9 +1765,9 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vecto
 			spark->gravity = -8 - (r >> 3 & 3);
 			spark->scalar = 2;
 			spark->maxYvel = -4 - (r >> 6 & 3);
-			spark->sSize = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->size = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->dSize = ((r >> 8) & 0xF) + 24;
+			spark->sSize = (((r >> 8) & 0xF) + 24) >> 3;
+			spark->size  = (((r >> 8) & 0xF) + 24) >> 3;
+			spark->dSize =  ((r >> 8) & 0xF) + 24;
 		}
 	}
 }

@@ -21,6 +21,7 @@ static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_Volume[]			= "Volume";
 static constexpr char ScriptReserved_Room[]				= "Room";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
+static constexpr char ScriptReserved_Vec2[]				= "Vec2";
 static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
@@ -32,6 +33,23 @@ static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase";
 static constexpr char ScriptReserved_OnSave[]			= "OnSave";
 static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
 
+static constexpr char ScriptReserved_EndReasonExitToTitle[]		= "EXITTOTITLE";
+static constexpr char ScriptReserved_EndReasonLevelComplete[]	= "LEVELCOMPLETE";
+static constexpr char ScriptReserved_EndReasonLoadGame[]		= "LOADGAME";
+static constexpr char ScriptReserved_EndReasonDeath[]			= "DEATH";
+static constexpr char ScriptReserved_EndReasonOther[]			= "OTHER";
+
+// Callback points
+static constexpr char ScriptReserved_PreStart[]			= "PRESTART";
+static constexpr char ScriptReserved_PostStart[]		= "POSTSTART";
+static constexpr char ScriptReserved_PreEnd[]			= "PREEND";
+static constexpr char ScriptReserved_PostEnd[]			= "POSTEND";
+static constexpr char ScriptReserved_PreSave[]			= "PRESAVE";
+static constexpr char ScriptReserved_PostSave[]			= "POSTSAVE";
+static constexpr char ScriptReserved_PreLoad[]			= "PRELOAD";
+static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
+static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
+static constexpr char ScriptReserved_PostControlPhase[] = "POSTCONTROLPHASE";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
@@ -57,6 +75,8 @@ static constexpr char ScriptReserved_GetVehicle[]			= "GetVehicle";
 static constexpr char ScriptReserved_GetTarget[]			= "GetTarget";
 static constexpr char ScriptReserved_GetColor[]				= "GetColor";
 static constexpr char ScriptReserved_SetColor[]				= "SetColor";
+static constexpr char ScriptReserved_SetFlags[]				= "SetFlags";
+static constexpr char ScriptReserved_SetTranslated[]		= "SetTranslated";
 static constexpr char ScriptReserved_GetPosition[]			= "GetPosition";
 static constexpr char ScriptReserved_GetJointPosition[]		= "GetJointPosition";
 static constexpr char ScriptReserved_SetPosition[]			= "SetPosition";
@@ -171,12 +191,16 @@ static constexpr char ScriptReserved_HandStatus[]		= "HandStatus";
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";
 static constexpr char ScriptReserved_HideString[]					= "HideString";
+static constexpr char ScriptReserved_IsStringDisplaying[]			= "IsStringDisplaying";
 static constexpr char ScriptReserved_SetAmbientTrack[]				= "SetAmbientTrack";
 static constexpr char ScriptReserved_PlayAudioTrack[]				= "PlayAudioTrack";
 static constexpr char ScriptReserved_StopAudioTrack[]				= "StopAudioTrack";
 static constexpr char ScriptReserved_StopAudioTracks[]				= "StopAudioTracks";
+static constexpr char ScriptReserved_GetAudioTrackLoudness[]		= "GetAudioTrackLoudness";
+static constexpr char ScriptReserved_GetCurrentSubtitle[]			= "GetCurrentSubtitle";
 static constexpr char ScriptReserved_PlaySound[]					= "PlaySound";
 static constexpr char ScriptReserved_IsSoundPlaying[]				= "IsSoundPlaying";
+static constexpr char ScriptReserved_IsAudioTrackPlaying[]			= "IsAudioTrackPlaying";
 static constexpr char ScriptReserved_GiveInvItem[]					= "GiveItem";
 static constexpr char ScriptReserved_TakeInvItem[]					= "TakeItem";
 static constexpr char ScriptReserved_GetInvItemCount[]				= "GetItemCount";
@@ -235,6 +259,7 @@ static constexpr char ScriptReserved_GetWeaponType[]				= "GetWeaponType";
 static constexpr char ScriptReserved_ThrowAwayTorch[]				= "ThrowAwayTorch";
 static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 static constexpr char ScriptReserved_TorchIsLit[]					= "TorchIsLit";
+static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
@@ -242,15 +267,23 @@ static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
 static constexpr char ScriptReserved_ActionID[]					= "ActionID";
 static constexpr char ScriptReserved_CameraType[]				= "CameraType";
+static constexpr char ScriptReserved_SoundTrackType[]			= "SoundTrackType";
+static constexpr char ScriptReserved_LogLevel[]					= "LogLevel";
 static constexpr char ScriptReserved_RoomFlagID[]				= "RoomFlagID";
 static constexpr char ScriptReserved_RoomReverb[]				= "RoomReverb";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
 static constexpr char ScriptReserved_CallbackPoint[]			= "CallbackPoint";
+static constexpr char ScriptReserved_EndReason[]				= "EndReason";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";
 static constexpr char ScriptReserved_LevelFuncs[]	= "LevelFuncs";
 static constexpr char ScriptReserved_Engine[]		= "Engine";
 
+// Constants
+static constexpr char ScriptReserved_LogLevelInfo[]		= "INFO";
+static constexpr char ScriptReserved_LogLevelWarning[]	= "WARNING";
+static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
+
 // Internal
-static constexpr char ScriptReserved_LaraObject[]				= "LaraObject";
+static constexpr char ScriptReserved_LaraObject[] = "LaraObject";

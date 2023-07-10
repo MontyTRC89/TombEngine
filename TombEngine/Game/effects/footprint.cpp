@@ -8,13 +8,14 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Utils/object_helper.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Footprint
@@ -41,77 +42,34 @@ namespace TEN::Effects::Footprint
 
 	static SOUND_EFFECTS GetFootprintSfx(MaterialType material)
 	{
-		switch (material)
+		static const auto SOUND_MAP = std::unordered_map<MaterialType, SOUND_EFFECTS>
 		{
-		default:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
+			{ MaterialType::Mud, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD },
+			{ MaterialType::Snow, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW },
+			{ MaterialType::Sand, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND },
+			{ MaterialType::Gravel, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRAVEL },
+			{ MaterialType::Ice, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_ICE },
+			{ MaterialType::Water, SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET },
+			{ MaterialType::Stone, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS },
+			{ MaterialType::Wood, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD },
+			{ MaterialType::Metal, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL },
+			{ MaterialType::Marble, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE },
+			{ MaterialType::Grass, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS },
+			{ MaterialType::Concrete, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS },
+			{ MaterialType::OldWood, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD },
+			{ MaterialType::OldMetal, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL },
+			{ MaterialType::Custom1, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1 },
+			{ MaterialType::Custom2, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2 },
+			{ MaterialType::Custom3, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3 },
+			{ MaterialType::Custom4, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4 },
+			{ MaterialType::Custom5, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5 },
+			{ MaterialType::Custom6, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6 },
+			{ MaterialType::Custom7, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7 },
+			{ MaterialType::Custom8, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8 }
+		};
 
-		case MaterialType::Mud:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD;
-
-		case MaterialType::Snow:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW;
-
-		case MaterialType::Sand:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND;
-
-		case MaterialType::Gravel:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRAVEL;
-
-		case MaterialType::Ice:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_ICE;
-
-		case MaterialType::Water:
-			return SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
-
-		case MaterialType::Stone:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
-
-		case MaterialType::Wood:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
-
-		case MaterialType::Metal:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
-
-		case MaterialType::Marble:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE;
-
-		case MaterialType::Grass:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS;
-
-		case MaterialType::Concrete:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
-
-		case MaterialType::OldWood:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
-
-		case MaterialType::OldMetal:
-			return SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
-
-		case MaterialType::Custom1:
-			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1;
-
-		case MaterialType::Custom2:
-			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2;
-
-		case MaterialType::Custom3:
-			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3;
-
-		case MaterialType::Custom4:
-			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4;
-
-		case MaterialType::Custom5:
-			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5;
-
-		case MaterialType::Custom6:
-			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6;
-
-		case MaterialType::Custom7:
-			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7;
-
-		case MaterialType::Custom8:
-			return SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8;
-		}
+		auto it = SOUND_MAP.find(material);
+		return ((it != SOUND_MAP.end()) ? it->second : SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS);
 	}
 
 	static std::array<Vector3, Footprint::VERTEX_COUNT> GetFootprintVertexPoints(const ItemInfo& item, const Vector3& pos, const Vector3& normal)
@@ -173,6 +131,9 @@ namespace TEN::Effects::Footprint
 
 	void SpawnFootprint(bool isRight, const std::array<Vector3, Footprint::VERTEX_COUNT>& vertexPoints)
 	{
+		if (!CheckIfSlotExists(ID_MISC_SPRITES, "Footprint rendering"))
+			return;
+
 		constexpr auto LIFE_MAX			 = 20.0f;
 		constexpr auto LIFE_START_FADING = 10.0f;
 		constexpr auto OPACITY_MAX		 = 0.5f;
