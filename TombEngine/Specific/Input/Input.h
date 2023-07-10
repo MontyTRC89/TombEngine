@@ -161,7 +161,7 @@ namespace TEN::Input
 		float	   FadeSpeed = 0.0f;
 	};
 
-	extern std::vector<std::string> g_KeyNames;
+	extern const std::vector<std::string> g_KeyNames;
 
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<QueueState>	ActionQueue;

@@ -24,7 +24,7 @@ namespace TEN::Input
 {
 	constexpr int AXIS_DEADZONE = 8000;
 
-	std::vector<std::string> g_KeyNames =
+	const std::vector<std::string> g_KeyNames =
 	{
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
 			"7",			"8",			"9",			"0",			"-",			"+",			"Back",			"Tab",
@@ -91,20 +91,19 @@ namespace TEN::Input
 	// 2. Vehicle controls (TODO)
 	// 3. Quick actions
 	// 4. Menu controls + target switch
-	auto DefaultBindings = std::vector<int>
+	const auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PGUP, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
 		KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
 		KC_RETURN, KC_ESCAPE, KC_ESCAPE, KC_P, KC_F5, KC_F6, KC_NUMPAD0
 	};
-	auto XInputBindings = std::vector<int>
+	const auto XInputBindings = std::vector<int>
 	{
-		// TODO: Get the order right.
-		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_LSTICK, XB_RSTICK, XB_A, XB_X, XB_AXIS_LTRIGGER_NEG, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_Y, XB_LSHIFT, XB_B,
+		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_LSTICK, XB_RSTICK, XB_A, XB_X, XB_RSHIFT, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_B, XB_Y, XB_LSHIFT,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
 		XB_DPAD_DOWN, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
-		KC_RETURN, KC_ESCAPE, XB_SELECT, XB_START, KC_F5, KC_F6, KC_NUMPAD0
+		KC_RETURN, XB_SELECT, XB_SELECT, XB_START, KC_F5, KC_F6, KC_NUMPAD0
 	};
 
 	// Input bindings. These are primitive mappings to actions.
