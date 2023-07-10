@@ -42,10 +42,10 @@ namespace TEN::Entities::Creatures::TR1
 			DoDamage(LaraItem, GetWeaponDamage(Lara.Control.Weapon.GunType));
 		}
 
-		auto* referencePtr = FindDoppelgangerReference(item, ID_BACON_REFERENCE);
+		auto* referencePtr = FindDoppelgangerReference(item, ID_DOPPELGANGER_ORIGIN);
 		if (referencePtr == nullptr)
 		{
-			TENLog("Doppelganger requires ID_DOPPELGANGER_REFERENCE to be placed in room center.", LogLevel::Warning);
+			TENLog("Doppelganger requires ID_DOPPELGANGER_ORIGIN to be placed in room center.", LogLevel::Warning);
 			return;
 		}
 
