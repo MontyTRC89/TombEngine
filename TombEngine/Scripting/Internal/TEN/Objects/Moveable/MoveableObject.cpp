@@ -110,6 +110,8 @@ static std::unique_ptr<Moveable> Create(
 	{
 		auto* item = &g_Level.Items[num];
 
+		ptr->SetObjectID(objID);
+
 		if (std::holds_alternative<short>(room))
 		{
 			ptr->SetPos(pos, false);
@@ -121,7 +123,6 @@ static std::unique_ptr<Moveable> Create(
 		}
 
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
-		ptr->SetObjectID(objID);
 		ptr->Init();
 
 		ptr->SetAnimNumber(USE_IF_HAVE(int, animNumber, 0));
