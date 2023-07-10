@@ -38,6 +38,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
@@ -491,6 +492,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Status.Stamina < LARA_STAMINA_MAX && item->Animation.ActiveState != LS_SPRINT)
 		lara->Status.Stamina++;
 
+	HandlePlayerQuickActions(*item);
 	RumbleLaraHealthCondition(item);
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
@@ -707,9 +709,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
-	{
 		item->HitPoints--;
-	}
 
 	if (item->HitPoints <= 0)
 	{

@@ -11,13 +11,11 @@
 #include "Game/camera.h"
 #include "Game/Gui.h"
 #include "Game/items.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_tests.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
+#include "Specific/clock.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
@@ -31,10 +29,9 @@ using TEN::Renderer::g_Renderer;
 namespace TEN::Input
 {
 	constexpr auto AXIS_SCALE			 = 1.5f;
+	constexpr auto AXIS_DEADZONE		 = 8000;
 	constexpr auto AXIS_OFFSET			 = 0.2f;
 	constexpr auto MOUSE_AXIS_CONSTRAINT = 100.0f;
-
-	constexpr auto AXIS_DEADZONE = 8000;
 
 	const std::vector<std::string> g_KeyNames =
 	{
@@ -45,9 +42,9 @@ namespace TEN::Input
 			"D",			"F",			"G",			"H",			"J",			"K",			"L",			";",
 			"'",			"`",			"Shift",		"#",			"Z",			"X",			"C",			"V",
 			"B",			"N",			"M",			",",			".",			"/",			"Shift",		"Pad X",
-			"Alt",			"Space",		"Caps Lock",	"",				"",				"",				"",				"",
+			"Alt",			"Space",		"Caps Lock",	"F1",			"F2",			"F3",			"F4",			"F5",
 
-			"",				"",				"",				"",				"",				"Num Lock",		"Scroll Lock",	"Pad 7",
+			"F6",			"F7",			"F8",			"F9",			"F10",			"Num Lock",		"Scroll Lock",	"Pad 7",
 			"Pad 8",		"Pad 9",		"Pad -",		"Pad 4",		"Pad 5",		"Pad 6",		"Pad +",		"Pad 1",
 			"Pad 2",		"Pad 3",		"Pad 0",		"Pad .",		"",				"",				"\\",			"",
 			"",				"",				"",				"",				"",				"",				"",				"",
@@ -64,7 +61,7 @@ namespace TEN::Input
 			"",				"",				"Shift",		"",				"",				"",				"",				"",
 			"",				"",				"",				"",				"",				"Pad /",		"",				"",
 			"Alt",			"",				"",				"",				"",				"",				"",				"",
-
+			
 			"",				"",				"",				"",				"",				"",				"",				"Home",
 			"Up",			"Page Up",		"",				"Left",			"",				"Right",		"",				"End",
 			"Down",			"Page Down",	"Insert",		"Del",			"",				"",				"",				"",
@@ -103,17 +100,24 @@ namespace TEN::Input
 	int DbInput = 0;
 	int TrInput = 0;
 
-	auto DefaultBindings = std::vector<int>
+	// Rows:
+	// 1. General controls
+	// 2. Vehicle controls (TODO)
+	// 3. Quick actions
+	// 4. Menu controls + target switch
+	const auto DefaultBindings = std::vector<int>
 	{
-		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/ // TODO: Dedicated vehicle actions.
-		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PGUP, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
+		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+		KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+		KC_RETURN, KC_ESCAPE, KC_ESCAPE, KC_P, KC_F5, KC_F6, KC_NUMPAD0
 	};
-	auto XInputBindings = std::vector<int>
+	const auto XInputBindings = std::vector<int>
 	{
-		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_AXIS_LTRIGGER_NEG, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_A, XB_Y, XB_DPAD_DOWN, XB_LSHIFT, XB_B, XB_SELECT, XB_START, XB_LSTICK, XB_RSTICK,
-		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/ // TODO: Dedicated vehicle actions.
-		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_LSTICK, XB_RSTICK, XB_A, XB_X, XB_RSHIFT, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_B, XB_Y, XB_LSHIFT,
+		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+		XB_DPAD_DOWN, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+		KC_RETURN, XB_SELECT, XB_SELECT, XB_START, KC_F5, KC_F6, KC_NUMPAD0
 	};
 
 	// Input bindings. These are primitive mappings to actions.
@@ -121,12 +125,16 @@ namespace TEN::Input
 	short KeyboardLayout[2][KEY_COUNT] =
 	{
 		{
-			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/ // TODO: Dedicated vehicle actions.
+			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PGUP, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
+			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+			KC_RETURN, KC_ESCAPE, KC_ESCAPE, KC_P, KC_F5, KC_F6
 		},
 		{
-			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
-			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE*/ // TODO: Dedicated vehicle actions.
+			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PGUP, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
+			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
+			KC_RETURN, KC_ESCAPE, KC_ESCAPE, KC_P, KC_F5, KC_F6
 		}
 	};
 
@@ -170,14 +178,22 @@ namespace TEN::Input
 			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
+			{
 				TENLog("Keyboard not found!", LogLevel::Warning);
+			}
 			else
+			{
 				OisKeyboard = (Keyboard*)OisInputManager->createInputObject(OISKeyboard, true);
+			}
 
 			if (OisInputManager->getNumberOfDevices(OISMouse) == 0)
+			{
 				TENLog("Mouse not found!", LogLevel::Warning);
+			}
 			else
+			{
 				OisMouse = (Mouse*)OisInputManager->createInputObject(OISMouse, true);
+			}
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -292,7 +308,8 @@ namespace TEN::Input
 
 	int WrapSimilarKeys(int source)
 	{
-		// Merge right and left Ctrl, Shift, and Alt.
+		// Merge right/left Ctrl, Shift, Alt.
+
 		switch (source)
 		{
 		case KC_LCONTROL:
@@ -335,13 +352,16 @@ namespace TEN::Input
 			{
 				AxisMap[(int)InputAxis::Move].y = 1.0f;
 			}
+			}
 			else if (KeyboardLayout[layout][KEY_BACK] == index)
 			{
 				AxisMap[(int)InputAxis::Move].y = -1.0f;
 			}
+			}
 			else if (KeyboardLayout[layout][KEY_LEFT] == index)
 			{
 				AxisMap[(int)InputAxis::Move].x = -1.0f;
+			}
 			}
 			else if (KeyboardLayout[layout][KEY_RIGHT] == index)
 			{
@@ -508,17 +528,21 @@ namespace TEN::Input
 				{
 					AxisMap[(int)InputAxis::Move].y = abs(scaledValue);
 				}
+				}
 				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
 				{
 					AxisMap[(int)InputAxis::Move].y = -abs(scaledValue);
+				}
 				}
 				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
 				{
 					AxisMap[(int)InputAxis::Move].x = -abs(scaledValue);
 				}
+				}
 				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
 				{
 					AxisMap[(int)InputAxis::Move].x = abs(scaledValue);
+				}
 				}
 				else if (!LayoutContainsIndex(usedIndex))
 				{
@@ -604,126 +628,13 @@ namespace TEN::Input
 		}
 	}
 
-	void HandlePlayerHotkeys(ItemInfo* item)
+	static void HandleHotkeyActions()
 	{
-		static const auto UNAVAILABLE_FLARE_STATES = std::vector<int>
-		{
-			LS_CRAWL_FORWARD,
-			LS_CRAWL_TURN_LEFT,
-			LS_CRAWL_TURN_RIGHT,
-			LS_CRAWL_BACK,
-			LS_CRAWL_TO_HANG,
-			LS_CRAWL_TURN_180
-		};
-
-		auto& lara = *GetLaraInfo(item);
-
-		// Handle hardcoded action-to-key mappings.
-		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? true : false);
-		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? true : false);
-		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? true : false);
-		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? true : false);
-
-		// Handle target switch when locked on to an entity.
-		if (lara.Control.HandStatus == HandStatus::WeaponReady &&
-			lara.TargetEntity != nullptr)
-		{
-			if (IsClicked(In::Look))
-			{
-				ActionMap[(int)In::SwitchTarget].Update(true);
-				//ActionMap[(int)In::Look].Clear(); // TODO: Should be cleared, but strange inventory issues occur. -- Sezz 2022.12.15
-			}
-			else
-			{
-				ClearAction(In::SwitchTarget);
-			}
-		}
-		else
-		{
-			ClearAction(In::SwitchTarget);
-		}
-
-		// Handle flares.
-		if (IsClicked(In::Flare))
-		{
-			if (TestState(item->Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
-				SayNo();
-		}
-
-		// Handle weapon hotkeys.
-		if (KeyMap[KC_1] && lara.Weapons[(int)LaraWeaponType::Pistol].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
-
-		if (KeyMap[KC_2] && lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
-
-		if (KeyMap[KC_3] && lara.Weapons[(int)LaraWeaponType::Uzi].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
-
-		if (KeyMap[KC_4] && lara.Weapons[(int)LaraWeaponType::Revolver].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
-
-		if (KeyMap[KC_5] && lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
-
-		if (KeyMap[KC_6] && lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
-
-		if (KeyMap[KC_7] && lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
-
-		if (KeyMap[KC_8] && lara.Weapons[(int)LaraWeaponType::HK].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
-
-		if (KeyMap[KC_9] && lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
-			lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
-
-		// Handle medipack hotkeys.
-		static bool dbMedipack = true;
-		if ((KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) && dbMedipack)
-		{
-			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
-				lara.Status.Poison)
-			{
-				bool hasUsedMedipack = false;
-
-				if (KeyMap[KC_MINUS] &&
-					lara.Inventory.TotalSmallMedipacks != 0)
-				{
-					hasUsedMedipack = true;
-
-					item->HitPoints += LARA_HEALTH_MAX / 2;
-					if (item->HitPoints > LARA_HEALTH_MAX)
-						item->HitPoints = LARA_HEALTH_MAX;
-
-					if (lara.Inventory.TotalSmallMedipacks != -1)
-						lara.Inventory.TotalSmallMedipacks--;
-				}
-				else if (KeyMap[KC_EQUALS] &&
-					lara.Inventory.TotalLargeMedipacks != 0)
-				{
-					hasUsedMedipack = true;
-					item->HitPoints = LARA_HEALTH_MAX;
-
-					if (lara.Inventory.TotalLargeMedipacks != -1)
-						lara.Inventory.TotalLargeMedipacks--;
-				}
-
-				if (hasUsedMedipack)
-				{
-					lara.Status.Poison = 0;
-					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					Statistics.Game.HealthUsed++;
-				}
-			}
-		}
-		dbMedipack = (KeyMap[KC_MINUS] || KeyMap[KC_EQUALS]) ? false : true;
-
 		// Save screenshot.
 		static bool dbScreenshot = true;
 		if (KeyMap[KC_SYSRQ] && dbScreenshot)
 			g_Renderer.SaveScreenshot();
-		dbScreenshot = KeyMap[KC_SYSRQ] ? false : true;
+		dbScreenshot = !KeyMap[KC_SYSRQ];
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;
@@ -733,19 +644,19 @@ namespace TEN::Input
 			SaveConfiguration();
 			g_Renderer.ToggleFullScreen();
 		}
-		dbFullscreen = ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]) ? false : true;
+		dbFullscreen = !((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]);
 
 		if (!DebugMode)
 			return;
 
-		// Handle debug page switch.
+		// Switch debug page.
 		static bool dbDebugPage = true;
 		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
 			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? false : true;
+		dbDebugPage = !(KeyMap[KC_F10] || KeyMap[KC_F11]);
 	}
 
-	void UpdateRumble()
+	static void UpdateRumble()
 	{
 		if (!OisRumble || !OisEffect || !RumbleInfo.Power)
 			return;
@@ -813,7 +724,7 @@ namespace TEN::Input
 			ApplyActionQueue();
 
 		// Additional handling.
-		HandlePlayerHotkeys(item);
+		HandleHotkeyActions();
 		SolveActionCollisions();
 
 		// Port actions back to legacy bit fields.
@@ -984,9 +895,9 @@ namespace TEN::Input
 
 	bool IsWakeActionHeld()
 	{
-		if (IsDirectionActionHeld() || IsHeld(In::LeftStep) || IsHeld(In::RightStep) ||
+		if (IsDirectionActionHeld() || IsHeld(In::StepLeft) || IsHeld(In::StepRight) ||
 			IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) ||
-			IsHeld(In::DrawWeapon) || IsHeld(In::Flare) || IsHeld(In::Action))
+			IsHeld(In::Draw) || IsHeld(In::Flare) || IsHeld(In::Action))
 		{
 			return true;
 		}

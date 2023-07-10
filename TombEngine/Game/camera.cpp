@@ -1171,7 +1171,7 @@ void BinocularCamera(ItemInfo* item)
 	if (!LaserSight)
 	{
 		if (IsClicked(In::Deselect) ||
-			IsClicked(In::DrawWeapon) ||
+			IsClicked(In::Draw) ||
 			IsClicked(In::Look) ||
 			IsHeld(In::Flare))
 		{

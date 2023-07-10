@@ -17,7 +17,7 @@ namespace TEN::Input
 
 	constexpr auto MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2) + MAX_GAMEPAD_POV_AXES;
 
-	enum XInputButtons
+	enum XInputButton
 	{
 		XB_START = MAX_KEYBOARD_KEYS,
 		XB_SELECT,
@@ -50,69 +50,70 @@ namespace TEN::Input
 		XB_DPAD_RIGHT
 	};
 
+	// Deprecated.
 	enum InputKey
 	{
 		KEY_FORWARD,
 		KEY_BACK,
 		KEY_LEFT,
 		KEY_RIGHT,
-		KEY_CROUCH,
-		KEY_SPRINT,
-		KEY_WALK,
-		KEY_JUMP,
+		KEY_LEFT_STEP,
+		KEY_RIGHT_STEP,
 		KEY_ACTION,
-		KEY_DRAW,
-		KEY_FLARE,
-		KEY_LOOK,
+		KEY_JUMP,
+		KEY_WALK,
+		KEY_SPRINT,
+		KEY_CROUCH,
 		KEY_ROLL,
+		KEY_DRAW,
+		KEY_LOOK,
+
+		KEY_LIGHT,
+		KEY_SMALL_MEDIPACK,
+		KEY_LARGE_MEDIPACK,
+		KEY_PREVIOUS_WEAPON,
+		KEY_NEXT_WEAPON,
+		KEY_WEAPON_1,
+		KEY_WEAPON_2,
+		KEY_WEAPON_3,
+		KEY_WEAPON_4,
+		KEY_WEAPON_5,
+		KEY_WEAPON_6,
+		KEY_WEAPON_7,
+		KEY_WEAPON_8,
+		KEY_WEAPON_9,
+		KEY_WEAPON_10,
+		KEY_SAY_NO,
+
+		KEY_SELECT,
+		KEY_DESELECT,
 		KEY_OPTION,
 		KEY_PAUSE,
-		KEY_LSTEP,
-		KEY_RSTEP,
-		/*KEY_ACCELERATE,
-		KEY_REVERSE,
-		KEY_SPEED,
-		KEY_SLOW,
-		KEY_BRAKE,
-		KEY_FIRE,*/
+		KEY_SAVE,
+		KEY_LOAD,
 
 		KEY_COUNT
 	};
 
+	// Deprecated.
 	enum InputActions
 	{
-		IN_NONE		  = 0,
-		IN_FORWARD	  = (1 << KEY_FORWARD),
-		IN_BACK		  = (1 << KEY_BACK),
-		IN_LEFT		  = (1 << KEY_LEFT),
-		IN_RIGHT	  = (1 << KEY_RIGHT),
-		IN_CROUCH	  = (1 << KEY_CROUCH),
-		IN_SPRINT	  = (1 << KEY_SPRINT),
-		IN_WALK		  = (1 << KEY_WALK),
-		IN_JUMP		  = (1 << KEY_JUMP),
-		IN_ACTION	  = (1 << KEY_ACTION),
-		IN_DRAW		  = (1 << KEY_DRAW),
-		IN_FLARE	  = (1 << KEY_FLARE),
-		IN_LOOK		  = (1 << KEY_LOOK),
-		IN_ROLL		  = (1 << KEY_ROLL),
-		IN_OPTION	  = (1 << KEY_OPTION),
-		IN_PAUSE	  = (1 << KEY_PAUSE),
-		IN_LSTEP	  = (1 << KEY_LSTEP),
-		IN_RSTEP	  = (1 << KEY_RSTEP),
-		/*IN_ACCELERATE = (1 << KEY_ACCELERATE),
-		IN_REVERSE	  = (1 << KEY_REVERSE),
-		IN_SPEED	  = (1 << KEY_SPEED),
-		IN_SLOW		  = (1 << KEY_SLOW),
-		IN_BRAKE	  = (1 << KEY_BRAKE),
-		IN_FIRE		  = (1 << KEY_FIRE),*/
+		IN_NONE = 0,
 
-		// Additional input actions without direct key relation
-
-		IN_SAVE		  = (1 << (KEY_COUNT + 0)),
-		IN_LOAD		  = (1 << (KEY_COUNT + 1)),
-		IN_SELECT	  = (1 << (KEY_COUNT + 2)),
-		IN_DESELECT   = (1 << (KEY_COUNT + 3)),
-		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))
+		IN_FORWARD = (1 << KEY_FORWARD),
+		IN_BACK	   = (1 << KEY_BACK),
+		IN_LEFT	   = (1 << KEY_LEFT),
+		IN_RIGHT   = (1 << KEY_RIGHT),
+		IN_LSTEP   = (1 << KEY_LEFT_STEP),
+		IN_RSTEP   = (1 << KEY_RIGHT_STEP),
+		IN_ACTION  = (1 << KEY_ACTION),
+		IN_JUMP	   = (1 << KEY_JUMP),
+		IN_WALK	   = (1 << KEY_WALK),
+		IN_SPRINT  = (1 << KEY_SPRINT),
+		IN_CROUCH  = (1 << KEY_CROUCH),
+		IN_ROLL	   = (1 << KEY_ROLL),
+		IN_DRAW	   = (1 << KEY_DRAW),
+		IN_LOOK	   = (1 << KEY_LOOK)
 	};
 	
 	// Temporary input constants for use with vehicles:
