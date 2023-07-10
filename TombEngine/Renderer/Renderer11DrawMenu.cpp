@@ -250,14 +250,14 @@ namespace TEN::Renderer
 				y = MenuVerticalTop;
 
 				// Title
-				auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_CONTROLS)) + " >";
+				auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_ACTIONS)) + " >";
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				// General control listing
-				for (int k = 0; k < GeneralControlStrings.size(); k++)
+				// General action listing
+				for (int k = 0; k < GeneralActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralControlStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
 					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
 					{
@@ -269,7 +269,7 @@ namespace TEN::Renderer
 						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
-					if (k < (GeneralControlStrings.size() - 1))
+					if (k < (GeneralActionStrings.size() - 1))
 					{
 						GetNextNarrowLinePosition(&y);
 					}
@@ -280,15 +280,15 @@ namespace TEN::Renderer
 				}
 
 				// Reset to defaults
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == GeneralControlStrings.size()));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == GeneralActionStrings.size()));
 				GetNextLinePosition(&y);
 
 				// Apply
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralControlStrings.size() + 1)));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralActionStrings.size() + 1)));
 				GetNextLinePosition(&y);
 
 				// Cancel
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralControlStrings.size() + 2)));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralActionStrings.size() + 2)));
 				break;
 			}
 
@@ -353,16 +353,16 @@ namespace TEN::Renderer
 				y = MenuVerticalTop;
 
 				// Title
-				auto titleString = "< " + std::string(g_GameFlow->GetString(STRING_MENU_CONTROLS));
+				auto titleString = "< " + std::string(g_GameFlow->GetString(STRING_MENU_ACTIONS));
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
 				int baseIndex = KEY_OPTION;
 
-				// Menu control listing.
-				for (int k = 0; k < MenuControlStrings.size(); k++)
+				// Menu action listing.
+				for (int k = 0; k < MenuActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuControlStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
 					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
 					{
@@ -374,7 +374,7 @@ namespace TEN::Renderer
 						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
-					if (k < (MenuControlStrings.size() - 1))
+					if (k < (MenuActionStrings.size() - 1))
 					{
 						GetNextNarrowLinePosition(&y);
 					}
@@ -385,15 +385,15 @@ namespace TEN::Renderer
 				}
 
 				// Reset to defaults
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == MenuControlStrings.size()));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == MenuActionStrings.size()));
 				GetNextLinePosition(&y);
 
 				// Apply
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuControlStrings.size() + 1)));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuActionStrings.size() + 1)));
 				GetNextLinePosition(&y);
 
 				// Cancel
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuControlStrings.size() + 2)));
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuActionStrings.size() + 2)));
 				break;
 			}
 		}
@@ -475,7 +475,7 @@ namespace TEN::Renderer
 			y = MenuVerticalPause;
 
 			// Header
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_PAUSE), PRINTSTRING_COLOR_ORANGE, SF_Center());
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_ACTIONS_PAUSE), PRINTSTRING_COLOR_ORANGE, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Statistics

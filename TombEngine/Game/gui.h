@@ -230,8 +230,8 @@ namespace TEN::Gui
 
 	extern GuiController g_Gui;
 	extern std::vector<const char*> OptionStrings;
-	extern std::vector<const char*> GeneralControlStrings;
-	extern std::vector<const char*> VehicleControlStrings;
+	extern std::vector<const char*> GeneralActionStrings;
+	extern std::vector<const char*> VehicleActionStrings;
 	extern std::vector<const char*> QuickActionStrings;
-	extern std::vector<const char*> MenuControlStrings;
+	extern std::vector<const char*> MenuActionStrings;
 }

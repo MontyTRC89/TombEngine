@@ -4,7 +4,7 @@ namespace TEN::Input
 {
 	typedef enum class ActionID
 	{
-		// General controls
+		// General actions
 		Forward,
 		Back,
 		Left,
@@ -20,7 +20,7 @@ namespace TEN::Input
 		Draw,
 		Look,
 
-		// Vehicle controls
+		// Vehicle actions
 		/*Accelerate,
 		Reverse,
 		Speed,
@@ -47,7 +47,7 @@ namespace TEN::Input
 		Weapon10,
 		SayNo,
 
-		// Menu controls
+		// Menu actions
 		Select,
 		Deselect,
 		Option,
