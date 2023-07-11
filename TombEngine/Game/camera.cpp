@@ -117,14 +117,10 @@ static void ClearLookAroundActions(const ItemInfo& item)
 	}
 }
 
-void HandleLookAround(ItemInfo& item, bool invertXAxis)
+static bool CanPlayerLookAround(ItemInfo& item)
 {
-	constexpr auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
-	constexpr auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
-
 	auto& player = GetLaraInfo(item);
 
-	// More than 1 targetable entity visible; return early.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
@@ -136,9 +132,21 @@ void HandleLookAround(ItemInfo& item, bool invertXAxis)
 				targetableCount++;
 		}
 
+		// Player can switch targets; return early.
 		if (targetableCount > 1)
 			return;
 	}
+}
+
+void HandleLookAround(ItemInfo& item, bool invertXAxis)
+{
+	constexpr auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
+	constexpr auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
+
+	auto& player = GetLaraInfo(item);
+
+	if (!CanPlayerLookAround(item))
+		return;
 
 	Camera.type = CameraType::Look;
 	auto axisCoeff = Vector2::Zero;
