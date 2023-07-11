@@ -60,11 +60,11 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Reset running jump timer.
-	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
+	if (!IsRunJumpCountableState(item->Animation.ActiveState))
 		lara->Control.Count.Run = 0;
 
 	// Reset running jump action queue.
-	if (!IsRunJumpQueueableState((LaraState)item->Animation.ActiveState))
+	if (!IsRunJumpQueueableState(item->Animation.ActiveState))
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
@@ -75,8 +75,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Reset crawl flex.
-	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
-		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(TrInput & (IN_LEFT | IN_RIGHT)))))
+	if (!IsHeld(In::Look) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM && // HACK
+		(item->Animation.Velocity.z == 0.0f || (item->Animation.Velocity.z != 0.0f && !(IsHeld(In::Left) || IsHeld(In::Right)))))
 	{
 		ResetPlayerFlex(item, 0.1f);
 	}
@@ -986,6 +986,36 @@ void ResetPlayerFlex(ItemInfo* item, float alpha)
 
 	player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
 	player.ExtraTorsoRot.Lerp(EulerAngles::Zero, alpha);
+}
+
+void ResetLook(ItemInfo& item, float alpha)
+{
+	auto& player = GetLaraInfo(item);
+
+	player.Control.Look.Orientation = EulerAngles::Zero;
+
+	if (Camera.type != CameraType::Look)
+	{
+		player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
+
+		if (player.Control.HandStatus != HandStatus::Busy &&
+			!player.LeftArm.Locked && !player.RightArm.Locked &&
+			player.Context.Vehicle == NO_ITEM)
+		{
+			player.ExtraTorsoRot = player.ExtraHeadRot;
+		}
+		else
+		{
+			if (!player.ExtraHeadRot.x)
+				player.ExtraTorsoRot.x = 0;
+
+			if (!player.ExtraHeadRot.y)
+				player.ExtraTorsoRot.y = 0;
+
+			if (!player.ExtraHeadRot.z)
+				player.ExtraTorsoRot.z = 0;
+		}
+	}
 }
 
 void RumbleLaraHealthCondition(ItemInfo* item)

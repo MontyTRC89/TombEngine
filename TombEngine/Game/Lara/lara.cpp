@@ -867,12 +867,11 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// Reset collision setup.
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT;
-
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
-
 	coll->Setup.BlockFloorSlopeUp = false;
 	coll->Setup.BlockFloorSlopeDown = false;
 	coll->Setup.BlockCeilingSlope = false;
@@ -880,12 +879,13 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = true;
-
 	coll->Setup.PrevPosition = item->Pose.Position;
 	coll->Setup.PrevAnimObjectID = item->Animation.AnimObjectID;
 	coll->Setup.PrevAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.PrevFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.PrevState = item->Animation.ActiveState;
+
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Handle look around.
 	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None &&
@@ -893,13 +893,11 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	{
 		HandleLookAround(*item);
 	}
-	else //if (!lara->Control.IsFlexing)
+	else
 	{
 		ResetLook(*item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
 	}
 	lara->Control.Look.Mode = LookMode::None;
-
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
 	if (HandleLaraVehicle(item, coll))

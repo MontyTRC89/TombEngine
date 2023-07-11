@@ -1414,34 +1414,6 @@ void CalculateCamera(const CollisionInfo& coll)
 	}
 }
 
-void ResetLook(ItemInfo& item, float alpha)
-{
-	auto& player = GetLaraInfo(item);
-
-	player.Control.Look.Orientation = EulerAngles::Zero;
-
-	if (Camera.type != CameraType::Look)
-	{
-		player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
-
-		if (player.Control.HandStatus != HandStatus::Busy &&
-			!player.LeftArm.Locked && !player.RightArm.Locked &&
-			player.Context.Vehicle == NO_ITEM)
-		{
-			player.ExtraTorsoRot = player.ExtraHeadRot;
-		}
-		else
-		{
-			if (!player.ExtraHeadRot.x)
-				player.ExtraTorsoRot.x = 0;
-			if (!player.ExtraHeadRot.y)
-				player.ExtraTorsoRot.y = 0;
-			if (!player.ExtraHeadRot.z)
-				player.ExtraTorsoRot.z = 0;
-		}
-	}
-}
-
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)
 {
 	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
