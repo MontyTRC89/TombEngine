@@ -34,10 +34,6 @@ constexpr auto COLL_CANCEL_THRESHOLD   = BLOCK(2);
 constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS           = CLICK(1);
 
-constexpr auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
-	EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
-	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0));
-
 struct OLD_CAMERA
 {
 	short ActiveState;
@@ -87,113 +83,6 @@ float ScreenFadeCurrent = 0;
 float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
-
-static void ClearLookAroundActions(const ItemInfo& item)
-{
-	const auto& player = GetLaraInfo(item);
-
-	switch (player.Control.Look.Mode)
-	{
-	default:
-	case LookMode::None:
-		break;
-
-	case LookMode::Vertical:
-		ClearAction(In::Forward);
-		ClearAction(In::Back);
-		break;
-
-	case LookMode::Horizontal:
-		ClearAction(In::Left);
-		ClearAction(In::Right);
-		break;
-
-	case LookMode::Free:
-		ClearAction(In::Forward);
-		ClearAction(In::Back);
-		ClearAction(In::Left);
-		ClearAction(In::Right);
-		break;
-	}
-}
-
-static bool CanPlayerLookAround(ItemInfo& item)
-{
-	auto& player = GetLaraInfo(item);
-
-	if (player.Control.HandStatus == HandStatus::WeaponReady &&
-		player.TargetEntity != nullptr)
-	{
-		unsigned int targetableCount = 0;
-
-		for (const auto* entity : player.TargetList)
-		{
-			if (entity != nullptr)
-				targetableCount++;
-		}
-
-		// Player can switch targets; return early.
-		if (targetableCount > 1)
-			return;
-	}
-}
-
-void HandleLookAround(ItemInfo& item, bool invertXAxis)
-{
-	constexpr auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
-	constexpr auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
-
-	auto& player = GetLaraInfo(item);
-
-	if (!CanPlayerLookAround(item))
-		return;
-
-	Camera.type = CameraType::Look;
-	auto axisCoeff = Vector2::Zero;
-
-	// Determine X axis coefficient.
-	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
-		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
-	{
-		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
-	}
-
-	// Determine Y axis coefficient.
-	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
-		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
-	{
-		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
-	}
-
-	// Define turn rate.
-	short turnRateMax = LOOKCAM_TURN_RATE_MAX;
-	if (BinocularRange)
-		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
-
-	// Modulate turn rates.
-	player.Control.Look.TurnRate = EulerAngles(
-		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, axisCoeff.x, invertXAxis),
-		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, LOOKCAM_TURN_RATE_ACCEL, 0, turnRateMax, axisCoeff.y, false),
-		0);
-
-	// Apply turn rates.
-	player.Control.Look.Orientation += player.Control.Look.TurnRate;
-	player.Control.Look.Orientation = EulerAngles(
-		std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x),
-		std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y),
-		0);
-
-	// Visually adapt head and torso orientations.
-	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
-	if (player.Control.HandStatus != HandStatus::Busy &&
-		!player.LeftArm.Locked && !player.RightArm.Locked &&
-		player.Context.Vehicle == NO_ITEM)
-	{
-		player.ExtraTorsoRot = player.ExtraHeadRot;
-	}
-
-	ClearLookAroundActions(item);
-}
 
 void DoThumbstickCamera()
 {

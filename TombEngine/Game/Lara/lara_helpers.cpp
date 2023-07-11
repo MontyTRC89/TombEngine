@@ -2,6 +2,7 @@
 #include "Game/Lara/lara_helpers.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
@@ -49,7 +50,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Update AFK pose timer.
 	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
-		!(TrInput & IN_LOOK || IsOpticActionHeld()) &&
+		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
 		lara->Control.Count.Pose++;
@@ -68,7 +69,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
-	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) &&
+	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
 		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
 		ResetPlayerLean(item, 1 / 6.0f);
@@ -83,11 +84,120 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
 		lara->Control.TurnRate = 0;
 
 	lara->Control.IsLow = false;
 	lara->Control.IsMonkeySwinging = false;
+}
+
+static bool CanPlayerLookAround(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.TargetEntity != nullptr)
+	{
+		unsigned int targetableCount = 0;
+
+		for (const auto* entity : player.TargetList)
+		{
+			if (entity != nullptr)
+				targetableCount++;
+		}
+
+		// Can switch targets; return false.
+		if (targetableCount > 1)
+			return false;
+	}
+
+	return true;
+}
+
+static void ClearPlayerLookAroundActions(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	switch (player.Control.Look.Mode)
+	{
+	default:
+	case LookMode::None:
+		break;
+
+	case LookMode::Vertical:
+		ClearAction(In::Forward);
+		ClearAction(In::Back);
+		break;
+
+	case LookMode::Horizontal:
+		ClearAction(In::Left);
+		ClearAction(In::Right);
+		break;
+
+	case LookMode::Free:
+		ClearAction(In::Forward);
+		ClearAction(In::Back);
+		ClearAction(In::Left);
+		ClearAction(In::Right);
+		break;
+	}
+}
+
+void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
+{
+	constexpr auto TURN_RATE_MAX   = ANGLE(4.0f);
+	constexpr auto TURN_RATE_ACCEL = ANGLE(0.75f);
+
+	auto& player = GetLaraInfo(item);
+
+	if (!CanPlayerLookAround(item))
+		return;
+
+	Camera.type = CameraType::Look;
+	auto axisCoeff = Vector2::Zero;
+
+	// Determine X axis coefficient.
+	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
+	{
+		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
+	}
+
+	// Determine Y axis coefficient.
+	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
+	{
+		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
+	}
+
+	// Define turn rate.
+	short turnRateMax = TURN_RATE_MAX;
+	if (BinocularRange)
+		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
+
+	// Modulate turn rates.
+	player.Control.Look.TurnRate = EulerAngles(
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, TURN_RATE_ACCEL, 0, turnRateMax, axisCoeff.x, invertXAxis),
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, TURN_RATE_ACCEL, 0, turnRateMax, axisCoeff.y, false),
+		0);
+
+	// Apply turn rates.
+	player.Control.Look.Orientation += player.Control.Look.TurnRate;
+	player.Control.Look.Orientation = EulerAngles(
+		std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x),
+		std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y),
+		0);
+
+	// Visually adapt head and torso orientations.
+	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
+	if (player.Control.HandStatus != HandStatus::Busy &&
+		!player.LeftArm.Locked && !player.RightArm.Locked &&
+		player.Context.Vehicle == NO_ITEM)
+	{
+		player.ExtraTorsoRot = player.ExtraHeadRot;
+	}
+
+	ClearPlayerLookAroundActions(item);
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -141,7 +251,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 		BigGunControl(item, coll);
 		break;
 
-		// Boats are processed like normal items in loop.
+	// Boats are processed like normal items in loop.
 	default:
 		HandleWeapon(*item);
 	}

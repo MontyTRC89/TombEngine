@@ -4,6 +4,10 @@
 
 struct CollisionInfo;
 
+constexpr auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
+	EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
+	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0));
+
 enum class CameraType
 {
 	Chase,
@@ -81,7 +85,6 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
-void HandleLookAround(ItemInfo& item, bool invertVerticalAxis = true);
 void DoThumbstickCamera();
 void LookCamera(ItemInfo& item, const CollisionInfo& coll);
 
