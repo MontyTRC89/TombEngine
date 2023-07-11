@@ -79,6 +79,12 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
+		if (IsHeld(In::Look))
+		{
+			item->Animation.TargetState = LS_CROUCH_IDLE;
+			return;
+		}
+
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
@@ -421,7 +427,13 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && !(TrInput & IN_LOOK)) // TODO: Look input check shouldn't be necessary, but it prevents start-stop bug for now. -- Sezz 2022.09.25
+		if (IsHeld(In::Look))
+		{
+			item->Animation.TargetState = LS_CRAWL_IDLE;
+			return;
+		}
+
+		if (TrInput & IN_FORWARD)
 		{
 			auto crawlVaultResult = TestLaraCrawlVault(item, coll);
 
@@ -439,7 +451,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_BACK && !(TrInput & IN_LOOK))
+		else if (TrInput & IN_BACK)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlToHang(item, coll))
 			{

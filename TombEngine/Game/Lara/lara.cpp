@@ -895,7 +895,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	}
 	else
 	{
-		ResetLook(*item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
+		// TODO: Extend ResetLaraFlex() to be a catch-all function.
+		ResetLook(*item);
 	}
 	lara->Control.Look.Mode = LookMode::None;
 
@@ -905,6 +906,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	// Handle player state.
 	lara_control_routines[item->Animation.ActiveState](item, coll);
+
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
 
@@ -940,15 +942,14 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
+	// Reset collision setup.
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_SURFACE;
-
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -CLICK(0.5f);
 	coll->Setup.LowerCeilingBound = LARA_RADIUS;
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
-
 	coll->Setup.BlockFloorSlopeUp = false;
 	coll->Setup.BlockFloorSlopeDown = false;
 	coll->Setup.BlockCeilingSlope = false;
@@ -956,7 +957,6 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
@@ -1013,15 +1013,14 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.IsLow = false;
 
+	// Reset collision setup.
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
-
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -(LARA_RADIUS_UNDERWATER + (LARA_RADIUS_UNDERWATER / 3));
 	coll->Setup.LowerCeilingBound = LARA_RADIUS_UNDERWATER + (LARA_RADIUS_UNDERWATER / 3);
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
-
 	coll->Setup.BlockFloorSlopeUp = false;
 	coll->Setup.BlockFloorSlopeDown = false;
 	coll->Setup.BlockCeilingSlope = false;
@@ -1029,7 +1028,6 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)

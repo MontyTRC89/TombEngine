@@ -319,6 +319,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	else
 		SnapItemToLedge(item, coll, 0.2f);
 
+	ResetPlayerFlex(item);
 	item->Animation.IsAirborne = true;
 	item->Animation.Velocity.z = 2;
 	item->Animation.Velocity.y = 1;
@@ -373,6 +374,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 	else
 		SnapItemToLedge(item, coll);
 
+	ResetPlayerFlex(item);
 	item->Animation.Velocity.z = 0;
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;

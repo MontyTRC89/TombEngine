@@ -463,7 +463,13 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Forward) && !(TrInput & IN_LOOK)) // TODO: Look input check shouldn't be necessary, but it prevents start-stop bug for now. -- Sezz 2022.09.25
+	if (IsHeld(In::Look))
+	{
+		item->Animation.TargetState = LS_IDLE;
+		return;
+	}
+
+	if (IsHeld(In::Forward))
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
@@ -492,7 +498,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 	}
-	else if (IsHeld(In::Back) && !(TrInput & IN_LOOK))
+	else if (IsHeld(In::Back))
 	{
 		if (IsHeld(In::Walk))
 		{
