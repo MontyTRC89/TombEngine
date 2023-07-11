@@ -1098,7 +1098,7 @@ void ResetPlayerFlex(ItemInfo* item, float alpha)
 	player.ExtraTorsoRot.Lerp(EulerAngles::Zero, alpha);
 }
 
-void ResetLook(ItemInfo& item, float alpha)
+void ResetPlayerLookAround(ItemInfo& item, float alpha)
 {
 	auto& player = GetLaraInfo(item);
 

@@ -950,6 +950,7 @@ void BinocularCamera(ItemInfo* item)
 			player.Inventory.IsBusy = false;
 			player.ExtraHeadRot = EulerAngles::Zero;
 			player.ExtraTorsoRot = EulerAngles::Zero;
+
 			Camera.type = BinocularOldCamera;
 			BinocularOn = false;
 			BinocularRange = 0;
@@ -964,14 +965,22 @@ void BinocularCamera(ItemInfo* item)
 	short headYRot = player.ExtraHeadRot.y;
 
 	if (headXRot > ANGLE(75.0f))
+	{
 		headXRot = ANGLE(75.0f);
+	}
 	else if (headXRot < -ANGLE(75.0f))
+	{
 		headXRot = -ANGLE(75.0f);
+	}
 
 	if (headYRot > ANGLE(80.0f))
+	{
 		headYRot = ANGLE(80.0f);
+	}
 	else if (headYRot < -ANGLE(80.0f))
+	{
 		headYRot = -ANGLE(80.0f);
+	}
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y - CLICK(2);
@@ -979,9 +988,13 @@ void BinocularCamera(ItemInfo* item)
 
 	auto probe = GetCollision(x, y, z, item->RoomNumber);
 	if (probe.Position.Ceiling <= (y - CLICK(1)))
+	{
 		y -= CLICK(1);
+	}
 	else
+	{
 		y = probe.Position.Ceiling + CLICK(0.25f);
+	}
 
 	Camera.pos.x = x;
 	Camera.pos.y = y;
@@ -1037,17 +1050,25 @@ void BinocularCamera(ItemInfo* item)
 	{
 		BinocularRange -= range;
 		if (BinocularRange < ANGLE(0.7f))
+		{
 			BinocularRange = ANGLE(0.7f);
+		}
 		else
+		{
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
+		}
 	}
 	else if (IsHeld(In::Crouch) && !IsHeld(In::Sprint))
 	{
 		BinocularRange += range;
 		if (BinocularRange > ANGLE(8.5f))
+		{
 			BinocularRange = ANGLE(8.5f);
+		}
 		else
+		{
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
+		}
 	}
 
 	auto origin = Camera.pos.ToVector3i();
@@ -1662,13 +1683,6 @@ void HandleOptics(ItemInfo* item)
 
 	bool breakOptics = true;
 
-	// Imitate pushing look key in binocular mode.
-	if (!LaserSight && BinocularOn)
-	{
-		TrInput |= IN_LOOK;
-		DbInput = 0;
-	}
-
 	// Standing; can use optics.
 	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
 		breakOptics = false;
@@ -1684,12 +1698,12 @@ void HandleOptics(ItemInfo* item)
 	if (LaserSight && !IsHeld(In::Look))
 		breakOptics = true;
 
-	// If lasersight, and weapon is holstered, exit optics.
+	// If lasersight and weapon is holstered, exit optics.
 	if (LaserSight && IsHeld(In::DrawWeapon))
 		breakOptics = true;
 
 	// Engage lasersight if available.
-	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK))
+	if (!LaserSight && !breakOptics && IsHeld(In::Look))
 	{
 		if (player.Control.HandStatus == HandStatus::WeaponReady &&
 			((player.Control.Weapon.GunType == LaraWeaponType::HK && player.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
@@ -1708,7 +1722,7 @@ void HandleOptics(ItemInfo* item)
 	if (!breakOptics)
 		return;
 
-	// Nothing to process, exit.
+	// Nothing to process; return early.
 	if (!BinocularOn && !LaserSight)
 		return;
 

@@ -896,7 +896,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	else
 	{
 		// TODO: Extend ResetLaraFlex() to be a catch-all function.
-		ResetLook(*item);
+		ResetPlayerLookAround(*item);
 	}
 	lara->Control.Look.Mode = LookMode::None;
 
@@ -965,7 +965,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	}
 	else
 	{
-		ResetLook(*item);
+		ResetPlayerLookAround(*item);
 	}
 
 	lara->Control.Count.Pose = 0;
@@ -1036,7 +1036,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	}
 	else
 	{
-		ResetLook(*item);
+		ResetPlayerLookAround(*item);
 	}
 
 	lara->Control.Count.Pose = 0;
