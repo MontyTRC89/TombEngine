@@ -81,7 +81,7 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
-void DoLookAround(ItemInfo& item, bool invertVerticalAxis = true);
+void HandleLookAround(ItemInfo& item, bool invertVerticalAxis = true);
 void DoThumbstickCamera();
 void LookCamera(ItemInfo& item, const CollisionInfo& coll);
 

@@ -891,7 +891,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None &&
 		lara->ExtraAnim == NO_ITEM)
 	{
-		DoLookAround(*item);
+		HandleLookAround(*item);
 	}
 	else //if (!lara->Control.IsFlexing)
 	{
@@ -963,7 +963,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
 	{
-		DoLookAround(*item);
+		HandleLookAround(*item);
 	}
 	else
 	{
@@ -1036,7 +1036,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
 	{
-		DoLookAround(*item);
+		HandleLookAround(*item);
 	}
 	else
 	{

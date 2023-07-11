@@ -937,14 +937,14 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 				break;
 		}
 
-		if (IsClicked(In::SwitchTarget) || player.Control.HandStatus != HandStatus::Free)
+		if (IsClicked(In::Look) || player.Control.HandStatus != HandStatus::Free)
 		{
 			if (player.TargetEntity == nullptr)
 			{
 				player.TargetEntity = closestEntityPtr;
 				player.LastTargets[0] = nullptr;
 			}
-			else if (IsClicked(In::SwitchTarget))
+			else if (IsClicked(In::Look))
 			{
 				player.TargetEntity = nullptr;
 				bool flag = true;

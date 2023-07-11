@@ -117,12 +117,28 @@ static void ClearLookAroundActions(const ItemInfo& item)
 	}
 }
 
-void DoLookAround(ItemInfo& item, bool invertXAxis)
+void HandleLookAround(ItemInfo& item, bool invertXAxis)
 {
 	constexpr auto LOOKCAM_TURN_RATE_ACCEL = ANGLE(0.75f);
 	constexpr auto LOOKCAM_TURN_RATE_MAX   = ANGLE(4.0f);
 
 	auto& player = GetLaraInfo(item);
+
+	// More than 1 targetable entity visible; return early.
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.TargetEntity != nullptr)
+	{
+		unsigned int targetableCount = 0;
+
+		for (const auto* entity : player.TargetList)
+		{
+			if (entity != nullptr)
+				targetableCount++;
+		}
+
+		if (targetableCount > 1)
+			return;
+	}
 
 	Camera.type = CameraType::Look;
 	auto axisCoeff = Vector2::Zero;

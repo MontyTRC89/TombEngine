@@ -58,7 +58,6 @@ namespace TEN::Input
 		Load,
 		Select,
 		Deselect,
-		SwitchTarget, // Look -> SwitchTarget conversion must be handled differently.
 
 		Count
 	} In;

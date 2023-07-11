@@ -92,13 +92,13 @@ namespace TEN::Input
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/ // TODO: Dedicated vehicle actions.
-		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE
 	};
 	auto XInputBindings = std::vector<int>
 	{
 		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_AXIS_LTRIGGER_NEG, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_A, XB_Y, XB_DPAD_DOWN, XB_LSHIFT, XB_B, XB_SELECT, XB_START, XB_LSTICK, XB_RSTICK,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/ // TODO: Dedicated vehicle actions.
-		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE
 	};
 
 	// Input bindings. These are primitive mappings to actions.
@@ -508,25 +508,6 @@ namespace TEN::Input
 		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? true : false);
 		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? true : false);
 		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? true : false);
-
-		// Handle target switch when locked on to an entity.
-		if (lara.Control.HandStatus == HandStatus::WeaponReady &&
-			lara.TargetEntity != nullptr)
-		{
-			if (IsClicked(In::Look))
-			{
-				ActionMap[(int)In::SwitchTarget].Update(true);
-				//ActionMap[(int)In::Look].Clear();
-			}
-			else
-			{
-				ClearAction(In::SwitchTarget);
-			}
-		}
-		else
-		{
-			ClearAction(In::SwitchTarget);
-		}
 
 		// Handle flares.
 		if (IsClicked(In::Flare))
