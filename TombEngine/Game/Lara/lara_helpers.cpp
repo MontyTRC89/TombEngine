@@ -264,7 +264,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 		SayNo();
 
 	// Handle flare no.
-	if (IsClicked(In::Flare))
+	if (IsClicked(In::Light))
 	{
 		if (TestState(item.Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
 			SayNo();

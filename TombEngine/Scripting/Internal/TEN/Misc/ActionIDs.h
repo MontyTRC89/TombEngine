@@ -58,7 +58,14 @@ static const std::unordered_map<std::string, ActionID> ACTION_IDS
 	{ "DRAW", ActionID::Draw },
 	{ "LOOK", ActionID::Look },
 
-	{ "LIGHT", ActionID::Flare },
+	/*{ "ACCELERATE", ActionID::Accelerate },
+	{ "REVERSE", ActionID::Revers },
+	{ "SPEED", ActionID::Speed },
+	{ "SLOW", ActionID::Slow },
+	{ "BRAKE", ActionID::Brake },
+	{ "FIRE", ActionID::Fire },*/
+
+	{ "LIGHT", ActionID::Light },
 	{ "SMALL_MEDIPACK", ActionID::SmallMedipack },
 	{ "LARGE_MEDIPACK", ActionID::LargeMedipack },
 	{ "PREVIOUS_WEAPON", ActionID::PreviousWeapon },
@@ -76,7 +83,7 @@ static const std::unordered_map<std::string, ActionID> ACTION_IDS
 
 	{ "SELECT", ActionID::Select },
 	{ "DESELECT", ActionID::Deselect },
-	{ "INVENTORY", ActionID::Option },
+	{ "OPTION", ActionID::Option },
 	{ "PAUSE", ActionID::Pause },
 	{ "SAVE", ActionID::Save },
 	{ "LOAD", ActionID::Load }

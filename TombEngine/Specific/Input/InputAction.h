@@ -29,8 +29,7 @@ namespace TEN::Input
 		Fire,*/
 
 		// Quick actions
-		Flare, // Light
-		/*Binoculars,*/
+		Light,
 		SmallMedipack,
 		LargeMedipack,
 		PreviousWeapon,

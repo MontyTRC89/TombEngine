@@ -87,10 +87,10 @@ namespace TEN::Input
 	int TrInput = 0;
 
 	// Rows:
-	// 1. General controls
-	// 2. Vehicle controls (TODO)
+	// 1. General actions
+	// 2. Vehicle actions (TODO)
 	// 3. Quick actions
-	// 4. Menu controls + target switch
+	// 4. Menu controls
 	const auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PGUP, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
@@ -776,7 +776,7 @@ namespace TEN::Input
 	{
 		if (IsDirectionActionHeld() || IsHeld(In::StepLeft) || IsHeld(In::StepRight) ||
 			IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) ||
-			IsHeld(In::Draw) || IsHeld(In::Flare) || IsHeld(In::Action))
+			IsHeld(In::Draw) || IsHeld(In::Light) || IsHeld(In::Action))
 		{
 			return true;
 		}
