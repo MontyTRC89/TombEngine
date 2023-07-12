@@ -272,11 +272,8 @@ void HandlePlayerQuickActions(ItemInfo& item)
 		SayNo();
 
 	// Handle flare no.
-	if (IsClicked(In::Light))
-	{
-		if (TestState(item.Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
-			SayNo();
-	}
+	if (IsClicked(In::Light) && TestState(item.Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
+		SayNo();
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
