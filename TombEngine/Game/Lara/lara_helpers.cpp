@@ -100,9 +100,9 @@ static bool CanPlayerLookAround(const ItemInfo& item)
 	{
 		unsigned int targetableCount = 0;
 
-		for (const auto* entity : player.TargetList)
+		for (const auto* targetPtr : player.TargetList)
 		{
-			if (entity != nullptr)
+			if (targetPtr != nullptr)
 				targetableCount++;
 		}
 
@@ -158,14 +158,14 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 
 	// Determine X axis coefficient.
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
-		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
+		(player.Control.Look.Mode == LookMode::Vertical || player.Control.Look.Mode == LookMode::Free))
 	{
 		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
-		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
+		(player.Control.Look.Mode == LookMode::Horizontal || player.Control.Look.Mode == LookMode::Free))
 	{
 		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
 	}
