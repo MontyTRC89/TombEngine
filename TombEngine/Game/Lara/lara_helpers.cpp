@@ -189,16 +189,6 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 
 void HandlePlayerQuickActions(ItemInfo& item)
 {
-	static const auto UNAVAILABLE_FLARE_STATES = std::vector<int>
-	{
-		LS_CRAWL_FORWARD,
-		LS_CRAWL_TURN_LEFT,
-		LS_CRAWL_TURN_RIGHT,
-		LS_CRAWL_BACK,
-		LS_CRAWL_TO_HANG,
-		LS_CRAWL_TURN_180
-	};
-
 	auto& player = GetLaraInfo(item);
 
 	// Handle medipacks.
@@ -269,10 +259,6 @@ void HandlePlayerQuickActions(ItemInfo& item)
 
 	// Handle saying no.
 	if (IsClicked(In::SayNo))
-		SayNo();
-
-	// Handle flare no.
-	if (IsClicked(In::Light) && TestState(item.Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
 		SayNo();
 }
 
