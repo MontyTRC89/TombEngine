@@ -123,7 +123,7 @@ static std::optional<LaraWeaponType> GetScrolledWeaponType(const ItemInfo& item,
 	if (!currentIndex.has_value())
 		return std::nullopt;
 
-	// Next index getter.
+	// Getter for next index.
 	auto calculateNextIndex = [getPrev](unsigned int index)
 	{
 		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
