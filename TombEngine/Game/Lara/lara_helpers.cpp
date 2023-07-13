@@ -234,7 +234,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
 	// TODO: 10th possible weapon, probably grapple gun.
-	/*if (IsClicked(In::Weapon1) && player.Weapons[(int)LaraWeaponType::].Present)
+	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 
 	// TODO: Could theoretically remove SwitchTarget and instead do unique behaviour handling using only Look. -- Sezz 2023.07.08
