@@ -76,7 +76,7 @@ namespace TEN::Input
 			"Joy 1", 		"Joy 2",		"Joy 3",		"Joy 4", 		"Joy 5",		"Joy 6", 		"Joy 7",		"Joy 8",
 			"Joy 9",		"Joy 10",		"Joy 11",		"Joy 12",		"Joy 13",		"Joy 14",		"Joy 15",		"Joy 16",
 
-			"Mouse X-",		"Mouse X+",		"Mouse Y-",		"Mouse Y+",		"Scroll-",		"Scroll+",
+			"Mouse X-",		"Mouse X+",		"Mouse Y-",		"Mouse Y+",		"Mouse Z-",		"Mouse Z+",
 
 			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+",
 			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
@@ -441,13 +441,13 @@ namespace TEN::Input
 						continue;
 					break;
 
-				// Scroll-
+				// Mouse Z-
 				case 4:
 					if (state.Z.rel >= 0)
 						continue;
 					break;
 
-				// Scroll+
+				// Mouse Z+
 				case 5:
 					if (state.Z.rel <= 0)
 						continue;
@@ -503,7 +503,7 @@ namespace TEN::Input
 				float normalizedValue = (state.mAxes[axis].abs + axisValue) / (SHRT_MAX - AXIS_DEADZONE);
 
 				// Calculate scaled analog value for movement.
-				// NOTE: [0.2f, 1.7f] range gives the most organic rates.
+				// NOTE: [0.2f, 1.7f] range gives most organic rates.
 				float scaledValue = (abs(normalizedValue) * AXIS_SCALE) + AXIS_OFFSET;
 
 				// Calculate and reset discrete input slots.
@@ -512,7 +512,7 @@ namespace TEN::Input
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
-				// Decide on the discrete input registering based on analog value.
+				// Determine discrete input registering based on analog value.
 				int usedIndex = (normalizedValue > 0) ? negKeyIndex : posKeyIndex;
 				KeyMap[usedIndex] = true;
 
