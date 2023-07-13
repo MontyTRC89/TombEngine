@@ -1173,7 +1173,7 @@ void BinocularCamera(ItemInfo* item)
 		if (IsClicked(In::Deselect) ||
 			IsClicked(In::Draw) ||
 			IsClicked(In::Look) ||
-			IsHeld(In::Light))
+			IsHeld(In::Flare))
 		{
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot = EulerAngles::Zero;

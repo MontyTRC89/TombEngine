@@ -776,7 +776,7 @@ namespace TEN::Input
 	{
 		if (IsDirectionActionHeld() || IsHeld(In::StepLeft) || IsHeld(In::StepRight) ||
 			IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) ||
-			IsHeld(In::Draw) || IsHeld(In::Light) || IsHeld(In::Action))
+			IsHeld(In::Draw) || IsHeld(In::Flare) || IsHeld(In::Action))
 		{
 			return true;
 		}

@@ -508,7 +508,7 @@ void HandleWeapon(ItemInfo& laraItem)
 				player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 		}
 		// Draw flare.
-		else if (IsHeld(In::Light) && (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young))
+		else if (IsHeld(In::Flare) && (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young))
 		{
 			if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
@@ -591,7 +591,7 @@ void HandleWeapon(ItemInfo& laraItem)
 			player.Control.HandStatus = HandStatus::WeaponUndraw;
 		}
 	}
-	else if (IsHeld(In::Light) &&
+	else if (IsHeld(In::Flare) &&
 		player.Control.HandStatus == HandStatus::Busy &&
 		laraItem.Animation.ActiveState == LS_CRAWL_IDLE &&
 		laraItem.Animation.AnimNumber == LA_CRAWL_IDLE)

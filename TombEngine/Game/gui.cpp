@@ -1979,7 +1979,7 @@ namespace TEN::Gui
 						{
 							// HACK.
 							ClearAllActions();
-							ActionMap[(int)In::Light].Update(1.0f);
+							ActionMap[(int)In::Flare].Update(1.0f);
 
 							HandleWeapon(*item);
 							ClearAllActions();

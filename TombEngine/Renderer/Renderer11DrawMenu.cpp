@@ -307,7 +307,7 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_LIGHT;
+				int baseIndex = KEY_FLARE;
 
 				// Quick action listing
 				for (int k = 0; k < QuickActionStrings.size(); k++)
