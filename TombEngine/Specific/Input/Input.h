@@ -82,8 +82,8 @@ namespace TEN::Input
 
 		KEY_SELECT,
 		KEY_DESELECT,
-		KEY_OPTION,
 		KEY_PAUSE,
+		KEY_INVENTORY,
 		KEY_SAVE,
 		KEY_LOAD,
 

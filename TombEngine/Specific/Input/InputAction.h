@@ -49,8 +49,8 @@ namespace TEN::Input
 		// Menu actions
 		Select,
 		Deselect,
-		Option,
 		Pause,
+		Inventory,
 		Save,
 		Load,
 		SwitchTarget, // TODO: Look -> SwitchTarget conversion must be handled differently.

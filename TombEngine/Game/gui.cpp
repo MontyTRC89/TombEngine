@@ -110,8 +110,8 @@ namespace TEN::Gui
 	{
 		STRING_ACTIONS_SELECT,
 		STRING_ACTIONS_DESELECT,
-		STRING_ACTIONS_INVENTORY,
 		STRING_ACTIONS_PAUSE,
+		STRING_ACTIONS_INVENTORY,
 		STRING_ACTIONS_SAVE,
 		STRING_ACTIONS_LOAD
 	};
@@ -3127,7 +3127,7 @@ namespace TEN::Gui
 
 			UpdateInputActions(item);
 
-			if (IsClicked(In::Option))
+			if (IsClicked(In::Deselect))
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				exitLoop = true;
