@@ -91,7 +91,50 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.IsMonkeySwinging = false;
 }
 
-static std::optional<LaraWeaponType> GetScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
+static void UsePlayerMedipack(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Can't use medipack; return early.
+	if ((item.HitPoints <= 0 && item.HitPoints >= LARA_HEALTH_MAX) ||
+		player.Status.Poison == 0)
+	{
+		return;
+	}
+
+	bool hasUsedMedipack = false;
+
+	if (IsClicked(In::SmallMedipack) &&
+		player.Inventory.TotalSmallMedipacks != 0)
+	{
+		hasUsedMedipack = true;
+
+		item.HitPoints += LARA_HEALTH_MAX / 2;
+		if (item.HitPoints > LARA_HEALTH_MAX)
+			item.HitPoints = LARA_HEALTH_MAX;
+
+		if (player.Inventory.TotalSmallMedipacks != -1)
+			player.Inventory.TotalSmallMedipacks--;
+	}
+	else if (IsClicked(In::LargeMedipack) &&
+		player.Inventory.TotalLargeMedipacks != 0)
+	{
+		hasUsedMedipack = true;
+		item.HitPoints = LARA_HEALTH_MAX;
+
+		if (player.Inventory.TotalLargeMedipacks != -1)
+			player.Inventory.TotalLargeMedipacks--;
+	}
+
+	if (hasUsedMedipack)
+	{
+		player.Status.Poison = 0;
+		Statistics.Game.HealthUsed++;
+		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+	}
+}
+
+static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
 {
 	static const auto SCROLL_WEAPON_TYPES = std::vector<LaraWeaponType>
 	{
@@ -123,21 +166,21 @@ static std::optional<LaraWeaponType> GetScrolledWeaponType(const ItemInfo& item,
 	if (!currentIndex.has_value())
 		return std::nullopt;
 
-	// Next index getter.
-	auto calculateNextIndex = [getPrev](unsigned int index)
+	// Getter for next index.
+	auto getNextIndex = [getPrev](unsigned int index)
 	{
 		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
 	};
 
 	// Get next valid weapon type in sequence.
-	unsigned int nextIndex = calculateNextIndex(*currentIndex);
+	unsigned int nextIndex = getNextIndex(*currentIndex);
 	while (nextIndex != *currentIndex)
 	{
 		auto nextWeaponType = SCROLL_WEAPON_TYPES[nextIndex];
 		if (player.Weapons[(int)nextWeaponType].Present)
 			return nextWeaponType;
 
-		nextIndex = calculateNextIndex(nextIndex);
+		nextIndex = getNextIndex(nextIndex);
 	}
 
 	// No valid weapon type; return nullopt.
@@ -146,62 +189,17 @@ static std::optional<LaraWeaponType> GetScrolledWeaponType(const ItemInfo& item,
 
 void HandlePlayerQuickActions(ItemInfo& item)
 {
-	static const auto UNAVAILABLE_FLARE_STATES = std::vector<int>
-	{
-		LS_CRAWL_FORWARD,
-		LS_CRAWL_TURN_LEFT,
-		LS_CRAWL_TURN_RIGHT,
-		LS_CRAWL_BACK,
-		LS_CRAWL_TO_HANG,
-		LS_CRAWL_TURN_180
-	};
-	
 	auto& player = GetLaraInfo(item);
 
 	// Handle medipacks.
 	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
-	{
-		if ((item.HitPoints > 0 && item.HitPoints < LARA_HEALTH_MAX) ||
-			player.Status.Poison)
-		{
-			bool hasUsedMedipack = false;
-
-			if (IsClicked(In::SmallMedipack) &&
-				player.Inventory.TotalSmallMedipacks != 0)
-			{
-				hasUsedMedipack = true;
-
-				item.HitPoints += LARA_HEALTH_MAX / 2;
-				if (item.HitPoints > LARA_HEALTH_MAX)
-					item.HitPoints = LARA_HEALTH_MAX;
-
-				if (player.Inventory.TotalSmallMedipacks != -1)
-					player.Inventory.TotalSmallMedipacks--;
-			}
-			else if (IsClicked(In::LargeMedipack) &&
-				player.Inventory.TotalLargeMedipacks != 0)
-			{
-				hasUsedMedipack = true;
-				item.HitPoints = LARA_HEALTH_MAX;
-
-				if (player.Inventory.TotalLargeMedipacks != -1)
-					player.Inventory.TotalLargeMedipacks--;
-			}
-
-			if (hasUsedMedipack)
-			{
-				player.Status.Poison = 0;
-				Statistics.Game.HealthUsed++;
-				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-			}
-		}
-	}
+		UsePlayerMedipack(item);
 
 	// Handle weapon scroll requests.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
 	{
 		bool getPrev = IsClicked(In::PreviousWeapon);
-		auto weaponType = GetScrolledWeaponType(item, player.Control.Weapon.GunType, getPrev);
+		auto weaponType = GetPlayerScrolledWeaponType(item, player.Control.Weapon.GunType, getPrev);
 
 		if (weaponType.has_value())
 			player.Control.Weapon.RequestGunType = *weaponType;
@@ -236,7 +234,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
 	// TODO: 10th possible weapon, probably grapple gun.
-	/*if (IsClicked(In::Weapon1) && player.Weapons[(int)LaraWeaponType::].Present)
+	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 
 	// TODO: Could theoretically remove SwitchTarget and instead do unique behaviour handling using only Look. -- Sezz 2023.07.08
@@ -262,13 +260,6 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	// Handle saying no.
 	if (IsClicked(In::SayNo))
 		SayNo();
-
-	// Handle flare no.
-	if (IsClicked(In::Flare))
-	{
-		if (TestState(item.Animation.ActiveState, UNAVAILABLE_FLARE_STATES))
-			SayNo();
-	}
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -410,7 +401,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
 
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
-	
+
 	auto pos = (level.GetLaraType() == LaraType::Divesuit) ?
 		GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160)).ToVector3() :
 		GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64)).ToVector3();
@@ -694,7 +685,7 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	/*if (TrInput & (IN_FORWARD | IN_BACK))
-		ModulateLaraTurnRateX(item, 0, 0, 0);*/
+	ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
 	if (TrInput & IN_FORWARD)
 		item->Pose.Orientation.x -= ANGLE(3.0f);
@@ -867,7 +858,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
 	}
 	//else
-		//lara->ExtraVelocity.x += minVelocity;
+	//lara->ExtraVelocity.x += minVelocity;
 }
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)

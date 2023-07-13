@@ -76,10 +76,10 @@ namespace TEN::Gui
 		LoadGame,
 		Options,
 		Display,
-		GeneralControls,
-		//VehicleControls,
+		GeneralActions,
+		//VehicleActions,
 		QuickActions,
-		MenuControls,
+		MenuActions,
 		OtherSettings
 	};
 

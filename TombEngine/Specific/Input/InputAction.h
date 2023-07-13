@@ -29,8 +29,7 @@ namespace TEN::Input
 		Fire,*/
 
 		// Quick actions
-		Flare, // Light
-		/*Binoculars,*/
+		Flare,
 		SmallMedipack,
 		LargeMedipack,
 		PreviousWeapon,
@@ -50,8 +49,8 @@ namespace TEN::Input
 		// Menu actions
 		Select,
 		Deselect,
-		Option,
 		Pause,
+		Inventory,
 		Save,
 		Load,
 		SwitchTarget, // TODO: Look -> SwitchTarget conversion must be handled differently.

@@ -256,7 +256,7 @@ namespace TEN::Renderer
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
 			break;
 
-		case Menu::GeneralControls:
+		case Menu::GeneralActions:
 			{
 				// Set up needed parameters.
 				y = MenuVerticalTop;
@@ -319,7 +319,7 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_LIGHT;
+				int baseIndex = KEY_FLARE;
 
 				// Quick action listing
 				for (int k = 0; k < QuickActionStrings.size(); k++)
@@ -359,7 +359,7 @@ namespace TEN::Renderer
 				break;
 			}
 
-		case Menu::MenuControls:
+		case Menu::MenuActions:
 			{
 				// Setup needed parameters.
 				y = MenuVerticalTop;
@@ -369,7 +369,7 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_OPTION;
+				int baseIndex = KEY_SELECT;
 
 				// Menu action listing.
 				for (int k = 0; k < MenuActionStrings.size(); k++)
@@ -463,10 +463,10 @@ namespace TEN::Renderer
 			break;
 
 		case Menu::Options:
-		case Menu::GeneralControls:
+		case Menu::GeneralActions:
 		//case Menu::VehicleControls:
 		case Menu::QuickActions:
-		case Menu::MenuControls:
+		case Menu::MenuActions:
 		case Menu::Display:
 		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
@@ -507,10 +507,10 @@ namespace TEN::Renderer
 			break;
 
 		case Menu::Options:
-		case Menu::GeneralControls:
+		case Menu::GeneralActions:
 		//case Menu::VehicleControls:
 		case Menu::QuickActions:
-		case Menu::MenuControls:
+		case Menu::MenuActions:
 		case Menu::Display:
 		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsPause);

@@ -113,9 +113,9 @@ namespace TEN::Gui
 	std::vector<const char*> MenuActionStrings =
 	{
 		STRING_ACTIONS_SELECT,
-		STRING_ACTIONS_DESELECT
-		STRING_ACTIONS_INVENTORY,
+		STRING_ACTIONS_DESELECT,
 		STRING_ACTIONS_PAUSE,
+		STRING_ACTIONS_INVENTORY,
 		STRING_ACTIONS_SAVE,
 		STRING_ACTIONS_LOAD
 	};
@@ -304,10 +304,10 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(false);
 			return inventoryResult;
 
-		case Menu::GeneralControls:
+		case Menu::GeneralActions:
 		//case Menu::VehicleControls:
 		case Menu::QuickActions:
-		case Menu::MenuControls:
+		case Menu::MenuActions:
 			HandleControlSettingsInput(item, false);
 			return inventoryResult;
 
@@ -597,7 +597,7 @@ namespace TEN::Gui
 		switch (MenuToDisplay)
 		{
 		default:
-		case Menu::GeneralControls:
+		case Menu::GeneralActions:
 			numControlSettingsOptions = (int)GeneralActionStrings.size() + 2;
 			break;
 
@@ -609,7 +609,7 @@ namespace TEN::Gui
 			numControlSettingsOptions = (int)QuickActionStrings.size() + 2;
 			break;
 
-		case Menu::MenuControls:
+		case Menu::MenuActions:
 			numControlSettingsOptions = (int)MenuActionStrings.size() + 2;
 			break;
 		}
@@ -671,7 +671,7 @@ namespace TEN::Gui
 							baseIndex = unsigned int(GeneralActionStrings.size());
 							break;
 
-						case Menu::MenuControls:
+						case Menu::MenuActions:
 							baseIndex = unsigned int(GeneralActionStrings.size() + QuickActionStrings.size());
 							break;
 
@@ -731,9 +731,9 @@ namespace TEN::Gui
 
 				if (GuiIsPulsed(In::Left))
 				{
-					if ((int)MenuToDisplay == (int)Menu::GeneralControls)
+					if ((int)MenuToDisplay == (int)Menu::GeneralActions)
 					{
-						menu = Menu::MenuControls;
+						menu = Menu::MenuActions;
 					}
 					else
 					{
@@ -742,9 +742,9 @@ namespace TEN::Gui
 				}
 				else if (GuiIsPulsed(In::Right))
 				{
-					if ((int)MenuToDisplay == (int)Menu::MenuControls)
+					if ((int)MenuToDisplay == (int)Menu::MenuActions)
 					{
-						menu = Menu::GeneralControls;
+						menu = Menu::GeneralActions;
 					}
 					else
 					{
@@ -834,7 +834,7 @@ namespace TEN::Gui
 
 		case OptionsOption::Controls:
 			BackupOptions();
-			MenuToDisplay = Menu::GeneralControls;
+			MenuToDisplay = Menu::GeneralActions;
 			SelectedOption = 0;
 			break;
 		}
@@ -1101,10 +1101,10 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(true);
 			return InventoryResult::None;
 
-		case Menu::GeneralControls:
+		case Menu::GeneralActions:
 		//case Menu::VehicleControls:
 		case Menu::QuickActions:
-		case Menu::MenuControls:
+		case Menu::MenuActions:
 			HandleControlSettingsInput(item, true);
 			return InventoryResult::None;
 
@@ -3181,7 +3181,7 @@ namespace TEN::Gui
 
 			UpdateInputActions(item);
 
-			if (IsClicked(In::Option))
+			if (IsClicked(In::Deselect))
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				exitLoop = true;
