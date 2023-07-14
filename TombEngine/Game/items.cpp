@@ -731,6 +731,9 @@ void UpdateAllItems()
 		auto* item = &g_Level.Items[itemNumber];
 		short nextItem = item->NextActive;
 
+		if (item->ObjectNumber == ID_NO_OBJECT)
+			continue;
+
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
 			if (Objects[item->ObjectNumber].control)
