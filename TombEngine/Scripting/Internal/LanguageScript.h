@@ -138,7 +138,7 @@
 #define STRING_MENU_ACTIONS				"menu_actions"
 #define STRING_QUICK_ACTIONS			"quick_actions"
 #define STRING_ACTIONS_LARGE_MEDIPACK	"actions_large_medipack"
-#define STRING_ACTIONS_LIGHT			"actions_light"
+#define STRING_ACTIONS_FLARE			"actions_flare"
 #define STRING_ACTIONS_NEXT_WEAPON		"actions_next_weapon"
 #define STRING_ACTIONS_PREVIOUS_WEAPON	"actions_previous_weapon"
 #define STRING_ACTIONS_SAY_NO			"actions_say_no"

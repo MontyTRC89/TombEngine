@@ -198,7 +198,7 @@ namespace TEN::Input
 	float GetActionTimeActive(ActionID actionID);
 	float GetActionTimeInactive(ActionID actionID);
 
-	bool IsDirectionActionHeld();
+	bool IsDirectionalActionHeld();
 	bool IsWakeActionHeld();
 	bool IsOpticActionHeld();
 }

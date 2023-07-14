@@ -602,12 +602,9 @@ namespace TEN::Input
 		ReadGameController();
 		DefaultConflict();
 
-		// Update action map (mappable actions only).
+		// Update action map.
 		for (int i = 0; i < KEY_COUNT; i++)
-		{
-			// TODO: Poll analog value of key. Potentially, any can be a trigger.
-			ActionMap[i].Update(Key(i) ? true : false);
-		}
+			ActionMap[i].Update(Key(i));
 
 		if (applyQueue)
 			ApplyActionQueue();
@@ -693,7 +690,6 @@ namespace TEN::Input
 		}
 
 		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
-
 		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
 		{
 			ApplyBindings(XInputBindings);
@@ -767,14 +763,14 @@ namespace TEN::Input
 		return ActionMap[(int)actionID].GetTimeInactive();
 	}
 
-	bool IsDirectionActionHeld()
+	bool IsDirectionalActionHeld()
 	{
 		return (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right));
 	}
 
 	bool IsWakeActionHeld()
 	{
-		if (IsDirectionActionHeld() || IsHeld(In::StepLeft) || IsHeld(In::StepRight) ||
+		if (IsDirectionalActionHeld() || IsHeld(In::StepLeft) || IsHeld(In::StepRight) ||
 			IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) ||
 			IsHeld(In::Draw) || IsHeld(In::Flare) || IsHeld(In::Action))
 		{
@@ -786,6 +782,6 @@ namespace TEN::Input
 
 	bool IsOpticActionHeld()
 	{
-		return (IsDirectionActionHeld() || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint));
+		return (IsDirectionalActionHeld() || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint));
 	}
 }
