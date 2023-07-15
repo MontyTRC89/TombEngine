@@ -99,8 +99,9 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
 	{
+		constexpr auto	  RIGHT_ARROW_OFFSET = 600;
 		static const auto LEFT_ARROW_STRING	 = std::string("<");
-		static const auto RIGHT_ARROW_STRING = std::string("           >");
+		static const auto RIGHT_ARROW_STRING = std::string(">");
 
 		int y = 0;
 		auto titleOption = g_Gui.GetSelectedOption();
@@ -253,7 +254,7 @@ namespace TEN::Renderer
 				y = MenuVerticalTop;
 
 				// Arrows
-				AddString(MenuRightSideEntry, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+				AddString(RIGHT_ARROW_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
 
 				// Title
 				auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_ACTIONS));
@@ -310,7 +311,7 @@ namespace TEN::Renderer
 
 				// Arrows
 				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
-				AddString(MenuRightSideEntry, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+				AddString(RIGHT_ARROW_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
 
 				// Title
 				auto titleString = std::string(g_GameFlow->GetString(STRING_QUICK_ACTIONS));
