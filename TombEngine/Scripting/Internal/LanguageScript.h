@@ -141,7 +141,6 @@
 #define STRING_ACTIONS_FLARE			"actions_flare"
 #define STRING_ACTIONS_NEXT_WEAPON		"actions_next_weapon"
 #define STRING_ACTIONS_PREVIOUS_WEAPON	"actions_previous_weapon"
-#define STRING_ACTIONS_SAY_NO			"actions_say_no"
 #define STRING_ACTIONS_SMALL_MEDIPACK	"actions_small_medipack"
 #define STRING_ACTIONS_WEAPON_1			"actions_weapon_1"
 #define STRING_ACTIONS_WEAPON_2			"actions_weapon_2"

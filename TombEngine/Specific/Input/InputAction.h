@@ -44,7 +44,6 @@ namespace TEN::Input
 		Weapon8,
 		Weapon9,
 		Weapon10,
-		SayNo,
 
 		// Menu actions
 		Select,

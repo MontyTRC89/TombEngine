@@ -245,7 +245,6 @@ void HandlePlayerQuickActions(ItemInfo& item)
 		if (IsClicked(In::Look))
 		{
 			ActionMap[(int)In::SwitchTarget].Update(true);
-			//ActionMap[(int)In::Look].Clear();
 		}
 		else
 		{

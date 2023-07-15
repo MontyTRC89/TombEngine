@@ -35,7 +35,6 @@ local strings =
 	actions_flare = { "Flare" },
 	actions_next_weapon = { "Next Weapon" },
 	actions_previous_weapon = { "Previous Weapon" },
-	actions_say_no = { "Say no" },
 	actions_small_medipack = { "Small Medipack" },
 	actions_weapon_1 = { "Weapon 1" },
 	actions_weapon_2 = { "Weapon 2" },

@@ -78,7 +78,6 @@ namespace TEN::Input
 		KEY_WEAPON_8,
 		KEY_WEAPON_9,
 		KEY_WEAPON_10,
-		KEY_SAY_NO,
 
 		KEY_SELECT,
 		KEY_DESELECT,
