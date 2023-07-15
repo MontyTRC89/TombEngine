@@ -24,6 +24,24 @@ namespace TEN::Input
 {
 	constexpr int AXIS_DEADZONE = 8000;
 
+	// OIS interfaces
+	InputManager*  OisInputManager = nullptr;
+	Keyboard*	   OisKeyboard	   = nullptr;
+	JoyStick*	   OisGamepad	   = nullptr;
+	ForceFeedback* OisRumble	   = nullptr;
+	Effect*		   OisEffect	   = nullptr;
+
+	// Globals
+	RumbleData				 RumbleInfo  = {};
+	std::vector<InputAction> ActionMap	 = {};
+	std::vector<QueueState>	 ActionQueue = {};
+	std::vector<bool>		 KeyMap		 = {};
+	std::vector<float>		 AxisMap	 = {};
+
+	//  Deprecated legacy input bit fields.
+	int DbInput = 0;
+	int TrInput = 0;
+
 	const std::vector<std::string> g_KeyNames =
 	{
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
@@ -69,28 +87,31 @@ namespace TEN::Input
 			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
 	};
 
-	// OIS interfaces
-	InputManager*  OisInputManager = nullptr;
-	Keyboard*	   OisKeyboard	   = nullptr;
-	JoyStick*	   OisGamepad	   = nullptr;
-	ForceFeedback* OisRumble	   = nullptr;
-	Effect*		   OisEffect	   = nullptr;
-
-	// Globals
-	RumbleData				 RumbleInfo  = {};
-	std::vector<InputAction> ActionMap	 = {};
-	std::vector<QueueState>	 ActionQueue = {};
-	std::vector<bool>		 KeyMap		 = {};
-	std::vector<float>		 AxisMap	 = {};
-
-	int DbInput = 0;
-	int TrInput = 0;
-
-	// Rows:
+	// Binding rows:
 	// 1. General actions
 	// 2. Vehicle actions
 	// 3. Quick actions
 	// 4. Menu actions
+	
+	// Primitive input action bindings.
+	std::vector<std::vector<int>> KeyboardLayout =
+	{
+		{
+			{
+				KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RCONTROL, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_SPACE, KC_NUMPAD0,
+				KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
+				KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
+				KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
+			},
+			{
+				KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RCONTROL, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_SPACE, KC_NUMPAD0,
+				KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
+				KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
+				KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
+			}
+		}
+	};
+
 	const auto DefaultBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RCONTROL, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_SPACE, KC_NUMPAD0,
@@ -106,23 +127,7 @@ namespace TEN::Input
 		KC_RETURN, XB_SELECT, XB_START, XB_SELECT, KC_F5, KC_F6, KC_NUMPAD0
 	};
 
-	// Input bindings. These are primitive mappings to actions.
-	bool ConflictingKeys[KEY_COUNT];
-	short KeyboardLayout[2][KEY_COUNT] =
-	{
-		{
-			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RCONTROL, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_SPACE, KC_NUMPAD0,
-			KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
-			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-			KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
-		},
-		{
-			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RCONTROL, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_SPACE, KC_NUMPAD0,
-			KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
-			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-			KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
-		}
-	};
+	auto ConflictingKeys = std::array<bool, KEY_COUNT>{};
 
 	void InitializeEffect()
 	{
