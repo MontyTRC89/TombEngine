@@ -623,7 +623,7 @@ namespace TEN::Entities::Vehicles
 		switch (laraItem->Animation.ActiveState)
 		{
 		case KAYAK_STATE_IDLE:
-			if ((IsHeld(In::Jump) || IsHeld(In::Brake)) &&
+			if (IsHeld(In::Brake) &&
 				!lara->Context.WaterCurrentActive &&
 				!lara->Context.WaterCurrentPull.x && !lara->Context.WaterCurrentPull.z)
 			{
