@@ -590,12 +590,12 @@ namespace TEN::Entities::Vehicles
 			case SKIDOO_STATE_LEFT:
 				if (skidooItem->Animation.Velocity.z >= 0)
 				{
-					if (!(IsHeld(In::Left)))
+					if (!IsHeld(In::Left))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 				}
 				else
 				{
-					if (!(IsHeld(In::Right)))
+					if (!IsHeld(In::Right))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 				}
 
@@ -604,12 +604,12 @@ namespace TEN::Entities::Vehicles
 			case SKIDOO_STATE_RIGHT:
 				if (skidooItem->Animation.Velocity.z >= 0)
 				{
-					if (!(IsHeld(In::Right)))
+					if (!IsHeld(In::Right))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 				}
 				else
 				{
-					if (!(IsHeld(In::Left)))
+					if (!IsHeld(In::Left))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 				}
 
