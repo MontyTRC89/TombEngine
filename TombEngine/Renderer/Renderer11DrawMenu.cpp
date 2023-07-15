@@ -102,7 +102,7 @@ namespace TEN::Renderer
 		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = SCREEN_SPACE_RES.x - MenuLeftSideEntry;
 		static const auto LEFT_ARROW_STRING				  = std::string("<");
 		static const auto RIGHT_ARROW_STRING			  = std::string(">");
-		static const auto CONTROL_SETTINGS_BLOCK_Y_OFFSET = (MenuVerticalNarrowLineSpacing * QuickActionStrings.size()) + (MenuVerticalBlockSpacing * 2);
+		static const auto CONTROL_SETTINGS_BLOCK_Y_OFFSET = (MenuVerticalNarrowLineSpacing * (int)QuickActionStrings.size()) + (MenuVerticalBlockSpacing * 2);
 
 		int y = 0;
 		auto titleOption = g_Gui.GetSelectedOption();
