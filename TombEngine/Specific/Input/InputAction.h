@@ -21,12 +21,12 @@ namespace TEN::Input
 		Look,
 
 		// Vehicle actions
-		Accelerate,
+		/*Accelerate,
 		Reverse,
 		Speed,
 		Slow,
 		Brake,
-		Fire,
+		Fire,*/
 
 		// Quick actions
 		Flare,
