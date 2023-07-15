@@ -99,7 +99,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
 	{
-		constexpr auto	  RIGHT_ARROW_OFFSET = 600;
+		constexpr auto	  RIGHT_ARROW_OFFSET = MenuLeftSideEntry + MenuCenterEntry;
 		static const auto LEFT_ARROW_STRING	 = std::string("<");
 		static const auto RIGHT_ARROW_STRING = std::string(">");
 
