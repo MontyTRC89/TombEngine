@@ -20,6 +20,7 @@ Version 1.1.0
 * Fix TR1 winged mutant pathfinding and damage issues and add new OCB for it.
 * Fix TR1 natla facing angle, bomb and shard, also this shooting anim in the second phase not playing.
 * Fix last inventory item not properly changed when loading, saving and restarting game.
+* Fix some puzzle hole objects crashing the engine on item insertion.
 * Make screenshot file in "Screenshots" subfolder by pressing print screen key.
 * Implement separate audio track channel for playing voiceovers with subtitles.
 * Don't stop ambience when Lara dies.

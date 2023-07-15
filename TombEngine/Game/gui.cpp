@@ -659,7 +659,7 @@ namespace TEN::Gui
 						switch (MenuToDisplay)
 						{
 						case Menu::VehicleActions:
-							numControlSettingsOptions = (unsigned int)GeneralActionStrings.size();
+							baseIndex = (unsigned int)GeneralActionStrings.size();
 							break;
 
 						case Menu::QuickActions:
