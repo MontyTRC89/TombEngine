@@ -29,7 +29,7 @@ namespace TEN::Input
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
 			"7",			"8",			"9",			"0",			"-",			"+",			"Back",			"Tab",
 			"Q",			"W",			"E",			"R",			"T",			"Y",			"U",			"I",
-			"O",			"P",			"<",			">",			"Enter",		"Ctrl",			"A",			"S",
+			"O",			"P",			"[",			"]",			"Enter",		"Ctrl",			"A",			"S",
 			"D",			"F",			"G",			"H",			"J",			"K",			"L",			";",
 			"'",			"`",			"Shift",		"#",			"Z",			"X",			"C",			"V",
 			"B",			"N",			"M",			",",			".",			"/",			"Shift",		"Pad X",
@@ -93,7 +93,7 @@ namespace TEN::Input
 	// 4. Menu controls
 	const auto DefaultBindings = std::vector<int>
 	{
-		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PGUP, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
+		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
 		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
 		KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
 		KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6, KC_NUMPAD0
@@ -111,13 +111,13 @@ namespace TEN::Input
 	short KeyboardLayout[2][KEY_COUNT] =
 	{
 		{
-			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PGUP, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
+			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
 			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
 			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
 			KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
 		},
 		{
-			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PGUP, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
+			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RCONTROL, KC_RMENU, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_END, KC_SPACE, KC_NUMPAD0,
 			/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
 			KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, KC_N,
 			KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
