@@ -300,7 +300,7 @@ namespace TEN::Gui
 			return inventoryResult;
 
 		case Menu::GeneralActions:
-		//case Menu::VehicleControls:
+		case Menu::VehicleActions:
 		case Menu::QuickActions:
 		case Menu::MenuActions:
 			HandleControlSettingsInput(item, false);
@@ -596,9 +596,9 @@ namespace TEN::Gui
 			numControlSettingsOptions = (int)GeneralActionStrings.size() + 2;
 			break;
 
-		/*case Menu::VehicleControls:
-			numControlSettingsOptions = (int)VehicleControlStrings.size() + 2;
-			break;*/
+		case Menu::VehicleActions:
+			numControlSettingsOptions = (int)VehicleActionStrings.size() + 2;
+			break;
 
 		case Menu::QuickActions:
 			numControlSettingsOptions = (int)QuickActionStrings.size() + 2;
@@ -658,16 +658,16 @@ namespace TEN::Gui
 						unsigned int baseIndex = 0;
 						switch (MenuToDisplay)
 						{
-						/*case Menu::VehicleControls:
-						numControlSettingsOptions = (unsigned int)GeneralControlStrings.size();
-						break;*/
+						case Menu::VehicleActions:
+							numControlSettingsOptions = (unsigned int)GeneralActionStrings.size();
+							break;
 
 						case Menu::QuickActions:
-							baseIndex = unsigned int(GeneralActionStrings.size());
+							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
 							break;
 
 						case Menu::MenuActions:
-							baseIndex = unsigned int(GeneralActionStrings.size() + QuickActionStrings.size());
+							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size() + QuickActionStrings.size());
 							break;
 
 						default:
@@ -1047,7 +1047,7 @@ namespace TEN::Gui
 			return InventoryResult::None;
 
 		case Menu::GeneralActions:
-		//case Menu::VehicleControls:
+		case Menu::VehicleActions:
 		case Menu::QuickActions:
 		case Menu::MenuActions:
 			HandleControlSettingsInput(item, true);
