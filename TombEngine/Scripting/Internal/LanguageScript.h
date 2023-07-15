@@ -107,7 +107,7 @@
 #define STRING_ACTIONS_REVERSE			"actions_reverse"
 #define STRING_ACTIONS_SPEED			"actions_speed"
 #define STRING_ACTIONS_SLOW				"actions_slow"
-#define STRING_ACTIONS_BRAKE			"actions_brake"
+#define STRING_ACTIONS_BRAKE_DISMOUNT			"actions_brake"
 #define STRING_ACTIONS_FIRE				"actions_fire"
 #define STRING_RESET_TO_DEFAULTS        "reset_to_defaults"
 #define STRING_TITLE_ITEMS				"items"
