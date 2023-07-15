@@ -770,8 +770,8 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					CurrentSettings.Configuration.KeyboardLayout = InputActionBindings[1];
-					g_Configuration.KeyboardLayout = InputActionBindings[1];
+					CurrentSettings.Configuration.InputActionBindings = InputActionBindings[1];
+					g_Configuration.InputActionBindings = InputActionBindings[1];
 					SaveConfiguration();
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
@@ -782,7 +782,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					InputActionBindings[1] = CurrentSettings.Configuration.KeyboardLayout;
+					InputActionBindings[1] = CurrentSettings.Configuration.InputActionBindings;
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;

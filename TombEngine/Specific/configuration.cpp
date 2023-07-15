@@ -275,7 +275,7 @@ bool SaveConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (SetDWORDRegKey(rootKey, buffer, g_Configuration.KeyboardLayout[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(rootKey, buffer, g_Configuration.InputActionBindings[i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
@@ -454,7 +454,7 @@ bool LoadConfiguration()
 			return false;
 		}
 
-		g_Configuration.KeyboardLayout.push_back(tempKey);
+		g_Configuration.InputActionBindings.push_back(tempKey);
 		InputActionBindings[1][i] = tempKey;
 	}
 
