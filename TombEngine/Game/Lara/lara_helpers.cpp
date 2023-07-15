@@ -96,8 +96,8 @@ static void UsePlayerMedipack(ItemInfo& item)
 	auto& player = GetLaraInfo(item);
 
 	// Can't use medipack; return early.
-	if ((item.HitPoints <= 0 || item.HitPoints >= LARA_HEALTH_MAX) &&
-		player.Status.Poison == 0)
+	if (item.HitPoints <= 0 ||
+		(item.HitPoints >= LARA_HEALTH_MAX && player.Status.Poison == 0))
 	{
 		return;
 	}

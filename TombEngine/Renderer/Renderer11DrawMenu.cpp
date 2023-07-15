@@ -99,9 +99,10 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
 	{
-		constexpr auto	  RIGHT_ARROW_OFFSET = SCREEN_SPACE_RES.x - MenuLeftSideEntry;
-		static const auto LEFT_ARROW_STRING	 = std::string("<");
-		static const auto RIGHT_ARROW_STRING = std::string(">");
+		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = SCREEN_SPACE_RES.x - MenuLeftSideEntry;
+		static const auto LEFT_ARROW_STRING				  = std::string("<");
+		static const auto RIGHT_ARROW_STRING			  = std::string(">");
+		static const auto CONTROL_SETTINGS_BLOCK_Y_OFFSET = (MenuVerticalNarrowLineSpacing * QuickActionStrings.size()) + (MenuVerticalBlockSpacing * 2);
 
 		int y = 0;
 		auto titleOption = g_Gui.GetSelectedOption();
@@ -254,7 +255,7 @@ namespace TEN::Renderer
 				y = MenuVerticalTop;
 
 				// Arrows
-				AddString(RIGHT_ARROW_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
 
 				// Title
 				auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_ACTIONS));
@@ -277,14 +278,10 @@ namespace TEN::Renderer
 					}
 
 					if (k < (GeneralActionStrings.size() - 1))
-					{
 						GetNextNarrowLinePosition(&y);
-					}
-					else
-					{
-						GetNextBlockPosition(&y);
-					}
 				}
+
+				y = CONTROL_SETTINGS_BLOCK_Y_OFFSET;
 
 				// Reset to defaults
 				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == GeneralActionStrings.size()));
@@ -311,7 +308,7 @@ namespace TEN::Renderer
 
 				// Arrows
 				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
-				AddString(RIGHT_ARROW_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
 
 				// Title
 				auto titleString = std::string(g_GameFlow->GetString(STRING_QUICK_ACTIONS));
@@ -336,14 +333,10 @@ namespace TEN::Renderer
 					}
 
 					if (k < (QuickActionStrings.size() - 1))
-					{
 						GetNextNarrowLinePosition(&y);
-					}
-					else
-					{
-						GetNextBlockPosition(&y);
-					}
 				}
+
+				y = CONTROL_SETTINGS_BLOCK_Y_OFFSET;
 
 				// Reset to defaults
 				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == QuickActionStrings.size()));
@@ -389,14 +382,10 @@ namespace TEN::Renderer
 					}
 
 					if (k < (MenuActionStrings.size() - 1))
-					{
 						GetNextNarrowLinePosition(&y);
-					}
-					else
-					{
-						GetNextBlockPosition(&y);
-					}
 				}
+
+				y = CONTROL_SETTINGS_BLOCK_Y_OFFSET;
 
 				// Reset to defaults
 				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == MenuActionStrings.size()));
