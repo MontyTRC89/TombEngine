@@ -720,7 +720,7 @@ namespace TEN::Entities::Vehicles
 			switch (laraItem->Animation.ActiveState)
 			{
 			case SPEEDBOAT_STATE_IDLE:
-				if (IsHeld(In::Jump) || IsHeld(In::Brake))
+				if (IsHeld(In::Brake))
 				{
 					if (speedboatItem->Animation.Velocity.z == 0)
 					{
@@ -737,7 +737,7 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			case SPEEDBOAT_STATE_MOVING:
-				if (IsHeld(In::Jump) || IsHeld(In::Brake))
+				if (IsHeld(In::Brake))
 				{
 					if (IsHeld(In::Right))
 						laraItem->Animation.TargetState = SPEEDBOAT_STATE_DISMOUNT_RIGHT;

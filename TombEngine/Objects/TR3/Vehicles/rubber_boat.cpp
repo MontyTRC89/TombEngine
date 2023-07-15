@@ -646,7 +646,7 @@ namespace TEN::Entities::Vehicles
 			switch (laraItem->Animation.ActiveState)
 			{
 			case RBOAT_STATE_IDLE:
-				if (IsHeld(In::Jump) || IsHeld(In::Brake))
+				if (IsHeld(In::Brake))
 				{
 					if (rBoatItem->Animation.Velocity.z == 0)
 					{
