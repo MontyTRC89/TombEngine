@@ -249,8 +249,12 @@ namespace TEN::Renderer
 				// Set up needed parameters.
 				y = MenuVerticalTop;
 
+				// Arrows
+				auto rightArrowString = std::string("           >");
+				AddString(MenuRightSideEntry, y, rightArrowString.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
 				// Title
-				auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_ACTIONS)) + " >";
+				auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_ACTIONS));
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
@@ -302,8 +306,14 @@ namespace TEN::Renderer
 				// Set up needed parameters.
 				y = MenuVerticalTop;
 
+				// Arrows
+				auto leftArrowString = std::string("<");
+				auto rightArrowString = std::string("           >");
+				AddString(MenuLeftSideEntry, y, leftArrowString.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+				AddString(MenuRightSideEntry, y, rightArrowString.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
 				// Title
-				auto titleString = "< " + std::string(g_GameFlow->GetString(STRING_QUICK_ACTIONS)) + " >";
+				auto titleString = std::string(g_GameFlow->GetString(STRING_QUICK_ACTIONS));
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
@@ -352,8 +362,14 @@ namespace TEN::Renderer
 				// Setup needed parameters.
 				y = MenuVerticalTop;
 
+				// Arrows
+				auto leftArrowString = std::string("<");
+				auto rightArrowString = std::string("           >");
+				AddString(MenuLeftSideEntry, y, leftArrowString.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+				AddString(MenuRightSideEntry, y, rightArrowString.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
 				// Title
-				auto titleString = "< " + std::string(g_GameFlow->GetString(STRING_MENU_ACTIONS));
+				auto titleString = std::string(g_GameFlow->GetString(STRING_MENU_ACTIONS));
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
