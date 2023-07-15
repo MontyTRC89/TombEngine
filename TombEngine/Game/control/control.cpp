@@ -633,7 +633,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		if (g_Gui.CallPause())
 			result = GameStatus::ExitToTitle;
 	}
-	else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
+	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
 			 LaraItem->HitPoints > 0 && !BinocularOn)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))
