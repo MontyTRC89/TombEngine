@@ -255,10 +255,6 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	{
 		ClearAction(In::SwitchTarget);
 	}
-
-	// Handle saying no.
-	if (IsClicked(In::SayNo))
-		SayNo();
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
