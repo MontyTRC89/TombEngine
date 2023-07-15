@@ -149,18 +149,16 @@ namespace TEN::Input
 		float	   FadeSpeed = 0.0f;
 	};
 
-	extern const std::vector<std::string> g_KeyNames;
-
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<QueueState>	ActionQueue;
 	extern std::vector<bool>		KeyMap;
 	extern std::vector<float>		AxisMap;
 
-	// Legacy input bit fields.
 	extern int DbInput; // Debounce input.
 	extern int TrInput; // Throttle input.
 
-	extern short KeyboardLayout[2][KEY_COUNT];
+	extern const std::vector<std::string>	   g_KeyNames;
+	extern		 std::vector<std::vector<int>> KeyboardLayout;
 
 	void InitializeInput(HWND handle);
 	void DeinitializeInput();

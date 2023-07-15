@@ -454,8 +454,8 @@ bool LoadConfiguration()
 			return false;
 		}
 
-		g_Configuration.KeyboardLayout[i] = (short)tempKey;
-		KeyboardLayout[1][i] = (short)tempKey;
+		g_Configuration.KeyboardLayout.push_back(tempKey);
+		KeyboardLayout[1][i] = tempKey;
 	}
 
 	// All configuration values were found, so I can apply configuration to the engine
