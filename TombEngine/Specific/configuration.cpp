@@ -448,14 +448,14 @@ bool LoadConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout[0][i]) != ERROR_SUCCESS)
+		if (GetDWORDRegKey(rootKey, buffer, &tempKey, InputActionBindings[0][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
 		}
 
 		g_Configuration.KeyboardLayout.push_back(tempKey);
-		KeyboardLayout[1][i] = tempKey;
+		InputActionBindings[1][i] = tempKey;
 	}
 
 	// All configuration values were found, so I can apply configuration to the engine
