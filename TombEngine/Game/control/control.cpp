@@ -218,7 +218,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		UpdateSimpleParticles();
-		UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
@@ -305,15 +304,11 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeScripting(levelIndex, loadGame);
 	InitializeNodeScripts();
 
+	// Initialize menu and inventory state.
+	g_Gui.Initialize();
+
 	// Initialize game variables and optionally load game.
 	InitializeOrLoadGame(loadGame);
-
-	// Prepare title menu, if necessary.
-	if (isTitle)
-	{
-		g_Gui.SetMenuToDisplay(Menu::Title);
-		g_Gui.SetSelectedOption(0);
-	}
 
 	// DoGameLoop() returns only when level has ended.
 	return DoGameLoop(levelIndex);
@@ -638,7 +633,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		if (g_Gui.CallPause())
 			result = GameStatus::ExitToTitle;
 	}
-	else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
+	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
 			 LaraItem->HitPoints > 0 && !BinocularOn)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))

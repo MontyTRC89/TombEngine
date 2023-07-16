@@ -35,7 +35,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto COMPY_PLAYER_ALERT_VELOCITY = 15;
 	constexpr auto COMPY_HIT_FLAG = 1;
 
-	const auto CompyBite = CreatureBiteInfo(Vector3i::Zero, 2);
+	const auto CompyBite = CreatureBiteInfo(Vector3::Zero, 2);
 	const auto CompyAttackJoints = std::vector<unsigned int>{ 1, 2 };
 
 	enum CompyState
@@ -120,7 +120,7 @@ namespace TEN::Entities::Creatures::TR3
 				float shortestDistance = INFINITY;
 				for (auto& targetItem : g_Level.Items)
 				{
-					if (targetItem.ObjectNumber == NO_ITEM || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
+					if (targetItem.ObjectNumber == ID_NO_OBJECT || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
 						continue;
 
 					if (SameZone(creature, &targetItem))

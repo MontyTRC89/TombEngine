@@ -21,13 +21,13 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto FLAMETHROWER_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
-	constexpr auto FLAMETHROWER_IDLE_RANGE	 = SQUARE(SECTOR(2));
-	constexpr auto FLAMETHROWER_AWARE_RANGE	 = SQUARE(SECTOR(8));
+	constexpr auto FLAMETHROWER_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto FLAMETHROWER_IDLE_RANGE	 = SQUARE(BLOCK(2));
+	constexpr auto FLAMETHROWER_AWARE_RANGE	 = SQUARE(BLOCK(8));
 
 	constexpr auto FLAMETHROWER_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 
-	const auto FlamethrowerBite = CreatureBiteInfo(Vector3i(0, 340, 64), 7);
+	const auto FlamethrowerBite = CreatureBiteInfo(Vector3(0, 340, 64), 7);
 
 	// TODO
 	enum FlamethrowerState

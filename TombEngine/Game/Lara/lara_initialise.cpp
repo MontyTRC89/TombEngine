@@ -14,14 +14,12 @@ using namespace TEN::Hud;
 
 void InitializeLara(bool restore)
 {
-	if (Lara.ItemNumber == NO_ITEM)
+	if (LaraItem->Index == NO_ITEM)
 		return;
 
 	LaraInfo lBackup = {};
 	if (restore)
 		memcpy(&lBackup, &Lara, sizeof(LaraInfo));
-
-	short itemNumber = Lara.ItemNumber;
 
 	LaraItem->Data = &Lara;
 	LaraItem->Collidable = false;
@@ -36,7 +34,6 @@ void InitializeLara(bool restore)
 	Lara.Status.Stamina = LARA_STAMINA_MAX;
 
 	Lara.Control.CanLook = true;
-	Lara.ItemNumber = itemNumber;
 	Lara.HitDirection = -1;
 	Lara.Control.Weapon.WeaponItem = NO_ITEM;
 	Lara.Context.WaterSurfaceDist = 100;
@@ -50,9 +47,13 @@ void InitializeLara(bool restore)
 	Lara.Control.HandStatus = HandStatus::Free;
 
 	if (restore)
-		InitializeLaraLevelJump(itemNumber, &lBackup);
+	{
+		InitializeLaraLevelJump(LaraItem->Index, &lBackup);
+	}
 	else
+	{
 		InitializeLaraDefaultInventory();
+	}
 
 	InitializeLaraMeshes(LaraItem);
 	InitializeLaraAnims(LaraItem);
@@ -143,10 +144,9 @@ void InitializeLaraAnims(ItemInfo* item)
 	}
 }
 
-void InitializeLaraLoad(short itemNum)
+void InitializeLaraLoad(short itemNumber)
 {
-	Lara.ItemNumber = itemNum;
-	LaraItem = &g_Level.Items[itemNum];
+	LaraItem = &g_Level.Items[itemNumber];
 }
 
 void InitializeLaraLevelJump(short itemNum, LaraInfo* lBackup)

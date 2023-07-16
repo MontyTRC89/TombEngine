@@ -43,35 +43,35 @@ bool IsOnExpandingPlatform(int itemNumber, int x, int z)
 	if (item->ItemFlags[1] <= 0)
 		return false;
 
-	int xb = x / SECTOR(1);
-	int zb = z / SECTOR(1);
-	int itemxb = item->Pose.Position.x / SECTOR(1);
-	int itemzb = item->Pose.Position.z / SECTOR(1);
+	int xb = x / BLOCK(1);
+	int zb = z / BLOCK(1);
+	int itemxb = item->Pose.Position.x / BLOCK(1);
+	int itemzb = item->Pose.Position.z / BLOCK(1);
 
 	auto bounds = GameBoundingBox(item);
 	auto halfWidth = abs(bounds.Z2 - bounds.Z1) / 2;
 
 	if (item->Pose.Orientation.y == ANGLE(90.0f))
 	{
-		int xBorder = item->Pose.Position.x + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
+		int xBorder = item->Pose.Position.x + halfWidth - BLOCK(1) * item->ItemFlags[1] / 4096;
 		if (x < xBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
 	else if (item->Pose.Orientation.y == ANGLE(270.0f))
 	{
-		int xBorder = item->Pose.Position.x - halfWidth + SECTOR(1) * item->ItemFlags[1] / 4096;
+		int xBorder = item->Pose.Position.x - halfWidth + BLOCK(1) * item->ItemFlags[1] / 4096;
 		if (x > xBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
 	else if (item->Pose.Orientation.y == 0)
 	{
-		int zBorder = item->Pose.Position.z + halfWidth - SECTOR(1) * item->ItemFlags[1] / 4096;
+		int zBorder = item->Pose.Position.z + halfWidth - BLOCK(1) * item->ItemFlags[1] / 4096;
 		if (z < zBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
 	else if (item->Pose.Orientation.y == ANGLE(180.0f))
 	{
-		int zBorder = item->Pose.Position.z - halfWidth + SECTOR(1) * item->ItemFlags[1] / 4096;
+		int zBorder = item->Pose.Position.z - halfWidth + BLOCK(1) * item->ItemFlags[1] / 4096;
 		if (z > zBorder || zb != itemzb || xb != itemxb)
 			return false;
 	}
@@ -95,35 +95,35 @@ bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margi
 	auto bounds = GameBoundingBox(item);
 	auto halfWidth = abs(bounds.Z2 - bounds.Z1) / 2;
 	
-	int xb = x / SECTOR(1);
-	int zb = z / SECTOR(1);
-	int itemxb = item->Pose.Position.x / SECTOR(1);
-	int itemzb = item->Pose.Position.z / SECTOR(1);
+	int xb = x / BLOCK(1);
+	int zb = z / BLOCK(1);
+	int itemxb = item->Pose.Position.x / BLOCK(1);
+	int itemzb = item->Pose.Position.z / BLOCK(1);
 
 	if (item->Pose.Orientation.y == ANGLE(90))
 	{
-		int xBorder = item->Pose.Position.x + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
+		int xBorder = item->Pose.Position.x + halfWidth - margin - BLOCK(1) * item->ItemFlags[1] / 4096;
 		int xBorder2 = item->Pose.Position.x + halfWidth;
 		if (x < xBorder || zb != itemzb || x > xBorder2)
 			return false;
 	}
 	else if (item->Pose.Orientation.y == ANGLE(270))
 	{
-		int xBorder = item->Pose.Position.x - halfWidth + margin + SECTOR(1) * item->ItemFlags[1] / 4096;
+		int xBorder = item->Pose.Position.x - halfWidth + margin + BLOCK(1) * item->ItemFlags[1] / 4096;
 		int xBorder2 = item->Pose.Position.x - halfWidth;
 		if (x > xBorder || zb != itemzb || x < xBorder2)
 			return false;
 	}
 	else if (item->Pose.Orientation.y == 0)
 	{
-		int zBorder = item->Pose.Position.z + halfWidth - margin - SECTOR(1) * item->ItemFlags[1] / 4096;
+		int zBorder = item->Pose.Position.z + halfWidth - margin - BLOCK(1) * item->ItemFlags[1] / 4096;
 		int zBorder2 = item->Pose.Position.z + halfWidth;
 		if (z < zBorder || xb != itemxb || z > zBorder2)
 			return false;
 	}
 	else if (item->Pose.Orientation.y == ANGLE(180))
 	{
-		int zBorder = item->Pose.Position.z - halfWidth + margin + SECTOR(1) * item->ItemFlags[1] / 4096;
+		int zBorder = item->Pose.Position.z - halfWidth + margin + BLOCK(1) * item->ItemFlags[1] / 4096;
 		int zBorder2 = item->Pose.Position.z - halfWidth;
 		if (z > zBorder || xb != itemxb || z < zBorder2)
 			return false;

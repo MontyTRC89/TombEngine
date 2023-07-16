@@ -27,8 +27,8 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto KID_TURN_RATE_MAX = ANGLE(4.0f);
 
-	const auto KidGunBiteRight = CreatureBiteInfo(Vector3i(0, 170, 34), 7);
-	const auto KidGunBiteLeft  = CreatureBiteInfo(Vector3i(0, 170, 37), 4);
+	const auto KidGunBiteRight = CreatureBiteInfo(Vector3(0, 170, 34), 7);
+	const auto KidGunBiteLeft  = CreatureBiteInfo(Vector3(0, 170, 37), 4);
 
 	enum SkateKidState
 	{

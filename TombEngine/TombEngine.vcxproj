@@ -73,13 +73,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
@@ -91,13 +91,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
@@ -569,6 +569,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
+    <ClInclude Include="Objects\TR4\Trap\SpikyCeiling.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_blade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_catwalkblade.h" />
@@ -584,7 +585,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Trap\tr4_sethblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_slicerdicer.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_spikeball.h" />
-    <ClInclude Include="Objects\TR4\Trap\tr4_spikyceiling.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_spikywall.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_stargate.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_teethspike.h" />
@@ -726,6 +726,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Misc\CameraTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\LevelLog.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\Miscellaneous.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Misc\SoundTrackTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\AIObject\AIObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Camera\CameraObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
@@ -1010,6 +1011,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Object\tr4_senet.cpp" />
     <ClCompile Include="Objects\TR4\Object\WraithTrap.cpp" />
     <ClCompile Include="Objects\TR4\tr4_objects.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\SpikyCeiling.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_birdblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_blade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_catwalkblade.cpp" />
@@ -1025,7 +1027,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Trap\tr4_sethblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_slicerdicer.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_spikeball.cpp" />
-    <ClCompile Include="Objects\TR4\Trap\tr4_spikyceiling.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_spikywall.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_stargate.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp" />

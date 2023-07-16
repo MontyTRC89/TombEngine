@@ -152,7 +152,7 @@ This is equivalent to TRNG's LevelFarView variable.
 void Level::SetLevelFarView(short val)
 {
 	static_assert(MIN_FAR_VIEW == 3200.0f, "Please update the comment, docs, and warning message if this number changes.");
-	const short min = std::ceil(MIN_FAR_VIEW / SECTOR(1));
+	const short min = std::ceil(MIN_FAR_VIEW / BLOCK(1));
 	bool cond = val >= min;
 
 	std::string msg{ "farView value must be 4 or greater." };

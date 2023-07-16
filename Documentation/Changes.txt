@@ -2,19 +2,43 @@ Version 1.1.0
 ==============
 
 * Fix enemies shooting Lara through static meshes and moveables.
+* Fix skeletons and mummies not affected by explosive weapons.
 * Fix crash on loading if static meshes with IDs above maximum are present.
+* Fix random crashes when playing audio tracks with names longer than 15 symbols.
+* Fix various crashes specific to 64-bit build.
+* Fix crashes when trying to play .wav soundtracks on some Windows 11 systems.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
-* Fix electricity effect crashing 64-bit version of the engine.
 * Fix clockwork beetle activation crashing the game.
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
 * Fix doppelganger being limited to be in a single room.
-* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
+* Fix bat AI, damage value, and incorrect collision after death.
+* Fix regeneration for pickups with OCB 128.
+* Fix raising blocks still shaking without OCB.
+* Fix spiky ceiling, allow any size of it, and add new OCBs for it.
+* Fix TR1 winged mutant pathfinding and damage issues and add new OCB for it.
+* Fix TR1 natla facing angle, bomb and shard, also this shooting anim in the second phase not playing.
+* Fix last inventory item not properly changed when loading, saving and restarting game.
+* Fix some puzzle hole objects crashing the engine on item insertion.
+* Make screenshot file in "Screenshots" subfolder by pressing print screen key.
+* Implement separate audio track channel for playing voiceovers with subtitles.
+* Don't stop ambience when Lara dies.
 * Pause all sounds when entering inventory or pause menu.
 * Improve deflection against slopes.
+* Move and rotate Lara and activated pickups together with dynamic bridge objects.
+* Change camera bounce to be more accurate to TR4 camera bounce.
+* Add input action bindings for previously hardcoded hotkeys such as weapon scroll or flare.
+* Add 2 new control settings pages for input action bindings.
+* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
+
+Lua API changes:
+* Add soundtrack functions:
+  - Misc::GetAudioTrackLoudness() for getting current loudness of a given track type.
+  - Misc::IsAudioTrackPlaying() for checking if a given track type is playing.
+  - Misc::GetCurrentSubtitle() for getting current subtitle string for the voice track.
 
 Version 1.0.9
 =============

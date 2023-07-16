@@ -187,8 +187,17 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		for (int i = 0; i < g_Level.NumItems; i++)
-			InitializeItem(i);
+		// Initialize all bridges first.
+		// It is needed because some other items need final floor height to init properly.
+
+		for (int isFloor = 0; isFloor <= 1; isFloor++)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if ((Objects[g_Level.Items[i].ObjectNumber].floor == nullptr) == (bool)isFloor)
+					InitializeItem(i);
+			}
+		}
 	}
 }
 
@@ -1404,8 +1413,8 @@ void BuildOutsideRoomsTable()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		int rx = (room->x / SECTOR(1));
-		int rz = (room->z / SECTOR(1));
+		int rx = (room->x / BLOCK(1));
+		int rz = (room->z / BLOCK(1));
 
 		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{

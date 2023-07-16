@@ -252,7 +252,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_FAST_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
@@ -418,8 +418,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (!IsHeld(In::Jump) || isSwamp) // JUMP locks orientation outside swamps.
 	{
 		// Sidestep locks orientation.
-		if ((IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
-			(IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right))))
+		if ((IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
+			(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))))
 		{
 			ModulateLaraTurnRateY(item, 0, 0, 0);
 		}
@@ -508,7 +508,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::LeftStep) || (IsHeld(In::Walk) && IsHeld(In::Left)))
+	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 	{
 		if (TestLaraStepLeft(item, coll))
 			item->Animation.TargetState = LS_STEP_LEFT;
@@ -517,7 +517,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right)))
+	else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 	{
 		if (TestLaraStepRight(item, coll))
 			item->Animation.TargetState = LS_STEP_RIGHT;
@@ -798,7 +798,7 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
@@ -822,7 +822,6 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
-	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -1465,7 +1464,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
@@ -1486,7 +1485,7 @@ void PseudoLaraAsSwampWalkBack(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 3);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX / 3);
@@ -1826,7 +1825,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraTurnRateY(item, 0, 0, 0);
 	else
 	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
@@ -1920,7 +1919,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraTurnRateY(item, 0, 0, 0);
 	else
 	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
@@ -2143,7 +2142,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 2, LARA_LEAN_MAX);
@@ -2175,7 +2174,7 @@ void PseudoLaraAsSwampWadeForward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SWAMP_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX * 0.6f);
@@ -2264,7 +2263,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
@@ -2400,7 +2399,7 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME)
 		lara->Control.Count.Run = LARA_RUN_JUMP_TIME;
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);

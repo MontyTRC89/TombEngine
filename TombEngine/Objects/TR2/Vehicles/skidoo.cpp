@@ -365,7 +365,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != skidooItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			AnimateItem(laraItem);
@@ -381,7 +381,7 @@ namespace TEN::Entities::Vehicles
 		if (probe.RoomNumber != skidooItem->RoomNumber)
 		{
 			ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+			ItemNewRoom(laraItem->Index, probe.RoomNumber);
 		}
 
 		if (laraItem->Animation.ActiveState != SKIDOO_STATE_FALLOFF)
@@ -730,10 +730,10 @@ namespace TEN::Entities::Vehicles
 
 	short DoSkidooShift(ItemInfo* skidooItem, Vector3i* pos, Vector3i* old)
 	{
-		int	x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
+		int	x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int xOld = old->x / BLOCK(1);
+		int zOld = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -751,7 +751,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				skidooItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				skidooItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (skidooItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -764,7 +764,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				skidooItem->Pose.Position.x += SECTOR(1) - shiftX;
+				skidooItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - skidooItem->Pose.Position.z);
 			}
 		}
@@ -779,7 +779,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, skidooItem->RoomNumber);
@@ -788,7 +788,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)

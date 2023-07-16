@@ -29,13 +29,13 @@ The following constants are inside RoomFlagID.
 @table CONSTANT_STRING_HERE
 */
 
-static const std::unordered_map<std::string, RoomEnvFlags> kRoomFlagIDs
+static const std::unordered_map<std::string, RoomEnvFlags> TOOM_FLAG_IDS
 {
-	{"WATER", RoomEnvFlags::ENV_FLAG_WATER},
-	{"QUICKSAND", RoomEnvFlags::ENV_FLAG_SWAMP},
-	{"SKYBOX", RoomEnvFlags::ENV_FLAG_OUTSIDE},
-	{"WIND", RoomEnvFlags::ENV_FLAG_WIND},
-	{"COLD", RoomEnvFlags::ENV_FLAG_COLD},
-	{"DAMAGE", RoomEnvFlags::ENV_FLAG_DAMAGE},
-	{"NOLENSFLARE", RoomEnvFlags::ENV_FLAG_NO_LENSFLARE}
+	{ "WATER", RoomEnvFlags::ENV_FLAG_WATER },
+	{ "QUICKSAND", RoomEnvFlags::ENV_FLAG_SWAMP },
+	{ "SKYBOX", RoomEnvFlags::ENV_FLAG_OUTSIDE },
+	{ "WIND", RoomEnvFlags::ENV_FLAG_WIND },
+	{ "COLD", RoomEnvFlags::ENV_FLAG_COLD },
+	{ "DAMAGE", RoomEnvFlags::ENV_FLAG_DAMAGE },
+	{ "NOLENSFLARE", RoomEnvFlags::ENV_FLAG_NO_LENSFLARE }
 };
