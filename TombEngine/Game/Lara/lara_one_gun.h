@@ -34,7 +34,7 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType);
 void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
 void UndrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType);
 
-void FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose = std::nullopt);
+bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose = std::nullopt);
 void HarpoonBoltControl(short itemNumber);
 void FireGrenade(ItemInfo& laraItem);
 void GrenadeControl(short itemNumber);

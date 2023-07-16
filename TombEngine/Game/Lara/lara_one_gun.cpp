@@ -561,19 +561,19 @@ void UndrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)
 	}
 }
 
-void FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
+bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 	auto& ammo = GetAmmo(player, LaraWeaponType::HarpoonGun);
 
 	if (!ammo)
-		return;
+		return false;
 
 	player.Control.Weapon.HasFired = true;
 
 	int itemNumber = CreateItem();
 	if (itemNumber == NO_ITEM)
-		return;
+		return false;
 
 	auto& harpoonItem = g_Level.Items[itemNumber];
 
@@ -632,6 +632,8 @@ void FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 
 	Statistics.Level.AmmoUsed++;
 	Statistics.Game.AmmoUsed++;
+
+	return true;
 }
 	
 void HarpoonBoltControl(short itemNumber)

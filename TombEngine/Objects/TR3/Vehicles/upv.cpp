@@ -227,7 +227,8 @@ namespace TEN::Entities::Vehicles
 		auto& upv = *GetUPVInfo(UPVItem);
 
 		auto harpoonPose = Pose(GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((upv.HarpoonLeft ? 22 : -22), 24, 230)));
-		FireHarpoon(*laraItem, harpoonPose);
+		if (!FireHarpoon(*laraItem, harpoonPose))
+			return;
 
 		auto soundID = (upv.Flags & UPV_FLAG_SURFACE) ? SFX_TR4_HARPOON_FIRE_DRY : SFX_TR4_HARPOON_FIRE_UNDERWATER;
 		SoundEffect(soundID, &harpoonPose, SoundEnvironment::Always);
