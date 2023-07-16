@@ -164,11 +164,16 @@ class ObjectHandler
 			std::memset(m_objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
 		}
 
-		bool CheckID(int index)
+		bool CheckID(int index, bool silent = false)
 		{
 			if (index == GAME_OBJECT_ID::ID_NO_OBJECT || index >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 			{
-				TENLog("Attempt to access unavailable slot ID (" + std::to_string(index) + "). Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
+				if (!silent)
+				{
+					TENLog("Attempt to access unavailable slot ID (" + std::to_string(index) + "). " +
+						"Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
+				}
+
 				return false;
 			}
 
