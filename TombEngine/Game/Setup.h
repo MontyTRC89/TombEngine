@@ -145,23 +145,23 @@ struct ObjectInfo
 class ObjectHandler
 {
 	private:
-		ObjectInfo m_objects[ID_NUMBER_OBJECTS];
+		ObjectInfo Objects[ID_NUMBER_OBJECTS];
 
 		ObjectInfo& GetFirstAvailableObject()
 		{
 			for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 			{
-				if (m_objects[i].loaded)
-					return m_objects[i];
+				if (Objects[i].loaded)
+					return Objects[i];
 			}
 
-			return m_objects[0];
+			return Objects[0];
 		}
 
 	public:
 		void Initialize() 
 		{ 
-			std::memset(m_objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
+			std::memset(Objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
 		}
 
 		bool CheckID(int index, bool silent = false)
@@ -183,7 +183,7 @@ class ObjectHandler
 		ObjectInfo& operator[](int index) 
 		{
 			if (CheckID(index))
-				return m_objects[index];
+				return Objects[index];
 			else
 				return GetFirstAvailableObject();
 		}
