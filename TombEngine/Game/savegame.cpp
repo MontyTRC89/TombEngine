@@ -507,8 +507,6 @@ bool SaveGame::Save(int slot)
 	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
-		ObjectInfo* obj = &Objects[itemToSerialize.ObjectNumber];
-
 		auto luaNameOffset = fbb.CreateString(itemToSerialize.Name);
 		auto luaOnKilledNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnKilled);
 		auto luaOnHitNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnHit);
@@ -663,9 +661,12 @@ bool SaveGame::Save(int slot)
 		}
 
 		Save::ItemBuilder serializedItem{ fbb };
+
+		if (Objects.CheckID(itemToSerialize.ObjectNumber))
+			serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - Objects[itemToSerialize.ObjectNumber].animIndex);
+
 		serializedItem.add_next_item(itemToSerialize.NextItem);
 		serializedItem.add_next_item_active(itemToSerialize.NextActive);
-		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
 		serializedItem.add_after_death(itemToSerialize.AfterDeath);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
