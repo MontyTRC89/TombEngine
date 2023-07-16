@@ -142,7 +142,49 @@ struct ObjectInfo
 	}
 };
 
-struct STATIC_INFO
+class ObjectHandler
+{
+	private:
+		ObjectInfo m_objects[ID_NUMBER_OBJECTS];
+
+		ObjectInfo& GetFirstAvailableObject()
+		{
+			for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
+			{
+				if (m_objects[i].loaded)
+					return m_objects[i];
+			}
+
+			return m_objects[0];
+		}
+
+	public:
+		void Initialize() 
+		{ 
+			std::memset(m_objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
+		}
+
+		bool CheckID(int index)
+		{
+			if (index == GAME_OBJECT_ID::ID_NO_OBJECT || index >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+			{
+				TENLog("Attempt to access unavailable slot ID (" + std::to_string(index) + "). Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
+				return false;
+			}
+
+			return true;
+		}
+
+		ObjectInfo& operator[](int index) 
+		{
+			if (CheckID(index))
+				return m_objects[index];
+			else
+				return GetFirstAvailableObject();
+		}
+};
+
+struct StaticInfo
 {
 	int meshNumber;
 	int flags;
@@ -158,8 +200,8 @@ constexpr auto SF_SHATTERABLE = 0x02;
 constexpr auto GRAVITY = 6.0f;
 constexpr auto SWAMP_GRAVITY = GRAVITY / 3.0f;
 
-extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
-extern STATIC_INFO StaticObjects[MAX_STATICS];
+extern ObjectHandler Objects;
+extern StaticInfo StaticObjects[MAX_STATICS];
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();

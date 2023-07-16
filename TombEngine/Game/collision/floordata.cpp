@@ -751,11 +751,8 @@ namespace TEN::Collision::Floordata
 	{
 		const auto& item = g_Level.Items[itemNumber];
 
-		if (item.ObjectNumber == ID_NO_OBJECT)
-		{
-			TENLog("Attempt to add item with nonexistent object ID as bridge", LogLevel::Error);
+		if (!Objects.CheckID(item.ObjectNumber))
 			return;
-		}
 
 		x += item.Pose.Position.x;
 		z += item.Pose.Position.z;
@@ -796,11 +793,8 @@ namespace TEN::Collision::Floordata
 	{
 		const auto& item = g_Level.Items[itemNumber];
 
-		if (item.ObjectNumber == ID_NO_OBJECT)
-		{
-			TENLog("Attempt to remove item with nonexistent object ID as bridge", LogLevel::Error);
+		if (!Objects.CheckID(item.ObjectNumber))
 			return;
-		}
 
 		x += item.Pose.Position.x;
 		z += item.Pose.Position.z;
@@ -877,11 +871,8 @@ namespace TEN::Collision::Floordata
 	{
 		auto item = &g_Level.Items[itemNumber];
 
-		if (item->ObjectNumber == ID_NO_OBJECT)
-		{
-			TENLog("Attempt to update item with nonexistent object ID as bridge", LogLevel::Error);
+		if (!Objects.CheckID(item->ObjectNumber))
 			return;
-		}
 
 		if (!Objects[item->ObjectNumber].loaded)
 			return;

@@ -31,8 +31,9 @@ using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
-ObjectInfo Objects[ID_NUMBER_OBJECTS];
-STATIC_INFO StaticObjects[MAX_STATICS];
+ObjectHandler Objects;
+StaticInfo StaticObjects[MAX_STATICS];
+
 
 void InitializeGameFlags()
 {
