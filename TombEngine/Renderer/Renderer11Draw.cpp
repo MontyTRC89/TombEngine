@@ -187,7 +187,7 @@ namespace TEN::Renderer
 			else if (m_shadowLight->Type == LIGHT_TYPE_SPOT)
 			{
 				view = Matrix::CreateLookAt(m_shadowLight->Position,
-					m_shadowLight->Position - m_shadowLight->Direction * BLOCK(10),
+					m_shadowLight->Position + m_shadowLight->Direction * BLOCK(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
 				// Vertex lighting fades out in 1024-steps. increase angle artificially for a bigger blend radius.
