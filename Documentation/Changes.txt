@@ -21,6 +21,7 @@ Version 1.1.0
 * Fix TR1 natla facing angle, bomb and shard, also this shooting anim in the second phase not playing.
 * Fix last inventory item not properly changed when loading, saving and restarting game.
 * Fix some puzzle hole objects crashing the engine on item insertion.
+* Fix harpoon bolt bug when shooting vertically.
 * Make screenshot file in "Screenshots" subfolder by pressing print screen key.
 * Implement separate audio track channel for playing voiceovers with subtitles.
 * Don't stop ambience when Lara dies.
@@ -28,6 +29,9 @@ Version 1.1.0
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
 * Change camera bounce to be more accurate to TR4 camera bounce.
+* Add input action bindings for previously hardcoded hotkeys such as weapon scroll or flare.
+* Add 2 new control settings pages for input action bindings.
+* Add splash effect for rockets and grenades when entering water.
 * Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.

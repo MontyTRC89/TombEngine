@@ -265,12 +265,12 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
-	if (DbInput & IN_JUMP && !IsDirectionActionHeld())
+	if (DbInput & IN_JUMP && !IsDirectionalActionHeld())
 		lara->Control.JumpDirection = JumpDirection::None;
 
 	if (((TrInput & IN_FORWARD &&
 			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
-		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Forward) &&
+		!IsDirectionalActionHeld() && lara->Control.JumpDirection == JumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_FORWARD;
@@ -278,7 +278,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	else if ((TrInput & IN_BACK ||
-		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Back) &&
+		!IsDirectionalActionHeld() && lara->Control.JumpDirection == JumpDirection::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_BACK;
@@ -287,7 +287,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((TrInput & IN_LEFT ||
-		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Left) &&
+		!IsDirectionalActionHeld() && lara->Control.JumpDirection == JumpDirection::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_LEFT;
@@ -295,7 +295,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	else if ((TrInput & IN_RIGHT ||
-		!IsDirectionActionHeld() && lara->Control.JumpDirection == JumpDirection::Right) &&
+		!IsDirectionalActionHeld() && lara->Control.JumpDirection == JumpDirection::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
 		item->Animation.TargetState = LS_JUMP_RIGHT;

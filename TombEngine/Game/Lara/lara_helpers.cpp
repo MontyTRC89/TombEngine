@@ -13,6 +13,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
@@ -68,7 +69,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
-	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))) &&
+	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
 		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
 		ResetPlayerLean(item, 1 / 6.0f);
@@ -76,18 +77,184 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
-		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(TrInput & (IN_LEFT | IN_RIGHT)))))
+		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(IsHeld(In::Left) || IsHeld(In::Right)))))
 	{
 		ResetPlayerFlex(item, 0.1f);
 	}
 
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
 		lara->Control.TurnRate = 0;
 
 	lara->Control.IsLow = false;
 	lara->Control.IsMonkeySwinging = false;
+}
+
+static void UsePlayerMedipack(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Can't use medipack; return early.
+	if (item.HitPoints <= 0 ||
+		(item.HitPoints >= LARA_HEALTH_MAX && player.Status.Poison == 0))
+	{
+		return;
+	}
+
+	bool hasUsedMedipack = false;
+
+	if (IsClicked(In::SmallMedipack) &&
+		player.Inventory.TotalSmallMedipacks != 0)
+	{
+		hasUsedMedipack = true;
+
+		item.HitPoints += LARA_HEALTH_MAX / 2;
+		if (item.HitPoints > LARA_HEALTH_MAX)
+			item.HitPoints = LARA_HEALTH_MAX;
+
+		if (player.Inventory.TotalSmallMedipacks != -1)
+			player.Inventory.TotalSmallMedipacks--;
+	}
+	else if (IsClicked(In::LargeMedipack) &&
+		player.Inventory.TotalLargeMedipacks != 0)
+	{
+		hasUsedMedipack = true;
+		item.HitPoints = LARA_HEALTH_MAX;
+
+		if (player.Inventory.TotalLargeMedipacks != -1)
+			player.Inventory.TotalLargeMedipacks--;
+	}
+
+	if (hasUsedMedipack)
+	{
+		player.Status.Poison = 0;
+		Statistics.Game.HealthUsed++;
+		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+	}
+}
+
+static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
+{
+	static const auto SCROLL_WEAPON_TYPES = std::vector<LaraWeaponType>
+	{
+		LaraWeaponType::Pistol,
+		LaraWeaponType::Shotgun,
+		LaraWeaponType::Uzi,
+		LaraWeaponType::Revolver,
+		LaraWeaponType::GrenadeLauncher,
+		LaraWeaponType::Crossbow,
+		LaraWeaponType::HarpoonGun,
+		LaraWeaponType::HK,
+		LaraWeaponType::RocketLauncher
+	};
+
+	auto& player = GetLaraInfo(item);
+
+	// Get vector index for current weapon type.
+	auto currentIndex = std::optional<unsigned int>(std::nullopt);
+	for (int i = 0; i < SCROLL_WEAPON_TYPES.size(); i++)
+	{
+		if (SCROLL_WEAPON_TYPES[i] == currentWeaponType)
+		{
+			currentIndex = i;
+			break;
+		}
+	}
+
+	// Invalid current weapon type; return nullopt.
+	if (!currentIndex.has_value())
+		return std::nullopt;
+
+	// Getter for next index.
+	auto getNextIndex = [getPrev](unsigned int index)
+	{
+		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
+	};
+
+	// Get next valid weapon type in sequence.
+	unsigned int nextIndex = getNextIndex(*currentIndex);
+	while (nextIndex != *currentIndex)
+	{
+		auto nextWeaponType = SCROLL_WEAPON_TYPES[nextIndex];
+		if (player.Weapons[(int)nextWeaponType].Present)
+			return nextWeaponType;
+
+		nextIndex = getNextIndex(nextIndex);
+	}
+
+	// No valid weapon type; return nullopt.
+	return std::nullopt;
+}
+
+void HandlePlayerQuickActions(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Handle medipacks.
+	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
+		UsePlayerMedipack(item);
+
+	// Handle weapon scroll requests.
+	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
+	{
+		bool getPrev = IsClicked(In::PreviousWeapon);
+		auto weaponType = GetPlayerScrolledWeaponType(item, player.Control.Weapon.GunType, getPrev);
+
+		if (weaponType.has_value())
+			player.Control.Weapon.RequestGunType = *weaponType;
+	}
+
+	// Handle weapon requests.
+	if (IsClicked(In::Weapon1) && player.Weapons[(int)LaraWeaponType::Pistol].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+
+	if (IsClicked(In::Weapon2) && player.Weapons[(int)LaraWeaponType::Shotgun].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+
+	if (IsClicked(In::Weapon3) && player.Weapons[(int)LaraWeaponType::Uzi].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+
+	if (IsClicked(In::Weapon4) && player.Weapons[(int)LaraWeaponType::Revolver].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+
+	if (IsClicked(In::Weapon5) && player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+
+	if (IsClicked(In::Weapon6) && player.Weapons[(int)LaraWeaponType::Crossbow].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
+
+	if (IsClicked(In::Weapon7) && player.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+
+	if (IsClicked(In::Weapon8) && player.Weapons[(int)LaraWeaponType::HK].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+
+	if (IsClicked(In::Weapon9) && player.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+
+	// TODO: 10th possible weapon, probably grapple gun.
+	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
+	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
+
+	// TODO: Could theoretically remove SwitchTarget and instead do unique behaviour handling using only Look. -- Sezz 2023.07.08
+	// HACK: Handle target switch when locked on to an entity.
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.TargetEntity != nullptr)
+	{
+		if (IsClicked(In::Look))
+		{
+			ActionMap[(int)In::SwitchTarget].Update(true);
+		}
+		else
+		{
+			ClearAction(In::SwitchTarget);
+		}
+	}
+	else
+	{
+		ClearAction(In::SwitchTarget);
+	}
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -229,7 +396,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
 
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
-	
+
 	auto pos = (level.GetLaraType() == LaraType::Divesuit) ?
 		GetJointPosition(item, LM_TORSO, Vector3i(0, -192, -160)).ToVector3() :
 		GetJointPosition(item, LM_HEAD, Vector3i(0, -4, -64)).ToVector3();
@@ -513,7 +680,7 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	/*if (TrInput & (IN_FORWARD | IN_BACK))
-		ModulateLaraTurnRateX(item, 0, 0, 0);*/
+	ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
 	if (TrInput & IN_FORWARD)
 		item->Pose.Orientation.x -= ANGLE(3.0f);
@@ -686,7 +853,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
 	}
 	//else
-		//lara->ExtraVelocity.x += minVelocity;
+	//lara->ExtraVelocity.x += minVelocity;
 }
 
 void AlignLaraToSurface(ItemInfo* item, float alpha)
