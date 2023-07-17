@@ -61,8 +61,6 @@ namespace TEN::Entities::Vehicles
 	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
 
-	constexpr auto IN_SKIDOO_FIRE = IN_DRAW;
-
 	const std::vector<VehicleMountType> SkidooMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -672,7 +670,7 @@ namespace TEN::Entities::Vehicles
 		FindNewTarget(*laraItem, weapon);
 		AimWeapon(*laraItem, lara->RightArm, weapon);
 
-		if (TrInput & IN_SKIDOO_FIRE && !skidooItem->ItemFlags[0])
+		if (IsHeld(In::Fire) && !skidooItem->ItemFlags[0])
 		{
 			auto angles = EulerAngles(
 				lara->RightArm.Orientation.x,
