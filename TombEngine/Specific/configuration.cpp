@@ -451,6 +451,10 @@ bool LoadConfiguration()
 		if (GetDWORDRegKey(rootKey, buffer, &tempKey, Bindings[0][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
+
+			// Reset bindings when upgrading to engine version with more bindings available.
+			g_Configuration.Bindings = Bindings[0];
+
 			return false;
 		}
 
