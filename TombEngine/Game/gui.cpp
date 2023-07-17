@@ -674,7 +674,7 @@ namespace TEN::Gui
 							break;
 						}
 
-						InputActionBindings[1][baseIndex + SelectedOption] = selectedKey;
+						Bindings[1][baseIndex + SelectedOption] = selectedKey;
 						DefaultConflict();
 
 						CurrentSettings.WaitingForKey = false;
@@ -770,8 +770,8 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					CurrentSettings.Configuration.InputActionBindings = InputActionBindings[1];
-					g_Configuration.InputActionBindings = InputActionBindings[1];
+					CurrentSettings.Configuration.Bindings = Bindings[1];
+					g_Configuration.Bindings = Bindings[1];
 					SaveConfiguration();
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
@@ -782,7 +782,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					InputActionBindings[1] = CurrentSettings.Configuration.InputActionBindings;
+					Bindings[1] = CurrentSettings.Configuration.Bindings;
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;

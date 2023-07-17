@@ -158,7 +158,7 @@ namespace TEN::Input
 	extern int TrInput; // Throttle input.
 
 	extern const std::vector<std::string>	   g_KeyNames;
-	extern		 std::vector<std::vector<int>> InputActionBindings;
+	extern		 std::vector<std::vector<int>> Bindings;
 
 	void InitializeInput(HWND handle);
 	void DeinitializeInput();

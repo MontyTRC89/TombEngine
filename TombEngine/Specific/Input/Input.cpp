@@ -93,7 +93,7 @@ namespace TEN::Input
 	// 3. Quick actions
 	// 4. Menu actions
 	
-	std::vector<std::vector<int>> InputActionBindings =
+	std::vector<std::vector<int>> Bindings =
 	{
 		{
 			// Default
@@ -279,7 +279,7 @@ namespace TEN::Input
 		{
 			for (int i = 0; i < KEY_COUNT; i++)
 			{
-				if (InputActionBindings[layout][i] == index)
+				if (Bindings[layout][i] == index)
 					return true;
 			}
 		}
@@ -310,13 +310,13 @@ namespace TEN::Input
 	{
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			int key = InputActionBindings[0][i];
+			int key = Bindings[0][i];
 
 			ConflictingKeys[i] = false;
 
 			for (int j = 0; j < KEY_COUNT; j++)
 			{
-				if (key != InputActionBindings[1][j])
+				if (key != Bindings[1][j])
 					continue;
 
 				ConflictingKeys[i] = true;
@@ -329,19 +329,19 @@ namespace TEN::Input
 	{
 		for (int layout = 0; layout <= 1; layout++)
 		{
-			if (InputActionBindings[layout][KEY_FORWARD] == index)
+			if (Bindings[layout][KEY_FORWARD] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
 			}
-			else if (InputActionBindings[layout][KEY_BACK] == index)
+			else if (Bindings[layout][KEY_BACK] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
 			}
-			else if (InputActionBindings[layout][KEY_LEFT] == index)
+			else if (Bindings[layout][KEY_LEFT] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
 			}
-			else if (InputActionBindings[layout][KEY_RIGHT] == index)
+			else if (Bindings[layout][KEY_RIGHT] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
 			}
@@ -397,19 +397,19 @@ namespace TEN::Input
 				// Otherwise, register as camera movement input (for future).
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
-				if (InputActionBindings[1][KEY_FORWARD] == usedIndex)
+				if (Bindings[1][KEY_FORWARD] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
 				}
-				else if (InputActionBindings[1][KEY_BACK] == usedIndex)
+				else if (Bindings[1][KEY_BACK] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
 				}
-				else if (InputActionBindings[1][KEY_LEFT] == usedIndex)
+				else if (Bindings[1][KEY_LEFT] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
 				}
-				else if (InputActionBindings[1][KEY_RIGHT] == usedIndex)
+				else if (Bindings[1][KEY_RIGHT] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
 				}
@@ -503,7 +503,7 @@ namespace TEN::Input
 	{
 		for (int layout = 1; layout >= 0; layout--)
 		{
-			int key = InputActionBindings[layout][number];
+			int key = Bindings[layout][number];
 			
 			if (layout == 0 && ConflictingKeys[number])
 				continue;
@@ -675,7 +675,7 @@ namespace TEN::Input
 			if (i >= KEY_COUNT)
 				break;
 
-			InputActionBindings[1][i] = bindings[i];
+			Bindings[1][i] = bindings[i];
 		}
 	}
 
@@ -692,7 +692,7 @@ namespace TEN::Input
 
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			if (InputActionBindings[1][i] != KC_UNASSIGNED && InputActionBindings[1][i] != InputActionBindings[0][i])
+			if (Bindings[1][i] != KC_UNASSIGNED && Bindings[1][i] != Bindings[0][i])
 				return false;
 		}
 
@@ -702,7 +702,7 @@ namespace TEN::Input
 			ApplyBindings(DefaultXInputBindings);
 
 			for (int i = 0; i < KEY_COUNT; i++)
-				g_Configuration.InputActionBindings[i] = InputActionBindings[1][i];
+				g_Configuration.Bindings[i] = Bindings[1][i];
 
 			// Additionally turn on thumbstick camera and vibration.
 			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCameraControl = true;

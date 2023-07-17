@@ -273,7 +273,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = InputActionBindings[1][k] ? InputActionBindings[1][k] : InputActionBindings[0][k];
+						int index = Bindings[1][k] ? Bindings[1][k] : Bindings[0][k];
 						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -323,7 +323,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = InputActionBindings[1][baseIndex + k] ? InputActionBindings[1][baseIndex + k] : InputActionBindings[0][baseIndex + k];
+						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
 						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -379,7 +379,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = InputActionBindings[1][baseIndex + k] ? InputActionBindings[1][baseIndex + k] : InputActionBindings[0][baseIndex + k];
+						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
 						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -428,7 +428,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = InputActionBindings[1][baseIndex + k] ? InputActionBindings[1][baseIndex + k] : InputActionBindings[0][baseIndex + k];
+						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
 						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 

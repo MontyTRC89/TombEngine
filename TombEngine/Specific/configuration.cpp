@@ -275,7 +275,7 @@ bool SaveConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (SetDWORDRegKey(rootKey, buffer, g_Configuration.InputActionBindings[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(rootKey, buffer, g_Configuration.Bindings[i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
@@ -448,14 +448,14 @@ bool LoadConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (GetDWORDRegKey(rootKey, buffer, &tempKey, InputActionBindings[0][i]) != ERROR_SUCCESS)
+		if (GetDWORDRegKey(rootKey, buffer, &tempKey, Bindings[0][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
 		}
 
-		g_Configuration.InputActionBindings.push_back(tempKey);
-		InputActionBindings[1][i] = tempKey;
+		g_Configuration.Bindings.push_back(tempKey);
+		Bindings[1][i] = tempKey;
 	}
 
 	// All configuration values were found, so I can apply configuration to the engine
