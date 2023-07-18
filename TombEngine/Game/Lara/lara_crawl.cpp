@@ -57,7 +57,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// HACK.
-	if (BinocularOn)
+	if (lara->Control.Look.IsUsingBinoculars)
 		return;
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
@@ -403,7 +403,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// HACK.
-	if (BinocularOn)
+	if (lara->Control.Look.IsUsingBinoculars)
 		return;
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))

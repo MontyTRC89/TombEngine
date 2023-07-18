@@ -413,7 +413,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	// HACK.
-	if (BinocularOn)
+	if (lara->Control.Look.IsUsingBinoculars)
 		return;
 
 	if (!IsHeld(In::Jump) || isSwamp) // JUMP locks orientation outside swamps.
@@ -1369,13 +1369,13 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	if (BinocularRange)
+	if (lara->Control.Look.OpticRange != 0)
 	{
-		BinocularRange = 0;
-		LaserSight = false;
-		AlterFOV(LastFOV);
 		item->MeshBits = ALL_JOINT_BITS;
+		lara->Control.Look.OpticRange = 0;
+		lara->Control.Look.IsUsingLasersight = false;
 		lara->Inventory.IsBusy = false;
+		AlterFOV(LastFOV);
 	}
 
 	auto bounds = GameBoundingBox(item);

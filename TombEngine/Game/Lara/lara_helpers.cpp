@@ -300,6 +300,10 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if (!CanPlayerLookAround(item))
 		return;
 
+	// HACK: Optics.
+	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
+		player.Control.Look.Mode = LookMode::Free;
+
 	Camera.type = CameraType::Look;
 	auto axisCoeff = Vector2::Zero;
 
@@ -319,8 +323,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 
 	// Define turn rate.
 	short turnRateMax = TURN_RATE_MAX;
-	if (BinocularRange)
-		turnRateMax *= (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
+	if (player.Control.Look.OpticRange)
+		turnRateMax *= (player.Control.Look.OpticRange - ANGLE(10.0f)) / ANGLE(17.0f);
 
 	// Modulate turn rates.
 	player.Control.Look.TurnRate = EulerAngles(

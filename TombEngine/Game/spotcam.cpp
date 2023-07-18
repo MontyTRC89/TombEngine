@@ -118,8 +118,8 @@ void InitializeSpotCam(short Sequence)
 		return;
 	}
 
-	BinocularRange = 0;
-	LaserSight = false;
+	Lara.Control.Look.OpticRange = 0;
+	Lara.Control.Look.IsUsingLasersight = false;
 
 	AlterFOV(ANGLE(DEFAULT_FOV), false);
 

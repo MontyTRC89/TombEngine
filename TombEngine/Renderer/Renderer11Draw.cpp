@@ -2163,13 +2163,13 @@ namespace TEN::Renderer
 		if (!level->Horizon || !anyOutsideRooms)
 			return;
 
-		if (BinocularRange)
-			AlterFOV(ANGLE(DEFAULT_FOV) - BinocularRange, false);
+		if (Lara.Control.Look.OpticRange != 0)
+			AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
-		// Draw the sky
+		// Draw sky.
 		Matrix rotation = Matrix::CreateRotationX(PI);
 
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);

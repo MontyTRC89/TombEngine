@@ -112,7 +112,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		player.Control.HandStatus == HandStatus::Free &&
-		!BinocularRange) ||
+		player.Control.Look.OpticRange == 0) ||
 		(player.Control.IsMoving &&
 			player.Context.InteractedItem == itemNumber))
 	{
@@ -263,7 +263,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		player.Control.HandStatus == HandStatus::Free &&
-		!BinocularRange) ||
+		player.Control.Look.OpticRange == 0) ||
 		(player.Control.IsMoving &&
 			player.Context.InteractedItem == itemNumber))
 	{
@@ -449,7 +449,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
 
-	bool isPlayerAvailable = !BinocularRange &&
+	bool isPlayerAvailable = !player->Control.Look.OpticRange &&
 							 laraItem->Animation.ActiveState == LS_IDLE &&
 							 laraItem->Animation.AnimNumber == LA_STAND_IDLE;
 

@@ -638,7 +638,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 			result = GameStatus::ExitToTitle;
 	}
 	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
-			 LaraItem->HitPoints > 0 && !BinocularOn)
+			 LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))
 			result = GameStatus::LoadGame;
@@ -660,8 +660,6 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 
 	if (isTitle)
 		return GameStatus::None;
-
-	HandleOptics(LaraItem);
 
 	// Check if player dead.
 	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||

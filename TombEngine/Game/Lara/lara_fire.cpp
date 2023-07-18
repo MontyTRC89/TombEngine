@@ -692,7 +692,7 @@ void HandleWeapon(ItemInfo& laraItem)
 			Camera.type = CameraType::Combat;
 		}
 
-		if (IsHeld(In::Action) && !LaserSight)
+		if (IsHeld(In::Action) && !player.Control.Look.IsUsingLasersight)
 		{
 			if (!GetAmmo(player, player.Control.Weapon.GunType))
 			{
@@ -860,7 +860,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 
 	auto& player = *GetLaraInfo(&laraItem);
 
-	if (BinocularRange)
+	if (player.Control.Look.OpticRange)
 	{
 		player.TargetEntity = nullptr;
 		return;

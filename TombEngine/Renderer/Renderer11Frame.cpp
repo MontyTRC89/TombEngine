@@ -318,7 +318,7 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			if (item->ObjectNumber == ID_LARA && (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara))
+			if (item->ObjectNumber == ID_LARA && (Lara.Control.Look.OpticRange || SpotcamOverlay || SpotcamDontDrawLara))
 			{
 				continue;
 			}

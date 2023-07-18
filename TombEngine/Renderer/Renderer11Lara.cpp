@@ -277,11 +277,11 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 {
-	// Don't draw Lara if binoculars or sniper
-	if (BinocularRange || SpotcamDontDrawLara)
+	// Don't draw player if using optics.
+	if (Lara.Control.Look.OpticRange != 0 || SpotcamDontDrawLara)
 		return;
 
-	// Don't draw Lara if title level and disabled
+	// Don't draw player if on title level and disabled.
 	if (CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 

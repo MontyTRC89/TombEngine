@@ -62,10 +62,7 @@ ObjectCameraInfo ItemCamera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 
-int BinocularRange;
-bool BinocularOn;
 CameraType BinocularOldCamera;
-bool LaserSight;
 
 short CurrentFOV;
 short LastFOV;
@@ -270,7 +267,7 @@ void InitializeCamera()
 
 void MoveCamera(GameVector* ideal, int speed)
 {
-	if (BinocularOn)
+	if (Lara.Control.Look.IsUsingBinoculars)
 		speed = 1;
 
 	if (OldCam.pos.Orientation != LaraItem->Pose.Orientation ||
@@ -289,7 +286,7 @@ void MoveCamera(GameVector* ideal, int speed)
 		OldCam.target.y != Camera.target.y ||
 		OldCam.target.z != Camera.target.z ||
 		Camera.oldType != Camera.type ||
-		BinocularOn)
+		Lara.Control.Look.IsUsingBinoculars)
 	{
 		OldCam.pos.Orientation = LaraItem->Pose.Orientation;
 		OldCam.pos2.Orientation.x = Lara.ExtraHeadRot.x;
@@ -450,7 +447,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 		OldCam.actualAngle != Camera.actualAngle ||
 		OldCam.target != Camera.target.ToVector3i() ||
 		Camera.oldType != Camera.type ||
-		BinocularOn)
+		Lara.Control.Look.IsUsingBinoculars)
 	{
 		OldCam.pos.Position = pos;
 		OldCam.targetDistance = Camera.targetDistance;
@@ -942,26 +939,26 @@ void BinocularCamera(ItemInfo* item)
 {
 	auto& player = GetLaraInfo(*item);
 
-	if (!LaserSight)
+	if (!player.Control.Look.IsUsingLasersight)
 	{
 		if (IsClicked(In::Deselect) ||
 			IsClicked(In::Draw) ||
 			IsClicked(In::Look) ||
 			IsHeld(In::Flare))
 		{
-			player.Inventory.IsBusy = false;
+			player.Control.Look.OpticRange = 0;
+			player.Control.Look.IsUsingBinoculars = false;
 			player.ExtraHeadRot = EulerAngles::Zero;
 			player.ExtraTorsoRot = EulerAngles::Zero;
+			player.Inventory.IsBusy = false;
 
 			Camera.type = BinocularOldCamera;
-			BinocularOn = false;
-			BinocularRange = 0;
 			AlterFOV(LastFOV);
 			return;
 		}
 	}
 
-	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange), false);
+	AlterFOV(7 * (ANGLE(11.5f) - player.Control.Look.OpticRange), false);
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y - CLICK(2);
@@ -1030,10 +1027,10 @@ void BinocularCamera(ItemInfo* item)
 	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
 	if (IsHeld(In::Sprint) && !IsHeld(In::Crouch))
 	{
-		BinocularRange -= range;
-		if (BinocularRange < ANGLE(0.7f))
+		player.Control.Look.OpticRange -= range;
+		if (player.Control.Look.OpticRange < ANGLE(0.7f))
 		{
-			BinocularRange = ANGLE(0.7f);
+			player.Control.Look.OpticRange = ANGLE(0.7f);
 		}
 		else
 		{
@@ -1042,10 +1039,10 @@ void BinocularCamera(ItemInfo* item)
 	}
 	else if (IsHeld(In::Crouch) && !IsHeld(In::Sprint))
 	{
-		BinocularRange += range;
-		if (BinocularRange > ANGLE(8.5f))
+		player.Control.Look.OpticRange += range;
+		if (player.Control.Look.OpticRange > ANGLE(8.5f))
 		{
-			BinocularRange = ANGLE(8.5f);
+			player.Control.Look.OpticRange = ANGLE(8.5f);
 		}
 		else
 		{
@@ -1102,7 +1099,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	CamOldPos.y = Camera.pos.y;
 	CamOldPos.z = Camera.pos.z;
 
-	if (BinocularOn)
+	if (Lara.Control.Look.IsUsingBinoculars)
 	{
 		BinocularCamera(LaraItem);
 		return;
@@ -1205,7 +1202,7 @@ void CalculateCamera(const CollisionInfo& coll)
 
 		Camera.target.RoomNumber = item->RoomNumber;
 
-		if (Camera.fixedCamera || BinocularOn)
+		if (Camera.fixedCamera || Lara.Control.Look.IsUsingBinoculars)
 		{
 			Camera.target.y = y;
 			Camera.speed = 1;
@@ -1260,7 +1257,7 @@ void CalculateCamera(const CollisionInfo& coll)
 			Camera.fixedCamera = false;
 			if (Camera.speed != 1 &&
 				Camera.oldType != CameraType::Look &&
-				!BinocularOn)
+				!Lara.Control.Look.IsUsingBinoculars)
 			{
 				if (TargetSnaps <= 8)
 				{
@@ -1680,26 +1677,26 @@ void HandleOptics(ItemInfo* item)
 	}
 
 	// If lasersight, and Look is not pressed, exit optics.
-	if (LaserSight && !IsHeld(In::Look))
+	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
 		breakOptics = true;
 
 	// If lasersight and weapon is holstered, exit optics.
-	if (LaserSight && IsHeld(In::Draw))
+	if (player.Control.Look.IsUsingLasersight && IsHeld(In::Draw))
 		breakOptics = true;
 
 	// Engage lasersight if available.
-	if (!LaserSight && !breakOptics && IsHeld(In::Look))
+	if (!player.Control.Look.IsUsingLasersight && !breakOptics && IsHeld(In::Look))
 	{
 		if (player.Control.HandStatus == HandStatus::WeaponReady &&
 			((player.Control.Weapon.GunType == LaraWeaponType::HK && player.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
 				(player.Control.Weapon.GunType == LaraWeaponType::Revolver && player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
 				(player.Control.Weapon.GunType == LaraWeaponType::Crossbow && player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 		{
-			BinocularRange = 128;
-			BinocularOldCamera = Camera.oldType;
-			BinocularOn = true;
-			LaserSight = true;
+			player.Control.Look.OpticRange = 128;
+			player.Control.Look.IsUsingBinoculars = true;
+			player.Control.Look.IsUsingLasersight = true;
 			player.Inventory.IsBusy = true;
+			BinocularOldCamera = Camera.oldType;
 			return;
 		}
 	}
@@ -1708,18 +1705,16 @@ void HandleOptics(ItemInfo* item)
 		return;
 
 	// Nothing to process; return early.
-	if (!BinocularOn && !LaserSight)
+	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
 		return;
 
-	BinocularRange = 0;
-	BinocularOn = false;
-	LaserSight = false;
+	player.Control.Look.OpticRange = 0;
+	player.Control.Look.IsUsingBinoculars = false;
+	player.Control.Look.IsUsingLasersight = false;
 	Camera.type = BinocularOldCamera;
 	Camera.bounce = 0;
 	AlterFOV(LastFOV);
 
 	player.Inventory.IsBusy = false;
 	ResetPlayerFlex(item);
-
-	ClearAction(In::Look);
 }

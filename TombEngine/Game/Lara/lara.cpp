@@ -886,9 +886,14 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
+	// HACK: Handle optics.
+	if (lara->Control.Look.IsUsingBinoculars || lara->Control.Look.IsUsingLasersight)
+		HandleOptics(LaraItem);
+
 	// Handle look around.
-	if ((IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None &&
-		lara->ExtraAnim == NO_ITEM) || BinocularOn)
+	if (((IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None) ||
+			(lara->Control.Look.IsUsingBinoculars || lara->Control.Look.IsUsingLasersight)) &&
+		lara->ExtraAnim == NO_ITEM)
 	{
 		HandlePlayerLookAround(*item);
 	}
