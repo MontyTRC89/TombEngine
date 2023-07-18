@@ -1023,7 +1023,7 @@ void BinocularCamera(ItemInfo* item)
 	Camera.oldType = Camera.type;
 
 	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
-	if (IsHeld(In::Sprint) && !IsHeld(In::Crouch))
+	if (IsHeld(In::StepLeft) && !IsHeld(In::StepRight))
 	{
 		player.Control.Look.OpticRange -= range;
 		if (player.Control.Look.OpticRange < ANGLE(0.7f))
@@ -1035,7 +1035,7 @@ void BinocularCamera(ItemInfo* item)
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 		}
 	}
-	else if (IsHeld(In::Crouch) && !IsHeld(In::Sprint))
+	else if (IsHeld(In::StepRight) && !IsHeld(In::StepLeft))
 	{
 		player.Control.Look.OpticRange += range;
 		if (player.Control.Look.OpticRange > ANGLE(8.5f))
