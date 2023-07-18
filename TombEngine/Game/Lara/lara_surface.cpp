@@ -268,9 +268,9 @@ void lara_col_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_surface_climb_out(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::None;
+	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;

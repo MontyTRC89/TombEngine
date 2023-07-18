@@ -71,9 +71,9 @@ void lara_col_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_underwater_swim_forward()
 void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::Horizontal;
+	player.Control.Look.Mode = LookMode::Horizontal;
 
 	auto laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
@@ -113,9 +113,9 @@ void lara_col_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_underwater_inertia()
 void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::Horizontal;
+	player.Control.Look.Mode = LookMode::Horizontal;
 
 	auto laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
@@ -201,10 +201,10 @@ void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_underwater_roll_180()
 void lara_as_underwater_roll_180(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	item->Animation.Velocity.y = 0.0f;
-	lara->Control.Look.Mode = LookMode::None;
+	player.Control.Look.Mode = LookMode::None;
 }
 
 // State:		LS_UNDERWATER_ROLL (66)

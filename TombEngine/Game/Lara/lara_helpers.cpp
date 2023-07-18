@@ -385,12 +385,11 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
 	}
 
-	// TODO for optics!!!!!
 	// Define turn rate.
 	short turnRateMax = IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
-	//if (player.Control.Look.OpticRange != 0)
-		//turnRateMax *= (player.Control.Look.OpticRange - ANGLE(10.0f)) / ANGLE(17.0f);
-	//turnRateMax *= IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
+	if (player.Control.Look.OpticRange != 0)
+		turnRateMax *= (player.Control.Look.OpticRange - ANGLE(10.0f)) / ANGLE(17.0f);
+	turnRateMax *= IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
 
 	g_Renderer.PrintDebugMessage("%d", player.Control.Look.OpticRange);
 	g_Renderer.PrintDebugMessage("%d", turnRateMax);

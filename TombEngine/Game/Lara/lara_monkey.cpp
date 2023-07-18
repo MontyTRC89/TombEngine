@@ -73,6 +73,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_MONKEY_IDLE;
 			return;
 		}
+
 		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;

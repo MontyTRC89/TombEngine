@@ -793,10 +793,10 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_freefall_dive()
 void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	item->Animation.Velocity.z *= 0.95f;
-	lara->Control.Look.Mode = LookMode::Free;
+	player.Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 

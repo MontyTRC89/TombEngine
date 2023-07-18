@@ -227,22 +227,22 @@ void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_shimmy_left()
 void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 }
 
 // State:		LS_SHIMMY_RIGHT (31)
 // Collision:	lara_col_shimmy_right()
 void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::Vertical;
+	player.Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
