@@ -170,7 +170,10 @@ table LaraCountData {
 }
 
 table LookControlData {
+	is_using_binoculars: bool;
+	is_using_lasersight: bool;
 	mode: int32;
+	optic_range: int32;
 	orientation: EulerAngles;
 	turn_rate: EulerAngles;
 }

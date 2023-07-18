@@ -341,7 +341,10 @@ bool SaveGame::Save(int slot)
 	auto countOffset = count.Finish();
 
 	Save::LookControlDataBuilder lookControl{ fbb };
+	lookControl.add_is_using_binoculars(Lara.Control.Look.IsUsingBinoculars);
+	lookControl.add_is_using_lasersight(Lara.Control.Look.IsUsingLasersight);
 	lookControl.add_mode((int)Lara.Control.Look.Mode);
+	lookControl.add_optic_range(Lara.Control.Look.OpticRange);
 	lookControl.add_orientation(&FromEulerAngles(Lara.Control.Look.Orientation));
 	lookControl.add_turn_rate(&FromEulerAngles(Lara.Control.Look.TurnRate));
 	auto lookControlOffset = lookControl.Finish();
@@ -1924,7 +1927,10 @@ bool SaveGame::Load(int slot)
 	Lara.Control.IsMoving = s->lara()->control()->is_moving();
 	Lara.Control.JumpDirection = (JumpDirection)s->lara()->control()->jump_direction();
 	Lara.Control.KeepLow = s->lara()->control()->keep_low();
+	Lara.Control.Look.IsUsingBinoculars = s->lara()->control()->look()->is_using_binoculars();
+	Lara.Control.Look.IsUsingLasersight = s->lara()->control()->look()->is_using_lasersight();
 	Lara.Control.Look.Mode = (LookMode)s->lara()->control()->look()->mode();
+	Lara.Control.Look.OpticRange = s->lara()->control()->look()->optic_range();
 	Lara.Control.Look.Orientation = ToEulerAngles(s->lara()->control()->look()->orientation());
 	Lara.Control.Look.TurnRate = ToEulerAngles(s->lara()->control()->look()->turn_rate());
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();

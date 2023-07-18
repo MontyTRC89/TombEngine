@@ -2725,7 +2725,10 @@ flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatBufferBu
 
 struct LookControlDataT : public flatbuffers::NativeTable {
   typedef LookControlData TableType;
+  bool is_using_binoculars = false;
+  bool is_using_lasersight = false;
   int32_t mode = 0;
+  int32_t optic_range = 0;
   std::unique_ptr<TEN::Save::EulerAngles> orientation{};
   std::unique_ptr<TEN::Save::EulerAngles> turn_rate{};
 };
@@ -2735,12 +2738,24 @@ struct LookControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef LookControlDataBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_MODE = 4,
-    VT_ORIENTATION = 6,
-    VT_TURN_RATE = 8
+    VT_IS_USING_BINOCULARS = 4,
+    VT_IS_USING_LASERSIGHT = 6,
+    VT_MODE = 8,
+    VT_OPTIC_RANGE = 10,
+    VT_ORIENTATION = 12,
+    VT_TURN_RATE = 14
   };
+  bool is_using_binoculars() const {
+    return GetField<uint8_t>(VT_IS_USING_BINOCULARS, 0) != 0;
+  }
+  bool is_using_lasersight() const {
+    return GetField<uint8_t>(VT_IS_USING_LASERSIGHT, 0) != 0;
+  }
   int32_t mode() const {
     return GetField<int32_t>(VT_MODE, 0);
+  }
+  int32_t optic_range() const {
+    return GetField<int32_t>(VT_OPTIC_RANGE, 0);
   }
   const TEN::Save::EulerAngles *orientation() const {
     return GetStruct<const TEN::Save::EulerAngles *>(VT_ORIENTATION);
@@ -2750,7 +2765,10 @@ struct LookControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_IS_USING_BINOCULARS) &&
+           VerifyField<uint8_t>(verifier, VT_IS_USING_LASERSIGHT) &&
            VerifyField<int32_t>(verifier, VT_MODE) &&
+           VerifyField<int32_t>(verifier, VT_OPTIC_RANGE) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_ORIENTATION) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_TURN_RATE) &&
            verifier.EndTable();
@@ -2764,8 +2782,17 @@ struct LookControlDataBuilder {
   typedef LookControlData Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_is_using_binoculars(bool is_using_binoculars) {
+    fbb_.AddElement<uint8_t>(LookControlData::VT_IS_USING_BINOCULARS, static_cast<uint8_t>(is_using_binoculars), 0);
+  }
+  void add_is_using_lasersight(bool is_using_lasersight) {
+    fbb_.AddElement<uint8_t>(LookControlData::VT_IS_USING_LASERSIGHT, static_cast<uint8_t>(is_using_lasersight), 0);
+  }
   void add_mode(int32_t mode) {
     fbb_.AddElement<int32_t>(LookControlData::VT_MODE, mode, 0);
+  }
+  void add_optic_range(int32_t optic_range) {
+    fbb_.AddElement<int32_t>(LookControlData::VT_OPTIC_RANGE, optic_range, 0);
   }
   void add_orientation(const TEN::Save::EulerAngles *orientation) {
     fbb_.AddStruct(LookControlData::VT_ORIENTATION, orientation);
@@ -2786,13 +2813,19 @@ struct LookControlDataBuilder {
 
 inline flatbuffers::Offset<LookControlData> CreateLookControlData(
     flatbuffers::FlatBufferBuilder &_fbb,
+    bool is_using_binoculars = false,
+    bool is_using_lasersight = false,
     int32_t mode = 0,
+    int32_t optic_range = 0,
     const TEN::Save::EulerAngles *orientation = 0,
     const TEN::Save::EulerAngles *turn_rate = 0) {
   LookControlDataBuilder builder_(_fbb);
   builder_.add_turn_rate(turn_rate);
   builder_.add_orientation(orientation);
+  builder_.add_optic_range(optic_range);
   builder_.add_mode(mode);
+  builder_.add_is_using_lasersight(is_using_lasersight);
+  builder_.add_is_using_binoculars(is_using_binoculars);
   return builder_.Finish();
 }
 
@@ -8273,7 +8306,10 @@ inline LookControlDataT *LookControlData::UnPack(const flatbuffers::resolver_fun
 inline void LookControlData::UnPackTo(LookControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = is_using_binoculars(); _o->is_using_binoculars = _e; }
+  { auto _e = is_using_lasersight(); _o->is_using_lasersight = _e; }
   { auto _e = mode(); _o->mode = _e; }
+  { auto _e = optic_range(); _o->optic_range = _e; }
   { auto _e = orientation(); if (_e) _o->orientation = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
   { auto _e = turn_rate(); if (_e) _o->turn_rate = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
 }
@@ -8286,12 +8322,18 @@ inline flatbuffers::Offset<LookControlData> CreateLookControlData(flatbuffers::F
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LookControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _is_using_binoculars = _o->is_using_binoculars;
+  auto _is_using_lasersight = _o->is_using_lasersight;
   auto _mode = _o->mode;
+  auto _optic_range = _o->optic_range;
   auto _orientation = _o->orientation ? _o->orientation.get() : 0;
   auto _turn_rate = _o->turn_rate ? _o->turn_rate.get() : 0;
   return TEN::Save::CreateLookControlData(
       _fbb,
+      _is_using_binoculars,
+      _is_using_lasersight,
       _mode,
+      _optic_range,
       _orientation,
       _turn_rate);
 }
