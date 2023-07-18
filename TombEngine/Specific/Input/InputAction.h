@@ -11,12 +11,12 @@ namespace TEN::Input
 		Right,
 		StepLeft,
 		StepRight,
-		Action,
 		Walk,
 		Sprint,
 		Crouch,
 		Jump,
 		Roll,
+		Action,
 		Draw,
 		Look,
 
