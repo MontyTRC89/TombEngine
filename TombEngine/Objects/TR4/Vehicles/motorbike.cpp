@@ -988,7 +988,7 @@ namespace TEN::Entities::Vehicles
 
 		if (motorbikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
-			if (!motorbike->Velocity && (TrInput & IN_LOOK))
+			if (!motorbike->Velocity && (IsHeld(In::Look)))
 				LookUpDown(laraItem);
 
 			// Moving forward.

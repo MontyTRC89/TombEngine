@@ -1071,7 +1071,7 @@ namespace TEN::Entities::Vehicles
 		auto* kayakItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* kayak = GetKayakInfo(kayakItem);
 
-		if (TrInput & IN_LOOK)
+		if (IsHeld(In::Look))
 			LookUpDown(laraItem);
 
 		int ofs = kayakItem->Animation.Velocity.y;

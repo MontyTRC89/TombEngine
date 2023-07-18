@@ -38,10 +38,6 @@ namespace TEN::Input
 	std::vector<bool>		 KeyMap		 = {};
 	std::vector<float>		 AxisMap	 = {};
 
-	//  Deprecated legacy input bit fields.
-	int DbInput = 0;
-	int TrInput = 0;
-
 	const std::vector<std::string> g_KeyNames =
 	{
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
@@ -240,10 +236,6 @@ namespace TEN::Input
 
 		for (auto& axis : AxisMap)
 			axis = 0.0f;
-
-		// Clear legacy bit fields.
-		DbInput = 0;
-		TrInput = 0;
 	}
 
 	void ApplyActionQueue()
@@ -619,15 +611,6 @@ namespace TEN::Input
 		// Additional handling.
 		HandleHotkeyActions();
 		SolveActionCollisions();
-
-		// Port actions back to legacy bit fields.
-		for (const auto& action : ActionMap)
-		{
-			int actionBit = 1 << (int)action.GetID();
-
-			DbInput |= action.IsClicked() ? actionBit : 0;
-			TrInput |= action.IsHeld()	  ? actionBit : 0;
-		}
 	}
 
 	void ClearAllActions()
@@ -637,9 +620,6 @@ namespace TEN::Input
 
 		for (auto& queue : ActionQueue)
 			queue = QueueState::None;
-
-		DbInput = 0;
-		TrInput = 0;
 	}
 
 	void Rumble(float power, float delayInSec, RumbleMode mode)
@@ -718,10 +698,6 @@ namespace TEN::Input
 	void ClearAction(ActionID actionID)
 	{
 		ActionMap[(int)actionID].Clear();
-
-		int actionBit = 1 << (int)actionID;
-		DbInput &= ~actionBit;
-		TrInput &= ~actionBit;
 	}
 
 	bool NoAction()

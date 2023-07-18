@@ -33,7 +33,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
+	if (IsHeld(In::Look))
 		LookUpDown(item);
 
 	if (TestLaraSlide(item, coll))
@@ -46,7 +46,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
-			if (TrInput & IN_LEFT)
+			if (IsHeld(In::Left))
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE_ACCEL;
 				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_RATE_MAX)
@@ -54,7 +54,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
-			else if (TrInput & IN_RIGHT)
+			else if (IsHeld(In::Right))
 			{
 				lara->Control.TurnRate += LARA_TURN_RATE_ACCEL;
 				if (lara->Control.TurnRate > LARA_SLIDE_TURN_RATE_MAX)
@@ -66,7 +66,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
+		if (IsHeld(In::Jump) && TestLaraSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -77,7 +77,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 		item->Animation.TargetState = LS_RUN_FORWARD;
 	else
 		item->Animation.TargetState = LS_IDLE;
@@ -142,7 +142,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
+	if (IsHeld(In::Look))
 		LookUpDown(item);
 
 	if (TestLaraSlide(item, coll))
@@ -155,7 +155,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraSlideVelocity(item, coll);
 
 			// TODO: Prepped for another time.
-			if (TrInput & IN_LEFT)
+			if (IsHeld(In::Left))
 			{
 				lara->Control.TurnRate -= LARA_TURN_RATE_ACCEL;
 				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_RATE_MAX)
@@ -163,7 +163,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
-			else if (TrInput & IN_RIGHT)
+			else if (IsHeld(In::Right))
 			{
 				lara->Control.TurnRate += LARA_TURN_RATE_ACCEL;
 				if (lara->Control.TurnRate > LARA_SLIDE_TURN_RATE_MAX)
@@ -175,7 +175,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
+		if (IsHeld(In::Jump) && TestLaraSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);

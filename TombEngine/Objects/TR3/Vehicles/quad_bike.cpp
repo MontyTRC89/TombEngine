@@ -855,7 +855,7 @@ namespace TEN::Entities::Vehicles
 
 		if (quadBikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
-			if (TrInput & IN_LOOK && !quadBike->Velocity)
+			if (IsHeld(In::Look) && !quadBike->Velocity)
 				LookUpDown(LaraItem);
 
 			// Driving forward.

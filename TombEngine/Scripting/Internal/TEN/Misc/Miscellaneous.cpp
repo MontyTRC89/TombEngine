@@ -232,15 +232,13 @@ namespace Misc
 
 	static bool CheckInput(int actionIndex)
 	{
-		if (actionIndex > ActionMap.size())
+		if (actionIndex > (int)ActionID::Count)
 		{
-			ScriptAssertF(false, "Key index {} does not exist", actionIndex);
+			ScriptAssertF(false, "Input action {} does not exist.", actionIndex);
 			return false;
 		}
-		else
-		{
-			return true;
-		}
+
+		return true;
 	}
 
 	static bool KeyIsHeld(int actionIndex)
@@ -251,7 +249,7 @@ namespace Misc
 		if (IsHeld((ActionID)actionIndex))
 			return true;
 
-		return (TrInput & (1 << actionIndex)) != 0;
+		return false;
 	}
 
 	static bool KeyIsHit(int actionIndex)
@@ -262,7 +260,7 @@ namespace Misc
 		if (IsClicked((ActionID)actionIndex))
 			return true;
 
-		return (DbInput & (1 << actionIndex)) != 0;
+		return false;
 	}
 
 	static void KeyPush(int actionIndex)

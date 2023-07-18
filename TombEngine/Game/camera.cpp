@@ -1543,7 +1543,7 @@ void LookLeftRight(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	Camera.type = CameraType::Look;
-	if (TrInput & IN_LEFT)
+	if (IsHeld(In::Left))
 	{
 		ClearAction(In::Left);
 
@@ -1555,7 +1555,7 @@ void LookLeftRight(ItemInfo* item)
 				lara->ExtraHeadRot.y -= ANGLE(2.0f);
 		}
 	}
-	else if (TrInput & IN_RIGHT)
+	else if (IsHeld(In::Right))
 	{
 		ClearAction(In::Right);
 
@@ -1582,7 +1582,7 @@ void LookUpDown(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	Camera.type = CameraType::Look;
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
 		ClearAction(In::Forward);
 
@@ -1594,7 +1594,7 @@ void LookUpDown(ItemInfo* item)
 				lara->ExtraHeadRot.x -= ANGLE(2.0f);
 		}
 	}
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 	{
 		ClearAction(In::Back);
 
@@ -2024,11 +2024,9 @@ void HandleOptics(ItemInfo* item)
 {
 	bool breakOptics = true;
 
-	if (!LaserSight && BinocularOn) // Imitate pushing look key in binocular mode
-	{
-		TrInput |= IN_LOOK;
-		DbInput = 0;
-	}
+	// HACK: Simulate holding Look in binocular mode.
+	if (!LaserSight && BinocularOn)
+		ActionMap[(int)In::Look].Update(true);
 
 	auto lara = GetLaraInfo(item);
 
@@ -2037,19 +2035,20 @@ void HandleOptics(ItemInfo* item)
 		breakOptics = false;
 
 	// We are crouching, can use optics.
-	if ((lara->Control.IsLow || TrInput & IN_CROUCH) &&
+	if ((lara->Control.IsLow || IsHeld(In::Crouch)) &&
 		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
 		breakOptics = false;
 
 	// If lasersight, and no look is pressed, exit optics.
-	if (LaserSight && !(TrInput & IN_LOOK))
+	if (LaserSight && !IsHeld(In::Look))
 		breakOptics = true;
 
 	// If lasersight, and weapon is holstered, exit optics.
-	if (LaserSight && (TrInput & IN_DRAW))
+	if (LaserSight && IsHeld(In::Draw))
 		breakOptics = true;
 
-	if (!LaserSight && !breakOptics && (TrInput == IN_LOOK)) // Engage lasersight, if available.
+	// Engage lasersight if available.
+	if (!LaserSight && !breakOptics && IsHeld(In::Look))
 	{
 		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
 			((lara->Control.Weapon.GunType == LaraWeaponType::HK && lara->Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
@@ -2068,7 +2067,7 @@ void HandleOptics(ItemInfo* item)
 	if (!breakOptics)
 		return;
 
-	// Nothing to process, exit.
+	// Nothing to process; return early.
 	if (!BinocularOn && !LaserSight)
 		return;
 
@@ -2082,5 +2081,5 @@ void HandleOptics(ItemInfo* item)
 	Lara.Inventory.IsBusy = false;
 	ResetPlayerFlex(LaraItem);
 
-	TrInput &= ~IN_LOOK;
+	//ActionMap[(int)In::Look].Clear();
 }

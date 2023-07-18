@@ -154,9 +154,6 @@ namespace TEN::Input
 	extern std::vector<bool>		KeyMap;
 	extern std::vector<float>		AxisMap;
 
-	extern int DbInput; // Debounce input.
-	extern int TrInput; // Throttle input.
-
 	extern const std::vector<std::string>	   g_KeyNames;
 	extern		 std::vector<std::vector<int>> Bindings;
 

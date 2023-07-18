@@ -430,7 +430,7 @@ namespace TEN::Entities::Vehicles
 		{
 			*pitch = skidooItem->Animation.Velocity.z + (height - skidooItem->Pose.Position.y);
 
-			if (TrInput & IN_LOOK && skidooItem->Animation.Velocity.z == 0)
+			if (IsHeld(In::Look) && skidooItem->Animation.Velocity.z == 0)
 				LookUpDown(laraItem);
 
 			if (IsHeld(In::Left) || IsHeld(In::Right))

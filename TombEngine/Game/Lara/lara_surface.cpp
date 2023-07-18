@@ -24,7 +24,7 @@ using namespace TEN::Input;
 // Collision:	lara_col_surface_dive()
 void lara_as_surface_dive(ItemInfo* item, CollisionInfo* coll)
 {
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 		item->Pose.Orientation.x -= ANGLE(1.0f);
 }
 
@@ -51,44 +51,44 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
+	if (IsHeld(In::Look))
 	{
 		LookUpDown(item);
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 	{
 		SetLaraSwimDiveAnimation(item);
 		return;
 	}
 	
-	if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+	if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
 		item->Animation.TargetState = LS_ONWATER_FORWARD;
 		return;
 	}
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 	{
 		item->Animation.TargetState = LS_ONWATER_BACK;
 		return;
 	}
 	
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 	{
 		item->Animation.TargetState = LS_ONWATER_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 	{
 		item->Animation.TargetState = LS_ONWATER_RIGHT;
 		return;
@@ -119,13 +119,13 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
-	if (!(TrInput & IN_FORWARD))
+	if (!IsHeld(In::Forward))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 		SetLaraSwimDiveAnimation(item);
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
@@ -158,16 +158,16 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	if (!IsHeld(In::Walk))	// WALK locks orientation.
 	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 	}
 
-	if (!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))
+	if (!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 		SetLaraSwimDiveAnimation(item);
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
@@ -197,16 +197,16 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	if (!IsHeld(In::Walk))	// WALK locks orientation.
 	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 	}
 
-	if (!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
+	if (!(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 		SetLaraSwimDiveAnimation(item);
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
@@ -236,13 +236,13 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 		SetLaraSwimDiveAnimation(item);
 
-	if (!(TrInput & IN_BACK))
+	if (!IsHeld(In::Back))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
