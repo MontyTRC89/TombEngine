@@ -46,7 +46,7 @@ namespace TEN::Input
 	std::vector<InputAction> ActionMap	 = {};
 	std::vector<QueueState>	 ActionQueue = {};
 	std::vector<bool>		 KeyMap		 = {};
-	std::vector<float>		 AxisMap	 = {};
+	std::vector<Vector2>	 AxisMap	 = {};
 
 	//  Deprecated legacy input bit fields.
 	int DbInput = 0;
