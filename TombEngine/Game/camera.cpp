@@ -146,16 +146,18 @@ static int GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionInfo
 
 void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 {
-	constexpr auto POS_LERP_ALPHA = 0.25f;
-	constexpr auto COLL_PUSH	  = BLOCK(0.25f) - BLOCK(1 / 16.0f);
-	constexpr auto LOOK_AT_DIST	  = BLOCK(0.5f);
+	constexpr auto POS_LERP_ALPHA	 = 0.25f;
+	constexpr auto COLL_PUSH		 = BLOCK(0.25f) - BLOCK(1 / 16.0f);
+	constexpr auto LOOK_AT_DIST		 = BLOCK(0.5f);
+	constexpr auto CAMERA_DIST_COEFF = 0.7f;
+	constexpr auto CAMERA_DIST_MAX	 = BLOCK(0.75f);
 
 	const auto& player = GetLaraInfo(item);
 
 	int verticalOffset = GetLookCameraVerticalOffset(item, coll);
 	auto pivotOffset = Vector3i(0, verticalOffset, 0);
 
-	float idealDist = -std::max(Camera.targetDistance * 0.5f, BLOCK(0.75f));
+	float idealDist = -std::max(Camera.targetDistance * CAMERA_DIST_COEFF, CAMERA_DIST_MAX);
 
 	// Define absolute camera orientation.
 	auto orient = player.Control.Look.Orientation +
