@@ -254,7 +254,7 @@ void KillItem(short const itemNumber)
 
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
-		if (item->ObjectNumber != ID_NO_OBJECT && Objects[item->ObjectNumber].floor != nullptr)
+		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
 		GameScriptHandleKilled(itemNumber, true);
@@ -731,7 +731,7 @@ void UpdateAllItems()
 		auto* item = &g_Level.Items[itemNumber];
 		short nextItem = item->NextActive;
 
-		if (item->ObjectNumber == ID_NO_OBJECT)
+		if (!Objects.CheckID(item->ObjectNumber))
 			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)

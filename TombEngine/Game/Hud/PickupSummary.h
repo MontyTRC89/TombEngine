@@ -10,7 +10,7 @@ namespace TEN::Hud
 	{
 		static constexpr auto LIFE_MAX = 3.0f;
 
-		GAME_OBJECT_ID ObjectID = ID_NO_OBJECT;
+		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 		unsigned int   Count	= 0;
 
 		Vector2		Position2D	= Vector2::Zero;

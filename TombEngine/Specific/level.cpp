@@ -203,8 +203,8 @@ void LoadItems()
 
 void LoadObjects()
 {
-	std::memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
-	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
+	Objects.Initialize();
+	std::memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
 	TENLog("Num meshes: " + std::to_string(numMeshes), LogLevel::Info);

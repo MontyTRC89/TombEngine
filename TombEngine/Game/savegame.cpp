@@ -507,8 +507,6 @@ bool SaveGame::Save(int slot)
 	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
-		ObjectInfo* obj = &Objects[itemToSerialize.ObjectNumber];
-
 		auto luaNameOffset = fbb.CreateString(itemToSerialize.Name);
 		auto luaOnKilledNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnKilled);
 		auto luaOnHitNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnHit);
@@ -534,7 +532,8 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
 
-		if (Objects[itemToSerialize.ObjectNumber].intelligent && itemToSerialize.IsCreature())
+		if (Objects.CheckID(itemToSerialize.ObjectNumber, true) && 
+			Objects[itemToSerialize.ObjectNumber].intelligent && itemToSerialize.IsCreature())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
 
@@ -663,9 +662,12 @@ bool SaveGame::Save(int slot)
 		}
 
 		Save::ItemBuilder serializedItem{ fbb };
+
+		if (Objects.CheckID(itemToSerialize.ObjectNumber, true))
+			serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - Objects[itemToSerialize.ObjectNumber].animIndex);
+
 		serializedItem.add_next_item(itemToSerialize.NextItem);
 		serializedItem.add_next_item_active(itemToSerialize.NextActive);
-		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
 		serializedItem.add_after_death(itemToSerialize.AfterDeath);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
@@ -702,8 +704,8 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_effect_secondary_colour(&FromVector3(itemToSerialize.Effect.SecondaryEffectColor));
 		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
 
-		if (Objects[itemToSerialize.ObjectNumber].intelligent 
-			&& itemToSerialize.Data.is<CreatureInfo>())
+		if (Objects.CheckID(itemToSerialize.ObjectNumber, true) && 
+			Objects[itemToSerialize.ObjectNumber].intelligent && itemToSerialize.Data.is<CreatureInfo>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
@@ -1510,7 +1512,7 @@ bool SaveGame::Load(int slot)
 		item->NextItem = savedItem->next_item();
 		item->NextActive = savedItem->next_item_active();
 
-		if (item->ObjectNumber == ID_NO_OBJECT)
+		if (item->ObjectNumber == GAME_OBJECT_ID::ID_NO_OBJECT)
 			continue;
 
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
