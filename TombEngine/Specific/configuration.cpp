@@ -453,7 +453,7 @@ bool LoadConfiguration()
 		{
 			RegCloseKey(rootKey);
 
-			// Reset bindings when upgrading to engine version with more bindings available.
+			// Reset key bindings when upgrading to engine version with new bindings available.
 			g_Configuration.Bindings = Bindings[0];
 
 			return false;
