@@ -51,7 +51,7 @@ float3 DoSpecularSpot(float3 pos, float3 n, ShaderLight light, float strength)
 	else
 	{
 		float3 lightPos = light.Position.xyz;
-		float radius = light.OutRange;
+		float radius = light.Out;
 
 		float dist = distance(lightPos, pos);
 		if (dist > radius)
