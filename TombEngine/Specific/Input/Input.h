@@ -63,6 +63,13 @@ namespace TEN::Input
 		KEY_DRAW,
 		KEY_LOOK,
 
+		KEY_ACCELERATE,
+		KEY_REVERSE,
+		KEY_SPEED,
+		KEY_SLOW,
+		KEY_BRAKE,
+		KEY_FIRE,
+
 		KEY_FLARE,
 		KEY_SMALL_MEDIPACK,
 		KEY_LARGE_MEDIPACK,
@@ -110,24 +117,6 @@ namespace TEN::Input
 		IN_LOOK	   = (1 << KEY_LOOK)
 	};
 	
-	// Temporary input constants for use with vehicles:
-
-	// TODO: Not needed. Thought too far ahead.
-	constexpr int VEHICLE_IN_UP			= IN_FORWARD;
-	constexpr int VEHICLE_IN_DOWN		= IN_BACK;
-	constexpr int VEHICLE_IN_LEFT		= IN_LEFT;
-	constexpr int VEHICLE_IN_RIGHT		= IN_RIGHT;
-
-	constexpr int VEHICLE_IN_ACCELERATE = IN_ACTION;
-	constexpr int VEHICLE_IN_REVERSE	= IN_BACK;
-	constexpr int VEHICLE_IN_SPEED		= IN_SPRINT;
-	constexpr int VEHICLE_IN_SLOW		= IN_WALK;
-	constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
-	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
-
-	// TODO: Not needed since BRAKE is explicitly associated with dismounts anyway.
-	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
-
 	enum InputAxis
 	{
 		MoveVertical,
@@ -154,24 +143,22 @@ namespace TEN::Input
 
 	struct RumbleData
 	{
-		RumbleMode Mode		 = RumbleMode::None;
 		float	   Power	 = 0.0f;
+		RumbleMode Mode		 = RumbleMode::None;
 		float	   LastPower = 0.0f;
 		float	   FadeSpeed = 0.0f;
 	};
-
-	extern const std::vector<std::string> g_KeyNames;
 
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<QueueState>	ActionQueue;
 	extern std::vector<bool>		KeyMap;
 	extern std::vector<float>		AxisMap;
 
-	// Legacy input bit fields.
 	extern int DbInput; // Debounce input.
 	extern int TrInput; // Throttle input.
 
-	extern short KeyboardLayout[2][KEY_COUNT];
+	extern const std::vector<std::string>	   g_KeyNames;
+	extern		 std::vector<std::vector<int>> Bindings;
 
 	void InitializeInput(HWND handle);
 	void DeinitializeInput();
