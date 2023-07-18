@@ -66,12 +66,12 @@ namespace TEN::Gui
 		STRING_ACTIONS_RIGHT,
 		STRING_ACTIONS_STEP_LEFT,
 		STRING_ACTIONS_STEP_RIGHT,
-		STRING_ACTIONS_ACTION,
 		STRING_ACTIONS_WALK,
 		STRING_ACTIONS_SPRINT,
 		STRING_ACTIONS_CROUCH,
 		STRING_ACTIONS_JUMP,
 		STRING_ACTIONS_ROLL,
+		STRING_ACTIONS_ACTION,
 		STRING_ACTIONS_DRAW,
 		STRING_ACTIONS_LOOK
 	};
@@ -300,7 +300,7 @@ namespace TEN::Gui
 			return inventoryResult;
 
 		case Menu::GeneralActions:
-		//case Menu::VehicleControls:
+		case Menu::VehicleActions:
 		case Menu::QuickActions:
 		case Menu::MenuActions:
 			HandleControlSettingsInput(item, false);
@@ -596,9 +596,9 @@ namespace TEN::Gui
 			numControlSettingsOptions = (int)GeneralActionStrings.size() + 2;
 			break;
 
-		/*case Menu::VehicleControls:
-			numControlSettingsOptions = (int)VehicleControlStrings.size() + 2;
-			break;*/
+		case Menu::VehicleActions:
+			numControlSettingsOptions = (int)VehicleActionStrings.size() + 2;
+			break;
 
 		case Menu::QuickActions:
 			numControlSettingsOptions = (int)QuickActionStrings.size() + 2;
@@ -658,23 +658,23 @@ namespace TEN::Gui
 						unsigned int baseIndex = 0;
 						switch (MenuToDisplay)
 						{
-						/*case Menu::VehicleControls:
-						numControlSettingsOptions = (unsigned int)GeneralControlStrings.size();
-						break;*/
+						case Menu::VehicleActions:
+							baseIndex = (unsigned int)GeneralActionStrings.size();
+							break;
 
 						case Menu::QuickActions:
-							baseIndex = unsigned int(GeneralActionStrings.size());
+							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
 							break;
 
 						case Menu::MenuActions:
-							baseIndex = unsigned int(GeneralActionStrings.size() + QuickActionStrings.size());
+							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size() + QuickActionStrings.size());
 							break;
 
 						default:
 							break;
 						}
 
-						KeyboardLayout[1][baseIndex + SelectedOption] = selectedKey;
+						Bindings[1][baseIndex + SelectedOption] = selectedKey;
 						DefaultConflict();
 
 						CurrentSettings.WaitingForKey = false;
@@ -770,8 +770,8 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					memcpy(CurrentSettings.Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
-					memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
+					CurrentSettings.Configuration.Bindings = Bindings[1];
+					g_Configuration.Bindings = Bindings[1];
 					SaveConfiguration();
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
@@ -782,7 +782,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					memcpy(KeyboardLayout[1], CurrentSettings.Configuration.KeyboardLayout, KEY_COUNT * sizeof(short));
+					Bindings[1] = CurrentSettings.Configuration.Bindings;
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;
@@ -1047,7 +1047,7 @@ namespace TEN::Gui
 			return InventoryResult::None;
 
 		case Menu::GeneralActions:
-		//case Menu::VehicleControls:
+		case Menu::VehicleActions:
 		case Menu::QuickActions:
 		case Menu::MenuActions:
 			HandleControlSettingsInput(item, true);

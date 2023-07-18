@@ -11,22 +11,22 @@ namespace TEN::Input
 		Right,
 		StepLeft,
 		StepRight,
-		Action,
 		Walk,
 		Sprint,
 		Crouch,
 		Jump,
 		Roll,
+		Action,
 		Draw,
 		Look,
 
 		// Vehicle actions
-		/*Accelerate,
+		Accelerate,
 		Reverse,
 		Speed,
 		Slow,
 		Brake,
-		Fire,*/
+		Fire,
 
 		// Quick actions
 		Flare,
