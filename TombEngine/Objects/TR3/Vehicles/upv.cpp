@@ -224,17 +224,16 @@ namespace TEN::Entities::Vehicles
 
 	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		auto* harpoon = FireHarpoon(*laraItem);
+		auto& upv = *GetUPVInfo(UPVItem);
 
-		if (harpoon == nullptr)
+		auto harpoonPose = Pose(GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((upv.HarpoonLeft ? 22 : -22), 24, 230)));
+		if (!FireHarpoon(*laraItem, harpoonPose))
 			return;
 
-		auto UPV = GetUPVInfo(UPVItem);
-		harpoon->Pose.Position = GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230));
-		harpoon->Pose.Orientation = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
+		auto soundID = (upv.Flags & UPV_FLAG_SURFACE) ? SFX_TR4_HARPOON_FIRE_DRY : SFX_TR4_HARPOON_FIRE_UNDERWATER;
+		SoundEffect(soundID, &harpoonPose, SoundEnvironment::Always);
 
-		harpoon->ItemFlags[0] = 1;
-		UPV->HarpoonLeft = !UPV->HarpoonLeft;	
+		upv.HarpoonLeft = !upv.HarpoonLeft;
 	}
 
 	static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
@@ -538,7 +537,7 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			if (IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				ModulateVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 				ModulateVehicleLean(UPVItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
@@ -567,13 +566,13 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+				if (IsHeld(In::Forward) || IsHeld(In::Back))
 					ModulateVehicleTurnRateX(&UPV->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
-			if (TrInput & VEHICLE_IN_ACCELERATE)
+			if (IsHeld(In::Accelerate))
 			{
-				if (TrInput & VEHICLE_IN_UP &&
+				if (IsHeld(In::Forward) &&
 					UPV->Flags & UPV_FLAG_SURFACE &&
 					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE_MAX)
 				{
@@ -594,7 +593,7 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 			
-			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			if (IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				ModulateVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 				ModulateVehicleLean(UPVItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
@@ -623,11 +622,11 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+				if (IsHeld(In::Forward) || IsHeld(In::Back))
 					ModulateVehicleTurnRateX(&UPV->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
-			if (TrInput & VEHICLE_IN_DISMOUNT && TestUPVDismount(UPVItem, laraItem))
+			if (IsHeld(In::Brake) && TestUPVDismount(UPVItem, laraItem))
 			{
 				if (UPV->Velocity > 0)
 					UPV->Velocity -= UPV_VELOCITY_ACCEL;
@@ -644,9 +643,9 @@ namespace TEN::Entities::Vehicles
 					SoundEffect(SFX_TR3_VEHICLE_UPV_STOP, (Pose*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 				}
 			}
-			else if (TrInput & VEHICLE_IN_ACCELERATE)
+			else if (IsHeld(In::Accelerate))
 			{
-				if (TrInput & VEHICLE_IN_UP &&
+				if (IsHeld(In::Forward) &&
 					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE_MAX &&
 					UPV->Flags & UPV_FLAG_SURFACE)
 				{
@@ -940,7 +939,7 @@ namespace TEN::Entities::Vehicles
 		TestTriggers(UPVItem, false);
 		UPVEffects(lara->Context.Vehicle);
 
-		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+		if (UPV->Velocity || IsDirectionalActionHeld())
 		{
 			waterHeight = GetWaterHeight(UPVItem);
 			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
@@ -951,7 +950,7 @@ namespace TEN::Entities::Vehicles
 		{
 			DoCurrent(UPVItem, laraItem);
 
-			if (TrInput & VEHICLE_IN_FIRE &&
+			if (IsHeld(In::Fire) &&
 				UPV->Flags & UPV_FLAG_CONTROL &&
 				!UPV->HarpoonTimer)
 			{

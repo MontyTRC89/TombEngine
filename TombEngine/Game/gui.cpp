@@ -41,7 +41,7 @@ namespace TEN::Gui
 
 	GuiController g_Gui;
 
-	const char* OptionStrings[] =
+	std::vector<const char*> OptionStrings = std::vector<const char*>
 	{
 		STRING_USE,
 		STRING_CHOOSE_AMMO,
@@ -58,31 +58,61 @@ namespace TEN::Gui
 	//	STRING_READ_DIARY
 	};
 
-	const char* ControlStrings[] =
+	std::vector<const char*> GeneralActionStrings =
 	{
-		STRING_CONTROLS_MOVE_FORWARD,
-		STRING_CONTROLS_MOVE_BACKWARD,
-		STRING_CONTROLS_MOVE_LEFT,
-		STRING_CONTROLS_MOVE_RIGHT,
-		STRING_CONTROLS_CROUCH,
-		STRING_CONTROLS_SPRINT,
-		STRING_CONTROLS_WALK,
-		STRING_CONTROLS_JUMP,
-		STRING_CONTROLS_ACTION,
-		STRING_CONTROLS_DRAW_WEAPON,
-		STRING_CONTROLS_USE_FLARE,
-		STRING_CONTROLS_LOOK,
-		STRING_CONTROLS_ROLL,
-		STRING_CONTROLS_INVENTORY,
-		STRING_CONTROLS_PAUSE,
-		STRING_CONTROLS_STEP_LEFT,
-		STRING_CONTROLS_STEP_RIGHT,
-		STRING_CONTROLS_V_ACCELERATE,
-		STRING_CONTROLS_V_REVERSE,
-		STRING_CONTROLS_V_SPEED,
-		STRING_CONTROLS_V_SLOW,
-		STRING_CONTROLS_V_BRAKE,
-		STRING_CONTROLS_V_FIRE
+		STRING_ACTIONS_FORWARD,
+		STRING_ACTIONS_BACKWARD,
+		STRING_ACTIONS_LEFT,
+		STRING_ACTIONS_RIGHT,
+		STRING_ACTIONS_STEP_LEFT,
+		STRING_ACTIONS_STEP_RIGHT,
+		STRING_ACTIONS_WALK,
+		STRING_ACTIONS_SPRINT,
+		STRING_ACTIONS_CROUCH,
+		STRING_ACTIONS_JUMP,
+		STRING_ACTIONS_ROLL,
+		STRING_ACTIONS_ACTION,
+		STRING_ACTIONS_DRAW,
+		STRING_ACTIONS_LOOK
+	};
+
+	std::vector<const char*> VehicleActionStrings =
+	{
+		STRING_ACTIONS_ACCELERATE,
+		STRING_ACTIONS_REVERSE,
+		STRING_ACTIONS_SPEED,
+		STRING_ACTIONS_SLOW,
+		STRING_ACTIONS_BRAKE,
+		STRING_ACTIONS_FIRE
+	};
+
+	std::vector<const char*> QuickActionStrings =
+	{
+		STRING_ACTIONS_FLARE,
+		STRING_ACTIONS_SMALL_MEDIPACK,
+		STRING_ACTIONS_LARGE_MEDIPACK,
+		STRING_ACTIONS_PREVIOUS_WEAPON,
+		STRING_ACTIONS_NEXT_WEAPON,
+		STRING_ACTIONS_WEAPON_1,
+		STRING_ACTIONS_WEAPON_2,
+		STRING_ACTIONS_WEAPON_3,
+		STRING_ACTIONS_WEAPON_4,
+		STRING_ACTIONS_WEAPON_5,
+		STRING_ACTIONS_WEAPON_6,
+		STRING_ACTIONS_WEAPON_7,
+		STRING_ACTIONS_WEAPON_8,
+		STRING_ACTIONS_WEAPON_9,
+		STRING_ACTIONS_WEAPON_10
+	};
+
+	std::vector<const char*> MenuActionStrings =
+	{
+		STRING_ACTIONS_SELECT,
+		STRING_ACTIONS_DESELECT,
+		STRING_ACTIONS_PAUSE,
+		STRING_ACTIONS_INVENTORY,
+		STRING_ACTIONS_SAVE,
+		STRING_ACTIONS_LOAD
 	};
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
@@ -90,7 +120,8 @@ namespace TEN::Gui
 		constexpr auto DELAY		 = 0.1f;
 		constexpr auto INITIAL_DELAY = 0.4f;
 
-		auto oppositeAction = In::None;
+		// Pulse only directional inputs.
+		auto oppositeAction = std::optional<ActionID>(std::nullopt);
 		switch (actionID)
 		{
 		case In::Forward:
@@ -108,9 +139,12 @@ namespace TEN::Gui
 		case In::Right:
 			oppositeAction = In::Left;
 			break;
+
+		default:
+			break;
 		}
 
-		bool isActionLocked = (oppositeAction == In::None) ? false : IsHeld(oppositeAction);
+		bool isActionLocked = oppositeAction.has_value() ? IsHeld(*oppositeAction) : false;
 		return (IsPulsed(actionID, DELAY, INITIAL_DELAY) && !isActionLocked);
 	}
 
@@ -121,7 +155,7 @@ namespace TEN::Gui
 	
 	bool GuiController::GuiIsDeselected() const
 	{
-		return (IsClicked(In::Deselect) && CanDeselect());
+		return ((IsClicked(In::Deselect) || IsClicked(In::Draw)) && CanDeselect());
 	}
 
 	bool GuiController::CanSelect() const
@@ -265,7 +299,10 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(false);
 			return inventoryResult;
 
-		case Menu::Controls:
+		case Menu::GeneralActions:
+		case Menu::VehicleActions:
+		case Menu::QuickActions:
+		case Menu::MenuActions:
 			HandleControlSettingsInput(item, false);
 			return inventoryResult;
 
@@ -312,8 +349,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GuiIsDeselected() &&
-				MenuToDisplay != Menu::Title)
+			if (GuiIsDeselected() && MenuToDisplay != Menu::Title)
 			{
 				MenuToDisplay = Menu::Title;
 				SelectedOption = selectedOptionBackup;
@@ -552,7 +588,26 @@ namespace TEN::Gui
 
 	void GuiController::HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu)
 	{
-		static const int numControlSettingsOptions = KEY_COUNT + 2;
+		unsigned int numControlSettingsOptions = 0;
+		switch (MenuToDisplay)
+		{
+		default:
+		case Menu::GeneralActions:
+			numControlSettingsOptions = (int)GeneralActionStrings.size() + 2;
+			break;
+
+		case Menu::VehicleActions:
+			numControlSettingsOptions = (int)VehicleActionStrings.size() + 2;
+			break;
+
+		case Menu::QuickActions:
+			numControlSettingsOptions = (int)QuickActionStrings.size() + 2;
+			break;
+
+		case Menu::MenuActions:
+			numControlSettingsOptions = (int)MenuActionStrings.size() + 2;
+			break;
+		}
 
 		OptionCount = numControlSettingsOptions;
 		CurrentSettings.WaitingForKey = false;
@@ -598,9 +653,28 @@ namespace TEN::Gui
 					if (selectedKey == MAX_INPUT_SLOTS)
 						selectedKey = 0;
 
-					if (selectedKey && g_KeyNames[selectedKey])
+					if (selectedKey && !g_KeyNames[selectedKey].empty())
 					{
-						KeyboardLayout[1][SelectedOption] = selectedKey;
+						unsigned int baseIndex = 0;
+						switch (MenuToDisplay)
+						{
+						case Menu::VehicleActions:
+							baseIndex = (unsigned int)GeneralActionStrings.size();
+							break;
+
+						case Menu::QuickActions:
+							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
+							break;
+
+						case Menu::MenuActions:
+							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size() + QuickActionStrings.size());
+							break;
+
+						default:
+							break;
+						}
+
+						Bindings[1][baseIndex + SelectedOption] = selectedKey;
 						DefaultConflict();
 
 						CurrentSettings.WaitingForKey = false;
@@ -645,6 +719,43 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
+			// HACK: Menu screen scroll.
+			if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
+			{
+				auto menu = std::optional<Menu>(std::nullopt);
+
+				if (GuiIsPulsed(In::Left))
+				{
+					if ((int)MenuToDisplay == (int)Menu::GeneralActions)
+					{
+						menu = Menu::MenuActions;
+					}
+					else
+					{
+						menu = Menu((int)MenuToDisplay - 1);
+					}
+				}
+				else if (GuiIsPulsed(In::Right))
+				{
+					if ((int)MenuToDisplay == (int)Menu::MenuActions)
+					{
+						menu = Menu::GeneralActions;
+					}
+					else
+					{
+						menu = Menu((int)MenuToDisplay + 1);
+					}
+				}
+
+				if (menu.has_value())
+				{
+					MenuToDisplay = *menu;
+					SelectedOption = 0;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					return;
+				}
+			}
+
 			if (GuiIsSelected())
 			{
 				// Defaults.
@@ -659,8 +770,8 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					memcpy(CurrentSettings.Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
-					memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
+					CurrentSettings.Configuration.Bindings = Bindings[1];
+					g_Configuration.Bindings = Bindings[1];
 					SaveConfiguration();
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
@@ -671,7 +782,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					memcpy(KeyboardLayout[1], CurrentSettings.Configuration.KeyboardLayout, KEY_COUNT * sizeof(short));
+					Bindings[1] = CurrentSettings.Configuration.Bindings;
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;
@@ -718,7 +829,7 @@ namespace TEN::Gui
 
 		case OptionsOption::Controls:
 			BackupOptions();
-			MenuToDisplay = Menu::Controls;
+			MenuToDisplay = Menu::GeneralActions;
 			SelectedOption = 0;
 			break;
 		}
@@ -935,7 +1046,10 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(true);
 			return InventoryResult::None;
 
-		case Menu::Controls:
+		case Menu::GeneralActions:
+		case Menu::VehicleActions:
+		case Menu::QuickActions:
+		case Menu::MenuActions:
 			HandleControlSettingsInput(item, true);
 			return InventoryResult::None;
 
@@ -3012,7 +3126,7 @@ namespace TEN::Gui
 
 			UpdateInputActions(item);
 
-			if (IsClicked(In::Option))
+			if (IsClicked(In::Deselect))
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				exitLoop = true;

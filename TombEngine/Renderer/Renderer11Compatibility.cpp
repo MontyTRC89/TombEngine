@@ -790,7 +790,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
 			int objNum = StaticObjectsIds[i];
-			STATIC_INFO* obj = &StaticObjects[objNum];
+			StaticInfo* obj = &StaticObjects[objNum];
 			MESH* mesh = &g_Level.Meshes[obj->meshNumber];
 
 			for (auto& bucket : mesh->buckets)
@@ -807,7 +807,7 @@ namespace TEN::Renderer
 		lastIndex = 0;
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
-			STATIC_INFO *obj = &StaticObjects[StaticObjectsIds[i]];
+			StaticInfo*obj = &StaticObjects[StaticObjectsIds[i]];
 			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
 			RendererObject &staticObject = *m_staticObjects[StaticObjectsIds[i]];
 			staticObject.Type = 1;

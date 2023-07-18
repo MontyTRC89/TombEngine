@@ -246,7 +246,6 @@ bool SaveConfiguration()
 		return false;
 	}
 
-
 	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
@@ -271,12 +270,13 @@ bool SaveConfiguration()
 		return false;
 	}
 
+	g_Configuration.Bindings.resize(KEY_COUNT);
 	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (SetDWORDRegKey(rootKey, buffer, g_Configuration.KeyboardLayout[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(rootKey, buffer, g_Configuration.Bindings[i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
@@ -449,14 +449,18 @@ bool LoadConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout[0][i]) != ERROR_SUCCESS)
+		if (GetDWORDRegKey(rootKey, buffer, &tempKey, Bindings[0][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
+
+			// Reset key bindings when upgrading to engine version with new bindings available.
+			g_Configuration.Bindings = Bindings[0];
+
 			return false;
 		}
 
-		g_Configuration.KeyboardLayout[i] = (short)tempKey;
-		KeyboardLayout[1][i] = (short)tempKey;
+		g_Configuration.Bindings.push_back(tempKey);
+		Bindings[1][i] = tempKey;
 	}
 
 	// All configuration values were found, so I can apply configuration to the engine

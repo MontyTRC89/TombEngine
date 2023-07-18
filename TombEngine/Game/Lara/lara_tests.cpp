@@ -1194,11 +1194,11 @@ bool TestLaraPose(ItemInfo* item, CollisionInfo* coll)
 	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		return false;
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+	if (!IsHeld(In::Draw) && !IsHeld(In::Flare) &&			// Avoid unsightly concurrent actions.
 		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
 		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Flare is not being handled.
 			lara->Flare.Life) &&
-		lara->Context.Vehicle == NO_ITEM)									// Not in a vehicle.
+		lara->Context.Vehicle == NO_ITEM)							// Not in a vehicle.
 	{
 		return true;
 	}
@@ -1665,7 +1665,7 @@ bool TestLaraCrouchToCrawl(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
+	if (!IsHeld(In::Draw) && !IsHeld(In::Flare) &&			// Avoid unsightly concurrent actions.
 		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
 		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare. TODO: Should be allowed, but the flare animation bugs out right now. @Sezz 2022.03.18
 			lara->Flare.Life))
@@ -2284,7 +2284,7 @@ CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll)
 
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!(TrInput & (IN_ACTION | IN_JUMP)))
+	if (!(IsHeld(In::Action) || IsHeld(In::Jump)))
 		return CrawlVaultTestResult{ false };
 
 	// Crawl vault exit down 1 step.

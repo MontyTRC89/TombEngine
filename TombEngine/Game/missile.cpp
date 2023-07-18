@@ -161,7 +161,7 @@ void ControlNatlaGun(short fxNumber)
 			fxNew.roomNumber = pointColl.RoomNumber;
 			fxNew.speed = fx.speed;
 			fxNew.frameNumber = 0;
-			fxNew.objectNumber = ID_PROJ_NATLA;
+			fxNew.objectNumber = ID_PROJ_BOMB;
 		}
 	}
 }

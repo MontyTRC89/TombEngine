@@ -76,7 +76,10 @@ namespace TEN::Gui
 		LoadGame,
 		Options,
 		Display,
-		Controls,
+		GeneralActions,
+		VehicleActions,
+		QuickActions,
+		MenuActions,
 		OtherSettings
 	};
 
@@ -226,5 +229,9 @@ namespace TEN::Gui
 	};
 
 	extern GuiController g_Gui;
-	extern const char* ControlStrings[];
+	extern std::vector<const char*> OptionStrings;
+	extern std::vector<const char*> GeneralActionStrings;
+	extern std::vector<const char*> VehicleActionStrings;
+	extern std::vector<const char*> QuickActionStrings;
+	extern std::vector<const char*> MenuActionStrings;
 }
