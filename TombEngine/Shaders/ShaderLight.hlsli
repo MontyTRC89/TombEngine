@@ -33,7 +33,7 @@ float3 DoSpecularSun(float3 n, ShaderLight light, float strength)
 		return float3(0, 0, 0);
 	else
 	{
-		float3 lightDir = normalize(light.Direction);
+		float3 lightDir = -normalize(light.Direction);
 		float3 reflectDir = reflect(lightDir, n);
 
 		float3 color = light.Color.xyz;
