@@ -190,5 +190,6 @@ namespace TEN::Collision::Floordata
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materialList);
 	
+	void DrawFlagLabel(const GameVector& point, const std::string& labelText, const Vector4& labelColor, float& offsetY, const float LABEL_SCALE, const RENDERER_DEBUG_PAGE debugTargetPage);
 	void DrawNearbyTileFlags(const ItemInfo& item);
 }

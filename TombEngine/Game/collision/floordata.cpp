@@ -940,13 +940,28 @@ namespace TEN::Collision::Floordata
 		return false;
 	}
 
-	// Draws color-coded spheres near the player describing collision block flags.
+	// Function to draw a flag label at the specified position with the given text and color.
+	void DrawFlagLabel(const GameVector& point, const std::string& labelText, const Vector4& labelColor, float& offsetY, const float LABEL_SCALE, const RENDERER_DEBUG_PAGE debugTargetPage)
+	{
+		// Get 2D label position.
+		auto labelPos = point.ToVector3() + Vector3(BLOCK(0.5f), -offsetY, BLOCK(0.5f));
+		auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
+
+		// Update offset
+		offsetY += BLOCK(0.1f);
+
+		// Draw label.
+		if (labelPos2D.has_value())
+			g_Renderer.AddDebugString(labelText, *labelPos2D, labelColor, LABEL_SCALE, PRINTSTRING_OUTLINE, debugTargetPage);
+	}
+
+	// Draws text labels describing collision block flags.
 	void DrawNearbyTileFlags(const ItemInfo& item)
 	{
 		constexpr auto DRAW_RANGE = BLOCK(3);
-		constexpr auto SPHERE_RADIUS = 64.0f;
+		constexpr auto LABEL_SCALE = 0.75f;
 		auto debugTargetPage = RENDERER_DEBUG_PAGE::LOGIC_STATS;
-
+		
 		auto point = GameVector(item.Pose.Position, item.RoomNumber);
 		auto pointColl = GetCollision(point);
 		const auto& room = g_Level.Rooms[point.RoomNumber];
@@ -956,7 +971,7 @@ namespace TEN::Collision::Floordata
 		int maxX = std::min(item.Pose.Position.x + DRAW_RANGE, room.x + (room.xSize * BLOCK(1))) / BLOCK(1);
 		int minZ = std::max(item.Pose.Position.z - DRAW_RANGE, room.z) / BLOCK(1);
 		int maxZ = std::min(item.Pose.Position.z + DRAW_RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
-
+		
 		for (int x = minX; x < maxX; x++)
 		{
 			for (int z = minZ; z < maxZ; z++)
@@ -967,48 +982,58 @@ namespace TEN::Collision::Floordata
 				pointColl = GetCollision(point);
 				point.y = pointColl.Position.Floor;
 
+				float offsetY = BLOCK(0.1f); // Initialize offsetY for each tile.
+
 				if (pointColl.Block->Stopper)
 				{
-					auto pos = point.ToVector3() + Vector3(BLOCK(0.25f), -BLOCK(0.5f), BLOCK(0.75f));
-					auto color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
-					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, debugTargetPage);
+					// Draw label for Stopper flag.
+					auto labelText = "STOPPER";
+					auto labelColor = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
 				}
-
+				
 				if (pointColl.Block->Flags.Death)
 				{
-					auto pos = point.ToVector3() + Vector3(BLOCK(0.75f), -BLOCK(0.5f), BLOCK(0.75f));
-					auto color = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
-					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, debugTargetPage);
+					// Draw label for Death flag.
+					auto labelText = "DEATH";
+					auto labelColor = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
 				}
 
 				if (pointColl.Block->Flags.Monkeyswing)
 				{
-					auto pos = point.ToVector3() + Vector3(BLOCK(0.5f), -BLOCK(0.5f), BLOCK(0.75f));
-					auto color = Vector4(1.0f, 0.5f, 0.5f, 1.0f);
-					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, debugTargetPage);
+					// Draw label for Monkeyswing flag.
+					auto labelText = "MONKEY";
+					auto labelColor = Vector4(1.0f, 0.5f, 0.5f, 1.0f);
+					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
 				}
 
 				if (pointColl.Block->Flags.MinecartRight())
 				{
-					auto pos = point.ToVector3() + Vector3(BLOCK(0.25f), -BLOCK(0.5f), BLOCK(0.25f));
-					auto color = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
-					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, debugTargetPage);
+					// Draw label for MinecartRight flag, also named as Bettle flag.
+					auto labelText = "BETTLE";
+					auto labelColor = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
 				}
 
 				if (pointColl.Block->Flags.MinecartLeft())
 				{
-					auto pos = point.ToVector3() + Vector3(BLOCK(0.75f), -BLOCK(0.5f), BLOCK(0.25f));
-					auto color = Vector4(1.0f, 0.0f, 1.0f, 1.0f);
-					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, debugTargetPage);
+					// Draw label for MinecartLeft flag. also named as Trigger Triggerer flag.
+					auto labelText = "TRIGGERER";
+					auto labelColor = Vector4(1.0f, 0.0f, 1.0f, 1.0f);
+					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
 				}
 
 				if (pointColl.Block->Flags.MinecartStop())
 				{
-					auto pos = point.ToVector3() + Vector3(BLOCK(0.5f), -BLOCK(0.5f), BLOCK(0.25f));
-					auto color = Vector4(0, 1.0f, 1.0f, 1.0f);
-					g_Renderer.AddDebugSphere(pos, SPHERE_RADIUS, color, debugTargetPage);
+					// Draw label for MinecartStop flag. Only active if MinecartRight and MinecartLeft are active in the same sector.
+					auto labelText = "MINECART STOP";
+					auto labelColor = Vector4(0, 1.0f, 1.0f, 1.0f);
+					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
 				}
 			}
 		}
 	}
+
+
 }
