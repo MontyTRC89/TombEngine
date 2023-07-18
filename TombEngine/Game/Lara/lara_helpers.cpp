@@ -150,6 +150,11 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		LaraWeaponType::RocketLauncher
 	};
 
+	auto getNextIndex = [getPrev](unsigned int index)
+	{
+		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
+	};
+
 	auto& player = GetLaraInfo(item);
 
 	// Get vector index for current weapon type.
@@ -166,12 +171,6 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 	// Invalid current weapon type; return nullopt.
 	if (!currentIndex.has_value())
 		return std::nullopt;
-
-	// Getter for next index.
-	auto getNextIndex = [getPrev](unsigned int index)
-	{
-		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
-	};
 
 	// Get next valid weapon type in sequence.
 	unsigned int nextIndex = getNextIndex(*currentIndex);
@@ -360,6 +359,14 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	constexpr auto TURN_RATE_MAX   = ANGLE(4.0f);
 	constexpr auto TURN_RATE_ACCEL = ANGLE(0.75f);
 
+	auto scaleTurnRate = [](short opticRange, short turnRate)
+	{
+		constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
+		constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
+
+		return (turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
+	};
+
 	auto& player = GetLaraInfo(item);
 
 	if (!CanPlayerLookAround(item))
@@ -388,14 +395,12 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	// Define turn rate.
 	short turnRateMax = IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
 	if (player.Control.Look.OpticRange != 0)
-		turnRateMax *= (player.Control.Look.OpticRange - ANGLE(10.0f)) / ANGLE(17.0f);
-	turnRateMax *= IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
-
-	g_Renderer.PrintDebugMessage("%d", player.Control.Look.OpticRange);
-	g_Renderer.PrintDebugMessage("%d", turnRateMax);
+		turnRateMax = scaleTurnRate(player.Control.Look.OpticRange, turnRateMax);
 
 	// Define turn rate acceleration.
 	short turnRateAccel = IsHeld(In::Walk) ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
+	if (player.Control.Look.OpticRange != 0)
+		turnRateAccel = scaleTurnRate(player.Control.Look.OpticRange, turnRateAccel);
 
 	// Modulate turn rates.
 	player.Control.Look.TurnRate = EulerAngles(
