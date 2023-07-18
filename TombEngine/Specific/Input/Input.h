@@ -96,27 +96,6 @@ namespace TEN::Input
 		KEY_COUNT
 	};
 
-	// Deprecated.
-	enum InputActions
-	{
-		IN_NONE = 0,
-
-		IN_FORWARD = (1 << KEY_FORWARD),
-		IN_BACK	   = (1 << KEY_BACK),
-		IN_LEFT	   = (1 << KEY_LEFT),
-		IN_RIGHT   = (1 << KEY_RIGHT),
-		IN_LSTEP   = (1 << KEY_LEFT_STEP),
-		IN_RSTEP   = (1 << KEY_RIGHT_STEP),
-		IN_WALK	   = (1 << KEY_WALK),
-		IN_SPRINT  = (1 << KEY_SPRINT),
-		IN_CROUCH  = (1 << KEY_CROUCH),
-		IN_JUMP	   = (1 << KEY_JUMP),
-		IN_ROLL	   = (1 << KEY_ROLL),
-		IN_ACTION  = (1 << KEY_ACTION),
-		IN_DRAW	   = (1 << KEY_DRAW),
-		IN_LOOK	   = (1 << KEY_LOOK)
-	};
-	
 	enum InputAxis
 	{
 		MoveVertical,
