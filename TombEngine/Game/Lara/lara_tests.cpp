@@ -2286,7 +2286,7 @@ CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll)
 
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!(TrInput & (IN_ACTION | IN_JUMP)))
+	if (!(IsHeld(In::Action) || IsHeld(In::Jump)))
 		return CrawlVaultTestResult{ false };
 
 	// Crawl vault exit down 1 step.

@@ -437,7 +437,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			auto crawlVaultResult = TestLaraCrawlVault(item, coll);
 
-			if (TrInput & (IN_ACTION | IN_JUMP) && crawlVaultResult.Success &&
+			if ((IsHeld(In::Action) || IsHeld(In::Jump)) && crawlVaultResult.Success &&
 				g_GameFlow->HasCrawlExtended())
 			{
 				item->Animation.TargetState = crawlVaultResult.TargetState;
@@ -453,7 +453,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (TrInput & IN_BACK)
 		{
-			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlToHang(item, coll))
+			if ((IsHeld(In::Action) || IsHeld(In::Jump)) && TestLaraCrawlToHang(item, coll))
 			{
 				item->Animation.TargetState = LS_CRAWL_TO_HANG;
 				DoLaraCrawlToHangSnap(item, coll);
