@@ -270,6 +270,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
+	g_Configuration.Bindings.resize(KEY_COUNT);
 	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		char buffer[6];
