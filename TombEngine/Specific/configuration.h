@@ -50,7 +50,7 @@ struct GameConfiguration
 	bool AutoTarget;
 	bool EnableRumble;
 	bool EnableThumbstickCameraControl;
-	short KeyboardLayout[TEN::Input::KEY_COUNT];
+	std::vector<int> Bindings = {};
 
 	std::vector<Vector2i> SupportedScreenResolutions;
 	std::string AdapterName;
