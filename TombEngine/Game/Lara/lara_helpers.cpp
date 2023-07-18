@@ -196,7 +196,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
 		UsePlayerMedipack(item);
 
-	// Handle weapon scroll requests.
+	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
 	{
 		bool getPrev = IsClicked(In::PreviousWeapon);
@@ -243,6 +243,10 @@ static bool CanPlayerLookAround(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
+	// Check if drawn weapon has lasersight.
+	if (player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+		return true;
+
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
@@ -252,7 +256,7 @@ static bool CanPlayerLookAround(const ItemInfo& item)
 			if (targetPtr != nullptr)
 				targetableCount++;
 
-			// Can switch targets; return false.
+			// Check if player can switch targets.
 			if (targetableCount > 1)
 				return false;
 		}
@@ -290,6 +294,67 @@ static void ClearPlayerLookAroundActions(const ItemInfo& item)
 	}
 }
 
+static void SetPlayerOptics(ItemInfo* item)
+{
+	constexpr auto OPTIC_RANGE_DEFAULT = 128;
+
+	auto& player = GetLaraInfo(*item);
+
+	bool breakOptics = true;
+
+	// Standing; can use optics.
+	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
+		breakOptics = false;
+
+	// Crouching; can use optics.
+	if ((player.Control.IsLow || !IsHeld(In::Crouch)) &&
+		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
+	{
+		breakOptics = false;
+	}
+
+	// If lasersight, and Look is not pressed, exit optics.
+	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
+		breakOptics = true;
+
+	// If lasersight and weapon is holstered, exit optics.
+	if (player.Control.Look.IsUsingLasersight && IsHeld(In::Draw))
+		breakOptics = true;
+
+	// Engage lasersight if available.
+	if (!player.Control.Look.IsUsingLasersight && !breakOptics && IsHeld(In::Look))
+	{
+		if (player.Control.HandStatus == HandStatus::WeaponReady &&
+			((player.Control.Weapon.GunType == LaraWeaponType::HK && player.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
+				(player.Control.Weapon.GunType == LaraWeaponType::Revolver && player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+				(player.Control.Weapon.GunType == LaraWeaponType::Crossbow && player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+		{
+			player.Control.Look.OpticRange = OPTIC_RANGE_DEFAULT;
+			player.Control.Look.IsUsingBinoculars = true;
+			player.Control.Look.IsUsingLasersight = true;
+			player.Inventory.IsBusy = true;
+			BinocularOldCamera = Camera.oldType;
+			return;
+		}
+	}
+
+	if (!breakOptics)
+		return;
+
+	// Nothing to process; return early.
+	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
+		return;
+
+	ResetPlayerFlex(item);
+	player.Control.Look.OpticRange = 0;
+	player.Control.Look.IsUsingBinoculars = false;
+	player.Control.Look.IsUsingLasersight = false;
+	player.Inventory.IsBusy = false;
+	Camera.type = BinocularOldCamera;
+	Camera.bounce = 0;
+	AlterFOV(LastFOV);
+}
+
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 {
 	constexpr auto TURN_RATE_MAX   = ANGLE(4.0f);
@@ -300,9 +365,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if (!CanPlayerLookAround(item))
 		return;
 
-	// HACK: Optics.
-	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
-		player.Control.Look.Mode = LookMode::Free;
+	// HACK: Set optics.
+	SetPlayerOptics(LaraItem);
 
 	Camera.type = CameraType::Look;
 	auto axisCoeff = Vector2::Zero;
@@ -321,15 +385,23 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
 	}
 
+	// TODO for optics!!!!!
 	// Define turn rate.
-	short turnRateMax = TURN_RATE_MAX;
-	if (player.Control.Look.OpticRange)
-		turnRateMax *= (player.Control.Look.OpticRange - ANGLE(10.0f)) / ANGLE(17.0f);
+	short turnRateMax = IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
+	//if (player.Control.Look.OpticRange != 0)
+		//turnRateMax *= (player.Control.Look.OpticRange - ANGLE(10.0f)) / ANGLE(17.0f);
+	//turnRateMax *= IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
+
+	g_Renderer.PrintDebugMessage("%d", player.Control.Look.OpticRange);
+	g_Renderer.PrintDebugMessage("%d", turnRateMax);
+
+	// Define turn rate acceleration.
+	short turnRateAccel = IsHeld(In::Walk) ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
 
 	// Modulate turn rates.
 	player.Control.Look.TurnRate = EulerAngles(
-		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, TURN_RATE_ACCEL, 0, turnRateMax, axisCoeff.x, invertXAxis),
-		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, TURN_RATE_ACCEL, 0, turnRateMax, axisCoeff.y, false),
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, turnRateAccel, 0, turnRateMax, axisCoeff.x, invertXAxis),
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, turnRateAccel, 0, turnRateMax, axisCoeff.y, false),
 		0);
 
 	// Apply turn rates.

@@ -979,12 +979,10 @@ void BinocularCamera(ItemInfo* item)
 	Camera.pos.z = z;
 	Camera.pos.RoomNumber = probe.RoomNumber;
 
-	int l = BLOCK(20.25f) * phd_cos(player.Control.Look.Orientation.x);
-	int tx = x + l * phd_sin(item->Pose.Orientation.y + player.Control.Look.Orientation.y);
-	int ty = y - BLOCK(20.25f) * phd_sin(player.Control.Look.Orientation.x);
-	int tz = z + l * phd_cos(item->Pose.Orientation.y + player.Control.Look.Orientation.y);
-
-	g_Renderer.PrintDebugMessage("%d", player.Control.Look.Orientation.y);
+	float l = BLOCK(20.25f) * phd_cos(player.Control.Look.Orientation.x);
+	float tx = x + l * phd_sin(item->Pose.Orientation.y + player.Control.Look.Orientation.y);
+	float ty = y - BLOCK(20.25f) * phd_sin(player.Control.Look.Orientation.x);
+	float tz = z + l * phd_cos(item->Pose.Orientation.y + player.Control.Look.Orientation.y);
 
 	if (Camera.oldType == CameraType::Fixed)
 	{
@@ -1657,64 +1655,4 @@ void UpdateFadeScreenAndCinematicBars()
 			ScreenFading = false;
 		}
 	}
-}
-
-void HandleOptics(ItemInfo* item)
-{
-	auto& player = GetLaraInfo(*item);
-
-	bool breakOptics = true;
-
-	// Standing; can use optics.
-	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
-		breakOptics = false;
-
-	// Crouching; can use optics.
-	if ((player.Control.IsLow || !IsHeld(In::Crouch)) &&
-		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
-	{
-		breakOptics = false;
-	}
-
-	// If lasersight, and Look is not pressed, exit optics.
-	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
-		breakOptics = true;
-
-	// If lasersight and weapon is holstered, exit optics.
-	if (player.Control.Look.IsUsingLasersight && IsHeld(In::Draw))
-		breakOptics = true;
-
-	// Engage lasersight if available.
-	if (!player.Control.Look.IsUsingLasersight && !breakOptics && IsHeld(In::Look))
-	{
-		if (player.Control.HandStatus == HandStatus::WeaponReady &&
-			((player.Control.Weapon.GunType == LaraWeaponType::HK && player.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
-				(player.Control.Weapon.GunType == LaraWeaponType::Revolver && player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-				(player.Control.Weapon.GunType == LaraWeaponType::Crossbow && player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
-		{
-			player.Control.Look.OpticRange = 128;
-			player.Control.Look.IsUsingBinoculars = true;
-			player.Control.Look.IsUsingLasersight = true;
-			player.Inventory.IsBusy = true;
-			BinocularOldCamera = Camera.oldType;
-			return;
-		}
-	}
-
-	if (!breakOptics)
-		return;
-
-	// Nothing to process; return early.
-	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
-		return;
-
-	player.Control.Look.OpticRange = 0;
-	player.Control.Look.IsUsingBinoculars = false;
-	player.Control.Look.IsUsingLasersight = false;
-	Camera.type = BinocularOldCamera;
-	Camera.bounce = 0;
-	AlterFOV(LastFOV);
-
-	player.Inventory.IsBusy = false;
-	ResetPlayerFlex(item);
 }

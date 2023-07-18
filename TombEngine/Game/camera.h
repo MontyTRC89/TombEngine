@@ -112,7 +112,6 @@ void SetScreenFadeIn(float speed);
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
-void HandleOptics(ItemInfo* item);
 void UpdateMikePos(const ItemInfo& item);
 void ClearObjCamera();
 
