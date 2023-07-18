@@ -65,11 +65,6 @@ namespace TEN::Input
 		KEY_JUMP,
 		KEY_ROLL,
 		KEY_ACTION,
-		KEY_JUMP,
-		KEY_WALK,
-		KEY_SPRINT,
-		KEY_CROUCH,
-		KEY_ROLL,
 		KEY_DRAW,
 		KEY_LOOK,
 
