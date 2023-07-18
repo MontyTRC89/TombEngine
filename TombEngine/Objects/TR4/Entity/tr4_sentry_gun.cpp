@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
+			ExplodingDeath(itemNumber, BODY_DO_EXPLOSION | BODY_NO_BOUNCE);
 			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
 

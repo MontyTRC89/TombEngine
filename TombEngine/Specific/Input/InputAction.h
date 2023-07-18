@@ -4,28 +4,23 @@ namespace TEN::Input
 {
 	typedef enum class ActionID
 	{
-		None = -1,
-
-		// Basic control
+		// General actions
 		Forward,
 		Back,
 		Left,
 		Right,
-		Crouch,
-		Sprint,
-		Walk,
-		Jump,
+		StepLeft,
+		StepRight,
 		Action,
-		DrawWeapon,
-		Flare, // Convert to generic Light button under Item hotkeys section.
-		Look,
+		Walk,
+		Sprint,
+		Crouch,
+		Jump,
 		Roll,
-		Option, // Move to GUI control section.
-		Pause, // Move to GUI control section.
-		LeftStep,
-		RightStep,
+		Draw,
+		Look,
 
-		// Vehicle control
+		// Vehicle actions
 		/*Accelerate,
 		Reverse,
 		Speed,
@@ -33,13 +28,12 @@ namespace TEN::Input
 		Brake,
 		Fire,*/
 
-		// Item hotkeys
-		/*Light, // Generic light button may be used for flares.
-		Binoculars,
+		// Quick actions
+		Flare,
 		SmallMedipack,
-		BigMedipack,
-		NextWeapon,
+		LargeMedipack,
 		PreviousWeapon,
+		NextWeapon,
 		Weapon1,
 		Weapon2,
 		Weapon3,
@@ -49,15 +43,15 @@ namespace TEN::Input
 		Weapon7,
 		Weapon8,
 		Weapon9,
-		Weapon10,*/
+		Weapon10,
 
-		// GUI control
-		/*Option,
-		Pause,*/
-		Save,
-		Load,
+		// Menu actions
 		Select,
 		Deselect,
+		Pause,
+		Inventory,
+		Save,
+		Load,
 
 		Count
 	} In;
@@ -67,7 +61,7 @@ namespace TEN::Input
 	{
 	private:
 		// Members
-		ActionID ID				= In::None;
+		ActionID ID				= In::Forward;
 		float	 Value			= 0.0f;
 		float	 PrevValue		= 0.0f;
 		float	 TimeActive		= 0.0f;

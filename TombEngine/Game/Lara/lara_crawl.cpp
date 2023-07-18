@@ -63,7 +63,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
@@ -245,7 +245,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
@@ -300,7 +300,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
@@ -349,7 +349,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	AlignLaraToSurface(item);
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
@@ -409,7 +409,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
@@ -419,7 +419,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
-			(TrInput & (IN_DRAW | IN_FLARE) &&
+			((IsHeld(In::Draw) || IsHeld(In::Flare)) &&
 			!IsStandingWeapon(item, lara->Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
@@ -555,7 +555,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraCrawlFlex(item, LARA_CRAWL_FLEX_RATE, LARA_CRAWL_FLEX_MAX);
 	}
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -651,7 +651,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraCrawlFlex(item, LARA_CRAWL_FLEX_RATE, LARA_CRAWL_FLEX_MAX);
 	}
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_BACK)
@@ -733,7 +733,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -795,7 +795,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
@@ -849,7 +849,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	AlignLaraToSurface(item);
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->Animation.TargetState = LS_CRAWL_IDLE;

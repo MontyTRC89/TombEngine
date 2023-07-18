@@ -501,7 +501,7 @@ void HandleWeapon(ItemInfo& laraItem)
 	else if (player.Control.HandStatus == HandStatus::Free)
 	{
 		// Draw weapon.
-		if (IsHeld(In::DrawWeapon))
+		if (IsHeld(In::Draw))
 		{
 			// No weapon - no any actions.
 			if (player.Control.Weapon.LastGunType != LaraWeaponType::None)
@@ -529,7 +529,7 @@ void HandleWeapon(ItemInfo& laraItem)
 			}
 		}
 
-		if ((IsHeld(In::DrawWeapon) && player.Control.Weapon.LastGunType != LaraWeaponType::None) ||
+		if ((IsHeld(In::Draw) && player.Control.Weapon.LastGunType != LaraWeaponType::None) ||
 			player.Control.Weapon.RequestGunType != player.Control.Weapon.GunType)
 		{
 			if (player.Control.IsLow && 
@@ -578,7 +578,7 @@ void HandleWeapon(ItemInfo& laraItem)
 	}
 	else if (player.Control.HandStatus == HandStatus::WeaponReady)
 	{
-		if (IsHeld(In::DrawWeapon) ||
+		if (IsHeld(In::Draw) ||
 			player.Control.Weapon.RequestGunType != player.Control.Weapon.GunType)
 		{
 			player.Control.HandStatus = HandStatus::WeaponUndraw;

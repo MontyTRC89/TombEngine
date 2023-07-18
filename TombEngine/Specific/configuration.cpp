@@ -246,7 +246,6 @@ bool SaveConfiguration()
 		return false;
 	}
 
-
 	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
@@ -452,6 +451,10 @@ bool LoadConfiguration()
 		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout[0][i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
+
+			// Reset key bindings when upgrading to engine version with new bindings available.
+			//g_Configuration.KeyboardLayout = KeyboardLayout[0];
+
 			return false;
 		}
 

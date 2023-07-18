@@ -491,6 +491,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Status.Stamina < LARA_STAMINA_MAX && item->Animation.ActiveState != LS_SPRINT)
 		lara->Status.Stamina++;
 
+	HandlePlayerQuickActions(*item);
 	RumbleLaraHealthCondition(item);
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
@@ -707,9 +708,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
-	{
 		item->HitPoints--;
-	}
 
 	if (item->HitPoints <= 0)
 	{
@@ -888,8 +887,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Handle look around.
-	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None &&
-		lara->ExtraAnim == NO_ITEM)
+	if ((IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None &&
+		lara->ExtraAnim == NO_ITEM) || BinocularOn)
 	{
 		HandlePlayerLookAround(*item);
 	}

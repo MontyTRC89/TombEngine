@@ -327,7 +327,7 @@ void MoveCamera(GameVector* ideal, int speed)
 		if (Camera.bounce <= 0)
 		{
 			int bounce = -Camera.bounce;
-			int bounce2 = -Camera.bounce >> 2;
+			int bounce2 = bounce / 2;
 			Camera.target.x += GetRandomControl() % bounce - bounce2;
 			Camera.target.y += GetRandomControl() % bounce - bounce2;
 			Camera.target.z += GetRandomControl() % bounce - bounce2;
@@ -943,7 +943,7 @@ void BinocularCamera(ItemInfo* item)
 	if (!LaserSight)
 	{
 		if (IsClicked(In::Deselect) ||
-			IsClicked(In::DrawWeapon) ||
+			IsClicked(In::Draw) ||
 			IsClicked(In::Look) ||
 			IsHeld(In::Flare))
 		{
@@ -960,27 +960,6 @@ void BinocularCamera(ItemInfo* item)
 	}
 
 	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange), false);
-
-	short headXRot = player.ExtraHeadRot.x * 2;
-	short headYRot = player.ExtraHeadRot.y;
-
-	if (headXRot > ANGLE(75.0f))
-	{
-		headXRot = ANGLE(75.0f);
-	}
-	else if (headXRot < -ANGLE(75.0f))
-	{
-		headXRot = -ANGLE(75.0f);
-	}
-
-	if (headYRot > ANGLE(80.0f))
-	{
-		headYRot = ANGLE(80.0f);
-	}
-	else if (headYRot < -ANGLE(80.0f))
-	{
-		headYRot = -ANGLE(80.0f);
-	}
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y - CLICK(2);
@@ -1001,11 +980,12 @@ void BinocularCamera(ItemInfo* item)
 	Camera.pos.z = z;
 	Camera.pos.RoomNumber = probe.RoomNumber;
 
-	int l = BLOCK(20.25f) * phd_cos(headXRot);
+	int l = BLOCK(20.25f) * phd_cos(player.Control.Look.Orientation.x);
+	int tx = x + l * phd_sin(item->Pose.Orientation.y + player.Control.Look.Orientation.y);
+	int ty = y - BLOCK(20.25f) * phd_sin(player.Control.Look.Orientation.x);
+	int tz = z + l * phd_cos(item->Pose.Orientation.y + player.Control.Look.Orientation.y);
 
-	int tx = x + l * phd_sin(item->Pose.Orientation.y + headYRot);
-	int ty = y - BLOCK(20.25f) * phd_sin(headXRot);
-	int tz = z + l * phd_cos(item->Pose.Orientation.y + headYRot);
+	g_Renderer.PrintDebugMessage("%d", player.Control.Look.Orientation.y);
 
 	if (Camera.oldType == CameraType::Fixed)
 	{
@@ -1082,7 +1062,10 @@ void BinocularCamera(ItemInfo* item)
 
 void ConfirmCameraTargetPos()
 {
-	auto pos = GetJointPosition(LaraItem, LM_TORSO);
+	auto pos = Vector3i(
+		LaraItem->Pose.Position.x,
+		LaraItem->Pose.Position.y - (LaraCollision.Setup.Height / 2),
+		LaraItem->Pose.Position.z);
 
 	if (Camera.laraNode != -1)
 	{
@@ -1699,7 +1682,7 @@ void HandleOptics(ItemInfo* item)
 		breakOptics = true;
 
 	// If lasersight and weapon is holstered, exit optics.
-	if (LaserSight && IsHeld(In::DrawWeapon))
+	if (LaserSight && IsHeld(In::Draw))
 		breakOptics = true;
 
 	// Engage lasersight if available.

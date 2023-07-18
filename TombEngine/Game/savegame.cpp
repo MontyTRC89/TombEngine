@@ -785,7 +785,6 @@ bool SaveGame::Save(int slot)
 	auto serializedEffectsOffset = fbb.CreateVector(serializedEffects);
 
 	// Event set call counters
-
 	std::vector<flatbuffers::Offset<Save::EventSetCallCounters>> serializedEventSetCallCounters{};
 	for (auto& set : g_Level.EventSets)
 	{
@@ -801,12 +800,18 @@ bool SaveGame::Save(int slot)
 	auto serializedEventSetCallCountersOffset = fbb.CreateVector(serializedEventSetCallCounters);
 
 	// Soundtrack playheads
-	auto bgmTrackData = GetSoundTrackNameAndPosition(SoundTrackType::BGM);
-	auto oneshotTrackData = GetSoundTrackNameAndPosition(SoundTrackType::OneShot);
-	auto voiceTrackData = GetSoundTrackNameAndPosition(SoundTrackType::Voice);
-	auto bgmTrackOffset = fbb.CreateString(bgmTrackData.first);
-	auto oneshotTrackOffset = fbb.CreateString(oneshotTrackData.first);
-	auto voiceTrackOffset = fbb.CreateString(voiceTrackData.first);
+	std::vector<flatbuffers::Offset<Save::Soundtrack>> soundtracks;
+	for (int j = 0; j < (int)SoundTrackType::Count; j++)
+	{
+		auto trackData = GetSoundTrackNameAndPosition((SoundTrackType)j);
+		auto nameOffset = fbb.CreateString(trackData.first);
+
+		Save::SoundtrackBuilder track{ fbb };
+		track.add_name(nameOffset);
+		track.add_position(trackData.second);
+		soundtracks.push_back(track.Finish());
+	}
+	auto soundtrackOffset = fbb.CreateVector(soundtracks);
 
 	// Legacy soundtrack map
 	std::vector<int> soundTrackMap;
@@ -1267,12 +1272,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
 	sgb.add_next_fx_active(NextFxActive);
-	sgb.add_ambient_track(bgmTrackOffset);
-	sgb.add_ambient_position(bgmTrackData.second);
-	sgb.add_oneshot_track(oneshotTrackOffset);
-	sgb.add_oneshot_position(oneshotTrackData.second);
-	sgb.add_voice_track(voiceTrackOffset);
-	sgb.add_voice_position(voiceTrackData.second);
+	sgb.add_soundtracks(soundtrackOffset);
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -1281,6 +1281,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_current_fov(LastFOV);
+	sgb.add_last_inv_item(g_Gui.GetLastInventoryItem());
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_volumes(volumesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
@@ -1447,6 +1448,9 @@ bool SaveGame::Load(int slot)
 	// Restore camera FOV
 	AlterFOV(s->current_fov());
 
+	// Restore current inventory item
+	g_Gui.SetLastInventoryItem(s->last_inv_item());
+
 	// Restore action queue
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
@@ -1455,9 +1459,13 @@ bool SaveGame::Load(int slot)
 	}
 
 	// Restore soundtracks
-	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
-	PlaySoundTrack(s->oneshot_track()->str(), SoundTrackType::OneShot, s->oneshot_position());
-	PlaySoundTrack(s->voice_track()->str(), SoundTrackType::Voice, s->voice_position());
+	for (int i = 0; i < s->soundtracks()->size(); i++)
+	{
+		assertion(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
+
+		auto track = s->soundtracks()->Get(i);
+		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
+	}
 
 	// Legacy soundtrack map
 	for (int i = 0; i < s->cd_flags()->size(); i++)
@@ -1507,6 +1515,9 @@ bool SaveGame::Load(int slot)
 
 		item->NextItem = savedItem->next_item();
 		item->NextActive = savedItem->next_item_active();
+
+		if (item->ObjectNumber == ID_NO_OBJECT)
+			continue;
 
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
 		

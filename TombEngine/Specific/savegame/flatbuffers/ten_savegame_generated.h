@@ -121,6 +121,10 @@ struct ParticleInfo;
 struct ParticleInfoBuilder;
 struct ParticleInfoT;
 
+struct Soundtrack;
+struct SoundtrackBuilder;
+struct SoundtrackT;
+
 struct SwarmObjectInfo;
 struct SwarmObjectInfoBuilder;
 struct SwarmObjectInfoT;
@@ -5085,6 +5089,87 @@ struct ParticleInfo::Traits {
 
 flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBufferBuilder &_fbb, const ParticleInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct SoundtrackT : public flatbuffers::NativeTable {
+  typedef Soundtrack TableType;
+  std::string name{};
+  uint64_t position = 0;
+};
+
+struct Soundtrack FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef SoundtrackT NativeTableType;
+  typedef SoundtrackBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_NAME = 4,
+    VT_POSITION = 6
+  };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  uint64_t position() const {
+    return GetField<uint64_t>(VT_POSITION, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyField<uint64_t>(verifier, VT_POSITION) &&
+           verifier.EndTable();
+  }
+  SoundtrackT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SoundtrackT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Soundtrack> Pack(flatbuffers::FlatBufferBuilder &_fbb, const SoundtrackT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SoundtrackBuilder {
+  typedef Soundtrack Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(Soundtrack::VT_NAME, name);
+  }
+  void add_position(uint64_t position) {
+    fbb_.AddElement<uint64_t>(Soundtrack::VT_POSITION, position, 0);
+  }
+  explicit SoundtrackBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Soundtrack> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Soundtrack>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Soundtrack> CreateSoundtrack(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    uint64_t position = 0) {
+  SoundtrackBuilder builder_(_fbb);
+  builder_.add_position(position);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+struct Soundtrack::Traits {
+  using type = Soundtrack;
+  static auto constexpr Create = CreateSoundtrack;
+};
+
+inline flatbuffers::Offset<Soundtrack> CreateSoundtrackDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    uint64_t position = 0) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return TEN::Save::CreateSoundtrack(
+      _fbb,
+      name__,
+      position);
+}
+
+flatbuffers::Offset<Soundtrack> CreateSoundtrack(flatbuffers::FlatBufferBuilder &_fbb, const SoundtrackT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct SwarmObjectInfoT : public flatbuffers::NativeTable {
   typedef SwarmObjectInfo TableType;
   bool on = false;
@@ -6824,13 +6909,9 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t flip_timer = 0;
   int32_t flip_status = 0;
   int16_t current_fov = 0;
+  int32_t last_inv_item = 0;
   std::vector<int32_t> action_queue{};
-  std::string ambient_track{};
-  uint64_t ambient_position = 0;
-  std::string oneshot_track{};
-  uint64_t oneshot_position = 0;
-  std::string voice_track{};
-  uint64_t voice_position = 0;
+  std::vector<std::unique_ptr<TEN::Save::SoundtrackT>> soundtracks{};
   std::vector<int32_t> cd_flags{};
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
@@ -6882,30 +6963,26 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_FLIP_TIMER = 52,
     VT_FLIP_STATUS = 54,
     VT_CURRENT_FOV = 56,
-    VT_ACTION_QUEUE = 58,
-    VT_AMBIENT_TRACK = 60,
-    VT_AMBIENT_POSITION = 62,
-    VT_ONESHOT_TRACK = 64,
-    VT_ONESHOT_POSITION = 66,
-    VT_VOICE_TRACK = 68,
-    VT_VOICE_POSITION = 70,
-    VT_CD_FLAGS = 72,
-    VT_ROPE = 74,
-    VT_PENDULUM = 76,
-    VT_ALTERNATE_PENDULUM = 78,
-    VT_VOLUMES = 80,
-    VT_CALL_COUNTERS = 82,
-    VT_SCRIPT_VARS = 84,
-    VT_CALLBACKS_PRE_START = 86,
-    VT_CALLBACKS_POST_START = 88,
-    VT_CALLBACKS_PRE_END = 90,
-    VT_CALLBACKS_POST_END = 92,
-    VT_CALLBACKS_PRE_SAVE = 94,
-    VT_CALLBACKS_POST_SAVE = 96,
-    VT_CALLBACKS_PRE_LOAD = 98,
-    VT_CALLBACKS_POST_LOAD = 100,
-    VT_CALLBACKS_PRE_CONTROL = 102,
-    VT_CALLBACKS_POST_CONTROL = 104
+    VT_LAST_INV_ITEM = 58,
+    VT_ACTION_QUEUE = 60,
+    VT_SOUNDTRACKS = 62,
+    VT_CD_FLAGS = 64,
+    VT_ROPE = 66,
+    VT_PENDULUM = 68,
+    VT_ALTERNATE_PENDULUM = 70,
+    VT_VOLUMES = 72,
+    VT_CALL_COUNTERS = 74,
+    VT_SCRIPT_VARS = 76,
+    VT_CALLBACKS_PRE_START = 78,
+    VT_CALLBACKS_POST_START = 80,
+    VT_CALLBACKS_PRE_END = 82,
+    VT_CALLBACKS_POST_END = 84,
+    VT_CALLBACKS_PRE_SAVE = 86,
+    VT_CALLBACKS_POST_SAVE = 88,
+    VT_CALLBACKS_PRE_LOAD = 90,
+    VT_CALLBACKS_POST_LOAD = 92,
+    VT_CALLBACKS_PRE_CONTROL = 94,
+    VT_CALLBACKS_POST_CONTROL = 96
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -6988,26 +7065,14 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int16_t current_fov() const {
     return GetField<int16_t>(VT_CURRENT_FOV, 0);
   }
+  int32_t last_inv_item() const {
+    return GetField<int32_t>(VT_LAST_INV_ITEM, 0);
+  }
   const flatbuffers::Vector<int32_t> *action_queue() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_ACTION_QUEUE);
   }
-  const flatbuffers::String *ambient_track() const {
-    return GetPointer<const flatbuffers::String *>(VT_AMBIENT_TRACK);
-  }
-  uint64_t ambient_position() const {
-    return GetField<uint64_t>(VT_AMBIENT_POSITION, 0);
-  }
-  const flatbuffers::String *oneshot_track() const {
-    return GetPointer<const flatbuffers::String *>(VT_ONESHOT_TRACK);
-  }
-  uint64_t oneshot_position() const {
-    return GetField<uint64_t>(VT_ONESHOT_POSITION, 0);
-  }
-  const flatbuffers::String *voice_track() const {
-    return GetPointer<const flatbuffers::String *>(VT_VOICE_TRACK);
-  }
-  uint64_t voice_position() const {
-    return GetField<uint64_t>(VT_VOICE_POSITION, 0);
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Soundtrack>> *soundtracks() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Soundtrack>> *>(VT_SOUNDTRACKS);
   }
   const flatbuffers::Vector<int32_t> *cd_flags() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CD_FLAGS);
@@ -7120,17 +7185,12 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FLIP_TIMER) &&
            VerifyField<int32_t>(verifier, VT_FLIP_STATUS) &&
            VerifyField<int16_t>(verifier, VT_CURRENT_FOV) &&
+           VerifyField<int32_t>(verifier, VT_LAST_INV_ITEM) &&
            VerifyOffset(verifier, VT_ACTION_QUEUE) &&
            verifier.VerifyVector(action_queue()) &&
-           VerifyOffset(verifier, VT_AMBIENT_TRACK) &&
-           verifier.VerifyString(ambient_track()) &&
-           VerifyField<uint64_t>(verifier, VT_AMBIENT_POSITION) &&
-           VerifyOffset(verifier, VT_ONESHOT_TRACK) &&
-           verifier.VerifyString(oneshot_track()) &&
-           VerifyField<uint64_t>(verifier, VT_ONESHOT_POSITION) &&
-           VerifyOffset(verifier, VT_VOICE_TRACK) &&
-           verifier.VerifyString(voice_track()) &&
-           VerifyField<uint64_t>(verifier, VT_VOICE_POSITION) &&
+           VerifyOffset(verifier, VT_SOUNDTRACKS) &&
+           verifier.VerifyVector(soundtracks()) &&
+           verifier.VerifyVectorOfTables(soundtracks()) &&
            VerifyOffset(verifier, VT_CD_FLAGS) &&
            verifier.VerifyVector(cd_flags()) &&
            VerifyOffset(verifier, VT_ROPE) &&
@@ -7269,26 +7329,14 @@ struct SaveGameBuilder {
   void add_current_fov(int16_t current_fov) {
     fbb_.AddElement<int16_t>(SaveGame::VT_CURRENT_FOV, current_fov, 0);
   }
+  void add_last_inv_item(int32_t last_inv_item) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_LAST_INV_ITEM, last_inv_item, 0);
+  }
   void add_action_queue(flatbuffers::Offset<flatbuffers::Vector<int32_t>> action_queue) {
     fbb_.AddOffset(SaveGame::VT_ACTION_QUEUE, action_queue);
   }
-  void add_ambient_track(flatbuffers::Offset<flatbuffers::String> ambient_track) {
-    fbb_.AddOffset(SaveGame::VT_AMBIENT_TRACK, ambient_track);
-  }
-  void add_ambient_position(uint64_t ambient_position) {
-    fbb_.AddElement<uint64_t>(SaveGame::VT_AMBIENT_POSITION, ambient_position, 0);
-  }
-  void add_oneshot_track(flatbuffers::Offset<flatbuffers::String> oneshot_track) {
-    fbb_.AddOffset(SaveGame::VT_ONESHOT_TRACK, oneshot_track);
-  }
-  void add_oneshot_position(uint64_t oneshot_position) {
-    fbb_.AddElement<uint64_t>(SaveGame::VT_ONESHOT_POSITION, oneshot_position, 0);
-  }
-  void add_voice_track(flatbuffers::Offset<flatbuffers::String> voice_track) {
-    fbb_.AddOffset(SaveGame::VT_VOICE_TRACK, voice_track);
-  }
-  void add_voice_position(uint64_t voice_position) {
-    fbb_.AddElement<uint64_t>(SaveGame::VT_VOICE_POSITION, voice_position, 0);
+  void add_soundtracks(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Soundtrack>>> soundtracks) {
+    fbb_.AddOffset(SaveGame::VT_SOUNDTRACKS, soundtracks);
   }
   void add_cd_flags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags) {
     fbb_.AddOffset(SaveGame::VT_CD_FLAGS, cd_flags);
@@ -7381,13 +7429,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
     int16_t current_fov = 0,
+    int32_t last_inv_item = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> action_queue = 0,
-    flatbuffers::Offset<flatbuffers::String> ambient_track = 0,
-    uint64_t ambient_position = 0,
-    flatbuffers::Offset<flatbuffers::String> oneshot_track = 0,
-    uint64_t oneshot_position = 0,
-    flatbuffers::Offset<flatbuffers::String> voice_track = 0,
-    uint64_t voice_position = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Soundtrack>>> soundtracks = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
@@ -7406,9 +7450,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_control = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_control = 0) {
   SaveGameBuilder builder_(_fbb);
-  builder_.add_voice_position(voice_position);
-  builder_.add_oneshot_position(oneshot_position);
-  builder_.add_ambient_position(ambient_position);
   builder_.add_callbacks_post_control(callbacks_post_control);
   builder_.add_callbacks_pre_control(callbacks_pre_control);
   builder_.add_callbacks_post_load(callbacks_post_load);
@@ -7426,10 +7467,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
   builder_.add_cd_flags(cd_flags);
-  builder_.add_voice_track(voice_track);
-  builder_.add_oneshot_track(oneshot_track);
-  builder_.add_ambient_track(ambient_track);
+  builder_.add_soundtracks(soundtracks);
   builder_.add_action_queue(action_queue);
+  builder_.add_last_inv_item(last_inv_item);
   builder_.add_flip_status(flip_status);
   builder_.add_flip_timer(flip_timer);
   builder_.add_flip_effect(flip_effect);
@@ -7494,13 +7534,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t flip_timer = 0,
     int32_t flip_status = 0,
     int16_t current_fov = 0,
+    int32_t last_inv_item = 0,
     const std::vector<int32_t> *action_queue = nullptr,
-    const char *ambient_track = nullptr,
-    uint64_t ambient_position = 0,
-    const char *oneshot_track = nullptr,
-    uint64_t oneshot_position = 0,
-    const char *voice_track = nullptr,
-    uint64_t voice_position = 0,
+    const std::vector<flatbuffers::Offset<TEN::Save::Soundtrack>> *soundtracks = nullptr,
     const std::vector<int32_t> *cd_flags = nullptr,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
@@ -7534,9 +7570,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto flip_maps__ = flip_maps ? _fbb.CreateVector<int32_t>(*flip_maps) : 0;
   auto flip_stats__ = flip_stats ? _fbb.CreateVector<int32_t>(*flip_stats) : 0;
   auto action_queue__ = action_queue ? _fbb.CreateVector<int32_t>(*action_queue) : 0;
-  auto ambient_track__ = ambient_track ? _fbb.CreateString(ambient_track) : 0;
-  auto oneshot_track__ = oneshot_track ? _fbb.CreateString(oneshot_track) : 0;
-  auto voice_track__ = voice_track ? _fbb.CreateString(voice_track) : 0;
+  auto soundtracks__ = soundtracks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Soundtrack>>(*soundtracks) : 0;
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
   auto volumes__ = volumes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Volume>>(*volumes) : 0;
   auto call_counters__ = call_counters ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>(*call_counters) : 0;
@@ -7579,13 +7613,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       flip_timer,
       flip_status,
       current_fov,
+      last_inv_item,
       action_queue__,
-      ambient_track__,
-      ambient_position,
-      oneshot_track__,
-      oneshot_position,
-      voice_track__,
-      voice_position,
+      soundtracks__,
       cd_flags__,
       rope,
       pendulum,
@@ -9005,6 +9035,35 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBuf
       _node_number);
 }
 
+inline SoundtrackT *Soundtrack::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<SoundtrackT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Soundtrack::UnPackTo(SoundtrackT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = position(); _o->position = _e; }
+}
+
+inline flatbuffers::Offset<Soundtrack> Soundtrack::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SoundtrackT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSoundtrack(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Soundtrack> CreateSoundtrack(flatbuffers::FlatBufferBuilder &_fbb, const SoundtrackT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SoundtrackT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _o->name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->name);
+  auto _position = _o->position;
+  return TEN::Save::CreateSoundtrack(
+      _fbb,
+      _name,
+      _position);
+}
+
 inline SwarmObjectInfoT *SwarmObjectInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<SwarmObjectInfoT>();
   UnPackTo(_o.get(), _resolver);
@@ -9649,13 +9708,9 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = flip_timer(); _o->flip_timer = _e; }
   { auto _e = flip_status(); _o->flip_status = _e; }
   { auto _e = current_fov(); _o->current_fov = _e; }
+  { auto _e = last_inv_item(); _o->last_inv_item = _e; }
   { auto _e = action_queue(); if (_e) { _o->action_queue.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->action_queue[_i] = _e->Get(_i); } } }
-  { auto _e = ambient_track(); if (_e) _o->ambient_track = _e->str(); }
-  { auto _e = ambient_position(); _o->ambient_position = _e; }
-  { auto _e = oneshot_track(); if (_e) _o->oneshot_track = _e->str(); }
-  { auto _e = oneshot_position(); _o->oneshot_position = _e; }
-  { auto _e = voice_track(); if (_e) _o->voice_track = _e->str(); }
-  { auto _e = voice_position(); _o->voice_position = _e; }
+  { auto _e = soundtracks(); if (_e) { _o->soundtracks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->soundtracks[_i] = std::unique_ptr<TEN::Save::SoundtrackT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = cd_flags(); if (_e) { _o->cd_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->cd_flags[_i] = _e->Get(_i); } } }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
@@ -9710,13 +9765,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _flip_timer = _o->flip_timer;
   auto _flip_status = _o->flip_status;
   auto _current_fov = _o->current_fov;
+  auto _last_inv_item = _o->last_inv_item;
   auto _action_queue = _fbb.CreateVector(_o->action_queue);
-  auto _ambient_track = _o->ambient_track.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->ambient_track);
-  auto _ambient_position = _o->ambient_position;
-  auto _oneshot_track = _o->oneshot_track.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->oneshot_track);
-  auto _oneshot_position = _o->oneshot_position;
-  auto _voice_track = _o->voice_track.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->voice_track);
-  auto _voice_position = _o->voice_position;
+  auto _soundtracks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Soundtrack>> (_o->soundtracks.size(), [](size_t i, _VectorArgs *__va) { return CreateSoundtrack(*__va->__fbb, __va->__o->soundtracks[i].get(), __va->__rehasher); }, &_va );
   auto _cd_flags = _fbb.CreateVector(_o->cd_flags);
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
@@ -9763,13 +9814,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _flip_timer,
       _flip_status,
       _current_fov,
+      _last_inv_item,
       _action_queue,
-      _ambient_track,
-      _ambient_position,
-      _oneshot_track,
-      _oneshot_position,
-      _voice_track,
-      _voice_position,
+      _soundtracks,
       _cd_flags,
       _rope,
       _pendulum,
