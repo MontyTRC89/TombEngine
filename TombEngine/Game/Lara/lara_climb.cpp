@@ -378,7 +378,7 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_LADDER_RIGHT;
 		lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	}
-	else if (TrInput & IN_JUMP)
+	else if (IsHeld(In::Jump))
 	{
 		if (item->Animation.AnimNumber == LA_LADDER_IDLE)
 		{

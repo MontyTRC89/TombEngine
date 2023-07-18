@@ -265,7 +265,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
-	if (DbInput & IN_JUMP && !IsDirectionalActionHeld())
+	if (IsClicked(In::Jump) && !IsDirectionalActionHeld())
 		lara->Control.JumpDirection = JumpDirection::None;
 
 	if (((TrInput & IN_FORWARD &&
