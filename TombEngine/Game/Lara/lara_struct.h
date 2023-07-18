@@ -1189,9 +1189,9 @@ struct LookControlData
 	EulerAngles Orientation = EulerAngles::Zero;
 	EulerAngles	TurnRate	= EulerAngles::Zero;
 
-	int	 OpticRange		   = 0;
-	bool IsUsingBinoculars = false;
-	bool IsUsingLasersight = false;
+	short OpticRange		= 0;
+	bool  IsUsingBinoculars = false;
+	bool  IsUsingLasersight = false;
 };
 
 struct WeaponControlData

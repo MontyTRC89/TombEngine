@@ -937,6 +937,10 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 
 void BinocularCamera(ItemInfo* item)
 {
+	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
+	constexpr auto OPTIC_RANGE_MIN	= ANGLE(0.7f);
+	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
+
 	auto& player = GetLaraInfo(*item);
 
 	if (!player.Control.Look.IsUsingLasersight)
@@ -1022,13 +1026,14 @@ void BinocularCamera(ItemInfo* item)
 	UpdateMikePos(*item);
 	Camera.oldType = Camera.type;
 
-	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
+	// Zoom optics.
+	short rangeAccel = IsHeld(In::Walk) ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
 	if (IsHeld(In::StepLeft) && !IsHeld(In::StepRight))
 	{
-		player.Control.Look.OpticRange -= range;
-		if (player.Control.Look.OpticRange < ANGLE(0.7f))
+		player.Control.Look.OpticRange -= rangeAccel;
+		if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
 		{
-			player.Control.Look.OpticRange = ANGLE(0.7f);
+			player.Control.Look.OpticRange = OPTIC_RANGE_MIN;
 		}
 		else
 		{
@@ -1037,10 +1042,10 @@ void BinocularCamera(ItemInfo* item)
 	}
 	else if (IsHeld(In::StepRight) && !IsHeld(In::StepLeft))
 	{
-		player.Control.Look.OpticRange += range;
-		if (player.Control.Look.OpticRange > ANGLE(8.5f))
+		player.Control.Look.OpticRange += rangeAccel;
+		if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
 		{
-			player.Control.Look.OpticRange = ANGLE(8.5f);
+			player.Control.Look.OpticRange = OPTIC_RANGE_MAX;
 		}
 		else
 		{
@@ -1048,13 +1053,14 @@ void BinocularCamera(ItemInfo* item)
 		}
 	}
 
-	auto origin = Camera.pos.ToVector3i();
-	auto target = Camera.target.ToVector3i();
-
 	GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
 	if (IsHeld(In::Action))
+	{
+		auto origin = Camera.pos.ToVector3i();
+		auto target = Camera.target.ToVector3i();
 		LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
+	}
 }
 
 void ConfirmCameraTargetPos()
