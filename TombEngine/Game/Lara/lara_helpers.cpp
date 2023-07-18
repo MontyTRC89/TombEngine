@@ -364,7 +364,10 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 		constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
 		constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
 
-		return (turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
+		if (opticRange == 0)
+			return turnRate;
+
+		return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
 	};
 
 	auto& player = GetLaraInfo(item);
@@ -380,27 +383,25 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 
 	// Determine X axis coefficient.
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
-		(player.Control.Look.Mode == LookMode::Vertical || player.Control.Look.Mode == LookMode::Free))
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
 	{
 		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
-		(player.Control.Look.Mode == LookMode::Horizontal || player.Control.Look.Mode == LookMode::Free))
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
 		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
 	}
 
-	// Define turn rate.
+	// Determine turn rate base values.
 	short turnRateMax = IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
-	if (player.Control.Look.OpticRange != 0)
-		turnRateMax = normalizeTurnRate(player.Control.Look.OpticRange, turnRateMax);
-
-	// Define turn rate acceleration.
 	short turnRateAccel = IsHeld(In::Walk) ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
-	if (player.Control.Look.OpticRange != 0)
-		turnRateAccel = normalizeTurnRate(player.Control.Look.OpticRange, turnRateAccel);
+
+	// Normalize turn rate base values.
+	turnRateMax = normalizeTurnRate(player.Control.Look.OpticRange, turnRateMax);
+	turnRateAccel = normalizeTurnRate(player.Control.Look.OpticRange, turnRateAccel);
 
 	// Modulate turn rates.
 	player.Control.Look.TurnRate = EulerAngles(
