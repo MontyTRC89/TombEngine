@@ -266,7 +266,7 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_LEAP;
 
 		item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
@@ -550,7 +550,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.FrameNumber = GetAnimData(item).frameBase;
 		}
 
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 			JumpOffRope(item);
 	}
 	else if (item->Animation.FrameNumber == GetAnimData(LA_ROPE_IDLE_TO_SWING).frameBase + 15)
@@ -618,7 +618,7 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		// TODO: Add forward jump.
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			return;
@@ -707,7 +707,7 @@ void lara_as_pole_up(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_POLE_IDLE;
 			return;
@@ -756,7 +756,7 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_POLE_IDLE;
 			return;

@@ -52,7 +52,7 @@ struct GameConfiguration
 	bool EnableThumbstickCameraControl;
 	int MouseSensitivity = 6;
 	int MouseSmoothing = 1;
-	short KeyboardLayout[TEN::Input::KEY_COUNT];
+	std::vector<int> Bindings = {};
 
 	std::vector<Vector2i> SupportedScreenResolutions;
 	std::string AdapterName;
