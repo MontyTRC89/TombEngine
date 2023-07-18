@@ -359,7 +359,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	constexpr auto TURN_RATE_MAX   = ANGLE(4.0f);
 	constexpr auto TURN_RATE_ACCEL = ANGLE(0.75f);
 
-	auto scaleTurnRate = [](short opticRange, short turnRate)
+	auto normalizeTurnRate = [](short opticRange, short turnRate)
 	{
 		constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
 		constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
@@ -395,12 +395,12 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	// Define turn rate.
 	short turnRateMax = IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
 	if (player.Control.Look.OpticRange != 0)
-		turnRateMax = scaleTurnRate(player.Control.Look.OpticRange, turnRateMax);
+		turnRateMax = normalizeTurnRate(player.Control.Look.OpticRange, turnRateMax);
 
 	// Define turn rate acceleration.
 	short turnRateAccel = IsHeld(In::Walk) ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
 	if (player.Control.Look.OpticRange != 0)
-		turnRateAccel = scaleTurnRate(player.Control.Look.OpticRange, turnRateAccel);
+		turnRateAccel = normalizeTurnRate(player.Control.Look.OpticRange, turnRateAccel);
 
 	// Modulate turn rates.
 	player.Control.Look.TurnRate = EulerAngles(
