@@ -971,7 +971,7 @@ namespace TEN::Collision::Floordata
 		int maxX = std::min(item.Pose.Position.x + DRAW_RANGE, room.x + (room.xSize * BLOCK(1))) / BLOCK(1);
 		int minZ = std::max(item.Pose.Position.z - DRAW_RANGE, room.z) / BLOCK(1);
 		int maxZ = std::min(item.Pose.Position.z + DRAW_RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
-		
+			
 		for (int x = minX; x < maxX; x++)
 		{
 			for (int z = minZ; z < maxZ; z++)
@@ -985,52 +985,22 @@ namespace TEN::Collision::Floordata
 				float offsetY = BLOCK(0.1f); // Initialize offsetY for each tile.
 
 				if (pointColl.Block->Stopper)
-				{
-					// Draw label for Stopper flag.
-					auto labelText = "STOPPER";
-					auto labelColor = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
-					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
-				}
+					DrawFlagLabel(point, "STOPPER", Vector4(1.0f, 0.0f, 0.0f, 1.0f), offsetY, LABEL_SCALE, debugTargetPage);
 				
 				if (pointColl.Block->Flags.Death)
-				{
-					// Draw label for Death flag.
-					auto labelText = "DEATH";
-					auto labelColor = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
-					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
-				}
+					DrawFlagLabel(point, "DEATH", Vector4(0.0f, 1.0f, 0.0f, 1.0f), offsetY, LABEL_SCALE, debugTargetPage);
 
 				if (pointColl.Block->Flags.Monkeyswing)
-				{
-					// Draw label for Monkeyswing flag.
-					auto labelText = "MONKEY";
-					auto labelColor = Vector4(1.0f, 0.5f, 0.5f, 1.0f);
-					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
-				}
+					DrawFlagLabel(point, "MONKEY", Vector4(1.0f, 0.5f, 0.5f, 1.0f), offsetY, LABEL_SCALE, debugTargetPage);
 
 				if (pointColl.Block->Flags.MinecartRight())
-				{
-					// Draw label for MinecartRight flag, also named as Bettle flag.
-					auto labelText = "BETTLE";
-					auto labelColor = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
-					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
-				}
+					DrawFlagLabel(point, "BETTLE", Vector4(0.0f, 0.0f, 1.0f, 1.0f), offsetY, LABEL_SCALE, debugTargetPage);
 
 				if (pointColl.Block->Flags.MinecartLeft())
-				{
-					// Draw label for MinecartLeft flag. also named as Trigger Triggerer flag.
-					auto labelText = "TRIGGERER";
-					auto labelColor = Vector4(1.0f, 0.0f, 1.0f, 1.0f);
-					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
-				}
+					DrawFlagLabel(point, "TRIGGERER", Vector4(1.0f, 0.0f, 1.0f, 1.0f), offsetY, LABEL_SCALE, debugTargetPage);
 
 				if (pointColl.Block->Flags.MinecartStop())
-				{
-					// Draw label for MinecartStop flag. Only active if MinecartRight and MinecartLeft are active in the same sector.
-					auto labelText = "MINECART STOP";
-					auto labelColor = Vector4(0, 1.0f, 1.0f, 1.0f);
-					DrawFlagLabel(point, labelText, labelColor, offsetY, LABEL_SCALE, debugTargetPage);
-				}
+					DrawFlagLabel(point, "MINECART STOP", Vector4(0, 1.0f, 1.0f, 1.0f), offsetY, LABEL_SCALE, debugTargetPage);
 			}
 		}
 	}
