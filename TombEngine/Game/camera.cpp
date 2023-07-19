@@ -946,10 +946,9 @@ void BinocularCamera(ItemInfo* item)
 			IsClicked(In::Look) ||
 			IsHeld(In::Flare))
 		{
+			ResetPlayerFlex(item);
 			player.Control.Look.OpticRange = 0;
 			player.Control.Look.IsUsingBinoculars = false;
-			player.ExtraHeadRot = EulerAngles::Zero;
-			player.ExtraTorsoRot = EulerAngles::Zero;
 			player.Inventory.IsBusy = false;
 
 			Camera.type = BinocularOldCamera;
