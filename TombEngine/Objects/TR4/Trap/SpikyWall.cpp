@@ -42,7 +42,7 @@ namespace TEN::Entities::Traps
 		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? frontWallBound : -backWallBound);
 
 		// Stop moving.
-		if (pointColl.Position.Floor != item.Pose.Position.y)
+		if (pointColl.Position.Floor < item.Pose.Position.y)
 		{
 			item.Status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_TR4_ROLLING_BALL);
