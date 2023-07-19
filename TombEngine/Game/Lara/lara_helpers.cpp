@@ -382,6 +382,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	SetPlayerOptics(LaraItem);
 	Camera.type = CameraType::Look;
 
+	bool isSlow = IsHeld(In::Walk);
 	auto axisCoeff = Vector2::Zero;
 
 	// Determine X axis coefficient.
@@ -401,7 +402,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	// Zoom optics.
 	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
 	{
-		short rangeRate = IsHeld(In::Walk) ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
+		short rangeRate = isSlow ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
 
 		if (IsHeld(In::StepLeft) && !IsHeld(In::StepRight))
 		{
@@ -430,8 +431,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	}
 
 	// Determine turn rate base values.
-	short turnRateMax = IsHeld(In::Walk) ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
-	short turnRateAccel = IsHeld(In::Walk) ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
+	short turnRateMax = isSlow ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
+	short turnRateAccel = isSlow ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
 
 	// Normalize turn rate base values.
 	turnRateMax = normalizeTurnRate(player.Control.Look.OpticRange, turnRateMax);
