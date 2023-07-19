@@ -412,10 +412,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 // 2. Object parenting. -- Sezz 2022.10.28
 void EaseOutLaraHeight(ItemInfo* item, int height)
 {
-	constexpr auto LINEAR_THRESHOLD		= STEPUP_HEIGHT / 2;
-	constexpr auto EASING_THRESHOLD_MIN = BLOCK(1.0f / 64);
-	constexpr auto LINEAR_RATE			= 50;
-	constexpr auto EASING_ALPHA			= 0.35f;
+	constexpr auto LINEAR_RATE_MIN = 50.0f;
 
 	// Check for wall.
 	if (height == NO_HEIGHT)
@@ -428,18 +425,12 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 		return;
 	}
 
-	int easingThreshold = std::max(abs(item->Animation.Velocity.z), EASING_THRESHOLD_MIN);
-
 	// Handle regular case.
-	if (abs(height) > LINEAR_THRESHOLD)
+	float linearRate = std::max(LINEAR_RATE_MIN, abs(item->Animation.Velocity.z));
+	if (abs(height) > linearRate)
 	{
 		int sign = std::copysign(1, height);
-		item->Pose.Position.y += LINEAR_RATE * sign;
-	}
-	else if (abs(height) > easingThreshold)
-	{
-		int vPos = item->Pose.Position.y;
-		item->Pose.Position.y = (int)round(Lerp(vPos, vPos + height, EASING_ALPHA));
+		item->Pose.Position.y += linearRate * sign;
 	}
 	else
 	{
