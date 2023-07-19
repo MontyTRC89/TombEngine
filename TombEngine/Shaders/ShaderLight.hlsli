@@ -51,22 +51,43 @@ float3 DoSpecularSpot(float3 pos, float3 n, ShaderLight light, float strength)
 	else
 	{
 		float3 lightPos = light.Position.xyz;
-		float radius = light.Out;
+		float3 direction = light.Direction.xyz;
+		float innerRange = light.In;
+		float outerRange = light.Out;
+		float coneIn = light.InRange;
+		float coneOut = light.OutRange;
 
-		float dist = distance(lightPos, pos);
-		if (dist > radius)
+		float3 lightVec = normalize(pos - lightPos);
+		float distance = length(lightVec);
+
+		if (distance > outerRange)
 			return float3(0, 0, 0);
 		else
 		{
-			float3 lightDir = normalize(lightPos - pos);
-			float3 reflectDir = reflect(lightDir, n);
+			float cosine = dot(lightVec, direction);
 
-			float3 color = light.Color.xyz;
-			float intensity = saturate(light.Intensity);
-			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
-			float attenuation = (radius - dist) / radius;
+			float minCosineIn = cos(coneIn * (PI / 180.0f));
+			float attenuationIn = max((cosine - minCosineIn), 0.0f) / (1.0f - minCosineIn);
 
-			return attenuation * spec * color * intensity;
+			float minCosineOut = cos(coneOut * (PI / 180.0f));
+			float attenuationOut = max((cosine - minCosineOut), 0.0f) / (1.0f - minCosineOut);
+
+			float attenuation = saturate(attenuationIn * 2.0f + attenuationOut);
+
+			if (attenuation > 0.0f)
+			{
+				float3 lightDir = -lightVec;
+				float3 reflectDir = reflect(lightDir, n);
+
+				float3 color = light.Color.xyz;
+				float intensity = saturate(light.Intensity);
+				float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
+				float attenuation = (outerRange - distance) / outerRange;
+
+				return attenuation * spec * color * intensity;
+			}
+			else
+				return float3(0, 0, 0);
 		}
 	}
 }
