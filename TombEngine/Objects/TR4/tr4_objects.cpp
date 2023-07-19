@@ -56,6 +56,7 @@
 
 // Traps
 #include "Objects/TR4/Trap/SpikyCeiling.h"
+#include "Objects/TR4/Trap/SpikyWall.h"
 #include "Objects/TR4/Trap/tr4_birdblade.h"
 #include "Objects/TR4/Trap/tr4_blade.h"
 #include "Objects/TR4/Trap/tr4_catwalkblade.h"
@@ -70,7 +71,6 @@
 #include "Objects/TR4/Trap/tr4_sethblade.h"
 #include "Objects/TR4/Trap/tr4_slicerdicer.h"
 #include "Objects/TR4/Trap/tr4_spikeball.h"
-#include "Objects/TR4/Trap/tr4_spikywall.h"
 #include "Objects/TR4/Trap/tr4_stargate.h"
 #include "Objects/TR4/Trap/tr4_cog.h"
 #include "Objects/TR4/Trap/tr4_teethspike.h"
@@ -900,7 +900,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeSpikyWall;
 			obj->control = ControlSpikyWall;
-			obj->collision = ObjectCollision;
+			obj->collision = CollideSpikyWall;
 			obj->SetupHitEffect(true);
 		}
 
