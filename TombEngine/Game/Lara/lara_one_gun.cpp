@@ -1167,7 +1167,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 	auto& ammo = GetAmmo(player, player.Control.Weapon.GunType);
 	const auto& weapon = player.Weapons[(int)weaponType];
 
-	if (!player.Control.Look.IsUsingLasersight || (!weapon.HasLasersight))
+	if (!player.Control.Look.IsUsingLasersight || !weapon.HasLasersight)
 		return;
 
 	bool isFiring = false;

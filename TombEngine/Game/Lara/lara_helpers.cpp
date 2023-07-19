@@ -295,7 +295,7 @@ static void ClearPlayerLookAroundActions(const ItemInfo& item)
 
 static void SetPlayerOptics(ItemInfo* item)
 {
-	constexpr auto OPTIC_RANGE_DEFAULT = 128;
+	constexpr auto OPTIC_RANGE_DEFAULT = ANGLE(0.7f);
 
 	auto& player = GetLaraInfo(*item);
 
@@ -340,15 +340,15 @@ static void SetPlayerOptics(ItemInfo* item)
 	if (!breakOptics)
 		return;
 
-	// Nothing to process; return early.
+	// Noth using optics; return early.
 	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
 		return;
 
-	ResetPlayerFlex(item);
 	player.Control.Look.OpticRange = 0;
 	player.Control.Look.IsUsingBinoculars = false;
 	player.Control.Look.IsUsingLasersight = false;
 	player.Inventory.IsBusy = false;
+
 	Camera.type = BinocularOldCamera;
 	Camera.bounce = 0;
 	AlterFOV(LastFOV);
@@ -356,8 +356,11 @@ static void SetPlayerOptics(ItemInfo* item)
 
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 {
-	constexpr auto TURN_RATE_MAX   = ANGLE(4.0f);
-	constexpr auto TURN_RATE_ACCEL = ANGLE(0.75f);
+	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
+	constexpr auto OPTIC_RANGE_MIN	= ANGLE(0.7f);
+	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
+	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
+	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
 
 	auto normalizeTurnRate = [](short opticRange, short turnRate)
 	{
@@ -375,10 +378,10 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if (!CanPlayerLookAround(item))
 		return;
 
-	// HACK: Set optics.
+	// Set optics.
 	SetPlayerOptics(LaraItem);
-
 	Camera.type = CameraType::Look;
+
 	auto axisCoeff = Vector2::Zero;
 
 	// Determine X axis coefficient.
@@ -393,6 +396,37 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
 		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
+	}
+
+	// Zoom optics.
+	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
+	{
+		short rangeRate = IsHeld(In::Walk) ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
+
+		if (IsHeld(In::StepLeft) && !IsHeld(In::StepRight))
+		{
+			player.Control.Look.OpticRange -= rangeRate;
+			if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
+			{
+				player.Control.Look.OpticRange = OPTIC_RANGE_MIN;
+			}
+			else
+			{
+				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
+			}
+		}
+		else if (IsHeld(In::StepRight) && !IsHeld(In::StepLeft))
+		{
+			player.Control.Look.OpticRange += rangeRate;
+			if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
+			{
+				player.Control.Look.OpticRange = OPTIC_RANGE_MAX;
+			}
+			else
+			{
+				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
+			}
+		}
 	}
 
 	// Determine turn rate base values.

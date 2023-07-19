@@ -937,10 +937,6 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 
 void BinocularCamera(ItemInfo* item)
 {
-	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
-	constexpr auto OPTIC_RANGE_MIN	= ANGLE(0.7f);
-	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
-
 	auto& player = GetLaraInfo(*item);
 
 	if (!player.Control.Look.IsUsingLasersight)
@@ -1025,33 +1021,6 @@ void BinocularCamera(ItemInfo* item)
 	LookAt(&Camera, 0);
 	UpdateMikePos(*item);
 	Camera.oldType = Camera.type;
-
-	// Zoom optics.
-	short rangeAccel = IsHeld(In::Walk) ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
-	if (IsHeld(In::StepLeft) && !IsHeld(In::StepRight))
-	{
-		player.Control.Look.OpticRange -= rangeAccel;
-		if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
-		{
-			player.Control.Look.OpticRange = OPTIC_RANGE_MIN;
-		}
-		else
-		{
-			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
-		}
-	}
-	else if (IsHeld(In::StepRight) && !IsHeld(In::StepLeft))
-	{
-		player.Control.Look.OpticRange += rangeAccel;
-		if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
-		{
-			player.Control.Look.OpticRange = OPTIC_RANGE_MAX;
-		}
-		else
-		{
-			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
-		}
-	}
 
 	GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
