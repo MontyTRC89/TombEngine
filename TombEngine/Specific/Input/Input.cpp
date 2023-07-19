@@ -724,6 +724,10 @@ namespace TEN::Input
 	{
 		ActionMap[(int)actionID].Clear();
 
+		// TEMP FIX: Only port up to 32 bits.
+		if ((int)actionID >= 32)
+			return;
+
 		int actionBit = 1 << (int)actionID;
 		DbInput &= ~actionBit;
 		TrInput &= ~actionBit;
