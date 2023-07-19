@@ -39,7 +39,7 @@ namespace TEN::Entities::Traps
 
 		// Get point collision.
 		int forwardVel = item.ItemFlags[0];
-		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? frontWallBound : backWallBound);
+		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? frontWallBound : -backWallBound);
 
 		// Stop moving.
 		if (pointColl.Position.Floor != item.Pose.Position.y)
