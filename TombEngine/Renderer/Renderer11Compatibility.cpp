@@ -208,7 +208,7 @@ namespace TEN::Renderer
 			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
-			
+
 			Vector3 boxMin = Vector3(room.x + BLOCK(1), room.maxceiling - CLICK(1), room.z + BLOCK(1));
 			Vector3 boxMax = Vector3(room.x + (room.xSize - 1) * BLOCK(1), room.minfloor + CLICK(1), room.z + (room.zSize - 1) * BLOCK(1));
 			Vector3 center = (boxMin + boxMax) / 2.0f;
@@ -316,6 +316,7 @@ namespace TEN::Renderer
 						vertex->UV = poly.textureCoordinates[k];
 						vertex->Color = Vector4(room.colors[index].x, room.colors[index].y, room.colors[index].z, 1.0f);
 						vertex->Tangent = poly.tangents[k];
+						vertex->Binormal = poly.binormals[k];
 						vertex->AnimationFrameOffset = poly.animatedFrame;
 						vertex->IndexInPoly = k;
 						vertex->OriginalIndex = index;
@@ -922,10 +923,18 @@ namespace TEN::Renderer
 					vertex.Position.x = meshPtr->positions[v].x;
 					vertex.Position.y = meshPtr->positions[v].y;
 					vertex.Position.z = meshPtr->positions[v].z;
-
+					 
 					vertex.Normal.x = poly->normals[k].x;
 					vertex.Normal.y = poly->normals[k].y;
 					vertex.Normal.z = poly->normals[k].z;
+
+					vertex.Tangent.x = poly->tangents[k].x;
+					vertex.Tangent.y = poly->tangents[k].y;
+					vertex.Tangent.z = poly->tangents[k].z;
+
+					vertex.Binormal.x = poly->binormals[k].x;
+					vertex.Binormal.y = poly->binormals[k].y;
+					vertex.Binormal.z = poly->binormals[k].z;
 
 					vertex.UV.x = poly->textureCoordinates[k].x;
 					vertex.UV.y = poly->textureCoordinates[k].y;
