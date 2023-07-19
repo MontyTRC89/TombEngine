@@ -35,9 +35,9 @@ namespace TEN::Entities::TR4
 	constexpr auto AHMET_VIEW_ANGLE				 = ANGLE(45.0f);
 	constexpr auto AHMET_ENEMY_ANGLE			 = ANGLE(90.0f);
 	
-	const auto AhmetBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 16);
-	const auto AhmetBiteRight = CreatureBiteInfo(Vector3i::Zero, 22);
-	const auto AhmetBiteJaw	  = CreatureBiteInfo(Vector3i::Zero, 11);
+	const auto AhmetBiteLeft  = CreatureBiteInfo(Vector3::Zero, 16);
+	const auto AhmetBiteRight = CreatureBiteInfo(Vector3::Zero, 22);
+	const auto AhmetBiteJaw	  = CreatureBiteInfo(Vector3::Zero, 11);
 	const auto AhmetSwipeAttackLeftJoints  = std::vector<unsigned int>{ 14, 15, 16, 17 };
 	const auto AhmetSwipeAttackRightJoints = std::vector<unsigned int>{ 20, 21, 22, 23 };
 
@@ -109,9 +109,9 @@ namespace TEN::Entities::TR4
 
 		InitializeCreature(itemNumber);
 		SetAnimation(item, AHMET_ANIM_IDLE);
-		item->ItemFlags[0] = item->Pose.Position.x / SECTOR(1);
-		item->ItemFlags[1] = (item->Pose.Position.y * 4) / SECTOR(1);
-		item->ItemFlags[2] = item->Pose.Position.z / SECTOR(1);
+		item->ItemFlags[0] = item->Pose.Position.x / BLOCK(1);
+		item->ItemFlags[1] = (item->Pose.Position.y * 4) / BLOCK(1);
+		item->ItemFlags[2] = item->Pose.Position.z / BLOCK(1);
 	}
 
 	void AhmetControl(short itemNumber)
@@ -390,9 +390,9 @@ namespace TEN::Entities::TR4
 
 		Weather.Flash(255, 64, 0, 0.03f);
 
-		item->Pose.Position.x = (item->ItemFlags[0] * SECTOR(1)) + CLICK(2);
+		item->Pose.Position.x = (item->ItemFlags[0] * BLOCK(1)) + CLICK(2);
 		item->Pose.Position.y = (item->ItemFlags[1] * CLICK(1));
-		item->Pose.Position.z = (item->ItemFlags[2] * SECTOR(1)) + CLICK(2);
+		item->Pose.Position.z = (item->ItemFlags[2] * BLOCK(1)) + CLICK(2);
 
 		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 		if (item->RoomNumber != outsideRoom)

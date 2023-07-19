@@ -16,9 +16,9 @@ const auto SarcophagusPosition = Vector3i(0, 0, -300);
 const ObjectCollisionBounds SarcophagusBounds =
 {
 	GameBoundingBox(
-		-SECTOR(0.5f), SECTOR(0.5f),
+		-BLOCK(0.5f), BLOCK(0.5f),
 		-100, 100,
-		-SECTOR(0.5f), 0
+		-BLOCK(0.5f), 0
 	),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), 0),

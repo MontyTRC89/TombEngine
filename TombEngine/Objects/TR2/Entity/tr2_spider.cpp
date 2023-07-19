@@ -30,7 +30,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto SMALL_SPIDER_TURN_RATE_MAX = ANGLE(8.0f);
 	constexpr auto BIG_SPIDER_TURN_RATE_MAX	  = ANGLE(4.0f);
 
-	const auto SpiderBite = CreatureBiteInfo(Vector3i(0, 0, 41), 1);
+	const auto SpiderBite = CreatureBiteInfo(Vector3(0, 0, 41), 1);
 
 	enum SpiderState
 	{

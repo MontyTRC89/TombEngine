@@ -3,11 +3,7 @@
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
 
-namespace sol
-{
-	class state;
-}
-
+namespace sol { class state; }
 class Rotation;
 class Vec3;
 

@@ -54,8 +54,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto BADDY_UZI_AMMO = 24;
 
-	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3i(-5, 200, 50), 11);
-	const auto BaddySwordBite = CreatureBiteInfo(Vector3i::Zero, 15);
+	const auto BaddyGunBite	  = CreatureBiteInfo(Vector3(-5, 200, 50), 11);
+	const auto BaddySwordBite = CreatureBiteInfo(Vector3::Zero, 15);
 	const auto BaddySwordAttackJoints = std::vector<unsigned int>{ 14, 15, 16 };
 
 	enum BaddyState
@@ -552,7 +552,7 @@ namespace TEN::Entities::TR4
 
 			// Is baddy alerted?
 			if (item->HitStatus ||
-				laraAI.distance < pow(SECTOR(1), 2) ||
+				laraAI.distance < pow(BLOCK(1), 2) ||
 				TargetVisible(item, &laraAI) &&
 				abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < CLICK(4))
 			{
@@ -699,7 +699,7 @@ namespace TEN::Entities::TR4
 				{
 					short objectNumber = currentCreature->Enemy->ObjectNumber;
 					if ((objectNumber == ID_SMALLMEDI_ITEM || objectNumber == ID_UZI_AMMO_ITEM || objectNumber == ID_BIGMEDI_ITEM) &&
-						AI.distance < pow(SECTOR(0.5f), 2))
+						AI.distance < pow(BLOCK(0.5f), 2))
 					{
 						item->Animation.TargetState = BADDY_STATE_STAND_TO_CROUCH;
 						item->Animation.RequiredState = BADDY_STATE_CROUCH_PICKUP;
@@ -758,12 +758,12 @@ namespace TEN::Entities::TR4
 
 					if (currentCreature->Enemy && 
 						currentCreature->Enemy->HitPoints > 0 && 
-						AI.distance < pow(SECTOR(0.5f), 2) &&
-						abs(AI.verticalDistance) < SECTOR(1))
+						AI.distance < pow(BLOCK(0.5f), 2) &&
+						abs(AI.verticalDistance) < BLOCK(1))
 					{
 						if (item->TestMeshSwapFlags(MESHSWAPFLAGS_BADDY_GUN))
 							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
-						else if (AI.distance >= pow(SECTOR(0.5f), 2))
+						else if (AI.distance >= pow(BLOCK(0.5f), 2))
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_FRONT;
 						else if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
@@ -817,7 +817,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
+				if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
@@ -831,7 +831,7 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (AI.distance < pow(SECTOR(1), 2))
+					if (AI.distance < pow(BLOCK(1), 2))
 					{
 						item->Animation.TargetState = BADDY_STATE_WALK_SWORD_HIT_RIGHT;
 						break;
@@ -846,7 +846,7 @@ namespace TEN::Entities::TR4
 
 				if (currentCreature->Mood == MoodType::Attack &&
 					!(currentCreature->JumpAhead) &&
-					AI.distance > pow(SECTOR(1), 2))
+					AI.distance > pow(BLOCK(1), 2))
 				{
 					item->Animation.TargetState = BADDY_STATE_RUN;
 				}
@@ -865,7 +865,7 @@ namespace TEN::Entities::TR4
 					item->Animation.FrameNumber == FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
-					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) && AI.distance < pow(SECTOR(3), 2) || height2 >= (height1 + CLICK(2))))
+					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) && AI.distance < pow(BLOCK(3), 2) || height2 >= (height1 + CLICK(2))))
 				{
 					item->Animation.TargetState = BADDY_STATE_SOMERSAULT;
 					currentCreature->MaxTurn = 0;
@@ -885,7 +885,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (AI.distance < pow(SECTOR(1), 2))
+				if (AI.distance < pow(BLOCK(1), 2))
 				{
 					item->Animation.TargetState = BADDY_STATE_WALK;
 					break;
@@ -900,7 +900,7 @@ namespace TEN::Entities::TR4
 				currentCreature->MaxTurn = 0;
 
 				if (item->Animation.ActiveState == BADDY_STATE_SWORD_HIT_RIGHT &&
-					AI.distance < pow(SECTOR(0.5f), 2))
+					AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
 				}
@@ -1048,7 +1048,7 @@ namespace TEN::Entities::TR4
 						if ((currentCreature->Enemy->ObjectNumber == ID_SMALLMEDI_ITEM ||
 							currentCreature->Enemy->ObjectNumber == ID_BIGMEDI_ITEM ||
 							currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM) &&
-							AI.distance < pow(SECTOR(0.5f), 2))
+							AI.distance < pow(BLOCK(0.5f), 2))
 						{
 							item->Animation.TargetState = BADDY_STATE_CROUCH_PICKUP;
 							break;

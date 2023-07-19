@@ -30,11 +30,11 @@ namespace TEN::Entities::TR4
 	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE	= 10;
 	constexpr auto HARPY_STINGER_POISON_POTENCY = 8;
 
-	const auto HarpyBite1	= CreatureBiteInfo(Vector3i::Zero, 4);
-	const auto HarpyBite2	= CreatureBiteInfo(Vector3i::Zero, 2);
-	const auto HarpyBite3	= CreatureBiteInfo(Vector3i::Zero, 15);
-	const auto HarpyAttack1 = CreatureBiteInfo(Vector3i(0, 128, 0), 2);
-	const auto HarpyAttack2 = CreatureBiteInfo(Vector3i(0, 128, 0), 4);
+	const auto HarpyBite1	= CreatureBiteInfo(Vector3::Zero, 4);
+	const auto HarpyBite2	= CreatureBiteInfo(Vector3::Zero, 2);
+	const auto HarpyBite3	= CreatureBiteInfo(Vector3::Zero, 15);
+	const auto HarpyAttack1 = CreatureBiteInfo(Vector3(0, 128, 0), 2);
+	const auto HarpyAttack2 = CreatureBiteInfo(Vector3(0, 128, 0), 4);
 	const auto HarpySwoopAttackJoints   = std::vector<unsigned int>{ 2, 4, 15 };
 	const auto HarpyStingerAttackJoints = std::vector<unsigned int>{ 2, 4 };
 

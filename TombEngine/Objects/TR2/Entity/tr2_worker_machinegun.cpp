@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerMachineGunBite = CreatureBiteInfo(Vector3i(0, 380, 37), 9);
+	const auto WorkerMachineGunBite = CreatureBiteInfo(Vector3(0, 380, 37), 9);
 
 	// TODO
 	enum WorkerMachineGunState

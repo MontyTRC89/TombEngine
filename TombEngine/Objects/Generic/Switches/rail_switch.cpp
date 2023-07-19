@@ -19,7 +19,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0,
-			-SECTOR(0.75f), -SECTOR(0.5f)
+			-BLOCK(0.75f), -BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -33,7 +33,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0,
-			SECTOR(0.5f), SECTOR(0.75f)
+			BLOCK(0.5f), BLOCK(0.75f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),

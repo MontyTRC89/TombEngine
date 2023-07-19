@@ -44,10 +44,10 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 	constexpr auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
-	const auto SethBite1   = CreatureBiteInfo(Vector3i(0, 220, 50), 17);
-	const auto SethBite2   = CreatureBiteInfo(Vector3i(0, 220, 50), 13);
-	const auto SethAttack1 = CreatureBiteInfo(Vector3i(-16, 200, 32), 13);
-	const auto SethAttack2 = CreatureBiteInfo(Vector3i(16, 200, 32), 17);
+	const auto SethBite1   = CreatureBiteInfo(Vector3(0, 220, 50), 17);
+	const auto SethBite2   = CreatureBiteInfo(Vector3(0, 220, 50), 13);
+	const auto SethAttack1 = CreatureBiteInfo(Vector3(-16, 200, 32), 13);
+	const auto SethAttack2 = CreatureBiteInfo(Vector3(16, 200, 32), 17);
 
 	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
@@ -667,7 +667,7 @@ namespace TEN::Entities::TR4
 		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
 
 		if (item->RoomNumber != laraItem->RoomNumber)
-			ItemNewRoom(lara.ItemNumber, item->RoomNumber);
+			ItemNewRoom(laraItem->Index, item->RoomNumber);
 
 		AnimateItem(laraItem);
 		laraItem->HitPoints = -1;

@@ -22,7 +22,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto VON_CROY_FLAG_JUMP = 6;
 
-	const auto VonCroyBite = CreatureBiteInfo(Vector3i(0, 35, 130), 18);
+	const auto VonCroyBite = CreatureBiteInfo(Vector3(0, 35, 130), 18);
 	const auto VonCroyKnifeSwapJoints = std::vector<unsigned int>{ 7, 18 };
 
 	bool VonCroyPassedWaypoints[128];
@@ -106,8 +106,8 @@ namespace TEN::Entities::TR4
 		VON_CROY_ANIM_LARA_INTERACT_COME_CLOSE = 32,
 		VON_CROY_ANIM_LARA_INTERACT_STOP = 33,
 		VON_CROY_ANIM_LARA_INTERACT_STOP_TO_COME = 34,
-		VON_CROY_ANIM_CLIMB_DOWN_1_SECTOR = 35,
-		VON_CROY_ANIM_CLIMB_DOWN_2_SECTORS = 36,
+		VON_CROY_ANIM_CLIMB_DOWN_1_BLOCK = 35,
+		VON_CROY_ANIM_CLIMB_DOWN_2_BLOCKS = 36,
 		VON_CROY_ANIM_JUMP_TO_HANG = 37,
 		VON_CROY_ANIM_SHIMMY_TO_THE_RIGHT = 38,
 		VON_CROY_ANIM_CLIMB = 39,
@@ -246,7 +246,7 @@ namespace TEN::Entities::TR4
 					dx = currentItem->Pose.Position.x - item->Pose.Position.x;
 					dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
-					if (abs(dx) < SECTOR(5) && abs(dz) < SECTOR(5))
+					if (abs(dx) < BLOCK(5) && abs(dz) < BLOCK(5))
 					{
 						distance = pow(dx, 2) + pow(dz, 2);
 						if (distance < minDistance)
@@ -268,7 +268,7 @@ namespace TEN::Entities::TR4
 		AI_INFO AI;
 
 		// HACK: Even the most advanced zone in TR must have a step height of 1024, so we need to recreate zones when step difference is higher.
-		if (item->Animation.AnimNumber == VON_CROY_ANIM_CLIMB_DOWN_2_SECTORS ||
+		if (item->Animation.AnimNumber == VON_CROY_ANIM_CLIMB_DOWN_2_BLOCKS ||
 			item->Animation.AnimNumber == VON_CROY_ANIM_CLIMB_UP_AFTER_JUMP)
 		{
 			short oldRoom = item->RoomNumber;
@@ -308,7 +308,7 @@ namespace TEN::Entities::TR4
 			laraAI.enemyFacing = laraAI.angle - LaraItem->Pose.Position.x + -ANGLE(180.0f);
 
 			int distance = 0;
-			if (dz > SECTOR(31.25f) || dz < -SECTOR(31.25f) || dx > SECTOR(31.25f) || dx < -SECTOR(31.25f))
+			if (dz > BLOCK(31.25f) || dz < -BLOCK(31.25f) || dx > BLOCK(31.25f) || dx < -BLOCK(31.25f))
 				laraAI.distance = INT_MAX;
 			else
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
@@ -496,20 +496,20 @@ namespace TEN::Entities::TR4
 			{
 				if (Lara.Location >= item->ItemFlags[3])
 				{
-					if (!foundTarget || AI.distance >= pow(SECTOR(1.5f), 2) &&
-						(item->TestMeshSwapFlags(18) || AI.distance >= pow(SECTOR(3), 2)))
+					if (!foundTarget || AI.distance >= pow(BLOCK(1.5f), 2) &&
+						(item->TestMeshSwapFlags(18) || AI.distance >= pow(BLOCK(3), 2)))
 					{
 						if (creature->Enemy->IsLara())
 						{
-							if (AI.distance >= pow(SECTOR(2), 2))
+							if (AI.distance >= pow(BLOCK(2), 2))
 							{
-								if (AI.distance > pow(SECTOR(4), 2))
+								if (AI.distance > pow(BLOCK(4), 2))
 									item->Animation.TargetState = VON_CROY_STATE_RUN;
 							}
 							else
 								item->Animation.TargetState = VON_CROY_STATE_IDLE;
 						}
-						else if (Lara.Location > item->ItemFlags[3] && laraAI.distance > pow(SECTOR(2), 2))
+						else if (Lara.Location > item->ItemFlags[3] && laraAI.distance > pow(BLOCK(2), 2))
 							item->Animation.TargetState = VON_CROY_STATE_RUN;
 					}
 					else
@@ -521,7 +521,7 @@ namespace TEN::Entities::TR4
 
 			if (AI.bite)
 			{
-				if (AI.distance < pow(SECTOR(1), 2))
+				if (AI.distance < pow(BLOCK(1), 2))
 				{
 					item->Animation.TargetState = VON_CROY_STATE_IDLE;
 					break;
@@ -530,7 +530,7 @@ namespace TEN::Entities::TR4
 
 			if (creature->Mood == MoodType::Attack &&
 				!(creature->JumpAhead) &&
-				AI.distance > pow(SECTOR(1), 2))
+				AI.distance > pow(BLOCK(1), 2))
 			{
 				item->Animation.TargetState = VON_CROY_STATE_RUN;
 			}
@@ -551,7 +551,7 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = ANGLE(11.0f);
 			tilt = abs(angle) / 2;
 
-			if (AI.distance < pow(SECTOR(2), 2) || Lara.Location < creature->LocationAI)
+			if (AI.distance < pow(BLOCK(2), 2) || Lara.Location < creature->LocationAI)
 			{
 				item->Animation.TargetState = VON_CROY_STATE_IDLE;
 				break;
@@ -577,13 +577,13 @@ namespace TEN::Entities::TR4
 				item->AIBits & FOLLOW ||
 				creature->MonkeySwingAhead ||
 				creature->JumpAhead ||
-				AI.distance < pow(SECTOR(1), 2))
+				AI.distance < pow(BLOCK(1), 2))
 			{
 				item->Animation.TargetState = VON_CROY_STATE_IDLE;
 				break;
 			}
 
-			if (AI.distance < pow(SECTOR(1), 2))
+			if (AI.distance < pow(BLOCK(1), 2))
 			{
 				item->Animation.TargetState = VON_CROY_STATE_WALK;
 				break;
@@ -613,7 +613,7 @@ namespace TEN::Entities::TR4
 			if (item->BoxNumber == creature->LOT.TargetBox || !creature->MonkeySwingAhead)
 			{
 				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
-				if (probe.Position.Ceiling == (probe.Position.Floor - SECTOR(1.5f)))
+				if (probe.Position.Ceiling == (probe.Position.Floor - BLOCK(1.5f)))
 					item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
 			}
 
@@ -894,14 +894,14 @@ namespace TEN::Entities::TR4
 				break;
 
 			case -7:
-				item->Animation.AnimNumber = VON_CROY_ANIM_CLIMB_DOWN_2_SECTORS;
+				item->Animation.AnimNumber = VON_CROY_ANIM_CLIMB_DOWN_2_BLOCKS;
 				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = VON_CROY_STATE_STEP_DOWN_HIGH;
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
-				item->Animation.AnimNumber = VON_CROY_ANIM_CLIMB_DOWN_1_SECTOR;
+				item->Animation.AnimNumber = VON_CROY_ANIM_CLIMB_DOWN_1_BLOCK;
 				item->Animation.FrameNumber = 0;
 				item->Animation.ActiveState = VON_CROY_STATE_JUMP_DOWN_4_CLICKS;
 				creature->MaxTurn = 0;

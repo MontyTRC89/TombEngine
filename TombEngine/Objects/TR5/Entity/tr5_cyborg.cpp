@@ -36,7 +36,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	constexpr auto CYBORG_DISTURBANCE_VELOCITY = 20.0f;
 
-	const auto CyborgGunBite = CreatureBiteInfo(Vector3i(-32, 240, 50), 18);
+	const auto CyborgGunBite = CreatureBiteInfo(Vector3(-32, 240, 50), 18);
 	const auto CyborgJoints = std::vector<unsigned int>{ 15, 14, 13, 6, 5, 12, 7, 4, 10, 11, 19 };
 
 	enum CyborgState

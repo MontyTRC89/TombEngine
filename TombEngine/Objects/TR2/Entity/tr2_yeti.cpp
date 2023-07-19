@@ -16,8 +16,8 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3i(12, 101, 19), 13);
-	const auto YetiBiteRight = CreatureBiteInfo(Vector3i(12, 101, 19), 10);
+	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3(12, 101, 19), 13);
+	const auto YetiBiteRight = CreatureBiteInfo(Vector3(12, 101, 19), 10);
 	const auto YetiAttackJoints1 = std::vector<unsigned int>{ 10, 12 }; // TODO: Rename.
 	const auto YetiAttackJoints2 = std::vector<unsigned int>{ 8, 9, 10 };
 
@@ -97,7 +97,7 @@ namespace TEN::Entities::Creatures::TR2
 					else if (Random::TestProbability(0.025f))
 						item->Animation.TargetState = 3;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2) && Random::TestProbability(1 / 2.0f))
+				else if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2) && Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = 4;
 				else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 					item->Animation.TargetState = 5;
@@ -184,7 +184,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 						item->Animation.TargetState = 2;
-					else if (AI.distance < pow(SECTOR(2), 2))
+					else if (AI.distance < pow(BLOCK(2), 2))
 						item->Animation.TargetState = 1;
 				}
 
@@ -204,7 +204,7 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = 3;
 				else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
 					item->Animation.TargetState = 2;
-				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(2), 2))
 					item->Animation.TargetState = 6;
 				else if (info->Mood == MoodType::Stalk)
 					item->Animation.TargetState = 3;

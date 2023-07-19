@@ -43,11 +43,11 @@ void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int spe
 		}
 	}
 
-	if (abs(Camera.pos.x - x) <= SECTOR(7))
+	if (abs(Camera.pos.x - x) <= BLOCK(7))
 	{
-		if (abs(Camera.pos.y - y) <= SECTOR(7))
+		if (abs(Camera.pos.y - y) <= BLOCK(7))
 		{
-			if (abs(Camera.pos.z - z) <= SECTOR(7))
+			if (abs(Camera.pos.z - z) <= BLOCK(7))
 			{
 				auto* spark = GetFreeParticle();
 
@@ -130,7 +130,7 @@ void InitializeVentilator(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->ItemFlags[0] = item->TriggerFlags * SECTOR(1);
+	item->ItemFlags[0] = item->TriggerFlags * BLOCK(1);
 	if (item->ItemFlags[0] < 2048)
 		item->ItemFlags[0] = 3072;
 }

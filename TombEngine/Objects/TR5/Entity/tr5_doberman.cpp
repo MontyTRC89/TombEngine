@@ -16,7 +16,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto DobermanBite = CreatureBiteInfo(Vector3i(0, 30, 141), 20);
+	const auto DobermanBite = CreatureBiteInfo(Vector3(0, 30, 141), 20);
 
 	enum DobermanState
 	{

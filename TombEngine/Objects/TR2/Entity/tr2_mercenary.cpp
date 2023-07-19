@@ -13,8 +13,8 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto MercenaryUziBite		   = CreatureBiteInfo(Vector3i(0, 200, 19), 17);
-	const auto MercenaryAutoPistolBite = CreatureBiteInfo(Vector3i(0, 230, 9), 17);
+	const auto MercenaryUziBite		   = CreatureBiteInfo(Vector3(0, 200, 19), 17);
+	const auto MercenaryAutoPistolBite = CreatureBiteInfo(Vector3(0, 230, 9), 17);
 
 	// TODO
 	enum MercenaryState

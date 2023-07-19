@@ -63,9 +63,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
 
-	const auto SophiaLeighStaffBite = CreatureBiteInfo(Vector3i(-28, 56, 356), 10);
-	const auto SophiaLeighLeftBite	= CreatureBiteInfo(Vector3i(-72, 48, 356), 10);
-	const auto SophiaLeighRightBite = CreatureBiteInfo(Vector3i(16, 48, 304), 10);
+	const auto SophiaLeighStaffBite = CreatureBiteInfo(Vector3(-28, 56, 356), 10);
+	const auto SophiaLeighLeftBite	= CreatureBiteInfo(Vector3(-72, 48, 356), 10);
+	const auto SophiaLeighRightBite = CreatureBiteInfo(Vector3(16, 48, 304), 10);
 
 	struct SophiaData
 	{

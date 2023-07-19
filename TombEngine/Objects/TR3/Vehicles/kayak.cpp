@@ -58,15 +58,6 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_MAX_KICK = -80;
 	constexpr auto KAYAK_MIN_BOUNCE = (KAYAK_VELOCITY_MAX / 2) / VEHICLE_VELOCITY_SCALE;
 
-	// TODO: Kayak control is fairly unique. Keep this? @Sezz 2022.06.25
-	constexpr auto KAYAK_IN_FORWARD	   = IN_FORWARD;
-	constexpr auto KAYAK_IN_BACK	   = IN_BACK;
-	constexpr auto KAYAK_IN_LEFT	   = IN_LEFT;
-	constexpr auto KAYAK_IN_RIGHT	   = IN_RIGHT;
-	constexpr auto KAYAK_IN_HOLD	   = IN_WALK;
-	constexpr auto KAYAK_IN_HOLD_LEFT  = IN_LSTEP;
-	constexpr auto KAYAK_IN_HOLD_RIGHT = IN_RSTEP;
-
 	const std::vector<unsigned int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
 	const std::vector<VehicleMountType> KayakMountTypes =
 	{
@@ -189,7 +180,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (laraItem->RoomNumber != kayakItem->RoomNumber)
-			ItemNewRoom(lara->ItemNumber, kayakItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, kayakItem->RoomNumber);
 
 		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = kayakItem->Pose.Position;
@@ -355,11 +346,11 @@ namespace TEN::Entities::Vehicles
 
 	int KayakDoShift(ItemInfo* kayakItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
 
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
+		int xOld = old->x / BLOCK(1);
+		int zOld = old->z / BLOCK(1);
 
 		int xShift = pos->x & WALL_MASK;
 		int zShift = pos->z & WALL_MASK;
@@ -380,7 +371,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				kayakItem->Pose.Position.z += SECTOR(1) - zShift;
+				kayakItem->Pose.Position.z += BLOCK(1) - zShift;
 				return (kayakItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -396,7 +387,7 @@ namespace TEN::Entities::Vehicles
 
 			else
 			{
-				kayakItem->Pose.Position.x += SECTOR(1) - xShift;
+				kayakItem->Pose.Position.x += BLOCK(1) - xShift;
 				return (pos->z - kayakItem->Pose.Position.z);
 			}
 		}
@@ -411,7 +402,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -zShift - 1;
 				else
-					z = SECTOR(1) - zShift;
+					z = BLOCK(1) - zShift;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, kayakItem->RoomNumber);
@@ -420,7 +411,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -xShift - 1;
 				else
-					x = SECTOR(1) - xShift;
+					x = BLOCK(1) - xShift;
 			}
 
 			if (x && z)
@@ -614,30 +605,30 @@ namespace TEN::Entities::Vehicles
 		switch (laraItem->Animation.ActiveState)
 		{
 		case KAYAK_STATE_IDLE:
-			if (TrInput & VEHICLE_IN_DISMOUNT &&
+			if (IsHeld(In::Brake) &&
 				!lara->Context.WaterCurrentActive &&
 				!lara->Context.WaterCurrentPull.x && !lara->Context.WaterCurrentPull.z)
 			{
-				if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD) && KayakCanGetOut(kayakItem, -1))
+				if (IsHeld(In::Left) && !IsHeld(In::Walk) && KayakCanGetOut(kayakItem, -1))
 				{
 					laraItem->Animation.TargetState = KAYAK_STATE_DISMOUNT;
 					laraItem->Animation.RequiredState = KAYAK_STATE_DISMOUNT_LEFT;
 				}
-				else if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD) && KayakCanGetOut(kayakItem, 1))
+				else if (IsHeld(In::Right) && !IsHeld(In::Walk) && KayakCanGetOut(kayakItem, 1))
 				{
 					laraItem->Animation.TargetState = KAYAK_STATE_DISMOUNT;
 					laraItem->Animation.RequiredState = KAYAK_STATE_DISMOUNT_RIGHT;
 				}
 			}
-			else if (TrInput & KAYAK_IN_FORWARD)
+			else if (IsHeld(In::Forward))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 				kayak->Turn = false;
 				kayak->Forward = true;
 			}
-			else if (TrInput & KAYAK_IN_BACK)
+			else if (IsHeld(In::Back))
 				laraItem->Animation.TargetState = KAYAK_STATE_BACK;
-			else if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD))
+			else if (IsHeld(In::Left) && !IsHeld(In::Walk))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_TURN_LEFT;
 
@@ -649,7 +640,7 @@ namespace TEN::Entities::Vehicles
 				kayak->Forward = false;
 			}
 
-			else if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD))
+			else if (IsHeld(In::Right) && !IsHeld(In::Walk))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 
@@ -660,13 +651,13 @@ namespace TEN::Entities::Vehicles
 
 				kayak->Forward = false;
 			}
-			else if ((TrInput & KAYAK_IN_HOLD_LEFT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_LEFT)) &&
+			else if ((IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))) &&
 				(kayak->Velocity ||
 					lara->Context.WaterCurrentPull.x || lara->Context.WaterCurrentPull.z))
 			{
 				laraItem->Animation.TargetState = KAYAK_STATE_HOLD_LEFT;
 			}
-			else if ((TrInput & KAYAK_IN_HOLD_RIGHT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_RIGHT)) &&
+			else if ((IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))) &&
 				(kayak->Velocity ||
 					lara->Context.WaterCurrentPull.x || lara->Context.WaterCurrentPull.z))
 			{
@@ -688,9 +679,9 @@ namespace TEN::Entities::Vehicles
 				else if (frame > 2)
 					kayak->LeftRightPaddleCount &= ~0x80;
 
-				if (TrInput & KAYAK_IN_FORWARD)
+				if (IsHeld(In::Forward))
 				{
-					if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD))
+					if (IsHeld(In::Left) && !IsHeld(In::Walk))
 					{
 						if ((kayak->LeftRightPaddleCount & ~0x80) >= 2)
 							laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
@@ -701,7 +692,7 @@ namespace TEN::Entities::Vehicles
 				else
 					laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 			}
-			else if (!(TrInput & KAYAK_IN_LEFT))
+			else if (!IsHeld(In::Left))
 				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 
 			if (frame == 7)
@@ -747,9 +738,9 @@ namespace TEN::Entities::Vehicles
 				else if (frame > 2)
 					kayak->LeftRightPaddleCount &= ~0x80;
 
-				if (TrInput & KAYAK_IN_FORWARD)
+				if (IsHeld(In::Forward))
 				{
-					if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD))
+					if (IsHeld(In::Right) && !IsHeld(In::Walk))
 					{
 						if ((kayak->LeftRightPaddleCount & ~0x80) >= 2)
 							laraItem->Animation.TargetState = KAYAK_STATE_TURN_LEFT;
@@ -761,7 +752,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 			}
 
-			else if (!(TrInput & KAYAK_IN_RIGHT))
+			else if (!IsHeld(In::Right))
 				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 
 			if (frame == 7)
@@ -796,7 +787,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_BACK:
-			if (!(TrInput & KAYAK_IN_BACK))
+			if (!IsHeld(In::Back))
 				laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
 
 			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_PADDLE_BACK)
@@ -823,7 +814,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_HOLD_LEFT:
-			if (!(TrInput & KAYAK_IN_HOLD_LEFT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_LEFT)) ||
+			if (!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
 				(!kayak->Velocity &&
 					!lara->Context.WaterCurrentPull.x &&
 					!lara->Context.WaterCurrentPull.z))
@@ -859,7 +850,7 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_HOLD_RIGHT:
-			if (!(TrInput & KAYAK_IN_HOLD_RIGHT || (TrInput & KAYAK_IN_HOLD && TrInput & KAYAK_IN_RIGHT)) ||
+			if (!(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))) ||
 				(!kayak->Velocity &&
 					!lara->Context.WaterCurrentPull.x &&
 					!lara->Context.WaterCurrentPull.z))
@@ -1110,7 +1101,7 @@ namespace TEN::Entities::Vehicles
 			if (kayakItem->RoomNumber != probe.RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose.Position = kayakItem->Pose.Position;

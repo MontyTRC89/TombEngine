@@ -39,9 +39,9 @@ namespace TEN::Entities::TR4
 			grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y - ANGLE(180.0f);
 			grenadeItem->Pose.Orientation.z = 0;
 
-			grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1) * phd_sin(grenadeItem->Pose.Orientation.y);
+			grenadeItem->Pose.Position.x = item->Pose.Position.x + BLOCK(1) * phd_sin(grenadeItem->Pose.Orientation.y);
 			grenadeItem->Pose.Position.y = item->Pose.Position.y - CLICK(3);
-			grenadeItem->Pose.Position.z = item->Pose.Position.x + SECTOR(1) * phd_cos(grenadeItem->Pose.Orientation.y);
+			grenadeItem->Pose.Position.z = item->Pose.Position.x + BLOCK(1) * phd_cos(grenadeItem->Pose.Orientation.y);
 
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
@@ -79,7 +79,7 @@ namespace TEN::Entities::TR4
 
 				item->ItemFlags[1] = i;
 				other->ItemFlags[0] = -80;
-				other->Pose.Position.y = item->Pose.Position.y - SECTOR(1);
+				other->Pose.Position.y = item->Pose.Position.y - BLOCK(1);
 			}
 		}
 	}
@@ -140,8 +140,8 @@ namespace TEN::Entities::TR4
 			short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 
 			int distance;
-			if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) ||
-				dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
+			if (dx > BLOCK(31.25f) || dx < -BLOCK(31.25f) ||
+				dz > BLOCK(31.25f) || dz < -BLOCK(31.25f))
 			{
 				distance = INT_MAX;
 			}
@@ -164,7 +164,7 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.distance > pow(SECTOR(1), 2) || Lara.Location >= item->ItemFlags[3])
+				else if (AI.distance > pow(BLOCK(1), 2) || Lara.Location >= item->ItemFlags[3])
 					item->Animation.TargetState = 1;
 
 				break;
@@ -243,7 +243,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			if (AI.distance < pow(SECTOR(1.5f), 2) || item->ItemFlags[3] == -2)
+			if (AI.distance < pow(BLOCK(1.5f), 2) || item->ItemFlags[3] == -2)
 				creature->ReachedGoal = true;
 
 			if (creature->ReachedGoal)
@@ -266,8 +266,8 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (distance > pow(SECTOR(2), 2) &&
-					distance < pow(SECTOR(10), 2) &&
+				if (distance > pow(BLOCK(2), 2) &&
+					distance < pow(BLOCK(10), 2) &&
 					!item->ItemFlags[2] &&
 					(angle < -ANGLE(112.5f) || angle > ANGLE(112.5f)))
 				{
@@ -372,7 +372,7 @@ namespace TEN::Entities::TR4
 				item->Animation.Velocity.y = 0;
 			}
 
-			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / SECTOR(8)); // TODO: Check actual sound!
+			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / BLOCK(8)); // TODO: Check actual sound!
 		}
 	}
 }

@@ -29,7 +29,7 @@ namespace TEN::Effects::Hair
 
 		// Get world matrix from head bone.
 		auto worldMatrix = Matrix::Identity;
-		g_Renderer.GetBoneMatrix(player.ItemNumber, LM_HEAD, &worldMatrix);
+		g_Renderer.GetBoneMatrix(item.Index, LM_HEAD, &worldMatrix);
 
 		// Apply base offset to world matrix.
 		auto relOffset = GetRelBaseOffset(hairUnitIndex, isYoung);

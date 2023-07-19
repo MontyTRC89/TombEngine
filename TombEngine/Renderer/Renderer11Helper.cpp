@@ -1,6 +1,10 @@
 #include "framework.h"
 
 #include <algorithm>
+#include <ctime>
+#include <filesystem>
+#include <ScreenGrab.h>
+#include <wincodec.h>
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
@@ -416,18 +420,25 @@ namespace TEN::Renderer
 
 		if (!itemToDraw->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
+			{
 				UpdateLaraAnimations(false);
+			}
 			else
+			{
 				UpdateItemAnimations(itemNumber, false);
+			}
 		}
 
-		Matrix world;
-
+		auto world = Matrix::Identity;
 		if (worldSpace & SPHERES_SPACE_WORLD)
+		{
 			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+		}
 		else
+		{
 			world = Matrix::Identity * local;
+		}
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
@@ -455,7 +466,7 @@ namespace TEN::Renderer
 
 	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
 	{
-		if (itemNumber == Lara.ItemNumber)
+		if (itemNumber == LaraItem->Index)
 		{
 			auto& object = *m_moveableObjects[ID_LARA];
 			*outMatrix = object.AnimationTransforms[jointIndex] * m_LaraWorldMatrix;
@@ -549,7 +560,7 @@ namespace TEN::Renderer
 
 		if (!rendererItem->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
 				UpdateLaraAnimations(false);
 			else
 				UpdateItemAnimations(itemNumber, false);
@@ -560,5 +571,24 @@ namespace TEN::Renderer
 
 		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
+	}
+
+	void Renderer11::SaveScreenshot()
+	{
+		char buffer[64];
+		time_t rawtime;
+
+		time(&rawtime);
+		auto time = localtime(&rawtime);
+		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.png", time);
+
+		auto screenPath = g_GameFlow->GetGameDir() + "Screenshots";
+
+		if (!std::filesystem::is_directory(screenPath))
+			std::filesystem::create_directory(screenPath);
+
+		screenPath += buffer;
+		SaveWICTextureToFile(m_context.Get(), m_backBufferTexture, GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
+			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
 }

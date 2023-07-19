@@ -15,7 +15,7 @@ using namespace TEN::Math;
 namespace TEN::Entities::Traps::TR1
 {
 	// NOTES:
-	// ItemFlags[0] = random turn rate.
+	// ItemFlags[0] = random turn rate when active.
 	// ItemFlags[1] = calculated forward velocity.
 
 	constexpr auto DAMOCLES_SWORD_DAMAGE = 100;
@@ -28,14 +28,17 @@ namespace TEN::Entities::Traps::TR1
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL = BLOCK(3);
 
 	constexpr auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto DAMOCLES_SWORD_TURN_RATE_MIN = ANGLE(1.0f);
 
 	void InitializeDamoclesSword(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
+		int sign = Random::TestProbability(0.5f) ? 1 : -1;
+
 		item.Pose.Orientation.y = Random::GenerateAngle();
 		item.Animation.Velocity.y = DAMOCLES_SWORD_VELOCITY_MIN;
-		item.ItemFlags[0] = Random::GenerateAngle(-DAMOCLES_SWORD_TURN_RATE_MAX, DAMOCLES_SWORD_TURN_RATE_MAX);
+		item.ItemFlags[0] = Random::GenerateAngle(DAMOCLES_SWORD_TURN_RATE_MIN, DAMOCLES_SWORD_TURN_RATE_MAX) * sign;
 	}
 
 	void ControlDamoclesSword(short itemNumber)

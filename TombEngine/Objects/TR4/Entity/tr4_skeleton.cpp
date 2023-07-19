@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
-	const auto SkeletonBite = CreatureBiteInfo(Vector3i(0, -16, 200), 11);
+	const auto SkeletonBite = CreatureBiteInfo(Vector3(0, -16, 200), 11);
 	const auto SkeletonSwordAttackJoints = std::vector<unsigned int>{ 15, 16 };
 
 	enum SkeletonState

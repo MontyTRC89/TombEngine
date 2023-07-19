@@ -31,17 +31,17 @@ public:
 
 	Moveable(short num, bool alreadyInitialized = true);
 	~Moveable();
-	Moveable& operator=(Moveable const& other) = delete;
-	Moveable(Moveable const& other) = delete;
-	Moveable(Moveable && other) noexcept;
+	Moveable& operator =(const Moveable& other) = delete;
+	Moveable(const Moveable& other) = delete;
+	Moveable(Moveable&& other) noexcept;
 
-	static void Register(sol::table & parent);
+	static void Register(sol::table& parent);
 
 	[[nodiscard]] GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID id);
 
 	[[nodiscard]] std::string GetName() const;
-	bool SetName(std::string const &);
+	bool SetName(const std::string&);
 
 	[[nodiscard]] bool GetValid() const;
 	void Invalidate();
@@ -50,10 +50,10 @@ public:
 
 	[[nodiscard]] Vec3 GetPos() const;
 	[[nodiscard]] Vec3 GetJointPos(int index) const;
-	void SetPos(Vec3 const& pos, sol::optional<bool> updateRoom);
+	void SetPos(const Vec3& pos, sol::optional<bool> updateRoom);
 
 	[[nodiscard]] Rotation GetRot() const;
-	void SetRot(Rotation const& rot);
+	void SetRot(const Rotation& rot);
 
 	[[nodiscard]] int GetStateNumber() const;
 	void SetStateNumber(int stateNumber);
@@ -118,17 +118,17 @@ public:
 	void Explode();
 	void Shatter();
 
-	void SetOnHit(TypeOrNil<LevelFunc> const& cb);
-	void SetOnKilled(TypeOrNil<LevelFunc> const& cb);
-	void SetOnCollidedWithObject(TypeOrNil<LevelFunc> const& cb);
-	void SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const& cb);
+	void SetOnHit(const TypeOrNil<LevelFunc>& cb);
+	void SetOnKilled(const TypeOrNil<LevelFunc>& cb);
+	void SetOnCollidedWithObject(const TypeOrNil<LevelFunc>& cb);
+	void SetOnCollidedWithRoom(const TypeOrNil<LevelFunc>& cb);
 
 	[[nodiscard]] short GetStatus() const;
 
 	void Init();
 
-	friend bool operator==(Moveable const&, Moveable const&);
-	friend void SetLevelFuncCallback(TypeOrNil<LevelFunc> const& cb, std::string const & callerName, Moveable& mov, std::string& toModify);
+	friend bool operator ==(const Moveable&, const Moveable&);
+	friend void SetLevelFuncCallback(const TypeOrNil<LevelFunc>& cb, const std::string& callerName, Moveable& mov, std::string& toModify);
 
 	short GetIndex() const;
 

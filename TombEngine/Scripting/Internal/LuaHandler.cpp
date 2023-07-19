@@ -8,7 +8,7 @@ LuaHandler::LuaHandler(sol::state* lua) : m_lua{ lua }
 
 void LuaHandler::ResetGlobals()
 {
-	sol::table mt = sol::table{ *m_lua, sol::create };
+	auto mt = sol::table{ *m_lua, sol::create };
 	m_globals = sol::table{ *m_lua, sol::create };
 	mt.set(sol::meta_function::new_index, m_globals);
 	mt.set(sol::meta_function::index, m_globals);
@@ -16,7 +16,8 @@ void LuaHandler::ResetGlobals()
 	m_lua->set(sol::metatable_key, mt);
 }
 
-void LuaHandler::ExecuteScript(std::string const& luaFilename) {
+void LuaHandler::ExecuteScript(const std::string& luaFilename)
+{
 	auto result = m_lua->safe_script_file(luaFilename, sol::script_pass_on_error);
 	if (!result.valid())
 	{
@@ -25,7 +26,8 @@ void LuaHandler::ExecuteScript(std::string const& luaFilename) {
 	}
 }
 
-void LuaHandler::ExecuteString(std::string const& command) {
+void LuaHandler::ExecuteString(const std::string& command)
+{
 	auto result = m_lua->safe_script(command, sol::environment(m_lua->lua_state(), sol::create, m_lua->globals()), sol::script_pass_on_error);
 	if (!result.valid())
 	{

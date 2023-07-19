@@ -32,11 +32,11 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto GUARD_NO_WEAPON_ON_HAND_SWAPFLAG = 0x2000;
 	constexpr auto GUARD_HEAD_MESH = 14;
 
-	const auto SwatGunBite				= CreatureBiteInfo(Vector3i(16, 240, 90), 13);
-	const auto MafiaGunBite				= CreatureBiteInfo(Vector3i(16, 270, 90), 13);
-	const auto SniperGunBite			= CreatureBiteInfo(Vector3i(0, 480, 110), 13);
-	const auto ArmedMafia2GunLeftBite	= CreatureBiteInfo(Vector3i(-16, 200, 60), 10);
-	const auto ArmedMafia2GunRightBite	= CreatureBiteInfo(Vector3i(16, 200, 60), 13);
+	const auto SwatGunBite				= CreatureBiteInfo(Vector3(16, 240, 90), 13);
+	const auto MafiaGunBite				= CreatureBiteInfo(Vector3(16, 270, 90), 13);
+	const auto SniperGunBite			= CreatureBiteInfo(Vector3(0, 480, 110), 13);
+	const auto ArmedMafia2GunLeftBite	= CreatureBiteInfo(Vector3(-16, 200, 60), 10);
+	const auto ArmedMafia2GunRightBite	= CreatureBiteInfo(Vector3(16, 200, 60), 13);
 
 	// TODO: Revise names of enum elements.
 
@@ -292,9 +292,9 @@ namespace TEN::Entities::Creatures::TR5
 
 		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
-		item->Pose.Position.x += SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
+		item->Pose.Position.x += BLOCK(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
 		item->Pose.Position.y += CLICK(2);
-		item->Pose.Position.z += SECTOR(1) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
+		item->Pose.Position.z += BLOCK(1) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 	}
 
 	void InitializeGuardLaser(short itemNumber)
@@ -420,7 +420,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (!(item->AIBits & FOLLOW) &&
 					item->ObjectNumber != ID_SCIENTIST &&
-					abs(item->Pose.Position.y - LaraItem->Pose.Position.y) < SECTOR(1.25f))
+					abs(item->Pose.Position.y - LaraItem->Pose.Position.y) < BLOCK(1.25f))
 				{
 					creature->Enemy = LaraItem; // TODO: deal with LaraItem global !
 					AlertAllGuards(itemNumber);
@@ -661,7 +661,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						creature->LOT.IsJumping = true;
 					}
-					else if (AI.distance >= SQUARE(SECTOR(1)))
+					else if (AI.distance >= SQUARE(BLOCK(1)))
 					{
 						if (!los || item->AIBits)
 						{
@@ -719,7 +719,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = 0;
 				headY = laraAI.angle;
 
-				if (item->Pose.Position.y <= (item->Floor - SECTOR(2)) || item->TriggerFlags != (int)GuardOcb::RopeDownFast)
+				if (item->Pose.Position.y <= (item->Floor - BLOCK(2)) || item->TriggerFlags != (int)GuardOcb::RopeDownFast)
 				{
 					if (item->Pose.Position.y >= (item->Floor - CLICK(2)))
 						item->Animation.TargetState = GUARD_STATE_AIM;
@@ -1225,7 +1225,7 @@ namespace TEN::Entities::Creatures::TR5
 			creature->Enemy = LaraItem;
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
+			if ((laraAI.distance < pow(BLOCK(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
 				item->HitStatus ||
 				TargetVisible(item, &laraAI))
 			{
@@ -1268,7 +1268,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				if (Targetable(item, &ai))
 				{
-					if (ai.distance < pow(SECTOR(1), 2) || ai.zoneNumber != ai.enemyZone)
+					if (ai.distance < pow(BLOCK(1), 2) || ai.zoneNumber != ai.enemyZone)
 						item->Animation.TargetState = MAFIA2_STATE_AIM;
 					else if (!(item->AIBits & MODIFY))
 						item->Animation.TargetState = MAFIA2_STATE_WALK;
@@ -1297,7 +1297,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (creature->Mood != MoodType::Bored)
 						{
-							if (ai.distance >= pow(SECTOR(3), 2))
+							if (ai.distance >= pow(BLOCK(3), 2))
 								item->Animation.TargetState = MAFIA2_STATE_WALK;
 						}
 						else
@@ -1400,7 +1400,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->LOT.IsJumping = false;
 
 				if (Targetable(item, &ai) &&
-					(ai.distance < pow(SECTOR(1), 2) || ai.zoneNumber != ai.enemyZone))
+					(ai.distance < pow(BLOCK(1), 2) || ai.zoneNumber != ai.enemyZone))
 				{
 					item->Animation.TargetState = MAFIA2_STATE_AIM;
 				}
@@ -1422,9 +1422,9 @@ namespace TEN::Entities::Creatures::TR5
 						break;
 					}
 
-					if (ai.distance >= pow(SECTOR(1), 2))
+					if (ai.distance >= pow(BLOCK(1), 2))
 					{
-						if (ai.distance > pow(SECTOR(3), 2))
+						if (ai.distance > pow(BLOCK(3), 2))
 							item->Animation.TargetState = MAFIA2_STATE_RUN;
 					}
 					else
@@ -1438,7 +1438,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->LOT.IsJumping = false;
 
 				if (Targetable(item, &ai) &&
-					(ai.distance < pow(SECTOR(1), 2) || ai.zoneNumber != ai.enemyZone))
+					(ai.distance < pow(BLOCK(1), 2) || ai.zoneNumber != ai.enemyZone))
 				{
 					item->Animation.TargetState = MAFIA2_STATE_AIM;
 				}
@@ -1456,7 +1456,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					creature->LOT.IsJumping = true;
 				}
-				else if (ai.distance < pow(SECTOR(3), 2))
+				else if (ai.distance < pow(BLOCK(3), 2))
 					item->Animation.TargetState = MAFIA2_STATE_WALK;
 			
 				break;

@@ -60,7 +60,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 	{
 		SetLaraSwimDiveAnimation(item);
 		return;
@@ -125,7 +125,7 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_FORWARD))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 		SetLaraSwimDiveAnimation(item);
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
@@ -167,7 +167,7 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 		SetLaraSwimDiveAnimation(item);
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
@@ -206,7 +206,7 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 		SetLaraSwimDiveAnimation(item);
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
@@ -239,7 +239,7 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 
-	if (DbInput & IN_JUMP)
+	if (IsClicked(In::Jump))
 		SetLaraSwimDiveAnimation(item);
 
 	if (!(TrInput & IN_BACK))

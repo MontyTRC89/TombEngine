@@ -101,13 +101,13 @@ void GameSticksControl(short itemNumber)
 			if (piece == -1)
 				piece = 16;
 
-			x = SenetTargetX + SECTOR(1);
-			z = SenetTargetZ + SECTOR(piece - 5);
+			x = SenetTargetX + BLOCK(1);
+			z = SenetTargetZ + BLOCK(piece - 5);
 		}
 		else
 		{
-			x = SenetTargetX + SECTOR(2 * number - 2);
-			z = SenetTargetZ + SECTOR(4 - piece);
+			x = SenetTargetX + BLOCK(2 * number - 2);
+			z = SenetTargetZ + BLOCK(4 - piece);
 		}
 
 		if (abs(x - item2->Pose.Position.x) < 128)
@@ -176,8 +176,8 @@ void GameSticksControl(short itemNumber)
 							z == item2->Pose.Position.z)
 						{
 							SenetPieceExplosionEffect(item2, number == 1 ? 0xFF8020 : 0x6060E0, -64);
-							item2->Pose.Position.x = SenetTargetX - SECTOR(4 * number) + SECTOR(7);
-							item2->Pose.Position.z = SenetTargetZ + SECTOR(i % 3);
+							item2->Pose.Position.x = SenetTargetX - BLOCK(4 * number) + BLOCK(7);
+							item2->Pose.Position.z = SenetTargetZ + BLOCK(i % 3);
 							
 							probedRoomNumber = GetCollision(item2->Pose.Position.x, item2->Pose.Position.y - 32, item2->Pose.Position.z, item2->RoomNumber).RoomNumber;
 							if (item2->RoomNumber != probedRoomNumber)

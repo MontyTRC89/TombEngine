@@ -80,59 +80,52 @@ void SaveGame::LoadSavegameInfos()
 	}
 }
 
-Pose ToPHD(const Save::Position* src)
+Pose ToPose(const Save::Pose* pose)
 {
-	Pose dest;
-	dest.Position.x = src->x_pos();
-	dest.Position.y = src->y_pos();
-	dest.Position.z = src->z_pos();
-	dest.Orientation.x = (short)src->x_rot();
-	dest.Orientation.y = (short)src->y_rot();
-	dest.Orientation.z = (short)src->z_rot();
-	return dest;
+	return Pose(
+		pose->x_pos(), pose->y_pos(), pose->z_pos(),
+		(short)pose->x_rot(), (short)pose->y_rot(), (short)pose->z_rot());
 }
 
-Save::Position FromPHD(const Pose& src)
+Save::Pose FromPose(const Pose& pose)
 {
-	return Save::Position
-	{
-		src.Position.x,
-		src.Position.y,
-		src.Position.z,
-		src.Orientation.x,
-		src.Orientation.y,
-		src.Orientation.z
-	};
+	return Save::Pose(
+		pose.Position.x,
+		pose.Position.y,
+		pose.Position.z,
+		pose.Orientation.x,
+		pose.Orientation.y,
+		pose.Orientation.z);
 }
 
-Save::Vector2 FromVector2(Vector2i vec)
+Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
+{
+	return Save::EulerAngles(eulers.x, eulers.y, eulers.z);
+}
+
+Save::Vector2 FromVector2(const Vector2i& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
 
-Save::Vector3 FromVector3(Vector3 vec)
+Save::Vector3 FromVector3(const Vector3& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(Vector3i vec)
+Save::Vector3 FromVector3(const Vector3i& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(EulerAngles vec)
-{
-	return Save::Vector3(vec.x, vec.y, vec.z);
-}
-
-Save::Vector4 FromVector4(Vector4 vec)
+Save::Vector4 FromVector4(const Vector4& vec)
 {
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-EulerAngles ToEulerAngles(const Save::Vector3* vec)
+EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
 {
-	return EulerAngles((short)vec->x(), (short)vec->y(), (short)vec->z());
+	return EulerAngles((short)eulers->x(), (short)eulers->y(), (short)eulers->z());
 }
 
 Vector2i ToVector2i(const Save::Vector2* vec)
@@ -271,11 +264,6 @@ bool SaveGame::Save(int slot)
 		dripNodes.push_back(Lara.Effect.DripNodes[i] == 1);
 	auto dripNodesOffset = fbb.CreateVector(dripNodes);
 
-	std::vector<int> laraTargetAngles{};
-	laraTargetAngles.push_back(Lara.TargetArmOrient.y);
-	laraTargetAngles.push_back(Lara.TargetArmOrient.x);
-	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
-
 	std::vector<int> subsuitVelocity{};
 	subsuitVelocity.push_back(Lara.Control.Subsuit.Velocity[0]);
 	subsuitVelocity.push_back(Lara.Control.Subsuit.Velocity[1]);
@@ -293,7 +281,7 @@ bool SaveGame::Save(int slot)
 	leftArm.add_gun_smoke(Lara.LeftArm.GunSmoke);
 	leftArm.add_frame_number(Lara.LeftArm.FrameNumber);
 	leftArm.add_locked(Lara.LeftArm.Locked);
-	leftArm.add_rotation(&FromVector3(Lara.LeftArm.Orientation));
+	leftArm.add_rotation(&FromEulerAngles(Lara.LeftArm.Orientation));
 	auto leftArmOffset = leftArm.Finish();
 
 	Save::ArmInfoBuilder rightArm{ fbb };
@@ -302,7 +290,7 @@ bool SaveGame::Save(int slot)
 	rightArm.add_gun_smoke(Lara.RightArm.GunSmoke);
 	rightArm.add_frame_number(Lara.RightArm.FrameNumber);
 	rightArm.add_locked(Lara.RightArm.Locked);
-	rightArm.add_rotation(&FromVector3(Lara.RightArm.Orientation));
+	rightArm.add_rotation(&FromEulerAngles(Lara.RightArm.Orientation));
 	auto rightArmOffset = rightArm.Finish();
 
 	Save::FlareDataBuilder flare{ fbb };
@@ -400,10 +388,21 @@ bool SaveGame::Save(int slot)
 	subsuitControl.add_hit_count(Lara.Control.Subsuit.HitCount);
 	auto subsuitControlOffset = subsuitControl.Finish();
 
+	Save::PlayerContextDataBuilder context{ fbb };
+	context.add_calc_jump_velocity(Lara.Context.CalcJumpVelocity);
+	context.add_interacted_item_number(Lara.Context.InteractedItem);
+	context.add_next_corner_pose(&FromPose(Lara.Context.NextCornerPos));
+	context.add_projected_floor_height(Lara.Context.ProjectedFloorHeight);
+	context.add_target_orient(&FromEulerAngles(Lara.Context.TargetOrientation));
+	context.add_vehicle_item_number(Lara.Context.Vehicle);
+	context.add_water_current_active(Lara.Context.WaterCurrentActive);
+	context.add_water_current_pull(&FromVector3(Lara.Context.WaterCurrentPull));
+	context.add_water_surface_dist(Lara.Context.WaterSurfaceDist);
+	auto contextOffset = context.Finish();
+
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_turn_rate(Lara.Control.TurnRate);
-	control.add_calculated_jump_velocity(Lara.Context.CalcJumpVelocity);
 	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_hand_status((int)Lara.Control.HandStatus);
 	control.add_is_moving(Lara.Control.IsMoving);
@@ -465,33 +464,25 @@ bool SaveGame::Save(int slot)
 	auto carriedWeaponsOffset = fbb.CreateVector(carriedWeapons);
 
 	Save::LaraBuilder lara{ fbb };
+	lara.add_context(contextOffset);
 	lara.add_control(controlOffset);
-	lara.add_next_corner_pose(&FromPHD(Lara.Context.NextCornerPos));
 	lara.add_effect(effectOffset);
 	lara.add_extra_anim(Lara.ExtraAnim);
-	lara.add_extra_head_rot(&FromVector3(Lara.ExtraHeadRot));
-	lara.add_extra_torso_rot(&FromVector3(Lara.ExtraTorsoRot));
+	lara.add_extra_head_rot(&FromEulerAngles(Lara.ExtraHeadRot));
+	lara.add_extra_torso_rot(&FromEulerAngles(Lara.ExtraTorsoRot));
 	lara.add_flare(flareOffset);
 	lara.add_highest_location(Lara.HighestLocation);
 	lara.add_hit_direction(Lara.HitDirection);
 	lara.add_hit_frame(Lara.HitFrame);
-	lara.add_interacted_item(Lara.Context.InteractedItem);
 	lara.add_inventory(inventoryOffset);
-	lara.add_item_number(Lara.ItemNumber);
 	lara.add_left_arm(leftArmOffset);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
-	lara.add_projected_floor_height(Lara.Context.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_status(statusOffset);
-	lara.add_target_facing_angle(Lara.Context.TargetOrientation.y);
-	lara.add_target_arm_angles(laraTargetAnglesOffset);
+	lara.add_target_arm_orient(&FromEulerAngles(Lara.TargetArmOrient));
 	lara.add_target_entity_number(Lara.TargetEntity == nullptr ? -1 : Lara.TargetEntity->Index);
 	lara.add_torch(torchOffset);
-	lara.add_vehicle(Lara.Context.Vehicle);
-	lara.add_water_current_active(Lara.Context.WaterCurrentActive);
-	lara.add_water_current_pull(&FromVector3(Lara.Context.WaterCurrentPull));
-	lara.add_water_surface_dist(Lara.Context.WaterSurfaceDist);
 	lara.add_weapons(carriedWeaponsOffset);
 	auto laraOffset = lara.Finish();
 
@@ -514,8 +505,6 @@ bool SaveGame::Save(int slot)
 	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
-		ObjectInfo* obj = &Objects[itemToSerialize.ObjectNumber];
-
 		auto luaNameOffset = fbb.CreateString(itemToSerialize.Name);
 		auto luaOnKilledNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnKilled);
 		auto luaOnHitNameOffset = fbb.CreateString(itemToSerialize.Callbacks.OnHit);
@@ -541,7 +530,8 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
 
-		if (Objects[itemToSerialize.ObjectNumber].intelligent && itemToSerialize.IsCreature())
+		if (Objects.CheckID(itemToSerialize.ObjectNumber, true) && 
+			Objects[itemToSerialize.ObjectNumber].intelligent && itemToSerialize.IsCreature())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
 
@@ -647,7 +637,7 @@ bool SaveGame::Save(int slot)
 			kayakBuilder.add_front_vertical_velocity(kayak->FrontVerticalVelocity);
 			kayakBuilder.add_left_right_count(kayak->LeftRightPaddleCount);
 			kayakBuilder.add_left_vertical_velocity(kayak->LeftVerticalVelocity);
-			kayakBuilder.add_old_pos(&FromPHD(kayak->OldPose));
+			kayakBuilder.add_old_pos(&FromPose(kayak->OldPose));
 			kayakBuilder.add_right_vertical_velocity(kayak->RightVerticalVelocity);
 			kayakBuilder.add_true_water(kayak->TrueWater);
 			kayakBuilder.add_turn(kayak->Turn);
@@ -670,6 +660,10 @@ bool SaveGame::Save(int slot)
 		}
 
 		Save::ItemBuilder serializedItem{ fbb };
+
+		if (Objects.CheckID(itemToSerialize.ObjectNumber, true))
+			serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - Objects[itemToSerialize.ObjectNumber].animIndex);
+
 		serializedItem.add_next_item(itemToSerialize.NextItem);
 		serializedItem.add_next_item_active(itemToSerialize.NextActive);
 		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber);
@@ -688,7 +682,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_mesh_pointers(meshPointerOffset);
 		serializedItem.add_base_mesh(itemToSerialize.Model.BaseMesh);
 		serializedItem.add_object_id(itemToSerialize.ObjectNumber);
-		serializedItem.add_pose(&FromPHD(itemToSerialize.Pose));
+		serializedItem.add_pose(&FromPose(itemToSerialize.Pose));
 		serializedItem.add_required_state(itemToSerialize.Animation.RequiredState);
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
 		serializedItem.add_velocity(&FromVector3(itemToSerialize.Animation.Velocity));
@@ -709,8 +703,8 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_effect_secondary_colour(&FromVector3(itemToSerialize.Effect.SecondaryEffectColor));
 		serializedItem.add_effect_count(itemToSerialize.Effect.Count);
 
-		if (Objects[itemToSerialize.ObjectNumber].intelligent 
-			&& itemToSerialize.Data.is<CreatureInfo>())
+		if (Objects.CheckID(itemToSerialize.ObjectNumber, true) && 
+			Objects[itemToSerialize.ObjectNumber].intelligent && itemToSerialize.Data.is<CreatureInfo>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
@@ -767,7 +761,7 @@ bool SaveGame::Save(int slot)
 	{
 		Save::FXInfoBuilder serializedEffect{ fbb };
 
-		serializedEffect.add_pose(&FromPHD(effectToSerialize.pos));
+		serializedEffect.add_pose(&FromPose(effectToSerialize.pos));
 		serializedEffect.add_room_number(effectToSerialize.roomNumber);
 		serializedEffect.add_object_number(effectToSerialize.objectNumber);
 		serializedEffect.add_next_fx(effectToSerialize.nextFx);
@@ -786,7 +780,6 @@ bool SaveGame::Save(int slot)
 	auto serializedEffectsOffset = fbb.CreateVector(serializedEffects);
 
 	// Event set call counters
-
 	std::vector<flatbuffers::Offset<Save::EventSetCallCounters>> serializedEventSetCallCounters{};
 	for (auto& set : g_Level.EventSets)
 	{
@@ -802,12 +795,18 @@ bool SaveGame::Save(int slot)
 	auto serializedEventSetCallCountersOffset = fbb.CreateVector(serializedEventSetCallCounters);
 
 	// Soundtrack playheads
-	auto bgmTrackData = GetSoundTrackNameAndPosition(SoundTrackType::BGM);
-	auto oneshotTrackData = GetSoundTrackNameAndPosition(SoundTrackType::OneShot);
-	auto voiceTrackData = GetSoundTrackNameAndPosition(SoundTrackType::Voice);
-	auto bgmTrackOffset = fbb.CreateString(bgmTrackData.first);
-	auto oneshotTrackOffset = fbb.CreateString(oneshotTrackData.first);
-	auto voiceTrackOffset = fbb.CreateString(voiceTrackData.first);
+	std::vector<flatbuffers::Offset<Save::Soundtrack>> soundtracks;
+	for (int j = 0; j < (int)SoundTrackType::Count; j++)
+	{
+		auto trackData = GetSoundTrackNameAndPosition((SoundTrackType)j);
+		auto nameOffset = fbb.CreateString(trackData.first);
+
+		Save::SoundtrackBuilder track{ fbb };
+		track.add_name(nameOffset);
+		track.add_position(trackData.second);
+		soundtracks.push_back(track.Finish());
+	}
+	auto soundtrackOffset = fbb.CreateVector(soundtracks);
 
 	// Legacy soundtrack map
 	std::vector<int> soundTrackMap;
@@ -881,7 +880,7 @@ bool SaveGame::Save(int slot)
 		{
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
 
-			staticMesh.add_pose(&FromPHD(room->mesh[j].pos));
+			staticMesh.add_pose(&FromPose(room->mesh[j].pos));
 			staticMesh.add_scale(room->mesh[j].scale);
 			staticMesh.add_color(&FromVector4(room->mesh[j].color));
 
@@ -996,7 +995,7 @@ bool SaveGame::Save(int slot)
 		batInfo.add_flags(bat->Counter);
 		batInfo.add_on(bat->On);
 		batInfo.add_room_number(bat->RoomNumber);
-		batInfo.add_pose(&FromPHD(bat->Pose));
+		batInfo.add_pose(&FromPose(bat->Pose));
 
 		bats.push_back(batInfo.Finish());
 	}
@@ -1012,7 +1011,7 @@ bool SaveGame::Save(int slot)
 		spiderInfo.add_flags(spider->Flags);
 		spiderInfo.add_on(spider->On);
 		spiderInfo.add_room_number(spider->RoomNumber);
-		spiderInfo.add_pose(&FromPHD(spider->Pose));
+		spiderInfo.add_pose(&FromPose(spider->Pose));
 
 		spiders.push_back(spiderInfo.Finish());
 	}
@@ -1028,7 +1027,7 @@ bool SaveGame::Save(int slot)
 		ratInfo.add_flags(rat->Flags);
 		ratInfo.add_on(rat->On);
 		ratInfo.add_room_number(rat->RoomNumber);
-		ratInfo.add_pose(&FromPHD(rat->Pose));
+		ratInfo.add_pose(&FromPose(rat->Pose));
 
 		rats.push_back(ratInfo.Finish());
 	}
@@ -1044,7 +1043,7 @@ bool SaveGame::Save(int slot)
 		scarabInfo.add_flags(beetle->Flags);
 		scarabInfo.add_on(beetle->On);
 		scarabInfo.add_room_number(beetle->RoomNumber);
-		scarabInfo.add_pose(&FromPHD(beetle->Pose));
+		scarabInfo.add_pose(&FromPose(beetle->Pose));
 
 		scarabs.push_back(scarabInfo.Finish());
 	}
@@ -1268,12 +1267,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
 	sgb.add_next_fx_active(NextFxActive);
-	sgb.add_ambient_track(bgmTrackOffset);
-	sgb.add_ambient_position(bgmTrackData.second);
-	sgb.add_oneshot_track(oneshotTrackOffset);
-	sgb.add_oneshot_position(oneshotTrackData.second);
-	sgb.add_voice_track(voiceTrackOffset);
-	sgb.add_voice_position(voiceTrackData.second);
+	sgb.add_soundtracks(soundtrackOffset);
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -1282,6 +1276,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_current_fov(LastFOV);
+	sgb.add_last_inv_item(g_Gui.GetLastInventoryItem());
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_volumes(volumesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
@@ -1387,7 +1382,7 @@ bool SaveGame::Load(int slot)
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
 		int number = staticMesh->number();
 
-		room->mesh[number].pos = ToPHD(staticMesh->pose());
+		room->mesh[number].pos = ToPose(staticMesh->pose());
 		room->mesh[number].roomNumber = staticMesh->room_number();
 		room->mesh[number].scale = staticMesh->scale();
 		room->mesh[number].color = ToVector4(staticMesh->color());
@@ -1448,6 +1443,9 @@ bool SaveGame::Load(int slot)
 	// Restore camera FOV
 	AlterFOV(s->current_fov());
 
+	// Restore current inventory item
+	g_Gui.SetLastInventoryItem(s->last_inv_item());
+
 	// Restore action queue
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
@@ -1456,9 +1454,13 @@ bool SaveGame::Load(int slot)
 	}
 
 	// Restore soundtracks
-	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
-	PlaySoundTrack(s->oneshot_track()->str(), SoundTrackType::OneShot, s->oneshot_position());
-	PlaySoundTrack(s->voice_track()->str(), SoundTrackType::Voice, s->voice_position());
+	for (int i = 0; i < s->soundtracks()->size(); i++)
+	{
+		assertion(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
+
+		auto track = s->soundtracks()->Get(i);
+		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
+	}
 
 	// Legacy soundtrack map
 	for (int i = 0; i < s->cd_flags()->size(); i++)
@@ -1509,6 +1511,9 @@ bool SaveGame::Load(int slot)
 		item->NextItem = savedItem->next_item();
 		item->NextActive = savedItem->next_item_active();
 
+		if (item->ObjectNumber == GAME_OBJECT_ID::ID_NO_OBJECT)
+			continue;
+
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
 		
 		item->Name = savedItem->lua_name()->str();
@@ -1522,7 +1527,7 @@ bool SaveGame::Load(int slot)
 
 		g_GameScriptEntities->TryAddColliding(i);
 
-		item->Pose = ToPHD(savedItem->pose());
+		item->Pose = ToPose(savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
 
 		item->Animation.Velocity = ToVector3(savedItem->velocity());
@@ -1530,7 +1535,6 @@ bool SaveGame::Load(int slot)
 		if (item->ObjectNumber == ID_LARA && !dynamicItem)
 		{
 			LaraItem->Data = nullptr;
-			Lara.ItemNumber = i;
 			LaraItem = item;
 			LaraItem->Location.roomNumber = savedItem->room_number();
 			LaraItem->Location.yNumber = item->Pose.Orientation.y;
@@ -1708,7 +1712,7 @@ bool SaveGame::Load(int slot)
 			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
 			kayak->LeftRightPaddleCount = savedKayak->left_right_count();
 			kayak->LeftVerticalVelocity = savedKayak->left_vertical_velocity();
-			kayak->OldPose = ToPHD(savedKayak->old_pos());
+			kayak->OldPose = ToPose(savedKayak->old_pos());
 			kayak->RightVerticalVelocity = savedKayak->right_vertical_velocity();
 			kayak->TrueWater = savedKayak->true_water();
 			kayak->Turn = savedKayak->turn();
@@ -1782,7 +1786,7 @@ bool SaveGame::Load(int slot)
 		bat->On = batInfo->on();
 		bat->Counter = batInfo->flags();
 		bat->RoomNumber = batInfo->room_number();
-		bat->Pose = ToPHD(batInfo->pose());
+		bat->Pose = ToPose(batInfo->pose());
 	}
 
 	for (int i = 0; i < s->rats()->size(); i++)
@@ -1793,7 +1797,7 @@ bool SaveGame::Load(int slot)
 		rat->On = ratInfo->on();
 		rat->Flags = ratInfo->flags();
 		rat->RoomNumber = ratInfo->room_number();
-		rat->Pose = ToPHD(ratInfo->pose());
+		rat->Pose = ToPose(ratInfo->pose());
 	}
 
 	for (int i = 0; i < s->spiders()->size(); i++)
@@ -1804,7 +1808,7 @@ bool SaveGame::Load(int slot)
 		spider->On = spiderInfo->on();
 		spider->Flags = spiderInfo->flags();
 		spider->RoomNumber = spiderInfo->room_number();
-		spider->Pose = ToPHD(spiderInfo->pose());
+		spider->Pose = ToPose(spiderInfo->pose());
 	}
 
 	for (int i = 0; i < s->scarabs()->size(); i++)
@@ -1815,7 +1819,7 @@ bool SaveGame::Load(int slot)
 		beetle->On = beetleInfo->on();
 		beetle->Flags = beetleInfo->flags();
 		beetle->RoomNumber = beetleInfo->room_number();
-		beetle->Pose = ToPHD(beetleInfo->pose());
+		beetle->Pose = ToPose(beetleInfo->pose());
 	}
 
 	NextFxFree = s->next_fx_free();
@@ -1825,7 +1829,7 @@ bool SaveGame::Load(int slot)
 	{
 		auto& fx = EffectList[i];
 		auto fx_saved = s->fxinfos()->Get(i);
-		fx.pos = ToPHD(fx_saved->pose());
+		fx.pos = ToPose(fx_saved->pose());
 		fx.roomNumber = fx_saved->room_number();
 		fx.objectNumber = fx_saved->object_number();
 		fx.nextFx = fx_saved->next_fx();
@@ -1892,7 +1896,17 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
 		Lara.Effect.DripNodes[i] = s->lara()->effect()->drip_nodes()->Get(i);
 
-	Lara.Context.CalcJumpVelocity = s->lara()->control()->calculated_jump_velocity();
+	Lara.Context.CalcJumpVelocity = s->lara()->context()->calc_jump_velocity();
+	Lara.Context.WaterCurrentActive = s->lara()->context()->water_current_active();
+	Lara.Context.WaterCurrentPull.x = s->lara()->context()->water_current_pull()->x();
+	Lara.Context.WaterCurrentPull.y = s->lara()->context()->water_current_pull()->y();
+	Lara.Context.WaterCurrentPull.z = s->lara()->context()->water_current_pull()->z();
+	Lara.Context.InteractedItem = s->lara()->context()->interacted_item_number();
+	Lara.Context.NextCornerPos = ToPose(s->lara()->context()->next_corner_pose());
+	Lara.Context.ProjectedFloorHeight = s->lara()->context()->projected_floor_height();
+	Lara.Context.TargetOrientation = ToEulerAngles(s->lara()->context()->target_orient());
+	Lara.Context.Vehicle = s->lara()->context()->vehicle_item_number();
+	Lara.Context.WaterSurfaceDist = s->lara()->context()->water_surface_dist();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
 	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
@@ -1932,17 +1946,12 @@ bool SaveGame::Load(int slot)
 	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->x();
 	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
 	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
-	Lara.Context.WaterCurrentActive = s->lara()->water_current_active();
-	Lara.Context.WaterCurrentPull.x = s->lara()->water_current_pull()->x();
-	Lara.Context.WaterCurrentPull.y = s->lara()->water_current_pull()->y();
-	Lara.Context.WaterCurrentPull.z = s->lara()->water_current_pull()->z();
 	Lara.Flare.Life = s->lara()->flare()->life();
 	Lara.Flare.ControlLeft = s->lara()->flare()->control_left();
 	Lara.Flare.Frame = s->lara()->flare()->frame();
 	Lara.HighestLocation = s->lara()->highest_location();
 	Lara.HitDirection = s->lara()->hit_direction();
 	Lara.HitFrame = s->lara()->hit_frame();
-	Lara.Context.InteractedItem = s->lara()->interacted_item();
 	Lara.Inventory.BeetleComponents = s->lara()->inventory()->beetle_components();
 	Lara.Inventory.BeetleLife = s->lara()->inventory()->beetle_life();
 	Lara.Inventory.BigWaterskin = s->lara()->inventory()->big_waterskin();
@@ -1957,7 +1966,6 @@ bool SaveGame::Load(int slot)
 	Lara.Inventory.TotalFlares = s->lara()->inventory()->total_flares();
 	Lara.Inventory.TotalLargeMedipacks = s->lara()->inventory()->total_large_medipacks();
 	Lara.Inventory.TotalSmallMedipacks = s->lara()->inventory()->total_small_medipacks();
-	Lara.ItemNumber = s->lara()->item_number();
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
 	Lara.LeftArm.GunFlash = s->lara()->left_arm()->gun_flash();
 	Lara.LeftArm.GunSmoke = s->lara()->left_arm()->gun_smoke();
@@ -1966,8 +1974,6 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
-	Lara.Context.NextCornerPos = ToPHD(s->lara()->next_corner_pose());
-	Lara.Context.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
 	Lara.RightArm.GunSmoke = s->lara()->right_arm()->gun_smoke();
@@ -2008,12 +2014,8 @@ bool SaveGame::Load(int slot)
 	Lara.Status.Exposure = s->lara()->status()->exposure();
 	Lara.Status.Poison = s->lara()->status()->poison();
 	Lara.Status.Stamina = s->lara()->status()->stamina();
-	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
-	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);
-	Lara.TargetArmOrient.x = s->lara()->target_arm_angles()->Get(1);
-	Lara.Context.TargetOrientation.y = s->lara()->target_facing_angle();
-	Lara.Context.Vehicle = s->lara()->vehicle();
-	Lara.Context.WaterSurfaceDist = s->lara()->water_surface_dist();
+	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0) ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr;
+	Lara.TargetArmOrient = ToEulerAngles(s->lara()->target_arm_orient());
 
 	for (int i = 0; i < s->lara()->weapons()->size(); i++)
 	{

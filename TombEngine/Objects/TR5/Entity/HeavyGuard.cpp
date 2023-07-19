@@ -171,7 +171,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto hitPos = Vector3i::Zero;
 		MESH_INFO* hitJoint = nullptr;
 
-		if (ObjectOnLOS2(&origin2, &target2, &hitPos, &hitJoint, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
+		if (ObjectOnLOS2(&origin2, &target2, &hitPos, &hitJoint, ID_LARA) == creature.Enemy->Index)
 		{
 			if (LaraItem->HitPoints <= HEAVY_GUARD_RAYGUN_PLAYER_BURN_HEALTH)
 			{

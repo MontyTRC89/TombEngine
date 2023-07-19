@@ -79,8 +79,8 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 
 void Renderer11::UpdateLaraAnimations(bool force)
 {
-	auto& rItem = m_items[Lara.ItemNumber];
-	rItem.ItemNumber = Lara.ItemNumber;
+	auto& rItem = m_items[LaraItem->Index];
+	rItem.ItemNumber = LaraItem->Index;
 
 	if (!force && rItem.DoneAnimations)
 		return;
@@ -260,14 +260,14 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	if (CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 
-	RendererItem* item = &m_items[Lara.ItemNumber];
-	ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
+	auto* item = &m_items[LaraItem->Index];
+	auto* nativeItem = &g_Level.Items[item->ItemNumber];
 
 	if (nativeItem->Flags & IFLAG_INVISIBLE)
 		return;
 
-	UINT stride = sizeof(RendererVertex);
-	UINT offset = 0;
+	unsigned int stride = sizeof(RendererVertex);
+	unsigned int offset = 0;
 
 	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

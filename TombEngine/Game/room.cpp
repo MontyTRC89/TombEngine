@@ -123,8 +123,8 @@ int IsRoomOutside(int x, int y, int z)
 	if (x < 0 || z < 0)
 		return NO_ROOM;
 
-	int xTable = x / SECTOR(1);
-	int zTable = z / SECTOR(1);
+	int xTable = x / BLOCK(1);
+	int zTable = z / BLOCK(1);
 
 	if (OutsideRoomTable[xTable][zTable].empty())
 		return NO_ROOM;
@@ -135,8 +135,8 @@ int IsRoomOutside(int x, int y, int z)
 		auto* room = &g_Level.Rooms[roomNumber];
 
 		if ((y > room->maxceiling && y < room->minfloor) &&
-			(z > (room->z + SECTOR(1)) && z < (room->z + (room->zSize - 1) * SECTOR(1))) &&
-			(x > (room->x + SECTOR(1)) && x < (room->x + (room->xSize - 1) * SECTOR(1))))
+			(z > (room->z + BLOCK(1)) && z < (room->z + (room->zSize - 1) * BLOCK(1))) &&
+			(x > (room->x + BLOCK(1)) && x < (room->x + (room->xSize - 1) * BLOCK(1))))
 		{
 			auto probe = GetCollision(x, y, z, roomNumber);
 
@@ -161,8 +161,8 @@ int IsRoomOutside(int x, int y, int z)
 
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z) 
 {
-	int sectorX = std::clamp(x / SECTOR(1), 0, room->xSize - 1);
-	int sectorZ = std::clamp(z / SECTOR(1), 0, room->zSize - 1);
+	int sectorX = std::clamp(x / BLOCK(1), 0, room->xSize - 1);
+	int sectorZ = std::clamp(z / BLOCK(1), 0, room->zSize - 1);
 
 	int index = sectorZ + sectorX * room->zSize;
 	if (index > room->floor.size()) 
@@ -218,8 +218,8 @@ Vector3i GetRoomCenter(int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	auto halfLength = SECTOR(room->xSize) / 2;
-	auto halfDepth = SECTOR(room->zSize) / 2;
+	auto halfLength = BLOCK(room->xSize) / 2;
+	auto halfDepth = BLOCK(room->zSize) / 2;
 	auto halfHeight = (room->maxceiling - room->minfloor) / 2;
 
 	auto center = Vector3i(

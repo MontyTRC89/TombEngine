@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 	constexpr auto CROC_STATE_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
 	constexpr auto CROC_STATE_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto CrocodileBite = CreatureBiteInfo(Vector3i(0, -100, 500), 9);
+	const auto CrocodileBite = CreatureBiteInfo(Vector3(0, -100, 500), 9);
 	const auto CrocodileBiteAttackJoints = std::vector<unsigned int>{ 8, 9 };
 
 	enum CrocodileState
@@ -93,8 +93,8 @@ namespace TEN::Entities::TR4
 		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 		if (waterDepth != NO_HEIGHT)
 		{
-			creature->LOT.Step = SECTOR(20);
-			creature->LOT.Drop = -SECTOR(20);
+			creature->LOT.Step = BLOCK(20);
+			creature->LOT.Drop = -BLOCK(20);
 			creature->LOT.Fly = CROC_SWIM_SPEED;
 		}
 		else

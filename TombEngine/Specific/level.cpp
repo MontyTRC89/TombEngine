@@ -202,8 +202,8 @@ void LoadItems()
 
 void LoadObjects()
 {
-	std::memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
-	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
+	Objects.Initialize();
+	std::memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
 	TENLog("Num meshes: " + std::to_string(numMeshes), LogLevel::Info);
@@ -1451,8 +1451,8 @@ void BuildOutsideRoomsTable()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		int rx = (room->x / SECTOR(1));
-		int rz = (room->z / SECTOR(1));
+		int rx = (room->x / BLOCK(1));
+		int rz = (room->z / BLOCK(1));
 
 		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{

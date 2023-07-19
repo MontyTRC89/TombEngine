@@ -3,6 +3,7 @@
 class GameVector;
 class Pose;
 class Vector3i;
+
 namespace sol { class state; }
 
 class Vec3

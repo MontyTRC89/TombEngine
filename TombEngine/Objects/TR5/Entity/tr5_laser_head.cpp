@@ -406,7 +406,7 @@ namespace TEN::Entities::Creatures::TR5
 										start.RoomNumber = item->RoomNumber;
 										auto end = GameVector(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, 0);
 
-										if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(LaraItem)->ItemNumber)
+										if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == LaraItem->Index)
 										{
 											if (LaraItem->Effect.Type != EffectType::Smoke)
 											{

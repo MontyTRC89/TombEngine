@@ -9,7 +9,7 @@
 namespace TEN {
 namespace Save {
 
-struct Position;
+struct Pose;
 
 struct CreatureTarget;
 struct CreatureTargetBuilder;
@@ -102,6 +102,8 @@ struct FloatT;
 struct ShortArray;
 struct ShortArrayBuilder;
 struct ShortArrayT;
+
+struct EulerAngles;
 
 struct Vector2;
 
@@ -507,7 +509,7 @@ struct ItemDataUnion {
 bool VerifyItemData(flatbuffers::Verifier &verifier, const void *obj, ItemData type);
 bool VerifyItemDataVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
 
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Pose FLATBUFFERS_FINAL_CLASS {
  private:
   int32_t x_pos_;
   int32_t y_pos_;
@@ -518,7 +520,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
 
  public:
   struct Traits;
-  Position()
+  Pose()
       : x_pos_(0),
         y_pos_(0),
         z_pos_(0),
@@ -526,7 +528,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
         y_rot_(0),
         z_rot_(0) {
   }
-  Position(int32_t _x_pos, int32_t _y_pos, int32_t _z_pos, int32_t _x_rot, int32_t _y_rot, int32_t _z_rot)
+  Pose(int32_t _x_pos, int32_t _y_pos, int32_t _z_pos, int32_t _x_rot, int32_t _y_rot, int32_t _z_rot)
       : x_pos_(flatbuffers::EndianScalar(_x_pos)),
         y_pos_(flatbuffers::EndianScalar(_y_pos)),
         z_pos_(flatbuffers::EndianScalar(_z_pos)),
@@ -553,10 +555,44 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
     return flatbuffers::EndianScalar(z_rot_);
   }
 };
-FLATBUFFERS_STRUCT_END(Position, 24);
+FLATBUFFERS_STRUCT_END(Pose, 24);
 
-struct Position::Traits {
-  using type = Position;
+struct Pose::Traits {
+  using type = Pose;
+};
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(2) EulerAngles FLATBUFFERS_FINAL_CLASS {
+ private:
+  int16_t x_;
+  int16_t y_;
+  int16_t z_;
+
+ public:
+  struct Traits;
+  EulerAngles()
+      : x_(0),
+        y_(0),
+        z_(0) {
+  }
+  EulerAngles(int16_t _x, int16_t _y, int16_t _z)
+      : x_(flatbuffers::EndianScalar(_x)),
+        y_(flatbuffers::EndianScalar(_y)),
+        z_(flatbuffers::EndianScalar(_z)) {
+  }
+  int16_t x() const {
+    return flatbuffers::EndianScalar(x_);
+  }
+  int16_t y() const {
+    return flatbuffers::EndianScalar(y_);
+  }
+  int16_t z() const {
+    return flatbuffers::EndianScalar(z_);
+  }
+};
+FLATBUFFERS_STRUCT_END(EulerAngles, 6);
+
+struct EulerAngles::Traits {
+  using type = EulerAngles;
 };
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector2 FLATBUFFERS_FINAL_CLASS {
@@ -668,7 +704,7 @@ struct CreatureTargetT : public flatbuffers::NativeTable {
   int32_t box_number = 0;
   int32_t flags = 0;
   int32_t trigger_flags = 0;
-  std::unique_ptr<TEN::Save::Position> position{};
+  std::unique_ptr<TEN::Save::Pose> position{};
 };
 
 struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -698,8 +734,8 @@ struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t trigger_flags() const {
     return GetField<int32_t>(VT_TRIGGER_FLAGS, 0);
   }
-  const TEN::Save::Position *position() const {
-    return GetStruct<const TEN::Save::Position *>(VT_POSITION);
+  const TEN::Save::Pose *position() const {
+    return GetStruct<const TEN::Save::Pose *>(VT_POSITION);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -708,7 +744,7 @@ struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_BOX_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            VerifyField<int32_t>(verifier, VT_TRIGGER_FLAGS) &&
-           VerifyField<TEN::Save::Position>(verifier, VT_POSITION) &&
+           VerifyField<TEN::Save::Pose>(verifier, VT_POSITION) &&
            verifier.EndTable();
   }
   CreatureTargetT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -735,7 +771,7 @@ struct CreatureTargetBuilder {
   void add_trigger_flags(int32_t trigger_flags) {
     fbb_.AddElement<int32_t>(CreatureTarget::VT_TRIGGER_FLAGS, trigger_flags, 0);
   }
-  void add_position(const TEN::Save::Position *position) {
+  void add_position(const TEN::Save::Pose *position) {
     fbb_.AddStruct(CreatureTarget::VT_POSITION, position);
   }
   explicit CreatureTargetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -756,7 +792,7 @@ inline flatbuffers::Offset<CreatureTarget> CreateCreatureTarget(
     int32_t box_number = 0,
     int32_t flags = 0,
     int32_t trigger_flags = 0,
-    const TEN::Save::Position *position = 0) {
+    const TEN::Save::Pose *position = 0) {
   CreatureTargetBuilder builder_(_fbb);
   builder_.add_position(position);
   builder_.add_trigger_flags(trigger_flags);
@@ -1566,7 +1602,7 @@ struct KayakT : public flatbuffers::NativeTable {
   int32_t right_vertical_velocity = 0;
   int32_t left_right_count = 0;
   int32_t water_height = 0;
-  std::unique_ptr<TEN::Save::Position> old_pos{};
+  std::unique_ptr<TEN::Save::Pose> old_pos{};
   bool turn = false;
   bool forward = false;
   bool true_water = false;
@@ -1612,8 +1648,8 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t water_height() const {
     return GetField<int32_t>(VT_WATER_HEIGHT, 0);
   }
-  const TEN::Save::Position *old_pos() const {
-    return GetStruct<const TEN::Save::Position *>(VT_OLD_POS);
+  const TEN::Save::Pose *old_pos() const {
+    return GetStruct<const TEN::Save::Pose *>(VT_OLD_POS);
   }
   bool turn() const {
     return GetField<uint8_t>(VT_TURN, 0) != 0;
@@ -1636,7 +1672,7 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_RIGHT_VERTICAL_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_LEFT_RIGHT_COUNT) &&
            VerifyField<int32_t>(verifier, VT_WATER_HEIGHT) &&
-           VerifyField<TEN::Save::Position>(verifier, VT_OLD_POS) &&
+           VerifyField<TEN::Save::Pose>(verifier, VT_OLD_POS) &&
            VerifyField<uint8_t>(verifier, VT_TURN) &&
            VerifyField<uint8_t>(verifier, VT_FORWARD) &&
            VerifyField<uint8_t>(verifier, VT_TRUE_WATER) &&
@@ -1673,7 +1709,7 @@ struct KayakBuilder {
   void add_water_height(int32_t water_height) {
     fbb_.AddElement<int32_t>(Kayak::VT_WATER_HEIGHT, water_height, 0);
   }
-  void add_old_pos(const TEN::Save::Position *old_pos) {
+  void add_old_pos(const TEN::Save::Pose *old_pos) {
     fbb_.AddStruct(Kayak::VT_OLD_POS, old_pos);
   }
   void add_turn(bool turn) {
@@ -1708,7 +1744,7 @@ inline flatbuffers::Offset<Kayak> CreateKayak(
     int32_t right_vertical_velocity = 0,
     int32_t left_right_count = 0,
     int32_t water_height = 0,
-    const TEN::Save::Position *old_pos = 0,
+    const TEN::Save::Pose *old_pos = 0,
     bool turn = false,
     bool forward = false,
     bool true_water = false,
@@ -2702,7 +2738,7 @@ inline void CreatureTarget::UnPackTo(CreatureTargetT *_o, const flatbuffers::res
   { auto _e = box_number(); _o->box_number = _e; }
   { auto _e = flags(); _o->flags = _e; }
   { auto _e = trigger_flags(); _o->trigger_flags = _e; }
-  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
 }
 
 inline flatbuffers::Offset<CreatureTarget> CreatureTarget::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CreatureTargetT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -3006,7 +3042,7 @@ inline void Kayak::UnPackTo(KayakT *_o, const flatbuffers::resolver_function_t *
   { auto _e = right_vertical_velocity(); _o->right_vertical_velocity = _e; }
   { auto _e = left_right_count(); _o->left_right_count = _e; }
   { auto _e = water_height(); _o->water_height = _e; }
-  { auto _e = old_pos(); if (_e) _o->old_pos = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
+  { auto _e = old_pos(); if (_e) _o->old_pos = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
   { auto _e = turn(); _o->turn = _e; }
   { auto _e = forward(); _o->forward = _e; }
   { auto _e = true_water(); _o->true_water = _e; }

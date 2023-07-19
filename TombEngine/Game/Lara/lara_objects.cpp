@@ -37,7 +37,7 @@ void lara_as_pickup(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	if (TestLastFrame(item))
 		item->Animation.TargetState = GetNextAnimState(*item);
@@ -54,7 +54,7 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(130.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	if (item->Animation.FrameNumber == (GetAnimData(*item).Keyframes.size() - 2))
 		lara->Control.HandStatus = HandStatus::Free;
@@ -75,7 +75,7 @@ void lara_as_switch_on(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 	Camera.speed = 6;
 }
 
@@ -90,7 +90,7 @@ void lara_as_switch_off(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 	Camera.speed = 6;
 }
 
@@ -129,7 +129,7 @@ void lara_as_use_key(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 }
 
 // State:		LS_USE_PUZZLE (43)
@@ -143,7 +143,7 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetDistance = BLOCK(1);
 
 	if (TestLastFrame(item) && item->ItemFlags[0])
 	{
@@ -266,7 +266,7 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_LEAP;
 
 		item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
@@ -502,7 +502,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	Camera.targetDistance = SECTOR(2);
+	Camera.targetDistance = BLOCK(2);
 
 	UpdateRopeSwing(item);
 	RopeSwingCollision(item, coll, true);
@@ -550,7 +550,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.FrameNumber = 0;
 		}
 
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 			JumpOffRope(item);
 	}
 	else if (item->Animation.FrameNumber == 15)
@@ -622,7 +622,7 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		// TODO: Add forward jump.
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			return;
@@ -711,7 +711,7 @@ void lara_as_pole_up(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_POLE_IDLE;
 			return;
@@ -760,7 +760,7 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_POLE_IDLE;
 			return;

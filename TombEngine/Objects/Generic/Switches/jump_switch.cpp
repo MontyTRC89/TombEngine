@@ -18,7 +18,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-CLICK(0.5f), CLICK(0.5f),
 			-CLICK(1), CLICK(1),
-			CLICK(1.5f), SECTOR(0.5f)
+			CLICK(1.5f), BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),

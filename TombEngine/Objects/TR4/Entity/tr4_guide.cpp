@@ -18,8 +18,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
 
-	const auto GuideBite1 = CreatureBiteInfo(Vector3i(0, 20, 180), 18);
-	const auto GuideBite2 = CreatureBiteInfo(Vector3i(30, 80, 50), 15);
+	const auto GuideBite1 = CreatureBiteInfo(Vector3(0, 20, 180), 18);
+	const auto GuideBite2 = CreatureBiteInfo(Vector3(30, 80, 50), 15);
 	const auto GuideLeftFingerSwapJoints = std::vector<unsigned int>{ 15 };
 	const auto GuideRightHandSwapJoints	 = std::vector<unsigned int>{ 18 };
 	const auto GuideHeadSwapJoints		 = std::vector<unsigned int>{ 21 };
