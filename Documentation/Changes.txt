@@ -22,6 +22,11 @@ Version 1.1.0
 * Fix last inventory item not properly changed when loading, saving and restarting game.
 * Fix some puzzle hole objects crashing the engine on item insertion.
 * Fix harpoon bolt bug when shooting vertically.
+* Fix black shatter debris.
+* Fix Lara's shadow projecting only her joints.
+* Fix sun and spot bulbs direction and sheen casts.
+* Fix room collector freezing game on some occassions.
+* Fix normal mapping
 * Make screenshot file in "Screenshots" subfolder by pressing print screen key.
 * Implement separate audio track channel for playing voiceovers with subtitles.
 * Don't stop ambience when Lara dies.
