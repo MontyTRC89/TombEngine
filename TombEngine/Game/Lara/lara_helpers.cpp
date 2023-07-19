@@ -379,25 +379,10 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 		return;
 
 	// Set optics.
-	SetPlayerOptics(LaraItem);
 	Camera.type = CameraType::Look;
+	SetPlayerOptics(LaraItem);
 
 	bool isSlow = IsHeld(In::Walk);
-	auto axisCoeff = Vector2::Zero;
-
-	// Determine X axis coefficient.
-	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
-		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
-	{
-		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
-	}
-
-	// Determine Y axis coefficient.
-	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
-		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
-	{
-		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
-	}
 
 	// Zoom optics.
 	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
@@ -428,6 +413,22 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
 			}
 		}
+	}
+
+	auto axisCoeff = Vector2::Zero;
+
+	// Determine X axis coefficient.
+	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
+	{
+		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
+	}
+
+	// Determine Y axis coefficient.
+	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
+	{
+		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
 	}
 
 	// Determine turn rate base values.
