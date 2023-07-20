@@ -36,7 +36,7 @@ namespace TEN::Entities::Traps
 		auto bounds = GameBoundingBox(&item);
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? -bounds.Z2 : bounds.Z1);
+		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1);
 		int upperFloorBound = item.Pose.Position.y;
 		int lowerCeilBound = item.Pose.Position.y + bounds.Y1;
 
