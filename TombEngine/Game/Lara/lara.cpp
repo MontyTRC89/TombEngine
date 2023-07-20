@@ -861,6 +861,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
+
+	if (DebugMode)
+	{
+		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
+		DrawNearbySectorFlags(*item);
+	}
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
@@ -932,12 +938,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
 	TestVolumes(item->Index, &coll->Setup);
-
-	if (DebugMode)
-	{
-		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
-		DrawNearbyTileFlags(*item);
-	}
 }
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
