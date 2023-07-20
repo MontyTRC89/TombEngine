@@ -421,7 +421,7 @@ namespace TEN::Renderer
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 						light->Intensity = oldLight->intensity;
- 			 			light->In = oldLight->in;
+						light->In = oldLight->in;
 						light->Out = oldLight->out;
 						light->Type = LIGHT_TYPE_FOG_BULB;
 						light->Luma = Luma(light->Color);
@@ -460,7 +460,7 @@ namespace TEN::Renderer
 		);
 
 		TENLog("Preparing object data...", LogLevel::Info);
-		     
+			 
 		bool isSkinPresent = false;
 
 		totalVertices = 0;
@@ -498,7 +498,7 @@ namespace TEN::Renderer
 				moveable.Id = MoveablesIds[i];
 				moveable.DoNotDraw = (obj->drawRoutine == nullptr);
 				moveable.ShadowType = obj->shadowType;
-				                                       
+													   
 				for (int j = 0; j < obj->nmeshes; j++)
 				{              
 					// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols

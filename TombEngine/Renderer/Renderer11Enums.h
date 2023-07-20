@@ -189,11 +189,11 @@ enum ALPHA_TEST_MODES
 	ALPHA_TEST_LESS_THAN = 2
 };
 
-enum RENDERER_PASS
+enum RendererPass
 {
-	RP_SHADOW_MAP = 0,
-	RP_OPAQUE = 1,
-	RP_TRANSPARENT = 2
+	ShadowMap,
+	Opaque,
+	Transparent
 };
 
 constexpr auto TEXTURE_HEIGHT = 256;

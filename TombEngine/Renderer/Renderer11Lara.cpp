@@ -275,7 +275,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 	rItem.DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer11::DrawLara(RenderView& view, RENDERER_PASS rendererPass)
+void TEN::Renderer::Renderer11::DrawLara(RenderView& view, RendererPass rendererPass)
 {
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamDontDrawLara)
@@ -339,7 +339,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, RENDERER_PASS rendere
 	DrawLaraHair(item, room, rendererPass);
 }
 
-void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RENDERER_PASS rendererPass)
+void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass)
 {
 	if (!Objects[ID_HAIR].loaded)
 		return;
@@ -383,7 +383,7 @@ void Renderer11::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, REND
 	}
 }
 
-void Renderer11::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RENDERER_PASS rendererPass)
+void Renderer11::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass)
 {
 	if (!m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 		return;
@@ -397,7 +397,7 @@ void Renderer11::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RE
 	}
 }
 
-void Renderer11::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RENDERER_PASS rendererPass)
+void Renderer11::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass)
 {
 	HolsterSlot leftHolsterID = Lara.Control.Weapon.HolsterInfo.LeftHolster;
 	HolsterSlot rightHolsterID = Lara.Control.Weapon.HolsterInfo.RightHolster;

@@ -1,3 +1,4 @@
+
 struct VertexShaderInput 
 {
 	float3 Position: POSITION0;

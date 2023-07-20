@@ -218,8 +218,8 @@ namespace TEN::Renderer
 		// See https://github.com/MontyTRC89/TombEngine/issues/947 for details.
 		// NOTE by MontyTRC: I'd keep this as a failsafe solution for 0.00000001% of cases we could have problems
 
-		int stackSize = (int) m_visitedRoomsStack.size();
-		int stackMinIndex = std::max(0, (int)(stackSize - 5));
+		int stackSize = (int)m_visitedRoomsStack.size();
+		int stackMinIndex = std::max(0, int(stackSize - 5));
 
 		for (int i = stackSize - 1; i >= stackMinIndex; i--)
 		{
@@ -303,9 +303,7 @@ namespace TEN::Renderer
 			}
 
 			if (from != door->RoomNumber && CheckPortal(to, door, viewPort, &clipPort, renderView))
-			{
 				GetVisibleRooms(to, door->RoomNumber, clipPort, water, count + 1, onlyRooms, renderView);
-			}
 		}
 
 		m_visitedRoomsStack.pop_back();

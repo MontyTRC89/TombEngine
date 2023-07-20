@@ -29,9 +29,9 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
-#include "Game/effects/hair.h"
 
 using namespace std::chrono;
+using namespace TEN::Effects::Hair;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 
@@ -118,8 +118,6 @@ namespace TEN::Renderer
 			1.0f, 0);
 		}
 	}
-
-	using namespace TEN::Effects::Hair;
 
 	void Renderer11::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
@@ -240,9 +238,9 @@ namespace TEN::Renderer
 			{
 				RendererRoom& room = m_rooms[item->RoomNumber];
 
-				DrawLaraHolsters(item, &room, RP_SHADOW_MAP);
-				DrawLaraJoints(item, &room, RP_SHADOW_MAP);
-				DrawLaraHair(item, &room, RP_SHADOW_MAP);
+				DrawLaraHolsters(item, &room, RendererPass::ShadowMap);
+				DrawLaraJoints(item, &room, RendererPass::ShadowMap);
+				DrawLaraHair(item, &room, RendererPass::ShadowMap);
 			}
 		}
 	}
@@ -425,62 +423,62 @@ namespace TEN::Renderer
 
 		if (Objects[ID_SPIDERS_EMITTER].loaded)
 		{
-		    ObjectInfo* obj = &Objects[ID_SPIDERS_EMITTER];
-		    RendererObject* moveableObj = m_moveableObjects[ID_SPIDERS_EMITTER].get();
-		    short* meshPtr = Meshes[Objects[ID_SPIDERS_EMITTER].meshIndex + ((Wibble >> 2) & 2)];
-		    RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
-		    RendererBucket* bucket = mesh->GetBucket(bucketIndex);
+			ObjectInfo* obj = &Objects[ID_SPIDERS_EMITTER];
+			RendererObject* moveableObj = m_moveableObjects[ID_SPIDERS_EMITTER].get();
+			short* meshPtr = Meshes[Objects[ID_SPIDERS_EMITTER].meshIndex + ((Wibble >> 2) & 2)];
+			RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
+			RendererBucket* bucket = mesh->GetBucket(bucketIndex);
 
-		    if (bucket->NumVertices == 0)
-		        return true;
+			if (bucket->NumVertices == 0)
+				return true;
 
-		    setGpuStateForBucket(bucketIndex);
+			setGpuStateForBucket(bucketIndex);
 
-		    m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
-		    m_device->SetIndices(bucket->GetIndexBuffer());
+			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+			m_device->SetIndices(bucket->GetIndexBuffer());
 
-		    LPD3DXEFFECT effect;
-		    if (pass == RENDERER_PASS_SHADOW_MAP)
-		        effect = m_shaderDepth->GetEffect();
-		    else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
-		        effect = m_shaderReconstructZBuffer->GetEffect();
-		    else if (pass == RENDERER_PASS_GBUFFER)
-		        effect = m_shaderFillGBuffer->GetEffect();
-		    else
-		        effect = m_shaderTransparent->GetEffect();
+			LPD3DXEFFECT effect;
+			if (pass == RENDERER_PASS_SHADOW_MAP)
+				effect = m_shaderDepth->GetEffect();
+			else if (pass == RENDERER_PASS_RECONSTRUCT_DEPTH)
+				effect = m_shaderReconstructZBuffer->GetEffect();
+			else if (pass == RENDERER_PASS_GBUFFER)
+				effect = m_shaderFillGBuffer->GetEffect();
+			else
+				effect = m_shaderTransparent->GetEffect();
 
-		    effect->SetBool(effect->GetParameterByName(nullptr, "UseSkinning"), false);
-		    effect->SetInt(effect->GetParameterByName(nullptr, "ModelType"), MODEL_TYPE_MOVEABLE);
+			effect->SetBool(effect->GetParameterByName(nullptr, "UseSkinning"), false);
+			effect->SetInt(effect->GetParameterByName(nullptr, "ModelType"), MODEL_TYPE_MOVEABLE);
 
-		    if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
-		        effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BLENDMODE_OPAQUE);
-		    else
-		        effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BLENDMODE_ALPHATEST);
+			if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
+				effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BLENDMODE_OPAQUE);
+			else
+				effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BLENDMODE_ALPHATEST);
 
-		    for (int i = 0; i < NUM_SPIDERS; i++)
-		    {
-		        SPIDER_STRUCT* spider = &Spiders[i];
+			for (int i = 0; i < NUM_SPIDERS; i++)
+			{
+				SPIDER_STRUCT* spider = &Spiders[i];
 
-		        if (spider->on)
-		        {
-		            XMMATRIXTranslation(&m_tempTranslation, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
-		            XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.yRot, spider->pos.xRot, spider->pos.zRot);
-		            XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
-		            effect->SetMatrix(effect->GetParameterByName(nullptr, "World"), &m_tempWorld);
+				if (spider->on)
+				{
+					XMMATRIXTranslation(&m_tempTranslation, spider->pos.xPos, spider->pos.yPos, spider->pos.zPos);
+					XMMATRIXRotationYawPitchRoll(&m_tempRotation, spider->pos.yRot, spider->pos.xRot, spider->pos.zRot);
+					XMMATRIXMultiply(&m_tempWorld, &m_tempRotation, &m_tempTranslation);
+					effect->SetMatrix(effect->GetParameterByName(nullptr, "World"), &m_tempWorld);
 
-		            effect->SetVector(effect->GetParameterByName(nullptr, "AmbientLight"), &m_rooms[spider->roomNumber]->AmbientLight);
+					effect->SetVector(effect->GetParameterByName(nullptr, "AmbientLight"), &m_rooms[spider->roomNumber]->AmbientLight);
 
-		            for (int iPass = 0; iPass < cPasses; iPass++)
-		            {
-		                effect->BeginPass(iPass);
-		                effect->CommitChanges();
+					for (int iPass = 0; iPass < cPasses; iPass++)
+					{
+						effect->BeginPass(iPass);
+						effect->CommitChanges();
 
-		                drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->Indices.size() / 3);
+						drawPrimitives(D3DPT_TRIANGLELIST, 0, 0, bucket->NumVertices, 0, bucket->Indices.size() / 3);
 
-		                effect->EndPass();
-		            }
-		        }
-		    }
+						effect->EndPass();
+					}
+				}
+			}
 		}*/
 	}
 
@@ -1349,7 +1347,7 @@ namespace TEN::Renderer
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[info->bucket->Texture]),
-		            SAMPLER_ANISOTROPIC_CLAMP);
+					SAMPLER_ANISOTROPIC_CLAMP);
 		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_staticsTextures[info->bucket->Texture]),
 					SAMPLER_ANISOTROPIC_CLAMP);
 
@@ -1481,17 +1479,17 @@ namespace TEN::Renderer
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
 		
 		// Draw opaque and alpha test faces
-		DrawRooms(view, RP_OPAQUE);
-		DrawItems(view, RP_OPAQUE);
-		DrawStatics(view, RP_OPAQUE);
-		DrawEffects(view, RP_OPAQUE);
+		DrawRooms(view, RendererPass::Opaque);
+		DrawItems(view, RendererPass::Opaque);
+		DrawStatics(view, RendererPass::Opaque);
+		DrawEffects(view, RendererPass::Opaque);
 		DrawGunShells(view);
 		DrawBats(view);
 		DrawRats(view);
 		DrawSpiders(view);
 		DrawScarabs(view);
 		DrawLocusts(view);
-		DrawDebris(view, RP_OPAQUE);
+		DrawDebris(view, RendererPass::Opaque);
 
 		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(),
 			m_renderTarget.DepthStencilView.Get());
@@ -1525,11 +1523,11 @@ namespace TEN::Renderer
 		DrawLines3D(view);
 
 		// Draw immediately additive and unsorted blended faces, and collect all sorted blend modes faces for later
-		DrawRooms(view, RP_TRANSPARENT);
-		DrawItems(view, RP_TRANSPARENT);
-		DrawStatics(view, RP_TRANSPARENT);
-		DrawEffects(view, RP_TRANSPARENT);
-		DrawDebris(view, RP_TRANSPARENT);
+		DrawRooms(view, RendererPass::Transparent);
+		DrawItems(view, RendererPass::Transparent);
+		DrawStatics(view, RendererPass::Transparent);
+		DrawEffects(view, RendererPass::Transparent);
+		DrawDebris(view, RendererPass::Transparent);
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
@@ -1558,7 +1556,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-	                                   RenderView& view)
+									   RenderView& view)
 	{
 		CollectRooms(view, true);
 		// Draw shadow map
@@ -1586,16 +1584,16 @@ namespace TEN::Renderer
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		DrawHorizonAndSky(view, depthTarget);
-		DrawRooms(view, RP_OPAQUE);
+		DrawRooms(view, RendererPass::Opaque);
 	}
 
 	void Renderer11::DumpGameScene()
 	{
 		RenderScene(m_dumpScreenRenderTarget.RenderTargetView.Get(), m_dumpScreenRenderTarget.DepthStencilView.Get(),
-		            gameCamera);
+					gameCamera);
 	}
 
-	void Renderer11::DrawItems(RenderView& view, RENDERER_PASS rendererPass)
+	void Renderer11::DrawItems(RenderView& view, RendererPass rendererPass)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1650,7 +1648,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RENDERER_PASS rendererPass)
+	void Renderer11::DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass)
 	{
 		// Extremely hacky function to get first rendered face of a waterfall object mesh, calculate
 		// its texture height and scroll all the textures according to that height.
@@ -1694,7 +1692,7 @@ namespace TEN::Renderer
 		m_cbAnimated.updateData(m_stAnimated, m_context.Get());
 	}
 
-	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, RENDERER_PASS rendererPass)
+	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass)
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &m_rooms[item->RoomNumber];
@@ -1758,7 +1756,7 @@ namespace TEN::Renderer
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[info->bucket->Texture]),
-		            SAMPLER_ANISOTROPIC_CLAMP);
+					SAMPLER_ANISOTROPIC_CLAMP);
 		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[info->bucket->Texture]),
 					SAMPLER_ANISOTROPIC_CLAMP);
 
@@ -1788,7 +1786,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawStatics(RenderView& view, RENDERER_PASS rendererPass)
+	void Renderer11::DrawStatics(RenderView& view, RendererPass rendererPass)
 	{
 		if (m_staticsTextures.size() == 0 || view.SortedStaticsToDraw.size() == 0)
 		{
@@ -1818,7 +1816,7 @@ namespace TEN::Renderer
 			std::vector<RendererStatic*> statics = it->second;
 
 			RendererStatic* refStatic = statics[0];
- 			RendererObject& refStaticObj = *m_staticObjects[refStatic->ObjectNumber];
+			RendererObject& refStaticObj = *m_staticObjects[refStatic->ObjectNumber];
 			if (refStaticObj.ObjectMeshes.size() == 0)
 				continue;
 
@@ -1851,7 +1849,7 @@ namespace TEN::Renderer
 
 				for (auto& bucket : refMesh->Buckets)
 				{
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RP_TRANSPARENT)))
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
 					{
 						continue;
 					}
@@ -1899,7 +1897,7 @@ namespace TEN::Renderer
 		}
 
 		// Collect sorted blend modes faces ordered by room, if transparent pass
-		if (rendererPass == RP_TRANSPARENT)
+		if (rendererPass == RendererPass::Transparent)
 		{
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -1915,7 +1913,7 @@ namespace TEN::Renderer
 
 						for (auto& bucket : mesh->Buckets)
 						{
-							if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RP_TRANSPARENT)))
+							if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
 							{
 								continue;
 							}
@@ -1959,7 +1957,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawRooms(RenderView& view, RENDERER_PASS rendererPass)
+	void Renderer11::DrawRooms(RenderView& view, RendererPass rendererPass)
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -2046,7 +2044,7 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RP_TRANSPARENT)))
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
 					{
 						continue;
 					}
@@ -2106,10 +2104,10 @@ namespace TEN::Renderer
 							if (animated)
 							{
 								BindTexture(TEXTURE_COLOR_MAP,
-								            &std::get<0>(m_animatedTextures[bucket.Texture]),
-								            SAMPLER_ANISOTROPIC_CLAMP);
+											&std::get<0>(m_animatedTextures[bucket.Texture]),
+											SAMPLER_ANISOTROPIC_CLAMP);
 								BindTexture(TEXTURE_NORMAL_MAP,
-								            &std::get<1>(m_animatedTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+											&std::get<1>(m_animatedTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
 								RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
 								m_stAnimated.NumFrames = set.NumTextures;
@@ -2134,9 +2132,9 @@ namespace TEN::Renderer
 							else
 							{
 								BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_roomTextures[bucket.Texture]),
-								            SAMPLER_ANISOTROPIC_CLAMP);
+											SAMPLER_ANISOTROPIC_CLAMP);
 								BindTexture(TEXTURE_NORMAL_MAP,
-								            &std::get<1>(m_roomTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+											&std::get<1>(m_roomTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -2270,13 +2268,13 @@ namespace TEN::Renderer
 		m_swapChain->Present(1, 0);
 	}
 
-	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RENDERER_PASS rendererPass)
+	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RendererPass rendererPass)
 	{
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 		for (auto& bucket : mesh->Buckets)
 		{
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RP_TRANSPARENT)))
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
 			{
 				continue;
 			}
@@ -2286,7 +2284,7 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			if (rendererPass == RP_SHADOW_MAP)
+			if (rendererPass == RendererPass::ShadowMap)
 			{
 				SetBlendMode(BLENDMODE_OPAQUE);
 				SetAlphaTest(ALPHA_TEST_NONE, ALPHA_TEST_THRESHOLD);
@@ -2326,7 +2324,7 @@ namespace TEN::Renderer
 				int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
-				            SAMPLER_ANISOTROPIC_CLAMP);
+							SAMPLER_ANISOTROPIC_CLAMP);
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
 					SAMPLER_ANISOTROPIC_CLAMP);
 
