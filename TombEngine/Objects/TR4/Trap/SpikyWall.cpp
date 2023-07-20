@@ -32,17 +32,17 @@ namespace TEN::Entities::Traps
 		if (!TriggerActive(&item) || item.Status == ITEM_DEACTIVATED)
 			return;
 
-		// Determine wall bounds.
+		int forwardVel = item.ItemFlags[0];
 		auto bounds = GameBoundingBox(&item);
-		int frontWallBound = bounds.Z2;
-		int backWallBound = bounds.Z1;
 
 		// Get point collision.
-		int forwardVel = item.ItemFlags[0];
-		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? frontWallBound : -backWallBound);
+		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? -bounds.Z2 : bounds.Z1);
+		int upperFloorBound = item.Pose.Position.y;
+		int lowerCeilBound = item.Pose.Position.y + bounds.Y1;
 
 		// Stop moving.
-		if (pointColl.Position.Floor < item.Pose.Position.y)
+		if (pointColl.Position.Floor < upperFloorBound ||
+			pointColl.Position.Ceiling > lowerCeilBound)
 		{
 			item.Status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_TR4_ROLLING_BALL);
