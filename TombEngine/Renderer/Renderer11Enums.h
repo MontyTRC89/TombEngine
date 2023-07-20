@@ -189,6 +189,13 @@ enum ALPHA_TEST_MODES
 	ALPHA_TEST_LESS_THAN = 2
 };
 
+enum RendererPass
+{
+	ShadowMap,
+	Opaque,
+	Transparent
+};
+
 constexpr auto TEXTURE_HEIGHT = 256;
 constexpr auto TEXTURE_WIDTH = 256;
 constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);

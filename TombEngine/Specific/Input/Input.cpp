@@ -623,7 +623,12 @@ namespace TEN::Input
 		// Port actions back to legacy bit fields.
 		for (const auto& action : ActionMap)
 		{
-			int actionBit = 1 << (int)action.GetID();
+			// TEMP FIX: Only port up to 32 bits.
+			auto actionID = action.GetID();
+			if ((int)actionID >= 32)
+				break;
+
+			int actionBit = 1 << (int)actionID;
 
 			DbInput |= action.IsClicked() ? actionBit : 0;
 			TrInput |= action.IsHeld()	  ? actionBit : 0;
@@ -718,6 +723,10 @@ namespace TEN::Input
 	void ClearAction(ActionID actionID)
 	{
 		ActionMap[(int)actionID].Clear();
+
+		// TEMP FIX: Only port up to 32 bits.
+		if ((int)actionID >= 32)
+			return;
 
 		int actionBit = 1 << (int)actionID;
 		DbInput &= ~actionBit;

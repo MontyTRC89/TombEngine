@@ -26,18 +26,21 @@ struct PixelShaderInput
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
-	float3x3 TBN : TBN;
 	float4 PositionCopy : TEXCOORD1;
 	float4 FogBulbs : TEXCOORD2;
 	float DistanceFog : FOG;
+	float3 Tangent: TANGENT;
+	float3 Binormal: BINORMAL;
 };
 
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
 Texture2D NormalTexture : register(t1);
+SamplerState NormalTextureSampler : register(s1);
 
 Texture2D CausticsTexture : register(t2);
+SamplerState CausticsTextureSampler : register(s2);
 
 struct PixelShaderOutput
 {
@@ -87,9 +90,8 @@ PixelShaderInput VS(VertexShaderInput input)
 #endif
 	
 	output.WorldPosition = input.Position.xyz;
-
-    float3x3 TBN = float3x3(input.Tangent, cross(input.Normal,input.Tangent), input.Normal);
-	output.TBN = TBN;
+	output.Tangent = input.Tangent;
+	output.Binormal = input.Binormal;
 
 	output.FogBulbs = DoFogBulbsForVertex(output.WorldPosition);
 	output.DistanceFog = DoDistanceFogForVertex(output.WorldPosition);
@@ -97,13 +99,11 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
-float3 UnpackNormalMap(float3 compressedNormalMap)
+float3 UnpackNormalMap(float4 n)
 {
-	float2 normalXY = compressedNormalMap.rg;
-
-	normalXY = normalXY * float2(2.0f, 2.0f) - float2(1.0f, 1.0f);
-	float normalZ = sqrt(saturate(1.0f - dot(normalXY, normalXY)));
-	return float3(normalXY.xy, normalZ);
+	n = n * 2.0f - 1.0f;
+	n.z = saturate(1.0f - dot(n.xy, n.xy));
+	return n.xyz;
 }
 
 PixelShaderOutput PS(PixelShaderInput input)
@@ -114,8 +114,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 	
 	DoAlphaTest(output.Color);
 
-	float3 normal = UnpackNormalMap(NormalTexture.Sample(Sampler, input.UV).rgb);
-	normal = normalize(mul(normal, input.TBN));
+	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
+	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
+	normal = normalize(mul(normal, TBN));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
@@ -132,7 +133,7 @@ PixelShaderOutput PS(PixelShaderInput input)
             DoSpotLightShadow(input.WorldPosition, lighting);
         }
 	}
-	
+
     DoBlobShadows(input.WorldPosition, lighting);
 
 	if (doLights)
@@ -149,7 +150,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 				continue;
 
 			lightVec = normalize(lightVec);
-			float d = saturate(dot(normal, -lightVec ));
+			float d = saturate(dot(normal, lightVec ));
 			if (d < 0)
 				continue;
 			
@@ -167,7 +168,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;
 		float fracZ = position.z - floor(position.z / 2048.0f) * 2048.0f;
 
-		float attenuation = saturate(dot(float3(0.0f, 1.0f, 0.0f), normal));
+		float attenuation = saturate(dot(float3(0.0f, -1.0f, 0.0f), normal));
 
 		float3 blending = abs(normal);
 		blending = normalize(max(blending, 0.00001f));
@@ -175,13 +176,13 @@ PixelShaderOutput PS(PixelShaderInput input)
 		blending /= float3(b, b, b);
 
 		float3 p = float3(fracX, fracY, fracZ) / 2048.0f;
-		float3 xaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.y * CausticsScale.x, p.z * CausticsScale.y)).xyz;
-		float3 yaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.z * CausticsScale.y)).xyz;
-		float3 zaxis = CausticsTexture.Sample(Sampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.y * CausticsScale.y)).xyz;
+		float3 xaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.y * CausticsScale.x, p.z * CausticsScale.y)).xyz;
+		float3 yaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.z * CausticsScale.y)).xyz;
+		float3 zaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.y * CausticsScale.y)).xyz;
 
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}
-	
+
 	output.Depth = output.Color.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
