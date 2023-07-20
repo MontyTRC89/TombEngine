@@ -962,12 +962,12 @@ namespace TEN::Collision::Floordata
 		constexpr auto DRAW_RANGE	  = BLOCK(3);
 		constexpr auto STRING_SPACING = -20.0f;
 
-		constexpr auto STOPPER_COLOR				 = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
-		constexpr auto DEATH_COLOR					 = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
-		constexpr auto MONKEY_SWING_COLOR			 = Vector4(1.0f, 0.5f, 0.5f, 1.0f);
-		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
-		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.0f, 1.0f, 1.0f);
-		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.0f, 1.0f, 1.0f, 1.0f);
+		constexpr auto STOPPER_COLOR				 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
+		constexpr auto DEATH_COLOR					 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
+		constexpr auto MONKEY_SWING_COLOR			 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
+		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Vector4(0.4f, 0.4f, 1.0f, 1.0f);
+		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
+		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
 		
 		static const auto STOPPER_STRING		= "Stopper";
 		static const auto DEATH_STRING			= "Death";
