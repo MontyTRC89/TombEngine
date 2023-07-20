@@ -32,8 +32,8 @@
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Bubble;
-using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Entities::Switches;
