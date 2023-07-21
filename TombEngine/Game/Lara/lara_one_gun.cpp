@@ -1631,7 +1631,6 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 					{
 						if (itemPtr->IsCreature())
 							GetCreatureInfo(itemPtr)->Poisoned = true;
-
 						if (itemPtr->IsLara())
 							GetLaraInfo(itemPtr)->Status.Poison += 5;
 					}
@@ -1646,12 +1645,10 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 					 itemPtr->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doShatter = hasHit = true;
-
 				// Smash objects are legacy objects from TRC. Let's make them explode in the legacy way.
 				ExplodeItemNode(itemPtr, 0, 0, 128);
-				short currentItemNumber = (itemPtr - CollidedItems[0]);
-				SmashObject(currentItemNumber);
-				KillItem(currentItemNumber);
+				SmashObject(itemPtr->Index);
+				KillItem(itemPtr->Index);
 			}
 		}
 
