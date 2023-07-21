@@ -538,7 +538,7 @@ void ChaseCamera(ItemInfo* item)
 
 void DoThumbstickCamera()
 {
-	if (!g_Configuration.EnableThumbstickCameraControl)
+	if (!g_Configuration.EnableThumbstickCamera)
 		return;
 
 	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
@@ -1899,7 +1899,7 @@ void UpdateMikePos(ItemInfo* item)
 	}
 	else
 	{
-		int phdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+		int phdPerspective = g_Configuration.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
 		Camera.mikePos.x = Camera.pos.x + phdPerspective * phd_sin(Camera.actualAngle);

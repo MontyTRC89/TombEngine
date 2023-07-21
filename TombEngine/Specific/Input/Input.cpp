@@ -205,7 +205,7 @@ namespace TEN::Input
 				if (ApplyDefaultXInputBindings())
 				{
 					g_Configuration.EnableRumble = (OisRumble != nullptr);
-					g_Configuration.EnableThumbstickCameraControl = true;
+					g_Configuration.EnableThumbstickCamera = true;
 					SaveConfiguration();
 				}
 			}
@@ -537,7 +537,7 @@ namespace TEN::Input
 		static bool dbFullscreen = true;
 		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN] && dbFullscreen)
 		{
-			g_Configuration.Windowed = !g_Configuration.Windowed;
+			g_Configuration.EnableWindowedMode = !g_Configuration.EnableWindowedMode;
 			SaveConfiguration();
 			g_Renderer.ToggleFullScreen();
 		}
@@ -710,7 +710,7 @@ namespace TEN::Input
 				g_Configuration.Bindings[i] = Bindings[1][i];
 
 			// Additionally turn on thumbstick camera and vibration.
-			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCameraControl = true;
+			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCamera = true;
 
 			return true;
 		}

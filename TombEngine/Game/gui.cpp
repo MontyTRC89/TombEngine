@@ -419,8 +419,8 @@ namespace TEN::Gui
 		for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 		{
 			auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
-			if (screenResolution.x == CurrentSettings.Configuration.Width &&
-				screenResolution.y == CurrentSettings.Configuration.Height)
+			if (screenResolution.x == CurrentSettings.Configuration.ScreenWidth &&
+				screenResolution.y == CurrentSettings.Configuration.ScreenHeight)
 			{
 				CurrentSettings.SelectedScreenResolution = i;
 				break;
@@ -466,7 +466,7 @@ namespace TEN::Gui
 
 			case DisplaySettingsOption::Windowed:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.Windowed = !CurrentSettings.Configuration.Windowed;
+				CurrentSettings.Configuration.EnableWindowedMode = !CurrentSettings.Configuration.EnableWindowedMode;
 				break;
 
 			case DisplaySettingsOption::ShadowType:
@@ -487,10 +487,10 @@ namespace TEN::Gui
 			case DisplaySettingsOption::Antialiasing:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-				if (CurrentSettings.Configuration.Antialiasing == AntialiasingMode::None)
-					CurrentSettings.Configuration.Antialiasing = AntialiasingMode::High;
+				if (CurrentSettings.Configuration.AntialiasingMode == AntialiasingMode::None)
+					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode::High;
 				else
-					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) - 1);
+					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) - 1);
 
 				break;
 			}
@@ -508,7 +508,7 @@ namespace TEN::Gui
 
 			case DisplaySettingsOption::Windowed:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.Windowed = !CurrentSettings.Configuration.Windowed;
+				CurrentSettings.Configuration.EnableWindowedMode = !CurrentSettings.Configuration.EnableWindowedMode;
 				break;
 
 			case DisplaySettingsOption::ShadowType:
@@ -528,10 +528,10 @@ namespace TEN::Gui
 			case DisplaySettingsOption::Antialiasing:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-				if (CurrentSettings.Configuration.Antialiasing == AntialiasingMode::High)
-					CurrentSettings.Configuration.Antialiasing = AntialiasingMode::None;
+				if (CurrentSettings.Configuration.AntialiasingMode == AntialiasingMode::High)
+					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode::None;
 				else
-					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) + 1);
+					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) + 1);
 
 				break;
 			}
@@ -565,15 +565,15 @@ namespace TEN::Gui
 			{
 				// Save the configuration.
 				auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
-				CurrentSettings.Configuration.Width = screenResolution.x;
-				CurrentSettings.Configuration.Height = screenResolution.y;
+				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
+				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
 
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
 
 				// Reset screen and go back.
-				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.Width, CurrentSettings.Configuration.Height, 
-					CurrentSettings.Configuration.Windowed);
+				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight, 
+					CurrentSettings.Configuration.EnableWindowedMode);
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 				SelectedOption = fromPauseMenu ? 1 : 0;
@@ -877,7 +877,7 @@ namespace TEN::Gui
 
 			case OtherSettingsOption::AutoTarget:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.AutoTarget = !CurrentSettings.Configuration.AutoTarget;
+				CurrentSettings.Configuration.EnableAutoTargeting = !CurrentSettings.Configuration.EnableAutoTargeting;
 				break;
 
 			case OtherSettingsOption::ToggleRumble:
@@ -887,7 +887,7 @@ namespace TEN::Gui
 
 			case OtherSettingsOption::ThumbstickCameraControl:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableThumbstickCameraControl = !CurrentSettings.Configuration.EnableThumbstickCameraControl;
+				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
 				break;
 
 			case OtherSettingsOption::Subtitles:
