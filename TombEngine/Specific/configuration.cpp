@@ -336,7 +336,7 @@ bool LoadConfiguration()
 
 	DWORD screenWidth = 0;
 	DWORD screenHeight = 0;
-	bool windowed = false;
+	bool enableWindowedMode = false;
 	DWORD shadowMode = 1;
 	DWORD shadowMapSize = 512;
 	DWORD shadowBlobsMax = 16;
@@ -346,7 +346,7 @@ bool LoadConfiguration()
 	// Load Graphics keys.
 	if (GetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, &screenWidth, 0) != ERROR_SUCCESS ||
 		GetDWORDRegKey(graphicsKey, REGKEY_SCREEN_HEIGHT, &screenHeight, 0) != ERROR_SUCCESS ||
-		GetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, &windowed, false) != ERROR_SUCCESS ||
+		GetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, &enableWindowedMode, false) != ERROR_SUCCESS ||
 		GetDWORDRegKey(graphicsKey, REGKEY_SHADOWS, &shadowMode, 1) != ERROR_SUCCESS ||
 		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, &shadowMapSize, 512) != ERROR_SUCCESS ||
 		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, &shadowBlobsMax, 16) != ERROR_SUCCESS ||
@@ -459,7 +459,7 @@ bool LoadConfiguration()
 	// All configuration values found; apply configuration to engine.
 	g_Configuration.ScreenWidth = screenWidth;
 	g_Configuration.ScreenHeight = screenHeight;
-	g_Configuration.EnableWindowedMode = windowed;
+	g_Configuration.EnableWindowedMode = enableWindowedMode;
 	g_Configuration.ShadowType = ShadowMode(shadowMode);
 	g_Configuration.ShadowBlobsMax = shadowBlobsMax;
 	g_Configuration.EnableCaustics = enableCaustics;

@@ -7,7 +7,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 // Directories
-constexpr auto REGKEY_ROOT	   = "Software\\TombEngine\\TombEngine1.1.0";
+constexpr auto REGKEY_ROOT	   = "Software\\TombEngine\\1.1.0";
 constexpr auto REGKEY_GRAPHICS = "Graphics";
 constexpr auto REGKEY_SOUND	   = "Sound";
 constexpr auto REGKEY_GAMEPLAY = "Gameplay";
