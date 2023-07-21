@@ -178,7 +178,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	// Open Graphics keys.
+	// Set Graphics keys.
 	if (SetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, g_Configuration.ScreenWidth) != ERROR_SUCCESS ||
 		SetDWORDRegKey(graphicsKey, REGKEY_SCREEN_HEIGHT, g_Configuration.ScreenHeight) != ERROR_SUCCESS ||
 		SetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, g_Configuration.EnableWindowedMode) != ERROR_SUCCESS ||
@@ -203,7 +203,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	// Open Sound keys.
+	// Set Sound keys.
 	if (SetDWORDRegKey(soundKey, REGKEY_SOUND_DEVICE, g_Configuration.SoundDevice) != ERROR_SUCCESS ||
 		SetBoolRegKey(soundKey, REGKEY_ENABLE_SOUND, g_Configuration.EnableSound) != ERROR_SUCCESS ||
 		SetBoolRegKey(soundKey, REGKEY_ENABLE_REVERB, g_Configuration.EnableReverb) != ERROR_SUCCESS ||
@@ -227,7 +227,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	// Open Gameplay keys.
+	// Set Gameplay keys.
 	if (SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
@@ -252,7 +252,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	// Open Input keys.
+	// Set Input keys.
 	g_Configuration.Bindings.resize(KEY_COUNT);
 	for (int i = 0; i < KEY_COUNT; i++)
 	{
