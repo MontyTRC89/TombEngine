@@ -428,9 +428,6 @@ bool LoadConfiguration()
 
 			if (GetDWORDRegKey(inputKey, buffer, &tempKey, Bindings[0][i]) != ERROR_SUCCESS)
 			{
-				// Reset key bindings when upgrading to engine version with new bindings available.
-				g_Configuration.Bindings = Bindings[0];
-
 				RegCloseKey(rootKey);
 				RegCloseKey(graphicsKey);
 				RegCloseKey(soundKey);
