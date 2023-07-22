@@ -202,7 +202,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 0;
 		obj->radius = 102;
-		obj->HitPoints = 1;
+		obj->HitPoints = 200;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
