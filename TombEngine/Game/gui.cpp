@@ -168,7 +168,7 @@ namespace TEN::Gui
 
 	bool GuiController::CanSelect() const
 	{
-		// Holding Deselect safely cancels input.
+		// Holding Deselect safely cancels select actions.
 		if (IsHeld(In::Deselect))
 			return false;
 
