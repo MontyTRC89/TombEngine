@@ -144,8 +144,16 @@ namespace TEN::Gui
 			break;
 		}
 
+		// Opposite action held; lock input.
 		bool isActionLocked = oppositeAction.has_value() ? IsHeld(*oppositeAction) : false;
-		return (IsPulsed(actionID, DELAY, INITIAL_DELAY) && !isActionLocked);
+		if (isActionLocked)
+			return false;
+
+		// Enforce initial delay if action is already pulsing prior to entering menu.
+		if (GetActionTimeActive(actionID) <= TimeInMenu || TimeInMenu >= round(INITIAL_DELAY / DELTA_TIME))
+			return IsPulsed(actionID, DELAY, INITIAL_DELAY);
+
+		return false;
 	}
 
 	bool GuiController::GuiIsSelected() const
