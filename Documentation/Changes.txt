@@ -26,6 +26,7 @@ Version 1.1.0
 * Fix Lara's shadow projecting only her joints on some occasions.
 * Fix sun and spot bulbs direction and sheen casts.
 * Fix room collector freezing game on some occasions.
+* Fix incorrect culling for scaled static meshes.
 * Fix normal mapping.
 * Add ability to save screenshot in the "Screenshots" subfolder by pressing the "Print screen" key.
 * Implement separate audio track channel for playing voiceovers with subtitles in .srt format.
