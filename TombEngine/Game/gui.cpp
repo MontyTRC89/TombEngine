@@ -156,9 +156,16 @@ namespace TEN::Gui
 		return false;
 	}
 
-	bool GuiController::GuiIsSelected() const
+	bool GuiController::GuiIsSelected(bool onClicked) const
 	{
-		return ((IsReleased(In::Select) || IsReleased(In::Action)) && CanSelect());
+		if (onClicked)
+		{
+			return ((IsClicked(In::Select) || IsClicked(In::Action)) && CanSelect());
+		}
+		else
+		{
+			return ((IsReleased(In::Select) || IsReleased(In::Action)) && CanSelect());
+		}
 	}
 	
 	bool GuiController::GuiIsDeselected() const
@@ -2202,7 +2209,7 @@ namespace TEN::Gui
 			if (Rings[(int)RingTypes::Ammo].ObjectListMovement)
 				return;
 
-			if (GuiIsSelected())
+			if (GuiIsSelected(false))
 			{
 				short invItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 				short ammoItem = Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].CurrentObjectInList].InventoryItem;
@@ -2454,7 +2461,7 @@ namespace TEN::Gui
 					}
 				}
 
-				if (GuiIsSelected())
+				if (GuiIsSelected(false))
 				{
 					if (CurrentOptions[CurrentSelectedOption].Type != MenuType::Equip && CurrentOptions[CurrentSelectedOption].Type != MenuType::Use)
 						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
