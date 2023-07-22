@@ -442,7 +442,7 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			auto length = Vector3(mesh->VisibilityBox.Extents).Length();
+			auto length = Vector3(mesh->VisibilityBox.Extents).Length() * mesh->Scale;
 			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, length))
 			{
 				continue;
