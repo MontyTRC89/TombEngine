@@ -120,7 +120,7 @@ namespace TEN::Entities::Creatures::TR1
 
 		if (skateItem.Status & ITEM_INVISIBLE)
 		{
-			skateItem.Active = false;
+			skateItem.Active = true;
 			skateItem.Status &= ~(ITEM_INVISIBLE);
 		}
 
