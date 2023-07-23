@@ -426,17 +426,17 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto vec2 = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
+					auto vec2 = Vec3(std::get<int(SavedVarType::Vec3)>(vars[second]));
 					solTables[i][vars[first]] = vec2;
 				}
 				else if (vars[second].index() == int(SavedVarType::Rotation))
 				{
-					auto vec2 = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
+					auto vec2 = Rotation(std::get<int(SavedVarType::Rotation)>(vars[second]));
 					solTables[i][vars[first]] = vec2;
 				}
 				else if (vars[second].index() == int(SavedVarType::Color))
 				{
-					auto color = D3DCOLOR{ std::get<int(SavedVarType::Color)>(vars[second]) };
+					auto color = D3DCOLOR(std::get<int(SavedVarType::Color)>(vars[second]));
 					solTables[i][vars[first]] = ScriptColor{color};
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))
