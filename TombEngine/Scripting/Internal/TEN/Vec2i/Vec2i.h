@@ -9,11 +9,11 @@ using namespace TEN::Math;
 class Vec2i
 {
 public:
+	static void Register(sol::table& parent);
+
 	// Members
 	int x = 0;
 	int y = 0;
-
-	static void Register(sol::table& parent);
 
 	// Constructors
 	Vec2i(int x, int y);

@@ -6,11 +6,11 @@ class Vec2i;
 class Vec2
 {
 public:
+	static void Register(sol::table& parent);
+
 	// Members
 	float x = 0;
 	float y = 0;
-
-	static void Register(sol::table& parent);
 
 	// Constructors
 	Vec2(float x, float y);
