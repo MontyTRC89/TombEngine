@@ -16,9 +16,9 @@ namespace TEN::Renderer
 		D3D11_RTV_DIMENSION rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		int sampleCount = 1;
 
-		if (g_Configuration.Antialiasing > AntialiasingMode::Low)
+		if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
 		{
-			int potentialSampleCount = (g_Configuration.Antialiasing == AntialiasingMode::Medium) ? 2 : 4;
+			int potentialSampleCount = (g_Configuration.AntialiasingMode == AntialiasingMode::Medium) ? 2 : 4;
 			unsigned int qualityLevels = 0;
 			if (device->CheckMultisampleQualityLevels(colorFormat, potentialSampleCount, &qualityLevels) == S_OK &&
 				qualityLevels > 0)

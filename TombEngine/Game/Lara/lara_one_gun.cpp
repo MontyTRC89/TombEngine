@@ -32,8 +32,8 @@
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Bubble;
-using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Drip;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Entities::Switches;
@@ -1666,18 +1666,16 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 						DoDamage(itemPtr, damage);
 					}
 				}
-
 			}
 			else if (itemPtr->ObjectNumber >= ID_SMASH_OBJECT1 &&
 					 itemPtr->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doShatter = hasHit = true;
 
-				// Smash objects are legacy objects from TRC. Let's make them explode in the legacy way.
+				// Smash objects are legacy objects from TRC. Make them explode in legacy way.
 				ExplodeItemNode(itemPtr, 0, 0, 128);
-				short currentItemNumber = (itemPtr - CollidedItems[0]);
-				SmashObject(currentItemNumber);
-				KillItem(currentItemNumber);
+				SmashObject(itemPtr->Index);
+				KillItem(itemPtr->Index);
 			}
 		}
 

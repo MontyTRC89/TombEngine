@@ -303,6 +303,8 @@ namespace TEN::Renderer
 
 		Texture2DArray m_shadowMap;
 
+		std::vector<short> m_visitedRoomsStack;
+
 		// Shaders
 		ComPtr<ID3D11VertexShader> m_vsRooms;
 		ComPtr<ID3D11VertexShader> m_vsRooms_Anim;
@@ -529,17 +531,17 @@ namespace TEN::Renderer
 		void DrawAllStrings();
 		void DrawLaserBarriers(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
-		void DrawRooms(RenderView& view, bool transparent);
+		void DrawRooms(RenderView& view, RendererPass rendererPass);
 		void DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawStaticsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
-		void DrawItems(RenderView& view, bool transparent);
+		void DrawItems(RenderView& view, RendererPass rendererPass);
 		void DrawItemsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
-		void DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent);
-		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, bool transparent);
+		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
+		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
 		void DrawBaddyGunflashes(RenderView& view);
-		void DrawStatics(RenderView& view, bool transparent);
-		void DrawLara(RenderView& view, bool transparent);
+		void DrawStatics(RenderView& view, RendererPass rendererPass);
+		void DrawLara(RenderView& view, RendererPass rendererPass);
 		void DrawFires(RenderView& view);
 		void DrawParticles(RenderView& view);
 		void DrawSmokes(RenderView& view);
@@ -549,8 +551,8 @@ namespace TEN::Renderer
 		void DrawWeatherParticles(RenderView& view);
 		void DrawDrips(RenderView& view);
 		void DrawBubbles(RenderView& view);
-		void DrawEffects(RenderView& view, bool transparent);
-		void DrawEffect(RenderView& view, RendererEffect* effect, bool transparent);
+		void DrawEffects(RenderView& view, RendererPass rendererPass);
+		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
 		void DrawSplashes(RenderView& view);
 		void DrawSprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
@@ -568,7 +570,7 @@ namespace TEN::Renderer
 		void DrawStatistics();
 		void DrawExamines();
 		void DrawDiary();
-		void DrawDebris(RenderView& view, bool transparent);
+		void DrawDebris(RenderView& view, RendererPass rendererPass);
 		void DrawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target,
 		                         ID3D11DepthStencilView* depthTarget);
 		void DrawShockwaves(RenderView& view);
@@ -579,10 +581,10 @@ namespace TEN::Renderer
 		void DrawSmokeParticles(RenderView& view);
 		void DrawSparkParticles(RenderView& view);
 		void DrawExplosionParticles(RenderView& view);
-		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
-		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
-		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, bool transparent);
-		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
+		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass);
+		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass);
+		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass);
+		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RendererPass rendererPass);
 		void DrawSimpleParticles(RenderView& view);
 		void DrawStreamers(RenderView& view);
 		void DrawFootprints(RenderView& view);
