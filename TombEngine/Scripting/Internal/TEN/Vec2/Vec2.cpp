@@ -40,7 +40,7 @@ void Vec2::Register(sol::table& parent)
 		@tparam float length new length to set.
 		@function Vec2:ToLength
 		*/
-		ScriptReserved_ToLength, &Vec2::ToLength,
+		ScriptReserved_ToLength, &Vec2::SetLength,
 
 		/// (float) x coordinate
 		//@mem x
@@ -80,7 +80,7 @@ Vec2i Vec2::ToVec2i()
 	return Vec2i((int)round(x), (int)round(y));
 }
 
-void Vec2::ToLength(float length)
+void Vec2::SetLength(float length)
 {
 	float currentLength = sqrt(SQUARE(x) + SQUARE(y));
 	x = (x / currentLength) * length;

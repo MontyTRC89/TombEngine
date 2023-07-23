@@ -16,9 +16,11 @@ public:
 	Vec2(float x, float y);
 	Vec2(const Vector2& pos);
 
+	// Setters
+	void SetLength(float length);
+
 	// Converters
 	Vec2i ToVec2i();
-	void ToLength(float length);
 
 	// Meta functions
 	[[nodiscard]] std::string ToString() const;
