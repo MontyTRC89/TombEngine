@@ -118,7 +118,7 @@ Save::Vector3 FromVector3(const Vector3& vec)
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(const Vector3i& vec)
+Save::Vector3 FromVector3i(const Vector3i& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
@@ -408,7 +408,7 @@ bool SaveGame::Save(int slot)
 	context.add_target_orient(&FromEulerAngles(Lara.Context.TargetOrientation));
 	context.add_vehicle_item_number(Lara.Context.Vehicle);
 	context.add_water_current_active(Lara.Context.WaterCurrentActive);
-	context.add_water_current_pull(&FromVector3(Lara.Context.WaterCurrentPull));
+	context.add_water_current_pull(&FromVector3i(Lara.Context.WaterCurrentPull));
 	context.add_water_surface_dist(Lara.Context.WaterSurfaceDist);
 	auto contextOffset = context.Finish();
 
@@ -1071,27 +1071,27 @@ bool SaveGame::Save(int slot)
 
 		std::vector<const Save::Vector3*> segments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			segments.push_back(&FromVector3(rope->segment[i]));
+			segments.push_back(&FromVector3i(rope->segment[i]));
 		auto segmentsOffset = fbb.CreateVector(segments);
 
 		std::vector<const Save::Vector3*> velocities;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			velocities.push_back(&FromVector3(rope->velocity[i]));
+			velocities.push_back(&FromVector3i(rope->velocity[i]));
 		auto velocitiesOffset = fbb.CreateVector(velocities);
 
 		std::vector<const Save::Vector3*> normalisedSegments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			normalisedSegments.push_back(&FromVector3(rope->normalisedSegment[i]));
+			normalisedSegments.push_back(&FromVector3i(rope->normalisedSegment[i]));
 		auto normalisedSegmentsOffset = fbb.CreateVector(normalisedSegments);
 
 		std::vector<const Save::Vector3*> meshSegments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			meshSegments.push_back(&FromVector3(rope->meshSegment[i]));
+			meshSegments.push_back(&FromVector3i(rope->meshSegment[i]));
 		auto meshSegmentsOffset = fbb.CreateVector(meshSegments);
 
 		std::vector<const Save::Vector3*> coords;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			coords.push_back(&FromVector3(rope->coords[i]));
+			coords.push_back(&FromVector3i(rope->coords[i]));
 		auto coordsOffset = fbb.CreateVector(coords);
 
 		Save::RopeBuilder ropeInfo{ fbb };
@@ -1102,21 +1102,21 @@ bool SaveGame::Save(int slot)
 		ropeInfo.add_normalised_segments(normalisedSegmentsOffset);
 		ropeInfo.add_coords(coordsOffset);
 		ropeInfo.add_coiled(rope->coiled);
-		ropeInfo.add_position(&FromVector3(rope->position));
+		ropeInfo.add_position(&FromVector3i(rope->position));
 		ropeInfo.add_segment_length(rope->segmentLength);
 
 		ropeOffset = ropeInfo.Finish();
 
 		Save::PendulumBuilder pendulumInfo{ fbb };
 		pendulumInfo.add_node(CurrentPendulum.node);
-		pendulumInfo.add_position(&FromVector3(CurrentPendulum.position));
-		pendulumInfo.add_velocity(&FromVector3(CurrentPendulum.velocity));
+		pendulumInfo.add_position(&FromVector3i(CurrentPendulum.position));
+		pendulumInfo.add_velocity(&FromVector3i(CurrentPendulum.velocity));
 		pendulumOffset = pendulumInfo.Finish();
 
 		Save::PendulumBuilder alternatePendulumInfo{ fbb };
 		alternatePendulumInfo.add_node(AlternatePendulum.node);
-		alternatePendulumInfo.add_position(&FromVector3(AlternatePendulum.position));
-		alternatePendulumInfo.add_velocity(&FromVector3(AlternatePendulum.velocity));
+		alternatePendulumInfo.add_position(&FromVector3i(AlternatePendulum.position));
+		alternatePendulumInfo.add_velocity(&FromVector3i(AlternatePendulum.velocity));
 		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
@@ -1204,7 +1204,7 @@ bool SaveGame::Save(int slot)
 
 			case SavedVarType::Vec3:
 			{
-				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
+				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
 			}
 			break;
 
