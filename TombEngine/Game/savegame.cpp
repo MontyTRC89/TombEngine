@@ -103,7 +103,12 @@ Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
 	return Save::EulerAngles(eulers.x, eulers.y, eulers.z);
 }
 
-Save::Vector2 FromVector2(const Vector2i& vec)
+Save::Vector2 FromVector2(const Vector2& vec)
+{
+	return Save::Vector2(vec.x, vec.y);
+}
+
+Save::Vector2 FromVector2i(const Vector2i& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
@@ -125,17 +130,22 @@ Save::Vector4 FromVector4(const Vector4& vec)
 
 EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
 {
-	return EulerAngles((short)eulers->x(), (short)eulers->y(), (short)eulers->z());
+	return EulerAngles((short)round(eulers->x()), (short)round(eulers->y()), (short)round(eulers->z()));
+}
+
+Vector2 ToVector2(const Save::Vector2* vec)
+{
+	return Vector2(vec->x(), vec->y());
 }
 
 Vector2i ToVector2i(const Save::Vector2* vec)
 {
-	return Vector2i((int)vec->x(), (int)vec->y());
+	return Vector2i((int)round(vec->x()), (int)round(vec->y()));
 }
 
 Vector3i ToVector3i(const Save::Vector3* vec)
 {
-	return Vector3i((int)vec->x(), (int)vec->y(), (int)vec->z());
+	return Vector3i((int)round(vec->x()), (int)round(vec->y()), (int)round(vec->z()));
 }
 
 Vector3 ToVector3(const Save::Vector3* vec)
@@ -1185,6 +1195,12 @@ bool SaveGame::Save(int slot)
 				SaveVec(SavedVarType::Vec2, s, Save::vec2TableBuilder, Save::VarUnion::vec2, Save::Vector2, FromVector2);
 			}
 			break;
+			
+			case SavedVarType::Vec2i:
+			{
+				SaveVec(SavedVarType::Vec2i, s, Save::vec2iTableBuilder, Save::VarUnion::vec2i, Save::Vector2, FromVector2i);
+			}
+			break;
 
 			case SavedVarType::Vec3:
 			{
@@ -2099,7 +2115,14 @@ bool SaveGame::Load(int slot)
 			{
 				auto stored = var->u_as_vec2()->vec();
 				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec2>(ToVector2i(stored));
+				var.emplace<(int)SavedVarType::Vec2i>(ToVector2(stored));
+				loadedVars.push_back(var);
+			}
+			else if (var->u_type() == Save::VarUnion::vec2i)
+			{
+				auto stored = var->u_as_vec2i()->vec();
+				SavedVar var;
+				var.emplace<(int)SavedVarType::Vec2i>(ToVector2i(stored));
 				loadedVars.push_back(var);
 			}
 			else if (var->u_type() == Save::VarUnion::vec3)

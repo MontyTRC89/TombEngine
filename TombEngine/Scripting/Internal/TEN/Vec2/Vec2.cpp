@@ -7,63 +7,53 @@
 using namespace TEN::Math;
 
 /***
-Represents a 2D vector.
+Represents a float-based 2D vector.
 @tenprimitive Vec2
 @pragma nostrip
 */
 
 void Vec2::Register(sol::table& parent)
 {
-	using ctors = sol::constructors<Vec2(int, int)>;
+	using ctors = sol::constructors<Vec2(float, float)>;
 
 	parent.new_usertype<Vec2>(
 		ScriptReserved_Vec2,
 		ctors(),
 		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Vec2::ToString,
-		sol::meta_function::addition, &AddVec2s,
-		sol::meta_function::subtraction, &SubtractVec2s,
-		sol::meta_function::unary_minus, &UnaryMinusVec2,
-		sol::meta_function::multiplication, &MultiplyVec2Number,
+		sol::meta_function::addition, &Vec2::Add,
+		sol::meta_function::subtraction, &Vec2::Subtract,
+		sol::meta_function::unary_minus, &Vec2::UnaryMinus,
+		sol::meta_function::multiplication, &Vec2::MultiplyByScale,
 
-/*** Modify this vector so that it becomes close to the requested length.
-
-Note that since the engine uses integers instead of floating-point
-numbers, this will be less accurate at smaller lengths.
-@tparam float length the new length to set the vector to.
-@function Vec2:ToLength
-*/
+		/*** Modify this vector so that it becomes close to the input length.
+		@tparam float length new length to set.
+		@function Vec2:ToLength
+		*/
 		ScriptReserved_ToLength, &Vec2::ToLength,
 
-		/// (int) x coordinate
+		/// (float) x coordinate
 		//@mem x
 		"x", &Vec2::x,
 
-		/// (int) y coordinate
+		/// (float) y coordinate
 		//@mem y
-
-		"y", &Vec2::y
-		);
+		"y", &Vec2::y);
 }
 
 /*** 
-@int X x coordinate
-@int Y y coordinate
+@float X x coordinate
+@float Y y coordinate
 @treturn Vec2 A Vec2 object.
 @function Vec2
 */
-Vec2::Vec2(int aX, int aY) : x{ aX }, y{ aY }
+Vec2::Vec2(float aX, float aY) : x(aX), y(aY)
 {
 }
 
-Vec2::Vec2(const Vector2i& pos) : x{ pos.x }, y{ pos.y }
+Vec2::Vec2(const Vector2& pos) : x(pos.x), y(pos.y)
 {
 }
-
-Vec2::operator Vector2i() const
-{
-	return Vector2i(x, y);
-};
 
 /*** Metafunction; use tostring(myVector)
 @tparam Vec2 Vec2 this Vec2
@@ -75,29 +65,34 @@ std::string Vec2::ToString() const
 	return "{" + std::to_string(x) + ", " + std::to_string(y) + "}";
 }
 
-Vec2 AddVec2s(const Vec2& vector0, const Vec2& vector1)
+void Vec2::ToLength(float length)
+{
+	float currentLength = sqrt(SQUARE(x) + SQUARE(y));
+	x = (x / currentLength) * length;
+	y = (y / currentLength) * length;
+}
+
+Vec2 Vec2::Add(const Vec2& vector0, const Vec2& vector1)
 {
 	return Vec2(vector0.x + vector1.x, vector0.y + vector1.y);
 }
 
-Vec2 SubtractVec2s(const Vec2& vector0, const Vec2& vector1)
+Vec2 Vec2::Subtract(const Vec2& vector0, const Vec2& vector1)
 {
 	return Vec2(vector0.x - vector1.x, vector0.y - vector1.y);
 }
 
-Vec2 MultiplyVec2Number(const Vec2& vector, float scale)
+Vec2 Vec2::MultiplyByScale(const Vec2& vector, float scale)
 {
-	return Vec2(int(vector.x * scale), int(vector.y * scale));
+	return Vec2(vector.x * scale, vector.y * scale);
 }
 
-Vec2 UnaryMinusVec2(const Vec2& vector)
+Vec2 Vec2::UnaryMinus(const Vec2& vector)
 {
 	return Vec2(vector.x * -1, vector.y * -1);
 }
 
-void Vec2::ToLength(float newLength)
+Vec2::operator Vector2() const
 {
-	float length = sqrt(SQUARE(x) + SQUARE(y));
-	x = (int)round((x / length) * newLength);
-	y = (int)round((y / length) * newLength);
-}
+	return Vector2(x, y);
+};

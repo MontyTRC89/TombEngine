@@ -9,8 +9,9 @@
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Vec2i/Vec2i.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
@@ -39,16 +40,16 @@ enum class CallbackPoint
 
 static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
 {
-	{ScriptReserved_PreStart, CallbackPoint::PreStart},
-	{ScriptReserved_PostStart, CallbackPoint::PostStart},
-	{ScriptReserved_PreLoad, CallbackPoint::PreLoad},
-	{ScriptReserved_PostLoad, CallbackPoint::PostLoad},
-	{ScriptReserved_PreControlPhase, CallbackPoint::PreControl},
-	{ScriptReserved_PostControlPhase, CallbackPoint::PostControl},
-	{ScriptReserved_PostSave, CallbackPoint::PostSave},
-	{ScriptReserved_PreSave, CallbackPoint::PreSave},
-	{ScriptReserved_PreEnd, CallbackPoint::PreEnd},
-	{ScriptReserved_PostEnd, CallbackPoint::PostEnd},
+	{ ScriptReserved_PreStart, CallbackPoint::PreStart },
+	{ ScriptReserved_PostStart, CallbackPoint::PostStart },
+	{ ScriptReserved_PreLoad, CallbackPoint::PreLoad },
+	{ ScriptReserved_PostLoad, CallbackPoint::PostLoad },
+	{ ScriptReserved_PreControlPhase, CallbackPoint::PreControl },
+	{ ScriptReserved_PostControlPhase, CallbackPoint::PostControl },
+	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
+	{ ScriptReserved_PreSave, CallbackPoint::PreSave },
+	{ ScriptReserved_PreEnd, CallbackPoint::PreEnd },
+	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd }
 };
 
 enum class LevelEndReason
@@ -62,11 +63,11 @@ enum class LevelEndReason
 
 static const std::unordered_map<std::string, LevelEndReason> kLevelEndReasons
 {
-	{ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete},
-	{ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame},
-	{ScriptReserved_EndReasonExitToTitle, LevelEndReason::ExitToTitle},
-	{ScriptReserved_EndReasonDeath, LevelEndReason::Death},
-	{ScriptReserved_EndReasonOther, LevelEndReason::Other},
+	{ ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete },
+	{ ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame },
+	{ ScriptReserved_EndReasonExitToTitle, LevelEndReason::ExitToTitle },
+	{ ScriptReserved_EndReasonDeath, LevelEndReason::Death },
+	{ ScriptReserved_EndReasonOther, LevelEndReason::Other }
 };
 
 static constexpr char const* strKey = "__internal_name";
@@ -81,6 +82,7 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 		case sol::type::string:
 			tab.raw_set(key, value);
 			break;
+
 		default:
 			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ErrorMode::Terminate);
 			break;
@@ -118,6 +120,7 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 	case sol::type::userdata:
 	{
 		if (value.is<Vec2>() ||
+			value.is<Vec2i>() ||
 			value.is<Vec3>() ||
 			value.is<Rotation>() ||
 			value.is<ScriptColor>())
@@ -145,15 +148,15 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 {
 	m_handler.GetState()->set_function("print", &LogicHandler::LogPrint, this);
 
-	sol::table table_logic{ m_handler.GetState()->lua_state(), sol::create };
+	sol::table tableLogic{ m_handler.GetState()->lua_state(), sol::create };
 
-	parent.set(ScriptReserved_Logic, table_logic);
+	parent.set(ScriptReserved_Logic, tableLogic);
 
-	table_logic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
-	table_logic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
+	tableLogic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
+	tableLogic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
 
-	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_EndReason, kLevelEndReasons);
-	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_CallbackPoint, kCallbackPoints);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, kLevelEndReasons);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, kCallbackPoints);
 
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreStart, &m_callbacksPreStart));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostStart, &m_callbacksPostStart));
@@ -166,7 +169,7 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreEnd, &m_callbacksPreEnd));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostEnd, &m_callbacksPostEnd));
 
-	LevelFunc::Register(table_logic);
+	LevelFunc::Register(tableLogic);
 
 	ResetScripts(true);
 }
@@ -248,10 +251,10 @@ void LogicHandler::ResetLevelTables()
 sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, const std::string& name)
 {
 	std::string partName = tab.raw_get<std::string>(strKey);
-	auto& theMap = m_levelFuncs_tablesOfNames[partName];
+	auto& map = m_levelFuncs_tablesOfNames[partName];
 
-	auto fullNameIt = theMap.find(name);
-	if (fullNameIt != std::cend(theMap))
+	auto fullNameIt = map.find(name);
+	if (fullNameIt != std::cend(map))
 	{
 		std::string_view key = fullNameIt->second;
 		if (m_levelFuncs_levelFuncObjects[key].valid())
@@ -411,10 +414,15 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
-				else if (vars[second].index() == int(SavedVarType::Vec2))
+				else if (vars[second].index() == (int)SavedVarType::Vec2)
 				{
-					auto vec2 = Vec2{ std::get<int(SavedVarType::Vec2)>(vars[second]) };
+					auto vec2 = Vec2(std::get<(int)SavedVarType::Vec2>(vars[second]));
 					solTables[i][vars[first]] = vec2;
+				}
+				else if (vars[second].index() == (int)SavedVarType::Vec2i)
+				{
+					auto vec2i = Vec2i(std::get<(int)SavedVarType::Vec2i>(vars[second]));
+					solTables[i][vars[first]] = vec2i;
 				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
@@ -634,9 +642,9 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 
 				case sol::type::userdata:
 				{
-					if (second.is<Vec2>())
+					if (second.is<Vec2i>())
 					{
-						putInVars(Handle<SavedVarType::Vec2, Vector2i>(second.as<Vec2>(), varsMap, numVars, vars));
+						putInVars(Handle<SavedVarType::Vec2i, Vector2i>(second.as<Vec2i>(), varsMap, numVars, vars));
 					}
 					else if (second.is<Vec3>())
 					{
