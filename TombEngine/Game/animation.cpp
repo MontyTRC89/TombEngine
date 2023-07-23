@@ -233,7 +233,9 @@ void AnimateItem(ItemInfo* item)
 
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
-	auto animVel = animPtr->VelocityStart + (((animPtr->VelocityEnd - animPtr->VelocityStart) / frameCount) * currentFrame);
+
+	auto animAccel = (animPtr->VelocityEnd - animPtr->VelocityStart) / frameCount;
+	auto animVel = animPtr->VelocityStart + (animAccel * currentFrame);
 
 	if (item->Animation.IsAirborne)
 	{
@@ -259,7 +261,7 @@ void AnimateItem(ItemInfo* item)
 			else
 			{
 				item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
-				item->Animation.Velocity.z += (animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount;
+				item->Animation.Velocity.z += animAccel.z;
 
 				item->Pose.Position.y += item->Animation.Velocity.y;
 			}
@@ -274,7 +276,7 @@ void AnimateItem(ItemInfo* item)
 	{
 		if (item->IsLara())
 		{
-			const auto& player = *GetLaraInfo(item);
+			const auto& player = GetLaraInfo(*item);
 
 			bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item));
 			item->Animation.Velocity.z = isInSwamp ? (animVel.z / 2) : animVel.z;
@@ -288,7 +290,7 @@ void AnimateItem(ItemInfo* item)
 	
 	if (item->IsLara())
 	{
-		const auto& player = *GetLaraInfo(item);
+		const auto& player = GetLaraInfo(*item);
 
 		item->Animation.Velocity.x = animVel.x;
 
