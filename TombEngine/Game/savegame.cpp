@@ -2115,7 +2115,7 @@ bool SaveGame::Load(int slot)
 			{
 				auto stored = var->u_as_vec2()->vec();
 				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec2i>(ToVector2(stored));
+				var.emplace<(int)SavedVarType::Vec2>(ToVector2(stored));
 				loadedVars.push_back(var);
 			}
 			else if (var->u_type() == Save::VarUnion::vec2i)
