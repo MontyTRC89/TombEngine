@@ -2091,8 +2091,8 @@ bool SaveGame::Load(int slot)
 	{
 		for (const auto& var : *(unionVec->members()))
 		{
-			auto varUnion = var->u_type();
-			switch (varUnion)
+			auto varType = var->u_type();
+			switch (varType)
 			{
 			case Save::VarUnion::num:
 				loadedVars.push_back(var->u_as_num()->scalar());
