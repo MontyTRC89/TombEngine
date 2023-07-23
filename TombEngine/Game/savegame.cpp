@@ -662,7 +662,7 @@ bool SaveGame::Save(int slot)
 		Save::ItemBuilder serializedItem{ fbb };
 
 		if (Objects.CheckID(itemToSerialize.ObjectNumber, true))
-			serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - Objects[itemToSerialize.ObjectNumber].animIndex);
+			serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber);
 
 		serializedItem.add_next_item(itemToSerialize.NextItem);
 		serializedItem.add_next_item_active(itemToSerialize.NextActive);

@@ -367,18 +367,18 @@ void LoadObjects()
 					switch (animCommand)
 					{
 					case AnimCommandType::MoveOrigin:
-						{
-							auto relOffset = ReadVector3();
-							command = std::make_unique<MoveOriginCommand>(relOffset);
-						}
+					{
+						auto relOffset = ReadVector3();
+						command = std::make_unique<MoveOriginCommand>(relOffset);
+					}
 						break;
 
 					case AnimCommandType::JumpVelocity:
-						{
-							auto jumpVel = ReadVector3();
-							command = std::make_unique<JumpVelocityCommand>(jumpVel);
-						}
-						break;
+					{
+						auto jumpVel = ReadVector3();
+						command = std::make_unique<JumpVelocityCommand>(jumpVel);
+					}
+					break;
 
 					case AnimCommandType::AttackReady:
 						command = std::make_unique<AttackReadyCommand>();
@@ -389,21 +389,21 @@ void LoadObjects()
 						break;
 
 					case AnimCommandType::SoundEffect:
-						{
-							int soundID = ReadInt32();
-							int frameNumber = ReadInt32();
+					{
+						int soundID = ReadInt32();
+						int frameNumber = ReadInt32();
 
-							command = std::make_unique<SoundEffectCommand>(soundID, frameNumber);
-						}
+						command = std::make_unique<SoundEffectCommand>(soundID, frameNumber);
+					}
 						break;
 
 					case AnimCommandType::Flipeffect:
-						{
-							int flipeffectID = ReadInt32();
-							int frameNumber = ReadInt32();
+					{
+						int flipeffectID = ReadInt32();
+						int frameNumber = ReadInt32();
 
-							command = std::make_unique<FlipeffectCommand>(flipeffectID, frameNumber);
-						}
+						command = std::make_unique<FlipeffectCommand>(flipeffectID, frameNumber);
+					}
 						break;
 
 					default:

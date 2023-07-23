@@ -77,6 +77,24 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 	}
 }
 
+// TODO: Not completely correct.
+// HACK: Arm frames for pistols, uzis, and revolver currently remain absolute.
+int GetNormalizedArmAnimFrame(GAME_OBJECT_ID animObjectID, int frameNumber)
+{
+	int frameCount = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		const auto& anim = GetAnimData(animObjectID, i);
+
+		if (frameNumber <= anim.EndFrameNumber)
+			return frameNumber;
+
+		frameNumber -= anim.EndFrameNumber;
+	}
+
+	return 0;
+}
+
 void Renderer11::UpdateLaraAnimations(bool force)
 {
 	auto& rItem = m_items[LaraItem->Index];
@@ -177,14 +195,22 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 		case LaraWeaponType::Revolver:
 		{
+			auto leftAnimData = GetNormalizedArmAnimFrame(Lara.LeftArm.AnimObjectID, Lara.LeftArm.FrameNumber);
+			const auto& leftAnim = GetAnimData(Lara.LeftArm.AnimObjectID, Lara.LeftArm.AnimNumber);
+			auto leftFrame = leftAnim.GetKeyframeInterpData(leftAnimData).Keyframe0;
+
+			auto rightAnimData = GetNormalizedArmAnimFrame(Lara.RightArm.AnimObjectID, Lara.RightArm.FrameNumber);
+			const auto& rightAnim = GetAnimData(Lara.RightArm.AnimObjectID, Lara.RightArm.AnimNumber);
+			auto rightFrame = leftAnim.GetKeyframeInterpData(rightAnimData).Keyframe0;
+
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			auto frameDataLeft = KeyframeInterpData(leftArmFrame, leftArmFrame, 0.0f);
+			auto frameDataLeft = KeyframeInterpData(leftFrame, leftFrame, 0.0f);
 			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			auto frameDataRight = KeyframeInterpData(rightArmFrame, rightArmFrame, 0.0f);
+			auto frameDataRight = KeyframeInterpData(rightFrame, rightFrame, 0.0f);
 			UpdateAnimation(&rItem, playerObject, frameDataRight, mask);
 		}
 
@@ -194,10 +220,18 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::Uzi:
 		default:
 		{
+			auto leftAnimData = GetNormalizedArmAnimFrame(Lara.LeftArm.AnimObjectID, Lara.LeftArm.FrameNumber);
+			const auto& leftAnim = GetAnimData(Lara.LeftArm.AnimObjectID, Lara.LeftArm.AnimNumber);
+			auto leftFrame = leftAnim.GetKeyframeInterpData(leftAnimData).Keyframe0;
+
+			auto rightAnimData = GetNormalizedArmAnimFrame(Lara.RightArm.AnimObjectID, Lara.RightArm.FrameNumber);
+			const auto& rightAnim = GetAnimData(Lara.RightArm.AnimObjectID, Lara.RightArm.AnimNumber);
+			auto rightFrame = leftAnim.GetKeyframeInterpData(rightAnimData).Keyframe0;
+
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			auto interpDataLeft = KeyframeInterpData(leftArmFrame, leftArmFrame, 0.0f);
+			auto interpDataLeft = KeyframeInterpData(leftFrame, leftFrame, 0.0f);
 
 			UpdateAnimation(&rItem, playerObject, interpDataLeft, upperArmMask, true);
 			UpdateAnimation(&rItem, playerObject, interpDataLeft, mask);
@@ -205,7 +239,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			auto interpDataRight = KeyframeInterpData(rightArmFrame, rightArmFrame, 0.0f);
+			auto interpDataRight = KeyframeInterpData(rightFrame, rightFrame, 0.0f);
 			
 			UpdateAnimation(&rItem, playerObject, interpDataRight, upperArmMask, true);
 			UpdateAnimation(&rItem, playerObject, interpDataRight, mask);
