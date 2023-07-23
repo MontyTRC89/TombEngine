@@ -233,6 +233,7 @@ void AnimateItem(ItemInfo* item)
 
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
+	auto animVel = animPtr->VelocityStart + (((animPtr->VelocityEnd - animPtr->VelocityStart) / frameCount) * currentFrame);
 
 	if (item->Animation.IsAirborne)
 	{
@@ -275,15 +276,13 @@ void AnimateItem(ItemInfo* item)
 		{
 			const auto& player = *GetLaraInfo(item);
 
-			if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-				item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame) / 4);
-			else
-				item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+			bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item));
+			item->Animation.Velocity.z = isInSwamp ? (animVel.z / 2) : animVel.z;
 		}
 		else
 		{
-			item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
-			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+			item->Animation.Velocity.x = animVel.x;
+			item->Animation.Velocity.z = animVel.z;
 		}
 	}
 	
@@ -291,7 +290,7 @@ void AnimateItem(ItemInfo* item)
 	{
 		const auto& player = *GetLaraInfo(item);
 
-		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
+		item->Animation.Velocity.x = animVel.x;
 
 		if (player.Control.Rope.Ptr != -1)
 			DelAlignLaraToRope(item);
