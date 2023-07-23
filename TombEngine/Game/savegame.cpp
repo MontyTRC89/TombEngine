@@ -2091,19 +2091,22 @@ bool SaveGame::Load(int slot)
 	{
 		for (const auto& var : *(unionVec->members()))
 		{
-			if (var->u_type() == Save::VarUnion::num)
+			auto varUnion = var->u_type();
+			switch (varUnion)
 			{
+			case Save::VarUnion::num:
 				loadedVars.push_back(var->u_as_num()->scalar());
-			}
-			else if (var->u_type() == Save::VarUnion::boolean)
-			{
+				break;
+
+			case Save::VarUnion::boolean:
 				loadedVars.push_back(var->u_as_boolean()->scalar());
-			}
-			else if (var->u_type() == Save::VarUnion::str)
-			{
+				break;
+					
+			case Save::VarUnion::str:
 				loadedVars.push_back(var->u_as_str()->str()->str());
-			}
-			else if (var->u_type() == Save::VarUnion::tab)
+				break;
+					
+			case Save::VarUnion::tab:
 			{
 				auto tab = var->u_as_tab()->keys_vals();
 				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
@@ -2111,41 +2114,54 @@ bool SaveGame::Load(int slot)
 				for (const auto& pair : *tab)
 					std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
 			}
-			else if (var->u_type() == Save::VarUnion::vec2)
+				break;
+					
+			case Save::VarUnion::vec2:
 			{
 				auto stored = var->u_as_vec2()->vec();
 				SavedVar var;
 				var.emplace<(int)SavedVarType::Vec2>(ToVector2(stored));
 				loadedVars.push_back(var);
 			}
-			else if (var->u_type() == Save::VarUnion::vec2i)
+				break;
+					
+			case Save::VarUnion::vec2i:
 			{
 				auto stored = var->u_as_vec2i()->vec();
 				SavedVar var;
 				var.emplace<(int)SavedVarType::Vec2i>(ToVector2i(stored));
 				loadedVars.push_back(var);
 			}
-			else if (var->u_type() == Save::VarUnion::vec3)
+				break;
+					
+			case Save::VarUnion::vec3:
 			{
 				auto stored = var->u_as_vec3()->vec();
 				SavedVar var;
 				var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
 				loadedVars.push_back(var);
 			}
-			else if (var->u_type() == Save::VarUnion::rotation)
+				break;
+					
+			case Save::VarUnion::rotation:
 			{
 				auto stored = var->u_as_rotation()->vec();
 				SavedVar var;
 				var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
 				loadedVars.push_back(var);
 			}
-			else if (var->u_type() == Save::VarUnion::color)
-			{
+				break;
+					
+			case Save::VarUnion::color:
 				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
-			}
-			else if (var->u_type() == Save::VarUnion::funcName)
-			{
+				break;
+	
+			case Save::VarUnion::funcName:
 				loadedVars.push_back(FuncName{var->u_as_funcName()->str()->str()});
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
