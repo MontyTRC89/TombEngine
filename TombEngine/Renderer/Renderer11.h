@@ -380,9 +380,9 @@ namespace TEN::Renderer
 		// Text
 		std::unique_ptr<SpriteFont> m_gameFont;
 		std::vector<RendererStringToDraw> m_strings;
-		int m_blinkColorValue;
-		int m_blinkColorDirection;
-		bool m_blinkUpdated = false;
+		float BlinkColorValue = 0.0f;
+		float BlinkTime		  = 0.0f;
+		bool  IsBlinkUpdated  = false;
 
 		// System resources
 		Texture2D m_logo;
