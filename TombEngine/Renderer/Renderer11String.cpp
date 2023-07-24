@@ -28,7 +28,7 @@ namespace TEN::Renderer
 			auto factor = Vector2(screenRes.x / SCREEN_SPACE_RES.x, screenRes.y / SCREEN_SPACE_RES.y);
 			float uiScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
 			float fontSpacing = m_gameFont->GetLineSpacing();
-			float fontScale   = REFERENCE_FONT_SIZE / fontSpacing;
+			float fontScale = REFERENCE_FONT_SIZE / fontSpacing;
 
 			auto stringLines = SplitString(string);
 			float yOffset = 0.0f;
@@ -40,7 +40,7 @@ namespace TEN::Renderer
 				rString.Flags = flags;
 				rString.X = 0;
 				rString.Y = 0;
-				rString.Color = color.ToVector3() * UCHAR_MAX;
+				rString.Color = color.ToVector3();
 				rString.Scale = (uiScale * fontScale) * scale;
 
 				// Measure string.
@@ -51,7 +51,7 @@ namespace TEN::Renderer
 
 				if (flags & PRINTSTRING_BLINK)
 				{
-					rString.Color = Vector3(BlinkColorValue * UCHAR_MAX);
+					rString.Color *= BlinkColorValue;
 
 					if (!IsBlinkUpdated)
 					{
@@ -79,7 +79,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawAllStrings()
 	{
-		float shadeOffset = 1.5f / (REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing());
+		float shadowOffset = 1.5f / (REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing());
 
 		m_spriteBatch->Begin();
 
@@ -90,7 +90,7 @@ namespace TEN::Renderer
 			{
 				m_gameFont->DrawString(
 					m_spriteBatch.get(), rString.String.c_str(),
-					Vector2(rString.X + shadeOffset * rString.Scale, rString.Y + shadeOffset * rString.Scale),
+					Vector2(rString.X + shadowOffset * rString.Scale, rString.Y + shadowOffset * rString.Scale),
 					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent,
 					0.0f, Vector4::Zero, rString.Scale);
 			}
@@ -99,7 +99,7 @@ namespace TEN::Renderer
 			m_gameFont->DrawString(
 				m_spriteBatch.get(), rString.String.c_str(),
 				Vector2(rString.X, rString.Y),
-				Vector4(rString.Color.x / UCHAR_MAX, rString.Color.y / UCHAR_MAX, rString.Color.z / UCHAR_MAX, 1.0f) * ScreenFadeCurrent,
+				Vector4(rString.Color.x, rString.Color.y, rString.Color.z, 1.0f) * ScreenFadeCurrent,
 				0.0f, Vector4::Zero, rString.Scale);
 		}
 
