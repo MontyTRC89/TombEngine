@@ -1097,8 +1097,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GuiIsDeselected() ||
-			IsClicked(In::Pause))
+		if (GuiIsDeselected() || IsClicked(In::Pause))
 		{
 			if (MenuToDisplay == Menu::Pause)
 			{
@@ -3141,7 +3140,7 @@ namespace TEN::Gui
 
 			UpdateInputActions(item);
 
-			if (IsClicked(In::Deselect))
+			if (GuiIsDeselected() || IsClicked(In::Inventory))
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				exitLoop = true;
