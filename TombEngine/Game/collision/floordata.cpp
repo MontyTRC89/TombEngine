@@ -946,7 +946,7 @@ namespace TEN::Collision::Floordata
 		constexpr auto HALF_BLOCK  = BLOCK(0.5f);
 
 		// Get 2D label position.
-		auto labelPos = pos + Vector3(HALF_BLOCK, 0.0f, -HALF_BLOCK);
+		auto labelPos = pos + Vector3(HALF_BLOCK, 0.0f, HALF_BLOCK);
 		auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
 
 		// Draw label.
@@ -993,11 +993,12 @@ namespace TEN::Collision::Floordata
 		{
 			for (int z = minZ; z < maxZ; z++)
 			{
-				pointColl = GetCollision(pos, item.RoomNumber);
-
 				pos.x = BLOCK(x);
-				pos.y = pointColl.Position.Floor;
 				pos.z = BLOCK(z);
+				
+				pointColl = GetCollision(pos, item.RoomNumber);
+				pos.y = pointColl.Position.Floor;
+				
 
 				float verticalOffset = STRING_SPACING;
 
