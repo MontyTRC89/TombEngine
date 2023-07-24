@@ -56,7 +56,7 @@ namespace TEN::Renderer
 					if (!IsBlinkUpdated)
 					{
 						// Calculate blink increment based on sine wave.
-						BlinkColorValue = (0.5 * (std::sin(BlinkTime) + BLINK_VALUE_MAX)) + BLINK_VALUE_MIN;
+						BlinkColorValue = (0.5 * (sin(BlinkTime) + BLINK_VALUE_MAX)) + BLINK_VALUE_MIN;
 
 						// Update blink time.
 						BlinkTime += BLINK_TIME_STEP;
@@ -67,11 +67,9 @@ namespace TEN::Renderer
 					}
 				}
 
-				m_strings.push_back(rString);
-
 				yOffset += size.y;
+				m_strings.push_back(rString);
 			}
-
 		}
 		catch (std::exception& ex)
 		{
