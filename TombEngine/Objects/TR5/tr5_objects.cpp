@@ -49,7 +49,7 @@
 #include "Objects/TR5/Object/tr5_genslot.h"
 #include "Objects/TR5/Object/tr5_highobject.h"
 #include "Objects/TR5/Object/tr5_missile.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Objects/Generic/Object/Pushables/PushableObject.h"
 #include "Objects/TR5/Object/tr5_raisingblock.h"
 #include "Objects/TR5/Switch/tr5_raisingcog.h"
 #include "Objects/TR5/Object/tr5_teleporter.h"

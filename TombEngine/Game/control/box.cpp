@@ -19,7 +19,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Objects/Generic/Object/Pushables/PushableObject.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Effects::Smoke;
@@ -2130,8 +2130,8 @@ void InitializeItemBoxData()
 	{
 		auto* currentItem = &g_Level.Items[i];
 
-		if (currentItem->Active && currentItem->Data.is<PushableInfo>())
-			ClearMovableBlockSplitters(currentItem->Pose.Position, currentItem->RoomNumber);
+		//if (currentItem->Active && currentItem->Data.is<PushableInfo>())
+			//ClearMovableBlockSplitters(currentItem->Pose.Position, currentItem->RoomNumber);
 	}
 
 	for (auto& room : g_Level.Rooms)

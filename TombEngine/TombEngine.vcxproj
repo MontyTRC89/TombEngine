@@ -433,6 +433,12 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\Object\generic_trapdoor.h" />
     <ClInclude Include="Objects\Generic\Object\objects.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_Info.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_Physics.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_Scans.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_Sounds.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_Stack.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
     <ClInclude Include="Objects\Generic\Switches\AirlockSwitch.h" />
     <ClInclude Include="Objects\Generic\Switches\cog_switch.h" />
@@ -626,8 +632,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_highobject.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_missile.h" />
-    <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h" />
-    <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_raisingblock.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_rollingball.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_teleporter.h" />
@@ -647,6 +651,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Utils\object_helper.h" />
     <ClInclude Include="Objects\game_object_ids.h" />
     <ClInclude Include="Objects\objectslist.h" />
+    <ClInclude Include="PushableObject_Sounds.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ShaderFogBulb.h" />
     <ClInclude Include="Renderer\ConstantBuffers\SkyBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffer\ConstantBuffer.h" />
@@ -885,6 +890,11 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Object\generic_trapdoor.cpp" />
     <ClCompile Include="Objects\Generic\Object\objects.cpp" />
     <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject_Physics.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject_Scans.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject_Sounds.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject_Stack.cpp" />
     <ClCompile Include="Objects\Generic\Object\rope.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Switches\AirlockSwitch.cpp" />
@@ -1063,7 +1073,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_highobject.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_missile.cpp" />
-    <ClCompile Include="Objects\TR5\Object\tr5_pushableblock.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_raisingblock.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_rollingball.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_teleporter.cpp" />
