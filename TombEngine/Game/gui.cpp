@@ -121,7 +121,7 @@ namespace TEN::Gui
 		constexpr auto INITIAL_DELAY = 0.4f;
 
 		// Action already held prior to entering menu; lock input.
-		if (GetActionTimeActive(actionID) > TimeInMenu)
+		if (GetActionTimeActive(actionID) >= TimeInMenu)
 			return false;
 
 		// Pulse only directional inputs.
