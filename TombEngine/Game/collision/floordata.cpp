@@ -962,15 +962,6 @@ namespace TEN::Collision::Floordata
 		constexpr auto DRAW_RANGE	  = BLOCK(3);
 		constexpr auto STRING_SPACING = -20.0f;
 
-		constexpr auto STOPPER_STRING		 = "Stopper";
-		constexpr auto DEATH_STRING			 = "Death";
-		constexpr auto MONKEY_SWING_STRING	 = "Monkey Swing";
-		constexpr auto BEETLE_STRING		 = "Beetle";
-		constexpr auto ACTIVATOR_STRING		 = "Activator";
-		constexpr auto MINECART_RIGHT_STRING = " / Minecart Right";
-		constexpr auto MINECART_LEFT_STRING  = " / Minecart Left";
-		constexpr auto MINECART_STOP_STRING  = "Minecart Stop";
-
 		constexpr auto STOPPER_COLOR				 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
 		constexpr auto DEATH_COLOR					 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
 		constexpr auto MONKEY_SWING_COLOR			 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
@@ -1004,28 +995,28 @@ namespace TEN::Collision::Floordata
 				// Stopper
 				if (pointColl.Block->Stopper)
 				{
-					DrawSectorFlagLabel(pos, STOPPER_STRING, STOPPER_COLOR, verticalOffset);
+					DrawSectorFlagLabel(pos, "Stopper", STOPPER_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 				
 				// Death
 				if (pointColl.Block->Flags.Death)
 				{
-					DrawSectorFlagLabel(pos, DEATH_STRING, DEATH_COLOR, verticalOffset);
+					DrawSectorFlagLabel(pos, "Death", DEATH_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 
 				// Monkey Swing
 				if (pointColl.Block->Flags.Monkeyswing)
 				{
-					DrawSectorFlagLabel(pos, MONKEY_SWING_STRING, MONKEY_SWING_COLOR, verticalOffset);
+					DrawSectorFlagLabel(pos, "Monkey Swing", MONKEY_SWING_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 
 				// Beetle / Minecart Right
 				if (pointColl.Block->Flags.MarkBeetle)
 				{
-					auto labelString = std::string(BEETLE_STRING) + (!pointColl.Block->Flags.MinecartStop() ? MINECART_RIGHT_STRING : "");
+					auto labelString = std::string("Beetle") + (!pointColl.Block->Flags.MinecartStop() ? " / Minecart Right" : "");
 					DrawSectorFlagLabel(pos, labelString, BEETLE_MINECART_RIGHT_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
@@ -1033,7 +1024,7 @@ namespace TEN::Collision::Floordata
 				// Activator / Minecart Left
 				if (pointColl.Block->Flags.MarkTriggerer)
 				{
-					auto labelString = std::string(ACTIVATOR_STRING) + (!pointColl.Block->Flags.MinecartStop() ? MINECART_LEFT_STRING : "");
+					auto labelString = std::string("Activator") + (!pointColl.Block->Flags.MinecartStop() ? " / Minecart Left" : "");
 					DrawSectorFlagLabel(pos, labelString, ACTIVATOR_MINECART_LEFT_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
@@ -1041,12 +1032,10 @@ namespace TEN::Collision::Floordata
 				// Minecart Stop
 				if (pointColl.Block->Flags.MinecartStop())
 				{
-					DrawSectorFlagLabel(pos, MINECART_STOP_STRING, MINECART_STOP_COLOR, verticalOffset);
+					DrawSectorFlagLabel(pos, "Minecart Stop", MINECART_STOP_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 			}
 		}
-
-		// TODO: Maybe draw box to help visually lock down which sector a label refers to?
 	}
 }
