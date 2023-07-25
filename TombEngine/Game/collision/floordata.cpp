@@ -962,6 +962,15 @@ namespace TEN::Collision::Floordata
 		constexpr auto DRAW_RANGE	  = BLOCK(3);
 		constexpr auto STRING_SPACING = -20.0f;
 
+		constexpr auto STOPPER_STRING		 = "Stopper";
+		constexpr auto DEATH_STRING			 = "Death";
+		constexpr auto MONKEY_SWING_STRING	 = "Monkey Swing";
+		constexpr auto BEETLE_STRING		 = "Beetle";
+		constexpr auto ACTIVATOR_STRING		 = "Activator";
+		constexpr auto MINECART_RIGHT_STRING = " / Minecart Right";
+		constexpr auto MINECART_LEFT_STRING  = " / Minecart Left";
+		constexpr auto MINECART_STOP_STRING  = "Minecart Stop";
+
 		constexpr auto STOPPER_COLOR				 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
 		constexpr auto DEATH_COLOR					 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
 		constexpr auto MONKEY_SWING_COLOR			 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
@@ -969,15 +978,6 @@ namespace TEN::Collision::Floordata
 		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
 		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
 		
-		static const auto STOPPER_STRING		= "Stopper";
-		static const auto DEATH_STRING			= "Death";
-		static const auto MONKEY_SWING_STRING	= "Monkey Swing";
-		static const auto BEETLE_STRING			= "Beetle";
-		static const auto ACTIVATOR_STRING		= "Activator";
-		static const auto MINECART_RIGHT_STRING = " / Minecart Right";
-		static const auto MINECART_LEFT_STRING	= " / Minecart Left";
-		static const auto MINECART_STOP_STRING	= "Minecart Stop";
-
 		// Only check sectors in player vicinity.
 		const auto& room = g_Level.Rooms[item.RoomNumber];
 		int minX = std::max(item.Pose.Position.x - DRAW_RANGE, room.x) / BLOCK(1);
@@ -998,7 +998,6 @@ namespace TEN::Collision::Floordata
 				
 				pointColl = GetCollision(pos, item.RoomNumber);
 				pos.y = pointColl.Position.Floor;
-				
 
 				float verticalOffset = STRING_SPACING;
 
