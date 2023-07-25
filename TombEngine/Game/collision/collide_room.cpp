@@ -229,12 +229,16 @@ static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSe
 
 	if (collSetup.BlockFloorSlopeUp &&
 		sectorAttribs.FloorSlope &&
+		sectorAttribs.Floor <= STEPUP_HEIGHT &&
+		sectorAttribs.Floor >= -STEPUP_HEIGHT &&
 		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		sectorAttribs.Floor = MAX_HEIGHT;
 	}
 	else if (collSetup.BlockFloorSlopeDown &&
 		sectorAttribs.FloorSlope &&
+		sectorAttribs.Floor <= STEPUP_HEIGHT &&
+		sectorAttribs.Floor >= -STEPUP_HEIGHT &&
 		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		sectorAttribs.Floor = MAX_HEIGHT;
