@@ -642,7 +642,11 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 
 				case sol::type::userdata:
 				{
-					if (second.is<Vec2i>())
+					if (second.is<Vec2>())
+					{
+						putInVars(Handle<SavedVarType::Vec2, Vector2>(second.as<Vec2>(), varsMap, numVars, vars));
+					}
+					else if (second.is<Vec2i>())
 					{
 						putInVars(Handle<SavedVarType::Vec2i, Vector2i>(second.as<Vec2i>(), varsMap, numVars, vars));
 					}
