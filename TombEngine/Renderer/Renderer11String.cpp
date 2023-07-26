@@ -5,6 +5,16 @@
 
 namespace TEN::Renderer
 {
+	void Renderer11::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RENDERER_DEBUG_PAGE page)
+	{
+		constexpr auto FLAGS = PRINTSTRING_OUTLINE | PRINTSTRING_CENTER;
+
+		if (m_numDebugPage != page)
+			return;
+
+		AddString(string, pos, color, scale, FLAGS);
+	}
+
 	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
 	{
 		AddString(std::string(string), Vector2(x, y), Color(color), 1.0f, flags);
