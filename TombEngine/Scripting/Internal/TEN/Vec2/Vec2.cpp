@@ -7,7 +7,7 @@
 using namespace TEN::Math;
 
 /***
-Float-based 2D vector.
+Represents a float-based 2D vector.
 @tenprimitive Vec2
 @pragma nostrip
 */
@@ -46,7 +46,7 @@ void Vec2::Register(sol::table& parent)
 /*** 
 @float X x coordinate
 @float Y y coordinate
-@treturn Vec2 A Vec2 object.
+@treturn Vec2 A Vec2 object
 @function Vec2
 */
 Vec2::Vec2(float aX, float aY) : x(aX), y(aY)
@@ -59,7 +59,7 @@ Vec2::Vec2(const Vector2& pos) : x(pos.x), y(pos.y)
 
 /*** Metafunction; use tostring(myVector)
 @tparam Vec2 Vec2 this Vec2
-@treturn string A string showing the x, y, and z values of the Vec2
+@treturn string A string showing the x and y values of the Vec2
 @function __tostring
 */
 std::string Vec2::ToString() const
