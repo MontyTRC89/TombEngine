@@ -29,18 +29,18 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_CLOSE_RANGE = SQUARE(BLOCK(3));
 	constexpr auto DRAGON_IDLE_RANGE  = SQUARE(BLOCK(6));
 
-	constexpr auto DRAGON_LIVE_TIME = 30 * 11;
-	constexpr auto DRAGON_ALMOST_LIVE = 100;
-	constexpr auto BOOM_TIME = 130;
-	constexpr auto BOOM_TIME_MIDDLE = 140;
-	constexpr auto BOOM_TIME_END = 150;
+	constexpr auto DRAGON_LIVE_TIME		 = 30 * 11;
+	constexpr auto DRAGON_ALMOST_LIVE	 = 100;
+	constexpr auto EXPLOSION_TIME		 = 130;
+	constexpr auto EXPLOSION_TIME_MIDDLE = 140;
+	constexpr auto EXPLOSION_TIME_END	 = 150;
 
-	constexpr auto BARTOLI_RANGE = BLOCK(9);
-	constexpr auto DRAGON_CLOSE = 900;
-	constexpr auto DRAGON_FAR = 2300;
-	constexpr auto DRAGON_MID = ((DRAGON_CLOSE + DRAGON_FAR) / 2);
-	constexpr auto DRAGON_LCOL = -CLICK(2);
-	constexpr auto DRAGON_RCOL = CLICK(2);
+	constexpr auto DRAGON_SPAWN_RANGE = BLOCK(9);
+	constexpr auto DRAGON_CLOSE		  = 900;
+	constexpr auto DRAGON_FAR		  = 2300;
+	constexpr auto DRAGON_MID		  = ((DRAGON_CLOSE + DRAGON_FAR) / 2);
+	constexpr auto DRAGON_LCOL		  = -CLICK(2);
+	constexpr auto DRAGON_RCOL		  = CLICK(2);
 
 	constexpr auto DRAGON_WALK_TURN_RATE_MAX   = ANGLE(2.0f);
 	constexpr auto DRAGON_TURN_THRESHOLD_ANGLE = ANGLE(1.0f);
@@ -143,7 +143,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	static void SpawnExplosion(const ItemInfo& item)
+	static void SpawnDragonExplosion(const ItemInfo& item)
 	{
 		int explosionItemNumber = CreateItem();
 		if (explosionItemNumber == NO_ITEM)
@@ -153,15 +153,15 @@ namespace TEN::Entities::Creatures::TR2
 
 		switch (item.Timer)
 		{
-		case BOOM_TIME:
+		case EXPLOSION_TIME:
 			explosion.ObjectNumber = ID_SPHERE_OF_DOOM;
 			break;
 
-		case (BOOM_TIME + 10):
+		case (EXPLOSION_TIME + 10):
 			explosion.ObjectNumber = ID_SPHERE_OF_DOOM2;
 			break;
 
-		case (BOOM_TIME + 20):
+		case (EXPLOSION_TIME + 20):
 			explosion.ObjectNumber = ID_SPHERE_OF_DOOM3;
 			break;
 		}
@@ -647,20 +647,20 @@ namespace TEN::Entities::Creatures::TR2
 			SpawnBartoliLight(item, 1);
 			AnimateItem(&item);
 
-			if (item.Timer == BOOM_TIME ||
-				item.Timer == (BOOM_TIME + 10) ||
-				item.Timer == (BOOM_TIME + 20))
+			if (item.Timer == EXPLOSION_TIME ||
+				item.Timer == (EXPLOSION_TIME + 10) ||
+				item.Timer == (EXPLOSION_TIME + 20))
 			{
 				dragonFrontNumber = CreateItem();
 				if (dragonFrontNumber != NO_ITEM)
 				{
 					dragonFrontPtr = &g_Level.Items[dragonFrontNumber];
 
-					if (item.Timer == BOOM_TIME)
+					if (item.Timer == EXPLOSION_TIME)
 					{
 						dragonFrontPtr->ObjectNumber = ID_SPHERE_OF_DOOM;
 					}
-					else if (item.Timer == BOOM_TIME + 10)
+					else if (item.Timer == EXPLOSION_TIME + 10)
 					{
 						dragonFrontPtr->ObjectNumber = ID_SPHERE_OF_DOOM2;
 					}
@@ -681,7 +681,7 @@ namespace TEN::Entities::Creatures::TR2
 					dragonFrontPtr->Status = ITEM_ACTIVE;
 				}
 			}
-			else if (item.Timer >= (BOOM_TIME + 30))
+			else if (item.Timer >= (EXPLOSION_TIME + 30))
 			{
 				CreateDragon(item);
 
@@ -700,8 +700,8 @@ namespace TEN::Entities::Creatures::TR2
 				KillItem(itemNumber);
 			}
 		}
-		else if (abs(LaraItem->Pose.Position.x - item.Pose.Position.x) < BARTOLI_RANGE &&
-			abs(LaraItem->Pose.Position.z - item.Pose.Position.z) < BARTOLI_RANGE)
+		else if (abs(LaraItem->Pose.Position.x - item.Pose.Position.x) < DRAGON_SPAWN_RANGE &&
+			abs(LaraItem->Pose.Position.z - item.Pose.Position.z) < DRAGON_SPAWN_RANGE)
 		{
 			item.Timer = 1;
 		}
