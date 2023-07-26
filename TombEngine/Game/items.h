@@ -19,8 +19,8 @@ constexpr auto NUM_ITEMS	 = 1024;
 constexpr auto NUM_ITEM_FLAGS = 8;
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS = 0;
-constexpr int		   NO_JOINT = -1;
+constexpr unsigned int NO_JOINT_BITS  = 0;
+constexpr int		   NO_JOINT		  = -1;
 
 enum AIObjectType
 {
@@ -179,15 +179,13 @@ short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
 void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
-void InitializeFXArray(int allocateMemory);
-short CreateNewEffect(short roomNumber);
+int CreateNewEffect(int roomNumber, GAME_OBJECT_ID objectID, const Pose& pose);
 void KillEffect(short fxNumber);
 void InitializeItem(short itemNumber);
 void InitializeItemArray(int totalItems);
 void KillItem(short itemNumber);
 bool UpdateItemRoom(short itemNumber);
 void UpdateAllItems();
-void UpdateAllEffects();
 const std::string& GetObjectName(GAME_OBJECT_ID objectID);
 std::vector<int> FindAllItems(GAME_OBJECT_ID objectID);
 std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID);

@@ -308,7 +308,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawParticles(RenderView& view)
 	{
 		for (int i = 0; i < ParticleNodeOffsetIDs::NodeMax; i++)
-			NodeOffsets[i].gotIt = false;
+			NodeOffsets[i].IsActive = false;
 
 		for (auto& particle : Particles)
 		{
@@ -321,9 +321,9 @@ namespace TEN::Renderer
 
 				if (particle.flags & SP_FX)
 				{
-					const auto& fx = EffectList[particle.fxObj];
+					const auto& fx = g_Level.Items[particle.fxObj];
 
-					pos += fx.pos.Position.ToVector3();
+					pos += fx.Pose.Position.ToVector3();
 
 					if ((particle.sLife - particle.life) > Random::GenerateInt(8, 12))
 					{
@@ -343,30 +343,32 @@ namespace TEN::Renderer
 				{
 					auto* item = &g_Level.Items[particle.fxObj];
 
-					auto nodePos = Vector3i::Zero;
+					auto nodeOffset = Vector3i::Zero;
 					if (particle.flags & SP_NODEATTACH)
 					{
-						if (NodeOffsets[particle.nodeNumber].gotIt)
+						if (NodeOffsets[particle.nodeNumber].IsActive)
 						{
-							nodePos = NodeVectors[particle.nodeNumber];
+							nodeOffset = NodeVectors[particle.nodeNumber];
 						}
 						else
 						{
-							nodePos.x = NodeOffsets[particle.nodeNumber].x;
-							nodePos.y = NodeOffsets[particle.nodeNumber].y;
-							nodePos.z = NodeOffsets[particle.nodeNumber].z;
+							nodeOffset = Vector3i(NodeOffsets[particle.nodeNumber].RelOffset);
 
-							int meshIndex = NodeOffsets[particle.nodeNumber].meshNum;
+							int meshIndex = NodeOffsets[particle.nodeNumber].BoneID;
 							if (meshIndex >= 0)
-								nodePos = GetJointPosition(item, meshIndex, nodePos);
+							{
+								nodeOffset = GetJointPosition(item, meshIndex, nodeOffset);
+							}
 							else
-								nodePos = GetJointPosition(LaraItem, -meshIndex, nodePos);
+							{
+								nodeOffset = GetJointPosition(LaraItem, -meshIndex, nodeOffset);
+							}
 
-							NodeOffsets[particle.nodeNumber].gotIt = true;
-							NodeVectors[particle.nodeNumber] = nodePos;
+							NodeOffsets[particle.nodeNumber].IsActive = true;
+							NodeVectors[particle.nodeNumber] = nodeOffset;
 						}
 
-						pos += nodePos.ToVector3();
+						pos += nodeOffset.ToVector3();
 
 						if ((particle.sLife - particle.life) > Random::GenerateInt(4, 8))
 						{

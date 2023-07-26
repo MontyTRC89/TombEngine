@@ -87,7 +87,6 @@ int GetRandomControl();
 int GetRandomDraw();
 
 void KillMoveItems();
-void KillMoveEffects();
 void UpdateShatters();
 
 void CleanUp();

@@ -204,38 +204,45 @@ struct Vector4 {
 	w: float;
 }
 
+table FXInfo {
+	counter : int32;
+	flag1: int32;
+	flag2: int32;
+}
+
 union ItemData {
-    /*byte,
-    ubyte,
-    bool,
-    short,
-    ushort,
-    int,
-    uint,
-    float,
-    long,
-    ulong,
-    double,*/
-    Int,
-    Short,
-    Float,
-    ShortArray,
-    ItemNumber,
-    Creature,
-    LaserHead,
-    QuadBike,
-    BigGun,
-    Motorbike,
-    Jeep,
-    LaraInfo,
-    Kayak,
-    Door,
-    Skidoo,
-    UPV,
-    Motorboat,
-    GameVector,
-    Wraith,
-    Rubberboat,
-    Pushable,
-    Minecart
+	/*byte,
+	ubyte,
+	bool,
+	short,
+	ushort,
+	int,
+	uint,
+	float,
+	long,
+	ulong,
+	double,*/
+	Int,
+	Short,
+	Float,
+	ShortArray,
+	ItemNumber,
+	Creature,
+	LaserHead,
+	QuadBike,
+	BigGun,
+	Motorbike,
+	Jeep,
+	LaraInfo,
+	Kayak,
+	Door,
+	Skidoo,
+	UPV,
+	Motorboat,
+	GameVector,
+	Wraith,
+	Rubberboat,
+	Pushable,
+	Minecart,
+	FXInfo
 }

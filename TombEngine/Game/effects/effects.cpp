@@ -39,39 +39,48 @@ using namespace TEN::Math::Random;
 using TEN::Renderer::g_Renderer;
 
 // New particle class
-Particle Particles[MAX_PARTICLES];
+Particle		Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
-FX_INFO EffectList[NUM_EFFECTS];
-
 GameBoundingBox DeadlyBounds;
-SPLASH_SETUP SplashSetup;
-SPLASH_STRUCT Splashes[MAX_SPLASHES];
-int SplashCount = 0;
 
-Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
-NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
+SPLASH_SETUP  SplashSetup;
+SPLASH_STRUCT Splashes[MAX_SPLASHES];
+int			  SplashCount = 0;
+
+Vector3i	   NodeVectors[ParticleNodeOffsetIDs::NodeMax];
+NodeOffsetData NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
 {
-	{ -16, 40, 160, 13, false },		// TR5 offset 0
-	{ -16, -8, 160, 0, false },			// TR5 offset 1
-	{ 0, 0, 256, 8, false },			// TR5 offset 2
-	{ 0, 0, 256, 17, false },			// TR5 offset 3
-	{ 0, 0, 256, 26, false },			// TR5 offset 4
-	{ 0, 144, 40, 10, false },			// TR5 offset 5
-	{ -40, 64, 360, 14, false },		// TR5 offset 6
-	{ 0, -600, -40, 0, false },			// TR5 offset 7
-	{ 0, 32, 16, 9, false },			// TR5 offset 8
-	{ 0, 340, 64, 7, false },			// TR3 offset 9
-	{ 0, 0, -96, 10, false },			// TR3 offset 10
-	{ 16, 48, 320, 13, false },			// TR3 offset 11
-	{ 0, -256, 0, 5, false },			// TR3 offset 12
-	{ 0, 64, 0, 10, false },			// TR3 offset 13
-	{ 0, 64, 0, 13, false },			// TR3 offset 14
-	{ -32, -16, -192, 13, false },		// TR3 offset 15
-	{ -64, 410, 0, 20, false },			// TR3 offset 16
-	{ 64, 410, 0, 23, false },			// TR3 offset 17
-	{ 0, 0, 0, 0, false }				// Empty offset 18
+	{ Vector3(-16, 40, 160), 13, false },		// TR5 offset 0
+	{ Vector3(-16, -8, 160), 0, false },		// TR5 offset 1
+	{ Vector3(0, 0, 256), 8, false },			// TR5 offset 2
+	{ Vector3(0, 0, 256), 17, false },			// TR5 offset 3
+	{ Vector3(0, 0, 256), 26, false },			// TR5 offset 4
+	{ Vector3(0, 144, 40), 10, false },			// TR5 offset 5
+	{ Vector3(-40, 64, 360), 14, false },		// TR5 offset 6
+	{ Vector3(0, -600, -40), 0, false },		// TR5 offset 7
+	{ Vector3(0, 32, 16), 9, false },			// TR5 offset 8
+	{ Vector3(0, 340, 64), 7, false },			// TR3 offset 9
+	{ Vector3(0, 0, -96), 10, false },			// TR3 offset 10
+	{ Vector3(16, 48, 320), 13, false },		// TR3 offset 11
+	{ Vector3(0, -256, 0), 5, false },			// TR3 offset 12
+	{ Vector3(0, 64, 0), 10, false },			// TR3 offset 13
+	{ Vector3(0, 64, 0), 13, false },			// TR3 offset 14
+	{ Vector3(-32, -16, -192), 13, false },		// TR3 offset 15
+	{ Vector3(-64, 410, 0), 20, false },		// TR3 offset 16
+	{ Vector3(64, 410, 0), 23, false },			// TR3 offset 17
+	{ Vector3::Zero, 0, false }					// Empty offset 18
 };
+
+FXInfo& GetFXInfo(ItemInfo& fx)
+{
+	return (FXInfo&)fx.Data;
+}
+
+const FXInfo& GetFXInfo(const ItemInfo& fx)
+{
+	return (FXInfo&)fx.Data;
+}
 
 void DetatchSpark(int number, SpriteEnumFlag type)
 {
@@ -83,35 +92,39 @@ void DetatchSpark(int number, SpriteEnumFlag type)
 		{
 			switch (type)
 			{
-				case SP_FX:
-					if (sptr->flags & SP_DAMAGE)
-						sptr->on = false;
-					else
-					{
-						auto* fx = &EffectList[number];
+			case SP_FX:
+				if (sptr->flags & SP_DAMAGE)
+				{
+					sptr->on = false;
+				}
+				else
+				{
+					const auto& fx = g_Level.Items[number];
 
-						sptr->x += fx->pos.Position.x;
-						sptr->y += fx->pos.Position.y;
-						sptr->z += fx->pos.Position.z;
-						sptr->flags &= ~SP_FX;
-					}
+					sptr->x += fx.Pose.Position.x;
+					sptr->y += fx.Pose.Position.y;
+					sptr->z += fx.Pose.Position.z;
+					sptr->flags &= ~SP_FX;
+				}
 
-					break;
+				break;
 
-				case SP_ITEM:
-					if (sptr->flags & SP_DAMAGE)
-						sptr->on = false;
-					else
-					{
-						auto* item = &g_Level.Items[number];
+			case SP_ITEM:
+				if (sptr->flags & SP_DAMAGE)
+				{
+					sptr->on = false;
+				}
+				else
+				{
+					const auto& item = g_Level.Items[number];
 
-						sptr->x += item->Pose.Position.x;
-						sptr->y += item->Pose.Position.y;
-						sptr->z += item->Pose.Position.z;
-						sptr->flags &= ~SP_ITEM;
-					}
+					sptr->x += item.Pose.Position.x;
+					sptr->y += item.Pose.Position.y;
+					sptr->z += item.Pose.Position.z;
+					sptr->flags &= ~SP_ITEM;
+				}
 
-					break;
+				break;
 			}
 		}
 	}
@@ -122,7 +135,6 @@ Particle* GetFreeParticle()
 	int result = -1;
 
 	// Get first free available spark
-
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
 		auto* particle = &Particles[i];
@@ -134,8 +146,7 @@ Particle* GetFreeParticle()
 		}
 	}
 
-	// No free sparks left, hijack existing one with less possible life
-
+	// No free sparks left; hijack existing one with shortest remaining life.
 	int life = INT_MAX;
 	if (result == -1)
 	{
@@ -181,13 +192,13 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 void UpdateSparks()
 {
 	auto bounds = GameBoundingBox(LaraItem);
-	DeadlyBounds = GameBoundingBox(
-		LaraItem->Pose.Position.x + bounds.X1,
-		LaraItem->Pose.Position.x + bounds.X2,
-		LaraItem->Pose.Position.y + bounds.Y1,
-		LaraItem->Pose.Position.y + bounds.Y2,
-		LaraItem->Pose.Position.z + bounds.Z1,
-		LaraItem->Pose.Position.z + bounds.Z2);
+	DeadlyBounds = bounds + GameBoundingBox(
+		LaraItem->Pose.Position.x,
+		LaraItem->Pose.Position.x,
+		LaraItem->Pose.Position.y,
+		LaraItem->Pose.Position.y,
+		LaraItem->Pose.Position.z,
+		LaraItem->Pose.Position.z);
 
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
@@ -445,42 +456,35 @@ void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	auto* spark = GetFreeParticle();
 
-	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
-		dz >= -BLOCK(16) && dz <= BLOCK(16))
-	{
-		auto* spark = GetFreeParticle();
-
-		int random = rand();
+	int random = rand();
 		
-		spark->sR = -1;
-		spark->sB = -1;
-		spark->sG = -1;
-		spark->dR = -1;
-		spark->on = true;
-		spark->colFadeSpeed = 3;
-		spark->fadeToBlack = 5;
-		spark->dG = (random & 0x7F) + 64;
-		spark->dB = -64 - ((random & 0x7F) + 64);
-		spark->life = 10;
-		spark->sLife = 10;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->friction = 34;
-		spark->scalar = 1;
-		spark->x = (random & 7) + x - 3;
-		spark->y = ((random >> 3) & 7) + y - 3;
-		spark->z = ((random >> 6) & 7) + z - 3;
-		spark->flags = SP_SCALE;
-		spark->xVel = (random >> 2) + xv - 128;
-		spark->yVel = (random >> 4) + yv - 128;
-		spark->zVel = (random >> 6) + zv - 128;
-		spark->sSize = spark->size = ((random >> 9) & 3) + 4;
-		spark->dSize = ((random >> 12) & 1) + 1;
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-	}
+	spark->sR = -1;
+	spark->sB = -1;
+	spark->sG = -1;
+	spark->dR = -1;
+	spark->on = true;
+	spark->colFadeSpeed = 3;
+	spark->fadeToBlack = 5;
+	spark->dG = (random & 0x7F) + 64;
+	spark->dB = -64 - ((random & 0x7F) + 64);
+	spark->life = 10;
+	spark->sLife = 10;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->friction = 34;
+	spark->scalar = 1;
+	spark->x = (random & 7) + x - 3;
+	spark->y = ((random >> 3) & 7) + y - 3;
+	spark->z = ((random >> 6) & 7) + z - 3;
+	spark->flags = SP_SCALE;
+	spark->xVel = (random >> 2) + xv - 128;
+	spark->yVel = (random >> 4) + yv - 128;
+	spark->zVel = (random >> 6) + zv - 128;
+	spark->sSize = spark->size = ((random >> 9) & 3) + 4;
+	spark->dSize = ((random >> 12) & 1) + 1;
+	spark->maxYvel = 0;
+	spark->gravity = 0;
 }
 
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber, const Vector3& mainColor, const Vector3& secondColor)
@@ -713,52 +717,45 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	auto* spark = GetFreeParticle();
 
-	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
-		dz >= -BLOCK(16) && dz <= BLOCK(16))
+	spark->sR = 128;
+	spark->dR = 128;
+	spark->dG = 128;
+	spark->dB = 128;
+	spark->on = 1;
+	spark->life = 24;
+	spark->sLife = 24;
+	spark->sG = 64;
+	spark->sB = 0;
+	spark->colFadeSpeed = 8;
+	spark->fadeToBlack = 12;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->x = x;
+	spark->y = y;
+	spark->z = z;
+	spark->xVel = 0;
+	spark->yVel = 0;
+	spark->zVel = 0;
+	spark->friction = 0;
+	spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
+	spark->scalar = 3;
+	spark->gravity = 0;
+	spark->maxYvel = 0;
+
+	int size = (GetRandomControl() & 7) + 63;
+	spark->sSize = size >> 1;
+	spark->size = size >> 1;
+	spark->dSize = 2 * size;
+
+	for (int i = 0; i < 8; i++)
 	{
-		auto* spark = GetFreeParticle();
-
-		spark->sR = 128;
-		spark->dR = 128;
-		spark->dG = 128;
-		spark->dB = 128;
-		spark->on = 1;
-		spark->life = 24;
-		spark->sLife = 24;
-		spark->sG = 64;
-		spark->sB = 0;
-		spark->colFadeSpeed = 8;
-		spark->fadeToBlack = 12;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->x = x;
-		spark->y = y;
-		spark->z = z;
-		spark->xVel = 0;
-		spark->yVel = 0;
-		spark->zVel = 0;
-		spark->friction = 0;
-		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
-		spark->scalar = 3;
-		spark->gravity = 0;
-		spark->maxYvel = 0;
-
-		int size = (GetRandomControl() & 7) + 63;
-		spark->sSize = size >> 1;
-		spark->size = size >> 1;
-		spark->dSize = 2 * size;
-
-		for (int i = 0; i < 8; i++)
-		{
-			auto pos = Vector3(
-				(GetRandomControl() & 0x1FF) + x - 256,
-				(GetRandomControl() & 0x7F) + y - 64,
-				(GetRandomControl() & 0x1FF) + z - 256);
-			SpawnBubble(pos, roomNumber, (int)BubbleFlags::HighAmplitude);
-		}
+		auto pos = Vector3(
+			(GetRandomControl() & 0x1FF) + x - 256,
+			(GetRandomControl() & 0x7F) + y - 64,
+			(GetRandomControl() & 0x1FF) + z - 256);
+		SpawnBubble(pos, roomNumber, (int)BubbleFlags::HighAmplitude);
 	}
 }
 
@@ -816,9 +813,13 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 	spark->rotAng = GetRandomControl() & 0xFFF;
 
 	if (GetRandomControl() & 1)
+	{
 		spark->rotAdd = -16 - (GetRandomControl() & 0xF);
+	}
 	else
+	{
 		spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+	}
 
 	spark->scalar = 3;
 
@@ -840,119 +841,100 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 
 void TriggerExplosionSmoke(int x, int y, int z, int uw)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
-	
-	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
-		dz >= -BLOCK(16) && dz <= BLOCK(16))
-	{
-		auto* spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
-		spark->sR = 144;
-		spark->sG = 144;
-		spark->sB = 144;
-		spark->on = 1;
-		spark->dR = 64;
-		spark->dG = 64;
-		spark->dB = 64;
-		spark->colFadeSpeed = 2;
-		spark->fadeToBlack = 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_SUBTRACTIVE;
-		spark->life = spark->sLife = (GetRandomControl() & 3) + 10;
-		spark->x = (GetRandomControl() & 0x1FF) + x - 256;
-		spark->y = (GetRandomControl() & 0x1FF) + y - 256;
-		spark->z = (GetRandomControl() & 0x1FF) + z - 256;
-		spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-		spark->yVel = GetRandomControl() - 128;
-		spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-
-		if (uw)
-			spark->friction = 2;
-		else
-			spark->friction = 6;
-
-		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->scalar = 1;
-		spark->rotAdd = (GetRandomControl() & 0xF) + 16;
-		spark->gravity = -3 - (GetRandomControl() & 3);
-		spark->maxYvel = -4 - (GetRandomControl() & 3);
-		spark->dSize = (GetRandomControl() & 0x1F) + 128;
-		spark->sSize = spark->dSize / 4;
-		spark->size = spark->dSize / 4;
-	}
+	spark->sR = 144;
+	spark->sG = 144;
+	spark->sB = 144;
+	spark->on = 1;
+	spark->dR = 64;
+	spark->dG = 64;
+	spark->dB = 64;
+	spark->colFadeSpeed = 2;
+	spark->fadeToBlack = 8;
+	spark->blendMode = BLEND_MODES::BLENDMODE_SUBTRACTIVE;
+	spark->life = spark->sLife = (GetRandomControl() & 3) + 10;
+	spark->x = (GetRandomControl() & 0x1FF) + x - 256;
+	spark->y = (GetRandomControl() & 0x1FF) + y - 256;
+	spark->z = (GetRandomControl() & 0x1FF) + z - 256;
+	spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
+	spark->yVel = GetRandomControl() - 128;
+	spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
+	spark->friction = uw ? 2 : 6;
+	spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+	spark->rotAng = GetRandomControl() & 0xFFF;
+	spark->scalar = 1;
+	spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+	spark->gravity = -3 - (GetRandomControl() & 3);
+	spark->maxYvel = -4 - (GetRandomControl() & 3);
+	spark->dSize = (GetRandomControl() & 0x1F) + 128;
+	spark->sSize = spark->dSize / 4;
+	spark->size = spark->dSize / 4;
 }
 
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 {
-	long dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-	long dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+	int size = (GetRandomControl() & 0x1FF) - yvel;
+	auto* sptr = GetFreeParticle();
 
-	if (dx >= -BLOCK(16) && dx <= BLOCK(16) &&
-		dz >= -BLOCK(16) && dz <= BLOCK(16))
+	if (size < 512)
+		size = 512;
+
+	sptr->on = 1;
+	sptr->sR = sptr->sG = (GetRandomControl() & 0x1F) + 48;
+	sptr->sB = (GetRandomControl() & 0x3F) - 64;
+	sptr->dR = (GetRandomControl() & 0x3F) - 64;
+	sptr->dG = (GetRandomControl() & 0x3F) - 128;
+	sptr->dB = 32;
+	sptr->colFadeSpeed = 8;
+	sptr->fadeToBlack = 8;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	sptr->life = sptr->sLife = (size >> 9) + (GetRandomControl() & 7) + 16;
+	sptr->x = (GetRandomControl() & 0x1F) + item->Pose.Position.x - 16;
+	sptr->y = (GetRandomControl() & 0x1F) + item->Pose.Position.y - 16;
+	sptr->z = (GetRandomControl() & 0x1F) + item->Pose.Position.z - 16;
+	sptr->friction = 51;
+	sptr->maxYvel = 0;
+	sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
+
+	if (deadly)
+		sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE | SP_FIRE;
+
+	sptr->scalar = 2;
+	sptr->dSize = (GetRandomControl() & 0xF) + (size >> 6) + 16;
+	sptr->sSize = sptr->size = sptr->dSize / 2;
+
+	if ((-(item->TriggerFlags & 0xFF) & 7) == 1)
 	{
-		int size = (GetRandomControl() & 0x1FF) - yvel;
-		auto* sptr = GetFreeParticle();
-
-		if (size < 512)
-			size = 512;
-
-		sptr->on = 1;
-		sptr->sR = sptr->sG = (GetRandomControl() & 0x1F) + 48;
-		sptr->sB = (GetRandomControl() & 0x3F) - 64;
-		sptr->dR = (GetRandomControl() & 0x3F) - 64;
-		sptr->dG = (GetRandomControl() & 0x3F) - 128;
-		sptr->dB = 32;
-		sptr->colFadeSpeed = 8;
-		sptr->fadeToBlack = 8;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		sptr->life = sptr->sLife = (size >> 9) + (GetRandomControl() & 7) + 16;
-		sptr->x = (GetRandomControl() & 0x1F) + item->Pose.Position.x - 16;
-		sptr->y = (GetRandomControl() & 0x1F) + item->Pose.Position.y - 16;
-		sptr->z = (GetRandomControl() & 0x1F) + item->Pose.Position.z - 16;
-		sptr->friction = 51;
-		sptr->maxYvel = 0;
-		sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE;
-
-		if (deadly)
-			sptr->flags = SP_EXPDEF | SP_ROTATE | SP_DEF | SP_SCALE | SP_FIRE;
-
-		sptr->scalar = 2;
-		sptr->dSize = (GetRandomControl() & 0xF) + (size >> 6) + 16;
-		sptr->sSize = sptr->size = sptr->dSize / 2;
-
-		if ((-(item->TriggerFlags & 0xFF) & 7) == 1)
-		{
-			sptr->gravity = -16 - (GetRandomControl() & 0x1F);
-			sptr->xVel = (GetRandomControl() & 0xFF) - 128;
-			sptr->yVel = -size;
-			sptr->zVel = (GetRandomControl() & 0xFF) - 128;
-			sptr->dSize += sptr->dSize / 4;
-			return;
-		}
-
-		sptr->y -= 64;
-		sptr->gravity = -((size >> 9) + GetRandomControl() % (size >> 8));
-		sptr->yVel = (GetRandomControl() & 0xFF) - 128;
+		sptr->gravity = -16 - (GetRandomControl() & 0x1F);
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
+		sptr->yVel = -size;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
+		sptr->dSize += sptr->dSize / 4;
+		return;
+	}
 
-		if (item->Pose.Orientation.y == 0)
-		{
-			sptr->zVel = -(size - (size >> 2));
-		}
-		else if (item->Pose.Orientation.y == ANGLE(90.0f))
-		{
-			sptr->xVel = -(size - (size >> 2));
-		}
-		else if (item->Pose.Orientation.y == ANGLE(-180.0f))
-		{
-			sptr->zVel = size - (size >> 2);
-		}
-		else
-		{
-			sptr->xVel = size - (size >> 2);
-		}
+	sptr->y -= 64;
+	sptr->gravity = -((size >> 9) + GetRandomControl() % (size >> 8));
+	sptr->yVel = (GetRandomControl() & 0xFF) - 128;
+	sptr->xVel = (GetRandomControl() & 0xFF) - 128;
+	sptr->zVel = (GetRandomControl() & 0xFF) - 128;
+
+	if (item->Pose.Orientation.y == 0)
+	{
+		sptr->zVel = -(size - (size >> 2));
+	}
+	else if (item->Pose.Orientation.y == ANGLE(90.0f))
+	{
+		sptr->xVel = -(size - (size >> 2));
+	}
+	else if (item->Pose.Orientation.y == ANGLE(-180.0f))
+	{
+		sptr->zVel = size - (size >> 2);
+	}
+	else
+	{
+		sptr->xVel = size - (size >> 2);
 	}
 }
 

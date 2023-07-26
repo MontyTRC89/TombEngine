@@ -139,25 +139,26 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void TriggerRiseEffect(ItemInfo* item)
+	void TriggerRiseEffect(/*const */ItemInfo& item)
 	{
-		int fxNumber = CreateNewEffect(item->RoomNumber);
+		int fxNumber = CreateNewEffect(item.RoomNumber, ID_BODY_PART, item.Pose);
 		if (fxNumber == NO_ITEM)
 			return;
 
-		auto* fx = &EffectList[fxNumber];
+		auto& fx = g_Level.Items[fxNumber];
+		auto& fxInfo = GetFXInfo(fx);
 
-		fx->pos.Position.x = (byte)GetRandomControl() + item->Pose.Position.x - 128;
-		fx->pos.Position.y = GetCollision(item).Position.Floor;
-		fx->pos.Position.z = (byte)GetRandomControl() + item->Pose.Position.z - 128;
-		fx->roomNumber = item->RoomNumber;
-		fx->pos.Orientation.y = 2 * GetRandomControl();
-		fx->speed = GetRandomControl() / 2048;
-		fx->fallspeed = -(GetRandomControl() / 1024);
-		fx->frameNumber = Objects[103].meshIndex;
-		fx->objectNumber = ID_BODY_PART;
-		fx->color = Vector4::One;
-		fx->flag2 = 0x601;
+		fx.Pose.Position.x = (byte)GetRandomControl() + item.Pose.Position.x - 128;
+		fx.Pose.Position.y = GetCollision(&item).Position.Floor;
+		fx.Pose.Position.z = (byte)GetRandomControl() + item.Pose.Position.z - 128;
+		fx.Pose.Orientation.y = 2 * GetRandomControl();
+		fx.RoomNumber = item.RoomNumber;
+		fx.Animation.Velocity.z = GetRandomControl() / 2048;
+		fx.Animation.Velocity.y = -(GetRandomControl() / 1024);
+		fx.Animation.FrameNumber = Objects[103].meshIndex;
+		fx.ObjectNumber = ID_BODY_PART;
+		fx.Model.Color = Vector4::One;
+		fxInfo.Flag2 = 0x601;
 
 		auto* spark = GetFreeParticle();
 		spark->on = 1;
@@ -170,12 +171,12 @@ namespace TEN::Entities::TR4
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
-		spark->x = fx->pos.Position.x;
-		spark->y = fx->pos.Position.y;
-		spark->z = fx->pos.Position.z;
-		spark->xVel = phd_sin(fx->pos.Orientation.y) * 4096;
+		spark->x = fx.Pose.Position.x;
+		spark->y = fx.Pose.Position.y;
+		spark->z = fx.Pose.Position.z;
+		spark->xVel = phd_sin(fx.Pose.Orientation.y) * 4096;
 		spark->yVel = 0;
-		spark->zVel = phd_cos(fx->pos.Orientation.y) * 4096;
+		spark->zVel = phd_cos(fx.Pose.Orientation.y) * 4096;
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 68;
 		spark->flags = 26;
@@ -776,7 +777,7 @@ namespace TEN::Entities::TR4
 
 			case SKELETON_STATE_SUBTERRANEAN:
 				if (item->Animation.FrameNumber - GetAnimData(item).frameBase < 32)
-					TriggerRiseEffect(item);
+					TriggerRiseEffect(*item);
 				
 				break;
 

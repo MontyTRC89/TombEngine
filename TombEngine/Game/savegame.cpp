@@ -528,6 +528,7 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::Minecart> mineOffset;
 		flatbuffers::Offset<Save::UPV> upvOffset;
 		flatbuffers::Offset<Save::Kayak> kayakOffset;
+		flatbuffers::Offset<Save::FXInfo> fxInfoOffset;
 
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
@@ -535,7 +536,7 @@ bool SaveGame::Save(int slot)
 		if (Objects.CheckID(itemToSerialize.ObjectNumber, true) && 
 			Objects[itemToSerialize.ObjectNumber].intelligent && itemToSerialize.IsCreature())
 		{
-			auto creature = GetCreatureInfo(&itemToSerialize);
+			auto* creature = GetCreatureInfo(&itemToSerialize);
 
 			std::vector<int> jointRotations;
 			for (int i = 0; i < 4; i++)
@@ -572,10 +573,9 @@ bool SaveGame::Save(int slot)
 		}
 		else if (itemToSerialize.Data.is<QuadBikeInfo>())
 		{
-			auto quad = (QuadBikeInfo*)itemToSerialize.Data;
+			auto* quad = (QuadBikeInfo*)itemToSerialize.Data;
 
 			Save::QuadBikeBuilder quadBuilder{ fbb };
-
 			quadBuilder.add_can_start_drift(quad->CanStartDrift);
 			quadBuilder.add_drift_starting(quad->DriftStarting);
 			quadBuilder.add_engine_revs(quad->EngineRevs);
@@ -596,10 +596,9 @@ bool SaveGame::Save(int slot)
 		}
 		else if (itemToSerialize.Data.is<UPVInfo>())
 		{
-			auto upv = (UPVInfo*)itemToSerialize.Data;
+			auto* upv = (UPVInfo*)itemToSerialize.Data;
 
 			Save::UPVBuilder upvBuilder{ fbb };
-
 			upvBuilder.add_fan_rot(upv->TurbineRotation);
 			upvBuilder.add_flags(upv->Flags);
 			upvBuilder.add_harpoon_left(upv->HarpoonLeft);
@@ -611,10 +610,9 @@ bool SaveGame::Save(int slot)
 		}
 		else if (itemToSerialize.Data.is<MinecartInfo>())
 		{
-			auto mine = (MinecartInfo*)itemToSerialize.Data;
+			auto* mine = (MinecartInfo*)itemToSerialize.Data;
 
 			Save::MinecartBuilder mineBuilder{ fbb };
-
 			mineBuilder.add_flags(mine->Flags);
 			mineBuilder.add_floor_height_front(mine->FloorHeightFront);
 			mineBuilder.add_floor_height_middle(mine->FloorHeightMiddle);
@@ -630,10 +628,9 @@ bool SaveGame::Save(int slot)
 		}
 		else if (itemToSerialize.Data.is<KayakInfo>())
 		{
-			auto kayak = (KayakInfo*)itemToSerialize.Data;
+			auto* kayak = (KayakInfo*)itemToSerialize.Data;
 
 			Save::KayakBuilder kayakBuilder{ fbb };
-
 			kayakBuilder.add_flags(kayak->Flags);
 			kayakBuilder.add_forward(kayak->Forward);
 			kayakBuilder.add_front_vertical_velocity(kayak->FrontVerticalVelocity);
@@ -659,6 +656,16 @@ bool SaveGame::Save(int slot)
 			Save::IntBuilder ib{ fbb };
 			ib.add_scalar(int(itemToSerialize.Data));
 			intOffset = ib.Finish();
+		}
+		else if (itemToSerialize.Data.is<FXInfo>())
+		{
+			auto& fxInfo = GetFXInfo(itemToSerialize);
+
+			Save::FXInfoBuilder fxInfoBuilder{ fbb };
+			fxInfoBuilder.add_counter(fxInfo.Counter);
+			fxInfoBuilder.add_flag1(fxInfo.Flag1);
+			fxInfoBuilder.add_flag2(fxInfo.Flag2);
+			auto fxInfoOffset = fxInfoBuilder.Finish();
 		}
 
 		Save::ItemBuilder serializedItem{ fbb };
@@ -730,6 +737,11 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data_type(Save::ItemData::Kayak);
 			serializedItem.add_data(kayakOffset.Union());
 		}
+		else if (itemToSerialize.Data.is<FXInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::FXInfo);
+			serializedItem.add_data(fxInfoOffset.Union());
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Short);
@@ -753,32 +765,6 @@ bool SaveGame::Save(int slot)
 		currentItemIndex++;
 	}
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
-
-	// TODO: In future, we should save only active FX, not whole array.
-	// This may come together with Monty's branch merge -- Lwmte, 10.07.22
-
-	std::vector<flatbuffers::Offset<Save::FXInfo>> serializedEffects{};
-	for (auto& effectToSerialize : EffectList)
-	{
-		Save::FXInfoBuilder serializedEffect{ fbb };
-
-		serializedEffect.add_pose(&FromPose(effectToSerialize.pos));
-		serializedEffect.add_room_number(effectToSerialize.roomNumber);
-		serializedEffect.add_object_number(effectToSerialize.objectNumber);
-		serializedEffect.add_next_fx(effectToSerialize.nextFx);
-		serializedEffect.add_next_active(effectToSerialize.nextActive);
-		serializedEffect.add_speed(effectToSerialize.speed);
-		serializedEffect.add_fall_speed(effectToSerialize.fallspeed);
-		serializedEffect.add_frame_number(effectToSerialize.frameNumber);
-		serializedEffect.add_counter(effectToSerialize.counter);
-		serializedEffect.add_color(&FromVector4(effectToSerialize.color));
-		serializedEffect.add_flag1(effectToSerialize.flag1);
-		serializedEffect.add_flag2(effectToSerialize.flag2);
-
-		auto serializedEffectOffset = serializedEffect.Finish();
-		serializedEffects.push_back(serializedEffectOffset);
-	}
-	auto serializedEffectsOffset = fbb.CreateVector(serializedEffects);
 
 	// Event set call counters
 	std::vector<flatbuffers::Offset<Save::EventSetCallCounters>> serializedEventSetCallCounters{};
@@ -1265,9 +1251,6 @@ bool SaveGame::Save(int slot)
 	sgb.add_next_item_free(NextItemFree);
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
-	sgb.add_fxinfos(serializedEffectsOffset);
-	sgb.add_next_fx_free(NextFxFree);
-	sgb.add_next_fx_active(NextFxActive);
 	sgb.add_soundtracks(soundtrackOffset);
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
@@ -1721,6 +1704,15 @@ bool SaveGame::Load(int slot)
 			kayak->Velocity = savedKayak->velocity();
 			kayak->WaterHeight = savedKayak->water_height();
 		}
+		else if (item->Data.is<FXInfo>())
+		{
+			auto& fxInfo = GetFXInfo(*item);
+			auto* savedFXInfo = (Save::FXInfo*)savedItem->data();
+
+			fxInfo.Counter = savedFXInfo->counter();
+			fxInfo.Flag1 = savedFXInfo->flag1();
+			fxInfo.Flag2 = savedFXInfo->flag2();
+		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
 			auto* data = savedItem->data();
@@ -1821,27 +1813,6 @@ bool SaveGame::Load(int slot)
 		beetle->Flags = beetleInfo->flags();
 		beetle->RoomNumber = beetleInfo->room_number();
 		beetle->Pose = ToPose(beetleInfo->pose());
-	}
-
-	NextFxFree = s->next_fx_free();
-	NextFxActive = s->next_fx_active();
-
-	for (int i = 0; i < s->fxinfos()->size(); ++i)
-	{
-		auto& fx = EffectList[i];
-		auto fx_saved = s->fxinfos()->Get(i);
-		fx.pos = ToPose(fx_saved->pose());
-		fx.roomNumber = fx_saved->room_number();
-		fx.objectNumber = fx_saved->object_number();
-		fx.nextFx = fx_saved->next_fx();
-		fx.nextActive = fx_saved->next_active();
-		fx.speed = fx_saved->speed();
-		fx.fallspeed = fx_saved->fall_speed();
-		fx.frameNumber = fx_saved->frame_number();
-		fx.counter = fx_saved->counter();
-		fx.color = ToVector4(fx_saved->color());
-		fx.flag1 = fx_saved->flag1();
-		fx.flag2 = fx_saved->flag2();
 	}
 
 	if (g_Level.EventSets.size() == s->call_counters()->size())
