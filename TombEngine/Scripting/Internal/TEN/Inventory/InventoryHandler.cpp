@@ -1,8 +1,8 @@
 #include "framework.h"
 
 #include "InventoryHandler.h"
-#include "ReservedScriptNames.h"
-#include "pickup.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Game/pickup/pickup.h"
 
 /***
 Inventory manipulation
@@ -66,16 +66,6 @@ namespace InventoryHandler
 	static void InventorySetCount(GAME_OBJECT_ID slot, int count)
 	{
 		SetInventoryCount(slot, count);
-	}
-
-	static void InventoryCombine(int slot1, int slot2)
-	{
-
-	}
-
-	static void InventorySeparate(int slot)
-	{
-
 	}
 
 	void Register(sol::state* state, sol::table& parent)

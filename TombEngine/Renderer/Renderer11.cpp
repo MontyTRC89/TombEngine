@@ -4,7 +4,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Specific/clock.h"
 #include "Math/Math.h"
-#include "Utils.h"
+#include "Renderer/Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
 #include "Renderer/RendererRectangle.h"
@@ -16,7 +16,6 @@ namespace TEN::Renderer
 
 	Renderer11::Renderer11() : gameCamera({0, 0, 0}, {0, 0, 1}, {0, 1, 0}, 1, 1, 0, 1, 10, 90)
 	{
-		m_blinkColorDirection = 1;
 	}
 
 	Renderer11::~Renderer11()
@@ -233,8 +232,8 @@ namespace TEN::Renderer
 			vertices[i].Bone = 0.0f;
 		}
 
-		this->InnerVertexBuffer = VertexBuffer(devicePtr, vertices.size(), vertices.data());
-		this->InnerIndexBuffer = IndexBuffer(devicePtr, barIndices.size(), barIndices.data());
+		InnerVertexBuffer = VertexBuffer(devicePtr, (int)vertices.size(), vertices.data());
+		InnerIndexBuffer = IndexBuffer(devicePtr, (int)barIndices.size(), barIndices.data());
 
 		auto borderVertices = std::array<RendererVertex, barBorderVertices.size()>{};
 		for (int i = 0; i < barBorderVertices.size(); i++)
@@ -246,8 +245,8 @@ namespace TEN::Renderer
 			borderVertices[i].Bone = 0.0f;
 		}
 
-		this->VertexBufferBorder = VertexBuffer(devicePtr, borderVertices.size(), borderVertices.data());
-		this->IndexBufferBorder = IndexBuffer(devicePtr, barBorderIndices.size(), barBorderIndices.data());
+		VertexBufferBorder = VertexBuffer(devicePtr, (int)borderVertices.size(), borderVertices.data());
+		IndexBufferBorder = IndexBuffer(devicePtr, (int)barBorderIndices.size(), barBorderIndices.data());
 	}
 
 	float Renderer11::CalculateFrameRate()
@@ -262,9 +261,9 @@ namespace TEN::Renderer
 			double t;
 			time_t this_time;
 			this_time = clock();
-			t = (this_time - last_time) / static_cast<double>(CLOCKS_PER_SEC);
+			t = (this_time - last_time) / (double)CLOCKS_PER_SEC;
 			last_time = this_time;
-			fps = static_cast<float>(count / t);
+			fps = float(count / t);
 			count = 0;
 		}
 
@@ -275,10 +274,10 @@ namespace TEN::Renderer
 
 	void Renderer11::BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType)
 	{
-		m_context->PSSetShaderResources(static_cast<UINT>(registerType), 1, texture->ShaderResourceView.GetAddressOf());
+		m_context->PSSetShaderResources((UINT)registerType, 1, texture->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
-		switch (samplerType)
+		switch (samplerType)  
 		{
 		case SAMPLER_ANISOTROPIC_CLAMP:
 			samplerState = m_states->AnisotropicClamp();
@@ -313,7 +312,7 @@ namespace TEN::Renderer
 
 	void Renderer11::BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType)
 	{
-		m_context->PSSetShaderResources(static_cast<UINT>(registerType), 1, target->ShaderResourceView.GetAddressOf());
+		m_context->PSSetShaderResources((UINT)registerType, 1, target->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
 		switch (samplerType)
@@ -352,28 +351,25 @@ namespace TEN::Renderer
 	void Renderer11::BindRoomLights(std::vector<RendererLight*>& lights)
 	{
 		for (int i = 0; i < lights.size(); i++)
-		{ 
 			memcpy(&m_stRoom.RoomLights[i], lights[i], sizeof(ShaderLight));
-		}
-		m_stRoom.NumRoomLights = lights.size();
+		
+		m_stRoom.NumRoomLights = (int)lights.size();
 	}
 
 	void Renderer11::BindStaticLights(std::vector<RendererLight*>& lights)
 	{
 		for (int i = 0; i < lights.size(); i++)
-		{
 			memcpy(&m_stStatic.Lights[i], lights[i], sizeof(ShaderLight));
-		}
-		m_stStatic.NumLights = lights.size();
+		
+		m_stStatic.NumLights = (int)lights.size();
 	}
 
 	void Renderer11::BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID)
 	{
 		for (int i = 0; i < lights.size(); i++)
-		{
 			memcpy(&m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].Lights[i], lights[i], sizeof(ShaderLight));
-		} 
-		m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = lights.size();
+
+		m_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = (int)lights.size();
 	}
 
 	void Renderer11::BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
@@ -529,11 +525,11 @@ namespace TEN::Renderer
 
 	void Renderer11::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force)
 	{
-		if (m_stBlending.AlphaTest != static_cast<int>(mode) ||
+		if (m_stBlending.AlphaTest != (int)mode ||
 			m_stBlending.AlphaThreshold != threshold ||
 			force)
 		{
-			m_stBlending.AlphaTest = static_cast<int>(mode);
+			m_stBlending.AlphaTest = (int)mode;
 			m_stBlending.AlphaThreshold = threshold;
 			m_cbBlending.updateData(m_stBlending, m_context.Get());
 			BindConstantBufferPS(CB_BLENDING, m_cbBlending.get());

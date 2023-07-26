@@ -253,8 +253,8 @@ using namespace TEN::Math;
 		if (Compare(angleFrom, angleTo, epsilon))
 			return angleTo;
 
-		short difference = Geometry::GetShortestAngle(angleFrom, angleTo);
-		return (short)round(angleFrom + (difference * alpha));
+		short angleDelta = Geometry::GetShortestAngle(angleFrom, angleTo);
+		return (short)round(angleFrom + (angleDelta * alpha));
 	}
 
 	short EulerAngles::InterpolateConstant(short angleFrom, short angleTo, short angularVel)

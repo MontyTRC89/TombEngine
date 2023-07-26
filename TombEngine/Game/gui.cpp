@@ -35,12 +35,13 @@ namespace TEN::Gui
 	constexpr int LINE_HEIGHT = 25;
 	constexpr int PHD_CENTER_X = SCREEN_SPACE_RES.x / 2;
 	constexpr int PHD_CENTER_Y = SCREEN_SPACE_RES.y / 2;
+	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
 
 	constexpr int VOLUME_MAX = 100;
 
 	GuiController g_Gui;
 
-	const char* OptionStrings[] =
+	std::vector<const char*> OptionStrings = std::vector<const char*>
 	{
 		STRING_USE,
 		STRING_CHOOSE_AMMO,
@@ -57,36 +58,74 @@ namespace TEN::Gui
 	//	STRING_READ_DIARY
 	};
 
-	const char* ControlStrings[] =
+	std::vector<const char*> GeneralActionStrings =
 	{
-		STRING_CONTROLS_MOVE_FORWARD,
-		STRING_CONTROLS_MOVE_BACKWARD,
-		STRING_CONTROLS_MOVE_LEFT,
-		STRING_CONTROLS_MOVE_RIGHT,
-		STRING_CONTROLS_CROUCH,
-		STRING_CONTROLS_SPRINT,
-		STRING_CONTROLS_WALK,
-		STRING_CONTROLS_JUMP,
-		STRING_CONTROLS_ACTION,
-		STRING_CONTROLS_DRAW_WEAPON,
-		STRING_CONTROLS_USE_FLARE,
-		STRING_CONTROLS_LOOK,
-		STRING_CONTROLS_ROLL,
-		STRING_CONTROLS_INVENTORY,
-		STRING_CONTROLS_PAUSE,
-		STRING_CONTROLS_STEP_LEFT,
-		STRING_CONTROLS_STEP_RIGHT,
-		STRING_CONTROLS_V_ACCELERATE,
-		STRING_CONTROLS_V_REVERSE,
-		STRING_CONTROLS_V_SPEED,
-		STRING_CONTROLS_V_SLOW,
-		STRING_CONTROLS_V_BRAKE,
-		STRING_CONTROLS_V_FIRE
+		STRING_ACTIONS_FORWARD,
+		STRING_ACTIONS_BACKWARD,
+		STRING_ACTIONS_LEFT,
+		STRING_ACTIONS_RIGHT,
+		STRING_ACTIONS_STEP_LEFT,
+		STRING_ACTIONS_STEP_RIGHT,
+		STRING_ACTIONS_WALK,
+		STRING_ACTIONS_SPRINT,
+		STRING_ACTIONS_CROUCH,
+		STRING_ACTIONS_JUMP,
+		STRING_ACTIONS_ROLL,
+		STRING_ACTIONS_ACTION,
+		STRING_ACTIONS_DRAW,
+		STRING_ACTIONS_LOOK
+	};
+
+	std::vector<const char*> VehicleActionStrings =
+	{
+		STRING_ACTIONS_ACCELERATE,
+		STRING_ACTIONS_REVERSE,
+		STRING_ACTIONS_SPEED,
+		STRING_ACTIONS_SLOW,
+		STRING_ACTIONS_BRAKE,
+		STRING_ACTIONS_FIRE
+	};
+
+	std::vector<const char*> QuickActionStrings =
+	{
+		STRING_ACTIONS_FLARE,
+		STRING_ACTIONS_SMALL_MEDIPACK,
+		STRING_ACTIONS_LARGE_MEDIPACK,
+		STRING_ACTIONS_PREVIOUS_WEAPON,
+		STRING_ACTIONS_NEXT_WEAPON,
+		STRING_ACTIONS_WEAPON_1,
+		STRING_ACTIONS_WEAPON_2,
+		STRING_ACTIONS_WEAPON_3,
+		STRING_ACTIONS_WEAPON_4,
+		STRING_ACTIONS_WEAPON_5,
+		STRING_ACTIONS_WEAPON_6,
+		STRING_ACTIONS_WEAPON_7,
+		STRING_ACTIONS_WEAPON_8,
+		STRING_ACTIONS_WEAPON_9,
+		STRING_ACTIONS_WEAPON_10
+	};
+
+	std::vector<const char*> MenuActionStrings =
+	{
+		STRING_ACTIONS_SELECT,
+		STRING_ACTIONS_DESELECT,
+		STRING_ACTIONS_PAUSE,
+		STRING_ACTIONS_INVENTORY,
+		STRING_ACTIONS_SAVE,
+		STRING_ACTIONS_LOAD
 	};
 
 	bool GuiController::GuiIsPulsed(ActionID actionID) const
 	{
-		auto oppositeAction = In::None;
+		constexpr auto DELAY		 = 0.1f;
+		constexpr auto INITIAL_DELAY = 0.4f;
+
+		// Action already held prior to entering menu; lock input.
+		if (GetActionTimeActive(actionID) >= TimeInMenu)
+			return false;
+
+		// Pulse only directional inputs.
+		auto oppositeAction = std::optional<ActionID>(std::nullopt);
 		switch (actionID)
 		{
 		case In::Forward:
@@ -104,34 +143,45 @@ namespace TEN::Gui
 		case In::Right:
 			oppositeAction = In::Left;
 			break;
+
+		default:
+			break;
 		}
 
-		bool isActionLocked = (oppositeAction == In::None) ? false : IsHeld(oppositeAction);
-		return (IsPulsed(actionID, 0.1f, 0.4f) && !isActionLocked);
+		// Opposite action held; lock input.
+		bool isActionLocked = oppositeAction.has_value() ? IsHeld(*oppositeAction) : false;
+		if (isActionLocked)
+			return false;
+
+		return IsPulsed(actionID, DELAY, INITIAL_DELAY);
 	}
 
-	bool GuiController::GuiIsSelected() const
+	bool GuiController::GuiIsSelected(bool onClicked) const
 	{
-		return ((IsReleased(In::Select) || IsReleased(In::Action)) && CanSelect());
+		if (onClicked)
+		{
+			return ((IsClicked(In::Select) || IsClicked(In::Action)) && CanSelect());
+		}
+		else
+		{
+			return ((IsReleased(In::Select) || IsReleased(In::Action)) && CanSelect());
+		}
 	}
 	
 	bool GuiController::GuiIsDeselected() const
 	{
-		return (IsClicked(In::Deselect) && CanDeselect());
+		return ((IsClicked(In::Deselect) || IsClicked(In::Draw)) && CanDeselect());
 	}
 
 	bool GuiController::CanSelect() const
 	{
+		// Holding Deselect safely cancels select actions.
 		if (IsHeld(In::Deselect))
 			return false;
 
-		if (GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) &&
-			GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
-		{
+		// Avoid Action release interference when entering inventory.
+		if (GetActionTimeActive(In::Action) < TimeInMenu)
 			return true;
-		}
 
 		return false;
 	}
@@ -148,7 +198,7 @@ namespace TEN::Gui
 
 	InventoryRing* GuiController::GetRings(int ringIndex)
 	{
-		return Rings[ringIndex];
+		return &Rings[ringIndex];
 	}
 
 	short GuiController::GetSelectedOption()
@@ -178,7 +228,11 @@ namespace TEN::Gui
 
 	void GuiController::SetInventoryMode(InventoryMode mode)
 	{
-		InvMode = mode;
+		if (mode != InvMode)
+		{
+			TimeInMenu = 0.0f;
+			InvMode = mode;
+		}
 	}
 
 	void GuiController::SetInventoryItemChosen(int number)
@@ -206,6 +260,11 @@ namespace TEN::Gui
 		return LastInvItem;
 	}
 
+	void GuiController::SetLastInventoryItem(int itemNumber)
+	{
+		LastInvItem = itemNumber;
+	}
+
 	void GuiController::DrawInventory()
 	{
 		g_Renderer.RenderInventory();
@@ -227,6 +286,8 @@ namespace TEN::Gui
 
 		static int selectedOptionBackup;
 		auto inventoryResult = InventoryResult::None;
+
+		TimeInMenu++;
 
 		// Stuff for credits goes here!
 
@@ -253,7 +314,10 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(false);
 			return inventoryResult;
 
-		case Menu::Controls:
+		case Menu::GeneralActions:
+		case Menu::VehicleActions:
+		case Menu::QuickActions:
+		case Menu::MenuActions:
 			HandleControlSettingsInput(item, false);
 			return inventoryResult;
 
@@ -281,8 +345,8 @@ namespace TEN::Gui
 			}
 		}
 		else if (MenuToDisplay == Menu::Title ||
-			MenuToDisplay == Menu::SelectLevel ||
-			MenuToDisplay == Menu::Options)
+				 MenuToDisplay == Menu::SelectLevel ||
+				 MenuToDisplay == Menu::Options)
 		{
 			if (GuiIsPulsed(In::Forward))
 			{
@@ -300,8 +364,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
-			if (GuiIsDeselected() &&
-				MenuToDisplay != Menu::Title)
+			if (GuiIsDeselected() && MenuToDisplay != Menu::Title)
 			{
 				MenuToDisplay = Menu::Title;
 				SelectedOption = selectedOptionBackup;
@@ -371,8 +434,8 @@ namespace TEN::Gui
 		for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 		{
 			auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
-			if (screenResolution.x == CurrentSettings.Configuration.Width &&
-				screenResolution.y == CurrentSettings.Configuration.Height)
+			if (screenResolution.x == CurrentSettings.Configuration.ScreenWidth &&
+				screenResolution.y == CurrentSettings.Configuration.ScreenHeight)
 			{
 				CurrentSettings.SelectedScreenResolution = i;
 				break;
@@ -418,7 +481,7 @@ namespace TEN::Gui
 
 			case DisplaySettingsOption::Windowed:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.Windowed = !CurrentSettings.Configuration.Windowed;
+				CurrentSettings.Configuration.EnableWindowedMode = !CurrentSettings.Configuration.EnableWindowedMode;
 				break;
 
 			case DisplaySettingsOption::ShadowType:
@@ -439,10 +502,10 @@ namespace TEN::Gui
 			case DisplaySettingsOption::Antialiasing:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-				if (CurrentSettings.Configuration.Antialiasing == AntialiasingMode::None)
-					CurrentSettings.Configuration.Antialiasing = AntialiasingMode::High;
+				if (CurrentSettings.Configuration.AntialiasingMode == AntialiasingMode::None)
+					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode::High;
 				else
-					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) - 1);
+					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) - 1);
 
 				break;
 			}
@@ -460,7 +523,7 @@ namespace TEN::Gui
 
 			case DisplaySettingsOption::Windowed:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.Windowed = !CurrentSettings.Configuration.Windowed;
+				CurrentSettings.Configuration.EnableWindowedMode = !CurrentSettings.Configuration.EnableWindowedMode;
 				break;
 
 			case DisplaySettingsOption::ShadowType:
@@ -480,10 +543,10 @@ namespace TEN::Gui
 			case DisplaySettingsOption::Antialiasing:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-				if (CurrentSettings.Configuration.Antialiasing == AntialiasingMode::High)
-					CurrentSettings.Configuration.Antialiasing = AntialiasingMode::None;
+				if (CurrentSettings.Configuration.AntialiasingMode == AntialiasingMode::High)
+					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode::None;
 				else
-					CurrentSettings.Configuration.Antialiasing = AntialiasingMode(int(CurrentSettings.Configuration.Antialiasing) + 1);
+					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) + 1);
 
 				break;
 			}
@@ -517,15 +580,15 @@ namespace TEN::Gui
 			{
 				// Save the configuration.
 				auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
-				CurrentSettings.Configuration.Width = screenResolution.x;
-				CurrentSettings.Configuration.Height = screenResolution.y;
+				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
+				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
 
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
 
 				// Reset screen and go back.
-				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.Width, CurrentSettings.Configuration.Height, 
-					CurrentSettings.Configuration.Windowed);
+				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight, 
+					CurrentSettings.Configuration.EnableWindowedMode);
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 				SelectedOption = fromPauseMenu ? 1 : 0;
@@ -540,7 +603,26 @@ namespace TEN::Gui
 
 	void GuiController::HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu)
 	{
-		static const int numControlSettingsOptions = KEY_COUNT + 1;
+		unsigned int numControlSettingsOptions = 0;
+		switch (MenuToDisplay)
+		{
+		default:
+		case Menu::GeneralActions:
+			numControlSettingsOptions = (int)GeneralActionStrings.size() + 2;
+			break;
+
+		case Menu::VehicleActions:
+			numControlSettingsOptions = (int)VehicleActionStrings.size() + 2;
+			break;
+
+		case Menu::QuickActions:
+			numControlSettingsOptions = (int)QuickActionStrings.size() + 2;
+			break;
+
+		case Menu::MenuActions:
+			numControlSettingsOptions = (int)MenuActionStrings.size() + 2;
+			break;
+		}
 
 		OptionCount = numControlSettingsOptions;
 		CurrentSettings.WaitingForKey = false;
@@ -554,7 +636,7 @@ namespace TEN::Gui
 		}
 
 		if (GuiIsSelected() &&
-			SelectedOption <= (numControlSettingsOptions - 2))
+			SelectedOption <= (numControlSettingsOptions - 3))
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			CurrentSettings.WaitingForKey = true;
@@ -586,9 +668,28 @@ namespace TEN::Gui
 					if (selectedKey == MAX_INPUT_SLOTS)
 						selectedKey = 0;
 
-					if (selectedKey && g_KeyNames[selectedKey])
+					if (selectedKey && !g_KeyNames[selectedKey].empty())
 					{
-						KeyboardLayout[1][SelectedOption] = selectedKey;
+						unsigned int baseIndex = 0;
+						switch (MenuToDisplay)
+						{
+						case Menu::VehicleActions:
+							baseIndex = (unsigned int)GeneralActionStrings.size();
+							break;
+
+						case Menu::QuickActions:
+							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
+							break;
+
+						case Menu::MenuActions:
+							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size() + QuickActionStrings.size());
+							break;
+
+						default:
+							break;
+						}
+
+						Bindings[1][baseIndex + SelectedOption] = selectedKey;
 						DefaultConflict();
 
 						CurrentSettings.WaitingForKey = false;
@@ -633,14 +734,59 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
+			// HACK: Menu screen scroll.
+			if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
+			{
+				auto menu = std::optional<Menu>(std::nullopt);
+
+				if (GuiIsPulsed(In::Left))
+				{
+					if ((int)MenuToDisplay == (int)Menu::GeneralActions)
+					{
+						menu = Menu::MenuActions;
+					}
+					else
+					{
+						menu = Menu((int)MenuToDisplay - 1);
+					}
+				}
+				else if (GuiIsPulsed(In::Right))
+				{
+					if ((int)MenuToDisplay == (int)Menu::MenuActions)
+					{
+						menu = Menu::GeneralActions;
+					}
+					else
+					{
+						menu = Menu((int)MenuToDisplay + 1);
+					}
+				}
+
+				if (menu.has_value())
+				{
+					MenuToDisplay = *menu;
+					SelectedOption = 0;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					return;
+				}
+			}
+
 			if (GuiIsSelected())
 			{
+				// Defaults.
+				if (SelectedOption == (OptionCount - 2))
+				{
+					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+					ApplyDefaultBindings();
+					return;
+				}
+
 				// Apply.
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					memcpy(CurrentSettings.Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
-					memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
+					CurrentSettings.Configuration.Bindings = Bindings[1];
+					g_Configuration.Bindings = Bindings[1];
 					SaveConfiguration();
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
@@ -651,7 +797,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					memcpy(KeyboardLayout[1], CurrentSettings.Configuration.KeyboardLayout, KEY_COUNT * sizeof(short));
+					Bindings[1] = CurrentSettings.Configuration.Bindings;
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;
@@ -698,7 +844,7 @@ namespace TEN::Gui
 
 		case OptionsOption::Controls:
 			BackupOptions();
-			MenuToDisplay = Menu::Controls;
+			MenuToDisplay = Menu::GeneralActions;
 			SelectedOption = 0;
 			break;
 		}
@@ -711,6 +857,7 @@ namespace TEN::Gui
 			Reverb,
 			MusicVolume,
 			SfxVolume,
+			Subtitles,
 			AutoTarget,
 			ToggleRumble,
 			ThumbstickCameraControl,
@@ -718,7 +865,7 @@ namespace TEN::Gui
 			Cancel
 		};
 
-		static const int numOtherSettingsOptions = 7;
+		static const int numOtherSettingsOptions = 8;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -745,7 +892,7 @@ namespace TEN::Gui
 
 			case OtherSettingsOption::AutoTarget:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.AutoTarget = !CurrentSettings.Configuration.AutoTarget;
+				CurrentSettings.Configuration.EnableAutoTargeting = !CurrentSettings.Configuration.EnableAutoTargeting;
 				break;
 
 			case OtherSettingsOption::ToggleRumble:
@@ -755,7 +902,12 @@ namespace TEN::Gui
 
 			case OtherSettingsOption::ThumbstickCameraControl:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableThumbstickCameraControl = !CurrentSettings.Configuration.EnableThumbstickCameraControl;
+				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
+				break;
+
+			case OtherSettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
 				break;
 			}
 		}
@@ -888,6 +1040,7 @@ namespace TEN::Gui
 		static const int numStatisticsOptions = 0;
 		static const int numOptionsOptions	  = 2;
 
+		TimeInMenu++;
 		UpdateInputActions(item);
 
 		switch (MenuToDisplay)
@@ -908,7 +1061,10 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(true);
 			return InventoryResult::None;
 
-		case Menu::Controls:
+		case Menu::GeneralActions:
+		case Menu::VehicleActions:
+		case Menu::QuickActions:
+		case Menu::MenuActions:
 			HandleControlSettingsInput(item, true);
 			return InventoryResult::None;
 
@@ -941,12 +1097,11 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GuiIsDeselected() ||
-			IsClicked(In::Pause))
+		if (GuiIsDeselected() || IsClicked(In::Pause))
 		{
 			if (MenuToDisplay == Menu::Pause)
 			{
-				InvMode = InventoryMode::None;
+				SetInventoryMode(InventoryMode::None);
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				return InventoryResult::None;
 			}
@@ -979,7 +1134,7 @@ namespace TEN::Gui
 					break;
 
 				case PauseMenuOption::ExitToTitle:
-					InvMode = InventoryMode::None;
+					SetInventoryMode(InventoryMode::None);
 					return InventoryResult::ExitToTitle;
 					break;
 				}
@@ -1066,7 +1221,7 @@ namespace TEN::Gui
 	{
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
-			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == objectNumber)
+			if (Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem == objectNumber)
 				return true;
 		}
 
@@ -1111,8 +1266,8 @@ namespace TEN::Gui
 	{
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
-			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == newObjectNumber)
-				Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
+			if (Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem == newObjectNumber)
+				Rings[(int)RingTypes::Inventory].CurrentObjectInList = i;
 		}
 	}
 
@@ -1126,11 +1281,11 @@ namespace TEN::Gui
 	void GuiController::SetupAmmoSelector()
 	{
 		int number = 0;
-		unsigned __int64 options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
+		unsigned __int64 options = InventoryObjectTable[Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem].Options;
 		AmmoSelectorFlag = 0;
 		NumAmmoSlots = 0;
 
-		if (Rings[(int)RingTypes::Ammo]->RingActive)
+		if (Rings[(int)RingTypes::Ammo].RingActive)
 			return;
 	
 		AmmoObjectList[0].Orientation = EulerAngles::Zero;
@@ -1250,10 +1405,10 @@ namespace TEN::Gui
 
 	void GuiController::InsertObjectIntoList(int objectNumber)
 	{
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].InventoryItem = objectNumber;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].Orientation = EulerAngles::Zero;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].Bright = 32;
-		Rings[(int)RingTypes::Inventory]->NumObjectsInList++;
+		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].InventoryItem = objectNumber;
+		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Orientation = EulerAngles::Zero;
+		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Bright = 32;
+		Rings[(int)RingTypes::Inventory].NumObjectsInList++;
 	}
 
 	void GuiController::InsertObjectIntoList_v2(int objectNumber)
@@ -1262,11 +1417,11 @@ namespace TEN::Gui
 
 		if (options & (OPT_COMBINABLE | OPT_ALWAYS_COMBINE))
 		{
-			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem != objectNumber)
+			if (Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem != objectNumber)
 			{
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].InventoryItem = objectNumber;
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].Orientation = EulerAngles::Zero;
-				Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList++].Bright = 32;
+				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].InventoryItem = objectNumber;
+				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].Orientation = EulerAngles::Zero;
+				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList++].Bright = 32;
 			}
 		}
 	}
@@ -1275,10 +1430,10 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		Rings[(int)RingTypes::Inventory]->NumObjectsInList = 0;
+		Rings[(int)RingTypes::Inventory].NumObjectsInList = 0;
 
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-			Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem = NO_ITEM;
+			Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 		Ammo.CurrentPistolsAmmoType = 0;
 		Ammo.CurrentUziAmmoType = 0;
@@ -1497,12 +1652,12 @@ namespace TEN::Gui
 			InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
 		}
 
-		Rings[(int)RingTypes::Inventory]->ObjectListMovement = 0;
-		Rings[(int)RingTypes::Inventory]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Inventory]->RingActive = true;
-		Rings[(int)RingTypes::Ammo]->ObjectListMovement = 0;
-		Rings[(int)RingTypes::Ammo]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Ammo]->RingActive = false;
+		Rings[(int)RingTypes::Inventory].ObjectListMovement = 0;
+		Rings[(int)RingTypes::Inventory].CurrentObjectInList = 0;
+		Rings[(int)RingTypes::Inventory].RingActive = true;
+		Rings[(int)RingTypes::Ammo].ObjectListMovement = 0;
+		Rings[(int)RingTypes::Ammo].CurrentObjectInList = 0;
+		Rings[(int)RingTypes::Ammo].RingActive = false;
 		HandleObjectChangeover((int)RingTypes::Inventory);
 		AmmoActive = 0;
 	}
@@ -1511,10 +1666,10 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		Rings[(int)RingTypes::Ammo]->NumObjectsInList = 0;
+		Rings[(int)RingTypes::Ammo].NumObjectsInList = 0;
 
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-			Rings[(int)RingTypes::Ammo]->CurrentObjectList[i].InventoryItem = NO_ITEM;
+			Rings[(int)RingTypes::Ammo].CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 		if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 		{
@@ -1588,12 +1743,19 @@ namespace TEN::Gui
 				InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 		}
 
-		Rings[(int)RingTypes::Ammo]->ObjectListMovement = 0;
-		Rings[(int)RingTypes::Ammo]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Ammo]->RingActive = false;
+		Rings[(int)RingTypes::Ammo].ObjectListMovement = 0;
+		Rings[(int)RingTypes::Ammo].CurrentObjectInList = 0;
+		Rings[(int)RingTypes::Ammo].RingActive = false;
 	}
 
-	void GuiController::InitialiseInventory(ItemInfo* item)
+	void GuiController::Initialize()
+	{
+		g_Gui.SetMenuToDisplay(Menu::Title);
+		g_Gui.SetSelectedOption(0);
+		g_Gui.SetLastInventoryItem(NO_ITEM);
+	}
+
+	void GuiController::InitializeInventory(ItemInfo* item)
 	{
 		auto* lara = GetLaraInfo(item);
 
@@ -1603,14 +1765,22 @@ namespace TEN::Gui
 		UseItem = false;
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
+		{
 			Ammo.AmountShotGunAmmo1 = -1;
+		}
 		else
+		{
 			Ammo.AmountShotGunAmmo1 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].GetCount() / 6;
+		}
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].HasInfinite())
+		{
 			Ammo.AmountShotGunAmmo2 = -1;
+		}
 		else
+		{
 			Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].GetCount() / 6;
+		}
 		
 		Ammo.AmountShotGunAmmo1 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 		Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
@@ -1633,7 +1803,9 @@ namespace TEN::Gui
 			if (LastInvItem != NO_ITEM)
 			{
 				if (IsItemInInventory(LastInvItem))
+				{
 					SetupObjectListStartPosition(LastInvItem);
+				}
 				else
 				{
 					if (LastInvItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY && LastInvItem <= INV_OBJECT_SMALL_WATERSKIN_3L)
@@ -1658,9 +1830,11 @@ namespace TEN::Gui
 							}
 						}
 					}
+					else
+					{
+						LastInvItem = NO_ITEM;
+					}
 				}
-
-				LastInvItem = NO_ITEM;
 			}
 		}
 		else
@@ -1691,8 +1865,8 @@ namespace TEN::Gui
 	{
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
-			if (InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem].ObjectNumber == newObjectNumber)
-				Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
+			if (InventoryObjectTable[Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem].ObjectNumber == newObjectNumber)
+				Rings[(int)RingTypes::Inventory].CurrentObjectInList = i;
 		}
 	}
 
@@ -1714,7 +1888,7 @@ namespace TEN::Gui
 
 	void GuiController::FadeAmmoSelector()
 	{
-		if (Rings[(int)RingTypes::Inventory]->RingActive)
+		if (Rings[(int)RingTypes::Inventory].RingActive)
 			AmmoSelectorFadeVal = 0;
 		else if (AmmoSelectorFadeDir == 1)
 		{
@@ -1763,7 +1937,7 @@ namespace TEN::Gui
 		auto* lara = GetLaraInfo(item);
 
 		int prevBinocularRange = BinocularRange;
-		short inventoryObject = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+		short inventoryObject = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 		short gameObject = InventoryObjectTable[inventoryObject].ObjectNumber;
 
 		item->MeshBits = ALL_JOINT_BITS;
@@ -1820,7 +1994,7 @@ namespace TEN::Gui
 							ClearAllActions();
 							ActionMap[(int)In::Flare].Update(1.0f);
 
-							HandleWeapon(item);
+							HandleWeapon(*item);
 							ClearAllActions();
 						}
 
@@ -2023,21 +2197,21 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		if (Rings[(int)RingTypes::Ammo]->RingActive)
+		if (Rings[(int)RingTypes::Ammo].RingActive)
 		{
 			auto optionString = g_GameFlow->GetString(OptionStrings[5]);
 			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
-			if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
+			if (Rings[(int)RingTypes::Inventory].ObjectListMovement)
 				return;
 
-			if (Rings[(int)RingTypes::Ammo]->ObjectListMovement)
+			if (Rings[(int)RingTypes::Ammo].ObjectListMovement)
 				return;
 
-			if (GuiIsSelected())
+			if (GuiIsSelected(false))
 			{
-				short invItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
-				short ammoItem = Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->CurrentObjectInList].InventoryItem;
+				short invItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
+				short ammoItem = Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].CurrentObjectInList].InventoryItem;
 
 				if (DoObjectsCombine(invItem, ammoItem))
 				{
@@ -2096,7 +2270,7 @@ namespace TEN::Gui
 		}
 		else
 		{
-			int num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+			int num = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 
 			for (int i = 0; i < 3; i++)
 			{
@@ -2108,7 +2282,7 @@ namespace TEN::Gui
 			unsigned long options;
 			if (!AmmoActive)
 			{
-				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
+				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem].Options;
 
 				if (options & OPT_LOAD)
 				{
@@ -2198,7 +2372,7 @@ namespace TEN::Gui
 				CurrentOptions[1].Text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[1].InventoryItem].ObjectName);
 				n = 2;
 
-				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
+				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem].Options;
 
 				if (options & (OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN | OPT_CHOOSE_AMMO_HK))
 				{
@@ -2237,8 +2411,8 @@ namespace TEN::Gui
 			}
 
 			if (MenuActive &&
-				!Rings[(int)RingTypes::Inventory]->ObjectListMovement &&
-				!Rings[(int)RingTypes::Ammo]->ObjectListMovement)
+				!Rings[(int)RingTypes::Inventory].ObjectListMovement &&
+				!Rings[(int)RingTypes::Ammo].ObjectListMovement)
 			{
 				if (AmmoActive)
 				{
@@ -2286,7 +2460,7 @@ namespace TEN::Gui
 					}
 				}
 
-				if (GuiIsSelected())
+				if (GuiIsSelected(false))
 				{
 					if (CurrentOptions[CurrentSelectedOption].Type != MenuType::Equip && CurrentOptions[CurrentSelectedOption].Type != MenuType::Use)
 						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -2294,7 +2468,7 @@ namespace TEN::Gui
 					switch (CurrentOptions[CurrentSelectedOption].Type)
 					{
 					case MenuType::ChooseAmmo:
-						Rings[(int)RingTypes::Inventory]->RingActive = false;
+						Rings[(int)RingTypes::Inventory].RingActive = false;
 						AmmoActive = 1;
 						Ammo.StashedCurrentSelectedOption = CurrentSelectedOption;
 						Ammo.StashedCurrentPistolsAmmoType = Ammo.CurrentPistolsAmmoType;
@@ -2310,34 +2484,34 @@ namespace TEN::Gui
 
 					case MenuType::Load:
 						// fill_up_savegames_array // Maybe not?
-						InvMode = InventoryMode::Load;
+						SetInventoryMode(InventoryMode::Load);
 						break;
 
 					case MenuType::Save:
 						// fill_up_savegames_array
-						InvMode = InventoryMode::Save;
+						SetInventoryMode(InventoryMode::Save);
 						break;
 
 					case MenuType::Examine:
-						InvMode = InventoryMode::Examine;
+						SetInventoryMode(InventoryMode::Examine);
 						break;
 
 					case MenuType::Statistics:
-						InvMode = InventoryMode::Statistics;
+						SetInventoryMode(InventoryMode::Statistics);
 						break;
 
 					case MenuType::Ammo1:
 					case MenuType::Ammo2:
 					case MenuType::Ammo3:
 						AmmoActive = 0;
-						Rings[(int)RingTypes::Inventory]->RingActive = true;
+						Rings[(int)RingTypes::Inventory].RingActive = true;
 						CurrentSelectedOption = 0;
 						break;
 
 					case MenuType::Combine:
 						ConstructCombineObjectList(item);
-						Rings[(int)RingTypes::Inventory]->RingActive = false;
-						Rings[(int)RingTypes::Ammo]->RingActive = true;
+						Rings[(int)RingTypes::Inventory].RingActive = false;
+						Rings[(int)RingTypes::Ammo].RingActive = true;
 						AmmoSelectorFlag = 0;
 						MenuActive = false;
 						CombineRingFadeDir = 1;
@@ -2355,7 +2529,7 @@ namespace TEN::Gui
 						break;
 
 					case MenuType::Diary:
-						InvMode = InventoryMode::Diary;
+						SetInventoryMode(InventoryMode::Diary);
 						lara->Inventory.Diary.CurrentPage = 1;
 						break;
 					}
@@ -2365,7 +2539,7 @@ namespace TEN::Gui
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					AmmoActive = 0;
-					Rings[(int)RingTypes::Inventory]->RingActive = true;
+					Rings[(int)RingTypes::Inventory].RingActive = true;
 					Ammo.CurrentPistolsAmmoType = Ammo.StashedCurrentPistolsAmmoType;
 					Ammo.CurrentUziAmmoType = Ammo.StashedCurrentUziAmmoType;
 					Ammo.CurrentRevolverAmmoType = Ammo.StashedCurrentRevolverAmmoType;
@@ -2505,7 +2679,7 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		if (Rings[ringIndex]->CurrentObjectList <= 0)
+		if (Rings[ringIndex].CurrentObjectList <= 0)
 			return;
 
 		if (ringIndex == (int)RingTypes::Ammo)
@@ -2537,13 +2711,13 @@ namespace TEN::Gui
 						NormalRingFadeDir = 2;
 					else
 					{
-						Rings[(int)RingTypes::Inventory]->RingActive = true;
+						Rings[(int)RingTypes::Inventory].RingActive = true;
 						MenuActive = true;
-						Rings[(int)RingTypes::Ammo]->RingActive = false;
+						Rings[(int)RingTypes::Ammo].RingActive = false;
 						HandleObjectChangeover((int)RingTypes::Inventory);
 					}
 
-					Rings[(int)RingTypes::Ammo]->RingActive = false;
+					Rings[(int)RingTypes::Ammo].RingActive = false;
 				}
 			}
 		}
@@ -2556,7 +2730,7 @@ namespace TEN::Gui
 			{
 				NormalRingFadeVal = 128;
 				NormalRingFadeDir = 0;
-				Rings[(int)RingTypes::Inventory]->RingActive = true;
+				Rings[(int)RingTypes::Inventory].RingActive = true;
 				MenuActive = true;
 			}
 
@@ -2582,7 +2756,7 @@ namespace TEN::Gui
 					SetupObjectListStartPosition(CombineObject1);
 				}
 				else if (SeperateTypeFlag)
-					SeparateObject(item, Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem);
+					SeparateObject(item, Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem);
 
 				HandleObjectChangeover((int)RingTypes::Inventory);
 			}
@@ -2593,34 +2767,34 @@ namespace TEN::Gui
 		int xOffset = 0;
 		int n = 0;
 
-		if (Rings[ringIndex]->NumObjectsInList != 1)
-			xOffset = (OBJLIST_SPACING * Rings[ringIndex]->ObjectListMovement) >> 16;
+		if (Rings[ringIndex].NumObjectsInList != 1)
+			xOffset = (OBJLIST_SPACING * Rings[ringIndex].ObjectListMovement) >> 16;
 
-		if (Rings[ringIndex]->NumObjectsInList == 2)
+		if (Rings[ringIndex].NumObjectsInList == 2)
 		{
 			minObj = -1;
 			maxObj = 0;
-			n = Rings[ringIndex]->CurrentObjectInList - 1;
+			n = Rings[ringIndex].CurrentObjectInList - 1;
 		}
 
-		if (Rings[ringIndex]->NumObjectsInList == 3 || Rings[ringIndex]->NumObjectsInList == 4)
+		if (Rings[ringIndex].NumObjectsInList == 3 || Rings[ringIndex].NumObjectsInList == 4)
 		{
 			minObj = -2;
 			maxObj = 1;
-			n = Rings[ringIndex]->CurrentObjectInList - 2;
+			n = Rings[ringIndex].CurrentObjectInList - 2;
 		}
 
-		if (Rings[ringIndex]->NumObjectsInList >= 5)
+		if (Rings[ringIndex].NumObjectsInList >= 5)
 		{
 			minObj = -3;
 			maxObj = 2;
-			n = Rings[ringIndex]->CurrentObjectInList - 3;
+			n = Rings[ringIndex].CurrentObjectInList - 3;
 		}
 
 		if (n < 0)
-			n += Rings[ringIndex]->NumObjectsInList;
+			n += Rings[ringIndex].NumObjectsInList;
 
-		if (Rings[ringIndex]->ObjectListMovement < 0)
+		if (Rings[ringIndex].ObjectListMovement < 0)
 			maxObj++;
 
 		if (minObj <= maxObj)
@@ -2631,10 +2805,10 @@ namespace TEN::Gui
 
 				if (minObj == i)
 				{
-					if (Rings[ringIndex]->ObjectListMovement < 0)
+					if (Rings[ringIndex].ObjectListMovement < 0)
 						shade = 0;
 					else
-						shade = Rings[ringIndex]->ObjectListMovement >> 9;
+						shade = Rings[ringIndex].ObjectListMovement >> 9;
 				}
 				else if (i != minObj + 1 || maxObj == minObj + 1)
 				{
@@ -2642,16 +2816,16 @@ namespace TEN::Gui
 						shade = 128;
 					else
 					{
-						if (Rings[ringIndex]->ObjectListMovement < 0)
-							shade = (-128 * Rings[ringIndex]->ObjectListMovement) >> 16;
+						if (Rings[ringIndex].ObjectListMovement < 0)
+							shade = (-128 * Rings[ringIndex].ObjectListMovement) >> 16;
 						else
-							shade = 128 - short(Rings[ringIndex]->ObjectListMovement >> 9);
+							shade = 128 - short(Rings[ringIndex].ObjectListMovement >> 9);
 					}
 				}
 				else
 				{
-					if (Rings[ringIndex]->ObjectListMovement < 0)
-						shade = 128 - ((-128 * Rings[ringIndex]->ObjectListMovement) >> 16);
+					if (Rings[ringIndex].ObjectListMovement < 0)
+						shade = 128 - ((-128 * Rings[ringIndex].ObjectListMovement) >> 16);
 					else
 						shade = 128;
 				}
@@ -2670,7 +2844,7 @@ namespace TEN::Gui
 					int count = 0;
 					char textBufferMe[128];
 
-					switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber)
+					switch (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber)
 					{
 					case ID_BIGMEDI_ITEM:
 						numItems = lara->Inventory.TotalLargeMedipacks;
@@ -2685,10 +2859,10 @@ namespace TEN::Gui
 						break;
 
 					default:
-						if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
-							InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
+						if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
+							InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
 						{
-							switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber)
+							switch (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber)
 							{
 							case ID_SHOTGUN_AMMO1_ITEM:
 								numItems = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
@@ -2751,29 +2925,29 @@ namespace TEN::Gui
 						}
 						else
 						{
-							numItems = lara->Inventory.Puzzles[InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber - ID_PUZZLE_ITEM1];
+							numItems = lara->Inventory.Puzzles[InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber - ID_PUZZLE_ITEM1];
 
 							if (numItems <= 1)
-								sprintf(textBufferMe, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+								sprintf(textBufferMe, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 							else
-								sprintf(textBufferMe, "%d x %s", numItems, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+								sprintf(textBufferMe, "%d x %s", numItems, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 						}
 
 						break;
 					}
 
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
-						InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
+					if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
+						InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
 					{
 						if (numItems)
 						{
 							if (numItems == -1)
-								sprintf(textBufferMe, "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+								sprintf(textBufferMe, "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 							else
-								sprintf(textBufferMe, "%d x %s", numItems, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+								sprintf(textBufferMe, "%d x %s", numItems, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 						}
 						else
-							sprintf(textBufferMe, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
+							sprintf(textBufferMe, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].ObjectName));
 					}
 
 					int objectNumber;
@@ -2785,24 +2959,24 @@ namespace TEN::Gui
 					g_Renderer.AddString(PHD_CENTER_X, objectNumber, textBufferMe, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				}
 
-				if (!i && !Rings[ringIndex]->ObjectListMovement)
+				if (!i && !Rings[ringIndex].ObjectListMovement)
 				{
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_X)
-						Rings[ringIndex]->CurrentObjectList[n].Orientation.x += ANGLE(5.0f);
+					if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_X)
+						Rings[ringIndex].CurrentObjectList[n].Orientation.x += ANGLE(5.0f);
 
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Y)
-						Rings[ringIndex]->CurrentObjectList[n].Orientation.y += ANGLE(5.0f);
+					if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Y)
+						Rings[ringIndex].CurrentObjectList[n].Orientation.y += ANGLE(5.0f);
 
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Z)
-						Rings[ringIndex]->CurrentObjectList[n].Orientation.z += ANGLE(5.0f);
+					if (InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Z)
+						Rings[ringIndex].CurrentObjectList[n].Orientation.z += ANGLE(5.0f);
 				}
 				else
-					SpinBack(Rings[ringIndex]->CurrentObjectList[n].Orientation);
+					SpinBack(Rings[ringIndex].CurrentObjectList[n].Orientation);
 
 				int activeNum = 0;
-				if (Rings[ringIndex]->ObjectListMovement)
+				if (Rings[ringIndex].ObjectListMovement)
 				{
-					if (Rings[ringIndex]->ObjectListMovement > 0)
+					if (Rings[ringIndex].ObjectListMovement > 0)
 						activeNum = -1;
 					else
 						activeNum = 1;
@@ -2810,51 +2984,51 @@ namespace TEN::Gui
 
 				if (i == activeNum)
 				{
-					if (Rings[ringIndex]->CurrentObjectList[n].Bright < 160)
-						Rings[ringIndex]->CurrentObjectList[n].Bright += 16;
+					if (Rings[ringIndex].CurrentObjectList[n].Bright < 160)
+						Rings[ringIndex].CurrentObjectList[n].Bright += 16;
 
-					if (Rings[ringIndex]->CurrentObjectList[n].Bright > 160)
-						Rings[ringIndex]->CurrentObjectList[n].Bright = 160;
+					if (Rings[ringIndex].CurrentObjectList[n].Bright > 160)
+						Rings[ringIndex].CurrentObjectList[n].Bright = 160;
 				}
 				else
 				{
-					if (Rings[ringIndex]->CurrentObjectList[n].Bright > 32)
-						Rings[ringIndex]->CurrentObjectList[n].Bright -= 16;
+					if (Rings[ringIndex].CurrentObjectList[n].Bright > 32)
+						Rings[ringIndex].CurrentObjectList[n].Bright -= 16;
 
-					if (Rings[ringIndex]->CurrentObjectList[n].Bright < 32)
-						Rings[ringIndex]->CurrentObjectList[n].Bright = 32;
+					if (Rings[ringIndex].CurrentObjectList[n].Bright < 32)
+						Rings[ringIndex].CurrentObjectList[n].Bright = 32;
 				}
 
 				int x = 400 + xOffset + i * OBJLIST_SPACING;
 				int y = 150;
 				int y2 = 480; // Combine.
-				short objectNumber = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
-				float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
-				auto& orientation = Rings[ringIndex]->CurrentObjectList[n].Orientation;
-				int bits = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].MeshBits;
+				short objectNumber = ConvertInventoryItemToObject(Rings[ringIndex].CurrentObjectList[n].InventoryItem);
+				float scaler = InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].Scale1;
+				auto& orientation = Rings[ringIndex].CurrentObjectList[n].Orientation;
+				int bits = InventoryObjectTable[Rings[ringIndex].CurrentObjectList[n].InventoryItem].MeshBits;
 
 				g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, (ringIndex == (int)RingTypes::Inventory) ? y : y2), orientation, scaler, 1.0f, bits);
 
-				if (++n >= Rings[ringIndex]->NumObjectsInList)
+				if (++n >= Rings[ringIndex].NumObjectsInList)
 					n = 0;
 			}
 
-			if (Rings[ringIndex]->RingActive)
+			if (Rings[ringIndex].RingActive)
 			{
-				if (Rings[ringIndex]->NumObjectsInList != 1 && (ringIndex != 1 || CombineRingFadeVal == 128))
+				if (Rings[ringIndex].NumObjectsInList != 1 && (ringIndex != 1 || CombineRingFadeVal == 128))
 				{
-					if (Rings[ringIndex]->ObjectListMovement > 0)
-						Rings[ringIndex]->ObjectListMovement += ANGLE(45.0f);
+					if (Rings[ringIndex].ObjectListMovement > 0)
+						Rings[ringIndex].ObjectListMovement += ANGLE(45.0f);
 
-					if (Rings[ringIndex]->ObjectListMovement < 0)
-						Rings[ringIndex]->ObjectListMovement -= ANGLE(45.0f);
+					if (Rings[ringIndex].ObjectListMovement < 0)
+						Rings[ringIndex].ObjectListMovement -= ANGLE(45.0f);
 
 					if (IsHeld(In::Left))
 					{
-						if (!Rings[ringIndex]->ObjectListMovement)
+						if (!Rings[ringIndex].ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							Rings[ringIndex]->ObjectListMovement += ANGLE(45.0f);
+							Rings[ringIndex].ObjectListMovement += ANGLE(45.0f);
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -2863,26 +3037,26 @@ namespace TEN::Gui
 
 					if (IsHeld(In::Right))
 					{
-						if (!Rings[ringIndex]->ObjectListMovement)
+						if (!Rings[ringIndex].ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							Rings[ringIndex]->ObjectListMovement -= ANGLE(45.0f);
+							Rings[ringIndex].ObjectListMovement -= ANGLE(45.0f);
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
 						}
 					}
 
-					if (Rings[ringIndex]->ObjectListMovement < 65536)
+					if (Rings[ringIndex].ObjectListMovement < 65536)
 					{
-						if (Rings[ringIndex]->ObjectListMovement < -65535)
+						if (Rings[ringIndex].ObjectListMovement < -65535)
 						{
-							Rings[ringIndex]->CurrentObjectInList++;
+							Rings[ringIndex].CurrentObjectInList++;
 
-							if (Rings[ringIndex]->CurrentObjectInList >= Rings[ringIndex]->NumObjectsInList)
-								Rings[ringIndex]->CurrentObjectInList = 0;
+							if (Rings[ringIndex].CurrentObjectInList >= Rings[ringIndex].NumObjectsInList)
+								Rings[ringIndex].CurrentObjectInList = 0;
 
-							Rings[ringIndex]->ObjectListMovement = 0;
+							Rings[ringIndex].ObjectListMovement = 0;
 
 							if (ringIndex == (int)RingTypes::Inventory)
 								HandleObjectChangeover(0);
@@ -2890,12 +3064,12 @@ namespace TEN::Gui
 					}
 					else
 					{
-						Rings[ringIndex]->CurrentObjectInList--;
+						Rings[ringIndex].CurrentObjectInList--;
 
-						if (Rings[ringIndex]->CurrentObjectInList < 0)
-							Rings[ringIndex]->CurrentObjectInList = Rings[ringIndex]->NumObjectsInList - 1;
+						if (Rings[ringIndex].CurrentObjectInList < 0)
+							Rings[ringIndex].CurrentObjectInList = Rings[ringIndex].NumObjectsInList - 1;
 
-						Rings[ringIndex]->ObjectListMovement = 0;
+						Rings[ringIndex].ObjectListMovement = 0;
 
 						if (ringIndex == (int)RingTypes::Inventory)
 							HandleObjectChangeover(0);
@@ -2903,6 +3077,38 @@ namespace TEN::Gui
 				}
 			}
 		}
+	}
+
+	bool GuiController::CallPause()
+	{
+		g_Renderer.DumpGameScene();
+		PauseAllSounds(SoundPauseMode::Pause);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
+		g_Gui.SetInventoryMode(InventoryMode::Pause);
+		g_Gui.SetMenuToDisplay(Menu::Pause);
+		g_Gui.SetSelectedOption(0);
+
+		bool doExitToTitle = false;
+
+		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
+		{
+			g_Gui.DrawInventory();
+			g_Renderer.Synchronize();
+
+			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+			{
+				doExitToTitle = true;
+				break;
+			}
+		}
+
+		if (doExitToTitle)
+			StopAllSounds();
+		else
+			ResumeAllSounds(SoundPauseMode::Pause);
+
+		return doExitToTitle;
 	}
 
 	bool GuiController::CallInventory(ItemInfo* item, bool resetMode)
@@ -2913,14 +3119,14 @@ namespace TEN::Gui
 
 		lara->Inventory.OldBusy = lara->Inventory.IsBusy;
 
-		Rings[(int)RingTypes::Inventory] = &PCRing1;
-		Rings[(int)RingTypes::Ammo] = &PCRing2;
 		g_Renderer.DumpGameScene();
+		PauseAllSounds(SoundPauseMode::Inventory);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 		if (resetMode)
-			InvMode = InventoryMode::InGame;
+			SetInventoryMode(InventoryMode::InGame);
 
-		InitialiseInventory(item);
+		InitializeInventory(item);
 		Camera.numberFrames = 2;
 
 		bool exitLoop = false;
@@ -2929,12 +3135,12 @@ namespace TEN::Gui
 			if (ThreadEnded)
 				return false;
 
-			OBJLIST_SPACING = PHD_CENTER_X / 2;
-
-			UpdateInputActions(item);
+			TimeInMenu++;
 			GameTimer++;
 
-			if (IsClicked(In::Option))
+			UpdateInputActions(item);
+
+			if (GuiIsDeselected() || IsClicked(In::Inventory))
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				exitLoop = true;
@@ -2973,7 +3179,7 @@ namespace TEN::Gui
 					exitLoop = !resetMode;
 
 					if (resetMode)
-						InvMode = InventoryMode::InGame;
+						SetInventoryMode(InventoryMode::InGame);
 
 					break;
 
@@ -2988,7 +3194,7 @@ namespace TEN::Gui
 				{
 					exitLoop = !resetMode;
 					if (resetMode)
-						InvMode = InventoryMode::InGame;
+						SetInventoryMode(InventoryMode::InGame);
 				}
 
 				break;
@@ -3002,39 +3208,40 @@ namespace TEN::Gui
 			Camera.numberFrames = g_Renderer.Synchronize();
 		}
 
-		LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);
 
 		if (UseItem)
 			UseCurrentItem(item);
 
 		AlterFOV(LastFOV);
+		ResumeAllSounds(SoundPauseMode::Inventory);
 
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;
-		InvMode = InventoryMode::None;
+		SetInventoryMode(InventoryMode::None);
 
 		return doLoad;
 	}
 
 	void GuiController::DoStatisticsMode()
 	{
-		InvMode = InventoryMode::Statistics;
+		SetInventoryMode(InventoryMode::Statistics);
 
 		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			InvMode = InventoryMode::InGame;
+			SetInventoryMode(InventoryMode::InGame);
 		}
 	}
 
 	void GuiController::DoExamineMode()
 	{
-		this->InvMode = InventoryMode::Examine;
+		SetInventoryMode(InventoryMode::Examine);
 
 		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			this->InvMode = InventoryMode::None;
+			SetInventoryMode(InventoryMode::None);
 		}
 	}
 
@@ -3045,7 +3252,9 @@ namespace TEN::Gui
 
 		auto needleOrient = EulerAngles(0, CompassNeedleAngle, 0);
 		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), LERP_ALPHA);
-		this->CompassNeedleAngle = needleOrient.y;
+
+		float wibble = std::sin(((float)(GameTimer & 0x3F) / (float)0x3F) * PI_MUL_2);
+		this->CompassNeedleAngle = needleOrient.y + ANGLE(wibble);
 
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];
@@ -3056,7 +3265,7 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		this->InvMode = InventoryMode::Diary;
+		SetInventoryMode(InventoryMode::Diary);
 
 		if (GuiIsPulsed(In::Right) &&
 			lara->Inventory.Diary.CurrentPage < lara->Inventory.Diary.NumPages)
@@ -3075,7 +3284,7 @@ namespace TEN::Gui
 		if (GuiIsDeselected())
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			InvMode = InventoryMode::None;
+			SetInventoryMode(InventoryMode::None);
 		}
 	}
 

@@ -7,7 +7,7 @@ class EulerAngles;
 	class AxisAngle
 	{
 	private:
-		// Components
+		// Members
 		Vector3 Axis  = Vector3::Backward;
 		short	Angle = 0;
 
@@ -31,8 +31,8 @@ class EulerAngles;
 		void SetAngle(short angle);
 
 		// Utilities
-		void			 Slerp(const AxisAngle& axisAngleTo, float alpha = 1.0f);
-		static AxisAngle Slerp(const AxisAngle& axisAngleFrom, const AxisAngle& axisAngleTo, float alpha = 1.0f);
+		void			 Slerp(const AxisAngle& axisAngleTo, float alpha);
+		static AxisAngle Slerp(const AxisAngle& axisAngleFrom, const AxisAngle& axisAngleTo, float alpha);
 
 		// Converters
 		Vector3		ToDirection() const;

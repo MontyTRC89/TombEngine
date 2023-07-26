@@ -13,12 +13,13 @@ struct VaultTestResult;
 // -----------------------------
 
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
+void HandlePlayerQuickActions(ItemInfo& item);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
 void HandlePlayerAirBubbles(ItemInfo* item);
 
-void EaseOutLaraHeight(ItemInfo* item, int height);
+void EasePlayerVerticalPosition(ItemInfo* item, int height);
 void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha);
 void DoPlayerLegIK(ItemInfo& item);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);
@@ -59,8 +60,8 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip);
 void SetLaraSwimDiveAnimation(ItemInfo* item);
 void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);
 
-void ResetLaraLean(ItemInfo* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);
-void ResetLaraFlex(ItemInfo* item, float rate = 1.0f);
+void ResetPlayerLean(ItemInfo* item, float alpha = 1.0f, bool resetRoll = true, bool resetPitch = true);
+void ResetPlayerFlex(ItemInfo* item, float alpha = 1.0f);
 void ResetPlayerLegIK(ItemInfo& item, float alpha = 0.4f);
 
 void RumbleLaraHealthCondition(ItemInfo* item);

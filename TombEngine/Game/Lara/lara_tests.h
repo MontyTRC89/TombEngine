@@ -29,7 +29,7 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
 
-bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);
+bool TestLaraWall(ItemInfo* item, float dist, float height);
 bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance);
 bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance);
 int LaraFloorFront(ItemInfo* item, short angle, int distance);
@@ -41,10 +41,6 @@ bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll);
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
-
-#ifndef NEW_TIGHTROPE
-void GetTightropeFallOff(ItemInfo* item, int regularity);
-#endif
 
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);

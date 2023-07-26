@@ -7,16 +7,16 @@
 #include "Game/effects/Hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Game/effects/footprint.h"
+#include "Game/effects/Footprint.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
@@ -25,7 +25,7 @@
 #include "Objects/Effects/tr4_locusts.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Effects::Footprints;
+using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
 
 int FlipEffect;
@@ -121,12 +121,12 @@ void Puzzle(ItemInfo* item)
 
 void AddLeftFootprint(ItemInfo* item)
 {
-	AddFootprint(item, false);
+	SpawnFootprint(*item, false);
 }
 
 void AddRightFootprint(ItemInfo* item)
 {
-	AddFootprint(item, true);
+	SpawnFootprint(*item, true);
 }
 
 void ResetHair(ItemInfo* item)
@@ -155,7 +155,7 @@ void DrawLeftPistol(ItemInfo* item)
 
 	if (item->Model.MeshIndex[LM_LHAND] == item->Model.BaseMesh + LM_LHAND)
 	{
-		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
+		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
 		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
@@ -171,7 +171,7 @@ void DrawRightPistol(ItemInfo* item)
 
 	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
 	{
-		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
+		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
 		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else
@@ -315,11 +315,11 @@ void FloorShake(ItemInfo* item)
 	int y = abs(item->Pose.Position.y - Camera.pos.y);
 	int z = abs(item->Pose.Position.z - Camera.pos.z);
 
-	if (x < SECTOR(16) &&
-		y < SECTOR(16) &&
-		z < SECTOR(16))
+	if (x < BLOCK(16) &&
+		y < BLOCK(16) &&
+		z < BLOCK(16))
 	{
-		Camera.bounce = 66 * ((pow(x, 2) + pow(y, 2) + pow(z, 2)) / CLICK(1) - pow(SECTOR(1), 2)) / pow(SECTOR(1), 2);
+		Camera.bounce = 66 * ((pow(x, 2) + pow(y, 2) + pow(z, 2)) / CLICK(1) - pow(BLOCK(1), 2)) / pow(BLOCK(1), 2);
 	}
 }
 

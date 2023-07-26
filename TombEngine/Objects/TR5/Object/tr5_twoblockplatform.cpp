@@ -10,9 +10,9 @@
 #include "Renderer/Renderer11.h"
 using namespace TEN::Renderer;
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
-void InitialiseTwoBlocksPlatform(short itemNumber)
+void InitializeTwoBlocksPlatform(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

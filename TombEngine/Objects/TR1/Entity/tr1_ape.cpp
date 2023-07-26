@@ -8,9 +8,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -35,7 +35,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
 
-	const auto ApeBite = BiteInfo(Vector3(0.0f, -19.0f, 75.0f), 15);
+	const auto ApeBite = CreatureBiteInfo(Vector3(0, -19, 75), 15);
 	const auto ApeAttackJoints = std::vector<unsigned int>{ 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	enum ApeState
@@ -103,8 +103,8 @@ namespace TEN::Entities::Creatures::TR1
 			creature->Flags &= ~APE_FLAG_TURN_RIGHT;
 		}
 
-		int xx = item->Pose.Position.z / SECTOR(1);
-		int yy = item->Pose.Position.x / SECTOR(1);
+		int xx = item->Pose.Position.z / BLOCK(1);
+		int yy = item->Pose.Position.x / BLOCK(1);
 		int y = item->Pose.Position.y;
 
 		CreatureAnimation(itemNumber, angle, 0);
@@ -112,8 +112,8 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->Pose.Position.y > (y - CLICK(1.5f)))
 			return;
 
-		int xFloor = item->Pose.Position.z / SECTOR(1);
-		int yFloor = item->Pose.Position.x / SECTOR(1);
+		int xFloor = item->Pose.Position.z / BLOCK(1);
+		int yFloor = item->Pose.Position.x / BLOCK(1);
 		if (xx == xFloor)
 		{
 			if (yy == yFloor)
@@ -121,12 +121,12 @@ namespace TEN::Entities::Creatures::TR1
 
 			if (yy < yFloor)
 			{
-				item->Pose.Position.x = (yFloor * SECTOR(1)) - APE_SHIFT;
+				item->Pose.Position.x = (yFloor * BLOCK(1)) - APE_SHIFT;
 				item->Pose.Orientation.y = ANGLE(90.0f);
 			}
 			else
 			{
-				item->Pose.Position.x = (yy * SECTOR(1)) + APE_SHIFT;
+				item->Pose.Position.x = (yy * BLOCK(1)) + APE_SHIFT;
 				item->Pose.Orientation.y = -ANGLE(90.0f);
 			}
 		}
@@ -134,12 +134,12 @@ namespace TEN::Entities::Creatures::TR1
 		{
 			if (xx < xFloor)
 			{
-				item->Pose.Position.z = (xFloor * SECTOR(1)) - APE_SHIFT;
+				item->Pose.Position.z = (xFloor * BLOCK(1)) - APE_SHIFT;
 				item->Pose.Orientation.y = 0;
 			}
 			else
 			{
-				item->Pose.Position.z = (xx * SECTOR(1)) + APE_SHIFT;
+				item->Pose.Position.z = (xx * BLOCK(1)) + APE_SHIFT;
 				item->Pose.Orientation.y = -ANGLE(180.0f);
 			}
 		}
@@ -169,7 +169,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != APE_STATE_DEATH)
-				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, ApeDeathAnims.size() - 1)]);
+				SetAnimation(item, ApeDeathAnims[Random::GenerateInt(0, (int)ApeDeathAnims.size() - 1)]);
 		}
 		else
 		{

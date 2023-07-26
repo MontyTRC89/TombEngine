@@ -5,12 +5,13 @@
 #include "Game/control/box.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Specific/setup.h"
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR4/Entity/Wraith.h" // OFF
 #include "Objects/TR4/Entity/tr4_enemy_jeep.h"
 #include "Objects/TR4/Entity/tr4_ahmet.h" // OK
 #include "Objects/TR4/Entity/tr4_baddy.h" // OK
@@ -33,7 +34,6 @@
 #include "Objects/TR4/Entity/tr4_sphinx.h" // OK
 #include "Objects/TR4/Entity/tr4_troops.h" // OK
 #include "Objects/TR4/Entity/tr4_wild_boar.h" // OK
-#include "Objects/TR4/Entity/tr4_wraith.h" // OFF
 #include "Objects/TR4/Entity/tr4_baboon.h" // OK
 #include "Objects/TR4/Entity/tr4_mutant.h" // OK
 #include "Objects/TR4/Entity/tr4_big_beetle.h" // OFF
@@ -43,6 +43,7 @@
 #include "Objects/TR4/Entity/tr4_setha.h"
 
 // Objects
+#include "Objects/TR4/Object/WraithTrap.h"
 #include "Objects/TR4/Object/tr4_element_puzzle.h"
 #include "Objects/TR4/Object/tr4_mapper.h"
 #include "Objects/TR4/Object/tr4_sarcophagus.h"
@@ -54,6 +55,8 @@
 // Switches
 
 // Traps
+#include "Objects/TR4/Trap/SpikyCeiling.h"
+#include "Objects/TR4/Trap/SpikyWall.h"
 #include "Objects/TR4/Trap/tr4_birdblade.h"
 #include "Objects/TR4/Trap/tr4_blade.h"
 #include "Objects/TR4/Trap/tr4_catwalkblade.h"
@@ -68,8 +71,6 @@
 #include "Objects/TR4/Trap/tr4_sethblade.h"
 #include "Objects/TR4/Trap/tr4_slicerdicer.h"
 #include "Objects/TR4/Trap/tr4_spikeball.h"
-#include "Objects/TR4/Trap/tr4_spikywall.h"
-#include "Objects/TR4/Trap/tr4_spikyceiling.h"
 #include "Objects/TR4/Trap/tr4_stargate.h"
 #include "Objects/TR4/Trap/tr4_cog.h"
 #include "Objects/TR4/Trap/tr4_teethspike.h"
@@ -81,6 +82,7 @@
 // Effects
 #include "Objects/Effects/tr4_locusts.h" // OK
 
+using namespace TEN::Entities::TR4;
 using namespace TEN::Entities::Traps;
 
 namespace TEN::Entities
@@ -90,7 +92,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SMALL_SCORPION];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSmallScorpion;
+			obj->Initialize = InitializeSmallScorpion;
 			obj->control = SmallScorpionControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -104,7 +106,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BIG_SCORPION];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseScorpion;
+			obj->Initialize = InitializeScorpion;
 			obj->control = ScorpionControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -118,7 +120,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_HAMMERHEAD];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseHammerhead;
+			obj->Initialize = InitializeHammerhead;
 			obj->control = HammerheadControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -134,7 +136,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_WILD_BOAR];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseWildBoar;
+			obj->Initialize = InitializeWildBoar;
 			obj->control = WildBoarControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -150,7 +152,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_DOG];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseTr4Dog;
+			obj->Initialize = InitializeTr4Dog;
 			obj->collision = CreatureCollision;
 			obj->control = Tr4DogControl;
 			obj->shadowType = ShadowMode::All;
@@ -166,7 +168,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BAT];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseBat;
+			obj->Initialize = InitializeBat;
 			obj->control = BatControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -181,7 +183,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_AHMET];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseAhmet;
+			obj->Initialize = InitializeAhmet;
 			obj->control = AhmetControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -197,12 +199,11 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			AssignObjectMeshSwap(*obj, ID_MESHSWAP_BADDY1, "ID_BADDY1", "ID_MESHSWAP_BADDY1");
-			obj->initialise = InitialiseBaddy;
+			obj->Initialize = InitializeBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
-			obj->biteOffset = 9;
 			obj->pivotLength = 50;
 			obj->radius = 102;
 			obj->intelligent = true;
@@ -217,14 +218,13 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			AssignObjectMeshSwap(*obj, ID_MESHSWAP_BADDY2, "ID_BADDY2", "ID_MESHSWAP_BADDY2");
-			obj->initialise = InitialiseBaddy;
+			obj->Initialize = InitializeBaddy;
 			obj->control = BaddyControl;
 			obj->collision = CreatureCollision;
 			obj->HitRoutine = Baddy2Hit;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 25;
 			obj->pivotLength = 50;
-			obj->biteOffset = 9;
 			obj->radius = 102;
 			obj->intelligent = true;
 			obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
@@ -237,11 +237,10 @@ namespace TEN::Entities
 		obj = &Objects[ID_SAS_CAIRO];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSas;
+			obj->Initialize = InitializeSas;
 			obj->control = SasControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
-			obj->biteOffset = 10;
 			obj->HitPoints = 40;
 			obj->pivotLength = 50;
 			obj->radius = 102;
@@ -254,14 +253,14 @@ namespace TEN::Entities
 		obj = &Objects[ID_MUMMY];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseMummy;
+			obj->Initialize = InitializeMummy;
 			obj->control = MummyControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 15;
 			obj->radius = 170;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::ExplosivesOnly;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
 		}
@@ -269,7 +268,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SKELETON];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSkeleton;
+			obj->Initialize = InitializeSkeleton;
 			obj->control = SkeletonControl;
 			obj->collision = CreatureCollision;
 			obj->HitPoints = 15;
@@ -278,7 +277,7 @@ namespace TEN::Entities
 			obj->radius = 128;
 			obj->explodableMeshbits = 0xA00;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::ExplosivesOnly;
 			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect();
 		}
@@ -286,7 +285,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_KNIGHT_TEMPLAR];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseKnightTemplar;
+			obj->Initialize = InitializeKnightTemplar;
 			obj->control = KnightTemplarControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -294,7 +293,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_Y);
 			obj->SetupHitEffect();
@@ -303,7 +302,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BIG_BEETLE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseBigBeetle;
+			obj->Initialize = InitializeBigBeetle;
 			obj->control = BigBeetleControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -311,7 +310,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
-			obj->undead = false;
 			obj->LotType = LotType::Flyer;
 			obj->SetupHitEffect();
 		}
@@ -319,7 +317,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SETHA];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSeth;
+			obj->Initialize = InitializeSeth;
 			obj->control = SethControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -327,7 +325,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect(true);
 		}
@@ -335,7 +333,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_DEMIGOD1];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseDemigod;
+			obj->Initialize = InitializeDemigod;
 			obj->control = DemigodControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -343,7 +341,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
 			obj->SetBoneRotationFlags(20, ROT_Y);
 			obj->SetupHitEffect(true);
@@ -352,7 +350,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_DEMIGOD2];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseDemigod;
+			obj->Initialize = InitializeDemigod;
 			obj->control = DemigodControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -368,7 +366,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_DEMIGOD3];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseDemigod;
+			obj->Initialize = InitializeDemigod;
 			obj->control = DemigodControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -384,7 +382,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_JEAN_YVES];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseJeanYves;
+			obj->Initialize = InitializeJeanYves;
 			obj->control = JeanYvesControl;
 			obj->collision = ObjectCollision;
 			obj->nonLot = true;
@@ -394,11 +392,10 @@ namespace TEN::Entities
 		obj = &Objects[ID_TROOPS];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseTroops;
+			obj->Initialize = InitializeTroops;
 			obj->control = TroopsControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
-			obj->biteOffset = 11;
 			obj->HitPoints = 40;
 			obj->pivotLength = 50;
 			obj->radius = 102;
@@ -411,11 +408,11 @@ namespace TEN::Entities
 		obj = &Objects[ID_SENTRY_GUN];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSentryGun;
+			obj->Initialize = InitializeSentryGun;
 			obj->control = SentryGunControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->HitPoints = 30;
 			obj->pivotLength = 50;
 			obj->radius = 204;
@@ -431,7 +428,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_HARPY];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseHarpy;
+			obj->Initialize = InitializeHarpy;
 			obj->control = HarpyControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -446,7 +443,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_GUIDE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseGuide;
+			obj->Initialize = InitializeGuide;
 			obj->control = GuideControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -463,7 +460,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_CROCODILE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseCrocodile;
+			obj->Initialize = InitializeCrocodile;
 			obj->control = CrocodileControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -483,7 +480,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SPHINX];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSphinx;
+			obj->Initialize = InitializeSphinx;
 			obj->control = SphinxControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -491,14 +488,14 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetupHitEffect();
 		}
 
 		obj = &Objects[ID_HORSE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseHorse;
+			obj->Initialize = InitializeHorse;
 			obj->collision = ObjectCollision;
 			obj->control = nullptr;
 			obj->SetupHitEffect(true);
@@ -507,7 +504,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_HORSEMAN];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseHorseman;
+			obj->Initialize = InitializeHorseman;
 			obj->control = HorsemanControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -521,7 +518,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BABOON_NORMAL];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseBaboon;
+			obj->Initialize = InitializeBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -536,7 +533,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			AssignObjectAnimations(*obj, ID_BABOON_NORMAL, "ID_BABOON_INV", "ID_BABOON_NORMAL");
-			obj->initialise = InitialiseBaboon;
+			obj->Initialize = InitializeBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -551,7 +548,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			AssignObjectAnimations(*obj, ID_BABOON_NORMAL, "ID_BABOON_SILENT", "ID_BABOON_NORMAL");
-			obj->initialise = InitialiseBaboon;
+			obj->Initialize = InitializeBaboon;
 			obj->control = BaboonControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -565,7 +562,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_CROCODILE_GOD];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseCrocgod;
+			obj->Initialize = InitializeCrocgod;
 			obj->control = CrocgodControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -573,7 +570,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -582,7 +579,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_LOCUSTS_EMITTER];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseLocust;
+			obj->Initialize = InitializeLocust;
 			obj->control = LocustControl;
 			obj->drawRoutine = NULL;
 		}
@@ -590,28 +587,28 @@ namespace TEN::Entities
 		obj = &Objects[ID_WRAITH1];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseWraith;
+			obj->Initialize = InitializeWraith;
 			obj->control = WraithControl;
 		}
 
 		obj = &Objects[ID_WRAITH2];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseWraith;
+			obj->Initialize = InitializeWraith;
 			obj->control = WraithControl;
 		}
 
 		obj = &Objects[ID_WRAITH3];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseWraith;
+			obj->Initialize = InitializeWraith;
 			obj->control = WraithControl;
 		}	
 
 		obj = &Objects[ID_LITTLE_BEETLE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseBeetleSwarm;
+			obj->Initialize = InitializeBeetleSwarm;
 			obj->control = BeetleSwarmControl;
 			obj->drawRoutine = NULL;
 		}
@@ -619,7 +616,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SAS_DYING];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseInjuredSas;
+			obj->Initialize = InitializeInjuredSas;
 			obj->control = InjuredSasControl;
 			obj->collision = ObjectCollision;
 			obj->SetupHitEffect(false, true);
@@ -628,7 +625,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_ENEMY_JEEP];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseEnemyJeep;
+			obj->Initialize = InitializeEnemyJeep;
 			obj->control = EnemyJeepControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -636,7 +633,7 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->undead = true; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
+			obj->damageType = DamageMode::None; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
 			obj->LotType = LotType::HumanPlusJumpAndMonkey;
 			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);
@@ -648,7 +645,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_VON_CROY];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseVonCroy;
+			obj->Initialize = InitializeVonCroy;
 			obj->control = VonCroyControl;
 			obj->collision = CreatureCollision;
 			obj->pivotLength = 0;
@@ -683,7 +680,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_MAPPER];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseMapper;
+			obj->Initialize = InitializeMapper;
 			obj->control = MapperControl;
 			obj->drawRoutine = nullptr;
 			obj->SetupHitEffect(true);
@@ -692,7 +689,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_ELEMENT_PUZZLE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseElementPuzzle;
+			obj->Initialize = InitializeElementPuzzle;
 			obj->control = ElementPuzzleControl;
 			obj->collision = ElementPuzzleCollision;
 			obj->SetupHitEffect(true);
@@ -701,7 +698,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_WHEEL_OF_FORTUNE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseGameSticks;
+			obj->Initialize = InitializeGameSticks;
 			obj->control = GameSticksControl;
 			obj->collision = GameSticksCollision;
 			obj->HitPoints = 1;
@@ -728,7 +725,7 @@ namespace TEN::Entities
 			obj = &Objects[ID_GAME_PIECE1 + i];
 			if (obj->loaded)
 			{
-				obj->initialise = InitialiseGamePiece;
+				obj->Initialize = InitializeGamePiece;
 				obj->control = SenetControl;
 				obj->collision = ObjectCollision;
 				obj->SetupHitEffect(true);
@@ -742,10 +739,26 @@ namespace TEN::Entities
 		obj = &Objects[ID_OBELISK];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseObelisk;
+			obj->Initialize = InitializeObelisk;
 			obj->control = ObeliskControl;
 			obj->collision = ObjectCollision;
 			obj->SetupHitEffect(true);
+		}
+
+		obj = &Objects[ID_WRAITH_TRAP];
+		if (obj->loaded)
+		{
+			obj->Initialize = InitializeWraithTrap;
+			obj->control = WraithTrapControl;
+			obj->collision = ObjectCollision;
+			obj->SetupHitEffect(true);
+		}
+
+		for (int objectID = ID_WATERFALL1; objectID <= ID_WATERFALL6; objectID++)
+		{
+			obj = &Objects[objectID];
+			if (obj->loaded)
+				obj->control = nullptr;
 		}
 	}
 
@@ -778,7 +791,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SETH_BLADE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSethBlade;
+			obj->Initialize = InitializeSethBlade;
 			obj->control = SethBladeControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetupHitEffect(true);
@@ -803,7 +816,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_JOBY_SPIKES];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseJobySpikes;
+			obj->Initialize = InitializeJobySpikes;
 			obj->control = JobySpikesControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetupHitEffect(true);
@@ -868,7 +881,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SLICER_DICER];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseSlicerDicer;
+			obj->Initialize = InitializeSlicerDicer;
 			obj->control = SlicerDicerControl;
 			obj->collision = BladeCollision;
 			obj->SetupHitEffect(true);
@@ -877,7 +890,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_MINE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseMine;
+			obj->Initialize = InitializeMine;
 			obj->control = MineControl;
 			obj->collision = MineCollision;
 		}
@@ -885,16 +898,18 @@ namespace TEN::Entities
 		obj = &Objects[ID_SPIKY_WALL];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializeSpikyWall;
 			obj->control = ControlSpikyWall;
-			obj->collision = ObjectCollision;
+			obj->collision = CollideSpikyWall;
 			obj->SetupHitEffect(true);
 		}
 
 		obj = &Objects[ID_SPIKY_CEILING];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializeSpikyCeiling;
 			obj->control = ControlSpikyCeiling;
-			obj->collision = TrapCollision;
+			obj->collision = CollideSpikyCeiling;
 			obj->SetupHitEffect(true);
 		}
 
@@ -909,7 +924,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_LARA_DOUBLE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseCreature;
+			obj->Initialize = InitializeCreature;
 			obj->control = LaraDoubleControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
@@ -923,7 +938,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_TEETH_SPIKES];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseTeethSpikes;
+			obj->Initialize = InitializeTeethSpikes;
 			obj->control = ControlTeethSpikes;
 		}
 
@@ -941,7 +956,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_JEEP];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseJeep;
+			obj->Initialize = InitializeJeep;
 			obj->collision = JeepPlayerCollision;
 			obj->shadowType = ShadowMode::Lara;
 			obj->SetupHitEffect(true);
@@ -950,7 +965,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_MOTORBIKE];
 		if (obj->loaded)
 		{
-			obj->initialise = InitialiseMotorbike;
+			obj->Initialize = InitializeMotorbike;
 			obj->collision = MotorbikePlayerCollision;
 			obj->shadowType = ShadowMode::Lara;
 			obj->SetupHitEffect(true);
@@ -962,7 +977,7 @@ namespace TEN::Entities
 	
 	}
 
-	void InitialiseTR4Objects()
+	void InitializeTR4Objects()
 	{
 		ObjectInfo* objectPtr = nullptr;
 		StartEntity(objectPtr);

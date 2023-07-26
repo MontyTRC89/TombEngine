@@ -22,7 +22,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0,
-			-SECTOR(0.5f), SECTOR(0.5f)
+			-BLOCK(0.5f), BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -31,7 +31,7 @@ namespace TEN::Entities::Switches
 	};
 	const auto CrowDovePos = Vector3i(0, 0, -400);
 
-	void InitialiseCrowDoveSwitch(short itemNumber)
+	void InitializeCrowDoveSwitch(short itemNumber)
 	{
 		g_Level.Items[itemNumber].MeshBits = 3;
 	}
@@ -48,7 +48,7 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 				laraItem->Animation.IsAirborne ||
 				laraInfo->Control.HandStatus != HandStatus::Free) &&
-			(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
+			(!laraInfo->Control.IsMoving || laraInfo->Context.InteractedItem != itemNumber))
 		{
 			if (laraItem->Animation.ActiveState != LS_DOVE_SWITCH)
 				ObjectCollision(itemNumber, laraItem, coll);
@@ -63,7 +63,7 @@ namespace TEN::Entities::Switches
 				{
 					laraItem->Animation.AnimNumber = LA_DOVESWITCH_TURN;
 					laraItem->Animation.ActiveState = LS_DOVE_SWITCH;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 
 					AddActiveItem(itemNumber);
 
@@ -73,19 +73,19 @@ namespace TEN::Entities::Switches
 
 					switchItem->Status = ITEM_ACTIVE;
 					switchItem->Pose.Orientation.y = oldYrot;
-					ResetLaraFlex(laraItem);
+					ResetPlayerFlex(laraItem);
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
-					laraInfo->InteractedItem = itemNumber;
+					laraInfo->Context.InteractedItem = itemNumber;
 				}
 				else
-					laraInfo->InteractedItem = itemNumber;
+					laraInfo->Context.InteractedItem = itemNumber;
 				
 				switchItem->Pose.Orientation.y = oldYrot;
 			}
 			else
 			{
-				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+				if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 				{
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Free;

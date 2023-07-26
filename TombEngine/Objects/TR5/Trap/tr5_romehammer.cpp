@@ -4,7 +4,7 @@
 #include "Game/items.h"
 #include "Specific/level.h"
 
-void InitialiseRomeHammer(short itemNumber)
+void InitializeRomeHammer(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

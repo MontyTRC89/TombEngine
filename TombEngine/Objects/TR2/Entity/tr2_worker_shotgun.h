@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	void InitialiseWorkerShotgun(short itemNumber);
+	void InitializeWorkerShotgun(short itemNumber);
 	void WorkerShotgunControl(short itemNumber);
 }

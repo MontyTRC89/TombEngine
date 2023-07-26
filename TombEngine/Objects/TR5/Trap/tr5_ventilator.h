@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseVentilator(short itemNumber);
+void InitializeVentilator(short itemNumber);
 void VentilatorControl(short itemNumber);

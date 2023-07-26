@@ -6,14 +6,14 @@
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
+#include "Game/Setup.h"
 #include "Objects/objectslist.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Bubble

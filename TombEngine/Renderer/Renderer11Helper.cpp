@@ -1,8 +1,12 @@
 #include "framework.h"
 
 #include <algorithm>
+#include <ctime>
+#include <filesystem>
+#include <ScreenGrab.h>
+#include <wincodec.h>
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -10,6 +14,7 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
@@ -27,7 +32,7 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Math;
 
@@ -241,11 +246,8 @@ namespace TEN::Renderer
 					case 2:
 					case 3:
 					case 4:
-						// TODO: Sort out this nonsense.
-						currentBone->ExtraRotation = EulerAngles(
-							0,
-							0,
-							(short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(EulerAngles(prevRotation).z)).ToQuaternion();
+						short zRot = (short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + EulerAngles(prevRotation).z;
+						currentBone->ExtraRotation = EulerAngles(0, 0, zRot).ToQuaternion();
 						break;
 					}
 				},
@@ -274,27 +276,33 @@ namespace TEN::Renderer
 				[&j, &currentBone](BigGunInfo& bigGun)
 				{
 					if (j == 2)
-						currentBone->ExtraRotation.z = bigGun.BarrelRotation;
+						currentBone->ExtraRotation = EulerAngles(0, 0, FROM_RAD(bigGun.BarrelRotation)).ToQuaternion();
 				},
-				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+					[&j, &currentBone, &lastJoint](CreatureInfo& creature)
 				{
+					auto xRot = Quaternion::Identity;
+					auto yRot = Quaternion::Identity;
+					auto zRot = Quaternion::Identity;
+
 					if (currentBone->ExtraRotationFlags & ROT_Y)
 					{
-						currentBone->ExtraRotation = EulerAngles(0, creature.JointRotation[lastJoint], 0).ToQuaternion();
+						yRot = EulerAngles(0, creature.JointRotation[lastJoint], 0).ToQuaternion();
 						lastJoint++;
 					}
 
 					if (currentBone->ExtraRotationFlags & ROT_X)
 					{
-						currentBone->ExtraRotation = EulerAngles(creature.JointRotation[lastJoint], 0, 0).ToQuaternion();
+						xRot = EulerAngles(creature.JointRotation[lastJoint], 0, 0).ToQuaternion();
 						lastJoint++;
 					}
 
 					if (currentBone->ExtraRotationFlags & ROT_Z)
 					{
-						currentBone->ExtraRotation = EulerAngles(0, 0, creature.JointRotation[lastJoint]).ToQuaternion();
+						zRot = EulerAngles(0, 0, creature.JointRotation[lastJoint]).ToQuaternion();
 						lastJoint++;
 					}
+
+					currentBone->ExtraRotation = xRot * yRot * zRot;
 				});
 		}
 
@@ -307,17 +315,14 @@ namespace TEN::Renderer
 
 	void Renderer11::UpdateItemAnimations(RenderView& view)
 	{
-		Matrix translation;
-		Matrix rotation;
-
-		for (auto* room : view.roomsToDraw)
+		for (const auto* room : view.RoomsToDraw)
 		{
-			for (auto* itemToDraw : room->ItemsToDraw)
+			for (const auto* itemToDraw : room->ItemsToDraw)
 			{
-				auto* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
+				const auto& nativeItem = g_Level.Items[itemToDraw->ItemNumber];
 
-				// Lara has her own routine
-				if (nativeItem->ObjectNumber == ID_LARA)
+				// Player has its own routine.
+				if (nativeItem.ObjectNumber == ID_LARA)
 					continue;
 
 				UpdateItemAnimations(itemToDraw->ItemNumber, false);
@@ -329,21 +334,21 @@ namespace TEN::Renderer
 	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
-		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
+		obj->Skeleton->GlobalTranslation = Vector3::Zero;
 		node->GlobalTranslation = node->Translation + parentNode->GlobalTranslation;
 
-		for (int j = 0; j < node->Children.size(); j++)
-			BuildHierarchyRecursive(obj, node->Children[j], node);
+		for (auto* childNode : node->Children)
+			BuildHierarchyRecursive(obj, childNode, node);
 	}
 
 	void Renderer11::BuildHierarchy(RendererObject *obj)
 	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
-		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
+		obj->Skeleton->GlobalTranslation = Vector3::Zero;
 
-		for (int j = 0; j < obj->Skeleton->Children.size(); j++)
-			BuildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
+		for (auto* childNode : obj->Skeleton->Children)
+			BuildHierarchyRecursive(obj, childNode, obj->Skeleton);
 	}
 
 	bool Renderer11::IsFullsScreen() 
@@ -357,7 +362,7 @@ namespace TEN::Renderer
 			farView = DEFAULT_FAR_VIEW;
 
 		m_farView = farView;
-		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
+		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 	}
 
 	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
@@ -415,18 +420,25 @@ namespace TEN::Renderer
 
 		if (!itemToDraw->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
+			{
 				UpdateLaraAnimations(false);
+			}
 			else
+			{
 				UpdateItemAnimations(itemNumber, false);
+			}
 		}
 
-		Matrix world;
-
+		auto world = Matrix::Identity;
 		if (worldSpace & SPHERES_SPACE_WORLD)
+		{
 			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+		}
 		else
+		{
 			world = Matrix::Identity * local;
+		}
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
@@ -449,12 +461,12 @@ namespace TEN::Renderer
 			// AddLine3D(v1, v2, Vector4::One);
 		}
 
-		return moveable.ObjectMeshes.size();
+		return (int)moveable.ObjectMeshes.size();
 	}
 
 	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
 	{
-		if (itemNumber == Lara.ItemNumber)
+		if (itemNumber == LaraItem->Index)
 		{
 			auto& object = *m_moveableObjects[ID_LARA];
 			*outMatrix = object.AnimationTransforms[jointIndex] * m_LaraWorldMatrix;
@@ -509,34 +521,32 @@ namespace TEN::Renderer
 		return Vector2i(m_screenWidth, m_screenHeight);
 	}
 
-	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
+	std::optional<Vector2> Renderer11::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
-			gameCamera.camera.WorldPosition.x,
-			gameCamera.camera.WorldPosition.y,
-			gameCamera.camera.WorldPosition.z,
+			gameCamera.Camera.WorldPosition.x,
+			gameCamera.Camera.WorldPosition.y,
+			gameCamera.Camera.WorldPosition.z,
 			1.0f);
 		auto cameraDirection = Vector4(
-			gameCamera.camera.WorldDirection.x,
-			gameCamera.camera.WorldDirection.y,
-			gameCamera.camera.WorldDirection.z,
+			gameCamera.Camera.WorldDirection.x,
+			gameCamera.Camera.WorldDirection.y,
+			gameCamera.Camera.WorldDirection.z,
 			1.0f);
 		
-		// If point is behind camera, return invalid screen space position.
+		// Point is behind camera; return nullopt.
 		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
-			return INVALID_2D_POSITION;
+			return std::nullopt;
 
 		// Calculate clip space coords.
-		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
+		point = Vector4::Transform(point, gameCamera.Camera.ViewProjection);
 
-		// Calculate normalized device coords.
+		// Calculate NDC.
 		point /= point.w;
 
-		// Calculate and return screen space position.
-		return Vector2(
-			((point.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
-			((1.0f - point.y) * SCREEN_SPACE_RES.y) / 2);
+		// Calculate and return 2D position.
+		return TEN::Utils::ConvertNDCTo2DPosition(Vector2(point));
 	}
 
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
@@ -550,7 +560,7 @@ namespace TEN::Renderer
 
 		if (!rendererItem->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
 				UpdateLaraAnimations(false);
 			else
 				UpdateItemAnimations(itemNumber, false);
@@ -573,4 +583,23 @@ namespace TEN::Renderer
 		return rItem.AnimationTransforms[jointIndex];
 	}
 
+
+	void Renderer11::SaveScreenshot()
+	{
+		char buffer[64];
+		time_t rawtime;
+
+		time(&rawtime);
+		auto time = localtime(&rawtime);
+		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.png", time);
+
+		auto screenPath = g_GameFlow->GetGameDir() + "Screenshots";
+
+		if (!std::filesystem::is_directory(screenPath))
+			std::filesystem::create_directory(screenPath);
+
+		screenPath += buffer;
+		SaveWICTextureToFile(m_context.Get(), m_backBufferTexture, GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
+			&GUID_WICPixelFormat24bppBGR, nullptr, true);
+	}
 }

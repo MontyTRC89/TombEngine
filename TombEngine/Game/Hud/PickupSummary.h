@@ -8,7 +8,9 @@ namespace TEN::Hud
 {
 	struct DisplayPickup
 	{
-		GAME_OBJECT_ID ObjectID = ID_NO_OBJECT;
+		static constexpr auto LIFE_MAX = 3.0f;
+
+		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 		unsigned int   Count	= 0;
 
 		Vector2		Position2D	= Vector2::Zero;
@@ -33,7 +35,7 @@ namespace TEN::Hud
 		// Constants
 		static constexpr auto DISPLAY_PICKUP_COUNT_MAX = 64;
 
-		// Components
+		// Members
 		std::vector<DisplayPickup> DisplayPickups = {};
 
 	public:
@@ -46,7 +48,7 @@ namespace TEN::Hud
 
 	private:
 		// Helpers
-		std::vector<Vector2> GetStack2DPositions() const;
+		std::vector<Vector2> Get2DStackPositions() const;
 		DisplayPickup&		 GetNewDisplayPickup();
 		void				 ClearInactiveDisplayPickups();
 

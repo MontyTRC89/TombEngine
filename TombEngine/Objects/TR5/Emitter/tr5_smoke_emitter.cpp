@@ -15,7 +15,7 @@
 
 using namespace TEN::Effects::Bubble;
 
-void InitialiseSmokeEmitter(short itemNumber)
+void InitializeSmokeEmitter(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -134,7 +134,7 @@ void SmokeEmitterControl(short itemNumber)
 			int dx = Camera.pos.x - item->Pose.Position.x;
 			int dz = Camera.pos.z - item->Pose.Position.z;
 
-			if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+			if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 				return;
 
 			auto* sptr = GetFreeParticle();
@@ -158,9 +158,9 @@ void SmokeEmitterControl(short itemNumber)
 			if (item->ItemFlags[2] == 4096)
 				size = (GetRandomControl() & 0x7FF) + 2048;
 
-			sptr->xVel = (short)((size * phd_sin(item->Pose.Orientation.y - 32768)) / SECTOR(1));
+			sptr->xVel = (short)((size * phd_sin(item->Pose.Orientation.y - 32768)) / BLOCK(1));
 			sptr->yVel = -16 - (GetRandomControl() & 0xF);
-			sptr->zVel = (short)((size * phd_cos(item->Pose.Orientation.y - 32768)) / SECTOR(1));
+			sptr->zVel = (short)((size * phd_cos(item->Pose.Orientation.y - 32768)) / BLOCK(1));
 			sptr->friction = 4;
 			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
@@ -196,7 +196,7 @@ void SmokeEmitterControl(short itemNumber)
 		int dx = Camera.pos.x - item->Pose.Position.x;
 		int dz = Camera.pos.z - item->Pose.Position.z;
 
-		if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+		if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 			return;
 
 		auto* sptr = GetFreeParticle();

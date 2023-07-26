@@ -14,9 +14,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math::Random;
@@ -39,7 +39,7 @@ namespace TEN::Entities::TR3
 		CORPSE_ANIM_LANDING = 3
 	};
 
-	void InitialiseCorpse(short itemNumber)
+	void InitializeCorpse(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -144,7 +144,6 @@ namespace TEN::Entities::TR3
 
 	void CorpseHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		const auto& object = Objects[target.ObjectNumber];
 		const auto& player = *GetLaraInfo(&source);
 
 		if (pos.has_value() && (player.Control.Weapon.GunType == LaraWeaponType::Pistol ||

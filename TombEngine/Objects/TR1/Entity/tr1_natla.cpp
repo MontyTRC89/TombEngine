@@ -8,32 +8,31 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
-#include "Sound/sound.h"
-#include "Specific/clock.h"
 #include "Specific/level.h"
+#include "Sound/sound.h"
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
 	// TODO: Organise.
-	constexpr auto NATLA_SHOT_DAMAGE = 100;
-	constexpr auto NATLA_NEAR_DEATH = 200;
-	constexpr auto NATLA_DEATH_TIME = FPS * 16; // 16 seconds.
-	constexpr auto NATLA_FLYMODE = 0x8000;
-	constexpr auto NATLA_TIMER = 0x7FFF;
+	constexpr auto NATLA_SHOT_DAMAGE  = 100;
+	constexpr auto NATLA_DEATH_TIME	  = 16 * FPS; // 16 seconds.
+	constexpr auto NATLA_FLY_MODE	  = 0x8000;
+	constexpr auto NATLA_TIMER		  = 0x7FFF;
 	constexpr auto NATLA_GUN_VELOCITY = 400;
 
 	constexpr auto NATLA_LAND_CHANCE = 1 / 128.0f;
 
 	constexpr auto NATLA_TURN_NEAR_DEATH_SPEED = ANGLE(6.0f);
-	constexpr auto NATLA_TURN_SPEED = ANGLE(5.0f);
-	constexpr auto NATLA_FLY_ANGLE_SPEED = ANGLE(5.0f);
-	constexpr auto NATLA_SHOOT_ANGLE = ANGLE(30.0f);
+	constexpr auto NATLA_TURN_SPEED			   = ANGLE(5.0f);
+	constexpr auto NATLA_FLY_ANGLE_SPEED	   = ANGLE(5.0f);
+	constexpr auto NATLA_SHOOT_ANGLE		   = ANGLE(30.0f);
 
-	const auto NatlaGunBite = BiteInfo(Vector3(5.0f, 220.0f, 7.0f), 4);
+	const auto NatlaGunBite = CreatureBiteInfo(Vector3(5, 220, 7), 4);
 
 	enum NatlaState
 	{
@@ -46,7 +45,8 @@ namespace TEN::Entities::Creatures::TR1
 		NATLA_STATE_SHOOT,
 		NATLA_STATE_FALL,
 		NATLA_STATE_STAND,
-		NATLA_STATE_DEATH
+		NATLA_STATE_DEATH,
+		NATLA_STATE_SHOOT_2, // After first phase when cannot fly anymore.
 	};
 
 	void NatlaControl(short itemNumber)
@@ -57,53 +57,61 @@ namespace TEN::Entities::Creatures::TR1
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short head = 0;
-		short tilt = 0;
-		short angle = 0;
-		short facing = 0;
-		short gun = creature->JointRotation[0] * 7 / 8;
+		short headingAngle = 0;
+		short tiltAngle = 0;
+		auto extraHeadRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Zero;
 
-		int shoot;
-		short timer = creature->Flags & NATLA_TIMER;
+		AI_INFO ai;
+		int timer = creature->Flags & NATLA_TIMER;
+		bool shoot = false;
 
-		AI_INFO AI;
-
-		if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
+		if (item->HitPoints <= 0 && item->ItemFlags[1] != 0)
+		{
 			item->Animation.TargetState = NATLA_STATE_DEATH;
-		else if (item->HitPoints <= NATLA_NEAR_DEATH)
+		}
+		else if (item->HitPoints <= (Objects[item->ObjectNumber].HitPoints / 2))
 		{
 			creature->LOT.Step = CLICK(1);
 			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Fly = NO_FLYING;
-			CreatureAIInfo(item, &AI);
+			creature->LOT.Zone = ZoneType::Basic;
+			CreatureAIInfo(item, &ai);
 
-			if (AI.ahead)
-				head = AI.angle;
-
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
-
-			angle = CreatureTurn(item, NATLA_TURN_NEAR_DEATH_SPEED);
-			shoot = (AI.angle > -NATLA_SHOOT_ANGLE && AI.angle < NATLA_SHOOT_ANGLE&& Targetable(item, &AI));
-
-			if (facing)
+			// NOTE: Only rotate joints if alive.
+			if (ai.ahead && item->ItemFlags[1] == 1)
 			{
-				item->Pose.Orientation.y += facing;
-				facing = 0;
+				extraHeadRot.x = ai.xAngle / 2;
+				extraHeadRot.y = ai.angle / 2;
+				extraTorsoRot.x = ai.xAngle / 2;
+				extraTorsoRot.y = ai.angle / 2;
+			}
+
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
+
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
+
+			if (item->ItemFlags[0] != 0)
+			{
+				item->Pose.Orientation.y += item->ItemFlags[0];
+				item->ItemFlags[0] = 0;
 			}
 
 			switch (item->Animation.ActiveState)
 			{
 			case NATLA_STATE_FALL:
+				creature->MaxTurn = 0;
+
 				if (item->Pose.Position.y < item->Floor)
 				{
 					item->Animation.IsAirborne = true;
 					item->Animation.Velocity.z = 0;
 				}
-				else
+				else if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Animation.TargetState = NATLA_STATE_SEMI_DEATH;
-					item->Animation.IsAirborne = 0;
+					item->Animation.IsAirborne = false;
 					item->Pose.Position.y = item->Floor;
 					timer = 0;
 				}
@@ -111,60 +119,68 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case NATLA_STATE_STAND:
-				if (!shoot)
+				creature->MaxTurn = NATLA_TURN_NEAR_DEATH_SPEED;
+
+				if (Targetable(item, &ai))
+				{
+					item->Animation.TargetState = NATLA_STATE_SHOOT_2;
+				}
+				else
+				{
 					item->Animation.TargetState = NATLA_STATE_RUN;
+				}
+
+				break;
+
+			case NATLA_STATE_SHOOT_2:
+				creature->MaxTurn = 0;
 
 				if (timer >= 20)
 				{
-					short FXNumber = CreatureEffect(item, NatlaGunBite, ShardGun);
-					if (FXNumber != NO_ITEM)
-					{
-						auto* fx = &EffectList[FXNumber];
-						gun = fx->pos.Orientation.x;
-						SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos);
-					}
-
 					timer = 0;
+					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle, ShardGun);
+					SoundEffect(SFX_TR1_ATLANTEAN_NEEDLE, &item->Pose);
 				}
 
 				break;
 
 			case NATLA_STATE_RUN:
-				tilt = angle;
+				creature->MaxTurn = NATLA_TURN_NEAR_DEATH_SPEED;
+				tiltAngle = headingAngle;
 
-				if (timer >= 20)
+				if (timer >= 20 && Targetable(item, &ai))
 				{
-					short FXNumber = CreatureEffect(item, NatlaGunBite, ShardGun);
-					if (FXNumber != NO_ITEM)
-					{
-						auto* fx = &EffectList[FXNumber];
-						gun = fx->pos.Orientation.x;
-						SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos);
-					}
-
+					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle, ShardGun);
+					SoundEffect(SFX_TR1_ATLANTEAN_NEEDLE, &item->Pose);
 					timer = 0;
 				}
 
-				if (shoot)
+				if (Targetable(item, &ai))
 					item->Animation.TargetState = NATLA_STATE_STAND;
 
 				break;
 
 			case NATLA_STATE_SEMI_DEATH:
+				creature->MaxTurn = 0;
+
 				if (timer == NATLA_DEATH_TIME)
 				{
 					item->Animation.TargetState = NATLA_STATE_STAND;
+					item->HitPoints = Objects[item->ObjectNumber].HitPoints / 2;
+					item->ItemFlags[1] = 1;
 					creature->Flags = 0;
 					timer = 0;
-					item->HitPoints = NATLA_NEAR_DEATH;
 				}
 				else
+				{
 					item->HitPoints = NOT_TARGETABLE;
+				}
 
 				break;
 
 			case NATLA_STATE_FLY:
 				item->Animation.TargetState = NATLA_STATE_FALL;
+				creature->MaxTurn = 0;
 				timer = 0;
 				break;
 
@@ -173,6 +189,7 @@ namespace TEN::Entities::Creatures::TR1
 			case NATLA_STATE_AIM:
 				item->Animation.TargetState = NATLA_STATE_SEMI_DEATH;
 				item->Flags = 0;
+				creature->MaxTurn = 0;
 				timer = 0;
 				break;
 			}
@@ -182,108 +199,132 @@ namespace TEN::Entities::Creatures::TR1
 			creature->LOT.Step = CLICK(1);
 			creature->LOT.Drop = -CLICK(1);
 			creature->LOT.Fly = NO_FLYING;
-			CreatureAIInfo(item, &AI);
+			creature->LOT.Zone = ZoneType::Basic;
+			CreatureAIInfo(item, &ai);
 
-			shoot = (AI.angle > -NATLA_SHOOT_ANGLE && AI.angle < NATLA_SHOOT_ANGLE&& Targetable(item, &AI));
+			shoot = (ai.angle > -NATLA_SHOOT_ANGLE && ai.angle < NATLA_SHOOT_ANGLE) && Targetable(item, &ai);
 
-			if (item->Animation.ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLYMODE))
+			if (item->Animation.ActiveState == NATLA_STATE_FLY && (creature->Flags & NATLA_FLY_MODE))
 			{
-				if (creature->Flags & NATLA_FLYMODE && shoot && Random::TestProbability(NATLA_LAND_CHANCE))
-					creature->Flags -= NATLA_FLYMODE;
+				if (shoot && Random::TestProbability(NATLA_LAND_CHANCE))
+					creature->Flags &= ~NATLA_FLY_MODE;
 
-				if (!(creature->Flags & NATLA_FLYMODE))
-					CreatureMood(item, &AI, true);
+				if (!(creature->Flags & NATLA_FLY_MODE))
+				{
+					GetCreatureMood(item, &ai, true);
+					CreatureMood(item, &ai, true);
+				}
 
-				creature->LOT.Step = SECTOR(20);
-				creature->LOT.Drop = -SECTOR(20);
-				creature->LOT.Fly = CLICK(0.25f) / 2;
-
-				CreatureAIInfo(item, &AI);
+				creature->LOT.Step = BLOCK(20);
+				creature->LOT.Drop = -BLOCK(20);
+				creature->LOT.Fly = 16;
+				creature->LOT.Zone = ZoneType::Flyer;
+				CreatureAIInfo(item, &ai);
 			}
 			else if (!shoot)
-				creature->Flags |= NATLA_FLYMODE;
+			{
+				creature->Flags |= NATLA_FLY_MODE;
+			}
 
-			if (AI.ahead)
-				head = AI.angle;
+			if (ai.ahead)
+			{
+				extraHeadRot.x = ai.xAngle / 2;
+				extraHeadRot.y = ai.angle / 2;
+				extraTorsoRot.x = ai.xAngle / 2;
+				extraTorsoRot.y = ai.angle / 2;
+			}
 
-			if (item->Animation.ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLYMODE))
-				CreatureMood(item, &AI, false);
+			if (item->Animation.ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLY_MODE))
+			{
+				GetCreatureMood(item, &ai, false);
+				CreatureMood(item, &ai, false);
+			}
 
-			item->Pose.Orientation.y -= facing;
-			angle = CreatureTurn(item, NATLA_TURN_SPEED);
+			item->Pose.Orientation.y -= item->ItemFlags[0];
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			if (item->Animation.ActiveState == NATLA_STATE_FLY)
 			{
-				if (AI.angle > NATLA_FLY_ANGLE_SPEED)
-					facing += NATLA_FLY_ANGLE_SPEED;
-				else if (AI.angle < -NATLA_FLY_ANGLE_SPEED)
-					facing -= NATLA_FLY_ANGLE_SPEED;
+				if (ai.angle > NATLA_FLY_ANGLE_SPEED)
+				{
+					item->ItemFlags[0] += NATLA_FLY_ANGLE_SPEED;
+				}
+				else if (ai.angle < -NATLA_FLY_ANGLE_SPEED)
+				{
+					item->ItemFlags[0] -= NATLA_FLY_ANGLE_SPEED;
+				}
 				else
-					facing += AI.angle;
+				{
+					item->ItemFlags[0] += ai.angle;
+				}
 
-				item->Pose.Orientation.y += facing;
+				item->Pose.Orientation.y += item->ItemFlags[0];
 			}
 			else
 			{
-				item->Pose.Orientation.y += facing - angle;
-				facing = 0;
+				item->Pose.Orientation.y += item->ItemFlags[0] - headingAngle;
+				item->ItemFlags[0] = 0;
 			}
 
 			switch (item->Animation.ActiveState)
 			{
 			case NATLA_STATE_IDLE:
+				creature->MaxTurn = NATLA_TURN_SPEED;
 				timer = 0;
 
-				if (creature->Flags & NATLA_FLYMODE)
+				if (creature->Flags & NATLA_FLY_MODE)
+				{
 					item->Animation.TargetState = NATLA_STATE_FLY;
+				}
 				else
+				{
 					item->Animation.TargetState = NATLA_STATE_AIM;
+				}
 
 				break;
 
 			case NATLA_STATE_FLY:
-				if (!(creature->Flags & NATLA_FLYMODE) && item->Pose.Position.y == item->Floor)
+				creature->MaxTurn = NATLA_FLY_ANGLE_SPEED;
+
+				if (!(creature->Flags & NATLA_FLY_MODE) && item->Pose.Position.y == item->Floor)
 					item->Animation.TargetState = NATLA_STATE_IDLE;
 
-				if (timer >= 30)
+				if (timer >= 30 && ai.ahead)
 				{
-					short FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
-					if (FXNumber != NO_ITEM)
-					{
-						auto* fx = &EffectList[FXNumber];
-						gun = fx->pos.Orientation.x;
-						SoundEffect(SFX_TR1_ATLANTEAN_WINGS, &fx->pos);
-					}
-
 					timer = 0;
+					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle, BombGun);
+					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &item->Pose);
 				}
 
 				break;
 
 			case NATLA_STATE_AIM:
+				creature->MaxTurn = NATLA_FLY_ANGLE_SPEED;
+
 				if (item->Animation.RequiredState != NO_STATE)
+				{
 					item->Animation.TargetState = item->Animation.RequiredState;
+				}
 				else if (shoot)
+				{
 					item->Animation.TargetState = NATLA_STATE_SHOOT;
+				}
 				else
+				{
 					item->Animation.TargetState = NATLA_STATE_IDLE;
+				}
 
 				break;
 
 			case NATLA_STATE_SHOOT:
-				if (item->Animation.RequiredState == NO_STATE)
+				creature->MaxTurn = NATLA_FLY_ANGLE_SPEED;
+
+				if (item->Animation.RequiredState == NO_STATE && ai.ahead)
 				{
-					short FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
-					if (FXNumber != NO_ITEM)
-						gun = EffectList[FXNumber].pos.Orientation.x;
-
-					FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
-					if (FXNumber != NO_ITEM)
-						EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
-
-					FXNumber = CreatureEffect(item, NatlaGunBite, BombGun);
-					if (FXNumber != NO_ITEM)
-						EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
+					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle, BombGun);
+					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle + (GetRandomControl() - ANGLE(45.0f)) / 4, BombGun);
+					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle + (GetRandomControl() - ANGLE(45.0f)) / 4, BombGun);
+					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &item->Pose);
 
 					item->Animation.RequiredState = NATLA_STATE_IDLE;
 				}
@@ -292,17 +333,22 @@ namespace TEN::Entities::Creatures::TR1
 			}
 		}
 
-		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, -head);
-
-		if (gun)
-			CreatureJoint(item, 0, gun);
+		CreatureTilt(item, tiltAngle);
+		CreatureJoint(item, 0, extraTorsoRot.y);
+		CreatureJoint(item, 1, extraTorsoRot.x);
+		CreatureJoint(item, 2, extraHeadRot.y);
+		CreatureJoint(item, 3, extraHeadRot.x);
 
 		timer++;
-		creature->Flags = (creature->Flags & NATLA_FLYMODE) + timer;
+		creature->Flags &= ~NATLA_TIMER;
+		creature->Flags |= timer & NATLA_TIMER;
 
-		item->Pose.Orientation.y -= facing;
-		CreatureAnimation(itemNumber, angle, tilt);
-		item->Pose.Orientation.y += facing;
+		if (item->ItemFlags[1] == 0)
+			item->Pose.Orientation.y -= item->ItemFlags[0];
+
+		CreatureAnimation(itemNumber, headingAngle, 0);
+
+		if (item->ItemFlags[1] == 0)
+			item->Pose.Orientation.y += item->ItemFlags[0];
 	}
 }

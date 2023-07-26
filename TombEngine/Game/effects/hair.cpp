@@ -9,10 +9,10 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
@@ -29,7 +29,7 @@ namespace TEN::Effects::Hair
 
 		// Get world matrix from head bone.
 		auto worldMatrix = Matrix::Identity;
-		g_Renderer.GetBoneMatrix(player.ItemNumber, LM_HEAD, &worldMatrix);
+		g_Renderer.GetBoneMatrix(item.Index, LM_HEAD, &worldMatrix);
 
 		// Apply base offset to world matrix.
 		auto relOffset = GetRelBaseOffset(hairUnitIndex, isYoung);
@@ -81,7 +81,7 @@ namespace TEN::Effects::Hair
 				// TR3 UPV uses a hack which forces player water status to dry. 
 				// Therefore, cannot directly use water status value to determine enrironment.
 				bool isOnLand = (player.Control.WaterStatus == WaterStatus::Dry &&
-								 (player.Vehicle == -1 || g_Level.Items[player.Vehicle].ObjectNumber != ID_UPV));
+								 (player.Context.Vehicle == -1 || g_Level.Items[player.Context.Vehicle].ObjectNumber != ID_UPV));
 
 				// Handle segment room collision.
 				CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
@@ -141,28 +141,28 @@ namespace TEN::Effects::Hair
 		// TODO: Not needed?
 		if (player.HitDirection >= 0)
 		{
-			int spasm = 0;
+			int animNumber = 0;
 			switch (player.HitDirection)
 			{
 			case NORTH:
-				spasm = (player.Control.IsLow) ? 294 : 125;
+				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_FRONT : LA_STAND_HIT_FRONT;
 				break;
 
 			case SOUTH:
-				spasm = (player.Control.IsLow) ? 293 : 126;
+				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_BACK : LA_STAND_HIT_BACK;
 				break;
 
 			case EAST:
-				spasm = (player.Control.IsLow) ? 295 : 127;
+				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_LEFT : LA_STAND_HIT_LEFT;
 				break;
 
 			default:
-				spasm = (player.Control.IsLow) ? 296 : 128;
+				animNumber = (player.Control.IsLow) ? LA_CROUCH_HIT_RIGHT : LA_STAND_HIT_RIGHT;
 				break;
 			}
 
-			int frameIndex = g_Level.Anims[spasm].FramePtr;
-			const auto& frame = g_Level.Frames[frameIndex + player.HitFrame];
+			int frameBaseIndex = GetAnimData(item.ObjectNumber, animNumber).FramePtr;
+			const auto& frame = g_Level.Frames[frameBaseIndex + player.HitFrame];
 			return frame.BoundingBox.GetCenter();
 		}
 

@@ -15,10 +15,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
@@ -44,16 +44,13 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 	constexpr auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
-	const auto SethBite1   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 17);
-	const auto SethBite2   = BiteInfo(Vector3(0.0f, 220.0f, 50.0f), 13);
-	const auto SethAttack1 = BiteInfo(Vector3(-16.0f, 200.0f, 32.0f), 13);
-	const auto SethAttack2 = BiteInfo(Vector3(16.0f, 200.0f, 32.0f), 17);
+	const auto SethBite1   = CreatureBiteInfo(Vector3(0, 220, 50), 17);
+	const auto SethBite2   = CreatureBiteInfo(Vector3(0, 220, 50), 13);
+	const auto SethAttack1 = CreatureBiteInfo(Vector3(-16, 200, 32), 13);
+	const auto SethAttack2 = CreatureBiteInfo(Vector3(16, 200, 32), 17);
 
 	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
-
-	constexpr auto LARA_STATE_SETH_DEATH = 14;
-	constexpr auto LARA_ANIM_SETH_DEATH	 = 14;
 
 	enum SethState
 	{
@@ -109,11 +106,11 @@ namespace TEN::Entities::TR4
 		SETH_ANIM_HOVER_IDLE = 28
 	};
 
-	void InitialiseSeth(short itemNumber)
+	void InitializeSeth(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(&item, SETH_ANIM_IDLE);
 	}
 
@@ -303,7 +300,7 @@ namespace TEN::Entities::TR4
 				if (canJump)
 				{
 					if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + SETH_ANIM_POUNCE_ATTACK_START) &&
-						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+						item->Animation.FrameNumber == GetAnimData(item).frameBase)
 					{
 						creature.MaxTurn = 0;
 						creature.ReachedGoal = true;
@@ -343,7 +340,7 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_HARD_RECOIL:
 				if (item->Animation.AnimNumber == (Objects[item->Animation.AnimNumber].animIndex + SETH_ANIM_HARD_RECOIL_START) &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+					item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 				{
 					if (Random::TestProbability(SETH_HARD_RECOIL_RECOVER_CHANCE))
 						item->Animation.RequiredState = SETH_STATE_HARD_RECOIL_RECOVER;
@@ -370,8 +367,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.TestAny())
 					{
-						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + SETH_ANIM_POUNCE_ATTACK_START) &&
-							item->Animation.FrameNumber < (g_Level.Anims[item->Animation.AnimNumber].frameBase + SETH_ANIM_IDLE_TO_HOVER))
+						if (item->Animation.FrameNumber > (GetAnimData(item).frameBase + SETH_ANIM_POUNCE_ATTACK_START) &&
+							item->Animation.FrameNumber < (GetAnimData(item).frameBase + SETH_ANIM_IDLE_TO_HOVER))
 						{
 							DoDamage(creature.Enemy, SETH_KILL_ATTACK_DAMAGE);
 							CreatureEffect2(item, SethBite1, 25, -1, DoBloodSplat);
@@ -496,8 +493,8 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[0]++;
 
-		auto pos1 = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position));
-		auto pos2 = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position));
+		auto pos1 = GetJointPosition(item, SethAttack1);
+		auto pos2 = GetJointPosition(item, SethAttack2);
 
 		int sparkR = 64;
 		int sparkG = Random::GenerateInt(64, 192);
@@ -545,13 +542,13 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
-				auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
+				auto pos = GetJointPosition(item, SethAttack1.BoneID, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 				SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 0);
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 			{
-				auto pos = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
+				auto pos = GetJointPosition(item, SethAttack2.BoneID, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
 				SethProjectileAttack(Pose(pos2, orient), item->RoomNumber, 0);
 			}
@@ -582,11 +579,11 @@ namespace TEN::Entities::TR4
 			{
 				if (Wibble & 4)
 				{
-					auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
+					auto pos = GetJointPosition(item, SethAttack1.BoneID, Vector3i(SethAttack1.Position.x, SethAttack1.Position.y * 2, SethAttack1.Position.z));
 					auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 					SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 0);
 
-					pos = GetJointPosition(item, SethAttack2.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
+					pos = GetJointPosition(item, SethAttack2.BoneID, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 					orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos.ToVector3());
 					SethProjectileAttack(Pose(pos2, orient), item->RoomNumber, 0);
 				}
@@ -627,14 +624,11 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] == 102)
 			{
-				auto pos = GetJointPosition(item, SethAttack1.meshNum, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
+				auto pos = GetJointPosition(item, SethAttack1.BoneID, Vector3i(SethAttack2.Position.x, SethAttack2.Position.y * 2, SethAttack2.Position.z));
 				auto orient = Geometry::GetOrientToPoint(pos1.ToVector3(), pos.ToVector3());
 				SethProjectileAttack(Pose(pos1, orient), item->RoomNumber, 1);
 			}
 
-			break;
-
-		default:
 			break;
 		}
 	}
@@ -668,15 +662,12 @@ namespace TEN::Entities::TR4
 
 		SetAnimation(item, SETH_ANIM_KILL_ATTACK_END);
 
-		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SETH_DEATH;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		laraItem->Animation.ActiveState = LARA_STATE_SETH_DEATH;
-		laraItem->Animation.TargetState = LARA_STATE_SETH_DEATH;
+		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_SETH_DEATH );
 		laraItem->Animation.IsAirborne = false;
 		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
 
 		if (item->RoomNumber != laraItem->RoomNumber)
-			ItemNewRoom(lara.ItemNumber, item->RoomNumber);
+			ItemNewRoom(laraItem->Index, item->RoomNumber);
 
 		AnimateItem(laraItem);
 		laraItem->HitPoints = -1;

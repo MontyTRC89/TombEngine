@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.0.8 Lua API</title>
+    <title>TombEngine 1.1.0 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -64,6 +64,7 @@
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li>    <a href="../3 primitive classes/Vec2.html">Vec2</a></li>
   <li>    <a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
 <h2>4 Enums</h2>
@@ -72,6 +73,8 @@
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
   <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
   <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
+  <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
+  <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -141,12 +144,31 @@
     <dd>
     Register a function as a callback.
 
-		<p>Possible values for CallbackPoint:</p>
-        <pre class="example">PRECONTROLPHASE <span class="comment">-- will be called immediately before OnControlPhase
+		<p>This is intended for module/library developers who want their modules to do
+stuff during level start/load/end/save/control phase, but don't want the level
+designer to add calls to <code>OnStart</code>, <code>OnLoad</code>, etc. in their level script.</p>
+
+<p>Possible values for CallbackPoint:</p>
+        <pre class="example"><span class="comment">-- These take functions which accept no arguments
+</span>PRESTART <span class="comment">-- will be called immediately before OnStart
+</span>POSTSTART <span class="comment">-- will be called immediately after OnStart
+</span>
+PRESAVE <span class="comment">-- will be called immediately before OnSave
+</span>POSTSAVE <span class="comment">-- will be called immediately after OnSave
+</span>
+PRELOAD <span class="comment">-- will be called immediately before OnLoad
+</span>POSTLOAD <span class="comment">-- will be called immediately after OnLoad
+</span>
+<span class="comment">-- These take a LevelEndReason arg, like OnEnd
+</span>PREEND <span class="comment">-- will be called immediately before OnEnd
+</span>POSTEND <span class="comment">-- will be called immediately after OnEnd
+</span>
+<span class="comment">-- These take functions which accepts a deltaTime argument
+</span>PRECONTROLPHASE <span class="comment">-- will be called immediately before OnControlPhase
 </span>POSTCONTROLPHASE <span class="comment">-- will be called immediately after OnControlPhase
 </span></pre>
 		<p>The order in which two functions with the same CallbackPoint are called is undefined.
-i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRECONTROLPHASE</code>, both will be called before <code>OnControlPhase</code>, but there is no guarantee whether <code>MyFunc</code> will be called before <code>MyFunc2</code>, or vice-versa.</p>
+i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRECONTROLPHASE</code>, both will be called before <code>OnControlPhase</code>, but there is no guarantee that <code>MyFunc</code> will be called before <code>MyFunc2</code>, or vice-versa.</p>
 
 <p>Any returned value will be discarded.</p>
 
@@ -159,7 +181,7 @@ i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRE
         </li>
         <li><span class="parameter">func</span>
             <span class="types"><span class="type">function</span></span>
-         The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+         The function to be called (must be in the <a href="../1 modules/Logic.html#LevelFuncs">LevelFuncs</a> hierarchy). Will receive, as an argument, the time in seconds since the last frame.
         </li>
     </ul>
 
@@ -354,7 +376,24 @@ and provides the delta time (a float representing game time since last call) via
         </li>
         <li><span class="parameter">OnEnd</span>
             <span class="types"><span class="type">function</span></span>
-         Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level.
+
+<p>(EndReason) Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an <code>EndReason</code> arg:</p>
+
+<pre><code>EXITTOTITLE
+LEVELCOMPLETE
+LOADGAME
+DEATH
+OTHER
+</code></pre>
+
+<p>For example:</p>
+<pre><code>LevelFuncs.OnEnd = function(reason)
+    if(reason == TEN.Logic.EndReason.DEATH) then
+        print("death")
+    end
+end
+</code></pre>
+
         </li>
     </ul>
 
@@ -369,8 +408,8 @@ and provides the delta time (a float representing game time since last call) via
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2023-03-24 18:25:34 </i>
+<i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
+<i style="float:right;">Last updated 2023-07-20 12:10:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

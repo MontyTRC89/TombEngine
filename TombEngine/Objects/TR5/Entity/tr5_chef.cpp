@@ -9,13 +9,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto ChefBite = BiteInfo(Vector3(0.0f, 200.0f, 0.0f), 13);
+	const auto ChefBite = CreatureBiteInfo(Vector3(0, 200, 0), 13);
 
 	// TODO
 	enum ChefState
@@ -37,11 +37,11 @@ namespace TEN::Entities::Creatures::TR5
 		CHEF_ANIM_DEATH = 16
 	};
 
-	void InitialiseChef(short itemNumber)
+	void InitializeChef(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, CHEF_ANIM_IDLE);
 		item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
 		item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);
@@ -55,7 +55,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
+		short headingAngle = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;
@@ -64,10 +64,8 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			if (item->Animation.ActiveState != CHEF_STATE_DEATH)
 			{
+				SetAnimation(item, CHEF_ANIM_DEATH);
 				item->HitPoints = 0;
-				item->Animation.ActiveState = CHEF_STATE_DEATH;
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CHEF_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 		else
@@ -77,14 +75,14 @@ namespace TEN::Entities::Creatures::TR5
 			else if (creature->HurtByLara)
 				creature->Enemy = LaraItem;
 
-			AI_INFO AI;
+			AI_INFO ai;
 			AI_INFO aiLaraInfo;
-			CreatureAIInfo(item, &AI);
+			CreatureAIInfo(item, &ai);
 
 			if (creature->Enemy == LaraItem)
 			{
-				aiLaraInfo.angle = AI.angle;
-				aiLaraInfo.distance = AI.distance;
+				aiLaraInfo.angle = ai.angle;
+				aiLaraInfo.distance = ai.distance;
 			}
 			else
 			{
@@ -100,16 +98,16 @@ namespace TEN::Entities::Creatures::TR5
 				aiLaraInfo.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
 			short angle = CreatureTurn(item, creature->MaxTurn);
 
-			if (AI.ahead)
+			if (ai.ahead)
 			{
-				joint0 = AI.angle / 2;
+				joint0 = ai.angle / 2;
 				//joint1 = info.xAngle;
-				joint2 = AI.angle / 2;
+				joint2 = ai.angle / 2;
 			}
 
 			creature->MaxTurn = 0;
@@ -117,8 +115,8 @@ namespace TEN::Entities::Creatures::TR5
 			switch (item->Animation.ActiveState)
 			{
 			case CHEF_STATE_COOKING:
-				if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(1) &&
-					AI.distance < pow(SECTOR(1.5f), 2) &&
+				if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < BLOCK(1) &&
+					ai.distance < pow(BLOCK(1.5f), 2) &&
 					(item->TouchBits.TestAny() ||
 						item->HitStatus ||
 						LaraItem->Animation.Velocity.z > 15 ||
@@ -134,11 +132,11 @@ namespace TEN::Entities::Creatures::TR5
 			case CHEF_STATE_TURN_180:
 				creature->MaxTurn = 0;
 
-				if (AI.angle > 0)
+				if (ai.angle > 0)
 					item->Pose.Orientation.y -= ANGLE(2.0f);
 				else
 					item->Pose.Orientation.y += ANGLE(2.0f);
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 					item->Pose.Orientation.y += -ANGLE(180.0f);
 
 				break;
@@ -146,21 +144,21 @@ namespace TEN::Entities::Creatures::TR5
 			case CHEF_STATE_ATTACK:
 				creature->MaxTurn = 0;
 
-				if (abs(AI.angle) >= ANGLE(2.0f))
+				if (abs(ai.angle) >= ANGLE(2.0f))
 				{
-					if (AI.angle > 0)
+					if (ai.angle > 0)
 						item->Pose.Orientation.y += ANGLE(2.0f);
 					else
 						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.y += ai.angle;
 
 				if (!creature->Flags)
 				{
 					if (item->TouchBits & 0x2000)
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
+						if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 10)
 						{
 							DoDamage(creature->Enemy, 80);
 							CreatureEffect2(item, ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);
@@ -176,14 +174,14 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = ANGLE(2.0f);
 				creature->Flags = 0;
 
-				if (AI.distance >= pow(682, 2))
+				if (ai.distance >= pow(682, 2))
 				{
-					if (AI.angle > ANGLE(112.5f) || AI.angle < -ANGLE(112.5f))
+					if (ai.angle > ANGLE(112.5f) || ai.angle < -ANGLE(112.5f))
 						item->Animation.TargetState = CHEF_STATE_TURN_180;
 					else if (creature->Mood == MoodType::Attack)
 						item->Animation.TargetState = CHEF_STATE_WALK;
 				}
-				else if (AI.bite)
+				else if (ai.bite)
 					item->Animation.TargetState = CHEF_STATE_ATTACK;
 
 				break;
@@ -191,9 +189,9 @@ namespace TEN::Entities::Creatures::TR5
 			case CHEF_STATE_WALK:
 				creature->MaxTurn = ANGLE(7.0f);
 
-				if (AI.distance < pow(682, 2) ||
-					AI.angle > ANGLE(112.5f) ||
-					AI.angle < -ANGLE(112.5f) ||
+				if (ai.distance < pow(682, 2) ||
+					ai.angle > ANGLE(112.5f) ||
+					ai.angle < -ANGLE(112.5f) ||
 					creature->Mood != MoodType::Attack)
 				{
 					item->Animation.TargetState = CHEF_STATE_AIM;
@@ -210,6 +208,6 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureJoint(item, 0, joint0);
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
-		CreatureAnimation(itemNumber, angle, 0);
+		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }

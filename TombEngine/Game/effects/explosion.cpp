@@ -4,8 +4,8 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -63,7 +63,7 @@ namespace TEN::Effects::Explosion
 			int numSprites = -Objects[ID_EXPLOSION_SPRITES].nmeshes - 1;
 			float normalizedAge = e.age / e.life;
 			e.sprite = Lerp(0.0f, numSprites, normalizedAge);
-			e.tint = Vector4::Lerp(Vector4(2, 2, 2, 1), Vector4(0, 0, 0, 0), normalizedAge);
+			e.tint = Vector4::Lerp(Vector4(2, 2, 2, 1), Vector4::Zero, normalizedAge);
 		}
 	}
 

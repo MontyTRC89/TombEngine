@@ -13,10 +13,10 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -29,8 +29,8 @@ namespace TEN::Entities::Creatures::TR1
 
 	constexpr auto CENTAUR_TURN_RATE_MAX = ANGLE(4.0f);
 
-	const auto CentaurRocketBite = BiteInfo(Vector3(11.0f, 415.0f, 41.0f), 13);
-	const auto CentaurRearBite	 = BiteInfo(Vector3(50.0f, 30.0f, 0.0f), 5);
+	const auto CentaurRocketBite = CreatureBiteInfo(Vector3(11, 415, 41), 13);
+	const auto CentaurRearBite	 = CreatureBiteInfo(Vector3(50, 30, 0), 5);
 	const auto CentaurAttackJoints = std::vector<unsigned int>{ 0, 3, 4, 7, 8, 16, 17 };
 
 	enum CentaurState
@@ -150,7 +150,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			ExplodingDeath(itemNumber, BODY_EXPLODE);
+			ExplodingDeath(itemNumber, BODY_DO_EXPLOSION);
 			KillItem(itemNumber);
 			item->Status = ITEM_DEACTIVATED;
 		}

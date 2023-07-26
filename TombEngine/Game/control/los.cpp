@@ -8,13 +8,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "ScriptInterfaceGame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 int NumberLosRooms;
 short LosRooms[20];
@@ -104,9 +104,9 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 
 	if (itemNumber != NO_LOS_ITEM)
 	{
-		target2.x = vector.x - (vector.x - origin->x >> 5);
-		target2.y = vector.y - (vector.y - origin->y >> 5);
-		target2.z = vector.z - (vector.z - origin->z >> 5);
+		target2.x = vector.x - ((vector.x - origin->x) >> 5);
+		target2.y = vector.y - ((vector.y - origin->y) >> 5);
+		target2.z = vector.z - ((vector.z - origin->z) >> 5);
 
 		GetFloor(target2.x, target2.y, target2.z, &target2.RoomNumber);
 
@@ -199,7 +199,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 					}
 					else
 					{
-						if (ShatterItem.bit == 1 << Objects[item->ObjectNumber].nmeshes - 1)
+						if (ShatterItem.bit == 1 << (Objects[item->ObjectNumber].nmeshes - 1))
 						{
 							if (!(item->Flags & 0x40))
 							{
@@ -252,7 +252,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			else
 			{
 				if (LaserSight && isFiring)
-					FireCrossBowFromLaserSight(LaraItem, origin, &target2);
+					FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 			}
 		}
 
@@ -263,13 +263,13 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 		{
 			if (isFiring && LaserSight)
-				FireCrossBowFromLaserSight(LaraItem, origin, &target2);
+				FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 		}
 		else
 		{
-			target2.x -= target2.x - origin->x >> 5;
-			target2.y -= target2.y - origin->y >> 5;
-			target2.z -= target2.z - origin->z >> 5;
+			target2.x -= (target2.x - origin->x) >> 5;
+			target2.y -= (target2.y - origin->y) >> 5;
+			target2.z -= (target2.z - origin->z) >> 5;
 
 			if (isFiring && !result)
 				TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 8, 0);
@@ -560,8 +560,8 @@ int xLOS(GameVector* origin, GameVector* target)
 	if (!dx)
 		return 1;
 
-	int dy = (target->y - origin->y << 10) / dx;
-	int dz = (target->z - origin->z << 10) / dx;
+	int dy = ((target->y - origin->y) << 10) / dx;
+	int dz = ((target->z - origin->z) << 10) / dx;
 
 	NumberLosRooms = 1;
 	LosRooms[0] = origin->RoomNumber;
@@ -606,7 +606,7 @@ int xLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			x -= SECTOR(1);
+			x -= BLOCK(1);
 			y -= dy;
 			z -= dz;
 		}
@@ -656,7 +656,7 @@ int xLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			x += SECTOR(1);
+			x += BLOCK(1);
 			y += dy;
 			z += dz;
 		}
@@ -680,8 +680,8 @@ int zLOS(GameVector* origin, GameVector* target)
 	if (!dz)
 		return 1;
 
-	int dx = (target->x - origin->x << 10) / dz;
-	int dy = (target->y - origin->y << 10) / dz;
+	int dx = ((target->x - origin->x) << 10) / dz;
+	int dy = ((target->y - origin->y) << 10) / dz;
 
 	NumberLosRooms = 1;
 	LosRooms[0] = origin->RoomNumber;
@@ -726,7 +726,7 @@ int zLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			z -= SECTOR(1);
+			z -= BLOCK(1);
 			x -= dx;
 			y -= dy;
 		}
@@ -776,7 +776,7 @@ int zLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			z += SECTOR(1);
+			z += BLOCK(1);
 			x += dx;
 			y += dy;
 		}
@@ -801,9 +801,9 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 	int z = origin->z;
 	short roomNumber = origin->RoomNumber;
 	short roomNumber2 = roomNumber;
-	int dx = target->x - x >> 3;
-	int dy = target->y - y >> 3;
-	int dz = target->z - z >> 3;
+	int dx = (target->x - x) >> 3;
+	int dy = (target->y - y) >> 3;
+	int dz = (target->z - z) >> 3;
 	bool flag = false;
 	bool result = false;
 
