@@ -11,8 +11,8 @@
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "ScriptInterfaceGame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
@@ -606,7 +606,7 @@ int xLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			x -= SECTOR(1);
+			x -= BLOCK(1);
 			y -= dy;
 			z -= dz;
 		}
@@ -656,7 +656,7 @@ int xLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			x += SECTOR(1);
+			x += BLOCK(1);
 			y += dy;
 			z += dz;
 		}
@@ -726,7 +726,7 @@ int zLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			z -= SECTOR(1);
+			z -= BLOCK(1);
 			x -= dx;
 			y -= dy;
 		}
@@ -776,7 +776,7 @@ int zLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			z += SECTOR(1);
+			z += BLOCK(1);
 			x += dx;
 			y += dy;
 		}

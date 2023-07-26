@@ -356,7 +356,7 @@
 		<parameter>
 			<name>speed</name>
 			<type>float</type>
-			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the flash take one second. Clamped to [0.005, 1.0]</description>
+			<description>(default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1013,9 +1013,9 @@ eyes of the creatures would be.</description>
 			<description>of track (without file extension) to play</description>
 		</parameter>
 		<parameter>
-			<name>loop</name>
-			<type>bool</type>
-			<description>if true, the track will loop; if false, it won't (default: false)</description>
+			<name>type</name>
+			<type>Misc.SoundTrackType</type>
+			<description>of the audio track to play</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1045,11 +1045,44 @@ eyes of the creatures would be.</description>
 	<summary>Stop audio track that is currently playing</summary>
 	<parameters>
 		<parameter>
-			<name>looped</name>
-			<type>bool</type>
-			<description>if set, stop looped audio track, if not, stop one-shot audio track</description>
+			<name>type</name>
+			<type>Misc.SoundTrackType</type>
+			<description>of the audio track</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>GetAudioTrackLoudness</name>
+	<summary>Get current loudness level for specified track type</summary>
+	<parameters>
+		<parameter>
+			<name>type</name>
+			<type>Misc.SoundTrackType</type>
+			<description>of the audio track</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>current loudness of a specified audio track</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>GetCurrentSubtitle</name>
+	<summary>Get current subtitle string for a voice track currently playing.</summary>
+	<description>Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
+Returns nil if no voice track is playing or no subtitle present.</description>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>current subtitle string</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -1079,6 +1112,19 @@ eyes of the creatures would be.</description>
 			<name>Sound</name>
 			<type>int</type>
 			<description>ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>IsAudioTrackPlaying</name>
+	<summary>Check if the audio track is playing</summary>
+	<parameters>
+		<parameter>
+			<name>Track</name>
+			<type>string</type>
+			<description>filename to check. Should be without extension and without full directory path.</description>
 		</parameter>
 	</parameters>
 </function>

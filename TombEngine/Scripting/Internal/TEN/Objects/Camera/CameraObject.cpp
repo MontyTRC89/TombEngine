@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "Objects/Camera/CameraObject.h"
+#include "CameraObject.h"
 #include "Game/camera.h"
 
-#include "ReservedScriptNames.h"
-#include "ScriptAssert.h"
-#include "ScriptUtil.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
 #include "Specific/LevelCameraInfo.h"
 #include "Specific/level.h"
-#include "Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 /***
 Basic cameras that can point at Lara or at a CAMERA_TARGET.

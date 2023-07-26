@@ -142,7 +142,7 @@ void ElectricityWiresControl(short itemNumber)
 
 	SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->Pose);
 
-	GetCollidedObjects(item, SECTOR(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
+	GetCollidedObjects(item, BLOCK(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
 
 	auto* object = &Objects[item->ObjectNumber];
 

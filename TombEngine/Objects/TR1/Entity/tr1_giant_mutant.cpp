@@ -228,12 +228,14 @@ namespace TEN::Entities::Creatures::TR1
 			}
 		}
 		else
+		{
 			CreatureAnimation(itemNumber, 0, 0);
+		}
 
 		if (item->Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			ExplodingDeath(itemNumber, BODY_EXPLODE);
+			ExplodingDeath(itemNumber, BODY_DO_EXPLOSION);
 		
 			TestTriggers(item, true);
 

@@ -257,7 +257,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 512;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(0, ROT_X);
 		obj->SetBoneRotationFlags(1, ROT_X);
@@ -406,7 +406,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->LotType = LotType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -443,7 +443,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 128;
 		obj->intelligent = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
 		obj->SetupHitEffect(true);
@@ -460,7 +460,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -623,7 +623,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = ControlGuardian;
 		obj->explodableMeshbits = 6;
 		obj->usingDrawAnimatingItem = false;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->nonLot = true;
 		obj->SetupHitEffect(true);
 	}
@@ -637,7 +637,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->Initialize = InitializeAutoGuns;
 		obj->control = ControlAutoGun;
 		obj->intelligent = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_Y);
 		obj->SetupHitEffect(true);

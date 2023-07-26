@@ -15,9 +15,9 @@
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
-#include "LanguageScript.h"
-#include "ScriptInterfaceState.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Internal/LanguageScript.h"
+#include "Scripting/Include/ScriptInterfaceState.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
@@ -205,14 +205,14 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
-			if (!g_Configuration.Windowed)
+			if (!g_Configuration.EnableWindowedMode)
 				g_Renderer.ToggleFullScreen(true);
 
 			if (!DebugMode && ThreadHandle > 0)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
-				ResumeAllSounds();
+				ResumeAllSounds(SoundPauseMode::Global);
 			}
 
 			return 0;
@@ -220,14 +220,14 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		if (!g_Configuration.Windowed)
+		if (!g_Configuration.EnableWindowedMode)
 			ShowWindow(hWnd, SW_MINIMIZE);
 
 		if (!DebugMode)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
-			PauseAllSounds();
+			PauseAllSounds(SoundPauseMode::Global);
 		}
 	}
 
@@ -388,8 +388,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	RECT Rect;
 	Rect.left = 0;
 	Rect.top = 0;
-	Rect.right = g_Configuration.Width;
-	Rect.bottom = g_Configuration.Height;
+	Rect.right = g_Configuration.ScreenWidth;
+	Rect.bottom = g_Configuration.ScreenHeight;
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
 	// Make window handle.
@@ -425,7 +425,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		// Initialize the renderer
-		g_Renderer.Initialize(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
+		g_Renderer.Initialize(g_Configuration.ScreenWidth, g_Configuration.ScreenHeight, g_Configuration.EnableWindowedMode, App.WindowHandle);
 
 		// Initialize audio
 		Sound_Init(gameDir);
@@ -498,5 +498,4 @@ void WinClose()
 	ShutdownTENLog();
 
 	CoUninitialize();
-
 }

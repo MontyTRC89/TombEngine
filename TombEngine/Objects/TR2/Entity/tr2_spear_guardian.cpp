@@ -34,8 +34,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto SPEAR_GUARDIAN_SWAPMESH_TIME = 3;
 
-	const auto SpearGuardianBiteLeft  = CreatureBiteInfo(Vector3i(0, 0, 920), 11);
-	const auto SpearGuardianBiteRight = CreatureBiteInfo(Vector3i(0, 0, 920), 18);
+	const auto SpearGuardianBiteLeft  = CreatureBiteInfo(Vector3(0, 0, 920), 11);
+	const auto SpearGuardianBiteRight = CreatureBiteInfo(Vector3(0, 0, 920), 18);
 
 	enum SpearGuardianState
 	{

@@ -73,13 +73,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
@@ -91,13 +91,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
@@ -111,7 +111,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -158,7 +158,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -205,7 +205,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -267,7 +267,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -450,6 +450,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Objects\Sink.h" />
     <ClInclude Include="Objects\TR1\Entity\Cowboy.h" />
+    <ClInclude Include="Objects\TR1\Entity\Kold.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_ape.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bear.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_big_rat.h" />
@@ -457,6 +458,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR1\Entity\tr1_doppelganger.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_natla.h" />
+    <ClInclude Include="Objects\TR1\Entity\SkateboardKid.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
@@ -567,6 +569,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
+    <ClInclude Include="Objects\TR4\Trap\SpikyCeiling.h" />
+    <ClInclude Include="Objects\TR4\Trap\SpikyWall.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_blade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_catwalkblade.h" />
@@ -582,8 +586,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Trap\tr4_sethblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_slicerdicer.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_spikeball.h" />
-    <ClInclude Include="Objects\TR4\Trap\tr4_spikyceiling.h" />
-    <ClInclude Include="Objects\TR4\Trap\tr4_spikywall.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_stargate.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_teethspike.h" />
     <ClInclude Include="Objects\TR4\Vehicles\jeep.h" />
@@ -724,6 +726,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Misc\CameraTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\LevelLog.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\Miscellaneous.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Misc\SoundTrackTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\AIObject\AIObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Camera\CameraObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
@@ -898,6 +901,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
     <ClCompile Include="Objects\TR1\Entity\Cowboy.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\Kold.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_big_rat.cpp" />
@@ -905,6 +909,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR1\Entity\tr1_doppelganger.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_giant_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_natla.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\SkateboardKid.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_winged_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
@@ -1006,6 +1011,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Object\tr4_senet.cpp" />
     <ClCompile Include="Objects\TR4\Object\WraithTrap.cpp" />
     <ClCompile Include="Objects\TR4\tr4_objects.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\SpikyCeiling.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\SpikyWall.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_birdblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_blade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_catwalkblade.cpp" />
@@ -1021,8 +1028,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Trap\tr4_sethblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_slicerdicer.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_spikeball.cpp" />
-    <ClCompile Include="Objects\TR4\Trap\tr4_spikyceiling.cpp" />
-    <ClCompile Include="Objects\TR4\Trap\tr4_spikywall.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_stargate.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />

@@ -44,6 +44,13 @@ enum class HitEffect
     Max
 };
 
+enum class DamageMode
+{
+	AnyWeapon,
+	ExplosivesOnly,
+	None
+};
+
 enum ShatterType
 {
 	SHT_NONE,
@@ -63,6 +70,7 @@ struct ObjectInfo
 
 	LotType LotType;
 	HitEffect hitEffect;
+	DamageMode damageType;
 	ShadowMode shadowType;
 
 	int meshSwapSlot;
@@ -72,7 +80,6 @@ struct ObjectInfo
 	int HitPoints;
 	bool intelligent;	// IsIntelligent
 	bool waterCreature; // IsWaterCreature
-	bool undead;		// IsUndead
 	bool nonLot;		// IsNonLot
 	bool isPickup;		// IsPickup
 	bool isPuzzleHole;	// IsReceptacle
@@ -115,11 +122,11 @@ struct ObjectInfo
 			{
 				hitEffect = HitEffect::Richochet;
 			}
-			else if ((undead && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+			else if ((damageType != DamageMode::AnyWeapon && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
 			{
 				hitEffect = HitEffect::Smoke;
 			}
-			else if (!undead && HitPoints > 0)
+			else if (damageType == DamageMode::AnyWeapon && HitPoints > 0)
 			{
 				hitEffect = HitEffect::Blood;
 			}
@@ -135,7 +142,58 @@ struct ObjectInfo
 	}
 };
 
-struct STATIC_INFO
+class ObjectHandler
+{
+	private:
+		ObjectInfo Objects[ID_NUMBER_OBJECTS];
+
+		ObjectInfo& GetFirstAvailableObject()
+		{
+			for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
+			{
+				if (Objects[i].loaded)
+					return Objects[i];
+			}
+
+			return Objects[0];
+		}
+
+	public:
+		void Initialize() 
+		{ 
+			std::memset(Objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
+		}
+
+		bool CheckID(int index, bool isSilent = false)
+		{
+			if (index == GAME_OBJECT_ID::ID_NO_OBJECT || index >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+			{
+				if (!isSilent)
+				{
+					TENLog("Attempted to access unavailable slot ID (" + std::to_string(index) + "). " +
+						"Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
+				}
+
+				return false;
+			}
+
+			return true;
+		}
+
+		ObjectInfo& operator[](int index) 
+		{
+			if (CheckID(index))
+			{
+				return Objects[index];
+			}
+			else
+			{
+				return GetFirstAvailableObject();
+			}
+		}
+};
+
+struct StaticInfo
 {
 	int meshNumber;
 	int flags;
@@ -151,8 +209,8 @@ constexpr auto SF_SHATTERABLE = 0x02;
 constexpr auto GRAVITY = 6.0f;
 constexpr auto SWAMP_GRAVITY = GRAVITY / 3.0f;
 
-extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
-extern STATIC_INFO StaticObjects[MAX_STATICS];
+extern ObjectHandler Objects;
+extern StaticInfo StaticObjects[MAX_STATICS];
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();

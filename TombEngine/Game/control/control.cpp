@@ -218,7 +218,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		UpdateSimpleParticles();
-		UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
@@ -305,15 +304,11 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeScripting(levelIndex, loadGame);
 	InitializeNodeScripts();
 
+	// Initialize menu and inventory state.
+	g_Gui.Initialize();
+
 	// Initialize game variables and optionally load game.
 	InitializeOrLoadGame(loadGame);
-
-	// Prepare title menu, if necessary.
-	if (isTitle)
-	{
-		g_Gui.SetMenuToDisplay(Menu::Title);
-		g_Gui.SetSelectedOption(0);
-	}
 
 	// DoGameLoop() returns only when level has ended.
 	return DoGameLoop(levelIndex);
@@ -457,14 +452,15 @@ void InitializeScripting(int levelIndex, bool loadGame)
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
 			g_Renderer.AddString(
-				float(x) / float(g_Configuration.Width) * SCREEN_SPACE_RES.x,
-				float(y) / float(g_Configuration.Height) * SCREEN_SPACE_RES.y,
+				float(x) / float(g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
+				float(y) / float(g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y,
 				key.c_str(), col, flags);
 		});
 	}
 
 	// Play default background music.
-	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
+	if (!loadGame)
+		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
@@ -634,24 +630,10 @@ GameStatus HandleMenuCalls(bool isTitle)
 	else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
 			 g_Gui.GetInventoryMode() != InventoryMode::Pause)
 	{
-		g_Renderer.DumpGameScene();
-		g_Gui.SetInventoryMode(InventoryMode::Pause);
-		g_Gui.SetMenuToDisplay(Menu::Pause);
-		g_Gui.SetSelectedOption(0);
-
-		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
-		{
-			g_Gui.DrawInventory();
-			g_Renderer.Synchronize();
-
-			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
-			{
-				result = GameStatus::ExitToTitle;
-				break;
-			}
-		}
+		if (g_Gui.CallPause())
+			result = GameStatus::ExitToTitle;
 	}
-	else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
+	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
 			 LaraItem->HitPoints > 0 && !BinocularOn)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))

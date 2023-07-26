@@ -31,8 +31,9 @@ using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
-ObjectInfo Objects[ID_NUMBER_OBJECTS];
-STATIC_INFO StaticObjects[MAX_STATICS];
+ObjectHandler Objects;
+StaticInfo StaticObjects[MAX_STATICS];
+
 
 void InitializeGameFlags()
 {
@@ -49,7 +50,6 @@ void InitializeSpecialEffects()
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
-	memset(&Gunflashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
@@ -101,7 +101,7 @@ void InitializeObjects()
 		obj->waterCreature = false;
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
-		obj->undead = false;
+		obj->damageType = DamageMode::AnyWeapon;
 		obj->LotType = LotType::Basic;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
@@ -110,11 +110,11 @@ void InitializeObjects()
 
 	InitializeEffectsObjects();
 	InitializeGenericObjects(); // Generic objects
+	InitializeTR5Objects(); // Standard TR5 objects (NOTE: lara need to be loaded first, so entity like doppelganger can use this animIndex !)
 	InitializeTR1Objects(); // Standard TR1 objects
 	InitializeTR2Objects(); // Standard TR2 objects
 	InitializeTR3Objects(); // Standard TR3 objects
 	InitializeTR4Objects(); // Standard TR4 objects
-	InitializeTR5Objects(); // Standard TR5 objects
 
 	// User defined objects
 	CustomObjects();

@@ -8,8 +8,8 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
@@ -51,7 +51,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 	else
 		ModulateLaraSwimTurnRates(item, coll);
 
-	if (TrInput & IN_JUMP)
+	if (IsHeld(In::Jump))
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
 	item->Animation.Velocity.y -= LARA_SWIM_VELOCITY_DECEL;
@@ -96,7 +96,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX)
 		item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX;
 
-	if (!(TrInput & IN_JUMP))
+	if (!(IsHeld(In::Jump)))
 		item->Animation.TargetState = LS_UNDERWATER_INERTIA;
 }
 
@@ -130,7 +130,7 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 	else
 		ModulateLaraSubsuitSwimTurnRates(item);
 
-	if (TrInput & IN_JUMP)
+	if (IsHeld(In::Jump))
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
 	item->Animation.Velocity.y -= LARA_SWIM_VELOCITY_DECEL;
