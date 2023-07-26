@@ -458,17 +458,17 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 	auto pole = Geometry::TranslatePoint(middle, item.Pose.Orientation.y + pivotAngle, std::max(length0, length1) * 1.5f);
 
 	// Get 3D IK solution.
-	auto ik3DSolution = Solvers::SolveIK3D(base, end, pole, length0, length1);
+	auto ik3DSol = Solvers::SolveIK3D(base, end, pole, length0, length1);
 
 	// Debug
 	if (true)
 	{
 		g_Renderer.AddDebugSphere(pole, 25, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
-		g_Renderer.AddDebugSphere(ik3DSolution.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-		g_Renderer.AddDebugSphere(ik3DSolution.Middle, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-		g_Renderer.AddDebugSphere(ik3DSolution.End, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
-		g_Renderer.AddLine3D(ik3DSolution.Base, ik3DSolution.Middle, Vector4::One);
-		g_Renderer.AddLine3D(ik3DSolution.Middle, ik3DSolution.End, Vector4::One);
+		g_Renderer.AddDebugSphere(ik3DSol.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddDebugSphere(ik3DSol.Middle, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddDebugSphere(ik3DSol.End, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddLine3D(ik3DSol.Base, ik3DSol.Middle, Vector4::One);
+		g_Renderer.AddLine3D(ik3DSol.Middle, ik3DSol.End, Vector4::One);
 	}
 
 	// TODO: Apply the solved IK to leg joints. Everything is wrong.
@@ -517,12 +517,13 @@ void DoPlayerLegIK(ItemInfo& item)
 	constexpr auto HEEL_HEIGHT		  = 56.0f;
 	constexpr auto ALPHA			  = 0.4f;
 
-	auto& player = *GetLaraInfo(&item);
+	auto& player = GetLaraInfo(item);
 
-	// Get point collision.
 	auto hipsPos  = GetJointPosition(&item, LM_HIPS);
 	auto lFootPos = GetJointPosition(&item, LM_LFOOT);
 	auto rFootPos = GetJointPosition(&item, LM_RFOOT);
+
+	// Get point collision.
 	auto lPointColl = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber);
 	auto rPointColl = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber);
 
@@ -535,7 +536,7 @@ void DoPlayerLegIK(ItemInfo& item)
 	bool isLeftFloorSteppable  = (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
 	bool isRightFloorSteppable = (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
 
-	// If floor isn't level, perform IK on one leg.
+	// If floor isn't level, perform IK on 1 leg.
 	if (lFloorHeight != rFloorHeight)
 	{
 		// Left leg.
