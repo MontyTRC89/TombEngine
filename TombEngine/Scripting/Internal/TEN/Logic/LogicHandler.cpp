@@ -10,7 +10,6 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Vec2i/Vec2i.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
@@ -92,11 +91,13 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 	auto UnsupportedValue = [](sol::table tab, sol::object key)
 	{
 		key.push();
-		size_t strLen;
-		const char* str = luaL_tolstring(tab.lua_state(), -1, &strLen);
-		if (str)
+
+		size_t stringLength = 0;
+		auto string = std::string(luaL_tolstring(tab.lua_state(), -1, &stringLength));
+
+		if (!string.empty())
 		{
-			ScriptAssert(false, "Variable " + std::string{ str } + " has an unsupported type.", ErrorMode::Terminate);
+			ScriptAssert(false, "Variable " + string + " has an unsupported type.", ErrorMode::Terminate);
 			lua_pop(tab.lua_state(), 1);
 		}
 		else
@@ -120,7 +121,6 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 	case sol::type::userdata:
 	{
 		if (value.is<Vec2>() ||
-			value.is<Vec2i>() ||
 			value.is<Vec3>() ||
 			value.is<Rotation>() ||
 			value.is<ScriptColor>())
@@ -419,11 +419,6 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 					auto vec2 = Vec2(std::get<(int)SavedVarType::Vec2>(vars[second]));
 					solTables[i][vars[first]] = vec2;
 				}
-				else if (vars[second].index() == (int)SavedVarType::Vec2i)
-				{
-					auto vec2i = Vec2i(std::get<(int)SavedVarType::Vec2i>(vars[second]));
-					solTables[i][vars[first]] = vec2i;
-				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
 					auto vec2 = Vec3(std::get<int(SavedVarType::Vec3)>(vars[second]));
@@ -645,10 +640,6 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 					if (second.is<Vec2>())
 					{
 						putInVars(Handle<SavedVarType::Vec2, Vector2>(second.as<Vec2>(), varsMap, numVars, vars));
-					}
-					else if (second.is<Vec2i>())
-					{
-						putInVars(Handle<SavedVarType::Vec2i, Vector2i>(second.as<Vec2i>(), varsMap, numVars, vars));
 					}
 					else if (second.is<Vec3>())
 					{

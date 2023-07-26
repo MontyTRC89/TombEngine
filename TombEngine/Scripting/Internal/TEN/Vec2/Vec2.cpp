@@ -3,12 +3,11 @@
 
 #include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/Vec2i/Vec2i.h"
 
 using namespace TEN::Math;
 
 /***
-Represents a float-based 2D vector.
+Float-based 2D vector.
 @tenprimitive Vec2
 @pragma nostrip
 */
@@ -23,18 +22,11 @@ void Vec2::Register(sol::table& parent)
 		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Vec2::ToString,
 		sol::meta_function::addition, &Vec2::Add,
-		sol::meta_function::addition, &Vec2::AddVec2i,
 		sol::meta_function::subtraction, &Vec2::Subtract,
-		sol::meta_function::subtraction, &Vec2::SubtractVec2i,
 		sol::meta_function::multiplication, &Vec2::Multiply,
-		sol::meta_function::multiplication, &Vec2::MultiplyVec2i,
 		sol::meta_function::multiplication, &Vec2::MultiplyScale,
 		sol::meta_function::division, &Vec2::DivideScale,
 		sol::meta_function::unary_minus, &Vec2::UnaryMinus,
-
-		/*** Convert to Vec2i object.
-		*/
-		ScriptReserved_ToVec2i, &Vec2::ToVec2i,
 
 		/*** Modify to match input length.
 		@tparam float length new length to set.
@@ -75,11 +67,6 @@ std::string Vec2::ToString() const
 	return "{ " + std::to_string(x) + ", " + std::to_string(y) + " }";
 }
 
-Vec2i Vec2::ToVec2i()
-{
-	return Vec2i((int)round(x), (int)round(y));
-}
-
 void Vec2::SetLength(float length)
 {
 	float currentLength = sqrt(SQUARE(x) + SQUARE(y));
@@ -92,27 +79,12 @@ Vec2 Vec2::Add(const Vec2& vector0, const Vec2& vector1)
 	return Vec2(vector0.x + vector1.x, vector0.y + vector1.y);
 }
 
-Vec2 Vec2::AddVec2i(const Vec2& vector0, const Vec2i& vector1)
-{
-	return Vec2(vector0.x + vector1.x, vector0.y + vector1.y);
-}
-
 Vec2 Vec2::Subtract(const Vec2& vector0, const Vec2& vector1)
 {
 	return Vec2(vector0.x - vector1.x, vector0.y - vector1.y);
 }
 
-Vec2 Vec2::SubtractVec2i(const Vec2& vector0, const Vec2i& vector1)
-{
-	return Vec2(vector0.x - vector1.x, vector0.y - vector1.y);
-}
-
 Vec2 Vec2::Multiply(const Vec2& vector0, const Vec2& vector1)
-{
-	return Vec2(vector0.x * vector1.x, vector0.y * vector1.y);
-}
-
-Vec2 Vec2::MultiplyVec2i(const Vec2& vector0, const Vec2i& vector1)
 {
 	return Vec2(vector0.x * vector1.x, vector0.y * vector1.y);
 }

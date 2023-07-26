@@ -428,10 +428,6 @@ table vec2Table {
 	vec: Vector2;
 }
 
-table vec2iTable {
-	vec: Vector2;
-}
-
 table vec3Table {
 	vec: Vector3;
 }
@@ -454,7 +450,6 @@ union VarUnion {
 	num: doubleTable,
 	boolean: boolTable,
 	vec2: vec2Table,
-	vec2i: vec2iTable,
 	vec3: vec3Table,
 	rotation: rotationTable,
 	color: colorTable,

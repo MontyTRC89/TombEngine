@@ -1191,39 +1191,32 @@ bool SaveGame::Save(int slot)
 			switch (SavedVarType(s.index()))
 			{
 			case SavedVarType::Vec2:
-			{
-				SaveVec(SavedVarType::Vec2, s, Save::vec2TableBuilder, Save::VarUnion::vec2, Save::Vector2, FromVector2);
-			}
-			break;
-			
-			case SavedVarType::Vec2i:
-			{
-				SaveVec(SavedVarType::Vec2i, s, Save::vec2iTableBuilder, Save::VarUnion::vec2i, Save::Vector2, FromVector2i);
-			}
-			break;
-
+				{
+					SaveVec(SavedVarType::Vec2, s, Save::vec2TableBuilder, Save::VarUnion::vec2, Save::Vector2, FromVector2);
+					break;
+				}
+				
 			case SavedVarType::Vec3:
-			{
-				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
-			}
-			break;
+				{
+					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
+					break;
+				}
 
 			case SavedVarType::Rotation:
-			{
-				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation, Save::Vector3, FromVector3);
-			}
-			break;
+				{
+					SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation, Save::Vector3, FromVector3);
+					break;
+				}
 
 			case SavedVarType::Color:
-			{
-				Save::colorTableBuilder ctb{ fbb };
-				ctb.add_color(std::get<(int)SavedVarType::Color>(s));
-				auto offset = ctb.Finish();
+				{
+					Save::colorTableBuilder ctb{ fbb };
+					ctb.add_color(std::get<(int)SavedVarType::Color>(s));
+					auto offset = ctb.Finish();
 
-				putDataInVec(Save::VarUnion::color, offset);
-			}
-			break;
-
+					putDataInVec(Save::VarUnion::color, offset);
+					break;
+				}
 			}
 		}
 	}
@@ -2101,57 +2094,49 @@ bool SaveGame::Load(int slot)
 			case Save::VarUnion::boolean:
 				loadedVars.push_back(var->u_as_boolean()->scalar());
 				break;
-					
+				
 			case Save::VarUnion::str:
 				loadedVars.push_back(var->u_as_str()->str()->str());
 				break;
-					
-			case Save::VarUnion::tab:
-			{
-				auto tab = var->u_as_tab()->keys_vals();
-				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
 
-				for (const auto& pair : *tab)
-					std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
-			}
-				break;
-					
+			case Save::VarUnion::tab:
+				{
+					auto tab = var->u_as_tab()->keys_vals();
+					auto& loadedTab = loadedVars.emplace_back(IndexTable{});
+
+					for (const auto& pair : *tab)
+						std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
+
+					break;
+				}
+				
 			case Save::VarUnion::vec2:
-			{
-				auto stored = var->u_as_vec2()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec2>(ToVector2(stored));
-				loadedVars.push_back(var);
-			}
-				break;
-					
-			case Save::VarUnion::vec2i:
-			{
-				auto stored = var->u_as_vec2i()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec2i>(ToVector2i(stored));
-				loadedVars.push_back(var);
-			}
-				break;
-					
+				{
+					auto stored = var->u_as_vec2()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Vec2>(ToVector2(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
 			case Save::VarUnion::vec3:
-			{
-				auto stored = var->u_as_vec3()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
-				loadedVars.push_back(var);
-			}
-				break;
-					
+				{
+					auto stored = var->u_as_vec3()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
 			case Save::VarUnion::rotation:
-			{
-				auto stored = var->u_as_rotation()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
-				loadedVars.push_back(var);
-			}
-				break;
-					
+				{
+					auto stored = var->u_as_rotation()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
 			case Save::VarUnion::color:
 				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
 				break;

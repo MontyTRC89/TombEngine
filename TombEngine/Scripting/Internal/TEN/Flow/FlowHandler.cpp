@@ -11,7 +11,6 @@
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Vec2i/Vec2i.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
@@ -191,7 +190,6 @@ Specify which translations in the strings table correspond to which languages.
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
-	Vec2i::Register(parent);
 	Vec3::Register(parent);
 	Level::Register(tableFlow);
 	SkyLayer::Register(tableFlow);
