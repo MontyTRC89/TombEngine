@@ -438,6 +438,36 @@ void HandlePlayerStepEasing(ItemInfo* item, int height)
 	}
 }
 
+static void HandlePlayerFootRoll(ItemInfo& item, LimbRotationData& limbRot, const Vector2& floorTilt,
+	int floorToFootHeight, int heelHeight, float alpha)
+{
+	constexpr auto HEIGHT_TOLERANCE	 = -CLICK(0.1f);
+	constexpr auto ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>
+	{
+		EulerAngles(ANGLE(-50.0f), 0, ANGLE(-15.0f)),
+		EulerAngles(ANGLE(20.0f), 0, ANGLE(15.0f))
+	};
+
+	// Leg is lifted; reset foot roll.
+	if ((floorToFootHeight + heelHeight) < HEIGHT_TOLERANCE)
+	{
+		limbRot.End = Quaternion::Slerp(limbRot.End, Quaternion::Identity, alpha);
+		return;
+	}
+
+	// Get floor normal.
+	auto floorNormal = GetSurfaceNormal(floorTilt, true);
+
+	// Calculate constrained target orientation.
+	auto targetOrient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
+	targetOrient.x = std::clamp(targetOrient.x, ORIENT_CONSTRAINT.first.x, ORIENT_CONSTRAINT.second.x);
+	targetOrient.z = std::clamp(targetOrient.z, ORIENT_CONSTRAINT.first.z, ORIENT_CONSTRAINT.second.z);
+
+	// Apply roll.
+	auto relTargetOrient = (targetOrient - item.Pose.Orientation).ToQuaternion();
+	limbRot.End = Quaternion::Slerp(limbRot.End, relTargetOrient, alpha);
+}
+
 // TODO: const item param.
 static void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha)
 {
@@ -461,7 +491,7 @@ static void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int join
 	auto middle = Geometry::TranslatePoint(base, dir, length0);
 	auto end = Geometry::TranslatePoint(middle, dir, length1);
 
-	// Clamp foot position to floor height.
+	// Clamp end point to floor.
 	int floorHeight = GetCollision(pos2.x, pos2.y, pos2.z, item.RoomNumber).Position.Floor - heelHeight;
 	if (end.y > floorHeight)
 		end.y = floorHeight;
@@ -474,6 +504,10 @@ static void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int join
 
 	auto baseOrient = EulerAngles(ik3DSol.Middle - ik3DSol.Base);
 	auto middleOrient = EulerAngles(ik3DSol.End - ik3DSol.Middle);
+
+	// FINAL TODO: Apply IK solution to relative joint space!
+	
+
 
 	//limbRot.Base = (baseOrient /*+ EulerAngles(ANGLE(90), ANGLE(180), 0)*/).ToQuaternion();
 	//limbRot.Middle = (middleOrient).ToQuaternion();
@@ -506,41 +540,13 @@ static void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int join
 	}
 }
 
-static void HandlePlayerFootRoll(ItemInfo& item, LimbRotationData& limbRot, const Vector2& floorTilt, int heightToFloor, int heelHeight, float alpha)
-{
-	constexpr auto HEIGHT_TOLERANCE	 = -CLICK(0.1f);
-	constexpr auto ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>
-	{
-		EulerAngles(ANGLE(-50.0f), 0, ANGLE(-15.0f)),
-		EulerAngles(ANGLE(20.0f), 0, ANGLE(15.0f))
-	};
-
-	// Leg is lifted; reset foot roll.
-	if ((heightToFloor + heelHeight) < HEIGHT_TOLERANCE)
-	{
-		limbRot.End = Quaternion::Slerp(limbRot.End, Quaternion::Identity, alpha);
-		return;
-	}
-
-	// Get floor normal.
-	auto floorNormal = GetSurfaceNormal(floorTilt, true);
-
-	// Calculate constrained target orientation.
-	auto targetOrient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
-	targetOrient.x = std::clamp(targetOrient.x, ORIENT_CONSTRAINT.first.x, ORIENT_CONSTRAINT.second.x);
-	targetOrient.z = std::clamp(targetOrient.z, ORIENT_CONSTRAINT.first.z, ORIENT_CONSTRAINT.second.z);
-
-	// Apply roll.
-	auto relTargetOrient = (targetOrient - item.Pose.Orientation).ToQuaternion();
-	limbRot.End = Quaternion::Slerp(limbRot.End, relTargetOrient, alpha);
-}
-
 void HandlePlayerLegIK(ItemInfo& item)
 {
-	constexpr auto PIVOT_ANGLE_OFFSET = ANGLE(5.0f);
-	constexpr auto HEIGHT_TOLERANCE	  = CLICK(1);
-	constexpr auto HEEL_HEIGHT		  = 56.0f;
-	constexpr auto ALPHA			  = 0.5f;
+	constexpr auto HEIGHT_TOLERANCE = CLICK(1);
+	constexpr auto HEEL_HEIGHT		= 56.0f;
+	constexpr auto PIVOT_ANGLE		= ANGLE(5.0f);
+	constexpr auto UPRIGHT_COEFF	= 0.3f;
+	constexpr auto ALPHA			= 0.5f;
 
 	auto& player = GetLaraInfo(item);
 
@@ -560,35 +566,35 @@ void HandlePlayerLegIK(ItemInfo& item)
 	int rFloorHeight = rPointColl.Position.Floor;
 
 	// Determine enquiries.
-	bool isUpright			   = ((vPosVisual - hipsPos.y) >= (LARA_HEIGHT * 0.3f));
+	bool isUpright			   = ((vPosVisual - hipsPos.y) >= (LARA_HEIGHT * UPRIGHT_COEFF));
 	bool isLeftFloorSteppable  = (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
 	bool isRightFloorSteppable = (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
 
 	// Handle foot roll.
 	HandlePlayerFootRoll(item, player.ExtraJointRot.LeftLeg, lPointColl.FloorTilt, lFootPos.y - lFloorHeight, HEEL_HEIGHT, ALPHA);
-	//HandlePlayerFootRoll(item, player.ExtraJointRot.RightLeg, rPointColl.FloorTilt, rFootPos.y - rFloorHeight, HEEL_HEIGHT, ALPHA);
+	HandlePlayerFootRoll(item, player.ExtraJointRot.RightLeg, rPointColl.FloorTilt, rFootPos.y - rFloorHeight, HEEL_HEIGHT, ALPHA);
 
 	// Floor is uneven; handle leg IK.
-	//if (lFloorHeight != rFloorHeight)
+	if (lFloorHeight != rFloorHeight)
 	{
 		// Left leg.
-		//if (lFloorHeight < rFloorHeight)
-		//{
-		//	// Solve IK chain.
-		//	if (abs(vPosVisual - lFloorHeight) <= HEIGHT_TOLERANCE &&
-		//		isUpright && isLeftFloorSteppable)
-		//	{
-		//		SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, -PIVOT_ANGLE_OFFSET, HEEL_HEIGHT, ALPHA);
-		//	}
-		//}
-		//// Right leg.
-		//else
+		if (lFloorHeight < rFloorHeight)
 		{
 			// Solve IK chain.
-			//if (abs(vPosVisual - rFloorHeight) <= HEIGHT_TOLERANCE &&
-			//	isUpright && isRightFloorSteppable)
+			if (abs(vPosVisual - lFloorHeight) <= HEIGHT_TOLERANCE &&
+				isUpright && isLeftFloorSteppable)
 			{
-				SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, PIVOT_ANGLE_OFFSET, HEEL_HEIGHT, ALPHA);
+				SolvePlayerLegIK(item, player.ExtraJointRot.LeftLeg, LM_LTHIGH, LM_LSHIN, LM_LFOOT, -PIVOT_ANGLE, HEEL_HEIGHT, ALPHA);
+			}
+		}
+		// Right leg.
+		else
+		{
+			// Solve IK chain.
+			if (abs(vPosVisual - rFloorHeight) <= HEIGHT_TOLERANCE &&
+				isUpright && isRightFloorSteppable)
+			{
+				SolvePlayerLegIK(item, player.ExtraJointRot.RightLeg, LM_RTHIGH, LM_RSHIN, LM_RFOOT, PIVOT_ANGLE, HEEL_HEIGHT, ALPHA);
 			}
 		}
 	}
@@ -1335,12 +1341,15 @@ void ResetPlayerLegIK(ItemInfo& item, float alpha)
 {
 	auto& player = *GetLaraInfo(&item);
 
+	// Reset vertical offset.
 	player.VerticalOffset = Lerp(player.VerticalOffset, 0, alpha);
 
+	// Reset left leg.
 	player.ExtraJointRot.LeftLeg.Base = Quaternion::Slerp(player.ExtraJointRot.LeftLeg.Base, Quaternion::Identity, alpha);
 	player.ExtraJointRot.LeftLeg.Middle = Quaternion::Slerp(player.ExtraJointRot.LeftLeg.Middle, Quaternion::Identity, alpha);
 	player.ExtraJointRot.LeftLeg.End = Quaternion::Slerp(player.ExtraJointRot.LeftLeg.End, Quaternion::Identity, alpha);
 
+	// Reset right leg.
 	player.ExtraJointRot.RightLeg.Base = Quaternion::Slerp(player.ExtraJointRot.RightLeg.Base, Quaternion::Identity, alpha);
 	player.ExtraJointRot.RightLeg.Middle = Quaternion::Slerp(player.ExtraJointRot.RightLeg.Middle, Quaternion::Identity, alpha);
 	player.ExtraJointRot.RightLeg.End = Quaternion::Slerp(player.ExtraJointRot.RightLeg.End, Quaternion::Identity, alpha);

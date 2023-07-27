@@ -61,6 +61,6 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);
 
 void ResetPlayerLean(ItemInfo* item, float alpha = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetPlayerFlex(ItemInfo* item, float alpha = 1.0f);
-void ResetPlayerLegIK(ItemInfo& item, float alpha = 0.4f);
+void ResetPlayerLegIK(ItemInfo& item, float alpha = 0.5f);
 
 void RumbleLaraHealthCondition(ItemInfo* item);
