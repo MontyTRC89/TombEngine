@@ -468,13 +468,12 @@ static void HandlePlayerFootRoll(ItemInfo& item, LimbRotationData& limbRot, cons
 	limbRot.End = Quaternion::Slerp(limbRot.End, relTargetOrient, alpha);
 }
 
-// TODO: const item param.
-static void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha)
+static void SolvePlayerLegIK(const ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha)
 {
 	// Get joint positions.
-	auto pos0 = GetJointPosition(&item, joint0).ToVector3();
-	auto pos1 = GetJointPosition(&item, joint1).ToVector3();
-	auto pos2 = GetJointPosition(&item, joint2).ToVector3();
+	auto pos0 = GetJointPosition(item, joint0).ToVector3();
+	auto pos1 = GetJointPosition(item, joint1).ToVector3();
+	auto pos2 = GetJointPosition(item, joint2).ToVector3();
 
 	// Get joint lengths.
 	float length0 = (pos1 - pos0).Length();
@@ -619,8 +618,7 @@ void HandlePlayerLegIK(ItemInfo& item)
 
 	// Set vertical offset.
 	// TODO: When the vertical offset is applied, gun flashes appear at higher positions.
-	// Must use it in GetJointPosition() as well?
-	// Or: modify mutators.
+	// Must use it in GetJointPosition() as well? Alternatively, improve mutator functionality.
 	if (abs(vOffset) <= HEIGHT_TOLERANCE && isUpright)
 	{
 		vOffset = std::clamp(vOffset, -HEIGHT_TOLERANCE, HEIGHT_TOLERANCE);
