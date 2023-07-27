@@ -410,7 +410,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 // Potential solutions:
 // 1. Consider floor tilt when translating objects.
 // 2. Object parenting. -- Sezz 2022.10.28
-void EasePlayerVerticalPosition(ItemInfo* item, int height)
+void HandlePlayerStepEasing(ItemInfo* item, int height)
 {
 	constexpr auto LINEAR_RATE_MIN = 50.0f;
 
@@ -649,12 +649,12 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	EasePlayerVerticalPosition(item, coll->Middle.Floor);
+	HandlePlayerStepEasing(item, coll->Middle.Floor);
 }
 
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 {
-	EasePlayerVerticalPosition(item, coll->Middle.Ceiling);
+	HandlePlayerStepEasing(item, coll->Middle.Ceiling);
 }
 
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)

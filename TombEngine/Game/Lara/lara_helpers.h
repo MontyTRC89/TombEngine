@@ -19,7 +19,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
 void HandlePlayerAirBubbles(ItemInfo* item);
 
-void EasePlayerVerticalPosition(ItemInfo* item, int height);
+void HandlePlayerStepEasing(ItemInfo* item, int height);
 void HandlePlayerLegIK(ItemInfo& item);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
