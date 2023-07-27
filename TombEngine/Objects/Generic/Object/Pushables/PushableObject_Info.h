@@ -33,7 +33,7 @@ namespace TEN::Entities::Generic
 		}
 	};
 
-	typedef pushableObjects_Physics::PushablePhysicState PushablePhysicState;
+	typedef PushablePhysicState PushablePhysicState;
 
 	struct PushableInfo
 	{

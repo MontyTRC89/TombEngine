@@ -13,24 +13,31 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
-	std::unordered_map < pushableObjects_Physics::PushablePhysicState, std::function <void(int)>> pushableObjects_Physics::PUSHABLES_STATES_MAP;
-	
-	// Call this function to initialize the state functions handlers
-	void pushableObjects_Physics::InitializeStateHandlers()
+	std::unordered_map<PushablePhysicState, std::function<void(int)>> PUSHABLES_STATES_MAP;
+
+	void InitializePushablesStatesMap()
 	{
-		PUSHABLES_STATES_MAP[PushablePhysicState::Idle] = std::bind(&pushableObjects_Physics::HandleIdleState, this, std::placeholders::_1);
-		PUSHABLES_STATES_MAP[PushablePhysicState::Moving] = std::bind(&pushableObjects_Physics::HandleMovingState, this, std::placeholders::_1);
-		PUSHABLES_STATES_MAP[PushablePhysicState::Falling] = std::bind(&pushableObjects_Physics::HandleFallingState, this, std::placeholders::_1);
-		PUSHABLES_STATES_MAP[PushablePhysicState::Sinking] = std::bind(&pushableObjects_Physics::HandleSinkingState, this, std::placeholders::_1);
-		PUSHABLES_STATES_MAP[PushablePhysicState::Floating] = std::bind(&pushableObjects_Physics::HandleFloatingState, this, std::placeholders::_1);
-		PUSHABLES_STATES_MAP[PushablePhysicState::OnWater] = std::bind(&pushableObjects_Physics::HandleOnWaterState, this, std::placeholders::_1);
-		PUSHABLES_STATES_MAP[PushablePhysicState::Sliding] = std::bind(&pushableObjects_Physics::HandleSlidingState, this, std::placeholders::_1);
+		static bool isInitialized = false;
+		if (PUSHABLES_STATES_MAP.empty() )
+		{
+			PUSHABLES_STATES_MAP.clear();
+
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Idle, &HandleIdleState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Moving, &HandleMovingState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Falling, &HandleFallingState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Sinking, &HandleSinkingState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Floating, &HandleFloatingState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::OnWater, &HandleOnWaterState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Sliding, &HandleSlidingState);
+		}
 	}
 
-	void pushableObjects_Physics::HandleIdleState(int itemNumber)
+	void HandleIdleState(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
+
+		TENLog("STATE: IDLE for " + std::to_string(static_cast<int>(itemNumber)), LogLevel::Error, LogConfig::All, true);
 
 		if (Lara.Context.InteractedItem == itemNumber)
 		{
@@ -117,13 +124,13 @@ namespace TEN::Entities::Generic
 
 				if (hasPushAction)
 				{
-					int pushAnim = PushableAnimInfos[pushable.AnimationSystemIndex].PushAnimNumber;
-					SetAnimation(LaraItem, pushAnim);
+					int pushAnimNumber = PushableAnimInfos[pushable.AnimationSystemIndex].PushAnimNumber;
+					SetAnimation(LaraItem, pushAnimNumber);
 				}
 				else if (hasPullAction)
 				{
-					int pullAnim = PushableAnimInfos[pushable.AnimationSystemIndex].PullAnimNumber;
-					SetAnimation(LaraItem, pullAnim);
+					int pullAnimNumber = PushableAnimInfos[pushable.AnimationSystemIndex].PullAnimNumber;
+					SetAnimation(LaraItem, pullAnimNumber);
 				}
 
 				pushable.BehaviourState = PushablePhysicState::Moving;
@@ -135,54 +142,34 @@ namespace TEN::Entities::Generic
 				Lara.Context.InteractedItem = NO_ITEM;
 			}
 		}
-
-		/*if (Lara.Context.InteractedItem == 10)
-		{
-			//Happy
-		}
-		
-		int pullAnimNumber = PushableAnimInfos[pushable.AnimationSystemIndex].PullAnimNumber;
-		int pushAnimNumber = PushableAnimInfos[pushable.AnimationSystemIndex].PushAnimNumber;
-
-		if (LaraItem->Animation.AnimNumber == pullAnimNumber || LaraItem->Animation.AnimNumber == pushAnimNumber)
-		{
-			pushable.BehaviourState = PushablePhysicState::None;
-			//PushableBlockManageMoving(itemNumber);
-		}
-		else if (LaraItem->Animation.ActiveState == LS_IDLE)
-		{
-			// Do last actions and deactivate (reactivated in collision function).
-			//PushableBlockManageIdle(itemNumber);
-		}
-		*/
 	}
 
-	void pushableObjects_Physics::HandleMovingState(int itemNumber)
+	void HandleMovingState(int itemNumber)
 	{
-
+		TENLog("STATE: MOVING for " + std::to_string(static_cast<int>(itemNumber)), LogLevel::Error, LogConfig::All, true);
 	}
 
-	void pushableObjects_Physics::HandleFallingState(int itemNumber)
+	void HandleFallingState(int itemNumber)
 	{
 		// Your code for handling the Falling state goes here
 	}
 
-	void pushableObjects_Physics::HandleSinkingState(int itemNumber)
+	void HandleSinkingState(int itemNumber)
 	{
 		// Your code for handling the Sinking state goes here
 	}
 
-	void pushableObjects_Physics::HandleFloatingState(int itemNumber)
+	void HandleFloatingState(int itemNumber)
 	{
 		// Your code for handling the Floating state goes here
 	}
 
-	void pushableObjects_Physics::HandleOnWaterState(int itemNumber)
+	void HandleOnWaterState(int itemNumber)
 	{
 		// Your code for handling the OnWater state goes here
 	}
 
-	void pushableObjects_Physics::HandleSlidingState(int itemNumber)
+	void HandleSlidingState(int itemNumber)
 	{
 		// Your code for handling the Sliding state goes here
 	}

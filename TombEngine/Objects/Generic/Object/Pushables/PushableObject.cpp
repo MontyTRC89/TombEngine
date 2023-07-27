@@ -55,6 +55,8 @@ namespace TEN::Entities::Generic
 		item.Data = PushableInfo();
 		auto& pushable = GetPushableInfo(item);
 
+		InitializePushablesStatesMap();
+
 		pushable.StartPos = item.Pose.Position;
 		pushable.StartPos.RoomNumber = item.RoomNumber;
 
@@ -88,8 +90,9 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		// Call the state handler function based on the current state (Functions in PushableObject_Physics class).
-		auto stateHandlerIterator = pushableObjects_Physics::PUSHABLES_STATES_MAP.find(pushable.BehaviourState);
-		if (stateHandlerIterator != pushableObjects_Physics::PUSHABLES_STATES_MAP.end())
+		auto stateHandlerIterator = PUSHABLES_STATES_MAP.find(pushable.BehaviourState);
+		//TENLog("Pushable Behaviour State: " + std::to_string(static_cast<int>(pushable.BehaviourState)), LogLevel::Error, LogConfig::All, true);
+		if (stateHandlerIterator != PUSHABLES_STATES_MAP.end())
 		{
 			stateHandlerIterator->second(itemNumber);
 		}

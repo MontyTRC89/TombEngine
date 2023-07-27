@@ -12,33 +12,26 @@ namespace TEN::Entities::Generic
 	constexpr auto GRAVITY_ACCEL = 0.5f;
 	constexpr auto WATER_SURFACE_DISTANCE = CLICK(0.5f);*/
 
-	class pushableObjects_Physics
+	enum class PushablePhysicState
 	{
-		public:
-
-			enum class PushablePhysicState
-			{
-				Idle,
-				Moving,
-				Falling,
-				Sinking,
-				Floating,
-				OnWater,
-				Sliding
-			};
-
-			static std::unordered_map<PushablePhysicState, std::function<void(int)>> PUSHABLES_STATES_MAP;
-
-			void InitializeStateHandlers();
-
-			void HandleIdleState(int itemNumber);
-			void HandleMovingState(int itemNumber);
-			void HandleFallingState(int itemNumber);
-			void HandleSinkingState(int itemNumber);
-			void HandleFloatingState(int itemNumber);
-			void HandleOnWaterState(int itemNumber);
-			void HandleSlidingState(int itemNumber);
+		Idle,
+		Moving,
+		Falling,
+		Sinking,
+		Floating,
+		OnWater,
+		Sliding
 	};
 
+	extern std::unordered_map<PushablePhysicState, std::function<void(int)>> PUSHABLES_STATES_MAP;
 
-}
+	void InitializePushablesStatesMap();
+
+	void HandleIdleState(int itemNumber);
+	void HandleMovingState(int itemNumber);
+	void HandleFallingState(int itemNumber);
+	void HandleSinkingState(int itemNumber);
+	void HandleFloatingState(int itemNumber);
+	void HandleOnWaterState(int itemNumber);
+	void HandleSlidingState(int itemNumber);
+};
