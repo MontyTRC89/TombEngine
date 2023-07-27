@@ -440,12 +440,6 @@ void EasePlayerVerticalPosition(ItemInfo* item, int height)
 
 void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha)
 {
-	constexpr auto FOOT_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>
-	{
-		EulerAngles(ANGLE(-50.0f), 0, ANGLE(-20.0f)),
-		EulerAngles(ANGLE(20.0f), 0, ANGLE(15.0f))
-	};
-	
 	// Get joint positions.
 	auto pos0 = GetJointPosition(&item, joint0).ToVector3();
 	auto pos1 = GetJointPosition(&item, joint1).ToVector3();
@@ -482,9 +476,13 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 
 	//limbRot.Base = (baseOrient /*+ EulerAngles(ANGLE(90), ANGLE(180), 0)*/).ToQuaternion();
 	//limbRot.Middle = (middleOrient).ToQuaternion();
+
+	//// Store required joint rotations in limb rotation data.
+	//limbRot.Base = Quaternion::Slerp(limbRot.Base, baseRot, alpha);
+	//limbRot.Middle = Quaternion::Slerp(limbRot.Middle, middleRot, alpha);
 	
 	// Debug
-	if (false)
+	if (true)
 	{
 		g_Renderer.AddDebugSphere(pole, 25, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
 		g_Renderer.AddDebugSphere(ik3DSol.Base, 50, Vector4::One, RENDERER_DEBUG_PAGE::NO_PAGE);
@@ -494,24 +492,46 @@ void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int
 		g_Renderer.AddLine3D(ik3DSol.Middle, ik3DSol.End, Vector4::One);
 
 		auto refBase = ik3DSol.Base;
-		//auto baseDir = 
+		refBase = Geometry::TranslatePoint(refBase, item.Pose.Orientation.y, BLOCK(0.5f));
+
+		auto baseDir = baseOrient.ToDirection();
+		auto refMiddle = Geometry::TranslatePoint(refBase, baseDir, length0);
+
+		auto middleDir = middleOrient.ToDirection();
+		auto refEnd = Geometry::TranslatePoint(refMiddle, middleDir, length1);
+
+		g_Renderer.AddLine3D(refBase, refMiddle, Vector4::One);
+		g_Renderer.AddLine3D(refMiddle, refEnd, Vector4::One);
+	}
+}
+
+static void HandlePlayerFootRoll(ItemInfo& item, LimbRotationData& limbRot, const Vector2& floorTilt, int heightToFloor, int heelHeight, float alpha)
+{
+	constexpr auto HEIGHT_TOLERANCE	 = -CLICK(0.1f);
+	constexpr auto ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>
+	{
+		EulerAngles(ANGLE(-50.0f), 0, ANGLE(-15.0f)),
+		EulerAngles(ANGLE(20.0f), 0, ANGLE(15.0f))
+	};
+
+	// Leg is lifted; reset foot roll.
+	if ((heightToFloor + heelHeight) < HEIGHT_TOLERANCE)
+	{
+		limbRot.End = Quaternion::Slerp(limbRot.End, Quaternion::Identity, alpha);
+		return;
 	}
 
-
-	//-------------------
-
-	//// Store required joint rotations in limb rotation data.
-	//limbRot.Base = Quaternion::Slerp(limbRot.Base, baseRot, alpha);
-	//limbRot.Middle = Quaternion::Slerp(limbRot.Middle, middleRot, alpha);
-
-	auto floorTilt = GetCollision(&item).FloorTilt;
+	// Get floor normal.
 	auto floorNormal = GetSurfaceNormal(floorTilt, true);
 
-	auto orient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
-	orient.x = std::clamp(orient.x, FOOT_ORIENT_CONSTRAINT.first.x, FOOT_ORIENT_CONSTRAINT.second.x);
-	orient.z = std::clamp(orient.z, FOOT_ORIENT_CONSTRAINT.first.z, FOOT_ORIENT_CONSTRAINT.second.z);
+	// Calculate constrained target orientation.
+	auto targetOrient = Geometry::GetRelOrientToNormal(item.Pose.Orientation.y, floorNormal);
+	targetOrient.x = std::clamp(targetOrient.x, ORIENT_CONSTRAINT.first.x, ORIENT_CONSTRAINT.second.x);
+	targetOrient.z = std::clamp(targetOrient.z, ORIENT_CONSTRAINT.first.z, ORIENT_CONSTRAINT.second.z);
 
-	limbRot.End = Quaternion::Slerp(limbRot.End, (orient - item.Pose.Orientation).ToQuaternion(), alpha);
+	// Apply roll.
+	auto relTargetOrient = (targetOrient - item.Pose.Orientation).ToQuaternion();
+	limbRot.End = Quaternion::Slerp(limbRot.End, relTargetOrient, alpha);
 }
 
 void HandlePlayerLegIK(ItemInfo& item)
@@ -519,10 +539,11 @@ void HandlePlayerLegIK(ItemInfo& item)
 	constexpr auto PIVOT_ANGLE_OFFSET = ANGLE(5.0f);
 	constexpr auto HEIGHT_TOLERANCE	  = CLICK(1);
 	constexpr auto HEEL_HEIGHT		  = 56.0f;
-	constexpr auto ALPHA			  = 0.4f;
+	constexpr auto ALPHA			  = 0.5f;
 
 	auto& player = GetLaraInfo(item);
 
+	// Get joint positions.
 	auto hipsPos  = GetJointPosition(&item, LM_HIPS);
 	auto lFootPos = GetJointPosition(&item, LM_LFOOT);
 	auto rFootPos = GetJointPosition(&item, LM_RFOOT);
@@ -531,14 +552,20 @@ void HandlePlayerLegIK(ItemInfo& item)
 	auto lPointColl = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber);
 	auto rPointColl = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber);
 
+	// Get height values.
 	int vPos = item.Pose.Position.y;
 	int vPosVisual = vPos + player.VerticalOffset;
 	int lFloorHeight = lPointColl.Position.Floor;
 	int rFloorHeight = rPointColl.Position.Floor;
 
+	// Determine enquiries.
 	bool isUpright			   = ((vPosVisual - hipsPos.y) >= (LARA_HEIGHT * 0.3f));
 	bool isLeftFloorSteppable  = (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
 	bool isRightFloorSteppable = (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
+
+	// Handle foot roll.
+	HandlePlayerFootRoll(item, player.ExtraJointRot.LeftLeg, lPointColl.FloorTilt, lFootPos.y - lFloorHeight, HEEL_HEIGHT, ALPHA);
+	//HandlePlayerFootRoll(item, player.ExtraJointRot.RightLeg, rPointColl.FloorTilt, rFootPos.y - rFloorHeight, HEEL_HEIGHT, ALPHA);
 
 	// If floor isn't level, perform IK on 1 leg.
 	//if (lFloorHeight != rFloorHeight)
