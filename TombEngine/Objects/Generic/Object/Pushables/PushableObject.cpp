@@ -8,7 +8,10 @@
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Info.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_Physics.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Sounds.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_Stack.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -22,16 +25,8 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
-	constexpr auto PUSHABLE_FALL_VELOCITY_MAX = BLOCK(1 / 8.0f);
-	constexpr auto PUSHABLE_WATER_VELOCITY_MAX = BLOCK(1 / 16.0f);
-	constexpr auto PUSHABLE_FALL_RUMBLE_VELOCITY = 96.0f;
-	constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
-
-	constexpr auto GRAVITY_AIR = 8.0f;
-	constexpr auto GRAVITY_ACCEL = 0.5f;
-	constexpr auto WATER_SURFACE_DISTANCE = CLICK(0.5f);	
-
 	auto PushableBlockPos = Vector3i::Zero;
+
 	ObjectCollisionBounds PushableBlockBounds =
 	{
 		GameBoundingBox(
@@ -43,12 +38,16 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 	};
 
-	std::vector<PushableAnimationInfo> PushableAnimInfos = {};
-
 	PushableInfo& GetPushableInfo(const ItemInfo& item)
 	{
 		return (PushableInfo&)item.Data;
 	}
+
+	std::vector<PushableAnimationInfo> PushableAnimInfos =
+	{
+		{LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, true},                  // TR4-TR5 animations.
+		//{LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, false}      // TR1-TR3 animations.
+	};
 
 	void InitializePushableBlock(int itemNumber)
 	{
@@ -69,7 +68,7 @@ namespace TEN::Entities::Generic
 			pushable.UsesRoomCollision = false;
 		}
 
-		//pushable.Height = GetPushableHeight(item);
+		pushable.Height = GetPushableHeight(item);
 
 		// Read OCB flags.
 		int ocb = item.TriggerFlags;
@@ -79,6 +78,8 @@ namespace TEN::Entities::Generic
 		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
 
 		//SetStopperFlag(pushable.StartPos, true);
+		item.Status = ITEM_ACTIVE;
+		AddActiveItem(itemNumber);
 	}
 
 	void PushableBlockControl(int itemNumber)
@@ -86,35 +87,27 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushableItem.Status != ITEM_ACTIVE)
-			return;
-
-		// Check and do gravity routine if necessary.
-		//if (PushableBlockManageGravity(itemNumber))
-			//return;
-
-		Lara.Context.InteractedItem = itemNumber;
-
-		int pullAnimNumber = PushableAnimInfos[pushable.AnimationSystemIndex].PullAnimNumber;
-		int pushAnimNumber = PushableAnimInfos[pushable.AnimationSystemIndex].PushAnimNumber;
-
-		if (LaraItem->Animation.AnimNumber == pullAnimNumber || LaraItem->Animation.AnimNumber == pushAnimNumber)
+		// Call the state handler function based on the current state (Functions in PushableObject_Physics class).
+		auto stateHandlerIterator = pushableObjects_Physics::PUSHABLES_STATES_MAP.find(pushable.BehaviourState);
+		if (stateHandlerIterator != pushableObjects_Physics::PUSHABLES_STATES_MAP.end())
 		{
-			pushable.GravityState = PushablePhysicState::None;
-			//PushableBlockManageMoving(itemNumber);
+			stateHandlerIterator->second(itemNumber);
 		}
-		else if (LaraItem->Animation.ActiveState == LS_IDLE)
+		else
 		{
-			// Do last actions and deactivate (reactivated in collision function).
-			//PushableBlockManageIdle(itemNumber);
+			TENLog("Unknown pushable state.", LogLevel::Error, LogConfig::All, true);
 		}
 
 		// Do sound effects.
-		PushablesManageSounds(itemNumber, pushable);
+		//PushablesManageSounds(itemNumber, pushable);
 	}
 	
 	void PushableBlockCollision(int itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
+		//This function does two actions:
+		//- if Lara is pressing Action, then it start to align her and eventually activating her grabbing animation.
+		//- Otherwise, this code just activates the normal object collision.
+
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 		auto& player = *GetLaraInfo(laraItem);
@@ -126,10 +119,13 @@ namespace TEN::Entities::Generic
 			!laraItem->Animation.IsAirborne &&
 			player.Control.HandStatus == HandStatus::Free &&
 			pushableItem.Status != ITEM_INVISIBLE &&
-			pushableItem.TriggerFlags >= 0) ||
-			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))
+			pushableItem.TriggerFlags >= 0) && //It requires a positive OCB to can interact with it.
+			pushable.BehaviourState == PushablePhysicState::Idle ||
+			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))	//It was already interacting with it and is aligning.
 		{
+			//Start Alignment process.
 
+			//Check the pushable collision box
 			auto bounds = GameBoundingBox(&pushableItem);
 			PushableBlockBounds.BoundingBox.X1 = (bounds.X1 / 2) - 100;
 			PushableBlockBounds.BoundingBox.X2 = (bounds.X2 / 2) + 100;
@@ -139,6 +135,7 @@ namespace TEN::Entities::Generic
 			short yOrient = pushableItem.Pose.Orientation.y;
 			pushableItem.Pose.Orientation.y = GetQuadrant(laraItem->Pose.Orientation.y) * ANGLE(90.0f);
 
+			//If Lara is inside the influence area, Calculate the goal point to align Lara.
 			if (TestLaraPosition(PushableBlockBounds, &pushableItem, laraItem))
 			{
 				int quadrant = GetQuadrant(pushableItem.Pose.Orientation.y);
@@ -168,21 +165,22 @@ namespace TEN::Entities::Generic
 					break;
 				}
 
+				//Displace Lara to align her.
 				if (MoveLaraPosition(PushableBlockPos, &pushableItem, laraItem))
 				{
+					//Alignment Movement has finished, activate the Pushable grab animation.
 					SetAnimation(laraItem, LA_PUSHABLE_GRAB);
 					laraItem->Pose.Orientation = pushableItem.Pose.Orientation;
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
 					player.Context.NextCornerPos.Position.x = itemNumber; // TODO: Do this differently.
 				}
-				else
-				{
-					player.Context.InteractedItem = itemNumber;
-				}
+
+				player.Context.InteractedItem = itemNumber;
 			}
 			else
 			{
+				//If Lara is outside of the influence area, set the flags IsMoving false to indicate that..
 				if (player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 				{
 					player.Control.IsMoving = false;
@@ -194,17 +192,20 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			// If player is not grabbing pushable, simply do collision routine if needed.
+			// If player is not pressing action key to grab the pushable, then just do the normal collision routine.
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
 				player.Context.NextCornerPos.Position.x != itemNumber)
 			{
-				if (!pushable.UsesRoomCollision)
+				if (!pushable.UsesRoomCollision) //If it uses room collision, then it up to bridge collision system.
 					ObjectCollision(itemNumber, laraItem, coll);
 
 				return;
 			}
+		}
+	}
 
+			/*
 			// Otherwise, player can push/pull.
 			bool hasPushAction = IsHeld(In::Forward);
 			bool hasPullAction = IsHeld(In::Back);
@@ -305,7 +306,15 @@ namespace TEN::Entities::Generic
 
 			pushable.StartPos = pushableItem.Pose.Position;
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
-		}
+			*/
+		//}
+	//}
+
+	int GetPushableHeight(ItemInfo& item)
+	{
+		int heightBoundingBox = -GameBoundingBox(&item).Y1;
+		int heightWorldAligned = (heightBoundingBox / CLICK(0.5)) * CLICK(0.5);
+		return heightWorldAligned;
 	}
 
 

@@ -70,7 +70,7 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 
-
+		/*
 		if (pushable.CurrentSoundState == PushableSoundState::Moving)
 		{
 			SoundEffect(GetPushableSfx(Loop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
@@ -79,7 +79,7 @@ namespace TEN::Entities::Generic
 		{
 			pushable.CurrentSoundState = PushableSoundState::None;
 			SoundEffect(GetPushableSfx(Stop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
-		}
+		}*/
 	}
 
 }

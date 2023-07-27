@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Objects/Generic/Object/Pushables/PushableObject_Physics.h"
+
 namespace TEN::Entities::Generic
 {
 
@@ -8,17 +10,6 @@ namespace TEN::Entities::Generic
 		None,
 		Moving,
 		Stopping
-	};
-
-	enum class PushablePhysicState
-	{
-		None,
-		Grounded,
-		Falling,
-		Sinking,
-		Floating,
-		OnWater,
-		Sliding // TODO
 	};
 
 	struct PushableSidesAttributes
@@ -42,10 +33,12 @@ namespace TEN::Entities::Generic
 		}
 	};
 
+	typedef pushableObjects_Physics::PushablePhysicState PushablePhysicState;
+
 	struct PushableInfo
 	{
 		PushableSoundState CurrentSoundState = PushableSoundState::None;
-		PushablePhysicState GravityState = PushablePhysicState::None;
+		PushablePhysicState BehaviourState = PushablePhysicState::Idle;
 
 		int	  Height = 0;
 		float Gravity = 0.0f;
@@ -73,7 +66,7 @@ namespace TEN::Entities::Generic
 			AnimationSystemIndex = 0;
 
 			Gravity = 8.0f;
-			GravityState = PushablePhysicState::Grounded;
+			BehaviourState = PushablePhysicState::Idle;
 			FloatingForce = 0.75f;
 
 			StackLimit = 3;
