@@ -20,11 +20,11 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 
-#include "Renderer11.h"
+#include "Renderer/Renderer11.h"
 using TEN::Renderer::g_Renderer;
 
 using namespace TEN::Input;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
@@ -147,7 +147,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	// TODO: Implement item alignment properly someday. -- Sezz 2021.11.01
 	if (lara->Control.IsMoving)
@@ -410,7 +410,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	// Handles waterskin and clockwork beetle.
 	// TODO: Hardcoding.
@@ -881,7 +881,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1129,7 +1129,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1465,7 +1465,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	if (lara->Control.IsMoving)
 	{
@@ -1576,7 +1576,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	if (IsHeld(In::Jump))
 	{
@@ -1704,7 +1704,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	if (IsHeld(In::Jump))
 	{
@@ -1832,7 +1832,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	if (lara->Control.IsMoving)
 	{
@@ -1928,7 +1928,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 
 	if (lara->Control.IsMoving)
 	{
@@ -2018,7 +2018,7 @@ void lara_as_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.CanLook = false;
 
-	DoPlayerLegIK(*item);
+	HandlePlayerLegIK(*item);
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	item->Animation.TargetState = LS_IDLE;
