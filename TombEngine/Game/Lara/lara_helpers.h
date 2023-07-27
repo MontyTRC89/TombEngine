@@ -20,7 +20,6 @@ void HandlePlayerDiveBubbles(ItemInfo& item);
 void HandlePlayerAirBubbles(ItemInfo* item);
 
 void EasePlayerVerticalPosition(ItemInfo* item, int height);
-void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha);
 void HandlePlayerLegIK(ItemInfo& item);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);

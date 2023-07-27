@@ -438,7 +438,8 @@ void EasePlayerVerticalPosition(ItemInfo* item, int height)
 	}
 }
 
-void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha)
+// TODO: const item param.
+static void SolvePlayerLegIK(ItemInfo& item, LimbRotationData& limbRot, int joint0, int joint1, int joint2, short pivotAngle, float heelHeight, float alpha)
 {
 	// Get joint positions.
 	auto pos0 = GetJointPosition(&item, joint0).ToVector3();
@@ -567,7 +568,7 @@ void HandlePlayerLegIK(ItemInfo& item)
 	HandlePlayerFootRoll(item, player.ExtraJointRot.LeftLeg, lPointColl.FloorTilt, lFootPos.y - lFloorHeight, HEEL_HEIGHT, ALPHA);
 	//HandlePlayerFootRoll(item, player.ExtraJointRot.RightLeg, rPointColl.FloorTilt, rFootPos.y - rFloorHeight, HEEL_HEIGHT, ALPHA);
 
-	// If floor isn't level, perform IK on 1 leg.
+	// Floor is uneven; handle leg IK.
 	//if (lFloorHeight != rFloorHeight)
 	{
 		// Left leg.
