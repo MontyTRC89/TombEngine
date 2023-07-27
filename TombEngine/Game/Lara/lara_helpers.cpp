@@ -548,6 +548,9 @@ void HandlePlayerLegIK(ItemInfo& item)
 	constexpr auto UPRIGHT_COEFF	= 0.3f;
 	constexpr auto ALPHA			= 0.5f;
 
+	if (!g_Configuration.EnableIK)
+		return;
+
 	auto& player = GetLaraInfo(item);
 
 	// Get joint positions.

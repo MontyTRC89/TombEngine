@@ -33,6 +33,7 @@ constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 // Gameplay keys
 constexpr auto REGKEY_ENABLE_SUBTITLES		   = "EnableSubtitles";
 constexpr auto REGKEY_ENABLE_AUTO_TARGETING	   = "EnableAutoTargeting";
+constexpr auto REGKEY_ENABLE_IK				   = "EnableIK";
 constexpr auto REGKEY_ENABLE_RUMBLE			   = "EnableRumble";
 constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA = "EnableThumbstickCamera";
 
@@ -55,9 +56,10 @@ struct GameConfiguration
 	int	 MusicVolume  = 0;
 	int	 SfxVolume	  = 0;
 
-	// Gaeplay
+	// Gameplay
 	bool EnableSubtitles		= false;
 	bool EnableAutoTargeting	= false;
+	bool EnableIK				= false;
 	bool EnableRumble			= false;
 	bool EnableThumbstickCamera = false;
 

@@ -77,6 +77,7 @@
 #define STRING_APPLY					"apply"
 #define STRING_BACK						"back"
 #define STRING_SOUND					"sound"
+#define STRING_ENABLE_IK				"enable_ik"
 #define STRING_ENABLE_SOUND				"enable_sound"
 #define STRING_REVERB					"reverb"
 #define STRING_AUTO_TARGET				"auto_target"

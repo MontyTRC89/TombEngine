@@ -859,13 +859,14 @@ namespace TEN::Gui
 			SfxVolume,
 			Subtitles,
 			AutoTarget,
+			IK,
 			ToggleRumble,
 			ThumbstickCameraControl,
 			Apply,
 			Cancel
 		};
 
-		static const int numOtherSettingsOptions = 8;
+		static const int numOtherSettingsOptions = 9;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -893,6 +894,11 @@ namespace TEN::Gui
 			case OtherSettingsOption::AutoTarget:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAutoTargeting = !CurrentSettings.Configuration.EnableAutoTargeting;
+				break;
+				
+			case OtherSettingsOption::IK:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableIK = !CurrentSettings.Configuration.EnableIK;
 				break;
 
 			case OtherSettingsOption::ToggleRumble:

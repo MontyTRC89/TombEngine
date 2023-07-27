@@ -230,6 +230,7 @@ bool SaveConfiguration()
 	// Set Gameplay keys.
 	if (SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_IK, g_Configuration.EnableIK) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS)
 	{
@@ -287,13 +288,13 @@ void SaveAudioConfig()
 
 void InitDefaultConfiguration()
 {
-	// Include default device into the list
+	// Include default device in list.
 	BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, true);
 
-	auto currentScreenResolution = GetScreenResolution();
+	auto currentScreenRes = GetScreenResolution();
 
-	g_Configuration.ScreenWidth = currentScreenResolution.x;
-	g_Configuration.ScreenHeight = currentScreenResolution.y;
+	g_Configuration.ScreenWidth = currentScreenRes.x;
+	g_Configuration.ScreenHeight = currentScreenRes.y;
 	g_Configuration.ShadowType = ShadowMode::Lara;
 	g_Configuration.ShadowMapSize = 512;
 	g_Configuration.ShadowBlobsMax = 16;
@@ -308,6 +309,7 @@ void InitDefaultConfiguration()
 
 	g_Configuration.EnableSubtitles = true;
 	g_Configuration.EnableAutoTargeting = true;
+	g_Configuration.EnableIK = true;
 	g_Configuration.EnableRumble = true;
 	g_Configuration.EnableThumbstickCamera = false;
 
@@ -400,6 +402,7 @@ bool LoadConfiguration()
 
 	bool enableSubtitles = true;
 	bool enableAutoTargeting = true;
+	bool enableIK = true;
 	bool enableRumble = true;
 	bool enableThumbstickCamera = true;
 
@@ -407,6 +410,7 @@ bool LoadConfiguration()
 	if (GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_IK, &enableIK, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);

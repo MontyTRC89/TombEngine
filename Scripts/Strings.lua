@@ -72,6 +72,7 @@ local strings =
 	display = { "Display Settings" },
 	display_adapter = { "Display Adapter" },
 	distance_travelled = { "Distance Travelled" },
+	enable_ik = { "Enable IK" },
 	enable_sound = { "Enable Sounds" },
 	enabled = { "Enabled" },
 	equip = { "Equip" },
