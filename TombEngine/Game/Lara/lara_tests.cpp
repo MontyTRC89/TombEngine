@@ -203,7 +203,7 @@ bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll)
 			SetAnimation(item, LA_EDGE_HANG_RELEASE_TO_JUMP_UP);
 			item.Animation.IsAirborne = true;
 			item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
-			item.Pose.Position += coll.Shift;
+			item.Pose.Position += coll.Shift.Position;
 			player.Control.HandStatus = HandStatus::Free;
 		}
 	}
