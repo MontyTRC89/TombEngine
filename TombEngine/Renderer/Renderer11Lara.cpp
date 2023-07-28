@@ -77,7 +77,7 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 	}
 }
 
-// TODO: Not completely correct.
+// TODO: Check.
 // HACK: Arm frames for pistols, uzis, and revolver currently remain absolute.
 int GetNormalizedArmAnimFrame(GAME_OBJECT_ID animObjectID, int frameNumber)
 {
@@ -86,7 +86,7 @@ int GetNormalizedArmAnimFrame(GAME_OBJECT_ID animObjectID, int frameNumber)
 	{
 		const auto& anim = GetAnimData(animObjectID, i);
 
-		if (frameNumber <= anim.EndFrameNumber)
+		if (frameNumber <= anim.EndFrameNumber + i)
 			return frameNumber;
 
 		frameNumber -= anim.EndFrameNumber;
@@ -254,7 +254,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 
-			// HACK: Mask head and torso when taking out a flare.
+			// HACK: Mask head and torso when taking out flare.
 			if (!Lara.Control.IsLow &&
 				tempItem.Animation.AnimNumber > 1 &&
 				tempItem.Animation.AnimNumber < 4)
