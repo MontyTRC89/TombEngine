@@ -28,9 +28,9 @@ namespace TEN::Player
 
 	struct EdgeHangAttractorCollisionData
 	{
-		AttractorCollisionData Center = {};
-		AttractorCollisionData Left	  = {};
-		AttractorCollisionData Right  = {};
+		AttractorCollisionData Center;
+		AttractorCollisionData Left;
+		AttractorCollisionData Right;
 	};
 
 	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
@@ -47,12 +47,12 @@ namespace TEN::Player
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
-			// 1. Ensure attractor is new.
-			if (attracColl.AttracPtr == &currentAttrac)
+			// 1. Check if attractor is new.
+			if (&attracColl.Attrac == &currentAttrac)
 				continue;
 
 			// 2) Check if attractor is edge type.
-			if (!attracColl.AttracPtr->IsEdge())
+			if (!attracColl.Attrac.IsEdge())
 				continue;
 
 			// 3) Check if edge is within range.
@@ -105,12 +105,12 @@ namespace TEN::Player
 				if (lineDistCenter <= 0.0f)
 				{
 					float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + lineDistCenter;
-					pointCenter = connectingAttracCollCenter->AttracPtr->GetPointAtLineDistance(transitLineDist);
+					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtLineDistance(transitLineDist);
 				}
 				else if (lineDistCenter >= length)
 				{
 					float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + (lineDistCenter - length);
-					pointCenter = connectingAttracCollCenter->AttracPtr->GetPointAtLineDistance(transitLineDist);
+					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtLineDistance(transitLineDist);
 				}
 			}
 			else
@@ -130,25 +130,25 @@ namespace TEN::Player
 		}
 
 		auto pointLeft = ((lineDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->AttracPtr->GetPointAtLineDistance(connectingAttracCollLeft->Proximity.LineDistance + lineDistLeft) :
+			connectingAttracCollLeft->Attrac.GetPointAtLineDistance(connectingAttracCollLeft->Proximity.LineDistance + lineDistLeft) :
 			handsAttrac.AttracPtr->GetPointAtLineDistance(lineDistLeft);
 		auto pointRight = ((lineDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->AttracPtr->GetPointAtLineDistance(connectingAttracCollRight->Proximity.LineDistance + (lineDistRight - length)) :
+			connectingAttracCollRight->Attrac.GetPointAtLineDistance(connectingAttracCollRight->Proximity.LineDistance + (lineDistRight - length)) :
 			handsAttrac.AttracPtr->GetPointAtLineDistance(lineDistRight);
 
 		auto basePos = item.Pose.Position.ToVector3();
 		auto orient = item.Pose.Orientation;
 
 		// Get attractor collisions.
-		auto attracCollCenter = handsAttrac.AttracPtr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
-		if ((lineDistCenter <= 0.0f || lineDistCenter >= length) && connectingAttracCollCenter.has_value())
-			attracCollCenter = connectingAttracCollCenter->AttracPtr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
+		auto attracCollCenter = ((lineDistCenter <= 0.0f || lineDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
+			connectingAttracCollCenter->Attrac.GetCollision(basePos, orient, pointCenter, coll.Setup.Radius) :
+			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
 
 		auto attracCollLeft = ((lineDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->AttracPtr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
+			connectingAttracCollLeft->Attrac.GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
 			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius);
 		auto attracCollRight = ((lineDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->AttracPtr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
+			connectingAttracCollRight->Attrac.GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
 			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointRight, coll.Setup.Radius);
 
 		// ----------Debug
@@ -222,7 +222,7 @@ namespace TEN::Player
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
-		player.Context.HandsAttractor.Set(*edgeAttracColls->Center.AttracPtr, edgeAttracColls->Center.Proximity.LineDistance);
+		player.Context.HandsAttractor.Set(edgeAttracColls->Center.Attrac, edgeAttracColls->Center.Proximity.LineDistance);
 	}
 
 	// State:	  LS_HANG_IDLE (10)
@@ -317,7 +317,7 @@ namespace TEN::Player
 				}
 			}
 
-			if (IsHeld(In::Left) || IsHeld(In::LeftStep))
+			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
 				if (Context::CanShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_LEFT))
 				{
@@ -328,11 +328,11 @@ namespace TEN::Player
 				auto cornerShimmyState = GetPlayerCornerShimmyState(*item, *coll);
 				if (cornerShimmyState.has_value())
 				{
-					item->Animation.TargetState = cornerShimmyState.value();
+					item->Animation.TargetState = *cornerShimmyState;
 					return;
 				}
 			}
-			else if (IsHeld(In::Right) || IsHeld(In::RightStep))
+			else if (IsHeld(In::Right) || IsHeld(In::StepRight))
 			{
 				if (Context::CanShimmyRight(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_RIGHT))
 				{
@@ -343,7 +343,7 @@ namespace TEN::Player
 				auto cornerShimmyState = GetPlayerCornerShimmyState(*item, *coll);
 				if (cornerShimmyState.has_value())
 				{
-					item->Animation.TargetState = cornerShimmyState.value();
+					item->Animation.TargetState = *cornerShimmyState;
 					return;
 				}
 			}
@@ -388,7 +388,7 @@ namespace TEN::Player
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
-			if (IsHeld(In::Left) || IsHeld(In::LeftStep))
+			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
 				item->Animation.TargetState = LS_SHIMMY_LEFT;
 				return;
@@ -437,7 +437,7 @@ namespace TEN::Player
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
-			if (IsHeld(In::Right) || IsHeld(In::RightStep))
+			if (IsHeld(In::Right) || IsHeld(In::StepRight))
 			{
 				item->Animation.TargetState = LS_SHIMMY_RIGHT;
 				return;

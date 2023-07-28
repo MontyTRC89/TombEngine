@@ -20,30 +20,28 @@ namespace TEN::Utils
 
 	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion);
 
-	template <typename TElement>
-	bool Contains(const std::vector<TElement>& vector, const TElement& element)
-	{
-		auto it = std::find(vector.begin(), vector.end(), element);
-		return (it != vector.end());
-	}
-
 	template<typename T>
-	std::vector<T> RemoveVectorDuplicates(const std::vector<T>& vector)
+	std::vector<T> RemoveDuplicates(const std::vector<T>& vector)
 	{
-		auto seenSet = std::unordered_set<T>{};
-
+		auto uniqueElements = std::unordered_set<T>{};
 		auto newVector = std::vector<T>{};
-		newVector.reserve(vector.size());
 
-		for (const auto& item : vector)
+		for (const auto& element : vector)
 		{
-			if (seenSet.find(item) == seenSet.end())
+			if (uniqueElements.find(element) == uniqueElements.end())
 			{
-				seenSet.insert(item);
-				newVector.push_back(item);
+				uniqueElements.insert(element);
+				newVector.push_back(element);
 			}
 		}
 
 		return newVector;
+	}
+
+	template <typename T>
+	bool Contains(const std::vector<T>& vector, const T& element)
+	{
+		auto it = std::find(vector.begin(), vector.end(), element);
+		return (it != vector.end());
 	}
 }

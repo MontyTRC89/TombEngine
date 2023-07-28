@@ -29,15 +29,16 @@ namespace TEN::Collision::Attractors
 
 	struct AttractorCollisionData
 	{
-		const Attractor* AttracPtr = nullptr;
+		const Attractor& Attrac;
 
 		AttractorProximityData Proximity = {};
-		short HeadingAngle = 0;
-		short SlopeAngle   = 0;
+		short HeadingAngle	  = 0;
+		short SlopeAngle	  = 0;
+		bool  IsIntersected	  = false;
+		bool  IsFacingForward = false;
+		bool  IsInFront		  = false;
 
-		bool IsIntersected	 = false;
-		bool IsFacingForward = false;
-		bool IsInFront		 = false;
+		AttractorCollisionData(const Attractor& attrac) : Attrac(attrac) {};
 	};
 
 	class Attractor
@@ -68,7 +69,7 @@ namespace TEN::Collision::Attractors
 
 		// Utilities
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
-		AttractorProximityData GetProximityData(const Vector3& refPoint) const;
+		AttractorProximityData GetProximity(const Vector3& refPoint) const;
 		Vector3				   GetPointAtLineDistance(float lineDist) const;
 		unsigned int		   GetSegmentIDAtDistance(float lineDist) const;
 
@@ -83,11 +84,12 @@ namespace TEN::Collision::Attractors
 		void DrawDebug() const;
 
 	private:
+		// Helpers
 		float NormalizeLineDistance(float lineDist) const;
 	};
 
 	// Temp
-	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item);
+	std::vector<const Attractor*> GetDebugAttractors(const ItemInfo& item);
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
 															   const Vector3& refPoint, float range);

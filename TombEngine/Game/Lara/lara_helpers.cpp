@@ -702,7 +702,7 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 
 std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& coll)
 {
-	if (IsHeld(In::Left) || IsHeld(In::LeftStep))
+	if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 	{
 		switch (TestLaraHangCorner(&item, &coll, ANGLE(-90.0f)))
 		{
@@ -722,7 +722,7 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 			return LS_SHIMMY_45_OUTER_LEFT;
 		}
 	}
-	else if (IsHeld(In::Right) || IsHeld(In::RightStep))
+	else if (IsHeld(In::Right) || IsHeld(In::StepRight))
 	{
 		switch (TestLaraHangCorner(&item, &coll, ANGLE(90.0f)))
 		{

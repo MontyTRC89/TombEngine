@@ -243,7 +243,7 @@ namespace TEN::Player::Context
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check if attractor is edge type.
-			if (!attracColl.AttracPtr->IsEdge())
+			if (!attracColl.Attrac.IsEdge())
 				continue;
 
 			// 2) Check if edge is within range.
@@ -265,20 +265,20 @@ namespace TEN::Player::Context
 			// 5) Test if target point is attractor end.
 			if (!hasEnd &&
 				(attracColl.Proximity.LineDistance <= EPSILON ||
-					(attracColl.AttracPtr->GetLength() - attracColl.Proximity.LineDistance) <= EPSILON))
+					(attracColl.Attrac.GetLength() - attracColl.Proximity.LineDistance) <= EPSILON))
 			{
 				// Handle seams between attractors.
 				hasEnd = true;
 
 				// 3.1) Test for loop seam.
-				const auto& points = attracColl.AttracPtr->GetPoints();
+				const auto& points = attracColl.Attrac.GetPoints();
 				if (Vector3::Distance(points[0], points.back()) > EPSILON)
 					continue;
 			}
 
 			// Get point collision off side of edge.
 			auto pointCollOffSide = GetCollision(
-				Vector3i(attracColl.Proximity.Point), attracColl.AttracPtr->GetRoomNumber(),
+				Vector3i(attracColl.Proximity.Point), attracColl.Attrac.GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 6) Test if edge is high enough off the ground.
@@ -328,14 +328,14 @@ namespace TEN::Player::Context
 
 		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = attracColl->AttracPtr->GetPointAtLineDistance(attracColl->Proximity.LineDistance - coll.Setup.Radius);
-		auto pointRight = attracColl->AttracPtr->GetPointAtLineDistance(attracColl->Proximity.LineDistance + coll.Setup.Radius);
+		auto pointLeft = attracColl->Attrac.GetPointAtLineDistance(attracColl->Proximity.LineDistance - coll.Setup.Radius);
+		auto pointRight = attracColl->Attrac.GetPointAtLineDistance(attracColl->Proximity.LineDistance + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
 		return EdgeCatchData
 		{
-			attracColl->AttracPtr,
+			&attracColl->Attrac,
 			EDGE_TYPE,
 			attracColl->Proximity.Point,
 			attracColl->Proximity.LineDistance,
