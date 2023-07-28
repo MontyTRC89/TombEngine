@@ -426,7 +426,10 @@ bool LoadConfiguration()
 			char buffer[9];
 			sprintf(buffer, "Action%d", i);
 
-			if (GetDWORDRegKey(inputKey, buffer, &tempKey, Bindings[0][i]) != ERROR_SUCCESS)
+			auto actionID = (ActionID)i;
+			int boundKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, actionID);
+
+			if (GetDWORDRegKey(inputKey, buffer, &tempKey, boundKey) != ERROR_SUCCESS)
 			{
 				RegCloseKey(rootKey);
 				RegCloseKey(graphicsKey);
@@ -437,15 +440,15 @@ bool LoadConfiguration()
 			}
 
 			g_Configuration.Bindings.push_back(tempKey);
-			Bindings[1][i] = tempKey;
+			g_Bindings.SetKeyBinding(BindingMapType::Custom, actionID, tempKey);
 		}
 
 		RegCloseKey(inputKey);
 	}
+	// Input key does not exist; use default bindings.
 	else
 	{
-		// "Input" key does not exist; use default bindings.
-		g_Configuration.Bindings = Bindings[0];
+		g_Configuration.Bindings = g_Bindings.GetBindingMap(BindingMapType::Keyboard);
 	}
 
 	RegCloseKey(rootKey);

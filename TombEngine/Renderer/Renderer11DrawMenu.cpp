@@ -12,6 +12,7 @@
 #include "Math/Math.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
+#include "Specific/Input/InputAction.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
@@ -273,8 +274,11 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = Bindings[1][k] ? Bindings[1][k] : Bindings[0][k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+						int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)k);
+						int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)k);
+
+						int key = userKey ? userKey : genericKey;
+						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (GeneralActionStrings.size() - 1))
@@ -323,8 +327,11 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+						int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)(baseIndex + k));
+
+						int key = userKey ? userKey : genericKey;
+						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (VehicleActionStrings.size() - 1))
@@ -379,8 +386,11 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+						int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)(baseIndex + k));
+
+						int key = userKey ? userKey : genericKey;
+						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (QuickActionStrings.size() - 1))
@@ -428,8 +438,11 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+						int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)(baseIndex + k));
+
+						int key = userKey ? userKey : genericKey;
+						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (MenuActionStrings.size() - 1))

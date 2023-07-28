@@ -20,7 +20,6 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/Input/InputAction.h"
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
@@ -659,16 +658,16 @@ namespace TEN::Gui
 				else
 				{
 					int selectedKey = 0;
-					for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
+					for (selectedKey = 0; selectedKey < KEY_SLOT_COUNT; selectedKey++)
 					{
 						if (KeyMap[selectedKey])
 							break;
 					}
 
-					if (selectedKey == MAX_INPUT_SLOTS)
+					if (selectedKey == KEY_SLOT_COUNT)
 						selectedKey = 0;
 
-					if (selectedKey && !g_KeyNames[selectedKey].empty())
+					if (selectedKey && !GetKeyName(selectedKey).empty())
 					{
 						unsigned int baseIndex = 0;
 						switch (MenuToDisplay)
@@ -689,7 +688,7 @@ namespace TEN::Gui
 							break;
 						}
 
-						Bindings[1][baseIndex + SelectedOption] = selectedKey;
+						g_Bindings.SetKeyBinding(BindingMapType::Custom, ActionID(baseIndex + SelectedOption), selectedKey);
 						DefaultConflict();
 
 						CurrentSettings.WaitingForKey = false;
@@ -785,8 +784,8 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					CurrentSettings.Configuration.Bindings = Bindings[1];
-					g_Configuration.Bindings = Bindings[1];
+					CurrentSettings.Configuration.Bindings = g_Bindings.GetBindingMap(BindingMapType::Custom);
+					g_Configuration.Bindings = g_Bindings.GetBindingMap(BindingMapType::Custom);
 					SaveConfiguration();
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
@@ -797,7 +796,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					Bindings[1] = CurrentSettings.Configuration.Bindings;
+					g_Bindings.SetBindingMap(BindingMapType::Custom, CurrentSettings.Configuration.Bindings);
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;

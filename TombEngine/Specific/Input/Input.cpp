@@ -41,96 +41,7 @@ namespace TEN::Input
 	//  Deprecated legacy input bit fields.
 	int DbInput = 0;
 	int TrInput = 0;
-
-	const std::vector<std::string> g_KeyNames =
-	{
-			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
-			"7",			"8",			"9",			"0",			"-",			"+",			"Back",			"Tab",
-			"Q",			"W",			"E",			"R",			"T",			"Y",			"U",			"I",
-			"O",			"P",			"[",			"]",			"Enter",		"Ctrl",			"A",			"S",
-			"D",			"F",			"G",			"H",			"J",			"K",			"L",			";",
-			"'",			"`",			"Shift",		"#",			"Z",			"X",			"C",			"V",
-			"B",			"N",			"M",			",",			".",			"/",			"Shift",		"Pad X",
-			"Alt",			"Space",		"Caps Lock",	"F1",			"F2",			"F3",			"F4",			"F5",
-
-			"F6",			"F7",			"F8",			"F9",			"F10",			"Num Lock",		"Scroll Lock",	"Pad 7",
-			"Pad 8",		"Pad 9",		"Pad -",		"Pad 4",		"Pad 5",		"Pad 6",		"Pad +",		"Pad 1",
-			"Pad 2",		"Pad 3",		"Pad 0",		"Pad .",		"",				"",				"\\",			"F11",
-			"F12",			"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"Pad Enter",	"Ctrl",			"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"Shift",		"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"Pad /",		"",				"",
-			"Alt",			"",				"",				"",				"",				"",				"",				"",
-			
-			"",				"",				"",				"",				"",				"",				"",				"Home",
-			"Up",			"Page Up",		"",				"Left",			"",				"Right",		"",				"End",
-			"Down",			"Page Down",	"Insert",		"Del",			"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-
-			"Joy 1", 		"Joy 2",		"Joy 3",		"Joy 4", 		"Joy 5",		"Joy 6", 		"Joy 7",		"Joy 8",
-			"Joy 9",		"Joy 10",		"Joy 11",		"Joy 12",		"Joy 13",		"Joy 14",		"Joy 15",		"Joy 16",
-
-			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+",
-			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
-	};
-
-	// Binding rows:
-	// 1. General actions
-	// 2. Vehicle actions
-	// 3. Quick actions
-	// 4. Menu actions
 	
-	std::vector<std::vector<int>> Bindings =
-	{
-		{
-			// Default
-			{
-				KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_RCONTROL, KC_SPACE, KC_NUMPAD0,
-				KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
-				KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-				KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
-			},
-
-			// User
-			{
-				KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_RCONTROL, KC_SPACE, KC_NUMPAD0,
-				KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
-				KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-				KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
-			}
-		}
-	};
-
-	const auto DefaultGenericBindings = std::vector<int>
-	{
-		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_RCONTROL, KC_SPACE, KC_NUMPAD0,
-		KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
-		KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-		KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6, KC_NUMPAD0
-	};
-	const auto DefaultXInputBindings = std::vector<int>
-	{
-		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_LSTICK, XB_RSTICK, XB_RSHIFT, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_X, XB_B, XB_A, XB_Y, XB_LSHIFT,
-		XB_A, XB_AXIS_X_POS, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_AXIS_LTRIGGER_NEG,
-		XB_DPAD_DOWN, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-		KC_RETURN, XB_SELECT, XB_START, XB_SELECT, KC_F5, KC_F6, KC_NUMPAD0
-	};
-
-	auto ConflictingKeys = std::array<bool, KEY_COUNT>{};
-
 	void InitializeEffect()
 	{
 		OisEffect = new Effect(Effect::ConstantForce, Effect::Constant);
@@ -159,7 +70,7 @@ namespace TEN::Input
 			ActionQueue.push_back(QueueState::None);
 		}
 
-		KeyMap.resize(MAX_INPUT_SLOTS);
+		KeyMap.resize(KEY_SLOT_COUNT);
 		AxisMap.resize(InputAxis::Count);
 
 		RumbleInfo = {};
@@ -248,7 +159,7 @@ namespace TEN::Input
 
 	void ApplyActionQueue()
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)ActionID::Count; i++)
 		{
 			switch (ActionQueue[i])
 			{
@@ -273,13 +184,15 @@ namespace TEN::Input
 			queue = QueueState::None;
 	}
 
-	bool LayoutContainsIndex(unsigned int index)
+	static bool TestBoundKey(int key)
 	{
-		for (int layout = 1; layout >= 0; layout--)
+		for (int i = 1; i >= 0; i--)
 		{
-			for (int i = 0; i < KEY_COUNT; i++)
+			auto mapType = (BindingMapType)i;
+			for (int j = 0; j < (int)ActionID::Count; j++)
 			{
-				if (Bindings[layout][i] == index)
+				auto actionID = (ActionID)j;
+				if (g_Bindings.GetBoundKey(mapType, actionID) != KC_UNASSIGNED)
 					return true;
 			}
 		}
@@ -308,42 +221,43 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)ActionID::Count; i++)
 		{
-			int key = Bindings[0][i];
+			auto actionID = (ActionID)i;
 
-			ConflictingKeys[i] = false;
+			g_Bindings.SetConflict(actionID, false);
 
-			for (int j = 0; j < KEY_COUNT; j++)
+			int key = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)i);
+			for (int j = 0; j < (int)ActionID::Count; j++)
 			{
-				if (key != Bindings[1][j])
+				if (key != g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)j))
 					continue;
 
-				ConflictingKeys[i] = true;
+				g_Bindings.SetConflict(actionID, true);
 				break;
 			}
 		}
 	}
 
-	void SetDiscreteAxisValues(unsigned int index)
+	static void SetDiscreteAxisValues(unsigned int keyID)
 	{
-		for (int layout = 0; layout <= 1; layout++)
+		for (int set = 0; set < (int)BindingMapType::Count; set++)
 		{
-			if (Bindings[layout][KEY_FORWARD] == index)
+			if (g_Bindings.GetBoundKey((BindingMapType)set, In::Forward) == keyID)
 			{
-				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
+				AxisMap[(int)InputAxis::MoveVertical] = 1.0f;
 			}
-			else if (Bindings[layout][KEY_BACK] == index)
+			else if (g_Bindings.GetBoundKey((BindingMapType)set, In::Back) == keyID)
 			{
-				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
+				AxisMap[(int)InputAxis::MoveVertical] = -1.0f;
 			}
-			else if (Bindings[layout][KEY_LEFT] == index)
+			else if (g_Bindings.GetBoundKey((BindingMapType)set, In::Left) == keyID)
 			{
-				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
+				AxisMap[(int)InputAxis::MoveHorizontal] = -1.0f;
 			}
-			else if (Bindings[layout][KEY_RIGHT] == index)
+			else if (g_Bindings.GetBoundKey((BindingMapType)set, In::Right) == keyID)
 			{
-				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
+				AxisMap[(int)InputAxis::MoveHorizontal] = 1.0f;
 			}
 		}
 	}
@@ -361,13 +275,13 @@ namespace TEN::Input
 
 			// Scan buttons.
 			for (int key = 0; key < state.mButtons.size(); key++)
-				KeyMap[MAX_KEYBOARD_KEYS + key] = state.mButtons[key];
+				KeyMap[KEYBOARD_KEY_COUNT + key] = state.mButtons[key];
 
 			// Scan axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
 			{
 				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers).
-				if (axis >= MAX_GAMEPAD_AXES)
+				if (axis >= GAMEPAD_AXIS_COUNT)
 					break;
 
 				// Filter out deadzone.
@@ -383,41 +297,41 @@ namespace TEN::Input
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
 				// Calculate and reset discrete input slots.
-				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
-				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
-				KeyMap[negKeyIndex] = false;
-				KeyMap[posKeyIndex] = false;
+				int negKey = KEYBOARD_KEY_COUNT + GAMEPAD_BUTTON_COUNT + (axis * 2);
+				int posKey = KEYBOARD_KEY_COUNT + GAMEPAD_BUTTON_COUNT + (axis * 2) + 1;
+				KeyMap[negKey] = false;
+				KeyMap[posKey] = false;
 
 				// Decide on the discrete input registering based on analog value.
-				unsigned int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
-				KeyMap[usedIndex] = true;
+				int usedKey = normalizedValue > 0 ? negKey : posKey;
+				KeyMap[usedKey] = true;
 
 				// Register analog input in certain direction.
 				// If axis is bound as directional controls, register axis as directional input.
 				// Otherwise, register as camera movement input (for future).
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
-				if (Bindings[1][KEY_FORWARD] == usedIndex)
+				if (g_Bindings.GetBoundKey(BindingMapType::Custom, In::Forward) == usedKey)
 				{
 					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_BACK] == usedIndex)
+				else if (g_Bindings.GetBoundKey(BindingMapType::Custom, In::Back) == usedKey)
 				{
 					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_LEFT] == usedIndex)
+				else if (g_Bindings.GetBoundKey(BindingMapType::Custom, In::Left)  == usedKey)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_RIGHT] == usedIndex)
+				else if (g_Bindings.GetBoundKey(BindingMapType::Custom, In::Right) == usedKey)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
 				}
-				else if (!LayoutContainsIndex(usedIndex))
+				else if (!TestBoundKey(usedKey))
 				{
-					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2,
-						(unsigned int)InputAxis::CameraVertical,
-						(unsigned int)InputAxis::CameraHorizontal);
+					unsigned int camAxisIndex = (int)std::clamp((int)InputAxis::CameraVertical + axis % 2,
+						(int)InputAxis::CameraVertical,
+						(int)InputAxis::CameraHorizontal);
 					AxisMap[camAxisIndex] = normalizedValue;
 				}
 			}
@@ -433,7 +347,7 @@ namespace TEN::Input
 				// This is needed to allow multiple directions  pressed at the same time.
 				for (int pass = 0; pass < 4; pass++)
 				{
-					unsigned int index = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_AXES * 2;
+					unsigned int index = KEYBOARD_KEY_COUNT + GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2);
 
 					switch (pass)
 					{
@@ -479,7 +393,7 @@ namespace TEN::Input
 		{
 			OisKeyboard->capture();
 
-			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
+			for (int i = 0; i < KEYBOARD_KEY_COUNT; i++)
 			{
 				if (!OisKeyboard->isKeyDown((KeyCode)i))
 				{
@@ -499,15 +413,16 @@ namespace TEN::Input
 		}
 	}
 
-	bool Key(int number)
+	static bool Key(ActionID actionID)
 	{
-		for (int layout = 1; layout >= 0; layout--)
+		for (int i = 1; i >= 0; i--)
 		{
-			int key = Bindings[layout][number];
-			
-			if (layout == 0 && ConflictingKeys[number])
+			auto mapType = (BindingMapType)i;
+
+			if (mapType == BindingMapType::Keyboard && g_Bindings.TestConflict(actionID))
 				continue;
 
+			int key = g_Bindings.GetBoundKey((BindingMapType)i, actionID);
 			if (KeyMap[key])
 				return true;
 		}
@@ -610,8 +525,11 @@ namespace TEN::Input
 		DefaultConflict();
 
 		// Update action map.
-		for (int i = 0; i < KEY_COUNT; i++)
-			ActionMap[i].Update(Key(i));
+		for (int i = 0; i < (int)ActionID::Count; i++)
+		{
+			auto actionID = (ActionID)i;
+			ActionMap[i].Update(Key(actionID));
+		}
 
 		if (applyQueue)
 			ApplyActionQueue();
@@ -673,20 +591,14 @@ namespace TEN::Input
 		RumbleInfo = {};
 	}
 
-	static void ApplyBindings(const std::vector<int>& bindings)
+	static void ApplyBindings(const BindingMap& set)
 	{
-		for (int i = 0; i < bindings.size(); i++)
-		{
-			if (i >= KEY_COUNT)
-				break;
-
-			Bindings[1][i] = bindings[i];
-		}
+		g_Bindings.SetBindingMap(BindingMapType::Custom, set);
 	}
 
 	void ApplyDefaultBindings()
 	{
-		ApplyBindings(DefaultGenericBindings);
+		ApplyBindings(BindingManager::DEFAULT_KEYBOARD_BINDING_MAP);
 		ApplyDefaultXInputBindings();
 	}
 
@@ -695,19 +607,25 @@ namespace TEN::Input
 		if (!OisGamepad)
 			return false;
 
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)ActionID::Count; i++)
 		{
-			if (Bindings[1][i] != KC_UNASSIGNED && Bindings[1][i] != Bindings[0][i])
+			auto actionID = (ActionID)i;
+
+			int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, actionID);
+			int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, actionID);
+
+			if (userKey != KC_UNASSIGNED &&
+				userKey != genericKey)
+			{
 				return false;
+			}
 		}
 
 		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
 		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
 		{
-			ApplyBindings(DefaultXInputBindings);
-
-			for (int i = 0; i < KEY_COUNT; i++)
-				g_Configuration.Bindings[i] = Bindings[1][i];
+			ApplyBindings(BindingManager::DEFAULT_XBOX_BINDING_MAP);
+			g_Configuration.Bindings = g_Bindings.GetBindingMap(BindingMapType::Custom);
 
 			// Additionally turn on thumbstick camera and vibration.
 			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCamera = true;
