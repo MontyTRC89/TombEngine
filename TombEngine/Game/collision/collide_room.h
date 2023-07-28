@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 
@@ -106,12 +107,15 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	Vector3i Shift;
+	Pose Shift = Pose::Zero;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
+
+	int  LastBridgeItemNumber;
+	Pose LastBridgeItemPose;
 
 	bool HitStatic;
 	bool HitTallObject;
@@ -124,9 +128,11 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
+CollisionResult GetCollision(const ItemInfo& item);
 CollisionResult GetCollision(const ItemInfo* item);
 CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(const GameVector& pos);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);

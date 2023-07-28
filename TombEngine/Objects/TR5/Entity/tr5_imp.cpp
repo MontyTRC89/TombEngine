@@ -33,8 +33,8 @@ namespace TEN::Entities::Creatures::TR5
 
 	constexpr auto IMP_HEAD_MESH_SWAP_INTERVAL = 16;
 
-	const auto ImpLeftHandBite	= CreatureBiteInfo(Vector3i(0, 100, 0), 7);
-	const auto ImpRightHandBite = CreatureBiteInfo(Vector3i(0, 100, 0), 9);
+	const auto ImpLeftHandBite	= CreatureBiteInfo(Vector3(0, 100, 0), 7);
+	const auto ImpRightHandBite = CreatureBiteInfo(Vector3(0, 100, 0), 9);
 	const auto ImpHeadMeshSwapJoints = std::vector<unsigned int>{ 10 };
 	
 	enum ImpState

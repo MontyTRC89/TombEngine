@@ -5,7 +5,7 @@ namespace TEN::Math
 	class Vector2i
 	{
 	public:
-		// Components
+		// Members
 		int x = 0;
 		int y = 0;
 

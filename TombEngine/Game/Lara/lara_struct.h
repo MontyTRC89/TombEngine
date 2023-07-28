@@ -1320,7 +1320,7 @@ struct PlayerContextData
 	int			CalcJumpVelocity	 = 0;
 	int			ProjectedFloorHeight = 0;
 	Pose		NextCornerPos		 = Pose::Zero;
-	EulerAngles TargetOrientation	 = EulerAngles::Zero;
+	EulerAngles TargetOrientation	 = EulerAngles::Zero; // TargetOrient
 
 	int		 WaterSurfaceDist	= 0;
 	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
@@ -1343,8 +1343,6 @@ struct LaraInfo
 
 	static constexpr auto TARGET_COUNT_MAX = 8;
 
-	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
-
 	LaraControlData	  Control	= {};
 	PlayerContextData Context	= {};
 	PlayerStatusData  Status	= {};
@@ -1362,13 +1360,12 @@ struct LaraInfo
 	ArmInfo		RightArm		= {};
 
 	ItemInfo* TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
-	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	 = {};
-	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets	 = {};
+	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	= {};
+	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets = {};
 
 	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
-	int		 HitFrame	  = 0;		 // Frame index.
-	int		 HitDirection = 0;		 // Cardinal direction.
-	FX_INFO* SpasmEffect  = nullptr; // Not saved.
+	int HitFrame	 = 0; // Frame index.
+	int HitDirection = 0; // Cardinal direction.
 
 	int ExtraAnim = 0; // Item number? Only ever set to NO_ITEM or 1.
 

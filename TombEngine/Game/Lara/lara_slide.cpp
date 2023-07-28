@@ -66,7 +66,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachPlayerTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
+		if (IsHeld(In::Jump) && TestLaraSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -175,7 +175,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachPlayerTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
+		if (IsHeld(In::Jump) && TestLaraSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);

@@ -21,7 +21,7 @@ const ObjectCollisionBounds CeilingTrapDoorBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		0, 900,
-		-SECTOR(0.75f), -CLICK(1)
+		-BLOCK(0.75f), -CLICK(1)
 	),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -35,7 +35,7 @@ const ObjectCollisionBounds FloorTrapDoorBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		0, 0,
-		-SECTOR(1), -CLICK(1)
+		-BLOCK(1), -CLICK(1)
 	),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),

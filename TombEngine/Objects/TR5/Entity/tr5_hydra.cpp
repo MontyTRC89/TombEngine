@@ -19,7 +19,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto HydraBite = CreatureBiteInfo(Vector3i::Zero, 11);
+	const auto HydraBite = CreatureBiteInfo(Vector3::Zero, 11);
 
 	enum HydraState
 	{
@@ -114,7 +114,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->gravity = 0;
 		spark->maxYvel = 0;
 		spark->scalar = 1;
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 96;
 		spark->dSize = spark->size / 4;
 	}
 
@@ -232,7 +232,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (AI.distance >= pow(CLICK(7), 2) && Random::TestProbability(0.97f))
 				{
-					if (AI.distance >= pow(SECTOR(2), 2) && Random::TestProbability(0.97f))
+					if (AI.distance >= pow(BLOCK(2), 2) && Random::TestProbability(0.97f))
 					{
 						if (Random::TestProbability(0.06f))
 							item->Animation.TargetState = HYDRA_STATE_AIM;
@@ -263,7 +263,7 @@ namespace TEN::Entities::Creatures::TR5
 					if (item->HitStatus && AI.distance < pow(CLICK(7), 2))
 					{
 						distance = sqrt(AI.distance);
-						damage = 5 - distance / SECTOR(1);
+						damage = 5 - distance / BLOCK(1);
 
 						if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 							damage *= 3;
@@ -294,7 +294,7 @@ namespace TEN::Entities::Creatures::TR5
 						damage *= 3;
 
 					if ((GetRandomControl() & 0xF) < damage &&
-						AI.distance < SQUARE(SECTOR(10)) && damage > 0)
+						AI.distance < SQUARE(BLOCK(10)) && damage > 0)
 					{
 						item->Animation.TargetState = 4;
 						DoDamage(item, damage);

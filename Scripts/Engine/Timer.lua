@@ -125,7 +125,10 @@ Timer = {
 					else
 						t.remainingTime = t.remainingTime + t.totalTime
 					end
-					t.func(table.unpack(t.funcArgs))
+					
+					if (t.func ~= nil) then
+						t.func(table.unpack(t.funcArgs))
+					end
 				end
 			end
 

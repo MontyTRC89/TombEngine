@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 
@@ -57,7 +57,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			lara->Control.HandStatus = HandStatus::Free;
@@ -140,8 +140,8 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item);
 	
 	// HACK: Prevent ShiftItem() from causing an instantaneous snap, thereby interfering with DoLaraMonkeyStep(), when going down a step. @Sezz 2022.01.28
-	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
-		coll->Shift.y = 0;
+	if (coll->Shift.Position.y >= 0 && coll->Shift.Position.y <= CLICK(1.25f))
+		coll->Shift.Position.y = 0;
 	ShiftItem(item, coll);
 
 	if (TestLaraMonkeyFall(item, coll))
@@ -497,7 +497,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			lara->Control.HandStatus = HandStatus::Free;
@@ -576,7 +576,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			lara->Control.HandStatus = HandStatus::Free;

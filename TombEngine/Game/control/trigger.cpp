@@ -64,17 +64,15 @@ int TriggerActive(ItemInfo* item)
 
 bool GetKeyTrigger(ItemInfo* item)
 {
-	auto triggerIndex = GetTriggerIndex(item);
-
-	if (triggerIndex == nullptr)
+	short* triggerIndexPtr = GetTriggerIndex(item);
+	if (triggerIndexPtr == nullptr)
 		return false;
 
-	short* trigger = triggerIndex;
-
-	if (*trigger & END_BIT)
+	short* triggerPtr = triggerIndexPtr;
+	if (*triggerPtr & END_BIT)
 		return false;
 
-	for (short* j = &trigger[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & VALUE_BITS]; j++)
+	for (short* j = &triggerPtr[2]; (*j >> 8) & 0x3C || item != &g_Level.Items[*j & VALUE_BITS]; j++)
 	{
 		if (*j & END_BIT)
 			return false;
@@ -86,13 +84,11 @@ bool GetKeyTrigger(ItemInfo* item)
 // NOTE: attatchedToSwitch parameter unused.
 int GetSwitchTrigger(ItemInfo* item, short* itemNumbersPtr, int attatchedToSwitch)
 {
-	auto triggerIndex = GetTriggerIndex(item);
-
-	if (triggerIndex == nullptr)
+	short* triggerIndexPtr = GetTriggerIndex(item);
+	if (triggerIndexPtr == nullptr)
 		return 0;
 
-	short* trigger = triggerIndex;
-
+	short* trigger = triggerIndexPtr;
 	if (*trigger & END_BIT)
 		return 0;
 

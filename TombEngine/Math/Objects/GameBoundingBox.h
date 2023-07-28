@@ -11,7 +11,7 @@ struct ObjectInfo;
 	class GameBoundingBox
 	{
 	public:
-		// Components
+		// Members
 		int X1 = 0;
 		int X2 = 0;
 		int Y1 = 0;

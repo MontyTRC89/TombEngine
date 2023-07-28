@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d11.h>
-#include "Utils.h"
-#include "debug/debug.h"
+#include "Renderer/Utils.h"
+#include "Game/debug/debug.h"
 
 namespace TEN::Renderer
 {

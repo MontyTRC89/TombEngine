@@ -22,12 +22,13 @@ enum class LaraType
 class ScriptInterfaceLevel
 {
 public:
-	bool Horizon{ false };
-	bool Rumble{ false };
-	std::string NameStringKey;
-	std::string FileName;
-	std::string ScriptFileName;
-	std::string LoadScreenFileName;
+	bool Horizon = false;
+	bool Rumble	 = false;
+
+	std::string NameStringKey	   = {};
+	std::string FileName		   = {};
+	std::string ScriptFileName	   = {};
+	std::string LoadScreenFileName = {};
 
 	virtual ~ScriptInterfaceLevel() = default;
 

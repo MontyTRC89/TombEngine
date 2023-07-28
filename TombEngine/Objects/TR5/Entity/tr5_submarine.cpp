@@ -127,7 +127,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->flags = SP_EXPDEF | SP_ROTATE | SP_SCALE;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 32;
 		spark->dSize = spark->size * 2;
 	}
 
@@ -256,7 +256,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->Flags = 0;
 			}
 
-			if (laraAI.distance >= pow(SECTOR(3), 2))
+			if (laraAI.distance >= pow(BLOCK(3), 2))
 			{
 				item->Animation.TargetState = 1;
 				SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_LOOP, &item->Pose, SoundEnvironment::Always);
@@ -264,7 +264,7 @@ namespace TEN::Entities::Creatures::TR5
 			else
 				item->Animation.TargetState = 0;
 
-			if (AI.distance < pow(SECTOR(1), 2))
+			if (AI.distance < pow(BLOCK(1), 2))
 			{
 				creature->MaxTurn = 0;
 				if (abs(laraAI.angle) >= ANGLE(2.0f))
@@ -316,9 +316,9 @@ namespace TEN::Entities::Creatures::TR5
 		if (!LOS(&origin, &target))
 		{
 			int distance = sqrt(pow(target.x - origin.x, 2) + pow(target.y - origin.y, 2) + pow(target.z - origin.z, 2));
-			if (distance < SECTOR(16))
+			if (distance < BLOCK(16))
 			{
-				distance = SECTOR(16) - distance;
+				distance = BLOCK(16) - distance;
 				byte color = (GetRandomControl() & 0xF) + (distance / 128) + 64;
 				TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 1) + (distance / 2048) + 12, color / 2, color, color / 2);
 			}

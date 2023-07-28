@@ -13,13 +13,14 @@ struct VaultTestResult;
 
 // Utilities
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
+void HandlePlayerQuickActions(ItemInfo& item);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll);
 void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
 void HandlePlayerAirBubbles(ItemInfo* item);
 
-void EaseOutLaraHeight(ItemInfo* item, int height);
+void EasePlayerVerticalPosition(ItemInfo* item, int height);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll);

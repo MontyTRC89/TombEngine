@@ -28,7 +28,7 @@ Context::CornerType		  TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, s
 Context::CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, short testAngle, bool isOuter);
 bool					  TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short testAngle);
 
-bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);
+bool TestLaraWall(ItemInfo* item, float dist, float height);
 bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance);
 bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance);
 int	 LaraFloorFront(ItemInfo* item, short angle, int distance);

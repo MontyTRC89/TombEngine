@@ -187,15 +187,24 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		for (int i = 0; i < g_Level.NumItems; i++)
-			InitializeItem(i);
+		// Initialize all bridges first.
+		// It is needed because some other items need final floor height to init properly.
+
+		for (int isFloor = 0; isFloor <= 1; isFloor++)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if ((Objects[g_Level.Items[i].ObjectNumber].floor == nullptr) == (bool)isFloor)
+					InitializeItem(i);
+			}
+		}
 	}
 }
 
 void LoadObjects()
 {
-	std::memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
-	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
+	Objects.Initialize();
+	std::memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
 	TENLog("Num meshes: " + std::to_string(numMeshes), LogLevel::Info);
@@ -253,7 +262,7 @@ void LoadObjects()
 				poly.textureCoordinates.resize(count);
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
-				poly.bitangents.resize(count);
+				poly.binormals.resize(count);
 				
 				for (int n = 0; n < count; n++)
 					poly.indices[n] = ReadInt32();
@@ -264,7 +273,7 @@ void LoadObjects()
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
 				for (int n = 0; n < count; n++)
-					poly.bitangents[n] = ReadVector3();
+					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
@@ -374,6 +383,15 @@ void LoadObjects()
 	for (int i = 0; i < numStatics; i++)
 	{
 		int meshID = ReadInt32();
+
+		if (meshID >= MAX_STATICS)
+		{
+			TENLog("Static with ID " + std::to_string(meshID) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ". " +
+				   "Change static mesh ID in WadTool to a value below maximum.", LogLevel::Warning);
+			
+			meshID = 0;
+		}
+
 		StaticObjectsIds.push_back(meshID);
 
 		StaticObjects[meshID].meshNumber = (short)ReadInt32();
@@ -642,7 +660,7 @@ void ReadRooms()
 				poly.textureCoordinates.resize(count);
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
-				poly.bitangents.resize(count);
+				poly.binormals.resize(count);
 
 				for (int n = 0; n < count; n++)
 					poly.indices[n] = ReadInt32();
@@ -653,7 +671,7 @@ void ReadRooms()
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
 				for (int n = 0; n < count; n++)
-					poly.bitangents[n] = ReadVector3();
+					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
@@ -1395,8 +1413,8 @@ void BuildOutsideRoomsTable()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		int rx = (room->x / SECTOR(1));
-		int rz = (room->z / SECTOR(1));
+		int rx = (room->x / BLOCK(1));
+		int rz = (room->z / BLOCK(1));
 
 		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{
