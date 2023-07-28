@@ -120,6 +120,10 @@ namespace TEN::Gui
 		constexpr auto DELAY		 = 0.1f;
 		constexpr auto INITIAL_DELAY = 0.4f;
 
+		// Action already held prior to entering menu; lock input.
+		if (GetActionTimeActive(actionID) >= TimeInMenu)
+			return false;
+
 		// Pulse only directional inputs.
 		auto oppositeAction = std::optional<ActionID>(std::nullopt);
 		switch (actionID)
@@ -149,11 +153,7 @@ namespace TEN::Gui
 		if (isActionLocked)
 			return false;
 
-		// Enforce initial delay if action is already pulsing prior to entering menu.
-		if (GetActionTimeActive(actionID) <= TimeInMenu || TimeInMenu >= round(INITIAL_DELAY / DELTA_TIME))
-			return IsPulsed(actionID, DELAY, INITIAL_DELAY);
-
-		return false;
+		return IsPulsed(actionID, DELAY, INITIAL_DELAY);
 	}
 
 	bool GuiController::GuiIsSelected(bool onClicked) const
@@ -1097,8 +1097,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GuiIsDeselected() ||
-			IsClicked(In::Pause))
+		if (GuiIsDeselected() || IsClicked(In::Pause))
 		{
 			if (MenuToDisplay == Menu::Pause)
 			{
@@ -3141,7 +3140,7 @@ namespace TEN::Gui
 
 			UpdateInputActions(item);
 
-			if (IsClicked(In::Deselect))
+			if (GuiIsDeselected() || IsClicked(In::Inventory))
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				exitLoop = true;

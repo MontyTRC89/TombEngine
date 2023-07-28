@@ -1,10 +1,12 @@
 #include "framework.h"
 #include "Game/collision/floordata.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
@@ -936,5 +938,104 @@ namespace TEN::Collision::Floordata
 		}
 
 		return false;
+	}
+
+	static void DrawSectorFlagLabel(const Vector3& pos, const std::string& string, const Vector4& color, float verticalOffset)
+	{
+		constexpr auto LABEL_SCALE = 0.8f;
+		constexpr auto HALF_BLOCK  = BLOCK(0.5f);
+
+		// Get 2D label position.
+		auto labelPos = pos + Vector3(HALF_BLOCK, 0.0f, HALF_BLOCK);
+		auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
+
+		// Draw label.
+		if (labelPos2D.has_value())
+		{
+			*labelPos2D += Vector2(0.0f, verticalOffset);
+			g_Renderer.AddDebugString(string, *labelPos2D, color, LABEL_SCALE, 0, RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		}
+	}
+
+	void DrawNearbySectorFlags(const ItemInfo& item)
+	{
+		constexpr auto DRAW_RANGE	  = BLOCK(3);
+		constexpr auto STRING_SPACING = -20.0f;
+
+		constexpr auto STOPPER_COLOR				 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
+		constexpr auto DEATH_COLOR					 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
+		constexpr auto MONKEY_SWING_COLOR			 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
+		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Vector4(0.4f, 0.4f, 1.0f, 1.0f);
+		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
+		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
+		
+		// Only check sectors in player vicinity.
+		const auto& room = g_Level.Rooms[item.RoomNumber];
+		int minX = std::max(item.Pose.Position.x - DRAW_RANGE, room.x) / BLOCK(1);
+		int maxX = std::min(item.Pose.Position.x + DRAW_RANGE, room.x + (room.xSize * BLOCK(1))) / BLOCK(1);
+		int minZ = std::max(item.Pose.Position.z - DRAW_RANGE, room.z) / BLOCK(1);
+		int maxZ = std::min(item.Pose.Position.z + DRAW_RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
+		
+		auto pointColl = GetCollision(item);
+		auto pos = item.Pose.Position.ToVector3();
+
+		// Draw sector flag labels.
+		for (int x = minX; x < maxX; x++)
+		{
+			for (int z = minZ; z < maxZ; z++)
+			{
+				pos.x = BLOCK(x);
+				pos.z = BLOCK(z);
+				
+				pointColl = GetCollision(pos, item.RoomNumber);
+				pos.y = pointColl.Position.Floor;
+
+				float verticalOffset = STRING_SPACING;
+
+				// Stopper
+				if (pointColl.Block->Stopper)
+				{
+					DrawSectorFlagLabel(pos, "Stopper", STOPPER_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+				
+				// Death
+				if (pointColl.Block->Flags.Death)
+				{
+					DrawSectorFlagLabel(pos, "Death", DEATH_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+
+				// Monkey Swing
+				if (pointColl.Block->Flags.Monkeyswing)
+				{
+					DrawSectorFlagLabel(pos, "Monkey Swing", MONKEY_SWING_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+
+				// Beetle / Minecart Right
+				if (pointColl.Block->Flags.MarkBeetle)
+				{
+					auto labelString = std::string("Beetle") + (!pointColl.Block->Flags.MinecartStop() ? " / Minecart Right" : "");
+					DrawSectorFlagLabel(pos, labelString, BEETLE_MINECART_RIGHT_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+
+				// Activator / Minecart Left
+				if (pointColl.Block->Flags.MarkTriggerer)
+				{
+					auto labelString = std::string("Activator") + (!pointColl.Block->Flags.MinecartStop() ? " / Minecart Left" : "");
+					DrawSectorFlagLabel(pos, labelString, ACTIVATOR_MINECART_LEFT_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+
+				// Minecart Stop
+				if (pointColl.Block->Flags.MinecartStop())
+				{
+					DrawSectorFlagLabel(pos, "Minecart Stop", MINECART_STOP_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+			}
+		}
 	}
 }

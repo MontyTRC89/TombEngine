@@ -380,9 +380,9 @@ namespace TEN::Renderer
 		// Text
 		std::unique_ptr<SpriteFont> m_gameFont;
 		std::vector<RendererStringToDraw> m_strings;
-		int m_blinkColorValue;
-		int m_blinkColorDirection;
-		bool m_blinkUpdated = false;
+		float BlinkColorValue = 0.0f;
+		float BlinkTime		  = 0.0f;
+		bool  IsBlinkUpdated  = false;
 
 		// System resources
 		Texture2D m_logo;
@@ -711,6 +711,7 @@ namespace TEN::Renderer
 		int  Synchronize();
 		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
+		void AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RENDERER_DEBUG_PAGE page);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);

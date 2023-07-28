@@ -75,10 +75,15 @@ void DrawNearbyPathfinding(int boxIndex)
 	if (boxIndex == NO_BOX)
 		return;
 
-	DrawBox(boxIndex, Vector3(0, 1, 1));
-
 	auto& currBox = g_Level.Boxes[boxIndex];
 	auto index = currBox.overlapIndex;
+
+	// Grey flag box.
+	auto currentBoxColor = Vector3(0.0f, 1.0f, 1.0f);
+	if (currBox.flags & BLOCKABLE)
+		currentBoxColor = (currBox.flags & BLOCKED) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
+
+	DrawBox(boxIndex, currentBoxColor);
 
 	while (true)
 	{

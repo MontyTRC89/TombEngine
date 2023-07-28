@@ -114,18 +114,24 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-// Overload used to quickly get point/room collision parameters at a given item's position.
-CollisionResult GetCollision(ItemInfo* item)
+// Overload used to quickly get point collision parameters at a given item's position.
+CollisionResult GetCollision(const ItemInfo& item)
 {
-	auto newRoomNumber = item->RoomNumber;
-	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &newRoomNumber);
-	auto probe = GetCollision(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	auto newRoomNumber = item.RoomNumber;
+	auto floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &newRoomNumber);
+	auto probe = GetCollision(floor, item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z);
 
 	probe.RoomNumber = newRoomNumber;
 	return probe;
 }
 
-// Overload used to probe point/room collision parameters from a given item's position.
+// Deprecated.
+CollisionResult GetCollision(ItemInfo* item)
+{
+	return GetCollision(*item);
+}
+
+// Overload used to probe point collision parameters from a given item's position.
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = item->RoomNumber;
@@ -140,8 +146,8 @@ CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, 
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
-// Overload used to probe point/room collision parameters from a given position.
-CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down, float right)
+// Overload used to probe point collision parameters from a given position.
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = roomNumber;
 	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
@@ -151,11 +157,17 @@ CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, f
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
-// Overload used as a universal wrapper across collisional code to replace
-// triads of roomNumber-GetFloor()-GetFloorHeight() operations.
-// The advantage is that it does NOT modify the incoming roomNumber argument,
-// instead storing one modified by GetFloor() within the returned CollisionResult struct.
+// Overload used as universal wrapper across collisional code replacing
+// triads of roomNumber-GetFloor()-GetFloorHeight() calls.
+// Advantage is that it does NOT modify incoming roomNumber argument,
+// instead storing one modified by GetFloor() within a returned CollisionResult struct.
 // This way, no external variables are modified as output arguments.
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber)
+{
+	return GetCollision(pos.x, pos.y, pos.z, roomNumber);
+}
+
+// Deprecated.
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto room = roomNumber;
@@ -166,9 +178,10 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
-CollisionResult GetCollision(const GameVector& point)
+// NOTE: To be used only when absolutely necessary.
+CollisionResult GetCollision(const GameVector& pos)
 {
-	return GetCollision(point.x, point.y, point.z, point.RoomNumber);
+	return GetCollision(pos.x, pos.y, pos.z, pos.RoomNumber);
 }
 
 // A reworked legacy GetFloorHeight() function which writes data
@@ -229,12 +242,16 @@ static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSe
 
 	if (collSetup.BlockFloorSlopeUp &&
 		sectorAttribs.FloorSlope &&
+		sectorAttribs.Floor <= STEPUP_HEIGHT &&
+		sectorAttribs.Floor >= -STEPUP_HEIGHT &&
 		abs(aspectAngleDelta) >= ASPECT_ANGLE_DELTA_MAX)
 	{
 		sectorAttribs.Floor = MAX_HEIGHT;
 	}
 	else if (collSetup.BlockFloorSlopeDown &&
 		sectorAttribs.FloorSlope &&
+		sectorAttribs.Floor <= STEPUP_HEIGHT &&
+		sectorAttribs.Floor >= -STEPUP_HEIGHT &&
 		abs(aspectAngleDelta) <= ASPECT_ANGLE_DELTA_MAX)
 	{
 		sectorAttribs.Floor = MAX_HEIGHT;
