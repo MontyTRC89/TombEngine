@@ -151,15 +151,10 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
 
+		g_Renderer.PrintDebugMessage("%d", (int)Lara.LeftArm.AnimObjectID);
 		g_Renderer.PrintDebugMessage("%d", Lara.LeftArm.AnimNumber);
 		g_Renderer.PrintDebugMessage("%d", Lara.LeftArm.FrameNumber);
 		g_Renderer.PrintDebugMessage("");
-
-		const auto& leftArmAnim = GetAnimData(Lara.LeftArm.AnimObjectID, Lara.LeftArm.AnimNumber);
-		const auto& leftArmFrame = leftArmAnim.GetKeyframeInterpData(Lara.LeftArm.FrameNumber).Keyframe0;
-
-		const auto& rightArmAnim = GetAnimData(Lara.RightArm.AnimObjectID, Lara.RightArm.AnimNumber);
-		const auto& rightArmFrame = rightArmAnim.GetKeyframeInterpData(Lara.RightArm.FrameNumber).Keyframe0;
 
 		// HACK: Back guns are handled differently.
 		switch (Lara.Control.Weapon.GunType)
@@ -177,6 +172,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
+			const auto& leftArmAnim = GetAnimData(Lara.LeftArm.AnimObjectID, Lara.LeftArm.AnimNumber);
 			const auto& frameLeft = leftArmAnim.GetKeyframeInterpData(Lara.LeftArm.FrameNumber).Keyframe0;
 			auto interpDataLeft = KeyframeInterpData(frameLeft, frameLeft, 0.0f);
 			UpdateAnimation(&rItem, playerObject, interpDataLeft, mask);
@@ -186,6 +182,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
+			const auto& rightArmAnim = GetAnimData(Lara.RightArm.AnimObjectID, Lara.RightArm.AnimNumber);
 			const auto& frameRight = rightArmAnim.GetKeyframeInterpData(Lara.RightArm.FrameNumber).Keyframe0;
 			auto interpDataRight = KeyframeInterpData(frameRight, frameRight, 0.0f);
 			UpdateAnimation(&rItem, playerObject, interpDataRight, mask);
@@ -251,6 +248,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::Torch:
 			// Left arm
 			ItemInfo tempItem;
+			tempItem.Animation.AnimObjectID = Lara.LeftArm.AnimObjectID;
 			tempItem.Animation.AnimNumber = Lara.LeftArm.AnimNumber;
 			tempItem.Animation.FrameNumber = Lara.LeftArm.FrameNumber;
 

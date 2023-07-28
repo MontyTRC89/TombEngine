@@ -25,9 +25,9 @@ namespace TEN::Entities::Creatures::TR1
 		return nullptr;
 	}
 
-	short GetWeaponDamage(LaraWeaponType weaponType)
+	static int GetWeaponDamage(LaraWeaponType weaponType)
 	{
-		return short(Weapons[(int)weaponType].Damage) * 10;
+		return (Weapons[(int)weaponType].Damage * 10);
 	}
 
 	void DoppelgangerControl(short itemNumber)
@@ -79,6 +79,7 @@ namespace TEN::Entities::Creatures::TR1
 				item.Pose.Position.y += 64;
 				item.ItemFlags[7] = 1;
 			}
+
 			break;
 		}
 		case 1:
@@ -125,7 +126,9 @@ namespace TEN::Entities::Creatures::TR1
 					item.Animation.FrameNumber >= anim.EndFrameNumber) // TODO: Check.
 					item.ItemFlags[7] = 2;
 			}
+
 			break;
+
 		case 2:
 			DisableEntityAI(itemNumber);
 			RemoveActiveItem(itemNumber);
