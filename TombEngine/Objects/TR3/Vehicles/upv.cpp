@@ -950,7 +950,7 @@ namespace TEN::Entities::Vehicles
 		{
 			DoCurrent(UPVItem, laraItem);
 
-			if ((IsHeld(In::Fire) || IsHeld(In::Speed)) &&
+			if (IsHeld(In::Fire) &&
 				UPV->Flags & UPV_FLAG_CONTROL &&
 				!UPV->HarpoonTimer)
 			{
