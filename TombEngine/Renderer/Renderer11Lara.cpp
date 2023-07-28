@@ -154,6 +154,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		g_Renderer.PrintDebugMessage("%d", (int)Lara.LeftArm.AnimObjectID);
 		g_Renderer.PrintDebugMessage("%d", Lara.LeftArm.AnimNumber);
 		g_Renderer.PrintDebugMessage("%d", Lara.LeftArm.FrameNumber);
+		g_Renderer.PrintDebugMessage("%d", (int)Lara.Control.HandStatus);
 		g_Renderer.PrintDebugMessage("");
 
 		// HACK: Back guns are handled differently.

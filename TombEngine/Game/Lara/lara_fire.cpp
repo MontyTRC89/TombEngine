@@ -503,13 +503,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
-				// NOTE: Original engines for some reason do this check, but it introduces a bug when player
-				// can't drop a flare underwater after it was dropped and picked up again once. -- Lwmte, 20/05/23
-
-				//if (!player.LeftArm.FrameNumber)
-				{
-					player.Control.HandStatus = HandStatus::WeaponUndraw;
-				}
+				player.Control.HandStatus = HandStatus::WeaponUndraw;
 			}
 			else if (player.Inventory.TotalFlares)
 			{

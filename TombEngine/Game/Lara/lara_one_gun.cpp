@@ -513,14 +513,17 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	auto& player = *GetLaraInfo(&laraItem);
-
+	auto& player = GetLaraInfo(laraItem);
 	auto& item = g_Level.Items[player.Control.Weapon.WeaponItem];
 
 	item.Animation.TargetState = WEAPON_STATE_UNDRAW;
 	item.Pose = laraItem.Pose;
 
 	AnimateItem(&item);
+
+	// TODO: Fix is elsewhere.
+	if ((item.Animation.AnimNumber != 0 && item.Animation.FrameNumber != 0) && item.Animation.AnimNumber != 3)
+		return;
 
 	if (item.Status == ITEM_DEACTIVATED)
 	{
