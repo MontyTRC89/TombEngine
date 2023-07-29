@@ -137,7 +137,7 @@ CollisionResult GetCollision(const ItemInfo& item)
 }
 
 // Deprecated.
-CollisionResult GetCollision(ItemInfo* item)
+CollisionResult GetCollision(const ItemInfo* item)
 {
 	return GetCollision(*item);
 }
