@@ -71,7 +71,7 @@ namespace TEN::Collision::Attractors
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
 		AttractorProximityData GetProximity(const Vector3& refPoint) const;
 		Vector3				   GetPointAtLineDistance(float lineDist) const;
-		unsigned int		   GetSegmentIDAtDistance(float lineDist) const;
+		unsigned int		   GetSegmentIDAtLineDistance(float lineDist) const;
 
 		// Inquirers
 		bool IsEdge() const;

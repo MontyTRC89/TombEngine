@@ -84,7 +84,7 @@ namespace TEN::Collision::Attractors
 		// Get attractor proximity data.
 		auto attracProx = GetProximity(refPoint);
 
-		// Getsegment origin and target.
+		// Get segment points.
 		const auto& origin = Points[attracProx.SegmentID];
 		const auto& target = Points[attracProx.SegmentID + 1];
 
@@ -206,7 +206,7 @@ namespace TEN::Collision::Attractors
 		return Points.back();
 	}
 
-	unsigned int Attractor::GetSegmentIDAtDistance(float lineDist) const
+	unsigned int Attractor::GetSegmentIDAtLineDistance(float lineDist) const
 	{
 		// Single segment exists; return segment ID 0.
 		if (Points.size() <= 2)
@@ -215,7 +215,7 @@ namespace TEN::Collision::Attractors
 		// Normalize distance along attractor.
 		lineDist = NormalizeLineDistance(lineDist);
 
-		// Line distance is outside attractor; return clamped segment ID.
+		// Line distance is on attractor edge; return clamped segment ID.
 		if (lineDist <= 0.0f)
 		{
 			return 0;
