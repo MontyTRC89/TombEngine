@@ -408,6 +408,13 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
+	// TODO: TRAE method of a search algorithm incorporating an R-tree might be ideal here, especially in cases where a room
+	// and its immediate neighbours contain hundreds of attractors.
+	// Approximately nearby attractors could be found more efficiently with a simple sphere-box intersection,
+	// avoiding the use of numerous expensive and accurate distance calculations reserved for attractor collision assessment.
+	// Prioritise the current room, then consider intersections with portals to other rooms. Maybe extend distance check to portal
+	// to best account for room loops.
+	// -- Sezz 2023.07.30
 	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
 	{
 		constexpr auto COUNT_MAX = 32;
