@@ -7,6 +7,7 @@ Version 1.1.0
 * Fix various crashes specific to 64-bit build.
 * Fix random crashes when playing audio tracks with names longer than 15 symbols.
 * Fix crashes when trying to play .wav audio tracks on some Windows 11 systems.
+* Fix last selected gun type not preserved after level jump.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix clockwork beetle activation crashing the game.
@@ -32,6 +33,7 @@ Version 1.1.0
 * Implement separate audio track channel for playing voiceovers with subtitles in .srt format.
 * Don't stop ambience when Lara dies.
 * Pause all sounds when entering inventory or pause menu.
+* Preserve hit points on level jump.
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
 * Reduce camera bounce.
