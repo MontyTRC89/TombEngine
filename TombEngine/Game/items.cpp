@@ -871,3 +871,43 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 
 	DoItemHit(&target, damage, isExplosive);
 }
+
+Vector3i GetNearestSectorCenter(const Vector3i& pos)
+{
+	constexpr auto BIT_MASK_LOWER_8 = 0xFFFFFE00; // 0-8
+	constexpr auto BIT_MASK_9 = 0x200;	  // 9
+
+	// Return collision block center.
+	// TODO: No bitwise operations.
+	return Vector3i(
+		pos.x & BIT_MASK_LOWER_8 | BIT_MASK_9,
+		pos.y,
+		pos.z & BIT_MASK_LOWER_8 | BIT_MASK_9);
+}
+
+void FloatItem(ItemInfo& item, float floatForce)
+{
+	constexpr auto BOX_VOLUME_MIN = 512.0f;
+
+	auto& time = item.Animation.Velocity.y;
+	time += 1.0f;
+
+	// Calculate bounding box volume scaling factor.
+	auto bounds = GameBoundingBox(&item);
+	float boxVolume = bounds.GetWidth() * bounds.GetDepth() * bounds.GetHeight();
+	float boxScale = std::sqrt(std::min(BOX_VOLUME_MIN, boxVolume)) / 32.0f;
+	boxScale *= floatForce;
+
+	float xOscillation = (std::sin(time * 0.05f) * 0.5f) * boxScale;
+	float zOscillation = (std::sin(time * 0.1f) * 0.75f) * boxScale;
+
+	short xAngle = ANGLE(xOscillation * 20.0f);
+	short zAngle = ANGLE(zOscillation * 20.0f);
+	item.Pose.Orientation = EulerAngles(xAngle, item.Pose.Orientation.y, zAngle);
+
+	// Reset the time after certain amount of time has passed.
+	// 125 is the lap of frames needed to finish the tilt sin cycle with these values.
+	// If frequency and amplitude changes, this value must be changed too.
+	if (time > 125.0f)
+		time = 0.0f;
+}

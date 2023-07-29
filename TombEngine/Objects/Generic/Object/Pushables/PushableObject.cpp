@@ -79,7 +79,6 @@ namespace TEN::Entities::Generic
 		pushable.IsBuoyant = (ocb & (1 << 2)) != 0;						 // Check bit 2.
 		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
 
-		//SetStopperFlag(pushable.StartPos, true);
 		item.Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
 	}

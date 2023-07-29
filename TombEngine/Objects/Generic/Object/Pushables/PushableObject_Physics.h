@@ -19,7 +19,8 @@ namespace TEN::Entities::Generic
 		Falling,
 		Sinking,
 		Floating,
-		OnWater,
+		Underwater,
+		Watersurface,
 		Sliding
 	};
 
@@ -32,6 +33,7 @@ namespace TEN::Entities::Generic
 	void HandleFallingState(int itemNumber);
 	void HandleSinkingState(int itemNumber);
 	void HandleFloatingState(int itemNumber);
-	void HandleOnWaterState(int itemNumber);
+	void HandleUnderwaterState(int itemNumber);
+	void HandleWatersurfaceState(int itemNumber);
 	void HandleSlidingState(int itemNumber);
 };

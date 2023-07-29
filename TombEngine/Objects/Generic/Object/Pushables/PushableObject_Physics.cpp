@@ -27,7 +27,8 @@ namespace TEN::Entities::Generic
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Falling, &HandleFallingState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Sinking, &HandleSinkingState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Floating, &HandleFloatingState);
-			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::OnWater, &HandleOnWaterState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Underwater, &HandleUnderwaterState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Watersurface, &HandleWatersurfaceState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Sliding, &HandleSlidingState);
 		}
 	}
@@ -37,8 +38,9 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		TENLog("STATE: IDLE for " + std::to_string(static_cast<int>(itemNumber)), LogLevel::Error, LogConfig::All, true);
+		//TENLog("STATE: IDLE for " + std::to_string(static_cast<int>(itemNumber)), LogLevel::Error, LogConfig::All, true);
 
+		//1. CHECK IF LARA IS INTERACTING WITH IT.
 		if (Lara.Context.InteractedItem == itemNumber)
 		{
 			//If Lara is grabbing, check the push pull actions.
@@ -133,6 +135,8 @@ namespace TEN::Entities::Generic
 					SetAnimation(LaraItem, pullAnimNumber);
 				}
 
+				pushable.StartPos = pushableItem.Pose.Position;
+				pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 				pushable.BehaviourState = PushablePhysicState::Moving;
 			}
 			else if (	LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB &&
@@ -141,37 +145,241 @@ namespace TEN::Entities::Generic
 			{
 				Lara.Context.InteractedItem = NO_ITEM;
 			}
+
+			return;
 		}
+
+		//2. CHECK IF IS IN WATER ROOM.
+		bool isUnderwater = false; // IsUnderwaterRoom(pushableItem.RoomNumber); // Implement this function in scan to check if the room is underwater.
+		if (isUnderwater)
+		{
+			if (pushable.IsBuoyant)
+			{
+				pushable.BehaviourState = PushablePhysicState::Sinking; 
+			}
+			else
+			{
+				pushable.BehaviourState = PushablePhysicState::Floating;
+			}
+			return;
+		}
+
+		//3. CHECK IF FLOOR HAS CHANGED.
+		/*int currentFloorHeight = 0; // GetFloorHeight(pushableItem);	// Implement this function to get the floor height at the current position of the pushable item.
+		if (currentFloorHeight > pushableItem.Pose.Position.y)			//The floor has decresed. (Flip map, trapdoor, etc...)
+		{
+			//Maybe add an extra, if the diffence is not very big, just teleport it.
+			pushable.BehaviourState = PushablePhysicState::Falling; 
+			return;
+		}
+		else if (currentFloorHeight < pushableItem.Pose.Position.y)		//The floor has risen. (Elevator, raising block, etc...)
+		{
+			pushableItem.Pose.Position.y = currentFloorHeight;
+			return;
+		}*/
+
+		return;
 	}
 
 	void HandleMovingState(int itemNumber)
 	{
-		TENLog("STATE: MOVING for " + std::to_string(static_cast<int>(itemNumber)), LogLevel::Error, LogConfig::All, true);
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		bool isPlayerPulling = (LaraItem->Animation.AnimNumber == LA_PUSHABLE_PULL);// || LaraItem->Animation.AnimNumber == LA_PUSHABLE_BLOCK_PULL);
+
+		int quadrantDir = GetQuadrant(LaraItem->Pose.Orientation.y);
+		int newPosX = pushable.StartPos.x;
+		int newPosZ = pushable.StartPos.z;
+
+		int displaceDepth = 0;
+		int displaceBox = GameBoundingBox(LaraItem).Z2;
+
+		if (pushable.CurrentSoundState == PushableSoundState::Moving)
+			pushable.CurrentSoundState = PushableSoundState::Stopping;
+
+		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
+		displaceBox -= isPlayerPulling ? (BLOCK(1) + displaceDepth) : (displaceDepth - BLOCK(1));
+
+		//Lara is doing the pushing / pulling animation
+		if (LaraItem->Animation.FrameNumber != g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
+		{
+			//1. DECIDE GOAL POSITION.
+			switch (quadrantDir)
+			{
+				case NORTH:
+					newPosZ += displaceBox;
+					break;
+
+				case EAST:
+					newPosX += displaceBox;
+					break;
+
+				case SOUTH:
+					newPosZ -= displaceBox;
+					break;
+
+				case WEST:
+					newPosX -= displaceBox;
+					break;
+
+				default:
+					break;
+			}
+
+			pushable.CurrentSoundState = PushableSoundState::Stopping;
+
+			//2. MOVE PUSHABLES
+			
+			//Don't move the pushable if the distance is too big (it may happens because the animation bounding changes in the continue push pull process).
+			if (abs(pushableItem.Pose.Position.z - newPosZ) > BLOCK(0.5f))
+				return;
+			if (abs(pushableItem.Pose.Position.x - newPosX) > BLOCK(0.5f))
+				return;
+
+			// move only if the move direction is oriented to the action
+			// So pushing only moves pushable forward, and pulling only moves backwards
+
+			//Z axis
+			if (isPlayerPulling)
+			{
+				pushable.CurrentSoundState = PushableSoundState::Moving;
+				if ((quadrantDir == NORTH && pushableItem.Pose.Position.z > newPosZ) ||
+					(quadrantDir == SOUTH && pushableItem.Pose.Position.z < newPosZ))
+				{
+					pushableItem.Pose.Position.z = newPosZ;
+				}
+			}
+			else
+			{
+				if ((quadrantDir == NORTH && pushableItem.Pose.Position.z < newPosZ) ||
+					(quadrantDir == SOUTH && pushableItem.Pose.Position.z > newPosZ))
+				{
+					pushableItem.Pose.Position.z = newPosZ;
+				}
+			}
+
+			//X axis
+			pushable.CurrentSoundState = PushableSoundState::Moving;
+			if (isPlayerPulling)
+			{
+				if ((quadrantDir == EAST && pushableItem.Pose.Position.x > newPosX) ||
+					(quadrantDir == WEST && pushableItem.Pose.Position.x < newPosX))
+				{
+					pushableItem.Pose.Position.x = newPosX;
+				}
+			}
+			else
+			{
+				if ((quadrantDir == EAST && pushableItem.Pose.Position.x < newPosX) ||
+					(quadrantDir == WEST && pushableItem.Pose.Position.x > newPosX))
+				{
+					pushableItem.Pose.Position.x = newPosX;
+				}
+			}
+		}
+		else
+		{
+			//Pushing Pulling animation ended
+			
+			//1. REALIGN WITH SECTOR CENTER
+			pushableItem.Pose.Position = GetNearestSectorCenter(pushableItem.Pose.Position);
+			pushable.StartPos = pushableItem.Pose.Position;
+			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
+
+			//2. ACTIVATE TRIGGER
+			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
+			
+			//3. CHECK FLOOR HEIGHT
+			// Check if pushing pushable over edge. Then can't keep pushing/pulling and pushable start to fall.
+			if (pushable.CanFall && !isPlayerPulling)
+			{
+				int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
+				if (floorHeight > pushableItem.Pose.Position.y)
+				{
+					LaraItem->Animation.TargetState = LS_IDLE;
+					Lara.Context.InteractedItem = NO_ITEM;
+					pushable.BehaviourState = PushablePhysicState::Falling;
+					pushable.CurrentSoundState = PushableSoundState::None;
+
+					return;
+				}
+			}
+
+			//4. CHECK INPUT AND IF CAN KEEP THE MOVEMENT
+
+			// Check the pushable animation system in use, if is using block animation which can't loop, go back to idle state.
+			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop)
+			{
+				pushable.BehaviourState = PushablePhysicState::Idle;
+				return;
+			}
+
+			//PENDING, GET NEW TARGET POSITION TO SCAN IF IT'S ALLOWED.
+			/*// Otherwise, just check if action key is still pressed.
+			auto nextPos = GameVector(pushableItem.Pose.Position, pushableItem.RoomNumber);
+
+			// Rotate orientation 180 degrees.
+			if (isPlayerPulling)
+				quadrantDir = (quadrantDir + 2) % 4;
+
+			switch (quadrantDir)
+			{
+			case NORTH:
+				nextPos.z = nextPos.z + BLOCK(1);
+				break;
+
+			case EAST:
+				nextPos.x = nextPos.x + BLOCK(1);
+				break;
+
+			case SOUTH:
+				nextPos.z = nextPos.z - BLOCK(1);
+				break;
+
+			case WEST:
+				nextPos.x = nextPos.x - BLOCK(1);
+				break;
+			}*/
+
+			if (!IsHeld(In::Action)) //&& IsNextSectorValid(pushableItem, nextPos, isPlayerPulling))
+			{
+				LaraItem->Animation.TargetState = LS_IDLE;
+				pushable.BehaviourState = PushablePhysicState::Idle;
+			}
+		}
+
+		return;
 	}
 
 	void HandleFallingState(int itemNumber)
 	{
-		// Your code for handling the Falling state goes here
+
 	}
 
 	void HandleSinkingState(int itemNumber)
 	{
-		// Your code for handling the Sinking state goes here
+
 	}
 
 	void HandleFloatingState(int itemNumber)
 	{
-		// Your code for handling the Floating state goes here
+
 	}
 
-	void HandleOnWaterState(int itemNumber)
+	void HandleUnderwaterState(int itemNumber)
 	{
-		// Your code for handling the OnWater state goes here
+
+	}
+
+	void HandleWatersurfaceState(int itemNumber)
+	{
+
 	}
 
 	void HandleSlidingState(int itemNumber)
 	{
-		// Your code for handling the Sliding state goes here
+
 	}
 
 }
