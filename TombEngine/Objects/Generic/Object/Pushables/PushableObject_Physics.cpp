@@ -2,6 +2,7 @@
 #include "Objects/Generic/Object/Pushables/PushableObject_Physics.h"
 
 #include "Game/animation.h"
+#include "Game/control/flipeffect.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
@@ -14,6 +15,16 @@ using namespace TEN::Input;
 namespace TEN::Entities::Generic
 {
 	std::unordered_map<PushablePhysicState, std::function<void(int)>> PUSHABLES_STATES_MAP;
+
+	constexpr auto PUSHABLE_FALL_VELOCITY_MAX = BLOCK(1 / 8.0f);
+	constexpr auto PUSHABLE_WATER_VELOCITY_MAX = BLOCK(1 / 16.0f);
+	constexpr auto GRAVITY_AIR = 8.0f;
+	constexpr auto GRAVITY_ACCEL = 0.5f;
+
+	constexpr auto PUSHABLE_FALL_RUMBLE_VELOCITY = 96.0f;
+	//constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
+
+	constexpr auto WATER_SURFACE_DISTANCE = CLICK(0.5f);
 
 	void InitializePushablesStatesMap()
 	{
@@ -165,18 +176,26 @@ namespace TEN::Entities::Generic
 		}
 
 		//3. CHECK IF FLOOR HAS CHANGED.
-		/*int currentFloorHeight = 0; // GetFloorHeight(pushableItem);	// Implement this function to get the floor height at the current position of the pushable item.
-		if (currentFloorHeight > pushableItem.Pose.Position.y)			//The floor has decresed. (Flip map, trapdoor, etc...)
+		int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
+		if (floorHeight > pushableItem.Pose.Position.y)			//The floor has decresed. (Flip map, trapdoor, etc...)
 		{
-			//Maybe add an extra, if the diffence is not very big, just teleport it.
-			pushable.BehaviourState = PushablePhysicState::Falling; 
+			//If the diffence is not very big, just teleport it.
+			if (abs(pushableItem.Pose.Position.y - floorHeight) >= CLICK(1))
+			{
+				pushable.BehaviourState = PushablePhysicState::Falling;
+			}
+			else
+			{
+				pushableItem.Pose.Position.y = floorHeight;
+			}
+			
 			return;
 		}
-		else if (currentFloorHeight < pushableItem.Pose.Position.y)		//The floor has risen. (Elevator, raising block, etc...)
+		else if (floorHeight < pushableItem.Pose.Position.y)	//The floor has risen. (Elevator, raising block, etc...)
 		{
-			pushableItem.Pose.Position.y = currentFloorHeight;
+			pushableItem.Pose.Position.y = floorHeight;
 			return;
-		}*/
+		}
 
 		return;
 	}
@@ -354,7 +373,51 @@ namespace TEN::Entities::Generic
 
 	void HandleFallingState(int itemNumber)
 	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
 
+		auto pointColl = GetCollision(&pushableItem);
+
+		float currentY = pushableItem.Pose.Position.y;
+		float velocityY = pushableItem.Animation.Velocity.y;
+
+		//1. CALCULATE THE FLOOR HEIGHT.
+		 
+		//2. MOVE THE PUSHABLE DOWNWARDS
+		// Move the pushable downwards if it hasn't reached the floor yet
+		if (currentY < (pointColl.Position.Floor - velocityY))
+		{
+			float newVelocityY = velocityY + pushable.Gravity;
+			pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_FALL_VELOCITY_MAX);
+
+			pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
+			
+			//3. CHECK IF IS IN WATER ROOM
+			if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+			{
+				pushable.BehaviourState = PushablePhysicState::Sinking;
+
+				// TODO: [Effects Requirement] Add Water splash.
+			}
+			return;
+		}
+
+		//Reached the ground
+		//3. CHECK ENVIRONMENT
+		
+		//If it's a flat ground?
+		
+		//place on ground
+		pushable.BehaviourState = PushablePhysicState::Idle;
+		pushableItem.Pose.Position.y = pointColl.Position.Floor;
+
+		// Shake floor if pushable landed at high enough velocity.
+		if (velocityY >= PUSHABLE_FALL_RUMBLE_VELOCITY)
+			FloorShake(&pushableItem);
+
+		//TODO: [Effects Requirement] Is there low water? -> Spawn water splash
+
+		//TODO: if it's a slope ground?...
 	}
 
 	void HandleSinkingState(int itemNumber)
