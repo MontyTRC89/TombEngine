@@ -9,8 +9,8 @@ namespace TEN::Entities::Generic
 		Falling,
 		Sinking,
 		Floating,
-		Underwater,
-		Watersurface,
+		UnderwaterIdle,
+		WatersurfaceIdle,
 		Sliding
 	};
 

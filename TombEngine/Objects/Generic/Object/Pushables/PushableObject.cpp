@@ -102,6 +102,14 @@ namespace TEN::Entities::Generic
 
 		// Do sound effects.
 		//PushablesManageSounds(itemNumber, pushable);
+
+		//Update Room
+		int probedRoomNumber = GetCollision(&pushableItem).RoomNumber;
+		if (pushableItem.RoomNumber != probedRoomNumber)
+		{
+			ItemNewRoom(itemNumber, probedRoomNumber);
+			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
+		}
 	}
 	
 	void PushableBlockCollision(int itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

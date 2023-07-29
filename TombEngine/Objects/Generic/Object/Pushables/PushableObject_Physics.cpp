@@ -38,8 +38,8 @@ namespace TEN::Entities::Generic
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Falling, &HandleFallingState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Sinking, &HandleSinkingState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Floating, &HandleFloatingState);
-			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Underwater, &HandleUnderwaterState);
-			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Watersurface, &HandleWatersurfaceState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::UnderwaterIdle, &HandleUnderwaterState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::WatersurfaceIdle, &HandleWatersurfaceState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Sliding, &HandleSlidingState);
 		}
 	}
@@ -376,12 +376,11 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
+		//1. PREPARE DATA, (floor height and velocities).
 		auto pointColl = GetCollision(&pushableItem);
 
 		float currentY = pushableItem.Pose.Position.y;
 		float velocityY = pushableItem.Animation.Velocity.y;
-
-		//1. CALCULATE THE FLOOR HEIGHT.
 		 
 		//2. MOVE THE PUSHABLE DOWNWARDS
 		// Move the pushable downwards if it hasn't reached the floor yet
@@ -410,6 +409,7 @@ namespace TEN::Entities::Generic
 		//place on ground
 		pushable.BehaviourState = PushablePhysicState::Idle;
 		pushableItem.Pose.Position.y = pointColl.Position.Floor;
+		pushableItem.Animation.Velocity.y = 0;
 
 		// Shake floor if pushable landed at high enough velocity.
 		if (velocityY >= PUSHABLE_FALL_RUMBLE_VELOCITY)
@@ -422,21 +422,151 @@ namespace TEN::Entities::Generic
 
 	void HandleSinkingState(int itemNumber)
 	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		//1. ENSURE IT'S IN WATER ROOM.
+		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+		{
+			pushable.BehaviourState = PushablePhysicState::Falling;
+			pushable.Gravity = GRAVITY_AIR;
+			return;
+		}
+
+		//2. PREPARE DATA, (floor height and velocities).
+		auto pointColl = GetCollision(&pushableItem);
+
+		float currentY = pushableItem.Pose.Position.y;
+		float velocityY = pushableItem.Animation.Velocity.y;
+
+		// TODO: [Effects Requirement] Add bubbles during this phase.
+
+		//3. MANAGE GRAVITY FORCE
+		if (pushable.IsBuoyant)
+		{
+			// Slowly reverses gravity direction. If gravity is 0, then it floats.
+			pushable.Gravity = pushable.Gravity - GRAVITY_ACCEL;
+			if (pushable.Gravity <= 0.0f)
+			{
+				pushable.BehaviourState = PushablePhysicState::Floating;
+				return;
+			}
+		}
+		else
+		{
+			// Decreases gravity, continues to fall until hits ground.
+			pushable.Gravity = std::max(pushable.Gravity - GRAVITY_ACCEL, 4.0f);
+		}
+
+		//4. MOVE OBJECT
+		if (currentY < pointColl.Position.Floor - velocityY)
+		{
+			// Sinking down.
+			float newVelocityY = velocityY + pushable.Gravity;
+			pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_WATER_VELOCITY_MAX);
+
+			pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
+
+			return;
+		}
+
+		// 5. HIT GROUND
+		if (pushable.IsBuoyant)
+		{
+			pushable.Gravity = 0.0f;
+			pushable.BehaviourState = PushablePhysicState::Floating;
+		}
+		else
+		{
+			pushable.BehaviourState = PushablePhysicState::UnderwaterIdle;
+			pushableItem.Pose.Position.y = pointColl.Position.Floor;
+		}
+
+		pushableItem.Animation.Velocity.y = 0.0f;
 
 	}
 
 	void HandleFloatingState(int itemNumber)
 	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
 
+		//1. ENSURE IT'S IN WATER ROOM.
+		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+		{
+			pushable.BehaviourState = PushablePhysicState::Falling;
+			pushable.Gravity = GRAVITY_AIR;
+			return;
+		}
+
+		//2. PREPARE DATA, (goal height and velocities).
+		auto pointColl = GetCollision(&pushableItem);
+
+		int goalHeight = 0;
+
+		int waterDepth = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+		if (waterDepth != NO_HEIGHT)
+			goalHeight = waterDepth - WATER_SURFACE_DISTANCE + pushable.Height;
+		else
+			goalHeight = pointColl.Position.Ceiling + WATER_SURFACE_DISTANCE + pushable.Height;
+
+		float currentY = pushableItem.Pose.Position.y;
+		float velocityY = pushableItem.Animation.Velocity.y;
+
+		pushable.Gravity = std::max(pushable.Gravity - GRAVITY_ACCEL, -4.0f);
+
+		//3. MOVE PUSHABLE UPWARDS
+		if (currentY > goalHeight)
+		{
+			// Floating up.
+			float newVelocityY = velocityY + pushable.Gravity;
+			pushableItem.Animation.Velocity.y = std::min(newVelocityY, PUSHABLE_WATER_VELOCITY_MAX);
+
+			// Update pushable's position and move its stack.
+			pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
+			return;
+		}
+
+		// Reached water surface.
+		pushable.BehaviourState = PushablePhysicState::WatersurfaceIdle;
+		pushableItem.Pose.Position.y = goalHeight;
+
+		pushableItem.Animation.Velocity.y = 0.0f;
 	}
 
 	void HandleUnderwaterState(int itemNumber)
 	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		//1. ENSURE IT'S IN WATER ROOM.
+		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+		{
+			pushable.BehaviourState = PushablePhysicState::Idle;
+			pushable.Gravity = GRAVITY_AIR;
+			return;
+		}
 
 	}
 
 	void HandleWatersurfaceState(int itemNumber)
 	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		//1. ENSURE IT'S IN WATER ROOM.
+		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+		{
+			pushable.BehaviourState = PushablePhysicState::Falling;
+			pushable.Gravity = GRAVITY_AIR;
+			pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
+			return;
+		}
+
+		//2. DO WATER ONDULATION EFFECT.
+		FloatItem(pushableItem, pushable.FloatingForce);
+
+		// TODO: [Effects Requirement] Spawn ripples.
 
 	}
 
