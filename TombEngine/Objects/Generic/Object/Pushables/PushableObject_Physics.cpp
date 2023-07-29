@@ -161,16 +161,17 @@ namespace TEN::Entities::Generic
 		}
 
 		//2. CHECK IF IS IN WATER ROOM.
-		bool isUnderwater = false; // IsUnderwaterRoom(pushableItem.RoomNumber); // Implement this function in scan to check if the room is underwater.
-		if (isUnderwater)
+		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
 			if (pushable.IsBuoyant)
 			{
-				pushable.BehaviourState = PushablePhysicState::Sinking; 
+				pushable.BehaviourState = PushablePhysicState::Floating;
+				pushable.Gravity = 0.0f;
 			}
 			else
 			{
-				pushable.BehaviourState = PushablePhysicState::Floating;
+				pushable.BehaviourState = PushablePhysicState::Sinking;
+				pushable.Gravity = 0.0f;
 			}
 			return;
 		}
@@ -545,6 +546,12 @@ namespace TEN::Entities::Generic
 			pushable.BehaviourState = PushablePhysicState::Idle;
 			pushable.Gravity = GRAVITY_AIR;
 			return;
+		}
+
+		if (pushable.IsBuoyant)
+		{
+			pushable.Gravity = 0.0f;
+			pushable.BehaviourState = PushablePhysicState::Floating;
 		}
 
 	}

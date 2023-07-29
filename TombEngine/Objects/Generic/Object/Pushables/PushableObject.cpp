@@ -77,7 +77,7 @@ namespace TEN::Entities::Generic
 		pushable.CanFall = (ocb & (1 << 0)) != 0;						 // Check bit 0.
 		pushable.DoAlignCenter = (ocb & (1 << 1)) != 0;					 // Check bit 1.
 		pushable.IsBuoyant = (ocb & (1 << 2)) != 0;						 // Check bit 2.
-		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
+		//pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
 
 		item.Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
