@@ -8,6 +8,7 @@ Version 1.1.0
 * Fix random crashes when playing audio tracks with names longer than 15 symbols.
 * Fix crashes when trying to play .wav audio tracks on some Windows 11 systems.
 * Fix last selected gun type not preserved after level jump.
+* Fix incorrect vertical position after reloading a savegame made while standing on a bridge.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix clockwork beetle activation crashing the game.
