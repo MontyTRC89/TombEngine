@@ -816,9 +816,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RendererDebugPage page)
 	{
-		if (!DebugMode || m_numDebugPage != page)
+		if (!DebugMode || DebugPage != page)
 			return;
 
 		AddSphere(center, radius, color);
@@ -936,9 +936,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RendererDebugPage page)
 	{
-		if (!DebugMode || m_numDebugPage != page)
+		if (!DebugMode || DebugPage != page)
 			return;
 
 		Vector3 corners[8];
@@ -946,10 +946,11 @@ namespace TEN::Renderer
 		AddBox(corners, color);
 	}
 
-	void Renderer11::AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RendererDebugPage page)
 	{
-		if (m_numDebugPage != page)
+		if (DebugPage != page)
 			return;
+
 		AddBox(min, max, color);
 	}
 

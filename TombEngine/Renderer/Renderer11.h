@@ -463,7 +463,7 @@ namespace TEN::Renderer
 		int m_currentY;
 		int m_dotProducts = 0;
 
-		RENDERER_DEBUG_PAGE m_numDebugPage = NO_PAGE;
+		RendererDebugPage DebugPage = RendererDebugPage::None;
 
 		// Times for debug
 		int m_timeUpdate;
@@ -706,12 +706,12 @@ namespace TEN::Renderer
 		void SaveScreenshot();
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);
-		void SwitchDebugPage(bool back);
+		void SwitchDebugPage(bool goBack);
 		void DrawDisplayPickup(const DisplayPickup& pickup);
 		int  Synchronize();
 		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
-		void AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RENDERER_DEBUG_PAGE page);
+		void AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);
@@ -724,10 +724,10 @@ namespace TEN::Renderer
 		void AddLine3D(Vector3 start, Vector3 end, Vector4 color);
 		void AddBox(Vector3 min, Vector3 max, Vector4 color);
 		void AddBox(Vector3* corners, Vector4 color);
-		void AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page);
-		void AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page);
+		void AddDebugBox(BoundingOrientedBox box, Vector4 color, RendererDebugPage page);
+		void AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RendererDebugPage page);
 		void AddSphere(Vector3 center, float radius, Vector4 color);
-		void AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page);
+		void AddDebugSphere(Vector3 center, float radius, Vector4 color, RendererDebugPage page);
 		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);
