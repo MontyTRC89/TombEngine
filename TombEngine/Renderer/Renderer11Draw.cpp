@@ -42,7 +42,7 @@ namespace TEN::Renderer
 	void Renderer11::RenderBlobShadows(RenderView& renderView)
 	{
 		auto nearestSpheres = std::vector<Sphere>{};
-		nearestSpheres.reserve(g_Configuration.ShadowMaxBlobs);
+		nearestSpheres.reserve(g_Configuration.ShadowBlobsMax);
 
 		// Collect player spheres.
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
@@ -91,7 +91,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (nearestSpheres.size() > g_Configuration.ShadowMaxBlobs) 
+		if (nearestSpheres.size() > g_Configuration.ShadowBlobsMax) 
 		{
 			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b) 
 			{
@@ -99,8 +99,8 @@ namespace TEN::Renderer
 				return Vector3::Distance(laraPos.ToVector3(), a.position) < Vector3::Distance(laraPos.ToVector3(), b.position);
 			});
 
-			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowMaxBlobs, m_stShadowMap.Spheres);
-			m_stShadowMap.NumSpheres = g_Configuration.ShadowMaxBlobs;
+			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowBlobsMax, m_stShadowMap.Spheres);
+			m_stShadowMap.NumSpheres = g_Configuration.ShadowBlobsMax;
 		}
 		else 
 		{

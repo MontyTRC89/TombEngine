@@ -570,6 +570,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
     <ClInclude Include="Objects\TR4\Trap\SpikyCeiling.h" />
+    <ClInclude Include="Objects\TR4\Trap\SpikyWall.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_blade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_catwalkblade.h" />
@@ -585,7 +586,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Trap\tr4_sethblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_slicerdicer.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_spikeball.h" />
-    <ClInclude Include="Objects\TR4\Trap\tr4_spikywall.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_stargate.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_teethspike.h" />
     <ClInclude Include="Objects\TR4\Vehicles\jeep.h" />
@@ -1012,6 +1012,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Object\WraithTrap.cpp" />
     <ClCompile Include="Objects\TR4\tr4_objects.cpp" />
     <ClCompile Include="Objects\TR4\Trap\SpikyCeiling.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\SpikyWall.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_birdblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_blade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_catwalkblade.cpp" />
@@ -1027,7 +1028,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Trap\tr4_sethblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_slicerdicer.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_spikeball.cpp" />
-    <ClCompile Include="Objects\TR4\Trap\tr4_spikywall.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_stargate.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />

@@ -86,7 +86,7 @@ void DoThumbstickCamera()
 	constexpr auto VERTICAL_CONSTRAINT_ANGLE   = ANGLE(120.0f);
 	constexpr auto HORIZONTAL_CONSTRAINT_ANGLE = ANGLE(80.0f);
 
-	if (!g_Configuration.EnableThumbstickCameraControl)
+	if (!g_Configuration.EnableThumbstickCamera)
 		return;
 
 	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
@@ -1510,7 +1510,7 @@ void UpdateMikePos(const ItemInfo& item)
 	}
 	else
 	{
-		int phdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+		int phdPerspective = g_Configuration.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
 		Camera.mikePos.x = Camera.pos.x + phdPerspective * phd_sin(Camera.actualAngle);

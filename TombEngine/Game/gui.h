@@ -118,7 +118,7 @@ namespace TEN::Gui
 	private:
 		// Input inquirers
 		bool GuiIsPulsed(ActionID actionID) const;
-		bool GuiIsSelected() const;
+		bool GuiIsSelected(bool onClicked = true) const;
 		bool GuiIsDeselected() const;
 		bool CanSelect() const;
 		bool CanDeselect() const;

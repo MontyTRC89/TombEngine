@@ -38,6 +38,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
@@ -859,7 +860,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	Statistics.Game.Distance += (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
+	Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
+
+	if (DebugMode)
+	{
+		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
+		DrawNearbySectorFlags(*item);
+	}
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
@@ -930,8 +937,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
 	TestVolumes(item->Index, &coll->Setup);
-
-	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)

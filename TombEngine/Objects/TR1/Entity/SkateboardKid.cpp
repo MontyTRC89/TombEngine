@@ -16,8 +16,8 @@ namespace TEN::Entities::Creatures::TR1
 	// NOTES:
 	// ItemFlags[0] = skateboard entity ID.
 
-	constexpr auto KID_IDLE_SHOT_DAMAGE	 = 50;
-	constexpr auto KID_SKATE_SHOT_DAMAGE = 40;
+	constexpr auto KID_IDLE_SHOT_DAMAGE	 = 30;
+	constexpr auto KID_SKATE_SHOT_DAMAGE = 20;
 
 	constexpr auto KID_CLOSE_RANGE = SQUARE(BLOCK(1));
 	constexpr auto KID_SKATE_RANGE = SQUARE(BLOCK(2.5f));
@@ -71,7 +71,7 @@ namespace TEN::Entities::Creatures::TR1
 		skate.Pose.Orientation = item.Pose.Orientation;
 		skate.StartPose = item.StartPose;
 		skate.Model.Color = item.Model.Color;
-		skate.Collidable = true;
+		skate.RoomNumber = item.RoomNumber;
 
 		InitializeItem(skateItemNumber);
 		AddActiveItem(skateItemNumber);
@@ -84,7 +84,6 @@ namespace TEN::Entities::Creatures::TR1
 	void InitializeSkateboardKid(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
 		InitializeCreature(itemNumber);
 		SpawnSkateboard(item);
 	}
@@ -113,20 +112,23 @@ namespace TEN::Entities::Creatures::TR1
 	{
 		if (!CreatureActive(itemNumber))
 			return;
-
 		auto& item = g_Level.Items[itemNumber];
+		if (item.ItemFlags[0] == NO_ITEM)
+		{
+			TENLog("Failed to do the skateboard kid control (itemNumber: " + std::to_string(itemNumber) + "), the skateboard itemNumber is missing, probably failed to be created !");
+			return;
+		}
 		auto& creature = *GetCreatureInfo(&item);
 		auto& skateItem = g_Level.Items[item.ItemFlags[0]];
-
-		if (skateItem.Status & ITEM_INVISIBLE)
-		{
-			skateItem.Active = false;
-			skateItem.Status &= ~(ITEM_INVISIBLE);
-		}
-
 		short headingAngle = 0;
 		auto extraHeadRot = EulerAngles::Zero;
 		auto extraTorsoRot = EulerAngles::Zero;
+
+		if (skateItem.Status & ITEM_INVISIBLE)
+		{
+			skateItem.Active = true;
+			skateItem.Status &= ~(ITEM_INVISIBLE);
+		}
 
 		for (auto& flash : creature.MuzzleFlash)
 		{
@@ -216,9 +218,10 @@ namespace TEN::Entities::Creatures::TR1
 		}
 
 		skateItem.Animation.AnimNumber = Objects[ID_SKATEBOARD].animIndex + (item.Animation.AnimNumber - Objects[ID_SKATEBOARD_KID].animIndex);
-		skateItem.Animation.FrameNumber = g_Level.Anims[item.Animation.AnimNumber].frameBase + (item.Animation.FrameNumber - g_Level.Anims[item.Animation.AnimNumber].frameBase);
+		skateItem.Animation.FrameNumber = GetAnimData(item).frameBase + (item.Animation.FrameNumber - GetAnimData(item).frameBase);
 		skateItem.Pose.Position = item.Pose.Position;
 		skateItem.Pose.Orientation = item.Pose.Orientation;
+		UpdateItemRoom(item.ItemFlags[0]);
 		AnimateItem(&skateItem);
 
 		CreatureJoint(&item, 0, extraHeadRot.y);
