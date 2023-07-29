@@ -96,7 +96,7 @@ namespace TEN::Player
 		auto connectingAttracCollRight = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.AttracPtr, points.back());
 
 		// Get points.
-		auto pointCenter = handsAttrac.AttracPtr->GetPointAtLineDistance(lineDistCenter);
+		auto pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(lineDistCenter);
 		if (!isLooped)
 		{
 			if (connectingAttracCollCenter.has_value())
@@ -104,13 +104,13 @@ namespace TEN::Player
 				// Get point at connecting attractor.
 				if (lineDistCenter <= 0.0f)
 				{
-					float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + lineDistCenter;
-					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtLineDistance(transitLineDist);
+					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + lineDistCenter;
+					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtChainDistance(transitLineDist);
 				}
 				else if (lineDistCenter >= length)
 				{
-					float transitLineDist = connectingAttracCollCenter->Proximity.LineDistance + (lineDistCenter - length);
-					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtLineDistance(transitLineDist);
+					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + (lineDistCenter - length);
+					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtChainDistance(transitLineDist);
 				}
 			}
 			else
@@ -118,11 +118,11 @@ namespace TEN::Player
 				// Get point within boundary of current attractor.
 				if (lineDistLeft <= 0.0f && !connectingAttracCollLeft.has_value())
 				{
-					pointCenter = handsAttrac.AttracPtr->GetPointAtLineDistance(coll.Setup.Radius);
+					pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(coll.Setup.Radius);
 				}
 				else if (lineDistRight >= length && !connectingAttracCollRight.has_value())
 				{
-					pointCenter = handsAttrac.AttracPtr->GetPointAtLineDistance(length - coll.Setup.Radius);
+					pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(length - coll.Setup.Radius);
 				}
 
 				// TODO: Unreachable segments on current attractor. Too steep, angle difference to great.
@@ -130,11 +130,11 @@ namespace TEN::Player
 		}
 
 		auto pointLeft = ((lineDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->Attrac.GetPointAtLineDistance(connectingAttracCollLeft->Proximity.LineDistance + lineDistLeft) :
-			handsAttrac.AttracPtr->GetPointAtLineDistance(lineDistLeft);
+			connectingAttracCollLeft->Attrac.GetPointAtChainDistance(connectingAttracCollLeft->Proximity.ChainDistance + lineDistLeft) :
+			handsAttrac.AttracPtr->GetPointAtChainDistance(lineDistLeft);
 		auto pointRight = ((lineDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->Attrac.GetPointAtLineDistance(connectingAttracCollRight->Proximity.LineDistance + (lineDistRight - length)) :
-			handsAttrac.AttracPtr->GetPointAtLineDistance(lineDistRight);
+			connectingAttracCollRight->Attrac.GetPointAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (lineDistRight - length)) :
+			handsAttrac.AttracPtr->GetPointAtChainDistance(lineDistRight);
 
 		auto basePos = item.Pose.Position.ToVector3();
 		auto orient = item.Pose.Orientation;
@@ -222,7 +222,7 @@ namespace TEN::Player
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
-		player.Context.HandsAttractor.Set(edgeAttracColls->Center.Attrac, edgeAttracColls->Center.Proximity.LineDistance);
+		player.Context.HandsAttractor.Set(edgeAttracColls->Center.Attrac, edgeAttracColls->Center.Proximity.ChainDistance);
 	}
 
 	// State:	  LS_HANG_IDLE (10)

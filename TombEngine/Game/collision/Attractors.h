@@ -21,10 +21,10 @@ namespace TEN::Collision::Attractors
 
 	struct AttractorProximityData
 	{
-		Vector3		 Point		  = Vector3::Zero;
-		float		 Distance	  = 0.0f;
-		float		 LineDistance = 0.0f;
-		unsigned int SegmentID	  = 0;
+		Vector3		 Point		   = Vector3::Zero;
+		float		 Distance	   = 0.0f;
+		float		 ChainDistance = 0.0f;
+		unsigned int SegmentID	   = 0;
 	};
 
 	struct AttractorCollisionData
@@ -70,8 +70,8 @@ namespace TEN::Collision::Attractors
 		// Utilities
 		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
 		AttractorProximityData GetProximity(const Vector3& refPoint) const;
-		Vector3				   GetPointAtLineDistance(float lineDist) const;
-		unsigned int		   GetSegmentIDAtLineDistance(float lineDist) const;
+		Vector3				   GetPointAtChainDistance(float chainDist) const;
+		unsigned int		   GetSegmentIDAtChainDistance(float chainDist) const;
 
 		// Inquirers
 		bool IsEdge() const;
@@ -85,7 +85,7 @@ namespace TEN::Collision::Attractors
 
 	private:
 		// Helpers
-		float NormalizeLineDistance(float lineDist) const;
+		float NormalizeChainDistance(float chainDist) const;
 	};
 
 	// Temp

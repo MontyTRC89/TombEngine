@@ -126,7 +126,7 @@ namespace TEN::Collision::Attractors
 		}
 
 		auto attracProx = AttractorProximityData{ Points.front(), INFINITY, 0.0f, 0 };
-		float lineDistTravelled = 0.0f;
+		float chainDistTravelled = 0.0f;
 
 		// Find closest point along attractor.
 		for (int i = 0; i < (Points.size() - 1); i++)
@@ -141,48 +141,48 @@ namespace TEN::Collision::Attractors
 			// Found new closest point; update proximity data.
 			if (dist < attracProx.Distance)
 			{
-				lineDistTravelled += Vector3::Distance(origin, closestPoint);
+				chainDistTravelled += Vector3::Distance(origin, closestPoint);
 
 				attracProx.Point = closestPoint;
 				attracProx.Distance = dist;
-				attracProx.LineDistance += lineDistTravelled;
+				attracProx.ChainDistance += chainDistTravelled;
 				attracProx.SegmentID = i;
 
-				// Restart accumulation of distance along attractor.
-				lineDistTravelled = Vector3::Distance(closestPoint, target);
+				// Restart accumulation of distance travelled along attractor.
+				chainDistTravelled = Vector3::Distance(closestPoint, target);
 				continue;
 			}
 
-			// Accumulate distance along attractor since last closest point.
+			// Accumulate distance travelled along attractor since last closest point.
 			float segmentLength = Vector3::Distance(origin, target);
-			lineDistTravelled += segmentLength;
+			chainDistTravelled += segmentLength;
 		}
 
 		// Return proximity data.
 		return attracProx;
 	}
 
-	Vector3 Attractor::GetPointAtLineDistance(float lineDist) const
+	Vector3 Attractor::GetPointAtChainDistance(float chainDist) const
 	{
 		// Single point exists; return it.
 		if (Points.size() == 1)
 			return Points.front();
 		
 		// Normalize distance along attractor.
-		lineDist = NormalizeLineDistance(lineDist);
+		chainDist = NormalizeChainDistance(chainDist);
 
 		// Line distance is outside attractor; return clamped point.
-		if (lineDist <= 0.0f)
+		if (chainDist <= 0.0f)
 		{
 			return Points.front();
 		}
-		else if (lineDist >= Length)
+		else if (chainDist >= Length)
 		{
 			return Points.back();
 		}
 		
 		// Find point at distance along attractor.
-		float lineDistTravelled = 0.0f;
+		float chainDistTravelled = 0.0f;
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
 			// Get segment points.
@@ -190,51 +190,55 @@ namespace TEN::Collision::Attractors
 			const auto& target = Points[i + 1];
 
 			float segmentLength = Vector3::Distance(origin, target);
-			float remainingLineDist = lineDist - lineDistTravelled;
+			float remainingChainDist = chainDist - chainDistTravelled;
 
-			// Found correct segment.
-			if (remainingLineDist <= segmentLength)
+			// Found segment of distance along attractor; return interpolated point.
+			if (remainingChainDist <= segmentLength)
 			{
-				float alpha = remainingLineDist / segmentLength;
+				float alpha = remainingChainDist / segmentLength;
 				return Vector3::Lerp(origin, target, alpha);
 			}
 
-			lineDistTravelled += segmentLength;
+			// Accumulate distance travelled along attractor.
+			chainDistTravelled += segmentLength;
 		}
 
 		// FAILSAFE: Return end point.
 		return Points.back();
 	}
 
-	unsigned int Attractor::GetSegmentIDAtLineDistance(float lineDist) const
+	unsigned int Attractor::GetSegmentIDAtChainDistance(float chainDist) const
 	{
 		// Single segment exists; return segment ID 0.
 		if (Points.size() <= 2)
 			return 0;
 
 		// Normalize distance along attractor.
-		lineDist = NormalizeLineDistance(lineDist);
+		chainDist = NormalizeChainDistance(chainDist);
 
-		// Line distance is on attractor edge; return clamped segment ID.
-		if (lineDist <= 0.0f)
+		// Chain distance is on attractor edge; return clamped segment ID.
+		if (chainDist <= 0.0f)
 		{
 			return 0;
 		}
-		else if (lineDist >= Length)
+		else if (chainDist >= Length)
 		{
 			return ((int)Points.size() - 1);
 		}
 
 		// Find segment at distance along attractor.
-		float lineDistTravelled = 0.0f;
+		float chainDistTravelled = 0.0f;
 		for (int i = 0; i < (Points.size() - 1); i++)
 		{
 			// Get segment points.
 			const auto& origin = Points[i];
 			const auto& target = Points[i + 1];
 
-			lineDistTravelled += Vector3::Distance(origin, target);
-			if (lineDistTravelled >= lineDist)
+			// Accumulate distance travelled along attractor.
+			chainDistTravelled += Vector3::Distance(origin, target);
+
+			// Segment found; return segment ID.
+			if (chainDistTravelled >= chainDist)
 				return i;
 		}
 
@@ -334,7 +338,7 @@ namespace TEN::Collision::Attractors
 				orient.y += ANGLE(90.0f);
 				auto dir = orient.ToDirection();
 
-				// Draw segment facing indicator lines.
+				// Draw segment heading indicator lines.
 				g_Renderer.AddLine3D(origin, origin + (dir * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 				g_Renderer.AddLine3D(target, target + (dir * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
@@ -362,21 +366,21 @@ namespace TEN::Collision::Attractors
 		}
 	}
 
-	float Attractor::NormalizeLineDistance(float lineDist) const
+	float Attractor::NormalizeChainDistance(float chainDist) const
 	{
 		// Distance along attractor is within bounds; return it.
-		if (lineDist >= 0.0f && lineDist <= Length)
-			return lineDist;
+		if (chainDist >= 0.0f && chainDist <= Length)
+			return chainDist;
 
 		// Looped; wrap distance along attractor.
 		if (IsLooped())
 		{
-			int sign = -std::copysign(1, lineDist);
-			return (lineDist + (Length * sign));
+			int sign = -std::copysign(1, chainDist);
+			return (chainDist + (Length * sign));
 		}
 		
 		// Not looped; clamp distance along attractor.
-		return std::clamp(lineDist, 0.0f, Length);
+		return std::clamp(chainDist, 0.0f, Length);
 	}
 
 	// Debug.
@@ -413,11 +417,11 @@ namespace TEN::Collision::Attractors
 
 		// Get debug attractors.
 		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
-		for (const auto& attrac : debugAttracPtrs)
+		for (const auto* attracPtr : debugAttracPtrs)
 		{
-			float dist = attrac->GetProximity(refPoint).Distance;
+			float dist = attracPtr->GetProximity(refPoint).Distance;
 			if (dist <= range)
-				nearbyAttracMap.insert({ dist, attrac });
+				nearbyAttracMap.insert({ dist, attracPtr });
 		}
 
 		// Get attractors in current room.

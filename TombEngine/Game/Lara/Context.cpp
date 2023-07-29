@@ -264,8 +264,8 @@ namespace TEN::Player::Context
 			// TODO: Accuracy.
 			// 5) Test if target point is attractor end.
 			if (!hasEnd &&
-				(attracColl.Proximity.LineDistance <= EPSILON ||
-					(attracColl.Attrac.GetLength() - attracColl.Proximity.LineDistance) <= EPSILON))
+				(attracColl.Proximity.ChainDistance <= EPSILON ||
+					(attracColl.Attrac.GetLength() - attracColl.Proximity.ChainDistance) <= EPSILON))
 			{
 				// Handle seams between attractors.
 				hasEnd = true;
@@ -277,12 +277,12 @@ namespace TEN::Player::Context
 			}
 
 			// Get point collision off side of edge.
-			auto pointCollOffSide = GetCollision(
+			auto pointColl = GetCollision(
 				Vector3i(attracColl.Proximity.Point), attracColl.Attrac.GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 6) Test if edge is high enough off the ground.
-			int floorToEdgeHeight = abs(attracColl.Proximity.Point.y - pointCollOffSide.Position.Floor);
+			int floorToEdgeHeight = abs(attracColl.Proximity.Point.y - pointColl.Position.Floor);
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
@@ -328,8 +328,8 @@ namespace TEN::Player::Context
 
 		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = attracColl->Attrac.GetPointAtLineDistance(attracColl->Proximity.LineDistance - coll.Setup.Radius);
-		auto pointRight = attracColl->Attrac.GetPointAtLineDistance(attracColl->Proximity.LineDistance + coll.Setup.Radius);
+		auto pointLeft = attracColl->Attrac.GetPointAtChainDistance(attracColl->Proximity.ChainDistance - coll.Setup.Radius);
+		auto pointRight = attracColl->Attrac.GetPointAtChainDistance(attracColl->Proximity.ChainDistance + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
@@ -338,7 +338,7 @@ namespace TEN::Player::Context
 			&attracColl->Attrac,
 			EDGE_TYPE,
 			attracColl->Proximity.Point,
-			attracColl->Proximity.LineDistance,
+			attracColl->Proximity.ChainDistance,
 			headingAngle
 		};
 	}
