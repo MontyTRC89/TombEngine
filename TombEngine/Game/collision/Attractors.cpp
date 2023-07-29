@@ -301,7 +301,7 @@ namespace TEN::Collision::Attractors
 
 	void Attractor::DrawDebug() const
 	{
-		constexpr auto LABEL_SCALE			 = 0.75f;
+		constexpr auto LABEL_SCALE			 = 0.8f;
 		constexpr auto LABEL_OFFSET			 = Vector3(0.0f, -CLICK(0.25f), 0.0f);
 		constexpr auto INDICATOR_LINE_LENGTH = 50.0f;
 		constexpr auto SPHERE_SCALE			 = 15.0f;
