@@ -1,31 +1,33 @@
 #include "framework.h"
-#include "tr5_raisingblock.h"
-#include "Game/items.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Game/collision/collide_room.h"
+#include "Objects/TR5/Object/tr5_raisingblock.h"
+
 #include "Game/animation.h"
-#include "Game/control/control.h"
+#include "Game/camera.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/box.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
+#include "Game/Setup.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
-#include "Game/camera.h"
-#include "Game/collision/floordata.h"
+#include "Specific/level.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 
-void InitialiseRaisingBlock(short itemNumber)
+void InitializeRaisingBlock(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->RoomNumber;
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	if(floor->Box != NO_BOX)
+	auto* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+
+	if (floor->Box != NO_BOX)
 		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
-	// Set mutators to 0 by default
-	for (int i = 0; i < item->Model.Mutator.size(); i++)
-		item->Model.Mutator[i].Scale.y = 0;
+	// Set mutators to EulerAngles identity by default.
+	for (auto& mutator : item->Model.Mutators)
+		mutator.Scale.y = 0;
 
 	if (item->TriggerFlags < 0)
 	{
@@ -34,7 +36,23 @@ void InitialiseRaisingBlock(short itemNumber)
 		item->Status = ITEM_ACTIVE;
 	}
 
-	TEN::Floordata::UpdateBridgeItem(itemNumber);
+	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
+}
+
+void ShakeRaisingBlock(ItemInfo* item)
+{
+	SoundEffect(SFX_TR4_RAISING_BLOCK, &item->Pose);
+
+	if (item->TriggerFlags == 0)
+		return;
+
+	if ((item->Pose.Position.ToVector3() - Camera.pos.ToVector3()).Length() < BLOCK(10))
+	{
+		if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
+			Camera.bounce = -32;
+		else
+			Camera.bounce = -16;
+	}
 }
 
 void ControlRaisingBlock(short itemNumber)
@@ -45,49 +63,17 @@ void ControlRaisingBlock(short itemNumber)
 	{
 		if (!item->ItemFlags[2])
 		{
-			if (item->ObjectNumber == ID_RAISING_BLOCK1)
-			{
-				if (item->TriggerFlags == -1)
-				{
-					//AlterFloorHeight(item, -255);
-				}
-				else if (item->TriggerFlags == -3)
-				{
-					//AlterFloorHeight(item, -1023);
-				}
-				else
-				{
-					//AlterFloorHeight(item, -item->itemFlags[7]);
-				}
-			}
-			else
-			{
-				//AlterFloorHeight(item, -item->itemFlags[7]);
-			}
-
 			item->ItemFlags[2] = 1;
 		}
 
 		if (item->TriggerFlags < 0)
+		{
 			item->ItemFlags[1] = 1;
+		}
 		else if (item->ItemFlags[1] < 4096)
 		{
-			SoundEffect(SFX_TR4_RAISING_BLOCK, &item->Pose);
-
+			ShakeRaisingBlock(item);
 			item->ItemFlags[1] += 64;
-
-			if (item->TriggerFlags > 0)
-			{
-				if (abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-					abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-					abs(item->Pose.Position.x - Camera.pos.x) < 10240)
-				{
-					if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
-						Camera.bounce = -32;
-					else
-						Camera.bounce = -16;
-				}
-			}
 		}
 	}
 	else if (item->ItemFlags[1] <= 0 || item->TriggerFlags < 0)
@@ -100,22 +86,12 @@ void ControlRaisingBlock(short itemNumber)
 			{
 				if (item->TriggerFlags == -1)
 				{
-					//AlterFloorHeight(item, 255);
 					item->ItemFlags[2] = 0;
 				}
 				else if (item->TriggerFlags == -3)
 				{
-					//AlterFloorHeight(item, 1023);
 					item->ItemFlags[2] = 0;
 				}
-				else
-				{
-					//AlterFloorHeight(item, item->itemFlags[7]);
-				}
-			}
-			else
-			{
-				//AlterFloorHeight(item, item->itemFlags[7]);
 			}
 
 			item->ItemFlags[2] = 0;
@@ -123,29 +99,15 @@ void ControlRaisingBlock(short itemNumber)
 	}
 	else
 	{
-		SoundEffect(SFX_TR4_RAISING_BLOCK, &item->Pose);
-
-		if (item->TriggerFlags >= 0)
-		{
-			if (abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-				abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-				abs(item->Pose.Position.x - Camera.pos.x) < 10240)
-			{
-				if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
-					Camera.bounce = -32;
-				else
-					Camera.bounce = -16;
-			}
-		}
-
+		ShakeRaisingBlock(item);
 		item->ItemFlags[1] -= 64;
 	}
 
-	// Update bone mutators
+	// Update bone mutators.
 	if (item->TriggerFlags > -1)
 	{
-		for (int i = 0; i < item->Model.Mutator.size(); i++)
-			item->Model.Mutator[i].Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
+		for (auto& mutator : item->Model.Mutators)
+			mutator.Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
 	}
 }
 

@@ -12,89 +12,111 @@ namespace TEN::Input
 
 	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
 
+	enum XInputButton
+	{
+		XB_START = MAX_KEYBOARD_KEYS,
+		XB_SELECT,
+		XB_LSTICK,
+		XB_RSTICK,
+		XB_LSHIFT,
+		XB_RSHIFT,
+		XB_UNUSED1,
+		XB_UNUSED2,
+		XB_A,
+		XB_B,
+		XB_X,
+		XB_Y,
+		XB_LOGO,
+		XB_AXIS_X_POS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS,
+		XB_AXIS_X_NEG,
+		XB_AXIS_Y_POS,
+		XB_AXIS_Y_NEG,
+		XB_AXIS_Z_POS,
+		XB_AXIS_Z_NEG,
+		XB_AXIS_W_POS,
+		XB_AXIS_W_NEG,
+		XB_AXIS_LTRIGGER_NEG,
+		XB_AXIS_LTRIGGER_POS,
+		XB_AXIS_RTRIGGER_NEG,
+		XB_AXIS_RTRIGGER_POS,
+		XB_DPAD_UP,
+		XB_DPAD_DOWN,
+		XB_DPAD_LEFT,
+		XB_DPAD_RIGHT
+	};
+
+	// Deprecated.
 	enum InputKey
 	{
 		KEY_FORWARD,
 		KEY_BACK,
 		KEY_LEFT,
 		KEY_RIGHT,
-		KEY_CROUCH,
-		KEY_SPRINT,
+		KEY_LEFT_STEP,
+		KEY_RIGHT_STEP,
 		KEY_WALK,
+		KEY_SPRINT,
+		KEY_CROUCH,
 		KEY_JUMP,
+		KEY_ROLL,
 		KEY_ACTION,
 		KEY_DRAW,
-		KEY_FLARE,
 		KEY_LOOK,
-		KEY_ROLL,
-		KEY_OPTION,
-		KEY_PAUSE,
-		KEY_LSTEP,
-		KEY_RSTEP,
-		/*KEY_ACCELERATE,
+
+		KEY_ACCELERATE,
 		KEY_REVERSE,
 		KEY_SPEED,
 		KEY_SLOW,
 		KEY_BRAKE,
-		KEY_FIRE,*/
+		KEY_FIRE,
+
+		KEY_FLARE,
+		KEY_SMALL_MEDIPACK,
+		KEY_LARGE_MEDIPACK,
+		KEY_PREVIOUS_WEAPON,
+		KEY_NEXT_WEAPON,
+		KEY_WEAPON_1,
+		KEY_WEAPON_2,
+		KEY_WEAPON_3,
+		KEY_WEAPON_4,
+		KEY_WEAPON_5,
+		KEY_WEAPON_6,
+		KEY_WEAPON_7,
+		KEY_WEAPON_8,
+		KEY_WEAPON_9,
+		KEY_WEAPON_10,
+
+		KEY_SELECT,
+		KEY_DESELECT,
+		KEY_PAUSE,
+		KEY_INVENTORY,
+		KEY_SAVE,
+		KEY_LOAD,
 
 		KEY_COUNT
 	};
 
+	// Deprecated.
 	enum InputActions
 	{
-		IN_NONE		  = 0,
-		IN_FORWARD	  = (1 << KEY_FORWARD),
-		IN_BACK		  = (1 << KEY_BACK),
-		IN_LEFT		  = (1 << KEY_LEFT),
-		IN_RIGHT	  = (1 << KEY_RIGHT),
-		IN_CROUCH	  = (1 << KEY_CROUCH),
-		IN_SPRINT	  = (1 << KEY_SPRINT),
-		IN_WALK		  = (1 << KEY_WALK),
-		IN_JUMP		  = (1 << KEY_JUMP),
-		IN_ACTION	  = (1 << KEY_ACTION),
-		IN_DRAW		  = (1 << KEY_DRAW),
-		IN_FLARE	  = (1 << KEY_FLARE),
-		IN_LOOK		  = (1 << KEY_LOOK),
-		IN_ROLL		  = (1 << KEY_ROLL),
-		IN_OPTION	  = (1 << KEY_OPTION),
-		IN_PAUSE	  = (1 << KEY_PAUSE),
-		IN_LSTEP	  = (1 << KEY_LSTEP),
-		IN_RSTEP	  = (1 << KEY_RSTEP),
-		/*IN_ACCELERATE = (1 << KEY_ACCELERATE),
-		IN_REVERSE	  = (1 << KEY_REVERSE),
-		IN_SPEED	  = (1 << KEY_SPEED),
-		IN_SLOW		  = (1 << KEY_SLOW),
-		IN_BRAKE	  = (1 << KEY_BRAKE),
-		IN_FIRE		  = (1 << KEY_FIRE),*/
+		IN_NONE = 0,
 
-		// Additional input actions without direct key relation
-
-		IN_SAVE		  = (1 << (KEY_COUNT + 0)),
-		IN_LOAD		  = (1 << (KEY_COUNT + 1)),
-		IN_SELECT	  = (1 << (KEY_COUNT + 2)),
-		IN_DESELECT   = (1 << (KEY_COUNT + 3)),
-		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))
+		IN_FORWARD = (1 << KEY_FORWARD),
+		IN_BACK	   = (1 << KEY_BACK),
+		IN_LEFT	   = (1 << KEY_LEFT),
+		IN_RIGHT   = (1 << KEY_RIGHT),
+		IN_LSTEP   = (1 << KEY_LEFT_STEP),
+		IN_RSTEP   = (1 << KEY_RIGHT_STEP),
+		IN_WALK	   = (1 << KEY_WALK),
+		IN_SPRINT  = (1 << KEY_SPRINT),
+		IN_CROUCH  = (1 << KEY_CROUCH),
+		IN_JUMP	   = (1 << KEY_JUMP),
+		IN_ROLL	   = (1 << KEY_ROLL),
+		IN_ACTION  = (1 << KEY_ACTION),
+		IN_DRAW	   = (1 << KEY_DRAW),
+		IN_LOOK	   = (1 << KEY_LOOK)
 	};
 	
-	// Temporary input constants for use with vehicles:
-
-	// TODO: Not needed. Thought too far ahead.
-	constexpr int VEHICLE_IN_UP			= IN_FORWARD;
-	constexpr int VEHICLE_IN_DOWN		= IN_BACK;
-	constexpr int VEHICLE_IN_LEFT		= IN_LEFT;
-	constexpr int VEHICLE_IN_RIGHT		= IN_RIGHT;
-
-	constexpr int VEHICLE_IN_ACCELERATE = IN_ACTION;
-	constexpr int VEHICLE_IN_REVERSE	= IN_BACK;
-	constexpr int VEHICLE_IN_SPEED		= IN_SPRINT;
-	constexpr int VEHICLE_IN_SLOW		= IN_WALK;
-	constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
-	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
-
-	// TODO: Not needed since BRAKE is explicitly assosiated with dismounts anyway.
-	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
-
 	enum InputAxis
 	{
 		MoveVertical,
@@ -121,27 +143,25 @@ namespace TEN::Input
 
 	struct RumbleData
 	{
-		RumbleMode Mode		 = RumbleMode::None;
 		float	   Power	 = 0.0f;
+		RumbleMode Mode		 = RumbleMode::None;
 		float	   LastPower = 0.0f;
 		float	   FadeSpeed = 0.0f;
 	};
 
-	extern const char* g_KeyNames[];
-
 	extern std::vector<InputAction> ActionMap;
-	extern vector<QueueState>		ActionQueue;
+	extern std::vector<QueueState>	ActionQueue;
 	extern std::vector<bool>		KeyMap;
 	extern std::vector<float>		AxisMap;
 
-	// Legacy input bit fields.
-	extern int DbInput; // Debounce: is input clicked?
-	extern int TrInput; // Throttle: is input held?
+	extern int DbInput; // Debounce input.
+	extern int TrInput; // Throttle input.
 
-	extern short KeyboardLayout[2][KEY_COUNT];
+	extern const std::vector<std::string>	   g_KeyNames;
+	extern		 std::vector<std::vector<int>> Bindings;
 
-	void InitialiseInput(HWND handle);
-	void DeinitialiseInput();
+	void InitializeInput(HWND handle);
+	void DeinitializeInput();
 	void DefaultConflict();
 	void UpdateInputActions(ItemInfo* item, bool applyQueue = false);
 	void ApplyActionQueue();
@@ -149,6 +169,8 @@ namespace TEN::Input
 	void ClearAllActions();
 	void Rumble(float power, float delayInSec = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
+    void ApplyDefaultBindings();
+    bool ApplyDefaultXInputBindings();
 
 	// TODO: Later, all these global action accessor functions should be tied to a specific controller/player.
 	// Having them loose like this is very inelegant, but since this is only the first iteration, they will do for now. -- Sezz 2022.10.12
@@ -162,7 +184,7 @@ namespace TEN::Input
 	float GetActionTimeActive(ActionID actionID);
 	float GetActionTimeInactive(ActionID actionID);
 
-	bool IsDirectionActionHeld();
+	bool IsDirectionalActionHeld();
 	bool IsWakeActionHeld();
 	bool IsOpticActionHeld();
 }

@@ -43,11 +43,11 @@ void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int spe
 		}
 	}
 
-	if (abs(Camera.pos.x - x) <= SECTOR(7))
+	if (abs(Camera.pos.x - x) <= BLOCK(7))
 	{
-		if (abs(Camera.pos.y - y) <= SECTOR(7))
+		if (abs(Camera.pos.y - y) <= BLOCK(7))
 		{
-			if (abs(Camera.pos.z - z) <= SECTOR(7))
+			if (abs(Camera.pos.z - z) <= BLOCK(7))
 			{
 				auto* spark = GetFreeParticle();
 
@@ -126,11 +126,11 @@ void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int spe
 	}
 }
 
-void InitialiseVentilator(short itemNumber)
+void InitializeVentilator(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->ItemFlags[0] = item->TriggerFlags * SECTOR(1);
+	item->ItemFlags[0] = item->TriggerFlags * BLOCK(1);
 	if (item->ItemFlags[0] < 2048)
 		item->ItemFlags[0] = 3072;
 }
@@ -153,7 +153,7 @@ void VentilatorControl(short itemNumber)
 		if (item->Animation.ActiveState == 1)
 		{
 			//result = 5 * item->animNumber;
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 				return;
 		}
 		else
@@ -162,7 +162,7 @@ void VentilatorControl(short itemNumber)
 
 	int speed = 0;
 	if (item->Animation.ActiveState == 1)
-		speed = g_Level.Anims[item->Animation.AnimNumber].frameEnd - item->Animation.FrameNumber;
+		speed = GetAnimData(item).frameEnd - item->Animation.FrameNumber;
 	else
 		speed = 128;
 

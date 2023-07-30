@@ -7,14 +7,14 @@
 #include "Game/effects/Ripple.h"
 #include "Game/effects/weather.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Drip
@@ -147,7 +147,7 @@ namespace TEN::Effects::Drip
 					pointColl.RoomNumber,
 					Random::GenerateFloat(RIPPLE_SIZE_GROUND_MIN, RIPPLE_SIZE_GROUND_MAX),
 					(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity | (int)RippleFlags::OnGround,
-					Geometry::GetFloorNormal(pointColl.FloorTilt));
+					GetSurfaceNormal(pointColl.FloorTilt, true));
 
 				drip.Life = 0.0f;
 				continue;

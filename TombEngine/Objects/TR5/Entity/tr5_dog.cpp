@@ -9,15 +9,15 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto DogBite = BiteInfo(Vector3(0.0f, 0.0f, 100.0f), 3);
+	const auto DogBite = CreatureBiteInfo(Vector3(0, 0, 100), 3);
 	static BYTE DogAnims[] = { 20, 21, 22, 20 };
 
-	void InitialiseTr5Dog(short itemNumber)
+	void InitializeTr5Dog(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -30,7 +30,7 @@ namespace TEN::Entities::Creatures::TR5
 			// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
 		}
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.FrameNumber = GetAnimData(item).frameBase;
 	}
 
 	void Tr5DogControl(short itemNumber)
@@ -54,7 +54,7 @@ namespace TEN::Entities::Creatures::TR5
 			else if (item->Animation.ActiveState != 11)
 			{
 				item->Animation.AnimNumber = object->animIndex + DogAnims[GetRandomControl() & 3];
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 11;
 			}
 		}
@@ -94,14 +94,14 @@ namespace TEN::Entities::Creatures::TR5
 			angle = CreatureTurn(item, creature->MaxTurn);
 			joint0 = 4 * angle;
 
-			if (creature->HurtByLara || distance < pow(SECTOR(3), 2) && !(item->AIBits & MODIFY))
+			if (creature->HurtByLara || distance < pow(BLOCK(3), 2) && !(item->AIBits & MODIFY))
 			{
 				AlertAllGuards(itemNumber);
 				item->AIBits &= ~MODIFY;
 			}
 
 			short random = GetRandomControl();
-			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 			switch (item->Animation.ActiveState)
 			{
@@ -249,9 +249,9 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+					if (AI.bite && AI.distance < pow(BLOCK(1), 2))
 						item->Animation.TargetState = 6;
-					else if (AI.distance < pow(SECTOR(1.5f), 2))
+					else if (AI.distance < pow(BLOCK(1.5f), 2))
 					{
 						item->Animation.RequiredState = 5;
 						item->Animation.TargetState = 9;
@@ -274,7 +274,7 @@ namespace TEN::Entities::Creatures::TR5
 						item->Animation.TargetState = 12;
 						item->Animation.RequiredState = 5;
 					}
-					else if (AI.distance > pow(SECTOR(1.5f), 2) || item->HitStatus)
+					else if (AI.distance > pow(BLOCK(1.5f), 2) || item->HitStatus)
 						item->Animation.TargetState = 3;
 				}
 				else

@@ -63,20 +63,21 @@ namespace TEN::Entities::Vehicles
 	int GetVehicleHeight(const ItemInfo& vehicleItem, int forward, int right, bool clamp, Vector3i& pos);
 
 	//-------------------
-	
-	VehicleMountType	GetVehicleMountType(ItemInfo& vehicleItem, ItemInfo& laraItem, const CollisionInfo& coll, const std::vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
-	VehicleDismountType GetVehicleDismountType(ItemInfo& vehicleItem, const std::vector<VehicleDismountType>& allowedDismountTypes, float distance, bool onLand = true);
-	bool				TestVehicleDismount(ItemInfo& vehicleItem, VehicleDismountType dismountType, short headingAngle, float distance, bool isOnLand);
+
+	VehicleMountType	GetVehicleMountType(ItemInfo& vehicleItem, ItemInfo& laraItem, const CollisionInfo& coll,
+											const std::vector<VehicleMountType>& allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
+	VehicleDismountType GetVehicleDismountType(ItemInfo& vehicleItem, const std::vector<VehicleDismountType>& allowedDismountTypes, float dist, bool onLand = true);
+	bool				TestVehicleDismount(ItemInfo& vehicleItem, VehicleDismountType dismountType, short headingAngle, float dist, bool isOnLand);
 	VehicleImpactType	GetVehicleImpactType(ItemInfo& vehicleItem, const Vector3i& prevPos);
-	
+
 	VehiclePointCollision GetVehicleCollision(ItemInfo& vehicleItem, int forward, int right, bool clamp);
 	int					  GetVehicleWaterHeight(ItemInfo& vehicleItem, int forward, int right, bool clamp, Vector3i& pos);
 
+	void  SyncVehicleAnimation(ItemInfo& vehicleItem, const ItemInfo& playerItem);
 	void  DoVehicleCollision(ItemInfo& vehicleItem, int radius);
 	float DoVehicleDynamics(int height, float verticalVelocity, int minBounce, int maxKick, int& outYPos, float weightMult = 1.0f);
-	void  CalculateVehicleShift(ItemInfo& vehicleItem, short& outExtraRot, const VehiclePointCollision& prevPoint, int height, int front, int side, int step, bool clamp);
 	short DoVehicleShift(ItemInfo& vehicleItem, const Vector3i& pos, const Vector3i& prevPos);
-	float DoVehicleWaterMovement(ItemInfo& vehicleItem, ItemInfo& laraItem, float currentVelocity, int radius, short& outTurnRate);
+	int	  DoVehicleWaterMovement(ItemInfo& vehicleItem, ItemInfo& laraItem, int currentVelocity, int radius, short* turnRate, const Vector3& wakeOffset);
 	void  DoVehicleFlareDiscard(ItemInfo& laraItem);
 
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);

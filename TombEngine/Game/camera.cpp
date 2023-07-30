@@ -13,12 +13,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -26,9 +26,9 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
-constexpr auto PARTICLE_FADE_THRESHOLD = SECTOR(14);
-constexpr auto COLL_CHECK_THRESHOLD    = SECTOR(4);
-constexpr auto COLL_CANCEL_THRESHOLD   = SECTOR(2);
+constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
+constexpr auto COLL_CHECK_THRESHOLD    = BLOCK(4);
+constexpr auto COLL_CANCEL_THRESHOLD   = BLOCK(2);
 constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS           = CLICK(1);
 
@@ -93,7 +93,7 @@ void LookAt(CAMERA_INFO* cam, short roll)
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
 	float r = TO_RAD(roll);
 
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(SECTOR(1));
+	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
 
 	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
 }
@@ -117,9 +117,9 @@ inline void RumbleFromBounce()
 }
 
 
-void InitialiseCamera()
+void InitializeCamera()
 {
-	Camera.shift = LaraItem->Pose.Position.y - SECTOR(1);
+	Camera.shift = LaraItem->Pose.Position.y - BLOCK(1);
 
 	LastTarget.x = LaraItem->Pose.Position.x;
 	LastTarget.y = Camera.shift;
@@ -136,7 +136,7 @@ void InitialiseCamera()
 	Camera.pos.z = LastTarget.z - 100;
 	Camera.pos.RoomNumber = LaraItem->RoomNumber;
 
-	Camera.targetDistance = SECTOR(1.5f);
+	Camera.targetDistance = BLOCK(1.5f);
 	Camera.item = NULL;
 	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
@@ -218,7 +218,7 @@ void MoveCamera(GameVector* ideal, int speed)
 		if (Camera.bounce <= 0)
 		{
 			int bounce = -Camera.bounce;
-			int bounce2 = -Camera.bounce >> 2;
+			int bounce2 = bounce / 2;
 			Camera.target.x += GetRandomControl() % bounce - bounce2;
 			Camera.target.y += GetRandomControl() % bounce - bounce2;
 			Camera.target.z += GetRandomControl() % bounce - bounce2;
@@ -243,9 +243,9 @@ void MoveCamera(GameVector* ideal, int speed)
 	{
 		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
 
-		if (abs(Camera.pos.x - ideal->x) < SECTOR(0.5f) &&
-			abs(Camera.pos.y - ideal->y) < SECTOR(0.5f) &&
-			abs(Camera.pos.z - ideal->z) < SECTOR(0.5f))
+		if (abs(Camera.pos.x - ideal->x) < BLOCK(0.5f) &&
+			abs(Camera.pos.y - ideal->y) < BLOCK(0.5f) &&
+			abs(Camera.pos.z - ideal->z) < BLOCK(0.5f))
 		{
 			to.x = Camera.pos.x;
 			to.y = Camera.pos.y;
@@ -538,15 +538,18 @@ void ChaseCamera(ItemInfo* item)
 
 void DoThumbstickCamera()
 {
-	if (!g_Configuration.EnableThumbstickCameraControl)
+	if (!g_Configuration.EnableThumbstickCamera)
 		return;
 
 	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
 		Camera.target.y == OldCam.target.y &&
 		Camera.target.z == OldCam.target.z))
 	{
-		Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraHorizontal]);
-		Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraVertical]));
+		if (abs(AxisMap[InputAxis::CameraHorizontal]) > EPSILON && abs(Camera.targetAngle) == 0)
+			Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraHorizontal]);
+
+		if (abs(AxisMap[InputAxis::CameraVertical]) > EPSILON)
+			Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraVertical]));
 	}
 }
 
@@ -557,7 +560,7 @@ void UpdateCameraElevation()
 	if (Camera.laraNode != -1)
 	{
 		auto pos = GetJointPosition(LaraItem, Camera.laraNode, Vector3i::Zero);
-		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), SECTOR(2)));
+		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
 		pos = pos1 - pos;
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
@@ -634,7 +637,7 @@ void CombatCamera(ItemInfo* item)
 
 	UpdateCameraElevation();
 
-	Camera.targetDistance = SECTOR(1.5f);
+	Camera.targetDistance = BLOCK(1.5f);
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	for (int i = 0; i < 5; i++)
@@ -952,7 +955,7 @@ void LookCamera(ItemInfo* item)
 		}
 	}
 
-	auto pos2 = GetJointPosition(item, LM_HEAD, Vector3i(0, 0, -SECTOR(1)));
+	auto pos2 = GetJointPosition(item, LM_HEAD, Vector3i(0, 0, -BLOCK(1)));
 	auto pos3 = GetJointPosition(item, LM_HEAD, Vector3i(0, 0, CLICK(8)));
 
 	int dx = (pos2.x - pos.x) >> 3;
@@ -1168,7 +1171,7 @@ void BinocularCamera(ItemInfo* item)
 	if (!LaserSight)
 	{
 		if (IsClicked(In::Deselect) ||
-			IsClicked(In::DrawWeapon) ||
+			IsClicked(In::Draw) ||
 			IsClicked(In::Look) ||
 			IsHeld(In::Flare))
 		{
@@ -1213,10 +1216,10 @@ void BinocularCamera(ItemInfo* item)
 	Camera.pos.z = z;
 	Camera.pos.RoomNumber = probe.RoomNumber;
 
-	int l = SECTOR(20.25f) * phd_cos(headXRot);
+	int l = BLOCK(20.25f) * phd_cos(headXRot);
 
 	int tx = x + l * phd_sin(item->Pose.Orientation.y + headYRot);
-	int ty = y - SECTOR(20.25f) * phd_sin(headXRot);
+	int ty = y - BLOCK(20.25f) * phd_sin(headXRot);
 	int tz = z + l * phd_cos(item->Pose.Orientation.y + headYRot);
 
 	if (Camera.oldType == CameraType::Fixed)
@@ -1286,7 +1289,10 @@ void BinocularCamera(ItemInfo* item)
 
 void ConfirmCameraTargetPos()
 {
-	auto pos = GetJointPosition(LaraItem, LM_TORSO);
+	auto pos = Vector3i(
+		LaraItem->Pose.Position.x,
+		LaraItem->Pose.Position.y - (LaraCollision.Setup.Height / 2),
+		LaraItem->Pose.Position.z);
 
 	if (Camera.laraNode != -1)
 	{
@@ -1526,7 +1532,7 @@ void CalculateCamera()
 		Camera.item = NULL;
 		Camera.targetElevation = 0;
 		Camera.targetAngle = 0;
-		Camera.targetDistance = SECTOR(1.5f);
+		Camera.targetDistance = BLOCK(1.5f);
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
@@ -1563,7 +1569,7 @@ void LookLeftRight(ItemInfo* item)
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
+		lara->Context.Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
@@ -1602,7 +1608,7 @@ void LookUpDown(ItemInfo* item)
 	}
 
 	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
+		lara->Context.Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
 		!lara->RightArm.Locked)
 	{
@@ -1634,7 +1640,7 @@ void ResetLook(ItemInfo* item)
 		if (lara->Control.HandStatus != HandStatus::Busy &&
 			!lara->LeftArm.Locked &&
 			!lara->RightArm.Locked &&
-			lara->Vehicle == NO_ITEM)
+			lara->Context.Vehicle == NO_ITEM)
 		{
 			lara->ExtraTorsoRot = lara->ExtraHeadRot;
 		}
@@ -1893,7 +1899,7 @@ void UpdateMikePos(ItemInfo* item)
 	}
 	else
 	{
-		int phdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+		int phdPerspective = g_Configuration.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
 		Camera.mikePos.x = Camera.pos.x + phdPerspective * phd_sin(Camera.actualAngle);
@@ -2074,7 +2080,7 @@ void HandleOptics(ItemInfo* item)
 	AlterFOV(LastFOV);
 
 	Lara.Inventory.IsBusy = false;
-	ResetLaraFlex(LaraItem);
+	ResetPlayerFlex(LaraItem);
 
 	TrInput &= ~IN_LOOK;
 }

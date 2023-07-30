@@ -1,8 +1,8 @@
 #pragma once
-#include "ScriptInterfaceGame.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Strings/ScriptInterfaceStringsHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 
 class ScriptInterfaceState
 {
@@ -11,6 +11,5 @@ public:
 	static ScriptInterfaceFlowHandler* CreateFlow();
 	static ScriptInterfaceObjectsHandler* CreateObjectsHandler();
 	static ScriptInterfaceStringsHandler* CreateStringsHandler();
-	static void ScriptInterfaceState::Init();
+	static void ScriptInterfaceState::Init(const std::string& assetsDir);
 };
-

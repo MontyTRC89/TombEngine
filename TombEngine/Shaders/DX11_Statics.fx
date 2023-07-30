@@ -23,8 +23,9 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
 	float Sheen: SHEEN;
-	float Fog: FOG;
 	float4 PositionCopy: TEXCOORD2;
+	float4 FogBulbs : TEXCOORD3;
+	float DistanceFog : FOG;
 };
 
 struct PixelShaderOutput
@@ -54,15 +55,12 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = float4(col, input.Color.w);
 	output.Color *= Color;
 
-	// Apply distance fog
-	float4 d = length(CamPositionWS - worldPosition);
-	if (FogMaxDistance == 0)
-		output.Fog = 1;
-	else
-		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
-	
+	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
+	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
+
 	output.PositionCopy = output.Position;
     output.Sheen = input.Effects.w;
+
 	return output;
 }
 
@@ -73,25 +71,28 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float4 tex = Texture.Sample(Sampler, input.UV);
     DoAlphaTest(tex);
 
+	float3 normal = normalize(input.Normal);
+
 	float3 color = (LightType == 0) ?
 		CombineLights(
 			AmbientLight.xyz, 
 			input.Color.xyz, 
 			tex.xyz, 
 			input.WorldPosition, 
-			normalize(input.Normal), 
+			normal, 
 			input.Sheen, 
 			StaticLights, 
-			NumStaticLights) :
-		StaticLight(input.Color.xyz, tex.xyz);
+			NumStaticLights,
+			input.FogBulbs.w) :
+		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
 	output.Color = float4(color, tex.w);
+	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
+	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 
 	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	output.Color = DoFog(output.Color, FogColor, input.Fog);
 
 	return output;
 }

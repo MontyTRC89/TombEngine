@@ -1,14 +1,15 @@
 #include "framework.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
-#include "Specific/level.h"
+
 #include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
-#include "Specific/setup.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Sound/sound.h"
-#include "Game/Lara/lara.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Setup.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 int NextSpider;
 SpiderData Spiders[NUM_SPIDERS];
@@ -50,7 +51,7 @@ void ClearSpiders()
 	}
 }
 
-void InitialiseSpiders(short itemNumber)
+void InitializeSpiders(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -185,7 +186,7 @@ void UpdateSpiders()
 				FloorInfo* floor = GetFloor(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z,&spider->RoomNumber);
 				int height = GetFloorHeight(floor, spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z);
 
-				if (height >= spider->Pose.Position.y - CLICK(5) || height == -SECTOR(31.75f))
+				if (height >= spider->Pose.Position.y - CLICK(5) || height == -BLOCK(31.75f))
 				{
 					if (height >= spider->Pose.Position.y - 64)
 					{

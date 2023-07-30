@@ -9,11 +9,15 @@ using namespace TEN::Math;
 // Ceiling:		Upper surface of a collision block.
 // Floor:		Lower surface of a collision block.
 // Floordata:	Name of the engine's level geometry collision system consisting of rooms and their divisions within a grid.
-// Plane:		One of two surface triangles. CHECK: If it's a Vector3, isn't that simply the surface normal?
+// Plane:		One of two surface triangles.
 // Portal:		Link from one room to another allowing traversal.
 // Room number: Unique numeric index of a room.
 // Surface:		Floor or ceiling.
 // Wall:		Inferred from a floor or ceiling with max height. Note that true "walls" do not exist.
+
+// Planes are non-standard. Instead of 4 components storing a normal and a distance, floordata uses a Vector3:
+// x and y store the 2D direction vector in the xz plane (not normalized).
+// z stores the distance.
 
 constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
 
@@ -123,8 +127,8 @@ class FloorInfo
 		bool Stopper	  = true;
 
 		// Getters
-		int		GetSurfacePlaneIndex(int x, int z, bool checkFloor) const;
-		Vector2 GetSurfaceTilt(int x, int z, bool checkFloor) const;
+		int		GetSurfacePlaneIndex(int x, int z, bool isFloor) const;
+		Vector2 GetSurfaceTilt(int x, int z, bool isFloor) const;
 
 		std::optional<int> GetRoomNumberAbove(int planeIndex) const;
 		std::optional<int> GetRoomNumberAbove(int x, int z) const;
@@ -134,17 +138,17 @@ class FloorInfo
 		std::optional<int> GetRoomNumberBelow(int x, int y, int z) const;
 		std::optional<int> GetRoomNumberAtSide() const; // Through wall?
 
-		int GetSurfaceHeight(int x, int z, bool checkFloor) const;
-		int GetSurfaceHeight(int x, int y, int z, bool checkFloor) const;
-		int GetBridgeSurfaceHeight(int x, int y, int z, bool checkFloor) const;
+		int GetSurfaceHeight(int x, int z, bool isFloor) const;
+		int GetSurfaceHeight(int x, int y, int z, bool isFloor) const;
+		int GetBridgeSurfaceHeight(int x, int y, int z, bool isFloor) const;
 
-		Vector2 GetSurfaceSlope(int planeIndex, bool checkFloor) const;
-		Vector2 GetSurfaceSlope(int x, int z, bool checkFloor) const;
+		Vector2 GetSurfaceSlope(int planeIndex, bool isFloor) const;
+		Vector2 GetSurfaceSlope(int x, int z, bool isFloor) const;
 
 		// Inquirers
-		bool IsSurfaceSplit(bool checkFloor) const;
-		bool IsSurfaceDiagonalStep(bool checkFloor) const;
-		bool IsSurfaceSplitPortal(bool checkFloor) const;
+		bool IsSurfaceSplit(bool isFloor) const;
+		bool IsSurfaceDiagonalStep(bool isFloor) const;
+		bool IsSurfaceSplitPortal(bool isFloor) const;
 		bool IsWall(int planeIndex) const;
 		bool IsWall(int x, int z) const;
 
@@ -154,8 +158,11 @@ class FloorInfo
 		void RemoveBridge(int itemNumber);
 };
 
-namespace TEN::Floordata
+namespace TEN::Collision::Floordata
 {
+	// TODO: Use normals natively.
+	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor);
+
 	Vector2i GetSectorPoint(int x, int z);
 	Vector2i GetRoomPosition(int roomNumber, int x, int z);
 	
@@ -180,4 +187,8 @@ namespace TEN::Floordata
 	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom);
 	int				   GetBridgeBorder(int itemNumber, bool bottom);
 	void			   UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
+
+	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materialList);
+	
+	void DrawNearbySectorFlags(const ItemInfo& item);
 }

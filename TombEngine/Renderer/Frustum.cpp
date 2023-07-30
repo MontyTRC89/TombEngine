@@ -69,7 +69,7 @@ void Frustum::Update(const Matrix& view, const Matrix& projection)
 
 bool Frustum::PointInFrustum(const Vector3& position) const
 {
-	for (uint32_t i = 0; i < 6; i++)
+	for (unsigned int i = 0; i < 6; i++)
 	{
 		if (m_frustum[i][0] * position.x + m_frustum[i][1] * position.y + m_frustum[i][2] * position.z + m_frustum[i][3] <= 0.0f)
 			return false;
@@ -80,7 +80,7 @@ bool Frustum::PointInFrustum(const Vector3& position) const
 
 bool Frustum::SphereInFrustum(const Vector3& position, float radius) const
 {
-	for (uint32_t i = 0; i < 6; i++)
+	for (unsigned int i = 0; i < 6; i++)
 	{
 		if (m_frustum[i][0] * position.x + m_frustum[i][1] * position.y + m_frustum[i][2] * position.z + m_frustum[i][3] <= -radius)
 			return false;
@@ -91,7 +91,7 @@ bool Frustum::SphereInFrustum(const Vector3& position, float radius) const
 
 bool Frustum::AABBInFrustum(const Vector3& min, const Vector3& max) const
 {
-	for (uint32_t i = 0; i < 6; i++)
+	for (unsigned int i = 0; i < 6; i++)
 	{
 		if (m_frustum[i][0] * min.x + m_frustum[i][1] * min.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f &&
 			m_frustum[i][0] * max.x + m_frustum[i][1] * min.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f &&
@@ -108,7 +108,7 @@ bool Frustum::AABBInFrustum(const Vector3& min, const Vector3& max) const
 	return true;
 }
 
-void Frustum::NormalizePlane(int32_t side)
+void Frustum::NormalizePlane(int side)
 {
 	float magnitude = sqrt(m_frustum[side][0] * m_frustum[side][0] + m_frustum[side][1] * m_frustum[side][1] + m_frustum[side][2] * m_frustum[side][2]);
 	m_frustum[side][0] /= magnitude;

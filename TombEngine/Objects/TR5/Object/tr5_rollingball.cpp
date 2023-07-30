@@ -1,20 +1,21 @@
 #include "framework.h"
-#include "tr5_rollingball.h"
-#include "Game/collision/sphere.h"
+#include "Objects/TR5/Object/tr5_rollingball.h"
+
+#include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
 #include "Game/control/control.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/setup.h"
-#include "Sound/sound.h"
-#include "Game/effects/effects.h"
-#include "Specific/level.h"
-#include "Game/animation.h"
-#include "Game/items.h"
-#include "Game/collision/collide_item.h"
+#include "Game/Setup.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
-constexpr auto ROLLING_BALL_MAX_VELOCITY = SECTOR(3);
+constexpr auto ROLLING_BALL_MAX_VELOCITY = BLOCK(3);
 
 void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
@@ -375,9 +376,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 
 void ClassicRollingBallControl(short itemNum)
 {
-	short roomNum;
-	int y1, y2, ydist, x, z, dist, oldx, oldz;
-	FloorInfo* floor;
+	int ydist, dist;
 	GameVector* old;
 	ROOM_INFO* r;
 
@@ -402,18 +401,17 @@ void ClassicRollingBallControl(short itemNum)
 		else if (item->Animation.ActiveState == 0)
 			item->Animation.TargetState = 1;
 
-		oldx = item->Pose.Position.x;
-		oldz = item->Pose.Position.z;
+		int oldx = item->Pose.Position.x;
+		int oldz = item->Pose.Position.z;
+
 		AnimateItem(item);
-		roomNum = item->RoomNumber;
-		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNum);
-		if (item->RoomNumber != roomNum)
-			ItemNewRoom(itemNum, item->RoomNumber);
 
-		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+		auto coll = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-		TestTriggers(item, true);
-		DoVehicleCollision(*item, CLICK(1.5f));
+		item->Floor = coll.Position.Floor;
+
+		if (item->RoomNumber != coll.RoomNumber)
+			ItemNewRoom(itemNum, coll.RoomNumber);
 
 		if (item->Pose.Position.y >= item->Floor - CLICK(1))
 		{
@@ -442,15 +440,11 @@ void ClassicRollingBallControl(short itemNum)
 			ydist = BLOCK(1);
 		}
 
-		x = item->Pose.Position.x + dist * phd_sin(item->Pose.Orientation.y);
-		z = item->Pose.Position.z + dist * phd_cos(item->Pose.Orientation.y);
+		int x = item->Pose.Position.x + dist * phd_sin(item->Pose.Orientation.y);
+		int z = item->Pose.Position.z + dist * phd_cos(item->Pose.Orientation.y);
 
-		floor = GetFloor(x, item->Pose.Position.y, z, &roomNum);
-		y1 = GetFloorHeight(floor, x, item->Pose.Position.y, z);
-
-		roomNum = item->RoomNumber;
-		floor = GetFloor(x, item->Pose.Position.y - ydist, z, &roomNum);
-		y2 = GetCeiling(floor, x, item->Pose.Position.y - ydist, z);
+		int y1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+		int y2 = GetCollision(x, item->Pose.Position.y - ydist, z, item->RoomNumber).Position.Ceiling;
 
 		if (y1 < item->Pose.Position.y || y2 > (item->Pose.Position.y - ydist))
 		{
@@ -484,16 +478,19 @@ void ClassicRollingBallControl(short itemNum)
 			item->Animation.ActiveState = 0;
 			item->Animation.TargetState = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState; 
-			item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
+			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.ActiveState = GetAnimData(item).ActiveState; 
+			item->Animation.TargetState = GetAnimData(item).ActiveState;
 			item->Animation.RequiredState = NO_STATE;
 			RemoveActiveItem(itemNum);
 		}
 	}
+
+	TestTriggers(item, true);
+	DoVehicleCollision(*item, CLICK(1.5f));
 }
 
-void InitialiseClassicRollingBall(short itemNum)
+void InitializeClassicRollingBall(short itemNum)
 {
 	ItemInfo *item;
 	GameVector* old;

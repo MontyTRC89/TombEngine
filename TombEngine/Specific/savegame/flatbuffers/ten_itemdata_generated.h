@@ -9,7 +9,7 @@
 namespace TEN {
 namespace Save {
 
-struct Position;
+struct Pose;
 
 struct CreatureTarget;
 struct CreatureTargetBuilder;
@@ -102,6 +102,10 @@ struct FloatT;
 struct ShortArray;
 struct ShortArrayBuilder;
 struct ShortArrayT;
+
+struct EulerAngles;
+
+struct Vector2;
 
 struct Vector3;
 
@@ -505,7 +509,7 @@ struct ItemDataUnion {
 bool VerifyItemData(flatbuffers::Verifier &verifier, const void *obj, ItemData type);
 bool VerifyItemDataVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
 
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Pose FLATBUFFERS_FINAL_CLASS {
  private:
   int32_t x_pos_;
   int32_t y_pos_;
@@ -516,7 +520,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
 
  public:
   struct Traits;
-  Position()
+  Pose()
       : x_pos_(0),
         y_pos_(0),
         z_pos_(0),
@@ -524,7 +528,7 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
         y_rot_(0),
         z_rot_(0) {
   }
-  Position(int32_t _x_pos, int32_t _y_pos, int32_t _z_pos, int32_t _x_rot, int32_t _y_rot, int32_t _z_rot)
+  Pose(int32_t _x_pos, int32_t _y_pos, int32_t _z_pos, int32_t _x_rot, int32_t _y_rot, int32_t _z_rot)
       : x_pos_(flatbuffers::EndianScalar(_x_pos)),
         y_pos_(flatbuffers::EndianScalar(_y_pos)),
         z_pos_(flatbuffers::EndianScalar(_z_pos)),
@@ -551,10 +555,72 @@ FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Position FLATBUFFERS_FINAL_CLASS {
     return flatbuffers::EndianScalar(z_rot_);
   }
 };
-FLATBUFFERS_STRUCT_END(Position, 24);
+FLATBUFFERS_STRUCT_END(Pose, 24);
 
-struct Position::Traits {
-  using type = Position;
+struct Pose::Traits {
+  using type = Pose;
+};
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(2) EulerAngles FLATBUFFERS_FINAL_CLASS {
+ private:
+  int16_t x_;
+  int16_t y_;
+  int16_t z_;
+
+ public:
+  struct Traits;
+  EulerAngles()
+      : x_(0),
+        y_(0),
+        z_(0) {
+  }
+  EulerAngles(int16_t _x, int16_t _y, int16_t _z)
+      : x_(flatbuffers::EndianScalar(_x)),
+        y_(flatbuffers::EndianScalar(_y)),
+        z_(flatbuffers::EndianScalar(_z)) {
+  }
+  int16_t x() const {
+    return flatbuffers::EndianScalar(x_);
+  }
+  int16_t y() const {
+    return flatbuffers::EndianScalar(y_);
+  }
+  int16_t z() const {
+    return flatbuffers::EndianScalar(z_);
+  }
+};
+FLATBUFFERS_STRUCT_END(EulerAngles, 6);
+
+struct EulerAngles::Traits {
+  using type = EulerAngles;
+};
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector2 FLATBUFFERS_FINAL_CLASS {
+ private:
+  float x_;
+  float y_;
+
+ public:
+  struct Traits;
+  Vector2()
+      : x_(0),
+        y_(0) {
+  }
+  Vector2(float _x, float _y)
+      : x_(flatbuffers::EndianScalar(_x)),
+        y_(flatbuffers::EndianScalar(_y)) {
+  }
+  float x() const {
+    return flatbuffers::EndianScalar(x_);
+  }
+  float y() const {
+    return flatbuffers::EndianScalar(y_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Vector2, 8);
+
+struct Vector2::Traits {
+  using type = Vector2;
 };
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector3 FLATBUFFERS_FINAL_CLASS {
@@ -638,7 +704,7 @@ struct CreatureTargetT : public flatbuffers::NativeTable {
   int32_t box_number = 0;
   int32_t flags = 0;
   int32_t trigger_flags = 0;
-  std::unique_ptr<TEN::Save::Position> position{};
+  std::unique_ptr<TEN::Save::Pose> position{};
 };
 
 struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -668,8 +734,8 @@ struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t trigger_flags() const {
     return GetField<int32_t>(VT_TRIGGER_FLAGS, 0);
   }
-  const TEN::Save::Position *position() const {
-    return GetStruct<const TEN::Save::Position *>(VT_POSITION);
+  const TEN::Save::Pose *position() const {
+    return GetStruct<const TEN::Save::Pose *>(VT_POSITION);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -678,7 +744,7 @@ struct CreatureTarget FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_BOX_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            VerifyField<int32_t>(verifier, VT_TRIGGER_FLAGS) &&
-           VerifyField<TEN::Save::Position>(verifier, VT_POSITION) &&
+           VerifyField<TEN::Save::Pose>(verifier, VT_POSITION) &&
            verifier.EndTable();
   }
   CreatureTargetT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -705,7 +771,7 @@ struct CreatureTargetBuilder {
   void add_trigger_flags(int32_t trigger_flags) {
     fbb_.AddElement<int32_t>(CreatureTarget::VT_TRIGGER_FLAGS, trigger_flags, 0);
   }
-  void add_position(const TEN::Save::Position *position) {
+  void add_position(const TEN::Save::Pose *position) {
     fbb_.AddStruct(CreatureTarget::VT_POSITION, position);
   }
   explicit CreatureTargetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -726,7 +792,7 @@ inline flatbuffers::Offset<CreatureTarget> CreateCreatureTarget(
     int32_t box_number = 0,
     int32_t flags = 0,
     int32_t trigger_flags = 0,
-    const TEN::Save::Position *position = 0) {
+    const TEN::Save::Pose *position = 0) {
   CreatureTargetBuilder builder_(_fbb);
   builder_.add_position(position);
   builder_.add_trigger_flags(trigger_flags);
@@ -760,7 +826,8 @@ struct CreatureT : public flatbuffers::NativeTable {
   bool hurt_by_lara = false;
   int32_t tosspad = 0;
   int32_t location_ai = 0;
-  int32_t fired_weapon = 0;
+  int32_t weapon_delay1 = 0;
+  int32_t weapon_delay2 = 0;
   int32_t mood = 0;
   int32_t enemy = 0;
   int32_t ai_target_number = 0;
@@ -791,16 +858,17 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HURT_BY_LARA = 26,
     VT_TOSSPAD = 28,
     VT_LOCATION_AI = 30,
-    VT_FIRED_WEAPON = 32,
-    VT_MOOD = 34,
-    VT_ENEMY = 36,
-    VT_AI_TARGET_NUMBER = 38,
-    VT_FLAGS = 40,
-    VT_CAN_JUMP = 42,
-    VT_CAN_MONKEY = 44,
-    VT_IS_AMPHIBIOUS = 46,
-    VT_IS_JUMPING = 48,
-    VT_IS_MONKEYING = 50
+    VT_WEAPON_DELAY1 = 32,
+    VT_WEAPON_DELAY2 = 34,
+    VT_MOOD = 36,
+    VT_ENEMY = 38,
+    VT_AI_TARGET_NUMBER = 40,
+    VT_FLAGS = 42,
+    VT_CAN_JUMP = 44,
+    VT_CAN_MONKEY = 46,
+    VT_IS_AMPHIBIOUS = 48,
+    VT_IS_JUMPING = 50,
+    VT_IS_MONKEYING = 52
   };
   int32_t maximum_turn() const {
     return GetField<int32_t>(VT_MAXIMUM_TURN, 0);
@@ -844,8 +912,11 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t location_ai() const {
     return GetField<int32_t>(VT_LOCATION_AI, 0);
   }
-  int32_t fired_weapon() const {
-    return GetField<int32_t>(VT_FIRED_WEAPON, 0);
+  int32_t weapon_delay1() const {
+    return GetField<int32_t>(VT_WEAPON_DELAY1, 0);
+  }
+  int32_t weapon_delay2() const {
+    return GetField<int32_t>(VT_WEAPON_DELAY2, 0);
   }
   int32_t mood() const {
     return GetField<int32_t>(VT_MOOD, 0);
@@ -891,7 +962,8 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_HURT_BY_LARA) &&
            VerifyField<int32_t>(verifier, VT_TOSSPAD) &&
            VerifyField<int32_t>(verifier, VT_LOCATION_AI) &&
-           VerifyField<int32_t>(verifier, VT_FIRED_WEAPON) &&
+           VerifyField<int32_t>(verifier, VT_WEAPON_DELAY1) &&
+           VerifyField<int32_t>(verifier, VT_WEAPON_DELAY2) &&
            VerifyField<int32_t>(verifier, VT_MOOD) &&
            VerifyField<int32_t>(verifier, VT_ENEMY) &&
            VerifyField<int32_t>(verifier, VT_AI_TARGET_NUMBER) &&
@@ -954,8 +1026,11 @@ struct CreatureBuilder {
   void add_location_ai(int32_t location_ai) {
     fbb_.AddElement<int32_t>(Creature::VT_LOCATION_AI, location_ai, 0);
   }
-  void add_fired_weapon(int32_t fired_weapon) {
-    fbb_.AddElement<int32_t>(Creature::VT_FIRED_WEAPON, fired_weapon, 0);
+  void add_weapon_delay1(int32_t weapon_delay1) {
+    fbb_.AddElement<int32_t>(Creature::VT_WEAPON_DELAY1, weapon_delay1, 0);
+  }
+  void add_weapon_delay2(int32_t weapon_delay2) {
+    fbb_.AddElement<int32_t>(Creature::VT_WEAPON_DELAY2, weapon_delay2, 0);
   }
   void add_mood(int32_t mood) {
     fbb_.AddElement<int32_t>(Creature::VT_MOOD, mood, 0);
@@ -1011,7 +1086,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(
     bool hurt_by_lara = false,
     int32_t tosspad = 0,
     int32_t location_ai = 0,
-    int32_t fired_weapon = 0,
+    int32_t weapon_delay1 = 0,
+    int32_t weapon_delay2 = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
     int32_t ai_target_number = 0,
@@ -1026,7 +1102,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(
   builder_.add_ai_target_number(ai_target_number);
   builder_.add_enemy(enemy);
   builder_.add_mood(mood);
-  builder_.add_fired_weapon(fired_weapon);
+  builder_.add_weapon_delay2(weapon_delay2);
+  builder_.add_weapon_delay1(weapon_delay1);
   builder_.add_location_ai(location_ai);
   builder_.add_tosspad(tosspad);
   builder_.add_joint_rotation(joint_rotation);
@@ -1070,7 +1147,8 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
     bool hurt_by_lara = false,
     int32_t tosspad = 0,
     int32_t location_ai = 0,
-    int32_t fired_weapon = 0,
+    int32_t weapon_delay1 = 0,
+    int32_t weapon_delay2 = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
     int32_t ai_target_number = 0,
@@ -1097,7 +1175,8 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
       hurt_by_lara,
       tosspad,
       location_ai,
-      fired_weapon,
+      weapon_delay1,
+      weapon_delay2,
       mood,
       enemy,
       ai_target_number,
@@ -1523,7 +1602,7 @@ struct KayakT : public flatbuffers::NativeTable {
   int32_t right_vertical_velocity = 0;
   int32_t left_right_count = 0;
   int32_t water_height = 0;
-  std::unique_ptr<TEN::Save::Position> old_pos{};
+  std::unique_ptr<TEN::Save::Pose> old_pos{};
   bool turn = false;
   bool forward = false;
   bool true_water = false;
@@ -1569,8 +1648,8 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t water_height() const {
     return GetField<int32_t>(VT_WATER_HEIGHT, 0);
   }
-  const TEN::Save::Position *old_pos() const {
-    return GetStruct<const TEN::Save::Position *>(VT_OLD_POS);
+  const TEN::Save::Pose *old_pos() const {
+    return GetStruct<const TEN::Save::Pose *>(VT_OLD_POS);
   }
   bool turn() const {
     return GetField<uint8_t>(VT_TURN, 0) != 0;
@@ -1593,7 +1672,7 @@ struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_RIGHT_VERTICAL_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_LEFT_RIGHT_COUNT) &&
            VerifyField<int32_t>(verifier, VT_WATER_HEIGHT) &&
-           VerifyField<TEN::Save::Position>(verifier, VT_OLD_POS) &&
+           VerifyField<TEN::Save::Pose>(verifier, VT_OLD_POS) &&
            VerifyField<uint8_t>(verifier, VT_TURN) &&
            VerifyField<uint8_t>(verifier, VT_FORWARD) &&
            VerifyField<uint8_t>(verifier, VT_TRUE_WATER) &&
@@ -1630,7 +1709,7 @@ struct KayakBuilder {
   void add_water_height(int32_t water_height) {
     fbb_.AddElement<int32_t>(Kayak::VT_WATER_HEIGHT, water_height, 0);
   }
-  void add_old_pos(const TEN::Save::Position *old_pos) {
+  void add_old_pos(const TEN::Save::Pose *old_pos) {
     fbb_.AddStruct(Kayak::VT_OLD_POS, old_pos);
   }
   void add_turn(bool turn) {
@@ -1665,7 +1744,7 @@ inline flatbuffers::Offset<Kayak> CreateKayak(
     int32_t right_vertical_velocity = 0,
     int32_t left_right_count = 0,
     int32_t water_height = 0,
-    const TEN::Save::Position *old_pos = 0,
+    const TEN::Save::Pose *old_pos = 0,
     bool turn = false,
     bool forward = false,
     bool true_water = false,
@@ -2659,7 +2738,7 @@ inline void CreatureTarget::UnPackTo(CreatureTargetT *_o, const flatbuffers::res
   { auto _e = box_number(); _o->box_number = _e; }
   { auto _e = flags(); _o->flags = _e; }
   { auto _e = trigger_flags(); _o->trigger_flags = _e; }
-  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
 }
 
 inline flatbuffers::Offset<CreatureTarget> CreatureTarget::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CreatureTargetT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -2709,7 +2788,8 @@ inline void Creature::UnPackTo(CreatureT *_o, const flatbuffers::resolver_functi
   { auto _e = hurt_by_lara(); _o->hurt_by_lara = _e; }
   { auto _e = tosspad(); _o->tosspad = _e; }
   { auto _e = location_ai(); _o->location_ai = _e; }
-  { auto _e = fired_weapon(); _o->fired_weapon = _e; }
+  { auto _e = weapon_delay1(); _o->weapon_delay1 = _e; }
+  { auto _e = weapon_delay2(); _o->weapon_delay2 = _e; }
   { auto _e = mood(); _o->mood = _e; }
   { auto _e = enemy(); _o->enemy = _e; }
   { auto _e = ai_target_number(); _o->ai_target_number = _e; }
@@ -2743,7 +2823,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
   auto _hurt_by_lara = _o->hurt_by_lara;
   auto _tosspad = _o->tosspad;
   auto _location_ai = _o->location_ai;
-  auto _fired_weapon = _o->fired_weapon;
+  auto _weapon_delay1 = _o->weapon_delay1;
+  auto _weapon_delay2 = _o->weapon_delay2;
   auto _mood = _o->mood;
   auto _enemy = _o->enemy;
   auto _ai_target_number = _o->ai_target_number;
@@ -2769,7 +2850,8 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
       _hurt_by_lara,
       _tosspad,
       _location_ai,
-      _fired_weapon,
+      _weapon_delay1,
+      _weapon_delay2,
       _mood,
       _enemy,
       _ai_target_number,
@@ -2960,7 +3042,7 @@ inline void Kayak::UnPackTo(KayakT *_o, const flatbuffers::resolver_function_t *
   { auto _e = right_vertical_velocity(); _o->right_vertical_velocity = _e; }
   { auto _e = left_right_count(); _o->left_right_count = _e; }
   { auto _e = water_height(); _o->water_height = _e; }
-  { auto _e = old_pos(); if (_e) _o->old_pos = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
+  { auto _e = old_pos(); if (_e) _o->old_pos = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
   { auto _e = turn(); _o->turn = _e; }
   { auto _e = forward(); _o->forward = _e; }
   { auto _e = true_water(); _o->true_water = _e; }

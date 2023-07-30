@@ -21,13 +21,13 @@ namespace TEN::Entities::Traps
 	const vector<unsigned int> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
 	const vector<Vector3i> StargateBounds =
 	{
-		Vector3i(-CLICK(2), CLICK(2), -SECTOR(2)), 
+		Vector3i(-CLICK(2), CLICK(2), -BLOCK(2)), 
 		Vector3i(-896, -96, 96),
 		Vector3i(-CLICK(2), CLICK(2), -128),
 		Vector3i(0, -96, 96),
-		Vector3i(-CLICK(2), -384, -SECTOR(2)),
+		Vector3i(-CLICK(2), -384, -BLOCK(2)),
 		Vector3i(0, -96, 96),
-		Vector3i(384, CLICK(2), -SECTOR(2)),
+		Vector3i(384, CLICK(2), -BLOCK(2)),
 		Vector3i(0, -96, 96)
 	};
 
@@ -57,7 +57,7 @@ namespace TEN::Entities::Traps
 			GlobalCollisionBounds.Z1 = bounds.z;
 
 			if (TestWithGlobalCollisionBounds(item, laraItem, coll))
-				ItemPushItem(item, laraItem, coll, 0, 2);
+				ItemPushItem(item, laraItem, coll, false, 2);
 		}*/
 
 		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
@@ -65,8 +65,8 @@ namespace TEN::Entities::Traps
 
 		if (TestCollision(item, laraItem) &&
 			TriggerActive(item) &&
-			item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 && // Hardcoded frame range.
-			item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 60)
+			item->Animation.FrameNumber > GetAnimData(item).frameBase + 20 && // Hardcoded frame range.
+			item->Animation.FrameNumber < GetAnimData(item).frameBase + 60)
 		{
 			// Blades deal damage cumulatively.
 			for (int i = 0; i < StargateHarmJoints.size(); i++)

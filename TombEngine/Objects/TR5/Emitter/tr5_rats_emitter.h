@@ -20,6 +20,6 @@ extern RatData Rats[NUM_RATS];
 
 void ClearRats();
 short GetNextRat();
-void InitialiseLittleRats(short itemNumber);
+void InitializeLittleRats(short itemNumber);
 void LittleRatsControl(short itemNumber);
 void UpdateRats();

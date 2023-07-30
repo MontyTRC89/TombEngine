@@ -12,8 +12,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
@@ -39,7 +39,7 @@ namespace TEN::Entities::TR4
 	constexpr auto NO_BABOON_COUNT		   = -2;
 	constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
 
-	const auto BaboonBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 4);
+	const auto BaboonBite = CreatureBiteInfo(Vector3(10, 10, 11), 4);
 	const auto BaboonAttackJoints	   = std::vector<unsigned int>{ 11, 12 };
 	const auto BaboonAttackRightJoints = std::vector<unsigned int>{ 1, 2, 3, 5, 8, 9 };
 	const auto BaboonJumpAttackJoints  = std::vector<unsigned int>{ 3, 4, 8 };
@@ -232,13 +232,13 @@ namespace TEN::Entities::TR4
 		UpdateRespawnedBaboon(itemNumber);
 	}
 
-	void InitialiseBaboon(short itemNumber)
+	void InitializeBaboon(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		if (!Objects[ID_BABOON_NORMAL].loaded)
 			TENLog("Failed to assign ID_BABOON_INV|ID_BABOON_SILENT animation index; ID_BABOON_NORMAL not found.", LogLevel::Warning);
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, BABOON_ANIM_SIT_IDLE);
 
 		if (item->ObjectNumber == ID_BABOON_SILENT && item->TriggerFlags != 0)
@@ -263,7 +263,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.ActiveState == BABOON_STATE_WALK)
 			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
 					BaboonRespawnFunction(itemNumber);
 			}
 			else if (item->Animation.ActiveState != BABOON_ACTIVATE_SWITCH)
@@ -486,28 +486,28 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				item->HitPoints = NOT_TARGETABLE;
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 212)
+				if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 212)
 				{
 					auto pos = Vector3i::Zero;
 					if (item->Pose.Orientation.y == ANGLE(270.0f))
 					{
-						pos.x = item->Pose.Position.x - SECTOR(1);
+						pos.x = item->Pose.Position.x - BLOCK(1);
 						pos.z = item->Pose.Position.z;
 					}
 					else if (item->Pose.Orientation.y == ANGLE(90.0f))
 					{
-						pos.x = item->Pose.Position.x + SECTOR(1);
+						pos.x = item->Pose.Position.x + BLOCK(1);
 						pos.z = item->Pose.Position.z;
 					}
 					else if (item->Pose.Orientation.y == ANGLE(0.0f))
 					{
 						pos.x = item->Pose.Position.x;
-						pos.z = item->Pose.Position.z + SECTOR(1);
+						pos.z = item->Pose.Position.z + BLOCK(1);
 					}
 					else if (item->Pose.Orientation.y == ANGLE(180.0f))
 					{
 						pos.x = item->Pose.Position.x;
-						pos.z = item->Pose.Position.z - SECTOR(1);
+						pos.z = item->Pose.Position.z - BLOCK(1);
 					}
 
 					pos.y = item->Pose.Position.y;

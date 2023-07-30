@@ -8,7 +8,7 @@ struct ItemInfo;
 namespace TEN::Entities::Vehicles
 {
 	JeepInfo& GetJeepInfo(ItemInfo& jeepItem);
-	void InitialiseJeep(short itemNumber);
+	void InitializeJeep(short itemNumber);
 
 	void JeepPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	int JeepControl(ItemInfo& laraItem);

@@ -1,24 +1,56 @@
 #pragma once
-#include "Math/Math.h"
 
-constexpr auto HAIR_MAX = 2; // HAIR_NORMAL = 0, HAIR_YOUNG = 1
-constexpr auto HAIR_SEGMENTS = 6; // classic = 7, young = 14
-constexpr auto HAIR_SPHERE = 6; // current hair max collision
-
-struct AnimFrame;
 struct ItemInfo;
 
-struct HAIR_STRUCT
+namespace TEN::Effects::Hair
 {
-	Pose pos;
-	Vector3i hvel;
-	Vector3i unknown;
+	class HairUnit
+	{
+	private:
+		// Constants
+		static constexpr auto HAIR_GRAVITY = 10.0f;
 
-	bool initialised = false;
-	bool enabled = false;
-};
-extern HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
+		struct HairSegment
+		{
+			Vector3	   Position	   = Vector3::Zero;
+			Vector3	   Velocity	   = Vector3::Zero;
+			Quaternion Orientation = Quaternion::Identity;
+		};
 
-void InitialiseHair();
-void HairControl(ItemInfo* item, bool young);
-void HairControl(ItemInfo* item, int ponytail, AnimFrame* framePtr);
+	public:
+		// Members
+		bool IsEnabled	   = false;
+		bool IsInitialized = false;
+		std::vector<HairSegment> Segments = {};
+
+		// Utilities
+		void Update(const ItemInfo& item, int hairUnitIndex);
+
+	private:
+		// Helpers
+		Vector3						GetRelBaseOffset(int hairUnitIndex, bool isYoung);
+		Vector3						GetWaterProbeOffset(const ItemInfo& item);
+		Quaternion					GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient);
+		std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, bool isYoung);
+
+		void CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand);
+		void CollideSegmentWithSpheres(HairSegment& segment, const std::vector<BoundingSphere>& spheres);
+	};
+
+	class HairEffectController
+	{
+	private:
+		// Constants
+		static constexpr auto UNIT_COUNT_MAX = 2;
+
+	public:
+		// Members
+		std::array<HairUnit, UNIT_COUNT_MAX> Units = {};
+
+		// Utilities
+		void Initialize();
+		void Update(ItemInfo& item, bool isYoung);
+	};
+
+	extern HairEffectController HairEffect;
+}

@@ -9,9 +9,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -23,7 +23,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	// TODO: Range constants.
 
-	const auto MonkeyBite = BiteInfo(Vector3(10.0f, 10.0f, 11.0f), 13);
+	const auto MonkeyBite = CreatureBiteInfo(Vector3(10, 10, 11), 13);
 	const auto MonkeyAttackJoints = std::vector<unsigned int>{ 10, 13 };
 
 	enum MonkeyState
@@ -85,11 +85,11 @@ namespace TEN::Entities::Creatures::TR3
 		MONKEY_ANIM_WALK_FORWARD_TO_IDLE = 30
 	};
 
-	void InitialiseMonkey(short itemNumber)
+	void InitializeMonkey(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, MONKEY_ANIM_SIT);
 	}
 
@@ -190,7 +190,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			GetCreatureMood(item, &AI, true);
 
-			if (Lara.Vehicle != NO_ITEM)
+			if (Lara.Context.Vehicle != NO_ITEM)
 				creature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &AI, true);
@@ -244,7 +244,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 				else if ((item->AIBits & FOLLOW) &&
-					(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+					(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 				{
 					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
@@ -305,7 +305,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 				else if (item->AIBits & FOLLOW &&
-					(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+					(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 				{
 					if (item->Animation.RequiredState != NO_STATE)
 						item->Animation.TargetState = item->Animation.RequiredState;
@@ -333,7 +333,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item->Animation.TargetState = MONKEY_STATE_BITE_ATTACK;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD_ROLL;
 				else
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD;
@@ -347,7 +347,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 				else if ((creature->Enemy->ObjectNumber == ID_SMALLMEDI_ITEM ||
 					creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
-					item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 12))
+					item->Animation.FrameNumber == (GetAnimData(item).frameBase + 12))
 				{
 					if (creature->Enemy->RoomNumber == NO_ROOM ||
 						creature->Enemy->Status == ITEM_INVISIBLE ||
@@ -382,7 +382,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 				else if (creature->Enemy->ObjectNumber == ID_AI_AMBUSH &&
-					item->Animation.FrameNumber == (g_Level.Anims[item->Animation.AnimNumber].frameBase + 12))
+					item->Animation.FrameNumber == (GetAnimData(item).frameBase + 12))
 				{
 					item->AIBits = 0;
 
@@ -448,7 +448,7 @@ namespace TEN::Entities::Creatures::TR3
 					break;
 				}
 				else if ((item->AIBits & FOLLOW) &&
-					(creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+					(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 				{
 					item->Animation.TargetState = MONKEY_STATE_IDLE;
 				}
@@ -456,7 +456,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD_ROLL;
 				else if (AI.distance < pow(682, 2))
 					item->Animation.TargetState = MONKEY_STATE_IDLE;
-				else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = MONKEY_STATE_RUN_FORWARD_ROLL;
 
 				break;

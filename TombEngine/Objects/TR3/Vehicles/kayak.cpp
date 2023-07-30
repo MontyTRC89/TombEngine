@@ -7,13 +7,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Sink.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -127,7 +127,7 @@ namespace TEN::Entities::Vehicles
 		return (KayakInfo&)kayakItem.Data;
 	}
 
-	void InitialiseKayak(short itemNumber)
+	void InitializeKayak(short itemNumber)
 	{
 		auto& kayakItem = g_Level.Items[itemNumber];
 		kayakItem.Data = KayakInfo();
@@ -289,7 +289,7 @@ namespace TEN::Entities::Vehicles
 		switch (laraItem.Animation.ActiveState)
 		{
 		case KAYAK_STATE_IDLE:
-			if (TrInput & VEHICLE_IN_DISMOUNT &&
+			if (IsHeld(In::Brake) &&
 				!player.WaterCurrentActive &&
 				!player.WaterCurrentPull.x && !player.WaterCurrentPull.z)
 			{
@@ -304,7 +304,7 @@ namespace TEN::Entities::Vehicles
 					laraItem.Animation.RequiredState = KAYAK_STATE_DISMOUNT_RIGHT;
 				}
 			}
-			else if (TrInput & KAYAK_IN_FORWARD)
+			else if (IsHeld(In::Forward))
 			{
 				laraItem.Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 				kayak.Turn = false;
@@ -326,7 +326,7 @@ namespace TEN::Entities::Vehicles
 				kayak.Forward = false;
 			}
 
-			else if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD))
+			else if (IsHeld(In::Right) && !IsHeld(In::Walk))
 			{
 				laraItem.Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 
@@ -365,9 +365,9 @@ namespace TEN::Entities::Vehicles
 				else if (frame > 2)
 					kayak.LeftRightPaddleCount &= ~0x80;
 
-				if (TrInput & KAYAK_IN_FORWARD)
+				if (IsHeld(In::Forward))
 				{
-					if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD))
+					if (IsHeld(In::Left) && !IsHeld(In::Walk))
 					{
 						if ((kayak.LeftRightPaddleCount & ~0x80) >= 2)
 							laraItem.Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
@@ -433,9 +433,9 @@ namespace TEN::Entities::Vehicles
 					kayak.LeftRightPaddleCount &= ~0x80;
 				}
 
-				if (TrInput & KAYAK_IN_FORWARD)
+				if (IsHeld(In::Forward))
 				{
-					if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD))
+					if (IsHeld(In::Right) && !IsHeld(In::Walk))
 					{
 						if ((kayak.LeftRightPaddleCount & ~0x80) >= 2)
 							laraItem.Animation.TargetState = KAYAK_STATE_TURN_LEFT;

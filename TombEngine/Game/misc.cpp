@@ -5,14 +5,14 @@
 #include "Game/Lara/lara.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
-#include "Specific/setup.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 
 using std::vector;
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item)
 {
-    return (CreatureInfo*)item->Data;
+	return (CreatureInfo*)item->Data;
 }
 
 void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)

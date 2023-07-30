@@ -61,12 +61,12 @@ namespace TEN::Entities::Vehicles
 
 	BiteInfo QuadBikeBites[6] =
 	{
-		{ -56, -32, -380, 0	},
-		{ 56, -32, -380, 0 },
-		{ -8, 180, -48, 3 },
-		{ 8, 180, -48, 4 },
-		{ 90, 180, -32, 6 },
-		{ -90, 180, -32, 7 }
+		CreatureBiteInfo(Vector3(-56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(-8, 180, -48), 3),
+		CreatureBiteInfo(Vector3(8, 180, -48), 4),
+		CreatureBiteInfo(Vector3(90, 180, -32), 6),
+		CreatureBiteInfo(Vector3(-90, 180, -32), 7)
 	};
 	const auto QuadBikeMountTypes = std::vector<VehicleMountType>
 	{
@@ -160,7 +160,7 @@ namespace TEN::Entities::Vehicles
 		return (QuadBikeInfo&)quadBikeItem.Data;
 	}
 
-	void InitialiseQuadBike(short itemNumber)
+	void InitializeQuadBike(short itemNumber)
 	{
 		auto& quadBikeItem = g_Level.Items[itemNumber];
 		quadBikeItem.Data = QuadBikeInfo();
@@ -373,7 +373,7 @@ namespace TEN::Entities::Vehicles
 
 		bool drive = false; // Never changes?
 
-		if (!(TrInput & VEHICLE_IN_SPEED) &&
+		if (!(IsHeld(In::Speed)) &&
 			!quadBike.Velocity && !quadBike.CanStartDrift)
 		{
 			quadBike.CanStartDrift = true;
@@ -383,7 +383,7 @@ namespace TEN::Entities::Vehicles
 			quadBike.CanStartDrift = false;
 		}
 
-		if (!(TrInput & VEHICLE_IN_SPEED))
+		if (!(IsHeld(In::Speed)))
 			quadBike.DriftStarting = false;
 
 		if (!quadBike.DriftStarting)
@@ -406,7 +406,7 @@ namespace TEN::Entities::Vehicles
 
 			if (quadBike.Velocity)
 			{
-				if (TrInput & VEHICLE_IN_SPEED &&
+				if (IsHeld(In::Speed) &&
 					!quadBike.DriftStarting &&
 					(quadBike.Velocity > QBIKE_DRIFT_VELOCITY_MIN ||
 						quadBike.Velocity < (-QBIKE_DRIFT_VELOCITY_MIN + (8 * VEHICLE_VELOCITY_SCALE))))
@@ -422,7 +422,7 @@ namespace TEN::Entities::Vehicles
 			// Reversing / braking.
 			if (TrInput & (VEHICLE_IN_REVERSE | VEHICLE_IN_BRAKE))
 			{
-				if (TrInput & VEHICLE_IN_SPEED &&
+				if (IsHeld(In::Speed) &&
 					(quadBike.CanStartDrift || quadBike.DriftStarting))
 				{
 					quadBike.DriftStarting = true;
@@ -450,9 +450,9 @@ namespace TEN::Entities::Vehicles
 					}
 				}
 			}
-			else if (TrInput & VEHICLE_IN_ACCELERATE)
+			else if (IsHeld(In::Accelerate))
 			{
-				if (TrInput & VEHICLE_IN_SPEED &&
+				if (IsHeld(In::Speed) &&
 					(quadBike.CanStartDrift || quadBike.DriftStarting))
 				{
 					quadBike.DriftStarting = true;
@@ -563,13 +563,13 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_IDLE:
 				if (dead)
 					laraItem.Animation.TargetState = QBIKE_STATE_BIKE_DEATH;
-				else if (TrInput & VEHICLE_IN_DISMOUNT &&
+				else if (IsHeld(In::Brake) &&
 					quadBike.Velocity == 0 &&
 					!quadBike.NoDismount)
 				{
-					if (TrInput & VEHICLE_IN_LEFT && TestQuadBikeDismount(laraItem, -1))
+					if (IsHeld(In::Left) && TestQuadBikeDismount(laraItem, -1))
 						laraItem.Animation.TargetState = QBIKE_STATE_DISMOUNT_LEFT;
-					else if (TrInput & VEHICLE_IN_RIGHT && TestQuadBikeDismount(laraItem, 1))
+					else if (IsHeld(In::Right) && TestQuadBikeDismount(laraItem, 1))
 						laraItem.Animation.TargetState = QBIKE_STATE_DISMOUNT_RIGHT;
 				}
 				else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
@@ -592,7 +592,7 @@ namespace TEN::Entities::Vehicles
 				{
 					laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
 				}
-				else if (TrInput & VEHICLE_IN_LEFT &&
+				else if (IsHeld(In::Left) &&
 					!quadBike.DriftStarting)
 				{
 					if (quadBikeItem.Animation.Velocity.z >= 0)
@@ -600,7 +600,7 @@ namespace TEN::Entities::Vehicles
 					else
 						laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT &&
+				else if (IsHeld(In::Right) &&
 					!quadBike.DriftStarting)
 				{
 					if (quadBikeItem.Animation.Velocity.z >= 0)
@@ -608,7 +608,7 @@ namespace TEN::Entities::Vehicles
 					else
 						laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 				}
-				else if (TrInput & (VEHICLE_IN_REVERSE | VEHICLE_IN_BRAKE))
+				else if (IsHeld(In::Reverse) || IsHeld(In::Brake))
 				{
 					if (quadBike.Velocity > (QBIKE_VELOCITY_MAX / 3 * 2))
 						laraItem.Animation.TargetState = QBIKE_STATE_BRAKE;
@@ -623,14 +623,14 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_STOP_SLOWLY:
 				if (!quadBikeItem.Animation.Velocity.z)
 					laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
-				else if (TrInput & VEHICLE_IN_LEFT)
+				else if (IsHeld(In::Left))
 				{
 					if (quadBikeItem.Animation.Velocity.z >= 0)
 						laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 					else
 						laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT)
+				else if (IsHeld(In::Right))
 				{
 					if (quadBikeItem.Animation.Velocity.z >= 0)
 						laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
@@ -643,7 +643,7 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_TURN_LEFT:
 				if (!quadBikeItem.Animation.Velocity.z)
 					laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
-				else if (TrInput & VEHICLE_IN_RIGHT &&
+				else if (IsHeld(In::Right) &&
 					quadBikeItem.Animation.Velocity.z > 0)
 				{
 					laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_RIGHT_START;
@@ -651,7 +651,7 @@ namespace TEN::Entities::Vehicles
 					laraItem.Animation.ActiveState = QBIKE_STATE_TURN_RIGHT;
 					laraItem.Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
-				else if (TrInput & VEHICLE_IN_LEFT &&
+				else if (IsHeld(In::Left) &&
 					quadBikeItem.Animation.Velocity.z < 0)
 				{
 					laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_LEFT_START;
@@ -663,12 +663,12 @@ namespace TEN::Entities::Vehicles
 				{
 					if (quadBikeItem.Animation.Velocity.z >= 0)
 					{
-						if (!(TrInput & VEHICLE_IN_LEFT))
+						if (!IsHeld(In::Left))
 							laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 					}
 					else
 					{
-						if (!(TrInput & VEHICLE_IN_RIGHT))
+						if (!IsHeld(In::Right))
 							laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 					}
 				}
@@ -678,7 +678,7 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_TURN_RIGHT:
 				if ((quadBike.Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 					laraItem.Animation.TargetState = QBIKE_STATE_IDLE;
-				else if (TrInput & VEHICLE_IN_LEFT &&
+				else if (IsHeld(In::Left) &&
 					quadBikeItem.Animation.Velocity.z > 0)
 				{
 					laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_LEFT_START;
@@ -686,7 +686,7 @@ namespace TEN::Entities::Vehicles
 					laraItem.Animation.ActiveState = QBIKE_STATE_TURN_LEFT;
 					laraItem.Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT &&
+				else if (IsHeld(In::Right) &&
 					quadBikeItem.Animation.Velocity.z < 0)
 				{
 					laraItem.Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_TURN_RIGHT_START;
@@ -698,12 +698,12 @@ namespace TEN::Entities::Vehicles
 				{
 					if (quadBikeItem.Animation.Velocity.z >= 0)
 					{
-						if (!(TrInput & VEHICLE_IN_RIGHT))
+						if (!IsHeld(In::Right))
 							laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 					}
 					else
 					{
-						if (!(TrInput & VEHICLE_IN_LEFT))
+						if (!IsHeld(In::Left))
 							laraItem.Animation.TargetState = QBIKE_STATE_DRIVE;
 					}
 				}
@@ -925,7 +925,7 @@ namespace TEN::Entities::Vehicles
 			quadBikeItem.Pose.Orientation.y += quadBike.TurnRate + quadBike.ExtraRotation;
 
 			short momentum = QBIKE_MOMENTUM_TURN_RATE_MIN - (((((QBIKE_MOMENTUM_TURN_RATE_MIN - QBIKE_MOMENTUM_TURN_RATE_MAX) * 256) / QBIKE_VELOCITY_MAX) * quadBike.Velocity) / 256);
-			if (!(TrInput & VEHICLE_IN_ACCELERATE) && quadBike.Velocity > 0)
+			if (!(IsHeld(In::Accelerate)) && quadBike.Velocity > 0)
 				momentum += momentum / 4;
 
 			short rotation = quadBikeItem.Pose.Orientation.y - quadBike.MomentumAngle;

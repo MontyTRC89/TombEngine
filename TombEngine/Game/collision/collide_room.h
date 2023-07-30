@@ -1,9 +1,9 @@
 #pragma once
+
 #include "Math/Math.h"
-#include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 
 struct ItemInfo;
-struct CollisionInfo;
 class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
@@ -11,7 +11,7 @@ enum RoomEnvFlags;
 
 constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
-constexpr auto COLLISION_CHECK_DISTANCE = SECTOR(8);
+constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
 enum CollisionType
 {
@@ -87,10 +87,11 @@ struct CollisionSetup
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
-	Vector3i OldPosition;
-	int OldAnimNumber;
-	int OldFrameNumber;
-	int OldState;
+	Vector3i	   OldPosition		= Vector3i::Zero;
+	GAME_OBJECT_ID PrevAnimObjectID = ID_NO_OBJECT;
+	int			   OldAnimNumber	= 0;
+	int			   OldFrameNumber	= 0;
+	int			   OldState			= 0;
 };
 
 struct CollisionInfo
@@ -104,12 +105,15 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	Vector3i Shift;
+	Pose Shift = Pose::Zero;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
+
+	int  LastBridgeItemNumber;
+	Pose LastBridgeItemPose;
 
 	bool HitStatic;
 	bool HitTallObject;
@@ -122,11 +126,13 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
+CollisionResult GetCollision(const ItemInfo& item);
 CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
-CollisionResult GetCollision(const GameVector& point);
+CollisionResult GetCollision(const GameVector& pos);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);

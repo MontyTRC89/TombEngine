@@ -2,13 +2,17 @@
 #include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
+#include "./ShaderLight.hlsli"
 
 // NOTE: This shader is used for all 3D and alpha blended sprites, because we send aleady transformed vertices to the GPU 
 // instead of instances
 
+#define FADE_FACTOR .789f
+
 cbuffer SpriteBuffer : register(b9)
 {
 	float IsSoftParticle;
+	int RenderType;
 };
 
 struct PixelShaderInput
@@ -17,8 +21,9 @@ struct PixelShaderInput
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
-	float  Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
+	float4 FogBulbs : TEXCOORD3;
+	float DistanceFog : FOG;
 };
 
 Texture2D Texture : register(t0);
@@ -34,16 +39,13 @@ PixelShaderInput VS(VertexShaderInput input)
 	float4 worldPosition = float4(input.Position, 1.0f);
 
 	output.Position = mul(worldPosition, ViewProjection);
-	output.PositionCopy = output.Position;	
+	output.PositionCopy = output.Position;
 	output.Normal = input.Normal;
 	output.Color = input.Color;
 	output.UV = input.UV;
 
-	float4 d = length(CamPositionWS - worldPosition);
-	if (FogMaxDistance == 0)
-		output.Fog = 1;
-	else
-		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
+	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
 
 	return output;
 }
@@ -58,7 +60,8 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	{
 		float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
 		input.PositionCopy.xy /= input.PositionCopy.w;
-		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1);
+
+		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1.0f);
 		float sceneDepth = DepthMap.Sample(DepthMapSampler, texCoord).r;
 
 		sceneDepth = LinearizeDepth(sceneDepth, NearPlane, FarPlane);
@@ -71,7 +74,15 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
+	if (RenderType == 1)
+	{
+		output = DoLaserBarrierEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
+	}
+
+	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
+	output.xyz = saturate(output.xyz);
+	
+	output = DoDistanceFogForPixel(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.DistanceFog);
 
 	return output;
 }

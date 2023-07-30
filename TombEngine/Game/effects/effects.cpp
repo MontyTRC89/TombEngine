@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/effects/effects.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/Blood.h"
@@ -17,13 +17,13 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -52,7 +52,7 @@ int SplashCount = 0;
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
 {
-	{ -16, 40, 160, -LM_LHAND, false }, // TR5 offset 0, TODO: This mesh is invalid as it can't be negative. -- TokyoSU 23.02.20
+	{ -16, 40, 160, 13, false },		// TR5 offset 0
 	{ -16, -8, 160, 0, false },			// TR5 offset 1
 	{ 0, 0, 256, 8, false },			// TR5 offset 2
 	{ 0, 0, 256, 17, false },			// TR5 offset 3
@@ -741,7 +741,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
@@ -1146,7 +1146,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	if (item.TriggerFlags != 0)
 	{
 		size = item.TriggerFlags % 100;
-		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, SECTOR(8));
+		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, BLOCK(8));
 	}
 
 	float cos = phd_cos(angle);
@@ -1169,7 +1169,6 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	auto endColor   = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * scale;
-	int steps = int((width / 2) / step);
 	int currentStep = 0;
 
 	while (true)
@@ -1246,11 +1245,11 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 		 TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) == TestEnvironment(ENV_FLAG_WATER, probe2.RoomNumber))
 		return;
 
-	auto* frame = GetBestFrame(item);
-	if (item->Pose.Position.y + frame->boundingBox.Y1 > wh)
+	const auto& bounds = GetBestFrame(*item).BoundingBox;
+	if (item->Pose.Position.y + bounds.Y1 > wh)
 		return;
 
-	if (item->Pose.Position.y + frame->boundingBox.Y2 < wh)
+	if (item->Pose.Position.y + bounds.Y2 < wh)
 		return;
 
 	if (item->Animation.Velocity.y <= 0.0f || wd >= 474 || SplashCount != 0)
@@ -1403,9 +1402,14 @@ void TriggerRocketFire(int x, int y, int z)
 }
 
 
-void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
+void TriggerRocketSmoke(int x, int y, int z)
 {
-	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z, 0);
+	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z);
+}
+
+void SpawnCorpseEffect(const Vector3& pos)
+{
+	TEN::Effects::Smoke::SpawnCorpseEffect(pos);
 }
 
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
@@ -1658,7 +1662,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 				spark->sLife = spark->life >> 2;
 			}
 
-			spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
+			spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 48;
 		}
 	}
 	else
@@ -1761,9 +1765,9 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vecto
 			spark->gravity = -8 - (r >> 3 & 3);
 			spark->scalar = 2;
 			spark->maxYvel = -4 - (r >> 6 & 3);
-			spark->sSize = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->size = ((r >> 8) & 0xF) + 24 >> 3;
-			spark->dSize = ((r >> 8) & 0xF) + 24;
+			spark->sSize = (((r >> 8) & 0xF) + 24) >> 3;
+			spark->size  = (((r >> 8) & 0xF) + 24) >> 3;
+			spark->dSize =  ((r >> 8) & 0xF) + 24;
 		}
 	}
 }
@@ -1811,55 +1815,76 @@ void ProcessEffects(ItemInfo* item)
 		case EffectType::Fire:
 			if (TestProbability(1 / 8.0f))
 				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
+			
 			break;
 
 		case EffectType::Custom:
 			if (TestProbability(1 / 8.0f))			
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium, 
+			{
+				TriggerFireFlame(
+					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium,
 					item->Effect.PrimaryEffectColor, item->Effect.SecondaryEffectColor);
+			}
+
 			break;
 
 		case EffectType::Sparks:
 			if (TestProbability(1 / 10.0f))
-				TriggerElectricSpark(GameVector(pos, item->RoomNumber),
-					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
+			{
+				TriggerElectricSpark(
+					GameVector(pos, item->RoomNumber),
+					EulerAngles(0, Random::GenerateAngle(0, ANGLE(359.0f)), 0), 2);
+			}
+
 			if (TestProbability(1 / 64.0f))
-				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
+				TriggerRocketSmoke(pos.x, pos.y, pos.z);
+
 			break;
 
 		case EffectType::ElectricIgnite:
 			if (TestProbability(1 / 1.0f))
-				TriggerElectricSpark(GameVector(pos, item->RoomNumber),
-					EulerAngles(0, Random::GenerateAngle(ANGLE(0), ANGLE(359)), 0), 2);
+			{
+				TriggerElectricSpark(
+					GameVector(pos, item->RoomNumber),
+					EulerAngles(0, Random::GenerateAngle(0, ANGLE(359.0f)), 0), 2);
+			}
+
 			if (TestProbability(1 / 1.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
+			{
+				TriggerFireFlame(
+					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium,
 					Vector3(0.2f, 0.5f, 1.0f), Vector3(0.2f, 0.8f, 1.0f));
+			}
+
 			break;
 
 		case EffectType::RedIgnite:
 			if (TestProbability(1 / 1.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium, 
+			{
+				TriggerFireFlame(
+					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium,
 					Vector3(1.0f, 0.5f, 0.2f), Vector3(0.6f, 0.1f, 0.0f));
+			}
+
 			break;
 
 		case EffectType::Smoke:
 			if (TestProbability(1 / 32.0f))
-				TriggerRocketSmoke(pos.x, pos.y, pos.z, 0);
+				TriggerRocketSmoke(pos.x, pos.y, pos.z);
+			
 			break;
 
-		case EffectType::Cadaver:
-			//TODO: Dead enemies can not have an effect yet. If it is possible, cadaver should emit a slow yellow, green poisonous cloud
-			break;
 		}
 	}
 
-	if (item->Effect.Type != EffectType::Smoke && item->Effect.Type != EffectType::Cadaver)
+	if (item->Effect.Type != EffectType::Smoke)
 	{
 		int falloff = item->Effect.Count < 0 ? MAX_LIGHT_FALLOFF :
 			MAX_LIGHT_FALLOFF - std::clamp(MAX_LIGHT_FALLOFF - item->Effect.Count, 0, MAX_LIGHT_FALLOFF);
 
 		auto pos = GetJointPosition(item, 0);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, falloff,
+		TriggerDynamicLight(
+			pos.x, pos.y, pos.z, falloff,
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.x * UCHAR_MAX), 0, UCHAR_MAX),
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.y * UCHAR_MAX), 0, UCHAR_MAX),
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.z * UCHAR_MAX), 0, UCHAR_MAX));

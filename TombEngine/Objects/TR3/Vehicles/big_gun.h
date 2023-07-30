@@ -1,12 +1,11 @@
 #pragma once
-#include "Objects/Utils/VehicleHelpers.h"
 
 struct CollisionInfo;
 struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	void BigGunInitialise(short itemNumber);
+	void BigGunInitlize(short itemNumber);
 
 	void BigGunCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool BigGunControl(ItemInfo& laraItem, CollisionInfo& coll);

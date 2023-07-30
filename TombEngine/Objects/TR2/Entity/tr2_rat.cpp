@@ -8,9 +8,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto RAT_TURN_RATE_MAX = ANGLE(6.0f);
 
-	const auto RatBite = BiteInfo(Vector3(0.0f, 0.0f, 57.0f), 2);
+	const auto RatBite = CreatureBiteInfo(Vector3(0, 0, 57), 2);
 
 	enum RatState
 	{
@@ -131,7 +131,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			case RAT_STATE_POUNCE_ATTACK:
 				if (item->Animation.RequiredState == NO_STATE &&
-					item->TouchBits.Test(RatBite.meshNum))
+					item->TouchBits.Test(RatBite.BoneID))
 				{
 					item->Animation.RequiredState = RAT_STATE_IDLE;
 					DoDamage(creature->Enemy, RAT_ATTACK_DAMAGE);

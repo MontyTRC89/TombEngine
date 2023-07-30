@@ -46,7 +46,7 @@ namespace TEN::Effects::Streamer
 			void TransformVertices(float vel, float scaleRate);
 		};
 
-		// Components
+		// Members
 		bool IsBroken = false;
 		std::vector<StreamerSegment> Segments = {};
 
@@ -68,8 +68,8 @@ namespace TEN::Effects::Streamer
 		static constexpr auto STREAMER_COUNT_MAX = 8;
 
 	public:
-		// Components
-		std::map<int, std::vector<Streamer>> Pools = {}; // Key = tag.
+		// Members
+		std::unordered_map<int, std::vector<Streamer>> Pools = {}; // Key = tag.
 
 		// Utilities
 		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
@@ -91,8 +91,8 @@ namespace TEN::Effects::Streamer
 		static constexpr auto MODULE_COUNT_MAX = 64;
 
 	public:
-		// Components
-		std::map<int, StreamerModule> Modules = {}; // Key = entity number.
+		// Members
+		std::unordered_map<int, StreamerModule> Modules = {}; // Key = entity number.
 
 		// Utilities
 		void Spawn(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,

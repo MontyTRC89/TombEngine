@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::Creatures::TR1
 {
-	void InitialiseBigRat(short itemNumber);
+	void InitializeBigRat(short itemNumber);
 	void BigRatControl(short itemNumber);
 }

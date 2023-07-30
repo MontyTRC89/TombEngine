@@ -26,7 +26,7 @@ namespace TEN::Entities::Traps::TR1
 		SLAMMING_DOORS_ANIM_OPENING = 2
 	};
 
-	void InitialiseSlammingDoors(short itemNumber)
+	void InitializeSlammingDoors(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

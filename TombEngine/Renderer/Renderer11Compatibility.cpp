@@ -1,18 +1,18 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
-#include "Specific/level.h"
-#include "Game/savegame.h"
-#include "Specific/setup.h"
-#include "Game/control/control.h"
-#include "Objects/Generic/Object/objects.h"
-#include "Game/Lara/lara_struct.h"
-#include <tuple>
-#include <stack>
-#include <execution>
 
-using std::optional;
-using std::stack;
-using std::vector;
+#include <execution>
+#include <stack>
+#include <tuple>
+
+#include "Game/control/control.h"
+#include "Game/Lara/lara_struct.h"
+#include "Game/savegame.h"
+#include "Game/Setup.h"
+#include "Objects/Generic/Object/objects.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Specific/level.h"
 
 namespace TEN::Renderer
 {
@@ -36,13 +36,16 @@ namespace TEN::Renderer
 		{
 			TEXTURE* texture = &g_Level.AnimatedTextures[i];
 			Texture2D normal;
-			if (texture->normalMapData.size() < 1) {
+			if (texture->normalMapData.size() < 1)
+			{
 				normal = CreateDefaultNormalTexture();
 			}
-			else {
-				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
+			else
+			{
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), (int)texture->normalMapData.size());
 			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), (int)texture->colorMapData.size()), normal);
 			m_animatedTextures[i] = tex;
 		}
 
@@ -76,12 +79,16 @@ namespace TEN::Renderer
 		{
 			TEXTURE *texture = &g_Level.RoomTextures[i];
 			Texture2D normal;
-			if (texture->normalMapData.size() < 1) {
+			if (texture->normalMapData.size() < 1)
+			{
 				normal = CreateDefaultNormalTexture();
-			} else {
-				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			else
+			{
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), (int)texture->normalMapData.size());
+			}
+
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), (int)texture->colorMapData.size()), normal);
 			m_roomTextures[i] = tex;
 
 #ifdef DUMP_TEXTURES
@@ -101,12 +108,16 @@ namespace TEN::Renderer
 		{
 			TEXTURE *texture = &g_Level.MoveablesTextures[i];
 			Texture2D normal;
-			if (texture->normalMapData.size() < 1) {
+			if (texture->normalMapData.size() < 1)
+			{
 				normal = CreateDefaultNormalTexture();
-			} else {
-				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			else
+			{
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), (int)texture->normalMapData.size());
+			}
+
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), (int)texture->colorMapData.size()), normal);
 			m_moveablesTextures[i] = tex;
 
 #ifdef DUMP_TEXTURES
@@ -126,12 +137,16 @@ namespace TEN::Renderer
 		{
 			TEXTURE *texture = &g_Level.StaticsTextures[i];
 			Texture2D normal;
-			if (texture->normalMapData.size() < 1) {
+			if (texture->normalMapData.size() < 1)
+			{
 				normal = CreateDefaultNormalTexture();
-			} else {
-				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
-			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size()), normal);
+			else
+			{
+				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), (int)texture->normalMapData.size());
+			}
+
+			TexturePair tex = std::make_tuple(Texture2D(m_device.Get(), texture->colorMapData.data(), (int)texture->colorMapData.size()), normal);
 			m_staticsTextures[i] = tex;
 
 #ifdef DUMP_TEXTURES
@@ -150,13 +165,13 @@ namespace TEN::Renderer
 		for (int i = 0; i < g_Level.SpritesTextures.size(); i++)
 		{
 			TEXTURE *texture = &g_Level.SpritesTextures[i];
-			m_spritesTextures[i] = Texture2D(m_device.Get(), texture->colorMapData.data(), texture->colorMapData.size());
+			m_spritesTextures[i] = Texture2D(m_device.Get(), texture->colorMapData.data(), (int)texture->colorMapData.size());
 		}
 
 		if (m_spritesTextures.size() > 0)
-			TENLog("Generated " + std::to_string(m_spritesTextures.size()) + " sprite atlases.", LogLevel::Info);
+			TENLog("Generated " + std::to_string((int)m_spritesTextures.size()) + " sprite atlases.", LogLevel::Info);
 
-		m_skyTexture = Texture2D(m_device.Get(), g_Level.SkyTexture.colorMapData.data(), g_Level.SkyTexture.colorMapData.size());
+		m_skyTexture = Texture2D(m_device.Get(), g_Level.SkyTexture.colorMapData.data(), (int)g_Level.SkyTexture.colorMapData.size());
 
 		TENLog("Loaded sky texture.", LogLevel::Info);
 
@@ -193,7 +208,7 @@ namespace TEN::Renderer
 			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
-			
+
 			Vector3 boxMin = Vector3(room.x + BLOCK(1), room.maxceiling - CLICK(1), room.z + BLOCK(1));
 			Vector3 boxMax = Vector3(room.x + (room.xSize - 1) * BLOCK(1), room.minfloor + CLICK(1), room.z + (room.zSize - 1) * BLOCK(1));
 			Vector3 center = (boxMin + boxMax) / 2.0f;
@@ -207,7 +222,7 @@ namespace TEN::Renderer
 
 			if (room.doors.size() != 0)
 			{
-				r->Doors.resize(room.doors.size());
+				r->Doors.resize((int)room.doors.size());
 
 				for (int l = 0; l < room.doors.size(); l++)
 				{
@@ -223,8 +238,7 @@ namespace TEN::Renderer
 							room.x + oldDoor->vertices[k].x,
 							room.y + oldDoor->vertices[k].y,
 							room.z + oldDoor->vertices[k].z,
-							1.0f
-						);
+							1.0f);
 					}
 				}
 			}
@@ -233,7 +247,7 @@ namespace TEN::Renderer
 			{
 				r->Statics.resize(room.mesh.size());
 
-				for (int l = 0; l < room.mesh.size(); l++)
+				for (int l = 0; l < (int)room.mesh.size(); l++)
 				{
 					RendererStatic* staticInfo = &r->Statics[l];
 					MESH_INFO* oldMesh = &room.mesh[l];
@@ -247,12 +261,13 @@ namespace TEN::Renderer
 					staticInfo->Pose = oldMesh->pos;
 					staticInfo->Scale = oldMesh->scale;
 					staticInfo->OriginalVisibilityBox = StaticObjects[staticInfo->ObjectNumber].visibilityBox;
+					staticInfo->IndexInRoom = l;
 
 					staticInfo->Update();
 				}
 			}
 
-			if (room.positions.size() == 0)
+			if (room.positions.empty())
 				continue;
 			
 			for (auto& levelBucket : room.buckets)
@@ -301,13 +316,17 @@ namespace TEN::Renderer
 						vertex->UV = poly.textureCoordinates[k];
 						vertex->Color = Vector4(room.colors[index].x, room.colors[index].y, room.colors[index].z, 1.0f);
 						vertex->Tangent = poly.tangents[k];
+						vertex->Binormal = poly.binormals[k];
 						vertex->AnimationFrameOffset = poly.animatedFrame;
 						vertex->IndexInPoly = k;
 						vertex->OriginalIndex = index;
 						vertex->Effects = Vector4(room.effects[index].x, room.effects[index].y, room.effects[index].z, 0);
 
 						const unsigned long long primes[]{ 73856093ULL, 19349663ULL, 83492791ULL };
-						vertex->Hash = std::hash<float>{}((vertex->Position.x)* primes[0]) ^ (std::hash<float>{}(vertex->Position.y)* primes[1]) ^ std::hash<float>{}(vertex->Position.z) * primes[2];
+						vertex->Hash = (unsigned int)std::hash<float>{}
+						((vertex->Position.x)* primes[0]) ^
+							((unsigned int)std::hash<float>{}(vertex->Position.y) * primes[1]) ^
+							(unsigned int)std::hash<float>{}(vertex->Position.z) * primes[2];
 						vertex->Bone = 0;
 
 						lastVertex++;
@@ -389,7 +408,7 @@ namespace TEN::Renderer
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
 						light->Intensity = oldLight->intensity;
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
-						light->In = oldLight->length;
+						light->In = oldLight->length;     
 						light->Out = oldLight->cutoff;
 						light->InRange = oldLight->in;
 						light->OutRange = oldLight->out;
@@ -397,6 +416,16 @@ namespace TEN::Renderer
 						light->Type = LIGHT_TYPE_SPOT;
 						light->Luma = Luma(light->Color);
 					}
+					else if (oldLight->type == LIGHT_TYPE_FOG_BULB)
+					{  
+						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
+						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
+						light->Intensity = oldLight->intensity;
+						light->In = oldLight->in;
+						light->Out = oldLight->out;
+						light->Type = LIGHT_TYPE_FOG_BULB;
+						light->Luma = Luma(light->Color);
+					} 
 
 					// Monty's temp variables for sorting
 					light->LocalIntensity = 0;
@@ -408,8 +437,8 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), m_roomsVertices.size(), m_roomsVertices.data());
-		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), m_roomsIndices.size(), m_roomsIndices.data());
+		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), (int)m_roomsVertices.size(), m_roomsVertices.data());
+		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), (int)m_roomsIndices.size(), m_roomsIndices.data());
 
 		std::for_each(std::execution::par_unseq,
 			m_rooms.begin(),
@@ -431,9 +460,8 @@ namespace TEN::Renderer
 		);
 
 		TENLog("Preparing object data...", LogLevel::Info);
-
-		bool skinPresent = false;
-		bool hairsPresent = false;
+			 
+		bool isSkinPresent = false;
 
 		totalVertices = 0;
 		totalIndices = 0;
@@ -470,16 +498,18 @@ namespace TEN::Renderer
 				moveable.Id = MoveablesIds[i];
 				moveable.DoNotDraw = (obj->drawRoutine == nullptr);
 				moveable.ShadowType = obj->shadowType;
-
+													   
 				for (int j = 0; j < obj->nmeshes; j++)
-				{
+				{              
 					// HACK: mesh pointer 0 is the placeholder for Lara's body parts and is right hand with pistols
 					// We need to override the bone index because the engine will take mesh 0 while drawing pistols anim,
 					// and vertices have bone index 0 and not 10.
-					RendererMesh *mesh = GetRendererMeshFromTrMesh(&moveable,
-																   &g_Level.Meshes[obj->meshIndex + j],
-																   j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-																   MoveablesIds[i] == ID_HAIR, &lastVertex, &lastIndex);
+					RendererMesh *mesh = GetRendererMeshFromTrMesh(
+						&moveable,
+						&g_Level.Meshes[obj->meshIndex + j],
+						j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
+						MoveablesIds[i] == ID_HAIR, &lastVertex, &lastIndex);
+
 					moveable.ObjectMeshes.push_back(mesh);
 					m_meshes.push_back(mesh);
 				}
@@ -503,7 +533,7 @@ namespace TEN::Renderer
 					{
 						int *bone = &g_Level.Bones[obj->boneIndex];
 
-						stack<RendererBone *> stack;
+						std::stack<RendererBone *> stack;
 
 						RendererBone *currentBone = moveable.LinearizedBones[0];
 						RendererBone *stackBone = moveable.LinearizedBones[0];
@@ -528,11 +558,12 @@ namespace TEN::Renderer
 								moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
 								currentBone->Children.push_back(moveable.LinearizedBones[j]);
 								currentBone = moveable.LinearizedBones[j];
-
 								break;
+
 							case 1:
 								if (stack.empty())
 									continue;
+
 								currentBone = stack.top();
 								stack.pop();
 
@@ -540,8 +571,8 @@ namespace TEN::Renderer
 								moveable.LinearizedBones[j]->Translation = Vector3(linkX, linkY, linkZ);
 								currentBone->Children.push_back(moveable.LinearizedBones[j]);
 								currentBone = moveable.LinearizedBones[j];
-
 								break;
+
 							case 2:
 								stack.push(currentBone);
 
@@ -549,11 +580,12 @@ namespace TEN::Renderer
 								moveable.LinearizedBones[j]->Parent = currentBone;
 								currentBone->Children.push_back(moveable.LinearizedBones[j]);
 								currentBone = moveable.LinearizedBones[j];
-
 								break;
+
 							case 3:
 								if (stack.empty())
 									continue;
+
 								RendererBone *theBone = stack.top();
 								stack.pop();
 
@@ -562,26 +594,27 @@ namespace TEN::Renderer
 								theBone->Children.push_back(moveable.LinearizedBones[j]);
 								currentBone = moveable.LinearizedBones[j];
 								stack.push(theBone);
-
 								break;
 							}
 						}
 					}
 
 					for (int n = 0; n < obj->nmeshes; n++)
+					{
 						moveable.LinearizedBones[n]->Transform = Matrix::CreateTranslation(
 							moveable.LinearizedBones[n]->Translation.x,
 							moveable.LinearizedBones[n]->Translation.y,
 							moveable.LinearizedBones[n]->Translation.z);
+					}
 
 					moveable.Skeleton = moveable.LinearizedBones[0];
 					BuildHierarchy(&moveable);
 
-					// Fix Lara skin joints and hairs
+					// Fix player skin joints and hair units.
 					if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)
 					{
-						skinPresent = true;
-						int BonesToCheck[2] = {0, 0};
+						isSkinPresent = true;
+						int bonesToCheck[2] = { 0, 0 };
 
 						RendererObject& objSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 
@@ -590,8 +623,8 @@ namespace TEN::Renderer
 							RendererMesh *jointMesh = moveable.ObjectMeshes[j];
 							RendererBone *jointBone = moveable.LinearizedBones[j];
 
-							BonesToCheck[0] = jointBone->Parent->Index;
-							BonesToCheck[1] = j;
+							bonesToCheck[0] = jointBone->Parent->Index;
+							bonesToCheck[1] = j;
 
 							for (int b1 = 0; b1 < jointMesh->Buckets.size(); b1++)
 							{
@@ -601,12 +634,12 @@ namespace TEN::Renderer
 								{
 									RendererVertex *jointVertex = &m_moveablesVertices[jointBucket->StartVertex + v1];
 
-									bool done = false;
+									bool isDone = false;
 
 									for (int k = 0; k < 2; k++)
 									{
-										RendererMesh *skinMesh = objSkin.ObjectMeshes[BonesToCheck[k]];
-										RendererBone *skinBone = objSkin.LinearizedBones[BonesToCheck[k]];
+										RendererMesh *skinMesh = objSkin.ObjectMeshes[bonesToCheck[k]];
+										RendererBone *skinBone = objSkin.LinearizedBones[bonesToCheck[k]];
 
 										for (int b2 = 0; b2 < skinMesh->Buckets.size(); b2++)
 										{
@@ -626,88 +659,103 @@ namespace TEN::Renderer
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
-													jointVertex->Bone = BonesToCheck[k];
+													jointVertex->Bone = bonesToCheck[k];
 													jointVertex->Position = skinVertex->Position;
 													jointVertex->Normal = skinVertex->Normal;
 
-													done = true;
+													isDone = true;
 													break;
 												}
 											}
 
-											if (done)
+											if (isDone)
 												break;
 										}
 
-										if (done)
+										if (isDone)
 											break;
 									}
 								}
 							}
 						}
 					}
-					else if (MoveablesIds[i] == ID_HAIR && skinPresent)
+					else if (MoveablesIds[i] == ID_HAIR && isSkinPresent)
 					{
-						hairsPresent = true;
-
-						for (int j = 0; j< obj->nmeshes;j++)
+						for (int j = 0; j < obj->nmeshes; j++)
 						{
-							RendererMesh* currentMesh = moveable.ObjectMeshes[j];
-							RendererBone* currentBone = moveable.LinearizedBones[j];
+							auto* currentMesh = moveable.ObjectMeshes[j];
+							auto* currentBone = moveable.LinearizedBones[j];
 
-							for (int b1 = 0; b1 < currentMesh->Buckets.size(); b1++)
+							for (const auto& currentBucket : currentMesh->Buckets)
 							{
-								RendererBucket* currentBucket = &currentMesh->Buckets[b1];
-
-								for (int v1 = 0; v1 < currentBucket->NumVertices; v1++)
+								for (int v1 = 0; v1 < currentBucket.NumVertices; v1++)
 								{
-									RendererVertex* currentVertex = &m_moveablesVertices[currentBucket->StartVertex + v1];
+									auto* currentVertex = &m_moveablesVertices[currentBucket.StartVertex + v1];
 									currentVertex->Bone = j + 1;
 
+									// Link mesh 0 to head.
 									if (j == 0)
 									{
-										// Mesh 0 must be linked with head
-										int parentVertices[] = { 37,39,40,38 };
-										
-										RendererObject& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
-										RendererMesh* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
-										RendererBone* parentBone = skinObj.LinearizedBones[LM_HEAD];
+										bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
+										// HACK: Hardcoded hair base parent vertices.
+										int parentVertices0[] = { 37, 39, 40, 38 }; // Single braid.
+										int parentVertices1[] = { 79, 78, 76, 77 }; // Left pigtail.
+										int parentVertices2[] = { 68, 69, 70, 71 }; // Right pigtail.
+
+										auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
+										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
+
+										// Link first 4 vertices.
 										if (currentVertex->OriginalIndex < 4)
 										{
 											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
-												RendererBucket* parentBucket = &parentMesh->Buckets[b2];
+												auto* parentBucket = &parentMesh->Buckets[b2];
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
-													RendererVertex* parentVertex = &m_moveablesVertices[parentBucket->StartVertex + v2];
-
-													if (parentVertex->OriginalIndex == parentVertices[currentVertex->OriginalIndex])
+													auto* parentVertex = &m_moveablesVertices[parentBucket->StartVertex + v2];
+													
+													// TODO
+													if (isYoung)
 													{
-														currentVertex->Bone = 0;
-														currentVertex->Position = parentVertex->Position;
-														currentVertex->Normal = parentVertex->Normal;
+														if (parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
+														{
+															currentVertex->Bone = 0;
+															currentVertex->Position = parentVertex->Position;
+															currentVertex->Normal = parentVertex->Normal;
+														}
+													}
+													else
+													{
+														if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
+														{
+															currentVertex->Bone = 0;
+															currentVertex->Position = parentVertex->Position;
+															currentVertex->Normal = parentVertex->Normal;
+														}
 													}
 												}
 											}
-										}										
+										}
 									}
+									// Link meshes > 0 to parent meshes.
 									else
 									{
-										// Meshes > 0 must be linked with hair parent meshes
-										RendererMesh* parentMesh = moveable.ObjectMeshes[j - 1];
-										RendererBone* parentBone = moveable.LinearizedBones[j - 1];
+										auto* parentMesh = moveable.ObjectMeshes[j - 1];
+										auto* parentBone = moveable.LinearizedBones[j - 1];
 
 										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 										{
-											RendererBucket* parentBucket = &parentMesh->Buckets[b2];
+											auto* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
-												RendererVertex* parentVertex = &m_moveablesVertices[parentBucket->StartVertex + v2];
+												auto* parentVertex = &m_moveablesVertices[parentBucket->StartVertex + v2];
 
-												int x1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
-												int y1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
-												int z1 = m_moveablesVertices[currentBucket->StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
+												int x1 = m_moveablesVertices[currentBucket.StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
+												int y1 = m_moveablesVertices[currentBucket.StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
+												int z1 = m_moveablesVertices[currentBucket.StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
 
 												int x2 = m_moveablesVertices[parentBucket->StartVertex + v2].Position.x + parentBone->GlobalTranslation.x;
 												int y2 = m_moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
@@ -732,8 +780,9 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), m_moveablesVertices.size(), m_moveablesVertices.data());
-		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), m_moveablesIndices.size(), m_moveablesIndices.data());
+
+		m_moveablesVertexBuffer = VertexBuffer(m_device.Get(), (int)m_moveablesVertices.size(), m_moveablesVertices.data());
+		m_moveablesIndexBuffer = IndexBuffer(m_device.Get(), (int)m_moveablesIndices.size(), m_moveablesIndices.data());
 
 		TENLog("Preparing static mesh data...", LogLevel::Info);
 
@@ -742,7 +791,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
 			int objNum = StaticObjectsIds[i];
-			STATIC_INFO* obj = &StaticObjects[objNum];
+			StaticInfo* obj = &StaticObjects[objNum];
 			MESH* mesh = &g_Level.Meshes[obj->meshNumber];
 
 			for (auto& bucket : mesh->buckets)
@@ -751,6 +800,7 @@ namespace TEN::Renderer
 				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
 			}
 		}
+
 		m_staticsVertices.resize(totalVertices);
 		m_staticsIndices.resize(totalIndices);
 
@@ -758,7 +808,7 @@ namespace TEN::Renderer
 		lastIndex = 0;
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
-			STATIC_INFO *obj = &StaticObjects[StaticObjectsIds[i]];
+			StaticInfo*obj = &StaticObjects[StaticObjectsIds[i]];
 			m_staticObjects[StaticObjectsIds[i]] = RendererObject();
 			RendererObject &staticObject = *m_staticObjects[StaticObjectsIds[i]];
 			staticObject.Type = 1;
@@ -774,8 +824,8 @@ namespace TEN::Renderer
 
 		if (m_staticsVertices.size() > 0)
 		{
-			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), m_staticsVertices.size(), m_staticsVertices.data());
-			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), m_staticsIndices.size(), m_staticsIndices.data());
+			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), (int)m_staticsVertices.size(), m_staticsVertices.data());
+			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), (int)m_staticsIndices.size(), m_staticsIndices.data());
 		}
 		else
 		{
@@ -833,7 +883,7 @@ namespace TEN::Renderer
 		mesh->Sphere = meshPtr->sphere;
 		mesh->LightMode = LIGHT_MODES(meshPtr->lightMode);
 
-		if (meshPtr->positions.size() == 0)
+		if (meshPtr->positions.empty())
 			return mesh;
 
 		mesh->Positions.resize(meshPtr->positions.size());
@@ -852,7 +902,7 @@ namespace TEN::Renderer
 			bucket.NumVertices = levelBucket->numQuads * 4 + levelBucket->numTriangles * 3;
 			bucket.NumIndices = levelBucket->numQuads * 6 + levelBucket->numTriangles * 3;
 
-			for (int p = 0; p < levelBucket->polygons.size(); p++)
+			for (int p = 0; p < (int)levelBucket->polygons.size(); p++)
 			{
 				POLYGON* poly = &levelBucket->polygons[p];
 				RendererPolygon newPoly;
@@ -865,7 +915,7 @@ namespace TEN::Renderer
 
 				int baseVertices = *lastVertex;
 
-				for (int k = 0; k < poly->indices.size(); k++)
+				for (int k = 0; k < (int)poly->indices.size(); k++)
 				{
 					RendererVertex vertex;
 					int v = poly->indices[k];
@@ -873,10 +923,18 @@ namespace TEN::Renderer
 					vertex.Position.x = meshPtr->positions[v].x;
 					vertex.Position.y = meshPtr->positions[v].y;
 					vertex.Position.z = meshPtr->positions[v].z;
-
+					 
 					vertex.Normal.x = poly->normals[k].x;
 					vertex.Normal.y = poly->normals[k].y;
 					vertex.Normal.z = poly->normals[k].z;
+
+					vertex.Tangent.x = poly->tangents[k].x;
+					vertex.Tangent.y = poly->tangents[k].y;
+					vertex.Tangent.z = poly->tangents[k].z;
+
+					vertex.Binormal.x = poly->binormals[k].x;
+					vertex.Binormal.y = poly->binormals[k].y;
+					vertex.Binormal.z = poly->binormals[k].z;
 
 					vertex.UV.x = poly->textureCoordinates[k].x;
 					vertex.UV.y = poly->textureCoordinates[k].y;
@@ -890,7 +948,10 @@ namespace TEN::Renderer
 					vertex.OriginalIndex = v;
 
 					vertex.Effects = Vector4(meshPtr->effects[v].x, meshPtr->effects[v].y, meshPtr->effects[v].z, poly->shineStrength);
-					vertex.Hash = std::hash<float>{}(vertex.Position.x) ^ std::hash<float>{}(vertex.Position.y) ^ std::hash<float>{}(vertex.Position.z);
+					vertex.Hash = (unsigned int)std::hash<float>{}
+						(vertex.Position.x) ^
+							(unsigned int)std::hash<float>{}(vertex.Position.y) ^
+							(unsigned int)std::hash<float>{}(vertex.Position.z);
 
 					if (obj->Type == 0)
 						m_moveablesVertices[*lastVertex] = vertex;
@@ -954,4 +1015,3 @@ namespace TEN::Renderer
 		return mesh;
 	}
 }
-

@@ -356,7 +356,7 @@
 		<parameter>
 			<name>speed</name>
 			<type>float</type>
-			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the flash take one second. Clamped to [0.005, 1.0]</description>
+			<description>(default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].</description>
 		</parameter>
 	</parameters>
 </function>
@@ -368,97 +368,8 @@
 	<parameters>
 		<parameter>
 			<name>level</name>
-			<type>Level</type>
+			<type>Flow.Level</type>
 			<description>a level object</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>GetLevel</name>
-	<summary>GetLevel.</summary>
-	<description>Returns the level indicated by the parameter id.</description>
-	<parameters>
-		<parameter>
-			<name>id</name>
-			<type>int</type>
-			<description>of the level</description>
-		</parameter>
-	</parameters>
-	<returns>
-		<return>
-			<type>Level</type>
-			<description>the level indicated by the id</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>GetCurrentLevel</name>
-	<summary>GetCurrentLevel.</summary>
-	<description>Returns the level that the game control is running in that moment.</description>
-	<returns>
-		<return>
-			<type>Level</type>
-			<description>the current level</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>EndLevel</name>
-	<summary>EndLevel.</summary>
-	<description>Finish level, with optional level index provided. If level index is not provided or is zero, jumps
-to next level. If level index is more than level count, jumps to title.</description>
-	<parameters>
-		<parameter>
-			<name>index</name>
-			<type>int</type>
-			<description>(optional) level index.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>GetSecretCount</name>
-	<summary>GetSecretCount.</summary>
-	<description>Returns current game secret count.</description>
-	<returns>
-		<return>
-			<type>Current</type>
-			<description>game secret count.</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>SetSecretCount</name>
-	<summary>SetSecretCount.</summary>
-	<description>Sets current secret count, overwriting existing one.</description>
-	<parameters>
-		<parameter>
-			<name>count</name>
-			<type>int</type>
-			<description>new secret count.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>AddSecret</name>
-	<summary>AddSecret.</summary>
-	<description>Adds one secret to game secret count and also plays secret music track.</description>
-	<parameters>
-		<parameter>
-			<name>index</name>
-			<type>int</type>
-			<description>an index of current level's secret (must be from 0 to 7).</description>
 		</parameter>
 	</parameters>
 </function>
@@ -494,6 +405,150 @@ __(not yet implemented)__</description>
 
 <function>
 	<module>Flow</module>
+	<name>EnableLaraInTitle</name>
+	<summary>Enable or disable Lara drawing in title flyby.</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>enabled</name>
+			<type>bool</type>
+			<description>true or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EnableLevelSelect</name>
+	<summary>Enable or disable level selection in title flyby.</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>enabled</name>
+			<type>bool</type>
+			<description>true or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EnableFlyCheat</name>
+	<summary>Enable or disable DOZY mode (fly cheat).</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>enabled</name>
+			<type>bool</type>
+			<description>true or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EnableMassPickup</name>
+	<summary>Enable or disable mass pickup.</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>enabled</name>
+			<type>bool</type>
+			<description>true or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetLevel</name>
+	<summary>Returns the level by index.</summary>
+	<description>Indices depend on the order in which AddLevel was called; the first added will
+have an ID of 0, the second an ID of 1, and so on.</description>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>of the level</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Flow.Level</type>
+			<description>the level indicated by the id</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetCurrentLevel</name>
+	<summary>Returns the level that the game control is running in that moment.</summary>
+	<returns>
+		<return>
+			<type>Flow.Level</type>
+			<description>the current level</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EndLevel</name>
+	<summary>Finishes the current level, with optional level index provided.</summary>
+	<description>If level index
+is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title.</description>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>level index (default 0)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetSecretCount</name>
+	<summary>Returns the player's current per-game secret count.</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>Current game secret count.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SetSecretCount</name>
+	<summary>Sets the player's current per-game secret count.</summary>
+	<parameters>
+		<parameter>
+			<name>count</name>
+			<type>int</type>
+			<description>new secret count.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>AddSecret</name>
+	<summary>Adds one secret to current level secret count and also plays secret music track.</summary>
+	<description>The index argument corresponds to the secret's unique ID, the same that would go in a secret trigger's Param.</description>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>an index of current level's secret (must be from 0 to 31).</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
 	<name>SetTotalSecretCount</name>
 	<summary>Total number of secrets in game.</summary>
 	<description>Must be an integer value (0 means no secrets).</description>
@@ -508,67 +563,11 @@ __(not yet implemented)__</description>
 
 <function>
 	<module>Flow</module>
-	<name>EnableFlyCheat</name>
-	<summary>Enable or disable DOZY mode (fly cheat).</summary>
-	<description>Must be true or false</description>
-	<parameters>
-		<parameter>
-			<name>true</name>
-			<type>bool</type>
-			<description>or false</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>EnableMassPickup</name>
-	<summary>Enable or disable mass pickup.</summary>
-	<description>Must be true or false</description>
-	<parameters>
-		<parameter>
-			<name>true</name>
-			<type>bool</type>
-			<description>or false</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>EnableLaraInTitle</name>
-	<summary>Enable or disable Lara drawing in title flyby.</summary>
-	<description>Must be true or false</description>
-	<parameters>
-		<parameter>
-			<name>true</name>
-			<type>bool</type>
-			<description>or false</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Flow</module>
-	<name>EnableLevelSelect</name>
-	<summary>Enable or disable level selection in title flyby.</summary>
-	<description>Must be true or false</description>
-	<parameters>
-		<parameter>
-			<name>true</name>
-			<type>bool</type>
-			<description>or false</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Flow</module>
 	<name>SetSettings</name>
 	<parameters>
 		<parameter>
 			<name>settings</name>
-			<type>Settings</type>
+			<type>Flow.Settings</type>
 			<description>a settings object</description>
 		</parameter>
 	</parameters>
@@ -580,7 +579,7 @@ __(not yet implemented)__</description>
 	<parameters>
 		<parameter>
 			<name>animations</name>
-			<type>Animations</type>
+			<type>Flow.Animations</type>
 			<description>an animations object</description>
 		</parameter>
 	</parameters>
@@ -853,7 +852,7 @@ Has no effect if the player has an infinite number of the item.</description>
 		<parameter>
 			<name>func</name>
 			<type>function</type>
-			<description>The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.</description>
+			<description>The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1014,9 +1013,9 @@ eyes of the creatures would be.</description>
 			<description>of track (without file extension) to play</description>
 		</parameter>
 		<parameter>
-			<name>loop</name>
-			<type>bool</type>
-			<description>if true, the track will loop; if false, it won't (default: false)</description>
+			<name>type</name>
+			<type>Misc.SoundTrackType</type>
+			<description>of the audio track to play</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1046,11 +1045,44 @@ eyes of the creatures would be.</description>
 	<summary>Stop audio track that is currently playing</summary>
 	<parameters>
 		<parameter>
-			<name>looped</name>
-			<type>bool</type>
-			<description>if set, stop looped audio track, if not, stop one-shot audio track</description>
+			<name>type</name>
+			<type>Misc.SoundTrackType</type>
+			<description>of the audio track</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>GetAudioTrackLoudness</name>
+	<summary>Get current loudness level for specified track type</summary>
+	<parameters>
+		<parameter>
+			<name>type</name>
+			<type>Misc.SoundTrackType</type>
+			<description>of the audio track</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>current loudness of a specified audio track</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>GetCurrentSubtitle</name>
+	<summary>Get current subtitle string for a voice track currently playing.</summary>
+	<description>Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
+Returns nil if no voice track is playing or no subtitle present.</description>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>current subtitle string</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -1067,6 +1099,32 @@ eyes of the creatures would be.</description>
 			<name>position</name>
 			<type>Vec3</type>
 			<description>The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>IsSoundPlaying</name>
+	<summary>Check if the sound effect is playing</summary>
+	<parameters>
+		<parameter>
+			<name>Sound</name>
+			<type>int</type>
+			<description>ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>IsAudioTrackPlaying</name>
+	<summary>Check if the audio track is playing</summary>
+	<parameters>
+		<parameter>
+			<name>Track</name>
+			<type>string</type>
+			<description>filename to check. Should be without extension and without full directory path.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1207,6 +1265,29 @@ eyes of the creatures would be.</description>
 	<module>Misc</module>
 	<name>ResetObjCamera</name>
 	<summary>Reset object camera back to Lara and deactivate object camera.</summary>
+</function>
+
+<function>
+	<module>Misc</module>
+	<name>PrintLog</name>
+	<summary>Write messages within the Log file</summary>
+	<parameters>
+		<parameter>
+			<name>message</name>
+			<type>string</type>
+			<description>to be displayed within the Log</description>
+		</parameter>
+		<parameter>
+			<name>logLevel</name>
+			<type>Misc.LogLevel</type>
+			<description>log level to be displayed</description>
+		</parameter>
+		<parameter>
+			<name>allowSpam</name>
+			<type>bool</type>
+			<description>true allows spamming of the message</description>
+		</parameter>
+	</parameters>
 </function>
 
 <function>
@@ -1548,12 +1629,12 @@ eyes of the creatures would be.</description>
 	<module>Objects.LaraObject</module>
 	<caller>LaraObject</caller>
 	<name>SetPoison</name>
-	<summary>Set Lara poison potency</summary>
+	<summary>Set Lara poison</summary>
 	<parameters>
 		<parameter>
-			<name>Potency</name>
+			<name>Poison</name>
 			<type>int</type>
-			<description>; maximum value is 64 (default 0)</description>
+			<description>; maximum value is 128 (default 0)</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1628,13 +1709,13 @@ eyes of the creatures would be.</description>
 <function>
 	<module>Objects.LaraObject</module>
 	<caller>LaraObject</caller>
-	<name>SetSprintEnergy</name>
+	<name>SetStamina</name>
 	<summary>Set sprint energy value of Lara</summary>
 	<parameters>
 		<parameter>
-			<name>sprint</name>
+			<name>stamina</name>
 			<type>int</type>
-			<description>energy to give to Lara; maximum value is 120.</description>
+			<description>to give to Lara; maximum value is 120.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1642,8 +1723,8 @@ eyes of the creatures would be.</description>
 <function>
 	<module>Objects.LaraObject</module>
 	<caller>LaraObject</caller>
-	<name>GetSprintEnergy</name>
-	<summary>Get sprint energy value of Lara</summary>
+	<name>GetStamina</name>
+	<summary>Get stamina value of Lara</summary>
 	<returns>
 		<return>
 			<type>int</type>
@@ -2012,7 +2093,7 @@ most can just be ignored (see usage).</description>
 	<parameters>
 		<parameter>
 			<name>ID</name>
-			<type>ObjectID</type>
+			<type>Objects.ObjID</type>
 			<description>the new ID</description>
 		</parameter>
 	</parameters>
@@ -2347,8 +2428,8 @@ most can just be ignored (see usage).</description>
  It cannot be blank and cannot share a name with any existing object.</description>
 	<parameters>
 		<parameter>
-			<name>string</name>
-			<type>name</type>
+			<name>name</name>
+			<type>string</type>
 			<description>the new moveable's name</description>
 		</parameter>
 	</parameters>
@@ -2379,7 +2460,7 @@ most can just be ignored (see usage).</description>
 	<caller>Moveable</caller>
 	<name>Destroy</name>
 	<summary>Destroy the moveable.</summary>
-	<description>This will mean it can no longer be used, except to re-initialise it with another object.</description>
+	<description>This will mean it can no longer be used, except to re-initialize it with another object.</description>
 </function>
 
 <function>
@@ -2439,7 +2520,7 @@ most can just be ignored (see usage).</description>
 		<parameter>
 			<name>func</name>
 			<type>function</type>
-			<description>callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable} taking part in the collision.</description>
+			<description>callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -2531,7 +2612,7 @@ most can just be ignored (see usage).</description>
 	<summary>Get the location value stored in the Enemy AI</summary>
 	<returns>
 		<return>
-			<type>(short)</type>
+			<type>short</type>
 			<description>the value contained in the LocationAI of the creature.</description>
 		</return>
 	</returns>
@@ -2544,9 +2625,9 @@ most can just be ignored (see usage).</description>
 	<summary>Updates the location in the enemy AI with the given value.</summary>
 	<parameters>
 		<parameter>
-			<name>short</name>
-			<type>value:</type>
-			<description>) value to store.</description>
+			<name>value</name>
+			<type>short</type>
+			<description>to store.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -2599,7 +2680,7 @@ most can just be ignored (see usage).</description>
 	<summary>Get the current room of the object</summary>
 	<returns>
 		<return>
-			<type>Room</type>
+			<type>Objects.Room</type>
 			<description>current room of the object</description>
 		</return>
 	</returns>
@@ -2668,7 +2749,7 @@ most can just be ignored (see usage).</description>
 			<description>index of a mesh</description>
 		</parameter>
 		<parameter>
-			<name>visible</name>
+			<name>isVisible</name>
 			<type>bool</type>
 			<description>true if you want the mesh to be visible, false otherwise</description>
 		</parameter>
@@ -3813,7 +3894,7 @@ __Default: empty__</description>
  If false or omitted, this will be the string that's displayed.</description>
 	<returns>
 		<return>
-			<type>String</type>
+			<type>string</type>
 			<description>a string</description>
 		</return>
 	</returns>
@@ -3830,7 +3911,7 @@ __Default: empty__</description>
 	<parameters>
 		<parameter>
 			<name>string</name>
-			<type>String</type>
+			<type>string</type>
 			<description>the new key for the display string</description>
 		</parameter>
 	</parameters>
@@ -3875,6 +3956,35 @@ __Default: empty__</description>
 </function>
 
 <function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>SetFlags</name>
+	<summary>Set the display string's flags</summary>
+	<parameters>
+		<parameter>
+			<name>table</name>
+			<type>table</type>
+			<description>the new table with display flags options</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>SetTranslated</name>
+	<summary>Set translated parameter of the string</summary>
+	<parameters>
+		<parameter>
+			<name>shouldTranslate</name>
+			<type>bool</type>
+			<description>if true, the string's key will be used as the key for the translation that will be displayed.
+ If false, the key itself will be displayed</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
 	<module>Strings</module>
 	<name>ShowString</name>
 	<summary>Show some text on-screen.</summary>
@@ -3910,9 +4020,86 @@ with a call to @{ShowString}, or this function will have no effect.</description
 </function>
 
 <function>
+	<module>Strings</module>
+	<name>IsStringDisplaying</name>
+	<summary>Checks if the string is shown</summary>
+	<parameters>
+		<parameter>
+			<name>str</name>
+			<type>DisplayString</type>
+			<description>the string object to be checked</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if it is shown, false if it is hidden</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<caller>Vec2</caller>
+	<name>ToLength</name>
+	<summary>Modify this vector so that it becomes close to the requested length.</summary>
+	<description>Note that since the engine uses integers instead of floating-point
+numbers, this will be less accurate at smaller lengths.</description>
+	<parameters>
+		<parameter>
+			<name>length</name>
+			<type>float</type>
+			<description>the new length to set the vector to.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<name>Vec2</name>
+	<parameters>
+		<parameter>
+			<name>X</name>
+			<type>int</type>
+			<description>x coordinate</description>
+		</parameter>
+		<parameter>
+			<name>Y</name>
+			<type>int</type>
+			<description>y coordinate</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>A Vec2 object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<name>tostring</name>
+	<summary>Metafunction; use tostring(myVector)</summary>
+	<parameters>
+		<parameter>
+			<name>Vec2</name>
+			<type>Vec2</type>
+			<description>this Vec2</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>A string showing the x, y, and z values of the Vec2</description>
+		</return>
+	</returns>
+</function>
+
+<function>
 	<module>Vec3</module>
 	<caller>Vec3</caller>
-	<name>GetNormalised</name>
+	<name>ToLength</name>
 	<summary>Modify this vector so that it becomes close to the requested length.</summary>
 	<description>Note that since the engine uses integers instead of floating-point
 numbers, this will be less accurate at smaller lengths.
@@ -3922,7 +4109,7 @@ However, this function would return it as (0, 1, 1).</description>
 	<parameters>
 		<parameter>
 			<name>length</name>
-			<type>int</type>
+			<type>float</type>
 			<description>the new length to set the vector to.</description>
 		</parameter>
 	</parameters>
@@ -4253,7 +4440,7 @@ However, this function would return it as (0, 1, 1).</description>
 <function>
 	<module>Timer</module>
 	<caller>myTimer</caller>
-	<name>GetRemainingTime</name>
+	<name>GetTotalTime</name>
 	<summary>Get the total time for a timer.</summary>
 	<description>This is the amount of time the timer will start with, as well as when starting a new loop</description>
 	<returns>

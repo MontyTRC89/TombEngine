@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.0.7 Lua API</title>
+    <title>TombEngine 1.1.0 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -64,6 +64,7 @@
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li>    <a href="../3 primitive classes/Vec2.html">Vec2</a></li>
   <li>    <a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
 <h2>4 Enums</h2>
@@ -72,6 +73,8 @@
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
   <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
   <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
+  <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
+  <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -227,7 +230,7 @@ associated getters and setters.</td>
  e.g.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetName">Moveable:SetName(string)</a></td>
+	<td class="name" ><a href="#Moveable:SetName">Moveable:SetName(name)</a></td>
 	<td class="summary">Set the moveable's name (its unique string identifier)
  e.g.</td>
 	</tr>
@@ -279,7 +282,7 @@ associated getters and setters.</td>
 	<td class="summary">Get the location value stored in the Enemy AI</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetLocationAI">Moveable:SetLocationAI(short)</a></td>
+	<td class="name" ><a href="#Moveable:SetLocationAI">Moveable:SetLocationAI(value)</a></td>
 	<td class="summary">Updates the location in the enemy AI with the given value.</td>
 	</tr>
 	<tr>
@@ -314,7 +317,7 @@ associated getters and setters.</td>
  if it is not visible.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetMeshVisible">Moveable:SetMeshVisible(index, visible)</a></td>
+	<td class="name" ><a href="#Moveable:SetMeshVisible">Moveable:SetMeshVisible(index, isVisible)</a></td>
 	<td class="summary">Makes specified mesh visible or invisible
  Use this to show or hide a specified mesh of an object.</td>
 	</tr>
@@ -663,7 +666,7 @@ baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">ID</span>
-            <span class="types"><span class="type">ObjectID</span></span>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          the new ID
         </li>
     </ul>
@@ -1165,7 +1168,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetName"></a>
-    <strong>Moveable:SetName(string)</strong>
+    <strong>Moveable:SetName(name)</strong>
     </dt>
     <dd>
     Set the moveable's name (its unique string identifier)
@@ -1176,8 +1179,8 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">string</span>
-            <span class="types"><span class="type">name</span></span>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
          the new moveable's name
         </li>
     </ul>
@@ -1219,7 +1222,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
     <strong>Moveable:Destroy()</strong>
     </dt>
     <dd>
-    Destroy the moveable.  This will mean it can no longer be used, except to re-initialise it with another object.
+    Destroy the moveable.  This will mean it can no longer be used, except to re-initialize it with another object.
 
 
 
@@ -1302,7 +1305,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
     <ul>
         <li><span class="parameter">func</span>
             <span class="types"><span class="type">function</span></span>
-         callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a> taking part in the collision.
+         callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a>s taking part in the collision.
         </li>
     </ul>
 
@@ -1455,7 +1458,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">(short)</span></span>
+           <span class="types"><span class="type">short</span></span>
         the value contained in the LocationAI of the creature.
     </ol>
 
@@ -1465,7 +1468,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetLocationAI"></a>
-    <strong>Moveable:SetLocationAI(short)</strong>
+    <strong>Moveable:SetLocationAI(value)</strong>
     </dt>
     <dd>
     Updates the location in the enemy AI with the given value.
@@ -1474,9 +1477,9 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">short</span>
-            <span class="types"><span class="type">value:</span></span>
-        ) value to store.
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">short</span></span>
+         to store.
         </li>
     </ul>
 
@@ -1559,7 +1562,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Room</span></span>
+           <span class="types"><a class="type" href="../2 classes/Objects.Room.html#">Room</a></span>
         current room of the object
     </ol>
 
@@ -1649,7 +1652,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetMeshVisible"></a>
-    <strong>Moveable:SetMeshVisible(index, visible)</strong>
+    <strong>Moveable:SetMeshVisible(index, isVisible)</strong>
     </dt>
     <dd>
     Makes specified mesh visible or invisible
@@ -1663,7 +1666,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
             <span class="types"><span class="type">int</span></span>
          index of a mesh
         </li>
-        <li><span class="parameter">visible</span>
+        <li><span class="parameter">isVisible</span>
             <span class="types"><span class="type">bool</span></span>
          true if you want the mesh to be visible, false otherwise
         </li>
@@ -1856,8 +1859,8 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2023-02-27 14:31:34 </i>
+<i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
+<i style="float:right;">Last updated 2023-07-20 12:10:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -12,12 +12,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
-#define TRAIN_VEL	260
-#define LARA_TRAIN_DEATH_ANIM 3;
+constexpr auto TRAIN_VEL = 260;
 
 long TrainTestHeight(ItemInfo* item, long x, long z, short* roomNumber)
 {
@@ -54,7 +53,7 @@ void TrainControl(short itemNumber)
 	item->Pose.Position.z += item->ItemFlags[1] * cosY;
 
 	short roomNumber;
-	long rh = TrainTestHeight(item, 0, SECTOR(5), &roomNumber);
+	long rh = TrainTestHeight(item, 0, BLOCK(5), &roomNumber);
 	long floorHeight = TrainTestHeight(item, 0, 0, &roomNumber);
 	item->Pose.Position.y = floorHeight;
 
@@ -72,7 +71,7 @@ void TrainControl(short itemNumber)
 
 	item->Pose.Orientation.x = -(rh - floorHeight) * 2;
 
-	TriggerDynamicLight(item->Pose.Position.x + SECTOR(3) * sinY, item->Pose.Position.y, item->Pose.Position.z + SECTOR(3) * cosY, 16, 31, 31, 31);
+	TriggerDynamicLight(item->Pose.Position.x + BLOCK(3) * sinY, item->Pose.Position.y, item->Pose.Position.z + BLOCK(3) * cosY, 16, 31, 31, 31);
 
 	if (item->ItemFlags[1] != TRAIN_VEL)
 	{
@@ -82,8 +81,8 @@ void TrainControl(short itemNumber)
 
 		if (!UseForcedFixedCamera)
 		{
-			ForcedFixedCamera.x = item->Pose.Position.x + SECTOR(8) * sinY;
-			ForcedFixedCamera.z = item->Pose.Position.z + SECTOR(8) * cosY;
+			ForcedFixedCamera.x = item->Pose.Position.x + BLOCK(8) * sinY;
+			ForcedFixedCamera.z = item->Pose.Position.z + BLOCK(8) * cosY;
 
 			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
 
@@ -110,10 +109,7 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	SoundEffect(SFX_TR4_LARA_HIGH_FALL_DEATH, &laraItem->Pose, SoundEnvironment::Always);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
-	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
-	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-	// laraItem->Animation.ActiveState = EXTRA_TRAINKILL;
-	// laraItem->Animation.TargetState = EXTRA_TRAINKILL;
+	SetAnimation(*item, ID_LARA_EXTRA_ANIMS, LEA_TRAIN_DEATH_START);
 	laraItem->Animation.IsAirborne = false;
 	laraItem->Animation.Velocity.y = 0.0f;
 	laraItem->Animation.Velocity.z = 0.0f;
@@ -137,5 +133,5 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	long x = laraItem->Pose.Position.x + CLICK(1) * sinY;
 	long z = laraItem->Pose.Position.z + CLICK(1) * cosY;
 
-	DoLotsOfBlood(x, laraItem->Pose.Position.y - CLICK(2), z, SECTOR(1), item->Pose.Orientation.y, laraItem->RoomNumber, 15);
+	DoLotsOfBlood(x, laraItem->Pose.Position.y - CLICK(2), z, BLOCK(1), item->Pose.Orientation.y, laraItem->RoomNumber, 15);
 }

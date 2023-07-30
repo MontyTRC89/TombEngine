@@ -9,8 +9,8 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Gui;
 
@@ -18,7 +18,7 @@ namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto LAGOON_WITCH_ATTACK_DAMAGE = 100;
 
-	const auto LagoonWitchBite = BiteInfo(Vector3::Zero, 7);
+	const auto LagoonWitchBite = CreatureBiteInfo(Vector3::Zero, 7);
 	const auto LagoonWitchAttackJoints = std::vector<unsigned int>{ 6, 7, 8, 9, 14, 15, 16, 17 };
 
 	enum LagoonWitchState
@@ -36,10 +36,10 @@ namespace TEN::Entities::Creatures::TR5
 		WITCH_ANIM_DEATH = 7
 	};
 
-	void InitialiseLagoonWitch(short itemNumber)
+	void InitializeLagoonWitch(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 1);
 		item->Pose.Position.y += CLICK(2);
 	}
@@ -64,7 +64,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				item->Animation.ActiveState = WITCH_STATE_DEATH;
 				item->Animation.AnimNumber = object->animIndex + WITCH_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->HitPoints = 0;
 			}
 		}
@@ -106,7 +106,7 @@ namespace TEN::Entities::Creatures::TR5
 			case WITCH_STATE_SWIM:
 				creature->MaxTurn = ANGLE(4.0f);
 
-				if (AI.distance < pow(SECTOR(1), 2))
+				if (AI.distance < pow(BLOCK(1), 2))
 					item->Animation.TargetState = WITCH_STATE_IDLE;
 
 				break;
@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (AI.distance < pow(CLICK(3), 2))
 					item->Animation.TargetState = WITCH_STATE_ATTACK;
-				else if (AI.distance > pow(SECTOR(1), 2))
+				else if (AI.distance > pow(BLOCK(1), 2))
 					item->Animation.TargetState = WITCH_STATE_SWIM;
 				else
 					item->Animation.TargetState = WITCH_STATE_IDLE;
@@ -129,7 +129,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (!creature->Flags &&
 					item->TouchBits.Test(LagoonWitchAttackJoints) &&
-					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
+					item->Animation.FrameNumber > GetAnimData(item).frameBase + 29)
 				{
 					DoDamage(creature->Enemy, LAGOON_WITCH_ATTACK_DAMAGE);
 					CreatureEffect2(item, LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);

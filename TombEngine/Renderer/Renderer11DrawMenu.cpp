@@ -8,11 +8,11 @@
 #include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
 #include "Game/savegame.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
@@ -36,13 +36,13 @@ namespace TEN::Renderer
 
 	// Vertical spacing templates
 	constexpr auto MenuVerticalLineSpacing = 30;
-	constexpr auto MenuVerticalNarrowLineSpacing = 25;
+	constexpr auto MenuVerticalNarrowLineSpacing = 24;
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalTop = 15;
+	constexpr auto MenuVerticalTop = 11;
 	constexpr auto MenuVerticalDisplaySettings = 200;
-	constexpr auto MenuVerticalOtherSettings = 150;
+	constexpr auto MenuVerticalOtherSettings = 130;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
@@ -74,7 +74,7 @@ namespace TEN::Renderer
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
 	TEN::Renderer::RendererHudBar* g_SFXVolumeBar	= nullptr;
 
-	void Renderer11::InitialiseMenuBars(int y)
+	void Renderer11::InitializeMenuBars(int y)
 	{
 		static const auto soundSettingColors = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
@@ -99,8 +99,13 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
 	{
+		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = SCREEN_SPACE_RES.x - MenuLeftSideEntry;
+		static const auto LEFT_ARROW_STRING				  = std::string("<");
+		static const auto RIGHT_ARROW_STRING			  = std::string(">");
+		static const auto CONTROL_SETTINGS_BLOCK_Y_OFFSET = (MenuVerticalNarrowLineSpacing * (int)QuickActionStrings.size()) + (MenuVerticalBlockSpacing * 2);
+
 		int y = 0;
-		auto title_option = g_Gui.GetSelectedOption();
+		auto titleOption = g_Gui.GetSelectedOption();
 
 		char stringBuffer[32] = {};
 		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().SelectedScreenResolution];
@@ -110,47 +115,45 @@ namespace TEN::Renderer
 			(g_Gui.GetCurrentSettings().Configuration.ShadowType == ShadowMode::Lara ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
 
 		const char* antialiasMode;
-		switch (g_Gui.GetCurrentSettings().Configuration.Antialiasing)
+		switch (g_Gui.GetCurrentSettings().Configuration.AntialiasingMode)
 		{
-			default:
-			case AntialiasingMode::None:
-				antialiasMode = STRING_ANTIALIASING_NONE;
-				break;
+		default:
+		case AntialiasingMode::None:
+			antialiasMode = STRING_ANTIALIASING_NONE;
+			break;
 
-			case AntialiasingMode::Low:
-				antialiasMode = STRING_ANTIALIASING_LOW;
-				break;
+		case AntialiasingMode::Low:
+			antialiasMode = STRING_ANTIALIASING_LOW;
+			break;
 
-			case AntialiasingMode::Medium:
-				antialiasMode = STRING_ANTIALIASING_MEDIUM;
-				break;
+		case AntialiasingMode::Medium:
+			antialiasMode = STRING_ANTIALIASING_MEDIUM;
+			break;
 
-			case AntialiasingMode::High:
-				antialiasMode = STRING_ANTIALIASING_HIGH;
-				break;
+		case AntialiasingMode::High:
+			antialiasMode = STRING_ANTIALIASING_HIGH;
+			break;
 		}
 
 		switch (menu)
 		{
 		case Menu::Options:
-
 			// Setup needed parameters
 			y = initialY;
 
 			// Display
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 0));
 			GetNextLinePosition(&y);
 
 			// Other options
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OTHER_SETTINGS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 1));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OTHER_SETTINGS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 1));
 			GetNextLinePosition(&y);
 
 			// Controls
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 2));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 2));
 			break;
 
 		case Menu::Display:
-
 			// Setup needed parameters
 			y = MenuVerticalDisplaySettings;
 
@@ -159,40 +162,39 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Screen resolution
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
-			AddString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 0));
+			AddString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(titleOption == 0));
 			GetNextLinePosition(&y);
 
 			// Windowed mode
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOWED), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.Windowed), PRINTSTRING_COLOR_WHITE, SF(title_option == 1));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOWED), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableWindowedMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
 			GetNextLinePosition(&y);
 
 			// Enable dynamic shadows
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SHADOWS), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
-			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(shadowMode), PRINTSTRING_COLOR_WHITE, SF(title_option == 2));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SHADOWS), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
+			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(shadowMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
 			GetNextLinePosition(&y);
 
 			// Enable caustics
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CAUSTICS), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CAUSTICS), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 3));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
 			GetNextLinePosition(&y);
 
 			// Enable antialiasing
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_ANTIALIASING), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
-			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(antialiasMode), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_ANTIALIASING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
+			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(antialiasMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextBlockPosition(&y);
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 5));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 5));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 6));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 6));
 			break;
 
 		case Menu::OtherSettings:
-
 			// Setup needed parameters
 			y = MenuVerticalOtherSettings;
 
@@ -201,91 +203,260 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Enable sound special effects
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_REVERB), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_REVERB), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 0));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(titleOption == 0));
 			GetNextLinePosition(&y);
 
-			// Initialise bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
+			// Initialize bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
 			if (g_MusicVolumeBar == nullptr)
-				InitialiseMenuBars(y);
+				InitializeMenuBars(y);
 
 			// Music volume
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
 			DrawBar(g_Gui.GetCurrentSettings().Configuration.MusicVolume / 100.0f, *g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextLinePosition(&y);
 
 			// Sound FX volume
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SFX_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SFX_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
 			DrawBar(g_Gui.GetCurrentSettings().Configuration.SfxVolume / 100.0f, *g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
+			// Subtitles
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 3));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
+			GetNextLinePosition(&y);
 
 			// Auto targeting
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGET), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextLinePosition(&y);
 
 			// Vibration
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
 			GetNextLinePosition(&y);
 
 			// Thumbstick camera
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(title_option == 5));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			GetNextBlockPosition(&y);
 
-
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 6));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 7));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
 			break;
 
-		case Menu::Controls:
-
-			// Setup needed parameters
-			y = MenuVerticalTop;
-
-			// Title
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_YELLOW, SF_Center());
-			GetNextBlockPosition(&y);
-
-			// Control listing
-			for (int k = 0; k < KEY_COUNT; k++)
+		case Menu::GeneralActions:
 			{
-				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(ControlStrings[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
+				// Set up needed parameters.
+				y = MenuVerticalTop;
 
-				if (g_Gui.GetCurrentSettings().WaitingForKey && title_option == k)
-					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
-				else
+				// Arrows
+				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
+				// Title
+				auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_ACTIONS));
+				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
+				GetNextBlockPosition(&y);
+
+				// General action listing
+				for (int k = 0; k < GeneralActionStrings.size(); k++)
 				{
-					int index = KeyboardLayout[1][k] ? KeyboardLayout[1][k] : KeyboardLayout[0][k];
-					AddString(MenuRightSideEntry, y, (char*)g_KeyNames[index], PRINTSTRING_COLOR_ORANGE, SF(false));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+
+					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					{
+						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+					}
+					else
+					{
+						int index = Bindings[1][k] ? Bindings[1][k] : Bindings[0][k];
+						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+					}
+
+					if (k < (GeneralActionStrings.size() - 1))
+						GetNextNarrowLinePosition(&y);
 				}
 
-				if (k < KEY_COUNT - 1)
-					GetNextNarrowLinePosition(&y);
-				else
-					GetNextBlockPosition(&y);
+				y = CONTROL_SETTINGS_BLOCK_Y_OFFSET;
+
+				// Reset to defaults
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == GeneralActionStrings.size()));
+				GetNextLinePosition(&y);
+
+				// Apply
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralActionStrings.size() + 1)));
+				GetNextLinePosition(&y);
+
+				// Cancel
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralActionStrings.size() + 2)));
+				break;
 			}
 
-			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
-			GetNextLinePosition(&y);
+		case Menu::VehicleActions:
+			{
+				// Set up needed parameters.
+				y = MenuVerticalTop;
 
-			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
-			break;
+				// Arrows
+				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
+				// Title
+				auto titleString = std::string(g_GameFlow->GetString(STRING_VEHICLE_ACTIONS));
+				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
+				GetNextBlockPosition(&y);
+
+				int baseIndex = KEY_ACCELERATE;
+
+				// Vehicle action listing
+				for (int k = 0; k < VehicleActionStrings.size(); k++)
+				{
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+
+					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					{
+						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+					}
+					else
+					{
+						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
+						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+					}
+
+					if (k < (VehicleActionStrings.size() - 1))
+					{
+						GetNextNarrowLinePosition(&y);
+					}
+					else
+					{
+						GetNextBlockPosition(&y);
+					}
+				}
+
+				y = CONTROL_SETTINGS_BLOCK_Y_OFFSET;
+
+				// Reset to defaults
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == VehicleActionStrings.size()));
+				GetNextLinePosition(&y);
+
+				// Apply
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (VehicleActionStrings.size() + 1)));
+				GetNextLinePosition(&y);
+
+				// Cancel
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (VehicleActionStrings.size() + 2)));
+				break;
+			}
+
+		case Menu::QuickActions:
+			{
+				// Set up needed parameters.
+				y = MenuVerticalTop;
+
+				// Arrows
+				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
+				// Title
+				auto titleString = std::string(g_GameFlow->GetString(STRING_QUICK_ACTIONS));
+				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
+				GetNextBlockPosition(&y);
+
+				int baseIndex = KEY_FLARE;
+
+				// Quick action listing
+				for (int k = 0; k < QuickActionStrings.size(); k++)
+				{
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+
+					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					{
+						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+					}
+					else
+					{
+						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
+						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+					}
+
+					if (k < (QuickActionStrings.size() - 1))
+						GetNextNarrowLinePosition(&y);
+				}
+
+				y = CONTROL_SETTINGS_BLOCK_Y_OFFSET;
+
+				// Reset to defaults
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == QuickActionStrings.size()));
+				GetNextLinePosition(&y);
+
+				// Apply
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (QuickActionStrings.size() + 1)));
+				GetNextLinePosition(&y);
+
+				// Cancel
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (QuickActionStrings.size() + 2)));
+				break;
+			}
+
+		case Menu::MenuActions:
+			{
+				// Setup needed parameters.
+				y = MenuVerticalTop;
+
+				// Arrows
+				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
+				// Title
+				auto titleString = std::string(g_GameFlow->GetString(STRING_MENU_ACTIONS));
+				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
+				GetNextBlockPosition(&y);
+
+				int baseIndex = KEY_SELECT;
+
+				// Menu action listing.
+				for (int k = 0; k < MenuActionStrings.size(); k++)
+				{
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+
+					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					{
+						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+					}
+					else
+					{
+						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
+						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+					}
+
+					if (k < (MenuActionStrings.size() - 1))
+						GetNextNarrowLinePosition(&y);
+				}
+
+				y = CONTROL_SETTINGS_BLOCK_Y_OFFSET;
+
+				// Reset to defaults
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == MenuActionStrings.size()));
+				GetNextLinePosition(&y);
+
+				// Apply
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuActionStrings.size() + 1)));
+				GetNextLinePosition(&y);
+
+				// Cancel
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuActionStrings.size() + 2)));
+				break;
+			}
 		}
 	}
 
 	void Renderer11::RenderTitleMenu(Menu menu)
 	{
 		int y = MenuVerticalBottomCenter;
-		auto title_option = g_Gui.GetSelectedOption();
+		auto titleOption = g_Gui.GetSelectedOption();
 
 		// HACK: Check if it works properly -- Lwmte, 07.06.22
 		if (menu == Menu::LoadGame && !g_GameFlow->EnableLoadSave)
@@ -296,19 +467,19 @@ namespace TEN::Renderer
 		case Menu::Title:
 
 			// New game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 0));
 			GetNextLinePosition(&y);
 
 			// Load game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 1));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 1));
 			GetNextLinePosition(&y);
 
 			// Options
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 2));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 2));
 			GetNextLinePosition(&y);
 
 			// Exit game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 3));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 3));
 			break;
 
 		case Menu::LoadGame:
@@ -328,13 +499,16 @@ namespace TEN::Renderer
 			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++)
 			{
 				AddString(MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey.c_str()),
-					PRINTSTRING_COLOR_WHITE, SF_Center(title_option == i - 1));
+					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == i - 1));
 				GetNextNarrowLinePosition(&y);
 			}
 			break;
 
 		case Menu::Options:
-		case Menu::Controls:
+		case Menu::GeneralActions:
+		case Menu::VehicleActions:
+		case Menu::QuickActions:
+		case Menu::MenuActions:
 		case Menu::Display:
 		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
@@ -345,7 +519,7 @@ namespace TEN::Renderer
 	void Renderer11::RenderPauseMenu(Menu menu)
 	{
 		int y = 0;
-		auto pause_option = g_Gui.GetSelectedOption();
+		auto pauseOption = g_Gui.GetSelectedOption();
 
 		switch (g_Gui.GetMenuToDisplay())
 		{
@@ -355,19 +529,19 @@ namespace TEN::Renderer
 			y = MenuVerticalPause;
 
 			// Header
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_PAUSE), PRINTSTRING_COLOR_ORANGE, SF_Center());
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_ACTIONS_PAUSE), PRINTSTRING_COLOR_ORANGE, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Statistics
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_WHITE, SF_Center(pauseOption == 0));
 			GetNextLinePosition(&y);
 
 			// Options
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 1));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(pauseOption == 1));
 			GetNextLinePosition(&y);
 
 			// Exit to title
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 2));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_TO_TITLE), PRINTSTRING_COLOR_WHITE, SF_Center(pauseOption == 2));
 			break;
 
 		case Menu::Statistics:
@@ -375,7 +549,10 @@ namespace TEN::Renderer
 			break;
 
 		case Menu::Options:
-		case Menu::Controls:
+		case Menu::GeneralActions:
+		case Menu::VehicleActions:
+		case Menu::QuickActions:
+		case Menu::MenuActions:
 		case Menu::Display:
 		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsPause);
@@ -398,7 +575,7 @@ namespace TEN::Renderer
 		int y = MenuVerticalLineSpacing;
 		short selection = g_Gui.GetLoadSaveSelection();
 		char stringBuffer[255];
-		LoadSavegameInfos();
+		SaveGame::LoadSavegameInfos();
 
 		// Title
 		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
@@ -565,8 +742,13 @@ namespace TEN::Renderer
 		const auto& object = Objects[objectNumber];
 		if (object.animIndex != -1)
 		{
-			AnimFrame* frame[] = { &g_Level.Frames[g_Level.Anims[object.animIndex].FramePtr] };
-			UpdateAnimation(nullptr, *moveableObject, frame, 0, 0, 0xFFFFFFFF);
+			auto frameData = AnimFrameInterpData
+			{
+				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
+				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
+				0.0f
+			};
+			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
 		}
 
 		auto pos = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
@@ -597,7 +779,7 @@ namespace TEN::Renderer
 
 			// HACK: Rotate compass needle.
 			if (objectNumber == ID_COMPASS_ITEM && n == 1)
-				(*moveableObject).LinearizedBones[n]->ExtraRotation.y = TO_RAD((g_Gui.CompassNeedleAngle) - ANGLE(180.0f));
+				(*moveableObject).LinearizedBones[n]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
 
 			// Construct world matrix.
 			auto tMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));
@@ -628,8 +810,11 @@ namespace TEN::Renderer
 				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
-
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				
+				 if (bucket.BlendMode != BLENDMODE_OPAQUE)
+					Renderer11::SetBlendMode(bucket.BlendMode, true);
+				
 				SetAlphaTest(
 					(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
 					ALPHA_TEST_THRESHOLD);
@@ -768,7 +953,7 @@ namespace TEN::Renderer
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
-		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
+		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
 
 		if (CurrentLevel == 0)
 		{
@@ -832,7 +1017,7 @@ namespace TEN::Renderer
 
 	void Renderer11::SetLoadingScreen(std::wstring& fileName)
 	{
-		SetTextureOrDefault(loadingScreenTexture, fileName);
+		SetTextureOrDefault(m_loadingScreenTexture, fileName);
 	}
 
 	void Renderer11::RenderLoadingScreen(float percentage)
@@ -853,9 +1038,9 @@ namespace TEN::Renderer
 			ResetScissor();
 
 			// Draw the full screen background
-			if (loadingScreenTexture.Texture)
+			if (m_loadingScreenTexture.Texture)
 				DrawFullScreenQuad(
-					loadingScreenTexture.ShaderResourceView.Get(),
+					m_loadingScreenTexture.ShaderResourceView.Get(),
 					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
 
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
@@ -906,42 +1091,44 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::RENDERER_STATS:
-				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
+				PrintDebugMessage("RENDERER STATS");
+				PrintDebugMessage("FPS: %3.2f", m_fps);
 				PrintDebugMessage("Resolution: %d x %d", m_screenWidth, m_screenHeight);
-				PrintDebugMessage("Fps: %3.2f", m_fps);
-				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
-				PrintDebugMessage("Rooms collector time: %d", m_timeRoomsCollector);
+				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);
-				PrintDebugMessage("Total draw calls: %d", m_numDrawCalls);
-				PrintDebugMessage("    For rooms: %d", m_numRoomsDrawCalls);
-				PrintDebugMessage("    For movables: %d", m_numMoveablesDrawCalls);
-				PrintDebugMessage("    For statics: %d", m_numStaticsDrawCalls);
-				PrintDebugMessage("    For sprites: %d", m_numSpritesDrawCalls);
-				PrintDebugMessage("Total triangles: %d", m_numPolygons);
-				PrintDebugMessage("Total sprites: %d", view.spritesToDraw.size());
+				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
+				PrintDebugMessage("Room collector time: %d", m_timeRoomsCollector);
+				PrintDebugMessage("Draw calls: %d", m_numDrawCalls);
+				PrintDebugMessage("    Rooms: %d", m_numRoomsDrawCalls);
+				PrintDebugMessage("    Movables: %d", m_numMoveablesDrawCalls);
+				PrintDebugMessage("    Statics: %d", m_numStaticsDrawCalls);
+				PrintDebugMessage("    Sprites: %d", m_numSpritesDrawCalls);
+				PrintDebugMessage("Triangles: %d", m_numPolygons);
+				PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
-				PrintDebugMessage("    For rooms: %d", m_numRoomsTransparentDrawCalls);
-				PrintDebugMessage("    For movables: %d", m_numMoveablesTransparentDrawCalls);
-				PrintDebugMessage("    For statics: %d", m_numStaticsTransparentDrawCalls);
-				PrintDebugMessage("    For sprites: %d", m_numSpritesTransparentDrawCalls);
+				PrintDebugMessage("    Rooms: %d", m_numRoomsTransparentDrawCalls);
+				PrintDebugMessage("    Movables: %d", m_numMoveablesTransparentDrawCalls);
+				PrintDebugMessage("    Statics: %d", m_numStaticsTransparentDrawCalls);
+				PrintDebugMessage("    Sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
-				PrintDebugMessage("Total rooms transparent polygons: %d", m_numRoomsTransparentPolygons);
-				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				PrintDebugMessage("Transparent room polys: %d", m_numRoomsTransparentPolygons);
+				PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
-				PrintDebugMessage("    dot products: %d", m_dotProducts);
+				PrintDebugMessage("    Dot products: %d", m_dotProducts);
 
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
-				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
-				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/ LaraItem->BoxNumber);
-				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
-				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1), r->z + r->zSize * SECTOR(1));
+				PrintDebugMessage("DIMENSION STATS");
+				PrintDebugMessage("Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+				PrintDebugMessage("Orient: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
+				PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
+				PrintDebugMessage("Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
+				PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
+				PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
+				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * BLOCK(1), r->z + r->zSize * BLOCK(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
@@ -949,19 +1136,21 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:
-				PrintDebugMessage("Lara AnimNumber: %d", LaraItem->Animation.AnimNumber);
-				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
-				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
-				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Lara Velocities: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
-				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
-				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);
-				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
-				PrintDebugMessage("Lara IsAirborne: %d", LaraItem->Animation.IsAirborne);
-				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
+				PrintDebugMessage("PLAYER STATS");
+				PrintDebugMessage("Anim ObjectID: %d", LaraItem->Animation.AnimObjectID);
+				PrintDebugMessage("AnimNumber: %d", LaraItem->Animation.AnimNumber);
+				PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber);
+				PrintDebugMessage("ActiveState: %d", LaraItem->Animation.ActiveState);
+				PrintDebugMessage("TargetState: %d", LaraItem->Animation.TargetState);
+				PrintDebugMessage("Velocity: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
+				PrintDebugMessage("IsAirborne: %d", LaraItem->Animation.IsAirborne);
+				PrintDebugMessage("HandStatus: %d", Lara.Control.HandStatus);
+				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
+				PrintDebugMessage("CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
+				PrintDebugMessage("LOGIC STATS");
 				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				PrintDebugMessage("Move axis vertical: %f", AxisMap[InputAxis::MoveVertical]);
 				PrintDebugMessage("Move axis horizontal: %f", AxisMap[InputAxis::MoveHorizontal]);

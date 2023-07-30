@@ -1,8 +1,12 @@
 #include "framework.h"
 
 #include <algorithm>
+#include <ctime>
+#include <filesystem>
+#include <ScreenGrab.h>
+#include <wincodec.h>
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -10,6 +14,7 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Setup.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
@@ -22,127 +27,126 @@
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
+#include "Math/Math.h"
 #include "Renderer/RenderView/RenderView.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
+#include "Specific/trutils.h"
+
+using namespace TEN::Math;
 
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	using std::pair;
-	using std::vector;
-
-	void Renderer11::UpdateAnimation(RendererItem *item, RendererObject& obj, AnimFrame** frmptr, short frac, short rate, int mask, bool useObjectWorldRotation)
+	void Renderer11::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation)
 	{
-		static std::vector<int> boneIndexList;
-		boneIndexList.clear();
+		static auto boneIndices = std::vector<int>{};
+		boneIndices.clear();
 		
-		RendererBone *Bones[MAX_BONES] = {};
+		RendererBone* bones[MAX_BONES] = {};
 		int nextBone = 0;
 
-		Matrix rotation;
-		
-		auto* transforms = ((item == nullptr) ? obj.AnimationTransforms.data() : &item->AnimationTransforms[0]);
+		auto* transforms = ((rItem == nullptr) ? rObject.AnimationTransforms.data() : &rItem->AnimationTransforms[0]);
 
-		// Push
-		Bones[nextBone++] = obj.Skeleton;
+		// Push.
+		bones[nextBone++] = rObject.Skeleton;
 
 		while (nextBone != 0)
 		{
-			// Pop the last bone in the stack
-			RendererBone *bone = Bones[--nextBone];
-			if (!bone)
-			{
-				return; // Otherwise inventory crashes
-			}
+			// Pop last bone in stack.
+			auto* bonePtr = bones[--nextBone];
 
-			if (frmptr[0]->angles.size() <= bone->Index || (frac && frmptr[1]->angles.size() <= bone->Index))
+			// Check nullptr, otherwise inventory crashes.
+			if (bonePtr == nullptr)
+				return;
+
+			if (frameData.FramePtr0->BoneOrientations.size() <= bonePtr->Index ||
+				(frameData.Alpha != 0.0f && frameData.FramePtr0->BoneOrientations.size() <= bonePtr->Index))
 			{
-				TENLog("Attempt to animate object ID " + GetObjectName((GAME_OBJECT_ID)item->ObjectNumber) +
-					" with incorrect animation data. Bad set of animations for a slot?", LogLevel::Error);
+				TENLog(
+					"Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
+					" using incorrect animation data. Bad animations set for slot?",
+					LogLevel::Error);
+
 				return;
 			}
 
-			bool calculateMatrix = (mask >> bone->Index) & 1;
+			bool calculateMatrix = (mask >> bonePtr->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
-
-				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
+				auto offset0 = frameData.FramePtr0->Offset;
+				auto rotMatrix = Matrix::CreateFromQuaternion(frameData.FramePtr0->BoneOrientations[bonePtr->Index]);
 				
-				if (frac)
+				if (frameData.Alpha != 0.0f)
 				{
-					auto p2 = Vector3(frmptr[1]->offsetX, frmptr[1]->offsetY, frmptr[1]->offsetZ);
-					p = Vector3::Lerp(p, p2, frac / ((float)rate));
+					auto offset1 = frameData.FramePtr1->Offset;
+					offset0 = Vector3::Lerp(offset0, offset1, frameData.Alpha);
 
-					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
+					auto rotMatrix2 = Matrix::CreateFromQuaternion(frameData.FramePtr1->BoneOrientations[bonePtr->Index]);
 
-					Quaternion q1, q2, q3;
+					auto quat1 = Quaternion::CreateFromRotationMatrix(rotMatrix);
+					auto quat2 = Quaternion::CreateFromRotationMatrix(rotMatrix2);
+					auto quat3 = Quaternion::Slerp(quat1, quat2, frameData.Alpha);
 
-					q1 = Quaternion::CreateFromRotationMatrix(rotation);
-					q2 = Quaternion::CreateFromRotationMatrix(rotation2);
-					q3 = Quaternion::Slerp(q1, q2, frac / ((float)rate));
-
-					rotation = Matrix::CreateFromQuaternion(q3);
+					rotMatrix = Matrix::CreateFromQuaternion(quat3);
 				}
 
-				Matrix translation;
-				if (bone == obj.Skeleton)
-					translation = Matrix::CreateTranslation(p.x, p.y, p.z);
+				auto tMatrix = (bonePtr == rObject.Skeleton) ? Matrix::CreateTranslation(offset0) : Matrix::Identity;
 
-				Matrix extraRotation = Matrix::CreateFromYawPitchRoll(bone->ExtraRotation.y, bone->ExtraRotation.x, bone->ExtraRotation.z);
+				auto extraRotMatrix = Matrix::CreateFromQuaternion(bonePtr->ExtraRotation);
 
 				if (useObjectWorldRotation)
 				{
-					Quaternion invertedQuat;
-					auto scale = Vector3{};
-					auto translation = Vector3{};
-					transforms[bone->Parent->Index].Invert().Decompose(scale, invertedQuat, translation);
-					rotation = rotation * extraRotation * Matrix::CreateFromQuaternion(invertedQuat);
+					auto scale = Vector3::Zero;
+					auto inverseQuat = Quaternion::Identity;
+					auto translation = Vector3::Zero;
+					transforms[bonePtr->Parent->Index].Invert().Decompose(scale, inverseQuat, translation);
+
+					rotMatrix = rotMatrix * extraRotMatrix * Matrix::CreateFromQuaternion(inverseQuat);
 				}
 				else
-					rotation = extraRotation * rotation;
+				{
+					rotMatrix = extraRotMatrix * rotMatrix;
+				}
 
-				if (bone != obj.Skeleton)
-					transforms[bone->Index] = rotation * bone->Transform;
+				if (bonePtr != rObject.Skeleton)
+					transforms[bonePtr->Index] = rotMatrix * bonePtr->Transform;
 				else
-					transforms[bone->Index] = rotation * translation;
+					transforms[bonePtr->Index] = rotMatrix * tMatrix;
 
-				if (bone != obj.Skeleton)
-					transforms[bone->Index] = transforms[bone->Index] * transforms[bone->Parent->Index];
+				if (bonePtr != rObject.Skeleton)
+					transforms[bonePtr->Index] = transforms[bonePtr->Index] * transforms[bonePtr->Parent->Index];
 			}
 
-			boneIndexList.push_back(bone->Index);
+			boneIndices.push_back(bonePtr->Index);
 
-			for (int i = 0; i < bone->Children.size(); i++)
-			{
-				// Push
-				Bones[nextBone++] = bone->Children[i];
-			}
+			// Push.
+			for (auto*& child : bonePtr->Children)
+				bones[nextBone++] = child;
 		}
 
-		// Apply mutations on top
-		if (item) 
+		// Apply mutators on top.
+		if (rItem != nullptr) 
 		{
-			auto* nativeItem = &g_Level.Items[item->ItemNumber];
+			const auto& nativeItem = g_Level.Items[rItem->ItemNumber];
 
-			if (nativeItem->Model.Mutator.size() == boneIndexList.size())
+			if (nativeItem.Model.Mutators.size() == boneIndices.size())
 			{
-				for (int i : boneIndexList)
+				for (const int& i : boneIndices)
 				{
-					auto mutator = nativeItem->Model.Mutator[i];
+					const auto& mutator = nativeItem.Model.Mutators[i];
+
 					if (mutator.IsEmpty())
 						continue;
 
-					auto m = Matrix::CreateFromYawPitchRoll(mutator.Rotation.y, mutator.Rotation.x, mutator.Rotation.z);
-					auto s = Matrix::CreateScale(mutator.Scale);
-					auto t = Matrix::CreateTranslation(mutator.Offset);
+					auto rotMatrix = mutator.Rotation.ToRotationMatrix();
+					auto scaleMatrix = Matrix::CreateScale(mutator.Scale);
+					auto tMatrix = Matrix::CreateTranslation(mutator.Offset);
 
-					transforms[i] = m * s * t * transforms[i];
+					transforms[i] = rotMatrix * scaleMatrix * tMatrix * transforms[i];
 				}
 			}
 		}
@@ -182,17 +186,18 @@ namespace TEN::Renderer
 			auto* currentBone = moveableObj.LinearizedBones[j];
 
 			auto prevRotation = currentBone->ExtraRotation;
-			currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
+			currentBone->ExtraRotation = Quaternion::Identity;
 				
 			nativeItem->Data.apply(
 				[&j, &currentBone](QuadBikeInfo& quadBike)
 				{
 					if (j == 3 || j == 4)
-						currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
+					{
+						currentBone->ExtraRotation = EulerAngles(quadBike.RearRot, 0, 0).ToQuaternion();
+					}
 					else if (j == 6 || j == 7)
 					{
-						currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
-						currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
+						currentBone->ExtraRotation = EulerAngles(quadBike.FrontRot, quadBike.TurnRate * 2, 0).ToQuaternion();
 					}
 				},
 				[&j, &currentBone](JeepInfo& jeep)
@@ -200,21 +205,19 @@ namespace TEN::Renderer
 					switch(j)
 					{
 					case 9:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
-						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+						currentBone->ExtraRotation = EulerAngles(jeep.FrontRightWheelRotation, jeep.TurnRate * 4, 0).ToQuaternion();
 						break;
 
 					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
-						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+						currentBone->ExtraRotation = EulerAngles(jeep.FrontLeftWheelRotation, jeep.TurnRate * 4, 0).ToQuaternion();
 						break;
 
 					case 12:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
+						currentBone->ExtraRotation = EulerAngles(jeep.BackRightWheelRotation, 0, 0).ToQuaternion();
 						break;
 
 					case 13:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
+						currentBone->ExtraRotation = EulerAngles(jeep.BackLeftWheelRotation, 0, 0).ToQuaternion();
 						break;
 					}
 				},
@@ -223,85 +226,88 @@ namespace TEN::Renderer
 					switch (j)
 					{
 					case 2:
-						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
-						currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
+						currentBone->ExtraRotation = EulerAngles(bike.RightWheelsRotation, bike.TurnRate * 8, 0).ToQuaternion();
 						break;
 
 					case 4:
-						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+						currentBone->ExtraRotation = EulerAngles(bike.RightWheelsRotation, 0, 0).ToQuaternion();
 						break;
 
-						case 8:
-							currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
-							break;
-						}
-					},
-					[&j, &currentBone, &prevRotation](MinecartInfo& cart)
-					{
-						switch (j)
-						{
-						case 1:
-						case 2:
-						case 3:
-						case 4:
-							currentBone->ExtraRotation.z = TO_RAD((short)std::clamp((int)round(cart.Velocity), 0, (int)ANGLE(25.0f)) + FROM_RAD(prevRotation.z));
-							break;
-						}
-					},
-					[&j, &currentBone](RubberBoatInfo& boat)
-					{
-						if (j == 2)
-							currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
-					},
-					[&j, &currentBone](UpvInfo& upv)
-					{
-						switch (j)
-						{
-						case 1:
-							currentBone->ExtraRotation.x = TO_RAD(upv.LeftRudderRotation);
-							break;
-
-					case 2:
-						currentBone->ExtraRotation.x = TO_RAD(upv.RightRudderRotation);
-						break;
-
-					case 3:
-						currentBone->ExtraRotation.z = TO_RAD(upv.TurbineRotation);
+					case 8:
+						currentBone->ExtraRotation = EulerAngles(bike.LeftWheelRotation, 0, 0).ToQuaternion();
 						break;
 					}
 				},
-				[&j, &currentBone](BigGunInfo& big_gun)
+				[&j, &currentBone, &prevRotation](MinecartInfo& cart)
+				{
+					switch (j)
+					{
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+						short zRot = (short)std::clamp((int)cart.Velocity, 0, (int)ANGLE(25.0f)) + EulerAngles(prevRotation).z;
+						currentBone->ExtraRotation = EulerAngles(0, 0, zRot).ToQuaternion();
+						break;
+					}
+				},
+				[&j, &currentBone](RubberBoatInfo& boat)
 				{
 					if (j == 2)
-						currentBone->ExtraRotation.z = big_gun.BarrelRotation;
+						currentBone->ExtraRotation = EulerAngles(0, 0, boat.PropellerRotation).ToQuaternion();
 				},
-				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+				[&j, &currentBone](UpvInfo& upv)
 				{
+					switch (j)
+					{
+					case 1:
+						currentBone->ExtraRotation = EulerAngles(upv.LeftRudderRotation, 0, 0).ToQuaternion();
+						break;
+
+					case 2:
+						currentBone->ExtraRotation = EulerAngles(upv.RightRudderRotation, 0, 0).ToQuaternion();
+						break;
+
+					case 3:
+						currentBone->ExtraRotation = EulerAngles(0, 0, upv.TurbineRotation).ToQuaternion();
+						break;
+					}
+				},
+				[&j, &currentBone](BigGunInfo& bigGun)
+				{
+					if (j == 2)
+						currentBone->ExtraRotation = EulerAngles(0, 0, FROM_RAD(bigGun.BarrelRotation)).ToQuaternion();
+				},
+					[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+				{
+					auto xRot = Quaternion::Identity;
+					auto yRot = Quaternion::Identity;
+					auto zRot = Quaternion::Identity;
+
 					if (currentBone->ExtraRotationFlags & ROT_Y)
 					{
-						currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
+						yRot = EulerAngles(0, creature.JointRotation[lastJoint], 0).ToQuaternion();
 						lastJoint++;
 					}
 
 					if (currentBone->ExtraRotationFlags & ROT_X)
 					{
-						currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
+						xRot = EulerAngles(creature.JointRotation[lastJoint], 0, 0).ToQuaternion();
 						lastJoint++;
 					}
 
 					if (currentBone->ExtraRotationFlags & ROT_Z)
 					{
-						currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
+						zRot = EulerAngles(0, 0, creature.JointRotation[lastJoint]).ToQuaternion();
 						lastJoint++;
 					}
+
+					currentBone->ExtraRotation = xRot * yRot * zRot;
 				});
 		}
 
-		AnimFrame* framePtr[2];
-		int rate;
-		int frac = GetFrame(nativeItem, framePtr, rate);
-
-		UpdateAnimation(itemToDraw, moveableObj, framePtr, frac, rate, UINT_MAX);
+		auto frameData = GetFrameInterpData(*nativeItem);
+		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX);
 
 		for (int m = 0; m < obj->nmeshes; m++)
 			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
@@ -309,17 +315,14 @@ namespace TEN::Renderer
 
 	void Renderer11::UpdateItemAnimations(RenderView& view)
 	{
-		Matrix translation;
-		Matrix rotation;
-
-		for (auto* room : view.roomsToDraw)
+		for (const auto* room : view.RoomsToDraw)
 		{
-			for (auto* itemToDraw : room->ItemsToDraw)
+			for (const auto* itemToDraw : room->ItemsToDraw)
 			{
-				auto* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
+				const auto& nativeItem = g_Level.Items[itemToDraw->ItemNumber];
 
-				// Lara has her own routine
-				if (nativeItem->ObjectNumber == ID_LARA)
+				// Player has its own routine.
+				if (nativeItem.ObjectNumber == ID_LARA)
 					continue;
 
 				UpdateItemAnimations(itemToDraw->ItemNumber, false);
@@ -331,21 +334,21 @@ namespace TEN::Renderer
 	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
-		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
+		obj->Skeleton->GlobalTranslation = Vector3::Zero;
 		node->GlobalTranslation = node->Translation + parentNode->GlobalTranslation;
 
-		for (int j = 0; j < node->Children.size(); j++)
-			BuildHierarchyRecursive(obj, node->Children[j], node);
+		for (auto* childNode : node->Children)
+			BuildHierarchyRecursive(obj, childNode, node);
 	}
 
 	void Renderer11::BuildHierarchy(RendererObject *obj)
 	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
-		obj->Skeleton->GlobalTranslation = Vector3(0.0f, 0.0f, 0.0f);
+		obj->Skeleton->GlobalTranslation = Vector3::Zero;
 
-		for (int j = 0; j < obj->Skeleton->Children.size(); j++)
-			BuildHierarchyRecursive(obj, obj->Skeleton->Children[j], obj->Skeleton);
+		for (auto* childNode : obj->Skeleton->Children)
+			BuildHierarchyRecursive(obj, childNode, obj->Skeleton);
 	}
 
 	bool Renderer11::IsFullsScreen() 
@@ -359,7 +362,7 @@ namespace TEN::Renderer
 			farView = DEFAULT_FAR_VIEW;
 
 		m_farView = farView;
-		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
+		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 	}
 
 	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
@@ -417,18 +420,25 @@ namespace TEN::Renderer
 
 		if (!itemToDraw->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
+			{
 				UpdateLaraAnimations(false);
+			}
 			else
+			{
 				UpdateItemAnimations(itemNumber, false);
+			}
 		}
 
-		Matrix world;
-
+		auto world = Matrix::Identity;
 		if (worldSpace & SPHERES_SPACE_WORLD)
+		{
 			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+		}
 		else
+		{
 			world = Matrix::Identity * local;
+		}
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
@@ -451,12 +461,12 @@ namespace TEN::Renderer
 			// AddLine3D(v1, v2, Vector4::One);
 		}
 
-		return moveable.ObjectMeshes.size();
+		return (int)moveable.ObjectMeshes.size();
 	}
 
 	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
 	{
-		if (itemNumber == Lara.ItemNumber)
+		if (itemNumber == LaraItem->Index)
 		{
 			auto& object = *m_moveableObjects[ID_LARA];
 			*outMatrix = object.AnimationTransforms[jointIndex] * m_LaraWorldMatrix;
@@ -511,34 +521,32 @@ namespace TEN::Renderer
 		return Vector2i(m_screenWidth, m_screenHeight);
 	}
 
-	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
+	std::optional<Vector2> Renderer11::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
-			gameCamera.camera.WorldPosition.x,
-			gameCamera.camera.WorldPosition.y,
-			gameCamera.camera.WorldPosition.z,
+			gameCamera.Camera.WorldPosition.x,
+			gameCamera.Camera.WorldPosition.y,
+			gameCamera.Camera.WorldPosition.z,
 			1.0f);
 		auto cameraDirection = Vector4(
-			gameCamera.camera.WorldDirection.x,
-			gameCamera.camera.WorldDirection.y,
-			gameCamera.camera.WorldDirection.z,
+			gameCamera.Camera.WorldDirection.x,
+			gameCamera.Camera.WorldDirection.y,
+			gameCamera.Camera.WorldDirection.z,
 			1.0f);
 		
-		// If point is behind camera, return invalid screen space position.
+		// Point is behind camera; return nullopt.
 		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
-			return INVALID_2D_POSITION;
+			return std::nullopt;
 
 		// Calculate clip space coords.
-		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
+		point = Vector4::Transform(point, gameCamera.Camera.ViewProjection);
 
-		// Calculate normalized device coords.
+		// Calculate NDC.
 		point /= point.w;
 
-		// Calculate and return screen space position.
-		return Vector2(
-			((point.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
-			((1.0f - point.y) * SCREEN_SPACE_RES.y) / 2);
+		// Calculate and return 2D position.
+		return TEN::Utils::ConvertNDCTo2DPosition(Vector2(point));
 	}
 
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
@@ -552,7 +560,7 @@ namespace TEN::Renderer
 
 		if (!rendererItem->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
 				UpdateLaraAnimations(false);
 			else
 				UpdateItemAnimations(itemNumber, false);
@@ -563,5 +571,24 @@ namespace TEN::Renderer
 
 		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
+	}
+
+	void Renderer11::SaveScreenshot()
+	{
+		char buffer[64];
+		time_t rawtime;
+
+		time(&rawtime);
+		auto time = localtime(&rawtime);
+		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.png", time);
+
+		auto screenPath = g_GameFlow->GetGameDir() + "Screenshots";
+
+		if (!std::filesystem::is_directory(screenPath))
+			std::filesystem::create_directory(screenPath);
+
+		screenPath += buffer;
+		SaveWICTextureToFile(m_context.Get(), m_backBufferTexture, GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
+			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
 }

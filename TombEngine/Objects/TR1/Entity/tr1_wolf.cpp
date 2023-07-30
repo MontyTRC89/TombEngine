@@ -8,9 +8,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Math;
 
@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto WOLF_RUN_TURN_RATE_MAX	= ANGLE(5.0f);
 	constexpr auto WOLF_STALK_TURN_RATE_MAX = ANGLE(2.0f);
 
-	const auto WolfBite = BiteInfo(Vector3(0.0f, -14.0f, 174.0f), 6);
+	const auto WolfBite = CreatureBiteInfo(Vector3(0, -14, 174), 6);
 	const auto WolfAttackJoints = std::vector<unsigned int>{ 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
 
 	enum WolfState
@@ -58,11 +58,11 @@ namespace TEN::Entities::Creatures::TR1
 		WOLF_ANIM_DEATH = 20,
 	};
 
-	void InitialiseWolf(short itemNumber)
+	void InitializeWolf(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		item->Animation.FrameNumber = WOLF_SLEEP_FRAME;
 	}
 
@@ -83,7 +83,7 @@ namespace TEN::Entities::Creatures::TR1
 			if (item->Animation.ActiveState != WOLF_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = Objects[ID_WOLF].animIndex + WOLF_ANIM_DEATH + (short)(GetRandomControl() / 11000);
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = WOLF_STATE_DEATH;
 			}
 		}
@@ -165,11 +165,11 @@ namespace TEN::Entities::Creatures::TR1
 					item->Animation.TargetState = WOLF_STATE_RUN;
 				else if (AI.distance < pow(345, 2) && AI.bite)
 					item->Animation.TargetState = WOLF_STATE_BITE;
-				else if (AI.distance > pow(SECTOR(3), 2))
+				else if (AI.distance > pow(BLOCK(3), 2))
 					item->Animation.TargetState = WOLF_STATE_RUN;
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2) ||
+					if (!AI.ahead || AI.distance > pow(BLOCK(1.5f), 2) ||
 						(AI.enemyFacing < FRONT_ARC && AI.enemyFacing > -FRONT_ARC))
 					{
 						item->Animation.TargetState = WOLF_STATE_RUN;

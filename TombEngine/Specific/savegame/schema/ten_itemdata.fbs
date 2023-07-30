@@ -1,6 +1,6 @@
 namespace TEN.Save;
 
-struct Position {
+struct Pose {
 	x_pos: int32;
 	y_pos: int32;
 	z_pos: int32;
@@ -15,7 +15,7 @@ table CreatureTarget {
 	box_number: int32;
 	flags: int32;
 	trigger_flags: int32;
-	position: Position;
+	position: Pose;
 }
 
 table Creature {
@@ -33,7 +33,8 @@ table Creature {
 	hurt_by_lara: bool;
 	tosspad: int32;
 	location_ai: int32;
-	fired_weapon: int32;
+	weapon_delay1: int32;
+	weapon_delay2: int32;
 	mood: int32;
 	enemy: int32;
 	ai_target_number: int32;
@@ -92,7 +93,7 @@ table Kayak {
 	right_vertical_velocity: int32;
 	left_right_count: int32;
 	water_height: int32;
-	old_pos: Position;
+	old_pos: Pose;
 	turn: bool;
 	forward: bool;
 	true_water: bool;
@@ -176,7 +177,18 @@ table Float {
 }
 
 table ShortArray {
-    arr: [short];
+	arr: [short];
+}
+
+struct EulerAngles {
+	x: short;
+	y: short;
+	z: short;
+}
+
+struct Vector2 {
+	x: float;
+	y: float;
 }
 
 struct Vector3 {
@@ -205,7 +217,7 @@ union ItemData {
     ulong,
     double,*/
     Int,
-	Short,
+    Short,
     Float,
     ShortArray,
     ItemNumber,

@@ -1,14 +1,15 @@
 #pragma once
 #include "Objects/TR3/Vehicles/kayak_info.h"
-#include "Objects/Utils/VehicleHelpers.h"
 
 struct CollisionInfo;
 struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
+	enum class VehicleMountType;
+
 	KayakInfo& GetKayakInfo(ItemInfo& kayakItem);
-	void InitialiseKayak(short itemNumber);
+	void InitializeKayak(short itemNumber);
 
 	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool KayakControl(ItemInfo& laraItem);

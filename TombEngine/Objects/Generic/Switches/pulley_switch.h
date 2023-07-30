@@ -5,6 +5,6 @@ struct ItemInfo;
 
 namespace TEN::Entities::Switches
 {
-	void InitialisePulleySwitch(short itemNumber);
+	void InitializePulleySwitch(short itemNumber);
 	void PulleySwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 }

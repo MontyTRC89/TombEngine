@@ -7,19 +7,19 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR5
 {
-	const auto InvisibleGhostBite = BiteInfo(Vector3::Zero, 17);
+	const auto InvisibleGhostBite = CreatureBiteInfo(Vector3::Zero, 17);
 
-	void InitialiseInvisibleGhost(short itemNumber)
+	void InitializeInvisibleGhost(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
+		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
 		item->Pose.Position.y += CLICK(2);
 	}
@@ -81,7 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->Animation.ActiveState <= 3 &&
 			!creature->Flags &&
 			item->TouchBits & 0x9470 &&
-			item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
+			item->Animation.FrameNumber > GetAnimData(item).frameBase + 18)
 		{
 			DoDamage(creature->Enemy, 400);
 			CreatureEffect2(item, InvisibleGhostBite, 10, item->Pose.Orientation.y, DoBloodSplat);
@@ -92,7 +92,7 @@ namespace TEN::Entities::Creatures::TR5
 		CreatureJoint(item, 1, joint1);
 		CreatureJoint(item, 2, joint2);
 
-		if (AI.distance >= pow(SECTOR(1.5f), 2))
+		if (AI.distance >= pow(BLOCK(1.5f), 2))
 		{
 			item->AfterDeath = 125;
 			item->ItemFlags[0] = 0;

@@ -8,7 +8,7 @@ struct ItemInfo;
 namespace TEN::Entities::Vehicles
 {
 	UpvInfo& GetUpvInfo(ItemInfo& upvItem);
-	void UpvInitialise(short itemNumber);
+	void UpvInitialize(short itemNumber);
 
 	bool UpvControl(ItemInfo& laraItem, CollisionInfo& coll);
 	void UpvUserControl(ItemInfo& upvItem, ItemInfo& laraItem);

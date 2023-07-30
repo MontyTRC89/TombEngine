@@ -25,7 +25,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
@@ -357,7 +356,7 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			if (IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				ModulateVehicleTurnRateY(upv.TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 				ModulateVehicleLean(upvItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
@@ -393,7 +392,7 @@ namespace TEN::Entities::Vehicles
 					ModulateVehicleTurnRateX(upv.TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
-			if (TrInput & VEHICLE_IN_ACCELERATE)
+			if (IsHeld(In::Accelerate))
 			{
 				if (TrInput & VEHICLE_IN_UP &&
 					upv.Flags & UPV_FLAG_SURFACE &&
@@ -453,7 +452,7 @@ namespace TEN::Entities::Vehicles
 					ModulateVehicleTurnRateX(upv.TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
-			if (TrInput & VEHICLE_IN_DISMOUNT && TestUpvDismount(upvItem, laraItem))
+			if (IsHeld(In::Brake) && TestUpvDismount(upvItem, laraItem))
 			{
 				if (upv.Velocity > 0.0f)
 					upv.Velocity -= UPV_VELOCITY_ACCEL;
@@ -470,7 +469,7 @@ namespace TEN::Entities::Vehicles
 					SoundEffect(SFX_TR3_VEHICLE_UPV_STOP, (Pose*)&upvItem.Pose.Position.x, SoundEnvironment::Always);
 				}
 			}
-			else if (TrInput & VEHICLE_IN_ACCELERATE)
+			else if (IsHeld(In::Accelerate))
 			{
 				if (TrInput & VEHICLE_IN_UP &&
 					upvItem.Pose.Orientation.x > -UPV_X_ORIENT_DIVE_MAX &&
@@ -485,7 +484,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_MOUNT:
-			if (anim == UPV_ANIM_MOUNT_SURFACE_END)
+			if (TestAnimNumber(*laraItem, UPV_ANIM_MOUNT_SURFACE_END))
 			{
 				upvItem.Pose.Position.y += 4;
 				upvItem.Pose.Orientation.x += ANGLE(1.0f);
@@ -508,7 +507,8 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DISMOUNT_UNDERWATER:
-			if (anim == UPV_ANIM_DISMOUNT_UNDERWATER && frame == UPV_DISMOUNT_UNDERWATER_FRAME)
+			if (TestAnimNumber(*laraItem, UPV_ANIM_DISMOUNT_UNDERWATER) &&
+				frame == UPV_DISMOUNT_UNDERWATER_FRAME)
 			{
 				upv.Flags &= ~UPV_FLAG_CONTROL;
 
@@ -545,7 +545,8 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DISMOUNT_WATER_SURFACE:
-			if (anim == UPV_ANIM_DISMOUNT_WATER_SURFACE_END && frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
+			if (TestAnimNumber(*laraItem, UPV_ANIM_DISMOUNT_WATER_SURFACE_END) &&
+				frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
 			{
 				upv.Flags &= ~UPV_FLAG_CONTROL;
 				int waterDepth, waterHeight, heightFromWater;
@@ -590,7 +591,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DEATH:
-			if ((anim == UPV_ANIM_IDLE_DEATH || anim == UPV_ANIM_MOVING_DEATH) &&
+			if ((TestAnimNumber(*laraItem, UPV_ANIM_IDLE_DEATH) || TestAnimNumber(*laraItem, UPV_ANIM_MOVING_DEATH)) &&
 				(frame == UPV_DEATH_FRAME_1 || frame == UPV_DEATH_FRAME_2))
 			{
 				auto vec = GetJointPosition(&laraItem, LM_HIPS);

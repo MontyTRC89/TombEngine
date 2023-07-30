@@ -8,7 +8,7 @@ struct ItemInfo;
 namespace TEN::Entities::Vehicles
 {
 	MinecartInfo& GetMinecartInfo(ItemInfo& minecartItem);
-	void InitialiseMinecart(short itemNumber);
+	void InitializeMinecart(short itemNumber);
 
 	bool MinecartControl(ItemInfo& laraItem);
 	void MinecartUserControl(ItemInfo& minecartItem, ItemInfo& laraItem);

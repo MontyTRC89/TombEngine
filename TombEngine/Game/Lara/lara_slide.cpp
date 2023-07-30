@@ -66,7 +66,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
+		if (IsHeld(In::Jump) && TestLaraSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
@@ -134,7 +134,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(45.0f);
-	Camera.targetAngle = ANGLE(135.0f);
+	//Camera.targetAngle = ANGLE(135.0f); // TODO: Player setting to swivel camera around. -- Sezz 2023.04.09
 
 	if (item->HitPoints <= 0)
 	{
@@ -175,7 +175,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		else
 			ApproachLaraTargetOrientation(item, direction);*/
 
-		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
+		if (IsHeld(In::Jump) && TestLaraSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			StopSoundEffect(SFX_TR4_LARA_SLIPPING);

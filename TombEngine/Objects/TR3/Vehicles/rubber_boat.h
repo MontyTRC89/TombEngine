@@ -8,7 +8,7 @@ struct ItemInfo;
 namespace TEN::Entities::Vehicles
 {
 	RubberBoatInfo& GetRubberBoatInfo(ItemInfo& rBoatItem);
-	void InitialiseRubberBoat(short itemNumber);
+	void InitializeRubberBoat(short itemNumber);
 
 	void RubberBoatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void RubberBoatControl(short itemNumber);

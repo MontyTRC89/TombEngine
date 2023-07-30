@@ -5,13 +5,12 @@
 #include "Game/control/control.h"
 #include "Sound/sound_effects.h"
 
-using std::string;
-
+constexpr auto SOUND_NO_CHANNEL              = -1;
 constexpr auto SOUND_BASS_UNITS              = 1.0f / 1024.0f;	// TR->BASS distance unit coefficient
 constexpr auto SOUND_MAXVOL_RADIUS           = 1024.0f;		// Max. volume hearing distance
 constexpr auto SOUND_OMNIPRESENT_ORIGIN      = Vector3(1.17549e-038f, 1.17549e-038f, 1.17549e-038f);
-constexpr auto SOUND_MAX_SAMPLES             = 8192; // Original was 1024, reallocate original 3-dword DX handle struct to just 1-dword memory pointer
-constexpr auto SOUND_MAX_CHANNELS            = 32; // Original was 24, reallocate original 36-byte struct with 24-byte SoundEffectSlot struct
+constexpr auto SOUND_MAX_SAMPLES             = 8192;
+constexpr auto SOUND_MAX_CHANNELS            = 32;
 constexpr auto SOUND_LEGACY_SOUNDMAP_SIZE    = 450;
 constexpr auto SOUND_NEW_SOUNDMAP_MAX_SIZE   = 4096;
 constexpr auto SOUND_LEGACY_TRACKTABLE_SIZE  = 136;
@@ -22,6 +21,7 @@ constexpr auto SOUND_MAX_PITCH_CHANGE        = 0.09f;
 constexpr auto SOUND_MAX_GAIN_CHANGE         = 0.0625f;
 constexpr auto SOUND_32BIT_SILENCE_LEVEL     = 4.9e-04f;
 constexpr auto SOUND_SAMPLE_FLAGS            = (BASS_SAMPLE_MONO | BASS_SAMPLE_FLOAT);
+constexpr auto SOUND_MILLISECONDS_IN_SECOND  = 1000.0f;
 constexpr auto SOUND_XFADETIME_BGM           = 5000;
 constexpr auto SOUND_XFADETIME_BGM_START     = 1500;
 constexpr auto SOUND_XFADETIME_ONESHOT       = 200;
@@ -31,10 +31,18 @@ constexpr auto SOUND_BGM_DAMP_COEFFICIENT    = 0.5f;
 constexpr auto SOUND_MIN_PARAM_MULTIPLIER    = 0.05f;
 constexpr auto SOUND_MAX_PARAM_MULTIPLIER    = 5.0f;
 
+enum class SoundPauseMode
+{
+	Global,
+	Inventory,
+	Pause
+};
+
 enum class SoundTrackType
 {
 	OneShot,
 	BGM,
+	Voice,
 	Count
 };
 
@@ -89,8 +97,8 @@ struct SoundEffectSlot
 
 struct SoundTrackSlot
 {
-	HSTREAM Channel;
-	std::string Track;
+	HSTREAM Channel { 0 };
+	std::string Track {};
 };
 
 struct SampleInfo
@@ -105,17 +113,17 @@ struct SampleInfo
 
 struct SoundTrackInfo
 {
-	std::string Name{};
-	SoundTrackType Mode{ SoundTrackType::OneShot };
-	int Mask{ 0 };
+	std::string Name {};
+	SoundTrackType Mode { SoundTrackType::OneShot };
+	int Mask { 0 };
 };
 
 struct SoundSourceInfo
 {
-	Vector3i Position = Vector3i::Zero;
-	int		 SoundID = 0;
-	int		 Flags = 0;
-	string	 Name = "";
+	Vector3i	Position = Vector3i::Zero;
+	int			SoundID = 0;
+	int			Flags = 0;
+	std::string	Name {};
 
 	SoundSourceInfo()
 	{
@@ -142,28 +150,29 @@ struct SoundSourceInfo
 
 extern std::map<std::string, int> SoundTrackMap;
 extern std::unordered_map<int, SoundTrackInfo> SoundTracks;
-extern int SecretSoundIndex;
 
 bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition = SoundEnvironment::Land, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();
 void StopAllSounds();
-void PauseAllSounds();
-void ResumeAllSounds();
-
-void PlaySoundTrack(std::string trackName, SoundTrackType mode, QWORD position = 0);
-void PlaySoundTrack(std::string trackName, short mask = 0);
-void PlaySoundTrack(int index, short mask = 0);
-void StopSoundTrack(SoundTrackType mode, int fadeoutTime);
-void StopSoundTracks();
-void ClearSoundTrackMasks();
-void PlaySecretTrack();
+void PauseAllSounds(SoundPauseMode mode);
+void ResumeAllSounds(SoundPauseMode mode);
 void SayNo();
 void PlaySoundSources();
 int  GetShatterSound(int shatterID);
-void EnumerateLegacyTracks();
 
+void PlaySoundTrack(const std::string& trackName, SoundTrackType mode, QWORD position = 0);
+void PlaySoundTrack(const std::string& trackName, short mask = 0);
+void PlaySoundTrack(int index, short mask = 0);
+void StopSoundTrack(SoundTrackType mode, int fadeoutTime);
+void StopSoundTracks(bool excludeAmbience = false);
+void ClearSoundTrackMasks();
+void PlaySecretTrack();
+void EnumerateLegacyTracks();
+void LoadSubtitles(const std::string& path);
+float GetSoundTrackLoudness(SoundTrackType mode);
+std::optional<std::string> GetCurrentSubtitle();
 std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SoundTrackType type);
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
@@ -171,7 +180,7 @@ static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD
 void  SetVolumeMusic(int vol);
 void  SetVolumeFX(int vol);
 
-void  Sound_Init();
+void  Sound_Init(const std::string& gameDirectory);
 void  Sound_DeInit();
 bool  Sound_CheckBASSError(const char* message, bool verbose, ...);
 void  Sound_UpdateScene();
@@ -179,6 +188,7 @@ void  Sound_FreeSample(int index);
 int   Sound_GetFreeSlot();
 void  Sound_FreeSlot(int index, unsigned int fadeout = 0);
 int   Sound_EffectIsPlaying(int effectID, Pose *position);
+int   Sound_TrackIsPlaying(const std::string& fileName);
 float Sound_DistanceToListener(Pose *position);
 float Sound_DistanceToListener(Vector3 position);
 float Sound_Attenuate(float gain, float distance, float radius);

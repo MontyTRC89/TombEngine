@@ -79,6 +79,7 @@ constexpr auto LARA_HEALTH_CRITICAL	  = LARA_HEALTH_MAX / 4;
 constexpr auto LARA_POISON_MAX		  = 128.0f;
 constexpr auto LARA_STAMINA_MAX		  = 120.0f;
 constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
+constexpr auto LARA_STAMINA_MIN       = LARA_STAMINA_MAX / 10;
 
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
 constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
@@ -107,6 +108,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll);
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll);
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll);
 void LaraCheat(ItemInfo* item, CollisionInfo* coll);
-void AnimateLara(ItemInfo* item);
+void AnimateItem(ItemInfo* item);
 void UpdateLara(ItemInfo* item, bool isTitle);
 bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);

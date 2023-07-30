@@ -2,20 +2,20 @@
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 
 #include "Game/animation.h"
-#include "Game/items.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
-using namespace TEN::Floordata;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -40,7 +40,7 @@ namespace TEN::Entities::Generic
 		return (PushableInfo*)item->Data;
 	}
 
-	void InitialisePushableBlock(short itemNumber)
+	void InitializePushableBlock(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		item->Data = PushableInfo();
@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 		if (ocb & 0x40 && (ocb & 0x1F) >= 2)
 		{
 			pushable->hasFloorCeiling = true;
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 			height = (ocb & 0x1F) * CLICK(1);
 		}
 		else
@@ -143,7 +143,7 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		auto* pushable = GetPushableInfo(item);
 
-		Lara.InteractedItem = itemNumber;
+		Lara.Context.InteractedItem = itemNumber;
 
 		auto pos = Vector3i::Zero;
 
@@ -207,10 +207,10 @@ namespace TEN::Entities::Generic
 		switch (LaraItem->Animation.AnimNumber)
 		{
 		case LA_PUSHABLE_PUSH:
-			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= displaceDepth - BLOCK(1);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)
 			{
 				RemoveFromStack(itemNumber);
 				RemoveBridgeStack(itemNumber);
@@ -256,7 +256,7 @@ namespace TEN::Entities::Generic
 
 			MoveStackXZ(itemNumber);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameEnd - 1)
 			{
 				// Check if pushable is about to fall.
 				if (pushable->canFall)
@@ -298,10 +298,10 @@ namespace TEN::Entities::Generic
 			break;
 
 		case LA_PUSHABLE_PULL:
-			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->boundingBox.Z2;
+			displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 			displaceBox -= BLOCK(1) + displaceDepth;
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)
 			{
 				RemoveFromStack(itemNumber);
 				RemoveBridgeStack(itemNumber);
@@ -343,7 +343,7 @@ namespace TEN::Entities::Generic
 
 			MoveStackXZ(itemNumber);
 
-			if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
+			if (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameEnd - 1)
 			{
 				if (IsHeld(In::Action))
 				{
@@ -431,11 +431,11 @@ namespace TEN::Entities::Generic
 			lara->Control.HandStatus != HandStatus::Free ||
 			pushableItem->Status == ITEM_INVISIBLE ||
 			pushableItem->TriggerFlags < 0) &&
-			(!lara->Control.IsMoving || lara->InteractedItem != itemNumber))
+			(!lara->Control.IsMoving || lara->Context.InteractedItem != itemNumber))
 		{
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
-				lara->NextCornerPos.Position.x != itemNumber)
+				lara->Context.NextCornerPos.Position.x != itemNumber)
 			{
 				if (!pushable->hasFloorCeiling)
 					ObjectCollision(itemNumber, laraItem, coll);
@@ -491,7 +491,7 @@ namespace TEN::Entities::Generic
 
 			pushableItem->Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
-			ResetLaraFlex(laraItem);
+			ResetPlayerFlex(laraItem);
 		
 			pushable->moveX = pushableItem->Pose.Position.x;
 			pushable->moveZ = pushableItem->Pose.Position.z;
@@ -539,7 +539,7 @@ namespace TEN::Entities::Generic
 					laraItem->Pose.Orientation = pushableItem->Pose.Orientation;
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Busy;
-					lara->NextCornerPos.Position.x = itemNumber;
+					lara->Context.NextCornerPos.Position.x = itemNumber;
 					pushableItem->Pose.Orientation.y = yOrient;
 				}
 				else
@@ -549,19 +549,19 @@ namespace TEN::Entities::Generic
 						SetAnimation(laraItem, LA_PUSHABLE_GRAB);
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
-						lara->NextCornerPos.Position.x = itemNumber;
+						lara->Context.NextCornerPos.Position.x = itemNumber;
 						pushableItem->Pose.Orientation.y = yOrient;
 					}
 					else
 					{
-						lara->InteractedItem = itemNumber;
+						lara->Context.InteractedItem = itemNumber;
 						pushableItem->Pose.Orientation.y = yOrient;
 					}
 				}
 			}
 			else
 			{
-				if (lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+				if (lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber)
 				{
 					lara->Control.IsMoving = false;
 					lara->Control.HandStatus = HandStatus::Free;
@@ -768,23 +768,25 @@ namespace TEN::Entities::Generic
 			}
 		}
 
+		const auto& frameOffset = GetBestFrame(*LaraItem).Offset;
+
 		auto playerOffset = Vector3i::Zero;
 		switch (quadrant)
 		{
 		case NORTH:
-			playerOffset.z = GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.z = frameOffset.z;
 			break;
 
 		case EAST:
-			playerOffset.x = GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.x = frameOffset.z;
 			break;
 
 		case SOUTH:
-			playerOffset.z = -GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.z = -frameOffset.z;
 			break;
 
 		case WEST:
-			playerOffset.x = -GetBestFrame(LaraItem)->offsetZ;
+			playerOffset.x = -frameOffset.z;
 			break;
 		}
 
@@ -894,13 +896,13 @@ namespace TEN::Entities::Generic
 		const auto* pushable = GetPushableInfo(item);
 
 		if (pushable->hasFloorCeiling)
-			TEN::Floordata::AddBridge(itemNumber);
+			TEN::Collision::Floordata::AddBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
 			if (pushable->hasFloorCeiling)
-				TEN::Floordata::AddBridge(stackIndex);
+				TEN::Collision::Floordata::AddBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
 		}
@@ -912,13 +914,13 @@ namespace TEN::Entities::Generic
 		const auto* pushable = GetPushableInfo(item);
 
 		if (pushable->hasFloorCeiling)
-			TEN::Floordata::RemoveBridge(itemNumber);
+			TEN::Collision::Floordata::RemoveBridge(itemNumber);
 
 		int stackIndex = g_Level.Items[itemNumber].ItemFlags[1];
 		while (stackIndex != NO_ITEM)
 		{
 			if (pushable->hasFloorCeiling)
-				TEN::Floordata::RemoveBridge(stackIndex);
+				TEN::Collision::Floordata::RemoveBridge(stackIndex);
 
 			stackIndex = g_Level.Items[stackIndex].ItemFlags[1];
 		}

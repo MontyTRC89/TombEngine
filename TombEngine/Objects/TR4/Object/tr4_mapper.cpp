@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::TR4
 {
-    void InitialiseMapper(short itemNumber)
+    void InitializeMapper(short itemNumber)
     {
         g_Level.Items[itemNumber].MeshBits = -3;
     }
@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
         if (!TriggerActive(item))
             return;
 
-        if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase >= 200)
+        if (item->Animation.FrameNumber - GetAnimData(item).frameBase >= 200)
         {
             SoundEffect(SFX_TR4_MAPPER_LASER, &item->Pose);
 
@@ -61,7 +61,7 @@ namespace TEN::Entities::TR4
                 spark->zVel = (GetRandomControl() & 0x3FF) - 512;
                 spark->friction = 4;
                 spark->scalar = 2;
-                spark->sSize = spark->size = (GetRandomControl() & 0xF) + 16;
+                spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 16;
                 spark->dSize = (GetRandomControl() & 1) + 3;
                 spark->maxYvel = 0;
                 spark->gravity = (GetRandomControl() & 0x1F) + 32;

@@ -1,6 +1,6 @@
 #pragma once
 #include "Game/GuiObjects.h"
-#include "LanguageScript.h"
+#include "Scripting/Internal/LanguageScript.h"
 #include "Math/Math.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"
@@ -76,7 +76,10 @@ namespace TEN::Gui
 		LoadGame,
 		Options,
 		Display,
-		Controls,
+		GeneralActions,
+		VehicleActions,
+		QuickActions,
+		MenuActions,
 		OtherSettings
 	};
 
@@ -115,7 +118,7 @@ namespace TEN::Gui
 	private:
 		// Input inquirers
 		bool GuiIsPulsed(ActionID actionID) const;
-		bool GuiIsSelected() const;
+		bool GuiIsSelected(bool onClicked = true) const;
 		bool GuiIsDeselected() const;
 		bool CanSelect() const;
 		bool CanDeselect() const;
@@ -126,6 +129,7 @@ namespace TEN::Gui
 		int OptionCount;
 		int SelectedSaveSlot;
 
+		float TimeInMenu = 0.0f;
 		SettingsData CurrentSettings;
 
 		// Inventory variables
@@ -134,9 +138,7 @@ namespace TEN::Gui
 		bool UseItem;
 		char SeperateTypeFlag;
 		char CombineTypeFlag;
-		InventoryRing PCRing1;
-		InventoryRing PCRing2;
-		InventoryRing* Rings[2];
+		InventoryRing Rings[2];
 		int CurrentSelectedOption;
 		bool MenuActive;
 		char AmmoSelectorFlag;
@@ -150,7 +152,6 @@ namespace TEN::Gui
 		short NormalRingFadeVal;
 		short NormalRingFadeDir;
 		unsigned char AmmoActive;
-		int OBJLIST_SPACING;
 		MenuOption CurrentOptions[3];
 		InventoryMode InvMode;
 		int InventoryItemChosen;
@@ -161,6 +162,8 @@ namespace TEN::Gui
 	public:
 		int CompassNeedleAngle;
 
+		void Initialize();
+		bool CallPause();
 		bool CallInventory(ItemInfo* item, bool resetMode);
 		InventoryResult TitleOptions(ItemInfo* item);
 		InventoryResult DoPauseMenu(ItemInfo* item);
@@ -191,6 +194,7 @@ namespace TEN::Gui
 		void SetInventoryMode(InventoryMode mode);
 		void SetEnterInventory(int number);
 		void SetInventoryItemChosen(int number);
+		void SetLastInventoryItem(int itemNumber);
 
 	private:
 		void HandleDisplaySettingsInput(bool fromPauseMenu);
@@ -199,7 +203,7 @@ namespace TEN::Gui
 		void HandleOptionsInput();
 		void BackupOptions();
 		bool DoObjectsCombine(int objectNumber1, int objectNumber2);
-		void InitialiseInventory(ItemInfo* item);
+		void InitializeInventory(ItemInfo* item);
 		void FillDisplayOptions();
 		bool IsItemCurrentlyCombinable(int objectNumber);
 		bool IsItemInInventory(int objectNumber);
@@ -225,5 +229,9 @@ namespace TEN::Gui
 	};
 
 	extern GuiController g_Gui;
-	extern const char* ControlStrings[];
+	extern std::vector<const char*> OptionStrings;
+	extern std::vector<const char*> GeneralActionStrings;
+	extern std::vector<const char*> VehicleActionStrings;
+	extern std::vector<const char*> QuickActionStrings;
+	extern std::vector<const char*> MenuActionStrings;
 }

@@ -11,9 +11,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Specific/setup.h"
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -30,7 +30,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto SMALL_SPIDER_TURN_RATE_MAX = ANGLE(8.0f);
 	constexpr auto BIG_SPIDER_TURN_RATE_MAX	  = ANGLE(4.0f);
 
-	const auto SpiderBite = BiteInfo(Vector3(0.0f, 0.0f, 41.0f), 1);
+	const auto SpiderBite = CreatureBiteInfo(Vector3(0, 0, 41), 1);
 
 	enum SpiderState
 	{
@@ -72,7 +72,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	void DoSpiderBloodEffect(ItemInfo& item)
 	{
-		auto pos = GetJointPosition(&item, SpiderBite.meshNum, SpiderBite.Position);
+		auto pos = GetJointPosition(&item, SpiderBite);
 		DoBloodSplat(pos.x, pos.y, pos.z, 10, item.Pose.Position.y, item.RoomNumber);
 	}
 
@@ -222,7 +222,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != 7)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.FrameNumber = GetAnimData(item).frameBase;
 				item->Animation.ActiveState = 7;
 			}
 		}

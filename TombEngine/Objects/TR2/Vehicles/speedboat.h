@@ -1,14 +1,16 @@
 #pragma once
 #include "Objects/TR2/Vehicles/SpeedboatInfo.h"
-#include "Objects/Utils/VehicleHelpers.h"
 
 struct CollisionInfo;
 struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
+	enum class VehicleImpactType;
+	enum class VehicleMountType;
+
 	SpeedboatInfo& GetSpeedboatInfo(ItemInfo& speedboatItem);
-	void InitialiseSpeedboat(short itemNumber);
+	void InitializeSpeedboat(short itemNumber);
 
 	void SpeedboatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void SpeedboatControl(short itemNumber);

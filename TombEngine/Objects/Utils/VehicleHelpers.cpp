@@ -10,11 +10,11 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
+#include "Game/Setup.h"
 #include "Game/room.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/setup.h"
 
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
@@ -71,10 +71,10 @@ namespace TEN::Entities::Vehicles
 			return VehicleMountType::None;
 
 		// Assess 2D distance to vehicle.
-		float distance2D = Vector2::Distance(
+		float dist2D = Vector2::Distance(
 			Vector2(laraItem.Pose.Position.x, laraItem.Pose.Position.z),
 			Vector2(vehicleItem.Pose.Position.x, vehicleItem.Pose.Position.z));
-		if (distance2D > maxDistance2D)
+		if (dist2D > maxDistance2D)
 			return VehicleMountType::None;
 
 		// Test object collision.
@@ -158,7 +158,7 @@ namespace TEN::Entities::Vehicles
 
 	VehicleDismountType GetVehicleDismountType(ItemInfo& vehicleItem, const std::vector<VehicleDismountType>& allowedDismountTypes, float distance, bool isOnLand)
 	{
-		if (!(TrInput & VEHICLE_IN_BRAKE))
+		if (!IsHeld(In::Brake))
 			return VehicleDismountType::None;
 		
 		// Assess dismount types allowed for vehicle.
@@ -314,6 +314,13 @@ namespace TEN::Entities::Vehicles
 			pos.y = height;
 
 		return height;
+	}
+
+	void SyncVehicleAnimation(ItemInfo& vehicleItem, const ItemInfo& playerItem)
+	{
+		int animNumber = GetAnimNumber(playerItem);
+		int frameNumber = GetFrameNumber(playerItem);
+		SetAnimation(vehicleItem, animNumber, frameNumber);
 	}
 
 	void DoVehicleCollision(ItemInfo& vehicleItem, int radius)
@@ -479,8 +486,7 @@ namespace TEN::Entities::Vehicles
 		if (TestEnvironment(ENV_FLAG_WATER, &vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, &vehicleItem))
 		{
-			float waterDepth = (float)GetWaterDepth(&vehicleItem);
-			float waterHeight = vehicleItem.Pose.Position.y - GetWaterHeight(&vehicleItem);
+			auto waterDepth = (float)GetWaterDepth(&vehicleItem);
 
 			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
 			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
@@ -501,8 +507,8 @@ namespace TEN::Entities::Vehicles
 
 					if (isWater)
 					{
-						int waterHeight = GetWaterHeight(vehicleItem);
-						SpawnVehicleWake(*vehicleItem, wakeOffset, waterHeight);
+						int waterHeight = GetWaterHeight(&vehicleItem);
+						SpawnVehicleWake(vehicleItem, wakeOffset, waterHeight);
 					}
 				}
 
@@ -514,14 +520,15 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
+				int waterHeight = vehicleItem.Pose.Position.y - GetWaterHeight(&vehicleItem);
+
 				if (waterDepth > VEHICLE_WATER_HEIGHT_MAX && waterHeight > VEHICLE_WATER_HEIGHT_MAX)
 				{
 					ExplodeVehicle(laraItem, vehicleItem);
 				}
-				else if (Random::GenerateInt(0, 32) > 25)
+				else if (Random::TestProbability(0.8f))
 				{
 					Splash(&vehicleItem);
-				}
 				}
 			}
 		}
@@ -537,11 +544,14 @@ namespace TEN::Entities::Vehicles
 		if (player.Control.Weapon.GunType != LaraWeaponType::Flare)
 			return;
 
-		CreateFlare(&laraItem, ID_FLARE_ITEM, 0);
-		UndrawFlareMeshes(&laraItem);
-		player.Control.Weapon.GunType = LaraWeaponType::None;
-		player.Control.Weapon.RequestGunType = LaraWeaponType::None;
-		player.Flare.ControlLeft = false;
+		if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
+			UndrawFlareMeshes(laraItem);
+			player.Control.Weapon.GunType = LaraWeaponType::None;
+			player.Control.Weapon.RequestGunType = LaraWeaponType::None;
+			player.Flare.ControlLeft = false;
+		}
 	}
 
 	// TODO: Vehicle turn rates must be affected by speed for more tactile modulation. Slower speed = slower turn rate.
@@ -575,10 +585,8 @@ namespace TEN::Entities::Vehicles
 			int sign = std::copysign(1, turnRate);
 			return (turnRate - (decelRate * sign));
 		}
-		else
-		{
-			return 0;
-		}
+	
+		return 0;
 	}
 
 	void ResetVehicleTurnRateX(short& turnRate, short decelRate)
