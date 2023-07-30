@@ -21,7 +21,7 @@ namespace TEN::Collision::Attractors
 		Type = type;
 		Points = points;
 		RoomNumber = roomNumber;
-		Bounds = Geometry::GetBoundingBox(points);
+		Box = Geometry::GetBoundingBox(points);
 
 		// Cache length if at least 2 points exist.
 		if (points.size() >= 2)
@@ -79,7 +79,7 @@ namespace TEN::Collision::Attractors
 
 	const BoundingBox& Attractor::GetBoundingBox() const
 	{
-		return Bounds;
+		return Box;
 	}
 
 	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const
@@ -289,7 +289,7 @@ namespace TEN::Collision::Attractors
 
 		Points = points;
 		RoomNumber = roomNumber;
-		Bounds = Geometry::GetBoundingBox(points);
+		Box = Geometry::GetBoundingBox(points);
 
 		// Cache length if at least 2 points exist.
 		Length = 0.0f;

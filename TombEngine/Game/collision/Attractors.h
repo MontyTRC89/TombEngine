@@ -49,7 +49,7 @@ namespace TEN::Collision::Attractors
 		std::vector<Vector3> Points		= {};
 		int					 RoomNumber = 0;
 		float				 Length		= 0.0f;
-		BoundingBox			 Bounds		= BoundingBox(); 
+		BoundingBox			 Box		= BoundingBox(); 
 
 		// TODO: Crashes on init.
 		//std::unordered_map<int, ItemInfo&> AttachedPlayers = {};
