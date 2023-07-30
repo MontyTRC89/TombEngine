@@ -122,6 +122,9 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 		auto& player = *GetLaraInfo(laraItem);
 
+		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
+		auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; //0 North, 1 East, 2 South or 3 West.
+
 		if ((IsHeld(In::Action) &&
 			!IsHeld(In::Forward) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
@@ -130,7 +133,8 @@ namespace TEN::Entities::Generic
 			player.Control.HandStatus == HandStatus::Free &&
 			pushableItem.Status != ITEM_INVISIBLE &&
 			pushableItem.TriggerFlags >= 0) && //It requires a positive OCB to can interact with it.
-			pushable.BehaviourState == PushablePhysicState::Idle ||
+			pushable.BehaviourState == PushablePhysicState::Idle && 
+			(pushableSidesAttributes.Pushable || pushableSidesAttributes.Pullable) ||	//Can do any interaction with that side of the pushable?
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))	//It was already interacting with it and is aligning.
 		{
 			//Start Alignment process.

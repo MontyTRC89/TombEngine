@@ -6,6 +6,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
@@ -57,84 +58,27 @@ namespace TEN::Entities::Generic
 			//If Lara is grabbing, check the push pull actions.
 			if (LaraItem->Animation.ActiveState == LS_PUSHABLE_GRAB || TestLastFrame(LaraItem, LA_PUSHABLE_GRAB))
 			{
+				//First checks conditions.
 				bool hasPushAction = IsHeld(In::Forward);
 				bool hasPullAction = IsHeld(In::Back);
 
+				//Cond 1: Is pressing Forward or Back?
 				if (!hasPushAction && !hasPullAction)
 					return;
 
-				/* This segment should go to the scan module.
+				//Cond 2: Can do the interaction with that side of the pushable?
 				int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
+				auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; //0 North, 1 East, 2 South or 3 West.
 
-				bool isQuadrantAvailable = false;
-				auto pos = GameVector(pushableItem.Pose.Position, pushableItem.RoomNumber);
-
-				switch (quadrant)
-				{
-				case NORTH:
-					if (hasPushAction)
-					{
-						isQuadrantAvailable = pushable.SidesMap[NORTH].Pushable;
-						pos.z = pos.z + BLOCK(1);
-					}
-					else if (hasPullAction)
-					{
-						isQuadrantAvailable = pushable.SidesMap[NORTH].Pullable;
-						pos.z = pos.z - BLOCK(1);
-					}
-
-					break;
-
-				case EAST:
-					if (hasPushAction)
-					{
-						isQuadrantAvailable = pushable.SidesMap[EAST].Pushable;
-						pos.x = pos.x + BLOCK(1);
-					}
-					else if (hasPullAction)
-					{
-						isQuadrantAvailable = pushable.SidesMap[EAST].Pullable;
-						pos.x = pos.x - BLOCK(1);
-					}
-
-					break;
-
-				case SOUTH:
-					if (hasPushAction)
-					{
-						isQuadrantAvailable = pushable.SidesMap[SOUTH].Pushable;
-						pos.z = pos.z - BLOCK(1);
-					}
-					else if (hasPullAction)
-					{
-						isQuadrantAvailable = pushable.SidesMap[SOUTH].Pullable;
-						pos.z = pos.z + BLOCK(1);
-					}
-
-					break;
-
-				case WEST:
-					if (hasPushAction)
-					{
-						isQuadrantAvailable = pushable.SidesMap[WEST].Pushable;
-						pos.x = pos.x - BLOCK(1);
-					}
-					else if (hasPullAction)
-					{
-						isQuadrantAvailable = pushable.SidesMap[WEST].Pullable;
-						pos.x = pos.x + BLOCK(1);
-					}
-
-					break;
-				}
-
-				if (!isQuadrantAvailable)
+				if ((hasPushAction && !pushableSidesAttributes.Pushable) ||
+					(hasPullAction && !pushableSidesAttributes.Pullable))
 					return;
 
-					if (!IsNextSectorValid(pushableItem, pos, hasPullAction))
-						return;
-					*/
+				//Cond 3: Does it comply with the room collision conditions?.
+				if (!PushableMovementConditions(itemNumber, hasPushAction, hasPullAction))
+					return;
 
+				//Then Do the interaction.
 				if (hasPushAction)
 				{
 					int pushAnimNumber = PushableAnimInfos[pushable.AnimationSystemIndex].PushAnimNumber;
@@ -335,34 +279,7 @@ namespace TEN::Entities::Generic
 				return;
 			}
 
-			//PENDING, GET NEW TARGET POSITION TO SCAN IF IT'S ALLOWED.
-			/*// Otherwise, just check if action key is still pressed.
-			auto nextPos = GameVector(pushableItem.Pose.Position, pushableItem.RoomNumber);
-
-			// Rotate orientation 180 degrees.
-			if (isPlayerPulling)
-				quadrantDir = (quadrantDir + 2) % 4;
-
-			switch (quadrantDir)
-			{
-			case NORTH:
-				nextPos.z = nextPos.z + BLOCK(1);
-				break;
-
-			case EAST:
-				nextPos.x = nextPos.x + BLOCK(1);
-				break;
-
-			case SOUTH:
-				nextPos.z = nextPos.z - BLOCK(1);
-				break;
-
-			case WEST:
-				nextPos.x = nextPos.x - BLOCK(1);
-				break;
-			}*/
-
-			if (!IsHeld(In::Action)) //&& IsNextSectorValid(pushableItem, nextPos, isPlayerPulling))
+			if (!IsHeld(In::Action) || !PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling))
 			{
 				LaraItem->Animation.TargetState = LS_IDLE;
 				pushable.BehaviourState = PushablePhysicState::Idle;
@@ -419,6 +336,7 @@ namespace TEN::Entities::Generic
 		//TODO: [Effects Requirement] Is there low water? -> Spawn water splash
 
 		//TODO: if it's a slope ground?...
+		//Then proceed to the sliding state.
 	}
 
 	void HandleSinkingState(int itemNumber)
@@ -548,6 +466,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
+		//2. IF IT'S BUOYANT, NEEDS TO FLOAT. (Maybe was on the floor and happened a flipmap that filled the room with water).
 		if (pushable.IsBuoyant)
 		{
 			pushable.Gravity = 0.0f;
@@ -579,6 +498,19 @@ namespace TEN::Entities::Generic
 
 	void HandleSlidingState(int itemNumber)
 	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		//PENDING
+		//1. DETECT FLOOR, (Slope orientation)
+		//2. CALCULATE DIRECTION AND SPEED
+		//3. MOVE OBJECT
+		//4. DETECT END CONDITIONS OF NEXT SECTOR 
+			//	Is a slope-> keep sliding
+			//	Is a flat floor -> so end slide
+			//	Is a fall -> so pass to falling
+			//	Is a forbiden Sector -> freeze the slide
+		//5. Incorporate effects? Smoke or sparkles?
 
 	}
 
