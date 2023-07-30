@@ -408,36 +408,63 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
+	static BoundingBox GenerateBoundingBox(const std::vector<Vector3>& points)
+	{
+		auto maxPoint = Vector3(-INFINITY);
+		auto minPoint = Vector3(INFINITY);
+
+		// Construct AABB.
+		for (const auto& point : points)
+		{
+			maxPoint = Vector3(
+				std::max(maxPoint.x, point.x),
+				std::max(maxPoint.y, point.y),
+				std::max(maxPoint.z, point.z));
+
+			minPoint = Vector3(
+				std::min(minPoint.x, point.x),
+				std::min(minPoint.y, point.y),
+				std::min(minPoint.z, point.z));
+		}
+
+		// Construct and return bounding box.
+		auto center = (minPoint + maxPoint) * 0.5f;
+		auto extents = (maxPoint - minPoint) * 0.5f;
+		return BoundingBox(center, extents);
+	}
+
 	// TODO: TRAE method of a search algorithm incorporating an R-tree might be ideal here, especially in cases where a room
 	// and its immediate neighbours contain hundreds of attractors.
-	// Approximately nearby attractors could be found more efficiently with a simple sphere-box intersection,
-	// avoiding the use of numerous expensive and accurate distance calculations reserved for attractor collision assessment.
 	// Prioritise the current room, then consider intersections with portals to other rooms. Maybe extend distance check to portal
 	// to best account for room loops.
 	// -- Sezz 2023.07.30
 	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
 	{
-		constexpr auto COUNT_MAX = 32;
+		auto sphere = BoundingSphere(refPoint, range);
+		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 
-		// Collect attractor pointers in map sorted by distance.
-		auto nearbyAttracMap = std::multimap<float, const Attractor*>{};
+		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 
 		// Get debug attractors.
 		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
 		for (const auto* attracPtr : debugAttracPtrs)
 		{
-			float dist = attracPtr->GetProximity(refPoint).Distance;
-			if (dist <= range)
-				nearbyAttracMap.insert({ dist, attracPtr });
+			auto box = GenerateBoundingBox(attracPtr->GetPoints());
+			if (sphere.Intersects(box))
+				nearbyAttracPtrs.push_back(attracPtr);
+
+			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 		}
 
 		// Get attractors in current room.
 		const auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
-			float dist = attrac.GetProximity(refPoint).Distance;
-			if (dist <= range)
-				nearbyAttracMap.insert({ dist, &attrac });
+			auto box = GenerateBoundingBox(attrac.GetPoints());
+			if (sphere.Intersects(box))
+				nearbyAttracPtrs.push_back(&attrac);
+
+			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 		}
 
 		// TODO: Check if it actually has search depth of 2.
@@ -447,47 +474,51 @@ namespace TEN::Collision::Attractors
 			const auto& subRoom = g_Level.Rooms[subRoomNumber];
 			for (const auto& attrac : subRoom.Attractors)
 			{
-				float dist = attrac.GetProximity(refPoint).Distance;
-				if (dist <= range)
-					nearbyAttracMap.insert({ dist, &attrac });
+				auto box = GenerateBoundingBox(attrac.GetPoints());
+				if (sphere.Intersects(box))
+					nearbyAttracPtrs.push_back(&attrac);
+
+				g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 			}
 		}
 
 		// Get bridge attractors.
 		for (const auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
 		{
-			float dist = attrac.GetProximity(refPoint).Distance;
-			if (dist <= range)
-				nearbyAttracMap.insert({ dist, &attrac });
+			auto box = GenerateBoundingBox(attrac.GetPoints());
+			if (sphere.Intersects(box))
+				nearbyAttracPtrs.push_back(&attrac);
+
+			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 		}
 
-		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
-		nearbyAttracPtrs.reserve(std::max((int)nearbyAttracMap.size(), COUNT_MAX));
-
-		// Move attractor pointers to capped vector.
-		auto it = nearbyAttracMap.begin();
-		for (int i = 0; i < COUNT_MAX && it != nearbyAttracMap.end(); i++, it++)
-			nearbyAttracPtrs.push_back(std::move(it->second));
-
-		// Return attractor pointers sorted by distance.
+		// Return attractor pointers found in sphere-AABB test.
 		return nearbyAttracPtrs;
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
 															   const Vector3& refPoint, float range)
 	{
+		constexpr auto COUNT_MAX = 32;
+
 		// Get nearby attractor pointers.
 		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(refPoint, roomNumber, range);
 
-		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(nearbyAttracPtrs.size());
-
-		// Get attractor collisions.
+		// Get attractor collisions sorted by distance.
+		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
 		for (const auto& attracPtr : nearbyAttracPtrs)
 		{
 			auto attracColl = attracPtr->GetCollision(basePos, orient, refPoint, range);
-			attracColls.push_back(attracColl);
+			attracCollMap.insert({ attracColl.Proximity.Distance, attracColl });
 		}
+
+		auto attracColls = std::vector<AttractorCollisionData>{};
+		attracColls.reserve(std::max((int)nearbyAttracPtrs.size(), COUNT_MAX));
+
+		// Move attractor collisions from map to capped vector.
+		auto it = attracCollMap.begin();
+		for (int i = 0; i < COUNT_MAX && it != attracCollMap.end(); i++, it++)
+			attracColls.push_back(std::move(it->second));
 
 		// Return attractor collisions.
 		return attracColls;
