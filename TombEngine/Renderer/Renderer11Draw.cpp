@@ -766,21 +766,44 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 	}
 
-	void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
+	void Renderer11::AddLine3D(const Vector3& target, const Vector3& origin, const Vector4& color)
 	{
 		if (m_Locked)
 			return;
 
 		RendererLine3D line;
 
-		line.Start = start;
-		line.End = end;
+		line.Start = target;
+		line.End = origin;
 		line.Color = color;
 
 		m_lines3DToDraw.push_back(line);
 	}
 
-	void Renderer11::AddSphere(Vector3 center, float radius, Vector4 color)
+	void Renderer11::AddReticle(const Vector3& center, float radius, const Vector4& color)
+	{
+		auto origin0 = center + Vector3(radius, 0.0f, 0.0f);
+		auto target0 = center + Vector3(-radius, 0.0f, 0.0f);
+		AddLine3D(origin0, target0, color);
+
+		auto origin1 = center + Vector3(0.0f, radius, 0.0f);
+		auto target1 = center + Vector3(0.0f, -radius, 0.0f);
+		AddLine3D(origin1, target1, color);
+
+		auto origin2 = center + Vector3(0.0f, 0.0f, radius);
+		auto target2 = center + Vector3(0.0f, 0.0f, -radius);
+		AddLine3D(origin2, target2, color);
+	}
+
+	void Renderer11::AddDebugReticle(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page)
+	{
+		if (!DebugMode || DebugPage != page)
+			return;
+
+		AddReticle(center, radius, color);
+	}
+
+	void Renderer11::AddSphere(const Vector3& center, float radius, const Vector4& color)
 	{
 		if (m_Locked)
 			return;
@@ -816,7 +839,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RendererDebugPage page)
+	void Renderer11::AddDebugSphere(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page)
 	{
 		if (!DebugMode || DebugPage != page)
 			return;
@@ -824,7 +847,7 @@ namespace TEN::Renderer
 		AddSphere(center, radius, color);
 	}
 
-	void Renderer11::AddBox(Vector3* corners, Vector4 color)
+	void Renderer11::AddBox(Vector3* corners, const Vector4& color)
 	{
 		if (m_Locked)
 			return;
@@ -880,7 +903,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::AddBox(Vector3 min, Vector3 max, Vector4 color)
+	void Renderer11::AddBox(const Vector3 min, const Vector3& max, const Vector4& color)
 	{
 		if (m_Locked)
 			return;
@@ -936,7 +959,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RendererDebugPage page)
+	void Renderer11::AddDebugBox(const BoundingOrientedBox& box, const Vector4& color, RendererDebugPage page)
 	{
 		if (!DebugMode || DebugPage != page)
 			return;
@@ -946,7 +969,7 @@ namespace TEN::Renderer
 		AddBox(corners, color);
 	}
 
-	void Renderer11::AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RendererDebugPage page)
+	void Renderer11::AddDebugBox(const Vector3& min, const Vector3& max, const Vector4& color, RendererDebugPage page)
 	{
 		if (DebugPage != page)
 			return;
