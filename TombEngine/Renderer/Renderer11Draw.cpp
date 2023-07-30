@@ -805,36 +805,39 @@ namespace TEN::Renderer
 
 	void Renderer11::AddSphere(const Vector3& center, float radius, const Vector4& color)
 	{
+		constexpr auto AXIS_COUNT		 = 3;
+		constexpr auto SUBDIVISION_COUNT = 32;
+		constexpr auto STEP_COUNT		 = 4;
+		constexpr auto STEP_ANGLE		 = PI / STEP_COUNT;
+
 		if (m_Locked)
 			return;
 
-		constexpr auto subdivisions = 10;
-		constexpr auto steps = 6;
-		constexpr auto step = PI / steps;
+		auto prevPoints = std::array<Vector3, AXIS_COUNT>{};
 
-		std::array<Vector3, 3> prevPoint;
-
-		for (int s = 0; s < steps; s++)
+		for (int i = 0; i < STEP_COUNT; i++)
 		{
-			auto x = sin(step * (float)s) * radius;
-			auto z = cos(step * (float)s) * radius;
-			float currAngle = 0.0f;
+			float x = sin(STEP_ANGLE * i) * radius;
+			float z = cos(STEP_ANGLE * i) * radius;
+			float angle = 0.0f;
 
-			for (int i = 0; i < subdivisions; i++)
+			for (int j = 0; j < SUBDIVISION_COUNT; j++)
 			{
-				std::array<Vector3, 3> point =
+				auto points = std::array<Vector3, AXIS_COUNT>
 				{
-					center + Vector3(sin(currAngle) * abs(x), z, cos(currAngle) * abs(x)),
-					center + Vector3(cos(currAngle) * abs(x), sin(currAngle) * abs(x), z),
-					center + Vector3(z, sin(currAngle) * abs(x), cos(currAngle) * abs(x))
+					center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
+					center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
+					center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
 				};
 
-				if (i > 0)
-					for (int p = 0; p < 3; p++)
-						AddLine3D(prevPoint[p], point[p], color);
+				if (j > 0)
+				{
+					for (int k = 0; k < points.size(); k++)
+						AddLine3D(prevPoints[k], points[k], color);
+				}
 
-				prevPoint = point;
-				currAngle += ((PI * 2) / (subdivisions - 1));
+				prevPoints = points;
+				angle += PI_MUL_2 / (SUBDIVISION_COUNT - 1);
 			}
 		}
 	}
