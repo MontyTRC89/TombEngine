@@ -90,7 +90,6 @@ namespace TEN::Entities::Generic
 
 		// Call the state handler function based on the current state (Functions in PushableObject_Physics class).
 		auto stateHandlerIterator = PUSHABLES_STATES_MAP.find(pushable.BehaviourState);
-		//TENLog("Pushable Behaviour State: " + std::to_string(static_cast<int>(pushable.BehaviourState)), LogLevel::Error, LogConfig::All, true);
 		if (stateHandlerIterator != PUSHABLES_STATES_MAP.end())
 		{
 			stateHandlerIterator->second(itemNumber);
@@ -101,9 +100,9 @@ namespace TEN::Entities::Generic
 		}
 
 		// Do sound effects.
-		//PushablesManageSounds(itemNumber, pushable);
+		PushablesManageSounds(itemNumber, pushable);
 
-		//Update Room
+		//Update Room Number
 		int probedRoomNumber = GetCollision(&pushableItem).RoomNumber;
 		if (pushableItem.RoomNumber != probedRoomNumber)
 		{
@@ -131,8 +130,7 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			!laraItem->Animation.IsAirborne &&
 			player.Control.HandStatus == HandStatus::Free &&
-			pushableItem.Status != ITEM_INVISIBLE &&
-			pushableItem.TriggerFlags >= 0) && //It requires a positive OCB to can interact with it.
+			IsPushableValid(itemNumber)) &&
 			pushable.BehaviourState == PushablePhysicState::Idle && 
 			(pushableSidesAttributes.Pushable || pushableSidesAttributes.Pullable) ||	//Can do any interaction with that side of the pushable?
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))	//It was already interacting with it and is aligning.

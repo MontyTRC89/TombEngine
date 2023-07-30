@@ -50,8 +50,6 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//TENLog("STATE: IDLE for " + std::to_string(static_cast<int>(itemNumber)), LogLevel::Error, LogConfig::All, true);
-
 		//1. CHECK IF LARA IS INTERACTING WITH IT.
 		if (Lara.Context.InteractedItem == itemNumber)
 		{

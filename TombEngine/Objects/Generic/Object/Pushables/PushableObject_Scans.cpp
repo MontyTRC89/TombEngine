@@ -17,6 +17,9 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
+		if (pushableItem.Status == ITEM_INVISIBLE || pushableItem.TriggerFlags < 0) //It requires a positive OCB to can interact with it.
+			return false;
+
 		auto collisionResult = CollisionResult{};
 
 		if (pushable.UsesRoomCollision)
@@ -44,11 +47,6 @@ namespace TEN::Entities::Generic
 
 	bool IsPushableObjectMoveAllowed(int itemNumber, Vector3i targetPos, int targetRoom)
 	{
-		// First check if the pushable is valid.
-		if (!IsPushableValid(itemNumber))
-			return false;
-
-
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
@@ -140,19 +138,19 @@ namespace TEN::Entities::Generic
 		switch (quadrant)
 		{
 		case NORTH:
-			playerOffset.z = GetBestFrame(*LaraItem).Offset.z + BLOCK(1);
+			playerOffset.z = GetBestFrame(*LaraItem).Offset.z - BLOCK(1);
 			break;
 
 		case EAST:
-			playerOffset.x = GetBestFrame(*LaraItem).Offset.z + BLOCK(1);
+			playerOffset.x = GetBestFrame(*LaraItem).Offset.z - BLOCK(1);
 			break;
 
 		case SOUTH:
-			playerOffset.z = -GetBestFrame(*LaraItem).Offset.z - BLOCK(1);
+			playerOffset.z = -GetBestFrame(*LaraItem).Offset.z + BLOCK(1);
 			break;
 
 		case WEST:
-			playerOffset.x = -GetBestFrame(*LaraItem).Offset.z - BLOCK(1);
+			playerOffset.x = -GetBestFrame(*LaraItem).Offset.z + BLOCK(1);
 			break;
 
 		default:
