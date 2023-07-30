@@ -21,6 +21,7 @@ namespace TEN::Collision::Attractors
 		Type = type;
 		Points = points;
 		RoomNumber = roomNumber;
+		Bounds = Geometry::GetBoundingBox(points);
 
 		// Cache length if at least 2 points exist.
 		if (points.size() >= 2)
@@ -74,6 +75,11 @@ namespace TEN::Collision::Attractors
 	float Attractor::GetLength() const
 	{
 		return Length;
+	}
+
+	const BoundingBox& Attractor::GetBoundingBox() const
+	{
+		return Bounds;
 	}
 
 	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const
@@ -283,6 +289,7 @@ namespace TEN::Collision::Attractors
 
 		Points = points;
 		RoomNumber = roomNumber;
+		Bounds = Geometry::GetBoundingBox(points);
 
 		// Cache length if at least 2 points exist.
 		Length = 0.0f;
@@ -414,8 +421,7 @@ namespace TEN::Collision::Attractors
 		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
 		for (const auto* attracPtr : debugAttracPtrs)
 		{
-			auto box = Geometry::GetBoundingBox(attracPtr->GetPoints());
-			if (sphere.Intersects(box))
+			if (sphere.Intersects(attracPtr->GetBoundingBox()))
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
@@ -423,8 +429,7 @@ namespace TEN::Collision::Attractors
 		const auto& room = g_Level.Rooms[roomNumber];
 		for (const auto& attrac : room.Attractors)
 		{
-			auto box = Geometry::GetBoundingBox(attrac.GetPoints());
-			if (sphere.Intersects(box))
+			if (sphere.Intersects(attrac.GetBoundingBox()))
 				nearbyAttracPtrs.push_back(&attrac);
 		}
 
@@ -435,8 +440,7 @@ namespace TEN::Collision::Attractors
 			const auto& subRoom = g_Level.Rooms[subRoomNumber];
 			for (const auto& attrac : subRoom.Attractors)
 			{
-				auto box = Geometry::GetBoundingBox(attrac.GetPoints());
-				if (sphere.Intersects(box))
+				if (sphere.Intersects(attrac.GetBoundingBox()))
 					nearbyAttracPtrs.push_back(&attrac);
 			}
 		}
@@ -444,15 +448,14 @@ namespace TEN::Collision::Attractors
 		// Get bridge attractors.
 		for (const auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
 		{
-			auto box = Geometry::GetBoundingBox(attrac.GetPoints());
-			if (sphere.Intersects(box))
+			if (sphere.Intersects(attrac.GetBoundingBox()))
 				nearbyAttracPtrs.push_back(&attrac);
 		}
 
 		// Draw debug.
 		for (const auto* attracPtr : nearbyAttracPtrs)
 		{
-			auto box = Geometry::GetBoundingBox(attracPtr->GetPoints());
+			const auto& box = attracPtr->GetBoundingBox();
 			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 			g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
 		}
