@@ -766,21 +766,21 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 	}
 
-	void Renderer11::AddLine3D(const Vector3& origin, const Vector3& target, const Vector4& color)
+	void Renderer11::AddLine3D(const Vector3& target, const Vector3& origin, const Vector4& color)
 	{
 		if (m_Locked)
 			return;
 
 		RendererLine3D line;
 
-		line.Start = origin;
-		line.End = target;
+		line.Start = target;
+		line.End = origin;
 		line.Color = color;
 
 		m_lines3DToDraw.push_back(line);
 	}
 
-	void Renderer11::AddReticle(const Vector3& center, const Vector4& color, float radius)
+	void Renderer11::AddReticle(const Vector3& center, float radius, const Vector4& color)
 	{
 		auto origin0 = center + Vector3(radius, 0.0f, 0.0f);
 		auto target0 = center + Vector3(-radius, 0.0f, 0.0f);
@@ -795,59 +795,62 @@ namespace TEN::Renderer
 		AddLine3D(origin2, target2, color);
 	}
 
-	void Renderer11::AddDebugReticle(const Vector3& center, const Vector4& color, float radius, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugReticle(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page)
 	{
-		if (!DebugMode || m_numDebugPage != page)
+		if (!DebugMode || DebugPage != page)
 			return;
 
-		AddReticle(center, color, radius);
+		AddReticle(center, radius, color);
 	}
 
-	void Renderer11::AddSphere(Vector3 center, float radius, Vector4 color)
+	void Renderer11::AddSphere(const Vector3& center, float radius, const Vector4& color)
 	{
+		constexpr auto AXIS_COUNT		 = 3;
+		constexpr auto SUBDIVISION_COUNT = 32;
+		constexpr auto STEP_COUNT		 = 4;
+		constexpr auto STEP_ANGLE		 = PI / STEP_COUNT;
+
 		if (m_Locked)
 			return;
 
-		constexpr auto subdivisions = 10;
-		constexpr auto steps = 6;
-		constexpr auto step = PI / steps;
+		auto prevPoints = std::array<Vector3, AXIS_COUNT>{};
 
-		std::array<Vector3, 3> prevPoint;
-
-		for (int s = 0; s < steps; s++)
+		for (int i = 0; i < STEP_COUNT; i++)
 		{
-			auto x = sin(step * (float)s) * radius;
-			auto z = cos(step * (float)s) * radius;
-			float currAngle = 0.0f;
+			float x = sin(STEP_ANGLE * i) * radius;
+			float z = cos(STEP_ANGLE * i) * radius;
+			float angle = 0.0f;
 
-			for (int i = 0; i < subdivisions; i++)
+			for (int j = 0; j < SUBDIVISION_COUNT; j++)
 			{
-				std::array<Vector3, 3> point =
+				auto points = std::array<Vector3, AXIS_COUNT>
 				{
-					center + Vector3(sin(currAngle) * abs(x), z, cos(currAngle) * abs(x)),
-					center + Vector3(cos(currAngle) * abs(x), sin(currAngle) * abs(x), z),
-					center + Vector3(z, sin(currAngle) * abs(x), cos(currAngle) * abs(x))
+					center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
+					center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
+					center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
 				};
 
-				if (i > 0)
-					for (int p = 0; p < 3; p++)
-						AddLine3D(prevPoint[p], point[p], color);
+				if (j > 0)
+				{
+					for (int k = 0; k < points.size(); k++)
+						AddLine3D(prevPoints[k], points[k], color);
+				}
 
-				prevPoint = point;
-				currAngle += ((PI * 2) / (subdivisions - 1));
+				prevPoints = points;
+				angle += PI_MUL_2 / (SUBDIVISION_COUNT - 1);
 			}
 		}
 	}
 
-	void Renderer11::AddDebugSphere(Vector3 center, float radius, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugSphere(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page)
 	{
-		if (!DebugMode || m_numDebugPage != page)
+		if (!DebugMode || DebugPage != page)
 			return;
 
 		AddSphere(center, radius, color);
 	}
 
-	void Renderer11::AddBox(Vector3* corners, Vector4 color)
+	void Renderer11::AddBox(Vector3* corners, const Vector4& color)
 	{
 		if (m_Locked)
 			return;
@@ -903,7 +906,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::AddBox(Vector3 min, Vector3 max, Vector4 color)
+	void Renderer11::AddBox(const Vector3 min, const Vector3& max, const Vector4& color)
 	{
 		if (m_Locked)
 			return;
@@ -968,9 +971,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::AddDebugBox(BoundingOrientedBox box, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugBox(const BoundingOrientedBox& box, const Vector4& color, RendererDebugPage page)
 	{
-		if (!DebugMode || m_numDebugPage != page)
+		if (!DebugMode || DebugPage != page)
 			return;
 
 		Vector3 corners[8];
@@ -978,10 +981,11 @@ namespace TEN::Renderer
 		AddBox(corners, color);
 	}
 
-	void Renderer11::AddDebugBox(Vector3 min, Vector3 max, Vector4 color, RENDERER_DEBUG_PAGE page)
+	void Renderer11::AddDebugBox(const Vector3& min, const Vector3& max, const Vector4& color, RendererDebugPage page)
 	{
-		if (m_numDebugPage != page)
+		if (DebugPage != page)
 			return;
+
 		AddBox(min, max, color);
 	}
 

@@ -314,7 +314,7 @@ namespace TEN::Collision::Attractors
 		constexpr auto SPHERE_SCALE			 = 15.0f;
 		constexpr auto COLOR_GREEN			 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
 		constexpr auto COLOR_YELLOW			 = Vector4(1.0f, 1.0f, 0.4f, 1.0f);
-		constexpr auto DEBUG_PAGE			 = RENDERER_DEBUG_PAGE::LARA_STATS;
+		constexpr auto DEBUG_PAGE			 = RendererDebugPage::CollisionStats;
 
 		// Determine label string.
 		auto labelString = std::string();
@@ -453,11 +453,11 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Draw debug.
+		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
 		for (const auto* attracPtr : nearbyAttracPtrs)
 		{
 			const auto& box = attracPtr->GetBoundingBox();
-			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
-			g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RENDERER_DEBUG_PAGE::LARA_STATS);
+			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RendererDebugPage::CollisionStats);
 		}
 
 		// Return attractor pointers found in sphere-AABB test.

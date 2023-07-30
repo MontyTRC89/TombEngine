@@ -2377,7 +2377,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 		auto sphere = BoundingSphere(spherePos, poleProbeCollRadius);
 		auto offsetSphere = BoundingSphere(spherePos + sphereOffset2D, poleProbeCollRadius);
 
-		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
 
 		int i = 0;
 		while (CollidedItems[i] != nullptr)
@@ -2391,7 +2391,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 			auto poleBox = GameBoundingBox(object).ToBoundingOrientedBox(object->Pose);
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0.0f, coll->Setup.Radius);
 
-			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
 
 			if (poleBox.Intersects(sphere) || poleBox.Intersects(offsetSphere))
 			{
