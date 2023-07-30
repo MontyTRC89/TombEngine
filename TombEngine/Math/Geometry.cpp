@@ -136,8 +136,8 @@ namespace TEN::Math::Geometry
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		auto lineDirection = linePoint1 - linePoint0;
-		float alpha = lineDirection.Dot(origin - linePoint0) / lineDirection.Dot(lineDirection);
+		auto lineDir = linePoint1 - linePoint0;
+		float alpha = lineDir.Dot(origin - linePoint0) / lineDir.Dot(lineDir);
 
 		// Clamp distance alpha.
 		if (alpha <= 0.0f)
@@ -150,7 +150,7 @@ namespace TEN::Math::Geometry
 		}
 
 		// Return closes point on line.
-		return (linePoint0 + (lineDirection * alpha));
+		return (linePoint0 + (lineDir * alpha));
 	}
 
 	Vector3 GetClosestPointOnLinePerp(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
@@ -158,11 +158,11 @@ namespace TEN::Math::Geometry
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		auto lineDirection = linePoint1 - linePoint0;
+		auto lineDir = linePoint1 - linePoint0;
 
 		// Calculate alpha from 2D projection of line on Y axis.
-		auto lineDirection2D = Vector3(lineDirection.x, 0.0f, lineDirection.z);
-		float alpha = lineDirection2D.Dot(origin - linePoint0) / lineDirection2D.Dot(lineDirection2D);
+		auto lineDir2D = Vector3(lineDir.x, 0.0f, lineDir.z);
+		float alpha = lineDir2D.Dot(origin - linePoint0) / lineDir2D.Dot(lineDir2D);
 
 		// Clamp distance alpha.
 		if (alpha <= 0.0f)
@@ -175,7 +175,7 @@ namespace TEN::Math::Geometry
 		}
 
 		// Return point on line perpendicular to Y axis.
-		return (linePoint0 + (lineDirection * alpha));
+		return (linePoint0 + (lineDir * alpha));
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
@@ -203,6 +203,31 @@ namespace TEN::Math::Geometry
 			-slopeAngle * cosDeltaAngle,
 			orient2D,
 			slopeAngle * sinDeltaAngle);
+	}
+
+	BoundingBox GetBoundingBox(const std::vector<Vector3>& points)
+	{
+		auto maxPoint = Vector3(-INFINITY);
+		auto minPoint = Vector3(INFINITY);
+
+		// Construct AABB.
+		for (const auto& point : points)
+		{
+			maxPoint = Vector3(
+				std::max(maxPoint.x, point.x),
+				std::max(maxPoint.y, point.y),
+				std::max(maxPoint.z, point.z));
+
+			minPoint = Vector3(
+				std::min(minPoint.x, point.x),
+				std::min(minPoint.y, point.y),
+				std::min(minPoint.z, point.z));
+		}
+
+		// Construct and return axis-aligned bounding box.
+		auto center = (minPoint + maxPoint) * 0.5f;
+		auto extents = (maxPoint - minPoint) * 0.5f;
+		return BoundingBox(center, extents);
 	}
 
 	Quaternion ConvertDirectionToQuat(const Vector3& direction)
