@@ -1,8 +1,8 @@
 #pragma once
 #include "Game/Lara/lara.h"
 
-class GameVector;
-class Vector3i;
+//class GameVector;
+//class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 

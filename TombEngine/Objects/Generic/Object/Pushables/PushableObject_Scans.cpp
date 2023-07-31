@@ -2,9 +2,9 @@
 #include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
 
 #include "Game/collision/collide_item.h"
-//#include "Game/collision/collide_room.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 
 #include "Specific/level.h"
 
@@ -24,9 +24,9 @@ namespace TEN::Entities::Generic
 
 		if (pushable.UsesRoomCollision)
 		{
-			//RemoveBridge(pushableItem.Index);
-			//collisionResult = GetCollision(&pushableItem);
-			//AddBridge(pushableItem.Index);
+			DeactivateClimbablePushableCollider(itemNumber);
+			collisionResult = GetCollision(&pushableItem);
+			ActivateClimbablePushableCollider(itemNumber);
 		}
 		else
 		{
@@ -40,6 +40,11 @@ namespace TEN::Entities::Generic
 		// Check if pushable isn't on the floor.
 		int heightDifference = abs(collisionResult.Position.Floor - pushableItem.Pose.Position.y);
 		if ((heightDifference >= PUSHABLE_HEIGHT_TOLERANCE))
+			return false;
+
+		//Check if is far from Lara (happened in the stacked pushables, that Lara was trying use the upper one but detects the lower one).
+		int LaraHeightDifference = abs(LaraItem->Pose.Position.y - pushableItem.Pose.Position.y);
+		if ((LaraHeightDifference >= PUSHABLE_HEIGHT_TOLERANCE))
 			return false;
 
 		return true;
@@ -130,8 +135,7 @@ namespace TEN::Entities::Generic
 	bool IsValidForLara(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		//auto dirVector = targetPos - pushableItem.Pose.Position;
-		//Determine the direction of the movement and set the player's offset accordingly.
+
 		auto playerOffset = Vector3i::Zero;
 				
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);

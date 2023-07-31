@@ -6,6 +6,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -91,6 +92,10 @@ namespace TEN::Entities::Generic
 				pushable.StartPos = pushableItem.Pose.Position;
 				pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 				pushable.BehaviourState = PushablePhysicState::Moving;
+				ResetPlayerFlex(LaraItem);
+
+				if (pushable.UsesRoomCollision)
+					DeactivateClimbablePushableCollider(itemNumber);
 			}
 			else if (	LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB &&
 						LaraItem->Animation.ActiveState != LS_PUSHABLE_PULL &&
@@ -105,6 +110,9 @@ namespace TEN::Entities::Generic
 		//2. CHECK IF IS IN WATER ROOM.
 		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
+			if (pushable.UsesRoomCollision)
+				DeactivateClimbablePushableCollider(itemNumber);
+
 			if (pushable.IsBuoyant)
 			{
 				pushable.BehaviourState = PushablePhysicState::Floating;
@@ -120,12 +128,22 @@ namespace TEN::Entities::Generic
 
 		//3. CHECK IF FLOOR HAS CHANGED.
 		int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
+
+		if (pushable.UsesRoomCollision)
+		{
+			DeactivateClimbablePushableCollider(itemNumber);
+			floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
+			ActivateClimbablePushableCollider(itemNumber);
+		}
+
 		if (floorHeight > pushableItem.Pose.Position.y)			//The floor has decresed. (Flip map, trapdoor, etc...)
 		{
 			//If the diffence is not very big, just teleport it.
 			if (abs(pushableItem.Pose.Position.y - floorHeight) >= CLICK(1))
 			{
 				pushable.BehaviourState = PushablePhysicState::Falling;
+				if (pushable.UsesRoomCollision)
+					DeactivateClimbablePushableCollider(itemNumber);
 			}
 			else
 			{
@@ -274,6 +292,8 @@ namespace TEN::Entities::Generic
 			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop)
 			{
 				pushable.BehaviourState = PushablePhysicState::Idle;
+				if (pushable.UsesRoomCollision)
+					ActivateClimbablePushableCollider(itemNumber);
 				return;
 			}
 
@@ -281,6 +301,8 @@ namespace TEN::Entities::Generic
 			{
 				LaraItem->Animation.TargetState = LS_IDLE;
 				pushable.BehaviourState = PushablePhysicState::Idle;
+				if (pushable.UsesRoomCollision)
+					ActivateClimbablePushableCollider(itemNumber);
 			}
 		}
 
@@ -326,6 +348,8 @@ namespace TEN::Entities::Generic
 		pushable.BehaviourState = PushablePhysicState::Idle;
 		pushableItem.Pose.Position.y = pointColl.Position.Floor;
 		pushableItem.Animation.Velocity.y = 0;
+		if (pushable.UsesRoomCollision)
+			ActivateClimbablePushableCollider(itemNumber);
 
 		// Shake floor if pushable landed at high enough velocity.
 		if (velocityY >= PUSHABLE_FALL_RUMBLE_VELOCITY)
@@ -461,6 +485,8 @@ namespace TEN::Entities::Generic
 		{
 			pushable.BehaviourState = PushablePhysicState::Idle;
 			pushable.Gravity = GRAVITY_AIR;
+			if (pushable.UsesRoomCollision)
+				ActivateClimbablePushableCollider(itemNumber);
 			return;
 		}
 

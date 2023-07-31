@@ -7,6 +7,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Info.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Physics.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
@@ -60,17 +61,17 @@ namespace TEN::Entities::Generic
 		pushable.StartPos = item.Pose.Position;
 		pushable.StartPos.RoomNumber = item.RoomNumber;
 
+		pushable.Height = GetPushableHeight(item);
+
 		if (item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushable.UsesRoomCollision = true;
-			TEN::Collision::Floordata::AddBridge(itemNumber);
+			ActivateClimbablePushableCollider(itemNumber);
 		}
 		else
 		{
 			pushable.UsesRoomCollision = false;
 		}
-
-		pushable.Height = GetPushableHeight(item);
 
 		// Read OCB flags.
 		int ocb = item.TriggerFlags;
@@ -108,6 +109,8 @@ namespace TEN::Entities::Generic
 		{
 			ItemNewRoom(itemNumber, probedRoomNumber);
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
+			if (pushable.UsesRoomCollision)
+				RefreshClimbablePushableCollider(itemNumber);
 		}
 	}
 	

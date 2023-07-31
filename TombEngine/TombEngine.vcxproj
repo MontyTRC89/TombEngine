@@ -434,6 +434,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\Object\objects.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_BridgeCol.h" />
     <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_Info.h" />
     <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_Physics.h" />
     <ClInclude Include="Objects\Generic\Object\Pushables\PushableObject_Scans.h" />
@@ -891,6 +892,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Object\objects.cpp" />
     <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject_BridgeCol.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject_Physics.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject_Scans.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushables\PushableObject_Sounds.cpp" />

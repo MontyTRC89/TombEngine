@@ -7,6 +7,7 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 #include "Specific/level.h"
 
 void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::string& baseName, const std::string& requiredName)
@@ -192,10 +193,10 @@ void InitPushableObject(ObjectInfo* object, int objectNumber)
 		object->Initialize = InitializePushableBlock;
 		object->control = PushableBlockControl;
 		object->collision = PushableBlockCollision;
-		//object->floor = PushableBlockFloor;
-		//object->ceiling = PushableBlockCeiling;
-		//object->floorBorder = PushableBlockFloorBorder;
-		//object->ceilingBorder = PushableBlockCeilingBorder;
+		object->floor = ClimbablePushableFloor;
+		object->ceiling = ClimbablePushableCeiling;
+		object->floorBorder = ClimbablePushableFloorBorder;
+		object->ceilingBorder = ClimbablePushableCeilingBorder;
 		object->SetupHitEffect(true);
 	}
 }
