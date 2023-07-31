@@ -553,7 +553,7 @@ namespace TEN::Effects::Blood
 				auto relOffset = Random::GeneratePointInSphere(sphere);
 				auto pos = GetJointPosition(item, i, relOffset);
 
-				SpawnBloodSplatEffect(pos.ToVector3(), item.RoomNumber, Vector3::Down, baseVel, baseCount);
+				SpawnBloodSplatEffect(pos.ToVector3(), item.RoomNumber, -Vector3::UnitY, baseVel, baseCount);
 				//DoBloodSplat(pos.x, pos.y, pos.z, Random::GenerateInt(8, 16), Random::GenerateAngle(), LaraItem->RoomNumber);
 			}
 
