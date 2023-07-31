@@ -178,7 +178,7 @@ namespace TEN::Entities::Generic
 			auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(-32, 64, 256));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 
-			if (!(Wibble & 7))
+			if (!(Wibble & 3))
 				TriggerTorchFlame(laraItem->Index, 0);
 
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (Pose*)&pos);
