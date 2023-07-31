@@ -71,7 +71,8 @@ namespace TEN::Hud
 		constexpr auto INVALID_2D_POS		   = Vector2(FLT_MAX);
 		constexpr auto ROT					   = ANGLE(2.0f);
 		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
-		constexpr auto SIZE_SCALE_PERIPHERAL   = 0.5f;
+		constexpr auto SIZE_SCALE_PRIMARY	   = 1.0f;
+		constexpr auto SIZE_SCALE_PERIPHERAL   = 0.75f;
 		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f * SQRT_2;
 		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f * SQRT_2;
 		constexpr auto PULSE_SCALE_MAX		   = 1.3f;
@@ -109,10 +110,7 @@ namespace TEN::Hud
 		if (IsActive)
 		{
 			float cameraDist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
-
-			float sizeTarget = GetCrosshairSize(cameraDist);
-			if (!IsPrimary)
-				sizeTarget *= SIZE_SCALE_PERIPHERAL;
+			float sizeTarget = GetCrosshairSize(cameraDist) * (IsPrimary ? SIZE_SCALE_PRIMARY : SIZE_SCALE_PERIPHERAL);
 
 			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
 		}

@@ -1462,7 +1462,7 @@ namespace TEN::Renderer
 				const auto& object = Objects[effectPtr->ObjectNumber];
 
 				if (object.drawRoutine && object.loaded)
-					DrawEffect(view, effect, rendererPass);
+					DrawEffect(view, effectPtr, rendererPass);
 			}
 		}
 	}
