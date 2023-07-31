@@ -179,7 +179,7 @@ namespace TEN::Entities::Generic
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 
 			if (!(Wibble & 7))
-				TriggerTorchFlame(laraItem - g_Level.Items.data(), 0);
+				TriggerTorchFlame(laraItem->Index, 0);
 
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (Pose*)&pos);
 		}
@@ -253,7 +253,7 @@ namespace TEN::Entities::Generic
 				if (!Objects[CollidedItems[0]->ObjectNumber].intelligent &&
 					CollidedItems[0]->ObjectNumber != ID_LARA)
 				{
-					ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &LaraCollision);
+					ObjectCollision(CollidedItems[0]->Index, item, &LaraCollision);
 				}
 			}
 			else if (CollidedMeshes[0])
