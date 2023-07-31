@@ -2,8 +2,6 @@
 
 namespace TEN::Entities::Generic
 {
-	void InitializeClimbablePushable(int itemNumber);
-
 	void ActivateClimbablePushableCollider(int itemNumber);
 	void DeactivateClimbablePushableCollider(int itemNumber);
 	void RefreshClimbablePushableCollider(int itemNumber);

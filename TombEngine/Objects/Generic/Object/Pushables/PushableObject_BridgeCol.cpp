@@ -9,13 +9,6 @@ using namespace TEN::Collision::Floordata;
 
 namespace TEN::Entities::Generic
 {
-
-	void InitializeClimbablePushable(int itemNumber)
-	{
-		//TEN::Collision::Floordata::AddBridge(itemNumber);
-	}
-
-
 	void ActivateClimbablePushableCollider(int itemNumber)
 	{
 		AddBridge(itemNumber);

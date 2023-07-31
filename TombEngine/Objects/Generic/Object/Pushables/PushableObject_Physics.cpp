@@ -24,11 +24,9 @@ namespace TEN::Entities::Generic
 	constexpr auto PUSHABLE_WATER_VELOCITY_MAX = BLOCK(1 / 16.0f);
 	constexpr auto GRAVITY_AIR = 8.0f;
 	constexpr auto GRAVITY_ACCEL = 0.5f;
-
 	constexpr auto PUSHABLE_FALL_RUMBLE_VELOCITY = 96.0f;
-	//constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
-
 	constexpr auto WATER_SURFACE_DISTANCE = CLICK(0.5f);
+	constexpr auto FRAMES_BETWEEN_RIPPLES = 8.0f;
 
 	void InitializePushablesStatesMap()
 	{
@@ -53,7 +51,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//1. CHECK IF LARA IS INTERACTING WITH IT.
+		//1. Check if Lara is interacting with it
 		if (Lara.Context.InteractedItem == itemNumber)
 		{
 			//If Lara is grabbing, check the push pull actions.
@@ -109,7 +107,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		//2. CHECK IF IS IN WATER ROOM.
+		//2. Check if it's in a water room
 		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
 			if (pushable.UsesRoomCollision)
@@ -128,7 +126,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		//3. CHECK IF FLOOR HAS CHANGED.
+		//3. Check if floor has changed
 		int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
 
 		if (pushable.UsesRoomCollision)
@@ -186,7 +184,7 @@ namespace TEN::Entities::Generic
 		//Lara is doing the pushing / pulling animation
 		if (LaraItem->Animation.FrameNumber != g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
 		{
-			//1. DECIDE GOAL POSITION.
+			//1. Decide the goal position
 			switch (quadrantDir)
 			{
 				case NORTH:
@@ -211,12 +209,12 @@ namespace TEN::Entities::Generic
 
 			pushable.CurrentSoundState = PushableSoundState::Stopping;
 
-			//2. MOVE PUSHABLES
+			//2. Move pushable
 			
-			//Don't move the pushable if the distance is too big (it may happens because the animation bounding changes in the continue push pull process).
-			if (abs(pushableItem.Pose.Position.z - newPosZ) > BLOCK(0.5f))
+			//Don't move the pushable if the distance is too big (it may happens because the animation bounds changes in the animation loop of push pull process).
+			if (abs(pushableItem.Pose.Position.z - newPosZ) > BLOCK(0.75f))
 				return;
-			if (abs(pushableItem.Pose.Position.x - newPosX) > BLOCK(0.5f))
+			if (abs(pushableItem.Pose.Position.x - newPosX) > BLOCK(0.75f))
 				return;
 
 			// move only if the move direction is oriented to the action
@@ -225,11 +223,11 @@ namespace TEN::Entities::Generic
 			//Z axis
 			if (isPlayerPulling)
 			{
-				pushable.CurrentSoundState = PushableSoundState::Moving;
 				if ((quadrantDir == NORTH && pushableItem.Pose.Position.z > newPosZ) ||
 					(quadrantDir == SOUTH && pushableItem.Pose.Position.z < newPosZ))
 				{
 					pushableItem.Pose.Position.z = newPosZ;
+					pushable.CurrentSoundState = PushableSoundState::Moving;
 				}
 			}
 			else
@@ -238,17 +236,18 @@ namespace TEN::Entities::Generic
 					(quadrantDir == SOUTH && pushableItem.Pose.Position.z > newPosZ))
 				{
 					pushableItem.Pose.Position.z = newPosZ;
+					pushable.CurrentSoundState = PushableSoundState::Moving;
 				}
 			}
 
 			//X axis
-			pushable.CurrentSoundState = PushableSoundState::Moving;
 			if (isPlayerPulling)
 			{
 				if ((quadrantDir == EAST && pushableItem.Pose.Position.x > newPosX) ||
 					(quadrantDir == WEST && pushableItem.Pose.Position.x < newPosX))
 				{
 					pushableItem.Pose.Position.x = newPosX;
+					pushable.CurrentSoundState = PushableSoundState::Moving;
 				}
 			}
 			else
@@ -257,6 +256,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == WEST && pushableItem.Pose.Position.x > newPosX))
 				{
 					pushableItem.Pose.Position.x = newPosX;
+					pushable.CurrentSoundState = PushableSoundState::Moving;
 				}
 			}
 		}
@@ -264,15 +264,15 @@ namespace TEN::Entities::Generic
 		{
 			//Pushing Pulling animation ended
 			
-			//1. REALIGN WITH SECTOR CENTER
+			//1. Realign with sector center
 			pushableItem.Pose.Position = GetNearestSectorCenter(pushableItem.Pose.Position);
 			pushable.StartPos = pushableItem.Pose.Position;
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 
-			//2. ACTIVATE TRIGGER
+			//2. Activate trigger
 			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
 			
-			//3. CHECK FLOOR HEIGHT
+			//3. Check floor height
 			// Check if pushing pushable over edge. Then can't keep pushing/pulling and pushable start to fall.
 			if (pushable.CanFall && !isPlayerPulling)
 			{
@@ -288,7 +288,7 @@ namespace TEN::Entities::Generic
 				}
 			}
 
-			//4. CHECK INPUT AND IF CAN KEEP THE MOVEMENT
+			//4. Check input too see if it can keep the movement
 
 			// Check the pushable animation system in use, if is using block animation which can't loop, go back to idle state.
 			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop)
@@ -305,7 +305,10 @@ namespace TEN::Entities::Generic
 				pushable.BehaviourState = PushablePhysicState::Idle;
 				if (pushable.UsesRoomCollision)
 					ActivateClimbablePushableCollider(itemNumber);
+
+				return;
 			}
+			//Otherwise, just keeps the pushing-pulling movement.
 		}
 
 		return;
@@ -316,14 +319,13 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//1. PREPARE DATA, (floor height and velocities).
+		//1. Prepare data (floor height and velocities).
 		auto pointColl = GetCollision(&pushableItem);
 
 		float currentY = pushableItem.Pose.Position.y;
 		float velocityY = pushableItem.Animation.Velocity.y;
 		 
-		//2. MOVE THE PUSHABLE DOWNWARDS
-		// Move the pushable downwards if it hasn't reached the floor yet
+		//2. Move the pushable downwards
 		if (currentY < (pointColl.Position.Floor - velocityY))
 		{
 			float newVelocityY = velocityY + pushable.Gravity;
@@ -331,7 +333,7 @@ namespace TEN::Entities::Generic
 
 			pushableItem.Pose.Position.y = currentY + pushableItem.Animation.Velocity.y;
 			
-			//3. CHECK IF IS IN WATER ROOM
+			//3. Check if it's in a water room
 			if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 			{
 				pushable.BehaviourState = PushablePhysicState::Sinking;
@@ -349,7 +351,7 @@ namespace TEN::Entities::Generic
 		}
 
 		//Reached the ground
-		//3. CHECK ENVIRONMENT
+		//3. Check room collision
 		
 		//If it's a flat ground?
 		
@@ -375,7 +377,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//1. ENSURE IT'S IN WATER ROOM.
+		//1. Ensure it's in water room
 		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
 			pushable.BehaviourState = PushablePhysicState::Falling;
@@ -383,7 +385,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		//2. PREPARE DATA, (floor height and velocities).
+		//2. Prepare data, (floor height and velocities).
 		auto pointColl = GetCollision(&pushableItem);
 
 		float currentY = pushableItem.Pose.Position.y;
@@ -391,7 +393,7 @@ namespace TEN::Entities::Generic
 
 		// TODO: [Effects Requirement] Add bubbles during this phase.
 
-		//3. MANAGE GRAVITY FORCE
+		//3. Manage gravity force
 		if (pushable.IsBuoyant)
 		{
 			// Slowly reverses gravity direction. If gravity is 0, then it floats.
@@ -408,7 +410,7 @@ namespace TEN::Entities::Generic
 			pushable.Gravity = std::max(pushable.Gravity - GRAVITY_ACCEL, 4.0f);
 		}
 
-		//4. MOVE OBJECT
+		//4. Move Object
 		if (currentY < pointColl.Position.Floor - velocityY)
 		{
 			// Sinking down.
@@ -420,7 +422,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		// 5. HIT GROUND
+		// 5. Hit ground
 		if (pushable.IsBuoyant)
 		{
 			pushable.Gravity = 0.0f;
@@ -441,7 +443,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//1. ENSURE IT'S IN WATER ROOM.
+		//1. Ensure it's in water room
 		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
 			pushable.BehaviourState = PushablePhysicState::Falling;
@@ -449,7 +451,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		//2. PREPARE DATA, (goal height and velocities).
+		//2. Prepare data (goal height and velocities).
 		auto pointColl = GetCollision(&pushableItem);
 
 		int goalHeight = 0;
@@ -465,7 +467,7 @@ namespace TEN::Entities::Generic
 
 		pushable.Gravity = std::max(pushable.Gravity - GRAVITY_ACCEL, -4.0f);
 
-		//3. MOVE PUSHABLE UPWARDS
+		//3. Move pushable upwards
 		if (currentY > goalHeight)
 		{
 			// Floating up.
@@ -494,7 +496,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//1. ENSURE IT'S IN WATER ROOM.
+		//1. Ensure it's in water room
 		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
 			pushable.BehaviourState = PushablePhysicState::Idle;
@@ -504,7 +506,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		//2. IF IT'S BUOYANT, NEEDS TO FLOAT. (Maybe was on the floor and happened a flipmap that filled the room with water).
+		//2. If it's buoyant, it needs to float. (case for sudden flipmaps).
 		if (pushable.IsBuoyant)
 		{
 			pushable.Gravity = 0.0f;
@@ -518,7 +520,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//1. ENSURE IT'S IN WATER ROOM.
+		//1. Ensure it's in water room
 		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
 			pushable.BehaviourState = PushablePhysicState::Falling;
@@ -531,12 +533,12 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		//2. DO WATER ONDULATION EFFECT.
+		//2. Do water ondulation effect.
 		FloatItem(pushableItem, pushable.FloatingForce);
 
 		// Effects: Spawn ripples.
 		//TODO: Enhace the effect to make the ripples increase their size through the time.
-		if (std::fmod(pushableItem.Animation.Velocity.y, 8.0f) <= 0.0f)
+		if (std::fmod(pushableItem.Animation.Velocity.y, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
 		{
 			SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.StartPos.y, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 		}
@@ -548,15 +550,15 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//PENDING
+		//TODO:
 		//1. DETECT FLOOR, (Slope orientation)
 		//2. CALCULATE DIRECTION AND SPEED
 		//3. MOVE OBJECT
 		//4. DETECT END CONDITIONS OF NEXT SECTOR 
 			//	Is a slope-> keep sliding
-			//	Is a flat floor -> so end slide
-			//	Is a fall -> so pass to falling
-			//	Is a forbiden Sector -> freeze the slide
+			//	Is a flat floor -> so ends slide
+			//	Is a fall -> so passes to falling
+			//	Is a forbiden Sector -> freezes the slide
 		//5. Incorporate effects? Smoke or sparkles?
 
 	}
