@@ -22,7 +22,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
-	void TriggerTorchFlame(char fxObject, char node)
+	void TriggerTorchFlame(int fxObject, unsigned char node)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -53,6 +53,7 @@ namespace TEN::Entities::Generic
 		spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_DEF | SP_SCALE;
 
 		spark->rotAng = GetRandomControl() & 0xFFF;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 		if (GetRandomControl() & 1)
 			spark->rotAdd = -16 - (GetRandomControl() & 0xF);

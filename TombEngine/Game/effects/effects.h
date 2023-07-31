@@ -157,8 +157,8 @@ struct Particle
 	BLEND_MODES blendMode;
 	unsigned char extras;
 	signed char dynamic;
-	unsigned char fxObj;
-	unsigned char roomNumber;
+	int fxObj;
+	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 };
 

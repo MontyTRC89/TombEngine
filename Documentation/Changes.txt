@@ -1,3 +1,8 @@
+Version 1.1.1
+==============
+
+* Fix burning torch not working properly if there is more than 256 objects in a level.
+
 Version 1.1.0
 ==============
 
