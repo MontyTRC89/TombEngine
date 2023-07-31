@@ -458,9 +458,19 @@ namespace TEN::Entities::Generic
 
 		int waterDepth = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 		if (waterDepth != NO_HEIGHT)
+		{
 			goalHeight = waterDepth - WATER_SURFACE_DISTANCE + pushable.Height;
+
+			//height position where the ripples will spawn
+			pushable.StartPos.y = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber) - 1;
+		}
 		else
+		{
 			goalHeight = pointColl.Position.Ceiling + WATER_SURFACE_DISTANCE + pushable.Height;
+
+			//With no_height, ripples won't spawn
+			pushable.StartPos.y = NO_HEIGHT;
+		}
 
 		float currentY = pushableItem.Pose.Position.y;
 		float velocityY = pushableItem.Animation.Velocity.y;
@@ -482,8 +492,6 @@ namespace TEN::Entities::Generic
 		// Reached water surface.
 		pushable.BehaviourState = PushablePhysicState::WatersurfaceIdle;
 		pushableItem.Pose.Position.y = goalHeight;
-
-		pushable.StartPos.y = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber) - 1;
 
 		if (pushable.UsesRoomCollision)
 			ActivateClimbablePushableCollider(itemNumber);
@@ -538,7 +546,7 @@ namespace TEN::Entities::Generic
 
 		// Effects: Spawn ripples.
 		//TODO: Enhace the effect to make the ripples increase their size through the time.
-		if (std::fmod(pushableItem.Animation.Velocity.y, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
+		if (pushable.StartPos.y != NO_HEIGHT && std::fmod(pushableItem.Animation.Velocity.y, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
 		{
 			SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.StartPos.y, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 		}
