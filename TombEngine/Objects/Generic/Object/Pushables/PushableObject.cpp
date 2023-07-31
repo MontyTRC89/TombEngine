@@ -109,8 +109,6 @@ namespace TEN::Entities::Generic
 		{
 			ItemNewRoom(itemNumber, probedRoomNumber);
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
-			if (pushable.UsesRoomCollision)
-				RefreshClimbablePushableCollider(itemNumber);
 		}
 	}
 	

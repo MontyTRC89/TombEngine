@@ -471,6 +471,8 @@ namespace TEN::Entities::Generic
 		// Reached water surface.
 		pushable.BehaviourState = PushablePhysicState::WatersurfaceIdle;
 		pushableItem.Pose.Position.y = goalHeight;
+		if (pushable.UsesRoomCollision)
+			ActivateClimbablePushableCollider(itemNumber);
 
 		pushableItem.Animation.Velocity.y = 0.0f;
 	}
@@ -510,6 +512,10 @@ namespace TEN::Entities::Generic
 			pushable.BehaviourState = PushablePhysicState::Falling;
 			pushable.Gravity = GRAVITY_AIR;
 			pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
+
+			if (pushable.UsesRoomCollision)
+				DeactivateClimbablePushableCollider(itemNumber);
+
 			return;
 		}
 
