@@ -572,6 +572,7 @@ namespace TEN::Renderer
 		void DrawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target,
 		                         ID3D11DepthStencilView* depthTarget);
 		void DrawShockwaves(RenderView& view);
+		void DrawDrips(RenderView& view);
 		void DrawRipples(RenderView& view);
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
 		void DrawFullScreenSprite(RendererSprite* sprite, DirectX::SimpleMath::Vector3 color, bool fit = true);

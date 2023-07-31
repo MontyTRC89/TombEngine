@@ -85,7 +85,7 @@ namespace TEN::Effects::Blood
 		std::vector<BloodStainEffectParticle> Particles = {};
 
 	public:
-		// Spawners
+		// Getters
 		const std::vector<BloodStainEffectParticle>& GetParticles();
 
 		// Spawners
@@ -180,11 +180,12 @@ namespace TEN::Effects::Blood
 	extern BloodMistEffectController	   BloodMistEffect;
 	extern UnderwaterBloodEffectController UnderwaterBloodEffect;
 
-	void SpawnBleedEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount);
+	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount);
 
-	short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
-	void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
-	void TriggerBlood(int x, int y, int z, int unk, int num);
+	// Legacy spawners
+	short DoBloodSplat(int x, int y, int z, short vel, short yRot, short roomNumber);
+	void DoLotsOfBlood(int x, int y, int z, int vel, short headingAngle, int roomNumber, unsigned int count);
+	void TriggerBlood(int x, int y, int z, short headingAngle, unsigned int count);
 	void TriggerLaraBlood();
 
 	void DrawBloodDebug();

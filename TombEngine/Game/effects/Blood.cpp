@@ -12,7 +12,7 @@
 #include "Specific/clock.h"
 
 // temp
-#include "lara.h"
+#include "Game/Lara/lara.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Environment;
@@ -302,7 +302,7 @@ namespace TEN::Effects::Blood
 		constexpr auto SCALAR	  = 0.4f;
 		constexpr auto DELAY_TIME = 5.0f;
 
-		auto pointColl = GetCollision(&item);
+		auto pointColl = GetCollision(item);
 		auto pos = Vector3(item.Pose.Position.x, pointColl.Position.Floor - BloodStainEffectParticle::SURFACE_OFFSET, item.Pose.Position.z);
 		auto normal = GetSurfaceNormal(pointColl.FloorTilt, true);
 
@@ -495,7 +495,7 @@ namespace TEN::Effects::Blood
 		Particles.clear();
 	}
 
-	void SpawnBleedEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount)
+	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount)
 	{
 		constexpr auto WIDTH_MAX	   = 4.0f;
 		constexpr auto WIDTH_MIN	   = WIDTH_MAX / 4;
@@ -509,6 +509,7 @@ namespace TEN::Effects::Blood
 
 		// Underwater; return early.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
+			UnderwaterBloodEffect.Spawn(pos, roomNumber, BLOCK(0.5f), baseCount);
 			return;
 
 		// Spawn drips.
@@ -530,65 +531,65 @@ namespace TEN::Effects::Blood
 		BloodMistEffect.Spawn(pos, roomNumber, dir, mistCount);
 	}
 
-	short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
+	short DoBloodSplat(int x, int y, int z, short vel, short headingAngle, short roomNumber)
 	{
 		int probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 		if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		{
-			UnderwaterBloodEffect.Spawn(Vector3(x, y, z), probedRoomNumber, speed);
+			UnderwaterBloodEffect.Spawn(Vector3(x, y, z), probedRoomNumber, vel);
 		}
 		else
 		{
-			TriggerBlood(x, y, z, direction >> 4, speed);
+			TriggerBlood(x, y, z, headingAngle / 16, vel);
 		}
 
 		return 0;
 	}
 
-	void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
+	void DoLotsOfBlood(int x, int y, int z, int vel, short headingAngle, int roomNumber, unsigned int count)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			DoBloodSplat(
-				x + 256 - (GetRandomControl() * 512 / 0x8000),
-				y + 256 - (GetRandomControl() * 512 / 0x8000),
-				z + 256 - (GetRandomControl() * 512 / 0x8000),
-				speed, direction, roomNumber);
+			auto pos = Vector3i(
+				x + Random::GenerateInt(-BLOCK(0.25f), BLOCK(0.25f)),
+				y + Random::GenerateInt(-BLOCK(0.25f), BLOCK(0.25f)),
+				z + Random::GenerateInt(-BLOCK(0.25f), BLOCK(0.25f)));
+
+			DoBloodSplat(pos.x, pos.y, pos.z, vel, headingAngle, roomNumber);
 		}
 	}
 
-	// Temporary wrapper for the old blood spawning function.
-	void TriggerBlood(int x, int y, int z, int direction, int num)
+	// Temporary wrapper for the old blood spawn function.
+	void TriggerBlood(int x, int y, int z, short headingAngle, unsigned int count)
 	{
-		BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, num);
+		BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, count);
 	}
 
 	void TriggerLaraBlood()
 	{
 		int node = 1;
-
 		for (int i = 0; i < LARA_MESHES::LM_HEAD; i++)
 		{
 			if (node & LaraItem->TouchBits.ToPackedBits())
 			{
-				auto vec = GetJointPosition(LaraItem, 
-					i,
-					Vector3i(
-						(GetRandomControl() & 31) - 16,
-						(GetRandomControl() & 31) - 16,
-						(GetRandomControl() & 31) - 16));
-				DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->RoomNumber);
+				auto relOffset = Vector3i(
+					Random::GenerateInt(-16, 16),
+					Random::GenerateInt(-16, 16),
+					Random::GenerateInt(-16, 16));
+				auto pos = GetJointPosition(LaraItem, i, relOffset);
+
+				DoBloodSplat(pos.x, pos.y, pos.z, Random::GenerateInt(8, 16), Random::GenerateAngle(), LaraItem->RoomNumber);
 			}
 
-			node <<= 1;
+			node *= 2;
 		}
 	}
 
 	void DrawBloodDebug()
 	{
-		g_Renderer.PrintDebugMessage("Blood drip count: %d ", BloodDripEffect.GetParticles().size());
-		g_Renderer.PrintDebugMessage("Blood stain count: %d ", BloodStainEffect.GetParticles().size());
-		g_Renderer.PrintDebugMessage("Blood mist count: %d ", BloodMistEffect.GetParticles().size());
-		g_Renderer.PrintDebugMessage("UW. blood count: %d ", UnderwaterBloodEffect.GetParticles().size());
+		g_Renderer.PrintDebugMessage("Blood drips: %d ", BloodDripEffect.GetParticles().size());
+		g_Renderer.PrintDebugMessage("Blood stains: %d ", BloodStainEffect.GetParticles().size());
+		g_Renderer.PrintDebugMessage("Blood mists: %d ", BloodMistEffect.GetParticles().size());
+		g_Renderer.PrintDebugMessage("UW. blood particles: %d ", UnderwaterBloodEffect.GetParticles().size());
 	}
 }
