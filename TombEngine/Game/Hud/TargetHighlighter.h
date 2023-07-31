@@ -34,6 +34,7 @@ namespace TEN::Hud
 		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
 		bool	IsOffscreen() const;
+		float	GetSize(float cameraDist) const;
 		float	GetRadius() const;
 		Vector2 Get2DPositionOffset(short orientOffset2D) const;
 

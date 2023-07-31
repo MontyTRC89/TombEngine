@@ -27,6 +27,16 @@ namespace TEN::Hud
 				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
 	}
 
+	float CrosshairData::GetSize(float cameraDist) const
+	{
+		constexpr auto RANGE			  = BLOCK(10);
+		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.15f;
+		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 3;
+
+		auto alpha = cameraDist / RANGE;
+		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, alpha);
+	}
+
 	float CrosshairData::GetRadius() const
 	{
 		return ((Size / 2) * (RadiusScale * PulseScale));
@@ -54,16 +64,6 @@ namespace TEN::Hud
 	{
 		IsPrimary = false;
 		ColorTarget = COLOR_GRAY;
-	}
-
-	static float GetCrosshairSize(float cameraDist)
-	{
-		constexpr auto RANGE			  = BLOCK(10);
-		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.15f;
-		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 3;
-
-		auto alpha = cameraDist / RANGE;
-		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, alpha);
 	}
 
 	void CrosshairData::Update(const Vector3& cameraPos, bool doPulse, bool isActive)
@@ -110,7 +110,7 @@ namespace TEN::Hud
 		if (IsActive)
 		{
 			float cameraDist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
-			float sizeTarget = GetCrosshairSize(cameraDist) * (IsPrimary ? SIZE_SCALE_PRIMARY : SIZE_SCALE_PERIPHERAL);
+			float sizeTarget = GetSize(cameraDist) * (IsPrimary ? SIZE_SCALE_PRIMARY : SIZE_SCALE_PERIPHERAL);
 
 			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
 		}
