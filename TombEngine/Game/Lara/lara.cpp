@@ -460,13 +460,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (KeyMap[OIS::KC_B] && dbBlood)
 	{
 		auto pos = GetJointPosition(item, LM_HEAD);
-		auto rotMatrix = (item->Pose.Orientation + EulerAngles(ANGLE(60.0f), 0, 0)).ToRotationMatrix();
-		auto baseVelocity = Vector3::Transform(item->Animation.Velocity, rotMatrix);
+		auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+		auto baseVel = Vector3::Transform(item->Animation.Velocity, rotMatrix);
 
-		unsigned int numBloodDrips = Random::GenerateInt(1, 3);
-		SpawnBloodSplatEffect(pos.ToVector3(), item->RoomNumber, Vector3::Up, baseVelocity, numBloodDrips);
+		unsigned int count = Random::GenerateInt(1, 3);
+		SpawnBloodSplatEffect(pos.ToVector3(), item->RoomNumber, Vector3::Down, baseVel, count);
 	}
-	dbBlood = KeyMap[OIS::KC_B] ? false : true;
+	dbBlood = !KeyMap[OIS::KC_B];
 
 	DrawBloodDebug();
 
