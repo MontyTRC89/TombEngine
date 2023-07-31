@@ -3,6 +3,8 @@
 
 #include "Game/animation.h"
 #include "Game/control/flipeffect.h"
+#include "Game/effects/effects.h"
+#include "Game/effects/Ripple.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
@@ -11,7 +13,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-
+using namespace TEN::Effects::Ripple;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -334,7 +336,14 @@ namespace TEN::Entities::Generic
 			{
 				pushable.BehaviourState = PushablePhysicState::Sinking;
 
-				// TODO: [Effects Requirement] Add Water splash.
+				// Effect: Water splash.
+				int waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+				SplashSetup.y = waterHeight - 1;
+				SplashSetup.x = pushableItem.Pose.Position.x;
+				SplashSetup.z = pushableItem.Pose.Position.z;
+				SplashSetup.splashPower = pushableItem.Animation.Velocity.y * 2;
+				SplashSetup.innerRadius = 160;
+				SetupSplash(&SplashSetup, pushableItem.RoomNumber);
 			}
 			return;
 		}
@@ -471,6 +480,9 @@ namespace TEN::Entities::Generic
 		// Reached water surface.
 		pushable.BehaviourState = PushablePhysicState::WatersurfaceIdle;
 		pushableItem.Pose.Position.y = goalHeight;
+
+		pushable.StartPos.y = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber) - 1;
+
 		if (pushable.UsesRoomCollision)
 			ActivateClimbablePushableCollider(itemNumber);
 
@@ -522,7 +534,12 @@ namespace TEN::Entities::Generic
 		//2. DO WATER ONDULATION EFFECT.
 		FloatItem(pushableItem, pushable.FloatingForce);
 
-		// TODO: [Effects Requirement] Spawn ripples.
+		// Effects: Spawn ripples.
+		//TODO: Enhace the effect to make the ripples increase their size through the time.
+		if (std::fmod(pushableItem.Animation.Velocity.y, 8.0f) <= 0.0f)
+		{
+			SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.StartPos.y, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
+		}
 
 	}
 

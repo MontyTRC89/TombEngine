@@ -49,7 +49,7 @@ namespace TEN::Entities::Generic
 		int StackLowerItem = 0;			// the itemNumber of the pushable that is placed under it.
 		int AnimationSystemIndex = 0;	// the index of the int PushableAnimationVector where are located the pull / push animation indices for this object.
 
-		GameVector StartPos = GameVector::Zero;	// Used by movement code and to deactivate stopper flag.
+		GameVector StartPos = GameVector::Zero;	// XZ used by movement code, Y used to store water height level.
 
 		std::map<int, PushableSidesAttributes> SidesMap = {};
 
