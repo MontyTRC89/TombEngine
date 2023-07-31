@@ -265,7 +265,7 @@ namespace TEN::Renderer
 				// General action listing
 				for (int k = 0; k < GeneralActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
 					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
 					{
@@ -315,7 +315,7 @@ namespace TEN::Renderer
 				// Vehicle action listing
 				for (int k = 0; k < VehicleActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
 					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
 					{
@@ -371,7 +371,7 @@ namespace TEN::Renderer
 				// Quick action listing
 				for (int k = 0; k < QuickActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
 					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
 					{
@@ -420,7 +420,7 @@ namespace TEN::Renderer
 				// Menu action listing.
 				for (int k = 0; k < MenuActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
 					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
 					{
@@ -674,10 +674,10 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderNewInventory()
 	{
-		g_Gui.DrawCurrentObjectList(LaraItem, (int)RingTypes::Inventory);
+		g_Gui.DrawCurrentObjectList(LaraItem, RingTypes::Inventory);
 
-		if (g_Gui.GetRings((int)RingTypes::Ammo)->RingActive)
-			g_Gui.DrawCurrentObjectList(LaraItem, (int)RingTypes::Ammo);
+		if (g_Gui.GetRing(RingTypes::Ammo).RingActive)
+			g_Gui.DrawCurrentObjectList(LaraItem, RingTypes::Ammo);
 
 		g_Gui.DrawAmmoSelector();
 		g_Gui.FadeAmmoSelector();
@@ -864,7 +864,7 @@ namespace TEN::Renderer
 		static EulerAngles orient = EulerAngles::Zero;
 		static float scaler = 1.2f;
 
-		short invItem = g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectList[g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectInList].InventoryItem;
+		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
 
 		auto& object = InventoryObjectTable[invItem];
 
