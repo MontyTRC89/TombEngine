@@ -10,6 +10,7 @@
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_Stack.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
@@ -30,7 +31,6 @@ namespace TEN::Entities::Generic
 
 	void InitializePushablesStatesMap()
 	{
-		static bool isInitialized = false;
 		if (PUSHABLES_STATES_MAP.empty() )
 		{
 			PUSHABLES_STATES_MAP.clear();
@@ -43,6 +43,7 @@ namespace TEN::Entities::Generic
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::UnderwaterIdle, &HandleUnderwaterState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::WatersurfaceIdle, &HandleWatersurfaceState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Sliding, &HandleSlidingState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::StackHorizontalMove, &HandleStackHorizontalMoveState);
 		}
 	}
 
@@ -92,6 +93,10 @@ namespace TEN::Entities::Generic
 				pushable.StartPos = pushableItem.Pose.Position;
 				pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 				pushable.BehaviourState = PushablePhysicState::Moving;
+
+				StartMovePushableStack(itemNumber);		//Prepare to the upper pushables in the stack for the move.
+				UnpilePushable(itemNumber);				//Cut the link with the lower pushables in the stack.
+
 				ResetPlayerFlex(LaraItem);
 
 				if (pushable.UsesRoomCollision)
@@ -271,7 +276,7 @@ namespace TEN::Entities::Generic
 
 			//2. Activate trigger
 			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
-			
+
 			//3. Check floor height
 			// Check if pushing pushable over edge. Then can't keep pushing/pulling and pushable start to fall.
 			if (pushable.CanFall && !isPlayerPulling)
@@ -288,27 +293,31 @@ namespace TEN::Entities::Generic
 				}
 			}
 
-			//4. Check input too see if it can keep the movement
+			//4. Update floor data
+			
+
+			//5. Check input too see if it can keep the movement
 
 			// Check the pushable animation system in use, if is using block animation which can't loop, go back to idle state.
-			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop)
-			{
-				pushable.BehaviourState = PushablePhysicState::Idle;
-				if (pushable.UsesRoomCollision)
-					ActivateClimbablePushableCollider(itemNumber);
-				return;
-			}
-
-			if (!IsHeld(In::Action) || !PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling))
+			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop ||
+				!IsHeld(In::Action) ||
+				!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling))
 			{
 				LaraItem->Animation.TargetState = LS_IDLE;
 				pushable.BehaviourState = PushablePhysicState::Idle;
+				StopMovePushableStack(itemNumber); //Set the upper pushables back to normal.
 				if (pushable.UsesRoomCollision)
 					ActivateClimbablePushableCollider(itemNumber);
 
+				//The pushable is going to stop here, do the checks to conect it with another Stack.
+				int FoundStack = SearchNearPushablesStack(itemNumber);
+				StackPushable(itemNumber, FoundStack);
+
 				return;
 			}
-			//Otherwise, just keeps the pushing-pulling movement.
+			//Otherwise, continue the movement
+			
+			
 		}
 
 		return;
@@ -569,6 +578,16 @@ namespace TEN::Entities::Generic
 			//	Is a forbiden Sector -> freezes the slide
 		//5. Incorporate effects? Smoke or sparkles?
 
+	}
+
+	void HandleStackHorizontalMoveState(int itemNumber)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		auto& MovingPushableItem = g_Level.Items[Lara.Context.InteractedItem];
+		pushableItem.Pose.Position.x = MovingPushableItem.Pose.Position.x;
+		pushableItem.Pose.Position.z = MovingPushableItem.Pose.Position.z;
 	}
 
 }

@@ -57,6 +57,7 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(item);
 
 		InitializePushablesStatesMap();
+		InitializePushablesStacks();
 
 		pushable.StartPos = item.Pose.Position;
 		pushable.StartPos.RoomNumber = item.RoomNumber;

@@ -885,6 +885,17 @@ Vector3i GetNearestSectorCenter(const Vector3i& pos)
 		pos.z & BIT_MASK_LOWER_8 | BIT_MASK_9);
 }
 
+bool CompareItem2DPositions(const int itemNumber0, const int itemNumber1)
+{
+	const auto& item0 = g_Level.Items[itemNumber0];
+	const auto& item1 = g_Level.Items[itemNumber1];
+
+	if (item0.Pose.Position.x == item1.Pose.Position.x)
+		return (item0.Pose.Position.z < item1.Pose.Position.z);
+	else
+		return (item0.Pose.Position.x < item1.Pose.Position.x);
+}
+
 void FloatItem(ItemInfo& item, float floatForce)
 {
 	constexpr auto BOX_VOLUME_MIN = 512.0f;

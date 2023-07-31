@@ -11,7 +11,8 @@ namespace TEN::Entities::Generic
 		Floating,
 		UnderwaterIdle,
 		WatersurfaceIdle,
-		Sliding
+		Sliding,
+		StackHorizontalMove
 	};
 
 	extern std::unordered_map<PushablePhysicState, std::function<void(int)>> PUSHABLES_STATES_MAP;
@@ -26,4 +27,5 @@ namespace TEN::Entities::Generic
 	void HandleUnderwaterState(int itemNumber);
 	void HandleWatersurfaceState(int itemNumber);
 	void HandleSlidingState(int itemNumber);
+	void HandleStackHorizontalMoveState(int itemNumber);
 };
