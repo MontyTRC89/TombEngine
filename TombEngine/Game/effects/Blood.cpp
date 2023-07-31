@@ -93,7 +93,7 @@ namespace TEN::Effects::Blood
 
 	void BloodDripEffectController::Spawn(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& size, float lifeInSec, bool canSpawnStain)
 	{
-		constexpr auto COUNT_MAX   = 256;
+		constexpr auto COUNT_MAX   = 1024;
 		constexpr auto GRAVITY_MAX = 10.0f;
 		constexpr auto GRAVITY_MIN = 5.0f;
 
@@ -504,8 +504,8 @@ namespace TEN::Effects::Blood
 		constexpr auto HEIGHT_MIN	   = WIDTH_MAX;
 		constexpr auto VEL_MAX		   = 35.0f;
 		constexpr auto VEL_MIN		   = 15.0f;
-		constexpr auto DRIP_COUNT_MULT = 16;
-		constexpr auto MIST_COUNT_MULT = 4;
+		constexpr auto DRIP_COUNT_MULT = 12;
+		constexpr auto MIST_COUNT_MULT = 8;
 		constexpr auto CONE_SEMIANGLE  = 50.0f;
 
 		// Spawn underwater blood.
@@ -532,6 +532,33 @@ namespace TEN::Effects::Blood
 		// Spawn mists.
 		unsigned int mistCount = baseCount * MIST_COUNT_MULT;
 		BloodMistEffect.Spawn(pos, roomNumber, dir, mistCount);
+	}
+
+	void SpawnPlayerBloodEffect(const ItemInfo& item)
+	{
+		constexpr auto BASE_COUNT_MAX	 = 3;
+		constexpr auto BASE_COUNT_MIN	 = 1;
+		constexpr auto SPHERE_RADIUS_MAX = 16.0f;
+
+		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+		auto baseVel = Vector3::Transform(item.Animation.Velocity, rotMatrix);
+		unsigned int baseCount = Random::GenerateInt(BASE_COUNT_MIN, BASE_COUNT_MAX);
+
+		int node = 1;
+		for (int i = 0; i < LARA_MESHES::LM_HEAD; i++)
+		{
+			if (node & item.TouchBits.ToPackedBits())
+			{
+				auto sphere = BoundingSphere(Vector3::Zero, Random::GenerateFloat(0.0f, SPHERE_RADIUS_MAX));
+				auto relOffset = Random::GeneratePointInSphere(sphere);
+				auto pos = GetJointPosition(item, i, relOffset);
+
+				SpawnBloodSplatEffect(pos.ToVector3(), item.RoomNumber, Vector3::Down, baseVel, baseCount);
+				//DoBloodSplat(pos.x, pos.y, pos.z, Random::GenerateInt(8, 16), Random::GenerateAngle(), LaraItem->RoomNumber);
+			}
+
+			node *= 2;
+		}
 	}
 
 	short DoBloodSplat(int x, int y, int z, short vel, short headingAngle, short roomNumber)
@@ -566,26 +593,6 @@ namespace TEN::Effects::Blood
 	void TriggerBlood(int x, int y, int z, short headingAngle, unsigned int count)
 	{
 		BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, count);
-	}
-
-	void TriggerLaraBlood()
-	{
-		int node = 1;
-		for (int i = 0; i < LARA_MESHES::LM_HEAD; i++)
-		{
-			if (node & LaraItem->TouchBits.ToPackedBits())
-			{
-				auto relOffset = Vector3i(
-					Random::GenerateInt(-16, 16),
-					Random::GenerateInt(-16, 16),
-					Random::GenerateInt(-16, 16));
-				auto pos = GetJointPosition(LaraItem, i, relOffset);
-
-				DoBloodSplat(pos.x, pos.y, pos.z, Random::GenerateInt(8, 16), Random::GenerateAngle(), LaraItem->RoomNumber);
-			}
-
-			node *= 2;
-		}
 	}
 
 	void DrawBloodDebug()

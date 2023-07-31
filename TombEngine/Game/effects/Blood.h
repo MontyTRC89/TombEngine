@@ -181,12 +181,12 @@ namespace TEN::Effects::Blood
 	extern UnderwaterBloodEffectController UnderwaterBloodEffect;
 
 	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount);
+	void SpawnPlayerBloodEffect(const ItemInfo& item);
 
 	// Legacy spawners
 	short DoBloodSplat(int x, int y, int z, short vel, short yRot, short roomNumber);
 	void DoLotsOfBlood(int x, int y, int z, int vel, short headingAngle, int roomNumber, unsigned int count);
 	void TriggerBlood(int x, int y, int z, short headingAngle, unsigned int count);
-	void TriggerLaraBlood();
 
 	void DrawBloodDebug();
 }

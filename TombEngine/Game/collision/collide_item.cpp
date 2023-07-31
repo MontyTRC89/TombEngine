@@ -79,7 +79,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 							if (dx || dy || dz)
 							{
 								if (TriggerActive(item))
-									TriggerLaraBlood();
+									SpawnPlayerBloodEffect(*laraItem);
 							}
 
 							if (!coll->Setup.EnableObjectPush)
