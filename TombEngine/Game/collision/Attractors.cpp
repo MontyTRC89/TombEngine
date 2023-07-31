@@ -391,7 +391,7 @@ namespace TEN::Collision::Attractors
 	}
 
 	// Debug.
-	std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
+	static std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
 	{
 		constexpr auto RANGE = BLOCK(5);
 
@@ -559,6 +559,7 @@ namespace TEN::Collision::Attractors
 		return GenerateAttractorFromPoints(points, bridge.RoomNumber, AttractorType::Edge);
 	}
 
+	// Debug
 	std::optional<Attractor> GenerateSectorAttractor(const CollisionResult& pointColl)
 	{
 		// Invalid sector; return nullopt.

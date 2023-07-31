@@ -90,9 +90,6 @@ namespace TEN::Collision::Attractors
 		float NormalizeChainDistance(float chainDist) const;
 	};
 
-	// Temp
-	std::vector<const Attractor*> GetDebugAttractors(const ItemInfo& item);
-
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
 															   const Vector3& refPoint, float range);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float range);
