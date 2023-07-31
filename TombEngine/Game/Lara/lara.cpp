@@ -38,6 +38,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
@@ -491,6 +492,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Status.Stamina < LARA_STAMINA_MAX && item->Animation.ActiveState != LS_SPRINT)
 		lara->Status.Stamina++;
 
+	HandlePlayerQuickActions(*item);
 	RumbleLaraHealthCondition(item);
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
@@ -588,7 +590,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
 						item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						item->Pose.Position.y = waterHeight + (SECTOR(1) - 24);
+						item->Pose.Position.y = waterHeight + (BLOCK(1) - 24);
 					}
 
 					SetAnimation(item, LA_WADE);
@@ -707,9 +709,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
-	{
 		item->HitPoints--;
-	}
 
 	if (item->HitPoints <= 0)
 	{
@@ -861,6 +861,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
+
+	if (DebugMode)
+	{
+		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
+		DrawNearbySectorFlags(*item);
+	}
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
@@ -931,9 +937,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber, &coll->Setup);
-
-	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
+	TestVolumes(item->Index, &coll->Setup);
 }
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
@@ -1005,7 +1009,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(item->Index);
 }
 
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
@@ -1094,7 +1098,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(Lara.ItemNumber);
+	TestVolumes(item->Index);
 }
 
 void LaraCheat(ItemInfo* item, CollisionInfo* coll)

@@ -160,8 +160,8 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
-	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomFlagID, kRoomFlagIDs);
-	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomReverb, kRoomReverbTypes);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomFlagID, TOOM_FLAG_IDS);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomReverb, ROOM_REVERB_TYPES);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
 }
@@ -200,7 +200,7 @@ void ObjectsHandler::TestCollidingObjects()
 
 void ObjectsHandler::AssignLara()
 {
-	m_table_objects.set(ScriptReserved_Lara, LaraObject(Lara.ItemNumber, true));
+	m_table_objects.set(ScriptReserved_Lara, LaraObject(LaraItem->Index, true));
 }
 
 bool ObjectsHandler::NotifyKilled(ItemInfo* key)

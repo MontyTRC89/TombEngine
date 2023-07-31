@@ -59,7 +59,7 @@ namespace TEN::Entities::Creatures::TR3
 		tRexItem->Animation.TargetState = TREX_STATE_KILL;
 
 		if (laraItem->RoomNumber != tRexItem->RoomNumber)
-			ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, tRexItem->RoomNumber);
 
 		laraItem->Pose = Pose(
 			tRexItem->Pose.Position,
@@ -114,7 +114,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->Flags = (creature->Mood != MoodType::Escape && !ai.ahead && ai.enemyFacing > -FRONT_ARC && ai.enemyFacing < FRONT_ARC);
 
 			if (ai.distance > pow(1500, 2) &&
-				ai.distance < pow(SECTOR(4), 2) &&
+				ai.distance < pow(BLOCK(4), 2) &&
 				ai.bite && !creature->Flags)
 			{
 				creature->Flags = 1;
@@ -150,7 +150,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TREX_STATE_RUN_FORWARD:
 				creature->MaxTurn = TREX_RUN_TURN_RATE_MAX;
 
-				if (ai.distance < pow(SECTOR(5), 2) && ai.bite)
+				if (ai.distance < pow(BLOCK(5), 2) && ai.bite)
 					item->Animation.TargetState = TREX_STATE_IDLE;
 				else if (creature->Flags)
 					item->Animation.TargetState = TREX_STATE_IDLE;

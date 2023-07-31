@@ -29,7 +29,7 @@ namespace TEN::Entities::Doors
 		GameBoundingBox(
 			-384, 384,
 			0, 0, 
-			-SECTOR(1), SECTOR(0.5f)
+			-BLOCK(1), BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),

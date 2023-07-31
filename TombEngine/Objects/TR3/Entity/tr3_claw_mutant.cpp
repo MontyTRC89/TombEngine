@@ -35,9 +35,9 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CLAW_MUTANT_WALK_TURN_RATE_MAX = ANGLE(3.0f);
 	constexpr auto CLAW_MUTANT_RUN_TURN_RATE_MAX  = ANGLE(4.0f);
 
-	const auto ClawMutantLeftBite  = CreatureBiteInfo(Vector3i(19, -13, 3), 7);
-	const auto ClawMutantRightBite = CreatureBiteInfo(Vector3i(19, -13, 3), 4);
-	const auto ClawMutantTailBite  = CreatureBiteInfo(Vector3i(-32, -16, -119), 13);
+	const auto ClawMutantLeftBite  = CreatureBiteInfo(Vector3(19, -13, 3), 7);
+	const auto ClawMutantRightBite = CreatureBiteInfo(Vector3(19, -13, 3), 4);
+	const auto ClawMutantTailBite  = CreatureBiteInfo(Vector3(-32, -16, -119), 13);
 
 	enum ClawMutantState
 	{

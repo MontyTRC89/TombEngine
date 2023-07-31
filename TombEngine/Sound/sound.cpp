@@ -19,6 +19,8 @@ HSAMPLE BASS_SamplePointer[SOUND_MAX_SAMPLES];
 HSTREAM BASS_3D_Mixdown;
 HFX     BASS_FXHandler[(int)SoundFilter::Count];
 
+HMODULE ADPCMLibrary = NULL; // Temporary hack for unexpected ADPCM codec unload on Win11 systems.
+
 SoundEffectSlot SoundSlot[SOUND_MAX_CHANNELS];
 SoundTrackSlot  SoundtrackSlot[(int)SoundTrackType::Count];
 
@@ -39,10 +41,10 @@ std::map<std::string, int> SoundTrackMap;
 std::unordered_map<int, SoundTrackInfo> SoundTracks;
 std::vector<SubtitleItem*> Subtitles;
 
-static int SecretSoundIndex = 5;
 constexpr int LegacyLoopingTrackMin = 98;
 constexpr int LegacyLoopingTrackMax = 111;
 
+static int SecretSoundIndex = 5;
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
 
@@ -175,7 +177,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		TENLog("Non present effect: " + std::to_string(effectID), LogLevel::Warning);
+		TENLog("Missing sound effect: " + std::to_string(effectID), LogLevel::Warning);
 		g_Level.SoundMap[effectID] = -2;
 		return false;
 	}
@@ -214,7 +216,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f) * SOUND_MAX_PITCH_CHANGE * 2.0f;
 
 	// Calculate sound radius and distance to sound
-	float radius = (float)(sampleInfo->Radius) * SECTOR(1);
+	float radius = (float)(sampleInfo->Radius) * BLOCK(1);
 	float distance = Sound_DistanceToListener(position);
 
 	// Don't play sound if it's too far from listener's position.
@@ -940,6 +942,9 @@ void Sound_Init(const std::string& gameDirectory)
 
 	if (!g_Configuration.EnableSound)
 		return;
+	
+	// HACK: Manually force-load ADPCM codec, because on Win11 systems it may suddenly unload otherwise.
+	ADPCMLibrary = LoadLibrary("msadp32.acm");
 
 	BASS_Init(g_Configuration.SoundDevice, 44100, BASS_DEVICE_3D, WindowsHandle, NULL);
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
@@ -997,11 +1002,15 @@ void Sound_Init(const std::string& gameDirectory)
 // Must be called on engine quit.
 void Sound_DeInit()
 {
-	if (g_Configuration.EnableSound)
-	{
-		TENLog("Shutting down BASS...", LogLevel::Info);
-		BASS_Free();
-	}
+	if (!g_Configuration.EnableSound)
+		return;
+
+	TENLog("Shutting down BASS...", LogLevel::Info);
+	BASS_Free();
+
+	// HACK: Manually unload previously loaded ADPCM codec.
+	if (ADPCMLibrary != NULL)
+		FreeLibrary(ADPCMLibrary);
 }
 
 bool Sound_CheckBASSError(const char* message, bool verbose, ...)

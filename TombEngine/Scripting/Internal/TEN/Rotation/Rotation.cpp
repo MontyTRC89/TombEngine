@@ -78,7 +78,7 @@ void Rotation::StoreInPHDPos(Pose& pose) const
 
 Rotation::operator Vector3() const
 {
-	return Vector3{ x, y, z };
+	return Vector3(x, y, z);
 };
 
 /***

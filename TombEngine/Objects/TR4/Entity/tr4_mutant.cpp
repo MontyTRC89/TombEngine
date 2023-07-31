@@ -245,11 +245,11 @@ namespace TEN::Entities::TR4
 
 	void MutantAIFix(ItemInfo* item, AI_INFO* AI)
 	{
-		MoveItemFront(item, SECTOR(2));
+		MoveItemFront(item, BLOCK(2));
 		item->Pose.Position.y -= CLICK(3);
 		CreatureAIInfo(item, AI);
 		item->Pose.Position.y += CLICK(3);
-		MoveItemBack(item, SECTOR(2));
+		MoveItemBack(item, BLOCK(2));
 	}
 
 	void InitializeCrocgod(short itemNumber)

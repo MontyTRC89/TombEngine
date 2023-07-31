@@ -39,7 +39,7 @@ namespace TEN::Entities::TR4
 	constexpr auto NO_BABOON_COUNT		   = -2;
 	constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
 
-	const auto BaboonBite = CreatureBiteInfo(Vector3i(10, 10, 11), 4);
+	const auto BaboonBite = CreatureBiteInfo(Vector3(10, 10, 11), 4);
 	const auto BaboonAttackJoints	   = std::vector<unsigned int>{ 11, 12 };
 	const auto BaboonAttackRightJoints = std::vector<unsigned int>{ 1, 2, 3, 5, 8, 9 };
 	const auto BaboonJumpAttackJoints  = std::vector<unsigned int>{ 3, 4, 8 };
@@ -491,23 +491,23 @@ namespace TEN::Entities::TR4
 					auto pos = Vector3i::Zero;
 					if (item->Pose.Orientation.y == ANGLE(270.0f))
 					{
-						pos.x = item->Pose.Position.x - SECTOR(1);
+						pos.x = item->Pose.Position.x - BLOCK(1);
 						pos.z = item->Pose.Position.z;
 					}
 					else if (item->Pose.Orientation.y == ANGLE(90.0f))
 					{
-						pos.x = item->Pose.Position.x + SECTOR(1);
+						pos.x = item->Pose.Position.x + BLOCK(1);
 						pos.z = item->Pose.Position.z;
 					}
 					else if (item->Pose.Orientation.y == ANGLE(0.0f))
 					{
 						pos.x = item->Pose.Position.x;
-						pos.z = item->Pose.Position.z + SECTOR(1);
+						pos.z = item->Pose.Position.z + BLOCK(1);
 					}
 					else if (item->Pose.Orientation.y == ANGLE(180.0f))
 					{
 						pos.x = item->Pose.Position.x;
-						pos.z = item->Pose.Position.z - SECTOR(1);
+						pos.z = item->Pose.Position.z - BLOCK(1);
 					}
 
 					pos.y = item->Pose.Position.y;

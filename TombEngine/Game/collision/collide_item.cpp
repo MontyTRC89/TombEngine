@@ -312,19 +312,18 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 		auto origin = Vector3(
 			item->Pose.Position.x + (sinHeading * (coll->Setup.Radius)),
 			item->Pose.Position.y - (height + CLICK(1)),
-			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius))
-		);
+			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius)));
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
-		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
 
 		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
 
-			short itemNumber = g_Level.Rooms[i].itemNumber;
+			int itemNumber = g_Level.Rooms[i].itemNumber;
 			while (itemNumber != NO_ITEM)
 			{
 				auto* item2 = &g_Level.Items[itemNumber];
@@ -979,7 +978,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	itemBounds.Extents = itemBounds.Extents - Vector3(BLOCK(1));
 
 	// Draw static bounds.
-	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RendererDebugPage::CollisionStats);
 
 	// Calculate horizontal item collision bounds according to radius.
 	GameBoundingBox collBox;
@@ -1010,7 +1009,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
 
 	// Draw item coll bounds.
-	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 	// Decompose static bounds into top/bottom plane vertices.
 	Vector3 corners[8];
@@ -1990,17 +1989,19 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 	}
 }
 
-void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (item->Status == ITEM_ACTIVE)
+	if (item.Status == ITEM_ACTIVE)
 	{
-		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-		TestCollision(item, laraItem);
+		TestCollision(&item, playerItem);
 	}
-	else if (item->Status != ITEM_INVISIBLE)
-		ObjectCollision(itemNumber, laraItem, coll);
+	else if (item.Status != ITEM_INVISIBLE)
+	{
+		ObjectCollision(itemNumber, playerItem, coll);
+	}
 }

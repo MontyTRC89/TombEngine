@@ -28,7 +28,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SLIP = 10;
 	constexpr auto SPEEDBOAT_SLIP_SIDE = 30;
 	constexpr auto SPEEDBOAT_MOUNT_DISTANCE = CLICK(2.25f);
-	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
+	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = BLOCK(1);
 
 	constexpr auto SPEEDBOAT_VELOCITY_ACCEL = 5;
 	constexpr auto SPEEDBOAT_VELOCITY_DECEL = 1;
@@ -42,7 +42,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_REVERSE_VELOCITY_MAX = 20;
 
 	constexpr auto SPEEDBOAT_STEP_HEIGHT_MAX = CLICK(1); // Unused.
-	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
+	constexpr auto SPEEDBOAT_SOUND_CEILING = BLOCK(5); // Unused.
 	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
 
 	constexpr auto SPEEDBOAT_WAKE_OFFSET = Vector3(SPEEDBOAT_SIDE * 1.2f, 0.0f, SPEEDBOAT_FRONT / 8);
@@ -213,7 +213,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 
 		if (laraItem->RoomNumber != speedboatItem->RoomNumber)
-			ItemNewRoom(lara->ItemNumber, speedboatItem->RoomNumber);
+			ItemNewRoom(laraItem->Index, speedboatItem->RoomNumber);
 
 		laraItem->Pose.Position = speedboatItem->Pose.Position;
 		laraItem->Pose.Position.y -= 5;
@@ -289,7 +289,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Position.z = z;
 
 				if (probe.RoomNumber != laraItem->RoomNumber)
-					ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+					ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 			laraItem->Pose.Position.y = y;
 
@@ -328,11 +328,11 @@ namespace TEN::Entities::Vehicles
 
 	short SpeedboatDoShift(ItemInfo* speedboatItem, Vector3i* pos, Vector3i* old)
 	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
 
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
+		int xOld = old->x / BLOCK(1);
+		int zOld = old->z / BLOCK(1);
 
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
@@ -351,7 +351,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				speedboatItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				speedboatItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (speedboatItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -364,7 +364,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				speedboatItem->Pose.Position.x += SECTOR(1) - shiftX;
+				speedboatItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - speedboatItem->Pose.Position.z);
 			}
 		}
@@ -379,7 +379,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, speedboatItem->RoomNumber);
@@ -388,7 +388,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)
@@ -604,11 +604,11 @@ namespace TEN::Entities::Vehicles
 
 		if (speedboatItem->Pose.Position.y >= speedboat->Water - CLICK(0.5f) && speedboat->Water != NO_HEIGHT)
 		{
-			if (!(TrInput & VEHICLE_IN_DISMOUNT) && !(TrInput & IN_LOOK) ||
+			if (!IsHeld(In::Brake) && !(TrInput & IN_LOOK) ||
 				speedboatItem->Animation.Velocity.z)
 			{
-				if (TrInput & VEHICLE_IN_LEFT && !(TrInput & VEHICLE_IN_REVERSE) ||
-					TrInput & VEHICLE_IN_RIGHT && TrInput & VEHICLE_IN_REVERSE)
+				if (IsHeld(In::Left) && !IsHeld(In::Reverse) ||
+					IsHeld(In::Right) && IsHeld(In::Reverse))
 				{
 					if (speedboat->TurnRate > 0)
 						speedboat->TurnRate -= SPEEDBOAT_TURN_RATE_DECEL;
@@ -621,8 +621,8 @@ namespace TEN::Entities::Vehicles
 
 					noTurn = false;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT && !(TrInput & VEHICLE_IN_REVERSE) ||
-					TrInput & VEHICLE_IN_LEFT && TrInput & VEHICLE_IN_REVERSE)
+				else if (IsHeld(In::Right) && !IsHeld(In::Reverse) ||
+					IsHeld(In::Left) && IsHeld(In::Reverse))
 				{
 					if (speedboat->TurnRate < 0)
 						speedboat->TurnRate += SPEEDBOAT_TURN_RATE_DECEL;
@@ -636,30 +636,30 @@ namespace TEN::Entities::Vehicles
 					noTurn = false;
 				}
 
-				if (TrInput & VEHICLE_IN_REVERSE)
+				if (IsHeld(In::Reverse))
 				{
 					if (speedboatItem->Animation.Velocity.z > 0)
 						speedboatItem->Animation.Velocity.z -= SPEEDBOAT_VELOCITY_BRAKE_DECEL;
 					else if (speedboatItem->Animation.Velocity.z > -SPEEDBOAT_REVERSE_VELOCITY_MAX)
 						speedboatItem->Animation.Velocity.z -= SPEEDBOAT_REVERSE_VELOCITY_DECEL;
 				}
-				else if (TrInput & VEHICLE_IN_ACCELERATE)
+				else if (IsHeld(In::Accelerate))
 				{
-					if (TrInput & VEHICLE_IN_SPEED)
+					if (IsHeld(In::Speed))
 						maxVelocity = SPEEDBOAT_FAST_VELOCITY_MAX;
 					else
-						maxVelocity = (TrInput & VEHICLE_IN_SLOW) ? SPEEDBOAT_SLOW_VELOCITY_MAX : SPEEDBOAT_NORMAL_VELOCITY_MAX;
+						maxVelocity = (IsHeld(In::Slow)) ? SPEEDBOAT_SLOW_VELOCITY_MAX : SPEEDBOAT_NORMAL_VELOCITY_MAX;
 
 					if (speedboatItem->Animation.Velocity.z < maxVelocity)
 						speedboatItem->Animation.Velocity.z += (SPEEDBOAT_VELOCITY_ACCEL / 2) + (SPEEDBOAT_VELOCITY_ACCEL * (speedboatItem->Animation.Velocity.z / (maxVelocity * 2)));
 					else if (speedboatItem->Animation.Velocity.z > (maxVelocity + SPEEDBOAT_VELOCITY_DECEL))
 						speedboatItem->Animation.Velocity.z -= SPEEDBOAT_VELOCITY_DECEL;
 				}
-				else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
+				else if (IsHeld(In::Left) || IsHeld(In::Right) &&
 					speedboatItem->Animation.Velocity.z >= 0 &&
 					speedboatItem->Animation.Velocity.z < SPEEDBOAT_VELOCITY_MIN)
 				{
-					if (!(TrInput & VEHICLE_IN_DISMOUNT) &&
+					if (!IsHeld(In::Brake) &&
 						speedboatItem->Animation.Velocity.z == 0)
 						speedboatItem->Animation.Velocity.z = SPEEDBOAT_VELOCITY_MIN;
 				}
@@ -670,11 +670,11 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
+				if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 					speedboatItem->Animation.Velocity.z >= 0 &&
 					speedboatItem->Animation.Velocity.z < SPEEDBOAT_VELOCITY_MIN)
 				{
-					if (speedboatItem->Animation.Velocity.z == 0 && !(TrInput & VEHICLE_IN_DISMOUNT))
+					if (speedboatItem->Animation.Velocity.z == 0 && !IsHeld(In::Brake))
 						speedboatItem->Animation.Velocity.z = SPEEDBOAT_VELOCITY_MIN;
 				}
 				else if (speedboatItem->Animation.Velocity.z > SPEEDBOAT_VELOCITY_DECEL)
@@ -720,13 +720,13 @@ namespace TEN::Entities::Vehicles
 			switch (laraItem->Animation.ActiveState)
 			{
 			case SPEEDBOAT_STATE_IDLE:
-				if (TrInput & VEHICLE_IN_DISMOUNT)
+				if (IsHeld(In::Brake))
 				{
 					if (speedboatItem->Animation.Velocity.z == 0)
 					{
-						if (TrInput & VEHICLE_IN_RIGHT && TestSpeedboatDismount(speedboatItem, speedboatItem->Pose.Orientation.y + ANGLE(90.0f)))
+						if (IsHeld(In::Right) && TestSpeedboatDismount(speedboatItem, speedboatItem->Pose.Orientation.y + ANGLE(90.0f)))
 							laraItem->Animation.TargetState = SPEEDBOAT_STATE_DISMOUNT_RIGHT;
-						else if (TrInput & VEHICLE_IN_LEFT && TestSpeedboatDismount(speedboatItem, speedboatItem->Pose.Orientation.y - ANGLE(90.0f)))
+						else if (IsHeld(In::Left) && TestSpeedboatDismount(speedboatItem, speedboatItem->Pose.Orientation.y - ANGLE(90.0f)))
 							laraItem->Animation.TargetState = SPEEDBOAT_STATE_DISMOUNT_LEFT;
 					}
 				}
@@ -737,11 +737,11 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			case SPEEDBOAT_STATE_MOVING:
-				if (TrInput & VEHICLE_IN_DISMOUNT)
+				if (IsHeld(In::Brake))
 				{
-					if (TrInput & VEHICLE_IN_RIGHT)
+					if (IsHeld(In::Right))
 						laraItem->Animation.TargetState = SPEEDBOAT_STATE_DISMOUNT_RIGHT;
-					else if (TrInput & VEHICLE_IN_RIGHT)
+					else if (IsHeld(In::Left))
 						laraItem->Animation.TargetState = SPEEDBOAT_STATE_DISMOUNT_LEFT;
 				}
 				else if (speedboatItem->Animation.Velocity.z <= 0)
@@ -756,7 +756,7 @@ namespace TEN::Entities::Vehicles
 				//case SPEEDBOAT_TURN_RATE_ACCELR:
 				if (speedboatItem->Animation.Velocity.z <= 0)
 					laraItem->Animation.TargetState = SPEEDBOAT_STATE_IDLE;
-				else if (!(TrInput & VEHICLE_IN_RIGHT))
+				else if (!IsHeld(In::Right))
 					laraItem->Animation.TargetState = SPEEDBOAT_STATE_MOVING;
 
 				break;
@@ -764,7 +764,7 @@ namespace TEN::Entities::Vehicles
 			case SPEEDBOAT_STATE_TURN_LEFT:
 				if (speedboatItem->Animation.Velocity.z <= 0)
 					laraItem->Animation.TargetState = SPEEDBOAT_STATE_IDLE;
-				else if (!(TrInput & VEHICLE_IN_LEFT))
+				else if (!IsHeld(In::Left))
 					laraItem->Animation.TargetState = SPEEDBOAT_STATE_MOVING;
 
 				break;
@@ -901,7 +901,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != speedboatItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose = speedboatItem->Pose;
@@ -913,7 +913,7 @@ namespace TEN::Entities::Vehicles
 				SyncVehicleAnimation(*speedboatItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(20.0f);
-			Camera.targetDistance = SECTOR(2);
+			Camera.targetDistance = BLOCK(2);
 
 			auto pitch = speedboatItem->Animation.Velocity.z;
 			speedboat->Pitch += (pitch - speedboat->Pitch) / 4;

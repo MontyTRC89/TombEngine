@@ -71,13 +71,15 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float4 tex = Texture.Sample(Sampler, input.UV);
     DoAlphaTest(tex);
 
+	float3 normal = normalize(input.Normal);
+
 	float3 color = (LightType == 0) ?
 		CombineLights(
 			AmbientLight.xyz, 
 			input.Color.xyz, 
 			tex.xyz, 
 			input.WorldPosition, 
-			normalize(input.Normal), 
+			normal, 
 			input.Sheen, 
 			StaticLights, 
 			NumStaticLights,

@@ -212,6 +212,20 @@ void CollectCarriedItems(ItemInfo* item)
 	item->CarriedItem = NO_ITEM;
 }
 
+static void HideOrDisablePickup(ItemInfo& pickupItem)
+{
+	if (pickupItem.TriggerFlags & 0xC0)
+	{
+		pickupItem.Status = ITEM_INVISIBLE;
+		pickupItem.Flags |= TRIGGERED;
+		pickupItem.ItemFlags[3] = 1;
+	}
+	else
+	{
+		KillItem(pickupItem.Index);
+	}
+}
+
 void CollectMultiplePickups(int itemNumber)
 {
 	auto* firstItem = &g_Level.Items[itemNumber];
@@ -244,15 +258,7 @@ void CollectMultiplePickups(int itemNumber)
 			}
 		}
 
-		if (currentItem->TriggerFlags & 0xC0)
-		{
-			currentItem->Status = ITEM_INVISIBLE;
-			currentItem->Flags |= TRIGGERED;
-			currentItem->ItemFlags[3] = 1;
-		}
-
-		//currentItem->Pose.Orientation = prevOrient;
-		KillItem(currentItem->Index);
+		HideOrDisablePickup(*currentItem);
 
 		if (currentItem == firstItem)
 			break;
@@ -313,16 +319,7 @@ void DoPickup(ItemInfo* laraItem)
 			}
 
 			g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
-			if (!(pickupItem->TriggerFlags & 0xC0))
-			{
-				KillItem(pickupItemNumber);
-			}
-			else
-			{
-				pickupItem->Status = ITEM_INVISIBLE;
-				pickupItem->Flags |= TRIGGERED;
-				pickupItem->ItemFlags[3] = 1;
-			}
+			HideOrDisablePickup(*pickupItem);
 
 			pickupItem->Pose.Orientation = prevOrient;
 			lara->Context.InteractedItem = NO_ITEM;
@@ -357,15 +354,9 @@ void DoPickup(ItemInfo* laraItem)
 					}
 				}
 
-				if (pickupItem->TriggerFlags & 0xC0)
-				{
-					pickupItem->Status = ITEM_INVISIBLE;
-					pickupItem->Flags |= TRIGGERED;
-					pickupItem->ItemFlags[3] = 1;
-				}
+				HideOrDisablePickup(*pickupItem);
 
 				pickupItem->Pose.Orientation = prevOrient;
-				KillItem(pickupItemNumber);
 				lara->Context.InteractedItem = NO_ITEM;
 				return;
 			}
