@@ -675,12 +675,10 @@ namespace TEN::Entities::Generic
 				return false;
 		
 			const auto& object = Objects[CollidedItems[i]->ObjectNumber];
-			int collidedIndex = CollidedItems[i] - g_Level.Items.data(); // Index of CollidedItems[i].
-
 			auto colPos = CollidedItems[i]->Pose.Position;
 
 			// Check if floor function returns nullopt.
-			if (object.floor(collidedIndex, colPos.x, colPos.y, colPos.z) == std::nullopt)
+			if (object.floor(CollidedItems[i]->Index, colPos.x, colPos.y, colPos.z) == std::nullopt)
 				return false;
 		}
 
@@ -757,13 +755,12 @@ namespace TEN::Entities::Generic
 			else
 			{
 				const auto& object = Objects[CollidedItems[i]->ObjectNumber];
-				int collidedIndex = CollidedItems[i] - g_Level.Items.data();
 
 				int xCol = CollidedItems[i]->Pose.Position.x;
 				int yCol = CollidedItems[i]->Pose.Position.y;
 				int zCol = CollidedItems[i]->Pose.Position.z;
 
-				if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
+				if (object.floor(CollidedItems[i]->Index, xCol, yCol, zCol) == std::nullopt)
 					return false;
 			}
 		}
@@ -832,12 +829,11 @@ namespace TEN::Entities::Generic
 			else
 			{
 				const auto& object = Objects[CollidedItems[i]->ObjectNumber];
-				int collidedIndex = CollidedItems[i] - g_Level.Items.data();
 				int xCol = CollidedItems[i]->Pose.Position.x;
 				int yCol = CollidedItems[i]->Pose.Position.y;
 				int zCol = CollidedItems[i]->Pose.Position.z;
 
-				if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
+				if (object.floor(CollidedItems[i]->Index, xCol, yCol, zCol) == std::nullopt)
 					return false;
 			}
 		}

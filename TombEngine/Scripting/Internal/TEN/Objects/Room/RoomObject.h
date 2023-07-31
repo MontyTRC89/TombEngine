@@ -2,14 +2,10 @@
 #include "Game/room.h"
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
 
-namespace sol
-{
-	class state;
-}
-
+namespace sol { class state; }
+enum class ReverbType;
 class ScriptColor;
 class Vec3; 
-enum class ReverbType;
 
 class Room : public NamedBase<Room, ROOM_INFO&>
 {

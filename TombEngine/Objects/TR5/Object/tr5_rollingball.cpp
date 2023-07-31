@@ -15,7 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-constexpr auto ROLLING_BALL_MAX_VELOCITY = SECTOR(3);
+constexpr auto ROLLING_BALL_MAX_VELOCITY = BLOCK(3);
 
 void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {

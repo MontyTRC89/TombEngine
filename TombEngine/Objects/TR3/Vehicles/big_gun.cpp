@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
-	const auto BigGunBite = CreatureBiteInfo(Vector3i(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
+	const auto BigGunBite = CreatureBiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -105,7 +105,7 @@ namespace TEN::Entities::Vehicles
 		int z = laraItem->Pose.Position.z - bigGunItem->Pose.Position.z;
 
 		int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
-		if (distance > SECTOR(30))
+		if (distance > BLOCK(30))
 			return false;
 
 		short deltaAngle = abs(laraItem->Pose.Orientation.y - bigGunItem->Pose.Orientation.y);
@@ -188,11 +188,11 @@ namespace TEN::Entities::Vehicles
 			if (!bigGun->BarrelRotation)
 				bigGun->IsBarrelRotating = false;
 
-			if (TrInput & VEHICLE_IN_DISMOUNT || laraItem->HitPoints <= 0)
+			if (IsHeld(In::Brake) || laraItem->HitPoints <= 0)
 				bigGun->Flags = BGUN_FLAG_AUTO_ROT;
 			else
 			{
-				if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_FIRE) && !bigGun->FireCount)
+				if ((IsHeld(In::Accelerate) || IsHeld(In::Fire)) && !bigGun->FireCount)
 				{
 					BigGunFire(bigGunItem, laraItem);
 					bigGun->FireCount = BGUN_RECOIL_TIME;
@@ -200,7 +200,7 @@ namespace TEN::Entities::Vehicles
 					bigGun->IsBarrelRotating = true;
 				}
 
-				if (TrInput & VEHICLE_IN_UP)
+				if (IsHeld(In::Forward))
 				{
 					if (bigGun->TurnRate.x < 0)
 						bigGun->TurnRate.x /= 2;
@@ -209,7 +209,7 @@ namespace TEN::Entities::Vehicles
 					if (bigGun->TurnRate.x > (BGUN_TURN_RATE_MAX / 2))
 						bigGun->TurnRate.x = (BGUN_TURN_RATE_MAX / 2);
 				}
-				else if (TrInput & VEHICLE_IN_DOWN)
+				else if (IsHeld(In::Back))
 				{
 					if (bigGun->TurnRate.x > 0)
 						bigGun->TurnRate.x /= 2;
@@ -225,7 +225,7 @@ namespace TEN::Entities::Vehicles
 						bigGun->TurnRate.x = 0;
 				}
 
-				if (TrInput & VEHICLE_IN_LEFT)
+				if (IsHeld(In::Left))
 				{
 					if (bigGun->TurnRate.y > 0)
 						bigGun->TurnRate.y /= 2;
@@ -234,7 +234,7 @@ namespace TEN::Entities::Vehicles
 					if (bigGun->TurnRate.y < -BGUN_TURN_RATE_MAX)
 						bigGun->TurnRate.y = -BGUN_TURN_RATE_MAX;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT)
+				else if (IsHeld(In::Right))
 				{
 					if (bigGun->TurnRate.y < 0)
 						bigGun->TurnRate.y /= 2;

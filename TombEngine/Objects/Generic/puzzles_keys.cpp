@@ -230,15 +230,14 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	auto& player = GetLaraInfo(*laraItem);
 
 	// NOTE: Only execute code below if Triggertype is switch trigger.
-	auto triggerIndex = GetTriggerIndex(&receptacleItem);
-
-	if (triggerIndex == 0)
+	short* triggerIndexPtr = GetTriggerIndex(&receptacleItem);
+	if (triggerIndexPtr == nullptr)
 		return;
 
-	int triggerType = (*(triggerIndex++) >> 8) & 0x3F;
-
+	int triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 	if (triggerType != TRIGGER_TYPES::SWITCH)
 		return;
+
 	AnimateItem(&receptacleItem);
 
 	// Start level with correct object when loading game.
@@ -330,12 +329,8 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 void PuzzleDone(ItemInfo* item, short itemNumber)
 {
-	auto triggerIndex = GetTriggerIndex(item);
-
-	if (triggerIndex == 0)
-		return;
-
-	short triggerType = (*(triggerIndex++) >> 8) & 0x3F;
+	short* triggerIndexPtr = GetTriggerIndex(item);
+	short triggerType = (triggerIndexPtr != nullptr) ? (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS : TRIGGER_TYPES::TRIGGER;
 
 	if (triggerType == TRIGGER_TYPES::SWITCH)
 	{
@@ -447,10 +442,10 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
 
-	if (triggerIndexPtr == 0)
+	if (triggerIndexPtr == nullptr)
 		return;
 
-	short triggerType = (*(triggerIndexPtr++) >> 8) & 0x3F;
+	short triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
 

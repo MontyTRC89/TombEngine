@@ -9,9 +9,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Sound/sound.h"
@@ -33,8 +33,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SHIVA_SWAPMESH_TIME	   = 3;
 	constexpr auto PLAYER_ANIM_SHIVA_DEATH = 7; // TODO: Move to LaraExtraAnims enum.
 
-	const auto ShivaBiteLeft  = CreatureBiteInfo(Vector3i(0, 0, 920), 13);
-	const auto ShivaBiteRight = CreatureBiteInfo(Vector3i(0, 0, 920), 22);
+	const auto ShivaBiteLeft  = CreatureBiteInfo(Vector3(0, 0, 920), 13);
+	const auto ShivaBiteRight = CreatureBiteInfo(Vector3(0, 0, 920), 22);
 	const auto ShivaAttackLeftJoints  = std::vector<unsigned int>{ 10, 13 };
 	const auto ShivaAttackRightJoints = std::vector<unsigned int>{ 22, 25 };
 

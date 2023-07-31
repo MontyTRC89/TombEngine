@@ -73,20 +73,20 @@ struct LOTInfo
 
 struct CreatureBiteInfo
 {
-	Vector3i Position = Vector3i::Zero; // TODO: Change back to Vector3.
-	int		 BoneID	  = -1;
+	Vector3 Position = Vector3::Zero;
+	int		BoneID	 = -1;
 
 	CreatureBiteInfo() {}
 
-	CreatureBiteInfo(const Vector3i& pos, int boneID)
+	CreatureBiteInfo(const Vector3& pos, int boneID)
 	{
 		Position = pos;
 		BoneID = boneID;
 	}
 
-	CreatureBiteInfo(int x, int y, int z, int boneID)
+	CreatureBiteInfo(float x, float y, float z, int boneID)
 	{
-		Position = Vector3i(x, y, z);
+		Position = Vector3(x, y, z);
 		BoneID = boneID;
 	}
 };
@@ -103,7 +103,7 @@ struct CreatureMuzzleFlashInfo
 
 	CreatureMuzzleFlashInfo() {}
 
-	CreatureMuzzleFlashInfo(const Vector3i& pos, int boneID, int delay, bool changeToMuzzle2 = false)
+	CreatureMuzzleFlashInfo(const Vector3& pos, int boneID, int delay, bool changeToMuzzle2 = false)
 	{
 		Bite = CreatureBiteInfo(pos, boneID);
 		Delay = delay;

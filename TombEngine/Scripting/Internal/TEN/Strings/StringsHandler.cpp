@@ -1,10 +1,10 @@
 #include "framework.h"
 #include "StringsHandler.h"
 
-#include "ScriptAssert.h"
-#include "Flow/FlowHandler.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/TEN/Flow/FlowHandler.h"
 #include "Renderer/Renderer11Enums.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 
 /***
 On-screen strings.
@@ -38,6 +38,7 @@ with a call to @{ShowString}, or this function will have no effect.
 
 /***
 Checks if the string is shown
+@function IsStringDisplaying
 @tparam DisplayString str the string object to be checked
 @treturn bool true if it is shown, false if it is hidden
 */
@@ -112,7 +113,7 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 		{
 			if (!endOfLife || str.m_isInfinite)
 			{
-				char const* cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
+				auto cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
 				int flags = 0;
 
 				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::CENTER)])

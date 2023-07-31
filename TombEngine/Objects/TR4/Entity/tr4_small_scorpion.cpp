@@ -28,8 +28,8 @@ namespace TEN::Entities::TR4
 
 	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SQUARE(BLOCK(0.31));
 
-	const auto SmallScorpionBite1 = CreatureBiteInfo(Vector3i::Zero, 0);
-	const auto SmallScorpionBite2 = CreatureBiteInfo(Vector3i::Zero, 23);
+	const auto SmallScorpionBite1 = CreatureBiteInfo(Vector3::Zero, 0);
+	const auto SmallScorpionBite2 = CreatureBiteInfo(Vector3::Zero, 23);
 	const auto SmallScorpionAttackJoints = std::vector<unsigned int>{ 8, 22, 23, 25, 26 };
 
 	enum SmallScorionState
@@ -74,9 +74,7 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		short tilt = 0;
 		short head = 0;
-		short neck = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;

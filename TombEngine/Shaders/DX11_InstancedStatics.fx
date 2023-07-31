@@ -29,8 +29,9 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
 	float Sheen : SHEEN;
-	float Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
+	float4 FogBulbs : TEXCOORD3;
+	float DistanceFog : FOG;
 	uint InstanceID : SV_InstanceID;
 };
 
@@ -60,17 +61,12 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.Position = mul(worldPosition, ViewProjection);
 	output.Color = float4(col, input.Color.w);
 	output.Color *= StaticMeshes[InstanceID].Color;
-
-	// Apply distance fog
-	float4 d = length(CamPositionWS - worldPosition);
-	if (FogMaxDistance == 0)
-		output.Fog = 1;
-	else
-		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
-
 	output.PositionCopy = output.Position;
 	output.Sheen = input.Effects.w;
 	output.InstanceID = InstanceID;
+
+	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
+	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
 
 	return output;
 }
@@ -85,25 +81,28 @@ PixelShaderOutput PS(PixelShaderInput input)
 	uint mode = StaticMeshes[input.InstanceID].LightInfo.y;
 	uint numLights = StaticMeshes[input.InstanceID].LightInfo.x;
 
+	float3 normal = normalize(input.Normal);
+
 	float3 color = (mode == 0) ?
 		CombineLights(
 			StaticMeshes[input.InstanceID].AmbientLight.xyz,
 			input.Color.xyz,
 			tex.xyz, 
 			input.WorldPosition, 
-			normalize(input.Normal), 
+			normal, 
 			input.Sheen,
 			StaticMeshes[input.InstanceID].InstancedStaticLights,
-			numLights) :
-		StaticLight(input.Color.xyz, tex.xyz);
+			numLights,
+			input.FogBulbs.w) :
+		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
 	output.Color = float4(color, tex.w);
+	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
+	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 
 	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	output.Color = DoFog(output.Color, FogColor, input.Fog);
 
 	return output;
 }

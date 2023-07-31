@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 				int dy = 0;
 				int dz = 0;
 
-				if (ItemPushItem(bladeItem, laraItem, coll, 1, 1))
+				if (ItemPushItem(bladeItem, laraItem, coll, true, 1))
 				{
 					DoDamage(laraItem, bladeItem->ItemFlags[3]);
 

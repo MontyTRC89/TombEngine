@@ -5,13 +5,27 @@
 
 namespace TEN::Renderer
 {
-	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
+	void Renderer11::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page)
 	{
-		AddString(std::string(string), Vector2(x, y), Color(color), 1.0f, flags);
+		constexpr auto FLAGS = PRINTSTRING_OUTLINE | PRINTSTRING_CENTER;
+
+		if (DebugPage != page)
+			return;
+
+		AddString(string, pos, color, scale, FLAGS);
+	}
+
+	void Renderer11::AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags)
+	{
+		AddString(string, Vector2(x, y), Color(color), 1.0f, flags);
 	}
 
 	void Renderer11::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)
 	{
+		constexpr auto BLINK_VALUE_MAX = 1.0f;
+		constexpr auto BLINK_VALUE_MIN = 0.1f;
+		constexpr auto BLINK_TIME_STEP = 0.2f;
+
 		if (m_Locked)
 			return;
 
@@ -22,9 +36,9 @@ namespace TEN::Renderer
 		{
 			auto screenRes = GetScreenResolution();
 			auto factor = Vector2(screenRes.x / SCREEN_SPACE_RES.x, screenRes.y / SCREEN_SPACE_RES.y);
-			float UIScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
+			float uiScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
 			float fontSpacing = m_gameFont->GetLineSpacing();
-			float fontScale   = REFERENCE_FONT_SIZE / fontSpacing;
+			float fontScale = REFERENCE_FONT_SIZE / fontSpacing;
 
 			auto stringLines = SplitString(string);
 			float yOffset = 0.0f;
@@ -36,44 +50,36 @@ namespace TEN::Renderer
 				rString.Flags = flags;
 				rString.X = 0;
 				rString.Y = 0;
-				rString.Color = color.ToVector3() * UCHAR_MAX;
-				rString.Scale = (UIScale * fontScale) * scale;
+				rString.Color = color.ToVector3();
+				rString.Scale = (uiScale * fontScale) * scale;
 
 				// Measure string.
-				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str()));
-				float width = size.x * rString.Scale;
+				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
 
-				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (width / 2.0f)) : (pos.x * factor.x);
-				rString.Y = (pos.y * UIScale) + yOffset;
+				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (size.x / 2.0f)) : (pos.x * factor.x);
+				rString.Y = (pos.y * uiScale) + yOffset;
 
 				if (flags & PRINTSTRING_BLINK)
 				{
-					rString.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
+					rString.Color *= BlinkColorValue;
 
-					if (!m_blinkUpdated)
+					if (!IsBlinkUpdated)
 					{
-						m_blinkColorValue += m_blinkColorDirection * 16;
-						m_blinkUpdated = true;
+						// Calculate blink increment based on sine wave.
+						BlinkColorValue = ((sin(BlinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
 
-						if (m_blinkColorValue < 0)
-						{
-							m_blinkColorValue = 0;
-							m_blinkColorDirection = 1;
-						}
+						// Update blink time.
+						BlinkTime += BLINK_TIME_STEP;
+						if (BlinkTime > PI_MUL_2)
+							BlinkTime -= PI_MUL_2;
 
-						if (m_blinkColorValue > UCHAR_MAX)
-						{
-							m_blinkColorValue = UCHAR_MAX;
-							m_blinkColorDirection = -1;
-						}
+						IsBlinkUpdated = true;
 					}
 				}
 
+				yOffset += size.y;
 				m_strings.push_back(rString);
-
-				yOffset += fontSpacing * 1.1f;
 			}
-
 		}
 		catch (std::exception& ex)
 		{
@@ -83,7 +89,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawAllStrings()
 	{
-		float shadeOffset = 1.5f / (REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing());
+		float shadowOffset = 1.5f / (REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing());
 
 		m_spriteBatch->Begin();
 
@@ -94,7 +100,7 @@ namespace TEN::Renderer
 			{
 				m_gameFont->DrawString(
 					m_spriteBatch.get(), rString.String.c_str(),
-					Vector2(rString.X + shadeOffset * rString.Scale, rString.Y + shadeOffset * rString.Scale),
+					Vector2(rString.X + shadowOffset * rString.Scale, rString.Y + shadowOffset * rString.Scale),
 					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent,
 					0.0f, Vector4::Zero, rString.Scale);
 			}
@@ -103,13 +109,13 @@ namespace TEN::Renderer
 			m_gameFont->DrawString(
 				m_spriteBatch.get(), rString.String.c_str(),
 				Vector2(rString.X, rString.Y),
-				Vector4(rString.Color.x / UCHAR_MAX, rString.Color.y / UCHAR_MAX, rString.Color.z / UCHAR_MAX, 1.0f) * ScreenFadeCurrent,
+				Vector4(rString.Color.x, rString.Color.y, rString.Color.z, 1.0f) * ScreenFadeCurrent,
 				0.0f, Vector4::Zero, rString.Scale);
 		}
 
 		m_spriteBatch->End();
 
-		m_blinkUpdated = false;
+		IsBlinkUpdated = false;
 		m_strings.clear();
 	}
 }

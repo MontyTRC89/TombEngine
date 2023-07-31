@@ -36,8 +36,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
-	const auto CivvyBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 10);
-	const auto CivvyBiteRight = CreatureBiteInfo(Vector3i::Zero, 13);
+	const auto CivvyBiteLeft  = CreatureBiteInfo(Vector3::Zero, 10);
+	const auto CivvyBiteRight = CreatureBiteInfo(Vector3::Zero, 13);
 	const auto CivvyAttackJoints = std::vector<unsigned int>{ 10, 13 };
   
 	const auto CivvyExcludedTargets = std::vector<GAME_OBJECT_ID>
@@ -172,7 +172,6 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 
 		auto& item = g_Level.Items[itemNumber];
-		auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
 		short angle = 0;

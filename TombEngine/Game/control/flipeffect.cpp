@@ -315,11 +315,11 @@ void FloorShake(ItemInfo* item)
 	int y = abs(item->Pose.Position.y - Camera.pos.y);
 	int z = abs(item->Pose.Position.z - Camera.pos.z);
 
-	if (x < SECTOR(16) &&
-		y < SECTOR(16) &&
-		z < SECTOR(16))
+	if (x < BLOCK(16) &&
+		y < BLOCK(16) &&
+		z < BLOCK(16))
 	{
-		Camera.bounce = 66 * ((pow(x, 2) + pow(y, 2) + pow(z, 2)) / CLICK(1) - pow(SECTOR(1), 2)) / pow(SECTOR(1), 2);
+		Camera.bounce = 66 * ((pow(x, 2) + pow(y, 2) + pow(z, 2)) / CLICK(1) - pow(BLOCK(1), 2)) / pow(BLOCK(1), 2);
 	}
 }
 

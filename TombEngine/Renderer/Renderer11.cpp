@@ -4,7 +4,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Specific/clock.h"
 #include "Math/Math.h"
-#include "Utils.h"
+#include "Renderer/Utils.h"
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
 #include "Renderer/RendererRectangle.h"
@@ -16,7 +16,6 @@ namespace TEN::Renderer
 
 	Renderer11::Renderer11() : gameCamera({0, 0, 0}, {0, 0, 1}, {0, 1, 0}, 1, 1, 0, 1, 10, 90)
 	{
-		m_blinkColorDirection = 1;
 	}
 
 	Renderer11::~Renderer11()
@@ -278,7 +277,7 @@ namespace TEN::Renderer
 		m_context->PSSetShaderResources((UINT)registerType, 1, texture->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
-		switch (samplerType)
+		switch (samplerType)  
 		{
 		case SAMPLER_ANISOTROPIC_CLAMP:
 			samplerState = m_states->AnisotropicClamp();
@@ -497,7 +496,7 @@ namespace TEN::Renderer
 
 	void Renderer11::SetCullMode(CULL_MODES cullMode, bool force)
 	{
-		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
+		if (DebugPage == RendererDebugPage::WireframeMode)
 		{
 			m_context->RSSetState(m_states->Wireframe());
 			return;

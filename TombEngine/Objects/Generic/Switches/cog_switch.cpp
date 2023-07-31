@@ -20,9 +20,9 @@ namespace TEN::Entities::Switches
 	const ObjectCollisionBounds CogSwitchBounds =
 	{
 		GameBoundingBox(
-			-SECTOR(0.5f), SECTOR(0.5f),
+			-BLOCK(0.5f), BLOCK(0.5f),
 			0, 0,
-			-SECTOR(1.5f), -SECTOR(0.5f)
+			-BLOCK(1.5f), -BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -100,7 +100,7 @@ namespace TEN::Entities::Switches
 						{
 							if (!door->opened)
 							{
-								AddActiveItem((target - g_Level.Items.data()));
+								AddActiveItem(target->Index);
 								target->Status = ITEM_ACTIVE;
 							}
 						}

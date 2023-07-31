@@ -171,7 +171,7 @@ void UpdateRats()
 				if (rat->Flags & 1)
 				{
 					// if rat is very near
-					if (abs(dz) + abs(dx) <= SECTOR(1))
+					if (abs(dz) + abs(dx) <= BLOCK(1))
 					{
 						if (rat->Velocity & 1)
 							rat->Pose.Orientation.y += ANGLE(2.8f);

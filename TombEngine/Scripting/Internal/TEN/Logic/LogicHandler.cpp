@@ -2,17 +2,18 @@
 #include "LogicHandler.h"
 
 #include <filesystem>
-#include "ScriptAssert.h"
+
 #include "Game/savegame.h"
-#include "ReservedScriptNames.h"
 #include "Game/effects/Electricity.h"
-#include "ScriptUtil.h"
-#include "Objects/Moveable/MoveableObject.h"
-#include "Vec3/Vec3.h"
-#include "Vec2/Vec2.h"
-#include "Rotation/Rotation.h"
-#include "Color/Color.h"
-#include "LevelFunc.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 
 using namespace TEN::Effects::Electricity;
 
@@ -182,13 +183,12 @@ void LogicHandler::ResetGameTables()
 @advancedDesc
 This is intended for module/library developers who want their modules to do
 stuff during level start/load/end/save/control phase, but don't want the level
-designer to add calls to OnStart, OnLoad, etc. in their level script.
+designer to add calls to `OnStart`, `OnLoad`, etc. in their level script.
 
 Possible values for CallbackPoint:
 	-- These take functions which accept no arguments
 	PRESTART -- will be called immediately before OnStart
 	POSTSTART -- will be called immediately after OnStart
-
 
 	PRESAVE -- will be called immediately before OnSave
 	POSTSAVE -- will be called immediately after OnSave
@@ -211,7 +211,7 @@ Any returned value will be discarded.
 
 @function AddCallback
 @tparam point CallbackPoint When should the callback be called?
-@tparam function func The function to be called (must be in the LevelFuncs hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+@tparam function func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
 @usage
 	LevelFuncs.MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
@@ -377,7 +377,7 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 	ResetGameTables();
 	ResetLevelTables();
 
-	std::unordered_map<uint32_t, sol::table> solTables;
+	std::unordered_map<unsigned int, sol::table> solTables;
 
 	for(int i = 0; i < vars.size(); ++i)
 	{
@@ -457,7 +457,7 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
 }
 
-template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int32_t Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
 {
 	auto [first, second] = varsMap.insert(std::make_pair(&var, (int)numVars));
 
@@ -476,12 +476,12 @@ template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename Map
 std::string LogicHandler::GetRequestedPath() const
 {
 	std::string path;
-	for (uint32_t i = 0; i < m_savedVarPath.size(); ++i)
+	for (unsigned int i = 0; i < m_savedVarPath.size(); ++i)
 	{
 		auto key = m_savedVarPath[i];
-		if (std::holds_alternative<uint32_t>(key))
+		if (std::holds_alternative<unsigned int>(key))
 		{
-			path += "[" + std::to_string(std::get<uint32_t>(key)) + "]";
+			path += "[" + std::to_string(std::get<unsigned int>(key)) + "]";
 		}
 		else if (std::holds_alternative<std::string>(key))
 		{
@@ -503,9 +503,9 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 	tab[ScriptReserved_LevelVars] = (*m_handler.GetState())[ScriptReserved_LevelVars];
 	tab[ScriptReserved_GameVars] = (*m_handler.GetState())[ScriptReserved_GameVars];
 
-	std::unordered_map<void const*, uint32_t> varsMap;
-	std::unordered_map<double, uint32_t> numMap;
-	std::unordered_map<bool, uint32_t> boolMap;
+	std::unordered_map<void const*, unsigned int> varsMap;
+	std::unordered_map<double, unsigned int> numMap;
+	std::unordered_map<bool, unsigned int> boolMap;
 
 	size_t numVars = 0;
 
@@ -557,7 +557,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 		return first->second;
 	};
 
-	std::function<uint32_t(const sol::table&)> populate = [&](const sol::table& obj)
+	std::function<unsigned int(const sol::table&)> populate = [&](const sol::table& obj)
 	{
 		auto [first, second] = varsMap.insert(std::make_pair(obj.pointer(), (int)numVars));
 
@@ -571,8 +571,8 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 			for (auto& [first, second] : obj)
 			{
 				bool validKey = true;
-				uint32_t keyIndex = 0;
-				std::variant<std::string, uint32_t> key{uint32_t(0)};
+				unsigned int keyIndex = 0;
+				std::variant<std::string, unsigned int> key{unsigned int(0)};
 
 				// Strings and numbers can be keys AND values.
 				switch (first.get_type())
@@ -595,7 +595,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 					else
 					{
 						keyIndex = handleNum(data, numMap);
-						key = static_cast<uint32_t>(data);
+						key = static_cast<unsigned int>(data);
 						m_savedVarPath.push_back(key);
 					}
 				}
@@ -609,7 +609,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 				if (!validKey)
 					continue;
 
-				auto putInVars = [&vars, id, keyIndex](uint32_t valIndex)
+				auto putInVars = [&vars, id, keyIndex](unsigned int valIndex)
 				{
 					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
 				};

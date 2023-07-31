@@ -310,7 +310,7 @@ namespace TEN::Renderer
 		m_context->ClearRenderTargetView(target, Colors::Black);
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		m_context->OMSetRenderTargets(1, &target, depthTarget);
-		m_context->RSSetViewports(1, &view.viewport);
+		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
 		RendererVertex vertices[4];
@@ -349,7 +349,7 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		m_stPostProcessBuffer.FXAA = g_Configuration.Antialiasing == AntialiasingMode::Low ? 1 : 0;
+		m_stPostProcessBuffer.FXAA = g_Configuration.AntialiasingMode == AntialiasingMode::Low ? 1 : 0;
 		m_stPostProcessBuffer.ViewportWidth = m_screenWidth;
 		m_stPostProcessBuffer.ViewportHeight = m_screenHeight;
 		m_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;

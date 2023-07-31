@@ -30,7 +30,7 @@ namespace TEN::Control::Volumes
 			if (roomNumber == Camera.pos.RoomNumber)
 			{
 				g_Renderer.AddDebugBox(volume.Box, 
-					Vector4(color, 0.0f, color, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
+					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
 			}
 			return volume.Box.Intersects(box);
 
@@ -38,7 +38,7 @@ namespace TEN::Control::Volumes
 			if (roomNumber == Camera.pos.RoomNumber)
 			{
 				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, 
-					Vector4(color, 0.0f, color, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
+					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
 			}
 			return volume.Sphere.Intersects(box);
 
@@ -171,7 +171,7 @@ namespace TEN::Control::Volumes
 		auto box = (coll != nullptr) ?
 			ConstructRoughBox(item, *coll) : GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
-		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
+		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 
 		if (item.IsLara() || item.Index == Lara.Context.Vehicle)
 		{
@@ -191,7 +191,7 @@ namespace TEN::Control::Volumes
 	{
 		std::string nodeScriptPath = g_GameFlow->GetGameDir() + "Scripts/Engine/NodeCatalogs/";
 
-		if (!std::filesystem::exists(nodeScriptPath))
+		if (!std::filesystem::is_directory(nodeScriptPath))
 			return;
 		
 		std::vector<std::string> nodeCatalogs;

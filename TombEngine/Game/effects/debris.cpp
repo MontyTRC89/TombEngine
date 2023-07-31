@@ -24,7 +24,7 @@ bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 	if (1 << node & item->MeshBits.ToPackedBits())
 	{
 		int number = bits;
-		if (number == BODY_EXPLODE)
+		if (number == BODY_DO_EXPLOSION)
 			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);

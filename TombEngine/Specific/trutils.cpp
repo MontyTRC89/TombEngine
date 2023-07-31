@@ -1,11 +1,11 @@
 #include "framework.h"
-#include "Specific/trutils.h"
 
 #include <codecvt>
 #include <filesystem>
 
 #include "Renderer/Renderer11.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -66,7 +66,7 @@ namespace TEN::Utils
 					// it means this is a valid asset folder.
 
 					auto testDir = result + (useCustomSubdirectory ? "/" : "") + testPath;
-					if (std::filesystem::exists(testDir))
+					if (std::filesystem::is_regular_file(testDir))
 						return result;
 				}
 			}
@@ -116,6 +116,20 @@ namespace TEN::Utils
 		wchar_t buffer[UCHAR_MAX];
 		std::mbstowcs(buffer, cString, UCHAR_MAX);
 		return std::wstring(buffer);
+	}
+
+	std::string ReplaceNewLineSymbols(const std::string& string)
+	{
+		auto result = string;
+		std::string::size_type index = 0;
+
+		while ((index = result.find("\\n", index)) != std::string::npos) 
+		{
+			result.replace(index, 2, "\n");
+			++index;
+		}
+
+		return result;
 	}
 
 	std::vector<std::string> SplitString(const std::string& string)

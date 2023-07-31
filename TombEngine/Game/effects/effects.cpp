@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/effects/effects.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/Blood.h"
@@ -1102,7 +1102,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	if (item.TriggerFlags != 0)
 	{
 		size = item.TriggerFlags % 100;
-		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, SECTOR(8));
+		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, BLOCK(8));
 	}
 
 	float cos = phd_cos(angle);
@@ -1125,7 +1125,6 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	auto endColor   = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * scale;
-	int steps = int((width / 2) / step);
 	int currentStep = 0;
 
 	while (true)
@@ -1619,7 +1618,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 				spark->sLife = spark->life >> 2;
 			}
 
-			spark->sSize = spark->size = (GetRandomControl() & 0xF) + 48;
+			spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 48;
 		}
 	}
 	else

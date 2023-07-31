@@ -57,7 +57,7 @@ namespace TEN::Entities::TR4
                     DoDamage(laraItem, 10);
                 }
                 else if (coll->Setup.EnableObjectPush)
-                    ItemPushItem(cogItem, laraItem, coll, 0, 0);
+                    ItemPushItem(cogItem, laraItem, coll, false, 0);
             }
         }
     }

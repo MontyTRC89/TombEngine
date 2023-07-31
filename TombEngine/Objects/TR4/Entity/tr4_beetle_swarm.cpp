@@ -167,7 +167,7 @@ namespace TEN::Entities::TR4
 
 				if (beetle->Flags)
 				{
-					if (abs(dx) + abs(dz) <= SECTOR(1))
+					if (abs(dx) + abs(dz) <= BLOCK(1))
 					{
 						if (beetle->Velocity & 1)
 							beetle->Pose.Orientation.y += ANGLE(2.8f);
@@ -197,7 +197,7 @@ namespace TEN::Entities::TR4
 
 				FloorInfo* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, &beetle->RoomNumber);
 				int height = GetFloorHeight(floor, beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-				if (height < (beetle->Pose.Position.y - SECTOR(1.25f)) || height == NO_HEIGHT)
+				if (height < (beetle->Pose.Position.y - BLOCK(1.25f)) || height == NO_HEIGHT)
 				{
 					// Beetle has hit a wall a high step.
 					if (angle <= 0)
