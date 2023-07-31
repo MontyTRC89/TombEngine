@@ -245,17 +245,17 @@ namespace TEN::Effects::Blood
 
 	void BloodStainEffectController::Spawn(const Vector3& pos, int roomNumber, const Vector3& normal, float size, float scalar, float delayInSec)
 	{
-		constexpr auto COUNT_MAX	 = 192;
-		constexpr auto OPACITY_MAX	 = 0.8f;
-		constexpr auto SPRITE_ID_MAX = 7; // TODO: Dehardcode ID range.
+		constexpr auto COUNT_MAX   = 192;
+		constexpr auto OPACITY_MAX = 0.8f;
 
 		// Sprite missing; return early.
 		if (!CheckIfSlotExists(ID_BLOOD_STAIN_SPRITES, "Blood stain sprite missing."))
 			return;
 
 		auto& part = GetNewEffect(Particles, COUNT_MAX);
+		const auto& object = Objects[ID_BLOOD_STAIN_SPRITES];
 
-		part.SpriteID = Objects[ID_BLOOD_STAIN_SPRITES].meshIndex + Random::GenerateInt(0, SPRITE_ID_MAX);
+		part.SpriteID = object.meshIndex + Random::GenerateInt(0, object.nmeshes - 1);
 		part.Position = pos;
 		part.RoomNumber = roomNumber;
 		part.Orientation2D = Random::GenerateAngle();
