@@ -12,21 +12,29 @@
 
 using namespace TEN::Hud;
 
-void InitializeLara(bool restore)
+LaraInfo lBackup = {};
+int lHitPoints   = 0;
+
+void BackupLara()
 {
-	if (LaraItem->Index == NO_ITEM)
+	if (LaraItem == nullptr || LaraItem->Index == NO_ITEM)
 		return;
 
-	LaraInfo lBackup = {};
-	if (restore)
-		memcpy(&lBackup, &Lara, sizeof(LaraInfo));
+	memcpy(&lBackup, &Lara, sizeof(LaraInfo));
+	lHitPoints = LaraItem->HitPoints;
+}
+
+void InitializeLara(bool restore)
+{
+	if (LaraItem == nullptr || LaraItem->Index == NO_ITEM)
+		return;
+
+	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	LaraItem->Data = &Lara;
 	LaraItem->Collidable = false;
 	LaraItem->Location.roomNumber = LaraItem->RoomNumber;
 	LaraItem->Location.yNumber = LaraItem->Pose.Position.y;
-
-	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	Lara.Status.Air = LARA_AIR_MAX;
 	Lara.Status.Exposure = LARA_EXPOSURE_MAX;
@@ -43,16 +51,17 @@ void InitializeLara(bool restore)
 	Lara.Location = -1;
 	Lara.HighestLocation = -1;
 	Lara.Control.Rope.Ptr = -1;
-	LaraItem->HitPoints = LARA_HEALTH_MAX;
 	Lara.Control.HandStatus = HandStatus::Free;
 
 	if (restore)
 	{
 		InitializeLaraLevelJump(LaraItem->Index, &lBackup);
+		LaraItem->HitPoints = lHitPoints;
 	}
 	else
 	{
 		InitializeLaraDefaultInventory();
+		LaraItem->HitPoints = LARA_HEALTH_MAX;
 	}
 
 	InitializeLaraMeshes(LaraItem);
@@ -157,6 +166,7 @@ void InitializeLaraLevelJump(short itemNum, LaraInfo* lBackup)
 	// Restore inventory.
 	// It restores even puzzle/key items, to reset them, a ResetHub analog must be made.
 	lara->Inventory = lBackup->Inventory;
+	lara->Control.Weapon.LastGunType = lBackup->Control.Weapon.LastGunType;
 	memcpy(&lara->Weapons, &lBackup->Weapons, sizeof(CarriedWeaponInfo) * int(LaraWeaponType::NumWeapons));
 
 	// If no flare present, quit

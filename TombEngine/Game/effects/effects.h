@@ -145,8 +145,8 @@ struct Particle
 	BLEND_MODES blendMode;
 	unsigned char extras;
 	signed char dynamic;
-	unsigned char fxObj;
-	unsigned char roomNumber;
+	int fxObj;
+	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 };
 
@@ -197,9 +197,10 @@ extern NodeOffsetData NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
+	assertion(effects.size() <= countMax, "Too many particle effects.");
+
 	// Add and return new effect.
-	assert(effects.size() <= countMax);
-	if (effects.size() != countMax)
+	if (effects.size() < countMax)
 		return effects.emplace_back();
 
 	TEffect* effectPtr = nullptr;
