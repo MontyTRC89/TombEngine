@@ -172,7 +172,8 @@ namespace TEN::Entities::Generic
 			return false;
 
 		// If floor is not flat
-		if (collisionResult.Position.Floor != LaraItem->Pose.Position.y)
+		int floorDifference = abs(collisionResult.Position.Floor - LaraItem->Pose.Position.y);
+		if (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE)
 			return false;
 
 		// Is ceiling (square or diagonal) high enough?
