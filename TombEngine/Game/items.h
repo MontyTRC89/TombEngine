@@ -199,5 +199,4 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber);
 
 Vector3i GetNearestSectorCenter(const Vector3i& pos);
-bool CompareItem2DPositions(const int itemNumber0, const int itemNumber1);
 void FloatItem(ItemInfo& item, float floatForce = 1.0f);
