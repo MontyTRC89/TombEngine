@@ -315,9 +315,7 @@ namespace TEN::Entities::Generic
 
 				return;
 			}
-			//Otherwise, continue the movement
-			
-			
+			//Otherwise, continue the movement	
 		}
 
 		return;

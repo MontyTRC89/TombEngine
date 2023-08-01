@@ -190,20 +190,20 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		// Activate gravity and deactivate collision for all pushables in the stack
-		int currentItem = pushable.StackUpperItem;
+		int currentItemNumber = pushable.StackUpperItem;
 
-		while (currentItem != NO_ITEM)
+		while (currentItemNumber != NO_ITEM)
 		{
-			if (pushable.UsesRoomCollision)
-				DeactivateClimbablePushableCollider(itemNumber); // Deactivate collision
+			auto& currentPushableItem = g_Level.Items[currentItemNumber];
+			auto& currentPushable = GetPushableInfo(currentPushableItem);
 
-			pushable.BehaviourState = PushablePhysicState::StackHorizontalMove;
+			if (currentPushable.UsesRoomCollision)
+				DeactivateClimbablePushableCollider(currentItemNumber); // Deactivate collision
 
-			pushableItem = g_Level.Items[currentItem];
-			currentItem = GetPushableInfo(pushableItem).StackUpperItem;
+			currentPushable.BehaviourState = PushablePhysicState::StackHorizontalMove;
+
+			currentItemNumber = currentPushable.StackUpperItem;
 		}
-
 	}
 
 	void StopMovePushableStack(int itemNumber)
@@ -215,15 +215,17 @@ namespace TEN::Entities::Generic
 
 		while (currentItemNumber != NO_ITEM)
 		{
-			pushableItem.Pose.Position = GetNearestSectorCenter(pushableItem.Pose.Position);
+			auto& currentPushableItem = g_Level.Items[currentItemNumber];
+			auto& currentPushable = GetPushableInfo(currentPushableItem);
 
-			if (pushable.UsesRoomCollision)
-				ActivateClimbablePushableCollider(itemNumber); // Activate collision
+			currentPushableItem.Pose.Position = GetNearestSectorCenter(currentPushableItem.Pose.Position);
 
-			pushable.BehaviourState = PushablePhysicState::Idle;
+			if (currentPushable.UsesRoomCollision)
+				ActivateClimbablePushableCollider(currentItemNumber); // Activate collision
 
-			pushableItem = g_Level.Items[currentItemNumber];
-			currentItemNumber = GetPushableInfo(pushableItem).StackUpperItem;
+			currentPushable.BehaviourState = PushablePhysicState::Idle;
+
+			currentItemNumber = currentPushable.StackUpperItem;
 		}
 	}
 	
