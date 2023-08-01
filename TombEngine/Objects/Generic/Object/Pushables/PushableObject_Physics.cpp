@@ -122,7 +122,7 @@ namespace TEN::Entities::Generic
 			if (pushable.UsesRoomCollision)
 				DeactivateClimbablePushableCollider(itemNumber);
 
-			if (pushable.IsBuoyant)
+			if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 			{
 				pushable.BehaviourState = PushablePhysicState::Floating;
 				pushable.Gravity = 0.0f;
@@ -156,14 +156,18 @@ namespace TEN::Entities::Generic
 			}
 			else
 			{
-				pushableItem.Pose.Position.y = floorHeight;
+				int heightdifference = floorHeight - pushableItem.Pose.Position.y;
+				pushableItem.Pose.Position.y += heightdifference;
+				VerticalPosAddition(itemNumber, heightdifference);
 			}
 			
 			return;
 		}
 		else if (floorHeight < pushableItem.Pose.Position.y)	//The floor has risen. (Elevator, raising block, etc...)
 		{
-			pushableItem.Pose.Position.y = floorHeight;
+			int heightdifference = floorHeight - pushableItem.Pose.Position.y;
+			pushableItem.Pose.Position.y += heightdifference;
+			VerticalPosAddition(itemNumber, heightdifference);
 			return;
 		}
 
@@ -356,7 +360,7 @@ namespace TEN::Entities::Generic
 				SplashSetup.x = pushableItem.Pose.Position.x;
 				SplashSetup.z = pushableItem.Pose.Position.z;
 				SplashSetup.splashPower = pushableItem.Animation.Velocity.y * 2;
-				SplashSetup.innerRadius = 160;
+				SplashSetup.innerRadius = 250;
 				SetupSplash(&SplashSetup, pushableItem.RoomNumber);
 			}
 			return;
@@ -406,7 +410,7 @@ namespace TEN::Entities::Generic
 		// TODO: [Effects Requirement] Add bubbles during this phase.
 
 		//3. Manage gravity force
-		if (pushable.IsBuoyant)
+		if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 		{
 			// Slowly reverses gravity direction. If gravity is 0, then it floats.
 			pushable.Gravity = pushable.Gravity - GRAVITY_ACCEL;
@@ -435,7 +439,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// 5. Hit ground
-		if (pushable.IsBuoyant)
+		if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 		{
 			pushable.Gravity = 0.0f;
 			pushable.BehaviourState = PushablePhysicState::Floating;
@@ -527,7 +531,7 @@ namespace TEN::Entities::Generic
 		}
 
 		//2. If it's buoyant, it needs to float. (case for sudden flipmaps).
-		if (pushable.IsBuoyant)
+		if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 		{
 			pushable.Gravity = 0.0f;
 			pushable.BehaviourState = PushablePhysicState::Floating;
@@ -549,6 +553,8 @@ namespace TEN::Entities::Generic
 
 			if (pushable.UsesRoomCollision)
 				DeactivateClimbablePushableCollider(itemNumber);
+
+			pushableItem.Animation.Velocity.y = 0;
 
 			return;
 		}
@@ -593,12 +599,12 @@ namespace TEN::Entities::Generic
 		pushableItem.Pose.Position.z = MovingPushableItem.Pose.Position.z;
 	}
 
-	/*void HandleStackFallingState(int itemNumber)
+	void HandleStackFallingState(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		auto& MovingPushableItem = g_Level.Items[Lara.Context.InteractedItem];
 		pushableItem.Pose.Position.y = MovingPushableItem.Pose.Position.y;
-	}*/
+	}
 }

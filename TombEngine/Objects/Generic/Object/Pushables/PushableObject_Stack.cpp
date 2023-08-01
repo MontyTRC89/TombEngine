@@ -300,4 +300,22 @@ namespace TEN::Entities::Generic
 	{
 
 	}
+
+	void VerticalPosAddition(int itemNumber, int deltaY)
+	{
+		auto pushableItemCopy = g_Level.Items[itemNumber];
+		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
+
+		while (pushableCopy.StackUpperItem != NO_ITEM)
+		{
+			if (pushableCopy.StackUpperItem == itemNumber)
+				break;
+
+			pushableItemCopy.Pose.Position.y += deltaY;
+
+			pushableItemCopy = g_Level.Items[pushableCopy.StackUpperItem];
+			pushableCopy = GetPushableInfo(pushableItemCopy);
+		}
+
+	}
 }
