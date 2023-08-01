@@ -5,6 +5,7 @@
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
+#include "Objects/Generic/Object/Pushables/PushableObject_Stack.h"
 
 #include "Specific/level.h"
 
@@ -83,7 +84,7 @@ namespace TEN::Entities::Generic
 
 		// Check for gap or step. (Can it fall down?) (Only available for pushing).
 		int floorDifference = abs(collisionResult.Position.Floor - pushableItem.Pose.Position.y);
-		if (pushable.CanFall)
+		if (pushable.CanFall && pushable.StackUpperItem == NO_ITEM)
 		{
 			if ((collisionResult.Position.Floor < pushableItem.Pose.Position.y) && (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE))
 				return false;
@@ -96,7 +97,7 @@ namespace TEN::Entities::Generic
 
 		// Is ceiling (square or diagonal) high enough?
 		int distanceToCeiling = abs(collisionResult.Position.Ceiling - collisionResult.Position.Floor);
-		int blockHeight = pushable.Height;
+		int blockHeight = CalculateStackHeight(itemNumber);
 		if (distanceToCeiling < blockHeight)
 			return false;
 

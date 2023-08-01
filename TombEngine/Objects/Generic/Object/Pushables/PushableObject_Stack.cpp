@@ -247,6 +247,24 @@ namespace TEN::Entities::Generic
 		return count <= pushable.StackLimit;
 	}
 
+	int CalculateStackHeight(int itemNumber)
+	{
+		auto pushableItemCopy = g_Level.Items[itemNumber];
+		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
+
+		int totalHeight = pushableCopy.Height;
+
+		while (pushableCopy.StackUpperItem != NO_ITEM)
+		{
+			pushableItemCopy = g_Level.Items[pushableCopy.StackUpperItem];
+			pushableCopy = GetPushableInfo(pushableItemCopy);
+
+			totalHeight = totalHeight + pushableCopy.Height;
+		}
+
+		return totalHeight;
+	}
+
 	void StartMovePushableStack(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
@@ -301,7 +319,7 @@ namespace TEN::Entities::Generic
 
 	}
 
-	void VerticalPosAddition(int itemNumber, int deltaY)
+	void VerticalPosAddition(int itemNumber, int deltaY) //Problems with bridge collision.
 	{
 		auto pushableItemCopy = g_Level.Items[itemNumber];
 		auto& pushableCopy = GetPushableInfo(pushableItemCopy);

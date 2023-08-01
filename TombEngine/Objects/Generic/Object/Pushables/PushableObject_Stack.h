@@ -16,6 +16,8 @@ namespace TEN::Entities::Generic
 	int CountPushablesInStack(int itemNumber);
 	bool IsUnderStackLimit(int itemNumber);
 
+	int CalculateStackHeight(int itemNumber);
+
 	void StartMovePushableStack(int itemNumber);
 	void StopMovePushableStack(int itemNumber);
 
