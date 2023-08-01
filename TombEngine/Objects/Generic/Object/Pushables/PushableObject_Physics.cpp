@@ -74,7 +74,11 @@ namespace TEN::Entities::Generic
 					(hasPullAction && !pushableSidesAttributes.Pullable))
 					return;
 
-				//Cond 3: Does it comply with the room collision conditions?.
+				//Cond 3: Is its stacked pushables under the limit?
+				if (!IsUnderStackLimit(itemNumber))
+					return;
+
+				//Cond 4: Does it comply with the room collision conditions?.
 				if (!PushableMovementConditions(itemNumber, hasPushAction, hasPullAction))
 					return;
 
@@ -301,6 +305,7 @@ namespace TEN::Entities::Generic
 			// Check the pushable animation system in use, if is using block animation which can't loop, go back to idle state.
 			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop ||
 				!IsHeld(In::Action) ||
+				!IsUnderStackLimit(itemNumber) ||
 				!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling))
 			{
 				LaraItem->Animation.TargetState = LS_IDLE;

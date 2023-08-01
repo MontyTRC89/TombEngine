@@ -11,8 +11,11 @@ using namespace TEN::Collision::Floordata;
 
 namespace TEN::Entities::Generic
 {
-	struct Vector3iHasher {
-		std::size_t operator()(const Vector3i& v) const {
+	//Required to can use our Vector3i in the std::unordered_map
+	struct Vector3iHasher 
+	{
+		std::size_t operator()(const Vector3i& v) const 
+		{
 			std::size_t h1 = std::hash<int>()(v.x);
 			std::size_t h2 = std::hash<int>()(v.y);
 			std::size_t h3 = std::hash<int>()(v.z);
@@ -180,10 +183,12 @@ namespace TEN::Entities::Generic
 				{
 					if (pushable.StackUpperItem == NO_ITEM)
 					{
+						//If the found item is at the top of a stack, return it.
 						return currentItemNumber;
 					}
 					else
 					{
+						//Otherwise, iterate through its stack till find the topest one, and return that one.
 						int topItemNumber = pushable.StackUpperItem;
 						while (topItemNumber != NO_ITEM)
 						{
@@ -230,6 +235,16 @@ namespace TEN::Entities::Generic
 		}
 
 		return count;
+	}
+
+	bool IsUnderStackLimit(int itemNumber)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		auto count = CountPushablesInStack(itemNumber);
+
+		return count <= pushable.StackLimit;
 	}
 
 	void StartMovePushableStack(int itemNumber)

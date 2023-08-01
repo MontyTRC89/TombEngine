@@ -13,6 +13,9 @@ namespace TEN::Entities::Generic
 	int SearchNearPushablesStack(int itemNumber);
 	int FindPushableStackInRoom(int itemNumber, int roomNumber);
 
+	int CountPushablesInStack(int itemNumber);
+	bool IsUnderStackLimit(int itemNumber);
+
 	void StartMovePushableStack(int itemNumber);
 	void StopMovePushableStack(int itemNumber);
 
