@@ -195,13 +195,12 @@ namespace TEN::Effects::Blood
 		constexpr auto POINT_2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
 		constexpr auto POINT_3 = Vector3( SQRT_2, 0.0f, -SQRT_2);
 
-		// No size; return early.
+		// No size; return vertices at singularity.
 		if (Size == 0.0f)
 			return std::array<Vector3, VERTEX_COUNT>{ Position, Position, Position, Position };
 
 		// Determine rotation matrix.
-		auto axisAngle = AxisAngle(Normal, Orientation2D);
-		auto rotMatrix = axisAngle.ToRotationMatrix();
+		auto rotMatrix = Geometry::GetRelOrientToNormal(Orientation2D, Normal).ToRotationMatrix();
 
 		// Calculate and return vertex points.
 		return std::array<Vector3, VERTEX_COUNT>
@@ -287,11 +286,14 @@ namespace TEN::Effects::Blood
 		if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
 			return;
 
+		auto normal = GetSurfaceNormal(isOnFloor ? pointColl.FloorTilt : pointColl.CeilingTilt, isOnFloor);
+
 		auto pos = Vector3(
 			drip.Position.x,
-			(isOnFloor ? pointColl.Position.Floor : pointColl.Position.Ceiling) - BloodStainEffectParticle::SURFACE_OFFSET,
+			(isOnFloor ? pointColl.Position.Floor : pointColl.Position.Ceiling),
 			drip.Position.z);
-		auto normal = GetSurfaceNormal(isOnFloor ? pointColl.FloorTilt : pointColl.CeilingTilt, isOnFloor);
+		pos = Geometry::TranslatePoint(pos, normal, BloodStainEffectParticle::SURFACE_OFFSET);
+
 		float size = ((drip.Size.x + drip.Size.y) / 2) * SIZE_COEFF;
 		float scalar = std::min(drip.Velocity.Length() / 2, size / 2);
 
