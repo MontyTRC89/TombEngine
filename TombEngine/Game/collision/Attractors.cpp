@@ -452,7 +452,7 @@ namespace TEN::Collision::Attractors
 			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RendererDebugPage::CollisionStats);
 		}
 
-		// Return attractor pointers found in sphere-AABB test.k
+		// Return attractor pointers found in sphere-AABB test.
 		return nearbyAttracPtrs;
 	}
 
