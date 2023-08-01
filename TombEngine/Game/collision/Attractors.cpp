@@ -23,7 +23,7 @@ namespace TEN::Collision::Attractors
 		RoomNumber = roomNumber;
 		Box = Geometry::GetBoundingBox(points);
 
-		// Cache length if at least 2 points exist.
+		// Cache length.
 		if (points.size() >= 2)
 		{
 			for (int i = 0; i < (points.size() - 1); i++)
@@ -291,7 +291,7 @@ namespace TEN::Collision::Attractors
 		RoomNumber = roomNumber;
 		Box = Geometry::GetBoundingBox(points);
 
-		// Cache length if at least 2 points exist.
+		// Cache length.
 		Length = 0.0f;
 		if (points.size() >= 2)
 		{
@@ -390,23 +390,15 @@ namespace TEN::Collision::Attractors
 		return std::clamp(chainDist, 0.0f, Length);
 	}
 
-	// Debug.
+	// Temp.
 	static std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
 	{
-		constexpr auto RANGE = BLOCK(5);
-
 		auto& player = GetLaraInfo(item);
 
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
-		for (const auto& attrac : player.Context.DebugAttrac.SectorAttractors)
-		{
-			nearbyAttracPtrs.push_back(&attrac);
-			attrac.DrawDebug();
-		}
-
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor0);
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor1);
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttrac.DebugAttractor2);
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac0);
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac1);
+		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac2);
 		return nearbyAttracPtrs;
 	}
 
@@ -460,7 +452,7 @@ namespace TEN::Collision::Attractors
 			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RendererDebugPage::CollisionStats);
 		}
 
-		// Return attractor pointers found in sphere-AABB test.
+		// Return attractor pointers found in sphere-AABB test.k
 		return nearbyAttracPtrs;
 	}
 
