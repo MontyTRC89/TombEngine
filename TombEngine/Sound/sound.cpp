@@ -177,7 +177,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		TENLog("Non present effect: " + std::to_string(effectID), LogLevel::Warning);
+		TENLog("Missing sound effect: " + std::to_string(effectID), LogLevel::Warning);
 		g_Level.SoundMap[effectID] = -2;
 		return false;
 	}
