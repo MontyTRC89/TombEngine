@@ -11,41 +11,88 @@ using namespace TEN::Collision::Floordata;
 
 namespace TEN::Entities::Generic
 {
+	struct Vector3iHasher {
+		std::size_t operator()(const Vector3i& v) const {
+			std::size_t h1 = std::hash<int>()(v.x);
+			std::size_t h2 = std::hash<int>()(v.y);
+			std::size_t h3 = std::hash<int>()(v.z);
+			return h1 ^ (h2 << 1) ^ (h3 << 2);
+		}
+	};
+
 	void InitializePushablesStacks()
 	{
+		//1. Make the function had an unique call
+		//Not a singleton, but it follows the idea...
+
 		static bool StacksInitialized = false;
 
 		if (StacksInitialized)
 			return;
+		else
+			StacksInitialized = true;
 
+		//2. Collect all the pushables placed in the level
 		auto& pushablesNumbersList = FindAllPushables(g_Level.Items);
 
 		if (pushablesNumbersList.empty())
 			return;
 
-		std::sort(pushablesNumbersList.begin(), pushablesNumbersList.end(), CompareItem2DPositions);
+		//3. Prepare data to create several lists per each stack group. (One for each position XZ, and the ground floor height).
+		//PROBLEM: Missing hash function in Vector3i, creating custom version Vector3iHasher at the top of this source code.
+		std::unordered_map < Vector3i, std::vector<int>, Vector3iHasher> stackGroups; // stack Position - pushable itemNumber  
 
-		for (int i = 0; i < pushablesNumbersList.size() - 1; ++i)
+		//4. Iterate through the pushables list, to put them in their different stack groups. According to their XZ and ground floor height).
+		//Extra, I moved also the .Data initialization here, to can store data in all the pushables objects (even the ones not initialized yet).
+		for (int itemNumber : pushablesNumbersList)
 		{
-			auto& objectA = g_Level.Items[pushablesNumbersList[i]];
-			auto& objectB = g_Level.Items[pushablesNumbersList[i + 1]];
-
-			// Are they in the same sector?
-			if ((objectA.Pose.Position.x == objectB.Pose.Position.x) && (objectA.Pose.Position.z == objectB.Pose.Position.z))
-			{
-				// Determine which object is up and which is down
-				auto& upperPushableItem = (objectA.Pose.Position.y < objectB.Pose.Position.y) ? objectA : objectB;
-				auto& lowerPushableItem = (objectA.Pose.Position.y < objectB.Pose.Position.y) ? objectB : objectA;
-
-				// Set the stackUpperItem and stackLowerItem variables accordingly
-				auto& upperPushable = GetPushableInfo(upperPushableItem);
-				auto& lowerPushable = GetPushableInfo(lowerPushableItem);
-				upperPushable.StackLowerItem = lowerPushableItem.Index;
-				lowerPushable.StackUpperItem = upperPushableItem.Index;
-			}
+			auto& pushableItem = g_Level.Items[itemNumber];
+			pushableItem.Data = PushableInfo();
+			
+			int x = pushableItem.Pose.Position.x;
+			int z = pushableItem.Pose.Position.z;
+			
+			auto collisionResult = GetCollision(&pushableItem);
+			int y = collisionResult.Position.Floor;
+			
+			stackGroups.emplace(Vector3i(x, y, z), std::vector<int>()).first->second.push_back(itemNumber);
 		}
 
-		StacksInitialized = true;
+		//5. Iterate through the stack groups lists, on each one, it has to sort them by height, and iterate through it to make the stack links.
+		for (auto& group : stackGroups)
+		//for (auto it = stackGroups.begin(); it != stackGroups.end(); ++it)
+		{
+			//const auto& group = *it;
+			auto& pushablesInGroup = group.second;
+
+			//If there is only 1 pushable in that position, no stack check is required.
+			if (pushablesInGroup.size() <= 1)
+				continue;
+
+			//If there are 2 or more pushables in the group, sort them from bottom to top. (Highest Y to Lowest Y).
+			std::sort(pushablesInGroup.begin(), pushablesInGroup.end(), [](int a, int b) 
+				{
+					auto& pushableA = g_Level.Items[a];
+					auto& pushableB = g_Level.Items[b];
+					return pushableA.Pose.Position.y > pushableB.Pose.Position.y; //a is over B
+				});
+
+			//Iterate through each group to set the stack links).
+			for (size_t i = 0; i < pushablesInGroup.size() - 1; ++i)
+			{
+				// Set the stackUpperItem and stackLowerItem variables accordingly
+				int lowerItemNumber = pushablesInGroup[i];
+				auto& lowerPushableItem = g_Level.Items[lowerItemNumber];
+				auto& lowerPushable = GetPushableInfo(lowerPushableItem);
+				
+				int upperItemNumber = pushablesInGroup[i + 1];
+				auto& upperPushableItem = g_Level.Items[upperItemNumber];
+				auto& upperPushable = GetPushableInfo(upperPushableItem);
+				
+				lowerPushable.StackUpperItem = upperItemNumber;
+				upperPushable.StackLowerItem = lowerItemNumber;
+			}
+		}
 	}
 
 	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList)

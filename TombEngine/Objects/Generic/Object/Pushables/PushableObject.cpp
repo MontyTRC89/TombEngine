@@ -52,12 +52,12 @@ namespace TEN::Entities::Generic
 
 	void InitializePushableBlock(int itemNumber)
 	{
-		auto& item = g_Level.Items[itemNumber];
-		item.Data = PushableInfo();
-		auto& pushable = GetPushableInfo(item);
-
 		InitializePushablesStatesMap();
 		InitializePushablesStacks();
+
+		auto& item = g_Level.Items[itemNumber];
+		//item.Data = PushableInfo(); //Moved into InitializePushablesStacks.
+		auto& pushable = GetPushableInfo(item);
 
 		pushable.StartPos = item.Pose.Position;
 		pushable.StartPos.RoomNumber = item.RoomNumber;
