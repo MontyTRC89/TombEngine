@@ -463,8 +463,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
 		auto baseVel = Vector3::Transform(item->Animation.Velocity, rotMatrix);
 
-		unsigned int count = Random::GenerateInt(1, 3);
-		SpawnBloodSplatEffect(pos.ToVector3(), item->RoomNumber, Vector3::Down, baseVel, count);
+		unsigned int baseCount = Random::GenerateInt(1, 3);
+		SpawnBloodSplatEffect(pos.ToVector3(), item->RoomNumber, Vector3::Down, baseVel, baseCount);
 	}
 	dbBlood = !KeyMap[OIS::KC_B];
 

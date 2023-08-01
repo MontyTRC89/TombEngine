@@ -255,7 +255,8 @@ namespace TEN::Effects::Blood
 		auto& part = GetNewEffect(Particles, COUNT_MAX);
 		const auto& object = Objects[ID_BLOOD_STAIN_SPRITES];
 
-		part.SpriteID = object.meshIndex + Random::GenerateInt(0, object.nmeshes - 1);
+		// TODO: Dehardcoding value doesn't work.
+		part.SpriteID = object.meshIndex + Random::GenerateInt(0, 7);
 		part.Position = pos;
 		part.RoomNumber = roomNumber;
 		part.Orientation2D = Random::GenerateAngle();
@@ -382,12 +383,12 @@ namespace TEN::Effects::Blood
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
 
-		auto& part = GetNewEffect(Particles, COUNT_MAX);
-
 		auto sphere = BoundingSphere(pos, SPHERE_RADIUS);
 
 		for (int i = 0; i < count; i++)
 		{
+			auto& part = GetNewEffect(Particles, COUNT_MAX);
+
 			part.SpriteID = Objects[ID_SMOKE_SPRITES].meshIndex;
 			part.Position = Random::GeneratePointInSphere(sphere);
 			part.RoomNumber = roomNumber;
@@ -589,10 +590,11 @@ namespace TEN::Effects::Blood
 		}
 	}
 
-	// Temporary wrapper for the old blood spawn function.
+	// TODO: Room number.
 	void TriggerBlood(int x, int y, int z, short headingAngle, unsigned int count)
 	{
-		BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, count);
+		SpawnBloodSplatEffect(Vector3(x, y, z), LaraItem->RoomNumber, -Vector3::UnitY, Vector3::Zero, count / 4);
+		//BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, count);
 	}
 
 	void DrawBloodDebug()

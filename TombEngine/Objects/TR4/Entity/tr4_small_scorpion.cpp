@@ -89,9 +89,10 @@ namespace TEN::Entities::TR4
 			{
 				SetAnimation(item, SSCORPION_ANIM_DEATH);
 
-				unsigned int numBloodDrips = 5;
-				auto baseVelocity = item->Pose.Orientation.ToDirection() * (item->Animation.Velocity.Length() + 20);
-				SpawnBloodSplatEffect(item->Pose.Position.ToVector3(), item->RoomNumber, Vector3::Down, baseVelocity, numBloodDrips);
+				unsigned int baseCount = Random::GenerateInt(1, 3);
+				auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+				auto baseVel = Vector3::Transform(item->Animation.Velocity, rotMatrix);
+				SpawnBloodSplatEffect(item->Pose.Position.ToVector3(), item->RoomNumber, -Vector3::UnitY, baseVel, baseCount);
 				BloodStainEffect.Spawn(*item);
 			}
 		}
