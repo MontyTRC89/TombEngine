@@ -593,4 +593,12 @@ namespace TEN::Entities::Generic
 		pushableItem.Pose.Position.z = MovingPushableItem.Pose.Position.z;
 	}
 
+	/*void HandleStackFallingState(int itemNumber)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		auto& MovingPushableItem = g_Level.Items[Lara.Context.InteractedItem];
+		pushableItem.Pose.Position.y = MovingPushableItem.Pose.Position.y;
+	}*/
 }

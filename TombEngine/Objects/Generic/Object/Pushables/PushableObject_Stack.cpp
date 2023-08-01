@@ -218,20 +218,20 @@ namespace TEN::Entities::Generic
 
 	int CountPushablesInStack(int itemNumber)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushable = GetPushableInfo(pushableItem);
+		auto pushableItemCopy = g_Level.Items[itemNumber];
+		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
 
 		int count = 1;
 
-		while (pushable.StackUpperItem != 0)
+		while (pushableCopy.StackUpperItem != NO_ITEM)
 		{
-			if (pushable.StackUpperItem == itemNumber) //It shouldn't happens, but just in case.
+			if (pushableCopy.StackUpperItem == itemNumber) //It shouldn't happens, but just in case.
 				break;
 
 			count++;
 
-			pushableItem = g_Level.Items[pushable.StackUpperItem];
-			pushable = GetPushableInfo(pushableItem);
+			pushableItemCopy = g_Level.Items[pushableCopy.StackUpperItem];
+			pushableCopy = GetPushableInfo(pushableItemCopy);
 		}
 
 		return count;
