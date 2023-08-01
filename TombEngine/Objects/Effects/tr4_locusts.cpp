@@ -188,7 +188,7 @@ namespace TEN::Entities::TR4
 				
 				if (ItemNearTarget(locust->pos.Position, LaraItem, CLICK(1) / 2))
 				{
-					TriggerBlood(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 2 * GetRandomControl(), 2);
+					TriggerBlood(locust->pos.Position.ToVector3(), Random::GenerateAngle(), 2);
 					DoDamage(LaraItem, LOCUST_LARA_DAMAGE);
 				}
 

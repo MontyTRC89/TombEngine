@@ -269,14 +269,14 @@ namespace Effects
 /***Emit blood.
 @function EmitBlood
 @tparam Vec3 pos
-@tparam int count (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
+@tparam int count (default 1) amount of blood.
 */
-	static void EmitBlood(Vec3 pos, TypeOrNil<int> num)
+	static void EmitBlood(Vec3 pos, TypeOrNil<int> count)
 	{
-		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, num, 1));
+		TriggerBlood(Vector3(pos.x, pos.y, pos.z), -1, USE_IF_HAVE(int, count, 1));
 	}
 
-/***Emit fire for one frame. Will not hurt Lara. Call this each frame if you want a continuous fire.
+/***Emit fire for one frame. Will not harm player. Call this each frame for a continuous fire.
 @function EmitFire
 @tparam Vec3 pos
 @tparam float size (default 1.0)
@@ -286,11 +286,11 @@ namespace Effects
 		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1), 0);
 	}
 
-/***Make an explosion. Does not hurt Lara
+/***Make an explosion. Does not har, player
 @function MakeExplosion 
 @tparam Vec3 pos
 @tparam float size (default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites
-@tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara
+@tparam bool shockwave (default false) if true, create a very faint white shockwave which will not harm player
 */
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{

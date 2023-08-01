@@ -145,7 +145,7 @@ namespace TEN::Entities::TR4
 				{
 					int dx = LaraItem->Pose.Position.x + (GetRandomControl() & 127) - 64;
 					int dz = LaraItem->Pose.Position.z + (GetRandomControl() & 127) - 64;
-					TriggerBlood(dx, yBottom - (GetRandomControl() % dy), dz, GetRandomControl() << 1, 1);
+					TriggerBlood(Vector3(dx, yBottom - (GetRandomControl() % dy), dz), Random::GenerateAngle(), 1);
 				}
 
 				if (LaraItem->HitPoints <= 0 && Lara.Context.Vehicle == NO_ITEM)

@@ -83,7 +83,12 @@ namespace TEN::Entities::Traps
 		if (TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 		{
 			DoDamage(playerItem, SPIKY_WALL_HARM_DAMAGE);
-			DoLotsOfBlood(playerItem->Pose.Position.x, playerItem->Pose.Position.y + CLICK(2), playerItem->Pose.Position.z, 4, playerItem->Pose.Orientation.y, playerItem->RoomNumber, 3);
+			DoLotsOfBlood(
+				Vector3(
+					playerItem->Pose.Position.x,
+					playerItem->Pose.Position.y - CLICK(2),
+					playerItem->Pose.Position.z),
+				4, playerItem->Pose.Orientation.y, playerItem->RoomNumber, 3);
 			playerItem->TouchBits.ClearAll();
 
 			SoundEffect(SFX_TR4_LARA_GRABFEET, &playerItem->Pose);

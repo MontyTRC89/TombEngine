@@ -562,6 +562,13 @@ namespace TEN::Effects::Blood
 		}
 	}
 
+	// TODO: Room number.
+	void TriggerBlood(const Vector3& pos, short headingAngle, unsigned int count)
+	{
+		SpawnBloodSplatEffect(pos, LaraItem->RoomNumber, -Vector3::UnitY, Vector3::Zero, count / 4);
+		//BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, count);
+	}
+
 	short DoBloodSplat(int x, int y, int z, short vel, short headingAngle, short roomNumber)
 	{
 		int probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
@@ -571,30 +578,22 @@ namespace TEN::Effects::Blood
 		}
 		else
 		{
-			TriggerBlood(x, y, z, headingAngle / 16, vel);
+			TriggerBlood(Vector3(x, y, z), headingAngle / 16, vel);
 		}
 
 		return 0;
 	}
 
-	void DoLotsOfBlood(int x, int y, int z, int vel, short headingAngle, int roomNumber, unsigned int count)
+	void DoLotsOfBlood(const Vector3& pos, int vel, short headingAngle, int roomNumber, unsigned int count)
 	{
+		constexpr auto SPHERE_RADIUS = BLOCK(0.25f);
+
+		auto sphere = BoundingSphere(pos, SPHERE_RADIUS);
 		for (int i = 0; i < count; i++)
 		{
-			auto pos = Vector3i(
-				x + Random::GenerateInt(-BLOCK(0.25f), BLOCK(0.25f)),
-				y + Random::GenerateInt(-BLOCK(0.25f), BLOCK(0.25f)),
-				z + Random::GenerateInt(-BLOCK(0.25f), BLOCK(0.25f)));
-
-			DoBloodSplat(pos.x, pos.y, pos.z, vel, headingAngle, roomNumber);
+			auto bloodPos = Random::GeneratePointInSphere(sphere);
+			DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, vel, headingAngle, roomNumber);
 		}
-	}
-
-	// TODO: Room number.
-	void TriggerBlood(int x, int y, int z, short headingAngle, unsigned int count)
-	{
-		SpawnBloodSplatEffect(Vector3(x, y, z), LaraItem->RoomNumber, -Vector3::UnitY, Vector3::Zero, count / 4);
-		//BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, count);
 	}
 
 	void DrawBloodDebug()

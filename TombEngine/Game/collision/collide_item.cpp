@@ -1868,9 +1868,10 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 					{
 						DoDamage(item, INT_MAX);
 						DoLotsOfBlood(
-							item->Pose.Position.x,
-							laraItem->Pose.Position.y - CLICK(1),
-							item->Pose.Position.z,
+							Vector3(
+								item->Pose.Position.x,
+								laraItem->Pose.Position.y - CLICK(1),
+								item->Pose.Position.z),
 							laraItem->Animation.Velocity.z,
 							laraItem->Pose.Orientation.y,
 							item->RoomNumber, 3);

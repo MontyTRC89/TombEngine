@@ -326,14 +326,11 @@ namespace TEN::Entities::Vehicles
 								else
 								{
 									DoLotsOfBlood(
-										item->Pose.Position.x,
-										minecartItem->Pose.Position.y - CLICK(1),
-										item->Pose.Position.z,
-										GetRandomControl() & 3,
-										minecartItem->Pose.Orientation.y,
-										item->RoomNumber,
-										3);
-
+										Vector3(
+											item->Pose.Position.x,
+											minecartItem->Pose.Position.y - CLICK(1),
+											item->Pose.Position.z),
+										Random::GenerateAngle(), minecartItem->Pose.Orientation.y, item->RoomNumber, 3);
 									DoDamage(item, INT_MAX);
 								}
 							}
@@ -910,13 +907,11 @@ namespace TEN::Entities::Vehicles
 					SetAnimation(*laraItem, ID_MINECART_LARA_ANIMS, MINECART_ANIM_BONK_HEAD);
 
 					DoLotsOfBlood(
-						laraItem->Pose.Position.x,
-						laraItem->Pose.Position.y - CLICK(3),
-						laraItem->Pose.Position.z,
-						minecartItem->Animation.Velocity.z,
-						minecartItem->Pose.Orientation.y,
-						laraItem->RoomNumber,
-						3);
+						Vector3(
+							laraItem->Pose.Position.x,
+							laraItem->Pose.Position.y - CLICK(3),
+							laraItem->Pose.Position.z),
+						minecartItem->Animation.Velocity.z, minecartItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
 
 					int hits = MINECART_NUM_HITS * short(minecart->Velocity / 2048);
 					if (hits < 20)

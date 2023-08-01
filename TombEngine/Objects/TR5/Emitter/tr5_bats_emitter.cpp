@@ -213,7 +213,7 @@ void UpdateBats()
 			bat->Pose.Position.z > z1 &&
 			bat->Pose.Position.z < z2)
 		{
-			TriggerBlood(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 2 * GetRandomControl(), 2);
+			TriggerBlood(bat->Pose.Position.ToVector3(), Random::GenerateAngle(), 2);
 			DoDamage(LaraItem, 2);
 		}
 	}

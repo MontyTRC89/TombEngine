@@ -185,7 +185,11 @@ namespace TEN::Entities::Creatures::TR3
 		if (item.BoxNumber != NO_BOX && (g_Level.Boxes[item.BoxNumber].flags & BLOCKED) && item.HitPoints > 0)
 		{
 			DoDamage(&item, INT_MAX);
-			DoLotsOfBlood(item.Pose.Position.x, item.Pose.Position.y - (GetRandomControl() & 255) - 32, item.Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item.RoomNumber, 3);
+			DoLotsOfBlood(
+				Vector3(item.Pose.Position.x,
+					item.Pose.Position.y - (GetRandomControl() & 255) - 32,
+					item.Pose.Position.z),
+				(GetRandomControl() & 127) + 128, GetRandomControl() << 1, item.RoomNumber, 3);
 		}
 
 		if (item.HitPoints <= 0)

@@ -133,5 +133,7 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	long x = laraItem->Pose.Position.x + CLICK(1) * sinY;
 	long z = laraItem->Pose.Position.z + CLICK(1) * cosY;
 
-	DoLotsOfBlood(x, laraItem->Pose.Position.y - CLICK(2), z, BLOCK(1), item->Pose.Orientation.y, laraItem->RoomNumber, 15);
+	DoLotsOfBlood(
+		Vector3(x, laraItem->Pose.Position.y - CLICK(2), z),
+		BLOCK(1), item->Pose.Orientation.y, laraItem->RoomNumber, 15);
 }

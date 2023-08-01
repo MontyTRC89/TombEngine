@@ -96,7 +96,7 @@ void ControlMissile(short fxNumber)
 			}
 			else if (fx.objectNumber == ID_PROJ_SHARD)
 			{
-				TriggerBlood(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, 0, 10);
+				TriggerBlood(fx.pos.Position.ToVector3(), 0, 10);
 				SoundEffect(SFX_TR4_BLOOD_LOOP, &fx.pos, soundFXType);
 				DoDamage(LaraItem, MUTANT_SHARD_DAMAGE);
 			}

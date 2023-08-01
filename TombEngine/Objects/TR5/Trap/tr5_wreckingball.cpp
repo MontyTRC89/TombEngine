@@ -71,8 +71,12 @@ void WreckingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 			{
 				for (int i = 14 + (GetRandomControl() & 3); i > 0; --i)
 				{
-					TriggerBlood(laraItem->Pose.Position.x + (GetRandomControl() & 63) - 32, laraItem->Pose.Position.y - (GetRandomControl() & 511) - 256,
-						laraItem->Pose.Position.z + (GetRandomControl() & 63) - 32, -1, 1);
+					TriggerBlood(
+						Vector3(
+							laraItem->Pose.Position.x + (GetRandomControl() & 63) - 32,
+							laraItem->Pose.Position.y - (GetRandomControl() & 511) - 256,
+							laraItem->Pose.Position.z + (GetRandomControl() & 63) - 32),
+						-1, 1);
 				}
 			}
 

@@ -152,7 +152,7 @@ void UpdateSpiders()
 				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
 				{
 					DoDamage(LaraItem, 3);
-					TriggerBlood(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z, spider->Pose.Orientation.y, 1);
+					TriggerBlood(spider->Pose.Position.ToVector3(), spider->Pose.Orientation.y, 1);
 				}
 
 				if (spider->Flags)

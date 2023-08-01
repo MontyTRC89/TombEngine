@@ -121,14 +121,14 @@ namespace TEN::Entities::Traps::TR1
 		{
 			DoDamage(laraItem, DAMOCLES_SWORD_DAMAGE);
 
-			auto bloodBox = GameBoundingBox(laraItem).ToBoundingOrientedBox(laraItem->Pose);
-			auto bloodPos = Vector3i(Random::GeneratePointInBox(bloodBox));
+			auto box = GameBoundingBox(laraItem).ToBoundingOrientedBox(laraItem->Pose);
+			auto pos = Vector3(Random::GeneratePointInBox(box));
 
 			auto orientToSword = Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
-			short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(11.25f));
+			short randAngleOffset = Random::GenerateAngle(ANGLE(-12.0f), ANGLE(12.0f));
 			short bloodHeadingAngle = orientToSword.y + randAngleOffset;
 			
-			DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, laraItem->Animation.Velocity.z, bloodHeadingAngle, laraItem->RoomNumber, 20);
+			DoLotsOfBlood(pos, laraItem->Animation.Velocity.z, bloodHeadingAngle, laraItem->RoomNumber, 20);
 		}
 	}
 }

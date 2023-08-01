@@ -184,9 +184,9 @@ namespace TEN::Effects::Blood
 	void SpawnPlayerBloodEffect(const ItemInfo& item);
 
 	// Legacy spawners
+	void TriggerBlood(const Vector3& pos, short headingAngle, unsigned int count);
 	short DoBloodSplat(int x, int y, int z, short vel, short yRot, short roomNumber);
-	void DoLotsOfBlood(int x, int y, int z, int vel, short headingAngle, int roomNumber, unsigned int count);
-	void TriggerBlood(int x, int y, int z, short headingAngle, unsigned int count);
+	void DoLotsOfBlood(const Vector3& pos, int vel, short headingAngle, int roomNumber, unsigned int count);
 
 	void DrawBloodDebug();
 }
