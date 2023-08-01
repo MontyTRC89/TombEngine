@@ -83,44 +83,44 @@ namespace TEN::Player
 		float length = handsAttrac.AttracPtr->GetLength();
 
 		// Calculate projected distances along attractor.
-		float lineDistCenter = handsAttrac.LineDistance + sideOffset;
-		float lineDistLeft = lineDistCenter - coll.Setup.Radius;
-		float lineDistRight = lineDistCenter + coll.Setup.Radius;
+		float chainDistCenter = handsAttrac.ChainDistance + sideOffset;
+		float chainDistLeft = chainDistCenter - coll.Setup.Radius;
+		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
 		bool isLooped = handsAttrac.AttracPtr->IsLooped();
 
 		// TODO: Horrible, organise later.
 		// Get connecting attractors just in case.
-		auto connectingAttracCollCenter = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.AttracPtr, (lineDistCenter <= 0.0f) ? points.front() : points.back());
+		auto connectingAttracCollCenter = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.AttracPtr, (chainDistCenter <= 0.0f) ? points.front() : points.back());
 		auto connectingAttracCollLeft = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.AttracPtr, points.front());
 		auto connectingAttracCollRight = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.AttracPtr, points.back());
 
 		// Get points.
-		auto pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(lineDistCenter);
+		auto pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(chainDistCenter);
 		if (!isLooped)
 		{
 			if (connectingAttracCollCenter.has_value())
 			{
 				// Get point at connecting attractor.
-				if (lineDistCenter <= 0.0f)
+				if (chainDistCenter <= 0.0f)
 				{
-					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + lineDistCenter;
+					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + chainDistCenter;
 					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtChainDistance(transitLineDist);
 				}
-				else if (lineDistCenter >= length)
+				else if (chainDistCenter >= length)
 				{
-					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + (lineDistCenter - length);
+					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + (chainDistCenter - length);
 					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtChainDistance(transitLineDist);
 				}
 			}
 			else
 			{
 				// Get point within boundary of current attractor.
-				if (lineDistLeft <= 0.0f && !connectingAttracCollLeft.has_value())
+				if (chainDistLeft <= 0.0f && !connectingAttracCollLeft.has_value())
 				{
 					pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(coll.Setup.Radius);
 				}
-				else if (lineDistRight >= length && !connectingAttracCollRight.has_value())
+				else if (chainDistRight >= length && !connectingAttracCollRight.has_value())
 				{
 					pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(length - coll.Setup.Radius);
 				}
@@ -129,33 +129,33 @@ namespace TEN::Player
 			}
 		}
 
-		auto pointLeft = ((lineDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->Attrac.GetPointAtChainDistance(connectingAttracCollLeft->Proximity.ChainDistance + lineDistLeft) :
-			handsAttrac.AttracPtr->GetPointAtChainDistance(lineDistLeft);
-		auto pointRight = ((lineDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->Attrac.GetPointAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (lineDistRight - length)) :
-			handsAttrac.AttracPtr->GetPointAtChainDistance(lineDistRight);
+		auto pointLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
+			connectingAttracCollLeft->Attrac.GetPointAtChainDistance(connectingAttracCollLeft->Proximity.ChainDistance + chainDistLeft) :
+			handsAttrac.AttracPtr->GetPointAtChainDistance(chainDistLeft);
+		auto pointRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
+			connectingAttracCollRight->Attrac.GetPointAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (chainDistRight - length)) :
+			handsAttrac.AttracPtr->GetPointAtChainDistance(chainDistRight);
 
 		auto basePos = item.Pose.Position.ToVector3();
 		auto orient = item.Pose.Orientation;
 
 		// Get attractor collisions.
-		auto attracCollCenter = ((lineDistCenter <= 0.0f || lineDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
+		auto attracCollCenter = ((chainDistCenter <= 0.0f || chainDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
 			connectingAttracCollCenter->Attrac.GetCollision(basePos, orient, pointCenter, coll.Setup.Radius) :
 			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
 
-		auto attracCollLeft = ((lineDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
+		auto attracCollLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
 			connectingAttracCollLeft->Attrac.GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
 			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius);
-		auto attracCollRight = ((lineDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
+		auto attracCollRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
 			connectingAttracCollRight->Attrac.GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
 			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointRight, coll.Setup.Radius);
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
-		g_Renderer.AddLine3D(attracCollCenter.Proximity.Point, attracCollCenter.Proximity.Point + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
-		g_Renderer.AddLine3D(attracCollLeft.Proximity.Point, attracCollLeft.Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
-		g_Renderer.AddLine3D(attracCollRight.Proximity.Point, attracCollRight.Proximity.Point + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollCenter.Proximity.IntersectPoint, attracCollCenter.Proximity.IntersectPoint + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollLeft.Proximity.IntersectPoint, attracCollLeft.Proximity.IntersectPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollRight.Proximity.IntersectPoint, attracCollRight.Proximity.IntersectPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 
 		short angleDelta = Geometry::GetShortestAngle(attracCollCenter.HeadingAngle, (sideOffset >= 0.0f) ? attracCollRight.HeadingAngle : attracCollLeft.HeadingAngle);
 		g_Renderer.PrintDebugMessage("Angle delta: %.3f", TO_DEGREES(angleDelta));
@@ -200,7 +200,7 @@ namespace TEN::Player
 		}
 
 		// Calculate heading angle.
-		auto orient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.Point, edgeAttracColls->Right.Proximity.Point);
+		auto orient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.IntersectPoint, edgeAttracColls->Right.Proximity.IntersectPoint);
 		auto headingAngle = orient.y - ANGLE(90.0f);
 
 		// Align orientation.
@@ -208,11 +208,11 @@ namespace TEN::Player
 		item.Pose.Orientation.Lerp(player.Context.TargetOrientation, ORIENT_LERP_ALPHA);
 
 		// Determine target point (correctly handles positioning at inner bends).
-		auto targetPoint = edgeAttracColls->Center.Proximity.Point;
-		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Left.Proximity.Point, player.Context.TargetOrientation) &&
-			!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Right.Proximity.Point, player.Context.TargetOrientation))
+		auto targetPoint = edgeAttracColls->Center.Proximity.IntersectPoint;
+		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Left.Proximity.IntersectPoint, player.Context.TargetOrientation) &&
+			!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Right.Proximity.IntersectPoint, player.Context.TargetOrientation))
 		{
-			targetPoint = (edgeAttracColls->Left.Proximity.Point + edgeAttracColls->Right.Proximity.Point) / 2;
+			targetPoint = (edgeAttracColls->Left.Proximity.IntersectPoint + edgeAttracColls->Right.Proximity.IntersectPoint) / 2;
 		}
 
 		// Align position.

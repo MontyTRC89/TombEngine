@@ -102,7 +102,7 @@ namespace TEN::Collision::Attractors
 		// Determine inquiries.
 		bool isIntersected = (attracProx.Distance <= range);
 		bool isFacingForward = (abs(Geometry::GetShortestAngle(headingAngle, orient.y)) <= FORWARD_FACING_ANGLE_THRESHOLD);
-		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.Point, orient);
+		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.IntersectPoint, orient);
 
 		// Create attractor collision data.
 		auto attracColl = AttractorCollisionData(*this);
@@ -149,7 +149,7 @@ namespace TEN::Collision::Attractors
 			{
 				chainDistTravelled += Vector3::Distance(origin, closestPoint);
 
-				attracProx.Point = closestPoint;
+				attracProx.IntersectPoint = closestPoint;
 				attracProx.Distance = dist;
 				attracProx.ChainDistance += chainDistTravelled;
 				attracProx.SegmentID = i;

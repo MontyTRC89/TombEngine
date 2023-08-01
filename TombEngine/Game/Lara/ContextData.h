@@ -28,12 +28,12 @@ namespace TEN::Player::Context
 
 	struct EdgeCatchData
 	{
-		const Attractor* AttractorPtr = nullptr;
+		const Attractor* AttracPtr = nullptr;
 		EdgeType Type = EdgeType::Ledge; // TODO: Won't be needed later.
 
-		Vector3 Point			  = Vector3::Zero;
-		float	DistanceAlongLine = 0.0f;
-		short	HeadingAngle	  = 0;
+		Vector3 IntersectPoint = Vector3::Zero;
+		float	ChainDistance  = 0.0f;
+		short	HeadingAngle   = 0;
 	};
 
 	struct MonkeySwingCatchData

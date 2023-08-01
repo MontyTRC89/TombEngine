@@ -343,7 +343,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 
 	// Calculate position.
 	auto catchPoint = (catchData.Type == Context::EdgeType::ClimbableWall) ?
-		Vector3(item.Pose.Position.x, catchData.Point.y, item.Pose.Position.z) : catchData.Point;
+		Vector3(item.Pose.Position.x, catchData.IntersectPoint.y, item.Pose.Position.z) : catchData.IntersectPoint;
 	auto pos = catchPoint + Vector3(0.0f, coll.Setup.Height, 0.0f); // TODO: Weird with reach catch.
 	pos = Geometry::TranslatePoint(pos, catchData.HeadingAngle, -coll.Setup.Radius);
 
@@ -358,8 +358,8 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Contex
 
 	// Set attractor attachment.
 	//catchData.AttractorPtr->AttachPlayer(item);
-	player.Context.HandsAttractor.AttracPtr = catchData.AttractorPtr;
-	player.Context.HandsAttractor.LineDistance = catchData.DistanceAlongLine;
+	player.Context.HandsAttractor.AttracPtr = catchData.AttracPtr;
+	player.Context.HandsAttractor.ChainDistance = catchData.ChainDistance;
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const Context::MonkeySwingCatchData& catchData)

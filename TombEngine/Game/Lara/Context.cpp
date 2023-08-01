@@ -278,16 +278,16 @@ namespace TEN::Player::Context
 
 			// Get point collision off side of edge.
 			auto pointColl = GetCollision(
-				Vector3i(attracColl.Proximity.Point), attracColl.Attrac.GetRoomNumber(),
+				Vector3i(attracColl.Proximity.IntersectPoint), attracColl.Attrac.GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 6) Test if edge is high enough off the ground.
-			int floorToEdgeHeight = abs(attracColl.Proximity.Point.y - pointColl.Position.Floor);
+			int floorToEdgeHeight = abs(attracColl.Proximity.IntersectPoint.y - pointColl.Position.Floor);
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
-			int relEdgeHeight = attracColl.Proximity.Point.y - vPos;
+			int relEdgeHeight = attracColl.Proximity.IntersectPoint.y - vPos;
 
 			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 			int lowerBound = isMovingUp ? 0 : (int)round(item.Animation.Velocity.y);
@@ -337,7 +337,7 @@ namespace TEN::Player::Context
 		{
 			&attracColl->Attrac,
 			EDGE_TYPE,
-			attracColl->Proximity.Point,
+			attracColl->Proximity.IntersectPoint,
 			attracColl->Proximity.ChainDistance,
 			headingAngle
 		};
