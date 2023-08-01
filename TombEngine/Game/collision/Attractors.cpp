@@ -459,7 +459,7 @@ namespace TEN::Collision::Attractors
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
 															   const Vector3& refPoint, float range)
 	{
-		constexpr auto COUNT_MAX = 32;
+		constexpr auto COUNT_MAX = 64;
 
 		// Get pointers to approximately nearby attractors from sphere-AABB test.
 		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(refPoint, roomNumber, range);
@@ -473,7 +473,7 @@ namespace TEN::Collision::Attractors
 		}
 
 		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(std::max((int)nearbyAttracPtrs.size(), COUNT_MAX));
+		attracColls.reserve(std::min((int)nearbyAttracPtrs.size(), COUNT_MAX));
 
 		// Move attractor collisions from map to capped vector.
 		auto it = attracCollMap.begin();
