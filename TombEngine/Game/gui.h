@@ -5,10 +5,10 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"
 
+struct ItemInfo;
+
 using namespace TEN::Input;
 using namespace TEN::Math;
-
-struct ItemInfo;
 
 namespace TEN::Gui
 {
@@ -85,14 +85,14 @@ namespace TEN::Gui
 
 	struct MenuOption
 	{
-		MenuType	Type;
-		char const* Text;
+		MenuType	Type = MenuType::None;
+		std::string Text = {};
 	};
 
 	struct ObjectList
 	{
-		short InventoryItem;
-		EulerAngles Orientation = EulerAngles::Zero;
+		int			InventoryItem = 0;
+		EulerAngles Orientation	  = EulerAngles::Zero;
 		unsigned short Bright;
 	};
 
@@ -168,7 +168,7 @@ namespace TEN::Gui
 		InventoryResult TitleOptions(ItemInfo* item);
 		InventoryResult DoPauseMenu(ItemInfo* item);
 		void DrawInventory();
-		void DrawCurrentObjectList(ItemInfo* item, int ringIndex);
+		void DrawCurrentObjectList(ItemInfo* item, RingTypes ringType);
 		int IsObjectInInventory(int objectNumber);
 		int ConvertObjectToInventoryItem(int objectNumber);
 		int ConvertInventoryItemToObject(int objectNumber);
@@ -178,7 +178,7 @@ namespace TEN::Gui
 		void DrawCompass(ItemInfo* item);
 
 		// Getters
-		InventoryRing* GetRings(int ringIndex);
+		const InventoryRing& GetRing(RingTypes ringType);
 		short GetSelectedOption();
 		Menu GetMenuToDisplay();
 		InventoryMode GetInventoryMode();
@@ -229,9 +229,9 @@ namespace TEN::Gui
 	};
 
 	extern GuiController g_Gui;
-	extern std::vector<const char*> OptionStrings;
-	extern std::vector<const char*> GeneralActionStrings;
-	extern std::vector<const char*> VehicleActionStrings;
-	extern std::vector<const char*> QuickActionStrings;
-	extern std::vector<const char*> MenuActionStrings;
+	extern std::vector<std::string> OptionStrings;
+	extern std::vector<std::string> GeneralActionStrings;
+	extern std::vector<std::string> VehicleActionStrings;
+	extern std::vector<std::string> QuickActionStrings;
+	extern std::vector<std::string> MenuActionStrings;
 }
