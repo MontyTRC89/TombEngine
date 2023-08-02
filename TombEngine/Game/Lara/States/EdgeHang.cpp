@@ -184,8 +184,8 @@ namespace TEN::Player
 		}
 
 		// Get edge hang attractor collisions.
-		float offset = item.Animation.Velocity.z * (isGoingRight ? 1 : -1);
-		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, offset);
+		float sideOffset = item.Animation.Velocity.z * (isGoingRight ? 1 : -1);
+		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, sideOffset);
 		if (!edgeAttracColls.has_value())
 		{
 			player.Control.IsHanging = false;

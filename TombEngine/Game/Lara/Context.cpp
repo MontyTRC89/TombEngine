@@ -21,14 +21,14 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Player::Context
 {
-	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setupData)
+	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setup)
 	{
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.8);
 
 		// Get point collision.
 		int probeHeight = -(LARA_HEIGHT_STRETCH + ABS_FLOOR_BOUND);
 		auto pointCollCenter = GetCollision(&item);
-		auto pointCollFront = GetCollision(&item, setupData.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
+		auto pointCollFront = GetCollision(&item, setup.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
 
 		int vPosTop = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
 		int relFloorHeight = abs(pointCollFront.Position.Floor - vPosTop);
@@ -37,7 +37,7 @@ namespace TEN::Player::Context
 
 		// TODO: This check fails for no reason.
 		// 1) Test for slippery slope (if applicable).
-		bool isSlipperySlope = setupData.TestSlipperySlope ? pointCollFront.Position.FloorSlope : false;
+		bool isSlipperySlope = setup.TestSlipperySlope ? pointCollFront.Position.FloorSlope : false;
 		if (isSlipperySlope)
 			return false;
 
@@ -52,9 +52,9 @@ namespace TEN::Player::Context
 
 		// 4) Assess point collision.
 		if (relFloorHeight <= ABS_FLOOR_BOUND &&				   // Floor height is within lower/upper floor bounds.
-			floorToCeilHeight > setupData.FloorToCeilHeightMin &&  // Floor-to-ceiling height isn't too narrow.
-			floorToCeilHeight <= setupData.FloorToCeilHeightMax && // Floor-to-ceiling height isn't too wide.
-			gapHeight >= setupData.GapHeightMin)				   // Gap height is permissive.
+			floorToCeilHeight > setup.FloorToCeilHeightMin &&  // Floor-to-ceiling height isn't too narrow.
+			floorToCeilHeight <= setup.FloorToCeilHeightMax && // Floor-to-ceiling height isn't too wide.
+			gapHeight >= setup.GapHeightMin)				   // Gap height is permissive.
 		{
 			return true;
 		}
@@ -121,7 +121,7 @@ namespace TEN::Player::Context
 
 	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll)
 	{
-		auto setupData = LedgeClimbSetupData
+		auto setup = LedgeClimbSetupData
 		{
 			item.Pose.Orientation.y,
 			LARA_HEIGHT, -MAX_HEIGHT,
@@ -129,12 +129,12 @@ namespace TEN::Player::Context
 			false
 		};
 
-		return TestLedgeClimbSetup(item, coll, setupData);
+		return TestLedgeClimbSetup(item, coll, setup);
 	}
 
 	bool CanClimbLedgeToCrouch(const ItemInfo& item, CollisionInfo& coll)
 	{
-		auto setupData = LedgeClimbSetupData
+		auto setup = LedgeClimbSetupData
 		{
 			item.Pose.Orientation.y,
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,
@@ -142,12 +142,12 @@ namespace TEN::Player::Context
 			true
 		};
 
-		return TestLedgeClimbSetup(item, coll, setupData);
+		return TestLedgeClimbSetup(item, coll, setup);
 	}
 
 	bool CanClimbLedgeToStand(const ItemInfo& item, CollisionInfo& coll)
 	{
-		auto setupData = LedgeClimbSetupData
+		auto setup = LedgeClimbSetupData
 		{
 			item.Pose.Orientation.y,
 			LARA_HEIGHT, -MAX_HEIGHT,
@@ -155,7 +155,7 @@ namespace TEN::Player::Context
 			false
 		};
 
-		return TestLedgeClimbSetup(item, coll, setupData);
+		return TestLedgeClimbSetup(item, coll, setup);
 	}
 
 	bool CanShimmyUp(const ItemInfo& item, const CollisionInfo& coll)
@@ -261,18 +261,17 @@ namespace TEN::Player::Context
 				continue;
 			}
 
-			// TODO: Accuracy.
-			// 5) Test if target point is attractor end.
+			// TODO: Accuracy. Or maybe snap to within bounds, but use offset blending.
+			// 5) Test for seam between connecting attractors.
 			if (!hasEnd &&
 				(attracColl.Proximity.ChainDistance <= EPSILON ||
 					(attracColl.Attrac.GetLength() - attracColl.Proximity.ChainDistance) <= EPSILON))
 			{
-				// Handle seams between attractors.
+				// Track ends.
 				hasEnd = true;
 
-				// 3.1) Test for loop seam.
-				const auto& points = attracColl.Attrac.GetPoints();
-				if (Vector3::Distance(points[0], points.back()) > EPSILON)
+				// 3.1) Test for looped attractor.
+				if (!attracColl.Attrac.IsLooped())
 					continue;
 			}
 
@@ -317,8 +316,6 @@ namespace TEN::Player::Context
 
 	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto EDGE_TYPE = EdgeType::Ledge;
-
 		const auto& player = GetLaraInfo(item);
 
 		// Get edge catch attractor collision.
@@ -336,7 +333,7 @@ namespace TEN::Player::Context
 		return EdgeCatchData
 		{
 			&attracColl->Attrac,
-			EDGE_TYPE,
+			EdgeType::Ledge,
 			attracColl->Proximity.IntersectPoint,
 			attracColl->Proximity.ChainDistance,
 			headingAngle
@@ -345,7 +342,6 @@ namespace TEN::Player::Context
 
 	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
 	{
-		constexpr auto EDGE_TYPE		= EdgeType::ClimbableWall;
 		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
 
 		const auto& player = GetLaraInfo(item);
@@ -369,7 +365,7 @@ namespace TEN::Player::Context
 		int vPos = item.Pose.Position.y - coll.Setup.Height;
 		int edgeHeight = (int)floor((vPos + item.Animation.Velocity.y) / WALL_STEP_HEIGHT) * WALL_STEP_HEIGHT;
 
-		// 4) Test if wall edge is too low to the ground.
+		// 4) Test if wall edge is high enough off the ground.
 		int floorToEdgeHeight = abs(edgeHeight - pointCollCenter.Position.Floor);
 		if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH)
 			return std::nullopt;
@@ -399,7 +395,7 @@ namespace TEN::Player::Context
 			return EdgeCatchData
 			{
 				nullptr,
-				EDGE_TYPE,
+				EdgeType::ClimbableWall,
 				offset
 			};
 		}

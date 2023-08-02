@@ -1262,7 +1262,7 @@ struct LaraControlData
 	bool IsMonkeySwinging = false;
 	bool IsMoving		  = false;
 	bool RunJumpQueued	  = false; // IsRunJumpQueued
-	bool KeepLow		  = false; // IsInLowSpace
+	bool KeepLow		  = false;
 
 	bool CanClimbLadder = false;
 	bool CanLook		= false;

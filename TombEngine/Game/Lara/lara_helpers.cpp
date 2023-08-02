@@ -389,7 +389,7 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 	auto monkeyCatchData = Context::GetMonkeySwingCatchData(item, coll);
 	if (monkeyCatchData.has_value())
 	{
-		SetPlayerMonkeySwingCatch(item, coll, monkeyCatchData.value());
+		SetPlayerMonkeySwingCatch(item, coll, *monkeyCatchData);
 		return true;
 	}
 
@@ -397,7 +397,7 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 	auto edgeCatchData = Context::GetEdgeCatchData(item, coll);
 	if (edgeCatchData.has_value())
 	{
-		SetPlayerEdgeCatch(item, coll, edgeCatchData.value());
+		SetPlayerEdgeCatch(item, coll, *edgeCatchData);
 		return true;
 	}
 
