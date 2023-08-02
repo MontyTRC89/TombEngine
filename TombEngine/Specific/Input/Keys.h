@@ -41,22 +41,22 @@ namespace TEN::Input
 	enum GamepadKey
 	{
 		// Buttons
-		GK_JOY_1 = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2),
-		GK_JOY_2,
-		GK_JOY_3,
-		GK_JOY_4,
-		GK_JOY_5,
-		GK_JOY_6,
-		GK_JOY_7,
-		GK_JOY_8,
-		GK_JOY_9,
-		GK_JOY_10,
-		GK_JOY_11,
-		GK_JOY_12,
-		GK_JOY_13,
-		GK_JOY_14,
-		GK_JOY_15,
-		GK_JOY_16,
+		GK_BUTTON_1 = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2),
+		GK_BUTTON_2,
+		GK_BUTTON_3,
+		GK_BUTTON_4,
+		GK_BUTTON_5,
+		GK_BUTTON_6,
+		GK_BUTTON_7,
+		GK_BUTTON_8,
+		GK_BUTTON_9,
+		GK_BUTTON_10,
+		GK_BUTTON_11,
+		GK_BUTTON_12,
+		GK_BUTTON_13,
+		GK_BUTTON_14,
+		GK_BUTTON_15,
+		GK_BUTTON_16,
 		
 		// Axes
 		GK_AXIS_X_NEG,
@@ -84,7 +84,7 @@ namespace TEN::Input
 	enum XInputKey
 	{
 		// Buttons
-		XK_START = GK_JOY_1,
+		XK_START = GK_BUTTON_1,
 		XK_SELECT,
 		XK_LSTICK,
 		XK_RSTICK,
