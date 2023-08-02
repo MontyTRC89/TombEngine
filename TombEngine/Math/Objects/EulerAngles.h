@@ -6,7 +6,7 @@
 	class EulerAngles
 	{
 	public:
-		// Components (CONVENTION: X = Pitch, Y = Yaw, Z = Roll)
+		// Members (CONVENTION: X = Pitch, Y = Yaw, Z = Roll)
 		short x = 0;
 		short y = 0;
 		short z = 0;

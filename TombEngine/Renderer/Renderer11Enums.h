@@ -113,14 +113,18 @@ enum RENDERER_FADE_STATUS
 	FADE_OUT
 };
 
-enum RENDERER_DEBUG_PAGE
+enum class RendererDebugPage
 {
-	NO_PAGE,
-	RENDERER_STATS,
-	DIMENSION_STATS,
-	LARA_STATS,
-	LOGIC_STATS,
-	WIREFRAME_MODE
+	None,
+	RendererStats,
+	DimensionStats,
+	PlayerStats,
+	LogicStats,
+	CollisionStats,
+	PathfindingStats,
+	WireframeMode,
+
+	Count
 };
 
 enum RendererTransparentFaceType
@@ -187,6 +191,13 @@ enum ALPHA_TEST_MODES
 	ALPHA_TEST_NONE = 0,
 	ALPHA_TEST_GREATER_THAN = 1,
 	ALPHA_TEST_LESS_THAN = 2
+};
+
+enum RendererPass
+{
+	ShadowMap,
+	Opaque,
+	Transparent
 };
 
 constexpr auto TEXTURE_HEIGHT = 256;

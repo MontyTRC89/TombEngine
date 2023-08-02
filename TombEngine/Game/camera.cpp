@@ -538,7 +538,7 @@ void ChaseCamera(ItemInfo* item)
 
 void DoThumbstickCamera()
 {
-	if (!g_Configuration.EnableThumbstickCameraControl)
+	if (!g_Configuration.EnableThumbstickCamera)
 		return;
 
 	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
@@ -1850,8 +1850,9 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &item->Pose, rad);
 
-		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(item->Pose),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
+		TEN::Renderer::g_Renderer.AddDebugBox(
+			bounds.ToBoundingOrientedBox(item->Pose),
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 	}
 
 	itemList.clear(); // Done
@@ -1877,8 +1878,9 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &mesh->pos, rad);
 
-		TEN::Renderer::g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(mesh->pos),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LARA_STATS);
+		TEN::Renderer::g_Renderer.AddDebugBox(
+			bounds.ToBoundingOrientedBox(mesh->pos),
+			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 	}
 
 	staticList.clear(); // Done
@@ -1899,7 +1901,7 @@ void UpdateMikePos(ItemInfo* item)
 	}
 	else
 	{
-		int phdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+		int phdPerspective = g_Configuration.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 
 		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
 		Camera.mikePos.x = Camera.pos.x + phdPerspective * phd_sin(Camera.actualAngle);

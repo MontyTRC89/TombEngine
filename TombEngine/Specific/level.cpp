@@ -262,7 +262,7 @@ void LoadObjects()
 				poly.textureCoordinates.resize(count);
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
-				poly.bitangents.resize(count);
+				poly.binormals.resize(count);
 				
 				for (int n = 0; n < count; n++)
 					poly.indices[n] = ReadInt32();
@@ -273,7 +273,7 @@ void LoadObjects()
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
 				for (int n = 0; n < count; n++)
-					poly.bitangents[n] = ReadVector3();
+					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
@@ -660,7 +660,7 @@ void ReadRooms()
 				poly.textureCoordinates.resize(count);
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
-				poly.bitangents.resize(count);
+				poly.binormals.resize(count);
 
 				for (int n = 0; n < count; n++)
 					poly.indices[n] = ReadInt32();
@@ -671,7 +671,7 @@ void ReadRooms()
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
 				for (int n = 0; n < count; n++)
-					poly.bitangents[n] = ReadVector3();
+					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
@@ -1288,6 +1288,7 @@ bool LoadLevelFile(int levelIndex)
 {
 	TENLog("Loading level file...", LogLevel::Info);
 
+	BackupLara();
 	CleanUp();
 	FreeLevel();
 	

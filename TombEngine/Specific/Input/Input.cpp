@@ -138,7 +138,7 @@ namespace TEN::Input
 	const auto DefaultXInputBindings = std::vector<int>
 	{
 		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_LSTICK, XB_RSTICK, XB_RSHIFT, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_X, XB_B, XB_A, XB_Y, XB_LSHIFT,
-		KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
+		XB_A, XB_AXIS_X_POS, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_AXIS_LTRIGGER_NEG,
 		XB_DPAD_DOWN, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
 		KC_RETURN, XB_SELECT, XB_START, XB_SELECT, KC_F5, KC_F6, KC_NUMPAD0
 	};
@@ -229,7 +229,7 @@ namespace TEN::Input
 				if (ApplyDefaultXInputBindings())
 				{
 					g_Configuration.EnableRumble = (OisRumble != nullptr);
-					g_Configuration.EnableThumbstickCameraControl = true;
+					g_Configuration.EnableThumbstickCamera = true;
 					SaveConfiguration();
 				}
 			}
@@ -644,7 +644,7 @@ namespace TEN::Input
 		static bool dbFullscreen = true;
 		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN] && dbFullscreen)
 		{
-			g_Configuration.Windowed = !g_Configuration.Windowed;
+			g_Configuration.EnableWindowedMode = !g_Configuration.EnableWindowedMode;
 			SaveConfiguration();
 			g_Renderer.ToggleFullScreen();
 		}
@@ -731,7 +731,12 @@ namespace TEN::Input
 		// Port actions back to legacy bit fields.
 		for (const auto& action : ActionMap)
 		{
-			int actionBit = 1 << (int)action.GetID();
+			// TEMP FIX: Only port up to 32 bits.
+			auto actionID = action.GetID();
+			if ((int)actionID >= 32)
+				break;
+
+			int actionBit = 1 << (int)actionID;
 
 			DbInput |= action.IsClicked() ? actionBit : 0;
 			TrInput |= action.IsHeld()	  ? actionBit : 0;
@@ -823,7 +828,7 @@ namespace TEN::Input
 				g_Configuration.Bindings[i] = Bindings[1][i];
 
 			// Additionally turn on thumbstick camera and vibration.
-			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCameraControl = true;
+			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCamera = true;
 
 			return true;
 		}
@@ -836,6 +841,10 @@ namespace TEN::Input
 	void ClearAction(ActionID actionID)
 	{
 		ActionMap[(int)actionID].Clear();
+
+		// TEMP FIX: Only port up to 32 bits.
+		if ((int)actionID >= 32)
+			return;
 
 		int actionBit = 1 << (int)actionID;
 		DbInput &= ~actionBit;
