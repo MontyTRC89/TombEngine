@@ -4,16 +4,16 @@ namespace TEN::Input
 {
 	constexpr auto KEYBOARD_KEY_COUNT	  = 256;
 	constexpr auto MOUSE_BUTTON_COUNT	  = 8;
-	constexpr auto MOUSE_AXIS_COUNT		  = 8;
+	constexpr auto MOUSE_AXIS_COUNT		  = 4;
 	constexpr auto GAMEPAD_BUTTON_COUNT	  = 16;
 	constexpr auto GAMEPAD_AXIS_COUNT	  = 6;
 	constexpr auto GAMEPAD_POV_AXIS_COUNT = 4;
 
 	constexpr auto KEY_SLOT_COUNT = KEYBOARD_KEY_COUNT +
-									MOUSE_BUTTON_COUNT + MOUSE_AXIS_COUNT +
+									MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) +
 									GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2) + GAMEPAD_POV_AXIS_COUNT;
 
-	// 8 buttons + 8 axes.
+	// 8 buttons + (4 * 2) axes.
 	enum MouseKey
 	{
 		// Buttons
@@ -37,11 +37,11 @@ namespace TEN::Input
 		MK_AXIS_W_POS
 	};
 
-	// 16 buttons + 12 axes + 4 POV axes.
+	// 16 buttons + (6 * 2) axes + 4 POV axes.
 	enum GamepadKey
 	{
 		// Buttons
-		GK_JOY_1 = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + MOUSE_AXIS_COUNT,
+		GK_JOY_1 = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2),
 		GK_JOY_2,
 		GK_JOY_3,
 		GK_JOY_4,

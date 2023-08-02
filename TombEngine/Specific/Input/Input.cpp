@@ -35,7 +35,7 @@ namespace TEN::Input
 	RumbleData				 RumbleInfo  = {};
 	std::vector<InputAction> ActionMap	 = {};
 	std::vector<QueueState>	 ActionQueue = {};
-	std::vector<bool>		 KeyMap		 = {};
+	std::vector<float>		 KeyMap		 = {};
 	std::vector<float>		 AxisMap	 = {};
 
 	//  Deprecated legacy input bit fields.
@@ -147,7 +147,7 @@ namespace TEN::Input
 	void ClearInputData()
 	{
 		for (auto& key : KeyMap)
-			key = false;
+			key = 0.0f;
 
 		for (auto& axis : AxisMap)
 			axis = 0.0f;
@@ -275,7 +275,7 @@ namespace TEN::Input
 
 			// Scan buttons.
 			for (int key = 0; key < state.mButtons.size(); key++)
-				KeyMap[KEYBOARD_KEY_COUNT + key] = state.mButtons[key];
+				KeyMap[KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + key] = state.mButtons[key] ? 1.0f : 0.0f;
 
 			// Scan axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
@@ -297,14 +297,14 @@ namespace TEN::Input
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
 				// Calculate and reset discrete input slots.
-				int negKey = KEYBOARD_KEY_COUNT + GAMEPAD_BUTTON_COUNT + (axis * 2);
-				int posKey = KEYBOARD_KEY_COUNT + GAMEPAD_BUTTON_COUNT + (axis * 2) + 1;
-				KeyMap[negKey] = false;
-				KeyMap[posKey] = false;
+				int negKey = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (axis * 2);
+				int posKey = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (axis * 2) + 1;
+				KeyMap[negKey] = 0.0f;
+				KeyMap[posKey] = 0.0f;
 
 				// Decide on the discrete input registering based on analog value.
 				int usedKey = normalizedValue > 0 ? negKey : posKey;
-				KeyMap[usedKey] = true;
+				KeyMap[usedKey] = 1.0f;
 
 				// Register analog input in certain direction.
 				// If axis is bound as directional controls, register axis as directional input.
@@ -347,7 +347,7 @@ namespace TEN::Input
 				// This is needed to allow multiple directions  pressed at the same time.
 				for (int pass = 0; pass < 4; pass++)
 				{
-					unsigned int index = KEYBOARD_KEY_COUNT + GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2);
+					unsigned int index = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2);
 
 					switch (pass)
 					{
@@ -373,7 +373,7 @@ namespace TEN::Input
 					}
 
 					index += pass;
-					KeyMap[index] = true;
+					KeyMap[index] = 1.0f;
 					SetDiscreteAxisValues(index);
 				}
 			}
@@ -401,7 +401,7 @@ namespace TEN::Input
 				}
 
 				int key = WrapSimilarKeys(i);
-				KeyMap[key] = true;
+				KeyMap[key] = 1.0f;
 
 				// Register directional discrete keypresses as max analog axis values.
 				SetDiscreteAxisValues(key);
@@ -413,7 +413,7 @@ namespace TEN::Input
 		}
 	}
 
-	static bool Key(ActionID actionID)
+	static float Key(ActionID actionID)
 	{
 		for (int i = 1; i >= 0; i--)
 		{
@@ -423,11 +423,11 @@ namespace TEN::Input
 				continue;
 
 			int key = g_Bindings.GetBoundKey((BindingMapType)i, actionID);
-			if (KeyMap[key])
-				return true;
+			if (KeyMap[key] != 0.0f)
+				return KeyMap[key];
 		}
 
-		return false;
+		return 0.0f;
 	}
 
 	void SolveActionCollisions()
@@ -598,7 +598,7 @@ namespace TEN::Input
 
 	void ApplyDefaultBindings()
 	{
-		ApplyBindings(BindingManager::DEFAULT_KEYBOARD_BINDING_MAP);
+		ApplyBindings(BindingManager::DEFAULT_XBOX_BINDING_MAP);
 		ApplyDefaultXInputBindings();
 	}
 

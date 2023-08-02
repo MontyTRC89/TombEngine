@@ -184,5 +184,15 @@ namespace TEN::Input
 		}
 	}
 
+	void BindingManager::SetConflict(ActionID actionID, bool value)
+	{
+		Conflicts.insert({ actionID, value });
+	}
+
+	bool BindingManager::TestConflict(ActionID actionID)
+	{
+		return Conflicts.at(actionID);
+	}
+
 	BindingManager g_Bindings;
 }

@@ -253,13 +253,13 @@ bool SaveConfiguration()
 	}
 
 	// Set Input keys.
-	g_Configuration.Bindings.resize(KEY_COUNT);
+	g_Configuration.Bindings = BindingManager::DEFAULT_KEYBOARD_BINDING_MAP;
 	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		char buffer[9];
 		sprintf(buffer, "Action%d", i);
 
-		if (SetDWORDRegKey(inputKey, buffer, g_Configuration.Bindings[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(inputKey, buffer, g_Configuration.Bindings.at((ActionID)i)) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -439,7 +439,7 @@ bool LoadConfiguration()
 				return false;
 			}
 
-			g_Configuration.Bindings.push_back(tempKey);
+			g_Configuration.Bindings.insert({ (ActionID)i, tempKey });
 			g_Bindings.SetKeyBinding(BindingMapType::Custom, actionID, tempKey);
 		}
 

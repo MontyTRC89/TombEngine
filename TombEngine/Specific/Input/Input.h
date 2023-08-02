@@ -113,7 +113,7 @@ namespace TEN::Input
 
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<QueueState>	ActionQueue;
-	extern std::vector<bool>		KeyMap;
+	extern std::vector<float>		KeyMap;
 	extern std::vector<float>		AxisMap;
 
 	extern int DbInput; // Debounce input.
