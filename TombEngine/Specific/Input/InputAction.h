@@ -57,7 +57,6 @@ namespace TEN::Input
 		Count
 	} In;
 
-	// TODO: For analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
 	class InputAction
 	{
 	private:

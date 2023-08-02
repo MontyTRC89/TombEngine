@@ -126,6 +126,7 @@ namespace TEN::Input
 
 	void InputAction::DrawDebug() const
 	{
+		g_Renderer.PrintDebugMessage("INPUT ACTION DEBUG");
 		g_Renderer.PrintDebugMessage("ID: %d", (int)ID);
 		g_Renderer.PrintDebugMessage("IsClicked: %d", IsClicked());
 		g_Renderer.PrintDebugMessage("IsHeld: %d", IsHeld());

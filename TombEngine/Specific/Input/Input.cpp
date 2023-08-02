@@ -289,8 +289,8 @@ namespace TEN::Input
 					continue;
 
 				// Calculate raw normalized analog value (for camera).
-				float normalizedValue = (float)(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE))
-					/ (float)(std::numeric_limits<short>::max() - AXIS_DEADZONE);
+				float normalizedValue = float(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE)) /
+					float(SHRT_MAX - AXIS_DEADZONE);
 
 				// Calculate scaled analog value (for movement).
 				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
@@ -299,12 +299,11 @@ namespace TEN::Input
 				// Calculate and reset discrete input slots.
 				int negKey = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (axis * 2);
 				int posKey = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (axis * 2) + 1;
-				KeyMap[negKey] = 0.0f;
-				KeyMap[posKey] = 0.0f;
+				KeyMap[negKey] = (normalizedValue > 0) ? abs(normalizedValue) : 0.0f;
+				KeyMap[posKey] = (normalizedValue < 0) ? abs(normalizedValue) : 0.0f;
 
 				// Decide on the discrete input registering based on analog value.
-				int usedKey = normalizedValue > 0 ? negKey : posKey;
-				KeyMap[usedKey] = 1.0f;
+				int usedKey = (normalizedValue > 0) ? negKey : posKey;
 
 				// Register analog input in certain direction.
 				// If axis is bound as directional controls, register axis as directional input.
