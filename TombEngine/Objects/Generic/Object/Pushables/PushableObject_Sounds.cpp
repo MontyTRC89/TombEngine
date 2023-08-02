@@ -41,8 +41,7 @@ namespace TEN::Entities::Generic
 	PushableSoundData GetPushableSfxData(const MaterialType material)
 	{
 		auto it = SOUND_DATA_MAP.find(material);
-		//return ((it != SOUND_DATA_MAP.end()) ? it->second : SOUND_DATA_DEFAULT);
-		return SOUND_DATA_DEFAULT; //Temporal while WIP.
+		return ((it != SOUND_DATA_MAP.end()) ? it->second : SOUND_DATA_DEFAULT);
 	}
 
 	int GetPushableSfx(PushableSoundType soundType, const Vector3i& pos, const short roomNumber)
