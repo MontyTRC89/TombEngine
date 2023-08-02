@@ -25,27 +25,17 @@ namespace TEN::Entities::Generic
 
 	void InitializePushablesStacks()
 	{
-		//1. Make the function had an unique call
-		//Not a singleton, but it follows the idea...
-
-		static bool StacksInitialized = false;
-
-		if (StacksInitialized)
-			return;
-		else
-			StacksInitialized = true;
-
-		//2. Collect all the pushables placed in the level
+		//1. Collect all the pushables placed in the level
 		auto& pushablesNumbersList = FindAllPushables(g_Level.Items);
 
 		if (pushablesNumbersList.empty())
 			return;
 
-		//3. Prepare data to create several lists per each stack group. (One for each position XZ, and the ground floor height).
+		//2. Prepare data to create several lists per each stack group. (One for each position XZ, and the ground floor height).
 		//PROBLEM: Missing hash function in Vector3i, creating custom version Vector3iHasher at the top of this source code.
 		std::unordered_map < Vector3i, std::vector<int>, Vector3iHasher> stackGroups; // stack Position - pushable itemNumber  
 
-		//4. Iterate through the pushables list, to put them in their different stack groups. According to their XZ and ground floor height).
+		//3. Iterate through the pushables list, to put them in their different stack groups. According to their XZ and ground floor height).
 		//Extra, I moved also the .Data initialization here, to can store data in all the pushables objects (even the ones not initialized yet).
 		for (int itemNumber : pushablesNumbersList)
 		{
@@ -61,7 +51,7 @@ namespace TEN::Entities::Generic
 			stackGroups.emplace(Vector3i(x, y, z), std::vector<int>()).first->second.push_back(itemNumber);
 		}
 
-		//5. Iterate through the stack groups lists, on each one, it has to sort them by height, and iterate through it to make the stack links.
+		//4. Iterate through the stack groups lists, on each one, it has to sort them by height, and iterate through it to make the stack links.
 		for (auto& group : stackGroups)
 		//for (auto it = stackGroups.begin(); it != stackGroups.end(); ++it)
 		{

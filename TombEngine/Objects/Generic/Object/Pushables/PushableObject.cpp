@@ -52,11 +52,13 @@ namespace TEN::Entities::Generic
 
 	void InitializePushableBlock(int itemNumber)
 	{
-		InitializePushablesStatesMap();
-		InitializePushablesStacks();
-
 		auto& pushableItem = g_Level.Items[itemNumber];
-		//item.Data = PushableInfo(); //Moved into InitializePushablesStacks.
+		if (pushableItem.Data == NULL) //Is the first pushableItem in initialize.
+		{
+			InitializePushablesStatesMap();
+			InitializePushablesStacks();
+		}
+		//pushableItem.Data = PushableInfo(); //Moved into InitializePushablesStacks.
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		pushable.StartPos = pushableItem.Pose.Position;
