@@ -576,9 +576,9 @@ enum LaraAnim
 	LA_PULLEY_PULL = 340,									// Pull pulley
 	LA_PULLEY_RELEASE = 341,								// Pull pulley > stand
 	LA_POLE_TO_STAND = 342,									// Pole > stand
-	LA_POLE_TURN_CLOCKWISE_CONTINUE_UNUSED = 343,				// TODO: remove.
+	LA_PUSHABLE_CLASSIC_PULL = 343,							// Pull pushable object TR1-TR3 style
 	LA_POLE_TURN_CLOCKWISE_END = 344,						// Rotate clockwise on pole (2/2)
-	LA_POLE_TURN_COUNTER_CLOCKWISE_CONTINUE_UNUSED = 345,		// TODO: remove.
+	LA_PUSHABLE_CLASSIC_PUSH = 345,							// Push pushable object TR1-TR3 style
 	LA_POLE_TURN_COUNTER_CLOCKWISE_END = 346,				// Rotate counter-clockwise on pole (2/2)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_START = 347,				// Push turnswitch clockwise (1/3)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_CONTINUE = 348,			// Push turnswitch clockwise (2/3) 
@@ -821,7 +821,6 @@ enum LaraAnim
 
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
 	// 280,
-	// 343, 345,
 	// 364, 366, 368, 370,
 };
 

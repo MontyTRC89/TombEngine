@@ -47,7 +47,7 @@ namespace TEN::Entities::Generic
 	std::vector<PushableAnimationInfo> PushableAnimInfos =
 	{
 		{LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, true},                  // TR4-TR5 animations.
-		//{LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, false}      // TR1-TR3 animations.
+		{LA_PUSHABLE_CLASSIC_PULL, LA_PUSHABLE_CLASSIC_PUSH, false}      // TR1-TR3 animations.
 	};
 
 	void InitializePushableBlock(int itemNumber)
@@ -79,7 +79,7 @@ namespace TEN::Entities::Generic
 		pushable.CanFall = (ocb & (1 << 0)) != 0;						 // Check bit 0.
 		pushable.DoAlignCenter = (ocb & (1 << 1)) != 0;					 // Check bit 1.
 		pushable.IsBuoyant = (ocb & (1 << 2)) != 0;						 // Check bit 2.
-		//pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
+		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
 
 		item.Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
@@ -226,5 +226,26 @@ namespace TEN::Entities::Generic
 		return heightWorldAligned;
 	}
 
+	void SetPushableStopperFlag(bool value, Vector3i& pos, int roomNumber)
+	{
+		auto collisionResult = GetCollision(pos, roomNumber);
+		
+		collisionResult.Block->Stopper = value;
+	}
 
+	void ManagePushableStopperFlag(int itemNumber)
+	{
+		//Idle -> Moving, put flag in destiny tile
+		//Moving -> Idles, quit flag in source tile (if it wasn't a stack),  make destiny tile the new source tile
+		//Moving -> Moving, quit flag in source tile (if it wasn't a stack), make destiny tile the new source tile, put flag in next destiny tile
+		//Moving -> Falling, quit flag in source tile.
+		//Moving -> Sliding, quit flag in source tile.
+		//Sliding -> Idle, put flag in destiny tile.
+		//Falling -> Idle, put flag in pushable location.
+		//Idle -> Water States, quit flag from pushable location.
+		//Water States -> Idle, put flag in pushable location.
+
+		//Conditions to check.
+		//- Check first if is getting to the tile as a stacked item (in such case the stopper flag is managed by the stack bottom pushable).
+	}
 }

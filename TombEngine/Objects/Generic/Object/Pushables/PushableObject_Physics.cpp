@@ -179,7 +179,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		bool isPlayerPulling = (LaraItem->Animation.AnimNumber == LA_PUSHABLE_PULL);// || LaraItem->Animation.AnimNumber == LA_PUSHABLE_BLOCK_PULL);
+		bool isPlayerPulling = LaraItem->Animation.ActiveState == LS_PUSHABLE_PULL;
 
 		int quadrantDir = GetQuadrant(LaraItem->Pose.Orientation.y);
 		int newPosX = pushable.StartPos.x;
@@ -599,6 +599,7 @@ namespace TEN::Entities::Generic
 		pushableItem.Pose.Position.z = MovingPushableItem.Pose.Position.z;
 	}
 
+	/*TODO: 
 	void HandleStackFallingState(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
@@ -606,5 +607,5 @@ namespace TEN::Entities::Generic
 
 		auto& MovingPushableItem = g_Level.Items[Lara.Context.InteractedItem];
 		pushableItem.Pose.Position.y = MovingPushableItem.Pose.Position.y;
-	}
+	}*/
 }
