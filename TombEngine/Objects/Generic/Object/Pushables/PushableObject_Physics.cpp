@@ -121,6 +121,7 @@ namespace TEN::Entities::Generic
 		{
 			if (pushable.UsesRoomCollision)
 				DeactivateClimbablePushableCollider(itemNumber);
+			SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
 			if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 			{
@@ -151,6 +152,7 @@ namespace TEN::Entities::Generic
 			if (abs(pushableItem.Pose.Position.y - floorHeight) >= CLICK(1))
 			{
 				pushable.BehaviourState = PushablePhysicState::Falling;
+				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 				if (pushable.UsesRoomCollision)
 					DeactivateClimbablePushableCollider(itemNumber);
 			}
@@ -279,6 +281,10 @@ namespace TEN::Entities::Generic
 			
 			//1. Realign with sector center
 			pushableItem.Pose.Position = GetNearestSectorCenter(pushableItem.Pose.Position);
+
+			//TODO: It only should do it if there is not any other pushable remaining there
+			SetPushableStopperFlag(false, pushable.StartPos.ToVector3i(), pushable.StartPos.RoomNumber);
+
 			pushable.StartPos = pushableItem.Pose.Position;
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 
@@ -300,9 +306,6 @@ namespace TEN::Entities::Generic
 					return;
 				}
 			}
-
-			//4. Update floor data
-			
 
 			//5. Check input too see if it can keep the movement
 
@@ -371,6 +374,14 @@ namespace TEN::Entities::Generic
 		
 		//If it's a flat ground?
 		
+		//The pushable is going to stop here, do the checks to conect it with another Stack.
+		int FoundStack = SearchNearPushablesStack(itemNumber);
+		StackPushable(itemNumber, FoundStack);
+
+		//Set Stopper Flag
+		if (pushable.StackLowerItem == NO_ITEM)
+			SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
+
 		//place on ground
 		pushable.BehaviourState = PushablePhysicState::Idle;
 		pushableItem.Pose.Position.y = pointColl.Position.Floor;
@@ -462,6 +473,10 @@ namespace TEN::Entities::Generic
 		//1. Ensure it's in water room
 		if (!TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
+			//Set Stopper Flag
+			if (pushable.StackLowerItem == NO_ITEM)
+				SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
+
 			pushable.BehaviourState = PushablePhysicState::Falling;
 			pushable.Gravity = GRAVITY_AIR;
 			return;

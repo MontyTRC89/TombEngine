@@ -55,16 +55,16 @@ namespace TEN::Entities::Generic
 		InitializePushablesStatesMap();
 		InitializePushablesStacks();
 
-		auto& item = g_Level.Items[itemNumber];
+		auto& pushableItem = g_Level.Items[itemNumber];
 		//item.Data = PushableInfo(); //Moved into InitializePushablesStacks.
-		auto& pushable = GetPushableInfo(item);
+		auto& pushable = GetPushableInfo(pushableItem);
 
-		pushable.StartPos = item.Pose.Position;
-		pushable.StartPos.RoomNumber = item.RoomNumber;
+		pushable.StartPos = pushableItem.Pose.Position;
+		pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 
-		pushable.Height = GetPushableHeight(item);
+		pushable.Height = GetPushableHeight(pushableItem);
 
-		if (item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
+		if (pushableItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushable.UsesRoomCollision = true;
 			ActivateClimbablePushableCollider(itemNumber);
@@ -74,14 +74,16 @@ namespace TEN::Entities::Generic
 			pushable.UsesRoomCollision = false;
 		}
 
+		SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
+
 		// Read OCB flags.
-		int ocb = item.TriggerFlags;
+		int ocb = pushableItem.TriggerFlags;
 		pushable.CanFall = (ocb & (1 << 0)) != 0;						 // Check bit 0.
 		pushable.DoAlignCenter = (ocb & (1 << 1)) != 0;					 // Check bit 1.
 		pushable.IsBuoyant = (ocb & (1 << 2)) != 0;						 // Check bit 2.
 		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
 
-		item.Status = ITEM_ACTIVE;
+		pushableItem.Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
 	}
 
@@ -231,21 +233,5 @@ namespace TEN::Entities::Generic
 		auto collisionResult = GetCollision(pos, roomNumber);
 		
 		collisionResult.Block->Stopper = value;
-	}
-
-	void ManagePushableStopperFlag(int itemNumber)
-	{
-		//Idle -> Moving, put flag in destiny tile
-		//Moving -> Idles, quit flag in source tile (if it wasn't a stack),  make destiny tile the new source tile
-		//Moving -> Moving, quit flag in source tile (if it wasn't a stack), make destiny tile the new source tile, put flag in next destiny tile
-		//Moving -> Falling, quit flag in source tile.
-		//Moving -> Sliding, quit flag in source tile.
-		//Sliding -> Idle, put flag in destiny tile.
-		//Falling -> Idle, put flag in pushable location.
-		//Idle -> Water States, quit flag from pushable location.
-		//Water States -> Idle, put flag in pushable location.
-
-		//Conditions to check.
-		//- Check first if is getting to the tile as a stacked item (in such case the stopper flag is managed by the stack bottom pushable).
 	}
 }

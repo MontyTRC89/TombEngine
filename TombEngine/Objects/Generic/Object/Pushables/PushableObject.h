@@ -42,5 +42,4 @@ namespace TEN::Entities::Generic
 	int GetPushableHeight(ItemInfo& item);
 
 	void SetPushableStopperFlag(bool value, Vector3i& pos, int roomNumber);
-	void ManagePushableStopperFlag(int itemNumber);
 }

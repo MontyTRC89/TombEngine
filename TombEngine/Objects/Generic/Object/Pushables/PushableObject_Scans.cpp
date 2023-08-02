@@ -74,13 +74,13 @@ namespace TEN::Entities::Generic
 			return false;
 
 		// Check for stopper flag.
-		if (collisionResult.Block->Stopper)
+		/*if (collisionResult.Block->Stopper)
 		{
 			if (collisionResult.Position.Floor <= pushableItem.Pose.Position.y)
 			{
 				return false;
 			}
-		}
+		}*/
 
 		// Check for gap or step. (Can it fall down?) (Only available for pushing).
 		int floorDifference = abs(collisionResult.Position.Floor - pushableItem.Pose.Position.y);
@@ -249,7 +249,7 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
-		auto targetRoom = pushableItem.RoomNumber; //DOUBT, What will happen in the room portals?
+		auto targetRoom = pushableItem.RoomNumber;
 
 		if (!IsPushableObjectMoveAllowed(itemNumber, targetPos, targetRoom))
 			return false;
@@ -257,6 +257,11 @@ namespace TEN::Entities::Generic
 		//If player is pulling, is there space for Lara?
 		if (hasPullAction && !IsValidForLara(itemNumber))
 			return false;
+
+
+		//Stopper flag
+		//Put it in destiny
+		SetPushableStopperFlag(true, targetPos, targetRoom);
 
 		return true;
 	}
