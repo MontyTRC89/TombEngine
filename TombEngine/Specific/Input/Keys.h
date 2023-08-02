@@ -79,7 +79,8 @@ namespace TEN::Input
 		GK_DPAD_RIGHT
 	};
 
-	// GamepadKey mirror. 11 buttons + 12 axes + 4 POV axes.
+	// GamepadKey mirror.
+	// 11 buttons + (6 * 2) axes + 4 POV axes.
 	enum XInputKey
 	{
 		// Buttons
