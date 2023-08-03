@@ -81,7 +81,7 @@ namespace TEN::Entities::Generic
 		// Read OCB flags.
 		int ocb = pushableItem.TriggerFlags;
 		pushable.CanFall = (ocb & (1 << 0)) != 0;						 // Check bit 0.
-		pushable.DoAlignCenter = (ocb & (1 << 1)) != 0;					 // Check bit 1.
+		pushable.DoAlignCenter = (ocb & (1 << 1)) != 1;					 // Check bit 1.
 		pushable.IsBuoyant = (ocb & (1 << 2)) != 0;						 // Check bit 2.
 		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
 
@@ -93,6 +93,9 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
+
+		if (Lara.Control.IsMoving)
+			return;
 
 		// Call the state handler function based on the current state (Functions in PushableObject_Physics class).
 		auto stateHandlerIterator = PUSHABLES_STATES_MAP.find(pushable.BehaviourState);
