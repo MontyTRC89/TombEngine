@@ -208,7 +208,18 @@ namespace TEN::Player
 			pointColl.Coordinates.z,
 			item.RoomNumber);
 
-		// 3) Assess level geometry ray collision.
+		// Prepare data for static object LOS.
+		auto origin = target0.ToVector3();
+		auto target = target1.ToVector3();
+		auto dir = target - origin;
+		dir.Normalize();
+
+		// 3) Assess ray-static collision.
+		auto staticLos = GetStaticObjectLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
+		if (staticLos.has_value())
+			return false;
+
+		// 4) Assess level geometry ray collision.
 		if (!LOS(&origin0, &target0) || !LOS(&origin1, &target1))
 			return false;
 
@@ -218,7 +229,7 @@ namespace TEN::Player
 		int relCeilHeight = pointColl.Position.Ceiling - vPos;
 		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
-		// 4) Assess point collision.
+		// 5) Assess point collision.
 		if (relFloorHeight <= setup.LowerFloorBound && // Floor height is above lower floor bound.
 			relFloorHeight >= setup.UpperFloorBound && // Floor height is below upper floor bound.
 			relCeilHeight < -playerHeight &&		   // Ceiling height is above player height.
@@ -670,6 +681,17 @@ namespace TEN::Player
 			pointColl.Coordinates.z,
 			item.RoomNumber);
 
+		// Prepare data for static object LOS.
+		auto origin = target0.ToVector3();
+		auto target = target1.ToVector3();
+		auto dir = target - origin;
+		dir.Normalize();
+
+		// 3) Assess ray-static collision.
+		auto staticLos = GetStaticObjectLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
+		if (staticLos.has_value())
+			return false;
+
 		// 3) Assess level geometry ray collision.
 		if (!LOS(&origin0, &target0) || !LOS(&origin1, &target1))
 			return false;
@@ -796,12 +818,23 @@ namespace TEN::Player
 		if (TestLaraFacingCorner(&item, setup.HeadingAngle, setup.Distance))
 			return false;
 
+		// Prepare data for static object LOS.
+		auto origin = Geometry::TranslatePoint(item.Pose.Position.ToVector3(), item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius));
+		auto target = origin + Vector3(0.0f,-STEPUP_HEIGHT, 0.0f);
+		auto dir = target - origin;
+		dir.Normalize();
+
+		// 3) Assess ray-static collision.
+		auto staticLos = GetStaticObjectLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
+		if (staticLos.has_value())
+			return false;
+
 		// Get point collision.
 		auto pointColl = GetCollision(&item, setup.HeadingAngle, setup.Distance, -coll.Setup.Height);
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
 
-		// 3) Assess point collision.
+		// 4) Assess point collision.
 		if (relFloorHeight >= -STEPUP_HEIGHT &&								  // Floor is within highest floor bound.
 			(relCeilHeight < -(coll.Setup.Height + (LARA_HEADROOM * 0.8f)) || // Ceiling is within lowest ceiling bound.
 				(relCeilHeight < -coll.Setup.Height &&						  // OR ceiling is level with Lara's head.

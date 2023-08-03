@@ -1900,3 +1900,35 @@ void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	else if (item->Status != ITEM_INVISIBLE)
 		ObjectCollision(itemNumber, laraItem, coll);
 }
+
+std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
+{
+	// Loop through neighboring rooms.
+	const auto& roomNumbers = g_Level.Rooms[roomNumber].neighbors;
+	for (int roomNumber : g_Level.Rooms[roomNumber].neighbors)
+	{
+		// Get room.
+		const auto& room = g_Level.Rooms[roomNumber];
+		if (!room.Active())
+			continue;
+
+		// Loop through meshes.
+		for (const auto& mesh : g_Level.Rooms[roomNumber].mesh)
+		{
+			// Check if static is visible.
+			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Check if static is solid (if applicable).
+			if (onlySolid && !(mesh.flags & StaticMeshFlags::SM_SOLID))
+				continue;
+
+			// Test for ray-box intersection.
+			auto box = GetBoundsAccurate(mesh).ToBoundingOrientedBox(mesh.pos);
+			if (box.Intersects(origin, dir, dist))
+				return Geometry::TranslatePoint(origin, dir, dist);
+		}
+	}
+
+	return std::nullopt;
+}

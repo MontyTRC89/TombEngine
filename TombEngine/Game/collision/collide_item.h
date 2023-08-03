@@ -52,3 +52,5 @@ void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
 void DoObjectCollision(ItemInfo* item, CollisionInfo* coll);
+
+std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid);

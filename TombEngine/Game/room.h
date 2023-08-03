@@ -140,7 +140,7 @@ struct ROOM_INFO
 
 	std::vector<int> neighbors = {};
 
-	bool Active();
+	bool Active() const;
 };
 
 void DoFlipMap(short group);
