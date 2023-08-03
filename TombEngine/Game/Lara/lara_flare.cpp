@@ -393,7 +393,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
 	if (DoFlareLight(pos, flareLife))
-		TriggerChaffEffects(BinocularOn ? 0 : flareLife);
+		TriggerChaffEffects(lara.Control.Look.IsUsingBinoculars ? 0 : flareLife);
 
 	if (lara.Flare.Life >= FLARE_LIFE_MAX - (FLARE_DEATH_DELAY / 2))
 	{
