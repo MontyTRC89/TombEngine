@@ -38,7 +38,7 @@ namespace TEN::Gui
 	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
 
 	constexpr auto VOLUME_MAX  = 100;
-	constexpr auto VOLUME_STEP = VOLUME_MAX / 10;
+	constexpr auto VOLUME_STEP = VOLUME_MAX / 20;
 
 	GuiController g_Gui;
 
