@@ -118,8 +118,8 @@ void InitializeSpotCam(short Sequence)
 		return;
 	}
 
-	BinocularRange = 0;
-	LaserSight = false;
+	Lara.Control.Look.OpticRange = 0;
+	Lara.Control.Look.IsUsingLasersight = false;
 
 	AlterFOV(ANGLE(DEFAULT_FOV), false);
 
@@ -495,7 +495,7 @@ void CalculateSpotCameras()
 		AlterFOV(cfov, false);
 
 		LookAt(&Camera, croll);
-		UpdateMikePos(LaraItem);
+		UpdateMikePos(*LaraItem);
 
 		if (SpotCam[CurrentSplineCamera].flags & SCF_OVERLAY)
 			SpotcamOverlay = true;
@@ -715,7 +715,7 @@ void CalculateSpotCameras()
 
 					int elevation = Camera.targetElevation;
 
-					CalculateCamera();
+					CalculateCamera(LaraCollision);
 
 					CameraRoll[2] = 0;
 					CameraRoll[3] = 0;
@@ -754,7 +754,7 @@ void CalculateSpotCameras()
 					Camera.targetElevation = elevation;
 
 					LookAt(&Camera, croll);
-					UpdateMikePos(LaraItem);
+					UpdateMikePos(*LaraItem);
 
 					SplineToCamera = 1;
 				}
@@ -778,7 +778,7 @@ void CalculateSpotCameras()
 			SpotCamFirstLook = true;
 		}
 
-		CalculateCamera();
+		CalculateCamera(LaraCollision);
 	}
 	else
 	{
@@ -788,7 +788,7 @@ void CalculateSpotCameras()
 		Lara.Control.Locked = false;
 		Camera.speed = 1;
 		AlterFOV(LastFOV);
-		CalculateCamera();
+		CalculateCamera(LaraCollision);
 		CheckTrigger = false;
 	}
 }

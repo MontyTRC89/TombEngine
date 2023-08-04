@@ -36,7 +36,8 @@ namespace TEN::Gui
 	constexpr int PHD_CENTER_Y = SCREEN_SPACE_RES.y / 2;
 	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
 
-	constexpr int VOLUME_MAX = 100;
+	constexpr auto VOLUME_MAX  = 100;
+	constexpr auto VOLUME_STEP = VOLUME_MAX / 20;
 
 	GuiController g_Gui;
 
@@ -913,17 +914,18 @@ namespace TEN::Gui
 
 		if (IsPulsed(In::Left, 0.05f, 0.4f))
 		{
+			bool isVolumeAdjusted = false;
 			switch (SelectedOption)
 			{
 			case OtherSettingsOption::MusicVolume:
 				if (CurrentSettings.Configuration.MusicVolume > 0)
 				{
-					CurrentSettings.Configuration.MusicVolume--;
+					CurrentSettings.Configuration.MusicVolume -= VOLUME_STEP;
 					if (CurrentSettings.Configuration.MusicVolume < 0)
 						CurrentSettings.Configuration.MusicVolume = 0;
 
 					SetVolumeMusic(CurrentSettings.Configuration.MusicVolume);
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					isVolumeAdjusted = true;
 				}
 
 				break;
@@ -931,31 +933,38 @@ namespace TEN::Gui
 			case OtherSettingsOption::SfxVolume:
 				if (CurrentSettings.Configuration.SfxVolume > 0)
 				{
-					CurrentSettings.Configuration.SfxVolume--;
+					CurrentSettings.Configuration.SfxVolume -= VOLUME_STEP;
 					if (CurrentSettings.Configuration.SfxVolume < 0)
 						CurrentSettings.Configuration.SfxVolume = 0;
 
 					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					isVolumeAdjusted = true;
 				}
 
 				break;
+			}
+
+			if (isVolumeAdjusted)
+			{
+				if (IsClicked(In::Left))
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 		}
 
 		if (IsPulsed(In::Right, 0.05f, 0.4f))
 		{
+			bool isVolumeAdjusted = false;
 			switch (SelectedOption)
 			{
 			case OtherSettingsOption::MusicVolume:
 				if (CurrentSettings.Configuration.MusicVolume < VOLUME_MAX)
 				{
-					CurrentSettings.Configuration.MusicVolume++;
+					CurrentSettings.Configuration.MusicVolume += VOLUME_STEP;
 					if (CurrentSettings.Configuration.MusicVolume > VOLUME_MAX)
 						CurrentSettings.Configuration.MusicVolume = VOLUME_MAX;
 
 					SetVolumeMusic(CurrentSettings.Configuration.MusicVolume);
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					isVolumeAdjusted = true;
 				}
 
 				break;
@@ -963,24 +972,34 @@ namespace TEN::Gui
 			case OtherSettingsOption::SfxVolume:
 				if (CurrentSettings.Configuration.SfxVolume < VOLUME_MAX)
 				{
-					CurrentSettings.Configuration.SfxVolume++;
+					CurrentSettings.Configuration.SfxVolume += VOLUME_STEP;
 					if (CurrentSettings.Configuration.SfxVolume > VOLUME_MAX)
 						CurrentSettings.Configuration.SfxVolume = VOLUME_MAX;
 
 					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					isVolumeAdjusted = true;
 				}
 
 				break;
+			}
+
+			if (isVolumeAdjusted)
+			{
+				if (IsClicked(In::Right))
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 		}
 
 		if (GuiIsPulsed(In::Forward))
 		{
 			if (SelectedOption <= 0)
+			{
 				SelectedOption += OptionCount;
+			}
 			else
+			{
 				SelectedOption--;
+			}
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
@@ -988,9 +1007,13 @@ namespace TEN::Gui
 		if (GuiIsPulsed(In::Back))
 		{
 			if (SelectedOption < OptionCount)
+			{
 				SelectedOption++;
+			}
 			else
+			{
 				SelectedOption -= OptionCount;
+			}
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
@@ -1944,13 +1967,13 @@ namespace TEN::Gui
 
 		auto* lara = GetLaraInfo(item);
 
-		int prevBinocularRange = BinocularRange;
+		int prevOpticRange = lara->Control.Look.OpticRange;
 		short inventoryObject = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 		short gameObject = InventoryObjectTable[inventoryObject].ObjectNumber;
 
 		item->MeshBits = ALL_JOINT_BITS;
+		lara->Control.Look.OpticRange = 0;
 		lara->Inventory.OldBusy = false;
-		BinocularRange = 0;
 
 		if (lara->Control.WaterStatus == WaterStatus::Dry ||
 			lara->Control.WaterStatus == WaterStatus::Wade)
@@ -2021,8 +2044,8 @@ namespace TEN::Gui
 						(lara->Control.IsLow && !IsHeld(In::Crouch))) &&
 					!UseSpotCam && !TrackCameraInit)
 				{
-					BinocularRange = 128;
-					BinocularOn = true;
+					lara->Control.Look.OpticRange = 128;
+					lara->Control.Look.IsUsingBinoculars = true;
 					lara->Inventory.OldBusy = true;
 
 					// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
@@ -2033,10 +2056,14 @@ namespace TEN::Gui
 						lara->Control.HandStatus = HandStatus::WeaponUndraw;
 				}
 
-				if (prevBinocularRange)
-					BinocularRange = prevBinocularRange;
+				if (prevOpticRange)
+				{
+					lara->Control.Look.OpticRange = prevOpticRange;
+				}
 				else
+				{
 					BinocularOldCamera = Camera.oldType;
+				}
 
 				return;
 

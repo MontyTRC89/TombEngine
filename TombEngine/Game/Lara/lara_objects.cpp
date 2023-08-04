@@ -32,7 +32,7 @@ void lara_as_pickup(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(130.0f);
@@ -49,7 +49,7 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(130.0f);
@@ -70,7 +70,7 @@ void lara_as_switch_on(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
@@ -85,7 +85,7 @@ void lara_as_switch_off(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
@@ -98,7 +98,7 @@ void lara_as_switch_off(ItemInfo* item, CollisionInfo* coll)
 // Control:	lara_as_controlled_no_look()
 void lara_col_turn_switch(ItemInfo* item, CollisionInfo* coll)
 {
-	if (coll->Setup.OldPosition.x != item->Pose.Position.x || coll->Setup.OldPosition.z != item->Pose.Position.z)
+	if (coll->Setup.PrevPosition.x != item->Pose.Position.x || coll->Setup.PrevPosition.z != item->Pose.Position.z)
 	{
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
 		{
@@ -124,7 +124,7 @@ void lara_as_use_key(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
@@ -138,7 +138,7 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = -ANGLE(80.0f);
@@ -163,7 +163,7 @@ void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(35.0f);
@@ -177,7 +177,7 @@ void lara_as_pushable_pull(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(35.0f);
@@ -208,7 +208,7 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 	auto* pulleyItem = &g_Level.Items[lara->Context.InteractedItem];
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -316,11 +316,12 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_tightrope_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Free;
+
 	DoLaraTightropeBalanceRegen(item);
 	DoLaraTightropeLean(item);
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -455,11 +456,12 @@ void lara_as_rope_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_vcol_rope_idle() (111), lara_col_rope_swing() (114, 115)
 void lara_as_rope_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Free;
+
 	if (!(TrInput & IN_ACTION))
 		FallFromRope(item);
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 }
 
 // State:	LS_ROPE_IDLE (111)
@@ -597,6 +599,7 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -605,9 +608,6 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_FREEFALL; // TODO: Death state dispatch.
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -816,6 +816,7 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -824,9 +825,6 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_POLE_IDLE; // TODO: Death state dispatch.
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -868,6 +866,7 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -876,9 +875,6 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_POLE_IDLE; // TODO: Death state dispatch.
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -924,6 +920,7 @@ void lara_as_zip_line(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
 	Camera.targetAngle = ANGLE(70.0f);
 
 	if (!(TrInput & IN_ACTION))

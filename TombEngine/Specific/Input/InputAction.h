@@ -52,7 +52,6 @@ namespace TEN::Input
 		Inventory,
 		Save,
 		Load,
-		SwitchTarget, // TODO: Look -> SwitchTarget conversion must be handled differently.
 
 		Count
 	} In;
