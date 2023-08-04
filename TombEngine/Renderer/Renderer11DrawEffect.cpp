@@ -847,7 +847,7 @@ namespace TEN::Renderer
 		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
 			return true;
 
-		if (BinocularRange > 0)
+		if (Lara.Control.Look.OpticRange > 0)
 			return true;
 
 		const auto& room = m_rooms[LaraItem->RoomNumber];

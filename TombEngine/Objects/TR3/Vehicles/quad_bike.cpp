@@ -828,6 +828,7 @@ namespace TEN::Entities::Vehicles
 	static int QuadUserControl(ItemInfo* quadBikeItem, int height, int* pitch)
 	{
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
+		auto* lara = GetLaraInfo(LaraItem);
 
 		bool drive = false; // Never changes?
 
@@ -855,8 +856,7 @@ namespace TEN::Entities::Vehicles
 
 		if (quadBikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
-			if (TrInput & IN_LOOK && !quadBike->Velocity)
-				LookUpDown(LaraItem);
+			lara->Control.Look.Mode = (quadBikeItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 
 			// Driving forward.
 			if (quadBike->Velocity > 0)

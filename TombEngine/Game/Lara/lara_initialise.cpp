@@ -41,7 +41,7 @@ void InitializeLara(bool restore)
 	Lara.Status.Poison = 0;
 	Lara.Status.Stamina = LARA_STAMINA_MAX;
 
-	Lara.Control.CanLook = true;
+	Lara.Control.Look.Mode = LookMode::None;
 	Lara.HitDirection = -1;
 	Lara.Control.Weapon.WeaponItem = NO_ITEM;
 	Lara.Context.WaterSurfaceDist = 100;
