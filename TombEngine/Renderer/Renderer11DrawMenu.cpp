@@ -310,7 +310,7 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_ACCELERATE;
+				int baseIndex = (int)In::Accelerate;
 
 				// Vehicle action listing
 				for (int k = 0; k < VehicleActionStrings.size(); k++)
@@ -366,7 +366,7 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_FLARE;
+				int baseIndex = (int)In::Flare;
 
 				// Quick action listing
 				for (int k = 0; k < QuickActionStrings.size(); k++)
@@ -415,7 +415,7 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_SELECT;
+				int baseIndex = (int)In::Select;
 
 				// Menu action listing.
 				for (int k = 0; k < MenuActionStrings.size(); k++)
