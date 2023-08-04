@@ -51,7 +51,7 @@ namespace TEN::Player::Context
 			return false;
 
 		// 4) Assess point collision.
-		if (relFloorHeight <= ABS_FLOOR_BOUND &&				   // Floor height is within lower/upper floor bounds.
+		if (relFloorHeight <= ABS_FLOOR_BOUND &&			   // Floor height is within lower/upper floor bounds.
 			floorToCeilHeight > setup.FloorToCeilHeightMin &&  // Floor-to-ceiling height isn't too narrow.
 			floorToCeilHeight <= setup.FloorToCeilHeightMax && // Floor-to-ceiling height isn't too wide.
 			gapHeight >= setup.GapHeightMin)				   // Gap height is permissive.

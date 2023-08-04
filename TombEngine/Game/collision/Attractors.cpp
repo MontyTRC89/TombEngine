@@ -390,7 +390,7 @@ namespace TEN::Collision::Attractors
 		return std::clamp(chainDist, 0.0f, Length);
 	}
 
-	// Temp.
+	// TEMP
 	static std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
 	{
 		auto& player = GetLaraInfo(item);
@@ -402,6 +402,19 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
+	static void DrawDebugAttractorBounds(const BoundingSphere& sphere, std::vector<const Attractor*> attracs)
+	{
+		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
+
+		for (const auto* attracPtr : attracs)
+		{
+			const auto& box = attracPtr->GetBoundingBox();
+			auto orientedBox = BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity);
+
+			g_Renderer.AddDebugBox(orientedBox, Vector4::One, RendererDebugPage::CollisionStats);
+		}
+	}
+
 	// TODO: TRAE method of a search algorithm incorporating an R-tree might be ideal here.
 	// Would require a general collision refactor. -- Sezz 2023.07.30
 	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
@@ -409,6 +422,7 @@ namespace TEN::Collision::Attractors
 		auto sphere = BoundingSphere(refPoint, range);
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 
+		// TEMP
 		// Get debug attractors.
 		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
 		for (const auto* attracPtr : debugAttracPtrs)
@@ -417,19 +431,11 @@ namespace TEN::Collision::Attractors
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
-		// Get attractors in current room.
+		// Get attractors in neighboring rooms.
 		const auto& room = g_Level.Rooms[roomNumber];
-		for (const auto& attrac : room.Attractors)
+		for (int roomNumber : room.neighbors)
 		{
-			if (sphere.Intersects(attrac.GetBoundingBox()))
-				nearbyAttracPtrs.push_back(&attrac);
-		}
-
-		// TODO: Check if it actually has search depth of 2.
-		// Get attractors in neighboring rooms (search depth of 2).
-		for (int subRoomNumber : room.neighbors)
-		{
-			const auto& subRoom = g_Level.Rooms[subRoomNumber];
+			const auto& subRoom = g_Level.Rooms[roomNumber];
 			for (const auto& attrac : subRoom.Attractors)
 			{
 				if (sphere.Intersects(attrac.GetBoundingBox()))
@@ -444,13 +450,7 @@ namespace TEN::Collision::Attractors
 				nearbyAttracPtrs.push_back(&attrac);
 		}
 
-		// Draw debug.
-		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
-		for (const auto* attracPtr : nearbyAttracPtrs)
-		{
-			const auto& box = attracPtr->GetBoundingBox();
-			g_Renderer.AddDebugBox(BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity), Vector4::One, RendererDebugPage::CollisionStats);
-		}
+		DrawDebugAttractorBounds(sphere, nearbyAttracPtrs);
 
 		// Return attractor pointers found in sphere-AABB test.
 		return nearbyAttracPtrs;
@@ -461,7 +461,7 @@ namespace TEN::Collision::Attractors
 	{
 		constexpr auto COUNT_MAX = 64;
 
-		// Get pointers to approximately nearby attractors from sphere-AABB test.
+		// Get pointers to approximately nearby attractors from sphere-AABB tests.
 		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(refPoint, roomNumber, range);
 
 		// Get attractor collisions sorted by distance.
