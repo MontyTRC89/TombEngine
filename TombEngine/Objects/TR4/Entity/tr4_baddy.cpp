@@ -1105,7 +1105,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 			
-				KillItem(currentCreature->Enemy - g_Level.Items.data());
+				KillItem(currentCreature->Enemy->Index);
 
 				// Cancel enemy pointer for other active baddys
 				for (int i = 0; i < ActiveCreatures.size(); i++)

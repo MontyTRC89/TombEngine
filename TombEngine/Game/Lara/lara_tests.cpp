@@ -100,7 +100,7 @@ bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll)
 					item.Animation.AnimNumber != LA_LADDER_TO_HANG_LEFT)
 				{
 					LaraSnapToEdgeOfBlock(&item, &coll, GetQuadrant(item.Pose.Orientation.y));
-					item.Pose.Position.y = coll.Setup.OldPosition.y;
+					item.Pose.Position.y = coll.Setup.PrevPosition.y;
 					SetAnimation(item, LA_HANG_IDLE);
 				}
 
@@ -175,7 +175,7 @@ bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll)
 			}
 			else
 			{
-				item.Pose.Position = coll.Setup.OldPosition;
+				item.Pose.Position = coll.Setup.PrevPosition;
 
 				// Stop shimmying.
 				if (item.Animation.ActiveState == LS_SHIMMY_LEFT ||
@@ -624,7 +624,7 @@ bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short testAngle)
 	auto prevPose = item->Pose;
 	player.Control.MoveAngle = item->Pose.Orientation.y + testAngle;
 	TranslateItem(item, player.Control.MoveAngle, SIDEWAY_SHIMMY_TEST_DIST);
-	coll->Setup.OldPosition.y = item->Pose.Position.y;
+	coll->Setup.PrevPosition.y = item->Pose.Position.y;
 
 	bool canHang = HandlePlayerEdgeHang(*item, *coll);
 	item->Pose = prevPose;
@@ -925,7 +925,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	if (waterDepth == NO_HEIGHT)
 	{
 		item->Animation.Velocity.y = 0;
-		item->Pose.Position = coll->Setup.OldPosition;
+		item->Pose.Position = coll->Setup.PrevPosition;
 	}
 	// Height check was at CLICK(2) before, but changed to this 
 	// because now player surfaces at head level, not mid-body level.

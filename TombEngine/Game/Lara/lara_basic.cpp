@@ -68,7 +68,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
@@ -86,7 +86,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -106,7 +106,7 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -122,7 +122,7 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -138,6 +138,8 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	lara->Control.Count.Run++;
 	if (lara->Control.Count.Run > (LARA_RUN_JUMP_TIME / 2 + 4))
@@ -248,6 +250,8 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	lara->Control.Count.Run++;
 	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME)
@@ -396,7 +400,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.CanLook = ((isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL) ? false : true;
+	lara->Control.Look.Mode = LookMode::Free;
 
 	if (item->HitPoints <= 0)
 	{
@@ -415,11 +419,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (UseSpecialItem(item))
 		return;
 
-	if (IsHeld(In::Look) && lara->Control.CanLook)
-		LookUpDown(item);
-
 	// HACK.
-	if (BinocularOn)
+	if (lara->Control.Look.IsUsingBinoculars)
 		return;
 
 	if (!IsHeld(In::Jump) || isSwamp) // JUMP locks orientation outside swamps.
@@ -466,6 +467,12 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Crouch) && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
+		return;
+	}
+
+	if (IsHeld(In::Look))
+	{
+		item->Animation.TargetState = LS_IDLE;
 		return;
 	}
 
@@ -769,14 +776,15 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_idle()
 void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Free;
+
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TestLaraPose(item, coll))
 	{
@@ -804,6 +812,8 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
@@ -871,7 +881,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1117,7 +1127,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1362,17 +1372,17 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.Velocity.z = 0.0f;
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	if (BinocularRange)
+	if (lara->Control.Look.OpticRange != 0)
 	{
-		BinocularRange = 0;
-		LaserSight = false;
-		AlterFOV(LastFOV);
 		item->MeshBits = ALL_JOINT_BITS;
+		lara->Control.Look.OpticRange = 0;
+		lara->Control.Look.IsUsingLasersight = false;
 		lara->Inventory.IsBusy = false;
+		AlterFOV(LastFOV);
 	}
 
 	auto bounds = GameBoundingBox(item);
@@ -1415,7 +1425,7 @@ void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Free;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 }
 
@@ -1451,7 +1461,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1560,6 +1570,8 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1688,6 +1700,8 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
+
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
@@ -1814,7 +1828,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1908,7 +1922,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -2002,7 +2016,7 @@ void lara_as_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	item->Animation.TargetState = LS_IDLE;
@@ -2021,7 +2035,7 @@ void lara_as_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	item->Animation.TargetState = LS_IDLE;
@@ -2077,7 +2091,7 @@ void lara_as_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::None;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	item->Animation.TargetState = LS_IDLE;
@@ -2134,7 +2148,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->HitPoints <= 0)
@@ -2258,6 +2272,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->Status.Stamina--;
 
 	lara->Control.Count.Run++;
@@ -2401,6 +2416,8 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	lara->Control.Count.Run++;
 	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME)

@@ -37,6 +37,8 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
+
 	// Update running jump counter in preparation for possible jump action soon after landing.
 	lara->Control.Count.Run++;
 	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME / 2)
@@ -109,7 +111,7 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = (item->Animation.Velocity.z > 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
+	lara->Control.MoveAngle = (item->Animation.Velocity.z > 0.0f) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -119,22 +121,22 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
-	lara->Control.MoveAngle = (item->Animation.Velocity.z < 0) ? item->Pose.Orientation.y : lara->Control.MoveAngle;
+	lara->Control.MoveAngle = (item->Animation.Velocity.z < 0.0f) ? item->Pose.Orientation.y : lara->Control.MoveAngle;
 }
 
 // State:		LS_FREEFALL (9)
 // Collision:	lara_col_freefall()
 void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
 	item->Animation.Velocity.z *= 0.95f;
+	lara->Control.Look.Mode = LookMode::Free;
 
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
-	if (item->Animation.Velocity.y == LARA_DEATH_VELOCITY &&
-		item->HitPoints > 0)
-	{
+	if (item->Animation.Velocity.y == LARA_DEATH_VELOCITY && item->HitPoints > 0)
 		SoundEffect(SFX_TR4_LARA_FALL, &item->Pose);
-	}
 
 	if (TestLaraLand(item, coll))
 	{
@@ -178,6 +180,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 	// Setup
 	item->Animation.IsAirborne = (player.Control.Rope.Ptr == -1) ? true : item->Animation.IsAirborne;
 	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -241,6 +244,8 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Free;
 
 	// TODO: I need to revise the directional jump system to work with changes done for OIS. @Sezz 2022.07.05
 	ModulateLaraTurnRateY(item, 0, 0, 0);
@@ -371,7 +376,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	Camera.targetAngle = ANGLE(135.0f);
 
 	if (item->HitPoints <= 0)
@@ -429,7 +434,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -484,7 +489,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -544,7 +549,7 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 
 	// Setup
 	player.Control.MoveAngle = item->Pose.Orientation.y;
-	player.Control.CanLook = false;
+	player.Control.Look.Mode = LookMode::Free;
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	coll->Setup.ForwardAngle = (item->Animation.Velocity.z >= 0) ? player.Control.MoveAngle : (player.Control.MoveAngle + ANGLE(180.0f));
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
@@ -633,6 +638,8 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
+
 	if (item->HitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))
@@ -690,7 +697,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.HandStatus = HandStatus::Busy;
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
@@ -766,7 +773,7 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeJump(item, coll))
 	{
 		// Reset position to avoid embedding inside sloped ceilings meeting the floor.
-		item->Pose.Position = coll->Setup.OldPosition;
+		item->Pose.Position = coll->Setup.PrevPosition;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 }
@@ -775,7 +782,10 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_freefall_dive()
 void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Velocity.z = item->Animation.Velocity.z * 0.95f;
+	auto& player = GetLaraInfo(*item);
+
+	item->Animation.Velocity.z *= 0.95f;
+	player.Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
