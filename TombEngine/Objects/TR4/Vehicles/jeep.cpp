@@ -719,6 +719,7 @@ namespace TEN::Entities::Vehicles
 	static int JeepUserControl(ItemInfo* jeepItem, ItemInfo* laraItem, int height, int* pitch)
 	{
 		auto* jeep = GetJeepInfo(jeepItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->Animation.ActiveState == JS_DISMOUNT || laraItem->Animation.TargetState == JS_DISMOUNT)
 			ClearAllActions();
@@ -736,11 +737,7 @@ namespace TEN::Entities::Vehicles
 
 		if (jeepItem->Pose.Position.y >= height - STEP_SIZE)
 		{
-			if (!jeep->Velocity)
-			{
-				if (IsHeld(In::Look))
-					LookUpDown(laraItem);
-			}
+			lara->Control.Look.Mode = (jeepItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 
 			if (abs(jeep->Velocity) <= JEEP_VELOCITY_MAX / 2)
 			{

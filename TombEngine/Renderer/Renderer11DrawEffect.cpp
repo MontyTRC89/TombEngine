@@ -831,6 +831,9 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
@@ -842,7 +845,7 @@ namespace TEN::Renderer
 		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
 			return true;
 
-		if (BinocularRange > 0)
+		if (Lara.Control.Look.OpticRange > 0)
 			return true;
 
 		const auto& room = m_rooms[LaraItem->RoomNumber];
@@ -956,6 +959,9 @@ namespace TEN::Renderer
 	{
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1213,7 +1219,7 @@ namespace TEN::Renderer
 				currentSpriteBucket.SpritesToDraw.push_back(rDrawSprite);
 			}
 		}
-
+		     
 		spriteBuckets.push_back(currentSpriteBucket);
 
 		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
@@ -1390,7 +1396,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 	}
 
-	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, bool transparent) 
+	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass) 
 	{
 		RendererRoom const& room = m_rooms[effect->RoomNumber];
 
@@ -1403,7 +1409,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-		if (transparent)
+		if (rendererPass == RendererPass::Transparent)
 		{
 			SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 		}
@@ -1420,11 +1426,11 @@ namespace TEN::Renderer
 			if (bucket.NumVertices == 0)
 				continue;
 
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
 				continue;
 
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
 			SetBlendMode(lastBlendMode);
 			
@@ -1433,10 +1439,13 @@ namespace TEN::Renderer
 
 	}
 
-	void Renderer11::DrawEffects(RenderView& view, bool transparent) 
+	void Renderer11::DrawEffects(RenderView& view, RendererPass rendererPass) 
 	{
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1454,16 +1463,20 @@ namespace TEN::Renderer
 				ObjectInfo* obj = &Objects[effect->ObjectNumber];
 
 				if (obj->drawRoutine && obj->loaded)
-					DrawEffect(view, effect, transparent);
+					DrawEffect(view, effect, rendererPass);
 			}
 		}
 	}
 
-	void Renderer11::DrawDebris(RenderView& view, bool transparent)
+	void Renderer11::DrawDebris(RenderView& view, RendererPass rendererPass)
 	{		
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
+		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<RendererVertex> vertices;
 
 		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
@@ -1472,7 +1485,7 @@ namespace TEN::Renderer
 		{
 			if (deb->active) 
 			{
-				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^ transparent))
+				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
 					continue;
 
 				Matrix translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
@@ -1490,7 +1503,7 @@ namespace TEN::Renderer
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				}
 
-				if (transparent)
+				if (rendererPass == RendererPass::Transparent)
 				{
 					SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 				}

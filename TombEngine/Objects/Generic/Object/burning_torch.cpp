@@ -22,7 +22,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
-	void TriggerTorchFlame(char fxObject, char node)
+	void TriggerTorchFlame(int fxObject, unsigned char node)
 	{
 		auto* spark = GetFreeParticle();
 
@@ -53,6 +53,7 @@ namespace TEN::Entities::Generic
 		spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_DEF | SP_SCALE;
 
 		spark->rotAng = GetRandomControl() & 0xFFF;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 		if (GetRandomControl() & 1)
 			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
@@ -177,8 +178,8 @@ namespace TEN::Entities::Generic
 			auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(-32, 64, 256));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
 
-			if (!(Wibble & 7))
-				TriggerTorchFlame(laraItem - g_Level.Items.data(), 0);
+			if (!(Wibble & 3))
+				TriggerTorchFlame(laraItem->Index, 0);
 
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (Pose*)&pos);
 		}
@@ -252,7 +253,7 @@ namespace TEN::Entities::Generic
 				if (!Objects[CollidedItems[0]->ObjectNumber].intelligent &&
 					CollidedItems[0]->ObjectNumber != ID_LARA)
 				{
-					ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &LaraCollision);
+					ObjectCollision(CollidedItems[0]->Index, item, &LaraCollision);
 				}
 			}
 			else if (CollidedMeshes[0])

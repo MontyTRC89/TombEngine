@@ -1,38 +1,59 @@
+Version 1.1.1
+==============
+
+* Fix burning torch not working properly if there is more than 256 objects in a level.
+* Overhaul look mode:
+ - Give consistent view angle while crawling, crouching, and hanging.
+ - Widen view range.
+ - Provide cleaner camera movement.
+ - Reenable look mode while performing up jump, backward jump, or backward crawl.
+
 Version 1.1.0
 ==============
 
 * Fix enemies shooting Lara through static meshes and moveables.
-* Fix skeletons and mummies not affected by explosive weapons.
+* Fix skeletons and mummies not being affected by explosive weapons.
 * Fix crash on loading if static meshes with IDs above maximum are present.
-* Fix random crashes when playing audio tracks with names longer than 15 symbols.
 * Fix various crashes specific to 64-bit build.
-* Fix crashes when trying to play .wav soundtracks on some Windows 11 systems.
+* Fix random crashes when playing audio tracks with names longer than 15 symbols.
+* Fix crashes when trying to play .wav audio tracks on some Windows 11 systems.
+* Fix last selected gun type not preserved after level jump.
+* Fix incorrect vertical position after reloading a savegame made while standing on a bridge.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix clockwork beetle activation crashing the game.
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
-* Fix doppelganger being limited to be in a single room.
+* Fix doppelganger being limited to a single room.
 * Fix bat AI, damage value, and incorrect collision after death.
 * Fix regeneration for pickups with OCB 128.
 * Fix raising blocks still shaking without OCB.
-* Fix spiky ceiling, allow any size of it, and add new OCBs for it.
-* Fix TR1 winged mutant pathfinding and damage issues and add new OCB for it.
-* Fix TR1 natla facing angle, bomb and shard, also this shooting anim in the second phase not playing.
-* Fix last inventory item not properly changed when loading, saving and restarting game.
-* Fix some puzzle hole objects crashing the engine on item insertion.
-* Fix harpoon bolt bug when shooting vertically.
-* Make screenshot file in "Screenshots" subfolder by pressing print screen key.
-* Implement separate audio track channel for playing voiceovers with subtitles.
+* Fix spiky ceiling, improve collision, and allow setting velocity via OCB.
+* Fix TR1 winged mutant pathfinding and damage issues and add new OCBs.
+* Fix TR1 Natla facing angle, bomb and shard projectiles, shooting anim in the second phase.
+* Fix last inventory item position not being saved.
+* Fix some puzzle hole objects crashing the game on item insertion.
+* Fix incorrect harpoon bolt speed and angle when shooting vertically.
+* Fix black shatter debris.
+* Fix Lara's shadow projecting only her joints on some occasions.
+* Fix sun and spot bulbs direction and sheen casts.
+* Fix room collector freezing game on some occasions.
+* Fix incorrect culling for scaled static meshes.
+* Fix normal mapping.
+* Add ability to save screenshot in the "Screenshots" subfolder by pressing the "Print screen" key.
+* Implement separate audio track channel for playing voiceovers with subtitles in .srt format.
 * Don't stop ambience when Lara dies.
 * Pause all sounds when entering inventory or pause menu.
+* Preserve hit points on level jump.
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
-* Change camera bounce to be more accurate to TR4 camera bounce.
-* Add input action bindings for previously hardcoded hotkeys such as weapon scroll or flare.
-* Add 3 new control settings pages for input action bindings.
-* Add splash effect for rockets and grenades when entering water.
-* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
+* Reduce camera bounce.
+* Improve spiky wall collision accuracy.
+* Expand control settings page.
+* Allow key bindings for previously hardcoded actions (weapon hotkeys, vehicle controls).
+* Add input actions for weapon scroll.
+* Add splash effect to rockets and grenades when they enter water.
+* Allow multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
 

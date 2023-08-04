@@ -38,6 +38,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
@@ -55,11 +56,8 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Look))
-		LookUpDown(item);
-
 	// HACK.
-	if (BinocularOn)
+	if (lara->Control.Look.IsUsingBinoculars)
 		return;
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
@@ -78,6 +76,12 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 			g_GameFlow->HasCrouchRoll())
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
+			return;
+		}
+
+		if (IsHeld(In::Look))
+		{
+			item->Animation.TargetState = LS_CROUCH_IDLE;
 			return;
 		}
 
@@ -154,7 +158,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
@@ -192,7 +196,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem in the uncommon scenario where
 	// she becomes IsAirborne within a crawlspace; collision handling will push her back very rapidly and potentially cause a softlock. @Sezz 2021.11.02
 	if (LaraDeflectEdgeCrawl(item, coll))
-		item->Pose.Position = coll->Setup.OldPosition;
+		item->Pose.Position = coll->Setup.PrevPosition;
 
 	if (TestLaraFall(item, coll))
 	{
@@ -229,6 +233,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 
@@ -239,10 +244,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (IsHeld(In::Look))
-		LookUpDown(item);
-
+	
 	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -286,6 +288,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 
@@ -296,10 +299,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (IsHeld(In::Look))
-		LookUpDown(item);
-
+	
 	if ((IsHeld(In::Crouch) || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -343,6 +343,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 
@@ -379,6 +380,9 @@ void lara_col_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
@@ -390,7 +394,6 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState == LS_CROUCH_IDLE)
 		return;
 
-	auto* lara = GetLaraInfo(item);
 	lara->Control.HandStatus = HandStatus::Busy;
 
 	if (item->HitPoints <= 0)
@@ -399,11 +402,8 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Look))
-		LookUpDown(item);
-
 	// HACK.
-	if (BinocularOn)
+	if (lara->Control.Look.IsUsingBinoculars)
 		return;
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
@@ -424,6 +424,12 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			lara->Control.HandStatus = HandStatus::Free;
+			return;
+		}
+
+		if (IsHeld(In::Look))
+		{
+			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
@@ -529,6 +535,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -624,7 +631,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.CanLook = false;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -712,6 +719,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -773,6 +781,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -834,6 +843,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 

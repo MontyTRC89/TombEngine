@@ -25,6 +25,7 @@ void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
 	lara->Control.IsClimbingLadder = false;
 
 	if (item->HitPoints <= 0)
@@ -32,9 +33,6 @@ void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_IDLE;
 		return;
 	}
-
-	if (IsHeld(In::Look))
-		LookUpDown(item);
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -212,6 +210,9 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_shimmy_left()
 void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -226,19 +227,22 @@ void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_shimmy_left()
 void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 }
 
 // State:		LS_SHIMMY_RIGHT (31)
 // Collision:	lara_col_shimmy_right()
 void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
