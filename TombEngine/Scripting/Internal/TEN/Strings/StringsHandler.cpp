@@ -113,7 +113,7 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 		{
 			if (!endOfLife || str.m_isInfinite)
 			{
-				char const* cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
+				auto cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
 				int flags = 0;
 
 				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::CENTER)])

@@ -113,14 +113,18 @@ enum RENDERER_FADE_STATUS
 	FADE_OUT
 };
 
-enum RENDERER_DEBUG_PAGE
+enum class RendererDebugPage
 {
-	NO_PAGE,
-	RENDERER_STATS,
-	DIMENSION_STATS,
-	LARA_STATS,
-	LOGIC_STATS,
-	WIREFRAME_MODE
+	None,
+	RendererStats,
+	DimensionStats,
+	PlayerStats,
+	LogicStats,
+	CollisionStats,
+	PathfindingStats,
+	WireframeMode,
+
+	Count
 };
 
 enum RendererTransparentFaceType

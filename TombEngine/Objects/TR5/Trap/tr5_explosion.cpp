@@ -142,8 +142,8 @@ void ExplosionControl(short itemNumber)
 						TriggerShockwave(&CollidedItems[i]->Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 						CollidedItems[i]->Pose.Position.y += 128;
 						ExplodeItemNode(CollidedItems[i], 0, 0, 80);
-						SmashObject(CollidedItems[i] - g_Level.Items.data());
-						KillItem(CollidedItems[i] - g_Level.Items.data());
+						SmashObject(CollidedItems[i]->Index);
+						KillItem(CollidedItems[i]->Index);
 					}
 					else if (CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE7 && CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE8)
 					{

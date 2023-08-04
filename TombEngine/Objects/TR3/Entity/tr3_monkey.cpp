@@ -357,8 +357,8 @@ namespace TEN::Entities::Creatures::TR3
 					}
 					else
 					{
-						item->CarriedItem = creature->Enemy - g_Level.Items.data();
-						RemoveDrawnItem(creature->Enemy - g_Level.Items.data());
+						item->CarriedItem = creature->Enemy->Index;
+						RemoveDrawnItem(creature->Enemy->Index);
 						creature->Enemy->RoomNumber = NO_ROOM;
 						creature->Enemy->CarriedItem = NO_ITEM;
 

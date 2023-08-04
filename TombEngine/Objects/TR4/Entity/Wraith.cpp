@@ -715,7 +715,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			item2->HitPoints = item - g_Level.Items.data();
+			item2->HitPoints = item->Index;
 		}
 
 		FlipEffect = -1;

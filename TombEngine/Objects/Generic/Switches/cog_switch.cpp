@@ -100,7 +100,7 @@ namespace TEN::Entities::Switches
 						{
 							if (!door->opened)
 							{
-								AddActiveItem((target - g_Level.Items.data()));
+								AddActiveItem(target->Index);
 								target->Status = ITEM_ACTIVE;
 							}
 						}

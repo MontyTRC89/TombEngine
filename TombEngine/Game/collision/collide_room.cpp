@@ -157,6 +157,16 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingA
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAngles& orient, float dist)
+{
+	auto point = Geometry::TranslatePoint(pos, orient, dist);
+
+	short tempRoomNumber = roomNumber;
+	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+}
+
 // Overload used as universal wrapper across collisional code replacing
 // triads of roomNumber-GetFloor()-GetFloorHeight() calls.
 // Advantage is that it does NOT modify incoming roomNumber argument,
@@ -412,7 +422,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xFront;
 	probePos.z = entityPos.z + zFront;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
 
 	collResult = GetCollision(probePos.x, probePos.y, probePos.z, topRoomNumber);
 
@@ -467,7 +477,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xLeft;
 	probePos.z = entityPos.z + zLeft;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
 
 	collResult = GetCollision(probePos.x, probePos.y, probePos.z, item->RoomNumber);
 
@@ -532,7 +542,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xRight;
 	probePos.z = entityPos.z + zRight;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 	collResult = GetCollision(probePos.x, probePos.y, probePos.z, item->RoomNumber);
 
@@ -601,14 +611,14 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (coll->Middle.Floor == NO_HEIGHT)
 	{
-		coll->Shift.Position += coll->Setup.OldPosition - entityPos;
+		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
 		coll->CollisionType = CT_FRONT;
 		return;
 	}
 
 	if (coll->Middle.Floor - coll->Middle.Ceiling <= 0)
 	{
-		coll->Shift.Position += coll->Setup.OldPosition - entityPos;
+		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
 		coll->CollisionType = CT_CLAMP;
 		return;
 	}
@@ -627,8 +637,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		if (coll->Front.HasDiagonalSplit())
 		{
-			coll->Shift.Position.x += coll->Setup.OldPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.OldPosition.z - entityPos.z;
+			coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
+			coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
 		}
 		else
 		{
@@ -636,14 +646,14 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			{
 			case 0:
 			case 2:
-				coll->Shift.Position.x += coll->Setup.OldPosition.x - entityPos.x;
+				coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
 				coll->Shift.Position.z += FindGridShift(entityPos.z + zFront, entityPos.z);
 				break;
 
 			case 1:
 			case 3:
 				coll->Shift.Position.x += FindGridShift(entityPos.x + xFront, entityPos.x);
-				coll->Shift.Position.z += coll->Setup.OldPosition.z - entityPos.z;
+				coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
 				break;
 
 			}
@@ -655,7 +665,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (coll->Front.Ceiling > coll->Setup.LowerCeilingBound ||
 		coll->Front.Ceiling < coll->Setup.UpperCeilingBound)
 	{
-		coll->Shift.Position += coll->Setup.OldPosition - entityPos;
+		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
 		coll->CollisionType = CT_TOP_FRONT;
 		return;
 	}
@@ -671,8 +681,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			// HACK: Force slight push-out to the left side to avoid stucking
 			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity.z);
 
-			coll->Shift.Position.x += coll->Setup.OldPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.OldPosition.z - entityPos.z;
+			coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
+			coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
 		}
 		else
 		{
@@ -725,8 +735,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			// HACK: Force slight push out to the right side to avoid getting stuck.
 			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity.z);
 
-			coll->Shift.Position.x += coll->Setup.OldPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.OldPosition.z - entityPos.z;
+			coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
+			coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
 		}
 		else
 		{
@@ -878,7 +888,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			}
 
 			// Debug probe point
-			// g_Renderer.AddDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+			// g_Renderer.AddDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 			// Determine front floor probe offset.
 			// It is needed to identify if there is bridge or ceiling split in front.
@@ -920,7 +930,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto fpZ = eZ + floorProbeOffset * cosForwardAngle;
 
 			// Debug probe point.
-			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 			// Get true room number and block, based on derived height
 			room = GetRoom(item->Location, fpX, height, fpZ).roomNumber;
@@ -991,7 +1001,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				auto cZ = fZ + BLOCK(1) + 1;
 
 				// Debug used block
-				// g_Renderer.AddDebugSphere(Vector3(round(eX / WALL_SIZE) * WALL_SIZE + 512, y, round(eZ / WALL_SIZE) * WALL_SIZE + 512), 16, Vector4(1, 1, 1, 1), RENDERER_DEBUG_PAGE::LARA_STATS);
+				// g_Renderer.AddDebugSphere(Vector3(round(eX / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f), y, round(eZ / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f)), 16, Vector4::One, RendererDebugPage::CollisionStats);
 
 				// Get split angle coordinates.
 				auto sX = fX + 1 + BLOCK(0.5f);

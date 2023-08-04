@@ -1326,6 +1326,7 @@ bool LoadLevelFile(int levelIndex)
 {
 	TENLog("Loading level file...", LogLevel::Info);
 
+	BackupLara();
 	CleanUp();
 	FreeLevel();
 	

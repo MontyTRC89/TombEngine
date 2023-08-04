@@ -354,6 +354,7 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
 	lara->Control.IsClimbingLadder = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
@@ -364,9 +365,6 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->Animation.AnimNumber == LA_LADDER_DISMOUNT_RIGHT_START)
 		Camera.targetAngle = ANGLE(60.0f);
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
@@ -521,19 +519,19 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 			AnimateItem(item);
 		} while (item->Animation.ActiveState != LS_HANG);
 
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item->Pose.Position.z = coll->Setup.PrevPosition.z;
 
 		return;
 	}
 
-	item->Pose.Position.x = coll->Setup.OldPosition.x;
-	item->Pose.Position.z = coll->Setup.OldPosition.z;
+	item->Pose.Position.x = coll->Setup.PrevPosition.x;
+	item->Pose.Position.z = coll->Setup.PrevPosition.z;
 
 	item->Animation.TargetState = LS_LADDER_IDLE;
 	item->Animation.ActiveState = LS_LADDER_IDLE;
 
-	if (coll->Setup.OldState != LS_LADDER_IDLE)
+	if (coll->Setup.PrevState != LS_LADDER_IDLE)
 	{	
 		SetAnimation(item, LA_LADDER_IDLE);
 		return;
@@ -596,8 +594,8 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 		}
 	}
 
-	item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
-	item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
+	item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
+	item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
 
 	AnimateItem(item);
 }

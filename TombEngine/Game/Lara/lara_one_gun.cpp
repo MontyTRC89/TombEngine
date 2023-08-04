@@ -1196,7 +1196,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 	auto& ammo = GetAmmo(player, player.Control.Weapon.GunType);
 	const auto& weapon = player.Weapons[(int)weaponType];
 
-	if (!LaserSight || (!weapon.HasLasersight))
+	if (!player.Control.Look.IsUsingLasersight || !weapon.HasLasersight)
 		return;
 
 	bool isFiring = false;
@@ -1290,7 +1290,7 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	const auto& weapon = Weapons[(int)weaponType];
 
 	// Never handle weapons in binocular mode.
-	if (BinocularRange || LaserSight)
+	if (player.Control.Look.OpticRange || player.Control.Look.IsUsingLasersight)
 		return;
 
 	FindNewTarget(laraItem, weapon);
@@ -1304,7 +1304,7 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	{
 		player.ExtraTorsoRot = player.LeftArm.Orientation;
 
-		if (Camera.oldType != CameraType::Look && !BinocularRange)
+		if (Camera.oldType != CameraType::Look && player.Control.Look.OpticRange == 0)
 			player.ExtraHeadRot = EulerAngles::Zero;
 	}
 
