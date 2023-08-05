@@ -448,13 +448,13 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 			}
 
-			KillEffect(fxNumber);
+			KillItem(fxNumber);
 			return;
 		}
 
 		if (TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
 		{
-			KillEffect(fxNumber);
+			KillItem(fxNumber);
 			return;
 		}
 
@@ -463,7 +463,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (ItemNearLara(fx.Pose.Position, 200))
 			{
 				LaraItem->HitStatus = true;
-				KillEffect(fxNumber);
+				KillItem(fxNumber);
 				DoDamage(LaraItem, 200);
 				ItemBurn(LaraItem);
 				return;
@@ -471,7 +471,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 
 		if (probe.RoomNumber != fx.RoomNumber)
-			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
+			ItemNewRoom(fxNumber, LaraItem->RoomNumber);
 
 		if (LightIntensityTable[fxInfo.Flag1])
 		{

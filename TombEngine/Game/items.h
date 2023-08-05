@@ -172,7 +172,6 @@ struct ItemInfo
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
-void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
 short CreateItem();
@@ -180,7 +179,6 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
 void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
 int CreateNewEffect(int roomNumber, GAME_OBJECT_ID objectID, const Pose& pose);
-void KillEffect(short fxNumber);
 void InitializeItem(short itemNumber);
 void InitializeItemArray(int totalItems);
 void KillItem(short itemNumber);

@@ -144,7 +144,7 @@ void MissileControl(short itemNumber)
 			TriggerShockwave(&fx.Pose, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 2, true, false, (int)ShockwaveStyle::Normal);
 		}
 		
-		KillEffect(itemNumber);
+		KillItem(itemNumber);
 	}
 	else if (ItemNearLara(fx.Pose.Position, 200))
 	{
@@ -158,7 +158,7 @@ void MissileControl(short itemNumber)
 				TriggerShockwave(&fx.Pose, 48, 256, 64, 0, 128, 64, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 				fx.Pose.Position.y -= 128;
 				TriggerShockwave(&fx.Pose, 48, 256, 48, 0, 128, 64, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
-				KillEffect(itemNumber);
+				KillItem(itemNumber);
 				DoDamage(LaraItem, 200);
 			}
 			else
@@ -173,7 +173,7 @@ void MissileControl(short itemNumber)
 					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 				}
 				
-				KillEffect(itemNumber);
+				KillItem(itemNumber);
 			}
 		}
 		else
@@ -191,13 +191,13 @@ void MissileControl(short itemNumber)
 				ItemBurn(LaraItem);
 			}
 
-			KillEffect(itemNumber);
+			KillItem(itemNumber);
 		}
 	}
 	else
 	{
 		if (probe.RoomNumber != fx.RoomNumber)
-			EffectNewRoom(itemNumber, probe.RoomNumber);
+			ItemNewRoom(itemNumber, probe.RoomNumber);
 
 		if (GlobalCounter & 1)
 		{

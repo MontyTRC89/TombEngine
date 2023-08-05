@@ -293,7 +293,7 @@ namespace TEN::Entities::Effects
 				break;
 			}
 
-			KillEffect(fxNumber);
+			KillItem(fxNumber);
 			return;
 		}
 
@@ -362,12 +362,12 @@ namespace TEN::Entities::Effects
 				break;
 			}
 
-			KillEffect(fxNumber);
+			KillItem(fxNumber);
 		}
 		else
 		{
 			if (pointColl.RoomNumber != fx.RoomNumber)
-				EffectNewRoom(fxNumber, pointColl.RoomNumber);
+				ItemNewRoom(fxNumber, pointColl.RoomNumber);
 
 			auto deltaPos = prevPos - fx.Pose.Position;
 

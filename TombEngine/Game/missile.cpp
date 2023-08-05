@@ -108,11 +108,11 @@ void ControlMissile(short fxNumber)
 			GetFXInfo(fx).Counter = 0;
 		}
 
-		KillEffect(fxNumber);
+		KillItem(fxNumber);
 	}
 
 	if (pointColl.RoomNumber != fx.RoomNumber)
-		EffectNewRoom(fxNumber, pointColl.RoomNumber);
+		ItemNewRoom(fxNumber, pointColl.RoomNumber);
 
 	if (fx.ObjectNumber == ID_KNIFETHROWER_KNIFE)
 		fx.Pose.Orientation.z += ANGLE(30.0f); // Update knife rotation over time.
@@ -137,7 +137,7 @@ void ControlNatlaGun(short fxNumber)
 
 	fx.Animation.FrameNumber--;
 	if (fx.Animation.FrameNumber <= Objects[fx.ObjectNumber].nmeshes)
-		KillEffect(fxNumber);
+		KillItem(fxNumber);
 
 	// If first frame, start another explosion at next position.
 	if (fx.Animation.FrameNumber == -1)

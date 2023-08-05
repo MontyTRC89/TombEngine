@@ -347,16 +347,6 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	}
 }
 
-void EffectNewRoom(short fxNumber, short roomNumber)
-{
-	ItemNewRoom(fxNumber, roomNumber);
-}
-
-void KillEffect(short fxNumber)
-{
-	KillItem(fxNumber);
-}
-
 int CreateNewEffect(int roomNumber, GAME_OBJECT_ID objectID, const Pose& pose) 
 {
 	int fxNumber = CreateItem();

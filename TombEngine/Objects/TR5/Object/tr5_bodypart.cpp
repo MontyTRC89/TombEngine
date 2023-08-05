@@ -114,7 +114,7 @@ void ControlBodyPart(short fxNumber)
 				if (fxInfo.Flag2 & BODY_PART_EXPLODE)
 					BodyPartExplode(fx);
 
-				KillEffect(fxNumber);
+				KillItem(fxNumber);
 
 				if (fxInfo.Flag2 & BODY_STONE_SOUND)
 					SoundEffect(SFX_TR4_ROCK_FALL_LAND, &fx.Pose);
@@ -128,7 +128,7 @@ void ControlBodyPart(short fxNumber)
 				if (fxInfo.Flag2 & BODY_PART_EXPLODE)
 				{
 					BodyPartExplode(fx);
-					KillEffect(fxNumber);
+					KillItem(fxNumber);
 				}
 
 				if (fx.Animation.Velocity.y <= BOUNCE_FALLSPEED)
@@ -185,7 +185,7 @@ void ControlBodyPart(short fxNumber)
 			if (!(fxInfo.Flag2 & BODY_NO_SHATTER_EFFECT))
 				ExplodeFX(fx, -1, 32);
 
-			KillEffect(fxNumber);
+			KillItem(fxNumber);
 			return;
 		}
 
@@ -222,10 +222,10 @@ void ControlBodyPart(short fxNumber)
 			if (fxInfo.Flag2 & BODY_PART_EXPLODE)
 			{
 				BodyPartExplode(fx);
-				KillEffect(fxNumber);
+				KillItem(fxNumber);
 			}
 		}
 
-		EffectNewRoom(fxNumber, pointColl.RoomNumber);
+		ItemNewRoom(fxNumber, pointColl.RoomNumber);
 	}
 }
