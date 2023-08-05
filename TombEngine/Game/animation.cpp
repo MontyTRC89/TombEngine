@@ -46,6 +46,20 @@ const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 	return ((interpData.Alpha <= 0.5f) ? interpData.Keyframe0 : interpData.Keyframe1);
 }
 
+KeyframeInterpData::KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
+	Keyframe0(keyframe0),
+	Keyframe1(keyframe1)
+{
+	Alpha = alpha;
+}
+
+bool BoneMutator::IsEmpty() const
+{
+	return (Offset == Vector3::Zero &&
+			Rotation == EulerAngles::Zero &&
+			Scale == Vector3::One);
+};
+
 static void ExecuteAnimCommands(ItemInfo& item, bool isFrameBased)
 {
 	const auto& anim = GetAnimData(item);

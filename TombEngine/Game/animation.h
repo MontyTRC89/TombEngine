@@ -60,12 +60,7 @@ struct KeyframeInterpData
 	const KeyframeData& Keyframe1;
 	float Alpha = 0.0f;
 
-	KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
-		Keyframe0(keyframe0),
-		Keyframe1(keyframe1)
-	{
-		Alpha = alpha;
-	}
+	KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
 };
 
 struct BoneMutator
@@ -74,12 +69,7 @@ struct BoneMutator
 	EulerAngles Rotation = EulerAngles::Zero;
 	Vector3		Scale	 = Vector3::One;
 
-	bool IsEmpty() const
-	{
-		return (Offset == Vector3::Zero &&
-				Rotation == EulerAngles::Zero &&
-				Scale == Vector3::One);
-	};
+	bool IsEmpty() const;
 };
 
 // Animation controller
