@@ -88,7 +88,7 @@ namespace TEN::Entities::Generic
 				lara->LeftArm.AnimNumber = DROP_ANIM_NUMBER;
 				lara->Torch.State = TorchState::Dropping;
 			}
-			else if (TrInput & IN_DRAW &&
+			else if (IsHeld(In::Draw) &&
 				!laraItem->Animation.IsAirborne &&
 				laraItem->Animation.Velocity.y == 0.0f &&
 				laraItem->Animation.ActiveState != LS_JUMP_PREPARE &&
@@ -298,7 +298,7 @@ namespace TEN::Entities::Generic
 		auto* torchItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (!(TrInput & IN_ACTION) ||
+		if (!IsHeld(In::Action) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraItem->Animation.IsAirborne ||

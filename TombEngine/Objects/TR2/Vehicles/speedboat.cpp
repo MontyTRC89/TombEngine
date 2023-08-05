@@ -605,7 +605,7 @@ namespace TEN::Entities::Vehicles
 
 		if (speedboatItem->Pose.Position.y >= speedboat->Water - CLICK(0.5f) && speedboat->Water != NO_HEIGHT)
 		{
-			if (!IsHeld(In::Brake) && !(TrInput & IN_LOOK) ||
+			if (!IsHeld(In::Brake) && !IsHeld(In::Look) ||
 				speedboatItem->Animation.Velocity.z)
 			{
 				if (IsHeld(In::Left) && !IsHeld(In::Reverse) ||

@@ -159,7 +159,7 @@ void ObeliskControl(short itemNumber)
 		{
 			item->Pose.Orientation.y -= ANGLE(90.0f);
 
-			if (TrInput & IN_ACTION)
+			if (IsHeld(In::Action))
 			{
 				item->Animation.AnimNumber = 1;
 				item->Animation.FrameNumber = 0;
@@ -172,7 +172,7 @@ void ObeliskControl(short itemNumber)
 		{
 			item->Pose.Orientation.y += ANGLE(90.0f);
 
-			if (!(TrInput & IN_ACTION))
+			if (!IsHeld(In::Action))
 			{
 				item->Animation.AnimNumber = 3;
 				item->Animation.FrameNumber = 0;

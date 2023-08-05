@@ -71,7 +71,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 	
-	if ((!(TrInput & IN_ACTION) ||
+	if ((!IsHeld(In::Action) ||
 		laraItem->Animation.ActiveState != LS_IDLE ||
 		laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 		laraItem->Status == ITEM_INVISIBLE ||
@@ -129,7 +129,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* barItem = &g_Level.Items[itemNumber];
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_REACH &&
 		laraItem->Animation.AnimNumber == LA_REACH &&
 		laraInfo->Control.HandStatus == HandStatus::Free)

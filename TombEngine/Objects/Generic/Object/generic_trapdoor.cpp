@@ -74,7 +74,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 	bool result2 = TestLaraPosition(CeilingTrapDoorBounds, trapDoorItem, laraItem);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_JUMP_UP &&
 		laraItem->Animation.IsAirborne &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
@@ -118,7 +118,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if ((TrInput & IN_ACTION &&
+	if ((IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&

@@ -1,12 +1,12 @@
 Version 1.1.1
 ==============
 
-* Fix burning torch not working properly if there is more than 256 objects in a level.
-* Overhaul look mode:
- - Give consistent view angle while crawling, crouching, and hanging.
- - Widen view range.
- - Provide cleaner camera movement.
+* Fix burning torch not working properly if there are more than 256 objects in a level.
+* Look-around mode overhaul:
+ - Give consistent and wider view angles while crawling, crouching, and hanging.
+ - Improve cleaner camera movement.
  - Reenable look mode while performing up jump, backward jump, or backward crawl.
+ - When using binoculars or lasersight, holding Walk allows the player to pan slowly.
 
 Version 1.1.0
 ==============

@@ -93,7 +93,7 @@ namespace TEN::Entities::Vehicles
 		// TODO: If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
 		auto* lara = &Lara/* GetLaraInfo(laraItem)*/;
 
-		if (!(TrInput & IN_ACTION) ||
+		if (!IsHeld(In::Action) ||
 			lara->Control.HandStatus != HandStatus::Free ||
 			laraItem->Animation.IsAirborne)
 		{

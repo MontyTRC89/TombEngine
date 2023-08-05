@@ -174,7 +174,7 @@ namespace TEN::Entities::Doors
 
 		if (doorItem->TriggerFlags == 2 &&
 			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Animation.IsAirborne && // CHECK
-			((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
+			((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
 				laraItem->Animation.ActiveState == LS_IDLE &&
 				laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 				!laraItem->HitStatus &&
