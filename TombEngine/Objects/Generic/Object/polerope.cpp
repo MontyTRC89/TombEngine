@@ -67,7 +67,7 @@ namespace TEN::Entities::Generic
 		bool isFacingPole = Geometry::IsPointInFront(laraItem->Pose, poleItem.Pose.Position.ToVector3());
 
 		// Mount while grounded.
-		if (TrInput & IN_ACTION && isFacingPole &&
+		if (IsHeld(In::Action) && isFacingPole &&
 			TestState(laraItem->Animation.ActiveState, VPoleGroundedMountStates) &&
 			player.Control.HandStatus == HandStatus::Free ||
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))
@@ -106,7 +106,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// Mount while airborne.
-		if (TrInput & IN_ACTION && isFacingPole &&
+		if (IsHeld(In::Action) && isFacingPole &&
 			TestState(laraItem->Animation.ActiveState, VPoleAirborneMountStates) &&
 			laraItem->Animation.IsAirborne &&
 			laraItem->Animation.Velocity.y > 0.0f &&

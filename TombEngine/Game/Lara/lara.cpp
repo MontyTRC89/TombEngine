@@ -982,14 +982,14 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
 		lara->Control.TurnRate = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 
 	// Reset lean.
-	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
 		ResetPlayerLean(item, 1 / 8.0f);
 
 	if (lara->Context.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
@@ -1053,13 +1053,13 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
 		lara->Control.TurnRate = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 
-	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	if (!lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
 		ResetPlayerLean(item, 1 / 8.0f, true, false);
 
 	if (item->Pose.Orientation.x < -ANGLE(85.0f))
@@ -1146,8 +1146,6 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	// is implemented -- Lwmte, 07.12.22
 
 	auto actionMap = ActionMap;
-	auto dbInput = DbInput;
-	auto trInput = TrInput;
 
 	if (isTitle)
 		ClearAllActions();
@@ -1160,11 +1158,7 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	KillMoveItems();
 
 	if (isTitle)
-	{
 		ActionMap = actionMap;
-		DbInput = dbInput;
-		TrInput = trInput;
-	}
 
 	if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
 	{

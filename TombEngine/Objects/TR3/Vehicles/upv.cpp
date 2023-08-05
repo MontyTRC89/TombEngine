@@ -863,7 +863,7 @@ namespace TEN::Entities::Vehicles
 			else if (UPVItem->Pose.Orientation.x < -UPV_X_ORIENT_MAX)
 				UPVItem->Pose.Orientation.x = -UPV_X_ORIENT_MAX;
 
-			if (!(TrInput & IN_LEFT ) && !(TrInput & IN_RIGHT))
+			if (!(IsHeld(In::Left) ) && !(IsHeld(In::Right)))
 				ResetVehicleLean(UPVItem, 12.0f);
 
 			TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity.z);

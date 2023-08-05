@@ -55,7 +55,7 @@ namespace TEN::Entities::Vehicles
 		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
 			return VehicleMountType::None;
 
-		bool hasInputAction = TrInput & IN_ACTION;
+		bool hasInputAction = IsHeld(In::Action);
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;

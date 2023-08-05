@@ -519,7 +519,7 @@ namespace TEN::Entities::Effects
 			Lara.LeftArm.Locked ||
 			Lara.Torch.IsLit == (item->Status & 1) ||
 			item->Timer == -1 ||
-			!(TrInput & IN_ACTION) ||
+			!IsHeld(In::Action) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraItem->Animation.IsAirborne)

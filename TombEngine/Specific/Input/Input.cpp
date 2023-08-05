@@ -38,10 +38,6 @@ namespace TEN::Input
 	std::vector<bool>		 KeyMap		 = {};
 	std::vector<float>		 AxisMap	 = {};
 
-	//  Deprecated legacy input bit fields.
-	int DbInput = 0;
-	int TrInput = 0;
-
 	const std::vector<std::string> g_KeyNames =
 	{
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
@@ -114,7 +110,7 @@ namespace TEN::Input
 		DefaultGenericBindings
 	};
 
-	auto ConflictingKeys = std::array<bool, KEY_COUNT>{};
+	auto ConflictingKeys = std::array<bool, (int)In::Count>{};
 
 	void InitializeEffect()
 	{
@@ -225,15 +221,11 @@ namespace TEN::Input
 
 		for (auto& axis : AxisMap)
 			axis = 0.0f;
-
-		// Clear legacy bit fields.
-		DbInput = 0;
-		TrInput = 0;
 	}
 
 	void ApplyActionQueue()
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			switch (ActionQueue[i])
 			{
@@ -262,7 +254,7 @@ namespace TEN::Input
 	{
 		for (int layout = 1; layout >= 0; layout--)
 		{
-			for (int i = 0; i < KEY_COUNT; i++)
+			for (int i = 0; i < (int)In::Count; i++)
 			{
 				if (Bindings[layout][i] == index)
 					return true;
@@ -293,13 +285,13 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			int key = Bindings[0][i];
 
 			ConflictingKeys[i] = false;
 
-			for (int j = 0; j < KEY_COUNT; j++)
+			for (int j = 0; j < (int)In::Count; j++)
 			{
 				if (key != Bindings[1][j])
 					continue;
@@ -314,19 +306,19 @@ namespace TEN::Input
 	{
 		for (int layout = 0; layout <= 1; layout++)
 		{
-			if (Bindings[layout][KEY_FORWARD] == index)
+			if (Bindings[layout][(int)In::Forward] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
 			}
-			else if (Bindings[layout][KEY_BACK] == index)
+			else if (Bindings[layout][(int)In::Back] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
 			}
-			else if (Bindings[layout][KEY_LEFT] == index)
+			else if (Bindings[layout][(int)In::Left] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
 			}
-			else if (Bindings[layout][KEY_RIGHT] == index)
+			else if (Bindings[layout][(int)In::Right] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
 			}
@@ -382,19 +374,19 @@ namespace TEN::Input
 				// Otherwise, register as camera movement input (for future).
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
-				if (Bindings[1][KEY_FORWARD] == usedIndex)
+				if (Bindings[1][(int)In::Forward] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_BACK] == usedIndex)
+				else if (Bindings[1][(int)In::Back] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_LEFT] == usedIndex)
+				else if (Bindings[1][(int)In::Left] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_RIGHT] == usedIndex)
+				else if (Bindings[1][(int)In::Right] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
 				}
@@ -595,7 +587,7 @@ namespace TEN::Input
 		DefaultConflict();
 
 		// Update action map.
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 			ActionMap[i].Update(Key(i));
 
 		if (applyQueue)
@@ -604,20 +596,6 @@ namespace TEN::Input
 		// Additional handling.
 		HandleHotkeyActions();
 		SolveActionCollisions();
-
-		// Port actions back to legacy bit fields.
-		for (const auto& action : ActionMap)
-		{
-			// TEMP FIX: Only port up to 32 bits.
-			auto actionID = action.GetID();
-			if ((int)actionID >= 32)
-				break;
-
-			int actionBit = 1 << (int)actionID;
-
-			DbInput |= action.IsClicked() ? actionBit : 0;
-			TrInput |= action.IsHeld()	  ? actionBit : 0;
-		}
 	}
 
 	void ClearAllActions()
@@ -627,9 +605,6 @@ namespace TEN::Input
 
 		for (auto& queue : ActionQueue)
 			queue = QueueState::None;
-
-		DbInput = 0;
-		TrInput = 0;
 	}
 
 	void Rumble(float power, float delayInSec, RumbleMode mode)
@@ -662,7 +637,7 @@ namespace TEN::Input
 	{
 		for (int i = 0; i < bindings.size(); i++)
 		{
-			if (i >= KEY_COUNT)
+			if (i >= (int)In::Count)
 				break;
 
 			Bindings[1][i] = bindings[i];
@@ -680,7 +655,7 @@ namespace TEN::Input
 		if (!OisGamepad)
 			return false;
 
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			if (Bindings[1][i] != KC_UNASSIGNED && Bindings[1][i] != Bindings[0][i])
 				return false;
@@ -691,7 +666,7 @@ namespace TEN::Input
 		{
 			ApplyBindings(DefaultXInputBindings);
 
-			for (int i = 0; i < KEY_COUNT; i++)
+			for (int i = 0; i < (int)In::Count; i++)
 				g_Configuration.Bindings[i] = Bindings[1][i];
 
 			// Additionally turn on thumbstick camera and vibration.
@@ -708,14 +683,6 @@ namespace TEN::Input
 	void ClearAction(ActionID actionID)
 	{
 		ActionMap[(int)actionID].Clear();
-
-		// TEMP FIX: Only port up to 32 bits.
-		if ((int)actionID >= 32)
-			return;
-
-		int actionBit = 1 << (int)actionID;
-		DbInput &= ~actionBit;
-		TrInput &= ~actionBit;
 	}
 
 	bool NoAction()
