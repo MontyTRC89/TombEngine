@@ -98,6 +98,7 @@ void AnimateItem(ItemInfo* item)
 
 		if (!item->IsLara())
 		{
+			// Reset RequiredState if already reached.
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
 				item->Animation.RequiredState = NO_STATE;
 		}
@@ -204,7 +205,7 @@ bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetState)
 	for (const auto& dispatch : anim.Dispatches)
 	{
 		// State doesn't match; continue.
-		if (dispatch.State != targetState.value())
+		if (dispatch.State != *targetState)
 			continue;
 
 		// Test if current frame is within dispatch range.
@@ -224,7 +225,7 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
-	const auto& anim = GetAnimData(item->Animation.AnimObjectID, animNumber.value());
+	const auto& anim = GetAnimData(item->Animation.AnimObjectID, *animNumber);
 	return (item->Animation.FrameNumber == anim.EndFrameNumber);
 }
 
@@ -321,7 +322,7 @@ const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber)
 	if (!animNumber.has_value())
 		animNumber = item.Animation.AnimNumber;
 
-	return GetAnimData(item.Animation.AnimObjectID, animNumber.value());
+	return GetAnimData(item.Animation.AnimObjectID, *animNumber);
 }
 
 KeyframeInterpData GetFrameInterpData(const ItemInfo& item)

@@ -60,7 +60,9 @@ struct KeyframeInterpData
 	const KeyframeData& Keyframe1;
 	float Alpha = 0.0f;
 
-	KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) : Keyframe0(keyframe0), Keyframe1(keyframe1)
+	KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
+		Keyframe0(keyframe0),
+		Keyframe1(keyframe1)
 	{
 		Alpha = alpha;
 	}
