@@ -193,7 +193,7 @@ void lara_as_pushable_grab(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(75.0f);
 
-	if (!(TrInput & IN_ACTION))
+	if (!IsHeld(In::Action))
 		item->Animation.TargetState = LS_IDLE;
 }
 
@@ -212,7 +212,7 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
-	if (TrInput & IN_ACTION && pulleyItem->TriggerFlags)
+	if (IsHeld(In::Action) && pulleyItem->TriggerFlags)
 		item->Animation.TargetState = LS_PULLEY;
 	else
 		item->Animation.TargetState = LS_IDLE;
@@ -264,7 +264,7 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
 		if (IsHeld(In::Jump))
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_LEAP;
@@ -323,13 +323,13 @@ void lara_as_tightrope_idle(ItemInfo* item, CollisionInfo* coll)
 	DoLaraTightropeBalanceRegen(item);
 	DoLaraTightropeLean(item);
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
 		item->Animation.TargetState = LS_TIGHTROPE_WALK;
 		return;
 	}
 
-	if (TrInput & (IN_ROLL | IN_BACK))
+	if (IsHeld(In::Roll) || IsHeld(In::Back))
 	{
 		item->Animation.TargetState = LS_TIGHTROPE_TURN_180;
 		return;
@@ -386,7 +386,7 @@ void lara_as_tightrope_walk(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
 		item->Animation.TargetState = LS_TIGHTROPE_WALK;
 		return;
@@ -424,9 +424,9 @@ void lara_as_rope_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			lara->Control.Rope.Y += ANGLE(1.4f);
 		else
 			item->Animation.TargetState = LS_ROPE_IDLE;
@@ -441,9 +441,9 @@ void lara_as_rope_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_RIGHT)
+		if (IsHeld(In::Right))
 			lara->Control.Rope.Y -= ANGLE(1.4f);
 		else
 			item->Animation.TargetState = LS_ROPE_IDLE;
@@ -460,7 +460,7 @@ void lara_as_rope_idle(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Look.Mode = LookMode::Free;
 
-	if (!(TrInput & IN_ACTION))
+	if (!IsHeld(In::Action))
 		FallFromRope(item);
 }
 
@@ -470,28 +470,28 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
 		UpdateRopeSwing(item);
 		RopeSwingCollision(item, coll, false);
 
-		if (TrInput & IN_SPRINT)
+		if (IsHeld(In::Sprint))
 		{
 			item->Animation.TargetState = LS_ROPE_SWING;
 			lara->Control.Rope.DFrame = (GetAnimData(LA_ROPE_SWING).frameBase + 32) << 8;
 			lara->Control.Rope.Frame = lara->Control.Rope.DFrame;
 		}
-		else if (TrInput & IN_FORWARD && lara->Control.Rope.Segment > 4)
+		else if (IsHeld(In::Forward) && lara->Control.Rope.Segment > 4)
 			item->Animation.TargetState = LS_ROPE_UP;
-		else if (TrInput & IN_BACK && lara->Control.Rope.Segment < 21)
+		else if (IsHeld(In::Back) && lara->Control.Rope.Segment < 21)
 		{
 			item->Animation.TargetState = LS_ROPE_DOWN;
 			lara->Control.Rope.Flag = 0;
 			lara->Control.Rope.Count = 0;
 		}
-		else if (TrInput & IN_LEFT)
+		else if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_ROPE_TURN_CLOCKWISE;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Animation.TargetState = LS_ROPE_TURN_COUNTER_CLOCKWISE;
 	}
 	else
@@ -511,7 +511,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->Animation.AnimNumber == LA_ROPE_SWING)
 	{
-		if (TrInput & IN_SPRINT)
+		if (IsHeld(In::Sprint))
 		{
 			int velocity;
 
@@ -541,7 +541,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 
 		item->Animation.FrameNumber = lara->Control.Rope.Frame >> 8;
 
-		if (!(TrInput & IN_SPRINT) &&
+		if (!IsHeld(In::Sprint) &&
 			item->Animation.FrameNumber == GetAnimData(LA_ROPE_SWING).frameBase + 32 &&
 			lara->Control.Rope.MaxXBackward < 6750 &&
 			lara->Control.Rope.MaxXForward < 6750)
@@ -565,7 +565,7 @@ void lara_as_rope_up(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_ROLL)
+	if (IsHeld(In::Roll))
 		FallFromRope(item);
 	else
 	{
@@ -577,7 +577,7 @@ void lara_as_rope_up(ItemInfo* item, CollisionInfo* coll)
 			lara->Control.Rope.Segment -= 2;
 		}
 
-		if (!(TrInput & IN_FORWARD) || lara->Control.Rope.Segment <= 4)
+		if (!IsHeld(In::Forward) || lara->Control.Rope.Segment <= 4)
 			item->Animation.TargetState = LS_ROPE_IDLE;
 	}
 }
@@ -609,11 +609,11 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
 		if (item->Animation.ActiveState == LA_POLE_IDLE) // HACK.
 		{
-			if (TrInput & (IN_LEFT | IN_RIGHT))
+			if (IsHeld(In::Left) || IsHeld(In::Right))
 				ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 		}
 
@@ -624,23 +624,23 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
+		if (IsHeld(In::Forward) && TestLaraPoleUp(item, coll))
 		{
 			item->Animation.TargetState = LS_POLE_UP;
 			return;
 		}
-		else if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
+		else if (IsHeld(In::Back) && TestLaraPoleDown(item, coll))
 		{
 			item->Animation.TargetState = LS_POLE_DOWN;
 			return;
 		}
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 		{
 			item->Animation.TargetState = LS_POLE_TURN_CLOCKWISE;
 			return;
 		}
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 		{
 			item->Animation.TargetState = LS_POLE_TURN_COUNTER_CLOCKWISE;
 			return;
@@ -702,9 +702,9 @@ void lara_as_pole_up(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 
 		if (IsHeld(In::Jump))
@@ -713,7 +713,7 @@ void lara_as_pole_up(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
+		if (IsHeld(In::Forward) && TestLaraPoleUp(item, coll))
 		{
 			item->Animation.TargetState = LS_POLE_UP;
 			return;
@@ -751,9 +751,9 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 	// TODO: In WAD.
 	SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &item->Pose);
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 
 		if (IsHeld(In::Jump))
@@ -762,7 +762,7 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
+		if (IsHeld(In::Back) && TestLaraPoleDown(item, coll))
 		{
 			item->Animation.TargetState = LS_POLE_DOWN;
 			return;
@@ -826,20 +826,20 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
+		if (IsHeld(In::Forward) && TestLaraPoleUp(item, coll))
 		{
 			item->Animation.TargetState = LS_POLE_IDLE; // TODO: Dispatch to climp up.
 			return;
 		}
-		else if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
+		else if (IsHeld(In::Back) && TestLaraPoleDown(item, coll))
 		{
 			item->Animation.TargetState = LS_POLE_IDLE; // TODO: Dispatch to climb down.
 			return;
 		}
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 		{
 			item->Animation.TargetState = LS_POLE_TURN_CLOCKWISE;
 			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
@@ -876,20 +876,20 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION)
+	if (IsHeld(In::Action))
 	{
-		if (TrInput & IN_FORWARD && TestLaraPoleUp(item, coll))
+		if (IsHeld(In::Forward) && TestLaraPoleUp(item, coll))
 		{
 			item->Animation.TargetState = LS_POLE_IDLE; // TODO: Dispatch to climb up.
 			return;
 		}
-		else if (TrInput & IN_BACK && TestLaraPoleDown(item, coll))
+		else if (IsHeld(In::Back) && TestLaraPoleDown(item, coll))
 		{
 			item->Animation.TargetState = LS_POLE_IDLE; // TODO: Dispatch to climb down.
 			return;
 		}
 
-		if (TrInput & IN_RIGHT)
+		if (IsHeld(In::Right))
 		{
 			item->Animation.TargetState = LS_POLE_TURN_COUNTER_CLOCKWISE;
 			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
@@ -923,7 +923,7 @@ void lara_as_zip_line(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.Look.Mode = LookMode::Free;
 	Camera.targetAngle = ANGLE(70.0f);
 
-	if (!(TrInput & IN_ACTION))
+	if (!IsHeld(In::Action))
 	{
 		item->Animation.TargetState = LS_JUMP_FORWARD;
 		AnimateItem(item);

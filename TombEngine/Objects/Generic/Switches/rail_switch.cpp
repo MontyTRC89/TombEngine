@@ -48,7 +48,7 @@ namespace TEN::Entities::Switches
 
 		int flag = 0;
 
-		if ((!(TrInput & IN_ACTION) ||
+		if ((!IsHeld(In::Action) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			lara->Control.HandStatus != HandStatus::Free) &&

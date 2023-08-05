@@ -55,7 +55,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 
 	if (TestLaraLand(item, coll))
@@ -64,7 +64,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 
 		if (item->HitPoints <= 0) USE_FEATURE_IF_CPP20([[unlikely]])
 			item->Animation.TargetState = LS_DEATH;
-		else if (TrInput & IN_FORWARD && !(TrInput & IN_WALK) &&
+		else if (IsHeld(In::Forward) && !IsHeld(In::Walk) &&
 			lara->Control.WaterStatus != WaterStatus::Wade)
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
@@ -82,20 +82,20 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		lara->Control.HandStatus == HandStatus::Free)
 	{
 		item->Animation.TargetState = LS_REACH;
 		return;
 	}
 
-	if (TrInput & IN_ROLL || TrInput & IN_BACK)
+	if (IsHeld(In::Roll) || IsHeld(In::Back))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
 	}
 
-	if (TrInput & IN_WALK &&
+	if (IsHeld(In::Walk) &&
 		lara->Control.HandStatus == HandStatus::Free)
 	{
 		item->Animation.TargetState = LS_SWAN_DIVE;
@@ -191,7 +191,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
 	if (TestLaraLand(item, coll))
@@ -273,8 +273,8 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	if (IsClicked(In::Jump) && !IsDirectionalActionHeld())
 		lara->Control.JumpDirection = JumpDirection::None;
 
-	if (((TrInput & IN_FORWARD &&
-			!(TrInput & IN_BACK && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
+	if (((IsHeld(In::Forward) &&
+			!(IsHeld(In::Back) && lara->Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
 		!IsDirectionalActionHeld() && lara->Control.JumpDirection == JumpDirection::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
@@ -282,7 +282,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.JumpDirection = JumpDirection::Forward;
 		return;
 	}
-	else if ((TrInput & IN_BACK ||
+	else if ((IsHeld(In::Back) ||
 		!IsDirectionalActionHeld() && lara->Control.JumpDirection == JumpDirection::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
@@ -291,7 +291,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((TrInput & IN_LEFT ||
+	if ((IsHeld(In::Left) ||
 		!IsDirectionalActionHeld() && lara->Control.JumpDirection == JumpDirection::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
@@ -299,7 +299,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.JumpDirection = JumpDirection::Left;
 		return;
 	}
-	else if ((TrInput & IN_RIGHT ||
+	else if ((IsHeld(In::Right) ||
 		!IsDirectionalActionHeld() && lara->Control.JumpDirection == JumpDirection::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
@@ -403,7 +403,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 
 	if (TestLaraLand(item, coll))
@@ -425,7 +425,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL || TrInput & IN_FORWARD)
+	if (IsHeld(In::Roll) || IsHeld(In::Forward))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
@@ -587,13 +587,13 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
 		item->Animation.Velocity.z += 2.0f;
 		if (item->Animation.Velocity.z > 5.0f)
 			item->Animation.Velocity.z = 5.0f;
 	}
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 	{
 		item->Animation.Velocity.z -= 2.0f;
 		if (item->Animation.Velocity.z < -5.0f)
@@ -662,7 +662,7 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
 	if (TestLaraLand(item, coll))
@@ -684,7 +684,7 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		lara->Control.HandStatus == HandStatus::Free)
 	{
 		item->Animation.TargetState = LS_REACH;
@@ -729,7 +729,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 2, LARA_LEAN_MAX);
@@ -741,7 +741,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else if ((TrInput & IN_CROUCH || TestLaraCrawlspaceDive(item, coll)) &&
+		else if ((IsHeld(In::Crouch) || TestLaraCrawlspaceDive(item, coll)) &&
 			g_GameFlow->HasCrawlspaceDive())
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
@@ -828,7 +828,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ROLL)
+	if (IsHeld(In::Roll))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
