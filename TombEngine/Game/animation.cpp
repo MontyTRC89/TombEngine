@@ -239,8 +239,9 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
+	// NOTE: Frames beyond designated end frame also count.
 	const auto& anim = GetAnimData(item->Animation.AnimObjectID, *animNumber);
-	return (item->Animation.FrameNumber == anim.EndFrameNumber);
+	return (item->Animation.FrameNumber >= anim.EndFrameNumber);
 }
 
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber)
