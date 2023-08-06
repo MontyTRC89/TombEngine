@@ -21,6 +21,13 @@ using TEN::Renderer::g_Renderer;
 
 // TODO: Arm anim object in samegame.
 
+KeyframeInterpData::KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
+	Keyframe0(keyframe0),
+	Keyframe1(keyframe1)
+{
+	Alpha = alpha;
+}
+
 KeyframeInterpData AnimData::GetKeyframeInterpData(int frameNumber) const
 {
 	// FAILSAFE: Clamp frame number.
@@ -44,13 +51,6 @@ const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 {
 	auto interpData = GetKeyframeInterpData(frameNumber);
 	return ((interpData.Alpha <= 0.5f) ? interpData.Keyframe0 : interpData.Keyframe1);
-}
-
-KeyframeInterpData::KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
-	Keyframe0(keyframe0),
-	Keyframe1(keyframe1)
-{
-	Alpha = alpha;
 }
 
 bool BoneMutator::IsEmpty() const
@@ -254,14 +254,14 @@ void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down
 	item->Pose.Translate(headingAngle, forward, down, right);
 }
 
-void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance)
+void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist)
 {
-	item->Pose.Translate(orient, distance);
+	item->Pose.Translate(orient, dist);
 }
 
-void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
+void TranslateItem(ItemInfo* item, const Vector3& dir, float dist)
 {
-	item->Pose.Translate(direction, distance);
+	item->Pose.Translate(dir, dist);
 }
 
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
@@ -443,15 +443,15 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 	}
 }
 
-Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
+Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset)
 {
 	// Use matrices done in renderer to transform relative offset.
-	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
+	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, relOffset.ToVector3()));
 }
 
-Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
+Vector3i GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset)
 {
-	return GetJointPosition(*item, jointIndex, relOffset);
+	return GetJointPosition(*item, boneID, relOffset);
 }
 
 Vector3i GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite)
@@ -464,24 +464,24 @@ Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite)
 	return GetJointPosition(item, bite.BoneID, bite.Position);
 }
 
-Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
+Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int boneID)
 {
 	const auto& object = Objects[objectID];
+	const int* bonePtr = &g_Level.Bones[object.boneIndex + (boneID * 4)];
 
-	int* bonePtr = &g_Level.Bones[object.boneIndex + (jointIndex * 4)];
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
 Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 {
-	static const auto REF_DIRECTION = Vector3::UnitZ;
+	static const auto REF_DIR = Vector3::UnitZ;
 
 	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID);
-	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, REF_DIRECTION);
+	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, REF_DIR);
 
-	auto direction = target - origin;
-	direction.Normalize();
-	return Geometry::ConvertDirectionToQuat(direction);
+	auto dir = target - origin;
+	dir.Normalize();
+	return Geometry::ConvertDirectionToQuat(dir);
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.

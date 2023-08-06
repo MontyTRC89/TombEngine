@@ -66,14 +66,14 @@ namespace TEN::Animation
 		void Execute(ItemInfo& item, bool isFrameBased) const override;
 	};
 
-	class FlipeffectCommand : public AnimCommand
+	class FlipEffectCommand : public AnimCommand
 	{
 	private:
-		const int FlipeffectID = 0;
+		const int FlipEffectID = 0;
 		const int FrameNumber  = 0;
 
 	public:
-		FlipeffectCommand(int flipeffectID, int frameNumber) : FlipeffectID(flipeffectID), FrameNumber(frameNumber) {};
+		FlipEffectCommand(int flipEffectID, int frameNumber) : FlipEffectID(flipEffectID), FrameNumber(frameNumber) {};
 		void Execute(ItemInfo& item, bool isFrameBased) const override;
 	};
 }

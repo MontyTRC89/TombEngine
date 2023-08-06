@@ -115,11 +115,11 @@ namespace TEN::Animation
 		}
 	}
 
-	void FlipeffectCommand::Execute(ItemInfo& item, bool isFrameBased) const
+	void FlipEffectCommand::Execute(ItemInfo& item, bool isFrameBased) const
 	{
 		if (!isFrameBased || item.Animation.FrameNumber != FrameNumber)
 			return;
 
-		DoFlipEffect(FlipeffectID & 0x3FFF, &item);
+		DoFlipEffect(FlipEffectID & 0x3FFF, &item);
 	}
 }

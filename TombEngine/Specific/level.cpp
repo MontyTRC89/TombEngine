@@ -402,7 +402,7 @@ void LoadObjects()
 						int flipeffectID = ReadInt32();
 						int frameNumber = ReadInt32();
 
-						command = std::make_unique<FlipeffectCommand>(flipeffectID, frameNumber);
+						command = std::make_unique<FlipEffectCommand>(flipeffectID, frameNumber);
 					}
 						break;
 

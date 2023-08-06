@@ -23,6 +23,15 @@ struct KeyframeData
 	std::vector<Quaternion> BoneOrientations = {};
 };
 
+struct KeyframeInterpData
+{
+	const KeyframeData& Keyframe0;
+	const KeyframeData& Keyframe1;
+	float Alpha = 0.0f;
+
+	KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
+};
+
 struct StateDispatchData
 {
 	int State			= 0;
@@ -54,15 +63,6 @@ struct AnimData
 	const KeyframeData& GetClosestKeyframe(int frameNumber) const;
 };
 
-struct KeyframeInterpData
-{
-	const KeyframeData& Keyframe0;
-	const KeyframeData& Keyframe1;
-	float Alpha = 0.0f;
-
-	KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
-};
-
 struct BoneMutator
 {
 	Vector3		Offset	 = Vector3::Zero;
@@ -82,8 +82,8 @@ bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameN
 
 // Entity translation
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
-void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
+void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist);
+void TranslateItem(ItemInfo* item, const Vector3& dir, float dist);
 
 // Setters
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0);
@@ -112,11 +112,11 @@ bool GetStateDispatch(ItemInfo& item, const AnimData& anim);
 void ClampRotation(Pose& outPose, short angle, short rotation); 
 void DrawAnimatingItem(ItemInfo* item);
 
-Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
-Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
+Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
+Vector3i GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
 Vector3i GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
 Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
 
-Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
+Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int boneID);
 Quaternion GetBoneOrientation(const ItemInfo& item, int boneID);
 float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneID);
