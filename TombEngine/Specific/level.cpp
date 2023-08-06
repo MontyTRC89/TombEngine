@@ -75,7 +75,7 @@ float ReadFloat()
 
 Vector2 ReadVector2()
 {
-	Vector2 value;
+	auto value = Vector2::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	return value;
@@ -83,7 +83,7 @@ Vector2 ReadVector2()
 
 Vector3 ReadVector3()
 {
-	Vector3 value;
+	auto value = Vector3::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	value.z = ReadFloat();
@@ -92,7 +92,7 @@ Vector3 ReadVector3()
 
 Vector4 ReadVector4()
 {
-	Vector4 value;
+	auto value = Vector4::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	value.z = ReadFloat();
@@ -123,9 +123,11 @@ long long ReadLEB128(bool sign)
 
 		result |= (long long)(currentByte & 0x7F) << currentShift;
 		currentShift += 7;
-	} while ((currentByte & 0x80) != 0);
+	}
+	while ((currentByte & 0x80) != 0);
 
-	if (sign) // Sign extend
+	// Sign extend
+	if (sign)
 	{
 		int shift = 64 - currentShift;
 		if (shift > 0)
@@ -140,7 +142,9 @@ std::string ReadString()
 	auto numBytes = ReadLEB128(false);
 
 	if (!numBytes)
+	{
 		return std::string();
+	}
 	else
 	{
 		auto newPtr = LevelDataPtr + numBytes;
@@ -352,19 +356,19 @@ void LoadObjects()
 				dispatch.FrameNumberRange.second = ReadInt32();
 			}
 
-			// Load commands.
+			// Load animation commands.
 			int commandCount = ReadInt32();
 			if (commandCount != 0)
 			{
 				anim.Commands.reserve(commandCount);
 
-				// Interpret raw command data.
 				for (int i = 0; i < commandCount; i++)
 				{
-					auto animCommand = (AnimCommandType)ReadInt32();
+					auto commandType = (AnimCommandType)ReadInt32();
 
+					// Interpret raw animation command data.
 					auto command = AnimData::AnimCommandPtr{};
-					switch (animCommand)
+					switch (commandType)
 					{
 					case AnimCommandType::MoveOrigin:
 					{
@@ -399,10 +403,10 @@ void LoadObjects()
 
 					case AnimCommandType::Flipeffect:
 					{
-						int flipeffectID = ReadInt32();
+						int flipEffectID = ReadInt32();
 						int frameNumber = ReadInt32();
 
-						command = std::make_unique<FlipEffectCommand>(flipeffectID, frameNumber);
+						command = std::make_unique<FlipEffectCommand>(flipEffectID, frameNumber);
 					}
 						break;
 
