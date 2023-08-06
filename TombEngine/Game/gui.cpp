@@ -626,7 +626,7 @@ namespace TEN::Gui
 		}
 
 		OptionCount = numControlSettingsOptions;
-		CurrentSettings.WaitingForKey = false;
+		CurrentSettings.NewKeyWaitTimer = false;
 
 		if (CurrentSettings.IgnoreInput)
 		{
@@ -640,16 +640,20 @@ namespace TEN::Gui
 			SelectedOption <= (numControlSettingsOptions - 3))
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			CurrentSettings.WaitingForKey = true;
+			CurrentSettings.NewKeyWaitTimer = SettingsData::NEW_KEY_WAIT_TIMEOUT;
 			CurrentSettings.IgnoreInput = true;
 		}
 
-		if (CurrentSettings.WaitingForKey)
+		if (CurrentSettings.NewKeyWaitTimer > 0.0f)
 		{
 			ClearAllActions();
 
-			while (true)
+			while (CurrentSettings.NewKeyWaitTimer > 0.0f)
 			{
+				CurrentSettings.NewKeyWaitTimer -= 1.0f;
+				if (CurrentSettings.NewKeyWaitTimer <= 0.0f)
+					CurrentSettings.NewKeyWaitTimer = 0.0f;
+
 				UpdateInputActions(item);
 
 				if (CurrentSettings.IgnoreInput)
@@ -693,7 +697,7 @@ namespace TEN::Gui
 						Bindings[1][baseIndex + SelectedOption] = selectedKey;
 						DefaultConflict();
 
-						CurrentSettings.WaitingForKey = false;
+						CurrentSettings.NewKeyWaitTimer = 0.0f;
 						CurrentSettings.IgnoreInput = true;
 						return;
 					}
