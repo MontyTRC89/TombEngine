@@ -30,8 +30,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SHIVA_WALK_TURN_RATE_MAX	  = ANGLE(4.0f);
 	constexpr auto SHIVA_ATTACK_TURN_RATE_MAX = ANGLE(4.0f);
 
-	constexpr auto SHIVA_SWAPMESH_TIME	   = 3;
-	constexpr auto PLAYER_ANIM_SHIVA_DEATH = 7; // TODO: Move to LaraExtraAnims enum.
+	constexpr auto SHIVA_SWAPMESH_TIME = 3;
 
 	const auto ShivaBiteLeft  = CreatureBiteInfo(Vector3(0, 0, 920), 13);
 	const auto ShivaBiteRight = CreatureBiteInfo(Vector3(0, 0, 920), 22);
@@ -199,7 +198,7 @@ namespace TEN::Entities::Creatures::TR3
 		item.Model.MeshIndex[jointIndex] = Objects[ID_SHIVA].meshIndex + jointIndex;
 	}
 
-	static bool DoShivaSwapMesh(ItemInfo& item, bool isDead)
+	static bool DoShivaMeshSwap(ItemInfo& item, bool isDead)
 	{
 		const auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
@@ -272,7 +271,7 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		/*const */auto& object = Objects[item->ObjectNumber];
+		const auto& object = Objects[item->ObjectNumber];
 		auto& creature = *GetCreatureInfo(item);
 
 		short headingAngle = 0;
@@ -286,17 +285,17 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				SetAnimation(item, SHIVA_ANIM_DEATH);
 				item->ItemFlags[0] = object.nmeshes - 1;
-				item->ItemFlags[2] = 1; // Redo mesh swap to stone.
+				item->ItemFlags[2] = 1; // Do mesh swap to stone.
 				item->ItemFlags[3] = 1;
 			}
 
+			// TODO: Mesh swaps after death don't work properly.
 			if (TestLastFrame(item))
 			{
-				// TODO: Find another way.
 				// Block frame until mesh is swapped.
-				//item->Animation.FrameNumber = frameEnd;
+				item->Animation.FrameNumber = GetAnimData(*item).EndFrameNumber;
 
-				if (DoShivaSwapMesh(*item, true))
+				if (DoShivaMeshSwap(*item, true))
 					CreatureDie(itemNumber, false);
 			}
 		}
@@ -315,7 +314,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.Target.z = creature.Enemy->Pose.Position.z;
 			}
 
-			bool isLaraAlive = (creature.Enemy->HitPoints > 0);
+			bool isPlayerAlive = (creature.Enemy->HitPoints > 0);
 			headingAngle = CreatureTurn(item, creature.MaxTurn);
 
 			switch (item->Animation.ActiveState)
@@ -323,7 +322,7 @@ namespace TEN::Entities::Creatures::TR3
 			case SHIVA_STATE_INACTIVE:
 				creature.MaxTurn = 0;
 
-				if (DoShivaSwapMesh(*item, false))
+				if (DoShivaMeshSwap(*item, false))
 					item->Animation.TargetState = SHIVA_STATE_IDLE;
 
 				break;
@@ -510,9 +509,9 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			// Dispatch kill animation.
-			if (isLaraAlive && LaraItem->HitPoints <= 0)
+			if (isPlayerAlive && LaraItem->HitPoints <= 0)
 			{
-				CreatureKill(item, SHIVA_ANIM_KILL, PLAYER_ANIM_SHIVA_DEATH, SHIVA_STATE_KILL, LS_DEATH);
+				CreatureKill(item, SHIVA_ANIM_KILL, LEA_SHIVA_DEATH, SHIVA_STATE_KILL, LS_DEATH);
 				return;
 			}
 		}
