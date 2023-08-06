@@ -626,7 +626,7 @@ namespace TEN::Gui
 		}
 
 		OptionCount = numControlSettingsOptions;
-		CurrentSettings.NewKeyWaitTimer = false;
+		CurrentSettings.NewKeyWaitTimer = 0.0f;
 
 		if (CurrentSettings.IgnoreInput)
 		{
