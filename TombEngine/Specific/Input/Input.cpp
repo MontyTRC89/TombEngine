@@ -587,8 +587,8 @@ namespace TEN::Input
 		DefaultConflict();
 
 		// Update action map.
-		for (int i = 0; i < (int)In::Count; i++)
-			ActionMap[i].Update(Key(i));
+		for (auto& action : ActionMap)
+			action.Update(Key((int)action.GetID()));
 
 		if (applyQueue)
 			ApplyActionQueue();
