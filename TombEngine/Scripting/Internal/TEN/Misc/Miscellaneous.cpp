@@ -268,7 +268,7 @@ namespace Misc
 		if (!CheckInput(actionIndex))
 			return;
 
-		ActionQueue[actionIndex] = QueueState::Push;
+		ActionQueue[actionIndex] = QueueState::Update;
 	}
 
 	static void KeyClear(int actionIndex)

@@ -19,7 +19,7 @@ namespace TEN::Input
 	enum class QueueState
 	{
 		None,
-		Push,
+		Update,
 		Clear
 	};
 

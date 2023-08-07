@@ -159,7 +159,7 @@ namespace TEN::Input
 			case QueueState::None:
 				break;
 
-			case QueueState::Push:
+			case QueueState::Update:
 				ActionMap[i].Update(true);
 				break;
 
