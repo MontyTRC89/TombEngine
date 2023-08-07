@@ -35,9 +35,6 @@ struct ObjectInfo;
 		Vector3 GetCenter() const;
 		Vector3 GetExtents() const;
 
-		// Inquirers
-		bool HasSize() const;
-
 		// Utilities
 		void RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds);
 
