@@ -162,15 +162,17 @@ namespace TEN::Input
 
 		try
 		{
-			// Use an OIS ParamList since the default behaviour blocks the WIN key.
-			ParamList pl;
-			std::ostringstream wnd;
+			// Use OIS ParamList since default behaviour blocks WIN key and steals mouse.
+			auto paramList = ParamList{};
+			auto wnd = std::ostringstream{};
 			wnd << (size_t)handle;
-			pl.insert(std::make_pair(std::string("WINDOW"), wnd.str()));
-			pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
-			pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
+			paramList.insert(std::make_pair(std::string("WINDOW"), wnd.str()));
+			paramList.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
+			paramList.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
+			paramList.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
+			paramList.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
 
-			OisInputManager = InputManager::createInputSystem(pl);
+			OisInputManager = InputManager::createInputSystem(paramList);
 			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
