@@ -4,11 +4,12 @@ namespace TEN::Input
 {
 	enum class ActionID;
 
-	using BindingMap = std::unordered_map<ActionID, int>;
+	using BindingProfile = std::unordered_map<ActionID, int>;
 
-	enum class BindingMapType
+	// TODO: These don't represent devices yet, it's still the legacy way.
+	enum class InputDeviceID
 	{
-		Keyboard,
+		KeyboardMouse,
 		//Gamepad,
 		//XBox,
 		//Dualshock,
@@ -18,29 +19,30 @@ namespace TEN::Input
 		Count
 	};
 
+	// TODO: Allow different binding profiles for each device. Default, Custom1, Custom2.
 	class BindingManager
 	{
 	private:
 		// Members
-		std::unordered_map<BindingMapType, BindingMap> Bindings	 = {};
-		std::unordered_map<ActionID, bool>			   Conflicts = {};
+		std::unordered_map<InputDeviceID, BindingProfile> Bindings	= {};
+		std::unordered_map<ActionID, bool>				  Conflicts = {};
 
 	public:
 		// Constants
-		static const BindingMap DEFAULT_KEYBOARD_BINDING_MAP;
-		static const BindingMap DEFAULT_XBOX_BINDING_MAP;
+		static const BindingProfile DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+		static const BindingProfile DEFAULT_XBOX_BINDING_PROFILE;
 
 		// Constructors
 		BindingManager();
 
 		// Getters
-		int				  GetBoundKey(BindingMapType bindingType, ActionID actionID);
-		const BindingMap& GetBindingMap(BindingMapType bindingType);
+		int					  GetBoundKey(InputDeviceID deviceID, ActionID actionID);
+		const BindingProfile& GetBindingProfile(InputDeviceID deviceID);
 
 		// Setters
-		void SetKeyBinding(BindingMapType bindingType, ActionID actionID, int key);
-		void SetBindingMap(BindingMapType bindingType, const BindingMap& bindingMap);
-		void SetDefaultBindingMap(BindingMapType bindingType);
+		void SetKeyBinding(InputDeviceID deviceID, ActionID actionID, int key);
+		void SetBindingProfile(InputDeviceID deviceID, const BindingProfile& profile);
+		void SetDefaultBindingProfile(InputDeviceID deviceID);
 		void SetConflict(ActionID actionID, bool value);
 
 		// Inquirers

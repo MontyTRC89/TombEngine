@@ -180,11 +180,11 @@ namespace TEN::Input
 	{
 		for (int i = 1; i >= 0; i--)
 		{
-			auto mapType = (BindingMapType)i;
+			auto deviceID = (InputDeviceID)i;
 			for (int j = 0; j < (int)In::Count; j++)
 			{
 				auto actionID = (ActionID)j;
-				if (g_Bindings.GetBoundKey(mapType, actionID) != KC_UNASSIGNED)
+				if (g_Bindings.GetBoundKey(deviceID, actionID) != KC_UNASSIGNED)
 					return true;
 			}
 		}
@@ -219,10 +219,10 @@ namespace TEN::Input
 
 			g_Bindings.SetConflict(actionID, false);
 
-			int key = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)i);
+			int key = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)i);
 			for (int j = 0; j < (int)In::Count; j++)
 			{
-				if (key != g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)j))
+				if (key != g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)j))
 					continue;
 
 				g_Bindings.SetConflict(actionID, true);
@@ -233,21 +233,22 @@ namespace TEN::Input
 
 	static void SetDiscreteAxisValues(unsigned int keyID)
 	{
-		for (int set = 0; set < (int)BindingMapType::Count; set++)
+		for (int i = 0; i < (int)InputDeviceID::Count; i++)
 		{
-			if (g_Bindings.GetBoundKey((BindingMapType)set, In::Forward) == keyID)
+			auto deviceID = (InputDeviceID)i;
+			if (g_Bindings.GetBoundKey(deviceID, In::Forward) == keyID)
 			{
 				AxisMap[(int)InputAxis::MoveVertical] = 1.0f;
 			}
-			else if (g_Bindings.GetBoundKey((BindingMapType)set, In::Back) == keyID)
+			else if (g_Bindings.GetBoundKey(deviceID, In::Back) == keyID)
 			{
 				AxisMap[(int)InputAxis::MoveVertical] = -1.0f;
 			}
-			else if (g_Bindings.GetBoundKey((BindingMapType)set, In::Left) == keyID)
+			else if (g_Bindings.GetBoundKey(deviceID, In::Left) == keyID)
 			{
 				AxisMap[(int)InputAxis::MoveHorizontal] = -1.0f;
 			}
-			else if (g_Bindings.GetBoundKey((BindingMapType)set, In::Right) == keyID)
+			else if (g_Bindings.GetBoundKey(deviceID, In::Right) == keyID)
 			{
 				AxisMap[(int)InputAxis::MoveHorizontal] = 1.0f;
 			}
@@ -302,19 +303,19 @@ namespace TEN::Input
 				// Otherwise, register as camera movement input (for future).
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
-				if (g_Bindings.GetBoundKey(BindingMapType::Custom, In::Forward) == usedKey)
+				if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Forward) == usedKey)
 				{
 					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
 				}
-				else if (g_Bindings.GetBoundKey(BindingMapType::Custom, In::Back) == usedKey)
+				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Back) == usedKey)
 				{
 					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
 				}
-				else if (g_Bindings.GetBoundKey(BindingMapType::Custom, In::Left)  == usedKey)
+				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Left)  == usedKey)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
 				}
-				else if (g_Bindings.GetBoundKey(BindingMapType::Custom, In::Right) == usedKey)
+				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Right) == usedKey)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
 				}
@@ -406,14 +407,14 @@ namespace TEN::Input
 
 	static float Key(ActionID actionID)
 	{
-		for (int i = 1; i >= 0; i--)
+		for (int i = (int)InputDeviceID::Count - 1; i >= 0; i--)
 		{
-			auto mapType = (BindingMapType)i;
+			auto deviceID = (InputDeviceID)i;
 
-			if (mapType == BindingMapType::Keyboard && g_Bindings.TestConflict(actionID))
+			if (deviceID == InputDeviceID::KeyboardMouse && g_Bindings.TestConflict(actionID))
 				continue;
 
-			int key = g_Bindings.GetBoundKey((BindingMapType)i, actionID);
+			int key = g_Bindings.GetBoundKey((InputDeviceID)i, actionID);
 			if (KeyMap[key] != 0.0f)
 				return KeyMap[key];
 		}
@@ -516,11 +517,8 @@ namespace TEN::Input
 		DefaultConflict();
 
 		// Update action map.
-		for (int i = 0; i < (int)In::Count; i++)
-		{
-			auto actionID = (ActionID)i;
-			ActionMap[i].Update(Key(actionID));
-		}
+		for (auto& action : ActionMap)
+			action.Update(Key(action.GetID()));
 
 		if (applyQueue)
 			ApplyActionQueue();
@@ -565,14 +563,14 @@ namespace TEN::Input
 		RumbleInfo = {};
 	}
 
-	static void ApplyBindings(const BindingMap& set)
+	static void ApplyBindings(const BindingProfile& set)
 	{
-		g_Bindings.SetBindingMap(BindingMapType::Custom, set);
+		g_Bindings.SetBindingProfile(InputDeviceID::Custom, set);
 	}
 
 	void ApplyDefaultBindings()
 	{
-		ApplyBindings(BindingManager::DEFAULT_XBOX_BINDING_MAP);
+		ApplyBindings(BindingManager::DEFAULT_XBOX_BINDING_PROFILE);
 		ApplyDefaultXInputBindings();
 	}
 
@@ -585,11 +583,11 @@ namespace TEN::Input
 		{
 			auto actionID = (ActionID)i;
 
-			int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, actionID);
-			int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, actionID);
+			int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
+			int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, actionID);
 
 			if (userKey != KC_UNASSIGNED &&
-				userKey != genericKey)
+				userKey != defaultKey)
 			{
 				return false;
 			}
@@ -598,11 +596,12 @@ namespace TEN::Input
 		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
 		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
 		{
-			ApplyBindings(BindingManager::DEFAULT_XBOX_BINDING_MAP);
-			g_Configuration.Bindings = g_Bindings.GetBindingMap(BindingMapType::Custom);
+			ApplyBindings(BindingManager::DEFAULT_XBOX_BINDING_PROFILE);
+			g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
 
 			// Additionally turn on thumbstick camera and vibration.
-			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCamera = true;
+			g_Configuration.EnableRumble = true;
+			g_Configuration.EnableThumbstickCamera = true;
 
 			return true;
 		}

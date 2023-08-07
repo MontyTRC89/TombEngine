@@ -274,10 +274,10 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)k);
-						int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)k);
+						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)k);
+						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)k);
 
-						int key = userKey ? userKey : genericKey;
+						int key = userKey ? userKey : defaultKey;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -327,10 +327,10 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)(baseIndex + k));
+						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)(baseIndex + k));
 
-						int key = userKey ? userKey : genericKey;
+						int key = userKey ? userKey : defaultKey;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -386,10 +386,10 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)(baseIndex + k));
+						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)(baseIndex + k));
 
-						int key = userKey ? userKey : genericKey;
+						int key = userKey ? userKey : defaultKey;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -438,10 +438,10 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int genericKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)(baseIndex + k));
+						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)(baseIndex + k));
 
-						int key = userKey ? userKey : genericKey;
+						int key = userKey ? userKey : defaultKey;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 

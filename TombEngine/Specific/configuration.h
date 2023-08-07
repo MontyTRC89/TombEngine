@@ -62,7 +62,7 @@ struct GameConfiguration
 	bool EnableThumbstickCamera = false;
 
 	// Input
-	BindingMap Bindings = {};
+	BindingProfile Bindings = {};
 
 	std::vector<Vector2i> SupportedScreenResolutions = {};
 	std::string			  AdapterName				 = {};

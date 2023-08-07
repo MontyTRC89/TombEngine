@@ -10,7 +10,7 @@ using namespace OIS;
 
 namespace TEN::Input
 {
-	const BindingMap BindingManager::DEFAULT_KEYBOARD_BINDING_MAP =
+	const BindingProfile BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE =
 	{
 		{ In::Forward, KC_UP },
 		{ In::Back, KC_DOWN },
@@ -58,7 +58,7 @@ namespace TEN::Input
 		{ In::Load, KC_F6 }
 	};
 
-	const BindingMap BindingManager::DEFAULT_XBOX_BINDING_MAP =
+	const BindingProfile BindingManager::DEFAULT_XBOX_BINDING_PROFILE =
 	{
 		{ In::Forward, XK_AXIS_X_NEG },
 		{ In::Back, XK_AXIS_X_POS },
@@ -110,41 +110,41 @@ namespace TEN::Input
 	{
 		Bindings =
 		{
-			{ BindingMapType::Keyboard, DEFAULT_KEYBOARD_BINDING_MAP },
-			{ BindingMapType::Custom, DEFAULT_KEYBOARD_BINDING_MAP }
+			{ InputDeviceID::KeyboardMouse, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
+			{ InputDeviceID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE }
 		};
 
-		for (int i = 0; i < (int)ActionID::Count; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			auto actionID = (ActionID)i;
 			Conflicts.insert({ actionID, false });
 		}
 	}
 
-	const BindingMap& BindingManager::GetBindingMap(BindingMapType bindingType)
+	const BindingProfile& BindingManager::GetBindingProfile(InputDeviceID deviceID)
 	{
-		// Find binding map.
-		auto it = Bindings.find(bindingType);
-		assertion(it != Bindings.end(), ("Attempted to get missing binding map " + std::to_string((int)bindingType)).c_str());
+		// Find binding profile.
+		auto it = Bindings.find(deviceID);
+		assertion(it != Bindings.end(), ("Attempted to get missing binding profile " + std::to_string((int)deviceID)).c_str());
 
-		// Get and return binding map.
-		const auto& bindingMap = it->second;
-		return bindingMap;
+		// Get and return binding profile.
+		const auto& bindingProfile = it->second;
+		return bindingProfile;
 	}
 
-	int BindingManager::GetBoundKey(BindingMapType bindingType, ActionID actionID)
+	int BindingManager::GetBoundKey(InputDeviceID deviceID, ActionID actionID)
 	{
-		// Find binding map.
-		auto bindingMapIt = Bindings.find(bindingType);
-		if (bindingMapIt == Bindings.end())
+		// Find binding profile.
+		auto bindingProfileIt = Bindings.find(deviceID);
+		if (bindingProfileIt == Bindings.end())
 			return KC_UNASSIGNED;
 
-		// Get binding map.
-		const auto& bindingMap = bindingMapIt->second;
+		// Get binding profile.
+		const auto& bindingProfile = bindingProfileIt->second;
 
 		// Find key binding.
-		auto keyIt = bindingMap.find(actionID);
-		if (keyIt == bindingMap.end())
+		auto keyIt = bindingProfile.find(actionID);
+		if (keyIt == bindingProfile.end())
 			return KC_UNASSIGNED;
 
 		// Get and return key binding.
@@ -152,34 +152,33 @@ namespace TEN::Input
 		return key;
 	}
 
-	void BindingManager::SetKeyBinding(BindingMapType bindingType, ActionID actionID, int key)
+	void BindingManager::SetKeyBinding(InputDeviceID deviceID, ActionID actionID, int key)
 	{
-		// Overwrite or add new key binding.
-		Bindings[bindingType][actionID] = key;
+		// Overwrite or add key binding.
+		Bindings[deviceID][actionID] = key;
 	}
 
-	void BindingManager::SetBindingMap(BindingMapType bindingType, const BindingMap& bindingMap)
+	void BindingManager::SetBindingProfile(InputDeviceID deviceID, const BindingProfile& bindingProfile)
 	{
-		// Overwrite or create new binding map.
-		Bindings[bindingType] = bindingMap;
+		// Overwrite or create binding profile.
+		Bindings[deviceID] = bindingProfile;
 	}
 
-	void BindingManager::SetDefaultBindingMap(BindingMapType bindingType)
+	void BindingManager::SetDefaultBindingProfile(InputDeviceID deviceID)
 	{
-		// TODO: Figure out how this should work.
-		// Reset binding map defaults.
-		switch (bindingType)
+		// Reset binding profile defaults.
+		switch (deviceID)
 		{
-		case BindingMapType::Keyboard:
-			Bindings[bindingType] = DEFAULT_KEYBOARD_BINDING_MAP;
+		case InputDeviceID::KeyboardMouse:
+			Bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 			break;
 
-		case BindingMapType::Custom:
-			Bindings[bindingType] = DEFAULT_KEYBOARD_BINDING_MAP;
+		case InputDeviceID::Custom:
+			Bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 			break;
 
 		default:
-			TENLog("Cannot reset defaults for binding map " + std::to_string((int)bindingType), LogLevel::Warning);
+			TENLog("Cannot reset defaults for binding profile " + std::to_string((int)deviceID), LogLevel::Warning);
 			return;
 		}
 	}

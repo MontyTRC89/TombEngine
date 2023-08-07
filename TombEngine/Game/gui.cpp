@@ -693,7 +693,7 @@ namespace TEN::Gui
 							break;
 						}
 
-						g_Bindings.SetKeyBinding(BindingMapType::Custom, ActionID(baseIndex + SelectedOption), selectedKey);
+						g_Bindings.SetKeyBinding(InputDeviceID::Custom, ActionID(baseIndex + SelectedOption), selectedKey);
 						DefaultConflict();
 
 						CurrentSettings.NewKeyWaitTimer = 0.0f;
@@ -789,8 +789,8 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					CurrentSettings.Configuration.Bindings = g_Bindings.GetBindingMap(BindingMapType::Custom);
-					g_Configuration.Bindings = g_Bindings.GetBindingMap(BindingMapType::Custom);
+					CurrentSettings.Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
+					g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
 					SaveConfiguration();
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
@@ -801,7 +801,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					g_Bindings.SetBindingMap(BindingMapType::Custom, CurrentSettings.Configuration.Bindings);
+					g_Bindings.SetBindingProfile(InputDeviceID::Custom, CurrentSettings.Configuration.Bindings);
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;

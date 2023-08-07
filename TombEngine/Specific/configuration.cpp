@@ -253,7 +253,7 @@ bool SaveConfiguration()
 	}
 
 	// Set Input keys.
-	g_Configuration.Bindings = BindingManager::DEFAULT_KEYBOARD_BINDING_MAP;
+	g_Configuration.Bindings = BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 	for (int i = 0; i < (int)In::Count; i++)
 	{
 		char buffer[9];
@@ -427,7 +427,7 @@ bool LoadConfiguration()
 			sprintf(buffer, "Action%d", i);
 
 			auto actionID = (ActionID)i;
-			int boundKey = g_Bindings.GetBoundKey(BindingMapType::Keyboard, actionID);
+			int boundKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
 
 			if (GetDWORDRegKey(inputKey, buffer, &tempKey, boundKey) != ERROR_SUCCESS)
 			{
@@ -440,7 +440,7 @@ bool LoadConfiguration()
 			}
 
 			g_Configuration.Bindings.insert({ (ActionID)i, tempKey });
-			g_Bindings.SetKeyBinding(BindingMapType::Custom, actionID, tempKey);
+			g_Bindings.SetKeyBinding(InputDeviceID::Custom, actionID, tempKey);
 		}
 
 		RegCloseKey(inputKey);
@@ -448,7 +448,7 @@ bool LoadConfiguration()
 	// Input key does not exist; use default bindings.
 	else
 	{
-		g_Configuration.Bindings = g_Bindings.GetBindingMap(BindingMapType::Keyboard);
+		g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::KeyboardMouse);
 	}
 
 	RegCloseKey(rootKey);
