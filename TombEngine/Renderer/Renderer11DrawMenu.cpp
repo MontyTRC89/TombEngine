@@ -1163,10 +1163,9 @@ namespace TEN::Renderer
 			case RendererDebugPage::LogicStats:
 				PrintDebugMessage("LOGIC STATS");
 				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
-				PrintDebugMessage("Move axis vertical: %f", AxisMap[(int)InputAxis::Move].y);
-				PrintDebugMessage("Move axis horizontal: %f", AxisMap[(int)InputAxis::Move].y);
-				PrintDebugMessage("Look axis vertical: %f", AxisMap[(int)InputAxis::Camera].x);
-				PrintDebugMessage("Look axis horizontal: %f", AxisMap[(int)InputAxis::Camera].x);
+				PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
+				PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
+				PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
 				break;
 
 			case RendererDebugPage::CollisionStats:

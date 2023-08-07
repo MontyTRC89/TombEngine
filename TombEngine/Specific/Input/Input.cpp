@@ -201,7 +201,7 @@ namespace TEN::Input
 		int numDevices = OisInputManager->getNumberOfDevices(OISJoyStick);
 		if (numDevices > 0)
 		{
-			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + ((numDevices > 1) ? "s." : "."), LogLevel::Info);
+			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + ((numDevices > 1) ? "s" : "") + ".", LogLevel::Info);
 
 			try
 			{
@@ -362,7 +362,7 @@ namespace TEN::Input
 		}
 	}
 
-	void ReadKeyboard()
+	static void ReadKeyboard()
 	{
 		if (OisKeyboard == nullptr)
 			return;
@@ -392,7 +392,7 @@ namespace TEN::Input
 		}
 	}
 
-	void ReadMouse()
+	static void ReadMouse()
 	{
 		if (OisMouse == nullptr)
 			return;
@@ -460,10 +460,11 @@ namespace TEN::Input
 				SetDiscreteAxisValues(baseIndex + pass);
 			}
 
-			// Poll axes.
+			// Calculate normalized axes.
 			auto rawAxes = Vector2(state.X.rel, state.Y.rel);
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
 			float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
+
 			AxisMap[(int)InputAxis::Mouse] = (rawAxes * sensitivity) * smoothing;
 		}
 		catch (OIS::Exception& ex)
@@ -472,7 +473,7 @@ namespace TEN::Input
 		}
 	}
 	
-	void ReadGameController()
+	static void ReadGameController()
 	{
 		if (OisGamepad == nullptr)
 			return;

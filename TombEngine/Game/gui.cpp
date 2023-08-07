@@ -39,10 +39,10 @@ namespace TEN::Gui
 
 	constexpr auto VOLUME_MAX			 = 100;
 	constexpr auto VOLUME_STEP			 = VOLUME_MAX / 20;
-	constexpr auto MOUSE_SENSITIVITY_MIN = 1;
 	constexpr auto MOUSE_SENSITIVITY_MAX = 35;
-	constexpr auto MOUSE_SMOOTHING_MIN	 = 0;
+	constexpr auto MOUSE_SENSITIVITY_MIN = 1;
 	constexpr auto MOUSE_SMOOTHING_MAX	 = 5;
+	constexpr auto MOUSE_SMOOTHING_MIN	 = 0;
 
 	GuiController g_Gui;
 
