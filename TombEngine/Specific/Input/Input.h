@@ -50,78 +50,6 @@ namespace TEN::Input
 		XB_DPAD_RIGHT
 	};
 
-	// Deprecated.
-	enum InputKey
-	{
-		KEY_FORWARD,
-		KEY_BACK,
-		KEY_LEFT,
-		KEY_RIGHT,
-		KEY_LEFT_STEP,
-		KEY_RIGHT_STEP,
-		KEY_WALK,
-		KEY_SPRINT,
-		KEY_CROUCH,
-		KEY_JUMP,
-		KEY_ROLL,
-		KEY_ACTION,
-		KEY_DRAW,
-		KEY_LOOK,
-
-		KEY_ACCELERATE,
-		KEY_REVERSE,
-		KEY_SPEED,
-		KEY_SLOW,
-		KEY_BRAKE,
-		KEY_FIRE,
-
-		KEY_FLARE,
-		KEY_SMALL_MEDIPACK,
-		KEY_LARGE_MEDIPACK,
-		KEY_PREVIOUS_WEAPON,
-		KEY_NEXT_WEAPON,
-		KEY_WEAPON_1,
-		KEY_WEAPON_2,
-		KEY_WEAPON_3,
-		KEY_WEAPON_4,
-		KEY_WEAPON_5,
-		KEY_WEAPON_6,
-		KEY_WEAPON_7,
-		KEY_WEAPON_8,
-		KEY_WEAPON_9,
-		KEY_WEAPON_10,
-
-		KEY_SELECT,
-		KEY_DESELECT,
-		KEY_PAUSE,
-		KEY_INVENTORY,
-		KEY_SAVE,
-		KEY_LOAD,
-
-		KEY_COUNT
-	};
-
-	// Deprecated.
-	enum InputActions
-	{
-		IN_NONE = 0,
-
-		IN_FORWARD = (1 << KEY_FORWARD),
-		IN_BACK	   = (1 << KEY_BACK),
-		IN_LEFT	   = (1 << KEY_LEFT),
-		IN_RIGHT   = (1 << KEY_RIGHT),
-		IN_LSTEP   = (1 << KEY_LEFT_STEP),
-		IN_RSTEP   = (1 << KEY_RIGHT_STEP),
-		IN_WALK	   = (1 << KEY_WALK),
-		IN_SPRINT  = (1 << KEY_SPRINT),
-		IN_CROUCH  = (1 << KEY_CROUCH),
-		IN_JUMP	   = (1 << KEY_JUMP),
-		IN_ROLL	   = (1 << KEY_ROLL),
-		IN_ACTION  = (1 << KEY_ACTION),
-		IN_DRAW	   = (1 << KEY_DRAW),
-		IN_LOOK	   = (1 << KEY_LOOK)
-	};
-	
 	enum class InputAxis
 	{
 		Move,
@@ -158,9 +86,6 @@ namespace TEN::Input
 	extern std::vector<QueueState>	ActionQueue;
 	extern std::vector<bool>		KeyMap;
 	extern std::vector<Vector2>		AxisMap;
-
-	extern int DbInput; // Debounce input.
-	extern int TrInput; // Throttle input.
 
 	extern const std::vector<std::string>	   g_KeyNames;
 	extern		 std::vector<std::vector<int>> Bindings;

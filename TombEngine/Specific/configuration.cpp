@@ -253,8 +253,8 @@ bool SaveConfiguration()
 	}
 
 	// Set Input keys.
-	g_Configuration.Bindings.resize(KEY_COUNT);
-	for (int i = 0; i < KEY_COUNT; i++)
+	g_Configuration.Bindings.resize((int)In::Count);
+	for (int i = 0; i < (int)In::Count; i++)
 	{
 		char buffer[9];
 		sprintf(buffer, "Action%d", i);
@@ -420,7 +420,7 @@ bool LoadConfiguration()
 	HKEY inputKey = NULL;
 	if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			DWORD tempKey;
 			char buffer[9];

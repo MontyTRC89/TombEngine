@@ -394,7 +394,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		{
 			item->Pose.Orientation.x = -ANGLE(25.0f);
 
-			if (TrInput & IN_ACTION && 
+			if (IsHeld(In::Action) && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
 				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && 
 				lara->Control.HandStatus == HandStatus::Free &&
@@ -445,8 +445,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		return;
 	}
 	
-	if (!(TrInput & IN_ACTION) && (g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
-		BinocularRange ||
+	if (!IsHeld(In::Action) && (g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
+		lara->Control.Look.IsUsingLasersight ||
 		(laraItem->Animation.ActiveState != LS_IDLE || laraItem->Animation.AnimNumber != LA_STAND_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CROUCH_IDLE || laraItem->Animation.AnimNumber != LA_CROUCH_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CRAWL_IDLE || laraItem->Animation.AnimNumber != LA_CRAWL_IDLE))
@@ -881,7 +881,6 @@ void DropPickups(ItemInfo* item)
 
 		// Iterate through all found items and statics around, and determine if dummy sphere
 		// intersects any of those. If so, try other corner.
-
 		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 		{
 			auto* currentItem = CollidedItems[i];
@@ -897,14 +896,19 @@ void DropPickups(ItemInfo* item)
 
 		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 		{
-			auto* currentMesh = CollidedMeshes[i];
-			if (!currentMesh)
+			const auto* currentMeshPtr = CollidedMeshes[i];
+			if (currentMeshPtr == nullptr)
 				break;
 
-			if (StaticObjects[currentMesh->staticNumber].collisionBox.ToBoundingOrientedBox(currentMesh->pos).Intersects(sphere))
+			const auto& staticObject = StaticObjects[currentMeshPtr->staticNumber];
+			if (staticObject.collisionBox.HasSize())
 			{
-				collidedWithObject = true;
-				break;
+				auto box = staticObject.collisionBox.ToBoundingOrientedBox(currentMeshPtr->pos);
+				if (box.Intersects(sphere))
+				{
+					collidedWithObject = true;
+					break;
+				}
 			}
 		}
 
@@ -1157,7 +1161,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1);
 
-	if ((TrInput & IN_ACTION &&
+	if ((IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		lara->Control.HandStatus == HandStatus::Free &&

@@ -118,15 +118,18 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 			for (int j = 0; j < room->mesh.size(); j++)
 			{
 				auto* mesh = &room->mesh[j];
-				const auto& bBox = GetBoundsAccurate(*mesh, false);
+				const auto& bounds = GetBoundsAccurate(*mesh, false);
+
+				if (!bounds.HasSize())
+					continue;
 
 				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) < (mesh->pos.Position.y + bBox.Y1))
+				if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) < (mesh->pos.Position.y + bounds.Y1))
 					continue;
 
-				if (collidingItem->Pose.Position.y > (mesh->pos.Position.y + bBox.Y2))
+				if (collidingItem->Pose.Position.y > (mesh->pos.Position.y + bounds.Y2))
 					continue;
 
 				float sinY = phd_sin(mesh->pos.Orientation.y);
@@ -135,10 +138,10 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 				float rx = ((collidingItem->Pose.Position.x - mesh->pos.Position.x) * cosY) - ((collidingItem->Pose.Position.z - mesh->pos.Position.z) * sinY);
 				float rz = ((collidingItem->Pose.Position.z - mesh->pos.Position.z) * cosY) + ((collidingItem->Pose.Position.x - mesh->pos.Position.x) * sinY);
 
-				if ((radius + rx + CLICK(0.5f) < bBox.X1) || (rx - radius - CLICK(0.5f) > bBox.X2))
+				if ((radius + rx + CLICK(0.5f) < bounds.X1) || (rx - radius - CLICK(0.5f) > bounds.X2))
 					continue;
 
-				if ((radius + rz + CLICK(0.5f) < bBox.Z1) || (rz - radius - CLICK(0.5f) > bBox.Z2))
+				if ((radius + rz + CLICK(0.5f) < bounds.Z1) || (rz - radius - CLICK(0.5f) > bounds.Z2))
 					continue;
 
 				collidedMeshes[numMeshes++] = mesh;
@@ -357,10 +360,14 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 				if (Vector3i::Distance(item->Pose.Position, mesh.pos.Position) < COLLISION_CHECK_DISTANCE)
 				{
-					const auto& bBox = GetBoundsAccurate(mesh, false).ToBoundingOrientedBox(mesh.pos);
-					float distance;
+					const auto& bounds = GetBoundsAccurate(mesh, false);
+					if (!bounds.HasSize())
+						continue;
+					
+					auto box = bounds.ToBoundingOrientedBox(mesh.pos);
 
-					if (bBox.Intersects(origin, direction, distance) && distance < (coll->Setup.Radius * 2))
+					float dist;
+					if (box.Intersects(origin, direction, dist) && dist < (coll->Setup.Radius * 2))
 					{
 						coll->HitStatic = true;
 						return;
@@ -585,6 +592,9 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 	const auto& bounds = GetBestFrame(*item).BoundingBox;
 	const auto& playerBounds = GetBestFrame(*laraItem).BoundingBox;
 
+	if (!bounds.HasSize())
+		return false;
+
 	if ((item->Pose.Position.y + bounds.Y2) <= (laraItem->Pose.Position.y + playerBounds.Y1))
 		return false;
 
@@ -723,7 +733,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
 	auto headingAngle = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.OldPosition.z, item2->Pose.Position.x - coll->Setup.OldPosition.x);
+	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.PrevPosition.z, item2->Pose.Position.x - coll->Setup.PrevPosition.x);
 
 	GetCollisionInfo(coll, item2);
 
@@ -731,15 +741,15 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.OldPosition = item2->Pose.Position;
+		coll->Setup.PrevPosition = item2->Pose.Position;
 
 		// Commented because causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"
 		// UpdateLaraRoom(item2, -10);
 	}
 	else
 	{
-		item2->Pose.Position.x = coll->Setup.OldPosition.x;
-		item2->Pose.Position.z = coll->Setup.OldPosition.z;
+		item2->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item2->Pose.Position.z = coll->Setup.PrevPosition.z;
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
@@ -766,6 +776,8 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2)
 	int rz = (direction.z * cosY) + (direction.x * sinY);
 
 	const auto& bounds = GetBestFrame(*item).BoundingBox;
+	if (!bounds.HasSize())
+		return false;
 
 	int minX = bounds.X1;
 	int maxX = bounds.X2;
@@ -846,7 +858,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 
 	auto prevHeadingAngle = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);
+	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.PrevPosition.z, item->Pose.Position.x - coll->Setup.PrevPosition.x);
 
 	GetCollisionInfo(coll, item);
 
@@ -854,14 +866,14 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.OldPosition = item->Pose.Position;
+		coll->Setup.PrevPosition = item->Pose.Position;
 		if (item->IsLara())
 			UpdateLaraRoom(item, -10);
 	}
 	else
 	{
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item->Pose.Position.z = coll->Setup.PrevPosition.z;
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
@@ -878,7 +890,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
 {
 	coll.Setup.ForwardAngle = item.Pose.Orientation.y;
-	coll.Setup.OldPosition = item.Pose.Position;
+	coll.Setup.PrevPosition = item.Pose.Position;
 	GetCollisionInfo(&coll, &item);
 	ShiftItem(&item, &coll);
 }
@@ -949,7 +961,11 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 			float distance = Vector3i::Distance(item->Pose.Position, mesh.pos.Position);
 			if (distance < COLLISION_CHECK_DISTANCE)
 			{
-				if (CollideSolidBounds(item, GetBoundsAccurate(mesh, false), mesh.pos, coll))
+				const auto& bounds = GetBoundsAccurate(mesh, false);
+				if (!bounds.HasSize())
+					continue;
+
+				if (CollideSolidBounds(item, bounds, mesh.pos, coll))
 					coll->HitStatic = true;
 			}
 		}
@@ -1005,7 +1021,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Check if previous item horizontal position intersects bounds.
-	auto prevCollBounds = collBox.ToBoundingOrientedBox(Pose(coll->Setup.OldPosition));
+	auto prevCollBounds = collBox.ToBoundingOrientedBox(Pose(coll->Setup.PrevPosition));
 	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
 
 	// Draw item coll bounds.
@@ -1150,7 +1166,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		rawShift.z = shiftRight;
 
 	// Rotate previous collision position to identity.
-	distance = (coll->Setup.OldPosition - pose.Position).ToVector3();
+	distance = (coll->Setup.PrevPosition - pose.Position).ToVector3();
 	auto ox = round((distance.x * cosY) - (distance.z * sinY)) + pose.Position.x;
 	auto oz = round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z;
 
