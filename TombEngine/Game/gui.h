@@ -2,6 +2,7 @@
 #include "Game/GuiObjects.h"
 #include "Scripting/Internal/LanguageScript.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"
 
@@ -107,10 +108,13 @@ namespace TEN::Gui
 
 	struct SettingsData
 	{
-		bool WaitingForKey = false; // Waiting for a key to be pressed when configuring controls.
-		bool IgnoreInput = false;   // Ignore input unless all keys were released.
-		int SelectedScreenResolution;
-		GameConfiguration Configuration;
+		static constexpr auto NEW_KEY_WAIT_TIMEOUT = 3.0f * FPS;
+
+		GameConfiguration Configuration = {};
+
+		int	  SelectedScreenResolution = 0;
+		bool  IgnoreInput			   = false; // Ignore input until all actions are inactive.
+		float NewKeyWaitTimer		   = 0.0f;
 	};
 
 	class GuiController

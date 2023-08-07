@@ -38,10 +38,6 @@ namespace TEN::Input
 	std::vector<float>		 KeyMap		 = {};
 	std::vector<float>		 AxisMap	 = {};
 
-	//  Deprecated legacy input bit fields.
-	int DbInput = 0;
-	int TrInput = 0;
-	
 	void InitializeEffect()
 	{
 		OisEffect = new Effect(Effect::ConstantForce, Effect::Constant);
@@ -151,15 +147,11 @@ namespace TEN::Input
 
 		for (auto& axis : AxisMap)
 			axis = 0.0f;
-
-		// Clear legacy bit fields.
-		DbInput = 0;
-		TrInput = 0;
 	}
 
 	void ApplyActionQueue()
 	{
-		for (int i = 0; i < (int)ActionID::Count; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			switch (ActionQueue[i])
 			{
@@ -189,7 +181,7 @@ namespace TEN::Input
 		for (int i = 1; i >= 0; i--)
 		{
 			auto mapType = (BindingMapType)i;
-			for (int j = 0; j < (int)ActionID::Count; j++)
+			for (int j = 0; j < (int)In::Count; j++)
 			{
 				auto actionID = (ActionID)j;
 				if (g_Bindings.GetBoundKey(mapType, actionID) != KC_UNASSIGNED)
@@ -221,14 +213,14 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < (int)ActionID::Count; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			auto actionID = (ActionID)i;
 
 			g_Bindings.SetConflict(actionID, false);
 
 			int key = g_Bindings.GetBoundKey(BindingMapType::Keyboard, (ActionID)i);
-			for (int j = 0; j < (int)ActionID::Count; j++)
+			for (int j = 0; j < (int)In::Count; j++)
 			{
 				if (key != g_Bindings.GetBoundKey(BindingMapType::Custom, (ActionID)j))
 					continue;
@@ -524,7 +516,7 @@ namespace TEN::Input
 		DefaultConflict();
 
 		// Update action map.
-		for (int i = 0; i < (int)ActionID::Count; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			auto actionID = (ActionID)i;
 			ActionMap[i].Update(Key(actionID));
@@ -536,20 +528,6 @@ namespace TEN::Input
 		// Additional handling.
 		HandleHotkeyActions();
 		SolveActionCollisions();
-
-		// Port actions back to legacy bit fields.
-		for (const auto& action : ActionMap)
-		{
-			// TEMP FIX: Only port up to 32 bits.
-			auto actionID = action.GetID();
-			if ((int)actionID >= 32)
-				break;
-
-			int actionBit = 1 << (int)actionID;
-
-			DbInput |= action.IsClicked() ? actionBit : 0;
-			TrInput |= action.IsHeld()	  ? actionBit : 0;
-		}
 	}
 
 	void ClearAllActions()
@@ -559,9 +537,6 @@ namespace TEN::Input
 
 		for (auto& queue : ActionQueue)
 			queue = QueueState::None;
-
-		DbInput = 0;
-		TrInput = 0;
 	}
 
 	void Rumble(float power, float delayInSec, RumbleMode mode)
@@ -606,7 +581,7 @@ namespace TEN::Input
 		if (!OisGamepad)
 			return false;
 
-		for (int i = 0; i < (int)ActionID::Count; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			auto actionID = (ActionID)i;
 
@@ -640,14 +615,6 @@ namespace TEN::Input
 	void ClearAction(ActionID actionID)
 	{
 		ActionMap[(int)actionID].Clear();
-
-		// TEMP FIX: Only port up to 32 bits.
-		if ((int)actionID >= 32)
-			return;
-
-		int actionBit = 1 << (int)actionID;
-		DbInput &= ~actionBit;
-		TrInput &= ~actionBit;
 	}
 
 	bool NoAction()
