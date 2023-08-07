@@ -400,7 +400,12 @@ namespace TEN::Input
 		try
 		{
 			OisMouse->capture();
-			const auto& state = OisMouse->getMouseState();
+			auto& state = OisMouse->getMouseState();
+
+			// Update active area resolution.
+			auto screenRes = g_Renderer.GetScreenResolution();
+			state.width = screenRes.x;
+			state.height = screenRes.y;
 
 			// Poll buttons.
 			for (int i = 0; i < MAX_MOUSE_KEYS; i++)
@@ -469,7 +474,6 @@ namespace TEN::Input
 	
 	void ReadGameController()
 	{
-		return;
 		if (OisGamepad == nullptr)
 			return;
 
@@ -715,10 +719,6 @@ namespace TEN::Input
 		// Additional handling.
 		HandleHotkeyActions();
 		SolveActionCollisions();
-
-		// TEMP: Mouse debug.
-		g_Renderer.PrintDebugMessage("Mouse X: %.3f", AxisMap[(int)InputAxis::Mouse].x);
-		g_Renderer.PrintDebugMessage("Mouse Y: %.3f", AxisMap[(int)InputAxis::Mouse].y);
 	}
 
 	void ClearAllActions()
