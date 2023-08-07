@@ -881,7 +881,6 @@ void DropPickups(ItemInfo* item)
 
 		// Iterate through all found items and statics around, and determine if dummy sphere
 		// intersects any of those. If so, try other corner.
-
 		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 		{
 			auto* currentItem = CollidedItems[i];
@@ -897,14 +896,19 @@ void DropPickups(ItemInfo* item)
 
 		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 		{
-			auto* currentMesh = CollidedMeshes[i];
-			if (!currentMesh)
+			const auto* currentMeshPtr = CollidedMeshes[i];
+			if (currentMeshPtr == nullptr)
 				break;
 
-			if (StaticObjects[currentMesh->staticNumber].collisionBox.ToBoundingOrientedBox(currentMesh->pos).Intersects(sphere))
+			const auto& staticObject = StaticObjects[currentMeshPtr->staticNumber];
+			if (staticObject.collisionBox.HasSize())
 			{
-				collidedWithObject = true;
-				break;
+				auto box = staticObject.collisionBox.ToBoundingOrientedBox(currentMeshPtr->pos);
+				if (box.Intersects(sphere))
+				{
+					collidedWithObject = true;
+					break;
+				}
 			}
 		}
 
