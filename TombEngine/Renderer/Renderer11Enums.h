@@ -119,7 +119,7 @@ enum class RendererDebugPage
 	RendererStats,
 	DimensionStats,
 	PlayerStats,
-	LogicStats,
+	InputStats,
 	CollisionStats,
 	PathfindingStats,
 	WireframeMode,

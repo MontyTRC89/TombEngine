@@ -1158,14 +1158,15 @@ namespace TEN::Renderer
 				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
 				PrintDebugMessage("CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				PrintDebugMessage("CanMonkeySwing: %d", Lara.Control.CanMonkeySwing);
+				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				break;
 
-			case RendererDebugPage::LogicStats:
-				PrintDebugMessage("LOGIC STATS");
-				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
+			case RendererDebugPage::InputStats:
+				PrintDebugMessage("INPUT STATS");
 				PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
 				PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
 				PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
+				PrintDebugMessage("Cursor pos: %d, %d", GetCursorPosition().x, GetCursorPosition().y);
 				break;
 
 			case RendererDebugPage::CollisionStats:

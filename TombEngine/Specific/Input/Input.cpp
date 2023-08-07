@@ -374,16 +374,14 @@ namespace TEN::Input
 			// Poll keys.
 			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			{
-				if (OisKeyboard->isKeyDown((KeyCode)i))
-				{
-					KeyMap[i] = true;
-
-					// Interpret discrete directional keypresses as analog axis values.
-					SetDiscreteAxisValues(i);
+				if (!OisKeyboard->isKeyDown((KeyCode)i))
 					continue;
-				}
 
-				KeyMap[i] = false;
+				int key = WrapSimilarKeys(i);
+				KeyMap[key] = true;
+
+				// Interpret discrete directional keypresses as analog axis values.
+				SetDiscreteAxisValues(key);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -808,6 +806,12 @@ namespace TEN::Input
 		{
 			return false;
 		}
+	}
+
+	Vector2i GetCursorPosition()
+	{
+		const auto& state = OisMouse->getMouseState();
+		return Vector2i(state.width, state.height);
 	}
 
 	void ClearAction(ActionID actionID)

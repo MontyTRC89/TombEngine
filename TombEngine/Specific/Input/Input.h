@@ -102,8 +102,9 @@ namespace TEN::Input
     void ApplyDefaultBindings();
     bool ApplyDefaultXInputBindings();
 
-	// TODO: Later, all these global action accessor functions should be tied to a specific controller/player.
-	// Having them loose like this is very inelegant, but since this is only the first iteration, they will do for now. -- Sezz 2022.10.12
+	Vector2i GetCursorPosition();
+
+	// TODO: Move global query functions to player input object (not happening soon). -- Sezz 2023.08.07
 	void  ClearAction(ActionID actionID);
 	bool  NoAction();
 	bool  IsClicked(ActionID actionID);
