@@ -811,7 +811,7 @@ namespace TEN::Input
 	Vector2i GetCursorPosition()
 	{
 		const auto& state = OisMouse->getMouseState();
-		return Vector2i(state.width, state.height);
+		return Vector2i(state.X.abs, state.Y.abs);
 	}
 
 	void ClearAction(ActionID actionID)
