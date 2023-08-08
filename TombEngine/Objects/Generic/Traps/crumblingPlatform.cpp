@@ -72,8 +72,10 @@ void CrumblingPlatformControl(short itemNumber)
 	if (item.TriggerFlags < 0)
 	{
 		if (TriggerActive(&item))
+		{
 			CrumblingPlatformActivate(itemNumber);
-
+			item.TriggerFlags = -item.TriggerFlags;
+		}
 		return;
 	}
 
