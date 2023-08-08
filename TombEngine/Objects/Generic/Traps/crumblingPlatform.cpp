@@ -12,7 +12,7 @@ constexpr auto CRUMBLING_PLATFORM_INITIAL_SPEED = 10;
 constexpr auto CRUMBLING_PLATFORM_MAX_SPEED = 100;
 constexpr auto CRUMBLING_PLATFORM_FALL_VELOCITY = 4;
 
-constexpr auto CRUMBLING_PLATFORM_DELAY = 52;
+constexpr auto CRUMBLING_PLATFORM_DELAY = 35;
 
 //I clamped it to ensure the value is less than half CLICK or it may not update room properly when landing on slopes in 1 click height rooms.
 constexpr auto CRUMBLING_PLATFORM_HEIGHT_TOLERANCE = std::clamp(8, 0, 128);
@@ -45,6 +45,11 @@ void InitializeCrumblingPlatform(short itemNumber)
 	auto bounds = GameBoundingBox(&item);
 	item.ItemFlags[2] = bounds.Y1; //floor
 	item.ItemFlags[3] = bounds.Y2; //ceiling
+
+	//ItemFlags 0 = timer
+	//ItemFlags 1 = gravity velocity
+	//ItemFlags 2 = Top height of bounding box
+	//ItemFlags 3 = Bottom height of bounding box
 }
 
 void CrumblingPlatformCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -131,10 +136,13 @@ void CrumblingPlatformControl(short itemNumber)
 
 		case CRUMBLING_PLATFORM_STATE_LANDING:
 		{
+			//Is hitting the ground.
+			
+			//Align to surface
 			auto radius = Vector2(Objects[item.ObjectNumber].radius);
 			AlignEntityToSurface(&item, radius);
 
-			//Is landing, check if it's the last frame to deactivate the item.
+			//Check if it's the last frame to deactivate the item.
 			int frameEnd = GetAnimData(Objects[item.ObjectNumber], CRUMBLING_PLATFORM_ANIM_LANDING).frameEnd;
 			if (item.Animation.FrameNumber >= frameEnd)
 			{
@@ -162,7 +170,7 @@ void CrumblingPlatformActivate(short itemNumber)
 
 	SetAnimation(&item, CRUMBLING_PLATFORM_ANIM_SHAKING);
 		
-	//item.Flags |= CODE_BITS;
+	item.Flags |= CODE_BITS;
 }
 
 std::optional<int> CrumblingPlatformFloor(short itemNumber, int x, int y, int z)
@@ -170,13 +178,9 @@ std::optional<int> CrumblingPlatformFloor(short itemNumber, int x, int y, int z)
 	ItemInfo& item = g_Level.Items[itemNumber];
 
 	if (item.Animation.ActiveState <= CRUMBLING_PLATFORM_STATE_SHAKING)
-	{
 		return item.Pose.Position.y + item.ItemFlags[2];
-	}
 	else
-	{
 		return std::nullopt;
-	}
 }
 
 std::optional<int> CrumblingPlatformCeiling(short itemNumber, int x, int y, int z)
@@ -184,13 +188,9 @@ std::optional<int> CrumblingPlatformCeiling(short itemNumber, int x, int y, int 
 	ItemInfo& item = g_Level.Items[itemNumber];
 
 	if (item.Animation.ActiveState <= CRUMBLING_PLATFORM_STATE_SHAKING)
-	{
 		return item.Pose.Position.y + item.ItemFlags[3];
-	}
 	else
-	{
 		return std::nullopt;
-	}
 }
 
 int CrumblingPlatformFloorBorder(short itemNumber)
