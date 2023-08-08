@@ -40,6 +40,7 @@
 // Traps
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Objects/Generic/Traps/falling_block.h"
+#include "Objects/Generic/Traps/crumblingPlatform.h"
 
 using namespace TEN::Entities::Doors;
 using namespace TEN::Entities::Generic;
@@ -444,9 +445,14 @@ void StartTraps(ObjectInfo* object)
 	object = &Objects[ID_CRUMBLING_FLOOR];
 	if (object->loaded)
 	{
-		object->Initialize = InitializeFallingBlock;
-		object->collision = FallingBlockCollision;
-		object->control = FallingBlockControl;
+		object->Initialize = InitializeCrumblingPlatform;
+		object->collision = CrumblingPlatformCollision;
+		object->control = CrumblingPlatformControl;
+
+		object->floor = CrumblingPlatformFloor;
+		object->ceiling = CrumblingPlatformCeiling;
+		object->floorBorder = CrumblingPlatformFloorBorder;
+		object->ceilingBorder = CrumblingPlatformCeilingBorder;
 	}
 
 	object = &Objects[ID_PARALLEL_BARS];
