@@ -11,17 +11,29 @@ namespace TEN::Entities::Generic
 {
 	void ActivateClimbablePushableCollider(int itemNumber)
 	{
-		AddBridge(itemNumber);
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		if (pushable.UsesRoomCollision)
+			AddBridge(itemNumber);
 	}
 
 	void DeactivateClimbablePushableCollider(int itemNumber)
 	{
-		RemoveBridge(itemNumber);
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+		
+		if (pushable.UsesRoomCollision)
+			RemoveBridge(itemNumber);
 	}
 
 	void RefreshClimbablePushableCollider(int itemNumber)
 	{
-		UpdateBridgeItem(itemNumber);
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		if (pushable.UsesRoomCollision)
+			UpdateBridgeItem(itemNumber);
 	}
 
 	std::optional<int> ClimbablePushableFloor(int itemNumber, int x, int y, int z)

@@ -103,8 +103,7 @@ namespace TEN::Entities::Generic
 
 				ResetPlayerFlex(LaraItem);
 
-				if (pushable.UsesRoomCollision)
-					DeactivateClimbablePushableCollider(itemNumber);
+				DeactivateClimbablePushableCollider(itemNumber);
 			}
 			else if (	LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB &&
 						LaraItem->Animation.ActiveState != LS_PUSHABLE_PULL &&
@@ -119,8 +118,7 @@ namespace TEN::Entities::Generic
 		//2. Check if it's in a water room
 		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
-			if (pushable.UsesRoomCollision)
-				DeactivateClimbablePushableCollider(itemNumber);
+			DeactivateClimbablePushableCollider(itemNumber);
 			SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
 			if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
@@ -137,14 +135,10 @@ namespace TEN::Entities::Generic
 		}
 
 		//3. Check if floor has changed
+		DeactivateClimbablePushableCollider(itemNumber);
 		int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
+		ActivateClimbablePushableCollider(itemNumber);
 
-		if (pushable.UsesRoomCollision)
-		{
-			DeactivateClimbablePushableCollider(itemNumber);
-			floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
-			ActivateClimbablePushableCollider(itemNumber);
-		}
 
 		if (floorHeight > pushableItem.Pose.Position.y)			//The floor has decresed. (Flip map, trapdoor, etc...)
 		{
@@ -153,8 +147,7 @@ namespace TEN::Entities::Generic
 			{
 				pushable.BehaviourState = PushablePhysicState::Falling;
 				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
-				if (pushable.UsesRoomCollision)
-					DeactivateClimbablePushableCollider(itemNumber);
+				DeactivateClimbablePushableCollider(itemNumber);
 			}
 			else
 			{
@@ -318,8 +311,7 @@ namespace TEN::Entities::Generic
 				LaraItem->Animation.TargetState = LS_IDLE;
 				pushable.BehaviourState = PushablePhysicState::Idle;
 				StopMovePushableStack(itemNumber); //Set the upper pushables back to normal.
-				if (pushable.UsesRoomCollision)
-					ActivateClimbablePushableCollider(itemNumber);
+				ActivateClimbablePushableCollider(itemNumber);
 
 				//The pushable is going to stop here, do the checks to conect it with another Stack.
 				int FoundStack = SearchNearPushablesStack(itemNumber);
@@ -385,9 +377,10 @@ namespace TEN::Entities::Generic
 		//place on ground
 		pushable.BehaviourState = PushablePhysicState::Idle;
 		pushableItem.Pose.Position.y = pointColl.Position.Floor;
+		
+		ActivateClimbablePushableCollider(itemNumber);
+
 		pushableItem.Animation.Velocity.y = 0;
-		if (pushable.UsesRoomCollision)
-			ActivateClimbablePushableCollider(itemNumber);
 
 		// Shake floor if pushable landed at high enough velocity.
 		if (velocityY >= PUSHABLE_FALL_RUMBLE_VELOCITY)
@@ -524,8 +517,7 @@ namespace TEN::Entities::Generic
 		pushable.BehaviourState = PushablePhysicState::WatersurfaceIdle;
 		pushableItem.Pose.Position.y = goalHeight;
 
-		if (pushable.UsesRoomCollision)
-			ActivateClimbablePushableCollider(itemNumber);
+		ActivateClimbablePushableCollider(itemNumber);
 
 		pushableItem.Animation.Velocity.y = 0.0f;
 	}
@@ -540,8 +532,9 @@ namespace TEN::Entities::Generic
 		{
 			pushable.BehaviourState = PushablePhysicState::Idle;
 			pushable.Gravity = GRAVITY_AIR;
-			if (pushable.UsesRoomCollision)
-				ActivateClimbablePushableCollider(itemNumber);
+			ActivateClimbablePushableCollider(itemNumber);
+
+			pushableItem.Animation.Velocity.y = 0;
 			return;
 		}
 
@@ -566,11 +559,9 @@ namespace TEN::Entities::Generic
 			pushable.Gravity = GRAVITY_AIR;
 			pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 
-			if (pushable.UsesRoomCollision)
-				DeactivateClimbablePushableCollider(itemNumber);
+			DeactivateClimbablePushableCollider(itemNumber);
 
 			pushableItem.Animation.Velocity.y = 0;
-
 			return;
 		}
 
