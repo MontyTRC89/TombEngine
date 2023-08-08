@@ -57,7 +57,7 @@ void CrumblingPlatformCollision(short itemNumber, ItemInfo* laraItem, CollisionI
 		//Checks if Lara and Item are in the same XZ sector. And Lara is over the platform.
 		if (!((item.Pose.Position.x ^ laraItem->Pose.Position.x) & 0xFFFFFC00) &&
 			!((laraItem->Pose.Position.z ^ item.Pose.Position.z) & 0xFFFFFC00) &&
-			abs(item.Pose.Position.y - CLICK(2) - laraItem->Pose.Position.y) < CRUMBLING_PLATFORM_HEIGHT_TOLERANCE)
+			abs((item.Pose.Position.y + item.ItemFlags[2]) - laraItem->Pose.Position.y) < CRUMBLING_PLATFORM_HEIGHT_TOLERANCE)
 		{
 			CrumblingPlatformActivate(itemNumber);
 		}
@@ -93,7 +93,6 @@ void CrumblingPlatformControl(short itemNumber)
 
 				auto& collisionResult = GetCollision(item);
 				collisionResult.Block->RemoveBridge(itemNumber);
-				UpdateBridgeItem(itemNumber);
 			}
 		}
 		break;
@@ -168,7 +167,7 @@ std::optional<int> CrumblingPlatformFloor(short itemNumber, int x, int y, int z)
 {
 	ItemInfo& item = g_Level.Items[itemNumber];
 
-	if (item.Animation.ActiveState >= CRUMBLING_PLATFORM_STATE_SHAKING)
+	if (item.Animation.ActiveState <= CRUMBLING_PLATFORM_STATE_SHAKING)
 	{
 		return item.Pose.Position.y + item.ItemFlags[2];
 	}
