@@ -101,9 +101,9 @@ void CrumblingPlatformControl(short itemNumber)
 		case CRUMBLING_PLATFORM_STATE_FALLING:
 		{
 			auto collisionResult = GetCollision(item);
-			auto height = abs(item.Pose.Position.y - collisionResult.Position.Floor);
+			auto height = item.Pose.Position.y - collisionResult.Position.Floor;
 
-			if (height > 0)
+			if (height < 0)
 			{//Is falling
 
 				item.ItemFlags[1] += CRUMBLING_PLATFORM_FALL_VELOCITY;
@@ -116,7 +116,7 @@ void CrumblingPlatformControl(short itemNumber)
 			else
 			{//Has reached the ground
 
-				item.Pose.Position.y = height;
+				item.Pose.Position.y = collisionResult.Position.Floor;
 
 				SetAnimation(&item, CRUMBLING_PLATFORM_ANIM_LANDING);
 			}
@@ -130,6 +130,9 @@ void CrumblingPlatformControl(short itemNumber)
 
 		case CRUMBLING_PLATFORM_STATE_LANDING:
 		{
+			auto radius = Vector2(Objects[item.ObjectNumber].radius);
+			AlignEntityToSurface(&item, radius);
+
 			//Is landing, check if it's the last frame to deactivate the item.
 			int frameEnd = GetAnimData(Objects[item.ObjectNumber], CRUMBLING_PLATFORM_ANIM_LANDING).frameEnd;
 			if (item.Animation.FrameNumber >= frameEnd)
