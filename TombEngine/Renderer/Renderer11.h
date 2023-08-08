@@ -69,9 +69,9 @@ namespace TEN::Renderer
 
 	struct RendererHudBar
 	{
-		static constexpr auto COLOR_COUNT		 = 5;
-		static constexpr auto BORDERSIZE_DEFAULT = 0.2f;
-		static constexpr auto SIZE_DEFAULT		 = Vector2(20.0f, 1.5f);
+		static constexpr auto COLOR_COUNT		  = 5;
+		static constexpr auto BORDER_SIZE_DEFAULT = 0.2f;
+		static constexpr auto SIZE_DEFAULT		  = Vector2(20.0f, 1.5f);
 
 		VertexBuffer VertexBufferBorder = VertexBuffer();
 		IndexBuffer	 IndexBufferBorder	= IndexBuffer();

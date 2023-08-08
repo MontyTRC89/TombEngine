@@ -94,13 +94,13 @@ namespace TEN::Renderer
 
 		g_MusicVolumeBar = new RendererHudBar(
 			m_device.Get(), Vector2(MenuRightSideEntry, y + shift),
-			RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, soundSettingColors);
+			RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDER_SIZE_DEFAULT, soundSettingColors);
 		
 		GetNextLinePosition(&y);
 		
 		g_SFXVolumeBar = new RendererHudBar(
 			m_device.Get(), Vector2(MenuRightSideEntry, y + shift),
-			RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, soundSettingColors);
+			RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDER_SIZE_DEFAULT, soundSettingColors);
 	}
 
 	void Renderer11::RenderOptionsMenu(Menu menu, float initialY)
@@ -694,7 +694,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
-		static const auto COUNT_STRING_PREFIX = std::string("  ");
+		constexpr auto STRING_OFFSET = Vector2(SCREEN_SPACE_RES.x * 0.02f, 0.0f);
 
 		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
@@ -708,8 +708,8 @@ namespace TEN::Renderer
 		if (pickup.Count > 1)
 		{
 			AddString(
-				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
-				pickup.Position2D, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+				std::to_string(pickup.Count),
+				pickup.Position2D + STRING_OFFSET, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}
 	}
 
@@ -727,7 +727,10 @@ namespace TEN::Renderer
 			screenRes.y / SCREEN_SPACE_RES.y);
 
 		pos2D *= factor;
-		scale *= (factor.x > factor.y) ? factor.y : factor.x * 0.01f;
+		scale *= (factor.x > factor.y) ? factor.y : factor.x;
+
+		// TODO: This corrective rescaling must happen elsewhere. I missed something. -- Sezz 2023.08.09
+		scale *= SCREEN_SPACE_RES.y / 600;
 
 		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
 		if (index != -1)

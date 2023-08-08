@@ -101,11 +101,11 @@ namespace TEN::Renderer
 			Vector4(0.0f, 0.18f, 0.38f, 1.0f)
 		};
 
-		g_AirBar = new RendererHudBar(m_device.Get(), AIR_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, AIR_BAR_COLORS);
-		g_ExposureBar = new RendererHudBar(m_device.Get(), EXPOSURE_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, EXPOSURE_BAR_COLORS);
-		g_HealthBar = new RendererHudBar(m_device.Get(), HEALTH_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, HEALTH_BAR_COLORS);
-		g_StaminaBar = new RendererHudBar(m_device.Get(), STAMINA_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, STAMINA_BAR_COLORS);
-		g_LoadingBar = new RendererHudBar(m_device.Get(), LOADING_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, LOADING_BAR_COLORS);
+		g_AirBar = new RendererHudBar(m_device.Get(), AIR_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDER_SIZE_DEFAULT, AIR_BAR_COLORS);
+		g_ExposureBar = new RendererHudBar(m_device.Get(), EXPOSURE_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDER_SIZE_DEFAULT, EXPOSURE_BAR_COLORS);
+		g_HealthBar = new RendererHudBar(m_device.Get(), HEALTH_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDER_SIZE_DEFAULT, HEALTH_BAR_COLORS);
+		g_StaminaBar = new RendererHudBar(m_device.Get(), STAMINA_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDER_SIZE_DEFAULT, STAMINA_BAR_COLORS);
+		g_LoadingBar = new RendererHudBar(m_device.Get(), LOADING_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDER_SIZE_DEFAULT, LOADING_BAR_COLORS);
 	}
 
 	void Renderer11::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)

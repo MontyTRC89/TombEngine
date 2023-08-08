@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -24,7 +25,6 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Renderer/Renderer11.h"
 
 /***
 Functions that don't fit in the other modules.

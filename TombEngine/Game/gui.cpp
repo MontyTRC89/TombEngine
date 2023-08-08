@@ -32,9 +32,9 @@ using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
-	constexpr auto SCREEN_CENTER   = Vector2(SCREEN_SPACE_RES.x / 2, SCREEN_SPACE_RES.y / 2);
-	constexpr auto LINE_HEIGHT	   = 4.15f; // SCREEN_SPACE_RES.y * 0.04f;
-	constexpr auto OBJLIST_SPACING = SCREEN_CENTER.x / 2;
+	constexpr auto SCREEN_CENTER	   = Vector2(SCREEN_SPACE_RES.x / 2, SCREEN_SPACE_RES.y / 2);
+	constexpr auto LINE_HEIGHT		   = SCREEN_SPACE_RES.y * 0.04f; //4.15f;
+	constexpr auto OBJECT_LIST_SPACING = SCREEN_CENTER.x / 2;
 
 	constexpr auto VOLUME_MAX  = 100;
 	constexpr auto VOLUME_STEP = VOLUME_MAX / 20;
@@ -2663,14 +2663,14 @@ namespace TEN::Gui
 		if (!AmmoSelectorFlag)
 			return;
 	
-		float xPos = ((SCREEN_CENTER.x * 2) - OBJLIST_SPACING) / 2;
+		float xPos = ((SCREEN_CENTER.x * 2) - OBJECT_LIST_SPACING) / 2;
 		if (NumAmmoSlots == 2)
 		{
-			xPos -= OBJLIST_SPACING / 2;
+			xPos -= OBJECT_LIST_SPACING / 2;
 		}
 		else if (NumAmmoSlots == 3)
 		{
-			xPos -= OBJLIST_SPACING;
+			xPos -= OBJECT_LIST_SPACING;
 		}
 
 		if (NumAmmoSlots > 0)
@@ -2728,7 +2728,7 @@ namespace TEN::Gui
 					g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 				}
 
-				xPos += OBJLIST_SPACING;
+				xPos += OBJECT_LIST_SPACING;
 			}
 		}
 	}
@@ -2831,7 +2831,7 @@ namespace TEN::Gui
 		int n = 0;
 
 		if (ring.NumObjectsInList != 1)
-			xOffset = (OBJLIST_SPACING * ring.ObjectListMovement) / 65536;
+			xOffset = (OBJECT_LIST_SPACING * ring.ObjectListMovement) / 65536;
 
 		if (ring.NumObjectsInList == 2)
 		{
@@ -3102,7 +3102,7 @@ namespace TEN::Gui
 						listObject.Bright = 32;
 				}
 
-				float x = (SCREEN_SPACE_RES.x / 2) + xOffset + (i * OBJLIST_SPACING);
+				float x = (SCREEN_SPACE_RES.x / 2) + xOffset + (i * OBJECT_LIST_SPACING);
 				float y = SCREEN_SPACE_RES.y / 4;
 				float y2 = SCREEN_SPACE_RES.y * 0.8f; // Combine.
 
