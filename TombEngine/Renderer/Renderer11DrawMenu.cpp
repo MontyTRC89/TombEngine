@@ -27,40 +27,40 @@ extern TEN::Renderer::RendererHudBar* g_MusicVolumeBar;
 namespace TEN::Renderer
 {
 	// Horizontal alignment constants
-	constexpr auto MenuLeftSideEntry = 200;
-	constexpr auto MenuCenterEntry = 400;
-	constexpr auto MenuRightSideEntry = 500;
+	constexpr auto MenuLeftSideEntry  = SCREEN_SPACE_RES.x / 4;
+	constexpr auto MenuCenterEntry	  = SCREEN_SPACE_RES.x / 2;
+	constexpr auto MenuRightSideEntry = SCREEN_SPACE_RES.x * 0.625f;
 
-	constexpr auto MenuLoadNumberLeftSide = 80;
-	constexpr auto MenuLoadNameLeftSide   = 150;
+	constexpr auto MenuLoadNumberLeftSide = 10.0f;
+	constexpr auto MenuLoadNameLeftSide   = 18.75f;
 
 	// Vertical spacing templates
-	constexpr auto MenuVerticalLineSpacing = 30;
-	constexpr auto MenuVerticalNarrowLineSpacing = 24;
-	constexpr auto MenuVerticalBlockSpacing = 50;
+	constexpr auto MenuVerticalLineSpacing		 = 5.0f;
+	constexpr auto MenuVerticalNarrowLineSpacing = 4.0f;
+	constexpr auto MenuVerticalBlockSpacing		 = 8.3f;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalTop = 11;
-	constexpr auto MenuVerticalDisplaySettings = 200;
-	constexpr auto MenuVerticalOtherSettings = 130;
-	constexpr auto MenuVerticalBottomCenter = 400;
-	constexpr auto MenuVerticalStatisticsTitle = 150;
-	constexpr auto MenuVerticalOptionsTitle = 350;
-	constexpr auto MenuVerticalPause = 220;
-	constexpr auto MenuVerticalOptionsPause = 275;
+	constexpr auto MenuVerticalTop			   = 1.8f;
+	constexpr auto MenuVerticalDisplaySettings = 33.3f;
+	constexpr auto MenuVerticalOtherSettings   = 21.6f;
+	constexpr auto MenuVerticalBottomCenter	   = 66.6f;
+	constexpr auto MenuVerticalStatisticsTitle = 25.0f;
+	constexpr auto MenuVerticalOptionsTitle	   = 58.3f;
+	constexpr auto MenuVerticalPause		   = 36.6f;
+	constexpr auto MenuVerticalOptionsPause	   = 45.8f;
 
 	// Title logo positioning
-	constexpr auto LogoTop = 50;
-	constexpr auto LogoWidth = 300;
-	constexpr auto LogoHeight = 150;
+	constexpr auto LogoTop	  = 8.33f;
+	constexpr auto LogoWidth  = 37.5f;
+	constexpr auto LogoHeight = 25.0f;
 
 	// Used with distance travelled
 	constexpr auto UnitsToMeters = 419;
 
 	// Helper functions to jump caret to new line
-	inline void GetNextLinePosition(int* value) { *value += MenuVerticalLineSpacing; }
-	inline void GetNextNarrowLinePosition(int* value) { *value += MenuVerticalNarrowLineSpacing; }
-	inline void GetNextBlockPosition(int* value) { *value += MenuVerticalBlockSpacing; }
+	inline void GetNextLinePosition(float* value) { *value += MenuVerticalLineSpacing; }
+	inline void GetNextNarrowLinePosition(float* value) { *value += MenuVerticalNarrowLineSpacing; }
+	inline void GetNextBlockPosition(float* value) { *value += MenuVerticalBlockSpacing; }
 
 	// Helper functions to construct string flags
 	inline int SF(bool selected = false) { return PRINTSTRING_OUTLINE | (selected ? PRINTSTRING_BLINK : 0); }
@@ -74,7 +74,7 @@ namespace TEN::Renderer
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
 	TEN::Renderer::RendererHudBar* g_SFXVolumeBar	= nullptr;
 
-	void Renderer11::InitializeMenuBars(int y)
+	void Renderer11::InitializeMenuBars(float y)
 	{
 		static const auto soundSettingColors = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
@@ -92,19 +92,25 @@ namespace TEN::Renderer
 
 		int shift = MenuVerticalLineSpacing / 2;
 
-		g_MusicVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
+		g_MusicVolumeBar = new RendererHudBar(
+			m_device.Get(), Vector2(MenuRightSideEntry, y + shift),
+			RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, soundSettingColors);
+		
 		GetNextLinePosition(&y);
-		g_SFXVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
+		
+		g_SFXVolumeBar = new RendererHudBar(
+			m_device.Get(), Vector2(MenuRightSideEntry, y + shift),
+			RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, soundSettingColors);
 	}
 
-	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
+	void Renderer11::RenderOptionsMenu(Menu menu, float initialY)
 	{
 		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = SCREEN_SPACE_RES.x - MenuLeftSideEntry;
 		static const auto LEFT_ARROW_STRING				  = std::string("<");
 		static const auto RIGHT_ARROW_STRING			  = std::string(">");
 		static const auto CONTROL_SETTINGS_BLOCK_Y_OFFSET = (MenuVerticalNarrowLineSpacing * (int)QuickActionStrings.size()) + (MenuVerticalBlockSpacing * 2);
 
-		int y = 0;
+		float y = 0.0f;
 		auto titleOption = g_Gui.GetSelectedOption();
 
 		char stringBuffer[32] = {};
@@ -455,7 +461,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderTitleMenu(Menu menu)
 	{
-		int y = MenuVerticalBottomCenter;
+		float y = MenuVerticalBottomCenter;
 		auto titleOption = g_Gui.GetSelectedOption();
 
 		// HACK: Check if it works properly -- Lwmte, 07.06.22
@@ -492,7 +498,7 @@ namespace TEN::Renderer
 			y = MenuVerticalLineSpacing;
 
 			// Title
-			AddString(MenuCenterEntry, 26, g_GameFlow->GetString(STRING_SELECT_LEVEL), PRINTSTRING_COLOR_ORANGE, SF_Center());
+			AddString(MenuCenterEntry, 4.3f, g_GameFlow->GetString(STRING_SELECT_LEVEL), PRINTSTRING_COLOR_ORANGE, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Level listing (starts with 1 because 0 is always title)
@@ -518,7 +524,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderPauseMenu(Menu menu)
 	{
-		int y = 0;
+		float y = 0.0f;
 		auto pauseOption = g_Gui.GetSelectedOption();
 
 		switch (g_Gui.GetMenuToDisplay())
@@ -572,7 +578,7 @@ namespace TEN::Renderer
 		}
 
 		// Setup needed parameters
-		int y = MenuVerticalLineSpacing;
+		float y = MenuVerticalLineSpacing;
 		short selection = g_Gui.GetLoadSaveSelection();
 		char stringBuffer[255];
 		SaveGame::LoadSavegameInfos();
@@ -721,7 +727,7 @@ namespace TEN::Renderer
 			screenRes.y / SCREEN_SPACE_RES.y);
 
 		pos2D *= factor;
-		scale *= (factor.x > factor.y) ? factor.y : factor.x;
+		scale *= (factor.x > factor.y) ? factor.y : factor.x * 0.01f;
 
 		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
 		if (index != -1)
@@ -788,9 +794,13 @@ namespace TEN::Renderer
 			auto worldMatrix = scaleMatrix * rotMatrix * tMatrix;
 
 			if (object.animIndex != -1)
+			{
 				m_stItem.World = (*moveableObject).AnimationTransforms[n] * worldMatrix;
+			}
 			else
+			{
 				m_stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
+			}
 
 			m_stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			m_stItem.Color = Vector4::One;

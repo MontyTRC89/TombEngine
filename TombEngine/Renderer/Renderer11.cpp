@@ -102,7 +102,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	RendererHudBar::RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, array<Vector4, COLOR_COUNT> colors)
+	RendererHudBar::RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, float borderSize, array<Vector4, COLOR_COUNT> colors)
 	{
 		constexpr auto VERTEX_COUNT		  = 5;
 		constexpr auto UV_COUNT			  = 5;

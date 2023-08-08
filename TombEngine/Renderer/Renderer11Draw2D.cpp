@@ -25,11 +25,11 @@ namespace TEN::Renderer
 {
 	void Renderer11::InitializeGameBars()
 	{
-		constexpr auto AIR_BAR_POS		= Vector2(630.0f, 30.0f);
-		constexpr auto EXPOSURE_BAR_POS = Vector2(630.0f, 70.0f);
-		constexpr auto HEALTH_BAR_POS	= Vector2(20.0f, 30.0f);
-		constexpr auto STAMINA_BAR_POS	= Vector2(630.0f, 50.0f);
-		constexpr auto LOADING_BAR_POS	= Vector2(325.0f, 550.0f);
+		constexpr auto AIR_BAR_POS		= Vector2(78.75f, 5.0f);
+		constexpr auto EXPOSURE_BAR_POS = Vector2(78.75f, 11.5f);
+		constexpr auto HEALTH_BAR_POS	= Vector2(2.5f, 5.0f);
+		constexpr auto STAMINA_BAR_POS	= Vector2(78.75f, 8.5f);
+		constexpr auto LOADING_BAR_POS	= Vector2(40.5f, 91.5f);
 
 		static const auto AIR_BAR_COLORS = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
@@ -101,11 +101,11 @@ namespace TEN::Renderer
 			Vector4(0.0f, 0.18f, 0.38f, 1.0f)
 		};
 
-		g_AirBar = new RendererHudBar(m_device.Get(), AIR_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, AIR_BAR_COLORS);
-		g_ExposureBar = new RendererHudBar(m_device.Get(), EXPOSURE_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, EXPOSURE_BAR_COLORS);
-		g_HealthBar = new RendererHudBar(m_device.Get(), HEALTH_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, HEALTH_BAR_COLORS);
-		g_StaminaBar = new RendererHudBar(m_device.Get(), STAMINA_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, STAMINA_BAR_COLORS);
-		g_LoadingBar = new RendererHudBar(m_device.Get(), LOADING_BAR_POS, RendererHudBar::SIZE_DEFAULT, 1, LOADING_BAR_COLORS);
+		g_AirBar = new RendererHudBar(m_device.Get(), AIR_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, AIR_BAR_COLORS);
+		g_ExposureBar = new RendererHudBar(m_device.Get(), EXPOSURE_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, EXPOSURE_BAR_COLORS);
+		g_HealthBar = new RendererHudBar(m_device.Get(), HEALTH_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, HEALTH_BAR_COLORS);
+		g_StaminaBar = new RendererHudBar(m_device.Get(), STAMINA_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, STAMINA_BAR_COLORS);
+		g_LoadingBar = new RendererHudBar(m_device.Get(), LOADING_BAR_POS, RendererHudBar::SIZE_DEFAULT, RendererHudBar::BORDERSIZE_DEFAULT, LOADING_BAR_COLORS);
 	}
 
 	void Renderer11::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)

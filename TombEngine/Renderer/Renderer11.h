@@ -69,8 +69,9 @@ namespace TEN::Renderer
 
 	struct RendererHudBar
 	{
-		static constexpr auto COLOR_COUNT  = 5;
-		static constexpr auto SIZE_DEFAULT = Vector2(150.0f, 10.0f);
+		static constexpr auto COLOR_COUNT		 = 5;
+		static constexpr auto BORDERSIZE_DEFAULT = 0.2f;
+		static constexpr auto SIZE_DEFAULT		 = Vector2(20.0f, 1.5f);
 
 		VertexBuffer VertexBufferBorder = VertexBuffer();
 		IndexBuffer	 IndexBufferBorder	= IndexBuffer();
@@ -86,7 +87,7 @@ namespace TEN::Renderer
 			| /   \ |
 			3-------4
 		*/
-		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, std::array<Vector4, COLOR_COUNT> colors);
+		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, float borderSize, std::array<Vector4, COLOR_COUNT> colors);
 	};
 
 	struct RendererAnimatedTexture
@@ -525,7 +526,7 @@ namespace TEN::Renderer
 		void InitializeScreen(int w, int h, HWND handle, bool reset);
 		void InitializeCommonTextures();
 		void InitializeGameBars();
-		void InitializeMenuBars(int y);
+		void InitializeMenuBars(float y);
 		void InitializeSky();
 
 		void DrawAllStrings();
@@ -596,7 +597,7 @@ namespace TEN::Renderer
 		void RenderTitleMenu(Menu menu);
 		void RenderPauseMenu(Menu menu);
 		void RenderLoadSaveMenu();
-		void RenderOptionsMenu(Menu menu, int initialY);
+		void RenderOptionsMenu(Menu menu, float initialY);
 		void RenderNewInventory();
 		void RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumber); 
 		void RenderBlobShadows(RenderView& renderView);
@@ -709,7 +710,7 @@ namespace TEN::Renderer
 		void SwitchDebugPage(bool goBack);
 		void DrawDisplayPickup(const DisplayPickup& pickup);
 		int  Synchronize();
-		void AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags);
+		void AddString(float x, float y, const std::string& string, D3DCOLOR color, int flags);
 		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
 		void AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page);
 		void FreeRendererData();

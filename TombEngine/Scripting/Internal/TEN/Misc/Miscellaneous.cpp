@@ -24,6 +24,7 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Renderer/Renderer11.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -33,6 +34,7 @@ Functions that don't fit in the other modules.
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Input;
+using TEN::Renderer::g_Renderer;
 
 namespace Misc 
 {
@@ -320,30 +322,30 @@ namespace Misc
 		return (int)round(Vector2::Distance(p1, p2));
 	}
 
-	///Translate a pair of percentages to screen-space pixel coordinates.
+	///Translate a pair of percentages to screen pixel coordinates.
 	//To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.
 	//@function PercentToScreen
 	//@tparam float x percent value to translate to x-coordinate
 	//@tparam float y percent value to translate to y-coordinate
-	//@treturn int x coordinate in pixels
-	//@treturn int y coordinate in pixels
+	//@treturn int x coordinate
+	//@treturn int y coordinate
 	//@usage	
-	//local halfwayX, halfwayY = PercentToScreen(50, 50)
-	//local baddy
+	//local centerX, centerY = PercentToScreen(50, 50)
+	//local enemy
 	//local spawnLocationNullmesh = GetMoveableByName("position_behind_left_pillar")
-	//local str1 = DisplayString("You spawned a baddy!", halfwayX, halfwayY, Color(255, 100, 100), false, {DisplayStringOption.SHADOW, DisplayStringOption.CENTER})
+	//local str1 = DisplayString("You spawned an enemy!", centerX, centerY, Color(255, 100, 100), false, { DisplayStringOption.SHADOW, DisplayStringOption.CENTER })
 	//
 	//LevelFuncs.triggerOne = function(obj) 
 	//	ShowString(str1, 4)
 	//end
 	static std::tuple<int, int> PercentToScreen(double x, double y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
-		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
-		int resX = static_cast<int>(std::round(fWidth / 100.0 * x));
-		int resY = static_cast<int>(std::round(fHeight / 100.0 * y));
-		//todo this still assumes a resolution of 800/600. account for this somehow
-		return std::make_tuple(resX, resY);
+		auto screenRes = g_Renderer.GetScreenResolution();
+		auto res = Vector2i(
+			(int)std::round(screenRes.x / (100.0 * x)),
+			(int)std::round(screenRes.y / (100.0 * y)));
+
+		return std::make_tuple(res.x, res.y);
 	}
 
 	///Translate a pair of coordinates to percentages of window dimensions.

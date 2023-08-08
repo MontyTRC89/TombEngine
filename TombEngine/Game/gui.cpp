@@ -32,10 +32,9 @@ using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
-	constexpr int LINE_HEIGHT = 25;
-	constexpr int PHD_CENTER_X = SCREEN_SPACE_RES.x / 2;
-	constexpr int PHD_CENTER_Y = SCREEN_SPACE_RES.y / 2;
-	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
+	constexpr auto SCREEN_CENTER   = Vector2(SCREEN_SPACE_RES.x / 2, SCREEN_SPACE_RES.y / 2);
+	constexpr auto LINE_HEIGHT	   = 4.15f; // SCREEN_SPACE_RES.y * 0.04f;
+	constexpr auto OBJLIST_SPACING = SCREEN_CENTER.x / 2;
 
 	constexpr auto VOLUME_MAX  = 100;
 	constexpr auto VOLUME_STEP = VOLUME_MAX / 20;
@@ -2242,7 +2241,7 @@ namespace TEN::Gui
 		if (ammoRing.RingActive)
 		{
 			auto optionString = g_GameFlow->GetString(OptionStrings[5].c_str());
-			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			g_Renderer.AddString(SCREEN_CENTER.x, SCREEN_CENTER.y, optionString, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (invRing.ObjectListMovement)
 				return;
@@ -2426,8 +2425,7 @@ namespace TEN::Gui
 				CurrentSelectedOption = *CurrentAmmoType;
 			}
 
-			int yPos = 310 - LINE_HEIGHT;
-
+			float yPos = (SCREEN_SPACE_RES.y / 2) - LINE_HEIGHT;
 			if (n == 1)
 			{
 				yPos += LINE_HEIGHT;
@@ -2445,12 +2443,12 @@ namespace TEN::Gui
 
 					if (i == CurrentSelectedOption)
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(SCREEN_CENTER.x, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 					else
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(SCREEN_CENTER.x, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 				}
@@ -2657,7 +2655,7 @@ namespace TEN::Gui
 
 	void GuiController::SpinBack(EulerAngles& orient)
 	{
-		orient.Lerp(EulerAngles::Zero, 1.0f / 8);
+		orient.Lerp(EulerAngles::Zero, 1 / 8.0f);
 	}
 
 	void GuiController::DrawAmmoSelector()
@@ -2665,11 +2663,15 @@ namespace TEN::Gui
 		if (!AmmoSelectorFlag)
 			return;
 	
-		int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) / 2;
+		float xPos = ((SCREEN_CENTER.x * 2) - OBJLIST_SPACING) / 2;
 		if (NumAmmoSlots == 2)
+		{
 			xPos -= OBJLIST_SPACING / 2;
+		}
 		else if (NumAmmoSlots == 3)
+		{
 			xPos -= OBJLIST_SPACING;
+		}
 
 		if (NumAmmoSlots > 0)
 		{
@@ -2689,10 +2691,13 @@ namespace TEN::Gui
 						AmmoObjectList[n].Orientation.z += ANGLE(5.0f);
 				}
 				else
+				{
 					SpinBack(AmmoObjectList[n].Orientation);
+				}
 
-				int x = PHD_CENTER_X - 300 + xPos;
-				int y = 480;
+				float x = SCREEN_CENTER.x - 37.5f + xPos;
+				float y = SCREEN_SPACE_RES.y * 0.8f;
+
 				short objectNumber = ConvertInventoryItemToObject(AmmoObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[AmmoObjectList[n].InventoryItem].Scale1;
 
@@ -2711,7 +2716,7 @@ namespace TEN::Gui
 
 					// CHECK: AmmoSelectorFadeVal is never true and therefore the string is never printed.
 					//if (AmmoSelectorFadeVal)
-						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(SCREEN_CENTER.x, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				
 					if (n == *CurrentAmmoType)
 						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
@@ -2822,11 +2827,11 @@ namespace TEN::Gui
 
 		int minObj = 0;
 		int maxObj = 0;
-		int xOffset = 0;
+		float xOffset = 0.0f;
 		int n = 0;
 
 		if (ring.NumObjectsInList != 1)
-			xOffset = (OBJLIST_SPACING * ring.ObjectListMovement) >> 16;
+			xOffset = (OBJLIST_SPACING * ring.ObjectListMovement) / 65536;
 
 		if (ring.NumObjectsInList == 2)
 		{
@@ -3041,14 +3046,14 @@ namespace TEN::Gui
 					int objectNumber;
 					if (ringType == RingTypes::Inventory)
 					{
-						objectNumber = int(PHD_CENTER_Y - (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.5);
+						objectNumber = int(SCREEN_CENTER.y - (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.5);
 					}
 					else
 					{
-						objectNumber = int(PHD_CENTER_Y + (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.0);
+						objectNumber = int(SCREEN_CENTER.y + (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.0);
 					}
 
-					g_Renderer.AddString(PHD_CENTER_X, objectNumber, textBuffer, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(SCREEN_CENTER.x, objectNumber, textBuffer, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				}
 
 				if (!i && !ring.ObjectListMovement)
@@ -3097,9 +3102,10 @@ namespace TEN::Gui
 						listObject.Bright = 32;
 				}
 
-				int x = 400 + xOffset + i * OBJLIST_SPACING;
-				int y = 150;
-				int y2 = 480; // Combine.
+				float x = (SCREEN_SPACE_RES.x / 2) + xOffset + (i * OBJLIST_SPACING);
+				float y = SCREEN_SPACE_RES.y / 4;
+				float y2 = SCREEN_SPACE_RES.y * 0.8f; // Combine.
+
 				short objectNumber = ConvertInventoryItemToObject(listObject.InventoryItem);
 				float scaler = invObject.Scale1;
 				auto& orient = listObject.Orientation;

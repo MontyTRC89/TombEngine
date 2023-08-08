@@ -15,7 +15,7 @@ namespace TEN::Renderer
 		AddString(string, pos, color, scale, FLAGS);
 	}
 
-	void Renderer11::AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags)
+	void Renderer11::AddString(float x, float y, const std::string& string, D3DCOLOR color, int flags)
 	{
 		AddString(string, Vector2(x, y), Color(color), 1.0f, flags);
 	}
@@ -89,7 +89,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawAllStrings()
 	{
-		float shadowOffset = 1.5f / (REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing());
+		float shadowOffset = 0.25f / (REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing());
 
 		m_spriteBatch->Begin();
 
