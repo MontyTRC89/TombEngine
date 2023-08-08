@@ -97,7 +97,7 @@ namespace TEN::Entities::Generic
 
 		// Is ceiling (square or diagonal) high enough?
 		int distanceToCeiling = abs(collisionResult.Position.Ceiling - collisionResult.Position.Floor);
-		int blockHeight = CalculateStackHeight(itemNumber);
+		int blockHeight = CalculateStackHeight(itemNumber) - PUSHABLE_HEIGHT_TOLERANCE;
 		if (distanceToCeiling < blockHeight)
 			return false;
 
