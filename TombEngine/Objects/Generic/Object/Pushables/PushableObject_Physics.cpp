@@ -98,7 +98,7 @@ namespace TEN::Entities::Generic
 				pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 				pushable.BehaviourState = PushablePhysicState::Moving;
 
-				StartMovePushableStack(itemNumber);		//Prepare to the upper pushables in the stack for the move.
+				StartMovePushableStack(itemNumber);		//Prepare the upper pushables in the stack for the move.
 				UnpilePushable(itemNumber);				//Cut the link with the lower pushables in the stack.
 
 				ResetPlayerFlex(LaraItem);
@@ -153,7 +153,7 @@ namespace TEN::Entities::Generic
 			{
 				int heightdifference = floorHeight - pushableItem.Pose.Position.y;
 				pushableItem.Pose.Position.y += heightdifference;
-				VerticalPosAddition(itemNumber, heightdifference);
+				VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.
 			}
 			
 			return;
@@ -162,7 +162,7 @@ namespace TEN::Entities::Generic
 		{
 			int heightdifference = floorHeight - pushableItem.Pose.Position.y;
 			pushableItem.Pose.Position.y += heightdifference;
-			VerticalPosAddition(itemNumber, heightdifference);
+			VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.
 			return;
 		}
 
@@ -286,18 +286,15 @@ namespace TEN::Entities::Generic
 
 			//3. Check floor height
 			// Check if pushing pushable over edge. Then can't keep pushing/pulling and pushable start to fall.
-			if (pushable.CanFall && !isPlayerPulling)
+			int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
+			if (floorHeight > pushableItem.Pose.Position.y)
 			{
-				int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
-				if (floorHeight > pushableItem.Pose.Position.y)
-				{
-					LaraItem->Animation.TargetState = LS_IDLE;
-					Lara.Context.InteractedItem = NO_ITEM;
-					pushable.BehaviourState = PushablePhysicState::Falling;
-					pushable.CurrentSoundState = PushableSoundState::None;
+				LaraItem->Animation.TargetState = LS_IDLE;
+				Lara.Context.InteractedItem = NO_ITEM;
+				pushable.BehaviourState = PushablePhysicState::Falling;
+				pushable.CurrentSoundState = PushableSoundState::None;
 
-					return;
-				}
+				return;
 			}
 
 			//5. Check input too see if it can keep the movement
@@ -305,7 +302,6 @@ namespace TEN::Entities::Generic
 			// Check the pushable animation system in use, if is using block animation which can't loop, go back to idle state.
 			if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop ||
 				!IsHeld(In::Action) ||
-				!IsUnderStackLimit(itemNumber) ||
 				!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling))
 			{
 				LaraItem->Animation.TargetState = LS_IDLE;
@@ -452,6 +448,7 @@ namespace TEN::Entities::Generic
 		{
 			pushable.BehaviourState = PushablePhysicState::UnderwaterIdle;
 			pushableItem.Pose.Position.y = pointColl.Position.Floor;
+			ActivateClimbablePushableCollider(itemNumber);
 		}
 
 		pushableItem.Animation.Velocity.y = 0.0f;
@@ -532,7 +529,6 @@ namespace TEN::Entities::Generic
 		{
 			pushable.BehaviourState = PushablePhysicState::Idle;
 			pushable.Gravity = GRAVITY_AIR;
-			ActivateClimbablePushableCollider(itemNumber);
 
 			pushableItem.Animation.Velocity.y = 0;
 			return;
