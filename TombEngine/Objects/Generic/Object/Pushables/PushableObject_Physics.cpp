@@ -11,11 +11,13 @@
 #include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Stack.h"
+#include "Math/Random.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Input;
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Generic
 {
@@ -516,7 +518,7 @@ namespace TEN::Entities::Generic
 
 		ActivateClimbablePushableCollider(itemNumber);
 
-		pushableItem.Animation.Velocity.y = 0.0f;
+		pushableItem.Animation.Velocity.y = GenerateFloat(0.0f, 125.0f);
 	}
 
 	void HandleUnderwaterState(int itemNumber)
