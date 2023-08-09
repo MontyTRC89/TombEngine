@@ -284,7 +284,8 @@ void FlowHandler::LoadFlowScript()
 	}
 }
 
-char const * FlowHandler::GetString(const char* id) const
+// TODO: Use std::string.
+const char* FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
 	{

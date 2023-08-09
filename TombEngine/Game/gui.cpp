@@ -2241,7 +2241,7 @@ namespace TEN::Gui
 		if (ammoRing.RingActive)
 		{
 			auto optionString = g_GameFlow->GetString(OptionStrings[5].c_str());
-			g_Renderer.AddString(SCREEN_CENTER.x, SCREEN_CENTER.y, optionString, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			g_Renderer.AddString(optionString, SCREEN_CENTER, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 			if (invRing.ObjectListMovement)
 				return;
@@ -2443,12 +2443,12 @@ namespace TEN::Gui
 
 					if (i == CurrentSelectedOption)
 					{
-						g_Renderer.AddString(SCREEN_CENTER.x, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(optionString, Vector2(SCREEN_CENTER.x, yPos), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 					else
 					{
-						g_Renderer.AddString(SCREEN_CENTER.x, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(optionString, Vector2(SCREEN_CENTER.x, yPos), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 						yPos += LINE_HEIGHT;
 					}
 				}
@@ -2716,12 +2716,16 @@ namespace TEN::Gui
 
 					// CHECK: AmmoSelectorFadeVal is never true and therefore the string is never printed.
 					//if (AmmoSelectorFadeVal)
-						g_Renderer.AddString(SCREEN_CENTER.x, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(&invTextBuffer[0], Vector2(SCREEN_CENTER.x, 63.3f), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				
 					if (n == *CurrentAmmoType)
+					{
 						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
+					}
 					else
+					{
 						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
+					}
 				}
 				else
 				{
@@ -3043,17 +3047,17 @@ namespace TEN::Gui
 						}
 					}
 
-					int objectNumber;
+					float yPos = 0.0f;
 					if (ringType == RingTypes::Inventory)
 					{
-						objectNumber = int(SCREEN_CENTER.y - (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.5);
+						yPos = SCREEN_CENTER.y - (((SCREEN_SPACE_RES.y + 1) * 0.0625f) * 2.5f);
 					}
 					else
 					{
-						objectNumber = int(SCREEN_CENTER.y + (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.0);
+						yPos = SCREEN_CENTER.y + (((SCREEN_SPACE_RES.y + 1) * 0.0625f) * 2.0f);
 					}
 
-					g_Renderer.AddString(SCREEN_CENTER.x, objectNumber, textBuffer, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(textBuffer, Vector2(SCREEN_CENTER.x, yPos), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				}
 
 				if (!i && !ring.ObjectListMovement)

@@ -15,9 +15,9 @@ namespace TEN::Renderer
 		AddString(string, pos, color, scale, FLAGS);
 	}
 
-	void Renderer11::AddString(float x, float y, const std::string& string, D3DCOLOR color, int flags)
+	void Renderer11::AddString(const std::string& string, const Vector2& pos, D3DCOLOR color, int flags)
 	{
-		AddString(string, Vector2(x, y), Color(color), 1.0f, flags);
+		AddString(string, pos, Color(color), 1.0f, flags);
 	}
 
 	void Renderer11::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)

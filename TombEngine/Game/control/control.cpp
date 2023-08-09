@@ -452,9 +452,11 @@ void InitializeScripting(int levelIndex, bool loadGame)
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
 			g_Renderer.AddString(
-				float(x) / float(g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
-				float(y) / float(g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y,
-				key.c_str(), col, flags);
+				key,
+				Vector2(
+					((float)x / (float)g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
+					((float)y / (float)g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y),
+				col, flags);
 		});
 	}
 
