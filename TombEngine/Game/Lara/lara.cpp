@@ -285,8 +285,8 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_surface_idle,//33
 	lara_col_surface_swim_forward,//34
 	lara_col_surface_dive,//35
-	lara_default_col,
-	lara_default_col,
+	lara_void_func,//36
+	lara_void_func,//37
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
