@@ -10,4 +10,6 @@ namespace TEN::Entities::Generic
 	std::optional<int> ClimbablePushableCeiling(int itemNumber, int x, int y, int z);
 	int ClimbablePushableFloorBorder(int itemNumber);
 	int ClimbablePushableCeilingBorder(int itemNumber);
+
+	void AddBridgePushableStack(int itemNumber, bool addBridge);
 }

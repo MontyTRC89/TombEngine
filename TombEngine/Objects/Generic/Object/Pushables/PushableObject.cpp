@@ -112,7 +112,9 @@ namespace TEN::Entities::Generic
 		PushablesManageSounds(itemNumber, pushable);
 
 		//Update Room Number
+		AddBridgePushableStack(itemNumber, false);
 		int probedRoomNumber = GetCollision(&pushableItem).RoomNumber;
+		AddBridgePushableStack(itemNumber, true);
 		if (pushableItem.RoomNumber != probedRoomNumber)
 		{
 			ItemNewRoom(itemNumber, probedRoomNumber);

@@ -148,6 +148,8 @@ table Pushable {
 	pushable_startZ: int32;
 	pushable_roomNumber: int32;
 
+	pushable_collider_flag: bool;
+
 	pushable_north_pullable: bool;
 	pushable_north_pushable: bool;
 	pushable_north_climbable: bool;

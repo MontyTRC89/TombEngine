@@ -2177,6 +2177,7 @@ struct PushableT : public flatbuffers::NativeTable {
   int32_t pushable_startX = 0;
   int32_t pushable_startZ = 0;
   int32_t pushable_roomNumber = 0;
+  bool pushable_collider_flag = false;
   bool pushable_north_pullable = false;
   bool pushable_north_pushable = false;
   bool pushable_north_climbable = false;
@@ -2205,18 +2206,19 @@ struct Pushable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_PUSHABLE_STARTX = 16,
     VT_PUSHABLE_STARTZ = 18,
     VT_PUSHABLE_ROOMNUMBER = 20,
-    VT_PUSHABLE_NORTH_PULLABLE = 22,
-    VT_PUSHABLE_NORTH_PUSHABLE = 24,
-    VT_PUSHABLE_NORTH_CLIMBABLE = 26,
-    VT_PUSHABLE_EAST_PULLABLE = 28,
-    VT_PUSHABLE_EAST_PUSHABLE = 30,
-    VT_PUSHABLE_EAST_CLIMBABLE = 32,
-    VT_PUSHABLE_SOUTH_PULLABLE = 34,
-    VT_PUSHABLE_SOUTH_PUSHABLE = 36,
-    VT_PUSHABLE_SOUTH_CLIMBABLE = 38,
-    VT_PUSHABLE_WEST_PULLABLE = 40,
-    VT_PUSHABLE_WEST_PUSHABLE = 42,
-    VT_PUSHABLE_WEST_CLIMBABLE = 44
+    VT_PUSHABLE_COLLIDER_FLAG = 22,
+    VT_PUSHABLE_NORTH_PULLABLE = 24,
+    VT_PUSHABLE_NORTH_PUSHABLE = 26,
+    VT_PUSHABLE_NORTH_CLIMBABLE = 28,
+    VT_PUSHABLE_EAST_PULLABLE = 30,
+    VT_PUSHABLE_EAST_PUSHABLE = 32,
+    VT_PUSHABLE_EAST_CLIMBABLE = 34,
+    VT_PUSHABLE_SOUTH_PULLABLE = 36,
+    VT_PUSHABLE_SOUTH_PUSHABLE = 38,
+    VT_PUSHABLE_SOUTH_CLIMBABLE = 40,
+    VT_PUSHABLE_WEST_PULLABLE = 42,
+    VT_PUSHABLE_WEST_PUSHABLE = 44,
+    VT_PUSHABLE_WEST_CLIMBABLE = 46
   };
   int32_t pushable_behaviour_state() const {
     return GetField<int32_t>(VT_PUSHABLE_BEHAVIOUR_STATE, 0);
@@ -2244,6 +2246,9 @@ struct Pushable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t pushable_roomNumber() const {
     return GetField<int32_t>(VT_PUSHABLE_ROOMNUMBER, 0);
+  }
+  bool pushable_collider_flag() const {
+    return GetField<uint8_t>(VT_PUSHABLE_COLLIDER_FLAG, 0) != 0;
   }
   bool pushable_north_pullable() const {
     return GetField<uint8_t>(VT_PUSHABLE_NORTH_PULLABLE, 0) != 0;
@@ -2292,6 +2297,7 @@ struct Pushable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_PUSHABLE_STARTX) &&
            VerifyField<int32_t>(verifier, VT_PUSHABLE_STARTZ) &&
            VerifyField<int32_t>(verifier, VT_PUSHABLE_ROOMNUMBER) &&
+           VerifyField<uint8_t>(verifier, VT_PUSHABLE_COLLIDER_FLAG) &&
            VerifyField<uint8_t>(verifier, VT_PUSHABLE_NORTH_PULLABLE) &&
            VerifyField<uint8_t>(verifier, VT_PUSHABLE_NORTH_PUSHABLE) &&
            VerifyField<uint8_t>(verifier, VT_PUSHABLE_NORTH_CLIMBABLE) &&
@@ -2341,6 +2347,9 @@ struct PushableBuilder {
   }
   void add_pushable_roomNumber(int32_t pushable_roomNumber) {
     fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_ROOMNUMBER, pushable_roomNumber, 0);
+  }
+  void add_pushable_collider_flag(bool pushable_collider_flag) {
+    fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_COLLIDER_FLAG, static_cast<uint8_t>(pushable_collider_flag), 0);
   }
   void add_pushable_north_pullable(bool pushable_north_pullable) {
     fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_NORTH_PULLABLE, static_cast<uint8_t>(pushable_north_pullable), 0);
@@ -2400,6 +2409,7 @@ inline flatbuffers::Offset<Pushable> CreatePushable(
     int32_t pushable_startX = 0,
     int32_t pushable_startZ = 0,
     int32_t pushable_roomNumber = 0,
+    bool pushable_collider_flag = false,
     bool pushable_north_pullable = false,
     bool pushable_north_pushable = false,
     bool pushable_north_climbable = false,
@@ -2434,6 +2444,7 @@ inline flatbuffers::Offset<Pushable> CreatePushable(
   builder_.add_pushable_north_climbable(pushable_north_climbable);
   builder_.add_pushable_north_pushable(pushable_north_pushable);
   builder_.add_pushable_north_pullable(pushable_north_pullable);
+  builder_.add_pushable_collider_flag(pushable_collider_flag);
   return builder_.Finish();
 }
 
@@ -3518,6 +3529,7 @@ inline void Pushable::UnPackTo(PushableT *_o, const flatbuffers::resolver_functi
   { auto _e = pushable_startX(); _o->pushable_startX = _e; }
   { auto _e = pushable_startZ(); _o->pushable_startZ = _e; }
   { auto _e = pushable_roomNumber(); _o->pushable_roomNumber = _e; }
+  { auto _e = pushable_collider_flag(); _o->pushable_collider_flag = _e; }
   { auto _e = pushable_north_pullable(); _o->pushable_north_pullable = _e; }
   { auto _e = pushable_north_pushable(); _o->pushable_north_pushable = _e; }
   { auto _e = pushable_north_climbable(); _o->pushable_north_climbable = _e; }
@@ -3549,6 +3561,7 @@ inline flatbuffers::Offset<Pushable> CreatePushable(flatbuffers::FlatBufferBuild
   auto _pushable_startX = _o->pushable_startX;
   auto _pushable_startZ = _o->pushable_startZ;
   auto _pushable_roomNumber = _o->pushable_roomNumber;
+  auto _pushable_collider_flag = _o->pushable_collider_flag;
   auto _pushable_north_pullable = _o->pushable_north_pullable;
   auto _pushable_north_pushable = _o->pushable_north_pushable;
   auto _pushable_north_climbable = _o->pushable_north_climbable;
@@ -3572,6 +3585,7 @@ inline flatbuffers::Offset<Pushable> CreatePushable(flatbuffers::FlatBufferBuild
       _pushable_startX,
       _pushable_startZ,
       _pushable_roomNumber,
+      _pushable_collider_flag,
       _pushable_north_pullable,
       _pushable_north_pushable,
       _pushable_north_climbable,

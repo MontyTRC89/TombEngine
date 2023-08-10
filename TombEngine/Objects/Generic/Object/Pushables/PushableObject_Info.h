@@ -57,6 +57,7 @@ namespace TEN::Entities::Generic
 		bool DoAlignCenter = false;		// OCB [1]: Player aligns to center when grabbing.
 		bool IsBuoyant = false;			// OCB [2]: Can float on water.
 		bool UsesRoomCollision = false; // Per Slot: Uses room collision or object collision.
+		bool BridgeColliderFlag = false;
 
 		PushableInfo()
 		{
@@ -77,6 +78,7 @@ namespace TEN::Entities::Generic
 			DoAlignCenter = true;
 			IsBuoyant = false;
 			UsesRoomCollision = false;
+			BridgeColliderFlag = false;
 
 			SidesMap =
 			{

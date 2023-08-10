@@ -15,7 +15,10 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		if (pushable.UsesRoomCollision)
+		{
 			AddBridge(itemNumber);
+			pushable.BridgeColliderFlag = true;
+		}
 	}
 
 	void DeactivateClimbablePushableCollider(int itemNumber)
@@ -24,7 +27,10 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 		
 		if (pushable.UsesRoomCollision)
+		{
 			RemoveBridge(itemNumber);
+			pushable.BridgeColliderFlag = false;
+		}
 	}
 
 	void RefreshClimbablePushableCollider(int itemNumber)
@@ -78,5 +84,26 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 
 		return pushableItem.Pose.Position.y;
+	}
+
+	void AddBridgePushableStack(int itemNumber, bool addBridge)
+	{
+		auto pushableItemCopy = g_Level.Items[itemNumber];
+		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
+
+		if (!pushableCopy.UsesRoomCollision)
+			return; //It can't have stacked items or bridge collider.
+
+		if (pushableCopy.BridgeColliderFlag)
+			addBridge ? AddBridge(itemNumber) : RemoveBridge(itemNumber);
+		
+		while (pushableCopy.StackUpperItem != NO_ITEM)
+		{
+			pushableItemCopy = g_Level.Items[pushableCopy.StackUpperItem];
+			pushableCopy = GetPushableInfo(pushableItemCopy);
+
+			if (pushableCopy.BridgeColliderFlag)
+				addBridge ? AddBridge(pushableItemCopy.Index) : RemoveBridge(pushableItemCopy.Index);
+		}
 	}
 }

@@ -667,6 +667,8 @@ bool SaveGame::Save(int slot)
 			pushableBuilder.add_pushable_startZ(pushable->StartPos.z);
 			pushableBuilder.add_pushable_roomNumber(pushable->StartPos.RoomNumber);
 
+			pushableBuilder.add_pushable_collider_flag(pushable->BridgeColliderFlag);
+
 			pushableBuilder.add_pushable_north_pullable(pushable->SidesMap[0].Pullable);
 			pushableBuilder.add_pushable_north_pushable(pushable->SidesMap[0].Pushable);
 			pushableBuilder.add_pushable_north_climbable(pushable->SidesMap[0].Climbable);
@@ -1779,6 +1781,8 @@ bool SaveGame::Load(int slot)
 			pushable->StartPos.x = savedPushable->pushable_startX();
 			pushable->StartPos.z = savedPushable->pushable_startZ();
 			pushable->StartPos.RoomNumber = savedPushable->pushable_roomNumber();
+
+			pushable->BridgeColliderFlag = savedPushable->pushable_collider_flag();
 
 			pushable->SidesMap[0].Pullable = savedPushable->pushable_north_pullable();
 			pushable->SidesMap[0].Pushable = savedPushable->pushable_north_pushable();
