@@ -77,12 +77,12 @@ namespace TEN::Collision::Attractors
 		return Length;
 	}
 
-	const BoundingBox& Attractor::GetBoundingBox() const
+	const BoundingBox& Attractor::GetBox() const
 	{
 		return Box;
 	}
 
-	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const
+	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint) const
 	{
 		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
 		constexpr auto FORWARD_FACING_ANGLE_THRESHOLD = ANGLE(90.0f);
@@ -100,7 +100,6 @@ namespace TEN::Collision::Attractors
 		short slopeAngle = attracOrient.x;
 
 		// Determine inquiries.
-		bool isIntersected = (attracProx.Distance <= range);
 		bool isFacingForward = (abs(Geometry::GetShortestAngle(headingAngle, orient.y)) <= FORWARD_FACING_ANGLE_THRESHOLD);
 		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.IntersectPoint, orient);
 
@@ -109,7 +108,6 @@ namespace TEN::Collision::Attractors
 		attracColl.Proximity = attracProx;
 		attracColl.HeadingAngle = headingAngle;
 		attracColl.SlopeAngle = slopeAngle;
-		attracColl.IsIntersected = isIntersected;
 		attracColl.IsFacingForward = isFacingForward;
 		attracColl.IsInFront = isInFront;
 
@@ -408,7 +406,7 @@ namespace TEN::Collision::Attractors
 
 		for (const auto* attracPtr : attracs)
 		{
-			const auto& box = attracPtr->GetBoundingBox();
+			const auto& box = attracPtr->GetBox();
 			auto orientedBox = BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity);
 
 			g_Renderer.AddDebugBox(orientedBox, Vector4::One, RendererDebugPage::CollisionStats);
@@ -427,7 +425,7 @@ namespace TEN::Collision::Attractors
 		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
 		for (const auto* attracPtr : debugAttracPtrs)
 		{
-			if (sphere.Intersects(attracPtr->GetBoundingBox()))
+			if (sphere.Intersects(attracPtr->GetBox()))
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
@@ -438,7 +436,7 @@ namespace TEN::Collision::Attractors
 			const auto& subRoom = g_Level.Rooms[roomNumber];
 			for (const auto& attrac : subRoom.Attractors)
 			{
-				if (sphere.Intersects(attrac.GetBoundingBox()))
+				if (sphere.Intersects(attrac.GetBox()))
 					nearbyAttracPtrs.push_back(&attrac);
 			}
 		}
@@ -446,7 +444,7 @@ namespace TEN::Collision::Attractors
 		// Get bridge attractors.
 		for (const auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
 		{
-			if (sphere.Intersects(attrac.GetBoundingBox()))
+			if (sphere.Intersects(attrac.GetBox()))
 				nearbyAttracPtrs.push_back(&attrac);
 		}
 
@@ -468,7 +466,9 @@ namespace TEN::Collision::Attractors
 		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
 		for (const auto& attracPtr : nearbyAttracPtrs)
 		{
-			auto attracColl = attracPtr->GetCollision(basePos, orient, refPoint, range);
+			auto attracColl = attracPtr->GetCollision(basePos, orient, refPoint);
+
+			// Filter out non-intersections.
 			if (attracColl.Proximity.Distance > range)
 				continue;
 

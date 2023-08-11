@@ -34,7 +34,6 @@ namespace TEN::Collision::Attractors
 		AttractorProximityData Proximity = {};
 		short HeadingAngle	  = 0;
 		short SlopeAngle	  = 0;
-		bool  IsIntersected	  = false;
 		bool  IsFacingForward = false;
 		bool  IsInFront		  = false;
 
@@ -67,10 +66,10 @@ namespace TEN::Collision::Attractors
 		const std::vector<Vector3>& GetPoints() const;
 		int							GetRoomNumber() const;
 		float						GetLength() const;
-		const BoundingBox&			GetBoundingBox() const;
+		const BoundingBox&			GetBox() const;
 
 		// Utilities
-		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint, float range) const;
+		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint) const;
 		AttractorProximityData GetProximity(const Vector3& refPoint) const;
 		Vector3				   GetPointAtChainDistance(float chainDist) const;
 		unsigned int		   GetSegmentIDAtChainDistance(float chainDist) const;

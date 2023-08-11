@@ -55,10 +55,6 @@ namespace TEN::Player
 			if (!attracColl.Attrac.IsEdge())
 				continue;
 
-			// 3) Check if edge is within range.
-			if (!attracColl.IsIntersected)
-				continue;
-
 			// Track closest attractor.
 			if (attracColl.Proximity.Distance < closestDist)
 			{
@@ -141,15 +137,15 @@ namespace TEN::Player
 
 		// Get attractor collisions.
 		auto attracCollCenter = ((chainDistCenter <= 0.0f || chainDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
-			connectingAttracCollCenter->Attrac.GetCollision(basePos, orient, pointCenter, coll.Setup.Radius) :
-			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointCenter, coll.Setup.Radius);
+			connectingAttracCollCenter->Attrac.GetCollision(basePos, orient, pointCenter) :
+			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointCenter);
 
 		auto attracCollLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->Attrac.GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
-			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointLeft, coll.Setup.Radius);
+			connectingAttracCollLeft->Attrac.GetCollision(basePos, orient, pointLeft) :
+			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointLeft);
 		auto attracCollRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->Attrac.GetCollision(basePos, orient, pointLeft, coll.Setup.Radius) :
-			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointRight, coll.Setup.Radius);
+			connectingAttracCollRight->Attrac.GetCollision(basePos, orient, pointLeft) :
+			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointRight);
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
@@ -235,6 +231,7 @@ namespace TEN::Player
 		item->Animation.IsAirborne = false;
 		player.Control.MoveAngle = item->Pose.Orientation.y;
 		player.Control.IsClimbingLadder = false;
+		player.Control.Look.Mode = LookMode::Free;
 		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.EnableObjectPush = false;
@@ -249,9 +246,6 @@ namespace TEN::Player
 		}
 
 		HandlePlayerEdgeMovement(*item, *coll, true);
-
-		if (IsHeld(In::Look))
-			LookUpDown(item);
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{

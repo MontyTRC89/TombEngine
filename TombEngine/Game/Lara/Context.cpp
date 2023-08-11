@@ -246,15 +246,11 @@ namespace TEN::Player::Context
 			if (!attracColl.Attrac.IsEdge())
 				continue;
 
-			// 2) Check if edge is within range.
-			if (!attracColl.IsIntersected )
-				continue;
-
-			// 3) Test if edge slope is slippery.
+			// 2) Test if edge slope is slippery.
 			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
 				continue;
 
-			// 4) Test catch angle.
+			// 3) Test catch angle.
 			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
 				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 			{
@@ -262,7 +258,7 @@ namespace TEN::Player::Context
 			}
 
 			// TODO: Accuracy. Or maybe snap to within bounds, but use offset blending.
-			// 5) Test for seam between connecting attractors.
+			// 4) Test for seam between connecting attractors.
 			if (!hasEnd &&
 				(attracColl.Proximity.ChainDistance <= EPSILON ||
 					(attracColl.Attrac.GetLength() - attracColl.Proximity.ChainDistance) <= EPSILON))
@@ -270,7 +266,7 @@ namespace TEN::Player::Context
 				// Track ends.
 				hasEnd = true;
 
-				// 3.1) Test for looped attractor.
+				// 4.1) Test for looped attractor.
 				if (!attracColl.Attrac.IsLooped())
 					continue;
 			}
@@ -280,7 +276,7 @@ namespace TEN::Player::Context
 				Vector3i(attracColl.Proximity.IntersectPoint), attracColl.Attrac.GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 6) Test if edge is high enough off the ground.
+			// 5) Test if edge is high enough off the ground.
 			int floorToEdgeHeight = abs(attracColl.Proximity.IntersectPoint.y - pointColl.Position.Floor);
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
@@ -292,7 +288,7 @@ namespace TEN::Player::Context
 			int lowerBound = isMovingUp ? 0 : (int)round(item.Animation.Velocity.y);
 			int upperBound = isMovingUp ? (int)round(item.Animation.Velocity.y) : 0;
 
-			// 7) Assess catch trajectory.
+			// 6) Assess catch trajectory.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
