@@ -7,6 +7,7 @@ Version 1.1.1
  - Improve cleaner camera movement.
  - Reenable look mode while performing up jump, backward jump, or backward crawl.
  - When using binoculars or lasersight, holding Walk allows the player to pan slowly.
+* Fix regression in train death animation.
 
 Version 1.1.0
 ==============
