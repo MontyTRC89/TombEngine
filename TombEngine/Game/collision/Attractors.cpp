@@ -476,7 +476,7 @@ namespace TEN::Collision::Attractors
 		}
 
 		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(std::min((int)nearbyAttracPtrs.size(), COUNT_MAX));
+		attracColls.reserve(std::min((int)attracCollMap.size(), COUNT_MAX));
 
 		// Move attractor collisions from map to capped vector.
 		auto it = attracCollMap.begin();
