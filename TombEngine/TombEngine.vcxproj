@@ -444,7 +444,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Objects\Generic\Switches\turn_switch.h" />
     <ClInclude Include="Objects\Generic\Switches\underwater_switch.h" />
-    <ClInclude Include="Objects\Generic\Traps\crumblingPlatform.h" />
+    <ClInclude Include="Objects\Generic\Traps\CrumblingPlatform.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\Generic\generic_objects.h" />
@@ -899,7 +899,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Objects\Generic\Switches\turn_switch.cpp" />
     <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp" />
-    <ClCompile Include="Objects\Generic\Traps\crumblingPlatform.cpp" />
+    <ClCompile Include="Objects\Generic\Traps\CrumblingPlatform.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
     <ClCompile Include="Objects\TR1\Entity\Cowboy.cpp" />
