@@ -212,6 +212,20 @@ void CollectCarriedItems(ItemInfo* item)
 	item->CarriedItem = NO_ITEM;
 }
 
+static void HideOrDisablePickup(ItemInfo& pickupItem)
+{
+	if (pickupItem.TriggerFlags & 0xC0)
+	{
+		pickupItem.Status = ITEM_INVISIBLE;
+		pickupItem.Flags |= TRIGGERED;
+		pickupItem.ItemFlags[3] = 1;
+	}
+	else
+	{
+		KillItem(pickupItem.Index);
+	}
+}
+
 void CollectMultiplePickups(int itemNumber)
 {
 	auto* firstItem = &g_Level.Items[itemNumber];
@@ -244,15 +258,7 @@ void CollectMultiplePickups(int itemNumber)
 			}
 		}
 
-		if (currentItem->TriggerFlags & 0xC0)
-		{
-			currentItem->Status = ITEM_INVISIBLE;
-			currentItem->Flags |= TRIGGERED;
-			currentItem->ItemFlags[3] = 1;
-		}
-
-		//currentItem->Pose.Orientation = prevOrient;
-		KillItem(currentItem->Index);
+		HideOrDisablePickup(*currentItem);
 
 		if (currentItem == firstItem)
 			break;
@@ -313,16 +319,7 @@ void DoPickup(ItemInfo* laraItem)
 			}
 
 			g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
-			if (!(pickupItem->TriggerFlags & 0xC0))
-			{
-				KillItem(pickupItemNumber);
-			}
-			else
-			{
-				pickupItem->Status = ITEM_INVISIBLE;
-				pickupItem->Flags |= TRIGGERED;
-				pickupItem->ItemFlags[3] = 1;
-			}
+			HideOrDisablePickup(*pickupItem);
 
 			pickupItem->Pose.Orientation = prevOrient;
 			lara->Context.InteractedItem = NO_ITEM;
@@ -357,15 +354,9 @@ void DoPickup(ItemInfo* laraItem)
 					}
 				}
 
-				if (pickupItem->TriggerFlags & 0xC0)
-				{
-					pickupItem->Status = ITEM_INVISIBLE;
-					pickupItem->Flags |= TRIGGERED;
-					pickupItem->ItemFlags[3] = 1;
-				}
+				HideOrDisablePickup(*pickupItem);
 
 				pickupItem->Pose.Orientation = prevOrient;
-				KillItem(pickupItemNumber);
 				lara->Context.InteractedItem = NO_ITEM;
 				return;
 			}
@@ -403,7 +394,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		{
 			item->Pose.Orientation.x = -ANGLE(25.0f);
 
-			if (TrInput & IN_ACTION && 
+			if (IsHeld(In::Action) && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
 				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && 
 				lara->Control.HandStatus == HandStatus::Free &&
@@ -454,8 +445,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		return;
 	}
 	
-	if (!(TrInput & IN_ACTION) && (g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
-		BinocularRange ||
+	if (!IsHeld(In::Action) && (g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
+		lara->Control.Look.IsUsingLasersight ||
 		(laraItem->Animation.ActiveState != LS_IDLE || laraItem->Animation.AnimNumber != LA_STAND_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CROUCH_IDLE || laraItem->Animation.AnimNumber != LA_CROUCH_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CRAWL_IDLE || laraItem->Animation.AnimNumber != LA_CRAWL_IDLE))
@@ -958,6 +949,8 @@ void DropPickups(ItemInfo* item)
 void PickupControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
+	
+	ItemPushBridge(*item, *(CollisionInfo*)item->Data);
 
 	short roomNumber;
 	short triggerFlags = item->TriggerFlags & 0x3F;
@@ -1056,8 +1049,12 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 void InitializePickup(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-
 	auto bounds = GameBoundingBox(item);
+
+	item->Data = CollisionInfo();
+	auto* coll = (CollisionInfo*)item->Data;
+	coll->Setup.Radius = std::max(bounds.GetWidth(), bounds.GetDepth());
+	coll->Setup.Height = bounds.GetHeight();
 
 	short triggerFlags = item->TriggerFlags & 0x3F;
 	if (triggerFlags == 5)
@@ -1160,7 +1157,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1);
 
-	if ((TrInput & IN_ACTION &&
+	if ((IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		lara->Control.HandStatus == HandStatus::Free &&

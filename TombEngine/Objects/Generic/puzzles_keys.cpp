@@ -112,7 +112,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		player.Control.HandStatus == HandStatus::Free &&
-		!BinocularRange) ||
+		player.Control.Look.OpticRange == 0) ||
 		(player.Control.IsMoving &&
 			player.Context.InteractedItem == itemNumber))
 	{
@@ -230,15 +230,14 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	auto& player = GetLaraInfo(*laraItem);
 
 	// NOTE: Only execute code below if Triggertype is switch trigger.
-	auto triggerIndex = GetTriggerIndex(&receptacleItem);
-
-	if (triggerIndex == nullptr)
+	short* triggerIndexPtr = GetTriggerIndex(&receptacleItem);
+	if (triggerIndexPtr == nullptr)
 		return;
 
-	int triggerType = (*(triggerIndex++) >> 8) & TRIGGER_BITS;
-
+	int triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 	if (triggerType != TRIGGER_TYPES::SWITCH)
 		return;
+
 	AnimateItem(&receptacleItem);
 
 	// Start level with correct object when loading game.
@@ -264,7 +263,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		player.Control.HandStatus == HandStatus::Free &&
-		!BinocularRange) ||
+		player.Control.Look.OpticRange == 0) ||
 		(player.Control.IsMoving &&
 			player.Context.InteractedItem == itemNumber))
 	{
@@ -330,8 +329,8 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 void PuzzleDone(ItemInfo* item, short itemNumber)
 {
-	auto triggerIndex = GetTriggerIndex(item);
-	short triggerType = (triggerIndex != nullptr) ? (*(triggerIndex++) >> 8) & TRIGGER_BITS : TRIGGER_TYPES::TRIGGER;
+	short* triggerIndexPtr = GetTriggerIndex(item);
+	short triggerType = (triggerIndexPtr != nullptr) ? (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS : TRIGGER_TYPES::TRIGGER;
 
 	if (triggerType == TRIGGER_TYPES::SWITCH)
 	{
@@ -450,9 +449,9 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
 
-	bool isPlayerAvailable = !BinocularRange &&
+	bool isPlayerAvailable = (player->Control.Look.OpticRange == 0 &&
 							 laraItem->Animation.ActiveState == LS_IDLE &&
-							 laraItem->Animation.AnimNumber == LA_STAND_IDLE;
+							 laraItem->Animation.AnimNumber == LA_STAND_IDLE);
 
 	bool actionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
 

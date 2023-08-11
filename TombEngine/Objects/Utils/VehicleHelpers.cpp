@@ -55,7 +55,7 @@ namespace TEN::Entities::Vehicles
 		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
 			return VehicleMountType::None;
 
-		bool hasInputAction = TrInput & IN_ACTION;
+		bool hasInputAction = IsHeld(In::Action);
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;
@@ -215,7 +215,6 @@ namespace TEN::Entities::Vehicles
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
 		{
 			auto waterDepth = (float)GetWaterDepth(vehicleItem);
-			auto waterHeight = vehicleItem->Pose.Position.y - GetWaterHeight(vehicleItem);
 
 			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
 			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
@@ -252,6 +251,8 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
+				int waterHeight = vehicleItem->Pose.Position.y - GetWaterHeight(vehicleItem);
+
 				if (waterDepth > VEHICLE_WATER_HEIGHT_MAX && waterHeight > VEHICLE_WATER_HEIGHT_MAX)
 				{
 					ExplodeVehicle(laraItem, vehicleItem);

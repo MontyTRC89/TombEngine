@@ -15,7 +15,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 using namespace TEN::Player;
@@ -31,6 +31,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
 	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -43,71 +44,83 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
-
 	// Overhang hook.
 	SlopeMonkeyExtra(item, coll);
 
-	if ((TrInput & IN_LEFT &&
-			!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))) ||	// Shimmy locks orientation.
-		(TrInput & IN_RIGHT &&
-			!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))))
+	// NOTE: Shimmy locks orientation.
+	if ((IsHeld(In::Left) &&
+			!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))) ||
+		(IsHeld(In::Right) &&
+			!(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 2);
 	}
 
-	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			lara->Control.HandStatus = HandStatus::Free;
 			return;
 		}
 
-		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
+		if (IsHeld(In::Look))
+		{
+			item->Animation.TargetState = LS_MONKEY_IDLE;
+			return;
+		}
+
+		if (IsHeld(In::Forward) && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		else if (IsHeld(In::Back) && TestLaraMonkeyBack(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
 		}
 
-		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
 			if (TestLaraMonkeyShimmyLeft(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
-		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
 			if (TestLaraMonkeyShimmyRight(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
 			return;
 		}
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 			return;
@@ -141,9 +154,10 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 	
-	// HACK: Prevent ShiftItem() from causing an instantaneous snap, thereby interfering with DoLaraMonkeyStep(), when going down a step. @Sezz 2022.01.28
-	if (coll->Shift.y >= 0 && coll->Shift.y <= MONKEY_STEPUP_HEIGHT)
-		coll->Shift.y = 0;
+	// HACK: Prevent ShiftItem() from causing an instantaneous snap,
+	// thereby interfering with DoLaraMonkeyStep() when going down a step. @Sezz 2022.01.28
+	if (coll->Shift.Position.y >= 0 && coll->Shift.Position.y <= MONKEY_STEPUP_HEIGHT)
+		coll->Shift.Position.y = 0;
 	ShiftItem(item, coll);
 
 	if (CanFallFromMonkeySwing(*item, *coll))
@@ -165,6 +179,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -177,18 +192,18 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 
-	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
 		}
 
-		if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
@@ -243,6 +258,7 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -255,12 +271,12 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 
-	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_BACK)
+		if (IsHeld(In::Back))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -315,6 +331,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -327,15 +344,15 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	if (!IsHeld(In::Walk))	// WALK locks orientation.
 	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
-	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
 			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
@@ -390,6 +407,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -402,15 +420,16 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	// NOTE: Walk locks orientation.
+	if (!IsHeld(In::Walk))
 	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
-	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
 			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;
@@ -463,6 +482,9 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_as_monkey_turn_180()
 void lara_as_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -485,6 +507,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -497,46 +520,54 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			lara->Control.HandStatus = HandStatus::Free;
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
+		if (IsHeld(In::Forward) && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		else if (IsHeld(In::Back) && TestLaraMonkeyBack(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
 		}
 
-		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
 			if (TestLaraMonkeyShimmyLeft(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
-		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
 			if (TestLaraMonkeyShimmyRight(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
@@ -564,6 +595,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Vertical;
 	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -576,46 +608,54 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
-		if (TrInput & IN_JUMP)
+		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			lara->Control.HandStatus = HandStatus::Free;
 			return;
 		}
 
-		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
+		if (IsHeld(In::Forward) && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		else if (IsHeld(In::Back) && TestLaraMonkeyBack(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
 		}
 
-		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
 			if (TestLaraMonkeyShimmyLeft(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
-		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
 			if (TestLaraMonkeyShimmyRight(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
 
-		if (TrInput & IN_RIGHT)
+		if (IsHeld(In::Right))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);

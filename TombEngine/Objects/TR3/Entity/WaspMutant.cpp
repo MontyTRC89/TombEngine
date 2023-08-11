@@ -28,8 +28,8 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto WaspVenomSackLightColor = Vector4(0.0f, 0.35f, 0.0f, 1.0f);
 
-	const auto WaspBite			 = CreatureBiteInfo(Vector3i(0, 0, -260), 12);
-	const auto WaspVenomSackBite = CreatureBiteInfo(Vector3i::Zero, 10);
+	const auto WaspBite			 = CreatureBiteInfo(Vector3(0, 0, -260), 12);
+	const auto WaspVenomSackBite = CreatureBiteInfo(Vector3::Zero, 10);
 
 	enum WaspMutantState
 	{

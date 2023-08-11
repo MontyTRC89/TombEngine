@@ -13,6 +13,6 @@ public:
 
 private:
 
-	void NormalizePlane(int32_t side);
+	void NormalizePlane(int side);
 	std::array<std::array<float, 4>, 6> m_frustum = {};
 };

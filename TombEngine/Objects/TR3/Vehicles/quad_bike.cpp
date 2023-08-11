@@ -29,12 +29,12 @@ namespace TEN::Entities::Vehicles
 {
 	const CreatureBiteInfo QuadBikeEffectsPositions[6] =
 	{
-		CreatureBiteInfo(Vector3i(-56, -32, -380), 0),
-		CreatureBiteInfo(Vector3i(56, -32, -380), 0),
-		CreatureBiteInfo(Vector3i(-8, 180, -48), 3),
-		CreatureBiteInfo(Vector3i(8, 180, -48), 4),
-		CreatureBiteInfo(Vector3i(90, 180, -32), 6),
-		CreatureBiteInfo(Vector3i(-90, 180, -32), 7)
+		CreatureBiteInfo(Vector3(-56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(56, -32, -380), 0),
+		CreatureBiteInfo(Vector3(-8, 180, -48), 3),
+		CreatureBiteInfo(Vector3(8, 180, -48), 4),
+		CreatureBiteInfo(Vector3(90, 180, -32), 6),
+		CreatureBiteInfo(Vector3(-90, 180, -32), 7)
 	};
 
 	const std::vector<VehicleMountType> QuadBikeMountTypes =
@@ -176,7 +176,6 @@ namespace TEN::Entities::Vehicles
 	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* quadBikeItem = &g_Level.Items[itemNumber];
-		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
@@ -345,10 +344,10 @@ namespace TEN::Entities::Vehicles
 	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3i* pos, Vector3i* old)
 	{
 		CollisionResult probe;
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
+		int x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int oldX = old->x / BLOCK(1);
+		int oldZ = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -366,7 +365,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				quadBikeItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				quadBikeItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (quadBikeItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -379,7 +378,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				quadBikeItem->Pose.Position.x += SECTOR(1) - shiftX;
+				quadBikeItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - quadBikeItem->Pose.Position.z);
 			}
 		}
@@ -394,7 +393,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, quadBikeItem->RoomNumber);
@@ -403,7 +402,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)
@@ -507,7 +506,7 @@ namespace TEN::Entities::Vehicles
 			quadBikeItem->Pose.Orientation.y += quadBike->TurnRate + quadBike->ExtraRotation;
 
 			short momentum = QBIKE_MOMENTUM_TURN_RATE_MIN - (((((QBIKE_MOMENTUM_TURN_RATE_MIN - QBIKE_MOMENTUM_TURN_RATE_MAX) * 256) / MAX_VELOCITY) * quadBike->Velocity) / 256);
-			if (!(TrInput & VEHICLE_IN_ACCELERATE) && quadBike->Velocity > 0)
+			if (!IsHeld(In::Accelerate) && quadBike->Velocity > 0)
 				momentum += momentum / 4;
 
 			short rot = quadBikeItem->Pose.Orientation.y - quadBike->MomentumAngle;
@@ -720,16 +719,16 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_IDLE:
 				if (dead)
 					laraItem->Animation.TargetState = QBIKE_STATE_BIKE_DEATH;
-				else if (TrInput & VEHICLE_IN_DISMOUNT &&
+				else if (IsHeld(In::Brake) &&
 					quadBike->Velocity == 0 &&
 					!quadBike->NoDismount)
 				{
-					if (TrInput & VEHICLE_IN_LEFT && CanQuadbikeGetOff(laraItem, -1))
+					if (IsHeld(In::Left) && CanQuadbikeGetOff(laraItem, -1))
 						laraItem->Animation.TargetState = QBIKE_STATE_DISMOUNT_LEFT;
-					else if (TrInput & VEHICLE_IN_RIGHT && CanQuadbikeGetOff(laraItem, 1))
+					else if (IsHeld(In::Right) && CanQuadbikeGetOff(laraItem, 1))
 						laraItem->Animation.TargetState = QBIKE_STATE_DISMOUNT_RIGHT;
 				}
-				else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
+				else if (IsHeld(In::Accelerate) || IsHeld(In::Reverse))
 					laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
 
 				break;
@@ -742,22 +741,22 @@ namespace TEN::Entities::Vehicles
 					else
 						laraItem->Animation.TargetState = QBIKE_STATE_BIKE_DEATH;
 				}
-				else if (!(TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE)) &&
+				else if (!IsHeld(In::Accelerate) && !IsHeld(In::Reverse) &&
 					(quadBike->Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 				{
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
 				}
-				else if (TrInput & VEHICLE_IN_LEFT &&
+				else if (IsHeld(In::Left) &&
 					!quadBike->DriftStarting)
 				{
 					laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT &&
+				else if (IsHeld(In::Right) &&
 					!quadBike->DriftStarting)
 				{
 					laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
-				else if (TrInput & (VEHICLE_IN_REVERSE | VEHICLE_IN_BRAKE))
+				else if (IsHeld(In::Reverse) || IsHeld(In::Brake))
 				{
 					if (quadBike->Velocity > (MAX_VELOCITY / 3 * 2))
 						laraItem->Animation.TargetState = QBIKE_STATE_BRAKE;
@@ -772,9 +771,9 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_STOP_SLOWLY:
 				if ((quadBike->Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
-				else if (TrInput & VEHICLE_IN_LEFT)
+				else if (IsHeld(In::Left))
 					laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
-				else if (TrInput & VEHICLE_IN_RIGHT)
+				else if (IsHeld(In::Right))
 					laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 
 				break;
@@ -782,11 +781,11 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_TURN_LEFT:
 				if ((quadBike->Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
-				else if (TrInput & VEHICLE_IN_RIGHT)
+				else if (IsHeld(In::Right))
 				{
 					SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_TURN_RIGHT_START);
 				}
-				else if (!(TrInput & VEHICLE_IN_LEFT))
+				else if (!IsHeld(In::Left))
 					laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
 
 				break;
@@ -794,11 +793,11 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_TURN_RIGHT:
 				if ((quadBike->Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
-				else if (TrInput & VEHICLE_IN_LEFT)
+				else if (IsHeld(In::Left))
 				{
 					SetAnimation(*laraItem, ID_QUAD_LARA_ANIMS, QBIKE_ANIM_TURN_LEFT_START);
 				}
-				else if (!(TrInput & VEHICLE_IN_RIGHT))
+				else if (!IsHeld(In::Right))
 					laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
 
 				break;
@@ -818,7 +817,7 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_HIT_BACK:
 			case QBIKE_STATE_HIT_LEFT:
 			case QBIKE_STATE_HIT_RIGHT:
-				if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
+				if (IsHeld(In::Accelerate) || IsHeld(In::Reverse))
 					laraItem->Animation.TargetState = QBIKE_STATE_DRIVE;
 
 				break;
@@ -829,10 +828,11 @@ namespace TEN::Entities::Vehicles
 	static int QuadUserControl(ItemInfo* quadBikeItem, int height, int* pitch)
 	{
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
+		auto* lara = GetLaraInfo(LaraItem);
 
 		bool drive = false; // Never changes?
 
-		if (!(TrInput & VEHICLE_IN_SPEED) &&
+		if (!IsHeld(In::Speed) &&
 			!quadBike->Velocity && !quadBike->CanStartDrift)
 		{
 			quadBike->CanStartDrift = true;
@@ -840,7 +840,7 @@ namespace TEN::Entities::Vehicles
 		else if (quadBike->Velocity)
 			quadBike->CanStartDrift = false;
 
-		if (!(TrInput & VEHICLE_IN_SPEED))
+		if (!IsHeld(In::Speed))
 			quadBike->DriftStarting = false;
 
 		if (!quadBike->DriftStarting)
@@ -856,23 +856,22 @@ namespace TEN::Entities::Vehicles
 
 		if (quadBikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
-			if (TrInput & IN_LOOK && !quadBike->Velocity)
-				LookUpDown(LaraItem);
+			lara->Control.Look.Mode = (quadBikeItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 
 			// Driving forward.
 			if (quadBike->Velocity > 0)
 			{
-				if (TrInput & VEHICLE_IN_SPEED &&
+				if (IsHeld(In::Speed) &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity > MIN_DRIFT_VELOCITY)
 				{
-					if (TrInput & VEHICLE_IN_LEFT)
+					if (IsHeld(In::Left))
 					{
 						quadBike->TurnRate -= QBIKE_DRIFT_TURN_RATE_ACCEL;
 						if (quadBike->TurnRate < -QBIKE_DRIFT_TURN_RATE_MAX)
 							quadBike->TurnRate = -QBIKE_DRIFT_TURN_RATE_MAX;
 					}
-					else if (TrInput & VEHICLE_IN_RIGHT)
+					else if (IsHeld(In::Right))
 					{
 						quadBike->TurnRate += QBIKE_DRIFT_TURN_RATE_ACCEL;
 						if (quadBike->TurnRate > QBIKE_DRIFT_TURN_RATE_MAX)
@@ -881,13 +880,13 @@ namespace TEN::Entities::Vehicles
 				}
 				else
 				{
-					if (TrInput & VEHICLE_IN_LEFT)
+					if (IsHeld(In::Left))
 					{
 						quadBike->TurnRate -= QBIKE_TURN_RATE_ACCEL;
 						if (quadBike->TurnRate < -QBIKE_TURN_RATE_MAX)
 							quadBike->TurnRate = -QBIKE_TURN_RATE_MAX;
 					}
-					else if (TrInput & VEHICLE_IN_RIGHT)
+					else if (IsHeld(In::Right))
 					{
 						quadBike->TurnRate += QBIKE_TURN_RATE_ACCEL;
 						if (quadBike->TurnRate > QBIKE_TURN_RATE_MAX)
@@ -898,17 +897,17 @@ namespace TEN::Entities::Vehicles
 			// Driving back.
 			else if (quadBike->Velocity < 0)
 			{
-				if (TrInput & VEHICLE_IN_SPEED &&
+				if (IsHeld(In::Speed) &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity < (-MIN_DRIFT_VELOCITY + 0x800))
 				{
-					if (TrInput & VEHICLE_IN_LEFT)
+					if (IsHeld(In::Left))
 					{
 						quadBike->TurnRate -= QBIKE_DRIFT_TURN_RATE_ACCEL;
 						if (quadBike->TurnRate < -QBIKE_DRIFT_TURN_RATE_MAX)
 							quadBike->TurnRate = -QBIKE_DRIFT_TURN_RATE_MAX;
 					}
-					else if (TrInput & VEHICLE_IN_RIGHT)
+					else if (IsHeld(In::Right))
 					{
 						quadBike->TurnRate += QBIKE_DRIFT_TURN_RATE_ACCEL;
 						if (quadBike->TurnRate > QBIKE_DRIFT_TURN_RATE_MAX)
@@ -917,13 +916,13 @@ namespace TEN::Entities::Vehicles
 				}
 				else
 				{
-					if (TrInput & VEHICLE_IN_RIGHT)
+					if (IsHeld(In::Right))
 					{
 						quadBike->TurnRate -= QBIKE_TURN_RATE_ACCEL;
 						if (quadBike->TurnRate < -QBIKE_TURN_RATE_MAX)
 							quadBike->TurnRate = -QBIKE_TURN_RATE_MAX;
 					}
-					else if (TrInput & VEHICLE_IN_LEFT)
+					else if (IsHeld(In::Left))
 					{
 						quadBike->TurnRate += QBIKE_TURN_RATE_ACCEL;
 						if (quadBike->TurnRate > QBIKE_TURN_RATE_MAX)
@@ -933,9 +932,9 @@ namespace TEN::Entities::Vehicles
 			}
 
 			// Driving back / braking.
-			if (TrInput & VEHICLE_IN_REVERSE)
+			if (IsHeld(In::Reverse))
 			{
-				if (TrInput & VEHICLE_IN_SPEED &&
+				if (IsHeld(In::Speed) &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
 				{
 					quadBike->DriftStarting = true;
@@ -951,9 +950,9 @@ namespace TEN::Entities::Vehicles
 						quadBike->Velocity += REVERSE_ACCELERATION;
 				}
 			}
-			else if (TrInput & VEHICLE_IN_ACCELERATE)
+			else if (IsHeld(In::Accelerate))
 			{
-				if (TrInput & VEHICLE_IN_SPEED &&
+				if (IsHeld(In::Speed) &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
 				{
 					quadBike->DriftStarting = true;
@@ -983,7 +982,7 @@ namespace TEN::Entities::Vehicles
 			else
 				quadBike->Velocity = 0;
 
-			if (!(TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE)) &&
+			if (!IsHeld(In::Accelerate) && !IsHeld(In::Reverse) &&
 				quadBike->DriftStarting &&
 				quadBike->Revs)
 			{
@@ -1177,7 +1176,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != quadBikeItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			laraItem->Pose = quadBikeItem->Pose;

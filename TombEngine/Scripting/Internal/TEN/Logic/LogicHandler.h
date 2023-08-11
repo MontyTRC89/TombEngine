@@ -68,7 +68,7 @@ private:
 
 	std::unordered_map<CallbackPoint, std::unordered_set<std::string> *> m_callbacks;
 
-	std::vector<std::variant<std::string, uint32_t>> m_savedVarPath;
+	std::vector<std::variant<std::string, unsigned int>> m_savedVarPath;
 
 	bool m_shortenedCalls = false;
 

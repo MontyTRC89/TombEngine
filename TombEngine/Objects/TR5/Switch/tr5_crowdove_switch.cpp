@@ -22,7 +22,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0,
-			-SECTOR(0.5f), SECTOR(0.5f)
+			-BLOCK(0.5f), BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -43,7 +43,7 @@ namespace TEN::Entities::Switches
 
 		if (switchItem->Flags & IFLAG_INVISIBLE ||
 			!(switchItem->MeshBits & 4) ||
-			(!(TrInput & IN_ACTION) ||
+			(!IsHeld(In::Action) ||
 				laraItem->Animation.ActiveState != LS_IDLE ||
 				laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 				laraItem->Animation.IsAirborne ||

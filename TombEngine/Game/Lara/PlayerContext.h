@@ -55,6 +55,8 @@ namespace TEN::Player
 	bool CanWadeForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanWadeBackward(const ItemInfo& item, const CollisionInfo& coll);
 
+	bool CanVaultFromSprint(const ItemInfo& item, const CollisionInfo& coll);
+
 	// Slide contexts
 	bool CanSlide(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanSteerOnSlide(const ItemInfo& item, const CollisionInfo& coll);

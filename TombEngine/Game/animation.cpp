@@ -234,6 +234,9 @@ void AnimateItem(ItemInfo* item)
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
 
+	auto animAccel = (animPtr->VelocityEnd - animPtr->VelocityStart) / frameCount;
+	auto animVel = animPtr->VelocityStart + (animAccel * currentFrame);
+
 	if (item->Animation.IsAirborne)
 	{
 		if (item->IsLara())
@@ -258,7 +261,7 @@ void AnimateItem(ItemInfo* item)
 			else
 			{
 				item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
-				item->Animation.Velocity.z += (animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount;
+				item->Animation.Velocity.z += animAccel.z;
 
 				item->Pose.Position.y += item->Animation.Velocity.y;
 			}
@@ -273,25 +276,23 @@ void AnimateItem(ItemInfo* item)
 	{
 		if (item->IsLara())
 		{
-			const auto& player = *GetLaraInfo(item);
+			const auto& player = GetLaraInfo(*item);
 
-			if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-				item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame) / 4);
-			else
-				item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+			bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item));
+			item->Animation.Velocity.z = isInSwamp ? (animVel.z / 2) : animVel.z;
 		}
 		else
 		{
-			item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
-			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+			item->Animation.Velocity.x = animVel.x;
+			item->Animation.Velocity.z = animVel.z;
 		}
 	}
 	
 	if (item->IsLara())
 	{
-		const auto& player = *GetLaraInfo(item);
+		const auto& player = GetLaraInfo(*item);
 
-		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
+		item->Animation.Velocity.x = animVel.x;
 
 		if (player.Control.Rope.Ptr != -1)
 			DelAlignLaraToRope(item);

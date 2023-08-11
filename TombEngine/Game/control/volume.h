@@ -8,11 +8,6 @@ struct CollisionSetup;
 
 namespace TEN::Control::Volumes
 {
-	constexpr auto NO_EVENT_SET = -1;
-
-	constexpr auto VOLUME_BUSY_TIMEOUT	= 10;
-	constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
-
 	constexpr auto VOLUME_STATE_QUEUE_SIZE = 16;
 
 	enum class VolumeStateStatus
@@ -38,19 +33,20 @@ namespace TEN::Control::Volumes
 		int Timestamp = 0;
 	};
 
-	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator);
-	void TestVolumes(short itemNumber, const CollisionSetup* coll = nullptr);
-	void TestVolumes(short roomNumber, MESH_INFO* mesh);
-	void TestVolumes(CAMERA_INFO* camera);
-
-	void HandleEvent(VolumeEvent& event, VolumeActivator& activator);
 	void InitializeNodeScripts();
+	void HandleEvent(VolumeEvent& event, VolumeActivator& activator);
+
+	void TestVolumes(int roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator);
+	void TestVolumes(int itemNumber, const CollisionSetup* collPtr = nullptr);
+	void TestVolumes(int roomNumber, MESH_INFO* meshPtr);
+	void TestVolumes(CAMERA_INFO* cameraPtr);
 }
 
 // TODO: Move into namespace and deal with errors.
+// ActivatorVolume
 struct TriggerVolume
 {
-	bool Enabled	   = true;
+	bool IsEnabled	   = true;
 	int	 EventSetIndex = 0;
 
 	std::string Name = {};

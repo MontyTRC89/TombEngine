@@ -11,8 +11,8 @@
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "ScriptInterfaceGame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
@@ -87,7 +87,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 
 	GetFloor(target2.x, target2.y, target2.z, &target2.RoomNumber);
 
-	if (isFiring && LaserSight)
+	if (isFiring && Lara.Control.Look.IsUsingLasersight)
 	{
 		Lara.Control.Weapon.HasFired = true;
 		Lara.Control.Weapon.Fired = true;
@@ -134,7 +134,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 					if (item->ObjectNumber < ID_SHOOT_SWITCH1 || item->ObjectNumber > ID_SHOOT_SWITCH4)
 					{
 						if ((Objects[item->ObjectNumber].explodableMeshbits & ShatterItem.bit) &&
-							LaserSight)
+							Lara.Control.Look.IsUsingLasersight)
 						{
 								item->MeshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = directionNorm;
@@ -251,7 +251,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			}
 			else
 			{
-				if (LaserSight && isFiring)
+				if (Lara.Control.Look.IsUsingLasersight && isFiring)
 					FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 			}
 		}
@@ -262,7 +262,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	{
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 		{
-			if (isFiring && LaserSight)
+			if (isFiring && Lara.Control.Look.IsUsingLasersight)
 				FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 		}
 		else
@@ -606,7 +606,7 @@ int xLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			x -= SECTOR(1);
+			x -= BLOCK(1);
 			y -= dy;
 			z -= dz;
 		}
@@ -656,7 +656,7 @@ int xLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			x += SECTOR(1);
+			x += BLOCK(1);
 			y += dy;
 			z += dz;
 		}
@@ -726,7 +726,7 @@ int zLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			z -= SECTOR(1);
+			z -= BLOCK(1);
 			x -= dx;
 			y -= dy;
 		}
@@ -776,7 +776,7 @@ int zLOS(GameVector* origin, GameVector* target)
 				break;
 			}
 
-			z += SECTOR(1);
+			z += BLOCK(1);
 			x += dx;
 			y += dy;
 		}

@@ -17,6 +17,7 @@
 #include "Scripting/Internal/TEN/Misc/ActionIDs.h"
 #include "Scripting/Internal/TEN/Misc/CameraTypes.h"
 #include "Scripting/Internal/TEN/Misc/LevelLog.h"
+#include "Scripting/Internal/TEN/Misc/SoundTrackTypes.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -144,11 +145,11 @@ namespace Misc
 	/// Play an audio track
 	//@function PlayAudioTrack
 	//@tparam string name of track (without file extension) to play
-	//@tparam bool loop if true, the track will loop; if false, it won't (default: false)
-	static void PlayAudioTrack(const std::string& trackName, TypeOrNil<bool> looped)
+	//@tparam Misc.SoundTrackType type of the audio track to play
+	static void PlayAudioTrack(const std::string& trackName, TypeOrNil<SoundTrackType> mode)
 	{
-		auto mode = USE_IF_HAVE(bool, looped, false) ? SoundTrackType::BGM : SoundTrackType::OneShot;
-		PlaySoundTrack(trackName, mode);
+		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		PlaySoundTrack(trackName, playMode);
 	}
 
 	///Set and play an ambient track
@@ -168,11 +169,40 @@ namespace Misc
 
 	///Stop audio track that is currently playing
 	//@function StopAudioTrack
-	//@tparam bool looped if set, stop looped audio track, if not, stop one-shot audio track
-	static void StopAudioTrack(TypeOrNil<bool> looped)
+	//@tparam Misc.SoundTrackType type of the audio track
+	static void StopAudioTrack(TypeOrNil<SoundTrackType> mode)
 	{
-		auto mode = USE_IF_HAVE(bool, looped, false) ? SoundTrackType::BGM : SoundTrackType::OneShot;
-		StopSoundTrack(mode, SOUND_XFADETIME_ONESHOT);
+		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		StopSoundTrack(playMode, SOUND_XFADETIME_ONESHOT);
+	}
+
+	///Get current loudness level for specified track type
+	//@function GetAudioTrackLoudness
+	//@tparam Misc.SoundTrackType type of the audio track
+	//@treturn float current loudness of a specified audio track
+	static float GetAudioTrackLoudness(TypeOrNil<SoundTrackType> mode)
+	{
+		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		return GetSoundTrackLoudness(playMode);
+	}
+
+	///Get current subtitle string for a voice track currently playing.
+	//Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
+	//Returns nil if no voice track is playing or no subtitle present.
+	//@function GetCurrentSubtitle
+	//@treturn string current subtitle string
+	static TypeOrNil<std::string> GetCurrentVoiceTrackSubtitle()
+	{
+		auto& result = GetCurrentSubtitle();
+
+		if (result.has_value())
+		{
+			return result.value();
+		}
+		else
+		{
+			return sol::nil;
+		}
 	}
 
 	/// Play sound effect
@@ -189,20 +219,26 @@ namespace Misc
 	//@tparam int Sound ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
 	static bool IsSoundPlaying(int effectID)
 	{
-		return IsSoundEffectPlaying(effectID);
+		return (Sound_EffectIsPlaying(effectID, nullptr) != SOUND_NO_CHANNEL);
+	}
+
+	/// Check if the audio track is playing
+	//@function IsAudioTrackPlaying
+	//@tparam string Track filename to check. Should be without extension and without full directory path.
+	static bool IsAudioTrackPlaying(const std::string& trackName)
+	{
+		return Sound_TrackIsPlaying(trackName);
 	}
 
 	static bool CheckInput(int actionIndex)
 	{
-		if (actionIndex > ActionMap.size())
+		if (actionIndex > (int)ActionID::Count)
 		{
-			ScriptAssertF(false, "Key index {} does not exist", actionIndex);
+			ScriptAssertF(false, "Input action {} does not exist.", actionIndex);
 			return false;
 		}
-		else
-		{
-			return true;
-		}
+
+		return true;
 	}
 
 	static bool KeyIsHeld(int actionIndex)
@@ -213,7 +249,7 @@ namespace Misc
 		if (IsHeld((ActionID)actionIndex))
 			return true;
 
-		return (TrInput & (1 << actionIndex)) != 0;
+		return false;
 	}
 
 	static bool KeyIsHit(int actionIndex)
@@ -224,7 +260,7 @@ namespace Misc
 		if (IsClicked((ActionID)actionIndex))
 			return true;
 
-		return (DbInput & (1 << actionIndex)) != 0;
+		return false;
 	}
 
 	static void KeyPush(int actionIndex)
@@ -302,8 +338,8 @@ namespace Misc
 	//end
 	static std::tuple<int, int> PercentToScreen(double x, double y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.Width);
-		auto fHeight = static_cast<double>(g_Configuration.Height);
+		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
+		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
 		int resX = static_cast<int>(std::round(fWidth / 100.0 * x));
 		int resY = static_cast<int>(std::round(fHeight / 100.0 * y));
 		//todo this still assumes a resolution of 800/600. account for this somehow
@@ -319,8 +355,8 @@ namespace Misc
 	//@treturn float y coordinate as percentage
 	static std::tuple<double, double> ScreenToPercent(int x, int y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.Width);
-		auto fHeight = static_cast<double>(g_Configuration.Height);
+		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
+		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
 		double resX = x / fWidth * 100.0;
 		double resY = y / fHeight * 100.0;
 		return std::make_tuple(resX, resY);
@@ -382,9 +418,12 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
 		tableMisc.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
 		tableMisc.set_function(ScriptReserved_StopAudioTracks, &StopAudioTracks);
+		tableMisc.set_function(ScriptReserved_GetAudioTrackLoudness, &GetAudioTrackLoudness); 
+		tableMisc.set_function(ScriptReserved_GetCurrentSubtitle, &GetCurrentVoiceTrackSubtitle);
 
 		tableMisc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 		tableMisc.set_function(ScriptReserved_IsSoundPlaying, &IsSoundPlaying);
+		tableMisc.set_function(ScriptReserved_IsAudioTrackPlaying, &IsAudioTrackPlaying);
 
 		/// Check if particular action key is held
 		//@function KeyIsHeld
@@ -421,6 +460,7 @@ namespace Misc
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_CameraType, CAMERA_TYPE);
+		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_SoundTrackType, SOUNDTRACK_TYPE);
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_LogLevel, LOG_LEVEL);
 	}
 }

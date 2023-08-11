@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto RAT_TURN_RATE_MAX = ANGLE(6.0f);
 
-	const auto RatBite = CreatureBiteInfo(Vector3i(0, 0, 57), 2);
+	const auto RatBite = CreatureBiteInfo(Vector3(0, 0, 57), 2);
 
 	enum RatState
 	{

@@ -36,8 +36,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto PUNA_EXPLOSION_MAIN_COLOR   = Vector4(0.0f, 0.7f, 0.3f, 0.5f);
 	constexpr auto PUNA_EXPLOSION_SECOND_COLOR = Vector4(0.1f, 0.3f, 0.7f, 0.5f);
 
-	const auto PunaBossHeadBite = CreatureBiteInfo(Vector3i::Zero, 8);
-	const auto PunaBossHandBite = CreatureBiteInfo(Vector3i::Zero, 14);
+	const auto PunaBossHeadBite = CreatureBiteInfo(Vector3::Zero, 8);
+	const auto PunaBossHandBite = CreatureBiteInfo(Vector3::Zero, 14);
 
 	enum PunaState
 	{
@@ -260,7 +260,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			auto hitPos = Vector3i::Zero;
 			MESH_INFO* mesh = nullptr;
-			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == GetLaraInfo(creature.Enemy)->ItemNumber)
+			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == creature.Enemy->Index)
 			{
 				if (creature.Enemy->HitPoints <= PUNA_LIGHTNING_DAMAGE)
 				{

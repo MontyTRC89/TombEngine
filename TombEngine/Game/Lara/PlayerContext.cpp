@@ -111,7 +111,7 @@ namespace TEN::Player
 		}
 
 		// 4) Assess player status.
-		if (!(IsHeld(In::Flare) || IsHeld(In::DrawWeapon)) &&		   // Avoid unsightly concurrent actions.
+		if (!(IsHeld(In::Flare) || IsHeld(In::Draw)) &&				   // Avoid unsightly concurrent actions.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare.
 				player.Flare.Life) &&								   // OR flare is still active.
 			player.Context.Vehicle == NO_ITEM)						   // Not in a vehicle.
@@ -377,6 +377,11 @@ namespace TEN::Player
 		return TestGroundMovementSetup(item, coll, setup);
 	}
 
+	bool CanVaultFromSprint(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return !TestLaraWall(&item, OFFSET_RADIUS(coll.Setup.Radius), -BLOCK(5 / 8.0f));
+	}
+
 	bool CanSlide(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ABS_FLOOR_BOUND = STEPUP_HEIGHT;
@@ -481,7 +486,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Assess player status.
-		if (!(IsHeld(In::Flare) || IsHeld(In::DrawWeapon)) &&		   // Avoid unsightly concurrent actions.
+		if (!(IsHeld(In::Flare) || IsHeld(In::Draw)) &&				   // Avoid unsightly concurrent actions.
 			player.Control.HandStatus == HandStatus::Free &&		   // Hands are free.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare. TODO: Should be allowed, but flare animation bugs out. -- Sezz 2022.03.18
 				player.Flare.Life))

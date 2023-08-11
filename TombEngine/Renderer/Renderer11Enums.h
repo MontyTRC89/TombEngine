@@ -113,14 +113,18 @@ enum RENDERER_FADE_STATUS
 	FADE_OUT
 };
 
-enum RENDERER_DEBUG_PAGE
+enum class RendererDebugPage
 {
-	NO_PAGE,
-	RENDERER_STATS,
-	DIMENSION_STATS,
-	LARA_STATS,
-	LOGIC_STATS,
-	WIREFRAME_MODE
+	None,
+	RendererStats,
+	DimensionStats,
+	PlayerStats,
+	LogicStats,
+	CollisionStats,
+	PathfindingStats,
+	WireframeMode,
+
+	Count
 };
 
 enum RendererTransparentFaceType
@@ -189,6 +193,13 @@ enum ALPHA_TEST_MODES
 	ALPHA_TEST_LESS_THAN = 2
 };
 
+enum RendererPass
+{
+	ShadowMap,
+	Opaque,
+	Transparent
+};
+
 constexpr auto TEXTURE_HEIGHT = 256;
 constexpr auto TEXTURE_WIDTH = 256;
 constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);
@@ -228,8 +239,8 @@ constexpr auto MAX_LIGHTS = 100;
 constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEP = 1.0f / 10.0f;
 constexpr auto MAX_DYNAMIC_SHADOWS = 1;
 constexpr auto MAX_DYNAMIC_LIGHTS = 1024;
-constexpr auto ITEM_LIGHT_COLLECTION_RADIUS = SECTOR(1);
-constexpr auto CAMERA_LIGHT_COLLECTION_RADIUS = SECTOR(4);
+constexpr auto ITEM_LIGHT_COLLECTION_RADIUS = BLOCK(1);
+constexpr auto CAMERA_LIGHT_COLLECTION_RADIUS = BLOCK(4);
 
 constexpr auto MAX_TRANSPARENT_FACES = 16384;
 constexpr auto MAX_TRANSPARENT_VERTICES = (MAX_TRANSPARENT_FACES * 6);

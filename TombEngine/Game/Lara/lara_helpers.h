@@ -13,6 +13,8 @@ struct VaultTestResult;
 // -----------------------------
 
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
+void HandlePlayerQuickActions(ItemInfo& item);
+void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerCrawlFlex(ItemInfo& item);
@@ -20,7 +22,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
 void HandlePlayerAirBubbles(ItemInfo* item);
 
-void EaseOutLaraHeight(ItemInfo* item, int height);
+void EasePlayerVerticalPosition(ItemInfo* item, int height);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll);
@@ -60,6 +62,7 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);
 
 void ResetPlayerLean(ItemInfo* item, float alpha = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetPlayerFlex(ItemInfo* item, float alpha = 1.0f);
+void ResetPlayerLookAround(ItemInfo& item, float alpha = 0.1f);
 
 void RumbleLaraHealthCondition(ItemInfo* item);
 

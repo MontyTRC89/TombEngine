@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_fire.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -22,9 +22,9 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "ScriptInterfaceGame.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
@@ -501,7 +501,7 @@ void HandleWeapon(ItemInfo& laraItem)
 	else if (player.Control.HandStatus == HandStatus::Free)
 	{
 		// Draw weapon.
-		if (IsHeld(In::DrawWeapon))
+		if (IsHeld(In::Draw))
 		{
 			// No weapon - no any actions.
 			if (player.Control.Weapon.LastGunType != LaraWeaponType::None)
@@ -529,7 +529,7 @@ void HandleWeapon(ItemInfo& laraItem)
 			}
 		}
 
-		if ((IsHeld(In::DrawWeapon) && player.Control.Weapon.LastGunType != LaraWeaponType::None) ||
+		if ((IsHeld(In::Draw) && player.Control.Weapon.LastGunType != LaraWeaponType::None) ||
 			player.Control.Weapon.RequestGunType != player.Control.Weapon.GunType)
 		{
 			if (player.Control.IsLow && 
@@ -578,7 +578,7 @@ void HandleWeapon(ItemInfo& laraItem)
 	}
 	else if (player.Control.HandStatus == HandStatus::WeaponReady)
 	{
-		if (IsHeld(In::DrawWeapon) ||
+		if (IsHeld(In::Draw) ||
 			player.Control.Weapon.RequestGunType != player.Control.Weapon.GunType)
 		{
 			player.Control.HandStatus = HandStatus::WeaponUndraw;
@@ -692,7 +692,7 @@ void HandleWeapon(ItemInfo& laraItem)
 			Camera.type = CameraType::Combat;
 		}
 
-		if (IsHeld(In::Action) && !LaserSight)
+		if (IsHeld(In::Action) && !player.Control.Look.IsUsingLasersight)
 		{
 			if (!GetAmmo(player, player.Control.Weapon.GunType))
 			{
@@ -855,12 +855,12 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 
 void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 {
-	if (!g_Configuration.AutoTarget)
+	if (!g_Configuration.EnableAutoTargeting)
 		return;
 
 	auto& player = *GetLaraInfo(&laraItem);
 
-	if (BinocularRange)
+	if (player.Control.Look.OpticRange)
 	{
 		player.TargetEntity = nullptr;
 		return;
@@ -937,14 +937,14 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 				break;
 		}
 
-		if (IsClicked(In::SwitchTarget) || player.Control.HandStatus != HandStatus::Free)
+		if (IsClicked(In::Look) || player.Control.HandStatus != HandStatus::Free)
 		{
 			if (player.TargetEntity == nullptr)
 			{
 				player.TargetEntity = closestEntityPtr;
 				player.LastTargets[0] = nullptr;
 			}
-			else if (IsClicked(In::SwitchTarget))
+			else if (IsClicked(In::Look))
 			{
 				player.TargetEntity = nullptr;
 				bool flag = true;

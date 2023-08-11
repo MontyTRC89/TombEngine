@@ -16,8 +16,8 @@
 #include "Objects/Sink.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Input;
 using namespace TEN::Player;
@@ -49,6 +49,10 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 		item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+	}
+	else if (coll->LastBridgeItemNumber != NO_ITEM)
+	{
+		ShiftItem(item, coll);
 	}
 
 	return false;
@@ -206,8 +210,8 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 {
 	// HACK
-	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
-		coll->Shift.y = 0;
+	if (coll->Shift.Position.y >= 0 && coll->Shift.Position.y <= CLICK(1.25f))
+		coll->Shift.Position.y = 0;
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT ||
 		coll->HitTallObject)
@@ -248,7 +252,7 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
 		item->Animation.ActiveState = coll->Setup.PrevState;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 		{
 			// Prevent turn lock against walls.
 			if (item->Animation.ActiveState == LS_TURN_RIGHT_SLOW ||
@@ -259,7 +263,7 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 			else
 				item->Animation.TargetState = LS_TURN_LEFT_SLOW;
 		}
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 		{
 			if (item->Animation.ActiveState == LS_TURN_LEFT_SLOW ||
 				item->Animation.ActiveState == LS_TURN_LEFT_FAST)
@@ -298,9 +302,9 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
 		item->Animation.ActiveState = coll->Setup.PrevState;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Animation.TargetState = LS_CRAWL_TURN_RIGHT;
 		else
 			item->Animation.TargetState = LS_CRAWL_IDLE;
@@ -334,9 +338,9 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
 		item->Animation.ActiveState = coll->Setup.PrevState;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 		else
 			item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -633,8 +637,8 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 		const auto& sink = g_Level.Sinks[lara->Context.WaterCurrentActive - 1];
 
 		short headingAngle = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), sink.Position).y;
-		lara->Context.WaterCurrentPull.x += ((sink.Strength * SECTOR(1) * phd_sin(headingAngle)) - lara->Context.WaterCurrentPull.x) / 16;
-		lara->Context.WaterCurrentPull.z += ((sink.Strength * SECTOR(1) * phd_cos(headingAngle)) - lara->Context.WaterCurrentPull.z) / 16;
+		lara->Context.WaterCurrentPull.x += ((sink.Strength * BLOCK(1) * phd_sin(headingAngle)) - lara->Context.WaterCurrentPull.x) / 16;
+		lara->Context.WaterCurrentPull.z += ((sink.Strength * BLOCK(1) * phd_cos(headingAngle)) - lara->Context.WaterCurrentPull.z) / 16;
 
 		item->Pose.Position.y += (sink.Position.y - item->Pose.Position.y) / 16;
 	}

@@ -923,15 +923,6 @@ enum class HolsterSlot
 	RocketLauncher	= ID_ROCKET_ANIM
 };
 
-enum class WaterStatus
-{
-	Dry,
-	Wade,
-	TreadWater,
-	Underwater,
-	FlyCheat
-};
-
 enum class HandStatus
 {
 	Free,
@@ -942,12 +933,13 @@ enum class HandStatus
 	Special
 };
 
-enum class TorchState
+enum class WaterStatus
 {
-	Holding,
-	Throwing,
-	Dropping,
-	JustLit
+	Dry,
+	Wade,
+	TreadWater,
+	Underwater,
+	FlyCheat
 };
 
 enum class JumpDirection
@@ -958,6 +950,22 @@ enum class JumpDirection
 	Back,
 	Left,
 	Right
+};
+
+enum class LookMode
+{
+	None,
+	Vertical,
+	Horizontal,
+	Free
+};
+
+enum class TorchState
+{
+	Holding,
+	Throwing,
+	Dropping,
+	JustLit
 };
 
 struct Ammo
@@ -1106,8 +1114,8 @@ struct FlareData
 
 struct TorchData
 {
-	TorchState State = TorchState::Holding;
 	bool	   IsLit = false;
+	TorchState State = TorchState::Holding;
 };
 
 // TODO: Troye's abandoned dairy feature.
@@ -1139,6 +1147,17 @@ struct LaraCountData
 	unsigned int PositionAdjust = 0;
 	unsigned int Run			= 0;
 	unsigned int Death			= 0;
+};
+
+struct LookControlData
+{
+	LookMode	Mode		= LookMode::None;
+	EulerAngles Orientation = EulerAngles::Zero;
+	EulerAngles	TurnRate	= EulerAngles::Zero;
+
+	short OpticRange		= 0;
+	bool  IsUsingBinoculars = false;
+	bool  IsUsingLasersight = false;
 };
 
 struct RopeControlData
@@ -1216,6 +1235,7 @@ struct PlayerControlData
 	JumpDirection JumpDirection = {};
 	LaraCountData Count			= {};
 
+	LookControlData		 Look	   = {};
 	RopeControlData		 Rope	   = {};
 	SubsuitControlData	 Subsuit   = {};
 	TightropeControlData Tightrope = {};
@@ -1287,17 +1307,16 @@ struct LaraInfo
 {
 	static constexpr auto TARGET_COUNT_MAX = 8;
 
-	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
-
 	PlayerContext		Context	  = PlayerContext();
 	PlayerControlData	Control	  = {};
 	PlayerStatusData	Status	  = {};
 	PlayerEffectData	Effect	  = {};
 	PlayerInventoryData Inventory = {};
 
+	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};
 	TorchData		  Torch = {};
-	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
 
 	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
 	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
@@ -1306,15 +1325,15 @@ struct LaraInfo
 	ArmInfo		RightArm		= {};
 
 	ItemInfo* TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
-	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	 = {};
-	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets	 = {};
+	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	= {};
+	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets = {};
 
 	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
-	int		 HitFrame	  = 0;		 // Frame index.
-	int		 HitDirection = 0;		 // Cardinal direction.
-	FX_INFO* SpasmEffect  = nullptr; // Not saved.
+	int HitFrame	 = 0; // Frame index.
+	int HitDirection = 0; // Cardinal direction.
 
-	int ExtraAnim = 0; // Item number? Only ever set to NO_ITEM or 1.
+	// Item number? Only ever set to NO_ITEM or 1. Probably anim object ID. Might not be needed since AnimObjectID is kept in item.Animation.
+	int ExtraAnim = 0;
 
 	signed char Location		= 0;
 	signed char HighestLocation = 0;

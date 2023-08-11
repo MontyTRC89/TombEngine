@@ -1,14 +1,15 @@
 #pragma once
 #include "Game/GuiObjects.h"
-#include "LanguageScript.h"
+#include "Scripting/Internal/LanguageScript.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"
 
+struct ItemInfo;
+
 using namespace TEN::Input;
 using namespace TEN::Math;
-
-struct ItemInfo;
 
 namespace TEN::Gui
 {
@@ -76,20 +77,23 @@ namespace TEN::Gui
 		LoadGame,
 		Options,
 		Display,
-		Controls,
+		GeneralActions,
+		VehicleActions,
+		QuickActions,
+		MenuActions,
 		OtherSettings
 	};
 
 	struct MenuOption
 	{
-		MenuType	Type;
-		char const* Text;
+		MenuType	Type = MenuType::None;
+		std::string Text = {};
 	};
 
 	struct ObjectList
 	{
-		short InventoryItem;
-		EulerAngles Orientation = EulerAngles::Zero;
+		int			InventoryItem = 0;
+		EulerAngles Orientation	  = EulerAngles::Zero;
 		unsigned short Bright;
 	};
 
@@ -104,10 +108,13 @@ namespace TEN::Gui
 
 	struct SettingsData
 	{
-		bool WaitingForKey = false; // Waiting for a key to be pressed when configuring controls.
-		bool IgnoreInput = false;   // Ignore input unless all keys were released.
-		int SelectedScreenResolution;
-		GameConfiguration Configuration;
+		static constexpr auto NEW_KEY_WAIT_TIMEOUT = 3.0f * FPS;
+
+		GameConfiguration Configuration = {};
+
+		int	  SelectedScreenResolution = 0;
+		bool  IgnoreInput			   = false; // Ignore input until all actions are inactive.
+		float NewKeyWaitTimer		   = 0.0f;
 	};
 
 	class GuiController
@@ -115,7 +122,7 @@ namespace TEN::Gui
 	private:
 		// Input inquirers
 		bool GuiIsPulsed(ActionID actionID) const;
-		bool GuiIsSelected() const;
+		bool GuiIsSelected(bool onClicked = true) const;
 		bool GuiIsDeselected() const;
 		bool CanSelect() const;
 		bool CanDeselect() const;
@@ -135,9 +142,7 @@ namespace TEN::Gui
 		bool UseItem;
 		char SeperateTypeFlag;
 		char CombineTypeFlag;
-		InventoryRing PCRing1;
-		InventoryRing PCRing2;
-		InventoryRing* Rings[2];
+		InventoryRing Rings[2];
 		int CurrentSelectedOption;
 		bool MenuActive;
 		char AmmoSelectorFlag;
@@ -161,11 +166,13 @@ namespace TEN::Gui
 	public:
 		int CompassNeedleAngle;
 
+		void Initialize();
+		bool CallPause();
 		bool CallInventory(ItemInfo* item, bool resetMode);
 		InventoryResult TitleOptions(ItemInfo* item);
 		InventoryResult DoPauseMenu(ItemInfo* item);
 		void DrawInventory();
-		void DrawCurrentObjectList(ItemInfo* item, int ringIndex);
+		void DrawCurrentObjectList(ItemInfo* item, RingTypes ringType);
 		int IsObjectInInventory(int objectNumber);
 		int ConvertObjectToInventoryItem(int objectNumber);
 		int ConvertInventoryItemToObject(int objectNumber);
@@ -175,7 +182,7 @@ namespace TEN::Gui
 		void DrawCompass(ItemInfo* item);
 
 		// Getters
-		InventoryRing* GetRings(int ringIndex);
+		const InventoryRing& GetRing(RingTypes ringType);
 		short GetSelectedOption();
 		Menu GetMenuToDisplay();
 		InventoryMode GetInventoryMode();
@@ -191,6 +198,7 @@ namespace TEN::Gui
 		void SetInventoryMode(InventoryMode mode);
 		void SetEnterInventory(int number);
 		void SetInventoryItemChosen(int number);
+		void SetLastInventoryItem(int itemNumber);
 
 	private:
 		void HandleDisplaySettingsInput(bool fromPauseMenu);
@@ -225,5 +233,9 @@ namespace TEN::Gui
 	};
 
 	extern GuiController g_Gui;
-	extern const char* ControlStrings[];
+	extern std::vector<std::string> OptionStrings;
+	extern std::vector<std::string> GeneralActionStrings;
+	extern std::vector<std::string> VehicleActionStrings;
+	extern std::vector<std::string> QuickActionStrings;
+	extern std::vector<std::string> MenuActionStrings;
 }

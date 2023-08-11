@@ -71,7 +71,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 	
-	if ((!(TrInput & IN_ACTION) ||
+	if ((!IsHeld(In::Action) ||
 		laraItem->Animation.ActiveState != LS_IDLE ||
 		laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 		laraItem->Status == ITEM_INVISIBLE ||
@@ -129,7 +129,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* barItem = &g_Level.Items[itemNumber];
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_REACH &&
 		laraItem->Animation.AnimNumber == LA_REACH &&
 		laraInfo->Control.HandStatus == HandStatus::Free)
@@ -294,7 +294,7 @@ void HighObject2Control(short itemNumber)
 		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 		spark->maxYvel = 0;
 		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 32;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 32;
 		spark->dSize = spark->size / 4;
 
 		if (GetRandomControl() & 3)

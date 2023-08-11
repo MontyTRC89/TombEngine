@@ -46,6 +46,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
@@ -65,11 +66,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Look))
-		LookUpDown(item);
-
-	// HACK: Handle binoculars.
-	if (BinocularOn)
+	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
@@ -89,7 +86,19 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
+		if (IsHeld(In::Look))
+		{
+			item->Animation.TargetState = LS_CROUCH_IDLE;
+			return;
+		}
+
 		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && CanCrouchToCrawl(*item, *coll))
+		{
+			item->Animation.TargetState = LS_CROUCH_IDLE;
+			return;
+		}
+
+		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && TestLaraCrouchToCrawl(item))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
@@ -162,7 +171,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.CanLook = false;
+	player.Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
@@ -237,6 +246,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 
@@ -247,9 +257,6 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (IsHeld(In::Look))
-		LookUpDown(item);
 
 	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
@@ -292,6 +299,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 
@@ -302,9 +310,6 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (IsHeld(In::Look))
-		LookUpDown(item);
 
 	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
@@ -347,6 +352,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 
@@ -384,7 +390,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.HandStatus = HandStatus::Busy;
+	player.Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
@@ -398,8 +404,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	auto* lara = GetLaraInfo(item);
-	lara->Control.HandStatus = HandStatus::Busy;
+	player.Control.HandStatus = HandStatus::Busy;
 
 	if (item->HitPoints <= 0)
 	{
@@ -407,11 +412,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Look))
-		LookUpDown(item);
-
-	// HACK: Binoculars handling.
-	if (BinocularOn)
+	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
@@ -426,11 +427,17 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		if ((IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll)) ||
-			((IsHeld(In::DrawWeapon) || IsHeld(In::Flare)) &&
+			((IsHeld(In::Draw) || IsHeld(In::Flare)) &&
 				!IsStandingWeapon(item, player.Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			player.Control.HandStatus = HandStatus::Free;
+			return;
+		}
+
+		if (IsHeld(In::Look))
+		{
+			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
 		}
 
@@ -537,6 +544,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Horizontal;
 	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -631,7 +639,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.CanLook = false;
+	player.Control.Look.Mode = LookMode::Horizontal;
 	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -718,6 +726,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Vertical;
 	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -778,6 +787,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Vertical;
 	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -838,6 +848,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 

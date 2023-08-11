@@ -32,9 +32,9 @@ namespace TEN::Entities::Doors
 	const ObjectCollisionBounds CrowbarDoorBounds =
 	{
 		GameBoundingBox(
-			-SECTOR(0.5f), SECTOR(0.5f),
-			-SECTOR(1), 0,
-			0, SECTOR(0.5f)
+			-BLOCK(0.5f), BLOCK(0.5f),
+			-BLOCK(1), 0,
+			0, BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -67,13 +67,13 @@ namespace TEN::Entities::Doors
 		int zOffset = 0;
 
 		if (doorItem->Pose.Orientation.y == 0)
-			zOffset = -SECTOR(1);
+			zOffset = -BLOCK(1);
 		else if (doorItem->Pose.Orientation.y == ANGLE(180.0f))
-			zOffset = SECTOR(1);
+			zOffset = BLOCK(1);
 		else if (doorItem->Pose.Orientation.y == ANGLE(90.0f))
-			xOffset = -SECTOR(1);
+			xOffset = -BLOCK(1);
 		else
-			xOffset = SECTOR(1);
+			xOffset = BLOCK(1);
 
 		auto* r = &g_Level.Rooms[doorItem->RoomNumber];
 		doorData->d1.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
@@ -174,7 +174,7 @@ namespace TEN::Entities::Doors
 
 		if (doorItem->TriggerFlags == 2 &&
 			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Animation.IsAirborne && // CHECK
-			((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
+			((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
 				laraItem->Animation.ActiveState == LS_IDLE &&
 				laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 				!laraItem->HitStatus &&
@@ -253,7 +253,7 @@ namespace TEN::Entities::Doors
 					if (!(doorItem->ObjectNumber >= ID_LIFT_DOORS1 &&
 						doorItem->ObjectNumber <= ID_LIFT_DOORS2) || doorItem->ItemFlags[0])
 					{
-						ItemPushItem(doorItem, laraItem, coll, FALSE, TRUE);
+						ItemPushItem(doorItem, laraItem, coll, false, 1);
 					}
 				}
 			}
@@ -347,7 +347,7 @@ namespace TEN::Entities::Doors
 			// TR5 lift doors
 			/*if (!TriggerActive(item))
 			{
-				if (item->itemFlags[0] >= SECTOR(4))
+				if (item->itemFlags[0] >= BLOCK(4))
 				{
 					if (door->opened)
 					{
@@ -369,7 +369,7 @@ namespace TEN::Entities::Doors
 			{
 				if (item->itemFlags[0] > 0)
 				{
-					if (item->itemFlags[0] == SECTOR(4))
+					if (item->itemFlags[0] == BLOCK(4))
 						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
 					item->itemFlags[0] -= STEP_SIZE;
 				}

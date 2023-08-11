@@ -13,8 +13,8 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto EagleBite = CreatureBiteInfo(Vector3i(15, 46, 21), 6);
-	const auto CrowBite	 = CreatureBiteInfo(Vector3i(2, 10, 60), 14);
+	const auto EagleBite = CreatureBiteInfo(Vector3(15, 46, 21), 6);
+	const auto CrowBite	 = CreatureBiteInfo(Vector3(2, 10, 60), 14);
 
 	enum EagleOrCrowState
 	{
@@ -134,7 +134,7 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = item->Animation.RequiredState;
 				if (creature->Mood == MoodType::Bored)
 					item->Animation.TargetState = 2;
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2))
 					item->Animation.TargetState = 6;
 				else
 					item->Animation.TargetState = 3;
@@ -147,7 +147,7 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.RequiredState = 2;
 					item->Animation.TargetState = 1;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2))
 					item->Animation.TargetState = 6;
 
 				break;
