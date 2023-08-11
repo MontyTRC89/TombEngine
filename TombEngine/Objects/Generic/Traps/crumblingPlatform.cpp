@@ -102,17 +102,19 @@ namespace TEN::Entities::Traps
 
 			case CRUMBLING_PLATFORM_STATE_FALL:
 			{
+				short& fallVel = item.ItemFlags[1];
+
 				auto pointColl = GetCollision(item);
 				int relFloorHeight = item.Pose.Position.y - pointColl.Position.Floor;
 
 				// Airborne.
-				if (relFloorHeight < 0)
+				if (relFloorHeight < -fallVel)
 				{
-					item.ItemFlags[1] += CRUMBLING_PLATFORM_FALL_VELOCITY;
-					if (item.ItemFlags[1] > CRUMBLING_PLATFORM_MAX_VELOCITY)
-						item.ItemFlags[1] = CRUMBLING_PLATFORM_MAX_VELOCITY;
+					fallVel += CRUMBLING_PLATFORM_FALL_VELOCITY;
+					if (fallVel > CRUMBLING_PLATFORM_MAX_VELOCITY)
+						fallVel = CRUMBLING_PLATFORM_MAX_VELOCITY;
 
-					item.Pose.Position.y += item.ItemFlags[1];
+					item.Pose.Position.y += fallVel;
 				}
 				// Grounded.
 				else
