@@ -68,7 +68,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		// OCD < 0; must be activated by trigger.
+		// OCB < 0; must be activated by trigger.
 		if (item.TriggerFlags < 0)
 		{
 			if (TriggerActive(&item))
@@ -166,7 +166,8 @@ namespace TEN::Entities::Traps
 		{
 			// Crumble if player is on platform.
 			if (!laraItem->Animation.IsAirborne &&
-				coll->LastBridgeItemNumber == item.Index)
+				coll->LastBridgeItemNumber == item.Index &&
+				laraItem->Animation.ActiveState != LS_DOZY)
 			{
 				ActivateCrumblingPlatform(itemNumber);
 			}
