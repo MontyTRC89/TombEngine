@@ -452,14 +452,14 @@ namespace TEN::Collision::Attractors
 
 		DrawDebugAttractorBounds(sphere, nearbyAttracPtrs);
 
-		// Return attractor pointers found in sphere-AABB test.
+		// Return attractor pointers found in sphere-AABB tests.
 		return nearbyAttracPtrs;
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
 															   const Vector3& refPoint, float range)
 	{
-		constexpr auto COUNT_MAX = 64;
+		constexpr auto COLL_COUNT_MAX = 64;
 
 		// Get pointers to approximately nearby attractors from sphere-AABB tests.
 		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(refPoint, roomNumber, range);
@@ -472,16 +472,22 @@ namespace TEN::Collision::Attractors
 			if (attracColl.Proximity.Distance > range)
 				continue;
 
-			attracCollMap.insert({ attracColl.Proximity.Distance, attracColl });
+			attracCollMap.insert({ attracColl.Proximity.Distance, std::move(attracColl) });
 		}
 
 		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(std::min((int)attracCollMap.size(), COUNT_MAX));
+		attracColls.reserve(std::min((int)attracCollMap.size(), COLL_COUNT_MAX));
 
 		// Move attractor collisions from map to capped vector.
-		auto it = attracCollMap.begin();
-		for (int i = 0; i < COUNT_MAX && it != attracCollMap.end(); i++, it++)
-			attracColls.push_back(std::move(it->second));
+		int count = 0;
+		for (auto& [dist, attracColl] : attracCollMap)
+		{
+			attracColls.push_back(std::move(attracColl));
+
+			count++;
+			if (count >= COLL_COUNT_MAX)
+				break;
+		}
 
 		// Return attractor collisions.
 		return attracColls;
