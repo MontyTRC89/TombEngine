@@ -930,7 +930,7 @@ bool SaveGame::Save(int slot)
 			volume.add_room_number(room->index);
 			volume.add_number(j);
 			volume.add_name(nameOffset);
-			volume.add_enabled(currVolume.Enabled);
+			volume.add_enabled(currVolume.IsEnabled);
 			volume.add_position(&FromVector3(currVolume.Box.Center));
 			volume.add_rotation(&FromVector4(currVolume.Box.Orientation));
 			volume.add_scale(&FromVector3(currVolume.Box.Extents));
@@ -1416,7 +1416,7 @@ bool SaveGame::Load(int slot)
 		auto room = &g_Level.Rooms[volume->room_number()];
 		int number = volume->number();
 
-		room->triggerVolumes[number].Enabled = volume->enabled();
+		room->triggerVolumes[number].IsEnabled = volume->enabled();
 		room->triggerVolumes[number].Name = volume->name()->str();
 		room->triggerVolumes[number].Box.Center =
 		room->triggerVolumes[number].Sphere.Center = ToVector3(volume->position());
