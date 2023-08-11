@@ -8,84 +8,86 @@
 
 using namespace TEN::Collision::Floordata;
 
-constexpr auto CRUMBLING_PLATFORM_INITIAL_SPEED = 10;
-constexpr auto CRUMBLING_PLATFORM_MAX_SPEED = 100;
-constexpr auto CRUMBLING_PLATFORM_FALL_VELOCITY = 4;
-
-constexpr auto CRUMBLING_PLATFORM_DELAY = 35;
-
-//I clamped it to ensure the value is less than half CLICK or it may not update room properly when landing on slopes in 1 click height rooms.
-constexpr auto CRUMBLING_PLATFORM_HEIGHT_TOLERANCE = std::clamp(8, 0, 128);
-
-enum CrumblingPlatformState
+namespace TEN::Entities::Traps
 {
-	CRUMBLING_PLATFORM_STATE_IDLE = 0,
-	CRUMBLING_PLATFORM_STATE_SHAKING = 1,
-	CRUMBLING_PLATFORM_STATE_FALLING = 2,
-	CRUMBLING_PLATFORM_STATE_LANDING = 3
-};
+	constexpr auto CRUMBLING_PLATFORM_INITIAL_SPEED = 10;
+	constexpr auto CRUMBLING_PLATFORM_MAX_SPEED = 100;
+	constexpr auto CRUMBLING_PLATFORM_FALL_VELOCITY = 4;
 
-enum CrumblingPlatformAnim
-{
-	CRUMBLING_PLATFORM_ANIM_IDLE = 0,
-	CRUMBLING_PLATFORM_ANIM_SHAKING = 1,
-	CRUMBLING_PLATFORM_ANIM_FALLING = 2,
-	CRUMBLING_PLATFORM_ANIM_LANDING = 3
-};
+	constexpr auto CRUMBLING_PLATFORM_DELAY = 35;
 
-void InitializeCrumblingPlatform(short itemNumber)
-{
-	auto& item = g_Level.Items[itemNumber];
+	//I clamped it to ensure the value is less than half CLICK or it may not update room properly when landing on slopes in 1 click height rooms.
+	constexpr auto CRUMBLING_PLATFORM_HEIGHT_TOLERANCE = std::clamp(8, 0, 128);
 
-	int timerFrames = (item.TriggerFlags != 0) ? std::abs(item.TriggerFlags) : CRUMBLING_PLATFORM_DELAY;
-	item.ItemFlags[0] = timerFrames;
-	UpdateBridgeItem(itemNumber);
-
-	//Store the bridge collider Ys to override them in the bridge collision (to avoid use the bounding box while is shaking).
-	auto bounds = GameBoundingBox(&item);
-	item.ItemFlags[2] = bounds.Y1; //floor
-	item.ItemFlags[3] = bounds.Y2; //ceiling
-
-	//ItemFlags 0 = timer
-	//ItemFlags 1 = gravity velocity
-	//ItemFlags 2 = Top height of bounding box
-	//ItemFlags 3 = Bottom height of bounding box
-}
-
-void CrumblingPlatformCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-{
-	auto& item = g_Level.Items[itemNumber];
-
-	//If OCB is 0 or higher, activate by Lara's collision. (If OCB < 0, it will activate by trigger).
-	if (item.TriggerFlags >= 0 && item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE)
+	enum CrumblingPlatformState
 	{
-		//Checks if Lara and Item are in the same XZ sector. And Lara is over the platform.
-		if (!((item.Pose.Position.x ^ laraItem->Pose.Position.x) & 0xFFFFFC00) &&
-			!((laraItem->Pose.Position.z ^ item.Pose.Position.z) & 0xFFFFFC00) &&
-			abs((item.Pose.Position.y + item.ItemFlags[2]) - laraItem->Pose.Position.y) < CRUMBLING_PLATFORM_HEIGHT_TOLERANCE)
-		{
-			CrumblingPlatformActivate(itemNumber);
-		}
-	}
-}
+		CRUMBLING_PLATFORM_STATE_IDLE = 0,
+		CRUMBLING_PLATFORM_STATE_SHAKING = 1,
+		CRUMBLING_PLATFORM_STATE_FALLING = 2,
+		CRUMBLING_PLATFORM_STATE_LANDING = 3
+	};
 
-void CrumblingPlatformControl(short itemNumber)
-{
-	auto& item = g_Level.Items[itemNumber];
-
-	//It ocb < 0, it must be activated by trigger.
-	if (item.TriggerFlags < 0)
+	enum CrumblingPlatformAnim
 	{
-		if (TriggerActive(&item))
-		{
-			CrumblingPlatformActivate(itemNumber);
-			item.TriggerFlags = -item.TriggerFlags;
-		}
-		return;
+		CRUMBLING_PLATFORM_ANIM_IDLE = 0,
+		CRUMBLING_PLATFORM_ANIM_SHAKING = 1,
+		CRUMBLING_PLATFORM_ANIM_FALLING = 2,
+		CRUMBLING_PLATFORM_ANIM_LANDING = 3
+	};
+
+	void InitializeCrumblingPlatform(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		int timerFrames = (item.TriggerFlags != 0) ? std::abs(item.TriggerFlags) : CRUMBLING_PLATFORM_DELAY;
+		item.ItemFlags[0] = timerFrames;
+		UpdateBridgeItem(itemNumber);
+
+		//Store the bridge collider Ys to override them in the bridge collision (to avoid use the bounding box while is shaking).
+		auto bounds = GameBoundingBox(&item);
+		item.ItemFlags[2] = bounds.Y1; //floor
+		item.ItemFlags[3] = bounds.Y2; //ceiling
+
+		//ItemFlags 0 = timer
+		//ItemFlags 1 = gravity velocity
+		//ItemFlags 2 = Top height of bounding box
+		//ItemFlags 3 = Bottom height of bounding box
 	}
 
-	switch (item.Animation.ActiveState)
+	void CrumblingPlatformCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
+		auto& item = g_Level.Items[itemNumber];
+
+		//If OCB is 0 or higher, activate by Lara's collision. (If OCB < 0, it will activate by trigger).
+		if (item.TriggerFlags >= 0 && item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE)
+		{
+			//Checks if Lara and Item are in the same XZ sector. And Lara is over the platform.
+			if (!((item.Pose.Position.x ^ laraItem->Pose.Position.x) & 0xFFFFFC00) &&
+				!((laraItem->Pose.Position.z ^ item.Pose.Position.z) & 0xFFFFFC00) &&
+				abs((item.Pose.Position.y + item.ItemFlags[2]) - laraItem->Pose.Position.y) < CRUMBLING_PLATFORM_HEIGHT_TOLERANCE)
+			{
+				CrumblingPlatformActivate(itemNumber);
+			}
+		}
+	}
+
+	void CrumblingPlatformControl(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		//It ocb < 0, it must be activated by trigger.
+		if (item.TriggerFlags < 0)
+		{
+			if (TriggerActive(&item))
+			{
+				CrumblingPlatformActivate(itemNumber);
+				item.TriggerFlags = -item.TriggerFlags;
+			}
+			return;
+		}
+
+		switch (item.Animation.ActiveState)
+		{
 		case CRUMBLING_PLATFORM_STATE_SHAKING:
 		{
 			if (item.ItemFlags[0] > 0)
@@ -137,7 +139,7 @@ void CrumblingPlatformControl(short itemNumber)
 		case CRUMBLING_PLATFORM_STATE_LANDING:
 		{
 			//Is hitting the ground.
-			
+
 			//Align to surface
 			auto radius = Vector2(Objects[item.ObjectNumber].radius);
 			AlignEntityToSurface(&item, radius);
@@ -154,53 +156,54 @@ void CrumblingPlatformControl(short itemNumber)
 
 		default:
 			TENLog("Error with Crumbling Platform object: " + std::to_string(itemNumber) + ", animation state not recognized.", LogLevel::Error, LogConfig::All, false);
-		break;
+			break;
 
+		}
+
+		AnimateItem(&item);
 	}
 
-	AnimateItem(&item);
-}
+	void CrumblingPlatformActivate(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
 
-void CrumblingPlatformActivate(short itemNumber)
-{
-	auto& item = g_Level.Items[itemNumber];
-	
-	item.Status = ITEM_ACTIVE;
-	AddActiveItem(itemNumber);
+		item.Status = ITEM_ACTIVE;
+		AddActiveItem(itemNumber);
 
-	SetAnimation(&item, CRUMBLING_PLATFORM_ANIM_SHAKING);
-		
-	item.Flags |= CODE_BITS;
-}
+		SetAnimation(&item, CRUMBLING_PLATFORM_ANIM_SHAKING);
 
-std::optional<int> CrumblingPlatformFloor(short itemNumber, int x, int y, int z)
-{
-	ItemInfo& item = g_Level.Items[itemNumber];
+		item.Flags |= CODE_BITS;
+	}
 
-	if (item.Animation.ActiveState <= CRUMBLING_PLATFORM_STATE_SHAKING)
-		return item.Pose.Position.y + item.ItemFlags[2];
-	else
-		return std::nullopt;
-}
+	std::optional<int> CrumblingPlatformFloor(short itemNumber, int x, int y, int z)
+	{
+		ItemInfo& item = g_Level.Items[itemNumber];
 
-std::optional<int> CrumblingPlatformCeiling(short itemNumber, int x, int y, int z)
-{
-	ItemInfo& item = g_Level.Items[itemNumber];
+		if (item.Animation.ActiveState <= CRUMBLING_PLATFORM_STATE_SHAKING)
+			return item.Pose.Position.y + item.ItemFlags[2];
+		else
+			return std::nullopt;
+	}
 
-	if (item.Animation.ActiveState <= CRUMBLING_PLATFORM_STATE_SHAKING)
-		return item.Pose.Position.y + item.ItemFlags[3];
-	else
-		return std::nullopt;
-}
+	std::optional<int> CrumblingPlatformCeiling(short itemNumber, int x, int y, int z)
+	{
+		ItemInfo& item = g_Level.Items[itemNumber];
 
-int CrumblingPlatformFloorBorder(short itemNumber)
-{
-	auto& item = g_Level.Items[itemNumber];
-	return item.ItemFlags[2];
-}
+		if (item.Animation.ActiveState <= CRUMBLING_PLATFORM_STATE_SHAKING)
+			return item.Pose.Position.y + item.ItemFlags[3];
+		else
+			return std::nullopt;
+	}
 
-int CrumblingPlatformCeilingBorder(short itemNumber)
-{
-	auto& item = g_Level.Items[itemNumber];
-	return item.ItemFlags[3];
+	int CrumblingPlatformFloorBorder(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		return item.ItemFlags[2];
+	}
+
+	int CrumblingPlatformCeilingBorder(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		return item.ItemFlags[3];
+	}
 }
