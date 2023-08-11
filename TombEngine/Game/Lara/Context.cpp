@@ -230,10 +230,14 @@ namespace TEN::Player::Context
 	{
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
 
+		auto relOffset = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
+		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+		float radius = std::max<float>(coll.Setup.Radius, item.Animation.Velocity.z);
+
 		// Get attractor collisions.
-		auto refPoint = item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f);
-		float range = OFFSET_RADIUS(coll.Setup.Radius);
-		auto attracColls = GetAttractorCollisions(item, refPoint, range);
+		auto refPoint = item.Pose.Position.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
+		float detectRadius = OFFSET_RADIUS(radius);
+		auto attracColls = GetAttractorCollisions(item, refPoint, detectRadius);
 
 		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
@@ -247,7 +251,7 @@ namespace TEN::Player::Context
 				continue;
 
 			// 2) Test if edge slope is slippery.
-			if (abs(attracColl.SlopeAngle) >= SLIPPERY_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= SLIPPERY_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 3) Test catch angle.

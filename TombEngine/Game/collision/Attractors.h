@@ -90,8 +90,8 @@ namespace TEN::Collision::Attractors
 	};
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
-															   const Vector3& refPoint, float range);
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float range);
+															   const Vector3& refPoint, float detectRadius);
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float detectRadius);
 
 	Attractor				 GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop = true);
 	

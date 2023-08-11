@@ -415,9 +415,9 @@ namespace TEN::Collision::Attractors
 
 	// TODO: TRAE method of a search algorithm incorporating an R-tree might be ideal here.
 	// Would require a general collision refactor. -- Sezz 2023.07.30
-	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float range)
+	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float detectRadius)
 	{
-		auto sphere = BoundingSphere(refPoint, range);
+		auto sphere = BoundingSphere(refPoint, detectRadius);
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 
 		// TEMP
@@ -455,12 +455,12 @@ namespace TEN::Collision::Attractors
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
-															   const Vector3& refPoint, float range)
+															   const Vector3& refPoint, float detectRadius)
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
 		// Get pointers to approximately nearby attractors from sphere-AABB tests.
-		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(refPoint, roomNumber, range);
+		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(refPoint, roomNumber, detectRadius);
 
 		// Get attractor collisions sorted by distance.
 		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
@@ -469,7 +469,7 @@ namespace TEN::Collision::Attractors
 			auto attracColl = attracPtr->GetCollision(basePos, orient, refPoint);
 
 			// Filter out non-intersections.
-			if (attracColl.Proximity.Distance > range)
+			if (attracColl.Proximity.Distance > detectRadius)
 				continue;
 
 			attracCollMap.insert({ attracColl.Proximity.Distance, std::move(attracColl) });
@@ -493,9 +493,9 @@ namespace TEN::Collision::Attractors
 		return attracColls;
 	}
 	
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float range)
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float detectRadius)
 	{
-		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, refPoint, range);
+		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, refPoint, detectRadius);
 	}
 	
 	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop)

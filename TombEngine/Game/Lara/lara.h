@@ -85,8 +85,8 @@ constexpr auto LARA_HEALTH_MAX		  = 1000.0f;
 constexpr auto LARA_HEALTH_CRITICAL	  = LARA_HEALTH_MAX / 4;
 constexpr auto LARA_POISON_MAX		  = 128.0f;
 constexpr auto LARA_STAMINA_MAX		  = 120.0f;
-constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 constexpr auto LARA_STAMINA_MIN       = LARA_STAMINA_MAX / 10;
+constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 
 // Effect node values
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;

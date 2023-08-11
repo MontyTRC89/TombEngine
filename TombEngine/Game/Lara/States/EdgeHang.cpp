@@ -47,7 +47,7 @@ namespace TEN::Player
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
-			// 1. Check if attractor is new.
+			// 1) Check if attractor is new.
 			if (&attracColl.Attrac == &currentAttrac)
 				continue;
 
@@ -189,7 +189,7 @@ namespace TEN::Player
 		}
 
 		// Test segment slope angle.
-		if (edgeAttracColls->Center.SlopeAngle >= SLIPPERY_SLOPE_ANGLE)
+		if (edgeAttracColls->Center.SlopeAngle >= SLIPPERY_FLOOR_SLOPE_ANGLE)
 		{
 			player.Control.IsHanging = false;
 			return;
