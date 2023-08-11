@@ -148,7 +148,7 @@ namespace TEN::Entities::Traps
 			default:
 				TENLog(
 					"Error with crumbling platform with entity ID" + std::to_string(itemNumber) + ". animation state not recognized.",
-					LogLevel::Error, LogConfig::All, false);
+					LogLevel::Error, LogConfig::All);
 				break;
 		}
 
