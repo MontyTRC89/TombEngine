@@ -108,7 +108,7 @@ namespace TEN::Entities::Traps
 				int relFloorHeight = item.Pose.Position.y - pointColl.Position.Floor;
 
 				// Airborne.
-				if (relFloorHeight < -fallVel)
+				if (relFloorHeight <= fallVel)
 				{
 					fallVel += CRUMBLING_PLATFORM_FALL_VELOCITY;
 					if (fallVel > CRUMBLING_PLATFORM_MAX_VELOCITY)
