@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Context.h"
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
@@ -22,9 +22,9 @@ namespace TEN::Player
 	{
 		const auto& player = GetLaraInfo(item);
 
-		ItemPtr = &item;
+		/*ItemPtr = &item;
 		PlayerPtr = &player;
-		CollPtr = &coll;
+		CollPtr = &coll;*/
 	}
 
 	bool CanPerformStep(const ItemInfo& item, const CollisionInfo& coll)
@@ -35,7 +35,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item);
+		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Offset required for correct bridge collision.
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 
 		// 1) Test if player is already aligned with floor.
@@ -59,7 +59,7 @@ namespace TEN::Player
 		constexpr auto UPPER_FLOOR_BOUND = -STEPUP_HEIGHT;
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2);
+		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Offset required for correct bridge collision.
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 
 		// Assess point collision.
@@ -78,7 +78,7 @@ namespace TEN::Player
 		constexpr auto UPPER_FLOOR_BOUND = CLICK(0.5f);
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2);
+		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Offset required for correct bridge collision.
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 
 		// Assess point collision.
@@ -393,7 +393,7 @@ namespace TEN::Player
 			return false;
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2);
+		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Offset required for correct bridge collision.
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 
 		// 2) Assess point collision.
@@ -824,7 +824,8 @@ namespace TEN::Player
 			return false;
 
 		// Prepare data for static object LOS.
-		auto origin = Geometry::TranslatePoint(item.Pose.Position.ToVector3(), item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius));
+		// TODO: Lock-up occurs.
+		/*auto origin = Geometry::TranslatePoint(item.Pose.Position.ToVector3(), item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius));
 		auto target = origin + Vector3(0.0f,-STEPUP_HEIGHT, 0.0f);
 		auto dir = target - origin;
 		dir.Normalize();
@@ -832,7 +833,7 @@ namespace TEN::Player
 		// 3) Assess ray-static collision.
 		auto staticLos = GetStaticObjectLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
 		if (staticLos.has_value())
-			return false;
+			return false;*/
 
 		// Get point collision.
 		auto pointColl = GetCollision(&item, setup.HeadingAngle, setup.Distance, -coll.Setup.Height);
@@ -905,7 +906,7 @@ namespace TEN::Player
 
 		auto& player = GetLaraInfo(item);
 
-		// Test if running jump is immediately possible.
+		// 1) Test if running jump is immediately possible.
 		if (CanRunJumpForward(item, coll))
 			return IsRunJumpQueueableState(item.Animation.TargetState);
 
@@ -916,7 +917,7 @@ namespace TEN::Player
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
 
-		// Assess point collision for possible running jump ahead.
+		// 2) Assess point collision for possible running jump ahead.
 		if (relCeilHeight < lowerCeilingBound || // Ceiling height is above lower ceiling bound.
 			relFloorHeight >= UPPER_FLOOR_BOUND) // OR floor height ahead is below upper floor bound.
 		{

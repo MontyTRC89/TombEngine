@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/Hud/Hud.h"
 #include "Game/items.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
@@ -877,7 +877,6 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	// TODO: Swamps.
 	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)) &&
 		CanSidestepLeft(*item, *coll))
 	{
@@ -1217,7 +1216,6 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	// TODO: Swamps.
 	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)) &&
 		CanSidestepLeft(*item, *coll))
 	{

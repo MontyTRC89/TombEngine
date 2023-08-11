@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/Lara/PlayerContextData.h"
+#include "Game/Lara/ContextData.h"
 #include "Math/Math.h"
 
 struct CollisionInfo;
@@ -13,10 +13,11 @@ namespace TEN::Player
 	class PlayerContext
 	{
 	private:
+		// TODO: Make LaraInfo aware of its parent.
 		// Parent pointers
-		const ItemInfo*		 ItemPtr = nullptr;
+		/*const ItemInfo*		 ItemPtr = nullptr;
 		const LaraInfo*		 PlayerPtr = nullptr;
-		const CollisionInfo* CollPtr = nullptr;
+		const CollisionInfo* CollPtr = nullptr;*/
 
 	public:
 		// Members
@@ -35,7 +36,7 @@ namespace TEN::Player
 		PlayerContext() {};
 		PlayerContext(const ItemInfo& item, const CollisionInfo& coll);
 
-		// TODO: Move all functions here.
+		// TODO: Move all functions below into this class. Resulting syntax will be a neat player.Context.CanDoXYZ().
 	};
 
 	// Ground movement contexts

@@ -7,7 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_collide.h"
@@ -93,12 +93,6 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && CanCrouchToCrawl(*item, *coll))
-		{
-			item->Animation.TargetState = LS_CROUCH_IDLE;
-			return;
-		}
-
-		if ((IsHeld(In::Forward) || IsHeld(In::Back)) && TestLaraCrouchToCrawl(item))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
