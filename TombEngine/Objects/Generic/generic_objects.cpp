@@ -38,9 +38,9 @@
 #include "Objects/Generic/Doors/underwater_door.h"
 
 // Traps
+#include "Objects/Generic/Traps/CrumblingPlatform.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Objects/Generic/Traps/falling_block.h"
-#include "Objects/Generic/Traps/crumblingPlatform.h"
 
 using namespace TEN::Entities::Doors;
 using namespace TEN::Entities::Generic;
@@ -446,8 +446,8 @@ void StartTraps(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->Initialize = InitializeCrumblingPlatform;
-		object->collision = CrumblingPlatformCollision;
-		object->control = CrumblingPlatformControl;
+		object->control = ControlCrumblingPlatform;
+		object->collision = CollideCrumblingPlatform;
 
 		object->floor = CrumblingPlatformFloor;
 		object->ceiling = CrumblingPlatformCeiling;
