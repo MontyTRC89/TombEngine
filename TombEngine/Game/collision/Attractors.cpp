@@ -469,6 +469,9 @@ namespace TEN::Collision::Attractors
 		for (const auto& attracPtr : nearbyAttracPtrs)
 		{
 			auto attracColl = attracPtr->GetCollision(basePos, orient, refPoint, range);
+			if (attracColl.Proximity.Distance > range)
+				continue;
+
 			attracCollMap.insert({ attracColl.Proximity.Distance, attracColl });
 		}
 
