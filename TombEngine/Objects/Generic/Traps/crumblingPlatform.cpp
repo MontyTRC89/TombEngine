@@ -47,7 +47,7 @@ namespace TEN::Entities::Traps
 		item.ItemFlags[0] = delayInFrameTime;
 		UpdateBridgeItem(itemNumber);
 
-		// Store override bridge collision heights to using bounding box while shaking.
+		// Store override bridge collision heights to avoid using bounding box while shaking.
 		auto bounds = GameBoundingBox(&item);
 		item.ItemFlags[2] = bounds.Y1; // Floor.
 		item.ItemFlags[3] = bounds.Y2; // Ceiling.
