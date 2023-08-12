@@ -128,7 +128,7 @@ namespace TEN::Control::Volumes
 
 		for (auto& volume : room.triggerVolumes)
 		{
-			if (!volume.IsEnabled)
+			if (!volume.Enabled)
 				continue;
 
 			if (volume.EventSetIndex == NO_EVENT_SET)
@@ -238,16 +238,15 @@ namespace TEN::Control::Volumes
 	void TestVolumes(int roomNumber, MESH_INFO* meshPtr)
 	{
 		auto box = GetBoundsAccurate(*meshPtr, false).ToBoundingOrientedBox(meshPtr->pos);
-		
 		TestVolumes(roomNumber, box, VolumeActivatorFlags::Static, meshPtr);
 	}
 
 	void TestVolumes(CAMERA_INFO* cameraPtr)
 	{
-		constexpr auto CAMERA_EXTENT = 32.0f;
+		constexpr auto CAMERA_EXTENTS = Vector3(32.0f);
 
-		// TODO: Camera box is currently AABB. Should derive orientation from look-at? -- Sezz 2023.08.11
-		auto box = BoundingOrientedBox(cameraPtr->pos.ToVector3(), Vector3(CAMERA_EXTENT), Quaternion::Identity);
+		// TODO: Camera box is currently an AABB. Should derive orientation from look-at? -- Sezz 2023.08.11
+		auto box = BoundingOrientedBox(cameraPtr->pos.ToVector3(), CAMERA_EXTENTS, Quaternion::Identity);
 		TestVolumes(cameraPtr->pos.RoomNumber, box, VolumeActivatorFlags::Flyby, cameraPtr);
 	}
 }

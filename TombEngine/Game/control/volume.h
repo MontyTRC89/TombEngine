@@ -46,7 +46,7 @@ namespace TEN::Control::Volumes
 // ActivatorVolume
 struct TriggerVolume
 {
-	bool IsEnabled	   = true;
+	bool Enabled	   = true;
 	int	 EventSetIndex = 0;
 
 	std::string Name = {};
