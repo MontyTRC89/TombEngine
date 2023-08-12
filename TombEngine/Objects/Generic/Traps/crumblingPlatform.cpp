@@ -3,6 +3,8 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/setup.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
@@ -160,6 +162,7 @@ namespace TEN::Entities::Traps
 	void CollideCrumblingPlatform(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		auto& player = *GetLaraInfo(laraItem);
 
 		// OCB >= 0; activate via player collision. OCB < 0 activates via trigger.
 		if (item.TriggerFlags >= 0 && item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE)
@@ -167,7 +170,7 @@ namespace TEN::Entities::Traps
 			// Crumble if player is on platform.
 			if (!laraItem->Animation.IsAirborne &&
 				coll->LastBridgeItemNumber == item.Index &&
-				laraItem->Animation.ActiveState != LS_DOZY)
+				player.Control.WaterStatus <= WaterStatus::Wade)
 			{
 				ActivateCrumblingPlatform(itemNumber);
 			}
