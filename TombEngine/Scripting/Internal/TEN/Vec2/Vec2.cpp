@@ -28,7 +28,7 @@ void Vec2::Register(sol::table& parent)
 		sol::meta_function::division, &Vec2::DivideScale,
 		sol::meta_function::unary_minus, &Vec2::UnaryMinus,
 
-		/*** Modify to match input length.
+		/*** Modify the Vec2 to match the input length.
 		@tparam float length new length to set.
 		@function Vec2:ToLength
 		*/

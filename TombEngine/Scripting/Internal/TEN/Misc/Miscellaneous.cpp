@@ -209,9 +209,9 @@ namespace Misc
 	//@function PlaySound
 	//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
 	////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
-	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
+	static void PlaySoundEffect(int id, sol::optional<Vec3> pos)
 	{
-		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+		SoundEffect(id, pos.has_value() ? &Pose(Vector3i(pos->x, pos->y, pos->z)) : nullptr, SoundEnvironment::Always);
 	}
 
 	/// Check if the sound effect is playing
