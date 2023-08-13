@@ -95,18 +95,18 @@ void Volume::Register(sol::table& parent)
 
 void Volume::Enable()
 {
-	m_volume.IsEnabled = true;
+	m_volume.Enabled = true;
 }
 
 void Volume::Disable()
 {
 	ClearActivators();
-	m_volume.IsEnabled = false;
+	m_volume.Enabled = false;
 }
 
 bool Volume::GetActive() const
 {
-	return m_volume.IsEnabled;
+	return m_volume.Enabled;
 }
 
 Vec3 Volume::GetPos() const

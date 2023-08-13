@@ -18,21 +18,22 @@ public:
 	ScriptColor(const Vector4& color);
 	ScriptColor(D3DCOLOR);
 
+	byte GetR() const;
+	byte GetG() const;
+	byte GetB() const;
+	byte GetA() const;
+
+	void SetR(byte value);
+	void SetG(byte value);
+	void SetB(byte value);
+	void SetA(byte value);
+
+	std::string ToString() const;
+
 	operator Vector3() const;
 	operator Vector4() const;
 	operator D3DCOLOR() const;
 	operator RGBAColor8Byte() const;
-
-	byte GetR() const;
-	void SetR(byte value);
-	byte GetG() const;
-	void SetG(byte value);
-	byte GetB() const;
-	void SetB(byte value);
-	byte GetA() const;
-	void SetA(byte value);
-
-	std::string ToString() const;
 
 	static void Register(sol::table& parent);
 
