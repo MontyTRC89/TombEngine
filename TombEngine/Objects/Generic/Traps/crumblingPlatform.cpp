@@ -19,9 +19,9 @@ using namespace TEN::Collision::Floordata;
 
 namespace TEN::Entities::Traps
 {
-	constexpr auto CRUMBLING_PLATFORM_INITIAL_VELOCITY = 10.0f;
-	constexpr auto CRUMBLING_PLATFORM_MAX_VELOCITY	   = 100.0f;
-	constexpr auto CRUMBLING_PLATFORM_FALL_VELOCITY	   = 4.0f;
+	constexpr auto CRUMBLING_PLATFORM_VELOCITY_MAX	 = 100.0f;
+	constexpr auto CRUMBLING_PLATFORM_VELOCITY_MIN	 = 10.0f;
+	constexpr auto CRUMBLING_PLATFORM_VELOCITY_ACCEL = 4.0f;
 
 	constexpr auto CRUMBLING_PLATFORM_DELAY = 1.2f;
 
@@ -93,7 +93,7 @@ namespace TEN::Entities::Traps
 				else
 				{
 					SetAnimation(item, CRUMBLING_PLATFORM_ANIM_FALL);
-					item.ItemFlags[1] = CRUMBLING_PLATFORM_INITIAL_VELOCITY;
+					item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
 
 					auto pointColl = GetCollision(item);
 					pointColl.Block->RemoveBridge(itemNumber);
@@ -112,9 +112,9 @@ namespace TEN::Entities::Traps
 				// Airborne.
 				if (relFloorHeight <= fallVel)
 				{
-					fallVel += CRUMBLING_PLATFORM_FALL_VELOCITY;
-					if (fallVel > CRUMBLING_PLATFORM_MAX_VELOCITY)
-						fallVel = CRUMBLING_PLATFORM_MAX_VELOCITY;
+					fallVel += CRUMBLING_PLATFORM_VELOCITY_ACCEL;
+					if (fallVel > CRUMBLING_PLATFORM_VELOCITY_MAX)
+						fallVel = CRUMBLING_PLATFORM_VELOCITY_MAX;
 
 					item.Pose.Position.y += fallVel;
 				}
