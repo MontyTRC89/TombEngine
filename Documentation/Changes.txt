@@ -15,6 +15,10 @@ Version 1.1.1
  - A positive value results in activation via player collision.
  - A negative value requires a trigger to activate.
 
+Lua API changes:
+* Make Vec2 object float-based instead of integer-based.
+* Add Vec2 arithmetic for division with a number and multiplication with another Vec2.
+
 Version 1.1.0
 ==============
 
