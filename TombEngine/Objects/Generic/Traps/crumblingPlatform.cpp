@@ -162,15 +162,16 @@ namespace TEN::Entities::Traps
 	void CollideCrumblingPlatform(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto& player = *GetLaraInfo(laraItem);
+		const auto& player = GetLaraInfo(*laraItem);
 
 		// OCB >= 0; activate via player collision. OCB < 0 activates via trigger.
 		if (item.TriggerFlags >= 0 && item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE)
 		{
 			// Crumble if player is on platform.
 			if (!laraItem->Animation.IsAirborne &&
-				coll->LastBridgeItemNumber == item.Index &&
-				player.Control.WaterStatus <= WaterStatus::Wade)
+				player.Control.WaterStatus != WaterStatus::Wade &&
+				player.Control.WaterStatus != WaterStatus::Underwater &&
+				coll->LastBridgeItemNumber == item.Index)
 			{
 				ActivateCrumblingPlatform(itemNumber);
 			}
