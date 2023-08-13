@@ -185,10 +185,15 @@ namespace TEN::Entities::Traps
 		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
 			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
 		{
-			int height = item.ItemFlags[2];
-			return (item.Pose.Position.y + height);
+			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+			if (boxHeight.has_value())
+			{
+				int relHeight = item.ItemFlags[2];
+				return (item.Pose.Position.y + relHeight);
+			}
+
 		}
-		
+
 		return std::nullopt;
 	}
 
@@ -199,10 +204,15 @@ namespace TEN::Entities::Traps
 		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
 			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
 		{
-			int height = item.ItemFlags[3];
-			return (item.Pose.Position.y + height);
+			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+			if (boxHeight.has_value())
+			{
+				int relHeight = item.ItemFlags[3];
+				return (item.Pose.Position.y + relHeight);
+			}
+
 		}
-		
+
 		return std::nullopt;
 	}
 
