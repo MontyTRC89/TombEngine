@@ -189,13 +189,13 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 
 	result.Coordinates = pointColl.Position;
 	result.RoomNumber = pointColl.RoomNumber;
-	result.Block = &pointColl.nGetSector();
+	result.Block = &pointColl.GetSector();
 	result.BottomBlock = &pointColl.GetBottomSector();
 
-	result.Position.Floor = pointColl.nGetFloorHeight();
-	result.Position.Ceiling = pointColl.nGetCeilingHeight();
+	result.Position.Floor = pointColl.GetFloorHeight();
+	result.Position.Ceiling = pointColl.GetCeilingHeight();
 	result.Position.Bridge = pointColl.GetBridgeItemNumber();
-	result.Position.SplitAngle = pointColl.GetSplitAngle();
+	result.Position.SplitAngle = pointColl.GetBottomSector().FloorCollision.SplitAngle;
 	result.Position.FloorSlope = pointColl.IsFloorSlope();
 	result.Position.CeilingSlope = pointColl.IsCeilingSlope();
 	result.Position.DiagonalStep = pointColl.IsDiagonalStep();
