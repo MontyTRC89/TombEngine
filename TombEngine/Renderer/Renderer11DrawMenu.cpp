@@ -321,7 +321,7 @@ namespace TEN::Renderer
 				{
 					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer >= 0.0f && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -380,7 +380,7 @@ namespace TEN::Renderer
 				{
 					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer >= 0.0f && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -432,7 +432,7 @@ namespace TEN::Renderer
 				{
 					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer >= 0.0f && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
