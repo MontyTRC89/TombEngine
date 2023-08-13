@@ -221,6 +221,7 @@ namespace TEN::Entities::Creatures::TR1
 		skateItem.Animation.FrameNumber = GetAnimData(item).frameBase + (item.Animation.FrameNumber - GetAnimData(item).frameBase);
 		skateItem.Pose.Position = item.Pose.Position;
 		skateItem.Pose.Orientation = item.Pose.Orientation;
+		UpdateItemRoom(item.ItemFlags[0]);
 		AnimateItem(&skateItem);
 
 		CreatureJoint(&item, 0, extraHeadRot.y);

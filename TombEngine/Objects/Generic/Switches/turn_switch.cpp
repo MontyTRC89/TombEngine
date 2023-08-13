@@ -59,7 +59,7 @@ namespace TEN::Entities::Switches
 
 		int doSwitch = 0;
 
-		if (TrInput & IN_ACTION &&
+		if (IsHeld(In::Action) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraItem->Animation.IsAirborne == false &&
@@ -176,7 +176,7 @@ namespace TEN::Entities::Switches
 			if (switchItem->Animation.AnimNumber == Objects[switchItem->ObjectNumber].animIndex + 2)
 			{
 				switchItem->Pose.Orientation.y += ANGLE(90.0f);
-				if (TrInput & IN_ACTION)
+				if (IsHeld(In::Action))
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_START;
 					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
@@ -204,7 +204,7 @@ namespace TEN::Entities::Switches
 			if (switchItem->Animation.AnimNumber == Objects[ID_TURN_SWITCH].animIndex + 6)
 			{
 				switchItem->Pose.Orientation.y -= ANGLE(90.0f);
-				if (TrInput & IN_ACTION)
+				if (IsHeld(In::Action))
 				{
 					SetAnimation(*laraItem, LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START);
 					SetAnimation(*switchItem, 5);

@@ -71,7 +71,7 @@ namespace TEN::Entities::Switches
 		if (switchItem->Status == ITEM_NOT_ACTIVE)
 		{
 			if (!(switchItem->Flags & IFLAG_INVISIBLE) &&
-				(TrInput & IN_ACTION &&
+				(IsHeld(In::Action) &&
 					laraItem->Animation.ActiveState == LS_IDLE &&
 					laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 					lara->Control.HandStatus == HandStatus::Free &&
@@ -100,7 +100,7 @@ namespace TEN::Entities::Switches
 						{
 							if (!door->opened)
 							{
-								AddActiveItem((target - g_Level.Items.data()));
+								AddActiveItem(target->Index);
 								target->Status = ITEM_ACTIVE;
 							}
 						}
@@ -129,7 +129,7 @@ namespace TEN::Entities::Switches
 
 		if (switchItem->Animation.ActiveState == SWITCH_ON)
 		{
-			if (switchItem->Animation.TargetState == SWITCH_ON && !(TrInput & IN_ACTION))
+			if (switchItem->Animation.TargetState == SWITCH_ON && !IsHeld(In::Action))
 			{
 				LaraItem->Animation.TargetState = LS_COGWHEEL_UNGRAB;
 				switchItem->Animation.TargetState = SWITCH_OFF;
