@@ -133,11 +133,6 @@ namespace TEN::Collision
 		return *BridgeItemNumber;
 	}
 
-	float PointCollision::GetSplitAngle()
-	{
-		return GetBottomSector().FloorCollision.SplitAngle;
-	}
-
 	int PointCollision::GetWaterSurfaceHeight()
 	{
 		if (WaterSurfaceHeight.has_value())
@@ -204,14 +199,16 @@ namespace TEN::Collision
 		constexpr auto DIAGONAL_SPLIT_0 = 45.0f * RADIAN;
 		constexpr auto DIAGONAL_SPLIT_1 = 135.0f * RADIAN;
 
-		return ((GetSplitAngle() == DIAGONAL_SPLIT_0) || (GetSplitAngle() == DIAGONAL_SPLIT_1));
+		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
+		return ((splitAngle == DIAGONAL_SPLIT_0) || (splitAngle == DIAGONAL_SPLIT_1));
 	}
 
 	bool PointCollision::HasFlippedDiagonalSplit()
 	{
 		constexpr auto DIAGONAL_SPLIT_0 = 45.0f * RADIAN;
 
-		return (HasDiagonalSplit() && (GetSplitAngle() != DIAGONAL_SPLIT_0));
+		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
+		return (HasDiagonalSplit() && (splitAngle != DIAGONAL_SPLIT_0));
 	}
 
 	bool PointCollision::HasEnvironmentFlag(RoomEnvFlags envFlag)

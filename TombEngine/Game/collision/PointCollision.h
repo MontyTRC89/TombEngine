@@ -44,7 +44,6 @@ namespace TEN::Collision
 		Vector3 GetFloorNormal();
 		Vector3 GetCeilingNormal();
 		int		GetBridgeItemNumber();
-		float	GetSplitAngle();
 
 		int GetWaterSurfaceHeight();
 		int GetWaterTopHeight();
