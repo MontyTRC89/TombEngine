@@ -13,6 +13,9 @@ constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBou
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
 constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
+constexpr auto SLIPPERY_FLOOR_SLOPE_ANGLE	= short(ANGLE(45.0f) * 0.75f);
+constexpr auto SLIPPERY_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
+
 enum CollisionType
 {
 	CT_NONE		 = 0,
@@ -126,6 +129,7 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
+// All deprecated. Use GetPointCollision() instead.
 CollisionResult GetCollision(const ItemInfo& item);
 CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
