@@ -159,16 +159,19 @@ int IsRoomOutside(int x, int y, int z)
 	return NO_ROOM;
 }
 
-FloorInfo* GetSector(ROOM_INFO* room, int x, int z) 
+namespace TEN::Room
 {
-	int sectorX = std::clamp(x / BLOCK(1), 0, room->xSize - 1);
-	int sectorZ = std::clamp(z / BLOCK(1), 0, room->zSize - 1);
+	FloorInfo* GetSector(ROOM_INFO* room, int x, int z)
+	{
+		int sectorX = std::clamp(x / BLOCK(1), 0, room->xSize - 1);
+		int sectorZ = std::clamp(z / BLOCK(1), 0, room->zSize - 1);
 
-	int index = sectorZ + sectorX * room->zSize;
-	if (index > room->floor.size()) 
-		return nullptr;
-	
-	return &room->floor[index];
+		int index = sectorZ + sectorX * room->zSize;
+		if (index > room->floor.size())
+			return nullptr;
+
+		return &room->floor[index];
+	}
 }
 
 GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool visibility)

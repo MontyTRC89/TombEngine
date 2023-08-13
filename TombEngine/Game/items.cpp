@@ -21,11 +21,12 @@
 #include "Specific/level.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
-using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Room;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 

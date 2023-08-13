@@ -17,6 +17,7 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
+using namespace TEN::Room;
 
 namespace TEN::Entities::Generic
 {

@@ -25,6 +25,7 @@
 
 using namespace TEN::Gui;
 using namespace TEN::Input;
+using namespace TEN::Room;
 
 namespace TEN::Entities::Doors
 {

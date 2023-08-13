@@ -23,6 +23,7 @@
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
+using namespace TEN::Room;
 
 namespace TEN::Entities::Creatures::TR5
 {

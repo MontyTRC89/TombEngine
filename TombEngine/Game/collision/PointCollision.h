@@ -35,12 +35,12 @@ namespace TEN::Collision
 		PointCollision(const Vector3i& pos, int roomNumber);
 
 		// Getters
-		FloorInfo& nGetSector();
+		FloorInfo& GetSector();
 		FloorInfo& GetTopSector();
 		FloorInfo& GetBottomSector();
 
-		int		nGetFloorHeight();
-		int		nGetCeilingHeight();
+		int		GetFloorHeight();
+		int		GetCeilingHeight();
 		Vector3 GetFloorNormal();
 		Vector3 GetCeilingNormal();
 		int		GetBridgeItemNumber();

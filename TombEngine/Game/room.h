@@ -155,4 +155,8 @@ std::set<int> GetRoomList(int roomNumber);
 void InitializeNeighborRoomList();
 
 GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool visibility);
-FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
+
+namespace TEN::Room
+{
+	FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
+}

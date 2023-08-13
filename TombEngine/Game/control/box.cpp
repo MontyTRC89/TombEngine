@@ -23,6 +23,7 @@
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Effects::Smoke;
+using namespace TEN::Room;
 
 constexpr auto ESCAPE_DIST = BLOCK(5);
 constexpr auto STALK_DIST = BLOCK(3);
