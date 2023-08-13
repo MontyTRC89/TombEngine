@@ -746,7 +746,7 @@ namespace TEN::Player
 		auto setup = MonkeySwingSetupData
 		{
 			short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
-			CLICK(0.5f), -CLICK(0.5f) // NOTE: Bounds defined by monkey shimmy left/right states.
+			(int)CLICK(0.5f), (int)-CLICK(0.5f) // NOTE: Bounds defined by monkey shimmy left/right states.
 		};
 
 		return TestMonkeySwingSetup(item, coll, setup);
