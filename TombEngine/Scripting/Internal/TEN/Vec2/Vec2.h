@@ -1,29 +1,32 @@
 #pragma once
 
 namespace sol { class state; }
-namespace TEN::Math { class Vector2i; }
-
-using namespace TEN::Math;
 
 class Vec2
 {
 public:
-	int x = 0;
-	int y = 0;
+	static void Register(sol::table& parent);
 
-	Vec2(int x, int y);
-	Vec2(const Vector2i& pos);
+	// Members
+	float x = 0;
+	float y = 0;
 
-	operator Vector2i() const;
+	// Constructors
+	Vec2(float x, float y);
+	Vec2(const Vector2& pos);
 
+	// Setters
+	void SetLength(float length);
+
+	// Meta functions
 	[[nodiscard]] std::string ToString() const;
+	static Vec2 Add(const Vec2& vector0, const Vec2& vector1);
+	static Vec2 Subtract(const Vec2& vector0, const Vec2& vector1);
+	static Vec2 Multiply(const Vec2& vector0, const Vec2& vector1);
+	static Vec2 MultiplyScale(const Vec2& vector, float scale);
+	static Vec2 DivideScale(const Vec2& vector, float scale);
+	static Vec2 UnaryMinus(const Vec2& vector);
 
-	void ToLength(float newLength);
-
-	static void Register(sol::table&);
+	// Operators
+	operator Vector2() const;
 };
-
-Vec2 AddVec2s(const Vec2& vector0, const Vec2& vector1);
-Vec2 SubtractVec2s(const Vec2& vector0, const Vec2& vector1);
-Vec2 MultiplyVec2Number(const Vec2& vector, float scale);
-Vec2 UnaryMinusVec2(const Vec2& vector);
