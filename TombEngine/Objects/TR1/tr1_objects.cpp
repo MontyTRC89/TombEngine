@@ -27,7 +27,7 @@
 // Traps
 #include "Objects/TR1/Trap/DamoclesSword.h"
 #include "Objects/TR1/Trap/SlammingDoors.h"
-#include "Objects/TR1/Trap/SwingingTrap.h"
+#include "Objects/TR1/Trap/SwingingBlade.h"
 
 using namespace TEN::Entities::Creatures::TR1;
 using namespace TEN::Entities::Traps::TR1;

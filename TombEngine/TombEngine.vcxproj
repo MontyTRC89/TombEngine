@@ -465,7 +465,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Objects\TR1\Trap\SlammingDoors.h" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
-    <ClInclude Include="Objects\TR1\Trap\SwingingTrap.h" />
+    <ClInclude Include="Objects\TR1\Trap\SwingingBlade.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_bird_monster.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
@@ -918,7 +918,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SlammingDoors.cpp" />
-    <ClCompile Include="Objects\TR1\Trap\SwingingTrap.cpp" />
+    <ClCompile Include="Objects\TR1\Trap\SwingingBlade.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_barracuda.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_bird_monster.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_dragon.cpp" />
