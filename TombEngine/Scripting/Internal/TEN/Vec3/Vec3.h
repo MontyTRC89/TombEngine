@@ -17,7 +17,7 @@ public:
 
 	// Constructors
 	Vec3(float x, float y, float z);
-	Vec3(const Pose& pose);
+	Vec3(const Vector3i& pos);
 	Vec3(const Vector3& pos);
 
 	void StoreInPose(Pose& pos) const;

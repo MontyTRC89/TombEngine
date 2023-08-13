@@ -58,7 +58,7 @@ Vec3::Vec3(float aX, float aY, float aZ) : x(aX), y(aY), z(aZ)
 {
 }
 
-Vec3::Vec3(const Pose& pose) : x(pose.Position.x), y(pose.Position.y), z(pose.Position.z)
+Vec3::Vec3(const Vector3i& pos) : x(pos.x), y(pos.y), z(pos.z)
 {
 }
 
