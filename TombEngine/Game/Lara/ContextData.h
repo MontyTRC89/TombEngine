@@ -16,8 +16,8 @@ namespace TEN::Player
 	struct MonkeySwingSetupData
 	{
 		short HeadingAngle		= 0;
-		float LowerCeilingBound = 0.0f;
-		float UpperCeilingBound = 0.0f;
+		int	  LowerCeilingBound = 0.0f;
+		int	  UpperCeilingBound = 0.0f;
 	};
 
 	struct JumpSetupData
