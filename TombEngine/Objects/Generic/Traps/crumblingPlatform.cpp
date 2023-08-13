@@ -164,8 +164,9 @@ namespace TEN::Entities::Traps
 		{
 			// Crumble if player is on platform.
 			if (!laraItem->Animation.IsAirborne &&
-				player.Control.WaterStatus != WaterStatus::Wade &&
+				player.Control.WaterStatus != WaterStatus::TreadWater &&
 				player.Control.WaterStatus != WaterStatus::Underwater &&
+				player.Control.WaterStatus != WaterStatus::FlyCheat &&
 				coll->LastBridgeItemNumber == item.Index)
 			{
 				ActivateCrumblingPlatform(itemNumber);
