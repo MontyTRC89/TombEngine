@@ -112,9 +112,17 @@ namespace TEN::Collision
 			return *FloorNormal;
 
 		// Set floor normal.
-		auto floorTilt = GetBottomSector().GetSurfaceTilt(Position.x, Position.z, true);
-		auto floorNormal = GetSurfaceNormal(floorTilt, true);
-		FloorNormal = floorNormal;
+		if (GetBridgeItemNumber() != NO_ITEM)
+		{
+			// TODO: Get bridge normal.
+			FloorNormal = -Vector3::UnitY;
+		}
+		else
+		{
+			auto floorTilt = GetBottomSector().GetSurfaceTilt(Position.x, Position.z, true);
+			auto floorNormal = GetSurfaceNormal(floorTilt, true);
+			FloorNormal = floorNormal;
+		}
 
 		return *FloorNormal;
 	}
@@ -125,9 +133,18 @@ namespace TEN::Collision
 			return *CeilingNormal;
 
 		// Set ceiling normal.
-		auto ceilingTilt = GetTopSector().GetSurfaceTilt(Position.x, Position.z, false); // TODO: Check GetTopSector().
-		auto ceilingNormal = GetSurfaceNormal(ceilingTilt, false);
-		CeilingNormal = ceilingNormal;
+		if (GetBridgeItemNumber() != NO_ITEM)
+		{
+			// TODO: Get bridge normal.
+			CeilingNormal = Vector3::UnitY;
+		}
+		else
+		{
+			// TODO: Check GetTopSector().
+			auto ceilingTilt = GetTopSector().GetSurfaceTilt(Position.x, Position.z, false);
+			auto ceilingNormal = GetSurfaceNormal(ceilingTilt, false);
+			CeilingNormal = ceilingNormal;
+		}
 
 		return *CeilingNormal;
 	}
@@ -189,7 +206,7 @@ namespace TEN::Collision
 		auto floorNormal = GetFloorNormal();
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
 
-		return (GetBridgeItemNumber() == NO_ITEM && abs(slopeAngle) >= SLIPPERY_FLOOR_SLOPE_ANGLE);
+		return ((GetBridgeItemNumber() == NO_ITEM) && (abs(slopeAngle) >= SLIPPERY_FLOOR_SLOPE_ANGLE));
 	}
 
 	bool PointCollision::IsCeilingSlope()
