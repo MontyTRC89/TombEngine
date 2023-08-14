@@ -920,7 +920,7 @@ void Moveable::SetRoomNumber(int roomNumber)
 		// or else camera won't be updated properly.
 
 		if (m_item->IsLara())
-			m_item->Location.roomNumber = roomNumber;
+			m_item->Location.RoomNumber = roomNumber;
 	}
 }
 

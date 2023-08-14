@@ -1186,9 +1186,9 @@ bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 	item->Location = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z);
 	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
 
-	if (item->RoomNumber != item->Location.roomNumber)
+	if (item->RoomNumber != item->Location.RoomNumber)
 	{
-		ItemNewRoom(item->Index, item->Location.roomNumber);
+		ItemNewRoom(item->Index, item->Location.RoomNumber);
 		return true;
 	}
 

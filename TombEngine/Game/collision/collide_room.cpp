@@ -142,10 +142,10 @@ CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, 
 	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. -- Sezz 2022.06.14
 	auto location = item->IsLara() ?
 		item->Location :
-		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
+		RoomVector(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y);
 
 	auto point = Geometry::TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
-	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
+	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -153,10 +153,10 @@ CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, 
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = roomNumber;
-	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y);
 
 	auto point = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
-	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
+	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -165,8 +165,8 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAng
 	auto point = Geometry::TranslatePoint(pos, orient, dist);
 
 	short tempRoomNumber = roomNumber;
-	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
-	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
+	auto location = RoomVector{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -227,8 +227,8 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.Block = floor;
 	
 	// Floor and ceiling heights are borrowed directly from floordata.
-	result.Position.Floor = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
-	result.Position.Ceiling = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	result.Position.Floor = GetFloorHeight(RoomVector(floor->Room, y), x, z).value_or(NO_HEIGHT);
+	result.Position.Ceiling = GetCeilingHeight(RoomVector(floor->Room, y), x, z).value_or(NO_HEIGHT);
 
 	// Probe bottom collision block through portals.
 	while (floor->GetRoomNumberBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
@@ -377,19 +377,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	}
 
 	// Define generic variables used for later object-specific position test shifts.
-	ROOM_VECTOR tfLocation{}, tcLocation{}, lrfLocation{}, lrcLocation{};
+	RoomVector tfLocation, tcLocation, lrfLocation, lrcLocation;
 	int height, ceiling;
 
 	// Parameter definition ends here, now process to actual collision tests...
 
 	// HACK: when using SetPosition animcommand, item->RoomNumber does not immediately
 	// update, but only at the end of control loop. This may cause bugs when Lara is
-	// climbing or vaulting ledges under slopes. Using Location->roomNumber solves
-	// these bugs, as it is updated immediately. But since Location->roomNumber is ONLY
+	// climbing or vaulting ledges under slopes. Using Location->RoomNumber solves
+	// these bugs, as it is updated immediately. But since Location->RoomNumber is ONLY
 	// updated for Lara, we can't use it for all objects for now. In future, we should
 	// either update Location field for all objects or use this value as it is now.
 
-	int realRoomNumber = doPlayerCollision ? item->Location.roomNumber : item->RoomNumber;
+	int realRoomNumber = doPlayerCollision ? item->Location.RoomNumber : item->RoomNumber;
 	
 	// TEST 1: TILT AND NEAREST LEDGE CALCULATION
 
@@ -921,12 +921,12 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			float maxZ =  ceil(ffpZ / BLOCK(1)) * BLOCK(1) + 1.0f;
 
 			// Get front floor block
-			auto room = GetRoom(item->Location, ffpX, y, ffpZ).roomNumber;
+			auto room = GetRoom(item->Location, ffpX, y, ffpZ).RoomNumber;
 			auto block = GetCollision(ffpX, y, ffpZ, room).Block;
 
 			// Get front floor surface heights
-			auto floorHeight   = GetFloorHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
-			auto ceilingHeight = GetCeilingHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
+			auto floorHeight   = GetFloorHeight(RoomVector(block->Room, y), ffpX, ffpZ).value_or(NO_HEIGHT);
+			auto ceilingHeight = GetCeilingHeight(RoomVector(block->Room, y), ffpX, ffpZ).value_or(NO_HEIGHT);
 
 			// If probe landed inside wall (i.e. both floor/ceiling heights are NO_HEIGHT), make a fake
 			// ledge for algorithm to further succeed.
@@ -951,7 +951,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 			// Get true room number and block, based on derived height
-			room = GetRoom(item->Location, fpX, height, fpZ).roomNumber;
+			room = GetRoom(item->Location, fpX, height, fpZ).RoomNumber;
 			block = GetCollision(fpX, height, fpZ, room).Block;
 
 			// We don't need actual corner heights to build planes, so just use normalized value here.
@@ -1150,19 +1150,19 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber)
 {
-	const auto location = GetRoom(ROOM_VECTOR{ *roomNumber, y }, x, y, z);
-	*roomNumber = location.roomNumber;
+	const auto location = GetRoom(RoomVector{ *roomNumber, y }, x, y, z);
+	*roomNumber = location.RoomNumber;
 	return &GetFloor(*roomNumber, x, z);
 }
 
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z)
 {
-	return GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	return GetFloorHeight(RoomVector(floor->Room, y), x, z).value_or(NO_HEIGHT);
 }
 
 int GetCeiling(FloorInfo* floor, int x, int y, int z)
 {
-	return GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	return GetCeilingHeight(RoomVector(floor->Room, y), x, z).value_or(NO_HEIGHT);
 }
 
 int GetDistanceToFloor(int itemNumber, bool precise)

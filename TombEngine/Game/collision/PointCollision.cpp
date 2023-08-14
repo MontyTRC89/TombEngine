@@ -15,12 +15,12 @@ using namespace TEN::Room;
 namespace TEN::Collision
 {
 	// TEMP: Wrappers to avoid name clashes.
-	static std::optional<int> WrapGetFloorHeight(const ROOM_VECTOR& roomVector, int x, int z)
+	static std::optional<int> WrapGetFloorHeight(const RoomVector& roomVector, int x, int z)
 	{
 		return GetFloorHeight(roomVector, x, z);
 	}
 	
-	static std::optional<int> WrapGetCeilingHeight(const ROOM_VECTOR& roomVector, int x, int z)
+	static std::optional<int> WrapGetCeilingHeight(const RoomVector& roomVector, int x, int z)
 	{
 		return GetCeilingHeight(roomVector, x, z);
 	}
@@ -88,7 +88,7 @@ namespace TEN::Collision
 			return *FloorHeight;
 
 		// Set floor height.
-		auto roomVector = ROOM_VECTOR{ GetSector().Room, Position.y };
+		auto roomVector = RoomVector(GetSector().Room, Position.y);
 		FloorHeight = WrapGetFloorHeight(roomVector, Position.x, Position.z).value_or(NO_HEIGHT);
 		
 		return *FloorHeight;
@@ -100,7 +100,7 @@ namespace TEN::Collision
 			return *CeilingHeight;
 
 		// Set ceiling height.
-		auto roomVector = ROOM_VECTOR{ GetSector().Room, Position.y};
+		auto roomVector = RoomVector(GetSector().Room, Position.y);
 		CeilingHeight = WrapGetCeilingHeight(roomVector, Position.x, Position.z).value_or(NO_HEIGHT);
 		
 		return *CeilingHeight;
@@ -256,10 +256,10 @@ namespace TEN::Collision
 		short tempRoomNumber = roomNumber;
 		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
 
-		auto roomVector = ROOM_VECTOR{ sector.Room, pos.y };
+		auto roomVector = RoomVector(sector.Room, pos.y);
 
 		auto probePos = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
-		int adjacentRoomNumber = GetRoom(roomVector, pos.x, probePos.y, pos.z).roomNumber;
+		int adjacentRoomNumber = GetRoom(roomVector, pos.x, probePos.y, pos.z).RoomNumber;
 		return PointCollision(probePos, adjacentRoomNumber);
 	}
 
@@ -270,7 +270,7 @@ namespace TEN::Collision
 
 	// TODO: Find cleaner solution. Constructing a room vector (sometimes dubbed "Location")
 	// on the spot for the player can result in a stumble when climbing onto thin platforms. -- Sezz 2022.06.14
-	static ROOM_VECTOR GetEntityRoomVector(const ItemInfo& item)
+	static RoomVector GetEntityRoomVector(const ItemInfo& item)
 	{
 		if (item.IsLara())
 			return item.Location;
@@ -278,7 +278,7 @@ namespace TEN::Collision
 		short tempRoomNumber = item.RoomNumber;
 		const auto& sector = *GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &tempRoomNumber);
 
-		return ROOM_VECTOR{ sector.Room, item.Pose.Position.y };
+		return RoomVector(sector.Room, item.Pose.Position.y);
 	}
 
 	PointCollision GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right)
@@ -286,7 +286,7 @@ namespace TEN::Collision
 		auto roomVector = GetEntityRoomVector(item);
 
 		auto probePos = Geometry::TranslatePoint(item.Pose.Position, headingAngle, forward, down, right);
-		int adjacentRoomNumber = GetRoom(roomVector, item.Pose.Position.x, probePos.y, item.Pose.Position.z).roomNumber;
+		int adjacentRoomNumber = GetRoom(roomVector, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
 		return PointCollision(probePos, adjacentRoomNumber);
 	}
 }

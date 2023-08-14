@@ -1555,8 +1555,8 @@ bool SaveGame::Load(int slot)
 		{
 			LaraItem->Data = nullptr;
 			LaraItem = item;
-			LaraItem->Location.roomNumber = savedItem->room_number();
-			LaraItem->Location.yNumber = item->Pose.Position.y;
+			LaraItem->Location.RoomNumber = savedItem->room_number();
+			LaraItem->Location.Height = item->Pose.Position.y;
 			LaraItem->Data = &Lara;
 		}
 

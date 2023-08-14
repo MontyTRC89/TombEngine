@@ -55,6 +55,20 @@ enum class ClimbDirectionFlags
 	West  = (1 << 11)
 };
 
+struct RoomVector 
+{
+	int RoomNumber = 0;
+	int Height	   = 0;
+
+	RoomVector() {};
+
+	RoomVector(int roomNumber, int height)
+	{
+		RoomNumber = roomNumber;
+		Height = height;
+	}
+};
+
 struct SurfaceCollisionData
 {
 private:
@@ -174,12 +188,12 @@ namespace TEN::Collision::Floordata
 	
 	std::optional<int> GetTopHeight(FloorInfo& startSector, Vector3i pos, int* topRoomNumberPtr = nullptr, FloorInfo** topSectorPtr = nullptr);
 	std::optional<int> GetBottomHeight(FloorInfo& startSector, Vector3i pos, int* bottomRoomNumberPtr = nullptr, FloorInfo** bottomSectorPtr = nullptr);
-	std::optional<int> GetFloorHeight(const ROOM_VECTOR& location, int x, int z);
-	std::optional<int> GetCeilingHeight(const ROOM_VECTOR& location, int x, int z);
+	std::optional<int> GetFloorHeight(const RoomVector& location, int x, int z);
+	std::optional<int> GetCeilingHeight(const RoomVector& location, int x, int z);
 	
-	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, int x, int y, int z);
-	std::optional<ROOM_VECTOR> GetTopRoom(ROOM_VECTOR location, int x, int y, int z);
-	ROOM_VECTOR				   GetRoom(ROOM_VECTOR location, int x, int y, int z);
+	std::optional<RoomVector> GetBottomRoom(RoomVector location, int x, int y, int z);
+	std::optional<RoomVector> GetTopRoom(RoomVector location, int x, int y, int z);
+	RoomVector				  GetRoom(RoomVector location, int x, int y, int z);
 
 	void AddBridge(int itemNumber, int x = 0, int z = 0);
 	void RemoveBridge(int itemNumber, int x = 0, int z = 0);

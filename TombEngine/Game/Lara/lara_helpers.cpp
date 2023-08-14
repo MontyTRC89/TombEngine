@@ -534,7 +534,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 	for (auto& node : player.Effect.DripNodes)
 	{
 		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
-		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).RoomNumber;
 		jointIndex++;
 
 		// Node underwater; set max wetness value.
@@ -571,7 +571,7 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 	for (auto& node : player.Effect.BubbleNodes)
 	{
 		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
-		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).RoomNumber;
 		jointIndex++;
 
 		// Node inactive; continue.
