@@ -233,7 +233,7 @@ namespace TEN::Collision
 	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber)
 	{
 		// HACK: This function takes arguments for a *current* position and room number.
-		// However, since some calls to the previous implementation (GetCollision()) had *projected*
+		// However, since some calls to the previous implementation (GetCollision()) had *vertically projected*
 		// positions passed to it, for now the room number must be corrected to account for such cases.
 		// They are primarily found in camera.cpp.
 		short correctedRoomNumber = roomNumber;

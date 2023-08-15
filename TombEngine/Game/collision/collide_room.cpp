@@ -164,22 +164,6 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingA
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAngles& orient, float dist)
-{
-	auto point = Geometry::TranslatePoint(pos, orient, dist);
-
-	short tempRoomNumber = roomNumber;
-	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y);
-	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).RoomNumber;
-
-	// Get probe position's room number.
-	short probeRoomNumber = GetRoom(location, pos.x, point.y, pos.z).RoomNumber;
-	GetFloor(point.x, point.y, point.z, &probeRoomNumber);
-
-	auto pointColl = GetPointCollision(point, roomNumber);
-	return ConvertPointCollisionToCollisionResult(pointColl);
-}
-
 // Overload used as universal wrapper across collisional code replacing
 // triads of roomNumber-GetFloor()-GetFloorHeight() calls.
 // Advantage is that it does NOT modify incoming roomNumber argument,
