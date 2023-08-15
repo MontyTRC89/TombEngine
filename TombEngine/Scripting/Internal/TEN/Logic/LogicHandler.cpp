@@ -222,7 +222,21 @@ Any returned value will be discarded.
 void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
 	auto it = m_callbacks.find(point);
-	it->second->insert(levelFunc.m_funcName);
+
+	if (it == m_callbacks.end()) 
+	{
+		TENLog("Error: Callback point not found, attempt to access a non-existent value.", LogLevel::Error, LogConfig::All, false);
+		return;
+	}
+	
+	if (it->second->find(levelFunc.m_funcName) != it->second->end())
+	{
+		TENLog("Warning: Function " + levelFunc.m_funcName + " is already register in the callbacks list", LogLevel::Warning, LogConfig::All, true);
+	}
+	else
+	{
+		it->second->insert(levelFunc.m_funcName);
+	}
 }
 
 /*** Deregister a function as a callback.
