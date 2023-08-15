@@ -251,6 +251,13 @@ Will have no effect if the function was not registered as a callback
 void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
 	auto it = m_callbacks.find(point);
+
+	if (it == m_callbacks.end())
+	{
+		TENLog("Error: Callback point not found, attempt to access a non-existent value.", LogLevel::Error, LogConfig::All, false);
+		return;
+	}
+
 	it->second->erase(levelFunc.m_funcName);
 }
 
