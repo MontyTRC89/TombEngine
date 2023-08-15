@@ -231,7 +231,7 @@ void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 	
 	if (it->second->find(levelFunc.m_funcName) != it->second->end())
 	{
-		TENLog("Warning: Function " + levelFunc.m_funcName + " is already register in the callbacks list", LogLevel::Warning, LogConfig::All, true);
+		TENLog("Warning: Function " + levelFunc.m_funcName + " is already registered in that callbacks list.", LogLevel::Warning, LogConfig::All, true);
 	}
 	else
 	{
