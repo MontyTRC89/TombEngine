@@ -159,7 +159,7 @@ int IsRoomOutside(int x, int y, int z)
 	return NO_ROOM;
 }
 
-namespace TEN::Room
+namespace TEN::Collision::Room
 {
 	FloorInfo* GetSector(ROOM_INFO* room, int x, int z)
 	{

@@ -15,8 +15,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Room;
 using namespace TEN::Math;
-using namespace TEN::Room;
 
 namespace TEN::Entities::Creatures::TR5
 {

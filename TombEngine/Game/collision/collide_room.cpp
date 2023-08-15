@@ -15,9 +15,9 @@
 
 using namespace TEN::Collision;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Room;
 
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {

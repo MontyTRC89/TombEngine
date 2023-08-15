@@ -156,7 +156,7 @@ void InitializeNeighborRoomList();
 
 GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool visibility);
 
-namespace TEN::Room
+namespace TEN::Collision::Room
 {
 	FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
 }

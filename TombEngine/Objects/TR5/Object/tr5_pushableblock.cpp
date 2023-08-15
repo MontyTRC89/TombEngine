@@ -16,8 +16,8 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Room;
 using namespace TEN::Input;
-using namespace TEN::Room;
 
 namespace TEN::Entities::Generic
 {

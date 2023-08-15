@@ -10,7 +10,7 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-using namespace TEN::Room;
+using namespace TEN::Collision::Room;
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32

@@ -23,9 +23,9 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/itemdata.h"
 
+using namespace TEN::Collision::Room;
 using namespace TEN::Gui;
 using namespace TEN::Input;
-using namespace TEN::Room;
 
 namespace TEN::Entities::Doors
 {

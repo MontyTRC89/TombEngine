@@ -6,7 +6,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 
-using namespace TEN::Room;
+using namespace TEN::Collision::Room;
 
 void InitializeSmashObject(short itemNumber)
 {

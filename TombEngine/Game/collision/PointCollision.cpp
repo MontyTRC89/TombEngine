@@ -9,8 +9,8 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Room;
 using namespace TEN::Math;
-using namespace TEN::Room;
 
 namespace TEN::Collision
 {
