@@ -742,12 +742,12 @@ namespace TEN::Collision::Floordata
 
 	RoomVector GetRoom(RoomVector location, int x, int y, int z)
 	{
-		const auto locationBelow = GetBottomRoom(location, x, y, z);
-		if (locationBelow)
+		auto locationBelow = GetBottomRoom(location, x, y, z);
+		if (locationBelow.has_value())
 			return *locationBelow;
 
-		const auto locationAbove = GetTopRoom(location, x, y, z);
-		if (locationAbove)
+		auto locationAbove = GetTopRoom(location, x, y, z);
+		if (locationAbove.has_value())
 			return *locationAbove;
 
 		return location;

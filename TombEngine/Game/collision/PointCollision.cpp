@@ -240,11 +240,10 @@ namespace TEN::Collision
 	{
 		short tempRoomNumber = roomNumber;
 		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
-
-		auto roomVector = RoomVector(sector.Room, pos.y);
+		auto location = RoomVector(sector.Room, pos.y);
 
 		auto probePos = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
-		int adjacentRoomNumber = GetRoom(roomVector, pos.x, probePos.y, pos.z).RoomNumber;
+		int adjacentRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
 		return PointCollision(probePos, adjacentRoomNumber);
 	}
 
@@ -253,9 +252,9 @@ namespace TEN::Collision
 		return PointCollision(item.Pose.Position, item.RoomNumber);
 	}
 
-	// TODO: Find cleaner solution. Constructing a room vector (sometimes dubbed "Location")
-	// on the spot for the player can result in a stumble when climbing onto thin platforms. -- Sezz 2022.06.14
-	static RoomVector GetEntityRoomVector(const ItemInfo& item)
+	// TODO: Find cleaner solution. Constructing a "location" on the spot for the player
+	// can result in a stumble when climbing onto thin platforms. -- Sezz 2022.06.14
+	static RoomVector GetEntityLocation(const ItemInfo& item)
 	{
 		if (item.IsLara())
 			return item.Location;
@@ -268,10 +267,10 @@ namespace TEN::Collision
 
 	PointCollision GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right)
 	{
-		auto roomVector = GetEntityRoomVector(item);
+		auto location = GetEntityLocation(item);
 
 		auto probePos = Geometry::TranslatePoint(item.Pose.Position, headingAngle, forward, down, right);
-		int adjacentRoomNumber = GetRoom(roomVector, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
+		int adjacentRoomNumber = GetRoom(location, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
 		return PointCollision(probePos, adjacentRoomNumber);
 	}
 }
