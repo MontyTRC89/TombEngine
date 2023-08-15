@@ -27,8 +27,7 @@ namespace TEN::Collision
 
 		// Set current sector pointer.
 		short probedRoomNumber = RoomNumber;
-		auto* sectorPtr = GetFloor(Position.x, Position.y, Position.z, &probedRoomNumber);
-		SectorPtr = sectorPtr;
+		SectorPtr = GetFloor(Position.x, Position.y, Position.z, &probedRoomNumber);
 
 		return *SectorPtr;
 	}
@@ -233,18 +232,48 @@ namespace TEN::Collision
 
 	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber)
 	{
-		return PointCollision(pos, roomNumber);
+		// HACK: This function takes arguments for a *current* position and room number.
+		// However, since some calls to the previous implementation (GetCollision()) had *projected*
+		// positions passed to it, for now the room number must be corrected to account for such cases.
+		// They are primarily found in camera.cpp.
+		short correctedRoomNumber = roomNumber;
+		GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
+
+		return PointCollision(pos, correctedRoomNumber);
 	}
 
-	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
+	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
 	{
+		// Get "location".
 		short tempRoomNumber = roomNumber;
 		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
 		auto location = RoomVector(sector.Room, pos.y);
 
+		// Calculate probe position.
+		auto probePos = Geometry::TranslatePoint(pos, dir, dist);
+
+		// Get probe position's room number.
+		short probeRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
+		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+
+		return PointCollision(probePos, probeRoomNumber);
+	}
+
+	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
+	{
+		// Get "location".
+		short tempRoomNumber = roomNumber;
+		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
+		auto location = RoomVector(sector.Room, pos.y);
+
+		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
-		int adjacentRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
-		return PointCollision(probePos, adjacentRoomNumber);
+
+		// Get probe position's room number.
+		short probeRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
+		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+
+		return PointCollision(probePos, probeRoomNumber);
 	}
 
 	PointCollision GetPointCollision(const ItemInfo& item)
@@ -265,12 +294,33 @@ namespace TEN::Collision
 		return RoomVector(sector.Room, item.Pose.Position.y);
 	}
 
-	PointCollision GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right)
+	PointCollision GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist)
 	{
+		// Get "location".
 		auto location = GetEntityLocation(item);
 
+		// Calculate probe position.
+		auto probePos = Geometry::TranslatePoint(item.Pose.Position, dir, dist);
+
+		// Get probe position's room number.
+		short probeRoomNumber = GetRoom(location, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
+		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+
+		return PointCollision(probePos, probeRoomNumber);
+	}
+
+	PointCollision GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right)
+	{
+		// Get "location".
+		auto location = GetEntityLocation(item);
+
+		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(item.Pose.Position, headingAngle, forward, down, right);
-		int adjacentRoomNumber = GetRoom(location, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
-		return PointCollision(probePos, adjacentRoomNumber);
+
+		// Get probe position's room number.
+		short probeRoomNumber = GetRoom(location, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
+		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+
+		return PointCollision(probePos, probeRoomNumber);
 	}
 }

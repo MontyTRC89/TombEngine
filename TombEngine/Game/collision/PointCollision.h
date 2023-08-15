@@ -60,7 +60,9 @@ namespace TEN::Collision
 	};
 
 	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber);
+	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist);
 	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 	PointCollision GetPointCollision(const ItemInfo& item);
+	PointCollision GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist);
 	PointCollision GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 }

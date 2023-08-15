@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/los.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -21,6 +22,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision;
 using TEN::Renderer::g_Renderer;
 
 using namespace TEN::Effects::Environment;
@@ -175,8 +177,8 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 	auto lookAtPos = Geometry::TranslatePoint(pivotPos, orient, LOOK_AT_DIST);
 
 	// Determine best position.
-	auto origin = GameVector(pivotPos, GetCollision(&item, item.Pose.Orientation.y, pivotOffset.z, pivotOffset.y).RoomNumber);
-	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, idealDist).RoomNumber);
+	auto origin = GameVector(pivotPos, GetPointCollision(item, item.Pose.Orientation.y, pivotOffset.z, pivotOffset.y).RoomNumber);
+	auto target = GameVector(idealPos, GetPointCollision(origin.ToVector3i(), origin.RoomNumber, orient.ToDirection(), idealDist).RoomNumber);
 
 	// Handle room and object collisions.
 	LOSAndReturnTarget(&origin, &target, 0);

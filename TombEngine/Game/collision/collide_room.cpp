@@ -117,47 +117,51 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-// Overload used to quickly get point collision parameters at a given item's position.
+static CollisionResult ConvertPointCollisionToCollisionResult(PointCollision& pointColl)
+{
+	auto collResult = CollisionResult{};
+
+	collResult.Coordinates = pointColl.Position;
+	collResult.RoomNumber = pointColl.RoomNumber;
+	collResult.Block = &pointColl.GetSector();
+	collResult.BottomBlock = &pointColl.GetBottomSector();
+
+	collResult.Position.Floor = pointColl.GetFloorHeight();
+	collResult.Position.Ceiling = pointColl.GetCeilingHeight();
+	collResult.Position.Bridge = pointColl.GetBridgeItemNumber();
+	collResult.Position.SplitAngle = pointColl.GetBottomSector().FloorCollision.SplitAngle;
+	collResult.Position.FloorSlope = pointColl.IsFloorSlope();
+	collResult.Position.CeilingSlope = pointColl.IsCeilingSlope();
+	collResult.Position.DiagonalStep = pointColl.IsDiagonalStep();
+
+	collResult.FloorTilt = collResult.BottomBlock->GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, true);
+	collResult.CeilingTilt = collResult.BottomBlock->GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, false);
+
+	return collResult;
+}
+
 CollisionResult GetCollision(const ItemInfo& item)
 {
-	auto newRoomNumber = item.RoomNumber;
-	auto floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &newRoomNumber);
-	auto probe = GetCollision(floor, item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z);
-
-	probe.RoomNumber = newRoomNumber;
-	return probe;
+	auto pointColl = GetPointCollision(item);
+	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-// Deprecated.
 CollisionResult GetCollision(ItemInfo* item)
 {
-	return GetCollision(*item);
+	auto pointColl = GetPointCollision(*item);
+	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-// Overload used to probe point collision parameters from a given item's position.
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
-	short tempRoomNumber = item->RoomNumber;
-
-	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. -- Sezz 2022.06.14
-	auto location = item->IsLara() ?
-		item->Location :
-		RoomVector(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y);
-
-	auto point = Geometry::TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
-	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).RoomNumber;
-	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+	auto pointColl = GetPointCollision(*item, headingAngle, forward, down, right);
+	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-// Overload used to probe point collision parameters from a given position.
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 {
-	short tempRoomNumber = roomNumber;
-	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y);
-
-	auto point = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
-	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).RoomNumber;
-	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+	auto pointColl = GetPointCollision(pos, roomNumber, headingAngle, forward, down, right);
+	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAngles& orient, float dist)
@@ -165,9 +169,15 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAng
 	auto point = Geometry::TranslatePoint(pos, orient, dist);
 
 	short tempRoomNumber = roomNumber;
-	auto location = RoomVector{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y);
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).RoomNumber;
-	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+
+	// Get probe position's room number.
+	short probeRoomNumber = GetRoom(location, pos.x, point.y, pos.z).RoomNumber;
+	GetFloor(point.x, point.y, point.z, &probeRoomNumber);
+
+	auto pointColl = GetPointCollision(point, roomNumber);
+	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
 // Overload used as universal wrapper across collisional code replacing
@@ -177,39 +187,26 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAng
 // This way, no external variables are modified as output arguments.
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber)
 {
-	return GetCollision(pos.x, pos.y, pos.z, roomNumber);
+	auto pointColl = GetPointCollision(pos, roomNumber);
+	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-// Deprecated.
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
+	/*auto room = roomNumber;
+	auto floor = GetFloor(x, y, z, &room);
+	auto result = GetCollision(floor, x, y, z);
+	result.RoomNumber = room;
+	return result;*/
+
 	auto pointColl = GetPointCollision(Vector3i(x, y, z), roomNumber);
-
-	auto result = CollisionResult{};
-
-	result.Coordinates = pointColl.Position;
-	result.RoomNumber = pointColl.RoomNumber;
-	result.Block = &pointColl.GetSector();
-	result.BottomBlock = &pointColl.GetBottomSector();
-
-	result.Position.Floor = pointColl.GetFloorHeight();
-	result.Position.Ceiling = pointColl.GetCeilingHeight();
-	result.Position.Bridge = pointColl.GetBridgeItemNumber();
-	result.Position.SplitAngle = pointColl.GetBottomSector().FloorCollision.SplitAngle;
-	result.Position.FloorSlope = pointColl.IsFloorSlope();
-	result.Position.CeilingSlope = pointColl.IsCeilingSlope();
-	result.Position.DiagonalStep = pointColl.IsDiagonalStep();
-
-	result.FloorTilt = result.BottomBlock->GetSurfaceTilt(x, z, true);
-	result.CeilingTilt = result.BottomBlock->GetSurfaceTilt(x, z, false);
-
-	return result;
+	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-// NOTE: To be used only when absolutely necessary.
 CollisionResult GetCollision(const GameVector& pos)
 {
-	return GetCollision(pos.x, pos.y, pos.z, pos.RoomNumber);
+	auto pointColl = GetPointCollision(pos.ToVector3i(), pos.RoomNumber);
+	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
 // A reworked legacy GetFloorHeight() function which writes data
