@@ -14,17 +14,6 @@ using namespace TEN::Room;
 
 namespace TEN::Collision
 {
-	// TEMP: Wrappers to avoid name clashes.
-	static std::optional<int> WrapGetFloorHeight(const RoomVector& roomVector, int x, int z)
-	{
-		return GetFloorHeight(roomVector, x, z);
-	}
-	
-	static std::optional<int> WrapGetCeilingHeight(const RoomVector& roomVector, int x, int z)
-	{
-		return GetCeilingHeight(roomVector, x, z);
-	}
-	
 	PointCollision::PointCollision(const Vector3i& pos, int roomNumber) :
 		Position(pos),
 		RoomNumber(roomNumber)
@@ -56,7 +45,7 @@ namespace TEN::Collision
 			auto roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z);
 			auto& room = g_Level.Rooms[roomNumberAbove.value_or(topSectorPtr->Room)];
 
-			topSectorPtr = TEN::Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
+			topSectorPtr = Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
 		}
 		TopSectorPtr = topSectorPtr;
 
@@ -75,7 +64,7 @@ namespace TEN::Collision
 			auto roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(Position.x, Position.y, Position.z);
 			auto& room = g_Level.Rooms[roomNumberBelow.value_or(bottomSectorPtr->Room)];
 
-			bottomSectorPtr = TEN::Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
+			bottomSectorPtr = Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
 		}
 		BottomSectorPtr = bottomSectorPtr;
 
@@ -89,7 +78,7 @@ namespace TEN::Collision
 
 		// Set floor height.
 		auto roomVector = RoomVector(GetSector().Room, Position.y);
-		FloorHeight = WrapGetFloorHeight(roomVector, Position.x, Position.z).value_or(NO_HEIGHT);
+		FloorHeight = Floordata::GetFloorHeight(roomVector, Position.x, Position.z).value_or(NO_HEIGHT);
 		
 		return *FloorHeight;
 	}
@@ -101,7 +90,7 @@ namespace TEN::Collision
 
 		// Set ceiling height.
 		auto roomVector = RoomVector(GetSector().Room, Position.y);
-		CeilingHeight = WrapGetCeilingHeight(roomVector, Position.x, Position.z).value_or(NO_HEIGHT);
+		CeilingHeight = Floordata::GetCeilingHeight(roomVector, Position.x, Position.z).value_or(NO_HEIGHT);
 		
 		return *CeilingHeight;
 	}
@@ -120,8 +109,7 @@ namespace TEN::Collision
 		else
 		{
 			auto floorTilt = GetBottomSector().GetSurfaceTilt(Position.x, Position.z, true);
-			auto floorNormal = GetSurfaceNormal(floorTilt, true);
-			FloorNormal = floorNormal;
+			FloorNormal = GetSurfaceNormal(floorTilt, true);
 		}
 
 		return *FloorNormal;
@@ -140,10 +128,8 @@ namespace TEN::Collision
 		}
 		else
 		{
-			// TODO: Check GetTopSector().
 			auto ceilingTilt = GetTopSector().GetSurfaceTilt(Position.x, Position.z, false);
-			auto ceilingNormal = GetSurfaceNormal(ceilingTilt, false);
-			CeilingNormal = ceilingNormal;
+			CeilingNormal = GetSurfaceNormal(ceilingTilt, false);
 		}
 
 		return *CeilingNormal;
@@ -156,8 +142,7 @@ namespace TEN::Collision
 
 		// Set bridge item number.
 		int floorHeight = GetFloorHeight();
-		int bridgItemNumber = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);
-		BridgeItemNumber = bridgItemNumber;
+		BridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);;
 
 		return *BridgeItemNumber;
 	}
