@@ -1125,7 +1125,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber)
 {
-	const auto location = GetRoom(RoomVector{ *roomNumber, y }, x, y, z);
+	auto location = GetRoom(RoomVector(*roomNumber, y), x, y, z);
 	*roomNumber = location.RoomNumber;
 	return &GetFloor(*roomNumber, x, z);
 }
