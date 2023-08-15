@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/collision/collide_room.h"
 #include "Math/Math.h"
 
 enum RoomEnvFlags;
@@ -51,8 +52,8 @@ namespace TEN::Collision
 
 		// Inquirers
 		bool IsWall();
-		bool IsFloorSlope();
-		bool IsCeilingSlope();
+		bool IsSlipperyFloor(short slopeAngleMin = DEFAULT_SLIPPERY_FLOOR_SLOPE_ANGLE);
+		bool IsSlipperyCeiling(short slopeAngleMin = DEFAULT_SLIPPERY_CEILING_SLOPE_ANGLE);
 		bool IsDiagonalStep();
 		bool HasDiagonalSplit();
 		bool HasFlippedDiagonalSplit();

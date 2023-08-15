@@ -184,22 +184,24 @@ namespace TEN::Collision
 		return ((GetFloorHeight() == NO_HEIGHT) || (GetCeilingHeight() == NO_HEIGHT));
 	}
 
-	bool PointCollision::IsFloorSlope()
+	bool PointCollision::IsSlipperyFloor(short slopeAngleMin)
 	{
 		// Get floor slope angle.
 		auto floorNormal = GetFloorNormal();
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
 
-		return ((GetBridgeItemNumber() == NO_ITEM) && (abs(slopeAngle) >= SLIPPERY_FLOOR_SLOPE_ANGLE));
+		// TODO: Slippery bridges.
+		return ((GetBridgeItemNumber() == NO_ITEM) && (abs(slopeAngle) >= slopeAngleMin));
 	}
 
-	bool PointCollision::IsCeilingSlope()
+	bool PointCollision::IsSlipperyCeiling(short slopeAngleMin)
 	{
 		// Get ceiling slope angle.
 		auto ceilingNormal = GetCeilingNormal();
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(ceilingNormal, -Vector3::UnitY);
-		
-		return (abs(slopeAngle) >= SLIPPERY_CEILING_SLOPE_ANGLE);
+
+		// TODO: Slippery bridges.
+		return (abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollision::IsDiagonalStep()

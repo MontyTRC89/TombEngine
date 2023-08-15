@@ -130,8 +130,8 @@ static CollisionResult ConvertPointCollisionToCollisionResult(PointCollision& po
 	collResult.Position.Ceiling = pointColl.GetCeilingHeight();
 	collResult.Position.Bridge = pointColl.GetBridgeItemNumber();
 	collResult.Position.SplitAngle = pointColl.GetBottomSector().FloorCollision.SplitAngle;
-	collResult.Position.FloorSlope = pointColl.IsFloorSlope();
-	collResult.Position.CeilingSlope = pointColl.IsCeilingSlope();
+	collResult.Position.FloorSlope = pointColl.IsSlipperyFloor();
+	collResult.Position.CeilingSlope = pointColl.IsSlipperyCeiling();
 	collResult.Position.DiagonalStep = pointColl.IsDiagonalStep();
 
 	collResult.FloorTilt = collResult.BottomBlock->GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, true);
@@ -177,12 +177,6 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber)
 
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
-	/*auto room = roomNumber;
-	auto floor = GetFloor(x, y, z, &room);
-	auto result = GetCollision(floor, x, y, z);
-	result.RoomNumber = room;
-	return result;*/
-
 	auto pointColl = GetPointCollision(Vector3i(x, y, z), roomNumber);
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
