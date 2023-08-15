@@ -13,6 +13,7 @@
 #include "Game/collision/collide_room.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Lara/LaraObject.h"
+#include "Lara/AmmoTypes.h"
 #include "Room/RoomFlags.h"
 #include "Room/RoomReverbTypes.h"
 
@@ -163,6 +164,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomFlagID, TOOM_FLAG_IDS);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomReverb, ROOM_REVERB_TYPES);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraAmmoType, AMMO_TYPE_IDS);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
 }
 

@@ -887,6 +887,27 @@ enum class WeaponAmmoType
 	NumAmmoTypes
 };
 
+enum class LaraAmmoType
+{
+	None,
+	Pistol,
+	Revolver,
+	Uzi,
+	Shotgun_Normal,
+	Shotgun_Wide,
+	HK,
+	Bolt_Normal,
+	Bolt_Poison,
+	Bolt_Explosive,
+	Grenade_Normal,
+	Grenade_Frag,
+	Grenade_Flash,
+	Harpoon,
+	Rocket,
+
+	NumAmmoTypes
+};
+
 enum class LaraWeaponType
 {
 	None,

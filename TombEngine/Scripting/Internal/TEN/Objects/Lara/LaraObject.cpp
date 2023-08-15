@@ -10,6 +10,7 @@
 #include "Game/effects/item_fx.h"
 #include "Specific/level.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
 
 /***
 Class for extra Lara-only functions.
@@ -241,6 +242,74 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 	}
 }
 
+/// Get current weapon's ammo type
+// @function LaraObject:GetAmmoType
+// @treturn int current ammo type
+// @usage
+// local CurrentAmmoType = Lara:GetAmmoType()
+int LaraObject::GetAmmoType() const
+{
+	auto* lara = GetLaraInfo(m_item);
+	auto& CurrentWeapon = lara->Control.Weapon.GunType;
+
+	int result = -1;
+
+	switch (CurrentWeapon)
+	{
+		case::LaraWeaponType::Pistol:
+			result = (int)LaraAmmoType::Pistol;
+		break;
+		case::LaraWeaponType::Revolver:
+			result = (int)LaraAmmoType::Revolver;
+			break;
+		case::LaraWeaponType::Uzi:
+			result = (int)LaraAmmoType::Uzi;
+			break;
+		case::LaraWeaponType::Shotgun:
+			if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo1)
+				result = (int)LaraAmmoType::Shotgun_Normal;
+			else
+				result = (int)LaraAmmoType::Shotgun_Wide;
+			break;
+		case::LaraWeaponType::HK:
+			result = (int)LaraAmmoType::HK;
+			break;
+		case::LaraWeaponType::Crossbow:
+			if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo1)
+				result = (int)LaraAmmoType::Bolt_Normal;
+			else if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo2)
+				result = (int)LaraAmmoType::Bolt_Poison;
+			else
+				result = (int)LaraAmmoType::Bolt_Explosive;
+			break;
+		case::LaraWeaponType::GrenadeLauncher:
+			if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo1)
+				result = (int)LaraAmmoType::Grenade_Normal;
+			else if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo2)
+				result = (int)LaraAmmoType::Grenade_Frag;
+			else
+				result = (int)LaraAmmoType::Grenade_Flash;
+			break;
+		case::LaraWeaponType::HarpoonGun:
+			result = (int)LaraAmmoType::Harpoon;
+			break;
+		case::LaraWeaponType::RocketLauncher:
+			result = (int)LaraAmmoType::Rocket;
+			break;
+		default:
+			result = (int)LaraAmmoType::None;
+			break;
+	}
+
+	if (result == -1)
+	{
+		TENLog("Error in the function GetAmmoType, unable to locate the indicated ammo.", LogLevel::Warning, LogConfig::All, false);
+		result = (int)LaraAmmoType::None;
+	}
+
+	return result;
+}
+
 /// Get current weapon's ammo count
 // @function LaraObject:GetAmmoCount
 // @treturn int current ammo count (-1 if infinite)
@@ -312,6 +381,7 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,
 			ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,
 			ScriptReserved_SetWeaponType, &LaraObject::SetWeaponType,
+			ScriptReserved_GetAmmoType, &LaraObject::GetAmmoType,
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,

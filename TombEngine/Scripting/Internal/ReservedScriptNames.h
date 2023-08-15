@@ -70,6 +70,7 @@ static constexpr char ScriptReserved_GetStamina[]			= "GetStamina";
 static constexpr char ScriptReserved_SetStamina[]			= "SetStamina";
 static constexpr char ScriptReserved_GetAirborne[]			= "GetAirborne";
 static constexpr char ScriptReserved_SetAirborne[]			= "SetAirborne";
+static constexpr char ScriptReserved_GetAmmoType[]			= "GetAmmoType";
 static constexpr char ScriptReserved_GetAmmoCount[]			= "GetAmmoCount";
 static constexpr char ScriptReserved_GetVehicle[]			= "GetVehicle";
 static constexpr char ScriptReserved_GetTarget[]			= "GetTarget";
@@ -187,6 +188,7 @@ static constexpr char ScriptReserved_ItemAction[]		= "ItemAction";
 static constexpr char ScriptReserved_ErrorMode[]		= "ErrorMode";
 static constexpr char ScriptReserved_InventoryItem[]	= "InventoryItem";
 static constexpr char ScriptReserved_LaraWeaponType[]	= "LaraWeaponType";
+static constexpr char ScriptReserved_LaraAmmoType[]		= "LaraAmmoType";
 static constexpr char ScriptReserved_HandStatus[]		= "HandStatus";
 
 // Functions
