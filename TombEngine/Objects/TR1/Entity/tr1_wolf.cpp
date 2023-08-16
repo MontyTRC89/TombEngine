@@ -229,7 +229,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WOLF_STATE_BITE:
-				if (AI.ahead && !item->Animation.RequiredState &&
+				if (AI.ahead && item->Animation.RequiredState == NO_STATE &&
 					item->TouchBits.Test(WolfAttackJoints))
 				{
 					item->Animation.RequiredState = WOLF_STATE_CROUCH;
