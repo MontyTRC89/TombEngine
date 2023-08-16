@@ -117,7 +117,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-static CollisionResult ConvertPointCollisionToCollisionResult(PointCollision& pointColl)
+static CollisionResult ConvertPointCollisionToCollisionResult(PointCollisionData& pointColl)
 {
 	auto collResult = CollisionResult{};
 

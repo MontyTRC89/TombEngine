@@ -14,13 +14,13 @@ using namespace TEN::Math;
 
 namespace TEN::Collision
 {
-	PointCollision::PointCollision(const Vector3i& pos, int roomNumber) :
+	PointCollisionData::PointCollisionData(const Vector3i& pos, int roomNumber) :
 		Position(pos),
 		RoomNumber(roomNumber)
 	{
 	}
 
-	FloorInfo& PointCollision::GetSector()
+	FloorInfo& PointCollisionData::GetSector()
 	{
 		if (SectorPtr != nullptr)
 			return *SectorPtr;
@@ -32,7 +32,7 @@ namespace TEN::Collision
 		return *SectorPtr;
 	}
 
-	FloorInfo& PointCollision::GetTopSector()
+	FloorInfo& PointCollisionData::GetTopSector()
 	{
 		if (TopSectorPtr != nullptr)
 			return *TopSectorPtr;
@@ -51,7 +51,7 @@ namespace TEN::Collision
 		return *TopSectorPtr;
 	}
 
-	FloorInfo& PointCollision::GetBottomSector()
+	FloorInfo& PointCollisionData::GetBottomSector()
 	{
 		if (BottomSectorPtr != nullptr)
 			return *BottomSectorPtr;
@@ -70,7 +70,7 @@ namespace TEN::Collision
 		return *BottomSectorPtr;
 	}
 
-	int PointCollision::GetFloorHeight()
+	int PointCollisionData::GetFloorHeight()
 	{
 		if (FloorHeight.has_value())
 			return *FloorHeight;
@@ -82,7 +82,7 @@ namespace TEN::Collision
 		return *FloorHeight;
 	}
 	
-	int PointCollision::GetCeilingHeight()
+	int PointCollisionData::GetCeilingHeight()
 	{
 		if (CeilingHeight.has_value())
 			return *CeilingHeight;
@@ -94,7 +94,7 @@ namespace TEN::Collision
 		return *CeilingHeight;
 	}
 
-	Vector3 PointCollision::GetFloorNormal()
+	Vector3 PointCollisionData::GetFloorNormal()
 	{
 		if (FloorNormal.has_value())
 			return *FloorNormal;
@@ -114,7 +114,7 @@ namespace TEN::Collision
 		return *FloorNormal;
 	}
 
-	Vector3 PointCollision::GetCeilingNormal()
+	Vector3 PointCollisionData::GetCeilingNormal()
 	{
 		if (CeilingNormal.has_value())
 			return *CeilingNormal;
@@ -134,7 +134,7 @@ namespace TEN::Collision
 		return *CeilingNormal;
 	}
 
-	int PointCollision::GetBridgeItemNumber()
+	int PointCollisionData::GetBridgeItemNumber()
 	{
 		if (BridgeItemNumber.has_value())
 			return *BridgeItemNumber;
@@ -146,7 +146,7 @@ namespace TEN::Collision
 		return *BridgeItemNumber;
 	}
 
-	int PointCollision::GetWaterSurfaceHeight()
+	int PointCollisionData::GetWaterSurfaceHeight()
 	{
 		if (WaterSurfaceHeight.has_value())
 			return *WaterSurfaceHeight;
@@ -157,7 +157,7 @@ namespace TEN::Collision
 		return *WaterSurfaceHeight;
 	}
 
-	int PointCollision::GetWaterTopHeight()
+	int PointCollisionData::GetWaterTopHeight()
 	{
 		if (WaterTopHeight.has_value())
 			return *WaterTopHeight;
@@ -168,7 +168,7 @@ namespace TEN::Collision
 		return *WaterTopHeight;
 	}
 
-	int PointCollision::GetWaterBottomHeight()
+	int PointCollisionData::GetWaterBottomHeight()
 	{
 		if (WaterBottomHeight.has_value())
 			return *WaterBottomHeight;
@@ -179,12 +179,12 @@ namespace TEN::Collision
 		return *WaterBottomHeight;
 	}
 
-	bool PointCollision::IsWall()
+	bool PointCollisionData::IsWall()
 	{
 		return ((GetFloorHeight() == NO_HEIGHT) || (GetCeilingHeight() == NO_HEIGHT));
 	}
 
-	bool PointCollision::IsSlipperyFloor(short slopeAngleMin)
+	bool PointCollisionData::IsSlipperyFloor(short slopeAngleMin)
 	{
 		// Get floor slope angle.
 		auto floorNormal = GetFloorNormal();
@@ -194,7 +194,7 @@ namespace TEN::Collision
 		return ((GetBridgeItemNumber() == NO_ITEM) && (abs(slopeAngle) >= slopeAngleMin));
 	}
 
-	bool PointCollision::IsSlipperyCeiling(short slopeAngleMin)
+	bool PointCollisionData::IsSlipperyCeiling(short slopeAngleMin)
 	{
 		// Get ceiling slope angle.
 		auto ceilingNormal = GetCeilingNormal();
@@ -204,12 +204,12 @@ namespace TEN::Collision
 		return (abs(slopeAngle) >= slopeAngleMin);
 	}
 
-	bool PointCollision::IsDiagonalStep()
+	bool PointCollisionData::IsDiagonalStep()
 	{
 		return GetBottomSector().IsSurfaceDiagonalStep(true);
 	}
 
-	bool PointCollision::HasDiagonalSplit()
+	bool PointCollisionData::HasDiagonalSplit()
 	{
 		constexpr auto DIAGONAL_SPLIT_0 = 45.0f * RADIAN;
 		constexpr auto DIAGONAL_SPLIT_1 = 135.0f * RADIAN;
@@ -218,7 +218,7 @@ namespace TEN::Collision
 		return ((splitAngle == DIAGONAL_SPLIT_0) || (splitAngle == DIAGONAL_SPLIT_1));
 	}
 
-	bool PointCollision::HasFlippedDiagonalSplit()
+	bool PointCollisionData::HasFlippedDiagonalSplit()
 	{
 		constexpr auto DIAGONAL_SPLIT_0 = 45.0f * RADIAN;
 
@@ -226,13 +226,13 @@ namespace TEN::Collision
 		return (HasDiagonalSplit() && (splitAngle != DIAGONAL_SPLIT_0));
 	}
 
-	bool PointCollision::HasEnvironmentFlag(RoomEnvFlags envFlag)
+	bool PointCollisionData::HasEnvironmentFlag(RoomEnvFlags envFlag)
 	{
 		const auto& room = g_Level.Rooms[RoomNumber];
 		return ((room.flags & envFlag) == envFlag);
 	}
 
-	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber)
+	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber)
 	{
 		// HACK: This function takes arguments for a *current* position and room number.
 		// However, since some calls to the previous implementation (GetCollision()) had *vertically projected*
@@ -241,10 +241,10 @@ namespace TEN::Collision
 		short correctedRoomNumber = roomNumber;
 		GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
 
-		return PointCollision(pos, correctedRoomNumber);
+		return PointCollisionData(pos, correctedRoomNumber);
 	}
 
-	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
+	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
 	{
 		// Get "location".
 		short tempRoomNumber = roomNumber;
@@ -258,10 +258,10 @@ namespace TEN::Collision
 		short probeRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
 		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
 
-		return PointCollision(probePos, probeRoomNumber);
+		return PointCollisionData(probePos, probeRoomNumber);
 	}
 
-	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
+	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 	{
 		// Get "location".
 		short tempRoomNumber = roomNumber;
@@ -275,12 +275,12 @@ namespace TEN::Collision
 		short probeRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
 		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
 
-		return PointCollision(probePos, probeRoomNumber);
+		return PointCollisionData(probePos, probeRoomNumber);
 	}
 
-	PointCollision GetPointCollision(const ItemInfo& item)
+	PointCollisionData GetPointCollision(const ItemInfo& item)
 	{
-		return PointCollision(item.Pose.Position, item.RoomNumber);
+		return PointCollisionData(item.Pose.Position, item.RoomNumber);
 	}
 
 	// TODO: Find cleaner solution. Constructing a "location" on the spot for the player
@@ -296,7 +296,7 @@ namespace TEN::Collision
 		return RoomVector(sector.Room, item.Pose.Position.y);
 	}
 
-	PointCollision GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist)
+	PointCollisionData GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist)
 	{
 		// Get "location".
 		auto location = GetEntityLocation(item);
@@ -308,10 +308,10 @@ namespace TEN::Collision
 		short probeRoomNumber = GetRoom(location, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
 		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
 
-		return PointCollision(probePos, probeRoomNumber);
+		return PointCollisionData(probePos, probeRoomNumber);
 	}
 
-	PointCollision GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right)
+	PointCollisionData GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right)
 	{
 		// Get "location".
 		auto location = GetEntityLocation(item);
@@ -323,6 +323,6 @@ namespace TEN::Collision
 		short probeRoomNumber = GetRoom(location, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
 		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
 
-		return PointCollision(probePos, probeRoomNumber);
+		return PointCollisionData(probePos, probeRoomNumber);
 	}
 }

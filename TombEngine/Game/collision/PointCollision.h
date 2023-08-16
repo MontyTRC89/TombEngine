@@ -9,7 +9,7 @@ using namespace TEN::Math;
 
 namespace TEN::Collision
 {
-	class PointCollision
+	class PointCollisionData
 	{
 	public:
 		// Members
@@ -33,7 +33,7 @@ namespace TEN::Collision
 
 	public:
 		// Constructors
-		PointCollision(const Vector3i& pos, int roomNumber);
+		PointCollisionData(const Vector3i& pos, int roomNumber);
 
 		// Getters
 		FloorInfo& GetSector();
@@ -60,10 +60,10 @@ namespace TEN::Collision
 		bool HasEnvironmentFlag(RoomEnvFlags envFlag);
 	};
 
-	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber);
-	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist);
-	PointCollision GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-	PointCollision GetPointCollision(const ItemInfo& item);
-	PointCollision GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist);
-	PointCollision GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber);
+	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist);
+	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	PointCollisionData GetPointCollision(const ItemInfo& item);
+	PointCollisionData GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist);
+	PointCollisionData GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 }
