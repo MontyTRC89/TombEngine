@@ -400,11 +400,11 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
-	static void DrawDebugAttractorBounds(const BoundingSphere& sphere, std::vector<const Attractor*> attracs)
+	static void DrawDebugAttractorBounds(const BoundingSphere& sphere, std::vector<const Attractor*> attracPtrs)
 	{
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
 
-		for (const auto* attracPtr : attracs)
+		for (const auto* attracPtr : attracPtrs)
 		{
 			const auto& box = attracPtr->GetBox();
 			auto orientedBox = BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity);
