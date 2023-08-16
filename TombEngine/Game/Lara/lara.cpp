@@ -448,8 +448,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	auto pointColl = GetPointCollision(*item);
-	g_Renderer.PrintDebugMessage("Floor bridge: %d", pointColl.GetFloorBridgeItemID());
-	g_Renderer.PrintDebugMessage("Ceiling bridge: %d", pointColl.GetCeilingBridgeItemID());
+	g_Renderer.PrintDebugMessage("Floor bridge: %d", pointColl.GetFloorBridgeEntityID());
+	g_Renderer.PrintDebugMessage("Ceiling bridge: %d", pointColl.GetCeilingBridgeEntityID());
 
 	if (lara->Control.Weapon.HasFired)
 	{

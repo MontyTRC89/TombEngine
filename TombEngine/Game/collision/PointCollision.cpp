@@ -102,7 +102,7 @@ namespace TEN::Collision
 			return *FloorNormal;
 
 		// Set floor normal.
-		if (GetFloorBridgeItemID() != NO_ITEM)
+		if (GetFloorBridgeEntityID() != NO_ITEM)
 		{
 			// TODO: Get bridge normal.
 			FloorNormal = -Vector3::UnitY;
@@ -122,7 +122,7 @@ namespace TEN::Collision
 			return *CeilingNormal;
 
 		// Set ceiling normal.
-		if (GetCeilingBridgeItemID() != NO_ITEM)
+		if (GetCeilingBridgeEntityID() != NO_ITEM)
 		{
 			// TODO: Get bridge normal.
 			CeilingNormal = Vector3::UnitY;
@@ -136,28 +136,28 @@ namespace TEN::Collision
 		return *CeilingNormal;
 	}
 
-	int PointCollisionData::GetFloorBridgeItemID()
+	int PointCollisionData::GetFloorBridgeEntityID()
 	{
-		if (FloorBridgeItemID.has_value())
-			return *FloorBridgeItemID;
+		if (FloorBridgeEntityID.has_value())
+			return *FloorBridgeEntityID;
 
 		// Set floor bridge item ID.
 		int floorHeight = GetFloorHeight();
-		FloorBridgeItemID = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);;
+		FloorBridgeEntityID = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);;
 
-		return *FloorBridgeItemID;
+		return *FloorBridgeEntityID;
 	}
 	
-	int PointCollisionData::GetCeilingBridgeItemID()
+	int PointCollisionData::GetCeilingBridgeEntityID()
 	{
-		if (CeilingBridgeItemID.has_value())
-			return *CeilingBridgeItemID;
+		if (CeilingBridgeEntityID.has_value())
+			return *CeilingBridgeEntityID;
 
 		// Set ceiling bridge item ID.
 		int ceilingHeight = GetCeilingHeight();
-		CeilingBridgeItemID = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);;
+		CeilingBridgeEntityID = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);;
 
-		return *CeilingBridgeItemID;
+		return *CeilingBridgeEntityID;
 	}
 
 	int PointCollisionData::GetWaterSurfaceHeight()
@@ -205,7 +205,7 @@ namespace TEN::Collision
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
 
 		// TODO: Slippery bridges.
-		return (GetFloorBridgeItemID() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
+		return (GetFloorBridgeEntityID() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollisionData::IsSlipperyCeiling(short slopeAngleMin)
@@ -215,7 +215,7 @@ namespace TEN::Collision
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(ceilingNormal, -Vector3::UnitY);
 
 		// TODO: Slippery bridges.
-		return (GetCeilingBridgeItemID() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
+		return (GetCeilingBridgeEntityID() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollisionData::IsDiagonalStep()
