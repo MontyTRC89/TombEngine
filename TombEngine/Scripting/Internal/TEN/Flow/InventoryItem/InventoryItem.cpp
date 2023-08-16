@@ -63,7 +63,10 @@ void InventoryItem::Register(sol::table & parent)
 // Add validation so the user can't choose something unimplemented
 void InventoryItem::SetAction(ItemOptions a_action)
 {
-	bool isSupported = (a_action == ItemOptions::OPT_EQUIP) ||(a_action == ItemOptions::OPT_USE) ||	(a_action == ItemOptions::OPT_EXAMINABLE) || (a_action == ItemOptions::OPT_COMBINABLE);
+	bool isSupported =	(a_action & ItemOptions::OPT_EQUIP) ||
+						(a_action & ItemOptions::OPT_USE) || 
+						(a_action & ItemOptions::OPT_EXAMINABLE) || 
+						(a_action & ItemOptions::OPT_COMBINABLE);
 
 	if (!ScriptAssert(isSupported, "Unsupported item action: " + std::to_string(a_action)))
 	{
