@@ -141,7 +141,7 @@ namespace TEN::Collision
 		if (FloorBridgeEntityID.has_value())
 			return *FloorBridgeEntityID;
 
-		// Set floor bridge item ID.
+		// Set floor bridge entity ID.
 		int floorHeight = GetFloorHeight();
 		FloorBridgeEntityID = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);;
 
@@ -153,7 +153,7 @@ namespace TEN::Collision
 		if (CeilingBridgeEntityID.has_value())
 			return *CeilingBridgeEntityID;
 
-		// Set ceiling bridge item ID.
+		// Set ceiling bridge entity ID.
 		int ceilingHeight = GetCeilingHeight();
 		CeilingBridgeEntityID = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);;
 
