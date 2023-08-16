@@ -464,7 +464,7 @@ namespace TEN::Collision::Attractors
 
 		// Get attractor collisions sorted by distance.
 		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
-		for (const auto& attracPtr : nearbyAttracPtrs)
+		for (const auto* attracPtr : nearbyAttracPtrs)
 		{
 			auto attracColl = attracPtr->GetCollision(basePos, orient, refPoint);
 
