@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR1/Entity/tr1_bear.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -16,62 +17,73 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {
-	constexpr auto BEAR_RUN_DAMAGE	  = 3;
-	constexpr auto BEAR_ATTACK_DAMAGE = 200;
-	constexpr auto BEAR_SLAM_DAMAGE	  = 200;
-	constexpr auto BEAR_PAT_DAMAGE	  = 400;
-
-	constexpr auto BEAR_ATTACK_RANGE			= BLOCK(1);
-	constexpr auto BEAR_REAR_RANGE				= BLOCK(2);
-	constexpr auto BEAR_REAR_SWIPE_ATTACK_RANGE = BLOCK(3 / 5.0f);
-	constexpr auto BEAR_EAT_RANGE				= BLOCK(3 / 4.0f);
+	constexpr auto BEAR_RUN_COLLISION_DAMAGE		= 3;
+	constexpr auto BEAR_ATTACK_CHARGE_DAMAGE		= 200;
+	constexpr auto BEAR_ATTACK_CLAW_DAMAGE		= 400;
+	constexpr auto BEAR_DEATH_CRUSH_DAMAGE		= 200;
 	
-	constexpr auto BEAR_ROAR_CHANCE = 1 / 400.0f;
-	constexpr auto BEAR_REAR_CHANCE = 1 / 40.0f;
-	constexpr auto BEAR_DROP_CHANCE = 1 / 22.0f;
+	constexpr auto BEAR_LOW_ATTACK_RANGE			= SQUARE(BLOCK(1));
+	constexpr auto BEAR_HIGH_STANCE_RANGE		= SQUARE(BLOCK(2));
+	constexpr auto BEAR_TRANSITION_RANGE		= SQUARE(BLOCK(3 / 5.0f));
+	constexpr auto BEAR_EAT_RANGE				= SQUARE(BLOCK(3 / 4.0f));
+	
+	constexpr auto BEAR_ROAR_CHANCE			= 1 / 400.0f;
+	constexpr auto BEAR_TO_HIGH_STANCE_CHANCE	= 1 / 40.0f;
+	constexpr auto BEAR_TO_LOW_STANCE_CHANCE	= 1 / 22.0f;
 
-	constexpr auto BEAR_WALK_TURN_RATE_MAX = ANGLE(2.0f);
-	constexpr auto BEAR_RUN_TURN_RATE_MAX  = ANGLE(5.0f);
+	constexpr auto BEAR_WALK_TURN_RATE_MAX		= ANGLE(2.0f);
+	constexpr auto BEAR_RUN_TURN_RATE_MAX		= ANGLE(5.0f);
 
 	const auto BearBite = CreatureBiteInfo(Vector3(0, 96, 335), 14);
 	const auto BearAttackJoints = std::vector<unsigned int>{ 2, 3, 5, 6, 14, 17 };
 
 	enum BearState
 	{
-		BEAR_STATE_STROLL = 0,
-		BEAR_STATE_IDLE = 1,
-		BEAR_STATE_WALK_FORWARD = 2,
-		BEAR_STATE_RUN_FORWARD = 3,
-		BEAR_STATE_REAR = 4,
+		// Low Stance (4-Feet)
+		BEAR_STATE_LOW_WALK = 0,
+		BEAR_STATE_LOW_IDLE = 1,
+		BEAR_STATE_LOW_RUN = 3,
+		BEAR_STATE_LOW_ATTACK = 6,
+		BEAR_STATE_LOW_EAT = 8,
+
+		// High Stance (2-Feet)
+		BEAR_STATE_HIGH_WALK = 2,
+		BEAR_STATE_HIGH_IDLE = 4,
+		BEAR_STATE_HIGH_ATTACK = 7,
+		
+		// For Both Stances
 		BEAR_STATE_ROAR = 5,
-		BEAR_STATE_RUN_SWIPE_ATTACK = 6,
-		BEAR_STATE_REAR_SWIPE_ATTACK = 7,
-		BEAR_STATE_EAT = 8,
 		BEAR_STATE_DEATH = 9
 	};
 
-	// TODO
 	enum BearAnim
 	{
-		BEAR_ANIM_INACTIVE = 0,
-		BEAR_ANIM_IDLE_TO_RUN_FORWARD = 1,
-		BEAR_ANIM_RUN_FORWARD = 2,
-		BEAR_ANIM_RUN_FORWARD_TO_IDLE = 3,
-		BEAR_ANIM_REAR_TO_IDLE = 4,
+		// Low Stance (4-Feet)
+		BEAR_ANIM_LOW_IDLE = 0,
+		BEAR_ANIM_LOW_IDLE_TO_RUN = 1,
+		BEAR_ANIM_LOW_RUN = 2,
+		BEAR_ANIM_LOW_RUN_TO_IDLE = 3,
+		BEAR_ANIM_LOW_ROAR = 11,
+		BEAR_ANIM_LOW_RUNING_ATTACK_START = 12,
+		BEAR_ANIM_LOW_RUNING_ATTACK_END = 13,
+		BEAR_ANIM_LOW_EAT = 15,
+		BEAR_ANIM_LOW_IDLE_TO_WALK = 16,
+		BEAR_ANIM_LOW_WALK = 17,
+		BEAR_ANIM_LOW_WALK_TO_IDLE = 18,
+		BEAR_ANIM_LOW_DEATH = 20,
 
-		BEAR_ANIM_REAR_IDLE = 7,
-		BEAR_ANIM_IDLE_TO_REAR = 8,
+		// High Stance (2-Feet)
+		BEAR_ANIM_HIGH_ROAR = 5,
+		BEAR_ANIM_HIGH_WALK = 6,
+		BEAR_ANIM_HIGH_IDLE = 7,
+		BEAR_ANIM_HIGH_IDLE_TO_WALK = 9,
+		BEAR_ANIM_HIGH_WALK_TO_IDLE = 10,
+		BEAR_ANIM_HIGH_ATTACK = 14,
+		BEAR_ANIM_HIGH_DEATH = 19,
 
-		BEAR_ANIM_ROAR = 11,
-		BEAR_ANIM_RUN_SWIPE_ATTACK_START = 12,
-		BEAR_ANIM_RUN_SWIPE_ATTACK_END = 13,
-
-		BEAR_ANIM_EAT = 15,
-		BEAR_ANIM_IDLE_TO_WALK_FORWARD = 16,
-		BEAR_ANIM_TO_WALK_FORWARD = 17,
-		BEAR_ANIM_WALK_FORWARD_TO_IDLE = 18,
-
-		BEAR_ANIM_DEATH = 20
+		// Stance transitions
+		BEAR_ANIM_HIGH_IDLE_TO_LOW_IDLE = 4,
+		BEAR_ANIM_LOW_IDLE_TO_HIGH_IDLE = 8,
 	};
 
 	void BearControl(short itemNumber)
@@ -80,6 +92,7 @@ namespace TEN::Entities::Creatures::TR1
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
+		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
@@ -91,39 +104,44 @@ namespace TEN::Entities::Creatures::TR1
 
 			switch (item->Animation.ActiveState)
 			{
-			case BEAR_STATE_WALK_FORWARD:
-			{
-				item->Animation.TargetState = BEAR_STATE_REAR;
-				break;
-			}
-			case BEAR_STATE_RUN_FORWARD:
-			case BEAR_STATE_STROLL:
-			{
-				item->Animation.TargetState = BEAR_STATE_IDLE;
-				break;
-			}
-			case BEAR_STATE_REAR:
-			{
-				item->Animation.TargetState = BEAR_STATE_DEATH;
-				creature->Flags = 1;
-				break;
-			}
-			case BEAR_STATE_IDLE:
-			{
-				item->Animation.TargetState = BEAR_STATE_DEATH;
-				creature->Flags = 0;
-				break;
-			}
-			case BEAR_STATE_DEATH:
-			{
-				if (creature->Flags && item->TouchBits.Test(BearAttackJoints))
+				//Low stance
+				case BEAR_STATE_LOW_RUN:
+				case BEAR_STATE_LOW_WALK:
 				{
-					DoDamage(creature->Enemy, BEAR_SLAM_DAMAGE);
+					item->Animation.TargetState = BEAR_STATE_LOW_IDLE;
+					break;
+				}
+				case BEAR_STATE_LOW_IDLE:
+				{
+					item->Animation.TargetState = BEAR_STATE_DEATH;
 					creature->Flags = 0;
+					break;
 				}
 
-				break;
-			}
+				//High stance
+				case BEAR_STATE_HIGH_WALK:
+				{
+					item->Animation.TargetState = BEAR_STATE_HIGH_IDLE;
+					break;
+				}
+				case BEAR_STATE_HIGH_IDLE:
+				{
+					item->Animation.TargetState = BEAR_STATE_DEATH;
+					creature->Flags = 1;
+					break;
+				}
+				
+				//Both stances
+				case BEAR_STATE_DEATH:
+				{
+					if (creature->Flags && item->TouchBits.Test(BearAttackJoints))
+					{
+						DoDamage(creature->Enemy, BEAR_DEATH_CRUSH_DAMAGE);
+						creature->Flags = 0;
+					}
+
+					break;
+				}
 			}
 		}
 		else
@@ -144,135 +162,171 @@ namespace TEN::Entities::Creatures::TR1
 
 			bool isLaraDead = LaraItem->HitPoints <= 0;
 
+			auto pointColl = GetCollision(item);
+			int distanceToCeiling = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+
 			switch (item->Animation.ActiveState)
 			{
-			case BEAR_STATE_IDLE:
-				if (isLaraDead)
-				{
-					if (AI.bite && AI.distance < pow(BEAR_EAT_RANGE, 2))
-						item->Animation.TargetState = BEAR_STATE_EAT;
-					else
-						item->Animation.TargetState = BEAR_STATE_STROLL;
-				}
-				else if (item->Animation.RequiredState != NO_STATE)
-					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (creature->Mood == MoodType::Bored)
-					item->Animation.TargetState = BEAR_STATE_STROLL;
-				else
-					item->Animation.TargetState = BEAR_STATE_RUN_FORWARD;
-
-				break;
-
-			case BEAR_STATE_STROLL:
-				creature->MaxTurn = BEAR_WALK_TURN_RATE_MAX;
-
-				if (isLaraDead && item->TouchBits.Test(BearAttackJoints) && AI.ahead)
-					item->Animation.TargetState = BEAR_STATE_IDLE;
-				else if (creature->Mood != MoodType::Bored)
-				{
-					item->Animation.TargetState = BEAR_STATE_IDLE;
-
-					if (creature->Mood == MoodType::Escape)
-						item->Animation.RequiredState = BEAR_STATE_STROLL;
-				}
-				else if (Random::TestProbability(BEAR_ROAR_CHANCE))
-				{
-					item->Animation.TargetState = BEAR_STATE_IDLE;
-					item->Animation.RequiredState = BEAR_STATE_ROAR;
-				}
-
-				break;
-
-			case BEAR_STATE_RUN_FORWARD:
-				creature->MaxTurn = BEAR_RUN_TURN_RATE_MAX;
-
-				if (item->TouchBits.Test(BearAttackJoints))
-					DoDamage(creature->Enemy, BEAR_RUN_DAMAGE);
-
-				if (creature->Mood == MoodType::Bored || isLaraDead)
-					item->Animation.TargetState = BEAR_STATE_IDLE;
-				else if (AI.ahead && item->Animation.RequiredState == NO_STATE)
-				{
-					if (AI.distance < pow(BEAR_REAR_RANGE, 2) &&
-						Random::TestProbability(BEAR_REAR_CHANCE) &&
-						!creature->Flags)
+				//Low Stance
+				case BEAR_STATE_LOW_IDLE:
+					if (isLaraDead)
 					{
-						item->Animation.RequiredState = BEAR_STATE_REAR;
-						item->Animation.TargetState = BEAR_STATE_IDLE;
+						if (AI.bite && AI.distance < BEAR_EAT_RANGE)
+							item->Animation.TargetState = BEAR_STATE_LOW_EAT;
+						else
+							item->Animation.TargetState = BEAR_STATE_LOW_WALK;
 					}
-					else if (AI.distance < pow(BEAR_ATTACK_RANGE, 2))
-						item->Animation.TargetState = BEAR_STATE_RUN_SWIPE_ATTACK;
-				}
+					else if (item->Animation.RequiredState != NO_STATE)
+						item->Animation.TargetState = item->Animation.RequiredState;
+					else if (creature->Mood == MoodType::Bored)
+						item->Animation.TargetState = BEAR_STATE_LOW_WALK;
+					else
+						item->Animation.TargetState = BEAR_STATE_LOW_RUN;
 
-				break;
+					break;
 
-			case BEAR_STATE_REAR:
-				if (creature->Flags)
-				{
-					item->Animation.RequiredState = BEAR_STATE_STROLL;
-					item->Animation.TargetState = BEAR_STATE_IDLE;
-				}
-				else if (item->Animation.RequiredState != NO_STATE)
-					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape)
-					item->Animation.TargetState = BEAR_STATE_IDLE;
-				else if (AI.bite && AI.distance < pow(BEAR_REAR_SWIPE_ATTACK_RANGE, 2))
-					item->Animation.TargetState = BEAR_STATE_REAR_SWIPE_ATTACK;
-				else
-					item->Animation.TargetState = BEAR_STATE_WALK_FORWARD;
+				case BEAR_STATE_LOW_WALK:
+					creature->MaxTurn = BEAR_WALK_TURN_RATE_MAX;
 
-				break;
+					if (isLaraDead && item->TouchBits.Test(BearAttackJoints) && AI.ahead)
+						item->Animation.TargetState = BEAR_STATE_LOW_IDLE; //Going to EAT state.
+					else if (creature->Mood != MoodType::Bored)
+					{
+						item->Animation.TargetState = BEAR_STATE_LOW_IDLE; //Going to RUN state.
+					}
+					else if (Random::TestProbability(BEAR_ROAR_CHANCE))
+					{
+						item->Animation.TargetState = BEAR_STATE_LOW_IDLE;
+						item->Animation.RequiredState = BEAR_STATE_ROAR;
+					}
 
-			case BEAR_STATE_WALK_FORWARD:
-				if (creature->Flags)
-				{
-					item->Animation.TargetState = BEAR_STATE_REAR;
-					item->Animation.RequiredState = BEAR_STATE_STROLL;
-				}
-				else if (AI.ahead && item->TouchBits.Test(BearAttackJoints))
-					item->Animation.TargetState = BEAR_STATE_REAR;
-				else if (creature->Mood == MoodType::Escape)
-				{
-					item->Animation.TargetState = BEAR_STATE_REAR;
-					item->Animation.RequiredState = BEAR_STATE_STROLL;
-				}
-				else if (creature->Mood == MoodType::Bored || Random::TestProbability(BEAR_ROAR_CHANCE))
-				{
-					item->Animation.TargetState = BEAR_STATE_REAR;
-					item->Animation.RequiredState = BEAR_STATE_ROAR;
-				}
-				else if (AI.distance > pow(BEAR_REAR_RANGE, 2) || Random::TestProbability(BEAR_DROP_CHANCE))
-				{
-					item->Animation.TargetState = BEAR_STATE_REAR;
-					item->Animation.RequiredState = BEAR_STATE_IDLE;
-				}
+					break;
 
-				break;
+				case BEAR_STATE_LOW_RUN:
+					creature->MaxTurn = BEAR_RUN_TURN_RATE_MAX;
 
-			case BEAR_STATE_REAR_SWIPE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE &&
-					item->TouchBits.Test(BearAttackJoints))
-				{
-					DoDamage(creature->Enemy, BEAR_PAT_DAMAGE);
-					item->Animation.RequiredState = BEAR_STATE_REAR;
-				}
+					if (item->TouchBits.Test(BearAttackJoints))
+						DoDamage(creature->Enemy, BEAR_RUN_COLLISION_DAMAGE);
 
-				break;
+					if (creature->Mood == MoodType::Bored ||
+						isLaraDead ||
+						item->Animation.RequiredState != NO_STATE)
+					{
+						//Going to WALK, EAT or the Required State.
+						item->Animation.TargetState = BEAR_STATE_LOW_IDLE;
+					}
+					else if (AI.ahead)
+					{
+						if (Random::TestProbability(BEAR_TO_HIGH_STANCE_CHANCE))
+						{
+							if (AI.distance < BEAR_HIGH_STANCE_RANGE && !creature->Flags && distanceToCeiling > CLICK(7))
+							{
+								item->Animation.RequiredState = BEAR_STATE_HIGH_IDLE;
+								item->Animation.TargetState = BEAR_STATE_LOW_IDLE;
+							}
+						}
+						else if (AI.distance < BEAR_LOW_ATTACK_RANGE)
+						{
+							item->Animation.TargetState = BEAR_STATE_LOW_ATTACK;
+						}
+					}
 
-			case BEAR_STATE_RUN_SWIPE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE &&
-					item->TouchBits.Test(BearAttackJoints))
-				{
-					DoDamage(creature->Enemy, BEAR_ATTACK_DAMAGE);
-					CreatureEffect(item, BearBite, DoBloodSplat);
-					item->Animation.RequiredState = BEAR_STATE_IDLE;
-				}
+					break;
 
-				break;
+				case BEAR_STATE_LOW_ATTACK:
+					if (item->Animation.RequiredState == NO_STATE &&
+						item->TouchBits.Test(BearAttackJoints))
+					{
+						DoDamage(creature->Enemy, BEAR_ATTACK_CHARGE_DAMAGE);
+						CreatureEffect(item, BearBite, DoBloodSplat);
+						item->Animation.RequiredState = BEAR_STATE_LOW_IDLE;
+					}
+
+					break;
+
+				//High Stance
+				case BEAR_STATE_HIGH_IDLE:
+					if (creature->Flags)
+					{
+						item->Animation.RequiredState = BEAR_STATE_LOW_WALK;
+						item->Animation.TargetState = BEAR_STATE_LOW_IDLE;
+					}
+					else if (item->Animation.RequiredState != NO_STATE)
+					{
+						item->Animation.TargetState = item->Animation.RequiredState;
+					}
+					else if (creature->Mood == MoodType::Bored ||
+						creature->Mood == MoodType::Escape ||
+						AI.distance > BEAR_HIGH_STANCE_RANGE ||
+						distanceToCeiling <= CLICK(7))
+					{
+						item->Animation.TargetState = BEAR_STATE_LOW_IDLE;
+					}
+					else if (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) <= CLICK(2) &&
+							 item->TouchBits.Test(BearAttackJoints))
+					{
+						item->Animation.TargetState = BEAR_STATE_HIGH_ATTACK;
+					}
+					else
+					{
+						item->Animation.TargetState = BEAR_STATE_HIGH_WALK;
+					}
+
+					break;
+
+				case BEAR_STATE_HIGH_WALK:
+					if (creature->Flags)
+					{
+						item->Animation.TargetState = BEAR_STATE_HIGH_IDLE;
+						item->Animation.RequiredState = BEAR_STATE_LOW_WALK;
+					}
+					else if (item->TouchBits.Test(BearAttackJoints))
+					{
+						item->Animation.TargetState = BEAR_STATE_HIGH_IDLE; //Going to ATTACK state
+					}
+					else if (creature->Mood == MoodType::Escape)
+					{
+						item->Animation.TargetState = BEAR_STATE_HIGH_IDLE;
+						item->Animation.RequiredState = BEAR_STATE_LOW_RUN;
+					}
+					else if (	creature->Mood == MoodType::Bored || 
+								Random::TestProbability(BEAR_ROAR_CHANCE))
+					{
+						//Will roar on random moment, or when it get bored if that happens during this state.
+						item->Animation.TargetState = BEAR_STATE_HIGH_IDLE;
+						item->Animation.RequiredState = BEAR_STATE_ROAR;
+					}
+					else if (	AI.distance > BEAR_HIGH_STANCE_RANGE ||
+								distanceToCeiling <= CLICK(7) ||
+								(AI.distance > BEAR_TRANSITION_RANGE && Random::TestProbability(BEAR_TO_LOW_STANCE_CHANCE)))
+					{
+						item->Animation.TargetState = BEAR_STATE_HIGH_IDLE;
+						item->Animation.RequiredState = BEAR_STATE_LOW_IDLE;
+					}
+
+					break;
+
+				case BEAR_STATE_HIGH_ATTACK:
+					if (item->Animation.RequiredState == NO_STATE &&
+						item->TouchBits.Test(BearAttackJoints))
+					{
+						DoDamage(creature->Enemy, BEAR_ATTACK_CLAW_DAMAGE);
+						item->Animation.RequiredState = BEAR_STATE_HIGH_IDLE;
+					}
+
+					break;
 			}
 		}
 
 		CreatureJoint(item, 0, head);
 		CreatureAnimation(itemNumber, angle, 0);
+
+		if (item->Animation.ActiveState != BEAR_STATE_HIGH_WALK &&
+			item->Animation.ActiveState != BEAR_STATE_HIGH_IDLE &&
+			item->Animation.ActiveState != BEAR_STATE_HIGH_ATTACK)
+		{
+			auto radius = Vector2(object->radius);
+			AlignEntityToSurface(item, radius);
+		}
 	}
 }
