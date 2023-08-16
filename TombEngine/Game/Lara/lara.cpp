@@ -25,6 +25,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
 #include "Game/effects/Hair.h"
@@ -40,10 +41,11 @@
 #include "Sound/sound.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Collision;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
-using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -444,6 +446,10 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	auto pointColl = GetPointCollision(*item);
+	g_Renderer.PrintDebugMessage("Floor bridge: %d", pointColl.GetFloorBridgeItemID());
+	g_Renderer.PrintDebugMessage("Ceiling bridge: %d", pointColl.GetCeilingBridgeItemID());
 
 	if (lara->Control.Weapon.HasFired)
 	{

@@ -128,14 +128,14 @@ static CollisionResult ConvertPointCollisionToCollisionResult(PointCollisionData
 
 	collResult.Position.Floor = pointColl.GetFloorHeight();
 	collResult.Position.Ceiling = pointColl.GetCeilingHeight();
-	collResult.Position.Bridge = pointColl.GetBridgeItemNumber();
+	collResult.Position.Bridge = pointColl.GetFloorBridgeItemID();
 	collResult.Position.SplitAngle = pointColl.GetBottomSector().FloorCollision.SplitAngle;
 	collResult.Position.FloorSlope = pointColl.IsSlipperyFloor();
 	collResult.Position.CeilingSlope = pointColl.IsSlipperyCeiling();
 	collResult.Position.DiagonalStep = pointColl.IsDiagonalStep();
 
-	collResult.FloorTilt = collResult.BottomBlock->GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, true);
-	collResult.CeilingTilt = collResult.BottomBlock->GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, false);
+	collResult.FloorTilt = pointColl.GetBottomSector().GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, true);
+	collResult.CeilingTilt = pointColl.GetTopSector().GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, false);
 
 	return collResult;
 }
