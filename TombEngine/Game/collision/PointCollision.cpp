@@ -26,8 +26,8 @@ namespace TEN::Collision
 			return *SectorPtr;
 
 		// Set current sector pointer.
-		short probedRoomNumber = RoomNumber;
-		SectorPtr = GetFloor(Position.x, Position.y, Position.z, &probedRoomNumber);
+		short probeRoomNumber = RoomNumber;
+		SectorPtr = GetFloor(Position.x, Position.y, Position.z, &probeRoomNumber);
 
 		return *SectorPtr;
 	}
@@ -39,12 +39,13 @@ namespace TEN::Collision
 
 		// Set top sector pointer.
 		auto* topSectorPtr = &GetSector();
-		while (topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z).has_value())
+		auto roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z);
+		while (roomNumberAbove.has_value())
 		{
-			auto roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z);
 			auto& room = g_Level.Rooms[roomNumberAbove.value_or(topSectorPtr->Room)];
-
 			topSectorPtr = Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
+
+			roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z);
 		}
 		TopSectorPtr = topSectorPtr;
 
@@ -58,12 +59,13 @@ namespace TEN::Collision
 
 		// Set bottom sector pointer.
 		auto* bottomSectorPtr = &GetSector();
-		while (bottomSectorPtr->GetRoomNumberBelow(Position.x, Position.y, Position.z).has_value())
+		auto roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(Position.x, Position.y, Position.z);
+		while (roomNumberBelow.has_value())
 		{
-			auto roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(Position.x, Position.y, Position.z);
 			auto& room = g_Level.Rooms[roomNumberBelow.value_or(bottomSectorPtr->Room)];
-
 			bottomSectorPtr = Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
+
+			roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(Position.x, Position.y, Position.z);
 		}
 		BottomSectorPtr = bottomSectorPtr;
 
@@ -181,7 +183,7 @@ namespace TEN::Collision
 
 	bool PointCollisionData::IsWall()
 	{
-		return ((GetFloorHeight() == NO_HEIGHT) || (GetCeilingHeight() == NO_HEIGHT));
+		return (GetFloorHeight() == NO_HEIGHT || GetCeilingHeight() == NO_HEIGHT);
 	}
 
 	bool PointCollisionData::IsSlipperyFloor(short slopeAngleMin)
@@ -191,7 +193,7 @@ namespace TEN::Collision
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
 
 		// TODO: Slippery bridges.
-		return ((GetBridgeItemNumber() == NO_ITEM) && (abs(slopeAngle) >= slopeAngleMin));
+		return (GetBridgeItemNumber() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollisionData::IsSlipperyCeiling(short slopeAngleMin)
@@ -215,7 +217,7 @@ namespace TEN::Collision
 		constexpr auto DIAGONAL_SPLIT_1 = 135.0f * RADIAN;
 
 		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
-		return ((splitAngle == DIAGONAL_SPLIT_0) || (splitAngle == DIAGONAL_SPLIT_1));
+		return (splitAngle == DIAGONAL_SPLIT_0 || splitAngle == DIAGONAL_SPLIT_1);
 	}
 
 	bool PointCollisionData::HasFlippedDiagonalSplit()
@@ -223,7 +225,7 @@ namespace TEN::Collision
 		constexpr auto DIAGONAL_SPLIT_0 = 45.0f * RADIAN;
 
 		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
-		return (HasDiagonalSplit() && (splitAngle != DIAGONAL_SPLIT_0));
+		return (HasDiagonalSplit() && splitAngle != DIAGONAL_SPLIT_0);
 	}
 
 	bool PointCollisionData::HasEnvironmentFlag(RoomEnvFlags envFlag)
