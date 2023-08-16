@@ -266,7 +266,7 @@ int LaraObject::GetAmmoType() const
 			result = (int)LaraAmmoType::Uzi;
 			break;
 		case::LaraWeaponType::Shotgun:
-			if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo1)
+			if (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1)
 				result = (int)LaraAmmoType::Shotgun_Normal;
 			else
 				result = (int)LaraAmmoType::Shotgun_Wide;
@@ -275,17 +275,17 @@ int LaraObject::GetAmmoType() const
 			result = (int)LaraAmmoType::HK;
 			break;
 		case::LaraWeaponType::Crossbow:
-			if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo1)
+			if (lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo1)
 				result = (int)LaraAmmoType::Bolt_Normal;
-			else if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo2)
+			else if (lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
 				result = (int)LaraAmmoType::Bolt_Poison;
 			else
 				result = (int)LaraAmmoType::Bolt_Explosive;
 			break;
 		case::LaraWeaponType::GrenadeLauncher:
-			if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo1)
+			if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo1)
 				result = (int)LaraAmmoType::Grenade_Normal;
-			else if (Lara.Weapons->SelectedAmmo == WeaponAmmoType::Ammo2)
+			else if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
 				result = (int)LaraAmmoType::Grenade_Frag;
 			else
 				result = (int)LaraAmmoType::Grenade_Flash;
