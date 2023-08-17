@@ -3,13 +3,13 @@
 
 /***
 Constants for player weapon ammo types.
-@enum Objects.AmmoTypeID
+@enum Objects.AmmoType
 @pragma nostrip
 */
 
-/*** Objects.AmmoTypeID constants.
+/*** Objects.AmmoType constants.
 
-The following constants are inside AmmoTypeID.
+The following constants are inside AmmoType.
 
 	NONE
 	PISTOLS
@@ -27,7 +27,7 @@ The following constants are inside AmmoTypeID.
 	HARPOON
 	ROCKET
 
-@section Objects.AmmoTypeID
+@section Objects.AmmoType
 */
 
 /*** PlayerAmmoType constants table.

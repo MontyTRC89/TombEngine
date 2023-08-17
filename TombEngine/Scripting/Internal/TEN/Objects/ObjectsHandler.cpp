@@ -7,7 +7,7 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Objects/Camera/CameraObject.h"
-#include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
+#include "Scripting/Internal/TEN/Objects/Lara/WeaponAmmoTypes.h"
 #include "Scripting/Internal/TEN/Objects/Lara/LaraObject.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomFlags.h"

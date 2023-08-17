@@ -16,13 +16,13 @@ Represents the properties of an object as it appears in the inventory.
 	@tparam string nameKey key for the item's (localised) name.<br />
 Corresponds to an entry in strings.lua.
 	@tparam Objects.ObjID objectID object ID of the inventory object to change
-	@tparam int yOffset y-axis offset (positive values move the item down).<br />
+	@tparam float yOffset y-axis offset (positive values move the item down).<br />
 A value of about 100 will cause the item to display directly below its usual position.
 	@tparam float scale item size (1 being standard size).<br />
 A value of 0.5 will cause the item to render at half the size,
 and a value of 2 will cause the item to render at twice the size.
-	@tparam Rotation rot rotation about x, y, and z axes
-	@tparam RotationAxis axis Axis to rotate about when the item is being looked at in the inventory.<br />
+	@tparam Rotation rot rotation around x, y, and z axes
+	@tparam RotationAxis axis Axis to rotate around when the item is observed at in the inventory.<br />
 Note that this is entirely separate from the `rot` field described above.
 Must one of the following:
 	X
@@ -39,21 +39,21 @@ Must be one of:
 e.g. `myItem.action = ItemAction.EXAMINE`
 	@treturn InventoryItem an InventoryItem
 */
-InventoryItem::InventoryItem(const std::string& name, GAME_OBJECT_ID objectID, short yOffset, float scale, const Rotation& rot, RotationFlags rotFlags, int meshBits, ItemOptions action) :
+InventoryItem::InventoryItem(const std::string& name, GAME_OBJECT_ID objectID, float yOffset, float scale, const Rotation& rot, RotationFlags rotFlags, int meshBits, ItemOptions action) :
 	Name(name),
-	yOffset(yOffset),
-	scale(scale),
-	rot(rot),
-	rotationFlags(rotFlags),
-	meshBits(meshBits)
+	YOffset(yOffset),
+	Scale(scale),
+	Rot(rot),
+	RotFlags(rotFlags),
+	MeshBits(meshBits)
 {
-	slot = (InventoryObjectTypes)g_Gui.ConvertObjectToInventoryItem(objectID);
+	ObjectID = (InventoryObjectTypes)g_Gui.ConvertObjectToInventoryItem(objectID);
 	SetAction(action);
 }
 
 void InventoryItem::Register(sol::table& parent)
 {
-	using ctors = sol::constructors<InventoryItem(const std::string&, GAME_OBJECT_ID, short, float, const Rotation&, RotationFlags, int, ItemOptions)>;
+	using ctors = sol::constructors<InventoryItem(const std::string&, GAME_OBJECT_ID, float, float, const Rotation&, RotationFlags, int, ItemOptions)>;
 
 	parent.new_usertype<InventoryItem>(
 		ScriptReserved_InventoryItem,
