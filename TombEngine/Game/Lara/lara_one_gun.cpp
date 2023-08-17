@@ -1644,6 +1644,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 					 itemPtr->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doShatter = hasHit = true;
+				doExplosion = isExplosive;
 
 				// Smash objects are legacy objects from TRC. Make them explode in legacy way.
 				ExplodeItemNode(itemPtr, 0, 0, 128);
@@ -1653,6 +1654,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 			else if (currentObject.collision && !(itemPtr->Status & ITEM_INVISIBLE))
 			{
 				doShatter = hasHit = true;
+				doExplosion = isExplosive;
 				affectedObjects.push_back(itemPtr->Index);
 			}
 		}
