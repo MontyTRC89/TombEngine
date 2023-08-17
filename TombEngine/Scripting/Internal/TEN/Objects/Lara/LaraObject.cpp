@@ -10,7 +10,7 @@
 #include "Game/effects/item_fx.h"
 #include "Specific/level.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/Objects/Lara/WeaponAmmoTypes.h"
+#include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
 
 /***
 Class for extra Lara-only functions.
@@ -251,49 +251,49 @@ int LaraObject::GetAmmoType() const
 {
 	const auto& player = GetLaraInfo(*m_item);
 
-	auto ammoType = std::optional<PlayerWeaponAmmoType>(std::nullopt);
+	auto ammoType = std::optional<PlayerAmmoType>(std::nullopt);
 	switch (player.Control.Weapon.GunType)
 	{
 		case::LaraWeaponType::Pistol:
-			ammoType = PlayerWeaponAmmoType::Pistol;
+			ammoType = PlayerAmmoType::Pistol;
 			break;
 
 		case::LaraWeaponType::Revolver:
-			ammoType = PlayerWeaponAmmoType::Revolver;
+			ammoType = PlayerAmmoType::Revolver;
 			break;
 
 		case::LaraWeaponType::Uzi:
-			ammoType = PlayerWeaponAmmoType::Uzi;
+			ammoType = PlayerAmmoType::Uzi;
 			break;
 
 		case::LaraWeaponType::Shotgun:
 			if (player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1)
 			{
-				ammoType = PlayerWeaponAmmoType::ShotgunNormal;
+				ammoType = PlayerAmmoType::ShotgunNormal;
 			}
 			else
 			{
-				ammoType = PlayerWeaponAmmoType::ShotgunWide;
+				ammoType = PlayerAmmoType::ShotgunWide;
 			}
 
 			break;
 
 		case::LaraWeaponType::HK:
-			ammoType = PlayerWeaponAmmoType::HK;
+			ammoType = PlayerAmmoType::HK;
 			break;
 
 		case::LaraWeaponType::Crossbow:
 			if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo1)
 			{
-				ammoType = PlayerWeaponAmmoType::CrossbowBoltNormal;
+				ammoType = PlayerAmmoType::CrossbowBoltNormal;
 			}
 			else if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
 			{
-				ammoType = PlayerWeaponAmmoType::CrossbowBoltPoison;
+				ammoType = PlayerAmmoType::CrossbowBoltPoison;
 			}
 			else
 			{
-				ammoType = PlayerWeaponAmmoType::CrossbowBoltExplosive;
+				ammoType = PlayerAmmoType::CrossbowBoltExplosive;
 			}
 
 			break;
@@ -301,25 +301,25 @@ int LaraObject::GetAmmoType() const
 		case::LaraWeaponType::GrenadeLauncher:
 			if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo1)
 			{
-				ammoType = PlayerWeaponAmmoType::GrenadeNormal;
+				ammoType = PlayerAmmoType::GrenadeNormal;
 			}
 			else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
 			{
-				ammoType = PlayerWeaponAmmoType::GrenadeFrag;
+				ammoType = PlayerAmmoType::GrenadeFrag;
 			}
 			else
 			{
-				ammoType = PlayerWeaponAmmoType::GrenadeFlash;
+				ammoType = PlayerAmmoType::GrenadeFlash;
 			}
 
 			break;
 
 		case::LaraWeaponType::HarpoonGun:
-			ammoType = PlayerWeaponAmmoType::Harpoon;
+			ammoType = PlayerAmmoType::Harpoon;
 			break;
 
 		case::LaraWeaponType::RocketLauncher:
-			ammoType = PlayerWeaponAmmoType::Rocket;
+			ammoType = PlayerAmmoType::Rocket;
 			break;
 
 		default:
@@ -329,7 +329,7 @@ int LaraObject::GetAmmoType() const
 	if (!ammoType.has_value())
 	{
 		TENLog("GetAmmoType() error; no ammo type.", LogLevel::Warning, LogConfig::All);
-		ammoType = PlayerWeaponAmmoType::None;
+		ammoType = PlayerAmmoType::None;
 	}
 
 	return (int)*ammoType;

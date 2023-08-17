@@ -887,7 +887,7 @@ enum class WeaponAmmoType
 	Count
 };
 
-enum class PlayerWeaponAmmoType
+enum class PlayerAmmoType
 {
 	None,
 	Pistol,

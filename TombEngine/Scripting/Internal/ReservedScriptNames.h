@@ -181,15 +181,15 @@ static constexpr char ScriptReserved_GetString[]			= "GetString";
 static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 
 // Flow Tables
-static constexpr char ScriptReserved_WeatherType[]			= "WeatherType";
-static constexpr char ScriptReserved_LaraType[]				= "LaraType";
-static constexpr char ScriptReserved_RotationAxis[]			= "RotationAxis";
-static constexpr char ScriptReserved_ItemAction[]			= "ItemAction";
-static constexpr char ScriptReserved_ErrorMode[]			= "ErrorMode";
-static constexpr char ScriptReserved_InventoryItem[]		= "InventoryItem";
-static constexpr char ScriptReserved_LaraWeaponType[]		= "LaraWeaponType";
-static constexpr char ScriptReserved_PlayerWeaponAmmoType[] = "PlayerWeaponAmmoType";
-static constexpr char ScriptReserved_HandStatus[]			= "HandStatus";
+static constexpr char ScriptReserved_WeatherType[]	  = "WeatherType";
+static constexpr char ScriptReserved_LaraType[]		  = "LaraType";
+static constexpr char ScriptReserved_RotationAxis[]	  = "RotationAxis";
+static constexpr char ScriptReserved_ItemAction[]	  = "ItemAction";
+static constexpr char ScriptReserved_ErrorMode[]	  = "ErrorMode";
+static constexpr char ScriptReserved_InventoryItem[]  = "InventoryItem";
+static constexpr char ScriptReserved_LaraWeaponType[] = "LaraWeaponType";
+static constexpr char ScriptReserved_PlayerAmmoType[] = "PlayerAmmoType";
+static constexpr char ScriptReserved_HandStatus[]	  = "HandStatus";
 
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";
