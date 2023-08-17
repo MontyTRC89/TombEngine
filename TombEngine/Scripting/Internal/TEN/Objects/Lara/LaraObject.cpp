@@ -242,72 +242,97 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 	}
 }
 
-/// Get current weapon's ammo type
+/// Get player weapon ammo type.
 // @function LaraObject:GetAmmoType
-// @treturn int current ammo type
+// @treturn int player weapon ammo type
 // @usage
 // local CurrentAmmoType = Lara:GetAmmoType()
 int LaraObject::GetAmmoType() const
 {
-	auto* lara = GetLaraInfo(m_item);
-	auto& CurrentWeapon = lara->Control.Weapon.GunType;
+	const auto& player = GetLaraInfo(*m_item);
 
-	int result = -1;
-
-	switch (CurrentWeapon)
+	auto ammoType = std::optional<PlayerWeaponAmmoType>(std::nullopt);
+	switch (player.Control.Weapon.GunType)
 	{
 		case::LaraWeaponType::Pistol:
-			result = (int)LaraAmmoType::Pistol;
-		break;
+			ammoType = PlayerWeaponAmmoType::Pistol;
+			break;
+
 		case::LaraWeaponType::Revolver:
-			result = (int)LaraAmmoType::Revolver;
+			ammoType = PlayerWeaponAmmoType::Revolver;
 			break;
+
 		case::LaraWeaponType::Uzi:
-			result = (int)LaraAmmoType::Uzi;
+			ammoType = PlayerWeaponAmmoType::Uzi;
 			break;
+
 		case::LaraWeaponType::Shotgun:
-			if (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1)
-				result = (int)LaraAmmoType::Shotgun_Normal;
+			if (player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerWeaponAmmoType::ShotgunNormal;
+			}
 			else
-				result = (int)LaraAmmoType::Shotgun_Wide;
+			{
+				ammoType = PlayerWeaponAmmoType::ShotgunWide;
+			}
+
 			break;
+
 		case::LaraWeaponType::HK:
-			result = (int)LaraAmmoType::HK;
+			ammoType = PlayerWeaponAmmoType::HK;
 			break;
+
 		case::LaraWeaponType::Crossbow:
-			if (lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo1)
-				result = (int)LaraAmmoType::Bolt_Normal;
-			else if (lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
-				result = (int)LaraAmmoType::Bolt_Poison;
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerWeaponAmmoType::CrossbowBoltNormal;
+			}
+			else if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
+			{
+				ammoType = PlayerWeaponAmmoType::CrossbowBoltPoison;
+			}
 			else
-				result = (int)LaraAmmoType::Bolt_Explosive;
+			{
+				ammoType = PlayerWeaponAmmoType::CrossbowBoltExplosive;
+			}
+
 			break;
+
 		case::LaraWeaponType::GrenadeLauncher:
-			if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo1)
-				result = (int)LaraAmmoType::Grenade_Normal;
-			else if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
-				result = (int)LaraAmmoType::Grenade_Frag;
+			if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerWeaponAmmoType::GrenadeNormal;
+			}
+			else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
+			{
+				ammoType = PlayerWeaponAmmoType::GrenadeFrag;
+			}
 			else
-				result = (int)LaraAmmoType::Grenade_Flash;
+			{
+				ammoType = PlayerWeaponAmmoType::GrenadeFlash;
+			}
+
 			break;
+
 		case::LaraWeaponType::HarpoonGun:
-			result = (int)LaraAmmoType::Harpoon;
+			ammoType = PlayerWeaponAmmoType::Harpoon;
 			break;
+
 		case::LaraWeaponType::RocketLauncher:
-			result = (int)LaraAmmoType::Rocket;
+			ammoType = PlayerWeaponAmmoType::Rocket;
 			break;
+
 		default:
-			result = (int)LaraAmmoType::None;
 			break;
 	}
 
-	if (result == -1)
+	if (!ammoType.has_value())
 	{
-		TENLog("Error in the function GetAmmoType, unable to locate the indicated ammo.", LogLevel::Warning, LogConfig::All, false);
-		result = (int)LaraAmmoType::None;
+		TENLog("GetAmmoType() error; no ammo type.", LogLevel::Warning, LogConfig::All);
+		ammoType = PlayerWeaponAmmoType::None;
 	}
 
-	return result;
+	return (int)*ammoType;
 }
 
 /// Get current weapon's ammo count

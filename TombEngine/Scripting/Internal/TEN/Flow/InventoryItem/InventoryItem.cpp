@@ -1,8 +1,8 @@
 #include "framework.h"
-#include "InventoryItem.h"
-#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
+
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include <string>
+#include "Scripting/Internal/ScriptAssert.h"
 
 /***
 Represents the properties of an object as it appears in the inventory.
@@ -15,7 +15,7 @@ Represents the properties of an object as it appears in the inventory.
 	@function InventoryItem
 	@tparam string nameKey key for the item's (localised) name.<br />
 Corresponds to an entry in strings.lua.
-	@tparam Objects.ObjID slot slot of inventory object to change
+	@tparam Objects.ObjID objectID object ID of the inventory object to change
 	@tparam int yOffset y-axis offset (positive values move the item down).<br />
 A value of about 100 will cause the item to display directly below its usual position.
 	@tparam float scale item size (1 being standard size).<br />
@@ -39,44 +39,43 @@ Must be one of:
 e.g. `myItem.action = ItemAction.EXAMINE`
 	@treturn InventoryItem an InventoryItem
 */
-InventoryItem::InventoryItem(std::string const& a_name, GAME_OBJECT_ID a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_action) :
-	name{ a_name },
-	yOffset{ a_yOffset },
-	scale{ a_scale },
-	rot{ a_rot },
-	rotationFlags{ a_rotationFlags },
-	meshBits{ a_meshBits }
+InventoryItem::InventoryItem(const std::string& name, GAME_OBJECT_ID objectID, short yOffset, float scale, const Rotation& rot, RotationFlags rotFlags, int meshBits, ItemOptions action) :
+	Name(name),
+	yOffset(yOffset),
+	scale(scale),
+	rot(rot),
+	rotationFlags(rotFlags),
+	meshBits(meshBits)
 {
-	slot = (InventoryObjectTypes)g_Gui.ConvertObjectToInventoryItem(a_slot);
-	SetAction(a_action);
+	slot = (InventoryObjectTypes)g_Gui.ConvertObjectToInventoryItem(objectID);
+	SetAction(action);
 }
 
-void InventoryItem::Register(sol::table & parent)
+void InventoryItem::Register(sol::table& parent)
 {
-	using ctors = sol::constructors<InventoryItem(std::string const&, GAME_OBJECT_ID, short, float, Rotation const&, RotationFlags, int, ItemOptions)>;
-	parent.new_usertype<InventoryItem>(ScriptReserved_InventoryItem,
-	ctors(),
-		sol::call_constructor, ctors()
-	);
+	using ctors = sol::constructors<InventoryItem(const std::string&, GAME_OBJECT_ID, short, float, const Rotation&, RotationFlags, int, ItemOptions)>;
+
+	parent.new_usertype<InventoryItem>(
+		ScriptReserved_InventoryItem,
+		ctors(), sol::call_constructor, ctors());
 }
 
-// Add validation so the user can't choose something unimplemented
-void InventoryItem::SetAction(ItemOptions a_action)
+// TODO: Add validation so the user can't choose something unimplemented.
+void InventoryItem::SetAction(ItemOptions menuAction)
 {
-	bool isSupported =	(a_action & ItemOptions::OPT_EQUIP) ||
-						(a_action & ItemOptions::OPT_USE) || 
-						(a_action & ItemOptions::OPT_EXAMINABLE) || 
-						(a_action & ItemOptions::OPT_COMBINABLE);
+	bool isSupported = (menuAction & ItemOptions::OPT_EQUIP) != 0 ||
+					   (menuAction & ItemOptions::OPT_USE) != 0 || 
+					   (menuAction & ItemOptions::OPT_EXAMINABLE) != 0 || 
+					   (menuAction & ItemOptions::OPT_COMBINABLE) != 0;
 
-	if (!ScriptAssert(isSupported, "Unsupported item action: " + std::to_string(a_action)))
+	if (!ScriptAssert(isSupported, "Unsupported item menu action: " + std::to_string(menuAction)))
 	{
-		ItemOptions def = ItemOptions::OPT_USE;
-		ScriptWarn("Defaulting to " + std::to_string(def));
-		action = def;
+		auto itemOption = ItemOptions::OPT_USE;
+		ScriptWarn("Defaulting to " + std::to_string(itemOption));
+		MenuAction = itemOption;
 	}
 	else
 	{
-		action = a_action;
+		MenuAction = menuAction;
 	}
 }
-

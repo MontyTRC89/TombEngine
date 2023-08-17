@@ -1,11 +1,8 @@
 #pragma once
-#include <string>
-#include <unordered_map>
-
 #include "Game/Lara/lara_struct.h"
 
 /***
-Constants for Lara's weapons types IDs.
+Constants for player weapon ammo types.
 @enum Objects.AmmoTypeID
 @pragma nostrip
 */
@@ -21,9 +18,9 @@ The following constants are inside AmmoTypeID.
 	SHOTGUN_NORMAL
 	SHOTGUN_WIDE
 	HK
-	BOLT_NORMAL
-	BOLT_POISON
-	BOLT_EXPLOSIVE
+	CROSSBOW_BOLT_NORMAL
+	CROSSBOW_BOLT_POISON
+	CROSSBOW_BOLT_EXPLOSIVE
 	GRENADE_NORMAL
 	GRENADE_FRAG
 	GRENADE_FLASH
@@ -33,25 +30,23 @@ The following constants are inside AmmoTypeID.
 @section Objects.AmmoTypeID
 */
 
-/*** Table of LaraAmmoType flag ID constants.
+/*** PlayerAmmoType constants table.
 @table CONSTANT_STRING_HERE
 */
-
-static const std::unordered_map<std::string, LaraAmmoType> AMMO_TYPE_IDS
+static const std::unordered_map<std::string, PlayerWeaponAmmoType> WEAPON_AMMO_TYPES
 {
-	{ "NONE", LaraAmmoType::None },
-	{ "PISTOLS", LaraAmmoType::Pistol },
-	{ "REVOLVER", LaraAmmoType::Revolver },
-	{ "UZI", LaraAmmoType::Uzi },
-	{ "SHOTGUN_NORMAL", LaraAmmoType::Shotgun_Normal },
-	{ "SHOTGUN_WIDE", LaraAmmoType::Shotgun_Wide },
-	{ "HK", LaraAmmoType::HK },
-	{ "BOLT_NORMAL", LaraAmmoType::Bolt_Normal },
-	{ "BOLT_POISON", LaraAmmoType::Bolt_Poison },
-	{ "BOLT_EXPLOSIVE", LaraAmmoType::Bolt_Explosive },
-	{ "GRENADE_NORMAL", LaraAmmoType::Grenade_Normal },
-	{ "GRENADE_FRAG", LaraAmmoType::Grenade_Frag },
-	{ "GRENADE_FLASH", LaraAmmoType::Grenade_Flash },
-	{ "HARPOON", LaraAmmoType::Harpoon },
-	{ "ROCKET", LaraAmmoType::Rocket }
+	{ "PISTOLS", PlayerWeaponAmmoType::Pistol },
+	{ "REVOLVER", PlayerWeaponAmmoType::Revolver },
+	{ "UZI", PlayerWeaponAmmoType::Uzi },
+	{ "SHOTGUN_NORMAL", PlayerWeaponAmmoType::ShotgunNormal },
+	{ "SHOTGUN_WIDE", PlayerWeaponAmmoType::ShotgunWide },
+	{ "HK", PlayerWeaponAmmoType::HK },
+	{ "BOLT_NORMAL", PlayerWeaponAmmoType::CrossbowBoltNormal },
+	{ "BOLT_POISON", PlayerWeaponAmmoType::CrossbowBoltPoison },
+	{ "BOLT_EXPLOSIVE", PlayerWeaponAmmoType::CrossbowBoltExplosive },
+	{ "GRENADE_NORMAL", PlayerWeaponAmmoType::GrenadeNormal },
+	{ "GRENADE_FRAG", PlayerWeaponAmmoType::GrenadeFrag },
+	{ "GRENADE_FLASH", PlayerWeaponAmmoType::GrenadeFlash },
+	{ "HARPOON", PlayerWeaponAmmoType::Harpoon },
+	{ "ROCKET", PlayerWeaponAmmoType::Rocket }
 };

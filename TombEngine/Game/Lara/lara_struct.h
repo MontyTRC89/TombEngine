@@ -884,28 +884,28 @@ enum class WeaponAmmoType
 	Ammo2,
 	Ammo3,
 
-	NumAmmoTypes
+	Count
 };
 
-enum class LaraAmmoType
+enum class PlayerWeaponAmmoType
 {
 	None,
 	Pistol,
 	Revolver,
 	Uzi,
-	Shotgun_Normal,
-	Shotgun_Wide,
+	ShotgunNormal,
+	ShotgunWide,
 	HK,
-	Bolt_Normal,
-	Bolt_Poison,
-	Bolt_Explosive,
-	Grenade_Normal,
-	Grenade_Frag,
-	Grenade_Flash,
+	CrossbowBoltNormal,
+	CrossbowBoltPoison,
+	CrossbowBoltExplosive,
+	GrenadeNormal,
+	GrenadeFrag,
+	GrenadeFlash,
 	Harpoon,
 	Rocket,
 
-	NumAmmoTypes
+	Count
 };
 
 enum class LaraWeaponType
@@ -1107,9 +1107,9 @@ struct CarriedWeaponInfo
 	bool HasLasersight = false; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer   = false; // TODO: Unused and duplicated in LaraInventoryData.
 
-	Ammo				  Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
-	WeaponAmmoType		  SelectedAmmo							  = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
-	LaraWeaponTypeCarried WeaponMode							  = LaraWeaponTypeCarried::WTYPE_MISSING;
+	Ammo				  Ammo[(int)WeaponAmmoType::Count] = {};
+	WeaponAmmoType		  SelectedAmmo					   = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
+	LaraWeaponTypeCarried WeaponMode					   = LaraWeaponTypeCarried::WTYPE_MISSING;
 };
 
 struct ArmInfo

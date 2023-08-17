@@ -492,14 +492,14 @@ bool FlowHandler::DoFlow()
 				{
 					InventoryObject* invObj = &InventoryObjectTable[obj->slot];
 
-					invObj->ObjectName = obj->name.c_str();
+					invObj->ObjectName = obj->Name.c_str();
 					invObj->Scale1 = obj->scale;
 					invObj->YOffset = obj->yOffset;
 					invObj->Orientation.x = ANGLE(obj->rot.x);
 					invObj->Orientation.y = ANGLE(obj->rot.y);
 					invObj->Orientation.z = ANGLE(obj->rot.z);
 					invObj->MeshBits = obj->meshBits;
-					invObj->Options = obj->action;
+					invObj->Options = obj->MenuAction;
 					invObj->RotFlags = obj->rotationFlags;
 				}
 			}
