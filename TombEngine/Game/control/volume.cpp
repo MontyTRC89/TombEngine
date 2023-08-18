@@ -18,67 +18,42 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Control::Volumes
 {
-	constexpr auto NO_EVENT_SET = -1;
+	constexpr auto CAM_SIZE = 32;
 
-	constexpr auto VOLUME_BUSY_TIMEOUT	= 10;
-	constexpr auto VOLUME_LEAVE_TIMEOUT = 5;
-
-	void InitializeNodeScripts()
+	bool TestVolumeContainment(const TriggerVolume& volume, const BoundingOrientedBox& box, short roomNumber)
 	{
-		auto nodeScriptPath = g_GameFlow->GetGameDir() + "Scripts/Engine/NodeCatalogs/";
-		if (!std::filesystem::is_directory(nodeScriptPath))
-			return;
+		float color = !volume.StateQueue.empty() ? 1.0f : 0.4f;
 
-		auto nodeCatalogs = std::vector<std::string>{};
-		for (const auto& path : std::filesystem::recursive_directory_iterator(nodeScriptPath))
+		switch (volume.Type)
 		{
-			if (path.path().extension() == ".lua")
-				nodeCatalogs.push_back(path.path().filename().string());
-		}
-
-		if (nodeCatalogs.empty())
-			return;
-
-		TENLog("Loading node scripts...", LogLevel::Info);
-
-		std::sort(nodeCatalogs.rbegin(), nodeCatalogs.rend());
-
-		if (!nodeCatalogs.empty())
-		{
-			for (const auto& file : nodeCatalogs)
-				g_GameScript->ExecuteScriptFile(nodeScriptPath + file);
-
-			TENLog(std::to_string(nodeCatalogs.size()) + " node catalogs found and loaded.", LogLevel::Info);
-		}
-		else
-		{
-			TENLog("Node catalogs not found.", LogLevel::Warning);
-		}
-
-		unsigned int nodeCount = 0;
-		for (const auto& set : g_Level.EventSets)
-		{
-			if ((set.OnEnter.Mode == VolumeEventMode::Nodes) && !set.OnEnter.Data.empty())
+		case VolumeType::Box:
+			if (roomNumber == Camera.pos.RoomNumber)
 			{
-				g_GameScript->ExecuteString(set.OnEnter.Data);
-				nodeCount++;
+				g_Renderer.AddDebugBox(volume.Box, 
+					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
 			}
+			return volume.Box.Intersects(box);
 
-			if ((set.OnInside.Mode == VolumeEventMode::Nodes) && !set.OnInside.Data.empty())
+		case VolumeType::Sphere:
+			if (roomNumber == Camera.pos.RoomNumber)
 			{
-				g_GameScript->ExecuteString(set.OnInside.Data);
-				nodeCount++;
-			}				
-
-			if ((set.OnLeave.Mode == VolumeEventMode::Nodes) && !set.OnLeave.Data.empty())
-			{
-				g_GameScript->ExecuteString(set.OnLeave.Data);
-				nodeCount++;
+				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, 
+					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
 			}
-		}
+			return volume.Sphere.Intersects(box);
 
-		if (nodeCount != 0)
-			TENLog(std::to_string(nodeCount) + " node scripts found and loaded.", LogLevel::Info);
+		default:
+			TENLog("Unsupported volume type encountered in room " + std::to_string(roomNumber), LogLevel::Error);
+			return false;
+		}
+	}
+
+	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetup& coll)
+	{
+		auto pBounds = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto pos = Vector3(item.Pose.Position.x, pBounds.Center.y, item.Pose.Position.z);
+		auto rot = item.Pose.Orientation.ToQuaternion();
+		return BoundingOrientedBox(pos, Vector3(coll.Radius, pBounds.Extents.y, coll.Radius), rot);
 	}
 
 	void HandleEvent(VolumeEvent& event, VolumeActivator& activator)
@@ -91,35 +66,7 @@ namespace TEN::Control::Volumes
 			event.CallCounter--;
 	}
 
-	static bool TestVolumeContainment(const TriggerVolume& volume, const BoundingOrientedBox& box, int roomNumber)
-	{
-		float color = !volume.StateQueue.empty() ? 1.0f : 0.4f;
-
-		switch (volume.Type)
-		{
-		case VolumeType::Box:
-			if (roomNumber == Camera.pos.RoomNumber)
-				g_Renderer.AddDebugBox(volume.Box, Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
-
-			return volume.Box.Intersects(box);
-
-		case VolumeType::Sphere:
-			if (roomNumber == Camera.pos.RoomNumber)
-			{
-				g_Renderer.AddDebugSphere(
-					volume.Sphere.Center, volume.Sphere.Radius,
-					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
-			}
-
-			return volume.Sphere.Intersects(box);
-
-		default:
-			TENLog("Unsupported volume type encountered in room " + std::to_string(roomNumber), LogLevel::Error);
-			return false;
-		}
-	}
-
-	void TestVolumes(int roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator)
+	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator)
 	{
 		if (roomNumber == NO_ROOM)
 			return;
@@ -156,10 +103,8 @@ namespace TEN::Control::Volumes
 						entryPtr = &candidate;
 				}
 
-				volume.StateQueue.erase(
-					std::remove_if(
-						volume.StateQueue.begin(), volume.StateQueue.end(), 
-						[](const VolumeState& object) { return (object.Status == VolumeStateStatus::Outside); }),
+				volume.StateQueue.erase(std::remove_if(volume.StateQueue.begin(), volume.StateQueue.end(), 
+					[](const VolumeState& obj) { return obj.Status == VolumeStateStatus::Outside; }),
 					volume.StateQueue.end());
 			}
 
@@ -187,8 +132,9 @@ namespace TEN::Control::Volumes
 			}
 			else if (entryPtr != nullptr)
 			{
-				// Only fire leave event when certain timeout has passed.
-				// Helps filter out borderline cases when moving around volumes.
+				// Only fire leave event when a certain timeout has passed.
+				// This helps to filter out borderline cases when moving around volumes.
+
 				if ((GameTimer - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
 				{
 					entryPtr->Status = VolumeStateStatus::Leaving;
@@ -199,25 +145,31 @@ namespace TEN::Control::Volumes
 			}
 		}
 	}
-
-	static BoundingOrientedBox ConstructRoughBox(const ItemInfo& item, const CollisionSetup& coll)
+	
+	void TestVolumes(CAMERA_INFO* camera)
 	{
-		auto playerBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto pose = Pose(camera->pos.ToVector3i(), EulerAngles::Zero);
+		auto bounds = GameBoundingBox::Zero;
+		bounds.X1 = bounds.Y1 = bounds.Z1 =  CAM_SIZE;
+		bounds.X2 = bounds.Y2 = bounds.Z2 = -CAM_SIZE;
 
-		auto pos = Vector3(item.Pose.Position.x, playerBox.Center.y, item.Pose.Position.z);
-		auto extents = Vector3(coll.Radius, playerBox.Extents.y, coll.Radius);
-		auto orient = item.Pose.Orientation.ToQuaternion();
+		auto box = bounds.ToBoundingOrientedBox(pose);
 
-		return BoundingOrientedBox(pos, extents, orient);
+		TestVolumes(camera->pos.RoomNumber, box, VolumeActivatorFlags::Flyby, camera);
 	}
 
-	void TestVolumes(int itemNumber, const CollisionSetup* collPtr)
+	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
-		const auto& item = g_Level.Items[itemNumber];
+		auto box = GetBoundsAccurate(*mesh, false).ToBoundingOrientedBox(mesh->pos);
+		
+		TestVolumes(roomNumber, box, VolumeActivatorFlags::Static, mesh);
+	}
 
-		auto box = (collPtr != nullptr) ?
-			ConstructRoughBox(item, *collPtr) :
-			GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+	void TestVolumes(short itemNumber, const CollisionSetup* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		auto box = (coll != nullptr) ?
+			ConstructRoughBox(item, *coll) : GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
 		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 
@@ -235,18 +187,62 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	void TestVolumes(int roomNumber, MESH_INFO* meshPtr)
+	void InitializeNodeScripts()
 	{
-		auto box = GetBoundsAccurate(*meshPtr, false).ToBoundingOrientedBox(meshPtr->pos);
-		TestVolumes(roomNumber, box, VolumeActivatorFlags::Static, meshPtr);
-	}
+		std::string nodeScriptPath = g_GameFlow->GetGameDir() + "Scripts/Engine/NodeCatalogs/";
 
-	void TestVolumes(CAMERA_INFO* cameraPtr)
-	{
-		constexpr auto CAMERA_EXTENTS = Vector3(32.0f);
+		if (!std::filesystem::is_directory(nodeScriptPath))
+			return;
+		
+		std::vector<std::string> nodeCatalogs;
+		for (const auto& path : std::filesystem::recursive_directory_iterator(nodeScriptPath))
+		{
+			if (path.path().extension() == ".lua")
+				nodeCatalogs.push_back(path.path().filename().string());
+		}
 
-		// TODO: Camera box is currently an AABB. Should derive orientation from look-at? -- Sezz 2023.08.11
-		auto box = BoundingOrientedBox(cameraPtr->pos.ToVector3(), CAMERA_EXTENTS, Quaternion::Identity);
-		TestVolumes(cameraPtr->pos.RoomNumber, box, VolumeActivatorFlags::Flyby, cameraPtr);
+		if (nodeCatalogs.empty())
+			return;
+
+		TENLog("Loading node scripts...", LogLevel::Info);
+
+		std::sort(nodeCatalogs.rbegin(), nodeCatalogs.rend());
+
+        if (!nodeCatalogs.empty())
+        {
+            for (const auto& file : nodeCatalogs)
+                g_GameScript->ExecuteScriptFile(nodeScriptPath + file);
+
+            TENLog(std::to_string(nodeCatalogs.size()) + " node catalogs were found and loaded.", LogLevel::Info);
+        }
+        else
+        {
+            TENLog("No node catalogs were found.", LogLevel::Warning);
+        }
+
+		unsigned int nodeCount = 0;
+		for (const auto& set : g_Level.EventSets)
+		{
+			if ((set.OnEnter.Mode == VolumeEventMode::Nodes) && !set.OnEnter.Data.empty())
+			{
+				g_GameScript->ExecuteString(set.OnEnter.Data);
+				nodeCount++;
+			}
+
+			if ((set.OnInside.Mode == VolumeEventMode::Nodes) && !set.OnInside.Data.empty())
+			{
+				g_GameScript->ExecuteString(set.OnInside.Data);
+				nodeCount++;
+			}				
+
+			if ((set.OnLeave.Mode == VolumeEventMode::Nodes) && !set.OnLeave.Data.empty())
+			{
+				g_GameScript->ExecuteString(set.OnLeave.Data);
+				nodeCount++;
+			}
+		}
+
+		if (nodeCount != 0)
+			TENLog(std::to_string(nodeCount) + " node scripts were found and loaded.", LogLevel::Info);
 	}
 }
