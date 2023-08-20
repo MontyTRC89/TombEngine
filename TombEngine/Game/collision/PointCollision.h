@@ -62,6 +62,10 @@ namespace TEN::Collision
 		bool HasDiagonalSplit();
 		bool HasFlippedDiagonalSplit();
 		bool HasEnvironmentFlag(RoomEnvFlags envFlag);
+
+	private:
+		// Helpers
+		Vector3 GetBridgeNormal(bool isFloor);
 	};
 
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber);

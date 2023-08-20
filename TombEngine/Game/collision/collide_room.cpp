@@ -187,32 +187,21 @@ CollisionResult GetCollision(const GameVector& pos)
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-// A reworked legacy GetFloorHeight() function which writes data
-// into a special CollisionResult struct instead of global variables.
-// It writes for both floor and ceiling heights at the same coordinates, meaning it should be used
-// in place of successive GetFloorHeight() and GetCeilingHeight() calls to increase readability.
+// Deprecated.
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
 	auto result = CollisionResult{};
 
-	// Record coordinates.
 	result.Coordinates = Vector3i(x, y, z);
-
-	// Return provided collision block into result as itself.
-	result.Block = floor;
-	
-	// Floor and ceiling heights are borrowed directly from floordata.
 	result.Position.Floor = GetFloorHeight(RoomVector(floor->Room, y), x, z).value_or(NO_HEIGHT);
 	result.Position.Ceiling = GetCeilingHeight(RoomVector(floor->Room, y), x, z).value_or(NO_HEIGHT);
 
-	// Probe bottom collision block through portals.
+	result.Block = floor;
 	while (floor->GetRoomNumberBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 	{
 		auto* room = &g_Level.Rooms[floor->GetRoomNumberBelow(x, y, z).value_or(floor->Room)];
 		floor = GetSector(room, x - room->x, z - room->z);
 	}
-
-	// Return probed bottom collision block into result.
 	result.BottomBlock = floor;
 
 	// Get tilts.

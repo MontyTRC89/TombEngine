@@ -5,7 +5,9 @@
 #include "Game/collision/floordata.h"
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/game_object_ids.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
@@ -104,8 +106,7 @@ namespace TEN::Collision
 		// Set floor normal.
 		if (GetFloorBridgeItemNumber() != NO_ITEM)
 		{
-			// TODO: Get bridge normal.
-			FloorNormal = -Vector3::UnitY;
+			FloorNormal = GetBridgeNormal(true);
 		}
 		else
 		{
@@ -124,8 +125,7 @@ namespace TEN::Collision
 		// Set ceiling normal.
 		if (GetCeilingBridgeItemNumber() != NO_ITEM)
 		{
-			// TODO: Get bridge normal.
-			CeilingNormal = Vector3::UnitY;
+			CeilingNormal = GetBridgeNormal(false);
 		}
 		else
 		{
@@ -195,7 +195,8 @@ namespace TEN::Collision
 
 	bool PointCollisionData::IsWall()
 	{
-		return (GetFloorHeight() == NO_HEIGHT || GetCeilingHeight() == NO_HEIGHT);
+		return (GetFloorHeight() == NO_HEIGHT || GetCeilingHeight() == NO_HEIGHT ||
+				GetFloorHeight() < GetCeilingHeight());
 	}
 
 	bool PointCollisionData::IsSlipperyFloor(short slopeAngleMin)
@@ -204,8 +205,7 @@ namespace TEN::Collision
 		auto floorNormal = GetFloorNormal();
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
 
-		// TODO: Slippery bridges.
-		return (GetFloorBridgeItemNumber() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
+		return (abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollisionData::IsSlipperyCeiling(short slopeAngleMin)
@@ -214,8 +214,7 @@ namespace TEN::Collision
 		auto ceilingNormal = GetCeilingNormal();
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(ceilingNormal, -Vector3::UnitY);
 
-		// TODO: Slippery bridges.
-		return (GetCeilingBridgeItemNumber() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
+		return (abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollisionData::IsDiagonalStep()
@@ -246,16 +245,39 @@ namespace TEN::Collision
 		return ((room.flags & envFlag) == envFlag);
 	}
 
-	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber)
+	// HACK.
+	Vector3 PointCollisionData::GetBridgeNormal(bool isFloor)
 	{
-		// HACK: This function takes arguments for a *current* position and room number.
-		// However, since some calls to the previous implementation (GetCollision()) had *projected*
-		// positions passed to it, the room number must be corrected to account for such cases.
-		// They are primarily found in camera.cpp.
-		short correctedRoomNumber = roomNumber;
-		GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
+		constexpr auto ANGLE_STEP = ANGLE(11.25f);
 
-		return PointCollisionData(pos, correctedRoomNumber);
+		int itemNumber = isFloor ? GetFloorBridgeItemNumber() : GetCeilingBridgeItemNumber();
+		const auto& item = g_Level.Items[itemNumber];
+
+		auto orient = item.Pose.Orientation;
+		switch (item.ObjectNumber)
+		{
+		default:
+		case ID_BRIDGE_FLAT:
+			break;
+
+		case ID_BRIDGE_TILT1:
+			orient.z -= ANGLE_STEP;
+			break;
+
+		case ID_BRIDGE_TILT2:
+			orient.z -= ANGLE_STEP * 2;
+			break;
+
+		case ID_BRIDGE_TILT3:
+			orient.z -= ANGLE_STEP * 3;
+			break;
+
+		case ID_BRIDGE_TILT4:
+			orient.z -= ANGLE_STEP * 4;
+			break;
+		}
+
+		return Vector3::Transform(isFloor ? -Vector3::UnitY : Vector3::UnitY, orient.ToRotationMatrix());
 	}
 
 	static int GetProbeRoomNumber(const Vector3i& pos, const RoomVector& location, const Vector3i& probePos)
@@ -273,6 +295,32 @@ namespace TEN::Collision
 		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
 
 		return RoomVector(sector.Room, pos.y);
+	}
+
+	static RoomVector GetLocation(const ItemInfo& item)
+	{
+		// TODO: Find cleaner solution. Constructing a "location" for the player on the spot
+		// can result in stumbles when climbing onto thin platforms. 
+		// May have to do with player's room number being updated at half-height? -- Sezz 2022.06.14
+		if (item.IsLara())
+			return item.Location;
+
+		short tempRoomNumber = item.RoomNumber;
+		const auto& sector = *GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &tempRoomNumber);
+
+		return RoomVector(sector.Room, item.Pose.Position.y);
+	}
+
+	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber)
+	{
+		// HACK: This function takes arguments for a *current* position and room number.
+		// However, since some calls to the previous implementation (GetCollision()) had *projected*
+		// positions passed to it, the room number must be corrected to account for such cases.
+		// They are primarily found in camera.cpp.
+		short correctedRoomNumber = roomNumber;
+		GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
+
+		return PointCollisionData(pos, correctedRoomNumber);
 	}
 
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
@@ -302,20 +350,6 @@ namespace TEN::Collision
 	PointCollisionData GetPointCollision(const ItemInfo& item)
 	{
 		return PointCollisionData(item.Pose.Position, item.RoomNumber);
-	}
-
-	static RoomVector GetLocation(const ItemInfo& item)
-	{
-		// TODO: Find cleaner solution. Constructing a "location" for the player on the spot
-		// can result in stumbles when climbing onto thin platforms. 
-		// May have to do with player's room number being updated at half-height? -- Sezz 2022.06.14
-		if (item.IsLara())
-			return item.Location;
-
-		short tempRoomNumber = item.RoomNumber;
-		const auto& sector = *GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &tempRoomNumber);
-
-		return RoomVector(sector.Room, item.Pose.Position.y);
 	}
 
 	PointCollisionData GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist)
