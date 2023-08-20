@@ -144,6 +144,15 @@ namespace TEN::Entities::Generic
 				}
 				return;
 			}
+			else
+			{
+				// Effects: Spawn ripples.
+				//TODO: Enhace the effect to make the ripples increase their size through the time.
+				if (pushable.StartPos.y != NO_HEIGHT && std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
+				{
+					SpawnRipple(Vector3(pushableItem.Pose.Position.x, waterHeight, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
+				}
+			}
 		}
 
 		//3. Check if floor has changed
@@ -593,15 +602,17 @@ namespace TEN::Entities::Generic
 			DeactivateClimbablePushableCollider(itemNumber);
 
 			pushableItem.Animation.Velocity.y = 0;
+			pushable.StartPos.y = NO_HEIGHT;
 			return;
 		}
 
 		//2. Do water ondulation effect.
-		FloatItem(pushableItem, pushable.FloatingForce);
+		if (!pushable.UsesRoomCollision)
+			FloatItem(pushableItem, pushable.FloatingForce);
 
 		// Effects: Spawn ripples.
 		//TODO: Enhace the effect to make the ripples increase their size through the time.
-		if (pushable.StartPos.y != NO_HEIGHT && std::fmod(pushableItem.Animation.Velocity.y, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
+		if (pushable.StartPos.y != NO_HEIGHT && std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
 		{
 			SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.StartPos.y, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 		}
