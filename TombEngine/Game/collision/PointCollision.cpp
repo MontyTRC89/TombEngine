@@ -267,7 +267,7 @@ namespace TEN::Collision
 		return probeRoomNumber;
 	}
 
-	static RoomVector GetPositionLocation(const Vector3i& pos, int roomNumber)
+	static RoomVector GetLocation(const Vector3i& pos, int roomNumber)
 	{
 		short tempRoomNumber = roomNumber;
 		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
@@ -278,7 +278,7 @@ namespace TEN::Collision
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
 	{
 		// Get "location".
-		auto location = GetPositionLocation(pos, roomNumber);
+		auto location = GetLocation(pos, roomNumber);
 
 		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(pos, dir, dist);
@@ -290,7 +290,7 @@ namespace TEN::Collision
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 	{
 		// Get "location".
-		auto location = GetPositionLocation(pos, roomNumber);
+		auto location = GetLocation(pos, roomNumber);
 
 		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
@@ -304,7 +304,7 @@ namespace TEN::Collision
 		return PointCollisionData(item.Pose.Position, item.RoomNumber);
 	}
 
-	static RoomVector GetEntityLocation(const ItemInfo& item)
+	static RoomVector GetLocation(const ItemInfo& item)
 	{
 		// TODO: Find cleaner solution. Constructing a "location" for the player on the spot
 		// can result in stumbles when climbing onto thin platforms. 
@@ -321,7 +321,7 @@ namespace TEN::Collision
 	PointCollisionData GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist)
 	{
 		// Get "location".
-		auto location = GetEntityLocation(item);
+		auto location = GetLocation(item);
 
 		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(item.Pose.Position, dir, dist);
@@ -333,7 +333,7 @@ namespace TEN::Collision
 	PointCollisionData GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right)
 	{
 		// Get "location".
-		auto location = GetEntityLocation(item);
+		auto location = GetLocation(item);
 
 		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(item.Pose.Position, headingAngle, forward, down, right);
