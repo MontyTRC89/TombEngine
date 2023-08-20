@@ -327,21 +327,21 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Position.y = probeNow.Position.Ceiling + HEIGHT_ADJUST;
 
 	// Drop down if action not pressed.
-	if (!(TrInput & IN_ACTION))
+	if (!IsHeld(In::Action))
 	{
 		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		return;
 	}
 
 	// Engage shimmy mode if LEFT/LSTEP or RIGHT/RSTEP are pressed.
-	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		lara->Context.NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
 		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 	{
 		// Test for ledge over slope.
 		short tempRoom = probeUp.Block->GetRoomNumberAbove(up.x, up.z).value_or(NO_ROOM);
@@ -404,7 +404,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 	}
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 	{
 		if ((GetClimbFlags(GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & slopeData.ClimbOrient) &&
 			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1)))
@@ -489,7 +489,7 @@ void lara_col_slopehang(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Position.y = probeNow.Position.Ceiling + HEIGHT_ADJUST;
 
 	// Drop down if action not pressed.
-	if (!(TrInput & IN_ACTION))
+	if (!IsHeld(In::Action))
 	{
 		SetAnimation(item, LA_OVERHANG_HANG_DROP);
 		item->Animation.IsAirborne = true;
@@ -499,22 +499,22 @@ void lara_col_slopehang(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber != LA_OVERHANG_HANG_SWING)
 	{
 		// Return to climbing mode.
-		if (TrInput & IN_FORWARD || TrInput & IN_BACK)
+		if (IsHeld(In::Forward) || IsHeld(In::Back))
 			SetAnimation(item, lara->Context.NextCornerPos.Orientation.z ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK.
 
 		// Shimmy control.
-		if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			auto shimmy = now;
 			short direction = 0;
 
-			if (TrInput & IN_LEFT)
+			if (IsHeld(In::Left))
 			{
 				shimmy.x -= slopeData.Offset.z / 2;
 				shimmy.z += slopeData.Offset.x / 2;
 				direction = -ANGLE(90.0f);
 			}
-			else if (TrInput & IN_RIGHT)
+			else if (IsHeld(In::Right))
 			{
 				shimmy.x += slopeData.Offset.z / 2;
 				shimmy.z -= slopeData.Offset.x / 2;
@@ -639,7 +639,7 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 	Camera.speed = 15;
 
 
-	if (!(TrInput & IN_ACTION))
+	if (!IsHeld(In::Action))
 	{
 		int frame = GetFrameNumber(item);
 		int length = GetFrameCount(item->Animation.AnimNumber);
@@ -669,7 +669,7 @@ void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = 1664;
 	Camera.speed = 15;
 
-	if (!(TrInput & IN_ACTION))
+	if (!IsHeld(In::Action))
 	{
 		int frame = GetFrameNumber(item);
 		int length = GetFrameCount(item->Animation.AnimNumber);
@@ -841,9 +841,9 @@ void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 				(probeDown.CeilingTilt.y / 3) == (slopeData.Goal.y / 3))
 			{
 				item->Animation.TargetState = LS_HANG;
-				if (TrInput & IN_FORWARD)
+				if (IsHeld(In::Forward))
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
-				/*else if (TrInput & IN_BACK)
+				/*else if (IsHeld(In::Back))
 					SetAnimation(item, LA_LADDER_SHIMMY_DOWN);*/
 			}
 		}
@@ -915,7 +915,7 @@ void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 	// Block for ladder to overhead slope transition.
 	if (item->Animation.AnimNumber == LA_LADDER_IDLE)
 	{
-		if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			int ceilDist = probeNow.Position.Ceiling - item->Pose.Position.y;
 
@@ -935,7 +935,7 @@ void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (TrInput & IN_BACK)
+		if (IsHeld(In::Back))
 		{
 			int ceilDist = probeDown.Position.Ceiling - item->Pose.Position.y;
 
@@ -988,7 +988,7 @@ void SlopeClimbDownExtra(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->Animation.AnimNumber == LA_LADDER_DOWN) // Make Lara stop before underlying slope ceiling at correct height.
 	{
-		if (TrInput & IN_BACK)
+		if (IsHeld(In::Back))
 		{
 			int ceilDist = probeDown.Position.Ceiling - item->Pose.Position.y;
 
@@ -1074,7 +1074,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (TrInput & IN_FORWARD) // Monkey to slope transitions.
+	if (IsHeld(In::Forward)) // Monkey to slope transitions.
 	{
 		if (probeNow.BottomBlock->Flags.Monkeyswing &&
 			((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameIndex(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))

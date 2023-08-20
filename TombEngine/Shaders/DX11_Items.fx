@@ -28,7 +28,6 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
 	float Sheen: SHEEN;
-	float3x3 TBN: TBN;
 	float4 PositionCopy: TEXCOORD2;
 	float4 FogBulbs : TEXCOORD3;
 	float DistanceFog : FOG;
@@ -45,8 +44,7 @@ Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
 Texture2D NormalTexture : register(t1);
-
-//TextureCube Reflection : register (t4);
+SamplerState NormalSampler : register(s1);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -60,12 +58,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Normal = normal;
 	output.UV = input.UV;
 	output.WorldPosition = worldPosition;
-	
-	float3 Tangent = mul(float4(input.Tangent, 0), world).xyz;
-    float3 Bitangent = cross(normal, Tangent);
-	float3x3 TBN = float3x3(Tangent, Bitangent, normal);
-
-	output.TBN = transpose(TBN);
 
 	// Calculate vertex effects
 	float wibble = Wibble(input.Effects.xyz, input.Hash);
@@ -95,9 +87,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float4 tex = Texture.Sample(Sampler, input.UV);	
     DoAlphaTest(tex);
 
-	float3 normal = NormalTexture.Sample(Sampler, input.UV).rgb;
-	normal = normal * 2 - 1;
-	normal = normalize(mul(input.TBN, normal));
+	float3 normal = normalize(input.Normal);
 
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(

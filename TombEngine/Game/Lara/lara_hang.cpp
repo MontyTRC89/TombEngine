@@ -25,6 +25,7 @@ void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.Look.Mode = LookMode::Free;
 	lara->Control.IsClimbingLadder = false;
 
 	if (item->HitPoints <= 0)
@@ -32,9 +33,6 @@ void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_IDLE;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -55,7 +53,7 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_REACH_TO_HANG ||
 		item->Animation.AnimNumber == LA_HANG_IDLE)
 	{
-		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
+		if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 		{
 			if (TestLaraHangSideways(item, coll, -ANGLE(90.0f)))
 			{
@@ -92,7 +90,7 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
+		if (IsHeld(In::Right) || IsHeld(In::StepRight))
 		{
 			if (TestLaraHangSideways(item, coll, ANGLE(90.0f)))
 			{
@@ -130,9 +128,9 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		// TODO: Allow direction locking just like with standing jumps. Needs new ledge jump prepare state? -- Sezz 24.10.2022
-		if (TrInput & IN_JUMP && TestLaraLedgeJump(item, coll))
+		if (IsHeld(In::Jump) && TestLaraLedgeJump(item, coll))
 		{
-			if (TrInput & IN_BACK)
+			if (IsHeld(In::Back))
 				item->Animation.TargetState = LS_JUMP_FORWARD;
 			else
 				item->Animation.TargetState = LS_JUMP_UP;
@@ -148,7 +146,7 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 	{
 		TestForObjectOnLedge(item, coll);
 
-		if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 		{
 			if (coll->Front.Floor > -(CLICK(3.5f) - 46) &&
 				TestValidLedge(item, coll) && !coll->HitStatic)
@@ -158,9 +156,9 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 					coll->FrontLeft.Floor >= coll->FrontLeft.Ceiling &&
 					coll->FrontRight.Floor >= coll->FrontRight.Ceiling)
 				{
-					if (TrInput & IN_WALK)
+					if (IsHeld(In::Walk))
 						item->Animation.TargetState = LS_HANDSTAND;
-					else if (TrInput & IN_CROUCH)
+					else if (IsHeld(In::Crouch))
 					{
 						item->Animation.TargetState = LS_HANG_TO_CRAWL;
 						item->Animation.RequiredState = LS_CROUCH_IDLE;
@@ -195,7 +193,7 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (TrInput & IN_BACK && lara->Control.CanClimbLadder &&
+		if (IsHeld(In::Back) && lara->Control.CanClimbLadder &&
 			coll->Middle.Floor > (CLICK(1.5f) - 40) &&
 			(item->Animation.AnimNumber == LA_REACH_TO_HANG ||
 				item->Animation.AnimNumber == LA_HANG_IDLE))
@@ -212,13 +210,16 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_shimmy_left()
 void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 
-	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
+	if (!(IsHeld(In::Left) || IsHeld(In::StepLeft)))
 		item->Animation.TargetState = LS_HANG;
 }
 
@@ -226,26 +227,29 @@ void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_shimmy_left()
 void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 }
 
 // State:		LS_SHIMMY_RIGHT (31)
 // Collision:	lara_col_shimmy_right()
 void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(45.0f);
 
-	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
+	if (!(IsHeld(In::Right) || IsHeld(In::StepRight)))
 		item->Animation.TargetState = LS_HANG;
 }
 

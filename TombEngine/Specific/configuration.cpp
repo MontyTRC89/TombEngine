@@ -2,17 +2,17 @@
 #include "Specific/configuration.h"
 
 #include <CommCtrl.h>
-#include "resource.h"
+
 #include "Renderer/Renderer11.h"
-#include "Scripting/Internal/LanguageScript.h"
+#include "resource.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Internal/LanguageScript.h"
 #include "Specific/Input/Input.h"
 #include "Specific/winmain.h"
 #include "Sound/sound.h"
 
-using std::vector;
-using namespace TEN::Renderer;
 using namespace TEN::Input;
+using namespace TEN::Renderer;
 
 GameConfiguration g_Configuration;
 
@@ -83,10 +83,10 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		LoadResolutionsInCombobox(handle);
 		LoadSoundDevicesInCombobox(handle);
 
-		// Set some default values
-		g_Configuration.AutoTarget = true;
+		// Set some default values.
+		g_Configuration.EnableAutoTargeting = true;
 
-		g_Configuration.Antialiasing = AntialiasingMode::Low;
+		g_Configuration.AntialiasingMode = AntialiasingMode::Low;
 		SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_SETCHECK, 1, 0);
 
 		g_Configuration.ShadowType = ShadowMode::Lara;
@@ -95,7 +95,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		g_Configuration.EnableCaustics = true;
 		SendDlgItemMessage(handle, IDC_CAUSTICS, BM_SETCHECK, 1, 0);
 
-		g_Configuration.Windowed = true;
+		g_Configuration.EnableWindowedMode = true;
 		SendDlgItemMessage(handle, IDC_WINDOWED, BM_SETCHECK, 1, 0);
 
 		g_Configuration.EnableSound = true;
@@ -112,19 +112,19 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			switch (LOWORD(wParam))
 			{
 			case IDOK:
-				// Get values from dialog components
-				g_Configuration.Windowed = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
+				// Get values from dialog components.
+				g_Configuration.EnableWindowedMode = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
 				g_Configuration.ShadowType = (ShadowMode)(SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
-				g_Configuration.Antialiasing = (AntialiasingMode)(SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_GETCHECK, 0, 0));
+				g_Configuration.AntialiasingMode = (AntialiasingMode)(SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
 				selectedMode = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
 				mode = g_Configuration.SupportedScreenResolutions[selectedMode];
-				g_Configuration.Width = mode.x;
-				g_Configuration.Height = mode.y;
+				g_Configuration.ScreenWidth = mode.x;
+				g_Configuration.ScreenHeight = mode.y;
 				g_Configuration.SoundDevice = (SendDlgItemMessage(handle, IDC_SNDADAPTER, CB_GETCURSEL, 0, 0)) + 1;
 
-				// Save the configuration
+				// Save configuration.
 				SaveConfiguration();
 				EndDialog(handle, wParam);
 				return 1;
@@ -149,7 +149,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int SetupDialog()
 {
-	HRSRC res = FindResource(nullptr, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
+	auto res = FindResource(nullptr, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
 
 	ShowCursor(true);
 	int result = DialogBoxParamA(nullptr, MAKEINTRESOURCE(IDD_SETUP), 0, (DLGPROC)DialogProc, 0);
@@ -160,129 +160,122 @@ int SetupDialog()
 
 bool SaveConfiguration()
 {
-	// Try to open the root key
+	// Open root key.
 	HKEY rootKey = NULL;
 	if (RegOpenKeyA(HKEY_CURRENT_USER, REGKEY_ROOT, &rootKey) != ERROR_SUCCESS)
 	{
-		// Create the new key
+		// Create new key.
 		if (RegCreateKeyA(HKEY_CURRENT_USER, REGKEY_ROOT, &rootKey) != ERROR_SUCCESS)
 			return false;
 	}
 
-	if (SetDWORDRegKey(rootKey, REGKEY_SCREEN_WIDTH, g_Configuration.Width) != ERROR_SUCCESS)
+	// Open Graphics subkey.
+	HKEY graphicsKey = NULL;
+	if (RegCreateKeyExA(rootKey, REGKEY_GRAPHICS, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &graphicsKey, NULL) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
 		return false;
 	}
 
-	if (SetDWORDRegKey(rootKey, REGKEY_SCREEN_HEIGHT, g_Configuration.Height) != ERROR_SUCCESS)
+	// Set Graphics keys.
+	if (SetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, g_Configuration.ScreenWidth) != ERROR_SUCCESS ||
+		SetDWORDRegKey(graphicsKey, REGKEY_SCREEN_HEIGHT, g_Configuration.ScreenHeight) != ERROR_SUCCESS ||
+		SetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, g_Configuration.EnableWindowedMode) != ERROR_SUCCESS ||
+		SetDWORDRegKey(graphicsKey, REGKEY_SHADOWS, DWORD(g_Configuration.ShadowType)) != ERROR_SUCCESS ||
+		SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, g_Configuration.ShadowMapSize) != ERROR_SUCCESS ||
+		SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, g_Configuration.ShadowBlobsMax) != ERROR_SUCCESS ||
+		SetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, g_Configuration.EnableCaustics) != ERROR_SUCCESS ||
+		SetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, (DWORD)g_Configuration.AntialiasingMode) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
 		return false;
 	}
 
-	if (SetBoolRegKey(rootKey, REGKEY_WINDOWED, g_Configuration.Windowed) != ERROR_SUCCESS)
+	// Open Sound subkey.
+	HKEY soundKey = NULL;
+	if (RegCreateKeyExA(rootKey, REGKEY_SOUND, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &soundKey, NULL) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
 		return false;
 	}
 
-	if (SetDWORDRegKey(rootKey, REGKEY_SHADOWS, DWORD(g_Configuration.ShadowType)) != ERROR_SUCCESS)
+	// Set Sound keys.
+	if (SetDWORDRegKey(soundKey, REGKEY_SOUND_DEVICE, g_Configuration.SoundDevice) != ERROR_SUCCESS ||
+		SetBoolRegKey(soundKey, REGKEY_ENABLE_SOUND, g_Configuration.EnableSound) != ERROR_SUCCESS ||
+		SetBoolRegKey(soundKey, REGKEY_ENABLE_REVERB, g_Configuration.EnableReverb) != ERROR_SUCCESS ||
+		SetDWORDRegKey(soundKey, REGKEY_MUSIC_VOLUME, g_Configuration.MusicVolume) != ERROR_SUCCESS ||
+		SetDWORDRegKey(soundKey, REGKEY_SFX_VOLUME, g_Configuration.SfxVolume) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
 		return false;
 	}
 
-	if (SetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, g_Configuration.ShadowMapSize) != ERROR_SUCCESS) {
+	// Open Gameplay subkey.
+	HKEY gameplayKey = NULL;
+	if (RegCreateKeyExA(rootKey, REGKEY_GAMEPLAY, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &gameplayKey, NULL) != ERROR_SUCCESS)
+	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
+		RegCloseKey(gameplayKey);
 		return false;
 	}
 
-	if (SetDWORDRegKey(rootKey, REGKEY_SHADOW_BLOBS, g_Configuration.ShadowMaxBlobs) != ERROR_SUCCESS)
+	// Set Gameplay keys.
+	if (SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
+		RegCloseKey(gameplayKey);
 		return false;
 	}
 
-	if (SetBoolRegKey(rootKey, REGKEY_CAUSTICS, g_Configuration.EnableCaustics) != ERROR_SUCCESS)
+	// Open Input subkey.
+	HKEY inputKey = NULL;
+	if (RegCreateKeyExA(rootKey, REGKEY_INPUT, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &inputKey, NULL) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
+		RegCloseKey(gameplayKey);
+		RegCloseKey(inputKey);
 		return false;
 	}
 
-	if (SetDWORDRegKey(rootKey, REGKEY_ANTIALIASING, DWORD(g_Configuration.Antialiasing)) != ERROR_SUCCESS)
+	// Set Input keys.
+	g_Configuration.Bindings.resize((int)In::Count);
+	for (int i = 0; i < (int)In::Count; i++)
 	{
-		RegCloseKey(rootKey);
-		return false;
-	}
+		char buffer[9];
+		sprintf(buffer, "Action%d", i);
 
-	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_SOUND, g_Configuration.EnableSound) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	if (SetDWORDRegKey(rootKey, REGKEY_SOUND_DEVICE, g_Configuration.SoundDevice) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	if (SetBoolRegKey(rootKey, REGKEY_SOUND_SPECIAL_FX, g_Configuration.EnableReverb) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	if (SetDWORDRegKey(rootKey, REGKEY_MUSIC_VOLUME, g_Configuration.MusicVolume) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	if (SetDWORDRegKey(rootKey, REGKEY_SFX_VOLUME, g_Configuration.SfxVolume) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-
-	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCameraControl) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	if (SetBoolRegKey(rootKey, REGKEY_AUTOTARGET, g_Configuration.AutoTarget) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	for (int i = 0; i < KEY_COUNT; i++)
-	{
-		char buffer[6];
-		sprintf(buffer, "Key%d", i);
-
-		if (SetDWORDRegKey(rootKey, buffer, g_Configuration.KeyboardLayout[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(inputKey, buffer, g_Configuration.Bindings[i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
+			RegCloseKey(graphicsKey);
+			RegCloseKey(soundKey);
+			RegCloseKey(gameplayKey);
+			RegCloseKey(inputKey);
 			return false;
 		}
 	}
 
+	// Close registry keys.
+	RegCloseKey(rootKey);
+	RegCloseKey(graphicsKey);
+	RegCloseKey(soundKey);
+	RegCloseKey(gameplayKey);
+	RegCloseKey(inputKey);
 	return true;
 }
 
@@ -299,26 +292,32 @@ void InitDefaultConfiguration()
 
 	auto currentScreenResolution = GetScreenResolution();
 
-	g_Configuration.EnableSubtitles = true;
-	g_Configuration.AutoTarget = true;
-	g_Configuration.SoundDevice = 1;
-	g_Configuration.EnableReverb = true;
-	g_Configuration.EnableCaustics = true;
+	g_Configuration.ScreenWidth = currentScreenResolution.x;
+	g_Configuration.ScreenHeight = currentScreenResolution.y;
 	g_Configuration.ShadowType = ShadowMode::Lara;
+	g_Configuration.ShadowMapSize = 512;
+	g_Configuration.ShadowBlobsMax = 16;
+	g_Configuration.EnableCaustics = true;
+	g_Configuration.AntialiasingMode = AntialiasingMode::Low;
+
+	g_Configuration.SoundDevice = 1;
 	g_Configuration.EnableSound = true;
-	g_Configuration.Antialiasing = AntialiasingMode::Low;
+	g_Configuration.EnableReverb = true;
 	g_Configuration.MusicVolume = 100;
 	g_Configuration.SfxVolume = 100;
-	g_Configuration.Width = currentScreenResolution.x;
-	g_Configuration.Height = currentScreenResolution.y;
-	g_Configuration.ShadowMapSize = 512;
+
+	g_Configuration.EnableSubtitles = true;
+	g_Configuration.EnableAutoTargeting = true;
+	g_Configuration.EnableRumble = true;
+	g_Configuration.EnableThumbstickCamera = false;
+
 	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
 	g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
 }
 
 bool LoadConfiguration()
 {
-	// Try to open the root key
+	// Open root key.
 	HKEY rootKey = NULL;
 	if (RegOpenKeyA(HKEY_CURRENT_USER, REGKEY_ROOT, &rootKey) != ERROR_SUCCESS)
 	{
@@ -326,147 +325,142 @@ bool LoadConfiguration()
 		return false;
 	}
 
-	// Load configuration keys
+	// Open Graphics subkey.
+	HKEY graphicsKey = NULL;
+	if (RegOpenKeyExA(rootKey, REGKEY_GRAPHICS, 0, KEY_READ, &graphicsKey) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		return false;
+	}
+
 	DWORD screenWidth = 0;
-	if (GetDWORDRegKey(rootKey, REGKEY_SCREEN_WIDTH, &screenWidth, 0) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
 	DWORD screenHeight = 0;
-	if (GetDWORDRegKey(rootKey, REGKEY_SCREEN_HEIGHT, &screenHeight, 0) != ERROR_SUCCESS)
-		return false;
-
-	bool windowed = false;
-	if (GetBoolRegKey(rootKey, REGKEY_WINDOWED, &windowed, false) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	bool caustics = false;
-	if (GetBoolRegKey(rootKey, REGKEY_CAUSTICS, &caustics, true) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	DWORD antialiasing = 1;
-	if (GetDWORDRegKey(rootKey, REGKEY_ANTIALIASING, &antialiasing, true) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
+	bool enableWindowedMode = false;
 	DWORD shadowMode = 1;
-	if (GetDWORDRegKey(rootKey, REGKEY_SHADOWS, &shadowMode, 1) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
 	DWORD shadowMapSize = 512;
-	if (GetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, &shadowMapSize, 512) != ERROR_SUCCESS)
+	DWORD shadowBlobsMax = 16;
+	bool enableCaustics = false;
+	DWORD antialiasingMode = 1;
+
+	// Load Graphics keys.
+	if (GetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, &screenWidth, 0) != ERROR_SUCCESS ||
+		GetDWORDRegKey(graphicsKey, REGKEY_SCREEN_HEIGHT, &screenHeight, 0) != ERROR_SUCCESS ||
+		GetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, &enableWindowedMode, false) != ERROR_SUCCESS ||
+		GetDWORDRegKey(graphicsKey, REGKEY_SHADOWS, &shadowMode, 1) != ERROR_SUCCESS ||
+		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, &shadowMapSize, 512) != ERROR_SUCCESS ||
+		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, &shadowBlobsMax, 16) != ERROR_SUCCESS ||
+		GetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, &enableCaustics, true) != ERROR_SUCCESS ||
+		GetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, &antialiasingMode, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
 		return false;
 	}
 
-	DWORD shadowBlobs = 16;
-	if (GetDWORDRegKey(rootKey, REGKEY_SHADOW_BLOBS, &shadowBlobs, 16) != ERROR_SUCCESS)
+	// Open Sound subkey.
+	HKEY soundKey = NULL;
+	if (RegOpenKeyExA(rootKey, REGKEY_SOUND, 0, KEY_READ, &soundKey) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
-		return false;
-	}
-
-	bool enableSound = true;
-	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_SOUND, &enableSound, true) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	bool enableReverb = true;
-	if (GetBoolRegKey(rootKey, REGKEY_SOUND_SPECIAL_FX, &enableReverb, true) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	DWORD musicVolume = 100;
-	if (GetDWORDRegKey(rootKey, REGKEY_MUSIC_VOLUME, &musicVolume, 100) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	DWORD sfxVolume = 100;
-	if (GetDWORDRegKey(rootKey, REGKEY_SFX_VOLUME, &sfxVolume, 100) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
 		return false;
 	}
 
 	DWORD soundDevice = 0;
-	if (GetDWORDRegKey(rootKey, REGKEY_SOUND_DEVICE, &soundDevice, 1) != ERROR_SUCCESS)
+	bool enableSound = true;
+	bool enableReverb = true;
+	DWORD musicVolume = 100;
+	DWORD sfxVolume = 100;
+
+	// Load Sound keys.
+	if (GetDWORDRegKey(soundKey, REGKEY_SOUND_DEVICE, &soundDevice, 1) != ERROR_SUCCESS ||
+		GetBoolRegKey(soundKey, REGKEY_ENABLE_SOUND, &enableSound, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(soundKey, REGKEY_ENABLE_REVERB, &enableReverb, true) != ERROR_SUCCESS ||
+		GetDWORDRegKey(soundKey, REGKEY_MUSIC_VOLUME, &musicVolume, 100) != ERROR_SUCCESS ||
+		GetDWORDRegKey(soundKey, REGKEY_SFX_VOLUME, &sfxVolume, 100) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
 		return false;
 	}
 
-	bool enableThumbstickCamera = true;
-	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS)
+	// Open Gameplay subkey.
+	HKEY gameplayKey = NULL;
+	if (RegOpenKeyExA(rootKey, REGKEY_GAMEPLAY, 0, KEY_READ, &gameplayKey) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
-		return false;
-	}
-
-	bool enableRumble = true;
-	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	bool autoTarget = true;
-	if (GetBoolRegKey(rootKey, REGKEY_AUTOTARGET, &autoTarget, true) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
+		RegCloseKey(gameplayKey);
 		return false;
 	}
 
 	bool enableSubtitles = true;
-	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS)
+	bool enableAutoTargeting = true;
+	bool enableRumble = true;
+	bool enableThumbstickCamera = true;
+
+	// Load Gameplay keys.
+	if (GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
+		RegCloseKey(gameplayKey);
 		return false;
 	}
 
-	for (int i = 0; i < KEY_COUNT; i++)
+	// Load Input keys.
+	HKEY inputKey = NULL;
+	if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
 	{
-		DWORD tempKey;
-		char buffer[6];
-		sprintf(buffer, "Key%d", i);
-
-		if (GetDWORDRegKey(rootKey, buffer, &tempKey, KeyboardLayout[0][i]) != ERROR_SUCCESS)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
-			RegCloseKey(rootKey);
-			return false;
+			DWORD tempKey;
+			char buffer[9];
+			sprintf(buffer, "Action%d", i);
+
+			if (GetDWORDRegKey(inputKey, buffer, &tempKey, Bindings[0][i]) != ERROR_SUCCESS)
+			{
+				RegCloseKey(rootKey);
+				RegCloseKey(graphicsKey);
+				RegCloseKey(soundKey);
+				RegCloseKey(gameplayKey);
+				RegCloseKey(inputKey);
+				return false;
+			}
+
+			g_Configuration.Bindings.push_back(tempKey);
+			Bindings[1][i] = tempKey;
 		}
 
-		g_Configuration.KeyboardLayout[i] = (short)tempKey;
-		KeyboardLayout[1][i] = (short)tempKey;
+		RegCloseKey(inputKey);
+	}
+	else
+	{
+		// "Input" key does not exist; use default bindings.
+		g_Configuration.Bindings = Bindings[0];
 	}
 
-	// All configuration values were found, so I can apply configuration to the engine
-	g_Configuration.Width = screenWidth;
-	g_Configuration.Height = screenHeight;
-	g_Configuration.Windowed = windowed;
+	RegCloseKey(rootKey);
+	RegCloseKey(graphicsKey);
+	RegCloseKey(soundKey);
+	RegCloseKey(gameplayKey);
+
+	// All configuration values found; apply configuration to engine.
+	g_Configuration.ScreenWidth = screenWidth;
+	g_Configuration.ScreenHeight = screenHeight;
+	g_Configuration.EnableWindowedMode = enableWindowedMode;
 	g_Configuration.ShadowType = ShadowMode(shadowMode);
-	g_Configuration.ShadowMaxBlobs = shadowBlobs;
-	g_Configuration.EnableCaustics = caustics;
-	g_Configuration.Antialiasing = AntialiasingMode(antialiasing);
+	g_Configuration.ShadowBlobsMax = shadowBlobsMax;
+	g_Configuration.EnableCaustics = enableCaustics;
+	g_Configuration.AntialiasingMode = AntialiasingMode(antialiasingMode);
 	g_Configuration.ShadowMapSize = shadowMapSize;
 
 	g_Configuration.EnableSound = enableSound;
@@ -475,16 +469,14 @@ bool LoadConfiguration()
 	g_Configuration.SfxVolume = sfxVolume;
 	g_Configuration.SoundDevice = soundDevice;
 
-	g_Configuration.AutoTarget = autoTarget;
+	g_Configuration.EnableAutoTargeting = enableAutoTargeting;
 	g_Configuration.EnableRumble = enableRumble;
-	g_Configuration.EnableThumbstickCameraControl = enableThumbstickCamera;
+	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
 	g_Configuration.EnableSubtitles = enableSubtitles;
 
-	// Set legacy variables
+	// Set legacy variables.
 	SetVolumeMusic(musicVolume);
 	SetVolumeFX(sfxVolume);
-
-	RegCloseKey(rootKey);
 
 	DefaultConflict();
 

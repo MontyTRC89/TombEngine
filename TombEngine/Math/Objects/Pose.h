@@ -7,7 +7,7 @@
 	class Pose
 	{
 	public:
-		// Components
+		// Members
 		Vector3i	Position	= Vector3i::Zero;
 		EulerAngles Orientation = EulerAngles::Zero;
 

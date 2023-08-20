@@ -149,10 +149,23 @@ bool ItemInfo::IsCreature() const
 
 void ItemInfo::ResetModelToDefault()
 {
-	Model.BaseMesh = Objects[ObjectNumber].meshIndex;
+	if (Objects[ObjectNumber].nmeshes > 0)
+	{
+		Model.MeshIndex.resize(Objects[ObjectNumber].nmeshes);
+		Model.BaseMesh = Objects[ObjectNumber].meshIndex;
 
-	for (int i = 0; i < Model.MeshIndex.size(); i++)
-		Model.MeshIndex[i] = Model.BaseMesh + i;
+		for (int i = 0; i < Model.MeshIndex.size(); i++)
+			Model.MeshIndex[i] = Model.BaseMesh + i;
+
+		Model.Mutators.resize(Objects[ObjectNumber].nmeshes);
+		for (auto& mutator : Model.Mutators)
+			mutator = {};
+	}
+	else
+	{
+		Model.Mutators.clear();
+		Model.MeshIndex.clear();
+	}
 }
 
 bool TestState(int refState, const vector<int>& stateList)
@@ -241,7 +254,7 @@ void KillItem(short const itemNumber)
 
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
-		if (item->ObjectNumber != ID_NO_OBJECT && Objects[item->ObjectNumber].floor != nullptr)
+		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
 		GameScriptHandleKilled(itemNumber, true);
@@ -555,20 +568,7 @@ void InitializeItem(short itemNumber)
 	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
 	item->BoxNumber = floor->Box;
 
-	if (Objects[item->ObjectNumber].nmeshes > 0)
-	{
-		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
-		item->ResetModelToDefault();
-
-		item->Model.Mutators.resize(Objects[item->ObjectNumber].nmeshes);
-		for (auto& mutator : item->Model.Mutators)
-			mutator = {};
-	}
-	else
-	{
-		item->Model.Mutators.clear();
-		item->Model.MeshIndex.clear();
-	}
+	item->ResetModelToDefault();
 
 	if (Objects[item->ObjectNumber].Initialize != nullptr)
 		Objects[item->ObjectNumber].Initialize(itemNumber);
@@ -731,7 +731,7 @@ void UpdateAllItems()
 		auto* item = &g_Level.Items[itemNumber];
 		short nextItem = item->NextActive;
 
-		if (item->ObjectNumber == ID_NO_OBJECT)
+		if (!Objects.CheckID(item->ObjectNumber))
 			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)

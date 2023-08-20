@@ -135,7 +135,7 @@ float4 DoLaserBarrierEffect(float3 input, float4 output, float2 uv, float faceFa
 	noisix.x = noisix.x > 0.9 ? 0.7 : noisix.x;
 	noisix.y = noisix.y > 0.9 ? 0.7 : noisix.y;
 	noisix.z = noisix.z > 0.9 ? 0.7 : noisix.z;
-	color.rgb *= noisix + 1.3f;
+	color.rgb += noisix + 0.5f;
 	color.rgb -= noisix + 0.2f;
 
 	float frequency = 0.1;
@@ -161,8 +161,7 @@ float4 DoLaserBarrierEffect(float3 input, float4 output, float2 uv, float faceFa
 
 	noiseValue2 += AnimatedNebula(uv/2, timeUniform * 0.05f);
 	
-	color.rgb -= noiseValue - 0.7f;
-	color.rgb *= noiseValue2 + 1.0f;
+	color.rgb *= noiseValue2 + 0.6f;
 	color.rgb += noiseValue3;
 	color.a *= noiseValue + 0.01f;
 

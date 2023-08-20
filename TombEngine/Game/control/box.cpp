@@ -66,7 +66,7 @@ void DrawBox(int boxIndex, Vector3 color)
 	for (int i = 0; i <= 10; i++)
 	{
 		dBox.Extents = extents + Vector3(i);
-		TEN::Renderer::g_Renderer.AddDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		TEN::Renderer::g_Renderer.AddDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RendererDebugPage::PathfindingStats);
 	}
 }
 
@@ -75,10 +75,15 @@ void DrawNearbyPathfinding(int boxIndex)
 	if (boxIndex == NO_BOX)
 		return;
 
-	DrawBox(boxIndex, Vector3(0, 1, 1));
-
 	auto& currBox = g_Level.Boxes[boxIndex];
 	auto index = currBox.overlapIndex;
+
+	// Grey flag box.
+	auto currentBoxColor = Vector3(0.0f, 1.0f, 1.0f);
+	if (currBox.flags & BLOCKABLE)
+		currentBoxColor = (currBox.flags & BLOCKED) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
+
+	DrawBox(boxIndex, currentBoxColor);
 
 	while (true)
 	{
