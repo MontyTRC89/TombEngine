@@ -608,7 +608,9 @@ namespace TEN::Entities::Generic
 
 		//2. Do water ondulation effect.
 		if (!pushable.UsesRoomCollision)
-			FloatItem(pushableItem, pushable.FloatingForce);
+			FloatingItem(pushableItem, pushable.FloatingForce);
+		else
+			FloatingBridge(pushableItem, pushable.FloatingForce);
 
 		// Effects: Spawn ripples.
 		//TODO: Enhace the effect to make the ripples increase their size through the time.
