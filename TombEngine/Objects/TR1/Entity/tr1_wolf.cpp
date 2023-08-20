@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR1
 		WOLF_ANIM_DEATH_3 = 22,
 	};
 
-	const auto WolfDeathAnims = std::vector<WolfAnim>{ WOLF_ANIM_DEATH_1, WOLF_ANIM_DEATH_2, WOLF_ANIM_DEATH_3 };
+	const auto WolfDeathAnims = std::vector<int>{ WOLF_ANIM_DEATH_1, WOLF_ANIM_DEATH_2, WOLF_ANIM_DEATH_3 };
 
 	void InitializeWolf(short itemNumber)
 	{
