@@ -102,7 +102,7 @@ namespace TEN::Collision
 			return *FloorNormal;
 
 		// Set floor normal.
-		if (GetFloorBridgeEntityID() != NO_ITEM)
+		if (GetFloorBridgeItemNumber() != NO_ITEM)
 		{
 			// TODO: Get bridge normal.
 			FloorNormal = -Vector3::UnitY;
@@ -122,7 +122,7 @@ namespace TEN::Collision
 			return *CeilingNormal;
 
 		// Set ceiling normal.
-		if (GetCeilingBridgeEntityID() != NO_ITEM)
+		if (GetCeilingBridgeItemNumber() != NO_ITEM)
 		{
 			// TODO: Get bridge normal.
 			CeilingNormal = Vector3::UnitY;
@@ -136,28 +136,28 @@ namespace TEN::Collision
 		return *CeilingNormal;
 	}
 
-	int PointCollisionData::GetFloorBridgeEntityID()
+	int PointCollisionData::GetFloorBridgeItemNumber()
 	{
-		if (FloorBridgeEntityID.has_value())
-			return *FloorBridgeEntityID;
+		if (FloorBridgeItemNumber.has_value())
+			return *FloorBridgeItemNumber;
 
-		// Set floor bridge entity ID.
+		// Set floor bridge item number.
 		int floorHeight = GetFloorHeight();
-		FloorBridgeEntityID = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);;
+		FloorBridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);;
 
-		return *FloorBridgeEntityID;
+		return *FloorBridgeItemNumber;
 	}
 	
-	int PointCollisionData::GetCeilingBridgeEntityID()
+	int PointCollisionData::GetCeilingBridgeItemNumber()
 	{
-		if (CeilingBridgeEntityID.has_value())
-			return *CeilingBridgeEntityID;
+		if (CeilingBridgeItemNumber.has_value())
+			return *CeilingBridgeItemNumber;
 
-		// Set ceiling bridge entity ID.
+		// Set ceiling bridge item number.
 		int ceilingHeight = GetCeilingHeight();
-		CeilingBridgeEntityID = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);;
+		CeilingBridgeItemNumber = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);;
 
-		return *CeilingBridgeEntityID;
+		return *CeilingBridgeItemNumber;
 	}
 
 	int PointCollisionData::GetWaterSurfaceHeight()
@@ -205,7 +205,7 @@ namespace TEN::Collision
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
 
 		// TODO: Slippery bridges.
-		return (GetFloorBridgeEntityID() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
+		return (GetFloorBridgeItemNumber() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollisionData::IsSlipperyCeiling(short slopeAngleMin)
@@ -215,7 +215,7 @@ namespace TEN::Collision
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(ceilingNormal, -Vector3::UnitY);
 
 		// TODO: Slippery bridges.
-		return (GetCeilingBridgeEntityID() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
+		return (GetCeilingBridgeItemNumber() == NO_ITEM && abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollisionData::IsDiagonalStep()
@@ -250,7 +250,7 @@ namespace TEN::Collision
 	{
 		// HACK: This function takes arguments for a *current* position and room number.
 		// However, since some calls to the previous implementation (GetCollision()) had *projected*
-		// positions passed to it, the room number must be corrected to account for such cases for now.
+		// positions passed to it, the room number must be corrected to account for such cases.
 		// They are primarily found in camera.cpp.
 		short correctedRoomNumber = roomNumber;
 		GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
@@ -258,19 +258,31 @@ namespace TEN::Collision
 		return PointCollisionData(pos, correctedRoomNumber);
 	}
 
+	static int GetProbeRoomNumber(const Vector3i& pos, const RoomVector& location, const Vector3i& probePos)
+	{
+		// Conduct L-shaped room traversal.
+		short probeRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
+		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+
+		return probeRoomNumber;
+	}
+
+	static RoomVector GetPositionLocation(const Vector3i& pos, int roomNumber)
+	{
+		short tempRoomNumber = roomNumber;
+		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
+
+		return RoomVector(sector.Room, pos.y);
+	}
+
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
 	{
 		// Get "location".
-		short tempRoomNumber = roomNumber;
-		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
-		auto location = RoomVector(sector.Room, pos.y);
+		auto location = GetPositionLocation(pos, roomNumber);
 
 		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(pos, dir, dist);
-
-		// Get probe position's room number.
-		short probeRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
-		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+		short probeRoomNumber = GetProbeRoomNumber(pos, location, probePos);
 
 		return PointCollisionData(probePos, probeRoomNumber);
 	}
@@ -278,16 +290,11 @@ namespace TEN::Collision
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 	{
 		// Get "location".
-		short tempRoomNumber = roomNumber;
-		const auto& sector = *GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber);
-		auto location = RoomVector(sector.Room, pos.y);
+		auto location = GetPositionLocation(pos, roomNumber);
 
 		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
-
-		// Get probe position's room number.
-		short probeRoomNumber = GetRoom(location, pos.x, probePos.y, pos.z).RoomNumber;
-		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+		short probeRoomNumber = GetProbeRoomNumber(pos, location, probePos);
 
 		return PointCollisionData(probePos, probeRoomNumber);
 	}
@@ -297,10 +304,11 @@ namespace TEN::Collision
 		return PointCollisionData(item.Pose.Position, item.RoomNumber);
 	}
 
-	// TODO: Find cleaner solution. Constructing a "location" on the spot for the player
-	// can result in a stumble when climbing onto thin platforms. -- Sezz 2022.06.14
 	static RoomVector GetEntityLocation(const ItemInfo& item)
 	{
+		// TODO: Find cleaner solution. Constructing a "location" for the player on the spot
+		// can result in stumbles when climbing onto thin platforms. 
+		// May have to do with player's room number being updated at half-height? -- Sezz 2022.06.14
 		if (item.IsLara())
 			return item.Location;
 
@@ -317,10 +325,7 @@ namespace TEN::Collision
 
 		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(item.Pose.Position, dir, dist);
-
-		// Get probe position's room number.
-		short probeRoomNumber = GetRoom(location, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
-		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+		short probeRoomNumber = GetProbeRoomNumber(item.Pose.Position, location, probePos);
 
 		return PointCollisionData(probePos, probeRoomNumber);
 	}
@@ -332,10 +337,7 @@ namespace TEN::Collision
 
 		// Calculate probe position.
 		auto probePos = Geometry::TranslatePoint(item.Pose.Position, headingAngle, forward, down, right);
-
-		// Get probe position's room number.
-		short probeRoomNumber = GetRoom(location, item.Pose.Position.x, probePos.y, item.Pose.Position.z).RoomNumber;
-		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
+		short probeRoomNumber = GetProbeRoomNumber(item.Pose.Position, location, probePos);
 
 		return PointCollisionData(probePos, probeRoomNumber);
 	}

@@ -128,7 +128,7 @@ static CollisionResult ConvertPointCollisionToCollisionResult(PointCollisionData
 
 	collResult.Position.Floor = pointColl.GetFloorHeight();
 	collResult.Position.Ceiling = pointColl.GetCeilingHeight();
-	collResult.Position.Bridge = pointColl.GetFloorBridgeEntityID();
+	collResult.Position.Bridge = pointColl.GetFloorBridgeItemNumber();
 	collResult.Position.SplitAngle = pointColl.GetBottomSector().FloorCollision.SplitAngle;
 	collResult.Position.FloorSlope = pointColl.IsSlipperyFloor();
 	collResult.Position.CeilingSlope = pointColl.IsSlipperyCeiling();

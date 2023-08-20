@@ -4,6 +4,8 @@
 
 enum RoomEnvFlags;
 class FloorInfo;
+struct ItemInfo;
+struct RoomVector;
 
 using namespace TEN::Math;
 
@@ -21,12 +23,12 @@ namespace TEN::Collision
 		FloorInfo* TopSectorPtr	   = nullptr;
 		FloorInfo* BottomSectorPtr = nullptr;
 
-		std::optional<int>	   FloorHeight			 = std::nullopt;
-		std::optional<int>	   CeilingHeight		 = std::nullopt;
-		std::optional<Vector3> FloorNormal			 = std::nullopt;
-		std::optional<Vector3> CeilingNormal		 = std::nullopt;
-		std::optional<int>	   FloorBridgeEntityID	 = std::nullopt;
-		std::optional<int>	   CeilingBridgeEntityID = std::nullopt;
+		std::optional<int>	   FloorHeight			   = std::nullopt;
+		std::optional<int>	   CeilingHeight		   = std::nullopt;
+		std::optional<Vector3> FloorNormal			   = std::nullopt;
+		std::optional<Vector3> CeilingNormal		   = std::nullopt;
+		std::optional<int>	   FloorBridgeItemNumber   = std::nullopt;
+		std::optional<int>	   CeilingBridgeItemNumber = std::nullopt;
 
 		std::optional<int> WaterSurfaceHeight = std::nullopt;
 		std::optional<int> WaterTopHeight	  = std::nullopt;
@@ -45,8 +47,8 @@ namespace TEN::Collision
 		int		GetCeilingHeight();
 		Vector3 GetFloorNormal();
 		Vector3 GetCeilingNormal();
-		int		GetFloorBridgeEntityID();
-		int		GetCeilingBridgeEntityID();
+		int		GetFloorBridgeItemNumber();
+		int		GetCeilingBridgeItemNumber();
 
 		int GetWaterSurfaceHeight();
 		int GetWaterTopHeight();
