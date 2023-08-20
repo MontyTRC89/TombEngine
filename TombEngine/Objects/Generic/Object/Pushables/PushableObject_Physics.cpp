@@ -11,6 +11,7 @@
 #include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Stack.h"
+#include "Math/Math.h"
 #include "Math/Random.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -120,20 +121,29 @@ namespace TEN::Entities::Generic
 		//2. Check if it's in a water room
 		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
-			DeactivateClimbablePushableCollider(itemNumber);
-			SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
+			//check if it's deep water. (Otherwise, is shallow water, keep this idle state).
+			auto pointColl = GetCollision(&pushableItem);
+			int waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+			int distanceToSurface = abs(waterHeight - pointColl.Position.Floor);
+			if (distanceToSurface > CLICK(2))
+			{
+				//Is deep water, transition to water states.
 
-			if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
-			{
-				pushable.BehaviourState = PushablePhysicState::Floating;
-				pushable.Gravity = 0.0f;
+				DeactivateClimbablePushableCollider(itemNumber);
+				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
+
+				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
+				{
+					pushable.BehaviourState = PushablePhysicState::Floating;
+					pushable.Gravity = 0.0f;
+				}
+				else
+				{
+					pushable.BehaviourState = PushablePhysicState::Sinking;
+					pushable.Gravity = 0.0f;
+				}
+				return;
 			}
-			else
-			{
-				pushable.BehaviourState = PushablePhysicState::Sinking;
-				pushable.Gravity = 0.0f;
-			}
-			return;
 		}
 
 		//3. Check if floor has changed
@@ -363,34 +373,37 @@ namespace TEN::Entities::Generic
 		//3. Check room collision
 		
 		//If it's a flat ground?
+		if (pointColl.FloorTilt.x == 0 && pointColl.FloorTilt.y == 0)
+		{
+			//The pushable is going to stop here, do the checks to conect it with another Stack.
+			int FoundStack = SearchNearPushablesStack(itemNumber);
+			StackPushable(itemNumber, FoundStack);
+
+			//Set Stopper Flag
+			if (pushable.StackLowerItem == NO_ITEM)
+				SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
+
+			//Activate trigger
+			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
+
+			//place on ground
+			pushable.BehaviourState = PushablePhysicState::Idle;
+			pushableItem.Pose.Position.y = pointColl.Position.Floor;
+
+			ActivateClimbablePushableCollider(itemNumber);
+
+			pushableItem.Animation.Velocity.y = 0;
+
+			// Shake floor if pushable landed at high enough velocity.
+			if (velocityY >= PUSHABLE_FALL_RUMBLE_VELOCITY)
+				FloorShake(&pushableItem);
 		
-		//The pushable is going to stop here, do the checks to conect it with another Stack.
-		int FoundStack = SearchNearPushablesStack(itemNumber);
-		StackPushable(itemNumber, FoundStack);
-
-		//Set Stopper Flag
-		if (pushable.StackLowerItem == NO_ITEM)
-			SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
-
-		//Activate trigger
-		TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
-
-		//place on ground
-		pushable.BehaviourState = PushablePhysicState::Idle;
-		pushableItem.Pose.Position.y = pointColl.Position.Floor;
-		
-		ActivateClimbablePushableCollider(itemNumber);
-
-		pushableItem.Animation.Velocity.y = 0;
-
-		// Shake floor if pushable landed at high enough velocity.
-		if (velocityY >= PUSHABLE_FALL_RUMBLE_VELOCITY)
-			FloorShake(&pushableItem);
-
-		//TODO: [Effects Requirement] Is there low water? -> Spawn water splash
-
-		//TODO: if it's a slope ground?...
-		//Then proceed to the sliding state.
+		}
+		else
+		{
+			//TODO: if it's a slope ground?...
+			//Then proceed to the sliding state.
+		}
 	}
 
 	void HandleSinkingState(int itemNumber)
@@ -444,23 +457,37 @@ namespace TEN::Entities::Generic
 		}
 
 		// 5. Hit ground
-		if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
+		int waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+		int distanceToSurface = abs(waterHeight - pointColl.Position.Floor);
+		if (distanceToSurface <= CLICK(2))
 		{
-			pushable.Gravity = 0.0f;
-			pushable.BehaviourState = PushablePhysicState::Floating;
-		}
-		else
-		{
-			pushable.BehaviourState = PushablePhysicState::UnderwaterIdle;
+			//shallow water
+			pushable.BehaviourState = PushablePhysicState::Idle;
 			pushableItem.Pose.Position.y = pointColl.Position.Floor;
 			ActivateClimbablePushableCollider(itemNumber);
 
 			//Activate trigger
 			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
 		}
+		else
+		{
+			//deep water
+			if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
+			{
+				pushable.Gravity = 0.0f;
+				pushable.BehaviourState = PushablePhysicState::Floating;
+			}
+			else
+			{
+				pushable.BehaviourState = PushablePhysicState::UnderwaterIdle;
+				pushableItem.Pose.Position.y = pointColl.Position.Floor;
+				ActivateClimbablePushableCollider(itemNumber);
 
-		pushableItem.Animation.Velocity.y = 0.0f;
-
+				//Activate trigger
+				TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
+			}
+			pushableItem.Animation.Velocity.y = 0.0f;
+		}
 	}
 
 	void HandleFloatingState(int itemNumber)
