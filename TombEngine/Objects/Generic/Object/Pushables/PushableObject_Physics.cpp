@@ -114,15 +114,45 @@ namespace TEN::Entities::Generic
 			{
 				Lara.Context.InteractedItem = NO_ITEM;
 			}
+		}
+
+		//2. Check if floor has changed
+		DeactivateClimbablePushableCollider(itemNumber);
+		auto pointColl = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+		int floorHeight = pointColl.Position.Floor;
+		ActivateClimbablePushableCollider(itemNumber);
+
+
+		if (floorHeight > pushableItem.Pose.Position.y) //The floor has decresed. (Flip map, trapdoor, etc...)
+		{
+			//If the diffence is not very big, just teleport it.
+			if (abs(pushableItem.Pose.Position.y - floorHeight) >= CLICK(1))
+			{
+				pushable.BehaviourState = PushablePhysicState::Falling;
+				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
+				DeactivateClimbablePushableCollider(itemNumber);
+			}
+			else
+			{
+				int heightdifference = floorHeight - pushableItem.Pose.Position.y;
+				pushableItem.Pose.Position.y += heightdifference;
+				VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.
+			}
 
 			return;
 		}
+		else if (floorHeight < pushableItem.Pose.Position.y)	//The floor has risen. (Elevator, raising block, etc...)
+		{
+			int heightdifference = floorHeight - pushableItem.Pose.Position.y;
+			pushableItem.Pose.Position.y += heightdifference;
+			VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.
+			return;
+		}
 
-		//2. Check if it's in a water room
+		//3. Check if it's in a water room
 		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
-			//check if it's deep water. (Otherwise, is shallow water, keep this idle state).
-			auto pointColl = GetCollision(&pushableItem);
+			//check if it's deep water.
 			int waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 			int distanceToSurface = abs(waterHeight - pointColl.Position.Floor);
 			if (distanceToSurface > CLICK(2))
@@ -153,38 +183,6 @@ namespace TEN::Entities::Generic
 					SpawnRipple(Vector3(pushableItem.Pose.Position.x, waterHeight, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 				}
 			}
-		}
-
-		//3. Check if floor has changed
-		DeactivateClimbablePushableCollider(itemNumber);
-		int floorHeight = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber).Position.Floor;
-		ActivateClimbablePushableCollider(itemNumber);
-
-
-		if (floorHeight > pushableItem.Pose.Position.y)			//The floor has decresed. (Flip map, trapdoor, etc...)
-		{
-			//If the diffence is not very big, just teleport it.
-			if (abs(pushableItem.Pose.Position.y - floorHeight) >= CLICK(1))
-			{
-				pushable.BehaviourState = PushablePhysicState::Falling;
-				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
-				DeactivateClimbablePushableCollider(itemNumber);
-			}
-			else
-			{
-				int heightdifference = floorHeight - pushableItem.Pose.Position.y;
-				pushableItem.Pose.Position.y += heightdifference;
-				VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.
-			}
-			
-			return;
-		}
-		else if (floorHeight < pushableItem.Pose.Position.y)	//The floor has risen. (Elevator, raising block, etc...)
-		{
-			int heightdifference = floorHeight - pushableItem.Pose.Position.y;
-			pushableItem.Pose.Position.y += heightdifference;
-			VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.
-			return;
 		}
 
 		return;
