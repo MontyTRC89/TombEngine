@@ -372,6 +372,9 @@ namespace TEN::Entities::Generic
 		if (pushable.StackLowerItem == NO_ITEM)
 			SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
+		//Activate trigger
+		TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
+
 		//place on ground
 		pushable.BehaviourState = PushablePhysicState::Idle;
 		pushableItem.Pose.Position.y = pointColl.Position.Floor;
@@ -451,6 +454,9 @@ namespace TEN::Entities::Generic
 			pushable.BehaviourState = PushablePhysicState::UnderwaterIdle;
 			pushableItem.Pose.Position.y = pointColl.Position.Floor;
 			ActivateClimbablePushableCollider(itemNumber);
+
+			//Activate trigger
+			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
 		}
 
 		pushableItem.Animation.Velocity.y = 0.0f;
