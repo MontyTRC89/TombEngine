@@ -503,7 +503,7 @@ namespace TEN::Entities::Generic
 		PushableEnvironemntState envState = CheckPushableEnvironment(itemNumber, floorHeight);
 
 		int goalHeight = 0;
-
+				
 		switch (envState)
 		{
 			case PushableEnvironemntState::Air:
@@ -532,15 +532,14 @@ namespace TEN::Entities::Generic
 			case PushableEnvironemntState::DeepWater:
 
 				//Calculate goal height
-				if (pushable.WaterSurfaceHeight == NO_HEIGHT) //There is ceiling.
+				if (pushable.WaterSurfaceHeight == NO_HEIGHT)
 				{
-					//Calculate ceiling height, and use it to get the pushable under it.
-					if (pushable.BridgeColliderFlag)
-						DeactivateClimbablePushableCollider(itemNumber);
+					//There is ceiling, put pushable under it.
 					goalHeight = GetCollision(&pushableItem).Position.Ceiling + WATER_SURFACE_DISTANCE + pushable.Height;
 				}
 				else
 				{
+					//No ceiling, so rise above water
 					goalHeight = pushable.WaterSurfaceHeight - WATER_SURFACE_DISTANCE + pushable.Height;
 				}
 

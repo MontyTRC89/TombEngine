@@ -319,13 +319,13 @@ namespace TEN::Entities::Generic
 		{
 			DeactivateClimbablePushableCollider(itemNumber);
 			pointColl = GetCollision(&pushableItem);
-			waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+			waterHeight = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 			ActivateClimbablePushableCollider(itemNumber);
 		}
 		else
 		{
 			pointColl = GetCollision(&pushableItem);
-			waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+			waterHeight = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 		}
 
 		floorHeight = pointColl.Position.Floor; //Updates floorHeight reference for external use.
