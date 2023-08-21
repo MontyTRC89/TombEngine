@@ -314,15 +314,18 @@ namespace TEN::Entities::Generic
 		PushableEnvironemntState result;
 
 		CollisionResult pointColl;
+		int waterHeight = NO_HEIGHT;
 		if (pushable.BridgeColliderFlag)
 		{
 			DeactivateClimbablePushableCollider(itemNumber);
 			pointColl = GetCollision(&pushableItem);
+			waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 			ActivateClimbablePushableCollider(itemNumber);
 		}
 		else
 		{
 			pointColl = GetCollision(&pushableItem);
+			waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 		}
 
 		floorHeight = pointColl.Position.Floor; //Updates floorHeight reference for external use.
@@ -330,7 +333,6 @@ namespace TEN::Entities::Generic
 		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
 			//Is in water, is it deep or shallow?
-			int waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 			int distanceToSurface = abs(waterHeight - floorHeight);
 			if (distanceToSurface > (GetPushableHeight(pushableItem) + 128))
 			{

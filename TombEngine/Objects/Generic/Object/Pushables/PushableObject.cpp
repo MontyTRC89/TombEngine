@@ -94,7 +94,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (Lara.Control.IsMoving)
+		if (Lara.Context.InteractedItem == itemNumber && Lara.Control.IsMoving)
 			return;
 
 		// Call the state handler function based on the current state (Functions in PushableObject_Physics class).

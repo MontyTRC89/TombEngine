@@ -5,8 +5,6 @@
 #include "Game/control/flipeffect.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Math/Math.h"
-#include "Math/Random.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Effects.h"
@@ -16,7 +14,6 @@
 #include "Specific/level.h"
 
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Generic
 {
@@ -538,6 +535,8 @@ namespace TEN::Entities::Generic
 				if (pushable.WaterSurfaceHeight == NO_HEIGHT) //There is ceiling.
 				{
 					//Calculate ceiling height, and use it to get the pushable under it.
+					if (pushable.BridgeColliderFlag)
+						DeactivateClimbablePushableCollider(itemNumber);
 					goalHeight = GetCollision(&pushableItem).Position.Ceiling + WATER_SURFACE_DISTANCE + pushable.Height;
 				}
 				else
