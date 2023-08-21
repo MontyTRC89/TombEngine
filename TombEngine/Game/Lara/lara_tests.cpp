@@ -935,7 +935,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Front.Bridge != NO_ITEM)
 	{
 		auto distancePointLara = GetBridgeBorder(coll->Front.Bridge, false) - LaraItem->Pose.Position.y;
-		frontFloor = distancePointLara;
+		frontFloor = distancePointLara - 64;
 		if (frontFloor <= -CLICK(2) ||
 			frontFloor > CLICK(1.25f) - 4)
 		{
@@ -991,7 +991,11 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
 	}
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+	if (coll->Front.Bridge == NO_ITEM)
+		UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+	else
+		UpdateLaraRoom(item, -LARA_HEIGHT);
+
 	SnapItemToLedge(item, coll, 1.7f);
 
 	item->Pose.Position.y += frontFloor - 5;
