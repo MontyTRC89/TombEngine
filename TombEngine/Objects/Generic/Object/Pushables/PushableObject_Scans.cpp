@@ -359,12 +359,4 @@ namespace TEN::Entities::Generic
 		}
 		return result;
 	}
-
-	void UpdateWaterHeight(int itemNumber)
-	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushable = GetPushableInfo(pushableItem);
-
-		pushable.WaterSurfaceHeight = 0;
-	}
 }

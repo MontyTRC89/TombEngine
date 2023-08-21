@@ -239,6 +239,9 @@ namespace TEN::Entities::Generic
 	{
 		auto collisionResult = GetCollision(pos, roomNumber);
 		
-		collisionResult.Block->Stopper = value;
+		collisionResult.Block->Stopper = value; 
+
+		//TODO: There is a problem, it also has to set/reset the flag in the flipped room.
+		//Because when flipmaps happens, it forgets about the old flag.
 	}
 }

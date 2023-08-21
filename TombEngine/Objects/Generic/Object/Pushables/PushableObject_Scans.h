@@ -21,5 +21,4 @@ namespace TEN::Entities::Generic
 	bool PushableMovementConditions(int itemNumber, bool hasPushAction, bool hasPullAction);
 
 	PushableEnvironemntState CheckPushableEnvironment(int itemNumber, int& floorHeight);
-	void UpdateWaterHeight(int itemNumber);
 }
