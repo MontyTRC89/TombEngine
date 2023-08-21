@@ -199,5 +199,3 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber);
 
 Vector3i GetNearestSectorCenter(const Vector3i& pos);
-void FloatingItem(ItemInfo& item, float floatForce = 1.0f);
-void FloatingBridge(ItemInfo& item, float floatForce = 1.0f);

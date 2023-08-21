@@ -42,6 +42,7 @@ namespace TEN::Entities::Generic
 
 		int	  Height = 0;
 		float Gravity = 0.0f;
+		int WaterSurfaceHeight = 0;		//Used to spawn effects. (Like water ripples).
 		float FloatingForce = 0.0f;		// Oscillation strength while floating on water (recomended range: (0.0f - 2.0f]).
 		
 		int StackLimit = 0;				// max of pushables that can be over it so Lara can move it.
@@ -68,6 +69,7 @@ namespace TEN::Entities::Generic
 
 			Gravity = 8.0f;
 			BehaviourState = PushablePhysicState::Idle;
+			WaterSurfaceHeight = NO_HEIGHT;
 			FloatingForce = 0.75f;
 
 			StackLimit = 3;

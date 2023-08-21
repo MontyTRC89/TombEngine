@@ -6,8 +6,11 @@
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Stack.h"
+#include "Specific/Input/Input.h"
 
 #include "Specific/level.h"
+
+using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
@@ -219,6 +222,43 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
+	bool PushableIdleConditions(int itemNumber)
+	{
+		//If Lara is grabbing, check the push pull actions.
+		if (LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB || 
+			!TestLastFrame(LaraItem, LA_PUSHABLE_GRAB))
+			return false;
+
+		//First checks conditions.
+		bool hasPushAction = IsHeld(In::Forward);
+		bool hasPullAction = IsHeld(In::Back);
+
+		//Cond 1: Is pressing Forward or Back?
+		if (!hasPushAction && !hasPullAction)
+			return false;
+
+		//Cond 2: Can do the interaction with that side of the pushable?
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
+		auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; //0 North, 1 East, 2 South or 3 West.
+
+		if ((hasPushAction && !pushableSidesAttributes.Pushable) ||
+			(hasPullAction && !pushableSidesAttributes.Pullable))
+			return false;
+
+		//Cond 3: Is its stacked pushables under the limit?
+		if (!IsUnderStackLimit(itemNumber))
+			return false;
+
+		//Cond 4: Does it comply with the room collision conditions?.
+		if (!PushableMovementConditions(itemNumber, hasPushAction, hasPullAction))
+			return false;
+
+		return true;
+	}
+
 	bool PushableMovementConditions(int itemNumber, bool hasPushAction, bool hasPullAction)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
@@ -264,5 +304,67 @@ namespace TEN::Entities::Generic
 		SetPushableStopperFlag(true, targetPos, targetRoom);
 
 		return true;
+	}
+
+	PushableEnvironemntState CheckPushableEnvironment(int itemNumber, int& floorHeight)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		PushableEnvironemntState result;
+
+		DeactivateClimbablePushableCollider(itemNumber);
+		auto pointColl = GetCollision(&pushableItem);
+		ActivateClimbablePushableCollider(itemNumber);
+
+		floorHeight = pointColl.Position.Floor; //Updates floorHeight reference for external use.
+		
+		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+		{
+			//Is in water, is it deep or shallow?
+			int waterHeight = GetWaterHeight(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+			int distanceToSurface = abs(waterHeight - floorHeight);
+			if (distanceToSurface > (GetPushableHeight(pushableItem) + 128))
+			{
+				result = PushableEnvironemntState::DeepWater;
+			}
+			else
+			{
+				result = PushableEnvironemntState::ShallowWater;
+			}
+			pushable.WaterSurfaceHeight = waterHeight;
+		}
+		else
+		{
+			//Is in dry, is it on ground or on air?
+			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
+				abs(pushableItem.Pose.Position.y - floorHeight) >= CLICK(1))
+			{
+				result = PushableEnvironemntState::Air;
+			}
+			else
+			{
+				if (pointColl.FloorTilt.x == 0 && pointColl.FloorTilt.y == 0)
+				{
+					//Is on a flat floor
+					result = PushableEnvironemntState::Ground;
+				}
+				else
+				{
+					//Is on a slope floor
+					result = PushableEnvironemntState::Slope;
+				}
+			}
+			pushable.WaterSurfaceHeight = NO_HEIGHT;
+		}
+		return result;
+	}
+
+	void UpdateWaterHeight(int itemNumber)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		pushable.WaterSurfaceHeight = 0;
 	}
 }
