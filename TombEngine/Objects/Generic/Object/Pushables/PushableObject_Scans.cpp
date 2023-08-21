@@ -313,9 +313,17 @@ namespace TEN::Entities::Generic
 
 		PushableEnvironemntState result;
 
-		DeactivateClimbablePushableCollider(itemNumber);
-		auto pointColl = GetCollision(&pushableItem);
-		ActivateClimbablePushableCollider(itemNumber);
+		CollisionResult pointColl;
+		if (pushable.BridgeColliderFlag)
+		{
+			DeactivateClimbablePushableCollider(itemNumber);
+			pointColl = GetCollision(&pushableItem);
+			ActivateClimbablePushableCollider(itemNumber);
+		}
+		else
+		{
+			pointColl = GetCollision(&pushableItem);
+		}
 
 		floorHeight = pointColl.Position.Floor; //Updates floorHeight reference for external use.
 		
