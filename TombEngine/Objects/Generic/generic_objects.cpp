@@ -39,6 +39,7 @@
 #include "Objects/Generic/Doors/underwater_door.h"
 
 // Traps
+#include "Objects/Generic/Traps/CrumblingPlatform.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Objects/Generic/Traps/falling_block.h"
 
@@ -451,9 +452,14 @@ void StartTraps(ObjectInfo* object)
 	object = &Objects[ID_CRUMBLING_FLOOR];
 	if (object->loaded)
 	{
-		object->Initialize = InitializeFallingBlock;
-		object->collision = FallingBlockCollision;
-		object->control = FallingBlockControl;
+		object->Initialize = InitializeCrumblingPlatform;
+		object->control = ControlCrumblingPlatform;
+		object->collision = CollideCrumblingPlatform;
+
+		object->floor = CrumblingPlatformFloor;
+		object->ceiling = CrumblingPlatformCeiling;
+		object->floorBorder = CrumblingPlatformFloorBorder;
+		object->ceilingBorder = CrumblingPlatformCeilingBorder;
 	}
 
 	object = &Objects[ID_PARALLEL_BARS];

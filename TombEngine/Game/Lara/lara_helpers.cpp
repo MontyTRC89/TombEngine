@@ -2,6 +2,7 @@
 #include "Game/Lara/lara_helpers.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
@@ -50,7 +51,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Update AFK pose timer.
 	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
-		!(TrInput & IN_LOOK || IsOpticActionHeld()) &&
+		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
 		lara->Control.Count.Pose++;
@@ -61,11 +62,11 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Reset running jump timer.
-	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
+	if (!IsRunJumpCountableState(item->Animation.ActiveState))
 		lara->Control.Count.Run = 0;
 
 	// Reset running jump action queue.
-	if (!IsRunJumpQueueableState((LaraState)item->Animation.ActiveState))
+	if (!IsRunJumpQueueableState(item->Animation.ActiveState))
 		lara->Control.RunJumpQueued = false;
 
 	// Reset lean.
@@ -76,8 +77,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Reset crawl flex.
-	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
-		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(IsHeld(In::Left) || IsHeld(In::Right)))))
+	if (!IsHeld(In::Look) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM && // HACK
+		(item->Animation.Velocity.z == 0.0f || (item->Animation.Velocity.z != 0.0f && !(IsHeld(In::Left) || IsHeld(In::Right)))))
 	{
 		ResetPlayerFlex(item, 0.1f);
 	}
@@ -149,6 +150,11 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		LaraWeaponType::RocketLauncher
 	};
 
+	auto getNextIndex = [getPrev](unsigned int index)
+	{
+		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
+	};
+
 	auto& player = GetLaraInfo(item);
 
 	// Get vector index for current weapon type.
@@ -165,12 +171,6 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 	// Invalid current weapon type; return nullopt.
 	if (!currentIndex.has_value())
 		return std::nullopt;
-
-	// Getter for next index.
-	auto getNextIndex = [getPrev](unsigned int index)
-	{
-		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
-	};
 
 	// Get next valid weapon type in sequence.
 	unsigned int nextIndex = getNextIndex(*currentIndex);
@@ -195,7 +195,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
 		UsePlayerMedipack(item);
 
-	// Handle weapon scroll requests.
+	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
 	{
 		bool getPrev = IsClicked(In::PreviousWeapon);
@@ -236,25 +236,238 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	// TODO: 10th possible weapon, probably grapple gun.
 	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
+}
 
-	// TODO: Could theoretically remove SwitchTarget and instead do unique behaviour handling using only Look. -- Sezz 2023.07.08
-	// HACK: Handle target switch when locked on to an entity.
+bool CanPlayerLookAround(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	// 1) Check if drawn weapon has lasersight.
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+	{
+		return true;
+	}
+
+	// 2) Test for switchable target.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
-		if (IsClicked(In::Look))
+		unsigned int targetableCount = 0;
+		for (const auto* targetPtr : player.TargetList)
 		{
-			ActionMap[(int)In::SwitchTarget].Update(true);
-		}
-		else
-		{
-			ClearAction(In::SwitchTarget);
+			if (targetPtr != nullptr)
+				targetableCount++;
+
+			if (targetableCount > 1)
+				return false;
 		}
 	}
-	else
+
+	return true;
+}
+
+static void ClearPlayerLookAroundActions(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	switch (player.Control.Look.Mode)
 	{
-		ClearAction(In::SwitchTarget);
+	default:
+	case LookMode::None:
+		break;
+
+	case LookMode::Vertical:
+		ClearAction(In::Forward);
+		ClearAction(In::Back);
+		break;
+
+	case LookMode::Horizontal:
+		ClearAction(In::Left);
+		ClearAction(In::Right);
+		break;
+
+	case LookMode::Free:
+		ClearAction(In::Forward);
+		ClearAction(In::Back);
+		ClearAction(In::Left);
+		ClearAction(In::Right);
+		break;
 	}
+}
+
+static void SetPlayerOptics(ItemInfo* item)
+{
+	constexpr auto OPTIC_RANGE_DEFAULT = ANGLE(0.7f);
+
+	auto& player = GetLaraInfo(*item);
+
+	bool breakOptics = true;
+
+	// Standing; can use optics.
+	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
+		breakOptics = false;
+
+	// Crouching; can use optics.
+	if ((player.Control.IsLow || !IsHeld(In::Crouch)) &&
+		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
+	{
+		breakOptics = false;
+	}
+
+	// If lasersight, and Look is not pressed, exit optics.
+	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
+		breakOptics = true;
+
+	// If lasersight and weapon is holstered, exit optics.
+	if (player.Control.Look.IsUsingLasersight && IsHeld(In::Draw))
+		breakOptics = true;
+
+	// Engage lasersight if available.
+	if (!player.Control.Look.IsUsingLasersight && !breakOptics && IsHeld(In::Look))
+	{
+		if (player.Control.HandStatus == HandStatus::WeaponReady &&
+			((player.Control.Weapon.GunType == LaraWeaponType::HK && player.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
+				(player.Control.Weapon.GunType == LaraWeaponType::Revolver && player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+				(player.Control.Weapon.GunType == LaraWeaponType::Crossbow && player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+		{
+			player.Control.Look.OpticRange = OPTIC_RANGE_DEFAULT;
+			player.Control.Look.IsUsingBinoculars = true;
+			player.Control.Look.IsUsingLasersight = true;
+			player.Inventory.IsBusy = true;
+			BinocularOldCamera = Camera.oldType;
+			return;
+		}
+	}
+
+	if (!breakOptics)
+		return;
+
+	// Noth using optics; return early.
+	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
+		return;
+
+	player.Control.Look.OpticRange = 0;
+	player.Control.Look.IsUsingBinoculars = false;
+	player.Control.Look.IsUsingLasersight = false;
+	player.Inventory.IsBusy = false;
+
+	Camera.type = BinocularOldCamera;
+	Camera.bounce = 0;
+	AlterFOV(LastFOV);
+}
+
+void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
+{
+	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
+	constexpr auto OPTIC_RANGE_MIN	= ANGLE(0.7f);
+	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
+	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
+	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
+
+	auto normalizeTurnRate = [](short turnRate, short opticRange)
+	{
+		constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
+		constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
+
+		if (opticRange == 0)
+			return turnRate;
+
+		return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
+	};
+
+	auto& player = GetLaraInfo(item);
+
+	if (!CanPlayerLookAround(item))
+		return;
+
+	// Set optics.
+	Camera.type = CameraType::Look;
+	SetPlayerOptics(LaraItem);
+
+	bool isSlow = IsHeld(In::Walk);
+
+	// Zoom optics.
+	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
+	{
+		short rangeRate = isSlow ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
+
+		// NOTE: Zooming allowed with either StepLeft/StepRight or Walk/Sprint.
+		if ((IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) ||
+			(IsHeld(In::Walk) && !IsHeld(In::Sprint)))
+		{
+			player.Control.Look.OpticRange -= rangeRate;
+			if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
+			{
+				player.Control.Look.OpticRange = OPTIC_RANGE_MIN;
+			}
+			else
+			{
+				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
+			}
+		}
+		else if ((IsHeld(In::StepRight) && !IsHeld(In::StepLeft)) ||
+			(IsHeld(In::Sprint) && !IsHeld(In::Walk)))
+		{
+			player.Control.Look.OpticRange += rangeRate;
+			if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
+			{
+				player.Control.Look.OpticRange = OPTIC_RANGE_MAX;
+			}
+			else
+			{
+				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
+			}
+		}
+	}
+
+	auto axisCoeff = Vector2::Zero;
+
+	// Determine X axis coefficient.
+	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
+	{
+		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
+	}
+
+	// Determine Y axis coefficient.
+	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
+	{
+		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
+	}
+
+	// Determine turn rate base values.
+	short turnRateMax = isSlow ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
+	short turnRateAccel = isSlow ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
+
+	// Normalize turn rate base values.
+	turnRateMax = normalizeTurnRate(turnRateMax, player.Control.Look.OpticRange);
+	turnRateAccel = normalizeTurnRate(turnRateAccel, player.Control.Look.OpticRange);
+
+	// Modulate turn rates.
+	player.Control.Look.TurnRate = EulerAngles(
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, turnRateAccel, 0, turnRateMax, axisCoeff.x, invertXAxis),
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, turnRateAccel, 0, turnRateMax, axisCoeff.y, false),
+		0);
+
+	// Apply turn rates.
+	player.Control.Look.Orientation += player.Control.Look.TurnRate;
+	player.Control.Look.Orientation = EulerAngles(
+		std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x),
+		std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y),
+		0);
+
+	// Visually adapt head and torso orientations.
+	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
+	if (player.Control.HandStatus != HandStatus::Busy &&
+		!player.LeftArm.Locked && !player.RightArm.Locked &&
+		player.Context.Vehicle == NO_ITEM)
+	{
+		player.ExtraTorsoRot = player.ExtraHeadRot;
+	}
+
+	ClearPlayerLookAroundActions(item);
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -308,7 +521,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 		BigGunControl(item, coll);
 		break;
 
-		// Boats are processed like normal items in loop.
+	// Boats are processed like normal items in loop.
 	default:
 		HandleWeapon(*item);
 	}
@@ -493,9 +706,9 @@ void DoLaraTightropeBalance(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 	const int factor = ((lara->Control.Tightrope.TimeOnTightrope >> 7) & 0xFF) * 128;
 
-	if (TrInput & IN_LEFT)
+	if (IsHeld(In::Left))
 		lara->Control.Tightrope.Balance += ANGLE(1.4f);
-	if (TrInput & IN_RIGHT)
+	if (IsHeld(In::Right))
 		lara->Control.Tightrope.Balance -= ANGLE(1.4f);
 
 	if (lara->Control.Tightrope.Balance < 0)
@@ -670,22 +883,22 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	/*if (TrInput & (IN_FORWARD | IN_BACK))
+	/*if ((IsHeld(In::Forward) || IsHeld(In::Back)))
 	ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 		item->Pose.Orientation.x -= ANGLE(3.0f);
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 		item->Pose.Orientation.x += ANGLE(3.0f);
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
 		// TODO: ModulateLaraLean() doesn't really work here. -- Sezz 2022.06.22
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Pose.Orientation.z -= LARA_LEAN_RATE;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -694,20 +907,20 @@ void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_FORWARD && item->Pose.Orientation.x > -ANGLE(85.0f))
+	if (IsHeld(In::Forward) && item->Pose.Orientation.x > -ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = -ANGLE(45.0f);
-	else if (TrInput & IN_BACK && item->Pose.Orientation.x < ANGLE(85.0f))
+	else if (IsHeld(In::Back) && item->Pose.Orientation.x < ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = ANGLE(45.0f);
 	else
 		lara->Control.Subsuit.DXRot = 0;
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Pose.Orientation.z -= LARA_LEAN_RATE;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -811,7 +1024,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 	if (abs(lara->ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
 		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
 
-	if (!(TrInput & IN_LOOK) &&
+	if (!IsHeld(In::Look) &&
 		item->Animation.ActiveState != LS_CRAWL_BACK)
 	{
 		lara->ExtraHeadRot.z = lara->ExtraTorsoRot.z / 2;
@@ -862,22 +1075,22 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_FORWARD &&
+	if (IsHeld(In::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
 		lara->Control.JumpDirection = JumpDirection::Forward;
 	}
-	else if (TrInput & IN_BACK &&
+	else if (IsHeld(In::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
 		lara->Control.JumpDirection = JumpDirection::Back;
 	}
-	else if (TrInput & IN_LEFT &&
+	else if (IsHeld(In::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
 		lara->Control.JumpDirection = JumpDirection::Left;
 	}
-	else if (TrInput & IN_RIGHT &&
+	else if (IsHeld(In::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
 		lara->Control.JumpDirection = JumpDirection::Right;
@@ -1096,7 +1309,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 
 		item->Pose.Position = lara->Context.NextCornerPos.Position;
 		item->Pose.Orientation.y = lara->Context.NextCornerPos.Orientation.y;
-		coll->Setup.OldPosition = lara->Context.NextCornerPos.Position;
+		coll->Setup.PrevPosition = lara->Context.NextCornerPos.Position;
 	}
 }
 
@@ -1144,6 +1357,36 @@ void ResetPlayerFlex(ItemInfo* item, float alpha)
 
 	player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
 	player.ExtraTorsoRot.Lerp(EulerAngles::Zero, alpha);
+}
+
+void ResetPlayerLookAround(ItemInfo& item, float alpha)
+{
+	auto& player = GetLaraInfo(item);
+
+	player.Control.Look.Orientation = EulerAngles::Zero;
+
+	if (Camera.type != CameraType::Look)
+	{
+		player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
+
+		if (player.Control.HandStatus != HandStatus::Busy &&
+			!player.LeftArm.Locked && !player.RightArm.Locked &&
+			player.Context.Vehicle == NO_ITEM)
+		{
+			player.ExtraTorsoRot = player.ExtraHeadRot;
+		}
+		else
+		{
+			if (!player.ExtraHeadRot.x)
+				player.ExtraTorsoRot.x = 0;
+
+			if (!player.ExtraHeadRot.y)
+				player.ExtraTorsoRot.y = 0;
+
+			if (!player.ExtraHeadRot.z)
+				player.ExtraTorsoRot.z = 0;
+		}
+	}
 }
 
 void RumbleLaraHealthCondition(ItemInfo* item)

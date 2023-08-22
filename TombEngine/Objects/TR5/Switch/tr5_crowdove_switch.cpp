@@ -43,7 +43,7 @@ namespace TEN::Entities::Switches
 
 		if (switchItem->Flags & IFLAG_INVISIBLE ||
 			!(switchItem->MeshBits & 4) ||
-			(!(TrInput & IN_ACTION) ||
+			(!IsHeld(In::Action) ||
 				laraItem->Animation.ActiveState != LS_IDLE ||
 				laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 				laraItem->Animation.IsAirborne ||

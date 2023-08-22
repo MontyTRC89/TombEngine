@@ -1,7 +1,25 @@
 Version 1.1.1
 ==============
 
-* Fix burning torch not working properly if there is more than 256 objects in a level.
+* Fix burning torch not working properly if there are more than 256 objects in a level.
+* Fix projectiles flying through animating objects.
+* Fix harpoon gun doing enormous damage on enemies.
+* Fix train death animation.
+* Fix knife thrower AI.
+* Overhaul look mode:
+ - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
+ - Improve movement and control.
+ - Re-enable looking while performing up jump, backward jump, or backward crawl.
+ - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+* Add crumbling platform and add new OCBs for behaviour:
+ - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
+ - OCB > 0 (crumble delay in frame time): When the player steps on the platform, it will shake and crumble after the number of frames set in the OCB.
+ - A positive value results in activation via player collision.
+ - A negative value requires a trigger to activate.
+
+Lua API changes:
+* Make Vec2 object float-based instead of integer-based.
+* Add Vec2 arithmetic for division with a number and multiplication with another Vec2.
 
 Version 1.1.0
 ==============

@@ -180,8 +180,8 @@ namespace TEN::Gui
 		if (IsHeld(In::Deselect))
 			return false;
 
-		// Avoid Action release interference when entering inventory.
-		if (GetActionTimeActive(In::Action) < TimeInMenu)
+		// Avoid Select or Action release interference when entering inventory.
+		if (GetActionTimeActive(In::Select) < TimeInMenu || GetActionTimeActive(In::Action) < TimeInMenu)
 			return true;
 
 		return false;
@@ -626,7 +626,7 @@ namespace TEN::Gui
 		}
 
 		OptionCount = numControlSettingsOptions;
-		CurrentSettings.WaitingForKey = false;
+		CurrentSettings.NewKeyWaitTimer = 0.0f;
 
 		if (CurrentSettings.IgnoreInput)
 		{
@@ -640,16 +640,20 @@ namespace TEN::Gui
 			SelectedOption <= (numControlSettingsOptions - 3))
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			CurrentSettings.WaitingForKey = true;
+			CurrentSettings.NewKeyWaitTimer = SettingsData::NEW_KEY_WAIT_TIMEOUT;
 			CurrentSettings.IgnoreInput = true;
 		}
 
-		if (CurrentSettings.WaitingForKey)
+		if (CurrentSettings.NewKeyWaitTimer > 0.0f)
 		{
 			ClearAllActions();
 
-			while (true)
+			while (CurrentSettings.NewKeyWaitTimer > 0.0f)
 			{
+				CurrentSettings.NewKeyWaitTimer -= 1.0f;
+				if (CurrentSettings.NewKeyWaitTimer <= 0.0f)
+					CurrentSettings.NewKeyWaitTimer = 0.0f;
+
 				UpdateInputActions(item);
 
 				if (CurrentSettings.IgnoreInput)
@@ -693,7 +697,7 @@ namespace TEN::Gui
 						Bindings[1][baseIndex + SelectedOption] = selectedKey;
 						DefaultConflict();
 
-						CurrentSettings.WaitingForKey = false;
+						CurrentSettings.NewKeyWaitTimer = 0.0f;
 						CurrentSettings.IgnoreInput = true;
 						return;
 					}
@@ -1968,13 +1972,13 @@ namespace TEN::Gui
 
 		auto* lara = GetLaraInfo(item);
 
-		int prevBinocularRange = BinocularRange;
+		int prevOpticRange = lara->Control.Look.OpticRange;
 		short inventoryObject = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 		short gameObject = InventoryObjectTable[inventoryObject].ObjectNumber;
 
 		item->MeshBits = ALL_JOINT_BITS;
+		lara->Control.Look.OpticRange = 0;
 		lara->Inventory.OldBusy = false;
-		BinocularRange = 0;
 
 		if (lara->Control.WaterStatus == WaterStatus::Dry ||
 			lara->Control.WaterStatus == WaterStatus::Wade)
@@ -2045,8 +2049,8 @@ namespace TEN::Gui
 						(lara->Control.IsLow && !IsHeld(In::Crouch))) &&
 					!UseSpotCam && !TrackCameraInit)
 				{
-					BinocularRange = 128;
-					BinocularOn = true;
+					lara->Control.Look.OpticRange = 128;
+					lara->Control.Look.IsUsingBinoculars = true;
 					lara->Inventory.OldBusy = true;
 
 					// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
@@ -2057,10 +2061,14 @@ namespace TEN::Gui
 						lara->Control.HandStatus = HandStatus::WeaponUndraw;
 				}
 
-				if (prevBinocularRange)
-					BinocularRange = prevBinocularRange;
+				if (prevOpticRange)
+				{
+					lara->Control.Look.OpticRange = prevOpticRange;
+				}
 				else
+				{
 					BinocularOldCamera = Camera.oldType;
+				}
 
 				return;
 
