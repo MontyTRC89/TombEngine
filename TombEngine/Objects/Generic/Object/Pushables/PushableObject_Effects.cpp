@@ -1,16 +1,19 @@
 #include "framework.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Effects.h"
 
+#include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Ripple;
 
 namespace TEN::Entities::Generic
 {
 	constexpr auto FRAMES_BETWEEN_RIPPLES = 8.0f;
+	constexpr auto FRAMES_BETWEEN_BUBBLES = 8.0f;
 
 	void DoPushableRipples(int itemNumber)
 	{
@@ -18,7 +21,7 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		//TODO: Enhace the effect to make the ripples increase their size through the time.
-		if (pushable.StartPos.y != NO_HEIGHT && std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
+		if (pushable.WaterSurfaceHeight != NO_HEIGHT && std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
 		{
 			SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.WaterSurfaceHeight, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 		}
@@ -42,7 +45,17 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//TODO
+		if (std::fmod(GameTimer, FRAMES_BETWEEN_BUBBLES) <= 0.0f)
+		{
+			for (int i = 0; i <32; i++)
+			{
+				auto pos = Vector3(
+					(GetRandomControl() & 0x1FF) + pushableItem.Pose.Position.x - 256,
+					(GetRandomControl() & 0x7F) + pushableItem.Pose.Position.y - 64,
+					(GetRandomControl() & 0x1FF) + pushableItem.Pose.Position.z - 256);
+				SpawnBubble(pos, pushableItem.RoomNumber, (int)BubbleFlags::HighAmplitude | (int)BubbleFlags::LargeScale);
+			}
+		}
 	}
 
 	void FloatingItem(ItemInfo& item, float floatForce)
