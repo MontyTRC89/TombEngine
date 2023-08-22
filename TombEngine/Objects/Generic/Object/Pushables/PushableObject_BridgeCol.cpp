@@ -49,7 +49,7 @@ namespace TEN::Entities::Generic
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 
-		if (pushableItem.Status != ITEM_INVISIBLE && pushable.UsesRoomCollision && boxHeight.has_value())
+		if (pushableItem.Status != ITEM_INVISIBLE && pushable.UsesRoomCollision && boxHeight.has_value() && pushableItem.Active)
 		{
 			int height = pushableItem.Pose.Position.y - GetPushableHeight(pushableItem);
 			return std::optional{ height };
@@ -65,7 +65,7 @@ namespace TEN::Entities::Generic
 
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
-		if (pushableItem.Status != ITEM_INVISIBLE && pushable.UsesRoomCollision && boxHeight.has_value())
+		if (pushableItem.Status != ITEM_INVISIBLE && pushable.UsesRoomCollision && boxHeight.has_value() && pushableItem.Active)
 			return std::optional{ pushableItem.Pose.Position.y };
 
 		return std::nullopt;
