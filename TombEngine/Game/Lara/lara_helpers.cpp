@@ -389,7 +389,9 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	{
 		short rangeRate = isSlow ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
 
-		if (IsHeld(In::StepLeft) && !IsHeld(In::StepRight))
+		// NOTE: Zooming allowed with either StepLeft/StepRight or Walk/Sprint.
+		if ((IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) ||
+			(IsHeld(In::Walk) && !IsHeld(In::Sprint)))
 		{
 			player.Control.Look.OpticRange -= rangeRate;
 			if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
@@ -401,7 +403,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 			}
 		}
-		else if (IsHeld(In::StepRight) && !IsHeld(In::StepLeft))
+		else if ((IsHeld(In::StepRight) && !IsHeld(In::StepLeft)) ||
+			(IsHeld(In::Sprint) && !IsHeld(In::Walk)))
 		{
 			player.Control.Look.OpticRange += rangeRate;
 			if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
