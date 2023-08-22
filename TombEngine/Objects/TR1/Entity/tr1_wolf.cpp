@@ -54,7 +54,6 @@ namespace TEN::Entities::Creatures::TR1
 		WOLF_STATE_BITE_ATTACK = 12
 	};
 
-	// TODO: Check. Copied from tr4_dog.cpp.
 	enum WolfAnim
 	{
 		WOLF_ANIM_SLEEP = 0,

@@ -321,7 +321,7 @@ namespace TEN::Entities::Creatures::TR1
 		CreatureAnimation(itemNumber, headingAngle, 0);
 
 		// Align with floor.
-		if (!TestState(item.Animation.ActiveState, BearHighStanceStates));
+		if (!TestState(item.Animation.ActiveState, BearHighStanceStates))
 		{
 			auto radius = Vector2(object.radius);
 			AlignEntityToSurface(&item, radius);
