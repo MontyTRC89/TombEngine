@@ -151,8 +151,7 @@ namespace TEN::Entities::Generic
 		int displaceDepth = 0;
 		int displaceBox = GameBoundingBox(LaraItem).Z2;
 
-		if (pushable.CurrentSoundState == PushableSoundState::Moving)
-			pushable.CurrentSoundState = PushableSoundState::Stopping;
+		pushable.CurrentSoundState = PushableSoundState::None;
 
 		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 		displaceBox -= isPlayerPulling ? (displaceDepth + BLOCK(1)) : (displaceDepth - BLOCK(1));
@@ -182,8 +181,6 @@ namespace TEN::Entities::Generic
 				default:
 					break;
 			}
-
-			pushable.CurrentSoundState = PushableSoundState::Stopping;
 
 			//2. Move pushable
 			
@@ -284,6 +281,8 @@ namespace TEN::Entities::Generic
 						//The pushable is going to stop here, do the checks to conect it with another Stack.
 						int FoundStack = SearchNearPushablesStack(itemNumber);
 						StackPushable(itemNumber, FoundStack);
+
+						pushable.CurrentSoundState = PushableSoundState::Stopping;
 
 					}
 					//Otherwise, continue the movement.
