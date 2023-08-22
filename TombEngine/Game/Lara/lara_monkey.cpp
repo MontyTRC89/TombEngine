@@ -68,7 +68,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Look))
+		if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 		{
 			item->Animation.TargetState = LS_MONKEY_IDLE;
 			return;

@@ -238,14 +238,18 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 }
 
-static bool CanPlayerLookAround(const ItemInfo& item)
+bool CanPlayerLookAround(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// Check if drawn weapon has lasersight.
-	if (player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+	// 1) Check if drawn weapon has lasersight.
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+	{
 		return true;
+	}
 
+	// 2) Test for switchable target.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
@@ -255,7 +259,6 @@ static bool CanPlayerLookAround(const ItemInfo& item)
 			if (targetPtr != nullptr)
 				targetableCount++;
 
-			// Check if player can switch targets.
 			if (targetableCount > 1)
 				return false;
 		}
