@@ -248,7 +248,7 @@ namespace TEN::Collision
 	// HACK.
 	Vector3 PointCollisionData::GetBridgeNormal(bool isFloor)
 	{
-		constexpr auto ANGLE_STEP = ANGLE(11.25f);
+		constexpr auto ANGLE_STEP = short(ANGLE(45.0f) / 4);
 
 		int itemNumber = isFloor ? GetFloorBridgeItemNumber() : GetCeilingBridgeItemNumber();
 		const auto& item = g_Level.Items[itemNumber];
