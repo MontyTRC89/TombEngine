@@ -188,11 +188,8 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
-	//if (input.FogBulbs.w > 0.0f)
-	//	lighting = saturate(lighting);
 	output.Color.xyz = output.Color.xyz * lighting;
-	//if (input.FogBulbs.w == 0.0f)
-		output.Color.xyz = saturate(output.Color.xyz);
+	output.Color.xyz = saturate(output.Color.xyz);
 
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
