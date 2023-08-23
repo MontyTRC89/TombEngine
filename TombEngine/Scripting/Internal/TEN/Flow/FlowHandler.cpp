@@ -91,7 +91,7 @@ Must be true or false
 @function EnablePointFilter
 @tparam bool enabled true or false
 */
-	table_flow.set_function(ScriptReserved_EnablePointFilter, &FlowHandler::EnablePointFilter, this);
+	tableFlow.set_function(ScriptReserved_EnablePointFilter, &FlowHandler::EnablePointFilter, this);
 
 /*** Enable or disable mass pickup.
 Must be true or false
