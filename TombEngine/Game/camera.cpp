@@ -1126,37 +1126,51 @@ void CalculateCamera(const CollisionInfo& coll)
 	{
 		if (!isFixedCamera)
 		{
-			auto dx = Camera.item->Pose.Position.x - item->Pose.Position.x;
-			auto dz = Camera.item->Pose.Position.z - item->Pose.Position.z;
-			int shift = sqrt(pow(dx, 2) + pow(dz, 2));
-			short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-			short tilt = phd_atan(shift, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y);
-			bounds = GameBoundingBox(Camera.item);
-			angle /= 2;
-			tilt /= 2;
+			auto deltaPos = Camera.item->Pose.Position - item->Pose.Position;
+			float dist = Vector3i::Distance(Camera.item->Pose.Position, item->Pose.Position);
 
-			if (angle > -ANGLE(50.0f) && angle < ANGLE(50.0f) && tilt > -ANGLE(85.0f) && tilt < ANGLE(85.0f))
+			auto lookOrient = EulerAngles(
+				phd_atan(dist, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y),
+				phd_atan(deltaPos.z, deltaPos.x) - item->Pose.Orientation.y,
+				0) / 2;
+
+			if (lookOrient.y > ANGLE(-50.0f) &&	lookOrient.y < ANGLE(50.0f) &&
+				lookOrient.z > ANGLE(-85.0f) && lookOrient.z < ANGLE(85.0f))
 			{
-				short change = angle - Lara.ExtraHeadRot.y;
-				if (change > ANGLE(4.0f))
+				short angleDelta = lookOrient.y - Lara.ExtraHeadRot.y;
+				if (angleDelta > ANGLE(4.0f))
+				{
 					Lara.ExtraHeadRot.y += ANGLE(4.0f);
-				else if (change < -ANGLE(4.0f))
+				}
+				else if (angleDelta < ANGLE(-4.0f))
+				{
 					Lara.ExtraHeadRot.y -= ANGLE(4.0f);
+				}
 				else
-					Lara.ExtraHeadRot.y += change;
+				{
+					Lara.ExtraHeadRot.y += angleDelta;
+				}
 				Lara.ExtraTorsoRot.y = Lara.ExtraHeadRot.y;
 
-				change = tilt - Lara.ExtraHeadRot.x;
-				if (change > ANGLE(4.0f))
+				angleDelta = lookOrient.z - Lara.ExtraHeadRot.x;
+				if (angleDelta > ANGLE(4.0f))
+				{
 					Lara.ExtraHeadRot.x += ANGLE(4.0f);
-				else if (change < -ANGLE(4.0f))
+				}
+				else if (angleDelta < ANGLE(-4.0f))
+				{
 					Lara.ExtraHeadRot.x -= ANGLE(4.0f);
+				}
 				else
-					Lara.ExtraHeadRot.x += change;
+				{
+					Lara.ExtraHeadRot.x += angleDelta;
+				}
 				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
 
+				Lara.Control.Look.Orientation = lookOrient;
+
 				Camera.type = CameraType::Look;
-				Camera.item->LookedAt = 1;
+				Camera.item->LookedAt = true;
 			}
 		}
 	}

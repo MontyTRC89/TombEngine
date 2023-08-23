@@ -1488,8 +1488,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		if (pointColl.Position.Floor < projectile.Pose.Position.y ||
 			pointColl.Position.Ceiling > projectile.Pose.Position.y)
 		{
-			hasHit =
-			hasHitNotByEmitter = true;
+			hasHit = hasHitNotByEmitter = true;
 		}
 	}
 	// If projectile is timed grenade, try to emit from it according to flags.
@@ -1645,11 +1644,18 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 					 itemPtr->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doShatter = hasHit = true;
+				doExplosion = isExplosive;
 
 				// Smash objects are legacy objects from TRC. Make them explode in legacy way.
 				ExplodeItemNode(itemPtr, 0, 0, 128);
 				SmashObject(itemPtr->Index);
 				KillItem(itemPtr->Index);
+			}
+			else if (currentObject.collision && !(itemPtr->Status & ITEM_INVISIBLE))
+			{
+				doShatter = hasHit = true;
+				doExplosion = isExplosive;
+				affectedObjects.push_back(itemPtr->Index);
 			}
 		}
 
@@ -1684,12 +1690,14 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		projectile.ItemFlags[1] = GRENADE_FRAG_TIMEOUT;
 		return;
 
+	case ProjectileType::Harpoon:
+		if (affectedObjects.empty())
+			return;
+		break;
+
 	default:
 		break;
 	}
-
-	if (type == ProjectileType::Harpoon)
-		return;
 
 	if (hasHit)
 		KillItem(projectile.Index);

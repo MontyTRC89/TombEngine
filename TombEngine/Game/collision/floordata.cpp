@@ -837,30 +837,25 @@ namespace TEN::Collision::Floordata
 		}
 	}
 
-	// New function which gets precise floor/ceiling collision from actual object bounding box.
-	// Animated objects are also supported, although horizontal collision shift is unstable.
-	// Method: get accurate bounds in world transform by converting to DirectX OBB, then do a
-	// ray test on top or bottom (depending on test side) to determine if box is present at 
-	// this particular point.
-
-	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom)
+	// Gets precise floor/ceiling height from object's bounding box.
+	// Animated objects are also supported, although horizontal collision shifting is unstable.
+	// Method: get accurate bounds in world transform by converting to OBB, then do a ray test
+	// on top or bottom (depending on test side) to determine if box is present at a particular point.
+	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool useBottomHeight)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		auto bounds = GameBoundingBox(item);
-		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
+		auto bounds = GameBoundingBox(&item);
+		auto dxBounds = bounds.ToBoundingOrientedBox(item.Pose);
 
-		auto pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case.
+		// Introduce slight vertical margin just in case.
+		auto pos = Vector3(x, y + (useBottomHeight ? 4 : -4), z);
 
-		float distance = 0.0f;
-		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
-		{
-			return std::optional{ item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1) };
-		}
-		else
-		{
-			return std::nullopt;
-		}
+		float dist = 0.0f;
+		if (dxBounds.Intersects(pos, (useBottomHeight ? -Vector3::UnitY : Vector3::UnitY), dist))
+			return (item.Pose.Position.y + (useBottomHeight ? bounds.Y2 : bounds.Y1));
+
+		return std::nullopt;
 	}
 
 	// Gets bridge min or max height regardless of actual X/Z world position.

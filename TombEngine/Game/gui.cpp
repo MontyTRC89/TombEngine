@@ -180,8 +180,8 @@ namespace TEN::Gui
 		if (IsHeld(In::Deselect))
 			return false;
 
-		// Avoid Action release interference when entering inventory.
-		if (GetActionTimeActive(In::Action) < TimeInMenu)
+		// Avoid Select or Action release interference when entering inventory.
+		if (GetActionTimeActive(In::Select) < TimeInMenu || GetActionTimeActive(In::Action) < TimeInMenu)
 			return true;
 
 		return false;

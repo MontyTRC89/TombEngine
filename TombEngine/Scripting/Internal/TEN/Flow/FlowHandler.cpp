@@ -28,31 +28,30 @@ ScriptInterfaceObjectsHandler* g_GameScriptEntities;
 ScriptInterfaceStringsHandler* g_GameStringsHandler;
 ScriptInterfaceFlowHandler* g_GameFlow;
 
-FlowHandler::FlowHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
+FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) : m_handler(lua)
 {
-
 /*** gameflow.lua.
 These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
 They handle a game's 'metadata'; i.e., things such as level titles, loading screen paths, and default
 ambient tracks.
 @section Flowlua
 */
-	sol::table table_flow{ m_handler.GetState()->lua_state(), sol::create };
-	parent.set(ScriptReserved_Flow, table_flow);
+	sol::table tableFlow{ m_handler.GetState()->lua_state(), sol::create };
+	parent.set(ScriptReserved_Flow, tableFlow);
 
 /***
 Add a level to the Flow.
 @function AddLevel
 @tparam Flow.Level level a level object
 */
-	table_flow.set_function(ScriptReserved_AddLevel, &FlowHandler::AddLevel, this);
+	tableFlow.set_function(ScriptReserved_AddLevel, &FlowHandler::AddLevel, this);
 
 /*** Image to show when loading the game.
 Must be a .jpg or .png image.
 @function SetIntroImagePath
 @tparam string path the path to the image, relative to the TombEngine exe
 */
-	table_flow.set_function(ScriptReserved_SetIntroImagePath, &FlowHandler::SetIntroImagePath, this);
+	tableFlow.set_function(ScriptReserved_SetIntroImagePath, &FlowHandler::SetIntroImagePath, this);
 
 /*** Image to show in the background of the title screen.
 Must be a .jpg or .png image.
@@ -60,21 +59,21 @@ __(not yet implemented)__
 @function SetTitleScreenImagePath
 @tparam string path the path to the image, relative to the TombEngine exe
 */
-	table_flow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
+	tableFlow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
 
 /*** Enable or disable Lara drawing in title flyby.
 Must be true or false
 @function EnableLaraInTitle
 @tparam bool enabled true or false
 */
-	table_flow.set_function(ScriptReserved_EnableLaraInTitle, &FlowHandler::EnableLaraInTitle, this);
+	tableFlow.set_function(ScriptReserved_EnableLaraInTitle, &FlowHandler::EnableLaraInTitle, this);
 
 /*** Enable or disable level selection in title flyby.
 Must be true or false
 @function EnableLevelSelect
 @tparam bool enabled true or false
 */
-	table_flow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
+	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
 /*** gameflow.lua or level scripts.
 @section FlowluaOrScripts
@@ -85,7 +84,7 @@ Must be true or false
 @function EnableFlyCheat
 @tparam bool enabled true or false
 */
-	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
+	tableFlow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
 /*** Enable or disable point texture filter.
 Must be true or false
@@ -99,7 +98,7 @@ Must be true or false
 @function EnableMassPickup
 @tparam bool enabled true or false
 */
-	table_flow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
+	tableFlow.set_function(ScriptReserved_EnableMassPickup, &FlowHandler::EnableMassPickup, this);
 
 /*** Returns the level by index.
 Indices depend on the order in which AddLevel was called; the first added will
@@ -108,13 +107,13 @@ have an ID of 0, the second an ID of 1, and so on.
 @tparam int index of the level
 @treturn Flow.Level the level indicated by the id
 */
-	table_flow.set_function(ScriptReserved_GetLevel, &FlowHandler::GetLevel, this);
+	tableFlow.set_function(ScriptReserved_GetLevel, &FlowHandler::GetLevel, this);
 
 /*** Returns the level that the game control is running in that moment.
 @function GetCurrentLevel
 @treturn Flow.Level the current level
 */
-	table_flow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
+	tableFlow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
 
 /***
 Finishes the current level, with optional level index provided. If level index
@@ -123,21 +122,21 @@ level count, jumps to title.
 @function EndLevel
 @int[opt] index level index (default 0)
 */
-	table_flow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
+	tableFlow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
 
 /***
 Returns the player's current per-game secret count.
 @function GetSecretCount
 @treturn int Current game secret count.
 */
-	table_flow.set_function(ScriptReserved_GetSecretCount, &FlowHandler::GetSecretCount, this);
+	tableFlow.set_function(ScriptReserved_GetSecretCount, &FlowHandler::GetSecretCount, this);
 
 /*** 
 Sets the player's current per-game secret count.
 @function SetSecretCount
 @tparam int count new secret count.
 */
-	table_flow.set_function(ScriptReserved_SetSecretCount, &FlowHandler::SetSecretCount, this);
+	tableFlow.set_function(ScriptReserved_SetSecretCount, &FlowHandler::SetSecretCount, this);
 
 /***
 Adds one secret to current level secret count and also plays secret music track.
@@ -145,16 +144,14 @@ The index argument corresponds to the secret's unique ID, the same that would go
 @function AddSecret
 @tparam int index an index of current level's secret (must be from 0 to 31).
 */
-	table_flow.set_function(ScriptReserved_AddSecret, &FlowHandler::AddSecret, this);
+	tableFlow.set_function(ScriptReserved_AddSecret, &FlowHandler::AddSecret, this);
 
 /*** Total number of secrets in game.
 Must be an integer value (0 means no secrets).
 @function SetTotalSecretCount
 @tparam int total number of secrets
 */
-	table_flow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
-
-
+	tableFlow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
 
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
@@ -165,13 +162,13 @@ settings.lua shouldn't be bundled with any finished levels/games.
 @function SetSettings
 @tparam Flow.Settings settings a settings object 
 */
-	table_flow.set_function(ScriptReserved_SetSettings, &FlowHandler::SetSettings, this);
+	tableFlow.set_function(ScriptReserved_SetSettings, &FlowHandler::SetSettings, this);
 
 /***
 @function SetAnimations
 @tparam Flow.Animations animations an animations object 
 */
-	table_flow.set_function(ScriptReserved_SetAnimations, &FlowHandler::SetAnimations, this);
+	tableFlow.set_function(ScriptReserved_SetAnimations, &FlowHandler::SetAnimations, this);
 
 /*** strings.lua. 
 These functions used in strings.lua, which is generated by TombIDE.
@@ -182,38 +179,38 @@ You will not need to call them manually.
 @function SetStrings
 @tparam tab table array-style table with strings
 */
-	table_flow.set_function(ScriptReserved_SetStrings, &FlowHandler::SetStrings, this);
+	tableFlow.set_function(ScriptReserved_SetStrings, &FlowHandler::SetStrings, this);
 
 /*** Get translated string
 @function GetString
 @tparam key string key for translated string 
 */
-	table_flow.set_function(ScriptReserved_GetString, &FlowHandler::GetString, this);
+	tableFlow.set_function(ScriptReserved_GetString, &FlowHandler::GetString, this);
 
 /*** Set language names for translations.
 Specify which translations in the strings table correspond to which languages.
 @function SetLanguageNames
 @tparam tab table array-style table with language names
 */
-	table_flow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
+	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);
-	Level::Register(table_flow);
-	SkyLayer::Register(table_flow);
-	Mirror::Register(table_flow);
-	InventoryItem::Register(table_flow);
-	Animations::Register(table_flow);
-	Settings::Register(table_flow);
-	Fog::Register(table_flow);
+	Level::Register(tableFlow);
+	SkyLayer::Register(tableFlow);
+	Mirror::Register(tableFlow);
+	InventoryItem::Register(tableFlow);
+	Animations::Register(tableFlow);
+	Settings::Register(tableFlow);
+	Fog::Register(tableFlow);
 	
-	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_WeatherType, kWeatherTypes);
-	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_LaraType, kLaraTypes);
-	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_RotationAxis, kRotAxes);
-	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_ItemAction, kItemActions);
-	m_handler.MakeReadOnlyTable(table_flow, ScriptReserved_ErrorMode, kErrorModes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, kWeatherTypes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, kLaraTypes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, kRotAxes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, kItemActions);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, kErrorModes);
 }
 
 FlowHandler::~FlowHandler()
