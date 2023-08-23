@@ -8,6 +8,7 @@
 #include "VertexBuffer/VertexBuffer.h"
 #include "RenderView/RenderView.h"
 #include "Renderer/RendererRectangle.h"
+#include <Scripting/Include/Flow/ScriptInterfaceFlowHandler.h>
 
 namespace TEN::Renderer
 {
@@ -275,6 +276,11 @@ namespace TEN::Renderer
 	void Renderer11::BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType)
 	{
 		m_context->PSSetShaderResources((UINT)registerType, 1, texture->ShaderResourceView.GetAddressOf());
+
+		if (g_GameFlow->IsPointFilterEnabled() && samplerType != SAMPLER_SHADOW_MAP)
+		{
+			samplerType = SAMPLER_POINT_WRAP;
+		}
 
 		ID3D11SamplerState* samplerState = nullptr;
 		switch (samplerType)  

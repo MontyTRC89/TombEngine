@@ -31,6 +31,7 @@ public:
 	int								FogOutDistance{ 0 };
 	bool							LevelSelect{ true };
 	bool							FlyCheat{ true };
+	bool							PointFilter{ true };
 	bool							MassPickup{ true }; 
 	bool							LaraInTitle{ false };
 	bool							DebugMode{ false };
@@ -66,6 +67,8 @@ public:
 	void		SetTotalSecretCount(int secretsNumber);
 	bool		IsFlyCheatEnabled() const;
 	void		EnableFlyCheat(bool flyCheat);
+	bool		IsPointFilterEnabled() const;
+	void		EnablePointFilter(bool pointFilter);
 	bool		IsMassPickupEnabled() const; 
 	void		EnableMassPickup(bool massPickup);
 	bool		IsLaraInTitleEnabled() const;

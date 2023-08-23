@@ -87,6 +87,13 @@ Must be true or false
 */
 	table_flow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
+/*** Enable or disable point texture filter.
+Must be true or false
+@function EnablePointFilter
+@tparam bool enabled true or false
+*/
+	table_flow.set_function(ScriptReserved_EnablePointFilter, &FlowHandler::EnablePointFilter, this);
+
 /*** Enable or disable mass pickup.
 Must be true or false
 @function EnableMassPickup
@@ -417,6 +424,16 @@ bool FlowHandler::IsFlyCheatEnabled() const
 void FlowHandler::EnableFlyCheat(bool flyCheat)
 {
 	FlyCheat = flyCheat;
+}
+
+bool FlowHandler::IsPointFilterEnabled() const
+{
+	return PointFilter;
+}
+
+void FlowHandler::EnablePointFilter(bool pointFilter)
+{
+	PointFilter = pointFilter;
 }
 
 bool FlowHandler::IsMassPickupEnabled() const

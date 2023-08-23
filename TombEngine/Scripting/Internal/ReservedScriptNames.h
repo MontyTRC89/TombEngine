@@ -172,6 +172,7 @@ static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
 static constexpr char ScriptReserved_EnableMassPickup[]			= "EnableMassPickup";
 static constexpr char ScriptReserved_EnableLaraInTitle[]		= "EnableLaraInTitle";
 static constexpr char ScriptReserved_EnableLevelSelect[]		= "EnableLevelSelect";
+static constexpr char ScriptReserved_EnablePointFilter[]		= "EnablePointFilter";
 
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
