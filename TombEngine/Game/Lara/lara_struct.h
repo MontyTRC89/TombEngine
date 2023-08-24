@@ -943,7 +943,6 @@ enum class HolsterSlot
 
 enum class HandStatus
 {
-	None,
 	Free,
 	Busy,
 	WeaponDraw,
@@ -954,7 +953,6 @@ enum class HandStatus
 
 enum class WaterStatus
 {
-	None,
 	Dry,
 	Wade,
 	TreadWater,
