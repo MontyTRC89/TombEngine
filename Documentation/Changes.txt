@@ -6,6 +6,8 @@ Version 1.1.1
 * Fix harpoon gun doing enormous damage on enemies.
 * Fix train death animation.
 * Fix knife thrower AI.
+* Fix wolf enemy, now they will cause the right damage when they do the close bite attack.
+* Fix bear enemy, now their behaviour is more fluid and it has been reduced the times it gets stucks doing an action.
 * Overhaul look mode:
  - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
  - Improve movement and control.
@@ -16,11 +18,16 @@ Version 1.1.1
  - OCB > 0 (crumble delay in frame time): When the player steps on the platform, it will shake and crumble after the number of frames set in the OCB.
  - A positive value results in activation via player collision.
  - A negative value requires a trigger to activate.
+ * Add swinging blade.
+
 
 Lua API changes:
+* Add Lara::GetAmmoType() function to read the ammo that Lara is using.
 * Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
 * Make Vec2 object float-based instead of integer-based.
 * Add Vec2 arithmetic for division with a number and multiplication with another Vec2.
+* Add log messages warnings to functions: AddCallback and RemoveCallback.
+* Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
 
 Version 1.1.0
 ==============
