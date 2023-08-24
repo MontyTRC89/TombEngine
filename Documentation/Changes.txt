@@ -28,6 +28,7 @@ Lua API changes:
 * Add Vec2 arithmetic for division with a number and multiplication with another Vec2.
 * Add log messages warnings to functions: AddCallback and RemoveCallback.
 * Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
+* Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.
 
 Version 1.1.0
 ==============
