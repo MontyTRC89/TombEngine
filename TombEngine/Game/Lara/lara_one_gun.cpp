@@ -1600,8 +1600,9 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				itemPtr->IsLara() ||
 				(itemPtr->Flags & 0x40 && Objects[itemPtr->ObjectNumber].explodableMeshbits))
 			{
-				// If we collide with emitter, don't process further in early launch stages.
-				if (!hasHitNotByEmitter && itemPtr == &emitter)
+				// If we collide with emitter, and there are no other objects around, 
+				// don't process further in early launch stages.
+				if (!hasHitNotByEmitter && itemPtr == &emitter && affectedObjects.empty())
 				{
 					// Non-grenade projectiles require larger timeout
 					int timeout = type >= ProjectileType::Grenade ? TRIGGER_TIMEOUT : TRIGGER_TIMEOUT * 2;
@@ -1655,6 +1656,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 			{
 				doShatter = hasHit = true;
 				doExplosion = isExplosive;
+
 				affectedObjects.push_back(itemPtr->Index);
 			}
 		}
