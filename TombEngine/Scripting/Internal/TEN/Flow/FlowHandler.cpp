@@ -201,8 +201,8 @@ Specify which translations in the strings table correspond to which languages.
 	
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, kWeatherTypes);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, kLaraTypes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, kRotAxes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, kItemActions);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, kErrorModes);
 }
 
@@ -488,19 +488,17 @@ bool FlowHandler::DoFlow()
 			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
 			{
 				InventoryItem* obj = &level->InventoryObjects[i];
-				if (obj->slot >= 0 && obj->slot < INVENTORY_TABLE_SIZE)
+				if (obj->ObjectID >= 0 && obj->ObjectID < INVENTORY_TABLE_SIZE)
 				{
-					InventoryObject* invObj = &InventoryObjectTable[obj->slot];
+					InventoryObject* invObj = &InventoryObjectTable[obj->ObjectID];
 
-					invObj->ObjectName = obj->name.c_str();
-					invObj->Scale1 = obj->scale;
-					invObj->YOffset = obj->yOffset;
-					invObj->Orientation.x = ANGLE(obj->rot.x);
-					invObj->Orientation.y = ANGLE(obj->rot.y);
-					invObj->Orientation.z = ANGLE(obj->rot.z);
-					invObj->MeshBits = obj->meshBits;
-					invObj->Options = obj->action;
-					invObj->RotFlags = obj->rotationFlags;
+					invObj->ObjectName = obj->Name.c_str();
+					invObj->Scale1 = obj->Scale;
+					invObj->YOffset = obj->YOffset;
+					invObj->Orientation = EulerAngles(ANGLE(obj->Rot.x), ANGLE(obj->Rot.y), ANGLE(obj->Rot.z));
+					invObj->MeshBits = obj->MeshBits;
+					invObj->Options = obj->MenuAction;
+					invObj->RotFlags = obj->RotFlags;
 				}
 			}
 

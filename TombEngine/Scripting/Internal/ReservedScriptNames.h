@@ -70,6 +70,7 @@ static constexpr char ScriptReserved_GetStamina[]			= "GetStamina";
 static constexpr char ScriptReserved_SetStamina[]			= "SetStamina";
 static constexpr char ScriptReserved_GetAirborne[]			= "GetAirborne";
 static constexpr char ScriptReserved_SetAirborne[]			= "SetAirborne";
+static constexpr char ScriptReserved_GetAmmoType[]			= "GetAmmoType";
 static constexpr char ScriptReserved_GetControlLock[]		= "GetControlLock";
 static constexpr char ScriptReserved_SetControlLock[]		= "SetControlLock";
 static constexpr char ScriptReserved_GetAmmoCount[]			= "GetAmmoCount";
@@ -182,14 +183,15 @@ static constexpr char ScriptReserved_GetString[]			= "GetString";
 static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 
 // Flow Tables
-static constexpr char ScriptReserved_WeatherType[]		= "WeatherType";
-static constexpr char ScriptReserved_LaraType[]			= "LaraType";
-static constexpr char ScriptReserved_RotationAxis[]		= "RotationAxis";
-static constexpr char ScriptReserved_ItemAction[]		= "ItemAction";
-static constexpr char ScriptReserved_ErrorMode[]		= "ErrorMode";
-static constexpr char ScriptReserved_InventoryItem[]	= "InventoryItem";
-static constexpr char ScriptReserved_LaraWeaponType[]	= "LaraWeaponType";
-static constexpr char ScriptReserved_HandStatus[]		= "HandStatus";
+static constexpr char ScriptReserved_WeatherType[]	  = "WeatherType";
+static constexpr char ScriptReserved_LaraType[]		  = "LaraType";
+static constexpr char ScriptReserved_RotationAxis[]	  = "RotationAxis";
+static constexpr char ScriptReserved_ItemAction[]	  = "ItemAction";
+static constexpr char ScriptReserved_ErrorMode[]	  = "ErrorMode";
+static constexpr char ScriptReserved_InventoryItem[]  = "InventoryItem";
+static constexpr char ScriptReserved_LaraWeaponType[] = "LaraWeaponType";
+static constexpr char ScriptReserved_PlayerAmmoType[] = "PlayerAmmoType";
+static constexpr char ScriptReserved_HandStatus[]	  = "HandStatus";
 
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";

@@ -51,6 +51,7 @@ public:
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
+	int GetAmmoType() const;
 	int GetAmmoCount() const;
 	void UndrawWeapon();
 	void ThrowAwayTorch();
