@@ -546,7 +546,7 @@ bool Moveable::SetName(const std::string& id)
 // @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
-	return Vec3(m_item->Pose);
+	return Vec3(m_item->Pose.Position);
 }
 
 /// Set the moveable's position

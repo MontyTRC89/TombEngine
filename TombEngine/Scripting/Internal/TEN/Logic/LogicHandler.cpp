@@ -460,7 +460,8 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
 }
 
-template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType>
+int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
 {
 	auto [first, second] = varsMap.insert(std::make_pair(&var, (int)numVars));
 
