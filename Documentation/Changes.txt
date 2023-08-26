@@ -8,6 +8,7 @@ Version 1.1.1
 * Fix TR1 wolf damage value inflicted on a close bite attack.
 * Fix TR1 bear various original AI issues.
 * Fix TR2 knife thrower AI.
+* Fix activation of a flipped room when using SetPos() script command or position change node.
 * Fix volume change in settings not affecting voice track.
 * Overhaul look mode:
  - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
