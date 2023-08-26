@@ -2,6 +2,7 @@ Version 1.1.1
 ==============
 
 * Fix burning torch not working properly if there are more than 256 objects in a level.
+* Fix grenade and rocket projectiles smoke offset in certain directions.
 * Fix projectiles flying through animating objects.
 * Fix harpoon gun doing enormous damage on enemies.
 * Fix train death animation.
