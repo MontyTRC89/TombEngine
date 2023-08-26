@@ -281,7 +281,7 @@ bool SaveConfiguration()
 
 void SaveAudioConfig()
 {
-	SetVolumeMusic(g_Configuration.MusicVolume);
+	SetVolumeTracks(g_Configuration.MusicVolume);
 	SetVolumeFX(g_Configuration.SfxVolume);
 }
 
@@ -475,7 +475,7 @@ bool LoadConfiguration()
 	g_Configuration.EnableSubtitles = enableSubtitles;
 
 	// Set legacy variables.
-	SetVolumeMusic(musicVolume);
+	SetVolumeTracks(musicVolume);
 	SetVolumeFX(sfxVolume);
 
 	DefaultConflict();
