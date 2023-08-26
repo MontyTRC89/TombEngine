@@ -11,6 +11,7 @@ Version 1.1.1
 * Fix TR2 knife thrower AI.
 * Fix TR2 doberman crashing the game when killed by explosive weapons.
 * Fix volume change in settings not affecting voice track.
+* Fix several lighting bugs.
 * Overhaul look mode:
  - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
  - Improve movement and control.
@@ -24,6 +25,7 @@ Version 1.1.1
  - A negative value requires a trigger to activate.
 
 Lua API changes:
+* Add Flow::EnablePointFilter() function to disable bilinear filtering.
 * Add Lara::GetAmmoType() function to read the ammo that Lara is using.
 * Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
 * Make Vec2 object float-based instead of integer-based.
