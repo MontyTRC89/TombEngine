@@ -9,7 +9,8 @@ namespace TEN::Entities::Generic
 	{
 		None,
 		Moving,
-		Stopping
+		Stopping,
+		Falling
 	};
 
 	struct PushableSidesAttributes

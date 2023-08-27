@@ -81,6 +81,11 @@ namespace TEN::Entities::Generic
 			pushable.CurrentSoundState = PushableSoundState::None;
 			SoundEffect(GetPushableSfx(Stop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
 		}
+		else if (pushable.CurrentSoundState == PushableSoundState::Falling)
+		{
+			pushable.CurrentSoundState = PushableSoundState::None;
+			SoundEffect(GetPushableSfx(Fall, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
+		}
 	}
 
 }

@@ -315,12 +315,12 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	PushableEnvironemntState CheckPushableEnvironment(int itemNumber, int& floorHeight)
+	PushableEnvironmentState CheckPushableEnvironment(int itemNumber, int& floorHeight, int* ceilingHeight)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		PushableEnvironemntState result;
+		PushableEnvironmentState result;
 
 		CollisionResult pointColl;
 		int waterHeight = NO_HEIGHT;
@@ -338,43 +338,60 @@ namespace TEN::Entities::Generic
 		}
 
 		floorHeight = pointColl.Position.Floor; //Updates floorHeight reference for external use.
+		if (ceilingHeight  != nullptr)
+			*ceilingHeight = pointColl.Position.Ceiling;
 		
 		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
-			//Is in water, is it deep or shallow?
-			int distanceToSurface = abs(waterHeight - floorHeight);
-			if (distanceToSurface > (GetPushableHeight(pushableItem) + 128))
-			{
-				result = PushableEnvironemntState::DeepWater;
-			}
-			else
-			{
-				result = PushableEnvironemntState::ShallowWater;
-			}
+			// Is in water
 			pushable.WaterSurfaceHeight = waterHeight;
-		}
-		else
-		{
-			//Is in dry, is it on ground or on air?
+
+			// Is it in ground or floating?
 			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
 				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
 			{
-				result = PushableEnvironemntState::Air;
+				// Floating
+				// Is it deep or shallow water?
+				int distanceToSurface = abs(waterHeight - floorHeight);
+				if (distanceToSurface > (GetPushableHeight(pushableItem) + 128))
+				{
+					result = PushableEnvironmentState::DeepWater;
+				}
+				else
+				{
+					result = PushableEnvironmentState::ShallowWater;
+				}
+			}
+			else
+			{
+				// Water ground
+				result = PushableEnvironmentState::GroundWater;
+			}
+		}
+		else
+		{
+			// Is in dry.
+			pushable.WaterSurfaceHeight = NO_HEIGHT;
+
+			// Is it on ground or on air?
+			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
+				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
+			{
+				result = PushableEnvironmentState::Air;
 			}
 			else
 			{
 				if (pointColl.FloorTilt.x == 0 && pointColl.FloorTilt.y == 0)
 				{
 					//Is on a flat floor
-					result = PushableEnvironemntState::Ground;
+					result = PushableEnvironmentState::Ground;
 				}
 				else
 				{
 					//Is on a slope floor
-					result = PushableEnvironemntState::Slope;
+					result = PushableEnvironmentState::Slope;
 				}
 			}
-			pushable.WaterSurfaceHeight = NO_HEIGHT;
 		}
 		return result;
 	}
