@@ -657,6 +657,7 @@ namespace TEN::Entities::Generic
 		PushableEnvironemntState envState = CheckPushableEnvironment(itemNumber, floorHeight);
 
 		int goalHeight = 0;
+		int ceilingHeight = GetCollision(&pushableItem).Position.Ceiling;
 				
 		switch (envState)
 		{
@@ -688,8 +689,17 @@ namespace TEN::Entities::Generic
 				//Calculate goal height
 				if (pushable.WaterSurfaceHeight == NO_HEIGHT)
 				{
-					//There is ceiling, put pushable under it.
-					goalHeight = GetCollision(&pushableItem).Position.Ceiling + WATER_SURFACE_DISTANCE + pushable.Height;
+					//Check if there are space for the floating effect:
+					if (abs(ceilingHeight - floorHeight) >= GetPushableHeight(pushableItem) + WATER_SURFACE_DISTANCE)
+					{
+						//If so, put pushable to float under the ceiling.
+						goalHeight = ceilingHeight + WATER_SURFACE_DISTANCE + pushable.Height;
+					}
+					else
+					{
+						//Otherwise, the pushable is "blocking all the gap", like stuck, so don't move it with floating effects.
+						goalHeight = pushableItem.Pose.Position.y;
+					}
 				}
 				else
 				{
@@ -796,6 +806,10 @@ namespace TEN::Entities::Generic
 		int floorHeight;
 		PushableEnvironemntState envState = CheckPushableEnvironment(itemNumber, floorHeight);
 
+		DeactivateClimbablePushableCollider(itemNumber);
+		int ceilingHeight = GetCollision(&pushableItem).Position.Ceiling;
+		ActivateClimbablePushableCollider(itemNumber);
+
 		switch (envState)
 		{
 			case PushableEnvironemntState::Ground:
@@ -814,7 +828,7 @@ namespace TEN::Entities::Generic
 			case PushableEnvironemntState::DeepWater:
 
 				// Effects: Do water ondulation effect.
-				if (abs(pushable.WaterSurfaceHeight - floorHeight) >= GetPushableHeight(pushableItem) + WATER_SURFACE_DISTANCE)
+				if (abs(ceilingHeight - floorHeight) >= GetPushableHeight(pushableItem) + WATER_SURFACE_DISTANCE)
 				{
 					if (!pushable.UsesRoomCollision)
 						FloatingItem(pushableItem, pushable.FloatingForce);
