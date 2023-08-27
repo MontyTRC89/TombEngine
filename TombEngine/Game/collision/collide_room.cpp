@@ -117,7 +117,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-static CollisionResult ConvertPointCollisionToCollisionResult(PointCollisionData& pointColl)
+static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& pointColl)
 {
 	auto collResult = CollisionResult{};
 
@@ -144,49 +144,49 @@ static CollisionResult ConvertPointCollisionToCollisionResult(PointCollisionData
 CollisionResult GetCollision(const ItemInfo& item)
 {
 	auto pointColl = GetPointCollision(item);
-	return ConvertPointCollisionToCollisionResult(pointColl);
+	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const ItemInfo* item)
 {
 	auto pointColl = GetPointCollision(*item);
-	return ConvertPointCollisionToCollisionResult(pointColl);
+	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	auto pointColl = GetPointCollision(*item, headingAngle, forward, down, right);
-	return ConvertPointCollisionToCollisionResult(pointColl);
+	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 {
 	auto pointColl = GetPointCollision(pos, roomNumber, headingAngle, forward, down, right);
-	return ConvertPointCollisionToCollisionResult(pointColl);
+	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber)
 {
 	auto pointColl = GetPointCollision(pos, roomNumber);
-	return ConvertPointCollisionToCollisionResult(pointColl);
+	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto pointColl = GetPointCollision(Vector3i(x, y, z), roomNumber);
-	return ConvertPointCollisionToCollisionResult(pointColl);
+	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const GameVector& pos)
 {
 	auto pointColl = GetPointCollision(pos.ToVector3i(), pos.RoomNumber);
-	return ConvertPointCollisionToCollisionResult(pointColl);
+	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
