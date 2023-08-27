@@ -140,54 +140,56 @@ static CollisionResult ConvertPointCollisionToCollisionResult(PointCollisionData
 	return collResult;
 }
 
+// NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const ItemInfo& item)
 {
 	auto pointColl = GetPointCollision(item);
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-CollisionResult GetCollision(ItemInfo* item)
+// NOTE: Deprecated. Use GetPointCollision().
+CollisionResult GetCollision(const ItemInfo* item)
 {
 	auto pointColl = GetPointCollision(*item);
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down, float right)
+// NOTE: Deprecated. Use GetPointCollision().
+CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	auto pointColl = GetPointCollision(*item, headingAngle, forward, down, right);
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
+// NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 {
 	auto pointColl = GetPointCollision(pos, roomNumber, headingAngle, forward, down, right);
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-// Overload used as universal wrapper across collisional code replacing
-// triads of roomNumber-GetFloor()-GetFloorHeight() calls.
-// Advantage is that it does NOT modify incoming roomNumber argument,
-// instead storing one modified by GetFloor() within a returned CollisionResult struct.
-// This way, no external variables are modified as output arguments.
+// NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber)
 {
 	auto pointColl = GetPointCollision(pos, roomNumber);
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
+// NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto pointColl = GetPointCollision(Vector3i(x, y, z), roomNumber);
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
+// NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const GameVector& pos)
 {
 	auto pointColl = GetPointCollision(pos.ToVector3i(), pos.RoomNumber);
 	return ConvertPointCollisionToCollisionResult(pointColl);
 }
 
-// Deprecated.
+// NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
 	auto result = CollisionResult{};
@@ -213,7 +215,10 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
 	result.Position.Bridge = result.BottomBlock->GetInsideBridgeItemNumber(x, result.Position.Floor, z, true, false);
 	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(result.FloorTilt.x) >= 3 || (abs(result.FloorTilt.y) >= 3));
-	result.Position.CeilingSlope = abs(result.CeilingTilt.x) >= 4 || abs(result.CeilingTilt.y) >= 4; // TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
+
+	// TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
+	// NOTE: Already fixed if using GetPointCollision().
+	result.Position.CeilingSlope = abs(result.CeilingTilt.x) >= 4 || abs(result.CeilingTilt.y) >= 4;
 
 	return result;
 }

@@ -129,10 +129,10 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
-// All deprecated. Use GetPointCollision() instead.
+// NOTE: All overloads deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const ItemInfo& item);
-CollisionResult GetCollision(ItemInfo* item);
-CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(const ItemInfo* item);
+CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
