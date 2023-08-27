@@ -14,19 +14,22 @@ namespace TEN::Entities::Generic
 	{
 		int	 PullAnimNumber;
 		int	 PushAnimNumber;
+		int	 EdgeAnimNumber;
 		bool EnableAnimLoop;
 
 		PushableAnimationInfo()
 		{
 			PullAnimNumber = LA_PUSHABLE_PULL;
 			PushAnimNumber = LA_PUSHABLE_PUSH;
+			EdgeAnimNumber = LA_PUSHABLE_EDGE;
 			EnableAnimLoop = true;
 		}
 
-		PushableAnimationInfo(int pullAnimNumber, int pushAnimNumber, bool enableAnimLoop)
+		PushableAnimationInfo(int pullAnimNumber, int pushAnimNumber, int edgeAnimNumber, bool enableAnimLoop)
 		{
 			PullAnimNumber = pullAnimNumber;
 			PushAnimNumber = pushAnimNumber;
+			EdgeAnimNumber = edgeAnimNumber;
 			EnableAnimLoop = enableAnimLoop;
 		}
 	};

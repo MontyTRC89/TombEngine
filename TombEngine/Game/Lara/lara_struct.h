@@ -211,6 +211,7 @@ enum LaraState
 	// 174-188 reserved for "true" ladders. -- Sezz 2023.04.16
 
 	LS_REMOVE_PUZZLE = 189,
+	LS_PUSHABLE_EDGE = 190,
 
 	NUM_LARA_STATES
 };
@@ -814,6 +815,8 @@ enum LaraAnim
 	LA_LEDGE_JUMP_UP_END = 566,
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
+	LA_PUSHABLE_EDGE = 569,
+	LA_PUSHABLE_CLASSIC_EDGE = 570,
 
 	// 569-598 reserved for "true" ladders. -- Sezz 2023.04.16
 

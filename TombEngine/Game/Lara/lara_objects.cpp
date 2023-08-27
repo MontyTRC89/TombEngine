@@ -158,7 +158,7 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 // --------
 
 // State:		LS_PUSHABLE_PUSH (36)
-// Collision:	lara_default_col()
+// Collision:	lara_void_func()
 void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -172,7 +172,7 @@ void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 }
 
 // State:		LS_PUSHABLE_PULL (37)
-// Collision:	lara_default_col()
+// Collision:	lara_void_func()
 void lara_as_pushable_pull(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -196,6 +196,21 @@ void lara_as_pushable_grab(ItemInfo* item, CollisionInfo* coll)
 	if (!IsHeld(In::Action))
 		item->Animation.TargetState = LS_IDLE;
 }
+
+// State:		LS_PUSHABLE_PUSH_EDGE (190)
+// Collision:	lara_void_func()
+void lara_as_pushable_edge(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Look.Mode = LookMode::None;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetAngle = ANGLE(35.0f);
+	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.flags = CF_FOLLOW_CENTER;
+}
+
 
 // ------
 // PULLEY

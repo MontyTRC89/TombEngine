@@ -10,4 +10,6 @@ namespace TEN::Entities::Generic
 
 	void FloatingItem(ItemInfo& item, float floatForce = 1.0f);
 	void FloatingBridge(ItemInfo& item, float floatForce = 1.0f);
+
+	void PushableFallingOrientation (ItemInfo& item);
 }

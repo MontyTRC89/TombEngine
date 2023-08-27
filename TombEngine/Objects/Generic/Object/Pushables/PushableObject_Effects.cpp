@@ -96,4 +96,43 @@ namespace TEN::Entities::Generic
 
 		item.Pose.Position.y += yTranslation;
 	}
+
+	void PushableFallingOrientation(ItemInfo& item)
+	{
+		auto& pushableItem = item;
+
+		//Check if rotation is out of the threeshold.
+		auto orientationThreshold = 1;
+		auto correctionStep = 40.0f / 30;  //40º / 30 frames to do the correction in 1 sec approx.
+
+		if (abs(pushableItem.Pose.Orientation.x) >= orientationThreshold ||
+			abs(pushableItem.Pose.Orientation.y) >= orientationThreshold)
+		{
+			if (pushableItem.Pose.Orientation.x > 0)
+			{
+				pushableItem.Pose.Orientation.x -= correctionStep;
+				if (pushableItem.Pose.Orientation.x < 0)
+					pushableItem.Pose.Orientation.x = 0;
+			}
+			else
+			{
+				pushableItem.Pose.Orientation.x += correctionStep;
+				if (pushableItem.Pose.Orientation.x > 0)
+					pushableItem.Pose.Orientation.x = 0;
+			}
+
+			if (pushableItem.Pose.Orientation.z > 0)
+			{
+				pushableItem.Pose.Orientation.z -= correctionStep;
+				if (pushableItem.Pose.Orientation.z < 0)
+					pushableItem.Pose.Orientation.z = 0;
+			}
+			else
+			{
+				pushableItem.Pose.Orientation.z += correctionStep;
+				if (pushableItem.Pose.Orientation.z > 0)
+					pushableItem.Pose.Orientation.z = 0;
+			}
+		}
+	}
 }

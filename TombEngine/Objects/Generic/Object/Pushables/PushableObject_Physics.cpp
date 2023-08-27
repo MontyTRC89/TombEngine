@@ -21,10 +21,16 @@ namespace TEN::Entities::Generic
 
 	constexpr auto PUSHABLE_FALL_VELOCITY_MAX = BLOCK(1 / 8.0f);
 	constexpr auto PUSHABLE_WATER_VELOCITY_MAX = BLOCK(1 / 16.0f);
+
+	constexpr auto PUSHABLE_EDGE_SPEED = 0.8f;
+	constexpr auto PUSHABLE_EDGE_ANGLE_MAX = 60.0f;
+
 	constexpr auto GRAVITY_AIR = 8.0f;
 	constexpr auto GRAVITY_WATER = 4.0f;
 	constexpr auto GRAVITY_ACCEL = 0.5f;
+
 	constexpr auto PUSHABLE_FALL_RUMBLE_VELOCITY = 96.0f;
+
 	constexpr auto WATER_SURFACE_DISTANCE = CLICK(0.5f);
 
 	void InitializePushablesStatesMap()
@@ -35,6 +41,7 @@ namespace TEN::Entities::Generic
 
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Idle, &HandleIdleState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Moving, &HandleMovingState);
+			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::MovingEdge, &HandleMovingEdgeState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Falling, &HandleFallingState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Sinking, &HandleSinkingState);
 			PUSHABLES_STATES_MAP.emplace(PushablePhysicState::Floating, &HandleFloatingState);
@@ -59,7 +66,9 @@ namespace TEN::Entities::Generic
 				//If all good, then do the interaction.
 				if (IsHeld(In::Forward)) //Pushing
 				{
-					int pushAnimNumber = PushableAnimInfos[pushable.AnimationSystemIndex].PushAnimNumber;
+					int pushAnimNumber = (pushable.isOnEdge)? 
+													PushableAnimInfos[pushable.AnimationSystemIndex].EdgeAnimNumber :
+													PushableAnimInfos[pushable.AnimationSystemIndex].PushAnimNumber;
 					SetAnimation(LaraItem, pushAnimNumber);
 				}
 				else if (IsHeld(In::Back)) //Pulling
@@ -81,7 +90,8 @@ namespace TEN::Entities::Generic
 			}
 			else if (	LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB &&
 						LaraItem->Animation.ActiveState != LS_PUSHABLE_PULL &&
-						LaraItem->Animation.ActiveState != LS_PUSHABLE_PUSH)
+						LaraItem->Animation.ActiveState != LS_PUSHABLE_PUSH &&
+						LaraItem->Animation.ActiveState != LS_PUSHABLE_EDGE)
 			{
 				Lara.Context.InteractedItem = NO_ITEM;
 			}
@@ -154,7 +164,22 @@ namespace TEN::Entities::Generic
 		pushable.CurrentSoundState = PushableSoundState::None;
 
 		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
-		displaceBox -= isPlayerPulling ? (displaceDepth + BLOCK(1)) : (displaceDepth - BLOCK(1));
+		
+		if (isPlayerPulling)
+		{
+			displaceBox -= (displaceDepth + BLOCK(1));
+		}
+		else
+		{
+			if (pushable.isOnEdge)
+			{
+				displaceBox -= (displaceDepth - BLOCK(0.5f));
+			}
+			else
+			{
+				displaceBox -= (displaceDepth - BLOCK(1));
+			}
+		}
 
 		//Lara is doing the pushing / pulling animation
 		if (LaraItem->Animation.FrameNumber != g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
@@ -191,6 +216,14 @@ namespace TEN::Entities::Generic
 			if (abs(pushableItem.Pose.Position.x - newPosX) > BLOCK(0.75f))
 				return;
 
+
+			int travelledDistance = Vector3i::Distance(pushableItem.Pose.Position, pushable.StartPos.ToVector3i());
+			if (pushable.isOnEdge && travelledDistance >= BLOCK(0.5f))
+			{
+				pushable.BehaviourState = PushablePhysicState::MovingEdge;
+				return;
+			}
+			
 			// move only if the move direction is oriented to the action
 			// So pushing only moves pushable forward, and pulling only moves backwards
 
@@ -256,10 +289,7 @@ namespace TEN::Entities::Generic
 
 			pushable.StartPos = pushableItem.Pose.Position;
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
-
-			//4. Activate trigger
-			TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
-
+			
 			//5. Check environment
 			int floorHeight;
 			PushableEnvironemntState envState = CheckPushableEnvironment(itemNumber, floorHeight);
@@ -268,10 +298,14 @@ namespace TEN::Entities::Generic
 			{
 				case PushableEnvironemntState::Ground:
 				case PushableEnvironemntState::ShallowWater:
+					//Activate trigger
+					TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
+
 					// Check if it has to stop the pushing/pulling movement.
 					if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop ||
 						!IsHeld(In::Action) ||
-						!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling))
+						!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling) ||
+						pushable.isOnEdge)
 					{
 						LaraItem->Animation.TargetState = LS_IDLE;
 						pushable.BehaviourState = PushablePhysicState::Idle;
@@ -285,7 +319,7 @@ namespace TEN::Entities::Generic
 						pushable.CurrentSoundState = PushableSoundState::Stopping;
 
 					}
-					//Otherwise, continue the movement.
+					//Otherwise, Lara continues the pushing/pull animation movement.
 				break;
 
 				case PushableEnvironemntState::Air:
@@ -314,6 +348,104 @@ namespace TEN::Entities::Generic
 		}
 	}
 
+	void HandleMovingEdgeState(int itemNumber)
+	{
+		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		int floorHeight;
+		PushableEnvironemntState envState = CheckPushableEnvironment(itemNumber, floorHeight);
+		
+		// Calculate movement direction
+		Vector3 movementDirection = (pushableItem.Pose.Position - pushable.StartPos.ToVector3i()).ToVector3();
+		movementDirection.y = 0.0f;
+		movementDirection.Normalize();
+
+		// Define starting and goal positions
+		Vector3 initialPos = pushable.StartPos.ToVector3() + (movementDirection * 512);
+		Vector3 goalPos = pushable.StartPos.ToVector3() + (movementDirection * 1024);
+		goalPos.y = pushable.StartPos.y + 1024;
+
+		// Calculate current position based on interpolation
+		Vector3 currentPos = pushableItem.Pose.Position.ToVector3();
+
+		float& elapsedTime = pushableItem.Animation.Velocity.y;
+		float interpolationValue = std::clamp(elapsedTime / PUSHABLE_EDGE_SPEED, 0.0f, 1.0f);
+
+		currentPos = Vector3(
+			InterpolateCubic(initialPos.x, initialPos.x, goalPos.x, goalPos.x, interpolationValue),
+			InterpolateCubic(initialPos.y, initialPos.y, goalPos.y - 700, goalPos.y, interpolationValue),
+			InterpolateCubic(initialPos.z, initialPos.z, goalPos.z, goalPos.z, interpolationValue)
+		);
+
+		// Calculate the orientation angle based on the movement direction
+		float maxLeanAngle = 40.0f; // Maximum lean angle (60 degrees)
+		float leanAngle = ANGLE (maxLeanAngle * interpolationValue); // Gradually increase the lean angle
+
+		if (currentPos.y > floorHeight)
+		{
+			currentPos.y = floorHeight;
+			pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
+		}
+		else
+		{
+			// Apply the lean angle to the correct axis
+			if (movementDirection.x > 0.0f) //EAST
+			{
+				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, leanAngle);
+
+			}
+			else if (movementDirection.x < 0.0f) //WEST
+			{
+				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, -leanAngle);
+			}
+			else if (movementDirection.z > 0.0f) //NORTH
+			{
+				pushableItem.Pose.Orientation = EulerAngles(-leanAngle, pushableItem.Pose.Orientation.y, 0);
+			}
+			else //SOUTH
+			{
+				pushableItem.Pose.Orientation = EulerAngles(leanAngle, pushableItem.Pose.Orientation.y, 0);
+			}
+		}
+		
+		pushableItem.Pose.Position = currentPos;
+
+		pushableItem.Pose.Position = currentPos;
+		elapsedTime += DELTA_TIME;
+
+		//Check if it has ended.
+		if (interpolationValue >= 1.0f)
+		{
+			currentPos = GetNearestSectorCenter(pushableItem.Pose.Position).ToVector3();
+			switch (envState)
+			{
+				case PushableEnvironemntState::Air:
+					pushable.BehaviourState = PushablePhysicState::Falling;
+					pushableItem.Animation.Velocity.y = PUSHABLE_FALL_VELOCITY_MAX / 2;
+				break;
+				case PushableEnvironemntState::Ground:
+				case PushableEnvironemntState::ShallowWater:
+					pushable.BehaviourState = PushablePhysicState::Idle;
+					pushableItem.Pose.Position.y = floorHeight;
+					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
+					pushableItem.Animation.Velocity.y = 0.0f;
+				break;
+				case PushableEnvironemntState::DeepWater:
+					pushable.BehaviourState = PushablePhysicState::Sinking;
+					pushableItem.Animation.Velocity.y = PUSHABLE_WATER_VELOCITY_MAX / 2;
+				break;
+				case PushableEnvironemntState::Slope:
+					pushable.BehaviourState = PushablePhysicState::Idle;
+					pushableItem.Animation.Velocity.y = 0.0f;
+				break;
+				default:
+					TENLog("Error detecting the pushable environment state during the exit of MOVING EDGE state, with pushable ID: " + std::to_string(itemNumber), LogLevel::Warning, LogConfig::All, false);
+				break;
+			}			
+		}
+	}
+
 	void HandleFallingState(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
@@ -331,6 +463,9 @@ namespace TEN::Entities::Generic
 				pushableItem.Pose.Position.y += pushableItem.Animation.Velocity.y;
 				pushableItem.Animation.Velocity.y = std::min(	pushableItem.Animation.Velocity.y + pushable.Gravity,
 																PUSHABLE_FALL_VELOCITY_MAX);
+
+				//Fixing orientation slowly:
+				PushableFallingOrientation(pushableItem);
 			break;
 
 			case PushableEnvironemntState::Slope: // TODO, the Slope will use Ground routine while it gets its own version created.
@@ -338,6 +473,8 @@ namespace TEN::Entities::Generic
 				//The pushable is going to stop here, do the checks to conect it with another Stack.
 				FoundStack = SearchNearPushablesStack(itemNumber);
 				StackPushable(itemNumber, FoundStack);
+
+				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 
 				//Set Stopper Flag
 				if (pushable.StackLowerItem == NO_ITEM)
@@ -414,6 +551,9 @@ namespace TEN::Entities::Generic
 					pushableItem.Pose.Position.y += pushableItem.Animation.Velocity.y;
 					pushableItem.Animation.Velocity.y = std::min(pushableItem.Animation.Velocity.y + pushable.Gravity,
 						PUSHABLE_WATER_VELOCITY_MAX);
+
+					//Fixing orientation slowly:
+					PushableFallingOrientation(pushableItem);
 				}
 				else
 				{
@@ -423,6 +563,8 @@ namespace TEN::Entities::Generic
 					pushable.Gravity = GRAVITY_AIR;
 					pushableItem.Animation.Velocity.y = 0.0f;
 					ActivateClimbablePushableCollider(itemNumber);
+
+					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 
 					//Activate trigger
 					TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);

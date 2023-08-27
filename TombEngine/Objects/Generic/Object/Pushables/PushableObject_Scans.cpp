@@ -59,12 +59,34 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
+		pushable.isOnEdge = false;
+
 		auto collisionResult = GetCollision(targetPos.x, targetPos.y, targetPos.z, targetRoom);
 
 		// Check for wall.
 		if (collisionResult.Block->IsWall(targetPos.x, targetPos.z))
 			return false;
 		
+		// Check for gaps or steps.
+		int floorDifference = abs(collisionResult.Position.Floor - pushableItem.Pose.Position.y);
+		if (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE)
+		{
+			if (collisionResult.Position.Floor < pushableItem.Pose.Position.y)
+			{
+				//Is a step
+				return false;
+			}
+			else
+			{
+				//Is a gap
+				pushable.isOnEdge = true;
+				if (!pushable.CanFall || pushable.StackUpperItem != NO_ITEM)
+				{
+					return false;
+				}
+			}
+		}
+
 		// Check for floor slope.
 		if (collisionResult.Position.FloorSlope)
 			return false;
@@ -84,19 +106,6 @@ namespace TEN::Entities::Generic
 				return false;
 			}
 		}*/
-
-		// Check for gap or step. (Can it fall down?) (Only available for pushing).
-		int floorDifference = abs(collisionResult.Position.Floor - pushableItem.Pose.Position.y);
-		if (pushable.CanFall && pushable.StackUpperItem == NO_ITEM)
-		{
-			if ((collisionResult.Position.Floor < pushableItem.Pose.Position.y) && (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE))
-				return false;
-		}
-		else
-		{
-			if (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE)
-				return false;
-		}
 
 		// Is ceiling (square or diagonal) high enough?
 		int distanceToCeiling = abs(collisionResult.Position.Ceiling - collisionResult.Position.Floor);
@@ -348,7 +357,7 @@ namespace TEN::Entities::Generic
 		{
 			//Is in dry, is it on ground or on air?
 			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
-				abs(pushableItem.Pose.Position.y - floorHeight) >= CLICK(1))
+				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
 			{
 				result = PushableEnvironemntState::Air;
 			}

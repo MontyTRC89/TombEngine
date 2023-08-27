@@ -6,6 +6,7 @@ namespace TEN::Entities::Generic
 	{
 		Idle,
 		Moving,
+		MovingEdge,
 		Falling,
 		Sinking,
 		Floating,
@@ -21,6 +22,7 @@ namespace TEN::Entities::Generic
 
 	void HandleIdleState(int itemNumber);
 	void HandleMovingState(int itemNumber);
+	void HandleMovingEdgeState(int itemNumber);
 	void HandleFallingState(int itemNumber);
 	void HandleSinkingState(int itemNumber);
 	void HandleFloatingState(int itemNumber);

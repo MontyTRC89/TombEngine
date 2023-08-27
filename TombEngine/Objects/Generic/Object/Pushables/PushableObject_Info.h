@@ -41,6 +41,7 @@ namespace TEN::Entities::Generic
 		PushablePhysicState BehaviourState = PushablePhysicState::Idle;
 
 		int	  Height = 0;
+		bool isOnEdge = false;
 		float Gravity = 0.0f;
 		int WaterSurfaceHeight = 0;		//Used to spawn effects. (Like water ripples).
 		float FloatingForce = 0.0f;		// Oscillation strength while floating on water (recomended range: (0.0f - 2.0f]).
