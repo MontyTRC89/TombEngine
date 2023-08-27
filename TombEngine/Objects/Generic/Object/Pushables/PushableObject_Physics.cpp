@@ -115,7 +115,7 @@ namespace TEN::Entities::Generic
 				break;
 
 			case PushableEnvironmentState::GroundWater:
-
+			{
 				if (floorHeight != pushableItem.Pose.Position.y)
 				{
 					pushableItem.Pose.Position.y = floorHeight;
@@ -123,15 +123,19 @@ namespace TEN::Entities::Generic
 					VerticalPosAddition(itemNumber, heightdifference);
 				}
 
-				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
+				int waterheight = abs(floorHeight - pushable.WaterSurfaceHeight);
+				if (waterheight > GetPushableHeight(pushableItem))
 				{
-					pushable.BehaviourState = PushablePhysicState::Floating;
-					pushable.Gravity = 0.0f;
+					if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
+					{
+						pushable.BehaviourState = PushablePhysicState::Floating;
+						pushable.Gravity = 0.0f;
+					}
 				}
-				
+
 				// Effects: Spawn ripples.
 				DoPushableRipples(itemNumber);
-				
+			}
 			break;
 
 			case PushableEnvironmentState::Air:
@@ -774,16 +778,29 @@ namespace TEN::Entities::Generic
 
 			case PushableEnvironmentState::GroundWater:
 			{
-				pushableItem.Pose.Position.y = floorHeight;
-				int heightdifference = floorHeight - pushableItem.Pose.Position.y;
-				VerticalPosAddition(itemNumber, heightdifference);
-
-				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
+				//If shallow water, change to idle
+				if (pushable.WaterSurfaceHeight != NO_HEIGHT)
+				{
+					int waterheight = abs(floorHeight - pushable.WaterSurfaceHeight);
+					if (waterheight < GetPushableHeight(pushableItem))
+					{
+						pushableItem.Pose.Position.y = floorHeight;
+						pushable.BehaviourState = PushablePhysicState::Idle;
+						pushableItem.Animation.Velocity.y = 0.0f;
+						pushable.Gravity = GRAVITY_AIR;
+					}
+				}
+				else if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 				{
 					pushable.BehaviourState = PushablePhysicState::Floating;
 					pushableItem.Animation.Velocity.y = 0.0f;
 					pushable.Gravity = 0.0f;
 				}
+
+				//Otherwise, remain stuck to the floor.
+				pushableItem.Pose.Position.y = floorHeight;
+				int heightdifference = floorHeight - pushableItem.Pose.Position.y;
+				VerticalPosAddition(itemNumber, heightdifference);
 			}
 			break;
 
@@ -859,9 +876,20 @@ namespace TEN::Entities::Generic
 
 			case PushableEnvironmentState::GroundWater:
 			{
+				//If shallow water, change to idle
+				int waterheight = abs(floorHeight - pushable.WaterSurfaceHeight);
+				if (waterheight < GetPushableHeight(pushableItem))
+				{
+					pushable.BehaviourState = PushablePhysicState::Idle;
+					pushable.Gravity = GRAVITY_AIR;
+				}
+				else
+				{
+					pushable.BehaviourState = PushablePhysicState::UnderwaterIdle;
+					pushable.Gravity = GRAVITY_WATER;
+				}
 				pushableItem.Pose.Position.y = floorHeight;
-				int heightdifference = floorHeight - pushableItem.Pose.Position.y;
-				VerticalPosAddition(itemNumber, heightdifference);
+				pushableItem.Animation.Velocity.y = 0.0f;
 			}
 			break;
 

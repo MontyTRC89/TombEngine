@@ -60,7 +60,7 @@ namespace TEN::Entities::Generic
 
 		case PushableSoundType::Fall:
 			return GetPushableSfxData(material).LandSfx;
-
+		
 		default:
 			TENLog("Missing pushable sfx.", LogLevel::Error, LogConfig::All, true);
 			return 0;
@@ -85,6 +85,11 @@ namespace TEN::Entities::Generic
 		{
 			pushable.CurrentSoundState = PushableSoundState::None;
 			SoundEffect(GetPushableSfx(Fall, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
+		}
+		else if (pushable.CurrentSoundState == PushableSoundState::WaterRipples)
+		{
+			pushable.CurrentSoundState = PushableSoundState::None;
+			SoundEffect(SFX_TR4_LARA_WADE, &pushableItem.Pose, SoundEnvironment::Always);
 		}
 	}
 

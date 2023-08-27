@@ -13,6 +13,7 @@ using namespace TEN::Effects::Ripple;
 namespace TEN::Entities::Generic
 {
 	constexpr auto FRAMES_BETWEEN_RIPPLES = 8.0f;
+	constexpr auto FRAMES_BETWEEN_RIPPLES_SOUNDS = 30.0f;
 	constexpr auto FRAMES_BETWEEN_BUBBLES = 8.0f;
 
 	void DoPushableRipples(int itemNumber)
@@ -21,9 +22,13 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		//TODO: Enhace the effect to make the ripples increase their size through the time.
-		if (pushable.WaterSurfaceHeight != NO_HEIGHT && std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
+		if (pushable.WaterSurfaceHeight != NO_HEIGHT)
 		{
-			SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.WaterSurfaceHeight, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
+			if (std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
+				SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.WaterSurfaceHeight, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
+			
+			if (std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES_SOUNDS) <= 0.0f)
+				pushable.CurrentSoundState = PushableSoundState::WaterRipples;
 		}
 	}
 

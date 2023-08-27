@@ -10,7 +10,8 @@ namespace TEN::Entities::Generic
 		None,
 		Moving,
 		Stopping,
-		Falling
+		Falling,
+		WaterRipples
 	};
 
 	struct PushableSidesAttributes
