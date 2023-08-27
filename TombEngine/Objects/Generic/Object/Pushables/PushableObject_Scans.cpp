@@ -351,16 +351,7 @@ namespace TEN::Entities::Generic
 				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
 			{
 				// Floating
-				// Is it deep or shallow water?
-				int distanceToSurface = abs(waterHeight - floorHeight);
-				if (distanceToSurface > (GetPushableHeight(pushableItem) + 128))
-				{
-					result = PushableEnvironmentState::DeepWater;
-				}
-				else
-				{
-					result = PushableEnvironmentState::ShallowWater;
-				}
+				result = PushableEnvironmentState::Water;
 			}
 			else
 			{

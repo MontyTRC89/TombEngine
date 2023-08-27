@@ -9,8 +9,7 @@ namespace TEN::Entities::Generic
 		Air,
 		Ground,
 		Slope,
-		ShallowWater,
-		DeepWater,
+		Water,
 		GroundWater
 	};
 

@@ -156,8 +156,7 @@ namespace TEN::Entities::Generic
 
 			break;
 
-			case PushableEnvironmentState::ShallowWater:
-			case PushableEnvironmentState::DeepWater:
+			case PushableEnvironmentState::Water:
 
 				DeactivateClimbablePushableCollider(itemNumber);
 				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
@@ -370,8 +369,7 @@ namespace TEN::Entities::Generic
 					//Then proceed to the sliding state.
 					break;
 
-				case PushableEnvironmentState::ShallowWater:
-				case PushableEnvironmentState::DeepWater:
+				case PushableEnvironmentState::Water:
 					// It's still in water, but there is not ground, Lara can't keep pushing nor pulling. And pushable starts to sink.
 					LaraItem->Animation.TargetState = LS_IDLE;
 					Lara.Context.InteractedItem = NO_ITEM;
@@ -473,8 +471,8 @@ namespace TEN::Entities::Generic
 					pushableItem.Animation.Velocity.y = 0.0f;
 				break;
 
-				case PushableEnvironmentState::ShallowWater:
-				case PushableEnvironmentState::DeepWater:
+				case PushableEnvironmentState::Water:
+
 					pushable.BehaviourState = PushablePhysicState::Sinking;
 					pushableItem.Animation.Velocity.y = PUSHABLE_WATER_VELOCITY_MAX / 2;
 					
@@ -554,8 +552,8 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = 0;
 			break;
 
-			case PushableEnvironmentState::ShallowWater:
-			case PushableEnvironmentState::DeepWater:
+			case PushableEnvironmentState::Water:
+
 				pushable.BehaviourState = PushablePhysicState::Sinking;
 
 				// Effect: Water splash.
@@ -592,9 +590,8 @@ namespace TEN::Entities::Generic
 
 				break;
 
-			case PushableEnvironmentState::ShallowWater:
-			case PushableEnvironmentState::DeepWater:
-				
+			case PushableEnvironmentState::Water:
+			{
 				//Manage gravity force
 				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 				{
@@ -612,23 +609,26 @@ namespace TEN::Entities::Generic
 
 				//Move Object
 				pushableItem.Pose.Position.y += pushableItem.Animation.Velocity.y;
-				pushableItem.Animation.Velocity.y = std::min(	pushableItem.Animation.Velocity.y + pushable.Gravity,
-																	PUSHABLE_WATER_VELOCITY_MAX);
+				pushableItem.Animation.Velocity.y = std::min(pushableItem.Animation.Velocity.y + pushable.Gravity,
+					PUSHABLE_WATER_VELOCITY_MAX);
 				//Fixing orientation slowly:
 				PushableFallingOrientation(pushableItem);
 
-				if (envState == PushableEnvironmentState::ShallowWater)
+				int waterheight = abs(floorHeight - pushable.WaterSurfaceHeight);
+				if (waterheight > GetPushableHeight(pushableItem))
 				{
+					//Shallow Water
 					// Effects: Spawn ripples.
 					DoPushableRipples(itemNumber);
 				}
 				else
 				{
+					//Deep Water
 					// Effects: Spawn bubbles.
 					DoPushableBubbles(itemNumber);
 				}
-
-				break;
+			}
+			break;
 
 			case PushableEnvironmentState::GroundWater:
 				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
@@ -650,7 +650,7 @@ namespace TEN::Entities::Generic
 					//Activate trigger
 					TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
 				}
-				break;
+			break;
 
 			default:
 				TENLog("Error detecting the pushable environment state during SINKING with pushable ID: " + std::to_string(itemNumber), LogLevel::Warning, LogConfig::All, false);
@@ -685,19 +685,7 @@ namespace TEN::Entities::Generic
 
 			break;
 
-			case PushableEnvironmentState::ShallowWater:
-				
-				TENLog("Warning, detected unexpected shallowWater routine during FLOATING state, pushable ID: " + std::to_string(itemNumber), LogLevel::Warning, LogConfig::All, false);
-				
-				pushableItem.Pose.Position.y = floorHeight;
-				pushable.BehaviourState = PushablePhysicState::Idle;
-				pushable.Gravity = GRAVITY_AIR;
-				pushableItem.Animation.Velocity.y = 0.0f;
-				ActivateClimbablePushableCollider(itemNumber);
-
-			break;
-
-			case PushableEnvironmentState::DeepWater:
+			case PushableEnvironmentState::Water:
 			case PushableEnvironmentState::GroundWater:
 
 				//Calculate goal height
@@ -804,8 +792,7 @@ namespace TEN::Entities::Generic
 			}
 			break;
 
-			case PushableEnvironmentState::ShallowWater:
-			case PushableEnvironmentState::DeepWater:
+			case PushableEnvironmentState::Water:
 				
 				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 				{
@@ -861,8 +848,7 @@ namespace TEN::Entities::Generic
 				
 			break;
 
-			case PushableEnvironmentState::ShallowWater:
-			case PushableEnvironmentState::DeepWater:
+			case PushableEnvironmentState::Water:
 
 				// Effects: Do water ondulation effect.
 				if (!pushable.UsesRoomCollision)
