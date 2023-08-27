@@ -55,6 +55,7 @@ struct CollisionPosition
 	bool HasFlippedDiagonalSplit() { return (HasDiagonalSplit() && (SplitAngle != (45.0f * RADIAN))); }
 };
 
+// Deprecated. Use PointCollisionData.
 struct CollisionResult
 {
 	Vector3i Coordinates;
