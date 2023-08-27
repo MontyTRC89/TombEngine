@@ -80,8 +80,8 @@ namespace TEN::Collision
 			return *FloorHeight;
 
 		// Set floor height.
-		auto roomVector = RoomVector(GetSector().Room, Position.y);
-		FloorHeight = Floordata::GetFloorHeight(roomVector, Position.x, Position.z).value_or(NO_HEIGHT);
+		auto location = RoomVector(GetSector().Room, Position.y);
+		FloorHeight = Floordata::GetFloorHeight(location, Position.x, Position.z).value_or(NO_HEIGHT);
 		
 		return *FloorHeight;
 	}
@@ -92,8 +92,8 @@ namespace TEN::Collision
 			return *CeilingHeight;
 
 		// Set ceiling height.
-		auto roomVector = RoomVector(GetSector().Room, Position.y);
-		CeilingHeight = Floordata::GetCeilingHeight(roomVector, Position.x, Position.z).value_or(NO_HEIGHT);
+		auto location = RoomVector(GetSector().Room, Position.y);
+		CeilingHeight = Floordata::GetCeilingHeight(location, Position.x, Position.z).value_or(NO_HEIGHT);
 		
 		return *CeilingHeight;
 	}
@@ -277,7 +277,8 @@ namespace TEN::Collision
 			break;
 		}
 
-		return Vector3::Transform(isFloor ? -Vector3::UnitY : Vector3::UnitY, orient.ToRotationMatrix());
+		int sign = isFloor ? -1 : 1;
+		return Vector3::Transform(Vector3::UnitY * sign, orient.ToRotationMatrix());
 	}
 
 	static int GetProbeRoomNumber(const Vector3i& pos, const RoomVector& location, const Vector3i& probePos)
