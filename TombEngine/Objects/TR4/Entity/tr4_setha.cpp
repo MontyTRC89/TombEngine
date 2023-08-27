@@ -650,7 +650,6 @@ namespace TEN::Entities::TR4
 		fx.Pose.Orientation.y = pose.Orientation.y;
 		fx.Pose.Orientation.z = 0;
 		fx.RoomNumber = roomNumber;
-		fx.ObjectNumber = ID_ENERGY_BUBBLES;
 		fx.Animation.Velocity.z = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
 		fx.Animation.FrameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + flags;
 		fxInfo.Counter = (GetRandomControl() * 2) - ANGLE(180.0f); // TODO: This isn't an angle. Run tests on what it actually does.

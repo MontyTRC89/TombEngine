@@ -139,7 +139,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void TriggerRiseEffect(/*const */ItemInfo& item)
+	void TriggerRiseEffect(const ItemInfo& item)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber, ID_BODY_PART, item.Pose);
 		if (fxNumber == NO_ITEM)
@@ -182,10 +182,14 @@ namespace TEN::Entities::TR4
 		spark->flags = 26;
 		spark->rotAng = GetRandomControl() & 0xFFF;
 
-			if (Random::TestProbability(1 / 2.0f))
-				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
-			else
-				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+		if (Random::TestProbability(1 / 2.0f))
+		{
+			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
+		}
+		else
+		{
+			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+		}
 
 		spark->gravity = -4 - (GetRandomControl() & 3);
 		spark->scalar = 3;

@@ -80,20 +80,18 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (!(GetRandomControl() & 0x1F))
 		{
-			int fxNumber = CreateNewEffect(item->RoomNumber, ID_ENERGY_BUBBLES, Pose(pos));
+			int fxNumber = CreateNewEffect(item->RoomNumber, ID_BODY_PART, Pose(pos));
 			if (fxNumber != NO_ITEM)
 			{
 				auto& fx = g_Level.Items[fxNumber];
 				auto& fxInfo = GetFXInfo(fx);
 
-				fx.Pose.Position = pos;
 				fx.RoomNumber = item->RoomNumber;
 				fx.Pose.Orientation.z = 0;
 				fx.Pose.Orientation.x = 0;
 				fx.Pose.Orientation.y = 2 * GetRandomControl();
 				fx.Animation.Velocity.z = 1;
 				fx.Animation.Velocity.y = 0;
-				fx.ObjectNumber = ID_BODY_PART;
 				fx.Model.Color = Vector4::One;
 				fx.Animation.FrameNumber = Objects[ID_BUBBLES].meshIndex + (GetRandomControl() & 7);
 				fxInfo.Flag2 = 9729;

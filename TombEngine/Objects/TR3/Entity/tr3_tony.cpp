@@ -91,10 +91,8 @@ namespace TEN::Entities::Creatures::TR3
 		auto& fx = g_Level.Items[fxNumber];
 		auto& fxInfo = GetFXInfo(fx);
 
-		fx.Pose.Position = flame.Position;
 		fx.Animation.Velocity.y = flame.VerticalVelocity;
 		fx.Pose.Orientation = EulerAngles(0, flame.yRot, 0);
-		fx.ObjectNumber = ID_TONY_BOSS_FLAME;
 		fxInfo.Flag1 = (short)flame.Type;
 		fx.Animation.Velocity.z = flame.speed;
 		fx.Model.Color = Vector4::Zero;

@@ -168,17 +168,14 @@ void ControlNatlaGun(short fxNumber)
 
 short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	int fxNumber = CreateNewEffect(roomNumber, ID_PROJ_SHARD, Pose(x, y, z));
+	int fxNumber = CreateNewEffect(roomNumber, ID_PROJ_SHARD, Pose(x, y, z, 0, yRot, 0));
 	if (fxNumber != NO_ITEM)
 	{
 		auto& fx = g_Level.Items[fxNumber];
 
-		fx.Pose.Position = Vector3i(x, y, z);
-		fx.Pose.Orientation = EulerAngles(0, yRot, 0);
 		fx.RoomNumber = roomNumber;
 		fx.Animation.Velocity.z = velocity;
 		fx.Animation.FrameNumber = 0;
-		fx.ObjectNumber = ID_PROJ_SHARD;
 		fx.Model.Color = Vector4::One;
 
 		ShootAtLara(fx);
@@ -189,17 +186,14 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 
 short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
-	int fxNumber = CreateNewEffect(roomNumber, ID_PROJ_BOMB, Pose(x, y, z));
+	int fxNumber = CreateNewEffect(roomNumber, ID_PROJ_BOMB, Pose(x, y, z, 0, yRot, 0));
 	if (fxNumber != NO_ITEM)
 	{
 		auto& fx = g_Level.Items[fxNumber];
 
-		fx.Pose.Position = Vector3i(x, y, z);
-		fx.Pose.Orientation = EulerAngles(0, yRot, 0);
 		fx.RoomNumber = roomNumber;
 		fx.Animation.Velocity.z = velocity;
 		fx.Animation.FrameNumber = 0;
-		fx.ObjectNumber = ID_PROJ_BOMB;
 		fx.Model.Color = Vector4::One;
 
 		ShootAtLara(fx);

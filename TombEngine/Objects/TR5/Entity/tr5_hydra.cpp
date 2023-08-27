@@ -57,7 +57,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	static void HydraBubblesAttack(const Pose& pose, short roomNumber, int count)
 	{
-		int fxNumber = CreateNewEffect(roomNumber, ID_ENERGY_BUBBLES, pose);
+		int fxNumber = CreateNewEffect(roomNumber, ID_BUBBLES, pose);
 		if (fxNumber == NO_ITEM)
 			return;
 
@@ -71,10 +71,9 @@ namespace TEN::Entities::Creatures::TR5
 		fx.Pose.Orientation.y = pose.Orientation.y;
 		fx.Pose.Orientation.z = 0;
 		fx.RoomNumber = roomNumber;
-		fx.ObjectNumber = ID_BUBBLES;
 		fx.Animation.Velocity.z = (GetRandomControl() & 0x1F) + 64;
 		fx.Animation.FrameNumber = Objects[ID_BUBBLES].meshIndex + 8;
-		fxInfo.Counter = 16 * count + 15;
+		fxInfo.Counter = (count * 16) + 15;
 		fxInfo.Flag1 = 0;
 	}
 

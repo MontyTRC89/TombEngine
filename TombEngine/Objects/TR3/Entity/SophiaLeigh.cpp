@@ -245,7 +245,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const CreatureBiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
-		int fxNumber = CreateNewEffect(item.RoomNumber, ID_PROJ_SHARD, item.Pose);
+		int fxNumber = CreateNewEffect(item.RoomNumber, ID_ENERGY_BUBBLES, item.Pose);
 		if (fxNumber == NO_ITEM)
 			return;
 
@@ -268,7 +268,6 @@ namespace TEN::Entities::Creatures::TR3
 		fx.Pose.Orientation.z = 0;
 		fx.RoomNumber = item.RoomNumber;
 		fx.Animation.Velocity.z = Random::GenerateInt(120, 160);
-		fx.ObjectNumber = ID_ENERGY_BUBBLES;
 		fx.Animation.FrameNumber = Objects[fx.ObjectNumber].meshIndex + (boltType - 1);
 		fxInfo.Counter = 0;
 		fxInfo.Flag1 = boltType;

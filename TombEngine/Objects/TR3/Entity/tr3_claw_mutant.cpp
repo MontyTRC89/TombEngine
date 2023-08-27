@@ -148,7 +148,7 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		const auto& creature = *GetCreatureInfo(&item);
 
-		int plasmaBall = CreateNewEffect(item.RoomNumber, ID_PROJ_BOMB, item.Pose);
+		int plasmaBall = CreateNewEffect(item.RoomNumber, ID_ENERGY_BUBBLES, item.Pose);
 		if (plasmaBall == NO_ITEM)
 			return;
 
@@ -169,9 +169,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto orient = Geometry::GetOrientToPoint(jointPos.ToVector3(), enemyPos.ToVector3());
 
 		fx.Pose.Position = jointPos;
-		fx.Pose.Orientation.x = orient.x;
-		fx.Pose.Orientation.y = orient.y;
-		fx.ObjectNumber = ID_ENERGY_BUBBLES;
+		fx.Pose.Orientation = orient;
 		fx.Model.Color = Vector4::Zero;
 		fx.Animation.Velocity.z = CLAW_MUTANT_PLASMA_VELOCITY;
 		fxInfo.Flag2 = CLAW_MUTANT_PLASMA_ATTACK_DAMAGE;
