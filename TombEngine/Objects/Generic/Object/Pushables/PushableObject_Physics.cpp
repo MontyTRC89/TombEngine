@@ -425,15 +425,28 @@ namespace TEN::Entities::Generic
 					pushableItem.Animation.Velocity.y = PUSHABLE_FALL_VELOCITY_MAX / 2;
 				break;
 				case PushableEnvironemntState::Ground:
-				case PushableEnvironemntState::ShallowWater:
 					pushable.BehaviourState = PushablePhysicState::Idle;
 					pushableItem.Pose.Position.y = floorHeight;
 					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 					pushableItem.Animation.Velocity.y = 0.0f;
 				break;
+
+				case PushableEnvironemntState::ShallowWater:
+					pushable.BehaviourState = PushablePhysicState::Idle;
+					pushableItem.Pose.Position.y = floorHeight;
+					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
+					pushableItem.Animation.Velocity.y = 0.0f;
+				
+					// Effect: Water splash.
+					DoPushableSplash(itemNumber);
+				break;
+
 				case PushableEnvironemntState::DeepWater:
 					pushable.BehaviourState = PushablePhysicState::Sinking;
 					pushableItem.Animation.Velocity.y = PUSHABLE_WATER_VELOCITY_MAX / 2;
+					
+					// Effect: Water splash.
+					DoPushableSplash(itemNumber);
 				break;
 				case PushableEnvironemntState::Slope:
 					pushable.BehaviourState = PushablePhysicState::Idle;
@@ -726,7 +739,6 @@ namespace TEN::Entities::Generic
 			case PushableEnvironemntState::Ground:
 			case PushableEnvironemntState::Slope:
 			case PushableEnvironemntState::Air:
-			case PushableEnvironemntState::ShallowWater:
 				//Set Stopper Flag
 				if (pushable.StackLowerItem == NO_ITEM)
 					SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
@@ -736,7 +748,17 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = 0.0f;
 				pushable.Gravity = GRAVITY_AIR;	
 			break;
-			
+
+			case PushableEnvironemntState::ShallowWater:
+				if (abs(floorHeight - pushableItem.Pose.Position.y) < CLICK(0.25f))
+				{
+					//As the diffence is not very big, just teleport it.
+					int heightdifference = floorHeight - pushableItem.Pose.Position.y;
+					pushableItem.Pose.Position.y += heightdifference;
+					VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.
+				}
+			break;
+
 			case PushableEnvironemntState::DeepWater:
 				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 				{
@@ -748,6 +770,14 @@ namespace TEN::Entities::Generic
 					pushable.BehaviourState = PushablePhysicState::Floating;
 					pushableItem.Animation.Velocity.y = 0.0f;
 					pushable.Gravity = 0.0f;
+				}
+
+				if (abs (floorHeight - pushableItem.Pose.Position.y) < CLICK(0.25f))
+				{
+					//As the diffence is not very big, just teleport it.
+					int heightdifference = floorHeight - pushableItem.Pose.Position.y;
+					pushableItem.Pose.Position.y += heightdifference;
+					VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.
 				}
 
 			break;
@@ -771,7 +801,6 @@ namespace TEN::Entities::Generic
 			case PushableEnvironemntState::Ground:
 			case PushableEnvironemntState::Slope:
 			case PushableEnvironemntState::Air:
-			case PushableEnvironemntState::ShallowWater:
 				pushable.BehaviourState = PushablePhysicState::Falling;
 				pushableItem.Animation.Velocity.y = 0.0f;
 				pushable.Gravity = GRAVITY_AIR;
@@ -780,13 +809,30 @@ namespace TEN::Entities::Generic
 				if (!pushable.UsesRoomCollision)
 					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 			break;
-		
+
+			case PushableEnvironemntState::ShallowWater:
 			case PushableEnvironemntState::DeepWater:
+
 				// Effects: Do water ondulation effect.
+				if (abs(pushable.WaterSurfaceHeight - floorHeight) >= GetPushableHeight(pushableItem) + WATER_SURFACE_DISTANCE)
+				{
 					if (!pushable.UsesRoomCollision)
 						FloatingItem(pushableItem, pushable.FloatingForce);
 					else
 						FloatingBridge(pushableItem, pushable.FloatingForce);
+				}
+				else
+				{
+					PushableFallingOrientation(pushableItem);
+
+					if (abs(floorHeight - pushableItem.Pose.Position.y) < CLICK(0.25f))
+					{
+						//As the diffence is not very big, just teleport it.
+						int heightdifference = floorHeight - pushableItem.Pose.Position.y;
+						pushableItem.Pose.Position.y += heightdifference;
+						VerticalPosAddition(itemNumber, heightdifference); //WIP: function to elevate the stack.z
+					}
+				}
 
 				// Effects: Spawn ripples.
 				DoPushableRipples(itemNumber);
