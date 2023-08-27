@@ -27,8 +27,8 @@
 		*this = GetFrame(objectID, animNumber, frameNumber)->BoundingBox;
 	}
 
-	// TODO: This shouldn't be a method. Make it a function in animation.cpp.
-	GameBoundingBox::GameBoundingBox(ItemInfo* item)
+	// TODO: Use reference, not pointer.
+	GameBoundingBox::GameBoundingBox(const ItemInfo* item)
 	{
 		auto frameData = GetFrameInterpData(*item);
 		if (frameData.Alpha == 0.0f)

@@ -103,7 +103,12 @@ Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
 	return Save::EulerAngles(eulers.x, eulers.y, eulers.z);
 }
 
-Save::Vector2 FromVector2(const Vector2i& vec)
+Save::Vector2 FromVector2(const Vector2& vec)
+{
+	return Save::Vector2(vec.x, vec.y);
+}
+
+Save::Vector2 FromVector2i(const Vector2i& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
@@ -113,7 +118,7 @@ Save::Vector3 FromVector3(const Vector3& vec)
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(const Vector3i& vec)
+Save::Vector3 FromVector3i(const Vector3i& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
@@ -125,17 +130,22 @@ Save::Vector4 FromVector4(const Vector4& vec)
 
 EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
 {
-	return EulerAngles(eulers->x(), eulers->y(), eulers->z());
+	return EulerAngles((short)round(eulers->x()), (short)round(eulers->y()), (short)round(eulers->z()));
+}
+
+Vector2 ToVector2(const Save::Vector2* vec)
+{
+	return Vector2(vec->x(), vec->y());
 }
 
 Vector2i ToVector2i(const Save::Vector2* vec)
 {
-	return Vector2i(vec->x(), vec->y());
+	return Vector2i((int)round(vec->x()), (int)round(vec->y()));
 }
 
 Vector3i ToVector3i(const Save::Vector3* vec)
 {
-	return Vector3i(vec->x(), vec->y(), vec->z());
+	return Vector3i((int)round(vec->x()), (int)round(vec->y()), (int)round(vec->z()));
 }
 
 Vector3 ToVector3(const Save::Vector3* vec)
@@ -407,7 +417,7 @@ bool SaveGame::Save(int slot)
 	context.add_target_orient(&FromEulerAngles(Lara.Context.TargetOrientation));
 	context.add_vehicle_item_number(Lara.Context.Vehicle);
 	context.add_water_current_active(Lara.Context.WaterCurrentActive);
-	context.add_water_current_pull(&FromVector3(Lara.Context.WaterCurrentPull));
+	context.add_water_current_pull(&FromVector3i(Lara.Context.WaterCurrentPull));
 	context.add_water_surface_dist(Lara.Context.WaterSurfaceDist);
 	auto contextOffset = context.Finish();
 
@@ -451,7 +461,7 @@ bool SaveGame::Save(int slot)
 		CarriedWeaponInfo* info = &Lara.Weapons[i];
 		
 		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
-		for (int j = 0; j < (int)WeaponAmmoType::NumAmmoTypes; j++)
+		for (int j = 0; j < (int)WeaponAmmoType::Count; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
 			ammo.add_count(info->Ammo[j].GetCount());
@@ -1056,27 +1066,27 @@ bool SaveGame::Save(int slot)
 
 		std::vector<const Save::Vector3*> segments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			segments.push_back(&FromVector3(rope->segment[i]));
+			segments.push_back(&FromVector3i(rope->segment[i]));
 		auto segmentsOffset = fbb.CreateVector(segments);
 
 		std::vector<const Save::Vector3*> velocities;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			velocities.push_back(&FromVector3(rope->velocity[i]));
+			velocities.push_back(&FromVector3i(rope->velocity[i]));
 		auto velocitiesOffset = fbb.CreateVector(velocities);
 
 		std::vector<const Save::Vector3*> normalisedSegments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			normalisedSegments.push_back(&FromVector3(rope->normalisedSegment[i]));
+			normalisedSegments.push_back(&FromVector3i(rope->normalisedSegment[i]));
 		auto normalisedSegmentsOffset = fbb.CreateVector(normalisedSegments);
 
 		std::vector<const Save::Vector3*> meshSegments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			meshSegments.push_back(&FromVector3(rope->meshSegment[i]));
+			meshSegments.push_back(&FromVector3i(rope->meshSegment[i]));
 		auto meshSegmentsOffset = fbb.CreateVector(meshSegments);
 
 		std::vector<const Save::Vector3*> coords;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			coords.push_back(&FromVector3(rope->coords[i]));
+			coords.push_back(&FromVector3i(rope->coords[i]));
 		auto coordsOffset = fbb.CreateVector(coords);
 
 		Save::RopeBuilder ropeInfo{ fbb };
@@ -1087,21 +1097,21 @@ bool SaveGame::Save(int slot)
 		ropeInfo.add_normalised_segments(normalisedSegmentsOffset);
 		ropeInfo.add_coords(coordsOffset);
 		ropeInfo.add_coiled(rope->coiled);
-		ropeInfo.add_position(&FromVector3(rope->position));
+		ropeInfo.add_position(&FromVector3i(rope->position));
 		ropeInfo.add_segment_length(rope->segmentLength);
 
 		ropeOffset = ropeInfo.Finish();
 
 		Save::PendulumBuilder pendulumInfo{ fbb };
 		pendulumInfo.add_node(CurrentPendulum.node);
-		pendulumInfo.add_position(&FromVector3(CurrentPendulum.position));
-		pendulumInfo.add_velocity(&FromVector3(CurrentPendulum.velocity));
+		pendulumInfo.add_position(&FromVector3i(CurrentPendulum.position));
+		pendulumInfo.add_velocity(&FromVector3i(CurrentPendulum.velocity));
 		pendulumOffset = pendulumInfo.Finish();
 
 		Save::PendulumBuilder alternatePendulumInfo{ fbb };
 		alternatePendulumInfo.add_node(AlternatePendulum.node);
-		alternatePendulumInfo.add_position(&FromVector3(AlternatePendulum.position));
-		alternatePendulumInfo.add_velocity(&FromVector3(AlternatePendulum.velocity));
+		alternatePendulumInfo.add_position(&FromVector3i(AlternatePendulum.position));
+		alternatePendulumInfo.add_velocity(&FromVector3i(AlternatePendulum.velocity));
 		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
@@ -1176,33 +1186,32 @@ bool SaveGame::Save(int slot)
 			switch (SavedVarType(s.index()))
 			{
 			case SavedVarType::Vec2:
-			{
-				SaveVec(SavedVarType::Vec2, s, Save::vec2TableBuilder, Save::VarUnion::vec2, Save::Vector2, FromVector2);
-			}
-			break;
-
+				{
+					SaveVec(SavedVarType::Vec2, s, Save::vec2TableBuilder, Save::VarUnion::vec2, Save::Vector2, FromVector2);
+					break;
+				}
+				
 			case SavedVarType::Vec3:
-			{
-				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
-			}
-			break;
+				{
+					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
+					break;
+				}
 
 			case SavedVarType::Rotation:
-			{
-				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation, Save::Vector3, FromVector3);
-			}
-			break;
+				{
+					SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation, Save::Vector3, FromVector3);
+					break;
+				}
 
 			case SavedVarType::Color:
-			{
-				Save::colorTableBuilder ctb{ fbb };
-				ctb.add_color(std::get<(int)SavedVarType::Color>(s));
-				auto offset = ctb.Finish();
+				{
+					Save::colorTableBuilder ctb{ fbb };
+					ctb.add_color(std::get<(int)SavedVarType::Color>(s));
+					auto offset = ctb.Finish();
 
-				putDataInVec(Save::VarUnion::color, offset);
-			}
-			break;
-
+					putDataInVec(Save::VarUnion::color, offset);
+					break;
+				}
 			}
 		}
 	}
@@ -2056,54 +2065,69 @@ bool SaveGame::Load(int slot)
 	{
 		for (const auto& var : *(unionVec->members()))
 		{
-			if (var->u_type() == Save::VarUnion::num)
+			auto varType = var->u_type();
+			switch (varType)
 			{
+			case Save::VarUnion::num:
 				loadedVars.push_back(var->u_as_num()->scalar());
-			}
-			else if (var->u_type() == Save::VarUnion::boolean)
-			{
-				loadedVars.push_back(var->u_as_boolean()->scalar());
-			}
-			else if (var->u_type() == Save::VarUnion::str)
-			{
-				loadedVars.push_back(var->u_as_str()->str()->str());
-			}
-			else if (var->u_type() == Save::VarUnion::tab)
-			{
-				auto tab = var->u_as_tab()->keys_vals();
-				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
+				break;
 
-				for (const auto& pair : *tab)
-					std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
-			}
-			else if (var->u_type() == Save::VarUnion::vec2)
-			{
-				auto stored = var->u_as_vec2()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec2>(ToVector2i(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::vec3)
-			{
-				auto stored = var->u_as_vec3()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::rotation)
-			{
-				auto stored = var->u_as_rotation()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::color)
-			{
+			case Save::VarUnion::boolean:
+				loadedVars.push_back(var->u_as_boolean()->scalar());
+				break;
+				
+			case Save::VarUnion::str:
+				loadedVars.push_back(var->u_as_str()->str()->str());
+				break;
+
+			case Save::VarUnion::tab:
+				{
+					auto tab = var->u_as_tab()->keys_vals();
+					auto& loadedTab = loadedVars.emplace_back(IndexTable{});
+
+					for (const auto& pair : *tab)
+						std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
+
+					break;
+				}
+				
+			case Save::VarUnion::vec2:
+				{
+					auto stored = var->u_as_vec2()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Vec2>(ToVector2(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
+			case Save::VarUnion::vec3:
+				{
+					auto stored = var->u_as_vec3()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
+			case Save::VarUnion::rotation:
+				{
+					auto stored = var->u_as_rotation()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
+			case Save::VarUnion::color:
 				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
-			}
-			else if (var->u_type() == Save::VarUnion::funcName)
-			{
+				break;
+	
+			case Save::VarUnion::funcName:
 				loadedVars.push_back(FuncName{var->u_as_funcName()->str()->str()});
+				break;
+
+			default:
+				break;
 			}
 		}
 	}

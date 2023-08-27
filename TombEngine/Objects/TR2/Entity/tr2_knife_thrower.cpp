@@ -97,6 +97,9 @@ namespace TEN::Entities::Creatures::TR2
 
 	void KnifeThrowerControl(short itemNumber)
 	{
+		if (!CreatureActive(itemNumber))
+			return;
+
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 

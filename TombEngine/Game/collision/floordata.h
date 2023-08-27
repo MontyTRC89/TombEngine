@@ -184,7 +184,7 @@ namespace TEN::Collision::Floordata
 	void AddBridge(int itemNumber, int x = 0, int z = 0);
 	void RemoveBridge(int itemNumber, int x = 0, int z = 0);
 
-	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom);
+	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool useBottomHeight);
 	int				   GetBridgeBorder(int itemNumber, bool bottom);
 	void			   UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
 
