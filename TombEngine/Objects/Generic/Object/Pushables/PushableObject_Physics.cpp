@@ -389,23 +389,26 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			// Apply the lean angle to the correct axis
-			if (movementDirection.x > 0.0f) //EAST
-			{
-				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, leanAngle);
+			// Determine the quadrants
+			int pushableQuadrant = GetQuadrant(pushableItem.Pose.Orientation.y);
+			int movementQuadrant = GetQuadrant(FROM_RAD(atan2(movementDirection.z, movementDirection.x)));
+			
+			movementQuadrant = (movementQuadrant + pushableQuadrant) % 4;
 
-			}
-			else if (movementDirection.x < 0.0f) //WEST
+			switch (movementQuadrant)
 			{
-				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, -leanAngle);
-			}
-			else if (movementDirection.z > 0.0f) //NORTH
-			{
-				pushableItem.Pose.Orientation = EulerAngles(-leanAngle, pushableItem.Pose.Orientation.y, 0);
-			}
-			else //SOUTH
-			{
-				pushableItem.Pose.Orientation = EulerAngles(leanAngle, pushableItem.Pose.Orientation.y, 0);
+				case 0: //EAST
+					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, leanAngle);
+					break;
+				case 1: //NORTH
+					pushableItem.Pose.Orientation = EulerAngles(-leanAngle, pushableItem.Pose.Orientation.y, 0);
+					break;
+				case 2: //WEST
+					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, -leanAngle);
+					break;
+				case 3: //SOUTH
+					pushableItem.Pose.Orientation = EulerAngles(leanAngle, pushableItem.Pose.Orientation.y, 0);
+					break;
 			}
 		}
 		
