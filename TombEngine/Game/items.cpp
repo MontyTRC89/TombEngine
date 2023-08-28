@@ -874,13 +874,14 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 
 Vector3i GetNearestSectorCenter(const Vector3i& pos)
 {
-	constexpr auto BIT_MASK_LOWER_8 = 0xFFFFFE00; // 0-8
-	constexpr auto BIT_MASK_9 = 0x200;	  // 9
+	constexpr int SECTOR_SIZE = 1024;
 
-	// Return collision block center.
-	// TODO: No bitwise operations.
-	return Vector3i(
-		pos.x & BIT_MASK_LOWER_8 | BIT_MASK_9,
-		pos.y,
-		pos.z & BIT_MASK_LOWER_8 | BIT_MASK_9);
+	// Calculate the sector-aligned coordinates.
+	int x = (pos.x / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+	int z = (pos.z / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+
+	// Keep the y-coordinate unchanged.
+	int y = pos.y;
+
+	return Vector3i(x, y, z);
 }
