@@ -380,7 +380,8 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::AddSpriteIn2DSpace(RendererSprite* sprite, const Vector2& pos2D, short orient2D,
-										 const Vector4& color, const Vector2& size, RenderView& renderView)
+										const Vector3& color, const Vector2& size, float opacity, int priority,
+										RenderView& renderView)
 	{
 		RendererSprite2DToDraw spriteToDraw;
 
@@ -389,12 +390,19 @@ namespace TEN::Renderer
 		spriteToDraw.Angle = orient2D;
 		spriteToDraw.Color = color;
 		spriteToDraw.Size = size;
+		spriteToDraw.Opacity = opacity;
+		spriteToDraw.Priority = priority;
 
 		renderView.Sprites2DToDraw.push_back(spriteToDraw);
 	}
 
 	void Renderer11::DrawSprites2D(RenderView& renderView)
 	{
+		if (renderView.Sprites2DToDraw.size() == 0)
+		{
+			return;
+		}
+
 		constexpr auto VERTEX_COUNT = 4;
 
 		SetBlendMode(BLENDMODE_ALPHABLEND);
@@ -452,7 +460,7 @@ namespace TEN::Renderer
 			{
 				vertices[i].Position = Vector3(vertexPoints[i]);
 				vertices[i].UV = spriteToDraw.Sprite->UV[i];
-				vertices[i].Color = spriteToDraw.Color;
+				vertices[i].Color = Vector4(spriteToDraw.Color.x, spriteToDraw.Color.y, spriteToDraw.Color.z, spriteToDraw.Opacity);
 			}
 			
 			m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);

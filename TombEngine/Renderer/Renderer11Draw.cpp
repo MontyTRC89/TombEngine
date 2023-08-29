@@ -1561,10 +1561,10 @@ namespace TEN::Renderer
 		// Draw all sorted blend mode faces collected in the previous steps
 		DrawSortedFaces(view);
 
-#if TEST_SPRITES
-		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1], Vector2(0, 0), 45, Vector4::One, Vector2(200, 200), view);
-		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY2], Vector2(300, 300), 66, Vector4::One, Vector2(200, 200), view);
-		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD], Vector2(0, 300), 22, Vector4::One, Vector2(200, 200), view);
+#ifdef TEST_SPRITES
+		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1], Vector2(0, 0), 45, Vector3::One, Vector2(200, 200), 0.8f, 0, view);
+		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY2], Vector2(300, 300), 66, Vector3::One, Vector2(200, 200), 0.6f, 0, view);
+		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD], Vector2(0, 300), 22, Vector3::One, Vector2(200, 200), 0.3f, 0, view);
 #endif
 
 		DrawSprites2D(view);

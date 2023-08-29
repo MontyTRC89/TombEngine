@@ -747,7 +747,7 @@ namespace TEN::Renderer
 		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 
 		void AddSpriteIn2DSpace(RendererSprite* sprite, const Vector2& pos2D, short orient2D,
-			const Vector4& color, const Vector2& size, RenderView& renderView);
+			const Vector3& color, const Vector2& size, float opacity, int priority, RenderView& renderView);
 	};
 
 	extern Renderer11 g_Renderer;

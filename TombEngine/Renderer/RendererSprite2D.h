@@ -10,7 +10,9 @@ namespace TEN::Renderer
 		RendererSprite* Sprite;
 		Vector2 Position;
 		Vector2 Size;
-		Vector4 Color;
+		Vector3 Color;
 		short Angle;
+		float Opacity;
+		int Priority;
 	};
 }
