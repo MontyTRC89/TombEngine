@@ -134,6 +134,7 @@ static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& poin
 	collResult.Position.CeilingSlope = pointColl.IsSlipperyCeiling();
 	collResult.Position.DiagonalStep = pointColl.IsDiagonalStep();
 
+	// NOTE: Bridge tilts ignored by old method.
 	collResult.FloorTilt = pointColl.GetBottomSector().GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, true);
 	collResult.CeilingTilt = pointColl.GetTopSector().GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, false);
 
