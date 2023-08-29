@@ -56,10 +56,6 @@ namespace TEN::Entities::Vehicles
 
 	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
 
-	// TODO: Simpler toggle.
-	#define JEEP_IN_TOGGLE_REVERSE	IN_SPRINT
-	#define JEEP_IN_TOGGLE_FORWARD	IN_WALK
-
 	enum JeepState
 	{
 		JS_IDLE = 0,
@@ -545,7 +541,7 @@ namespace TEN::Entities::Vehicles
 			rot = jeepItem->Pose.Orientation.y - jeep->MomentumAngle;
 			short momentum = (short)(728 - ((3 * jeep->Velocity) / 2048));
 
-			if (!(TrInput & IN_ACTION) && jeep->Velocity > 0)
+			if (!IsHeld(In::Action) && jeep->Velocity > 0)
 				momentum -= (momentum / 4);
 
 			if (rot < -273)
@@ -723,6 +719,7 @@ namespace TEN::Entities::Vehicles
 	static int JeepUserControl(ItemInfo* jeepItem, ItemInfo* laraItem, int height, int* pitch)
 	{
 		auto* jeep = GetJeepInfo(jeepItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->Animation.ActiveState == JS_DISMOUNT || laraItem->Animation.TargetState == JS_DISMOUNT)
 			ClearAllActions();
@@ -740,11 +737,7 @@ namespace TEN::Entities::Vehicles
 
 		if (jeepItem->Pose.Position.y >= height - STEP_SIZE)
 		{
-			if (!jeep->Velocity)
-			{
-				if (TrInput & IN_LOOK)
-					LookUpDown(laraItem);
-			}
+			lara->Control.Look.Mode = (jeepItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 
 			if (abs(jeep->Velocity) <= JEEP_VELOCITY_MAX / 2)
 			{
@@ -928,14 +921,14 @@ namespace TEN::Entities::Vehicles
 						break;
 					}
 
-					if (DbInput & JEEP_IN_TOGGLE_FORWARD)
+					if (IsClicked(In::Walk))
 					{
 						if (jeep->Gear)
 							jeep->Gear--;
 
 						break;
 					}
-					else if (DbInput & JEEP_IN_TOGGLE_REVERSE)
+					else if (IsClicked(In::Sprint))
 					{
 						if (jeep->Gear < 1)
 						{
@@ -959,9 +952,9 @@ namespace TEN::Entities::Vehicles
 							laraItem->Animation.TargetState = JS_FWD_RIGHT;
 					}
 
-	/*				if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
+	/*				if (!(IsClicked(In::Walk)))
 					{
-						if (!(DbInput & JEEP_IN_TOGGLE_REVERSE))
+						if (!(IsClicked(In::Sprint)))
 						{
 							if (IsHeld(In::Accelerate) && !IsHeld(In::Brake))
 							{
@@ -1048,9 +1041,9 @@ namespace TEN::Entities::Vehicles
 			case JS_FWD_LEFT:
 				if (dead)
 					laraItem->Animation.TargetState = JS_IDLE;
-				else if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
+				else if (!(IsClicked(In::Walk)))
 				{
-					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
+					if (IsClicked(In::Sprint))
 					{
 						if (jeep->Gear < 1)
 						{
@@ -1094,9 +1087,9 @@ namespace TEN::Entities::Vehicles
 				if (dead)
 					laraItem->Animation.TargetState = JS_IDLE;
 
-				if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
+				if (!(IsClicked(In::Walk)))
 				{
-					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
+					if (IsClicked(In::Sprint))
 					{
 						if (jeep->Gear < 1)
 						{
@@ -1161,9 +1154,9 @@ namespace TEN::Entities::Vehicles
 			case JS_BACK_LEFT:
 				if (dead)
 					laraItem->Animation.TargetState = JS_DRIVE_BACK;
-				else if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
+				else if (!(IsClicked(In::Walk)))
 				{
-					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
+					if (IsClicked(In::Sprint))
 					{
 						if (jeep->Gear < 1)
 							jeep->Gear++;
@@ -1202,9 +1195,9 @@ namespace TEN::Entities::Vehicles
 				{
 					laraItem->Animation.TargetState = JS_DRIVE_BACK;
 				}
-				else if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
+				else if (!(IsClicked(In::Walk)))
 				{
-					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
+					if (IsClicked(In::Sprint))
 					{
 						if (jeep->Gear < 1)
 							jeep->Gear++;
@@ -1248,9 +1241,9 @@ namespace TEN::Entities::Vehicles
 				else
 	//			if (jeep->Velocity || JeepNoGetOff)
 				{
-					if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
+					if (!(IsClicked(In::Walk)))
 					{
-						if (DbInput & JEEP_IN_TOGGLE_REVERSE)
+						if (IsClicked(In::Sprint))
 						{
 							if (jeep->Gear < 1)
 								jeep->Gear++;

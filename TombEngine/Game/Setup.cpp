@@ -38,10 +38,10 @@ StaticInfo StaticObjects[MAX_STATICS];
 void InitializeGameFlags()
 {
 	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
-	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(int));
+	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(bool));
 
 	FlipEffect = -1;
-	FlipStatus = 0;
+	FlipStatus = false;
 	Camera.underwater = false;
 }
 

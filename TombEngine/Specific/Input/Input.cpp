@@ -38,10 +38,6 @@ namespace TEN::Input
 	std::vector<bool>		 KeyMap		 = {};
 	std::vector<float>		 AxisMap	 = {};
 
-	//  Deprecated legacy input bit fields.
-	int DbInput = 0;
-	int TrInput = 0;
-
 	const std::vector<std::string> g_KeyNames =
 	{
 			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
@@ -92,44 +88,29 @@ namespace TEN::Input
 	// 2. Vehicle actions
 	// 3. Quick actions
 	// 4. Menu actions
-	
-	std::vector<std::vector<int>> Bindings =
-	{
-		{
-			// Default
-			{
-				KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_RCONTROL, KC_SPACE, KC_NUMPAD0,
-				KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
-				KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-				KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
-			},
-
-			// User
-			{
-				KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_RCONTROL, KC_SPACE, KC_NUMPAD0,
-				KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
-				KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-				KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
-			}
-		}
-	};
 
 	const auto DefaultGenericBindings = std::vector<int>
 	{
 		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_RCONTROL, KC_SPACE, KC_NUMPAD0,
 		KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
 		KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-		KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6, KC_NUMPAD0
+		KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
 	};
 	const auto DefaultXInputBindings = std::vector<int>
 	{
 		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_LSTICK, XB_RSTICK, XB_RSHIFT, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_X, XB_B, XB_A, XB_Y, XB_LSHIFT,
 		XB_A, XB_AXIS_X_POS, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_AXIS_LTRIGGER_NEG,
 		XB_DPAD_DOWN, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-		KC_RETURN, XB_SELECT, XB_START, XB_SELECT, KC_F5, KC_F6, KC_NUMPAD0
+		KC_RETURN, XB_SELECT, XB_START, XB_SELECT, KC_F5, KC_F6
 	};
 
-	auto ConflictingKeys = std::array<bool, KEY_COUNT>{};
+	std::vector<std::vector<int>> Bindings =
+	{
+		DefaultGenericBindings,
+		DefaultGenericBindings
+	};
+
+	auto ConflictingKeys = std::array<bool, (int)In::Count>{};
 
 	void InitializeEffect()
 	{
@@ -166,7 +147,15 @@ namespace TEN::Input
 
 		try
 		{
-			OisInputManager = InputManager::createInputSystem((size_t)handle);
+			// Use an OIS ParamList since the default behaviour blocks the WIN key.
+			ParamList pl;
+			std::ostringstream wnd;
+			wnd << (size_t)handle;
+			pl.insert(std::make_pair(std::string("WINDOW"), wnd.str()));
+			pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
+			pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
+
+			OisInputManager = InputManager::createInputSystem(pl);
 			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
@@ -240,15 +229,11 @@ namespace TEN::Input
 
 		for (auto& axis : AxisMap)
 			axis = 0.0f;
-
-		// Clear legacy bit fields.
-		DbInput = 0;
-		TrInput = 0;
 	}
 
 	void ApplyActionQueue()
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			switch (ActionQueue[i])
 			{
@@ -277,7 +262,7 @@ namespace TEN::Input
 	{
 		for (int layout = 1; layout >= 0; layout--)
 		{
-			for (int i = 0; i < KEY_COUNT; i++)
+			for (int i = 0; i < (int)In::Count; i++)
 			{
 				if (Bindings[layout][i] == index)
 					return true;
@@ -308,13 +293,13 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			int key = Bindings[0][i];
 
 			ConflictingKeys[i] = false;
 
-			for (int j = 0; j < KEY_COUNT; j++)
+			for (int j = 0; j < (int)In::Count; j++)
 			{
 				if (key != Bindings[1][j])
 					continue;
@@ -329,19 +314,19 @@ namespace TEN::Input
 	{
 		for (int layout = 0; layout <= 1; layout++)
 		{
-			if (Bindings[layout][KEY_FORWARD] == index)
+			if (Bindings[layout][(int)In::Forward] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
 			}
-			else if (Bindings[layout][KEY_BACK] == index)
+			else if (Bindings[layout][(int)In::Back] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
 			}
-			else if (Bindings[layout][KEY_LEFT] == index)
+			else if (Bindings[layout][(int)In::Left] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
 			}
-			else if (Bindings[layout][KEY_RIGHT] == index)
+			else if (Bindings[layout][(int)In::Right] == index)
 			{
 				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
 			}
@@ -397,19 +382,19 @@ namespace TEN::Input
 				// Otherwise, register as camera movement input (for future).
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
-				if (Bindings[1][KEY_FORWARD] == usedIndex)
+				if (Bindings[1][(int)In::Forward] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_BACK] == usedIndex)
+				else if (Bindings[1][(int)In::Back] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_LEFT] == usedIndex)
+				else if (Bindings[1][(int)In::Left] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
 				}
-				else if (Bindings[1][KEY_RIGHT] == usedIndex)
+				else if (Bindings[1][(int)In::Right] == usedIndex)
 				{
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
 				}
@@ -610,8 +595,8 @@ namespace TEN::Input
 		DefaultConflict();
 
 		// Update action map.
-		for (int i = 0; i < KEY_COUNT; i++)
-			ActionMap[i].Update(Key(i));
+		for (auto& action : ActionMap)
+			action.Update(Key((int)action.GetID()));
 
 		if (applyQueue)
 			ApplyActionQueue();
@@ -619,20 +604,6 @@ namespace TEN::Input
 		// Additional handling.
 		HandleHotkeyActions();
 		SolveActionCollisions();
-
-		// Port actions back to legacy bit fields.
-		for (const auto& action : ActionMap)
-		{
-			// TEMP FIX: Only port up to 32 bits.
-			auto actionID = action.GetID();
-			if ((int)actionID >= 32)
-				break;
-
-			int actionBit = 1 << (int)actionID;
-
-			DbInput |= action.IsClicked() ? actionBit : 0;
-			TrInput |= action.IsHeld()	  ? actionBit : 0;
-		}
 	}
 
 	void ClearAllActions()
@@ -642,9 +613,6 @@ namespace TEN::Input
 
 		for (auto& queue : ActionQueue)
 			queue = QueueState::None;
-
-		DbInput = 0;
-		TrInput = 0;
 	}
 
 	void Rumble(float power, float delayInSec, RumbleMode mode)
@@ -677,7 +645,7 @@ namespace TEN::Input
 	{
 		for (int i = 0; i < bindings.size(); i++)
 		{
-			if (i >= KEY_COUNT)
+			if (i >= (int)In::Count)
 				break;
 
 			Bindings[1][i] = bindings[i];
@@ -695,7 +663,7 @@ namespace TEN::Input
 		if (!OisGamepad)
 			return false;
 
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < (int)In::Count; i++)
 		{
 			if (Bindings[1][i] != KC_UNASSIGNED && Bindings[1][i] != Bindings[0][i])
 				return false;
@@ -706,7 +674,7 @@ namespace TEN::Input
 		{
 			ApplyBindings(DefaultXInputBindings);
 
-			for (int i = 0; i < KEY_COUNT; i++)
+			for (int i = 0; i < (int)In::Count; i++)
 				g_Configuration.Bindings[i] = Bindings[1][i];
 
 			// Additionally turn on thumbstick camera and vibration.
@@ -723,14 +691,6 @@ namespace TEN::Input
 	void ClearAction(ActionID actionID)
 	{
 		ActionMap[(int)actionID].Clear();
-
-		// TEMP FIX: Only port up to 32 bits.
-		if ((int)actionID >= 32)
-			return;
-
-		int actionBit = 1 << (int)actionID;
-		DbInput &= ~actionBit;
-		TrInput &= ~actionBit;
 	}
 
 	bool NoAction()

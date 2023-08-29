@@ -813,11 +813,11 @@ void GrenadeControl(short itemNumber)
 	// Trigger fire and smoke sparks in direction of motion.
 	if (grenadeItem.Animation.Velocity.z && aboveWater)
 	{
-		auto world = Matrix::CreateFromYawPitchRoll(
-			TO_RAD(grenadeItem.Pose.Orientation.y - ANGLE(180.0f)),
-			TO_RAD(grenadeItem.Pose.Orientation.x),
-			TO_RAD(grenadeItem.Pose.Orientation.z)) *
-			Matrix::CreateTranslation(0, 0, -64);
+		auto world = Matrix::CreateTranslation(0, 0, -64) * 
+					 Matrix::CreateFromYawPitchRoll(
+						TO_RAD(grenadeItem.Pose.Orientation.y - ANGLE(180.0f)),
+						TO_RAD(grenadeItem.Pose.Orientation.x),
+						TO_RAD(grenadeItem.Pose.Orientation.z));
 
 		int wx = world.Translation().x;
 		int wy = world.Translation().y;
@@ -958,11 +958,11 @@ void RocketControl(short itemNumber)
 	rocketItem.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Calculate offset in rocket direction for fire and smoke sparks.
-	auto world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(rocketItem.Pose.Orientation.y - ANGLE(180.0f)),
-		TO_RAD(rocketItem.Pose.Orientation.x),
-		TO_RAD(rocketItem.Pose.Orientation.z)) *
-		Matrix::CreateTranslation(0, 0, -64);
+	auto world = Matrix::CreateTranslation(0, 0, -64) *
+				 Matrix::CreateFromYawPitchRoll(
+					TO_RAD(rocketItem.Pose.Orientation.y - ANGLE(180.0f)),
+					TO_RAD(rocketItem.Pose.Orientation.x),
+					TO_RAD(rocketItem.Pose.Orientation.z));
 
 	int wx = world.Translation().x;
 	int wy = world.Translation().y;
@@ -1167,7 +1167,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 	auto& ammo = GetAmmo(player, player.Control.Weapon.GunType);
 	const auto& weapon = player.Weapons[(int)weaponType];
 
-	if (!LaserSight || (!weapon.HasLasersight))
+	if (!player.Control.Look.IsUsingLasersight || !weapon.HasLasersight)
 		return;
 
 	bool isFiring = false;
@@ -1261,7 +1261,7 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	const auto& weapon = Weapons[(int)weaponType];
 
 	// Never handle weapons in binocular mode.
-	if (BinocularRange || LaserSight)
+	if (player.Control.Look.OpticRange || player.Control.Look.IsUsingLasersight)
 		return;
 
 	FindNewTarget(laraItem, weapon);
@@ -1275,7 +1275,7 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	{
 		player.ExtraTorsoRot = player.LeftArm.Orientation;
 
-		if (Camera.oldType != CameraType::Look && !BinocularRange)
+		if (Camera.oldType != CameraType::Look && player.Control.Look.OpticRange == 0)
 			player.ExtraHeadRot = EulerAngles::Zero;
 	}
 
@@ -1488,8 +1488,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		if (pointColl.Position.Floor < projectile.Pose.Position.y ||
 			pointColl.Position.Ceiling > projectile.Pose.Position.y)
 		{
-			hasHit =
-			hasHitNotByEmitter = true;
+			hasHit = hasHitNotByEmitter = true;
 		}
 	}
 	// If projectile is timed grenade, try to emit from it according to flags.
@@ -1601,8 +1600,9 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				itemPtr->IsLara() ||
 				(itemPtr->Flags & 0x40 && Objects[itemPtr->ObjectNumber].explodableMeshbits))
 			{
-				// If we collide with emitter, don't process further in early launch stages.
-				if (!hasHitNotByEmitter && itemPtr == &emitter)
+				// If we collide with emitter, and there are no other objects around, 
+				// don't process further in early launch stages.
+				if (!hasHitNotByEmitter && itemPtr == &emitter && affectedObjects.empty())
 				{
 					// Non-grenade projectiles require larger timeout
 					int timeout = type >= ProjectileType::Grenade ? TRIGGER_TIMEOUT : TRIGGER_TIMEOUT * 2;
@@ -1645,11 +1645,19 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 					 itemPtr->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doShatter = hasHit = true;
+				doExplosion = isExplosive;
 
 				// Smash objects are legacy objects from TRC. Make them explode in legacy way.
 				ExplodeItemNode(itemPtr, 0, 0, 128);
 				SmashObject(itemPtr->Index);
 				KillItem(itemPtr->Index);
+			}
+			else if (currentObject.collision && !(itemPtr->Status & ITEM_INVISIBLE))
+			{
+				doShatter = hasHit = true;
+				doExplosion = isExplosive;
+
+				affectedObjects.push_back(itemPtr->Index);
 			}
 		}
 
@@ -1684,12 +1692,14 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		projectile.ItemFlags[1] = GRENADE_FRAG_TIMEOUT;
 		return;
 
+	case ProjectileType::Harpoon:
+		if (affectedObjects.empty())
+			return;
+		break;
+
 	default:
 		break;
 	}
-
-	if (type == ProjectileType::Harpoon)
-		return;
 
 	if (hasHit)
 		KillItem(projectile.Index);

@@ -5,6 +5,7 @@
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/effects/weather.h"
+#include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
@@ -240,16 +241,16 @@ namespace TEN::Renderer
 		if (CurrentLevel == 0)
 			return;
 
-		if (!BinocularRange && !SpotcamOverlay)
+		if (!Lara.Control.Look.OpticRange && !SpotcamOverlay)
 			return;
 
 		SetBlendMode(BLENDMODE_ALPHABLEND);
 
-		if (BinocularRange && !LaserSight)
+		if (Lara.Control.Look.OpticRange != 0 && !Lara.Control.Look.IsUsingLasersight)
 		{
 			DrawFullScreenSprite(&m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex], Vector3::One, false);
 		}
-		else if (BinocularRange && LaserSight)
+		else if (Lara.Control.Look.OpticRange != 0 && Lara.Control.Look.IsUsingLasersight)
 		{
 			DrawFullScreenSprite(&m_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex], Vector3::One);
 

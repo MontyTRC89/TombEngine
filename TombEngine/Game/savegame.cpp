@@ -103,7 +103,12 @@ Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
 	return Save::EulerAngles(eulers.x, eulers.y, eulers.z);
 }
 
-Save::Vector2 FromVector2(const Vector2i& vec)
+Save::Vector2 FromVector2(const Vector2& vec)
+{
+	return Save::Vector2(vec.x, vec.y);
+}
+
+Save::Vector2 FromVector2i(const Vector2i& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
@@ -113,7 +118,7 @@ Save::Vector3 FromVector3(const Vector3& vec)
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3(const Vector3i& vec)
+Save::Vector3 FromVector3i(const Vector3i& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
@@ -125,17 +130,22 @@ Save::Vector4 FromVector4(const Vector4& vec)
 
 EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
 {
-	return EulerAngles((short)eulers->x(), (short)eulers->y(), (short)eulers->z());
+	return EulerAngles((short)round(eulers->x()), (short)round(eulers->y()), (short)round(eulers->z()));
+}
+
+Vector2 ToVector2(const Save::Vector2* vec)
+{
+	return Vector2(vec->x(), vec->y());
 }
 
 Vector2i ToVector2i(const Save::Vector2* vec)
 {
-	return Vector2i((int)vec->x(), (int)vec->y());
+	return Vector2i((int)round(vec->x()), (int)round(vec->y()));
 }
 
 Vector3i ToVector3i(const Save::Vector3* vec)
 {
-	return Vector3i((int)vec->x(), (int)vec->y(), (int)vec->z());
+	return Vector3i((int)round(vec->x()), (int)round(vec->y()), (int)round(vec->z()));
 }
 
 Vector3 ToVector3(const Save::Vector3* vec)
@@ -340,20 +350,14 @@ bool SaveGame::Save(int slot)
 	count.add_run_jump(Lara.Control.Count.Run);
 	auto countOffset = count.Finish();
 
-	Save::WeaponControlDataBuilder weaponControl{ fbb };
-	weaponControl.add_weapon_item(Lara.Control.Weapon.WeaponItem);
-	weaponControl.add_has_fired(Lara.Control.Weapon.HasFired);
-	weaponControl.add_fired(Lara.Control.Weapon.Fired);
-	weaponControl.add_uzi_left(Lara.Control.Weapon.UziLeft);
-	weaponControl.add_uzi_right(Lara.Control.Weapon.UziRight);
-	weaponControl.add_gun_type((int)Lara.Control.Weapon.GunType);
-	weaponControl.add_request_gun_type((int)Lara.Control.Weapon.RequestGunType);
-	weaponControl.add_last_gun_type((int)Lara.Control.Weapon.LastGunType);
-	weaponControl.add_holster_info(holsterInfoOffset);
-	weaponControl.add_interval(Lara.Control.Weapon.Interval);
-	weaponControl.add_timer(Lara.Control.Weapon.Timer);
-	weaponControl.add_num_shots_fired(Lara.Control.Weapon.NumShotsFired);
-	auto weaponControlOffset = weaponControl.Finish();
+	Save::LookControlDataBuilder lookControl{ fbb };
+	lookControl.add_is_using_binoculars(Lara.Control.Look.IsUsingBinoculars);
+	lookControl.add_is_using_lasersight(Lara.Control.Look.IsUsingLasersight);
+	lookControl.add_mode((int)Lara.Control.Look.Mode);
+	lookControl.add_optic_range(Lara.Control.Look.OpticRange);
+	lookControl.add_orientation(&FromEulerAngles(Lara.Control.Look.Orientation));
+	lookControl.add_turn_rate(&FromEulerAngles(Lara.Control.Look.TurnRate));
+	auto lookControlOffset = lookControl.Finish();
 
 	Save::RopeControlDataBuilder ropeControl{ fbb };
 	ropeControl.add_segment(Lara.Control.Rope.Segment);
@@ -374,13 +378,6 @@ bool SaveGame::Save(int slot)
 	ropeControl.add_count(Lara.Control.Rope.Count);
 	auto ropeControlOffset = ropeControl.Finish();
 
-	Save::TightropeControlDataBuilder tightropeControl{ fbb };
-	tightropeControl.add_balance(Lara.Control.Tightrope.Balance);
-	tightropeControl.add_can_dismount(Lara.Control.Tightrope.CanDismount);
-	tightropeControl.add_tightrope_item(Lara.Control.Tightrope.TightropeItem);
-	tightropeControl.add_time_on_tightrope(Lara.Control.Tightrope.TimeOnTightrope);
-	auto tightropeControlOffset = tightropeControl.Finish();
-
 	Save::SubsuitControlDataBuilder subsuitControl{ fbb };
 	subsuitControl.add_x_rot(Lara.Control.Subsuit.XRot);
 	subsuitControl.add_d_x_rot(Lara.Control.Subsuit.DXRot);
@@ -390,6 +387,28 @@ bool SaveGame::Save(int slot)
 	subsuitControl.add_hit_count(Lara.Control.Subsuit.HitCount);
 	auto subsuitControlOffset = subsuitControl.Finish();
 
+	Save::TightropeControlDataBuilder tightropeControl{ fbb };
+	tightropeControl.add_balance(Lara.Control.Tightrope.Balance);
+	tightropeControl.add_can_dismount(Lara.Control.Tightrope.CanDismount);
+	tightropeControl.add_tightrope_item(Lara.Control.Tightrope.TightropeItem);
+	tightropeControl.add_time_on_tightrope(Lara.Control.Tightrope.TimeOnTightrope);
+	auto tightropeControlOffset = tightropeControl.Finish();
+
+	Save::WeaponControlDataBuilder weaponControl{ fbb };
+	weaponControl.add_weapon_item(Lara.Control.Weapon.WeaponItem);
+	weaponControl.add_has_fired(Lara.Control.Weapon.HasFired);
+	weaponControl.add_fired(Lara.Control.Weapon.Fired);
+	weaponControl.add_uzi_left(Lara.Control.Weapon.UziLeft);
+	weaponControl.add_uzi_right(Lara.Control.Weapon.UziRight);
+	weaponControl.add_gun_type((int)Lara.Control.Weapon.GunType);
+	weaponControl.add_request_gun_type((int)Lara.Control.Weapon.RequestGunType);
+	weaponControl.add_last_gun_type((int)Lara.Control.Weapon.LastGunType);
+	weaponControl.add_holster_info(holsterInfoOffset);
+	weaponControl.add_interval(Lara.Control.Weapon.Interval);
+	weaponControl.add_timer(Lara.Control.Weapon.Timer);
+	weaponControl.add_num_shots_fired(Lara.Control.Weapon.NumShotsFired);
+	auto weaponControlOffset = weaponControl.Finish();
+
 	Save::PlayerContextDataBuilder context{ fbb };
 	context.add_calc_jump_velocity(Lara.Context.CalcJumpVelocity);
 	context.add_interacted_item_number(Lara.Context.InteractedItem);
@@ -398,28 +417,28 @@ bool SaveGame::Save(int slot)
 	context.add_target_orient(&FromEulerAngles(Lara.Context.TargetOrientation));
 	context.add_vehicle_item_number(Lara.Context.Vehicle);
 	context.add_water_current_active(Lara.Context.WaterCurrentActive);
-	context.add_water_current_pull(&FromVector3(Lara.Context.WaterCurrentPull));
+	context.add_water_current_pull(&FromVector3i(Lara.Context.WaterCurrentPull));
 	context.add_water_surface_dist(Lara.Context.WaterSurfaceDist);
 	auto contextOffset = context.Finish();
 
 	Save::LaraControlDataBuilder control{ fbb };
-	control.add_move_angle(Lara.Control.MoveAngle);
-	control.add_turn_rate(Lara.Control.TurnRate);
-	control.add_jump_direction((int)Lara.Control.JumpDirection);
-	control.add_hand_status((int)Lara.Control.HandStatus);
-	control.add_is_moving(Lara.Control.IsMoving);
-	control.add_run_jump_queued(Lara.Control.RunJumpQueued);
-	control.add_can_look(Lara.Control.CanLook);
-	control.add_count(countOffset);
-	control.add_keep_low(Lara.Control.KeepLow);
-	control.add_is_low(Lara.Control.IsLow);
 	control.add_can_climb_ladder(Lara.Control.CanClimbLadder);
-	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
 	control.add_can_monkey_swing(Lara.Control.CanMonkeySwing);
-	control.add_locked(Lara.Control.Locked);
+	control.add_count(countOffset);
+	control.add_hand_status((int)Lara.Control.HandStatus);
+	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
+	control.add_is_locked(Lara.Control.Locked);
+	control.add_is_low(Lara.Control.IsLow);
+	control.add_is_moving(Lara.Control.IsMoving);
+	control.add_is_run_jump_queued(Lara.Control.RunJumpQueued);
+	control.add_jump_direction((int)Lara.Control.JumpDirection);
+	control.add_keep_low(Lara.Control.KeepLow);
+	control.add_look(lookControlOffset);
+	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
 	control.add_tightrope(tightropeControlOffset);
+	control.add_turn_rate(Lara.Control.TurnRate);
 	control.add_water_status((int)Lara.Control.WaterStatus);
 	control.add_weapon(weaponControlOffset);
 	auto controlOffset = control.Finish();
@@ -442,7 +461,7 @@ bool SaveGame::Save(int slot)
 		CarriedWeaponInfo* info = &Lara.Weapons[i];
 		
 		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
-		for (int j = 0; j < (int)WeaponAmmoType::NumAmmoTypes; j++)
+		for (int j = 0; j < (int)WeaponAmmoType::Count; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
 			ammo.add_count(info->Ammo[j].GetCount());
@@ -1061,27 +1080,27 @@ bool SaveGame::Save(int slot)
 
 		std::vector<const Save::Vector3*> segments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			segments.push_back(&FromVector3(rope->segment[i]));
+			segments.push_back(&FromVector3i(rope->segment[i]));
 		auto segmentsOffset = fbb.CreateVector(segments);
 
 		std::vector<const Save::Vector3*> velocities;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			velocities.push_back(&FromVector3(rope->velocity[i]));
+			velocities.push_back(&FromVector3i(rope->velocity[i]));
 		auto velocitiesOffset = fbb.CreateVector(velocities);
 
 		std::vector<const Save::Vector3*> normalisedSegments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			normalisedSegments.push_back(&FromVector3(rope->normalisedSegment[i]));
+			normalisedSegments.push_back(&FromVector3i(rope->normalisedSegment[i]));
 		auto normalisedSegmentsOffset = fbb.CreateVector(normalisedSegments);
 
 		std::vector<const Save::Vector3*> meshSegments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			meshSegments.push_back(&FromVector3(rope->meshSegment[i]));
+			meshSegments.push_back(&FromVector3i(rope->meshSegment[i]));
 		auto meshSegmentsOffset = fbb.CreateVector(meshSegments);
 
 		std::vector<const Save::Vector3*> coords;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			coords.push_back(&FromVector3(rope->coords[i]));
+			coords.push_back(&FromVector3i(rope->coords[i]));
 		auto coordsOffset = fbb.CreateVector(coords);
 
 		Save::RopeBuilder ropeInfo{ fbb };
@@ -1092,21 +1111,21 @@ bool SaveGame::Save(int slot)
 		ropeInfo.add_normalised_segments(normalisedSegmentsOffset);
 		ropeInfo.add_coords(coordsOffset);
 		ropeInfo.add_coiled(rope->coiled);
-		ropeInfo.add_position(&FromVector3(rope->position));
+		ropeInfo.add_position(&FromVector3i(rope->position));
 		ropeInfo.add_segment_length(rope->segmentLength);
 
 		ropeOffset = ropeInfo.Finish();
 
 		Save::PendulumBuilder pendulumInfo{ fbb };
 		pendulumInfo.add_node(CurrentPendulum.node);
-		pendulumInfo.add_position(&FromVector3(CurrentPendulum.position));
-		pendulumInfo.add_velocity(&FromVector3(CurrentPendulum.velocity));
+		pendulumInfo.add_position(&FromVector3i(CurrentPendulum.position));
+		pendulumInfo.add_velocity(&FromVector3i(CurrentPendulum.velocity));
 		pendulumOffset = pendulumInfo.Finish();
 
 		Save::PendulumBuilder alternatePendulumInfo{ fbb };
 		alternatePendulumInfo.add_node(AlternatePendulum.node);
-		alternatePendulumInfo.add_position(&FromVector3(AlternatePendulum.position));
-		alternatePendulumInfo.add_velocity(&FromVector3(AlternatePendulum.velocity));
+		alternatePendulumInfo.add_position(&FromVector3i(AlternatePendulum.position));
+		alternatePendulumInfo.add_velocity(&FromVector3i(AlternatePendulum.velocity));
 		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
@@ -1181,33 +1200,32 @@ bool SaveGame::Save(int slot)
 			switch (SavedVarType(s.index()))
 			{
 			case SavedVarType::Vec2:
-			{
-				SaveVec(SavedVarType::Vec2, s, Save::vec2TableBuilder, Save::VarUnion::vec2, Save::Vector2, FromVector2);
-			}
-			break;
-
+				{
+					SaveVec(SavedVarType::Vec2, s, Save::vec2TableBuilder, Save::VarUnion::vec2, Save::Vector2, FromVector2);
+					break;
+				}
+				
 			case SavedVarType::Vec3:
-			{
-				SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
-			}
-			break;
+				{
+					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
+					break;
+				}
 
 			case SavedVarType::Rotation:
-			{
-				SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation, Save::Vector3, FromVector3);
-			}
-			break;
+				{
+					SaveVec(SavedVarType::Rotation, s, Save::rotationTableBuilder, Save::VarUnion::rotation, Save::Vector3, FromVector3);
+					break;
+				}
 
 			case SavedVarType::Color:
-			{
-				Save::colorTableBuilder ctb{ fbb };
-				ctb.add_color(std::get<(int)SavedVarType::Color>(s));
-				auto offset = ctb.Finish();
+				{
+					Save::colorTableBuilder ctb{ fbb };
+					ctb.add_color(std::get<(int)SavedVarType::Color>(s));
+					auto offset = ctb.Finish();
 
-				putDataInVec(Save::VarUnion::color, offset);
-			}
-			break;
-
+					putDataInVec(Save::VarUnion::color, offset);
+					break;
+				}
 			}
 		}
 	}
@@ -1920,11 +1938,16 @@ bool SaveGame::Load(int slot)
 	Lara.Control.IsMoving = s->lara()->control()->is_moving();
 	Lara.Control.JumpDirection = (JumpDirection)s->lara()->control()->jump_direction();
 	Lara.Control.KeepLow = s->lara()->control()->keep_low();
-	Lara.Control.CanLook = s->lara()->control()->can_look();
+	Lara.Control.Look.IsUsingBinoculars = s->lara()->control()->look()->is_using_binoculars();
+	Lara.Control.Look.IsUsingLasersight = s->lara()->control()->look()->is_using_lasersight();
+	Lara.Control.Look.Mode = (LookMode)s->lara()->control()->look()->mode();
+	Lara.Control.Look.OpticRange = s->lara()->control()->look()->optic_range();
+	Lara.Control.Look.Orientation = ToEulerAngles(s->lara()->control()->look()->orientation());
+	Lara.Control.Look.TurnRate = ToEulerAngles(s->lara()->control()->look()->turn_rate());
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
-	Lara.Control.RunJumpQueued = s->lara()->control()->run_jump_queued();
+	Lara.Control.RunJumpQueued = s->lara()->control()->is_run_jump_queued();
 	Lara.Control.TurnRate = s->lara()->control()->turn_rate();
-	Lara.Control.Locked = s->lara()->control()->locked();
+	Lara.Control.Locked = s->lara()->control()->is_locked();
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
 	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();
 	Lara.Control.Weapon.HasFired = s->lara()->control()->weapon()->has_fired();
@@ -1932,7 +1955,6 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Weapon.Fired = s->lara()->control()->weapon()->fired();
 	Lara.Control.Weapon.LastGunType = (LaraWeaponType)s->lara()->control()->weapon()->last_gun_type();
 	Lara.Control.Weapon.RequestGunType = (LaraWeaponType)s->lara()->control()->weapon()->request_gun_type();
-	Lara.Control.Weapon.WeaponItem = s->lara()->control()->weapon()->weapon_item();
 	Lara.Control.Weapon.HolsterInfo.BackHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->back_holster();
 	Lara.Control.Weapon.HolsterInfo.LeftHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->left_holster();
 	Lara.Control.Weapon.HolsterInfo.RightHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->right_holster();
@@ -1940,13 +1962,10 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Weapon.Timer = s->lara()->control()->weapon()->timer();
 	Lara.Control.Weapon.UziLeft = s->lara()->control()->weapon()->uzi_left();
 	Lara.Control.Weapon.UziRight = s->lara()->control()->weapon()->uzi_right();
+	Lara.Control.Weapon.WeaponItem = s->lara()->control()->weapon()->weapon_item();
 	Lara.ExtraAnim = s->lara()->extra_anim();
-	Lara.ExtraHeadRot.x = s->lara()->extra_head_rot()->x();
-	Lara.ExtraHeadRot.y = s->lara()->extra_head_rot()->y();
-	Lara.ExtraHeadRot.z = s->lara()->extra_head_rot()->z();
-	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->x();
-	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
-	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
+	Lara.ExtraHeadRot = ToEulerAngles(s->lara()->extra_head_rot());
+	Lara.ExtraTorsoRot = ToEulerAngles(s->lara()->extra_torso_rot());
 	Lara.Flare.Life = s->lara()->flare()->life();
 	Lara.Flare.ControlLeft = s->lara()->flare()->control_left();
 	Lara.Flare.Frame = s->lara()->flare()->frame();
@@ -2075,54 +2094,69 @@ bool SaveGame::Load(int slot)
 	{
 		for (const auto& var : *(unionVec->members()))
 		{
-			if (var->u_type() == Save::VarUnion::num)
+			auto varType = var->u_type();
+			switch (varType)
 			{
+			case Save::VarUnion::num:
 				loadedVars.push_back(var->u_as_num()->scalar());
-			}
-			else if (var->u_type() == Save::VarUnion::boolean)
-			{
-				loadedVars.push_back(var->u_as_boolean()->scalar());
-			}
-			else if (var->u_type() == Save::VarUnion::str)
-			{
-				loadedVars.push_back(var->u_as_str()->str()->str());
-			}
-			else if (var->u_type() == Save::VarUnion::tab)
-			{
-				auto tab = var->u_as_tab()->keys_vals();
-				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
+				break;
 
-				for (const auto& pair : *tab)
-					std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
-			}
-			else if (var->u_type() == Save::VarUnion::vec2)
-			{
-				auto stored = var->u_as_vec2()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec2>(ToVector2i(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::vec3)
-			{
-				auto stored = var->u_as_vec3()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::rotation)
-			{
-				auto stored = var->u_as_rotation()->vec();
-				SavedVar var;
-				var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
-				loadedVars.push_back(var);
-			}
-			else if (var->u_type() == Save::VarUnion::color)
-			{
+			case Save::VarUnion::boolean:
+				loadedVars.push_back(var->u_as_boolean()->scalar());
+				break;
+				
+			case Save::VarUnion::str:
+				loadedVars.push_back(var->u_as_str()->str()->str());
+				break;
+
+			case Save::VarUnion::tab:
+				{
+					auto tab = var->u_as_tab()->keys_vals();
+					auto& loadedTab = loadedVars.emplace_back(IndexTable{});
+
+					for (const auto& pair : *tab)
+						std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
+
+					break;
+				}
+				
+			case Save::VarUnion::vec2:
+				{
+					auto stored = var->u_as_vec2()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Vec2>(ToVector2(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
+			case Save::VarUnion::vec3:
+				{
+					auto stored = var->u_as_vec3()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
+			case Save::VarUnion::rotation:
+				{
+					auto stored = var->u_as_rotation()->vec();
+					SavedVar var;
+					var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+					loadedVars.push_back(var);
+					break;
+				}
+				
+			case Save::VarUnion::color:
 				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
-			}
-			else if (var->u_type() == Save::VarUnion::funcName)
-			{
+				break;
+	
+			case Save::VarUnion::funcName:
 				loadedVars.push_back(FuncName{var->u_as_funcName()->str()->str()});
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
