@@ -34,6 +34,8 @@ namespace TEN::Collision
 		std::optional<int> WaterTopHeight	  = std::nullopt;
 		std::optional<int> WaterBottomHeight  = std::nullopt;
 
+		std::optional<Vector3> ObjectIntersectPoint = std::nullopt;
+
 	public:
 		// Constructors
 		PointCollisionData(const Vector3i& pos, int roomNumber);
@@ -53,6 +55,9 @@ namespace TEN::Collision
 		int GetWaterSurfaceHeight();
 		int GetWaterTopHeight();
 		int GetWaterBottomHeight();
+
+		// TODO: Above and below. Also return reference to object itself? May need std::variant.
+		Vector3 GetObjectIntersectPoint();
 
 		// Inquirers
 		bool IsWall();
