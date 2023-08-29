@@ -31,7 +31,7 @@ public:
 	int								FogOutDistance{ 0 };
 	bool							LevelSelect{ true };
 	bool							FlyCheat{ true };
-	bool							PointFilter{ true };
+	bool							PointFilter{ false };
 	bool							MassPickup{ true }; 
 	bool							LaraInTitle{ false };
 	bool							DebugMode{ false };

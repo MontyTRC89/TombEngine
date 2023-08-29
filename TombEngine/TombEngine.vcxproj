@@ -670,6 +670,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h" />
     <ClInclude Include="Renderer\Quad\RenderQuad.h" />
+    <ClInclude Include="Renderer\RendererSprite2D.h" />
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
