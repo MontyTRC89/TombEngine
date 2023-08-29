@@ -193,7 +193,9 @@ namespace TEN::Entities::Generic
 		int displaceDepth = 0;
 		int displaceBox = GameBoundingBox(LaraItem).Z2;
 
-		pushable.CurrentSoundState = PushableSoundState::None;
+
+		if (pushable.CurrentSoundState == PushableSoundState::Moving)
+			pushable.CurrentSoundState = PushableSoundState::Stopping;
 
 		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 		
@@ -450,6 +452,17 @@ namespace TEN::Entities::Generic
 
 		pushableItem.Pose.Position = currentPos;
 		elapsedTime += DELTA_TIME;
+
+		// Manage Sound
+		if (interpolationValue <= 0.5f)
+		{
+			pushable.CurrentSoundState = PushableSoundState::Moving;
+		}
+		else
+		{
+			if (pushable.CurrentSoundState == PushableSoundState::Moving)
+				pushable.CurrentSoundState = PushableSoundState::Stopping;
+		}
 
 		//Check if the movement is completed.
 		if (interpolationValue >= 1.0f)
