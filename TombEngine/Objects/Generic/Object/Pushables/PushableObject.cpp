@@ -46,19 +46,19 @@ namespace TEN::Entities::Generic
 
 	std::vector<PushableAnimationInfo> PushableAnimInfos =
 	{
-		{LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, LA_PUSHABLE_EDGE, true}, // TR4-TR5 animations.
-		{LA_PUSHABLE_CLASSIC_PULL, LA_PUSHABLE_CLASSIC_PUSH, LA_PUSHABLE_CLASSIC_EDGE, false} // TR1-TR3 animations.
+		{ LA_PUSHABLE_PULL, LA_PUSHABLE_PUSH, LA_PUSHABLE_EDGE, true }, // TR4-TR5 animations.
+		{ LA_PUSHABLE_CLASSIC_PULL, LA_PUSHABLE_CLASSIC_PUSH, LA_PUSHABLE_CLASSIC_EDGE, false } // TR1-TR3 animations.
 	};
 
 	void InitializePushableBlock(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		if (pushableItem.Data == NULL) //Is the first pushableItem in initialize.
+		if (pushableItem.Data == NULL) // Is first pushableItem in initialize.
 		{
 			InitializePushablesStatesMap();
 			InitializePushablesStacks();
 		}
-		//pushableItem.Data = PushableInfo(); //Moved into InitializePushablesStacks.
+		//pushableItem.Data = PushableInfo(); // Moved to InitializePushablesStacks.
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		pushable.StartPos = pushableItem.Pose.Position;
@@ -97,7 +97,7 @@ namespace TEN::Entities::Generic
 		if (Lara.Context.InteractedItem == itemNumber && Lara.Control.IsMoving)
 			return;
 
-		// Call the state handler function based on the current state (Functions in PushableObject_Physics class).
+		// Call state handler function based current state. Functions defined in PushableObject_Physics class.
 		auto stateHandlerIterator = PUSHABLES_STATES_MAP.find(pushable.BehaviourState);
 		if (stateHandlerIterator != PUSHABLES_STATES_MAP.end())
 		{
@@ -108,13 +108,14 @@ namespace TEN::Entities::Generic
 			TENLog("Unknown pushable state.", LogLevel::Error, LogConfig::All, true);
 		}
 
-		// Do sound effects.
+		// Play sound effects.
 		PushablesManageSounds(itemNumber, pushable);
 
-		//Update Room Number
+		// Update room number.
 		AddBridgePushableStack(itemNumber, false);
 		int probedRoomNumber = GetCollision(&pushableItem).RoomNumber;
 		AddBridgePushableStack(itemNumber, true);
+
 		if (pushableItem.RoomNumber != probedRoomNumber)
 		{
 			ItemNewRoom(itemNumber, probedRoomNumber);
@@ -133,8 +134,9 @@ namespace TEN::Entities::Generic
 		auto& player = *GetLaraInfo(laraItem);
 
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
-		auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; //0 North, 1 East, 2 South or 3 West.
+		auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; // NOTE: 0 = north, 1 = east, 2 = south, 3 = west.
 
+		// Align player to pushable.
 		if ((IsHeld(In::Action) &&
 			!IsHeld(In::Forward) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
@@ -143,12 +145,10 @@ namespace TEN::Entities::Generic
 			player.Control.HandStatus == HandStatus::Free &&
 			IsPushableValid(itemNumber)) &&
 			pushable.BehaviourState == PushablePhysicState::Idle && 
-			(pushableSidesAttributes.Pushable || pushableSidesAttributes.Pullable) ||	//Can do any interaction with that side of the pushable?
-			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))	//It was already interacting with it and is aligning.
+			(pushableSidesAttributes.Pushable || pushableSidesAttributes.Pullable) || // Player can interact with this side.
+			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber)) // Player already interacting.
 		{
-			//Start Alignment process.
-
-			//Check the pushable collision box
+			// Set pushable bounds.
 			auto bounds = GameBoundingBox(&pushableItem);
 			PushableBlockBounds.BoundingBox.X1 = (bounds.X1 / 2) - 100;
 			PushableBlockBounds.BoundingBox.X2 = (bounds.X2 / 2) + 100;
@@ -158,7 +158,7 @@ namespace TEN::Entities::Generic
 			short yOrient = pushableItem.Pose.Orientation.y;
 			pushableItem.Pose.Orientation.y = GetQuadrant(laraItem->Pose.Orientation.y) * ANGLE(90.0f);
 
-			//If Lara is inside the influence area, Calculate the goal point to align Lara.
+			// If player is within interaction range, calculate target position for alignment.
 			if (TestLaraPosition(PushableBlockBounds, &pushableItem, laraItem))
 			{
 				int quadrant = GetQuadrant(pushableItem.Pose.Orientation.y);
@@ -188,10 +188,9 @@ namespace TEN::Entities::Generic
 					break;
 				}
 
-				//Displace Lara to align her.
+				// Align player.
 				if (MoveLaraPosition(PushableBlockPos, &pushableItem, laraItem))
 				{
-					//Alignment Movement has finished, activate the Pushable grab animation.
 					SetAnimation(laraItem, LA_PUSHABLE_GRAB);
 					laraItem->Pose.Orientation = pushableItem.Pose.Orientation;
 					player.Control.IsMoving = false;
@@ -203,7 +202,7 @@ namespace TEN::Entities::Generic
 			}
 			else
 			{
-				//If Lara is outside of the influence area, set the flags IsMoving false to indicate that..
+				// If player is outside iteraction range, set flags IsMoving false to indicate that.
 				if (player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 				{
 					player.Control.IsMoving = false;
@@ -215,12 +214,13 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			// If player is not pressing action key to grab the pushable, then just do the normal collision routine.
+			// If player is not holding Action, do normal collision routine.
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
 				player.Context.NextCornerPos.Position.x != itemNumber)
 			{
-				if (!pushable.UsesRoomCollision) //If it uses room collision, then it up to bridge collision system.
+				// NOTE: If using room collision, leave it up to bridge collision system.
+				if (!pushable.UsesRoomCollision)
 					ObjectCollision(itemNumber, laraItem, coll);
 
 				return;
@@ -237,11 +237,10 @@ namespace TEN::Entities::Generic
 
 	void SetPushableStopperFlag(bool value, Vector3i& pos, int roomNumber)
 	{
-		auto collisionResult = GetCollision(pos, roomNumber);
-		
-		collisionResult.Block->Stopper = value; 
+		auto pointColl = GetCollision(pos, roomNumber);
+		pointColl.Block->Stopper = value; 
 
-		//TODO: There is a problem, it also has to set/reset the flag in the flipped room.
-		//Because when flipmaps happens, it forgets about the old flag.
+		// TODO: There is a problem, it also has to set/reset the flag in the flipped room.
+		// Because when flipmaps happens, it forgets about the old flag.
 	}
 }

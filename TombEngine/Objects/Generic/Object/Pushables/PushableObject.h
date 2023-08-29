@@ -1,8 +1,6 @@
 #pragma once
 #include "Game/Lara/lara.h"
 
-//class GameVector;
-//class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 
@@ -12,11 +10,12 @@ namespace TEN::Entities::Generic
 
 	struct PushableAnimationInfo
 	{
-		int	 PullAnimNumber;
-		int	 PushAnimNumber;
-		int	 EdgeAnimNumber;
-		bool EnableAnimLoop;
+		int	 PullAnimNumber = 0;
+		int	 PushAnimNumber = 0;
+		int	 EdgeAnimNumber = 0;
+		bool EnableAnimLoop = 0;
 
+		// TODO: Constants.
 		PushableAnimationInfo()
 		{
 			PullAnimNumber = LA_PUSHABLE_PULL;
