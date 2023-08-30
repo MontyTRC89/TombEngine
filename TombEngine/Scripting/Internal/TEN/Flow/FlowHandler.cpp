@@ -215,8 +215,8 @@ Specify which translations in the strings table correspond to which languages.
 
 FlowHandler::~FlowHandler()
 {
-	for (auto& lev : Levels)
-		delete lev;
+	for (auto& level : Levels)
+		delete level;
 }
 
 std::string FlowHandler::GetGameDir()
@@ -229,7 +229,7 @@ void FlowHandler::SetGameDir(const std::string& assetDir)
 	m_gameDir = assetDir;
 }
 
-void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
+void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src)
 {
 	m_languageNames = std::move(src);
 }

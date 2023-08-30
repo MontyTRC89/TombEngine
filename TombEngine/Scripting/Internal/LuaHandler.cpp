@@ -18,9 +18,9 @@ void LuaHandler::ResetGlobals()
 	m_lua->set(sol::metatable_key, mt);
 }
 
-void LuaHandler::ExecuteScript(const std::string& luaFilename, bool optional)
+void LuaHandler::ExecuteScript(const std::string& luaFilename, bool isOptional)
 {
-	if (optional && !std::filesystem::is_regular_file(luaFilename))
+	if (isOptional && !std::filesystem::is_regular_file(luaFilename))
 		return;
 
 	auto result = m_lua->safe_script_file(luaFilename, sol::script_pass_on_error);
