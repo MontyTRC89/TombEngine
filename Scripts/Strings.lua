@@ -1,37 +1,50 @@
 local strings =
 {
+	--[[
+	Level name strings
+	--]]
+	lara_home = { "Lara's Home" },
+	test_level = { "Test Level" }
+	title = { "Title" },
+
+	--[[
+	Inventory item strings
+	--]]
 	binoculars = { "Binoculars" },
 	crossbow = { "Crossbow" },
-	crossbow_normal_ammo = { "Crossbow Normal Ammo" },
-	crossbow_poison_ammo = { "Crossbow Poison Ammo" },
 	crossbow_explosive_ammo = { "Crossbow Explosive Ammo" },
 	crossbow_lasersight = { "Crossbow + Lasersight" },
+	crossbow_normal_ammo = { "Crossbow Normal Ammo" },
+	crossbow_poison_ammo = { "Crossbow Poison Ammo" },
 	crowbar = { "Crowbar" },
 	diary = { "Diary" },
 	flares = { "Flares" },
 	grenade_launcher = { "Grenade Launcher" },
+	grenade_launcher_flash_ammo = { "Grenade Launcher Flash Ammo" },
 	grenade_launcher_normal_ammo = { "Grenade Launcher Normal Ammo" },
 	grenade_launcher_super_ammo = { "Grenade Launcher Super Ammo" },
-	grenade_launcher_flash_ammo = { "Grenade Launcher Flash Ammo" },
 	harpoon_gun = { "Harpoon Gun" },
 	harpoon_gun_ammo = { "Harpoon Gun Ammo" },
 	headset = { "Headset" },
 	hk = { "HK" },
 	hk_ammo = { "HK Ammo" },
 	hk_burst_mode = { "Burst Mode" },
-	hk_rapid_mode = { "Rapid Mode" },
 	hk_lasersight = { "HK + Lasersight" },
+	hk_rapid_mode = { "Rapid Mode" },
 	hk_sniper_mode = { "Sniper Mode" },
 	large_medipack = { "Large Medipack" },
 	lasersight = { "Lasersight" },
+	mechanical_scarab = { "Mechanical Scarab With Winding Key" },
+	mechanical_scarab_1 = { "Mechanical Scarab (No Winding Key)" },
+	mechanical_scarab_2 = { "Mechanical Scarab Winding Key" },
 	passport = { "Passport" },
 	pistol_ammo = { "Pistol Ammo" },
 	pistols = { "Pistols" },
 	revolver = { "Revolver" },
 	revolver_ammo = { "Revolver Ammo" },
 	revolver_lasersight = { "Revolver + Lasersight" },
-	rocket_launcher_ammo = { "Rocket Launcher Ammo" },
 	rocket_launcher = { "Rocket Launcher" },
+	rocket_launcher_ammo = { "Rocket Launcher Ammo" },
 	shotgun = { "Shotgun" },
 	shotgun_normal_ammo = { "Shotgun Normal Ammo" },
 	shotgun_wideshot_ammo = { "Shotgun Wideshot Ammo" },
@@ -40,24 +53,16 @@ local strings =
 	torch = { "Torch" },
 	uzi_ammo = { "Uzi Ammo" },
 	uzis = { "Uzis" },
-	
-	waterskin_small_empty = { "Small Waterskin (Empty)" },
-	waterskin_small_1l = { "Small Waterskin (1L)" },
-	waterskin_small_2l = { "Small Waterskin (2L)" },
-	waterskin_small_3l = { "Small Waterskin (3L)" },
-	waterskin_large_empty = { "Large Waterskin (Empty)" },
 	waterskin_large_1l = { "Large Waterskin (1L)" },
 	waterskin_large_2l = { "Large Waterskin (2L)" },
 	waterskin_large_3l = { "Large Waterskin (3L)" },
 	waterskin_large_4l = { "Large Waterskin (4L)" },
 	waterskin_large_5l = { "Large Waterskin (5L)" },
-	mechanical_scarab = { "Mechanical Scarab With Winding Key" },
-	mechanical_scarab_1 = { "Mechanical Scarab (No Winding Key)" },
-	mechanical_scarab_2 = { "Mechanical Scarab Winding Key" },
-	
-	lara_home = { "Lara's Home" },
-	title = { "Title" },
-	test_level = { "Test Level" }
+	waterskin_large_empty = { "Large Waterskin (Empty)" },
+	waterskin_small_1l = { "Small Waterskin (1L)" },
+	waterskin_small_2l = { "Small Waterskin (2L)" },
+	waterskin_small_3l = { "Small Waterskin (3L)" },
+	waterskin_small_empty = { "Small Waterskin (Empty)" },
 }
 
 TEN.Flow.SetStrings(strings)
