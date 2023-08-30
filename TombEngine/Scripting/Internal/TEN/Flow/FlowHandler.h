@@ -17,7 +17,7 @@ class FlowHandler : public ScriptInterfaceFlowHandler
 private:
 	Settings				m_settings;
 
-	std::unordered_map < std::string, std::vector<std::string > > m_translationsMap;
+	std::unordered_map<std::string, std::vector<std::string>> m_translationsMap;
 	std::vector<std::string> m_languageNames;
 
 	std::map<short, short>			m_itemsMap;

@@ -236,7 +236,15 @@ void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && 
 
 void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
-	m_translationsMap = std::move(src);
+	if (m_translationsMap.empty())
+	{
+		m_translationsMap = std::move(src);
+	}
+	else
+	{
+		for (auto& s : src.value())
+			m_translationsMap.insert_or_assign(s.first, s.second);
+	}
 }
 
 void FlowHandler::SetSettings(Settings const & src)
@@ -272,8 +280,9 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 void FlowHandler::LoadFlowScript()
 {
 	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/StringsSystem.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua", true);
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua", true);
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
