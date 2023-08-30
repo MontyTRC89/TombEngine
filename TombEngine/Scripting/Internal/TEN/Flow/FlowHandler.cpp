@@ -280,7 +280,7 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 void FlowHandler::LoadFlowScript()
 {
 	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/StringsSystem.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/SystemStrings.lua");
 	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua", true);
 	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua", true);
 
