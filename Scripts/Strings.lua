@@ -4,7 +4,7 @@ local strings =
 	Level name strings
 	--]]
 	lara_home = { "Lara's Home" },
-	test_level = { "Test Level" }
+	test_level = { "Test Level" },
 	title = { "Title" },
 
 	--[[
