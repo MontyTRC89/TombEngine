@@ -818,7 +818,7 @@ enum LaraAnim
 	LA_PUSHABLE_EDGE = 569,
 	LA_PUSHABLE_CLASSIC_EDGE = 570,
 
-	// 569-598 reserved for "true" ladders. -- Sezz 2023.04.16
+	// 571-600 reserved for "true" ladders. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 

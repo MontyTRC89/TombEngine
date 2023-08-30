@@ -338,8 +338,7 @@ namespace TEN::Entities::Generic
 					// Check if it has to stop the pushing/pulling movement.
 					if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop ||
 						!IsHeld(In::Action) ||
-						!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling) ||
-						pushable.isOnEdge)
+						!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling))
 					{
 						LaraItem->Animation.TargetState = LS_IDLE;
 						pushable.BehaviourState = PushablePhysicState::Idle;
@@ -352,6 +351,14 @@ namespace TEN::Entities::Generic
 
 						pushable.CurrentSoundState = PushableSoundState::Stopping;
 
+					}
+					else if (LaraItem->Animation.ActiveState == LS_PUSHABLE_PUSH && pushable.isOnEdge)
+					{
+						LaraItem->Animation.TargetState = LS_PUSHABLE_EDGE;
+
+						Vector3 movementDirection = pushableItem.Pose.Position.ToVector3() - LaraItem->Pose.Position.ToVector3();
+						movementDirection.Normalize();
+						LaraItem->Pose.Position = LaraItem->Pose.Position + movementDirection * BLOCK(1);
 					}
 					//Otherwise, Lara continues the pushing/pull animation movement.
 				break;
