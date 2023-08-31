@@ -15,7 +15,7 @@ public:
 	LuaHandler& operator=(const LuaHandler&) = delete;
 	~LuaHandler() = default;
 
-	void ExecuteScript(const std::string& luaFilename);
+	void ExecuteScript(const std::string& luaFilename, bool isOptional = false);
 	void ExecuteString(const std::string& command);
 
 	void ResetGlobals();
