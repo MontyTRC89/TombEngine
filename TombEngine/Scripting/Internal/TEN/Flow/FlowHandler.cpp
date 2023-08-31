@@ -242,8 +242,8 @@ void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::ve
 	}
 	else
 	{
-		for (auto& s : src.value())
-			m_translationsMap.insert_or_assign(s.first, s.second);
+		for (auto& stringPair : src.value())
+			m_translationsMap.insert_or_assign(stringPair.first, stringPair.second);
 	}
 }
 
