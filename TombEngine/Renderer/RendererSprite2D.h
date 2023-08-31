@@ -7,12 +7,11 @@ namespace TEN::Renderer
 
 	struct RendererSprite2DToDraw
 	{
-		RendererSprite* Sprite;
-		Vector2 Position;
-		Vector2 Size;
-		Vector3 Color;
-		short Angle;
-		float Opacity;
-		int Priority;
+		RendererSprite* SpritePtr	= nullptr;
+		Vector2			Position	= Vector2::Zero;
+		Vector2			Size		= Vector2::Zero;
+		Vector4			Color		= Vector4::Zero;
+		short			Orientation = 0;
+		int				Priority	= 0;
 	};
 }
