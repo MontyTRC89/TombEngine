@@ -555,10 +555,10 @@ namespace TEN::Renderer
 		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
 		void DrawSplashes(RenderView& view);
 		void DrawSprites(RenderView& view);
-		void DrawSprites2D(RenderView& view);
+		void DrawSpritesIn2DSpace(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
 		void DrawLines3D(RenderView& view);
-		void DrawLines2D();
+		void DrawLinesIn2DSpace();
 		void DrawOverlays(RenderView& view);
 		void DrawRopes(RenderView& view);
 		void DrawBats(RenderView& view);

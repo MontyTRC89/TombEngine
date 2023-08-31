@@ -395,7 +395,7 @@ namespace TEN::Renderer
 		renderView.Sprites2DToDraw.push_back(spriteToDraw);
 	}
 
-	void Renderer11::DrawSprites2D(RenderView& renderView)
+	void Renderer11::DrawSpritesIn2DSpace(RenderView& renderView)
 	{
 		constexpr auto VERTEX_COUNT = 4;
 
