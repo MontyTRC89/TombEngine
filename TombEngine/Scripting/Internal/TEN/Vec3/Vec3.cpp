@@ -54,23 +54,30 @@ void Vec3::Register(sol::table& parent)
 @treturn Vec3 A Vec3 object.
 @function Vec3
 */
-Vec3::Vec3(float aX, float aY, float aZ) : x(aX), y(aY), z(aZ)
+Vec3::Vec3(float aX, float aY, float aZ) :
+	x(aX),
+	y(aY),
+	z(aZ)
 {
 }
 
-Vec3::Vec3(const Vector3i& pos) : x((float)pos.x), y((float)pos.y), z((float)pos.z)
+Vec3::Vec3(const Vector3i& pos) :
+	x((float)pos.x),
+	y((float)pos.y),
+	z((float)pos.z)
 {
 }
 
-Vec3::Vec3(const Vector3& pos) : x(pos.x), y(pos.y), z(pos.z)
+Vec3::Vec3(const Vector3& pos) :
+	x(pos.x),
+	y(pos.y),
+	z(pos.z)
 {
 }
 
 void Vec3::StoreInPose(Pose& pose) const
 {
-	pose.Position.x = (int)x;
-	pose.Position.y = (int)y;
-	pose.Position.z = (int)z;
+	pose.Position = Vector3i(x, y, z);
 }
 
 void Vec3::StoreInGameVector(GameVector& pos) const

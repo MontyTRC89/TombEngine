@@ -49,11 +49,15 @@ void Vec2::Register(sol::table& parent)
 @treturn Vec2 A Vec2 object
 @function Vec2
 */
-Vec2::Vec2(float aX, float aY) : x(aX), y(aY)
+Vec2::Vec2(float aX, float aY) :
+	x(aX),
+	y(aY)
 {
 }
 
-Vec2::Vec2(const Vector2& pos) : x(pos.x), y(pos.y)
+Vec2::Vec2(const Vector2& pos) :
+	x(pos.x),
+	y(pos.y)
 {
 }
 
