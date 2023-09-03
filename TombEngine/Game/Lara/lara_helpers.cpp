@@ -241,14 +241,18 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 }
 
-static bool CanPlayerLookAround(const ItemInfo& item)
+bool CanPlayerLookAround(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// Check if drawn weapon has lasersight.
-	if (player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+	// 1) Check if drawn weapon has lasersight.
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+	{
 		return true;
+	}
 
+	// 2) Test for switchable target.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
@@ -258,7 +262,6 @@ static bool CanPlayerLookAround(const ItemInfo& item)
 			if (targetPtr != nullptr)
 				targetableCount++;
 
-			// Check if player can switch targets.
 			if (targetableCount > 1)
 				return false;
 		}
@@ -392,7 +395,9 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	{
 		short rangeRate = isSlow ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
 
-		if (IsHeld(In::StepLeft) && !IsHeld(In::StepRight))
+		// NOTE: Zooming allowed with either StepLeft/StepRight or Walk/Sprint.
+		if ((IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) ||
+			(IsHeld(In::Walk) && !IsHeld(In::Sprint)))
 		{
 			player.Control.Look.OpticRange -= rangeRate;
 			if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
@@ -404,7 +409,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 			}
 		}
-		else if (IsHeld(In::StepRight) && !IsHeld(In::StepLeft))
+		else if ((IsHeld(In::StepRight) && !IsHeld(In::StepLeft)) ||
+			(IsHeld(In::Sprint) && !IsHeld(In::Walk)))
 		{
 			player.Control.Look.OpticRange += rangeRate;
 			if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
@@ -788,9 +794,9 @@ void DoLaraTightropeBalance(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 	const int factor = ((lara->Control.Tightrope.TimeOnTightrope >> 7) & 0xFF) * 128;
 
-	if (TrInput & IN_LEFT)
+	if (IsHeld(In::Left))
 		lara->Control.Tightrope.Balance += ANGLE(1.4f);
-	if (TrInput & IN_RIGHT)
+	if (IsHeld(In::Right))
 		lara->Control.Tightrope.Balance -= ANGLE(1.4f);
 
 	if (lara->Control.Tightrope.Balance < 0)
@@ -1011,22 +1017,22 @@ void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	/*if (TrInput & (IN_FORWARD | IN_BACK))
+	/*if ((IsHeld(In::Forward) || IsHeld(In::Back)))
 	ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 		item->Pose.Orientation.x -= ANGLE(3.0f);
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 		item->Pose.Orientation.x += ANGLE(3.0f);
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
 		// TODO: ModulateLaraLean() doesn't really work here. -- Sezz 2022.06.22
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Pose.Orientation.z -= LARA_LEAN_RATE;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -1035,20 +1041,20 @@ void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_FORWARD && item->Pose.Orientation.x > -ANGLE(85.0f))
+	if (IsHeld(In::Forward) && item->Pose.Orientation.x > -ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = -ANGLE(45.0f);
-	else if (TrInput & IN_BACK && item->Pose.Orientation.x < ANGLE(85.0f))
+	else if (IsHeld(In::Back) && item->Pose.Orientation.x < ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = ANGLE(45.0f);
 	else
 		lara->Control.Subsuit.DXRot = 0;
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Pose.Orientation.z -= LARA_LEAN_RATE;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -1152,7 +1158,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 	if (abs(lara->ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
 		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
 
-	if (!(TrInput & IN_LOOK) &&
+	if (!IsHeld(In::Look) &&
 		item->Animation.ActiveState != LS_CRAWL_BACK)
 	{
 		lara->ExtraHeadRot.z = lara->ExtraTorsoRot.z / 2;
@@ -1203,22 +1209,22 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_FORWARD &&
+	if (IsHeld(In::Forward) &&
 		TestLaraJumpForward(item, coll))
 	{
 		lara->Control.JumpDirection = JumpDirection::Forward;
 	}
-	else if (TrInput & IN_BACK &&
+	else if (IsHeld(In::Back) &&
 		TestLaraJumpBack(item, coll))
 	{
 		lara->Control.JumpDirection = JumpDirection::Back;
 	}
-	else if (TrInput & IN_LEFT &&
+	else if (IsHeld(In::Left) &&
 		TestLaraJumpLeft(item, coll))
 	{
 		lara->Control.JumpDirection = JumpDirection::Left;
 	}
-	else if (TrInput & IN_RIGHT &&
+	else if (IsHeld(In::Right) &&
 		TestLaraJumpRight(item, coll))
 	{
 		lara->Control.JumpDirection = JumpDirection::Right;

@@ -74,7 +74,7 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 
 	item->Pose.Position.y -= CLICK(1);
 
-	if (TrInput & IN_BACK &&
+	if (IsHeld(In::Back) &&
 		resultRight != 0 && resultLeft != 0 &&
 		resultRight != -2 && resultLeft != -2)
 	{
@@ -152,7 +152,7 @@ void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 
 		item->Pose.Position.y += CLICK(1);
 		 
-		if (TrInput & IN_FORWARD && resultRight && resultLeft)
+		if (IsHeld(In::Forward) && resultRight && resultLeft)
 		{
 			if (resultRight < 0 || resultLeft < 0)
 			{
@@ -216,7 +216,7 @@ void lara_as_climb_right(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = ANGLE(30.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
 
-	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
+	if (!(IsHeld(In::Right) || IsHeld(In::StepRight)))
 		item->Animation.TargetState = LS_LADDER_IDLE;
 }
 
@@ -239,7 +239,7 @@ void lara_as_climb_left(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = -ANGLE(30.0f);
 	Camera.targetElevation = -ANGLE(15.0f);
 
-	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
+	if (!(IsHeld(In::Left) || IsHeld(In::StepLeft)))
 		item->Animation.TargetState = LS_LADDER_IDLE;
 }
 
@@ -252,9 +252,9 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 	if (LaraCheckForLetGo(item, coll) || item->Animation.AnimNumber != LA_LADDER_IDLE)
 		return;
 
-	if (!(TrInput & IN_FORWARD))
+	if (!IsHeld(In::Forward))
 	{
-		if (!(TrInput & IN_BACK))
+		if (!IsHeld(In::Back))
 			return;
 
 		if (item->Animation.TargetState == LS_HANG_IDLE)
@@ -366,12 +366,12 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_LADDER_DISMOUNT_RIGHT_START)
 		Camera.targetAngle = ANGLE(60.0f);
 
-	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
+	if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 	{
 		item->Animation.TargetState = LS_LADDER_LEFT;
 		lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	}
-	else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
+	else if (IsHeld(In::Right) || IsHeld(In::StepRight))
 	{
 		item->Animation.TargetState = LS_LADDER_RIGHT;
 		lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
@@ -499,9 +499,9 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 {
 	if (result == 1)
 	{
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_LADDER_LEFT;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Animation.TargetState = LS_LADDER_RIGHT;
 		else
 			item->Animation.TargetState = LS_LADDER_IDLE;
@@ -537,7 +537,7 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (IsHeld(In::Left))
 	{
 		short troomnumber = item->RoomNumber;
 		int dx = int(sin(TO_RAD(item->Pose.Orientation.y - ANGLE(90.0f))) * 10);
@@ -550,7 +550,7 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 			item->Animation.ActiveState = LS_MISC_CONTROL;
 		}
 	}
-	else if (TrInput & IN_RIGHT)
+	else if (IsHeld(In::Right))
 	{
 		short troomnumber = item->RoomNumber;
 		int dx = int(sin(TO_RAD(item->Pose.Orientation.y + ANGLE(90.0f))) * 10);
@@ -565,7 +565,7 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 		}
 	}
 
-	if (TrInput & IN_LEFT)
+	if (IsHeld(In::Left))
 	{
 		int flag = LaraClimbLeftCornerTest(item, coll);
 
@@ -579,7 +579,7 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 			return;
 		}
 	}
-	else if (TrInput & IN_RIGHT)
+	else if (IsHeld(In::Right))
 	{
 		int flag = LaraClimbRightCornerTest(item, coll);
 

@@ -267,7 +267,7 @@ namespace TEN::Renderer
 				{
 					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -310,14 +310,14 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_ACCELERATE;
+				int baseIndex = (int)In::Accelerate;
 
 				// Vehicle action listing
 				for (int k = 0; k < VehicleActionStrings.size(); k++)
 				{
 					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -366,14 +366,14 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_FLARE;
+				int baseIndex = (int)In::Flare;
 
 				// Quick action listing
 				for (int k = 0; k < QuickActionStrings.size(); k++)
 				{
 					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -415,14 +415,14 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_SELECT;
+				int baseIndex = (int)In::Select;
 
 				// Menu action listing.
 				for (int k = 0; k < MenuActionStrings.size(); k++)
 				{
 					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -868,22 +868,22 @@ namespace TEN::Renderer
 
 		auto& object = InventoryObjectTable[invItem];
 
-		if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 			orient.x += ANGLE(3.0f);
 
-		if (TrInput & IN_BACK)
+		if (IsHeld(In::Back))
 			orient.x -= ANGLE(3.0f);
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			orient.y += ANGLE(3.0f);
 
-		if (TrInput & IN_RIGHT)
+		if (IsHeld(In::Right))
 			orient.y -= ANGLE(3.0f);
 
-		if (TrInput & IN_SPRINT)
+		if (IsHeld(In::Sprint))
 			scaler += 0.03f;
 
-		if (TrInput & IN_CROUCH)
+		if (IsHeld(In::Crouch))
 			scaler -= 0.03f;
 
 		if (scaler > 1.6f)

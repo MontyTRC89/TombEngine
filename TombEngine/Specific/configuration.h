@@ -55,7 +55,7 @@ struct GameConfiguration
 	int	 MusicVolume  = 0;
 	int	 SfxVolume	  = 0;
 
-	// Gaeplay
+	// Gameplay
 	bool EnableSubtitles		= false;
 	bool EnableAutoTargeting	= false;
 	bool EnableRumble			= false;

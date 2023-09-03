@@ -430,7 +430,7 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		Lara.Control.HandStatus == HandStatus::Free &&
