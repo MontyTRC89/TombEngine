@@ -3,6 +3,7 @@
 
 #include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 
 using namespace TEN::Math;
 
@@ -27,37 +28,70 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::multiplication, &Vec3::MultiplyScale,
 		sol::meta_function::division, &Vec3::DivideScale,
 		sol::meta_function::unary_minus, &Vec3::UnaryMinus,
+		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
-		/*** Modify the Vec3 to match the input length.
+		/*** Normalize this Vec3 to a length of 1.0.
+		*/
+		ScriptReserved_Vec3Normalize, &Vec3::Normalize,
+
+		/*** Set the length of this Vec3 to match the input length.
 		@tparam float length new length to set.
 		@function Vec3:ToLength
 		*/
-		ScriptReserved_ToLength, &Vec3::SetLength,
+		ScriptReserved_Vec3SetLength, &Vec3::SetLength,
 
-		/// (float) x coordinate
+		/*** Clamp the length of this Vec3 to be within the input length (inclusive).
+		*/
+		ScriptReserved_ToLength, &Vec3::ClampLength,
+
+		/*** Linearly interpolate this Vec3 toward the input Vec3 according to an alpha between 0 and 1.
+		*/
+		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
+
+		/*** Set this Vec3 to the cross product of this Vec3 and the input Vec3.
+		*/
+		ScriptReserved_Vec3Cross, &Vec3::Cross,
+
+		/*** Rotate this Vec3 according to the input Rotation.
+		*/
+		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
+
+		/*** Get the length of this Vec3.
+		*/
+		ScriptReserved_Vec3Length, &Vec3::Length,
+
+		/*** Get the distance between this Vec3 and the input Vec3.
+		*/
+		ScriptReserved_Vec3Distance, &Vec3::Distance,
+
+		/*** Get the dot product of this Vec3 and the input Vec3.
+		*/
+		ScriptReserved_Vec3Dot, &Vec3::Dot,
+
+		/// (float) X component.
 		//@mem x
 		"x", &Vec3::x,
 
-		/// (float) y coordinate
+		/// (float) Y component.
 		//@mem y
 		"y", &Vec3::y,
 
-		/// (float) z coordinate
+		/// (float) Z component.
 		//@mem z
 		"z", &Vec3::z);
 }
 
 /*** 
-@float X x coordinate
-@float Y y coordinate
-@float Z z coordinate
-@treturn Vec3 A Vec3 object.
+@float x X component.
+@float y Y component.
+@float z Z component.
+@treturn Vec3 A Vec3.
 @function Vec3
 */
-Vec3::Vec3(float aX, float aY, float aZ) :
-	x(aX),
-	y(aY),
-	z(aZ)
+Vec3::Vec3(float x, float y, float z) :
+	x(x),
+	y(y),
+	z(z)
 {
 }
 
@@ -87,17 +121,78 @@ void Vec3::StoreInGameVector(GameVector& pos) const
 	pos.z = (int)z;
 }
 
+void Vec3::Normalize()
+{
+	auto normVector = Vector3(x, y, z);
+	normVector.Normalize();
+
+	*this = Vec3(normVector);
+}
+
 void Vec3::SetLength(float newLength)
 {
-	float currentLength = sqrt(SQUARE(x) + SQUARE(y) + SQUARE(z));
+	float currentLength = Length();
+
 	x = (x / currentLength) * newLength;
 	y = (y / currentLength) * newLength;
 	z = (z / currentLength) * newLength;
 }
 
+void Vec3::ClampLength(float lengthMax)
+{
+	if (Length() > lengthMax)
+		SetLength(lengthMax);
+}
+
+void Vec3::Lerp(const Vec3& vector, float alpha)
+{
+	auto vector0 = Vector3(x, y, z);
+	auto vector1 = Vector3(vector.x, vector.y, vector.z);
+
+	*this = Vec3(Vector3::Lerp(vector0, vector1, alpha));
+}
+
+void Vec3::Cross(const Vec3& vector)
+{
+	auto vector0 = Vector3(x, y, z);
+	auto vector1 = Vector3(vector.x, vector.y, vector.z);
+
+	*this = vector0.Cross(vector1);
+}
+
+void Vec3::Rotate(const Rotation& rot)
+{
+	auto vector = Vector3(x, y, z);
+	auto eulerRot = rot.ToEulerAngles();
+	auto rotMatrix = eulerRot.ToRotationMatrix();
+
+	*this = Vec3(Vector3::Transform(vector, rotMatrix));
+}
+
+float Vec3::Length() const
+{
+	return Vector3(x, y, z).Length();
+}
+
+float Vec3::Distance(const Vec3& vector) const
+{
+	auto vector0 = Vector3(x, y, z);
+	auto vector1 = Vector3(vector.x, vector.y, vector.z);
+
+	return Vector3::Distance(vector0, vector1);
+}
+
+float Vec3::Dot(const Vec3& vector)
+{
+	auto vector0 = Vector3(x, y, z);
+	auto vector1 = Vector3(vector.x, vector.y, vector.z);
+
+	return vector0.Dot(vector1);
+}
+
 /*** Metafunction; use tostring(myVector)
-@tparam Vec3 Vec3 this Vec3
-@treturn string A string showing the x, y, and z values of the Vec3
+@tparam Vec3 Vec3 this Vec3.
+@treturn string A string showing the X, Y, and Z components of the Vec3.
 @function __tostring
 */
 std::string Vec3::ToString() const
@@ -133,6 +228,14 @@ Vec3 Vec3::DivideScale(const Vec3& vector, float scale)
 Vec3 Vec3::UnaryMinus(const Vec3& vector)
 {
 	return Vec3(vector.x * -1, vector.y * -1, vector.z * -1);
+}
+
+bool Vec3::IsEqualTo(const Vec3& vector0, const Vec3& vector1)
+{
+	if (vector0.Distance(vector1) <= EPSILON)
+		return true;
+
+	return false;
 }
 
 Vec3::operator Vector3() const

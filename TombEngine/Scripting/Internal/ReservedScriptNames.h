@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Clean up and organise this entire file.
+
 // Tables
 static constexpr char ScriptReserved_TEN[]				= "TEN";
 static constexpr char ScriptReserved_Flow[]				= "Flow";
@@ -144,7 +146,6 @@ static constexpr char ScriptReserved_GetOnCollidedWithObject[]	= "GetOnCollidedW
 static constexpr char ScriptReserved_SetOnCollidedWithObject[]	= "SetOnCollidedWithObject";
 static constexpr char ScriptReserved_GetOnCollidedWithRoom[]	= "GetOnCollidedWithRoom";
 static constexpr char ScriptReserved_SetOnCollidedWithRoom[]	= "SetOnCollidedWithRoom";
-static constexpr char ScriptReserved_ToLength[]					= "ToLength"; // Should've been SetLength;
 static constexpr char ScriptReserved_ToVec2[]					= "ToVec2";
 static constexpr char ScriptReserved_AttachObjCamera[]		= "AttachObjCamera";
 static constexpr char ScriptReserved_AnimFromObject[]		= "AnimFromObject";
@@ -288,3 +289,14 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
+
+// Vec3
+constexpr char ScriptReserved_Vec3Normalize[] = "Normalize";
+constexpr char ScriptReserved_Vec3SetLength[] = "ToLength"; // Should've been SetLength!!!!!!!!!!!!!!!!!!!
+constexpr char ScriptReserved_ToLength[] = "ClampLength";
+constexpr char ScriptReserved_Vec3Lerp[] = "Lerp";
+constexpr char ScriptReserved_Vec3Cross[] = "Cross";
+constexpr char ScriptReserved_Vec3Rotate[] = "Rotate";
+constexpr char ScriptReserved_Vec3Length[] = "Length";
+constexpr char ScriptReserved_Vec3Distance[] = "Distance";
+constexpr char ScriptReserved_Vec3Dot[] = "Dot";
