@@ -193,17 +193,6 @@ namespace TEN::Collision
 		return *WaterBottomHeight;
 	}
 
-	Vector3 PointCollisionData::GetObjectIntersectPoint()
-	{
-		if (ObjectIntersectPoint.has_value())
-			return *ObjectIntersectPoint;
-
-		// Set object intersect point.
-		ObjectIntersectPoint = Vector3::Zero;
-
-		return *ObjectIntersectPoint;
-	}
-
 	bool PointCollisionData::IsWall()
 	{
 		return (GetFloorHeight() == NO_HEIGHT || GetCeilingHeight() == NO_HEIGHT ||

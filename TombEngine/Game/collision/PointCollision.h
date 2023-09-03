@@ -56,9 +56,6 @@ namespace TEN::Collision
 		int GetWaterTopHeight();
 		int GetWaterBottomHeight();
 
-		// TODO: Above and below. Also return reference to object itself? May need std::variant.
-		Vector3 GetObjectIntersectPoint();
-
 		// Inquirers
 		bool IsWall();
 		bool IsSlipperyFloor(short slopeAngleMin = DEFAULT_SLIPPERY_FLOOR_SLOPE_ANGLE);
