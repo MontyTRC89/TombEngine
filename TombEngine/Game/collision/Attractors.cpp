@@ -82,13 +82,13 @@ namespace TEN::Collision::Attractors
 		return Box;
 	}
 
-	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint) const
+	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint) const
 	{
 		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
 		constexpr auto FORWARD_FACING_ANGLE_THRESHOLD = ANGLE(90.0f);
 
 		// Get attractor proximity data.
-		auto attracProx = GetProximity(refPoint);
+		auto attracProx = GetProximity(probePoint);
 
 		// Get segment points.
 		const auto& origin = Points[attracProx.SegmentID];
@@ -115,7 +115,7 @@ namespace TEN::Collision::Attractors
 		return attracColl;
 	}
 
-	AttractorProximityData Attractor::GetProximity(const Vector3& refPoint) const
+	AttractorProximityData Attractor::GetProximity(const Vector3& probePoint) const
 	{
 		// Single point exists; return simple attractor proximity data.
 		if (Points.size() == 1)
@@ -123,7 +123,7 @@ namespace TEN::Collision::Attractors
 			return AttractorProximityData
 			{
 				Points.front(),
-				Vector3::Distance(refPoint, Points.front()),
+				Vector3::Distance(probePoint, Points.front()),
 				0.0f,
 				0
 			};
@@ -139,8 +139,8 @@ namespace TEN::Collision::Attractors
 			const auto& origin = Points[i];
 			const auto& target = Points[i + 1];
 
-			auto closestPoint = Geometry::GetClosestPointOnLinePerp(refPoint, origin, target);
-			float dist = Vector3::Distance(refPoint, closestPoint);
+			auto closestPoint = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
+			float dist = Vector3::Distance(probePoint, closestPoint);
 
 			// Found new closest point; update proximity data.
 			if (dist < attracProx.Distance)
@@ -414,9 +414,9 @@ namespace TEN::Collision::Attractors
 
 	// TODO: TRAE method of a search algorithm incorporating an R-tree might be ideal here.
 	// Would require a general collision refactor. -- Sezz 2023.07.30
-	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& refPoint, int roomNumber, float detectRadius)
+	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& probePoint, int roomNumber, float detectRadius)
 	{
-		auto sphere = BoundingSphere(refPoint, detectRadius);
+		auto sphere = BoundingSphere(probePoint, detectRadius);
 		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
 
 		// TEMP
@@ -454,18 +454,18 @@ namespace TEN::Collision::Attractors
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
-															   const Vector3& refPoint, float detectRadius)
+															   const Vector3& probePoint, float detectRadius)
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
 		// Get pointers to approximately nearby attractors from sphere-AABB tests.
-		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(refPoint, roomNumber, detectRadius);
+		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(probePoint, roomNumber, detectRadius);
 
 		// Get attractor collisions sorted by distance.
 		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
 		for (const auto* attracPtr : nearbyAttracPtrs)
 		{
-			auto attracColl = attracPtr->GetCollision(basePos, orient, refPoint);
+			auto attracColl = attracPtr->GetCollision(basePos, orient, probePoint);
 
 			// Filter out non-intersections.
 			if (attracColl.Proximity.Distance > detectRadius)
@@ -492,9 +492,9 @@ namespace TEN::Collision::Attractors
 		return attracColls;
 	}
 	
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float detectRadius)
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& probePoint, float detectRadius)
 	{
-		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, refPoint, detectRadius);
+		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, probePoint, detectRadius);
 	}
 	
 	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop)

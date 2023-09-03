@@ -69,8 +69,8 @@ namespace TEN::Collision::Attractors
 		const BoundingBox&			GetBox() const;
 
 		// Utilities
-		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& refPoint) const;
-		AttractorProximityData GetProximity(const Vector3& refPoint) const;
+		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint) const;
+		AttractorProximityData GetProximity(const Vector3& probePoint) const;
 		Vector3				   GetPointAtChainDistance(float chainDist) const;
 		unsigned int		   GetSegmentIDAtChainDistance(float chainDist) const;
 
@@ -90,8 +90,8 @@ namespace TEN::Collision::Attractors
 	};
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
-															   const Vector3& refPoint, float detectRadius);
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& refPoint, float detectRadius);
+															   const Vector3& probePoint, float detectRadius);
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& probePoint, float detectRadius);
 
 	Attractor				 GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop = true);
 	
