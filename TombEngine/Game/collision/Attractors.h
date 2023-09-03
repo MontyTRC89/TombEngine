@@ -21,10 +21,10 @@ namespace TEN::Collision::Attractors
 
 	struct AttractorProximityData
 	{
-		Vector3		 IntersectPoint = Vector3::Zero;
-		float		 Distance		= 0.0f;
-		float		 ChainDistance	= 0.0f;
-		unsigned int SegmentID		= 0;
+		Vector3		 Intersection  = Vector3::Zero;
+		float		 Distance	   = 0.0f;
+		float		 ChainDistance = 0.0f;
+		unsigned int SegmentID	   = 0;
 	};
 
 	struct AttractorCollisionData

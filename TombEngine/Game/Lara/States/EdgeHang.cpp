@@ -149,9 +149,9 @@ namespace TEN::Player
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
-		g_Renderer.AddLine3D(attracCollCenter.Proximity.IntersectPoint, attracCollCenter.Proximity.IntersectPoint + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
-		g_Renderer.AddLine3D(attracCollLeft.Proximity.IntersectPoint, attracCollLeft.Proximity.IntersectPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
-		g_Renderer.AddLine3D(attracCollRight.Proximity.IntersectPoint, attracCollRight.Proximity.IntersectPoint + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollCenter.Proximity.Intersection, attracCollCenter.Proximity.Intersection + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollLeft.Proximity.Intersection, attracCollLeft.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddLine3D(attracCollRight.Proximity.Intersection, attracCollRight.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 
 		short angleDelta = Geometry::GetShortestAngle(attracCollCenter.HeadingAngle, (sideOffset >= 0.0f) ? attracCollRight.HeadingAngle : attracCollLeft.HeadingAngle);
 		g_Renderer.PrintDebugMessage("Angle delta: %.3f", TO_DEGREES(angleDelta));
@@ -196,7 +196,7 @@ namespace TEN::Player
 		}
 
 		// Calculate heading angle.
-		auto orient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.IntersectPoint, edgeAttracColls->Right.Proximity.IntersectPoint);
+		auto orient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.Intersection, edgeAttracColls->Right.Proximity.Intersection);
 		auto headingAngle = orient.y - ANGLE(90.0f);
 
 		// Align orientation.
@@ -204,11 +204,11 @@ namespace TEN::Player
 		item.Pose.Orientation.Lerp(player.Context.TargetOrientation, ORIENT_LERP_ALPHA);
 
 		// Determine target point (correctly handles positioning at inner bends).
-		auto targetPoint = edgeAttracColls->Center.Proximity.IntersectPoint;
-		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Left.Proximity.IntersectPoint, player.Context.TargetOrientation) &&
-			!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Right.Proximity.IntersectPoint, player.Context.TargetOrientation))
+		auto targetPoint = edgeAttracColls->Center.Proximity.Intersection;
+		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Left.Proximity.Intersection, player.Context.TargetOrientation) &&
+			!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Right.Proximity.Intersection, player.Context.TargetOrientation))
 		{
-			targetPoint = (edgeAttracColls->Left.Proximity.IntersectPoint + edgeAttracColls->Right.Proximity.IntersectPoint) / 2;
+			targetPoint = (edgeAttracColls->Left.Proximity.Intersection + edgeAttracColls->Right.Proximity.Intersection) / 2;
 		}
 
 		// Align position.

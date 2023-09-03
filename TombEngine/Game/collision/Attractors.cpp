@@ -101,7 +101,7 @@ namespace TEN::Collision::Attractors
 
 		// Determine inquiries.
 		bool isFacingForward = (abs(Geometry::GetShortestAngle(headingAngle, orient.y)) <= FORWARD_FACING_ANGLE_THRESHOLD);
-		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.IntersectPoint, orient);
+		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.Intersection, orient);
 
 		// Create attractor collision data.
 		auto attracColl = AttractorCollisionData(*this);
@@ -147,7 +147,7 @@ namespace TEN::Collision::Attractors
 			{
 				chainDistTravelled += Vector3::Distance(origin, closestPoint);
 
-				attracProx.IntersectPoint = closestPoint;
+				attracProx.Intersection = closestPoint;
 				attracProx.Distance = dist;
 				attracProx.ChainDistance += chainDistTravelled;
 				attracProx.SegmentID = i;
@@ -312,7 +312,6 @@ namespace TEN::Collision::Attractors
 		constexpr auto SPHERE_SCALE			 = 15.0f;
 		constexpr auto COLOR_GREEN			 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
 		constexpr auto COLOR_YELLOW			 = Vector4(1.0f, 1.0f, 0.4f, 1.0f);
-		constexpr auto DEBUG_PAGE			 = RendererDebugPage::CollisionStats;
 
 		// Determine label string.
 		auto labelString = std::string();
@@ -352,7 +351,7 @@ namespace TEN::Collision::Attractors
 
 				// Draw label.
 				if (labelPos2D.has_value())
-					g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0, DEBUG_PAGE);
+					g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0, RendererDebugPage::CollisionStats);
 			}
 
 			// Draw start and end indicator lines.
@@ -377,14 +376,14 @@ namespace TEN::Collision::Attractors
 		if (chainDist >= 0.0f && chainDist <= Length)
 			return chainDist;
 
-		// Looped; wrap distance along attractor.
+		// Is looped; wrap distance along attractor.
 		if (IsLooped())
 		{
 			int sign = -std::copysign(1, chainDist);
 			return (chainDist + (Length * sign));
 		}
 		
-		// Not looped; clamp distance along attractor.
+		// Isn't looped; clamp distance along attractor.
 		return std::clamp(chainDist, 0.0f, Length);
 	}
 
@@ -450,7 +449,7 @@ namespace TEN::Collision::Attractors
 
 		DrawDebugAttractorBounds(sphere, nearbyAttracPtrs);
 
-		// Return attractor pointers found in sphere-AABB tests.
+		// Return pointers to approximately nearby attractors from sphere-AABB tests.
 		return nearbyAttracPtrs;
 	}
 
