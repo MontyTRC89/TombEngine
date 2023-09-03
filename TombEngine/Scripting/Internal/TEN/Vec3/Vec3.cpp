@@ -14,7 +14,7 @@ Represents a float-based 3D vector.
 
 void Vec3::Register(sol::table& parent)
 {
-	using ctors = sol::constructors<Vec3(int, int, int)>;
+	using ctors = sol::constructors<Vec3(float, float, float)>;
 
 	parent.new_usertype<Vec3>(
 		ScriptReserved_Vec3,
@@ -28,7 +28,7 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::division, &Vec3::DivideScale,
 		sol::meta_function::unary_minus, &Vec3::UnaryMinus,
 
-		/*** Modify the Vec2 to match the input length.
+		/*** Modify the Vec3 to match the input length.
 		@tparam float length new length to set.
 		@function Vec3:ToLength
 		*/
@@ -58,7 +58,7 @@ Vec3::Vec3(float aX, float aY, float aZ) : x(aX), y(aY), z(aZ)
 {
 }
 
-Vec3::Vec3(const Vector3i& pos) : x(pos.x), y(pos.y), z(pos.z)
+Vec3::Vec3(const Vector3i& pos) : x(float(pos.x)), y(float(pos.y)), z(float(pos.z))
 {
 }
 
@@ -68,16 +68,16 @@ Vec3::Vec3(const Vector3& pos) : x(pos.x), y(pos.y), z(pos.z)
 
 void Vec3::StoreInPose(Pose& pose) const
 {
-	pose.Position.x = x;
-	pose.Position.y = y;
-	pose.Position.z = z;
+	pose.Position.x = int(x);
+	pose.Position.y = int(y);
+	pose.Position.z = int(z);
 }
 
 void Vec3::StoreInGameVector(GameVector& pos) const
 {
-	pos.x = x;
-	pos.y = y;
-	pos.z = z;
+	pos.x = int(x);
+	pos.y = int(y);
+	pos.z = int(z);
 }
 
 void Vec3::SetLength(float newLength)
@@ -95,7 +95,7 @@ void Vec3::SetLength(float newLength)
 */
 std::string Vec3::ToString() const
 {
-	return ("{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }");
+	return "{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }";
 }
 
 Vec3 Vec3::Add(const Vec3& vector0, const Vec3& vector1)
