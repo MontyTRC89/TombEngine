@@ -2171,12 +2171,12 @@ struct PushableT : public flatbuffers::NativeTable {
   int32_t pushable_behaviour_state = 0;
   float pushable_gravity = 0.0f;
   float pushable_water_force = 0.0f;
-  int32_t pushable_stackLimit = 0;
-  int32_t pushable_stackUpper = 0;
-  int32_t pushable_stackLower = 0;
-  int32_t pushable_startX = 0;
-  int32_t pushable_startZ = 0;
-  int32_t pushable_roomNumber = 0;
+  int32_t pushable_stack_limit = 0;
+  int32_t pushable_stack_upper = 0;
+  int32_t pushable_stack_lower = 0;
+  int32_t pushable_start_x = 0;
+  int32_t pushable_start_z = 0;
+  int32_t pushable_room_number = 0;
   bool pushable_collider_flag = false;
   bool pushable_north_pullable = false;
   bool pushable_north_pushable = false;
@@ -2200,12 +2200,12 @@ struct Pushable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_PUSHABLE_BEHAVIOUR_STATE = 4,
     VT_PUSHABLE_GRAVITY = 6,
     VT_PUSHABLE_WATER_FORCE = 8,
-    VT_PUSHABLE_STACKLIMIT = 10,
-    VT_PUSHABLE_STACKUPPER = 12,
-    VT_PUSHABLE_STACKLOWER = 14,
-    VT_PUSHABLE_STARTX = 16,
-    VT_PUSHABLE_STARTZ = 18,
-    VT_PUSHABLE_ROOMNUMBER = 20,
+    VT_PUSHABLE_STACK_LIMIT = 10,
+    VT_PUSHABLE_STACK_UPPER = 12,
+    VT_PUSHABLE_STACK_LOWER = 14,
+    VT_PUSHABLE_START_X = 16,
+    VT_PUSHABLE_START_Z = 18,
+    VT_PUSHABLE_ROOM_NUMBER = 20,
     VT_PUSHABLE_COLLIDER_FLAG = 22,
     VT_PUSHABLE_NORTH_PULLABLE = 24,
     VT_PUSHABLE_NORTH_PUSHABLE = 26,
@@ -2229,23 +2229,23 @@ struct Pushable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float pushable_water_force() const {
     return GetField<float>(VT_PUSHABLE_WATER_FORCE, 0.0f);
   }
-  int32_t pushable_stackLimit() const {
-    return GetField<int32_t>(VT_PUSHABLE_STACKLIMIT, 0);
+  int32_t pushable_stack_limit() const {
+    return GetField<int32_t>(VT_PUSHABLE_STACK_LIMIT, 0);
   }
-  int32_t pushable_stackUpper() const {
-    return GetField<int32_t>(VT_PUSHABLE_STACKUPPER, 0);
+  int32_t pushable_stack_upper() const {
+    return GetField<int32_t>(VT_PUSHABLE_STACK_UPPER, 0);
   }
-  int32_t pushable_stackLower() const {
-    return GetField<int32_t>(VT_PUSHABLE_STACKLOWER, 0);
+  int32_t pushable_stack_lower() const {
+    return GetField<int32_t>(VT_PUSHABLE_STACK_LOWER, 0);
   }
-  int32_t pushable_startX() const {
-    return GetField<int32_t>(VT_PUSHABLE_STARTX, 0);
+  int32_t pushable_start_x() const {
+    return GetField<int32_t>(VT_PUSHABLE_START_X, 0);
   }
-  int32_t pushable_startZ() const {
-    return GetField<int32_t>(VT_PUSHABLE_STARTZ, 0);
+  int32_t pushable_start_z() const {
+    return GetField<int32_t>(VT_PUSHABLE_START_Z, 0);
   }
-  int32_t pushable_roomNumber() const {
-    return GetField<int32_t>(VT_PUSHABLE_ROOMNUMBER, 0);
+  int32_t pushable_room_number() const {
+    return GetField<int32_t>(VT_PUSHABLE_ROOM_NUMBER, 0);
   }
   bool pushable_collider_flag() const {
     return GetField<uint8_t>(VT_PUSHABLE_COLLIDER_FLAG, 0) != 0;
@@ -2291,12 +2291,12 @@ struct Pushable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_PUSHABLE_BEHAVIOUR_STATE) &&
            VerifyField<float>(verifier, VT_PUSHABLE_GRAVITY) &&
            VerifyField<float>(verifier, VT_PUSHABLE_WATER_FORCE) &&
-           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACKLIMIT) &&
-           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACKUPPER) &&
-           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACKLOWER) &&
-           VerifyField<int32_t>(verifier, VT_PUSHABLE_STARTX) &&
-           VerifyField<int32_t>(verifier, VT_PUSHABLE_STARTZ) &&
-           VerifyField<int32_t>(verifier, VT_PUSHABLE_ROOMNUMBER) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACK_LIMIT) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACK_UPPER) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_STACK_LOWER) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_START_X) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_START_Z) &&
+           VerifyField<int32_t>(verifier, VT_PUSHABLE_ROOM_NUMBER) &&
            VerifyField<uint8_t>(verifier, VT_PUSHABLE_COLLIDER_FLAG) &&
            VerifyField<uint8_t>(verifier, VT_PUSHABLE_NORTH_PULLABLE) &&
            VerifyField<uint8_t>(verifier, VT_PUSHABLE_NORTH_PUSHABLE) &&
@@ -2330,23 +2330,23 @@ struct PushableBuilder {
   void add_pushable_water_force(float pushable_water_force) {
     fbb_.AddElement<float>(Pushable::VT_PUSHABLE_WATER_FORCE, pushable_water_force, 0.0f);
   }
-  void add_pushable_stackLimit(int32_t pushable_stackLimit) {
-    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACKLIMIT, pushable_stackLimit, 0);
+  void add_pushable_stack_limit(int32_t pushable_stack_limit) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACK_LIMIT, pushable_stack_limit, 0);
   }
-  void add_pushable_stackUpper(int32_t pushable_stackUpper) {
-    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACKUPPER, pushable_stackUpper, 0);
+  void add_pushable_stack_upper(int32_t pushable_stack_upper) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACK_UPPER, pushable_stack_upper, 0);
   }
-  void add_pushable_stackLower(int32_t pushable_stackLower) {
-    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACKLOWER, pushable_stackLower, 0);
+  void add_pushable_stack_lower(int32_t pushable_stack_lower) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STACK_LOWER, pushable_stack_lower, 0);
   }
-  void add_pushable_startX(int32_t pushable_startX) {
-    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STARTX, pushable_startX, 0);
+  void add_pushable_start_x(int32_t pushable_start_x) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_START_X, pushable_start_x, 0);
   }
-  void add_pushable_startZ(int32_t pushable_startZ) {
-    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_STARTZ, pushable_startZ, 0);
+  void add_pushable_start_z(int32_t pushable_start_z) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_START_Z, pushable_start_z, 0);
   }
-  void add_pushable_roomNumber(int32_t pushable_roomNumber) {
-    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_ROOMNUMBER, pushable_roomNumber, 0);
+  void add_pushable_room_number(int32_t pushable_room_number) {
+    fbb_.AddElement<int32_t>(Pushable::VT_PUSHABLE_ROOM_NUMBER, pushable_room_number, 0);
   }
   void add_pushable_collider_flag(bool pushable_collider_flag) {
     fbb_.AddElement<uint8_t>(Pushable::VT_PUSHABLE_COLLIDER_FLAG, static_cast<uint8_t>(pushable_collider_flag), 0);
@@ -2403,12 +2403,12 @@ inline flatbuffers::Offset<Pushable> CreatePushable(
     int32_t pushable_behaviour_state = 0,
     float pushable_gravity = 0.0f,
     float pushable_water_force = 0.0f,
-    int32_t pushable_stackLimit = 0,
-    int32_t pushable_stackUpper = 0,
-    int32_t pushable_stackLower = 0,
-    int32_t pushable_startX = 0,
-    int32_t pushable_startZ = 0,
-    int32_t pushable_roomNumber = 0,
+    int32_t pushable_stack_limit = 0,
+    int32_t pushable_stack_upper = 0,
+    int32_t pushable_stack_lower = 0,
+    int32_t pushable_start_x = 0,
+    int32_t pushable_start_z = 0,
+    int32_t pushable_room_number = 0,
     bool pushable_collider_flag = false,
     bool pushable_north_pullable = false,
     bool pushable_north_pushable = false,
@@ -2423,12 +2423,12 @@ inline flatbuffers::Offset<Pushable> CreatePushable(
     bool pushable_west_pushable = false,
     bool pushable_west_climbable = false) {
   PushableBuilder builder_(_fbb);
-  builder_.add_pushable_roomNumber(pushable_roomNumber);
-  builder_.add_pushable_startZ(pushable_startZ);
-  builder_.add_pushable_startX(pushable_startX);
-  builder_.add_pushable_stackLower(pushable_stackLower);
-  builder_.add_pushable_stackUpper(pushable_stackUpper);
-  builder_.add_pushable_stackLimit(pushable_stackLimit);
+  builder_.add_pushable_room_number(pushable_room_number);
+  builder_.add_pushable_start_z(pushable_start_z);
+  builder_.add_pushable_start_x(pushable_start_x);
+  builder_.add_pushable_stack_lower(pushable_stack_lower);
+  builder_.add_pushable_stack_upper(pushable_stack_upper);
+  builder_.add_pushable_stack_limit(pushable_stack_limit);
   builder_.add_pushable_water_force(pushable_water_force);
   builder_.add_pushable_gravity(pushable_gravity);
   builder_.add_pushable_behaviour_state(pushable_behaviour_state);
@@ -3523,12 +3523,12 @@ inline void Pushable::UnPackTo(PushableT *_o, const flatbuffers::resolver_functi
   { auto _e = pushable_behaviour_state(); _o->pushable_behaviour_state = _e; }
   { auto _e = pushable_gravity(); _o->pushable_gravity = _e; }
   { auto _e = pushable_water_force(); _o->pushable_water_force = _e; }
-  { auto _e = pushable_stackLimit(); _o->pushable_stackLimit = _e; }
-  { auto _e = pushable_stackUpper(); _o->pushable_stackUpper = _e; }
-  { auto _e = pushable_stackLower(); _o->pushable_stackLower = _e; }
-  { auto _e = pushable_startX(); _o->pushable_startX = _e; }
-  { auto _e = pushable_startZ(); _o->pushable_startZ = _e; }
-  { auto _e = pushable_roomNumber(); _o->pushable_roomNumber = _e; }
+  { auto _e = pushable_stack_limit(); _o->pushable_stack_limit = _e; }
+  { auto _e = pushable_stack_upper(); _o->pushable_stack_upper = _e; }
+  { auto _e = pushable_stack_lower(); _o->pushable_stack_lower = _e; }
+  { auto _e = pushable_start_x(); _o->pushable_start_x = _e; }
+  { auto _e = pushable_start_z(); _o->pushable_start_z = _e; }
+  { auto _e = pushable_room_number(); _o->pushable_room_number = _e; }
   { auto _e = pushable_collider_flag(); _o->pushable_collider_flag = _e; }
   { auto _e = pushable_north_pullable(); _o->pushable_north_pullable = _e; }
   { auto _e = pushable_north_pushable(); _o->pushable_north_pushable = _e; }
@@ -3555,12 +3555,12 @@ inline flatbuffers::Offset<Pushable> CreatePushable(flatbuffers::FlatBufferBuild
   auto _pushable_behaviour_state = _o->pushable_behaviour_state;
   auto _pushable_gravity = _o->pushable_gravity;
   auto _pushable_water_force = _o->pushable_water_force;
-  auto _pushable_stackLimit = _o->pushable_stackLimit;
-  auto _pushable_stackUpper = _o->pushable_stackUpper;
-  auto _pushable_stackLower = _o->pushable_stackLower;
-  auto _pushable_startX = _o->pushable_startX;
-  auto _pushable_startZ = _o->pushable_startZ;
-  auto _pushable_roomNumber = _o->pushable_roomNumber;
+  auto _pushable_stack_limit = _o->pushable_stack_limit;
+  auto _pushable_stack_upper = _o->pushable_stack_upper;
+  auto _pushable_stack_lower = _o->pushable_stack_lower;
+  auto _pushable_start_x = _o->pushable_start_x;
+  auto _pushable_start_z = _o->pushable_start_z;
+  auto _pushable_room_number = _o->pushable_room_number;
   auto _pushable_collider_flag = _o->pushable_collider_flag;
   auto _pushable_north_pullable = _o->pushable_north_pullable;
   auto _pushable_north_pushable = _o->pushable_north_pushable;
@@ -3579,12 +3579,12 @@ inline flatbuffers::Offset<Pushable> CreatePushable(flatbuffers::FlatBufferBuild
       _pushable_behaviour_state,
       _pushable_gravity,
       _pushable_water_force,
-      _pushable_stackLimit,
-      _pushable_stackUpper,
-      _pushable_stackLower,
-      _pushable_startX,
-      _pushable_startZ,
-      _pushable_roomNumber,
+      _pushable_stack_limit,
+      _pushable_stack_upper,
+      _pushable_stack_lower,
+      _pushable_start_x,
+      _pushable_start_z,
+      _pushable_room_number,
       _pushable_collider_flag,
       _pushable_north_pullable,
       _pushable_north_pushable,

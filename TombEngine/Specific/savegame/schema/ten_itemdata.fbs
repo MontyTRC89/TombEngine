@@ -140,13 +140,13 @@ table Pushable {
 	pushable_gravity: float;
 	pushable_water_force: float;
 
-	pushable_stackLimit: int32;
-	pushable_stackUpper: int32;
-	pushable_stackLower: int32;
+	pushable_stack_limit: int32;
+	pushable_stack_upper: int32;
+	pushable_stack_lower: int32;
 
-	pushable_startX: int32;
-	pushable_startZ: int32;
-	pushable_roomNumber: int32;
+	pushable_start_x: int32;
+	pushable_start_z: int32;
+	pushable_room_number: int32;
 
 	pushable_collider_flag: bool;
 

@@ -678,13 +678,13 @@ bool SaveGame::Save(int slot)
 			pushableBuilder.add_pushable_gravity(pushable->Gravity);
 			pushableBuilder.add_pushable_water_force(pushable->FloatingForce);
 
-			pushableBuilder.add_pushable_stackLimit(pushable->StackLimit);
-			pushableBuilder.add_pushable_stackUpper(pushable->StackUpperItem);
-			pushableBuilder.add_pushable_stackLower(pushable->StackLowerItem);
+			pushableBuilder.add_pushable_stack_limit(pushable->StackLimit);
+			pushableBuilder.add_pushable_stack_upper(pushable->StackUpperItem);
+			pushableBuilder.add_pushable_stack_lower(pushable->StackLowerItem);
 
-			pushableBuilder.add_pushable_startX(pushable->StartPos.x);
-			pushableBuilder.add_pushable_startZ(pushable->StartPos.z);
-			pushableBuilder.add_pushable_roomNumber(pushable->StartPos.RoomNumber);
+			pushableBuilder.add_pushable_start_x(pushable->StartPos.x);
+			pushableBuilder.add_pushable_start_z(pushable->StartPos.z);
+			pushableBuilder.add_pushable_room_number(pushable->StartPos.RoomNumber);
 
 			pushableBuilder.add_pushable_collider_flag(pushable->BridgeColliderFlag);
 
@@ -1792,13 +1792,13 @@ bool SaveGame::Load(int slot)
 			pushable->Gravity = savedPushable->pushable_gravity();
 			pushable->FloatingForce = savedPushable->pushable_water_force();
 
-			pushable->StackLimit = savedPushable->pushable_stackLimit();
-			pushable->StackUpperItem = savedPushable->pushable_stackUpper();
-			pushable->StackLowerItem = savedPushable->pushable_stackLower();
+			pushable->StackLimit = savedPushable->pushable_stack_limit();
+			pushable->StackUpperItem = savedPushable->pushable_stack_upper();
+			pushable->StackLowerItem = savedPushable->pushable_stack_lower();
 
-			pushable->StartPos.x = savedPushable->pushable_startX();
-			pushable->StartPos.z = savedPushable->pushable_startZ();
-			pushable->StartPos.RoomNumber = savedPushable->pushable_roomNumber();
+			pushable->StartPos.x = savedPushable->pushable_start_x();
+			pushable->StartPos.z = savedPushable->pushable_start_z();
+			pushable->StartPos.RoomNumber = savedPushable->pushable_room_number();
 
 			pushable->BridgeColliderFlag = savedPushable->pushable_collider_flag();
 
