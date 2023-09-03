@@ -34,12 +34,13 @@ namespace TEN::Player
 	};
 
 	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																					 const Attractor& currentAttrac, const Vector3& refPoint)
+																					 const Attractor& currentAttrac, const Vector3& probePoint)
 	{
 		constexpr auto CONNECT_DIST_THRESHOLD = BLOCK(1 / 64.0f);
+		constexpr auto CORNER_ANGLE_MAX		  = ANGLE(30.0f);
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, refPoint, CONNECT_DIST_THRESHOLD);
+		auto attracColls = GetAttractorCollisions(item, probePoint, CONNECT_DIST_THRESHOLD);
 
 		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
@@ -47,12 +48,17 @@ namespace TEN::Player
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
-			// 1) Check if attractor is new.
+			// 1) Filter out current attractor.
 			if (&attracColl.Attrac == &currentAttrac)
 				continue;
 
 			// 2) Check if attractor is edge type.
 			if (!attracColl.Attrac.IsEdge())
+				continue;
+
+			// 3) Test sharp corner.
+			auto currentAttracColl = currentAttrac.GetCollision(item.Pose.Position.ToVector3(), item.Pose.Orientation, probePoint);
+			if (Geometry::GetShortestAngle(attracColl.HeadingAngle, currentAttracColl.HeadingAngle) > CORNER_ANGLE_MAX)
 				continue;
 
 			// Track closest attractor.
