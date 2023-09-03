@@ -58,7 +58,7 @@ Vec3::Vec3(float aX, float aY, float aZ) : x(aX), y(aY), z(aZ)
 {
 }
 
-Vec3::Vec3(const Vector3i& pos) : x(float(pos.x)), y(float(pos.y)), z(float(pos.z))
+Vec3::Vec3(const Vector3i& pos) : x((float)pos.x), y((float)pos.y), z((float)pos.z)
 {
 }
 
@@ -68,16 +68,16 @@ Vec3::Vec3(const Vector3& pos) : x(pos.x), y(pos.y), z(pos.z)
 
 void Vec3::StoreInPose(Pose& pose) const
 {
-	pose.Position.x = int(x);
-	pose.Position.y = int(y);
-	pose.Position.z = int(z);
+	pose.Position.x = (int)x;
+	pose.Position.y = (int)y;
+	pose.Position.z = (int)z;
 }
 
 void Vec3::StoreInGameVector(GameVector& pos) const
 {
-	pos.x = int(x);
-	pos.y = int(y);
-	pos.z = int(z);
+	pos.x = (int)x;
+	pos.y = (int)y;
+	pos.z = (int)z;
 }
 
 void Vec3::SetLength(float newLength)
