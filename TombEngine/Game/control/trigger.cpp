@@ -785,20 +785,15 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 				if (!((int)set.Activators & activatorType))
 					continue;
 
-				switch (trigger & TIMER_BITS)
+				int eventType = trigger & TIMER_BITS;
+
+				if (eventType > (int)VolumeEventType::Count)
 				{
-				case 0:
-					HandleEvent(set.OnEnter, activator);
-					break;
-
-				case 1:
-					HandleEvent(set.OnInside, activator);
-					break;
-
-				case 2:
-					HandleEvent(set.OnLeave, activator);
-					break;
+					TENLog("Unknown volume event type encountered for legacy trigger: " + std::to_string(eventType), LogLevel::Warning);
+					continue;
 				}
+
+				HandleEvent(set.Events[eventType], activator);
 			}
 			break;
 

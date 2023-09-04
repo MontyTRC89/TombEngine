@@ -805,9 +805,9 @@ bool SaveGame::Save(int slot)
 	{
 		Save::EventSetCallCountersBuilder serializedEventSetCallCounter{ fbb };
 
-		serializedEventSetCallCounter.add_on_enter(set.OnEnter.CallCounter);
-		serializedEventSetCallCounter.add_on_inside(set.OnInside.CallCounter);
-		serializedEventSetCallCounter.add_on_leave(set.OnLeave.CallCounter);
+		serializedEventSetCallCounter.add_on_enter(set.Events[(int)VolumeEventType::Enter].CallCounter);
+		serializedEventSetCallCounter.add_on_inside(set.Events[(int)VolumeEventType::Inside].CallCounter);
+		serializedEventSetCallCounter.add_on_leave(set.Events[(int)VolumeEventType::Leave].CallCounter);
 
 		auto serializedEventSetCallCounterOffset = serializedEventSetCallCounter.Finish();
 		serializedEventSetCallCounters.push_back(serializedEventSetCallCounterOffset);
@@ -1868,9 +1868,9 @@ bool SaveGame::Load(int slot)
 		{
 			auto cc_saved = s->call_counters()->Get(i);
 
-			g_Level.EventSets[i].OnEnter.CallCounter = cc_saved->on_enter();
-			g_Level.EventSets[i].OnInside.CallCounter = cc_saved->on_inside();
-			g_Level.EventSets[i].OnLeave.CallCounter = cc_saved->on_leave();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Enter].CallCounter = cc_saved->on_enter();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Inside].CallCounter = cc_saved->on_inside();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Leave].CallCounter = cc_saved->on_leave();
 		}
 	}
 

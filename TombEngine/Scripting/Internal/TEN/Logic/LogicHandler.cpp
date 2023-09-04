@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "Game/savegame.h"
+#include "Game/control/volume.h"
 #include "Game/effects/Electricity.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -49,6 +50,13 @@ static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
 	{ ScriptReserved_PreSave, CallbackPoint::PreSave },
 	{ ScriptReserved_PreEnd, CallbackPoint::PreEnd },
 	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd }
+};
+
+static const std::unordered_map<std::string, VolumeEventType> kEventTypes
+{
+	{ ScriptReserved_OnEnter, VolumeEventType::Enter },
+	{ ScriptReserved_OnInside, VolumeEventType::Inside },
+	{ ScriptReserved_OnLeave, VolumeEventType::Leave }
 };
 
 enum class LevelEndReason
@@ -154,9 +162,11 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 
 	tableLogic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
 	tableLogic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
+	tableLogic.set_function(ScriptReserved_HandleEvent, &LogicHandler::HandleEvent, this);
 
 	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, kLevelEndReasons);
 	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, kCallbackPoints);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EventType, kEventTypes);
 
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreStart, &m_callbacksPreStart));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostStart, &m_callbacksPostStart));
@@ -258,6 +268,33 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 	}
 
 	it->second->erase(levelFunc.m_funcName);
+}
+
+/*** Attempt to find an event set and exectute a particular event from it.
+
+@function HandleEvent
+@tparam name string Name of the event set to find.
+@tparam type EventType Event to execute.
+@tparam activator Moveable Optional activator. If not provided, player object will be automatically provided as activator.
+*/
+void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, TypeOrNil<Moveable>& activator)
+{
+	bool result = false;
+
+	if (std::holds_alternative<Moveable>(activator))
+	{
+		result = TEN::Control::Volumes::HandleEvent(name, type, std::get<Moveable>(activator).GetIndex());
+	}
+	else
+	{
+		result = TEN::Control::Volumes::HandleEvent(name, type, nullptr);
+	}
+
+	if (!result)
+	{
+		TENLog("Error: event " + name + " could not be executed. Check if event with such name exists in project.",
+			   LogLevel::Error, LogConfig::All, false);
+	}
 }
 
 void LogicHandler::ResetLevelTables()
