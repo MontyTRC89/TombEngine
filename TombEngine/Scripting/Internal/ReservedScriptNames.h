@@ -291,12 +291,18 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 
 // Vec3
-constexpr char ScriptReserved_Vec3Normalize[] = "Normalize";
-constexpr char ScriptReserved_Vec3SetLength[] = "ToLength"; // Should've been SetLength!!!!!!!!!!!!!!!!!!!
-constexpr char ScriptReserved_ToLength[] = "ClampLength";
-constexpr char ScriptReserved_Vec3Lerp[] = "Lerp";
-constexpr char ScriptReserved_Vec3Cross[] = "Cross";
-constexpr char ScriptReserved_Vec3Rotate[] = "Rotate";
-constexpr char ScriptReserved_Vec3Length[] = "Length";
-constexpr char ScriptReserved_Vec3Distance[] = "Distance";
-constexpr char ScriptReserved_Vec3Dot[] = "Dot";
+constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
+constexpr char ScriptReserved_Vec3StaticNormalize[] = "Normalize";
+constexpr char ScriptReserved_Vec3SetLength[]		= "ToLength"; // SetLength
+constexpr char ScriptReserved_Vec3ClampLength[]		= "ClampLength";
+constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
+constexpr char ScriptReserved_Vec3StaticRotate[]	= "Rotate";
+constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
+constexpr char ScriptReserved_Vec3StaticLerp[]		= "Lerp";
+constexpr char ScriptReserved_Vec3Cross[]			= "Cross";
+constexpr char ScriptReserved_Vec3StaticCross[]		= "Cross";
+constexpr char ScriptReserved_Vec3Length[]			= "Length";
+constexpr char ScriptReserved_Vec3Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec3StaticDistance[]	= "Distance";
+constexpr char ScriptReserved_Vec3Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec3StaticDot[]		= "Dot";

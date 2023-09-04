@@ -17,7 +17,7 @@ public:
 	float z = 0;
 
 	// Constructors
-	Vec3() = default;
+	Vec3() {};
 	Vec3(float x, float y, float z);
 	Vec3(const Vector3i& pos);
 	Vec3(const Vector3& pos);
@@ -25,20 +25,23 @@ public:
 	void StoreInPose(Pose& pos) const;
 	void StoreInGameVector(GameVector& vector) const;
 	
-	// TODO: Register static variants of some of these methods.
-	
 	// Utilities
-	void Normalize();
-	void SetLength(float length);
-	void ClampLength(float lengthMax);
-	void Lerp(const Vec3& vector, float alpha);
-	void Cross(const Vec3& vector);
-	void Rotate(const Rotation& rot);
+	void		Normalize();
+	static Vec3 StaticNormalize(const Vec3& vector);
+	void		SetLength(float length);
+	void		ClampLength(float lengthMax);
+	void		Rotate(const Rotation& rot);
+	static Vec3 StaticRotate(const Vec3& vector, const Rotation& rot);
+	void		Lerp(const Vec3& vector, float alpha);
+	static Vec3 StaticLerp(const Vec3& vector0, const Vec3& vector1, float alpha);
+	void		Cross(const Vec3& vector);
+	static Vec3 StaticCross(const Vec3& vector0, const Vec3& vector1);
 
-	// Getters
-	float Length() const;
-	float Distance(const Vec3& vector) const;
-	float Dot(const Vec3& vector);
+	float		 Length() const;
+	float		 Distance(const Vec3& vector) const;
+	static float StaticDistance(const Vec3& vector0, const Vec3& vector1);
+	float		 Dot(const Vec3& vector) const;
+	static float StaticDot(const Vec3& vector0, const Vec3& vector1);
 
 	// Meta functions
 	[[nodiscard]] std::string ToString() const;

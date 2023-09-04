@@ -30,9 +30,13 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::unary_minus, &Vec3::UnaryMinus,
 		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
-		/*** Normalize this Vec3 to a length of 1.0.
+		/*** Normalize this Vec3 to the length of 1.0.
 		*/
 		ScriptReserved_Vec3Normalize, &Vec3::Normalize,
+		
+		/*** Get a normalized Vec3 at the length of 1.0.
+		*/
+		ScriptReserved_Vec3StaticNormalize, &Vec3::StaticNormalize,
 
 		/*** Set the length of this Vec3 to match the input length.
 		@tparam float length new length to set.
@@ -42,19 +46,31 @@ void Vec3::Register(sol::table& parent)
 
 		/*** Clamp the length of this Vec3 to be within the input length (inclusive).
 		*/
-		ScriptReserved_ToLength, &Vec3::ClampLength,
-
-		/*** Linearly interpolate this Vec3 toward the input Vec3 according to an alpha between 0 and 1.
-		*/
-		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
-
-		/*** Set this Vec3 to the cross product of this Vec3 and the input Vec3.
-		*/
-		ScriptReserved_Vec3Cross, &Vec3::Cross,
+		ScriptReserved_Vec3ClampLength, &Vec3::ClampLength,
 
 		/*** Rotate this Vec3 according to the input Rotation.
 		*/
 		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
+		
+		/*** Get a rotated Vec3 according to the input Rotation.
+		*/
+		ScriptReserved_Vec3StaticRotate, &Vec3::StaticRotate,
+
+		/*** Linearly interpolate this Vec3 toward the input Vec3 according to the provided alpha value in the range [0.0, 1.0].
+		*/
+		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
+		
+		/*** Get a linearly interpolated Vec3 between the input Vec3 objects according to the provided alpha value in the range [0.0, 1.0].
+		*/
+		ScriptReserved_Vec3StaticLerp, &Vec3::StaticLerp,
+
+		/*** Set this Vec3 to the cross product of this Vec3 and the input Vec3.
+		*/
+		ScriptReserved_Vec3Cross, &Vec3::Cross,
+		
+		/*** Get the cross product between the input Vec3 objects.
+		*/
+		ScriptReserved_Vec3StaticCross, &Vec3::StaticCross,
 
 		/*** Get the length of this Vec3.
 		*/
@@ -63,10 +79,18 @@ void Vec3::Register(sol::table& parent)
 		/*** Get the distance between this Vec3 and the input Vec3.
 		*/
 		ScriptReserved_Vec3Distance, &Vec3::Distance,
+		
+		/*** Get the distance between the input Vec3 objects.
+		*/
+		ScriptReserved_Vec3StaticDistance, &Vec3::StaticDistance,
 
 		/*** Get the dot product of this Vec3 and the input Vec3.
 		*/
 		ScriptReserved_Vec3Dot, &Vec3::Dot,
+		
+		/*** Get the dot product of the input Vec3 objects.
+		*/
+		ScriptReserved_Vec3StaticDot, &Vec3::StaticDot,
 
 		/// (float) X component.
 		//@mem x
@@ -88,25 +112,25 @@ void Vec3::Register(sol::table& parent)
 @treturn Vec3 A Vec3.
 @function Vec3
 */
-Vec3::Vec3(float x, float y, float z) :
-	x(x),
-	y(y),
-	z(z)
+Vec3::Vec3(float x, float y, float z)
 {
+	this->x = x;
+	this->y = y;
+	this->z = z;
 }
 
-Vec3::Vec3(const Vector3i& pos) :
-	x((float)pos.x),
-	y((float)pos.y),
-	z((float)pos.z)
+Vec3::Vec3(const Vector3i& pos)
 {
+	x = pos.x;
+	y = pos.y;
+	z = pos.z;
 }
 
-Vec3::Vec3(const Vector3& pos) :
-	x(pos.x),
-	y(pos.y),
-	z(pos.z)
+Vec3::Vec3(const Vector3& pos)
 {
+	x = pos.x;
+	y = pos.y;
+	z = pos.z;
 }
 
 void Vec3::StoreInPose(Pose& pose) const
@@ -123,10 +147,15 @@ void Vec3::StoreInGameVector(GameVector& pos) const
 
 void Vec3::Normalize()
 {
-	auto normVector = Vector3(x, y, z);
+	SetLength(1.0f);
+}
+
+Vec3 Vec3::StaticNormalize(const Vec3& vector)
+{
+	auto normVector = vector;
 	normVector.Normalize();
 
-	*this = Vec3(normVector);
+	return normVector;
 }
 
 void Vec3::SetLength(float newLength)
@@ -144,12 +173,37 @@ void Vec3::ClampLength(float lengthMax)
 		SetLength(lengthMax);
 }
 
+void Vec3::Rotate(const Rotation& rot)
+{
+	auto vector = Vector3(x, y, z);
+	auto eulerRot = rot.ToEulerAngles();
+	auto rotMatrix = eulerRot.ToRotationMatrix();
+
+	*this = Vec3(Vector3::Transform(vector, rotMatrix));
+}
+
+Vec3 Vec3::StaticRotate(const Vec3& vector, const Rotation& rot)
+{
+	auto rotVector = vector;
+	rotVector.Rotate(rot);
+
+	return rotVector;
+}
+
 void Vec3::Lerp(const Vec3& vector, float alpha)
 {
 	auto vector0 = Vector3(x, y, z);
 	auto vector1 = Vector3(vector.x, vector.y, vector.z);
 
 	*this = Vec3(Vector3::Lerp(vector0, vector1, alpha));
+}
+
+Vec3 Vec3::StaticLerp(const Vec3& vector0, const Vec3& vector1, float alpha)
+{
+	auto lerpVector = vector0;
+	lerpVector.Lerp(vector1, alpha);
+
+	return lerpVector;
 }
 
 void Vec3::Cross(const Vec3& vector)
@@ -160,13 +214,12 @@ void Vec3::Cross(const Vec3& vector)
 	*this = vector0.Cross(vector1);
 }
 
-void Vec3::Rotate(const Rotation& rot)
+Vec3 Vec3::StaticCross(const Vec3& vector0, const Vec3& vector1)
 {
-	auto vector = Vector3(x, y, z);
-	auto eulerRot = rot.ToEulerAngles();
-	auto rotMatrix = eulerRot.ToRotationMatrix();
+	auto crossVector = vector0;
+	crossVector.Cross(vector1);
 
-	*this = Vec3(Vector3::Transform(vector, rotMatrix));
+	return crossVector;
 }
 
 float Vec3::Length() const
@@ -182,11 +235,21 @@ float Vec3::Distance(const Vec3& vector) const
 	return Vector3::Distance(vector0, vector1);
 }
 
-float Vec3::Dot(const Vec3& vector)
+float Vec3::StaticDistance(const Vec3& vector0, const Vec3& vector1)
+{
+	return vector0.Distance(vector1);
+}
+
+float Vec3::Dot(const Vec3& vector) const
 {
 	auto vector0 = Vector3(x, y, z);
 	auto vector1 = Vector3(vector.x, vector.y, vector.z);
 
+	return vector0.Dot(vector1);
+}
+
+float Vec3::StaticDot(const Vec3& vector0, const Vec3& vector1)
+{
 	return vector0.Dot(vector1);
 }
 
