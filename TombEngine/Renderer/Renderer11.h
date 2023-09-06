@@ -558,7 +558,7 @@ namespace TEN::Renderer
 		void DrawScreenSprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
 		void DrawLines3D(RenderView& view);
-		void DrawLines2D();
+		void DrawLinesIn2DSpace();
 		void DrawOverlays(RenderView& view);
 		void DrawRopes(RenderView& view);
 		void DrawBats(RenderView& view);

@@ -411,12 +411,12 @@ namespace TEN::Renderer
 		);
 	}
 
-	void Renderer11::AddScreenSprite(RendererSprite* sprite, const Vector2& pos2D, const Vector2& size, const Vector3& color,
+	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, const Vector2& size, const Vector3& color,
 									 BLEND_MODES blendMode, short angle, float opacity, int priority, RenderView& renderView)
 	{
-		RendererSprite2DToDraw spriteToDraw;
+		auto spriteToDraw = RendererSprite2DToDraw{};
 
-		spriteToDraw.Sprite = sprite;
+		spriteToDraw.SpritePtr = spritePtr;
 		spriteToDraw.Position = pos2D;
 		spriteToDraw.Angle = angle;
 		spriteToDraw.Color = color;
@@ -430,12 +430,10 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawScreenSprites(RenderView& renderView)
 	{
-		if (renderView.Sprites2DToDraw.size() == 0)
-		{
-			return;
-		}
-
 		constexpr auto VERTEX_COUNT = 4;
+
+		if (renderView.Sprites2DToDraw.empty())
+			return;
 
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
@@ -443,32 +441,32 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		RendererSprite* currentSprite = nullptr;
-		Texture2D* currentTexture = nullptr;
+		RendererSprite* currentSpritePtr = nullptr;
+		Texture2D* currentTexturePtr = nullptr;
 
-		for (auto spriteToDraw : renderView.Sprites2DToDraw)
+		for (const auto& spriteToDraw : renderView.Sprites2DToDraw)
 		{
-			if (currentTexture == nullptr)
+			if (currentTexturePtr == nullptr)
 			{
 				m_primitiveBatch->Begin();
 
-				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.Sprite->Texture, SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
-			else if (currentTexture != spriteToDraw.Sprite->Texture ||
+			else if (currentTexturePtr != spriteToDraw.SpritePtr->Texture ||
 				lastBlendMode != spriteToDraw.BlendMode)
 			{
 				m_primitiveBatch->End();
 
 				m_primitiveBatch->Begin();
 
-				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.Sprite->Texture, SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
 
 			// Calculate vertex base.
 			auto halfSize = spriteToDraw.Size / 2;
-			auto vertexPoints = std::array<Vector2, VERTEX_COUNT>
+			auto vertices = std::array<Vector2, VERTEX_COUNT>
 			{
 				halfSize,
 					Vector2(-halfSize.x, halfSize.y),
@@ -478,29 +476,29 @@ namespace TEN::Renderer
 
 			// Transform vertices.
 			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(spriteToDraw.Angle + ANGLE(180.0f))); // NOTE: +Y is down.
-			for (auto& vertexPoint : vertexPoints)
+			for (auto& vertex : vertices)
 			{
 				// Rotate.
-				vertexPoint = Vector2::Transform(vertexPoint, rotMatrix);
+				vertex = Vector2::Transform(vertex, rotMatrix);
 
 				// Adjust for aspect ratio and convert to NDC.
-				vertexPoint = TEN::Utils::GetAspectCorrect2DPosition(vertexPoint);
-				vertexPoint += spriteToDraw.Position;
-				vertexPoint = TEN::Utils::Convert2DPositionToNDC(vertexPoint);
+				vertex = TEN::Utils::GetAspectCorrect2DPosition(vertex);
+				vertex += spriteToDraw.Position;
+				vertex = TEN::Utils::Convert2DPositionToNDC(vertex);
 			}
 
 			// Define renderer vertices.
-			auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
-			for (int i = 0; i < vertices.size(); i++)
+			auto rVertices = std::array<RendererVertex, VERTEX_COUNT>{};
+			for (int i = 0; i < rVertices.size(); i++)
 			{
-				vertices[i].Position = Vector3(vertexPoints[i]);
-				vertices[i].UV = spriteToDraw.Sprite->UV[i];
-				vertices[i].Color = Vector4(spriteToDraw.Color.x, spriteToDraw.Color.y, spriteToDraw.Color.z, spriteToDraw.Opacity);
+				rVertices[i].Position = Vector3(vertices[i]);
+				rVertices[i].UV = spriteToDraw.SpritePtr->UV[i];
+				rVertices[i].Color = Vector4(spriteToDraw.Color.x, spriteToDraw.Color.y, spriteToDraw.Color.z, spriteToDraw.Opacity);
 			}
 			
-			m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+			m_primitiveBatch->DrawQuad(rVertices[0], rVertices[1], rVertices[2], rVertices[3]);
 
-			currentTexture = spriteToDraw.Sprite->Texture;
+			currentTexturePtr = spriteToDraw.SpritePtr->Texture;
 		}
 		
 		m_primitiveBatch->End();

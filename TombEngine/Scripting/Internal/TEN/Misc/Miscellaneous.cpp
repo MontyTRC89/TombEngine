@@ -14,10 +14,12 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Misc/ActionIDs.h"
 #include "Scripting/Internal/TEN/Misc/CameraTypes.h"
 #include "Scripting/Internal/TEN/Misc/LevelLog.h"
 #include "Scripting/Internal/TEN/Misc/SoundTrackTypes.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -338,16 +340,16 @@ namespace Misc
 	//end
 	static std::tuple<int, int> PercentToScreen(double x, double y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
-		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
-		int resX = static_cast<int>(std::round(fWidth / 100.0 * x));
-		int resY = static_cast<int>(std::round(fHeight / 100.0 * y));
+		auto fWidth = (double)g_Configuration.ScreenWidth;
+		auto fHeight = (double)g_Configuration.ScreenHeight;
+		int resX = (int)std::round(fWidth / 100.0 * x);
+		int resY = (int)std::round(fHeight / 100.0 * y);
 		//todo this still assumes a resolution of 800/600. account for this somehow
 		return std::make_tuple(resX, resY);
 	}
 
-	///Translate a pair of coordinates to percentages of window dimensions.
-	//To be used with @{Strings.DisplayString:GetPosition}.
+	/// Translate a pair of coordinates to percentages of window dimensions.
+	//To be used with @{ Strings.DisplayString:GetPosition }.
 	//@function ScreenToPercent
 	//@tparam int x pixel value to translate to a percentage of the window width
 	//@tparam int y pixel value to translate to a percentage of the window height
@@ -355,11 +357,35 @@ namespace Misc
 	//@treturn float y coordinate as percentage
 	static std::tuple<double, double> ScreenToPercent(int x, int y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
-		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
+		auto fWidth = (double)g_Configuration.ScreenWidth;
+		auto fHeight = (double)g_Configuration.ScreenHeight;
 		double resX = x / fWidth * 100.0;
 		double resY = y / fHeight * 100.0;
 		return std::make_tuple(resX, resY);
+	}
+
+	/// Draw a sprite in 2D space. Note that 100x100 describes visible screen space.
+	// @function DrawSpriteIn2DSpace
+	// @tparam int spriteObjectID ID of the sprite object.
+	// @tparam int spriteIndex index of the sprite inside the sprite object.
+	// @tparam Vec2 pos position of the sprite in 2D space.
+	// @tparam float orient 2D orientation of the sprite in degrees.
+	// @tparam ScriptColor color color of the sprite.
+	// @tparam Vec2 size size of the sprite.
+	// @tparam priority render priority of the sprite; can be thought of as a layer value. Lower values have higher priority.
+	static void DrawSpriteIn2DSpace(int spriteObjectID, int spriteIndex, const Vec2& pos, float orient, const ScriptColor& color, const Vec2& size, int priority)
+	{
+		// NOTE: Conversion from intuitive 100x100 screen space to internal 800x600 is required.
+		// Later, everything will be natively 100x100. -- Sezz 2023.08.31
+		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
+
+		auto pos2 = (pos.x, pos.y) * POS_CONVERSION_COEFF;
+		short orient2 = ANGLE(orient);
+		auto color2 = Vector4(color.GetR(), color.GetG(), color.GetB(), color.GetA()) / UCHAR_MAX;
+		auto size2 = Vector2(size.x, size.y);
+
+		// TODO: Add accessible renderer function.
+		//g_Renderer.AddSpriteIn2DSpace(&m_sprites[Objects[spriteObjectID].meshIndex + spriteIndex], Vector2(0, 0), 45, Vector4(1.0f, 1.0f, 1.0f, 0.8f), Vector2(200.0f, 200.0f),0, view);
 	}
 
 	/// Reset object camera back to Lara and deactivate object camera.
@@ -451,6 +477,7 @@ namespace Misc
 
 		tableMisc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		tableMisc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+		tableMisc.set_function(ScriptReserved_DrawSpriteIn2DSpace, &DrawSpriteIn2DSpace);
 
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
