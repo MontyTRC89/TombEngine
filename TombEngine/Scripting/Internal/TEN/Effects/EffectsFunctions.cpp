@@ -43,12 +43,12 @@ namespace Effects
 	//@tparam int objectID Object ID of the sprite.
 	//@tparam int spriteIndex Index of the sprite in the sprite object.
 	//@tparam Vec2 pos 2D position of the sprite. NOTE: Screen space resolution is 100x100.
-	//@tparam Vec2 size Size of the sprite.
 	//@tparam float rot Rotation of the sprite in degrees. Default is 0.
+	//@tparam Vec2 size Size of the sprite.
 	//@tparam Color color Color of the sprite. Default is Color(255, 255, 255, 255).
 	//@tparam int priority Render priority of the sprite. Higher values have higher priority. Default is 0.
 	//@tparam Effects.BlendID blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
-	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, const Vec2& size, TypeOrNil<float> rot,
+	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, TypeOrNil<float> rot, const Vec2& size,
 									TypeOrNil<ScriptColor> color, TypeOrNil<int> priority, TypeOrNil<BLEND_MODES> blendMode)
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
