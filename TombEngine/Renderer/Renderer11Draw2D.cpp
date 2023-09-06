@@ -625,7 +625,7 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectScreenSprites(RenderView& renderView)
 	{
-		for (auto& screenSprite : ScreenSprites)
+		for (const auto& screenSprite : ScreenSprites)
 		{
 			AddScreenSprite(
 				&m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex],
@@ -639,14 +639,13 @@ namespace TEN::Renderer
 		}
 
 		std::sort(
-			renderView.Sprites2DToDraw.begin(),
-			renderView.Sprites2DToDraw.end(),
-			[](RendererSprite2DToDraw a, RendererSprite2DToDraw b)
+			renderView.Sprites2DToDraw.begin(), renderView.Sprites2DToDraw.end(),
+			[](const RendererSprite2DToDraw& spriteToDraw0, const RendererSprite2DToDraw& spriteToDraw1)
 			{
-				if (a.Priority == b.Priority)
-					return (a.BlendMode < b.BlendMode);
+				if (spriteToDraw0.Priority == spriteToDraw1.Priority)
+					return (spriteToDraw0.BlendMode < spriteToDraw1.BlendMode);
 
-				return (a.Priority < b.Priority);
+				return (spriteToDraw0.Priority < spriteToDraw1.Priority);
 			}
 		);
 	}
