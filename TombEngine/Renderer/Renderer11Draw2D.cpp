@@ -639,8 +639,7 @@ namespace TEN::Renderer
 		}
 
 		std::sort(
-			renderView.Sprites2DToDraw.begin(),
-			renderView.Sprites2DToDraw.end(),
+			renderView.Sprites2DToDraw.begin(), renderView.Sprites2DToDraw.end(),
 			[](const RendererSprite2DToDraw& spriteToDraw0, const RendererSprite2DToDraw& spriteToDraw1)
 			{
 				if (spriteToDraw0.Priority == spriteToDraw1.Priority)
