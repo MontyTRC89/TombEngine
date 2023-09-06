@@ -101,16 +101,6 @@ namespace TEN::Renderer
 		{
 			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
 		}
-
-		// Sort 2D screen sprites
-		std::sort(
-			renderView.Sprites2DToDraw.begin(),
-			renderView.Sprites2DToDraw.end(),
-			[](RendererSprite2DToDraw a, RendererSprite2DToDraw b)
-			{
-				return (a.Priority > b.Priority);
-			}
-		);
 	}
 
 	bool Renderer11::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

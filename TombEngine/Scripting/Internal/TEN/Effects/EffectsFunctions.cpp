@@ -5,6 +5,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
+#include "Game/effects/ScreenSprite.h"
 #include "Game/control/los.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
@@ -19,6 +20,7 @@
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 
@@ -29,12 +31,43 @@ Functions to generate effects.
 */
 
 using namespace TEN::Effects::Electricity;
+using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
+	///Display a sprite on screen at 2D coordinates with specified size
+	//@function DisplayScreenSprite
+	//@tparam GAME_OBJECT_ID objectNumber
+	//@tparam int spriteIndex
+	//@tparam Vec2 pos
+	//@tparam Vec2 size
+	//@tparam Color color (default Color(255, 255, 255))
+	//@tparam float angle Rotation of the sprite. Clamped to [0, 360]. (default 0)
+	//@tparam float opacity Sets the transparency of the sprite. Clamped to [0, 1]. (default 0)
+	//@tparam int priority Sets the priorty. Higher value means higher priority. (default 0)
+	//@tparam Effects.BlendID blendMode(default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings ?
+	static void DisplayScreenSprite(GAME_OBJECT_ID objectNumber, short spriteIndex, Vec2 pos, Vec2 size, TypeOrNil<ScriptColor> color, 
+		TypeOrNil<BLEND_MODES> blendMode, TypeOrNil<float> angle, TypeOrNil<float> opacity, TypeOrNil<int> priority)
+	{
+		BLEND_MODES bMode = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
+		bMode = BLEND_MODES(std::clamp(int(bMode), int(BLEND_MODES::BLENDMODE_OPAQUE), int(BLEND_MODES::BLENDMODE_ALPHABLEND)));
+
+		AddScreenSprite(
+			objectNumber,
+			spriteIndex,
+			Vector2(pos.x, pos.y),
+			Vector2(size.x, size.y),
+			USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)),
+			bMode,
+			ANGLE(std::clamp(USE_IF_HAVE(float, angle, 0.0f), 0.0f, 360.0f)),
+			std::clamp(USE_IF_HAVE(float, opacity, 1.0f), 0.0f, 1.0f),
+			USE_IF_HAVE(int, priority, 0)
+		);
+	}
+
 	///Emit a lightning arc.
 	//@function EmitLightningArc
 	//@tparam Vec3 src
@@ -323,6 +356,7 @@ namespace Effects
 		sol::table tableEffects = { state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Effects, tableEffects);
 
+		tableEffects.set_function(ScriptReserved_DisplayScreenSprite, &DisplayScreenSprite);
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);

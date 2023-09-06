@@ -14,5 +14,6 @@ namespace TEN::Renderer
 		short Angle;
 		float Opacity;
 		int Priority;
+		BLEND_MODES BlendMode;
 	};
 }

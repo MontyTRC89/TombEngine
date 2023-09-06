@@ -1561,14 +1561,11 @@ namespace TEN::Renderer
 		// Draw all sorted blend mode faces collected in the previous steps
 		DrawSortedFaces(view);
 
-#ifdef TEST_SPRITES
-		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1], Vector2(0, 0), 45, Vector3::One, Vector2(200, 200), 0.8f, 0, view);
-		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY2], Vector2(300, 300), 66, Vector3::One, Vector2(200, 200), 0.6f, 0, view);
-		AddSpriteIn2DSpace(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD], Vector2(0, 300), 22, Vector3::One, Vector2(200, 200), 0.3f, 0, view);
-#endif
+		// Draw all screen-space sprites, sorted by priority
+		CollectScreenSprites(view);
+		DrawScreenSprites(view);
 
-		DrawSprites2D(view);
-
+		// Do post-process effects (cinematic bars, fade, flash, HDR, tone mapping...)
 		DrawPostprocess(target, depthTarget, view);
 
 		// Draw GUI stuff at the end
