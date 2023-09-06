@@ -1557,6 +1557,9 @@ namespace TEN::Renderer
 		// Draw all sorted blend mode faces collected in previous steps.
 		DrawSortedFaces(view);
 
+		// Draw HUD.
+		g_Hud.Draw(*LaraItem);
+
 		// Draw screen sprites sorted by priority.
 		CollectScreenSprites(view);
 		DrawScreenSprites(view);
@@ -1566,9 +1569,6 @@ namespace TEN::Renderer
 
 		// Draw GUI elements at end.
 		DrawLinesIn2DSpace();
-
-		// Draw HUD.
-		g_Hud.Draw(*LaraItem);
 
 		// Draw binoculars or lasersight.
 		DrawOverlays(view); 

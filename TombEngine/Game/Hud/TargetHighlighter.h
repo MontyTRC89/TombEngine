@@ -6,9 +6,8 @@ namespace TEN::Hud
 {
 	struct CrosshairData
 	{
-		static constexpr auto COLOR_GREEN	= Vector4(0.0f, 0.8f, 0.2f, 0.9f);
-		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.1f, 0.1f, 0.9f);
-		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 0.6f);
+		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.2f, 0.2f, 0.9f);
+		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 0.5f);
 		static constexpr auto SEGMENT_COUNT = 4;
 
 	private:

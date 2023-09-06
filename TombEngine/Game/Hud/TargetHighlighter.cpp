@@ -59,7 +59,7 @@ namespace TEN::Hud
 	void CrosshairData::SetPrimary()
 	{
 		IsPrimary = true;
-		ColorTarget = COLOR_GREEN;
+		ColorTarget = COLOR_RED;
 	}
 
 	void CrosshairData::SetPeripheral()
@@ -110,7 +110,7 @@ namespace TEN::Hud
 		}
 		else
 		{
-			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA);
+			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA / 2);
 		}
 
 		// Update color.
@@ -252,7 +252,7 @@ namespace TEN::Hud
 		// Update inactive crosshairs.
 		for (auto& [itemNumber, crosshair] : Crosshairs)
 		{
-			// Find crosshairs at absent entity ID keys.
+			// Find crosshairs at absent item number keys.
 			if (Contains(itemNumbers, itemNumber))
 				continue;
 
@@ -296,7 +296,7 @@ namespace TEN::Hud
 	}
 
 	// TODO: If crosshair happens to be in view upon spawn, first frame is sometimes garbage.
-	void TargetHighlighterController::AddCrosshair(int entityID, const Vector3& targetPos)
+	void TargetHighlighterController::AddCrosshair(int itemNumber, const Vector3& targetPos)
 	{
 		constexpr auto SIZE_START		  = SCREEN_SPACE_RES.x / 2;
 		constexpr auto RADIUS_SCALE_START = 1.5f * SQRT_2;
@@ -307,7 +307,7 @@ namespace TEN::Hud
 			return;
 
 		// Create new crosshair.
-		auto& crosshair = GetNewCrosshair(entityID);
+		auto& crosshair = GetNewCrosshair(itemNumber);
 
 		crosshair.IsActive = true;
 		crosshair.IsPrimary = false;
@@ -347,7 +347,7 @@ namespace TEN::Hud
 		unsigned int peripheralCount = 0;
 		unsigned int visibleCount = 0;
 
-		for (const auto& [entityID, crosshair] : Crosshairs)
+		for (const auto& [itemNumber, crosshair] : Crosshairs)
 		{
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
 			
