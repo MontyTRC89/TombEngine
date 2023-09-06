@@ -372,7 +372,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawLines2D()
+	void Renderer11::DrawLinesIn2DSpace()
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
@@ -1416,13 +1416,13 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
-		ResetDebugVariables();
-		m_Locked = false;
-		 
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
 
-		auto* level = g_GameFlow->GetLevel(CurrentLevel);
+		ResetDebugVariables();
+		m_Locked = false;
+		 
+		auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
 		// Prepare scene to draw.
 		auto time1 = std::chrono::high_resolution_clock::now();
@@ -1456,26 +1456,26 @@ namespace TEN::Renderer
 		m_context->ClearRenderTargetView(m_depthMap.RenderTargetView.Get(), Colors::White);
 		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		ID3D11RenderTargetView* m_pRenderViews[2]; 
-		m_pRenderViews[0] = m_renderTarget.RenderTargetView.Get(); 
-		m_pRenderViews[1] = m_depthMap.RenderTargetView.Get(); 
-		m_context->OMSetRenderTargets(2, &m_pRenderViews[0], m_renderTarget.DepthStencilView.Get());
+		ID3D11RenderTargetView* pRenderViewPtrs[2]; 
+		pRenderViewPtrs[0] = m_renderTarget.RenderTargetView.Get(); 
+		pRenderViewPtrs[1] = m_depthMap.RenderTargetView.Get(); 
+		m_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], m_renderTarget.DepthStencilView.Get());
 
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
-		// Camera constant buffer contains matrices, camera position, fog values, and other things shared for all shaders.
+		// Camera constant buffer contains matrices, camera position, fog values, and other things that are shared for all shaders.
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.fillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.Frame = GlobalCounter;
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 
-		if (level->GetFogEnabled())
+		if (level.GetFogEnabled())
 		{
-			auto fogCol = level->GetFogColor();
-			cameraConstantBuffer.FogColor = Vector4(fogCol.GetR() / 255.0f, fogCol.GetG() / 255.0f, fogCol.GetB() / 255.0f, 1.0f);
-			cameraConstantBuffer.FogMinDistance = level->GetFogMinDistance();
-			cameraConstantBuffer.FogMaxDistance = level->GetFogMaxDistance();
+			auto fogColor = level.GetFogColor();
+			cameraConstantBuffer.FogColor = Vector4(fogColor.GetR() / 255.0f, fogColor.GetG() / 255.0f, fogColor.GetB() / 255.0f, 1.0f);
+			cameraConstantBuffer.FogMinDistance = level.GetFogMinDistance();
+			cameraConstantBuffer.FogMaxDistance = level.GetFogMaxDistance();
 		}
 		else
 		{
@@ -1498,11 +1498,11 @@ namespace TEN::Renderer
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());
-
+		
 		// Draw horizon and sky.
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
 		
-		// Draw opaque and alpha test faces.
+		// Draw opaque and alpha faces.
 		DrawRooms(view, RendererPass::Opaque);
 		DrawItems(view, RendererPass::Opaque);
 		DrawStatics(view, RendererPass::Opaque);
@@ -1515,11 +1515,10 @@ namespace TEN::Renderer
 		DrawLocusts(view);
 		DrawDebris(view, RendererPass::Opaque);
 
-		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(),
-			m_renderTarget.DepthStencilView.Get());
+		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), m_renderTarget.DepthStencilView.Get());
 
-		// Do special effects and weather .
-		// NOTE: These functions merely fill sprite array to draw later.
+		// Prepare special effects and weather.
+		// NOTE: Functions here merely fill array of sprites to draw.
 		DrawFires(view);
 		DrawSmokes(view);
 		DrawSmokeParticles(view);
@@ -1546,7 +1545,7 @@ namespace TEN::Renderer
 		DrawSprites(view);
 		DrawLines3D(view);
 
-		// Draw additive and unsorted blended faces, and collect all sorted blend modes faces for later.
+		// Immediately draw additive and unsorted blended faces, and collect all sorted blend modes faces for later.
 		DrawRooms(view, RendererPass::Transparent);
 		DrawItems(view, RendererPass::Transparent);
 		DrawStatics(view, RendererPass::Transparent);
@@ -1557,11 +1556,16 @@ namespace TEN::Renderer
 
 		// Draw all sorted blend mode faces collected in previous steps.
 		DrawSortedFaces(view);
+
+		// Draw screen sprites sorted by priority.
+		CollectScreenSprites(view);
+		DrawScreenSprites(view);
+
+		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(target, depthTarget, view);
 
-		// Draw 2D space elements.
-		//Draw2DSprites(); // TODO
-		DrawLines2D();
+		// Draw GUI elements at end.
+		DrawLinesIn2DSpace();
 
 		// Draw HUD.
 		g_Hud.Draw(*LaraItem);

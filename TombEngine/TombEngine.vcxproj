@@ -324,11 +324,11 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game\effects\Bubble.h" />
+    <ClInclude Include="Game\effects\ScreenSprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\Hud\PickupSummary.h" />
     <ClInclude Include="Game\Hud\StatusBars.h" />
-    <ClInclude Include="Game\Hud\TargetHighlighter.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -672,6 +672,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h" />
     <ClInclude Include="Renderer\Quad\RenderQuad.h" />
+    <ClInclude Include="Renderer\RendererSprite2D.h" />
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
@@ -810,6 +811,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\effects\Hair.cpp" />
     <ClCompile Include="Game\effects\item_fx.cpp" />
     <ClCompile Include="Game\effects\Ripple.cpp" />
+    <ClCompile Include="Game\effects\ScreenSprite.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />
@@ -821,7 +823,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\Hud\PickupSummary.cpp" />
     <ClCompile Include="Game\Hud\StatusBars.cpp" />
-    <ClCompile Include="Game\Hud\TargetHighlighter.cpp" />
     <ClCompile Include="Game\itemdata\creature_info.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\items.cpp" />

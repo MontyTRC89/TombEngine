@@ -10,6 +10,7 @@
 #include "Renderer/RendererTransparentFace.h"
 #include "Renderer/Structures/RendererFogBulb.h"
 #include "Specific/memory/LinearArrayBuffer.h"
+#include "Renderer/RendererSprite2D.h"
 
 namespace TEN::Renderer 
 {
@@ -56,6 +57,7 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> LightsToDraw;
 		std::vector<RendererFogBulb> FogBulbsToDraw;
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
+		std::vector<RendererSprite2DToDraw> Sprites2DToDraw;
 		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw;
 
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);

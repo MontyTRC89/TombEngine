@@ -11,7 +11,9 @@
 #include "Objects/game_object_ids.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/trutils.h"
+#include "Game/effects/ScreenSprite.h"
 
+using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
@@ -379,60 +381,79 @@ namespace TEN::Renderer
 		DrawFullScreenQuad(texture, Vector3(fade), true);
 	}
 
-	void Renderer11::DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
-										 const Vector4& color, const Vector2& size)
+	void Renderer11::DrawScreenSprites(RenderView& renderView)
 	{
-		if (!CheckIfSlotExists(spriteID, "2D space sprite rendering"))
+		constexpr auto VERTEX_COUNT = 4;
+
+		if (renderView.Sprites2DToDraw.empty())
 			return;
-
-		constexpr auto VERTEX_COUNT	  = 4;
-
-		const auto& spritePtr = m_sprites[Objects[spriteID].meshIndex + spriteIndex];
-
-		// Calculate vertex base.
-		auto halfSize = size / 2;
-		auto vertexPoints = std::array<Vector2, VERTEX_COUNT>
-		{
-			halfSize,
-			Vector2(-halfSize.x, halfSize.y),
-			-halfSize,
-			Vector2(halfSize.x, -halfSize.y)
-		};
-
-		// Transform vertices.
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(orient2D + ANGLE(180.0f))); // NOTE: +Y is down.
-		for (auto& vertexPoint : vertexPoints)
-		{
-			// Rotate.
-			vertexPoint = Vector2::Transform(vertexPoint, rotMatrix);
-
-			// Adjust for aspect ratio and convert to NDC.
-			vertexPoint = TEN::Utils::GetAspectCorrect2DPosition(vertexPoint);
-			vertexPoint += pos2D;
-			vertexPoint = TEN::Utils::Convert2DPositionToNDC(vertexPoint);
-		}
-
-		// Define renderer vertices.
-		auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
-		for (int i = 0; i < vertices.size(); i++)
-		{
-			vertices[i].Position = Vector3(vertexPoints[i]);
-			vertices[i].UV = spritePtr.UV[i];
-			vertices[i].Color = color;
-		}
-
-		SetBlendMode(BLENDMODE_ALPHABLEND);
 
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
-		BindTexture(TEXTURE_COLOR_MAP, spritePtr.Texture, SAMPLER_ANISOTROPIC_CLAMP);
-
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		m_primitiveBatch->Begin();
-		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		RendererSprite* currentSpritePtr = nullptr;
+		Texture2D* currentTexturePtr = nullptr;
+
+		for (const auto& spriteToDraw : renderView.Sprites2DToDraw)
+		{
+			if (currentTexturePtr == nullptr)
+			{
+				m_primitiveBatch->Begin();
+
+				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
+				SetBlendMode(spriteToDraw.BlendMode);
+			}
+			else if (currentTexturePtr != spriteToDraw.SpritePtr->Texture ||
+				lastBlendMode != spriteToDraw.BlendMode)
+			{
+				m_primitiveBatch->End();
+
+				m_primitiveBatch->Begin();
+
+				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
+				SetBlendMode(spriteToDraw.BlendMode);
+			}
+
+			// Calculate vertex base.
+			auto halfSize = spriteToDraw.Size / 2;
+			auto vertices = std::array<Vector2, VERTEX_COUNT>
+			{
+				halfSize,
+					Vector2(-halfSize.x, halfSize.y),
+					-halfSize,
+					Vector2(halfSize.x, -halfSize.y)
+			};
+
+			// Transform vertices. // NOTE: Must rotate 180 degrees to account for +Y being down.
+			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(spriteToDraw.Orientation + ANGLE(180.0f)));
+			for (auto& vertex : vertices)
+			{
+				// Rotate.
+				vertex = Vector2::Transform(vertex, rotMatrix);
+
+				// Adjust for aspect ratio and convert to NDC.
+				vertex = TEN::Utils::GetAspectCorrect2DPosition(vertex);
+				vertex += spriteToDraw.Position;
+				vertex = TEN::Utils::Convert2DPositionToNDC(vertex);
+			}
+
+			// Define renderer vertices.
+			auto rVertices = std::array<RendererVertex, VERTEX_COUNT>{};
+			for (int i = 0; i < rVertices.size(); i++)
+			{
+				rVertices[i].Position = Vector3(vertices[i]);
+				rVertices[i].UV = spriteToDraw.SpritePtr->UV[i];
+				rVertices[i].Color = Vector4(spriteToDraw.Color.x, spriteToDraw.Color.y, spriteToDraw.Color.z, spriteToDraw.Color.w);
+			}
+			
+			m_primitiveBatch->DrawQuad(rVertices[0], rVertices[1], rVertices[2], rVertices[3]);
+
+			currentTexturePtr = spriteToDraw.SpritePtr->Texture;
+		}
+		
 		m_primitiveBatch->End();
 	}
 
@@ -583,5 +604,50 @@ namespace TEN::Renderer
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
 		m_primitiveBatch->End();
+	}
+
+
+	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size,
+									 const Vector4& color, int priority, BLEND_MODES blendMode, RenderView& renderView)
+	{
+		auto spriteToDraw = RendererSprite2DToDraw{};
+
+		spriteToDraw.SpritePtr = spritePtr;
+		spriteToDraw.Position = pos2D;
+		spriteToDraw.Orientation = orient;
+		spriteToDraw.Size = size;
+		spriteToDraw.Color = color;
+		spriteToDraw.Priority = priority;
+		spriteToDraw.BlendMode = blendMode;
+
+		renderView.Sprites2DToDraw.push_back(spriteToDraw);
+	}
+
+	void Renderer11::CollectScreenSprites(RenderView& renderView)
+	{
+		for (auto& screenSprite : ScreenSprites)
+		{
+			AddScreenSprite(
+				&m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex],
+				screenSprite.Position,
+				screenSprite.Orientation,
+				screenSprite.Size,
+				screenSprite.Color,
+				screenSprite.Priority,
+				screenSprite.BlendMode,
+				renderView);
+		}
+
+		std::sort(
+			renderView.Sprites2DToDraw.begin(),
+			renderView.Sprites2DToDraw.end(),
+			[](RendererSprite2DToDraw a, RendererSprite2DToDraw b)
+			{
+				if (a.Priority == b.Priority)
+					return (a.BlendMode < b.BlendMode);
+
+				return (a.Priority < b.Priority);
+			}
+		);
 	}
 }

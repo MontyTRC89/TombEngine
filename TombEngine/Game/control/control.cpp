@@ -20,6 +20,7 @@
 #include "Game/effects/Footprint.h"
 #include "Game/effects/Hair.h"
 #include "Game/effects/Ripple.h"
+#include "Game/effects/ScreenSprite.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -69,6 +70,7 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Streamer;
@@ -145,6 +147,8 @@ GameStatus ControlPhase(int numFrames)
 
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
+		ClearScreenSprites();
+
 		// Controls are polled before OnControlPhase, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
@@ -420,6 +424,7 @@ void CleanUp()
 	ClearDrips();
 	ClearRipples();
 	ClearLaserBarrierEffects();
+	ClearScreenSprites();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();

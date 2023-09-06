@@ -14,10 +14,12 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Misc/ActionIDs.h"
 #include "Scripting/Internal/TEN/Misc/CameraTypes.h"
 #include "Scripting/Internal/TEN/Misc/LevelLog.h"
 #include "Scripting/Internal/TEN/Misc/SoundTrackTypes.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -338,16 +340,16 @@ namespace Misc
 	//end
 	static std::tuple<int, int> PercentToScreen(double x, double y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
-		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
-		int resX = static_cast<int>(std::round(fWidth / 100.0 * x));
-		int resY = static_cast<int>(std::round(fHeight / 100.0 * y));
+		auto fWidth = (double)g_Configuration.ScreenWidth;
+		auto fHeight = (double)g_Configuration.ScreenHeight;
+		int resX = (int)std::round(fWidth / 100.0 * x);
+		int resY = (int)std::round(fHeight / 100.0 * y);
 		//todo this still assumes a resolution of 800/600. account for this somehow
 		return std::make_tuple(resX, resY);
 	}
 
-	///Translate a pair of coordinates to percentages of window dimensions.
-	//To be used with @{Strings.DisplayString:GetPosition}.
+	/// Translate a pair of coordinates to percentages of window dimensions.
+	//To be used with @{ Strings.DisplayString:GetPosition }.
 	//@function ScreenToPercent
 	//@tparam int x pixel value to translate to a percentage of the window width
 	//@tparam int y pixel value to translate to a percentage of the window height
@@ -355,8 +357,8 @@ namespace Misc
 	//@treturn float y coordinate as percentage
 	static std::tuple<double, double> ScreenToPercent(int x, int y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
-		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
+		auto fWidth = (double)g_Configuration.ScreenWidth;
+		auto fHeight = (double)g_Configuration.ScreenHeight;
 		double resX = x / fWidth * 100.0;
 		double resY = y / fHeight * 100.0;
 		return std::make_tuple(resX, resY);
