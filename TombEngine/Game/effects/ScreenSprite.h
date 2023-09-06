@@ -10,17 +10,17 @@ namespace TEN::Effects::ScreenSprite
 		int			   SpriteIndex = 0;
 
 		Vector2 Position	= Vector2::Zero;
-		Vector2 Size		= Vector2::One;
 		short	Orientation = 0;
+		Vector2 Size		= Vector2::One;
 		Vector4 Color		= Vector4::One;
 
 		int			Priority  = 0;
-		BLEND_MODES BlendMode = BLENDMODE_ALPHATEST;
+		BLEND_MODES BlendMode = BLENDMODE_ALPHABLEND;
 	};
 
 	extern std::vector<ScreenSprite> ScreenSprites;
 
-	void AddScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, const Vector2& size, short orient,
+	void AddScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& size,
 						 const Vector4& color, int priority, BLEND_MODES blendMode);
 	void ClearScreenSprites();
 }

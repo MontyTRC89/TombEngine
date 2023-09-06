@@ -607,15 +607,15 @@ namespace TEN::Renderer
 	}
 
 
-	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, const Vector2& size,  short orient,
+	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size,
 									 const Vector4& color, int priority, BLEND_MODES blendMode, RenderView& renderView)
 	{
 		auto spriteToDraw = RendererSprite2DToDraw{};
 
 		spriteToDraw.SpritePtr = spritePtr;
 		spriteToDraw.Position = pos2D;
-		spriteToDraw.Size = size;
 		spriteToDraw.Orientation = orient;
+		spriteToDraw.Size = size;
 		spriteToDraw.Color = color;
 		spriteToDraw.Priority = priority;
 		spriteToDraw.BlendMode = blendMode;
@@ -630,8 +630,8 @@ namespace TEN::Renderer
 			AddScreenSprite(
 				&m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex],
 				screenSprite.Position,
-				screenSprite.Size,
 				screenSprite.Orientation,
+				screenSprite.Size,
 				screenSprite.Color,
 				screenSprite.Priority,
 				screenSprite.BlendMode,

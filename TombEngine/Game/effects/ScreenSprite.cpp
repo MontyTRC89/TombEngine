@@ -13,7 +13,7 @@ namespace TEN::Effects::ScreenSprite
 {
 	std::vector<ScreenSprite> ScreenSprites = {};
 
-	void AddScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, const Vector2& size, short orient,
+	void AddScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& size,
 						 const Vector4& color, int priority, BLEND_MODES blendMode)
 	{
 		auto screenSprite = ScreenSprite{};
@@ -21,8 +21,8 @@ namespace TEN::Effects::ScreenSprite
 		screenSprite.ObjectID = objectID;
 		screenSprite.SpriteIndex = spriteIndex;
 		screenSprite.Position = pos;
-		screenSprite.Size = size;
 		screenSprite.Orientation = orient;
+		screenSprite.Size = size;
 		screenSprite.Color = color;
 		screenSprite.Priority = priority;
 		screenSprite.BlendMode = blendMode;

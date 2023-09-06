@@ -64,8 +64,8 @@ namespace Effects
 			objectID,
 			spriteIndex,
 			Vector2(pos.x, pos.y) * POS_CONVERSION_COEFF,
-			Vector2(size.x, size.y),
 			ANGLE(USE_IF_HAVE(float, rot, 0.0f)),
+			Vector2(size.x, size.y),
 			Vector4(scriptColor.GetR(), scriptColor.GetG(), scriptColor.GetB(), scriptColor.GetA()) / UCHAR_MAX,
 			USE_IF_HAVE(int, priority, 0),
 			bMode);
