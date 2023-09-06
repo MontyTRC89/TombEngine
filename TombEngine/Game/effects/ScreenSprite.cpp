@@ -13,18 +13,17 @@ namespace TEN::Effects::ScreenSprite
 {
 	std::vector<ScreenSprite> ScreenSprites = {};
 
-	void AddScreenSprite(GAME_OBJECT_ID objectNumber, short spriteIndex, const Vector2& pos, const Vector2& size, const Vector3& color,
-		BLEND_MODES blendMode, short angle, float opacity, int priority)
+	void AddScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, const Vector2& size, short orient,
+						 const Vector4& color, int priority, BLEND_MODES blendMode)
 	{
-		ScreenSprite screenSprite;
+		auto screenSprite = ScreenSprite{};
 
-		screenSprite.ObjectNumber = objectNumber;
+		screenSprite.ObjectID = objectID;
 		screenSprite.SpriteIndex = spriteIndex;
 		screenSprite.Position = pos;
 		screenSprite.Size = size;
+		screenSprite.Orientation = orient;
 		screenSprite.Color = color;
-		screenSprite.Opacity = opacity;
-		screenSprite.Angle = angle;
 		screenSprite.Priority = priority;
 		screenSprite.BlendMode = blendMode;
 

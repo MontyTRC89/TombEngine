@@ -364,30 +364,6 @@ namespace Misc
 		return std::make_tuple(resX, resY);
 	}
 
-	/// Draw a sprite in 2D space. Note that 100x100 describes visible screen space.
-	// @function DrawSpriteIn2DSpace
-	// @tparam int spriteObjectID ID of the sprite object.
-	// @tparam int spriteIndex index of the sprite inside the sprite object.
-	// @tparam Vec2 pos position of the sprite in 2D space.
-	// @tparam float orient 2D orientation of the sprite in degrees.
-	// @tparam ScriptColor color color of the sprite.
-	// @tparam Vec2 size size of the sprite.
-	// @tparam priority render priority of the sprite; can be thought of as a layer value. Lower values have higher priority.
-	static void DrawSpriteIn2DSpace(int spriteObjectID, int spriteIndex, const Vec2& pos, float orient, const ScriptColor& color, const Vec2& size, int priority)
-	{
-		// NOTE: Conversion from intuitive 100x100 screen space to internal 800x600 is required.
-		// Later, everything will be natively 100x100. -- Sezz 2023.08.31
-		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
-
-		auto pos2 = (pos.x, pos.y) * POS_CONVERSION_COEFF;
-		short orient2 = ANGLE(orient);
-		auto color2 = Vector4(color.GetR(), color.GetG(), color.GetB(), color.GetA()) / UCHAR_MAX;
-		auto size2 = Vector2(size.x, size.y);
-
-		// TODO: Add accessible renderer function.
-		//g_Renderer.AddSpriteIn2DSpace(&m_sprites[Objects[spriteObjectID].meshIndex + spriteIndex], Vector2(0, 0), 45, Vector4(1.0f, 1.0f, 1.0f, 0.8f), Vector2(200.0f, 200.0f),0, view);
-	}
-
 	/// Reset object camera back to Lara and deactivate object camera.
 	//@function ResetObjCamera
 	static void ResetObjCamera()
@@ -477,7 +453,6 @@ namespace Misc
 
 		tableMisc.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		tableMisc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
-		tableMisc.set_function(ScriptReserved_DrawSpriteIn2DSpace, &DrawSpriteIn2DSpace);
 
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);

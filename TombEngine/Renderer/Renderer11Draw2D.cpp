@@ -381,53 +381,6 @@ namespace TEN::Renderer
 		DrawFullScreenQuad(texture, Vector3(fade), true);
 	}
 
-	void Renderer11::CollectScreenSprites(RenderView& renderView)
-	{
-		for (auto screenSprite : ScreenSprites)
-		{
-			AddScreenSprite(
-				&m_sprites[Objects[screenSprite.ObjectNumber].meshIndex + screenSprite.SpriteIndex],
-				screenSprite.Position,
-				screenSprite.Size,
-				screenSprite.Color,
-				screenSprite.BlendMode,
-				screenSprite.Angle,
-				screenSprite.Opacity,
-				screenSprite.Priority,
-				renderView
-			);
-		}
-
-		std::sort(
-			renderView.Sprites2DToDraw.begin(),
-			renderView.Sprites2DToDraw.end(),
-			[](RendererSprite2DToDraw a, RendererSprite2DToDraw b)
-			{
-				if (a.Priority == b.Priority)
-					return (a.BlendMode < b.BlendMode);
-				else
-					return (a.Priority < b.Priority);
-			}
-		);
-	}
-
-	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, const Vector2& size, const Vector3& color,
-									 BLEND_MODES blendMode, short angle, float opacity, int priority, RenderView& renderView)
-	{
-		auto spriteToDraw = RendererSprite2DToDraw{};
-
-		spriteToDraw.SpritePtr = spritePtr;
-		spriteToDraw.Position = pos2D;
-		spriteToDraw.Angle = angle;
-		spriteToDraw.Color = color;
-		spriteToDraw.Size = size;
-		spriteToDraw.Opacity = opacity;
-		spriteToDraw.Priority = priority;
-		spriteToDraw.BlendMode = blendMode;
-
-		renderView.Sprites2DToDraw.push_back(spriteToDraw);
-	}
-
 	void Renderer11::DrawScreenSprites(RenderView& renderView)
 	{
 		constexpr auto VERTEX_COUNT = 4;
@@ -474,8 +427,8 @@ namespace TEN::Renderer
 					Vector2(halfSize.x, -halfSize.y)
 			};
 
-			// Transform vertices.
-			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(spriteToDraw.Angle + ANGLE(180.0f))); // NOTE: +Y is down.
+			// Transform vertices. // NOTE: Must rotate 180 degrees to account for +Y being down.
+			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(spriteToDraw.Orientation + ANGLE(180.0f)));
 			for (auto& vertex : vertices)
 			{
 				// Rotate.
@@ -493,7 +446,7 @@ namespace TEN::Renderer
 			{
 				rVertices[i].Position = Vector3(vertices[i]);
 				rVertices[i].UV = spriteToDraw.SpritePtr->UV[i];
-				rVertices[i].Color = Vector4(spriteToDraw.Color.x, spriteToDraw.Color.y, spriteToDraw.Color.z, spriteToDraw.Opacity);
+				rVertices[i].Color = Vector4(spriteToDraw.Color.x, spriteToDraw.Color.y, spriteToDraw.Color.z, spriteToDraw.Color.w);
 			}
 			
 			m_primitiveBatch->DrawQuad(rVertices[0], rVertices[1], rVertices[2], rVertices[3]);
@@ -651,5 +604,50 @@ namespace TEN::Renderer
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
 		m_primitiveBatch->End();
+	}
+
+
+	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, const Vector2& size,  short orient,
+									 const Vector4& color, int priority, BLEND_MODES blendMode, RenderView& renderView)
+	{
+		auto spriteToDraw = RendererSprite2DToDraw{};
+
+		spriteToDraw.SpritePtr = spritePtr;
+		spriteToDraw.Position = pos2D;
+		spriteToDraw.Size = size;
+		spriteToDraw.Orientation = orient;
+		spriteToDraw.Color = color;
+		spriteToDraw.Priority = priority;
+		spriteToDraw.BlendMode = blendMode;
+
+		renderView.Sprites2DToDraw.push_back(spriteToDraw);
+	}
+
+	void Renderer11::CollectScreenSprites(RenderView& renderView)
+	{
+		for (auto& screenSprite : ScreenSprites)
+		{
+			AddScreenSprite(
+				&m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex],
+				screenSprite.Position,
+				screenSprite.Size,
+				screenSprite.Orientation,
+				screenSprite.Color,
+				screenSprite.Priority,
+				screenSprite.BlendMode,
+				renderView);
+		}
+
+		std::sort(
+			renderView.Sprites2DToDraw.begin(),
+			renderView.Sprites2DToDraw.end(),
+			[](RendererSprite2DToDraw a, RendererSprite2DToDraw b)
+			{
+				if (a.Priority == b.Priority)
+					return (a.BlendMode < b.BlendMode);
+
+				return (a.Priority < b.Priority);
+			}
+		);
 	}
 }

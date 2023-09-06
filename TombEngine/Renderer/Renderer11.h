@@ -746,10 +746,9 @@ namespace TEN::Renderer
 		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
 		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 
-		void AddScreenSprite(RendererSprite* sprite, const Vector2& pos2D, const Vector2& size, const Vector3& color,
-			BLEND_MODES blendMode, short angle, float opacity, int priority, RenderView& renderView);
+		void AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, const Vector2& size, short orient,
+							 const Vector4& color, int priority, BLEND_MODES blendMode, RenderView& renderView);
 		void CollectScreenSprites(RenderView& renderView);
-
 	};
 
 	extern Renderer11 g_Renderer;

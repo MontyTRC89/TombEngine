@@ -308,7 +308,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeCamera();
 	InitializeSpotCamSequences(isTitle);
 	InitializeItemBoxData();
-	
+
 	// Initialize scripting.
 	InitializeScripting(levelIndex, loadGame);
 	InitializeNodeScripts();

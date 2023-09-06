@@ -1559,11 +1559,11 @@ namespace TEN::Renderer
 		// Draw all sorted blend mode faces collected in previous steps.
 		DrawSortedFaces(view);
 
-		// Draw all screen-space sprites, sorted by priority
+		// Draw screen sprites sorted by priority.
 		CollectScreenSprites(view);
 		DrawScreenSprites(view);
 
-		// Do post-process effects (cinematic bars, fade, flash, HDR, tone mapping...)
+		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(target, depthTarget, view);
 
 		// Draw GUI elements at end.

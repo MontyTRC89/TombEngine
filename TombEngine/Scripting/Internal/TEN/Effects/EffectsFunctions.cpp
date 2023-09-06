@@ -3,11 +3,11 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
-#include "Game/effects/ScreenSprite.h"
-#include "Game/control/los.h"
 #include "Game/effects/explosion.h"
+#include "Game/effects/ScreenSprite.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -31,41 +31,44 @@ Functions to generate effects.
 */
 
 using namespace TEN::Effects::Electricity;
-using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
+using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
-	///Display a sprite on screen at 2D coordinates with specified size
+	/// Display a sprite on the screen.
 	//@function DisplayScreenSprite
-	//@tparam GAME_OBJECT_ID objectNumber
-	//@tparam int spriteIndex
-	//@tparam Vec2 pos
-	//@tparam Vec2 size
-	//@tparam Color color (default Color(255, 255, 255))
-	//@tparam float angle Rotation of the sprite. Clamped to [0, 360]. (default 0)
-	//@tparam float opacity Sets the transparency of the sprite. Clamped to [0, 1]. (default 0)
-	//@tparam int priority Sets the priorty. Higher value means higher priority. (default 0)
-	//@tparam Effects.BlendID blendMode(default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings ?
-	static void DisplayScreenSprite(GAME_OBJECT_ID objectNumber, short spriteIndex, Vec2 pos, Vec2 size, TypeOrNil<ScriptColor> color, 
-		TypeOrNil<BLEND_MODES> blendMode, TypeOrNil<float> angle, TypeOrNil<float> opacity, TypeOrNil<int> priority)
+	//@tparam int objectID Object ID of the sprite.
+	//@tparam int spriteIndex Index of the sprite in the sprite object.
+	//@tparam Vec2 pos 2D position of the sprite. NOTE: Screen space resolution is 100x100.
+	//@tparam Vec2 size Size of the sprite.
+	//@tparam float rot Rotation of the sprite in degrees. Default is 0.
+	//@tparam Color color Color of the sprite. Default is Color(255, 255, 255, 255).
+	//@tparam int priority Render priority of the sprite. Higher values have higher priority. Default is 0.
+	//@tparam Effects.BlendID blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
+	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, const Vec2& size, TypeOrNil<float> rot,
+									TypeOrNil<ScriptColor> color, TypeOrNil<int> priority, TypeOrNil<BLEND_MODES> blendMode)
 	{
-		BLEND_MODES bMode = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
-		bMode = BLEND_MODES(std::clamp(int(bMode), int(BLEND_MODES::BLENDMODE_OPAQUE), int(BLEND_MODES::BLENDMODE_ALPHABLEND)));
+		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
+		// Later, everything will be natively 100x100. -- Sezz 2023.08.31
+		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
+
+		auto scriptColor = USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255, 255));
+
+		auto bMode = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
+		bMode = BLEND_MODES(std::clamp((int)bMode, (int)BLEND_MODES::BLENDMODE_OPAQUE, (int)BLEND_MODES::BLENDMODE_ALPHABLEND));
 
 		AddScreenSprite(
-			objectNumber,
+			objectID,
 			spriteIndex,
-			Vector2(pos.x, pos.y),
+			Vector2(pos.x, pos.y) * POS_CONVERSION_COEFF,
 			Vector2(size.x, size.y),
-			USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)),
-			bMode,
-			ANGLE(std::clamp(USE_IF_HAVE(float, angle, 0.0f), 0.0f, 360.0f)),
-			std::clamp(USE_IF_HAVE(float, opacity, 1.0f), 0.0f, 1.0f),
-			USE_IF_HAVE(int, priority, 0)
-		);
+			ANGLE(USE_IF_HAVE(float, rot, 0.0f)),
+			Vector4(scriptColor.GetR(), scriptColor.GetG(), scriptColor.GetB(), scriptColor.GetA()) / UCHAR_MAX,
+			USE_IF_HAVE(int, priority, 0),
+			bMode);
 	}
 
 	///Emit a lightning arc.
