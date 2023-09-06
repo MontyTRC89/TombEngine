@@ -13,9 +13,9 @@ namespace TEN::Hud
 		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 		unsigned int   Count	= 0;
 
-		Vector2		Position2D	= Vector2::Zero;
-		Vector2		Origin2D	= Vector2::Zero;
-		Vector2		Target2D	= Vector2::Zero;
+		Vector2		Position	= Vector2::Zero;
+		Vector2		Origin		= Vector2::Zero;
+		Vector2		Target		= Vector2::Zero;
 		EulerAngles Orientation = EulerAngles::Zero;
 
 		float Life		   = 0.0f;
@@ -40,7 +40,7 @@ namespace TEN::Hud
 
 	public:
 		// Utilities
-		void AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos);
+		void AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& targetPos);
 
 		void Update();
 		void Draw() const;
@@ -48,7 +48,7 @@ namespace TEN::Hud
 
 	private:
 		// Helpers
-		std::vector<Vector2> Get2DStackPositions() const;
+		std::vector<Vector2> GetStackPositions() const;
 		DisplayPickup&		 GetNewDisplayPickup();
 		void				 ClearInactiveDisplayPickups();
 

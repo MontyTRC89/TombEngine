@@ -16,10 +16,10 @@ namespace TEN::Hud
 		constexpr auto SCREEN_THRESHOLD_COEFF = 0.1f;
 		constexpr auto SCREEN_THRESHOLD		  = Vector2(SCREEN_SPACE_RES.x * SCREEN_THRESHOLD_COEFF, SCREEN_SPACE_RES.y * SCREEN_THRESHOLD_COEFF);
 
-		if (Position2D.x <= -SCREEN_THRESHOLD.x ||
-			Position2D.y <= -SCREEN_THRESHOLD.y ||
-			Position2D.x >= (SCREEN_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
-			Position2D.y >= (SCREEN_SPACE_RES.y + SCREEN_THRESHOLD.y))
+		if (Position.x <= -SCREEN_THRESHOLD.x ||
+			Position.y <= -SCREEN_THRESHOLD.y ||
+			Position.x >= (SCREEN_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
+			Position.y >= (SCREEN_SPACE_RES.y + SCREEN_THRESHOLD.y))
 		{
 			return true;
 		}
@@ -32,42 +32,42 @@ namespace TEN::Hud
 		constexpr auto LIFE_BUFFER		   = 0.2f;
 		constexpr auto SCALE_MAX		   = 0.4f;
 		constexpr auto SCALE_MIN		   = 0.25f;
-		constexpr auto HIDE_VELOCITY_MAX   = SCREEN_SPACE_RES.x * 0.03f;
-		constexpr auto HIDE_VELOCITY_ACCEL = HIDE_VELOCITY_MAX / 4;
-		constexpr auto POSITION_LERP_ALPHA = 0.2f;
+		constexpr auto HIDE_VEL_MAX		   = SCREEN_SPACE_RES.x * 0.03f;
+		constexpr auto HIDE_VEL_ACCEL	   = HIDE_VEL_MAX / 4;
+		constexpr auto POS_LERP_ALPHA	   = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
-		constexpr auto ROTATION_RATE	   = ANGLE(360.0f / (LIFE_MAX * FPS));
-		constexpr auto ROTATION			   = EulerAngles(0, ROTATION_RATE, 0);
+		constexpr auto ROT_RATE			   = ANGLE(360.0f / (LIFE_MAX * FPS));
+		constexpr auto ROT				   = EulerAngles(0, ROT_RATE, 0);
 
 		// Move offscreen.
 		if (Life <= 0.0f && isHead)
 		{
-			HideVelocity = std::clamp(HideVelocity + HIDE_VELOCITY_ACCEL, 0.0f, HIDE_VELOCITY_MAX);
-			Position2D.x += HideVelocity;
+			HideVelocity = std::clamp(HideVelocity + HIDE_VEL_ACCEL, 0.0f, HIDE_VEL_MAX);
+			Position.x += HideVelocity;
 		}
 		// Update position, scale, and opacity.
 		else if (Life > 0.0f)
 		{
-			float totalDist = Vector2::Distance(Origin2D, Target2D);
-			float coveredDist = Vector2::Distance(Origin2D, Position2D);
+			float totalDist = Vector2::Distance(Origin, Target);
+			float coveredDist = Vector2::Distance(Origin, Position);
 
 			// Handle edge case when stack shifts.
 			if (coveredDist > totalDist)
 			{
-				Origin2D = Position2D;
-				totalDist = Vector2::Distance(Origin2D, Target2D);
-				coveredDist = Vector2::Distance(Origin2D, Position2D);
+				Origin = Position;
+				totalDist = Vector2::Distance(Origin, Target);
+				coveredDist = Vector2::Distance(Origin, Position);
 			}
 
 			float alpha = coveredDist / totalDist;
 
-			Position2D = Vector2::Lerp(Position2D, Target2D, POSITION_LERP_ALPHA);
+			Position = Vector2::Lerp(Position, Target, POS_LERP_ALPHA);
 			Scale = std::max(Lerp(SCALE_MIN, SCALE_MAX, alpha), Scale);
 			Opacity = std::max(Lerp(0.0f, 1.0f, alpha), Opacity);
 		}
 
 		// Update orientation.
-		Orientation += ROTATION;
+		Orientation += ROT;
 
 		// Update string scale.
 		float alpha = Scale / SCALE_MAX;
@@ -80,7 +80,7 @@ namespace TEN::Hud
 			Life = std::max(Life, round(LIFE_BUFFER * FPS));
 	}
 
-	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos)
+	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& targetPos)
 	{
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
@@ -108,15 +108,15 @@ namespace TEN::Hud
 		// Create new display pickup.
 		auto& pickup = GetNewDisplayPickup();
 
-		auto origin2D = g_Renderer.Get2DPosition(pos);
-		if (!origin2D.has_value())
-			origin2D = Vector2::Zero;
+		auto origin = g_Renderer.Get2DPosition(targetPos);
+		if (!origin.has_value())
+			origin = Vector2::Zero;
 
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
-		pickup.Position2D =
-		pickup.Origin2D = origin2D.value();
-		pickup.Target2D = Vector2::Zero;
+		pickup.Position =
+		pickup.Origin = origin.value();
+		pickup.Target = Vector2::Zero;
 		pickup.Life = life;
 		pickup.Scale = 0.0f;
 		pickup.Opacity = 0.0f;
@@ -130,10 +130,10 @@ namespace TEN::Hud
 		if (DisplayPickups.empty())
 			return;
 
-		// Get and apply 2D stack positions as targets.
-		auto stack2DPositions = Get2DStackPositions();
-		for (int i = 0; i < stack2DPositions.size(); i++)
-			DisplayPickups[i].Target2D = std::move(stack2DPositions[i]);
+		// Get and apply stack positions as targets.
+		auto stackPositions = GetStackPositions();
+		for (int i = 0; i < stackPositions.size(); i++)
+			DisplayPickups[i].Target = std::move(stackPositions[i]);
 
 		// Update display pickups.
 		bool isHead = true;
@@ -168,7 +168,7 @@ namespace TEN::Hud
 		DisplayPickups.clear();
 	}
 
-	std::vector<Vector2> PickupSummaryController::Get2DStackPositions() const
+	std::vector<Vector2> PickupSummaryController::GetStackPositions() const
 	{
 		constexpr auto STACK_HEIGHT_MAX	   = 6;
 		constexpr auto SCREEN_SCALE_COEFF  = 1 / 7.0f;
@@ -176,17 +176,17 @@ namespace TEN::Hud
 		constexpr auto SCREEN_SCALE		   = Vector2(SCREEN_SPACE_RES.x * SCREEN_SCALE_COEFF, SCREEN_SPACE_RES.y * SCREEN_SCALE_COEFF);
 		constexpr auto SCREEN_OFFSET	   = Vector2(SCREEN_SPACE_RES.y * SCREEN_OFFSET_COEFF);
 
-		// Calculate 2D positions. 
-		auto stack2DPositions = std::vector<Vector2>{};
-		stack2DPositions.resize(DisplayPickups.size());
+		// Calculate positions. 
+		auto stackPositions = std::vector<Vector2>{};
+		stackPositions.resize(DisplayPickups.size());
 		for (int i = 0; i < DisplayPickups.size(); i++)
 		{
 			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, SCREEN_SPACE_RES.y);
 			auto pos = (SCREEN_SPACE_RES - relPos) - SCREEN_OFFSET;
-			stack2DPositions[i] = (pos);
+			stackPositions[i] = (pos);
 		}
 
-		return stack2DPositions;
+		return stackPositions;
 	}
 
 	DisplayPickup& PickupSummaryController::GetNewDisplayPickup()
