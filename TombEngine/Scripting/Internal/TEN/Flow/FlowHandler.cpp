@@ -215,8 +215,8 @@ Specify which translations in the strings table correspond to which languages.
 
 FlowHandler::~FlowHandler()
 {
-	for (auto& lev : Levels)
-		delete lev;
+	for (auto& level : Levels)
+		delete level;
 }
 
 std::string FlowHandler::GetGameDir()
@@ -229,14 +229,22 @@ void FlowHandler::SetGameDir(const std::string& assetDir)
 	m_gameDir = assetDir;
 }
 
-void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
+void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src)
 {
 	m_languageNames = std::move(src);
 }
 
 void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
-	m_translationsMap = std::move(src);
+	if (m_translationsMap.empty())
+	{
+		m_translationsMap = std::move(src);
+	}
+	else
+	{
+		for (auto& stringPair : src.value())
+			m_translationsMap.insert_or_assign(stringPair.first, stringPair.second);
+	}
 }
 
 void FlowHandler::SetSettings(Settings const & src)
@@ -272,8 +280,9 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 void FlowHandler::LoadFlowScript()
 {
 	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/SystemStrings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua", true);
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua", true);
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
