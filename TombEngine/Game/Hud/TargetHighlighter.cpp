@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/items.h"
+#include "Game/effects/ScreenSprite.h"
 #include "Game/lara/lara_fire.h"
 #include "Game/lara/lara_helpers.h"
 #include "Math/Math.h"
@@ -10,6 +11,7 @@
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
@@ -21,10 +23,10 @@ namespace TEN::Hud
 	{
 		float screenEdgeThreshold = GetRadius();
 
-		return (Position2D.x <= -screenEdgeThreshold ||
-				Position2D.y <= -screenEdgeThreshold ||
-				Position2D.x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
-				Position2D.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
+		return (Position.x <= -screenEdgeThreshold ||
+				Position.y <= -screenEdgeThreshold ||
+				Position.x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
+				Position.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
 	}
 
 	float CrosshairData::GetSize(float cameraDist) const
@@ -42,15 +44,15 @@ namespace TEN::Hud
 		return ((Size / 2) * (RadiusScale * PulseScale));
 	}
 
-	Vector2 CrosshairData::Get2DPositionOffset(short orientOffset2D) const
+	Vector2 CrosshairData::GetPositionOffset(short orientOffset) const
 	{
 		constexpr auto ANGLE_OFFSET = ANGLE(-360.0f / (SEGMENT_COUNT * 2));
 
 		float offsetDist = GetRadius();
-		auto relPosOffset2D = Vector2(offsetDist, 0.0f);
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation2D + orientOffset2D + ANGLE_OFFSET));
+		auto relPosOffset = Vector2(offsetDist, 0.0f);
+		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation + orientOffset + ANGLE_OFFSET));
 
-		auto posOffset2D = Vector2::Transform(relPosOffset2D, rotMatrix);
+		auto posOffset2D = Vector2::Transform(relPosOffset, rotMatrix);
 		return GetAspectCorrect2DPosition(posOffset2D);
 	}
 
@@ -66,9 +68,9 @@ namespace TEN::Hud
 		ColorTarget = COLOR_GRAY;
 	}
 
-	void CrosshairData::Update(const Vector3& cameraPos, bool doPulse, bool isActive)
+	void CrosshairData::Update(const Vector3& targetPos, bool doPulse, bool isActive)
 	{
-		constexpr auto INVALID_2D_POS		   = Vector2(FLT_MAX);
+		constexpr auto INVALID_POS			   = Vector2(FLT_MAX);
 		constexpr auto ROT					   = ANGLE(2.0f);
 		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
 		constexpr auto SIZE_SCALE_PRIMARY	   = 1.0f;
@@ -83,19 +85,32 @@ namespace TEN::Hud
 		// Update active status.
 		IsActive = isActive;
 
-		// Update 2D position.
-		auto pos2D = g_Renderer.Get2DPosition(cameraPos);
-		Position2D = pos2D.has_value() ? pos2D.value() : INVALID_2D_POS;
+		// Update position.
+		auto pos = g_Renderer.Get2DPosition(targetPos);
+		Position = pos.has_value() ? pos.value() : INVALID_POS;
 
-		// Update 2D orientation.
+		// Update orientation.
 		if (IsPrimary)
 		{
-			Orientation2D += ROT;
+			Orientation += ROT;
 		}
 		else
 		{
-			short closestAlignAngle = (Orientation2D / ALIGN_ANGLE_STEP) * ALIGN_ANGLE_STEP;
-			Orientation2D = (short)round(Lerp(Orientation2D, closestAlignAngle, ORIENT_LERP_ALPHA));
+			short closestAlignAngle = (Orientation / ALIGN_ANGLE_STEP) * ALIGN_ANGLE_STEP;
+			Orientation = (short)round(Lerp(Orientation, closestAlignAngle, ORIENT_LERP_ALPHA));
+		}
+
+		// Update size.
+		if (IsActive)
+		{
+			float cameraDist = Vector3::Distance(Camera.pos.ToVector3(), targetPos);
+			float sizeTarget = GetSize(cameraDist) * (IsPrimary ? SIZE_SCALE_PRIMARY : SIZE_SCALE_PERIPHERAL);
+
+			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
+		}
+		else
+		{
+			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA);
 		}
 
 		// Update color.
@@ -105,19 +120,6 @@ namespace TEN::Hud
 			ColorTarget.w = 0.0f;
 		}
 		Color = Vector4::Lerp(Color, ColorTarget, MORPH_LERP_ALPHA);
-
-		// Update size.
-		if (IsActive)
-		{
-			float cameraDist = Vector3::Distance(Camera.pos.ToVector3(), cameraPos);
-			float sizeTarget = GetSize(cameraDist) * (IsPrimary ? SIZE_SCALE_PRIMARY : SIZE_SCALE_PERIPHERAL);
-
-			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
-		}
-		else
-		{
-			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA);
-		}
 
 		// Update radius scale.
 		float radiusScaleTarget = IsPrimary ? RADIUS_SCALE_PRIMARY : RADIUS_SCALE_PERIPHERAL;
@@ -131,7 +133,7 @@ namespace TEN::Hud
 
 		// Update segments.
 		for (auto& segment : Segments)
-			segment.PosOffset2D = Get2DPositionOffset(segment.OrientOffset2D);
+			segment.PosOffset = GetPositionOffset(segment.OrientOffset);
 	}
 
 	void TargetHighlighterController::Update(const ItemInfo& playerItem)
@@ -148,24 +150,24 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(playerItem);
 
 		// Loop over player targets.
-		auto entityIds = std::vector<int>{};
-		for (const auto* entityPtr : player.TargetList)
+		auto itemNumbers = std::vector<int>{};
+		for (const auto* itemPtr : player.TargetList)
 		{
-			if (entityPtr == nullptr)
+			if (itemPtr == nullptr)
 				continue;
 
-			// Collect entity ID.
-			entityIds.push_back(entityPtr->Index);
+			// Collect item number.
+			itemNumbers.push_back(itemPtr->Index);
 
-			// Find crosshair at entity ID key.
-			auto it = Crosshairs.find(entityPtr->Index);
+			// Find crosshair at item number key.
+			auto it = Crosshairs.find(itemPtr->Index);
 			if (it == Crosshairs.end())
 				continue;
 
 			// Set crosshair as primary or peripheral.
 			auto& crosshair = it->second;
 			if (player.TargetEntity != nullptr &&
-				entityPtr->Index == player.TargetEntity->Index)
+				itemPtr->Index == player.TargetEntity->Index)
 			{
 				crosshair.SetPrimary();
 			}
@@ -176,37 +178,37 @@ namespace TEN::Hud
 		}
 
 		// Update crosshairs.
-		Update(entityIds);
+		Update(itemNumbers);
 	}
 
 	void TargetHighlighterController::Draw() const
 	{
-		constexpr auto SPRITE_STATIC_ELEMENT_INDEX	= 0;
-		constexpr auto SPRITE_SEGMENT_ELEMENT_INDEX = 1;
+		constexpr auto CROSSHAIR_SPRITE_STATIC_ELEMENT_INDEX  = 0;
+		constexpr auto CROSSHAIR_SPRITE_SEGMENT_ELEMENT_INDEX = 1;
 
 		DrawDebug();
 
 		if (Crosshairs.empty())
 			return;
 
-		for (const auto& [entityID, crosshair] : Crosshairs)
+		for (const auto& [itemNumber, crosshair] : Crosshairs)
 		{
 			if (crosshair.IsOffscreen())
 				continue;
 
-			g_Renderer.DrawSpriteIn2DSpace(
-				ID_CROSSHAIR, SPRITE_STATIC_ELEMENT_INDEX,
-				crosshair.Position2D, crosshair.Orientation2D,
-				crosshair.Color, Vector2(crosshair.Size));
+			AddScreenSprite(
+				ID_CROSSHAIR, CROSSHAIR_SPRITE_STATIC_ELEMENT_INDEX,
+				crosshair.Position, crosshair.Orientation,
+				Vector2(crosshair.Size), crosshair.Color, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
 
 			if (crosshair.RadiusScale > EPSILON)
 			{
 				for (const auto& segment : crosshair.Segments)
 				{
-					g_Renderer.DrawSpriteIn2DSpace(
-						ID_CROSSHAIR, SPRITE_SEGMENT_ELEMENT_INDEX,
-						crosshair.Position2D + segment.PosOffset2D, crosshair.Orientation2D + segment.OrientOffset2D,
-						crosshair.Color, Vector2(crosshair.Size / 2));
+					AddScreenSprite(
+						ID_CROSSHAIR, CROSSHAIR_SPRITE_SEGMENT_ELEMENT_INDEX,
+						crosshair.Position + segment.PosOffset, crosshair.Orientation + segment.OrientOffset,
+						Vector2(crosshair.Size / 2), crosshair.Color, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
 				}
 			}
 		}
@@ -217,54 +219,54 @@ namespace TEN::Hud
 		*this = {};
 	}
 
-	void TargetHighlighterController::Update(const std::vector<int>& entityIds)
+	void TargetHighlighterController::Update(const std::vector<int>& itemNumbers)
 	{
 		constexpr auto TARGET_BONE_ID = 0;
 
 		// No crosshairs to update; return early.
-		if (Crosshairs.empty() && entityIds.empty())
+		if (Crosshairs.empty() && itemNumbers.empty())
 			return;
 
 		// Update active crosshairs.
-		for (int entityID : entityIds)
+		for (int itemNumber : itemNumbers)
 		{
-			const auto& item = g_Level.Items[entityID];
-			auto pos = GetJointPosition(item, TARGET_BONE_ID).ToVector3();
+			const auto& item = g_Level.Items[itemNumber];
+			auto targetPos = GetJointPosition(item, TARGET_BONE_ID).ToVector3();
 
 			// Update existing active crosshair.
-			auto it = Crosshairs.find(entityID);
+			auto it = Crosshairs.find(itemNumber);
 			if (it != Crosshairs.end())
 			{
 				auto& crosshair = it->second;
 				if (crosshair.IsActive)
 				{
-					crosshair.Update(pos, item.HitStatus, true);
+					crosshair.Update(targetPos, item.HitStatus, true);
 					continue;
 				}
 			}
 
 			// Add new active crosshair.
-			AddCrosshair(entityID, pos);
+			AddCrosshair(itemNumber, targetPos);
 		}
 
 		// Update inactive crosshairs.
-		for (auto& [entityID, crosshair] : Crosshairs)
+		for (auto& [itemNumber, crosshair] : Crosshairs)
 		{
 			// Find crosshairs at absent entity ID keys.
-			if (Contains(entityIds, entityID))
+			if (Contains(itemNumbers, itemNumber))
 				continue;
 
-			const auto& item = g_Level.Items[entityID];
-			auto pos = GetJointPosition(item, 0).ToVector3();
+			const auto& item = g_Level.Items[itemNumber];
+			auto targetPos = GetJointPosition(item, 0).ToVector3();
 
 			// Update inactive crosshair.
-			crosshair.Update(pos, item.HitStatus, false);
+			crosshair.Update(targetPos, item.HitStatus, false);
 		}
 
 		ClearInactiveCrosshairs();
 	}
 
-	CrosshairData& TargetHighlighterController::GetNewCrosshair(int entityID)
+	CrosshairData& TargetHighlighterController::GetNewCrosshair(int itemNumber)
 	{
 		constexpr auto COUNT_MAX = 16;
 
@@ -274,11 +276,11 @@ namespace TEN::Hud
 			int key = 0;
 			float smallestSize = INFINITY;
 			
-			for (auto& [entityID, crosshair] : Crosshairs)
+			for (auto& [itemNumber, crosshair] : Crosshairs)
 			{
 				if (crosshair.Size < smallestSize)
 				{
-					key = entityID;
+					key = itemNumber;
 					smallestSize = crosshair.Size;
 				}
 			}
@@ -287,21 +289,21 @@ namespace TEN::Hud
 		}
 
 		// Return new crosshair.
-		Crosshairs.insert({ entityID, {} });
-		auto& crosshair = Crosshairs.at(entityID);
+		Crosshairs.insert({ itemNumber, {} });
+		auto& crosshair = Crosshairs.at(itemNumber);
 		crosshair = {};
 		return crosshair;
 	}
 
-	// TODO: If crosshair happens to be in view upon spawn, first frame is garbage.
-	void TargetHighlighterController::AddCrosshair(int entityID, const Vector3& pos)
+	// TODO: If crosshair happens to be in view upon spawn, first frame is sometimes garbage.
+	void TargetHighlighterController::AddCrosshair(int entityID, const Vector3& targetPos)
 	{
 		constexpr auto SIZE_START		  = SCREEN_SPACE_RES.x / 2;
 		constexpr auto RADIUS_SCALE_START = 1.5f * SQRT_2;
 		constexpr auto ANGLE_STEP		  = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
 
-		auto pos2D = g_Renderer.Get2DPosition(pos);
-		if (!pos2D.has_value())
+		auto pos = g_Renderer.Get2DPosition(targetPos);
+		if (!pos.has_value())
 			return;
 
 		// Create new crosshair.
@@ -309,12 +311,12 @@ namespace TEN::Hud
 
 		crosshair.IsActive = true;
 		crosshair.IsPrimary = false;
-		crosshair.Position2D = pos2D.value();
-		crosshair.Orientation2D = 0;
+		crosshair.Position = pos.value();
+		crosshair.Orientation = 0;
+		crosshair.Size = SIZE_START;
 		crosshair.Color = CrosshairData::COLOR_GRAY;
 		crosshair.Color.w = 0.0f;
 		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
-		crosshair.Size = SIZE_START;
 		crosshair.RadiusScale = RADIUS_SCALE_START;
 		crosshair.PulseScale = 1.0f;
 
@@ -322,8 +324,8 @@ namespace TEN::Hud
 		short angleOffset = 0;
 		for (auto& segment : crosshair.Segments)
 		{
-			segment.PosOffset2D = crosshair.Get2DPositionOffset(segment.OrientOffset2D);
-			segment.OrientOffset2D = angleOffset;
+			segment.PosOffset = crosshair.GetPositionOffset(segment.OrientOffset);
+			segment.OrientOffset = angleOffset;
 
 			angleOffset += ANGLE_STEP;
 		}

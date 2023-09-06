@@ -14,20 +14,20 @@ namespace TEN::Hud
 	private:
 		struct SegmentData
 		{
-			Vector2 PosOffset2D	   = Vector2::Zero;
-			short	OrientOffset2D = 0;
+			Vector2 PosOffset	 = Vector2::Zero;
+			short	OrientOffset = 0;
 		};
 
 	public:
 		bool IsActive  = false;
 		bool IsPrimary = false;
 
-		Vector2 Position2D	  = Vector2::Zero;
-		short	Orientation2D = 0;
-		Vector4 Color		  = Vector4::Zero;
-		Vector4 ColorTarget	  = Vector4::Zero;
+		Vector2 Position	= Vector2::Zero;
+		short	Orientation = 0;
+		float	Size		= 0.0f;
+		Vector4 Color		= Vector4::Zero;
+		Vector4 ColorTarget = Vector4::Zero;
 
-		float Size		  = 0.0f;
 		float RadiusScale = 0.0f;
 		float PulseScale  = 0.0f;
 
@@ -36,11 +36,11 @@ namespace TEN::Hud
 		bool	IsOffscreen() const;
 		float	GetSize(float cameraDist) const;
 		float	GetRadius() const;
-		Vector2 Get2DPositionOffset(short orientOffset2D) const;
+		Vector2 GetPositionOffset(short orientOffset) const;
 
 		void SetPrimary();
 		void SetPeripheral();
-		void Update(const Vector3& cameraPos, bool doPulse, bool isActive);
+		void Update(const Vector3& targetPos, bool doPulse, bool isActive);
 	};
 
 	class TargetHighlighterController
@@ -57,11 +57,11 @@ namespace TEN::Hud
 
 	private:
 		// Update helpers
-		void Update(const std::vector<int>& entityIds);
+		void Update(const std::vector<int>& itemNumbers);
 
 		// Misc. helpers
-		CrosshairData& GetNewCrosshair(int entityID);
-		void		   AddCrosshair(int entityID, const Vector3& pos);
+		CrosshairData& GetNewCrosshair(int itemNumber);
+		void		   AddCrosshair(int itemNumber, const Vector3& targetPos);
 		void		   ClearInactiveCrosshairs();
 
 		void DrawDebug() const;
