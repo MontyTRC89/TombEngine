@@ -11,33 +11,32 @@ using namespace TEN::Collision::Floordata;
 
 namespace TEN::Entities::Generic
 {
-	//Required to can use our Vector3i in the std::unordered_map
+	// NOTE: Required to use Vector3i in std::unordered_map.
 	struct Vector3iHasher 
 	{
-		std::size_t operator()(const Vector3i& v) const 
+		std::size_t operator()(const Vector3i& vector) const 
 		{
-			std::size_t h1 = std::hash<int>()(v.x);
-			std::size_t h2 = std::hash<int>()(v.y);
-			std::size_t h3 = std::hash<int>()(v.z);
-			return h1 ^ (h2 << 1) ^ (h3 << 2);
+			std::size_t h1 = std::hash<int>()(vector.x);
+			std::size_t h2 = std::hash<int>()(vector.y);
+			std::size_t h3 = std::hash<int>()(vector.z);
+			return (h1 ^ (h2 << 1) ^ (h3 << 2));
 		}
 	};
 
-	void InitializePushablesStacks()
+	void InitializePushableStacks()
 	{
-		//1. Collect all the pushables placed in the level
-		auto& pushablesNumbersList = FindAllPushables(g_Level.Items);
-
-		if (pushablesNumbersList.empty())
+		// 1) Collect all pushables in level.
+		auto& pushableItemNumbers = FindAllPushables(g_Level.Items);
+		if (pushableItemNumbers.empty())
 			return;
 
-		//2. Prepare data to create several lists per each stack group. (One for each position XZ, and the ground floor height).
-		//PROBLEM: Missing hash function in Vector3i, creating custom version Vector3iHasher at the top of this source code.
+		// 2) Prepare data to create several lists per each stack group (one for each XZ and ground floor height).
+		// PROBLEM: Missing hash function in Vector3i, creating custom version Vector3iHasher at the top of this source code.
 		std::unordered_map < Vector3i, std::vector<int>, Vector3iHasher> stackGroups; // stack Position - pushable itemNumber  
 
-		//3. Iterate through the pushables list, to put them in their different stack groups. According to their XZ and ground floor height).
+		// 3) Iterate through the pushables list, to put them in their different stack groups. According to their XZ and ground floor height).
 		//Extra, I moved also the .Data initialization here, to can store data in all the pushables objects (even the ones not initialized yet).
-		for (int itemNumber : pushablesNumbersList)
+		for (int itemNumber : pushableItemNumbers)
 		{
 			auto& pushableItem = g_Level.Items[itemNumber];
 			pushableItem.Data = PushableInfo();
@@ -45,35 +44,34 @@ namespace TEN::Entities::Generic
 			int x = pushableItem.Pose.Position.x;
 			int z = pushableItem.Pose.Position.z;
 			
-			auto collisionResult = GetCollision(&pushableItem);
-			int y = collisionResult.Position.Floor;
+			auto pointColl = GetCollision(&pushableItem);
+			int y = pointColl.Position.Floor;
 			
 			stackGroups.emplace(Vector3i(x, y, z), std::vector<int>()).first->second.push_back(itemNumber);
 		}
 
-		//4. Iterate through the stack groups lists, on each one, it has to sort them by height, and iterate through it to make the stack links.
+		// 4) Iterate through stack groups lists, sort each by vertical position, and iterate to make stack links.
 		for (auto& group : stackGroups)
-		//for (auto it = stackGroups.begin(); it != stackGroups.end(); ++it)
 		{
-			//const auto& group = *it;
 			auto& pushablesInGroup = group.second;
 
-			//If there is only 1 pushable in that position, no stack check is required.
+			// If only 1 pushable in that position, no stack check required.
 			if (pushablesInGroup.size() <= 1)
 				continue;
 
-			//If there are 2 or more pushables in the group, sort them from bottom to top. (Highest Y to Lowest Y).
-			std::sort(pushablesInGroup.begin(), pushablesInGroup.end(), [](int a, int b) 
+			// If 2 or more pushables in group, sort from bottom to top (highest Y to Lowest Y).
+			std::sort(pushablesInGroup.begin(), pushablesInGroup.end(), [](int pushableItemNumber0, int pushableItemNumber1) 
 				{
-					auto& pushableA = g_Level.Items[a];
-					auto& pushableB = g_Level.Items[b];
-					return pushableA.Pose.Position.y > pushableB.Pose.Position.y; //a is over B
+					const auto& pushable0 = g_Level.Items[pushableItemNumber0];
+					const auto& pushable1 = g_Level.Items[pushableItemNumber1];
+
+					return (pushable0.Pose.Position.y > pushable1.Pose.Position.y);
 				});
 
-			//Iterate through each group to set the stack links).
-			for (size_t i = 0; i < pushablesInGroup.size() - 1; ++i)
+			// Iterate through each group to set the stack links).
+			for (int i = 0; i < (pushablesInGroup.size() - 1); ++i)
 			{
-				// Set the stackUpperItem and stackLowerItem variables accordingly
+				// Set stackUpperItem and stackLowerItem variables accordingly.
 				int lowerItemNumber = pushablesInGroup[i];
 				auto& lowerPushableItem = g_Level.Items[lowerItemNumber];
 				auto& lowerPushable = GetPushableInfo(lowerPushableItem);
@@ -88,41 +86,40 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList)
+	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& items)
 	{
-		std::vector<int> pushables;
-
-		for (int i = 0; i < objectsList.size(); i++)
+		auto pushableItemNumbers = std::vector<int>{};
+		for (int i = 0; i < items.size(); i++)
 		{
-			auto& item = objectsList[i];
+			auto& item = items[i];
 
 			if ((item.ObjectNumber >= ID_PUSHABLE_OBJECT1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT10) ||
 				(item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10))
 			{
-				pushables.push_back(i);
+				pushableItemNumbers.push_back(i);
 			}
 		}
 
-		return pushables;
+		return pushableItemNumbers;
 	}
 
-	void StackPushable(int itemNumber, int itemNumber_target)
+	void StackPushable(int itemNumber, int targetItemNumber)
 	{
-		if (itemNumber_target == NO_ITEM)
+		if (targetItemNumber == NO_ITEM)
 			return;
 
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		pushable.StackLowerItem = itemNumber_target;
+		pushable.StackLowerItem = targetItemNumber;
 
-		auto& lowerPushableItem = g_Level.Items[itemNumber_target];
+		auto& lowerPushableItem = g_Level.Items[targetItemNumber];
 		auto& lowerPushable = GetPushableInfo(lowerPushableItem);
 
 		lowerPushable.StackUpperItem = itemNumber;
 	}
 
-	void UnpilePushable(int itemNumber)
+	void UnstackPushable(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
@@ -146,7 +143,7 @@ namespace TEN::Entities::Generic
 		if (pushabelStackFound != NO_ITEM)
 			return pushabelStackFound;
 
-		//Otherwise, check the room below.
+		// Otherwise, check room below.
 		//auto collisionResult = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);		
 		//auto roomNumberBelow = collisionResult.Block->GetRoomNumberBelow(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z).value();
 		//pushabelStackFound = FindPushableStackInRoom(itemNumber, roomNumberBelow);
@@ -166,19 +163,18 @@ namespace TEN::Entities::Generic
 			{
 				auto& currentItem = g_Level.Items[currentItemNumber];
 
-				//If is a climbable pushable, is in the same XZ position and is at a lower height.
+				// If climbable pushable, is in the same XZ position and is at a lower height.
 				if ((currentItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && currentItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10) &&
 					(currentItem.Pose.Position.x == pushableItem.Pose.Position.x) && (currentItem.Pose.Position.z == pushableItem.Pose.Position.z) &&
 					(currentItem.Pose.Position.y > pushableItem.Pose.Position.y))
 				{
+					// Find top item.
 					if (pushable.StackUpperItem == NO_ITEM)
 					{
-						//If the found item is at the top of a stack, return it.
 						return currentItemNumber;
 					}
 					else
 					{
-						//Otherwise, iterate through its stack till find the topest one, and return that one.
 						int topItemNumber = pushable.StackUpperItem;
 						while (topItemNumber != NO_ITEM)
 						{
@@ -198,46 +194,45 @@ namespace TEN::Entities::Generic
 				}
 				else
 				{
-					//Else, check the next item.
 					currentItemNumber = currentItem.NextItem;
 				}
 			}
 		}
+
 		return NO_ITEM;
 	}
 
-	int CountPushablesInStack(int itemNumber)
+	int GetPushableCountInStack(int itemNumber)
 	{
 		auto pushableItemCopy = g_Level.Items[itemNumber];
 		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
 
 		int count = 1;
-
 		while (pushableCopy.StackUpperItem != NO_ITEM)
 		{
-			if (pushableCopy.StackUpperItem == itemNumber) //It shouldn't happens, but just in case.
+			// Filter out current pushable item.
+			if (pushableCopy.StackUpperItem == itemNumber)
 				break;
-
-			count++;
 
 			pushableItemCopy = g_Level.Items[pushableCopy.StackUpperItem];
 			pushableCopy = GetPushableInfo(pushableItemCopy);
+
+			count++;
 		}
 
 		return count;
 	}
 
-	bool IsUnderStackLimit(int itemNumber)
+	bool IsWithinStackLimit(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		auto count = CountPushablesInStack(itemNumber);
-
-		return count <= pushable.StackLimit;
+		auto count = GetPushableCountInStack(itemNumber);
+		return (count <= pushable.StackLimit);
 	}
 
-	int CalculateStackHeight(int itemNumber)
+	int GetStackHeight(int itemNumber)
 	{
 		auto pushableItemCopy = g_Level.Items[itemNumber];
 		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
@@ -261,14 +256,14 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		int currentItemNumber = pushable.StackUpperItem;
-
 		while (currentItemNumber != NO_ITEM)
 		{
 			auto& currentPushableItem = g_Level.Items[currentItemNumber];
 			auto& currentPushable = GetPushableInfo(currentPushableItem);
 
+			// Deactivate collision.
 			if (currentPushable.UsesRoomCollision)
-				DeactivateClimbablePushableCollider(currentItemNumber); // Deactivate collision
+				DeactivateClimbablePushableCollider(currentItemNumber);
 
 			currentPushable.BehaviourState = PushableState::MoveStackHorizontal;
 
@@ -282,7 +277,6 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		int currentItemNumber = pushable.StackUpperItem;
-
 		while (currentItemNumber != NO_ITEM)
 		{
 			auto& currentPushableItem = g_Level.Items[currentItemNumber];
@@ -290,8 +284,9 @@ namespace TEN::Entities::Generic
 
 			currentPushableItem.Pose.Position = GetNearestSectorCenter(currentPushableItem.Pose.Position);
 
+			// Activate collision.
 			if (currentPushable.UsesRoomCollision)
-				ActivateClimbablePushableCollider(currentItemNumber); // Activate collision
+				ActivateClimbablePushableCollider(currentItemNumber);
 
 			currentPushable.BehaviourState = PushableState::Idle;
 
@@ -309,7 +304,8 @@ namespace TEN::Entities::Generic
 
 	}
 
-	void VerticalPosAddition(int itemNumber, int deltaY) //Problems with bridge collision.
+	// TODO: Problems with bridge collision.
+	void VerticalPosAddition(int itemNumber, int deltaY)
 	{
 		auto pushableItemCopy = g_Level.Items[itemNumber];
 		auto& pushableCopy = GetPushableInfo(pushableItemCopy);

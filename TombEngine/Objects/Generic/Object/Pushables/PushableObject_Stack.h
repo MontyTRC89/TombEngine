@@ -4,19 +4,19 @@ struct ItemInfo;
 
 namespace TEN::Entities::Generic
 {
-	void InitializePushablesStacks();
-	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& objectsList);
+	void InitializePushableStacks();
+	std::vector<int> FindAllPushables(const std::vector<ItemInfo>& items);
 
-	void StackPushable(int itemNumber, int itemNumber_target);
-	void UnpilePushable(int itemNumber);
+	void StackPushable(int itemNumber, int targetItemNumber);
+	void UnstackPushable(int itemNumber);
 	
 	int SearchNearPushablesStack(int itemNumber);
 	int FindPushableStackInRoom(int itemNumber, int roomNumber);
 
-	int CountPushablesInStack(int itemNumber);
-	bool IsUnderStackLimit(int itemNumber);
+	int GetPushableCountInStack(int itemNumber);
+	bool IsWithinStackLimit(int itemNumber);
 
-	int CalculateStackHeight(int itemNumber);
+	int GetStackHeight(int itemNumber);
 
 	void StartMovePushableStack(int itemNumber);
 	void StopMovePushableStack(int itemNumber);

@@ -95,7 +95,7 @@ namespace TEN::Entities::Generic
 				pushable.BehaviourState = PushableState::Move;
 
 				// Cut links with  lower pushables in stack.
-				UnpilePushable(itemNumber);
+				UnstackPushable(itemNumber);
 
 				// Prepare upper pushables in stack for movement.
 				StartMovePushableStack(itemNumber);

@@ -56,7 +56,7 @@ namespace TEN::Entities::Generic
 		if (pushableItem.Data == NULL) // Is first pushableItem in initialize.
 		{
 			InitializePushableStateMap();
-			InitializePushablesStacks();
+			InitializePushableStacks();
 		}
 		
 		//pushableItem.Data = PushableInfo(); // Moved to InitializePushablesStacks.

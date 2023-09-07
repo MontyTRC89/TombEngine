@@ -25,25 +25,25 @@ namespace TEN::Entities::Generic
 		if (pushableItem.Status == ITEM_INVISIBLE || pushableItem.TriggerFlags < 0) //It requires a positive OCB to can interact with it.
 			return false;
 
-		auto collisionResult = CollisionResult{};
+		auto pointColl = CollisionResult{};
 
 		if (pushable.UsesRoomCollision)
 		{
 			DeactivateClimbablePushableCollider(itemNumber);
-			collisionResult = GetCollision(&pushableItem);
+			pointColl = GetCollision(&pushableItem);
 			ActivateClimbablePushableCollider(itemNumber);
 		}
 		else
 		{
-			collisionResult = GetCollision(&pushableItem);
+			pointColl = GetCollision(&pushableItem);
 		}
 
 		// Check is pushable is in a wall.
-		if (collisionResult.Block->IsWall(pushableItem.Pose.Position.x, pushableItem.Pose.Position.z))
+		if (pointColl.Block->IsWall(pushableItem.Pose.Position.x, pushableItem.Pose.Position.z))
 			return false;
 
 		// Check if pushable isn't on the floor.
-		int heightDifference = abs(collisionResult.Position.Floor - pushableItem.Pose.Position.y);
+		int heightDifference = abs(pointColl.Position.Floor - pushableItem.Pose.Position.y);
 		if ((heightDifference >= PUSHABLE_HEIGHT_TOLERANCE))
 			return false;
 
@@ -62,17 +62,17 @@ namespace TEN::Entities::Generic
 
 		pushable.isOnEdge = false;
 
-		auto collisionResult = GetCollision(targetPos.x, targetPos.y, targetPos.z, targetRoom);
+		auto pointColl = GetCollision(targetPos.x, targetPos.y, targetPos.z, targetRoom);
 
 		// Check for wall.
-		if (collisionResult.Block->IsWall(targetPos.x, targetPos.z))
+		if (pointColl.Block->IsWall(targetPos.x, targetPos.z))
 			return false;
 		
 		// Check for gaps or steps.
-		int floorDifference = abs(collisionResult.Position.Floor - pushableItem.Pose.Position.y);
+		int floorDifference = abs(pointColl.Position.Floor - pushableItem.Pose.Position.y);
 		if (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE)
 		{
-			if (collisionResult.Position.Floor < pushableItem.Pose.Position.y)
+			if (pointColl.Position.Floor < pushableItem.Pose.Position.y)
 			{
 				//Is a step
 				return false;
@@ -89,14 +89,14 @@ namespace TEN::Entities::Generic
 		}
 
 		// Check for floor slope.
-		if (collisionResult.Position.FloorSlope)
+		if (pointColl.Position.FloorSlope)
 			return false;
 
 		// Check for diagonal floor.
-		if (collisionResult.Position.DiagonalStep)
+		if (pointColl.Position.DiagonalStep)
 			return false;
 
-		if ((collisionResult.Block->GetSurfaceSlope(0, true) != Vector2::Zero) || (collisionResult.Block->GetSurfaceSlope(1, true) != Vector2::Zero))
+		if ((pointColl.Block->GetSurfaceSlope(0, true) != Vector2::Zero) || (pointColl.Block->GetSurfaceSlope(1, true) != Vector2::Zero))
 			return false;
 
 		// Check for stopper flag.
@@ -109,8 +109,8 @@ namespace TEN::Entities::Generic
 		}*/
 
 		// Is ceiling (square or diagonal) high enough?
-		int distanceToCeiling = abs(collisionResult.Position.Ceiling - collisionResult.Position.Floor);
-		int blockHeight = CalculateStackHeight(itemNumber) - PUSHABLE_HEIGHT_TOLERANCE;
+		int distanceToCeiling = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+		int blockHeight = GetStackHeight(itemNumber) - PUSHABLE_HEIGHT_TOLERANCE;
 		if (distanceToCeiling < blockHeight)
 			return false;
 
@@ -176,21 +176,21 @@ namespace TEN::Entities::Generic
 		}
 
 		auto laraDetectionPos = LaraItem->Pose.Position + playerOffset;
-		auto collisionResult = GetCollision(laraDetectionPos.x, laraDetectionPos.y, laraDetectionPos.z, LaraItem->RoomNumber);
+		auto pointColl = GetCollision(laraDetectionPos.x, laraDetectionPos.y, laraDetectionPos.z, LaraItem->RoomNumber);
 
 		//This collisionResult is the point where Lara would be at the end of the pushable pull.
 
 		// If is a wall
-		if (collisionResult.Block->IsWall(laraDetectionPos.x, laraDetectionPos.z))
+		if (pointColl.Block->IsWall(laraDetectionPos.x, laraDetectionPos.z))
 			return false;
 
 		// If floor is not flat
-		int floorDifference = abs(collisionResult.Position.Floor - LaraItem->Pose.Position.y);
+		int floorDifference = abs(pointColl.Position.Floor - LaraItem->Pose.Position.y);
 		if (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE)
 			return false;
 
 		// Is ceiling (square or diagonal) high enough?
-		int distanceToCeiling = abs(collisionResult.Position.Ceiling - collisionResult.Position.Floor);
+		int distanceToCeiling = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 		if (distanceToCeiling < LARA_HEIGHT)
 			return false;
 
@@ -259,7 +259,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		//Cond 3: Is its stacked pushables under the limit?
-		if (!IsUnderStackLimit(itemNumber))
+		if (!IsWithinStackLimit(itemNumber))
 			return false;
 
 		//Cond 4: Does it comply with the room collision conditions?.
