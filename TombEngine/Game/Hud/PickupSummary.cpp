@@ -115,7 +115,7 @@ namespace TEN::Hud
 		pickup.ObjectID = objectID;
 		pickup.Count = 1;
 		pickup.Position =
-		pickup.Origin = origin.value();
+		pickup.Origin = *origin;
 		pickup.Target = Vector2::Zero;
 		pickup.Life = life;
 		pickup.Scale = 0.0f;
