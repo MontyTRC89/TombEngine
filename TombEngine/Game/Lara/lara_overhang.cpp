@@ -960,7 +960,7 @@ void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_LADDER_IDLE (56)
 bool LadderMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	auto probe = GetCollision(item);
+	auto probe = GetCollision(*item);
 
 	if (probe.Position.CeilingSlope)
 		return false;
