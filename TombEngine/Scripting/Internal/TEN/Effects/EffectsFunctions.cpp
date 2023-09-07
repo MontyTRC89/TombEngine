@@ -56,7 +56,7 @@ namespace Effects
 		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
 
 		auto scriptColor = USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255, 255));
-
+		
 		auto bMode = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
 		bMode = BLEND_MODES(std::clamp((int)bMode, (int)BLEND_MODES::BLENDMODE_OPAQUE, (int)BLEND_MODES::BLENDMODE_ALPHABLEND));
 
