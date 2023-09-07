@@ -1,5 +1,7 @@
 #pragma once
 #include "framework.h"
+
+#include <filesystem>
 #include "Scripting/Internal/LuaHandler.h"
 
 LuaHandler::LuaHandler(sol::state* lua) : m_lua{ lua }
@@ -16,8 +18,11 @@ void LuaHandler::ResetGlobals()
 	m_lua->set(sol::metatable_key, mt);
 }
 
-void LuaHandler::ExecuteScript(const std::string& luaFilename)
+void LuaHandler::ExecuteScript(const std::string& luaFilename, bool isOptional)
 {
+	if (isOptional && !std::filesystem::is_regular_file(luaFilename))
+		return;
+
 	auto result = m_lua->safe_script_file(luaFilename, sol::script_pass_on_error);
 	if (!result.valid())
 	{
