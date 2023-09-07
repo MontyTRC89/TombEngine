@@ -179,8 +179,8 @@ namespace TEN::Gui
 		if (IsHeld(In::Deselect))
 			return false;
 
-		// Avoid Action release interference when entering inventory.
-		if (GetActionTimeActive(In::Action) < TimeInMenu)
+		// Avoid Select or Action release interference when entering inventory.
+		if (GetActionTimeActive(In::Select) < TimeInMenu || GetActionTimeActive(In::Action) < TimeInMenu)
 			return true;
 
 		return false;
@@ -880,7 +880,7 @@ namespace TEN::Gui
 			MenuToDisplay = Menu::Options;
 			SelectedOption = 1;
 
-			SetVolumeMusic(g_Configuration.MusicVolume);
+			SetVolumeTracks(g_Configuration.MusicVolume);
 			SetVolumeFX(g_Configuration.SfxVolume);
 			return;
 		}
@@ -928,7 +928,7 @@ namespace TEN::Gui
 					if (CurrentSettings.Configuration.MusicVolume < 0)
 						CurrentSettings.Configuration.MusicVolume = 0;
 
-					SetVolumeMusic(CurrentSettings.Configuration.MusicVolume);
+					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
 					isVolumeAdjusted = true;
 				}
 
@@ -967,7 +967,7 @@ namespace TEN::Gui
 					if (CurrentSettings.Configuration.MusicVolume > VOLUME_MAX)
 						CurrentSettings.Configuration.MusicVolume = VOLUME_MAX;
 
-					SetVolumeMusic(CurrentSettings.Configuration.MusicVolume);
+					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
 					isVolumeAdjusted = true;
 				}
 
@@ -1045,7 +1045,7 @@ namespace TEN::Gui
 			else if (SelectedOption == OtherSettingsOption::Cancel)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				SetVolumeMusic(g_Configuration.MusicVolume);
+				SetVolumeTracks(g_Configuration.MusicVolume);
 				SetVolumeFX(g_Configuration.SfxVolume);
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 				SelectedOption = 1;
