@@ -606,7 +606,6 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 	}
 
-
 	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size,
 									 const Vector4& color, int priority, BLEND_MODES blendMode, RenderView& renderView)
 	{
