@@ -13,6 +13,7 @@ namespace TEN::Input
 									MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) +
 									GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2) + GAMEPAD_POV_AXIS_COUNT;
 
+	// Mouse
 	// 8 buttons + (4 * 2) axes.
 	enum MouseKey
 	{
@@ -37,6 +38,7 @@ namespace TEN::Input
 		MK_AXIS_W_POS
 	};
 
+	// Gamepad
 	// 16 buttons + (6 * 2) axes + 4 POV axes.
 	enum GamepadKey
 	{
@@ -79,7 +81,7 @@ namespace TEN::Input
 		GK_DPAD_RIGHT
 	};
 
-	// GamepadKey mirror.
+	// XBox (GamepadKey mirror).
 	// 11 buttons + (6 * 2) axes + 4 POV axes.
 	enum XInputKey
 	{
