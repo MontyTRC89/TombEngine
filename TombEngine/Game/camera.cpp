@@ -95,11 +95,11 @@ void DoThumbstickCamera()
 			AxisMap[InputAxis::CameraHorizontal],
 			AxisMap[InputAxis::CameraVertical]);
 
-		if (abs(axisCoeff.x) > EPSILON)
-			Camera.targetElevation = ANGLE(-10.0f + (HORIZONTAL_CONSTRAINT_ANGLE * axisCoeff.x));
+		if (abs(axisCoeff.x) > EPSILON && abs(Camera.targetAngle) == 0)
+			Camera.targetAngle = ANGLE(VERTICAL_CONSTRAINT_ANGLE * axisCoeff.x);
 
-		if (abs(axisCoeff.y) > EPSILON && abs(Camera.targetAngle) == 0)
-			Camera.targetAngle = ANGLE(VERTICAL_CONSTRAINT_ANGLE * axisCoeff.y);
+		if (abs(axisCoeff.y) > EPSILON)
+			Camera.targetElevation = ANGLE(-10.0f + (HORIZONTAL_CONSTRAINT_ANGLE * axisCoeff.y));
 	}
 }
 
@@ -1130,9 +1130,9 @@ void CalculateCamera(const CollisionInfo& coll)
 			float dist = Vector3i::Distance(Camera.item->Pose.Position, item->Pose.Position);
 
 			auto lookOrient = EulerAngles(
-				0,
+				phd_atan(dist, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y),
 				phd_atan(deltaPos.z, deltaPos.x) - item->Pose.Orientation.y,
-				phd_atan(dist, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y)) / 2;
+				0) / 2;
 
 			if (lookOrient.y > ANGLE(-50.0f) &&	lookOrient.y < ANGLE(50.0f) &&
 				lookOrient.z > ANGLE(-85.0f) && lookOrient.z < ANGLE(85.0f))

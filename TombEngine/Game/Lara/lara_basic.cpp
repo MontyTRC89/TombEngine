@@ -479,7 +479,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Look))
+	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 	{
 		item->Animation.TargetState = LS_IDLE;
 		return;
