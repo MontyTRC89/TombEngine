@@ -86,6 +86,13 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
+/*** Enable or disable point texture filter.
+Must be true or false
+@function EnablePointFilter
+@tparam bool enabled true or false
+*/
+	tableFlow.set_function(ScriptReserved_EnablePointFilter, &FlowHandler::EnablePointFilter, this);
+
 /*** Enable or disable mass pickup.
 Must be true or false
 @function EnableMassPickup
@@ -201,15 +208,15 @@ Specify which translations in the strings table correspond to which languages.
 	
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, kWeatherTypes);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, kLaraTypes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, kRotAxes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, kItemActions);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, kErrorModes);
 }
 
 FlowHandler::~FlowHandler()
 {
-	for (auto& lev : Levels)
-		delete lev;
+	for (auto& level : Levels)
+		delete level;
 }
 
 std::string FlowHandler::GetGameDir()
@@ -222,14 +229,22 @@ void FlowHandler::SetGameDir(const std::string& assetDir)
 	m_gameDir = assetDir;
 }
 
-void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
+void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src)
 {
 	m_languageNames = std::move(src);
 }
 
 void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
-	m_translationsMap = std::move(src);
+	if (m_translationsMap.empty())
+	{
+		m_translationsMap = std::move(src);
+	}
+	else
+	{
+		for (auto& stringPair : src.value())
+			m_translationsMap.insert_or_assign(stringPair.first, stringPair.second);
+	}
 }
 
 void FlowHandler::SetSettings(Settings const & src)
@@ -265,8 +280,9 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 void FlowHandler::LoadFlowScript()
 {
 	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/SystemStrings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua", true);
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua", true);
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
@@ -416,6 +432,16 @@ void FlowHandler::EnableFlyCheat(bool flyCheat)
 	FlyCheat = flyCheat;
 }
 
+bool FlowHandler::IsPointFilterEnabled() const
+{
+	return PointFilter;
+}
+
+void FlowHandler::EnablePointFilter(bool pointFilter)
+{
+	PointFilter = pointFilter;
+}
+
 bool FlowHandler::IsMassPickupEnabled() const
 {
 	return MassPickup;
@@ -488,19 +514,17 @@ bool FlowHandler::DoFlow()
 			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
 			{
 				InventoryItem* obj = &level->InventoryObjects[i];
-				if (obj->slot >= 0 && obj->slot < INVENTORY_TABLE_SIZE)
+				if (obj->ObjectID >= 0 && obj->ObjectID < INVENTORY_TABLE_SIZE)
 				{
-					InventoryObject* invObj = &InventoryObjectTable[obj->slot];
+					InventoryObject* invObj = &InventoryObjectTable[obj->ObjectID];
 
-					invObj->ObjectName = obj->name.c_str();
-					invObj->Scale1 = obj->scale;
-					invObj->YOffset = obj->yOffset;
-					invObj->Orientation.x = ANGLE(obj->rot.x);
-					invObj->Orientation.y = ANGLE(obj->rot.y);
-					invObj->Orientation.z = ANGLE(obj->rot.z);
-					invObj->MeshBits = obj->meshBits;
-					invObj->Options = obj->action;
-					invObj->RotFlags = obj->rotationFlags;
+					invObj->ObjectName = obj->Name.c_str();
+					invObj->Scale1 = obj->Scale;
+					invObj->YOffset = obj->YOffset;
+					invObj->Orientation = EulerAngles(ANGLE(obj->Rot.x), ANGLE(obj->Rot.y), ANGLE(obj->Rot.z));
+					invObj->MeshBits = obj->MeshBits;
+					invObj->Options = obj->MenuAction;
+					invObj->RotFlags = obj->RotFlags;
 				}
 			}
 
