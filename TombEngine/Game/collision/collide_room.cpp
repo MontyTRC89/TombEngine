@@ -172,21 +172,36 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingA
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber)
 {
-	auto pointColl = GetPointCollision(pos, roomNumber);
+	// HACK: GetPointCollision() takes arguments for a *current* position and room number.
+	// However, since some calls to this deprecated function had *projected*
+	// positions passed to it, the room number must be corrected to account for such cases.
+	// They are primarily found in camera.cpp.
+	short correctedRoomNumber = roomNumber;
+	GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
+
+	auto pointColl = GetPointCollision(pos, correctedRoomNumber);
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
-	auto pointColl = GetPointCollision(Vector3i(x, y, z), roomNumber);
+	// HACK: Explained above.
+	short correctedRoomNumber = roomNumber;
+	GetFloor(x, y, z, &correctedRoomNumber);
+
+	auto pointColl = GetPointCollision(Vector3i(x, y, z), correctedRoomNumber);
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const GameVector& pos)
 {
-	auto pointColl = GetPointCollision(pos.ToVector3i(), pos.RoomNumber);
+	// HACK: Explained above.
+	short correctedRoomNumber = pos.RoomNumber;
+	GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
+
+	auto pointColl = GetPointCollision(pos.ToVector3i(), correctedRoomNumber);
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 
