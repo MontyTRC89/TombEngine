@@ -1162,11 +1162,32 @@ namespace TEN::Renderer
 				break;
 
 			case RendererDebugPage::InputStats:
+			{
+				auto clickedActions = BitField((int)In::Count);
+				auto heldActions = BitField((int)In::Count);
+				auto releasedActions = BitField((int)In::Count);
+
+				for (const auto& action : ActionMap)
+				{
+					if (action.IsClicked())
+						clickedActions.Set((int)action.GetID());
+
+					if (action.IsHeld())
+						heldActions.Set((int)action.GetID());
+
+					if (action.IsReleased())
+						releasedActions.Set((int)action.GetID());
+				}
+				
 				PrintDebugMessage("INPUT STATS");
+				PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
+				PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
+				PrintDebugMessage(("Released actions: " + releasedActions.ToString()).c_str());
 				PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
 				PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
 				PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
 				PrintDebugMessage("Cursor pos: %.3f, %.3f", GetCursor2DPosition().x, GetCursor2DPosition().y);
+			}
 				break;
 
 			case RendererDebugPage::CollisionStats:
