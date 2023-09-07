@@ -52,8 +52,8 @@ namespace TEN::Hud
 		auto relPosOffset = Vector2(offsetDist, 0.0f);
 		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation + orientOffset + ANGLE_OFFSET));
 
-		auto posOffset2D = Vector2::Transform(relPosOffset, rotMatrix);
-		return GetAspectCorrect2DPosition(posOffset2D);
+		auto posOffset = Vector2::Transform(relPosOffset, rotMatrix);
+		return GetAspectCorrect2DPosition(posOffset);
 	}
 
 	void CrosshairData::SetPrimary()
@@ -87,7 +87,7 @@ namespace TEN::Hud
 
 		// Update position.
 		auto pos = g_Renderer.Get2DPosition(targetPos);
-		Position = pos.has_value() ? pos.value() : INVALID_POS;
+		Position = pos.value_or(INVALID_POS);
 
 		// Update orientation.
 		if (IsPrimary)
@@ -96,7 +96,7 @@ namespace TEN::Hud
 		}
 		else
 		{
-			short closestAlignAngle = (Orientation / ALIGN_ANGLE_STEP) * ALIGN_ANGLE_STEP;
+			short closestAlignAngle = round(Orientation / ALIGN_ANGLE_STEP) * ALIGN_ANGLE_STEP;
 			Orientation = (short)round(Lerp(Orientation, closestAlignAngle, ORIENT_LERP_ALPHA));
 		}
 
@@ -311,7 +311,7 @@ namespace TEN::Hud
 
 		crosshair.IsActive = true;
 		crosshair.IsPrimary = false;
-		crosshair.Position = pos.value();
+		crosshair.Position = *pos;
 		crosshair.Orientation = 0;
 		crosshair.Size = SIZE_START;
 		crosshair.Color = CrosshairData::COLOR_GRAY;
