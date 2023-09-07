@@ -270,7 +270,7 @@ namespace TEN::Entities::Generic
 			if (currentPushable.UsesRoomCollision)
 				DeactivateClimbablePushableCollider(currentItemNumber); // Deactivate collision
 
-			currentPushable.BehaviourState = PushablePhysicState::StackHorizontalMove;
+			currentPushable.BehaviourState = PushableState::MoveStackHorizontal;
 
 			currentItemNumber = currentPushable.StackUpperItem;
 		}
@@ -293,7 +293,7 @@ namespace TEN::Entities::Generic
 			if (currentPushable.UsesRoomCollision)
 				ActivateClimbablePushableCollider(currentItemNumber); // Activate collision
 
-			currentPushable.BehaviourState = PushablePhysicState::Idle;
+			currentPushable.BehaviourState = PushableState::Idle;
 
 			currentItemNumber = currentPushable.StackUpperItem;
 		}

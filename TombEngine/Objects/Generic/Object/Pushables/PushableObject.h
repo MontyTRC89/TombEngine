@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_struct.h"
 
 struct CollisionInfo;
 struct ItemInfo;

@@ -1788,7 +1788,7 @@ bool SaveGame::Load(int slot)
 			auto* pushable = (PushableInfo*)item->Data;
 			auto* savedPushable = (Save::Pushable*)savedItem->data();
 
-			pushable->BehaviourState = static_cast<PushablePhysicState> (savedPushable->pushable_behaviour_state());
+			pushable->BehaviourState = (PushableState)savedPushable->pushable_behaviour_state();
 			pushable->Gravity = savedPushable->pushable_gravity();
 			pushable->FloatingForce = savedPushable->pushable_water_force();
 

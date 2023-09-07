@@ -55,9 +55,10 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		if (pushableItem.Data == NULL) // Is first pushableItem in initialize.
 		{
-			InitializePushablesStatesMap();
+			InitializePushableStateMap();
 			InitializePushablesStacks();
 		}
+		
 		//pushableItem.Data = PushableInfo(); // Moved to InitializePushablesStacks.
 		auto& pushable = GetPushableInfo(pushableItem);
 
@@ -98,8 +99,8 @@ namespace TEN::Entities::Generic
 			return;
 
 		// Call state handler function based current state. Functions defined in PushableObject_Physics class.
-		auto stateHandlerIterator = PUSHABLES_STATES_MAP.find(pushable.BehaviourState);
-		if (stateHandlerIterator != PUSHABLES_STATES_MAP.end())
+		auto stateHandlerIterator = PUSHABLE_STATE_MAP.find(pushable.BehaviourState);
+		if (stateHandlerIterator != PUSHABLE_STATE_MAP.end())
 		{
 			stateHandlerIterator->second(itemNumber);
 		}
@@ -144,7 +145,7 @@ namespace TEN::Entities::Generic
 			!laraItem->Animation.IsAirborne &&
 			player.Control.HandStatus == HandStatus::Free &&
 			IsPushableValid(itemNumber)) &&
-			pushable.BehaviourState == PushablePhysicState::Idle && 
+			pushable.BehaviourState == PushableState::Idle && 
 			(pushableSidesAttributes.Pushable || pushableSidesAttributes.Pullable) || // Player can interact with this side.
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber)) // Player already interacting.
 		{

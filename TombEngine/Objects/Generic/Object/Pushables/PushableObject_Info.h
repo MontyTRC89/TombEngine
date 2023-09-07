@@ -35,12 +35,10 @@ namespace TEN::Entities::Generic
 		}
 	};
 
-	typedef PushablePhysicState PushablePhysicState;
-
 	struct PushableInfo
 	{
-		PushableSoundState CurrentSoundState = PushableSoundState::None;
-		PushablePhysicState BehaviourState = PushablePhysicState::Idle;
+		PushableSoundState	 SoundState		= PushableSoundState::None;
+		PushableState BehaviourState = PushableState::Idle;
 
 		int	  Height = 0;
 		bool isOnEdge = false;
@@ -65,13 +63,13 @@ namespace TEN::Entities::Generic
 
 		PushableInfo()
 		{
-			CurrentSoundState = PushableSoundState::None;
+			SoundState = PushableSoundState::None;
 			Height = BLOCK(1);
 
 			AnimationSystemIndex = 0;
 
 			Gravity = 8.0f;
-			BehaviourState = PushablePhysicState::Idle;
+			BehaviourState = PushableState::Idle;
 			WaterSurfaceHeight = NO_HEIGHT;
 			FloatingForce = 0.75f;
 

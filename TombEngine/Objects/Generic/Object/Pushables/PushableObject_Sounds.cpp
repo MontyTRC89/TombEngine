@@ -70,23 +70,23 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		
-		if (pushable.CurrentSoundState == PushableSoundState::Moving)
+		if (pushable.SoundState == PushableSoundState::Moving)
 		{
 			SoundEffect(GetPushableSfx(Loop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
 		}
-		else if (pushable.CurrentSoundState == PushableSoundState::Stopping)
+		else if (pushable.SoundState == PushableSoundState::Stopping)
 		{
-			pushable.CurrentSoundState = PushableSoundState::None;
+			pushable.SoundState = PushableSoundState::None;
 			SoundEffect(GetPushableSfx(Stop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
 		}
-		else if (pushable.CurrentSoundState == PushableSoundState::Falling)
+		else if (pushable.SoundState == PushableSoundState::Falling)
 		{
-			pushable.CurrentSoundState = PushableSoundState::None;
+			pushable.SoundState = PushableSoundState::None;
 			SoundEffect(GetPushableSfx(Fall, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
 		}
-		else if (pushable.CurrentSoundState == PushableSoundState::WaterRipples)
+		else if (pushable.SoundState == PushableSoundState::WaterRipples)
 		{
-			pushable.CurrentSoundState = PushableSoundState::None;
+			pushable.SoundState = PushableSoundState::None;
 			SoundEffect(SFX_TR4_LARA_WADE, &pushableItem.Pose, SoundEnvironment::Always);
 		}
 	}

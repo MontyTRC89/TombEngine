@@ -2,32 +2,32 @@
 
 namespace TEN::Entities::Generic
 {
-	enum class PushablePhysicState
+	enum class PushableState
 	{
 		Idle,
-		Moving,
-		MovingEdge,
-		Falling,
-		Sinking,
-		Floating,
+		Move,
+		EdgeFall, // EdgeSlip?
+		Fall,
+		Sink,
+		Float,
 		UnderwaterIdle,
-		WatersurfaceIdle,
-		Sliding,
-		StackHorizontalMove
+		WaterSurfaceIdle,
+		Slide,
+		MoveStackHorizontal
 	};
 
-	extern std::unordered_map<PushablePhysicState, std::function<void(int)>> PUSHABLES_STATES_MAP;
-
-	void InitializePushablesStatesMap();
+	extern std::unordered_map<PushableState, std::function<void(int)>> PUSHABLE_STATE_MAP;
+	
+	void InitializePushableStateMap();
 
 	void HandleIdleState(int itemNumber);
-	void HandleMovingState(int itemNumber);
-	void HandleMovingEdgeState(int itemNumber);
-	void HandleFallingState(int itemNumber);
-	void HandleSinkingState(int itemNumber);
-	void HandleFloatingState(int itemNumber);
+	void HandleMoveState(int itemNumber);
+	void HandleEdgeFallState(int itemNumber);
+	void HandleFallState(int itemNumber);
+	void HandleSinkState(int itemNumber);
+	void HandleFloatState(int itemNumber);
 	void HandleUnderwaterState(int itemNumber);
-	void HandleWatersurfaceState(int itemNumber);
-	void HandleSlidingState(int itemNumber);
-	void HandleStackHorizontalMoveState(int itemNumber);
+	void HandleWaterSurfaceState(int itemNumber);
+	void HandleSlideState(int itemNumber);
+	void HandleMoveStackHorizontalState(int itemNumber);
 };

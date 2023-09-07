@@ -2,6 +2,7 @@
 #include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
 
 #include "Game/collision/collide_item.h"
+#include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
