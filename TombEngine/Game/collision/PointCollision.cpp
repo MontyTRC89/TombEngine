@@ -143,7 +143,7 @@ namespace TEN::Collision
 
 		// Set floor bridge item number.
 		int floorHeight = GetFloorHeight();
-		FloorBridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);;
+		FloorBridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);
 
 		return *FloorBridgeItemNumber;
 	}
@@ -155,7 +155,7 @@ namespace TEN::Collision
 
 		// Set ceiling bridge item number.
 		int ceilingHeight = GetCeilingHeight();
-		CeilingBridgeItemNumber = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);;
+		CeilingBridgeItemNumber = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);
 
 		return *CeilingBridgeItemNumber;
 	}
@@ -196,7 +196,7 @@ namespace TEN::Collision
 	bool PointCollisionData::IsWall()
 	{
 		return (GetFloorHeight() == NO_HEIGHT || GetCeilingHeight() == NO_HEIGHT ||
-				GetFloorHeight() < GetCeilingHeight());
+				GetFloorHeight() <= GetCeilingHeight());
 	}
 
 	bool PointCollisionData::IsSlipperyFloor(short slopeAngleMin)
