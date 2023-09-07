@@ -815,10 +815,12 @@ enum LaraAnim
 	LA_LEDGE_JUMP_UP_END = 566,
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
+
+	// TODO: Move.
 	LA_PUSHABLE_EDGE = 569,
 	LA_PUSHABLE_CLASSIC_EDGE = 570,
 
-	// 571-600 reserved for "true" ladders. -- Sezz 2023.04.16
+	// 569-598 reserved for "true" ladders. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 
