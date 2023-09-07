@@ -34,8 +34,6 @@ namespace TEN::Collision
 		std::optional<int> WaterTopHeight	  = std::nullopt;
 		std::optional<int> WaterBottomHeight  = std::nullopt;
 
-		std::optional<Vector3> ObjectIntersectPoint = std::nullopt;
-
 	public:
 		// Constructors
 		PointCollisionData(const Vector3i& pos, int roomNumber);
