@@ -177,7 +177,7 @@ namespace TEN::Input
 
 			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
 			{
-				TENLog("Keyboard not found!", LogLevel::Warning);
+				TENLog("Keyboard not found.", LogLevel::Warning);
 			}
 			else
 			{
@@ -186,7 +186,7 @@ namespace TEN::Input
 
 			if (OisInputManager->getNumberOfDevices(OISMouse) == 0)
 			{
-				TENLog("Mouse not found!", LogLevel::Warning);
+				TENLog("Mouse not found.", LogLevel::Warning);
 			}
 			else
 			{
@@ -301,10 +301,9 @@ namespace TEN::Input
 		return false;
 	}
 
+	// Merge right and left Ctrl, Shift, and Alt keys.
 	int WrapSimilarKeys(int source)
 	{
-		// Merge right/left Ctrl, Shift, Alt.
-
 		switch (source)
 		{
 		case KC_LCONTROL:
@@ -458,12 +457,19 @@ namespace TEN::Input
 				SetDiscreteAxisValues(baseIndex + pass);
 			}
 
-			// Calculate normalized axes.
+			// Normalize raw mouse axis values to [-1.0f, 1.0f] range.
 			auto rawAxes = Vector2(state.X.rel, state.Y.rel);
+			auto normAxes = Vector2(
+				(((rawAxes.x - -SCREEN_SPACE_RES.x) * 2) / (SCREEN_SPACE_RES.x - -SCREEN_SPACE_RES.x)) - 1.0f,
+				(((rawAxes.y - -SCREEN_SPACE_RES.y) * 2) / (SCREEN_SPACE_RES.y - -SCREEN_SPACE_RES.y)) - 1.0f);
+			
+			// Apply sensitivity and smoothing.
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
 			float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
+			normAxes = (normAxes * sensitivity) * smoothing;
 
-			AxisMap[(int)InputAxis::Mouse] = (rawAxes * sensitivity) * smoothing;
+			// Set mouse axis values.
+			AxisMap[(int)InputAxis::Mouse] = Vector2(std::clamp(normAxes.x, -1.0f, 1.0f), std::clamp(normAxes.y, -1.0f, 1.0f));
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -488,7 +494,7 @@ namespace TEN::Input
 			// Poll axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
 			{
-				// NOTE: We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus two triggers = 6).
+				// NOTE: We don't support anything above 6 existing XBOX/PS controller axes (2 sticks plus 2 triggers = 6).
 				if (axis >= MAX_GAMEPAD_AXES)
 					break;
 
