@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -25,7 +26,6 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Renderer/Renderer11.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -396,26 +396,28 @@ namespace Misc
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
-	/// Get the 2d position from a 3D position (Vec3) of an object
-	//@tparam Vec3 pos3D 3D position
-	//the 3D position can be gotten by the GetPosition() function of the object. 
-	//@return Vec2 pos2D 2D position on the screen in percent.
+	/// Get the projected 2D screen position of a 3D world position. Returns an invalid distant 2D position if the 3D position is behind the camera.
+	//@tparam Vec3 pos3D 3D world position.
+	//@return Vec2 pos2D Projected 2D screen position. NOTE: Screen space resolution is 100x100.
 	//@usage 
 	//
-	//example: write text with coordinates relative to an object.
-	//local example = DisplayString('example', 0, 0, Color(0, 0, 0), false)
-	//local pos2D = Get2DPosition(Lara:GetPosition())
-	//example:SetPosition(PercentToScreen(pos2D.x, pos2D.y))
-	static Vec2 Get2dPosition(const Vec3& pos)
+	// Example: display string at an object's position.
+	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
+	// local pos2D = Get2DPosition(Lara:GetPosition())
+	// string:SetPosition(PercentToScreen(pos2D.x, pos2D.y))
+	static Vec2 Get2DPosition(const Vec3& pos)
 	{
-		auto pos2D = g_Renderer.Get2DPosition(Vector3(pos.x, pos.y, pos.z));
+		// TODO: Move to Renderer11Enums.h.
 		constexpr auto INVALID_2D_POSITION = Vector2(FLT_MAX);
+		
+		auto pos2D = g_Renderer.Get2DPosition(pos);
 		if (pos2D.has_value())
 		{
 			return Vec2(
 				(pos2D->x / SCREEN_SPACE_RES.x) * 100,
 				(pos2D->y / SCREEN_SPACE_RES.y) * 100);
 		}
+		
 		return Vec2(INVALID_2D_POSITION);
 	}
 
@@ -482,7 +484,7 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
-		tableMisc.set_function(ScriptReserved_Get2DPosition, &Get2dPosition);
+		tableMisc.set_function(ScriptReserved_Get2DPosition, &Get2DPosition);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);
