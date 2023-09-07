@@ -19,11 +19,13 @@
 #include "Scripting/Internal/TEN/Misc/LevelLog.h"
 #include "Scripting/Internal/TEN/Misc/SoundTrackTypes.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Renderer/Renderer11.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -33,6 +35,7 @@ Functions that don't fit in the other modules.
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Input;
+using namespace TEN::Renderer;
 
 namespace Misc 
 {
@@ -393,6 +396,29 @@ namespace Misc
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
+	/// Get the 2d position from a 3D position (Vec3) of an object
+	//@tparam Vec3 pos3D 3D position
+	//the 3D position can be gotten by the GetPosition() function of the object. 
+	//@return Vec2 pos2D 2D position on the screen in percent.
+	//@usage 
+	//
+	//example: write text with coordinates relative to an object.
+	//local example = DisplayString('example', 0, 0, Color(0, 0, 0), false)
+	//local pos2D = Get2DPosition(Lara:GetPosition())
+	//example:SetPosition(PercentToScreen(pos2D.x, pos2D.y))
+	static Vec2 Get2dPosition(const Vec3& pos)
+	{
+		auto pos2D = g_Renderer.Get2DPosition(Vector3(pos.x, pos.y, pos.z));
+		constexpr auto INVALID_2D_POSITION = Vector2(FLT_MAX);
+		if (pos2D.has_value())
+		{
+			return Vec2(
+				(pos2D->x / SCREEN_SPACE_RES.x) * 100,
+				(pos2D->y / SCREEN_SPACE_RES.y) * 100);
+		}
+		return Vec2(INVALID_2D_POSITION);
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table tableMisc{ state->lua_state(), sol::create };
@@ -456,6 +482,7 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
+		tableMisc.set_function(ScriptReserved_Get2DPosition, &Get2dPosition);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);
