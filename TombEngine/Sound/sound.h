@@ -177,7 +177,7 @@ std::pair<std::string, QWORD> GetSoundTrackNameAndPosition(SoundTrackType type);
 
 static void CALLBACK Sound_FinishOneshotTrack(HSYNC handle, DWORD channel, DWORD data, void* userData);
 
-void  SetVolumeMusic(int vol);
+void  SetVolumeTracks(int vol);
 void  SetVolumeFX(int vol);
 
 void  Sound_Init(const std::string& gameDirectory);
