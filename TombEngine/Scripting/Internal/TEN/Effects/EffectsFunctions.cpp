@@ -43,12 +43,12 @@ namespace Effects
 	//@tparam int objectID Object ID of the sprite.
 	//@tparam int spriteIndex Index of the sprite in the sprite object.
 	//@tparam Vec2 pos 2D position of the sprite. NOTE: Screen space resolution is 100x100.
-	//@tparam float rot Rotation of the sprite in degrees.
-	//@tparam Vec2 size Size of the sprite.
+	//@tparam float rot Rotation of the sprite in degrees. Default is 0.
+	//@tparam Vec2 size Size of the sprite. NOTE: Screen space resolution is 100x100.
 	//@tparam Color color Color of the sprite. Default is Color(255, 255, 255, 255).
 	//@tparam int priority Render priority of the sprite. Higher values have higher priority. Default is 0.
 	//@tparam Effects.BlendID blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
-	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, float rot, const Vec2& size,
+	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, TypeOrNil<float> rot, const Vec2& size,
 									TypeOrNil<ScriptColor> color, TypeOrNil<int> priority, TypeOrNil<BLEND_MODES> blendMode)
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
@@ -64,8 +64,8 @@ namespace Effects
 			objectID,
 			spriteIndex,
 			Vector2(pos.x, pos.y) * POS_CONVERSION_COEFF,
-			ANGLE(rot),
-			Vector2(size.x, size.y),
+			ANGLE(USE_IF_HAVE(float, rot, 0.0f)),
+			Vector2(size.x, size.y) * POS_CONVERSION_COEFF,
 			Vector4(scriptColor.GetR(), scriptColor.GetG(), scriptColor.GetB(), scriptColor.GetA()) / UCHAR_MAX,
 			USE_IF_HAVE(int, priority, 0),
 			bMode);
