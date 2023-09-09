@@ -290,6 +290,9 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 
+// Vec2
+constexpr char ScriptReserved_Vec2SetLength[] = "ToLength";
+
 // Vec3
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3StaticNormalize[] = "Normalize";

@@ -32,7 +32,7 @@ void Vec2::Register(sol::table& parent)
 		@tparam float length new length to set.
 		@function Vec2:ToLength
 		*/
-		ScriptReserved_ToLength, &Vec2::SetLength,
+		ScriptReserved_Vec2SetLength, &Vec2::SetLength,
 
 		/// (float) x coordinate
 		//@mem x
