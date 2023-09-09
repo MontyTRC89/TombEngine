@@ -38,11 +38,11 @@ using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
-	/// Display a sprite on the screen.
+	/// Display a sprite in 2D space on the screen.
 	//@function DisplayScreenSprite
 	//@tparam int objectID Object ID of the sprite.
 	//@tparam int spriteIndex Index of the sprite in the sprite object.
-	//@tparam Vec2 pos 2D position of the sprite. NOTE: Screen space resolution is 100x100.
+	//@tparam Vec2 pos 2D space position of the sprite. NOTE: Screen space resolution is 100x100.
 	//@tparam float rot Rotation of the sprite in degrees. Default is 0.
 	//@tparam Vec2 size Size of the sprite. NOTE: Screen space resolution is 100x100.
 	//@tparam Color color Color of the sprite. Default is Color(255, 255, 255, 255).

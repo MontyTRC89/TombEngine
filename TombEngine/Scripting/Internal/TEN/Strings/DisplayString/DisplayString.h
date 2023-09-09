@@ -62,8 +62,8 @@ public:
 	void SetPos(int x, int y);
 	std::tuple<int, int> GetPos() const;
 
-	void SetCol(const ScriptColor&);
-	ScriptColor GetCol();
+	void SetColor(const ScriptColor&);
+	ScriptColor GetColor();
 
 	void SetKey(const std::string&);
 	std::string GetKey() const;
