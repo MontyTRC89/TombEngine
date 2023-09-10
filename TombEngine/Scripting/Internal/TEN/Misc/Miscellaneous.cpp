@@ -396,29 +396,24 @@ namespace Misc
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
-	/// Get the projected 2D screen position of a 3D world position. Returns an invalid distant 2D position if the 3D position is behind the camera.
+	/// Get the projected 2D screen position of a 3D world position. Returns nil if the 3D position is behind the camera view.
 	//@tparam Vec3 pos3D 3D world position.
 	//@return Vec2 pos2D Projected 2D screen position. NOTE: Screen space resolution is 100x100.
 	//@usage 
 	//
-	// Example: display string at an object's position.
+	// Example: Display a string at the player's position.
 	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
 	// local pos2D = Get2DPosition(Lara:GetPosition())
 	// string:SetPosition(PercentToScreen(pos2D.x, pos2D.y))
-	static Vec2 Get2DPosition(const Vec3& pos)
+	static std::optional<Vec2> Get2DPosition(const Vec3& pos3D)
 	{
-		// TODO: Move to Renderer11Enums.h.
-		constexpr auto INVALID_2D_POSITION = Vector2(FLT_MAX);
-		
-		auto pos2D = g_Renderer.Get2DPosition(pos);
-		if (pos2D.has_value())
-		{
-			return Vec2(
-				(pos2D->x / SCREEN_SPACE_RES.x) * 100,
-				(pos2D->y / SCREEN_SPACE_RES.y) * 100);
-		}
-		
-		return Vec2(INVALID_2D_POSITION);
+		auto pos2D = g_Renderer.Get2DPosition(pos3D);
+		if (!pos2D.has_value())
+			return std::nullopt;
+
+		return Vec2(
+			(pos2D->x / SCREEN_SPACE_RES.x) * 100,
+			(pos2D->y / SCREEN_SPACE_RES.y) * 100);
 	}
 
 	void Register(sol::state* state, sol::table& parent)
