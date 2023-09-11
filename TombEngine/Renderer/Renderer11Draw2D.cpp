@@ -394,19 +394,17 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		RendererSprite* currentSpritePtr = nullptr;
-		Texture2D* currentTexturePtr = nullptr;
-
+		Texture2D* texture2DPtr = nullptr;
 		for (const auto& spriteToDraw : renderView.Sprites2DToDraw)
 		{
-			if (currentTexturePtr == nullptr)
+			if (texture2DPtr == nullptr)
 			{
 				m_primitiveBatch->Begin();
 
 				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
-			else if (currentTexturePtr != spriteToDraw.SpritePtr->Texture ||
+			else if (texture2DPtr != spriteToDraw.SpritePtr->Texture ||
 				lastBlendMode != spriteToDraw.BlendMode)
 			{
 				m_primitiveBatch->End();
@@ -416,8 +414,31 @@ namespace TEN::Renderer
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
 
-			// Calculate size and vertex base.
-			auto halfSize = (Vector2(SCREEN_SPACE_RES.y) * spriteToDraw.Scale) / 2;
+			// Get resolutions.
+			auto screenRes = GetScreenResolution().ToVector2();
+			auto spriteRes = (texture2DPtr == nullptr) ?
+				Vector2(spriteToDraw.SpritePtr->Texture->Width / spriteToDraw.SpritePtr->Texture->Height) :
+				Vector2(texture2DPtr->Width / texture2DPtr->Height);
+
+			// Calculate aspect ratios.
+			float screenAspect = screenRes.x / screenRes.y;
+			float spriteAspect = spriteRes.x / spriteRes.y;
+
+			// TODO: Screen aspect ratio awareness.
+			// Calculate size.
+			auto halfSize = Vector2::Zero;
+			if (screenAspect >= spriteAspect)
+			{
+				halfSize = (Vector2(SCREEN_SPACE_RES.y) * spriteToDraw.Scale) / 2;
+				halfSize.x *= spriteAspect;
+			}
+			else
+			{
+				halfSize = (Vector2(SCREEN_SPACE_RES.x) * spriteToDraw.Scale) / 2;
+				halfSize.y *= spriteAspect;
+			}
+
+			// Calculate and vertex base.
 			auto vertices = std::array<Vector2, VERTEX_COUNT>
 			{
 				halfSize,
@@ -426,7 +447,8 @@ namespace TEN::Renderer
 				Vector2(halfSize.x, -halfSize.y)
 			};
 
-			// Transform vertices. // NOTE: Must rotate 180 degrees to account for +Y being down.
+			// Transform vertices.
+			// NOTE: Must rotate 180 degrees to account for +Y being down.
 			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(spriteToDraw.Orientation + ANGLE(180.0f)));
 			for (auto& vertex : vertices)
 			{
@@ -450,7 +472,7 @@ namespace TEN::Renderer
 			
 			m_primitiveBatch->DrawQuad(rVertices[0], rVertices[1], rVertices[2], rVertices[3]);
 
-			currentTexturePtr = spriteToDraw.SpritePtr->Texture;
+			texture2DPtr = spriteToDraw.SpritePtr->Texture;
 		}
 		
 		m_primitiveBatch->End();
@@ -466,11 +488,11 @@ namespace TEN::Renderer
 
 		if (fit)
 		{
-			ID3D11Texture2D* texture2D;
-			texture->GetResource(reinterpret_cast<ID3D11Resource**>(&texture2D));
+			ID3D11Texture2D* texture2DPtr;
+			texture->GetResource(reinterpret_cast<ID3D11Resource**>(&texture2DPtr));
 
 			auto desc = D3D11_TEXTURE2D_DESC();
-			texture2D->GetDesc(&desc);
+			texture2DPtr->GetDesc(&desc);
 
 			float screenAspect = float(m_screenWidth) / float(m_screenHeight);
 			float imageAspect  = float(desc.Width) / float(desc.Height);

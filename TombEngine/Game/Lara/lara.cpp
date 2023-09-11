@@ -441,9 +441,14 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_default_col,//189
 };
 
+#include "Game/effects/ScreenSprite.h"
+using namespace TEN::Effects::ScreenSprite;
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	//AddScreenSprite(ID_DEFAULT_SPRITES, 0, Vector2(400, 300), 0, Vector2::One, Vector4::One, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
 
 	if (lara->Control.Weapon.HasFired)
 	{
