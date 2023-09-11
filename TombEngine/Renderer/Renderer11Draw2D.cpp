@@ -410,21 +410,20 @@ namespace TEN::Renderer
 				lastBlendMode != spriteToDraw.BlendMode)
 			{
 				m_primitiveBatch->End();
-
 				m_primitiveBatch->Begin();
 
 				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
 
-			// Calculate vertex base.
-			auto halfSize = spriteToDraw.Size / 2;
+			// Calculate size and vertex base.
+			auto halfSize = (Vector2(SCREEN_SPACE_RES.y) * spriteToDraw.Scale) / 2;
 			auto vertices = std::array<Vector2, VERTEX_COUNT>
 			{
 				halfSize,
-					Vector2(-halfSize.x, halfSize.y),
-					-halfSize,
-					Vector2(halfSize.x, -halfSize.y)
+				Vector2(-halfSize.x, halfSize.y),
+				-halfSize,
+				Vector2(halfSize.x, -halfSize.y)
 			};
 
 			// Transform vertices. // NOTE: Must rotate 180 degrees to account for +Y being down.
@@ -606,7 +605,7 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 	}
 
-	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size,
+	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& scale,
 									 const Vector4& color, int priority, BLEND_MODES blendMode, RenderView& renderView)
 	{
 		auto spriteToDraw = RendererSprite2DToDraw{};
@@ -614,7 +613,7 @@ namespace TEN::Renderer
 		spriteToDraw.SpritePtr = spritePtr;
 		spriteToDraw.Position = pos2D;
 		spriteToDraw.Orientation = orient;
-		spriteToDraw.Size = size;
+		spriteToDraw.Scale = scale;
 		spriteToDraw.Color = color;
 		spriteToDraw.Priority = priority;
 		spriteToDraw.BlendMode = blendMode;
@@ -630,7 +629,7 @@ namespace TEN::Renderer
 				&m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex],
 				screenSprite.Position,
 				screenSprite.Orientation,
-				screenSprite.Size,
+				screenSprite.Scale,
 				screenSprite.Color,
 				screenSprite.Priority,
 				screenSprite.BlendMode,
@@ -645,7 +644,6 @@ namespace TEN::Renderer
 					return (spriteToDraw0.BlendMode < spriteToDraw1.BlendMode);
 
 				return (spriteToDraw0.Priority < spriteToDraw1.Priority);
-			}
-		);
+			});
 	}
 }

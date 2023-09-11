@@ -38,37 +38,36 @@ using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
-	/// Display a sprite in 2D space on the screen.
+	/// Display a sprite in 2D space. NOTE: Screen space resolution is 100x100.
 	//@function DisplayScreenSprite
 	//@tparam int objectID Object ID of the sprite.
 	//@tparam int spriteIndex Index of the sprite in the sprite object.
-	//@tparam Vec2 pos 2D space position of the sprite. NOTE: Screen space resolution is 100x100.
+	//@tparam Vec2 pos 2D space position of the sprite.
 	//@tparam float rot Rotation of the sprite in degrees. Default is 0.
-	//@tparam Vec2 size Size of the sprite. NOTE: Screen space resolution is 100x100.
+	//@tparam Vec2 scale Scale of the sprite relative to the screen height.
 	//@tparam Color color Color of the sprite. Default is Color(255, 255, 255, 255).
-	//@tparam int priority Render priority of the sprite. Higher values have higher priority. Default is 0.
+	//@tparam int priority Render priority of the sprite. Higher values have higher priority and can be thought of as layers. Default is 0.
 	//@tparam Effects.BlendID blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
-	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, TypeOrNil<float> rot, const Vec2& size,
+	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, TypeOrNil<float> rot, const Vec2& scale,
 									TypeOrNil<ScriptColor> color, TypeOrNil<int> priority, TypeOrNil<BLEND_MODES> blendMode)
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
-		// Later, everything will be natively 100x100. -- Sezz 2023.08.31
+		// Later, everything will use 100x100 natively. -- Sezz 2023.08.31
 		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
 
-		auto scriptColor = USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255, 255));
-		
-		auto bMode = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
-		bMode = BLEND_MODES(std::clamp((int)bMode, (int)BLEND_MODES::BLENDMODE_OPAQUE, (int)BLEND_MODES::BLENDMODE_ALPHABLEND));
+		auto pos2 = Vector2(pos.x, pos.y) * POS_CONVERSION_COEFF;
+		float rot2 = ANGLE(USE_IF_HAVE(float, rot, 0.0f));
+		auto scale2 = Vector2(scale.x, scale.y);
+		auto color2 = USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255, 255));
+		int priority2 = USE_IF_HAVE(int, priority, 0);
+
+		auto blendMode2 = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
+		blendMode2 = BLEND_MODES(std::clamp((int)blendMode2, (int)BLEND_MODES::BLENDMODE_OPAQUE, (int)BLEND_MODES::BLENDMODE_ALPHABLEND));
 
 		AddScreenSprite(
-			objectID,
-			spriteIndex,
-			Vector2(pos.x, pos.y) * POS_CONVERSION_COEFF,
-			ANGLE(USE_IF_HAVE(float, rot, 0.0f)),
-			Vector2(size.x, size.y) * POS_CONVERSION_COEFF,
-			Vector4(scriptColor.GetR(), scriptColor.GetG(), scriptColor.GetB(), scriptColor.GetA()) / UCHAR_MAX,
-			USE_IF_HAVE(int, priority, 0),
-			bMode);
+			objectID, spriteIndex,
+			pos2, rot2, scale2, color2,
+			priority2, blendMode2);
 	}
 
 	///Emit a lightning arc.

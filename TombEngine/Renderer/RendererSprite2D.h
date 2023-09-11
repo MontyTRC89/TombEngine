@@ -11,10 +11,10 @@ namespace TEN::Renderer
 
 		Vector2 Position	= Vector2::Zero;
 		short	Orientation = 0;
-		Vector2 Size		= Vector2::Zero;
+		Vector2 Scale		= Vector2::Zero;
 		Vector4 Color		= Vector4::Zero;
 
-		int				Priority  = 0;
-		BLEND_MODES		BlendMode = BLENDMODE_ALPHABLEND;
+		int			Priority  = 0;
+		BLEND_MODES BlendMode = BLENDMODE_ALPHABLEND;
 	};
 }
