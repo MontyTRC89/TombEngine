@@ -407,7 +407,7 @@ namespace Misc
 	// string:SetPosition(PercentToScreen(pos2D.x, pos2D.y))
 	static std::optional<Vec2> Get2DPosition(const Vec3& pos3D)
 	{
-		auto pos2D = g_Renderer.Get2DPosition(pos3D);
+		auto pos2D = g_Renderer.Get2DPosition(Vector3(pos3D.x, pos3D.y, pos3D.z));
 		if (!pos2D.has_value())
 			return std::nullopt;
 
