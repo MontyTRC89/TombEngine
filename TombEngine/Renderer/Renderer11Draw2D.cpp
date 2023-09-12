@@ -417,28 +417,29 @@ namespace TEN::Renderer
 			// Get resolutions.
 			auto screenRes = GetScreenResolution().ToVector2();
 			auto spriteRes = (texture2DPtr == nullptr) ?
-				Vector2(spriteToDraw.SpritePtr->Texture->Width / spriteToDraw.SpritePtr->Texture->Height) :
-				Vector2(texture2DPtr->Width / texture2DPtr->Height);
+				Vector2(spriteToDraw.SpritePtr->Texture->Width, spriteToDraw.SpritePtr->Texture->Height) :
+				Vector2(texture2DPtr->Width, texture2DPtr->Height);
 
 			// Calculate aspect ratios.
 			float screenAspect = screenRes.x / screenRes.y;
 			float spriteAspect = spriteRes.x / spriteRes.y;
 
-			// TODO: Screen aspect ratio awareness.
 			// Calculate size.
 			auto halfSize = Vector2::Zero;
 			if (screenAspect >= spriteAspect)
 			{
-				halfSize = (Vector2(SCREEN_SPACE_RES.y) * spriteToDraw.Scale) / 2;
+				float heightMax = (SCREEN_SPACE_RES.y / screenRes.y) * screenRes.y;
+				halfSize = (Vector2(heightMax) * spriteToDraw.Scale) / 2;
 				halfSize.x *= spriteAspect;
 			}
 			else
 			{
-				halfSize = (Vector2(SCREEN_SPACE_RES.x) * spriteToDraw.Scale) / 2;
+				float widthMax = (SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x;
+				halfSize = (Vector2(widthMax) * spriteToDraw.Scale) / 2;
 				halfSize.y *= spriteAspect;
 			}
 
-			// Calculate and vertex base.
+			// Calculate vertex base.
 			auto vertices = std::array<Vector2, VERTEX_COUNT>
 			{
 				halfSize,
