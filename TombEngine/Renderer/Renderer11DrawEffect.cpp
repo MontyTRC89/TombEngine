@@ -1427,7 +1427,8 @@ namespace TEN::Renderer
 			if (bucket.NumVertices == 0)
 				continue;
 
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST)
+				^ (rendererPass == RendererPass::Transparent)))
 				continue;
 
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
@@ -1486,7 +1487,8 @@ namespace TEN::Renderer
 		{
 			if (deb->active) 
 			{
-				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) 
+					^ (rendererPass == RendererPass::Transparent)))
 					continue;
 
 				Matrix translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);

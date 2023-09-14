@@ -198,7 +198,8 @@ enum RendererPass
 {
 	ShadowMap,
 	Opaque,
-	Transparent
+	Transparent,
+	CollectSortedFaces
 };
 
 constexpr auto TEXTURE_HEIGHT = 256;

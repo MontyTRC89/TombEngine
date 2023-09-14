@@ -1547,7 +1547,15 @@ namespace TEN::Renderer
 		DrawSprites(view);
 		DrawLines3D(view);
 
-		// Immediately draw additive and unsorted blended faces, and collect all sorted blend modes faces for later.
+		// Collect all sorted blend modes faces for later.
+		DrawRooms(view, RendererPass::CollectSortedFaces);
+		DrawItems(view, RendererPass::CollectSortedFaces);
+		DrawStatics(view, RendererPass::CollectSortedFaces);
+
+		// Draw all sorted blend mode faces collected in previous steps.
+		DrawSortedFaces(view);
+
+		// Draw immediate transparent faces (i.e. additive)
 		DrawRooms(view, RendererPass::Transparent);
 		DrawItems(view, RendererPass::Transparent);
 		DrawStatics(view, RendererPass::Transparent);
@@ -1555,9 +1563,6 @@ namespace TEN::Renderer
 		DrawDebris(view, RendererPass::Transparent);
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
-
-		// Draw all sorted blend mode faces collected in previous steps.
-		DrawSortedFaces(view);
 
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(target, depthTarget, view);
@@ -1879,7 +1884,8 @@ namespace TEN::Renderer
 
 				for (auto& bucket : refMesh->Buckets)
 				{
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) 
+						^ (rendererPass == RendererPass::Transparent)))
 					{
 						continue;
 					}
@@ -1927,7 +1933,7 @@ namespace TEN::Renderer
 		}
 
 		// Collect sorted blend modes faces ordered by room, if transparent pass
-		if (rendererPass == RendererPass::Transparent)
+		if (rendererPass == RendererPass::CollectSortedFaces)
 		{
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -1943,11 +1949,6 @@ namespace TEN::Renderer
 
 						for (auto& bucket : mesh->Buckets)
 						{
-							if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
-							{
-								continue;
-							}
-
 							if (bucket.NumVertices == 0)
 							{
 								continue;
@@ -2074,12 +2075,13 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) 
+						^ (rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
 					{
 						continue;
 					}
 
-					if (DoesBlendModeRequireSorting(bucket.BlendMode))
+					if (rendererPass == RendererPass::CollectSortedFaces && DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
 						// Collect transparent faces
 						for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -2304,7 +2306,8 @@ namespace TEN::Renderer
 
 		for (auto& bucket : mesh->Buckets)
 		{
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) 
+				^ (rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
 			{
 				continue;
 			}
@@ -2323,7 +2326,7 @@ namespace TEN::Renderer
 
 				m_numMoveablesDrawCalls++;
 			}
-			else if (DoesBlendModeRequireSorting(bucket.BlendMode))
+			else if (rendererPass == RendererPass::CollectSortedFaces && DoesBlendModeRequireSorting(bucket.BlendMode))
 			{
 				// Collect transparent faces
 				for (int j = 0; j < bucket.Polygons.size(); j++)
