@@ -277,20 +277,11 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 @tparam type EventType Event to execute.
 @tparam activator Moveable Optional activator. If not provided, player object will be automatically provided as activator.
 */
-void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, TypeOrNil<Moveable>& activator)
+void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator)
 {
-	bool result = false;
-
-	if (std::holds_alternative<Moveable>(activator))
-	{
-		result = TEN::Control::Volumes::HandleEvent(name, type, std::get<Moveable>(activator).GetIndex());
-	}
-	else
-	{
-		result = TEN::Control::Volumes::HandleEvent(name, type, nullptr);
-	}
-
-	if (!result)
+	bool success = TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? 
+					(VolumeActivator)activator.value().GetIndex() : nullptr);
+	if (!success)
 	{
 		TENLog("Error: event " + name + " could not be executed. Check if event with such name exists in project.",
 			   LogLevel::Error, LogConfig::All, false);
