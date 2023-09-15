@@ -16,6 +16,10 @@ Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 
 Flow.SetTotalSecretCount(5)
 
+-- Enable/Disable bilinear filtering.
+
+Flow.EnablePointFilter(false)
+
 -- Disable/enable flycheat globally
 
 Flow.EnableFlyCheat(true)
