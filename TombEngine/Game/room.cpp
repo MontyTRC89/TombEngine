@@ -11,9 +11,9 @@
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Renderer;
 
-byte FlipStatus = 0;
-int FlipStats[MAX_FLIPMAP];
-int FlipMap[MAX_FLIPMAP];
+bool FlipStatus = false;
+bool FlipStats[MAX_FLIPMAP];
+int  FlipMap[MAX_FLIPMAP];
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
@@ -22,7 +22,13 @@ bool ROOM_INFO::Active()
 	if (flipNumber == NO_ROOM)
 		return true;
 
-	return !(FlipStats[flipNumber] && flippedRoom == NO_ROOM);
+	// Because engine swaps whole room memory block but substitutes flippedRoom,
+	// we have to check both original index and flippedRoom equality, as well as NO_ROOM
+	// in case we are checking non-flipped rooms.
+
+	return (!FlipStats[flipNumber] && flippedRoom != index && flippedRoom != NO_ROOM) ||
+		   ( FlipStats[flipNumber] && flippedRoom == index);
+		   
 }
 
 void DoFlipMap(short group)
@@ -203,8 +209,10 @@ int FindRoomNumber(Vector3i position, int startRoom)
 	{
 		auto& room = g_Level.Rooms[startRoom];
 		for (auto n : room.neighbors)
+		{
 			if (n != startRoom && IsPointInRoom(position, n) && g_Level.Rooms[n].Active())
 				return n;
+		}
 	}
 
 	for (int i = 0; i < g_Level.Rooms.size(); i++)

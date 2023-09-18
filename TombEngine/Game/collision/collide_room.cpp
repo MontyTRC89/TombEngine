@@ -784,32 +784,32 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, s
 	// Reduce ellipse axis lengths for stability.
 	auto reducedEllipse = ellipse * 0.75f;
 
-	// Probe heights at points around the entity.
+	// Probe heights at points around entity.
 	int frontHeight = GetCollision(item, item->Pose.Orientation.y, reducedEllipse.y).Position.Floor;
 	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), reducedEllipse.y).Position.Floor;
 	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), reducedEllipse.x).Position.Floor;
 	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), reducedEllipse.x).Position.Floor;
 
-	// Calculate height differences.
-	int forwardHeightDif = backHeight - frontHeight;
-	int lateralHeightDif = rightHeight - leftHeight;
+	// Calculate height deltas.
+	int forwardHeightDelta = backHeight - frontHeight;
+	int lateralHeightDelta = rightHeight - leftHeight;
 
 	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
-		FROM_RAD(atan2(forwardHeightDif, ellipse.y * 2)),
+		FROM_RAD(atan2(forwardHeightDelta, ellipse.y * 2)),
 		0,
-		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))) -
+		FROM_RAD(atan2(lateralHeightDelta, ellipse.x * 2))) -
 		EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 
 	// Rotate X axis.
-	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
+	if (abs(forwardHeightDelta) <= STEPUP_HEIGHT)
 	{
 		if (abs(extraRot.x) <= constraintAngle)
 			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
 	// Rotate Z axis.
-	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
+	if (abs(lateralHeightDelta) <= STEPUP_HEIGHT)
 	{
 		if (abs(extraRot.z) <= constraintAngle)
 			item->Pose.Orientation.z += extraRot.z * alpha;

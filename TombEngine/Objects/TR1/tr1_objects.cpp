@@ -27,6 +27,7 @@
 // Traps
 #include "Objects/TR1/Trap/DamoclesSword.h"
 #include "Objects/TR1/Trap/SlammingDoors.h"
+#include "Objects/TR1/Trap/SwingingBlade.h"
 
 using namespace TEN::Entities::Creatures::TR1;
 using namespace TEN::Entities::Traps::TR1;
@@ -251,6 +252,16 @@ static void StartTrap(ObjectInfo* obj)
 	{
 		obj->Initialize = InitializeSlammingDoors;
 		obj->control = ControlSlammingDoors;
+		obj->collision = GenericSphereBoxCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->SetupHitEffect(true);
+	}
+
+	obj = &Objects[ID_SWINGING_BLADE];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeSwingingBlade;
+		obj->control = ControlSwingingBlade;
 		obj->collision = GenericSphereBoxCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->SetupHitEffect(true);

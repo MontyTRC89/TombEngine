@@ -125,9 +125,17 @@ static std::unique_ptr<Moveable> Create(
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
 		ptr->Init();
 
-		ptr->SetAnimNumber(USE_IF_HAVE(int, animNumber, 0));
-		ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
-		ptr->SetHP(USE_IF_HAVE(short, hp, 10));
+		if (std::holds_alternative<int>(animNumber))
+		{
+			ptr->SetAnimNumber(std::get<int>(animNumber));
+			ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+		}
+
+		if (std::holds_alternative<short>(hp))
+		{
+			ptr->SetHP(std::get<short>(hp));
+		}
+
 		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
 		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
 		ptr->SetColor(ScriptColor(Vector4::One));

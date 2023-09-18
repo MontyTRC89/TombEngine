@@ -147,7 +147,15 @@ namespace TEN::Input
 
 		try
 		{
-			OisInputManager = InputManager::createInputSystem((size_t)handle);
+			// Use an OIS ParamList since the default behaviour blocks the WIN key.
+			ParamList pl;
+			std::ostringstream wnd;
+			wnd << (size_t)handle;
+			pl.insert(std::make_pair(std::string("WINDOW"), wnd.str()));
+			pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
+			pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
+
+			OisInputManager = InputManager::createInputSystem(pl);
 			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
@@ -587,8 +595,8 @@ namespace TEN::Input
 		DefaultConflict();
 
 		// Update action map.
-		for (int i = 0; i < (int)In::Count; i++)
-			ActionMap[i].Update(Key(i));
+		for (auto& action : ActionMap)
+			action.Update(Key((int)action.GetID()));
 
 		if (applyQueue)
 			ApplyActionQueue();

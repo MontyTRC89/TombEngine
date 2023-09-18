@@ -12,14 +12,12 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using std::vector;
-
 namespace TEN::Entities::Traps
 {
 	constexpr auto STARGATE_HARM_DAMAGE = 100;
 
-	const vector<unsigned int> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
-	const vector<Vector3i> StargateBounds =
+	const std::vector<unsigned int> StargateHarmJoints = { 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 25 };
+	const std::vector<Vector3i> StargateBounds =
 	{
 		Vector3i(-CLICK(2), CLICK(2), -BLOCK(2)), 
 		Vector3i(-896, -96, 96),

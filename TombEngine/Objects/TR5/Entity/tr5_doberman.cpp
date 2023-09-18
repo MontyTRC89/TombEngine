@@ -79,11 +79,11 @@ namespace TEN::Entities::Creatures::TR5
 
 	void DobermanControl(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
-
 		if (!CreatureActive(itemNumber))
 			return;
+
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
 		short tilt = 0;

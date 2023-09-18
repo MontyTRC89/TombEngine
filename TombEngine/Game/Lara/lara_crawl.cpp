@@ -79,7 +79,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Look))
+		if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			return;
@@ -427,7 +427,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Look))
+		if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 		{
 			item->Animation.TargetState = LS_CRAWL_IDLE;
 			return;
