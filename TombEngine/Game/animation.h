@@ -34,7 +34,7 @@ struct KeyframeInterpData
 
 struct StateDispatchData
 {
-	int State			= 0;
+	int StateID			= 0;
 	int NextAnimNumber	= 0;
 	int NextFrameNumber = 0;
 	std::pair<int, int> FrameNumberRange = {};
@@ -45,7 +45,7 @@ struct AnimData
 {
 	using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 
-	int State			= 0;
+	int StateID			= 0;
 	int EndFrameNumber	= 0;
 	int NextAnimNumber	= 0;
 	int NextFrameNumber = 0;
@@ -76,7 +76,7 @@ struct BoneMutator
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
-bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetState = std::nullopt);
+bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
 bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt);
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
 
@@ -95,7 +95,7 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
 
-KeyframeInterpData GetFrameInterpData(const ItemInfo& item);
+KeyframeInterpData	GetFrameInterpData(const ItemInfo& item);
 const KeyframeData&	GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
 const KeyframeData&	GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber = 0);
 const KeyframeData&	GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);
@@ -109,7 +109,7 @@ int	 GetNextAnimState(const ItemInfo& item);
 int	 GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
 bool GetStateDispatch(ItemInfo& item, const AnimData& anim);
 
-void ClampRotation(Pose& outPose, short angle, short rotation); 
+void ClampRotation(Pose& outPose, short angle, short rot); 
 void DrawAnimatingItem(ItemInfo* item);
 
 Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset = Vector3i::Zero);

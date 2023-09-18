@@ -20,7 +20,7 @@ namespace TEN::Animation
 
 		if (item.IsLara())
 		{
-			// NOTE: Always clamped to last frame when getting bounding box to avoid errors.
+			// NOTE: GameBoundingBox constructor always clamps to last frame to avoid errors.
 			auto bounds = GameBoundingBox(&item);
 			UpdateLaraRoom(&item, -bounds.GetHeight() / 2, -RelOffset.x, -RelOffset.z);
 		}

@@ -75,6 +75,8 @@ float ReadFloat()
 
 Vector2 ReadVector2()
 {
+	// NOTE: Cannot use Vector2 constructor due to quirky C++ init ordering.
+
 	auto value = Vector2::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
@@ -83,6 +85,8 @@ Vector2 ReadVector2()
 
 Vector3 ReadVector3()
 {
+	// NOTE: Cannot use Vector3 constructor due to quirky C++ init ordering.
+
 	auto value = Vector3::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
@@ -92,6 +96,8 @@ Vector3 ReadVector3()
 
 Vector4 ReadVector4()
 {
+	// NOTE: Cannot use Vector4 constructor due to quirky C++ init ordering.
+
 	auto value = Vector4::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
@@ -102,7 +108,7 @@ Vector4 ReadVector4()
 
 bool ReadBool()
 {
-	return bool(ReadUInt8());
+	return (bool)ReadUInt8();
 }
 
 void ReadBytes(void* dest, int count)
@@ -126,12 +132,12 @@ long long ReadLEB128(bool sign)
 	}
 	while ((currentByte & 0x80) != 0);
 
-	// Sign extend
+	// Sign extend.
 	if (sign)
 	{
 		int shift = 64 - currentShift;
 		if (shift > 0)
-			result = (long long)(result << shift) >> shift;
+			result = long long(result << shift) >> shift;
 	}
 
 	return result;
@@ -317,7 +323,7 @@ void LoadObjects()
 		object.Animations.resize(animCount);
 		for (auto& anim : object.Animations)
 		{
-			anim.State = ReadInt32();
+			anim.StateID = ReadInt32();
 			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
@@ -349,7 +355,7 @@ void LoadObjects()
 			anim.Dispatches.resize(dispatchCount);
 			for (auto& dispatch : anim.Dispatches)
 			{
-				dispatch.State = ReadInt32();
+				dispatch.StateID = ReadInt32();
 				dispatch.NextAnimNumber = ReadInt32();
 				dispatch.NextFrameNumber = ReadInt32();
 				dispatch.FrameNumberRange.first = ReadInt32();
@@ -382,7 +388,7 @@ void LoadObjects()
 						auto jumpVel = ReadVector3();
 						command = std::make_unique<JumpVelocityCommand>(jumpVel);
 					}
-					break;
+						break;
 
 					case AnimCommandType::AttackReady:
 						command = std::make_unique<AttackReadyCommand>();

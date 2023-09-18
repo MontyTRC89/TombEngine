@@ -19,7 +19,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
-// TODO: Arm anim object in samegame.
+// TODO: Arm anim object in savegame.
 
 KeyframeInterpData::KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
 	Keyframe0(keyframe0),
@@ -63,7 +63,6 @@ bool BoneMutator::IsEmpty() const
 static void ExecuteAnimCommands(ItemInfo& item, bool isFrameBased)
 {
 	const auto& anim = GetAnimData(item);
-
 	for (const auto& command : anim.Commands)
 		command->Execute(item, isFrameBased);
 }
@@ -85,7 +84,7 @@ void AnimateItem(ItemInfo* item)
 	{
 		animPtr = &GetAnimData(*item);
 
-		item->Animation.ActiveState = animPtr->State;
+		item->Animation.ActiveState = animPtr->StateID;
 
 		if (!item->IsLara())
 		{
@@ -104,10 +103,10 @@ void AnimateItem(ItemInfo* item)
 
 		animPtr = &GetAnimData(*item);
 		
-		if (item->Animation.ActiveState != animPtr->State)
+		if (item->Animation.ActiveState != animPtr->StateID)
 		{
 			item->Animation.ActiveState =
-			item->Animation.TargetState = animPtr->State;
+			item->Animation.TargetState = animPtr->StateID;
 		}
 
 		if (!item->IsLara())
@@ -203,23 +202,23 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetState)
+bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
 {
 	const auto& anim = GetAnimData(item);
 
-	// No dispatches; return early.
+	// No dispatches.
 	if (anim.Dispatches.empty())
 		return false;
 
 	// Use entity's target state if no targetState argument passed.
-	if (!targetState.has_value())
-		targetState = item.Animation.TargetState;
+	if (!targetStateID.has_value())
+		targetStateID = item.Animation.TargetState;
 
 	// Iterate over state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
-		// State doesn't match; continue.
-		if (dispatch.State != *targetState)
+		// State ID mismatch; continue.
+		if (dispatch.StateID != *targetStateID)
 			continue;
 
 		// Test if current frame is within dispatch range.
@@ -235,11 +234,11 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 	if (!animNumber.has_value())
 		animNumber = item->Animation.AnimNumber;
 
-	// Animation doesn't match; return early.
+	// Animation number mismatch; return early.
 	if (item->Animation.AnimNumber != animNumber)
 		return false;
 
-	// NOTE: Frames beyond designated end frame also count.
+	// FAILSAFE: Frames beyond real end frame also count.
 	const auto& anim = GetAnimData(item->Animation.AnimObjectID, *animNumber);
 	return (item->Animation.FrameNumber >= anim.EndFrameNumber);
 }
@@ -267,7 +266,7 @@ void TranslateItem(ItemInfo* item, const Vector3& dir, float dist)
 
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 {
-	// Animation already set; return early.
+	// Animation number already set; return early.
 	if (item.Animation.AnimObjectID == animObjectID &&
 		item.Animation.AnimNumber == animNumber &&
 		item.Animation.FrameNumber == frameNumber)
@@ -297,7 +296,7 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 		TENLog(
 			"Attempted to set missing frame " + std::to_string(frameNumber) +
 			" from animation " + std::to_string(animNumber) +
-			((animObjectID == item.ObjectNumber) ? "" : (" from object " + GetObjectName(animObjectID))) +
+			((animObjectID == item.ObjectNumber) ? "" : (" from moveable " + GetObjectName(animObjectID))) +
 			" for object " + GetObjectName(item.ObjectNumber),
 			LogLevel::Warning);
 
@@ -308,7 +307,7 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 	item.Animation.AnimNumber = animNumber;
 	item.Animation.FrameNumber = frameNumber;
 	item.Animation.ActiveState =
-	item.Animation.TargetState = anim.State;
+	item.Animation.TargetState = anim.StateID;
 }
 
 void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
@@ -394,7 +393,7 @@ int GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber)
 	const auto& anim = GetAnimData(objectID, animNumber);
 	const auto& nextAnim = GetAnimData(objectID, anim.NextAnimNumber);
 
-	return nextAnim.State;
+	return nextAnim.StateID;
 }
 
 bool GetStateDispatch(ItemInfo& item, const AnimData& anim)
@@ -403,18 +402,18 @@ bool GetStateDispatch(ItemInfo& item, const AnimData& anim)
 	if (anim.Dispatches.empty())
 		return false;
 
-	// Active and target states already match; return early.
+	// Active and target state IDs already match; return early.
 	if (item.Animation.ActiveState == item.Animation.TargetState)
 		return false;
 
 	// Iterate over state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
-		// State doesn't match; continue.
-		if (dispatch.State != item.Animation.TargetState)
+		// State ID mismatch; continue.
+		if (dispatch.StateID != item.Animation.TargetState)
 			continue;
 
-		// Set new animation if current frame number is within dispatch range.
+		// Set new animation number if current frame number is within dispatch range.
 		if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
 		{
 			item.Animation.AnimNumber = dispatch.NextAnimNumber;
@@ -432,15 +431,15 @@ void DrawAnimatingItem(ItemInfo* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is nullptr in ObjectInfo
 }
 
-void ClampRotation(Pose& outPose, short angle, short rotation)
+void ClampRotation(Pose& outPose, short angle, short rot)
 {
-	if (angle <= rotation)
+	if (angle <= rot)
 	{
-		outPose.Orientation.y += (angle >= -rotation) ? angle : -rotation;
+		outPose.Orientation.y += (angle >= -rot) ? angle : -rot;
 	}
 	else
 	{
-		outPose.Orientation.y += rotation;
+		outPose.Orientation.y += rot;
 	}
 }
 

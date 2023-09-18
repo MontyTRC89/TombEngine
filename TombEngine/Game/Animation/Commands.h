@@ -4,6 +4,7 @@ struct ItemInfo;
 
 namespace TEN::Animation
 {
+	// NOTE: Only used when loading animation commands from level file.
 	enum class AnimCommandType
 	{
 		None,
@@ -15,6 +16,7 @@ namespace TEN::Animation
 		Flipeffect
 	};
 
+	// Abstract base class used by high-level animation command classes.
 	class AnimCommand abstract
 	{
 	public:
