@@ -1399,7 +1399,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass) 
 	{
-		RendererRoom const& room = m_rooms[effect->RoomNumber];
+		const auto& room = m_rooms[effect->RoomNumber];
 
 		m_stStatic.World = effect->World;
 		m_stStatic.Color = effect->Color;
@@ -1419,17 +1419,19 @@ namespace TEN::Renderer
 			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 		}
 
-		RendererMesh* mesh = effect->Mesh;
-		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+		auto* meshPtr = effect->Mesh;
+		auto lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
-		for (auto& bucket : mesh->Buckets) 
+		for (auto& bucket : meshPtr->Buckets) 
 		{
 			if (bucket.NumVertices == 0)
 				continue;
 
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST)
-				^ (rendererPass == RendererPass::Transparent)))
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+				(rendererPass == RendererPass::Transparent)))
+			{
 				continue;
+			}
 
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
@@ -1438,7 +1440,6 @@ namespace TEN::Renderer
 			
 			DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 		}
-
 	}
 
 	void Renderer11::DrawEffects(RenderView& view, RendererPass rendererPass) 
@@ -1481,19 +1482,21 @@ namespace TEN::Renderer
 		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<RendererVertex> vertices;
 
-		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+		auto lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
 		for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
 		{
 			if (deb->active) 
 			{
-				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) 
-					^ (rendererPass == RendererPass::Transparent)))
+				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^
+					(rendererPass == RendererPass::Transparent)))
+				{
 					continue;
+				}
 
-				Matrix translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
-				Matrix rotation = Matrix::CreateFromQuaternion(deb->rotation);
-				Matrix world = rotation * translation;
+				auto translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
+				auto rotation = Matrix::CreateFromQuaternion(deb->rotation);
+				auto world = rotation * translation;
 
 				m_primitiveBatch->Begin();
 

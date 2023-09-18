@@ -1884,8 +1884,8 @@ namespace TEN::Renderer
 
 				for (auto& bucket : refMesh->Buckets)
 				{
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) 
-						^ (rendererPass == RendererPass::Transparent)))
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+						(rendererPass == RendererPass::Transparent)))
 					{
 						continue;
 					}
@@ -1907,9 +1907,8 @@ namespace TEN::Renderer
 							{
 								SetBlendMode(bucket.BlendMode);
 								SetAlphaTest(
-									bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
-									ALPHA_TEST_THRESHOLD
-								);
+									(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+									ALPHA_TEST_THRESHOLD);
 							}
 							else
 							{
@@ -1993,19 +1992,19 @@ namespace TEN::Renderer
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
-		// Bind vertex and index buffer
+		// Bind vertex and index buffer.
 		m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Bind pixel shaders
+		// Bind pixel shaders.
 		m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
 
 		BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 		BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 
-		// Bind caustics texture
+		// Bind caustics texture.
 		if (!m_sprites.empty())
 		{
 			int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
@@ -2013,13 +2012,13 @@ namespace TEN::Renderer
 			int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)m_sprites.size());
 			BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_ANISOTROPIC_CLAMP);
 
-			// Strange packing due to particular HLSL 16 bytes alignment requirements
+			// NOTE: Strange packing due to particular HLSL 16 bytes alignment requirements.
 			RendererSprite* causticsSprite = &m_sprites[causticsFrame];
 			m_stRoom.CausticsStartUV = causticsSprite->UV[0];
 			m_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
 		}
 		
-		// Set shadow map data and bind shadow map texture
+		// Set shadow map data and bind shadow map texture.
 		if (m_shadowLight != nullptr)
 		{
 			memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
@@ -2075,15 +2074,15 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) 
-						^ (rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
+					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+						(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
 					{
 						continue;
 					}
 
 					if (rendererPass == RendererPass::CollectSortedFaces && DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
-						// Collect transparent faces
+						// Collect transparent faces.
 						for (int j = 0; j < bucket.Polygons.size(); j++)
 						{
 							RendererPolygon* p = &bucket.Polygons[j];
@@ -2183,20 +2182,20 @@ namespace TEN::Renderer
 	
 	void Renderer11::DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget)
 	{
-		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
 		bool anyOutsideRooms = false;
 		for (int k = 0; k < renderView.RoomsToDraw.size(); k++)
 		{
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.RoomsToDraw[k]->RoomNumber];
-			if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
+			const auto& nativeRoom = g_Level.Rooms[renderView.RoomsToDraw[k]->RoomNumber];
+			if (nativeRoom.flags & ENV_FLAG_OUTSIDE)
 			{
 				anyOutsideRooms = true;
 				break;
 			}
 		}
 
-		if (!level->Horizon || !anyOutsideRooms)
+		if (!levelPtr->Horizon || !anyOutsideRooms)
 			return;
 
 		if (Lara.Control.Look.OpticRange != 0)
@@ -2206,7 +2205,7 @@ namespace TEN::Renderer
 		UINT offset = 0;
 
 		// Draw sky.
-		Matrix rotation = Matrix::CreateRotationX(PI);
+		auto rotation = Matrix::CreateRotationX(PI);
 
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
@@ -2226,9 +2225,9 @@ namespace TEN::Renderer
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
-				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
+				auto translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
 					Camera.pos.y - 1536.0f, Camera.pos.z);
-				Matrix world = rotation * translation;
+				auto world = rotation * translation;
 
 				m_stSky.World = (rotation * translation);
 				m_stSky.Color = weather.SkyColor(s);
@@ -2244,7 +2243,7 @@ namespace TEN::Renderer
 
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
-		// Draw horizon
+		// Draw horizon.
 		if (m_moveableObjects[ID_HORIZON].has_value())
 		{
 			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -2252,7 +2251,7 @@ namespace TEN::Renderer
 			m_context->IASetInputLayout(m_inputLayout.Get());
 			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
+			auto& moveableObj = *m_moveableObjects[ID_HORIZON];
 
 			m_stSky.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			m_stSky.Color = Vector4::One;
@@ -2264,9 +2263,9 @@ namespace TEN::Renderer
 
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
-				RendererMesh* mesh = moveableObj.ObjectMeshes[k];
+				auto* meshPtr = moveableObj.ObjectMeshes[k];
 
-				for (auto& bucket : mesh->Buckets)
+				for (auto& bucket : meshPtr->Buckets)
 				{
 					if (bucket.NumVertices == 0)
 						continue;
@@ -2276,11 +2275,11 @@ namespace TEN::Renderer
 					BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
 						SAMPLER_ANISOTROPIC_CLAMP);
 
-					// Always render horizon as alpha-blended surface
+					// Always render horizon as alpha-blended surface.
 					SetBlendMode(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? BLEND_MODES::BLENDMODE_ALPHABLEND : bucket.BlendMode);
 					SetAlphaTest(ALPHA_TEST_NONE, ALPHA_TEST_THRESHOLD);
 
-					// Draw vertices
+					// Draw vertices.
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
 					m_numMoveablesDrawCalls++;
@@ -2288,7 +2287,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		// Clear just the Z-buffer so we can start drawing on top of the horizon
+		// Clear just the Z-buffer to start drawing on top of horizon.
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
@@ -2302,20 +2301,18 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RendererPass rendererPass)
 	{
-		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto cameraPos = Camera.pos.ToVector3();
 
 		for (auto& bucket : mesh->Buckets)
 		{
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) 
-				^ (rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+				(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
 			{
 				continue;
 			}
 
 			if (bucket.NumVertices == 0)
-			{
 				continue;
-			}
 
 			if (rendererPass == RendererPass::ShadowMap)
 			{
@@ -2331,16 +2328,16 @@ namespace TEN::Renderer
 				// Collect transparent faces
 				for (int j = 0; j < bucket.Polygons.size(); j++)
 				{
-					RendererPolygon* p = &bucket.Polygons[j];
+					auto* polygonPtr = &bucket.Polygons[j];
 
-					// As polygon distance, for moveables, we use the averaged distance
-					Vector3 centre = Vector3::Transform(
-						p->centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
-					int distance = (centre - cameraPosition).Length();
+					// Use averaged distance as polygon distance for moveables.
+					auto centre = Vector3::Transform(
+						polygonPtr->centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
+					int distance = (centre - cameraPos).Length();
 
 					RendererTransparentFace face;
 					face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
-					face.info.polygon = p;
+					face.info.polygon = polygonPtr;
 					face.distance = distance;
 					face.info.animated = bucket.Animated;
 					face.info.texture = bucket.Texture;
@@ -2368,8 +2365,7 @@ namespace TEN::Renderer
 						SetBlendMode(bucket.BlendMode);
 						SetAlphaTest(
 							bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
-							ALPHA_TEST_THRESHOLD
-						);
+							ALPHA_TEST_THRESHOLD);
 					}
 					else
 					{
