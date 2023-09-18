@@ -190,13 +190,26 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
 					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
 
+					int upperBound = radius;
+					int lowerBound = radius;
+
+					if (!radius)
+					{
+						auto collidingItemBounds = GetBestFrame(*collidingItem).BoundingBox;
+						upperBound = collidingItemBounds.Y1;
+						lowerBound = collidingItemBounds.Y2;
+					}
+
 					auto bounds = GetBestFrame(*item).BoundingBox;
+
+					int verticalDelta1 = (collidingItem->Pose.Position.y + lowerBound + CLICK(0.5f)) - (item->Pose.Position.y + bounds.Y1);
+					int verticalDelta2 = (collidingItem->Pose.Position.y - upperBound - CLICK(0.5f)) - (item->Pose.Position.y + bounds.Y2);
 
 					if (dx >= -BLOCK(2) && dx <= BLOCK(2) &&
 						dy >= -BLOCK(2) && dy <= BLOCK(2) &&
 						dz >= -BLOCK(2) && dz <= BLOCK(2) &&
-						(collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
-						(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
+						(collidingItem->Pose.Position.y + lowerBound + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
+						(collidingItem->Pose.Position.y - upperBound - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
 					{
 						float sinY = phd_sin(item->Pose.Orientation.y);
 						float cosY = phd_cos(item->Pose.Orientation.y);
