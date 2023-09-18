@@ -210,7 +210,7 @@ bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
 	if (anim.Dispatches.empty())
 		return false;
 
-	// Use entity's target state if no targetState argument passed.
+	// Use entity's target state ID if no targetStateID argument provided.
 	if (!targetStateID.has_value())
 		targetStateID = item.Animation.TargetState;
 
