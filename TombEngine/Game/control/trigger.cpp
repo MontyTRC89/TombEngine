@@ -787,7 +787,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 
 				int eventType = trigger & TIMER_BITS;
 
-				if (eventType > (int)VolumeEventType::Count)
+				if (eventType >= (int)VolumeEventType::Count)
 				{
 					TENLog("Unknown volume event type encountered for legacy trigger: " + std::to_string(eventType), LogLevel::Warning);
 					continue;
