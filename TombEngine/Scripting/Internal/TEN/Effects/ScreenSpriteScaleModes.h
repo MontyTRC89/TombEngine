@@ -17,7 +17,7 @@ Constants for screen sprite scale modes.
 The following constants are inside ScreenSpriteScaleMode.
 
 FIT
-CROP
+FILL
 STRETCH
 TILE
 
@@ -31,7 +31,7 @@ TILE
 static const std::unordered_map<std::string, ScreenSpriteScaleMode> SCREEN_SPRITE_SCALE_MODES
 {
 	{ "FIT", ScreenSpriteScaleMode::Fit },
-	{ "CROP", ScreenSpriteScaleMode::Crop },
+	{ "FILL", ScreenSpriteScaleMode::Fill },
 	{ "STRETCH", ScreenSpriteScaleMode::Stretch },
 	{ "TILE", ScreenSpriteScaleMode::Tile }
 };

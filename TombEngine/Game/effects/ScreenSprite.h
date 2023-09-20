@@ -7,7 +7,7 @@ namespace TEN::Effects::ScreenSprite
 	enum class ScreenSpriteScaleMode
 	{
 		Fit,
-		Crop,
+		Fill,
 		Stretch,
 		Tile
 	};
