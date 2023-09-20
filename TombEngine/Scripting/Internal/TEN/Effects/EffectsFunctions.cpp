@@ -44,13 +44,32 @@ namespace Effects
 	//@tparam int spriteIndex Index of the sprite in the sprite object.
 	//@tparam Vec2 pos 2D space position of the sprite.
 	//@tparam float rot Rotation of the sprite in degrees. Default is 0.
-	//@tparam Vec2 scale Scale of the sprite relative to the screen height.
+	//@tparam Vec2 scale Scale of the sprite relative to the screen height. Treated as a size if scaleMode is ScreenSpriteScaleMode.FIT.
 	//@tparam Color color Color of the sprite. Default is Color(255, 255, 255, 255).
 	//@tparam int priority Render priority of the sprite. Higher values have higher priority and can be thought of as layers. Default is 0.
 	//@tparam Effects.BlendID blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
+	//@tparam Effects.ScreenSpriteScaleMode scaleMode Scale mode of the sprite. Default is TEN.Effects.ScreenSpriteScaleMode.FIT.
 	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, TypeOrNil<float> rot, const Vec2& scale,
-									TypeOrNil<ScriptColor> color, TypeOrNil<int> priority, TypeOrNil<BLEND_MODES> blendMode)
+									TypeOrNil<ScriptColor> color, TypeOrNil<int> priority, TypeOrNil<BLEND_MODES> blendMode,
+									TypeOrNil<ScreenSpriteScaleMode> scaleMode)
 	{
+		// Object is not a sprite object; return early.
+		if (objectID < GAME_OBJECT_ID::ID_HORIZON)
+		{
+			TENLog("Attempted to draw screen sprite from non-sprite object " + std::to_string(objectID), LogLevel::Warning);
+			return;
+		}
+
+		// Sprite missing; return early.
+		const auto& object = Objects[objectID];
+		if (spriteIndex > (object.nmeshes - 1))
+		{
+			TENLog(
+				"Attempted to draw missing screen sprite " + std::to_string(spriteIndex) +
+				" from sprite object " + std::to_string(objectID), LogLevel::Warning);
+			return;
+		}
+
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
 		// Later, everything will use 100x100 natively. -- Sezz 2023.08.31
 		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
@@ -64,10 +83,12 @@ namespace Effects
 		auto blendMode2 = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
 		blendMode2 = BLEND_MODES(std::clamp((int)blendMode2, (int)BLEND_MODES::BLENDMODE_OPAQUE, (int)BLEND_MODES::BLENDMODE_ALPHABLEND));
 
+		auto scaleMode2 = USE_IF_HAVE(ScreenSpriteScaleMode, scaleMode, ScreenSpriteScaleMode::Fit);
+
 		AddScreenSprite(
 			objectID, spriteIndex,
 			pos2, rot2, scale2, color2,
-			priority2, blendMode2);
+			priority2, blendMode2, scaleMode2);
 	}
 
 	///Emit a lightning arc.
