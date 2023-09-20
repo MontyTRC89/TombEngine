@@ -106,7 +106,7 @@ namespace TEN::Entities::Generic
 			else if (LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB &&
 				LaraItem->Animation.ActiveState != LS_PUSHABLE_PULL &&
 				LaraItem->Animation.ActiveState != LS_PUSHABLE_PUSH &&
-				LaraItem->Animation.ActiveState != LS_PUSHABLE_EDGE)
+				LaraItem->Animation.ActiveState != LS_PUSHABLE_EDGE_SLIP)
 			{
 				Lara.Context.InteractedItem = NO_ITEM;
 			}
@@ -367,7 +367,7 @@ namespace TEN::Entities::Generic
 				}
 				else if (LaraItem->Animation.ActiveState == LS_PUSHABLE_PUSH && pushable.IsOnEdge)
 				{
-					LaraItem->Animation.TargetState = LS_PUSHABLE_EDGE;
+					LaraItem->Animation.TargetState = LS_PUSHABLE_EDGE_SLIP;
 
 					Vector3 movementDirection = pushableItem.Pose.Position.ToVector3() - LaraItem->Pose.Position.ToVector3();
 					movementDirection.Normalize();

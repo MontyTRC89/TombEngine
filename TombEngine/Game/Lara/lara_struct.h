@@ -208,10 +208,10 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
-	// 174-188 reserved for "true" ladders. -- Sezz 2023.04.16
+	// 174-188 reserved for "true" ladders. DO NOT add anything here. -- Sezz 2023.04.16
 
 	LS_REMOVE_PUZZLE = 189,
-	LS_PUSHABLE_EDGE = 190,
+	LS_PUSHABLE_EDGE_SLIP = 190,
 
 	NUM_LARA_STATES
 };
@@ -345,8 +345,8 @@ enum LaraAnim
 	LA_ONWATER_DIVE = 119,									// Tread water > underwater
 	LA_PUSHABLE_GRAB = 120,									// Grab pushable object (looped)
 	LA_PUSHABLE_RELEASE = 121,								// Release pushable object
-	LA_PUSHABLE_PULL = 122,									// Pull pushable object (looped)
-	LA_PUSHABLE_PUSH = 123,									// Push pushable object (looped)
+	LA_PUSHABLE_OBJECT_PULL = 122,							// Pull pushable object (looped)
+	LA_PUSHABLE_OBJECT_PUSH = 123,							// Push pushable object (looped)
 	LA_UNDERWATER_DEATH = 124,								// Drowning death
 	LA_STAND_HIT_FRONT = 125,								// Jerk back standing from damage
 	LA_STAND_HIT_BACK = 126,								// Jerk forward standing from damage
@@ -577,9 +577,9 @@ enum LaraAnim
 	LA_PULLEY_PULL = 340,									// Pull pulley
 	LA_PULLEY_RELEASE = 341,								// Pull pulley > stand
 	LA_POLE_TO_STAND = 342,									// Pole > stand
-	LA_PUSHABLE_CLASSIC_PULL = 343,							// Pull pushable object TR1-TR3 style
+	LA_PUSHABLE_BLOCK_PULL = 343,							// Pull pushable block
 	LA_POLE_TURN_CLOCKWISE_END = 344,						// Rotate clockwise on pole (2/2)
-	LA_PUSHABLE_CLASSIC_PUSH = 345,							// Push pushable object TR1-TR3 style
+	LA_PUSHABLE_BLOCK_PUSH = 345,							// Push pushable block
 	LA_POLE_TURN_COUNTER_CLOCKWISE_END = 346,				// Rotate counter-clockwise on pole (2/2)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_START = 347,				// Push turnswitch clockwise (1/3)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_CONTINUE = 348,			// Push turnswitch clockwise (2/3) 
@@ -597,14 +597,14 @@ enum LaraAnim
 	LA_SHIMMY_LEFT_CORNER_INNER_45 = 360,					// Shimmy around inner left corner (45)
 	LA_SHIMMY_RIGHT_CORNER_INNER_90 = 361,				    // Shimmy around inner right corner (90)
 	LA_SHIMMY_RIGHT_CORNER_INNER_45 = 362,					// Shimmy around inner right corner (45)
-	LA_LADDER_LEFT_CORNER_OUTER_START = 363,				// Ladder around outer left corner (1/2)
-	LA_LADDER_LEFT_CORNER_OUTER_END = 364,					// Ladder around outer left corner (2/2)
-	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner (1/2)
-	LA_LADDER_RIGHT_CORNER_OUTER_END = 366,					// Ladder around outer right corner (2/2)
-	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner (1/2)
-	LA_LADDER_LEFT_CORNER_INNER_END = 368,					// Ladder around inner left corner (2/2)
-	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner (1/2)
-	LA_LADDER_RIGHT_CORNER_INNER_END = 370,					// Ladder around inner right corner (2/2)
+	LA_LADDER_LEFT_CORNER_OUTER_START = 363,				// Ladder around outer left corner
+	LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP = 364,
+	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner
+	LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP = 366,
+	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner
+	LA_LADDER_LEFT_CORNER_INNER_END = 368,					// TODO: Remove.
+	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner
+	LA_LADDER_RIGHT_CORNER_INNER_END = 370,					// TODO: Remove.
 	LA_JUMP_UP_TO_ROPE_START = 371,							// Jump up > rope idle (1/2)
 	LA_TRAIN_OVERBOARD_DEATH = 372,							// Train overboard death
 	LA_JUMP_UP_TO_ROPE_END = 373,							// Jump up > rope idle (2/2)
@@ -653,9 +653,8 @@ enum LaraAnim
 	LA_JUMPSWITCH_PULL = 414,								// Pull jumpswitch
 	LA_UNDERWATER_CEILING_SWITCH_PULL = 415,				// Pull underwater ceiling switch
 	LA_UNDERWATER_DOOR_OPEN = 416,							// Open underwater_door
-	LA_PUSHABLE_PUSH_TO_STAND = 417,						// Push pushable object (not looped) > stand
-	LA_PUSHABLE_PULL_TO_STAND = 418,						// Pull pushable object (not looped) > stand
-																// TODO: add TR1-3 push/pull anims.
+	LA_PUSHABLE_OBJECT_PUSH_TO_STAND = 417,						// Push pushable object (not looped) > stand
+	LA_PUSHABLE_OBJECT_PULL_TO_STAND = 418,						// Pull pushable object (not looped) > stand
 	LA_CROWBAR_PRY_WALL_FAST = 419,							// Pry item off wall quickly
 	LA_CROWBAR_USE_ON_FLOOR = 420,							// Use crowbar to activate floor lever
 	LA_CRAWL_JUMP_FLIP_DOWN = 421,							// Roll jump down from crawl
@@ -816,17 +815,13 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
-	// TODO: Move.
-	LA_PUSHABLE_EDGE = 569,
-	LA_PUSHABLE_CLASSIC_EDGE = 570,
-
-	// 569-598 reserved for "true" ladders. -- Sezz 2023.04.16
+	// 569-598 reserved for "true" ladders. DO NOT add anything here. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 
-	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
+	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
 	// 280,
-	// 364, 366, 368, 370,
+	// 368, 370,
 };
 
 enum LaraExtraAnim

@@ -20,9 +20,9 @@ namespace TEN::Entities::Generic
 		// TODO: Constants.
 		PushableAnimationInfo()
 		{
-			PullAnimNumber = LA_PUSHABLE_PULL;
-			PushAnimNumber = LA_PUSHABLE_PUSH;
-			EdgeAnimNumber = LA_PUSHABLE_EDGE;
+			PullAnimNumber = LA_PUSHABLE_OBJECT_PULL;
+			PushAnimNumber = LA_PUSHABLE_OBJECT_PUSH;
+			EdgeAnimNumber = LA_PUSHABLE_OBJECT_EDGE_SLIP;
 			EnableAnimLoop = true;
 		}
 
