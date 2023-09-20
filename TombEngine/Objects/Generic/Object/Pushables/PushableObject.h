@@ -22,7 +22,7 @@ namespace TEN::Entities::Generic
 		{
 			PullAnimNumber = LA_PUSHABLE_OBJECT_PULL;
 			PushAnimNumber = LA_PUSHABLE_OBJECT_PUSH;
-			EdgeAnimNumber = LA_PUSHABLE_OBJECT_EDGE_SLIP;
+			EdgeAnimNumber = LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP;
 			EnableAnimLoop = true;
 		}
 
