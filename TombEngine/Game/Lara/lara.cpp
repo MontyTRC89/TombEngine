@@ -245,7 +245,7 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,
 	lara_as_null,
 	lara_as_use_puzzle,//189
-	lara_as_pushable_edge,//190
+	lara_as_pushable_edge_slip,//190
 };
 
 std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
