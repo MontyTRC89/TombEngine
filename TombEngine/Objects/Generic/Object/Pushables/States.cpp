@@ -5,8 +5,8 @@
 #include "Game/control/flipeffect.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Objects/Generic/Object/Pushables/PushableBridge.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
-#include "Objects/Generic/Object/Pushables/BridgeCollision.h"
 #include "Objects/Generic/Object/Pushables/PushableEffects.h"
 #include "Objects/Generic/Object/Pushables/Context.h"
 #include "Objects/Generic/Object/Pushables/Stack.h"
@@ -101,7 +101,7 @@ namespace TEN::Entities::Generic
 				StartMovePushableStack(itemNumber);
 
 				ResetPlayerFlex(LaraItem);
-				DeactivateClimbablePushableCollider(itemNumber);
+				RemovePushableBridge(itemNumber);
 			}
 			else if (LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB &&
 				LaraItem->Animation.ActiveState != LS_PUSHABLE_PULL &&
@@ -158,7 +158,7 @@ namespace TEN::Entities::Generic
 			{
 				pushable.BehaviourState = PushableState::Fall;
 				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
-				DeactivateClimbablePushableCollider(itemNumber);
+				RemovePushableBridge(itemNumber);
 			}
 			else
 			{
@@ -170,7 +170,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case PushableEnvironmentState::Water:
-			DeactivateClimbablePushableCollider(itemNumber);
+			RemovePushableBridge(itemNumber);
 			SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
 			if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
@@ -356,7 +356,7 @@ namespace TEN::Entities::Generic
 					LaraItem->Animation.TargetState = LS_IDLE;
 					pushable.BehaviourState = PushableState::Idle;
 					StopMovePushableStack(itemNumber); //Set the upper pushables back to normal.
-					ActivateClimbablePushableCollider(itemNumber);
+					AddPushableBridge(itemNumber);
 
 					//The pushable is going to stop here, do the checks to conect it with another Stack.
 					int FoundStack = SearchNearPushablesStack(itemNumber);
@@ -572,7 +572,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Pose.Position.y = floorHeight;
 				pushableItem.Animation.Velocity.y = 0.0f;
 
-				ActivateClimbablePushableCollider(itemNumber);
+				AddPushableBridge(itemNumber);
 				break;
 
 			case PushableEnvironmentState::Slope:
@@ -672,7 +672,7 @@ namespace TEN::Entities::Generic
 					pushable.BehaviourState = PushableState::UnderwaterIdle;
 					pushable.Gravity = GRAVITY_WATER;
 					pushableItem.Animation.Velocity.y = 0.0f;
-					ActivateClimbablePushableCollider(itemNumber);
+					AddPushableBridge(itemNumber);
 
 					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 
@@ -759,7 +759,7 @@ namespace TEN::Entities::Generic
 					pushable.Gravity = GRAVITY_WATER;
 					pushableItem.Animation.Velocity.y = 0.0f;
 					pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
-					ActivateClimbablePushableCollider(itemNumber);
+					AddPushableBridge(itemNumber);
 				}
 
 			break;
@@ -873,7 +873,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = 0.0f;
 				pushable.Gravity = GRAVITY_AIR;
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
-				DeactivateClimbablePushableCollider(itemNumber);
+				RemovePushableBridge(itemNumber);
 				break;
 
 			case PushableEnvironmentState::Water:

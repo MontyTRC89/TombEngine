@@ -5,7 +5,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
-#include "Objects/Generic/Object/Pushables/BridgeCollision.h"
+#include "Objects/Generic/Object/Pushables/PushableBridge.h"
 #include "Objects/Generic/Object/Pushables/Stack.h"
 #include "Specific/Input/Input.h"
 
@@ -29,9 +29,9 @@ namespace TEN::Entities::Generic
 
 		if (pushable.UsesRoomCollision)
 		{
-			DeactivateClimbablePushableCollider(itemNumber);
+			RemovePushableBridge(itemNumber);
 			pointColl = GetCollision(&pushableItem);
-			ActivateClimbablePushableCollider(itemNumber);
+			AddPushableBridge(itemNumber);
 		}
 		else
 		{
@@ -327,10 +327,10 @@ namespace TEN::Entities::Generic
 		int waterHeight = NO_HEIGHT;
 		if (pushable.BridgeColliderFlag)
 		{
-			DeactivateClimbablePushableCollider(itemNumber);
+			RemovePushableBridge(itemNumber);
 			pointColl = GetCollision(&pushableItem);
 			waterHeight = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
-			ActivateClimbablePushableCollider(itemNumber);
+			AddPushableBridge(itemNumber);
 		}
 		else
 		{

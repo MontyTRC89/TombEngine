@@ -4,7 +4,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
-#include "Objects/Generic/Object/Pushables/BridgeCollision.h"
+#include "Objects/Generic/Object/Pushables/PushableBridge.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
@@ -263,7 +263,7 @@ namespace TEN::Entities::Generic
 
 			// Deactivate collision.
 			if (currentPushable.UsesRoomCollision)
-				DeactivateClimbablePushableCollider(currentItemNumber);
+				RemovePushableBridge(currentItemNumber);
 
 			currentPushable.BehaviourState = PushableState::MoveStackHorizontal;
 
@@ -286,7 +286,7 @@ namespace TEN::Entities::Generic
 
 			// Activate collision.
 			if (currentPushable.UsesRoomCollision)
-				ActivateClimbablePushableCollider(currentItemNumber);
+				AddPushableBridge(currentItemNumber);
 
 			currentPushable.BehaviourState = PushableState::Idle;
 

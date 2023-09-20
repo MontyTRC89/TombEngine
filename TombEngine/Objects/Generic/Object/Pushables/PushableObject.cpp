@@ -7,7 +7,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
-#include "Objects/Generic/Object/Pushables/BridgeCollision.h"
+#include "Objects/Generic/Object/Pushables/PushableBridge.h"
 #include "Objects/Generic/Object/Pushables/Info.h"
 #include "Objects/Generic/Object/Pushables/States.h"
 #include "Objects/Generic/Object/Pushables/Context.h"
@@ -70,7 +70,7 @@ namespace TEN::Entities::Generic
 		if (pushableItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushable.UsesRoomCollision = true;
-			ActivateClimbablePushableCollider(itemNumber);
+			AddPushableBridge(itemNumber);
 		}
 		else
 		{
@@ -113,9 +113,9 @@ namespace TEN::Entities::Generic
 		HandlePushableSounds(itemNumber, pushable);
 
 		// Update room number.
-		AddBridgePushableStack(itemNumber, false);
+		AddPushableStackBridge(itemNumber, false);
 		int probedRoomNumber = GetCollision(&pushableItem).RoomNumber;
-		AddBridgePushableStack(itemNumber, true);
+		AddPushableStackBridge(itemNumber, true);
 
 		if (pushableItem.RoomNumber != probedRoomNumber)
 		{
