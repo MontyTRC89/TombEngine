@@ -66,37 +66,33 @@ namespace TEN::Control::Volumes
 			event.CallCounter--;
 	}
 
-	bool HandleEvent(const std::string& name, VolumeEventType type, VolumeActivator activator)
+	bool HandleEvent(const std::string& name, VolumeEventType eventType, VolumeActivator activator)
 	{
 		// Cache last used event sets so that whole list is not searched every time user calls this.
-		static VolumeEventSet* lastEventSet = nullptr;
+		static VolumeEventSet* lastEventSetPtr = nullptr;
 
-		if (lastEventSet != nullptr && lastEventSet->Name != name)
-		{
-			lastEventSet = nullptr;
-		}
+		if (lastEventSetPtr != nullptr && lastEventSetPtr->Name != name)
+			lastEventSetPtr = nullptr;
 
-		if (lastEventSet == nullptr)
+		if (lastEventSetPtr == nullptr)
 		{
 			for (auto& eventSet : g_Level.EventSets)
 			{
 				if (eventSet.Name == name)
 				{
-					lastEventSet = &eventSet;
+					lastEventSetPtr = &eventSet;
 					break;
 				}
 			}
 		}
 
-		if (lastEventSet != nullptr)
+		if (lastEventSetPtr != nullptr)
 		{
-			HandleEvent(lastEventSet->Events[(int)type], activator);
+			HandleEvent(lastEventSetPtr->Events[(int)eventType], activator);
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+	
+		return false;
 	}
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator)

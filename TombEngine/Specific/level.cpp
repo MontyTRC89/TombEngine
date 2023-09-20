@@ -1001,8 +1001,8 @@ void LoadEventSets()
 		eventSet.Name = ReadString();
 		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		for (int e = 0; e < (int)VolumeEventType::Count; e++)
-			LoadEvent(eventSet.Events[e]);
+		for (int eventType = 0; eventType < (int)VolumeEventType::Count; eventType++)
+			LoadEvent(eventSet.Events[eventType]);
 
 		g_Level.EventSets.push_back(eventSet);
 	}

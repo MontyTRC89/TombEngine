@@ -25,6 +25,7 @@ namespace TEN::Control::Volumes
 		Enter,
 		Inside,
 		Leave,
+
 		Count
 	};
 
