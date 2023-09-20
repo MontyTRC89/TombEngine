@@ -51,6 +51,11 @@ static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
 static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
 static constexpr char ScriptReserved_PostControlPhase[] = "POSTCONTROLPHASE";
 
+// Event types
+static constexpr char ScriptReserved_OnEnter[]	= "ENTER";
+static constexpr char ScriptReserved_OnInside[] = "INSIDE";
+static constexpr char ScriptReserved_OnLeave[]	= "LEAVE";
+
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
 static constexpr char ScriptReserved_Init[]					= "Init";
@@ -230,6 +235,7 @@ static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 
 static constexpr char ScriptReserved_AddCallback[]					= "AddCallback";
 static constexpr char ScriptReserved_RemoveCallback[]				= "RemoveCallback";
+static constexpr char ScriptReserved_HandleEvent[]					= "HandleEvent";
 
 static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
@@ -280,6 +286,7 @@ static constexpr char ScriptReserved_RoomReverb[]				= "RoomReverb";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
 static constexpr char ScriptReserved_CallbackPoint[]			= "CallbackPoint";
 static constexpr char ScriptReserved_EndReason[]				= "EndReason";
+static constexpr char ScriptReserved_EventType[]				= "EventType";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";
