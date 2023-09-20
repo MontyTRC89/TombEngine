@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_Info.h"
+#include "Objects/Generic/Object/Pushables/Info.h"
 
 namespace TEN::Entities::Generic
 {

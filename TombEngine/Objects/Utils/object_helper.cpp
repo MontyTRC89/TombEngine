@@ -7,7 +7,7 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
+#include "Objects/Generic/Object/Pushables/BridgeCollision.h"
 #include "Specific/level.h"
 
 void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::string& baseName, const std::string& requiredName)

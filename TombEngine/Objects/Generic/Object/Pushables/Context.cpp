@@ -1,12 +1,12 @@
 #include "framework.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
+#include "Objects/Generic/Object/Pushables/Context.h"
 
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_Stack.h"
+#include "Objects/Generic/Object/Pushables/BridgeCollision.h"
+#include "Objects/Generic/Object/Pushables/Stack.h"
 #include "Specific/Input/Input.h"
 
 #include "Specific/level.h"
@@ -55,7 +55,7 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	bool IsPushableObjectMoveAllowed(int itemNumber, Vector3i targetPos, int targetRoom)
+	bool IsPushableObjectMoveAllowed(int itemNumber, const Vector3i& targetPos, int targetRoom)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
@@ -146,7 +146,7 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	bool IsValidForLara(int itemNumber)
+	bool IsValidForPlayer(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 
@@ -305,7 +305,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		//If player is pulling, is there space for Lara?
-		if (hasPullAction && !IsValidForLara(itemNumber))
+		if (hasPullAction && !IsValidForPlayer(itemNumber))
 			return false;
 
 

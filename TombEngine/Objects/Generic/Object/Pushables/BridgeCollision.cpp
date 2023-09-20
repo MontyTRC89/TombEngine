@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
+#include "Objects/Generic/Object/Pushables/BridgeCollision.h"
 
 #include "Game/collision/floordata.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"

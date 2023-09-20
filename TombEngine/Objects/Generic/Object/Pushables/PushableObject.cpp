@@ -7,12 +7,12 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_BridgeCol.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_Info.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_Physics.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_Scans.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_Sounds.h"
-#include "Objects/Generic/Object/Pushables/PushableObject_Stack.h"
+#include "Objects/Generic/Object/Pushables/BridgeCollision.h"
+#include "Objects/Generic/Object/Pushables/Info.h"
+#include "Objects/Generic/Object/Pushables/States.h"
+#include "Objects/Generic/Object/Pushables/Context.h"
+#include "Objects/Generic/Object/Pushables/PushableSound.h"
+#include "Objects/Generic/Object/Pushables/Stack.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -98,7 +98,7 @@ namespace TEN::Entities::Generic
 		if (Lara.Context.InteractedItem == itemNumber && Lara.Control.IsMoving)
 			return;
 
-		// Call state handler function based current state. Functions defined in PushableObject_Physics class.
+		// Call state handler function based current state. Functions defined in States class.
 		auto stateHandlerIterator = PUSHABLE_STATE_MAP.find(pushable.BehaviourState);
 		if (stateHandlerIterator != PUSHABLE_STATE_MAP.end())
 		{
