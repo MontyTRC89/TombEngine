@@ -274,118 +274,21 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
 		}
-		else
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_STOP;
-		}
-
-		player.Control.HandStatus = HandStatus::Busy;
-		return;
-	}
-
-	player.Control.HandStatus = HandStatus::Free;
-	item->Animation.TargetState = LS_JUMP_BACK;
-}
-
-// State:	  LS_HORIZONTAL_BAR_SWING_STOP (190)
-// Collision: lara_default_col()
-void lara_as_horizontal_bar_swing_stop(ItemInfo* item, CollisionInfo* coll)
-{
-	auto& player = GetLaraInfo(*item);
-
-	if (IsHeld(In::Action))
-	{
-		if (IsHeld(In::Forward))
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
-		}
-		else if (IsHeld(In::Roll) || IsHeld(In::Back))
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
-		}
-
-		player.Control.HandStatus = HandStatus::Busy;
-		return;
-	}
-
-	player.Control.HandStatus = HandStatus::Free;
-	item->Animation.TargetState = LS_JUMP_BACK;
-}
-
-// State:	  LS_HORIZONTAL_BAR_IDLE (191)
-// Collision: lara_default_col()
-void lara_as_horizontal_bar_idle(ItemInfo* item, CollisionInfo* coll)
-{
-	auto& player = GetLaraInfo(*item);
-
-	if (IsHeld(In::Action))
-	{
-		if (IsHeld(In::Forward))
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_START;
-		}
-		else if (IsHeld(In::Roll) || IsHeld(In::Back))
-		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
-		}
-
-		player.Control.HandStatus = HandStatus::Busy;
-		return;
-	}
-
-	player.Control.HandStatus = HandStatus::Free;
-	item->Animation.TargetState = LS_JUMP_BACK;
-}
-
-// State:	  LS_HORIZONTAL_BAR_SWING_START (192)
-// Collision: lara_default_col()
-void lara_as_horizontal_bar_swing_start(ItemInfo* item, CollisionInfo* coll)
-{
-	auto& player = GetLaraInfo(*item);
-
-	if (IsHeld(In::Action))
-	{
-		if (IsHeld(In::Forward))
+		else if (IsHeld(In::Forward))
 		{
 			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
 		}
 		else
 		{
-			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_STOP;
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE;
 		}
 
 		player.Control.HandStatus = HandStatus::Busy;
 		return;
 	}
 
+	item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE;
 	player.Control.HandStatus = HandStatus::Free;
-	item->Animation.TargetState = LS_JUMP_BACK;
-}
-
-// State:	  LS_HORIZONTAL_BAR_IDLE_TURN_180 (193)
-// Collision: lara_default_col()
-void lara_as_horizontal_bar_idle_turn_180(ItemInfo* item, CollisionInfo* coll)
-{
-	auto& player = GetLaraInfo(*item);
-
-	if (IsHeld(In::Action))
-	{
-		player.Control.HandStatus = HandStatus::Busy;
-		item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE;
-		return;
-	}
-
-	player.Control.HandStatus = HandStatus::Free;
-	item->Animation.TargetState = LS_JUMP_BACK;
-}
-
-// State:	  LS_HORIZONTAL_BAR_SWING_TURN_180 (194)
-// Collision: lara_default_col()
-void lara_as_horizontal_bar_swing_turn_180(ItemInfo* item, CollisionInfo* coll)
-{
-	auto& player = GetLaraInfo(*item);
-
-	player.Control.HandStatus = HandStatus::Busy;
 }
 
 // State:	  LS_HORIZONTAL_BAR_JUMP (129)
@@ -404,7 +307,7 @@ void lara_as_horizontal_bar_jump(ItemInfo* item, CollisionInfo* coll)
 		{
 			dist = (barItem.TriggerFlags / 100) - 2;
 		}
-		else
+		else if (IsHeld(In::Roll) || IsHeld(In::Back))
 		{
 			dist = (barItem.TriggerFlags % 100) - 2;
 		}
@@ -421,6 +324,61 @@ void lara_as_horizontal_bar_jump(ItemInfo* item, CollisionInfo* coll)
 		TranslateItem(item, item->Pose.Orientation, 700);
 		item->Pose.Position.y -= 361;
 	}
+}
+
+// State:	  LS_HORIZONTAL_BAR_IDLE (190)
+// Collision: lara_default_col()
+void lara_as_horizontal_bar_idle(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	if (IsHeld(In::Action))
+	{
+		if (IsHeld(In::Forward) || IsHeld(In::Jump))
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING;
+		}
+		else if (IsHeld(In::Roll) || IsHeld(In::Back))
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
+		}
+		else
+		{
+			item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE;
+		}
+
+		player.Control.HandStatus = HandStatus::Busy;
+		return;
+	}
+
+	item->Animation.TargetState = LS_JUMP_UP;
+	player.Control.HandStatus = HandStatus::Free;
+}
+
+// State:	  LS_HORIZONTAL_BAR_IDLE_TURN_180 (191)
+// Collision: lara_default_col()
+void lara_as_horizontal_bar_idle_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	if (IsHeld(In::Action))
+	{
+		item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
+		player.Control.HandStatus = HandStatus::Busy;
+		return;
+	}
+
+	item->Animation.TargetState = LS_JUMP_UP;
+	player.Control.HandStatus = HandStatus::Free;
+}
+
+// State:	  LS_HORIZONTAL_BAR_SWING_TURN_180 (192)
+// Collision: lara_default_col()
+void lara_as_horizontal_bar_swing_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.HandStatus = HandStatus::Busy;
 }
 
 // ---------

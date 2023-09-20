@@ -126,54 +126,73 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 
 void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* barItem = &g_Level.Items[itemNumber];
+	static const auto HORIZONTAL_BAR_STATES = std::vector<int>
+	{
+		LS_HORIZONTAL_BAR_SWING,
+		LS_HORIZONTAL_BAR_JUMP,
+		LS_HORIZONTAL_BAR_IDLE,
+		LS_HORIZONTAL_BAR_IDLE_TURN_180,
+		LS_HORIZONTAL_BAR_SWING_TURN_180
+	};
 
-	if (TrInput & IN_ACTION &&
+	auto& barItem = g_Level.Items[itemNumber];
+	auto& player = GetLaraInfo(*laraItem);
+
+	if (IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_REACH &&
 		laraItem->Animation.AnimNumber == LA_REACH &&
-		laraInfo->Control.HandStatus == HandStatus::Free)
+		player.Control.HandStatus == HandStatus::Free)
 	{
-		int test1 = TestLaraPosition(ParallelBarsBounds, barItem, laraItem);
-		int test2 = 0;
+		bool test1 = TestLaraPosition(ParallelBarsBounds, &barItem, laraItem);
+		bool test2 = false;
 		if (!test1)
 		{
-			barItem->Pose.Orientation.y += -ANGLE(180.0f);
-			test2 = TestLaraPosition(ParallelBarsBounds, barItem, laraItem);
-			barItem->Pose.Orientation.y += -ANGLE(180);
+			barItem.Pose.Orientation.y += ANGLE(-180.0f);
+			test2 = TestLaraPosition(ParallelBarsBounds, &barItem, laraItem);
+			barItem.Pose.Orientation.y += ANGLE(-180.0f);
 		}
 
 		if (test1 || test2)
 		{
-			laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-			laraItem->Animation.AnimNumber = LA_SWINGBAR_GRAB;
-			laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
-			laraItem->Animation.Velocity.y = false;
+			SetAnimation(laraItem, 507);
+			ResetPlayerFlex(laraItem);
+			laraItem->Animation.Velocity.y = 0.0f;
 			laraItem->Animation.IsAirborne = false;
 
-			ResetPlayerFlex(barItem);
-
 			if (test1)
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y;
+			{
+				laraItem->Pose.Orientation.y = barItem.Pose.Orientation.y;
+			}
 			else
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y - ANGLE(180.0f);
+			{
+				laraItem->Pose.Orientation.y = barItem.Pose.Orientation.y - ANGLE(180.0f);
+			}
 
 			auto pos1 = GetJointPosition(laraItem, LM_LHAND, Vector3i(0, -128, 512));
 			auto pos2 = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, -128, 512));
 		
 			if (laraItem->Pose.Orientation.y & 0x4000)
-				laraItem->Pose.Position.x += barItem->Pose.Position.x - ((pos1.x + pos2.x) >> 1);
+			{
+				laraItem->Pose.Position.x += barItem.Pose.Position.x - ((pos1.x + pos2.x) >> 1);
+			}
 			else
-				laraItem->Pose.Position.z += barItem->Pose.Position.z - ((pos1.z + pos2.z) / 2);
-			laraItem->Pose.Position.y += barItem->Pose.Position.y - ((pos1.y + pos2.y) / 2);
+			{
+				laraItem->Pose.Position.z += barItem.Pose.Position.z - ((pos1.z + pos2.z) / 2);
+			}
 
-			laraInfo->Context.InteractedItem = itemNumber;
+			laraItem->Pose.Position.y += barItem.Pose.Position.y - ((pos1.y + pos2.y) / 2);
+
+			player.Context.InteractedItem = itemNumber;
 		}
 		else
+		{
 			ObjectCollision(itemNumber, laraItem, coll);
+		}
 	}
-	else if (laraItem->Animation.ActiveState != LS_HORIZONTAL_BAR_SWING)
+	else if (!TestState(laraItem->Animation.ActiveState, HORIZONTAL_BAR_STATES))
+	{
 		ObjectCollision(itemNumber, laraItem, coll);
+	}
 }
 
 void CutsceneRopeControl(short itemNumber) 

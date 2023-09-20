@@ -19,6 +19,7 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 
 using namespace TEN::Control::Volumes;
@@ -157,13 +158,7 @@ void ItemInfo::ResetModelToDefault()
 
 bool TestState(int refState, const vector<int>& stateList)
 {
-	for (const auto& state : stateList)
-	{
-		if (state == refState)
-			return true;
-	}
-
-	return false;
+	return TEN::Utils::Contains(stateList, refState);
 }
 
 static void GameScriptHandleKilled(short itemNumber, bool destroyed)

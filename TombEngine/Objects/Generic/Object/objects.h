@@ -8,7 +8,9 @@ void SmashObjectControl(short itemNumber);
 void ControlAnimatingSlots(short itemNumber);
 void ControlTriggerTriggerer(short itemNumber);
 void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+
 void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+
 void CutsceneRopeControl(short itemNumber);
 void HybridCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void InitializeSmashObject(short itemNumber);

@@ -244,11 +244,9 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,
 	lara_as_null,
 	lara_as_use_puzzle,//189
-	lara_as_horizontal_bar_swing_stop,//190
-	lara_as_horizontal_bar_idle,//191
-	lara_as_horizontal_bar_swing_start,//192
-	lara_as_horizontal_bar_idle_turn_180,//193
-	lara_as_horizontal_bar_swing_turn_180,//194
+	lara_as_horizontal_bar_idle,//190
+	lara_as_horizontal_bar_idle_turn_180,//191
+	lara_as_horizontal_bar_swing_turn_180,//192
 };
 
 std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -446,8 +444,6 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_default_col,//190
 	lara_default_col,//191
 	lara_default_col,//192
-	lara_default_col,//193
-	lara_default_col,//194
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
