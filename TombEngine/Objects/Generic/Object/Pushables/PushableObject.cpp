@@ -46,8 +46,8 @@ namespace TEN::Entities::Generic
 
 	std::vector<PushableAnimationInfo> PushableAnimInfos =
 	{
-		{ LA_PUSHABLE_OBJECT_PULL, LA_PUSHABLE_OBJECT_PUSH, LA_PUSHABLE_OBJECT_EDGE_SLIP, true }, // TR4-TR5 animations.
-		{ LA_PUSHABLE_CLASSIC_PULL, LA_PUSHABLE_CLASSIC_PUSH, LA_PUSHABLE_BLOCK_EDGE_SLIP, false } // TR1-TR3 animations.
+		{ LA_PUSHABLE_OBJECT_PULL, LA_PUSHABLE_OBJECT_PUSH, LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP, true }, // TR4-TR5 animations.
+		{ LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP, false } // TR1-TR3 animations.
 	};
 
 	void InitializePushableBlock(int itemNumber)
