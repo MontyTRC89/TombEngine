@@ -28,7 +28,7 @@ namespace TEN::Entities::Generic
 				SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.WaterSurfaceHeight, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 			
 			if (std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES_SOUNDS) <= 0.0f)
-				pushable.SoundState = PushableSoundState::WaterRipples;
+				pushable.SoundState = PushableSoundState::Wade;
 		}
 	}
 

@@ -60,7 +60,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		pushable.isOnEdge = false;
+		pushable.IsOnEdge = false;
 
 		auto pointColl = GetCollision(targetPos.x, targetPos.y, targetPos.z, targetRoom);
 
@@ -80,7 +80,7 @@ namespace TEN::Entities::Generic
 			else
 			{
 				//Is a gap
-				pushable.isOnEdge = true;
+				pushable.IsOnEdge = true;
 				if (!pushable.CanFall || pushable.StackUpperItem != NO_ITEM)
 				{
 					return false;
@@ -254,8 +254,8 @@ namespace TEN::Entities::Generic
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
 		auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; //0 North, 1 East, 2 South or 3 West.
 
-		if ((hasPushAction && !pushableSidesAttributes.Pushable) ||
-			(hasPullAction && !pushableSidesAttributes.Pullable))
+		if ((hasPushAction && !pushableSidesAttributes.IsPushable) ||
+			(hasPullAction && !pushableSidesAttributes.IsPullable))
 			return false;
 
 		//Cond 3: Is its stacked pushables under the limit?

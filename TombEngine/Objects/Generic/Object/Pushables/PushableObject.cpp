@@ -110,7 +110,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// Play sound effects.
-		PushablesManageSounds(itemNumber, pushable);
+		HandlePushableSounds(itemNumber, pushable);
 
 		// Update room number.
 		AddBridgePushableStack(itemNumber, false);
@@ -123,13 +123,11 @@ namespace TEN::Entities::Generic
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 		}
 	}
-	
+
+	// If player is holding Action, initiates object interaction.
+	// Otherwise, activates normal object collision.
 	void PushableBlockCollision(int itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		//This function does two actions:
-		//- if Lara is pressing Action, then it start to align her and eventually activating her grabbing animation.
-		//- Otherwise, this code just activates the normal object collision.
-
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 		auto& player = *GetLaraInfo(laraItem);
@@ -146,7 +144,7 @@ namespace TEN::Entities::Generic
 			player.Control.HandStatus == HandStatus::Free &&
 			IsPushableValid(itemNumber)) &&
 			pushable.BehaviourState == PushableState::Idle && 
-			(pushableSidesAttributes.Pushable || pushableSidesAttributes.Pullable) || // Player can interact with this side.
+			(pushableSidesAttributes.IsPushable || pushableSidesAttributes.IsPullable) || // Player can interact with this side.
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber)) // Player already interacting.
 		{
 			// Set pushable bounds.
@@ -236,10 +234,10 @@ namespace TEN::Entities::Generic
 		return heightWorldAligned;
 	}
 
-	void SetPushableStopperFlag(bool value, Vector3i& pos, int roomNumber)
+	void SetPushableStopperFlag(bool isStopper, const Vector3i& pos, int roomNumber)
 	{
 		auto pointColl = GetCollision(pos, roomNumber);
-		pointColl.Block->Stopper = value; 
+		pointColl.Block->Stopper = isStopper; 
 
 		// TODO: There is a problem, it also has to set/reset the flag in the flipped room.
 		// Because when flipmaps happens, it forgets about the old flag.

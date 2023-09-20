@@ -688,21 +688,21 @@ bool SaveGame::Save(int slot)
 
 			pushableBuilder.add_pushable_collider_flag(pushable->BridgeColliderFlag);
 
-			pushableBuilder.add_pushable_north_pullable(pushable->SidesMap[0].Pullable);
-			pushableBuilder.add_pushable_north_pushable(pushable->SidesMap[0].Pushable);
-			pushableBuilder.add_pushable_north_climbable(pushable->SidesMap[0].Climbable);
+			pushableBuilder.add_pushable_north_pullable(pushable->SidesMap[0].IsPullable);
+			pushableBuilder.add_pushable_north_pushable(pushable->SidesMap[0].IsPushable);
+			pushableBuilder.add_pushable_north_climbable(pushable->SidesMap[0].IsClimbable);
 
-			pushableBuilder.add_pushable_east_pullable(pushable->SidesMap[1].Pullable);
-			pushableBuilder.add_pushable_east_pushable(pushable->SidesMap[1].Pushable);
-			pushableBuilder.add_pushable_east_climbable(pushable->SidesMap[1].Climbable);
+			pushableBuilder.add_pushable_east_pullable(pushable->SidesMap[1].IsPullable);
+			pushableBuilder.add_pushable_east_pushable(pushable->SidesMap[1].IsPushable);
+			pushableBuilder.add_pushable_east_climbable(pushable->SidesMap[1].IsClimbable);
 
-			pushableBuilder.add_pushable_south_pullable(pushable->SidesMap[2].Pullable);
-			pushableBuilder.add_pushable_south_pushable(pushable->SidesMap[2].Pushable);
-			pushableBuilder.add_pushable_south_climbable(pushable->SidesMap[2].Climbable);
+			pushableBuilder.add_pushable_south_pullable(pushable->SidesMap[2].IsPullable);
+			pushableBuilder.add_pushable_south_pushable(pushable->SidesMap[2].IsPushable);
+			pushableBuilder.add_pushable_south_climbable(pushable->SidesMap[2].IsClimbable);
 
-			pushableBuilder.add_pushable_west_pullable(pushable->SidesMap[3].Pullable);
-			pushableBuilder.add_pushable_west_pushable(pushable->SidesMap[3].Pushable);
-			pushableBuilder.add_pushable_west_climbable(pushable->SidesMap[3].Climbable);
+			pushableBuilder.add_pushable_west_pullable(pushable->SidesMap[3].IsPullable);
+			pushableBuilder.add_pushable_west_pushable(pushable->SidesMap[3].IsPushable);
+			pushableBuilder.add_pushable_west_climbable(pushable->SidesMap[3].IsClimbable);
 
 			pushableOffset = pushableBuilder.Finish();
 		}
@@ -1802,21 +1802,21 @@ bool SaveGame::Load(int slot)
 
 			pushable->BridgeColliderFlag = savedPushable->pushable_collider_flag();
 
-			pushable->SidesMap[0].Pullable = savedPushable->pushable_north_pullable();
-			pushable->SidesMap[0].Pushable = savedPushable->pushable_north_pushable();
-			pushable->SidesMap[0].Climbable = savedPushable->pushable_north_climbable();
+			pushable->SidesMap[0].IsPullable = savedPushable->pushable_north_pullable();
+			pushable->SidesMap[0].IsPushable = savedPushable->pushable_north_pushable();
+			pushable->SidesMap[0].IsClimbable = savedPushable->pushable_north_climbable();
 
-			pushable->SidesMap[1].Pullable = savedPushable->pushable_east_pullable();
-			pushable->SidesMap[1].Pushable = savedPushable->pushable_east_pushable();
-			pushable->SidesMap[1].Climbable = savedPushable->pushable_east_climbable();
+			pushable->SidesMap[1].IsPullable = savedPushable->pushable_east_pullable();
+			pushable->SidesMap[1].IsPushable = savedPushable->pushable_east_pushable();
+			pushable->SidesMap[1].IsClimbable = savedPushable->pushable_east_climbable();
 
-			pushable->SidesMap[2].Pullable = savedPushable->pushable_south_pullable();
-			pushable->SidesMap[2].Pushable = savedPushable->pushable_south_pushable();
-			pushable->SidesMap[2].Climbable = savedPushable->pushable_south_climbable();
+			pushable->SidesMap[2].IsPullable = savedPushable->pushable_south_pullable();
+			pushable->SidesMap[2].IsPushable = savedPushable->pushable_south_pushable();
+			pushable->SidesMap[2].IsClimbable = savedPushable->pushable_south_climbable();
 
-			pushable->SidesMap[3].Pullable = savedPushable->pushable_west_pullable();
-			pushable->SidesMap[3].Pushable = savedPushable->pushable_west_pushable();
-			pushable->SidesMap[3].Climbable = savedPushable->pushable_west_climbable();
+			pushable->SidesMap[3].IsPullable = savedPushable->pushable_west_pullable();
+			pushable->SidesMap[3].IsPushable = savedPushable->pushable_west_pushable();
+			pushable->SidesMap[3].IsClimbable = savedPushable->pushable_west_climbable();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{

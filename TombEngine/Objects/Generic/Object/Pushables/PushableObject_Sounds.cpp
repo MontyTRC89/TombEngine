@@ -6,7 +6,7 @@
 
 namespace TEN::Entities::Generic
 {
-	PushableSoundData GetPushableSfxData(const MaterialType material)
+	PushableSoundData GetPushableSoundData(MaterialType material)
 	{
 		static const PushableSoundData SOUND_DATA_DEFAULT =
 		{
@@ -44,7 +44,7 @@ namespace TEN::Entities::Generic
 		return SOUND_DATA_DEFAULT;
 	}
 
-	int GetPushableSfx(PushableSoundType soundType, const Vector3i& pos, const short roomNumber)
+	int GetPushableSound(PushableSoundType soundType, const Vector3i& pos, const short roomNumber)
 	{
 		auto pointColl = GetCollision(pos);
 		auto material = pointColl.BottomBlock->Material;
@@ -52,13 +52,13 @@ namespace TEN::Entities::Generic
 		switch (soundType)
 		{
 		case PushableSoundType::Loop:
-			return GetPushableSfxData(material).LoopSfx;
+			return GetPushableSoundData(material).LoopSfx;
 
 		case PushableSoundType::Stop:
-			return GetPushableSfxData(material).StopSfx;
+			return GetPushableSoundData(material).StopSfx;
 
 		case PushableSoundType::Fall:
-			return GetPushableSfxData(material).LandSfx;
+			return GetPushableSoundData(material).LandSfx;
 		
 		default:
 			TENLog("Missing pushable sfx.", LogLevel::Error, LogConfig::All, true);
@@ -66,25 +66,25 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void PushablesManageSounds(int itemNumber, PushableInfo& pushable)
+	void HandlePushableSounds(int itemNumber, PushableInfo& pushable)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		
-		if (pushable.SoundState == PushableSoundState::Moving)
+		if (pushable.SoundState == PushableSoundState::Move)
 		{
-			SoundEffect(GetPushableSfx(Loop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
+			SoundEffect(GetPushableSound(Loop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
 		}
-		else if (pushable.SoundState == PushableSoundState::Stopping)
-		{
-			pushable.SoundState = PushableSoundState::None;
-			SoundEffect(GetPushableSfx(Stop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
-		}
-		else if (pushable.SoundState == PushableSoundState::Falling)
+		else if (pushable.SoundState == PushableSoundState::Stop)
 		{
 			pushable.SoundState = PushableSoundState::None;
-			SoundEffect(GetPushableSfx(Fall, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
+			SoundEffect(GetPushableSound(Stop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
 		}
-		else if (pushable.SoundState == PushableSoundState::WaterRipples)
+		else if (pushable.SoundState == PushableSoundState::Fall)
+		{
+			pushable.SoundState = PushableSoundState::None;
+			SoundEffect(GetPushableSound(Fall, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
+		}
+		else if (pushable.SoundState == PushableSoundState::Wade)
 		{
 			pushable.SoundState = PushableSoundState::None;
 			SoundEffect(SFX_TR4_LARA_WADE, &pushableItem.Pose, SoundEnvironment::Always);

@@ -78,7 +78,7 @@ namespace TEN::Entities::Generic
 				// Pushing.
 				if (IsHeld(In::Forward))
 				{
-					int pushAnimNumber = (pushable.isOnEdge) ? 
+					int pushAnimNumber = (pushable.IsOnEdge) ? 
 						PushableAnimInfos[pushable.AnimationSystemIndex].EdgeAnimNumber :
 						PushableAnimInfos[pushable.AnimationSystemIndex].PushAnimNumber;
 					SetAnimation(LaraItem, pushAnimNumber);
@@ -207,8 +207,8 @@ namespace TEN::Entities::Generic
 		int displaceBox = GameBoundingBox(LaraItem).Z2;
 
 
-		if (pushable.SoundState == PushableSoundState::Moving)
-			pushable.SoundState = PushableSoundState::Stopping;
+		if (pushable.SoundState == PushableSoundState::Move)
+			pushable.SoundState = PushableSoundState::Stop;
 
 		displaceDepth = GetLastFrame(GAME_OBJECT_ID::ID_LARA, LaraItem->Animation.AnimNumber)->BoundingBox.Z2;
 		
@@ -218,7 +218,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			if (pushable.isOnEdge)
+			if (pushable.IsOnEdge)
 			{
 				displaceBox -= (displaceDepth - BLOCK(0.5f));
 			}
@@ -265,7 +265,7 @@ namespace TEN::Entities::Generic
 
 
 			int travelledDistance = Vector3i::Distance(pushableItem.Pose.Position, pushable.StartPos.ToVector3i());
-			if (pushable.isOnEdge && travelledDistance >= BLOCK(0.5f))
+			if (pushable.IsOnEdge && travelledDistance >= BLOCK(0.5f))
 			{
 				pushable.BehaviourState = PushableState::EdgeFall;
 				return;
@@ -281,7 +281,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == SOUTH && pushableItem.Pose.Position.z < newPosZ))
 				{
 					pushableItem.Pose.Position.z = newPosZ;
-					pushable.SoundState = PushableSoundState::Moving;
+					pushable.SoundState = PushableSoundState::Move;
 				}
 			}
 			else
@@ -290,7 +290,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == SOUTH && pushableItem.Pose.Position.z > newPosZ))
 				{
 					pushableItem.Pose.Position.z = newPosZ;
-					pushable.SoundState = PushableSoundState::Moving;
+					pushable.SoundState = PushableSoundState::Move;
 				}
 			}
 
@@ -301,7 +301,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == WEST && pushableItem.Pose.Position.x < newPosX))
 				{
 					pushableItem.Pose.Position.x = newPosX;
-					pushable.SoundState = PushableSoundState::Moving;
+					pushable.SoundState = PushableSoundState::Move;
 				}
 			}
 			else
@@ -310,7 +310,7 @@ namespace TEN::Entities::Generic
 					(quadrantDir == WEST && pushableItem.Pose.Position.x > newPosX))
 				{
 					pushableItem.Pose.Position.x = newPosX;
-					pushable.SoundState = PushableSoundState::Moving;
+					pushable.SoundState = PushableSoundState::Move;
 				}
 			}
 
@@ -362,10 +362,10 @@ namespace TEN::Entities::Generic
 					int FoundStack = SearchNearPushablesStack(itemNumber);
 					StackPushable(itemNumber, FoundStack);
 
-					pushable.SoundState = PushableSoundState::Stopping;
+					pushable.SoundState = PushableSoundState::Stop;
 
 				}
-				else if (LaraItem->Animation.ActiveState == LS_PUSHABLE_PUSH && pushable.isOnEdge)
+				else if (LaraItem->Animation.ActiveState == LS_PUSHABLE_PUSH && pushable.IsOnEdge)
 				{
 					LaraItem->Animation.TargetState = LS_PUSHABLE_EDGE;
 
@@ -373,11 +373,11 @@ namespace TEN::Entities::Generic
 					movementDirection.Normalize();
 					LaraItem->Pose.Position = LaraItem->Pose.Position + movementDirection * BLOCK(1);
 				}
-				//Otherwise, Lara continues the pushing/pull animation movement.
+				//Otherwise, player continues the pushing/pull animation movement.
 				break;
 
 			case PushableEnvironmentState::Air:
-				// It's now in the air, Lara can't keep pushing nor pulling. And pushable starts to fall.
+				// It's now in the air, player can't keep pushing nor pulling. And pushable starts to fall.
 				LaraItem->Animation.TargetState = LS_IDLE;
 				Lara.Context.InteractedItem = NO_ITEM;
 				pushable.BehaviourState = PushableState::Fall;
@@ -408,6 +408,8 @@ namespace TEN::Entities::Generic
 
 	void HandleEdgeFallState(int itemNumber)
 	{
+		constexpr auto LEAN_ANGLE_MAX = ANGLE(40.0f);
+
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
@@ -420,9 +422,9 @@ namespace TEN::Entities::Generic
 		moveDir.Normalize();
 
 		// Define origin and target.
-		auto origin = pushable.StartPos.ToVector3() + (moveDir * 512);
-		auto target = pushable.StartPos.ToVector3() + (moveDir * 1024);
-		target.y = pushable.StartPos.y + 1024;
+		auto origin = pushable.StartPos.ToVector3() + (moveDir * BLOCK(0.5f));
+		auto target = pushable.StartPos.ToVector3() + (moveDir * BLOCK(1));
+		target.y = pushable.StartPos.y + BLOCK(1);
 
 		// Calculate current position based on interpolation
 		auto currentPos = pushableItem.Pose.Position.ToVector3();
@@ -435,9 +437,8 @@ namespace TEN::Entities::Generic
 			InterpolateCubic(origin.y, origin.y, target.y - 700, target.y, alpha),
 			InterpolateCubic(origin.z, origin.z, target.z, target.z, alpha));
 
-		// Calculate the orientation angle based on the movement direction
-		float leanAngleMax = 40.0f; // Maximum lean angle (60 degrees)
-		float leanAngle = ANGLE (leanAngleMax * alpha); // Gradually increase the lean angle
+		// Calculate lean angle based on movement direction.
+		float leanAngle = LEAN_ANGLE_MAX * alpha;
 
 		if (currentPos.y > floorHeight)
 		{
@@ -473,18 +474,18 @@ namespace TEN::Entities::Generic
 		pushableItem.Pose.Position = currentPos;
 		elapsedTime += DELTA_TIME;
 
-		// Manage Sound
+		// Handle sounds.
 		if (alpha <= 0.5f)
 		{
-			pushable.SoundState = PushableSoundState::Moving;
+			pushable.SoundState = PushableSoundState::Move;
 		}
 		else
 		{
-			if (pushable.SoundState == PushableSoundState::Moving)
-				pushable.SoundState = PushableSoundState::Stopping;
+			if (pushable.SoundState == PushableSoundState::Move)
+				pushable.SoundState = PushableSoundState::Stop;
 		}
 
-		//Check if the movement is completed.
+		// Check if movement is completed.
 		if (alpha >= 1.0f)
 		{
 			currentPos = GetNearestSectorCenter(pushableItem.Pose.Position).ToVector3();
@@ -494,7 +495,7 @@ namespace TEN::Entities::Generic
 			case PushableEnvironmentState::Air:
 				pushable.BehaviourState = PushableState::Fall;
 				pushableItem.Animation.Velocity.y = PUSHABLE_FALL_VELOCITY_MAX / 2;
-			break;
+				break;
 
 			case PushableEnvironmentState::Ground:
 			case PushableEnvironmentState::GroundWater:
@@ -508,7 +509,6 @@ namespace TEN::Entities::Generic
 				pushable.BehaviourState = PushableState::Sink;
 				pushableItem.Animation.Velocity.y = PUSHABLE_WATER_VELOCITY_MAX / 2;
 					
-				// Effect: Water splash.
 				DoPushableSplash(itemNumber);
 				break;
 
@@ -518,7 +518,7 @@ namespace TEN::Entities::Generic
 				break;
 
 			default:
-				TENLog("Error detecting the pushable environment state during the exit of MOVING EDGE state, with pushable ID: " + std::to_string(itemNumber), LogLevel::Warning, LogConfig::All, false);
+				TENLog("Error detecting pushable environment state during exit of MOVING EDGE state, for pushable with item number " + std::to_string(itemNumber), LogLevel::Warning, LogConfig::All);
 				break;
 			}			
 		}
@@ -537,14 +537,13 @@ namespace TEN::Entities::Generic
 		switch (envState)
 		{
 			case PushableEnvironmentState::Air:
-				//Is still falling...
+				//Is still falling.
 				pushableItem.Pose.Position.y += pushableItem.Animation.Velocity.y;
-				pushableItem.Animation.Velocity.y = std::min(	pushableItem.Animation.Velocity.y + pushable.Gravity,
-																PUSHABLE_FALL_VELOCITY_MAX);
+				pushableItem.Animation.Velocity.y = std::min(pushableItem.Animation.Velocity.y + pushable.Gravity, PUSHABLE_FALL_VELOCITY_MAX);
 
 				//Fixing orientation slowly:
 				PushableFallingOrientation(pushableItem);
-			break;
+				break;
 
 			case PushableEnvironmentState::Ground:
 			case PushableEnvironmentState::GroundWater:
@@ -565,13 +564,13 @@ namespace TEN::Entities::Generic
 				if (pushableItem.Animation.Velocity.y >= PUSHABLE_FALL_RUMBLE_VELOCITY)
 				{
 					FloorShake(&pushableItem);
-					pushable.SoundState = PushableSoundState::Falling;
+					pushable.SoundState = PushableSoundState::Fall;
 				}
 
 				//place on ground
 				pushable.BehaviourState = PushableState::Idle;
 				pushableItem.Pose.Position.y = floorHeight;
-				pushableItem.Animation.Velocity.y = 0;
+				pushableItem.Animation.Velocity.y = 0.0f;
 
 				ActivateClimbablePushableCollider(itemNumber);
 				break;
@@ -579,7 +578,7 @@ namespace TEN::Entities::Generic
 			case PushableEnvironmentState::Slope:
 				pushable.BehaviourState = PushableState::Slide;
 				pushableItem.Pose.Position.y = floorHeight;
-				pushableItem.Animation.Velocity.y = 0;
+				pushableItem.Animation.Velocity.y = 0.0f;
 				break;
 
 			case PushableEnvironmentState::Water:
@@ -591,9 +590,9 @@ namespace TEN::Entities::Generic
 				break;
 
 			default:
-				TENLog("Error detecting the pushable environment state during FALLING with pushable ID: " + std::to_string(itemNumber), LogLevel::Warning, LogConfig::All, false);
+				TENLog("Error detecting pushable environment state during FALLING for pushable with item number  " + std::to_string(itemNumber), LogLevel::Warning, LogConfig::All, false);
 				break;
-		}
+			}
 	}
 
 	void HandleSinkState(int itemNumber)
@@ -601,8 +600,8 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		int floorHeight;
-		PushableEnvironmentState envState = CheckPushableEnvironment(itemNumber, floorHeight);
+		int floorHeight = 0;
+		auto envState = CheckPushableEnvironment(itemNumber, floorHeight);
 
 		int FoundStack = NO_ITEM;
 

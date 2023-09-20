@@ -1,96 +1,56 @@
 #pragma once
-
+#include "Math/Math.h"
 #include "Objects/Generic/Object/Pushables/PushableObject_Physics.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
 {
-
 	enum class PushableSoundState
 	{
 		None,
-		Moving,
-		Stopping,
-		Falling,
-		WaterRipples
+		Move,
+		Stop,
+		Fall,
+		Wade
 	};
 
 	struct PushableSidesAttributes
 	{
-		bool Pullable = false;
-		bool Pushable = false;
-		bool Climbable = false;
+		bool IsPullable	 = false;
+		bool IsPushable	 = false;
+		bool IsClimbable = false;
 
-		PushableSidesAttributes()
-		{
-			Pullable = true;
-			Pushable = true;
-			Climbable = false;
-		}
-
-		PushableSidesAttributes(bool isPullable, bool isPushable, bool isClimbable)
-		{
-			Pullable = isPullable;
-			Pushable = isPushable;
-			Climbable = isClimbable;
-		}
+		PushableSidesAttributes();
+		PushableSidesAttributes(bool isPullable, bool isPushable, bool isClimbable);
 	};
 
 	struct PushableInfo
 	{
-		PushableSoundState	 SoundState		= PushableSoundState::None;
-		PushableState BehaviourState = PushableState::Idle;
+		PushableSoundState SoundState	  = PushableSoundState::None;
+		PushableState	   BehaviourState = PushableState::Idle;
 
-		int	  Height = 0;
-		bool isOnEdge = false;
-		float Gravity = 0.0f;
-		int WaterSurfaceHeight = 0;		//Used to spawn effects. (Like water ripples).
-		float FloatingForce = 0.0f;		// Oscillation strength while floating on water (recomended range: (0.0f - 2.0f]).
+		int	  Height			 = 0;
+		bool  IsOnEdge			 = false;
+		float Gravity			 = 0.0f;
+		int	  WaterSurfaceHeight = 0;	 // Used for spawning effects, e.g. water ripples.
+		float FloatingForce		 = 0.0f; // Oscillation strength on water surface. Recomended range: (0.0f, 2.0f].
 		
-		int StackLimit = 0;				// max of pushables that can be over it so Lara can move it.
-		int StackUpperItem = 0;			// the itemNumber of the pushable that is placed over it.
-		int StackLowerItem = 0;			// the itemNumber of the pushable that is placed under it.
-		int AnimationSystemIndex = 0;	// the index of the int PushableAnimationVector where are located the pull / push animation indices for this object.
+		int StackLimit			 = 0; // Max number of pushables in stack that can be pushed by player.
+		int StackUpperItem		 = 0; // Item number of pushable above.
+		int StackLowerItem		 = 0; // Item number of pushable below.
+		int AnimationSystemIndex = 0; // ???Index of the int PushableAnimationVector where are located the pull / push animation indices for this object.
 
 		GameVector StartPos = GameVector::Zero;	// XZ used by movement code, Y used to store water height level.
 
 		std::map<int, PushableSidesAttributes> SidesMap = {};
 
-		bool CanFall = false;			// OCB [0]: Can fall.
-		bool DoAlignCenter = false;		// OCB [1]: Player aligns to center when grabbing.
-		bool IsBuoyant = false;			// OCB [2]: Can float on water.
-		bool UsesRoomCollision = false; // Per Slot: Uses room collision or object collision.
+		bool CanFall			= false; // OCB 0.
+		bool DoAlignCenter		= false; // OCB 1.
+		bool IsBuoyant			= false; // OCB 2.
+		bool UsesRoomCollision	= false; // Use room collision or object collision. Per slot.
 		bool BridgeColliderFlag = false;
 
-		PushableInfo()
-		{
-			SoundState = PushableSoundState::None;
-			Height = BLOCK(1);
-
-			AnimationSystemIndex = 0;
-
-			Gravity = 8.0f;
-			BehaviourState = PushableState::Idle;
-			WaterSurfaceHeight = NO_HEIGHT;
-			FloatingForce = 0.75f;
-
-			StackLimit = 3;
-			StackUpperItem = -1;
-			StackLowerItem = -1;
-
-			CanFall = false;
-			DoAlignCenter = true;
-			IsBuoyant = false;
-			UsesRoomCollision = false;
-			BridgeColliderFlag = false;
-
-			SidesMap =
-			{
-				{ 0, PushableSidesAttributes() },	//NORTH
-				{ 1, PushableSidesAttributes() },	//EAST
-				{ 2, PushableSidesAttributes() },	//SOUTH
-				{ 3, PushableSidesAttributes() }	//WEST
-			};
-		}
-
+		PushableInfo();
 	};
 }
