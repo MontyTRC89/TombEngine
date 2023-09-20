@@ -232,15 +232,13 @@ namespace Misc
 
 	static bool CheckInput(int actionIndex)
 	{
-		if (actionIndex > ActionMap.size())
+		if (actionIndex > (int)ActionID::Count)
 		{
-			ScriptAssertF(false, "Key index {} does not exist", actionIndex);
+			ScriptAssertF(false, "Input action {} does not exist.", actionIndex);
 			return false;
 		}
-		else
-		{
-			return true;
-		}
+
+		return true;
 	}
 
 	static bool KeyIsHeld(int actionIndex)
@@ -251,7 +249,7 @@ namespace Misc
 		if (IsHeld((ActionID)actionIndex))
 			return true;
 
-		return (TrInput & (1 << actionIndex)) != 0;
+		return false;
 	}
 
 	static bool KeyIsHit(int actionIndex)
@@ -262,7 +260,7 @@ namespace Misc
 		if (IsClicked((ActionID)actionIndex))
 			return true;
 
-		return (DbInput & (1 << actionIndex)) != 0;
+		return false;
 	}
 
 	static void KeyPush(int actionIndex)
@@ -340,8 +338,8 @@ namespace Misc
 	//end
 	static std::tuple<int, int> PercentToScreen(double x, double y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.Width);
-		auto fHeight = static_cast<double>(g_Configuration.Height);
+		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
+		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
 		int resX = static_cast<int>(std::round(fWidth / 100.0 * x));
 		int resY = static_cast<int>(std::round(fHeight / 100.0 * y));
 		//todo this still assumes a resolution of 800/600. account for this somehow
@@ -357,8 +355,8 @@ namespace Misc
 	//@treturn float y coordinate as percentage
 	static std::tuple<double, double> ScreenToPercent(int x, int y)
 	{
-		auto fWidth = static_cast<double>(g_Configuration.Width);
-		auto fHeight = static_cast<double>(g_Configuration.Height);
+		auto fWidth = static_cast<double>(g_Configuration.ScreenWidth);
+		auto fHeight = static_cast<double>(g_Configuration.ScreenHeight);
 		double resX = x / fWidth * 100.0;
 		double resY = y / fHeight * 100.0;
 		return std::make_tuple(resX, resY);

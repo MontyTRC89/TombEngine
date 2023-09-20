@@ -9,6 +9,7 @@ namespace TEN::Renderer
 		Vector2 UV		 = Vector2::Zero;
 		Vector4 Color	 = Vector4::Zero;
 		Vector3 Tangent	 = Vector3::Zero;
+		Vector3 Binormal = Vector3::Zero;
 
 		unsigned int AnimationFrameOffset = 0;
 		Vector4		 Effects			  = Vector4::Zero;

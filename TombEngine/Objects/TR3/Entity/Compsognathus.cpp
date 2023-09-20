@@ -120,7 +120,7 @@ namespace TEN::Entities::Creatures::TR3
 				float shortestDistance = INFINITY;
 				for (auto& targetItem : g_Level.Items)
 				{
-					if (targetItem.ObjectNumber == NO_ITEM || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
+					if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
 						continue;
 
 					if (SameZone(creature, &targetItem))

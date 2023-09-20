@@ -27,6 +27,7 @@
 // Traps
 #include "Objects/TR1/Trap/DamoclesSword.h"
 #include "Objects/TR1/Trap/SlammingDoors.h"
+#include "Objects/TR1/Trap/SwingingBlade.h"
 
 using namespace TEN::Entities::Creatures::TR1;
 using namespace TEN::Entities::Traps::TR1;
@@ -105,7 +106,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 400;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
+		obj->LotType = LotType::Flyer;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y); // Torso
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y); // Head
 		obj->SetupHitEffect();
 	}
 
@@ -200,7 +203,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 0;
 		obj->radius = 102;
-		obj->HitPoints = 1;
+		obj->HitPoints = 200;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(1, ROT_Y);
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
@@ -215,7 +218,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 0;
-		obj->radius = 102;
+		obj->radius = 256;
 		obj->HitPoints = 125;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(7, ROT_Y); // Head.
@@ -226,7 +229,7 @@ static void StartEntity(ObjectInfo* obj)
 
 static void StartObject(ObjectInfo* obj)
 {
-	obj = &Objects[ID_BACON_REFERENCE];
+	obj = &Objects[ID_DOPPELGANGER_ORIGIN];
 	if (obj->loaded)
 	{
 		obj->collision = AIPickupCollision;
@@ -255,12 +258,22 @@ static void StartTrap(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->SetupHitEffect(true);
 	}
+
+	obj = &Objects[ID_SWINGING_BLADE];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeSwingingBlade;
+		obj->control = ControlSwingingBlade;
+		obj->collision = GenericSphereBoxCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->SetupHitEffect(true);
+	}
 }
 
 static void StartProjectiles(ObjectInfo* obj)
 {
 	InitProjectile(obj, ControlMissile, ID_PROJ_SHARD);
-	InitProjectile(obj, ControlMissile, ID_PROJ_NATLA);
+	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 }
 

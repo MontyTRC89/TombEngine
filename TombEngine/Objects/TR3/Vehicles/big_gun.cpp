@@ -93,7 +93,7 @@ namespace TEN::Entities::Vehicles
 		// TODO: If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
 		auto* lara = &Lara/* GetLaraInfo(laraItem)*/;
 
-		if (!(TrInput & IN_ACTION) ||
+		if (!IsHeld(In::Action) ||
 			lara->Control.HandStatus != HandStatus::Free ||
 			laraItem->Animation.IsAirborne)
 		{
@@ -188,11 +188,11 @@ namespace TEN::Entities::Vehicles
 			if (!bigGun->BarrelRotation)
 				bigGun->IsBarrelRotating = false;
 
-			if (TrInput & VEHICLE_IN_DISMOUNT || laraItem->HitPoints <= 0)
+			if (IsHeld(In::Brake) || laraItem->HitPoints <= 0)
 				bigGun->Flags = BGUN_FLAG_AUTO_ROT;
 			else
 			{
-				if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_FIRE) && !bigGun->FireCount)
+				if ((IsHeld(In::Accelerate) || IsHeld(In::Fire)) && !bigGun->FireCount)
 				{
 					BigGunFire(bigGunItem, laraItem);
 					bigGun->FireCount = BGUN_RECOIL_TIME;
@@ -200,7 +200,7 @@ namespace TEN::Entities::Vehicles
 					bigGun->IsBarrelRotating = true;
 				}
 
-				if (TrInput & VEHICLE_IN_UP)
+				if (IsHeld(In::Forward))
 				{
 					if (bigGun->TurnRate.x < 0)
 						bigGun->TurnRate.x /= 2;
@@ -209,7 +209,7 @@ namespace TEN::Entities::Vehicles
 					if (bigGun->TurnRate.x > (BGUN_TURN_RATE_MAX / 2))
 						bigGun->TurnRate.x = (BGUN_TURN_RATE_MAX / 2);
 				}
-				else if (TrInput & VEHICLE_IN_DOWN)
+				else if (IsHeld(In::Back))
 				{
 					if (bigGun->TurnRate.x > 0)
 						bigGun->TurnRate.x /= 2;
@@ -225,7 +225,7 @@ namespace TEN::Entities::Vehicles
 						bigGun->TurnRate.x = 0;
 				}
 
-				if (TrInput & VEHICLE_IN_LEFT)
+				if (IsHeld(In::Left))
 				{
 					if (bigGun->TurnRate.y > 0)
 						bigGun->TurnRate.y /= 2;
@@ -234,7 +234,7 @@ namespace TEN::Entities::Vehicles
 					if (bigGun->TurnRate.y < -BGUN_TURN_RATE_MAX)
 						bigGun->TurnRate.y = -BGUN_TURN_RATE_MAX;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT)
+				else if (IsHeld(In::Right))
 				{
 					if (bigGun->TurnRate.y < 0)
 						bigGun->TurnRate.y /= 2;

@@ -81,13 +81,15 @@ PixelShaderOutput PS(PixelShaderInput input)
 	uint mode = StaticMeshes[input.InstanceID].LightInfo.y;
 	uint numLights = StaticMeshes[input.InstanceID].LightInfo.x;
 
+	float3 normal = normalize(input.Normal);
+
 	float3 color = (mode == 0) ?
 		CombineLights(
 			StaticMeshes[input.InstanceID].AmbientLight.xyz,
 			input.Color.xyz,
 			tex.xyz, 
 			input.WorldPosition, 
-			normalize(input.Normal), 
+			normal, 
 			input.Sheen,
 			StaticMeshes[input.InstanceID].InstancedStaticLights,
 			numLights,

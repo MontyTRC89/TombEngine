@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string_view>
 
 #include "Scripting/Internal/LanguageScript.h"
@@ -15,25 +14,26 @@
 class FlowHandler : public ScriptInterfaceFlowHandler
 {
 private:
-	Settings				m_settings;
+	Settings m_settings;
 
-	std::unordered_map < std::string, std::vector<std::string > > m_translationsMap;
+	std::unordered_map<std::string, std::vector<std::string>> m_translationsMap;
 	std::vector<std::string> m_languageNames;
 
-	std::map<short, short>			m_itemsMap;
+	std::map<short, short> m_itemsMap;
 
 	std::string m_gameDir;
 
 	LuaHandler m_handler;
 
 public:
-	int								FogInDistance{ 0 };
-	int								FogOutDistance{ 0 };
-	bool							LevelSelect{ true };
-	bool							FlyCheat{ true };
-	bool							MassPickup{ true }; 
-	bool							LaraInTitle{ false };
-	bool							DebugMode{ false };
+	int	 FogInDistance{ 0 };
+	int	 FogOutDistance{ 0 };
+	bool LevelSelect{ true };
+	bool FlyCheat{ true };
+	bool PointFilter{ false };
+	bool MassPickup{ true }; 
+	bool LaraInTitle{ false };
+	bool DebugMode{ false };
 
 	// New animation flag table
 	Animations			Anims{};
@@ -66,6 +66,8 @@ public:
 	void		SetTotalSecretCount(int secretsNumber);
 	bool		IsFlyCheatEnabled() const;
 	void		EnableFlyCheat(bool flyCheat);
+	bool		IsPointFilterEnabled() const;
+	void		EnablePointFilter(bool pointFilter);
 	bool		IsMassPickupEnabled() const; 
 	void		EnableMassPickup(bool massPickup);
 	bool		IsLaraInTitleEnabled() const;

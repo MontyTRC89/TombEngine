@@ -1,33 +1,86 @@
+Version 1.1.1
+==============
+
+* Fix burning torch not working properly if there are more than 256 objects in a level.
+* Fix grenade and rocket projectiles smoke offset in certain directions.
+* Fix projectiles flying through animating objects.
+* Fix harpoon gun doing enormous damage on enemies.
+* Fix train death animation.
+* Fix TR1 wolf damage value inflicted on a close bite attack.
+* Fix TR1 bear various original AI issues.
+* Fix TR2 knife thrower AI.
+* Fix TR2 doberman crashing the game when killed by explosive weapons.
+* Fix volume change in settings not affecting voice track.
+* Fix several lighting bugs.
+* Overhaul look mode:
+ - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
+ - Improve movement and control.
+ - Re-enable looking while performing up jump, backward jump, or backward crawl.
+ - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+* Add swinging blade.
+* Add crumbling platform and add new OCBs for behaviour:
+ - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
+ - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
+ - A positive value results in activation via player collision.
+ - A negative value requires a trigger to activate.
+
+Lua API changes:
+* Add Flow::EnablePointFilter() function to disable bilinear filtering.
+* Add Lara::GetAmmoType() function to read the ammo that Lara is using.
+* Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
+* Make Vec2 object float-based instead of integer-based.
+* Add Vec2 arithmetic for division with a number and multiplication with another Vec2.
+* Add log messages warnings to functions AddCallback and RemoveCallback.
+* Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
+* Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.
+* Fix activation of a flipped room when using SetPos() script command or position change node.
+
 Version 1.1.0
 ==============
 
 * Fix enemies shooting Lara through static meshes and moveables.
-* Fix skeletons and mummies not affected by explosive weapons.
+* Fix skeletons and mummies not being affected by explosive weapons.
 * Fix crash on loading if static meshes with IDs above maximum are present.
+* Fix various crashes specific to 64-bit build.
 * Fix random crashes when playing audio tracks with names longer than 15 symbols.
-* Fix possible crashes when killing some enemies in 64-bit version.
-* Fix possible crashes when loading savegame in 64-bit version.
-* Fix electricity effect crashing in 64-bit version.
-* Fix crashes when trying to play .wav soundtracks on some Windows 11 systems.
+* Fix crashes when trying to play .wav audio tracks on some Windows 11 systems.
+* Fix last selected gun type not preserved after level jump.
+* Fix incorrect vertical position after reloading a savegame made while standing on a bridge.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix clockwork beetle activation crashing the game.
 * Fix corrupted vehicle positions after savegame reload.
 * Fix default ambience overlapping current one when loading a savegame.
-* Fix doppelganger being limited to be in a single room.
+* Fix doppelganger being limited to a single room.
 * Fix bat AI, damage value, and incorrect collision after death.
 * Fix regeneration for pickups with OCB 128.
 * Fix raising blocks still shaking without OCB.
-* Fix spiky ceiling and add new OCBs for it.
-* Fix TR1 winged mutant pathfinding and damage issues and add new OCB for it.
-* Fix last inventory item not properly changed when loading, saving and restarting game.
-* Make screenshot file in "Screenshots" subfolder by pressing print screen key.
-* Implement separate audio track channel for playing voiceovers with subtitles.
+* Fix spiky ceiling, improve collision, and allow setting velocity via OCB.
+* Fix TR1 winged mutant pathfinding and damage issues and add new OCBs.
+* Fix TR1 Natla facing angle, bomb and shard projectiles, shooting anim in the second phase.
+* Fix last inventory item position not being saved.
+* Fix some puzzle hole objects crashing the game on item insertion.
+* Fix incorrect harpoon bolt speed and angle when shooting vertically.
+* Fix black shatter debris.
+* Fix Lara's shadow projecting only her joints on some occasions.
+* Fix sun and spot bulbs direction and sheen casts.
+* Fix room collector freezing game on some occasions.
+* Fix incorrect culling for scaled static meshes.
+* Fix normal mapping.
+* Add ability to save screenshot in the "Screenshots" subfolder by pressing the "Print screen" key.
+* Implement separate audio track channel for playing voiceovers with subtitles in .srt format.
 * Don't stop ambience when Lara dies.
 * Pause all sounds when entering inventory or pause menu.
+* Preserve hit points on level jump.
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
-* Add multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
+* Reduce camera bounce.
+* Improve spiky wall collision accuracy.
+* Expand control settings page.
+* Allow key bindings for previously hardcoded actions (weapon hotkeys, vehicle controls).
+* Add input actions for weapon scroll.
+* Add splash effect to rockets and grenades when they enter water.
+* Allow multiple doppelgangers by using the same OCB for the origin nullmesh and doppelganger.
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
 

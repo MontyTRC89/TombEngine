@@ -1,13 +1,15 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
+
 #include "Game/camera.h"
 #include "Game/effects/tomb4fx.h"
-#include "Specific/clock.h"
 #include "Math/Math.h"
-#include "Renderer/Utils.h"
-#include "VertexBuffer/VertexBuffer.h"
-#include "RenderView/RenderView.h"
 #include "Renderer/RendererRectangle.h"
+#include "Renderer/RenderView/RenderView.h"
+#include "Renderer/Utils.h"
+#include "Renderer/VertexBuffer/VertexBuffer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/clock.h"
 
 namespace TEN::Renderer
 {
@@ -16,7 +18,6 @@ namespace TEN::Renderer
 
 	Renderer11::Renderer11() : gameCamera({0, 0, 0}, {0, 0, 1}, {0, 1, 0}, 1, 1, 0, 1, 10, 90)
 	{
-		m_blinkColorDirection = 1;
 	}
 
 	Renderer11::~Renderer11()
@@ -277,6 +278,11 @@ namespace TEN::Renderer
 	{
 		m_context->PSSetShaderResources((UINT)registerType, 1, texture->ShaderResourceView.GetAddressOf());
 
+		if (g_GameFlow->IsPointFilterEnabled() && samplerType != SAMPLER_SHADOW_MAP)
+		{
+			samplerType = SAMPLER_POINT_WRAP;
+		}
+
 		ID3D11SamplerState* samplerState = nullptr;
 		switch (samplerType)  
 		{
@@ -497,7 +503,7 @@ namespace TEN::Renderer
 
 	void Renderer11::SetCullMode(CULL_MODES cullMode, bool force)
 	{
-		if (m_numDebugPage == RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
+		if (DebugPage == RendererDebugPage::WireframeMode)
 		{
 			m_context->RSSetState(m_states->Wireframe());
 			return;

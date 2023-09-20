@@ -888,7 +888,28 @@ enum class WeaponAmmoType
 	Ammo2,
 	Ammo3,
 
-	NumAmmoTypes
+	Count
+};
+
+enum class PlayerAmmoType
+{
+	None,
+	Pistol,
+	Revolver,
+	Uzi,
+	ShotgunNormal,
+	ShotgunWide,
+	HK,
+	CrossbowBoltNormal,
+	CrossbowBoltPoison,
+	CrossbowBoltExplosive,
+	GrenadeNormal,
+	GrenadeFrag,
+	GrenadeFlash,
+	Harpoon,
+	Rocket,
+
+	Count
 };
 
 enum class LaraWeaponType
@@ -924,15 +945,6 @@ enum class HolsterSlot
 	RocketLauncher	= ID_ROCKET_ANIM
 };
 
-enum class WaterStatus
-{
-	Dry,
-	Wade,
-	TreadWater,
-	Underwater,
-	FlyCheat
-};
-
 enum class HandStatus
 {
 	Free,
@@ -943,12 +955,13 @@ enum class HandStatus
 	Special
 };
 
-enum class TorchState
+enum class WaterStatus
 {
-	Holding,
-	Throwing,
-	Dropping,
-	JustLit
+	Dry,
+	Wade,
+	TreadWater,
+	Underwater,
+	FlyCheat
 };
 
 enum class JumpDirection
@@ -959,6 +972,22 @@ enum class JumpDirection
 	Back,
 	Left,
 	Right
+};
+
+enum class LookMode
+{
+	None,
+	Vertical,
+	Horizontal,
+	Free
+};
+
+enum class TorchState
+{
+	Holding,
+	Throwing,
+	Dropping,
+	JustLit
 };
 
 struct Ammo
@@ -1080,9 +1109,9 @@ struct CarriedWeaponInfo
 	bool HasLasersight = false; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer   = false; // TODO: Unused and duplicated in LaraInventoryData.
 
-	Ammo				  Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
-	WeaponAmmoType		  SelectedAmmo							  = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
-	LaraWeaponTypeCarried WeaponMode							  = LaraWeaponTypeCarried::WTYPE_MISSING;
+	Ammo				  Ammo[(int)WeaponAmmoType::Count] = {};
+	WeaponAmmoType		  SelectedAmmo					   = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
+	LaraWeaponTypeCarried WeaponMode					   = LaraWeaponTypeCarried::WTYPE_MISSING;
 };
 
 struct ArmInfo
@@ -1107,8 +1136,8 @@ struct FlareData
 
 struct TorchData
 {
-	TorchState State = TorchState::Holding;
 	bool	   IsLit = false;
+	TorchState State = TorchState::Holding;
 };
 
 // TODO: Troye's abandoned dairy feature.
@@ -1175,6 +1204,17 @@ struct LaraCountData
 	unsigned int PositionAdjust = 0;
 	unsigned int Run			= 0;
 	unsigned int Death			= 0;
+};
+
+struct LookControlData
+{
+	LookMode	Mode		= LookMode::None;
+	EulerAngles Orientation = EulerAngles::Zero;
+	EulerAngles	TurnRate	= EulerAngles::Zero;
+
+	short OpticRange		= 0;
+	bool  IsUsingBinoculars = false;
+	bool  IsUsingLasersight = false;
 };
 
 struct WeaponControlData
@@ -1252,6 +1292,7 @@ struct LaraControlData
 	JumpDirection JumpDirection = {};
 	LaraCountData Count			= {};
 
+	LookControlData		 Look	   = {};
 	RopeControlData		 Rope	   = {};
 	SubsuitControlData	 Subsuit   = {};
 	TightropeControlData Tightrope = {};
@@ -1290,8 +1331,8 @@ struct PlayerContextData
 	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
 	Vector3i WaterCurrentPull	= Vector3i::Zero;
 
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
+	int InteractedItem = 0; // InteractedItemNumber
+	int Vehicle		   = 0; // VehicleItemNumber
 };
 
 struct PlayerEffectData
@@ -1310,9 +1351,10 @@ struct LaraInfo
 	PlayerEffectData  Effect	= {};
 	LaraInventoryData Inventory = {};
 
+	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};
 	TorchData		  Torch = {};
-	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
 
 	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
 	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
@@ -1328,7 +1370,8 @@ struct LaraInfo
 	int HitFrame	 = 0; // Frame index.
 	int HitDirection = 0; // Cardinal direction.
 
-	int ExtraAnim = 0; // Item number? Only ever set to NO_ITEM or 1.
+	// Item number? Only ever set to NO_ITEM or 1. Probably anim object ID. Might not be needed since AnimObjectID is kept in item.Animation.
+	int ExtraAnim = 0;
 
 	signed char Location		= 0;
 	signed char HighestLocation = 0;
