@@ -23,7 +23,7 @@ namespace InventoryHandler
 	//@bool[opt] addToPickupSummary If true, display the item in the pickup summary. Default is false.
 	static void GiveItem(GAME_OBJECT_ID objectID, sol::optional<int> count, sol::optional<bool> addToPickupSummary)
 	{
-		if (count.has_value()
+		if (count.has_value())
 		{
 			PickedUpObject(objectID, *count);
 		}
