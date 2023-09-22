@@ -3,12 +3,16 @@
 #include "InventoryHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Game/pickup/pickup.h"
+#include "Game/Lara/lara.h"
+#include "Game/Hud/Hud.h"
 
 /***
 Inventory manipulation
 @tentable Inventory 
 @pragma nostrip
 */
+
+using namespace TEN::Hud;
 
 namespace InventoryHandler
 {
@@ -21,7 +25,8 @@ namespace InventoryHandler
 	//@function GiveItem
 	//@tparam Objects.ObjID item the item to be added
 	//@int[opt] count the number of items to add (default: the amount you would get from a pickup)
-	static void InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count)
+	//@bool[opt] display true if the item is to be displayed
+	static void InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count, sol::optional<bool> display)
 	{
 		// If nil is passed in, then the amount added will be the default amount
 		// for that pickup - i.e. the amount you would get from picking up the
@@ -32,6 +37,12 @@ namespace InventoryHandler
 			PickedUpObject(slot, count.value());
 		else
 			PickedUpObject(slot, std::nullopt);
+
+		if (display.has_value() && display.value())
+		{
+			auto pos = GetJointPosition(LaraItem, LM_HIPS);
+			g_Hud.PickupSummary.AddDisplayPickup(slot, pos.ToVector3());
+		}
 	}
 
 	///Remove x of a certain item from the inventory.
