@@ -40,7 +40,7 @@ namespace TEN::Hud
 
 	public:
 		// Utilities
-		void AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos);
+		void AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos, bool pickupObject = true);
 
 		void Update();
 		void Draw() const;

@@ -80,12 +80,13 @@ namespace TEN::Hud
 			Life = std::max(Life, round(LIFE_BUFFER * FPS));
 	}
 
-	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos)
+	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos, bool pickUpObject)
 	{
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
 		// TODO: Call this elsewhere, maybe in pickup.cpp. -- Sezz 2023.02.06
-		PickedUpObject(objectID);
+		if (pickUpObject)
+			PickedUpObject(objectID);
 
 		float life = round(DisplayPickup::LIFE_MAX * FPS);
 
