@@ -23,8 +23,15 @@ namespace InventoryHandler
 	//@bool[opt] addToPickupSummary If true, display the item in the pickup summary. Default is false.
 	static void GiveItem(GAME_OBJECT_ID objectID, sol::optional<int> count, sol::optional<bool> addToPickupSummary)
 	{
-		PickedUpObject(objectID, count.has_value() ? *count : std::nullopt);
-
+		if (count.has_value()
+		{
+			PickedUpObject(objectID, *count);
+		}
+		else
+		{
+			PickedUpObject(objectID, std::nullopt);
+		}
+		
 		if (addToPickupSummary.has_value() && *addToPickupSummary)
 		{
 			auto pos = GetJointPosition(LaraItem, LM_HIPS).ToVector3();
