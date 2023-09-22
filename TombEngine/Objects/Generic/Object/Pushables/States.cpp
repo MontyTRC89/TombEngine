@@ -908,6 +908,7 @@ namespace TEN::Entities::Generic
 				}
 				pushableItem.Pose.Position.y = floorHeight;
 				pushableItem.Animation.Velocity.y = 0.0f;
+				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 			}
 			break;
 
