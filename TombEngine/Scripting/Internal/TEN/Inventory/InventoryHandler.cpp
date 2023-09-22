@@ -1,10 +1,12 @@
 #include "framework.h"
+#include "Scripting/Internal/TEN/Inventory/InventoryHandler.h"
 
-#include "InventoryHandler.h"
-#include "Scripting/Internal/ReservedScriptNames.h"
-#include "Game/pickup/pickup.h"
-#include "Game/Lara/lara.h"
 #include "Game/Hud/Hud.h"
+#include "Game/Lara/lara.h"
+#include "Game/pickup/pickup.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+
+using namespace TEN::Hud;
 
 /***
 Inventory manipulation
@@ -12,71 +14,49 @@ Inventory manipulation
 @pragma nostrip
 */
 
-using namespace TEN::Hud;
-
 namespace InventoryHandler
 {
-	///Add x of an item to the inventory.
-	//Omitting the second argument will give the "default" amount of the item
-	//(i.e. the amount the player would get from a pickup of that type).
-	//For example, giving crossbow ammo without specifying the number would give the player
-	//10 instead.
-	//Has no effect if the player has an infinite number of that item.
+	/// Add an item to the player's inventory.
 	//@function GiveItem
-	//@tparam Objects.ObjID item the item to be added
-	//@int[opt] count the number of items to add (default: the amount you would get from a pickup)
-	//@bool[opt] display true if the item is to be displayed
-	static void InventoryAdd(GAME_OBJECT_ID slot, sol::optional<int> count, sol::optional<bool> display)
+	//@tparam Objects.ObjID objectID Object ID of the item to add.
+	//@int[opt] count The amount of items to add. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.
+	//@bool[opt] addToPickupSummary If true, display the item in the pickup summary. Default is false.
+	static void GiveItem(GAME_OBJECT_ID objectID, sol::optional<int> count, sol::optional<bool> addToPickupSummary)
 	{
-		// If nil is passed in, then the amount added will be the default amount
-		// for that pickup - i.e. the amount you would get from picking up the
-		// item in-game (e.g. 1 for medipacks, 12 for flares).
+		PickedUpObject(objectID, count.has_value() ? *count : std::nullopt);
 
-		// can't use value_or(std::nullopt) here because nullopt isn't an int
-		if (count.has_value())
-			PickedUpObject(slot, count.value());
-		else
-			PickedUpObject(slot, std::nullopt);
-
-		if (display.has_value() && display.value())
+		if (addToPickupSummary.has_value() && *addToPickupSummary)
 		{
-			auto pos = GetJointPosition(LaraItem, LM_HIPS);
-			g_Hud.PickupSummary.AddDisplayPickup(slot, pos.ToVector3());
+			auto pos = GetJointPosition(LaraItem, LM_HIPS).ToVector3();
+			g_Hud.PickupSummary.AddDisplayPickup(objectID, pos);
 		}
 	}
 
-	///Remove x of a certain item from the inventory.
-	//As in @{GiveItem}, omitting the count will remove the "default" amount of that item.
-	//Has no effect if the player has an infinite number of the item.
+	/// Remove an item from the player's inventory.
 	//@function TakeItem
-	//@tparam Objects.ObjID item the item to be removed
-	//@int[opt] count the number of items to remove (default: the amount you would get from a pickup)
-	static void InventoryRemove(GAME_OBJECT_ID slot, sol::optional<int> count)
+	//@tparam Objects.ObjID Object ID of the item to remove.
+	//@int[opt] count The amount of items to remove. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.
+	static void TakeItem(GAME_OBJECT_ID objectID, sol::optional<int> count)
 	{
-		//can't use value_or(std::nullopt) here because nullopt isn't an int
-		if (count.has_value())
-			RemoveObjectFromInventory(slot, count.value());
-		else
-			RemoveObjectFromInventory(slot, std::nullopt);
+		RemoveObjectFromInventory(objectID, count.has_value() ? *count : std::nullopt);
 	}
 
-	///Get the amount the player holds of an item.
+	/// Get the amount of an item held in the player's inventory.
 	//@function GetItemCount
-	//@tparam Objects.ObjID item the ID item to check
-	//@treturn int the amount of the item the player has in the inventory. -1 indicates an infinite amount of that item.
-	static int InventoryGetCount(GAME_OBJECT_ID slot)
+	//@tparam Objects.ObjID objectID Object ID of the item to check.
+	//@treturn int The amount of items. -1 indicates infinity.
+	static int GetItemCount(GAME_OBJECT_ID objectID)
 	{
-		return GetInventoryCount(slot);
+		return GetInventoryCount(objectID);
 	}
 
-	///Set the amount of a certain item the player has in the inventory.
-	//Similar to @{GiveItem} but replaces with the new amount instead of adding it.
+	/// Set the amount of an item in the player's inventory.
 	//@function SetItemCount
-	//@tparam Objects.ObjID item the ID of the item to be set.
-	//@tparam int count the number of items the player will have. A value of -1 will give an infinite amount of that item.
-	static void InventorySetCount(GAME_OBJECT_ID slot, int count)
+	//@tparam Objects.ObjID objectID Object ID of the item amount to set.
+	//@tparam int count The amount of items to set. -1 indicates infinity.
+	static void SetItemCount(GAME_OBJECT_ID objectID, int count)
 	{
-		SetInventoryCount(slot, count);
+		SetInventoryCount(objectID, count);
 	}
 
 	void Register(sol::state* state, sol::table& parent)
@@ -84,9 +64,9 @@ namespace InventoryHandler
 		sol::table table_inventory{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Inventory, table_inventory);
 
-		table_inventory.set_function(ScriptReserved_GiveInvItem, &InventoryAdd);
-		table_inventory.set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
-		table_inventory.set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
-		table_inventory.set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
+		table_inventory.set_function(ScriptReserved_GiveInvItem, &GiveItem);
+		table_inventory.set_function(ScriptReserved_TakeInvItem, &TakeItem);
+		table_inventory.set_function(ScriptReserved_GetInvItemCount, &GetItemCount);
+		table_inventory.set_function(ScriptReserved_SetInvItemCount, &SetItemCount);
 	}
 }
