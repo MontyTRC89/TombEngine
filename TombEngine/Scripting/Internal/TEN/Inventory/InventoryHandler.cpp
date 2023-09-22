@@ -45,7 +45,14 @@ namespace InventoryHandler
 	//@int[opt] count The amount of items to remove. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.
 	static void TakeItem(GAME_OBJECT_ID objectID, sol::optional<int> count)
 	{
-		RemoveObjectFromInventory(objectID, count.has_value() ? *count : std::nullopt);
+		if (count.has_value())
+		{
+			RemoveObjectFromInventory(objectID, *count);
+		}	
+		else
+		{
+			RemoveObjectFromInventory(objectID, std::nullopt);
+		}
 	}
 
 	/// Get the amount of an item held in the player's inventory.
