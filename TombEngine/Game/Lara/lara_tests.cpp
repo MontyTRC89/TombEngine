@@ -937,7 +937,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Front.Bridge != NO_ITEM)
 	{
 		auto distancePointLara = GetBridgeBorder(coll->Front.Bridge, false) - LaraItem->Pose.Position.y;
-		frontFloor = distancePointLara - 64;
+		frontFloor = distancePointLara - 128;
 		if (frontFloor <= -CLICK(2) ||
 			frontFloor > CLICK(1.25f) - 4)
 		{
