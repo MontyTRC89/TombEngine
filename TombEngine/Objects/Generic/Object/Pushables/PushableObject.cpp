@@ -169,7 +169,7 @@ namespace TEN::Entities::Generic
 					break;
 
 				case SOUTH:
-					PushableBlockPos.z = bounds.Z1 - CLICK(0.4f);
+					PushableBlockPos.z = (bounds.Z2 + CLICK(0.4f)) * (-1);
 					PushableBlockPos.x = pushable.DoAlignCenter ? 0 : pushableItem.Pose.Position.x - LaraItem->Pose.Position.x;
 					break;
 
@@ -179,7 +179,7 @@ namespace TEN::Entities::Generic
 					break;
 
 				case WEST:
-					PushableBlockPos.z = bounds.X1 - CLICK(0.4f);
+					PushableBlockPos.z = (bounds.X2 + CLICK(0.4f)) * (- 1);
 					PushableBlockPos.x = pushable.DoAlignCenter ? 0 : LaraItem->Pose.Position.z - pushableItem.Pose.Position.z;
 					break;
 
