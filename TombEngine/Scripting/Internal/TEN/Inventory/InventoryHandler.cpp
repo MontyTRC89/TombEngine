@@ -23,16 +23,9 @@ namespace InventoryHandler
 	//@bool[opt] addToPickupSummary If true, display the item in the pickup summary. Default is false.
 	static void GiveItem(GAME_OBJECT_ID objectID, sol::optional<int> count, sol::optional<bool> addToPickupSummary)
 	{
-		if (count.has_value())
-		{
-			PickedUpObject(objectID, *count);
-		}
-		else
-		{
-			PickedUpObject(objectID, std::nullopt);
-		}
+		PickedUpObject(objectID, count.has_value() ? std::optional<int>(count.value()) : std::nullopt);
 		
-		if (addToPickupSummary.has_value() && *addToPickupSummary)
+		if (addToPickupSummary.value_or(false))
 		{
 			auto pos = GetJointPosition(LaraItem, LM_HIPS).ToVector3();
 			g_Hud.PickupSummary.AddDisplayPickup(objectID, pos, false);
@@ -45,14 +38,7 @@ namespace InventoryHandler
 	//@int[opt] count The amount of items to remove. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.
 	static void TakeItem(GAME_OBJECT_ID objectID, sol::optional<int> count)
 	{
-		if (count.has_value())
-		{
-			RemoveObjectFromInventory(objectID, *count);
-		}	
-		else
-		{
-			RemoveObjectFromInventory(objectID, std::nullopt);
-		}
+		RemoveObjectFromInventory(objectID, count.has_value() ? std::optional<int>(count.value()) : std::nullopt);
 	}
 
 	/// Get the amount of an item held in the player's inventory.
