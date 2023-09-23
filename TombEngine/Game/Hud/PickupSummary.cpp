@@ -95,7 +95,7 @@ namespace TEN::Hud
 
 			if (pickup.ObjectID == objectID)
 			{
-				pickup.Count++;
+				pickup.Count += count;
 				pickup.Life = life;
 				pickup.StringScalar = STRING_SCALAR_MAX;
 				return;
