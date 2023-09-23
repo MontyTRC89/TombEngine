@@ -40,6 +40,7 @@ namespace TEN::Hud
 		std::vector<DisplayPickup> DisplayPickups = {};
 
 	public:
+		// Utilities
 		void AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector2& origin, unsigned int count = DISPLAY_PICKUP_COUNT_ARG_DEFAULT);
 		void AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos, unsigned int count = DISPLAY_PICKUP_COUNT_ARG_DEFAULT);
 
