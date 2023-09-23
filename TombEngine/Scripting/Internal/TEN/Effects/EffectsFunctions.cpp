@@ -54,15 +54,16 @@ namespace Effects
 									TypeOrNil<ScreenSpriteScaleMode> scaleMode)
 	{
 		// Object is not a sprite object; return early.
-		if (objectID < GAME_OBJECT_ID::ID_HORIZON)
+		if (objectID < GAME_OBJECT_ID::ID_HORIZON || objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
 			TENLog("Attempted to draw screen sprite from non-sprite object " + std::to_string(objectID), LogLevel::Warning);
 			return;
 		}
 
-		// Sprite missing; return early.
 		const auto& object = Objects[objectID];
-		if (spriteIndex > (object.nmeshes - 1))
+
+		// Sprite missing or sequence not found, return early.
+		if (!object.loaded || spriteIndex >= abs(object.nmeshes))
 		{
 			TENLog(
 				"Attempted to draw missing screen sprite " + std::to_string(spriteIndex) +
