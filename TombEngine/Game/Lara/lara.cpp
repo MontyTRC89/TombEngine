@@ -448,8 +448,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	//AddScreenSprite(ID_DEFAULT_SPRITES, 0, Vector2(400, 300), 0, Vector2::One, Vector4::One, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
-
 	if (lara->Control.Weapon.HasFired)
 	{
 		AlertNearbyGuards(item);

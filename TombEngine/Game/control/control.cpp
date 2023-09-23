@@ -120,6 +120,9 @@ int DrawPhase(bool isTitle)
 		g_Renderer.Render();
 	}
 
+	// Clear screen sprites.
+	ClearScreenSprites();
+
 	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
 }
@@ -145,10 +148,11 @@ GameStatus ControlPhase(int numFrames)
 	bool isFirstTime = true;
 	static int framesCount = 0;
 
+	AddScreenSprite(ID_DEFAULT_SPRITES, 4, Vector2(400, 300), 0, Vector2(0.5, 0.5), Vector4::One, 0,
+		BLEND_MODES::BLENDMODE_ALPHABLEND, ScreenSpriteScaleMode::Stretch);
+
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
-		ClearScreenSprites();
-
 		// Controls are polled before OnControlPhase, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);

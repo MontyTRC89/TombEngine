@@ -404,8 +404,7 @@ namespace TEN::Renderer
 				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
-			else if (texture2DPtr != spriteToDraw.SpritePtr->Texture ||
-				lastBlendMode != spriteToDraw.BlendMode)
+			else if (texture2DPtr != spriteToDraw.SpritePtr->Texture || lastBlendMode != spriteToDraw.BlendMode)
 			{
 				m_primitiveBatch->End();
 				m_primitiveBatch->Begin();
@@ -414,38 +413,13 @@ namespace TEN::Renderer
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
 
-			// Get resolutions.
-			auto screenRes = GetScreenResolution().ToVector2();
-			auto spriteRes = (texture2DPtr == nullptr) ?
-				Vector2(spriteToDraw.SpritePtr->Texture->Width, spriteToDraw.SpritePtr->Texture->Height) :
-				Vector2(texture2DPtr->Width, texture2DPtr->Height);
-
-			// Calculate aspect ratios.
-			float screenAspect = screenRes.x / screenRes.y;
-			float spriteAspect = spriteRes.x / spriteRes.y;
-
-			// Calculate size.
-			auto halfSize = Vector2::Zero;
-			if (screenAspect >= spriteAspect)
-			{
-				float heightMax = (SCREEN_SPACE_RES.y / screenRes.y) * screenRes.y;
-				halfSize = (Vector2(heightMax) * spriteToDraw.Scale) / 2;
-				halfSize.x *= spriteAspect;
-			}
-			else
-			{
-				float widthMax = (SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x;
-				halfSize = (Vector2(widthMax) * spriteToDraw.Scale) / 2;
-				halfSize.y *= spriteAspect;
-			}
-
 			// Calculate vertex base.
 			auto vertices = std::array<Vector2, VERTEX_COUNT>
 			{
-				halfSize,
-				Vector2(-halfSize.x, halfSize.y),
-				-halfSize,
-				Vector2(halfSize.x, -halfSize.y)
+				spriteToDraw.Scale,
+				Vector2(-spriteToDraw.Scale.x, spriteToDraw.Scale.y),
+				-spriteToDraw.Scale,
+				Vector2(spriteToDraw.Scale.x, -spriteToDraw.Scale.y)
 			};
 
 			// Transform vertices.
@@ -646,13 +620,49 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectScreenSprites(RenderView& renderView)
 	{
+		// Get resolution, dimensions and screen aspect ratio.
+		auto  screenRes		  = GetScreenResolution().ToVector2();
+		float screenAspect	  = screenRes.x / screenRes.y;
+		float screenWidthMax  = (SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x;
+		float screenHeightMax = (SCREEN_SPACE_RES.y / screenRes.y) * screenRes.y;
+
 		for (const auto& screenSprite : ScreenSprites)
 		{
+			auto& texture = m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex];
+
+			// Calculate sprite aspect ratio.
+			float spriteAspect = texture.Width / texture.Height;
+
+			// Calculate size.
+			auto halfSize = Vector2::Zero;
+
+			switch (screenSprite.ScaleMode)
+			{
+				case ScreenSpriteScaleMode::Fit:
+
+					if (screenAspect >= spriteAspect)
+					{
+						halfSize = (Vector2(screenHeightMax) * screenSprite.Scale) / 2;
+						halfSize.x *= spriteAspect;
+					}
+					else
+					{
+						halfSize = (Vector2(screenWidthMax) * screenSprite.Scale) / 2;
+						halfSize.y *= spriteAspect;
+					}
+					break;
+
+				case ScreenSpriteScaleMode::Stretch:
+
+					halfSize = Vector2(screenWidthMax, screenHeightMax) * screenSprite.Scale / 2;
+					break;
+			}
+
 			AddScreenSprite(
-				&m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex],
+				&texture,
 				screenSprite.Position,
 				screenSprite.Orientation,
-				screenSprite.Scale,
+				halfSize,
 				screenSprite.Color,
 				screenSprite.Priority,
 				screenSprite.BlendMode,
