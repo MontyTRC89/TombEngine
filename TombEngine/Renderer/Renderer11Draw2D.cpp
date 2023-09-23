@@ -631,7 +631,7 @@ namespace TEN::Renderer
 			auto& texture = m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex];
 
 			// Calculate sprite aspect ratio.
-			float spriteAspect = texture.Width / texture.Height;
+			float spriteAspect = (float)texture.Width / (float)texture.Height;
 
 			// Calculate size.
 			auto halfSize = Vector2::Zero;
@@ -648,7 +648,21 @@ namespace TEN::Renderer
 					else
 					{
 						halfSize = (Vector2(screenWidthMax) * screenSprite.Scale) / 2;
-						halfSize.y *= spriteAspect;
+						halfSize.y /= spriteAspect;
+					}
+					break;
+
+				case ScreenSpriteScaleMode::Fill:
+
+					if (screenAspect >= spriteAspect)
+					{
+						halfSize = (Vector2(screenWidthMax) * screenSprite.Scale) / 2;
+						halfSize.y /= spriteAspect;
+					}
+					else
+					{
+						halfSize = (Vector2(screenHeightMax) * screenSprite.Scale) / 2;
+						halfSize.x *= spriteAspect;
 					}
 					break;
 
