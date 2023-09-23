@@ -122,10 +122,8 @@ namespace TEN::Hud
 	{
 		// Project 3D position to 2D origin.
 		auto origin = g_Renderer.Get2DPosition(pos);
-		if (!origin.has_value())
-			origin = Vector2::Zero;
 
-		AddDisplayPickup(objectID, *origin, count);
+		AddDisplayPickup(objectID, origin.value_or(Vector2::Zero), count);
 	}
 
 	void PickupSummaryController::Update()
