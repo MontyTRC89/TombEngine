@@ -565,6 +565,7 @@ bool FlowHandler::DoFlow()
 
 			// Load level
 			CurrentLevel = header.Level;
+			LevelComplete = 0;
 			GameTimer = header.Timer;
 			loadFromSavegame = true;
 			break;

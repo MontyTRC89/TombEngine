@@ -676,7 +676,6 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	else if (LevelComplete < 0)
 	{
 		g_GameFlow->SelectedSaveGame = -(LevelComplete + 1);
-		LevelComplete = 0;
 		return GameStatus::LoadGame;
 	}
 

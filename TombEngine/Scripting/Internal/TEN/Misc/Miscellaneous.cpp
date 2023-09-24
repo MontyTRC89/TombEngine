@@ -9,6 +9,7 @@
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
+#include "Game/savegame.h"
 #include "Game/spotcam.h"
 #include "Game/savegame.h"
 #include "Scripting/Internal/LuaHandler.h"
