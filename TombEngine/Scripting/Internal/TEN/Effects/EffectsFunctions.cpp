@@ -30,10 +30,10 @@ Functions to generate effects.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Spark;
 
 namespace Effects
