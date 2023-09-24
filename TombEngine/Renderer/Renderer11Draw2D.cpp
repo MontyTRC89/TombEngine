@@ -385,7 +385,7 @@ namespace TEN::Renderer
 	{
 		constexpr auto VERTEX_COUNT = 4;
 
-		if (renderView.Sprites2DToDraw.empty())
+		if (renderView.DisplaySpritesToDraw.empty())
 			return;
 
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
@@ -395,7 +395,7 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
 		Texture2D* texture2DPtr = nullptr;
-		for (const auto& spriteToDraw : renderView.Sprites2DToDraw)
+		for (const auto& spriteToDraw : renderView.DisplaySpritesToDraw)
 		{
 			if (texture2DPtr == nullptr)
 			{
@@ -416,10 +416,10 @@ namespace TEN::Renderer
 			// Calculate vertex base.
 			auto vertices = std::array<Vector2, VERTEX_COUNT>
 			{
-				spriteToDraw.Scale,
-				Vector2(-spriteToDraw.Scale.x, spriteToDraw.Scale.y),
-				-spriteToDraw.Scale,
-				Vector2(spriteToDraw.Scale.x, -spriteToDraw.Scale.y)
+				spriteToDraw.Size,
+				Vector2(-spriteToDraw.Size.x, spriteToDraw.Size.y),
+				-spriteToDraw.Size,
+				Vector2(spriteToDraw.Size.x, -spriteToDraw.Size.y)
 			};
 
 			// Transform vertices.
@@ -551,7 +551,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		Vector2 scale = Vector2(sprite->Width / (float)sprite->Texture->Width, sprite->Height / (float)sprite->Texture->Height);
+		auto scale = Vector2(sprite->Width / (float)sprite->Texture->Width, sprite->Height / (float)sprite->Texture->Height);
 		uvStart.x = uvStart.x * scale.x + sprite->UV[0].x;
 		uvStart.y = uvStart.y * scale.y + sprite->UV[0].y;
 		uvEnd.x = uvEnd.x * scale.x + sprite->UV[0].x;
@@ -591,7 +591,7 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
 		m_context->PSSetShaderResources(0, 1, &texture);
-		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+		auto* sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -602,25 +602,25 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 	}
 
-	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& scale,
-									 const Vector4& color, int priority, BLEND_MODES blendMode, RenderView& renderView)
+	void Renderer11::AddDisplaySprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
+									  int priority, BLEND_MODES blendMode, RenderView& renderView)
 	{
-		auto spriteToDraw = RendererSprite2DToDraw{};
+		auto spriteToDraw = RendererDisplaySpriteToDraw{};
 
 		spriteToDraw.SpritePtr = spritePtr;
 		spriteToDraw.Position = pos2D;
 		spriteToDraw.Orientation = orient;
-		spriteToDraw.Scale = scale;
+		spriteToDraw.Size = size;
 		spriteToDraw.Color = color;
 		spriteToDraw.Priority = priority;
 		spriteToDraw.BlendMode = blendMode;
 
-		renderView.Sprites2DToDraw.push_back(spriteToDraw);
+		renderView.DisplaySpritesToDraw.push_back(spriteToDraw);
 	}
 
-	void Renderer11::CollectScreenSprites(RenderView& renderView)
+	void Renderer11::CollectDisplaySprites(RenderView& renderView)
 	{
-		// Get resolution, dimensions, and screen aspect ratio.
+		// Get screen resolution, dimensions, and aspect ratio.
 		auto  screenRes		  = GetScreenResolution().ToVector2();
 		float screenAspect	  = screenRes.x / screenRes.y;
 		float screenWidthMax  = (SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x;
@@ -635,9 +635,9 @@ namespace TEN::Renderer
 
 			// Calculate size.
 			auto halfSize = Vector2::Zero;
-
 			switch (displaySprite.ScaleMode)
 			{
+			default:
 			case DisplaySpriteScaleMode::Fit:
 				if (screenAspect >= spriteAspect)
 				{
@@ -669,9 +669,51 @@ namespace TEN::Renderer
 				break;
 			}
 
-			AddScreenSprite(
+			// Calculate position offset.
+			auto offset = Vector2::Zero;
+			switch (displaySprite.OriginType)
+			{
+			default:
+			case DisplaySpriteOriginType::Center:
+				break;
+
+			case DisplaySpriteOriginType::CenterTop:
+				offset = Vector2(0.0f, halfSize.y);
+				break;
+
+			case DisplaySpriteOriginType::CenterBottom:
+				offset = Vector2(0.0f, -halfSize.y);
+				break;
+
+			case DisplaySpriteOriginType::CenterLeft:
+				offset = Vector2(-halfSize.x, 0.0f);
+				break;
+				
+			case DisplaySpriteOriginType::CenterRight:
+				offset = Vector2(halfSize.x, 0.0f);
+				break;
+
+			case DisplaySpriteOriginType::TopLeft:
+				offset = Vector2(-halfSize.x, halfSize.y);
+				break;
+
+			case DisplaySpriteOriginType::TopRight:
+				offset = Vector2(halfSize.x, halfSize.y);
+				break;
+
+			case DisplaySpriteOriginType::BottomLeft:
+				offset = Vector2(-halfSize.x, -halfSize.y);
+				break;
+
+			case DisplaySpriteOriginType::BottomRight:
+				offset = Vector2(halfSize.x, -halfSize.y);
+				break;
+			}
+			offset = offset;//TEN::Utils::GetAspectCorrect2DPosition(offset); // TODO: Check if aspect correction is necessary.
+
+			AddDisplaySprite(
 				&texture,
-				displaySprite.Position,
+				displaySprite.Position + offset,
 				displaySprite.Orientation,
 				halfSize,
 				displaySprite.Color,
@@ -681,8 +723,8 @@ namespace TEN::Renderer
 		}
 
 		std::sort(
-			renderView.Sprites2DToDraw.begin(), renderView.Sprites2DToDraw.end(),
-			[](const RendererSprite2DToDraw& spriteToDraw0, const RendererSprite2DToDraw& spriteToDraw1)
+			renderView.DisplaySpritesToDraw.begin(), renderView.DisplaySpritesToDraw.end(),
+			[](const RendererDisplaySpriteToDraw& spriteToDraw0, const RendererDisplaySpriteToDraw& spriteToDraw1)
 			{
 				if (spriteToDraw0.Priority == spriteToDraw1.Priority)
 					return (spriteToDraw0.BlendMode < spriteToDraw1.BlendMode);

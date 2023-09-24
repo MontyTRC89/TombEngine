@@ -1573,8 +1573,8 @@ namespace TEN::Renderer
 		// Draw HUD.
 		g_Hud.Draw(*LaraItem);
 
-		// Draw screen sprites sorted by priority.
-		CollectScreenSprites(view);
+		// Draw display sprites sorted by priority.
+		CollectDisplaySprites(view);
 		DrawDisplaySprites(view);
 
 		// Draw binoculars or lasersight.

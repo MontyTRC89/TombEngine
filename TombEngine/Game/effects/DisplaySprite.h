@@ -7,10 +7,10 @@ namespace TEN::Effects::DisplaySprite
 	enum class DisplaySpriteOriginType
 	{
 		Center,
-		CenterLeft,
-		CenterRight,
 		CenterTop,
 		CenterBottom,
+		CenterLeft,
+		CenterRight,
 		TopLeft,
 		TopRight,
 		BottomLeft,

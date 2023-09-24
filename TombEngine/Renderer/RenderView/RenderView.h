@@ -20,6 +20,11 @@ namespace TEN::Renderer
 	struct RendererEffect;
 	struct RendererRoom;
 	struct RendererTransparentFace;
+
+	using DirectX::SimpleMath::Vector3;
+	using DirectX::SimpleMath::Vector2;
+	using DirectX::SimpleMath::Matrix;
+
 	constexpr auto MAX_ROOMS_DRAW = 256;
 	constexpr auto MAX_STATICS_DRAW = 128;
 	constexpr auto MAX_EFFECTS_DRAW = 16;
@@ -27,9 +32,6 @@ namespace TEN::Renderer
 	constexpr auto MAX_LIGHTS_DRAW = 48;
 	constexpr auto MAX_FOG_BULBS_DRAW = 32;
 	constexpr auto MAX_SPRITES_DRAW = 512;
-	using DirectX::SimpleMath::Vector3;
-	using DirectX::SimpleMath::Vector2;
-	using DirectX::SimpleMath::Matrix;
 
 	struct RenderViewCamera
 	{
@@ -52,16 +54,18 @@ namespace TEN::Renderer
 	struct RenderView
 	{
 		RenderViewCamera Camera;
-		D3D11_VIEWPORT Viewport;
-		std::vector<RendererRoom*> RoomsToDraw;
-		std::vector<RendererLight*> LightsToDraw;
-		std::vector<RendererFogBulb> FogBulbsToDraw;
-		std::vector<RendererSpriteToDraw> SpritesToDraw;
-		std::vector<RendererSprite2DToDraw> Sprites2DToDraw;
-		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw;
+		D3D11_VIEWPORT	 Viewport;
+
+		std::vector<RendererRoom*>					RoomsToDraw			 = {};
+		std::vector<RendererLight*>					LightsToDraw		 = {};
+		std::vector<RendererFogBulb>				FogBulbsToDraw		 = {};
+		std::vector<RendererSpriteToDraw>			SpritesToDraw		 = {};
+		std::vector<RendererDisplaySpriteToDraw>	DisplaySpritesToDraw = {};
+		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw	 = {};
 
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
+		
 		void fillConstantBuffer(CCameraMatrixBuffer& bufferToFill);
 		void clear();
 	};

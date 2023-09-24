@@ -17,10 +17,10 @@ Constants for display sprite origin types.
 The following constants are inside OriginType.
 
 CENTER
-CENTER_LEFT
-CENTER_RIGHT
 CENTER_TOP
 CENTER_BOTTOM
+CENTER_LEFT
+CENTER_RIGHT
 TOP_LEFT
 TOP_RIGHT
 BOTTOM_LEFT
@@ -36,10 +36,10 @@ BOTTOM_RIGHT
 static const std::unordered_map<std::string, DisplaySpriteOriginType> DISPLAY_SPRITE_ORIGIN_TYPES
 {
 	{ "CENTER", DisplaySpriteOriginType::Center },
-	{ "CENTER_LEFT", DisplaySpriteOriginType::CenterLeft },
-	{ "CENTER_RIGHT", DisplaySpriteOriginType::CenterRight },
 	{ "CENTER_TOP", DisplaySpriteOriginType::CenterTop },
 	{ "CENTER_BOTTOM", DisplaySpriteOriginType::CenterBottom },
+	{ "CENTER_LEFT", DisplaySpriteOriginType::CenterLeft },
+	{ "CENTER_RIGHT", DisplaySpriteOriginType::CenterRight },
 	{ "TOP_LEFT", DisplaySpriteOriginType::TopLeft },
 	{ "TOP_RIGHT", DisplaySpriteOriginType::TopRight },
 	{ "BOTTOM_LEFT", DisplaySpriteOriginType::BottomLeft },

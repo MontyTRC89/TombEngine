@@ -51,7 +51,7 @@ namespace Effects
 		ScriptColor Color	 = ScriptColor(255, 255, 255, 255);
 	};
 
-	/// Draw a display a sprite in display space. NOTE: Display space is a relative 100x100.
+	/// Draw a display a sprite in display space for the current frame. NOTE: Display space is a relative 100x100.
 	//@function DrawDisplaySprite
 	//@tparam ScriptScreenSprite Base sprite object.
 	//@tparam int[opt] priority Render priority of the sprite. Higher values have higher priority and can be thought of as layers. Default is 0.
@@ -62,13 +62,13 @@ namespace Effects
 								  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
-		// Later, everything will use 100x100 natively. -- Sezz 2023.08.31
+		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
 		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
 
-		static const auto DEFAULT_PRIORITY	  = 0;
-		static const auto DEFAULT_ORIGIN_TYPE = DisplaySpriteOriginType::Center;
-		static const auto DEFAULT_SCALE_MODE  = DisplaySpriteScaleMode::Fit;
-		static const auto DEFAULT_BLEND_MODE  = BLENDMODE_ALPHABLEND;
+		constexpr auto DEFAULT_PRIORITY	   = 0;
+		constexpr auto DEFAULT_ORIGIN_TYPE = DisplaySpriteOriginType::Center;
+		constexpr auto DEFAULT_SCALE_MODE  = DisplaySpriteScaleMode::Fit;
+		constexpr auto DEFAULT_BLEND_MODE  = BLENDMODE_ALPHABLEND;
 
 		// Object is not a sprite object; return early.
 		if (sprite.ObjectID < GAME_OBJECT_ID::ID_HORIZON || sprite.ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
@@ -83,7 +83,8 @@ namespace Effects
 		{
 			TENLog(
 				"Attempted to draw missing display sprite " + std::to_string(sprite.SpriteIndex) +
-				" from sprite object " + std::to_string(sprite.ObjectID), LogLevel::Warning);
+				" from sprite object " + std::to_string(sprite.ObjectID),
+				LogLevel::Warning);
 			return;
 		}
 
