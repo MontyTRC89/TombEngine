@@ -2279,7 +2279,7 @@ void SaveGame::Delete(int slot)
 	}
 	else
 	{
-		TENLog("The savegame slot " + std::to_string(slot) + " was not found!");
+		TENLog("The savegame slot " + std::to_string(slot) + " was not found!", LogLevel::Warning);
 		return;
 	}
 }
