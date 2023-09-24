@@ -4,34 +4,34 @@
 
 #include "Game/effects/ScreenSprite.h"
 
-using namespace TEN::Effects::ScreenSprite;
+using namespace TEN::Effects::DisplaySprite;
 
 /***
-Constants for screen sprite scale modes.
-@enum Effects.ScreenSpriteScaleMode
+Constants for display sprite scale modes.
+@enum Effects.DisplaySpriteScaleMode
 @pragma nostrip
 */
 
-/*** Effects.ScreenSpriteScaleMode constants.
+/*** Effects.DisplaySpriteScaleMode constants.
 
-The following constants are inside ScreenSpriteScaleMode.
+The following constants are inside DisplaySpriteScaleMode.
 
 FIT
 FILL
 STRETCH
 TILE
 
-@section Effects.ScreenSpriteScaleMode
+@section Effects.DisplaySpriteScaleMode
 */
 
-/*** Table of screen sprite scale modes.
+/*** Table of display sprite scale modes.
 @table CONSTANT_STRING_HERE
 */
 
-static const std::unordered_map<std::string, ScreenSpriteScaleMode> SCREEN_SPRITE_SCALE_MODES
+static const std::unordered_map<std::string, DisplaySpriteScaleMode> DISPLAY_SPRITE_SCALE_MODES
 {
-	{ "FIT", ScreenSpriteScaleMode::Fit },
-	{ "FILL", ScreenSpriteScaleMode::Fill },
-	{ "STRETCH", ScreenSpriteScaleMode::Stretch },
-	{ "TILE", ScreenSpriteScaleMode::Tile }
+	{ "FIT", DisplaySpriteScaleMode::Fit },
+	{ "FILL", DisplaySpriteScaleMode::Fill },
+	{ "STRETCH", DisplaySpriteScaleMode::Stretch },
+	{ "TILE", DisplaySpriteScaleMode::Tile }
 };

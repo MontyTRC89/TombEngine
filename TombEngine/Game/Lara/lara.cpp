@@ -441,9 +441,6 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_default_col,//189
 };
 
-#include "Game/effects/ScreenSprite.h"
-using namespace TEN::Effects::ScreenSprite;
-
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);

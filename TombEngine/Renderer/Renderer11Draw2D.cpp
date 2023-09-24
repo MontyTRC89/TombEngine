@@ -13,7 +13,7 @@
 #include "Specific/trutils.h"
 #include "Game/effects/ScreenSprite.h"
 
-using namespace TEN::Effects::ScreenSprite;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
@@ -620,15 +620,15 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectScreenSprites(RenderView& renderView)
 	{
-		// Get resolution, dimensions and screen aspect ratio.
+		// Get resolution, dimensions, and screen aspect ratio.
 		auto  screenRes		  = GetScreenResolution().ToVector2();
 		float screenAspect	  = screenRes.x / screenRes.y;
 		float screenWidthMax  = (SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x;
 		float screenHeightMax = (SCREEN_SPACE_RES.y / screenRes.y) * screenRes.y;
 
-		for (const auto& screenSprite : ScreenSprites)
+		for (const auto& displaySprite : DisplaySprites)
 		{
-			auto& texture = m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex];
+			auto& texture = m_sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteIndex];
 
 			// Calculate sprite aspect ratio.
 			float spriteAspect = (float)texture.Width / (float)texture.Height;
@@ -636,50 +636,47 @@ namespace TEN::Renderer
 			// Calculate size.
 			auto halfSize = Vector2::Zero;
 
-			switch (screenSprite.ScaleMode)
+			switch (displaySprite.ScaleMode)
 			{
-				case ScreenSpriteScaleMode::Fit:
+			case DisplaySpriteScaleMode::Fit:
+				if (screenAspect >= spriteAspect)
+				{
+					halfSize = (Vector2(screenHeightMax) * displaySprite.Scale) / 2;
+					halfSize.x *= spriteAspect;
+				}
+				else
+				{
+					halfSize = (Vector2(screenWidthMax) * displaySprite.Scale) / 2;
+					halfSize.y /= spriteAspect;
+				}
+				break;
 
-					if (screenAspect >= spriteAspect)
-					{
-						halfSize = (Vector2(screenHeightMax) * screenSprite.Scale) / 2;
-						halfSize.x *= spriteAspect;
-					}
-					else
-					{
-						halfSize = (Vector2(screenWidthMax) * screenSprite.Scale) / 2;
-						halfSize.y /= spriteAspect;
-					}
-					break;
+			case DisplaySpriteScaleMode::Fill:
+				if (screenAspect >= spriteAspect)
+				{
+					halfSize = (Vector2(screenWidthMax) * displaySprite.Scale) / 2;
+					halfSize.y /= spriteAspect;
+				}
+				else
+				{
+					halfSize = (Vector2(screenHeightMax) * displaySprite.Scale) / 2;
+					halfSize.x *= spriteAspect;
+				}
+				break;
 
-				case ScreenSpriteScaleMode::Fill:
-
-					if (screenAspect >= spriteAspect)
-					{
-						halfSize = (Vector2(screenWidthMax) * screenSprite.Scale) / 2;
-						halfSize.y /= spriteAspect;
-					}
-					else
-					{
-						halfSize = (Vector2(screenHeightMax) * screenSprite.Scale) / 2;
-						halfSize.x *= spriteAspect;
-					}
-					break;
-
-				case ScreenSpriteScaleMode::Stretch:
-
-					halfSize = Vector2(screenWidthMax, screenHeightMax) * screenSprite.Scale / 2;
-					break;
+			case DisplaySpriteScaleMode::Stretch:
+				halfSize = Vector2(screenWidthMax, screenHeightMax) * displaySprite.Scale / 2;
+				break;
 			}
 
 			AddScreenSprite(
 				&texture,
-				screenSprite.Position,
-				screenSprite.Orientation,
+				displaySprite.Position,
+				displaySprite.Orientation,
 				halfSize,
-				screenSprite.Color,
-				screenSprite.Priority,
-				screenSprite.BlendMode,
+				displaySprite.Color,
+				displaySprite.Priority,
+				displaySprite.BlendMode,
 				renderView);
 		}
 

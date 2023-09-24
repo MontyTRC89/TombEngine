@@ -63,6 +63,7 @@ using namespace std::chrono;
 using namespace TEN::Effects;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -70,7 +71,6 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Streamer;
@@ -120,8 +120,8 @@ int DrawPhase(bool isTitle)
 		g_Renderer.Render();
 	}
 
-	// Clear screen sprites.
-	ClearScreenSprites();
+	// Clear display sprites.
+	ClearDisplaySprites();
 
 	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
@@ -432,11 +432,11 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearDisplaySprites();
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
 	ClearLaserBarrierEffects();
-	ClearScreenSprites();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();

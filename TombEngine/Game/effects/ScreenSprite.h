@@ -2,9 +2,22 @@
 #include "Objects/game_object_ids.h"
 #include "Renderer/Renderer11Enums.h"
 
-namespace TEN::Effects::ScreenSprite
+namespace TEN::Effects::DisplaySprite
 {
-	enum class ScreenSpriteScaleMode
+	enum class DisplaySpriteOriginType
+	{
+		Center,
+		CenterLeft,
+		CenterRight,
+		CenterTop,
+		CenterBottom,
+		TopLeft,
+		TopRight,
+		BottomLeft,
+		BottomRight
+	};
+
+	enum class DisplaySpriteScaleMode
 	{
 		Fit,
 		Fill,
@@ -12,7 +25,7 @@ namespace TEN::Effects::ScreenSprite
 		Tile
 	};
 	
-	struct ScreenSprite
+	struct DisplaySprite
 	{
 		GAME_OBJECT_ID ObjectID	   = ID_DEFAULT_SPRITES;
 		int			   SpriteIndex = 0;
@@ -22,14 +35,15 @@ namespace TEN::Effects::ScreenSprite
 		Vector2 Scale		= Vector2::One;
 		Vector4 Color		= Vector4::One;
 
-		int					  Priority	= 0;
-		BLEND_MODES			  BlendMode = BLENDMODE_ALPHABLEND;
-		ScreenSpriteScaleMode ScaleMode = ScreenSpriteScaleMode::Fit;
+		int						Priority   = 0;
+		DisplaySpriteOriginType OriginType = DisplaySpriteOriginType::Center;
+		DisplaySpriteScaleMode	ScaleMode  = DisplaySpriteScaleMode::Fit;
+		BLEND_MODES				BlendMode  = BLENDMODE_ALPHABLEND;
 	};
 
-	extern std::vector<ScreenSprite> ScreenSprites;
-
-	void AddScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& scale,
-						 const Vector4& color, int priority, BLEND_MODES blendMode, ScreenSpriteScaleMode scaleMode);
-	void ClearScreenSprites();
+	extern std::vector<DisplaySprite> DisplaySprites;
+	
+	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
+						  int priority, DisplaySpriteOriginType originType, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode);
+	void ClearDisplaySprites();
 }

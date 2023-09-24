@@ -33,41 +33,54 @@ Functions to generate effects.
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::ScreenSprite;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
-	/// Display a sprite in 2D space. NOTE: Screen space resolution is 100x100.
-	//@function DisplayScreenSprite
-	//@tparam int objectID Object ID of the sprite.
-	//@tparam int spriteIndex Index of the sprite in the sprite object.
-	//@tparam Vec2 pos 2D space position of the sprite.
-	//@tparam float rot Rotation of the sprite in degrees. Default is 0.
-	//@tparam Vec2 scale Scale of the sprite relative to the screen height. Treated as a size if scaleMode is ScreenSpriteScaleMode.FIT.
-	//@tparam Color color Color of the sprite. Default is Color(255, 255, 255, 255).
-	//@tparam int priority Render priority of the sprite. Higher values have higher priority and can be thought of as layers. Default is 0.
-	//@tparam Effects.BlendID blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
-	//@tparam Effects.ScreenSpriteScaleMode scaleMode Scale mode of the sprite. Default is TEN.Effects.ScreenSpriteScaleMode.FIT.
-	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, TypeOrNil<float> rot, const Vec2& scale,
-									TypeOrNil<ScriptColor> color, TypeOrNil<int> priority, TypeOrNil<BLEND_MODES> blendMode,
-									TypeOrNil<ScreenSpriteScaleMode> scaleMode)
+	// TODO: Move these to their own file.
+	class ScriptDisplaySprite
 	{
+	public:
+		GAME_OBJECT_ID ObjectID	   = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteIndex = 0;
+
+		Vec2		Position = Vec2(0.0f, 0.0f);
+		float		Rotation = 0.0f;
+		Vec3		Scale	 = Vec3(0.0f, 0.0f, 0.0f);
+		ScriptColor Color	 = ScriptColor(255, 255, 255, 255);
+	};
+
+	/// Draw a display a sprite in display space. NOTE: Screen display space is a relative 100x100.
+	//@function DrawDisplaySprite
+	//@tparam ScriptScreenSprite Base sprite object.
+	//@tparam int[opt] priority Render priority of the sprite. Higher values have higher priority and can be thought of as layers. Default is 0.
+	//@tparam Effects.DisplaySpriteOriginType[opt] originType Origin type of the sprite. Default is TEN.Effects.ScreenSpriteOriginType.CENTER.
+	//@tparam Effects.DisplaySpriteScaleMode[opt] scaleMode Scale mode of the sprite. Default is TEN.Effects.ScreenSpriteScaleMode.FIT.
+	//@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
+	static void DrawDisplaySprite(const ScriptDisplaySprite& sprite, sol::optional<int> priority, sol::optional<DisplaySpriteOriginType> originType,
+								  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
+	{
+		static const auto DEFAULT_PRIORITY	  = 0;
+		static const auto DEFAULT_ORIGIN_TYPE = DisplaySpriteOriginType::Center;
+		static const auto DEFAULT_SCALE_MODE  = DisplaySpriteScaleMode::Fit;
+		static const auto DEFAULT_BLEND_MODE  = BLENDMODE_ALPHABLEND;
+
 		// Object is not a sprite object; return early.
-		if (objectID < GAME_OBJECT_ID::ID_HORIZON || objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+		if (sprite.ObjectID < GAME_OBJECT_ID::ID_HORIZON || sprite.ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
-			TENLog("Attempted to draw screen sprite from non-sprite object " + std::to_string(objectID), LogLevel::Warning);
+			TENLog("Attempted to draw screen sprite from non-sprite object " + std::to_string(sprite.ObjectID), LogLevel::Warning);
 			return;
 		}
 
-		const auto& object = Objects[objectID];
+		const auto& object = Objects[sprite.ObjectID];
 
-		// Sprite missing or sequence not found, return early.
-		if (!object.loaded || spriteIndex >= abs(object.nmeshes))
+		// Sprite missing or sequence not found; return early.
+		if (!object.loaded || sprite.SpriteIndex >= abs(object.nmeshes))
 		{
 			TENLog(
-				"Attempted to draw missing screen sprite " + std::to_string(spriteIndex) +
-				" from sprite object " + std::to_string(objectID), LogLevel::Warning);
+				"Attempted to draw missing screen sprite " + std::to_string(sprite.SpriteIndex) +
+				" from sprite object " + std::to_string(sprite.ObjectID), LogLevel::Warning);
 			return;
 		}
 
@@ -75,21 +88,18 @@ namespace Effects
 		// Later, everything will use 100x100 natively. -- Sezz 2023.08.31
 		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
 
-		auto pos2 = Vector2(pos.x, pos.y) * POS_CONVERSION_COEFF;
-		float rot2 = ANGLE(USE_IF_HAVE(float, rot, 0.0f));
-		auto scale2 = Vector2(scale.x, scale.y);
-		auto color2 = USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255, 255));
-		int priority2 = USE_IF_HAVE(int, priority, 0);
+		auto convertedPos = Vector2(sprite.Position.x, sprite.Position.y) * POS_CONVERSION_COEFF;
+		float convertedRot = ANGLE(sprite.Rotation);
+		auto convertedScale = Vector2(sprite.Scale.x, sprite.Scale.y);
+		auto convertedColor = Vector4(sprite.Color.GetR(), sprite.Color.GetG(), sprite.Color.GetB(), sprite.Color.GetA()) / UCHAR_MAX;
 
-		auto blendMode2 = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
-		blendMode2 = BLEND_MODES(std::clamp((int)blendMode2, (int)BLEND_MODES::BLENDMODE_OPAQUE, (int)BLEND_MODES::BLENDMODE_ALPHABLEND));
-
-		auto scaleMode2 = USE_IF_HAVE(ScreenSpriteScaleMode, scaleMode, ScreenSpriteScaleMode::Fit);
-
-		AddScreenSprite(
-			objectID, spriteIndex,
-			pos2, rot2, scale2, color2,
-			priority2, blendMode2, scaleMode2);
+		AddDisplaySprite(
+			sprite.ObjectID, sprite.SpriteIndex,
+			convertedPos, convertedRot, convertedScale, convertedColor,
+			priority.value_or(DEFAULT_PRIORITY),
+			originType.value_or(DEFAULT_ORIGIN_TYPE),
+			scaleMode.value_or(DEFAULT_SCALE_MODE),
+			blendMode.value_or(DEFAULT_BLEND_MODE));
 	}
 
 	///Emit a lightning arc.

@@ -9,30 +9,31 @@
 
 using namespace TEN::Math;
 
-namespace TEN::Effects::ScreenSprite
+namespace TEN::Effects::DisplaySprite
 {
-	std::vector<ScreenSprite> ScreenSprites = {};
+	std::vector<DisplaySprite> DisplaySprites = {};
 
-	void AddScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& scale,
-						 const Vector4& color, int priority, BLEND_MODES blendMode, ScreenSpriteScaleMode scaleMode)
+	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
+						  int priority, DisplaySpriteOriginType originType, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode)
 	{
-		auto screenSprite = ScreenSprite{};
+		auto displaySprite = DisplaySprite{};
 
-		screenSprite.ObjectID = objectID;
-		screenSprite.SpriteIndex = spriteIndex;
-		screenSprite.Position = pos;
-		screenSprite.Orientation = orient;
-		screenSprite.Scale = scale;
-		screenSprite.Color = color;
-		screenSprite.Priority = priority;
-		screenSprite.BlendMode = blendMode;
-		screenSprite.ScaleMode = scaleMode;
+		displaySprite.ObjectID = objectID;
+		displaySprite.SpriteIndex = spriteIndex;
+		displaySprite.Position = pos;
+		displaySprite.Orientation = orient;
+		displaySprite.Scale = scale;
+		displaySprite.Color = color;
+		displaySprite.Priority = priority;
+		displaySprite.OriginType = originType;
+		displaySprite.ScaleMode = scaleMode;
+		displaySprite.BlendMode = blendMode;
 
-		ScreenSprites.push_back(screenSprite);
+		DisplaySprites.push_back(displaySprite);
 	}
 
-	void ClearScreenSprites()
+	void ClearDisplaySprites()
 	{
-		ScreenSprites.clear();
+		DisplaySprites.clear();
 	}
 }
