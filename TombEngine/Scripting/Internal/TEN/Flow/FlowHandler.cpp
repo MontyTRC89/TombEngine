@@ -126,23 +126,23 @@ level count, jumps to title.
 
 /***
 Save the game
-@function Save
+@function SaveGame
 @tparam int index the index of the slot to save.
 */
-	tableFlow.set_function(ScriptReserved_Save, &FlowHandler::Save, this);
+	tableFlow.set_function(ScriptReserved_SaveGame, &FlowHandler::SaveGame, this);
 
 /***
 Load the game
-@function Load
+@function LoadGame
 @tparam int index the index of the slot to load.
 */
-	tableFlow.set_function(ScriptReserved_Load, &FlowHandler::Load, this);
+	tableFlow.set_function(ScriptReserved_LoadGame, &FlowHandler::LoadGame, this);
 /***
 Delete the savegame
-@function De;ete
+@function DeleteSaveGane
 @tparam int index the index of the slot to delete the savegame.
 */
-	tableFlow.set_function(ScriptReserved_Delete, &FlowHandler::Delete, this);
+	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
 
 /***
 Returns the player's current per-game secret count.
@@ -405,26 +405,17 @@ void FlowHandler::EndLevel(std::optional<int> nextLevel)
 	NextLevel = index;
 }
 
-// Save the game
-//@function save
-//@tparam int index the index of the slot to save.
-void FlowHandler::Save(int slot)
+void FlowHandler::SaveGame(int slot)
 {
 	SaveGame::Save(slot);
 }
 
-// Load the game
-//@function load
-//@tparam int index the index of the slot to load.
-void FlowHandler::Load(int slot)
+void FlowHandler::LoadGame(int slot)
 {
 	NextLevel = -(slot + 1);
 }
 
-// Delete the Save
-//@function Delete
-//@tparam int index the index of the slot to load.
-void FlowHandler::Delete(int slot)
+void FlowHandler::DeleteSaveGame(int slot)
 {
 	SaveGame::Delete(slot);
 }

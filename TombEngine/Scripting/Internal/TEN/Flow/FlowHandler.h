@@ -58,9 +58,9 @@ public:
 	int			GetLevelNumber(const std::string& flieName);
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel);
-	void		Save(int slot);
-	void		Load(int slot);
-	void		Delete(int slot);
+	void		SaveGame(int slot);
+	void		LoadGame(int slot);
+	void		DeleteSaveGame(int slot);
 	int			GetSecretCount() const;
 	void		SetSecretCount(int secretsNum);
 	void		AddSecret(int levelSecretIndex);
