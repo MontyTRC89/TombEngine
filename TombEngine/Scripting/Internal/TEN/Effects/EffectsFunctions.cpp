@@ -54,9 +54,9 @@ namespace Effects
 	/// Draw a display a sprite in display space for the current frame. NOTE: Display space is a relative 100x100.
 	//@function DrawDisplaySprite
 	//@tparam ScriptScreenSprite Base sprite object.
-	//@tparam int[opt] priority Render priority of the sprite. Higher values have higher priority and can be thought of as layers. Default is 0.
-	//@tparam Effects.DisplaySpriteOriginType[opt] originType Origin type of the sprite. Default is TEN.Effects.ScreenSpriteOriginType.CENTER.
-	//@tparam Effects.DisplaySpriteScaleMode[opt] scaleMode Scale mode of the sprite. Default is TEN.Effects.ScreenSpriteScaleMode.FIT.
+	//@tparam int[opt] priority Render priority of the sprite. Can be thought of as a layer, with higher values having higher priority. Default is 0.
+	//@tparam Effects.DisplaySpriteOriginType[opt] originType Origin type of the sprite. Default is TEN.Effects.DisplaySpriteOriginType.CENTER.
+	//@tparam Effects.DisplaySpriteScaleMode[opt] scaleMode Scale mode of the sprite. Default is TEN.Effects.DisplaySpriteScaleMode.FIT.
 	//@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
 	static void DrawDisplaySprite(const ScriptDisplaySprite& sprite, sol::optional<int> priority, sol::optional<DisplaySpriteOriginType> originType,
 								  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
