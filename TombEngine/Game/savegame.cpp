@@ -1381,7 +1381,7 @@ bool SaveGame::Load(int slot)
 	if (!std::filesystem::is_regular_file(fileName))
 	{
 		TENLog("Attempted to load non-existing savegame!");
-		return;
+		return false;
 	}
 
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
