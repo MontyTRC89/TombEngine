@@ -55,4 +55,5 @@ public:
 	static bool LoadHeader(int slot, SaveGameHeader* header);
 	static bool Save(int slot);
 	static void LoadSavegameInfos();
+	static void DeleteSave(int slot);
 };

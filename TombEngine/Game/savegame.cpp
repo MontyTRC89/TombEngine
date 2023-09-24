@@ -2233,3 +2233,20 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 	return true;
 }
+
+// helper function for deleting savegame via lua
+
+void SaveGame::DeleteSave(int slot)
+{
+	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+
+	if (std::filesystem::exists(fileName))
+	{
+		std::filesystem::remove(fileName);
+	}
+	else
+	{
+		TENLog("The savegame slot: " + std::to_string(slot) + " was not found!");
+		return;
+	}
+}

@@ -371,22 +371,6 @@ namespace Misc
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
-	// Save the game
-	//@function save
-	//@tparam int idx the index of the slot to save.
-	static void Save(int slot)
-	{
-		SaveGame::Save(slot);
-	}
-
-	// Load the game
-	//@function load
-	//@tparam int idx the index of the slot to load.
-	static void Load(int slot)
-	{
-		LevelComplete = -(slot + 1);
-	}
-
 	/// Write messages within the Log file
 	//@advancedDesc
 	//For native Lua handling of errors, see the official Lua website:
@@ -473,8 +457,6 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
-		tableMisc.set_function(ScriptReserved_Save, &Save);
-		tableMisc.set_function(ScriptReserved_Load, &Load);
 
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
 

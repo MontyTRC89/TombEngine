@@ -173,6 +173,9 @@ static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";
 static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
 static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
+static constexpr char ScriptReserved_Save[]						= "Save";
+static constexpr char ScriptReserved_Load[]						= "Load";
+static constexpr char ScriptReserved_Delete[]					= "Delete";
 static constexpr char ScriptReserved_GetSecretCount[]			= "GetSecretCount";
 static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
 static constexpr char ScriptReserved_SetTotalSecretCount[]		= "SetTotalSecretCount";
@@ -262,9 +265,6 @@ static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
 static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
-
-static constexpr char ScriptReserved_Save[]							= "Save";
-static constexpr char ScriptReserved_Load[]							= "Load";
 
 static constexpr char ScriptReserved_PlayCamera[]					= "PlayCamera";
 static constexpr char ScriptReserved_ResetObjCamera[]				= "ResetObjCamera";
