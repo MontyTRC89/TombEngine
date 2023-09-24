@@ -1377,6 +1377,13 @@ bool SaveGame::Load(int slot)
 		return false;
 
 	auto fileName = GetSavegameFilename(slot);
+
+	if (!std::filesystem::is_regular_file(fileName))
+	{
+		TENLog("Attempted to load non-existing savegame!");
+		return;
+	}
+
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
