@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
+#include "Game/savegame.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -471,6 +472,9 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
+		tableMisc.set_function(ScriptReserved_Save, &Save);
+		tableMisc.set_function(ScriptReserved_Load, &Load);
+
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
 
 		LuaHandler handler{ state };
