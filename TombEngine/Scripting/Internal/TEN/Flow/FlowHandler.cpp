@@ -412,6 +412,9 @@ void FlowHandler::SaveGame(int slot)
 
 void FlowHandler::LoadGame(int slot)
 {
+	if (!SaveGame::CheckIfSavegameExists(slot))
+		return;
+
 	NextLevel = -(slot + 1);
 }
 

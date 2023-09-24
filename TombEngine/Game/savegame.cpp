@@ -175,6 +175,17 @@ bool SaveGame::CheckIfSlotIsCorrect(int slot)
 	return true;
 }
 
+bool SaveGame::CheckIfSavegameExists(int slot)
+{
+	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
+	{
+		TENLog("Attempted to load non-existing savegame from slot " + std::to_string(slot), LogLevel::Warning);
+		return false;
+	}
+
+	return true;
+}
+
 std::string SaveGame::GetSavegameFilename(int slot)
 {
 	return FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot);
@@ -1376,6 +1387,9 @@ bool SaveGame::Load(int slot)
 	if (!CheckIfSlotIsCorrect(slot))
 		return false;
 
+	if (!CheckIfSavegameExists(slot))
+		return false;
+
 	auto fileName = GetSavegameFilename(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
@@ -2231,6 +2245,12 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
+	if (!CheckIfSlotIsCorrect(slot))
+		return false;
+
+	if (!CheckIfSavegameExists(slot))
+		return false;
+
 	auto fileName = GetSavegameFilename(slot);
 
 	std::ifstream file;

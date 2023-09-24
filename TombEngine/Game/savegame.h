@@ -59,4 +59,6 @@ public:
 	static bool Save(int slot);
 	static void LoadSavegameInfos();
 	static void Delete(int slot);
+
+	static bool SaveGame::CheckIfSavegameExists(int slot);
 };
