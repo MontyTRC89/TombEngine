@@ -45,7 +45,9 @@ using namespace TEN::Entities::TR4;
 
 namespace Save = TEN::Save;
 
+constexpr int SAVEGAME_MAX_SLOT = 99;
 const std::string SAVEGAME_PATH = "Save//";
+const std::string SAVEGAME_FILE_MASK = "savegame.";
 
 GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
@@ -65,8 +67,7 @@ void SaveGame::LoadSavegameInfos()
 	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		auto fileName = FullSaveDirectory + "savegame." + std::to_string(i);
-		auto savegamePtr = fopen(fileName.c_str(), "rb");
+		auto savegamePtr = fopen(GetSavegameFilename(i).c_str(), "rb");
 
 		if (savegamePtr == nullptr)
 			continue;
@@ -163,6 +164,22 @@ Vector4 ToVector4(const Save::Vector4* vec)
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
+bool SaveGame::CheckIfSlotIsCorrect(int slot)
+{
+	if (slot < 0 || slot > SAVEGAME_MAX_SLOT)
+	{
+		TENLog("Attempt to access wrong savegame slot: " + std::to_string(slot), LogLevel::Error);
+		return false;
+	}
+
+	return true;
+}
+
+std::string SaveGame::GetSavegameFilename(int slot)
+{
+	return FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot);
+}
+
 #define SaveVec(Type, Data, TableBuilder, UnionType, SaveType, ConversionFunc) \
 				auto data = std::get<(int)Type>(Data); \
 				TableBuilder vtb{ fbb }; \
@@ -178,9 +195,12 @@ void SaveGame::Init(const std::string& gameDirectory)
 
 bool SaveGame::Save(int slot)
 {
+	if (!CheckIfSlotIsCorrect(slot))
+		return false;
+
 	g_GameScript->OnSave();
 
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	auto fileName = GetSavegameFilename(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
@@ -1353,7 +1373,10 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!CheckIfSlotIsCorrect(slot))
+		return false;
+
+	auto fileName = GetSavegameFilename(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
@@ -2208,7 +2231,7 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	auto fileName = GetSavegameFilename(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -2236,17 +2259,20 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 // helper function for deleting savegame via lua
 
-void SaveGame::DeleteSave(int slot)
+void SaveGame::Delete(int slot)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!CheckIfSlotIsCorrect(slot))
+		return;
 
-	if (std::filesystem::exists(fileName))
+	auto fileName = GetSavegameFilename(slot);
+
+	if (std::filesystem::is_regular_file(fileName))
 	{
 		std::filesystem::remove(fileName);
 	}
 	else
 	{
-		TENLog("The savegame slot: " + std::to_string(slot) + " was not found!");
+		TENLog("The savegame slot " + std::to_string(slot) + " was not found!");
 		return;
 	}
 }

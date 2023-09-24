@@ -426,7 +426,7 @@ void FlowHandler::Load(int slot)
 //@tparam int index the index of the slot to load.
 void FlowHandler::Delete(int slot)
 {
-	SaveGame::DeleteSave(slot);
+	SaveGame::Delete(slot);
 }
 
 int FlowHandler::GetSecretCount() const
