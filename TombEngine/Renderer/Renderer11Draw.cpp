@@ -1575,7 +1575,7 @@ namespace TEN::Renderer
 
 		// Draw screen sprites sorted by priority.
 		CollectScreenSprites(view);
-		DrawScreenSprites(view);
+		DrawDisplaySprites(view);
 
 		// Draw binoculars or lasersight.
 		DrawOverlays(view); 

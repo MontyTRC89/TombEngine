@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
@@ -11,7 +12,6 @@
 #include "Objects/game_object_ids.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/trutils.h"
-#include "Game/effects/ScreenSprite.h"
 
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Environment;
@@ -381,7 +381,7 @@ namespace TEN::Renderer
 		DrawFullScreenQuad(texture, Vector3(fade), true);
 	}
 
-	void Renderer11::DrawScreenSprites(RenderView& renderView)
+	void Renderer11::DrawDisplaySprites(RenderView& renderView)
 	{
 		constexpr auto VERTEX_COUNT = 4;
 

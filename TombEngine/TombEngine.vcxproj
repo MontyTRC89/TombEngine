@@ -324,7 +324,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game\effects\Bubble.h" />
-    <ClInclude Include="Game\effects\ScreenSprite.h" />
+    <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\Hud\PickupSummary.h" />
@@ -713,9 +713,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
     <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\DisplaySpriteOriginTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\DisplaySpriteScaleModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectsFunctions.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Effects\ScreenSpriteScaleModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\FlowHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
@@ -804,6 +805,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
     <ClCompile Include="Game\effects\debris.cpp" />
+    <ClCompile Include="Game\effects\DisplaySprite.cpp" />
     <ClCompile Include="Game\effects\Drip.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\effects\Electricity.cpp" />
@@ -812,7 +814,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\effects\Hair.cpp" />
     <ClCompile Include="Game\effects\item_fx.cpp" />
     <ClCompile Include="Game\effects\Ripple.cpp" />
-    <ClCompile Include="Game\effects\ScreenSprite.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />

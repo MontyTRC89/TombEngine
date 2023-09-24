@@ -4,10 +4,10 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/ScreenSprite.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -51,7 +51,7 @@ namespace Effects
 		ScriptColor Color	 = ScriptColor(255, 255, 255, 255);
 	};
 
-	/// Draw a display a sprite in display space. NOTE: Screen display space is a relative 100x100.
+	/// Draw a display a sprite in display space. NOTE: Display space is a relative 100x100.
 	//@function DrawDisplaySprite
 	//@tparam ScriptScreenSprite Base sprite object.
 	//@tparam int[opt] priority Render priority of the sprite. Higher values have higher priority and can be thought of as layers. Default is 0.
@@ -61,6 +61,10 @@ namespace Effects
 	static void DrawDisplaySprite(const ScriptDisplaySprite& sprite, sol::optional<int> priority, sol::optional<DisplaySpriteOriginType> originType,
 								  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
 	{
+		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
+		// Later, everything will use 100x100 natively. -- Sezz 2023.08.31
+		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
+
 		static const auto DEFAULT_PRIORITY	  = 0;
 		static const auto DEFAULT_ORIGIN_TYPE = DisplaySpriteOriginType::Center;
 		static const auto DEFAULT_SCALE_MODE  = DisplaySpriteScaleMode::Fit;
@@ -69,27 +73,22 @@ namespace Effects
 		// Object is not a sprite object; return early.
 		if (sprite.ObjectID < GAME_OBJECT_ID::ID_HORIZON || sprite.ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
-			TENLog("Attempted to draw screen sprite from non-sprite object " + std::to_string(sprite.ObjectID), LogLevel::Warning);
+			TENLog("Attempted to draw display sprite from non-sprite object " + std::to_string(sprite.ObjectID), LogLevel::Warning);
 			return;
 		}
 
-		const auto& object = Objects[sprite.ObjectID];
-
 		// Sprite missing or sequence not found; return early.
+		const auto& object = Objects[sprite.ObjectID];
 		if (!object.loaded || sprite.SpriteIndex >= abs(object.nmeshes))
 		{
 			TENLog(
-				"Attempted to draw missing screen sprite " + std::to_string(sprite.SpriteIndex) +
+				"Attempted to draw missing display sprite " + std::to_string(sprite.SpriteIndex) +
 				" from sprite object " + std::to_string(sprite.ObjectID), LogLevel::Warning);
 			return;
 		}
 
-		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
-		// Later, everything will use 100x100 natively. -- Sezz 2023.08.31
-		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
-
 		auto convertedPos = Vector2(sprite.Position.x, sprite.Position.y) * POS_CONVERSION_COEFF;
-		float convertedRot = ANGLE(sprite.Rotation);
+		short convertedRot = ANGLE(sprite.Rotation);
 		auto convertedScale = Vector2(sprite.Scale.x, sprite.Scale.y);
 		auto convertedColor = Vector4(sprite.Color.GetR(), sprite.Color.GetG(), sprite.Color.GetB(), sprite.Color.GetA()) / UCHAR_MAX;
 
@@ -387,10 +386,10 @@ namespace Effects
 
 	void Register(sol::state* state, sol::table& parent) 
 	{
-		sol::table tableEffects = { state->lua_state(), sol::create };
+		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
-		tableEffects.set_function(ScriptReserved_DisplayScreenSprite, &DisplayScreenSprite);
+		tableEffects.set_function(ScriptReserved_DrawDisplaySprite, &DrawDisplaySprite);
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
@@ -401,7 +400,7 @@ namespace Effects
 		tableEffects.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 
-		LuaHandler handler{ state };
+		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}

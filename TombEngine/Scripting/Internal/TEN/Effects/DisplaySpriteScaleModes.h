@@ -2,17 +2,17 @@
 #include <string>
 #include <unordered_map>
 
-#include "Game/effects/ScreenSprite.h"
+#include "Game/effects/DisplaySprite.h"
 
 using namespace TEN::Effects::DisplaySprite;
 
 /***
 Constants for display sprite scale modes.
-@enum Effects.DisplaySpriteScaleMode
+@enum DisplaySprite.DisplaySpriteScaleMode
 @pragma nostrip
 */
 
-/*** Effects.DisplaySpriteScaleMode constants.
+/*** DisplaySprite.DisplaySpriteScaleMode constants.
 
 The following constants are inside DisplaySpriteScaleMode.
 
@@ -21,7 +21,7 @@ FILL
 STRETCH
 TILE
 
-@section Effects.DisplaySpriteScaleMode
+@section DisplaySprite.DisplaySpriteScaleMode
 */
 
 /*** Table of display sprite scale modes.
