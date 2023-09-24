@@ -93,7 +93,7 @@ bool ThreadEnded;
 
 int RequiredStartPos;
 int CurrentLevel;
-int LevelComplete;
+int NextLevel;
 
 int SystemNameHash = 0;
 
@@ -668,14 +668,14 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	}
 
 	// Check if level has been completed.
-	// Negative LevelComplete indicates that a savegame must be loaded from corresponding slot.
-	if (LevelComplete > 0)
+	// Negative NextLevel indicates that a savegame must be loaded from corresponding slot.
+	if (NextLevel > 0)
 	{
 		return GameStatus::LevelComplete;
 	}
-	else if (LevelComplete < 0)
+	else if (NextLevel < 0)
 	{
-		g_GameFlow->SelectedSaveGame = -(LevelComplete + 1);
+		g_GameFlow->SelectedSaveGame = -(NextLevel + 1);
 		return GameStatus::LoadGame;
 	}
 

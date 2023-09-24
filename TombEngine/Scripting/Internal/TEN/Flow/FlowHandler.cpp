@@ -402,7 +402,7 @@ int FlowHandler::GetLevelNumber(const std::string& fileName)
 void FlowHandler::EndLevel(std::optional<int> nextLevel)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
-	LevelComplete = index;
+	NextLevel = index;
 }
 
 // Save the game
@@ -418,7 +418,7 @@ void FlowHandler::Save(int slot)
 //@tparam int index the index of the slot to load.
 void FlowHandler::Load(int slot)
 {
-	LevelComplete = -(slot + 1);
+	NextLevel = -(slot + 1);
 }
 
 // Delete the Save
@@ -609,22 +609,22 @@ bool FlowHandler::DoFlow()
 
 			// Load level
 			CurrentLevel = header.Level;
-			LevelComplete = 0;
+			NextLevel = 0;
 			GameTimer = header.Timer;
 			loadFromSavegame = true;
 			break;
 
 		case GameStatus::LevelComplete:
-			if (LevelComplete >= Levels.size())
+			if (NextLevel >= Levels.size())
 			{
 				CurrentLevel = 0; // TODO: final credits
 			}
 			else
 			{
-				CurrentLevel = LevelComplete;
+				CurrentLevel = NextLevel;
 			}
 
-			LevelComplete = 0;
+			NextLevel = 0;
 			break;
 		}
 	}
