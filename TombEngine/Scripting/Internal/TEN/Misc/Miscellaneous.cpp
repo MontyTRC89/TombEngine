@@ -369,6 +369,22 @@ namespace Misc
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
+	// Save the game
+	//@function save
+	//@tparam int idx the index of the slot to save.
+	static void Save(int slot)
+	{
+		SaveGame::Save(slot);
+	}
+
+	// Load the game
+	//@function load
+	//@tparam int idx the index of the slot to load.
+	static void Load(int slot)
+	{
+		LevelComplete = -(slot + 1);
+	}
+
 	/// Write messages within the Log file
 	//@advancedDesc
 	//For native Lua handling of errors, see the official Lua website:

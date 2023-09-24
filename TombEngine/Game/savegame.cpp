@@ -178,6 +178,8 @@ void SaveGame::Init(const std::string& gameDirectory)
 
 bool SaveGame::Save(int slot)
 {
+	g_GameScript->OnSave();
+
 	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 

@@ -668,8 +668,17 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	}
 
 	// Check if level has been completed.
-	if (LevelComplete)
+	// Negative LevelComplete indicates that a savegame must be loaded from corresponding slot.
+	if (LevelComplete > 0)
+	{
 		return GameStatus::LevelComplete;
+	}
+	else if (LevelComplete < 0)
+	{
+		g_GameFlow->SelectedSaveGame = -(LevelComplete + 1);
+		LevelComplete = 0;
+		return GameStatus::LoadGame;
+	}
 
 	return GameStatus::None;
 }
