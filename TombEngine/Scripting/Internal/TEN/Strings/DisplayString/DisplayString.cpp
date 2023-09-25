@@ -50,6 +50,7 @@ strings.lua. __Default: false__.
 @tparam table flags a table of display options. Can be empty or omitted. The possible values and their effects are...
 	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
 	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
+	TEN.Strings.DisplayStringOption.BLINK  -- will give the text the blinking effect
 __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */
