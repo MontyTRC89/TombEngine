@@ -119,6 +119,9 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::CENTER)])
 					flags |= PRINTSTRING_CENTER;
 
+				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::RIGHT)])
+					flags |= PRINTSTRING_RIGHT;
+
 				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::OUTLINE)])
 					flags |= PRINTSTRING_OUTLINE;
 
