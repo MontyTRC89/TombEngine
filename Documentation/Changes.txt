@@ -25,6 +25,7 @@ Version 1.1.1
  - A negative value requires a trigger to activate.
 
 Lua API changes:
+* Add functions to load, save, and delete savegames.
 * Add Flow::EnablePointFilter() function to disable bilinear filtering.
 * Add Lara::GetAmmoType() function to read the ammo that Lara is using.
 * Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
