@@ -48,7 +48,7 @@ private:
 	static std::string FullSaveDirectory;
 
 	static std::string SaveGame::GetSavegameFilename(int slot);
-	static bool SaveGame::CheckIfSlotIsCorrect(int slot);
+	static bool IsSaveGameSlotValid(int slot);
 	
 public:
 	static int LastSaveGame;
@@ -60,5 +60,5 @@ public:
 	static void LoadSavegameInfos();
 	static void Delete(int slot);
 
-	static bool SaveGame::CheckIfSavegameExists(int slot);
+	static bool DoesSaveGameExist(int slot);
 };

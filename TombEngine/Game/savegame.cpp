@@ -45,9 +45,9 @@ using namespace TEN::Entities::TR4;
 
 namespace Save = TEN::Save;
 
-constexpr int SAVEGAME_MAX_SLOT = 99;
-const std::string SAVEGAME_PATH = "Save//";
-const std::string SAVEGAME_FILE_MASK = "savegame.";
+constexpr auto SAVEGAME_MAX_SLOT  = 99;
+constexpr auto SAVEGAME_PATH	  = "Save//";
+constexpr auto SAVEGAME_FILE_MASK = "savegame.";
 
 GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
@@ -164,22 +164,22 @@ Vector4 ToVector4(const Save::Vector4* vec)
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
-bool SaveGame::CheckIfSlotIsCorrect(int slot)
+bool SaveGame::IsSaveGameSlotValid(int slot)
 {
 	if (slot < 0 || slot > SAVEGAME_MAX_SLOT)
 	{
-		TENLog("Attempt to access wrong savegame slot: " + std::to_string(slot), LogLevel::Error);
+		TENLog("Attempted to access invalid savegame slot " + std::to_string(slot), LogLevel::Error);
 		return false;
 	}
 
 	return true;
 }
 
-bool SaveGame::CheckIfSavegameExists(int slot)
+bool SaveGame::DoesSaveGameExist(int slot)
 {
 	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
 	{
-		TENLog("Attempt to access non-existing savegame file from slot " + std::to_string(slot), LogLevel::Warning);
+		TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
 		return false;
 	}
 
@@ -188,7 +188,7 @@ bool SaveGame::CheckIfSavegameExists(int slot)
 
 std::string SaveGame::GetSavegameFilename(int slot)
 {
-	return FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot);
+	return (FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot));
 }
 
 #define SaveVec(Type, Data, TableBuilder, UnionType, SaveType, ConversionFunc) \
@@ -206,7 +206,7 @@ void SaveGame::Init(const std::string& gameDirectory)
 
 bool SaveGame::Save(int slot)
 {
-	if (!CheckIfSlotIsCorrect(slot))
+	if (!IsSaveGameSlotValid(slot))
 		return false;
 
 	g_GameScript->OnSave();
@@ -1384,10 +1384,10 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	if (!CheckIfSlotIsCorrect(slot))
+	if (!IsSaveGameSlotValid(slot))
 		return false;
 
-	if (!CheckIfSavegameExists(slot))
+	if (!DoesSaveGameExist(slot))
 		return false;
 
 	auto fileName = GetSavegameFilename(slot);
@@ -2245,10 +2245,10 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	if (!CheckIfSlotIsCorrect(slot))
+	if (!IsSaveGameSlotValid(slot))
 		return false;
 
-	if (!CheckIfSavegameExists(slot))
+	if (!DoesSaveGameExist(slot))
 		return false;
 
 	auto fileName = GetSavegameFilename(slot);
@@ -2279,10 +2279,10 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 void SaveGame::Delete(int slot)
 {
-	if (!CheckIfSlotIsCorrect(slot))
+	if (!IsSaveGameSlotValid(slot))
 		return;
 
-	if (!CheckIfSavegameExists(slot))
+	if (!DoesSaveGameExist(slot))
 		return;
 
 	std::filesystem::remove(GetSavegameFilename(slot));

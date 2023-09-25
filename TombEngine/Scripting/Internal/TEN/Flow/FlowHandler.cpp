@@ -124,24 +124,25 @@ level count, jumps to title.
 */
 	tableFlow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
 
-/***
-Save the game
-@function SaveGame
-@tparam int index the index of the slot to save.
-*/
+	/***
+	Save the game to a savegame slot.
+	@function SaveGame
+	@tparam int slotID ID of the savegame slot to save to.
+	*/
 	tableFlow.set_function(ScriptReserved_SaveGame, &FlowHandler::SaveGame, this);
 
-/***
-Load the game
-@function LoadGame
-@tparam int index the index of the slot to load.
-*/
+	/***
+	Load the game from a savegame slot.
+	@function LoadGame
+	@tparam int slotID ID of the savegame slot to load from.
+	*/
 	tableFlow.set_function(ScriptReserved_LoadGame, &FlowHandler::LoadGame, this);
-/***
-Delete the savegame
-@function DeleteSaveGane
-@tparam int index the index of the slot to delete the savegame.
-*/
+
+	/***
+	Delete a savegame.
+	@function DeleteSaveGame
+	@tparam int slotID ID of the savegame slot to clear.
+	*/
 	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
 
 /***
@@ -412,7 +413,7 @@ void FlowHandler::SaveGame(int slot)
 
 void FlowHandler::LoadGame(int slot)
 {
-	if (!SaveGame::CheckIfSavegameExists(slot))
+	if (!SaveGame::DoesSaveGameExist(slot))
 		return;
 
 	NextLevel = -(slot + 1);
