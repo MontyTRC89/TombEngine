@@ -168,7 +168,7 @@ bool SaveGame::IsSaveGameSlotValid(int slot)
 {
 	if (slot < 0 || slot > SAVEGAME_MAX_SLOT)
 	{
-		TENLog("Attempted to access invalid savegame slot " + std::to_string(slot), LogLevel::Error);
+		TENLog("Attempted to access invalid savegame slot " + std::to_string(slot), LogLevel::Warning);
 		return false;
 	}
 
