@@ -459,7 +459,7 @@ namespace TEN::Renderer
 		auto titleOption = g_Gui.GetSelectedOption();
 
 		// HACK: Check if it works properly -- Lwmte, 07.06.22
-		if (menu == Menu::LoadGame && !g_GameFlow->EnableLoadSave)
+		if (menu == Menu::LoadGame && !g_GameFlow->EnableSaveLoad)
 			menu = Menu::Title;
 
 		switch (menu)
@@ -565,7 +565,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderLoadSaveMenu()
 	{
-		if (!g_GameFlow->EnableLoadSave)
+		if (!g_GameFlow->EnableSaveLoad)
 		{
 			g_Gui.SetInventoryMode(InventoryMode::InGame);
 			return;
