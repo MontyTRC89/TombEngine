@@ -12,6 +12,7 @@ Version 1.1.1
 * Fix TR2 doberman crashing the game when killed by explosive weapons.
 * Fix volume change in settings not affecting voice track.
 * Fix several lighting bugs.
+* Fix savegame count not properly increasing.
 * Overhaul look mode:
  - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
  - Improve movement and control.

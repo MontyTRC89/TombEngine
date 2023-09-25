@@ -617,6 +617,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		g_Gui.GetInventoryMode() != InventoryMode::Save &&
 		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -626,6 +627,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		g_Gui.GetInventoryMode() != InventoryMode::Load &&
 		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))

@@ -64,20 +64,20 @@ void SaveGame::LoadSavegameInfos()
 	if (!std::filesystem::is_directory(FullSaveDirectory))
 		return;
 
+	// Reset overall savegame count.
+	LastSaveGame = 0;
+
 	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		auto savegamePtr = fopen(GetSavegameFilename(i).c_str(), "rb");
-
-		if (savegamePtr == nullptr)
+		if (!DoesSaveGameExist(i))
 			continue;
-
-		fclose(savegamePtr);
 
 		SavegameInfos[i].Present = true;
 		SaveGame::LoadHeader(i, &SavegameInfos[i]);
 
-		fclose(savegamePtr);
+		if (SavegameInfos[i].Count > LastSaveGame)
+			LastSaveGame = SavegameInfos[i].Count;
 	}
 }
 
@@ -1405,7 +1405,6 @@ bool SaveGame::Load(int slot)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
 	// Statistics
-	LastSaveGame = s->header()->count();
 	GameTimer = s->header()->timer();
 
 	Statistics.Game.AmmoHits = s->game()->ammo_hits();
