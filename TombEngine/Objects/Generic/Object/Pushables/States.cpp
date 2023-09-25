@@ -351,7 +351,8 @@ namespace TEN::Entities::Generic
 				// Check if it has to stop the pushing/pulling movement.
 				if (!PushableAnimInfos[pushable.AnimationSystemIndex].EnableAnimLoop ||
 					!IsHeld(In::Action) ||
-					!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling))
+					!PushableMovementConditions(itemNumber, !isPlayerPulling, isPlayerPulling) ||
+					!IsPushableValid(itemNumber))
 				{
 					LaraItem->Animation.TargetState = LS_IDLE;
 					pushable.BehaviourState = PushableState::Idle;
