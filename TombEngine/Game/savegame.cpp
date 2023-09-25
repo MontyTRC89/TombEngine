@@ -211,6 +211,9 @@ bool SaveGame::Save(int slot)
 
 	g_GameScript->OnSave();
 
+	// Savegame infos need to be reloaded so that last savegame counter properly increases.
+	SaveGame::LoadSavegameInfos();
+
 	auto fileName = GetSavegameFilename(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
