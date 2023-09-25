@@ -295,7 +295,7 @@ namespace TEN::Gui
 		switch (MenuToDisplay)
 		{
 		case Menu::Title:
-			OptionCount = g_GameFlow->IsLoadSaveEnabled() ? numTitleOptions : numTitleOptions - 1;
+			OptionCount = g_GameFlow->IsLoadSaveEnabled() ? numTitleOptions : (numTitleOptions - 1);
 			break;
 
 		case Menu::SelectLevel:
@@ -378,7 +378,7 @@ namespace TEN::Gui
 
 				if (MenuToDisplay == Menu::Title)
 				{
-					// Skip load game entry in case it is disabled.
+					// Skip load game entry if loading and saving is disabled.
 					int realSelectedOption = SelectedOption;
 					if (!g_GameFlow->IsLoadSaveEnabled() && SelectedOption > TitleOption::NewGame)
 						realSelectedOption++;
@@ -393,7 +393,9 @@ namespace TEN::Gui
 							MenuToDisplay = Menu::SelectLevel;
 						}
 						else
+						{
 							inventoryResult = InventoryResult::NewGame;
+						}
 
 						break;
 

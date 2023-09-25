@@ -26,18 +26,19 @@ private:
 	LuaHandler m_handler;
 
 public:
-	int	 FogInDistance{ 0 };
-	int	 FogOutDistance{ 0 };
-	bool LevelSelect{ true };
-	bool LoadSave{ true };
-	bool FlyCheat{ true };
-	bool PointFilter{ false };
-	bool MassPickup{ true }; 
-	bool LaraInTitle{ false };
-	bool DebugMode{ false };
+	int FogInDistance  = 0;
+	int FogOutDistance = 0;
 
-	// New animation flag table
-	Animations			Anims{};
+	bool LevelSelect = true;
+	bool LoadSave	 = true;
+	bool FlyCheat	 = true;
+	bool PointFilter = false;
+	bool MassPickup	 = true; 
+	bool LaraInTitle = false;
+	bool DebugMode	 = false;
+
+	// Table for movesets.
+	Animations Anims = {};
 
 	std::vector<Level*>	Levels;
 

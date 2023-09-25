@@ -75,11 +75,10 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
-/*** Enable or disable saving and loading the game.
-Must be true or false
-@function EnableLoadSave
-@tparam bool enabled true or false
-*/
+	/*** Enable or disable saving and loading of savegames.
+	@function EnableLoadSave
+	@tparam bool enabled true or false.
+	*/
 	tableFlow.set_function(ScriptReserved_EnableLoadSave, &FlowHandler::EnableLoadSave, this);
 
 /*** gameflow.lua or level scripts.
