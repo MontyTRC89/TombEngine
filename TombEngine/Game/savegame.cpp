@@ -179,7 +179,7 @@ bool SaveGame::CheckIfSavegameExists(int slot)
 {
 	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
 	{
-		TENLog("Attempted to load non-existing savegame from slot " + std::to_string(slot), LogLevel::Warning);
+		TENLog("Attempt to access non-existing savegame file from slot " + std::to_string(slot), LogLevel::Warning);
 		return false;
 	}
 
@@ -2277,22 +2277,13 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 	return true;
 }
 
-// helper function for deleting savegame via lua
-
 void SaveGame::Delete(int slot)
 {
 	if (!CheckIfSlotIsCorrect(slot))
 		return;
 
-	auto fileName = GetSavegameFilename(slot);
-
-	if (std::filesystem::is_regular_file(fileName))
-	{
-		std::filesystem::remove(fileName);
-	}
-	else
-	{
-		TENLog("The savegame slot " + std::to_string(slot) + " was not found!", LogLevel::Warning);
+	if (!CheckIfSavegameExists(slot))
 		return;
-	}
+
+	std::filesystem::remove(GetSavegameFilename(slot));
 }
