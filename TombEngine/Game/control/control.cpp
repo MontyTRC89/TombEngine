@@ -614,7 +614,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 	// Does the player want to enter inventory?
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-		g_Gui.GetInventoryMode() != InventoryMode::Save)
+		g_Gui.GetInventoryMode() != InventoryMode::Save &&
+		g_GameFlow->EnableLoadSave)
 	{
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 
@@ -622,7 +623,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 			result = GameStatus::SaveGame;
 	}
 	else if (IsClicked(In::Load) &&
-			 g_Gui.GetInventoryMode() != InventoryMode::Load)
+		g_Gui.GetInventoryMode() != InventoryMode::Load &&
+		g_GameFlow->EnableLoadSave)
 	{
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
