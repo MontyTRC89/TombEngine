@@ -751,7 +751,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 
 		case TO_FINISH:
 			RequiredStartPos = false;
-			LevelComplete = CurrentLevel + 1;
+			NextLevel = CurrentLevel + 1;
 			break;
 
 		case TO_CD:
