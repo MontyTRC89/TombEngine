@@ -75,6 +75,13 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
+/*** Enable or disable saving and loading the game.
+Must be true or false
+@function EnableLoadSave
+@tparam bool enabled true or false
+*/
+	tableFlow.set_function(ScriptReserved_EnableLoadSave, &FlowHandler::EnableLoadSave, this);
+
 /*** gameflow.lua or level scripts.
 @section FlowluaOrScripts
 */
@@ -504,6 +511,16 @@ void FlowHandler::EnableLaraInTitle(bool laraInTitle)
 void FlowHandler::EnableLevelSelect(bool levelSelect)
 {
 	LevelSelect = levelSelect;
+}
+
+bool FlowHandler::IsLoadSaveEnabled() const
+{
+	return LoadSave;
+}
+
+void FlowHandler::EnableLoadSave(bool loadSave)
+{
+	LoadSave = loadSave;
 }
 
 bool FlowHandler::DoFlow()

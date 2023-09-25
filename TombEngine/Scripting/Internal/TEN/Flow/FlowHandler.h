@@ -29,6 +29,7 @@ public:
 	int	 FogInDistance{ 0 };
 	int	 FogOutDistance{ 0 };
 	bool LevelSelect{ true };
+	bool LoadSave{ true };
 	bool FlyCheat{ true };
 	bool PointFilter{ false };
 	bool MassPickup{ true }; 
@@ -77,6 +78,8 @@ public:
 	void		EnableLaraInTitle(bool laraInTitle);
 	bool		IsLevelSelectEnabled() const;
 	void		EnableLevelSelect(bool laraInTitle);
+	bool		IsLoadSaveEnabled() const;
+	void		EnableLoadSave(bool loadSave);
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }

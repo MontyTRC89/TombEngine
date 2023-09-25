@@ -17,7 +17,6 @@ public:
 
 	int	 SelectedLevelForNewGame = 0;
 	int	 SelectedSaveGame		 = 0;
-	bool EnableSaveLoad			 = true;
 
 	int TotalNumberOfSecrets = 0;
 
@@ -34,6 +33,7 @@ public:
 	virtual bool IsMassPickupEnabled() const = 0;
 	virtual bool IsPointFilterEnabled() const = 0;
 	virtual bool IsLaraInTitleEnabled() const = 0;
+	virtual bool IsLoadSaveEnabled() const = 0;
 	virtual bool HasCrawlExtended() const = 0;
 	virtual bool HasCrouchRoll() const = 0;
 	virtual bool HasCrawlspaceDive() const = 0;

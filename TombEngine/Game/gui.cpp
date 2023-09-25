@@ -202,7 +202,7 @@ namespace TEN::Gui
 		return Rings[(int)ringType];
 	}
 
-	short GuiController::GetSelectedOption()
+	int GuiController::GetSelectedOption()
 	{
 		return SelectedOption;
 	}
@@ -295,7 +295,7 @@ namespace TEN::Gui
 		switch (MenuToDisplay)
 		{
 		case Menu::Title:
-			OptionCount = numTitleOptions;
+			OptionCount = g_GameFlow->IsLoadSaveEnabled() ? numTitleOptions : numTitleOptions - 1;
 			break;
 
 		case Menu::SelectLevel:
@@ -378,7 +378,12 @@ namespace TEN::Gui
 
 				if (MenuToDisplay == Menu::Title)
 				{
-					switch (SelectedOption)
+					// Skip load game entry in case it is disabled.
+					int realSelectedOption = SelectedOption;
+					if (!g_GameFlow->IsLoadSaveEnabled() && SelectedOption > TitleOption::NewGame)
+						realSelectedOption++;
+
+					switch (realSelectedOption)
 					{
 					case TitleOption::NewGame:
 						if (g_GameFlow->IsLevelSelectEnabled())
@@ -1680,7 +1685,7 @@ namespace TEN::Gui
 		if (lara->Inventory.Diary.Present)
 			InsertObjectIntoList(INV_OBJECT_DIARY);
 
-		if (g_GameFlow->EnableSaveLoad)
+		if (g_GameFlow->IsLoadSaveEnabled())
 		{
 			InsertObjectIntoList(INV_OBJECT_LOAD_FLOPPY);
 			InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
@@ -3386,7 +3391,7 @@ namespace TEN::Gui
 		}
 	}
 
-	short GuiController::GetLoadSaveSelection()
+	int GuiController::GetLoadSaveSelection()
 	{
 		return SelectedSaveSlot;
 	}

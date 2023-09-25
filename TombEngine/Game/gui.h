@@ -183,14 +183,14 @@ namespace TEN::Gui
 
 		// Getters
 		const InventoryRing& GetRing(RingTypes ringType);
-		short GetSelectedOption();
+		int GetSelectedOption();
 		Menu GetMenuToDisplay();
 		InventoryMode GetInventoryMode();
 		int GetInventoryItemChosen();
 		int GetEnterInventory();
 		int GetLastInventoryItem();
 		SettingsData& GetCurrentSettings();
-		short GetLoadSaveSelection();
+		int GetLoadSaveSelection();
 
 		// Setters
 		void SetSelectedOption(int menu);
