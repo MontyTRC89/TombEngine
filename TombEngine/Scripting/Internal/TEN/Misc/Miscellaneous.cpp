@@ -455,6 +455,7 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
+
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
 
 		LuaHandler handler{ state };

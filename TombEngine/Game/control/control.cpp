@@ -93,7 +93,7 @@ bool ThreadEnded;
 
 int RequiredStartPos;
 int CurrentLevel;
-int LevelComplete;
+int NextLevel;
 
 int SystemNameHash = 0;
 
@@ -153,6 +153,11 @@ GameStatus ControlPhase(int numFrames)
 		// value of 1/30 keeps it in lock-step with the rest of the game logic,
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(DELTA_TIME);
+
+		// Control lock is processed after handling scripts, because builder may want to
+		// process input externally, while still locking Lara from input.
+		if (!isTitle && Lara.Control.Locked)
+			ClearAllActions();
 
 		// Handle inventory / pause / load / save screens.
 		auto result = HandleMenuCalls(isTitle);
@@ -591,15 +596,8 @@ void HandleControls(bool isTitle)
 	// Poll input devices and update input variables.
 	if (!isTitle)
 	{
-		if (Lara.Control.Locked)
-		{
-			ClearAllActions();
-		}
-		else
-		{
-			// TODO: To allow cutscene skipping later, don't clear Deselect action.
-			UpdateInputActions(LaraItem, true);
-		}
+		// TODO: To allow cutscene skipping later, don't clear Deselect action.
+		UpdateInputActions(LaraItem, true);
 	}
 	else
 	{
@@ -616,16 +614,20 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 	// Does the player want to enter inventory?
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-		g_Gui.GetInventoryMode() != InventoryMode::Save)
+		g_Gui.GetInventoryMode() != InventoryMode::Save &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 
 		if (g_Gui.CallInventory(LaraItem, false))
 			result = GameStatus::SaveGame;
 	}
 	else if (IsClicked(In::Load) &&
-			 g_Gui.GetInventoryMode() != InventoryMode::Load)
+		g_Gui.GetInventoryMode() != InventoryMode::Load &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -670,8 +672,16 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	}
 
 	// Check if level has been completed.
-	if (LevelComplete)
+	// Negative NextLevel indicates that a savegame must be loaded from corresponding slot.
+	if (NextLevel > 0)
+	{
 		return GameStatus::LevelComplete;
+	}
+	else if (NextLevel < 0)
+	{
+		g_GameFlow->SelectedSaveGame = -(NextLevel + 1);
+		return GameStatus::LoadGame;
+	}
 
 	return GameStatus::None;
 }

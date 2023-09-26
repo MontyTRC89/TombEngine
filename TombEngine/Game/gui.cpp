@@ -202,7 +202,7 @@ namespace TEN::Gui
 		return Rings[(int)ringType];
 	}
 
-	short GuiController::GetSelectedOption()
+	int GuiController::GetSelectedOption()
 	{
 		return SelectedOption;
 	}
@@ -295,7 +295,7 @@ namespace TEN::Gui
 		switch (MenuToDisplay)
 		{
 		case Menu::Title:
-			OptionCount = numTitleOptions;
+			OptionCount = g_GameFlow->IsLoadSaveEnabled() ? numTitleOptions : (numTitleOptions - 1);
 			break;
 
 		case Menu::SelectLevel:
@@ -378,7 +378,12 @@ namespace TEN::Gui
 
 				if (MenuToDisplay == Menu::Title)
 				{
-					switch (SelectedOption)
+					// Skip load game entry if loading and saving is disabled.
+					int realSelectedOption = SelectedOption;
+					if (!g_GameFlow->IsLoadSaveEnabled() && SelectedOption > TitleOption::NewGame)
+						realSelectedOption++;
+
+					switch (realSelectedOption)
 					{
 					case TitleOption::NewGame:
 						if (g_GameFlow->IsLevelSelectEnabled())
@@ -388,7 +393,9 @@ namespace TEN::Gui
 							MenuToDisplay = Menu::SelectLevel;
 						}
 						else
+						{
 							inventoryResult = InventoryResult::NewGame;
+						}
 
 						break;
 
@@ -396,6 +403,7 @@ namespace TEN::Gui
 						selectedOptionBackup = SelectedOption;
 						SelectedOption = 0;
 						MenuToDisplay = Menu::LoadGame;
+						SaveGame::LoadSavegameInfos();
 						break;
 
 					case TitleOption::Options:
@@ -881,7 +889,7 @@ namespace TEN::Gui
 			MenuToDisplay = Menu::Options;
 			SelectedOption = 1;
 
-			SetVolumeMusic(g_Configuration.MusicVolume);
+			SetVolumeTracks(g_Configuration.MusicVolume);
 			SetVolumeFX(g_Configuration.SfxVolume);
 			return;
 		}
@@ -929,7 +937,7 @@ namespace TEN::Gui
 					if (CurrentSettings.Configuration.MusicVolume < 0)
 						CurrentSettings.Configuration.MusicVolume = 0;
 
-					SetVolumeMusic(CurrentSettings.Configuration.MusicVolume);
+					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
 					isVolumeAdjusted = true;
 				}
 
@@ -968,7 +976,7 @@ namespace TEN::Gui
 					if (CurrentSettings.Configuration.MusicVolume > VOLUME_MAX)
 						CurrentSettings.Configuration.MusicVolume = VOLUME_MAX;
 
-					SetVolumeMusic(CurrentSettings.Configuration.MusicVolume);
+					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
 					isVolumeAdjusted = true;
 				}
 
@@ -1046,7 +1054,7 @@ namespace TEN::Gui
 			else if (SelectedOption == OtherSettingsOption::Cancel)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				SetVolumeMusic(g_Configuration.MusicVolume);
+				SetVolumeTracks(g_Configuration.MusicVolume);
 				SetVolumeFX(g_Configuration.SfxVolume);
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 				SelectedOption = 1;
@@ -1680,7 +1688,7 @@ namespace TEN::Gui
 		if (lara->Inventory.Diary.Present)
 			InsertObjectIntoList(INV_OBJECT_DIARY);
 
-		if (g_GameFlow->EnableLoadSave)
+		if (g_GameFlow->IsLoadSaveEnabled())
 		{
 			InsertObjectIntoList(INV_OBJECT_LOAD_FLOPPY);
 			InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
@@ -2532,12 +2540,12 @@ namespace TEN::Gui
 						break;
 
 					case MenuType::Load:
-						// fill_up_savegames_array // Maybe not?
+						SaveGame::LoadSavegameInfos();
 						SetInventoryMode(InventoryMode::Load);
 						break;
 
 					case MenuType::Save:
-						// fill_up_savegames_array
+						SaveGame::LoadSavegameInfos();
 						SetInventoryMode(InventoryMode::Save);
 						break;
 
@@ -3386,7 +3394,7 @@ namespace TEN::Gui
 		}
 	}
 
-	short GuiController::GetLoadSaveSelection()
+	int GuiController::GetLoadSaveSelection()
 	{
 		return SelectedSaveSlot;
 	}
@@ -3456,7 +3464,6 @@ namespace TEN::Gui
 		if (GuiIsSelected())
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			g_GameScript->OnSave();
 			SaveGame::Save(SelectedSaveSlot);
 			return true;
 		}
