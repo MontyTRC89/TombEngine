@@ -56,7 +56,19 @@ namespace TEN::Renderer
 				// Measure string.
 				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
 
-				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (size.x / 2.0f)) : (pos.x * factor.x);
+				if (flags & PRINTSTRING_CENTER)
+				{
+					rString.X = ((pos.x * factor.x) - (size.x / 2.0f));
+				}
+				else if (flags & PRINTSTRING_RIGHT)
+				{
+					rString.X = ((pos.x * factor.x) - size.x);
+				}
+				else
+				{
+					rString.X = (pos.x * factor.x);
+				}
+
 				rString.Y = (pos.y * uiScale) + yOffset;
 
 				if (flags & PRINTSTRING_BLINK)
