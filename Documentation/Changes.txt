@@ -39,6 +39,7 @@ Lua API changes:
 * Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
 * Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.
 * Fix activation of a flipped room when using SetPos() script command or position change node.
+* Add extra parameter to GiveItem() function to optionally display an inventory item given to the player in the pickup summary.
 
 Version 1.1.0
 ==============
