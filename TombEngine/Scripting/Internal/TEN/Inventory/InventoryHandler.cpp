@@ -28,7 +28,7 @@ namespace InventoryHandler
 		if (addToPickupSummary.value_or(false))
 		{
 			auto pos = GetJointPosition(LaraItem, LM_HIPS).ToVector3();
-			g_Hud.PickupSummary.AddDisplayPickup(objectID, pos, false);
+			g_Hud.PickupSummary.AddDisplayPickup(objectID, pos);
 		}
 	}
 
