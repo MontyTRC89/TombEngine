@@ -55,7 +55,7 @@ namespace TEN::Player
 
 	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto LOWER_FLOOR_BOUND = -CLICK(0.5f);
+		constexpr auto LOWER_FLOOR_BOUND = -CLICK(0.75f);
 		constexpr auto UPPER_FLOOR_BOUND = -STEPUP_HEIGHT;
 
 		// Get point collision.
@@ -75,7 +75,7 @@ namespace TEN::Player
 	bool CanStepDown(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto LOWER_FLOOR_BOUND = STEPUP_HEIGHT;
-		constexpr auto UPPER_FLOOR_BOUND = CLICK(0.5f);
+		constexpr auto UPPER_FLOOR_BOUND = CLICK(0.75f);
 
 		// Get point collision.
 		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Offset required for correct bridge collision.
