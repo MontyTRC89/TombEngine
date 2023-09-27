@@ -133,7 +133,7 @@ namespace TEN::Gui
 		int OptionCount;
 		int SelectedSaveSlot;
 
-		float TimeInMenu = 0.0f;
+		float TimeInMenu = -1.0f;
 		SettingsData CurrentSettings;
 
 		// Inventory variables
@@ -183,14 +183,14 @@ namespace TEN::Gui
 
 		// Getters
 		const InventoryRing& GetRing(RingTypes ringType);
-		short GetSelectedOption();
+		int GetSelectedOption();
 		Menu GetMenuToDisplay();
 		InventoryMode GetInventoryMode();
 		int GetInventoryItemChosen();
 		int GetEnterInventory();
 		int GetLastInventoryItem();
 		SettingsData& GetCurrentSettings();
-		short GetLoadSaveSelection();
+		int GetLoadSaveSelection();
 
 		// Setters
 		void SetSelectedOption(int menu);

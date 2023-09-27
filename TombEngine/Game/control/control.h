@@ -57,7 +57,7 @@ extern bool ThreadEnded;
 
 extern int RequiredStartPos;
 extern int CurrentLevel;
-extern int LevelComplete;
+extern int NextLevel;
 extern int SystemNameHash;
 
 extern bool  InItemControlLoop;

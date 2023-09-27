@@ -93,7 +93,7 @@ bool ThreadEnded;
 
 int RequiredStartPos;
 int CurrentLevel;
-int LevelComplete;
+int NextLevel;
 
 int SystemNameHash = 0;
 
@@ -614,16 +614,20 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 	// Does the player want to enter inventory?
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-		g_Gui.GetInventoryMode() != InventoryMode::Save)
+		g_Gui.GetInventoryMode() != InventoryMode::Save &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 
 		if (g_Gui.CallInventory(LaraItem, false))
 			result = GameStatus::SaveGame;
 	}
 	else if (IsClicked(In::Load) &&
-			 g_Gui.GetInventoryMode() != InventoryMode::Load)
+		g_Gui.GetInventoryMode() != InventoryMode::Load &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -668,8 +672,16 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	}
 
 	// Check if level has been completed.
-	if (LevelComplete)
+	// Negative NextLevel indicates that a savegame must be loaded from corresponding slot.
+	if (NextLevel > 0)
+	{
 		return GameStatus::LevelComplete;
+	}
+	else if (NextLevel < 0)
+	{
+		g_GameFlow->SelectedSaveGame = -(NextLevel + 1);
+		return GameStatus::LoadGame;
+	}
 
 	return GameStatus::None;
 }

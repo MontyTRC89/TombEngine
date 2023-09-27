@@ -66,6 +66,35 @@ namespace TEN::Control::Volumes
 			event.CallCounter--;
 	}
 
+	bool HandleEvent(const std::string& name, VolumeEventType eventType, VolumeActivator activator)
+	{
+		// Cache last used event sets so that whole list is not searched every time user calls this.
+		static VolumeEventSet* lastEventSetPtr = nullptr;
+
+		if (lastEventSetPtr != nullptr && lastEventSetPtr->Name != name)
+			lastEventSetPtr = nullptr;
+
+		if (lastEventSetPtr == nullptr)
+		{
+			for (auto& eventSet : g_Level.EventSets)
+			{
+				if (eventSet.Name == name)
+				{
+					lastEventSetPtr = &eventSet;
+					break;
+				}
+			}
+		}
+
+		if (lastEventSetPtr != nullptr)
+		{
+			HandleEvent(lastEventSetPtr->Events[(int)eventType], activator);
+			return true;
+		}
+	
+		return false;
+	}
+
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator)
 	{
 		if (roomNumber == NO_ROOM)
@@ -120,14 +149,14 @@ namespace TEN::Control::Volumes
 							GameTimer 
 						});
 
-					HandleEvent(set.OnEnter, activator);
+					HandleEvent(set.Events[(int)VolumeEventType::Enter], activator);
 				}
 				else
 				{
 					entryPtr->Status = VolumeStateStatus::Inside;
 					entryPtr->Timestamp = GameTimer;
 
-					HandleEvent(set.OnInside, activator);
+					HandleEvent(set.Events[(int)VolumeEventType::Inside], activator);
 				}
 			}
 			else if (entryPtr != nullptr)
@@ -140,7 +169,7 @@ namespace TEN::Control::Volumes
 					entryPtr->Status = VolumeStateStatus::Leaving;
 					entryPtr->Timestamp = GameTimer;
 
-					HandleEvent(set.OnLeave, activator);
+					HandleEvent(set.Events[(int)VolumeEventType::Leave], activator);
 				}
 			}
 		}
@@ -223,21 +252,24 @@ namespace TEN::Control::Volumes
 		unsigned int nodeCount = 0;
 		for (const auto& set : g_Level.EventSets)
 		{
-			if ((set.OnEnter.Mode == VolumeEventMode::Nodes) && !set.OnEnter.Data.empty())
+			if ((set.Events[(int)VolumeEventType::Enter].Mode == VolumeEventMode::Nodes) && 
+				!set.Events[(int)VolumeEventType::Enter].Data.empty())
 			{
-				g_GameScript->ExecuteString(set.OnEnter.Data);
+				g_GameScript->ExecuteString(set.Events[(int)VolumeEventType::Enter].Data);
 				nodeCount++;
 			}
 
-			if ((set.OnInside.Mode == VolumeEventMode::Nodes) && !set.OnInside.Data.empty())
+			if ((set.Events[(int)VolumeEventType::Inside].Mode == VolumeEventMode::Nodes) &&
+				!set.Events[(int)VolumeEventType::Inside].Data.empty())
 			{
-				g_GameScript->ExecuteString(set.OnInside.Data);
+				g_GameScript->ExecuteString(set.Events[(int)VolumeEventType::Inside].Data);
 				nodeCount++;
 			}				
 
-			if ((set.OnLeave.Mode == VolumeEventMode::Nodes) && !set.OnLeave.Data.empty())
+			if ((set.Events[(int)VolumeEventType::Leave].Mode == VolumeEventMode::Nodes) && 
+				!set.Events[(int)VolumeEventType::Leave].Data.empty())
 			{
-				g_GameScript->ExecuteString(set.OnLeave.Data);
+				g_GameScript->ExecuteString(set.Events[(int)VolumeEventType::Leave].Data);
 				nodeCount++;
 			}
 		}
