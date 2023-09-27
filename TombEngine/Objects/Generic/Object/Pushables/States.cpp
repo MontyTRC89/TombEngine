@@ -27,8 +27,7 @@ namespace TEN::Entities::Generic
 	constexpr auto PUSHABLE_GRAVITY_WATER	 = 4.0f;
 	constexpr auto PUSHABLE_GRAVITY_ACCEL	 = 0.5f;
 
-	constexpr auto PUSHABLE_WATER_SURFACE_DISTANCE	 = CLICK(0.5f);
-	constexpr auto PUSHABLE_EDGE_SLIP_LEAN_ANGLE_MAX = ANGLE(60.0f);
+	constexpr auto PUSHABLE_WATER_SURFACE_DISTANCE = CLICK(0.5f);
 
 	// TODO: Do it this way.
 	std::unordered_map<PushableState, std::function<void(int)>> PUSHABLE_STATE_MAP;/* =
