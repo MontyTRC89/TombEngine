@@ -119,7 +119,7 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 
 	LaraDeflectEdge(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
 		//DoLaraStep(item, coll);
 		LaraSnapToHeight(item, coll);
@@ -222,7 +222,7 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 
 	LaraDeflectEdge(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
 		//DoLaraStep(item, coll);
 		LaraSnapToHeight(item, coll);

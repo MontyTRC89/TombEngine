@@ -13,7 +13,7 @@ namespace TEN::Player
 		bool TestDeathFloor			= true;
 	};
 
-	struct MonkeySwingSetupData
+	struct MonkeySwingMovementSetupData
 	{
 		short HeadingAngle		= 0;
 		int	  LowerCeilingBound = 0.0f;

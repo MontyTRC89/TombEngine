@@ -27,7 +27,7 @@ namespace TEN::Player
 		CollPtr = &coll;*/
 	}
 
-	bool CanPerformStep(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanChangeElevation(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto LOWER_FLOOR_BOUND = STEPUP_HEIGHT;
 		constexpr auto UPPER_FLOOR_BOUND = -STEPUP_HEIGHT;
@@ -35,7 +35,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Offset required for correct bridge collision.
+		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Height offset required for correct bridge collision.
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 
 		// 1) Test if player is already aligned with floor.
@@ -53,18 +53,24 @@ namespace TEN::Player
 		return false;
 	}
 
-	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll)
+	static bool CanPerformStep(const ItemInfo& item, const CollisionInfo& coll, bool isGoingUp)
 	{
-		constexpr auto LOWER_FLOOR_BOUND = -CLICK(0.75f);
-		constexpr auto UPPER_FLOOR_BOUND = -STEPUP_HEIGHT;
+		constexpr auto LOWER_FLOOR_BOUND_UP	  = -CLICK(0.75f);
+		constexpr auto UPPER_FLOOR_BOUND_UP	  = -STEPUP_HEIGHT;
+		constexpr auto LOWER_FLOOR_BOUND_DOWN = STEPUP_HEIGHT;
+		constexpr auto UPPER_FLOOR_BOUND_DOWN = CLICK(0.75f);
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Offset required for correct bridge collision.
+		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Height offset required for correct bridge collision.
 		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
 
+		// Determine appropriate floor bounds.
+		int lowerFloorBound = isGoingUp ? LOWER_FLOOR_BOUND_UP : LOWER_FLOOR_BOUND_DOWN;
+		int upperFloorBound = isGoingUp ? UPPER_FLOOR_BOUND_UP : UPPER_FLOOR_BOUND_DOWN;
+
 		// Assess point collision.
-		if (relFloorHeight <= LOWER_FLOOR_BOUND && // Floor height is above lower floor bound.
-			relFloorHeight >= UPPER_FLOOR_BOUND)   // Floor height is below upper floor bound.
+		if (relFloorHeight <= lowerFloorBound && // Floor height is above lower floor bound.
+			relFloorHeight >= upperFloorBound)	 // Floor height is below upper floor bound.
 		{
 			return true;
 		}
@@ -72,23 +78,14 @@ namespace TEN::Player
 		return false;
 	}
 
+	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return CanPerformStep(item, coll, true);
+	}
+
 	bool CanStepDown(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto LOWER_FLOOR_BOUND = STEPUP_HEIGHT;
-		constexpr auto UPPER_FLOOR_BOUND = CLICK(0.75f);
-
-		// Get point collision.
-		auto pointColl = GetCollision(&item, 0, 0, -coll.Setup.Height / 2); // NOTE: Offset required for correct bridge collision.
-		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
-
-		// Assess point collision.
-		if (relFloorHeight <= LOWER_FLOOR_BOUND && // Floor height is above lower floor bound.
-			relFloorHeight >= UPPER_FLOOR_BOUND)   // Floor height is below upper floor bound.
-		{
-			return true;
-		}
-
-		return false;
+		return CanPerformStep(item, coll, false);
 	}
 
 	bool CanStrikeAfkPose(const ItemInfo& item, const CollisionInfo& coll)
@@ -643,7 +640,7 @@ namespace TEN::Player
 		return false;
 	}
 
-	static bool TestMonkeySwingSetup(const ItemInfo& item, const CollisionInfo& coll, const MonkeySwingSetupData& setup)
+	static bool TestMonkeySwingSetup(const ItemInfo& item, const CollisionInfo& coll, const MonkeySwingMovementSetupData& setup)
 	{
 		// HACK: Have to make the height explicit for now. -- Sezz 2022.07.28
 		constexpr auto PLAYER_HEIGHT = LARA_HEIGHT_MONKEY;
@@ -721,7 +718,7 @@ namespace TEN::Player
 
 	bool CanMonkeyForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setup = MonkeySwingSetupData
+		auto setup = MonkeySwingMovementSetupData
 		{
 			item.Pose.Orientation.y,
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey forward state.
@@ -732,7 +729,7 @@ namespace TEN::Player
 
 	bool CanMonkeyBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto setup = MonkeySwingSetupData
+		auto setup = MonkeySwingMovementSetupData
 		{
 			short(item.Pose.Orientation.y + ANGLE(180.0f)),
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey backward state.
@@ -743,7 +740,7 @@ namespace TEN::Player
 
 	static bool TestMonkeyShimmy(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
 	{
-		auto setup = MonkeySwingSetupData
+		auto setup = MonkeySwingMovementSetupData
 		{
 			short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 			(int)CLICK(0.5f), (int)-CLICK(0.5f) // NOTE: Bounds defined by monkey shimmy left/right states.

@@ -661,20 +661,20 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 		SpawnBubble(pos, item->RoomNumber);
 }
 
-// TODO: This approach may cause undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
+// TODO: This approach may present undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
 // Potential solutions:
 // 1. Consider floor tilt when translating objects.
 // 2. Object parenting. -- Sezz 2022.10.28
-void EasePlayerVerticalPosition(ItemInfo* item, int height)
+void EasePlayerElevation(ItemInfo* item, int relHeight)
 {
 	constexpr auto LINEAR_RATE_MIN = 50.0f;
 
 	// Check for wall.
-	if (height == NO_HEIGHT)
+	if (relHeight == NO_HEIGHT)
 		return;
 
 	// Handle swamp case.
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && relHeight > 0)
 	{
 		item->Pose.Position.y += SWAMP_GRAVITY;
 		return;
@@ -682,20 +682,20 @@ void EasePlayerVerticalPosition(ItemInfo* item, int height)
 
 	// Handle regular case.
 	float linearRate = std::max(LINEAR_RATE_MIN, abs(item->Animation.Velocity.z));
-	if (abs(height) > linearRate)
+	if (abs(relHeight) > linearRate)
 	{
-		int sign = std::copysign(1, height);
-		item->Pose.Position.y += linearRate * sign;
+		int sign = std::copysign(1, relHeight);
+		item->Pose.Position.y += (int)round(linearRate * sign);
+		return;
 	}
-	else
-	{
-		item->Pose.Position.y += height;
-	}
+
+	// Snap elevation.
+	item->Pose.Position.y += relHeight;
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
-void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
+void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 {
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
@@ -719,12 +719,12 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	EasePlayerVerticalPosition(item, coll->Middle.Floor);
+	EasePlayerElevation(item, coll->Middle.Floor);
 }
 
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 {
-	EasePlayerVerticalPosition(item, coll->Middle.Ceiling);
+	EasePlayerElevation(item, coll->Middle.Ceiling);
 }
 
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
@@ -914,12 +914,15 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
 {
+	// Determine sign.
 	axisCoeff *= invert ? -1 : 1;
 	int sign = std::copysign(1, axisCoeff);
 
+	// Normalize min and max turn rates according to axis coefficient.
 	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
 
+	// Calculate and return new turn rate.
 	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNorm, maxTurnRateNorm);
 	return (newTurnRate * sign);

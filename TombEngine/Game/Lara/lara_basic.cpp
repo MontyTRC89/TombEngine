@@ -103,7 +103,7 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	EasePlayerVerticalPosition(item, player.Context.ProjectedFloorHeight - item->Pose.Position.y);
+	EasePlayerElevation(item, player.Context.ProjectedFloorHeight - item->Pose.Position.y);
 	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.4f);
 
 	item->Animation.TargetState = LS_IDLE;
@@ -239,9 +239,9 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -394,9 +394,9 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -656,9 +656,9 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -757,9 +757,9 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -976,9 +976,9 @@ void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1010,9 +1010,9 @@ void lara_col_splat(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1105,9 +1105,9 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdge(item, coll))
 		LaraCollideStop(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1339,9 +1339,9 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanPerformStep(*item, *coll) || isWading)
+	if (CanChangeElevation(*item, *coll) || isWading)
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1435,9 +1435,9 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanPerformStep(*item, *coll) || isWading)
+	if (CanChangeElevation(*item, *coll) || isWading)
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1510,9 +1510,9 @@ void lara_col_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1565,9 +1565,9 @@ void lara_col_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1671,9 +1671,9 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanPerformStep(*item, *coll) || isWading)
+	if (CanChangeElevation(*item, *coll) || isWading)
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1822,9 +1822,9 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 	if (TestAndDoLaraLadderClimb(item, coll))
 		return;
 
-	if (CanPerformStep(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
@@ -1873,9 +1873,9 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }

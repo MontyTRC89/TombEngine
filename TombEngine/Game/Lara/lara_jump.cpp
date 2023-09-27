@@ -378,9 +378,9 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	ShiftItem(item, coll);
 
-	if (CanPerformStep(*item, *coll))
+	if (CanChangeElevation(*item, *coll))
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }

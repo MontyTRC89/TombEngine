@@ -13,7 +13,7 @@ namespace TEN::Player
 	class PlayerContext
 	{
 	private:
-		// TODO: Make LaraInfo aware of its parent.
+		// TODO: Make LaraInfo aware of its parent ItemInfo.
 		// Parent pointers
 		/*const ItemInfo*		 ItemPtr = nullptr;
 		const LaraInfo*		 PlayerPtr = nullptr;
@@ -21,7 +21,7 @@ namespace TEN::Player
 
 	public:
 		// Members
-		int			ProjectedFloorHeight = 0;
+		int			ProjectedFloorHeight = 0; // Used for primitive offset blend. TODO: Real offset blend feature + object parenting. -- Sezz 2023.09.27
 		float		CalcJumpVelocity	 = 0;
 		Pose		NextCornerPos		 = Pose::Zero;
 		EulerAngles TargetOrientation	 = EulerAngles::Zero;
@@ -30,17 +30,17 @@ namespace TEN::Player
 		short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
 		Vector3i WaterCurrentPull	= Vector3i::Zero;
 
-		int InteractedItem = 0; // Item number.
-		int Vehicle		   = 0; // Item number.
+		int InteractedItem = 0; // InteractedItemNumber.
+		int Vehicle		   = 0; // VehicleItemNumber.
 
 		PlayerContext() {};
 		PlayerContext(const ItemInfo& item, const CollisionInfo& coll);
 
-		// TODO: Move all functions below into this class. Resulting syntax will be a neat player.Context.CanDoXYZ().
+		// TODO: Move all functions seen below into this class. Resulting syntax will be a neat player.Context.CanDoXYZ().
 	};
 
-	// Ground movement contexts
-	bool CanPerformStep(const ItemInfo& item, const CollisionInfo& coll);
+	// Basic round movement contexts
+	bool CanChangeElevation(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepDown(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStrikeAfkPose(const ItemInfo& item, const CollisionInfo& coll);
@@ -56,6 +56,7 @@ namespace TEN::Player
 	bool CanWadeForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanWadeBackward(const ItemInfo& item, const CollisionInfo& coll);
 
+	// Basic vault contexts
 	bool CanVaultFromSprint(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Slide contexts
