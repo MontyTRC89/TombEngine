@@ -558,13 +558,13 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 	return true;
 }
 
-void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnimNumber, int creatureState, int playerState, GAME_OBJECT_ID playerAnimObjectID)
+void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnimNumber, int creatureState, int playerState)
 {
 	auto& playerItem = *LaraItem;
 	auto& player = GetLaraInfo(playerItem);
 
 	SetAnimation(*creatureItem, creatureAnimNumber);
-	SetAnimation(playerItem, playerAnimObjectID, playerAnimNumber);
+	SetAnimation(playerItem, ID_LARA_EXTRA_ANIMS, playerAnimNumber);
 
 	playerItem.Pose = creatureItem->Pose;
 	playerItem.Animation.IsAirborne = false;
