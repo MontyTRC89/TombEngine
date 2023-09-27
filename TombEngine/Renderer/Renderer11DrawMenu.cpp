@@ -702,7 +702,7 @@ namespace TEN::Renderer
 		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
 
 		// Draw count string.
-		if (pickup.Count != 0 && pickup.Count != 1)
+		if (pickup.Count != 1)
 		{
 			auto countString = (pickup.Count != -1) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
 			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;

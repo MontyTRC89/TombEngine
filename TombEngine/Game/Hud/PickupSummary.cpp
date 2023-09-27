@@ -84,6 +84,10 @@ namespace TEN::Hud
 	{
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
+		// No count; return early.
+		if (count == 0)
+			return;
+
 		float life = round(DisplayPickup::LIFE_MAX * FPS);
 
 		// Increment count of existing display pickup if it exists.
