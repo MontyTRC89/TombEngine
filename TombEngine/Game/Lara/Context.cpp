@@ -243,7 +243,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		if (player.Control.WaterStatus != WaterStatus::Wade &&
-			!player.Control.IsRunJumpQueued)				   // NOTE: Queued running jump blocks 180 roll.
+			!player.Control.IsRunJumpQueued) // NOTE: Queued running jump blocks 180 roll by design.
 		{
 			return true;
 		}
