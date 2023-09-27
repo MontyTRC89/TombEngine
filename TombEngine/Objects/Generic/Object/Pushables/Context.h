@@ -4,13 +4,13 @@ class Vector3i;
 
 namespace TEN::Entities::Generic
 {
-	enum class PushableEnvironmentState
+	enum class PushableEnvironmentType
 	{
 		Air,
-		Ground,
-		Slope,
-		Water,
-		GroundWater
+		FlatFloor,
+		SlopedFloor,
+		DeepWater,
+		ShallowWater
 	};
 
 	bool IsPushableValid(int itemNumber);
@@ -20,5 +20,5 @@ namespace TEN::Entities::Generic
 	bool PushableIdleConditions(int itemNumber);
 	bool PushableMovementConditions(int itemNumber, bool hasPushAction, bool hasPullAction);
 
-	PushableEnvironmentState CheckPushableEnvironment(int itemNumber, int& floorHeight, int* ceilingHeight = nullptr);
+	PushableEnvironmentType GetPushableEnvironmentType(int itemNumber, int& floorHeight, int* ceilingHeight = nullptr);
 }

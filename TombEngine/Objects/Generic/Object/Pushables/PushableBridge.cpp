@@ -66,7 +66,7 @@ namespace TEN::Entities::Generic
 		if (pushable.UsesRoomCollision)
 		{
 			AddBridge(itemNumber);
-			pushable.BridgeColliderFlag = true;
+			pushable.UseBridgeCollision = true;
 		}
 	}
 
@@ -78,7 +78,7 @@ namespace TEN::Entities::Generic
 		if (pushable.UsesRoomCollision)
 		{
 			RemoveBridge(itemNumber);
-			pushable.BridgeColliderFlag = false;
+			pushable.UseBridgeCollision = false;
 		}
 	}
 
@@ -100,7 +100,7 @@ namespace TEN::Entities::Generic
 		if (!pushablePtr->UsesRoomCollision)
 			return;
 
-		if (pushablePtr->BridgeColliderFlag)
+		if (pushablePtr->UseBridgeCollision)
 			addBridge ? AddBridge(itemNumber) : RemoveBridge(itemNumber);
 		
 		while (pushablePtr->StackUpperItem != NO_ITEM)
@@ -108,7 +108,7 @@ namespace TEN::Entities::Generic
 			pushableItemPtr = &g_Level.Items[pushablePtr->StackUpperItem];
 			pushablePtr = &GetPushableInfo(*pushableItemPtr);
 
-			if (pushablePtr->BridgeColliderFlag)
+			if (pushablePtr->UseBridgeCollision)
 				addBridge ? AddBridge(pushableItemPtr->Index) : RemoveBridge(pushableItemPtr->Index);
 		}
 	}

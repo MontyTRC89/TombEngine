@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Objects/Generic/Object/Pushables/Info.h"
 
+#include "Game/control/control.h"
+
 namespace TEN::Entities::Generic
 {
 	const auto PUSHABLE_SIDES_ATTRIBUTES_DEFAULT = PushableSidesAttributes(true, true, false);
@@ -17,7 +19,7 @@ namespace TEN::Entities::Generic
 		IsClimbable = isClimbable;
 	}
 
-	// TODO: Constants.
+	// TODO: Define constants.
 	PushableInfo::PushableInfo()
 	{
 		SoundState = PushableSoundState::None;
@@ -38,14 +40,15 @@ namespace TEN::Entities::Generic
 		DoAlignCenter = true;
 		IsBuoyant = false;
 		UsesRoomCollision = false;
-		BridgeColliderFlag = false;
+		UseBridgeCollision = false;
 
+		// TODO: Descriptive name.
 		SidesMap =
 		{
-			{ 0, PushableSidesAttributes() }, // North
-			{ 1, PushableSidesAttributes() }, // East
-			{ 2, PushableSidesAttributes() }, // South
-			{ 3, PushableSidesAttributes() }  // West
+			{ CardinalDirection::NORTH, PushableSidesAttributes() },
+			{ CardinalDirection::EAST, PushableSidesAttributes() },
+			{ CardinalDirection::SOUTH, PushableSidesAttributes() },
+			{ CardinalDirection::WEST, PushableSidesAttributes() }
 		};
 	}
 }

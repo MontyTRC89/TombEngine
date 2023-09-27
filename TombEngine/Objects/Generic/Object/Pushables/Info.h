@@ -49,7 +49,7 @@ namespace TEN::Entities::Generic
 		bool DoAlignCenter		= false; // OCB 1.
 		bool IsBuoyant			= false; // OCB 2.
 		bool UsesRoomCollision	= false; // Use room collision or object collision. Per slot.
-		bool BridgeColliderFlag = false;
+		bool UseBridgeCollision = false;
 
 		PushableInfo();
 	};

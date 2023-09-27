@@ -6,7 +6,7 @@ namespace TEN::Entities::Generic
 	{
 		Idle,
 		Move,
-		EdgeFall, // EdgeSlip?
+		EdgeSlip,
 		Fall,
 		Sink,
 		Float,
@@ -22,7 +22,7 @@ namespace TEN::Entities::Generic
 
 	void HandleIdleState(int itemNumber);
 	void HandleMoveState(int itemNumber);
-	void HandleEdgeFallState(int itemNumber);
+	void HandleEdgeSlipState(int itemNumber);
 	void HandleFallState(int itemNumber);
 	void HandleSinkState(int itemNumber);
 	void HandleFloatState(int itemNumber);

@@ -2,15 +2,16 @@
 #include "Objects/Generic/Object/Pushables/Context.h"
 
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushables/PushableObject.h"
 #include "Objects/Generic/Object/Pushables/PushableBridge.h"
 #include "Objects/Generic/Object/Pushables/Stack.h"
 #include "Specific/Input/Input.h"
-
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -308,7 +309,6 @@ namespace TEN::Entities::Generic
 		if (hasPullAction && !IsValidForPlayer(itemNumber))
 			return false;
 
-
 		//Stopper flag
 		//Put it in destiny
 		SetPushableStopperFlag(true, targetPos, targetRoom);
@@ -316,16 +316,15 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	PushableEnvironmentState CheckPushableEnvironment(int itemNumber, int& floorHeight, int* ceilingHeight)
+	// TODO: No output arguments.
+	PushableEnvironmentType GetPushableEnvironmentType(int itemNumber, int& floorHeight, int* ceilingHeight)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		PushableEnvironmentState result;
-
-		CollisionResult pointColl;
+		auto pointColl = CollisionResult{};
 		int waterHeight = NO_HEIGHT;
-		if (pushable.BridgeColliderFlag)
+		if (pushable.UseBridgeCollision)
 		{
 			RemovePushableBridge(itemNumber);
 			pointColl = GetCollision(&pushableItem);
@@ -338,53 +337,54 @@ namespace TEN::Entities::Generic
 			waterHeight = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
 		}
 
-		floorHeight = pointColl.Position.Floor; //Updates floorHeight reference for external use.
-		if (ceilingHeight  != nullptr)
+		// Update floorHeight reference for external use.
+		floorHeight = pointColl.Position.Floor;
+		if (ceilingHeight != nullptr)
 			*ceilingHeight = pointColl.Position.Ceiling;
-		
+
+
 		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
 		{
-			// Is in water
+			// Is in water.
 			pushable.WaterSurfaceHeight = waterHeight;
 
-			// Is it in ground or floating?
+			// Floating.
 			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
 				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
 			{
-				// Floating
-				result = PushableEnvironmentState::Water;
+				return PushableEnvironmentType::DeepWater;
 			}
+			// Water ground.
 			else
 			{
-				// Water ground
-				result = PushableEnvironmentState::GroundWater;
+				return PushableEnvironmentType::ShallowWater;
 			}
 		}
 		else
 		{
-			// Is in dry.
+			// Is above dry ground.
 			pushable.WaterSurfaceHeight = NO_HEIGHT;
 
-			// Is it on ground or on air?
+			// Airborne.
 			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
 				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
 			{
-				result = PushableEnvironmentState::Air;
+				return PushableEnvironmentType::Air;
 			}
+			// Grounded.
 			else
 			{
-				if (pointColl.FloorTilt.x == 0 && pointColl.FloorTilt.y == 0)
+				// Floor is flat.
+				if (Geometry::GetSurfaceSlopeAngle(GetSurfaceNormal(pointColl.FloorTilt, true)) == 0)
 				{
-					//Is on a flat floor
-					result = PushableEnvironmentState::Ground;
+					return PushableEnvironmentType::FlatFloor;
 				}
+				// Floor is sloped.
 				else
 				{
-					//Is on a slope floor
-					result = PushableEnvironmentState::Slope;
+					return PushableEnvironmentType::SlopedFloor;
 				}
 			}
 		}
-		return result;
 	}
 }
