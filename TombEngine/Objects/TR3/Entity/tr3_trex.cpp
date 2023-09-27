@@ -73,49 +73,6 @@ namespace TEN::Entities::Creatures::TR3
 		TREX_ANIM_RUN_FORWARD_TO_IDLE_LEFT = 18 //This one is missing in TR1 TRex object.
 	};
 
-	void LaraTRexDeath(ItemInfo* tRexItem, ItemInfo* laraItem)
-	{
-		tRexItem->Animation.TargetState = TREX_STATE_KILL;
-		
-		auto& lara = *GetLaraInfo(laraItem);
-
-		if (laraItem->RoomNumber != tRexItem->RoomNumber)
-			ItemNewRoom(laraItem->Index, tRexItem->RoomNumber);
-
-		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_TREX_DEATH);
-		laraItem->Animation.IsAirborne = false;
-
-		laraItem->Pose = Pose(
-			tRexItem->Pose.Position,
-			EulerAngles(0, tRexItem->Pose.Orientation.y, 0));
-		
-		if (tRexItem->RoomNumber != laraItem->RoomNumber)
-			ItemNewRoom(laraItem->Index, tRexItem->RoomNumber);
-		
-		AnimateItem(laraItem);
-		laraItem->HitPoints = -1;
-		lara.ExtraAnim = 1;
-		lara.HitDirection = -1;
-		lara.Status.Air = -1;
-		lara.Control.HandStatus = HandStatus::Busy;
-		lara.Control.Weapon.GunType = LaraWeaponType::None;
-
-		/* Old method (Waiting for review before delete it).
-		Camera.flags = CF_FOLLOW_CENTER;
-		Camera.targetAngle = ANGLE(170.0f);
-		Camera.targetElevation = -ANGLE(25.0f);
-		*/
-
-		//TR4 method
-		Camera.pos.RoomNumber = laraItem->RoomNumber;
-		Camera.type = CameraType::Fixed;
-		ForcedFixedCamera.x = tRexItem->Pose.Position.x + ((BLOCK(5) * phd_sin(tRexItem->Pose.Orientation.y)));
-		ForcedFixedCamera.y = tRexItem->Pose.Position.y - BLOCK(1.5f);
-		ForcedFixedCamera.z = tRexItem->Pose.Position.z + ((BLOCK(5) * phd_cos(tRexItem->Pose.Orientation.y)));
-		ForcedFixedCamera.RoomNumber = tRexItem->RoomNumber;
-		UseForcedFixedCamera = true;
-	}
-
 	void TRexControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -205,17 +162,22 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TREX_STATE_ATTACK:
-				creature->MaxTurn = 0;
 
 				if (item->TouchBits.Test(TRexAttackJoints))
 				{
-					item->Animation.TargetState = TREX_STATE_KILL;
-
-					DoDamage(LaraItem, 1500);
-					LaraTRexDeath(item, LaraItem);
+					CreatureKill(item, TREX_ANIM_KILL, LEA_TREX_DEATH, TREX_STATE_KILL, LS_DEATH);
 				}
 
-				item->Animation.RequiredState = TREX_STATE_WALK_FORWARD;
+				break;
+
+			case TREX_STATE_KILL:
+				creature->MaxTurn = 0;
+
+				Camera.flags = CF_FOLLOW_CENTER;
+				Camera.targetAngle = ANGLE(170.0f);
+				Camera.targetElevation = -ANGLE(25.0f);
+				Camera.targetDistance = BLOCK(3);
+
 				break;
 			}
 		}
