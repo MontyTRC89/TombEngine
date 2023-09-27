@@ -151,6 +151,14 @@ level count, jumps to title.
 	*/
 	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
 
+	/***
+	Check if SaveGame exists.
+	@function DoesSaveGameExist
+	@tparam int slotID ID of the savegame slot to clear.
+	@treturn bool true if the savegame exists, false if it does not exist.
+	*/
+	tableFlow.set_function(ScriptReserved_DoesSaveGameExist, &FlowHandler::DoesSaveGameExist, this);
+
 /***
 Returns the player's current per-game secret count.
 @function GetSecretCount
@@ -428,6 +436,11 @@ void FlowHandler::LoadGame(int slot)
 void FlowHandler::DeleteSaveGame(int slot)
 {
 	SaveGame::Delete(slot);
+}
+
+bool FlowHandler::DoesSaveGameExist(int slot)
+{
+	return SaveGame::DoesSaveGameExist(slot);
 }
 
 int FlowHandler::GetSecretCount() const
