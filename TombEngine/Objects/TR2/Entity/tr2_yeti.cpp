@@ -235,6 +235,9 @@ namespace TEN::Entities::Creatures::TR2
 					CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 					DoDamage(info->Enemy, 100);
 					info->Flags = 1;
+
+					if (LaraItem->HitPoints <= 0)
+						CreatureKill(item, YETI_ANIM_KILL, LEA_YETI_DEATH, YETI_ANIM_DEATH, LS_DEATH);
 				}
 
 				break;
@@ -256,6 +259,9 @@ namespace TEN::Entities::Creatures::TR2
 
 					DoDamage(info->Enemy, 150);
 					info->Flags = 1;
+
+					if (LaraItem->HitPoints <= 0)
+						CreatureKill(item, YETI_ANIM_KILL, LEA_YETI_DEATH, YETI_ANIM_DEATH, LS_DEATH);
 				}
 
 				break;
@@ -275,6 +281,9 @@ namespace TEN::Entities::Creatures::TR2
 
 					DoDamage(info->Enemy, 200);
 					info->Flags = 1;
+
+					if (LaraItem->HitPoints <= 0)
+						CreatureKill(item, YETI_ANIM_KILL, LEA_YETI_DEATH, YETI_ANIM_DEATH, LS_DEATH);
 				}
 
 				break;
@@ -297,14 +306,6 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 			}
-		}
-
-		if (!isLaraAlive && LaraItem->Animation.AnimNumber != (LEA_YETI_DEATH + NUM_LARA_ANIMS))
-		{
-			info->MaxTurn = 0;
-			CreatureKill(item, YETI_ANIM_KILL, LEA_YETI_DEATH, YETI_ANIM_DEATH, LS_DEATH);
-
-			return;
 		}
 
 		CreatureTilt(item, tilt);
