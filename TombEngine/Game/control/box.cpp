@@ -558,13 +558,13 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 	return true;
 }
 
-void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnimNumber, int creatureState, int playerState)
+void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnimNumber, int creatureState, int playerState, GAME_OBJECT_ID playerAnimObjectID)
 {
 	auto& playerItem = *LaraItem;
 	auto& player = GetLaraInfo(playerItem);
 
 	SetAnimation(*creatureItem, creatureAnimNumber);
-	SetAnimation(playerItem, ID_LARA_EXTRA_ANIMS, playerAnimNumber);
+	SetAnimation(playerItem, playerAnimObjectID, playerAnimNumber);
 
 	playerItem.Pose = creatureItem->Pose;
 	playerItem.Animation.IsAirborne = false;
@@ -576,15 +576,16 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 	AnimateItem(&playerItem);
 
 	player.ExtraAnim = 1;
+	playerItem.HitPoints = -1;
 	player.Control.HandStatus = HandStatus::Busy;
 	player.Control.Weapon.GunType = LaraWeaponType::None;
 	player.HitDirection = -1;
 
 	Camera.pos.RoomNumber = playerItem.RoomNumber; 
-	Camera.type = CameraType::Chase;
-	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	//Camera.type = CameraType::Chase;
+	//Camera.flags = CF_FOLLOW_CENTER;
+	//Camera.targetAngle = ANGLE(170.0f);
+	//Camera.targetElevation = -ANGLE(25.0f);
 }
 
 short CreatureEffect2(ItemInfo* item, const CreatureBiteInfo& bite, short velocity, short angle, std::function<CreatureEffectFunction> func)

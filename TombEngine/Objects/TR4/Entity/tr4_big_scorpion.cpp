@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/tr4_big_scorpion.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
@@ -251,12 +252,21 @@ namespace TEN::Entities::TR4
 
 					if (creature->Enemy->IsLara() && creature->Enemy->HitPoints <= 0)
 					{
-						CreatureKill(item, BSCORPION_ANIM_KILL, 0, BSCORPION_STATE_KILL, LS_DEATH); // TODO: add big_scorpion lara extra state enum
+						CreatureKill(item, BSCORPION_ANIM_KILL, LA_BIG_SCORPION_DEATH, BSCORPION_STATE_KILL, LS_DEATH, ID_LARA); // TODO: add big_scorpion lara extra state enum
 						creature->MaxTurn = 0;
 						return;
 					}
 				}
 
+				break;
+
+			case BSCORPION_STATE_KILL:
+				creature->MaxTurn = 0;
+
+				Camera.flags = CF_FOLLOW_CENTER;
+				Camera.targetAngle = ANGLE(170.0f);
+				Camera.targetElevation = -ANGLE(25.0f);
+				Camera.targetDistance = BLOCK(2);
 				break;
 
 			case BSCORPION_STATE_KILL_TROOP:
