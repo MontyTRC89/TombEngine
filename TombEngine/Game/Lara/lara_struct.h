@@ -841,7 +841,8 @@ enum LaraExtraAnim
 	LEA_STRIKE_GONG = 11,
 	LEA_WILLARD_DEATH = 12,
 	LEA_TRAIN_DEATH_END = 13,
-	LEA_SETH_DEATH = 14
+	LEA_SETH_DEATH = 14,
+	LEA_YETI_DEATH = 15
 };
 #pragma endregion
 

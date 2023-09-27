@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_yeti.h"
 
+#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -24,13 +25,27 @@ namespace TEN::Entities::Creatures::TR2
 	// TODO
 	enum YetiState
 	{
-
+		YETI_STATE_RUN = 1,
+		YETI_STATE_IDLE = 2,
+		YETI_STATE_WALK = 3,
+		YETI_STATE_ATTACK_IDLE = 4,
+		YETI_STATE_ATTACK_DOUBLE = 5,
+		YETI_STATE_ATTACK_MOVING = 6,
+		YETI_STATE_ROAR = 7,
+		YETI_STATE_DEATH = 8,
+		YETI_STATE_RAGE = 9,
+		YETI_STATE_CLIMB_2 = 10,
+		YETI_STATE_CLIMB_3 = 11,
+		YETI_STATE_CLIMB_4 = 12,
+		YETI_STATE_FALL_4 = 13,
+		YETI_STATE_KILL = 14
 	};
 
 	// TODO
 	enum YetiAnim
 	{
-
+		YETI_ANIM_DEATH = 31,
+		YETI_ANIM_KILL = 36
 	};
 
 	void InitializeYeti(short itemNumber)
@@ -77,7 +92,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			switch (item->Animation.ActiveState)
 			{
-			case 2:
+			case YETI_STATE_IDLE:
 				info->MaxTurn = 0;
 				info->Flags = 0;
 
@@ -108,7 +123,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case 7:
+			case YETI_STATE_ROAR:
 				if (AI.ahead)
 					head = AI.angle;
 
@@ -134,7 +149,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case 9:
+			case YETI_STATE_RAGE:
 				if (AI.ahead)
 					head = AI.angle;
 
@@ -157,7 +172,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case 3:
+			case YETI_STATE_WALK:
 				info->MaxTurn = ANGLE(4.0f);
 
 				if (AI.ahead)
@@ -190,7 +205,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case 1:
+			case YETI_STATE_RUN:
 				tilt = angle / 4;
 				info->MaxTurn = ANGLE(6.0f);
 				info->Flags = 0;
@@ -211,7 +226,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case 4:
+			case YETI_STATE_ATTACK_IDLE:
 				if (AI.ahead)
 					torso = AI.angle;
 
@@ -224,7 +239,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case 5:
+			case YETI_STATE_ATTACK_DOUBLE:
 				info->MaxTurn = ANGLE(4.0f);
 
 				if (AI.ahead)
@@ -245,7 +260,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case 6:
+			case YETI_STATE_ATTACK_MOVING:
 				if (AI.ahead)
 					torso = AI.angle;
 
@@ -264,19 +279,31 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case 10:
-			case 11:
-			case 12:
-			case 13:
+			case YETI_STATE_CLIMB_2:
+			case YETI_STATE_CLIMB_3:
+			case YETI_STATE_CLIMB_4:
+			case YETI_STATE_FALL_4:
 				info->MaxTurn = 0;
+
+				break;
+
+			case YETI_STATE_KILL:
+				info->MaxTurn = 0;
+
+				Camera.flags = CF_FOLLOW_CENTER;
+				Camera.targetAngle = ANGLE(170.0f);
+				Camera.targetElevation = -ANGLE(25.0f);
+				Camera.targetDistance = BLOCK(2);
+
 				break;
 			}
 		}
 
-		if (!isLaraAlive)
+		if (!isLaraAlive && LaraItem->Animation.AnimNumber != (LEA_YETI_DEATH + NUM_LARA_ANIMS))
 		{
 			info->MaxTurn = 0;
-			CreatureKill(item, 31, 0, 14, 103); // TODO: add yeti state enum and lara extra state enum
+			CreatureKill(item, YETI_ANIM_KILL, LEA_YETI_DEATH, YETI_ANIM_DEATH, LS_DEATH);
+
 			return;
 		}
 
