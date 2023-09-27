@@ -166,17 +166,13 @@ namespace TEN::Entities::Creatures::TR3
 				if (item->TouchBits.Test(TRexAttackJoints))
 				{
 					CreatureKill(item, TREX_ANIM_KILL, LEA_TREX_DEATH, TREX_STATE_KILL, LS_DEATH);
+					Camera.targetDistance = BLOCK(3);
 				}
 
 				break;
 
 			case TREX_STATE_KILL:
 				creature->MaxTurn = 0;
-
-				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = ANGLE(170.0f);
-				Camera.targetElevation = -ANGLE(25.0f);
-				Camera.targetDistance = BLOCK(3);
 
 				break;
 			}

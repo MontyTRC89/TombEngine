@@ -514,11 +514,6 @@ namespace TEN::Entities::Creatures::TR2
 			case SPEAR_GUARDIAN_STATE_KILL:
 				creature->MaxTurn = 0;
 
-				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = ANGLE(170.0f);
-				Camera.targetElevation = -ANGLE(25.0f);
-				Camera.targetDistance = BLOCK(2);
-
 				break;
 			}
 		}

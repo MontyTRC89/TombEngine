@@ -263,10 +263,6 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_KILL:
 				creature->MaxTurn = 0;
 
-				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = ANGLE(170.0f);
-				Camera.targetElevation = -ANGLE(25.0f);
-				Camera.targetDistance = BLOCK(2);
 				break;
 
 			case BSCORPION_STATE_KILL_TROOP:

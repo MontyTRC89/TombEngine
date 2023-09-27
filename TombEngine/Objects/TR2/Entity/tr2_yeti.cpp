@@ -299,11 +299,6 @@ namespace TEN::Entities::Creatures::TR2
 			case YETI_STATE_KILL:
 				info->MaxTurn = 0;
 
-				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = ANGLE(170.0f);
-				Camera.targetElevation = -ANGLE(25.0f);
-				Camera.targetDistance = BLOCK(2);
-
 				break;
 			}
 		}

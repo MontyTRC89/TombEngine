@@ -506,11 +506,6 @@ namespace TEN::Entities::Creatures::TR3
 					CreatureEffect(item, ShivaBiteLeft, DoBloodSplat);
 				}
 
-				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = ANGLE(170.0f);
-				Camera.targetElevation = -ANGLE(25.0f);
-				Camera.targetDistance = BLOCK(2);
-
 				break;
 			}
 
