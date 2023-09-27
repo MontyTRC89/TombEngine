@@ -7,6 +7,7 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
@@ -35,7 +36,15 @@ namespace TEN::Entities::Creatures::TR3
 		TREX_STATE_DEATH = 5,
 		TREX_STATE_ROAR = 6,
 		TREX_STATE_ATTACK = 7,
-		TREX_STATE_KILL = 8
+		TREX_STATE_KILL = 8,
+		
+		//TODO TR3 states
+		TREX_STATE_ROARING_START = 9,
+		TREX_STATE_ROARING_LOOP = 10,
+		TREX_STATE_ROARING_END = 11,
+		TREX_STATE_SNIF_START = 12,
+		TREX_STATE_SNIF_LOOP = 13,
+		TREX_STATE_SNIF_END = 14
 	};
 
 	enum TRexAnim
@@ -49,32 +58,62 @@ namespace TEN::Entities::Creatures::TR3
 		TREX_ANIM_ATTACK = 6,
 		TREX_ANIM_IDLE_TO_RUN_START = 7,
 		TREX_ANIM_IDLE_TO_RUN_END = 8,
-		TREX_ANIM_RUN_FORWARD_TO_IDLE = 9,
+		TREX_ANIM_RUN_FORWARD_TO_IDLE_RIGHT = 9,
 		TREX_ANIM_DEATH = 10,
-		TREX_ANIM_KILL = 11
+		TREX_ANIM_KILL = 11,
+		
+		//TODO TR3 STATES
+		TREX_ANIM_ROARING_START = 12,
+		TREX_ANIM_ROARING_LOOP = 13,
+		TREX_ANIM_ROARING_END = 14,
+		TREX_ANIM_SNIF_START = 15,
+		TREX_ANIM_SNIF_LOOP = 16,
+		TREX_ANIM_SNIF_END = 17,
+
+		TREX_ANIM_RUN_FORWARD_TO_IDLE_LEFT = 18 //This one is missing in TR1 TRex object.
 	};
 
 	void LaraTRexDeath(ItemInfo* tRexItem, ItemInfo* laraItem)
 	{
 		tRexItem->Animation.TargetState = TREX_STATE_KILL;
+		
+		auto& lara = *GetLaraInfo(laraItem);
 
 		if (laraItem->RoomNumber != tRexItem->RoomNumber)
 			ItemNewRoom(laraItem->Index, tRexItem->RoomNumber);
 
+		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_TREX_DEATH);
+		laraItem->Animation.IsAirborne = false;
+
 		laraItem->Pose = Pose(
 			tRexItem->Pose.Position,
 			EulerAngles(0, tRexItem->Pose.Orientation.y, 0));
-		laraItem->Animation.IsAirborne = false;
+		
+		if (tRexItem->RoomNumber != laraItem->RoomNumber)
+			ItemNewRoom(laraItem->Index, tRexItem->RoomNumber);
+		
+		AnimateItem(laraItem);
+		laraItem->HitPoints = -1;
+		lara.ExtraAnim = 1;
+		lara.HitDirection = -1;
+		lara.Status.Air = -1;
+		lara.Control.HandStatus = HandStatus::Busy;
+		lara.Control.Weapon.GunType = LaraWeaponType::None;
 
-		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_TREX_DEATH);
-		laraItem->HitPoints = NOT_TARGETABLE;
-		Lara.Status.Air = -1;
-		Lara.Control.HandStatus = HandStatus::Busy;
-		Lara.Control.Weapon.GunType = LaraWeaponType::None;
-
+		/* Old method (Waiting for review before delete it).
 		Camera.flags = CF_FOLLOW_CENTER;
 		Camera.targetAngle = ANGLE(170.0f);
 		Camera.targetElevation = -ANGLE(25.0f);
+		*/
+
+		//TR4 method
+		Camera.pos.RoomNumber = laraItem->RoomNumber;
+		Camera.type = CameraType::Fixed;
+		ForcedFixedCamera.x = tRexItem->Pose.Position.x + ((BLOCK(5) * phd_sin(tRexItem->Pose.Orientation.y)));
+		ForcedFixedCamera.y = tRexItem->Pose.Position.y - BLOCK(1.5f);
+		ForcedFixedCamera.z = tRexItem->Pose.Position.z + ((BLOCK(5) * phd_cos(tRexItem->Pose.Orientation.y)));
+		ForcedFixedCamera.RoomNumber = tRexItem->RoomNumber;
+		UseForcedFixedCamera = true;
 	}
 
 	void TRexControl(short itemNumber)
@@ -166,6 +205,8 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TREX_STATE_ATTACK:
+				creature->MaxTurn = 0;
+
 				if (item->TouchBits.Test(TRexAttackJoints))
 				{
 					item->Animation.TargetState = TREX_STATE_KILL;
@@ -179,7 +220,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureJoint(item, 0, headYRot * 2);
+		CreatureJoint(item, 0, headYRot);
 		creature->JointRotation[1] = creature->JointRotation[0];
 
 		CreatureAnimation(itemNumber, headingAngle, 0);
