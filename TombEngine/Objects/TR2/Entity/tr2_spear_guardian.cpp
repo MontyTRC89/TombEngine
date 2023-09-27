@@ -2,6 +2,7 @@
 #include "Objects/TR2/Entity/tr2_spear_guardian.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
@@ -507,6 +508,16 @@ namespace TEN::Entities::Creatures::TR2
 					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
 				else
 					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN;
+
+				break;
+
+			case SPEAR_GUARDIAN_STATE_KILL:
+				creature->MaxTurn = 0;
+
+				Camera.flags = CF_FOLLOW_CENTER;
+				Camera.targetAngle = ANGLE(170.0f);
+				Camera.targetElevation = -ANGLE(25.0f);
+				Camera.targetDistance = BLOCK(2);
 
 				break;
 			}
