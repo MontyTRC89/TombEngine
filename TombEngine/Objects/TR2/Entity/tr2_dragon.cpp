@@ -284,7 +284,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 					IsHeld(In::Action) &&
-					item->ObjectNumber == ID_DRAGON_BACK &&
+					item.ObjectNumber == ID_DRAGON_BACK &&
 					!laraItem->Animation.IsAirborne &&
 					shift <= DRAGON_MID &&
 					shift > (DRAGON_CLOSE - 350) &&
