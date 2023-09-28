@@ -94,7 +94,7 @@ namespace TEN::Entities::Creatures::TR2
 		DRAGON_ANIM_RECOVER = 23
 	};
 
-	void InitializeBartoli(short itemNumber)
+	void InitializeBartoliOld(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -115,7 +115,7 @@ namespace TEN::Entities::Creatures::TR2
 		dragonBack.Status = ITEM_INVISIBLE;
 		dragonBack.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		InitializeItem(backItemNumber);
+		//InitializeItem(backItemNumber);
 		item.Data = backItemNumber;
 		dragonBack.MeshBits = 0x1FFFFF;
 
@@ -128,7 +128,7 @@ namespace TEN::Entities::Creatures::TR2
 		dragonFront.Status = ITEM_INVISIBLE;
 		dragonFront.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		InitializeItem(frontItemNumber);
+		//InitializeItem(frontItemNumber);
 		dragonBack.Data = frontItemNumber;
 
 		g_Level.NumItems += 2;
@@ -274,7 +274,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	void CollideDragon(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideDragonOld(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -354,7 +354,7 @@ namespace TEN::Entities::Creatures::TR2
 		ItemPushItem(&item, laraItem, coll, 1, 0);
 	}
 
-	void ControlDragon(short backItemNumber)
+	void ControlDragonOld(short backItemNumber)
 	{
 		auto& dragonBack = g_Level.Items[backItemNumber];
 		if (dragonBack.Data && dragonBack.ObjectNumber == ID_DRAGON_FRONT)
@@ -650,7 +650,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	void ControlBartoli(short itemNumber)
+	void ControlBartoliOld(short itemNumber)
 	{
 		ItemInfo* dragonFrontPtr = nullptr;
 		ItemInfo* dragonBackPtr = nullptr;
@@ -728,7 +728,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	void ControlDragonTransformationSphere(short itemNumber)
+	void ControlDragonTransformationSphereOld(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

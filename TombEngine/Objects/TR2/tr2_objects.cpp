@@ -10,9 +10,11 @@
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR2/Entity/Bartoli.h" // OK
+#include "Objects/TR2/Entity/Dragon.h" // OK
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
 #include "Objects/TR2/Entity/tr2_bird_monster.h" // OK
-#include "Objects/TR2/Entity/tr2_dragon.h" // OK
+//#include "Objects/TR2/Entity/tr2_dragon.h" // OK
 #include "Objects/TR2/Entity/tr2_eagle_or_crow.h" // OK
 #include "Objects/TR2/Entity/tr2_knife_thrower.h" // OK
 #include "Objects/TR2/Entity/tr2_mercenary.h" // OK
@@ -494,15 +496,24 @@ static void StartObject(ObjectInfo* obj)
 
 	obj = &Objects[ID_SPHERE_OF_DOOM];
 	if (obj->loaded)
-		obj->control = ControlDragonTransformationSphere;
+	{
+		obj->control = ControlDragonBlast;
+		obj->shadowType = ShadowMode::None;
+	}
 
 	obj = &Objects[ID_SPHERE_OF_DOOM2];
 	if (obj->loaded)
-		obj->control = ControlDragonTransformationSphere;
+	{
+		obj->control = ControlDragonBlast;
+		obj->shadowType = ShadowMode::None;
+	}
 
 	obj = &Objects[ID_SPHERE_OF_DOOM3];
 	if (obj->loaded)
-		obj->control = ControlDragonTransformationSphere;
+	{
+		obj->control = ControlDragonBlast;
+		obj->shadowType = ShadowMode::None;
+	}
 }
 
 static void StartTrap(ObjectInfo* obj)

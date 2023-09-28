@@ -5,10 +5,10 @@ struct ItemInfo;
 
 namespace TEN::Entities::Creatures::TR2
 {
-	void InitializeBartoli(short itemNumber);
-	void ControlBartoli(short itemNumber);
-	void CollideDragon(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-	void ControlDragon(short backNumber);
+	void InitializeBartoliOld(short itemNumber);
+	void ControlBartoliOld(short itemNumber);
+	void CollideDragonOld(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void ControlDragonOld(short backNumber);
 
-	void ControlDragonTransformationSphere(short itemNumber);
+	void ControlDragonTransformationSphereOld(short itemNumber);
 }
