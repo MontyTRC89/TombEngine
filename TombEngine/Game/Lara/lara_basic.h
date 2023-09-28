@@ -73,3 +73,4 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll);
 void lara_col_sprint(ItemInfo* item, CollisionInfo* coll);
 void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll);
 void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll);
+void lara_as_extra_anims(ItemInfo* item, CollisionInfo* coll);

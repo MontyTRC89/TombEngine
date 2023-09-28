@@ -2458,3 +2458,36 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 }
+
+// State:		LS_EXTRA_ANIMS (191)
+// Control:		lara_as_extra_anims()
+// It runs the animations and automatically returns to the Idle state in ID_LARA object when if finishes.
+void lara_as_extra_anims(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+	lara->Control.Look.Mode = LookMode::None;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+
+	if (TestLastFrame(item) && item->ItemFlags[0])
+	{
+		item->Animation.ActiveState = LS_IDLE;
+		item->Animation.AnimNumber = LA_STAND_IDLE;
+		item->Animation.FrameNumber = GetAnimData(*item).frameBase;
+		lara->ExtraAnim = 0;
+		lara->Control.HandStatus = HandStatus::Free;
+	}
+
+	/*GAME_OBJECT_ID object = LaraItem->Animation.AnimObjectID;
+	int frameEnd = GetAnimData(object, LaraItem->Animation.AnimNumber).frameEnd;
+	int frameStart = GetAnimData(object, LaraItem->Animation.AnimNumber).frameBase;
+	auto anim = GetAnimData(object, LaraItem->Animation.AnimNumber);
+	if (LaraItem->Animation.FrameNumber >= frameEnd - frameStart)
+	{
+		SetAnimation(LaraItem, LA_STAND_IDLE, 0);
+		LaraItem->Animation.ActiveState = LS_IDLE;
+
+		Lara.ExtraAnim = 0;
+		Lara.Control.HandStatus = HandStatus::Free;
+	}*/
+}

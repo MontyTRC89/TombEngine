@@ -1,11 +1,16 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/Dragon.h"
 
+#include "Game/collision/collide_item.h"
+#include "Game/collision/sphere.h"
 #include "Game/control/lot.h"
+#include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
+#include "Specific/Input/Input.h"
 
 
+using namespace TEN::Input;
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
@@ -19,6 +24,12 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto DRAGON_WALK_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto DRAGON_TURN_THRESHOLD_ANGLE = ANGLE(1.0f);
+
+	constexpr auto DRAGON_CLOSE = 900;
+	constexpr auto DRAGON_FAR = 2300;
+	constexpr auto DRAGON_MID = ((DRAGON_CLOSE + DRAGON_FAR) / 2);
+	constexpr auto DRAGON_LCOL = -CLICK(2);
+	constexpr auto DRAGON_RCOL = CLICK(2);
 
 	const auto DragonMouthBite = CreatureBiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
 	//const auto DragonBackSpineJoints = std::vector<unsigned int>{ 21, 22, 23 };
@@ -108,7 +119,9 @@ namespace TEN::Entities::Creatures::TR2
 			return;
 		
 		auto& item = g_Level.Items[itemNumber];
-		auto& itemBack = g_Level.Items[item.ItemFlags[0]];
+
+		int backItemNumber = item.ItemFlags[0];
+		auto& itemBack = g_Level.Items[backItemNumber];
 
 		if (item.ObjectNumber == ID_DRAGON_BACK)
 			return;
@@ -125,50 +138,50 @@ namespace TEN::Entities::Creatures::TR2
 			if (item.Animation.ActiveState != DRAGON_STATE_DEFEAT)
 			{
 				SetAnimation(item, DRAGON_ANIM_DEATH);
-				creature->Flags = 0;
+				item.ItemFlags[1] = 0;
 			}
 			else
 			{
-				if (item.Flags >= 0)
+				if (item.ItemFlags[1] >= 0)
 				{
 					//Defeat routine
 
 					//SpawnBartoliLight(item, 1);
-					creature->Flags++;
+					item.ItemFlags[1]++;
 
-					if (creature->Flags == DRAGON_LIVE_TIME)
+					if (item.ItemFlags[1] == DRAGON_LIVE_TIME)
 						item.Animation.TargetState = DRAGON_STATE_IDLE;
 
-					if (creature->Flags == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
+					if (item.ItemFlags[1] == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 						item.HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
 				}
 				else
 				{
 					//Death routine
 
-					//if (creature->Flags > -20)
+					//if (item.ItemFlags[1] > -20)
 						//SpawnBartoliLight(item, 2);
 
-					if (creature->Flags == -100)
+					if (item.ItemFlags[1] == -100)
 					{
 						//CreateDragonBone(itemNumber);
 					}
-					else if (creature->Flags == -200)
+					else if (item.ItemFlags[1] == -200)
 					{
 						DisableEntityAI(itemNumber);
-						KillItem(item.ItemFlags[0]);
+						KillItem(backItemNumber);
 						itemBack.Status = ITEM_DEACTIVATED;
 						KillItem(itemNumber);
 						item.Status = ITEM_DEACTIVATED;
 						return;
 					}
-					else if (creature->Flags < -100)
+					else if (item.ItemFlags[1] < -100)
 					{
 						item.Pose.Position.y += 10;
 						itemBack.Pose.Position.y += 10;
 					}
 
-					creature->Flags--;
+					item.ItemFlags[1]--;
 					return;
 				}
 			}
@@ -356,12 +369,104 @@ namespace TEN::Entities::Creatures::TR2
 		itemBack.Pose = item.Pose;
 
 		if (itemBack.RoomNumber != item.RoomNumber)
-			ItemNewRoom(item.ItemFlags[0], item.RoomNumber);
+			ItemNewRoom(backItemNumber, item.RoomNumber);
 	}
 
 	void CollideDragon(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto& itemBack = g_Level.Items[item.ItemFlags[0]];
+
+		int backItemNumber = item.ItemFlags[0];
+		auto& itemBack = g_Level.Items[backItemNumber];
+
+		if (!TestBoundsCollide(&item, laraItem, coll->Setup.Radius))
+			if (!TestBoundsCollide(&itemBack, laraItem, coll->Setup.Radius))
+				return;
+
+		if (!TestCollision(&item, laraItem))
+			if (!TestCollision(&itemBack, laraItem))
+				return;
+
+		if (item.Animation.ActiveState == DRAGON_STATE_DEFEAT)
+		{
+			int rx = laraItem->Pose.Position.x - item.Pose.Position.x;
+			int rz = laraItem->Pose.Position.z - item.Pose.Position.z;
+			float sinY = phd_sin(item.Pose.Orientation.y);
+			float cosY = phd_cos(item.Pose.Orientation.y);
+
+			int sideShift = rx * sinY + rz * cosY;
+			if (sideShift > DRAGON_LCOL && sideShift < DRAGON_RCOL)
+			{
+				int shift = rx * cosY - rz * sinY;
+				if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
+					return;
+
+				int angle = laraItem->Pose.Orientation.y - item.Pose.Orientation.y;
+
+				int anim = item.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
+				int frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+
+				if ((anim == DRAGON_ANIM_DEFEATED || (anim == DRAGON_ANIM_DEFEATED + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
+					IsHeld(In::Action) &&
+					item.ObjectNumber == ID_DRAGON_BACK &&
+					!laraItem->Animation.IsAirborne &&
+					shift <= DRAGON_MID &&
+					shift > (DRAGON_CLOSE - 350) &&
+					sideShift > -350 &&
+					sideShift < 350 &&
+					angle >(ANGLE(45.0f) - ANGLE(30.0f)) &&
+					angle < (ANGLE(45.0f) + ANGLE(30.0f)))
+				{
+					SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
+					laraItem->Pose = item.Pose;
+					laraItem->Animation.IsAirborne = false;
+					laraItem->Animation.Velocity.y = 0.0f;
+					laraItem->Animation.Velocity.z = 0.0f;
+
+					if (item.RoomNumber != laraItem->RoomNumber)
+						ItemNewRoom(LaraItem->Index, item.RoomNumber);
+
+					AnimateItem(LaraItem);
+
+					LaraItem->Animation.ActiveState = LS_EXTRA_ANIMS;
+
+					Lara.ExtraAnim = 1;
+					Lara.Control.HandStatus = HandStatus::Busy;
+					Lara.HitDirection = -1;
+
+					//laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
+
+					if (item.ObjectNumber == ID_DRAGON_FRONT)
+					{
+						item.ItemFlags[1] = -1;
+					}
+					else if (item.ObjectNumber == ID_DRAGON_BACK)
+					{
+						auto frontItemNumber = item.NextItem;
+						auto& frontPart = g_Level.Items[frontItemNumber];
+						frontPart.ItemFlags[1] = -1;
+					}
+						
+
+					return;
+				}
+
+				if (shift < DRAGON_MID)
+				{
+					shift = DRAGON_CLOSE - shift;
+				}
+				else
+				{
+					shift = DRAGON_FAR - shift;
+				}
+
+				laraItem->Pose.Position.x += shift * cosY;
+				laraItem->Pose.Position.z -= shift * sinY;
+
+				return;
+			}
+		}
+
+		ItemPushItem(&item, laraItem, coll, 1, 0);
 	}
 }
