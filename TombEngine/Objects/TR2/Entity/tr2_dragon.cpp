@@ -282,9 +282,9 @@ namespace TEN::Entities::Creatures::TR2
 				int anim = item.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
 				int frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 
-				if (IsHeld(In::Action) &&
-					(anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
-					item.ObjectNumber == ID_DRAGON_BACK &&
+				if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
+					IsHeld(In::Action) &&
+					item->ObjectNumber == ID_DRAGON_BACK &&
 					!laraItem->Animation.IsAirborne &&
 					shift <= DRAGON_MID &&
 					shift > (DRAGON_CLOSE - 350) &&

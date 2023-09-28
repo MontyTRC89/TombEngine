@@ -55,7 +55,7 @@ namespace TEN::Entities::Vehicles
 		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
 			return VehicleMountType::None;
 
-		bool hasInputAction = TrInput & IN_ACTION;
+		bool hasInputAction = IsHeld(In::Action);
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;
@@ -203,7 +203,7 @@ namespace TEN::Entities::Vehicles
 		CollisionInfo coll = {};
 		coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
 		coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
-		coll.Setup.OldPosition = vehicleItem->Pose.Position;
+		coll.Setup.PrevPosition = vehicleItem->Pose.Position;
 		coll.Setup.EnableObjectPush = true;
 
 		DoObjectCollision(vehicleItem, &coll);

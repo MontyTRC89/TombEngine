@@ -4,6 +4,8 @@
 #include "Game/items.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/LuaHandler.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
 enum class CallbackPoint;
 class LevelFunc;
@@ -121,6 +123,7 @@ public:
 
 	void AddCallback(CallbackPoint point, const LevelFunc& levelFunc);
 	void RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc);
+	void HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator);
 
 	void ResetScripts(bool clearGameVars) override;
 	void ShortenTENCalls() override;

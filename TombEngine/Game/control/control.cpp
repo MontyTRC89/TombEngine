@@ -93,7 +93,7 @@ bool ThreadEnded;
 
 int RequiredStartPos;
 int CurrentLevel;
-int LevelComplete;
+int NextLevel;
 
 int SystemNameHash = 0;
 
@@ -154,6 +154,11 @@ GameStatus ControlPhase(int numFrames)
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
+		// Control lock is processed after handling scripts, because builder may want to
+		// process input externally, while still locking Lara from input.
+		if (!isTitle && Lara.Control.Locked)
+			ClearAllActions();
+
 		// Handle inventory / pause / load / save screens.
 		auto result = HandleMenuCalls(isTitle);
 		if (result != GameStatus::None)
@@ -185,7 +190,7 @@ GameStatus ControlPhase(int numFrames)
 		{
 			// Do the standard camera.
 			TrackCameraInit = false;
-			CalculateCamera();
+			CalculateCamera(LaraCollision);
 		}
 
 		// Update oscillator seed.
@@ -588,14 +593,11 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 
 void HandleControls(bool isTitle)
 {
-	// Poll keyboard and update input variables.
+	// Poll input devices and update input variables.
 	if (!isTitle)
 	{
-		if (Lara.Control.Locked)
-			ClearAllActions();
-		else
-			// TODO: To allow cutscene skipping later, don't clear Deselect action.
-			UpdateInputActions(LaraItem, true);
+		// TODO: To allow cutscene skipping later, don't clear Deselect action.
+		UpdateInputActions(LaraItem, true);
 	}
 	else
 	{
@@ -612,16 +614,20 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 	// Does the player want to enter inventory?
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-		g_Gui.GetInventoryMode() != InventoryMode::Save)
+		g_Gui.GetInventoryMode() != InventoryMode::Save &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 
 		if (g_Gui.CallInventory(LaraItem, false))
 			result = GameStatus::SaveGame;
 	}
 	else if (IsClicked(In::Load) &&
-			 g_Gui.GetInventoryMode() != InventoryMode::Load)
+		g_Gui.GetInventoryMode() != InventoryMode::Load &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -634,7 +640,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 			result = GameStatus::ExitToTitle;
 	}
 	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
-			 LaraItem->HitPoints > 0 && !BinocularOn)
+			 LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))
 			result = GameStatus::LoadGame;
@@ -651,25 +657,30 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 GameStatus HandleGlobalInputEvents(bool isTitle)
 {
+	constexpr auto DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
+	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
+
 	if (isTitle)
 		return GameStatus::None;
 
-	HandleOptics(LaraItem);
-
-	// Is Lara dead?
-	static constexpr int DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
-	static constexpr int DEATH_INPUT_TIMEOUT = 10 * FPS;
-
+	// Check if player dead.
 	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||
 		Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT && !NoAction())
 	{
-		return GameStatus::LaraDead; // Maybe do game over menu like some PSX versions have??
+		// TODO: Maybe do game over menu like some PSX versions have?
+		return GameStatus::LaraDead;
 	}
 
-	// Has level been completed?
-	if (LevelComplete)
+	// Check if level has been completed.
+	// Negative NextLevel indicates that a savegame must be loaded from corresponding slot.
+	if (NextLevel > 0)
 	{
 		return GameStatus::LevelComplete;
+	}
+	else if (NextLevel < 0)
+	{
+		g_GameFlow->SelectedSaveGame = -(NextLevel + 1);
+		return GameStatus::LoadGame;
 	}
 
 	return GameStatus::None;

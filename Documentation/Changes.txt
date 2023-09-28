@@ -1,3 +1,47 @@
+Version 1.1.1
+==============
+
+* Fix burning torch not working properly if there are more than 256 objects in a level.
+* Fix grenade and rocket projectiles smoke offset in certain directions.
+* Fix projectiles flying through animating objects.
+* Fix harpoon gun doing enormous damage on enemies.
+* Fix train death animation.
+* Fix zipline not following correct trajectory.
+* Fix TR1 wolf damage value inflicted on a close bite attack.
+* Fix TR1 bear various original AI issues.
+* Fix TR2 knife thrower AI.
+* Fix TR2 doberman crashing the game when killed by explosive weapons.
+* Fix volume change in settings not affecting voice track.
+* Fix several lighting bugs.
+* Fix savegame count not properly increasing.
+* Overhaul look mode:
+ - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
+ - Improve movement and control.
+ - Re-enable looking while performing up jump, backward jump, or backward crawl.
+ - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+* Add swinging blade.
+* Add crumbling platform and add new OCBs for behaviour:
+ - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
+ - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
+ - A positive value results in activation via player collision.
+ - A negative value requires a trigger to activate.
+
+Lua API changes:
+* Add Flow::EnableLoadSave() function to disable savegames.
+* Add Flow::EnablePointFilter() function to disable bilinear filtering.
+* Add Lara::GetAmmoType() function to read the ammo that Lara is using.
+* Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
+* Add Logic.HandleEvent() function to call node events.
+* Add functions to load, save, and delete savegames.
+* Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.
+* Make Vec2 object float-based instead of integer-based.
+* Add Vec2 arithmetic for division with a number and multiplication with another Vec2.
+* Add log messages warnings to functions AddCallback and RemoveCallback.
+* Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
+* Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.
+* Fix activation of a flipped room when using SetPos() script command or position change node.
+* Add extra parameter to GiveItem() function to optionally display an inventory item given to the player in the pickup summary.
+
 Version 1.1.0
 ==============
 
@@ -7,6 +51,8 @@ Version 1.1.0
 * Fix various crashes specific to 64-bit build.
 * Fix random crashes when playing audio tracks with names longer than 15 symbols.
 * Fix crashes when trying to play .wav audio tracks on some Windows 11 systems.
+* Fix last selected gun type not preserved after level jump.
+* Fix incorrect vertical position after reloading a savegame made while standing on a bridge.
 * Fix sprint value going below zero.
 * Fix fog bulb density formula.
 * Fix clockwork beetle activation crashing the game.
@@ -32,6 +78,7 @@ Version 1.1.0
 * Implement separate audio track channel for playing voiceovers with subtitles in .srt format.
 * Don't stop ambience when Lara dies.
 * Pause all sounds when entering inventory or pause menu.
+* Preserve hit points on level jump.
 * Improve deflection against slopes.
 * Move and rotate Lara and activated pickups together with dynamic bridge objects.
 * Reduce camera bounce.

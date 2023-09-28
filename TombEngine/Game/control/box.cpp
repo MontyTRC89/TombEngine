@@ -66,7 +66,7 @@ void DrawBox(int boxIndex, Vector3 color)
 	for (int i = 0; i <= 10; i++)
 	{
 		dBox.Extents = extents + Vector3(i);
-		TEN::Renderer::g_Renderer.AddDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		TEN::Renderer::g_Renderer.AddDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RendererDebugPage::PathfindingStats);
 	}
 }
 
@@ -75,10 +75,15 @@ void DrawNearbyPathfinding(int boxIndex)
 	if (boxIndex == NO_BOX)
 		return;
 
-	DrawBox(boxIndex, Vector3(0, 1, 1));
-
 	auto& currBox = g_Level.Boxes[boxIndex];
 	auto index = currBox.overlapIndex;
+
+	// Grey flag box.
+	auto currentBoxColor = Vector3(0.0f, 1.0f, 1.0f);
+	if (currBox.flags & BLOCKABLE)
+		currentBoxColor = (currBox.flags & BLOCKED) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
+
+	DrawBox(boxIndex, currentBoxColor);
 
 	while (true)
 	{
@@ -144,7 +149,7 @@ void CreatureYRot2(Pose* fromPose, short angle, short angleAdd)
 bool SameZone(CreatureInfo* creature, ItemInfo* target)
 {
 	auto& item = g_Level.Items[creature->ItemNumber];
-	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
+	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
 
 	auto& roomSource = g_Level.Rooms[item.RoomNumber];
 	auto& boxSource = GetSector(&roomSource, item.Pose.Position.x - roomSource.x, item.Pose.Position.z - roomSource.z)->Box;
@@ -245,7 +250,7 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 
 	auto* creature = GetCreatureInfo(item);
 	auto* LOT = &creature->LOT;
-	int* zone = g_Level.Zones[(int)LOT->Zone][FlipStatus].data();
+	int* zone = g_Level.Zones[(int)LOT->Zone][(int)FlipStatus].data();
 
 	int boxHeight;
 	if (item->BoxNumber != NO_BOX)
@@ -906,7 +911,7 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 		return false;
 
 	const auto& creature = *GetCreatureInfo(item);
-	const auto& zone = g_Level.Zones[(int)creature.LOT.Zone][FlipStatus].data();
+	const auto& zone = g_Level.Zones[(int)creature.LOT.Zone][(int)FlipStatus].data();
 
 	if (creature.LOT.Fly == NO_FLYING && zone[boxNumber] != zoneNumber)
 		return false;
@@ -988,7 +993,7 @@ bool UpdateLOT(LOTInfo* LOT, int depth)
 
 bool SearchLOT(LOTInfo* LOT, int depth)
 {
-	auto* zone = g_Level.Zones[(int)LOT->Zone][FlipStatus].data();
+	auto* zone = g_Level.Zones[(int)LOT->Zone][(int)FlipStatus].data();
 	int searchZone = zone[LOT->Head];
 
 	for (int i = 0; i < depth; i++)
@@ -1441,7 +1446,7 @@ void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool 
 			aiObject.triggerFlags == ocb &&
 			aiObject.roomNumber != NO_ROOM)
 		{
-			int* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
+			int* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
 			auto* room = &g_Level.Rooms[item.RoomNumber];
 
 			item.BoxNumber = GetSector(room, item.Pose.Position.x - room->x, item.Pose.Position.z - room->z)->Box;
@@ -1526,7 +1531,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 		creature->Enemy = LaraItem;
 	}
 
-	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][FlipStatus].data();
+	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
 	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;

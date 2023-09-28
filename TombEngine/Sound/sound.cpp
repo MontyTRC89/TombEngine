@@ -48,18 +48,15 @@ static int SecretSoundIndex = 5;
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
 
-void SetVolumeMusic(int vol) 
+void SetVolumeTracks(int vol) 
 {
 	GlobalMusicVolume = vol;
 
 	float fVol = static_cast<float>(vol) / 100.0f;
-	if (BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::BGM].Channel))
+	for (int i = 0; i < (int)SoundTrackType::Count; i++)
 	{
-		BASS_ChannelSetAttribute(SoundtrackSlot[(int)SoundTrackType::BGM].Channel, BASS_ATTRIB_VOL, fVol);
-	}
-	if (BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::OneShot].Channel))
-	{
-		BASS_ChannelSetAttribute(SoundtrackSlot[(int)SoundTrackType::OneShot].Channel, BASS_ATTRIB_VOL, fVol);
+		if (BASS_ChannelIsActive(SoundtrackSlot[i].Channel))
+			BASS_ChannelSetAttribute(SoundtrackSlot[i].Channel, BASS_ATTRIB_VOL, fVol);
 	}
 }
 
@@ -177,7 +174,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		TENLog("Non present effect: " + std::to_string(effectID), LogLevel::Warning);
+		TENLog("Missing sound effect: " + std::to_string(effectID), LogLevel::Warning);
 		g_Level.SoundMap[effectID] = -2;
 		return false;
 	}

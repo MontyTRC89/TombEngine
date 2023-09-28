@@ -265,9 +265,9 @@ namespace TEN::Renderer
 				// General action listing
 				for (int k = 0; k < GeneralActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -310,14 +310,14 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_ACCELERATE;
+				int baseIndex = (int)In::Accelerate;
 
 				// Vehicle action listing
 				for (int k = 0; k < VehicleActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -366,14 +366,14 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_FLARE;
+				int baseIndex = (int)In::Flare;
 
 				// Quick action listing
 				for (int k = 0; k < QuickActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -415,14 +415,14 @@ namespace TEN::Renderer
 				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
 				GetNextBlockPosition(&y);
 
-				int baseIndex = KEY_SELECT;
+				int baseIndex = (int)In::Select;
 
 				// Menu action listing.
 				for (int k = 0; k < MenuActionStrings.size(); k++)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k]), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
+					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k].c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == k));
 
-					if (g_Gui.GetCurrentSettings().WaitingForKey && titleOption == k)
+					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
 						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
 					}
@@ -456,30 +456,33 @@ namespace TEN::Renderer
 	void Renderer11::RenderTitleMenu(Menu menu)
 	{
 		int y = MenuVerticalBottomCenter;
-		auto titleOption = g_Gui.GetSelectedOption();
-
-		// HACK: Check if it works properly -- Lwmte, 07.06.22
-		if (menu == Menu::LoadGame && !g_GameFlow->EnableLoadSave)
-			menu = Menu::Title;
+		int titleOption = g_Gui.GetSelectedOption();
+		int selectedOption = 0;
 
 		switch (menu)
 		{
 		case Menu::Title:
 
 			// New game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			GetNextLinePosition(&y);
+			selectedOption++;
 
 			// Load game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 1));
-			GetNextLinePosition(&y);
+			if (g_GameFlow->IsLoadSaveEnabled())
+			{
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
+				GetNextLinePosition(&y);
+				selectedOption++;
+			}
 
 			// Options
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 2));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			GetNextLinePosition(&y);
+			selectedOption++;
 
 			// Exit game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 3));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			break;
 
 		case Menu::LoadGame:
@@ -496,10 +499,10 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Level listing (starts with 1 because 0 is always title)
-			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++)
+			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
 			{
 				AddString(MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey.c_str()),
-					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == i - 1));
+					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 				GetNextNarrowLinePosition(&y);
 			}
 			break;
@@ -565,7 +568,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderLoadSaveMenu()
 	{
-		if (!g_GameFlow->EnableLoadSave)
+		if (!g_GameFlow->IsLoadSaveEnabled())
 		{
 			g_Gui.SetInventoryMode(InventoryMode::InGame);
 			return;
@@ -575,7 +578,6 @@ namespace TEN::Renderer
 		int y = MenuVerticalLineSpacing;
 		short selection = g_Gui.GetLoadSaveSelection();
 		char stringBuffer[255];
-		SaveGame::LoadSavegameInfos();
 
 		// Title
 		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
@@ -674,10 +676,10 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderNewInventory()
 	{
-		g_Gui.DrawCurrentObjectList(LaraItem, (int)RingTypes::Inventory);
+		g_Gui.DrawCurrentObjectList(LaraItem, RingTypes::Inventory);
 
-		if (g_Gui.GetRings((int)RingTypes::Ammo)->RingActive)
-			g_Gui.DrawCurrentObjectList(LaraItem, (int)RingTypes::Ammo);
+		if (g_Gui.GetRing(RingTypes::Ammo).RingActive)
+			g_Gui.DrawCurrentObjectList(LaraItem, RingTypes::Ammo);
 
 		g_Gui.DrawAmmoSelector();
 		g_Gui.FadeAmmoSelector();
@@ -688,7 +690,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
-		static const auto COUNT_STRING_PREFIX = std::string("  ");
+		constexpr auto COUNT_STRING_INF	   = "Inf";
+		constexpr auto COUNT_STRING_OFFSET = Vector2(SCREEN_SPACE_RES.x / 40, 0.0f);
 
 		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
@@ -696,14 +699,15 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Draw display pickup.
-		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position2D, pickup.Orientation, pickup.Scale);
+		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
 
 		// Draw count string.
-		if (pickup.Count > 1)
+		if (pickup.Count != 1)
 		{
-			AddString(
-				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
-				pickup.Position2D, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+			auto countString = (pickup.Count != -1) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
+			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;
+
+			AddString(countString, countStringPos, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}
 	}
 
@@ -864,26 +868,26 @@ namespace TEN::Renderer
 		static EulerAngles orient = EulerAngles::Zero;
 		static float scaler = 1.2f;
 
-		short invItem = g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectList[g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectInList].InventoryItem;
+		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
 
 		auto& object = InventoryObjectTable[invItem];
 
-		if (TrInput & IN_FORWARD)
+		if (IsHeld(In::Forward))
 			orient.x += ANGLE(3.0f);
 
-		if (TrInput & IN_BACK)
+		if (IsHeld(In::Back))
 			orient.x -= ANGLE(3.0f);
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			orient.y += ANGLE(3.0f);
 
-		if (TrInput & IN_RIGHT)
+		if (IsHeld(In::Right))
 			orient.y -= ANGLE(3.0f);
 
-		if (TrInput & IN_SPRINT)
+		if (IsHeld(In::Sprint))
 			scaler += 0.03f;
 
-		if (TrInput & IN_CROUCH)
+		if (IsHeld(In::Crouch))
 			scaler -= 0.03f;
 
 		if (scaler > 1.6f)
@@ -1085,12 +1089,12 @@ namespace TEN::Renderer
 
 			ROOM_INFO* r = &g_Level.Rooms[LaraItem->RoomNumber];
 
-			switch (m_numDebugPage)
+			switch (DebugPage)
 			{
-			case RENDERER_DEBUG_PAGE::NO_PAGE:
+			case RendererDebugPage::None:
 				break;
 
-			case RENDERER_DEBUG_PAGE::RENDERER_STATS:
+			case RendererDebugPage::RendererStats:
 				PrintDebugMessage("RENDERER STATS");
 				PrintDebugMessage("FPS: %3.2f", m_fps);
 				PrintDebugMessage("Resolution: %d x %d", m_screenWidth, m_screenHeight);
@@ -1106,7 +1110,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    Sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Triangles: %d", m_numPolygons);
 				PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
-				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
+				PrintDebugMessage("Transparent face draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    Rooms: %d", m_numRoomsTransparentDrawCalls);
 				PrintDebugMessage("    Movables: %d", m_numMoveablesTransparentDrawCalls);
 				PrintDebugMessage("    Statics: %d", m_numStaticsTransparentDrawCalls);
@@ -1120,7 +1124,7 @@ namespace TEN::Renderer
 
 				break;
 
-			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
+			case RendererDebugPage::DimensionStats:
 				PrintDebugMessage("DIMENSION STATS");
 				PrintDebugMessage("Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 				PrintDebugMessage("Orient: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
@@ -1132,12 +1136,12 @@ namespace TEN::Renderer
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
-				PrintDebugMessage("Camera.roomNumber: %d", Camera.pos.RoomNumber);
+				PrintDebugMessage("Camera.RoomNumber: %d", Camera.pos.RoomNumber);
 				break;
 
-			case RENDERER_DEBUG_PAGE::LARA_STATS:
+			case RendererDebugPage::PlayerStats:
 				PrintDebugMessage("PLAYER STATS");
-				PrintDebugMessage("Anim ObjectID: %d", LaraItem->Animation.AnimObjectID);
+				PrintDebugMessage("AnimObjectID: %d", LaraItem->Animation.AnimObjectID);
 				PrintDebugMessage("AnimNumber: %d", LaraItem->Animation.AnimNumber);
 				PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber);
 				PrintDebugMessage("ActiveState: %d", LaraItem->Animation.ActiveState);
@@ -1147,9 +1151,10 @@ namespace TEN::Renderer
 				PrintDebugMessage("HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
 				PrintDebugMessage("CanClimbLadder: %d", Lara.Control.CanClimbLadder);
+				PrintDebugMessage("CanMonkeySwing: %d", Lara.Control.CanMonkeySwing);
 				break;
 
-			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
+			case RendererDebugPage::LogicStats:
 				PrintDebugMessage("LOGIC STATS");
 				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				PrintDebugMessage("Move axis vertical: %f", AxisMap[InputAxis::MoveVertical]);
@@ -1158,26 +1163,47 @@ namespace TEN::Renderer
 				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
 				break;
 
+			case RendererDebugPage::CollisionStats:
+				PrintDebugMessage("COLLISION STATS");
+				PrintDebugMessage("Collision type: %d", LaraCollision.CollisionType);
+				PrintDebugMessage("Bridge item ID: %d", LaraCollision.Middle.Bridge);
+				PrintDebugMessage("Front floor: %d", LaraCollision.Front.Floor);
+				PrintDebugMessage("Front left floor: %d", LaraCollision.FrontLeft.Floor);
+				PrintDebugMessage("Front right floor: %d", LaraCollision.FrontRight.Floor);
+				PrintDebugMessage("Front ceil: %d", LaraCollision.Front.Ceiling);
+				PrintDebugMessage("Front left ceil: %d", LaraCollision.FrontLeft.Ceiling);
+				PrintDebugMessage("Front right ceil: %d", LaraCollision.FrontRight.Ceiling);
+				break;
+				
+			case RendererDebugPage::PathfindingStats:
+				PrintDebugMessage("PATHFINDING STATS");
+				PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
+				break;
+				
+			case RendererDebugPage::WireframeMode:
+				PrintDebugMessage("WIREFRAME MODE");
+				break;
+
 			default:
 				break;
 			}
 		}
 	}
 
-	void Renderer11::SwitchDebugPage(bool back)
+	void Renderer11::SwitchDebugPage(bool goBack)
 	{
-		auto index = (int)m_numDebugPage;
+		int page = (int)DebugPage;
+		goBack ? --page : ++page;
 
-		if (back)
-			--index;
-		else
-			++index;
+		if (page < (int)RendererDebugPage::None)
+		{
+			page = (int)RendererDebugPage::Count - 1;
+		}
+		else if (page > (int)RendererDebugPage::WireframeMode)
+		{
+			page = (int)RendererDebugPage::None;
+		}
 
-		if (index < RENDERER_DEBUG_PAGE::NO_PAGE)
-			index = RENDERER_DEBUG_PAGE::WIREFRAME_MODE;
-		else if (index > RENDERER_DEBUG_PAGE::WIREFRAME_MODE)
-			index = 0;
-
-		m_numDebugPage = (RENDERER_DEBUG_PAGE)index;
+		DebugPage = (RendererDebugPage)page;
 	}
 }

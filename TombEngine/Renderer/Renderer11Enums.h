@@ -113,14 +113,18 @@ enum RENDERER_FADE_STATUS
 	FADE_OUT
 };
 
-enum RENDERER_DEBUG_PAGE
+enum class RendererDebugPage
 {
-	NO_PAGE,
-	RENDERER_STATS,
-	DIMENSION_STATS,
-	LARA_STATS,
-	LOGIC_STATS,
-	WIREFRAME_MODE
+	None,
+	RendererStats,
+	DimensionStats,
+	PlayerStats,
+	LogicStats,
+	CollisionStats,
+	PathfindingStats,
+	WireframeMode,
+
+	Count
 };
 
 enum RendererTransparentFaceType
@@ -189,6 +193,14 @@ enum ALPHA_TEST_MODES
 	ALPHA_TEST_LESS_THAN = 2
 };
 
+enum PrintStringFlags
+{
+	PRINTSTRING_CENTER	= (1 << 0),
+	PRINTSTRING_BLINK	= (1 << 1),
+	PRINTSTRING_RIGHT	= (1 << 2),
+	PRINTSTRING_OUTLINE	= (1 << 3)
+};
+
 enum RendererPass
 {
 	ShadowMap,
@@ -218,9 +230,6 @@ constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);
 #define NUM_SPRITES_PER_BUCKET 4096
 #define NUM_LINES_PER_BUCKET 4096
 #define NUM_CAUSTICS_TEXTURES	16
-#define PRINTSTRING_CENTER 1
-#define PRINTSTRING_BLINK 2
-#define PRINTSTRING_OUTLINE	8
 #define PRINTSTRING_COLOR_ORANGE D3DCOLOR_ARGB(255, 216, 117, 49)
 #define PRINTSTRING_COLOR_WHITE D3DCOLOR_ARGB(255, 255, 255, 255)
 #define PRINTSTRING_COLOR_BLACK D3DCOLOR_ARGB(255, 0, 0, 0)

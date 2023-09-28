@@ -5,9 +5,19 @@
 
 namespace TEN::Renderer
 {
-	void Renderer11::AddString(int x, int y, const char* string, D3DCOLOR color, int flags)
+	void Renderer11::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page)
 	{
-		AddString(std::string(string), Vector2(x, y), Color(color), 1.0f, flags);
+		constexpr auto FLAGS = PRINTSTRING_OUTLINE | PRINTSTRING_CENTER;
+
+		if (DebugPage != page)
+			return;
+
+		AddString(string, pos, color, scale, FLAGS);
+	}
+
+	void Renderer11::AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags)
+	{
+		AddString(string, Vector2(x, y), Color(color), 1.0f, flags);
 	}
 
 	void Renderer11::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)
@@ -45,8 +55,19 @@ namespace TEN::Renderer
 
 				// Measure string.
 				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
+				if (flags & PRINTSTRING_CENTER)
+				{
+					rString.X = (pos.x * factor.x) - (size.x / 2.0f);
+				}
+				else if (flags & PRINTSTRING_RIGHT)
+				{
+					rString.X = (pos.x * factor.x) - size.x;
+				}
+				else
+				{
+					rString.X = pos.x * factor.x;
+				}
 
-				rString.X = (flags & PRINTSTRING_CENTER) ? ((pos.x * factor.x) - (size.x / 2.0f)) : (pos.x * factor.x);
 				rString.Y = (pos.y * uiScale) + yOffset;
 
 				if (flags & PRINTSTRING_BLINK)

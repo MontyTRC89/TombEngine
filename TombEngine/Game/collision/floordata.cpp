@@ -1,10 +1,12 @@
 #include "framework.h"
 #include "Game/collision/floordata.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
@@ -58,9 +60,9 @@ bool FloorInfo::IsSurfaceDiagonalStep(bool isFloor) const
 	// Check if ??
 	if (surfaceColl.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_0 &&
 		surfaceColl.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_1)
-		{
-			return false;
-		}
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -102,9 +104,9 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(int x, int y, int z) const
 			continue;
 
 		// Assess relation of bridge to collision block.
-		if (bridgeFloorHeight.value() >= y &&			// Below input height bound.
-			bridgeFloorHeight.value() <= floorHeight && // Within floor bound.
-			bridgeFloorHeight.value() >= ceilingHeight) // Within ceiling bound.
+		if (*bridgeFloorHeight >= y &&			 // Below input height bound.
+			*bridgeFloorHeight <= floorHeight && // Within floor bound.
+			*bridgeFloorHeight >= ceilingHeight) // Within ceiling bound.
 		{
 			return std::nullopt;
 		}
@@ -143,9 +145,9 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(int x, int y, int z) const
 			continue;
 
 		// Assess relation of bridge to collision block.
-		if (bridgeCeilingHeight.value() <= y &&			  // Above input height bound.
-			bridgeCeilingHeight.value() <= floorHeight && // Within floor bound.
-			bridgeCeilingHeight.value() >= ceilingHeight) // Within ceiling bound.
+		if (*bridgeCeilingHeight <= y &&		   // Above input height bound.
+			*bridgeCeilingHeight <= floorHeight && // Within floor bound.
+			*bridgeCeilingHeight >= ceilingHeight) // Within ceiling bound.
 		{
 			return std::nullopt;
 		}
@@ -195,20 +197,20 @@ int FloorInfo::GetSurfaceHeight(int x, int y, int z, bool isFloor) const
 		// Assess relation of bridge to collision block.
 		if (isFloor)
 		{
-			if (bridgeSurfaceHeight.value() >= y &&			  // Below input height bound.
-				bridgeSurfaceHeight.value() < floorHeight &&  // Within floor bound.
-				bridgeSurfaceHeight.value() >= ceilingHeight) // Within ceiling bound.
+			if (*bridgeSurfaceHeight >= y &&		   // Below input height bound.
+				*bridgeSurfaceHeight < floorHeight &&  // Within floor bound.
+				*bridgeSurfaceHeight >= ceilingHeight) // Within ceiling bound.
 			{
-				floorHeight = bridgeSurfaceHeight.value();
+				floorHeight = *bridgeSurfaceHeight;
 			}
 		}
 		else
 		{
-			if (bridgeSurfaceHeight.value() <= y &&			  // Above input height bound.
-				bridgeSurfaceHeight.value() <= floorHeight && // Within floor bound.
-				bridgeSurfaceHeight.value() > ceilingHeight)  // Within ceiling bound.
+			if (*bridgeSurfaceHeight <= y &&			  // Above input height bound.
+				*bridgeSurfaceHeight <= floorHeight && // Within floor bound.
+				*bridgeSurfaceHeight > ceilingHeight)  // Within ceiling bound.
 			{
-				ceilingHeight = bridgeSurfaceHeight.value();
+				ceilingHeight = *bridgeSurfaceHeight;
 			}
 		}
 	}
@@ -234,18 +236,18 @@ int FloorInfo::GetBridgeSurfaceHeight(int x, int y, int z, bool isFloor) const
 		// Assess relation of bridge to collision block.
 		if (isFloor)
 		{
-			if (y > floorHeight.value() &&
-				y <= ceilingHeight.value())
+			if (y > *floorHeight &&
+				y <= *ceilingHeight)
 			{
-				return floorHeight.value();
+				return *floorHeight;
 			}
 		}
 		else
 		{
-			if (y >= floorHeight.value() &&
-				y < ceilingHeight.value())
+			if (y >= *floorHeight &&
+				y < *ceilingHeight)
 			{
-				return ceilingHeight.value();
+				return *ceilingHeight;
 			}
 		}
 	}
@@ -281,7 +283,7 @@ bool FloorInfo::IsWall(int x, int z) const
 
 int FloorInfo::GetInsideBridgeItemNumber(int x, int y, int z, bool testFloorBorder, bool testCeilingBorder) const
 {
-	for (const int& itemNumber : BridgeItemNumbers)
+	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
@@ -292,9 +294,9 @@ int FloorInfo::GetInsideBridgeItemNumber(int x, int y, int z, bool testFloorBord
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
-		if ((y > floorHeight.value() && y < ceilingHeight.value()) ||
-			(testFloorBorder && y == floorHeight.value()) ||
-			(testCeilingBorder && y == ceilingHeight.value()))
+		if ((y > *floorHeight && y < *ceilingHeight) ||
+			(testFloorBorder && y == *floorHeight) ||
+			(testCeilingBorder && y == *ceilingHeight))
 		{
 			return itemNumber;
 		}
@@ -422,60 +424,64 @@ namespace TEN::Collision::Floordata
 		return *floor;
 	}
 
-	std::optional<int> GetTopHeight(FloorInfo& startFloor, int x, int y, int z, int* topRoomNumber, FloorInfo** topFloor)
+	std::optional<int> GetTopHeight(FloorInfo& startSector, Vector3i pos, int* topRoomNumberPtr, FloorInfo** topSectorPtr)
 	{
-		auto floor = &startFloor;
-		int roomNumber;
-		if (topRoomNumber)
-			roomNumber = *topRoomNumber;
+		int roomNumber = 0;
+		if (topRoomNumberPtr != nullptr)
+			roomNumber = *topRoomNumberPtr;
 
+		auto* sectorPtr = &startSector;
 		do
 		{
-			y = floor->GetBridgeSurfaceHeight(x, y, z, true);
-			while (y <= floor->GetSurfaceHeight(x, z, false))
+			pos.y = sectorPtr->GetBridgeSurfaceHeight(pos.x, pos.y, pos.z, true);
+			while (pos.y <= sectorPtr->GetSurfaceHeight(pos.x, pos.z, false))
 			{
-				const auto roomAbove = floor->GetRoomNumberAbove(x, z);
-				if (!roomAbove)
+				auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(pos.x, pos.z);
+				if (!roomNumberAbove.has_value())
 					return std::nullopt;
 
-				floor = &GetFloorSide(*roomAbove, x, z, &roomNumber);
+				sectorPtr = &GetFloorSide(*roomNumberAbove, pos.x, pos.z, &roomNumber);
 			}
 		}
-		while (floor->GetInsideBridgeItemNumber(x, y, z, false, true) >= 0);
+		while (sectorPtr->GetInsideBridgeItemNumber(pos.x, pos.y, pos.z, false, true) >= 0);
 
-		if (topRoomNumber)
-			*topRoomNumber = roomNumber;
-		if (topFloor)
-			*topFloor = floor;
-		return std::optional{y};
+		if (topRoomNumberPtr != nullptr)
+			*topRoomNumberPtr = roomNumber;
+
+		if (topSectorPtr != nullptr)
+			*topSectorPtr = sectorPtr;
+
+		return pos.y;
 	}
 
-	std::optional<int> GetBottomHeight(FloorInfo& startFloor, int x, int y, int z, int* bottomRoomNumber, FloorInfo** bottomFloor)
+	std::optional<int> GetBottomHeight(FloorInfo& startSector, Vector3i pos, int* bottomRoomNumberPtr, FloorInfo** bottomSectorPtr)
 	{
-		auto floor = &startFloor;
-		int roomNumber;
-		if (bottomRoomNumber)
-			roomNumber = *bottomRoomNumber;
+		int roomNumber = 0;
+		if (bottomRoomNumberPtr)
+			roomNumber = *bottomRoomNumberPtr;
 
+		auto* sectorPtr = &startSector;
 		do
 		{
-			y = floor->GetBridgeSurfaceHeight(x, y, z, false);
-			while (y >= floor->GetSurfaceHeight(x, z, true))
+			pos.y = sectorPtr->GetBridgeSurfaceHeight(pos.x, pos.y, pos.z, false);
+			while (pos.y >= sectorPtr->GetSurfaceHeight(pos.x, pos.z, true))
 			{
-				const auto roomBelow = floor->GetRoomNumberBelow(x, z);
-				if (!roomBelow)
+				auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(pos.x, pos.z);
+				if (!roomNumberBelow.has_value())
 					return std::nullopt;
 
-				floor = &GetFloorSide(*roomBelow, x, z, &roomNumber);
+				sectorPtr = &GetFloorSide(*roomNumberBelow, pos.x, pos.z, &roomNumber);
 			}
 		}
-		while (floor->GetInsideBridgeItemNumber(x, y, z, true, false) >= 0);
+		while (sectorPtr->GetInsideBridgeItemNumber(pos.x, pos.y, pos.z, true, false) >= 0);
 
-		if (bottomRoomNumber)
-			*bottomRoomNumber = roomNumber;
-		if (bottomFloor)
-			*bottomFloor = floor;
-		return std::optional{y};
+		if (bottomRoomNumberPtr)
+			*bottomRoomNumberPtr = roomNumber;
+
+		if (bottomSectorPtr)
+			*bottomSectorPtr = sectorPtr;
+
+		return pos.y;
 	}
 
 	std::optional<int> GetFloorHeight(const ROOM_VECTOR& location, int x, int z)
@@ -516,14 +522,14 @@ namespace TEN::Collision::Floordata
 		{
 			if (direction <= 0)
 			{
-				auto height = GetTopHeight(*floor, x, y, z);
+				auto height = GetTopHeight(*floor, Vector3i(x, y, z));
 				if (height)
 					return height;
 			}
 
 			if (direction >= 0)
 			{
-				auto height = GetBottomHeight(*floor, x, y, z, nullptr, &floor);
+				auto height = GetBottomHeight(*floor, Vector3i(x, y, z), nullptr, &floor);
 				if (!height)
 					return std::nullopt;
 
@@ -582,14 +588,14 @@ namespace TEN::Collision::Floordata
 		{
 			if (direction >= 0)
 			{
-				auto height = GetBottomHeight(*floor, x, y, z);
+				auto height = GetBottomHeight(*floor, Vector3i(x, y, z));
 				if (height)
 					return height;
 			}
 
 			if (direction <= 0)
 			{
-				auto height = GetTopHeight(*floor, x, y, z, nullptr, &floor);
+				auto height = GetTopHeight(*floor, Vector3i(x, y, z), nullptr, &floor);
 				if (!height)
 					return std::nullopt;
 
@@ -631,7 +637,7 @@ namespace TEN::Collision::Floordata
 
 		if (floor->GetInsideBridgeItemNumber(x, location.yNumber, z, location.yNumber == ceilingHeight, location.yNumber == floorHeight) >= 0)
 		{
-			const auto height = GetBottomHeight(*floor, x, location.yNumber, z, &location.roomNumber, &floor);
+			const auto height = GetBottomHeight(*floor, Vector3i(x, location.yNumber, z), &location.roomNumber, &floor);
 			if (!height)
 				return std::nullopt;
 
@@ -693,7 +699,7 @@ namespace TEN::Collision::Floordata
 
 		if (floor->GetInsideBridgeItemNumber(x, location.yNumber, z, location.yNumber == ceilingHeight, location.yNumber == floorHeight) >= 0)
 		{
-			const auto height = GetTopHeight(*floor, x, location.yNumber, z, &location.roomNumber, &floor);
+			const auto height = GetTopHeight(*floor, Vector3i(x, location.yNumber, z), &location.roomNumber, &floor);
 			if (!height)
 				return std::nullopt;
 
@@ -831,30 +837,25 @@ namespace TEN::Collision::Floordata
 		}
 	}
 
-	// New function which gets precise floor/ceiling collision from actual object bounding box.
-	// Animated objects are also supported, although horizontal collision shift is unstable.
-	// Method: get accurate bounds in world transform by converting to DirectX OBB, then do a
-	// ray test on top or bottom (depending on test side) to determine if box is present at 
-	// this particular point.
-
-	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool bottom)
+	// Gets precise floor/ceiling height from object's bounding box.
+	// Animated objects are also supported, although horizontal collision shifting is unstable.
+	// Method: get accurate bounds in world transform by converting to OBB, then do a ray test
+	// on top or bottom (depending on test side) to determine if box is present at a particular point.
+	std::optional<int> GetBridgeItemIntersect(int itemNumber, int x, int y, int z, bool useBottomHeight)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		auto bounds = GameBoundingBox(item);
-		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
+		auto bounds = GameBoundingBox(&item);
+		auto dxBounds = bounds.ToBoundingOrientedBox(item.Pose);
 
-		auto pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case.
+		// Introduce slight vertical margin just in case.
+		auto pos = Vector3(x, y + (useBottomHeight ? 4 : -4), z);
 
-		float distance = 0.0f;
-		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
-		{
-			return std::optional{ item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1) };
-		}
-		else
-		{
-			return std::nullopt;
-		}
+		float dist = 0.0f;
+		if (dxBounds.Intersects(pos, (useBottomHeight ? -Vector3::UnitY : Vector3::UnitY), dist))
+			return (item.Pose.Position.y + (useBottomHeight ? bounds.Y2 : bounds.Y1));
+
+		return std::nullopt;
 	}
 
 	// Gets bridge min or max height regardless of actual X/Z world position.
@@ -936,5 +937,104 @@ namespace TEN::Collision::Floordata
 		}
 
 		return false;
+	}
+
+	static void DrawSectorFlagLabel(const Vector3& pos, const std::string& string, const Vector4& color, float verticalOffset)
+	{
+		constexpr auto LABEL_SCALE = 0.8f;
+		constexpr auto HALF_BLOCK  = BLOCK(0.5f);
+
+		// Get 2D label position.
+		auto labelPos = pos + Vector3(HALF_BLOCK, 0.0f, HALF_BLOCK);
+		auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
+
+		// Draw label.
+		if (labelPos2D.has_value())
+		{
+			*labelPos2D += Vector2(0.0f, verticalOffset);
+			g_Renderer.AddDebugString(string, *labelPos2D, color, LABEL_SCALE, 0, RendererDebugPage::CollisionStats);
+		}
+	}
+
+	void DrawNearbySectorFlags(const ItemInfo& item)
+	{
+		constexpr auto DRAW_RANGE	  = BLOCK(3);
+		constexpr auto STRING_SPACING = -20.0f;
+
+		constexpr auto STOPPER_COLOR				 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
+		constexpr auto DEATH_COLOR					 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
+		constexpr auto MONKEY_SWING_COLOR			 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
+		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Vector4(0.4f, 0.4f, 1.0f, 1.0f);
+		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
+		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
+		
+		// Only check sectors in player vicinity.
+		const auto& room = g_Level.Rooms[item.RoomNumber];
+		int minX = std::max(item.Pose.Position.x - DRAW_RANGE, room.x) / BLOCK(1);
+		int maxX = std::min(item.Pose.Position.x + DRAW_RANGE, room.x + (room.xSize * BLOCK(1))) / BLOCK(1);
+		int minZ = std::max(item.Pose.Position.z - DRAW_RANGE, room.z) / BLOCK(1);
+		int maxZ = std::min(item.Pose.Position.z + DRAW_RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
+		
+		auto pointColl = GetCollision(item);
+		auto pos = item.Pose.Position.ToVector3();
+
+		// Draw sector flag labels.
+		for (int x = minX; x < maxX; x++)
+		{
+			for (int z = minZ; z < maxZ; z++)
+			{
+				pos.x = BLOCK(x);
+				pos.z = BLOCK(z);
+				
+				pointColl = GetCollision(pos, item.RoomNumber);
+				pos.y = pointColl.Position.Floor;
+
+				float verticalOffset = STRING_SPACING;
+
+				// Stopper
+				if (pointColl.Block->Stopper)
+				{
+					DrawSectorFlagLabel(pos, "Stopper", STOPPER_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+				
+				// Death
+				if (pointColl.Block->Flags.Death)
+				{
+					DrawSectorFlagLabel(pos, "Death", DEATH_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+
+				// Monkey Swing
+				if (pointColl.Block->Flags.Monkeyswing)
+				{
+					DrawSectorFlagLabel(pos, "Monkey Swing", MONKEY_SWING_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+
+				// Beetle / Minecart Right
+				if (pointColl.Block->Flags.MarkBeetle)
+				{
+					auto labelString = std::string("Beetle") + (!pointColl.Block->Flags.MinecartStop() ? " / Minecart Right" : "");
+					DrawSectorFlagLabel(pos, labelString, BEETLE_MINECART_RIGHT_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+
+				// Activator / Minecart Left
+				if (pointColl.Block->Flags.MarkTriggerer)
+				{
+					auto labelString = std::string("Activator") + (!pointColl.Block->Flags.MinecartStop() ? " / Minecart Left" : "");
+					DrawSectorFlagLabel(pos, labelString, ACTIVATOR_MINECART_LEFT_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+
+				// Minecart Stop
+				if (pointColl.Block->Flags.MinecartStop())
+				{
+					DrawSectorFlagLabel(pos, "Minecart Stop", MINECART_STOP_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+			}
+		}
 	}
 }

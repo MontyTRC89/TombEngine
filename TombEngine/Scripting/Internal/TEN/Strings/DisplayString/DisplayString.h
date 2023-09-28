@@ -8,13 +8,17 @@ enum class DisplayStringOptions : size_t
 {
 	CENTER,
 	OUTLINE,
+	RIGHT,
+	BLINK,
 	NUM_OPTIONS
 };
 
 static const std::unordered_map<std::string, DisplayStringOptions> kDisplayStringOptionNames
 {
 	{"CENTER", DisplayStringOptions::CENTER},
-	{"SHADOW", DisplayStringOptions::OUTLINE}
+	{"SHADOW", DisplayStringOptions::OUTLINE},
+	{"RIGHT", DisplayStringOptions::RIGHT},
+	{"BLINK", DisplayStringOptions::BLINK}
 };
 
 using FlagArray = std::array<bool, static_cast<size_t>(DisplayStringOptions::NUM_OPTIONS)>;

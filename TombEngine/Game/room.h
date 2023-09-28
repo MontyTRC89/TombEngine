@@ -13,9 +13,9 @@ constexpr auto NO_ROOM		= -1;
 constexpr auto OUTSIDE_Z	= 64;
 constexpr auto OUTSIDE_SIZE = 1024;
 
-extern byte FlipStatus;
-extern int FlipStats[MAX_FLIPMAP];
-extern int FlipMap[MAX_FLIPMAP];
+extern bool FlipStatus;
+extern bool FlipStats[MAX_FLIPMAP];
+extern int  FlipMap[MAX_FLIPMAP];
 
 enum RoomEnvFlags
 {

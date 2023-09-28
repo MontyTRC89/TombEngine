@@ -497,13 +497,14 @@ namespace TEN::Entities::Vehicles
 	bool RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
 	{
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		bool noTurn = true;
 
 		if (rBoatItem->Pose.Position.y >= (rBoat->Water - 128) && 
 			rBoat->Water != NO_HEIGHT)
 		{
-			if (!IsHeld(In::Brake) && !(TrInput & IN_LOOK) || rBoatItem->Animation.Velocity.z)
+			if (!IsHeld(In::Brake) && !IsHeld(In::Look) || rBoatItem->Animation.Velocity.z)
 			{
 				if ((IsHeld(In::Left) && !IsHeld(In::Reverse)) ||
 					(IsHeld(In::Right) && IsHeld(In::Reverse)))
@@ -581,8 +582,7 @@ namespace TEN::Entities::Vehicles
 				else
 					rBoatItem->Animation.Velocity.z = 0;
 
-				if (TrInput & IN_LOOK && rBoatItem->Animation.Velocity.z == 0)
-					LookUpDown(laraItem);
+				lara->Control.Look.Mode = (rBoatItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 			}
 		}
 
@@ -650,9 +650,9 @@ namespace TEN::Entities::Vehicles
 				{
 					if (rBoatItem->Animation.Velocity.z == 0)
 					{
-						if (TrInput & IN_RIGHT && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y + ANGLE(90.0f)))
+						if (IsHeld(In::Right) && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y + ANGLE(90.0f)))
 							laraItem->Animation.TargetState = RBOAT_STATE_JUMP_RIGHT;
-						else if (TrInput & IN_LEFT && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y - ANGLE(90.0f)))
+						else if (IsHeld(In::Left) && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y - ANGLE(90.0f)))
 							laraItem->Animation.TargetState = RBOAT_STATE_JUMP_LEFT;
 					}
 				}

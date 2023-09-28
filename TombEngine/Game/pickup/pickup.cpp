@@ -203,6 +203,7 @@ void CollectCarriedItems(ItemInfo* item)
 	{
 		auto* pickupItem = &g_Level.Items[pickupNumber];
 
+		PickedUpObject(pickupItem->ObjectNumber);
 		g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 		KillItem(pickupNumber);
 
@@ -248,7 +249,9 @@ void CollectMultiplePickups(int itemNumber)
 				continue;
 		}
 
+		PickedUpObject(currentItem->ObjectNumber);
 		g_Hud.PickupSummary.AddDisplayPickup(currentItem->ObjectNumber, currentItem->Pose.Position.ToVector3());
+
 		if (currentItem->TriggerFlags & (1 << 8))
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
@@ -282,7 +285,9 @@ void DoPickup(ItemInfo* laraItem)
 
 	if (pickupItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
 	{
+		PickedUpObject(ID_BURNING_TORCH_ITEM);
 		g_Hud.PickupSummary.AddDisplayPickup(ID_BURNING_TORCH_ITEM, pickupItem->Pose.Position.ToVector3());
+
 		GetFlameTorch();
 		lara->Torch.IsLit = (pickupItem->ItemFlags[3] & 1);
 
@@ -318,6 +323,7 @@ void DoPickup(ItemInfo* laraItem)
 				return;
 			}
 
+			PickedUpObject(pickupItem->ObjectNumber);
 			g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 			HideOrDisablePickup(*pickupItem);
 
@@ -329,9 +335,11 @@ void DoPickup(ItemInfo* laraItem)
 		{
 			if (laraItem->Animation.AnimNumber == LA_CROWBAR_PRY_WALL_SLOW)
 			{
+				PickedUpObject(ID_CROWBAR_ITEM);
 				g_Hud.PickupSummary.AddDisplayPickup(ID_CROWBAR_ITEM, pickupItem->Pose.Position.ToVector3());
-				lara->Inventory.HasCrowbar = true;
 				KillItem(pickupItemNumber);
+
+				lara->Inventory.HasCrowbar = true;
 			}
 			else if (laraItem->Animation.ActiveState == LS_PICKUP ||
 					 laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST ||
@@ -344,7 +352,9 @@ void DoPickup(ItemInfo* laraItem)
 					return;
 				}
 
+				PickedUpObject(pickupItem->ObjectNumber);
 				g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
+
 				if (pickupItem->TriggerFlags & (1 << 8))
 				{
 					for (int i = 0; i < g_Level.NumItems; i++)
@@ -394,7 +404,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		{
 			item->Pose.Orientation.x = -ANGLE(25.0f);
 
-			if (TrInput & IN_ACTION && 
+			if (IsHeld(In::Action) && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
 				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && 
 				lara->Control.HandStatus == HandStatus::Free &&
@@ -445,8 +455,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		return;
 	}
 	
-	if (!(TrInput & IN_ACTION) && (g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
-		BinocularRange ||
+	if (!IsHeld(In::Action) && (g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
+		lara->Control.Look.IsUsingLasersight ||
 		(laraItem->Animation.ActiveState != LS_IDLE || laraItem->Animation.AnimNumber != LA_STAND_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CROUCH_IDLE || laraItem->Animation.AnimNumber != LA_CROUCH_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CRAWL_IDLE || laraItem->Animation.AnimNumber != LA_CRAWL_IDLE))
@@ -1157,7 +1167,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1);
 
-	if ((TrInput & IN_ACTION &&
+	if ((IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		lara->Control.HandStatus == HandStatus::Free &&
@@ -1261,6 +1271,7 @@ void SearchObjectControl(short itemNumber)
 
 				if (Objects[item2->ObjectNumber].isPickup)
 				{
+					PickedUpObject(item2->ObjectNumber);
 					g_Hud.PickupSummary.AddDisplayPickup(item2->ObjectNumber, item2->Pose.Position.ToVector3());
 					KillItem(item->ItemFlags[1]);
 				}
@@ -1280,7 +1291,6 @@ void SearchObjectControl(short itemNumber)
 			CollectCarriedItems(item);
 		}
 	}
-
 	
 	if (item->Status == ITEM_DEACTIVATED)
 	{
