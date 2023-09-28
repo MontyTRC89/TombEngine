@@ -6,7 +6,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerWorkingDirectory>$(SolutionDir)Build\$(Configuration)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>/debug</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-gameDir "P:\Projects\TombEngineAssets" -debug</LocalDebuggerCommandArguments>
+    <RemoteDebuggerCommandArguments>-gameDir "P:\Projects\TombEngineAssets" -debug</RemoteDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerWorkingDirectory>$(SolutionDir)Build\$(Configuration)\</LocalDebuggerWorkingDirectory>

@@ -28,13 +28,14 @@ using FlagArray = std::array<bool, static_cast<size_t>(DisplayStringOptions::NUM
 class UserDisplayString
 {
 public:
-	UserDisplayString(const std::string& key, int x, int y, D3DCOLOR color, const FlagArray& flags, bool translated);
+	UserDisplayString(const std::string& key, int x, int y, float scale, D3DCOLOR color, const FlagArray& flags, bool translated);
 
 private:
 	UserDisplayString() = default;
 	std::string m_key{};
 	D3DCOLOR m_color{ 0xFFFFFFFF };
 	FlagArray m_flags{};
+	float m_scale{ 1.0f };
 	int m_x{ 0 };
 	int m_y{ 0 };
 	bool m_deleteWhenZero{ false };
@@ -61,6 +62,8 @@ public:
 	DisplayString();
 	~DisplayString();
 	DisplayStringIDType GetID() const;
+	void SetScale(float scale);
+	float GetScale() const;
 	static void Register(sol::table& parent);
 
 	void SetPos(int x, int y);

@@ -1,11 +1,5 @@
 #pragma once
-#include <functional>
-#include <string>
-
-#include "Game/room.h"
-#include "Specific/level.h"
-
-using CallbackDrawString = std::function<void(const std::string&, D3DCOLOR, int, int, int)>;
+#include "StringsCommon.h"
 
 class ScriptInterfaceStringsHandler
 {

@@ -19,10 +19,11 @@ when you need to use screen-space coordinates.
 @pragma nostrip
 */
 
-UserDisplayString::UserDisplayString(const std::string& key, int x, int y, D3DCOLOR color, const FlagArray& flags, bool translated) :
+UserDisplayString::UserDisplayString(const std::string& key, int x, int y, float scale, D3DCOLOR color, const FlagArray& flags, bool translated) :
 	m_key{ key },
 	m_x{ x },
 	m_y{ y },
+	m_scale{ scale }, 
 	m_color{ color },
 	m_flags{ flags },
 	m_isTranslated{ translated }
@@ -40,6 +41,7 @@ DisplayString::DisplayString()
 /*** Create a DisplayString.
 For use in @{ Strings.ShowString | ShowString } and @{ Strings.HideString | HideString }.
 @function DisplayString
+<<<<<<< Updated upstream
 @tparam string string The string to display or key of the translated string.
 @tparam int x X component of the string.
 @tparam int y Y component of the string.
@@ -51,10 +53,23 @@ If true, the string argument will be the key of a translated string specified in
 	TEN.Strings.DisplayStringOption.RIGHT: set the horizontal origin point to right of the string.
 	TEN.Strings.DisplayStringOption.SHADOW: give the string a small shadow.
 	TEN.Strings.DisplayStringOption.BLINK: blink the string.
+=======
+@tparam string str string to print or key of translated string
+@tparam int x x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
+@tparam int y y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
+@tparam[opt] float scale size of the string, relative to the default size. __Default: 1.0__
+@tparam[opt] Color color the color of the text. __Default: white__
+@tparam[opt] bool translated if false or omitted, the str argument will be printed.
+If true, the str argument will be the key of a translated string specified in
+strings.lua. __Default: false__.
+@tparam[opt] table flags a table of display options. Can be empty or omitted. The possible values and their effects are...
+	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
+	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
+>>>>>>> Stashed changes
 __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */
-static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x, int y, ScriptColor color, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags)
+static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x, int y, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags)
 {
 	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();
@@ -74,17 +89,23 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x
 		ScriptAssertF(false, "Wrong argument type for {}.new \"flags\" argument; must be a table or nil.", ScriptReserved_DisplayString);
 	}
 
-	bool translated = false;
-	if (std::holds_alternative<bool>(maybeTranslated))	
-	{
-		translated = std::get<bool>(maybeTranslated);
-	}
-	else if (!std::holds_alternative<sol::nil_t>(maybeTranslated))
+	if (!IsValidOptionalArg(maybeTranslated))	
 	{
 		ScriptAssertF(false, "Wrong argument type for {}.new \"translated\" argument; must be a bool or nil.", ScriptReserved_DisplayString);
 	}
 
-	UserDisplayString ds{ key, x, y, color, f, translated};
+	if (!IsValidOptionalArg(color))	
+	{
+		ScriptAssertF(false, "Wrong argument type for {}.new \"color\" argument; must be a {} or nil.", ScriptReserved_DisplayString, ScriptReserved_Color);
+	}
+
+	if (!IsValidOptionalArg(scale))	
+	{
+		ScriptAssertF(false, "Wrong argument type for {}.new \"scale\" argument; must be a float or nil.", ScriptReserved_DisplayString);
+	}
+
+
+	UserDisplayString ds{ key, x, y, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255,255,255)), f, USE_IF_HAVE(bool, maybeTranslated, false) };
 
 	DisplayString::s_setItemCallback(id, ds);
 	return ptr;
@@ -125,6 +146,15 @@ void DisplayString::Register(sol::table& parent)
 		// @tparam string string the new key for the display string 
 		ScriptReserved_SetKey, &DisplayString::SetKey, 
 
+		/// Set the scale of the string.
+		// @function DisplayString:SetScale
+		// @tparam float scale the new scale of the text, relative to the default size
+		ScriptReserved_SetScale, &DisplayString::SetScale,
+
+		/// Get the scale of the string.
+		// @function DisplayString:GetScale
+		// @treturn float scale scale of the string 
+		ScriptReserved_GetScale, &DisplayString::GetScale,
 
 		/// Set the position of the string.
 		// Screen-space coordinates are expected.
@@ -165,6 +195,18 @@ void DisplayString::Register(sol::table& parent)
 DisplayStringIDType DisplayString::GetID() const
 {
 	return m_id;
+}
+
+void DisplayString::SetScale(float scale)
+{
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	displayString.m_scale = scale;
+}
+
+float DisplayString::GetScale() const
+{
+	const UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	return displayString.m_scale;
 }
 
 void DisplayString::SetPos(int x, int y)

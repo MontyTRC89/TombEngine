@@ -32,6 +32,11 @@ template <typename ... Ts> using TypeOrNil = std::variant<Ts..., sol::nil_t, sol
 #define USE_IF_HAVE(Type, ifThere, ifNotThere) \
 (std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere)
 
+template<typename T> bool IsValidOptionalArg(const TypeOrNil<T> & arg)
+{
+	return std::holds_alternative<T>(arg) || std::holds_alternative<sol::nil_t>(arg);
+}
+
 sol::table MakeSpecialTableBase(sol::state* state, std::string const& name);
 
 template <typename funcIndex, typename funcNewindex>

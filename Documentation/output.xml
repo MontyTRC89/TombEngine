@@ -447,6 +447,20 @@ __(not yet implemented)__</description>
 
 <function>
 	<module>Flow</module>
+	<name>EnablePointFilter</name>
+	<summary>Enable or disable point texture filter.</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>enabled</name>
+			<type>bool</type>
+			<description>true or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
 	<name>EnableMassPickup</name>
 	<summary>Enable or disable mass pickup.</summary>
 	<description>Must be true or false</description>
@@ -665,13 +679,13 @@ level count, jumps to title.</description>
 Corresponds to an entry in strings.lua.</description>
 		</parameter>
 		<parameter>
-			<name>slot</name>
+			<name>objectID</name>
 			<type>Objects.ObjID</type>
-			<description>slot of inventory object to change</description>
+			<description>object ID of the inventory object to change</description>
 		</parameter>
 		<parameter>
 			<name>yOffset</name>
-			<type>int</type>
+			<type>float</type>
 			<description>y-axis offset (positive values move the item down).<br />
 A value of about 100 will cause the item to display directly below its usual position.</description>
 		</parameter>
@@ -685,12 +699,12 @@ and a value of 2 will cause the item to render at twice the size.</description>
 		<parameter>
 			<name>rot</name>
 			<type>Rotation</type>
-			<description>rotation about x, y, and z axes</description>
+			<description>rotation around x, y, and z axes</description>
 		</parameter>
 		<parameter>
 			<name>axis</name>
 			<type>RotationAxis</type>
-			<description>Axis to rotate about when the item is being looked at in the inventory.<br />
+			<description>Axis to rotate around when the item is observed at in the inventory.<br />
 Note that this is entirely separate from the `rot` field described above.
 Must one of the following:
 	X
@@ -872,6 +886,29 @@ Has no effect if the player has an infinite number of the item.</description>
 			<name>LevelFunc</name>
 			<type>func</type>
 			<description>the function to remove; must be in the LevelFuncs hierarchy.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Logic</module>
+	<name>HandleEvent</name>
+	<summary>Attempt to find an event set and exectute a particular event from it.</summary>
+	<parameters>
+		<parameter>
+			<name>string</name>
+			<type>name</type>
+			<description>Name of the event set to find.</description>
+		</parameter>
+		<parameter>
+			<name>EventType</name>
+			<type>type</type>
+			<description>Event to execute.</description>
+		</parameter>
+		<parameter>
+			<name>Moveable</name>
+			<type>activator</type>
+			<description>Optional activator. If not provided, player object will be automatically provided as activator.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1735,6 +1772,33 @@ Returns nil if no voice track is playing or no subtitle present.</description>
 
 <function>
 	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>SetControlLock</name>
+	<summary>Set control lock for Lara.</summary>
+	<parameters>
+		<parameter>
+			<name>whether</name>
+			<type>bool</type>
+			<description>set or not set control lock.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetControlLock</name>
+	<summary>Get control lock for Lara.</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>current control lock value</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
 	<caller>Moveable</caller>
 	<name>GetAirborne</name>
 	<summary>Get the moveable's airborne status</summary>
@@ -1829,6 +1893,19 @@ Returns nil if no voice track is playing or no subtitle present.</description>
 			<description>true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetAmmoType</name>
+	<summary>Get player weapon ammo type.</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>player weapon ammo type</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -4042,14 +4119,12 @@ with a call to @{ShowString}, or this function will have no effect.</description
 	<module>Vec2</module>
 	<caller>Vec2</caller>
 	<name>ToLength</name>
-	<summary>Modify this vector so that it becomes close to the requested length.</summary>
-	<description>Note that since the engine uses integers instead of floating-point
-numbers, this will be less accurate at smaller lengths.</description>
+	<summary>Modify to match input length.</summary>
 	<parameters>
 		<parameter>
 			<name>length</name>
 			<type>float</type>
-			<description>the new length to set the vector to.</description>
+			<description>new length to set.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -4057,22 +4132,10 @@ numbers, this will be less accurate at smaller lengths.</description>
 <function>
 	<module>Vec2</module>
 	<name>Vec2</name>
-	<parameters>
-		<parameter>
-			<name>X</name>
-			<type>int</type>
-			<description>x coordinate</description>
-		</parameter>
-		<parameter>
-			<name>Y</name>
-			<type>int</type>
-			<description>y coordinate</description>
-		</parameter>
-	</parameters>
 	<returns>
 		<return>
 			<type>Vec2</type>
-			<description>A Vec2 object.</description>
+			<description>A Vec2 object</description>
 		</return>
 	</returns>
 </function>
@@ -4091,7 +4154,7 @@ numbers, this will be less accurate at smaller lengths.</description>
 	<returns>
 		<return>
 			<type>string</type>
-			<description>A string showing the x, y, and z values of the Vec2</description>
+			<description>A string showing the x and y values of the Vec2</description>
 		</return>
 	</returns>
 </function>

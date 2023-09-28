@@ -208,6 +208,7 @@ namespace TEN::Renderer
 		Texture2D* Texture;
 	};
 
+struct FontData { int size; std::wstring path; std::unique_ptr<SpriteFont> font; };
 	struct RendererSpriteSequence
 	{
 		int Id;
@@ -379,6 +380,7 @@ namespace TEN::Renderer
 
 		// Text
 		std::unique_ptr<SpriteFont> m_gameFont;
+		std::vector<FontData> m_gameFonts;
 		std::vector<RendererStringToDraw> m_strings;
 		float BlinkColorValue = 0.0f;
 		float BlinkTime		  = 0.0f;
