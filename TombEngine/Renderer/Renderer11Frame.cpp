@@ -296,7 +296,7 @@ namespace TEN::Renderer
 				m_dotProducts++;
 			}
 
-			if (door->DotProduct <= 0)
+			if (door->DotProduct < 0)
 			{
 				door->InvisibleFromCamera = true;
 				continue;
