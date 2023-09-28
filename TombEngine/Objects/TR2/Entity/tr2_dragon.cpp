@@ -63,14 +63,35 @@ namespace TEN::Entities::Creatures::TR2
 		DRAGON_STATE_TURN_RIGHT = 8,
 		DRAGON_STATE_SWIPE_LEFT = 9,
 		DRAGON_STATE_SWIPE_RIGHT = 10,
-		DRAGON_STATE_DEATH = 11
+		DRAGON_STATE_DEFEAT = 11
 	};
 
-	// TODO
 	enum DragonAnim
 	{
+		DRAGON_ANIM_WALK = 0,
+		DRAGON_ANIM_WALK_TO_MOVE_LEFT = 1,
+		DRAGON_ANIM_MOVE_LEFT = 2,
+		DRAGON_ANIM_MOVE_LEFT_TO_WALK = 3,
+		DRAGON_ANIM_WALK_TO_MOVE_RIGHT = 4,
+		DRAGON_ANIM_MOVE_RIGHT = 5,
+		DRAGON_ANIM_MOVE_RIGHT_TO_WALK = 6,
+		DRAGON_ANIM_WALK_TO_IDLE = 7,
+		DRAGON_ANIM_IDLE = 8,
+		DRAGON_ANIM_IDLE_TO_WALK = 9,
+		DRAGON_ANIM_IDLE_TO_FIRE = 10,
+		DRAGON_ANIM_FIRE = 11,
+		DRAGON_ANIM_FIRE_TO_IDLE = 12,
+		DRAGON_ANIM_TURNING_LEFT = 13,
+		DRAGON_ANIM_TURNING_RIGHT = 14,
+		DRAGON_ANIM_ATTACK_LEFT_1 = 15,
+		DRAGON_ANIM_ATTACK_LEFT_2 = 16,
+		DRAGON_ANIM_ATTACK_LEFT_3 = 17,
+		DRAGON_ANIM_ATTACK_RIGHT_1 = 18,
+		DRAGON_ANIM_ATTACK_RIGHT_2 = 19,
+		DRAGON_ANIM_ATTACK_RIGHT_3 = 20,
 		DRAGON_ANIM_DEATH = 21,
-		DRAGON_ANIM_DEAD = 22
+		DRAGON_ANIM_DEFEATED = 22,
+		DRAGON_ANIM_RECOVER = 23
 	};
 
 	void InitializeBartoli(short itemNumber)
@@ -263,7 +284,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (!TestCollision(&item, laraItem))
 			return;
 
-		if (item.Animation.ActiveState == DRAGON_STATE_DEATH)
+		if (item.Animation.ActiveState == DRAGON_STATE_DEFEAT)
 		{
 			int rx = laraItem->Pose.Position.x - item.Pose.Position.x;
 			int rz = laraItem->Pose.Position.z - item.Pose.Position.z;
@@ -282,7 +303,7 @@ namespace TEN::Entities::Creatures::TR2
 				int anim = item.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
 				int frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 
-				if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
+				if ((anim == DRAGON_ANIM_DEFEATED || (anim == DRAGON_ANIM_DEFEATED + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 					IsHeld(In::Action) &&
 					item.ObjectNumber == ID_DRAGON_BACK &&
 					!laraItem->Animation.IsAirborne &&
@@ -353,7 +374,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		if (item.HitPoints <= 0)
 		{
-			if (item.Animation.ActiveState != DRAGON_STATE_DEATH)
+			if (item.Animation.ActiveState != DRAGON_STATE_DEFEAT)
 			{
 				SetAnimation(item, 21);
 				creature->Flags = 0;
