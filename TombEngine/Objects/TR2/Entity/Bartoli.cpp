@@ -22,9 +22,6 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.Pose.Position.x -= CLICK(2);
-		item.Pose.Position.z -= CLICK(2);
-
 		InitializeCreature(itemNumber);
 
 		if (item.TriggerFlags == 0)

@@ -433,8 +433,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_BACK");
-		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_MARCO_BARTOLI");
-		obj->Initialize = InitializeCreature;
+		obj->Initialize = InitializeDragon;
 		obj->collision = CollideDragon;
 		obj->control = ControlDragon;
 		obj->HitPoints = 300;
@@ -449,8 +448,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_FRONT");
-		CheckIfSlotExists(ID_MARCO_BARTOLI, "ID_MARCO_BARTOLI");
-		obj->Initialize = InitializeCreature;
+		//obj->Initialize = InitializeCreature;
 		obj->collision = CollideDragon;
 		obj->control = ControlDragon;
 		obj->radius = 256;
@@ -460,8 +458,6 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_BACK");
-		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_FRONT");
 		obj->Initialize = InitializeBartoli;
 		obj->control = ControlBartoli;
 	}
