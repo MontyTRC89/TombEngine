@@ -52,10 +52,28 @@ namespace TEN::Entities::Creatures::TR1
 		MUTANT_STATE_KILL = 11
 	};
 
-	// TODO: Fill enum.
 	enum GiantMutantAnim
 	{
+		MUTANT_ANIM_COCOON = 0,
+		MUTANT_ANIM_LANDING = 1,
+		MUTANT_ANIM_IDLE = 2,
+		MUTANT_ANIM_IDLE_TO_FORWARD = 3,
+		MUTANT_ANIM_FORWARD_1 = 4,
+		MUTANT_ANIM_FORWARD_2 = 5,
+		MUTANT_ANIM_FORWARD_TO_IDLE = 6,
+		MUTANT_ANIM_IDLE_TO_TURN_LEFT = 7,
+		MUTANT_ANIM_TURN_LEFT = 8,
+		MUTANT_ANIM_TURN_LEFT_TO_IDLE = 9,
+		MUTANT_ANIM_ATTACK_SINGLE = 10,
+		MUTANT_ANIM_ATTACK_DOUBLE = 11,
+		MUTANT_ANIM_ATTACK_AREA = 12,
 		MUTANT_ANIM_DEATH = 13,
+		MUTANT_ANIM_FALLING = 14,
+		MUTANT_ANIM_COCOON_TO_FALLING = 15,
+		MUTANT_ANIM_IDLE_TO_TURN_RIGHT = 16,
+		MUTANT_ANIM_TURN_RIGHT = 17,
+		MUTANT_ANIM_TURN_RIGHT_TO_IDLE = 18,
+		MUTANT_ANIM_KILL = 19
 	};
 
 	void GiantMutantControl(short itemNumber)
@@ -190,25 +208,15 @@ namespace TEN::Entities::Creatures::TR1
 			case MUTANT_STATE_ATTACK_3:
 				if (item->TouchBits.Test(MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
 				{
-					item->Animation.TargetState = MUTANT_STATE_KILL;
-					Camera.targetDistance = BLOCK(2);
-					Camera.flags = CF_FOLLOW_CENTER;
-
-					SetAnimation(*LaraItem, ID_LARA_EXTRA_ANIMS, LEA_GIANT_MUTANT_DEATH);
-					LaraItem->Animation.IsAirborne = false;
-					LaraItem->Pose = Pose(item->Pose.Position, 0, item->Pose.Orientation.y, 0);
-					LaraItem->RoomNumber = item->RoomNumber;
-					LaraItem->HitPoints = -1;
-					Lara.Status.Air = -1;
-					Lara.Control.HandStatus = HandStatus::Busy;
-					Lara.Control.Weapon.GunType = LaraWeaponType::None;
+					CreatureKill(item, MUTANT_ANIM_KILL, LEA_GIANT_MUTANT_DEATH, MUTANT_STATE_KILL, LS_DEATH);
+					Camera.targetDistance = BLOCK(3);
 				}
 
 				break;
 
 			case MUTANT_STATE_KILL:
-				Camera.targetDistance = BLOCK(2);
-				Camera.flags = CF_FOLLOW_CENTER;
+				creature->MaxTurn = 0;
+
 				break;
 			}
 		}
