@@ -41,7 +41,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (distFromPlayer > DRAGON_SPAWN_RANGE)
 					return;
 			}
-			// Activate on level load.
+			// Activate by trigger.
 			else
 			{
 				if (!TriggerActive(&item))

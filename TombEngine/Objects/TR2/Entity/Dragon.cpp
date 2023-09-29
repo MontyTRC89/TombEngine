@@ -4,6 +4,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/lot.h"
+#include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
@@ -146,7 +147,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					//Defeat routine
 
-					//SpawnBartoliLight(item, 1);
+					DragonLightsManager(item, 1);
 					item.ItemFlags[1]++;
 
 					if (item.ItemFlags[1] == DRAGON_LIVE_TIME)
@@ -159,12 +160,12 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					//Death routine
 
-					//if (item.ItemFlags[1] > -20)
-						//SpawnBartoliLight(item, 2);
+					if (item.ItemFlags[1] > -20)
+						DragonLightsManager(item, 2);
 
 					if (item.ItemFlags[1] == -100)
 					{
-						//CreateDragonBone(itemNumber);
+						InstantiateDragonBones (itemNumber);
 					}
 					else if (item.ItemFlags[1] == -200)
 					{
@@ -345,7 +346,7 @@ namespace TEN::Entities::Creatures::TR2
 					if (creature->Flags)
 					{
 						if (ai.ahead)
-							//TODO spawn fire function
+							// TODO: spawn fire function
 							//SpawnDragonFireBreath(&item, DragonMouthBite, Vector3i(0, 0, 300), creature->Enemy);
 
 						creature->Flags--;
@@ -477,5 +478,71 @@ namespace TEN::Entities::Creatures::TR2
 		}
 
 		ItemPushItem(&item, laraItem, coll, 1, 0);
+	}
+
+	void DragonLightsManager(const ItemInfo& item, int type)
+	{
+		switch (type)
+		{
+			case 0:
+				TriggerDynamicLight(
+					item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
+					(GetRandomControl() & 150) + 25, //Strong
+					(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 200, (GetRandomControl() & 20) + 200); //White
+				break;
+
+			case 1:
+				TriggerDynamicLight(
+					item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
+					(GetRandomControl() & 75) + 25, //Middle
+					(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50); //Yellowish
+				break;
+
+			case 2:
+				TriggerDynamicLight(
+					item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
+					(GetRandomControl() & 20) + 25, //Weak
+					(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0); //Reddish
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	void InstantiateDragonBones(short itemNumber)
+	{
+		short frontItemNumber = itemNumber;
+		const auto& frontItem = g_Level.Items[frontItemNumber];
+		
+		short backItemNumber = frontItem.ItemFlags[0];
+		const auto& backItem = g_Level.Items[backItemNumber];
+
+		int boneFrontItemNumber = CreateItem();
+		int boneBackItemNumber = CreateItem();
+		if (boneBackItemNumber == NO_ITEM || boneFrontItemNumber == NO_ITEM)
+			return;
+
+		auto& boneFrontItem = g_Level.Items[boneFrontItemNumber];
+		auto& boneBackItem = g_Level.Items[boneBackItemNumber];
+						
+		boneFrontItem.ObjectNumber = ID_DRAGON_BONE_FRONT;
+		boneFrontItem.Pose = frontItem.Pose;
+		boneFrontItem.Pose.Orientation.x = 0;
+		boneFrontItem.Pose.Orientation.z = 0;
+		boneFrontItem.RoomNumber = frontItem.RoomNumber;
+		boneFrontItem.Model.Color = frontItem.Model.Color;
+		InitializeItem(boneFrontItemNumber);
+
+		boneBackItem.ObjectNumber = ID_DRAGON_BONE_BACK;
+		boneBackItem.Pose = backItem.Pose;
+		boneBackItem.Pose.Orientation.x = 0;
+		boneBackItem.Pose.Orientation.z = 0;
+		boneBackItem.RoomNumber = backItem.RoomNumber;
+		boneBackItem.Model.Color = backItem.Model.Color;
+		InitializeItem(boneBackItemNumber);
+		
+		boneFrontItem.MeshBits = 0xFF3FFFFF;
+		boneBackItem.MeshBits = 0xFF3FFFFF;
 	}
 }
