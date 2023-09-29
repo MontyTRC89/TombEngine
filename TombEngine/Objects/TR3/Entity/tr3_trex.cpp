@@ -38,13 +38,13 @@ namespace TEN::Entities::Creatures::TR3
 		TREX_STATE_ATTACK = 7,
 		TREX_STATE_KILL = 8,
 		
-		//TODO TR3 states
-		TREX_STATE_ROARING_START = 9,
-		TREX_STATE_ROARING_LOOP = 10,
-		TREX_STATE_ROARING_END = 11,
-		TREX_STATE_SNIF_START = 12,
-		TREX_STATE_SNIF_LOOP = 13,
-		TREX_STATE_SNIF_END = 14
+		// TODO: TR3 states.
+		/*TREX_STATE_ROAR_START = 9,
+		TREX_STATE_ROAR_CONT = 10,
+		TREX_STATE_ROAR_END = 11,
+		TREX_STATE_HUNCH_START = 12,
+		TREX_STATE_HUNCH_LOOP = 13,
+		TREX_STATE_HUNCH_END = 14*/
 	};
 
 	enum TRexAnim
@@ -62,15 +62,16 @@ namespace TEN::Entities::Creatures::TR3
 		TREX_ANIM_DEATH = 10,
 		TREX_ANIM_KILL = 11,
 		
-		//TODO TR3 STATES
-		TREX_ANIM_ROARING_START = 12,
+		// TODO: TR3 anims.
+		/*TREX_ANIM_ROARING_START = 12,
 		TREX_ANIM_ROARING_LOOP = 13,
 		TREX_ANIM_ROARING_END = 14,
-		TREX_ANIM_SNIF_START = 15,
-		TREX_ANIM_SNIF_LOOP = 16,
-		TREX_ANIM_SNIF_END = 17,
+		TREX_ANIM_HUNCH_START = 15,
+		TREX_ANIM_HUNCH_LOOP = 16,
+		TREX_ANIM_HUNCH_END = 17,
 
-		TREX_ANIM_RUN_FORWARD_TO_IDLE_LEFT = 18 //This one is missing in TR1 TRex object.
+		// TODO: Missing in TR1 object.
+		TREX_ANIM_RUN_FORWARD_TO_IDLE_LEFT = 18*/
 	};
 
 	void TRexControl(short itemNumber)
@@ -87,9 +88,13 @@ namespace TEN::Entities::Creatures::TR3
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState == TREX_STATE_IDLE)
+			{
 				item->Animation.TargetState = TREX_STATE_DEATH;
+			}
 			else
+			{
 				item->Animation.TargetState = TREX_STATE_IDLE;
+			}
 		}
 		else
 		{
@@ -162,7 +167,6 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TREX_STATE_ATTACK:
-
 				if (item->TouchBits.Test(TRexAttackJoints))
 				{
 					CreatureKill(item, TREX_ANIM_KILL, LEA_TREX_DEATH, TREX_STATE_KILL, LS_DEATH);
@@ -173,7 +177,6 @@ namespace TEN::Entities::Creatures::TR3
 
 			case TREX_STATE_KILL:
 				creature->MaxTurn = 0;
-
 				break;
 			}
 		}

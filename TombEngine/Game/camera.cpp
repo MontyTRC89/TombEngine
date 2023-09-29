@@ -1276,19 +1276,20 @@ void CalculateCamera(const CollisionInfo& coll)
 		}
 
 		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT)
+		{
 			FixedCamera(item);
+		}
 		else
+		{
 			ChaseCamera(item);
+		}
 	}
 
 	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
 
-	if (
-		(Camera.type != CameraType::Heavy ||
-		Camera.timer == -1) &&
-		(LaraItem->HitPoints > 0)
-		)
+	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
+		LaraItem->HitPoints > 0)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;

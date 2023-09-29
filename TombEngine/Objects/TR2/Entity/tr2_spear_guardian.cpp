@@ -505,15 +505,18 @@ namespace TEN::Entities::Creatures::TR2
 						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
 				}
 				else if (ai.ahead && ai.distance < SPEAR_GUARDIAN_RUN_RANGE)
+				{
 					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
+				}
 				else
+				{
 					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN;
+				}
 
 				break;
 
 			case SPEAR_GUARDIAN_STATE_KILL:
 				creature->MaxTurn = 0;
-
 				break;
 			}
 		}
