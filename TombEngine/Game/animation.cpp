@@ -80,7 +80,7 @@ void AnimateItem(ItemInfo* item)
 
 	const auto* animPtr = &GetAnimData(*item);
 
-	if (GetStateDispatch(*item, *animPtr))
+	if (SetStateDispatch(*item))
 	{
 		animPtr = &GetAnimData(*item);
 
@@ -202,23 +202,19 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
+bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
 {
 	const auto& anim = GetAnimData(item);
 
-	// No dispatches.
+	// No dispatches; return early.
 	if (anim.Dispatches.empty())
 		return false;
-
-	// Use entity's target state ID if no targetStateID argument provided.
-	if (!targetStateID.has_value())
-		targetStateID = item.Animation.TargetState;
 
 	// Iterate over state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
 		// State ID mismatch; continue.
-		if (dispatch.StateID != *targetStateID)
+		if (dispatch.StateID != targetStateID.value_or(item.Animation.TargetState))
 			continue;
 
 		// Test if current frame is within dispatch range.
@@ -235,7 +231,7 @@ bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 		animNumber = item->Animation.AnimNumber;
 
 	// Animation number mismatch; return early.
-	if (item->Animation.AnimNumber != animNumber)
+	if (item->Animation.AnimNumber != *animNumber)
 		return false;
 
 	// FAILSAFE: Frames beyond real end frame also count.
@@ -281,7 +277,7 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 	{
 		TENLog(
 			"Attempted to set missing animation " + std::to_string(animNumber) +
-			((animObjectID == item.ObjectNumber) ? "" : (" from object " + GetObjectName(animObjectID))) +
+			((animObjectID == item.ObjectNumber) ? "" : (" from moveable " + GetObjectName(animObjectID))) +
 			" for object " + GetObjectName(item.ObjectNumber),
 			LogLevel::Warning);
 
@@ -396,8 +392,14 @@ int GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber)
 	return nextAnim.StateID;
 }
 
-bool GetStateDispatch(ItemInfo& item, const AnimData& anim)
+bool SetStateDispatch(ItemInfo& item, std::optional<int> targetStateID)
 {
+	// Set target state ID.
+	if (targetStateID.has_value())
+		item.Animation.TargetState = *targetStateID;
+
+	const auto& anim = GetAnimData(item);
+
 	// No dispatches; return early.
 	if (anim.Dispatches.empty())
 		return false;
@@ -413,7 +415,7 @@ bool GetStateDispatch(ItemInfo& item, const AnimData& anim)
 		if (dispatch.StateID != item.Animation.TargetState)
 			continue;
 
-		// Set new animation number if current frame number is within dispatch range.
+		// Set new animation and frame numbers if current frame number is within dispatch range.
 		if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
 		{
 			item.Animation.AnimNumber = dispatch.NextAnimNumber;

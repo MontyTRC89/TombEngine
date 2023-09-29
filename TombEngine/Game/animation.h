@@ -40,7 +40,6 @@ struct StateDispatchData
 	std::pair<int, int> FrameNumberRange = {};
 };
 
-// TODO: Make class?
 struct AnimData
 {
 	using AnimCommandPtr = std::unique_ptr<AnimCommand>;
@@ -76,7 +75,7 @@ struct BoneMutator
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
-bool HasStateDispatch(const ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
+bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
 bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt);
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
 
@@ -102,12 +101,12 @@ const KeyframeData&	GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);
 const KeyframeData&	GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber);
 const KeyframeData&	GetClosestKeyframe(const ItemInfo& item);
 
-int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber); // Not needed? Not the "real" frame count anyway since 0 isn't counted.
+int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber); // TODO: Not needed? Not the "real" frame count anyway since 0 isn't counted.
 int GetFrameCount(const ItemInfo& item);
 
 int	 GetNextAnimState(const ItemInfo& item);
 int	 GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
-bool GetStateDispatch(ItemInfo& item, const AnimData& anim);
+bool SetStateDispatch(ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
 
 void ClampRotation(Pose& outPose, short angle, short rot); 
 void DrawAnimatingItem(ItemInfo* item);

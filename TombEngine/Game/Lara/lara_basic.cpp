@@ -221,8 +221,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetStateDispatch(*item, GetAnimData(*item)))
+		if (SetStateDispatch(*item, LS_SOFT_SPLAT))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -358,8 +357,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
 		{
-			item->Animation.TargetState = LS_SPLAT;
-			if (GetStateDispatch(*item, GetAnimData(*item)))
+			if (SetStateDispatch(*item, LS_SPLAT))
 			{
 				Rumble(0.4f, 0.15f);
 
@@ -368,8 +366,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetStateDispatch(*item, GetAnimData(*item)))
+		if (SetStateDispatch(*item, LS_SOFT_SPLAT))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -1892,8 +1889,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetStateDispatch(*item, GetAnimData(*item)))
+		if (SetStateDispatch(*item, LS_SOFT_SPLAT))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -1986,8 +1982,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetStateDispatch(*item, GetAnimData(*item)))
+		if (SetStateDispatch(*item, LS_SOFT_SPLAT))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -2242,8 +2237,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		ResetPlayerLean(item);
 
-		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetStateDispatch(*item, GetAnimData(*item)))
+		if (SetStateDispatch(*item, LS_SOFT_SPLAT))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
@@ -2292,7 +2286,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 		else if (IsHeld(In::Sprint) && lara->Control.Count.Run >= LARA_SPRINT_JUMP_TIME &&
-			TestLaraRunJumpForward(item, coll) && HasStateDispatch(*item, LS_JUMP_FORWARD))
+			TestLaraRunJumpForward(item, coll) && TestStateDispatch(*item, LS_JUMP_FORWARD))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
@@ -2374,8 +2368,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
 		{
-			item->Animation.TargetState = LS_SPLAT;
-			if (GetStateDispatch(*item, GetAnimData(*item)))
+			if (SetStateDispatch(*item, LS_SPLAT))
 			{
 				Rumble(0.5f, 0.15f);
 
@@ -2384,8 +2377,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		item->Animation.TargetState = LS_SOFT_SPLAT;
-		if (GetStateDispatch(*item, GetAnimData(*item)))
+		if (SetStateDispatch(*item, LS_SOFT_SPLAT))
 		{
 			item->Animation.ActiveState = LS_SOFT_SPLAT;
 			return;
