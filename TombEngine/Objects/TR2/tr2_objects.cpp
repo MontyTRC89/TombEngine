@@ -493,21 +493,21 @@ static void StartObject(ObjectInfo* obj)
 	obj = &Objects[ID_SPHERE_OF_DOOM];
 	if (obj->loaded)
 	{
-		obj->control = ControlDragonBlast;
+		obj->control = ControlDragonExplosion;
 		obj->shadowType = ShadowMode::None;
 	}
 
 	obj = &Objects[ID_SPHERE_OF_DOOM2];
 	if (obj->loaded)
 	{
-		obj->control = ControlDragonBlast;
+		obj->control = ControlDragonExplosion;
 		obj->shadowType = ShadowMode::None;
 	}
 
 	obj = &Objects[ID_SPHERE_OF_DOOM3];
 	if (obj->loaded)
 	{
-		obj->control = ControlDragonBlast;
+		obj->control = ControlDragonExplosion;
 		obj->shadowType = ShadowMode::None;
 	}
 }

@@ -29,11 +29,11 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_CLOSE_RANGE = SQUARE(BLOCK(3));
 	constexpr auto DRAGON_IDLE_RANGE  = SQUARE(BLOCK(6));
 
-	constexpr auto DRAGON_LIVE_TIME		 = 30 * 11;
-	constexpr auto DRAGON_ALMOST_LIVE	 = 100;
-	constexpr auto EXPLOSION_TIME		 = 130;
-	constexpr auto EXPLOSION_TIME_MIDDLE = 140;
-	constexpr auto EXPLOSION_TIME_END	 = 150;
+	constexpr auto DRAGON_LIVE_TIME		   = 30 * 11;
+	constexpr auto DRAGON_ALMOST_LIVE	   = 100;
+	constexpr auto DRAGON_EXPLOSION_1_TIME = 130;
+	constexpr auto DRAGON_EXPLOSION_2_TIME = DRAGON_EXPLOSION_1_TIME + 10;
+	constexpr auto DRAGON_EXPLOSION_3_TIME = DRAGON_EXPLOSION_2_TIME + 10;
 
 	constexpr auto DRAGON_SPAWN_RANGE = BLOCK(9);
 	constexpr auto DRAGON_CLOSE		  = 900;
@@ -174,15 +174,15 @@ namespace TEN::Entities::Creatures::TR2
 
 		switch (item.Timer)
 		{
-		case EXPLOSION_TIME:
+		case DRAGON_EXPLOSION_1_TIME:
 			explosion.ObjectNumber = ID_SPHERE_OF_DOOM;
 			break;
 
-		case (EXPLOSION_TIME + 10):
+		case (DRAGON_EXPLOSION_2_TIME):
 			explosion.ObjectNumber = ID_SPHERE_OF_DOOM2;
 			break;
 
-		case (EXPLOSION_TIME + 20):
+		case (DRAGON_EXPLOSION_3_TIME):
 			explosion.ObjectNumber = ID_SPHERE_OF_DOOM3;
 			break;
 		}
@@ -668,20 +668,20 @@ namespace TEN::Entities::Creatures::TR2
 			SpawnBartoliLight(item, 1);
 			AnimateItem(&item);
 
-			if (item.Timer == EXPLOSION_TIME ||
-				item.Timer == (EXPLOSION_TIME + 10) ||
-				item.Timer == (EXPLOSION_TIME + 20))
+			if (item.Timer == DRAGON_EXPLOSION_1_TIME ||
+				item.Timer == (DRAGON_EXPLOSION_1_TIME + 10) ||
+				item.Timer == (DRAGON_EXPLOSION_1_TIME + 20))
 			{
 				dragonFrontNumber = CreateItem();
 				if (dragonFrontNumber != NO_ITEM)
 				{
 					dragonFrontPtr = &g_Level.Items[dragonFrontNumber];
 
-					if (item.Timer == EXPLOSION_TIME)
+					if (item.Timer == DRAGON_EXPLOSION_1_TIME)
 					{
 						dragonFrontPtr->ObjectNumber = ID_SPHERE_OF_DOOM;
 					}
-					else if (item.Timer == EXPLOSION_TIME + 10)
+					else if (item.Timer == DRAGON_EXPLOSION_1_TIME + 10)
 					{
 						dragonFrontPtr->ObjectNumber = ID_SPHERE_OF_DOOM2;
 					}
@@ -702,7 +702,7 @@ namespace TEN::Entities::Creatures::TR2
 					dragonFrontPtr->Status = ITEM_ACTIVE;
 				}
 			}
-			else if (item.Timer >= (EXPLOSION_TIME + 30))
+			else if (item.Timer >= (DRAGON_EXPLOSION_1_TIME + 30))
 			{
 				CreateDragon(item);
 

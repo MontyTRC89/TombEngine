@@ -5,18 +5,20 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
+#include "Objects/game_object_ids.h"
 
-
+// NOTES:
+// item.ItemFlags[0]: Effect counter in frame time.
 
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto DRAGON_SPAWN_RANGE = BLOCK(9);
-	constexpr auto EXPLOSION_TIME = 100;
-	constexpr auto EXPLOSION_TIME_MIDDLE = 115;
-	constexpr auto EXPLOSION_TIME_END = 130;
 
+	constexpr auto DRAGON_EXPLOSION_1_TIME = 100;
+	constexpr auto DRAGON_EXPLOSION_2_TIME = 115;
+	constexpr auto DRAGON_EXPLOSION_3_TIME = 130;
 
-	void InitializeBartoli (short itemNumber)
+	void InitializeBartoli(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -26,22 +28,22 @@ namespace TEN::Entities::Creatures::TR2
 			item.Status = ITEM_INVISIBLE;
 	}
 
-	void ControlBartoli (short itemNumber)
+	void ControlBartoli(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		
 		if (item.Animation.FrameNumber == 0)
 		{
+			// Activate when within player's range.
 			if (item.TriggerFlags == 0)
 			{
-				//Trigger makes Bartoli appears. Distance activate it
-				auto distance = Vector3i::Distance(LaraItem->Pose.Position, item.Pose.Position);
-				if ( distance > DRAGON_SPAWN_RANGE)
+				float distFromPlayer = Vector3i::Distance(LaraItem->Pose.Position, item.Pose.Position);
+				if (distFromPlayer > DRAGON_SPAWN_RANGE)
 					return;
 			}
+			// Activate on level load.
 			else
 			{
-				//Level Loading makes Bartoli appears. Trigger activates it
 				if (!TriggerActive(&item))
 					return;
 			}
@@ -49,11 +51,10 @@ namespace TEN::Entities::Creatures::TR2
 		
 		AnimateItem(&item);
 
-		//Effects
-		auto& frameCounter = item.ItemFlags[0];
-		frameCounter++;
+		short& effectCounter = item.ItemFlags[0];
+		effectCounter++;
 			
-		if (!(frameCounter & 7))
+		if (!(effectCounter & 7))
 			Camera.bounce = item.Timer;
 
 		TriggerDynamicLight(
@@ -61,49 +62,43 @@ namespace TEN::Entities::Creatures::TR2
 			(GetRandomControl() & 75) + 25,
 			(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50);
 		
-		if (frameCounter == EXPLOSION_TIME)
+		if (effectCounter == DRAGON_EXPLOSION_1_TIME)
 		{
-			SpawnDragonBlast(itemNumber, ID_SPHERE_OF_DOOM);
+			SpawnDragonExplosion(item, ID_SPHERE_OF_DOOM);
 		}
-		if (frameCounter == EXPLOSION_TIME_MIDDLE)
+		if (effectCounter == DRAGON_EXPLOSION_2_TIME)
 		{
-			SpawnDragonBlast(itemNumber, ID_SPHERE_OF_DOOM2);
+			SpawnDragonExplosion(item, ID_SPHERE_OF_DOOM2);
 		}
-		if (frameCounter == EXPLOSION_TIME_END)
+		if (effectCounter == DRAGON_EXPLOSION_3_TIME)
 		{
-			SpawnDragonBlast(itemNumber, ID_SPHERE_OF_DOOM3);
+			SpawnDragonExplosion(item, ID_SPHERE_OF_DOOM3);
 
-			//Pending Spawn dragon
+			// TODO: Spawn dragon.
 
-			KillItem(itemNumber); //Kill Bartoli object
+			KillItem(itemNumber);
 		}
 	}
 
-	void SpawnDragonBlast(short sourceItemNumber, short ObjectToSpawn)
+	void SpawnDragonExplosion(const ItemInfo& originItem, GAME_OBJECT_ID objectID)
 	{
-		auto& sourceItem = g_Level.Items[sourceItemNumber];
-
-		int SphereObjNumber;
-		ItemInfo* SphereObjPtr = nullptr;
+		int expItemNumber = CreateItem();
+		auto& expItem = g_Level.Items[expItemNumber];
 		
+		expItem.ObjectNumber = objectID;
+		expItem.Pose.Position = originItem.Pose.Position + Vector3i(0, CLICK(1), 0);
+		expItem.RoomNumber = originItem.RoomNumber;
+		expItem.Model.Color = originItem.Model.Color;
 
-		SphereObjNumber = CreateItem();
-		SphereObjPtr = &g_Level.Items[SphereObjNumber];
-		
-		SphereObjPtr->ObjectNumber = GAME_OBJECT_ID(ObjectToSpawn);
-		SphereObjPtr->Pose.Position = sourceItem.Pose.Position + Vector3i(0, CLICK(1), 0);
-		SphereObjPtr->RoomNumber = sourceItem.RoomNumber;
-		SphereObjPtr->Model.Color = sourceItem.Model.Color;
-
-		InitializeItem(SphereObjNumber);
-		AddActiveItem(SphereObjNumber);
+		InitializeItem(expItemNumber);
+		AddActiveItem(expItemNumber);
 
 		// Time before fading away.
-		SphereObjPtr->Timer = 100;
-		SphereObjPtr->Status = ITEM_ACTIVE;
+		expItem.Timer = 100;
+		expItem.Status = ITEM_ACTIVE;
 	}
 
-	void ControlDragonBlast(short itemNumber)
+	void ControlDragonExplosion(int itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -121,5 +116,4 @@ namespace TEN::Entities::Creatures::TR2
 				KillItem(itemNumber);
 		}
 	}
-
 }
