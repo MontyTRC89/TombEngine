@@ -352,12 +352,12 @@ namespace TEN::Entities::Generic
 			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
 				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
 			{
-				return PushableEnvironmentType::DeepWater;
+				return PushableEnvironmentType::Water;
 			}
 			// Water ground.
 			else
 			{
-				return PushableEnvironmentType::ShallowWater;
+				return PushableEnvironmentType::WaterFloor;
 			}
 		}
 		else

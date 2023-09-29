@@ -20,8 +20,8 @@ namespace TEN::Entities::Generic
 	constexpr auto PUSHABLE_FALL_VELOCITY_MAX  = BLOCK(1 / 8.0f);
 	constexpr auto PUSHABLE_WATER_VELOCITY_MAX = BLOCK(1 / 16.0f);
 
-	constexpr auto PUSHABLE_RUMBLE_FALL_VELOCITY	 = 96.0f;
-	constexpr auto PUSHABLE_EDGE_SLIP_FALL_VELOCITY	 = 0.8f;
+	constexpr auto PUSHABLE_RUMBLE_FALL_VELOCITY = 96.0f;
+	constexpr auto PUSHABLE_EDGE_SLIP_VELOCITY	 = 0.8f;
 
 	constexpr auto PUSHABLE_GRAVITY_AIRBORNE = 8.0f;
 	constexpr auto PUSHABLE_GRAVITY_WATER	 = 4.0f;
@@ -128,7 +128,7 @@ namespace TEN::Entities::Generic
 
 			break;
 
-		case PushableEnvironmentType::ShallowWater:
+		case PushableEnvironmentType::WaterFloor:
 			{
 				if (floorHeight != pushableItem.Pose.Position.y)
 				{
@@ -169,7 +169,7 @@ namespace TEN::Entities::Generic
 
 			break;
 
-		case PushableEnvironmentType::DeepWater:
+		case PushableEnvironmentType::Water:
 			RemovePushableBridge(itemNumber);
 			SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
@@ -342,7 +342,7 @@ namespace TEN::Entities::Generic
 			switch (envState)
 			{
 			case PushableEnvironmentType::FlatFloor:
-			case PushableEnvironmentType::ShallowWater:
+			case PushableEnvironmentType::WaterFloor:
 				//Activate trigger
 				TestTriggers(&pushableItem, true, pushableItem.Flags & IFLAG_ACTIVATION_MASK);
 
@@ -390,7 +390,7 @@ namespace TEN::Entities::Generic
 				//Then proceed to the sliding state.
 				break;
 
-			case PushableEnvironmentType::DeepWater:
+			case PushableEnvironmentType::Water:
 				// It's still in water, but there is not ground, Lara can't keep pushing nor pulling. And pushable starts to sink.
 				LaraItem->Animation.TargetState = LS_IDLE;
 				Lara.Context.InteractedItem = NO_ITEM;
@@ -429,7 +429,7 @@ namespace TEN::Entities::Generic
 		auto currentPos = pushableItem.Pose.Position.ToVector3();
 
 		float& elapsedTime = pushableItem.Animation.Velocity.y;
-		float alpha = std::clamp(elapsedTime / PUSHABLE_EDGE_SLIP_FALL_VELOCITY, 0.0f, 1.0f);
+		float alpha = std::clamp(elapsedTime / PUSHABLE_EDGE_SLIP_VELOCITY, 0.0f, 1.0f);
 
 		currentPos = Vector3(
 			InterpolateCubic(origin.x, origin.x, target.x, target.x, alpha),
@@ -500,14 +500,14 @@ namespace TEN::Entities::Generic
 				break;
 
 			case PushableEnvironmentType::FlatFloor:
-			case PushableEnvironmentType::ShallowWater:
+			case PushableEnvironmentType::WaterFloor:
 				pushable.BehaviourState = PushableState::Idle;
 				pushableItem.Pose.Position.y = floorHeight;
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 				pushableItem.Animation.Velocity.y = 0.0f;
 				break;
 
-			case PushableEnvironmentType::DeepWater:
+			case PushableEnvironmentType::Water:
 				pushable.BehaviourState = PushableState::Sink;
 				pushableItem.Animation.Velocity.y = PUSHABLE_WATER_VELOCITY_MAX / 2;
 					
@@ -548,7 +548,7 @@ namespace TEN::Entities::Generic
 				break;
 
 			case PushableEnvironmentType::FlatFloor:
-			case PushableEnvironmentType::ShallowWater:
+			case PushableEnvironmentType::WaterFloor:
 				//The pushable is going to stop here, do the checks to conect it with another Stack.
 				FoundStack = SearchNearPushablesStack(itemNumber);
 				StackPushable(itemNumber, FoundStack);
@@ -583,7 +583,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = 0.0f;
 				break;
 
-			case PushableEnvironmentType::DeepWater:
+			case PushableEnvironmentType::Water:
 
 				pushable.BehaviourState = PushableState::Sink;
 
@@ -621,7 +621,7 @@ namespace TEN::Entities::Generic
 
 				break;
 
-			case PushableEnvironmentType::DeepWater:
+			case PushableEnvironmentType::Water:
 			{
 				//Manage gravity force
 				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
@@ -661,7 +661,7 @@ namespace TEN::Entities::Generic
 			}
 			break;
 
-			case PushableEnvironmentType::ShallowWater:
+			case PushableEnvironmentType::WaterFloor:
 				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 				{
 					pushableItem.Pose.Position.y = floorHeight;
@@ -716,8 +716,8 @@ namespace TEN::Entities::Generic
 
 			break;
 
-			case PushableEnvironmentType::DeepWater:
-			case PushableEnvironmentType::ShallowWater:
+			case PushableEnvironmentType::Water:
+			case PushableEnvironmentType::WaterFloor:
 
 				//Calculate goal height
 				if (pushable.WaterSurfaceHeight == NO_HEIGHT)
@@ -795,7 +795,7 @@ namespace TEN::Entities::Generic
 				pushable.Gravity = PUSHABLE_GRAVITY_AIRBORNE;	
 				break;
 
-			case PushableEnvironmentType::ShallowWater:
+			case PushableEnvironmentType::WaterFloor:
 			{
 				//If shallow water, change to idle
 				if (pushable.WaterSurfaceHeight != NO_HEIGHT)
@@ -823,7 +823,7 @@ namespace TEN::Entities::Generic
 			}
 			break;
 
-			case PushableEnvironmentType::DeepWater:
+			case PushableEnvironmentType::Water:
 				
 				if (pushable.IsBuoyant && pushable.StackUpperItem == NO_ITEM)
 				{
@@ -878,7 +878,7 @@ namespace TEN::Entities::Generic
 				RemovePushableBridge(itemNumber);
 				break;
 
-			case PushableEnvironmentType::DeepWater:
+			case PushableEnvironmentType::Water:
 
 				// Effects: Do water ondulation effect.
 				if (!pushable.UsesRoomCollision)
@@ -894,7 +894,7 @@ namespace TEN::Entities::Generic
 				DoPushableRipples(itemNumber);
 				break;
 
-			case PushableEnvironmentType::ShallowWater:
+			case PushableEnvironmentType::WaterFloor:
 			{
 				//If shallow water, change to idle
 				int waterheight = abs(floorHeight - pushable.WaterSurfaceHeight);

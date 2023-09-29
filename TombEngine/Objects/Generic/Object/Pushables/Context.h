@@ -9,8 +9,8 @@ namespace TEN::Entities::Generic
 		Air,
 		FlatFloor,
 		SlopedFloor,
-		DeepWater,
-		ShallowWater
+		Water,
+		WaterFloor
 	};
 
 	bool IsPushableValid(int itemNumber);
