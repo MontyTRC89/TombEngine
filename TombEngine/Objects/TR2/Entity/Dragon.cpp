@@ -8,10 +8,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Specific/Input/Input.h"
 
-
 using namespace TEN::Input;
+using namespace TEN::Math;
+
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
@@ -346,8 +348,7 @@ namespace TEN::Entities::Creatures::TR2
 					if (creature->Flags)
 					{
 						if (ai.ahead)
-							// TODO: spawn fire function
-							//SpawnDragonFireBreath(&item, DragonMouthBite, Vector3i(0, 0, 300), creature->Enemy);
+							DragonFireBreath(&item, DragonMouthBite, 300, creature->Enemy);
 
 						creature->Flags--;
 					}
@@ -478,6 +479,64 @@ namespace TEN::Entities::Creatures::TR2
 		}
 
 		ItemPushItem(&item, laraItem, coll, 1, 0);
+	}
+
+	void DragonFireBreath(ItemInfo* item, const CreatureBiteInfo& bite, int speed, ItemInfo* enemy)
+	{
+		constexpr auto COUNT = 3;
+
+		for (int i = 0; i < COUNT; i++)
+		{
+			auto& fire = *GetFreeParticle();
+
+			fire.on = true;
+			fire.sR = 255 - (GetRandomControl() & 0x1F);
+			fire.sG = 64;
+			fire.sB = 38;
+			fire.dR = 128 + (GetRandomControl() & 0x3F);
+			fire.dG = 80 + (GetRandomControl() & 0x3F);
+			fire.dB = 32;
+			fire.colFadeSpeed = 12;
+			fire.fadeToBlack = 8;
+			fire.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+			int rotation = (GetRandomControl() & 0x3FF) % 360; //A random value between 0 and 359
+			fire.rotAng = ANGLE(rotation);
+
+			// TODO: solve flame sprite animation.
+			//float alpha = fmin(1, fmax(0, 1 - (fire.life / (float)fire.sLife)));
+			float alpha = 20.0f;
+			int sprite = (int)Lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex + (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
+			fire.spriteIndex = sprite;
+
+			auto posStart = GetJointPosition(item, bite.BoneID, Vector3i(-4, -30, -4) + bite.Position);
+			auto posGoal = LaraItem->Pose.Position + Vector3i (0, -CLICK(1), 0);
+
+			auto direction = (posGoal - posStart).ToVector3();
+			direction.Normalize();
+			direction *= speed;
+
+			fire.x = (GetRandomControl() & 0x1F) + posStart.x - 16;
+			fire.y = (GetRandomControl() & 0x1F) + posStart.y - 16;
+			fire.z = (GetRandomControl() & 0x1F) + posStart.z - 16;
+
+			int v = (GetRandomControl() & 0x3F) + 192;
+			fire.life = fire.sLife = v / 6;
+
+			fire.xVel = v * (direction.x) / 10;
+			fire.yVel = v * (direction.y) / 10;
+			fire.zVel = v * (direction.z) / 10;
+
+			fire.friction = 85;
+			fire.gravity = -16 - (GetRandomControl() & 0x1F);
+			fire.maxYvel = 0;
+			fire.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+
+			fire.scalar = 6;
+			fire.dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
+			fire.sSize = fire.dSize / 4;
+			fire.size = fire.dSize;
+		}
 	}
 
 	void DragonLightsManager(const ItemInfo& item, int type)
