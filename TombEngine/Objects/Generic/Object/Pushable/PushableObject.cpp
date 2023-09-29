@@ -28,7 +28,7 @@ namespace TEN::Entities::Generic
 {
 	auto PushableBlockPos = Vector3i::Zero;
 
-	ObjectCollisionBounds PushableBlockBounds =
+	auto PushableBlockBounds = ObjectCollisionBounds
 	{
 		GameBoundingBox(
 			0, 0,
@@ -39,16 +39,19 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 	};
 
+	std::vector<PushableAnimationInfo> PushableAnimInfos =
+	{
+		// Pushable object (TR4-5).
+		{ LA_PUSHABLE_OBJECT_PULL, LA_PUSHABLE_OBJECT_PUSH, LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP, true },
+
+		// Pushable block (TR1-3).
+		{ LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP, false }
+	};
+
 	PushableInfo& GetPushableInfo(const ItemInfo& item)
 	{
 		return (PushableInfo&)item.Data;
 	}
-
-	std::vector<PushableAnimationInfo> PushableAnimInfos =
-	{
-		{ LA_PUSHABLE_OBJECT_PULL, LA_PUSHABLE_OBJECT_PUSH, LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP, true }, // TR4-TR5 animations.
-		{ LA_PUSHABLE_BLOCK_PULL, LA_PUSHABLE_BLOCK_PUSH, LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP, false } // TR1-TR3 animations.
-	};
 
 	void InitializePushableBlock(int itemNumber)
 	{
@@ -69,12 +72,12 @@ namespace TEN::Entities::Generic
 
 		if (pushableItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
-			pushable.UsesRoomCollision = true;
+			pushable.UseRoomCollision = true;
 			AddPushableBridge(itemNumber);
 		}
 		else
 		{
-			pushable.UsesRoomCollision = false;
+			pushable.UseRoomCollision = false;
 		}
 
 		SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
@@ -219,7 +222,7 @@ namespace TEN::Entities::Generic
 				player.Context.NextCornerPos.Position.x != itemNumber)
 			{
 				// NOTE: If using room collision, leave it up to bridge collision system.
-				if (!pushable.UsesRoomCollision)
+				if (!pushable.UseRoomCollision)
 					ObjectCollision(itemNumber, laraItem, coll);
 
 				return;

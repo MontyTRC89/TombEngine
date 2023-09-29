@@ -39,7 +39,7 @@ namespace TEN::Entities::Generic
 		CanFall = false;
 		DoAlignCenter = true;
 		IsBuoyant = false;
-		UsesRoomCollision = false;
+		UseRoomCollision = false;
 		UseBridgeCollision = false;
 
 		// TODO: Descriptive name.

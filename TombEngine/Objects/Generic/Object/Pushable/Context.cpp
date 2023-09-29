@@ -16,19 +16,19 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
 {
-	constexpr auto PUSHABLE_HEIGHT_TOLERANCE = 32;
+	constexpr auto PUSHABLE_FLOOR_HEIGHT_TOLERANCE = 32;
 
 	bool IsPushableValid(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushableItem.Status == ITEM_INVISIBLE || pushableItem.TriggerFlags < 0) //It requires a positive OCB to can interact with it.
+		// NOTE: Requires positive OCB value for interaction.
+		if (pushableItem.Status == ITEM_INVISIBLE || pushableItem.TriggerFlags < 0)
 			return false;
 
 		auto pointColl = CollisionResult{};
-
-		if (pushable.UsesRoomCollision)
+		if (pushable.UseRoomCollision)
 		{
 			RemovePushableBridge(itemNumber);
 			pointColl = GetCollision(&pushableItem);
@@ -39,18 +39,18 @@ namespace TEN::Entities::Generic
 			pointColl = GetCollision(&pushableItem);
 		}
 
-		// Check is pushable is in a wall.
+		// 1) Check for wall.
 		if (pointColl.Block->IsWall(pushableItem.Pose.Position.x, pushableItem.Pose.Position.z))
 			return false;
 
-		// Check if pushable isn't on the floor.
-		int heightDifference = abs(pointColl.Position.Floor - pushableItem.Pose.Position.y);
-		if ((heightDifference >= PUSHABLE_HEIGHT_TOLERANCE))
+		// 2) Test height from floor.
+		int heightFromFloor = abs(pointColl.Position.Floor - pushableItem.Pose.Position.y);
+		if (heightFromFloor >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 			return false;
 
-		//Check if is far from Lara (happened in the stacked pushables, that Lara was trying use the upper one but detects the lower one).
-		int LaraHeightDifference = abs(LaraItem->Pose.Position.y - pushableItem.Pose.Position.y);
-		if ((LaraHeightDifference >= PUSHABLE_HEIGHT_TOLERANCE))
+		// 3) Test height from player. Prevents player from grabbing pushable at wrong elevation in stack.
+		int heightFromPlayer = abs(LaraItem->Pose.Position.y - pushableItem.Pose.Position.y);
+		if (heightFromPlayer >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 			return false;
 
 		return true;
@@ -65,38 +65,37 @@ namespace TEN::Entities::Generic
 
 		auto pointColl = GetCollision(targetPos.x, targetPos.y, targetPos.z, targetRoom);
 
-		// Check for wall.
+		// 1) Check for wall.
 		if (pointColl.Block->IsWall(targetPos.x, targetPos.z))
 			return false;
 		
-		// Check for gaps or steps.
-		int floorDifference = abs(pointColl.Position.Floor - pushableItem.Pose.Position.y);
-		if (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE)
+		// 2) Check for gaps or steps.
+		int heightFromFloor = abs(pointColl.Position.Floor - pushableItem.Pose.Position.y);
+		if (heightFromFloor >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 		{
+			// Step.
 			if (pointColl.Position.Floor < pushableItem.Pose.Position.y)
 			{
-				//Is a step
 				return false;
 			}
+			// Gap.
 			else
 			{
-				//Is a gap
 				pushable.IsOnEdge = true;
 				if (!pushable.CanFall || pushable.StackUpperItem != NO_ITEM)
-				{
 					return false;
-				}
 			}
 		}
 
-		// Check for floor slope.
+		// 3) Check for floor slope.
 		if (pointColl.Position.FloorSlope)
 			return false;
 
-		// Check for diagonal floor.
+		// 4) Check for diagonal floor.
 		if (pointColl.Position.DiagonalStep)
 			return false;
 
+		// 5) Test floor slope. TODO: Check slope angles of normals directly.
 		if ((pointColl.Block->GetSurfaceSlope(0, true) != Vector2::Zero) || (pointColl.Block->GetSurfaceSlope(1, true) != Vector2::Zero))
 			return false;
 
@@ -104,18 +103,16 @@ namespace TEN::Entities::Generic
 		/*if (collisionResult.Block->Stopper)
 		{
 			if (collisionResult.Position.Floor <= pushableItem.Pose.Position.y)
-			{
 				return false;
-			}
 		}*/
 
 		// Is ceiling (square or diagonal) high enough?
-		int distanceToCeiling = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
-		int blockHeight = GetStackHeight(itemNumber) - PUSHABLE_HEIGHT_TOLERANCE;
-		if (distanceToCeiling < blockHeight)
+		int distFromCeil = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+		int blockHeight = GetStackHeight(itemNumber) - PUSHABLE_FLOOR_HEIGHT_TOLERANCE;
+		if (distFromCeil < blockHeight)
 			return false;
 
-		// Is there any enemy or object?
+		// Test object collision.
 		auto prevPos = pushableItem.Pose.Position;
 		pushableItem.Pose.Position = targetPos;
 		GetCollidedObjects(&pushableItem, BLOCK(0.25f), true, &CollidedItems[0], &CollidedMeshes[0], true);
@@ -144,6 +141,7 @@ namespace TEN::Entities::Generic
 			if (object.floor(collidedIndex, colPos.x, colPos.y, colPos.z) == std::nullopt)
 				return false;
 		}
+
 		return true;
 	}
 
@@ -187,7 +185,7 @@ namespace TEN::Entities::Generic
 
 		// If floor is not flat
 		int floorDifference = abs(pointColl.Position.Floor - LaraItem->Pose.Position.y);
-		if (floorDifference >= PUSHABLE_HEIGHT_TOLERANCE)
+		if (floorDifference >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 			return false;
 
 		// Is ceiling (square or diagonal) high enough?
@@ -316,75 +314,75 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	// TODO: No output arguments.
-	PushableEnvironmentType GetPushableEnvironmentType(int itemNumber, int& floorHeight, int* ceilingHeight)
+	PushableCollisionData GetPushableCollision(const ItemInfo& item)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushable = GetPushableInfo(pushableItem);
+		auto& pushable = GetPushableInfo(item);
 
 		auto pointColl = CollisionResult{};
 		int waterHeight = NO_HEIGHT;
+
 		if (pushable.UseBridgeCollision)
 		{
-			RemovePushableBridge(itemNumber);
-			pointColl = GetCollision(&pushableItem);
-			waterHeight = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
-			AddPushableBridge(itemNumber);
+			RemovePushableBridge(item.Index);
+
+			pointColl = GetCollision(item);
+			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+			AddPushableBridge(item.Index);
 		}
 		else
 		{
-			pointColl = GetCollision(&pushableItem);
-			waterHeight = GetWaterSurface(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);
+			pointColl = GetCollision(item);
+			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 		}
 
-		// Update floorHeight reference for external use.
-		floorHeight = pointColl.Position.Floor;
-		if (ceilingHeight != nullptr)
-			*ceilingHeight = pointColl.Position.Ceiling;
+		auto pushableColl = PushableCollisionData{};
+		pushableColl.FloorHeight = pointColl.Position.Floor;
+		pushableColl.CeilingHeight = pointColl.Position.Ceiling;
 
-
-		if (TestEnvironment(ENV_FLAG_WATER, pushableItem.RoomNumber))
+		// Above water.
+		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 		{
-			// Is in water.
 			pushable.WaterSurfaceHeight = waterHeight;
 
-			// Floating.
-			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
-				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
+			if (pushableColl.FloorHeight > (item.Pose.Position.y + item.Animation.Velocity.y) &&
+				abs(item.Pose.Position.y - pushableColl.FloorHeight) >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 			{
-				return PushableEnvironmentType::Water;
+				pushableColl.EnvType = PushableEnvironmentType::Water;
 			}
-			// Water ground.
 			else
 			{
-				return PushableEnvironmentType::WaterFloor;
+				pushableColl.EnvType = PushableEnvironmentType::WaterFloor;
 			}
 		}
+		// Above dry ground.
 		else
 		{
-			// Is above dry ground.
 			pushable.WaterSurfaceHeight = NO_HEIGHT;
 
 			// Airborne.
-			if (floorHeight > (pushableItem.Pose.Position.y + pushableItem.Animation.Velocity.y) &&
-				abs(pushableItem.Pose.Position.y - floorHeight) >= PUSHABLE_HEIGHT_TOLERANCE)
+			if (pushableColl.FloorHeight > (item.Pose.Position.y + item.Animation.Velocity.y) &&
+				abs(item.Pose.Position.y - pushableColl.FloorHeight) >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 			{
-				return PushableEnvironmentType::Air;
+				pushableColl.EnvType = PushableEnvironmentType::Air;
 			}
 			// Grounded.
 			else
 			{
-				// Floor is flat.
-				if (Geometry::GetSurfaceSlopeAngle(GetSurfaceNormal(pointColl.FloorTilt, true)) == 0)
+				auto floorNormal = GetSurfaceNormal(pointColl.FloorTilt, true);
+				auto floorSlopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
+
+				if (floorSlopeAngle == 0)
 				{
-					return PushableEnvironmentType::FlatFloor;
+					pushableColl.EnvType = PushableEnvironmentType::FlatFloor;
 				}
-				// Floor is sloped.
 				else
 				{
-					return PushableEnvironmentType::SlopedFloor;
+					pushableColl.EnvType = PushableEnvironmentType::SlopedFloor;
 				}
 			}
 		}
+
+		return pushableColl;
 	}
 }

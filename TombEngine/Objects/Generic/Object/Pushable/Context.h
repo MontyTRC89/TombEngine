@@ -1,6 +1,7 @@
 #pragma once
 
 class Vector3i;
+struct ItemInfo;
 
 namespace TEN::Entities::Generic
 {
@@ -13,6 +14,14 @@ namespace TEN::Entities::Generic
 		WaterFloor
 	};
 
+	struct PushableCollisionData
+	{
+		PushableEnvironmentType EnvType = PushableEnvironmentType::Air;
+
+		int FloorHeight	  = 0;
+		int CeilingHeight = 0;
+	};
+
 	bool IsPushableValid(int itemNumber);
 	bool IsPushableObjectMoveAllowed(int itemNumber, const Vector3i& targetPos, int targetRoom);
 	bool IsValidForPlayer(int itemNumber);
@@ -20,5 +29,5 @@ namespace TEN::Entities::Generic
 	bool PushableIdleConditions(int itemNumber);
 	bool PushableMovementConditions(int itemNumber, bool hasPushAction, bool hasPullAction);
 
-	PushableEnvironmentType GetPushableEnvironmentType(int itemNumber, int& floorHeight, int* ceilingHeight = nullptr);
+	PushableCollisionData GetPushableCollision(const ItemInfo& item);
 }

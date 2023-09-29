@@ -17,7 +17,7 @@ namespace TEN::Entities::Generic
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 
 		if (pushableItem.Active &&pushableItem.Status != ITEM_INVISIBLE &&
-			pushable.UsesRoomCollision &&
+			pushable.UseRoomCollision &&
 			boxHeight.has_value())
 		{
 			int height = pushableItem.Pose.Position.y - GetPushableHeight(pushableItem);
@@ -35,7 +35,7 @@ namespace TEN::Entities::Generic
 		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
 		if (pushableItem.Active && pushableItem.Status != ITEM_INVISIBLE &&
-			pushable.UsesRoomCollision &&
+			pushable.UseRoomCollision &&
 			boxHeight.has_value())
 		{
 			return pushableItem.Pose.Position.y;
@@ -63,7 +63,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.UsesRoomCollision)
+		if (pushable.UseRoomCollision)
 		{
 			AddBridge(itemNumber);
 			pushable.UseBridgeCollision = true;
@@ -75,7 +75,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.UsesRoomCollision)
+		if (pushable.UseRoomCollision)
 		{
 			RemoveBridge(itemNumber);
 			pushable.UseBridgeCollision = false;
@@ -87,7 +87,7 @@ namespace TEN::Entities::Generic
 		const auto& pushableItem = g_Level.Items[itemNumber];
 		const auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.UsesRoomCollision)
+		if (pushable.UseRoomCollision)
 			UpdateBridgeItem(itemNumber);
 	}
 
@@ -96,8 +96,8 @@ namespace TEN::Entities::Generic
 		auto* pushableItemPtr = &g_Level.Items[itemNumber];
 		const auto* pushablePtr = &GetPushableInfo(*pushableItemPtr);
 
-		// Can't have stacked items or bridge.
-		if (!pushablePtr->UsesRoomCollision)
+		// NOTE: Can't have stacked items on bridge.
+		if (!pushablePtr->UseRoomCollision)
 			return;
 
 		if (pushablePtr->UseBridgeCollision)
