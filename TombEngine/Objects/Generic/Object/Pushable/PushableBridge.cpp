@@ -1,8 +1,8 @@
 #include "framework.h"
-#include "Objects/Generic/Object/Pushables/PushableBridge.h"
+#include "Objects/Generic/Object/Pushable/PushableBridge.h"
 
 #include "Game/collision/floordata.h"
-#include "Objects/Generic/Object/Pushables/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;

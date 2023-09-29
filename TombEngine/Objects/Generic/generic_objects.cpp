@@ -14,7 +14,7 @@
 #include "Objects/Generic/Object/generic_bridge.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/polerope.h"
-#include "Objects/Generic/Object/Pushables/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Objects/Generic/Object/rope.h"
 
 // Switches

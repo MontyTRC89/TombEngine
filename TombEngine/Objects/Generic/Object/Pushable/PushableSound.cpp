@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/Generic/Object/Pushables/PushableSound.h"
+#include "Objects/Generic/Object/Pushable/PushableSound.h"
 
 #include "Sound/sound.h"
 #include "Specific/level.h"

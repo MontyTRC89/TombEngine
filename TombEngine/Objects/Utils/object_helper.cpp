@@ -6,8 +6,8 @@
 #include "Game/pickup/pickup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/puzzles_keys.h"
-#include "Objects/Generic/Object/Pushables/PushableObject.h"
-#include "Objects/Generic/Object/Pushables/PushableBridge.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Specific/level.h"
 
 void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::string& baseName, const std::string& requiredName)

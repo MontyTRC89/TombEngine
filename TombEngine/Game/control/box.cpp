@@ -19,7 +19,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Objects/Generic/Object/Pushables/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Effects::Smoke;

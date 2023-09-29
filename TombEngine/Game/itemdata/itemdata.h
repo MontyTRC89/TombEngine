@@ -22,7 +22,7 @@
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR5/Entity/tr5_laserhead_info.h"
 #include "Objects/TR5/Light/tr5_light_info.h"
-#include "Objects/Generic/Object/Pushables/Info.h"
+#include "Objects/Generic/Object/Pushable/Info.h"
 
 template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // TODO: Line not needed in C++20.

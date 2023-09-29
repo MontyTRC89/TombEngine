@@ -1,11 +1,11 @@
 #include "framework.h"
-#include "Objects/Generic/Object/Pushables/PushableEffects.h"
+#include "Objects/Generic/Object/Pushable/PushableEffects.h"
 
 #include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/Setup.h"
-#include "Objects/Generic/Object/Pushables/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Ripple;

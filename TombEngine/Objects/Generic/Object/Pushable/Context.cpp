@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "Objects/Generic/Object/Pushables/Context.h"
+#include "Objects/Generic/Object/Pushable/Context.h"
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
-#include "Objects/Generic/Object/Pushables/PushableObject.h"
-#include "Objects/Generic/Object/Pushables/PushableBridge.h"
-#include "Objects/Generic/Object/Pushables/Stack.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableBridge.h"
+#include "Objects/Generic/Object/Pushable/Stack.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
