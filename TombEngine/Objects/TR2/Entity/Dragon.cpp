@@ -417,20 +417,28 @@ namespace TEN::Entities::Creatures::TR2
 					angle >(ANGLE(45.0f) - ANGLE(30.0f)) &&
 					angle < (ANGLE(45.0f) + ANGLE(30.0f)))
 				{
+					/*
+					// TODO: Reimplement the Dagger Pickup animation when the transition from ID_LARA_EXTRA_ANIMS to ID_LARA get solved
 					SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
 					laraItem->Pose = item.Pose;
 					laraItem->Animation.IsAirborne = false;
 					laraItem->Animation.Velocity.y = 0.0f;
 					laraItem->Animation.Velocity.z = 0.0f;
+					
 
 					if (item.RoomNumber != laraItem->RoomNumber)
 						ItemNewRoom(LaraItem->Index, item.RoomNumber);
+					*/
 
+					SetAnimation(*laraItem, LA_BUTTON_SMALL_PUSH);
 					AnimateItem(LaraItem);
 
+					/*
+					// TODO: Review, This code was used with the old Dagger Pickup method
 					Lara.ExtraAnim = 1;
 					Lara.Control.HandStatus = HandStatus::Busy;
 					Lara.HitDirection = -1;
+					*/
 
 					//laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 
@@ -458,8 +466,11 @@ namespace TEN::Entities::Creatures::TR2
 					shift = DRAGON_FAR - shift;
 				}
 
+				/*
+				// TODO: Review, This code was used with the old Dagger Pickup method
 				laraItem->Pose.Position.x += shift * cosY;
 				laraItem->Pose.Position.z -= shift * sinY;
+				*/
 
 				return;
 			}
