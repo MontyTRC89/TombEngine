@@ -181,7 +181,7 @@ namespace TEN::Gui
 			return false;
 
 		// Avoid Select or Action release interference when entering inventory.
-		if (GetActionTimeActive(In::Select) < TimeInMenu || GetActionTimeActive(In::Action) < TimeInMenu)
+		if (GetActionTimeActive(In::Select) < TimeInMenu && GetActionTimeActive(In::Action) < TimeInMenu)
 			return true;
 
 		return false;
