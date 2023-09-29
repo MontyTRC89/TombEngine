@@ -428,8 +428,6 @@ namespace TEN::Entities::Creatures::TR2
 
 					AnimateItem(LaraItem);
 
-					LaraItem->Animation.ActiveState = LS_EXTRA_ANIMS;
-
 					Lara.ExtraAnim = 1;
 					Lara.Control.HandStatus = HandStatus::Busy;
 					Lara.HitDirection = -1;
