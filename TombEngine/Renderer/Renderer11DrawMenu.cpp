@@ -456,30 +456,33 @@ namespace TEN::Renderer
 	void Renderer11::RenderTitleMenu(Menu menu)
 	{
 		int y = MenuVerticalBottomCenter;
-		auto titleOption = g_Gui.GetSelectedOption();
-
-		// HACK: Check if it works properly -- Lwmte, 07.06.22
-		if (menu == Menu::LoadGame && !g_GameFlow->EnableLoadSave)
-			menu = Menu::Title;
+		int titleOption = g_Gui.GetSelectedOption();
+		int selectedOption = 0;
 
 		switch (menu)
 		{
 		case Menu::Title:
 
 			// New game
-			AddString(g_GameFlow->GetString(STRING_NEW_GAME), Vector2(MenuCenterEntry, y), Color(PRINTSTRING_COLOR_WHITE), 10.0f, SF_Center(titleOption == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			GetNextLinePosition(&y);
+			selectedOption++;
 
 			// Load game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 1));
-			GetNextLinePosition(&y);
+			if (g_GameFlow->IsLoadSaveEnabled())
+			{
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
+				GetNextLinePosition(&y);
+				selectedOption++;
+			}
 
 			// Options
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 2));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			GetNextLinePosition(&y);
+			selectedOption++;
 
 			// Exit game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 3));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			break;
 
 		case Menu::LoadGame:
@@ -496,10 +499,10 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Level listing (starts with 1 because 0 is always title)
-			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++)
+			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
 			{
 				AddString(MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey.c_str()),
-					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == i - 1));
+					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 				GetNextNarrowLinePosition(&y);
 			}
 			break;
@@ -565,7 +568,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderLoadSaveMenu()
 	{
-		if (!g_GameFlow->EnableLoadSave)
+		if (!g_GameFlow->IsLoadSaveEnabled())
 		{
 			g_Gui.SetInventoryMode(InventoryMode::InGame);
 			return;
@@ -575,7 +578,6 @@ namespace TEN::Renderer
 		int y = MenuVerticalLineSpacing;
 		short selection = g_Gui.GetLoadSaveSelection();
 		char stringBuffer[255];
-		SaveGame::LoadSavegameInfos();
 
 		// Title
 		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
@@ -688,7 +690,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
-		static const auto COUNT_STRING_PREFIX = std::string("  ");
+		constexpr auto COUNT_STRING_INF	   = "Inf";
+		constexpr auto COUNT_STRING_OFFSET = Vector2(SCREEN_SPACE_RES.x / 40, 0.0f);
 
 		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
@@ -696,14 +699,15 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Draw display pickup.
-		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position2D, pickup.Orientation, pickup.Scale);
+		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
 
 		// Draw count string.
-		if (pickup.Count > 1)
+		if (pickup.Count != 1)
 		{
-			AddString(
-				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
-				pickup.Position2D, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+			auto countString = (pickup.Count != -1) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
+			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;
+
+			AddString(countString, countStringPos, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}
 	}
 

@@ -41,11 +41,11 @@ DisplayString::DisplayString()
 /*** Create a DisplayString.
 For use in @{ Strings.ShowString | ShowString } and @{ Strings.HideString | HideString }.
 @function DisplayString
-<<<<<<< Updated upstream
 @tparam string string The string to display or key of the translated string.
 @tparam int x X component of the string.
 @tparam int y Y component of the string.
-@tparam Color color The color of the string.
+@tparam float[opt] scale size of the string, relative to the default size. __Default: 1.0__
+@tparam Color[opt] color the color of the text. __Default: white__
 @tparam bool[opt] translated If false or omitted, the input string argument will be displayed.
 If true, the string argument will be the key of a translated string specified in strings.lua. __Default: false__.
 @tparam table[opt] flags A table of string display options. Can be empty or omitted. The possible values and their effects are:
@@ -53,19 +53,6 @@ If true, the string argument will be the key of a translated string specified in
 	TEN.Strings.DisplayStringOption.RIGHT: set the horizontal origin point to right of the string.
 	TEN.Strings.DisplayStringOption.SHADOW: give the string a small shadow.
 	TEN.Strings.DisplayStringOption.BLINK: blink the string.
-=======
-@tparam string str string to print or key of translated string
-@tparam int x x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
-@tparam int y y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
-@tparam[opt] float scale size of the string, relative to the default size. __Default: 1.0__
-@tparam[opt] Color color the color of the text. __Default: white__
-@tparam[opt] bool translated if false or omitted, the str argument will be printed.
-If true, the str argument will be the key of a translated string specified in
-strings.lua. __Default: false__.
-@tparam[opt] table flags a table of display options. Can be empty or omitted. The possible values and their effects are...
-	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
-	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
->>>>>>> Stashed changes
 __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */

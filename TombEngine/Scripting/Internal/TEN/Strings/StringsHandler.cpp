@@ -125,15 +125,10 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::OUTLINE)])
 					flags |= PRINTSTRING_OUTLINE;
 
-<<<<<<< Updated upstream
 				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::BLINK)])
 					flags |= PRINTSTRING_BLINK;
 
-				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, flags);
-=======
-				//todo change this
 				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, str.m_scale, flags);
->>>>>>> Stashed changes
 
 				str.m_timeRemaining -= deltaTime;
 			}
