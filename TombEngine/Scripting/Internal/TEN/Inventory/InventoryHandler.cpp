@@ -70,12 +70,12 @@ namespace InventoryHandler
 
 	void Register(sol::state* state, sol::table& parent)
 	{
-		sol::table table_inventory{ state->lua_state(), sol::create };
-		parent.set(ScriptReserved_Inventory, table_inventory);
+		auto tableInventory = sol::table{ state->lua_state(), sol::create };
+		parent.set(ScriptReserved_Inventory, tableInventory);
 
-		table_inventory.set_function(ScriptReserved_GiveInvItem, &InventoryAdd);
-		table_inventory.set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
-		table_inventory.set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
-		table_inventory.set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
+		tableInventory.set_function(ScriptReserved_GiveInvItem, &InventoryAdd);
+		tableInventory.set_function(ScriptReserved_TakeInvItem, &InventoryRemove);
+		tableInventory.set_function(ScriptReserved_GetInvItemCount, &InventoryGetCount);
+		tableInventory.set_function(ScriptReserved_SetInvItemCount, &InventorySetCount);
 	}
 }

@@ -678,11 +678,11 @@ namespace TEN::Renderer
 				break;
 
 			case DisplaySpriteOriginType::CenterTop:
-				offset = Vector2(0.0f, halfSize.y);
+				offset = Vector2(0.0f, -halfSize.y);
 				break;
 
 			case DisplaySpriteOriginType::CenterBottom:
-				offset = Vector2(0.0f, -halfSize.y);
+				offset = Vector2(0.0f, halfSize.y);
 				break;
 
 			case DisplaySpriteOriginType::CenterLeft:
@@ -694,19 +694,19 @@ namespace TEN::Renderer
 				break;
 
 			case DisplaySpriteOriginType::TopLeft:
-				offset = Vector2(-halfSize.x, halfSize.y);
-				break;
-
-			case DisplaySpriteOriginType::TopRight:
-				offset = Vector2(halfSize.x, halfSize.y);
-				break;
-
-			case DisplaySpriteOriginType::BottomLeft:
 				offset = Vector2(-halfSize.x, -halfSize.y);
 				break;
 
-			case DisplaySpriteOriginType::BottomRight:
+			case DisplaySpriteOriginType::TopRight:
 				offset = Vector2(halfSize.x, -halfSize.y);
+				break;
+
+			case DisplaySpriteOriginType::BottomLeft:
+				offset = Vector2(-halfSize.x, halfSize.y);
+				break;
+
+			case DisplaySpriteOriginType::BottomRight:
+				offset = Vector2(halfSize.x, halfSize.y);
 				break;
 			}
 			offset = offset;//TEN::Utils::GetAspectCorrect2DPosition(offset); // TODO: Check if aspect correction is necessary.

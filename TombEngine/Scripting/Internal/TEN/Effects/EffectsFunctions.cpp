@@ -38,70 +38,6 @@ using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
-	// TODO: Move these to their own file.
-	class ScriptDisplaySprite
-	{
-	public:
-		GAME_OBJECT_ID ObjectID	   = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
-		int			   SpriteIndex = 0;
-
-		Vec2		Position = Vec2(0.0f, 0.0f);
-		float		Rotation = 0.0f;
-		Vec3		Scale	 = Vec3(0.0f, 0.0f, 0.0f);
-		ScriptColor Color	 = ScriptColor(255, 255, 255, 255);
-	};
-
-	/// Draw a display a sprite in display space for the current frame. NOTE: Display space is a relative 100x100.
-	//@function DrawDisplaySprite
-	//@tparam ScriptScreenSprite Base sprite object.
-	//@tparam int[opt] priority Render priority of the sprite. Can be thought of as a layer, with higher values having higher priority. Default is 0.
-	//@tparam Effects.DisplaySpriteOriginType[opt] originType Origin type of the sprite. Default is TEN.Effects.DisplaySpriteOriginType.CENTER.
-	//@tparam Effects.DisplaySpriteScaleMode[opt] scaleMode Scale mode of the sprite. Default is TEN.Effects.DisplaySpriteScaleMode.FIT.
-	//@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
-	static void DrawDisplaySprite(const ScriptDisplaySprite& sprite, sol::optional<int> priority, sol::optional<DisplaySpriteOriginType> originType,
-								  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
-	{
-		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
-		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
-		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
-
-		constexpr auto DEFAULT_PRIORITY	   = 0;
-		constexpr auto DEFAULT_ORIGIN_TYPE = DisplaySpriteOriginType::Center;
-		constexpr auto DEFAULT_SCALE_MODE  = DisplaySpriteScaleMode::Fit;
-		constexpr auto DEFAULT_BLEND_MODE  = BLENDMODE_ALPHABLEND;
-
-		// Object is not a sprite object; return early.
-		if (sprite.ObjectID < GAME_OBJECT_ID::ID_HORIZON || sprite.ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
-		{
-			TENLog("Attempted to draw display sprite from non-sprite object " + std::to_string(sprite.ObjectID), LogLevel::Warning);
-			return;
-		}
-
-		// Sprite missing or sequence not found; return early.
-		const auto& object = Objects[sprite.ObjectID];
-		if (!object.loaded || sprite.SpriteIndex >= abs(object.nmeshes))
-		{
-			TENLog(
-				"Attempted to draw missing display sprite " + std::to_string(sprite.SpriteIndex) +
-				" from sprite object " + std::to_string(sprite.ObjectID),
-				LogLevel::Warning);
-			return;
-		}
-
-		auto convertedPos = Vector2(sprite.Position.x, sprite.Position.y) * POS_CONVERSION_COEFF;
-		short convertedRot = ANGLE(sprite.Rotation);
-		auto convertedScale = Vector2(sprite.Scale.x, sprite.Scale.y);
-		auto convertedColor = Vector4(sprite.Color.GetR(), sprite.Color.GetG(), sprite.Color.GetB(), sprite.Color.GetA()) / UCHAR_MAX;
-
-		AddDisplaySprite(
-			sprite.ObjectID, sprite.SpriteIndex,
-			convertedPos, convertedRot, convertedScale, convertedColor,
-			priority.value_or(DEFAULT_PRIORITY),
-			originType.value_or(DEFAULT_ORIGIN_TYPE),
-			scaleMode.value_or(DEFAULT_SCALE_MODE),
-			blendMode.value_or(DEFAULT_BLEND_MODE));
-	}
-
 	///Emit a lightning arc.
 	//@function EmitLightningArc
 	//@tparam Vec3 src
@@ -385,12 +321,11 @@ namespace Effects
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
 	}
 
-	void Register(sol::state* state, sol::table& parent) 
+	void Register(sol::state* state, sol::table& parent)
 	{
 		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
-		tableEffects.set_function(ScriptReserved_DrawDisplaySprite, &DrawDisplaySprite);
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);

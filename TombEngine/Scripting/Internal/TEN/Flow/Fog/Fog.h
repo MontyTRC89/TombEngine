@@ -20,5 +20,5 @@ struct Fog
 	void SetColor(ScriptColor const& col);
 	ScriptColor GetColor() const;
 
-	static void Register(sol::table &);
+	static void Register(sol::table&);
 };

@@ -21,8 +21,7 @@ namespace TEN::Effects::DisplaySprite
 	{
 		Fit,
 		Fill,
-		Stretch,
-		Tile
+		Stretch
 	};
 	
 	struct DisplaySprite
