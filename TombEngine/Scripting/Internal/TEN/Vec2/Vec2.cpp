@@ -44,8 +44,8 @@ void Vec2::Register(sol::table& parent)
 }
 
 /*** 
-@float X x coordinate
-@float Y y coordinate
+@tparam float X x coordinate
+@tparam float Y y coordinate
 @treturn Vec2 A Vec2 object
 @function Vec2
 */

@@ -39,16 +39,16 @@ DisplayString::DisplayString()
 }
 
 /*** Create a DisplayString.
-For use in @{ Strings.ShowString | ShowString } and @{ Strings.HideString | HideString }.
+For use in @{Strings.ShowString | ShowString } and @{Strings.HideString | HideString }.
 @function DisplayString
 @tparam string string The string to display or key of the translated string.
 @tparam int x X component of the string.
 @tparam int y Y component of the string.
-@tparam float[opt] scale size of the string, relative to the default size. __Default: 1.0__
-@tparam Color[opt] color the color of the text. __Default: white__
-@tparam bool[opt] translated If false or omitted, the input string argument will be displayed.
+@tparam[opt] float scale size of the string, relative to the default size. __Default: 1.0__
+@tparam[opt] Color color the color of the text. __Default: white__
+@tparam[opt] bool translated If false or omitted, the input string argument will be displayed.
 If true, the string argument will be the key of a translated string specified in strings.lua. __Default: false__.
-@tparam table[opt] flags A table of string display options. Can be empty or omitted. The possible values and their effects are:
+@tparam[opt] table flags A table of string display options. Can be empty or omitted. The possible values and their effects are:
 	TEN.Strings.DisplayStringOption.CENTER: set the horizontal origin point to the center of the string.
 	TEN.Strings.DisplayStringOption.RIGHT: set the horizontal origin point to right of the string.
 	TEN.Strings.DisplayStringOption.SHADOW: give the string a small shadow.
@@ -123,7 +123,7 @@ void DisplayString::Register(sol::table& parent)
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:GetKey
-		// @treturn string a string
+		// @treturn string the string to use
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
 		/// Set the string key to use. If `translated` is true when @{DisplayString}
@@ -140,7 +140,7 @@ void DisplayString::Register(sol::table& parent)
 
 		/// Get the scale of the string.
 		// @function DisplayString:GetScale
-		// @treturn float scale scale of the string 
+		// @treturn float scale of the string 
 		ScriptReserved_GetScale, &DisplayString::GetScale,
 
 		/// Set the position of the string.
@@ -153,8 +153,8 @@ void DisplayString::Register(sol::table& parent)
 		/// Get the position of the string.
 		// Screen-space coordinates are returned.
 		// @function DisplayString:GetPosition
-		// @treturn int x x-coordinate of the string
-		// @treturn int y y-coordinate of the string
+		// @treturn int x-coordinate of the string
+		// @treturn int y-coordinate of the string
 		ScriptReserved_GetPosition, &DisplayString::GetPos,
 
 		/// Set the display string's flags 
