@@ -7,7 +7,7 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/Effects/DisplaySprite/OriginTypes.h"
+#include "Scripting/Internal/TEN/Effects/DisplaySprite/AlignModes.h"
 #include "Scripting/Internal/TEN/Effects/DisplaySprite/ScaleModes.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
@@ -25,7 +25,7 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 		/*** Draw the display sprite in display space for the current frame.
 		@function DisplaySprite:Draw
 		@tparam int[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. Default is 0.
-		@tparam DisplaySprite.OriginType[opt] originType Origin type of the sprite. Default is DisplaySprite.OriginType.CENTER.
+		@tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. Default is DisplaySprite.AlignMode.CENTER.
 		@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. Default is DisplaySprite.ScaleMode.FIT.
 		@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. Default is Effects.BlendID.ALPHABLEND.
 		*/
@@ -36,7 +36,7 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 	parent.set(ScriptReserved_DisplaySprite, tableDisplaySprite);
 
 	auto handler = LuaHandler{ state };
-	handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteOriginType, DISPLAY_SPRITE_ORIGIN_TYPES);
+	handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
 	handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteScaleMode, DISPLAY_SPRITE_SCALE_MODES);*/
 }
 
@@ -51,17 +51,17 @@ ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteInde
 	Color = color;
 }
 
-void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteOriginType> originType,
+void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
 							   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
 {
 	// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
 	// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
 	constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
 
-	constexpr auto DEFAULT_PRIORITY	   = 0;
-	constexpr auto DEFAULT_ORIGIN_TYPE = DisplaySpriteOriginType::Center;
-	constexpr auto DEFAULT_SCALE_MODE  = DisplaySpriteScaleMode::Fit;
-	constexpr auto DEFAULT_BLEND_MODE  = BLENDMODE_ALPHABLEND;
+	constexpr auto DEFAULT_PRIORITY	  = 0;
+	constexpr auto DEFAULT_ALIGN_MODE = DisplaySpriteAlignMode::Center;
+	constexpr auto DEFAULT_SCALE_MODE = DisplaySpriteScaleMode::Fit;
+	constexpr auto DEFAULT_BLEND_MODE = BLENDMODE_ALPHABLEND;
 
 	// Object is not a sprite object; return early.
 	if (ObjectID < GAME_OBJECT_ID::ID_HORIZON || ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
@@ -90,7 +90,7 @@ void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<Displa
 		ObjectID, SpriteIndex,
 		convertedPos, convertedRot, convertedScale, convertedColor,
 		priority.value_or(DEFAULT_PRIORITY),
-		originType.value_or(DEFAULT_ORIGIN_TYPE),
+		alignMode.value_or(DEFAULT_ALIGN_MODE),
 		scaleMode.value_or(DEFAULT_SCALE_MODE),
 		blendMode.value_or(DEFAULT_BLEND_MODE));
 }

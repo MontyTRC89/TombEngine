@@ -4,7 +4,7 @@
 
 namespace TEN::Effects::DisplaySprite
 {
-	enum class DisplaySpriteOriginType
+	enum class DisplaySpriteAlignMode
 	{
 		Center,
 		CenterTop,
@@ -34,15 +34,15 @@ namespace TEN::Effects::DisplaySprite
 		Vector2 Scale		= Vector2::One;
 		Vector4 Color		= Vector4::One;
 
-		int						Priority   = 0;
-		DisplaySpriteOriginType OriginType = DisplaySpriteOriginType::Center;
-		DisplaySpriteScaleMode	ScaleMode  = DisplaySpriteScaleMode::Fit;
-		BLEND_MODES				BlendMode  = BLENDMODE_ALPHABLEND;
+		int					   Priority   = 0;
+		DisplaySpriteAlignMode AlignMode = DisplaySpriteAlignMode::Center;
+		DisplaySpriteScaleMode ScaleMode  = DisplaySpriteScaleMode::Fit;
+		BLEND_MODES			   BlendMode  = BLENDMODE_ALPHABLEND;
 	};
 
 	extern std::vector<DisplaySprite> DisplaySprites;
 	
 	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
-						  int priority, DisplaySpriteOriginType originType, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode);
+						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode);
 	void ClearDisplaySprites();
 }

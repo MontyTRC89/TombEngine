@@ -14,7 +14,7 @@ namespace TEN::Effects::DisplaySprite
 	std::vector<DisplaySprite> DisplaySprites = {};
 
 	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
-						  int priority, DisplaySpriteOriginType originType, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode)
+						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode)
 	{
 		auto displaySprite = DisplaySprite{};
 
@@ -25,7 +25,7 @@ namespace TEN::Effects::DisplaySprite
 		displaySprite.Scale = scale;
 		displaySprite.Color = color;
 		displaySprite.Priority = priority;
-		displaySprite.OriginType = originType;
+		displaySprite.AlignMode = alignMode;
 		displaySprite.ScaleMode = scaleMode;
 		displaySprite.BlendMode = blendMode;
 

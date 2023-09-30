@@ -9,7 +9,7 @@ enum BLEND_MODE;
 using namespace TEN::Effects::DisplaySprite;
 
 // TODO:
-// Check if origin types are applied correctly.
+// Check if align modes are applied correctly.
 // Check if ScriptDisplaySprite object has been registered correctly.
 // Check if its methods have been registered correctly.
 // Register DISPLAY_SPRITE_SCALE_MODES and DISPLAY_SPRITE_ORIGIN_TYPES under the correct sub-thing.
@@ -34,6 +34,6 @@ public:
 	ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color);
 
 	// Utilities
-	void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteOriginType> originType, sol::optional<DisplaySpriteScaleMode> scaleMode,
+	void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode, sol::optional<DisplaySpriteScaleMode> scaleMode,
 			  sol::optional<BLEND_MODES> blendMode);
 };

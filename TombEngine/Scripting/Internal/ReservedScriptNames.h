@@ -29,7 +29,7 @@ static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 // DisplaySprite object
 static constexpr char ScriptReserved_DisplaySprite[]			= "DisplaySprite";
 static constexpr char ScriptReserved_DisplaySpriteDraw[]		= "Draw";
-static constexpr char ScriptReserved_DisplaySpriteOriginType[]	= "OriginType";
+static constexpr char ScriptReserved_DisplaySpriteAlignMode[]	= "AlignMode";
 static constexpr char ScriptReserved_DisplaySpriteScaleMode[]	= "ScaleMode";
 
 // Built-in LevelFuncs
