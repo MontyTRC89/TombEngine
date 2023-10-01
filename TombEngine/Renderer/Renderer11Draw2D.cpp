@@ -671,45 +671,45 @@ namespace TEN::Renderer
 
 			// Calculate position offset.
 			auto offset = Vector2::Zero;
-			switch (displaySprite.OriginType)
+			switch (displaySprite.AlignMode)
 			{
 			default:
-			case DisplaySpriteOriginType::Center:
+			case DisplaySpriteAlignMode::Center:
 				break;
 
-			case DisplaySpriteOriginType::CenterTop:
-				offset = Vector2(0.0f, halfSize.y);
-				break;
-
-			case DisplaySpriteOriginType::CenterBottom:
+			case DisplaySpriteAlignMode::CenterTop:
 				offset = Vector2(0.0f, -halfSize.y);
 				break;
 
-			case DisplaySpriteOriginType::CenterLeft:
+			case DisplaySpriteAlignMode::CenterBottom:
+				offset = Vector2(0.0f, halfSize.y);
+				break;
+
+			case DisplaySpriteAlignMode::CenterLeft:
 				offset = Vector2(-halfSize.x, 0.0f);
 				break;
 				
-			case DisplaySpriteOriginType::CenterRight:
+			case DisplaySpriteAlignMode::CenterRight:
 				offset = Vector2(halfSize.x, 0.0f);
 				break;
 
-			case DisplaySpriteOriginType::TopLeft:
-				offset = Vector2(-halfSize.x, halfSize.y);
-				break;
-
-			case DisplaySpriteOriginType::TopRight:
-				offset = Vector2(halfSize.x, halfSize.y);
-				break;
-
-			case DisplaySpriteOriginType::BottomLeft:
+			case DisplaySpriteAlignMode::TopLeft:
 				offset = Vector2(-halfSize.x, -halfSize.y);
 				break;
 
-			case DisplaySpriteOriginType::BottomRight:
+			case DisplaySpriteAlignMode::TopRight:
 				offset = Vector2(halfSize.x, -halfSize.y);
 				break;
+
+			case DisplaySpriteAlignMode::BottomLeft:
+				offset = Vector2(-halfSize.x, halfSize.y);
+				break;
+
+			case DisplaySpriteAlignMode::BottomRight:
+				offset = Vector2(halfSize.x, halfSize.y);
+				break;
 			}
-			offset = offset;//TEN::Utils::GetAspectCorrect2DPosition(offset); // TODO: Check if aspect correction is necessary.
+			//offset = TEN::Utils::GetAspectCorrect2DPosition(offset); // TODO: Check if aspect correction is necessary.
 
 			AddDisplaySprite(
 				&texture,

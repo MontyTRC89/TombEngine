@@ -26,6 +26,12 @@ static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
+// DisplaySprite object
+static constexpr char ScriptReserved_DisplaySprite[]			= "DisplaySprite";
+static constexpr char ScriptReserved_DisplaySpriteDraw[]		= "Draw";
+static constexpr char ScriptReserved_DisplaySpriteAlignMode[]	= "AlignMode";
+static constexpr char ScriptReserved_DisplaySpriteScaleMode[]	= "ScaleMode";
+
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
 static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";

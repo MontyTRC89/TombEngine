@@ -8,6 +8,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Effects/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
@@ -28,7 +29,8 @@ ScriptInterfaceObjectsHandler* g_GameScriptEntities;
 ScriptInterfaceStringsHandler* g_GameStringsHandler;
 ScriptInterfaceFlowHandler* g_GameFlow;
 
-FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) : m_handler(lua)
+FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) :
+	m_handler(lua)
 {
 /*** gameflow.lua.
 These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
@@ -195,6 +197,7 @@ Specify which translations in the strings table correspond to which languages.
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 	ScriptColor::Register(parent);
+	ScriptDisplaySprite::Register(parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);
@@ -206,11 +209,11 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
 	
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, kWeatherTypes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, kLaraTypes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, kErrorModes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
 }
 
 FlowHandler::~FlowHandler()

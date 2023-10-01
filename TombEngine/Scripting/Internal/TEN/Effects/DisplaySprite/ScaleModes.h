@@ -8,20 +8,19 @@ using namespace TEN::Effects::DisplaySprite;
 
 /***
 Constants for display sprite scale modes.
-@enum DisplaySprite.DisplaySpriteScaleMode
+@enum DisplaySprite.ScaleMode
 @pragma nostrip
 */
 
-/*** DisplaySprite.DisplaySpriteScaleMode constants.
+/*** DisplaySprite.ScaleMode constants.
 
-The following constants are inside DisplaySpriteScaleMode.
+The following constants are inside DisplaySprite.ScaleMode.
 
 FIT
 FILL
 STRETCH
-TILE
 
-@section DisplaySprite.DisplaySpriteScaleMode
+@section DisplaySprite.ScaleMode
 */
 
 /*** Table of display sprite scale modes.
@@ -32,6 +31,5 @@ static const std::unordered_map<std::string, DisplaySpriteScaleMode> DISPLAY_SPR
 {
 	{ "FIT", DisplaySpriteScaleMode::Fit },
 	{ "FILL", DisplaySpriteScaleMode::Fill },
-	{ "STRETCH", DisplaySpriteScaleMode::Stretch },
-	{ "TILE", DisplaySpriteScaleMode::Tile }
+	{ "STRETCH", DisplaySpriteScaleMode::Stretch }
 };
