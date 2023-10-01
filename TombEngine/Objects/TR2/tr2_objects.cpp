@@ -439,6 +439,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 300;
 		obj->pivotLength = 300;
 		obj->radius = 256;
+		obj->shadowType = ShadowMode::All;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(10, ROT_Z);
 		obj->SetupHitEffect();
@@ -448,11 +449,9 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_FRONT");
-		//obj->Initialize = InitializeCreature;
 		obj->collision = CollideDragon;
-		obj->control = ControlDragon;
 		obj->radius = 256;
-		obj->SetupHitEffect();
+		obj->SetupHitEffect(false, true);
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];

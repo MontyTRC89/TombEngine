@@ -9,6 +9,7 @@
 
 // NOTES:
 // item.ItemFlags[0]: Effect counter in frame time.
+// item.ItemFlags[1]: ObjectID of the enemy to instantiate, by default ID_DRAGON_FRONT.
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -47,6 +48,8 @@ namespace TEN::Entities::Creatures::TR2
 				if (!TriggerActive(&item))
 					return;
 			}
+
+			item.ItemFlags[1] = (short) ID_DRAGON_FRONT;
 		}
 		
 		AnimateItem(&item);
@@ -73,10 +76,26 @@ namespace TEN::Entities::Creatures::TR2
 		if (effectCounter == DRAGON_EXPLOSION_3_TIME)
 		{
 			SpawnDragonExplosion(item, ID_SPHERE_OF_DOOM3);
+			KillItem(itemNumber);
 
 			// TODO: Spawn dragon.
+			short enemyItemNumber = CreateItem();
+			if (enemyItemNumber == NO_ITEM)
+				return;
 
-			KillItem(itemNumber);
+			auto& enemyItem = g_Level.Items[enemyItemNumber];
+
+			enemyItem.ObjectNumber = (GAME_OBJECT_ID)item.ItemFlags[1];
+
+			enemyItem.Pose = item.Pose;
+			enemyItem.RoomNumber = item.RoomNumber;
+			enemyItem.Model.Color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
+			auto& enemyObject = Objects[enemyItem.ObjectNumber];
+		
+			InitializeItem(enemyItemNumber);
+			AddActiveItem(enemyItemNumber);
+
 		}
 	}
 
