@@ -139,7 +139,6 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		auto& backItem = g_Level.Items[backItemNumber];
 
-		//InitializeCreature(backItem.Index);
 		SetAnimation(backItem, DRAGON_ANIM_IDLE);
 
 		// TODO: Check if necessary.
@@ -178,11 +177,10 @@ namespace TEN::Entities::Creatures::TR2
 			return;
 		}
 
-		// TODO: Better way.
-		backItem.Animation.ActiveState = item.Animation.ActiveState;
-		backItem.Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item.Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
-		backItem.Animation.FrameNumber = GetAnimData(backItem).frameBase + (item.Animation.FrameNumber - GetAnimData(item).frameBase);
+		// Sync animation.
+		SetAnimation(backItem, GetAnimNumber(item), GetFrameNumber(item));
 
+		// Sync position.
 		backItem.Pose = item.Pose;
 		if (backItem.RoomNumber != item.RoomNumber)
 			ItemNewRoom(backItem.Index, item.RoomNumber);
@@ -294,7 +292,7 @@ namespace TEN::Entities::Creatures::TR2
 		short headingAngle = 0;
 		short headYRot = 0;
 
-		bool isAhead = false;
+		bool isTargetAhead = false;
 
 		if (item.HitPoints <= 0)
 		{
@@ -351,7 +349,7 @@ namespace TEN::Entities::Creatures::TR2
 			CreatureMood(&item, &ai, true);
 			headingAngle = CreatureTurn(&item, DRAGON_WALK_TURN_RATE_MAX);
 
-			isAhead = (ai.ahead && ai.distance > DRAGON_NEAR_RANGE && ai.distance < DRAGON_IDLE_RANGE);
+			isTargetAhead = (ai.ahead && ai.distance > DRAGON_NEAR_RANGE && ai.distance < DRAGON_IDLE_RANGE);
 
 			// Contact damage.
 			if (item.TouchBits.TestAny())
@@ -362,7 +360,7 @@ namespace TEN::Entities::Creatures::TR2
 			case DRAGON_STATE_IDLE:
 				item.Pose.Orientation.y -= headingAngle;
 
-				if (!isAhead)
+				if (!isTargetAhead)
 				{
 					if (ai.distance > DRAGON_IDLE_RANGE || !ai.ahead)
 					{
@@ -418,7 +416,7 @@ namespace TEN::Entities::Creatures::TR2
 			case DRAGON_STATE_WALK:
 				creature.Flags = 0;
 
-				if (isAhead)
+				if (isTargetAhead)
 				{
 					item.Animation.TargetState = DRAGON_STATE_IDLE;
 				}
@@ -448,13 +446,13 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case DRAGON_STATE_MOVE_LEFT:
-				if (headingAngle > -DRAGON_TURN_THRESHOLD_ANGLE || isAhead)
+				if (headingAngle > -DRAGON_TURN_THRESHOLD_ANGLE || isTargetAhead)
 					item.Animation.TargetState = DRAGON_STATE_WALK;
 
 				break;
 
 			case DRAGON_STATE_MOVE_RIGHT:
-				if (headingAngle < DRAGON_TURN_THRESHOLD_ANGLE || isAhead)
+				if (headingAngle < DRAGON_TURN_THRESHOLD_ANGLE || isTargetAhead)
 					item.Animation.TargetState = DRAGON_STATE_WALK;
 
 				break;
@@ -475,7 +473,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (ai.ahead)
 					headYRot = -ai.angle;
 
-				if (isAhead)
+				if (isTargetAhead)
 				{
 					item.Animation.TargetState = DRAGON_STATE_FIRE_1;
 					creature.Flags = 30;
