@@ -1236,7 +1236,7 @@ void SpawnDynamicLight(const Vector3& pos, const Color& color, float falloff)
 	TriggerDynamicLight(pos.x, pos.y, pos.z, falloff, color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 }
 
-// Deprecated.
+// Deprecated. Use SpawnDynamicLight() instead.
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);

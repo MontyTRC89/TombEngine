@@ -985,25 +985,19 @@ namespace TEN::Renderer
 		if (m_Locked)
 			return;
 
-		RendererLight dynamicLight = {};
-
-		if (falloff >= 8)
-		{
-			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
-		}
-		else
+		if (falloff < 8)
 		{
 			r = (r * falloff) >> 3;
 			g = (g * falloff) >> 3;
 			b = (b * falloff) >> 3;
-
-			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
 		}
 
+		auto dynamicLight = RendererLight{};
+		dynamicLight.Position = Vector3(x, y, z);
 		dynamicLight.RoomNumber = NO_ROOM;
+		dynamicLight.Color = (Vector3(r, g, b) / UCHAR_MAX) * 2;
 		dynamicLight.Intensity = 1.0f;
-		dynamicLight.Position = Vector3(float(x), float(y), float(z));
-		dynamicLight.Out = falloff * 256.0f;
+		dynamicLight.Out = falloff * UCHAR_MAX;
 		dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
 		dynamicLight.BoundingSphere = BoundingSphere(dynamicLight.Position, dynamicLight.Out);
 		dynamicLight.Luma = Luma(dynamicLight.Color);

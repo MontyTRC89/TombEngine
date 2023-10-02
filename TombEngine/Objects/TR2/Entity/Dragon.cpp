@@ -43,11 +43,10 @@ namespace TEN::Entities::Creatures::TR2
 	const auto DragonSwipeAttackJointsLeft	= std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
 
-	// TODO: Names.
 	enum class DragonLightEffectType
 	{
-		Type0,
-		Type1
+		Yellow,
+		Red
 	};
 
 	enum DragonState
@@ -189,41 +188,35 @@ namespace TEN::Entities::Creatures::TR2
 			ItemNewRoom(backItem.Index, item.RoomNumber);
 	}
 
-	// TODO: No GetRandomControl(). 
-	// TODO: Demagic type with enum class.
-	// TODO: Demagic colors.
 	static void SpawnDragonLightEffect(const ItemInfo& item, DragonLightEffectType type)
 	{
-		constexpr auto COLOR_YELLOW = Color(1.0f, 1.0f, 1.0f);
-		constexpr auto COLOR_RED	= Color(1.0f, 1.0f, 1.0f);
-
 		auto pos = item.Pose.Position.ToVector3();
 		pos.y -= CLICK(1);
 
 		switch (type)
 		{
 		default:
-		case DragonLightEffectType::Type0:
+		case DragonLightEffectType::Yellow:
 		{
-			float falloff = (GetRandomControl() & 75) + 25;
-			SpawnDynamicLight(pos, COLOR_YELLOW, falloff);
+			auto color = Color(
+				Random::GenerateFloat(0.8f, 0.9f),
+				Random::GenerateFloat(0.4f, 0.5f),
+				Random::GenerateFloat(0.2f, 0.3f));
+			float falloff = Random::GenerateFloat(0.1f, 0.4f);
 
-			TriggerDynamicLight(
-				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-				falloff,
-				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50);
+			SpawnDynamicLight(pos, color, falloff);
 		}
 			break;
 
-		case DragonLightEffectType::Type1:
+		case DragonLightEffectType::Red:
 		{
-			float falloff = (GetRandomControl() & 20) + 25;
-			SpawnDynamicLight(pos, COLOR_RED, falloff);
+			auto color = Color(
+				Random::GenerateFloat(0.8f, 0.9f),
+				Random::GenerateFloat(0.2f, 0.3f),
+				Random::GenerateFloat(0.0f, 0.1f));
+			float falloff = Random::GenerateFloat(0.1f, 0.2f);
 
-			TriggerDynamicLight(
-				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-				falloff,
-				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0);
+			SpawnDynamicLight(pos, color, falloff);
 		}
 			break;
 		}
@@ -238,14 +231,14 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			auto& fire = *GetFreeParticle();
 
-			auto origin = GetJointPosition(item, bite.BoneID, Vector3i(-4, -30, -4) + bite.Position);
-			auto target = LaraItem->Pose.Position + Vector3i(0, -CLICK(1), 0);
+			auto origin = GetJointPosition(item, bite.BoneID, bite.Position);
+			auto target = GetJointPosition(LaraItem, LM_HIPS);
 
 			auto dir = (target - origin).ToVector3();
 			dir.Normalize();
 			dir *= vel;
 
-			// TODO: Animate sprite.
+			// TODO: Animate sprite. Can't be done here.
 			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex;
 
 			fire.on = true;
@@ -309,7 +302,7 @@ namespace TEN::Entities::Creatures::TR2
 				// Temporary defeat.
 				if (frameCounter >= 0)
 				{
-					SpawnDragonLightEffect(item, DragonLightEffectType::Type0);
+					SpawnDragonLightEffect(item, DragonLightEffectType::Yellow);
 					frameCounter++;
 
 					if (frameCounter == DRAGON_LIVE_TIME)
@@ -322,7 +315,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 				{
 					if (frameCounter > -20)
-						SpawnDragonLightEffect(item, DragonLightEffectType::Type1);
+						SpawnDragonLightEffect(item, DragonLightEffectType::Red);
 
 					if (frameCounter == -100)
 					{
