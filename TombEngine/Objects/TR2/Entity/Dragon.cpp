@@ -16,7 +16,7 @@ using namespace TEN::Math;
 
 // NOTES:
 // item.ItemFlags[0]: Back segment item number.
-// item.ItemFlags[1]: Frame counter for temporary defeat and death.
+// frameCounter: Frame counter for temporary defeat and death.
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -42,6 +42,13 @@ namespace TEN::Entities::Creatures::TR2
 	const auto DragonBackSpineJoints		= std::vector<unsigned int>{ 21, 22, 23 };
 	const auto DragonSwipeAttackJointsLeft	= std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
+
+	// TODO: Names.
+	enum class DragonLightEffectType
+	{
+		Type0,
+		Type1
+	};
 
 	enum DragonState
 	{
@@ -185,32 +192,39 @@ namespace TEN::Entities::Creatures::TR2
 	// TODO: No GetRandomControl(). 
 	// TODO: Demagic type with enum class.
 	// TODO: Demagic colors.
-	static void SpawnDragonLightEffect(const ItemInfo& item, int type)
+	static void SpawnDragonLightEffect(const ItemInfo& item, DragonLightEffectType type)
 	{
+		constexpr auto COLOR_YELLOW = Color(1.0f, 1.0f, 1.0f);
+		constexpr auto COLOR_RED	= Color(1.0f, 1.0f, 1.0f);
+
+		auto pos = item.Pose.Position.ToVector3();
+		pos.y -= CLICK(1);
+
 		switch (type)
 		{
-		case 0:
-			TriggerDynamicLight(
-				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-				(GetRandomControl() & 150) + 25, //Strong
-				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 200, (GetRandomControl() & 20) + 200); //White
-			break;
-
-		case 1:
-			TriggerDynamicLight(
-				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-				(GetRandomControl() & 75) + 25, //Middle
-				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50); //Yellowish
-			break;
-
-		case 2:
-			TriggerDynamicLight(
-				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-				(GetRandomControl() & 20) + 25, //Weak
-				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0); //Reddish
-			break;
-
 		default:
+		case DragonLightEffectType::Type0:
+		{
+			float falloff = (GetRandomControl() & 75) + 25;
+			SpawnDynamicLight(pos, COLOR_YELLOW, falloff);
+
+			TriggerDynamicLight(
+				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
+				falloff,
+				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50);
+		}
+			break;
+
+		case DragonLightEffectType::Type1:
+		{
+			float falloff = (GetRandomControl() & 20) + 25;
+			SpawnDynamicLight(pos, COLOR_RED, falloff);
+
+			TriggerDynamicLight(
+				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
+				falloff,
+				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0);
+		}
 			break;
 		}
 	}
@@ -274,85 +288,86 @@ namespace TEN::Entities::Creatures::TR2
 		if (!CreatureActive(itemNumber))
 			return;
 		
-		auto& dragonItem = g_Level.Items[itemNumber];
-		auto& creature = *GetCreatureInfo(&dragonItem);
+		auto& item = g_Level.Items[itemNumber];
+		auto& creature = *GetCreatureInfo(&item);
+		auto& frameCounter = item.ItemFlags[1];
 
 		short headingAngle = 0;
 		short headYRot = 0;
 
 		bool isAhead = false;
 
-		if (dragonItem.HitPoints <= 0)
+		if (item.HitPoints <= 0)
 		{
-			if (dragonItem.Animation.ActiveState != DRAGON_STATE_DEFEAT)
+			if (item.Animation.ActiveState != DRAGON_STATE_DEFEAT)
 			{
-				SetAnimation(dragonItem, DRAGON_ANIM_DEATH);
-				dragonItem.ItemFlags[1] = 0;
+				SetAnimation(item, DRAGON_ANIM_DEATH);
+				frameCounter = 0;
 			}
 			else
 			{
 				// Temporary defeat.
-				if (dragonItem.ItemFlags[1] >= 0)
+				if (frameCounter >= 0)
 				{
-					SpawnDragonLightEffect(dragonItem, 1);
-					dragonItem.ItemFlags[1]++;
+					SpawnDragonLightEffect(item, DragonLightEffectType::Type0);
+					frameCounter++;
 
-					if (dragonItem.ItemFlags[1] == DRAGON_LIVE_TIME)
-						dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
+					if (frameCounter == DRAGON_LIVE_TIME)
+						item.Animation.TargetState = DRAGON_STATE_IDLE;
 
-					if (dragonItem.ItemFlags[1] == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
-						dragonItem.HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
+					if (frameCounter == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
+						item.HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
 				}
 				// Death.
 				else
 				{
-					if (dragonItem.ItemFlags[1] > -20)
-						SpawnDragonLightEffect(dragonItem, 2);
+					if (frameCounter > -20)
+						SpawnDragonLightEffect(item, DragonLightEffectType::Type1);
 
-					if (dragonItem.ItemFlags[1] == -100)
+					if (frameCounter == -100)
 					{
 						InitializeDragonBones (itemNumber);
 					}
-					else if (dragonItem.ItemFlags[1] == -200)
+					else if (frameCounter == -200)
 					{
 						DisableEntityAI(itemNumber);
 						KillItem(itemNumber);
-						dragonItem.Status = ITEM_DEACTIVATED;
+						item.Status = ITEM_DEACTIVATED;
 					}
-					else if (dragonItem.ItemFlags[1] < -100)
+					else if (frameCounter < -100)
 					{
-						dragonItem.Pose.Position.y += 10;
+						item.Pose.Position.y += 10;
 					}
 
-					dragonItem.ItemFlags[1]--;
+					frameCounter--;
 				}
 			}
 		}
 		else
 		{
 			AI_INFO ai;
-			CreatureAIInfo(&dragonItem, &ai);
+			CreatureAIInfo(&item, &ai);
 			
-			GetCreatureMood(&dragonItem, &ai, true);
-			CreatureMood(&dragonItem, &ai, true);
-			headingAngle = CreatureTurn(&dragonItem, DRAGON_WALK_TURN_RATE_MAX);
+			GetCreatureMood(&item, &ai, true);
+			CreatureMood(&item, &ai, true);
+			headingAngle = CreatureTurn(&item, DRAGON_WALK_TURN_RATE_MAX);
 
 			isAhead = (ai.ahead && ai.distance > DRAGON_NEAR_RANGE && ai.distance < DRAGON_IDLE_RANGE);
 
 			// Contact damage.
-			if (dragonItem.TouchBits.TestAny())
+			if (item.TouchBits.TestAny())
 				DoDamage(creature.Enemy, DRAGON_CONTACT_DAMAGE);
 
-			switch (dragonItem.Animation.ActiveState)
+			switch (item.Animation.ActiveState)
 			{
 			case DRAGON_STATE_IDLE:
-				dragonItem.Pose.Orientation.y -= headingAngle;
+				item.Pose.Orientation.y -= headingAngle;
 
 				if (!isAhead)
 				{
 					if (ai.distance > DRAGON_IDLE_RANGE || !ai.ahead)
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
+						item.Animation.TargetState = DRAGON_STATE_WALK;
 					}
 					else if (ai.ahead && ai.distance < DRAGON_NEAR_RANGE && !creature.Flags)
 					{
@@ -360,31 +375,31 @@ namespace TEN::Entities::Creatures::TR2
 
 						if (ai.angle < 0)
 						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_SWIPE_LEFT;
+							item.Animation.TargetState = DRAGON_STATE_SWIPE_LEFT;
 						}
 						else
 						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_SWIPE_RIGHT;
+							item.Animation.TargetState = DRAGON_STATE_SWIPE_RIGHT;
 						}
 					}
 					else if (ai.angle < 0)
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_TURN_LEFT;
+						item.Animation.TargetState = DRAGON_STATE_TURN_LEFT;
 					}
 					else
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_TURN_RIGHT;
+						item.Animation.TargetState = DRAGON_STATE_TURN_RIGHT;
 					}
 				}
 				else
 				{
-					dragonItem.Animation.TargetState = DRAGON_STATE_AIM_1;
+					item.Animation.TargetState = DRAGON_STATE_AIM_1;
 				}
 
 				break;
 
 			case DRAGON_STATE_SWIPE_LEFT:
-				if (dragonItem.TouchBits.Test(DragonSwipeAttackJointsLeft))
+				if (item.TouchBits.Test(DragonSwipeAttackJointsLeft))
 				{
 					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature.Flags = 0;
@@ -393,7 +408,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case DRAGON_STATE_SWIPE_RIGHT:
-				if (dragonItem.TouchBits.Test(DragonSwipeAttackJointsRight))
+				if (item.TouchBits.Test(DragonSwipeAttackJointsRight))
 				{
 					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature.Flags = 0;
@@ -406,28 +421,28 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (isAhead)
 				{
-					dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
+					item.Animation.TargetState = DRAGON_STATE_IDLE;
 				}
 				else if (headingAngle < -DRAGON_TURN_THRESHOLD_ANGLE)
 				{
 					if (ai.distance < DRAGON_IDLE_RANGE && ai.ahead)
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
+						item.Animation.TargetState = DRAGON_STATE_IDLE;
 					}
 					else
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_MOVE_LEFT;
+						item.Animation.TargetState = DRAGON_STATE_MOVE_LEFT;
 					}
 				}
 				else if (headingAngle > DRAGON_TURN_THRESHOLD_ANGLE)
 				{
 					if (ai.distance < DRAGON_IDLE_RANGE && ai.ahead)
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
+						item.Animation.TargetState = DRAGON_STATE_IDLE;
 					}
 					else
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_MOVE_RIGHT;
+						item.Animation.TargetState = DRAGON_STATE_MOVE_RIGHT;
 					}
 				}
 
@@ -435,48 +450,48 @@ namespace TEN::Entities::Creatures::TR2
 
 			case DRAGON_STATE_MOVE_LEFT:
 				if (headingAngle > -DRAGON_TURN_THRESHOLD_ANGLE || isAhead)
-					dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
+					item.Animation.TargetState = DRAGON_STATE_WALK;
 
 				break;
 
 			case DRAGON_STATE_MOVE_RIGHT:
 				if (headingAngle < DRAGON_TURN_THRESHOLD_ANGLE || isAhead)
-					dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
+					item.Animation.TargetState = DRAGON_STATE_WALK;
 
 				break;
 
 			case DRAGON_STATE_TURN_LEFT:
-				dragonItem.Pose.Orientation.y += -(ANGLE(1.0f) - headingAngle);
+				item.Pose.Orientation.y += -(ANGLE(1.0f) - headingAngle);
 				creature.Flags = 0;
 				break;
 
 			case DRAGON_STATE_TURN_RIGHT:
-				dragonItem.Pose.Orientation.y += (ANGLE(1.0f) - headingAngle);
+				item.Pose.Orientation.y += (ANGLE(1.0f) - headingAngle);
 				creature.Flags = 0;
 				break;
 
 			case DRAGON_STATE_AIM_1:
-				dragonItem.Pose.Orientation.y -= headingAngle;
+				item.Pose.Orientation.y -= headingAngle;
 
 				if (ai.ahead)
 					headYRot = -ai.angle;
 
 				if (isAhead)
 				{
-					dragonItem.Animation.TargetState = DRAGON_STATE_FIRE_1;
+					item.Animation.TargetState = DRAGON_STATE_FIRE_1;
 					creature.Flags = 30;
 				}
 				else
 				{
-					dragonItem.Animation.TargetState = DRAGON_STATE_AIM_1;
+					item.Animation.TargetState = DRAGON_STATE_AIM_1;
 					creature.Flags = 0;
 				}
 
 				break;
 
 			case DRAGON_STATE_FIRE_1:
-				dragonItem.Pose.Orientation.y -= headingAngle;
-				SoundEffect(SFX_TR2_DRAGON_FIRE, &dragonItem.Pose);
+				item.Pose.Orientation.y -= headingAngle;
+				SoundEffect(SFX_TR2_DRAGON_FIRE, &item.Pose);
 
 				if (ai.ahead)
 					headYRot = -ai.angle;
@@ -484,24 +499,24 @@ namespace TEN::Entities::Creatures::TR2
 				if (creature.Flags)
 				{
 					if (ai.ahead)
-						SpawnDragonFireBreath(dragonItem, DragonMouthBite, *creature.Enemy, 300.0f);
+						SpawnDragonFireBreath(item, DragonMouthBite, *creature.Enemy, 300.0f);
 
 					creature.Flags--;
 				}
 				else
 				{
-					dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
+					item.Animation.TargetState = DRAGON_STATE_IDLE;
 				}
 
 				break;
 			}
 		}
 
-		if (dragonItem.ItemFlags[1] >= 0)
+		if (frameCounter >= 0)
 		{
-			CreatureJoint(&dragonItem, 0, headYRot);
+			CreatureJoint(&item, 0, headYRot);
 			CreatureAnimation(itemNumber, headingAngle, 0);
-			UpdateDragonBack(dragonItem);
+			UpdateDragonBack(item);
 		}
 	}
 
