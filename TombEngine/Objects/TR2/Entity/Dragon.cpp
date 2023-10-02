@@ -15,32 +15,32 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 // NOTES:
-// item.ItemFlags[0]: Used to store the itemNumber of the linked body object.
-// item.ItemFlags[1]: Used to store the frame counter of the defeat and death routines
+// item.ItemFlags[0]: Back item number.
+// item.ItemFlags[1]: Frame counter of defeat and death.
 
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
-	constexpr auto DRAGON_CONTACT_DAMAGE = 10;
+	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
-	constexpr auto DRAGON_LIVE_TIME = 30 * 11;
-	constexpr auto DRAGON_ALMOST_LIVE = 100;
-
-	constexpr auto DRAGON_CLOSE_RANGE = SQUARE(BLOCK(3));
+	constexpr auto DRAGON_NEAR_RANGE = SQUARE(BLOCK(3));
 	constexpr auto DRAGON_IDLE_RANGE = SQUARE(BLOCK(6));
 
-	constexpr auto DRAGON_WALK_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto DRAGON_WALK_TURN_RATE_MAX   = ANGLE(2.0f);
 	constexpr auto DRAGON_TURN_THRESHOLD_ANGLE = ANGLE(1.0f);
 
-	constexpr auto DRAGON_CLOSE = 900;
-	constexpr auto DRAGON_FAR = 2300;
-	constexpr auto DRAGON_MID = ((DRAGON_CLOSE + DRAGON_FAR) / 2);
-	constexpr auto DRAGON_LCOL = -CLICK(2);
-	constexpr auto DRAGON_RCOL = CLICK(2);
+	constexpr auto DRAGON_LIVE_TIME	  = 30 * 11;
+	constexpr auto DRAGON_ALMOST_LIVE = 100;
+
+	constexpr auto DRAGON_DISTANCE_NEAR = 900;
+	constexpr auto DRAGON_DISTANCE_FAR	= 2300;
+	constexpr auto DRAGON_MID	= ((DRAGON_DISTANCE_NEAR + DRAGON_DISTANCE_FAR) / 2);
+	constexpr auto DRAGON_LCOL	= -CLICK(2);
+	constexpr auto DRAGON_RCOL	= CLICK(2);
 
 	const auto DragonMouthBite = CreatureBiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
-	const auto DragonBackSpineJoints = std::vector<unsigned int>{ 21, 22, 23 };
-	const auto DragonSwipeAttackJointsLeft = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
+	const auto DragonBackSpineJoints		= std::vector<unsigned int>{ 21, 22, 23 };
+	const auto DragonSwipeAttackJointsLeft	= std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
 
 	enum DragonState
@@ -87,17 +87,184 @@ namespace TEN::Entities::Creatures::TR2
 		DRAGON_ANIM_RECOVER = 23
 	};
 
+	// TODO: Check.
+	static void InitializeDragonBones(short frontItemNumber)
+	{
+		const auto& frontItem = g_Level.Items[frontItemNumber];
+
+		short backItemNumber = frontItem.ItemFlags[0];
+		const auto& backItem = g_Level.Items[backItemNumber];
+
+		int frontBoneItemNumber = CreateItem();
+		int backBoneItemNumber = CreateItem();
+		if (backBoneItemNumber == NO_ITEM || frontBoneItemNumber == NO_ITEM)
+			return;
+
+		auto& frontBoneItem = g_Level.Items[frontBoneItemNumber];
+		auto& backBoneItem = g_Level.Items[backBoneItemNumber];
+
+		frontBoneItem.ObjectNumber = ID_DRAGON_BONE_FRONT;
+		frontBoneItem.Pose = frontItem.Pose;
+		frontBoneItem.Pose.Orientation.x = 0;
+		frontBoneItem.Pose.Orientation.z = 0;
+		frontBoneItem.RoomNumber = frontItem.RoomNumber;
+		frontBoneItem.Model.Color = frontItem.Model.Color;
+		InitializeItem(frontBoneItemNumber);
+
+		backBoneItem.ObjectNumber = ID_DRAGON_BONE_BACK;
+		backBoneItem.Pose = backItem.Pose;
+		backBoneItem.Pose.Orientation.x = 0;
+		backBoneItem.Pose.Orientation.z = 0;
+		backBoneItem.RoomNumber = backItem.RoomNumber;
+		backBoneItem.Model.Color = backItem.Model.Color;
+		InitializeItem(backBoneItemNumber);
+
+		frontBoneItem.MeshBits = 0xFF3FFFFF;
+		backBoneItem.MeshBits = 0xFF3FFFFF;
+	}
+
+	static void InitializeDragonBack(ItemInfo& item)
+	{
+		int backItemNumber = CreateItem();
+		if (backItemNumber == NO_ITEM)
+		{
+			TENLog("Failed to create dragon back.", LogLevel::Warning);
+			return;
+		}
+		auto& backItem = g_Level.Items[backItemNumber];
+
+		// TODO: Check if necessary.
+		backItem.ObjectNumber = ID_DRAGON_BACK;
+		backItem.Pose = item.Pose;
+		backItem.RoomNumber = item.RoomNumber;
+		backItem.Model.Color = item.Model.Color;
+
+		item.ItemFlags[0] = backItemNumber;
+	}
+
 	void InitializeDragon(short itemNumber)
 	{
-		auto frontItemNumber = itemNumber;
-		auto& frontItem = g_Level.Items[frontItemNumber];
+		auto& item = g_Level.Items[itemNumber];
 		
-		InitializeCreature(frontItemNumber);
-		SetAnimation(frontItem, DRAGON_ANIM_IDLE);
+		// Initialize front body segment.
+		InitializeCreature(itemNumber);
+		SetAnimation(item, DRAGON_ANIM_IDLE);
 
-		frontItem.ItemFlags[0] = NO_ITEM;
+		// Initialize back body segment.
+		InitializeDragonBack(item);
+	}
 
-		InstantiateDragonBack(itemNumber);
+	// TODO: No GetRandomControl(). 
+	// TODO: Demagic type with enum class.
+	// TODO: Demagic colors.
+	static void HandleDragonLight(const ItemInfo& item, int type)
+	{
+		switch (type)
+		{
+		case 0:
+			TriggerDynamicLight(
+				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
+				(GetRandomControl() & 150) + 25, //Strong
+				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 200, (GetRandomControl() & 20) + 200); //White
+			break;
+
+		case 1:
+			TriggerDynamicLight(
+				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
+				(GetRandomControl() & 75) + 25, //Middle
+				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50); //Yellowish
+			break;
+
+		case 2:
+			TriggerDynamicLight(
+				item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
+				(GetRandomControl() & 20) + 25, //Weak
+				(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0); //Reddish
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	static void UpdateDragonBack(ItemInfo& frontItem)
+	{
+		auto& backItem = g_Level.Items[frontItem.ItemFlags[0]];
+
+		backItem.Status = frontItem.Status;
+		if (backItem.Status == ITEM_DEACTIVATED)
+		{
+			KillItem(backItem.Index);
+			frontItem.ItemFlags[0] = NO_ITEM;
+			return;
+		}
+
+		backItem.Pose = frontItem.Pose;
+		if (backItem.RoomNumber != frontItem.RoomNumber)
+			ItemNewRoom(backItem.Index, frontItem.RoomNumber);
+
+		// TODO: Use proper anim functions.
+		backItem.Animation.ActiveState = frontItem.Animation.ActiveState;
+		backItem.Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (frontItem.Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
+		backItem.Animation.FrameNumber = GetAnimData(backItem).frameBase + (frontItem.Animation.FrameNumber - GetAnimData(frontItem).frameBase);
+
+		if (frontItem.ItemFlags[1] >= 0)
+			CreatureAnimation(backItem.Index, 0, 0);
+	}
+
+	void SpawnDragonFireBreath(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
+	{
+		constexpr auto FIRE_COUNT = 3;
+
+		for (int i = 0; i < FIRE_COUNT; i++)
+		{
+			auto& fire = *GetFreeParticle();
+
+			fire.on = true;
+			fire.sR = 255 - (GetRandomControl() & 0x1F);
+			fire.sG = 64;
+			fire.sB = 38;
+			fire.dR = 128 + (GetRandomControl() & 0x3F);
+			fire.dG = 80 + (GetRandomControl() & 0x3F);
+			fire.dB = 32;
+			fire.colFadeSpeed = 12;
+			fire.fadeToBlack = 8;
+			fire.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+			// TODO: Animate sprite.
+			//float alpha = fmin(1, fmax(0, 1 - (fire.life / (float)fire.sLife)));
+			float alpha = 20.0f; // Not an alpha value.
+			int sprite = (int)Lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex + (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
+			fire.spriteIndex = sprite;
+
+			auto posStart = GetJointPosition(item, bite.BoneID, Vector3i(-4, -30, -4) + bite.Position);
+			auto posGoal = LaraItem->Pose.Position + Vector3i (0, -CLICK(1), 0);
+
+			auto direction = (posGoal - posStart).ToVector3();
+			direction.Normalize();
+			direction *= vel;
+
+			fire.x = (GetRandomControl() & 0x1F) + posStart.x - 16;
+			fire.y = (GetRandomControl() & 0x1F) + posStart.y - 16;
+			fire.z = (GetRandomControl() & 0x1F) + posStart.z - 16;
+
+			int v = (GetRandomControl() & 0x3F) + 192;
+			fire.life = fire.sLife = v / 6;
+
+			fire.xVel = v * (direction.x) / 10;
+			fire.yVel = v * (direction.y) / 10;
+			fire.zVel = v * (direction.z) / 10;
+
+			fire.friction = 85;
+			fire.gravity = -16 - (GetRandomControl() & 0x1F);
+			fire.maxYvel = 0;
+			fire.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+
+			fire.scalar = 6;
+			fire.dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
+			fire.sSize = fire.dSize / 4;
+			fire.size = fire.dSize;
+		}
 	}
 
 	void ControlDragon(short itemNumber)
@@ -106,12 +273,12 @@ namespace TEN::Entities::Creatures::TR2
 			return;
 		
 		auto& dragonItem = g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(&dragonItem);
+		auto& creature = *GetCreatureInfo(&dragonItem);
 
 		short headingAngle = 0;
-		short head = 0;
+		short headYRot = 0;
 
-		bool isAhead;
+		bool isAhead = false;
 
 		if (dragonItem.HitPoints <= 0)
 		{
@@ -122,11 +289,10 @@ namespace TEN::Entities::Creatures::TR2
 			}
 			else
 			{
+				// Defeat.
 				if (dragonItem.ItemFlags[1] >= 0)
 				{
-					//Defeat routine
-
-					DragonLightsManager(dragonItem, 1);
+					HandleDragonLight(dragonItem, 1);
 					dragonItem.ItemFlags[1]++;
 
 					if (dragonItem.ItemFlags[1] == DRAGON_LIVE_TIME)
@@ -135,16 +301,15 @@ namespace TEN::Entities::Creatures::TR2
 					if (dragonItem.ItemFlags[1] == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 						dragonItem.HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
 				}
+				// Death.
 				else
 				{
-					//Death routine
-
 					if (dragonItem.ItemFlags[1] > -20)
-						DragonLightsManager(dragonItem, 2);
+						HandleDragonLight(dragonItem, 2);
 
 					if (dragonItem.ItemFlags[1] == -100)
 					{
-						InstantiateDragonBones (itemNumber);
+						InitializeDragonBones (itemNumber);
 					}
 					else if (dragonItem.ItemFlags[1] == -200)
 					{
@@ -170,205 +335,197 @@ namespace TEN::Entities::Creatures::TR2
 			CreatureMood(&dragonItem, &ai, true);
 			headingAngle = CreatureTurn(&dragonItem, DRAGON_WALK_TURN_RATE_MAX);
 
-			isAhead = (ai.ahead && ai.distance > DRAGON_CLOSE_RANGE && ai.distance < DRAGON_IDLE_RANGE);
+			isAhead = (ai.ahead && ai.distance > DRAGON_NEAR_RANGE && ai.distance < DRAGON_IDLE_RANGE);
 
-			//Contact Damage
+			// Contact damage.
 			if (dragonItem.TouchBits.TestAny())
-				DoDamage(creature->Enemy, DRAGON_CONTACT_DAMAGE);
+				DoDamage(creature.Enemy, DRAGON_CONTACT_DAMAGE);
 
-			//States Machine
 			switch (dragonItem.Animation.ActiveState)
 			{
-				case DRAGON_STATE_IDLE:
-					dragonItem.Pose.Orientation.y -= headingAngle;
+			case DRAGON_STATE_IDLE:
+				dragonItem.Pose.Orientation.y -= headingAngle;
 
-					if (!isAhead)
+				if (!isAhead)
+				{
+					if (ai.distance > DRAGON_IDLE_RANGE || !ai.ahead)
 					{
-						if (ai.distance > DRAGON_IDLE_RANGE || !ai.ahead)
-						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
-						}
-						else if (ai.ahead && ai.distance < DRAGON_CLOSE_RANGE && !creature->Flags)
-						{
-							creature->Flags = 1;
+						dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
+					}
+					else if (ai.ahead && ai.distance < DRAGON_NEAR_RANGE && !creature.Flags)
+					{
+						creature.Flags = 1;
 
-							if (ai.angle < 0)
-							{
-								dragonItem.Animation.TargetState = DRAGON_STATE_SWIPE_LEFT;
-							}
-							else
-							{
-								dragonItem.Animation.TargetState = DRAGON_STATE_SWIPE_RIGHT;
-							}
-						}
-						else if (ai.angle < 0)
+						if (ai.angle < 0)
 						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_TURN_LEFT;
+							dragonItem.Animation.TargetState = DRAGON_STATE_SWIPE_LEFT;
 						}
 						else
 						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_TURN_RIGHT;
+							dragonItem.Animation.TargetState = DRAGON_STATE_SWIPE_RIGHT;
 						}
+					}
+					else if (ai.angle < 0)
+					{
+						dragonItem.Animation.TargetState = DRAGON_STATE_TURN_LEFT;
 					}
 					else
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_AIM_1;
+						dragonItem.Animation.TargetState = DRAGON_STATE_TURN_RIGHT;
 					}
+				}
+				else
+				{
+					dragonItem.Animation.TargetState = DRAGON_STATE_AIM_1;
+				}
 
-					break;
+				break;
 
-				case DRAGON_STATE_SWIPE_LEFT:
-					if (dragonItem.TouchBits.Test(DragonSwipeAttackJointsLeft))
-					{
-						DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
-						creature->Flags = 0;
-					}
+			case DRAGON_STATE_SWIPE_LEFT:
+				if (dragonItem.TouchBits.Test(DragonSwipeAttackJointsLeft))
+				{
+					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
+					creature.Flags = 0;
+				}
 
-					break;
+				break;
 
-				case DRAGON_STATE_SWIPE_RIGHT:
-					if (dragonItem.TouchBits.Test(DragonSwipeAttackJointsRight))
-					{
-						DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
-						creature->Flags = 0;
-					}
+			case DRAGON_STATE_SWIPE_RIGHT:
+				if (dragonItem.TouchBits.Test(DragonSwipeAttackJointsRight))
+				{
+					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
+					creature.Flags = 0;
+				}
 
-					break;
+				break;
 
-				case DRAGON_STATE_WALK:
-					creature->Flags = 0;
+			case DRAGON_STATE_WALK:
+				creature.Flags = 0;
 
-					if (isAhead)
+				if (isAhead)
+				{
+					dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
+				}
+				else if (headingAngle < -DRAGON_TURN_THRESHOLD_ANGLE)
+				{
+					if (ai.distance < DRAGON_IDLE_RANGE && ai.ahead)
 					{
 						dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
 					}
-					else if (headingAngle < -DRAGON_TURN_THRESHOLD_ANGLE)
-					{
-						if (ai.distance < DRAGON_IDLE_RANGE && ai.ahead)
-						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
-						}
-						else
-						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_MOVE_LEFT;
-						}
-					}
-					else if (headingAngle > DRAGON_TURN_THRESHOLD_ANGLE)
-					{
-						if (ai.distance < DRAGON_IDLE_RANGE && ai.ahead)
-						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
-						}
-						else
-						{
-							dragonItem.Animation.TargetState = DRAGON_STATE_MOVE_RIGHT;
-						}
-					}
-
-					break;
-
-				case DRAGON_STATE_MOVE_LEFT:
-					if (headingAngle > -DRAGON_TURN_THRESHOLD_ANGLE || isAhead)
-						dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
-
-					break;
-
-				case DRAGON_STATE_MOVE_RIGHT:
-					if (headingAngle < DRAGON_TURN_THRESHOLD_ANGLE || isAhead)
-						dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
-
-					break;
-
-				case DRAGON_STATE_TURN_LEFT:
-					dragonItem.Pose.Orientation.y += -(ANGLE(1.0f) - headingAngle);
-					creature->Flags = 0;
-
-					break;
-
-				case DRAGON_STATE_TURN_RIGHT:
-					dragonItem.Pose.Orientation.y += (ANGLE(1.0f) - headingAngle);
-					creature->Flags = 0;
-
-					break;
-
-				case DRAGON_STATE_AIM_1:
-					dragonItem.Pose.Orientation.y -= headingAngle;
-
-					if (ai.ahead)
-						head = -ai.angle;
-
-					if (isAhead)
-					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_FIRE_1;
-						creature->Flags = 30;
-					}
 					else
 					{
-						dragonItem.Animation.TargetState = DRAGON_STATE_AIM_1;
-						creature->Flags = 0;
+						dragonItem.Animation.TargetState = DRAGON_STATE_MOVE_LEFT;
 					}
-
-					break;
-
-				case DRAGON_STATE_FIRE_1:
-					dragonItem.Pose.Orientation.y -= headingAngle;
-					SoundEffect(SFX_TR2_DRAGON_FIRE, &dragonItem.Pose);
-
-					if (ai.ahead)
-						head = -ai.angle;
-
-					if (creature->Flags)
-					{
-						if (ai.ahead)
-							DragonFireBreath(&dragonItem, DragonMouthBite, 300, creature->Enemy);
-
-						creature->Flags--;
-					}
-					else
+				}
+				else if (headingAngle > DRAGON_TURN_THRESHOLD_ANGLE)
+				{
+					if (ai.distance < DRAGON_IDLE_RANGE && ai.ahead)
 					{
 						dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
 					}
+					else
+					{
+						dragonItem.Animation.TargetState = DRAGON_STATE_MOVE_RIGHT;
+					}
+				}
 
-					break;
+				break;
+
+			case DRAGON_STATE_MOVE_LEFT:
+				if (headingAngle > -DRAGON_TURN_THRESHOLD_ANGLE || isAhead)
+					dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
+
+				break;
+
+			case DRAGON_STATE_MOVE_RIGHT:
+				if (headingAngle < DRAGON_TURN_THRESHOLD_ANGLE || isAhead)
+					dragonItem.Animation.TargetState = DRAGON_STATE_WALK;
+
+				break;
+
+			case DRAGON_STATE_TURN_LEFT:
+				dragonItem.Pose.Orientation.y += -(ANGLE(1.0f) - headingAngle);
+				creature.Flags = 0;
+				break;
+
+			case DRAGON_STATE_TURN_RIGHT:
+				dragonItem.Pose.Orientation.y += (ANGLE(1.0f) - headingAngle);
+				creature.Flags = 0;
+				break;
+
+			case DRAGON_STATE_AIM_1:
+				dragonItem.Pose.Orientation.y -= headingAngle;
+
+				if (ai.ahead)
+					headYRot = -ai.angle;
+
+				if (isAhead)
+				{
+					dragonItem.Animation.TargetState = DRAGON_STATE_FIRE_1;
+					creature.Flags = 30;
+				}
+				else
+				{
+					dragonItem.Animation.TargetState = DRAGON_STATE_AIM_1;
+					creature.Flags = 0;
+				}
+
+				break;
+
+			case DRAGON_STATE_FIRE_1:
+				dragonItem.Pose.Orientation.y -= headingAngle;
+				SoundEffect(SFX_TR2_DRAGON_FIRE, &dragonItem.Pose);
+
+				if (ai.ahead)
+					headYRot = -ai.angle;
+
+				if (creature.Flags)
+				{
+					if (ai.ahead)
+						SpawnDragonFireBreath(dragonItem, DragonMouthBite, *creature.Enemy, 300.0f);
+
+					creature.Flags--;
+				}
+				else
+				{
+					dragonItem.Animation.TargetState = DRAGON_STATE_IDLE;
+				}
+
+				break;
 			}
-
 		}
 
 		if (dragonItem.ItemFlags[1] >= 0)
 		{
-			CreatureJoint(&dragonItem, 0, head);
+			CreatureJoint(&dragonItem, 0, headYRot);
 			CreatureAnimation(itemNumber, headingAngle, 0);
-		}
-
-		if (dragonItem.ItemFlags[0] != NO_ITEM)
-		{
-			UpdateDragonBack(itemNumber, dragonItem.ItemFlags[0]);
-		}
-		else
-		{
-			InstantiateDragonBack(itemNumber);
 		}
 	}
 
-	void CollideDragon(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
 		int backItemNumber = item.ItemFlags[0];
-		auto& itemBack = g_Level.Items[backItemNumber];
+		auto& backItem = g_Level.Items[backItemNumber];
 
-		if (!TestBoundsCollide(&item, laraItem, coll->Setup.Radius))
-			if (!TestBoundsCollide(&itemBack, laraItem, coll->Setup.Radius))
+		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
+		{
+			if (!TestBoundsCollide(&backItem, playerItem, coll->Setup.Radius))
 				return;
+		}
 
-		if (!TestCollision(&item, laraItem))
-			if (!TestCollision(&itemBack, laraItem))
+		if (!TestCollision(&item, playerItem))
+		{
+			if (!TestCollision(&backItem, playerItem))
 				return;
+		}
 
 		if (item.Animation.ActiveState == DRAGON_STATE_DEFEAT)
 		{
-			int rx = laraItem->Pose.Position.x - item.Pose.Position.x;
-			int rz = laraItem->Pose.Position.z - item.Pose.Position.z;
+			// TODO: No trig.
+			int rx = playerItem->Pose.Position.x - item.Pose.Position.x;
+			int rz = playerItem->Pose.Position.z - item.Pose.Position.z;
 			float sinY = phd_sin(item.Pose.Orientation.y);
 			float cosY = phd_cos(item.Pose.Orientation.y);
 
@@ -376,39 +533,39 @@ namespace TEN::Entities::Creatures::TR2
 			if (sideShift > DRAGON_LCOL && sideShift < DRAGON_RCOL)
 			{
 				int shift = rx * cosY - rz * sinY;
-				if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
+				if (shift <= DRAGON_DISTANCE_NEAR && shift >= DRAGON_DISTANCE_FAR)
 					return;
 
-				int angle = laraItem->Pose.Orientation.y - item.Pose.Orientation.y;
+				int angle = playerItem->Pose.Orientation.y - item.Pose.Orientation.y;
 
-				int anim = item.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
-				int frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+				int animNumber = item.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
+				int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 
-				if ((anim == DRAGON_ANIM_DEFEATED || (anim == DRAGON_ANIM_DEFEATED + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
+				if ((animNumber == DRAGON_ANIM_DEFEATED ||
+						(animNumber == (DRAGON_ANIM_DEFEATED + 1) && frameNumber <= DRAGON_ALMOST_LIVE)) &&
 					IsHeld(In::Action) &&
+					!playerItem->Animation.IsAirborne &&
 					item.ObjectNumber == ID_DRAGON_BACK &&
-					!laraItem->Animation.IsAirborne &&
 					shift <= DRAGON_MID &&
-					shift > (DRAGON_CLOSE - 350) &&
+					shift > (DRAGON_DISTANCE_NEAR - 350) &&
 					sideShift > -350 &&
 					sideShift < 350 &&
-					angle >(ANGLE(45.0f) - ANGLE(30.0f)) &&
+					angle > (ANGLE(45.0f) - ANGLE(30.0f)) &&
 					angle < (ANGLE(45.0f) + ANGLE(30.0f)))
 				{
 					/*
 					// TODO: Reimplement the Dagger Pickup animation when the transition from ID_LARA_EXTRA_ANIMS to ID_LARA get solved
-					SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
-					laraItem->Pose = item.Pose;
-					laraItem->Animation.IsAirborne = false;
-					laraItem->Animation.Velocity.y = 0.0f;
-					laraItem->Animation.Velocity.z = 0.0f;
-					
+					SetAnimation(*playerItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
+					playerItem->Pose = item.Pose;
+					playerItem->Animation.IsAirborne = false;
+					playerItem->Animation.Velocity.y = 0.0f;
+					playerItem->Animation.Velocity.z = 0.0f;
 
-					if (item.RoomNumber != laraItem->RoomNumber)
-						ItemNewRoom(LaraItem->Index, item.RoomNumber);
+					if (item.RoomNumber != playerItem->RoomNumber)
+						ItemNewRoom(playerItem->Index, item.RoomNumber);
 					*/
 
-					SetAnimation(*laraItem, LA_BUTTON_SMALL_PUSH);
+					SetAnimation(*playerItem, LA_BUTTON_SMALL_PUSH);
 					AnimateItem(LaraItem);
 
 					/*
@@ -418,7 +575,7 @@ namespace TEN::Entities::Creatures::TR2
 					Lara.HitDirection = -1;
 					*/
 
-					//laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
+					//playerItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
 
 					if (item.ObjectNumber == ID_DRAGON_FRONT)
 					{
@@ -431,17 +588,16 @@ namespace TEN::Entities::Creatures::TR2
 						frontPart.ItemFlags[1] = -1;
 					}
 						
-
 					return;
 				}
 
 				if (shift < DRAGON_MID)
 				{
-					shift = DRAGON_CLOSE - shift;
+					shift = DRAGON_DISTANCE_NEAR - shift;
 				}
 				else
 				{
-					shift = DRAGON_FAR - shift;
+					shift = DRAGON_DISTANCE_FAR - shift;
 				}
 
 				/*
@@ -454,183 +610,6 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		ItemPushItem(&item, laraItem, coll, 1, 0);
-	}
-
-	void DragonFireBreath(ItemInfo* item, const CreatureBiteInfo& bite, int speed, ItemInfo* enemy)
-	{
-		constexpr auto COUNT = 3;
-
-		for (int i = 0; i < COUNT; i++)
-		{
-			auto& fire = *GetFreeParticle();
-
-			fire.on = true;
-			fire.sR = 255 - (GetRandomControl() & 0x1F);
-			fire.sG = 64;
-			fire.sB = 38;
-			fire.dR = 128 + (GetRandomControl() & 0x3F);
-			fire.dG = 80 + (GetRandomControl() & 0x3F);
-			fire.dB = 32;
-			fire.colFadeSpeed = 12;
-			fire.fadeToBlack = 8;
-			fire.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-
-			int rotation = (GetRandomControl() & 0x3FF) % 360; //A random value between 0 and 359
-			fire.rotAng = ANGLE(rotation);
-
-			// TODO: solve flame sprite animation.
-			//float alpha = fmin(1, fmax(0, 1 - (fire.life / (float)fire.sLife)));
-			float alpha = 20.0f;
-			int sprite = (int)Lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex + (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
-			fire.spriteIndex = sprite;
-
-			auto posStart = GetJointPosition(item, bite.BoneID, Vector3i(-4, -30, -4) + bite.Position);
-			auto posGoal = LaraItem->Pose.Position + Vector3i (0, -CLICK(1), 0);
-
-			auto direction = (posGoal - posStart).ToVector3();
-			direction.Normalize();
-			direction *= speed;
-
-			fire.x = (GetRandomControl() & 0x1F) + posStart.x - 16;
-			fire.y = (GetRandomControl() & 0x1F) + posStart.y - 16;
-			fire.z = (GetRandomControl() & 0x1F) + posStart.z - 16;
-
-			int v = (GetRandomControl() & 0x3F) + 192;
-			fire.life = fire.sLife = v / 6;
-
-			fire.xVel = v * (direction.x) / 10;
-			fire.yVel = v * (direction.y) / 10;
-			fire.zVel = v * (direction.z) / 10;
-
-			fire.friction = 85;
-			fire.gravity = -16 - (GetRandomControl() & 0x1F);
-			fire.maxYvel = 0;
-			fire.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-
-			fire.scalar = 6;
-			fire.dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
-			fire.sSize = fire.dSize / 4;
-			fire.size = fire.dSize;
-		}
-	}
-
-	void DragonLightsManager(const ItemInfo& item, int type)
-	{
-		switch (type)
-		{
-			case 0:
-				TriggerDynamicLight(
-					item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-					(GetRandomControl() & 150) + 25, //Strong
-					(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 200, (GetRandomControl() & 20) + 200); //White
-				break;
-
-			case 1:
-				TriggerDynamicLight(
-					item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-					(GetRandomControl() & 75) + 25, //Middle
-					(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50); //Yellowish
-				break;
-
-			case 2:
-				TriggerDynamicLight(
-					item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-					(GetRandomControl() & 20) + 25, //Weak
-					(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0); //Reddish
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	void UpdateDragonBack(short frontItemNumber, short backItemNumber)
-	{
-		auto& backItem = g_Level.Items[backItemNumber];
-		auto& frontItem = g_Level.Items[frontItemNumber];
-
-		backItem.Status = frontItem.Status;
-		if (backItem.Status == ITEM_DEACTIVATED)
-		{
-			KillItem(backItemNumber);
-			frontItem.ItemFlags[0] = NO_ITEM;
-			return;
-		}
-
-		backItem.Pose = frontItem.Pose;
-		if (backItem.RoomNumber != frontItem.RoomNumber)
-			ItemNewRoom(backItemNumber, frontItem.RoomNumber);
-
-		backItem.Animation.ActiveState = frontItem.Animation.ActiveState;
-		backItem.Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (frontItem.Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
-		backItem.Animation.FrameNumber = GetAnimData(backItem).frameBase + (frontItem.Animation.FrameNumber - GetAnimData(frontItem).frameBase);
-
-		if (frontItem.ItemFlags[1] >= 0)
-		{
-			CreatureAnimation(backItemNumber, 0, 0);
-		}
-	}
-
-	void InstantiateDragonBack(short itemNumber)
-	{
-		auto frontItemNumber = itemNumber;
-		auto& frontItem = g_Level.Items[frontItemNumber];
-
-		int backItemNumber = CreateItem();
-		if (backItemNumber == NO_ITEM)
-		{
-			TENLog("Failed to create ID_DRAGON_BACK from ID_DRAGON_FRONT.", LogLevel::Warning);
-			return;
-		}
-		auto& backItem = g_Level.Items[backItemNumber];
-
-		backItem.ObjectNumber = ID_DRAGON_BACK;
-
-		backItem.Pose = frontItem.Pose;
-		backItem.RoomNumber = frontItem.RoomNumber;
-		backItem.Model.Color = frontItem.Model.Color;
-		backItem.MeshBits.SetAll();
-		backItem.Name = "instantiated_Dragon_Back_" + std::to_string (backItemNumber);		
-		
-		g_Level.NumItems++;
-
-		frontItem.ItemFlags[0] = backItemNumber;
-	}
-
-	void InstantiateDragonBones(short itemNumber)
-	{
-		short frontItemNumber = itemNumber;
-		const auto& frontItem = g_Level.Items[frontItemNumber];
-		
-		short backItemNumber = frontItem.ItemFlags[0];
-		const auto& backItem = g_Level.Items[backItemNumber];
-
-		int boneFrontItemNumber = CreateItem();
-		int boneBackItemNumber = CreateItem();
-		if (boneBackItemNumber == NO_ITEM || boneFrontItemNumber == NO_ITEM)
-			return;
-
-		auto& boneFrontItem = g_Level.Items[boneFrontItemNumber];
-		auto& boneBackItem = g_Level.Items[boneBackItemNumber];
-						
-		boneFrontItem.ObjectNumber = ID_DRAGON_BONE_FRONT;
-		boneFrontItem.Pose = frontItem.Pose;
-		boneFrontItem.Pose.Orientation.x = 0;
-		boneFrontItem.Pose.Orientation.z = 0;
-		boneFrontItem.RoomNumber = frontItem.RoomNumber;
-		boneFrontItem.Model.Color = frontItem.Model.Color;
-		InitializeItem(boneFrontItemNumber);
-
-		boneBackItem.ObjectNumber = ID_DRAGON_BONE_BACK;
-		boneBackItem.Pose = backItem.Pose;
-		boneBackItem.Pose.Orientation.x = 0;
-		boneBackItem.Pose.Orientation.z = 0;
-		boneBackItem.RoomNumber = backItem.RoomNumber;
-		boneBackItem.Model.Color = backItem.Model.Color;
-		InitializeItem(boneBackItemNumber);
-		
-		boneFrontItem.MeshBits = 0xFF3FFFFF;
-		boneBackItem.MeshBits = 0xFF3FFFFF;
+		ItemPushItem(&item, playerItem, coll, 1, 0);
 	}
 }

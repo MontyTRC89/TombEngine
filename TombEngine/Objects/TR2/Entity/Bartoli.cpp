@@ -9,7 +9,7 @@
 
 // NOTES:
 // item.ItemFlags[0]: Effect counter in frame time.
-// item.ItemFlags[1]: ObjectID of the enemy to instantiate, by default ID_DRAGON_FRONT.
+// item.ItemFlags[1]: Object ID of item to initialize. ID_DRAGON_FRONT by default.
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -42,14 +42,14 @@ namespace TEN::Entities::Creatures::TR2
 				if (distFromPlayer > DRAGON_SPAWN_RANGE)
 					return;
 			}
-			// Activate by trigger.
+			// Activate via trigger.
 			else
 			{
 				if (!TriggerActive(&item))
 					return;
 			}
 
-			item.ItemFlags[1] = (short) ID_DRAGON_FRONT;
+			item.ItemFlags[1] = ID_DRAGON_FRONT;
 		}
 		
 		AnimateItem(&item);
@@ -57,7 +57,7 @@ namespace TEN::Entities::Creatures::TR2
 		short& effectCounter = item.ItemFlags[0];
 		effectCounter++;
 			
-		if (!(effectCounter & 7))
+		if ((effectCounter & 7) == 0)
 			Camera.bounce = item.Timer;
 
 		TriggerDynamicLight(
@@ -86,7 +86,6 @@ namespace TEN::Entities::Creatures::TR2
 			auto& enemyItem = g_Level.Items[enemyItemNumber];
 
 			enemyItem.ObjectNumber = (GAME_OBJECT_ID)item.ItemFlags[1];
-
 			enemyItem.Pose = item.Pose;
 			enemyItem.RoomNumber = item.RoomNumber;
 			enemyItem.Model.Color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -95,7 +94,6 @@ namespace TEN::Entities::Creatures::TR2
 		
 			InitializeItem(enemyItemNumber);
 			AddActiveItem(enemyItemNumber);
-
 		}
 	}
 

@@ -26,7 +26,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
-	constexpr auto DRAGON_CLOSE_RANGE = SQUARE(BLOCK(3));
+	constexpr auto DRAGON_NEAR_RANGE = SQUARE(BLOCK(3));
 	constexpr auto DRAGON_IDLE_RANGE  = SQUARE(BLOCK(6));
 
 	constexpr auto DRAGON_LIVE_TIME		   = 30 * 11;
@@ -36,9 +36,9 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_EXPLOSION_3_TIME = DRAGON_EXPLOSION_2_TIME + 10;
 
 	constexpr auto DRAGON_SPAWN_RANGE = BLOCK(9);
-	constexpr auto DRAGON_CLOSE		  = 900;
-	constexpr auto DRAGON_FAR		  = 2300;
-	constexpr auto DRAGON_MID		  = ((DRAGON_CLOSE + DRAGON_FAR) / 2);
+	constexpr auto DRAGON_DISTANCE_NEAR		  = 900;
+	constexpr auto DRAGON_DISTANCE_FAR		  = 2300;
+	constexpr auto DRAGON_MID		  = ((DRAGON_DISTANCE_NEAR + DRAGON_DISTANCE_FAR) / 2);
 	constexpr auto DRAGON_LCOL		  = -CLICK(2);
 	constexpr auto DRAGON_RCOL		  = CLICK(2);
 
@@ -295,7 +295,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (sideShift > DRAGON_LCOL && sideShift < DRAGON_RCOL)
 			{
 				int shift = rx * cosY - rz * sinY;
-				if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
+				if (shift <= DRAGON_DISTANCE_NEAR && shift >= DRAGON_DISTANCE_FAR)
 					return;
 
 				int angle = laraItem->Pose.Orientation.y - item.Pose.Orientation.y;
@@ -308,7 +308,7 @@ namespace TEN::Entities::Creatures::TR2
 					item.ObjectNumber == ID_DRAGON_BACK &&
 					!laraItem->Animation.IsAirborne &&
 					shift <= DRAGON_MID &&
-					shift > (DRAGON_CLOSE - 350) &&
+					shift > (DRAGON_DISTANCE_NEAR - 350) &&
 					sideShift > -350 &&
 					sideShift < 350 &&
 					angle > (ANGLE(45.0f) - ANGLE(30.0f)) &&
@@ -337,11 +337,11 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (shift < DRAGON_MID)
 				{
-					shift = DRAGON_CLOSE - shift;
+					shift = DRAGON_DISTANCE_NEAR - shift;
 				}
 				else
 				{
-					shift = DRAGON_FAR - shift;
+					shift = DRAGON_DISTANCE_FAR - shift;
 				}
 
 				laraItem->Pose.Position.x += shift * cosY;
@@ -427,7 +427,7 @@ namespace TEN::Entities::Creatures::TR2
 			CreatureMood(&item, &ai, true);
 			headingAngle = CreatureTurn(&item, DRAGON_WALK_TURN_RATE_MAX);
 
-			isAhead = (ai.ahead && ai.distance > DRAGON_CLOSE_RANGE && ai.distance < DRAGON_IDLE_RANGE);
+			isAhead = (ai.ahead && ai.distance > DRAGON_NEAR_RANGE && ai.distance < DRAGON_IDLE_RANGE);
 
 			if (item.TouchBits.TestAny())
 				DoDamage(creature->Enemy, DRAGON_CONTACT_DAMAGE);
@@ -443,7 +443,7 @@ namespace TEN::Entities::Creatures::TR2
 					{
 						item.Animation.TargetState = DRAGON_STATE_WALK;
 					}
-					else if (ai.ahead && ai.distance < DRAGON_CLOSE_RANGE && !creature->Flags)
+					else if (ai.ahead && ai.distance < DRAGON_NEAR_RANGE && !creature->Flags)
 					{
 						creature->Flags = 1;
 
