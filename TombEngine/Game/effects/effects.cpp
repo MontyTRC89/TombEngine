@@ -1233,7 +1233,7 @@ void KillAllCurrentItems(short itemNumber)
 
 void SpawnDynamicLight(const Vector3& pos, const Color& color, float falloff)
 {
-	TriggerDynamicLight(pos.x, pos.y, pos.z, falloff, color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
+	TriggerDynamicLight(pos.x, pos.y, pos.z, falloff * UCHAR_MAX, color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 }
 
 // Deprecated. Use SpawnDynamicLight() instead.
