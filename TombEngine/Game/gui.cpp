@@ -2710,7 +2710,7 @@ namespace TEN::Gui
 
 					if (AmmoObjectList[n].Amount == -1)
 					{
-						sprintf(&invTextBuffer[0], strcat(strdup(g_GameFlow->GetString(STRING_UNLIMITED)), " %s"), g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
+						sprintf(&invTextBuffer[0], g_GameFlow->GetString(STRING_UNLIMITED), g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 					}
 					else
 					{
@@ -3033,7 +3033,7 @@ namespace TEN::Gui
 						{
 							if (numItems == -1)
 							{
-								sprintf(textBuffer, strcat(strdup(g_GameFlow->GetString(STRING_UNLIMITED)), " %s"), g_GameFlow->GetString(invObject.ObjectName));
+								sprintf(textBuffer, g_GameFlow->GetString(STRING_UNLIMITED), g_GameFlow->GetString(invObject.ObjectName));
 							}
 							else
 							{
