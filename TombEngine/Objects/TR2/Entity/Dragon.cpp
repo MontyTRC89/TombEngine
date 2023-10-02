@@ -222,19 +222,25 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
+	// TODO: No GetRandomControl().
+	// TODO: Demagic.
 	// TODO: Smoke and sparks.
 	static void SpawnDragonFireBreath(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
 	{
 		constexpr auto FIRE_COUNT = 3;
+		constexpr auto SPHERE_RADIUS = BLOCK(0.2f);
 
 		for (int i = 0; i < FIRE_COUNT; i++)
 		{
 			auto& fire = *GetFreeParticle();
 
-			auto origin = GetJointPosition(item, bite.BoneID, bite.Position);
-			auto target = GetJointPosition(LaraItem, LM_HIPS);
+			auto origin = GetJointPosition(item, bite.BoneID, bite.Position).ToVector3();
+			auto target = GetJointPosition(LaraItem, LM_HIPS).ToVector3();
 
-			auto dir = (target - origin).ToVector3();
+			auto sphere = BoundingSphere(origin, SPHERE_RADIUS);
+			auto pos = Random::GeneratePointInSphere(sphere);
+
+			auto dir = target - origin;
 			dir.Normalize();
 			dir *= vel;
 
@@ -251,10 +257,10 @@ namespace TEN::Entities::Creatures::TR2
 			fire.colFadeSpeed = 12;
 			fire.fadeToBlack = 8;
 			fire.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-
-			fire.x = (GetRandomControl() & 0x1F) + origin.x - 16;
-			fire.y = (GetRandomControl() & 0x1F) + origin.y - 16;
-			fire.z = (GetRandomControl() & 0x1F) + origin.z - 16;
+			
+			fire.x = pos.x;
+			fire.y = pos.y;
+			fire.z = pos.z;
 
 			int v = (GetRandomControl() & 0x3F) + 192;
 			fire.life =
