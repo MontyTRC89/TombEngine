@@ -2458,5 +2458,3 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 }
-
-
