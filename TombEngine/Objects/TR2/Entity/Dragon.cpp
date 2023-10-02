@@ -513,8 +513,8 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			CreatureJoint(&item, 0, headYRot);
 			CreatureAnimation(itemNumber, headingAngle, 0);
-			UpdateDragonBack(item);
 		}
+		UpdateDragonBack(item);
 	}
 
 	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
