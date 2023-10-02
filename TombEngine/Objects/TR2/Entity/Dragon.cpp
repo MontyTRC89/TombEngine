@@ -15,8 +15,8 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 // NOTES:
-// item.ItemFlags[0]: Back item number.
-// item.ItemFlags[1]: Frame counter of defeat and death.
+// item.ItemFlags[0]: Back segment item number.
+// item.ItemFlags[1]: Frame counter for temporary defeat and death.
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -133,12 +133,18 @@ namespace TEN::Entities::Creatures::TR2
 		}
 		auto& backItem = g_Level.Items[backItemNumber];
 
+		//InitializeCreature(backItem.Index);
+		SetAnimation(backItem, DRAGON_ANIM_IDLE);
+
 		// TODO: Check if necessary.
 		backItem.ObjectNumber = ID_DRAGON_BACK;
 		backItem.Pose = item.Pose;
 		backItem.RoomNumber = item.RoomNumber;
 		backItem.Model.Color = item.Model.Color;
+		backItem.MeshBits.Clear(DragonBackSpineJoints); // TODO: Check what this is.
+		InitializeItem(backItem.Index);
 
+		// Store ID of back segment item number.
 		item.ItemFlags[0] = backItemNumber;
 	}
 
@@ -147,17 +153,39 @@ namespace TEN::Entities::Creatures::TR2
 		auto& item = g_Level.Items[itemNumber];
 		
 		// Initialize front body segment.
-		InitializeCreature(itemNumber);
+		InitializeCreature(item.Index);
 		SetAnimation(item, DRAGON_ANIM_IDLE);
 
 		// Initialize back body segment.
 		InitializeDragonBack(item);
 	}
 
+	static void UpdateDragonBack(ItemInfo& item)
+	{
+		auto& backItem = g_Level.Items[item.ItemFlags[0]];
+
+		backItem.Status = item.Status;
+		if (backItem.Status == ITEM_DEACTIVATED)
+		{
+			KillItem(backItem.Index);
+			item.ItemFlags[0] = NO_ITEM;
+			return;
+		}
+
+		// TODO: Better way.
+		backItem.Animation.ActiveState = item.Animation.ActiveState;
+		backItem.Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item.Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
+		backItem.Animation.FrameNumber = GetAnimData(backItem).frameBase + (item.Animation.FrameNumber - GetAnimData(item).frameBase);
+
+		backItem.Pose = item.Pose;
+		if (backItem.RoomNumber != item.RoomNumber)
+			ItemNewRoom(backItem.Index, item.RoomNumber);
+	}
+
 	// TODO: No GetRandomControl(). 
 	// TODO: Demagic type with enum class.
 	// TODO: Demagic colors.
-	static void HandleDragonLight(const ItemInfo& item, int type)
+	static void SpawnDragonLightEffect(const ItemInfo& item, int type)
 	{
 		switch (type)
 		{
@@ -187,38 +215,24 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	static void UpdateDragonBack(ItemInfo& frontItem)
-	{
-		auto& backItem = g_Level.Items[frontItem.ItemFlags[0]];
-
-		backItem.Status = frontItem.Status;
-		if (backItem.Status == ITEM_DEACTIVATED)
-		{
-			KillItem(backItem.Index);
-			frontItem.ItemFlags[0] = NO_ITEM;
-			return;
-		}
-
-		backItem.Pose = frontItem.Pose;
-		if (backItem.RoomNumber != frontItem.RoomNumber)
-			ItemNewRoom(backItem.Index, frontItem.RoomNumber);
-
-		// TODO: Use proper anim functions.
-		backItem.Animation.ActiveState = frontItem.Animation.ActiveState;
-		backItem.Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (frontItem.Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
-		backItem.Animation.FrameNumber = GetAnimData(backItem).frameBase + (frontItem.Animation.FrameNumber - GetAnimData(frontItem).frameBase);
-
-		if (frontItem.ItemFlags[1] >= 0)
-			CreatureAnimation(backItem.Index, 0, 0);
-	}
-
-	void SpawnDragonFireBreath(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
+	// TODO: Smoke and sparks.
+	static void SpawnDragonFireBreath(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
 	{
 		constexpr auto FIRE_COUNT = 3;
 
 		for (int i = 0; i < FIRE_COUNT; i++)
 		{
 			auto& fire = *GetFreeParticle();
+
+			auto origin = GetJointPosition(item, bite.BoneID, Vector3i(-4, -30, -4) + bite.Position);
+			auto target = LaraItem->Pose.Position + Vector3i(0, -CLICK(1), 0);
+
+			auto dir = (target - origin).ToVector3();
+			dir.Normalize();
+			dir *= vel;
+
+			// TODO: Animate sprite.
+			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex;
 
 			fire.on = true;
 			fire.sR = 255 - (GetRandomControl() & 0x1F);
@@ -231,29 +245,17 @@ namespace TEN::Entities::Creatures::TR2
 			fire.fadeToBlack = 8;
 			fire.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-			// TODO: Animate sprite.
-			//float alpha = fmin(1, fmax(0, 1 - (fire.life / (float)fire.sLife)));
-			float alpha = 20.0f; // Not an alpha value.
-			int sprite = (int)Lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex + (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
-			fire.spriteIndex = sprite;
-
-			auto posStart = GetJointPosition(item, bite.BoneID, Vector3i(-4, -30, -4) + bite.Position);
-			auto posGoal = LaraItem->Pose.Position + Vector3i (0, -CLICK(1), 0);
-
-			auto direction = (posGoal - posStart).ToVector3();
-			direction.Normalize();
-			direction *= vel;
-
-			fire.x = (GetRandomControl() & 0x1F) + posStart.x - 16;
-			fire.y = (GetRandomControl() & 0x1F) + posStart.y - 16;
-			fire.z = (GetRandomControl() & 0x1F) + posStart.z - 16;
+			fire.x = (GetRandomControl() & 0x1F) + origin.x - 16;
+			fire.y = (GetRandomControl() & 0x1F) + origin.y - 16;
+			fire.z = (GetRandomControl() & 0x1F) + origin.z - 16;
 
 			int v = (GetRandomControl() & 0x3F) + 192;
-			fire.life = fire.sLife = v / 6;
+			fire.life =
+			fire.sLife = v / 6;
 
-			fire.xVel = v * (direction.x) / 10;
-			fire.yVel = v * (direction.y) / 10;
-			fire.zVel = v * (direction.z) / 10;
+			fire.xVel = v * (dir.x) / 10;
+			fire.yVel = v * (dir.y) / 10;
+			fire.zVel = v * (dir.z) / 10;
 
 			fire.friction = 85;
 			fire.gravity = -16 - (GetRandomControl() & 0x1F);
@@ -289,10 +291,10 @@ namespace TEN::Entities::Creatures::TR2
 			}
 			else
 			{
-				// Defeat.
+				// Temporary defeat.
 				if (dragonItem.ItemFlags[1] >= 0)
 				{
-					HandleDragonLight(dragonItem, 1);
+					SpawnDragonLightEffect(dragonItem, 1);
 					dragonItem.ItemFlags[1]++;
 
 					if (dragonItem.ItemFlags[1] == DRAGON_LIVE_TIME)
@@ -305,7 +307,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 				{
 					if (dragonItem.ItemFlags[1] > -20)
-						HandleDragonLight(dragonItem, 2);
+						SpawnDragonLightEffect(dragonItem, 2);
 
 					if (dragonItem.ItemFlags[1] == -100)
 					{
@@ -499,6 +501,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			CreatureJoint(&dragonItem, 0, headYRot);
 			CreatureAnimation(itemNumber, headingAngle, 0);
+			UpdateDragonBack(dragonItem);
 		}
 	}
 
