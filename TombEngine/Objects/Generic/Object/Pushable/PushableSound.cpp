@@ -40,6 +40,7 @@ namespace TEN::Entities::Generic
 		};
 
 		auto it = SOUND_DATA_MAP.find(material);
+		// TODO: uncomment the next line once we get actual sounds for them.
 		//return ((it != SOUND_DATA_MAP.end()) ? it->second : SOUND_DATA_DEFAULT);
 		return SOUND_DATA_DEFAULT;
 	}
