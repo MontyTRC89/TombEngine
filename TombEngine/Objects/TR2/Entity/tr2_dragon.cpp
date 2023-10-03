@@ -35,7 +35,7 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_EXPLOSION_2_TIME = DRAGON_EXPLOSION_1_TIME + 10;
 	constexpr auto DRAGON_EXPLOSION_3_TIME = DRAGON_EXPLOSION_2_TIME + 10;
 
-	constexpr auto DRAGON_SPAWN_RANGE = BLOCK(9);
+	constexpr auto TRANSFORM_SPAWN_RANGE = BLOCK(9);
 	constexpr auto DRAGON_DISTANCE_NEAR		  = 900;
 	constexpr auto DRAGON_DISTANCE_FAR		  = 2300;
 	constexpr auto DRAGON_MID		  = ((DRAGON_DISTANCE_NEAR + DRAGON_DISTANCE_FAR) / 2);
@@ -61,8 +61,8 @@ namespace TEN::Entities::Creatures::TR2
 		DRAGON_STATE_IDLE = 6,
 		DRAGON_STATE_TURN_LEFT = 7,
 		DRAGON_STATE_TURN_RIGHT = 8,
-		DRAGON_STATE_SWIPE_LEFT = 9,
-		DRAGON_STATE_SWIPE_RIGHT = 10,
+		DRAGON_STATE_SWIPE_ATTACK_LEFT = 9,
+		DRAGON_STATE_SWIPE_ATTACK_RIGHT = 10,
 		DRAGON_STATE_DEFEAT = 11
 	};
 
@@ -449,11 +449,11 @@ namespace TEN::Entities::Creatures::TR2
 
 						if (ai.angle < 0)
 						{
-							item.Animation.TargetState = DRAGON_STATE_SWIPE_LEFT;
+							item.Animation.TargetState = DRAGON_STATE_SWIPE_ATTACK_LEFT;
 						}
 						else
 						{
-							item.Animation.TargetState = DRAGON_STATE_SWIPE_RIGHT;
+							item.Animation.TargetState = DRAGON_STATE_SWIPE_ATTACK_RIGHT;
 						}
 					}
 					else if (ai.angle < 0)
@@ -472,7 +472,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case DRAGON_STATE_SWIPE_LEFT:
+			case DRAGON_STATE_SWIPE_ATTACK_LEFT:
 				if (item.TouchBits.Test(DragonSwipeAttackJointsLeft))
 				{
 					DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
@@ -481,7 +481,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case DRAGON_STATE_SWIPE_RIGHT:
+			case DRAGON_STATE_SWIPE_ATTACK_RIGHT:
 				if (item.TouchBits.Test(DragonSwipeAttackJointsRight))
 				{
 					DoDamage(creature->Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
@@ -721,8 +721,8 @@ namespace TEN::Entities::Creatures::TR2
 				KillItem(itemNumber);
 			}
 		}
-		else if (abs(LaraItem->Pose.Position.x - item.Pose.Position.x) < DRAGON_SPAWN_RANGE &&
-			abs(LaraItem->Pose.Position.z - item.Pose.Position.z) < DRAGON_SPAWN_RANGE)
+		else if (abs(LaraItem->Pose.Position.x - item.Pose.Position.x) < TRANSFORM_SPAWN_RANGE &&
+			abs(LaraItem->Pose.Position.z - item.Pose.Position.z) < TRANSFORM_SPAWN_RANGE)
 		{
 			item.Timer = 1;
 		}

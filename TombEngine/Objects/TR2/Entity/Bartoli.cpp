@@ -8,16 +8,16 @@
 #include "Objects/game_object_ids.h"
 
 // NOTES:
-// item.ItemFlags[0]: Effect counter in frame time.
-// item.ItemFlags[1]: Object ID of item to initialize. ID_DRAGON_FRONT by default.
+// item.ItemFlags[0]: Effect timer in frame time.
+// item.ItemFlags[1]: Object ID of item to transform into. Default: ID_DRAGON_FRONT.
 
 namespace TEN::Entities::Creatures::TR2
 {
-	constexpr auto DRAGON_SPAWN_RANGE = BLOCK(9);
+	constexpr auto TRANSFORM_SPAWN_RANGE = BLOCK(9);
 
-	constexpr auto DRAGON_EXPLOSION_1_TIME = 100;
-	constexpr auto DRAGON_EXPLOSION_2_TIME = 115;
-	constexpr auto DRAGON_EXPLOSION_3_TIME = 130;
+	constexpr auto TRANSFORM_EFFECT_1_TIME = 100;
+	constexpr auto TRANSFORM_EFFECT_2_TIME = 115;
+	constexpr auto TRANSFORM_EFFECT_3_TIME = 130;
 
 	void InitializeBartoli(short itemNumber)
 	{
@@ -29,83 +29,15 @@ namespace TEN::Entities::Creatures::TR2
 			item.Status = ITEM_INVISIBLE;
 	}
 
-	void ControlBartoli(short itemNumber)
-	{
-		auto& item = g_Level.Items[itemNumber];
-		
-		if (item.Animation.FrameNumber == 0)
-		{
-			// Activate when within player's range.
-			if (item.TriggerFlags == 0)
-			{
-				float distFromPlayer = Vector3i::Distance(LaraItem->Pose.Position, item.Pose.Position);
-				if (distFromPlayer > DRAGON_SPAWN_RANGE)
-					return;
-			}
-			// Activate via trigger.
-			else
-			{
-				if (!TriggerActive(&item))
-					return;
-			}
-
-			item.ItemFlags[1] = ID_DRAGON_FRONT;
-		}
-		
-		AnimateItem(&item);
-
-		short& effectCounter = item.ItemFlags[0];
-		effectCounter++;
-			
-		if ((effectCounter & 7) == 0)
-			Camera.bounce = item.Timer;
-
-		TriggerDynamicLight(
-			item.Pose.Position.x, item.Pose.Position.y - CLICK(1), item.Pose.Position.z,
-			(GetRandomControl() & 75) + 25,
-			(GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 100, (GetRandomControl() & 20) + 50);
-		
-		if (effectCounter == DRAGON_EXPLOSION_1_TIME)
-		{
-			SpawnDragonExplosion(item, ID_SPHERE_OF_DOOM);
-		}
-		if (effectCounter == DRAGON_EXPLOSION_2_TIME)
-		{
-			SpawnDragonExplosion(item, ID_SPHERE_OF_DOOM2);
-		}
-		if (effectCounter == DRAGON_EXPLOSION_3_TIME)
-		{
-			SpawnDragonExplosion(item, ID_SPHERE_OF_DOOM3);
-			KillItem(itemNumber);
-
-			// TODO: Spawn dragon.
-			short enemyItemNumber = CreateItem();
-			if (enemyItemNumber == NO_ITEM)
-				return;
-
-			auto& enemyItem = g_Level.Items[enemyItemNumber];
-
-			enemyItem.ObjectNumber = (GAME_OBJECT_ID)item.ItemFlags[1];
-			enemyItem.Pose = item.Pose;
-			enemyItem.RoomNumber = item.RoomNumber;
-			enemyItem.Model.Color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
-			auto& enemyObject = Objects[enemyItem.ObjectNumber];
-		
-			InitializeItem(enemyItemNumber);
-			AddActiveItem(enemyItemNumber);
-		}
-	}
-
-	void SpawnDragonExplosion(const ItemInfo& originItem, GAME_OBJECT_ID objectID)
+	static void SpawnBartoliTransformEffect(const ItemInfo& item, GAME_OBJECT_ID objectID)
 	{
 		int expItemNumber = CreateItem();
 		auto& expItem = g_Level.Items[expItemNumber];
-		
+
 		expItem.ObjectNumber = objectID;
-		expItem.Pose.Position = originItem.Pose.Position + Vector3i(0, CLICK(1), 0);
-		expItem.RoomNumber = originItem.RoomNumber;
-		expItem.Model.Color = originItem.Model.Color;
+		expItem.Pose.Position = item.Pose.Position + Vector3i(0, CLICK(1), 0);
+		expItem.RoomNumber = item.RoomNumber;
+		expItem.Model.Color = item.Model.Color;
 
 		InitializeItem(expItemNumber);
 		AddActiveItem(expItemNumber);
@@ -115,20 +47,94 @@ namespace TEN::Entities::Creatures::TR2
 		expItem.Status = ITEM_ACTIVE;
 	}
 
-	void ControlDragonExplosion(int itemNumber)
+	void ControlBartoli(short itemNumber)
 	{
+		auto& item = g_Level.Items[itemNumber];
+		short& effectTimer = item.ItemFlags[0];
+		short& transformObjectID = item.ItemFlags[1];
+		
+		if (item.Animation.FrameNumber == 0)
+		{
+			// Activate when within player's range.
+			if (item.TriggerFlags == 0)
+			{
+				float distFromPlayer = Vector3i::Distance(LaraItem->Pose.Position, item.Pose.Position);
+				if (distFromPlayer > TRANSFORM_SPAWN_RANGE)
+					return;
+			}
+			// Activate via trigger.
+			else
+			{
+				if (!TriggerActive(&item))
+					return;
+			}
+
+			transformObjectID = ID_DRAGON_FRONT;
+		}
+		
+		AnimateItem(&item);
+
+		effectTimer++;
+		if ((effectTimer & 7) == 0)
+			Camera.bounce = item.Timer;
+
+		// Spawn light.
+		auto lightPos = item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(1), 0.0f);
+		auto lightColor = Color(
+			Random::GenerateFloat(0.8f, 0.9f),
+			Random::GenerateFloat(0.4f, 0.5f),
+			Random::GenerateFloat(0.2f, 0.3f));
+		float lightFalloff = Random::GenerateFloat(0.1f, 0.4f);
+		SpawnDynamicLight(lightPos, lightColor, lightFalloff);
+		
+		// Handle transformation.
+		if (effectTimer == TRANSFORM_EFFECT_1_TIME)
+		{
+			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM);
+		}
+		if (effectTimer == TRANSFORM_EFFECT_2_TIME)
+		{
+			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM2);
+		}
+		if (effectTimer == TRANSFORM_EFFECT_3_TIME)
+		{
+			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM3);
+			KillItem(itemNumber);
+
+			int transformItemNumber = CreateItem();
+			if (transformItemNumber == NO_ITEM)
+				return;
+
+			auto& transformItem = g_Level.Items[transformItemNumber];
+
+			transformItem.ObjectNumber = (GAME_OBJECT_ID)transformObjectID;
+			transformItem.Pose = item.Pose;
+			transformItem.RoomNumber = item.RoomNumber;
+			transformItem.Model.Color = Vector4::One;
+
+			InitializeItem(transformItemNumber);
+			AddActiveItem(transformItemNumber);
+		}
+	}
+
+	void ControlBartoliTransformEffect(int itemNumber)
+	{
+		constexpr auto SCALE_RATE		   = Vector3(0.4f);
+		constexpr auto OPACITY_CHANGE_RATE = 0.05f;
+
 		auto& item = g_Level.Items[itemNumber];
 
 		// Expand over time.
 		if (item.Timer > 0)
 		{
 			item.Timer--;
+
 			if (!item.Model.Mutators.empty())
-				item.Model.Mutators[0].Scale += Vector3(0.4f);
+				item.Model.Mutators[0].Scale += SCALE_RATE;
 		}
 		else
 		{
-			item.Model.Color.w -= 0.05f;
+			item.Model.Color.w -= OPACITY_CHANGE_RATE;
 			if (item.Model.Color.w <= 0.0f)
 				KillItem(itemNumber);
 		}

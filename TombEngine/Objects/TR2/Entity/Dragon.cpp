@@ -16,7 +16,7 @@ using namespace TEN::Math;
 
 // NOTES:
 // item.ItemFlags[0]: Back segment item number.
-// frameCounter: Frame counter for temporary defeat and death.
+// item.ItemFlags[1]: Timer for temporary defeat and death in frame time.
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -60,8 +60,8 @@ namespace TEN::Entities::Creatures::TR2
 		DRAGON_STATE_IDLE = 6,
 		DRAGON_STATE_TURN_LEFT = 7,
 		DRAGON_STATE_TURN_RIGHT = 8,
-		DRAGON_STATE_SWIPE_LEFT = 9,
-		DRAGON_STATE_SWIPE_RIGHT = 10,
+		DRAGON_STATE_SWIPE_ATTACK_LEFT = 9,
+		DRAGON_STATE_SWIPE_ATTACK_RIGHT = 10,
 		DRAGON_STATE_DEFEAT = 11
 	};
 
@@ -98,7 +98,7 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		const auto& frontItem = g_Level.Items[frontItemNumber];
 
-		short backItemNumber = frontItem.ItemFlags[0];
+		int backItemNumber = frontItem.ItemFlags[0];
 		const auto& backItem = g_Level.Items[backItemNumber];
 
 		int frontBoneItemNumber = CreateItem();
@@ -149,7 +149,7 @@ namespace TEN::Entities::Creatures::TR2
 		backItem.MeshBits.Clear(DragonBackSpineJoints); // TODO: Check what this is.
 		InitializeItem(backItem.Index);
 
-		// Store ID of back segment item number.
+		// Store item number of back segment.
 		item.ItemFlags[0] = backItemNumber;
 	}
 
@@ -165,15 +165,17 @@ namespace TEN::Entities::Creatures::TR2
 		InitializeDragonBack(item);
 	}
 
-	static void UpdateDragonBack(ItemInfo& item)
+	static void SyncDragonBackSegment(ItemInfo& item)
 	{
-		auto& backItem = g_Level.Items[item.ItemFlags[0]];
+		short& backItemNumber = item.ItemFlags[0];
+		auto& backItem = g_Level.Items[backItemNumber];
 
+		// Sync destruction.
 		backItem.Status = item.Status;
 		if (backItem.Status == ITEM_DEACTIVATED)
 		{
 			KillItem(backItem.Index);
-			item.ItemFlags[0] = NO_ITEM;
+			backItemNumber = NO_ITEM;
 			return;
 		}
 
@@ -188,8 +190,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	static void SpawnDragonLightEffect(const ItemInfo& item, DragonLightEffectType type)
 	{
-		auto pos = item.Pose.Position.ToVector3();
-		pos.y -= CLICK(1);
+		auto pos = item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(1), 0.0f);
 
 		switch (type)
 		{
@@ -287,7 +288,7 @@ namespace TEN::Entities::Creatures::TR2
 		
 		auto& item = g_Level.Items[itemNumber];
 		auto& creature = *GetCreatureInfo(&item);
-		auto& frameCounter = item.ItemFlags[1];
+		auto& timer = item.ItemFlags[1];
 
 		short headingAngle = 0;
 		short headYRot = 0;
@@ -299,44 +300,44 @@ namespace TEN::Entities::Creatures::TR2
 			if (item.Animation.ActiveState != DRAGON_STATE_DEFEAT)
 			{
 				SetAnimation(item, DRAGON_ANIM_DEATH);
-				frameCounter = 0;
+				timer = 0;
 			}
 			else
 			{
 				// Temporary defeat.
-				if (frameCounter >= 0)
+				if (timer >= 0)
 				{
 					SpawnDragonLightEffect(item, DragonLightEffectType::Yellow);
-					frameCounter++;
+					timer++;
 
-					if (frameCounter == DRAGON_LIVE_TIME)
+					if (timer == DRAGON_LIVE_TIME)
 						item.Animation.TargetState = DRAGON_STATE_IDLE;
 
-					if (frameCounter == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
+					if (timer == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 						item.HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
 				}
 				// Death.
 				else
 				{
-					if (frameCounter > -20)
+					if (timer > -20)
 						SpawnDragonLightEffect(item, DragonLightEffectType::Red);
 
-					if (frameCounter == -100)
+					if (timer == -100)
 					{
 						InitializeDragonBones (itemNumber);
 					}
-					else if (frameCounter == -200)
+					else if (timer == -200)
 					{
 						DisableEntityAI(itemNumber);
 						KillItem(itemNumber);
 						item.Status = ITEM_DEACTIVATED;
 					}
-					else if (frameCounter < -100)
+					else if (timer < -100)
 					{
 						item.Pose.Position.y += 10;
 					}
 
-					frameCounter--;
+					timer--;
 				}
 			}
 		}
@@ -351,7 +352,6 @@ namespace TEN::Entities::Creatures::TR2
 
 			isTargetAhead = (ai.ahead && ai.distance > DRAGON_NEAR_RANGE && ai.distance < DRAGON_IDLE_RANGE);
 
-			// Contact damage.
 			if (item.TouchBits.TestAny())
 				DoDamage(creature.Enemy, DRAGON_CONTACT_DAMAGE);
 
@@ -372,11 +372,11 @@ namespace TEN::Entities::Creatures::TR2
 
 						if (ai.angle < 0)
 						{
-							item.Animation.TargetState = DRAGON_STATE_SWIPE_LEFT;
+							item.Animation.TargetState = DRAGON_STATE_SWIPE_ATTACK_LEFT;
 						}
 						else
 						{
-							item.Animation.TargetState = DRAGON_STATE_SWIPE_RIGHT;
+							item.Animation.TargetState = DRAGON_STATE_SWIPE_ATTACK_RIGHT;
 						}
 					}
 					else if (ai.angle < 0)
@@ -395,7 +395,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case DRAGON_STATE_SWIPE_LEFT:
+			case DRAGON_STATE_SWIPE_ATTACK_LEFT:
 				if (item.TouchBits.Test(DragonSwipeAttackJointsLeft))
 				{
 					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
@@ -404,7 +404,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case DRAGON_STATE_SWIPE_RIGHT:
+			case DRAGON_STATE_SWIPE_ATTACK_RIGHT:
 				if (item.TouchBits.Test(DragonSwipeAttackJointsRight))
 				{
 					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
@@ -463,7 +463,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case DRAGON_STATE_TURN_RIGHT:
-				item.Pose.Orientation.y += (ANGLE(1.0f) - headingAngle);
+				item.Pose.Orientation.y += ANGLE(1.0f) - headingAngle;
 				creature.Flags = 0;
 				break;
 
@@ -509,19 +509,19 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		if (frameCounter >= 0)
+		if (timer >= 0)
 		{
 			CreatureJoint(&item, 0, headYRot);
 			CreatureAnimation(itemNumber, headingAngle, 0);
 		}
-		UpdateDragonBack(item);
+
+		SyncDragonBackSegment(item);
 	}
 
 	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
-		int backItemNumber = item.ItemFlags[0];
+		short& backItemNumber = item.ItemFlags[0];
 		auto& backItem = g_Level.Items[backItemNumber];
 
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
@@ -568,39 +568,36 @@ namespace TEN::Entities::Creatures::TR2
 					angle > (ANGLE(45.0f) - ANGLE(30.0f)) &&
 					angle < (ANGLE(45.0f) + ANGLE(30.0f)))
 				{
-					/*
-					// TODO: Reimplement the Dagger Pickup animation when the transition from ID_LARA_EXTRA_ANIMS to ID_LARA get solved
-					SetAnimation(*playerItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
+					SetAnimation(*playerItem, LA_BUTTON_SMALL_PUSH);
+					AnimateItem(LaraItem);
+
+					// TODO: Reimplement dagger pickup animation when state transitions
+					// from ID_LARA_EXTRA_ANIMS to ID_LARA are possible. -- Adngel 2023.10.03
+					/*SetAnimation(*playerItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
 					playerItem->Pose = item.Pose;
 					playerItem->Animation.IsAirborne = false;
 					playerItem->Animation.Velocity.y = 0.0f;
 					playerItem->Animation.Velocity.z = 0.0f;
 
 					if (item.RoomNumber != playerItem->RoomNumber)
-						ItemNewRoom(playerItem->Index, item.RoomNumber);
-					*/
-
-					SetAnimation(*playerItem, LA_BUTTON_SMALL_PUSH);
-					AnimateItem(LaraItem);
-
-					/*
-					// TODO: Review, This code was used with the old Dagger Pickup method
-					Lara.ExtraAnim = 1;
+						ItemNewRoom(playerItem->Index, item.RoomNumber);*/
+					
+					// TODO: Check. This code was used in old dagger pickup method.
+					/*Lara.ExtraAnim = 1;
 					Lara.Control.HandStatus = HandStatus::Busy;
 					Lara.HitDirection = -1;
-					*/
-
-					//playerItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;
+					
+					playerItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;*/
 
 					if (item.ObjectNumber == ID_DRAGON_FRONT)
 					{
-						item.ItemFlags[1] = -1;
+						backItemNumber = NO_ITEM;
 					}
 					else if (item.ObjectNumber == ID_DRAGON_BACK)
 					{
 						auto frontItemNumber = item.NextItem;
 						auto& frontPart = g_Level.Items[frontItemNumber];
-						frontPart.ItemFlags[1] = -1;
+						backItemNumber = NO_ITEM;
 					}
 						
 					return;
@@ -615,11 +612,9 @@ namespace TEN::Entities::Creatures::TR2
 					shift = DRAGON_DISTANCE_FAR - shift;
 				}
 
-				/*
-				// TODO: Review, This code was used with the old Dagger Pickup method
-				laraItem->Pose.Position.x += shift * cosY;
-				laraItem->Pose.Position.z -= shift * sinY;
-				*/
+				// TODO: Check. This code was used in old dagger pickup method.
+				/*laraItem->Pose.Position.x += shift * cosY;
+				laraItem->Pose.Position.z -= shift * sinY;*/
 
 				return;
 			}
