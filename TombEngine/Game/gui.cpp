@@ -181,7 +181,7 @@ namespace TEN::Gui
 			return false;
 
 		// Avoid Select or Action release interference when entering inventory.
-		if (GetActionTimeActive(In::Select) < TimeInMenu || GetActionTimeActive(In::Action) < TimeInMenu)
+		if (GetActionTimeActive(In::Select) < TimeInMenu && GetActionTimeActive(In::Action) < TimeInMenu)
 			return true;
 
 		return false;
@@ -2710,7 +2710,7 @@ namespace TEN::Gui
 
 					if (AmmoObjectList[n].Amount == -1)
 					{
-						sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
+						sprintf(&invTextBuffer[0], g_GameFlow->GetString(STRING_UNLIMITED), g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 					}
 					else
 					{
@@ -3033,7 +3033,7 @@ namespace TEN::Gui
 						{
 							if (numItems == -1)
 							{
-								sprintf(textBuffer, "Unlimited %s", g_GameFlow->GetString(invObject.ObjectName));
+								sprintf(textBuffer, g_GameFlow->GetString(STRING_UNLIMITED), g_GameFlow->GetString(invObject.ObjectName));
 							}
 							else
 							{

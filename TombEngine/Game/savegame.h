@@ -60,5 +60,5 @@ public:
 	static void LoadSavegameInfos();
 	static void Delete(int slot);
 
-	static bool DoesSaveGameExist(int slot);
+	static bool DoesSaveGameExist(int slot, bool silent = false);
 };
