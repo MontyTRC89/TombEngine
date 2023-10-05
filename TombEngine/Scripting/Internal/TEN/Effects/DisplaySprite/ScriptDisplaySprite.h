@@ -35,6 +35,6 @@ public:
 						sol::optional<ScriptColor> color);
 
 	// Utilities
-	void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode, sol::optional<DisplaySpriteScaleMode> scaleMode,
-			  sol::optional<BLEND_MODES> blendMode);
+	void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
+			  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode);
 };

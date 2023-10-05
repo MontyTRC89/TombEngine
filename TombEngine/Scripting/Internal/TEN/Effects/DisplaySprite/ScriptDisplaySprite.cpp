@@ -22,7 +22,31 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 		ctors(),
 		sol::call_constructor, ctors(),
 
-		ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
+		ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw,
+
+		/// (int) ID of the sprite object.
+		//@mem ObjectID
+		"ObjectID", &ScriptDisplaySprite::ObjectID,
+
+		/// (int) ID of the display sprite in the sprite object.
+		//@mem SpriteID
+		"SpriteID", &ScriptDisplaySprite::SpriteID,
+		
+		/// (Vec2) Display position of the display sprite.
+		//@mem Position
+		"Position", &ScriptDisplaySprite::Position,
+		
+		/// (float) Rotation of the display sprite in degrees.
+		//@mem Rotation
+		"Rotation", &ScriptDisplaySprite::Rotation,
+		
+		/// (Vec2) Horizontal and vertical scale of the display sprite.
+		//@mem Scale
+		"Scale", &ScriptDisplaySprite::Scale,
+		
+		/// (Color) Color of the display sprite.
+		//@mem Color
+		"Color", &ScriptDisplaySprite::Color);
 
 	// TODO: How???
 	/*auto tableDisplaySprite = sol::table(state->lua_state(), sol::create);
@@ -34,12 +58,12 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 }
 
 /*** 
-@int objectID Sprite object ID.
-@int spriteID Sprite ID inside the sprite object.
+@int objectID ID of the sprite object.
+@int spriteID ID of the display sprite in the sprite object.
 @Vec2 pos Display position of the display sprite.
-@float rot Rotation of the sprite in degrees.
-@Vec2 scale Horizontal and vertical scale of the sprite.
-@Color color[opt] Color of the sprite. __Default: Color(255, 255, 255, 255)__
+@float rot Rotation of the display sprite in degrees.
+@Vec2 scale Horizontal and vertical scale of the display sprite.
+@Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
 @function Vec3
 */
 ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
