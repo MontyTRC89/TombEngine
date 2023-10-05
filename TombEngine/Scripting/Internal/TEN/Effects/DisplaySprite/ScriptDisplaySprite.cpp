@@ -72,7 +72,7 @@ void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<Displa
 
 	// Sprite missing or sequence not found; return early.
 	const auto& object = Objects[ObjectID];
-	if (!object.loaded || SpriteIndex >= object.nmeshes)
+	if (!object.loaded || SpriteIndex >= abs(object.nmeshes))
 	{
 		TENLog(
 			"Attempted to draw missing display sprite " + std::to_string(SpriteIndex) +
