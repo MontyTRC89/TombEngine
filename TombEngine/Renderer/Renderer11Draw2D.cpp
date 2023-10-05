@@ -628,7 +628,7 @@ namespace TEN::Renderer
 
 		for (const auto& displaySprite : DisplaySprites)
 		{
-			auto& texture = m_sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteIndex];
+			auto& texture = m_sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
 
 			// Calculate sprite aspect ratio.
 			float spriteAspect = (float)texture.Width / (float)texture.Height;
@@ -726,9 +726,11 @@ namespace TEN::Renderer
 			renderView.DisplaySpritesToDraw.begin(), renderView.DisplaySpritesToDraw.end(),
 			[](const RendererDisplaySpriteToDraw& spriteToDraw0, const RendererDisplaySpriteToDraw& spriteToDraw1)
 			{
+				// Same priority; sort by blend mode.
 				if (spriteToDraw0.Priority == spriteToDraw1.Priority)
 					return (spriteToDraw0.BlendMode < spriteToDraw1.BlendMode);
 
+				// Sort by priority.
 				return (spriteToDraw0.Priority < spriteToDraw1.Priority);
 			});
 	}

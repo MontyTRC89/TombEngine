@@ -26,8 +26,8 @@ namespace TEN::Effects::DisplaySprite
 	
 	struct DisplaySprite
 	{
-		GAME_OBJECT_ID ObjectID	   = ID_DEFAULT_SPRITES;
-		int			   SpriteIndex = 0;
+		GAME_OBJECT_ID ObjectID = ID_DEFAULT_SPRITES;
+		int			   SpriteID = 0;
 
 		Vector2 Position	= Vector2::Zero;
 		short	Orientation = 0;
@@ -42,7 +42,7 @@ namespace TEN::Effects::DisplaySprite
 
 	extern std::vector<DisplaySprite> DisplaySprites;
 	
-	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
+	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
 						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode);
 	void ClearDisplaySprites();
 }

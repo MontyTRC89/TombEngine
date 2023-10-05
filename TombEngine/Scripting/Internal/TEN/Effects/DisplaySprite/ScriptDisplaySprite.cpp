@@ -24,10 +24,10 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 
 		/*** Draw the display sprite in display space for the current frame.
 		@function DisplaySprite:Draw
-		@tparam int[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. Default is 0.
-		@tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. Default is DisplaySprite.AlignMode.CENTER.
-		@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. Default is DisplaySprite.ScaleMode.FIT.
-		@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. Default is Effects.BlendID.ALPHABLEND.
+		@tparam int[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. __Default: 0__
+		@tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. __Default: DisplaySprite.AlignMode.CENTER__
+		@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. __Default: DisplaySprite.ScaleMode.FIT__
+		@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. __Default: Effects.BlendID.ALPHABLEND__
 		*/
 		ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
 
@@ -40,11 +40,11 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 	handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteScaleMode, DISPLAY_SPRITE_SCALE_MODES);*/
 }
 
-ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, float rot, const Vec2& scale,
+ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
 										 const ScriptColor& color)
 {
 	ObjectID = objectID;
-	SpriteIndex = spriteIndex;
+	SpriteID = spriteID;
 	Position = pos;
 	Rotation = rot;
 	Scale = scale;
@@ -72,10 +72,10 @@ void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<Displa
 
 	// Sprite missing or sequence not found; return early.
 	const auto& object = Objects[ObjectID];
-	if (!object.loaded || SpriteIndex >= abs(object.nmeshes))
+	if (!object.loaded || SpriteID >= abs(object.nmeshes))
 	{
 		TENLog(
-			"Attempted to draw missing display sprite " + std::to_string(SpriteIndex) +
+			"Attempted to draw missing display sprite " + std::to_string(SpriteID) +
 			" from sprite object " + std::to_string(ObjectID),
 			LogLevel::Warning);
 		return;
@@ -87,7 +87,7 @@ void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<Displa
 	auto convertedColor = Vector4(Color.GetR(), Color.GetG(), Color.GetB(), Color.GetA()) / UCHAR_MAX;
 
 	AddDisplaySprite(
-		ObjectID, SpriteIndex,
+		ObjectID, SpriteID,
 		convertedPos, convertedRot, convertedScale, convertedColor,
 		priority.value_or(DEFAULT_PRIORITY),
 		alignMode.value_or(DEFAULT_ALIGN_MODE),
