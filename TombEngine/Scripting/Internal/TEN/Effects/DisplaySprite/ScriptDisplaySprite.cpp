@@ -22,13 +22,6 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 		ctors(),
 		sol::call_constructor, ctors(),
 
-		/*** Draw the display sprite in display space for the current frame.
-		@function DisplaySprite:Draw
-		@tparam int[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. __Default: 0__
-		@tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. __Default: DisplaySprite.AlignMode.CENTER__
-		@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. __Default: DisplaySprite.ScaleMode.FIT__
-		@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. __Default: Effects.BlendID.ALPHABLEND__
-		*/
 		ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
 
 	// TODO: How???
@@ -40,17 +33,35 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 	handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteScaleMode, DISPLAY_SPRITE_SCALE_MODES);*/
 }
 
+/*** 
+@int objectID Sprite object ID.
+@int spriteID Sprite ID inside the sprite object.
+@Vec2 pos Display position of the display sprite.
+@float rot Rotation of the sprite in degrees.
+@Vec2 scale Horizontal and vertical scale of the sprite.
+@Color color[opt] Color of the sprite. __Default: Color(255, 255, 255, 255)__
+@function Vec3
+*/
 ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
-										 const ScriptColor& color)
+										 sol::optional<ScriptColor> color)
 {
+	static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255, 255);
+
 	ObjectID = objectID;
 	SpriteID = spriteID;
 	Position = pos;
 	Rotation = rot;
 	Scale = scale;
-	Color = color;
+	Color = color.value_or(DEFAULT_COLOR);
 }
 
+/*** Draw the display sprite in display space for the current frame.
+@function DisplaySprite:Draw
+@tparam int[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. __Default: 0__
+@tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. __Default: DisplaySprite.AlignMode.CENTER__
+@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. __Default: DisplaySprite.ScaleMode.FIT__
+@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. __Default: Effects.BlendID.ALPHABLEND__
+*/
 void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
 							   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
 {
