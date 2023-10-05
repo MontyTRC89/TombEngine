@@ -9,6 +9,7 @@
 #include "Scripting/Internal/TEN/Misc/Miscellaneous.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Strings/StringsHandler.h"
+#include "Scripting/Internal/TEN/Sound/SoundHandler.h"
 
 static sol::state s_solState;
 static sol::table s_rootTable;
@@ -51,5 +52,6 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 	// Misc. handlers not assigned above.
 	InventoryHandler::Register(&s_solState, s_rootTable);
 	Misc::Register(&s_solState, s_rootTable);
+	Sound::Register(&s_solState, s_rootTable);
 	Effects::Register(&s_solState, s_rootTable);
 }
