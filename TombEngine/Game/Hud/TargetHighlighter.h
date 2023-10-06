@@ -4,12 +4,8 @@ struct ItemInfo;
 
 namespace TEN::Hud
 {
-	struct CrosshairData
+	class CrosshairData
 	{
-		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.2f, 0.2f, 0.9f);
-		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 0.5f);
-		static constexpr auto SEGMENT_COUNT = 4;
-
 	private:
 		struct SegmentData
 		{
@@ -18,12 +14,18 @@ namespace TEN::Hud
 		};
 
 	public:
+		// Constants
+		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.2f, 0.2f, 0.9f);
+		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+		static constexpr auto SEGMENT_COUNT = 4;
+
+		// Members
 		bool IsActive  = false;
 		bool IsPrimary = false;
 
-		Vector2 Position	= Vector2::Zero;
+		std::optional<Vector2> Position	= std::nullopt;
 		short	Orientation = 0;
-		float	Size		= 0.0f;
+		float	Scale		= 0.0f;
 		Vector4 Color		= Vector4::Zero;
 		Vector4 ColorTarget = Vector4::Zero;
 
@@ -32,14 +34,21 @@ namespace TEN::Hud
 
 		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
-		bool	IsOffscreen() const;
-		float	GetSize(float cameraDist) const;
+		// Getters
+		float	GetScale(float cameraDist) const;
 		float	GetRadius() const;
 		Vector2 GetPositionOffset(short orientOffset) const;
 
+		// Setters
 		void SetPrimary();
 		void SetPeripheral();
+		
+		// Inquirers
+		bool IsOffscreen() const;
+
+		// Utilities
 		void Update(const Vector3& targetPos, bool doPulse, bool isActive);
+		void Draw() const;
 	};
 
 	class TargetHighlighterController

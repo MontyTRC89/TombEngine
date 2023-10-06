@@ -18,30 +18,19 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
 {
-	// TODO: Not working?
-	bool CrosshairData::IsOffscreen() const
+	float CrosshairData::GetScale(float cameraDist) const
 	{
-		float screenEdgeThreshold = GetRadius();
-
-		return (Position.x <= -screenEdgeThreshold ||
-				Position.y <= -screenEdgeThreshold ||
-				Position.x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
-				Position.y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
-	}
-
-	float CrosshairData::GetSize(float cameraDist) const
-	{
-		constexpr auto RANGE			  = BLOCK(10);
-		constexpr auto CROSSHAIR_SIZE_MAX = SCREEN_SPACE_RES.y * 0.15f;
-		constexpr auto CROSSHAIR_SIZE_MIN = CROSSHAIR_SIZE_MAX / 3;
+		constexpr auto RANGE			   = BLOCK(10);
+		constexpr auto CROSSHAIR_SCALE_MAX = 0.15f;
+		constexpr auto CROSSHAIR_SCALE_MIN = CROSSHAIR_SCALE_MAX / 3;
 
 		auto alpha = cameraDist / RANGE;
-		return Lerp(CROSSHAIR_SIZE_MAX, CROSSHAIR_SIZE_MIN, alpha);
+		return Lerp(CROSSHAIR_SCALE_MAX, CROSSHAIR_SCALE_MIN, alpha);
 	}
 
 	float CrosshairData::GetRadius() const
 	{
-		return ((Size / 2) * (RadiusScale * PulseScale));
+		return (((SCREEN_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale));
 	}
 
 	Vector2 CrosshairData::GetPositionOffset(short orientOffset) const
@@ -50,7 +39,7 @@ namespace TEN::Hud
 
 		float offsetDist = GetRadius();
 		auto relPosOffset = Vector2(offsetDist, 0.0f);
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(Orientation + orientOffset + ANGLE_OFFSET));
+		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD((Orientation + orientOffset) + ANGLE_OFFSET));
 
 		auto posOffset = Vector2::Transform(relPosOffset, rotMatrix);
 		return GetAspectCorrect2DPosition(posOffset);
@@ -68,13 +57,25 @@ namespace TEN::Hud
 		ColorTarget = COLOR_GRAY;
 	}
 
+	bool CrosshairData::IsOffscreen() const
+	{
+		if (!Position.has_value())
+			return true;
+
+		// TODO: Not working?
+		float screenEdgeThreshold = GetRadius();
+		return (Position->x <= -screenEdgeThreshold ||
+				Position->y <= -screenEdgeThreshold ||
+				Position->x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
+				Position->y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
+	}
+
 	void CrosshairData::Update(const Vector3& targetPos, bool doPulse, bool isActive)
 	{
-		constexpr auto INVALID_POS			   = Vector2(FLT_MAX);
 		constexpr auto ROT					   = ANGLE(2.0f);
 		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
-		constexpr auto SIZE_SCALE_PRIMARY	   = 1.0f;
-		constexpr auto SIZE_SCALE_PERIPHERAL   = 0.75f;
+		constexpr auto SCALE_PRIMARY		   = 1.0f;
+		constexpr auto SCALE_PERIPHERAL		   = 0.75f;
 		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f * SQRT_2;
 		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f * SQRT_2;
 		constexpr auto PULSE_SCALE_MAX		   = 1.3f;
@@ -86,8 +87,7 @@ namespace TEN::Hud
 		IsActive = isActive;
 
 		// Update position.
-		auto pos = g_Renderer.Get2DPosition(targetPos);
-		Position = pos.value_or(INVALID_POS);
+		Position = g_Renderer.Get2DPosition(targetPos);
 
 		// Update orientation.
 		if (IsPrimary)
@@ -100,17 +100,17 @@ namespace TEN::Hud
 			Orientation = (short)round(Lerp(Orientation, closestAlignAngle, ORIENT_LERP_ALPHA));
 		}
 
-		// Update size.
+		// Update scale.
 		if (IsActive)
 		{
 			float cameraDist = Vector3::Distance(Camera.pos.ToVector3(), targetPos);
-			float sizeTarget = GetSize(cameraDist) * (IsPrimary ? SIZE_SCALE_PRIMARY : SIZE_SCALE_PERIPHERAL);
+			float scaleTarget = GetScale(cameraDist) * (IsPrimary ? SCALE_PRIMARY : SCALE_PERIPHERAL);
 
-			Size = Lerp(Size, sizeTarget, MORPH_LERP_ALPHA);
+			Scale = Lerp(Scale, scaleTarget, MORPH_LERP_ALPHA);
 		}
 		else
 		{
-			Size = Lerp(Size, 0.0f, MORPH_LERP_ALPHA / 2);
+			Scale = Lerp(Scale, 0.0f, MORPH_LERP_ALPHA / 2);
 		}
 
 		// Update color.
@@ -134,6 +134,39 @@ namespace TEN::Hud
 		// Update segments.
 		for (auto& segment : Segments)
 			segment.PosOffset = GetPositionOffset(segment.OrientOffset);
+	}
+
+	void CrosshairData::Draw() const
+	{
+		constexpr auto SPRITE_SEQUENCE_OBJECT_ID = ID_CROSSHAIR;
+		constexpr auto STATIC_ELEMENT_SPRITE_ID	 = 0;
+		constexpr auto SEGMENT_ELEMENT_SPRITE_ID = 1;
+		constexpr auto PRIORITY					 = 0; // TODO: Check later. May interfere with Lua display sprites. -- Sezz 2023.10.06
+		constexpr auto ALIGN_MODE				 = DisplaySpriteAlignMode::Center;
+		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
+		constexpr auto BLEND_MODE				 = BLEND_MODES::BLENDMODE_ALPHABLEND;
+
+		if (IsOffscreen())
+			return;
+
+		// Draw main static element.
+		AddDisplaySprite(
+			SPRITE_SEQUENCE_OBJECT_ID, STATIC_ELEMENT_SPRITE_ID,
+			*Position, Orientation, Vector2(Scale), Color,
+			PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE);
+
+		// Draw animated outer segment elements.
+		for (const auto& segment : Segments)
+		{
+			auto pos = *Position + segment.PosOffset;
+			short orient = Orientation + segment.OrientOffset;
+			auto scale = Vector2(Scale / 2);
+
+			AddDisplaySprite(
+				SPRITE_SEQUENCE_OBJECT_ID, SEGMENT_ELEMENT_SPRITE_ID,
+				pos, orient, scale, Color,
+				PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE);
+		}
 	}
 
 	void TargetHighlighterController::Update(const ItemInfo& playerItem)
@@ -183,38 +216,13 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Draw() const
 	{
-		constexpr auto CROSSHAIR_SPRITE_STATIC_ELEMENT_INDEX  = 0;
-		constexpr auto CROSSHAIR_SPRITE_SEGMENT_ELEMENT_INDEX = 1;
-
 		DrawDebug();
 
 		if (Crosshairs.empty())
 			return;
 
 		for (const auto& [itemNumber, crosshair] : Crosshairs)
-		{
-			if (crosshair.IsOffscreen())
-				continue;
-
-			AddDisplaySprite(
-				ID_CROSSHAIR, CROSSHAIR_SPRITE_STATIC_ELEMENT_INDEX,
-				crosshair.Position, crosshair.Orientation, Vector2(crosshair.Size), crosshair.Color,
-				0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
-
-			if (crosshair.RadiusScale > EPSILON)
-			{
-				for (const auto& segment : crosshair.Segments)
-				{
-					short orient = crosshair.Orientation + segment.OrientOffset;
-					auto scale = Vector2(crosshair.Size / 2);
-
-					AddDisplaySprite(
-						ID_CROSSHAIR, CROSSHAIR_SPRITE_SEGMENT_ELEMENT_INDEX,
-						crosshair.Position + segment.PosOffset, orient, scale, crosshair.Color,
-						0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
-				}
-			}
-		}
+			crosshair.Draw();
 	}
 
 	void TargetHighlighterController::Clear()
@@ -271,20 +279,20 @@ namespace TEN::Hud
 
 	CrosshairData& TargetHighlighterController::GetNewCrosshair(int itemNumber)
 	{
-		constexpr auto COUNT_MAX = 16;
+		constexpr auto CROSSHAIR_COUNT_MAX = 16;
 
 		// Map is full; clear smallest crosshair.
-		if (Crosshairs.size() >= COUNT_MAX)
+		if (Crosshairs.size() >= CROSSHAIR_COUNT_MAX)
 		{
 			int key = 0;
-			float smallestSize = INFINITY;
+			float smallestScale = INFINITY;
 			
 			for (auto& [itemNumber, crosshair] : Crosshairs)
 			{
-				if (crosshair.Size < smallestSize)
+				if (crosshair.Scale < smallestScale)
 				{
 					key = itemNumber;
-					smallestSize = crosshair.Size;
+					smallestScale = crosshair.Scale;
 				}
 			}
 
@@ -301,7 +309,7 @@ namespace TEN::Hud
 	// TODO: If crosshair happens to be in view upon spawn, first frame is sometimes garbage.
 	void TargetHighlighterController::AddCrosshair(int itemNumber, const Vector3& targetPos)
 	{
-		constexpr auto SIZE_START		  = SCREEN_SPACE_RES.x / 2;
+		constexpr auto SCALE_START		  = 0.75f;
 		constexpr auto RADIUS_SCALE_START = 1.5f * SQRT_2;
 		constexpr auto ANGLE_STEP		  = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
 
@@ -316,7 +324,7 @@ namespace TEN::Hud
 		crosshair.IsPrimary = false;
 		crosshair.Position = *pos;
 		crosshair.Orientation = 0;
-		crosshair.Size = SIZE_START;
+		crosshair.Scale = SCALE_START;
 		crosshair.Color = CrosshairData::COLOR_GRAY;
 		crosshair.Color.w = 0.0f;
 		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
@@ -339,7 +347,7 @@ namespace TEN::Hud
 		for (auto it = Crosshairs.begin(); it != Crosshairs.end();)
 		{
 			const auto& crosshair = it->second;
-			(!crosshair.IsActive && crosshair.Size <= EPSILON) ?
+			(!crosshair.IsActive && crosshair.Scale <= EPSILON) ?
 				(it = Crosshairs.erase(it)) : ++it;
 		}
 	}
