@@ -16,25 +16,28 @@ using namespace TEN::Effects::DisplaySprite;
 // Test nested sprites in various modes and how they behave when the aspect ratio changes.
 // Check with everyone if the mySprite.Draw(blah, blah, blah) syntax is sensible.
 
-class ScriptDisplaySprite
+namespace TEN::Scripting::DisplaySprite
 {
-public:
-	static void Register(sol::table& parent);
+	class ScriptDisplaySprite
+	{
+	public:
+		static void Register(sol::table& parent);
 
-	// Members
-	GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
-	int			   SpriteID = 0;
+		// Members
+		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID = 0;
 
-	Vec2		Position = Vec2(0.0f, 0.0f);
-	float		Rotation = 0.0f;
-	Vec2		Scale	 = Vec2(0.0f, 0.0f);
-	ScriptColor Color	 = ScriptColor(255, 255, 255, 255);
+		Vec2		Position = Vec2(0.0f, 0.0f);
+		float		Rotation = 0.0f;
+		Vec2		Scale = Vec2(0.0f, 0.0f);
+		ScriptColor Color = ScriptColor(255, 255, 255, 255);
 
-	// Constructors
-	ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
-						sol::optional<ScriptColor> color);
+		// Constructors
+		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
+			sol::optional<ScriptColor> color);
 
-	// Utilities
-	void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
-			  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode);
-};
+		// Utilities
+		void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
+			sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode);
+	};
+}

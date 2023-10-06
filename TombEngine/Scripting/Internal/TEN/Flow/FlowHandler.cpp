@@ -16,6 +16,8 @@
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Scripting::DisplaySprite;
+
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
 in gameflow.lua, settings.lua and strings.lua; some can be used in level
