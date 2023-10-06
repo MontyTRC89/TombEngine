@@ -51,16 +51,6 @@ namespace TEN::Scripting::DisplaySprite
 			"Color", &ScriptDisplaySprite::Color);
 	}
 
-	void ScriptDisplaySprite::RegisterTables(sol::state* state, sol::table& parent)
-	{
-		auto table = sol::table(state->lua_state(), sol::create);
-		parent.set(ScriptReserved_DisplaySprite, table);
-
-		auto handler = LuaHandler(state);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableScaleMode, DISPLAY_SPRITE_SCALE_MODES);
-	}
-
 	/***
 	@int objectID ID of the sprite sequence object.
 	@int spriteID ID of the sprite in the sprite sequence object.

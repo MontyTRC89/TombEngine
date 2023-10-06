@@ -4,17 +4,15 @@
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
-enum BLEND_MODE;
-
 using namespace TEN::Effects::DisplaySprite;
+
+enum BLEND_MODE;
 
 // TODO:
 // Check if align modes are applied correctly.
 // Check if ScriptDisplaySprite object has been registered correctly.
-// Check if its methods have been registered correctly.
 // Register DISPLAY_SPRITE_SCALE_MODES and DISPLAY_SPRITE_ORIGIN_TYPES under the correct sub-thing.
 // Test nested sprites in various modes and how they behave when the aspect ratio changes.
-// Check with everyone if the mySprite.Draw(blah, blah, blah) syntax is sensible.
 
 namespace TEN::Scripting::DisplaySprite
 {
@@ -22,7 +20,6 @@ namespace TEN::Scripting::DisplaySprite
 	{
 	public:
 		static void Register(sol::table& parent);
-		static void RegisterTables(sol::state* state, sol::table& parent);
 
 		// Members
 		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;

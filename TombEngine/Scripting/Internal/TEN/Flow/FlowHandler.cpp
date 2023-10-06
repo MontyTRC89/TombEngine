@@ -8,6 +8,8 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
 #include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
@@ -245,6 +247,10 @@ Specify which translations in the strings table correspond to which languages.
 	Animations::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
+
+	// TODO: Register inside ScriptDisplaySprite for syntax that looks like this: DisplaySprite.AlignMode.CENTER.
+	m_handler.MakeReadOnlyTable(tableFlow, "DisplayStringAlignMode"/*ScriptReserved_DisplaySpriteTableAlignMode*/, DISPLAY_SPRITE_ALIGN_MODES);
+	m_handler.MakeReadOnlyTable(tableFlow, "DisplayStringScaleMode"/*ScriptReserved_DisplaySpriteTableScaleMode*/, DISPLAY_SPRITE_SCALE_MODES);
 	
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
