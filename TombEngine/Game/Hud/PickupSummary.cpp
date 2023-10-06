@@ -84,6 +84,10 @@ namespace TEN::Hud
 	{
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
+		// No count; return early.
+		if (count == 0)
+			return;
+
 		float life = round(DisplayPickup::LIFE_MAX * FPS);
 
 		// Increment count of existing display pickup if it exists.
@@ -95,7 +99,7 @@ namespace TEN::Hud
 
 			if (pickup.ObjectID == objectID)
 			{
-				pickup.Count++;
+				pickup.Count += count;
 				pickup.Life = life;
 				pickup.StringScalar = STRING_SCALAR_MAX;
 				return;
@@ -122,10 +126,8 @@ namespace TEN::Hud
 	{
 		// Project 3D position to 2D origin.
 		auto origin = g_Renderer.Get2DPosition(pos);
-		if (!origin.has_value())
-			origin = Vector2::Zero;
 
-		AddDisplayPickup(objectID, *origin, count);
+		AddDisplayPickup(objectID, origin.value_or(Vector2::Zero), count);
 	}
 
 	void PickupSummaryController::Update()

@@ -79,6 +79,12 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
+	/*** Enable or disable saving and loading of savegames.
+	@function EnableLoadSave
+	@tparam bool enabled true or false.
+	*/
+	tableFlow.set_function(ScriptReserved_EnableLoadSave, &FlowHandler::EnableLoadSave, this);
+
 /*** gameflow.lua or level scripts.
 @section FlowluaOrScripts
 */
@@ -127,6 +133,35 @@ level count, jumps to title.
 @int[opt] index level index (default 0)
 */
 	tableFlow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
+
+	/***
+	Save the game to a savegame slot.
+	@function SaveGame
+	@tparam int slotID ID of the savegame slot to save to.
+	*/
+	tableFlow.set_function(ScriptReserved_SaveGame, &FlowHandler::SaveGame, this);
+
+	/***
+	Load the game from a savegame slot.
+	@function LoadGame
+	@tparam int slotID ID of the savegame slot to load from.
+	*/
+	tableFlow.set_function(ScriptReserved_LoadGame, &FlowHandler::LoadGame, this);
+
+	/***
+	Delete a savegame.
+	@function DeleteSaveGame
+	@tparam int slotID ID of the savegame slot to clear.
+	*/
+	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
+
+	/***
+	Check if a savegame exists.
+	@function DoesSaveGameExist
+	@tparam int slotID ID of the savegame slot to check.
+	@treturn bool true if the savegame exists, false if not.
+	*/
+	tableFlow.set_function(ScriptReserved_DoesSaveGameExist, &FlowHandler::DoesSaveGameExist, this);
 
 /***
 Returns the player's current per-game secret count.
@@ -387,7 +422,30 @@ int FlowHandler::GetLevelNumber(const std::string& fileName)
 void FlowHandler::EndLevel(std::optional<int> nextLevel)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
-	LevelComplete = index;
+	NextLevel = index;
+}
+
+void FlowHandler::SaveGame(int slot)
+{
+	SaveGame::Save(slot);
+}
+
+void FlowHandler::LoadGame(int slot)
+{
+	if (!SaveGame::DoesSaveGameExist(slot))
+		return;
+
+	NextLevel = -(slot + 1);
+}
+
+void FlowHandler::DeleteSaveGame(int slot)
+{
+	SaveGame::Delete(slot);
+}
+
+bool FlowHandler::DoesSaveGameExist(int slot)
+{
+	return SaveGame::DoesSaveGameExist(slot, true);
 }
 
 int FlowHandler::GetSecretCount() const
@@ -470,6 +528,16 @@ void FlowHandler::EnableLaraInTitle(bool laraInTitle)
 void FlowHandler::EnableLevelSelect(bool levelSelect)
 {
 	LevelSelect = levelSelect;
+}
+
+bool FlowHandler::IsLoadSaveEnabled() const
+{
+	return LoadSave;
+}
+
+void FlowHandler::EnableLoadSave(bool loadSave)
+{
+	LoadSave = loadSave;
 }
 
 bool FlowHandler::DoFlow()
@@ -570,21 +638,22 @@ bool FlowHandler::DoFlow()
 
 			// Load level
 			CurrentLevel = header.Level;
+			NextLevel = 0;
 			GameTimer = header.Timer;
 			loadFromSavegame = true;
 			break;
 
 		case GameStatus::LevelComplete:
-			if (LevelComplete >= Levels.size())
+			if (NextLevel >= Levels.size())
 			{
 				CurrentLevel = 0; // TODO: final credits
 			}
 			else
 			{
-				CurrentLevel = LevelComplete;
+				CurrentLevel = NextLevel;
 			}
 
-			LevelComplete = 0;
+			NextLevel = 0;
 			break;
 		}
 	}

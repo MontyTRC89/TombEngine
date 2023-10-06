@@ -71,7 +71,7 @@ local strings =
 	examine = { "Examine" },
 	exit_game = { "Exit Game" },
 	exit_to_title = { "Exit to Title" },
-	general_actions = { "General Actions"},
+	general_actions = { "General Actions" },
 	high = { "High" },
 	level_secrets_found = { "Secrets Found in Level" },
 	load_game = { "Load Game" },
@@ -112,6 +112,7 @@ local strings =
 	waiting_for_input = { "Waiting For Input" },
 	window_title = { "TombEngine" },
 	windowed = { "Windowed" },
+	unlimited = { "Unlimited %s" },
 }
 
 TEN.Flow.SetStrings(strings)

@@ -72,7 +72,7 @@ namespace TEN::Entities::Creatures::TR2
 		InitializeItem(skidooItemNumber); g_Level.NumItems++;
 
 		// Register snowmobile gun for driver to control.
-		riderItem.Data = skidooItemNumber;
+		riderItem.ItemFlags[0] = skidooItemNumber;
 	}
 
 	void InitializeSkidooMan(short itemNumber)
@@ -118,17 +118,17 @@ namespace TEN::Entities::Creatures::TR2
 	void SkidooManControl(short riderItemNumber)
 	{
 		auto& riderItem = g_Level.Items[riderItemNumber];
-		if (!riderItem.Data)
+		if (!riderItem.ItemFlags[0])
 		{
 			// Create snowmobile.
 			CreateSkidooGun(riderItem);
-			if (!riderItem.Data)
+			if (!riderItem.ItemFlags[0])
 				TENLog("Skidoo rider data does not contain skidoo item ID.", LogLevel::Error);
 
 			return;
 		}
 
-		int skidooItemNumber = (short)riderItem.Data;
+		int skidooItemNumber = (short)riderItem.ItemFlags[0];
 		auto* skidooItem = &g_Level.Items[skidooItemNumber];
 
 		if (!skidooItem->Data)

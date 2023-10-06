@@ -8,6 +8,8 @@ enum class DisplayStringOptions
 {
 	Center,
 	Outline,
+	Right,
+	Blink,
 
 	Count
 };
@@ -15,7 +17,9 @@ enum class DisplayStringOptions
 static const std::unordered_map<std::string, DisplayStringOptions> DISPLAY_STRING_OPTION_NAMES
 {
 	{ "CENTER", DisplayStringOptions::Center },
-	{ "SHADOW", DisplayStringOptions::Outline }
+	{ "SHADOW", DisplayStringOptions::Outline },
+	{ "RIGHT", DisplayStringOptions::Right },
+	{ "BLINK", DisplayStringOptions::Blink }
 };
 
 using FlagArray = std::array<bool, (int)DisplayStringOptions::Count>;

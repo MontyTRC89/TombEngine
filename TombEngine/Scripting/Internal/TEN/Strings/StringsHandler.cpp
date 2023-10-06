@@ -116,11 +116,17 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 				auto cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
 				int flags = 0;
 
-				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::Center)])
+				if (str.m_flags[(size_t)DisplayStringOptions::Center])
 					flags |= PRINTSTRING_CENTER;
 
-				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::Outline)])
+				if (str.m_flags[(size_t)DisplayStringOptions::Right])
+					flags |= PRINTSTRING_RIGHT;
+
+				if (str.m_flags[(size_t)DisplayStringOptions::Outline])
 					flags |= PRINTSTRING_OUTLINE;
+
+				if (str.m_flags[(size_t)DisplayStringOptions::Blink])
+					flags |= PRINTSTRING_BLINK;
 
 				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, flags);
 
