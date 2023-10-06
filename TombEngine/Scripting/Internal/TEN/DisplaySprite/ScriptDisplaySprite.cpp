@@ -30,7 +30,7 @@ namespace TEN::Scripting::DisplaySprite
 			//@mem ObjectID
 			"ObjectID", &ScriptDisplaySprite::ObjectID,
 
-			/// (int) ID of the display sprite in the sprite sequence object.
+			/// (int) ID of the sprite in the sprite sequence object.
 			//@mem SpriteID
 			"SpriteID", &ScriptDisplaySprite::SpriteID,
 
