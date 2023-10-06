@@ -34,7 +34,7 @@ namespace TEN::Scripting::DisplaySprite
 			//@mem SpriteID
 			"SpriteID", &ScriptDisplaySprite::SpriteID,
 
-			/// (Vec2) Display space position of the display sprite.
+			/// (Vec2) Display space position of the display sprite in percent. Alignment determined by __DisplaySprite.AlignMode__
 			//@mem Position
 			"Position", &ScriptDisplaySprite::Position,
 
@@ -42,7 +42,7 @@ namespace TEN::Scripting::DisplaySprite
 			//@mem Rotation
 			"Rotation", &ScriptDisplaySprite::Rotation,
 
-			/// (Vec2) Horizontal and vertical scale of the display sprite.
+			/// (Vec2) Horizontal and vertical scale of the display sprite in percent. Relative to __DisplaySprite.ScaleMode__.
 			//@mem Scale
 			"Scale", &ScriptDisplaySprite::Scale,
 
@@ -53,20 +53,20 @@ namespace TEN::Scripting::DisplaySprite
 
 	void ScriptDisplaySprite::RegisterTables(sol::state* state, sol::table& parent)
 	{
-		auto tableDisplaySprite = sol::table(state->lua_state(), sol::create);
-		parent.set(ScriptReserved_DisplaySprite, tableDisplaySprite);
+		auto table = sol::table(state->lua_state(), sol::create);
+		parent.set(ScriptReserved_DisplaySprite, table);
 
-		auto handler = LuaHandler{ state };
-		handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteTableAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
-		handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteTableScaleMode, DISPLAY_SPRITE_SCALE_MODES);
+		auto handler = LuaHandler(state);
+		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
+		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
 	/***
 	@int objectID ID of the sprite sequence object.
 	@int spriteID ID of the sprite in the sprite sequence object.
-	@Vec2 pos Display space position of the display sprite relative to the __DisplaySprite.AlignMode__ used in the __Draw()__ call.
+	@Vec2 pos Display space position of the display sprite in percent. Alignment determined by __DisplaySprite.AlignMode__
 	@float rot Rotation of the display sprite in degrees.
-	@Vec2 scale Horizontal and vertical scale of the display sprite relative to the __DisplaySprite.ScaleMode__ used in the __Draw()__ call.
+	@Vec2 scale Horizontal and vertical scale of the display sprite in percent. Relative to __DisplaySprite.ScaleMode__.
 	@Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
 	@treturn DisplaySprite A DisplaySprite object.
 	*/
@@ -95,7 +95,8 @@ namespace TEN::Scripting::DisplaySprite
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
 		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
-		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
+		constexpr auto POS_CONVERSION_COEFF	  = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
+		constexpr auto SCALE_CONVERSION_COEFF = 0.01f;
 
 		constexpr auto DEFAULT_PRIORITY = 0;
 		constexpr auto DEFAULT_ALIGN_MODE = DisplaySpriteAlignMode::Center;
@@ -122,7 +123,7 @@ namespace TEN::Scripting::DisplaySprite
 
 		auto convertedPos = Vector2(Position.x, Position.y) * POS_CONVERSION_COEFF;
 		short convertedRot = ANGLE(Rotation);
-		auto convertedScale = Vector2(Scale.x, Scale.y);
+		auto convertedScale = Vector2(Scale.x, Scale.y) * SCALE_CONVERSION_COEFF;
 		auto convertedColor = Vector4(Color.GetR(), Color.GetG(), Color.GetB(), Color.GetA()) / UCHAR_MAX;
 
 		AddDisplaySprite(
