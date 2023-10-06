@@ -24,15 +24,15 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 
 		ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw,
 
-		/// (int) ID of the sprite object.
+		/// (Objects.ObjID) ID of the sprite sequence object.
 		//@mem ObjectID
 		"ObjectID", &ScriptDisplaySprite::ObjectID,
 
-		/// (int) ID of the display sprite in the sprite object.
+		/// (int) ID of the display sprite in the sprite sequence object.
 		//@mem SpriteID
 		"SpriteID", &ScriptDisplaySprite::SpriteID,
 		
-		/// (Vec2) Display position of the display sprite.
+		/// (Vec2) Display space position of the display sprite.
 		//@mem Position
 		"Position", &ScriptDisplaySprite::Position,
 		
@@ -58,13 +58,13 @@ void ScriptDisplaySprite::Register(sol::table& parent)
 }
 
 /*** 
-@int objectID ID of the sprite object.
-@int spriteID ID of the display sprite in the sprite object.
-@Vec2 pos Display position of the display sprite.
+@int objectID ID of the sprite sequence object.
+@int spriteID ID of the sprite in the sprite sequence object.
+@Vec2 pos Display space position of the display sprite relative to the __DisplaySprite.AlignMode__ used in the __Draw()__ call.
 @float rot Rotation of the display sprite in degrees.
-@Vec2 scale Horizontal and vertical scale of the display sprite.
+@Vec2 scale Horizontal and vertical scale of the display sprite relative to the __DisplaySprite.ScaleMode__ used in the __Draw()__ call.
 @Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
-@function Vec3
+@treturn DisplaySprite A DisplaySprite object.
 */
 ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
 										 sol::optional<ScriptColor> color)
@@ -81,7 +81,7 @@ ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, 
 
 /*** Draw the display sprite in display space for the current frame.
 @function DisplaySprite:Draw
-@tparam int[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. __Default: 0__
+@tparam Objects.ObjID[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. __Default: 0__
 @tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. __Default: DisplaySprite.AlignMode.CENTER__
 @tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. __Default: DisplaySprite.ScaleMode.FIT__
 @tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. __Default: Effects.BlendID.ALPHABLEND__
