@@ -152,10 +152,10 @@ level count, jumps to title.
 	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
 
 	/***
-	Check if SaveGame exists.
+	Check if a savegame exists.
 	@function DoesSaveGameExist
-	@tparam int slotID ID of the savegame slot to clear.
-	@treturn bool true if the savegame exists, false if it does not exist.
+	@tparam int slotID ID of the savegame slot to check.
+	@treturn bool true if the savegame exists, false if not.
 	*/
 	tableFlow.set_function(ScriptReserved_DoesSaveGameExist, &FlowHandler::DoesSaveGameExist, this);
 
