@@ -249,8 +249,8 @@ Specify which translations in the strings table correspond to which languages.
 	Fog::Register(tableFlow);
 
 	// TODO: Register inside ScriptDisplaySprite for syntax that looks like this: DisplaySprite.AlignMode.CENTER.
-	m_handler.MakeReadOnlyTable(tableFlow, "DisplayStringAlignMode"/*ScriptReserved_DisplaySpriteTableAlignMode*/, DISPLAY_SPRITE_ALIGN_MODES);
-	m_handler.MakeReadOnlyTable(tableFlow, "DisplayStringScaleMode"/*ScriptReserved_DisplaySpriteTableScaleMode*/, DISPLAY_SPRITE_SCALE_MODES);
+	m_handler.MakeReadOnlyTable(tableFlow, "DisplaySpriteAlignMode"/*ScriptReserved_DisplaySpriteTableAlignMode*/, DISPLAY_SPRITE_ALIGN_MODES);
+	m_handler.MakeReadOnlyTable(tableFlow, "DisplaySpriteScaleMode"/*ScriptReserved_DisplaySpriteTableScaleMode*/, DISPLAY_SPRITE_SCALE_MODES);
 	
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
