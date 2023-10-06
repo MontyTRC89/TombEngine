@@ -106,7 +106,7 @@ namespace TEN::Scripting::DisplaySprite
 		// Object is not a sprite object; return early.
 		if (ObjectID < GAME_OBJECT_ID::ID_HORIZON || ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
-			TENLog("Attempted to draw display sprite from non-sprite object " + std::to_string(ObjectID), LogLevel::Warning);
+			TENLog("Attempted to draw display sprite from non-sprite sequence object " + std::to_string(ObjectID), LogLevel::Warning);
 			return;
 		}
 
@@ -115,8 +115,9 @@ namespace TEN::Scripting::DisplaySprite
 		if (!object.loaded || SpriteID >= abs(object.nmeshes))
 		{
 			TENLog(
-				"Attempted to draw missing display sprite " + std::to_string(SpriteID) +
-				" from sprite object " + std::to_string(ObjectID),
+				"Attempted to draw missing sprite " + std::to_string(SpriteID) +
+				" from sprite sequence object " + std::to_string(ObjectID) +
+				" as display sprite.",
 				LogLevel::Warning);
 			return;
 		}
