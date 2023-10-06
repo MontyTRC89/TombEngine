@@ -1,16 +1,12 @@
 #pragma once
-#include <vector>
-#include <d3d11.h>
-#include <SimpleMath.h>
-
 #include "Game/camera.h"
-#include "Renderer/Frustum.h"
 #include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
+#include "Renderer/Frustum.h"
+#include "Specific/memory/LinearArrayBuffer.h"
+#include "Renderer/RendererSprite2D.h"
 #include "Renderer/RendererSprites.h"
 #include "Renderer/RendererTransparentFace.h"
 #include "Renderer/Structures/RendererFogBulb.h"
-#include "Specific/memory/LinearArrayBuffer.h"
-#include "Renderer/RendererSprite2D.h"
 
 namespace TEN::Renderer 
 {
@@ -20,10 +16,6 @@ namespace TEN::Renderer
 	struct RendererEffect;
 	struct RendererRoom;
 	struct RendererTransparentFace;
-
-	using DirectX::SimpleMath::Vector3;
-	using DirectX::SimpleMath::Vector2;
-	using DirectX::SimpleMath::Matrix;
 
 	constexpr auto MAX_ROOMS_DRAW = 256;
 	constexpr auto MAX_STATICS_DRAW = 128;

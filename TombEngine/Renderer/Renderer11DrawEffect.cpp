@@ -28,8 +28,8 @@
 #include "Math/Math.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/Utils/object_helper.h"
-#include "Renderer/RendererSprites.h"
 #include "Renderer/RendererSprite2D.h"
+#include "Renderer/RendererSprites.h"
 #include "Renderer/Quad/RenderQuad.h"
 #include "Specific/level.h"
 

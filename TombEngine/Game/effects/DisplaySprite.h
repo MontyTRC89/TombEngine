@@ -34,10 +34,10 @@ namespace TEN::Effects::DisplaySprite
 		Vector2 Scale		= Vector2::One;
 		Vector4 Color		= Vector4::One;
 
-		int					   Priority   = 0;
+		int					   Priority	 = 0;
 		DisplaySpriteAlignMode AlignMode = DisplaySpriteAlignMode::Center;
-		DisplaySpriteScaleMode ScaleMode  = DisplaySpriteScaleMode::Fit;
-		BLEND_MODES			   BlendMode  = BLENDMODE_ALPHABLEND;
+		DisplaySpriteScaleMode ScaleMode = DisplaySpriteScaleMode::Fit;
+		BLEND_MODES			   BlendMode = BLENDMODE_ALPHABLEND;
 	};
 
 	extern std::vector<DisplaySprite> DisplaySprites;

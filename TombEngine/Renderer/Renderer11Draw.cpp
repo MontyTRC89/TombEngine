@@ -611,11 +611,9 @@ namespace TEN::Renderer
 	void Renderer11::DrawScarabs(RenderView& view)
 	{
 		if (!Objects[ID_LITTLE_BEETLE].loaded)
-		{
 			return;
-		}
 
-		RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
+		auto& mesh = *GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 
 		m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
@@ -633,51 +631,49 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 		BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 
-		int littleBeetlesCount = 0;
+		int beetleCount = 0;
 		
 		for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 		{
-			auto* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
+			auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
 
-			if (beetle->On)
+			if (beetle.On)
 			{
-				RendererRoom& room = m_rooms[beetle->RoomNumber];
+				auto& room = m_rooms[beetle.RoomNumber];
 
-				Matrix translation = Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-				Matrix rotation = beetle->Pose.Orientation.ToRotationMatrix();
-				Matrix world = rotation * translation;
+				auto tmatrix = Matrix::CreateTranslation(beetle.Pose.Position.ToVector3());
+				auto rotMatrix = beetle.Pose.Orientation.ToRotationMatrix();
+				auto worldMatrix = rotMatrix * tmatrix;
 
-				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].World = world;
-				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].Ambient = room.AmbientLight;
-				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].Color = Vector4::One;
-				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].LightMode = mesh->LightMode;
-				BindInstancedStaticLights(room.LightsToDraw, littleBeetlesCount);
+				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = worldMatrix;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Color = Vector4::One;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = mesh.LightMode;
+				BindInstancedStaticLights(room.LightsToDraw, beetleCount);
 
-				littleBeetlesCount++;
+				beetleCount++;
 
-				// If we have reached the max bucket size or it's the last beetle, let's draw beetles
-				if (littleBeetlesCount == INSTANCED_STATIC_MESH_BUCKET_SIZE || i == TEN::Entities::TR4::NUM_BEETLES - 1)
+				// If max bucket size reached or last beetle, draw beetles.
+				if (beetleCount == INSTANCED_STATIC_MESH_BUCKET_SIZE || i == (TEN::Entities::TR4::NUM_BEETLES - 1))
 				{
 					m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
 
-					for (auto& bucket : mesh->Buckets)
+					for (auto& bucket : mesh.Buckets)
 					{
 						if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
-						{
 							continue;
-						}
 
 						SetBlendMode(bucket.BlendMode);
 
 						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 						BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
 
-						DrawIndexedInstancedTriangles(bucket.NumIndices, littleBeetlesCount, bucket.StartIndex, 0);
+						DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
 
 						m_numStaticsDrawCalls++;
 					}
 
-					littleBeetlesCount = 0;
+					beetleCount = 0;
 				}
 			}
 		}

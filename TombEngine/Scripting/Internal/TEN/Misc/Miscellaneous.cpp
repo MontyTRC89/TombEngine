@@ -323,13 +323,13 @@ namespace Misc
 		return (int)round(Vector2::Distance(p1, p2));
 	}
 
-	/// Translate a pair of 2D space position coordinates to pixel coordinates.
+	/// Translate a pair display position coordinates to pixel coordinates.
 	//To be used with @{ Strings.DisplayString:SetPosition } and @{ Strings.DisplayString }.
 	//@function PercentToScreen
-	//@tparam float x X component of 2D screen position.
-	//@tparam float y Y component of 2D screen position.
-	//@treturn int x coordinate in pixels
-	//@treturn int y coordinate in pixels
+	//@tparam float x X component of the display position.
+	//@tparam float y Y component of the display position.
+	//@treturn int x X coordinate in pixels.
+	//@treturn int y Y coordinate in pixels.
 	//@usage	
 	//local halfwayX, halfwayY = PercentToScreen(50, 50)
 	//local baddy
@@ -349,13 +349,13 @@ namespace Misc
 		return std::make_tuple(resX, resY);
 	}
 
-	/// Translate a pair of coordinates to percentages of window dimensions.
+	/// Translate a pair of pixel coordinates to display position coordinates.
 	//To be used with @{ Strings.DisplayString:GetPosition }.
 	//@function ScreenToPercent
-	//@tparam int x X pixel coordinate to translate to 2D screen position.
-	//@tparam int y Y pixel coordinate to translate to 2D screen position.
-	//@treturn float x X component of 2D screen position.
-	//@treturn float y Y component of 2D screen position.
+	//@tparam int x X pixel coordinate to translate to display position.
+	//@tparam int y Y pixel coordinate to translate to display position.
+	//@treturn float x X component of display position.
+	//@treturn float y Y component of display position.
 	static std::tuple<float, float> ScreenToPercent(int x, int y)
 	{
 		float fWidth = g_Configuration.ScreenWidth;
@@ -365,7 +365,7 @@ namespace Misc
 		return std::make_tuple(resX, resY);
 	}
 
-	/// Reset object camera back to Lara and deactivate object camera.
+	/// Reset object camera back to the player and deactivate object camera.
 	//@function ResetObjCamera
 	static void ResetObjCamera()
 	{

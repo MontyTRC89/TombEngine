@@ -148,17 +148,6 @@ GameStatus ControlPhase(int numFrames)
 	bool isFirstTime = true;
 	static int framesCount = 0;
 
-	//if ((GlobalCounter & 0x3F) > 0x1F)
-	//{
-	//	AddScreenSprite(ID_DEFAULT_SPRITES, 4, Vector2(400, 300), 0, Vector2(0.5f, 0.5f), Vector4::One, 0,
-	//		BLEND_MODES::BLENDMODE_ALPHABLEND, ScreenSpriteScaleMode::Fill);
-	//}
-	//else
-	//{
-	//	AddScreenSprite(ID_DEFAULT_SPRITES, 25, Vector2(400, 300), 0, Vector2(0.5f, 0.5f), Vector4::One, 0,
-	//		BLEND_MODES::BLENDMODE_ALPHABLEND, ScreenSpriteScaleMode::Fill);
-	//}
-
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
 		// Controls are polled before OnControlPhase, so input data could be
