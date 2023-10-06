@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
@@ -11,9 +12,8 @@
 #include "Objects/game_object_ids.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/trutils.h"
-#include "Game/effects/ScreenSprite.h"
 
-using namespace TEN::Effects::ScreenSprite;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
@@ -381,11 +381,11 @@ namespace TEN::Renderer
 		DrawFullScreenQuad(texture, Vector3(fade), true);
 	}
 
-	void Renderer11::DrawScreenSprites(RenderView& renderView)
+	void Renderer11::DrawDisplaySprites(RenderView& renderView)
 	{
 		constexpr auto VERTEX_COUNT = 4;
 
-		if (renderView.Sprites2DToDraw.empty())
+		if (renderView.DisplaySpritesToDraw.empty())
 			return;
 
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
@@ -394,23 +394,19 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		RendererSprite* currentSpritePtr = nullptr;
-		Texture2D* currentTexturePtr = nullptr;
-
-		for (const auto& spriteToDraw : renderView.Sprites2DToDraw)
+		Texture2D* texture2DPtr = nullptr;
+		for (const auto& spriteToDraw : renderView.DisplaySpritesToDraw)
 		{
-			if (currentTexturePtr == nullptr)
+			if (texture2DPtr == nullptr)
 			{
 				m_primitiveBatch->Begin();
 
 				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
-			else if (currentTexturePtr != spriteToDraw.SpritePtr->Texture ||
-				lastBlendMode != spriteToDraw.BlendMode)
+			else if (texture2DPtr != spriteToDraw.SpritePtr->Texture || lastBlendMode != spriteToDraw.BlendMode)
 			{
 				m_primitiveBatch->End();
-
 				m_primitiveBatch->Begin();
 
 				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
@@ -418,16 +414,16 @@ namespace TEN::Renderer
 			}
 
 			// Calculate vertex base.
-			auto halfSize = spriteToDraw.Size / 2;
 			auto vertices = std::array<Vector2, VERTEX_COUNT>
 			{
-				halfSize,
-					Vector2(-halfSize.x, halfSize.y),
-					-halfSize,
-					Vector2(halfSize.x, -halfSize.y)
+				spriteToDraw.Size,
+				Vector2(-spriteToDraw.Size.x, spriteToDraw.Size.y),
+				-spriteToDraw.Size,
+				Vector2(spriteToDraw.Size.x, -spriteToDraw.Size.y)
 			};
 
-			// Transform vertices. // NOTE: Must rotate 180 degrees to account for +Y being down.
+			// Transform vertices.
+			// NOTE: Must rotate 180 degrees to account for +Y being down.
 			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(spriteToDraw.Orientation + ANGLE(180.0f)));
 			for (auto& vertex : vertices)
 			{
@@ -451,7 +447,7 @@ namespace TEN::Renderer
 			
 			m_primitiveBatch->DrawQuad(rVertices[0], rVertices[1], rVertices[2], rVertices[3]);
 
-			currentTexturePtr = spriteToDraw.SpritePtr->Texture;
+			texture2DPtr = spriteToDraw.SpritePtr->Texture;
 		}
 		
 		m_primitiveBatch->End();
@@ -467,11 +463,11 @@ namespace TEN::Renderer
 
 		if (fit)
 		{
-			ID3D11Texture2D* texture2D;
-			texture->GetResource(reinterpret_cast<ID3D11Resource**>(&texture2D));
+			ID3D11Texture2D* texture2DPtr;
+			texture->GetResource(reinterpret_cast<ID3D11Resource**>(&texture2DPtr));
 
 			auto desc = D3D11_TEXTURE2D_DESC();
-			texture2D->GetDesc(&desc);
+			texture2DPtr->GetDesc(&desc);
 
 			float screenAspect = float(m_screenWidth) / float(m_screenHeight);
 			float imageAspect  = float(desc.Width) / float(desc.Height);
@@ -555,7 +551,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		Vector2 scale = Vector2(sprite->Width / (float)sprite->Texture->Width, sprite->Height / (float)sprite->Texture->Height);
+		auto scale = Vector2(sprite->Width / (float)sprite->Texture->Width, sprite->Height / (float)sprite->Texture->Height);
 		uvStart.x = uvStart.x * scale.x + sprite->UV[0].x;
 		uvStart.y = uvStart.y * scale.y + sprite->UV[0].y;
 		uvEnd.x = uvEnd.x * scale.x + sprite->UV[0].x;
@@ -595,7 +591,7 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
 
 		m_context->PSSetShaderResources(0, 1, &texture);
-		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+		auto* sampler = m_states->AnisotropicClamp();
 		m_context->PSSetSamplers(0, 1, &sampler);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -606,10 +602,10 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 	}
 
-	void Renderer11::AddScreenSprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size,
-									 const Vector4& color, int priority, BLEND_MODES blendMode, RenderView& renderView)
+	void Renderer11::AddDisplaySprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
+									  int priority, BLEND_MODES blendMode, RenderView& renderView)
 	{
-		auto spriteToDraw = RendererSprite2DToDraw{};
+		auto spriteToDraw = RendererDisplaySpriteToDraw{};
 
 		spriteToDraw.SpritePtr = spritePtr;
 		spriteToDraw.Position = pos2D;
@@ -619,33 +615,123 @@ namespace TEN::Renderer
 		spriteToDraw.Priority = priority;
 		spriteToDraw.BlendMode = blendMode;
 
-		renderView.Sprites2DToDraw.push_back(spriteToDraw);
+		renderView.DisplaySpritesToDraw.push_back(spriteToDraw);
 	}
 
-	void Renderer11::CollectScreenSprites(RenderView& renderView)
+	void Renderer11::CollectDisplaySprites(RenderView& renderView)
 	{
-		for (const auto& screenSprite : ScreenSprites)
+		// Get screen resolution, dimensions, and aspect ratio.
+		auto  screenRes		  = GetScreenResolution().ToVector2();
+		float screenAspect	  = screenRes.x / screenRes.y;
+		float screenWidthMax  = (SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x;
+		float screenHeightMax = (SCREEN_SPACE_RES.y / screenRes.y) * screenRes.y;
+
+		for (const auto& displaySprite : DisplaySprites)
 		{
-			AddScreenSprite(
-				&m_sprites[Objects[screenSprite.ObjectID].meshIndex + screenSprite.SpriteIndex],
-				screenSprite.Position,
-				screenSprite.Orientation,
-				screenSprite.Size,
-				screenSprite.Color,
-				screenSprite.Priority,
-				screenSprite.BlendMode,
+			auto& texture = m_sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
+
+			// Calculate sprite aspect ratio.
+			float spriteAspect = (float)texture.Width / (float)texture.Height;
+
+			// Calculate size.
+			auto halfSize = Vector2::Zero;
+			switch (displaySprite.ScaleMode)
+			{
+			default:
+			case DisplaySpriteScaleMode::Fit:
+				if (screenAspect >= spriteAspect)
+				{
+					halfSize = (Vector2(screenHeightMax) * displaySprite.Scale) / 2;
+					halfSize.x *= spriteAspect;
+				}
+				else
+				{
+					halfSize = (Vector2(screenWidthMax) * displaySprite.Scale) / 2;
+					halfSize.y /= spriteAspect;
+				}
+				break;
+
+			case DisplaySpriteScaleMode::Fill:
+				if (screenAspect >= spriteAspect)
+				{
+					halfSize = (Vector2(screenWidthMax) * displaySprite.Scale) / 2;
+					halfSize.y /= spriteAspect;
+				}
+				else
+				{
+					halfSize = (Vector2(screenHeightMax) * displaySprite.Scale) / 2;
+					halfSize.x *= spriteAspect;
+				}
+				break;
+
+			case DisplaySpriteScaleMode::Stretch:
+				halfSize = Vector2(screenWidthMax, screenHeightMax) * displaySprite.Scale / 2;
+				break;
+			}
+
+			// Calculate position offset.
+			auto offset = Vector2::Zero;
+			switch (displaySprite.AlignMode)
+			{
+			default:
+			case DisplaySpriteAlignMode::Center:
+				break;
+
+			case DisplaySpriteAlignMode::CenterTop:
+				offset = Vector2(0.0f, -halfSize.y);
+				break;
+
+			case DisplaySpriteAlignMode::CenterBottom:
+				offset = Vector2(0.0f, halfSize.y);
+				break;
+
+			case DisplaySpriteAlignMode::CenterLeft:
+				offset = Vector2(-halfSize.x, 0.0f);
+				break;
+				
+			case DisplaySpriteAlignMode::CenterRight:
+				offset = Vector2(halfSize.x, 0.0f);
+				break;
+
+			case DisplaySpriteAlignMode::TopLeft:
+				offset = Vector2(-halfSize.x, -halfSize.y);
+				break;
+
+			case DisplaySpriteAlignMode::TopRight:
+				offset = Vector2(halfSize.x, -halfSize.y);
+				break;
+
+			case DisplaySpriteAlignMode::BottomLeft:
+				offset = Vector2(-halfSize.x, halfSize.y);
+				break;
+
+			case DisplaySpriteAlignMode::BottomRight:
+				offset = Vector2(halfSize.x, halfSize.y);
+				break;
+			}
+			//offset = TEN::Utils::GetAspectCorrect2DPosition(offset); // TODO: Check if aspect correction is necessary.
+
+			AddDisplaySprite(
+				&texture,
+				displaySprite.Position + offset,
+				displaySprite.Orientation,
+				halfSize,
+				displaySprite.Color,
+				displaySprite.Priority,
+				displaySprite.BlendMode,
 				renderView);
 		}
 
 		std::sort(
-			renderView.Sprites2DToDraw.begin(), renderView.Sprites2DToDraw.end(),
-			[](const RendererSprite2DToDraw& spriteToDraw0, const RendererSprite2DToDraw& spriteToDraw1)
+			renderView.DisplaySpritesToDraw.begin(), renderView.DisplaySpritesToDraw.end(),
+			[](const RendererDisplaySpriteToDraw& spriteToDraw0, const RendererDisplaySpriteToDraw& spriteToDraw1)
 			{
+				// Same priority; sort by blend mode.
 				if (spriteToDraw0.Priority == spriteToDraw1.Priority)
 					return (spriteToDraw0.BlendMode < spriteToDraw1.BlendMode);
 
+				// Sort by priority.
 				return (spriteToDraw0.Priority < spriteToDraw1.Priority);
-			}
-		);
+			});
 	}
 }

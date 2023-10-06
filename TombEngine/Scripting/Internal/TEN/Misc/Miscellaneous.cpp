@@ -310,11 +310,12 @@ namespace Misc
 		return (int)round(Vector3::Distance(p1, p2));
 	}
 
+	// TODO: Deprecated. Also should not use int!
 	///Calculate the horizontal distance between two positions.
 	//@function CalculateHorizontalDistance
 	//@tparam Vec3 posA first position
 	//@tparam Vec3 posB second position
-	//@treturn int the direct distance on the XZ plane from one position to the other
+	//@treturn float the direct distance on the XZ plane from one position to the other
 	static int CalculateHorizontalDistance(const Vec3& pos1, const Vec3& pos2)
 	{
 		auto p1 = Vector2(pos1.x, pos1.z);
@@ -322,49 +323,49 @@ namespace Misc
 		return (int)round(Vector2::Distance(p1, p2));
 	}
 
-	///Translate a pair of percentages to screen-space pixel coordinates.
-	//To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.
+	/// Translate a pair display position coordinates to pixel coordinates.
+	//To be used with @{ Strings.DisplayString:SetPosition } and @{ Strings.DisplayString }.
 	//@function PercentToScreen
-	//@tparam float x percent value to translate to x-coordinate
-	//@tparam float y percent value to translate to y-coordinate
-	//@treturn int x coordinate in pixels
-	//@treturn int y coordinate in pixels
+	//@tparam float x X component of the display position.
+	//@tparam float y Y component of the display position.
+	//@treturn int x X coordinate in pixels.
+	//@treturn int y Y coordinate in pixels.
 	//@usage	
 	//local halfwayX, halfwayY = PercentToScreen(50, 50)
 	//local baddy
 	//local spawnLocationNullmesh = GetMoveableByName("position_behind_left_pillar")
-	//local str1 = DisplayString("You spawned a baddy!", halfwayX, halfwayY, Color(255, 100, 100), false, {DisplayStringOption.SHADOW, DisplayStringOption.CENTER})
+	//local str1 = DisplayString("You spawned an enemy!", halfwayX, halfwayY, Color(255, 100, 100), false, { DisplayStringOption.SHADOW, DisplayStringOption.CENTER })
 	//
 	//LevelFuncs.triggerOne = function(obj) 
 	//	ShowString(str1, 4)
 	//end
-	static std::tuple<int, int> PercentToScreen(double x, double y)
+	static std::tuple<int, int> PercentToScreen(float x, float y)
 	{
-		auto fWidth = (double)g_Configuration.ScreenWidth;
-		auto fHeight = (double)g_Configuration.ScreenHeight;
-		int resX = (int)std::round(fWidth / 100.0 * x);
-		int resY = (int)std::round(fHeight / 100.0 * y);
-		//todo this still assumes a resolution of 800/600. account for this somehow
+		float fWidth = g_Configuration.ScreenWidth;
+		float fHeight = g_Configuration.ScreenHeight;
+		int resX = (int)std::round(fWidth / 100.0f * x);
+		int resY = (int)std::round(fHeight / 100.0f * y);
+
 		return std::make_tuple(resX, resY);
 	}
 
-	/// Translate a pair of coordinates to percentages of window dimensions.
+	/// Translate a pair of pixel coordinates to display position coordinates.
 	//To be used with @{ Strings.DisplayString:GetPosition }.
 	//@function ScreenToPercent
-	//@tparam int x pixel value to translate to a percentage of the window width
-	//@tparam int y pixel value to translate to a percentage of the window height
-	//@treturn float x coordinate as percentage
-	//@treturn float y coordinate as percentage
-	static std::tuple<double, double> ScreenToPercent(int x, int y)
+	//@tparam int x X pixel coordinate to translate to display position.
+	//@tparam int y Y pixel coordinate to translate to display position.
+	//@treturn float x X component of display position.
+	//@treturn float y Y component of display position.
+	static std::tuple<float, float> ScreenToPercent(int x, int y)
 	{
-		auto fWidth = (double)g_Configuration.ScreenWidth;
-		auto fHeight = (double)g_Configuration.ScreenHeight;
-		double resX = x / fWidth * 100.0;
-		double resY = y / fHeight * 100.0;
+		float fWidth = g_Configuration.ScreenWidth;
+		float fHeight = g_Configuration.ScreenHeight;
+		float resX = x / fWidth * 100.0f;
+		float resY = y / fHeight * 100.0f;
 		return std::make_tuple(resX, resY);
 	}
 
-	/// Reset object camera back to Lara and deactivate object camera.
+	/// Reset object camera back to the player and deactivate object camera.
 	//@function ResetObjCamera
 	static void ResetObjCamera()
 	{
@@ -457,6 +458,7 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_FlipMap, &FlipMap);
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
+
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
 
 		LuaHandler handler{ state };

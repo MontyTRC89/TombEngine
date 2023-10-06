@@ -13,6 +13,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -20,7 +21,6 @@
 #include "Game/effects/Footprint.h"
 #include "Game/effects/Hair.h"
 #include "Game/effects/Ripple.h"
-#include "Game/effects/ScreenSprite.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -63,6 +63,7 @@ using namespace std::chrono;
 using namespace TEN::Effects;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -70,7 +71,6 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Streamer;
@@ -95,7 +95,7 @@ bool ThreadEnded;
 
 int RequiredStartPos;
 int CurrentLevel;
-int LevelComplete;
+int NextLevel;
 
 int SystemNameHash = 0;
 
@@ -119,6 +119,9 @@ int DrawPhase(bool isTitle)
 	{
 		g_Renderer.Render();
 	}
+
+	// Clear display sprites.
+	ClearDisplaySprites();
 
 	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
@@ -147,8 +150,6 @@ GameStatus ControlPhase(int numFrames)
 
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
-		ClearScreenSprites();
-
 		// Controls are polled before OnControlPhase, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
@@ -420,11 +421,11 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearDisplaySprites();
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
 	ClearLaserBarrierEffects();
-	ClearScreenSprites();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
@@ -619,16 +620,20 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 	// Does the player want to enter inventory?
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-		g_Gui.GetInventoryMode() != InventoryMode::Save)
+		g_Gui.GetInventoryMode() != InventoryMode::Save &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 
 		if (g_Gui.CallInventory(LaraItem, false))
 			result = GameStatus::SaveGame;
 	}
 	else if (IsClicked(In::Load) &&
-			 g_Gui.GetInventoryMode() != InventoryMode::Load)
+		g_Gui.GetInventoryMode() != InventoryMode::Load &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -673,8 +678,16 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	}
 
 	// Check if level has been completed.
-	if (LevelComplete)
+	// Negative NextLevel indicates that a savegame must be loaded from corresponding slot.
+	if (NextLevel > 0)
+	{
 		return GameStatus::LevelComplete;
+	}
+	else if (NextLevel < 0)
+	{
+		g_GameFlow->SelectedSaveGame = -(NextLevel + 1);
+		return GameStatus::LoadGame;
+	}
 
 	return GameStatus::None;
 }

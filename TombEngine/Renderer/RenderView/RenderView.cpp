@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "RenderView.h"
+#include "Renderer/RenderView/RenderView.h"
 
 namespace TEN::Renderer
 {
@@ -46,9 +46,9 @@ namespace TEN::Renderer
 		RoomsToDraw.clear();
 		LightsToDraw.clear();
 		SpritesToDraw.clear();
+		DisplaySpritesToDraw.clear();
 		SortedStaticsToDraw.clear();
 		FogBulbsToDraw.clear();
-		Sprites2DToDraw.clear();
 	}
 
 	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h)

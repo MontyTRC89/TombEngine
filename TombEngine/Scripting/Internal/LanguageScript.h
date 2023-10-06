@@ -168,3 +168,4 @@
 #define STRING_MECHANICAL_SCARAB_1		"mechanical_scarab_1"
 #define STRING_MECHANICAL_SCARAB_2		"mechanical_scarab_2"
 #define STRING_VEHICLE_ACTIONS			"vehicle_actions"
+#define STRING_UNLIMITED				"unlimited"

@@ -80,12 +80,13 @@ namespace TEN::Hud
 			Life = std::max(Life, round(LIFE_BUFFER * FPS));
 	}
 
-	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& targetPos)
+	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector2& origin, unsigned int count)
 	{
 		constexpr auto STRING_SCALAR_MAX = 0.6f;
 
-		// TODO: Call this elsewhere, maybe in pickup.cpp. -- Sezz 2023.02.06
-		PickedUpObject(objectID);
+		// No count; return early.
+		if (count == 0)
+			return;
 
 		float life = round(DisplayPickup::LIFE_MAX * FPS);
 
@@ -98,7 +99,7 @@ namespace TEN::Hud
 
 			if (pickup.ObjectID == objectID)
 			{
-				pickup.Count++;
+				pickup.Count += count;
 				pickup.Life = life;
 				pickup.StringScalar = STRING_SCALAR_MAX;
 				return;
@@ -108,14 +109,10 @@ namespace TEN::Hud
 		// Create new display pickup.
 		auto& pickup = GetNewDisplayPickup();
 
-		auto origin = g_Renderer.Get2DPosition(targetPos);
-		if (!origin.has_value())
-			origin = Vector2::Zero;
-
 		pickup.ObjectID = objectID;
-		pickup.Count = 1;
+		pickup.Count = count;
 		pickup.Position =
-		pickup.Origin = *origin;
+		pickup.Origin = origin;
 		pickup.Target = Vector2::Zero;
 		pickup.Life = life;
 		pickup.Scale = 0.0f;
@@ -123,6 +120,14 @@ namespace TEN::Hud
 		pickup.HideVelocity = 0.0f;
 		pickup.StringScale = 0.0f;
 		pickup.StringScalar = 0.0f;
+	}
+
+	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos, unsigned int count)
+	{
+		// Project 3D position to 2D origin.
+		auto origin = g_Renderer.Get2DPosition(pos);
+
+		AddDisplayPickup(objectID, origin.value_or(Vector2::Zero), count);
 	}
 
 	void PickupSummaryController::Update()
@@ -176,14 +181,14 @@ namespace TEN::Hud
 		constexpr auto SCREEN_SCALE		   = Vector2(SCREEN_SPACE_RES.x * SCREEN_SCALE_COEFF, SCREEN_SPACE_RES.y * SCREEN_SCALE_COEFF);
 		constexpr auto SCREEN_OFFSET	   = Vector2(SCREEN_SPACE_RES.y * SCREEN_OFFSET_COEFF);
 
-		// Calculate positions. 
+		// Calculate stack positions. 
 		auto stackPositions = std::vector<Vector2>{};
 		stackPositions.resize(DisplayPickups.size());
 		for (int i = 0; i < DisplayPickups.size(); i++)
 		{
 			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, SCREEN_SPACE_RES.y);
 			auto pos = (SCREEN_SPACE_RES - relPos) - SCREEN_OFFSET;
-			stackPositions[i] = (pos);
+			stackPositions[i] = pos;
 		}
 
 		return stackPositions;
@@ -191,6 +196,8 @@ namespace TEN::Hud
 
 	DisplayPickup& PickupSummaryController::GetNewDisplayPickup()
 	{
+		assertion(DisplayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
+
 		// Add and return new display pickup.
 		if (DisplayPickups.size() < DISPLAY_PICKUP_COUNT_MAX)
 			return DisplayPickups.emplace_back();
@@ -212,7 +219,6 @@ namespace TEN::Hud
 
 	void PickupSummaryController::DrawDebug() const
 	{
-		g_Renderer.PrintDebugMessage("PICKUP SUMMARY DEBUG");
-		g_Renderer.PrintDebugMessage("Display pickups: %d", DisplayPickups.size());
+		g_Renderer.PrintDebugMessage("Display pickups in summary: %d", DisplayPickups.size());
 	}
 }

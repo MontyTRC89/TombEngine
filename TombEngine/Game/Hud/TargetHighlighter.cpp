@@ -2,8 +2,8 @@
 #include "Game/Hud/TargetHighlighter.h"
 
 #include "Game/camera.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/items.h"
-#include "Game/effects/ScreenSprite.h"
 #include "Game/lara/lara_fire.h"
 #include "Game/lara/lara_helpers.h"
 #include "Math/Math.h"
@@ -11,7 +11,7 @@
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
 
-using namespace TEN::Effects::ScreenSprite;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
@@ -196,19 +196,22 @@ namespace TEN::Hud
 			if (crosshair.IsOffscreen())
 				continue;
 
-			AddScreenSprite(
+			AddDisplaySprite(
 				ID_CROSSHAIR, CROSSHAIR_SPRITE_STATIC_ELEMENT_INDEX,
-				crosshair.Position, crosshair.Orientation,
-				Vector2(crosshair.Size), crosshair.Color, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+				crosshair.Position, crosshair.Orientation, Vector2(crosshair.Size), crosshair.Color,
+				0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
 
 			if (crosshair.RadiusScale > EPSILON)
 			{
 				for (const auto& segment : crosshair.Segments)
 				{
-					AddScreenSprite(
+					short orient = crosshair.Orientation + segment.OrientOffset;
+					auto scale = Vector2(crosshair.Size / 2);
+
+					AddDisplaySprite(
 						ID_CROSSHAIR, CROSSHAIR_SPRITE_SEGMENT_ELEMENT_INDEX,
-						crosshair.Position + segment.PosOffset, crosshair.Orientation + segment.OrientOffset,
-						Vector2(crosshair.Size / 2), crosshair.Color, 0, BLEND_MODES::BLENDMODE_ALPHABLEND);
+						crosshair.Position + segment.PosOffset, orient, scale, crosshair.Color,
+						0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
 				}
 			}
 		}

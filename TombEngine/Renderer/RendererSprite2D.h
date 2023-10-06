@@ -5,7 +5,7 @@ namespace TEN::Renderer
 {
 	struct RendererSprite;
 
-	struct RendererSprite2DToDraw
+	struct RendererDisplaySpriteToDraw
 	{
 		RendererSprite* SpritePtr = nullptr;
 
@@ -14,7 +14,7 @@ namespace TEN::Renderer
 		Vector2 Size		= Vector2::Zero;
 		Vector4 Color		= Vector4::Zero;
 
-		int				Priority  = 0;
-		BLEND_MODES		BlendMode = BLENDMODE_ALPHABLEND;
+		int			Priority  = 0;
+		BLEND_MODES BlendMode = BLENDMODE_ALPHABLEND;
 	};
 }

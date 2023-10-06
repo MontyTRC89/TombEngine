@@ -4,10 +4,10 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
-#include "Game/effects/ScreenSprite.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -30,47 +30,14 @@ Functions to generate effects.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
-using namespace TEN::Effects::ScreenSprite;
 using namespace TEN::Effects::Spark;
 
 namespace Effects
 {
-	/// Display a sprite on the screen.
-	//@function DisplayScreenSprite
-	//@tparam int objectID Object ID of the sprite.
-	//@tparam int spriteIndex Index of the sprite in the sprite object.
-	//@tparam Vec2 pos 2D position of the sprite. NOTE: Screen space resolution is 100x100.
-	//@tparam float rot Rotation of the sprite in degrees. Default is 0.
-	//@tparam Vec2 size Size of the sprite.
-	//@tparam Color color Color of the sprite. Default is Color(255, 255, 255, 255).
-	//@tparam int priority Render priority of the sprite. Higher values have higher priority. Default is 0.
-	//@tparam Effects.BlendID blendMode Blend mode of the sprite. Default is TEN.Effects.BlendID.ALPHABLEND.
-	static void DisplayScreenSprite(GAME_OBJECT_ID objectID, int spriteIndex, const Vec2& pos, TypeOrNil<float> rot, const Vec2& size,
-									TypeOrNil<ScriptColor> color, TypeOrNil<int> priority, TypeOrNil<BLEND_MODES> blendMode)
-	{
-		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
-		// Later, everything will be natively 100x100. -- Sezz 2023.08.31
-		constexpr auto POS_CONVERSION_COEFF = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
-
-		auto scriptColor = USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255, 255));
-		
-		auto bMode = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
-		bMode = BLEND_MODES(std::clamp((int)bMode, (int)BLEND_MODES::BLENDMODE_OPAQUE, (int)BLEND_MODES::BLENDMODE_ALPHABLEND));
-
-		AddScreenSprite(
-			objectID,
-			spriteIndex,
-			Vector2(pos.x, pos.y) * POS_CONVERSION_COEFF,
-			ANGLE(USE_IF_HAVE(float, rot, 0.0f)),
-			Vector2(size.x, size.y),
-			Vector4(scriptColor.GetR(), scriptColor.GetG(), scriptColor.GetB(), scriptColor.GetA()) / UCHAR_MAX,
-			USE_IF_HAVE(int, priority, 0),
-			bMode);
-	}
-
 	///Emit a lightning arc.
 	//@function EmitLightningArc
 	//@tparam Vec3 src
@@ -354,12 +321,11 @@ namespace Effects
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
 	}
 
-	void Register(sol::state* state, sol::table& parent) 
+	void Register(sol::state* state, sol::table& parent)
 	{
-		sol::table tableEffects = { state->lua_state(), sol::create };
+		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
-		tableEffects.set_function(ScriptReserved_DisplayScreenSprite, &DisplayScreenSprite);
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
@@ -370,7 +336,7 @@ namespace Effects
 		tableEffects.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 
-		LuaHandler handler{ state };
+		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}

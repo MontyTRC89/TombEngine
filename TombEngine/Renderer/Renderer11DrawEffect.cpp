@@ -28,8 +28,8 @@
 #include "Math/Math.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/Utils/object_helper.h"
-#include "Renderer/RendererSprites.h"
 #include "Renderer/RendererSprite2D.h"
+#include "Renderer/RendererSprites.h"
 #include "Renderer/Quad/RenderQuad.h"
 #include "Specific/level.h"
 
@@ -1420,15 +1420,18 @@ namespace TEN::Renderer
 		}
 
 		auto* meshPtr = effect->Mesh;
-		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+		auto lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
 		for (auto& bucket : meshPtr->Buckets) 
 		{
 			if (bucket.NumVertices == 0)
 				continue;
 
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+				(rendererPass == RendererPass::Transparent)))
+			{
 				continue;
+			}
 
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
@@ -1479,18 +1482,21 @@ namespace TEN::Renderer
 		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<RendererVertex> vertices;
 
-		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+		auto lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
 		for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
 		{
 			if (deb->active) 
 			{
-				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^
+					(rendererPass == RendererPass::Transparent)))
+				{
 					continue;
+				}
 
-				Matrix translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
-				Matrix rotation = Matrix::CreateFromQuaternion(deb->rotation);
-				Matrix world = rotation * translation;
+				auto translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
+				auto rotation = Matrix::CreateFromQuaternion(deb->rotation);
+				auto world = rotation * translation;
 
 				m_primitiveBatch->Begin();
 
