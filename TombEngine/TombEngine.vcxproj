@@ -712,10 +712,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
     <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\AlignModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScaleModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Effects\DisplaySprite\AlignModes.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Effects\DisplaySprite\ScaleModes.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Effects\DisplaySprite\ScriptDisplaySprite.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectsFunctions.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
@@ -1133,7 +1133,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptUtil.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Color\Color.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Effects\DisplaySprite\ScriptDisplaySprite.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Effects\EffectsFunctions.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Animations\Animations.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\FlowHandler.cpp" />

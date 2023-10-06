@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Scripting/Internal/TEN/Effects/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 
 #include "Game/effects/DisplaySprite.h"
 #include "Game/Setup.h"
@@ -7,8 +7,8 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/Effects/DisplaySprite/AlignModes.h"
-#include "Scripting/Internal/TEN/Effects/DisplaySprite/ScaleModes.h"
+#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
 using namespace TEN::Effects::DisplaySprite;
