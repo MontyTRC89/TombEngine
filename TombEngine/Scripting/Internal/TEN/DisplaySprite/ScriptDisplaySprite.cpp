@@ -93,7 +93,7 @@ namespace TEN::Scripting::DisplaySprite
 		constexpr auto DEFAULT_SCALE_MODE = DisplaySpriteScaleMode::Fit;
 		constexpr auto DEFAULT_BLEND_MODE = BLENDMODE_ALPHABLEND;
 
-		// Object is not a sprite object; return early.
+		// Object is not a sprite sequence object; return early.
 		if (ObjectID < GAME_OBJECT_ID::ID_HORIZON || ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
 			TENLog("Attempted to draw display sprite from non-sprite sequence object " + std::to_string(ObjectID), LogLevel::Warning);
