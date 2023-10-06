@@ -35,10 +35,10 @@ namespace TEN::Scripting::DisplaySprite
 
 		// Constructors
 		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
-			sol::optional<ScriptColor> color);
+							sol::optional<const ScriptColor&> color);
 
 		// Utilities
 		void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
-			sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode);
+				  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode);
 	};
 }
