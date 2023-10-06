@@ -49,14 +49,16 @@ namespace TEN::Scripting::DisplaySprite
 			/// (Color) Color of the display sprite.
 			//@mem Color
 			"Color", &ScriptDisplaySprite::Color);
+	}
 
-		// TODO: Call in ScriptInterfaceState.cpp
-		/*auto tableDisplaySprite = sol::table(state->lua_state(), sol::create);
+	void ScriptDisplaySprite::RegisterTables(sol::state* state, sol::table& parent)
+	{
+		auto tableDisplaySprite = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_DisplaySprite, tableDisplaySprite);
 
 		auto handler = LuaHandler{ state };
-		handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
-		handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteScaleMode, DISPLAY_SPRITE_SCALE_MODES);*/
+		handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteTableAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
+		handler.MakeReadOnlyTable(tableDisplaySprite, ScriptReserved_DisplaySpriteTableScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
 	/***

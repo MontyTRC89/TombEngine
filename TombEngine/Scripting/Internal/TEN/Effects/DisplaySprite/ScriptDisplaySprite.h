@@ -22,6 +22,7 @@ namespace TEN::Scripting::DisplaySprite
 	{
 	public:
 		static void Register(sol::table& parent);
+		static void RegisterTables(sol::state* state, sol::table& parent);
 
 		// Members
 		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;

@@ -2,6 +2,7 @@
 #include "Scripting/Include/ScriptInterfaceState.h"
 
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Effects/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
 #include "Scripting/Internal/TEN/Inventory/InventoryHandler.h"
@@ -9,6 +10,8 @@
 #include "Scripting/Internal/TEN/Misc/Miscellaneous.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Strings/StringsHandler.h"
+
+using namespace TEN::Scripting::DisplaySprite;
 
 static sol::state s_solState;
 static sol::table s_rootTable;
@@ -54,4 +57,6 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 	InventoryHandler::Register(&s_solState, s_rootTable);
 	Misc::Register(&s_solState, s_rootTable);
 	Effects::Register(&s_solState, s_rootTable);
+
+	ScriptDisplaySprite::RegisterTables(&s_solState, s_rootTable);
 }

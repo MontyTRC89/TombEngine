@@ -27,10 +27,10 @@ static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
 // DisplaySprite object
-static constexpr char ScriptReserved_DisplaySprite[]			= "DisplaySprite";
-static constexpr char ScriptReserved_DisplaySpriteDraw[]		= "Draw";
-static constexpr char ScriptReserved_DisplaySpriteAlignMode[]	= "AlignMode";
-static constexpr char ScriptReserved_DisplaySpriteScaleMode[]	= "ScaleMode";
+static constexpr char ScriptReserved_DisplaySprite[]				= "DisplaySprite";
+static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
+static constexpr char ScriptReserved_DisplaySpriteTableAlignMode[]	= "AlignMode";
+static constexpr char ScriptReserved_DisplaySpriteTableScaleMode[]	= "ScaleMode";
 
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
