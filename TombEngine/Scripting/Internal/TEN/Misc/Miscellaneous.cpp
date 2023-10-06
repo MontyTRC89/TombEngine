@@ -396,24 +396,24 @@ namespace Misc
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
-	/// Get the projected 2D screen position of a 3D world position. Returns nil if the 3D position is behind the camera view.
-	//@tparam Vec3 pos3D 3D world position.
-	//@return Vec2 pos2D Projected 2D screen position. NOTE: Screen space resolution is 100x100.
+	/// Get the projected 2D display position of a 3D world position. Returns nil if the world position is behind the camera view.
+	//@tparam Vec3 worldPos 3D world space position.
+	//@return Vec2 displayPos Projected 2D display space position in percent.
 	//@usage 
 	//
 	// Example: Display a string at the player's position.
 	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
-	// local pos2D = Get2DPosition(Lara:GetPosition())
-	// string:SetPosition(PercentToScreen(pos2D.x, pos2D.y))
-	static std::optional<Vec2> Get2DPosition(const Vec3& pos3D)
+	// local displayPos = GetDisplayPosition(Lara:GetPosition())
+	// string:SetPosition(PercentToScreen(displayPos.x, displayPos.y))
+	static std::optional<Vec2> GetDisplayPosition(const Vec3& worldPos)
 	{
-		auto pos2D = g_Renderer.Get2DPosition(Vector3(pos3D.x, pos3D.y, pos3D.z));
-		if (!pos2D.has_value())
+		auto displayPos = g_Renderer.Get2DPosition(Vector3(worldPos.x, worldPos.y, worldPos.z));
+		if (!displayPos.has_value())
 			return std::nullopt;
 
 		return Vec2(
-			(pos2D->x / SCREEN_SPACE_RES.x) * 100,
-			(pos2D->y / SCREEN_SPACE_RES.y) * 100);
+			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
+			(displayPos->y / SCREEN_SPACE_RES.y) * 100);
 	}
 
 	void Register(sol::state* state, sol::table& parent)
@@ -479,7 +479,7 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
-		tableMisc.set_function(ScriptReserved_Get2DPosition, &Get2DPosition);
+		tableMisc.set_function(ScriptReserved_GetDisplayPosition, &GetDisplayPosition);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);
