@@ -17,7 +17,9 @@ namespace TEN::Scripting::DisplaySprite
 {
 	void ScriptDisplaySprite::Register(sol::state& state, sol::table& parent)
 	{
-		using ctors = sol::constructors<ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&, sol::optional<const ScriptColor&>)>;
+		using ctors = sol::constructors<
+			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&, const ScriptColor&),
+			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&)>;
 
 		parent.new_usertype<ScriptDisplaySprite>(
 			ScriptReserved_DisplaySprite,
