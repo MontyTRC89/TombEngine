@@ -26,6 +26,15 @@ namespace TEN::Scripting::DisplaySprite
 			ctors(),
 			sol::call_constructor, ctors(),
 
+			/***
+			@Objects.ObjID objectID ID of the sprite sequence object.
+			@int spriteID ID of the sprite in the sprite sequence object.
+			@Vec2 pos Display space position of the display sprite in percent. Alignment determined by __DisplaySprite.AlignMode__
+			@float rot Rotation of the display sprite in degrees.
+			@Vec2 scale Horizontal and vertical scale of the display sprite in percent. Relative to __DisplaySprite.ScaleMode__.
+			@Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
+			@treturn DisplaySprite A DisplaySprite object.
+			*/
 			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw,
 
 			/// (Objects.ObjID) ID of the sprite sequence object.
@@ -60,26 +69,21 @@ namespace TEN::Scripting::DisplaySprite
 		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
-	/***
-	@Objects.ObjID objectID ID of the sprite sequence object.
-	@int spriteID ID of the sprite in the sprite sequence object.
-	@Vec2 pos Display space position of the display sprite in percent. Alignment determined by __DisplaySprite.AlignMode__
-	@float rot Rotation of the display sprite in degrees.
-	@Vec2 scale Horizontal and vertical scale of the display sprite in percent. Relative to __DisplaySprite.ScaleMode__.
-	@Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
-	@treturn DisplaySprite A DisplaySprite object.
-	*/
-	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
-											 sol::optional<const ScriptColor&> color)
+	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
 	{
-		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255, 255);
-
 		ObjectID = objectID;
 		SpriteID = spriteID;
 		Position = pos;
 		Rotation = rot;
 		Scale = scale;
-		Color = color.value_or(DEFAULT_COLOR);
+		Color = color;
+	}
+
+	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale)
+	{
+		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255, 255);
+
+		*this = ScriptDisplaySprite(objectID, spriteID, pos, rot, scale, DEFAULT_COLOR);
 	}
 
 	GAME_OBJECT_ID ScriptDisplaySprite::GetObjectID() const
