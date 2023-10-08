@@ -678,35 +678,35 @@ namespace TEN::Renderer
 				break;
 
 			case DisplaySpriteAlignMode::CenterTop:
-				offset = Vector2(0.0f, -halfSize.y);
-				break;
-
-			case DisplaySpriteAlignMode::CenterBottom:
 				offset = Vector2(0.0f, halfSize.y);
 				break;
 
+			case DisplaySpriteAlignMode::CenterBottom:
+				offset = Vector2(0.0f, -halfSize.y);
+				break;
+
 			case DisplaySpriteAlignMode::CenterLeft:
-				offset = Vector2(-halfSize.x, 0.0f);
+				offset = Vector2(halfSize.x, 0.0f);
 				break;
 				
 			case DisplaySpriteAlignMode::CenterRight:
-				offset = Vector2(halfSize.x, 0.0f);
+				offset = Vector2(-halfSize.x, 0.0f);
 				break;
 
 			case DisplaySpriteAlignMode::TopLeft:
-				offset = Vector2(-halfSize.x, -halfSize.y);
+				offset = Vector2(halfSize.x, halfSize.y);
 				break;
 
 			case DisplaySpriteAlignMode::TopRight:
-				offset = Vector2(halfSize.x, -halfSize.y);
-				break;
-
-			case DisplaySpriteAlignMode::BottomLeft:
 				offset = Vector2(-halfSize.x, halfSize.y);
 				break;
 
+			case DisplaySpriteAlignMode::BottomLeft:
+				offset = Vector2(halfSize.x, -halfSize.y);
+				break;
+
 			case DisplaySpriteAlignMode::BottomRight:
-				offset = Vector2(halfSize.x, halfSize.y);
+				offset = Vector2(-halfSize.x, -halfSize.y);
 				break;
 			}
 			//offset = TEN::Utils::GetAspectCorrect2DPosition(offset); // TODO: Check if aspect correction is necessary.
