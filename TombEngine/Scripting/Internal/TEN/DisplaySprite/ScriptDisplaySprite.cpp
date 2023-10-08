@@ -28,31 +28,31 @@ namespace TEN::Scripting::DisplaySprite
 
 			/// (Objects.ObjID) ID of the sprite sequence object.
 			//@mem ObjectID
-			"ObjectID", &ScriptDisplaySprite::ObjectID,
+			"ObjectID", sol::property(&ScriptDisplaySprite::GetObjectID, &ScriptDisplaySprite::SetObjectID),
 
 			/// (int) ID of the sprite in the sprite sequence object.
 			//@mem SpriteID
-			"SpriteID", &ScriptDisplaySprite::SpriteID,
+			"SpriteID", sol::property(&ScriptDisplaySprite::GetSpriteID, &ScriptDisplaySprite::SetSpriteID),
 
 			/// (Vec2) Display space position of the display sprite in percent. Alignment determined by __DisplaySprite.AlignMode__
 			//@mem Position
-			"Position", &ScriptDisplaySprite::Position,
+			"Position", sol::property(&ScriptDisplaySprite::GetPosition, &ScriptDisplaySprite::SetPosition),
 
 			/// (float) Rotation of the display sprite in degrees.
 			//@mem Rotation
-			"Rotation", &ScriptDisplaySprite::Rotation,
+			"Rotation", sol::property(&ScriptDisplaySprite::GetRotation, &ScriptDisplaySprite::SetRotation),
 
 			/// (Vec2) Horizontal and vertical scale of the display sprite in percent. Relative to __DisplaySprite.ScaleMode__.
 			//@mem Scale
-			"Scale", &ScriptDisplaySprite::Scale,
+			"Scale", sol::property(&ScriptDisplaySprite::GetScale, &ScriptDisplaySprite::SetScale),
 
 			/// (Color) Color of the display sprite.
 			//@mem Color
-			"Color", &ScriptDisplaySprite::Color);
+			"Color", sol::property(&ScriptDisplaySprite::GetColor, &ScriptDisplaySprite::SetColor));
 	}
 
 	/***
-	@int objectID ID of the sprite sequence object.
+	@Objects.ObjID objectID ID of the sprite sequence object.
 	@int spriteID ID of the sprite in the sprite sequence object.
 	@Vec2 pos Display space position of the display sprite in percent. Alignment determined by __DisplaySprite.AlignMode__
 	@float rot Rotation of the display sprite in degrees.
@@ -71,6 +71,66 @@ namespace TEN::Scripting::DisplaySprite
 		Rotation = rot;
 		Scale = scale;
 		Color = color.value_or(DEFAULT_COLOR);
+	}
+
+	GAME_OBJECT_ID ScriptDisplaySprite::GetObjectID() const
+	{
+		return ObjectID;
+	}
+
+	int ScriptDisplaySprite::GetSpriteID() const
+	{
+		return SpriteID;
+	}
+
+	Vec2 ScriptDisplaySprite::GetPosition() const
+	{
+		return Position;
+	}
+
+	float ScriptDisplaySprite::GetRotation() const
+	{
+		return Rotation;
+	}
+
+	Vec2 ScriptDisplaySprite::GetScale() const
+	{
+		return Scale;
+	}
+
+	ScriptColor ScriptDisplaySprite::GetColor() const
+	{
+		return Color;
+	}
+
+	void ScriptDisplaySprite::SetObjectID(GAME_OBJECT_ID objectID)
+	{
+		ObjectID = objectID;
+	}
+
+	void ScriptDisplaySprite::SetSpriteID(int spriteID)
+	{
+		SpriteID = spriteID;
+	}
+
+	void ScriptDisplaySprite::SetPosition(const Vec2& pos)
+	{
+		Position = pos;
+	}
+
+	void ScriptDisplaySprite::SetRotation(float rot)
+	{
+		Rotation = rot;
+	}
+
+	void ScriptDisplaySprite::SetScale(const Vec2& scale)
+	{
+		Scale = scale;
+	}
+
+	void ScriptDisplaySprite::SetColor(const ScriptColor& color)
+	{
+		Color = color;
 	}
 
 	/*** Draw the display sprite in display space for the current frame.

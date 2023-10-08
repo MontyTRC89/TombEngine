@@ -9,17 +9,16 @@ using namespace TEN::Effects::DisplaySprite;
 enum BLEND_MODE;
 
 // TODO:
-// Check if align modes are applied correctly.
-// Check if ScriptDisplaySprite object has been registered correctly.
 // Register DISPLAY_SPRITE_SCALE_MODES and DISPLAY_SPRITE_ORIGIN_TYPES under the correct sub-thing.
 // Test nested sprites in various modes and how they behave when the aspect ratio changes.
+// Fix weird flashing effect.
+// Fix scaling with different screen aspect ratios.
 
 namespace TEN::Scripting::DisplaySprite
 {
 	class ScriptDisplaySprite
 	{
-	public:
-	//private:
+	private:
 		// Members
 		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 		int			   SpriteID = 0;
@@ -45,12 +44,12 @@ namespace TEN::Scripting::DisplaySprite
 		ScriptColor	   GetColor() const;
 
 		// Setters
-		void SetObjectID();
-		void SetSpriteID();
-		void SetPosition();
-		void SetRotation();
-		void SetScale();
-		void SetColor();
+		void SetObjectID(GAME_OBJECT_ID objectID);
+		void SetSpriteID(int spriteID);
+		void SetPosition(const Vec2& pos);
+		void SetRotation(float rot);
+		void SetScale(const Vec2& scale);
+		void SetColor(const ScriptColor& color);
 
 		// Utilities
 		void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
