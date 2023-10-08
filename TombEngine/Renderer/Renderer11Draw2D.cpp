@@ -620,11 +620,18 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectDisplaySprites(RenderView& renderView)
 	{
-		// Get screen resolution, dimensions, and aspect ratio.
-		auto  screenRes		  = GetScreenResolution().ToVector2();
-		float screenAspect	  = screenRes.x / screenRes.y;
-		float screenWidthMax  = (SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x;
-		float screenHeightMax = (SCREEN_SPACE_RES.y / screenRes.y) * screenRes.y;
+		constexpr auto SCREEN_SPACE_ASPECT = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
+
+		// Get screen resolution, aspect ratio, and dimensions.
+		auto screenRes = GetScreenResolution().ToVector2();
+		float screenAspect = screenRes.x / screenRes.y;
+		auto screenDimensionsMax = Vector2(
+			(SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x,
+			(SCREEN_SPACE_RES.y / screenRes.y) * screenRes.y);
+
+		// TODO: Only a partial fix. Scaling with certain aspect ratio combinations is strange.
+		// Calculate scale correction as relation between screen resolution aspect ratio and screen space aspect ratio.
+		float scaleCorrection = screenAspect / SCREEN_SPACE_ASPECT;
 
 		for (const auto& displaySprite : DisplaySprites)
 		{
@@ -641,12 +648,12 @@ namespace TEN::Renderer
 			case DisplaySpriteScaleMode::Fit:
 				if (screenAspect >= spriteAspect)
 				{
-					halfSize = (Vector2(screenHeightMax) * displaySprite.Scale) / 2;
+					halfSize = ((Vector2(screenDimensionsMax.y) * displaySprite.Scale) * scaleCorrection) / 2;
 					halfSize.x *= spriteAspect;
 				}
 				else
 				{
-					halfSize = (Vector2(screenWidthMax) * displaySprite.Scale) / 2;
+					halfSize = ((Vector2(screenDimensionsMax.x) * displaySprite.Scale) * scaleCorrection) / 2;
 					halfSize.y /= spriteAspect;
 				}
 				break;
@@ -654,18 +661,18 @@ namespace TEN::Renderer
 			case DisplaySpriteScaleMode::Fill:
 				if (screenAspect >= spriteAspect)
 				{
-					halfSize = (Vector2(screenWidthMax) * displaySprite.Scale) / 2;
+					halfSize = ((Vector2(screenDimensionsMax.x) * displaySprite.Scale) * scaleCorrection) / 2;
 					halfSize.y /= spriteAspect;
 				}
 				else
 				{
-					halfSize = (Vector2(screenHeightMax) * displaySprite.Scale) / 2;
+					halfSize = ((Vector2(screenDimensionsMax.y) * displaySprite.Scale) * scaleCorrection) / 2;
 					halfSize.x *= spriteAspect;
 				}
 				break;
 
 			case DisplaySpriteScaleMode::Stretch:
-				halfSize = Vector2(screenWidthMax, screenHeightMax) * displaySprite.Scale / 2;
+				halfSize = ((Vector2(screenDimensionsMax.x, screenDimensionsMax.y) * displaySprite.Scale) * scaleCorrection) / 2;
 				break;
 			}
 

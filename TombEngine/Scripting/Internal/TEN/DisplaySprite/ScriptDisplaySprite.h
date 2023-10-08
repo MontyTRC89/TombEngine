@@ -9,7 +9,6 @@ using namespace TEN::Effects::DisplaySprite;
 enum BLEND_MODE;
 
 // TODO:
-// Register DISPLAY_SPRITE_SCALE_MODES and DISPLAY_SPRITE_ORIGIN_TYPES under the correct sub-thing.
 // Test nested sprites in various modes and how they behave when the aspect ratio changes.
 // Fix weird flashing effect.
 // Fix scaling with different screen aspect ratios.

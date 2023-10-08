@@ -451,16 +451,16 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto pos = Vector2(100, 300);
+	auto pos = Vector2(400, 300);
 
 	// debug-----------------------
-	//AddDisplaySprite(
-	//	ID_BINOCULAR_GRAPHIC, 0, pos, 0, Vector2::One/2, Vector4::One,
-	//	0, DisplaySpriteAlignMode::TopLeft, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
-	//
-	//AddDisplaySprite(
-	//	ID_BINOCULAR_GRAPHIC, 1, pos, 0, Vector2::One/4, Vector4::One,
-	//	0, DisplaySpriteAlignMode::BottomRight, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
+	/*AddDisplaySprite(
+		ID_BINOCULAR_GRAPHIC, 0, pos, 0, Vector2::One, Vector4::One,
+		0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);*/
+	
+	/*AddDisplaySprite(
+		ID_BINOCULAR_GRAPHIC, 0, pos, 0, Vector2::One, Vector4::One,
+		0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);*/
 	//-----------------------
 
 	if (lara->Control.Weapon.HasFired)
