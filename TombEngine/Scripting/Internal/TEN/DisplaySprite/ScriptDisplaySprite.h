@@ -18,6 +18,9 @@ namespace TEN::Scripting::DisplaySprite
 {
 	class ScriptDisplaySprite
 	{
+	public:
+		static void Register(sol::table& parent);
+
 	private:
 		// Members
 		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
@@ -29,8 +32,6 @@ namespace TEN::Scripting::DisplaySprite
 		ScriptColor Color	 = ScriptColor(255, 255, 255, 255);
 
 	public:
-		static void Register(sol::table& parent);
-
 		// Constructors
 		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
 							sol::optional<const ScriptColor&> color);
