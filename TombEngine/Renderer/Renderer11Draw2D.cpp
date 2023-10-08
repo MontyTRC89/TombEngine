@@ -602,12 +602,12 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 	}
 
-	void Renderer11::AddDisplaySprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
+	void Renderer11::AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 									  int priority, BLEND_MODES blendMode, RenderView& renderView)
 	{
 		auto spriteToDraw = RendererDisplaySpriteToDraw{};
 
-		spriteToDraw.SpritePtr = spritePtr;
+		spriteToDraw.SpritePtr = &sprite;
 		spriteToDraw.Position = pos2D;
 		spriteToDraw.Orientation = orient;
 		spriteToDraw.Size = size;
@@ -628,10 +628,10 @@ namespace TEN::Renderer
 
 		for (const auto& displaySprite : DisplaySprites)
 		{
-			auto& texture = m_sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
+			const auto& sprite = m_sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
 
 			// Calculate sprite aspect ratio.
-			float spriteAspect = (float)texture.Width / (float)texture.Height;
+			float spriteAspect = (float)sprite.Width / (float)sprite.Height;
 
 			// Calculate size.
 			auto halfSize = Vector2::Zero;
@@ -712,7 +712,7 @@ namespace TEN::Renderer
 			offset = TEN::Utils::GetAspectCorrect2DPosition(offset);
 
 			AddDisplaySprite(
-				&texture,
+				sprite,
 				displaySprite.Position + offset,
 				displaySprite.Orientation,
 				halfSize,

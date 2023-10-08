@@ -7,7 +7,7 @@ namespace TEN::Renderer
 
 	struct RendererDisplaySpriteToDraw
 	{
-		RendererSprite* SpritePtr = nullptr;
+		const RendererSprite* SpritePtr = nullptr;
 
 		Vector2 Position	= Vector2::Zero;
 		short	Orientation = 0;
