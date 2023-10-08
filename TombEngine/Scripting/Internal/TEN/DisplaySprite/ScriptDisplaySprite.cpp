@@ -51,7 +51,7 @@ namespace TEN::Scripting::DisplaySprite
 			"Color", sol::property(&ScriptDisplaySprite::GetColor, &ScriptDisplaySprite::SetColor));
 
 		auto table = sol::table(state.lua_state(), sol::create);
-		parent.set(ScriptReserved_DisplaySprite, table);
+		parent.set("DisplaySpriteEnum"/*ScriptReserved_DisplaySprite*/, table);
 		
 		auto handler = LuaHandler(&state);
 		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
