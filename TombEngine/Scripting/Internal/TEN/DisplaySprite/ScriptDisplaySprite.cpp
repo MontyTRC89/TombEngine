@@ -26,31 +26,58 @@ namespace TEN::Scripting::DisplaySprite
 			ctors(),
 			sol::call_constructor, ctors(),
 
+			/*** Draw the display sprite in display space for the current frame.
+			@function DisplaySprite:Draw
+			@tparam Objects.ObjID[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. __Default: 0__
+			@tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. __Default: DisplaySprite.AlignMode.CENTER__
+			@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. __Default: DisplaySprite.ScaleMode.FIT__
+			@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. __Default: Effects.BlendID.ALPHABLEND__
+			*/
 			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw,
 
-			/// (Objects.ObjID) ID of the sprite sequence object.
-			//@mem ObjectID
-			"ObjectID", sol::property(&ScriptDisplaySprite::GetObjectID, &ScriptDisplaySprite::SetObjectID),
+			/// Get the position of the display sprite.
+			// Coordinates in percentages are returned.
+			// @function DisplaySprite:GetPosition()
+			// @treturn Vec2 (x,y) x and y coordinates.
+			ScriptReserved_DisplayStringGetPosition, &ScriptDisplaySprite::GetPosition,
 
-			/// (int) ID of the sprite in the sprite sequence object.
-			//@mem SpriteID
-			"SpriteID", sol::property(&ScriptDisplaySprite::GetSpriteID, &ScriptDisplaySprite::SetSpriteID),
+			/// Set the position of the display sprite.
+			// Coordinates in percentage are expected.
+			// @function DisplaySprite:SetPosition(Vec2(x,y))
+			// @tparam Vec2 (x,y)  new x and y coordinates.
+			ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
 
-			/// (Vec2) Display space position of the display sprite in percent. Alignment determined by __DisplaySprite.AlignMode__
-			//@mem Position
-			"Position", sol::property(&ScriptDisplaySprite::GetPosition, &ScriptDisplaySprite::SetPosition),
+			/// Get the rotation of the display sprite.
+			// Rotation in float is returned.
+			// @function DisplaySprite:GetRotation()
+			// @treturn float rotation rotation of the display sprite.
+			ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
 
-			/// (float) Rotation of the display sprite in degrees.
-			//@mem Rotation
-			"Rotation", sol::property(&ScriptDisplaySprite::GetRotation, &ScriptDisplaySprite::SetRotation),
+			/// Set the rotation of the display sprite.
+			// Rotation in float is expected.
+			// @function DisplaySprite:SetRotation(float)
+			// @tparam float rotation new rotation of the display sprite.
+			ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
 
-			/// (Vec2) Horizontal and vertical scale of the display sprite in percent. Relative to __DisplaySprite.ScaleMode__.
-			//@mem Scale
-			"Scale", sol::property(&ScriptDisplaySprite::GetScale, &ScriptDisplaySprite::SetScale),
+			/// Get the color of the display sprite.
+			// Get the display sprite's color
+			// @function DisplaySprite:GetColor()
+			// @treturn Color color a copy of the display sprite's color
+			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
 
-			/// (Color) Color of the display sprite.
-			//@mem Color
-			"Color", sol::property(&ScriptDisplaySprite::GetColor, &ScriptDisplaySprite::SetColor));
+			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
+
+			ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
+
+			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
+
+			ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
+
+			ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
+
+			ScriptReserved_DisplayStringGetSpriteID, & ScriptDisplaySprite::GetSpriteID,
+
+			ScriptReserved_DisplayStringSetSpriteID, & ScriptDisplaySprite::SetSpriteID);
 
 		auto table = sol::table(state.lua_state(), sol::create);
 		parent.set("DisplaySpriteEnum"/*ScriptReserved_DisplaySprite*/, table);
@@ -60,14 +87,15 @@ namespace TEN::Scripting::DisplaySprite
 		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
-	/***
-	@Objects.ObjID objectID ID of the sprite sequence object.
-	@int spriteID ID of the sprite in the sprite sequence object.
-	@Vec2 pos Display space position of the display sprite in percent. Alignment determined by __DisplaySprite.AlignMode__
-	@float rot Rotation of the display sprite in degrees.
-	@Vec2 scale Horizontal and vertical scale of the display sprite in percent. Relative to __DisplaySprite.ScaleMode__.
-	@Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
-	@treturn DisplaySprite A DisplaySprite object.
+	/*** Create a DisplaySprite.
+	@function DisplaySprite
+	@tparam Objects.ObjID ID of the sprite object.
+	@tparam int int spriteID ID of the display sprite in the sprite object.
+	@tparam Vec2 pos Display position of the display sprite.
+	@tparam float rot Rotation of the display sprite in degrees.
+	@tparam Vec2 scale Horizontal and vertical scale of the display sprite.
+	@tparam Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
+	@treturn DisplaySprite A new DisplaySprite object.
 	*/
 	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
 	{
@@ -146,13 +174,6 @@ namespace TEN::Scripting::DisplaySprite
 		Color = color;
 	}
 
-	/*** Draw the display sprite in display space for the current frame.
-	@function DisplaySprite:Draw
-	@tparam Objects.ObjID[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. __Default: 0__
-	@tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. __Default: DisplaySprite.AlignMode.CENTER__
-	@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. __Default: DisplaySprite.ScaleMode.FIT__
-	@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. __Default: Effects.BlendID.ALPHABLEND__
-	*/
 	void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
 								   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
 	{
