@@ -451,9 +451,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// debug
-	AddDisplaySprite(
+	/*AddDisplaySprite(
 		ID_DEFAULT_SPRITES, 0, Vector2(400, 300), 0, Vector2::One, Vector4::One,
-		0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
+		0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);*/
 
 	if (lara->Control.Weapon.HasFired)
 	{
