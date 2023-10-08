@@ -236,7 +236,7 @@ Specify which translations in the strings table correspond to which languages.
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 	ScriptColor::Register(parent);
-	ScriptDisplaySprite::Register(parent);
+	ScriptDisplaySprite::Register(*lua, parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);
@@ -247,10 +247,6 @@ Specify which translations in the strings table correspond to which languages.
 	Animations::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
-
-	// TODO: Register inside ScriptDisplaySprite for syntax that looks like this: DisplaySprite.AlignMode.CENTER.
-	m_handler.MakeReadOnlyTable(tableFlow, "DisplaySpriteAlignMode"/*ScriptReserved_DisplaySpriteTableAlignMode*/, DISPLAY_SPRITE_ALIGN_MODES);
-	m_handler.MakeReadOnlyTable(tableFlow, "DisplaySpriteScaleMode"/*ScriptReserved_DisplaySpriteTableScaleMode*/, DISPLAY_SPRITE_SCALE_MODES);
 	
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);

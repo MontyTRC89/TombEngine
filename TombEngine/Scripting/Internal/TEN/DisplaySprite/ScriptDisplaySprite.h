@@ -19,7 +19,7 @@ namespace TEN::Scripting::DisplaySprite
 	class ScriptDisplaySprite
 	{
 	public:
-		static void Register(sol::table& parent);
+		static void Register(sol::state& state, sol::table& parent);
 
 	private:
 		// Members

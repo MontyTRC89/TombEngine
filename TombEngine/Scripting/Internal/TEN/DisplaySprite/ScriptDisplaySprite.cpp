@@ -15,7 +15,7 @@ using namespace TEN::Effects::DisplaySprite;
 
 namespace TEN::Scripting::DisplaySprite
 {
-	void ScriptDisplaySprite::Register(sol::table& parent)
+	void ScriptDisplaySprite::Register(sol::state& state, sol::table& parent)
 	{
 		using ctors = sol::constructors<ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&, sol::optional<const ScriptColor&>)>;
 
@@ -49,6 +49,13 @@ namespace TEN::Scripting::DisplaySprite
 			/// (Color) Color of the display sprite.
 			//@mem Color
 			"Color", sol::property(&ScriptDisplaySprite::GetColor, &ScriptDisplaySprite::SetColor));
+
+		auto table = sol::table(state.lua_state(), sol::create);
+		parent.set(ScriptReserved_DisplaySprite, table);
+		
+		auto handler = LuaHandler(&state);
+		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
+		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
 	/***
