@@ -33,8 +33,7 @@ namespace TEN::Scripting::DisplaySprite
 
 	public:
 		// Constructors
-		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color);
-		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale);
+		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, sol::optional<ScriptColor> color);
 
 		// Getters
 		GAME_OBJECT_ID GetObjectID() const;

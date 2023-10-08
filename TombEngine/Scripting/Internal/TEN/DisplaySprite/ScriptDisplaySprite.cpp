@@ -17,9 +17,7 @@ namespace TEN::Scripting::DisplaySprite
 {
 	void ScriptDisplaySprite::Register(sol::state& state, sol::table& parent)
 	{
-		using ctors = sol::constructors<
-			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&, const ScriptColor&),
-			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&)>;
+		using ctors = sol::constructors<ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&, sol::optional<ScriptColor>)>;
 
 		parent.new_usertype<ScriptDisplaySprite>(
 			ScriptReserved_DisplaySprite,
@@ -69,21 +67,16 @@ namespace TEN::Scripting::DisplaySprite
 	@Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
 	@treturn DisplaySprite A DisplaySprite object.
 	*/
-	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
+	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, sol::optional<ScriptColor> color)
 	{
+		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255, 255);
+
 		ObjectID = objectID;
 		SpriteID = spriteID;
 		Position = pos;
 		Rotation = rot;
 		Scale = scale;
-		Color = color;
-	}
-
-	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale)
-	{
-		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255, 255);
-
-		*this = ScriptDisplaySprite(objectID, spriteID, pos, rot, scale, DEFAULT_COLOR);
+		Color = color.value_or(DEFAULT_COLOR);
 	}
 
 	GAME_OBJECT_ID ScriptDisplaySprite::GetObjectID() const
