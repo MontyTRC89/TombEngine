@@ -26,75 +26,70 @@ namespace TEN::Scripting::DisplaySprite
 			ctors(),
 			sol::call_constructor, ctors(),
 
-			/*** Draw the display sprite in display space for the current frame.
-			@function DisplaySprite:Draw
-			@tparam Objects.ObjID[opt] priority Draw priority of the sprite. Can be thought of as a layer, with higher values having higher priority. __Default: 0__
-			@tparam DisplaySprite.AlignMode[opt] alignMode Align mode of the sprite. __Default: DisplaySprite.AlignMode.CENTER__
-			@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode of the sprite. __Default: DisplaySprite.ScaleMode.FIT__
-			@tparam Effects.BlendID[opt] blendMode Blend mode of the sprite. __Default: Effects.BlendID.ALPHABLEND__
-			*/
-			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw,
+			ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
 
-			/// Get the position of the display sprite.
-			// Coordinates in percentages are returned.
+			ScriptReserved_DisplayStringGetSpriteID, &ScriptDisplaySprite::GetSpriteID,
+
+			/// Get the display position of the display sprite in percent.
 			// @function DisplaySprite:GetPosition()
-			// @treturn Vec2 (x,y) x and y coordinates.
+			// @treturn Vec2 Display position in percent.
 			ScriptReserved_DisplayStringGetPosition, &ScriptDisplaySprite::GetPosition,
 
-			/// Set the position of the display sprite.
-			// Coordinates in percentage are expected.
-			// @function DisplaySprite:SetPosition(Vec2(x,y))
-			// @tparam Vec2 (x,y)  new x and y coordinates.
-			ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
-
-			/// Get the rotation of the display sprite.
-			// Rotation in float is returned.
+			/// Get the rotation of the display sprite in degrees.
 			// @function DisplaySprite:GetRotation()
-			// @treturn float rotation rotation of the display sprite.
+			// @treturn float Rotation in degrees.
 			ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
-
-			/// Set the rotation of the display sprite.
-			// Rotation in float is expected.
-			// @function DisplaySprite:SetRotation(float)
-			// @tparam float rotation new rotation of the display sprite.
-			ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
-
-			/// Get the color of the display sprite.
-			// Get the display sprite's color
-			// @function DisplaySprite:GetColor()
-			// @treturn Color color a copy of the display sprite's color
-			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
-
-			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
 
 			ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
 
-			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
-
-			ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
+			/// Get the color of the display sprite.
+			// @function DisplaySprite:GetColor()
+			// @treturn Color Color.
+			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
 
 			ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
 
-			ScriptReserved_DisplayStringGetSpriteID, & ScriptDisplaySprite::GetSpriteID,
+			ScriptReserved_DisplayStringSetSpriteID, &ScriptDisplaySprite::SetSpriteID,
 
-			ScriptReserved_DisplayStringSetSpriteID, & ScriptDisplaySprite::SetSpriteID);
+			/// Set the display position of the display sprite in percent.
+			// @function DisplaySprite:SetPosition(Vec2(x, y))
+			// @tparam Vec2 New display position in percent.
+			ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
+
+			/// Set the rotation of the display sprite in degrees.
+			// @function DisplaySprite:SetRotation(float)
+			// @tparam float New rotation in degrees.
+			ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
+
+			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
+
+			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
+			
+			/*** Draw the display sprite in display space for the current frame.
+			@function DisplaySprite:Draw
+			@tparam Objects.ObjID[opt] priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
+			@tparam DisplaySprite.AlignMode[opt] alignMode Align mode. __Default: DisplaySprite.AlignMode.CENTER__
+			@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode. __Default: DisplaySprite.ScaleMode.FIT__
+			@tparam Effects.BlendID[opt] blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
+			*/
+			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
 
 		auto table = sol::table(state.lua_state(), sol::create);
-		parent.set("DisplaySpriteEnum"/*ScriptReserved_DisplaySprite*/, table);
+		parent.set(ScriptReserved_DisplaySpriteEnum, table);
 		
 		auto handler = LuaHandler(&state);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteTableScaleMode, DISPLAY_SPRITE_SCALE_MODES);
+		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
+		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
 	/*** Create a DisplaySprite.
 	@function DisplaySprite
-	@tparam Objects.ObjID ID of the sprite object.
-	@tparam int int spriteID ID of the display sprite in the sprite object.
-	@tparam Vec2 pos Display position of the display sprite.
-	@tparam float rot Rotation of the display sprite in degrees.
-	@tparam Vec2 scale Horizontal and vertical scale of the display sprite.
-	@tparam Color color[opt] Color of the display sprite. __Default: Color(255, 255, 255, 255)__
+	@tparam Objects.ObjID ID of the sprite sequence object.
+	@tparam int int spriteID ID of the sprite in the sequence.
+	@tparam Vec2 pos Display position in percent.
+	@tparam float rot Rotation in degrees.
+	@tparam Vec2 scale Horizontal and vertical scale.
+	@tparam Color color[opt] Color. __Default: Color(255, 255, 255, 255)__
 	@treturn DisplaySprite A new DisplaySprite object.
 	*/
 	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
