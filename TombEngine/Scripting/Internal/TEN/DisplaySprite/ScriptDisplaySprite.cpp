@@ -21,13 +21,20 @@ namespace TEN::Scripting::DisplaySprite
 			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&, const ScriptColor&),
 			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&)>;
 
+		// Register type.
 		parent.new_usertype<ScriptDisplaySprite>(
 			ScriptReserved_DisplaySprite,
 			ctors(),
 			sol::call_constructor, ctors(),
 
+			/// Get the object ID of the sprite sequence object used by the display sprite.
+			// @function DisplaySprite:GetObjectID()
+			// @treturn Objects.ObjID Sprite sequence object ID.
 			ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
 
+			/// Get the sprite ID in the sprite sequence object used by the display sprite.
+			// @function DisplaySprite:GetSpriteID()
+			// @treturn int Sprite ID in the sprite sequence object.
 			ScriptReserved_DisplayStringGetSpriteID, &ScriptDisplaySprite::GetSpriteID,
 
 			/// Get the display position of the display sprite in percent.
@@ -40,6 +47,9 @@ namespace TEN::Scripting::DisplaySprite
 			// @treturn float Rotation in degrees.
 			ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
 
+			/// Get the horizontal and vertical scale of the display sprite in percent.
+			// @function DisplaySprite:GetScale()
+			// @treturn Vec2 Horizontal and vertical scale in percent.
 			ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
 
 			/// Get the color of the display sprite.
@@ -47,12 +57,18 @@ namespace TEN::Scripting::DisplaySprite
 			// @treturn Color Color.
 			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
 
+			/// Set the sprite sequence object ID used by the display sprite.
+			// @function DisplaySprite:SetObjectID(Objects.ObjID)
+			// @tparam Objects.ObjID New sprite sequence object ID.
 			ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
 
+			/// Set the sprite ID in the sprite sequence object used by the display sprite.
+			// @function DisplaySprite:SetSpriteID(int)
+			// @tparam int New sprite ID in the sprite sequence object.
 			ScriptReserved_DisplayStringSetSpriteID, &ScriptDisplaySprite::SetSpriteID,
 
 			/// Set the display position of the display sprite in percent.
-			// @function DisplaySprite:SetPosition(Vec2(x, y))
+			// @function DisplaySprite:SetPosition(Vec2)
 			// @tparam Vec2 New display position in percent.
 			ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
 
@@ -61,15 +77,21 @@ namespace TEN::Scripting::DisplaySprite
 			// @tparam float New rotation in degrees.
 			ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
 
+			/// Set the horizontal and vertical scale of the display sprite in percent.
+			// @function DisplaySprite:SetScale(Vec2)
+			// @tparam float New horizontal and vertical scale in percent.
 			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
 
+			/// Set the color of the display sprite.
+			// @function DisplaySprite:SetColor(Color)
+			// @tparam float New color.
 			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
 			
 			/*** Draw the display sprite in display space for the current frame.
 			@function DisplaySprite:Draw
 			@tparam Objects.ObjID[opt] priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
-			@tparam DisplaySprite.AlignMode[opt] alignMode Align mode. __Default: DisplaySprite.AlignMode.CENTER__
-			@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode. __Default: DisplaySprite.ScaleMode.FIT__
+			@tparam DisplaySprite.AlignMode[opt] alignMode Align mode interpreting an offset from the position. __Default: DisplaySprite.AlignMode.CENTER__
+			@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode interpreting horizontal and vertical scale. __Default: DisplaySprite.ScaleMode.FIT__
 			@tparam Effects.BlendID[opt] blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
 			*/
 			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
@@ -77,6 +99,7 @@ namespace TEN::Scripting::DisplaySprite
 		auto table = sol::table(state.lua_state(), sol::create);
 		parent.set(ScriptReserved_DisplaySpriteEnum, table);
 		
+		// Register enums.
 		auto handler = LuaHandler(&state);
 		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
 		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumScaleMode, DISPLAY_SPRITE_SCALE_MODES);
@@ -88,7 +111,7 @@ namespace TEN::Scripting::DisplaySprite
 	@tparam int int spriteID ID of the sprite in the sequence.
 	@tparam Vec2 pos Display position in percent.
 	@tparam float rot Rotation in degrees.
-	@tparam Vec2 scale Horizontal and vertical scale.
+	@tparam Vec2 scale Horizontal and vertical scale in percent. Scaling is interpreted by the DisplaySpriteEnum.ScaleMode passed to the Draw() function call.
 	@tparam Color color[opt] Color. __Default: Color(255, 255, 255, 255)__
 	@treturn DisplaySprite A new DisplaySprite object.
 	*/
