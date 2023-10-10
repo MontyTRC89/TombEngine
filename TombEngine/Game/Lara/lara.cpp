@@ -455,8 +455,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	// debug-----------------------
 	/*AddDisplaySprite(
-		ID_BINOCULAR_GRAPHIC, 0, pos, 0, Vector2::One, Vector4::One,
-		0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);*/
+		ID_BINOCULAR_GRAPHIC, 1, pos, item->Pose.Orientation.y, Vector2::One, Vector4::One,
+		0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Stretch, BLEND_MODES::BLENDMODE_ALPHABLEND);*/
 	
 	/*AddDisplaySprite(
 		ID_BINOCULAR_GRAPHIC, 0, pos, 0, Vector2::One, Vector4::One,

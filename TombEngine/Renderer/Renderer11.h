@@ -747,7 +747,7 @@ namespace TEN::Renderer
 		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
-							  int priority, BLEND_MODES blendMode, RenderView& renderView);
+							  int priority, BLEND_MODES blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);
 	};
 

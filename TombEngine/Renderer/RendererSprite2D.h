@@ -16,5 +16,7 @@ namespace TEN::Renderer
 
 		int			Priority  = 0;
 		BLEND_MODES BlendMode = BLENDMODE_ALPHABLEND;
+
+		Vector2 AspectCorrection = Vector2::One;
 	};
 }
