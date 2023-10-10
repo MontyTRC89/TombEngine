@@ -726,7 +726,7 @@ namespace TEN::Renderer
 				offset = Vector2(-halfSize.x, -halfSize.y);
 				break;
 			}
-			offset = TEN::Utils::GetAspectCorrect2DPosition(offset);
+			offset *= aspectCorrection;
 
 			AddDisplaySprite(
 				sprite,
