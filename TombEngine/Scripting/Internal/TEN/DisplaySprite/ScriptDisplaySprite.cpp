@@ -4,6 +4,7 @@
 #include "Game/effects/DisplaySprite.h"
 #include "Game/Setup.h"
 #include "Objects/game_object_ids.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
@@ -12,6 +13,7 @@
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
 using namespace TEN::Effects::DisplaySprite;
+using TEN::Renderer::g_Renderer;
 
 namespace TEN::Scripting::DisplaySprite
 {
@@ -62,6 +64,13 @@ namespace TEN::Scripting::DisplaySprite
 			@treturn Color Color.
 			*/
 			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
+
+			/*** Get the size of the display sprite in percent relative to the input scale mode.
+			@function DisplaySprite:GetSize(scaleMode)
+			@tparam DisplaySpriteEnum.ScaleMode Scale mode for which to get the size.
+			@treturn Vec2 Size in percent relative to the scale mode.
+			*/
+			ScriptReserved_DisplayStringGetSize, &ScriptDisplaySprite::GetSize,
 
 			/*** Set the sprite sequence object ID used by the display sprite.
 			@function DisplaySprite:SetObjectID(Objects.ObjID)
@@ -172,6 +181,45 @@ namespace TEN::Scripting::DisplaySprite
 	ScriptColor ScriptDisplaySprite::GetColor() const
 	{
 		return Color;
+	}
+
+	Vec2 ScriptDisplaySprite::GetSize(DisplaySpriteScaleMode scaleMode) const
+	{
+		constexpr auto DISPLAY_SPACE_ASPECT = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
+
+		// Calculate screen aspect ratio.
+		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
+		float screenResAspect = screenRes.x / screenRes.y;
+
+		// Calculate sprite aspect ratio.
+		const auto& sprite = g_Level.SpritesTextures[Objects[ObjectID].meshIndex + SpriteID];
+		auto spriteAspect = (float)sprite.width / (float)sprite.height;
+
+		auto halfSize = Vector2::Zero;
+		switch (scaleMode)
+		{
+		default:
+		case DisplaySpriteScaleMode::Fit:
+			if (screenResAspect >= spriteAspect)
+			{
+				halfSize = (Vector2(SCREEN_SPACE_RES.y) * Scale) / 2;
+				halfSize.x *= (spriteAspect >= 1.0f) ? spriteAspect : (1.0f / spriteAspect);
+			}
+			else
+			{
+				halfSize = (Vector2(SCREEN_SPACE_RES.x) * Scale) / 2;
+				halfSize.y *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
+			}
+			break;
+		
+		case DisplaySpriteScaleMode::Fill:
+			break;
+
+		case DisplaySpriteScaleMode::Stretch:
+			break;
+		}
+
+		return (halfSize * 2);
 	}
 
 	void ScriptDisplaySprite::SetObjectID(GAME_OBJECT_ID objectID)

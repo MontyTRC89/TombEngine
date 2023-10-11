@@ -42,6 +42,7 @@ namespace TEN::Scripting::DisplaySprite
 		float		   GetRotation() const;
 		Vec2		   GetScale() const;
 		ScriptColor	   GetColor() const;
+		Vec2		   GetSize(DisplaySpriteScaleMode scaleMode) const;
 
 		// Setters
 		void SetObjectID(GAME_OBJECT_ID objectID);
