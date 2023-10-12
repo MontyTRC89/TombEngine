@@ -14,6 +14,7 @@ Version 1.1.1
 * Fix volume change in settings not affecting voice track.
 * Fix several lighting bugs.
 * Fix savegame count not properly increasing.
+* Fix regeneration of non-ammo pickups with OCB 128.
 * Overhaul look mode:
  - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
  - Improve movement and control.
