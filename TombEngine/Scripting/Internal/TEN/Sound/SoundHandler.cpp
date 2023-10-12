@@ -49,7 +49,7 @@ namespace Sound
 		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
 	}
 
-	static void StopSoundEffect(int id)
+	static void StopSound(int id)
 	{
 		StopSoundEffect(id);
 	}
@@ -118,7 +118,7 @@ namespace Sound
 		/// Stop sound effect
 		//@function StopSound
 		//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
-		tableSound.set_function(ScriptReserved_StopSound, &StopSoundEffect);
+		tableSound.set_function(ScriptReserved_StopSound, &StopSound);
 
 		/// Check if the sound effect is playing
 		//@function IsSoundPlaying

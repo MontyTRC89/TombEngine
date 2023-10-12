@@ -17,7 +17,6 @@
 #include "Scripting/Internal/TEN/Misc/ActionIDs.h"
 #include "Scripting/Internal/TEN/Misc/CameraTypes.h"
 #include "Scripting/Internal/TEN/Misc/LevelLog.h"
-#include "Scripting/Internal/TEN/Sound/SoundTrackTypes.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
