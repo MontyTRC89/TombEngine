@@ -42,13 +42,6 @@ void Vec3::Register(sol::table& parent)
 		*/
 		ScriptReserved_Vec3Normalize, &Vec3::Normalize,
 		
-		/*** Get a copy of the Vec3 rotated by the input Rotation object.
-		@function Vec3:Rotate(rot)
-		@tparam Rotation rot Rotation object.
-		@treturn Vec3 Rotated Vec3.
-		*/
-		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
-
 		/*** Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input alpha value in the range [0, 1].
 		@function Vec3:Lerp(vector)
 		@tparam Vec3 vector Target interpolation vector.
@@ -57,6 +50,13 @@ void Vec3::Register(sol::table& parent)
 		*/
 		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
 		
+		/*** Get a copy of the Vec3 rotated by the input Rotation object.
+		@function Vec3:Rotate(rot)
+		@tparam Rotation rot Rotation object.
+		@treturn Vec3 Rotated Vec3.
+		*/
+		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
+
 		/*** Get the cross product of this Vec3 and the input Vec3.
 		@function Vec3:Cross(vector)
 		@tparam Vec3 vector Input vector.
@@ -142,6 +142,14 @@ Vec3 Vec3::Normalize() const
 	return vector;
 }
 
+Vec3 Vec3::Lerp(const Vec3& vector, float alpha) const
+{
+	auto vector0 = ToVector3();
+	auto vector1 = vector.ToVector3();
+
+	return Vec3(Vector3::Lerp(vector0, vector1, alpha));
+}
+
 Vec3 Vec3::Rotate(const Rotation& rot) const
 {
 	auto vector = ToVector3();
@@ -149,14 +157,6 @@ Vec3 Vec3::Rotate(const Rotation& rot) const
 	auto rotMatrix = eulerRot.ToRotationMatrix();
 
 	return Vec3(Vector3::Transform(vector, rotMatrix));
-}
-
-Vec3 Vec3::Lerp(const Vec3& vector, float alpha) const
-{
-	auto vector0 = ToVector3();
-	auto vector1 = vector.ToVector3();
-
-	return Vec3(Vector3::Lerp(vector0, vector1, alpha));
 }
 
 Vec3 Vec3::Cross(const Vec3& vector) const
