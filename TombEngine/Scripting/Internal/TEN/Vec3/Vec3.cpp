@@ -37,7 +37,7 @@ void Vec3::Register(sol::table& parent)
 		
 		/*** Set the length of this Vec3 to the input length.
 		@tparam float length New length.
-		@function Vec3:ToLength(length)
+		@function Vec3:SetLength(length)
 		*/
 		ScriptReserved_Vec3SetLength, &Vec3::SetLength,
 

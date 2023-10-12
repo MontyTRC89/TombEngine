@@ -331,7 +331,7 @@ constexpr char ScriptReserved_Vec2SetLength[] = "ToLength";
 
 // Vec3
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
-constexpr char ScriptReserved_Vec3SetLength[]		= "ToLength"; // SetLength
+constexpr char ScriptReserved_Vec3SetLength[]		= "SetLength";
 constexpr char ScriptReserved_Vec3ClampLength[]		= "ClampLength";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
 constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
