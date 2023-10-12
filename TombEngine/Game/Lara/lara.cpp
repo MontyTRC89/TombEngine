@@ -441,42 +441,9 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_default_col,//189
 };
 
-
-// debug--------------------
-#include "Game/effects/DisplaySprite.h"
-using namespace TEN::Effects::DisplaySprite;
-//-----------------------
-
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-
-	auto pos = Vector2(400, 300);
-
-	// Calculate sprite aspect ratio.
-	const auto& sprite = g_Level.Sprites[Objects[ID_FIRE_SPRITES].meshIndex + 0];
-	auto spriteAspect = float(sprite.x1 - sprite.x4) / float(sprite.y1 - sprite.y4);
-
-	g_Renderer.PrintDebugMessage("%d", Objects[ID_FIRE_SPRITES].meshIndex);
-	g_Renderer.PrintDebugMessage("%d", sprite.x1);
-	g_Renderer.PrintDebugMessage("%d", sprite.x2);
-	g_Renderer.PrintDebugMessage("%d", sprite.x3);
-	g_Renderer.PrintDebugMessage("%d", sprite.x4);
-	g_Renderer.PrintDebugMessage("%d", sprite.y1);
-	g_Renderer.PrintDebugMessage("%d", sprite.y2);
-	g_Renderer.PrintDebugMessage("%d", sprite.y3);
-	g_Renderer.PrintDebugMessage("%d", sprite.y4);
-	g_Renderer.PrintDebugMessage("%.3f", spriteAspect);
-
-	// debug-----------------------
-	/*AddDisplaySprite(
-		ID_BINOCULAR_GRAPHIC, 1, pos, item->Pose.Orientation.y, Vector2::One, Vector4::One,
-		0, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Stretch, BLEND_MODES::BLENDMODE_ALPHABLEND);
-	
-	AddDisplaySprite(
-		ID_BINOCULAR_GRAPHIC, 0, pos, 0, Vector2::One, Vector4::One,
-		0, DisplaySpriteAlignMode::TopLeft, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);*/
-	//-----------------------
 
 	if (lara->Control.Weapon.HasFired)
 	{
