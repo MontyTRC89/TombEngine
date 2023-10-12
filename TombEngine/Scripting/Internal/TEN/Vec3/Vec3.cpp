@@ -30,7 +30,7 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::unary_minus, &Vec3::UnaryMinus,
 		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
-		/*** Set the length of the Vec3 to the input length.
+		/*** Set the length of this Vec3 to the input length.
 		@function Vec3:SetLength(length)
 		@tparam float length New length.
 		*/
@@ -78,7 +78,7 @@ void Vec3::Register(sol::table& parent)
 		*/
 		ScriptReserved_Vec3Distance, &Vec3::Distance,
 
-		/*** Get the length of the Vec3.
+		/*** Get the length of this Vec3.
 		@function Vec3:Length()
 		@treturn float Length.
 		*/
