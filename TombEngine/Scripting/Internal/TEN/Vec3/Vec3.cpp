@@ -95,11 +95,11 @@ void Vec3::Register(sol::table& parent)
 		"z", &Vec3::z);
 }
 
-/*** 
+/*** Create a Vec3.
 @float x X component.
 @float y Y component.
 @float z Z component.
-@treturn Vec3 A Vec3.
+@treturn Vec3 A new Vec3 object.
 @function Vec3
 */
 Vec3::Vec3(float x, float y, float z)
