@@ -25,8 +25,8 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::addition, &Vec3::Add,
 		sol::meta_function::subtraction, &Vec3::Subtract,
 		sol::meta_function::multiplication, &Vec3::Multiply,
-		sol::meta_function::multiplication, &Vec3::MultiplyScale,
-		sol::meta_function::division, &Vec3::DivideScale,
+		sol::meta_function::multiplication, &Vec3::MultiplyByScale,
+		sol::meta_function::division, &Vec3::DivideByScale,
 		sol::meta_function::unary_minus, &Vec3::UnaryMinus,
 		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
@@ -226,12 +226,12 @@ Vec3 Vec3::Multiply(const Vec3& vector0, const Vec3& vector1)
 	return Vec3(vector0.x * vector1.x, vector0.y * vector1.y, vector0.z * vector1.z);
 }
 
-Vec3 Vec3::MultiplyScale(const Vec3& vector, float scale)
+Vec3 Vec3::MultiplyByScale(const Vec3& vector, float scale)
 {
 	return Vec3(vector.x * scale, vector.y * scale, vector.z * scale);
 }
 
-Vec3 Vec3::DivideScale(const Vec3& vector, float scale)
+Vec3 Vec3::DivideByScale(const Vec3& vector, float scale)
 {
 	return Vec3(vector.x / scale, vector.y / scale, vector.z / scale);
 }

@@ -42,8 +42,8 @@ public:
 	static Vec3 Add(const Vec3& vector0, const Vec3& vector1);
 	static Vec3 Subtract(const Vec3& vector0, const Vec3& vector1);
 	static Vec3 Multiply(const Vec3& vector0, const Vec3& vector1);
-	static Vec3 MultiplyScale(const Vec3& vector, float scale);
-	static Vec3 DivideScale(const Vec3& vector, float scale);
+	static Vec3 MultiplyByScale(const Vec3& vector, float scale);
+	static Vec3 DivideByScale(const Vec3& vector, float scale);
 	static Vec3 UnaryMinus(const Vec3& vector);
 	static bool IsEqualTo(const Vec3& vector0, const Vec3& vector1);
 
