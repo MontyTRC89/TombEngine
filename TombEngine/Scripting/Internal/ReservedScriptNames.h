@@ -261,7 +261,6 @@ static constexpr char ScriptReserved_AddCallback[]					= "AddCallback";
 static constexpr char ScriptReserved_RemoveCallback[]				= "RemoveCallback";
 static constexpr char ScriptReserved_HandleEvent[]					= "HandleEvent";
 
-static constexpr char ScriptReserved_DrawDisplaySprite[]			= "DrawDisplaySprite";
 static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
 static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";
