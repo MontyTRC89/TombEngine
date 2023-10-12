@@ -3,9 +3,10 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/los.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
-#include "Game/control/los.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -19,6 +20,7 @@
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 
@@ -28,6 +30,7 @@ Functions to generate effects.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
@@ -318,9 +321,9 @@ namespace Effects
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
 	}
 
-	void Register(sol::state* state, sol::table& parent) 
+	void Register(sol::state* state, sol::table& parent)
 	{
-		sol::table tableEffects = { state->lua_state(), sol::create };
+		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
@@ -333,7 +336,7 @@ namespace Effects
 		tableEffects.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 
-		LuaHandler handler{ state };
+		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}

@@ -412,7 +412,7 @@ namespace TEN::Entities::TR4
 								if (!FlipStats[item.TriggerFlags])
 								{
 									DoFlipMap(item.TriggerFlags);
-									FlipStats[item.TriggerFlags] = 1;
+									FlipStats[item.TriggerFlags] = true;
 								}
 							}
 						}

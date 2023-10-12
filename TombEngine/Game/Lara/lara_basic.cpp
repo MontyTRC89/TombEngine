@@ -463,7 +463,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Look))
+	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 	{
 		item->Animation.TargetState = LS_IDLE;
 		return;
@@ -2426,7 +2426,7 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 }
 
 // State:		LS_SPRINT_DIVE (74)
-// Control:		lara_col_sprint_dive()
+// Control:		lara_as_sprint_dive()
 void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -2453,6 +2453,80 @@ void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 	ShiftItem(item, coll);
 
 	if (TestLaraStep(item, coll))
+	{
+		DoLaraStep(item, coll);
+		return;
+	}
+}
+
+// TODO: Useful for having the player sweep under a gate. No default animation is currently included,
+// but later one will be added to avoid making this an "insider feature". -- Sezz 2023.10.12
+// State:	  LS_SPRINT_SLIDE (191)
+// Collision: lara_col_sprint_slide()
+void lara_as_sprint_slide(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Horizontal;
+
+	player.Control.Count.Run++;
+	if (player.Control.Count.Run > LARA_RUN_JUMP_TIME)
+		player.Control.Count.Run = LARA_RUN_JUMP_TIME;
+
+	if (IsHeld(In::Left) || IsHeld(In::Right))
+	{
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		ModulateLaraLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);
+	}
+
+	if ((player.Control.KeepLow || IsHeld(In::Crouch)) && HasStateDispatch(item, LS_CROUCH_IDLE) &&
+		TestLaraCrouch(item))
+	{
+		item->Animation.TargetState = LS_CROUCH_IDLE;
+		return;
+	}
+
+	item->Animation.TargetState = LS_RUN_FORWARD;
+}
+
+// State:	LS_SPRINT_SLIDE (191)
+// Control: lara_as_sprint_slide()
+void lara_col_sprint_slide(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.KeepLow = TestLaraKeepLow(item, coll);
+	player.Control.IsLow = true;
+	coll->Setup.Height = LARA_HEIGHT_CRAWL;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	GetCollisionInfo(coll, item);
+
+	LaraDeflectEdge(item, coll);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+		return;
+	}
+
+	if (TestLaraFall(item, coll))
+	{
+		SetLaraFallAnimation(item);
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideAnimation(item, coll);
+		return;
+	}
+
+	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
 	{
 		DoLaraStep(item, coll);
 		return;

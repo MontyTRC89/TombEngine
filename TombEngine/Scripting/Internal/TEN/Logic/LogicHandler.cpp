@@ -3,17 +3,18 @@
 
 #include <filesystem>
 
-#include "Game/savegame.h"
+#include "Game/control/volume.h"
 #include "Game/effects/Electricity.h"
+#include "Game/savegame.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 using namespace TEN::Effects::Electricity;
 
@@ -37,7 +38,7 @@ enum class CallbackPoint
 	PostEnd
 };
 
-static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
+static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 {
 	{ ScriptReserved_PreStart, CallbackPoint::PreStart },
 	{ ScriptReserved_PostStart, CallbackPoint::PostStart },
@@ -51,6 +52,13 @@ static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
 	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd }
 };
 
+static const std::unordered_map<std::string, VolumeEventType> EVENT_TYPES
+{
+	{ ScriptReserved_OnEnter, VolumeEventType::Enter },
+	{ ScriptReserved_OnInside, VolumeEventType::Inside },
+	{ ScriptReserved_OnLeave, VolumeEventType::Leave }
+};
+
 enum class LevelEndReason
 {
 	LevelComplete,
@@ -60,7 +68,7 @@ enum class LevelEndReason
 	Other
 };
 
-static const std::unordered_map<std::string, LevelEndReason> kLevelEndReasons
+static const std::unordered_map<std::string, LevelEndReason> LEVEL_END_REASONS
 {
 	{ ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete },
 	{ ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame },
@@ -154,9 +162,11 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 
 	tableLogic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
 	tableLogic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
+	tableLogic.set_function(ScriptReserved_HandleEvent, &LogicHandler::HandleEvent, this);
 
-	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, kLevelEndReasons);
-	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, kCallbackPoints);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, LEVEL_END_REASONS);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, CALLBACK_POINTS);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EventType, EVENT_TYPES);
 
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreStart, &m_callbacksPreStart));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostStart, &m_callbacksPostStart));
@@ -222,7 +232,21 @@ Any returned value will be discarded.
 void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
 	auto it = m_callbacks.find(point);
-	it->second->insert(levelFunc.m_funcName);
+
+	if (it == m_callbacks.end()) 
+	{
+		TENLog("Error: callback point not found. Attempted to access missing value.", LogLevel::Error, LogConfig::All, false);
+		return;
+	}
+	
+	if (it->second->find(levelFunc.m_funcName) != it->second->end())
+	{
+		TENLog("Warning: function " + levelFunc.m_funcName + " already registered in callbacks list.", LogLevel::Warning, LogConfig::All, true);
+	}
+	else
+	{
+		it->second->insert(levelFunc.m_funcName);
+	}
 }
 
 /*** Deregister a function as a callback.
@@ -237,7 +261,31 @@ Will have no effect if the function was not registered as a callback
 void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
 	auto it = m_callbacks.find(point);
+	if (it == m_callbacks.end())
+	{
+		TENLog("Error: callback point not found. Attempted to access missing value.", LogLevel::Error, LogConfig::All, false);
+		return;
+	}
+
 	it->second->erase(levelFunc.m_funcName);
+}
+
+/*** Attempt to find an event set and exectute a particular event from it.
+
+@function HandleEvent
+@tparam name string Name of the event set to find.
+@tparam type EventType Event to execute.
+@tparam activator Moveable Optional activator. Default is the player object.
+*/
+void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator)
+{
+	bool success = TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? 
+					(VolumeActivator)activator.value().GetIndex() : nullptr);
+	if (!success)
+	{
+		TENLog("Error: event " + name + " could not be executed. Check if event with such name exists in project.",
+			   LogLevel::Error, LogConfig::All, false);
+	}
 }
 
 void LogicHandler::ResetLevelTables()

@@ -1,20 +1,21 @@
 #include "framework.h"
 #include "ObjectsHandler.h"
 
-#include "Scripting/Internal/ReservedScriptNames.h"
-#include "Game/Lara/lara.h"
-#include "ObjectIDs.h"
-#include "Camera/CameraObject.h"
-#include "Room/RoomObject.h"
-#include "Sink/SinkObject.h"
-#include "SoundSource/SoundSourceObject.h"
-#include "Volume/VolumeObject.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/Lara/lara.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
-#include "Lara/LaraObject.h"
-#include "Room/RoomFlags.h"
-#include "Room/RoomReverbTypes.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Objects/Camera/CameraObject.h"
+#include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
+#include "Scripting/Internal/TEN/Objects/Lara/LaraObject.h"
+#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomFlags.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomReverbTypes.h"
+#include "Scripting/Internal/TEN/Objects/Sink/SinkObject.h"
+#include "Scripting/Internal/TEN/Objects/SoundSource/SoundSourceObject.h"
+#include "Scripting/Internal/TEN/Objects/Volume/VolumeObject.h"
 
 /***
 Moveables, statics, cameras, and so on.
@@ -23,7 +24,7 @@ Moveables, statics, cameras, and so on.
 */
 
 ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
-	m_handler{ lua },
+	m_handler(lua),
 	m_table_objects(sol::table{m_handler.GetState()->lua_state(), sol::create})
 {
 	parent.set(ScriptReserved_Objects, m_table_objects);
@@ -160,9 +161,10 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
-	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomFlagID, TOOM_FLAG_IDS);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomFlagID, ROOM_FLAG_IDS);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomReverb, ROOM_REVERB_TYPES);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_PlayerAmmoType, PLAYER_AMMO_TYPES);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
 }
 
@@ -239,11 +241,12 @@ bool ObjectsHandler::RemoveMoveableFromMap(ItemInfo* key, Moveable* mov)
 	if (std::end(m_moveables) != it)
 	{
 		auto& set = m_moveables[key];
-		bool erased = static_cast<bool>(set.erase(mov));
-		if (erased && set.empty())
-			erased = erased && static_cast<bool>(m_moveables.erase(key));
+
+		bool isErased = static_cast<bool>(set.erase(mov));
+		if (isErased && set.empty())
+			isErased = isErased && static_cast<bool>(m_moveables.erase(key));
 		
-		return erased;
+		return isErased;
 	}
 
 	return false;

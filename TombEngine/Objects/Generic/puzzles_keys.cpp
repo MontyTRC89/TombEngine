@@ -360,9 +360,9 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 
 void PuzzleHole(ItemInfo* item, short itemNumber)
 {
-	// Display pickup object. TODO: Get offset.
 	auto objectID = GAME_OBJECT_ID(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_ITEM1));
-	g_Hud.PickupSummary.AddDisplayPickup(objectID, item->Pose.Position.ToVector3());
+	PickedUpObject(objectID);
+	g_Hud.PickupSummary.AddDisplayPickup(objectID, item->Pose.Position.ToVector3()); // TODO: Get appealing position offset.
 
 	item->ItemFlags[1] = true;
 

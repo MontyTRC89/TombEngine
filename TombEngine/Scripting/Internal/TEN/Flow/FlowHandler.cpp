@@ -8,12 +8,17 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
+
+using namespace TEN::Scripting::DisplaySprite;
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -28,7 +33,8 @@ ScriptInterfaceObjectsHandler* g_GameScriptEntities;
 ScriptInterfaceStringsHandler* g_GameStringsHandler;
 ScriptInterfaceFlowHandler* g_GameFlow;
 
-FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) : m_handler(lua)
+FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) :
+	m_handler(lua)
 {
 /*** gameflow.lua.
 These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
@@ -75,6 +81,12 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
+	/*** Enable or disable saving and loading of savegames.
+	@function EnableLoadSave
+	@tparam bool enabled true or false.
+	*/
+	tableFlow.set_function(ScriptReserved_EnableLoadSave, &FlowHandler::EnableLoadSave, this);
+
 /*** gameflow.lua or level scripts.
 @section FlowluaOrScripts
 */
@@ -85,6 +97,13 @@ Must be true or false
 @tparam bool enabled true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
+
+/*** Enable or disable point texture filter.
+Must be true or false
+@function EnablePointFilter
+@tparam bool enabled true or false
+*/
+	tableFlow.set_function(ScriptReserved_EnablePointFilter, &FlowHandler::EnablePointFilter, this);
 
 /*** Enable or disable mass pickup.
 Must be true or false
@@ -116,6 +135,35 @@ level count, jumps to title.
 @int[opt] index level index (default 0)
 */
 	tableFlow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
+
+	/***
+	Save the game to a savegame slot.
+	@function SaveGame
+	@tparam int slotID ID of the savegame slot to save to.
+	*/
+	tableFlow.set_function(ScriptReserved_SaveGame, &FlowHandler::SaveGame, this);
+
+	/***
+	Load the game from a savegame slot.
+	@function LoadGame
+	@tparam int slotID ID of the savegame slot to load from.
+	*/
+	tableFlow.set_function(ScriptReserved_LoadGame, &FlowHandler::LoadGame, this);
+
+	/***
+	Delete a savegame.
+	@function DeleteSaveGame
+	@tparam int slotID ID of the savegame slot to clear.
+	*/
+	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
+
+	/***
+	Check if a savegame exists.
+	@function DoesSaveGameExist
+	@tparam int slotID ID of the savegame slot to check.
+	@treturn bool true if the savegame exists, false if not.
+	*/
+	tableFlow.set_function(ScriptReserved_DoesSaveGameExist, &FlowHandler::DoesSaveGameExist, this);
 
 /***
 Returns the player's current per-game secret count.
@@ -188,6 +236,7 @@ Specify which translations in the strings table correspond to which languages.
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 	ScriptColor::Register(parent);
+	ScriptDisplaySprite::Register(*lua, parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);
@@ -199,17 +248,17 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
 	
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, kWeatherTypes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, kLaraTypes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, kRotAxes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, kItemActions);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, kErrorModes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
 }
 
 FlowHandler::~FlowHandler()
 {
-	for (auto& lev : Levels)
-		delete lev;
+	for (auto& level : Levels)
+		delete level;
 }
 
 std::string FlowHandler::GetGameDir()
@@ -222,14 +271,22 @@ void FlowHandler::SetGameDir(const std::string& assetDir)
 	m_gameDir = assetDir;
 }
 
-void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
+void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src)
 {
 	m_languageNames = std::move(src);
 }
 
 void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
-	m_translationsMap = std::move(src);
+	if (m_translationsMap.empty())
+	{
+		m_translationsMap = std::move(src);
+	}
+	else
+	{
+		for (auto& stringPair : src.value())
+			m_translationsMap.insert_or_assign(stringPair.first, stringPair.second);
+	}
 }
 
 void FlowHandler::SetSettings(Settings const & src)
@@ -265,8 +322,9 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 void FlowHandler::LoadFlowScript()
 {
 	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua");
+	m_handler.ExecuteScript(m_gameDir + "Scripts/SystemStrings.lua", true);
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua", true);
+	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua", true);
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
@@ -366,7 +424,30 @@ int FlowHandler::GetLevelNumber(const std::string& fileName)
 void FlowHandler::EndLevel(std::optional<int> nextLevel)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
-	LevelComplete = index;
+	NextLevel = index;
+}
+
+void FlowHandler::SaveGame(int slot)
+{
+	SaveGame::Save(slot);
+}
+
+void FlowHandler::LoadGame(int slot)
+{
+	if (!SaveGame::DoesSaveGameExist(slot))
+		return;
+
+	NextLevel = -(slot + 1);
+}
+
+void FlowHandler::DeleteSaveGame(int slot)
+{
+	SaveGame::Delete(slot);
+}
+
+bool FlowHandler::DoesSaveGameExist(int slot)
+{
+	return SaveGame::DoesSaveGameExist(slot, true);
 }
 
 int FlowHandler::GetSecretCount() const
@@ -416,6 +497,16 @@ void FlowHandler::EnableFlyCheat(bool flyCheat)
 	FlyCheat = flyCheat;
 }
 
+bool FlowHandler::IsPointFilterEnabled() const
+{
+	return PointFilter;
+}
+
+void FlowHandler::EnablePointFilter(bool pointFilter)
+{
+	PointFilter = pointFilter;
+}
+
 bool FlowHandler::IsMassPickupEnabled() const
 {
 	return MassPickup;
@@ -439,6 +530,16 @@ void FlowHandler::EnableLaraInTitle(bool laraInTitle)
 void FlowHandler::EnableLevelSelect(bool levelSelect)
 {
 	LevelSelect = levelSelect;
+}
+
+bool FlowHandler::IsLoadSaveEnabled() const
+{
+	return LoadSave;
+}
+
+void FlowHandler::EnableLoadSave(bool loadSave)
+{
+	LoadSave = loadSave;
 }
 
 bool FlowHandler::DoFlow()
@@ -488,19 +589,17 @@ bool FlowHandler::DoFlow()
 			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
 			{
 				InventoryItem* obj = &level->InventoryObjects[i];
-				if (obj->slot >= 0 && obj->slot < INVENTORY_TABLE_SIZE)
+				if (obj->ObjectID >= 0 && obj->ObjectID < INVENTORY_TABLE_SIZE)
 				{
-					InventoryObject* invObj = &InventoryObjectTable[obj->slot];
+					InventoryObject* invObj = &InventoryObjectTable[obj->ObjectID];
 
-					invObj->ObjectName = obj->name.c_str();
-					invObj->Scale1 = obj->scale;
-					invObj->YOffset = obj->yOffset;
-					invObj->Orientation.x = ANGLE(obj->rot.x);
-					invObj->Orientation.y = ANGLE(obj->rot.y);
-					invObj->Orientation.z = ANGLE(obj->rot.z);
-					invObj->MeshBits = obj->meshBits;
-					invObj->Options = obj->action;
-					invObj->RotFlags = obj->rotationFlags;
+					invObj->ObjectName = obj->Name.c_str();
+					invObj->Scale1 = obj->Scale;
+					invObj->YOffset = obj->YOffset;
+					invObj->Orientation = EulerAngles(ANGLE(obj->Rot.x), ANGLE(obj->Rot.y), ANGLE(obj->Rot.z));
+					invObj->MeshBits = obj->MeshBits;
+					invObj->Options = obj->MenuAction;
+					invObj->RotFlags = obj->RotFlags;
 				}
 			}
 
@@ -541,21 +640,22 @@ bool FlowHandler::DoFlow()
 
 			// Load level
 			CurrentLevel = header.Level;
+			NextLevel = 0;
 			GameTimer = header.Timer;
 			loadFromSavegame = true;
 			break;
 
 		case GameStatus::LevelComplete:
-			if (LevelComplete >= Levels.size())
+			if (NextLevel >= Levels.size())
 			{
 				CurrentLevel = 0; // TODO: final credits
 			}
 			else
 			{
-				CurrentLevel = LevelComplete;
+				CurrentLevel = NextLevel;
 			}
 
-			LevelComplete = 0;
+			NextLevel = 0;
 			break;
 		}
 	}

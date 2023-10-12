@@ -19,7 +19,7 @@ static auto newindex_error = newindex_error_maker(AIObject, ScriptReserved_AIObj
 AIObject::AIObject(AI_OBJECT & ref) : m_aiObject{ref}
 {};
 
-void AIObject::Register(sol::table & parent)
+void AIObject::Register(sol::table& parent)
 {
 	parent.new_usertype<AIObject>(ScriptReserved_AIObject,
 		sol::no_constructor, // ability to spawn new ones could be added later

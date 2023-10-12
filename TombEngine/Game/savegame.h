@@ -46,6 +46,9 @@ class SaveGame
 private:
 	static FileStream* StreamPtr;
 	static std::string FullSaveDirectory;
+
+	static std::string SaveGame::GetSavegameFilename(int slot);
+	static bool IsSaveGameSlotValid(int slot);
 	
 public:
 	static int LastSaveGame;
@@ -55,4 +58,7 @@ public:
 	static bool LoadHeader(int slot, SaveGameHeader* header);
 	static bool Save(int slot);
 	static void LoadSavegameInfos();
+	static void Delete(int slot);
+
+	static bool DoesSaveGameExist(int slot, bool silent = false);
 };

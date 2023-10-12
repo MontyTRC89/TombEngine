@@ -14,8 +14,6 @@ using namespace TEN::Collision::Floordata;
 // NOTES:
 // ItemFlags[0]: Delay in frame time.
 // ItemFlags[1]: Fall velocity.
-// ItemFlags[2]: Top height of bounding box.
-// ItemFlags[3]: Bottom height of bounding box.
 
 namespace TEN::Entities::Traps
 {
@@ -48,21 +46,16 @@ namespace TEN::Entities::Traps
 		int delayInFrameTime = (item.TriggerFlags != 0) ? std::abs(item.TriggerFlags) : (int)round(CRUMBLING_PLATFORM_DELAY * FPS);
 		item.ItemFlags[0] = delayInFrameTime;
 		UpdateBridgeItem(itemNumber);
-
-		// Store override bridge collision heights to avoid using bounding box while shaking.
-		auto bounds = GameBoundingBox(&item);
-		item.ItemFlags[2] = bounds.Y1; // Floor.
-		item.ItemFlags[3] = bounds.Y2; // Ceiling.
 	}
 
-	void ActivateCrumblingPlatform(short itemNumber)
+	static void ActivateCrumblingPlatform(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
 		item.Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
 
-		SetAnimation(item, CRUMBLING_PLATFORM_ANIM_SHAKE);
+		item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_SHAKE;
 		item.Flags |= CODE_BITS;
 	}
 
@@ -92,7 +85,7 @@ namespace TEN::Entities::Traps
 				}
 				else
 				{
-					SetAnimation(item, CRUMBLING_PLATFORM_ANIM_FALL);
+					item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
 					item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
 
 					auto pointColl = GetCollision(item);
@@ -106,8 +99,10 @@ namespace TEN::Entities::Traps
 			{
 				short& fallVel = item.ItemFlags[1];
 
+				// Get point collision.
+				auto box = GameBoundingBox(&item);
 				auto pointColl = GetCollision(item);
-				int relFloorHeight = item.Pose.Position.y - pointColl.Position.Floor;
+				int relFloorHeight = (item.Pose.Position.y - pointColl.Position.Floor) - box.Y1 ;
 
 				// Airborne.
 				if (relFloorHeight <= fallVel)
@@ -121,7 +116,7 @@ namespace TEN::Entities::Traps
 				// Grounded.
 				else
 				{
-					SetAnimation(item, CRUMBLING_PLATFORM_ANIM_LAND);
+					item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_LAND;
 					item.Pose.Position.y = pointColl.Position.Floor;
 				}
 
@@ -169,8 +164,9 @@ namespace TEN::Entities::Traps
 		{
 			// Crumble if player is on platform.
 			if (!laraItem->Animation.IsAirborne &&
-				player.Control.WaterStatus != WaterStatus::Wade &&
+				player.Control.WaterStatus != WaterStatus::TreadWater &&
 				player.Control.WaterStatus != WaterStatus::Underwater &&
+				player.Control.WaterStatus != WaterStatus::FlyCheat &&
 				coll->LastBridgeItemNumber == item.Index)
 			{
 				ActivateCrumblingPlatform(itemNumber);
@@ -187,11 +183,7 @@ namespace TEN::Entities::Traps
 		{
 			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 			if (boxHeight.has_value())
-			{
-				int relHeight = item.ItemFlags[2];
-				return (item.Pose.Position.y + relHeight);
-			}
-
+				return *boxHeight;
 		}
 
 		return std::nullopt;
@@ -206,11 +198,7 @@ namespace TEN::Entities::Traps
 		{
 			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 			if (boxHeight.has_value())
-			{
-				int relHeight = item.ItemFlags[3];
-				return (item.Pose.Position.y + relHeight);
-			}
-
+				return *boxHeight;
 		}
 
 		return std::nullopt;
@@ -220,15 +208,15 @@ namespace TEN::Entities::Traps
 	{
 		const auto& item = g_Level.Items[itemNumber];
 
-		int height = item.ItemFlags[2];
-		return height;
+		auto bounds = GameBoundingBox(&item);
+		return bounds.Y1;
 	}
 
 	int CrumblingPlatformCeilingBorder(short itemNumber)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 
-		int height = item.ItemFlags[3];
-		return height;
+		auto bounds = GameBoundingBox(&item);
+		return bounds.Y2;
 	}
 }
