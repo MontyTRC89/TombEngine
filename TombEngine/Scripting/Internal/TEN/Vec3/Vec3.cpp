@@ -188,7 +188,7 @@ float Vec3::Length() const
 	return ToVector3().Length();
 }
 
-/*** Metafunction; use tostring(myVector)
+/*** Metafunction; use tostring(vector)
 @tparam Vec3 This Vec3.
 @treturn string A string showing the X, Y, and Z components of the Vec3.
 @function __tostring
