@@ -26,22 +26,16 @@ public:
 	void StoreInGameVector(GameVector& vector) const;
 	
 	// Utilities
-	void		Normalize();
-	static Vec3 StaticNormalize(const Vec3& vector);
-	void		SetLength(float length);
-	void		ClampLength(float lengthMax);
-	void		Rotate(const Rotation& rot);
-	static Vec3 StaticRotate(const Vec3& vector, const Rotation& rot);
-	void		Lerp(const Vec3& vector, float alpha);
-	static Vec3 StaticLerp(const Vec3& vector0, const Vec3& vector1, float alpha);
-	void		Cross(const Vec3& vector);
-	static Vec3 StaticCross(const Vec3& vector0, const Vec3& vector1);
+	void Normalize();
+	void SetLength(float length);
+	void ClampLength(float lengthMax);
+	void Rotate(const Rotation& rot);
+	void Lerp(const Vec3& vector, float alpha);
+	void Cross(const Vec3& vector);
 
-	float		 Length() const;
-	float		 Distance(const Vec3& vector) const;
-	static float StaticDistance(const Vec3& vector0, const Vec3& vector1);
-	float		 Dot(const Vec3& vector) const;
-	static float StaticDot(const Vec3& vector0, const Vec3& vector1);
+	float Length() const;
+	float Distance(const Vec3& vector) const;
+	float Dot(const Vec3& vector) const;
 
 	// Meta functions
 	[[nodiscard]] std::string ToString() const;
