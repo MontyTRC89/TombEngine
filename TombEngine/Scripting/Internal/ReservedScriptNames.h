@@ -28,9 +28,22 @@ static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
 // DisplaySprite object
 static constexpr char ScriptReserved_DisplaySprite[]				= "DisplaySprite";
+static constexpr char ScriptReserved_DisplayStringGetObjectID[]		= "GetObjectID";
+static constexpr char ScriptReserved_DisplayStringGetSpriteID[]		= "GetSpriteID";
+static constexpr char ScriptReserved_DisplayStringGetPosition[]		= "GetPosition";
+static constexpr char ScriptReserved_DisplayStringGetRotation[]		= "GetRotation";
+static constexpr char ScriptReserved_DisplayStringGetScale[]		= "GetScale";
+static constexpr char ScriptReserved_DisplayStringGetColor[]		= "GetColor";
+static constexpr char ScriptReserved_DisplayStringSetObjectID[]		= "SetObjectID";
+static constexpr char ScriptReserved_DisplayStringSetSpriteID[]		= "SetSpriteID";
+static constexpr char ScriptReserved_DisplayStringSetPosition[]		= "SetPosition";
+static constexpr char ScriptReserved_DisplayStringSetRotation[]		= "SetRotation";
+static constexpr char ScriptReserved_DisplayStringSetScale[]		= "SetScale";
+static constexpr char ScriptReserved_DisplayStringSetColor[]		= "SetColor";
 static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
-static constexpr char ScriptReserved_DisplaySpriteTableAlignMode[]	= "AlignMode";
-static constexpr char ScriptReserved_DisplaySpriteTableScaleMode[]	= "ScaleMode";
+static constexpr char ScriptReserved_DisplaySpriteEnum[]			= "DisplaySpriteEnum";
+static constexpr char ScriptReserved_DisplaySpriteEnumAlignMode[]	= "AlignMode";
+static constexpr char ScriptReserved_DisplaySpriteEnumScaleMode[]	= "ScaleMode";
 
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
@@ -248,7 +261,6 @@ static constexpr char ScriptReserved_AddCallback[]					= "AddCallback";
 static constexpr char ScriptReserved_RemoveCallback[]				= "RemoveCallback";
 static constexpr char ScriptReserved_HandleEvent[]					= "HandleEvent";
 
-static constexpr char ScriptReserved_DrawDisplaySprite[]			= "DrawDisplaySprite";
 static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
 static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";

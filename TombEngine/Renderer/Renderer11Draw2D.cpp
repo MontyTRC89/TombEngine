@@ -416,10 +416,10 @@ namespace TEN::Renderer
 			// Calculate vertex base.
 			auto vertices = std::array<Vector2, VERTEX_COUNT>
 			{
-				spriteToDraw.Size,
-				Vector2(-spriteToDraw.Size.x, spriteToDraw.Size.y),
-				-spriteToDraw.Size,
-				Vector2(spriteToDraw.Size.x, -spriteToDraw.Size.y)
+				spriteToDraw.Size / 2,
+				Vector2(-spriteToDraw.Size.x, spriteToDraw.Size.y) / 2,
+				-spriteToDraw.Size / 2,
+				Vector2(spriteToDraw.Size.x, -spriteToDraw.Size.y) / 2
 			};
 
 			// Transform vertices.
@@ -430,8 +430,10 @@ namespace TEN::Renderer
 				// Rotate.
 				vertex = Vector2::Transform(vertex, rotMatrix);
 
-				// Adjust for aspect ratio and convert to NDC.
-				vertex = TEN::Utils::GetAspectCorrect2DPosition(vertex);
+				// Apply aspect correction.
+				vertex *= spriteToDraw.AspectCorrection;
+
+				// Offset to position and convert to NDC.
 				vertex += spriteToDraw.Position;
 				vertex = TEN::Utils::Convert2DPositionToNDC(vertex);
 			}
@@ -602,70 +604,97 @@ namespace TEN::Renderer
 		m_primitiveBatch->End();
 	}
 
-	void Renderer11::AddDisplaySprite(RendererSprite* spritePtr, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
-									  int priority, BLEND_MODES blendMode, RenderView& renderView)
+	void Renderer11::AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
+									  int priority, BLEND_MODES blendMode, const Vector2& aspectCorrection, RenderView& renderView)
 	{
 		auto spriteToDraw = RendererDisplaySpriteToDraw{};
 
-		spriteToDraw.SpritePtr = spritePtr;
+		spriteToDraw.SpritePtr = &sprite;
 		spriteToDraw.Position = pos2D;
 		spriteToDraw.Orientation = orient;
 		spriteToDraw.Size = size;
 		spriteToDraw.Color = color;
 		spriteToDraw.Priority = priority;
 		spriteToDraw.BlendMode = blendMode;
+		spriteToDraw.AspectCorrection = aspectCorrection;
 
 		renderView.DisplaySpritesToDraw.push_back(spriteToDraw);
 	}
 
 	void Renderer11::CollectDisplaySprites(RenderView& renderView)
 	{
-		// Get screen resolution, dimensions, and aspect ratio.
-		auto  screenRes		  = GetScreenResolution().ToVector2();
-		float screenAspect	  = screenRes.x / screenRes.y;
-		float screenWidthMax  = (SCREEN_SPACE_RES.x / screenRes.x) * screenRes.x;
-		float screenHeightMax = (SCREEN_SPACE_RES.y / screenRes.y) * screenRes.y;
+		constexpr auto DISPLAY_SPACE_ASPECT = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
+
+		// Calculate screen aspect ratio.
+		auto screenRes = GetScreenResolution().ToVector2();
+		float screenResAspect = screenRes.x / screenRes.y;
+
+		// Calculate aspect ratio correction base.
+		auto aspectCorrectionBase = screenResAspect / DISPLAY_SPACE_ASPECT;
 
 		for (const auto& displaySprite : DisplaySprites)
 		{
-			auto& texture = m_sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
+			const auto& sprite = m_sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
 
 			// Calculate sprite aspect ratio.
-			float spriteAspect = (float)texture.Width / (float)texture.Height;
+			float spriteAspect = (float)sprite.Width / (float)sprite.Height;
 
-			// Calculate size.
 			auto halfSize = Vector2::Zero;
+			auto aspectCorrection = Vector2::One;
+
+			// Calculate size and aspect correction.
 			switch (displaySprite.ScaleMode)
 			{
 			default:
 			case DisplaySpriteScaleMode::Fit:
-				if (screenAspect >= spriteAspect)
+				if (screenResAspect >= spriteAspect)
 				{
-					halfSize = (Vector2(screenHeightMax) * displaySprite.Scale) / 2;
-					halfSize.x *= spriteAspect;
+					halfSize = (Vector2(SCREEN_SPACE_RES.y) * displaySprite.Scale) / 2;
+					halfSize.x *= (spriteAspect >= 1.0f) ? spriteAspect : (1.0f / spriteAspect);
+					
+					aspectCorrection.x = 1.0f / aspectCorrectionBase;
 				}
 				else
 				{
-					halfSize = (Vector2(screenWidthMax) * displaySprite.Scale) / 2;
-					halfSize.y /= spriteAspect;
+					halfSize = (Vector2(SCREEN_SPACE_RES.x) * displaySprite.Scale) / 2;
+					halfSize.y *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
+
+					aspectCorrection.y = aspectCorrectionBase;
 				}
 				break;
 
 			case DisplaySpriteScaleMode::Fill:
-				if (screenAspect >= spriteAspect)
+				if (screenResAspect >= spriteAspect)
 				{
-					halfSize = (Vector2(screenWidthMax) * displaySprite.Scale) / 2;
-					halfSize.y /= spriteAspect;
+					halfSize = (Vector2(SCREEN_SPACE_RES.x) * displaySprite.Scale) / 2;
+					halfSize.y *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
+
+					aspectCorrection.y = aspectCorrectionBase;
 				}
 				else
 				{
-					halfSize = (Vector2(screenHeightMax) * displaySprite.Scale) / 2;
-					halfSize.x *= spriteAspect;
+					halfSize = (Vector2(SCREEN_SPACE_RES.y) * displaySprite.Scale) / 2;
+					halfSize.x *= (spriteAspect >= 1.0f) ? spriteAspect : (1.0f / spriteAspect);
+
+					aspectCorrection.x = 1.0f / aspectCorrectionBase;
 				}
 				break;
 
 			case DisplaySpriteScaleMode::Stretch:
-				halfSize = Vector2(screenWidthMax, screenHeightMax) * displaySprite.Scale / 2;
+				if (screenResAspect >= 1.0f)
+				{
+					halfSize = (SCREEN_SPACE_RES.x * displaySprite.Scale) / 2;
+					halfSize.y *= (screenResAspect >= 1.0f) ? (1.0f / screenResAspect) : screenResAspect;
+
+					aspectCorrection.y = aspectCorrectionBase;
+				}
+				else
+				{
+					halfSize = (Vector2(SCREEN_SPACE_RES.y) * displaySprite.Scale) / 2;
+					halfSize.x *= (screenResAspect >= 1.0f) ? (1.0f / screenResAspect) : screenResAspect;
+
+					aspectCorrection.x = 1.0f / aspectCorrectionBase;
+				}
 				break;
 			}
 
@@ -678,47 +707,48 @@ namespace TEN::Renderer
 				break;
 
 			case DisplaySpriteAlignMode::CenterTop:
-				offset = Vector2(0.0f, -halfSize.y);
-				break;
-
-			case DisplaySpriteAlignMode::CenterBottom:
 				offset = Vector2(0.0f, halfSize.y);
 				break;
 
+			case DisplaySpriteAlignMode::CenterBottom:
+				offset = Vector2(0.0f, -halfSize.y);
+				break;
+
 			case DisplaySpriteAlignMode::CenterLeft:
-				offset = Vector2(-halfSize.x, 0.0f);
+				offset = Vector2(halfSize.x, 0.0f);
 				break;
 				
 			case DisplaySpriteAlignMode::CenterRight:
-				offset = Vector2(halfSize.x, 0.0f);
+				offset = Vector2(-halfSize.x, 0.0f);
 				break;
 
 			case DisplaySpriteAlignMode::TopLeft:
-				offset = Vector2(-halfSize.x, -halfSize.y);
+				offset = Vector2(halfSize.x, halfSize.y);
 				break;
 
 			case DisplaySpriteAlignMode::TopRight:
-				offset = Vector2(halfSize.x, -halfSize.y);
-				break;
-
-			case DisplaySpriteAlignMode::BottomLeft:
 				offset = Vector2(-halfSize.x, halfSize.y);
 				break;
 
+			case DisplaySpriteAlignMode::BottomLeft:
+				offset = Vector2(halfSize.x, -halfSize.y);
+				break;
+
 			case DisplaySpriteAlignMode::BottomRight:
-				offset = Vector2(halfSize.x, halfSize.y);
+				offset = Vector2(-halfSize.x, -halfSize.y);
 				break;
 			}
-			//offset = TEN::Utils::GetAspectCorrect2DPosition(offset); // TODO: Check if aspect correction is necessary.
+			offset *= aspectCorrection;
 
 			AddDisplaySprite(
-				&texture,
+				sprite,
 				displaySprite.Position + offset,
 				displaySprite.Orientation,
-				halfSize,
+				halfSize * 2,
 				displaySprite.Color,
 				displaySprite.Priority,
 				displaySprite.BlendMode,
+				aspectCorrection,
 				renderView);
 		}
 

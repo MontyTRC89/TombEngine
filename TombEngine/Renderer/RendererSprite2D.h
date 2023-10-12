@@ -7,7 +7,7 @@ namespace TEN::Renderer
 
 	struct RendererDisplaySpriteToDraw
 	{
-		RendererSprite* SpritePtr = nullptr;
+		const RendererSprite* SpritePtr = nullptr;
 
 		Vector2 Position	= Vector2::Zero;
 		short	Orientation = 0;
@@ -16,5 +16,7 @@ namespace TEN::Renderer
 
 		int			Priority  = 0;
 		BLEND_MODES BlendMode = BLENDMODE_ALPHABLEND;
+
+		Vector2 AspectCorrection = Vector2::One;
 	};
 }

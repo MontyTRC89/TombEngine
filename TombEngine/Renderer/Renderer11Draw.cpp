@@ -605,43 +605,25 @@ namespace TEN::Renderer
 			}
 		}
 	}
-
 	void Renderer11::DrawScarabs(RenderView& view)
 	{
 		if (!Objects[ID_LITTLE_BEETLE].loaded)
 			return;
 
-		auto& mesh = *GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
+		const auto& mesh = *GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 
-		m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
-
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-		BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
-		BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
-
-		int beetleCount = 0;
-		
+		unsigned int beetleCount = 0;
 		for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 		{
-			auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
+			const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
 
 			if (beetle.On)
 			{
 				auto& room = m_rooms[beetle.RoomNumber];
 
-				auto tmatrix = Matrix::CreateTranslation(beetle.Pose.Position.ToVector3());
+				auto tMatrix = Matrix::CreateTranslation(beetle.Pose.Position.x, beetle.Pose.Position.y, beetle.Pose.Position.z);
 				auto rotMatrix = beetle.Pose.Orientation.ToRotationMatrix();
-				auto worldMatrix = rotMatrix * tmatrix;
+				auto worldMatrix = rotMatrix * tMatrix;
 
 				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = worldMatrix;
 				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
@@ -650,29 +632,42 @@ namespace TEN::Renderer
 				BindInstancedStaticLights(room.LightsToDraw, beetleCount);
 
 				beetleCount++;
+			}
+		}
 
-				// If max bucket size reached or last beetle, draw beetles.
-				if (beetleCount == INSTANCED_STATIC_MESH_BUCKET_SIZE || i == (TEN::Entities::TR4::NUM_BEETLES - 1))
-				{
-					m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
+		if (beetleCount > 0)
+		{
+			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
+			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
 
-					for (auto& bucket : mesh.Buckets)
-					{
-						if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
-							continue;
+			unsigned int stride = sizeof(RendererVertex);
+			unsigned int offset = 0;
 
-						SetBlendMode(bucket.BlendMode);
+			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-						BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-						DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
+			m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
 
-						m_numStaticsDrawCalls++;
-					}
+			BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
+			BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 
-					beetleCount = 0;
-				}
+			for (const auto& bucket : mesh.Buckets)
+			{
+				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+					continue;
+
+				SetBlendMode(bucket.BlendMode);
+
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+
+				DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
+
+				m_numStaticsDrawCalls++;
 			}
 		}
 	}

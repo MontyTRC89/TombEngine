@@ -57,6 +57,4 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 	InventoryHandler::Register(&SolState, RootTable);
 	Misc::Register(&SolState, RootTable);
 	Effects::Register(&SolState, RootTable);
-
-	ScriptDisplaySprite::RegisterTables(&SolState, RootTable);
 }

@@ -8,6 +8,8 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
 #include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
@@ -234,7 +236,7 @@ Specify which translations in the strings table correspond to which languages.
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 	ScriptColor::Register(parent);
-	ScriptDisplaySprite::Register(parent);
+	ScriptDisplaySprite::Register(*lua, parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);

@@ -4,38 +4,47 @@
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
-enum BLEND_MODE;
-
 using namespace TEN::Effects::DisplaySprite;
 
-// TODO:
-// Check if align modes are applied correctly.
-// Check if ScriptDisplaySprite object has been registered correctly.
-// Check if its methods have been registered correctly.
-// Register DISPLAY_SPRITE_SCALE_MODES and DISPLAY_SPRITE_ORIGIN_TYPES under the correct sub-thing.
-// Test nested sprites in various modes and how they behave when the aspect ratio changes.
-// Check with everyone if the mySprite.Draw(blah, blah, blah) syntax is sensible.
+enum BLEND_MODE;
 
 namespace TEN::Scripting::DisplaySprite
 {
 	class ScriptDisplaySprite
 	{
 	public:
-		static void Register(sol::table& parent);
-		static void RegisterTables(sol::state* state, sol::table& parent);
+		static void Register(sol::state& state, sol::table& parent);
 
+	private:
 		// Members
 		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 		int			   SpriteID = 0;
 
 		Vec2		Position = Vec2(0.0f, 0.0f);
 		float		Rotation = 0.0f;
-		Vec2		Scale = Vec2(0.0f, 0.0f);
-		ScriptColor Color = ScriptColor(255, 255, 255, 255);
+		Vec2		Scale	 = Vec2(0.0f, 0.0f);
+		ScriptColor Color	 = ScriptColor(255, 255, 255, 255);
 
+	public:
 		// Constructors
-		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale,
-							sol::optional<const ScriptColor&> color);
+		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color);
+		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale);
+
+		// Getters
+		GAME_OBJECT_ID GetObjectID() const;
+		int			   GetSpriteID() const;
+		Vec2		   GetPosition() const;
+		float		   GetRotation() const;
+		Vec2		   GetScale() const;
+		ScriptColor	   GetColor() const;
+
+		// Setters
+		void SetObjectID(GAME_OBJECT_ID objectID);
+		void SetSpriteID(int spriteID);
+		void SetPosition(const Vec2& pos);
+		void SetRotation(float rot);
+		void SetScale(const Vec2& scale);
+		void SetColor(const ScriptColor& color);
 
 		// Utilities
 		void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
