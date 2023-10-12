@@ -23,7 +23,6 @@ public:
 	Vec3(const Vector3& pos);
 
 	void StoreInPose(Pose& pos) const;
-	void StoreInGameVector(GameVector& vector) const;
 	
 	// Setters
 	void SetLength(float length);
@@ -31,7 +30,7 @@ public:
 	// Utilities
 	Vec3  Normalize() const;
 	Vec3  Rotate(const Rotation& rot) const;
-	Vec3  Lerp(const Vec3& target, float alpha) const;
+	Vec3  Lerp(const Vec3& vector, float alpha) const;
 	Vec3  Cross(const Vec3& vector) const;
 	float Dot(const Vec3& vector) const;
 	float Distance(const Vec3& vector) const;
@@ -46,6 +45,11 @@ public:
 	static Vec3 DivideByScale(const Vec3& vector, float scale);
 	static Vec3 UnaryMinus(const Vec3& vector);
 	static bool IsEqualTo(const Vec3& vector0, const Vec3& vector1);
+
+	// Converters
+	Vector3	   ToVector3() const;
+	Vector3i   ToVector3i() const;
+	GameVector ToGameVector() const;
 
 	// Operators
 	operator Vector3() const;

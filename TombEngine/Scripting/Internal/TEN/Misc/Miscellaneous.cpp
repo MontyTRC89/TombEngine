@@ -38,35 +38,27 @@ using namespace TEN::Input;
 
 namespace Misc 
 {
-	///Determine if there's a line of sight between two points.
-	//
-	//i.e. if we run a direct line from one position to another
-	//will any geometry get in the way?
-	//
-	//Note: if you use this with Moveable:GetPosition to test if (for example)
-	//two creatures can see one another, you might have to do some extra adjustments.
-	//
-	//This is because the "position" for most objects refers to its base, i.e., the floor.
-	//As a solution, you can increase the y-coordinate of this position to correspond to roughly where the
-	//eyes of the creatures would be.
-	//@function HasLineOfSight
-	//@tparam float room1 ID of the room where the first position is
-	//@tparam Vec3 pos1 first position
-	//@tparam Vec3 pos2 second position
-	//@treturn bool is there a direct line of sight between the two positions?
-	//@usage
-	//local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
-	//print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
-	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
-	{
-		GameVector vec1, vec2;
-		pos1.StoreInGameVector(vec1);
-		vec1.RoomNumber = roomNumber1;
-		pos2.StoreInGameVector(vec2);
+	/*** Determine if there is a clear line of sight between two positions.
+	NOTE: Limited to room geometry. Objects are ignored.
 
-		MESH_INFO* mesh;
-		Vector3i vector;
-		return LOS(&vec1, &vec2) && (ObjectOnLOS2(&vec1, &vec2, &vector, &mesh) == NO_LOS_ITEM);
+	@function HasLineOfSight()
+	@tparam float roomID Room ID of the first position's room.
+	@tparam Vec3 posA First position.
+	@tparam Vec3 posB Second position.
+	@treturn bool __true__ if there is a line of sight, __false__ if not.
+	@usage
+	local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
+	print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
+	*/
+	[[nodiscard]] static bool HasLineOfSight(int roomID, const Vec3& posA, const Vec3& posB)
+	{
+		auto vector0 = posA.ToGameVector();
+		auto vector1 = posB.ToGameVector();
+
+		MESH_INFO* meshPtr = nullptr;
+		auto vector = Vector3i::Zero;
+		return (LOS(&vector0, &vector1) &&
+				ObjectOnLOS2(&vector0, &vector1, &vector, &meshPtr) == NO_LOS_ITEM);
 	}
 
 	///Vibrate game controller, if function is available and setting is on.

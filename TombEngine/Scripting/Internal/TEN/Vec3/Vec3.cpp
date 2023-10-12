@@ -49,9 +49,9 @@ void Vec3::Register(sol::table& parent)
 		*/
 		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
 
-		/*** Get the linearly interpolated Vec3 between this Vec3 and the target Vec3 according to an alpha value in the range [0, 1].
-		@function Vec3:Lerp(target)
-		@tparam Vec3 target Target interpolation vector.
+		/*** Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input alpha value in the range [0, 1].
+		@function Vec3:Lerp(vector)
+		@tparam Vec3 vector Target interpolation vector.
 		@tparam float alpha Interpolation alpha.
 		@treturn Vec3 Linearly interpolated vector.
 		*/
@@ -125,18 +125,6 @@ Vec3::Vec3(const Vector3& pos)
 	z = pos.z;
 }
 
-void Vec3::StoreInPose(Pose& pose) const
-{
-	pose.Position = Vector3i(x, y, z);
-}
-
-void Vec3::StoreInGameVector(GameVector& pos) const
-{
-	pos.x = (int)x;
-	pos.y = (int)y;
-	pos.z = (int)z;
-}
-
 void Vec3::SetLength(float length)
 {
 	float currentLength = Length();
@@ -156,52 +144,52 @@ Vec3 Vec3::Normalize() const
 
 Vec3 Vec3::Rotate(const Rotation& rot) const
 {
-	auto vector = Vector3(x, y, z);
+	auto vector = ToVector3();
 	auto eulerRot = rot.ToEulerAngles();
 	auto rotMatrix = eulerRot.ToRotationMatrix();
 
 	return Vec3(Vector3::Transform(vector, rotMatrix));
 }
 
-Vec3 Vec3::Lerp(const Vec3& target, float alpha) const
+Vec3 Vec3::Lerp(const Vec3& vector, float alpha) const
 {
-	auto vector0 = Vector3(x, y, z);
-	auto vector1 = Vector3(target.x, target.y, target.z);
+	auto vector0 = ToVector3();
+	auto vector1 = vector.ToVector3();
 
 	return Vec3(Vector3::Lerp(vector0, vector1, alpha));
 }
 
 Vec3 Vec3::Cross(const Vec3& vector) const
 {
-	auto vector0 = Vector3(x, y, z);
-	auto vector1 = Vector3(vector.x, vector.y, vector.z);
+	auto vector0 = ToVector3();
+	auto vector1 = vector.ToVector3();
 
 	return vector0.Cross(vector1);
 }
 
 float Vec3::Dot(const Vec3& vector) const
 {
-	auto vector0 = Vector3(x, y, z);
-	auto vector1 = Vector3(vector.x, vector.y, vector.z);
+	auto vector0 = ToVector3();
+	auto vector1 = vector.ToVector3();
 
 	return vector0.Dot(vector1);
 }
 
 float Vec3::Distance(const Vec3& vector) const
 {
-	auto vector0 = Vector3(x, y, z);
-	auto vector1 = Vector3(vector.x, vector.y, vector.z);
+	auto vector0 = ToVector3();
+	auto vector1 = vector.ToVector3();
 
 	return Vector3::Distance(vector0, vector1);
 }
 
 float Vec3::Length() const
 {
-	return Vector3(x, y, z).Length();
+	return ToVector3().Length();
 }
 
 /*** Metafunction; use tostring(myVector)
-@tparam Vec3 Vec3 this Vec3.
+@tparam Vec3 This Vec3.
 @treturn string A string showing the X, Y, and Z components of the Vec3.
 @function __tostring
 */
@@ -248,7 +236,22 @@ bool Vec3::IsEqualTo(const Vec3& vector0, const Vec3& vector1)
 	return false;
 }
 
-Vec3::operator Vector3() const
+Vector3 Vec3::ToVector3() const
 {
 	return Vector3(x, y, z);
+}
+
+Vector3i Vec3::ToVector3i() const
+{
+	return Vector3i(x, y, z);
+}
+
+GameVector Vec3::ToGameVector() const
+{
+	return GameVector(x, y, z);
+}
+
+Vec3::operator Vector3() const
+{
+	return ToVector3();
 };
