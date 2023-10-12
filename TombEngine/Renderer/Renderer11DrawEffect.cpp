@@ -1192,7 +1192,7 @@ namespace TEN::Renderer
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 				 
-			//HACK: prevent sprites like Explosionsmoke which have blendmode_subtractive from having laser effects
+			// HACK: Prevent sprites like Explosionsmoke which have blendmode_subtractive from having laser effects.
 			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType)
 			{
 				// If blend mode requires sorting, save sprite for later.
@@ -1206,7 +1206,7 @@ namespace TEN::Renderer
 
 				for (int j = 0; j < view.RoomsToDraw.size(); j++)
 				{
-					short roomNumber = view.RoomsToDraw[j]->RoomNumber;
+					int roomNumber = view.RoomsToDraw[j]->RoomNumber;
 					if (g_Level.Rooms[roomNumber].Active() && IsPointInRoom(Vector3i(rDrawSprite.pos), roomNumber))
 					{
 						view.RoomsToDraw[j]->TransparentFacesToDraw.push_back(face);
@@ -1363,8 +1363,8 @@ namespace TEN::Renderer
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
-		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsSprites.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psSprites.Get(), nullptr, 0);
 
 		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, (int)m_transparentFacesVertices.size());
 		  
@@ -1444,8 +1444,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawEffects(RenderView& view, RendererPass rendererPass) 
 	{
-		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
-		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -1458,23 +1458,23 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		for (auto room : view.RoomsToDraw)
+		for (auto* roomPtr : view.RoomsToDraw)
 		{
-			for (auto effect : room->EffectsToDraw)
+			for (auto* effectPtr : roomPtr->EffectsToDraw)
 			{
-				RendererRoom const& room = m_rooms[effect->RoomNumber];
-				ObjectInfo* obj = &Objects[effect->ObjectNumber];
+				const auto& room = m_rooms[effectPtr->RoomNumber];
+				const auto& object = Objects[effectPtr->ObjectNumber];
 
-				if (obj->drawRoutine && obj->loaded)
-					DrawEffect(view, effect, rendererPass);
+				if (object.drawRoutine && object.loaded)
+					DrawEffect(view, effectPtr, rendererPass);
 			}
 		}
 	}
 
 	void Renderer11::DrawDebris(RenderView& view, RendererPass rendererPass)
 	{		
-		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
-		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());

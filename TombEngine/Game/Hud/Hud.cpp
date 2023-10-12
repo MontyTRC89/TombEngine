@@ -13,18 +13,21 @@ namespace TEN::Hud
 
 	void HudController::Update(const ItemInfo& item)
 	{
+		TargetHighlighter.Update(item);
 		PickupSummary.Update();
 		StatusBars.Update(item);
 	}
 
 	void HudController::Draw(const ItemInfo& item) const
 	{
+		TargetHighlighter.Draw();
 		PickupSummary.Draw();
 		StatusBars.Draw(item);
 	}
 
 	void HudController::Clear()
 	{
+		TargetHighlighter.Clear();
 		PickupSummary.Clear();
 		StatusBars.Clear();
 	}
