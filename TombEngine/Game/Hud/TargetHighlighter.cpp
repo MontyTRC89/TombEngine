@@ -358,9 +358,9 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::DrawDebug() const
 	{
+		unsigned int visibleCount = 0;
 		unsigned int primaryCount = 0;
 		unsigned int peripheralCount = 0;
-		unsigned int visibleCount = 0;
 
 		for (const auto& [itemNumber, crosshair] : Crosshairs)
 		{
