@@ -680,9 +680,21 @@ namespace TEN::Renderer
 				}
 				break;
 
-			// TODO: Not right.
 			case DisplaySpriteScaleMode::Stretch:
-				halfSize = (SCREEN_SPACE_RES * displaySprite.Scale) / 2;
+				if (screenResAspect >= 1.0f)
+				{
+					halfSize = (SCREEN_SPACE_RES.x * displaySprite.Scale) / 2;
+					halfSize.y *= (screenResAspect >= 1.0f) ? (1.0f / screenResAspect) : screenResAspect;
+
+					aspectCorrection.y = aspectCorrectionBase;
+				}
+				else
+				{
+					halfSize = (Vector2(SCREEN_SPACE_RES.y) * displaySprite.Scale) / 2;
+					halfSize.x *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
+
+					aspectCorrection.x = 1.0f / aspectCorrectionBase;
+				}
 				break;
 			}
 

@@ -65,10 +65,10 @@ namespace TEN::Scripting::DisplaySprite
 			*/
 			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
 
-			/*** Get the size of the display sprite in percent relative to the input scale mode.
+			/*** Get the absolute size of the display sprite in percent according to the input scale mode.
 			@function DisplaySprite:GetSize(scaleMode)
 			@tparam DisplaySpriteEnum.ScaleMode Scale mode for which to get the size.
-			@treturn Vec2 Size in percent relative to the scale mode.
+			@treturn Vec2 Absolute size in percent according to the input scale mode.
 			*/
 			ScriptReserved_DisplayStringGetSize, &ScriptDisplaySprite::GetSize,
 
@@ -192,10 +192,15 @@ namespace TEN::Scripting::DisplaySprite
 		float screenResAspect = screenRes.x / screenRes.y;
 
 		// Calculate sprite aspect ratio.
-		const auto& sprite = g_Level.SpritesTextures[Objects[ObjectID].meshIndex + SpriteID];
-		auto spriteAspect = (float)sprite.width / (float)sprite.height;
+		const auto& sprite = g_Level.Sprites[Objects[ObjectID].meshIndex + SpriteID];
+		auto spriteAspect = float(sprite.x1 - sprite.x3) / float(sprite.y1 - sprite.y3);
+
+		// Calculate aspect ratio correction base.
+		auto aspectCorrectionBase = screenResAspect / DISPLAY_SPACE_ASPECT;
 
 		auto halfSize = Vector2::Zero;
+		auto aspectCorrection = Vector2::One;
+
 		switch (scaleMode)
 		{
 		default:
@@ -204,11 +209,13 @@ namespace TEN::Scripting::DisplaySprite
 			{
 				halfSize = (Vector2(SCREEN_SPACE_RES.y) * Scale) / 2;
 				halfSize.x *= (spriteAspect >= 1.0f) ? spriteAspect : (1.0f / spriteAspect);
+				aspectCorrection.x = 1.0f / aspectCorrectionBase;
 			}
 			else
 			{
 				halfSize = (Vector2(SCREEN_SPACE_RES.x) * Scale) / 2;
 				halfSize.y *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
+				aspectCorrection.y = aspectCorrectionBase;
 			}
 			break;
 		
@@ -219,7 +226,7 @@ namespace TEN::Scripting::DisplaySprite
 			break;
 		}
 
-		return (halfSize * 2);
+		return ((halfSize * 2) * aspectCorrection);
 	}
 
 	void ScriptDisplaySprite::SetObjectID(GAME_OBJECT_ID objectID)
