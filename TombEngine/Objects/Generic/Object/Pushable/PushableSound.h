@@ -1,6 +1,8 @@
 #pragma once
 #include "Sound/sound.h"
 
+struct ItemInfo;
+
 namespace TEN::Entities::Generic
 {
 	enum PushableSoundType
@@ -23,5 +25,5 @@ namespace TEN::Entities::Generic
 	PushableSoundData GetPushableSoundData(MaterialType material);
 	int				  GetPushableSound(PushableSoundType soundType, const Vector3i& pos, const short roomNumber);
 
-	void HandlePushableSounds(int itemNumber, PushableInfo& pushable);
+	void HandlePushableSoundState(ItemInfo& pushableItem);
 }

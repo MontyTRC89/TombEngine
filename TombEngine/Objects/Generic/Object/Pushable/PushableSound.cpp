@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Object/Pushable/PushableSound.h"
 
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
@@ -67,28 +68,31 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void HandlePushableSounds(int itemNumber, PushableInfo& pushable)
+	void HandlePushableSoundState(ItemInfo& pushableItem)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
+		auto& pushable = GetPushableInfo(pushableItem);
 		
-		if (pushable.SoundState == PushableSoundState::Move)
+		switch (pushable.SoundState)
 		{
+		default:
+		case PushableSoundState::Move:
 			SoundEffect(GetPushableSound(Loop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
-		}
-		else if (pushable.SoundState == PushableSoundState::Stop)
-		{
+			break;
+
+		case PushableSoundState::Stop:
 			pushable.SoundState = PushableSoundState::None;
 			SoundEffect(GetPushableSound(Stop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
-		}
-		else if (pushable.SoundState == PushableSoundState::Fall)
-		{
+			break;
+
+		case  PushableSoundState::Fall:
 			pushable.SoundState = PushableSoundState::None;
 			SoundEffect(GetPushableSound(Fall, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
-		}
-		else if (pushable.SoundState == PushableSoundState::Wade)
-		{
+			break;
+
+		case PushableSoundState::Wade:
 			pushable.SoundState = PushableSoundState::None;
 			SoundEffect(SFX_TR4_LARA_WADE, &pushableItem.Pose, SoundEnvironment::Always);
+			break;
 		}
 	}
 }

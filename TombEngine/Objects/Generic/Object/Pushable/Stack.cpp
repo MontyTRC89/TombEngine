@@ -265,7 +265,7 @@ namespace TEN::Entities::Generic
 			if (currentPushable.UseRoomCollision)
 				RemovePushableBridge(currentItemNumber);
 
-			currentPushable.BehaviourState = PushableState::MoveStackHorizontal;
+			currentPushable.BehaviorState = PushableState::MoveStackHorizontal;
 
 			currentItemNumber = currentPushable.StackUpperItem;
 		}
@@ -288,7 +288,7 @@ namespace TEN::Entities::Generic
 			if (currentPushable.UseRoomCollision)
 				AddPushableBridge(currentItemNumber);
 
-			currentPushable.BehaviourState = PushableState::Idle;
+			currentPushable.BehaviorState = PushableState::Idle;
 
 			currentItemNumber = currentPushable.StackUpperItem;
 		}

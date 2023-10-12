@@ -1,5 +1,7 @@
 #pragma once
 
+struct ItemInfo;
+
 namespace TEN::Entities::Generic
 {
 	enum class PushableState
@@ -16,18 +18,16 @@ namespace TEN::Entities::Generic
 		MoveStackHorizontal
 	};
 
-	extern std::unordered_map<PushableState, std::function<void(int)>> PUSHABLE_STATE_MAP;
-	
-	void InitializePushableStateMap();
+	void HandlePushableBehaviorState(ItemInfo& pushableItem);
 
-	void HandleIdleState(int itemNumber);
-	void HandleMoveState(int itemNumber);
-	void HandleEdgeSlipState(int itemNumber);
-	void HandleFallState(int itemNumber);
-	void HandleSinkState(int itemNumber);
-	void HandleFloatState(int itemNumber);
-	void HandleUnderwaterState(int itemNumber);
-	void HandleWaterSurfaceState(int itemNumber);
-	void HandleSlideState(int itemNumber);
-	void HandleMoveStackHorizontalState(int itemNumber);
+	void HandleIdleState(ItemInfo& pushableItem);
+	void HandleMoveState(ItemInfo& pushableItem);
+	void HandleEdgeSlipState(ItemInfo& pushableItem);
+	void HandleFallState(ItemInfo& pushableItem);
+	void HandleSinkState(ItemInfo& pushableItem);
+	void HandleFloatState(ItemInfo& pushableItem);
+	void HandleUnderwaterState(ItemInfo& pushableItem);
+	void HandleWaterSurfaceState(ItemInfo& pushableItem);
+	void HandleSlideState(ItemInfo& pushableItem);
+	void HandleMoveStackHorizontalState(ItemInfo& pushableItem);
 };

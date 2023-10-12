@@ -7,16 +7,16 @@
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Objects/Generic/Object/Pushable/Info.h"
 #include "Objects/Generic/Object/Pushable/States.h"
 #include "Objects/Generic/Object/Pushable/Context.h"
 #include "Objects/Generic/Object/Pushable/PushableSound.h"
 #include "Objects/Generic/Object/Pushable/Stack.h"
-#include "Game/items.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -56,21 +56,16 @@ namespace TEN::Entities::Generic
 	void InitializePushableBlock(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		if (pushableItem.Data == NULL) // Is first pushableItem in initialize.
-		{
-			InitializePushableStateMap();
+		if (pushableItem.Data == NULL) // First pushableItem in initialize.
 			InitializePushableStacks();
-		}
 		
-		//pushableItem.Data = PushableInfo(); // Moved to InitializePushablesStacks.
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		pushable.StartPos = pushableItem.Pose.Position;
-		pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
-
+		pushable.StartPos = GameVector(pushableItem.Pose.Position, pushableItem.RoomNumber);
 		pushable.Height = GetPushableHeight(pushableItem);
 
-		if (pushableItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
+		if (pushableItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 &&
+			pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushable.UseRoomCollision = true;
 			AddPushableBridge(itemNumber);
@@ -84,10 +79,10 @@ namespace TEN::Entities::Generic
 
 		// Read OCB flags.
 		int ocb = pushableItem.TriggerFlags;
-		pushable.CanFall = (ocb & (1 << 0)) != 0;						 // Check bit 0.
-		pushable.DoAlignCenter = (ocb & (1 << 1)) != 1;					 // Check bit 1.
-		pushable.IsBuoyant = (ocb & (1 << 2)) != 0;						 // Check bit 2.
-		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Check bit 3.
+		pushable.CanFall			  = (ocb & (1 << 0)) != 0;			 // Bit 0.
+		pushable.DoAlignCenter		  = (ocb & (1 << 1)) != 1;			 // Bit 1.
+		pushable.IsBuoyant			  = (ocb & (1 << 2)) != 0;			 // Bit 2.
+		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Bit 3.
 
 		pushableItem.Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
@@ -101,28 +96,19 @@ namespace TEN::Entities::Generic
 		if (Lara.Context.InteractedItem == itemNumber && Lara.Control.IsMoving)
 			return;
 
-		// Call state handler function based current state. Functions defined in States class.
-		auto stateHandlerIterator = PUSHABLE_STATE_MAP.find(pushable.BehaviourState);
-		if (stateHandlerIterator != PUSHABLE_STATE_MAP.end())
-		{
-			stateHandlerIterator->second(itemNumber);
-		}
-		else
-		{
-			TENLog("Unknown pushable state.", LogLevel::Error, LogConfig::All, true);
-		}
+		// Handle behaviour and sound state.
+		HandlePushableBehaviorState(pushableItem);
+		HandlePushableSoundState(pushableItem);
 
-		// Play sound effects.
-		HandlePushableSounds(itemNumber, pushable);
-
-		// Update room number.
+		// Update bridge.
 		AddPushableStackBridge(itemNumber, false);
-		int probedRoomNumber = GetCollision(&pushableItem).RoomNumber;
+		int probeRoomNumber = GetCollision(&pushableItem).RoomNumber;
 		AddPushableStackBridge(itemNumber, true);
 
-		if (pushableItem.RoomNumber != probedRoomNumber)
+		// Update room number.
+		if (pushableItem.RoomNumber != probeRoomNumber)
 		{
-			ItemNewRoom(itemNumber, probedRoomNumber);
+			ItemNewRoom(itemNumber, probeRoomNumber);
 			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
 		}
 	}
@@ -146,9 +132,9 @@ namespace TEN::Entities::Generic
 			!laraItem->Animation.IsAirborne &&
 			player.Control.HandStatus == HandStatus::Free &&
 			IsPushableValid(itemNumber)) &&
-			pushable.BehaviourState == PushableState::Idle && 
-			(pushableSidesAttributes.IsPushable || pushableSidesAttributes.IsPullable) || // Player can interact with this side.
-			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber)) // Player already interacting.
+			pushable.BehaviorState == PushableState::Idle && 
+			(pushableSidesAttributes.IsPushable || pushableSidesAttributes.IsPullable) || // Can interact with this side.
+			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))	  // Already interacting.
 		{
 			// Set pushable bounds.
 			auto bounds = GameBoundingBox(&pushableItem);
@@ -160,7 +146,7 @@ namespace TEN::Entities::Generic
 			short yOrient = pushableItem.Pose.Orientation.y;
 			pushableItem.Pose.Orientation.y = GetQuadrant(laraItem->Pose.Orientation.y) * ANGLE(90.0f);
 
-			// If player is within interaction range, calculate target position for alignment.
+			// Within interaction range, calculate target position for alignment.
 			if (TestLaraPosition(PushableBlockBounds, &pushableItem, laraItem))
 			{
 				int quadrant = GetQuadrant(pushableItem.Pose.Orientation.y);
@@ -204,7 +190,6 @@ namespace TEN::Entities::Generic
 			}
 			else
 			{
-				// If player is outside iteraction range, set flags IsMoving false to indicate that.
 				if (player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 				{
 					player.Control.IsMoving = false;
@@ -216,12 +201,12 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			// If player is not holding Action, do normal collision routine.
+			// Not holding Action; do normal collision routine.
 			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
 				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
 				player.Context.NextCornerPos.Position.x != itemNumber)
 			{
-				// NOTE: If using room collision, leave it up to bridge collision system.
+				// NOTE: If using room collision, use bridge collision.
 				if (!pushable.UseRoomCollision)
 					ObjectCollision(itemNumber, laraItem, coll);
 

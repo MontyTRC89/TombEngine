@@ -674,7 +674,7 @@ bool SaveGame::Save(int slot)
 
 			Save::PushableBuilder pushableBuilder{ fbb };
 
-			pushableBuilder.add_pushable_behaviour_state((int)pushable->BehaviourState);
+			pushableBuilder.add_pushable_behaviour_state((int)pushable->BehaviorState);
 			pushableBuilder.add_pushable_gravity(pushable->Gravity);
 			pushableBuilder.add_pushable_water_force(pushable->FloatingForce);
 
@@ -1788,7 +1788,7 @@ bool SaveGame::Load(int slot)
 			auto* pushable = (PushableInfo*)item->Data;
 			auto* savedPushable = (Save::Pushable*)savedItem->data();
 
-			pushable->BehaviourState = (PushableState)savedPushable->pushable_behaviour_state();
+			pushable->BehaviorState = (PushableState)savedPushable->pushable_behaviour_state();
 			pushable->Gravity = savedPushable->pushable_gravity();
 			pushable->FloatingForce = savedPushable->pushable_water_force();
 
