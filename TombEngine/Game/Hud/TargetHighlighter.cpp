@@ -74,7 +74,7 @@ namespace TEN::Hud
 				Position->y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
 	}
 
-	void CrosshairData::Update(const Vector3& targetPos, bool doPulse, bool isActive)
+	void CrosshairData::Update(const Vector3& targetPos, bool isActive, bool doPulse)
 	{
 		constexpr auto ROT					   = ANGLE(2.0f);
 		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
@@ -255,7 +255,7 @@ namespace TEN::Hud
 				auto& crosshair = it->second;
 				if (crosshair.IsActive)
 				{
-					crosshair.Update(targetPos, item.HitStatus, true);
+					crosshair.Update(targetPos, true, item.HitStatus);
 					continue;
 				}
 			}
@@ -275,7 +275,7 @@ namespace TEN::Hud
 			auto targetPos = GetJointPosition(item, 0).ToVector3();
 
 			// Update inactive crosshair.
-			crosshair.Update(targetPos, item.HitStatus, false);
+			crosshair.Update(targetPos, false, item.HitStatus);
 		}
 
 		ClearInactiveCrosshairs();

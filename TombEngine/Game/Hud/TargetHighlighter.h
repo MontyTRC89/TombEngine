@@ -47,7 +47,7 @@ namespace TEN::Hud
 		bool IsOffscreen() const;
 
 		// Utilities
-		void Update(const Vector3& targetPos, bool doPulse, bool isActive);
+		void Update(const Vector3& targetPos, bool isActive, bool doPulse);
 		void Draw() const;
 	};
 
