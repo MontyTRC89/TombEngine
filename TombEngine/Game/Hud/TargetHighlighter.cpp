@@ -78,8 +78,8 @@ namespace TEN::Hud
 	{
 		constexpr auto ROT					   = ANGLE(2.0f);
 		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
-		constexpr auto SCALE_PRIMARY		   = 1.0f;
-		constexpr auto SCALE_PERIPHERAL		   = 0.75f;
+		constexpr auto SCALE_PRIMARY		   = 0.75f;
+		constexpr auto SCALE_PERIPHERAL		   = 0.5f;
 		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f;
 		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f;
 		constexpr auto PULSE_SCALE_MAX		   = 1.3f;
