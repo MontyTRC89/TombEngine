@@ -372,8 +372,8 @@ namespace TEN::Hud
 
 		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
 		g_Renderer.PrintDebugMessage(g_Configuration.EnableTargetHighlighter ? "Enabled" : "Disabled");
+		g_Renderer.PrintDebugMessage("Visible crosshairs: %d", visibleCount);
 		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
-		g_Renderer.PrintDebugMessage("Visible crosshairs: %d", peripheralCount);
 	}
 }
