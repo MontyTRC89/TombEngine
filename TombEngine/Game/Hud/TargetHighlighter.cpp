@@ -34,7 +34,7 @@ namespace TEN::Hud
 		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 		float screenResAspect = screenRes.x / screenRes.y;
 
-		return (((SCREEN_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale)) * screenResAspect;
+		return ((((SCREEN_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale)) * screenResAspect);
 	}
 
 	Vector2 CrosshairData::GetPositionOffset(short orientOffset) const
