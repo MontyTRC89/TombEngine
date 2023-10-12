@@ -691,7 +691,7 @@ namespace TEN::Renderer
 				else
 				{
 					halfSize = (Vector2(SCREEN_SPACE_RES.y) * displaySprite.Scale) / 2;
-					halfSize.x *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
+					halfSize.x *= (screenResAspect >= 1.0f) ? (1.0f / screenResAspect) : screenResAspect;
 
 					aspectCorrection.x = 1.0f / aspectCorrectionBase;
 				}
