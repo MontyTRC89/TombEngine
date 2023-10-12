@@ -57,11 +57,11 @@ struct GameConfiguration
 	int	 SfxVolume	  = 0;
 
 	// Gameplay
-	bool EnableSubtitles		= false;
-	bool EnableAutoTargeting	= false;
+	bool EnableSubtitles		 = false;
+	bool EnableAutoTargeting	 = false;
 	bool EnableTargetHighlighter = false;
-	bool EnableRumble			= false;
-	bool EnableThumbstickCamera = false;
+	bool EnableRumble			 = false;
+	bool EnableThumbstickCamera	 = false;
 
 	// Input
 	std::vector<int> Bindings = {};
