@@ -19,47 +19,48 @@ using namespace TEN::Math;
 namespace TEN::Renderer
 {
 	using TEN::Memory::LinearArrayBuffer;
-	using std::vector;
 
 	void Renderer11::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
+		constexpr auto VIEW_PORT = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
+
 		m_visitedRoomsStack.clear();
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{ 
-			RendererRoom* room = &m_rooms[i];
+			auto& room = m_rooms[i];
 			                         
-			room->ItemsToDraw.clear();        
-			room->EffectsToDraw.clear();
-			room->TransparentFacesToDraw.clear();
-			room->StaticsToDraw.clear();
-			room->LightsToDraw.clear();
-			room->Visited = false;
-			room->ViewPort = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
+			room.ItemsToDraw.clear();        
+			room.EffectsToDraw.clear();
+			room.TransparentFacesToDraw.clear();
+			room.StaticsToDraw.clear();
+			room.LightsToDraw.clear();
+			room.Visited = false;
+			room.ViewPort = VIEW_PORT;
 
-			for (int j = 0; j < room->Doors.size(); j++)
+			for (auto& door : room.Doors)
 			{
-				room->Doors[j].Visited = false;
-				room->Doors[j].InvisibleFromCamera = false;
-				room->Doors[j].DotProduct = FLT_MAX;
+				door.Visited = false;
+				door.InvisibleFromCamera = false;
+				door.DotProduct = FLT_MAX;
 			}
 		}
 
-		GetVisibleRooms(NO_ROOM, renderView.Camera.RoomNumber, Vector4(-1.0f, -1.0f, 1.0f, 1.0f), false, 0, onlyRooms, renderView);
+		GetVisibleRooms(NO_ROOM, renderView.Camera.RoomNumber, VIEW_PORT, false, 0, onlyRooms, renderView);
 
 		m_invalidateCache = false; 
 
-		// Prepare the real DX scissor test rectangle
-		for (auto room : renderView.RoomsToDraw)
+		// Prepare real DX scissor test rectangle.
+		for (auto* roomPtr : renderView.RoomsToDraw)
 		{
-			room->ClipBounds.left = (room->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
-			room->ClipBounds.bottom = (1.0f - room->ViewPort.y) * m_screenHeight * 0.5f;
-			room->ClipBounds.right = (room->ViewPort.z + 1.0f) * m_screenWidth * 0.5f;
-			room->ClipBounds.top = (1.0f - room->ViewPort.w) * m_screenHeight * 0.5f;
+			roomPtr->ClipBounds.left = (roomPtr->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
+			roomPtr->ClipBounds.bottom = (1.0f - roomPtr->ViewPort.y) * m_screenHeight * 0.5f;
+			roomPtr->ClipBounds.right = (roomPtr->ViewPort.z + 1.0f) * m_screenWidth * 0.5f;
+			roomPtr->ClipBounds.top = (1.0f - roomPtr->ViewPort.w) * m_screenHeight * 0.5f;
 		} 
 
-		// Collect fog bulbs
-		vector<RendererFogBulb> tempFogBulbs;
+		// Collect fog bulbs.
+		std::vector<RendererFogBulb> tempFogBulbs;
 		tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
 
 		for (auto& room : m_rooms)     
@@ -67,12 +68,13 @@ namespace TEN::Renderer
 			if (!g_Level.Rooms[room.RoomNumber].Active())
 				continue;
 
-			for (auto& light : room.Lights)
+			for (const auto& light : room.Lights)
 			{
 				if (light.Type != LIGHT_TYPE_FOG_BULB)
 					continue;
 
-				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f)) /* Test a bigger radius for avoiding bad clipping */
+				// Test bigger radius to avoid bad clipping.
+				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f))
 				{
 					RendererFogBulb bulb;
 					
@@ -88,19 +90,17 @@ namespace TEN::Renderer
 			}
 		}
 		
+		// Sort fog bulbs.
 		std::sort(
 			tempFogBulbs.begin(),
 			tempFogBulbs.end(),
-			[](RendererFogBulb a, RendererFogBulb b)
+			[](const RendererFogBulb& bulb0, const RendererFogBulb& bulb1)
 			{
-				return a.Distance < b.Distance;
-			}
-		);
+				return bulb0.Distance < bulb1.Distance;
+			});
 
 		for (int i = 0; i < std::min(MAX_FOG_BULBS_DRAW, (int)tempFogBulbs.size()); i++)
-		{
 			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
-		}
 	}
 
 	bool Renderer11::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
@@ -296,7 +296,7 @@ namespace TEN::Renderer
 				m_dotProducts++;
 			}
 
-			if (door->DotProduct <= 0)
+			if (door->DotProduct < 0)
 			{
 				door->InvisibleFromCamera = true;
 				continue;

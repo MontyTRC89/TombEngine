@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "RenderView.h"
+#include "Renderer/RenderView/RenderView.h"
 
 namespace TEN::Renderer
 {
@@ -46,6 +46,7 @@ namespace TEN::Renderer
 		RoomsToDraw.clear();
 		LightsToDraw.clear();
 		SpritesToDraw.clear();
+		DisplaySpritesToDraw.clear();
 		SortedStaticsToDraw.clear();
 		FogBulbsToDraw.clear();
 	}
