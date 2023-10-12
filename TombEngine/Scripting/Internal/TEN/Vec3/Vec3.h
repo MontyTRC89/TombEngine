@@ -22,8 +22,6 @@ public:
 	Vec3(const Vector3i& pos);
 	Vec3(const Vector3& pos);
 
-	void StoreInPose(Pose& pos) const;
-	
 	// Setters
 	void SetLength(float length);
 
