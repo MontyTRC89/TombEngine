@@ -8,11 +8,6 @@ using namespace TEN::Effects::DisplaySprite;
 
 enum BLEND_MODE;
 
-// TODO:
-// Test nested sprites in various modes and how they behave when the aspect ratio changes.
-// Fix weird flashing effect.
-// Fix scaling with different screen aspect ratios.
-
 namespace TEN::Scripting::DisplaySprite
 {
 	class ScriptDisplaySprite
@@ -42,7 +37,6 @@ namespace TEN::Scripting::DisplaySprite
 		float		   GetRotation() const;
 		Vec2		   GetScale() const;
 		ScriptColor	   GetColor() const;
-		Vec2		   GetSize(DisplaySpriteScaleMode scaleMode) const;
 
 		// Setters
 		void SetObjectID(GAME_OBJECT_ID objectID);

@@ -65,13 +65,6 @@ namespace TEN::Scripting::DisplaySprite
 			*/
 			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
 
-			/*** Get the absolute size of the display sprite in percent according to the input scale mode.
-			@function DisplaySprite:GetSize(scaleMode)
-			@tparam DisplaySpriteEnum.ScaleMode Scale mode for which to get the size.
-			@treturn Vec2 Absolute size in percent according to the input scale mode.
-			*/
-			ScriptReserved_DisplayStringGetSize, &ScriptDisplaySprite::GetSize,
-
 			/*** Set the sprite sequence object ID used by the display sprite.
 			@function DisplaySprite:SetObjectID(Objects.ObjID)
 			@tparam Objects.ObjID New sprite sequence object ID.
@@ -181,52 +174,6 @@ namespace TEN::Scripting::DisplaySprite
 	ScriptColor ScriptDisplaySprite::GetColor() const
 	{
 		return Color;
-	}
-
-	Vec2 ScriptDisplaySprite::GetSize(DisplaySpriteScaleMode scaleMode) const
-	{
-		constexpr auto DISPLAY_SPACE_ASPECT = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
-
-		// Calculate screen aspect ratio.
-		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
-		float screenResAspect = screenRes.x / screenRes.y;
-
-		// Calculate sprite aspect ratio.
-		const auto& sprite = g_Level.Sprites[Objects[ObjectID].meshIndex + SpriteID];
-		auto spriteAspect = float(sprite.x1 - sprite.x3) / float(sprite.y1 - sprite.y3);
-
-		// Calculate aspect ratio correction base.
-		auto aspectCorrectionBase = screenResAspect / DISPLAY_SPACE_ASPECT;
-
-		auto halfSize = Vector2::Zero;
-		auto aspectCorrection = Vector2::One;
-
-		switch (scaleMode)
-		{
-		default:
-		case DisplaySpriteScaleMode::Fit:
-			if (screenResAspect >= spriteAspect)
-			{
-				halfSize = (Vector2(SCREEN_SPACE_RES.y) * Scale) / 2;
-				halfSize.x *= (spriteAspect >= 1.0f) ? spriteAspect : (1.0f / spriteAspect);
-				aspectCorrection.x = 1.0f / aspectCorrectionBase;
-			}
-			else
-			{
-				halfSize = (Vector2(SCREEN_SPACE_RES.x) * Scale) / 2;
-				halfSize.y *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
-				aspectCorrection.y = aspectCorrectionBase;
-			}
-			break;
-		
-		case DisplaySpriteScaleMode::Fill:
-			break;
-
-		case DisplaySpriteScaleMode::Stretch:
-			break;
-		}
-
-		return ((halfSize * 2) * aspectCorrection);
 	}
 
 	void ScriptDisplaySprite::SetObjectID(GAME_OBJECT_ID objectID)
