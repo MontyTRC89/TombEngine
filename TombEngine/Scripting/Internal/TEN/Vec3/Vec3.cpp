@@ -42,10 +42,10 @@ void Vec3::Register(sol::table& parent)
 		*/
 		ScriptReserved_Vec3Normalize, &Vec3::Normalize,
 		
-		/*** Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input alpha value in the range [0, 1].
+		/*** Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha.
 		@function Vec3:Lerp(vector)
 		@tparam Vec3 vector Target interpolation vector.
-		@tparam float alpha Interpolation alpha.
+		@tparam float alpha Interpolation alpha in the range [0, 1].
 		@treturn Vec3 Linearly interpolated vector.
 		*/
 		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
