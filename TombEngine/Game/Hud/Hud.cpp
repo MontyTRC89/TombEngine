@@ -11,18 +11,18 @@ namespace TEN::Hud
 {
 	HudController g_Hud = {};
 
-	void HudController::Update(const ItemInfo& item)
+	void HudController::Update(const ItemInfo& playerItem)
 	{
-		TargetHighlighter.Update(item);
+		TargetHighlighter.Update(playerItem);
 		PickupSummary.Update();
-		StatusBars.Update(item);
+		StatusBars.Update(playerItem);
 	}
 
-	void HudController::Draw(const ItemInfo& item) const
+	void HudController::Draw(const ItemInfo& playerItem) const
 	{
 		TargetHighlighter.Draw();
 		PickupSummary.Draw();
-		StatusBars.Draw(item);
+		StatusBars.Draw(playerItem);
 	}
 
 	void HudController::Clear()

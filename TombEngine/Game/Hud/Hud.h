@@ -16,8 +16,8 @@ namespace TEN::Hud
 		TargetHighlighterController TargetHighlighter = {};
 
 		// Utilities
-		void Update(const ItemInfo& item);
-		void Draw(const ItemInfo& item) const;
+		void Update(const ItemInfo& playerItem);
+		void Draw(const ItemInfo& playerItem) const;
 		void Clear();
 	};
 
