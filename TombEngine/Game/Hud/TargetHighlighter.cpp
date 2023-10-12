@@ -30,7 +30,11 @@ namespace TEN::Hud
 
 	float CrosshairData::GetRadius() const
 	{
-		return (((SCREEN_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale));
+		// Get screen aspect ratio.
+		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
+		float screenResAspect = screenRes.x / screenRes.y;
+
+		return (((SCREEN_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale)) * screenResAspect;
 	}
 
 	Vector2 CrosshairData::GetPositionOffset(short orientOffset) const
@@ -76,8 +80,8 @@ namespace TEN::Hud
 		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
 		constexpr auto SCALE_PRIMARY		   = 1.0f;
 		constexpr auto SCALE_PERIPHERAL		   = 0.75f;
-		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f * SQRT_2;
-		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f * SQRT_2;
+		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f;
+		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f;
 		constexpr auto PULSE_SCALE_MAX		   = 1.3f;
 		constexpr auto MORPH_LERP_ALPHA		   = 0.3f;
 		constexpr auto ORIENT_LERP_ALPHA	   = 0.1f;
@@ -121,11 +125,11 @@ namespace TEN::Hud
 		}
 		Color = Vector4::Lerp(Color, ColorTarget, MORPH_LERP_ALPHA);
 
-		// Update radius scale.
 		float radiusScaleTarget = IsPrimary ? RADIUS_SCALE_PRIMARY : RADIUS_SCALE_PERIPHERAL;
 		if (!IsActive)
 			radiusScaleTarget = RADIUS_SCALE_PERIPHERAL;
 
+		// Update radius scale.
 		RadiusScale = Lerp(RadiusScale, radiusScaleTarget, RADIUS_LERP_ALPHA);
 
 		// Update pulse scale.
@@ -216,7 +220,7 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Draw() const
 	{
-		DrawDebug();
+		//DrawDebug();
 
 		if (Crosshairs.empty())
 			return;

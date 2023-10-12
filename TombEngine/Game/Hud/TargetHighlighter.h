@@ -67,7 +67,7 @@ namespace TEN::Hud
 		// Update helpers
 		void Update(const std::vector<int>& itemNumbers);
 
-		// Misc. helpers
+		// Object helpers
 		CrosshairData& GetNewCrosshair(int itemNumber);
 		void		   AddCrosshair(int itemNumber, const Vector3& targetPos);
 		void		   ClearInactiveCrosshairs();
