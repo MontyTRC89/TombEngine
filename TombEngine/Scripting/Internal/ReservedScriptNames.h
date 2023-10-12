@@ -24,7 +24,6 @@ static constexpr char ScriptReserved_Volume[]			= "Volume";
 static constexpr char ScriptReserved_Room[]				= "Room";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Vec2[]				= "Vec2";
-static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
@@ -330,12 +329,12 @@ static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 constexpr char ScriptReserved_Vec2SetLength[] = "ToLength";
 
 // Vec3
+constexpr char ScriptReserved_Vec3[]				= "Vec3";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3SetLength[]		= "SetLength";
-constexpr char ScriptReserved_Vec3ClampLength[]		= "ClampLength";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
 constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Cross[]			= "Cross";
-constexpr char ScriptReserved_Vec3Length[]			= "Length";
-constexpr char ScriptReserved_Vec3Distance[]		= "Distance";
 constexpr char ScriptReserved_Vec3Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec3Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec3Length[]			= "Length";
