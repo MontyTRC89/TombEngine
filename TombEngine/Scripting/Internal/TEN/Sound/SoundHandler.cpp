@@ -49,6 +49,11 @@ namespace Sound
 		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
 	}
 
+	static void StopSoundEffect(int id)
+	{
+		StopSoundEffect(id);
+	}
+
 	static bool IsSoundPlaying(int effectID)
 	{
 		return (Sound_EffectIsPlaying(effectID, nullptr) != SOUND_NO_CHANNEL);
@@ -109,6 +114,11 @@ namespace Sound
 		//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
 		////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
 		tableSound.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
+
+		/// Stop sound effect
+		//@function StopSound
+		//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+		tableSound.set_function(ScriptReserved_StopSound, &StopSoundEffect);
 
 		/// Check if the sound effect is playing
 		//@function IsSoundPlaying
