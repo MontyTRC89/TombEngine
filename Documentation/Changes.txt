@@ -21,6 +21,7 @@ Version 1.1.1
  - Re-enable looking while performing up jump, backward jump, or backward crawl.
  - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
 * Add target highlighter system with toggle in Sound and Gameplay settings.
+* Add sprint slide state 191.
 * Add swinging blade.
 * Add crumbling platform and add new OCBs for behaviour:
  - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
