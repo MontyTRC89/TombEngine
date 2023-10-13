@@ -19,8 +19,8 @@ public:
 	// Constructors
 	Vec3() {};
 	Vec3(float x, float y, float z);
-	Vec3(const Vector3i& pos);
 	Vec3(const Vector3& pos);
+	Vec3(const Vector3i& pos);
 
 	// Setters
 	void SetLength(float length);

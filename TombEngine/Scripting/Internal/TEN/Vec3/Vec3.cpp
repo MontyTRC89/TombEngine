@@ -111,14 +111,14 @@ Vec3::Vec3(float x, float y, float z)
 	this->z = z;
 }
 
-Vec3::Vec3(const Vector3i& pos)
+Vec3::Vec3(const Vector3& pos)
 {
 	x = pos.x;
 	y = pos.y;
 	z = pos.z;
 }
 
-Vec3::Vec3(const Vector3& pos)
+Vec3::Vec3(const Vector3i& pos)
 {
 	x = pos.x;
 	y = pos.y;
