@@ -13,6 +13,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -62,6 +63,7 @@ using namespace std::chrono;
 using namespace TEN::Effects;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -117,6 +119,9 @@ int DrawPhase(bool isTitle)
 	{
 		g_Renderer.Render();
 	}
+
+	// Clear display sprites.
+	ClearDisplaySprites();
 
 	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
@@ -416,6 +421,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearDisplaySprites();
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();

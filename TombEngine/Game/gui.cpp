@@ -181,7 +181,7 @@ namespace TEN::Gui
 			return false;
 
 		// Avoid Select or Action release interference when entering inventory.
-		if (GetActionTimeActive(In::Select) < TimeInMenu || GetActionTimeActive(In::Action) < TimeInMenu)
+		if (GetActionTimeActive(In::Select) < TimeInMenu && GetActionTimeActive(In::Action) < TimeInMenu)
 			return true;
 
 		return false;
@@ -871,14 +871,16 @@ namespace TEN::Gui
 			MusicVolume,
 			SfxVolume,
 			Subtitles,
-			AutoTarget,
+			AutoTargeting,
+			TargetHighlighter,
 			ToggleRumble,
 			ThumbstickCameraControl,
+
 			Apply,
 			Cancel
 		};
 
-		static const int numOtherSettingsOptions = 8;
+		static const int numOtherSettingsOptions = 9;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -903,11 +905,21 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.EnableReverb = !CurrentSettings.Configuration.EnableReverb;
 				break;
 
-			case OtherSettingsOption::AutoTarget:
+			case OtherSettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
+				break;
+
+			case OtherSettingsOption::AutoTargeting:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAutoTargeting = !CurrentSettings.Configuration.EnableAutoTargeting;
 				break;
 
+			case OtherSettingsOption::TargetHighlighter:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
+				break;
+				
 			case OtherSettingsOption::ToggleRumble:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
@@ -916,11 +928,6 @@ namespace TEN::Gui
 			case OtherSettingsOption::ThumbstickCameraControl:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
-				break;
-
-			case OtherSettingsOption::Subtitles:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
 				break;
 			}
 		}
@@ -2710,7 +2717,7 @@ namespace TEN::Gui
 
 					if (AmmoObjectList[n].Amount == -1)
 					{
-						sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
+						sprintf(&invTextBuffer[0], g_GameFlow->GetString(STRING_UNLIMITED), g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 					}
 					else
 					{
@@ -3033,7 +3040,7 @@ namespace TEN::Gui
 						{
 							if (numItems == -1)
 							{
-								sprintf(textBuffer, "Unlimited %s", g_GameFlow->GetString(invObject.ObjectName));
+								sprintf(textBuffer, g_GameFlow->GetString(STRING_UNLIMITED), g_GameFlow->GetString(invObject.ObjectName));
 							}
 							else
 							{

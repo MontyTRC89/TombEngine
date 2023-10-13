@@ -324,12 +324,12 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game\effects\Bubble.h" />
+    <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\Hud\PickupSummary.h" />
     <ClInclude Include="Game\Hud\StatusBars.h" />
-    <ClInclude Include="Game\Lara\Context.h" />
-    <ClInclude Include="Game\Lara\ContextData.h" />
+    <ClInclude Include="Game\Hud\TargetHighlighter.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -673,6 +673,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h" />
     <ClInclude Include="Renderer\Quad\RenderQuad.h" />
+    <ClInclude Include="Renderer\RendererSprite2D.h" />
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
@@ -712,6 +713,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
     <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\AlignModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScaleModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectsFunctions.h" />
@@ -803,6 +807,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
     <ClCompile Include="Game\effects\debris.cpp" />
+    <ClCompile Include="Game\effects\DisplaySprite.cpp" />
     <ClCompile Include="Game\effects\Drip.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\effects\Electricity.cpp" />
@@ -822,10 +827,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\Hud\PickupSummary.cpp" />
     <ClCompile Include="Game\Hud\StatusBars.cpp" />
+    <ClCompile Include="Game\Hud\TargetHighlighter.cpp" />
     <ClCompile Include="Game\itemdata\creature_info.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\items.cpp" />
-    <ClCompile Include="Game\Lara\Context.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
@@ -1130,6 +1135,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptUtil.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Color\Color.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Effects\EffectsFunctions.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Animations\Animations.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\FlowHandler.cpp" />

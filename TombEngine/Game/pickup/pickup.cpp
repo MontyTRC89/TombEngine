@@ -827,6 +827,9 @@ void RegeneratePickups()
 			case ID_SHOTGUN_AMMO2_ITEM:
 				ammo = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2];
 				break;
+
+			default:
+				continue; // Don't regenerate anything but ammo.
 			}
 
 			if (ammo == 0)
