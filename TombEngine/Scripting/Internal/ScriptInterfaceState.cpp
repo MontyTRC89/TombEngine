@@ -57,10 +57,10 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 	SolState.set(ScriptReserved_TEN, RootTable);
 
 	// Misc. handlers not assigned above.
-	InventoryHandler::Register(&s_solState, s_rootTable);
-	Effects::Register(&s_solState, s_rootTable);
-	Input::Register(&s_solState, s_rootTable);
-	Sound::Register(&s_solState, s_rootTable);
-	Util::Register(&s_solState, s_rootTable);
-	View::Register(&s_solState, s_rootTable);
+	InventoryHandler::Register(&SolState, RootTable);
+	Effects::Register(&SolState, RootTable);
+	Input::Register(&SolState, RootTable);
+	Sound::Register(&SolState, RootTable);
+	Util::Register(&SolState, RootTable);
+	View::Register(&SolState, RootTable);
 }
