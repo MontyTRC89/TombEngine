@@ -435,9 +435,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\Object\generic_trapdoor.h" />
     <ClInclude Include="Objects\Generic\Object\objects.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
-    <ClInclude Include="Objects\Generic\Object\Pushable\Context.h" />
     <ClInclude Include="Objects\Generic\Object\Pushable\Info.h" />
     <ClInclude Include="Objects\Generic\Object\Pushable\PushableBridge.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableCollision.h" />
     <ClInclude Include="Objects\Generic\Object\Pushable\PushableEffects.h" />
     <ClInclude Include="Objects\Generic\Object\Pushable\PushableObject.h" />
     <ClInclude Include="Objects\Generic\Object\Pushable\PushableSound.h" />
@@ -904,9 +904,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Object\generic_trapdoor.cpp" />
     <ClCompile Include="Objects\Generic\Object\objects.cpp" />
     <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
-    <ClCompile Include="Objects\Generic\Object\Pushable\Context.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushable\Info.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushable\PushableBridge.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableCollision.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushable\PushableEffects.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushable\PushableObject.cpp" />
     <ClCompile Include="Objects\Generic\Object\Pushable\PushableSound.cpp" />

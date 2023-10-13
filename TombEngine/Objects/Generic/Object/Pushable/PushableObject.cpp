@@ -14,7 +14,7 @@
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Objects/Generic/Object/Pushable/Info.h"
 #include "Objects/Generic/Object/Pushable/States.h"
-#include "Objects/Generic/Object/Pushable/Context.h"
+#include "Objects/Generic/Object/Pushable/PushableCollision.h"
 #include "Objects/Generic/Object/Pushable/PushableSound.h"
 #include "Objects/Generic/Object/Pushable/Stack.h"
 #include "Sound/sound.h"
