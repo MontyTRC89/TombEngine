@@ -43,7 +43,7 @@ namespace Sound
 
 	///Stop audio track that is currently playing
 	//@function StopAudioTrack
-	//@tparam Misc.SoundTrackType type of the audio track
+	//@tparam Sound.SoundTrackType type of the audio track
 	static void StopAudioTrack(TypeOrNil<SoundTrackType> mode)
 	{
 		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
@@ -52,7 +52,7 @@ namespace Sound
 
 	///Get current loudness level for specified track type
 	//@function GetAudioTrackLoudness
-	//@tparam Misc.SoundTrackType type of the audio track
+	//@tparam Sound.SoundTrackType type of the audio track
 	//@treturn float current loudness of a specified audio track
 	static float GetAudioTrackLoudness(TypeOrNil<SoundTrackType> mode)
 	{
