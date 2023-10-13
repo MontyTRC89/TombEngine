@@ -1,10 +1,8 @@
 #pragma once
-
-// Last generated on 31/7/2022.
+#include <string>
+#include <unordered_map>
 
 #include "Renderer/Renderer11Enums.h"
-#include <unordered_map>
-#include <string>
 
 /***
 Constants for blend mode IDs.
@@ -34,17 +32,16 @@ The following constants are inside BlendID.
 @table CONSTANT_STRING_HERE
 */
 
-
 static const std::unordered_map<std::string, BLEND_MODES> BLEND_IDS
 {
-	{"OPAQUE", BLENDMODE_OPAQUE},
-	{"ALPHATEST", BLENDMODE_ALPHATEST},
-	{"ADDITIVE", BLENDMODE_ADDITIVE},
-	{"NOZTEST", BLENDMODE_NOZTEST},
-	{"SUBTRACTIVE", BLENDMODE_SUBTRACTIVE},
-	{"WIREFRAME", BLENDMODE_WIREFRAME},
-	{"EXCLUDE", BLENDMODE_EXCLUDE},
-	{"SCREEN", BLENDMODE_SCREEN},
-	{"LIGHTEN", BLENDMODE_LIGHTEN},
-	{"ALPHABLEND", BLENDMODE_ALPHABLEND}
+	{ "OPAQUE", BLENDMODE_OPAQUE },
+	{ "ALPHATEST", BLENDMODE_ALPHATEST },
+	{ "ADDITIVE", BLENDMODE_ADDITIVE },
+	{ "NOZTEST", BLENDMODE_NOZTEST },
+	{ "SUBTRACTIVE", BLENDMODE_SUBTRACTIVE },
+	{ "WIREFRAME", BLENDMODE_WIREFRAME },
+	{ "EXCLUDE", BLENDMODE_EXCLUDE },
+	{ "SCREEN", BLENDMODE_SCREEN },
+	{ "LIGHTEN", BLENDMODE_LIGHTEN },
+	{ "ALPHABLEND", BLENDMODE_ALPHABLEND }
 };

@@ -33,17 +33,16 @@ struct WeaponAnimData
 
 static WeaponAnimData GetWeaponAnimData(LaraWeaponType weaponType)
 {
-	static const auto DEFAULT_WEAPON_ANIM_DATA = WeaponAnimData{ ID_LARA, 0, 0, 0, 0 };
-	static const auto ANIM_DATA_MAP			   = std::unordered_map<LaraWeaponType, WeaponAnimData>
+	static const auto ANIM_DATA_MAP = std::unordered_map<LaraWeaponType, WeaponAnimData>
 	{
 		{ LaraWeaponType::None, WeaponAnimData{ ID_LARA, 0, 0, 0, 0 } },
 		{ LaraWeaponType::Pistol, WeaponAnimData{ ID_PISTOLS_ANIM, 4, 5, 13, 24 } },
 		{ LaraWeaponType::Revolver, WeaponAnimData{ ID_REVOLVER_ANIM , 7, 8, 15, 29 } },
 		{ LaraWeaponType::Uzi, WeaponAnimData{ ID_UZI_ANIM, 4, 5, 13, 24 } }
 	};
-
+	
 	auto it = ANIM_DATA_MAP.find(weaponType);
-	return ((it != ANIM_DATA_MAP.end()) ? it->second : DEFAULT_WEAPON_ANIM_DATA);
+	return ((it != ANIM_DATA_MAP.end()) ? it->second : ANIM_DATA_MAP.at(LaraWeaponType::None));
 }
 
 static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType, bool isRightWeapon)

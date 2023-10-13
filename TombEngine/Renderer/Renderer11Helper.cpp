@@ -529,14 +529,14 @@ namespace TEN::Renderer
 			gameCamera.Camera.WorldPosition.y,
 			gameCamera.Camera.WorldPosition.z,
 			1.0f);
-		auto cameraDirection = Vector4(
+		auto cameraDir = Vector4(
 			gameCamera.Camera.WorldDirection.x,
 			gameCamera.Camera.WorldDirection.y,
 			gameCamera.Camera.WorldDirection.z,
 			1.0f);
 		
 		// Point is behind camera; return nullopt.
-		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
+		if ((point - cameraPos).Dot(cameraDir) < 0.0f)
 			return std::nullopt;
 
 		// Calculate clip space coords.

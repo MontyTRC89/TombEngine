@@ -555,9 +555,10 @@ namespace TEN::Renderer
 		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
 		void DrawSplashes(RenderView& view);
 		void DrawSprites(RenderView& view);
+		void DrawDisplaySprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
 		void DrawLines3D(RenderView& view);
-		void DrawLines2D();
+		void DrawLinesIn2DSpace();
 		void DrawOverlays(RenderView& view);
 		void DrawRopes(RenderView& view);
 		void DrawBats(RenderView& view);
@@ -745,8 +746,9 @@ namespace TEN::Renderer
 		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
 		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 
-		void DrawSpriteIn2DSpace(GAME_OBJECT_ID spriteID, unsigned int spriteIndex, const Vector2& pos2D, short orient2D,
-								 const Vector4& color, const Vector2& size);
+		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
+							  int priority, BLEND_MODES blendMode, const Vector2& aspectCorrection, RenderView& renderView);
+		void CollectDisplaySprites(RenderView& renderView);
 	};
 
 	extern Renderer11 g_Renderer;
