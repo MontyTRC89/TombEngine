@@ -4,20 +4,25 @@
 
 #include "Scripting/Internal/TEN/Color/Color.h"
 
-enum class DisplayStringOptions : size_t
+enum class DisplayStringOptions
 {
-	CENTER,
-	OUTLINE,
-	NUM_OPTIONS
+	Center,
+	Outline,
+	Right,
+	Blink,
+
+	Count
 };
 
-static const std::unordered_map<std::string, DisplayStringOptions> kDisplayStringOptionNames
+static const std::unordered_map<std::string, DisplayStringOptions> DISPLAY_STRING_OPTION_NAMES
 {
-	{"CENTER", DisplayStringOptions::CENTER},
-	{"SHADOW", DisplayStringOptions::OUTLINE}
+	{ "CENTER", DisplayStringOptions::Center },
+	{ "SHADOW", DisplayStringOptions::Outline },
+	{ "RIGHT", DisplayStringOptions::Right },
+	{ "BLINK", DisplayStringOptions::Blink }
 };
 
-using FlagArray = std::array<bool, static_cast<size_t>(DisplayStringOptions::NUM_OPTIONS)>;
+using FlagArray = std::array<bool, (int)DisplayStringOptions::Count>;
 // Used to store data used to render the string.
 // This is separate from DisplayString because the lifetimes of the classes differ slightly.
 
@@ -62,8 +67,8 @@ public:
 	void SetPos(int x, int y);
 	std::tuple<int, int> GetPos() const;
 
-	void SetCol(const ScriptColor&);
-	ScriptColor GetCol();
+	void SetColor(const ScriptColor&);
+	ScriptColor GetColor();
 
 	void SetKey(const std::string&);
 	std::string GetKey() const;

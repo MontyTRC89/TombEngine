@@ -20,6 +20,15 @@ namespace TEN::Control::Volumes
 		Nodes
 	};
 
+	enum class VolumeEventType
+	{
+		Enter,
+		Inside,
+		Leave,
+
+		Count
+	};
+
 	enum class VolumeActivatorFlags
 	{
 		None		   = (0 << 0),
@@ -42,11 +51,8 @@ namespace TEN::Control::Volumes
 
 	struct VolumeEventSet
 	{
-		std::string			 Name		= {};
+		std::string	Name = {};
 		VolumeActivatorFlags Activators = VolumeActivatorFlags::None;
-
-		VolumeEvent OnEnter	 = {};
-		VolumeEvent OnLeave	 = {};
-		VolumeEvent OnInside = {};
+		std::array<VolumeEvent, int(VolumeEventType::Count)> Events = {};
 	};
 };

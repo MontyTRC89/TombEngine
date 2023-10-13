@@ -14,8 +14,8 @@ namespace TEN::Utils
 	std::vector<std::string> SplitString(const std::string& string);
 
 	// 2D space utilities
-	Vector2 GetAspectCorrect2DPosition(Vector2 pos2D);
-	Vector2 Convert2DPositionToNDC(const Vector2& pos2D);
+	Vector2 GetAspectCorrect2DPosition(const Vector2& pos);
+	Vector2 Convert2DPositionToNDC(const Vector2& pos);
 	Vector2 ConvertNDCTo2DPosition(const Vector2& ndc);
 
 	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion);

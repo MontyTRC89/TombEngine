@@ -13,6 +13,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -62,6 +63,7 @@ using namespace std::chrono;
 using namespace TEN::Effects;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -93,7 +95,7 @@ bool ThreadEnded;
 
 int RequiredStartPos;
 int CurrentLevel;
-int LevelComplete;
+int NextLevel;
 
 int SystemNameHash = 0;
 
@@ -117,6 +119,9 @@ int DrawPhase(bool isTitle)
 	{
 		g_Renderer.Render();
 	}
+
+	// Clear display sprites.
+	ClearDisplaySprites();
 
 	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
@@ -401,6 +406,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearDisplaySprites();
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
@@ -599,16 +605,20 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 	// Does the player want to enter inventory?
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-		g_Gui.GetInventoryMode() != InventoryMode::Save)
+		g_Gui.GetInventoryMode() != InventoryMode::Save &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 
 		if (g_Gui.CallInventory(LaraItem, false))
 			result = GameStatus::SaveGame;
 	}
 	else if (IsClicked(In::Load) &&
-			 g_Gui.GetInventoryMode() != InventoryMode::Load)
+		g_Gui.GetInventoryMode() != InventoryMode::Load &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -653,8 +663,16 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	}
 
 	// Check if level has been completed.
-	if (LevelComplete)
+	// Negative NextLevel indicates that a savegame must be loaded from corresponding slot.
+	if (NextLevel > 0)
+	{
 		return GameStatus::LevelComplete;
+	}
+	else if (NextLevel < 0)
+	{
+		g_GameFlow->SelectedSaveGame = -(NextLevel + 1);
+		return GameStatus::LoadGame;
+	}
 
 	return GameStatus::None;
 }
