@@ -63,6 +63,7 @@ public:
 	void		SaveGame(int slot);
 	void		LoadGame(int slot);
 	void		DeleteSaveGame(int slot);
+	bool		DoesSaveGameExist(int slot);
 	int			GetSecretCount() const;
 	void		SetSecretCount(int secretsNum);
 	void		AddSecret(int levelSecretIndex);

@@ -8,12 +8,17 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
+
+using namespace TEN::Scripting::DisplaySprite;
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -28,7 +33,8 @@ ScriptInterfaceObjectsHandler* g_GameScriptEntities;
 ScriptInterfaceStringsHandler* g_GameStringsHandler;
 ScriptInterfaceFlowHandler* g_GameFlow;
 
-FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) : m_handler(lua)
+FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) :
+	m_handler(lua)
 {
 /*** gameflow.lua.
 These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
@@ -151,6 +157,14 @@ level count, jumps to title.
 	*/
 	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
 
+	/***
+	Check if a savegame exists.
+	@function DoesSaveGameExist
+	@tparam int slotID ID of the savegame slot to check.
+	@treturn bool true if the savegame exists, false if not.
+	*/
+	tableFlow.set_function(ScriptReserved_DoesSaveGameExist, &FlowHandler::DoesSaveGameExist, this);
+
 /***
 Returns the player's current per-game secret count.
 @function GetSecretCount
@@ -222,6 +236,7 @@ Specify which translations in the strings table correspond to which languages.
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 	ScriptColor::Register(parent);
+	ScriptDisplaySprite::Register(*lua, parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);
@@ -233,11 +248,11 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
 	
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, kWeatherTypes);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, kLaraTypes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, kErrorModes);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
 }
 
 FlowHandler::~FlowHandler()
@@ -428,6 +443,11 @@ void FlowHandler::LoadGame(int slot)
 void FlowHandler::DeleteSaveGame(int slot)
 {
 	SaveGame::Delete(slot);
+}
+
+bool FlowHandler::DoesSaveGameExist(int slot)
+{
+	return SaveGame::DoesSaveGameExist(slot, true);
 }
 
 int FlowHandler::GetSecretCount() const

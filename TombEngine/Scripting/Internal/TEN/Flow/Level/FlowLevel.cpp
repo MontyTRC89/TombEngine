@@ -14,7 +14,7 @@ These are things things which aren't present in the compiled level file itself.
 	@function Level
 	@treturn Level a Level object
 	*/
-void Level::Register(sol::table & parent)
+void Level::Register(sol::table& parent)
 {	
 	parent.new_usertype<Level>("Level",
 		sol::constructors<Level()>(),

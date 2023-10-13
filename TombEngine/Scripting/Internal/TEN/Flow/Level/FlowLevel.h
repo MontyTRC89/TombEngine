@@ -6,7 +6,7 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 
-static const std::unordered_map<std::string, WeatherType> kWeatherTypes
+static const std::unordered_map<std::string, WeatherType> WEATHER_TYPES
 {
 	{"None", WeatherType::None},
 	{"Rain", WeatherType::Rain},
@@ -14,7 +14,7 @@ static const std::unordered_map<std::string, WeatherType> kWeatherTypes
 };
 
 
-static const std::unordered_map<std::string, LaraType> kLaraTypes
+static const std::unordered_map<std::string, LaraType> PLAYER_TYPES
 {
 	{"Normal", LaraType::Normal},
 	{"Young", LaraType::Young},
@@ -50,7 +50,7 @@ struct Level : public ScriptInterfaceLevel
 	LaraType GetLaraType() const override;
 	void SetWeatherStrength(float val);
 	void SetLevelFarView(short val);
-	static void Register(sol::table & parent);
+	static void Register(sol::table& parent);
 	WeatherType GetWeatherType() const override;
 	short GetMirrorRoom() const override;
 	short GetFogMinDistance() const override;
