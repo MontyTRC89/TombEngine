@@ -27,6 +27,25 @@ static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
+// DisplaySprite object
+static constexpr char ScriptReserved_DisplaySprite[]				= "DisplaySprite";
+static constexpr char ScriptReserved_DisplayStringGetObjectID[]		= "GetObjectID";
+static constexpr char ScriptReserved_DisplayStringGetSpriteID[]		= "GetSpriteID";
+static constexpr char ScriptReserved_DisplayStringGetPosition[]		= "GetPosition";
+static constexpr char ScriptReserved_DisplayStringGetRotation[]		= "GetRotation";
+static constexpr char ScriptReserved_DisplayStringGetScale[]		= "GetScale";
+static constexpr char ScriptReserved_DisplayStringGetColor[]		= "GetColor";
+static constexpr char ScriptReserved_DisplayStringSetObjectID[]		= "SetObjectID";
+static constexpr char ScriptReserved_DisplayStringSetSpriteID[]		= "SetSpriteID";
+static constexpr char ScriptReserved_DisplayStringSetPosition[]		= "SetPosition";
+static constexpr char ScriptReserved_DisplayStringSetRotation[]		= "SetRotation";
+static constexpr char ScriptReserved_DisplayStringSetScale[]		= "SetScale";
+static constexpr char ScriptReserved_DisplayStringSetColor[]		= "SetColor";
+static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
+static constexpr char ScriptReserved_DisplaySpriteEnum[]			= "DisplaySpriteEnum";
+static constexpr char ScriptReserved_DisplaySpriteEnumAlignMode[]	= "AlignMode";
+static constexpr char ScriptReserved_DisplaySpriteEnumScaleMode[]	= "ScaleMode";
+
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
 static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";
@@ -177,6 +196,7 @@ static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_SaveGame[]					= "SaveGame";
 static constexpr char ScriptReserved_LoadGame[]					= "LoadGame";
 static constexpr char ScriptReserved_DeleteSaveGame[]			= "DeleteSaveGame";
+static constexpr char ScriptReserved_DoesSaveGameExist[]		= "DoesSaveGameExist";
 static constexpr char ScriptReserved_GetSecretCount[]			= "GetSecretCount";
 static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
 static constexpr char ScriptReserved_SetTotalSecretCount[]		= "SetTotalSecretCount";
@@ -234,8 +254,8 @@ static constexpr char ScriptReserved_GetRoomsByTag[]				= "GetRoomsByTag";
 static constexpr char ScriptReserved_GetRoomByName[]				= "GetRoomByName";
 static constexpr char ScriptReserved_CalculateDistance[]			= "CalculateDistance";
 static constexpr char ScriptReserved_CalculateHorizontalDistance[]	= "CalculateHorizontalDistance";
-static constexpr char ScriptReserved_ScreenToPercent[]				= "ScreenToPercent";
 static constexpr char ScriptReserved_PercentToScreen[]				= "PercentToScreen";
+static constexpr char ScriptReserved_ScreenToPercent[]				= "ScreenToPercent";
 static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 
 static constexpr char ScriptReserved_AddCallback[]					= "AddCallback";
