@@ -32,9 +32,9 @@ template <typename ... Ts> using TypeOrNil = std::variant<Ts..., sol::nil_t, sol
 #define USE_IF_HAVE(Type, valueIfExists, valueIfMissing) \
 (std::holds_alternative<Type>(valueIfExists) ? std::get<Type>(valueIfExists) : valueIfMissing)
 
-template<typename T> bool IsValidOptionalArg(const TypeOrNil<T> & arg)
+template<typename T> bool IsValidOptionalArg(const TypeOrNil<T>& arg)
 {
-	return std::holds_alternative<T>(arg) || std::holds_alternative<sol::nil_t>(arg);
+	return (std::holds_alternative<T>(arg) || std::holds_alternative<sol::nil_t>(arg));
 }
 
 sol::table MakeSpecialTableBase(sol::state* state, std::string const& name);

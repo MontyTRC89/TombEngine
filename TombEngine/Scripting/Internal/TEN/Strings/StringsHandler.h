@@ -1,6 +1,6 @@
 #pragma once
-#include <unordered_map>
 #include <optional>
+#include <unordered_map>
 
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"

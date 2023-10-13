@@ -389,7 +389,6 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 	SetFullScreen();
 }
 
-
 void Renderer11::InitializeCommonTextures()
 {
 	// Initialize font.

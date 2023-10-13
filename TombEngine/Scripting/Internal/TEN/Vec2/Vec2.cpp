@@ -34,20 +34,20 @@ void Vec2::Register(sol::table& parent)
 		*/
 		ScriptReserved_ToLength, &Vec2::SetLength,
 
-		/// (float) x coordinate
+		/// (float) X component.
 		//@mem x
 		"x", &Vec2::x,
 
-		/// (float) y coordinate
+		/// (float) Y component.
 		//@mem y
 		"y", &Vec2::y);
 }
 
 /*** 
-@tparam float X x coordinate
-@tparam float Y y coordinate
-@treturn Vec2 A Vec2 object
 @function Vec2
+@tparam float x X component.
+@tparam float y Y component.
+@treturn Vec2 A Vec2 object
 */
 Vec2::Vec2(float aX, float aY) : x(aX), y(aY)
 {

@@ -39,7 +39,7 @@ DisplayString::DisplayString()
 }
 
 /*** Create a DisplayString.
-For use in @{Strings.ShowString | ShowString } and @{Strings.HideString | HideString }.
+For use in @{ Strings.ShowString | ShowString } and @{Strings.HideString | HideString }.
 @function DisplayString
 @tparam string string The string to display or key of the translated string.
 @tparam int x X component of the string.
@@ -130,43 +130,43 @@ void DisplayString::Register(sol::table& parent)
 		/// Get the string key to use. If `isTranslated` is true when @{ DisplayString }
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
-		// @function DisplayString:GetKey
+		// @function DisplayString:GetKey()
 		// @treturn string the string to use
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
 		/// Set the string key to use. If `isTranslated` is true when @{ DisplayString }
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
-		// @function DisplayString:SetKey
+		// @function DisplayString:SetKey()
 		// @tparam string string the new key for the display string 
 		ScriptReserved_SetKey, &DisplayString::SetKey, 
 
 		/// Set the scale of the string.
-		// @function DisplayString:SetScale
-		// @tparam float scale the new scale of the text, relative to the default size
+		// @function DisplayString:SetScale()
+		// @tparam float scale New scale of the string relative to the default size.
 		ScriptReserved_SetScale, &DisplayString::SetScale,
 
 		/// Get the scale of the string.
-		// @function DisplayString:GetScale
-		// @treturn float scale of the string 
+		// @function DisplayString:GetScale()
+		// @treturn float Scale of the string 
 		ScriptReserved_GetScale, &DisplayString::GetScale,
 
 		/// Set the position of the string.
 		// Screen-space coordinates are expected.
-		// @function DisplayString:SetPosition
+		// @function DisplayString:SetPosition()
 		// @tparam int x X component.
 		// @tparam int y Y component.
 		ScriptReserved_SetPosition, &DisplayString::SetPos,
 
 		/// Get the position of the string.
 		// Screen-space coordinates are returned.
-		// @function DisplayString:GetPosition
+		// @function DisplayString:GetPosition()
 		// @treturn int x X component.
 		// @treturn int y Y component.
 		ScriptReserved_GetPosition, &DisplayString::GetPos,
 
 		/// Set the display string's flags 
-		// @function DisplayString:SetFlags
+		// @function DisplayString:SetFlags()
 		// @tparam table table the new table with display flags options
 		// @usage
 		// local varDisplayString = DisplayString('example string', 0, 0, Color(255, 255, 255), false)
@@ -220,6 +220,7 @@ void DisplayString::SetColor(const ScriptColor& color)
 {
 	UserDisplayString& displayString = s_getItemCallback(m_id).value();
 	displayString.m_color = color;
+
 	//todo maybe change getItemCallback to return a ref instead? or move its
 	//todo UserDisplayString object? and then move back?
 	//s_addItemCallback(m_id, s);
