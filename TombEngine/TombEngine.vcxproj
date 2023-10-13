@@ -638,8 +638,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_highobject.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_missile.h" />
-    <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h" />
-    <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_raisingblock.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_rollingball.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_teleporter.h" />
@@ -1092,7 +1090,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_highobject.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_missile.cpp" />
-    <ClCompile Include="Objects\TR5\Object\tr5_pushableblock.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_raisingblock.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_rollingball.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_teleporter.cpp" />
