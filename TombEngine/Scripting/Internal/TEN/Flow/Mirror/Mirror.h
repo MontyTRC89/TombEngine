@@ -12,7 +12,7 @@ struct Mirror
 	int StartZ{ 0 };
 	int EndZ{ 0 };
 
-	static void Register(sol::table & parent);
+	static void Register(sol::table& parent);
 	Mirror() = default;
 
 	Mirror(short room, int startX, int endX, int startZ, int endZ);

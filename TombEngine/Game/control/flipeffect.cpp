@@ -331,7 +331,7 @@ void Turn180(ItemInfo* item)
 
 void FinishLevel(ItemInfo* item)
 {
-	LevelComplete = CurrentLevel + 1;
+	NextLevel = CurrentLevel + 1;
 }
 
 void VoidEffect(ItemInfo* item)
