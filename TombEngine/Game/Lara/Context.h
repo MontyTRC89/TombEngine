@@ -36,7 +36,7 @@ namespace TEN::Player
 		PlayerContext() {};
 		PlayerContext(const ItemInfo& item, const CollisionInfo& coll);
 
-		// TODO: Move all functions seen below into this class. Resulting syntax will be a neat player.Context.CanDoXYZ().
+		// TODO: Move all functions below into this class. Resulting syntax will be a neat player.Context.CanDoXYZ().
 	};
 
 	// Basic round movement contexts

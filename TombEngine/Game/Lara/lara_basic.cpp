@@ -1917,7 +1917,7 @@ void lara_col_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.MoveAngle = item->Pose.Orientation.y;
-	player.Control.KeepLow = TestLaraKeepLow(item, coll);
+	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -1935,21 +1935,21 @@ void lara_col_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraFall(item, coll))
+	if (CanFall(*item, *coll))
 	{
 		SetLaraFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraSlide(item, coll))
+	if (CanSlide(*item, *coll))
 	{
 		SetLaraSlideAnimation(item, coll);
 		return;
 	}
 
-	if (TestLaraStep(item, coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
 	{
-		DoLaraStep(item, coll);
+		HandlePlayerElevationChange(item, coll);
 		return;
 	}
 }
