@@ -100,12 +100,12 @@ namespace Sound
 
 		///Stop audio track that is currently playing
 		//@function StopAudioTrack
-		//@tparam Misc.SoundTrackType type of the audio track
+		//@tparam Sound.SoundTrackType type of the audio track
 		tableSound.set_function(ScriptReserved_StopAudioTrack, &StopAudioTrack);
 
 		///Get current loudness level for specified track type
 		//@function GetAudioTrackLoudness
-		//@tparam Misc.SoundTrackType type of the audio track
+		//@tparam Sound.SoundTrackType type of the audio track
 		//@treturn float current loudness of a specified audio track
 		tableSound.set_function(ScriptReserved_GetAudioTrackLoudness, &GetAudioTrackLoudness);
 

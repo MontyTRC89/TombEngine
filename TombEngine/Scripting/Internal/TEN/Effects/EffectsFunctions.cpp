@@ -9,7 +9,6 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/effects/weather.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
@@ -29,7 +28,6 @@ Functions to generate effects.
 */
 
 using namespace TEN::Effects::Electricity;
-using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 
@@ -307,17 +305,6 @@ namespace Effects
 		Camera.bounce = -str;
 	}
 
-/***Flash screen.
-@function FlashScreen
-@tparam Color color (default Color(255, 255, 255))
-@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
-*/
-	static void FlashScreen(TypeOrNil<ScriptColor> col, TypeOrNil<float> speed)
-	{
-		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
-		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
-	}
-
 	void Register(sol::state* state, sol::table& parent) 
 	{
 		sol::table tableEffects = { state->lua_state(), sol::create };
@@ -330,7 +317,6 @@ namespace Effects
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
-		tableEffects.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 
 		LuaHandler handler{ state };

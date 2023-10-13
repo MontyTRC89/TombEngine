@@ -4,12 +4,14 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
+#include "Scripting/Internal/TEN/Input/InputHandler.h"
 #include "Scripting/Internal/TEN/Inventory/InventoryHandler.h"
 #include "Scripting/Internal/TEN/Logic/LogicHandler.h"
-#include "Scripting/Internal/TEN/Misc/Miscellaneous.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Strings/StringsHandler.h"
 #include "Scripting/Internal/TEN/Sound/SoundHandler.h"
+#include "Scripting/Internal/TEN/Util/Util.h"
+#include "Scripting/Internal/TEN/View/ViewHandler.h"
 
 static sol::state s_solState;
 static sol::table s_rootTable;
@@ -51,7 +53,9 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 
 	// Misc. handlers not assigned above.
 	InventoryHandler::Register(&s_solState, s_rootTable);
-	Misc::Register(&s_solState, s_rootTable);
-	Sound::Register(&s_solState, s_rootTable);
 	Effects::Register(&s_solState, s_rootTable);
+	Input::Register(&s_solState, s_rootTable);
+	Sound::Register(&s_solState, s_rootTable);
+	Util::Register(&s_solState, s_rootTable);
+	View::Register(&s_solState, s_rootTable);
 }

@@ -2,7 +2,7 @@
 
 namespace sol { class state; };
 
-namespace Misc
+namespace Util
 {
 	void Register(sol::state* lua, sol::table& parent);
 };
