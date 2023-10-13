@@ -3,7 +3,6 @@
 #include <string>
 #include <memory>
 #include <filesystem>
-#include <regex>
 
 #include "Renderer/Renderer11.h"
 #include "Renderer/Quad/RenderQuad.h"
@@ -395,24 +394,6 @@ void Renderer11::InitializeCommonTextures()
 {
 	// Initialize font.
 	auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
-	auto fontDir = GetAssetPath(L"Textures");
-	//get all paths in directory matching a pattern
-
-	std::regex pattern("Font(\\d{1,3})\\.spritefont");
-	for (const auto& file : std::filesystem::directory_iterator(fontDir))
-	{
-		std::smatch result;
-			std::string fileName = file.path().filename().string();
-			auto bResult = std::regex_search(fileName, result, pattern);
-		//ensure the paths have a number in the name
-				// result[0] is the whole match including the leading backslash
-				// result[1] is the digits/font size
-
-				if (!result.empty())
-				{
-					m_gameFonts.push_back({ std::stoi(result[1].str()), file.path().wstring(), std::make_unique<SpriteFont>(m_device.Get(), file.path().wstring().c_str()) });
-				}
-	}
 
 	if (!std::filesystem::is_regular_file(fontPath))
 		throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");

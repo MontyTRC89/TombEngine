@@ -56,10 +56,18 @@ If true, the string argument will be the key of a translated string specified in
 __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */
-static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x, int y, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags)
+static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x, int y, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
 {
 	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();
+
+	auto getCallStack = [state]
+	{
+		luaL_traceback(state, state, NULL, 0);
+		std::string traceback{ lua_tostring(state, -1) };
+		lua_pop(state, 1);
+		return traceback;
+	};
 
 	FlagArray f{};
 	if (std::holds_alternative<sol::table>(flags))
@@ -73,22 +81,22 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x
 	}
 	else if (!std::holds_alternative<sol::nil_t>(flags))
 	{
-		ScriptAssertF(false, "Wrong argument type for {}.new \"flags\" argument; must be a table or nil.", ScriptReserved_DisplayString);
+		ScriptAssertF(false, "Wrong argument type for {}.new \"flags\" argument; must be a table or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 	}
 
 	if (!IsValidOptionalArg(maybeTranslated))	
 	{
-		ScriptAssertF(false, "Wrong argument type for {}.new \"translated\" argument; must be a bool or nil.", ScriptReserved_DisplayString);
+		ScriptAssertF(false, "Wrong argument type for {}.new \"translated\" argument; must be a bool or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 	}
 
 	if (!IsValidOptionalArg(color))	
 	{
-		ScriptAssertF(false, "Wrong argument type for {}.new \"color\" argument; must be a {} or nil.", ScriptReserved_DisplayString, ScriptReserved_Color);
+		ScriptAssertF(false, "Wrong argument type for {}.new \"color\" argument; must be a {} or nil.\n{}", ScriptReserved_DisplayString, ScriptReserved_Color, getCallStack());
 	}
 
 	if (!IsValidOptionalArg(scale))	
 	{
-		ScriptAssertF(false, "Wrong argument type for {}.new \"scale\" argument; must be a float or nil.", ScriptReserved_DisplayString);
+		ScriptAssertF(false, "Wrong argument type for {}.new \"scale\" argument; must be a float or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 	}
 
 
