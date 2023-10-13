@@ -115,11 +115,11 @@ namespace TEN::Entities::Generic
 
 	// If player is holding Action, initiates object interaction.
 	// Otherwise, activates normal object collision.
-	void PushableBlockCollision(int itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void PushableBlockCollision(int itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
-		auto& player = *GetLaraInfo(laraItem);
+		auto& player = *GetLaraInfo(playerItem);
 
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
 		auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; // NOTE: 0 = north, 1 = east, 2 = south, 3 = west.
@@ -127,12 +127,12 @@ namespace TEN::Entities::Generic
 		// Align player to pushable.
 		if ((IsHeld(In::Action) &&
 			!IsHeld(In::Forward) &&
-			laraItem->Animation.ActiveState == LS_IDLE &&
-			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			!laraItem->Animation.IsAirborne &&
+			playerItem->Animation.ActiveState == LS_IDLE &&
+			playerItem->Animation.AnimNumber == LA_STAND_IDLE &&
+			!playerItem->Animation.IsAirborne &&
 			player.Control.HandStatus == HandStatus::Free &&
 			IsPushableValid(itemNumber)) &&
-			pushable.BehaviorState == PushableState::Idle && 
+			pushable.BehaviorState == PushableBehaviourState::Idle && 
 			(pushableSidesAttributes.IsPushable || pushableSidesAttributes.IsPullable) || // Can interact with this side.
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))	  // Already interacting.
 		{
@@ -144,10 +144,10 @@ namespace TEN::Entities::Generic
 			PushableBlockBounds.BoundingBox.Z2 = 0;
 
 			short yOrient = pushableItem.Pose.Orientation.y;
-			pushableItem.Pose.Orientation.y = GetQuadrant(laraItem->Pose.Orientation.y) * ANGLE(90.0f);
+			pushableItem.Pose.Orientation.y = GetQuadrant(playerItem->Pose.Orientation.y) * ANGLE(90.0f);
 
 			// Within interaction range, calculate target position for alignment.
-			if (TestLaraPosition(PushableBlockBounds, &pushableItem, laraItem))
+			if (TestLaraPosition(PushableBlockBounds, &pushableItem, playerItem))
 			{
 				int quadrant = GetQuadrant(pushableItem.Pose.Orientation.y);
 				switch (quadrant)
@@ -177,10 +177,10 @@ namespace TEN::Entities::Generic
 				}
 
 				// Align player.
-				if (MoveLaraPosition(PushableBlockPos, &pushableItem, laraItem))
+				if (MoveLaraPosition(PushableBlockPos, &pushableItem, playerItem))
 				{
-					SetAnimation(laraItem, LA_PUSHABLE_GRAB);
-					laraItem->Pose.Orientation = pushableItem.Pose.Orientation;
+					SetAnimation(playerItem, LA_PUSHABLE_GRAB);
+					playerItem->Pose.Orientation = pushableItem.Pose.Orientation;
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
 					player.Context.NextCornerPos.Position.x = itemNumber; // TODO: Do this differently.
@@ -202,13 +202,13 @@ namespace TEN::Entities::Generic
 		else
 		{
 			// Not holding Action; do normal collision routine.
-			if (laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
-				!TestLastFrame(laraItem, LA_PUSHABLE_GRAB) ||
+			if (playerItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
+				!TestLastFrame(playerItem, LA_PUSHABLE_GRAB) ||
 				player.Context.NextCornerPos.Position.x != itemNumber)
 			{
 				// NOTE: If using room collision, use bridge collision.
 				if (!pushable.UseRoomCollision)
-					ObjectCollision(itemNumber, laraItem, coll);
+					ObjectCollision(itemNumber, playerItem, coll);
 
 				return;
 			}

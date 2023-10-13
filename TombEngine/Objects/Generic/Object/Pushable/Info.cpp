@@ -28,7 +28,7 @@ namespace TEN::Entities::Generic
 		AnimationSystemIndex = 0;
 
 		Gravity = 8.0f;
-		BehaviorState = PushableState::Idle;
+		BehaviorState = PushableBehaviourState::Idle;
 		WaterSurfaceHeight = NO_HEIGHT;
 		FloatingForce = 0.75f;
 

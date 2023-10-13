@@ -7,14 +7,28 @@
 
 namespace TEN::Entities::Generic
 {
-	PushableSoundData GetPushableSoundData(MaterialType material)
+	enum PushableSoundType
 	{
-		static const PushableSoundData SOUND_DATA_DEFAULT =
+		Loop,
+		Stop,
+		Fall
+	};
+
+	struct PushableSoundData
+	{
+		int LoopSoundID		  = 0;
+		int StopSoundID		  = 0;
+		int FallImpactSoundID = 0;
+	};
+
+	static PushableSoundData GetPushableSoundData(MaterialType material)
+	{
+		static const auto DEFAULT_SOUND_DATA = PushableSoundData
 		{
 			SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL
 		};
 
-		static const std::unordered_map<MaterialType, PushableSoundData> SOUND_DATA_MAP =
+		static const auto SOUND_DATA_MAP = std::unordered_map<MaterialType, PushableSoundData>
 		{
 			{ MaterialType::Mud, PushableSoundData{ SFX_TEN_PUSHABLES_MOVE_MUD, SFX_TEN_PUSHABLES_STOP_MUD, SFX_TEN_PUSHABLES_COLLIDE_MUD } },
 			{ MaterialType::Snow, PushableSoundData{ SFX_TEN_PUSHABLES_MOVE_SNOW, SFX_TEN_PUSHABLES_STOP_SNOW, SFX_TEN_PUSHABLES_COLLIDE_SNOW } },
@@ -40,59 +54,68 @@ namespace TEN::Entities::Generic
 			{ MaterialType::Custom8, PushableSoundData{ SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL } }
 		};
 
-		auto it = SOUND_DATA_MAP.find(material);
-		// TODO: uncomment the next line once we get actual sounds for them.
+		// TODO: Uncomment when we get actual sounds for them.
+		//auto it = SOUND_DATA_MAP.find(material);
 		//return ((it != SOUND_DATA_MAP.end()) ? it->second : SOUND_DATA_DEFAULT);
-		return SOUND_DATA_DEFAULT;
+
+		return DEFAULT_SOUND_DATA;
 	}
 
-	int GetPushableSound(PushableSoundType soundType, const Vector3i& pos, const short roomNumber)
+	static std::optional<int> GetPushableSoundID(const ItemInfo& pushableItem, PushableSoundType soundType)
 	{
-		auto pointColl = GetCollision(pos);
+		// Get floor material.
+		auto pointColl = GetCollision(pushableItem);
 		auto material = pointColl.BottomBlock->Material;
 
 		switch (soundType)
 		{
 		case PushableSoundType::Loop:
-			return GetPushableSoundData(material).LoopSfx;
+			return GetPushableSoundData(material).LoopSoundID;
 
 		case PushableSoundType::Stop:
-			return GetPushableSoundData(material).StopSfx;
+			return GetPushableSoundData(material).StopSoundID;
 
 		case PushableSoundType::Fall:
-			return GetPushableSoundData(material).LandSfx;
+			return GetPushableSoundData(material).FallImpactSoundID;
 		
 		default:
-			TENLog("Missing pushable sfx.", LogLevel::Error, LogConfig::All, true);
-			return 0;
+			TENLog("Missing pushable sound.", LogLevel::Error);
 		}
+
+		return std::nullopt;
 	}
 
 	void HandlePushableSoundState(ItemInfo& pushableItem)
 	{
 		auto& pushable = GetPushableInfo(pushableItem);
 		
+		auto soundID = std::optional<int>(std::nullopt);
 		switch (pushable.SoundState)
 		{
 		default:
 		case PushableSoundState::Move:
-			SoundEffect(GetPushableSound(Loop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
+			soundID = GetPushableSoundID(pushableItem, PushableSoundType::Loop);
 			break;
 
 		case PushableSoundState::Stop:
+			soundID = GetPushableSoundID(pushableItem, PushableSoundType::Stop);
 			pushable.SoundState = PushableSoundState::None;
-			SoundEffect(GetPushableSound(Stop, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
 			break;
 
-		case  PushableSoundState::Fall:
+		case PushableSoundState::Fall:
+			soundID = GetPushableSoundID(pushableItem, PushableSoundType::Fall);
 			pushable.SoundState = PushableSoundState::None;
-			SoundEffect(GetPushableSound(Fall, pushableItem.Pose.Position, pushableItem.RoomNumber), &pushableItem.Pose, SoundEnvironment::Always);
 			break;
 
 		case PushableSoundState::Wade:
+			soundID = SFX_TR4_LARA_WADE;
 			pushable.SoundState = PushableSoundState::None;
-			SoundEffect(SFX_TR4_LARA_WADE, &pushableItem.Pose, SoundEnvironment::Always);
 			break;
 		}
+
+		if (!soundID.has_value())
+			return;
+
+		SoundEffect(*soundID, &pushableItem.Pose, SoundEnvironment::Always);
 	}
 }

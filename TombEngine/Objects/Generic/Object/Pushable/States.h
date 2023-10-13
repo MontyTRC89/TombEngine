@@ -4,7 +4,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Generic
 {
-	enum class PushableState
+	enum class PushableBehaviourState
 	{
 		Idle,
 		Move,
@@ -19,15 +19,4 @@ namespace TEN::Entities::Generic
 	};
 
 	void HandlePushableBehaviorState(ItemInfo& pushableItem);
-
-	void HandleIdleState(ItemInfo& pushableItem);
-	void HandleMoveState(ItemInfo& pushableItem);
-	void HandleEdgeSlipState(ItemInfo& pushableItem);
-	void HandleFallState(ItemInfo& pushableItem);
-	void HandleSinkState(ItemInfo& pushableItem);
-	void HandleFloatState(ItemInfo& pushableItem);
-	void HandleUnderwaterState(ItemInfo& pushableItem);
-	void HandleWaterSurfaceState(ItemInfo& pushableItem);
-	void HandleSlideState(ItemInfo& pushableItem);
-	void HandleMoveStackHorizontalState(ItemInfo& pushableItem);
 };

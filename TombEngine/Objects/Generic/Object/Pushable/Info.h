@@ -27,8 +27,8 @@ namespace TEN::Entities::Generic
 
 	struct PushableInfo
 	{
-		PushableSoundState SoundState	  = PushableSoundState::None;
-		PushableState	   BehaviorState = PushableState::Idle;
+		PushableSoundState	   SoundState	 = PushableSoundState::None;
+		PushableBehaviourState BehaviorState = PushableBehaviourState::Idle;
 
 		int	  Height			 = 0;
 		bool  IsOnEdge			 = false;

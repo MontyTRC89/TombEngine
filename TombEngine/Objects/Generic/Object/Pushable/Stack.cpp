@@ -265,7 +265,7 @@ namespace TEN::Entities::Generic
 			if (currentPushable.UseRoomCollision)
 				RemovePushableBridge(currentItemNumber);
 
-			currentPushable.BehaviorState = PushableState::MoveStackHorizontal;
+			currentPushable.BehaviorState = PushableBehaviourState::MoveStackHorizontal;
 
 			currentItemNumber = currentPushable.StackUpperItem;
 		}
@@ -288,7 +288,7 @@ namespace TEN::Entities::Generic
 			if (currentPushable.UseRoomCollision)
 				AddPushableBridge(currentItemNumber);
 
-			currentPushable.BehaviorState = PushableState::Idle;
+			currentPushable.BehaviorState = PushableBehaviourState::Idle;
 
 			currentItemNumber = currentPushable.StackUpperItem;
 		}
@@ -305,21 +305,20 @@ namespace TEN::Entities::Generic
 	}
 
 	// TODO: Problems with bridge collision.
-	void VerticalPosAddition(int itemNumber, int deltaY)
+	void SetPushableVerticalPos(const ItemInfo& pushableItem, int relHeight)
 	{
-		auto pushableItemCopy = g_Level.Items[itemNumber];
-		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
+		auto* pushableItemPtr = &g_Level.Items[pushableItem.Index];
+		const auto* pushablePtr = &GetPushableInfo(*pushableItemPtr);
 
-		while (pushableCopy.StackUpperItem != NO_ITEM)
+		while (pushablePtr->StackUpperItem != NO_ITEM)
 		{
-			if (pushableCopy.StackUpperItem == itemNumber)
+			if (pushablePtr->StackUpperItem == pushableItem.Index)
 				break;
 
-			pushableItemCopy.Pose.Position.y += deltaY;
+			pushableItemPtr->Pose.Position.y += relHeight;
 
-			pushableItemCopy = g_Level.Items[pushableCopy.StackUpperItem];
-			pushableCopy = GetPushableInfo(pushableItemCopy);
+			pushableItemPtr = &g_Level.Items[pushablePtr->StackUpperItem];
+			pushablePtr = &GetPushableInfo(*pushableItemPtr);
 		}
-
 	}
 }

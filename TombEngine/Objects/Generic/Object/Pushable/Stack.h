@@ -24,5 +24,5 @@ namespace TEN::Entities::Generic
 	void StartFallPushableStack(int itemNumber);
 	void StopFallPushableStack(int itemNumber);
 
-	void VerticalPosAddition(int itemNumber, int deltaY);
+	void SetPushableVerticalPos(const ItemInfo& pushableItem, int deltaY);
 }
