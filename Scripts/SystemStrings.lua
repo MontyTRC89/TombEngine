@@ -50,7 +50,7 @@ local strings =
 	ammo_used = { "Ammo Used" },
 	antialiasing = { "Antialiasing" },
 	apply = { "Apply" },
-	auto_target = { "Automatic Targeting" },
+	automatic_targeting = { "Automatic Targeting" },
 	back = { "Back" },
 	cancel = { "Cancel" },
 	caustics = { "Underwater Caustics" },
@@ -71,7 +71,7 @@ local strings =
 	examine = { "Examine" },
 	exit_game = { "Exit Game" },
 	exit_to_title = { "Exit to Title" },
-	general_actions = { "General Actions"},
+	general_actions = { "General Actions" },
 	high = { "High" },
 	level_secrets_found = { "Secrets Found in Level" },
 	load_game = { "Load Game" },
@@ -103,6 +103,7 @@ local strings =
 	sound = { "Sound" },
 	statistics = { "Statistics" },
 	subtitles = { "Subtitles" },
+	target_highlighter = { "Target Highlighter" },
 	thumbstick_camera = { "Thumbstick Camera" },
 	time_taken = { "Time Taken" },
 	total_secrets_found = { "Secrets Found Total" },
@@ -114,6 +115,7 @@ local strings =
 	waiting_for_input = { "Waiting For Input" },
 	window_title = { "TombEngine" },
 	windowed = { "Windowed" },
+	unlimited = { "Unlimited %s" },
 }
 
 TEN.Flow.SetStrings(strings)

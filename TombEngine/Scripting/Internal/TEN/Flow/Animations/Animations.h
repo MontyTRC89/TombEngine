@@ -20,5 +20,5 @@ struct Animations
 	bool HasOverhangClimb;	// Overhang functionality.
 	bool HasLedgeJumps;		// Jump up or back from a ledge.
 
-	static void Register(sol::table &);
+	static void Register(sol::table&);
 };

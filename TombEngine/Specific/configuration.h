@@ -31,10 +31,11 @@ constexpr auto REGKEY_MUSIC_VOLUME	= "MusicVolume";
 constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
 // Gameplay keys
-constexpr auto REGKEY_ENABLE_SUBTITLES		   = "EnableSubtitles";
-constexpr auto REGKEY_ENABLE_AUTO_TARGETING	   = "EnableAutoTargeting";
-constexpr auto REGKEY_ENABLE_RUMBLE			   = "EnableRumble";
-constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA = "EnableThumbstickCamera";
+constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
+constexpr auto REGKEY_ENABLE_AUTO_TARGETING		= "EnableAutoTargeting";
+constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER = "EnableTargetHighlighter";
+constexpr auto REGKEY_ENABLE_RUMBLE				= "EnableRumble";
+constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
 
 // Input keys
 constexpr auto REGKEY_MOUSE_SENSITIVITY = "MouseSensitivity";
@@ -65,10 +66,11 @@ struct GameConfiguration
 	int	 SfxVolume	  = 0;
 
 	// Gameplay
-	bool EnableSubtitles		= false;
-	bool EnableAutoTargeting	= false;
-	bool EnableRumble			= false;
-	bool EnableThumbstickCamera = false;
+	bool EnableSubtitles		 = false;
+	bool EnableAutoTargeting	 = false;
+	bool EnableTargetHighlighter = false;
+	bool EnableRumble			 = false;
+	bool EnableThumbstickCamera	 = false;
 
 	// Input
 	int MouseSensitivity = DEFAULT_MOUSE_SENSITIVITY;

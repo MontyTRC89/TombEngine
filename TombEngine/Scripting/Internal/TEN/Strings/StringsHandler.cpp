@@ -12,7 +12,8 @@ On-screen strings.
 @pragma nostrip
 */
 
-StringsHandler::StringsHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
+StringsHandler::StringsHandler(sol::state* lua, sol::table& parent) :
+	LuaHandler{ lua }
 {
 	sol::table table_strings{ m_lua->lua_state(), sol::create };
 	parent.set(ScriptReserved_Strings, table_strings);
@@ -46,12 +47,11 @@ Checks if the string is shown
 
 	DisplayString::Register(table_strings);
 	DisplayString::SetCallbacks(
-		[this](auto && ... param) {return SetDisplayString(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) {return GetDisplayString(std::forward<decltype(param)>(param)...); }
-		);
+		[this](auto && ... param) { return SetDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto && ... param) { return GetDisplayString(std::forward<decltype(param)>(param)...); });
 	
-	MakeReadOnlyTable(table_strings, ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
+	MakeReadOnlyTable(table_strings, ScriptReserved_DisplayStringOption, DISPLAY_STRING_OPTION_NAMES);
 }
 
 std::optional<std::reference_wrapper<UserDisplayString>> StringsHandler::GetDisplayString(DisplayStringIDType id)
@@ -116,11 +116,17 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 				auto cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
 				int flags = 0;
 
-				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::CENTER)])
+				if (str.m_flags[(size_t)DisplayStringOptions::Center])
 					flags |= PRINTSTRING_CENTER;
 
-				if (str.m_flags[static_cast<size_t>(DisplayStringOptions::OUTLINE)])
+				if (str.m_flags[(size_t)DisplayStringOptions::Right])
+					flags |= PRINTSTRING_RIGHT;
+
+				if (str.m_flags[(size_t)DisplayStringOptions::Outline])
 					flags |= PRINTSTRING_OUTLINE;
+
+				if (str.m_flags[(size_t)DisplayStringOptions::Blink])
+					flags |= PRINTSTRING_BLINK;
 
 				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, flags);
 
