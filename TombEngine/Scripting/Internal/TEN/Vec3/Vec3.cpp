@@ -17,6 +17,7 @@ void Vec3::Register(sol::table& parent)
 {
 	using ctors = sol::constructors<Vec3(float, float, float)>;
 
+	// Register type.
 	parent.new_usertype<Vec3>(
 		ScriptReserved_Vec3,
 		ctors(),
