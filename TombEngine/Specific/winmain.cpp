@@ -62,14 +62,14 @@ Vector2i GetScreenResolution()
 
 std::vector<Vector2i> GetAllSupportedScreenResolutions()
 {
-	std::vector<Vector2i> result;
+	auto resList = std::vector<Vector2i>{};
 
 	DEVMODE dm = { 0 };
 	dm.dmSize = sizeof(dm);
 	for (int iModeNum = 0; EnumDisplaySettings(NULL, iModeNum, &dm) != 0; iModeNum++)
 	{
 		bool add = true;
-		for (auto m : result)
+		for (auto m : resList)
 		{
 			if (m.x == dm.dmPelsWidth && m.y == dm.dmPelsHeight)
 			{
@@ -79,30 +79,19 @@ std::vector<Vector2i> GetAllSupportedScreenResolutions()
 		}
 		if (add)
 		{
-			Vector2i resolution;
-			resolution.x = dm.dmPelsWidth;
-			resolution.y = dm.dmPelsHeight;
-			result.push_back(resolution);
+			auto res = Vector2i(dm.dmPelsWidth, dm.dmPelsHeight);
+			resList.push_back(res);
 		}
 	}
 
 	std::sort(
-		result.begin(),
-		result.end(),
+		resList.begin(), resList.end(),
 		[](Vector2i& a, Vector2i& b)
 		{
-			if (a.x == b.x)
-			{
-				return (a.y < b.y);
-			}
-			else
-			{
-				return (a.x < b.x);
-			}
-		}
-	);
+			return ((a.x == b.x) ? (a.y < b.y) : (a.x < b.x));
+		});
 
-	return result;
+	return resList;
 }
 
 void DisableDpiAwareness()

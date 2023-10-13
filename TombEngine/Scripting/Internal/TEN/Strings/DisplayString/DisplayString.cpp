@@ -19,13 +19,13 @@ when you need to use screen-space coordinates.
 @pragma nostrip
 */
 
-UserDisplayString::UserDisplayString(const std::string& key, int x, int y, D3DCOLOR color, const FlagArray& flags, bool translated) :
-	m_key{ key },
-	m_x{ x },
-	m_y{ y },
-	m_color{ color },
-	m_flags{ flags },
-	m_isTranslated{ translated }
+UserDisplayString::UserDisplayString(const std::string& key, int x, int y, D3DCOLOR color, const FlagArray& flags, bool isTranslated) :
+	m_key(key),
+	m_x(x),
+	m_y(y),
+	m_color(color),
+	m_flags(flags),
+	m_isTranslated(isTranslated)
 {
 }
 
@@ -104,21 +104,21 @@ void DisplayString::Register(sol::table& parent)
 		/// Get the display string's color
 		// @function DisplayString:GetColor
 		// @treturn Color a copy of the display string's color
-		ScriptReserved_GetColor, &DisplayString::GetCol,
+		ScriptReserved_GetColor, &DisplayString::GetColor,
 
 		/// Set the display string's color 
 		// @function DisplayString:SetColor
 		// @tparam Color color the new color of the display string 
-		ScriptReserved_SetColor, &DisplayString::SetCol,
+		ScriptReserved_SetColor, &DisplayString::SetColor,
 
-		/// Get the string key to use. If `translated` is true when @{DisplayString}
+		/// Get the string key to use. If `isTranslated` is true when @{ DisplayString }
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:GetKey
 		// @treturn string a string
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
-		/// Set the string key to use. If `translated` is true when @{DisplayString}
+		/// Set the string key to use. If `isTranslated` is true when @{ DisplayString }
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:SetKey
@@ -129,15 +129,15 @@ void DisplayString::Register(sol::table& parent)
 		/// Set the position of the string.
 		// Screen-space coordinates are expected.
 		// @function DisplayString:SetPosition
-		// @tparam int x x-coordinate of the string
-		// @tparam int y y-coordinate of the string
+		// @tparam int x X component.
+		// @tparam int y Y component.
 		ScriptReserved_SetPosition, &DisplayString::SetPos,
 
 		/// Get the position of the string.
 		// Screen-space coordinates are returned.
 		// @function DisplayString:GetPosition
-		// @treturn int x x-coordinate of the string
-		// @treturn int y y-coordinate of the string
+		// @treturn int x X component.
+		// @treturn int y Y component.
 		ScriptReserved_GetPosition, &DisplayString::GetPos,
 
 		/// Set the display string's flags 
@@ -158,8 +158,7 @@ void DisplayString::Register(sol::table& parent)
 		// @function DisplayString:SetTranslated
 		// @tparam bool shouldTranslate if true, the string's key will be used as the key for the translation that will be displayed.
 		// If false, the key itself will be displayed
-		ScriptReserved_SetTranslated, &DisplayString::SetTranslated
-	);
+		ScriptReserved_SetTranslated, &DisplayString::SetTranslated);
 }
 
 DisplayStringIDType DisplayString::GetID() const
@@ -180,7 +179,7 @@ std::tuple<int, int> DisplayString::GetPos() const
 	return std::make_tuple(displayString.m_x, displayString.m_y);
 }
 	
-void DisplayString::SetCol(const ScriptColor& color)
+void DisplayString::SetColor(const ScriptColor& color)
 {
 	UserDisplayString& displayString = s_getItemCallback(m_id).value();
 	displayString.m_color = color;
@@ -189,10 +188,10 @@ void DisplayString::SetCol(const ScriptColor& color)
 	//s_addItemCallback(m_id, s);
 }
 
-ScriptColor DisplayString::GetCol() 
+ScriptColor DisplayString::GetColor() 
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	return s.m_color;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	return displayString.m_color;
 }
 
 void DisplayString::SetKey(const std::string& key)

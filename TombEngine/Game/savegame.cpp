@@ -180,9 +180,7 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
 	{
 		if (!silent)
-		{
 			TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
-		}
 
 		return false;
 	}
