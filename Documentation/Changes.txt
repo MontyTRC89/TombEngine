@@ -15,11 +15,12 @@ Version 1.1.1
 * Fix several lighting bugs.
 * Fix savegame count not properly increasing.
 * Fix regeneration of non-ammo pickups with OCB 128.
-* Overhaul look mode:
- - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
- - Improve movement and control.
+* Overhaul look-around feature:
+ - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
+ - Improve look camera movement and control.
  - Re-enable looking while performing up jump, backward jump, or backward crawl.
  - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+* Add target highlighter system with toggle in Sound and Gameplay settings.
 * Add swinging blade.
 * Add crumbling platform and add new OCBs for behaviour:
  - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
@@ -28,6 +29,7 @@ Version 1.1.1
  - A negative value requires a trigger to activate.
 
 Lua API changes:
+* Add DisplaySprite object.
 * Add Flow::EnableLoadSave() function to disable savegames.
 * Add Flow::EnablePointFilter() function to disable bilinear filtering.
 * Add Lara::GetAmmoType() function to read the ammo that Lara is using.
