@@ -36,15 +36,15 @@ KeyframeInterpData AnimData::GetKeyframeInterpData(int frameNumber) const
 	// Normalize frame number into keyframe range.
 	float keyframeNumber = frameNumber / (float)Interpolation;
 
-	// Determine keyframe numbers defining interpolated frame.
-	int keyframeNumber0 = (int)floor(keyframeNumber);
-	int keyframeNumber1 = (int)ceil(keyframeNumber);
+	// Determine keyframes defining interpolated frame.
+	const auto& keyframe0 = Keyframes[(int)floor(keyframeNumber)];
+	const auto& keyframe1 = Keyframes[(int)ceil(keyframeNumber)];
 
 	// Calculate interpolation alpha between keyframes.
 	float alpha = (1.0f / Interpolation) * (frameNumber % Interpolation);
 
 	// Return keyframe interpolation data.
-	return KeyframeInterpData(Keyframes[keyframeNumber0], Keyframes[keyframeNumber1], alpha);
+	return KeyframeInterpData(keyframe0, keyframe1, alpha);
 }
 
 const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
@@ -262,7 +262,7 @@ void TranslateItem(ItemInfo* item, const Vector3& dir, float dist)
 
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 {
-	// Animation number already set; return early.
+	// Animation already set; return early.
 	if (item.Animation.AnimObjectID == animObjectID &&
 		item.Animation.AnimNumber == animNumber &&
 		item.Animation.FrameNumber == frameNumber)
