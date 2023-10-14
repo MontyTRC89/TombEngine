@@ -7,11 +7,9 @@
 
 using namespace TEN::Math;
 
-/***
-Represents a float-based 3D vector.
-@tenprimitive Vec3
-@pragma nostrip
-*/
+/// Represents a float-based 3D vector.
+// @tenprimitive Vec3
+// @pragma nostrip
 
 void Vec3::Register(sol::table& parent)
 {
@@ -22,89 +20,44 @@ void Vec3::Register(sol::table& parent)
 		ScriptReserved_Vec3,
 		ctors(),
 		sol::call_constructor, ctors(),
+
 		sol::meta_function::to_string, &Vec3::ToString,
 		sol::meta_function::addition, &Vec3::Add,
 		sol::meta_function::subtraction, &Vec3::Subtract,
 		sol::meta_function::multiplication, &Vec3::Multiply,
-		sol::meta_function::multiplication, &Vec3::MultiplyByScale,
-		sol::meta_function::division, &Vec3::DivideByScale,
+		sol::meta_function::multiplication, &Vec3::MultiplyByValue,
+		sol::meta_function::division, &Vec3::DivideByValue,
 		sol::meta_function::unary_minus, &Vec3::UnaryMinus,
 		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
-		/*** Set the length of this Vec3 to the input length.
-		@function Vec3:SetLength(length)
-		@tparam float length New length.
-		*/
 		ScriptReserved_Vec3SetLength, &Vec3::SetLength,
-
-		/*** Get a copy of the Vec3 normalized to length 1.
-		@function Vec3:Normalize()
-		@treturn Vec3 Normalized vector.
-		*/
 		ScriptReserved_Vec3Normalize, &Vec3::Normalize,
-		
-		/*** Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha.
-		@function Vec3:Lerp(vector)
-		@tparam Vec3 vector Target interpolation vector.
-		@tparam float alpha Interpolation alpha in the range [0, 1].
-		@treturn Vec3 Linearly interpolated vector.
-		*/
 		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
-		
-		/*** Get a copy of the Vec3 rotated by the input Rotation object.
-		@function Vec3:Rotate(rot)
-		@tparam Rotation rot Rotation object.
-		@treturn Vec3 Rotated Vec3.
-		*/
 		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
-
-		/*** Get the cross product of this Vec3 and the input Vec3.
-		@function Vec3:Cross(vector)
-		@tparam Vec3 vector Input vector.
-		@treturn Vec3 Cross product.
-		*/
 		ScriptReserved_Vec3Cross, &Vec3::Cross,
-
-		/*** Get the dot product of this Vec3 and the input Vec3.
-		@function Vec3:Dot(vector)
-		@tparam Vec3 vector Input vector.
-		@treturn float Dot product.
-		*/
 		ScriptReserved_Vec3Dot, &Vec3::Dot,
-
-		/*** Get the distance between this Vec3 and the input Vec3.
-		@function Vec3:Distance(vector)
-		@tparam Vec3 vector Input vector.
-		@treturn float Distance.
-		*/
 		ScriptReserved_Vec3Distance, &Vec3::Distance,
-
-		/*** Get the length of this Vec3.
-		@function Vec3:Length()
-		@treturn float Length.
-		*/
 		ScriptReserved_Vec3Length, &Vec3::Length,
 
 		/// (float) X component.
-		//@mem x
+		// @mem x
 		"x", &Vec3::x,
 
 		/// (float) Y component.
-		//@mem y
+		// @mem y
 		"y", &Vec3::y,
 
 		/// (float) Z component.
-		//@mem z
+		// @mem z
 		"z", &Vec3::z);
 }
 
-/*** Create a Vec3.
-@float x X component.
-@float y Y component.
-@float z Z component.
-@treturn Vec3 A new Vec3 object.
-@function Vec3
-*/
+/// Create a Vec3.
+// @float x X component.
+// @float y Y component.
+// @float z Z component.
+// @treturn Vec3 A new Vec3 object.
+// @function Vec3
 Vec3::Vec3(float x, float y, float z)
 {
 	this->x = x;
@@ -126,6 +79,9 @@ Vec3::Vec3(const Vector3i& pos)
 	z = pos.z;
 }
 
+/// Set the length of this Vec3 to the input length.
+// @function Vec3:SetLength(length)
+// @tparam float length New length.
 void Vec3::SetLength(float length)
 {
 	float currentLength = Length();
@@ -135,6 +91,9 @@ void Vec3::SetLength(float length)
 	z = (z / currentLength) * length;
 }
 
+/// Get a copy of the Vec3 normalized to length 1.
+// @function Vec3:Normalize()
+// @treturn Vec3 Normalized vector.
 Vec3 Vec3::Normalize() const
 {
 	auto vector = *this;
@@ -143,6 +102,11 @@ Vec3 Vec3::Normalize() const
 	return vector;
 }
 
+/// Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha.
+// @function Vec3:Lerp(vector)
+// @tparam Vec3 vector Target interpolation vector.
+// @tparam float alpha Interpolation alpha in the range [0, 1].
+// @treturn Vec3 Linearly interpolated vector
 Vec3 Vec3::Lerp(const Vec3& vector, float alpha) const
 {
 	auto vector0 = ToVector3();
@@ -151,6 +115,10 @@ Vec3 Vec3::Lerp(const Vec3& vector, float alpha) const
 	return Vec3(Vector3::Lerp(vector0, vector1, alpha));
 }
 
+/// Get a copy of the Vec3 rotated by the input Rotation object.
+// @function Vec3:Rotate(rot)
+// @tparam Rotation rot Rotation object.
+// @treturn Vec3 Rotated Vec3.
 Vec3 Vec3::Rotate(const Rotation& rot) const
 {
 	auto vector = ToVector3();
@@ -160,6 +128,10 @@ Vec3 Vec3::Rotate(const Rotation& rot) const
 	return Vec3(Vector3::Transform(vector, rotMatrix));
 }
 
+/// Get the cross product of this Vec3 and the input Vec3.
+// @function Vec3:Cross(vector)
+// @tparam Vec3 vector Input vector.
+// @treturn Vec3 Cross product.
 Vec3 Vec3::Cross(const Vec3& vector) const
 {
 	auto vector0 = ToVector3();
@@ -168,6 +140,10 @@ Vec3 Vec3::Cross(const Vec3& vector) const
 	return vector0.Cross(vector1);
 }
 
+/// Get the dot product of this Vec3 and the input Vec3.
+// @function Vec3:Dot(vector)
+// @tparam Vec3 vector Input vector.
+// @treturn float Dot product.
 float Vec3::Dot(const Vec3& vector) const
 {
 	auto vector0 = ToVector3();
@@ -176,6 +152,10 @@ float Vec3::Dot(const Vec3& vector) const
 	return vector0.Dot(vector1);
 }
 
+/// Get the distance between this Vec3 and the input Vec3.
+// @function Vec3:Distance(vector)
+// @tparam Vec3 vector Input vector.
+// @treturn float Distance.
 float Vec3::Distance(const Vec3& vector) const
 {
 	auto vector0 = ToVector3();
@@ -184,16 +164,18 @@ float Vec3::Distance(const Vec3& vector) const
 	return Vector3::Distance(vector0, vector1);
 }
 
+/// Get the length of this Vec3.
+// @function Vec3:Length()
+// @treturn float Length.
 float Vec3::Length() const
 {
 	return ToVector3().Length();
 }
 
-/*** Metafunction; use tostring(vector)
-@tparam Vec3 This Vec3.
-@treturn string A string showing the X, Y, and Z components of the Vec3.
-@function __tostring
-*/
+/// Metafunction; use tostring(vector)
+// @tparam Vec3 This Vec3.
+// @treturn string A string showing the X, Y, and Z components of the Vec3.
+// @function __tostring
 std::string Vec3::ToString() const
 {
 	return "{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }";
@@ -214,14 +196,14 @@ Vec3 Vec3::Multiply(const Vec3& vector0, const Vec3& vector1)
 	return Vec3(vector0.x * vector1.x, vector0.y * vector1.y, vector0.z * vector1.z);
 }
 
-Vec3 Vec3::MultiplyByScale(const Vec3& vector, float scale)
+Vec3 Vec3::MultiplyByValue(const Vec3& vector, float value)
 {
-	return Vec3(vector.x * scale, vector.y * scale, vector.z * scale);
+	return Vec3(vector.x * value, vector.y * value, vector.z * value);
 }
 
-Vec3 Vec3::DivideByScale(const Vec3& vector, float scale)
+Vec3 Vec3::DivideByValue(const Vec3& vector, float value)
 {
-	return Vec3(vector.x / scale, vector.y / scale, vector.z / scale);
+	return Vec3(vector.x / value, vector.y / value, vector.z / value);
 }
 
 Vec3 Vec3::UnaryMinus(const Vec3& vector)
