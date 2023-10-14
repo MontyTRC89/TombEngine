@@ -70,7 +70,7 @@ void SaveGame::LoadSavegameInfos()
 	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		if (!DoesSaveGameExist(i))
+		if (!DoesSaveGameExist(i, true))
 			continue;
 
 		SavegameInfos[i].Present = true;
@@ -175,11 +175,13 @@ bool SaveGame::IsSaveGameSlotValid(int slot)
 	return true;
 }
 
-bool SaveGame::DoesSaveGameExist(int slot)
+bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 {
 	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
 	{
-		TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
+		if (!silent)
+			TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
+
 		return false;
 	}
 

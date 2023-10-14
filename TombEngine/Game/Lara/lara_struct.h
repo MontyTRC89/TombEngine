@@ -211,6 +211,8 @@ enum LaraState
 	// 174-188 reserved for "true" ladders. -- Sezz 2023.04.16
 
 	LS_REMOVE_PUZZLE = 189,
+	LS_RESERVED_PUSHABLE_STATE = 190,
+	LS_SPRINT_SLIDE = 191,
 
 	NUM_LARA_STATES
 };
