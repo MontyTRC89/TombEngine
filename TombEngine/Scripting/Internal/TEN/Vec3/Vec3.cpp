@@ -24,13 +24,12 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::to_string, &Vec3::ToString,
 		sol::meta_function::addition, &Vec3::Add,
 		sol::meta_function::subtraction, &Vec3::Subtract,
-		sol::meta_function::multiplication, &Vec3::Multiply,
-		sol::meta_function::multiplication, &Vec3::MultiplyByValue,
+		sol::overload(sol::meta_function::multiplication, &Vec3::Multiply),
+		sol::overload(sol::meta_function::multiplication, &Vec3::MultiplyByValue),
 		sol::meta_function::division, &Vec3::DivideByValue,
 		sol::meta_function::unary_minus, &Vec3::UnaryMinus,
 		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
-		ScriptReserved_Vec3SetLength, &Vec3::SetLength,
 		ScriptReserved_Vec3Normalize, &Vec3::Normalize,
 		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
 		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
@@ -79,25 +78,13 @@ Vec3::Vec3(const Vector3i& pos)
 	z = pos.z;
 }
 
-/// Set the length of this Vec3 to the input length.
-// @function Vec3:SetLength(length)
-// @tparam float length New length.
-void Vec3::SetLength(float length)
-{
-	float currentLength = Length();
-
-	x = (x / currentLength) * length;
-	y = (y / currentLength) * length;
-	z = (z / currentLength) * length;
-}
-
 /// Get a copy of the Vec3 normalized to length 1.
 // @function Vec3:Normalize()
 // @treturn Vec3 Normalized vector.
 Vec3 Vec3::Normalize() const
 {
-	auto vector = *this;
-	vector.SetLength(1.0f);
+	auto vector = ToVector3();
+	vector.Normalize();
 
 	return vector;
 }

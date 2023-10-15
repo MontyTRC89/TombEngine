@@ -22,9 +22,6 @@ public:
 	Vec3(const Vector3& pos);
 	Vec3(const Vector3i& pos);
 
-	// Setters
-	void SetLength(float length);
-
 	// Utilities
 	Vec3  Normalize() const;
 	Vec3  Lerp(const Vec3& vector, float alpha) const;
