@@ -184,14 +184,20 @@ Vec2 Vec2::Multiply(const Vec2& vector0, const Vec2& vector1)
 	return Vec2(vector0.x * vector1.x, vector0.y * vector1.y);
 }
 
-Vec2 Vec2::MultiplyScalar(const Vec2& vector, float scale)
+Vec2 Vec2::MultiplyScalar(const Vec2& vector, float scalar)
 {
-	return Vec2(vector.x * scale, vector.y * scale);
+	return Vec2(vector.x * scalar, vector.y * scalar);
 }
 
-Vec2 Vec2::DivideByScalar(const Vec2& vector, float scale)
+Vec2 Vec2::DivideByScalar(const Vec2& vector, float scalar)
 {
-	return Vec2(vector.x / scale, vector.y / scale);
+	if (scalar == 0.0f)
+	{
+		TENLog("Vec2 attempted division by 0.", LogLevel::Warning);
+		return vector;
+	}
+
+	return Vec2(vector.x / scalar, vector.y / scalar);
 }
 
 Vec2 Vec2::UnaryMinus(const Vec2& vector)

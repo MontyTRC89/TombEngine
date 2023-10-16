@@ -202,6 +202,12 @@ Vec3 Vec3::MultiplyByScalar(const Vec3& vector, float scalar)
 
 Vec3 Vec3::DivideByScalar(const Vec3& vector, float scalar)
 {
+	if (scalar == 0.0f)
+	{
+		TENLog("Vec3 attempted division by 0.", LogLevel::Warning);
+		return vector;
+	}
+
 	return Vec3(vector.x / scalar, vector.y / scalar, vector.z / scalar);
 }
 
