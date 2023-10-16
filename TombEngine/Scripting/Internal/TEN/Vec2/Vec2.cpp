@@ -89,7 +89,7 @@ std::string Vec2::ToString() const
 	return "{ " + std::to_string(x) + ", " + std::to_string(y) + " }";
 }
 
-/// Get a copy of the Vec2 normalized to length 1.
+/// Get a copy of this Vec2 normalized to length 1.
 // @function Vec2:Normalize()
 // @treturn Vec2 Normalized vector.
 Vec2 Vec2::Normalize() const
@@ -100,7 +100,7 @@ Vec2 Vec2::Normalize() const
 	return vector;
 }
 
-/// Get a copy of the Vec2 rotated by the input rotation in degrees.
+/// Get a copy of this Vec2 rotated by the input rotation in degrees.
 // @function Vec2:Rotate(rot)
 // @tparam float rot Rotation in degrees.
 // @treturn Vec2 Rotated Vec2.

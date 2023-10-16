@@ -90,7 +90,7 @@ Vec3::Vec3(const Vector3i& vector)
 	z = vector.z;
 }
 
-/// Get a copy of the Vec3 normalized to length 1.
+/// Get a copy of this Vec3 normalized to length 1.
 // @function Vec3:Normalize()
 // @treturn Vec3 Normalized vector.
 Vec3 Vec3::Normalize() const
@@ -101,7 +101,7 @@ Vec3 Vec3::Normalize() const
 	return vector;
 }
 
-/// Get a copy of the Vec3 rotated by the input Rotation object.
+/// Get a copy of this Vec3 rotated by the input Rotation object.
 // @function Vec3:Rotate(rot)
 // @tparam Rotation rot Rotation object.
 // @treturn Vec3 Rotated Vec3.
