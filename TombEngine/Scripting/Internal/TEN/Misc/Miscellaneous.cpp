@@ -403,7 +403,7 @@ namespace Misc
 	{
 		auto displayPos = g_Renderer.Get2DPosition(worldPos.ToVector3());
 		if (!displayPos.has_value())
-			return sol::nil;
+			return sol::nullopt;
 
 		return Vec2(
 			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
