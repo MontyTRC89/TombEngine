@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 			else
 			{
 				pushable.IsOnEdge = true;
-				if (!pushable.CanFall || pushable.StackUpperItem != NO_ITEM)
+				if (!pushable.CanFall || pushable.Stack.ItemNumberAbove != NO_ITEM)
 					return false;
 			}
 		}
@@ -251,11 +251,13 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
-		auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; //0 North, 1 East, 2 South or 3 West.
+		auto& pushableSidesAttributes = pushable.EdgeAttribs[quadrant]; //0 North, 1 East, 2 South or 3 West.
 
 		if ((hasPushAction && !pushableSidesAttributes.IsPushable) ||
 			(hasPullAction && !pushableSidesAttributes.IsPullable))
+		{
 			return false;
+		}
 
 		//Cond 3: Is its stacked pushables under the limit?
 		if (!IsWithinStackLimit(itemNumber))

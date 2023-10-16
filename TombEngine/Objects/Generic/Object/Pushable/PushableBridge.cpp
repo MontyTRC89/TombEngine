@@ -103,9 +103,9 @@ namespace TEN::Entities::Generic
 		if (pushablePtr->UseBridgeCollision)
 			addBridge ? AddBridge(itemNumber) : RemoveBridge(itemNumber);
 		
-		while (pushablePtr->StackUpperItem != NO_ITEM)
+		while (pushablePtr->Stack.ItemNumberAbove != NO_ITEM)
 		{
-			pushableItemPtr = &g_Level.Items[pushablePtr->StackUpperItem];
+			pushableItemPtr = &g_Level.Items[pushablePtr->Stack.ItemNumberAbove];
 			pushablePtr = &GetPushableInfo(*pushableItemPtr);
 
 			if (pushablePtr->UseBridgeCollision)

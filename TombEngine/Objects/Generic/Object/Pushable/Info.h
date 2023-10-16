@@ -15,41 +15,44 @@ namespace TEN::Entities::Generic
 		Wade
 	};
 
-	struct PushableSidesAttributes
+	struct PushableEdgeAttribs
 	{
 		bool IsPullable	 = false;
 		bool IsPushable	 = false;
 		bool IsClimbable = false;
 
-		PushableSidesAttributes();
-		PushableSidesAttributes(bool isPullable, bool isPushable, bool isClimbable);
+		PushableEdgeAttribs();
+		PushableEdgeAttribs(bool isPullable, bool isPushable, bool isClimbable);
+	};
+
+	struct PushableStackData
+	{
+		int Limit			= 0; // Max number of pushables in stack that can be pushed.
+		int ItemNumberAbove = 0;
+		int ItemNumberBelow = 0;
 	};
 
 	struct PushableInfo
 	{
-		PushableSoundState	   SoundState	 = PushableSoundState::None;
 		PushableBehaviourState BehaviorState = PushableBehaviourState::Idle;
+		PushableSoundState	   SoundState	 = PushableSoundState::None;
+		int AnimSetID = 0;
+
+		GameVector StartPos = GameVector::Zero;	// ?? XZ used by movement code. Y used to store water height level.
+		PushableStackData Stack = {};
 
 		int	  Height			 = 0;
+		int	  WaterSurfaceHeight = 0;	 // Used for spawning effects.
 		bool  IsOnEdge			 = false;
 		float Gravity			 = 0.0f;
-		int	  WaterSurfaceHeight = 0;	 // Used for spawning effects, e.g. water ripples.
-		float FloatingForce		 = 0.0f; // Oscillation strength on water surface. Recomended range: (0.0f, 2.0f].
-		
-		int StackLimit			 = 0; // Max number of pushables in stack that can be pushed by player.
-		int StackUpperItem		 = 0; // Item number of pushable above.
-		int StackLowerItem		 = 0; // Item number of pushable below.
-		int AnimationSystemIndex = 0; // ???Index of the int PushableAnimationVector where are located the pull / push animation indices for this object.
-
-		GameVector StartPos = GameVector::Zero;	// XZ used by movement code, Y used to store water height level.
-
-		std::map<int, PushableSidesAttributes> SidesMap = {};
+		float Oscillation		 = 0.0f; // Used when floating on water surface. Recomended range: (0.0f, 2.0f].
 
 		bool CanFall			= false; // OCB 0.
-		bool DoAlignCenter		= false; // OCB 1.
+		bool DoCenterAlign		= false; // OCB 1.
 		bool IsBuoyant			= false; // OCB 2.
-		bool UseRoomCollision	= false; // Use room collision or object collision. Per slot.
+		bool UseRoomCollision	= false;
 		bool UseBridgeCollision = false;
+		std::map<int, PushableEdgeAttribs> EdgeAttribs = {};
 
 		PushableInfo();
 	};

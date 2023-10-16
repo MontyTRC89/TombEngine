@@ -80,8 +80,8 @@ namespace TEN::Entities::Generic
 				auto& upperPushableItem = g_Level.Items[upperItemNumber];
 				auto& upperPushable = GetPushableInfo(upperPushableItem);
 				
-				lowerPushable.StackUpperItem = upperItemNumber;
-				upperPushable.StackLowerItem = lowerItemNumber;
+				lowerPushable.Stack.ItemNumberAbove = upperItemNumber;
+				upperPushable.Stack.ItemNumberBelow = lowerItemNumber;
 			}
 		}
 	}
@@ -111,12 +111,12 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		pushable.StackLowerItem = targetItemNumber;
+		pushable.Stack.ItemNumberBelow = targetItemNumber;
 
 		auto& lowerPushableItem = g_Level.Items[targetItemNumber];
 		auto& lowerPushable = GetPushableInfo(lowerPushableItem);
 
-		lowerPushable.StackUpperItem = itemNumber;
+		lowerPushable.Stack.ItemNumberAbove = itemNumber;
 	}
 
 	void UnstackPushable(int itemNumber)
@@ -124,14 +124,14 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.StackLowerItem == NO_ITEM)
+		if (pushable.Stack.ItemNumberBelow == NO_ITEM)
 			return;
 
-		auto& lowerPushableItem = g_Level.Items[pushable.StackLowerItem];
+		auto& lowerPushableItem = g_Level.Items[pushable.Stack.ItemNumberBelow];
 		auto& lowerPushable = GetPushableInfo(lowerPushableItem);
 
-		pushable.StackLowerItem = NO_ITEM;
-		lowerPushable.StackUpperItem = NO_ITEM;
+		pushable.Stack.ItemNumberBelow = NO_ITEM;
+		lowerPushable.Stack.ItemNumberAbove = NO_ITEM;
 	}
 
 	int SearchNearPushablesStack(int itemNumber)
@@ -169,25 +169,25 @@ namespace TEN::Entities::Generic
 					(currentItem.Pose.Position.y > pushableItem.Pose.Position.y))
 				{
 					// Find top item.
-					if (pushable.StackUpperItem == NO_ITEM)
+					if (pushable.Stack.ItemNumberAbove == NO_ITEM)
 					{
 						return currentItemNumber;
 					}
 					else
 					{
-						int topItemNumber = pushable.StackUpperItem;
+						int topItemNumber = pushable.Stack.ItemNumberAbove;
 						while (topItemNumber != NO_ITEM)
 						{
 							auto& topItem = g_Level.Items[topItemNumber];
 							auto& topPushable = GetPushableInfo(topItem);
 
-							if (topPushable.StackUpperItem == NO_ITEM)
+							if (topPushable.Stack.ItemNumberAbove == NO_ITEM)
 							{
 								return topItemNumber;
 							}
 							else
 							{
-								topItemNumber = topPushable.StackUpperItem;
+								topItemNumber = topPushable.Stack.ItemNumberAbove;
 							}
 						}
 					}
@@ -208,13 +208,13 @@ namespace TEN::Entities::Generic
 		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
 
 		int count = 1;
-		while (pushableCopy.StackUpperItem != NO_ITEM)
+		while (pushableCopy.Stack.ItemNumberAbove != NO_ITEM)
 		{
 			// Filter out current pushable item.
-			if (pushableCopy.StackUpperItem == itemNumber)
+			if (pushableCopy.Stack.ItemNumberAbove == itemNumber)
 				break;
 
-			pushableItemCopy = g_Level.Items[pushableCopy.StackUpperItem];
+			pushableItemCopy = g_Level.Items[pushableCopy.Stack.ItemNumberAbove];
 			pushableCopy = GetPushableInfo(pushableItemCopy);
 
 			count++;
@@ -229,7 +229,7 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		auto count = GetPushableCountInStack(itemNumber);
-		return (count <= pushable.StackLimit);
+		return (count <= pushable.Stack.Limit);
 	}
 
 	int GetStackHeight(int itemNumber)
@@ -239,9 +239,9 @@ namespace TEN::Entities::Generic
 
 		int totalHeight = pushableCopy.Height;
 
-		while (pushableCopy.StackUpperItem != NO_ITEM)
+		while (pushableCopy.Stack.ItemNumberAbove != NO_ITEM)
 		{
-			pushableItemCopy = g_Level.Items[pushableCopy.StackUpperItem];
+			pushableItemCopy = g_Level.Items[pushableCopy.Stack.ItemNumberAbove];
 			pushableCopy = GetPushableInfo(pushableItemCopy);
 
 			totalHeight = totalHeight + pushableCopy.Height;
@@ -255,7 +255,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		int currentItemNumber = pushable.StackUpperItem;
+		int currentItemNumber = pushable.Stack.ItemNumberAbove;
 		while (currentItemNumber != NO_ITEM)
 		{
 			auto& currentPushableItem = g_Level.Items[currentItemNumber];
@@ -267,7 +267,7 @@ namespace TEN::Entities::Generic
 
 			currentPushable.BehaviorState = PushableBehaviourState::MoveStackHorizontal;
 
-			currentItemNumber = currentPushable.StackUpperItem;
+			currentItemNumber = currentPushable.Stack.ItemNumberAbove;
 		}
 	}
 
@@ -276,7 +276,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		int currentItemNumber = pushable.StackUpperItem;
+		int currentItemNumber = pushable.Stack.ItemNumberAbove;
 		while (currentItemNumber != NO_ITEM)
 		{
 			auto& currentPushableItem = g_Level.Items[currentItemNumber];
@@ -290,7 +290,7 @@ namespace TEN::Entities::Generic
 
 			currentPushable.BehaviorState = PushableBehaviourState::Idle;
 
-			currentItemNumber = currentPushable.StackUpperItem;
+			currentItemNumber = currentPushable.Stack.ItemNumberAbove;
 		}
 	}
 	
@@ -310,14 +310,14 @@ namespace TEN::Entities::Generic
 		auto* pushableItemPtr = &g_Level.Items[pushableItem.Index];
 		const auto* pushablePtr = &GetPushableInfo(*pushableItemPtr);
 
-		while (pushablePtr->StackUpperItem != NO_ITEM)
+		while (pushablePtr->Stack.ItemNumberAbove != NO_ITEM)
 		{
-			if (pushablePtr->StackUpperItem == pushableItem.Index)
+			if (pushablePtr->Stack.ItemNumberAbove == pushableItem.Index)
 				break;
 
 			pushableItemPtr->Pose.Position.y += relHeight;
 
-			pushableItemPtr = &g_Level.Items[pushablePtr->StackUpperItem];
+			pushableItemPtr = &g_Level.Items[pushablePtr->Stack.ItemNumberAbove];
 			pushablePtr = &GetPushableInfo(*pushableItemPtr);
 		}
 	}

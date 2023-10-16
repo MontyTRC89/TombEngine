@@ -2,53 +2,59 @@
 #include "Objects/Generic/Object/Pushable/Info.h"
 
 #include "Game/control/control.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
 {
-	const auto PUSHABLE_SIDES_ATTRIBUTES_DEFAULT = PushableSidesAttributes(true, true, false);
+	const auto PUSHABLE_EDGE_ATTRIBS_DEFAULT = PushableEdgeAttribs(true, true, false);
 
-	PushableSidesAttributes::PushableSidesAttributes()
+	PushableEdgeAttribs::PushableEdgeAttribs()
 	{
-		*this = PUSHABLE_SIDES_ATTRIBUTES_DEFAULT;
+		*this = PUSHABLE_EDGE_ATTRIBS_DEFAULT;
 	}
 
-	PushableSidesAttributes::PushableSidesAttributes(bool isPullable, bool isPushable, bool isClimbable)
+	PushableEdgeAttribs::PushableEdgeAttribs(bool isPullable, bool isPushable, bool isClimbable)
 	{
 		IsPullable = isPullable;
 		IsPushable = isPushable;
 		IsClimbable = isClimbable;
 	}
 
-	// TODO: Define constants.
 	PushableInfo::PushableInfo()
 	{
-		SoundState = PushableSoundState::None;
-		Height = BLOCK(1);
+		constexpr auto DEFAULT_HEIGHT	   = BLOCK(1);
+		constexpr auto DEFAULT_GRAVITY	   = 8.0f;
+		constexpr auto DEFAULT_OSC		   = 0.75f;
+		constexpr auto DEFAULT_STACK_LIMIT = 3;
 
-		AnimationSystemIndex = 0;
-
-		Gravity = 8.0f;
 		BehaviorState = PushableBehaviourState::Idle;
-		WaterSurfaceHeight = NO_HEIGHT;
-		FloatingForce = 0.75f;
+		SoundState = PushableSoundState::None;
+		AnimSetID = 0;
 
-		StackLimit = 3;
-		StackUpperItem = -1;
-		StackLowerItem = -1;
+		Height = DEFAULT_HEIGHT;
+		WaterSurfaceHeight = NO_HEIGHT;
+		IsOnEdge = false;
+		Gravity = DEFAULT_GRAVITY;
+		Oscillation = DEFAULT_OSC;
+
+		Stack.Limit = DEFAULT_STACK_LIMIT;
+		Stack.ItemNumberAbove = NO_ITEM;
+		Stack.ItemNumberBelow = NO_ITEM;
 
 		CanFall = false;
-		DoAlignCenter = true;
+		DoCenterAlign = true;
 		IsBuoyant = false;
 		UseRoomCollision = false;
 		UseBridgeCollision = false;
 
-		// TODO: Descriptive name.
-		SidesMap =
+		EdgeAttribs =
 		{
-			{ CardinalDirection::NORTH, PushableSidesAttributes() },
-			{ CardinalDirection::EAST, PushableSidesAttributes() },
-			{ CardinalDirection::SOUTH, PushableSidesAttributes() },
-			{ CardinalDirection::WEST, PushableSidesAttributes() }
+			{ CardinalDirection::NORTH, PushableEdgeAttribs() },
+			{ CardinalDirection::EAST, PushableEdgeAttribs() },
+			{ CardinalDirection::SOUTH, PushableEdgeAttribs() },
+			{ CardinalDirection::WEST, PushableEdgeAttribs() }
 		};
 	}
 }

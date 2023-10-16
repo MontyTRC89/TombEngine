@@ -39,7 +39,7 @@ namespace TEN::Entities::Generic
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 	};
 
-	std::vector<PushableAnimationInfo> PushableAnimInfos =
+	std::vector<PushableAnimSet> PushableAnimSets =
 	{
 		// Pushable object (TR4-5).
 		{ LA_PUSHABLE_OBJECT_PULL, LA_PUSHABLE_OBJECT_PUSH, LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP, true },
@@ -80,9 +80,9 @@ namespace TEN::Entities::Generic
 		// Read OCB flags.
 		int ocb = pushableItem.TriggerFlags;
 		pushable.CanFall			  = (ocb & (1 << 0)) != 0;			 // Bit 0.
-		pushable.DoAlignCenter		  = (ocb & (1 << 1)) != 1;			 // Bit 1.
+		pushable.DoCenterAlign		  = (ocb & (1 << 1)) != 1;			 // Bit 1.
 		pushable.IsBuoyant			  = (ocb & (1 << 2)) != 0;			 // Bit 2.
-		pushable.AnimationSystemIndex = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Bit 3.
+		pushable.AnimSetID = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Bit 3.
 
 		pushableItem.Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
@@ -122,7 +122,7 @@ namespace TEN::Entities::Generic
 		auto& player = *GetLaraInfo(playerItem);
 
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
-		auto& pushableSidesAttributes = pushable.SidesMap[quadrant]; // NOTE: 0 = north, 1 = east, 2 = south, 3 = west.
+		auto& pushableSidesAttributes = pushable.EdgeAttribs[quadrant]; // NOTE: 0 = north, 1 = east, 2 = south, 3 = west.
 
 		// Align player to pushable.
 		if ((IsHeld(In::Action) &&
@@ -154,22 +154,22 @@ namespace TEN::Entities::Generic
 				{
 				case NORTH:
 					PushableBlockPos.z = bounds.Z1 - CLICK(0.4f);
-					PushableBlockPos.x = pushable.DoAlignCenter ? 0 : LaraItem->Pose.Position.x - pushableItem.Pose.Position.x;
+					PushableBlockPos.x = pushable.DoCenterAlign ? 0 : LaraItem->Pose.Position.x - pushableItem.Pose.Position.x;
 					break;
 
 				case SOUTH:
 					PushableBlockPos.z = (bounds.Z2 + CLICK(0.4f)) * (-1);
-					PushableBlockPos.x = pushable.DoAlignCenter ? 0 : pushableItem.Pose.Position.x - LaraItem->Pose.Position.x;
+					PushableBlockPos.x = pushable.DoCenterAlign ? 0 : pushableItem.Pose.Position.x - LaraItem->Pose.Position.x;
 					break;
 
 				case EAST:
 					PushableBlockPos.z = bounds.X1 - CLICK(0.4f);
-					PushableBlockPos.x = pushable.DoAlignCenter ? 0 : pushableItem.Pose.Position.z - LaraItem->Pose.Position.z;
+					PushableBlockPos.x = pushable.DoCenterAlign ? 0 : pushableItem.Pose.Position.z - LaraItem->Pose.Position.z;
 					break;
 
 				case WEST:
 					PushableBlockPos.z = (bounds.X2 + CLICK(0.4f)) * (- 1);
-					PushableBlockPos.x = pushable.DoAlignCenter ? 0 : LaraItem->Pose.Position.z - pushableItem.Pose.Position.z;
+					PushableBlockPos.x = pushable.DoCenterAlign ? 0 : LaraItem->Pose.Position.z - pushableItem.Pose.Position.z;
 					break;
 
 				default:

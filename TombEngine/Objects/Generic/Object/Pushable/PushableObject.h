@@ -10,23 +10,14 @@ namespace TEN::Entities::Generic
 {
 	struct PushableInfo;
 
-	struct PushableAnimationInfo
+	struct PushableAnimSet
 	{
 		int	 PullAnimNumber = 0;
 		int	 PushAnimNumber = 0;
 		int	 EdgeAnimNumber = 0;
 		bool EnableAnimLoop = 0;
 
-		// TODO: Constants.
-		PushableAnimationInfo()
-		{
-			PullAnimNumber = LA_PUSHABLE_OBJECT_PULL;
-			PushAnimNumber = LA_PUSHABLE_OBJECT_PUSH;
-			EdgeAnimNumber = LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP;
-			EnableAnimLoop = true;
-		}
-
-		PushableAnimationInfo(int pullAnimNumber, int pushAnimNumber, int edgeAnimNumber, bool enableAnimLoop)
+		PushableAnimSet(int pullAnimNumber, int pushAnimNumber, int edgeAnimNumber, bool enableAnimLoop)
 		{
 			PullAnimNumber = pullAnimNumber;
 			PushAnimNumber = pushAnimNumber;
@@ -35,7 +26,7 @@ namespace TEN::Entities::Generic
 		}
 	};
 
-	extern std::vector<PushableAnimationInfo> PushableAnimInfos;
+	extern std::vector<PushableAnimSet> PushableAnimSets;
 
 	PushableInfo& GetPushableInfo(const ItemInfo& item);
 	
