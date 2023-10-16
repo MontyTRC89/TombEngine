@@ -39,7 +39,7 @@ using SavedVar = std::variant<
 	double,
 	IndexTable,
 	Vector2,  // Vec2
-	Vector3i, // Vec3
+	Vector3,  // Vec3
 	Vector3,  // Rotation
 	D3DCOLOR, // Color
 	FuncName>;
