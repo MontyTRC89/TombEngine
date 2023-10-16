@@ -12,8 +12,11 @@ using namespace TEN::Math;
 
 void Vec2::Register(sol::table& parent)
 {
-	using ctors = sol::constructors<Vec2(float, float)>;
+	using ctors = sol::constructors<
+		Vec2(float, float),
+		Vec2(float)>;
 
+	// Register type.
 	parent.new_usertype<Vec2>(
 		ScriptReserved_Vec2,
 		ctors(),
@@ -44,15 +47,25 @@ void Vec2::Register(sol::table& parent)
 		"y", &Vec2::y);
 }
 
-/// Create a Vec2.
+/// Create a Vec2 object.
+// @function Vec2(x, y)
 // @float x X component.
 // @float y Y component.
 // @treturn Vec2 A new Vec2 object.
-// @function Vec2()
 Vec2::Vec2(float x, float y)
 {
 	this->x = x;
 	this->y = y;
+}
+
+/// Create a Vec2 object.
+// @function Vec(value)
+// @float value X and Z component.
+// @treturn Vec2 A new Vec2 object.
+Vec2::Vec2(float value)
+{
+	x = value;
+	y = value;
 }
 
 Vec2::Vec2(const Vector2& vector)

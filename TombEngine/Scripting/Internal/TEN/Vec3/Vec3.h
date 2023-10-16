@@ -19,6 +19,7 @@ public:
 	// Constructors
 	Vec3() {};
 	Vec3(float x, float y, float z);
+	Vec3(float value);
 	Vec3(const Vector3& vector);
 	Vec3(const Vector3i& vector);
 

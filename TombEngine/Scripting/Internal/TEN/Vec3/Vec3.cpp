@@ -13,7 +13,9 @@ using namespace TEN::Math;
 
 void Vec3::Register(sol::table& parent)
 {
-	using ctors = sol::constructors<Vec3(float, float, float)>;
+	using ctors = sol::constructors<
+		Vec3(float, float, float),
+		Vec3(float)>;
 
 	// Register type.
 	parent.new_usertype<Vec3>(
@@ -50,17 +52,28 @@ void Vec3::Register(sol::table& parent)
 		"z", &Vec3::z);
 }
 
-/// Create a Vec3.
+/// Create a Vec3 object.
+// @function Vec3(x, y, z)
 // @float x X component.
 // @float y Y component.
 // @float z Z component.
 // @treturn Vec3 A new Vec3 object.
-// @function Vec3()
 Vec3::Vec3(float x, float y, float z)
 {
 	this->x = x;
 	this->y = y;
 	this->z = z;
+}
+
+/// Create a Vec3 object.
+// @function Vec3(value)
+// @float value X, Y, and Z component.
+// @treturn Vec3 A new Vec3 object.
+Vec3::Vec3(float value)
+{
+	x = value;
+	y = value;
+	z = value;
 }
 
 Vec3::Vec3(const Vector3& vector)

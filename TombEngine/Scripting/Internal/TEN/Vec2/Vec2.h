@@ -14,6 +14,7 @@ public:
 
 	// Constructors
 	Vec2(float x, float y);
+	Vec2(float value);
 	Vec2(const Vector2& vector);
 	//Vec2(const Vector2i& vector);
 
