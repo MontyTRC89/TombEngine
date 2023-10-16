@@ -48,6 +48,7 @@ constexpr float DEG_TO_RAD(float degrees)
 {
 	return ((degrees * PI) / 180.0f);
 }
+
 float phd_sin(short x);
 float phd_cos(short x);
 int	  phd_atan(int y, int x);
