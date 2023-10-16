@@ -80,7 +80,7 @@ Vec2::Vec2(const Vector2& vector)
 //	y = vector.y;
 //}
 
-/// Metafunction; use tostring(vector)
+/// Metafunction. Use tostring(vector).
 // @tparam Vec2 This Vec2.
 // @treturn string A string showing the X and Y components of the Vec2.
 // @function __tostring
