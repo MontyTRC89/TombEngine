@@ -24,8 +24,8 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::to_string, &Vec3::ToString,
 		sol::meta_function::addition, &Vec3::Add,
 		sol::meta_function::subtraction, &Vec3::Subtract,
-		sol::meta_function::multiplication, sol::overload(&Vec3::Multiply, &Vec3::MultiplyByValue),
-		sol::meta_function::division, &Vec3::DivideByValue,
+		sol::meta_function::multiplication, sol::overload(&Vec3::Multiply, &Vec3::MultiplyByScalar),
+		sol::meta_function::division, &Vec3::DivideByScalar,
 		sol::meta_function::unary_minus, &Vec3::UnaryMinus,
 		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
@@ -182,14 +182,14 @@ Vec3 Vec3::Multiply(const Vec3& vector0, const Vec3& vector1)
 	return Vec3(vector0.x * vector1.x, vector0.y * vector1.y, vector0.z * vector1.z);
 }
 
-Vec3 Vec3::MultiplyByValue(const Vec3& vector, float value)
+Vec3 Vec3::MultiplyByScalar(const Vec3& vector, float scalar)
 {
-	return Vec3(vector.x * value, vector.y * value, vector.z * value);
+	return Vec3(vector.x * scalar, vector.y * scalar, vector.z * scalar);
 }
 
-Vec3 Vec3::DivideByValue(const Vec3& vector, float value)
+Vec3 Vec3::DivideByScalar(const Vec3& vector, float scalar)
 {
-	return Vec3(vector.x / value, vector.y / value, vector.z / value);
+	return Vec3(vector.x / scalar, vector.y / scalar, vector.z / scalar);
 }
 
 Vec3 Vec3::UnaryMinus(const Vec3& vector)
