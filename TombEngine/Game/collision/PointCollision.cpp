@@ -201,19 +201,13 @@ namespace TEN::Collision
 
 	bool PointCollisionData::IsSlipperyFloor(short slopeAngleMin)
 	{
-		// Get floor slope angle.
-		auto floorNormal = GetFloorNormal();
-		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
-
+		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
 		return (abs(slopeAngle) >= slopeAngleMin);
 	}
 
 	bool PointCollisionData::IsSlipperyCeiling(short slopeAngleMin)
 	{
-		// Get ceiling slope angle.
-		auto ceilingNormal = GetCeilingNormal();
-		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(ceilingNormal, -Vector3::UnitY);
-
+		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
 		return (abs(slopeAngle) >= slopeAngleMin);
 	}
 
@@ -224,19 +218,14 @@ namespace TEN::Collision
 
 	bool PointCollisionData::HasDiagonalSplit()
 	{
-		constexpr auto DIAGONAL_SPLIT_0 = 45.0f * RADIAN;
-		constexpr auto DIAGONAL_SPLIT_1 = 135.0f * RADIAN;
-
 		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
-		return (splitAngle == DIAGONAL_SPLIT_0 || splitAngle == DIAGONAL_SPLIT_1);
+		return (splitAngle == SurfaceCollisionData::SPLIT_ANGLE_0 || splitAngle == SurfaceCollisionData::SPLIT_ANGLE_1);
 	}
 
 	bool PointCollisionData::HasFlippedDiagonalSplit()
 	{
-		constexpr auto DIAGONAL_SPLIT_0 = 45.0f * RADIAN;
-
 		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
-		return (HasDiagonalSplit() && splitAngle != DIAGONAL_SPLIT_0);
+		return (HasDiagonalSplit() && splitAngle == SurfaceCollisionData::SPLIT_ANGLE_1);
 	}
 
 	bool PointCollisionData::HasEnvironmentFlag(RoomEnvFlags envFlag)
@@ -251,6 +240,12 @@ namespace TEN::Collision
 		constexpr auto ANGLE_STEP = short(ANGLE(45.0f) / 4);
 
 		int itemNumber = isFloor ? GetFloorBridgeItemNumber() : GetCeilingBridgeItemNumber();
+		if (itemNumber == NO_ITEM)
+		{
+			TENLog("PointCollisionData error: invalid bridge item number in GetBridgeNormal().", LogLevel::Warning);
+			return -Vector3::UnitY;
+		}
+
 		const auto& item = g_Level.Items[itemNumber];
 
 		auto orient = item.Pose.Orientation;
