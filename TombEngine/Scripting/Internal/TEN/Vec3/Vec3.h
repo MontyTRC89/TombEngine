@@ -19,8 +19,8 @@ public:
 	// Constructors
 	Vec3() {};
 	Vec3(float x, float y, float z);
-	Vec3(const Vector3& pos);
-	Vec3(const Vector3i& pos);
+	Vec3(const Vector3& vector);
+	Vec3(const Vector3i& vector);
 
 	// Utilities
 	Vec3  Normalize() const;
@@ -32,12 +32,12 @@ public:
 	float Length() const;
 
 	// Meta functions
-	[[nodiscard]] std::string ToString() const;
+	std::string ToString() const;
 	static Vec3 Add(const Vec3& vector0, const Vec3& vector1);
 	static Vec3 Subtract(const Vec3& vector0, const Vec3& vector1);
 	static Vec3 Multiply(const Vec3& vector0, const Vec3& vector1);
-	static Vec3 MultiplyByScalar(const Vec3& vector, float value);
-	static Vec3 DivideByScalar(const Vec3& vector, float value);
+	static Vec3 MultiplyByScalar(const Vec3& vector, float scalar);
+	static Vec3 DivideByScalar(const Vec3& vector, float scalar);
 	static Vec3 UnaryMinus(const Vec3& vector);
 	static bool IsEqualTo(const Vec3& vector0, const Vec3& vector1);
 

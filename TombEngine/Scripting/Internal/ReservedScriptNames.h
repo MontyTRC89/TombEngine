@@ -326,7 +326,14 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 
 // Vec2
-constexpr char ScriptReserved_Vec2SetLength[] = "ToLength";
+constexpr char ScriptReserved_Vec2SetLength[]		= "ToLength";
+constexpr char ScriptReserved_Vec2Normalize[]		= "Normalize";
+constexpr char ScriptReserved_Vec2Rotate[]			= "Rotate";
+constexpr char ScriptReserved_Vec2Lerp[]			= "Lerp";
+constexpr char ScriptReserved_Vec2Cross[]			= "Cross";
+constexpr char ScriptReserved_Vec2Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec2Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec2Length[]			= "Length";
 
 // Vec3
 constexpr char ScriptReserved_Vec3[]				= "Vec3";

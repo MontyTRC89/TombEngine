@@ -55,7 +55,7 @@ void Vec3::Register(sol::table& parent)
 // @float y Y component.
 // @float z Z component.
 // @treturn Vec3 A new Vec3 object.
-// @function Vec3
+// @function Vec3()
 Vec3::Vec3(float x, float y, float z)
 {
 	this->x = x;
@@ -63,18 +63,18 @@ Vec3::Vec3(float x, float y, float z)
 	this->z = z;
 }
 
-Vec3::Vec3(const Vector3& pos)
+Vec3::Vec3(const Vector3& vector)
 {
-	x = pos.x;
-	y = pos.y;
-	z = pos.z;
+	x = vector.x;
+	y = vector.y;
+	z = vector.z;
 }
 
-Vec3::Vec3(const Vector3i& pos)
+Vec3::Vec3(const Vector3i& vector)
 {
-	x = pos.x;
-	y = pos.y;
-	z = pos.z;
+	x = vector.x;
+	y = vector.y;
+	z = vector.z;
 }
 
 /// Get a copy of the Vec3 normalized to length 1.
