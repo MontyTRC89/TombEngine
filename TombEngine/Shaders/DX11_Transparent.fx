@@ -92,7 +92,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 			break;
 
 		case BLENDMODE_ALPHABLEND:
-			color.xyz = lerp(color.xyz, SortedPixels[i].PixelColor.xyz, SortedPixels[i].PixelColor.xyz);
+			color.xyz = lerp(color.xyz, SortedPixels[i].PixelColor.xyz, SortedPixels[i].PixelColor.w);
 			break;
 
 		default:
