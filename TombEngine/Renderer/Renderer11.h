@@ -338,6 +338,15 @@ namespace TEN::Renderer
 		ComPtr<ID3D11SamplerState> m_shadowSampler;
 		ComPtr<ID3D11VertexShader> m_vsFinalPass;
 		ComPtr<ID3D11PixelShader> m_psFinalPass;
+		ComPtr<ID3D11VertexShader> m_vsTransparent;
+		ComPtr<ID3D11PixelShader> m_psTransparent;
+
+		ComPtr<ID3D11PixelShader> m_psRoomsTransparent;
+		ComPtr<ID3D11PixelShader> m_psItemsTransparent;
+		ComPtr<ID3D11PixelShader> m_psStaticsTransparent;
+		ComPtr<ID3D11PixelShader> m_psSpritesTransparent;
+		ComPtr<ID3D11PixelShader> m_psInstancedStaticMeshesTransparent;
+		ComPtr<ID3D11PixelShader> m_psInstancedSpritesTransparent;
 
 		// Constant buffers
 		RenderView gameCamera;
@@ -372,6 +381,15 @@ namespace TEN::Renderer
 		ConstantBuffer<CInstancedStaticMeshBuffer> m_cbInstancedStaticMeshBuffer;
 		CSkyBuffer m_stSky;
 		ConstantBuffer<CSkyBuffer> m_cbSky;
+
+		ComPtr<ID3D11Buffer> m_transparentDataAndLinkBuffer;
+		ComPtr<ID3D11Buffer> m_transparentStartOffsetBuffer;
+
+		ComPtr<ID3D11UnorderedAccessView> m_transparentDataAndLinkUAV;
+		ComPtr<ID3D11UnorderedAccessView> m_transparentStartOffsetUAV;
+
+		ComPtr<ID3D11ShaderResourceView> m_transparentDataAndLinkSRV;
+		ComPtr<ID3D11ShaderResourceView> m_transparentStartOffsetSRV;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;

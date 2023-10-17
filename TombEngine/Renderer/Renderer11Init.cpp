@@ -39,6 +39,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	ComPtr<ID3D10Blob> blob;
 	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
 	const D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
+	const D3D_SHADER_MACRO transparent[] = { "TRANSPARENT", "", nullptr, nullptr };
 
 	m_vsRooms = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", nullptr, blob);
   
@@ -91,6 +92,16 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "VS", "vs_4_0", nullptr, blob);
 	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_4_0", nullptr, blob);
  
+	m_psRoomsTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_5_0", &transparent[0], blob);
+	m_psItemsTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_5_0", &transparent[0], blob);
+	m_psStaticsTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "PS", "ps_5_0", &transparent[0], blob);
+	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_5_0", &transparent[0], blob);
+	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_5_0", &transparent[0], blob);
+	m_psSpritesTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "PS", "ps_5_0", &transparent[0], blob);
+
+	m_vsTransparent = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Transparent.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Transparent.fx"), "PS", "ps_5_0", nullptr, blob);
+	 
 	// Initialize constant buffers
 	m_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
 	m_cbItem = CreateConstantBuffer<CItemBuffer>();
@@ -215,6 +226,62 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	rasterizerStateDesc.AntialiasedLineEnable = true;
 	rasterizerStateDesc.ScissorEnable = true;
 	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullNoneRasterizerState.GetAddressOf()));
+	 
+	D3D11_BUFFER_DESC desc = {};
+	desc.ByteWidth = 28 * m_screenWidth * m_screenHeight * 4;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	desc.StructureByteStride = 28;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.CPUAccessFlags = 0;
+
+	Utils::throwIfFailed(m_device->CreateBuffer(&desc, NULL, m_transparentDataAndLinkBuffer.GetAddressOf()));
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc; 
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN; 
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+	uavDesc.Buffer.FirstElement = 0; 
+	uavDesc.Buffer.NumElements = m_screenWidth * m_screenHeight * 4;
+	uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_COUNTER;
+
+	Utils::throwIfFailed(m_device->CreateUnorderedAccessView(m_transparentDataAndLinkBuffer.Get(), &uavDesc, m_transparentDataAndLinkUAV.GetAddressOf()));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
+	shaderDesc.Format = uavDesc.Format;
+	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+	shaderDesc.Buffer.FirstElement = 0;
+	shaderDesc.Buffer.ElementOffset = 0;
+	shaderDesc.Buffer.ElementWidth = 28;
+	shaderDesc.Buffer.NumElements = m_screenWidth * m_screenHeight * 4;
+
+	Utils::throwIfFailed(m_device->CreateShaderResourceView(m_transparentDataAndLinkBuffer.Get(), &shaderDesc, m_transparentDataAndLinkSRV.GetAddressOf()));
+
+	desc.ByteWidth = 4 * m_screenWidth * m_screenHeight;
+	desc.MiscFlags = 0;
+	desc.StructureByteStride = 4;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.CPUAccessFlags = 0;
+
+	Utils::throwIfFailed(m_device->CreateBuffer(&desc, NULL, m_transparentStartOffsetBuffer.GetAddressOf()));
+	   
+	uavDesc.Format = DXGI_FORMAT_R32_UINT;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.NumElements = m_screenWidth * m_screenHeight;
+	uavDesc.Buffer.Flags = 0;
+
+	Utils::throwIfFailed(m_device->CreateUnorderedAccessView(m_transparentStartOffsetBuffer.Get(), &uavDesc, m_transparentStartOffsetUAV.GetAddressOf()));
+   
+	shaderDesc;
+	shaderDesc.Format = uavDesc.Format;
+	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+	shaderDesc.Buffer.FirstElement = 0;
+	shaderDesc.Buffer.ElementOffset = 0;
+	shaderDesc.Buffer.ElementWidth = 4;
+	shaderDesc.Buffer.NumElements = m_screenWidth * m_screenHeight;
+
+	Utils::throwIfFailed(m_device->CreateShaderResourceView(m_transparentStartOffsetBuffer.Get(), &shaderDesc, m_transparentStartOffsetSRV.GetAddressOf()));
 
 	InitializeGameBars();
 	initQuad(m_device.Get());
@@ -417,7 +484,7 @@ void TEN::Renderer::Renderer11::Create()
 {
 	TENLog("Creating DX11 renderer device...", LogLevel::Info);
 
-	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 }; 
+	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_11_0 }; 
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT res;
 

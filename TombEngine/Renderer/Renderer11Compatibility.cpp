@@ -15,7 +15,7 @@
 #include "Specific/level.h"
 
 namespace TEN::Renderer
-{
+{ 
 	bool Renderer11::PrepareDataForTheRenderer()
 	{
 		lastBlendMode = BLENDMODE_UNSET;

@@ -42,11 +42,29 @@ SamplerState NormalTextureSampler : register(s1);
 Texture2D CausticsTexture : register(t2);
 SamplerState CausticsTextureSampler : register(s2);
 
+#ifdef TRANSPARENT
+
+struct FragmentAndLinkBuffer_STRUCT
+{
+	float4 PixelColor; // Packed pixel color
+	float PixelDepth; // Pixel depth
+	uint PixelBlendMode;
+	uint uNext; // Address of next link
+};
+
+RWStructuredBuffer<FragmentAndLinkBuffer_STRUCT> FLBuffer : register(u2);
+
+RWByteAddressBuffer StartOffsetBuffer : register(u3);
+
+#else
+
 struct PixelShaderOutput
 {
 	float4 Color: SV_TARGET0;
 	float4 Depth: SV_TARGET1;
 };
+
+#endif
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -106,13 +124,16 @@ float3 UnpackNormalMap(float4 n)
 	return n.xyz;
 }
 
+#ifdef TRANSPARENT
+[earlydepthstencil]
+float PS(PixelShaderInput input)  : SV_Target
+#else
 PixelShaderOutput PS(PixelShaderInput input)
+#endif
 {
-	PixelShaderOutput output;
-
-	output.Color = Texture.Sample(Sampler, input.UV);
+	float4 textureColor = Texture.Sample(Sampler, input.UV);
 	
-	DoAlphaTest(output.Color);
+	DoAlphaTest(textureColor);
 
 	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
 	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
@@ -183,16 +204,50 @@ PixelShaderOutput PS(PixelShaderInput input)
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}
 
-	output.Depth = output.Color.w > 0.0f ?
+	float4 outputColor = textureColor;
+
+	float outputDepth = outputColor.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
-	output.Color.xyz = output.Color.xyz * lighting;
-	output.Color.xyz = saturate(output.Color.xyz);
+	outputColor.xyz = outputColor.xyz * lighting;
+	outputColor.xyz = saturate(outputColor.xyz);
+	outputColor = DoFogBulbsForPixel(outputColor, float4(input.FogBulbs.xyz, 1.0f));
+	outputColor = DoDistanceFogForPixel(outputColor, FogColor, input.DistanceFog);
 
-	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
-	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
+#ifdef TRANSPARENT
 
+	uint uPixelCount = FLBuffer.IncrementCounter();
+	// Exchange offsets in StartOffsetBuffer
+	float4 vPos = (input.PositionCopy);
+	vPos.xy /= vPos.w;
+	float2 pos = 0.5f * (float2(vPos.x, vPos.y) + 1);
+	pos.x *= ViewSize.x;
+	pos.y *= ViewSize.y;
+
+	uint uStartOffsetAddress = 4 * ((ViewSize.x * pos.y) + pos.x);
+	uint uOldStartOffset;
+	StartOffsetBuffer.InterlockedExchange(
+		uStartOffsetAddress, uPixelCount, uOldStartOffset);
+	// Add new fragment entry in Fragment & Link Buffer
+	FragmentAndLinkBuffer_STRUCT Element;
+	Element.PixelColor = outputColor;
+	Element.PixelDepth = outputDepth;
+	Element.PixelBlendMode = BlendMode;
+	Element.uNext = uOldStartOffset;
+	FLBuffer[uPixelCount] = Element;
+
+	return 0;
+
+#else
+
+	PixelShaderOutput output;
+
+	output.Depth = outputDepth;
+	output.Color = outputColor;
+	
 	return output;
+
+#endif
 }

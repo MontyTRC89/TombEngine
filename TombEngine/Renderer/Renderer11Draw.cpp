@@ -1445,9 +1445,14 @@ namespace TEN::Renderer
 		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
 		SetCullMode(CULL_MODE_CCW, true);
 
+		UINT clearValue1[4] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
+		UINT clearValue2[4] = { 0,0,0,0 };
+
 		// Bind and clear render target.
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
 		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_context->ClearUnorderedAccessViewUint(m_transparentStartOffsetUAV.Get(), clearValue1);
+		m_context->ClearUnorderedAccessViewUint(m_transparentDataAndLinkUAV.Get(), clearValue2);
 
 		m_context->ClearRenderTargetView(m_depthMap.RenderTargetView.Get(), Colors::White);
 		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -1542,7 +1547,7 @@ namespace TEN::Renderer
 		DrawLines3D(view);
 
 		// Collect all sorted blend modes faces for later.
-		DrawRooms(view, RendererPass::CollectSortedFaces);
+		//DrawRooms(view, RendererPass::CollectSortedFaces);
 		DrawItems(view, RendererPass::CollectSortedFaces);
 		DrawStatics(view, RendererPass::CollectSortedFaces);
 
@@ -1550,7 +1555,6 @@ namespace TEN::Renderer
 		DrawSortedFaces(view);
 
 		// Draw immediate transparent faces (i.e. additive)
-		DrawRooms(view, RendererPass::Transparent);
 		DrawItems(view, RendererPass::Transparent);
 		DrawStatics(view, RendererPass::Transparent);
 		DrawEffects(view, RendererPass::Transparent);
@@ -1558,8 +1562,73 @@ namespace TEN::Renderer
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
+		ID3D11UnorderedAccessView* pViews[2];
+		pViews[0] = m_transparentDataAndLinkUAV.Get();
+		pViews[1] = m_transparentStartOffsetUAV.Get();
+		UINT counter = 0;
+		m_context->OMSetRenderTargetsAndUnorderedAccessViews(0, nullptr, m_renderTarget.DepthStencilView.Get(), 2, 2, &pViews[0], &counter);
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		DrawRooms(view, RendererPass::Transparent);
+		 
+		//m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), m_renderTarget.DepthStencilView.Get());
+
+		SetBlendMode(BLENDMODE_OPAQUE);
+
+		m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
+		m_context->ClearRenderTargetView(target, Colors::Black);
+		// m_context->ClearDepthStencilView(depthTarget, 0, 1.0f, 0);
+		m_context->OMSetRenderTargets(1, &target, m_renderTarget.DepthStencilView.Get());
+		m_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
+
+		RendererVertex vertices[4];
+
+		vertices[0].Position.x = -1.0f;
+		vertices[0].Position.y = 1.0f;
+		vertices[0].Position.z = 0.0f;
+		vertices[0].UV.x = 0.0f;
+		vertices[0].UV.y = 0.0f;
+		vertices[0].Color = Vector4::One;
+
+		vertices[1].Position.x = 1.0f;
+		vertices[1].Position.y = 1.0f;
+		vertices[1].Position.z = 0.0f;
+		vertices[1].UV.x = 1.0f;
+		vertices[1].UV.y = 0.0f;
+		vertices[1].Color = Vector4::One;
+
+		vertices[2].Position.x = 1.0f;
+		vertices[2].Position.y = -1.0f;
+		vertices[2].Position.z = 0.0f;
+		vertices[2].UV.x = 1.0f;
+		vertices[2].UV.y = 1.0f;
+		vertices[2].Color = Vector4::One;
+
+		vertices[3].Position.x = -1.0f;
+		vertices[3].Position.y = -1.0f;
+		vertices[3].Position.z = 0.0f;
+		vertices[3].UV.x = 0.0f;
+		vertices[3].UV.y = 1.0f;
+		vertices[3].Color = Vector4::One;
+
+		m_context->VSSetShader(m_vsTransparent.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psTransparent.Get(), nullptr, 0);
+		 
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+
+		BindRenderTargetAsTexture(TEXTURE_COLOR_MAP, &m_renderTarget, SAMPLER_ANISOTROPIC_CLAMP);
+		m_context->PSSetShaderResources(1, 1, m_transparentDataAndLinkSRV.GetAddressOf());
+		m_context->PSSetShaderResources(2, 1, m_transparentStartOffsetSRV.GetAddressOf());
+
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		m_primitiveBatch->End();
+		
+		  
+		  
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
-		DrawPostprocess(target, depthTarget, view);
+		//DrawPostprocess(target, depthTarget, view);
 
 		// Draw GUI elements at end.
 		DrawLinesIn2DSpace();
@@ -1993,7 +2062,10 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Bind pixel shaders.
-		m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
+		if (rendererPass == RendererPass::Transparent)
+			m_context->PSSetShader(m_psRoomsTransparent.Get(), nullptr, 0);
+		else
+			m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
 
 		BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 		BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
@@ -2074,7 +2146,7 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (rendererPass == RendererPass::CollectSortedFaces && DoesBlendModeRequireSorting(bucket.BlendMode))
+					/*if (rendererPass == RendererPass::CollectSortedFaces && DoesBlendModeRequireSorting(bucket.BlendMode))
 					{
 						// Collect transparent faces.
 						for (int j = 0; j < bucket.Polygons.size(); j++)
@@ -2105,7 +2177,7 @@ namespace TEN::Renderer
 							room->TransparentFacesToDraw.push_back(face);
 						}
 					}
-					else
+					else*/
 					{
 						int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
