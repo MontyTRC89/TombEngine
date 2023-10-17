@@ -46,10 +46,9 @@ SamplerState CausticsTextureSampler : register(s2);
 
 struct FragmentAndLinkBuffer_STRUCT
 {
-	float4 PixelColor; // Packed pixel color
-	float PixelDepth; // Pixel depth
-	uint PixelBlendMode;
-	uint uNext; // Address of next link
+	float4 PixelColor;
+	uint PixelDepthAndBlendMode;
+	uint NextNode;
 };
 
 RWStructuredBuffer<FragmentAndLinkBuffer_STRUCT> FLBuffer : register(u2);
@@ -233,9 +232,8 @@ PixelShaderOutput PS(PixelShaderInput input)
 	// Add new fragment entry in Fragment & Link Buffer
 	FragmentAndLinkBuffer_STRUCT Element;
 	Element.PixelColor = outputColor;
-	Element.PixelDepth = outputDepth;
-	Element.PixelBlendMode = BlendMode;
-	Element.uNext = uOldStartOffset;
+	Element.PixelDepthAndBlendMode = (BlendMode << 24) | (uint)(outputDepth * 16777215);
+	Element.NextNode = uOldStartOffset;
 	FLBuffer[uPixelCount] = Element;
 
 	return 0;

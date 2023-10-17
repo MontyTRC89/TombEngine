@@ -15,10 +15,9 @@ struct PixelShaderInput
 
 struct FragmentAndLinkBuffer_STRUCT
 {
-	float4 PixelColor; // Packed pixel color
-	float PixelDepth; // Pixel depth
-	uint PixelBlendMode;
-	uint uNext; // Address of next link
+	float4 PixelColor;
+	uint PixelDepthAndBlendMode;
+	uint NextNode;
 };
 
 StructuredBuffer<FragmentAndLinkBuffer_STRUCT> FLBufferSRV : register(t1);
@@ -62,30 +61,34 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		FragmentAndLinkBuffer_STRUCT Element = FLBufferSRV[uOffset];
 		// Copy pixel data into temp array
 		SortedPixels[nNumPixels].PixelColor = Element.PixelColor;
-		SortedPixels[nNumPixels].PixelDepth = Element.PixelDepth;
-		SortedPixels[nNumPixels].PixelBlendMode = Element.PixelBlendMode;
+		SortedPixels[nNumPixels].PixelDepthAndBlendMode = Element.PixelDepthAndBlendMode;
 
 		nNumPixels++;
 
 		// Retrieve next offset
 		[flatten] uOffset = (nNumPixels >= MAX_SORTED_PIXELS) ?
-			0xFFFFFFFF : Element.uNext;
+			0xFFFFFFFF : Element.NextNode;
 	}
 
 	for (int j = 0; j < nNumPixels - 1; j++)
+	{
 		for (int i = 0; i < nNumPixels - 1; i++)
-			if (SortedPixels[i].PixelDepth < SortedPixels[i + 1].PixelDepth)
+		{
+			if ((SortedPixels[i].PixelDepthAndBlendMode & 0xFFFFFF) < (SortedPixels[i + 1].PixelDepthAndBlendMode & 0xFFFFFF))
 			{
 				FragmentAndLinkBuffer_STRUCT temp = SortedPixels[i];
 				SortedPixels[i] = SortedPixels[i + 1];
 				SortedPixels[i + 1] = temp;
 			}
+		}
+	}
 
 	float4 color = Texture.Sample(Sampler, input.UV);
 
 	for (int i = 0; i < nNumPixels; i++)
 	{
-		uint blendMode = SortedPixels[i].PixelBlendMode;
+		uint blendMode = (SortedPixels[i].PixelDepthAndBlendMode & 0xFF000000) >> 24;
+
 		switch (blendMode)
 		{
 		case BLENDMODE_ADDITIVE:

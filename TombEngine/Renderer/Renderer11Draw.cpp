@@ -1569,7 +1569,7 @@ namespace TEN::Renderer
 		m_context->OMSetRenderTargetsAndUnorderedAccessViews(0, nullptr, m_renderTarget.DepthStencilView.Get(), 2, 2, &pViews[0], &counter);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		DrawRooms(view, RendererPass::Transparent);
-		 
+		
 		//m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), m_renderTarget.DepthStencilView.Get());
 
 		SetBlendMode(BLENDMODE_OPAQUE);

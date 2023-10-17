@@ -227,10 +227,12 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	rasterizerStateDesc.ScissorEnable = true;
 	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullNoneRasterizerState.GetAddressOf()));
 	 
+#define TRANSPARENT_DATA_SIZE 24
+
 	D3D11_BUFFER_DESC desc = {};
-	desc.ByteWidth = 28 * m_screenWidth * m_screenHeight * 4;
+	desc.ByteWidth = TRANSPARENT_DATA_SIZE * m_screenWidth * m_screenHeight * 4;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	desc.StructureByteStride = 28;
+	desc.StructureByteStride = TRANSPARENT_DATA_SIZE;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.CPUAccessFlags = 0;
@@ -251,11 +253,11 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 	shaderDesc.Buffer.FirstElement = 0;
 	shaderDesc.Buffer.ElementOffset = 0;
-	shaderDesc.Buffer.ElementWidth = 28;
+	shaderDesc.Buffer.ElementWidth = TRANSPARENT_DATA_SIZE;
 	shaderDesc.Buffer.NumElements = m_screenWidth * m_screenHeight * 4;
 
 	Utils::throwIfFailed(m_device->CreateShaderResourceView(m_transparentDataAndLinkBuffer.Get(), &shaderDesc, m_transparentDataAndLinkSRV.GetAddressOf()));
-
+	 
 	desc.ByteWidth = 4 * m_screenWidth * m_screenHeight;
 	desc.MiscFlags = 0;
 	desc.StructureByteStride = 4;
