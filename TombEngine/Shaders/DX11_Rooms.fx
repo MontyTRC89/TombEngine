@@ -126,7 +126,7 @@ float3 UnpackNormalMap(float4 n)
 
 #ifdef TRANSPARENT
 [earlydepthstencil]
-float PS(PixelShaderInput input)  : SV_Target
+float PS(PixelShaderInput input) : SV_Target
 #else
 PixelShaderOutput PS(PixelShaderInput input)
 #endif
@@ -223,10 +223,10 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float4 vPos = (input.PositionCopy);
 	vPos.xy /= vPos.w;
 	float2 pos = 0.5f * (float2(vPos.x, vPos.y) + 1);
-	pos.x *= ViewSize.x;
-	pos.y *= ViewSize.y;
+	int posX = (int)(pos.x * ViewSize.x);
+	int posY = (int)(pos.y * ViewSize.y);
 
-	uint uStartOffsetAddress = 4 * ((ViewSize.x * pos.y) + pos.x);
+	uint uStartOffsetAddress = 4 * ((ViewSize.x * posY) + posX);
 	uint uOldStartOffset;
 	StartOffsetBuffer.InterlockedExchange(
 		uStartOffsetAddress, uPixelCount, uOldStartOffset);

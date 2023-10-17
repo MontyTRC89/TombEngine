@@ -48,12 +48,13 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float4 vPos = (input.PositionCopy);
 	vPos.xy /= vPos.w;
 	float2 pos = 0.5f * (float2(vPos.x, vPos.y) + 1);
-	pos.x *= ViewSize.x;
-	pos.y *= ViewSize.y;
+	int posX = (int)(pos.x * ViewSize.x);
+	int posY = (int)(pos.y * ViewSize.y);
 
-	uint uStartOffsetAddress = ViewSize.x * pos.y + pos.x;
+	uint uStartOffsetAddress = 4 * ((ViewSize.x * posY) + posX);
+
 	// Fetch offset of first fragment for current pixel
-	uint uOffset = StartOffsetBufferSRV.Load(uStartOffsetAddress * 4);
+	uint uOffset = StartOffsetBufferSRV.Load(uStartOffsetAddress);
 
 	while (uOffset != 0xFFFFFFFF)
 	{
