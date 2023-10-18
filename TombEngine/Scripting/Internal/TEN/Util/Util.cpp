@@ -144,7 +144,7 @@ namespace Util
 
 	void Register(sol::state* state, sol::table& parent)
 	{
-		sol::table tableUtil{ state->lua_state(), sol::create };
+		auto tableUtil = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Util, tableUtil);
 
 		tableUtil.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
@@ -154,7 +154,7 @@ namespace Util
 		tableUtil.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);
 
-		LuaHandler handler{ state };
+		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(tableUtil, ScriptReserved_LogLevel, LOG_LEVEL);
 	}
 }
