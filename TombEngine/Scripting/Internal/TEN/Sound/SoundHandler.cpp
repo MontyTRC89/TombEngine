@@ -64,7 +64,8 @@ namespace Sound
 	////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
 	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
 	{
-		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+		auto pose = Pose(Vector3i(p.value().x, p.value().y, p.value().z));
+		SoundEffect(id, p.has_value() ? &pose : nullptr, SoundEnvironment::Always);
 	}
 
 	/// Stop sound effect
