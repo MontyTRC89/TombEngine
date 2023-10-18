@@ -5,14 +5,18 @@
 #include "Game/control/los.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Util/LevelLog.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+
+using TEN::Renderer::g_Renderer;
 
 /// Utility functions for various calculations.
 // @tentable Utils 
@@ -51,17 +55,35 @@ namespace Util
 		return posA.Distance(posB);
 	}
 
-	// TODO: Deprecated. Also should not use int!
-	///Calculate the horizontal distance between two positions.
-	//@function CalculateHorizontalDistance
-	//@tparam Vec3 posA first position
-	//@tparam Vec3 posB second position
-	//@treturn float the direct distance on the XZ plane from one position to the other
-	static int CalculateHorizontalDistance(const Vec3& pos1, const Vec3& pos2)
+	/// Calculate the horizontal distance between two positions.
+	// @function CalculateHorizontalDistance
+	// @tparam Vec3 posA First position.
+	// @tparam Vec3 posB Second position.
+	// @treturn float Horizontal distance between the two positions.
+	static float CalculateHorizontalDistance(const Vec3& posA, const Vec3& posB)
 	{
-		auto p1 = Vector2(pos1.x, pos1.z);
-		auto p2 = Vector2(pos2.x, pos2.z);
-		return (int)round(Vector2::Distance(p1, p2));
+		auto pos0 = Vector2(posA.x, posA.z);
+		auto pos1 = Vector2(posA.x, posB.z);
+		return round(Vector2::Distance(pos0, pos1));
+	}
+
+	/// Get the projected display space position of a 3D world position. Returns nil if the world position is behind the camera view.
+	// @tparam Vec3 worldPos 3D world position.
+	// @return Vec2 Projected display space position in percent.
+	// @usage 
+	// Example: Display a string at the player's position.
+	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
+	// local displayPos = GetDisplayPosition(Lara:GetPosition())
+	// string:SetPosition(PercentToScreen(displayPos.x, displayPos.y))
+	static sol::optional<Vec2> GetDisplayPosition(const Vec3& worldPos)
+	{
+		auto displayPos = g_Renderer.Get2DPosition(worldPos.ToVector3());
+		if (!displayPos.has_value())
+			return sol::nullopt;
+
+		return Vec2(
+			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
+			(displayPos->y / SCREEN_SPACE_RES.y) * 100);
 	}
 
 	/// Translate a pair display position coordinates to pixel coordinates.
@@ -135,9 +157,10 @@ namespace Util
 		auto tableUtil = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Util, tableUtil);
 
+		tableUtil.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
 		tableUtil.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 		tableUtil.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
-		tableUtil.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
+		tableUtil.set_function(ScriptReserved_GetDisplayPosition, &GetDisplayPosition);
 		tableUtil.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		tableUtil.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);
