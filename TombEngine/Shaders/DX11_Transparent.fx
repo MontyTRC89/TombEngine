@@ -39,7 +39,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
-float4 PS(PixelShaderInput input) : SV_TARGET
+float4 PS(PixelShaderInput input, in uint sampleIndex: SV_SampleIndex) : SV_TARGET
 {
 	int nNumPixels = 0;
 	
@@ -60,12 +60,17 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	{
 		// Retrieve pixel at current offset
 		FragmentAndLinkBuffer_STRUCT Element = FLBufferSRV[uOffset];
-		// Copy pixel data into temp array
-		SortedPixels[nNumPixels].PixelColorRG = Element.PixelColorRG;
-		SortedPixels[nNumPixels].PixelColorBA = Element.PixelColorBA;
-		SortedPixels[nNumPixels].PixelDepthAndBlendMode = Element.PixelDepthAndBlendMode;
 
-		nNumPixels++;
+		uint coverage = (SortedPixels[nNumPixels].PixelDepthAndBlendMode >> 28) & 0x0F;
+		if (coverage & (1 << sampleIndex))
+		{
+			// Copy pixel data into temp array
+			SortedPixels[nNumPixels].PixelColorRG = Element.PixelColorRG;
+			SortedPixels[nNumPixels].PixelColorBA = Element.PixelColorBA;
+			SortedPixels[nNumPixels].PixelDepthAndBlendMode = Element.PixelDepthAndBlendMode;
+
+			nNumPixels++;
+		}
 
 		// Retrieve next offset
 		[flatten] uOffset = (nNumPixels >= MAX_SORTED_PIXELS) ?
@@ -89,7 +94,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 
 	for (int i = 0; i < nNumPixels; i++)
 	{
-		uint blendMode = (SortedPixels[i].PixelDepthAndBlendMode & 0xFF000000) >> 24;
+		uint blendMode = (SortedPixels[i].PixelDepthAndBlendMode & 0x0F000000) >> 24;
 		float4 pixelColor = float4(
 			((SortedPixels[i].PixelColorRG >> 16) & 0xFFFF) / 255.0f,
 			(SortedPixels[i].PixelColorRG & 0xFFFF) / 255.0f,

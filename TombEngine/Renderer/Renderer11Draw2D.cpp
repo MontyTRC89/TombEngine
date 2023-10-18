@@ -305,7 +305,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
+	void Renderer11::DrawPostprocess(RenderTarget2D* currentRenderTarget, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
 
@@ -360,7 +360,7 @@ namespace TEN::Renderer
 		m_cbPostProcessBuffer.updateData(m_stPostProcessBuffer, m_context.Get());
 		BindConstantBufferPS(CB_POSTPROCESS, m_cbPostProcessBuffer.get());
 
-		BindTexture(TEXTURE_COLOR_MAP, &m_renderTarget, SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TEXTURE_COLOR_MAP, currentRenderTarget, SAMPLER_ANISOTROPIC_CLAMP);
 
 		m_primitiveBatch->Begin();
 		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);

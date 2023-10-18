@@ -1575,9 +1575,8 @@ namespace TEN::Renderer
 		SetBlendMode(BLENDMODE_OPAQUE);
 
 		m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
-		m_context->ClearRenderTargetView(target, Colors::Black);
-		// m_context->ClearDepthStencilView(depthTarget, 0, 1.0f, 0);
-		m_context->OMSetRenderTargets(1, &target, m_renderTarget.DepthStencilView.Get());
+		m_context->ClearRenderTargetView(m_currentRenderTarget.RenderTargetView.Get(), Colors::Black);
+		m_context->OMSetRenderTargets(1, m_currentRenderTarget.RenderTargetView.GetAddressOf(), m_currentRenderTarget.DepthStencilView.Get());
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
@@ -1625,11 +1624,9 @@ namespace TEN::Renderer
 		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
 		m_primitiveBatch->End();
 		
-		  
-		  
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
-		//DrawPostprocess(target, depthTarget, view);
-
+		DrawPostprocess(&m_currentRenderTarget, target, depthTarget, view);
+		 
 		// Draw GUI elements at end.
 		DrawLinesIn2DSpace();
 

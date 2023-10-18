@@ -41,7 +41,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	const D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
 	const D3D_SHADER_MACRO transparent[] = { "TRANSPARENT", "", nullptr, nullptr };
 
-	m_vsRooms = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", nullptr, blob);
+	m_vsRooms = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_5_0", nullptr, blob);
   
 	// Initialize input layout using first vertex shader.
 	D3D11_INPUT_ELEMENT_DESC inputLayout[] =
@@ -60,37 +60,37 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 		{ "HASH", 0, DXGI_FORMAT_R32_SINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 12, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
-
-	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
+	 
+	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_5_0", &roomDefinesAnimated[0], blob);
 	m_psRooms = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_4_1", nullptr, blob);
-	m_vsItems = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psItems = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsStatics = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psStatics = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsHairs = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Hairs.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psHairs = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Hairs.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsSky = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sky.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psSky = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sky.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsSolid = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Solid.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psSolid = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Solid.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsInventory = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Inventory.fx"), "VS", "vs_4_0",nullptr, blob);
-	m_psInventory = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Inventory.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsFullScreenQuad = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "VS", "vs_4_0",nullptr, blob);
-	m_psFullScreenQuad = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsShadowMap = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psShadowMap = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsHUD = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_VS_HUD.hlsl"), "VS", "vs_4_0", nullptr, blob);
-	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSColored", "ps_4_0", nullptr, blob);
-	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
-	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
-	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsInstancedStaticMeshes = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_4_0", nullptr, blob);
-	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "VS", "vs_4_0", nullptr, blob);
-	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_4_0", nullptr, blob);
+	m_vsItems = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psItems = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsStatics = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psStatics = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsHairs = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Hairs.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psHairs = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Hairs.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsSky = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sky.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psSky = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sky.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsSolid = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Solid.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psSolid = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Solid.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsInventory = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Inventory.fx"), "VS", "vs_5_0",nullptr, blob);
+	m_psInventory = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Inventory.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsFullScreenQuad = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "VS", "vs_5_0",nullptr, blob);
+	m_psFullScreenQuad = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsShadowMap = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psShadowMap = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsHUD = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_VS_HUD.hlsl"), "VS", "vs_5_0", nullptr, blob);
+	m_psHUDColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSColored", "ps_5_0", nullptr, blob);
+	m_psHUDTexture = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSTextured", "ps_5_0", nullptr, blob);
+	m_psHUDBarColor = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl"), "PSTextured", "ps_5_0", nullptr, blob);
+	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsInstancedStaticMeshes = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_5_0", nullptr, blob);
+	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "VS", "vs_5_0", nullptr, blob);
+	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_5_0", nullptr, blob);
  
 	m_psRoomsTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_5_0", &transparent[0], blob);
 	m_psItemsTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_5_0", &transparent[0], blob);
@@ -227,64 +227,6 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	rasterizerStateDesc.ScissorEnable = true;
 	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullNoneRasterizerState.GetAddressOf()));
 	 
-#define TRANSPARENT_DATA_SIZE 16
-
-	D3D11_BUFFER_DESC desc = {};
-	desc.ByteWidth = TRANSPARENT_DATA_SIZE * m_screenWidth * m_screenHeight * 4;
-	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	desc.StructureByteStride = TRANSPARENT_DATA_SIZE;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.CPUAccessFlags = 0;
-
-	Utils::throwIfFailed(m_device->CreateBuffer(&desc, NULL, m_transparentDataAndLinkBuffer.GetAddressOf()));
-
-	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc; 
-	uavDesc.Format = DXGI_FORMAT_UNKNOWN; 
-	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-	uavDesc.Buffer.FirstElement = 0; 
-	uavDesc.Buffer.NumElements = m_screenWidth * m_screenHeight * 4;
-	uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_COUNTER;
-
-	Utils::throwIfFailed(m_device->CreateUnorderedAccessView(m_transparentDataAndLinkBuffer.Get(), &uavDesc, m_transparentDataAndLinkUAV.GetAddressOf()));
-
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
-	shaderDesc.Format = uavDesc.Format;
-	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-	shaderDesc.Buffer.FirstElement = 0;
-	shaderDesc.Buffer.ElementOffset = 0;
-	shaderDesc.Buffer.ElementWidth = TRANSPARENT_DATA_SIZE;
-	shaderDesc.Buffer.NumElements = m_screenWidth * m_screenHeight * 4;
-
-	Utils::throwIfFailed(m_device->CreateShaderResourceView(m_transparentDataAndLinkBuffer.Get(), &shaderDesc, m_transparentDataAndLinkSRV.GetAddressOf()));
-	 
-	desc.ByteWidth = 4 * m_screenWidth * m_screenHeight;
-	desc.MiscFlags = 0;
-	desc.StructureByteStride = 4;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.CPUAccessFlags = 0;
-
-	Utils::throwIfFailed(m_device->CreateBuffer(&desc, NULL, m_transparentStartOffsetBuffer.GetAddressOf()));
-	   
-	uavDesc.Format = DXGI_FORMAT_R32_UINT;
-	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-	uavDesc.Buffer.FirstElement = 0;
-	uavDesc.Buffer.NumElements = m_screenWidth * m_screenHeight;
-	uavDesc.Buffer.Flags = 0;
-
-	Utils::throwIfFailed(m_device->CreateUnorderedAccessView(m_transparentStartOffsetBuffer.Get(), &uavDesc, m_transparentStartOffsetUAV.GetAddressOf()));
-   
-	shaderDesc;
-	shaderDesc.Format = uavDesc.Format;
-	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-	shaderDesc.Buffer.FirstElement = 0;
-	shaderDesc.Buffer.ElementOffset = 0;
-	shaderDesc.Buffer.ElementWidth = 4;
-	shaderDesc.Buffer.NumElements = m_screenWidth * m_screenHeight;
-
-	Utils::throwIfFailed(m_device->CreateShaderResourceView(m_transparentStartOffsetBuffer.Get(), &shaderDesc, m_transparentStartOffsetSRV.GetAddressOf()));
-
 	InitializeGameBars();
 	initQuad(m_device.Get());
 	InitializeSky();
@@ -432,6 +374,7 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 	// Initialize buffers
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
+	m_currentRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
 	m_reflectionCubemap = RenderTargetCube(m_device.Get(), 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
@@ -454,6 +397,75 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 	m_viewportToolkit = Viewport(m_viewport.TopLeftX, m_viewport.TopLeftY, m_viewport.Width, m_viewport.Height,
 		m_viewport.MinDepth, m_viewport.MaxDepth);
+
+	// With these parameters, the transparency buffer will be 512 MB for 4K and 128 MB for FHD 
+	// and in the worst case of all screen locations having at least one transaprent pixel, this will
+	// allow 4 transparency levels for each screen location
+	// Pixel data is packed in this way:
+	// * Pixel color RG (uint)
+	// * Pixel color BA (uint)
+	// * Pixel depth (24 bits) and blend mode (8 bits) (uint)
+	// * Next node in the linked list (uint)
+
+	constexpr auto TRANSPARENT_DATA_SIZE = 16;
+	constexpr auto MAX_TRANSPARENT_PIXELS_PER_POSITION = 4;
+
+	D3D11_BUFFER_DESC desc = {};
+	desc.ByteWidth = TRANSPARENT_DATA_SIZE * w * h * MAX_TRANSPARENT_PIXELS_PER_POSITION;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	desc.StructureByteStride = TRANSPARENT_DATA_SIZE;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.CPUAccessFlags = 0;
+
+	Utils::throwIfFailed(m_device->CreateBuffer(&desc, NULL, m_transparentDataAndLinkBuffer.GetAddressOf()));
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.NumElements = w * h * MAX_TRANSPARENT_PIXELS_PER_POSITION;
+	uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_COUNTER;
+
+	Utils::throwIfFailed(m_device->CreateUnorderedAccessView(m_transparentDataAndLinkBuffer.Get(), &uavDesc, m_transparentDataAndLinkUAV.GetAddressOf()));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
+	shaderDesc.Format = uavDesc.Format;
+	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+	shaderDesc.Buffer.FirstElement = 0;
+	shaderDesc.Buffer.ElementOffset = 0;
+	shaderDesc.Buffer.ElementWidth = TRANSPARENT_DATA_SIZE;
+	shaderDesc.Buffer.NumElements = w * h * MAX_TRANSPARENT_PIXELS_PER_POSITION;
+
+	Utils::throwIfFailed(m_device->CreateShaderResourceView(m_transparentDataAndLinkBuffer.Get(), &shaderDesc, m_transparentDataAndLinkSRV.GetAddressOf()));
+
+	desc.ByteWidth = 4 * w * h;
+	desc.MiscFlags = 0;
+	desc.StructureByteStride = 4;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.CPUAccessFlags = 0;
+
+	Utils::throwIfFailed(m_device->CreateBuffer(&desc, NULL, m_transparentStartOffsetBuffer.GetAddressOf()));
+
+	uavDesc.Format = DXGI_FORMAT_R32_UINT;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.NumElements = w * h;
+	uavDesc.Buffer.Flags = 0;
+
+	Utils::throwIfFailed(m_device->CreateUnorderedAccessView(m_transparentStartOffsetBuffer.Get(), &uavDesc, m_transparentStartOffsetUAV.GetAddressOf()));
+
+	shaderDesc;
+	shaderDesc.Format = uavDesc.Format;
+	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+	shaderDesc.Buffer.FirstElement = 0;
+	shaderDesc.Buffer.ElementOffset = 0;
+	shaderDesc.Buffer.ElementWidth = 4;
+	shaderDesc.Buffer.NumElements = w * h;
+
+	Utils::throwIfFailed(m_device->CreateShaderResourceView(m_transparentStartOffsetBuffer.Get(), &shaderDesc, m_transparentStartOffsetSRV.GetAddressOf()));
+
 
 	SetFullScreen();
 }

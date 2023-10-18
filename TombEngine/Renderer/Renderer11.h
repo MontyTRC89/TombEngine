@@ -608,7 +608,7 @@ namespace TEN::Renderer
 		void DrawStreamers(RenderView& view);
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
-		void DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
+		void DrawPostprocess(RenderTarget2D* currentRenderTarget, ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		
 		void RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 			ID3D11ShaderResourceView* background);
