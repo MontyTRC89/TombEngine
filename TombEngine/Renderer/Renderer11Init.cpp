@@ -227,7 +227,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	rasterizerStateDesc.ScissorEnable = true;
 	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullNoneRasterizerState.GetAddressOf()));
 	 
-#define TRANSPARENT_DATA_SIZE 24
+#define TRANSPARENT_DATA_SIZE 16
 
 	D3D11_BUFFER_DESC desc = {};
 	desc.ByteWidth = TRANSPARENT_DATA_SIZE * m_screenWidth * m_screenHeight * 4;

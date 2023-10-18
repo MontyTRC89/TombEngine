@@ -46,7 +46,8 @@ SamplerState CausticsTextureSampler : register(s2);
 
 struct FragmentAndLinkBuffer_STRUCT
 {
-	float4 PixelColor;
+	uint PixelColorRG;
+	uint PixelColorBA;
 	uint PixelDepthAndBlendMode;
 	uint NextNode;
 };
@@ -230,8 +231,10 @@ PixelShaderOutput PS(PixelShaderInput input)
 	StartOffsetBuffer.InterlockedExchange(
 		uStartOffsetAddress, uPixelCount, uOldStartOffset);
 	// Add new fragment entry in Fragment & Link Buffer
+
 	FragmentAndLinkBuffer_STRUCT Element;
-	Element.PixelColor = outputColor;
+	Element.PixelColorRG = ((uint)(outputColor.x * 255.0f) << 16) | ((uint)(outputColor.y * 255.0f) & 0xFFFF);
+	Element.PixelColorBA = ((uint)(outputColor.z * 255.0f) << 16) | ((uint)(outputColor.w * 255.0f) & 0xFFFF);
 	Element.PixelDepthAndBlendMode = (BlendMode << 24) | (uint)(outputDepth * 16777215);
 	Element.NextNode = uOldStartOffset;
 	FLBuffer[uPixelCount] = Element;

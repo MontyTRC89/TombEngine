@@ -15,7 +15,8 @@ struct PixelShaderInput
 
 struct FragmentAndLinkBuffer_STRUCT
 {
-	float4 PixelColor;
+	uint PixelColorRG;
+	uint PixelColorBA;
 	uint PixelDepthAndBlendMode;
 	uint NextNode;
 };
@@ -60,7 +61,8 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		// Retrieve pixel at current offset
 		FragmentAndLinkBuffer_STRUCT Element = FLBufferSRV[uOffset];
 		// Copy pixel data into temp array
-		SortedPixels[nNumPixels].PixelColor = Element.PixelColor;
+		SortedPixels[nNumPixels].PixelColorRG = Element.PixelColorRG;
+		SortedPixels[nNumPixels].PixelColorBA = Element.PixelColorBA;
 		SortedPixels[nNumPixels].PixelDepthAndBlendMode = Element.PixelDepthAndBlendMode;
 
 		nNumPixels++;
@@ -88,19 +90,25 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	for (int i = 0; i < nNumPixels; i++)
 	{
 		uint blendMode = (SortedPixels[i].PixelDepthAndBlendMode & 0xFF000000) >> 24;
+		float4 pixelColor = float4(
+			((SortedPixels[i].PixelColorRG >> 16) & 0xFFFF) / 255.0f,
+			(SortedPixels[i].PixelColorRG & 0xFFFF) / 255.0f,
+			((SortedPixels[i].PixelColorBA >> 16) & 0xFFFF) / 255.0f,
+			(SortedPixels[i].PixelColorBA & 0xFFFF) / 255.0f
+			);
 
 		switch (blendMode)
 		{
 		case BLENDMODE_ADDITIVE:
-			color.xyz += SortedPixels[i].PixelColor.xyz;
+			color.xyz += pixelColor.xyz;
 			break;
 
 		case BLENDMODE_ALPHABLEND:
-			color.xyz = lerp(color.xyz, SortedPixels[i].PixelColor.xyz, SortedPixels[i].PixelColor.w);
+			color.xyz = lerp(color.xyz, pixelColor.xyz, pixelColor.w);
 			break;
 
 		default:
-			color = SortedPixels[i].PixelColor;
+			color = pixelColor;
 			break;
 
 		}	
