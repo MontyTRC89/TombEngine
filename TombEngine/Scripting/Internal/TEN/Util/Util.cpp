@@ -14,11 +14,9 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 
-/***
-Utility functions, mainly mathematical, for in-game calculations.
-@tentable Utils 
-@pragma nostrip
-*/
+/// Utility functions (mainly mathematical) for in-game calculations.
+// @tentable Utils 
+// @pragma nostrip
 
 namespace Util
 {

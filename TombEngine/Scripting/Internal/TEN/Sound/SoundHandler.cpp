@@ -4,15 +4,13 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Sound/SoundTrackTypes.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 
-/***
-Functions to manage sounds.
-@tentable Sound 
-@pragma nostrip
-*/
+/// Functions for sound management.
+// @tentable Sound
+// @pragma nostrip
 
 namespace Sound
 {
