@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
 enum class DisplayStringOptions
 {
@@ -29,16 +30,16 @@ using FlagArray = std::array<bool, (int)DisplayStringOptions::Count>;
 class UserDisplayString
 {
 public:
-	UserDisplayString(const std::string& key, int x, int y, float scale, D3DCOLOR color, const FlagArray& flags, bool translated);
+	UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool translated);
 
 private:
 	UserDisplayString() = default;
+
 	std::string m_key{};
+	Vec2 Position = Vec2(0, 0);
 	D3DCOLOR m_color{ 0xFFFFFFFF };
 	FlagArray m_flags{};
 	float m_scale{ 1.0f };
-	int m_x{ 0 };
-	int m_y{ 0 };
 	bool m_deleteWhenZero{ false };
 
 	// Seconds
@@ -57,32 +58,30 @@ using GetItemCallback = std::function<std::optional<std::reference_wrapper<UserD
 class DisplayString
 {
 private:
-	DisplayStringIDType m_id{ 0 };
+	DisplayStringIDType m_id = 0;
 
 public:
-	DisplayString();
-	~DisplayString();
-	DisplayStringIDType GetID() const;
-	void SetScale(float scale);
-	float GetScale() const;
 	static void Register(sol::table& parent);
 
-	void SetPos(int x, int y);
-	std::tuple<int, int> GetPos() const;
+	DisplayString();
+	~DisplayString();
 
-	void SetColor(const ScriptColor&);
-	ScriptColor GetColor();
+	DisplayStringIDType GetID() const;
+	std::string			GetKey() const;
+	Vec2				GetPos() const;
+	float				GetScale() const;
+	ScriptColor			GetColor() const;
 
 	void SetKey(const std::string&);
-	std::string GetKey() const;
-
+	void SetPosition(const Vec2& pos);
+	void SetScale(float scale);
+	void SetColor(const ScriptColor&);
+	void SetTranslated(bool isTranslated);
 	void SetFlags(const sol::table&);
 
-	void SetTranslated(bool isTranslated);
-
-	static SetItemCallback s_setItemCallback;
+	static SetItemCallback	  s_setItemCallback;
 	static RemoveItemCallback s_removeItemCallback;
-	static GetItemCallback s_getItemCallback;
+	static GetItemCallback	  s_getItemCallback;
 
 	// Creating a DisplayString requires us to add an identifier
 	// to a data structure. We use callbacks so this class doesn't have

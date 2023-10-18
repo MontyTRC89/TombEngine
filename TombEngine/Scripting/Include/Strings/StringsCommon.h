@@ -1,9 +1,9 @@
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
 using CallbackDrawString = std::function<
 	void(
 		const std::string&,
 		D3DCOLOR,
-		int,   // X
-		int,   // X
+		Vec2,
 		float, // Scale
 		int)>; // Flags

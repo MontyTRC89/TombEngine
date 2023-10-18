@@ -128,7 +128,7 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 				if (str.m_flags[(size_t)DisplayStringOptions::Blink])
 					flags |= PRINTSTRING_BLINK;
 
-				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, str.m_scale, flags);
+				m_callbackDrawSring(cstr, str.m_color, str.Position, str.m_scale, flags);
 
 				str.m_timeRemaining -= deltaTime;
 			}

@@ -460,12 +460,12 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	{
 		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level->ScriptFileName);
 		g_GameScript->InitCallbacks();
-		g_GameStringsHandler->SetCallbackDrawString([](const std::string& key, D3DCOLOR color, int x, int y, float scale, int flags)
+		g_GameStringsHandler->SetCallbackDrawString([](const std::string& key, D3DCOLOR color, const Vec2& pos, float scale, int flags)
 		{
 			g_Renderer.AddString(
 				key,
-				Vector2(((float)x / (float)g_Configuration.ScreenWidth * SCREEN_SPACE_RES.x),
-				((float)y / (float)g_Configuration.ScreenHeight * SCREEN_SPACE_RES.y)),
+				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * SCREEN_SPACE_RES.x),
+				((float)pos.y / (float)g_Configuration.ScreenHeight * SCREEN_SPACE_RES.y)),
 				Color(color), scale, flags);
 		});
 	}

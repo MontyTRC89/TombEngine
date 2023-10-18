@@ -4,6 +4,7 @@
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
 /*** A string appearing on the screen.
 Can be used for subtitles and "2001, somewhere in Egypt"-style messages.
@@ -19,10 +20,9 @@ when you need to use screen-space coordinates.
 @pragma nostrip
 */
 
-UserDisplayString::UserDisplayString(const std::string& key, int x, int y, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated) :
+UserDisplayString::UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated) :
 	m_key(key),
-	m_x(x),
-	m_y(y),
+	Position(pos),
 	m_scale(scale),
 	m_color(color),
 	m_flags(flags),
@@ -42,8 +42,7 @@ DisplayString::DisplayString()
 For use in @{ Strings.ShowString | ShowString } and @{Strings.HideString | HideString }.
 @function DisplayString
 @tparam string string The string to display or key of the translated string.
-@tparam int x X component of the string.
-@tparam int y Y component of the string.
+@tparam Vec2 Position of the string in pixel coordinates.
 @tparam[opt] float scale size of the string, relative to the default size. __Default: 1.0__
 @tparam[opt] Color color the color of the text. __Default: white__
 @tparam[opt] bool translated If false or omitted, the input string argument will be displayed.
@@ -56,7 +55,7 @@ If true, the string argument will be the key of a translated string specified in
 __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */
-static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x, int y, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
+static std::unique_ptr<DisplayString> CreateString(const std::string& key, const Vec2& pos, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
 {
 	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();
@@ -100,7 +99,7 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, int x
 	}
 
 
-	UserDisplayString ds{ key, x, y, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255,255,255)), f, USE_IF_HAVE(bool, maybeTranslated, false) };
+	UserDisplayString ds{ key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255,255,255)), f, USE_IF_HAVE(bool, maybeTranslated, false) };
 
 	DisplayString::s_setItemCallback(id, ds);
 	return ptr;
@@ -148,21 +147,19 @@ void DisplayString::Register(sol::table& parent)
 
 		/// Get the scale of the string.
 		// @function DisplayString:GetScale()
-		// @treturn float Scale of the string 
+		// @treturn float Scale.
 		ScriptReserved_GetScale, &DisplayString::GetScale,
 
 		/// Set the position of the string.
 		// Screen-space coordinates are expected.
 		// @function DisplayString:SetPosition()
-		// @tparam int x X component.
-		// @tparam int y Y component.
-		ScriptReserved_SetPosition, &DisplayString::SetPos,
+		// @tparam Vec2 pos New position in pixel coordinates.
+		ScriptReserved_SetPosition, &DisplayString::SetPosition,
 
 		/// Get the position of the string.
 		// Screen-space coordinates are returned.
 		// @function DisplayString:GetPosition()
-		// @treturn int x X component.
-		// @treturn int y Y component.
+		// @treturn Vec2 pos Position in pixel coordinates.
 		ScriptReserved_GetPosition, &DisplayString::GetPos,
 
 		/// Set the display string's flags 
@@ -203,17 +200,16 @@ float DisplayString::GetScale() const
 	return displayString.m_scale;
 }
 
-void DisplayString::SetPos(int x, int y)
+void DisplayString::SetPosition(const Vec2& pos)
 {
 	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	displayString.m_x = x;
-	displayString.m_y = y;
+	displayString.Position = pos;
 }
 
-std::tuple<int, int> DisplayString::GetPos() const
+Vec2 DisplayString::GetPos() const
 {	
 	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	return std::make_tuple(displayString.m_x, displayString.m_y);
+	return displayString.Position;
 }
 	
 void DisplayString::SetColor(const ScriptColor& color)
@@ -226,7 +222,7 @@ void DisplayString::SetColor(const ScriptColor& color)
 	//s_addItemCallback(m_id, s);
 }
 
-ScriptColor DisplayString::GetColor() 
+ScriptColor DisplayString::GetColor() const
 {
 	UserDisplayString& displayString = s_getItemCallback(m_id).value();
 	return displayString.m_color;
