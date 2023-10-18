@@ -48,17 +48,18 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 {
 	PixelShaderInput output;
 
-	float4 worldPosition = (mul(float4(input.Position, 1.0f), StaticMeshes[InstanceID].World));
 	float3 normal = (mul(float4(input.Normal, 0.0f), StaticMeshes[InstanceID].World).xyz);
 
+	float wibble = Wibble(input.Effects.xyz, input.Hash);
+	float3 pos = Move(input.Position, input.Effects.xyz, wibble);
+	float3 col = Glow(input.Color.xyz, input.Effects.xyz, input.Hash);
+
+	float4 worldPosition = (mul(float4(pos, 1.0f), StaticMeshes[InstanceID].World));
+
+	output.Position = mul(worldPosition, ViewProjection);
 	output.Normal = normal;
 	output.UV = input.UV;
 	output.WorldPosition = worldPosition;
-
-	float3 pos = Move(input.Position, input.Effects.xyz, input.Hash);
-	float3 col = Glow(input.Color.xyz, input.Effects.xyz, input.Hash);
-
-	output.Position = mul(worldPosition, ViewProjection);
 	output.Color = float4(col, input.Color.w);
 	output.Color *= StaticMeshes[InstanceID].Color;
 	output.PositionCopy = output.Position;
