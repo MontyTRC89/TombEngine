@@ -52,6 +52,7 @@
 #include "Renderer/RenderTarget2D/RenderTarget2D.h"
 #include "Renderer/Structures/RendererDoor.h"
 #include "Renderer/ConstantBuffers/SkyBuffer.h"
+#include "Texture2D/Texture2DUAV.h"
 
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
@@ -491,6 +492,67 @@ namespace TEN::Renderer
 		int m_numCheckPortalCalls;
 		int m_numGetVisibleRoomsCalls;
 
+		// CMAA2
+		ComPtr<ID3D11ComputeShader> m_CSEdgesColor2x2;
+		ComPtr<ID3D11ComputeShader> m_CSProcessCandidates;
+		ComPtr<ID3D11ComputeShader> m_CSDeferredColorApply2x2;
+		ComPtr<ID3D11ComputeShader> m_CSComputeDispatchArgs;
+		ComPtr<ID3D11ComputeShader> m_CSDebugDrawEdges;
+
+		////////////////////////////////////////////////////////////////////////////////////
+
+	   ////////////////////////////////////////////////////////////////////////////////////
+	   // SHADER SETTINGS
+		int                             m_textureResolutionX = 0;
+		int                             m_textureResolutionY = 0;
+		int                             m_textureSampleCount = 0;
+		//
+		bool                            m_extraSharpness = false;
+		int                             m_qualityPreset = -1;
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// IN/OUT BUFFER VIEWS
+		ID3D11ShaderResourceView* m_inoutColorReadonlySRV = nullptr;
+		ID3D11UnorderedAccessView* m_inoutColorWriteonlyUAV = nullptr;
+		//
+		////////////////////////////////////////////////////////////////////////////////////
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// used only for .Gather - can be avoided for slight loss of perf
+		ID3D11SamplerState* m_pointSampler = nullptr;
+		////////////////////////////////////////////////////////////////////////////////////
+
+		////////////////////////////////////////////////////////////////////////////////////
+		// WORKING BUFFERS
+		//
+		// This texture stores the edges output by EdgeColor2x2CS
+		Texture2DUAV            m_workingEdges;
+		//
+		// This buffer stores potential shapes for further processing, filled in EdgesColor2x2CS and read/used by ProcessCandidatesCS; each element is a pixel location encoded as (pixelPos.x << 16) | pixelPos.y
+		ID3D11UnorderedAccessView* m_workingShapeCandidatesUAV = nullptr;
+		//
+		// This buffer stores a list of pixel coordinates (locations) that contain one or more anti-aliased color values generated in ProcessCanidatesCS; coordinates are in 2x2 quad locations (instead of simple per-pixel) for memory usage reasons; this is used used by DeferredColorApply2x2CS
+		ID3D11UnorderedAccessView* m_workingDeferredBlendLocationListUAV = nullptr;
+		//
+		// This buffer contains per-location linked lists with the actual anti-aliased color values.
+		ID3D11UnorderedAccessView* m_workingDeferredBlendItemListUAV = nullptr;
+		//
+		// This buffer contains per-location linked list heads (pointing to 'workingDeferredBlendItemList') (to add to confusion, it's all in 2x2-sized chunks to reduce memory usage)
+		Texture2DUAV           m_workingDeferredBlendItemListHeads;
+		//
+		// Global counters & info for setting up DispatchIndirect
+		ID3D11Buffer* m_workingControlBuffer = nullptr;
+		ID3D11UnorderedAccessView* m_workingControlBufferUAV = nullptr;
+		// DispatchIndirect/ExecuteIndirect buffer
+		ID3D11Buffer* g_workingExecuteIndirectBuffer = nullptr;
+		ID3D11UnorderedAccessView* g_workingExecuteIndirectBufferUAV = nullptr;
+		//
+		////////////////////////////////////////////////////////////////////////////////////
+
+		// SMAA2
+		Texture2D m_SMAA2AreaTexture;
+		Texture2D m_SMAA2SearchTexture;
+
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
 		void BindRoomLights(std::vector<RendererLight*>& lights);
@@ -685,6 +747,12 @@ namespace TEN::Renderer
 				    blendMode == BLENDMODE_SUBTRACTIVE ||
 				    blendMode == BLENDMODE_NOZTEST);
 		}
+
+		bool CMAA2CreateBufferAndViews(ID3D11Device* pDevice, const D3D11_BUFFER_DESC& BuffDesc, D3D11_SUBRESOURCE_DATA* pInitData, ID3D11Buffer** ppBuffer, ID3D11ShaderResourceView** ppSRV, ID3D11UnorderedAccessView** ppUAV, UINT UAVFlags /*= 0*/);
+		bool CMAA2CheckUAVTypedStoreFormatSupport(ID3D11Device* device, DXGI_FORMAT format);
+		ID3D11UnorderedAccessView* CMAA2CreateUnorderedAccessView(ID3D11Resource* resource, DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN, int mipSliceMin = 0, int arraySliceMin = 0, int arraySliceCount = -1);
+		void CMAA2CleanupTemporaryResources();
+		bool CMAA2UpdateResources(RenderTarget2D* renderTarget);
 
 	public:
 		Renderer11();

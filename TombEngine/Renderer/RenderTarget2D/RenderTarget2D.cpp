@@ -14,21 +14,6 @@ namespace TEN::Renderer
 		D3D11_SRV_DIMENSION srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		D3D11_DSV_DIMENSION dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		D3D11_RTV_DIMENSION rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-		int sampleCount = 1;
-
-		if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
-		{
-			int potentialSampleCount = (g_Configuration.AntialiasingMode == AntialiasingMode::Medium) ? 2 : 4;
-			unsigned int qualityLevels = 0;
-			if (device->CheckMultisampleQualityLevels(colorFormat, potentialSampleCount, &qualityLevels) == S_OK &&
-				qualityLevels > 0)
-			{
-				sampleCount = potentialSampleCount;
-				dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-				rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-				srvDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-			}
-		}
 
 		// Now set up render target.
 
@@ -38,7 +23,7 @@ namespace TEN::Renderer
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
 		desc.Format = colorFormat;
-		desc.SampleDesc.Count = sampleCount;
+		desc.SampleDesc.Count = 1;
 		desc.SampleDesc.Quality = 0;
 		desc.Usage = D3D11_USAGE_DEFAULT;
 		desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
@@ -71,7 +56,7 @@ namespace TEN::Renderer
 		depthTexDesc.Height = h;
 		depthTexDesc.MipLevels = 1;
 		depthTexDesc.ArraySize = 1;
-		depthTexDesc.SampleDesc.Count = sampleCount;
+		depthTexDesc.SampleDesc.Count = 1;
 		depthTexDesc.SampleDesc.Quality = 0;
 		depthTexDesc.Format = depthFormat;
 		depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
