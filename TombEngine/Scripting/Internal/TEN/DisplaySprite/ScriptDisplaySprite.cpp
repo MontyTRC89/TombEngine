@@ -19,6 +19,7 @@ namespace TEN::Scripting::DisplaySprite
 {
 	void ScriptDisplaySprite::Register(sol::state& state, sol::table& parent)
 	{
+		// NOTE: Single constructor with a sol::optional argument for the color doesn't work, hence the two constructors. -- Sezz 2023.10.19
 		using ctors = sol::constructors<
 			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&, const ScriptColor&),
 			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&)>;
