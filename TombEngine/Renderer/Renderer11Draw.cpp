@@ -539,9 +539,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawBats(RenderView& view)
 	{
 		if (!Objects[ID_BATS_EMITTER].loaded)
-		{
 			return;
-		}
 
 		RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 

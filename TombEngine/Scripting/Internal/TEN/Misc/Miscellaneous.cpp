@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -35,38 +36,31 @@ Functions that don't fit in the other modules.
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Input;
+using namespace TEN::Renderer;
 
 namespace Misc 
 {
-	///Determine if there's a line of sight between two points.
-	//
-	//i.e. if we run a direct line from one position to another
-	//will any geometry get in the way?
-	//
-	//Note: if you use this with Moveable:GetPosition to test if (for example)
-	//two creatures can see one another, you might have to do some extra adjustments.
-	//
-	//This is because the "position" for most objects refers to its base, i.e., the floor.
-	//As a solution, you can increase the y-coordinate of this position to correspond to roughly where the
-	//eyes of the creatures would be.
-	//@function HasLineOfSight
-	//@tparam float room1 ID of the room where the first position is
-	//@tparam Vec3 pos1 first position
-	//@tparam Vec3 pos2 second position
-	//@treturn bool is there a direct line of sight between the two positions?
-	//@usage
-	//local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
-	//print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
-	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
-	{
-		GameVector vec1, vec2;
-		pos1.StoreInGameVector(vec1);
-		vec1.RoomNumber = roomNumber1;
-		pos2.StoreInGameVector(vec2);
+	/*** Determine if there is a clear line of sight between two positions.
+	NOTE: Limited to room geometry. Objects are ignored.
 
-		MESH_INFO* mesh;
-		Vector3i vector;
-		return LOS(&vec1, &vec2) && (ObjectOnLOS2(&vec1, &vec2, &vector, &mesh) == NO_LOS_ITEM);
+	@function HasLineOfSight()
+	@tparam float roomID Room ID of the first position's room.
+	@tparam Vec3 posA First position.
+	@tparam Vec3 posB Second position.
+	@treturn bool __true__ if there is a line of sight, __false__ if not.
+	@usage
+	local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
+	print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
+	*/
+	[[nodiscard]] static bool HasLineOfSight(int roomID, const Vec3& posA, const Vec3& posB)
+	{
+		auto vector0 = posA.ToGameVector();
+		auto vector1 = posB.ToGameVector();
+
+		MESH_INFO* meshPtr = nullptr;
+		auto vector = Vector3i::Zero;
+		return (LOS(&vector0, &vector1) &&
+				ObjectOnLOS2(&vector0, &vector1, &vector, &meshPtr) == NO_LOS_ITEM);
 	}
 
 	///Vibrate game controller, if function is available and setting is on.
@@ -211,9 +205,9 @@ namespace Misc
 	//@function PlaySound
 	//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
 	////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
-	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
+	static void PlaySoundEffect(int id, sol::optional<Vec3> pos)
 	{
-		SoundEffect(id, p.has_value() ? &Pose(p.value().x, p.value().y, p.value().z) : nullptr, SoundEnvironment::Always);
+		SoundEffect(id, pos.has_value() ? &Pose(Vector3i(pos->x, pos->y, pos->z)) : nullptr, SoundEnvironment::Always);
 	}
 
 	/// Check if the sound effect is playing
@@ -396,6 +390,26 @@ namespace Misc
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
+	/// Get the projected 2D display space position of a 3D world position. Returns nil if the world position is behind the camera view.
+	// @tparam Vec3 worldPos 3D world position.
+	// @return Vec2 Projected display space position in percent.
+	// @usage 
+	//
+	// Example: Display a string at the player's position.
+	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
+	// local displayPos = GetDisplayPosition(Lara:GetPosition())
+	// string:SetPosition(PercentToScreen(displayPos.x, displayPos.y))
+	static sol::optional<Vec2> GetDisplayPosition(const Vec3& worldPos)
+	{
+		auto displayPos = g_Renderer.Get2DPosition(worldPos.ToVector3());
+		if (!displayPos.has_value())
+			return sol::nullopt;
+
+		return Vec2(
+			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
+			(displayPos->y / SCREEN_SPACE_RES.y) * 100);
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table tableMisc{ state->lua_state(), sol::create };
@@ -460,6 +474,7 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
+		tableMisc.set_function(ScriptReserved_GetDisplayPosition, &GetDisplayPosition);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);

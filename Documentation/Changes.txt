@@ -14,11 +14,14 @@ Version 1.1.1
 * Fix volume change in settings not affecting voice track.
 * Fix several lighting bugs.
 * Fix savegame count not properly increasing.
-* Overhaul look mode:
- - Allow for consistent and wider viewing angles while crawling, crouching, and hanging.
- - Improve movement and control.
+* Fix regeneration of non-ammo pickups with OCB 128.
+* Overhaul look-around feature:
+ - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
+ - Improve look camera movement and control.
  - Re-enable looking while performing up jump, backward jump, or backward crawl.
  - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+* Add target highlighter system with toggle in Sound and Gameplay settings.
+* Add sprint slide state 191.
 * Add swinging blade.
 * Add crumbling platform and add new OCBs for behaviour:
  - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
@@ -27,6 +30,7 @@ Version 1.1.1
  - A negative value requires a trigger to activate.
 
 Lua API changes:
+* Add DisplaySprite object.
 * Add Flow::EnableLoadSave() function to disable savegames.
 * Add Flow::EnablePointFilter() function to disable bilinear filtering.
 * Add Lara::GetAmmoType() function to read the ammo that Lara is using.
@@ -34,8 +38,9 @@ Lua API changes:
 * Add Logic.HandleEvent() function to call node events.
 * Add functions to load, save, delete and check existence of savegames.
 * Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.
-* Make Vec2 object float-based instead of integer-based.
-* Add Vec2 arithmetic for division with a number and multiplication with another Vec2.
+* Make Vec2 and Vec3 objects float-based instead of integer-based.
+* Add Vec2/Vec3 arithmetic for division with a number and multiplication with another Vec2/Vec3.
+* Add various Vec2/Vec3 operations such as Normalize() or Lerp().
 * Add log messages warnings to functions AddCallback and RemoveCallback.
 * Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
 * Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.

@@ -176,9 +176,9 @@ namespace Effects
 		s->colFadeSpeed = lifeInFrames / 2;
 		s->fadeToBlack = lifeInFrames / 3;
 
-		s->xVel = short(velocity.x << 5);
-		s->yVel = short(velocity.y << 5);
-		s->zVel = short(velocity.z << 5);
+		s->xVel = short(velocity.x * 32);
+		s->yVel = short(velocity.y * 32);
+		s->zVel = short(velocity.z * 32);
 
 		int sSize = USE_IF_HAVE(int, startSize, 10);
 		int eSize = USE_IF_HAVE(int, endSize, 0);
@@ -231,7 +231,7 @@ namespace Effects
 		constexpr auto LIFE_IN_SECONDS_MAX = 8.5f;
 		constexpr auto SECONDS_PER_FRAME   = 1 / (float)FPS;
 
-		auto pose = Pose(pos.x, pos.y, pos.z);
+		auto pose = Pose(Vector3i(pos.x, pos.y, pos.z));
 
 		int innerRad = USE_IF_HAVE(int, innerRadius, 0);
 		int outerRad = USE_IF_HAVE(int, outerRadius, 128);
