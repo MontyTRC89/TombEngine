@@ -35,7 +35,7 @@ Lua API changes:
 * Add DisplaySprite object.
 * Add Flow::EnableLoadSave() function to disable savegames.
 * Add Flow::EnablePointFilter() function to disable bilinear filtering.
-* Add Input:GetCursorDisplayPosition() function.
+* Add Input:GetCursorDisplayPosition() function to get the position of the cursor.
 * Add Lara::GetAmmoType() function to read the ammo that Lara is using.
 * Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
 * Add Logic.HandleEvent() function to call node events.
