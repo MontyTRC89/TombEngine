@@ -467,7 +467,7 @@ namespace TEN::Input
 			// Apply sensitivity and smoothing.
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
 			float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
-			normAxes = (normAxes * sensitivity) * smoothing;
+			normAxes *= sensitivity * smoothing;
 
 			// Set mouse axis values.
 			AxisMap[(int)InputAxis::Mouse] = normAxes;
