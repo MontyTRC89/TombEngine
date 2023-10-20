@@ -12,7 +12,7 @@ Uses screen-space coordinates, with x values specifying the number of pixels fro
 and y values specifying the number of pixels from the top of the window.
 
 Since different players will have different resolutions, you should work in terms of percentages where possible,
-and use @{Misc.ScreenToPercent|ScreenToPercent} and @{Misc.PercentToScreen|PercentToScreen}
+and use @{Util.ScreenToPercent|ScreenToPercent} and @{Util.PercentToScreen|PercentToScreen}
 when you need to use screen-space coordinates.
 
 @tenclass Strings.DisplayString
