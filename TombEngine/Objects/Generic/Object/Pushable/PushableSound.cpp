@@ -93,6 +93,8 @@ namespace TEN::Entities::Generic
 		switch (pushable.SoundState)
 		{
 		default:
+			break;
+
 		case PushableSoundState::Move:
 			soundID = GetPushableSoundID(pushableItem, PushableSoundType::Loop);
 			break;
