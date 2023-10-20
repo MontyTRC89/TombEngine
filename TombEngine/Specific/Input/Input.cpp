@@ -198,10 +198,10 @@ namespace TEN::Input
 			TENLog("An exception occured during input system init: " + std::string(ex.eText), LogLevel::Error);
 		}
 
-		int numDevices = OisInputManager->getNumberOfDevices(OISJoyStick);
-		if (numDevices > 0)
+		int deviceCount = OisInputManager->getNumberOfDevices(OISJoyStick);
+		if (deviceCount > 0)
 		{
-			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + ((numDevices > 1) ? "s." : "."), LogLevel::Info);
+			TENLog("Found " + std::to_string(deviceCount) + " connected game controller" + ((deviceCount > 1) ? "s." : "."), LogLevel::Info);
 
 			try
 			{
