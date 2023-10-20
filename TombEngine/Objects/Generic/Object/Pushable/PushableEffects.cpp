@@ -65,43 +65,46 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void HandlePushableFloatOscillation(ItemInfo& item, float oscillation)
+	void HandlePushableOscillation(ItemInfo& pushableItem)
 	{
 		constexpr auto BOX_VOLUME_MIN = BLOCK(0.5f);
 
-		auto time = GameTimer + item.Animation.Velocity.y;
+		const auto& pushable = GetPushableInfo(pushableItem);
+
+		auto time = GameTimer + pushableItem.Animation.Velocity.y;
 
 		// Calculate bounding box volume scaling factor.
-		auto bounds = GameBoundingBox(&item);
+		auto bounds = GameBoundingBox(&pushableItem);
 		float boxVolume = bounds.GetWidth() * bounds.GetDepth() * bounds.GetHeight();
 		float boxScale = std::sqrt(std::min(BOX_VOLUME_MIN, boxVolume)) / 32.0f;
-		boxScale *= oscillation;
+		boxScale *= pushable.Oscillation;
 
 		float xOsc = (std::sin(time * 0.05f) * 0.5f) * boxScale;
 		float zOsc = (std::sin(time * 0.1f) * 0.75f) * boxScale;
 
 		short xAngle = ANGLE(xOsc * 20.0f);
 		short zAngle = ANGLE(zOsc * 20.0f);
-		item.Pose.Orientation = EulerAngles(xAngle, item.Pose.Orientation.y, zAngle);
+		pushableItem.Pose.Orientation = EulerAngles(xAngle, pushableItem.Pose.Orientation.y, zAngle);
 	}
 
-	void HandlePushableBridgeFloatOscillation(ItemInfo& item, float oscillation)
+	void HandlePushableBridgeOscillation(ItemInfo& pushableItem)
 	{
 		constexpr auto BOX_VOLUME_MIN = BLOCK(0.5f);
 
-		auto time = GameTimer + item.Animation.Velocity.y;
+		const auto& pushable = GetPushableInfo(pushableItem);
+		auto time = GameTimer + pushableItem.Animation.Velocity.y;
 
 		// Calculate bounding box volume scaling factor.
-		auto bounds = GameBoundingBox(&item);
+		auto bounds = GameBoundingBox(&pushableItem);
 		float boxVolume = bounds.GetWidth() * bounds.GetDepth() * bounds.GetHeight();
 		float boxScale = std::sqrt(std::min(BOX_VOLUME_MIN, boxVolume)) / 32.0f;
-		boxScale *= oscillation;
+		boxScale *= pushable.Oscillation;
 
 		// Vertical oscillation.
 		float verticalOsc = (std::sin(time * 0.2f) * 0.5f) * boxScale * 32;
 		short verticalTranslation = (short)verticalOsc;
 
-		item.Pose.Position.y += verticalTranslation;
+		pushableItem.Pose.Position.y += verticalTranslation;
 	}
 
 	void HandlePushableFallRotation(ItemInfo& item)

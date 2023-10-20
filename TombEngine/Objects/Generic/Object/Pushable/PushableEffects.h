@@ -9,7 +9,7 @@ namespace TEN::Entities::Generic
 	void SpawnPushableBubbles(const ItemInfo& pushableItem);
 
 	// TODO: Move. Not effects.
-	void HandlePushableFloatOscillation(ItemInfo& item, float oscillation = 1.0f);
-	void HandlePushableBridgeFloatOscillation(ItemInfo& item, float oscillation = 1.0f);
-	void HandlePushableFallRotation(ItemInfo& item);
+	void HandlePushableOscillation(ItemInfo& pushableItem);
+	void HandlePushableBridgeOscillation(ItemInfo& pushableItem);
+	void HandlePushableFallRotation(ItemInfo& pushableItem);
 }

@@ -824,23 +824,13 @@ namespace TEN::Entities::Generic
 			break;
 
 		case PushableEnvironmentType::Water:
-			// Effects: Do water ondulation effect.
-			if (!pushable.UseRoomCollision)
-			{
-				HandlePushableFloatOscillation(pushableItem, pushable.Oscillation);
-			}
-			else
-			{
-				HandlePushableBridgeFloatOscillation(pushableItem, pushable.Oscillation);
-			}
-
-			// Effects: Spawn ripples.
+			pushable.UseRoomCollision ? HandlePushableBridgeOscillation(pushableItem) : HandlePushableOscillation(pushableItem);
 			HandlePushableRippleEffect(pushableItem);
 			break;
 
 		case PushableEnvironmentType::WaterFloor:
 		{
-			//If shallow water, change to idle
+			// If shallow water, change to idle state.
 			int waterheight = abs(pushableColl.FloorHeight - pushable.WaterSurfaceHeight);
 			if (waterheight < GetPushableHeight(pushableItem))
 			{
@@ -892,8 +882,8 @@ namespace TEN::Entities::Generic
 		pushableItem.Pose.Position.z = movingPushableItem.Pose.Position.z;
 	}
 
-	/*TODO: 
-	void HandleStackFallState(ItemInfo& pushableItem)
+	// TODO 
+	/*void HandleStackFallState(ItemInfo& pushableItem)
 	{
 		auto& pushableItem = g_Level.Items[pushableItem.Index];
 		auto& pushable = GetPushableInfo(pushableItem);
@@ -925,7 +915,7 @@ namespace TEN::Entities::Generic
 		auto it = BEHAVIOR_STATE_MAP.find(pushable.BehaviorState);
 		if (it == BEHAVIOR_STATE_MAP.end())
 		{
-			TENLog("Missing pushable state.", LogLevel::Error, LogConfig::All);
+			TENLog("Attempted to handle missing pushable state " + std::to_string((int)pushable.BehaviorState), LogLevel::Error, LogConfig::All);
 			return;
 		}
 
