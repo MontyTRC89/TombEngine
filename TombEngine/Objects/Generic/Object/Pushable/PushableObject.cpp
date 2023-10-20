@@ -68,7 +68,7 @@ namespace TEN::Entities::Generic
 			pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushable.UseRoomCollision = true;
-			AddPushableBridge(itemNumber);
+			AddPushableBridge(pushableItem);
 		}
 		else
 		{
@@ -101,9 +101,9 @@ namespace TEN::Entities::Generic
 		HandlePushableSoundState(pushableItem);
 
 		// Update bridge.
-		AddPushableStackBridge(itemNumber, false);
+		AddPushableStackBridge(pushableItem, false);
 		int probeRoomNumber = GetCollision(&pushableItem).RoomNumber;
-		AddPushableStackBridge(itemNumber, true);
+		AddPushableStackBridge(pushableItem, true);
 
 		// Update room number.
 		if (pushableItem.RoomNumber != probeRoomNumber)
@@ -131,7 +131,7 @@ namespace TEN::Entities::Generic
 			playerItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			!playerItem->Animation.IsAirborne &&
 			player.Control.HandStatus == HandStatus::Free &&
-			IsPushableValid(itemNumber)) &&
+			IsPushableValid(pushableItem)) &&
 			pushable.BehaviorState == PushableBehaviourState::Idle && 
 			(pushableSidesAttributes.IsPushable || pushableSidesAttributes.IsPullable) || // Can interact with this side.
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))	  // Already interacting.

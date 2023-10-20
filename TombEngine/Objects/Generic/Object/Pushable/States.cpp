@@ -38,7 +38,7 @@ namespace TEN::Entities::Generic
 		// 1) Check if player is interacting.
 		if (player.Context.InteractedItem == pushableItem.Index)
 		{
-			if (PushableIdleConditions(pushableItem.Index))
+			if (PushableIdleConditions(pushableItem))
 			{
 				// Pushing.
 				if (IsHeld(In::Forward))
@@ -66,7 +66,7 @@ namespace TEN::Entities::Generic
 				StartMovePushableStack(pushableItem.Index);
 
 				ResetPlayerFlex(LaraItem);
-				RemovePushableBridge(pushableItem.Index);
+				RemovePushableBridge(pushableItem);
 			}
 			else if (playerItem.Animation.ActiveState != LS_PUSHABLE_GRAB &&
 				playerItem.Animation.ActiveState != LS_PUSHABLE_PULL &&
@@ -113,7 +113,7 @@ namespace TEN::Entities::Generic
 					}
 				}
 
-				DoPushableRipples(pushableItem.Index);
+				HandlePushableRippleEffect(pushableItem);
 			}
 			break;
 
@@ -124,7 +124,7 @@ namespace TEN::Entities::Generic
 				pushable.BehaviorState = PushableBehaviourState::Fall;
 				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
-				RemovePushableBridge(pushableItem.Index);
+				RemovePushableBridge(pushableItem);
 			}
 			else
 			{
@@ -137,7 +137,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case PushableEnvironmentType::Water:
-			RemovePushableBridge(pushableItem.Index);
+			RemovePushableBridge(pushableItem);
 			SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
 			if (pushable.IsBuoyant && pushable.Stack.ItemNumberAbove == NO_ITEM)
@@ -274,7 +274,7 @@ namespace TEN::Entities::Generic
 			}
 
 			if (pushable.WaterSurfaceHeight != NO_HEIGHT)
-				DoPushableRipples(pushableItem.Index);
+				HandlePushableRippleEffect(pushableItem);
 		}
 		else
 		{
@@ -306,15 +306,15 @@ namespace TEN::Entities::Generic
 				// Check if pushing/pulling movement must stop.
 				if (!PushableAnimSets[pushable.AnimSetID].EnableAnimLoop ||
 					!IsHeld(In::Action) ||
-					!PushableMovementConditions(pushableItem.Index, !isPlayerPulling, isPlayerPulling) ||
-					!IsPushableValid(pushableItem.Index))
+					!PushableMovementConditions(pushableItem, !isPlayerPulling, isPlayerPulling) ||
+					!IsPushableValid(pushableItem))
 				{
 					playerItem.Animation.TargetState = LS_IDLE;
 					pushable.BehaviorState = PushableBehaviourState::Idle;
 
 					// Set upper pushables back to normal.
 					StopMovePushableStack(pushableItem.Index);
-					AddPushableBridge(pushableItem.Index);
+					AddPushableBridge(pushableItem);
 
 					// Do checks to conect it with another Stack.
 					int foundStack = SearchNearPushablesStack(pushableItem.Index);
@@ -466,7 +466,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = PUSHABLE_WATER_VELOCITY_MAX / 2;
 				pushable.BehaviorState = PushableBehaviourState::Sink;
 					
-				DoPushableSplash(pushableItem.Index);
+				SpawnPushableSplash(pushableItem);
 				break;
 
 			case PushableEnvironmentType::SlopedFloor:
@@ -498,7 +498,7 @@ namespace TEN::Entities::Generic
 			pushableItem.Animation.Velocity.y = std::min(pushableItem.Animation.Velocity.y + pushable.Gravity, PUSHABLE_FALL_VELOCITY_MAX);
 
 			//Fixing orientation slowly:
-			PushableFallingOrientation(pushableItem);
+			HandlePushableFallRotation(pushableItem);
 			break;
 
 		case PushableEnvironmentType::FlatFloor:
@@ -528,7 +528,7 @@ namespace TEN::Entities::Generic
 			pushableItem.Pose.Position.y = pushableColl.FloorHeight;
 			pushable.BehaviorState = PushableBehaviourState::Idle;
 
-			AddPushableBridge(pushableItem.Index);
+			AddPushableBridge(pushableItem);
 			break;
 
 		case PushableEnvironmentType::SlopedFloor:
@@ -542,7 +542,7 @@ namespace TEN::Entities::Generic
 			pushable.BehaviorState = PushableBehaviourState::Sink;
 
 			// Effect: Water splash.
-			DoPushableSplash(pushableItem.Index);
+			SpawnPushableSplash(pushableItem);
 			break;
 
 		default:
@@ -594,20 +594,20 @@ namespace TEN::Entities::Generic
 			pushableItem.Pose.Position.y += pushableItem.Animation.Velocity.y;
 			pushableItem.Animation.Velocity.y = std::min(pushableItem.Animation.Velocity.y + pushable.Gravity, PUSHABLE_WATER_VELOCITY_MAX);
 			//Fixing orientation slowly:
-			PushableFallingOrientation(pushableItem);
+			HandlePushableFallRotation(pushableItem);
 
 			int waterheight = abs(pushableColl.FloorHeight - pushable.WaterSurfaceHeight);
 			if (waterheight > GetPushableHeight(pushableItem))
 			{
 				//Shallow Water
 				// Effects: Spawn ripples.
-				DoPushableRipples(pushableItem.Index);
+				HandlePushableRippleEffect(pushableItem);
 			}
 			else
 			{
 				//Deep Water
 				// Effects: Spawn bubbles.
-				DoPushableBubbles(pushableItem.Index);
+				SpawnPushableBubbles(pushableItem);
 			}
 		}
 			break;
@@ -625,7 +625,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = 0.0f;
 				pushable.BehaviorState = PushableBehaviourState::UnderwaterIdle;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
-				AddPushableBridge(pushableItem.Index);
+				AddPushableBridge(pushableItem);
 
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 
@@ -698,7 +698,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = std::min(	pushableItem.Animation.Velocity.y + pushable.Gravity,
 																PUSHABLE_WATER_VELOCITY_MAX);
 				//Fixing orientation slowly:
-				PushableFallingOrientation(pushableItem);
+				HandlePushableFallRotation(pushableItem);
 			}
 			else
 			{
@@ -708,7 +708,7 @@ namespace TEN::Entities::Generic
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
 				pushableItem.Animation.Velocity.y = 0.0f;
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
-				AddPushableBridge(pushableItem.Index);
+				AddPushableBridge(pushableItem);
 			}
 
 		break;
@@ -820,22 +820,22 @@ namespace TEN::Entities::Generic
 			pushable.BehaviorState = PushableBehaviourState::Fall;
 			pushable.Gravity = PUSHABLE_GRAVITY_AIR;
 
-			RemovePushableBridge(pushableItem.Index);
+			RemovePushableBridge(pushableItem);
 			break;
 
 		case PushableEnvironmentType::Water:
 			// Effects: Do water ondulation effect.
 			if (!pushable.UseRoomCollision)
 			{
-				FloatingItem(pushableItem, pushable.Oscillation);
+				HandlePushableFloatOscillation(pushableItem, pushable.Oscillation);
 			}
 			else
 			{
-				FloatingBridge(pushableItem, pushable.Oscillation);
+				HandlePushableBridgeFloatOscillation(pushableItem, pushable.Oscillation);
 			}
 
 			// Effects: Spawn ripples.
-			DoPushableRipples(pushableItem.Index);
+			HandlePushableRippleEffect(pushableItem);
 			break;
 
 		case PushableEnvironmentType::WaterFloor:

@@ -1,5 +1,7 @@
 #pragma once
 
+struct ItemInfo;
+
 namespace TEN::Entities::Generic
 {
 	std::optional<int> PushableBridgeFloor(int itemNumber, int x, int y, int z);
@@ -7,9 +9,8 @@ namespace TEN::Entities::Generic
 	int PushableBridgeFloorBorder(int itemNumber);
 	int PushableBridgeCeilingBorder(int itemNumber);
 
-	void AddPushableBridge(int itemNumber);
-	void RemovePushableBridge(int itemNumber);
-	void UpdatePushableBridge(int itemNumber);
-
-	void AddPushableStackBridge(int itemNumber, bool addBridge);
+	void AddPushableBridge(ItemInfo& pushableItem);
+	void AddPushableStackBridge(ItemInfo& pushableItem, bool addBridge);
+	void RemovePushableBridge(ItemInfo& pushableItem);
+	void UpdatePushableBridge(const ItemInfo& pushableItem);
 }

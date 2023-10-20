@@ -18,9 +18,8 @@ namespace TEN::Entities::Generic
 {
 	constexpr auto PUSHABLE_FLOOR_HEIGHT_TOLERANCE = 32;
 
-	bool IsPushableValid(int itemNumber)
+	bool IsPushableValid(ItemInfo& pushableItem)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		// NOTE: Requires positive OCB value for interaction.
@@ -30,9 +29,9 @@ namespace TEN::Entities::Generic
 		auto pointColl = CollisionResult{};
 		if (pushable.UseRoomCollision)
 		{
-			RemovePushableBridge(itemNumber);
+			RemovePushableBridge(pushableItem);
 			pointColl = GetCollision(&pushableItem);
-			AddPushableBridge(itemNumber);
+			AddPushableBridge(pushableItem);
 		}
 		else
 		{
@@ -56,14 +55,13 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	bool IsPushableObjectMoveAllowed(int itemNumber, const Vector3i& targetPos, int targetRoom)
+	bool IsPushableObjectMoveAllowed(ItemInfo& pushableItem, const Vector3i& targetPos, int targetRoomNumber)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		pushable.IsOnEdge = false;
 
-		auto pointColl = GetCollision(targetPos.x, targetPos.y, targetPos.z, targetRoom);
+		auto pointColl = GetCollision(targetPos, targetRoomNumber);
 
 		// 1) Check for wall.
 		if (pointColl.Block->IsWall(targetPos.x, targetPos.z))
@@ -87,11 +85,11 @@ namespace TEN::Entities::Generic
 			}
 		}
 
-		// 3) Check for floor slope.
+		// 3) Check for slippery floor slope.
 		if (pointColl.Position.FloorSlope)
 			return false;
 
-		// 4) Check for diagonal floor.
+		// 4) Check for diagonal floor step.
 		if (pointColl.Position.DiagonalStep)
 			return false;
 
@@ -108,10 +106,11 @@ namespace TEN::Entities::Generic
 
 		// Is ceiling (square or diagonal) high enough?
 		int distFromCeil = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
-		int blockHeight = GetStackHeight(itemNumber) - PUSHABLE_FLOOR_HEIGHT_TOLERANCE;
+		int blockHeight = GetStackHeight(pushableItem.Index) - PUSHABLE_FLOOR_HEIGHT_TOLERANCE;
 		if (distFromCeil < blockHeight)
 			return false;
 
+		// TODO: Don't modify item.
 		// Test object collision.
 		auto prevPos = pushableItem.Pose.Position;
 		pushableItem.Pose.Position = targetPos;
@@ -145,10 +144,8 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	bool IsValidForPlayer(int itemNumber)
+	bool IsValidForPlayer(const ItemInfo& pushableItem)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-
 		auto playerOffset = Vector3i::Zero;
 				
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
@@ -207,23 +204,23 @@ namespace TEN::Entities::Generic
 			if (!CollidedItems[i])
 				break;
 
-			if (CollidedItems[i] == &pushableItem) // If collided item is not pushblock in which lara embedded
+			if (CollidedItems[i] == &pushableItem)
 				continue;
 
-			if (Objects[CollidedItems[i]->ObjectNumber].isPickup) // If it isn't a picukp
+			if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
 				continue;
 
 			if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr)
+			{
 				return false;
+			}
 			else
 			{
-				auto& object = Objects[CollidedItems[i]->ObjectNumber];
-				int collidedIndex = CollidedItems[i] - g_Level.Items.data();
-				int xCol = CollidedItems[i]->Pose.Position.x;
-				int yCol = CollidedItems[i]->Pose.Position.y;
-				int zCol = CollidedItems[i]->Pose.Position.z;
+				const auto& object = Objects[CollidedItems[i]->ObjectNumber];
+				int collidedItemNumber = CollidedItems[i] - g_Level.Items.data();
 
-				if (object.floor(collidedIndex, xCol, yCol, zCol) == std::nullopt)
+				auto pos = CollidedItems[i]->Pose.Position;
+				if (object.floor(collidedItemNumber, pos.x, pos.y, pos.z) == std::nullopt)
 					return false;
 			}
 		}
@@ -231,14 +228,15 @@ namespace TEN::Entities::Generic
 		return true;
 	}
 
-	bool PushableIdleConditions(int itemNumber)
+	bool PushableIdleConditions(ItemInfo& pushableItem)
 	{
-		//If Lara is grabbing, check the push pull actions.
+		// If player is grabbing, check the push pull actions.
 		if (LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB || 
 			!TestLastFrame(LaraItem, LA_PUSHABLE_GRAB))
+		{
 			return false;
+		}
 
-		//First checks conditions.
 		bool hasPushAction = IsHeld(In::Forward);
 		bool hasPullAction = IsHeld(In::Back);
 
@@ -247,7 +245,6 @@ namespace TEN::Entities::Generic
 			return false;
 
 		//Cond 2: Can do the interaction with that side of the pushable?
-		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
@@ -260,63 +257,58 @@ namespace TEN::Entities::Generic
 		}
 
 		//Cond 3: Is its stacked pushables under the limit?
-		if (!IsWithinStackLimit(itemNumber))
+		if (!IsWithinStackLimit(pushableItem.Index))
 			return false;
 
 		//Cond 4: Does it comply with the room collision conditions?.
-		if (!PushableMovementConditions(itemNumber, hasPushAction, hasPullAction))
+		if (!PushableMovementConditions(pushableItem, hasPushAction, hasPullAction))
 			return false;
 
 		return true;
 	}
 
-	bool PushableMovementConditions(int itemNumber, bool hasPushAction, bool hasPullAction)
+	bool PushableMovementConditions(ItemInfo& pushableItem, bool hasPushAction, bool hasPullAction)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushable = GetPushableInfo(pushableItem);
+		const auto& pushable = GetPushableInfo(pushableItem);
 
-		//Is the pushable allowed in the target position?
 		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
 		auto targetPos = pushableItem.Pose.Position;
 
-		int direction = (hasPushAction) ? 1 : -1;
+		int dir = (hasPushAction) ? 1 : -1;
 
 		switch (quadrant)
 		{
 		case NORTH:
-			targetPos.z = targetPos.z + direction * BLOCK(1);
+			targetPos.z = targetPos.z + dir * BLOCK(1);
 			break;
 
 		case EAST:
-			targetPos.x = targetPos.x + direction * BLOCK(1);
+			targetPos.x = targetPos.x + dir * BLOCK(1);
 			break;
 
 		case SOUTH:
-			targetPos.z = targetPos.z - direction * BLOCK(1);
+			targetPos.z = targetPos.z - dir * BLOCK(1);
 			break;
 
 		case WEST:
-			targetPos.x = targetPos.x - direction * BLOCK(1);
+			targetPos.x = targetPos.x - dir * BLOCK(1);
 			break;
 		}
 
 		auto targetRoom = pushableItem.RoomNumber;
 
-		if (!IsPushableObjectMoveAllowed(itemNumber, targetPos, targetRoom))
+		if (!IsPushableObjectMoveAllowed(pushableItem, targetPos, targetRoom))
 			return false;
 
-		//If player is pulling, is there space for Lara?
-		if (hasPullAction && !IsValidForPlayer(itemNumber))
+		if (hasPullAction && !IsValidForPlayer(pushableItem))
 			return false;
 
-		//Stopper flag
-		//Put it in destiny
 		SetPushableStopperFlag(true, targetPos, targetRoom);
 
 		return true;
 	}
 
-	PushableCollisionData GetPushableCollision(const ItemInfo& item)
+	PushableCollisionData GetPushableCollision(ItemInfo& item)
 	{
 		auto& pushable = GetPushableInfo(item);
 
@@ -325,12 +317,12 @@ namespace TEN::Entities::Generic
 
 		if (pushable.UseBridgeCollision)
 		{
-			RemovePushableBridge(item.Index);
+			RemovePushableBridge(item);
 
 			pointColl = GetCollision(item);
 			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
-			AddPushableBridge(item.Index);
+			AddPushableBridge(item);
 		}
 		else
 		{

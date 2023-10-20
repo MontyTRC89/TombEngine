@@ -22,12 +22,12 @@ namespace TEN::Entities::Generic
 		int CeilingHeight = 0;
 	};
 
-	bool IsPushableValid(int itemNumber);
-	bool IsPushableObjectMoveAllowed(int itemNumber, const Vector3i& targetPos, int targetRoom);
-	bool IsValidForPlayer(int itemNumber);
+	bool IsPushableValid(ItemInfo& pushableItem);
+	bool IsPushableObjectMoveAllowed(ItemInfo& pushableItem, const Vector3i& targetPos, int targetRoomNumber);
+	bool IsValidForPlayer(const ItemInfo& pushableItem);
 
-	bool PushableIdleConditions(int itemNumber);
-	bool PushableMovementConditions(int itemNumber, bool hasPushAction, bool hasPullAction);
+	bool PushableIdleConditions(ItemInfo& pushableItem);
+	bool PushableMovementConditions(ItemInfo& pushableItem, bool hasPushAction, bool hasPullAction);
 
-	PushableCollisionData GetPushableCollision(const ItemInfo& item);
+	PushableCollisionData GetPushableCollision(ItemInfo& item);
 }

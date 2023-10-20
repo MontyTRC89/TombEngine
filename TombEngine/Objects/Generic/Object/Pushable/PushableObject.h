@@ -32,7 +32,7 @@ namespace TEN::Entities::Generic
 	
 	void InitializePushableBlock(int itemNumber);
 	void PushableBlockControl(int itemNumber);
-	void PushableBlockCollision(int itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void PushableBlockCollision(int itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
 
 	int GetPushableHeight(ItemInfo& item);
 

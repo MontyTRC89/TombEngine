@@ -4,12 +4,12 @@ struct ItemInfo;
 
 namespace TEN::Entities::Generic
 {
-	void DoPushableRipples(int itemNumber);
-	void DoPushableSplash(int itemNumber);
-	void DoPushableBubbles(int itemNumber);
+	void HandlePushableRippleEffect(ItemInfo& pushableItem);
+	void SpawnPushableSplash(ItemInfo& pushableItem);
+	void SpawnPushableBubbles(const ItemInfo& pushableItem);
 
-	void FloatingItem(ItemInfo& item, float floatForce = 1.0f);
-	void FloatingBridge(ItemInfo& item, float floatForce = 1.0f);
-
-	void PushableFallingOrientation (ItemInfo& item);
+	// TODO: Move. Not effects.
+	void HandlePushableFloatOscillation(ItemInfo& item, float oscillation = 1.0f);
+	void HandlePushableBridgeFloatOscillation(ItemInfo& item, float oscillation = 1.0f);
+	void HandlePushableFallRotation(ItemInfo& item);
 }

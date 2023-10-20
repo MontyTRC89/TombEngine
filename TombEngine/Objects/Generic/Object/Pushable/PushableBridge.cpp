@@ -58,42 +58,20 @@ namespace TEN::Entities::Generic
 		return pushableItem.Pose.Position.y;
 	}
 
-	void AddPushableBridge(int itemNumber)
+	void AddPushableBridge(ItemInfo& pushableItem)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		if (pushable.UseRoomCollision)
 		{
-			AddBridge(itemNumber);
+			AddBridge(pushableItem.Index);
 			pushable.UseBridgeCollision = true;
 		}
 	}
 
-	void RemovePushableBridge(int itemNumber)
+	void AddPushableStackBridge(ItemInfo& pushableItem, bool addBridge)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushable = GetPushableInfo(pushableItem);
-
-		if (pushable.UseRoomCollision)
-		{
-			RemoveBridge(itemNumber);
-			pushable.UseBridgeCollision = false;
-		}
-	}
-
-	void UpdatePushableBridge(int itemNumber)
-	{
-		const auto& pushableItem = g_Level.Items[itemNumber];
-		const auto& pushable = GetPushableInfo(pushableItem);
-
-		if (pushable.UseRoomCollision)
-			UpdateBridgeItem(itemNumber);
-	}
-
-	void AddPushableStackBridge(int itemNumber, bool addBridge)
-	{
-		auto* pushableItemPtr = &g_Level.Items[itemNumber];
+		auto* pushableItemPtr = &g_Level.Items[pushableItem.Index];
 		const auto* pushablePtr = &GetPushableInfo(*pushableItemPtr);
 
 		// NOTE: Can't have stacked items on bridge.
@@ -101,7 +79,7 @@ namespace TEN::Entities::Generic
 			return;
 
 		if (pushablePtr->UseBridgeCollision)
-			addBridge ? AddBridge(itemNumber) : RemoveBridge(itemNumber);
+			addBridge ? AddBridge(pushableItem.Index) : RemoveBridge(pushableItem.Index);
 		
 		while (pushablePtr->Stack.ItemNumberAbove != NO_ITEM)
 		{
@@ -111,5 +89,24 @@ namespace TEN::Entities::Generic
 			if (pushablePtr->UseBridgeCollision)
 				addBridge ? AddBridge(pushableItemPtr->Index) : RemoveBridge(pushableItemPtr->Index);
 		}
+	}
+
+	void RemovePushableBridge(ItemInfo& pushableItem)
+	{
+		auto& pushable = GetPushableInfo(pushableItem);
+
+		if (pushable.UseRoomCollision)
+		{
+			RemoveBridge(pushableItem.Index);
+			pushable.UseBridgeCollision = false;
+		}
+	}
+
+	void UpdatePushableBridge(const ItemInfo& pushableItem)
+	{
+		const auto& pushable = GetPushableInfo(pushableItem);
+
+		if (pushable.UseRoomCollision)
+			UpdateBridgeItem(pushableItem.Index);
 	}
 }

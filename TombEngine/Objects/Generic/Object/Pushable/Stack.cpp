@@ -263,7 +263,7 @@ namespace TEN::Entities::Generic
 
 			// Deactivate collision.
 			if (currentPushable.UseRoomCollision)
-				RemovePushableBridge(currentItemNumber);
+				RemovePushableBridge(currentPushableItem);
 
 			currentPushable.BehaviorState = PushableBehaviourState::MoveStackHorizontal;
 
@@ -286,7 +286,7 @@ namespace TEN::Entities::Generic
 
 			// Activate collision.
 			if (currentPushable.UseRoomCollision)
-				AddPushableBridge(currentItemNumber);
+				AddPushableBridge(currentPushableItem);
 
 			currentPushable.BehaviorState = PushableBehaviourState::Idle;
 

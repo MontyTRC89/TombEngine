@@ -12,29 +12,31 @@ using namespace TEN::Effects::Ripple;
 
 namespace TEN::Entities::Generic
 {
-	constexpr auto FRAMES_BETWEEN_RIPPLES = 8.0f;
-	constexpr auto FRAMES_BETWEEN_RIPPLES_SOUNDS = 30.0f;
-	constexpr auto FRAMES_BETWEEN_BUBBLES = 8.0f;
-
-	void DoPushableRipples(int itemNumber)
+	void HandlePushableRippleEffect(ItemInfo& pushableItem)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
+		constexpr auto FRAMES_BETWEEN_RIPPLES		 = 8;
+		constexpr auto FRAMES_BETWEEN_RIPPLES_SOUNDS = 30;
+
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		//TODO: Enhace the effect to make the ripples increase their size through the time.
+		// TODO: cleanup.
+		// TODO: Enhace the effect to make the ripples increase their size through the time.
 		if (pushable.WaterSurfaceHeight != NO_HEIGHT)
 		{
-			if (std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
-				SpawnRipple(Vector3(pushableItem.Pose.Position.x, pushable.WaterSurfaceHeight, pushableItem.Pose.Position.z), pushableItem.RoomNumber, GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
+			if (fmod(GameTimer, FRAMES_BETWEEN_RIPPLES) <= 0.0f)
+				SpawnRipple(
+					Vector3(pushableItem.Pose.Position.x, pushable.WaterSurfaceHeight, pushableItem.Pose.Position.z),
+					pushableItem.RoomNumber,
+					GameBoundingBox(&pushableItem).GetWidth() + (GetRandomControl() & 15),
+					(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 			
-			if (std::fmod(GameTimer, FRAMES_BETWEEN_RIPPLES_SOUNDS) <= 0.0f)
+			if (fmod(GameTimer, FRAMES_BETWEEN_RIPPLES_SOUNDS) <= 0.0f)
 				pushable.SoundState = PushableSoundState::Wade;
 		}
 	}
 
-	void DoPushableSplash(int itemNumber)
+	void SpawnPushableSplash(ItemInfo& pushableItem)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		SplashSetup.y = pushable.WaterSurfaceHeight - 1;
@@ -42,17 +44,17 @@ namespace TEN::Entities::Generic
 		SplashSetup.z = pushableItem.Pose.Position.z;
 		SplashSetup.splashPower = pushableItem.Animation.Velocity.y * 2;
 		SplashSetup.innerRadius = 250;
+
 		SetupSplash(&SplashSetup, pushableItem.RoomNumber);
 	}
 
-	void DoPushableBubbles(int itemNumber)
+	void SpawnPushableBubbles(const ItemInfo& pushableItem)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		auto& pushable = GetPushableInfo(pushableItem);
+		constexpr auto FRAMES_BETWEEN_BUBBLES = 8.0f;
 
-		if (std::fmod(GameTimer, FRAMES_BETWEEN_BUBBLES) <= 0.0f)
+		if (fmod(GameTimer, FRAMES_BETWEEN_BUBBLES) <= 0.0f)
 		{
-			for (int i = 0; i <32; i++)
+			for (int i = 0; i < 32; i++)
 			{
 				auto pos = Vector3(
 					(GetRandomControl() & 0x1FF) + pushableItem.Pose.Position.x - 256,
@@ -63,9 +65,9 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void FloatingItem(ItemInfo& item, float floatForce)
+	void HandlePushableFloatOscillation(ItemInfo& item, float oscillation)
 	{
-		constexpr auto BOX_VOLUME_MIN = 512.0f;
+		constexpr auto BOX_VOLUME_MIN = BLOCK(0.5f);
 
 		auto time = GameTimer + item.Animation.Velocity.y;
 
@@ -73,19 +75,19 @@ namespace TEN::Entities::Generic
 		auto bounds = GameBoundingBox(&item);
 		float boxVolume = bounds.GetWidth() * bounds.GetDepth() * bounds.GetHeight();
 		float boxScale = std::sqrt(std::min(BOX_VOLUME_MIN, boxVolume)) / 32.0f;
-		boxScale *= floatForce;
+		boxScale *= oscillation;
 
-		float xOscillation = (std::sin(time * 0.05f) * 0.5f) * boxScale;
-		float zOscillation = (std::sin(time * 0.1f) * 0.75f) * boxScale;
+		float xOsc = (std::sin(time * 0.05f) * 0.5f) * boxScale;
+		float zOsc = (std::sin(time * 0.1f) * 0.75f) * boxScale;
 
-		short xAngle = ANGLE(xOscillation * 20.0f);
-		short zAngle = ANGLE(zOscillation * 20.0f);
+		short xAngle = ANGLE(xOsc * 20.0f);
+		short zAngle = ANGLE(zOsc * 20.0f);
 		item.Pose.Orientation = EulerAngles(xAngle, item.Pose.Orientation.y, zAngle);
 	}
 
-	void FloatingBridge(ItemInfo& item, float floatForce)
+	void HandlePushableBridgeFloatOscillation(ItemInfo& item, float oscillation)
 	{
-		constexpr auto BOX_VOLUME_MIN = 512.0f;
+		constexpr auto BOX_VOLUME_MIN = BLOCK(0.5f);
 
 		auto time = GameTimer + item.Animation.Velocity.y;
 
@@ -93,25 +95,25 @@ namespace TEN::Entities::Generic
 		auto bounds = GameBoundingBox(&item);
 		float boxVolume = bounds.GetWidth() * bounds.GetDepth() * bounds.GetHeight();
 		float boxScale = std::sqrt(std::min(BOX_VOLUME_MIN, boxVolume)) / 32.0f;
-		boxScale *= floatForce;
+		boxScale *= oscillation;
 
-		// Vertical oscillation (up and down).
-		float yOscillation = (std::sin(time * 0.2f) * 0.5f) * boxScale * 32;
-		short yTranslation = static_cast<short>(yOscillation);
+		// Vertical oscillation.
+		float verticalOsc = (std::sin(time * 0.2f) * 0.5f) * boxScale * 32;
+		short verticalTranslation = (short)verticalOsc;
 
-		item.Pose.Position.y += yTranslation;
+		item.Pose.Position.y += verticalTranslation;
 	}
 
-	void PushableFallingOrientation(ItemInfo& item)
+	void HandlePushableFallRotation(ItemInfo& item)
 	{
 		auto& pushableItem = item;
 
-		//Check if rotation is out of the threeshold.
-		auto orientationThreshold = 1;
-		auto correctionStep = 40.0f / 30;  //40º / 30 frames to do the correction in 1 sec approx.
+		// Check if orientation is outside threeshold.
+		short orientThreshold = 1;
+		float correctionStep = 40.0f / 30; // 40 deg / 30 frames to do the correction in 1 sec approx.
 
-		if (abs(pushableItem.Pose.Orientation.x) >= orientationThreshold ||
-			abs(pushableItem.Pose.Orientation.y) >= orientationThreshold)
+		if (abs(pushableItem.Pose.Orientation.x) >= orientThreshold ||
+			abs(pushableItem.Pose.Orientation.y) >= orientThreshold)
 		{
 			if (pushableItem.Pose.Orientation.x > 0)
 			{
