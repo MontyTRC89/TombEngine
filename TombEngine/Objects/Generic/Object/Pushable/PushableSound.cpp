@@ -93,6 +93,7 @@ namespace TEN::Entities::Generic
 		switch (pushable.SoundState)
 		{
 		default:
+		case PushableSoundState::None:
 			break;
 
 		case PushableSoundState::Move:
