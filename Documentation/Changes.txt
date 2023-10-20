@@ -39,6 +39,7 @@ Lua API changes:
 * Add functions to load, save, delete and check existence of savegames.
 * Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.
 * Make Vec2 and Vec3 objects float-based instead of integer-based.
+* Split the functions in `Misc` namespace to appropriate new namespaces.
 * Add Vec2/Vec3 arithmetic for division with a number and multiplication with another Vec2/Vec3.
 * Add various Vec2/Vec3 operations such as Normalize() or Lerp().
 * Add log messages warnings to functions AddCallback and RemoveCallback.
