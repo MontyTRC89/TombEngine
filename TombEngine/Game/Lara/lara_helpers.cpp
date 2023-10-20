@@ -427,14 +427,14 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
 	{
-		axisCoeff.x = AxisMap[(int)InputAxis::Move].x;
+		axisCoeff.x = AxisMap[(int)InputAxis::Move].y;
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
-		axisCoeff.y = AxisMap[(int)InputAxis::Move].y;
+		axisCoeff.y = AxisMap[(int)InputAxis::Move].x;
 	}
 
 	// Determine turn rate base values.
