@@ -403,26 +403,6 @@ namespace Misc
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
-	/// Get the projected 2D display space position of a 3D world position. Returns nil if the world position is behind the camera view.
-	// @tparam Vec3 worldPos 3D world position.
-	// @return Vec2 Projected display space position in percent.
-	// @usage 
-	//
-	// Example: Display a string at the player's position.
-	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
-	// local displayPos = GetDisplayPosition(Lara:GetPosition())
-	// string:SetPosition(PercentToScreen(displayPos.x, displayPos.y))
-	static sol::optional<Vec2> GetDisplayPosition(const Vec3& worldPos)
-	{
-		auto displayPos = g_Renderer.Get2DPosition(worldPos.ToVector3());
-		if (!displayPos.has_value())
-			return sol::nullopt;
-
-		return Vec2(
-			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
-			(displayPos->y / SCREEN_SPACE_RES.y) * 100);
-	}
-
 	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table tableMisc{ state->lua_state(), sol::create };
@@ -487,8 +467,6 @@ namespace Misc
 		tableMisc.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
-		tableMisc.set_function(ScriptReserved_GetDisplayPosition, &GetDisplayPosition);
-		tableMisc.set_function(ScriptReserved_GetCursorDisplayPosition, &GetCursorDisplayPosition);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);

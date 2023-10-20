@@ -3,11 +3,11 @@
 
 /***
 Constants for the type of the Camera.
-@enum Misc.CameraType
+@enum View.CameraType
 @pragma nostrip
 */
 
-/*** Misc.CameraType constants.
+/*** View.CameraType constants.
 
 The following constants are inside CameraType.
 
@@ -18,7 +18,7 @@ The following constants are inside CameraType.
 	HEAVY
 	OBJECT
 
-@section Misc.CameraType
+@section View.CameraType
 */
 
 /*** Table of camera type constants (for use with GetCameraType() function).
