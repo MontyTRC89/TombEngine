@@ -446,9 +446,24 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_sprint_slide,//191
 };
 
+//debug--------------
+#include "Game/effects/DisplaySprite.h"
+using namespace TEN::Effects::DisplaySprite;
+//--------------------
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+
+	//debug--------------
+	
+	auto cursorPos = GetCursorDisplayPosition();
+	AddDisplaySprite(
+		ID_DEFAULT_SPRITES, 20,
+		cursorPos, 0, Vector2(0.2f, 0.25f) / 4, Vector4::One,
+		0, DisplaySpriteAlignMode::TopLeft, DisplaySpriteScaleMode::Fill, BLEND_MODES::BLENDMODE_ALPHABLEND);
+
+	//--------------------
 
 	if (lara->Control.Weapon.HasFired)
 	{

@@ -1195,7 +1195,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
 				PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
 				PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
-				PrintDebugMessage("Cursor pos: %.3f, %.3f", GetCursor2DPosition().x, GetCursor2DPosition().y);
+				PrintDebugMessage("Cursor pos: %.3f, %.3f", GetCursorDisplayPosition().x, GetCursorDisplayPosition().y);
 			}
 				break;
 

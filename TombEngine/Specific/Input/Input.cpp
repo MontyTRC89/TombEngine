@@ -457,7 +457,7 @@ namespace TEN::Input
 				SetDiscreteAxisValues(baseIndex + pass);
 			}
 
-			// Normalize raw mouse axis values to [-1.0f, 1.0f] range.
+			// Normalize raw mouse axis values to range [-1.0f, 1.0f].
 			auto rawAxes = Vector2(state.X.rel, state.Y.rel);
 			auto normAxes = Vector2(
 				(((rawAxes.x - -SCREEN_SPACE_RES.x) * 2) / (SCREEN_SPACE_RES.x - -SCREEN_SPACE_RES.x)) - 1.0f,
@@ -814,7 +814,7 @@ namespace TEN::Input
 		}
 	}
 
-	Vector2 GetCursor2DPosition()
+	Vector2 GetCursorDisplayPosition()
 	{
 		const auto& state = OisMouse->getMouseState();
 
