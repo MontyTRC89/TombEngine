@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: Clean up and organise this entire file.
+
 // Tables
 static constexpr char ScriptReserved_TEN[]				= "TEN";
 static constexpr char ScriptReserved_Flow[]				= "Flow";
@@ -22,7 +24,6 @@ static constexpr char ScriptReserved_Volume[]			= "Volume";
 static constexpr char ScriptReserved_Room[]				= "Room";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Vec2[]				= "Vec2";
-static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
@@ -171,7 +172,6 @@ static constexpr char ScriptReserved_GetOnCollidedWithObject[]	= "GetOnCollidedW
 static constexpr char ScriptReserved_SetOnCollidedWithObject[]	= "SetOnCollidedWithObject";
 static constexpr char ScriptReserved_GetOnCollidedWithRoom[]	= "GetOnCollidedWithRoom";
 static constexpr char ScriptReserved_SetOnCollidedWithRoom[]	= "SetOnCollidedWithRoom";
-static constexpr char ScriptReserved_ToLength[]					= "ToLength"; // Should've been SetLength;
 static constexpr char ScriptReserved_ToVec2[]					= "ToVec2";
 static constexpr char ScriptReserved_AttachObjCamera[]		= "AttachObjCamera";
 static constexpr char ScriptReserved_AnimFromObject[]		= "AnimFromObject";
@@ -296,6 +296,7 @@ static constexpr char ScriptReserved_ThrowAwayTorch[]				= "ThrowAwayTorch";
 static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 static constexpr char ScriptReserved_TorchIsLit[]					= "TorchIsLit";
 static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
+static constexpr char ScriptReserved_GetDisplayPosition[]			= "GetDisplayPosition";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
@@ -324,3 +325,23 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
+
+// Vec2
+constexpr char ScriptReserved_Vec2SetLength[]		= "ToLength";
+constexpr char ScriptReserved_Vec2Normalize[]		= "Normalize";
+constexpr char ScriptReserved_Vec2Rotate[]			= "Rotate";
+constexpr char ScriptReserved_Vec2Lerp[]			= "Lerp";
+constexpr char ScriptReserved_Vec2Cross[]			= "Cross";
+constexpr char ScriptReserved_Vec2Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec2Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec2Length[]			= "Length";
+
+// Vec3
+constexpr char ScriptReserved_Vec3[]				= "Vec3";
+constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
+constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
+constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
+constexpr char ScriptReserved_Vec3Cross[]			= "Cross";
+constexpr char ScriptReserved_Vec3Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec3Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec3Length[]			= "Length";
