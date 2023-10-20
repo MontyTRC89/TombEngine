@@ -42,7 +42,7 @@ namespace Misc
 {
 	/// Get the display position of the cursor in percent.
 	// @function GetCursorDisplayPosition()
-	// @treturn Vec2 Display position in percent.
+	// @treturn Vec2 Cursor display position in percent.
 	static Vec2 GetCursorDisplayPosition()
 	{
 		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
