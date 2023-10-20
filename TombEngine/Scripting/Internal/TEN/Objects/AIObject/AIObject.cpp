@@ -96,7 +96,7 @@ void AIObject::Register(sol::table& parent)
 
 Vec3 AIObject::GetPos() const
 {
-	return Vec3{ m_aiObject.pos.Position.x, m_aiObject.pos.Position.y, m_aiObject.pos.Position.z };
+	return Vec3(m_aiObject.pos.Position.x, m_aiObject.pos.Position.y, m_aiObject.pos.Position.z);
 }
 
 void AIObject::SetPos(Vec3 const& pos)

@@ -32,13 +32,17 @@ using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
-	constexpr int LINE_HEIGHT = 25;
-	constexpr int PHD_CENTER_X = SCREEN_SPACE_RES.x / 2;
-	constexpr int PHD_CENTER_Y = SCREEN_SPACE_RES.y / 2;
+	constexpr int LINE_HEIGHT	  = 25;
+	constexpr int PHD_CENTER_X	  = SCREEN_SPACE_RES.x / 2;
+	constexpr int PHD_CENTER_Y	  = SCREEN_SPACE_RES.y / 2;
 	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
 
-	constexpr auto VOLUME_MAX  = 100;
-	constexpr auto VOLUME_STEP = VOLUME_MAX / 20;
+	constexpr auto VOLUME_MAX			 = 100;
+	constexpr auto VOLUME_STEP			 = VOLUME_MAX / 20;
+	constexpr auto MOUSE_SENSITIVITY_MAX = 35;
+	constexpr auto MOUSE_SENSITIVITY_MIN = 1;
+	constexpr auto MOUSE_SMOOTHING_MAX	 = 5;
+	constexpr auto MOUSE_SMOOTHING_MIN	 = 0;
 
 	GuiController g_Gui;
 
@@ -875,12 +879,14 @@ namespace TEN::Gui
 			TargetHighlighter,
 			ToggleRumble,
 			ThumbstickCameraControl,
+			MouseSensitivity,
+			MouseSmoothing,
 
 			Apply,
 			Cancel
 		};
 
-		static const int numOtherSettingsOptions = 9;
+		static const auto numOtherSettingsOptions = 11;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -962,6 +968,30 @@ namespace TEN::Gui
 				}
 
 				break;
+
+			case OtherSettingsOption::MouseSensitivity:
+				if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MIN)
+				{
+					CurrentSettings.Configuration.MouseSensitivity -= 1;
+					if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MIN)
+						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MIN;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
+
+			case OtherSettingsOption::MouseSmoothing:
+				if (CurrentSettings.Configuration.MouseSmoothing > MOUSE_SMOOTHING_MIN)
+				{
+					CurrentSettings.Configuration.MouseSmoothing -= 1;
+					if (CurrentSettings.Configuration.MouseSmoothing < MOUSE_SMOOTHING_MIN)
+						CurrentSettings.Configuration.MouseSmoothing = MOUSE_SMOOTHING_MIN;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
 			}
 
 			if (isVolumeAdjusted)
@@ -998,6 +1028,30 @@ namespace TEN::Gui
 
 					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
 					isVolumeAdjusted = true;
+				}
+
+				break;
+
+			case OtherSettingsOption::MouseSensitivity:
+				if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MAX)
+				{
+					CurrentSettings.Configuration.MouseSensitivity += 1;
+					if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MAX)
+						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
+
+			case OtherSettingsOption::MouseSmoothing:
+				if (CurrentSettings.Configuration.MouseSmoothing < MOUSE_SMOOTHING_MAX)
+				{
+					CurrentSettings.Configuration.MouseSmoothing += 1;
+					if (CurrentSettings.Configuration.MouseSmoothing > MOUSE_SMOOTHING_MAX)
+						CurrentSettings.Configuration.MouseSmoothing = MOUSE_SMOOTHING_MAX;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				}
 
 				break;

@@ -119,7 +119,7 @@ namespace TEN::Scripting::DisplaySprite
 		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
-	/*** Create a DisplaySprite.
+	/*** Create a DisplaySprite object.
 	@function DisplaySprite
 	@tparam Objects.ObjID ID of the sprite sequence object.
 	@tparam int int spriteID ID of the sprite in the sequence.

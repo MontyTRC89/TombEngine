@@ -3,11 +3,11 @@
 
 /***
 Constants for the type of the audio tracks.
-@enum Misc.SoundTrackType
+@enum Sound.SoundTrackType
 @pragma nostrip
 */
 
-/*** Misc.SoundTrackType constants.
+/*** Sound.SoundTrackType constants.
 
 The following constants are inside SoundTrackType.
 
@@ -15,7 +15,7 @@ The following constants are inside SoundTrackType.
 	LOOPED
 	VOICE
 
-@section Misc.SoundTrackType
+@section Sound.SoundTrackType
 */
 
 /*** Table of sound track type constants (for use with sound track functions).
