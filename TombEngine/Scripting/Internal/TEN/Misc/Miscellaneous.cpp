@@ -40,6 +40,19 @@ using namespace TEN::Renderer;
 
 namespace Misc 
 {
+	/// Get the display position of the cursor in percent.
+	// @function GetCursorDisplayPosition()
+	// @treturn Vec2 Display position in percent.
+	static Vec2 GetCursorDisplayPosition()
+	{
+		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
+		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
+
+		auto cursorPos = TEN::Input::GetCursorDisplayPosition();
+		cursorPos = Vector2(cursorPos.x / SCREEN_SPACE_RES.x, cursorPos.y / SCREEN_SPACE_RES.y) * 100;
+		return Vec2(cursorPos);
+	}
+
 	/*** Determine if there is a clear line of sight between two positions.
 	NOTE: Limited to room geometry. Objects are ignored.
 
@@ -475,6 +488,7 @@ namespace Misc
 
 		tableMisc.set_function(ScriptReserved_PrintLog, &PrintLog);
 		tableMisc.set_function(ScriptReserved_GetDisplayPosition, &GetDisplayPosition);
+		tableMisc.set_function(ScriptReserved_GetCursorDisplayPosition, &GetCursorDisplayPosition);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableMisc, ScriptReserved_ActionID, ACTION_IDS);
