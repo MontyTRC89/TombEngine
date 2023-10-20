@@ -463,14 +463,14 @@ namespace TEN::Input
 			auto normAxes = Vector2(
 				(((rawAxes.x - -SCREEN_SPACE_RES.x) * 2) / (SCREEN_SPACE_RES.x - -SCREEN_SPACE_RES.x)) - 1.0f,
 				(((rawAxes.y - -SCREEN_SPACE_RES.y) * 2) / (SCREEN_SPACE_RES.y - -SCREEN_SPACE_RES.y)) - 1.0f);
-			
+
 			// Apply sensitivity and smoothing.
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
 			float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
 			normAxes = (normAxes * sensitivity) * smoothing;
 
 			// Set mouse axis values.
-			AxisMap[(int)InputAxis::Mouse] = Vector2(std::clamp(normAxes.x, -1.0f, 1.0f), std::clamp(normAxes.y, -1.0f, 1.0f));
+			AxisMap[(int)InputAxis::Mouse] = normAxes;
 		}
 		catch (OIS::Exception& ex)
 		{
