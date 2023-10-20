@@ -201,7 +201,7 @@ namespace TEN::Input
 		int numDevices = OisInputManager->getNumberOfDevices(OISJoyStick);
 		if (numDevices > 0)
 		{
-			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + ((numDevices > 1) ? "s" : "") + ".", LogLevel::Info);
+			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + ((numDevices > 1) ? "s." : "."), LogLevel::Info);
 
 			try
 			{

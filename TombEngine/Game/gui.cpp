@@ -881,6 +881,7 @@ namespace TEN::Gui
 			ThumbstickCameraControl,
 			MouseSensitivity,
 			MouseSmoothing,
+
 			Apply,
 			Cancel
 		};
