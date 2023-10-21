@@ -38,6 +38,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Control::Volumes;
