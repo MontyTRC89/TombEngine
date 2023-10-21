@@ -8,11 +8,11 @@ using namespace TEN::Input;
 
 /***
 Constants for action key IDs.
-@enum Misc.ActionID
+@enum Input.ActionID
 @pragma nostrip
 */
 
-/*** Misc.ActionID constants.
+/*** Input.ActionID constants.
 
 The following constants are inside ActionID.
 
@@ -61,14 +61,14 @@ The following constants are inside ActionID.
 	SAVE
 	LOAD
 
-@section Misc.ActionID
+@section Input.ActionID
 */
 
 /*** Table of action ID constants (for use with KeyIsHeld / KeyIsHit / etc commands).
 @table CONSTANT_STRING_HERE
 */
 
-static const std::unordered_map<std::string, ActionID> ACTION_IDS
+static const std::unordered_map<std::string, InputActionID> ACTION_IDS
 {
 	{ "FORWARD", In::Forward },
 	{ "BACK", In::Back },

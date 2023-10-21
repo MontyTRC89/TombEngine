@@ -45,7 +45,9 @@ using namespace TEN::Entities::TR4;
 
 namespace Save = TEN::Save;
 
-const std::string SAVEGAME_PATH = "Save//";
+constexpr auto SAVEGAME_MAX_SLOT  = 99;
+constexpr auto SAVEGAME_PATH	  = "Save//";
+constexpr auto SAVEGAME_FILE_MASK = "savegame.";
 
 GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
@@ -62,21 +64,20 @@ void SaveGame::LoadSavegameInfos()
 	if (!std::filesystem::is_directory(FullSaveDirectory))
 		return;
 
+	// Reset overall savegame count.
+	LastSaveGame = 0;
+
 	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		auto fileName = FullSaveDirectory + "savegame." + std::to_string(i);
-		auto savegamePtr = fopen(fileName.c_str(), "rb");
-
-		if (savegamePtr == nullptr)
+		if (!DoesSaveGameExist(i, true))
 			continue;
-
-		fclose(savegamePtr);
 
 		SavegameInfos[i].Present = true;
 		SaveGame::LoadHeader(i, &SavegameInfos[i]);
 
-		fclose(savegamePtr);
+		if (SavegameInfos[i].Count > LastSaveGame)
+			LastSaveGame = SavegameInfos[i].Count;
 	}
 }
 
@@ -163,6 +164,35 @@ Vector4 ToVector4(const Save::Vector4* vec)
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
+bool SaveGame::IsSaveGameSlotValid(int slot)
+{
+	if (slot < 0 || slot > SAVEGAME_MAX_SLOT)
+	{
+		TENLog("Attempted to access invalid savegame slot " + std::to_string(slot), LogLevel::Warning);
+		return false;
+	}
+
+	return true;
+}
+
+bool SaveGame::DoesSaveGameExist(int slot, bool silent)
+{
+	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
+	{
+		if (!silent)
+			TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
+
+		return false;
+	}
+
+	return true;
+}
+
+std::string SaveGame::GetSavegameFilename(int slot)
+{
+	return (FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot));
+}
+
 #define SaveVec(Type, Data, TableBuilder, UnionType, SaveType, ConversionFunc) \
 				auto data = std::get<(int)Type>(Data); \
 				TableBuilder vtb{ fbb }; \
@@ -178,7 +208,15 @@ void SaveGame::Init(const std::string& gameDirectory)
 
 bool SaveGame::Save(int slot)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	g_GameScript->OnSave();
+
+	// Savegame infos need to be reloaded so that last savegame counter properly increases.
+	SaveGame::LoadSavegameInfos();
+
+	auto fileName = GetSavegameFilename(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
@@ -805,9 +843,9 @@ bool SaveGame::Save(int slot)
 	{
 		Save::EventSetCallCountersBuilder serializedEventSetCallCounter{ fbb };
 
-		serializedEventSetCallCounter.add_on_enter(set.OnEnter.CallCounter);
-		serializedEventSetCallCounter.add_on_inside(set.OnInside.CallCounter);
-		serializedEventSetCallCounter.add_on_leave(set.OnLeave.CallCounter);
+		serializedEventSetCallCounter.add_on_enter(set.Events[(int)VolumeEventType::Enter].CallCounter);
+		serializedEventSetCallCounter.add_on_inside(set.Events[(int)VolumeEventType::Inside].CallCounter);
+		serializedEventSetCallCounter.add_on_leave(set.Events[(int)VolumeEventType::Leave].CallCounter);
 
 		auto serializedEventSetCallCounterOffset = serializedEventSetCallCounter.Finish();
 		serializedEventSetCallCounters.push_back(serializedEventSetCallCounterOffset);
@@ -839,8 +877,8 @@ bool SaveGame::Save(int slot)
 
 	// Action queue
 	std::vector<int> actionQueue;
-	for (int i = 0; i < ActionQueue.size(); i++)
-		actionQueue.push_back((int)ActionQueue[i]);
+	for (int i = 0; i < ActionQueueMap.size(); i++)
+		actionQueue.push_back((int)ActionQueueMap[(InputActionID)i]);
 	auto actionQueueOffset = fbb.CreateVector(actionQueue);
 
 	// Flipmaps
@@ -1207,7 +1245,7 @@ bool SaveGame::Save(int slot)
 				
 			case SavedVarType::Vec3:
 				{
-					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
+					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
 					break;
 				}
 
@@ -1351,7 +1389,13 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	if (!DoesSaveGameExist(slot))
+		return false;
+
+	auto fileName = GetSavegameFilename(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
@@ -1366,7 +1410,6 @@ bool SaveGame::Load(int slot)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
 	// Statistics
-	LastSaveGame = s->header()->count();
 	GameTimer = s->header()->timer();
 
 	Statistics.Game.AmmoHits = s->game()->ammo_hits();
@@ -1465,11 +1508,11 @@ bool SaveGame::Load(int slot)
 	// Restore current inventory item
 	g_Gui.SetLastInventoryItem(s->last_inv_item());
 
-	// Restore action queue
+	// Restore action queue map.
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
-		assertion(i < ActionQueue.size(), "Action queue size was changed");
-		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
+		assertion(i < ActionQueueMap.size(), "Action queue size was changed.");
+		ActionQueueMap[(InputActionID)i] = (ActionQueueState)s->action_queue()->Get(i);
 	}
 
 	// Restore soundtracks
@@ -1868,9 +1911,9 @@ bool SaveGame::Load(int slot)
 		{
 			auto cc_saved = s->call_counters()->Get(i);
 
-			g_Level.EventSets[i].OnEnter.CallCounter = cc_saved->on_enter();
-			g_Level.EventSets[i].OnInside.CallCounter = cc_saved->on_inside();
-			g_Level.EventSets[i].OnLeave.CallCounter = cc_saved->on_leave();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Enter].CallCounter = cc_saved->on_enter();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Inside].CallCounter = cc_saved->on_inside();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Leave].CallCounter = cc_saved->on_leave();
 		}
 	}
 
@@ -2133,7 +2176,7 @@ bool SaveGame::Load(int slot)
 				{
 					auto stored = var->u_as_vec3()->vec();
 					SavedVar var;
-					var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+					var.emplace<(int)SavedVarType::Vec3>(ToVector3(stored));
 					loadedVars.push_back(var);
 					break;
 				}
@@ -2206,7 +2249,13 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	if (!DoesSaveGameExist(slot))
+		return false;
+
+	auto fileName = GetSavegameFilename(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -2230,4 +2279,15 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 	header->Count = s->header()->count();
 
 	return true;
+}
+
+void SaveGame::Delete(int slot)
+{
+	if (!IsSaveGameSlotValid(slot))
+		return;
+
+	if (!DoesSaveGameExist(slot))
+		return;
+
+	std::filesystem::remove(GetSavegameFilename(slot));
 }

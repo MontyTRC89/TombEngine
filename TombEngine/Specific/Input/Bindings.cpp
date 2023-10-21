@@ -114,9 +114,9 @@ namespace TEN::Input
 			{ InputDeviceID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE }
 		};
 
-		for (int i = 0; i < (int)In::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			auto actionID = (ActionID)i;
+			auto actionID = (InputActionID)i;
 			Conflicts.insert({ actionID, false });
 		}
 	}
@@ -132,7 +132,7 @@ namespace TEN::Input
 		return bindingProfile;
 	}
 
-	int BindingManager::GetBoundKey(InputDeviceID deviceID, ActionID actionID)
+	int BindingManager::GetBoundKey(InputDeviceID deviceID, InputActionID actionID)
 	{
 		// Find binding profile.
 		auto bindingProfileIt = Bindings.find(deviceID);
@@ -152,7 +152,7 @@ namespace TEN::Input
 		return key;
 	}
 
-	void BindingManager::SetKeyBinding(InputDeviceID deviceID, ActionID actionID, int key)
+	void BindingManager::SetKeyBinding(InputDeviceID deviceID, InputActionID actionID, int key)
 	{
 		// Overwrite or add key binding.
 		Bindings[deviceID][actionID] = key;
@@ -183,12 +183,12 @@ namespace TEN::Input
 		}
 	}
 
-	void BindingManager::SetConflict(ActionID actionID, bool value)
+	void BindingManager::SetConflict(InputActionID actionID, bool value)
 	{
 		Conflicts.insert({ actionID, value });
 	}
 
-	bool BindingManager::TestConflict(ActionID actionID)
+	bool BindingManager::TestConflict(InputActionID actionID)
 	{
 		return Conflicts.at(actionID);
 	}

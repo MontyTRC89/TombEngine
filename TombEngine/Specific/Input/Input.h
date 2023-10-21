@@ -1,22 +1,25 @@
 #pragma once
+#include "Math/Math.h"
 #include "Specific/Input/Bindings.h"
 #include "Specific/Input/InputAction.h"
 #include "Specific/Input/Keys.h"
+
+using namespace TEN::Math;
 
 struct ItemInfo;
 
 namespace TEN::Input
 {
-	enum InputAxis
+	enum class InputAxisID
 	{
-		MoveVertical,
-		MoveHorizontal,
-		CameraVertical,
-		CameraHorizontal,
+		Move,
+		Camera,
+		Mouse,
+
 		Count
 	};
 
-	enum class QueueState
+	enum class ActionQueueState
 	{
 		None,
 		Update,
@@ -39,10 +42,10 @@ namespace TEN::Input
 		float	   FadeSpeed = 0.0f;
 	};
 
-	extern std::vector<InputAction> ActionMap;
-	extern std::vector<QueueState>	ActionQueue;
-	extern std::vector<float>		KeyMap;
-	extern std::vector<float>		AxisMap;
+	extern std::unordered_map<int, float>					   KeyMap;
+	extern std::unordered_map<InputAxisID, Vector2>			   AxisMap;
+	extern std::unordered_map<InputActionID, InputAction>	   ActionMap;
+	extern std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap;
 
 	void InitializeInput(HWND handle);
 	void DeinitializeInput();
@@ -56,17 +59,18 @@ namespace TEN::Input
     void ApplyDefaultBindings();
     bool ApplyDefaultXInputBindings();
 
-	// TODO: Later, all these global action accessor functions should be tied to a specific controller/player.
-	// Having them loose like this is very inelegant, but since this is only the first iteration, they will do for now. -- Sezz 2022.10.12
-	void  ClearAction(ActionID actionID);
+	Vector2 GetCursorDisplayPosition();
+
+	// TODO: Move global query functions to player input object (not happening soon). -- Sezz 2023.08.07
+	void  ClearAction(InputActionID actionID);
 	bool  NoAction();
-	bool  IsClicked(ActionID actionID);
-	bool  IsHeld(ActionID actionID, float delayInSec = 0.0f);
-	bool  IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec = 0.0f);
-	bool  IsReleased(ActionID actionID, float maxDelayInSec = INFINITY);
-	float GetActionValue(ActionID actionID);
-	float GetActionTimeActive(ActionID actionID);
-	float GetActionTimeInactive(ActionID actionID);
+	bool  IsClicked(InputActionID actionID);
+	bool  IsHeld(InputActionID actionID, float delayInSec = 0.0f);
+	bool  IsPulsed(InputActionID actionID, float delayInSec, float initialDelayInSec = 0.0f);
+	bool  IsReleased(InputActionID actionID, float maxDelayInSec = INFINITY);
+	float GetActionValue(InputActionID actionID);
+	float GetActionTimeActive(InputActionID actionID);
+	float GetActionTimeInactive(InputActionID actionID);
 
 	bool IsDirectionalActionHeld();
 	bool IsWakeActionHeld();

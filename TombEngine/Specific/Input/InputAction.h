@@ -2,7 +2,7 @@
 
 namespace TEN::Input
 {
-	typedef enum class ActionID
+	typedef enum class InputActionID
 	{
 		// General actions
 		Forward,
@@ -60,28 +60,29 @@ namespace TEN::Input
 	{
 	private:
 		// Members
-		ActionID ID				= In::Forward;
-		float	 Value			= 0.0f;
-		float	 PrevValue		= 0.0f;
-		float	 TimeActive		= 0.0f;
-		float	 PrevTimeActive = 0.0f;
-		float	 TimeInactive	= 0.0f;
+		InputActionID ID	 = In::Forward;
+		float Value			 = 0.0f;
+		float PrevValue		 = 0.0f;
+		float TimeActive	 = 0.0f;
+		float PrevTimeActive = 0.0f;
+		float TimeInactive	 = 0.0f;
 
 	public:
 		// Constructors
-		InputAction(ActionID actionID);
+		InputAction() = default;
+		InputAction(InputActionID actionID);
 
 		// Getters
-		ActionID GetID() const;
-		float	 GetValue() const;
-		float	 GetTimeActive() const;
-		float	 GetTimeInactive() const;
+		InputActionID GetID() const;
+		float GetValue() const;
+		float GetTimeActive() const;
+		float GetTimeInactive() const;
 		
 		// Inquirers
 		bool IsClicked() const;
 		bool IsHeld(float delayInSec = 0.0f) const;
 		bool IsPulsed(float delayInSec, float initialDelayInSec = 0.0f) const;
-		bool IsReleased(float maxDelayInSec = INFINITY) const;
+		bool IsReleased(float delayInSecMax = INFINITY) const;
 
 		// Utilities
 		void Update(bool value);

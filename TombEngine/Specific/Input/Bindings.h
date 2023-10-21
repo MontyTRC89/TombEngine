@@ -2,9 +2,9 @@
 
 namespace TEN::Input
 {
-	enum class ActionID;
+	enum class InputActionID;
 
-	using BindingProfile = std::unordered_map<ActionID, int>;
+	using BindingProfile = std::unordered_map<InputActionID, int>;
 
 	// TODO: These don't represent devices yet, it's still the legacy way.
 	enum class InputDeviceID
@@ -25,7 +25,7 @@ namespace TEN::Input
 	private:
 		// Members
 		std::unordered_map<InputDeviceID, BindingProfile> Bindings	= {};
-		std::unordered_map<ActionID, bool>				  Conflicts = {};
+		std::unordered_map<InputActionID, bool>			  Conflicts = {};
 
 	public:
 		// Constants
@@ -36,17 +36,17 @@ namespace TEN::Input
 		BindingManager();
 
 		// Getters
-		int					  GetBoundKey(InputDeviceID deviceID, ActionID actionID);
+		int					  GetBoundKey(InputDeviceID deviceID, InputActionID actionID);
 		const BindingProfile& GetBindingProfile(InputDeviceID deviceID);
 
 		// Setters
-		void SetKeyBinding(InputDeviceID deviceID, ActionID actionID, int key);
+		void SetKeyBinding(InputDeviceID deviceID, InputActionID actionID, int key);
 		void SetBindingProfile(InputDeviceID deviceID, const BindingProfile& profile);
 		void SetDefaultBindingProfile(InputDeviceID deviceID);
-		void SetConflict(ActionID actionID, bool value);
+		void SetConflict(InputActionID actionID, bool value);
 
 		// Inquirers
-		bool TestConflict(ActionID actionID);
+		bool TestConflict(InputActionID actionID);
 	};
 
 	extern BindingManager g_Bindings;

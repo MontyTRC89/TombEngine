@@ -174,7 +174,6 @@ namespace TEN::Input
 		if (it != KEY_NAME_MAP.end())
 			return it->second;
 
-		// Return empty string.
 		return {};
 	}
 }

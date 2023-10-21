@@ -8,12 +8,12 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
-	InputAction::InputAction(ActionID actionID)
+	InputAction::InputAction(InputActionID actionID)
 	{
 		ID = actionID;
 	}
 
-	ActionID InputAction::GetID() const
+	InputActionID InputAction::GetID() const
 	{
 		return ID;
 	}
@@ -69,10 +69,10 @@ namespace TEN::Input
 		return false;
 	}
 
-	bool InputAction::IsReleased(float maxDelayInSec) const
+	bool InputAction::IsReleased(float delayInSecMax) const
 	{
-		float maxDelayInFrameTime = (maxDelayInSec == INFINITY) ? INFINITY : round(maxDelayInSec / DELTA_TIME);
-		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= maxDelayInFrameTime));
+		float delayInFrameTimeMax = (delayInSecMax == INFINITY) ? INFINITY : round(delayInSecMax / DELTA_TIME);
+		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= delayInFrameTimeMax));
 	}
 
 	void InputAction::Update(bool value)

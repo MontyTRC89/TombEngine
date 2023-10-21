@@ -421,6 +421,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetStamina, &LaraObject::GetStamina,
 			ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
 			ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
+			ScriptReserved_SetControlLock, &LaraObject::SetControlLock,
+			ScriptReserved_GetControlLock, &LaraObject::GetControlLock,
 			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
 			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,

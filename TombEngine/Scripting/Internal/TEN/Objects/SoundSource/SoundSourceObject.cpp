@@ -61,7 +61,7 @@ void SoundSource::Register(sol::table& parent)
 
 Vec3 SoundSource::GetPos() const
 {
-	return Vec3{ m_soundSource.Position };
+	return Vec3(m_soundSource.Position);
 }
 
 void SoundSource::SetPos(Vec3 const& pos)

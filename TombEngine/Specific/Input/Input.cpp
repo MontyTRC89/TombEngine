@@ -6,9 +6,13 @@
 #include <OISInputManager.h>
 #include <OISJoyStick.h>
 #include <OISKeyboard.h>
+#include <OISMouse.h>
 
+#include "Game/camera.h"
+#include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/savegame.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -16,27 +20,33 @@
 #include "Specific/winmain.h"
 
 using namespace OIS;
+using namespace TEN::Gui;
+using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 // Big TODO: Entire input system shouldn't be left exposed like this.
 
 namespace TEN::Input
 {
-	constexpr int AXIS_DEADZONE = 8000;
+	constexpr auto AXIS_SCALE			 = 1.5f;
+	constexpr auto AXIS_DEADZONE		 = 8000;
+	constexpr auto AXIS_OFFSET			 = 0.2f;
+	constexpr auto MOUSE_AXIS_CONSTRAINT = 100.0f;
 
 	// OIS interfaces
 	InputManager*  OisInputManager = nullptr;
 	Keyboard*	   OisKeyboard	   = nullptr;
+	Mouse*		   OisMouse		   = nullptr;
 	JoyStick*	   OisGamepad	   = nullptr;
 	ForceFeedback* OisRumble	   = nullptr;
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
-	RumbleData				 RumbleInfo  = {};
-	std::vector<InputAction> ActionMap	 = {};
-	std::vector<QueueState>	 ActionQueue = {};
-	std::vector<float>		 KeyMap		 = {};
-	std::vector<float>		 AxisMap	 = {};
+	RumbleData RumbleInfo = {};
+	std::unordered_map<int, float>						KeyMap;
+	std::unordered_map<InputAxisID, Vector2>			AxisMap;
+	std::unordered_map<InputActionID, InputAction>		ActionMap;
+	std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap;
 
 	void InitializeEffect()
 	{
@@ -60,37 +70,58 @@ namespace TEN::Input
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
-		for (int i = 0; i < (int)ActionID::Count; i++)
+		RumbleInfo = {};
+
+		// Initialize key map.
+		for (int i = 0; i < KEY_SLOT_COUNT; i++)
+			KeyMap[i] = 0.0f;
+
+		// Initialize input axis map.
+		for (int i = 0; i < (int)InputAxisID::Count; i++)
 		{
-			ActionMap.push_back(InputAction((ActionID)i));
-			ActionQueue.push_back(QueueState::None);
+			auto inputAxis = (InputAxisID)i;
+			AxisMap[inputAxis] = Vector2::Zero;
 		}
 
-		KeyMap.resize(KEY_SLOT_COUNT);
-		AxisMap.resize(InputAxis::Count);
-
-		RumbleInfo = {};
+		// Initialize input action and input action queue maps.
+		for (int i = 0; i < (int)InputActionID::Count; i++)
+		{
+			auto actionID = (InputActionID)i;
+			ActionMap[actionID] = InputAction(actionID);
+			ActionQueueMap[actionID] = ActionQueueState::None;
+		}
 
 		try
 		{
-			// Use an OIS ParamList since the default behaviour blocks the WIN key.
-			ParamList pl;
-			std::ostringstream wnd;
+			// Use OIS ParamList since default behaviour blocks WIN key and steals mouse.
+			auto paramList = ParamList{};
+			auto wnd = std::ostringstream{};
 			wnd << (size_t)handle;
-			pl.insert(std::make_pair(std::string("WINDOW"), wnd.str()));
-			pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
-			pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
+			paramList.insert(std::make_pair(std::string("WINDOW"), wnd.str()));
+			paramList.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
+			paramList.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
+			paramList.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
+			paramList.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
 
-			OisInputManager = InputManager::createInputSystem(pl);
+			OisInputManager = InputManager::createInputSystem(paramList);
 			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
 			{
-				TENLog("Keyboard not found!", LogLevel::Warning);
+				TENLog("Keyboard not found.", LogLevel::Warning);
 			}
 			else
 			{
 				OisKeyboard = (Keyboard*)OisInputManager->createInputObject(OISKeyboard, true);
+			}
+
+			if (OisInputManager->getNumberOfDevices(OISMouse) == 0)
+			{
+				TENLog("Mouse not found.", LogLevel::Warning);
+			}
+			else
+			{
+				OisMouse = (Mouse*)OisInputManager->createInputObject(OISMouse, true);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -98,10 +129,10 @@ namespace TEN::Input
 			TENLog("An exception occured during input system init: " + std::string(ex.eText), LogLevel::Error);
 		}
 
-		int numDevices = OisInputManager->getNumberOfDevices(OISJoyStick);
-		if (numDevices > 0)
+		int deviceCount = OisInputManager->getNumberOfDevices(OISJoyStick);
+		if (deviceCount > 0)
 		{
-			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + (numDevices > 1 ? "s." : "."), LogLevel::Info);
+			TENLog("Found " + std::to_string(deviceCount) + " connected game controller" + ((deviceCount > 1) ? "s." : "."), LogLevel::Info);
 
 			try
 			{
@@ -110,7 +141,7 @@ namespace TEN::Input
 
 				// Try to initialize vibration interface.
 				OisRumble = (ForceFeedback*)OisGamepad->queryInterface(Interface::ForceFeedback);
-				if (OisRumble)
+				if (OisRumble != nullptr)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
 					InitializeEffect();
@@ -133,13 +164,16 @@ namespace TEN::Input
 
 	void DeinitializeInput()
 	{
-		if (OisKeyboard)
+		if (OisKeyboard != nullptr)
 			OisInputManager->destroyInputObject(OisKeyboard);
 
-		if (OisGamepad)
+		if (OisMouse != nullptr)
+			OisInputManager->destroyInputObject(OisMouse);
+
+		if (OisGamepad != nullptr)
 			OisInputManager->destroyInputObject(OisGamepad);
 
-		if (OisEffect)
+		if (OisEffect != nullptr)
 		{
 			delete OisEffect;
 			OisEffect = nullptr;
@@ -150,29 +184,30 @@ namespace TEN::Input
 
 	void ClearInputData()
 	{
-		for (auto& key : KeyMap)
-			key = 0.0f;
+		for (auto& [key, value] : KeyMap)
+			value = 0.0f;
 
-		for (auto& axis : AxisMap)
-			axis = 0.0f;
+		for (auto& [axisID, axis] : AxisMap)
+			axis = Vector2::Zero;
 	}
 
 	void ApplyActionQueue()
 	{
-		for (int i = 0; i < (int)In::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			switch (ActionQueue[i])
+			auto actionID = (InputActionID)i;
+			switch (ActionQueueMap[actionID])
 			{
 			default:
-			case QueueState::None:
+			case ActionQueueState::None:
 				break;
 
-			case QueueState::Update:
-				ActionMap[i].Update(true);
+			case ActionQueueState::Update:
+				ActionMap[actionID].Update(true);
 				break;
 
-			case QueueState::Clear:
-				ActionMap[i].Clear();
+			case ActionQueueState::Clear:
+				ActionMap[actionID].Clear();
 				break;
 			}
 		}
@@ -180,8 +215,8 @@ namespace TEN::Input
 
 	void ClearActionQueue()
 	{
-		for (auto& queue : ActionQueue)
-			queue = QueueState::None;
+		for (auto& [actionID, queue] : ActionQueueMap)
+			queue = ActionQueueState::None;
 	}
 
 	static bool TestBoundKey(int key)
@@ -189,9 +224,9 @@ namespace TEN::Input
 		for (int i = 1; i >= 0; i--)
 		{
 			auto deviceID = (InputDeviceID)i;
-			for (int j = 0; j < (int)In::Count; j++)
+			for (int j = 0; j < (int)InputActionID::Count; j++)
 			{
-				auto actionID = (ActionID)j;
+				auto actionID = (InputActionID)j;
 				if (g_Bindings.GetBoundKey(deviceID, actionID) != KC_UNASSIGNED)
 					return true;
 			}
@@ -200,10 +235,9 @@ namespace TEN::Input
 		return false;
 	}
 
+	// Merge right and left Ctrl, Shift, and Alt keys.
 	int WrapSimilarKeys(int source)
 	{
-		// Merge right/left Ctrl, Shift, Alt.
-
 		switch (source)
 		{
 		case KC_LCONTROL:
@@ -221,16 +255,16 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < (int)In::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			auto actionID = (ActionID)i;
+			auto actionID = (InputActionID)i;
 
 			g_Bindings.SetConflict(actionID, false);
 
-			int key = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)i);
-			for (int j = 0; j < (int)In::Count; j++)
+			int key = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)i);
+			for (int j = 0; j < (int)InputActionID::Count; j++)
 			{
-				if (key != g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)j))
+				if (key != g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)j))
 					continue;
 
 				g_Bindings.SetConflict(actionID, true);
@@ -246,42 +280,158 @@ namespace TEN::Input
 			auto deviceID = (InputDeviceID)i;
 			if (g_Bindings.GetBoundKey(deviceID, In::Forward) == keyID)
 			{
-				AxisMap[(int)InputAxis::MoveVertical] = 1.0f;
+				AxisMap[InputAxisID::Move].y = 1.0f;
 			}
 			else if (g_Bindings.GetBoundKey(deviceID, In::Back) == keyID)
 			{
-				AxisMap[(int)InputAxis::MoveVertical] = -1.0f;
+				AxisMap[InputAxisID::Move].y = -1.0f;
 			}
 			else if (g_Bindings.GetBoundKey(deviceID, In::Left) == keyID)
 			{
-				AxisMap[(int)InputAxis::MoveHorizontal] = -1.0f;
+				AxisMap[InputAxisID::Move].x = -1.0f;
 			}
 			else if (g_Bindings.GetBoundKey(deviceID, In::Right) == keyID)
 			{
-				AxisMap[(int)InputAxis::MoveHorizontal] = 1.0f;
+				AxisMap[InputAxisID::Move].x = 1.0f;
 			}
 		}
 	}
 
-	void ReadGameController()
+	static void ReadKeyboard()
 	{
-		if (!OisGamepad)
+		if (OisKeyboard == nullptr)
 			return;
 
 		try
 		{
-			// Poll gamepad.
-			OisGamepad->capture();
-			const JoyStickState& state = OisGamepad->getJoyStickState();
+			OisKeyboard->capture();
 
-			// Scan buttons.
+			// Poll keyboard keys.
+			for (int i = 0; i < KEYBOARD_KEY_COUNT; i++)
+			{
+				if (!OisKeyboard->isKeyDown((KeyCode)i))
+					continue;
+
+				int key = WrapSimilarKeys(i);
+				KeyMap[key] = 1.0f;
+
+				// Interpret discrete directional keypresses as analog axis values.
+				SetDiscreteAxisValues(key);
+			}
+		}
+		catch (OIS::Exception& ex)
+		{
+			TENLog("Unable to poll keyboard input: " + std::string(ex.eText), LogLevel::Warning);
+		}
+	}
+
+	static void ReadMouse()
+	{
+		if (OisMouse == nullptr)
+			return;
+
+		try
+		{
+			OisMouse->capture();
+			auto& state = OisMouse->getMouseState();
+
+			// Update active area resolution.
+			auto screenRes = g_Renderer.GetScreenResolution();
+			state.width = screenRes.x;
+			state.height = screenRes.y;
+
+			// Poll buttons.
+			for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
+				KeyMap[MOUSE_BUTTON_COUNT + i] = state.buttonDown((MouseButtonID)i) ? 1.0f : 0.0f;
+
+			// Register multiple directional keypresses mapped to mouse axes.
+			int baseIndex = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT;
+			for (int pass = 0; pass < MOUSE_AXIS_COUNT; pass++)
+			{
+				switch (pass)
+				{
+				// Mouse X-
+				case 0:
+					if (state.X.rel >= 0)
+						continue;
+					break;
+
+				// Mouse X+
+				case 1:
+					if (state.X.rel <= 0)
+						continue;
+					break;
+
+				// Mouse Y-
+				case 2:
+					if (state.Y.rel >= 0)
+						continue;
+					break;
+
+				// Mouse Y+
+				case 3:
+					if (state.Y.rel <= 0)
+						continue;
+					break;
+
+				// Mouse Z-
+				case 4:
+					if (state.Z.rel >= 0)
+						continue;
+					break;
+
+				// Mouse Z+
+				case 5:
+					if (state.Z.rel <= 0)
+						continue;
+					break;
+				}
+
+				KeyMap[baseIndex + pass] = 1.0f;
+
+				// Interpret discrete directional keypresses as mouse axis values.
+				SetDiscreteAxisValues(baseIndex + pass);
+			}
+
+			// TODO: Will need to take screen aspect ratio into account once mouse axes start being used. -- Sezz 2023.10.20
+			// Normalize raw mouse axis values to range [-1.0f, 1.0f].
+			auto rawAxes = Vector2(state.X.rel, state.Y.rel);
+			auto normAxes = Vector2(
+				(((rawAxes.x - -SCREEN_SPACE_RES.x) * 2) / (SCREEN_SPACE_RES.x - -SCREEN_SPACE_RES.x)) - 1.0f,
+				(((rawAxes.y - -SCREEN_SPACE_RES.y) * 2) / (SCREEN_SPACE_RES.y - -SCREEN_SPACE_RES.y)) - 1.0f);
+
+			// Apply sensitivity and smoothing.
+			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
+			float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
+			normAxes *= sensitivity * smoothing;
+
+			// Set mouse axis values.
+			AxisMap[InputAxisID::Mouse] = normAxes;
+		}
+		catch (OIS::Exception& ex)
+		{
+			TENLog("Unable to poll mouse input: " + std::string(ex.eText), LogLevel::Warning);
+		}
+	}
+	
+	static void ReadGameController()
+	{
+		if (OisGamepad == nullptr)
+			return;
+
+		try
+		{
+			OisGamepad->capture();
+			const auto& state = OisGamepad->getJoyStickState();
+
+			// Poll buttons.
 			for (int key = 0; key < state.mButtons.size(); key++)
 				KeyMap[KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + key] = state.mButtons[key] ? 1.0f : 0.0f;
 
-			// Scan axes.
+			// Poll axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
 			{
-				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers).
+				// NOTE: Anything above 6 existing XBOX/PS controller axes not supported (2 sticks plus 2 triggers).
 				if (axis >= GAMEPAD_AXIS_COUNT)
 					break;
 
@@ -293,9 +443,9 @@ namespace TEN::Input
 				float normalizedValue = float(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE)) /
 					float(SHRT_MAX - AXIS_DEADZONE);
 
-				// Calculate scaled analog value (for movement).
-				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
-				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
+				// Calculate scaled analog value for movement.
+				// NOTE: [0.2f, 1.7f] range gives most organic rates.
+				float scaledValue = (abs(normalizedValue) * AXIS_SCALE) + AXIS_OFFSET;
 
 				// Calculate and reset discrete input slots.
 				int negKey = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (axis * 2);
@@ -303,7 +453,7 @@ namespace TEN::Input
 				KeyMap[negKey] = (normalizedValue > 0) ? abs(normalizedValue) : 0.0f;
 				KeyMap[posKey] = (normalizedValue < 0) ? abs(normalizedValue) : 0.0f;
 
-				// Decide on the discrete input registering based on analog value.
+				// Determine discrete input registering based on analog value.
 				int usedKey = (normalizedValue > 0) ? negKey : posKey;
 
 				// Register analog input in certain direction.
@@ -313,61 +463,71 @@ namespace TEN::Input
 
 				if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Forward) == usedKey)
 				{
-					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
+					AxisMap[InputAxisID::Move].y = abs(scaledValue);
 				}
 				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Back) == usedKey)
 				{
-					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
+					AxisMap[InputAxisID::Move].y = -abs(scaledValue);
 				}
 				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Left)  == usedKey)
 				{
-					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
+					AxisMap[InputAxisID::Move].x = -abs(scaledValue);
 				}
 				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Right) == usedKey)
 				{
-					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
+					AxisMap[InputAxisID::Move].x = abs(scaledValue);
 				}
 				else if (!TestBoundKey(usedKey))
 				{
-					unsigned int camAxisIndex = (int)std::clamp((int)InputAxis::CameraVertical + axis % 2,
-						(int)InputAxis::CameraVertical,
-						(int)InputAxis::CameraHorizontal);
-					AxisMap[camAxisIndex] = normalizedValue;
+					if ((axis % 2) == 0)
+					{
+						AxisMap[InputAxisID::Camera].y = normalizedValue;
+					}
+					else
+					{
+						AxisMap[InputAxisID::Camera].x = normalizedValue;
+					}
 				}
 			}
 
-			// Scan POVs (controllers usually have one, but scan all out of paranoia).
-			for (int pov = 0; pov < 4; pov++)
+			// Poll POVs.
+			// NOTE: Controllers usually have one, but scan all just in case.
+			for (int pov = 0; pov < GAMEPAD_POV_AXIS_COUNT; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 
-				// Do 4 passes; every pass checks every POV direction. For every direction,
-				// separate keypress is registered.
-				// This is needed to allow multiple directions  pressed at the same time.
-				for (int pass = 0; pass < 4; pass++)
+				;
+
+				// Register multiple directional keypresses mapped to analog axes.
+				int baseIndex = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2);
+				for (int pass = 0; pass < GAMEPAD_POV_AXIS_COUNT; pass++)
 				{
 					unsigned int index = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2);
 
 					switch (pass)
 					{
+					// D-Pad Up
 					case 0:
-						if (!(state.mPOV[pov].direction & Pov::North))
+						if ((state.mPOV[pov].direction & Pov::North) == 0)
 							continue;
 						break;
 
+					// D-Pad Down
 					case 1:
-						if (!(state.mPOV[pov].direction & Pov::South))
+						if ((state.mPOV[pov].direction & Pov::South) == 0)
 							continue;
 						break;
 
+					// D-Pad Left
 					case 2:
-						if (!(state.mPOV[pov].direction & Pov::West))
+						if ((state.mPOV[pov].direction & Pov::West) == 0)
 							continue;
 						break;
 
+					// D-Pad Right
 					case 3:
-						if (!(state.mPOV[pov].direction & Pov::East))
+						if ((state.mPOV[pov].direction & Pov::East) == 0)
 							continue;
 						break;
 					}
@@ -384,36 +544,7 @@ namespace TEN::Input
 		}
 	}
 
-	void ReadKeyboard()
-	{
-		if (!OisKeyboard)
-			return;
-
-		try
-		{
-			OisKeyboard->capture();
-
-			for (int i = 0; i < KEYBOARD_KEY_COUNT; i++)
-			{
-				if (!OisKeyboard->isKeyDown((KeyCode)i))
-				{
-					continue;
-				}
-
-				int key = WrapSimilarKeys(i);
-				KeyMap[key] = 1.0f;
-
-				// Register directional discrete keypresses as max analog axis values.
-				SetDiscreteAxisValues(key);
-			}
-		}
-		catch (OIS::Exception& ex)
-		{
-			TENLog("Unable to poll keyboard input: " + std::string(ex.eText), LogLevel::Warning);
-		}
-	}
-
-	static float Key(ActionID actionID)
+	static float Key(InputActionID actionID)
 	{
 		for (int i = (int)InputDeviceID::Count - 1; i >= 0; i--)
 		{
@@ -521,11 +652,12 @@ namespace TEN::Input
 		ClearInputData();
 		UpdateRumble();
 		ReadKeyboard();
+		ReadMouse();
 		ReadGameController();
 		DefaultConflict();
 
 		// Update action map.
-		for (auto& action : ActionMap)
+		for (auto& [actionID, action] : ActionMap)
 			action.Update(Key(action.GetID()));
 
 		if (applyQueue)
@@ -538,11 +670,11 @@ namespace TEN::Input
 
 	void ClearAllActions()
 	{
-		for (auto& action : ActionMap)
+		for (auto& [actionID, action] : ActionMap)
 			action.Clear();
 
-		for (auto& queue : ActionQueue)
-			queue = QueueState::None;
+		for (auto& [actionID, queue] : ActionQueueMap)
+			queue = ActionQueueState::None;
 	}
 
 	void Rumble(float power, float delayInSec, RumbleMode mode)
@@ -555,7 +687,7 @@ namespace TEN::Input
 		if (power == 0.0f || RumbleInfo.Power)
 			return;
 
-		RumbleInfo.FadeSpeed = power / (delayInSec * (float)FPS);
+		RumbleInfo.FadeSpeed = power / (delayInSec * FPS);
 		RumbleInfo.Power = power + RumbleInfo.FadeSpeed;
 		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
@@ -565,8 +697,14 @@ namespace TEN::Input
 		if (!OisRumble || !OisEffect)
 			return;
 
-		try { OisRumble->remove(OisEffect); }
-		catch (OIS::Exception& ex) { TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error); }
+		try
+		{
+			OisRumble->remove(OisEffect);
+		}
+		catch (OIS::Exception& ex)
+		{
+			TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error);
+		}
 
 		RumbleInfo = {};
 	}
@@ -587,9 +725,9 @@ namespace TEN::Input
 		if (!OisGamepad)
 			return false;
 
-		for (int i = 0; i < (int)In::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			auto actionID = (ActionID)i;
+			auto actionID = (InputActionID)i;
 
 			int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
 			int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, actionID);
@@ -619,14 +757,23 @@ namespace TEN::Input
 		}
 	}
 
-	void ClearAction(ActionID actionID)
+	Vector2 GetCursorDisplayPosition()
 	{
-		ActionMap[(int)actionID].Clear();
+		const auto& state = OisMouse->getMouseState();
+
+		auto areaRes = Vector2(state.width, state.height);
+		auto areaPos = Vector2(state.X.abs, state.Y.abs);
+		return (SCREEN_SPACE_RES * (areaPos / areaRes));
+	}
+
+	void ClearAction(InputActionID actionID)
+	{
+		ActionMap[actionID].Clear();
 	}
 
 	bool NoAction()
 	{
-		for (const auto& action : ActionMap)
+		for (const auto& [actionID, action] : ActionMap)
 		{
 			if (action.IsHeld())
 				return false;
@@ -635,39 +782,39 @@ namespace TEN::Input
 		return true;
 	}
 
-	bool IsClicked(ActionID actionID)
+	bool IsClicked(InputActionID actionID)
 	{
-		return ActionMap[(int)actionID].IsClicked();
+		return ActionMap[actionID].IsClicked();
 	}
 
-	bool IsHeld(ActionID actionID, float delayInSec)
+	bool IsHeld(InputActionID actionID, float delayInSec)
 	{
-		return ActionMap[(int)actionID].IsHeld(delayInSec);
+		return ActionMap[actionID].IsHeld(delayInSec);
 	}
 
-	bool IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec)
+	bool IsPulsed(InputActionID actionID, float delayInSec, float initialDelayInSec)
 	{
-		return ActionMap[(int)actionID].IsPulsed(delayInSec, initialDelayInSec);
+		return ActionMap[actionID].IsPulsed(delayInSec, initialDelayInSec);
 	}
 
-	bool IsReleased(ActionID actionID, float maxDelayInSec)
+	bool IsReleased(InputActionID actionID, float maxDelayInSec)
 	{
-		return ActionMap[(int)actionID].IsReleased(maxDelayInSec);
+		return ActionMap[actionID].IsReleased(maxDelayInSec);
 	}
 
-	float GetActionValue(ActionID actionID)
+	float GetActionValue(InputActionID actionID)
 	{
-		return ActionMap[(int)actionID].GetValue();
+		return ActionMap[actionID].GetValue();
 	}
 
-	float GetActionTimeActive(ActionID actionID)
+	float GetActionTimeActive(InputActionID actionID)
 	{
-		return ActionMap[(int)actionID].GetTimeActive();
+		return ActionMap[actionID].GetTimeActive();
 	}
 
-	float GetActionTimeInactive(ActionID actionID)
+	float GetActionTimeInactive(InputActionID actionID)
 	{
-		return ActionMap[(int)actionID].GetTimeInactive();
+		return ActionMap[actionID].GetTimeInactive();
 	}
 
 	bool IsDirectionalActionHeld()

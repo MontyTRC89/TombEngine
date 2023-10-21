@@ -228,26 +228,41 @@ namespace TEN::Renderer
 			GetNextLinePosition(&y);
 
 			// Auto targeting
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGET), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOMATIC_TARGETING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextLinePosition(&y);
 
+			// Target highlighter
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
+			GetNextLinePosition(&y);
+			
 			// Vibration
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			GetNextLinePosition(&y);
 
 			// Thumbstick camera
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
+			GetNextLinePosition(&y);
+
+			// Mouse sensitivity
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
+			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
+			GetNextLinePosition(&y);
+
+			// Mouse smoothing
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SMOOTHING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 9));
+			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSmoothing).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
 			GetNextBlockPosition(&y);
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 10));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
 			break;
 
 		case Menu::GeneralActions:
@@ -274,8 +289,8 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)k);
-						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)k);
+						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)k);
+						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)k);
 
 						int key = userKey ? userKey : defaultKey;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
@@ -327,8 +342,8 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)(baseIndex + k));
+						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
 						int key = userKey ? userKey : defaultKey;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
@@ -386,8 +401,8 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)(baseIndex + k));
+						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
 						int key = userKey ? userKey : defaultKey;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
@@ -438,8 +453,8 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (ActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (ActionID)(baseIndex + k));
+						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
 						int key = userKey ? userKey : defaultKey;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
@@ -469,30 +484,33 @@ namespace TEN::Renderer
 	void Renderer11::RenderTitleMenu(Menu menu)
 	{
 		int y = MenuVerticalBottomCenter;
-		auto titleOption = g_Gui.GetSelectedOption();
-
-		// HACK: Check if it works properly -- Lwmte, 07.06.22
-		if (menu == Menu::LoadGame && !g_GameFlow->EnableLoadSave)
-			menu = Menu::Title;
+		int titleOption = g_Gui.GetSelectedOption();
+		int selectedOption = 0;
 
 		switch (menu)
 		{
 		case Menu::Title:
 
 			// New game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_NEW_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			GetNextLinePosition(&y);
+			selectedOption++;
 
 			// Load game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 1));
-			GetNextLinePosition(&y);
+			if (g_GameFlow->IsLoadSaveEnabled())
+			{
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_LOAD_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
+				GetNextLinePosition(&y);
+				selectedOption++;
+			}
 
 			// Options
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 2));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			GetNextLinePosition(&y);
+			selectedOption++;
 
 			// Exit game
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 3));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_EXIT_GAME), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 			break;
 
 		case Menu::LoadGame:
@@ -509,10 +527,10 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Level listing (starts with 1 because 0 is always title)
-			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++)
+			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
 			{
 				AddString(MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey.c_str()),
-					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == i - 1));
+					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 				GetNextNarrowLinePosition(&y);
 			}
 			break;
@@ -572,13 +590,13 @@ namespace TEN::Renderer
 			break;
 		}
 
-		DrawLines2D();
+		DrawLinesIn2DSpace();
 		DrawAllStrings();
 	}
 
 	void Renderer11::RenderLoadSaveMenu()
 	{
-		if (!g_GameFlow->EnableLoadSave)
+		if (!g_GameFlow->IsLoadSaveEnabled())
 		{
 			g_Gui.SetInventoryMode(InventoryMode::InGame);
 			return;
@@ -588,7 +606,6 @@ namespace TEN::Renderer
 		int y = MenuVerticalLineSpacing;
 		short selection = g_Gui.GetLoadSaveSelection();
 		char stringBuffer[255];
-		SaveGame::LoadSavegameInfos();
 
 		// Title
 		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
@@ -701,7 +718,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
-		static const auto COUNT_STRING_PREFIX = std::string("  ");
+		constexpr auto COUNT_STRING_INF	   = "Inf";
+		constexpr auto COUNT_STRING_OFFSET = Vector2(SCREEN_SPACE_RES.x / 40, 0.0f);
 
 		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
@@ -709,14 +727,15 @@ namespace TEN::Renderer
 		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Draw display pickup.
-		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position2D, pickup.Orientation, pickup.Scale);
+		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
 
 		// Draw count string.
-		if (pickup.Count > 1)
+		if (pickup.Count != 1)
 		{
-			AddString(
-				COUNT_STRING_PREFIX + std::to_string(pickup.Count),
-				pickup.Position2D, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
+			auto countString = (pickup.Count != -1) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
+			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;
+
+			AddString(countString, countStringPos, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}
 	}
 
@@ -1161,15 +1180,36 @@ namespace TEN::Renderer
 				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
 				PrintDebugMessage("CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				PrintDebugMessage("CanMonkeySwing: %d", Lara.Control.CanMonkeySwing);
+				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				break;
 
-			case RendererDebugPage::LogicStats:
-				PrintDebugMessage("LOGIC STATS");
-				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
-				PrintDebugMessage("Move axis vertical: %f", AxisMap[InputAxis::MoveVertical]);
-				PrintDebugMessage("Move axis horizontal: %f", AxisMap[InputAxis::MoveHorizontal]);
-				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
-				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
+			case RendererDebugPage::InputStats:
+			{
+				auto clickedActions = BitField((int)InputActionID::Count);
+				auto heldActions = BitField((int)InputActionID::Count);
+				auto releasedActions = BitField((int)InputActionID::Count);
+
+				for (const auto& [actionID, action] : ActionMap)
+				{
+					if (action.IsClicked())
+						clickedActions.Set((int)action.GetID());
+
+					if (action.IsHeld())
+						heldActions.Set((int)action.GetID());
+
+					if (action.IsReleased())
+						releasedActions.Set((int)action.GetID());
+				}
+				
+				PrintDebugMessage("INPUT STATS");
+				PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
+				PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
+				PrintDebugMessage(("Released actions: " + releasedActions.ToString()).c_str());
+				PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[InputAxisID::Move].x, AxisMap[InputAxisID::Move].y);
+				PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[InputAxisID::Camera].x, AxisMap[InputAxisID::Camera].y);
+				PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[InputAxisID::Mouse].x, AxisMap[InputAxisID::Mouse].y);
+				PrintDebugMessage("Cursor pos: %.3f, %.3f", GetCursorDisplayPosition().x, GetCursorDisplayPosition().y);
+			}
 				break;
 
 			case RendererDebugPage::CollisionStats:
