@@ -4,7 +4,7 @@ namespace TEN::Input
 {
 	constexpr auto KEYBOARD_KEY_COUNT	  = 256;
 	constexpr auto MOUSE_BUTTON_COUNT	  = 8;
-	constexpr auto MOUSE_AXIS_COUNT		  = 4;
+	constexpr auto MOUSE_AXIS_COUNT		  = 3;
 	constexpr auto GAMEPAD_BUTTON_COUNT	  = 16;
 	constexpr auto GAMEPAD_AXIS_COUNT	  = 6;
 	constexpr auto GAMEPAD_POV_AXIS_COUNT = 4;
@@ -14,7 +14,7 @@ namespace TEN::Input
 									GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2) + GAMEPAD_POV_AXIS_COUNT;
 
 	// Mouse
-	// 8 buttons + (4 * 2) axes.
+	// 8 buttons + (3 * 2) axes.
 	enum MouseKey
 	{
 		// Buttons
@@ -33,9 +33,7 @@ namespace TEN::Input
 		MK_AXIS_Y_NEG,
 		MK_AXIS_Y_POS,
 		MK_AXIS_Z_NEG,
-		MK_AXIS_Z_POS,
-		MK_AXIS_W_NEG,
-		MK_AXIS_W_POS
+		MK_AXIS_Z_POS
 	};
 
 	// Gamepad
@@ -81,7 +79,7 @@ namespace TEN::Input
 		GK_DPAD_RIGHT
 	};
 
-	// XBox (GamepadKey mirror).
+	// XBox Controller (GamepadKey mirror).
 	// 11 buttons + (6 * 2) axes + 4 POV axes.
 	enum XInputKey
 	{

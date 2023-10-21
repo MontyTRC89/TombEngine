@@ -340,13 +340,13 @@ namespace TEN::Input
 			state.width = screenRes.x;
 			state.height = screenRes.y;
 
-			// Poll buttons.
+			// Poll mouse buttons.
 			for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
-				KeyMap[MOUSE_BUTTON_COUNT + i] = state.buttonDown((MouseButtonID)i) ? 1.0f : 0.0f;
+				KeyMap[KEYBOARD_KEY_COUNT + i] = state.buttonDown((MouseButtonID)i) ? 1.0f : 0.0f;
 
 			// Register multiple directional keypresses mapped to mouse axes.
-			int baseIndex = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT;
-			for (int pass = 0; pass < MOUSE_AXIS_COUNT; pass++)
+			int baseIndex = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT;
+			for (int pass = 0; pass < (MOUSE_AXIS_COUNT * 2); pass++)
 			{
 				switch (pass)
 				{
@@ -496,8 +496,6 @@ namespace TEN::Input
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
-
-				;
 
 				// Register multiple directional keypresses mapped to analog axes.
 				int baseIndex = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2);

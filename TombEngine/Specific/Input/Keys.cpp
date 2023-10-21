@@ -131,8 +131,6 @@ namespace TEN::Input
 			{ MK_AXIS_Y_POS, "Mouse Y+" },
 			{ MK_AXIS_Z_NEG, "Mouse Z-" },
 			{ MK_AXIS_Z_POS, "Mouse Z+" },
-			{ MK_AXIS_W_NEG, "Mouse W-" },
-			{ MK_AXIS_W_POS, "Mouse W+" },
 
 			// Gamepad keys
 			{ GK_BUTTON_1, "Gamepad 1" },
