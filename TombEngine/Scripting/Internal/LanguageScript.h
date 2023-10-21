@@ -84,6 +84,8 @@
 #define STRING_RUMBLE					"rumble"
 #define STRING_THUMBSTICK_CAMERA		"thumbstick_camera"
 #define STRING_SUBTITLES				"subtitles"
+#define STRING_MOUSE_SENSITIVITY		"mouse_sensitivity"
+#define STRING_MOUSE_SMOOTHING			"mouse_smoothing"
 #define STRING_ACTIONS_FORWARD			"actions_forward"
 #define STRING_ACTIONS_BACKWARD			"actions_backward"
 #define STRING_ACTIONS_LEFT				"actions_left"

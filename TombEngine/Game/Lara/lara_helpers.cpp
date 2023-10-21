@@ -429,14 +429,14 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
 	{
-		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
+		axisCoeff.x = AxisMap[(int)InputAxis::Move].y;
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
-		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
+		axisCoeff.y = AxisMap[(int)InputAxis::Move].x;
 	}
 
 	// Determine turn rate base values.
@@ -536,7 +536,7 @@ void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	if (!item->Animation.Velocity.z)
 		return;
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
@@ -557,7 +557,7 @@ void HandlePlayerCrawlFlex(ItemInfo& item)
 	if (item.Animation.Velocity.z == 0.0f)
 		return;
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = FLEX_ANGLE_MAX * axisCoeff;
 
@@ -933,14 +933,14 @@ void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, s
 {
 	auto* lara = GetLaraInfo(item);
 
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
+	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::Move].y, invert);
 }
 
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);

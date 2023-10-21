@@ -2,20 +2,23 @@
 #include <string>
 #include <unordered_map>
 
+#include "Game/debug/debug.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+
 /***
 Constants for LogLevel IDs.
-@enum Misc.LogLevel
+@enum Util.LogLevel
 @pragma nostrip
 */
 
-/*** Misc.LogLevel constants.
+/*** Util.LogLevel constants.
 The following constants are inside LogLevel.
 
 	INFO
 	WARNING
 	ERROR
 
-@section Misc.LogLevel
+@section Util.LogLevel
 */
 
 /*** Table of LogLevel ID constants (for use with PrintLog() command).
