@@ -714,7 +714,7 @@ namespace TEN::Input
 
 	void ApplyDefaultBindings()
 	{
-		ApplyBindings(BindingManager::DEFAULT_XBOX_BINDING_PROFILE);
+		ApplyBindings(BindingManager::DEFAULT_XBOX_CONTROLLER_BINDING_PROFILE);
 		ApplyDefaultXInputBindings();
 	}
 
@@ -740,7 +740,7 @@ namespace TEN::Input
 		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
 		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
 		{
-			ApplyBindings(BindingManager::DEFAULT_XBOX_BINDING_PROFILE);
+			ApplyBindings(BindingManager::DEFAULT_XBOX_CONTROLLER_BINDING_PROFILE);
 			g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
 
 			// Additionally turn on thumbstick camera and vibration.

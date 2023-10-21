@@ -30,7 +30,7 @@ namespace TEN::Input
 	public:
 		// Constants
 		static const BindingProfile DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
-		static const BindingProfile DEFAULT_XBOX_BINDING_PROFILE;
+		static const BindingProfile DEFAULT_XBOX_CONTROLLER_BINDING_PROFILE;
 
 		// Constructors
 		BindingManager();

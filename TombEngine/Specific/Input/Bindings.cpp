@@ -58,7 +58,7 @@ namespace TEN::Input
 		{ In::Load, KC_F6 }
 	};
 
-	const BindingProfile BindingManager::DEFAULT_XBOX_BINDING_PROFILE =
+	const BindingProfile BindingManager::DEFAULT_XBOX_CONTROLLER_BINDING_PROFILE =
 	{
 		{ In::Forward, XK_AXIS_X_NEG },
 		{ In::Back, XK_AXIS_X_POS },
