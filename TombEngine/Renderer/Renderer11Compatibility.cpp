@@ -164,8 +164,8 @@ namespace TEN::Renderer
 		m_spritesTextures.resize(g_Level.SpritesTextures.size());
 		for (int i = 0; i < g_Level.SpritesTextures.size(); i++)
 		{
-			TEXTURE *texture = &g_Level.SpritesTextures[i];
-			m_spritesTextures[i] = Texture2D(m_device.Get(), texture->colorMapData.data(), (int)texture->colorMapData.size());
+			auto& texture = g_Level.SpritesTextures[i];
+			m_spritesTextures[i] = Texture2D(m_device.Get(), texture.colorMapData.data(), (int)texture.colorMapData.size());
 		}
 
 		if (m_spritesTextures.size() > 0)

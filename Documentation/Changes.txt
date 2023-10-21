@@ -2,11 +2,54 @@ Version 1.1.1
 ==============
 
 * Fix burning torch not working properly if there are more than 256 objects in a level.
-* Look-around mode overhaul:
- - Give consistent and wider view angles while crawling, crouching, and hanging.
- - Improve cleaner camera movement.
- - Reenable look mode while performing up jump, backward jump, or backward crawl.
- - When using binoculars or lasersight, holding Walk allows the player to pan slowly.
+* Fix grenade and rocket projectiles smoke offset in certain directions.
+* Fix projectiles flying through animating objects.
+* Fix harpoon gun doing enormous damage on enemies.
+* Fix train death animation.
+* Fix zipline not following correct trajectory.
+* Fix TR1 wolf damage value inflicted on a close bite attack.
+* Fix TR1 bear various original AI issues.
+* Fix TR2 knife thrower AI.
+* Fix TR2 doberman crashing the game when killed by explosive weapons.
+* Fix volume change in settings not affecting voice track.
+* Fix several lighting bugs.
+* Fix savegame count not properly increasing.
+* Fix regeneration of non-ammo pickups with OCB 128.
+* Overhaul look-around feature:
+ - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
+ - Improve look camera movement and control.
+ - Re-enable looking while performing up jump, backward jump, or backward crawl.
+ - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+* Add target highlighter system with toggle in Sound and Gameplay settings.
+* Add sprint slide state 191.
+* Add swinging blade.
+* Add crumbling platform and add new OCBs for behaviour:
+ - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
+ - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
+ - A positive value results in activation via player collision.
+ - A negative value requires a trigger to activate.
+* Add basic mouse input handling. Allows for binding of mouse inputs in control settings.
+* Add settings for Mouse Sensitivity and Mouse Smoothing (not used in-game yet).
+
+Lua API changes:
+* Add DisplaySprite object.
+* Add Flow::EnableLoadSave() function to disable savegames.
+* Add Flow::EnablePointFilter() function to disable bilinear filtering.
+* Add Input:GetCursorDisplayPosition() function to get the position of the cursor.
+* Add Lara::GetAmmoType() function to read the ammo that Lara is using.
+* Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
+* Add Logic.HandleEvent() function to call node events.
+* Add functions to load, save, delete and check existence of savegames.
+* Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.
+* Make Vec2 and Vec3 objects float-based instead of integer-based.
+* Split and organise functions in `Misc` namespace to appropriate new namespaces.
+* Add Vec2/Vec3 arithmetic for division with a number and multiplication with another Vec2/Vec3.
+* Add various Vec2/Vec3 operations such as Normalize() or Lerp().
+* Add log messages warnings to functions AddCallback and RemoveCallback.
+* Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
+* Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.
+* Fix activation of a flipped room when using SetPos() script command or position change node.
+* Add extra parameter to GiveItem() function to optionally display an inventory item given to the player in the pickup summary.
 
 Version 1.1.0
 ==============

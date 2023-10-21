@@ -3,17 +3,18 @@
 
 #include <filesystem>
 
-#include "Game/savegame.h"
+#include "Game/control/volume.h"
 #include "Game/effects/Electricity.h"
+#include "Game/savegame.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 using namespace TEN::Effects::Electricity;
 
@@ -37,18 +38,25 @@ enum class CallbackPoint
 	PostEnd
 };
 
-static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
+static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 {
-	{ScriptReserved_PreStart, CallbackPoint::PreStart},
-	{ScriptReserved_PostStart, CallbackPoint::PostStart},
-	{ScriptReserved_PreLoad, CallbackPoint::PreLoad},
-	{ScriptReserved_PostLoad, CallbackPoint::PostLoad},
-	{ScriptReserved_PreControlPhase, CallbackPoint::PreControl},
-	{ScriptReserved_PostControlPhase, CallbackPoint::PostControl},
-	{ScriptReserved_PostSave, CallbackPoint::PostSave},
-	{ScriptReserved_PreSave, CallbackPoint::PreSave},
-	{ScriptReserved_PreEnd, CallbackPoint::PreEnd},
-	{ScriptReserved_PostEnd, CallbackPoint::PostEnd},
+	{ ScriptReserved_PreStart, CallbackPoint::PreStart },
+	{ ScriptReserved_PostStart, CallbackPoint::PostStart },
+	{ ScriptReserved_PreLoad, CallbackPoint::PreLoad },
+	{ ScriptReserved_PostLoad, CallbackPoint::PostLoad },
+	{ ScriptReserved_PreControlPhase, CallbackPoint::PreControl },
+	{ ScriptReserved_PostControlPhase, CallbackPoint::PostControl },
+	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
+	{ ScriptReserved_PreSave, CallbackPoint::PreSave },
+	{ ScriptReserved_PreEnd, CallbackPoint::PreEnd },
+	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd }
+};
+
+static const std::unordered_map<std::string, VolumeEventType> EVENT_TYPES
+{
+	{ ScriptReserved_OnEnter, VolumeEventType::Enter },
+	{ ScriptReserved_OnInside, VolumeEventType::Inside },
+	{ ScriptReserved_OnLeave, VolumeEventType::Leave }
 };
 
 enum class LevelEndReason
@@ -60,13 +68,13 @@ enum class LevelEndReason
 	Other
 };
 
-static const std::unordered_map<std::string, LevelEndReason> kLevelEndReasons
+static const std::unordered_map<std::string, LevelEndReason> LEVEL_END_REASONS
 {
-	{ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete},
-	{ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame},
-	{ScriptReserved_EndReasonExitToTitle, LevelEndReason::ExitToTitle},
-	{ScriptReserved_EndReasonDeath, LevelEndReason::Death},
-	{ScriptReserved_EndReasonOther, LevelEndReason::Other},
+	{ ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete },
+	{ ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame },
+	{ ScriptReserved_EndReasonExitToTitle, LevelEndReason::ExitToTitle },
+	{ ScriptReserved_EndReasonDeath, LevelEndReason::Death },
+	{ ScriptReserved_EndReasonOther, LevelEndReason::Other }
 };
 
 static constexpr char const* strKey = "__internal_name";
@@ -81,6 +89,7 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 		case sol::type::string:
 			tab.raw_set(key, value);
 			break;
+
 		default:
 			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ErrorMode::Terminate);
 			break;
@@ -90,11 +99,13 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 	auto UnsupportedValue = [](sol::table tab, sol::object key)
 	{
 		key.push();
-		size_t strLen;
-		const char* str = luaL_tolstring(tab.lua_state(), -1, &strLen);
-		if (str)
+
+		size_t stringLength = 0;
+		auto string = std::string(luaL_tolstring(tab.lua_state(), -1, &stringLength));
+
+		if (!string.empty())
 		{
-			ScriptAssert(false, "Variable " + std::string{ str } + " has an unsupported type.", ErrorMode::Terminate);
+			ScriptAssert(false, "Variable " + string + " has an unsupported type.", ErrorMode::Terminate);
 			lua_pop(tab.lua_state(), 1);
 		}
 		else
@@ -145,15 +156,17 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 {
 	m_handler.GetState()->set_function("print", &LogicHandler::LogPrint, this);
 
-	sol::table table_logic{ m_handler.GetState()->lua_state(), sol::create };
+	sol::table tableLogic{ m_handler.GetState()->lua_state(), sol::create };
 
-	parent.set(ScriptReserved_Logic, table_logic);
+	parent.set(ScriptReserved_Logic, tableLogic);
 
-	table_logic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
-	table_logic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
+	tableLogic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
+	tableLogic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
+	tableLogic.set_function(ScriptReserved_HandleEvent, &LogicHandler::HandleEvent, this);
 
-	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_EndReason, kLevelEndReasons);
-	m_handler.MakeReadOnlyTable(table_logic, ScriptReserved_CallbackPoint, kCallbackPoints);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, LEVEL_END_REASONS);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, CALLBACK_POINTS);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EventType, EVENT_TYPES);
 
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreStart, &m_callbacksPreStart));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostStart, &m_callbacksPostStart));
@@ -166,7 +179,7 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreEnd, &m_callbacksPreEnd));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostEnd, &m_callbacksPostEnd));
 
-	LevelFunc::Register(table_logic);
+	LevelFunc::Register(tableLogic);
 
 	ResetScripts(true);
 }
@@ -219,7 +232,21 @@ Any returned value will be discarded.
 void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
 	auto it = m_callbacks.find(point);
-	it->second->insert(levelFunc.m_funcName);
+
+	if (it == m_callbacks.end()) 
+	{
+		TENLog("Error: callback point not found. Attempted to access missing value.", LogLevel::Error, LogConfig::All, false);
+		return;
+	}
+	
+	if (it->second->find(levelFunc.m_funcName) != it->second->end())
+	{
+		TENLog("Warning: function " + levelFunc.m_funcName + " already registered in callbacks list.", LogLevel::Warning, LogConfig::All, true);
+	}
+	else
+	{
+		it->second->insert(levelFunc.m_funcName);
+	}
 }
 
 /*** Deregister a function as a callback.
@@ -234,7 +261,31 @@ Will have no effect if the function was not registered as a callback
 void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
 	auto it = m_callbacks.find(point);
+	if (it == m_callbacks.end())
+	{
+		TENLog("Error: callback point not found. Attempted to access missing value.", LogLevel::Error, LogConfig::All, false);
+		return;
+	}
+
 	it->second->erase(levelFunc.m_funcName);
+}
+
+/*** Attempt to find an event set and exectute a particular event from it.
+
+@function HandleEvent
+@tparam name string Name of the event set to find.
+@tparam type EventType Event to execute.
+@tparam activator Moveable Optional activator. Default is the player object.
+*/
+void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator)
+{
+	bool success = TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? 
+					(VolumeActivator)activator.value().GetIndex() : nullptr);
+	if (!success)
+	{
+		TENLog("Error: event " + name + " could not be executed. Check if event with such name exists in project.",
+			   LogLevel::Error, LogConfig::All, false);
+	}
 }
 
 void LogicHandler::ResetLevelTables()
@@ -248,10 +299,10 @@ void LogicHandler::ResetLevelTables()
 sol::object LogicHandler::GetLevelFuncsMember(sol::table tab, const std::string& name)
 {
 	std::string partName = tab.raw_get<std::string>(strKey);
-	auto& theMap = m_levelFuncs_tablesOfNames[partName];
+	auto& map = m_levelFuncs_tablesOfNames[partName];
 
-	auto fullNameIt = theMap.find(name);
-	if (fullNameIt != std::cend(theMap))
+	auto fullNameIt = map.find(name);
+	if (fullNameIt != std::cend(map))
 	{
 		std::string_view key = fullNameIt->second;
 		if (m_levelFuncs_levelFuncObjects[key].valid())
@@ -411,24 +462,24 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 						solTables[i][vars[first]] = vars[second];
 					}
 				}
-				else if (vars[second].index() == int(SavedVarType::Vec2))
+				else if (vars[second].index() == (int)SavedVarType::Vec2)
 				{
-					auto vec2 = Vec2{ std::get<int(SavedVarType::Vec2)>(vars[second]) };
+					auto vec2 = Vec2(std::get<(int)SavedVarType::Vec2>(vars[second]));
 					solTables[i][vars[first]] = vec2;
 				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto vec2 = Vec3{ std::get<int(SavedVarType::Vec3)>(vars[second]) };
-					solTables[i][vars[first]] = vec2;
+					auto vec3 = Vec3(std::get<int(SavedVarType::Vec3)>(vars[second]));
+					solTables[i][vars[first]] = vec3;
 				}
 				else if (vars[second].index() == int(SavedVarType::Rotation))
 				{
-					auto vec2 = Rotation{ std::get<int(SavedVarType::Rotation)>(vars[second]) };
-					solTables[i][vars[first]] = vec2;
+					auto vec3 = Rotation(std::get<int(SavedVarType::Rotation)>(vars[second]));
+					solTables[i][vars[first]] = vec3;
 				}
 				else if (vars[second].index() == int(SavedVarType::Color))
 				{
-					auto color = D3DCOLOR{ std::get<int(SavedVarType::Color)>(vars[second]) };
+					auto color = D3DCOLOR(std::get<int(SavedVarType::Color)>(vars[second]));
 					solTables[i][vars[first]] = ScriptColor{color};
 				}
 				else if (std::holds_alternative<FuncName>(vars[second]))
@@ -457,7 +508,8 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
 }
 
-template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType>
+int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
 {
 	auto [first, second] = varsMap.insert(std::make_pair(&var, (int)numVars));
 
@@ -466,7 +518,7 @@ template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename Map
 		SavedVar savedVar;
 		TypeTo varTo = (TypeTo)var;
 		savedVar.emplace<(int)TypeEnum>(varTo);
-		vars.push_back(varTo);
+		vars.push_back(savedVar);
 		++numVars;
 	}
 
@@ -636,11 +688,11 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 				{
 					if (second.is<Vec2>())
 					{
-						putInVars(Handle<SavedVarType::Vec2, Vector2i>(second.as<Vec2>(), varsMap, numVars, vars));
+						putInVars(Handle<SavedVarType::Vec2, Vector2>(second.as<Vec2>(), varsMap, numVars, vars));
 					}
 					else if (second.is<Vec3>())
 					{
-						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, numVars, vars));
+						putInVars(Handle<SavedVarType::Vec3, Vector3>(second.as<Vec3>(), varsMap, numVars, vars));
 					}
 					else if (second.is<Rotation>())
 					{

@@ -230,6 +230,7 @@ bool SaveConfiguration()
 	// Set Gameplay keys.
 	if (SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS)
 	{
@@ -253,6 +254,18 @@ bool SaveConfiguration()
 	}
 
 	// Set Input keys.
+	if (SetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS ||
+		SetDWORDRegKey(inputKey, REGKEY_MOUSE_SMOOTHING, g_Configuration.MouseSmoothing) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		RegCloseKey(graphicsKey);
+		RegCloseKey(soundKey);
+		RegCloseKey(gameplayKey);
+		RegCloseKey(inputKey);
+		return false;
+	}
+
+	// Set Input binding keys.
 	g_Configuration.Bindings.resize((int)In::Count);
 	for (int i = 0; i < (int)In::Count; i++)
 	{
@@ -281,7 +294,7 @@ bool SaveConfiguration()
 
 void SaveAudioConfig()
 {
-	SetVolumeMusic(g_Configuration.MusicVolume);
+	SetVolumeTracks(g_Configuration.MusicVolume);
 	SetVolumeFX(g_Configuration.SfxVolume);
 }
 
@@ -295,8 +308,8 @@ void InitDefaultConfiguration()
 	g_Configuration.ScreenWidth = currentScreenResolution.x;
 	g_Configuration.ScreenHeight = currentScreenResolution.y;
 	g_Configuration.ShadowType = ShadowMode::Lara;
-	g_Configuration.ShadowMapSize = 512;
-	g_Configuration.ShadowBlobsMax = 16;
+	g_Configuration.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
+	g_Configuration.ShadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
 	g_Configuration.EnableCaustics = true;
 	g_Configuration.AntialiasingMode = AntialiasingMode::Low;
 
@@ -308,8 +321,12 @@ void InitDefaultConfiguration()
 
 	g_Configuration.EnableSubtitles = true;
 	g_Configuration.EnableAutoTargeting = true;
+	g_Configuration.EnableTargetHighlighter = false;
 	g_Configuration.EnableRumble = true;
 	g_Configuration.EnableThumbstickCamera = false;
+
+	g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
+	g_Configuration.MouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
 
 	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
 	g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
@@ -338,8 +355,8 @@ bool LoadConfiguration()
 	DWORD screenHeight = 0;
 	bool enableWindowedMode = false;
 	DWORD shadowMode = 1;
-	DWORD shadowMapSize = 512;
-	DWORD shadowBlobsMax = 16;
+	DWORD shadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
+	DWORD shadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
 	bool enableCaustics = false;
 	DWORD antialiasingMode = 1;
 
@@ -348,8 +365,8 @@ bool LoadConfiguration()
 		GetDWORDRegKey(graphicsKey, REGKEY_SCREEN_HEIGHT, &screenHeight, 0) != ERROR_SUCCESS ||
 		GetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, &enableWindowedMode, false) != ERROR_SUCCESS ||
 		GetDWORDRegKey(graphicsKey, REGKEY_SHADOWS, &shadowMode, 1) != ERROR_SUCCESS ||
-		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, &shadowMapSize, 512) != ERROR_SUCCESS ||
-		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, &shadowBlobsMax, 16) != ERROR_SUCCESS ||
+		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, &shadowMapSize, GameConfiguration::DEFAULT_SHADOW_MAP_SIZE) != ERROR_SUCCESS ||
+		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, &shadowBlobsMax, GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX) != ERROR_SUCCESS ||
 		GetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, &enableCaustics, true) != ERROR_SUCCESS ||
 		GetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, &antialiasingMode, true) != ERROR_SUCCESS)
 	{
@@ -400,12 +417,14 @@ bool LoadConfiguration()
 
 	bool enableSubtitles = true;
 	bool enableAutoTargeting = true;
+	bool enableTargetHighlighter = true;
 	bool enableRumble = true;
 	bool enableThumbstickCamera = true;
 
 	// Load Gameplay keys.
 	if (GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS)
 	{
@@ -416,17 +435,31 @@ bool LoadConfiguration()
 		return false;
 	}
 
+	DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
+	DWORD mouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
+
 	// Load Input keys.
 	HKEY inputKey = NULL;
 	if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
 	{
+		if (GetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
+			GetDWORDRegKey(inputKey, REGKEY_MOUSE_SMOOTHING, &mouseSmoothing, GameConfiguration::DEFAULT_MOUSE_SMOOTHING) != ERROR_SUCCESS)
+		{
+			RegCloseKey(rootKey);
+			RegCloseKey(graphicsKey);
+			RegCloseKey(soundKey);
+			RegCloseKey(gameplayKey);
+			RegCloseKey(inputKey);
+			return false;
+		}
+
 		for (int i = 0; i < (int)In::Count; i++)
 		{
-			DWORD tempKey;
+			DWORD tempAction = 0;
 			char buffer[9];
 			sprintf(buffer, "Action%d", i);
 
-			if (GetDWORDRegKey(inputKey, buffer, &tempKey, Bindings[0][i]) != ERROR_SUCCESS)
+			if (GetDWORDRegKey(inputKey, buffer, &tempAction, Bindings[0][i]) != ERROR_SUCCESS)
 			{
 				RegCloseKey(rootKey);
 				RegCloseKey(graphicsKey);
@@ -436,8 +469,8 @@ bool LoadConfiguration()
 				return false;
 			}
 
-			g_Configuration.Bindings.push_back(tempKey);
-			Bindings[1][i] = tempKey;
+			g_Configuration.Bindings.push_back(tempAction);
+			Bindings[1][i] = tempAction;
 		}
 
 		RegCloseKey(inputKey);
@@ -470,12 +503,16 @@ bool LoadConfiguration()
 	g_Configuration.SoundDevice = soundDevice;
 
 	g_Configuration.EnableAutoTargeting = enableAutoTargeting;
+	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
 	g_Configuration.EnableRumble = enableRumble;
 	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
 	g_Configuration.EnableSubtitles = enableSubtitles;
 
+	g_Configuration.MouseSensitivity = mouseSensitivity;
+	g_Configuration.MouseSmoothing = mouseSmoothing;
+
 	// Set legacy variables.
-	SetVolumeMusic(musicVolume);
+	SetVolumeTracks(musicVolume);
 	SetVolumeFX(sfxVolume);
 
 	DefaultConflict();
@@ -501,31 +538,32 @@ LONG SetStringRegKey(HKEY hKey, LPCSTR strValueName, char* strValue)
 LONG GetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD* nValue, DWORD nDefaultValue)
 {
 	*nValue = nDefaultValue;
+
 	DWORD dwBufferSize(sizeof(DWORD));
 	DWORD nResult(0);
-	LONG nError = ::RegQueryValueEx(hKey,
+	LONG nError = ::RegQueryValueEx(
+		hKey,
 		strValueName,
 		0,
 		NULL,
 		reinterpret_cast<LPBYTE>(&nResult),
 		&dwBufferSize);
+	
 	if (ERROR_SUCCESS == nError)
-	{
 		*nValue = nResult;
-	}
+	
 	return nError;
 }
-
 
 LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultValue)
 {
 	DWORD nDefValue((bDefaultValue) ? 1 : 0);
 	DWORD nResult(nDefValue);
 	LONG nError = GetDWORDRegKey(hKey, strValueName, &nResult, nDefValue);
+	
 	if (ERROR_SUCCESS == nError)
-	{
-		*bValue = (nResult != 0) ? true : false;
-	}
+		*bValue = (nResult != 0);
+	
 	return nError;
 }
 

@@ -76,19 +76,18 @@ most can just be ignored (see usage).
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
 	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@int[opt] room room ID item is in (default: calculated automatically)
+	@int[opt] roomID room ID item is in (default: calculated automatically)
 	@int[opt=0] animNumber anim number
 	@int[opt=0] frameNumber frame number
 	@int[opt=10] hp HP of item
 	@int[opt=0] OCB ocb of item (default 0)
-	@tparam[opt] table AIBits table with AI bits (default {0,0,0,0,0,0})
+	@tparam[opt] table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
 	@treturn Moveable A new Moveable object (a wrapper around the new object)
 	@usage 
 	local item = Moveable(
 		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Vec3(18907, 0, 21201)
-		)
+		Vec3(18907, 0, 21201))
 	*/
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
@@ -125,9 +124,17 @@ static std::unique_ptr<Moveable> Create(
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
 		ptr->Init();
 
-		ptr->SetAnimNumber(USE_IF_HAVE(int, animNumber, 0));
-		ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
-		ptr->SetHP(USE_IF_HAVE(short, hp, 10));
+		if (std::holds_alternative<int>(animNumber))
+		{
+			ptr->SetAnimNumber(std::get<int>(animNumber));
+			ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+		}
+
+		if (std::holds_alternative<short>(hp))
+		{
+			ptr->SetHP(std::get<short>(hp));
+		}
+
 		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
 		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
 		ptr->SetColor(ScriptColor(Vector4::One));
@@ -546,7 +553,7 @@ bool Moveable::SetName(const std::string& id)
 // @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
-	return Vec3(m_item->Pose);
+	return Vec3(m_item->Pose.Position);
 }
 
 /// Set the moveable's position
@@ -559,7 +566,7 @@ Vec3 Moveable::GetPos() const
 void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	auto prevPos = m_item->Pose.Position.ToVector3();
-	pos.StoreInPose(m_item->Pose);
+	m_item->Pose.Position = pos.ToVector3i();
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 

@@ -238,14 +238,18 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 }
 
-static bool CanPlayerLookAround(const ItemInfo& item)
+bool CanPlayerLookAround(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// Check if drawn weapon has lasersight.
-	if (player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+	// 1) Check if drawn weapon has lasersight.
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+	{
 		return true;
+	}
 
+	// 2) Test for switchable target.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
@@ -255,7 +259,6 @@ static bool CanPlayerLookAround(const ItemInfo& item)
 			if (targetPtr != nullptr)
 				targetableCount++;
 
-			// Check if player can switch targets.
 			if (targetableCount > 1)
 				return false;
 		}
@@ -389,7 +392,9 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	{
 		short rangeRate = isSlow ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
 
-		if (IsHeld(In::StepLeft) && !IsHeld(In::StepRight))
+		// NOTE: Zooming allowed with either StepLeft/StepRight or Walk/Sprint.
+		if ((IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) ||
+			(IsHeld(In::Walk) && !IsHeld(In::Sprint)))
 		{
 			player.Control.Look.OpticRange -= rangeRate;
 			if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
@@ -401,7 +406,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 			}
 		}
-		else if (IsHeld(In::StepRight) && !IsHeld(In::StepLeft))
+		else if ((IsHeld(In::StepRight) && !IsHeld(In::StepLeft)) ||
+			(IsHeld(In::Sprint) && !IsHeld(In::Walk)))
 		{
 			player.Control.Look.OpticRange += rangeRate;
 			if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
@@ -421,14 +427,14 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
 	{
-		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
+		axisCoeff.x = AxisMap[(int)InputAxis::Move].y;
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
-		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
+		axisCoeff.y = AxisMap[(int)InputAxis::Move].x;
 	}
 
 	// Determine turn rate base values.
@@ -856,14 +862,14 @@ void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, s
 {
 	auto* lara = GetLaraInfo(item);
 
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
+	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::Move].y, invert);
 }
 
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
@@ -994,7 +1000,7 @@ void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	if (!item->Animation.Velocity.z)
 		return;
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
@@ -1011,7 +1017,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 	if (!item->Animation.Velocity.z)
 		return;
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 

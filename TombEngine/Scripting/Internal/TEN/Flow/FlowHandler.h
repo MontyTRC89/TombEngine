@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string_view>
 
 #include "Scripting/Internal/LanguageScript.h"
@@ -15,28 +14,31 @@
 class FlowHandler : public ScriptInterfaceFlowHandler
 {
 private:
-	Settings				m_settings;
+	Settings m_settings;
 
-	std::unordered_map < std::string, std::vector<std::string > > m_translationsMap;
+	std::unordered_map<std::string, std::vector<std::string>> m_translationsMap;
 	std::vector<std::string> m_languageNames;
 
-	std::map<short, short>			m_itemsMap;
+	std::map<short, short> m_itemsMap;
 
 	std::string m_gameDir;
 
 	LuaHandler m_handler;
 
 public:
-	int								FogInDistance{ 0 };
-	int								FogOutDistance{ 0 };
-	bool							LevelSelect{ true };
-	bool							FlyCheat{ true };
-	bool							MassPickup{ true }; 
-	bool							LaraInTitle{ false };
-	bool							DebugMode{ false };
+	int FogInDistance  = 0;
+	int FogOutDistance = 0;
 
-	// New animation flag table
-	Animations			Anims{};
+	bool LevelSelect = true;
+	bool LoadSave	 = true;
+	bool FlyCheat	 = true;
+	bool PointFilter = false;
+	bool MassPickup	 = true; 
+	bool LaraInTitle = false;
+	bool DebugMode	 = false;
+
+	// Table for movesets.
+	Animations Anims = {};
 
 	std::vector<Level*>	Levels;
 
@@ -58,6 +60,11 @@ public:
 	int			GetLevelNumber(const std::string& flieName);
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel);
+	void		FlipMap(int flipmap);
+	void		SaveGame(int slot);
+	void		LoadGame(int slot);
+	void		DeleteSaveGame(int slot);
+	bool		DoesSaveGameExist(int slot);
 	int			GetSecretCount() const;
 	void		SetSecretCount(int secretsNum);
 	void		AddSecret(int levelSecretIndex);
@@ -66,12 +73,16 @@ public:
 	void		SetTotalSecretCount(int secretsNumber);
 	bool		IsFlyCheatEnabled() const;
 	void		EnableFlyCheat(bool flyCheat);
+	bool		IsPointFilterEnabled() const;
+	void		EnablePointFilter(bool pointFilter);
 	bool		IsMassPickupEnabled() const; 
 	void		EnableMassPickup(bool massPickup);
 	bool		IsLaraInTitleEnabled() const;
 	void		EnableLaraInTitle(bool laraInTitle);
 	bool		IsLevelSelectEnabled() const;
 	void		EnableLevelSelect(bool laraInTitle);
+	bool		IsLoadSaveEnabled() const;
+	void		EnableLoadSave(bool loadSave);
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }

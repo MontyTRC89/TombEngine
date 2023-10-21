@@ -10,6 +10,7 @@
 #include "Game/effects/item_fx.h"
 #include "Specific/level.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
 
 /***
 Class for extra Lara-only functions.
@@ -127,6 +128,26 @@ int LaraObject::GetStamina() const
 	return lara->Status.Stamina;
 }
 
+/// Set control lock for Lara.
+// @function LaraObject:SetControlLock
+// @tparam bool whether set or not set control lock. 
+// @usage
+// Lara:SetControlLock(true)
+void LaraObject::SetControlLock(bool value)
+{
+	GetLaraInfo(m_item)->Control.Locked = value;
+}
+
+/// Get control lock for Lara.
+// @function LaraObject:GetControlLock
+// @treturn bool current control lock value
+// @usage
+// local areControlsLocked = Lara:GetControlLock()
+bool LaraObject::GetControlLock() const
+{
+	return GetLaraInfo(m_item)->Control.Locked;
+}
+
 /// Get the moveable's airborne status
 // @function Moveable:GetAirborne
 // @treturn (bool) true if Lara state must react to aerial forces.
@@ -241,6 +262,99 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 	}
 }
 
+/// Get player weapon ammo type.
+// @function LaraObject:GetAmmoType
+// @treturn int player weapon ammo type
+// @usage
+// local CurrentAmmoType = Lara:GetAmmoType()
+int LaraObject::GetAmmoType() const
+{
+	const auto& player = GetLaraInfo(*m_item);
+
+	auto ammoType = std::optional<PlayerAmmoType>(std::nullopt);
+	switch (player.Control.Weapon.GunType)
+	{
+		case::LaraWeaponType::Pistol:
+			ammoType = PlayerAmmoType::Pistol;
+			break;
+
+		case::LaraWeaponType::Revolver:
+			ammoType = PlayerAmmoType::Revolver;
+			break;
+
+		case::LaraWeaponType::Uzi:
+			ammoType = PlayerAmmoType::Uzi;
+			break;
+
+		case::LaraWeaponType::Shotgun:
+			if (player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerAmmoType::ShotgunNormal;
+			}
+			else
+			{
+				ammoType = PlayerAmmoType::ShotgunWide;
+			}
+
+			break;
+
+		case::LaraWeaponType::HK:
+			ammoType = PlayerAmmoType::HK;
+			break;
+
+		case::LaraWeaponType::Crossbow:
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerAmmoType::CrossbowBoltNormal;
+			}
+			else if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
+			{
+				ammoType = PlayerAmmoType::CrossbowBoltPoison;
+			}
+			else
+			{
+				ammoType = PlayerAmmoType::CrossbowBoltExplosive;
+			}
+
+			break;
+
+		case::LaraWeaponType::GrenadeLauncher:
+			if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerAmmoType::GrenadeNormal;
+			}
+			else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
+			{
+				ammoType = PlayerAmmoType::GrenadeFrag;
+			}
+			else
+			{
+				ammoType = PlayerAmmoType::GrenadeFlash;
+			}
+
+			break;
+
+		case::LaraWeaponType::HarpoonGun:
+			ammoType = PlayerAmmoType::Harpoon;
+			break;
+
+		case::LaraWeaponType::RocketLauncher:
+			ammoType = PlayerAmmoType::Rocket;
+			break;
+
+		default:
+			break;
+	}
+
+	if (!ammoType.has_value())
+	{
+		TENLog("GetAmmoType() error; no ammo type.", LogLevel::Warning, LogConfig::All);
+		ammoType = PlayerAmmoType::None;
+	}
+
+	return (int)*ammoType;
+}
+
 /// Get current weapon's ammo count
 // @function LaraObject:GetAmmoCount
 // @treturn int current ammo count (-1 if infinite)
@@ -307,11 +421,14 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetStamina, &LaraObject::GetStamina,
 			ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
 			ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
+			ScriptReserved_SetControlLock, &LaraObject::SetControlLock,
+			ScriptReserved_GetControlLock, &LaraObject::GetControlLock,
 			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
 			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,
 			ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,
 			ScriptReserved_SetWeaponType, &LaraObject::SetWeaponType,
+			ScriptReserved_GetAmmoType, &LaraObject::GetAmmoType,
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,

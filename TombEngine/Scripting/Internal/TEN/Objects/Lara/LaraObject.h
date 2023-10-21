@@ -44,16 +44,19 @@ public:
 	int GetWet() const;
 	[[nodiscard]] bool GetAirborne() const;
 	void SetAirborne(bool newAirborne);
+	bool GetControlLock() const;
+	void SetControlLock(bool value);
 	std::unique_ptr<Moveable> GetVehicle() const;
 	std::unique_ptr<Moveable> GetTarget() const;
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
+	int GetAmmoType() const;
 	int GetAmmoCount() const;
 	void UndrawWeapon();
 	void ThrowAwayTorch();
 	bool TorchIsLit() const;
-	static void Register(sol::table & parent);
+	static void Register(sol::table& parent);
 	using Moveable::Moveable;
 };
 
