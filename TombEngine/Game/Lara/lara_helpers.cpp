@@ -357,6 +357,17 @@ static void SetPlayerOptics(ItemInfo* item)
 	AlterFOV(LastFOV);
 }
 
+static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
+{
+	constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
+	constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
+
+	if (opticRange == 0)
+		return turnRate;
+
+	return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
+};
+
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 {
 	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
@@ -364,17 +375,6 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
 	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
 	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
-
-	auto normalizeTurnRate = [](short turnRate, short opticRange)
-	{
-		constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
-		constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
-
-		if (opticRange == 0)
-			return turnRate;
-
-		return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
-	};
 
 	auto& player = GetLaraInfo(item);
 
@@ -442,8 +442,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	short turnRateAccel = isSlow ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
 
 	// Normalize turn rate base values.
-	turnRateMax = normalizeTurnRate(turnRateMax, player.Control.Look.OpticRange);
-	turnRateAccel = normalizeTurnRate(turnRateAccel, player.Control.Look.OpticRange);
+	turnRateMax = NormalizeLookAroundTurnRate(turnRateMax, player.Control.Look.OpticRange);
+	turnRateAccel = NormalizeLookAroundTurnRate(turnRateAccel, player.Control.Look.OpticRange);
 
 	// Modulate turn rates.
 	player.Control.Look.TurnRate = EulerAngles(
