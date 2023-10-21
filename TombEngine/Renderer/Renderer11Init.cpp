@@ -107,6 +107,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
 	m_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
 	m_cbSky = CreateConstantBuffer<CSkyBuffer>();
+	m_cbSMAA = CreateConstantBuffer<CSMAABuffer>();
 
 	//Prepare HUD Constant buffer  
 	m_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
@@ -218,8 +219,8 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	rasterizerStateDesc.ScissorEnable = true;
 	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullNoneRasterizerState.GetAddressOf()));
 
-	m_SMAA2AreaTexture = Texture2D(m_device.Get(), AREATEX_WIDTH, AREATEX_HEIGHT, DXGI_FORMAT_R8G8_UNORM, AREATEX_PITCH, areaTexBytes);
-	m_SMAA2SearchTexture = Texture2D(m_device.Get(), SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, DXGI_FORMAT_R8_UNORM, SEARCHTEX_PITCH, searchTexBytes);
+	m_SMAAAreaTexture = Texture2D(m_device.Get(), AREATEX_WIDTH, AREATEX_HEIGHT, DXGI_FORMAT_R8G8_UNORM, AREATEX_PITCH, areaTexBytes);
+	m_SMAASearchTexture = Texture2D(m_device.Get(), SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, DXGI_FORMAT_R8_UNORM, SEARCHTEX_PITCH, searchTexBytes);
 
 	InitializeGameBars();
 	initQuad(m_device.Get());
@@ -367,9 +368,9 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 	m_primitiveBatch = std::make_unique<PrimitiveBatch<RendererVertex>>(m_context.Get());
 
 	// Initialize buffers
-	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
-	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
-	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
+	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false, DXGI_FORMAT_D16_UNORM);
 	m_reflectionCubemap = RenderTargetCube(m_device.Get(), 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	m_shadowMap = Texture2DArray(m_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
 
@@ -392,6 +393,107 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 		m_viewport.MinDepth, m_viewport.MaxDepth);
 
 	//CMAA2UpdateResources(&m_renderTarget);
+
+	// Low AA is done with FXAA, Medium - High AA are done with SMAA
+	if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
+	{
+		m_SMAASceneRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		m_SMAASceneSRGBRenderTarget = RenderTarget2D(m_device.Get(), &m_SMAASceneRenderTarget, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+		m_SMAAVelocityRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R16G16_FLOAT, false);
+		m_SMAAEdgesRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8_UNORM, false);
+		m_SMAABlendRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+		m_SMAADepthRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false);
+
+		for (int i = 0; i < 2; i++) 
+		{
+			m_SMAATempRenderTargets[i] = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+			m_SMAATempSRGBRenderTargets[i] = RenderTarget2D(m_device.Get(),&m_SMAATempRenderTargets[i], DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+			m_SMAAPreviousRenderTargets[i] = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, false);
+		}
+
+		std::stringstream s;
+		std::vector<D3D10_SHADER_MACRO> defines;
+
+		// Setup pixel size macro:
+		s << "float4(1.0 / " << w << ", 1.0 / " << h << ", " << w << ", " << h << ")";
+		std::string pixelSizeText = s.str();
+		D3D10_SHADER_MACRO renderTargetMetricsMacro = { "SMAA_RT_METRICS", pixelSizeText.c_str() };
+		defines.push_back(renderTargetMetricsMacro);
+
+		if (g_Configuration.AntialiasingMode == AntialiasingMode::Medium)
+		{
+			defines.push_back({ "SMAA_PRESET_HIGH", nullptr });
+		}
+		else
+		{
+			defines.push_back({ "SMAA_PRESET_ULTRA", nullptr });
+		}
+
+		// Setup the predicated thresholding macro:
+		/*if (predication) {
+			D3D10_SHADER_MACRO predicationMacro = { "SMAA_PREDICATION", "1" };
+			defines.push_back(predicationMacro);
+		}
+
+		// Setup the reprojection macro:
+		if (reprojection) {
+			D3D10_SHADER_MACRO reprojectionMacro = { "SMAA_REPROJECTION", "1" };
+			defines.push_back(reprojectionMacro);
+		}*/
+
+		// Setup the target macro:
+		D3D10_SHADER_MACRO dx101Macro = { "SMAA_HLSL_4_1", "1" };
+		defines.push_back(dx101Macro);
+
+		D3D10_SHADER_MACRO null = { nullptr, nullptr };
+		defines.push_back(null);
+
+		ComPtr<ID3D10Blob> blob;
+		m_SMAALumaEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAALumaEdgeDetectionPS", "ps_4_1", defines.data(), blob);
+		m_SMAAColorEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAAColorEdgeDetectionPS", "ps_4_1", defines.data(), blob);
+		m_SMAADepthEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAADepthEdgeDetectionPS", "ps_4_1", defines.data(), blob);
+		m_SMAABlendingWeightCalculationPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAABlendingWeightCalculationPS", "ps_4_1", defines.data(), blob);
+		m_SMAANeighborhoodBlendingPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAANeighborhoodBlendingPS", "ps_4_1", defines.data(), blob);
+		m_SMAALumaEdgeDetectionVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAAEdgeDetectionVS", "vs_4_1", defines.data(), blob);
+		m_SMAABlendingWeightCalculationVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAABlendingWeightCalculationVS", "vs_4_1", defines.data(), blob);
+		m_SMAANeighborhoodBlendingVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAANeighborhoodBlendingVS", "vs_4_1", defines.data(), blob);
+	
+		SMAAVertex vertices[3];
+
+		vertices[0].Position = Vector3(-1.0f, -1.0f, 1.0f);
+		vertices[1].Position = Vector3(-1.0f, 3.0f, 1.0f);
+		vertices[2].Position = Vector3(3.0f, -1.0f, 1.0f);
+
+		vertices[0].UV = Vector2(0.0f, 1.0f);
+		vertices[1].UV = Vector2(0.0f, -1.0f);
+		vertices[2].UV = Vector2(2.0f, 1.0f);
+
+		D3D11_BUFFER_DESC bufferDesc;
+		D3D11_SUBRESOURCE_DATA data;
+
+		bufferDesc.ByteWidth = sizeof(SMAAVertex) * 3;
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.MiscFlags = 0;
+
+		data.pSysMem = vertices;
+		data.SysMemPitch = 0;
+		data.SysMemSlicePitch = 0;
+
+		Utils::throwIfFailed(m_device->CreateBuffer(&bufferDesc, &data, &m_SMAATriangleVertexBuffer));
+
+		const D3D11_INPUT_ELEMENT_DESC layout[] = {
+			{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD",  0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+		UINT numElements = sizeof(layout) / sizeof(D3D10_INPUT_ELEMENT_DESC);
+
+		Utils::throwIfFailed(m_device->CreateInputLayout(layout, numElements, blob->GetBufferPointer(), blob->GetBufferSize(), m_SMAATriangleInputLayout.GetAddressOf()));
+	
+		m_SMAAprimitiveBatch = std::make_unique<PrimitiveBatch<SMAAVertex>>(m_context.Get());
+		m_postProcess = std::make_unique<BasicPostProcess>(m_device.Get());
+	}
 
 	SetFullScreen();
 }

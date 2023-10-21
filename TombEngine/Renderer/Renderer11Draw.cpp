@@ -1558,6 +1558,111 @@ namespace TEN::Renderer
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
+		if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
+		{
+			float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			m_context->ClearRenderTargetView(m_SMAASceneRenderTarget.RenderTargetView.Get(), clearColor);
+			m_context->ClearDepthStencilView(m_SMAASceneRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			m_context->OMSetRenderTargets(1, m_SMAASceneRenderTarget.RenderTargetView.GetAddressOf(), m_SMAASceneRenderTarget.DepthStencilView.Get());
+			m_postProcess->SetEffect(BasicPostProcess::Copy);
+			m_postProcess->SetSourceTexture(m_renderTarget.ShaderResourceView.Get());
+			m_postProcess->Process(m_context.Get());
+
+			for (int pass = 0; pass < 1; pass++)
+			{
+				m_context->ClearRenderTargetView(m_SMAAEdgesRenderTarget.RenderTargetView.Get(), clearColor);
+				m_context->ClearRenderTargetView(m_SMAABlendRenderTarget.RenderTargetView.Get(), clearColor);
+
+				m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
+				m_context->OMSetRenderTargets(1, m_SMAAEdgesRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
+				m_context->RSSetViewports(1, &view.Viewport);
+				ResetScissor();
+
+				m_context->VSSetShader(m_SMAALumaEdgeDetectionVS.Get(), nullptr, 0);
+				m_context->PSSetShader(m_SMAAColorEdgeDetectionPS.Get(), nullptr, 0);
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				m_context->IASetInputLayout(m_SMAATriangleInputLayout.Get());
+
+				m_stSMAA.BlendFactor = pass == 0 ? 1.0f : 0.5f;
+				m_cbSMAA.updateData(m_stSMAA, m_context.Get());
+				BindConstantBufferPS(CB_CAMERA, m_cbSMAA.get());
+
+				//ID3D11SamplerState* samplerState = m_states->LinearClamp();
+
+				//m_context->PSSetShaderResources((UINT)0, 1, m_SMAASceneRenderTarget.ShaderResourceView.GetAddressOf());
+				//m_context->PSSetSamplers(0, 1, &samplerState);
+				//m_context->PSSetShaderResources((UINT)1, 1, m_SMAASceneRenderTarget.SRGBShaderResourceView.GetAddressOf());
+				//m_context->PSSetSamplers(1, 1, &samplerState);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)0, &m_SMAASceneRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)1, &m_SMAASceneSRGBRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)5, &m_SMAAEdgesRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)6, &m_SMAABlendRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindTexture((TEXTURE_REGISTERS)7, &m_SMAAAreaTexture, SAMPLER_LINEAR_CLAMP);
+				BindTexture((TEXTURE_REGISTERS)8, &m_SMAASearchTexture, SAMPLER_LINEAR_CLAMP);
+
+				SMAAVertex vertices[3];
+
+				vertices[0].Position = Vector3(-1.0f, -1.0f, 1.0f);
+				vertices[1].Position = Vector3(-1.0f, 3.0f, 1.0f);
+				vertices[2].Position = Vector3(3.0f, -1.0f, 1.0f);
+
+				vertices[0].UV = Vector2(0.0f, 1.0f);
+				vertices[1].UV = Vector2(0.0f, -1.0f);
+				vertices[2].UV = Vector2(2.0f, 1.0f);
+
+				m_SMAAprimitiveBatch->Begin();
+				m_SMAAprimitiveBatch->DrawTriangle(vertices[0], vertices[1], vertices[2]);
+				m_SMAAprimitiveBatch->End();
+
+				m_context->OMSetRenderTargets(1, m_SMAABlendRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
+
+				m_context->VSSetShader(m_SMAABlendingWeightCalculationVS.Get(), nullptr, 0);
+				m_context->PSSetShader(m_SMAABlendingWeightCalculationPS.Get(), nullptr, 0);
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				m_context->IASetInputLayout(m_SMAATriangleInputLayout.Get());
+
+				m_stSMAA.SubsampleIndices = Vector4::Zero;
+				m_cbSMAA.updateData(m_stSMAA, m_context.Get());
+				BindConstantBufferPS(CB_CAMERA, m_cbSMAA.get());
+
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)0, &m_SMAASceneRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)1, &m_SMAASceneSRGBRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)5, &m_SMAAEdgesRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)6, &m_SMAABlendRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindTexture((TEXTURE_REGISTERS)7, &m_SMAAAreaTexture, SAMPLER_LINEAR_CLAMP);
+				BindTexture((TEXTURE_REGISTERS)8, &m_SMAASearchTexture, SAMPLER_LINEAR_CLAMP);
+
+				m_SMAAprimitiveBatch->Begin();
+				m_SMAAprimitiveBatch->DrawTriangle(vertices[0], vertices[1], vertices[2]);
+				m_SMAAprimitiveBatch->End();
+
+				m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), nullptr);
+
+				m_context->VSSetShader(m_SMAANeighborhoodBlendingVS.Get(), nullptr, 0);
+				m_context->PSSetShader(m_SMAANeighborhoodBlendingPS.Get(), nullptr, 0);
+
+				m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				m_context->IASetInputLayout(m_SMAATriangleInputLayout.Get());
+
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)0, &m_SMAASceneRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)1, &m_SMAASceneSRGBRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)5, &m_SMAAEdgesRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindRenderTargetAsTexture((TEXTURE_REGISTERS)6, &m_SMAABlendRenderTarget, SAMPLER_LINEAR_CLAMP);
+				BindTexture((TEXTURE_REGISTERS)7, &m_SMAAAreaTexture, SAMPLER_LINEAR_CLAMP);
+				BindTexture((TEXTURE_REGISTERS)8, &m_SMAASearchTexture, SAMPLER_LINEAR_CLAMP);
+
+				SetBlendMode(BLENDMODE_OPAQUE);
+
+				m_SMAAprimitiveBatch->Begin();
+				m_SMAAprimitiveBatch->DrawTriangle(vertices[0], vertices[1], vertices[2]);
+				m_SMAAprimitiveBatch->End();
+
+				SetBlendMode(BLENDMODE_OPAQUE);
+			}
+		}
+
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(target, depthTarget, view);
 

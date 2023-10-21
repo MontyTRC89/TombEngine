@@ -26,28 +26,29 @@
  * SOFTWARE.
  */
 
+cbuffer SMAABuffer : register(b0)
+{
+    /**
+     * This is only required for temporal modes (SMAA T2x).
+     */
+    float4 subsampleIndices;
 
- /**
-  * This is only required for temporal modes (SMAA T2x).
-  */
-float4 subsampleIndices;
+    /**
+     * This is required for blending the results of previous subsample with the
+     * output render target; it's used in SMAA S2x and 4x, for other modes just use
+     * 1.0 (no blending).
+     */
+    float blendFactor;
 
-/**
- * This is required for blending the results of previous subsample with the
- * output render target; it's used in SMAA S2x and 4x, for other modes just use
- * 1.0 (no blending).
- */
-float blendFactor;
-
-/**
- * This can be ignored; its purpose is to support interactive custom parameter
- * tweaking.
- */
-float threshld;
-float maxSearchSteps;
-float maxSearchStepsDiag;
-float cornerRounding;
-
+    /**
+     * This can be ignored; its purpose is to support interactive custom parameter
+     * tweaking.
+     */
+    float threshld;
+    float maxSearchSteps;
+    float maxSearchStepsDiag;
+    float cornerRounding;
+};
 
 // Use a real macro here for maximum performance!
 #ifndef SMAA_RT_METRICS // This is just for compilation-time syntax checking.
@@ -115,24 +116,24 @@ BlendState NoBlending {
 /**
  * Input textures
  */
-Texture2D colorTex;
-Texture2D colorTexGamma;
-Texture2D colorTexPrev;
+Texture2D colorTex : register(t0);
+Texture2D colorTexGamma : register(t1);
+Texture2D colorTexPrev : register(t2);
 Texture2DMS<float4, 2> colorTexMS;
-Texture2D depthTex;
-Texture2D velocityTex;
+Texture2D depthTex : register(t3);
+Texture2D velocityTex : register(t4);
 
 /**
  * Temporal textures
  */
-Texture2D edgesTex;
-Texture2D blendTex;
+Texture2D edgesTex : register(t5);
+Texture2D blendTex : register(t6);
 
 /**
  * Pre-computed area and search textures
  */
-Texture2D areaTex;
-Texture2D searchTex;
+Texture2D areaTex : register(t7);
+Texture2D searchTex : register(t8);
 
 
 /**

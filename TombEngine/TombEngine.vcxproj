@@ -652,6 +652,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ShaderFogBulb.h" />
     <ClInclude Include="Renderer\ConstantBuffers\SkyBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\SMAABuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffer\ConstantBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AnimatedBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\BlendingBuffer.h" />
@@ -1122,6 +1123,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Renderer\Renderer11PostProcess.cpp" />
     <ClCompile Include="Renderer\Renderer11Settings.cpp" />
     <ClCompile Include="Renderer\Renderer11String.cpp" />
+    <ClCompile Include="Renderer\RendererSMAA.cpp" />
     <ClCompile Include="Renderer\RendererSprites.cpp" />
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />

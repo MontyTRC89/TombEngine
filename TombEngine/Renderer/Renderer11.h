@@ -4,6 +4,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+#include "PostProcess.h"
 
 #include "Math/Math.h"
 #include "Game/control/box.h"
@@ -32,6 +33,7 @@
 #include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
 #include "Renderer/ConstantBuffers/SpriteBuffer.h"
 #include "Renderer/ConstantBuffers/InstancedStaticBuffer.h"
+#include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Frustum.h"
 #include "RendererBucket.h"
 #include "Renderer/RenderTargetCube/RenderTargetCube.h"
@@ -63,6 +65,11 @@ struct RendererRectangle;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Gui;
 using namespace TEN::Hud;
+
+struct SMAAVertex {
+	Vector3 Position;
+	Vector2 UV;
+};
 
 namespace TEN::Renderer
 {
@@ -373,6 +380,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CInstancedStaticMeshBuffer> m_cbInstancedStaticMeshBuffer;
 		CSkyBuffer m_stSky;
 		ConstantBuffer<CSkyBuffer> m_cbSky;
+		CSMAABuffer m_stSMAA;
+		ConstantBuffer<CSMAABuffer> m_cbSMAA;
 
 		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
@@ -550,8 +559,32 @@ namespace TEN::Renderer
 		////////////////////////////////////////////////////////////////////////////////////
 
 		// SMAA2
-		Texture2D m_SMAA2AreaTexture;
-		Texture2D m_SMAA2SearchTexture;
+		Texture2D m_SMAAAreaTexture;
+		Texture2D m_SMAASearchTexture;
+		RenderTarget2D m_SMAAVelocityRenderTarget;
+		RenderTarget2D m_SMAASceneRenderTarget;
+		RenderTarget2D m_SMAASceneSRGBRenderTarget;
+		RenderTarget2D m_SMAATempRenderTargets[2];
+		RenderTarget2D m_SMAATempSRGBRenderTargets[2];
+		RenderTarget2D m_SMAAPreviousRenderTargets[2];
+		RenderTarget2D m_SMAADepthRenderTarget;
+		RenderTarget2D m_SMAAEdgesRenderTarget;
+		RenderTarget2D m_SMAABlendRenderTarget;
+		
+		ComPtr<ID3D11VertexShader> m_SMAALumaEdgeDetectionVS;
+		ComPtr<ID3D11PixelShader> m_SMAALumaEdgeDetectionPS;
+		ComPtr<ID3D11PixelShader> m_SMAAColorEdgeDetectionPS;
+		ComPtr<ID3D11PixelShader> m_SMAADepthEdgeDetectionPS;
+		ComPtr<ID3D11VertexShader> m_SMAABlendingWeightCalculationVS;
+		ComPtr<ID3D11PixelShader> m_SMAABlendingWeightCalculationPS;
+		ComPtr<ID3D11VertexShader> m_SMAANeighborhoodBlendingVS;
+		ComPtr<ID3D11PixelShader> m_SMAANeighborhoodBlendingPS;
+
+		ComPtr<ID3D11Buffer> m_SMAATriangleVertexBuffer;
+		ComPtr<ID3D11InputLayout> m_SMAATriangleInputLayout;
+
+		std::unique_ptr<PrimitiveBatch<SMAAVertex>> m_SMAAprimitiveBatch;
+		std::unique_ptr<BasicPostProcess> m_postProcess;
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
