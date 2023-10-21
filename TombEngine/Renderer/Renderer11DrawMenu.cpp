@@ -27,9 +27,9 @@ extern TEN::Renderer::RendererHudBar* g_MusicVolumeBar;
 namespace TEN::Renderer
 {
 	// Horizontal alignment constants
-	constexpr auto MenuLeftSideEntry  = SCREEN_SPACE_RES.x / 4;
-	constexpr auto MenuCenterEntry	  = SCREEN_SPACE_RES.x / 2;
-	constexpr auto MenuRightSideEntry = SCREEN_SPACE_RES.x * 0.625f;
+	constexpr auto MenuLeftSideEntry  = DISPLAY_SPACE_RES.x / 4;
+	constexpr auto MenuCenterEntry	  = DISPLAY_SPACE_RES.x / 2;
+	constexpr auto MenuRightSideEntry = DISPLAY_SPACE_RES.x * 0.625f;
 
 	constexpr auto MenuLoadNumberLeftSide = 10.0f;
 	constexpr auto MenuLoadNameLeftSide   = 18.75f;
@@ -105,7 +105,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderOptionsMenu(Menu menu, float initialY)
 	{
-		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = SCREEN_SPACE_RES.x - MenuLeftSideEntry;
+		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = DISPLAY_SPACE_RES.x - MenuLeftSideEntry;
 		static const auto LEFT_ARROW_STRING				  = std::string("<");
 		static const auto RIGHT_ARROW_STRING			  = std::string(">");
 		static const auto CONTROL_SETTINGS_BLOCK_Y_OFFSET = (MenuVerticalNarrowLineSpacing * (int)QuickActionStrings.size()) + (MenuVerticalBlockSpacing * 2);
@@ -708,7 +708,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
 		constexpr auto COUNT_STRING_INF	   = "Inf";
-		constexpr auto COUNT_STRING_OFFSET = Vector2(SCREEN_SPACE_RES.x * 0.02f, 0.0f);
+		constexpr auto COUNT_STRING_OFFSET = Vector2(DISPLAY_SPACE_RES.x * 0.02f, 0.0f);
 
 		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
@@ -738,14 +738,14 @@ namespace TEN::Renderer
 
 		auto screenRes = GetScreenResolution();
 		auto factor = Vector2(
-			screenRes.x / SCREEN_SPACE_RES.x,
-			screenRes.y / SCREEN_SPACE_RES.y);
+			screenRes.x / DISPLAY_SPACE_RES.x,
+			screenRes.y / DISPLAY_SPACE_RES.y);
 
 		pos2D *= factor;
 		scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
 		// TODO: This corrective rescaling must happen elsewhere. I missed something. -- Sezz 2023.08.09
-		scale *= SCREEN_SPACE_RES.y / 600;
+		scale *= DISPLAY_SPACE_RES.y / 600;
 
 		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
 		if (index != -1)
@@ -990,12 +990,12 @@ namespace TEN::Renderer
 
 			if (drawLogo)
 			{
-				float factorX = (float)m_screenWidth / SCREEN_SPACE_RES.x;
-				float factorY = (float)m_screenHeight / SCREEN_SPACE_RES.y;
+				float factorX = (float)m_screenWidth / DISPLAY_SPACE_RES.x;
+				float factorY = (float)m_screenHeight / DISPLAY_SPACE_RES.y;
 				float scale = m_screenWidth > m_screenHeight ? factorX : factorY;
 
-				int logoLeft   = (SCREEN_SPACE_RES.x / 2) - (LogoWidth / 2);
-				int logoRight  = (SCREEN_SPACE_RES.x / 2) + (LogoWidth / 2);
+				int logoLeft   = (DISPLAY_SPACE_RES.x / 2) - (LogoWidth / 2);
+				int logoRight  = (DISPLAY_SPACE_RES.x / 2) + (LogoWidth / 2);
 				int logoBottom = LogoTop + LogoHeight;
 
 				RECT rect;

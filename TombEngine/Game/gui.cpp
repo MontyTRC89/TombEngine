@@ -32,8 +32,8 @@ using namespace TEN::Utils;
 
 namespace TEN::Gui
 {
-	constexpr auto SCREEN_CENTER	   = Vector2(SCREEN_SPACE_RES.x / 2, SCREEN_SPACE_RES.y / 2);
-	constexpr auto LINE_HEIGHT		   = SCREEN_SPACE_RES.y * 0.04f; //4.15f;
+	constexpr auto SCREEN_CENTER	   = Vector2(DISPLAY_SPACE_RES.x / 2, DISPLAY_SPACE_RES.y / 2);
+	constexpr auto LINE_HEIGHT		   = DISPLAY_SPACE_RES.y * 0.04f; //4.15f;
 	constexpr auto OBJECT_LIST_SPACING = SCREEN_CENTER.x / 2;
 
 	constexpr auto VOLUME_MAX			 = 100;
@@ -2494,7 +2494,7 @@ namespace TEN::Gui
 				CurrentSelectedOption = *CurrentAmmoType;
 			}
 
-			float yPos = (SCREEN_SPACE_RES.y / 2) - LINE_HEIGHT;
+			float yPos = (DISPLAY_SPACE_RES.y / 2) - LINE_HEIGHT;
 			if (n == 1)
 			{
 				yPos += LINE_HEIGHT;
@@ -2765,7 +2765,7 @@ namespace TEN::Gui
 				}
 
 				float x = SCREEN_CENTER.x - 37.5f + xPos;
-				float y = SCREEN_SPACE_RES.y * 0.8f;
+				float y = DISPLAY_SPACE_RES.y * 0.8f;
 
 				short objectNumber = ConvertInventoryItemToObject(AmmoObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[AmmoObjectList[n].InventoryItem].Scale1;
@@ -3119,11 +3119,11 @@ namespace TEN::Gui
 					float yPos = 0.0f;
 					if (ringType == RingTypes::Inventory)
 					{
-						yPos = SCREEN_CENTER.y - (((SCREEN_SPACE_RES.y + 1) * 0.0625f) * 2.5f);
+						yPos = SCREEN_CENTER.y - (((DISPLAY_SPACE_RES.y + 1) * 0.0625f) * 2.5f);
 					}
 					else
 					{
-						yPos = SCREEN_CENTER.y + (((SCREEN_SPACE_RES.y + 1) * 0.0625f) * 2.0f);
+						yPos = SCREEN_CENTER.y + (((DISPLAY_SPACE_RES.y + 1) * 0.0625f) * 2.0f);
 					}
 
 					g_Renderer.AddString(textBuffer, Vector2(SCREEN_CENTER.x, yPos), PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
@@ -3175,9 +3175,9 @@ namespace TEN::Gui
 						listObject.Bright = 32;
 				}
 
-				float x = (SCREEN_SPACE_RES.x / 2) + xOffset + (i * OBJECT_LIST_SPACING);
-				float y = SCREEN_SPACE_RES.y / 4;
-				float y2 = SCREEN_SPACE_RES.y * 0.8f; // Combine.
+				float x = (DISPLAY_SPACE_RES.x / 2) + xOffset + (i * OBJECT_LIST_SPACING);
+				float y = DISPLAY_SPACE_RES.y / 4;
+				float y2 = DISPLAY_SPACE_RES.y * 0.8f; // Combine.
 
 				short objectNumber = ConvertInventoryItemToObject(listObject.InventoryItem);
 				float scaler = invObject.Scale1;

@@ -465,8 +465,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 			g_Renderer.AddString(
 				key,
 				Vector2(
-					((float)x / (float)g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
-					((float)y / (float)g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y),
+					((float)x / (float)g_Configuration.ScreenWidth) * DISPLAY_SPACE_RES.x,
+					((float)y / (float)g_Configuration.ScreenHeight) * DISPLAY_SPACE_RES.y),
 				col, flags);
 		});
 	}

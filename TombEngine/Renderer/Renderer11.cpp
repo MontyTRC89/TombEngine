@@ -123,7 +123,7 @@ namespace TEN::Renderer
 		};
 
 		auto hudBorderSize = Vector2(
-			borderSize * (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y),
+			borderSize * (DISPLAY_SPACE_RES.x / DISPLAY_SPACE_RES.y),
 			borderSize);
 
 		auto barBorderVertices = std::array<Vector3, 16>
