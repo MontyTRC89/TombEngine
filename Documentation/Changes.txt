@@ -17,7 +17,7 @@ Version 1.1.1
 * Fix regeneration of non-ammo pickups with OCB 128.
 * Overhaul Pushable blocks:
  - Separate climbable and normal pushable blocks slots.
- - Add new pushable OCB to manipulate pushable properties.
+ - Add new pushable OCB to manipulate pushable block properties.
  - Add new Lara animations for pushing over the block off the edge (both TR1-3 and TR4-5 versions).
  - Fix pushables not working with raising block.
 * Overhaul look-around feature:
