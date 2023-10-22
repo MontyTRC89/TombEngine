@@ -5,9 +5,9 @@
 #include "Game/collision/floordata.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
-#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
-#include "Objects/Generic/Object/Pushable/Stack.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableStack.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 

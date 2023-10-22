@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/Generic/Object/Pushable/Info.h"
+#include "Objects/Generic/Object/Pushable/PushableInfo.h"
 
 #include "Game/control/control.h"
 #include "Math/Math.h"
