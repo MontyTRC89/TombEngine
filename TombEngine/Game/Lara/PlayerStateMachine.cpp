@@ -247,7 +247,7 @@ namespace TEN::Entities::Player
 
 	void HandlePlayerStateCollision(ItemInfo& playerItem, CollisionInfo& coll)
 	{
-		static const auto STATE_COLLISION_ROUTINE_MAP = PlayerStateRoutineMap
+		static const auto STATE_COLL_ROUTINE_MAP = PlayerStateRoutineMap
 		{
 			{ LS_WALK_FORWARD, lara_col_walk_forward },
 			{ LS_RUN_FORWARD, lara_col_run_forward },
@@ -447,8 +447,8 @@ namespace TEN::Entities::Player
 		};
 
 		// Find state collision routine.
-		auto it = STATE_COLLISION_ROUTINE_MAP.find(playerItem.Animation.ActiveState);
-		if (it == STATE_COLLISION_ROUTINE_MAP.end())
+		auto it = STATE_COLL_ROUTINE_MAP.find(playerItem.Animation.ActiveState);
+		if (it == STATE_COLL_ROUTINE_MAP.end())
 		{
 			TENLog(
 				"Error handling missing player state collision routine for state " + std::to_string(playerItem.Animation.ActiveState),
@@ -457,7 +457,7 @@ namespace TEN::Entities::Player
 		}
 
 		// Handle state collision.
-		const auto& stateCollisionRoutine = it->second;
-		stateCollisionRoutine(&playerItem, &coll);
+		const auto& stateCollRoutine = it->second;
+		stateCollRoutine(&playerItem, &coll);
 	}
 }
