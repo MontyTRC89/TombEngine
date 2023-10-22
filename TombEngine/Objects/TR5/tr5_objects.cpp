@@ -49,7 +49,6 @@
 #include "Objects/TR5/Object/tr5_genslot.h"
 #include "Objects/TR5/Object/tr5_highobject.h"
 #include "Objects/TR5/Object/tr5_missile.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Objects/TR5/Object/tr5_raisingblock.h"
 #include "Objects/TR5/Switch/tr5_raisingcog.h"
 #include "Objects/TR5/Object/tr5_teleporter.h"
@@ -659,9 +658,6 @@ static void StartObject(ObjectInfo *obj)
 
 	for (int objectNumber = ID_SEARCH_OBJECT1; objectNumber <= ID_SEARCH_OBJECT4; objectNumber++)
 		InitSearchObject(obj, objectNumber);
-
-	for (int objectNumber = ID_PUSHABLE_OBJECT1; objectNumber <= ID_PUSHABLE_OBJECT10; objectNumber++)
-		InitPushableObject(obj, objectNumber);
 
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
 	if (obj->loaded)

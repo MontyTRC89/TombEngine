@@ -357,6 +357,17 @@ static void SetPlayerOptics(ItemInfo* item)
 	AlterFOV(LastFOV);
 }
 
+static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
+{
+	constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
+	constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
+
+	if (opticRange == 0)
+		return turnRate;
+
+	return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
+};
+
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 {
 	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
@@ -364,17 +375,6 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
 	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
 	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
-
-	auto normalizeTurnRate = [](short turnRate, short opticRange)
-	{
-		constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
-		constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
-
-		if (opticRange == 0)
-			return turnRate;
-
-		return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
-	};
 
 	auto& player = GetLaraInfo(item);
 
@@ -427,14 +427,14 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
 	{
-		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
+		axisCoeff.x = AxisMap[(int)InputAxis::Move].y;
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
-		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
+		axisCoeff.y = AxisMap[(int)InputAxis::Move].x;
 	}
 
 	// Determine turn rate base values.
@@ -442,8 +442,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	short turnRateAccel = isSlow ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
 
 	// Normalize turn rate base values.
-	turnRateMax = normalizeTurnRate(turnRateMax, player.Control.Look.OpticRange);
-	turnRateAccel = normalizeTurnRate(turnRateAccel, player.Control.Look.OpticRange);
+	turnRateMax = NormalizeLookAroundTurnRate(turnRateMax, player.Control.Look.OpticRange);
+	turnRateAccel = NormalizeLookAroundTurnRate(turnRateAccel, player.Control.Look.OpticRange);
 
 	// Modulate turn rates.
 	player.Control.Look.TurnRate = EulerAngles(
@@ -862,14 +862,14 @@ void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, s
 {
 	auto* lara = GetLaraInfo(item);
 
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
+	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::Move].y, invert);
 }
 
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
@@ -1000,7 +1000,7 @@ void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	if (!item->Animation.Velocity.z)
 		return;
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
@@ -1017,7 +1017,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 	if (!item->Animation.Velocity.z)
 		return;
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 

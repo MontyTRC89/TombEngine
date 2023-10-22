@@ -9,7 +9,10 @@ static constexpr char ScriptReserved_Logic[]			= "Logic";
 static constexpr char ScriptReserved_Objects[]			= "Objects";
 static constexpr char ScriptReserved_Strings[]			= "Strings";
 static constexpr char ScriptReserved_Inventory[]		= "Inventory";
-static constexpr char ScriptReserved_Misc[]				= "Misc";
+static constexpr char ScriptReserved_Input[]			= "Input";
+static constexpr char ScriptReserved_Sound[]			= "Sound";
+static constexpr char ScriptReserved_View[]				= "View";
+static constexpr char ScriptReserved_Util[]				= "Util";
 static constexpr char ScriptReserved_Effects[]			= "Effects";
 
 // Classes
@@ -234,6 +237,7 @@ static constexpr char ScriptReserved_StopAudioTracks[]				= "StopAudioTracks";
 static constexpr char ScriptReserved_GetAudioTrackLoudness[]		= "GetAudioTrackLoudness";
 static constexpr char ScriptReserved_GetCurrentSubtitle[]			= "GetCurrentSubtitle";
 static constexpr char ScriptReserved_PlaySound[]					= "PlaySound";
+static constexpr char ScriptReserved_StopSound[]					= "StopSound";
 static constexpr char ScriptReserved_IsSoundPlaying[]				= "IsSoundPlaying";
 static constexpr char ScriptReserved_IsAudioTrackPlaying[]			= "IsAudioTrackPlaying";
 static constexpr char ScriptReserved_GiveInvItem[]					= "GiveItem";
@@ -297,6 +301,7 @@ static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 static constexpr char ScriptReserved_TorchIsLit[]					= "TorchIsLit";
 static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
 static constexpr char ScriptReserved_GetDisplayPosition[]			= "GetDisplayPosition";
+static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDisplayPosition";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
