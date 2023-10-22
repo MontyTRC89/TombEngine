@@ -226,7 +226,7 @@ namespace TEN::Entities::Player
 		PlayerStateRoutines[188] = std::pair(lara_as_null, lara_void_func);
 
 		PlayerStateRoutines[LS_REMOVE_PUZZLE] = std::pair(lara_as_use_puzzle, lara_default_col);
-		PlayerStateRoutines[LS_RESERVED_PUSHABLE_STATE] = std::pair(lara_as_null, lara_void_func);
+		PlayerStateRoutines[LS_PUSHABLE_EDGE_SLIP] = std::pair(lara_as_null, lara_void_func);
 		PlayerStateRoutines[LS_SPRINT_SLIDE] = std::pair(lara_as_sprint_slide, lara_col_sprint_slide);
 	}
 

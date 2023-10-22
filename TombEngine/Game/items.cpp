@@ -871,3 +871,17 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 
 	DoItemHit(&target, damage, isExplosive);
 }
+
+Vector3i GetNearestSectorCenter(const Vector3i& pos)
+{
+	constexpr int SECTOR_SIZE = 1024;
+
+	// Calculate the sector-aligned coordinates.
+	int x = (pos.x / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+	int z = (pos.z / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+
+	// Keep the y-coordinate unchanged.
+	int y = pos.y;
+
+	return Vector3i(x, y, z);
+}

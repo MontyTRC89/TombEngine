@@ -560,7 +560,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockCeilingSlope = false;
 	coll->Setup.BlockDeathFloorDown = false;
 	coll->Setup.BlockMonkeySwingEdge = false;
-	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
