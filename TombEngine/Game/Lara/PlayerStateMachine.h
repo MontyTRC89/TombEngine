@@ -11,5 +11,6 @@ namespace TEN::Entities::Player
 		Collision
 	};
 
+	void InitializePlayerStateRoutines();
 	void HandlePlayerState(ItemInfo& item, CollisionInfo& coll, PlayerStateRoutineType routineType);
 }
