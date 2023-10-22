@@ -24,13 +24,14 @@
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
 
-using PlayerStateRoutine = std::function<void(ItemInfo* item, CollisionInfo* coll)>;
-
 namespace TEN::Entities::Player
 {
+	using PlayerStateRoutine	= std::function<void(ItemInfo* item, CollisionInfo* coll)>;
+	using PlayerStateRoutineMap = std::unordered_map<int, PlayerStateRoutine>;
+
 	void HandlePlayerStateControl(ItemInfo& playerItem, CollisionInfo& coll)
 	{
-		static const auto STATE_CONTROL_ROUTINE_MAP = std::unordered_map<int, PlayerStateRoutine>
+		static const auto STATE_CONTROL_ROUTINE_MAP = PlayerStateRoutineMap
 		{
 			{ LS_WALK_FORWARD, lara_as_walk_forward },
 			{ LS_RUN_FORWARD, lara_as_run_forward },
@@ -246,7 +247,7 @@ namespace TEN::Entities::Player
 
 	void HandlePlayerStateCollision(ItemInfo& playerItem, CollisionInfo& coll)
 	{
-		static const auto STATE_COLLISION_ROUTINE_MAP = std::unordered_map<int, PlayerStateRoutine>
+		static const auto STATE_COLLISION_ROUTINE_MAP = PlayerStateRoutineMap
 		{
 			{ LS_WALK_FORWARD, lara_col_walk_forward },
 			{ LS_RUN_FORWARD, lara_col_run_forward },
