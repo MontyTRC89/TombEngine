@@ -66,7 +66,7 @@ void InitializeLara(bool restore)
 		LaraItem->HitPoints = LARA_HEALTH_MAX;
 	}
 
-	InitializePlayerStateRoutines();
+	InitializePlayerStateMachine();
 	InitializeLaraMeshes(LaraItem);
 	InitializeLaraAnims(LaraItem);
 

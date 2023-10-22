@@ -31,7 +31,7 @@ namespace TEN::Entities::Player
 
 	auto PlayerStateRoutines = std::array<PlayerStateRoutinePair, NUM_LARA_STATES>{};
 
-	void InitializePlayerStateRoutines()
+	void InitializePlayerStateMachine()
 	{
 		PlayerStateRoutines[LS_WALK_FORWARD] = std::pair(lara_as_walk_forward, lara_col_walk_forward);
 		PlayerStateRoutines[LS_RUN_FORWARD] = std::pair(lara_as_run_forward, lara_col_run_forward);
