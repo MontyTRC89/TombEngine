@@ -208,7 +208,7 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
-	// 174-188 reserved for "true" ladders. -- Sezz 2023.04.16
+	// 174-188 reserved for ladder object. -- Sezz 2023.04.16
 
 	LS_REMOVE_PUZZLE = 189,
 	LS_RESERVED_PUSHABLE_STATE = 190,
@@ -817,7 +817,7 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
-	// 569-598 reserved for "true" ladders. -- Sezz 2023.04.16
+	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 
