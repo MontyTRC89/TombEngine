@@ -1289,7 +1289,7 @@ bool SaveGame::Save(int slot)
 				
 			case SavedVarType::Vec3:
 				{
-					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
+					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
 					break;
 				}
 
@@ -2255,7 +2255,7 @@ bool SaveGame::Load(int slot)
 				{
 					auto stored = var->u_as_vec3()->vec();
 					SavedVar var;
-					var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+					var.emplace<(int)SavedVarType::Vec3>(ToVector3(stored));
 					loadedVars.push_back(var);
 					break;
 				}

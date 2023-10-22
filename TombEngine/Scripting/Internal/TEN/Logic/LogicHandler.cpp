@@ -469,13 +469,13 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto vec2 = Vec3(std::get<int(SavedVarType::Vec3)>(vars[second]));
-					solTables[i][vars[first]] = vec2;
+					auto vec3 = Vec3(std::get<int(SavedVarType::Vec3)>(vars[second]));
+					solTables[i][vars[first]] = vec3;
 				}
 				else if (vars[second].index() == int(SavedVarType::Rotation))
 				{
-					auto vec2 = Rotation(std::get<int(SavedVarType::Rotation)>(vars[second]));
-					solTables[i][vars[first]] = vec2;
+					auto vec3 = Rotation(std::get<int(SavedVarType::Rotation)>(vars[second]));
+					solTables[i][vars[first]] = vec3;
 				}
 				else if (vars[second].index() == int(SavedVarType::Color))
 				{
@@ -508,7 +508,8 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
 }
 
-template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType>
+int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
 {
 	auto [first, second] = varsMap.insert(std::make_pair(&var, (int)numVars));
 
@@ -517,7 +518,7 @@ template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename Map
 		SavedVar savedVar;
 		TypeTo varTo = (TypeTo)var;
 		savedVar.emplace<(int)TypeEnum>(varTo);
-		vars.push_back(varTo);
+		vars.push_back(savedVar);
 		++numVars;
 	}
 
@@ -691,7 +692,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 					}
 					else if (second.is<Vec3>())
 					{
-						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, numVars, vars));
+						putInVars(Handle<SavedVarType::Vec3, Vector3>(second.as<Vec3>(), varsMap, numVars, vars));
 					}
 					else if (second.is<Rotation>())
 					{
