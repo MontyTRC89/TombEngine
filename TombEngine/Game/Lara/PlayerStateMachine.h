@@ -5,6 +5,11 @@ struct ItemInfo;
 
 namespace TEN::Entities::Player
 {
-	void HandlePlayerStateControl(ItemInfo& playerItem, CollisionInfo& coll);
-	void HandlePlayerStateCollision(ItemInfo& playerItem, CollisionInfo& coll);
+	enum class PlayerStateRoutineType
+	{
+		Control,
+		Collision
+	};
+
+	void HandlePlayerState(ItemInfo& item, CollisionInfo& coll, PlayerStateRoutineType routineType);
 }

@@ -512,7 +512,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	// Handle player state control.
-	HandlePlayerStateControl(*item, *coll);
+	HandlePlayerState(*item, *coll, PlayerStateRoutineType::Control);
 
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
@@ -524,7 +524,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 		// Handle player state collision.
 		if (lara->Context.Vehicle == NO_ITEM)
-			HandlePlayerStateCollision(*item, *coll);
+			HandlePlayerState(*item, *coll, PlayerStateRoutineType::Collision);
 	}
 
 	// Handle weapons.
@@ -575,7 +575,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Count.Pose = 0;
 
-	HandlePlayerStateControl(*item, *coll);
+	HandlePlayerState(*item, *coll, PlayerStateRoutineType::Control);
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -601,7 +601,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	DoObjectCollision(item, coll);
 
 	if (lara->Context.Vehicle == NO_ITEM)
-		HandlePlayerStateCollision(*item, *coll);
+		HandlePlayerState(*item, *coll, PlayerStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, LARA_RADIUS);
 
@@ -646,7 +646,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Count.Pose = 0;
 
-	HandlePlayerStateControl(*item, *coll);
+	HandlePlayerState(*item, *coll, PlayerStateRoutineType::Control);
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -691,7 +691,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	DoObjectCollision(item, coll);
 
 	if (/*lara->ExtraAnim == -1 &&*/ lara->Context.Vehicle == NO_ITEM)
-		HandlePlayerStateCollision(*item, *coll);
+		HandlePlayerState(*item, *coll, PlayerStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, 0);
 
