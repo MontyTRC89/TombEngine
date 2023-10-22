@@ -18,8 +18,9 @@ Version 1.1.1
 * Overhaul Pushable blocks:
  - Separate climbable and normal pushable blocks slots.
  - Add new pushable OCB to manipulate pushable block properties.
- - Add new Lara animations for pushing over the block off the edge (both TR1-3 and TR4-5 versions - credits to Gecko).
+ - Add new Lara animations for pushing over the block off the edge (both TR1-3 and TR4-5 versions).
  - Fix pushables not working with raising block.
+ - Fix miscellaneous pushable bugs.
 * Overhaul look-around feature:
  - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
  - Improve look camera movement and control.
