@@ -6,7 +6,8 @@
 #include "Game/pickup/pickup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/puzzles_keys.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Specific/level.h"
 
 void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::string& baseName, const std::string& requiredName)
@@ -192,10 +193,10 @@ void InitPushableObject(ObjectInfo* object, int objectNumber)
 		object->Initialize = InitializePushableBlock;
 		object->control = PushableBlockControl;
 		object->collision = PushableBlockCollision;
-		object->floor = PushableBlockFloor;
-		object->ceiling = PushableBlockCeiling;
-		object->floorBorder = PushableBlockFloorBorder;
-		object->ceilingBorder = PushableBlockCeilingBorder;
+		object->floor = PushableBridgeFloor;
+		object->ceiling = PushableBridgeCeiling;
+		object->floorBorder = PushableBridgeFloorBorder;
+		object->ceilingBorder = PushableBridgeCeilingBorder;
 		object->SetupHitEffect(true);
 	}
 }

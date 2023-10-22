@@ -248,7 +248,7 @@ auto PlayerStateControlRoutines = std::array<PlayerStateRoutine, NUM_LARA_STATES
 	lara_as_null,
 	lara_as_null,
 	lara_as_use_puzzle,//189
-	lara_as_null,//190
+	lara_as_pushable_edge_slip,//190
 	lara_as_sprint_slide,//191
 };
 
@@ -290,8 +290,8 @@ auto PlayerStateCollisionRoutines = std::array<PlayerStateRoutine, NUM_LARA_STAT
 	lara_col_surface_idle,//33
 	lara_col_surface_swim_forward,//34
 	lara_col_surface_dive,//35
-	lara_default_col,
-	lara_default_col,
+	lara_void_func,//36
+	lara_void_func,//37
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -967,7 +967,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockCeilingSlope = false;
 	coll->Setup.BlockDeathFloorDown = false;
 	coll->Setup.BlockMonkeySwingEdge = false;
-	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
