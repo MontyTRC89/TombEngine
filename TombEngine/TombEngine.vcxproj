@@ -698,7 +698,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Texture2DArray\Texture2DArray.h" />
     <ClInclude Include="Renderer\Texture2D\Texture2D.h" />
-    <ClInclude Include="Renderer\Texture2D\Texture2DUAV.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\Utils.h" />
     <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h" />
@@ -1123,7 +1122,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Renderer\Renderer11PostProcess.cpp" />
     <ClCompile Include="Renderer\Renderer11Settings.cpp" />
     <ClCompile Include="Renderer\Renderer11String.cpp" />
-    <ClCompile Include="Renderer\RendererSMAA.cpp" />
     <ClCompile Include="Renderer\RendererSprites.cpp" />
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
@@ -1131,7 +1129,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
     <ClCompile Include="Renderer\Texture2DArray\Texture2DArray.cpp" />
     <ClCompile Include="Renderer\Texture2D\Texture2D.cpp" />
-    <ClCompile Include="Renderer\Texture2D\Texture2DUAV.cpp" />
     <ClCompile Include="Renderer\Utils.cpp" />
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Scripting\Internal\LuaHandler.cpp" />

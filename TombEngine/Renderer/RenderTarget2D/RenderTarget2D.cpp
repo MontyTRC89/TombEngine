@@ -41,16 +41,6 @@ namespace TEN::Renderer
 		res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &RenderTargetView);
 		throwIfFailed(res);
 
-		if (typeless && false)
-		{
-			viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			viewDesc.ViewDimension = rtvDimension;
-			viewDesc.Texture2D.MipSlice = 0;
-
-			res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &SRGBRenderTargetView);
-			throwIfFailed(res);
-		}
-
 		// Setup the description of the shader resource view.
 		D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
 		shaderDesc.Format = colorFormat;
@@ -60,18 +50,6 @@ namespace TEN::Renderer
 
 		res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
 		throwIfFailed(res);
-
-		// Setup the description of the shader resource view.
-		if (typeless && false)
-		{
-			shaderDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			shaderDesc.ViewDimension = srvDimension;
-			shaderDesc.Texture2D.MostDetailedMip = 0;
-			shaderDesc.Texture2D.MipLevels = 1;
-
-			res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &SRGBShaderResourceView);
-			throwIfFailed(res);
-		}
 
 		D3D11_TEXTURE2D_DESC depthTexDesc = {};
 		depthTexDesc.Width = w;
@@ -99,6 +77,9 @@ namespace TEN::Renderer
 		throwIfFailed(res);
 	}
 
+	/* This constructor is for sharing the same texture resource of another render target.
+	 * We use it in SMAA technique for having one UNORM and one SRGB render targets but using the same texture.
+	 */
 	RenderTarget2D::RenderTarget2D(ID3D11Device* device, RenderTarget2D* parent, DXGI_FORMAT colorFormat)
 	{
 		D3D11_TEXTURE2D_DESC desc;

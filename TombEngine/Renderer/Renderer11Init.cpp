@@ -399,17 +399,18 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 	{
 		m_SMAASceneRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, true);
 		m_SMAASceneSRGBRenderTarget = RenderTarget2D(m_device.Get(), &m_SMAASceneRenderTarget, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-		m_SMAAVelocityRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R16G16_FLOAT, false);
+		//m_SMAAVelocityRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R16G16_FLOAT, false);
 		m_SMAAEdgesRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8_UNORM, false);
 		m_SMAABlendRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
-		m_SMAADepthRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false);
+		//m_SMAADepthRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false);
 
-		for (int i = 0; i < 2; i++) 
+		// TODO: in the future for SMAA T2X
+		/*for (int i = 0; i < 2; i++)
 		{
 			m_SMAATempRenderTargets[i] = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, true);
 			m_SMAATempSRGBRenderTargets[i] = RenderTarget2D(m_device.Get(),&m_SMAATempRenderTargets[i], DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 			m_SMAAPreviousRenderTargets[i] = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, false);
-		}
+		}*/
 
 		std::stringstream s;
 		std::vector<D3D10_SHADER_MACRO> defines;
@@ -422,24 +423,14 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 		if (g_Configuration.AntialiasingMode == AntialiasingMode::Medium)
 		{
-			defines.push_back({ "SMAA_PRESET_HIGH", nullptr });
+			defines.push_back({ "SMAA_PRESET_MEDIUM", nullptr });
 		}
 		else
 		{
 			defines.push_back({ "SMAA_PRESET_ULTRA", nullptr });
 		}
 
-		// Setup the predicated thresholding macro:
-		/*if (predication) {
-			D3D10_SHADER_MACRO predicationMacro = { "SMAA_PREDICATION", "1" };
-			defines.push_back(predicationMacro);
-		}
-
-		// Setup the reprojection macro:
-		if (reprojection) {
-			D3D10_SHADER_MACRO reprojectionMacro = { "SMAA_REPROJECTION", "1" };
-			defines.push_back(reprojectionMacro);
-		}*/
+		// defines.push_back({ "SMAA_PREDICATION", "1" });
 
 		// Setup the target macro:
 		D3D10_SHADER_MACRO dx101Macro = { "SMAA_HLSL_4_1", "1" };
@@ -449,39 +440,14 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 		defines.push_back(null);
 
 		ComPtr<ID3D10Blob> blob;
-		m_SMAALumaEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAALumaEdgeDetectionPS", "ps_4_1", defines.data(), blob);
-		m_SMAAColorEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAAColorEdgeDetectionPS", "ps_4_1", defines.data(), blob);
-		m_SMAADepthEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAADepthEdgeDetectionPS", "ps_4_1", defines.data(), blob);
-		m_SMAABlendingWeightCalculationPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAABlendingWeightCalculationPS", "ps_4_1", defines.data(), blob);
-		m_SMAANeighborhoodBlendingPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAANeighborhoodBlendingPS", "ps_4_1", defines.data(), blob);
-		m_SMAALumaEdgeDetectionVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAAEdgeDetectionVS", "vs_4_1", defines.data(), blob);
-		m_SMAABlendingWeightCalculationVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAABlendingWeightCalculationVS", "vs_4_1", defines.data(), blob);
-		m_SMAANeighborhoodBlendingVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAANeighborhoodBlendingVS", "vs_4_1", defines.data(), blob);
-	
-		SMAAVertex vertices[3];
-
-		vertices[0].Position = Vector3(-1.0f, -1.0f, 1.0f);
-		vertices[1].Position = Vector3(-1.0f, 3.0f, 1.0f);
-		vertices[2].Position = Vector3(3.0f, -1.0f, 1.0f);
-
-		vertices[0].UV = Vector2(0.0f, 1.0f);
-		vertices[1].UV = Vector2(0.0f, -1.0f);
-		vertices[2].UV = Vector2(2.0f, 1.0f);
-
-		D3D11_BUFFER_DESC bufferDesc;
-		D3D11_SUBRESOURCE_DATA data;
-
-		bufferDesc.ByteWidth = sizeof(SMAAVertex) * 3;
-		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bufferDesc.CPUAccessFlags = 0;
-		bufferDesc.MiscFlags = 0;
-
-		data.pSysMem = vertices;
-		data.SysMemPitch = 0;
-		data.SysMemSlicePitch = 0;
-
-		Utils::throwIfFailed(m_device->CreateBuffer(&bufferDesc, &data, &m_SMAATriangleVertexBuffer));
+		m_SMAALumaEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAALumaEdgeDetectionPS", "ps_5_0", defines.data(), blob);
+		m_SMAAColorEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAAColorEdgeDetectionPS", "ps_5_0", defines.data(), blob);
+		m_SMAADepthEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAADepthEdgeDetectionPS", "ps_5_0", defines.data(), blob);
+		m_SMAABlendingWeightCalculationPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAABlendingWeightCalculationPS", "ps_5_0", defines.data(), blob);
+		m_SMAANeighborhoodBlendingPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAANeighborhoodBlendingPS", "ps_5_0", defines.data(), blob);
+		m_SMAAEdgeDetectionVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAAEdgeDetectionVS", "vs_5_0", defines.data(), blob);
+		m_SMAABlendingWeightCalculationVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAABlendingWeightCalculationVS", "vs_5_0", defines.data(), blob);
+		m_SMAANeighborhoodBlendingVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAANeighborhoodBlendingVS", "vs_5_0", defines.data(), blob);
 
 		const D3D11_INPUT_ELEMENT_DESC layout[] = {
 			{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -489,7 +455,12 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 		};
 		UINT numElements = sizeof(layout) / sizeof(D3D10_INPUT_ELEMENT_DESC);
 
-		Utils::throwIfFailed(m_device->CreateInputLayout(layout, numElements, blob->GetBufferPointer(), blob->GetBufferSize(), m_SMAATriangleInputLayout.GetAddressOf()));
+		Utils::throwIfFailed(m_device->CreateInputLayout(
+			layout, 
+			numElements, 
+			blob->GetBufferPointer(), 
+			blob->GetBufferSize(), 
+			m_SMAATriangleInputLayout.GetAddressOf()));
 	
 		m_SMAAprimitiveBatch = std::make_unique<PrimitiveBatch<SMAAVertex>>(m_context.Get());
 		m_postProcess = std::make_unique<BasicPostProcess>(m_device.Get());
@@ -526,7 +497,7 @@ void TEN::Renderer::Renderer11::Create()
 {
 	TENLog("Creating DX11 renderer device...", LogLevel::Info);
 
-	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 }; 
+	D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_11_0 }; 
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT res;
 
@@ -576,260 +547,4 @@ void Renderer11::SetFullScreen()
 	}
 
 	UpdateWindow(WindowsHandle);
-}
-
-#ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p) { if (p) { (p)->Release(); (p) = nullptr; } }
-#endif
-
-bool Renderer11::CMAA2CreateBufferAndViews(ID3D11Device* pDevice, const D3D11_BUFFER_DESC& BuffDesc, D3D11_SUBRESOURCE_DATA* pInitData, ID3D11Buffer** ppBuffer, ID3D11ShaderResourceView** ppSRV, ID3D11UnorderedAccessView** ppUAV, UINT UAVFlags)
-{
-	ID3D11Buffer* dummyBuffer = nullptr;
-	if (ppBuffer == nullptr)
-		ppBuffer = &dummyBuffer;
-
-	Utils::throwIfFailed(pDevice->CreateBuffer(&BuffDesc, pInitData, ppBuffer));
-
-	if (ppSRV)
-	{
-		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-		ZeroMemory(&SRVDesc, sizeof(SRVDesc));
-		SRVDesc.Format = (BuffDesc.MiscFlags & D3D11_RESOURCE_MISC_BUFFER_STRUCTURED) ? (DXGI_FORMAT_UNKNOWN) : (DXGI_FORMAT_R32_UINT);
-		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-		SRVDesc.Buffer.FirstElement = 0;
-		SRVDesc.Buffer.NumElements = BuffDesc.ByteWidth / BuffDesc.StructureByteStride;
-		Utils::throwIfFailed(pDevice->CreateShaderResourceView(*ppBuffer, &SRVDesc, ppSRV));
-	}
-
-	if (ppUAV)
-	{
-		D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
-		UAVDesc.Format = (BuffDesc.MiscFlags & D3D11_RESOURCE_MISC_BUFFER_STRUCTURED) ? (DXGI_FORMAT_UNKNOWN) : (DXGI_FORMAT_R32_UINT);
-		if ((UAVFlags & D3D11_BUFFER_UAV_FLAG_RAW))
-			UAVDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-		UAVDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-		UAVDesc.Buffer.FirstElement = 0;
-		UAVDesc.Buffer.NumElements = BuffDesc.ByteWidth / BuffDesc.StructureByteStride;
-		UAVDesc.Buffer.Flags = UAVFlags;
-		Utils::throwIfFailed(pDevice->CreateUnorderedAccessView(*ppBuffer, &UAVDesc, ppUAV));
-	}
-
-	SAFE_RELEASE(dummyBuffer);
-
-	return true;
-}
-
-bool Renderer11::CMAA2CheckUAVTypedStoreFormatSupport(ID3D11Device* device, DXGI_FORMAT format)
-{
-	D3D11_FEATURE_DATA_FORMAT_SUPPORT   capsFormatSupport = { format };
-	D3D11_FEATURE_DATA_FORMAT_SUPPORT2  capsFormatSupport2 = { format };
-	HRESULT hr;
-	hr = device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT, &capsFormatSupport, sizeof(capsFormatSupport));
-	assert(SUCCEEDED(hr));
-	hr = device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT2, &capsFormatSupport2, sizeof(capsFormatSupport2));
-	assert(SUCCEEDED(hr));
-
-	bool typed_unordered_access_view = (capsFormatSupport.OutFormatSupport & D3D11_FORMAT_SUPPORT_TYPED_UNORDERED_ACCESS_VIEW) != 0;     // Format can be used for an unordered access view.
-
-	bool uav_typed_store = (capsFormatSupport2.OutFormatSupport2 & D3D11_FORMAT_SUPPORT2_UAV_TYPED_STORE) != 0;            // Format supports a typed store.
-
-	return typed_unordered_access_view && uav_typed_store;
-}
-
-ID3D11UnorderedAccessView* Renderer11::CMAA2CreateUnorderedAccessView(ID3D11Resource* resource, DXGI_FORMAT format, int mipSliceMin, int arraySliceMin, int arraySliceCount)
-{
-	ID3D11UnorderedAccessView* ret = NULL;
-
-	D3D11_UNORDERED_ACCESS_VIEW_DESC desc;
-	D3D11_UAV_DIMENSION dimension = D3D11_UAV_DIMENSION_UNKNOWN;
-
-	ID3D11Texture2D* texture2D = NULL;
-	if (SUCCEEDED(resource->QueryInterface(IID_ID3D11Texture2D, (void**)&texture2D)))
-	{
-		D3D11_TEXTURE2D_DESC descTex2D;
-		texture2D->GetDesc(&descTex2D);
-
-		if (arraySliceCount == -1)
-			arraySliceCount = descTex2D.ArraySize - arraySliceMin;
-
-		assert(mipSliceMin >= 0 && (UINT)mipSliceMin < descTex2D.MipLevels);
-		assert(arraySliceMin >= 0 && (UINT)arraySliceMin < descTex2D.ArraySize);
-		assert(arraySliceMin + arraySliceCount > 0 && (UINT)arraySliceMin + arraySliceCount <= descTex2D.ArraySize);
-
-		dimension = (descTex2D.ArraySize == 1) ? (D3D11_UAV_DIMENSION_TEXTURE2D) : (D3D11_UAV_DIMENSION_TEXTURE2DARRAY);
-
-		desc = CD3D11_UNORDERED_ACCESS_VIEW_DESC(texture2D, dimension, format);
-
-		if (dimension == D3D11_UAV_DIMENSION_TEXTURE2D)
-		{
-			desc.Texture2D.MipSlice = mipSliceMin;
-			assert(arraySliceMin == 0);
-		}
-		else if (dimension == D3D11_UAV_DIMENSION_TEXTURE2DARRAY)
-		{
-			desc.Texture2DArray.MipSlice = mipSliceMin;
-			desc.Texture2DArray.FirstArraySlice = arraySliceMin;
-			desc.Texture2DArray.ArraySize = arraySliceCount;
-		}
-		else { assert(false); }
-
-		SAFE_RELEASE(texture2D);
-	}
-	else
-	{
-		assert(false);
-		return nullptr;
-	}
-
-	ID3D11Device* device = nullptr;
-	resource->GetDevice(&device);
-	device->Release(); // yeah, ugly - we know at minimum texture will guarantee device persistence but still...
-	if (SUCCEEDED(device->CreateUnorderedAccessView(resource, &desc, &ret)))
-	{
-		return ret;
-	}
-	else
-	{
-		assert(false);
-		return NULL;
-	}
-}
-
-void Renderer11::CMAA2CleanupTemporaryResources()
-{
-	SAFE_RELEASE(m_workingShapeCandidatesUAV);
-	SAFE_RELEASE(m_workingDeferredBlendLocationListUAV);
-	SAFE_RELEASE(m_workingDeferredBlendItemListUAV);
-	SAFE_RELEASE(m_workingControlBuffer);
-	SAFE_RELEASE(m_workingControlBufferUAV);
-	SAFE_RELEASE(g_workingExecuteIndirectBuffer);
-	SAFE_RELEASE(g_workingExecuteIndirectBufferUAV);
-	SAFE_RELEASE(m_inoutColorReadonlySRV);
-	SAFE_RELEASE(m_inoutColorWriteonlyUAV);
-
-	//Reset();
-}
-
-bool Renderer11::CMAA2UpdateResources(RenderTarget2D* renderTarget)
-{
-	int resX = m_screenWidth;
-	int resY = m_screenHeight;
-
-	//CMAA2CleanupTemporaryResources();
-
-	// Set quality settings
-	std::vector<std::pair<std::string, std::string>> shaderMacros;
-	if (g_Configuration.AntialiasingMode == AntialiasingMode::Medium)
-		shaderMacros.push_back({ "CMAA2_STATIC_QUALITY_PRESET", "1" });
-	else if (g_Configuration.AntialiasingMode == AntialiasingMode::High)
-		shaderMacros.push_back({ "CMAA2_STATIC_QUALITY_PRESET", "2" });
-	shaderMacros.push_back({ "CMAA2_EXTRA_SHARPNESS", "0" });
-
-	// support for various color format combinations
-	{
-		m_inoutColorReadonlySRV = renderTarget->ShaderResourceView.Get();
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-		m_inoutColorReadonlySRV->GetDesc(&srvDesc);
-
-		DXGI_FORMAT srvFormat = srvDesc.Format;
-		DXGI_FORMAT srvFormatStrippedSRGB = srvFormat;
-
-		// Assume we don't support typed UAV store-s for our combination of inputs/outputs - reset if we do
-		bool convertToSRGBOnOutput = true;
-
-		assert(m_inoutColorWriteonlyUAV == nullptr);
-
-		bool hdrFormat = false;
-		bool uavStoreTyped = false;
-		bool uavStoreTypesUnormFloat = false;
-
-		m_inoutColorWriteonlyUAV = CMAA2CreateUnorderedAccessView(renderTarget->Texture.Get(), DXGI_FORMAT_R32_UINT);
-
-		assert(m_inoutColorWriteonlyUAV != nullptr); // check DX errors for clues
-
-		// the need for pre-store sRGB conversion already accounted for above by 'convertToSRGBOnOutput'
-		switch (srvFormatStrippedSRGB)
-		{
-		case DXGI_FORMAT_R8G8B8A8_UNORM:    shaderMacros.push_back(std::pair<std::string, std::string>("CMAA2_UAV_STORE_UNTYPED_FORMAT", "1"));     break;
-		case DXGI_FORMAT_R10G10B10A2_UNORM: shaderMacros.push_back(std::pair<std::string, std::string>("CMAA2_UAV_STORE_UNTYPED_FORMAT", "2"));     break;
-		}
-
-		// force manual conversion to sRGB before write
-		shaderMacros.push_back(std::pair<std::string, std::string>("CMAA2_UAV_STORE_TYPED", (uavStoreTyped) ? ("1") : ("0")));
-		shaderMacros.push_back(std::pair<std::string, std::string>("CMAA2_UAV_STORE_TYPED_UNORM_FLOAT", (uavStoreTypesUnormFloat) ? ("1") : ("0")));
-		shaderMacros.push_back(std::pair<std::string, std::string>("CMAA2_UAV_STORE_CONVERT_TO_SRGB", (convertToSRGBOnOutput) ? ("1") : ("0")));
-		shaderMacros.push_back(std::pair<std::string, std::string>("CMAA2_SUPPORT_HDR_COLOR_RANGE", (hdrFormat) ? ("1") : ("0")));
-	}
-
-	// create all temporary storage buffers
-	{
-		int edgesResX = resX;
-		edgesResX = (edgesResX + 1) / 2;
-
-		m_workingEdges = Texture2DUAV(m_device.Get(), edgesResX, resY, DXGI_FORMAT_R8_UINT);
-
-		m_workingDeferredBlendItemListHeads = Texture2DUAV(m_device.Get(), (resX + 1) / 2, (resY + 1) / 2, DXGI_FORMAT_R32_UINT);
-
-		// 99.99% safe version that uses less memory but will start running out of storage in extreme cases (and start ignoring edges in a non-deterministic way)
-		// on an average scene at ULTRA preset only 1/4 of below is used but we leave 4x margin for extreme cases like full screen dense foliage
-		int requiredCandidatePixels = resX * resY / 4;
-		int requiredDeferredColorApplyBuffer = resX * resY / 2;
-		int requiredListHeadsPixels = (resX * resY + 3) / 6;
-
-		// Create buffer for storing a list of all pixel candidates to process (potential AA shapes, both simple and complex)
-		{
-			CD3D11_BUFFER_DESC cdesc(requiredCandidatePixels * sizeof(UINT), D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(UINT));
-			CMAA2CreateBufferAndViews(m_device.Get(), cdesc, nullptr, nullptr, nullptr, &m_workingShapeCandidatesUAV, 0);
-		}
-
-		// Create buffer for storing linked list of all output values to blend
-		{
-			CD3D11_BUFFER_DESC cdesc(requiredDeferredColorApplyBuffer * sizeof(UINT) * 2, D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(UINT) * 2);
-			CMAA2CreateBufferAndViews(m_device.Get(), cdesc, nullptr, nullptr, nullptr, &m_workingDeferredBlendItemListUAV, 0);
-		}
-
-		// Create buffer for storing a list of coordinates of linked list heads quads, to allow for combined processing in the last step
-		{
-			CD3D11_BUFFER_DESC cdesc(requiredListHeadsPixels * sizeof(UINT), D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(UINT));
-			CMAA2CreateBufferAndViews(m_device.Get(), cdesc, nullptr, nullptr, nullptr, &m_workingDeferredBlendLocationListUAV, 0);
-		}
-
-		// Control buffer (always the same size, doesn't need re-creating but oh well)
-		{
-			CD3D11_BUFFER_DESC cdesc(16 * sizeof(UINT), D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS, sizeof(UINT));
-			UINT initData[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-			D3D11_SUBRESOURCE_DATA srd;
-			srd.pSysMem = initData; srd.SysMemPitch = srd.SysMemSlicePitch = 0;
-			CMAA2CreateBufferAndViews(m_device.Get(), cdesc, &srd, &m_workingControlBuffer, nullptr, &m_workingControlBufferUAV, D3D11_BUFFER_UAV_FLAG_RAW);
-		}
-
-		// Control buffer (always the same size, doesn't need re-creating but oh well)
-		{
-			CD3D11_BUFFER_DESC cdesc(4 * sizeof(UINT), D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS | D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS, sizeof(UINT));
-			CMAA2CreateBufferAndViews(m_device.Get(), cdesc, nullptr, &g_workingExecuteIndirectBuffer, nullptr, &g_workingExecuteIndirectBufferUAV, D3D11_BUFFER_UAV_FLAG_RAW);
-		}
-	}
-
-	// Update shaders to match input/output format permutations based on support
-	{
-		ComPtr<ID3D10Blob> blob;
-
-		D3D_SHADER_MACRO* macros = (D3D_SHADER_MACRO*)malloc(sizeof(LPCSTR) * (shaderMacros.size() + 1));
-		for (int i = 0; i < shaderMacros.size(); i++)
-		{
-			macros[i].Name = shaderMacros[i].first.c_str();
-			macros[i].Definition = shaderMacros[i].second.c_str();
-		}
-		macros[shaderMacros.size()].Name = nullptr;
-		macros[shaderMacros.size()].Definition = nullptr;
-
-		m_CSEdgesColor2x2 = Utils::compileComputeShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_CMAA2.fx"), "EdgesColor2x2CS", "cs_5_0", macros, blob);
-		m_CSProcessCandidates = Utils::compileComputeShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_CMAA2.fx"), "ProcessCandidatesCS", "cs_5_0", macros, blob);
-		m_CSDeferredColorApply2x2 = Utils::compileComputeShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_CMAA2.fx"), "DeferredColorApply2x2CS", "cs_5_0", macros, blob);
-		m_CSComputeDispatchArgs = Utils::compileComputeShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_CMAA2.fx"), "ComputeDispatchArgsCS", "cs_5_0", macros, blob);
-		m_CSDebugDrawEdges = Utils::compileComputeShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_CMAA2.fx"), "DebugDrawEdgesCS", "cs_5_0", macros, blob);
-	}
-
-	return true;
 }
