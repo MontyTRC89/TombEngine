@@ -244,14 +244,24 @@ namespace TEN::Renderer
 			// Thumbstick camera
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
+			GetNextLinePosition(&y);
+
+			// Mouse sensitivity
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
+			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
+			GetNextLinePosition(&y);
+
+			// Mouse smoothing
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SMOOTHING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 9));
+			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSmoothing).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
 			GetNextBlockPosition(&y);
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 10));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 9));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
 			break;
 
 		case Menu::GeneralActions:
@@ -1159,15 +1169,36 @@ namespace TEN::Renderer
 				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
 				PrintDebugMessage("CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				PrintDebugMessage("CanMonkeySwing: %d", Lara.Control.CanMonkeySwing);
+				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				break;
 
-			case RendererDebugPage::LogicStats:
-				PrintDebugMessage("LOGIC STATS");
-				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
-				PrintDebugMessage("Move axis vertical: %f", AxisMap[InputAxis::MoveVertical]);
-				PrintDebugMessage("Move axis horizontal: %f", AxisMap[InputAxis::MoveHorizontal]);
-				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
-				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
+			case RendererDebugPage::InputStats:
+			{
+				auto clickedActions = BitField((int)In::Count);
+				auto heldActions = BitField((int)In::Count);
+				auto releasedActions = BitField((int)In::Count);
+
+				for (const auto& action : ActionMap)
+				{
+					if (action.IsClicked())
+						clickedActions.Set((int)action.GetID());
+
+					if (action.IsHeld())
+						heldActions.Set((int)action.GetID());
+
+					if (action.IsReleased())
+						releasedActions.Set((int)action.GetID());
+				}
+				
+				PrintDebugMessage("INPUT STATS");
+				PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
+				PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
+				PrintDebugMessage(("Released actions: " + releasedActions.ToString()).c_str());
+				PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
+				PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
+				PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
+				PrintDebugMessage("Cursor pos: %.3f, %.3f", GetCursorDisplayPosition().x, GetCursorDisplayPosition().y);
+			}
 				break;
 
 			case RendererDebugPage::CollisionStats:

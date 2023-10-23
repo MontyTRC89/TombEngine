@@ -553,7 +553,7 @@ bool Moveable::SetName(const std::string& id)
 // @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
-	return Vec3(m_item->Pose);
+	return Vec3(m_item->Pose.Position);
 }
 
 /// Set the moveable's position
@@ -566,7 +566,7 @@ Vec3 Moveable::GetPos() const
 void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	auto prevPos = m_item->Pose.Position.ToVector3();
-	pos.StoreInPose(m_item->Pose);
+	m_item->Pose.Position = pos.ToVector3i();
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 

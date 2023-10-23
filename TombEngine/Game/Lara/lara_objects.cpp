@@ -157,36 +157,36 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 // PUSHABLE
 // --------
 
-// State:		LS_PUSHABLE_PUSH (36)
-// Collision:	lara_default_col()
+// State:	  LS_PUSHABLE_PUSH (36)
+// Collision: lara_void_func()
 void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::None;
+	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(35.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
 	Camera.flags = CF_FOLLOW_CENTER;
 }
 
-// State:		LS_PUSHABLE_PULL (37)
-// Collision:	lara_default_col()
+// State:	  LS_PUSHABLE_PULL (37)
+// Collision: lara_void_func()
 void lara_as_pushable_pull(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::None;
+	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(35.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
 	Camera.flags = CF_FOLLOW_CENTER;
 }
 
-// State:		LS_PUSHABLE_GRAB (38)
-// Collision:	lara_default_col()
+// State:	  LS_PUSHABLE_GRAB (38)
+// Collision: lara_default_col()
 void lara_as_pushable_grab(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
@@ -195,6 +195,20 @@ void lara_as_pushable_grab(ItemInfo* item, CollisionInfo* coll)
 
 	if (!IsHeld(In::Action))
 		item->Animation.TargetState = LS_IDLE;
+}
+
+// State:	  LS_PUSHABLE_PUSH_EDGE_SLIP (190)
+// Collision: lara_void_func()
+void lara_as_pushable_edge_slip(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::None;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetAngle = ANGLE(35.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
+	Camera.flags = CF_FOLLOW_CENTER;
 }
 
 // ------
