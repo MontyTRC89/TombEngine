@@ -56,12 +56,12 @@ static void StartObject(ObjectInfo* object)
 		if (object->loaded)
 		{
 			object->Initialize = InitializeTrapDoor;
-			object->collision = TrapDoorCollision;
 			object->control = TrapDoorControl;
-			object->floorBorder = TrapDoorFloorBorder;
-			object->ceilingBorder = TrapDoorCeilingBorder;
-			object->floor = TrapDoorFloor;
-			object->ceiling = TrapDoorCeiling;
+			object->collision = TrapDoorCollision;
+			object->GetFloorBorder = GetTrapDoorFloorBorder;
+			object->GetCeilingBorder = GetTrapDoorCeilingBorder;
+			object->GetFloorHeight = GetTrapDoorFloorHeight;
+			object->GetCeilingHeight = GetTrapDoorCeilingHeight;
 			object->SetupHitEffect(true);
 		}
 	}
@@ -72,12 +72,12 @@ static void StartObject(ObjectInfo* object)
 		if (object->loaded)
 		{
 			object->Initialize = InitializeTrapDoor;
-			object->collision = FloorTrapDoorCollision;
 			object->control = TrapDoorControl;
-			object->floorBorder = TrapDoorFloorBorder;
-			object->ceilingBorder = TrapDoorCeilingBorder;
-			object->floor = TrapDoorFloor;
-			object->ceiling = TrapDoorCeiling;
+			object->collision = FloorTrapDoorCollision;
+			object->GetFloorHeight = GetTrapDoorFloorHeight;
+			object->GetCeilingHeight = GetTrapDoorCeilingHeight;
+			object->GetFloorBorder = GetTrapDoorFloorBorder;
+			object->GetCeilingBorder = GetTrapDoorCeilingBorder;
 			object->SetupHitEffect(true);
 		}
 	}
@@ -88,12 +88,12 @@ static void StartObject(ObjectInfo* object)
 		if (object->loaded)
 		{
 			object->Initialize = InitializeTrapDoor;
-			object->collision = CeilingTrapDoorCollision;
 			object->control = TrapDoorControl;
-			object->floorBorder = TrapDoorFloorBorder;
-			object->ceilingBorder = TrapDoorCeilingBorder;
-			object->floor = TrapDoorFloor;
-			object->ceiling = TrapDoorCeiling;
+			object->collision = CeilingTrapDoorCollision;
+			object->GetFloorHeight = GetTrapDoorFloorHeight;
+			object->GetCeilingHeight = GetTrapDoorCeilingHeight;
+			object->GetFloorBorder = GetTrapDoorFloorBorder;
+			object->GetCeilingBorder = GetTrapDoorCeilingBorder;
 			object->SetupHitEffect(true);
 		}
 	}
@@ -108,50 +108,50 @@ static void StartObject(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<0>;
-		object->ceiling = BridgeCeiling<0>;
-		object->floorBorder = BridgeFloorBorder<0>;
-		object->ceilingBorder = BridgeCeilingBorder<0>;
+		object->GetFloorHeight = GetBridgeFloorHeight<0>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<0>;
+		object->GetFloorBorder = GetBridgeFloorBorder<0>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<0>;
 	}
 
 	object = &Objects[ID_BRIDGE_TILT1];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<1>;
-		object->ceiling = BridgeCeiling<1>;
-		object->floorBorder = BridgeFloorBorder<1>;
-		object->ceilingBorder = BridgeCeilingBorder<1>;
+		object->GetFloorHeight = GetBridgeFloorHeight<1>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<1>;
+		object->GetFloorBorder = GetBridgeFloorBorder<1>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<1>;
 	}
 
 	object = &Objects[ID_BRIDGE_TILT2];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<2>;
-		object->ceiling = BridgeCeiling<2>;
-		object->floorBorder = BridgeFloorBorder<2>;
-		object->ceilingBorder = BridgeCeilingBorder<2>;
+		object->GetFloorHeight = GetBridgeFloorHeight<2>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<2>;
+		object->GetFloorBorder = GetBridgeFloorBorder<2>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<2>;
 	}
 
 	object = &Objects[ID_BRIDGE_TILT3];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<3>;
-		object->ceiling = BridgeCeiling<3>;
-		object->floorBorder = BridgeFloorBorder<3>;
-		object->ceilingBorder = BridgeCeilingBorder<3>;
+		object->GetFloorHeight = GetBridgeFloorHeight<3>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<3>;
+		object->GetFloorBorder = GetBridgeFloorBorder<3>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<3>;
 	}
 
 	object = &Objects[ID_BRIDGE_TILT4];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<4>;
-		object->ceiling = BridgeCeiling<4>;
-		object->floorBorder = BridgeFloorBorder<4>;
-		object->ceilingBorder = BridgeCeilingBorder<4>;
+		object->GetFloorHeight = GetBridgeFloorHeight<4>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<4>;
+		object->GetFloorBorder = GetBridgeFloorBorder<4>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<4>;
 	}
 }
 
@@ -429,24 +429,24 @@ void StartTraps(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->Initialize = InitializeFallingBlock;
-		object->collision = FallingBlockCollision;
 		object->control = FallingBlockControl;
-		object->floor = FallingBlockFloor;
-		object->ceiling = FallingBlockCeiling;
-		object->floorBorder = FallingBlockFloorBorder;
-		object->ceilingBorder = FallingBlockCeilingBorder;
+		object->collision = FallingBlockCollision;
+		object->GetFloorHeight = GetFallingBlockFloorHeight;
+		object->GetCeilingHeight = GetFallingBlockCeilingHeight;
+		object->GetFloorBorder = GetFallingBlockFloorBorder;
+		object->GetCeilingBorder = GetFallingBlockCeilingBorder;
 	}
 
 	object = &Objects[ID_FALLING_BLOCK2];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeFallingBlock;
-		object->collision = FallingBlockCollision;
 		object->control = FallingBlockControl;
-		object->floor = FallingBlockFloor;
-		object->ceiling = FallingBlockCeiling;
-		object->floorBorder = FallingBlockFloorBorder;
-		object->ceilingBorder = FallingBlockCeilingBorder;
+		object->collision = FallingBlockCollision;
+		object->GetFloorHeight = GetFallingBlockFloorHeight;
+		object->GetCeilingHeight = GetFallingBlockCeilingHeight;
+		object->GetFloorBorder = GetFallingBlockFloorBorder;
+		object->GetCeilingBorder = GetFallingBlockCeilingBorder;
 	}
 
 	object = &Objects[ID_CRUMBLING_FLOOR];
@@ -455,11 +455,10 @@ void StartTraps(ObjectInfo* object)
 		object->Initialize = InitializeCrumblingPlatform;
 		object->control = ControlCrumblingPlatform;
 		object->collision = CollideCrumblingPlatform;
-
-		object->floor = CrumblingPlatformFloor;
-		object->ceiling = CrumblingPlatformCeiling;
-		object->floorBorder = CrumblingPlatformFloorBorder;
-		object->ceilingBorder = CrumblingPlatformCeilingBorder;
+		object->GetFloorHeight = GetCrumblingPlatformFloorHeight;
+		object->GetCeilingHeight = GetCrumblingPlatformCeilingHeight;
+		object->GetFloorBorder = GetCrumblingPlatformFloorBorder;
+		object->GetCeilingBorder = GetCrumblingPlatformCeilingBorder;
 	}
 
 	object = &Objects[ID_PARALLEL_BARS];

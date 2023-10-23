@@ -662,12 +662,12 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeTwoBlocksPlatform;
-		obj->control = TwoBlocksPlatformControl;
-		obj->floor = TwoBlocksPlatformFloor;
-		obj->ceiling = TwoBlocksPlatformCeiling;
-		obj->floorBorder = TwoBlocksPlatformFloorBorder;
-		obj->ceilingBorder = TwoBlocksPlatformCeilingBorder;
+		obj->Initialize = InitializeTwoBlockPlatform;
+		obj->control = TwoBlockPlatformControl;
+		obj->GetFloorHeight = GetTwoBlockPlatformFloorHeight;
+		obj->GetCeilingHeight = GetTwoBlockPlatformCeilingHeight;
+		obj->GetFloorBorder = GetTwoBlockPlatformFloorBorder;
+		obj->GetCeilingBorder = GetTwoBlockPlatformCeilingBorder;
 		obj->SetupHitEffect(true);
 	}
 
@@ -678,10 +678,10 @@ static void StartObject(ObjectInfo *obj)
 		{
 			obj->Initialize = InitializeRaisingBlock;
 			obj->control = ControlRaisingBlock;
-			obj->floor = RaisingBlockFloor;
-			obj->ceiling = RaisingBlockCeiling;
-			obj->floorBorder = RaisingBlockFloorBorder;
-			obj->ceilingBorder = RaisingBlockCeilingBorder;
+			obj->GetFloorHeight = GetRaisingBlockFloorHeight;
+			obj->GetCeilingHeight = GetRaisingBlockCeilingHeight;
+			obj->GetFloorBorder = GetRaisingBlockFloorBorder;
+			obj->GetCeilingBorder = GetRaisingBlockCeilingBorder;
 			obj->SetupHitEffect(true);
 		}
 	}
@@ -691,10 +691,10 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeExpandingPlatform;
 		obj->control = ControlExpandingPlatform;
-		obj->floor = ExpandingPlatformFloor;
-		obj->ceiling = ExpandingPlatformCeiling;
-		obj->floorBorder = ExpandingPlatformFloorBorder;
-		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
+		obj->GetFloorHeight = GetExpandingPlatformFloorHeight;
+		obj->GetCeilingHeight = GetExpandingPlatformCeilingHeight;
+		obj->GetFloorBorder = ExpandingPlatformFloorBorder;
+		obj->GetCeilingBorder = ExpandingPlatformCeilingBorder;
 		obj->SetupHitEffect(true);
 	}
 

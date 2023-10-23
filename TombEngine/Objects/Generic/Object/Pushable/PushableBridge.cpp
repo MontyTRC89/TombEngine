@@ -9,53 +9,47 @@ using namespace TEN::Collision::Floordata;
 
 namespace TEN::Entities::Generic
 {
-	std::optional<int> PushableBridgeFloor(int itemNumber, int x, int y, int z)
+	std::optional<int> GetPushableBridgeFloorHeight(const ItemInfo& item, const Vector3i& pos)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		const auto& pushable = GetPushableInfo(pushableItem);
+		const auto& pushable = GetPushableInfo(item);
 
-		auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
+		auto boxHeight = GetBridgeItemIntersect(item, pos, false);
 
-		if (pushableItem.Active &&pushableItem.Status != ITEM_INVISIBLE &&
+		if (item.Active &&item.Status != ITEM_INVISIBLE &&
 			pushable.UseRoomCollision &&
 			boxHeight.has_value())
 		{
-			int height = pushableItem.Pose.Position.y - GetPushableHeight(pushableItem);
+			int height = item.Pose.Position.y - GetPushableHeight(item);
 			return height;
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<int> PushableBridgeCeiling(int itemNumber, int x, int y, int z)
+	std::optional<int> GetPushableBridgeCeilingHeight(const ItemInfo& item, const Vector3i& pos)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-		const auto& pushable = GetPushableInfo(pushableItem);
+		const auto& pushable = GetPushableInfo(item);
 
-		auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
+		auto boxHeight = GetBridgeItemIntersect(item, pos, true);
 
-		if (pushableItem.Active && pushableItem.Status != ITEM_INVISIBLE &&
+		if (item.Active && item.Status != ITEM_INVISIBLE &&
 			pushable.UseRoomCollision &&
 			boxHeight.has_value())
 		{
-			return pushableItem.Pose.Position.y;
+			return item.Pose.Position.y;
 		}
 
 		return std::nullopt;
 	}
 
-	int PushableBridgeFloorBorder(int itemNumber)
+	int GetPushableBridgeFloorBorder(const ItemInfo& item)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-
-		return (pushableItem.Pose.Position.y - GetPushableHeight(pushableItem));
+		return (item.Pose.Position.y - GetPushableHeight(item));
 	}
 
-	int PushableBridgeCeilingBorder(int itemNumber)
+	int GetPushableBridgeCeilingBorder(const ItemInfo& item)
 	{
-		auto& pushableItem = g_Level.Items[itemNumber];
-
-		return pushableItem.Pose.Position.y;
+		return item.Pose.Position.y;
 	}
 
 	void AddPushableBridge(ItemInfo& pushableItem)
@@ -107,6 +101,6 @@ namespace TEN::Entities::Generic
 		const auto& pushable = GetPushableInfo(pushableItem);
 
 		if (pushable.UseRoomCollision)
-			UpdateBridgeItem(pushableItem.Index);
+			UpdateBridgeItem(pushableItem);
 	}
 }

@@ -936,7 +936,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	//Do extra check if it's a bridge collider:
 	if (coll->Front.Bridge != NO_ITEM)
 	{
-		auto distancePointLara = GetBridgeBorder(coll->Front.Bridge, false) - LaraItem->Pose.Position.y;
+		auto distancePointLara = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - LaraItem->Pose.Position.y;
 		frontFloor = distancePointLara - 128;
 		if (frontFloor <= -CLICK(2) ||
 			frontFloor > CLICK(1.25f) - 4)

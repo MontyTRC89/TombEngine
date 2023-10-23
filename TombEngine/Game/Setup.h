@@ -1,10 +1,10 @@
 #pragma once
 #include "Game/control/box.h"
-#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 
+class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 
@@ -94,10 +94,11 @@ struct ObjectInfo
 	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
 	std::function<void(ItemInfo* item)> drawRoutine;
 
-	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> floor;
-	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> ceiling;
-	std::function<int(short itemNumber)> floorBorder;
-	std::function<int(short itemNumber)> ceilingBorder;
+	// Bridge routines
+	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = {};
+	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = {};
+	std::function<int(const ItemInfo& item)> GetFloorBorder	  = {};
+	std::function<int(const ItemInfo& item)> GetCeilingBorder = {};
 
 	// NOTE: ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
 	void SetBoneRotationFlags(int boneNumber, int flags)

@@ -4,18 +4,22 @@
 
 using namespace TEN::Math;
 
+struct ItemInfo;
+
+// GLOSSARY OF TERMS
 // Ceiling:		  Upper surface of a sector.
 // Floor:		  Lower surface of a sector.
 // Floordata:	  Name of the engine's level geometry collision system composed of rooms with sectors.
 // Plane:		  Mathematical representation of one of two surface triangles.
 // Portal:		  Link from one room to another allowing traversal between them.
 // Room number:	  Unique ID of a room.
-// Room position: Relative grid coordinates of room sectors.
+// Room position: Relative 2D sector position within a room grid (e.g. [0, 0] denotes the first sector).
 // Sector/block:  Collision data describing a single grid division within a room.
+// Sector point:  Relative 2D position within a sector (range [0, 0] to [BLOCK(1), BLOCK(1)]).
 // Surface:		  Floor or ceiling consisting of two triangles.
 // Triangle:	  Surface subdivision.
 // Wall:		  Inferred from a floor or ceiling with max height. Note that true "walls" don't exist in floordata.
-// 
+
 // The way floordata "planes" are stored is non-standard.
 // Instead of a Plane object with a normal + distance,
 // they use a Vector3 object with data laid out as follows:
@@ -188,9 +192,9 @@ namespace TEN::Collision::Floordata
 	void AddBridge(int itemNumber, int x = 0, int z = 0);
 	void RemoveBridge(int itemNumber, int x = 0, int z = 0);
 
-	std::optional<int> GetBridgeItemIntersect(const Vector3i& pos, int itemNumber, bool useBottomHeight);
-	int				   GetBridgeBorder(int itemNumber, bool bottom);
-	void			   UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
+	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight);
+	int	 GetBridgeBorder(const ItemInfo& item, bool isBottom);
+	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval = false);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
 	

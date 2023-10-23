@@ -87,8 +87,8 @@ void InitializeObjects()
 		obj->Initialize = nullptr;
 		obj->collision = nullptr;
 		obj->control = nullptr;
-		obj->floor = nullptr;
-		obj->ceiling = nullptr;
+		obj->GetFloorHeight = nullptr;
+		obj->GetCeilingHeight = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
 		obj->HitRoutine = DefaultItemHit;
 		obj->pivotLength = 0;

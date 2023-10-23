@@ -94,14 +94,14 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(const Vector3i& pos) const
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
-	// Loop through bridges.
-	for (int i : BridgeItemNumbers)
+	// Loop over bridge item numbers.
+	for (int itemNumber : BridgeItemNumbers)
 	{
-		const auto& bridgeItem = g_Level.Items[i];
+		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
 		// Get bridge floor height.
-		auto bridgeFloorHeight = bridgeObject.floor(i, pos.x, pos.y, pos.z);
+		auto bridgeFloorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
 		if (!bridgeFloorHeight.has_value())
 			continue;
 
@@ -135,14 +135,14 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(const Vector3i& pos) const
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
-	// Loop through bridges.
-	for (int i : BridgeItemNumbers)
+	// Loop over bridge item numbers.
+	for (int itemNumber : BridgeItemNumbers)
 	{
-		const auto& bridgeItem = g_Level.Items[i];
+		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
 		// Get bridge ceiling height.
-		auto bridgeCeilingHeight = bridgeObject.ceiling(i, pos.x, pos.y, pos.z);
+		auto bridgeCeilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!bridgeCeilingHeight.has_value())
 			continue;
 
@@ -185,14 +185,14 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
-	// Loop through bridges.
-	for (int i : BridgeItemNumbers)
+	// Loop over bridge item numbers.
+	for (int itemNumber : BridgeItemNumbers)
 	{
-		const auto& bridgeItem = g_Level.Items[i];
+		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
 		// Get bridge surface height.
-		auto bridgeSurfaceHeight = isFloor ? bridgeObject.floor(i, pos.x, pos.y, pos.z) : bridgeObject.ceiling(i, pos.x, pos.y, pos.z);
+		auto bridgeSurfaceHeight = isFloor ? bridgeObject.GetFloorHeight(bridgeItem, pos) : bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
 
@@ -223,15 +223,15 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 
 int FloorInfo::GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const
 {
-	// Loop through bridges.
-	for (int i : BridgeItemNumbers)
+	// Loop over bridge item numbers.
+	for (int itemNumber : BridgeItemNumbers)
 	{
-		const auto& bridgeItem = g_Level.Items[i];
+		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
 		// Get surface heights.
-		auto floorHeight = bridgeObject.floor(i, pos.x, pos.y, pos.z);
-		auto ceilingHeight = bridgeObject.ceiling(i, pos.x, pos.y, pos.z);
+		auto floorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
+		auto ceilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
@@ -285,14 +285,15 @@ bool FloorInfo::IsWall(int x, int z) const
 
 int FloorInfo::GetInsideBridgeItemNumber(const Vector3i& pos, bool testFloorBorder, bool testCeilingBorder) const
 {
+	// Loop over bridge item numbers.
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
 		// Get surface heights.
-		auto floorHeight = bridgeObject.floor(itemNumber, pos.x, pos.y, pos.z);
-		auto ceilingHeight = bridgeObject.ceiling(itemNumber, pos.x, pos.y, pos.z);
+		auto floorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
+		auto ceilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
@@ -781,9 +782,9 @@ namespace TEN::Collision::Floordata
 		auto floor = &GetFloorSide(item.RoomNumber, x, z);
 		floor->AddBridge(itemNumber);
 
-		if (Objects[item.ObjectNumber].floorBorder != nullptr)
+		if (Objects[item.ObjectNumber].GetFloorBorder != nullptr)
 		{
-			int floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
+			int floorBorder = Objects[item.ObjectNumber].GetFloorBorder(item);
 			while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
 			{
 				const auto roomAbove = floor->GetRoomNumberAbove(x, z);
@@ -795,9 +796,9 @@ namespace TEN::Collision::Floordata
 			}
 		}
 		
-		if (Objects[item.ObjectNumber].ceilingBorder != nullptr)
+		if (Objects[item.ObjectNumber].GetCeilingBorder != nullptr)
 		{
-			int ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
+			int ceilingBorder = Objects[item.ObjectNumber].GetCeilingBorder(item);
 			while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
 			{
 				const auto roomBelow = floor->GetRoomNumberBelow(x, z);
@@ -823,9 +824,9 @@ namespace TEN::Collision::Floordata
 		auto* floor = &GetFloorSide(item.RoomNumber, x, z);
 		floor->RemoveBridge(itemNumber);
 
-		if (Objects[item.ObjectNumber].floorBorder != nullptr)
+		if (Objects[item.ObjectNumber].GetFloorBorder != nullptr)
 		{
-			int floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
+			int floorBorder = Objects[item.ObjectNumber].GetFloorBorder(item);
 			while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
 			{
 				const auto roomAbove = floor->GetRoomNumberAbove(x, z);
@@ -837,9 +838,9 @@ namespace TEN::Collision::Floordata
 			}
 		}
 
-		if (Objects[item.ObjectNumber].ceilingBorder != nullptr)
+		if (Objects[item.ObjectNumber].GetCeilingBorder != nullptr)
 		{
-			int ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
+			int ceilingBorder = Objects[item.ObjectNumber].GetCeilingBorder(item);
 			while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
 			{
 				const auto roomBelow = floor->GetRoomNumberBelow(x, z);
@@ -856,10 +857,8 @@ namespace TEN::Collision::Floordata
 	// Animated objects are also supported, although horizontal collision shifting is unstable.
 	// Method: get accurate bounds in world transform by converting to OBB, then do a ray test
 	// on top or bottom (depending on test side) to determine if box is present at a particular point.
-	std::optional<int> GetBridgeItemIntersect(const Vector3i& pos, int itemNumber, bool useBottomHeight)
+	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight)
 	{
-		auto& item = g_Level.Items[itemNumber];
-
 		auto bounds = GameBoundingBox(&item);
 		auto dxBounds = bounds.ToBoundingOrientedBox(item.Pose);
 
@@ -875,71 +874,73 @@ namespace TEN::Collision::Floordata
 	}
 
 	// Gets bridge min or max height regardless of actual X/Z world position.
-	int GetBridgeBorder(int itemNumber, bool bottom)
+	int GetBridgeBorder(const ItemInfo& item, bool isBottom)
 	{
-		auto item = &g_Level.Items[itemNumber];
-
-		auto bounds = GameBoundingBox(item);
-		return item->Pose.Position.y + (bottom ? bounds.Y2 : bounds.Y1);
+		auto bounds = GameBoundingBox(&item);
+		return (item.Pose.Position.y + (isBottom ? bounds.Y2 : bounds.Y1));
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
-	void UpdateBridgeItem(int itemNumber, bool forceRemoval)
+	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval)
 	{
-		auto item = &g_Level.Items[itemNumber];
+		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(1 / 2.0f));
 
-		if (!Objects.CheckID(item->ObjectNumber))
+		if (!Objects.CheckID(item.ObjectNumber))
 			return;
 
-		if (!Objects[item->ObjectNumber].loaded)
+		if (!Objects[item.ObjectNumber].loaded)
 			return;
 
-		// Force removal if object was killed
-		if (item->Flags & IFLAG_KILLED)
+		// Force removal if item was killed.
+		if (item.Flags & IFLAG_KILLED)
 			forceRemoval = true;
 
-		// Get real OBB bounds of a bridge in world space
-		auto bounds = GameBoundingBox(item);
-		auto dxBounds = bounds.ToBoundingOrientedBox(item->Pose);
+		// Get real OBB of bridge in world space.
+		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
 		// Get corners of a projected OBB
 		Vector3 corners[8];
-		dxBounds.GetCorners(corners); //corners[0], corners[1], corners[4] corners[5]
+		box.GetCorners(corners); // corners[0], corners[1], corners[4] corners[5]
 
-		auto room = &g_Level.Rooms[item->RoomNumber];
+		auto room = &g_Level.Rooms[item.RoomNumber];
 
-		// Get min/max of a projected AABB
+		// Get min/max of projected AABB.
 		auto minX = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / BLOCK(1));
 		auto minZ = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / BLOCK(1));
 		auto maxX =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / BLOCK(1));
 		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / BLOCK(1));
 
-		// Run through all blocks enclosed in AABB
+		// Run through all blocks enclosed in AABB.
 		for (int x = 0; x < room->xSize; x++)
 		{
 			for (int z = 0; z < room->zSize; z++)
 			{
 				float pX = room->x + (x * BLOCK(1)) + BLOCK(0.5f);
 				float pZ = room->z + (z * BLOCK(1)) + BLOCK(0.5f);
-				float offX = pX - item->Pose.Position.x;
-				float offZ = pZ - item->Pose.Position.z;
+				float offX = pX - item.Pose.Position.x;
+				float offZ = pZ - item.Pose.Position.z;
 
-				// Clean previous bridge state
-				RemoveBridge(itemNumber, offX, offZ);
+				// Clean previous bridge state.
+				RemoveBridge(item.Index, offX, offZ);
 
-				// If we're in sweeping mode, don't try to re-add block
+				// If in sweeping mode, don't try readding to block.
 				if (forceRemoval)
 					continue;
 
-				// If block isn't in enclosed AABB space, ignore precise check
-				if (x < minX || z < minZ || x > maxX || z > maxZ)
+				// If block isn't in enclosed AABB space, ignore precise check.
+				if (x < minX || z < minZ ||
+					x > maxX || z > maxZ)
+				{
 					continue;
+				}
 
-				// Block is in enclosed AABB space, do more precise test.
-				// Construct a block bounding box within same plane as bridge bounding box and test intersection.
-				auto blockBox = BoundingOrientedBox(Vector3(pX, dxBounds.Center.y, pZ), Vector3(BLOCK(1 / 2.0f)), Vector4::UnitY);
-				if (dxBounds.Intersects(blockBox))
-					AddBridge(itemNumber, offX, offZ); // Intersects, try to add bridge to this block.
+				// Block is in enclosed AABB space; do more precise test.
+				// Construct block bounding box within same plane as bridge bounding box and test intersection.
+				auto blockBox = BoundingOrientedBox(Vector3(pX, box.Center.y, pZ), SECTOR_EXTENTS, Vector4::UnitY);
+
+				// Add bridge to current sector if intersection is valid.
+				if (box.Intersects(blockBox))
+					AddBridge(item.Index, offX, offZ);
 			}
 		}
 	}
