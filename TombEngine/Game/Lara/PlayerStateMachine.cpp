@@ -249,7 +249,7 @@ namespace TEN::Entities::Player
 		{
 		default:
 		case PlayerStateRoutineType::Control:
-			if (stateControlRoutine)
+			if (stateControlRoutine != nullptr)
 			{
 				stateControlRoutine(&item, &coll);
 				return;
@@ -257,7 +257,7 @@ namespace TEN::Entities::Player
 			break;
 
 		case PlayerStateRoutineType::Collision:
-			if (stateCollRoutine)
+			if (stateCollRoutine != nullptr)
 			{
 				stateCollRoutine(&item, &coll);
 				return;
