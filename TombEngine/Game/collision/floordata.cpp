@@ -181,43 +181,45 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 
 int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 {
-	// Get surface heights.
+	// 1) Get sector surface heights.
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
-	// Loop over bridge item numbers.
+	// 2) Find closest floor or ceiling bridge height (if applicable).
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		// Get bridge surface height.
+		// 3) Get bridge surface height.
 		auto bridgeSurfaceHeight = isFloor ? bridgeObject.GetFloorHeight(bridgeItem, pos) : bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
 
-		// Assess relation of bridge to collision block.
+		// 4) Track closest floor or ceiling height.
 		if (isFloor)
 		{
-			if (*bridgeSurfaceHeight >= pos.y &&	   // Below input height bound.
-				*bridgeSurfaceHeight < floorHeight &&  // Within floor bound.
-				*bridgeSurfaceHeight >= ceilingHeight) // Within ceiling bound.
+			// Bridge floor is closer; use bridge floor height.
+			if (*bridgeSurfaceHeight >= pos.y &&	   // Position is above bridge floor height.
+				*bridgeSurfaceHeight < floorHeight &&  // Bridge floor height is above current closest floor height.
+				*bridgeSurfaceHeight >= ceilingHeight) // Bridge ceiling height is below sector ceiling height.
 			{
 				floorHeight = *bridgeSurfaceHeight;
 			}
 		}
 		else
 		{
-			if (*bridgeSurfaceHeight <= pos.y &&	   // Above input height bound.
-				*bridgeSurfaceHeight <= floorHeight && // Within floor bound.
-				*bridgeSurfaceHeight > ceilingHeight)  // Within ceiling bound.
+			// Bridge ceiling is closer; use bridge ceiling height.
+			if (*bridgeSurfaceHeight <= pos.y &&		// Position is below bridge ceiling height.
+				*bridgeSurfaceHeight > ceilingHeight && // Bridge ceiling height is below current closest ceiling height.
+				*bridgeSurfaceHeight <= floorHeight)	// Bridge floor height is above sector floor height.
 			{
 				ceilingHeight = *bridgeSurfaceHeight;
 			}
 		}
 	}
 
-	// Return surface height.
+	// Return closest floor or ceiling height.
 	return (isFloor ? floorHeight : ceilingHeight);
 }
 
