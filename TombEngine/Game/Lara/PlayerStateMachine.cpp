@@ -11,7 +11,6 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_hang.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_initialise.h"
 #include "Game/Lara/lara_jump.h"
 #include "Game/Lara/lara_monkey.h"
