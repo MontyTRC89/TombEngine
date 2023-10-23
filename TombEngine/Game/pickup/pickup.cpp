@@ -1090,7 +1090,9 @@ void InitializePickup(short itemNumber)
 			{
 				// Automatically align pickups to the floor surface.
 				auto pointColl = GetCollision(item);
-				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(item->Pose.Position, true, true);
+				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(
+					item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+					true, true);
 
 				if (bridgeItemNumber != NO_ITEM)
 				{

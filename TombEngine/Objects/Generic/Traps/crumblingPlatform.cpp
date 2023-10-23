@@ -185,7 +185,7 @@ namespace TEN::Entities::Traps
 		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
 			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
 		{
-			auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
+			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 			if (boxHeight.has_value())
 				return *boxHeight;
 		}
@@ -200,7 +200,7 @@ namespace TEN::Entities::Traps
 		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
 			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
 		{
-			auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
+			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 			if (boxHeight.has_value())
 				return *boxHeight;
 		}

@@ -14,7 +14,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		const auto& pushable = GetPushableInfo(pushableItem);
 
-		auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
+		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 
 		if (pushableItem.Active &&pushableItem.Status != ITEM_INVISIBLE &&
 			pushable.UseRoomCollision &&
@@ -32,7 +32,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		const auto& pushable = GetPushableInfo(pushableItem);
 
-		auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
+		auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
 		if (pushableItem.Active && pushableItem.Status != ITEM_INVISIBLE &&
 			pushable.UseRoomCollision &&
