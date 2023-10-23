@@ -87,18 +87,18 @@ struct ObjectInfo
 
 	DWORD explodableMeshbits;
 
-	std::function<void(short itemNumber)> Initialize;
-	std::function<void(short itemNumber)> control;
-	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
+	std::function<void(short itemNumber)> Initialize = nullptr;
+	std::function<void(short itemNumber)> control = nullptr;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision = nullptr;
 
-	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
-	std::function<void(ItemInfo* item)> drawRoutine;
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine = nullptr;
+	std::function<void(ItemInfo* item)> drawRoutine = nullptr;
 
 	// Bridge routines
-	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = {};
-	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = {};
-	std::function<int(const ItemInfo& item)> GetFloorBorder	  = {};
-	std::function<int(const ItemInfo& item)> GetCeilingBorder = {};
+	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
+	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;
+	std::function<int(const ItemInfo& item)> GetFloorBorder	  = nullptr;
+	std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
 
 	// NOTE: ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
 	void SetBoneRotationFlags(int boneNumber, int flags)
