@@ -239,24 +239,32 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		// Execute state routine.
+		// Get state routines.
 		const auto& stateRoutinePair = PlayerStateRoutines[item.Animation.ActiveState];
+		const auto& stateControlRoutine = stateRoutinePair.first;
+		const auto& stateCollRoutine = stateRoutinePair.second;
+
+		// Execute state routine.
 		switch (routineType)
 		{
 		default:
 		case PlayerStateRoutineType::Control:
-		{
-			const auto& stateRoutine = stateRoutinePair.first;
-			stateRoutine(&item, &coll);
-		}
+			if (stateControlRoutine)
+			{
+				stateControlRoutine(&item, &coll);
+				return;
+			}
 			break;
 
 		case PlayerStateRoutineType::Collision:
-		{
-			const auto& stateRoutine = stateRoutinePair.second;
-			stateRoutine(&item, &coll);
-		}
+			if (stateCollRoutine)
+			{
+				stateCollRoutine(&item, &coll);
+				return;
+			}
 			break;
 		}
+
+		TENLog("Error handling unregistered player state " + std::to_string(item.Animation.ActiveState) + ".", LogLevel::Warning);
 	}
 }
