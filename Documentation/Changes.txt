@@ -15,6 +15,7 @@ _For setup instructions please see: https://tombengine.com/docs/ocb-and-setup-in
 * Fix TR2 doberman crashing the game when killed by explosive weapons.
 * Fix volume change in settings not affecting voice track.
 * Fix several lighting bugs.
+* Fix double drawing additive faces.
 * Fix savegame count not properly increasing.
 * Fix regeneration of non-ammo pickups with OCB 128.
 * Overhaul Pushable blocks:
