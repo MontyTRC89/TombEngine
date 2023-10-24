@@ -181,7 +181,7 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 
 int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 {
-	// 1) Get sector surface heights.
+	// 1) Get sector floor and ceiling heights.
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
@@ -191,12 +191,12 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		// 3) Get bridge surface height.
+		// 2.1) Get bridge surface height.
 		auto bridgeSurfaceHeight = isFloor ? bridgeObject.GetFloorHeight(bridgeItem, pos) : bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
 
-		// 4) Track closest floor or ceiling height.
+		// 2.2) Track closest floor or ceiling height.
 		if (isFloor)
 		{
 			// Test if bridge floor height is closer.
@@ -219,27 +219,28 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		}
 	}
 
-	// Return closest floor or ceiling height.
+	// 3) Return closest floor or ceiling height.
 	return (isFloor ? floorHeight : ceilingHeight);
 }
 
 int FloorInfo::GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const
 {
-	// 1) Find and return bridge floor or ceiling height of intersected bridge (if applicable).
+	// 1) Find and return intersected bridge floor or ceiling height (if applicable).
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		// 2) Get bridge floor and ceiling heights.
+		// 1.1) Get bridge floor and ceiling heights.
 		auto floorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
 		auto ceilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
-		// 3) If position is inside bridge, return bridge floor or ceiling height.
+		// 1.2) If position is inside bridge, return bridge floor or ceiling height.
 		if (isFloor)
 		{
+			// Test for bridge intersection.
 			if (pos.y > *floorHeight &&	 // Position is below bridge floor height.
 				pos.y <= *ceilingHeight) // Position is above bridge ceiling height.
 			{
@@ -248,6 +249,7 @@ int FloorInfo::GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		}
 		else
 		{
+			// Test for bridge intersection.
 			if (pos.y >= *floorHeight && // Position is below bridge floor height.
 				pos.y < *ceilingHeight)	 // Position is above bridge ceiling height.
 			{
@@ -256,7 +258,7 @@ int FloorInfo::GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		}
 	}
 	
-	// 4) Get and return closest floor or ceiling height.
+	// 2) Get and return closest floor or ceiling height.
 	return GetSurfaceHeight(pos, isFloor);
 }
 
@@ -287,31 +289,35 @@ bool FloorInfo::IsWall(int x, int z) const
 
 int FloorInfo::GetInsideBridgeItemNumber(const Vector3i& pos, bool testFloorBorder, bool testCeilingBorder) const
 {
-	// Loop over bridge item numbers.
+	// 1) Find and return intersected bridge item number (if applicable).
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		// Get surface heights.
+		// 1.1) Get bridge floor and ceiling heights.
 		auto floorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
 		auto ceilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
-		if (pos.y > *floorHeight &&
-			pos.y < *ceilingHeight)
+		// 1.2) Test for bridge intersection.
+		if (pos.y > *floorHeight && // Position is below bridge floor height.
+			pos.y < *ceilingHeight) // Position is above bridge ceiling height.
 		{
 			return itemNumber;
 		}
 
-		if ((testFloorBorder && pos.y == *floorHeight) ||
-			(testCeilingBorder && pos.y == *ceilingHeight))
+		// TODO: Check what this does.
+		// 1.3) Test bridge floor and ceiling borders (if applicable).
+		if ((testFloorBorder && pos.y == *floorHeight) ||	// Position matches floor height.
+			(testCeilingBorder && pos.y == *ceilingHeight)) // Position matches ceiling height.
 		{
 			return itemNumber;
 		}
 	}
 
+	// 2) No bridge intersection; return invalid item number.
 	return NO_ITEM;
 }
 
