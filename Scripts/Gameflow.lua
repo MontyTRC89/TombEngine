@@ -6,11 +6,6 @@
 
 Flow.SetIntroImagePath("Screens\\main.jpg")
 
--- This image should be used for static title screen background (as in TR1-TR3).
--- For now it is not implemented.
-
-Flow.SetTitleScreenImagePath("Screens\\main.jpg")
-
 -- Set overall amount of secrets in game.
 -- If set to 0, secrets won't be displayed in statistics.
 

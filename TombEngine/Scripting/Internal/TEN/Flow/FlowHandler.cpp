@@ -59,14 +59,6 @@ Must be a .jpg or .png image.
 */
 	tableFlow.set_function(ScriptReserved_SetIntroImagePath, &FlowHandler::SetIntroImagePath, this);
 
-/*** Image to show in the background of the title screen.
-Must be a .jpg or .png image.
-__(not yet implemented)__
-@function SetTitleScreenImagePath
-@tparam string path the path to the image, relative to the TombEngine exe
-*/
-	tableFlow.set_function(ScriptReserved_SetTitleScreenImagePath, &FlowHandler::SetTitleScreenImagePath, this);
-
 /*** Enable or disable Lara drawing in title flyby.
 Must be true or false
 @function EnableLaraInTitle
@@ -313,11 +305,6 @@ void FlowHandler::AddLevel(Level const& level)
 void FlowHandler::SetIntroImagePath(const std::string& path)
 {
 	IntroImagePath = path;
-}
-
-void FlowHandler::SetTitleScreenImagePath(const std::string& path)
-{
-	TitleScreenImagePath = path;
 }
 
 void FlowHandler::SetTotalSecretCount(int secretsNumber)
