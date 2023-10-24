@@ -35,11 +35,29 @@ struct PixelShaderInput
 	uint InstanceID : SV_InstanceID;
 };
 
+#ifdef TRANSPARENT
+
+struct PixelAndLinkBufferData
+{
+	uint PixelColorRG;
+	uint PixelColorBA;
+	uint PixelDepthAndBlendMode;
+	uint NextNode;
+};
+
+RWStructuredBuffer<PixelAndLinkBufferData> FLBuffer : register(u2);
+
+RWByteAddressBuffer StartOffsetBuffer : register(u3);
+
+#else
+
 struct PixelShaderOutput
 {
 	float4 Color: SV_TARGET0;
 	float4 Depth: SV_TARGET1;
 };
+
+#endif
 
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
@@ -72,10 +90,13 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	return output;
 }
 
+#ifdef TRANSPARENT
+[earlydepthstencil]
+float PS(PixelShaderInput input) : SV_Target
+#else
 PixelShaderOutput PS(PixelShaderInput input)
+#endif
 {
-	PixelShaderOutput output;
-
 	float4 tex = Texture.Sample(Sampler, input.UV);
 	DoAlphaTest(tex);
 
@@ -97,13 +118,46 @@ PixelShaderOutput PS(PixelShaderInput input)
 			input.FogBulbs.w) :
 		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
-	output.Color = float4(color, tex.w);
-	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
-	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
+	float4 outputColor = float4(color, tex.w);
+	outputColor = DoFogBulbsForPixel(outputColor, float4(input.FogBulbs.xyz, 1.0f));
+	outputColor = DoDistanceFogForPixel(outputColor, FogColor, input.DistanceFog);
 
-	output.Depth = tex.w > 0.0f ?
+	float outputDepth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
+#ifdef TRANSPARENT
+
+	uint uPixelCount = FLBuffer.IncrementCounter();
+	// Exchange offsets in StartOffsetBuffer
+	float4 vPos = (input.PositionCopy);
+	vPos.xy /= vPos.w;
+	float2 pos = 0.5f * (float2(vPos.x, vPos.y) + 1);
+	int posX = (int)(pos.x * ViewSize.x);
+	int posY = (int)(pos.y * ViewSize.y);
+
+	uint uStartOffsetAddress = 4 * ((ViewSize.x * posY) + posX);
+	uint uOldStartOffset;
+	StartOffsetBuffer.InterlockedExchange(
+		uStartOffsetAddress, uPixelCount, uOldStartOffset);
+	// Add new fragment entry in Fragment & Link Buffer
+	PixelAndLinkBufferData Element;
+	Element.PixelColorRG = ((uint)(outputColor.x * 255.0f) << 16) | ((uint)(outputColor.y * 255.0f) & 0xFFFF);
+	Element.PixelColorBA = ((uint)(outputColor.z * 255.0f) << 16) | ((uint)(outputColor.w * 255.0f) & 0xFFFF);
+	Element.PixelDepthAndBlendMode = ((BlendMode & 0x0F) << 24) | (uint)(outputDepth * 16777215);
+	Element.NextNode = uOldStartOffset;
+	FLBuffer[uPixelCount] = Element;
+
+	return 0;
+
+#else
+
+	PixelShaderOutput output;
+
+	output.Depth = outputDepth;
+	output.Color = outputColor;
+
 	return output;
+
+#endif
 }

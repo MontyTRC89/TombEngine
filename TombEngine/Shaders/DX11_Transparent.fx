@@ -4,7 +4,7 @@
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 
-#define MAX_SORTED_PIXELS 16
+#define MAX_SORTED_PIXELS 8
 
 struct PixelShaderInput
 {
@@ -61,16 +61,12 @@ float4 PS(PixelShaderInput input, in uint sampleIndex: SV_SampleIndex) : SV_TARG
 		// Retrieve pixel at current offset
 		FragmentAndLinkBuffer_STRUCT Element = FLBufferSRV[uOffset];
 
-		uint coverage = (SortedPixels[nNumPixels].PixelDepthAndBlendMode >> 28) & 0x0F;
-		if (coverage & (1 << sampleIndex))
-		{
-			// Copy pixel data into temp array
-			SortedPixels[nNumPixels].PixelColorRG = Element.PixelColorRG;
-			SortedPixels[nNumPixels].PixelColorBA = Element.PixelColorBA;
-			SortedPixels[nNumPixels].PixelDepthAndBlendMode = Element.PixelDepthAndBlendMode;
+		// Copy pixel data into temp array
+		SortedPixels[nNumPixels].PixelColorRG = Element.PixelColorRG;
+		SortedPixels[nNumPixels].PixelColorBA = Element.PixelColorBA;
+		SortedPixels[nNumPixels].PixelDepthAndBlendMode = Element.PixelDepthAndBlendMode;
 
-			nNumPixels++;
-		}
+		nNumPixels++;
 
 		// Retrieve next offset
 		[flatten] uOffset = (nNumPixels >= MAX_SORTED_PIXELS) ?

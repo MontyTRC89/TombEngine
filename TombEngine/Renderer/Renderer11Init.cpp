@@ -91,12 +91,12 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_5_0", nullptr, blob);
 	m_vsInstancedSprites = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "VS", "vs_5_0", nullptr, blob);
 	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_5_0", nullptr, blob);
- 
+    
 	m_psRoomsTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_5_0", &transparent[0], blob);
 	m_psItemsTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_5_0", &transparent[0], blob);
 	m_psStaticsTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "PS", "ps_5_0", &transparent[0], blob);
-	m_psInstancedSprites = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_5_0", &transparent[0], blob);
-	m_psInstancedStaticMeshes = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_5_0", &transparent[0], blob);
+	m_psInstancedSpritesTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_5_0", &transparent[0], blob);
+	m_psInstancedStaticMeshesTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_5_0", &transparent[0], blob);
 	m_psSpritesTransparent = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "PS", "ps_5_0", &transparent[0], blob);
 
 	m_vsTransparent = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_Transparent.fx"), "VS", "vs_5_0", nullptr, blob);
@@ -155,7 +155,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_subtractiveBlendState.GetAddressOf()));
-	
+   
 	blendStateDesc.AlphaToCoverageEnable = false;
 	blendStateDesc.IndependentBlendEnable = false;
 	blendStateDesc.RenderTarget[0].BlendEnable = true;
@@ -374,6 +374,7 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 	// Initialize buffers
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
+	m_debugRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_currentRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);

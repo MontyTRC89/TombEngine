@@ -44,7 +44,7 @@ SamplerState CausticsTextureSampler : register(s2);
 
 #ifdef TRANSPARENT
 
-struct FragmentAndLinkBuffer_STRUCT
+struct PixelAndLinkBufferData
 {
 	uint PixelColorRG;
 	uint PixelColorBA;
@@ -52,7 +52,7 @@ struct FragmentAndLinkBuffer_STRUCT
 	uint NextNode;
 };
 
-RWStructuredBuffer<FragmentAndLinkBuffer_STRUCT> FLBuffer : register(u2);
+RWStructuredBuffer<PixelAndLinkBufferData> FLBuffer : register(u2);
 
 RWByteAddressBuffer StartOffsetBuffer : register(u3);
 
@@ -126,7 +126,7 @@ float3 UnpackNormalMap(float4 n)
 
 #ifdef TRANSPARENT
 [earlydepthstencil]
-float PS(PixelShaderInput input, in uint coverage: SV_Coverage) : SV_Target
+float PS(PixelShaderInput input) : SV_Target
 #else
 PixelShaderOutput PS(PixelShaderInput input)
 #endif
@@ -231,11 +231,10 @@ PixelShaderOutput PS(PixelShaderInput input)
 	StartOffsetBuffer.InterlockedExchange(
 		uStartOffsetAddress, uPixelCount, uOldStartOffset);
 	// Add new fragment entry in Fragment & Link Buffer
-	outputDepth = 0;
-	FragmentAndLinkBuffer_STRUCT Element;
+	PixelAndLinkBufferData Element;
 	Element.PixelColorRG = ((uint)(outputColor.x * 255.0f) << 16) | ((uint)(outputColor.y * 255.0f) & 0xFFFF);
 	Element.PixelColorBA = ((uint)(outputColor.z * 255.0f) << 16) | ((uint)(outputColor.w * 255.0f) & 0xFFFF);
-	Element.PixelDepthAndBlendMode = ((coverage & 0x0F) << 28) | ((BlendMode & 0x0F) << 24) | (uint)(outputDepth * 16777215);
+	Element.PixelDepthAndBlendMode = ((BlendMode & 0x0F) << 24) | (uint)(outputDepth * 16777215);
 	Element.NextNode = uOldStartOffset;
 	FLBuffer[uPixelCount] = Element;
 

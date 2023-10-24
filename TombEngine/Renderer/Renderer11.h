@@ -297,6 +297,7 @@ namespace TEN::Renderer
 
 		RenderTarget2D m_dumpScreenRenderTarget;
 		RenderTarget2D m_renderTarget;
+		RenderTarget2D m_debugRenderTarget;
 		RenderTarget2D m_currentRenderTarget;
 		RenderTarget2D m_depthMap;
 		RenderTargetCube m_reflectionCubemap;
@@ -550,11 +551,7 @@ namespace TEN::Renderer
 		void DrawLaserBarriers(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
-		void DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
-		void DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
-		void DrawStaticsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawItems(RenderView& view, RendererPass rendererPass);
-		void DrawItemsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
 		void DrawBaddyGunflashes(RenderView& view);
@@ -574,7 +571,6 @@ namespace TEN::Renderer
 		void DrawSplashes(RenderView& view);
 		void DrawSprites(RenderView& view);
 		void DrawDisplaySprites(RenderView& view);
-		void DrawSortedFaces(RenderView& view);
 		void DrawLines3D(RenderView& view);
 		void DrawLinesIn2DSpace();
 		void DrawOverlays(RenderView& view);

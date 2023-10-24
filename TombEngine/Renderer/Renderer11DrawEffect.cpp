@@ -830,7 +830,7 @@ namespace TEN::Renderer
 	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStaticsTransparent.Get(), nullptr, 0);
 
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -959,7 +959,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawBaddyGunflashes(RenderView& view)
 	{
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStaticsTransparent.Get(), nullptr, 0);
 
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -1146,13 +1146,13 @@ namespace TEN::Renderer
 			view.SpritesToDraw.end(),
 			[](RendererSpriteToDraw& rDrawSprite0, RendererSpriteToDraw& rDrawSprite1)
 			{
-				if (rDrawSprite0.Sprite != rDrawSprite1.Sprite)
-				{
-					return (rDrawSprite0.Sprite > rDrawSprite1.Sprite);
-				}
-				else if (rDrawSprite0.BlendMode != rDrawSprite1.BlendMode)
+				if (rDrawSprite0.BlendMode != rDrawSprite1.BlendMode)
 				{
 					return (rDrawSprite0.BlendMode > rDrawSprite1.BlendMode);
+				}
+				else if (rDrawSprite0.Sprite != rDrawSprite1.Sprite)
+				{
+					return (rDrawSprite0.Sprite > rDrawSprite1.Sprite);
 				}
 				else
 				{
@@ -1193,7 +1193,7 @@ namespace TEN::Renderer
 			}
 				 
 			//HACK: prevent sprites like Explosionsmoke which have blendmode_subtractive from having laser effects
-			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType)
+			/*if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType)
 			{
 				// If blend mode requires sorting, save sprite for later.
 				int distance = (rDrawSprite.pos - Camera.pos.ToVector3()).Length();
@@ -1216,9 +1216,11 @@ namespace TEN::Renderer
 			}
 			// Add sprite to current bucket.
 			else
-			{
-				currentSpriteBucket.SpritesToDraw.push_back(rDrawSprite);
-			}
+			{*/
+
+			currentSpriteBucket.SpritesToDraw.push_back(rDrawSprite);
+
+			//}
 		}
 		     
 		spriteBuckets.push_back(currentSpriteBucket);
@@ -1229,7 +1231,6 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_NONE);
 
 		m_context->VSSetShader(m_vsInstancedSprites.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psInstancedSprites.Get(), nullptr, 0);
 
 		// Set up vertex buffer and parameters.
 		UINT stride = sizeof(RendererVertex);
@@ -1242,6 +1243,11 @@ namespace TEN::Renderer
 		{
 			if (spriteBucket.SpritesToDraw.size() == 0 || !spriteBucket.IsBillboard)
 				continue;
+
+			if (spriteBucket.BlendMode == BLENDMODE_OPAQUE || spriteBucket.BlendMode == BLENDMODE_ALPHATEST)
+				m_context->PSSetShader(m_psInstancedSprites.Get(), nullptr, 0);
+			else
+				m_context->PSSetShader(m_psInstancedSpritesTransparent.Get(), nullptr, 0);
 
 			// Prepare constant buffer for instanced sprites.
 			for (int i = 0; i < spriteBucket.SpritesToDraw.size(); i++)
@@ -1291,7 +1297,6 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_NONE);
 
 		m_context->VSSetShader(m_vsSprites.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psSprites.Get(), nullptr, 0);
 
 		stride = sizeof(RendererVertex);
 		offset = 0;
@@ -1303,6 +1308,11 @@ namespace TEN::Renderer
 		{
 			if (spriteBucket.SpritesToDraw.empty() || spriteBucket.IsBillboard)
 				continue;
+
+			if (spriteBucket.BlendMode == BLENDMODE_OPAQUE || spriteBucket.BlendMode == BLENDMODE_ALPHATEST)
+				m_context->PSSetShader(m_psSprites.Get(), nullptr, 0);
+			else
+				m_context->PSSetShader(m_psSpritesTransparent.Get(), nullptr, 0);
 
 			m_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
 			m_stSprite.RenderType = spriteBucket.RenderType;
@@ -1357,46 +1367,7 @@ namespace TEN::Renderer
 			m_numDrawCalls++;
 		}
 	}
-
-	void Renderer11::DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
-	{	
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
-		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, (int)m_transparentFacesVertices.size());
-		  
-		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-
-		if (resetPipeline)
-		{
-			m_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
-			m_stSprite.RenderType = SpriteRenderType::Default;
-
-			m_cbSprite.updateData(m_stSprite, m_context.Get());
-			BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
-			BindConstantBufferPS(CB_SPRITE, m_cbSprite.get());
-		}
-
-		SetBlendMode(info->sprite->BlendMode);
-		SetCullMode(CULL_MODE_NONE);
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetAlphaTest(ALPHA_TEST_NONE, 0);
-
-		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
-
-		DrawTriangles((int)m_transparentFacesVertices.size(), 0);
-
-		m_numTransparentDrawCalls++;
-		m_numSpritesTransparentDrawCalls++;
-
-		SetCullMode(CULL_MODE_CCW);
-	}
-
+    
 	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass) 
 	{
 		const auto& room = m_rooms[effect->RoomNumber];
