@@ -90,25 +90,25 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(int x, int z) const
 
 std::optional<int> FloorInfo::GetRoomNumberBelow(const Vector3i& pos) const
 {
-	// Get surface heights.
+	// 1) Get sector floor and ceiling heights.
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
-	// Loop over bridge item numbers.
+	// 2) Test access to room below.
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		// Get bridge floor height.
+		// 2.1) Get bridge floor height.
 		auto bridgeFloorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
 		if (!bridgeFloorHeight.has_value())
 			continue;
 
-		// Assess relation of bridge to collision block.
-		if (*bridgeFloorHeight >= pos.y &&		 // Below input height bound.
-			*bridgeFloorHeight <= floorHeight && // Within floor bound.
-			*bridgeFloorHeight >= ceilingHeight) // Within ceiling bound.
+		// 2.2) Test if bridge blocks access to room below.
+		if (*bridgeFloorHeight >= pos.y &&		 // Bridge floor height is below position.
+			*bridgeFloorHeight <= floorHeight && // Bridge floor height is above sector floor height.
+			*bridgeFloorHeight >= ceilingHeight) // Bridge floor height is below sector ceiling height.
 		{
 			return std::nullopt;
 		}
@@ -131,30 +131,31 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(int x, int z) const
 
 std::optional<int> FloorInfo::GetRoomNumberAbove(const Vector3i& pos) const
 {
-	// Get surface heights.
+	// 1) Get sector floor and ceiling heights.
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
-	// Loop over bridge item numbers.
+	// 2) Test access to room above.
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		// Get bridge ceiling height.
+		// 2.1) Get bridge ceiling height.
 		auto bridgeCeilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!bridgeCeilingHeight.has_value())
 			continue;
 
-		// Assess relation of bridge to collision block.
-		if (*bridgeCeilingHeight <= pos.y &&	   // Above input height bound.
-			*bridgeCeilingHeight <= floorHeight && // Within floor bound.
-			*bridgeCeilingHeight >= ceilingHeight) // Within ceiling bound.
+		// 2.2) Test if bridge blocks access to room above.
+		if (*bridgeCeilingHeight <= pos.y &&	   // Bridge ceiling height is above position.
+			*bridgeCeilingHeight <= floorHeight && // Bridge ceiling height is above sector floor height.
+			*bridgeCeilingHeight >= ceilingHeight) // Bridge ceiling height is below sector ceiling height.
 		{
 			return std::nullopt;
 		}
 	}
 
+	// 3) Get and return room number above.
 	return GetRoomNumberAbove(pos.x, pos.z);
 }
 
