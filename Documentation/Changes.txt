@@ -1,5 +1,7 @@
 Version 1.1.1
 ==============
+_For objects and sounds that have been made to work with TombEngine please see: https://tombengine.com/docs/resource-downloads/ _
+_For setup instructions please see: https://tombengine.com/docs/ocb-and-setup-instructions/ _
 
 * Fix burning torch not working properly if there are more than 256 objects in a level.
 * Fix grenade and rocket projectiles smoke offset in certain directions.
@@ -15,6 +17,12 @@ Version 1.1.1
 * Fix several lighting bugs.
 * Fix savegame count not properly increasing.
 * Fix regeneration of non-ammo pickups with OCB 128.
+* Overhaul Pushable blocks:
+ - Separate climbable and normal pushable blocks slots.
+ - Add new pushable OCB to manipulate pushable block properties.
+ - Add new Lara animations for pushing over the block off the edge (both TR1-3 and TR4-5 versions).
+ - Fix pushables not working with raising block.
+ - Fix miscellaneous pushable bugs.
 * Overhaul look-around feature:
  - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
  - Improve look camera movement and control.
@@ -28,11 +36,14 @@ Version 1.1.1
  - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
  - A positive value results in activation via player collision.
  - A negative value requires a trigger to activate.
+* Add basic mouse input handling. Allows for binding of mouse inputs in control settings.
+* Add settings for Mouse Sensitivity and Mouse Smoothing (not used in-game yet).
 
 Lua API changes:
 * Add DisplaySprite object.
 * Add Flow::EnableLoadSave() function to disable savegames.
 * Add Flow::EnablePointFilter() function to disable bilinear filtering.
+* Add Input:GetCursorDisplayPosition() function to get the position of the cursor.
 * Add Lara::GetAmmoType() function to read the ammo that Lara is using.
 * Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
 * Add Logic.HandleEvent() function to call node events.

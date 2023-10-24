@@ -14,7 +14,7 @@ std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
 
-	auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 	if (boxHeight.has_value() && tiltGrade != 0)
 	{
 		int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, x, z) / 4) + (BLOCK(1) / 8)));
@@ -29,7 +29,7 @@ std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
 {
 	const auto& item = g_Level.Items[itemNumber];
 
-	auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 	if (boxHeight.has_value() && tiltGrade != 0)
 	{
 		int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, x, z) / 4) + (BLOCK(1) / 8)));
