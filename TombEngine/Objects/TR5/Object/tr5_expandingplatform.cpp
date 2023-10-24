@@ -43,7 +43,7 @@ static void UpdateExpandingPlatformMutators(short itemNumber)
 	for (auto& mutator : item.Model.Mutators)
 	{
 		mutator.Offset = Vector3(0.0f, 0.0f, zTranslate);
-		mutator.Scale = Vector3(1.0f, 1.0f, item.ItemFlags[1] / 4096.0f);
+		mutator.Scale = Vector3(1.0f, 1.0f, item.ItemFlags[1] / BLOCK(4.0f));
 	}
 }
 
