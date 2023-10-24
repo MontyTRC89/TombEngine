@@ -1,7 +1,5 @@
 Version 1.1.1
 ==============
-_For objects and sounds that have been made to work with TombEngine please see: https://tombengine.com/docs/resource-downloads/ _
-_For setup instructions please see: https://tombengine.com/docs/ocb-and-setup-instructions/ _
 
 * Fix burning torch not working properly if there are more than 256 objects in a level.
 * Fix grenade and rocket projectiles smoke offset in certain directions.
