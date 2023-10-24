@@ -199,8 +199,8 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		// 4) Track closest floor or ceiling height.
 		if (isFloor)
 		{
-			// Bridge floor is closer; use bridge floor height.
-			if (*bridgeSurfaceHeight >= pos.y &&	   // Position is above bridge floor height.
+			// Test if bridge floor height is closer.
+			if (*bridgeSurfaceHeight >= pos.y &&	   // Bridge floor height is below position.
 				*bridgeSurfaceHeight < floorHeight &&  // Bridge floor height is above current closest floor height.
 				*bridgeSurfaceHeight >= ceilingHeight) // Bridge ceiling height is below sector ceiling height.
 			{
@@ -209,8 +209,8 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		}
 		else
 		{
-			// Bridge ceiling is closer; use bridge ceiling height.
-			if (*bridgeSurfaceHeight <= pos.y &&		// Position is below bridge ceiling height.
+			// Test if bridge ceiling height is closer.
+			if (*bridgeSurfaceHeight <= pos.y &&		// Bridge ceiling height is above position.
 				*bridgeSurfaceHeight > ceilingHeight && // Bridge ceiling height is below current closest ceiling height.
 				*bridgeSurfaceHeight <= floorHeight)	// Bridge floor height is above sector floor height.
 			{
@@ -225,38 +225,38 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 
 int FloorInfo::GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const
 {
-	// Loop over bridge item numbers.
+	// 1) Find and return bridge floor or ceiling height of intersected bridge (if applicable).
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		// Get surface heights.
+		// 2) Get bridge floor and ceiling heights.
 		auto floorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
 		auto ceilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
-		// Assess relation of bridge to collision block.
+		// 3) If position is inside bridge, return bridge floor or ceiling height.
 		if (isFloor)
 		{
-			if (pos.y > *floorHeight &&
-				pos.y <= *ceilingHeight)
+			if (pos.y > *floorHeight &&	 // Position is below bridge floor height.
+				pos.y <= *ceilingHeight) // Position is above bridge ceiling height.
 			{
 				return *floorHeight;
 			}
 		}
 		else
 		{
-			if (pos.y >= *floorHeight &&
-				pos.y < *ceilingHeight)
+			if (pos.y >= *floorHeight && // Position is below bridge floor height.
+				pos.y < *ceilingHeight)	 // Position is above bridge ceiling height.
 			{
 				return *ceilingHeight;
 			}
 		}
 	}
 	
-	// Return bridge surface height.
+	// 4) Get and return closest floor or ceiling height.
 	return GetSurfaceHeight(pos, isFloor);
 }
 
