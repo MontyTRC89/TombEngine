@@ -79,7 +79,10 @@ bool FloorInfo::IsSurfaceSplitPortal(bool isFloor) const
 std::optional<int> FloorInfo::GetRoomNumberBelow(int planeIndex) const
 {
 	int roomNumber = FloorCollision.Portals[planeIndex];
-	return ((roomNumber != NO_ROOM) ? std::optional(roomNumber) : std::nullopt);
+	if (roomNumber != NO_ROOM)
+		return roomNumber;
+
+	return std::nullopt;
 }
 
 std::optional<int> FloorInfo::GetRoomNumberBelow(int x, int z) const
@@ -114,13 +117,17 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(const Vector3i& pos) const
 		}
 	}
 
+	// 3) Get and return room number below.
 	return GetRoomNumberBelow(pos.x, pos.z);
 }
 
 std::optional<int> FloorInfo::GetRoomNumberAbove(int planeIndex) const
 {
 	int roomNumber = CeilingCollision.Portals[planeIndex];
-	return ((roomNumber != NO_ROOM) ? std::optional(roomNumber) : std::nullopt);
+	if (roomNumber != NO_ROOM)
+		return roomNumber;
+
+	return std::nullopt;
 }
 
 std::optional<int> FloorInfo::GetRoomNumberAbove(int x, int z) const
@@ -161,7 +168,10 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(const Vector3i& pos) const
 
 std::optional<int> FloorInfo::GetRoomNumberAtSide() const
 {
-	return ((WallPortal != NO_ROOM) ? std::optional(WallPortal) : std::nullopt);
+	if (WallPortal != NO_ROOM)
+		return WallPortal;
+	
+	return std::nullopt;
 }
 
 int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
@@ -353,29 +363,16 @@ namespace TEN::Collision::Floordata
 	Vector2i GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
-		const auto zRoom = (z - room.z) / BLOCK(1);
-		const auto xRoom = (x - room.x) / BLOCK(1);
-		auto pos = Vector2i{xRoom, zRoom};
+		
+		// Calculate room position.
+		auto roomPos = Vector2i(
+			(x - room.x) / BLOCK(1),
+			(z - room.z) / BLOCK(1));
 
-		if (pos.x < 0)
-		{
-			pos.x = 0;
-		}
-		else if (pos.x > room.xSize - 1)
-		{
-			pos.x = room.xSize - 1;
-		}
-
-		if (pos.y < 0)
-		{
-			pos.y = 0;
-		}
-		else if (pos.y > room.zSize - 1)
-		{
-			pos.y = room.zSize - 1;
-		}
-
-		return pos;
+		// Clamp and return room position.
+		roomPos.x = std::clamp(roomPos.x, 0, room.xSize - 1);
+		roomPos.y = std::clamp(roomPos.y, 0, room.zSize - 1);
+		return roomPos;
 	}
 
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomPos)
