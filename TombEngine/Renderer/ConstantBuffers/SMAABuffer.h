@@ -2,24 +2,16 @@
 
 struct alignas(16) CSMAABuffer
 {
-    /**
-     * This is only required for temporal modes (SMAA T2x).
-     */
-    Vector4 SubsampleIndices;
+	// Only required for temporal modes (SMAA T2x).
+	Vector4 SubsampleIndices = Vector4::Zero;
 
-    /**
-     * This is required for blending the results of previous subsample with the
-     * output render target; it's used in SMAA S2x and 4x, for other modes just use
-     * 1.0 (no blending).
-     */
-    float BlendFactor;
+	 // Required for blending results of previous subsample with output render target.
+	 // Used in SMAA S2x and 4x, for other modes just use 1.0 (no blending).
+	float BlendFactor = 0.0f;
 
-    /**
-     * This can be ignored; its purpose is to support interactive custom parameter
-     * tweaking.
-     */
-    float Threshld;
-    float MaxSearchSteps;
-    float MaxSearchStepsDiag;
-    float CornerRounding;
+	// Can be ignored; purpose is to support interactive custom parameter tweaking.
+	float Threshold			 = 0.0f;
+	float MaxSearchSteps	 = 0.0f;
+	float MaxSearchStepsDiag = 0.0f;
+	float CornerRounding	 = 0.0f;
 };

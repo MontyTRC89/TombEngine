@@ -5,17 +5,16 @@
 #include <filesystem>
 
 #include "Renderer/Renderer11.h"
+#include "Renderer/SMAA/AreaTex.h"
+#include "Renderer/SMAA/SearchTex.h"
 #include "Renderer/Quad/RenderQuad.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/configuration.h"
 #include "Specific/memory/Vector.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
-#include "Renderer/SMAA/AreaTex.h"
-#include "Renderer/SMAA/SearchTex.h"
 
 using namespace TEN::Renderer;
-using std::vector;
 
 extern GameConfiguration g_Configuration;
 
@@ -394,7 +393,7 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 	//CMAA2UpdateResources(&m_renderTarget);
 
-	// Low AA is done with FXAA, Medium - High AA are done with SMAA
+	// Low AA is done with FXAA, Medium - High AA are done with SMAA.
 	if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
 	{
 		m_SMAASceneRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, true);
@@ -404,7 +403,7 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 		m_SMAABlendRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
 		//m_SMAADepthRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false);
 
-		// TODO: in the future for SMAA T2X
+		// TODO: In future for SMAA T2X.
 		/*for (int i = 0; i < 2; i++)
 		{
 			m_SMAATempRenderTargets[i] = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, true);
@@ -412,13 +411,13 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 			m_SMAAPreviousRenderTargets[i] = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, false);
 		}*/
 
-		std::stringstream s;
-		std::vector<D3D10_SHADER_MACRO> defines;
+		auto string = std::stringstream{};
+		auto defines = std::vector<D3D10_SHADER_MACRO>{};
 
-		// Setup pixel size macro:
-		s << "float4(1.0 / " << w << ", 1.0 / " << h << ", " << w << ", " << h << ")";
-		std::string pixelSizeText = s.str();
-		D3D10_SHADER_MACRO renderTargetMetricsMacro = { "SMAA_RT_METRICS", pixelSizeText.c_str() };
+		// Set up pixel size macro.
+		string << "float4(1.0 / " << w << ", 1.0 / " << h << ", " << w << ", " << h << ")";
+		auto pixelSizeText = string.str();
+		auto renderTargetMetricsMacro = D3D10_SHADER_MACRO{ "SMAA_RT_METRICS", pixelSizeText.c_str() };
 		defines.push_back(renderTargetMetricsMacro);
 
 		if (g_Configuration.AntialiasingMode == AntialiasingMode::Medium)
@@ -432,14 +431,14 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 		// defines.push_back({ "SMAA_PREDICATION", "1" });
 
-		// Setup the target macro:
-		D3D10_SHADER_MACRO dx101Macro = { "SMAA_HLSL_4_1", "1" };
+		// Set up target macro.
+		auto dx101Macro = D3D10_SHADER_MACRO{ "SMAA_HLSL_4_1", "1" };
 		defines.push_back(dx101Macro);
 
-		D3D10_SHADER_MACRO null = { nullptr, nullptr };
+		auto null = D3D10_SHADER_MACRO{ nullptr, nullptr };
 		defines.push_back(null);
 
-		ComPtr<ID3D10Blob> blob;
+		auto blob = ComPtr<ID3D10Blob>{};
 		m_SMAALumaEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAALumaEdgeDetectionPS", "ps_5_0", defines.data(), blob);
 		m_SMAAColorEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAAColorEdgeDetectionPS", "ps_5_0", defines.data(), blob);
 		m_SMAADepthEdgeDetectionPS = Utils::compilePixelShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAADepthEdgeDetectionPS", "ps_5_0", defines.data(), blob);
@@ -449,13 +448,15 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 		m_SMAABlendingWeightCalculationVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAABlendingWeightCalculationVS", "vs_5_0", defines.data(), blob);
 		m_SMAANeighborhoodBlendingVS = Utils::compileVertexShader(m_device.Get(), GetAssetPath(L"Shaders\\DX11_SMAA.fx"), "DX11_SMAANeighborhoodBlendingVS", "vs_5_0", defines.data(), blob);
 
-		const D3D11_INPUT_ELEMENT_DESC layout[] = {
-			{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD",  0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		const D3D11_INPUT_ELEMENT_DESC layout[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,	  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
-		UINT numElements = sizeof(layout) / sizeof(D3D10_INPUT_ELEMENT_DESC);
+		unsigned int numElements = sizeof(layout) / sizeof(D3D10_INPUT_ELEMENT_DESC);
 
-		Utils::throwIfFailed(m_device->CreateInputLayout(
+		Utils::throwIfFailed(
+			m_device->CreateInputLayout(
 			layout, 
 			numElements, 
 			blob->GetBufferPointer(), 

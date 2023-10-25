@@ -1,12 +1,11 @@
 #pragma once
-#include <wrl/client.h>
 #include <CommonStates.h>
-#include <SpriteFont.h>
-#include <PrimitiveBatch.h>
 #include <d3d9types.h>
+#include <PrimitiveBatch.h>
+#include <SpriteFont.h>
+#include <wrl/client.h>
 #include "PostProcess.h"
 
-#include "Math/Math.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/animation.h"
@@ -15,11 +14,13 @@
 #include "Game/Hud/PickupSummary.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/Structures/RendererLight.h"
 #include "RenderView/RenderView.h"
+#include "Renderer/RendererBucket.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
 #include "Renderer/ConstantBuffers/MiscBuffer.h"
@@ -34,10 +35,8 @@
 #include "Renderer/ConstantBuffers/SpriteBuffer.h"
 #include "Renderer/ConstantBuffers/InstancedStaticBuffer.h"
 #include "Renderer/ConstantBuffers/SMAABuffer.h"
-#include "Frustum.h"
-#include "RendererBucket.h"
+#include "Renderer/Frustum.h"
 #include "Renderer/RenderTargetCube/RenderTargetCube.h"
-#include "Specific/level.h"
 #include "ConstantBuffer/ConstantBuffer.h"
 #include "RenderTargetCubeArray/RenderTargetCubeArray.h"
 #include "Specific/fast_vector.h"
@@ -69,9 +68,10 @@ using namespace TEN::Hud;
 #define SAFE_RELEASE(p) { if (p) { (p)->Release(); (p) = nullptr; } }
 #endif
 
-struct SMAAVertex {
-	Vector3 Position;
-	Vector2 UV;
+struct SMAAVertex
+{
+	Vector3 Position = Vector3::Zero;
+	Vector2 UV		 = Vector3::Zero;
 };
 
 namespace TEN::Renderer

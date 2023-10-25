@@ -7,22 +7,20 @@ namespace TEN::Renderer
 {
 	using TEN::Renderer::Utils::throwIfFailed;
 
-	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, bool typeless, DXGI_FORMAT depthFormat)
+	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int width, int height, DXGI_FORMAT colorFormat, bool isTypeless, DXGI_FORMAT depthFormat)
 	{
-		 // Check if antialiasing quality is available, and set it if it is.
-		
-		D3D11_SRV_DIMENSION srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		D3D11_DSV_DIMENSION dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		D3D11_RTV_DIMENSION rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		 // Check if antialiasing quality is available and set it if it is.
+		auto srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		auto dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		auto rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-		// Now set up render target.
-
-		D3D11_TEXTURE2D_DESC desc = {};
-		desc.Width = w;
-		desc.Height = h;
+		// Set up render target.
+		auto desc = D3D11_TEXTURE2D_DESC {};
+		desc.Width = width;
+		desc.Height = height;
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
-		desc.Format = typeless ? MakeTypeless(colorFormat) : colorFormat;
+		desc.Format = isTypeless ? MakeTypeless(colorFormat) : colorFormat;
 		desc.SampleDesc.Count = 1;
 		desc.SampleDesc.Quality = 0;
 		desc.Usage = D3D11_USAGE_DEFAULT;
@@ -30,10 +28,10 @@ namespace TEN::Renderer
 		desc.CPUAccessFlags = 0;
 		desc.MiscFlags = 0;
 
-		HRESULT res = device->CreateTexture2D(&desc, NULL, &Texture);
+		auto res = device->CreateTexture2D(&desc, nullptr, &Texture);
 		throwIfFailed(res);
 
-		D3D11_RENDER_TARGET_VIEW_DESC viewDesc;
+		auto viewDesc = D3D11_RENDER_TARGET_VIEW_DESC{};
 		viewDesc.Format = colorFormat;
 		viewDesc.ViewDimension = rtvDimension;
 		viewDesc.Texture2D.MipSlice = 0;
@@ -41,8 +39,8 @@ namespace TEN::Renderer
 		res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &RenderTargetView);
 		throwIfFailed(res);
 
-		// Setup the description of the shader resource view.
-		D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
+		// Set up description of shader resource view.
+		auto shaderDesc = D3D11_SHADER_RESOURCE_VIEW_DESC{};
 		shaderDesc.Format = colorFormat;
 		shaderDesc.ViewDimension = srvDimension;
 		shaderDesc.Texture2D.MostDetailedMip = 0;
@@ -51,9 +49,9 @@ namespace TEN::Renderer
 		res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
 		throwIfFailed(res);
 
-		D3D11_TEXTURE2D_DESC depthTexDesc = {};
-		depthTexDesc.Width = w;
-		depthTexDesc.Height = h;
+		auto depthTexDesc = D3D11_TEXTURE2D_DESC {};
+		depthTexDesc.Width = width;
+		depthTexDesc.Height = height;
 		depthTexDesc.MipLevels = 1;
 		depthTexDesc.ArraySize = 1;
 		depthTexDesc.SampleDesc.Count = 1;
@@ -67,7 +65,7 @@ namespace TEN::Renderer
 		res = device->CreateTexture2D(&depthTexDesc, NULL, &DepthStencilTexture);
 		throwIfFailed(res);
 
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+		auto dsvDesc = D3D11_DEPTH_STENCIL_VIEW_DESC{};
 		dsvDesc.Format = depthTexDesc.Format;
 		dsvDesc.Flags = 0;
 		dsvDesc.ViewDimension = dsvDimension;
@@ -77,28 +75,26 @@ namespace TEN::Renderer
 		throwIfFailed(res);
 	}
 
-	/* This constructor is for sharing the same texture resource of another render target.
-	 * We use it in SMAA technique for having one UNORM and one SRGB render targets but using the same texture.
-	 */
+	// Constructor is for sharing same texture resource of another render target.
+	// Used in SMAA technique to have one UNORM and one SRGB render target, but using same texture.
 	RenderTarget2D::RenderTarget2D(ID3D11Device* device, RenderTarget2D* parent, DXGI_FORMAT colorFormat)
 	{
-		D3D11_TEXTURE2D_DESC desc;
+		auto desc = D3D11_TEXTURE2D_DESC{};
 		parent->Texture.Get()->GetDesc(&desc);
 		int width = desc.Width;
 		int height = desc.Height;
 		parent->Texture.CopyTo(Texture.GetAddressOf());
 
-		D3D11_RENDER_TARGET_VIEW_DESC viewDesc;
+		auto viewDesc = D3D11_RENDER_TARGET_VIEW_DESC{};
 		viewDesc.Format = colorFormat;
 		viewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipSlice = 0;
 
-		HRESULT res;
-		res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &RenderTargetView);
+		auto res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &RenderTargetView);
 		throwIfFailed(res);
 
-		// Setup the description of the shader resource view.
-		D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
+		// Set up description of shader resource view.
+		auto shaderDesc = D3D11_SHADER_RESOURCE_VIEW_DESC{};
 		shaderDesc.Format = colorFormat;
 		shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		shaderDesc.Texture2D.MostDetailedMip = 0;
@@ -110,7 +106,8 @@ namespace TEN::Renderer
 
 	DXGI_FORMAT RenderTarget2D::MakeTypeless(DXGI_FORMAT format) 
 	{
-		switch (format) {
+		switch (format)
+		{
 		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
 		case DXGI_FORMAT_R8G8B8A8_UNORM:
 		case DXGI_FORMAT_R8G8B8A8_UINT:
@@ -121,9 +118,11 @@ namespace TEN::Renderer
 		case DXGI_FORMAT_BC1_UNORM_SRGB:
 		case DXGI_FORMAT_BC1_UNORM:
 			return DXGI_FORMAT_BC1_TYPELESS;
+
 		case DXGI_FORMAT_BC2_UNORM_SRGB:
 		case DXGI_FORMAT_BC2_UNORM:
 			return DXGI_FORMAT_BC2_TYPELESS;
+
 		case DXGI_FORMAT_BC3_UNORM_SRGB:
 		case DXGI_FORMAT_BC3_UNORM:
 			return DXGI_FORMAT_BC3_TYPELESS;

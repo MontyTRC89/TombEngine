@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include <string>
 #include <wrl/client.h>
+
 #include "Renderer/TextureBase.h"
 
 namespace TEN::Renderer 
@@ -15,14 +16,13 @@ namespace TEN::Renderer
 		int Height;
 
 		ComPtr<ID3D11Texture2D> Texture;
+
 		Texture2D() = default;
-		Texture2D(ID3D11Device* device, int w, int h, byte* data);
-		Texture2D(ID3D11Device* device, int w, int h, DXGI_FORMAT format, int pitch, const unsigned char* data);
+		Texture2D(ID3D11Device* device, int width, int height, byte* data);
+		Texture2D(ID3D11Device* device, int width, int height, DXGI_FORMAT format, int pitch, const unsigned char* data);
 		Texture2D(ID3D11Device* device, const std::wstring& fileName);
+		Texture2D(ID3D11Device* device, byte* data, int length);
 
 		~Texture2D() = default;
-
-		Texture2D(ID3D11Device* device, byte* data, int length);
 	};
-
 }

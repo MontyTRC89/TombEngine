@@ -1559,9 +1559,7 @@ namespace TEN::Renderer
 		DrawBaddyGunflashes(view);
 
 		if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
-		{
 			DoSMAA(&m_renderTarget, view);
-		}
 
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(target, depthTarget, view);
@@ -1591,7 +1589,7 @@ namespace TEN::Renderer
 
 	bool Renderer11::DoSMAA(RenderTarget2D* renderTarget, RenderView& view)
 	{
-		// Copy the render target to the SMAA scene targer
+		// Copy render target to SMAA scene target.
 		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		m_context->ClearRenderTargetView(m_SMAASceneRenderTarget.RenderTargetView.Get(), clearColor);
 		m_context->ClearDepthStencilView(m_SMAASceneRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -1600,7 +1598,7 @@ namespace TEN::Renderer
 		m_postProcess->SetSourceTexture(renderTarget->ShaderResourceView.Get());
 		m_postProcess->Process(m_context.Get());
 
-		// 1) Edge detection using color method (also depth and luma available)
+		// 1) Edge detection using color method (also depth and luma available).
 		m_context->ClearRenderTargetView(m_SMAAEdgesRenderTarget.RenderTargetView.Get(), clearColor);
 		m_context->ClearRenderTargetView(m_SMAABlendRenderTarget.RenderTargetView.Get(), clearColor);
 
@@ -1641,7 +1639,7 @@ namespace TEN::Renderer
 		m_SMAAprimitiveBatch->DrawTriangle(vertices[0], vertices[1], vertices[2]);
 		m_SMAAprimitiveBatch->End();
 
-		// 2) Blend weights calculation
+		// 2) Blend weights calculation.
 		m_context->OMSetRenderTargets(1, m_SMAABlendRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 
 		m_context->VSSetShader(m_SMAABlendingWeightCalculationVS.Get(), nullptr, 0);
@@ -1665,7 +1663,7 @@ namespace TEN::Renderer
 		m_SMAAprimitiveBatch->DrawTriangle(vertices[0], vertices[1], vertices[2]);
 		m_SMAAprimitiveBatch->End();
 
-		// 3) Neighborhood blending 
+		// 3) Neighborhood blending.
 		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), nullptr);
 
 		m_context->VSSetShader(m_SMAANeighborhoodBlendingVS.Get(), nullptr, 0);
