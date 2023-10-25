@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "RendererSprites.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Structures/RendererSprite.h"
+#include "Renderer/Renderer.h"
 
 namespace TEN::Renderer 
 {
 	void Renderer11::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 										Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		if (scale <= 0.0f)
@@ -41,7 +41,7 @@ namespace TEN::Renderer
 												   float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& constrainAxis,
 												   bool softParticles, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		if (scale <= 0.0f)
@@ -76,7 +76,7 @@ namespace TEN::Renderer
 														 float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& lookAtAxis,
 														 bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		if (scale <= 0.0f)
@@ -118,7 +118,7 @@ namespace TEN::Renderer
 							 const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
 							 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		if (scale <= 0.0f)
@@ -161,7 +161,7 @@ namespace TEN::Renderer
 									const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 									BLEND_MODES blendMode, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		auto sprite = RendererSpriteToDraw{};

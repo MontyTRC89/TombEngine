@@ -1,7 +1,10 @@
 #pragma once
 
-struct alignas(16) CHUDBuffer
+namespace TEN::Renderer::ConstantBuffers
 {
-	Matrix View;
-	Matrix Projection;
-};
+	struct alignas(16) CHUDBuffer
+	{
+		Matrix View;
+		Matrix Projection;
+	};
+}

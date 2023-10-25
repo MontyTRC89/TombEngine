@@ -29,7 +29,7 @@
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Math/Math.h"
 #include "Renderer/RenderView/RenderView.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"

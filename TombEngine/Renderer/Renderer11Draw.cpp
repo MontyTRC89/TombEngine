@@ -25,7 +25,7 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "RenderView/RenderView.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
@@ -154,7 +154,7 @@ namespace TEN::Renderer
 			if (m_shadowLight->Position == item->Position)
 				return;
 
-			UINT stride = sizeof(RendererVertex);
+			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
 
 			// Set shaders
@@ -288,7 +288,7 @@ namespace TEN::Renderer
 			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
 			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
 
-			UINT stride = sizeof(RendererVertex);
+			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
 
 			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -389,13 +389,13 @@ namespace TEN::Renderer
 
 		for (const auto& line : m_lines2DToDraw)
 		{
-			auto v1 = RendererVertex();
+			auto v1 = Vertex();
 			v1.Position.x = line.Origin.x;
 			v1.Position.y = line.Origin.y;
 			v1.Position.z = 1.0f;
 			v1.Color = line.Color;
 
-			auto v2 = RendererVertex();
+			auto v2 = Vertex();
 			v2.Position.x = line.Target.x;
 			v2.Position.y = line.Target.y;
 			v2.Position.z = 1.0f;
@@ -434,7 +434,7 @@ namespace TEN::Renderer
 
 			setGpuStateForBucket(bucketIndex);
 
-			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(RendererVertex));
+			m_device->SetStreamSource(0, bucket->GetVertexBuffer(), 0, sizeof(Vertex));
 			m_device->SetIndices(bucket->GetIndexBuffer());
 
 			LPD3DXEFFECT effect;
@@ -487,7 +487,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -572,7 +572,7 @@ namespace TEN::Renderer
 			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
 			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
 
-			UINT stride = sizeof(RendererVertex);
+			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
 
 			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -640,7 +640,7 @@ namespace TEN::Renderer
 			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
 			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
 
-			unsigned int stride = sizeof(RendererVertex);
+			unsigned int stride = sizeof(Vertex);
 			unsigned int offset = 0;
 
 			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -677,7 +677,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 		m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -742,11 +742,11 @@ namespace TEN::Renderer
 		{
 			RendererLine3D* line = &m_lines3DToDraw[i];
 
-			RendererVertex v1;
+			Vertex v1;
 			v1.Position = line->Start;
 			v1.Color = line->Color;
 
-			RendererVertex v2;
+			Vertex v2;
 			v2.Position = line->End;
 			v2.Color = line->Color;
 			m_primitiveBatch->DrawLine(v1, v2);
@@ -760,7 +760,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddLine3D(const Vector3& target, const Vector3& origin, const Vector4& color)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		RendererLine3D line;
@@ -802,7 +802,7 @@ namespace TEN::Renderer
 		constexpr auto STEP_COUNT		 = 4;
 		constexpr auto STEP_ANGLE		 = PI / STEP_COUNT;
 
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		auto prevPoints = std::array<Vector3, AXIS_COUNT>{};
@@ -844,7 +844,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddBox(Vector3* corners, const Vector4& color)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		for (int i = 0; i < 12; i++)
@@ -900,7 +900,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddBox(const Vector3 min, const Vector3& max, const Vector4& color)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		for (int i = 0; i < 12; i++)
@@ -974,7 +974,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		RendererLight dynamicLight = {};
@@ -1075,7 +1075,7 @@ namespace TEN::Renderer
 								|| oldFace->info.texture != face->info.texture
 								|| oldFace->info.animated != face->info.animated
 								|| oldFace->info.blendMode != face->info.blendMode
-								|| m_transparentFacesIndices.size() + (face->info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+								|| m_transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
 						{
 							outputPolygons = true;
 							resetPipeline = oldFace->info.room != face->info.room;
@@ -1083,7 +1083,7 @@ namespace TEN::Renderer
 						else if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE &&
 							(oldFace->info.blendMode != face->info.blendMode
 								|| oldFace->info.item->ItemNumber != face->info.item->ItemNumber
-								|| m_transparentFacesIndices.size() + (face->info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+								|| m_transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
 						{
 							outputPolygons = true;
 							resetPipeline = oldFace->info.item->ItemNumber != face->info.item->ItemNumber;
@@ -1092,7 +1092,7 @@ namespace TEN::Renderer
 							(oldFace->info.blendMode != face->info.blendMode
 								|| oldFace->info.staticMesh->IndexInRoom != face->info.staticMesh->IndexInRoom
 								|| oldFace->info.staticMesh->RoomNumber != face->info.staticMesh->RoomNumber
-								|| m_transparentFacesIndices.size() + (face->info.polygon->shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+								|| m_transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
 						{
 							outputPolygons = true;
 							resetPipeline = oldFace->info.staticMesh != face->info.staticMesh;
@@ -1141,20 +1141,20 @@ namespace TEN::Renderer
 				if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
-					int numIndices = (face->info.polygon->shape == 0 ? 6 : 3);
-					m_transparentFacesIndices.bulk_push_back(m_roomsIndices.data(), face->info.polygon->baseIndex, numIndices);
+					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
+					m_transparentFacesIndices.bulk_push_back(m_roomsIndices.data(), face->info.polygon->BaseIndex, numIndices);
 				}
 				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
-					int numIndices = (face->info.polygon->shape == 0 ? 6 : 3);
-					m_transparentFacesIndices.bulk_push_back(m_moveablesIndices.data(), face->info.polygon->baseIndex, numIndices);
+					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
+					m_transparentFacesIndices.bulk_push_back(m_moveablesIndices.data(), face->info.polygon->BaseIndex, numIndices);
 				}
 				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
-					int numIndices = (face->info.polygon->shape == 0 ? 6 : 3);
-					m_transparentFacesIndices.bulk_push_back(m_staticsIndices.data(), face->info.polygon->baseIndex, numIndices);
+					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
+					m_transparentFacesIndices.bulk_push_back(m_staticsIndices.data(), face->info.polygon->BaseIndex, numIndices);
 				}
 				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
 				{
@@ -1201,22 +1201,22 @@ namespace TEN::Renderer
 					uv2 = spr->Sprite->UV[2];
 					uv3 = spr->Sprite->UV[3];
 
-					RendererVertex v0;
+					Vertex v0;
 					v0.Position = Vector3::Transform(p0t, face->info.world);
 					v0.UV = uv0;
 					v0.Color = spr->c1;
 
-					RendererVertex v1;
+					Vertex v1;
 					v1.Position = Vector3::Transform(p1t, face->info.world);
 					v1.UV = uv1;
 					v1.Color = spr->c2;
 
-					RendererVertex v2;
+					Vertex v2;
 					v2.Position = Vector3::Transform(p2t, face->info.world);
 					v2.UV = uv2;
 					v2.Color = spr->c3;
 
-					RendererVertex v3;
+					Vertex v3;
 					v3.Position = Vector3::Transform(p3t, face->info.world);
 					v3.UV = uv3;
 					v3.Color = spr->c4;
@@ -1256,7 +1256,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[info->room->RoomNumber];
@@ -1353,7 +1353,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStaticsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -1414,7 +1414,7 @@ namespace TEN::Renderer
 		using get_time = std::chrono::steady_clock;
 
 		ResetDebugVariables();
-		m_Locked = false;
+		m_locked = false;
 		 
 		auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1460,7 +1460,7 @@ namespace TEN::Renderer
 
 		// Camera constant buffer contains matrices, camera position, fog values, and other things that are shared for all shaders.
 		CCameraMatrixBuffer cameraConstantBuffer;
-		view.fillConstantBuffer(cameraConstantBuffer);
+		view.FillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.Frame = GlobalCounter;
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 
@@ -1606,7 +1606,7 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 
 		CCameraMatrixBuffer cameraConstantBuffer;
-		view.fillConstantBuffer(cameraConstantBuffer);
+		view.FillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
@@ -1622,7 +1622,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawItems(RenderView& view, RendererPass rendererPass)
 	{
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -1750,7 +1750,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawItemsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -1832,7 +1832,7 @@ namespace TEN::Renderer
 			BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 
 			// Bind vertex and index buffer
-			UINT stride = sizeof(RendererVertex);
+			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
 
 			m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -1956,7 +1956,7 @@ namespace TEN::Renderer
 									RendererPolygon* p = &bucket.Polygons[j];
 
 									// As polygon distance, for moveables, we use the averaged distance
-									auto centre = Vector3::Transform(p->centre, msh->World);
+									auto centre = Vector3::Transform(p->Centre, msh->World);
 									float distance = (centre - cameraPosition).Length();
 
 									RendererTransparentFace face;
@@ -1984,7 +1984,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawRooms(RenderView& view, RendererPass rendererPass)
 	{
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		// Bind vertex and index buffer.
@@ -2081,12 +2081,12 @@ namespace TEN::Renderer
 								m_numRoomsTransparentPolygons++;
 
 								// As polygon distance, for rooms, we use the farthest vertex distance                            
-								int d1 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
-								int d2 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
-								int d3 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
+								int d1 = (m_roomsVertices[m_roomsIndices[p->BaseIndex + 0]].Position - cameraPosition).Length();
+								int d2 = (m_roomsVertices[m_roomsIndices[p->BaseIndex + 1]].Position - cameraPosition).Length();
+								int d3 = (m_roomsVertices[m_roomsIndices[p->BaseIndex + 2]].Position - cameraPosition).Length();
 								int d4 = 0;
-								if (p->shape == 0)
-									d4 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
+								if (p->Shape == 0)
+									d4 = (m_roomsVertices[m_roomsIndices[p->BaseIndex + 3]].Position - cameraPosition).Length();
 
 								int distance = std::max(std::max(std::max(d1, d2), d3), d4);
 
@@ -2199,7 +2199,7 @@ namespace TEN::Renderer
 		if (Lara.Control.Look.OpticRange != 0)
 			AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
 
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		// Draw sky.
@@ -2326,7 +2326,7 @@ namespace TEN::Renderer
 
 						// Use averaged distance as polygon distance for moveables.
 						auto centre = Vector3::Transform(
-							polygonPtr->centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
+							polygonPtr->Centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
 						int distance = (centre - cameraPos).Length();
 
 						RendererTransparentFace face;

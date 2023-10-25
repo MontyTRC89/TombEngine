@@ -4,7 +4,7 @@
 #include "Game/effects/DisplaySprite.h"
 #include "Game/Setup.h"
 #include "Objects/game_object_ids.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Color/Color.h"

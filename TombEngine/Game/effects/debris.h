@@ -2,8 +2,8 @@
 #include "Game/collision/sphere.h"
 #include "Specific/newtypes.h"
 #include "Specific/level.h"
-#include "Renderer/Renderer11.h"
-#include "Renderer/RendererVertex.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Graphics/Vertices/Vertex.h"
 
 constexpr int MAX_DEBRIS = 2048;
 

@@ -2,11 +2,14 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 
-using DirectX::SimpleMath::Matrix;
-using DirectX::SimpleMath::Vector4;
-
-struct alignas(16) CSpriteBuffer
+namespace TEN::Renderer::ConstantBuffers
 {
-	float IsSoftParticle;
-	int RenderType;
-};
+	using DirectX::SimpleMath::Matrix;
+	using DirectX::SimpleMath::Vector4;
+
+	struct alignas(16) CSpriteBuffer
+	{
+		float IsSoftParticle;
+		int RenderType;
+	};
+}

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 #include "Specific/trutils.h"
 
@@ -26,7 +26,7 @@ namespace TEN::Renderer
 		constexpr auto BLINK_VALUE_MIN = 0.1f;
 		constexpr auto BLINK_TIME_STEP = 0.2f;
 
-		if (m_Locked)
+		if (m_locked)
 			return;
 
 		if (string.empty())
@@ -72,19 +72,19 @@ namespace TEN::Renderer
 
 				if (flags & PRINTSTRING_BLINK)
 				{
-					rString.Color *= BlinkColorValue;
+					rString.Color *= m_blinkColorValue;
 
-					if (!IsBlinkUpdated)
+					if (!m_isBlinkUpdated)
 					{
 						// Calculate blink increment based on sine wave.
-						BlinkColorValue = ((sin(BlinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
+						m_blinkColorValue = ((sin(m_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
 
 						// Update blink time.
-						BlinkTime += BLINK_TIME_STEP;
-						if (BlinkTime > PI_MUL_2)
-							BlinkTime -= PI_MUL_2;
+						m_blinkTime += BLINK_TIME_STEP;
+						if (m_blinkTime > PI_MUL_2)
+							m_blinkTime -= PI_MUL_2;
 
-						IsBlinkUpdated = true;
+						m_isBlinkUpdated = true;
 					}
 				}
 
@@ -126,7 +126,7 @@ namespace TEN::Renderer
 
 		m_spriteBatch->End();
 
-		IsBlinkUpdated = false;
+		m_isBlinkUpdated = false;
 		m_strings.clear();
 	}
 }

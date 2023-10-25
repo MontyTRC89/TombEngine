@@ -168,7 +168,7 @@ void ItemInfo::ResetModelToDefault()
 	}
 }
 
-bool TestState(int refState, const vector<int>& stateList)
+bool TestState(int refState, const std::vector<int>& stateList)
 {
 	for (const auto& state : stateList)
 	{

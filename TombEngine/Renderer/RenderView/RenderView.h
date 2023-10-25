@@ -2,28 +2,23 @@
 #include "Game/camera.h"
 #include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
 #include "Renderer/Frustum.h"
+#include "Renderer/Renderer11Enums.h"
 #include "Specific/memory/LinearArrayBuffer.h"
-#include "Renderer/RendererSprite2D.h"
-#include "Renderer/RendererSprites.h"
-#include "Renderer/RendererTransparentFace.h"
+#include "Renderer/Structures/RendererSprite2D.h"
+#include "Renderer/Structures/RendererSprite.h"
+#include "Renderer/Structures/RendererTransparentFace.h"
 #include "Renderer/Structures/RendererFogBulb.h"
+#include "Renderer/Structures/RendererStatic.h"
+#include "Renderer/Structures/RendererItem.h"
+#include "Renderer/Structures/RendererLight.h"
+#include "Renderer/Structures/RendererEffect.h"
+#include "Renderer/Structures/RendererRoom.h"
+#include "Renderer/Structures/RendererTransparentFace.h"
 
 namespace TEN::Renderer 
 {
-	struct RendererStatic;
-	struct RendererItem;
-	struct RendererLight;
-	struct RendererEffect;
-	struct RendererRoom;
-	struct RendererTransparentFace;
-
-	constexpr auto MAX_ROOMS_DRAW = 256;
-	constexpr auto MAX_STATICS_DRAW = 128;
-	constexpr auto MAX_EFFECTS_DRAW = 16;
-	constexpr auto MAX_ITEMS_DRAW = 128;
-	constexpr auto MAX_LIGHTS_DRAW = 48;
-	constexpr auto MAX_FOG_BULBS_DRAW = 32;
-	constexpr auto MAX_SPRITES_DRAW = 512;
+	using namespace TEN::Renderer::ConstantBuffers;
+	using namespace TEN::Renderer::Structures;
 
 	struct RenderViewCamera
 	{
@@ -58,7 +53,7 @@ namespace TEN::Renderer
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
 		
-		void fillConstantBuffer(CCameraMatrixBuffer& bufferToFill);
-		void clear();
+		void FillConstantBuffer(CCameraMatrixBuffer& bufferToFill);
+		void Clear();
 	};
 }

@@ -1,19 +1,19 @@
 #pragma once
 #include <vector>
 #include <SimpleMath.h>
+#include "Renderer/Structures/RendererRectangle.h"
+#include "Renderer/Structures/RendererBucket.h"
+#include "Renderer/Structures/RendererLight.h"
+#include "Renderer/Structures/RendererItem.h"
+#include "Renderer/Structures/RendererEffect.h"
+#include "Renderer/Structures/RendererStatic.h"
+#include "Renderer/Structures/RendererTransparentFace.h"
+#include "Renderer/Structures/RendererDoor.h"
 
-#include "Renderer/RendererRectangle.h"
-
-struct MESH_INFO;
-
-namespace TEN::Renderer
+namespace TEN::Renderer::Structures
 {
-	struct RendererItem;
-	struct RendererBucket;
-	struct RendererLight;
-	struct RendererEffect;
-	struct RendererTransparentFace;
-	struct RendererDoor;
+	using namespace DirectX;
+	using namespace DirectX::SimpleMath;
 
 	struct RendererRoom
 	{

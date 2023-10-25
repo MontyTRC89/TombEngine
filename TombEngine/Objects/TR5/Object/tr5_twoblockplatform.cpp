@@ -7,7 +7,7 @@
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 using namespace TEN::Renderer;
 
 using namespace TEN::Collision::Floordata;

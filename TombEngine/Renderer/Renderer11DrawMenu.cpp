@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 #include "Game/animation.h"
 #include "Game/control/control.h"
@@ -731,7 +731,7 @@ namespace TEN::Renderer
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		auto screenRes = GetScreenResolution();
@@ -957,7 +957,7 @@ namespace TEN::Renderer
 
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		// Set vertex buffer

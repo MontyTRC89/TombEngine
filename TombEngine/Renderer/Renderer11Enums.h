@@ -210,6 +210,12 @@ enum RendererPass
 	CollectSortedFaces
 };
 
+enum SpriteRenderType
+{
+	Default,
+	LaserBarrier
+};
+
 constexpr auto TEXTURE_HEIGHT = 256;
 constexpr auto TEXTURE_WIDTH = 256;
 constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);
@@ -242,6 +248,7 @@ constexpr auto FADE_FACTOR = 0.0625f;
 
 constexpr auto NUM_LIGHTS_PER_BUFFER = 48;
 constexpr auto MAX_LIGHTS_PER_ITEM = 8;
+constexpr auto MAX_LIGHTS_PER_ROOM = 48;
 constexpr auto MAX_LIGHTS = 100;
 constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEP = 1.0f / 10.0f;
 constexpr auto MAX_DYNAMIC_SHADOWS = 1;
@@ -276,6 +283,14 @@ constexpr auto SKY_SIZE = 10240.0f;
 constexpr auto SKY_VERTICES_COUNT = 4 * SKY_TILES_COUNT * SKY_TILES_COUNT;
 constexpr auto SKY_INDICES_COUNT = 6 * SKY_TILES_COUNT * SKY_TILES_COUNT;
 constexpr auto SKY_TRIANGLES_COUNT = 2 * SKY_TILES_COUNT * SKY_TILES_COUNT;
+
+constexpr auto MAX_ROOMS_DRAW = 256;
+constexpr auto MAX_STATICS_DRAW = 128;
+constexpr auto MAX_EFFECTS_DRAW = 16;
+constexpr auto MAX_ITEMS_DRAW = 128;
+constexpr auto MAX_LIGHTS_DRAW = 48;
+constexpr auto MAX_FOG_BULBS_DRAW = 32;
+constexpr auto MAX_SPRITES_DRAW = 512;
 
 // FUTURE
 /*

@@ -9,7 +9,7 @@
 #include "Specific/level.h"
 #include "Game/animation.h"
 #include "Game/items.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Game/collision/collide_item.h"
 
 using namespace TEN::Input;

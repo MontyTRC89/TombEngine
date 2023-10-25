@@ -26,7 +26,7 @@ namespace TEN::Renderer
 		Viewport.MaxDepth = 1;
 	}
 
-	void RenderView::fillConstantBuffer(CCameraMatrixBuffer& bufferToFill)
+	void RenderView::FillConstantBuffer(CCameraMatrixBuffer& bufferToFill)
 	{
 		bufferToFill.Projection = Camera.Projection;
 		bufferToFill.View = Camera.View;
@@ -41,7 +41,7 @@ namespace TEN::Renderer
 		bufferToFill.FarPlane = Camera.FarPlane;
 	}
 
-	void RenderView::clear() 
+	void RenderView::Clear() 
 	{
 		RoomsToDraw.clear();
 		LightsToDraw.clear();

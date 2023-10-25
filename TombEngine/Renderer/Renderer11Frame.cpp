@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
@@ -53,10 +53,10 @@ namespace TEN::Renderer
 		// Prepare real DX scissor test rectangle.
 		for (auto* roomPtr : renderView.RoomsToDraw)
 		{
-			roomPtr->ClipBounds.left = (roomPtr->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
-			roomPtr->ClipBounds.bottom = (1.0f - roomPtr->ViewPort.y) * m_screenHeight * 0.5f;
-			roomPtr->ClipBounds.right = (roomPtr->ViewPort.z + 1.0f) * m_screenWidth * 0.5f;
-			roomPtr->ClipBounds.top = (1.0f - roomPtr->ViewPort.w) * m_screenHeight * 0.5f;
+			roomPtr->ClipBounds.Left = (roomPtr->ViewPort.x + 1.0f) * m_screenWidth * 0.5f;
+			roomPtr->ClipBounds.Bottom = (1.0f - roomPtr->ViewPort.y) * m_screenHeight * 0.5f;
+			roomPtr->ClipBounds.Right = (roomPtr->ViewPort.z + 1.0f) * m_screenWidth * 0.5f;
+			roomPtr->ClipBounds.Top = (1.0f - roomPtr->ViewPort.w) * m_screenHeight * 0.5f;
 		} 
 
 		// Collect fog bulbs.

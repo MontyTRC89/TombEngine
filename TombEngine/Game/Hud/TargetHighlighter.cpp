@@ -7,7 +7,7 @@
 #include "Game/lara/lara_fire.h"
 #include "Game/lara/lara_helpers.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
 

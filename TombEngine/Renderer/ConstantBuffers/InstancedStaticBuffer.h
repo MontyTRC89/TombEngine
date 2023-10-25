@@ -1,13 +1,11 @@
 #pragma once
 #include <SimpleMath.h>
 #include "Renderer/ConstantBuffers/ShaderLight.h"
-#include "Renderer/Renderer11.h"
-#include "Renderer/ConstantBuffers/ShaderLight.h"
+#include "Renderer/Renderer.h"
 
-namespace TEN::Renderer
+namespace TEN::Renderer::ConstantBuffers
 {
-	using DirectX::SimpleMath::Matrix;
-	using DirectX::SimpleMath::Vector4;
+	using namespace DirectX::SimpleMath;
 
 	constexpr int INSTANCED_STATIC_MESH_BUCKET_SIZE = 100;
 	

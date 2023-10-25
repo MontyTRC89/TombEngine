@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 #include "Game/camera.h"
 #include "Game/control/control.h"
@@ -115,7 +115,7 @@ namespace TEN::Renderer
 		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering"))
 			return;
 
-		unsigned int strides = sizeof(RendererVertex);
+		unsigned int strides = sizeof(Vertex);
 		unsigned int offset = 0;
 	
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
@@ -175,7 +175,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawLoadingBar(float percentage)
 	{
-		unsigned int strides = sizeof(RendererVertex);
+		unsigned int strides = sizeof(Vertex);
 		unsigned int offset = 0;
 		
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
@@ -259,7 +259,7 @@ namespace TEN::Renderer
 			SetBlendMode(BLENDMODE_OPAQUE);
 
 			// Draw the aiming point
-			RendererVertex vertices[4];
+			Vertex vertices[4];
 
 			vertices[0].Position.x = -4.0f / m_screenWidth;
 			vertices[0].Position.y = 4.0f / m_screenHeight;
@@ -316,7 +316,7 @@ namespace TEN::Renderer
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
-		RendererVertex vertices[4];
+		Vertex vertices[4];
 
 		vertices[0].Position.x = -1.0f;
 		vertices[0].Position.y = 1.0f;
@@ -404,7 +404,7 @@ namespace TEN::Renderer
 				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
-			else if (texture2DPtr != spriteToDraw.SpritePtr->Texture || lastBlendMode != spriteToDraw.BlendMode)
+			else if (texture2DPtr != spriteToDraw.SpritePtr->Texture || m_lastBlendMode != spriteToDraw.BlendMode)
 			{
 				m_primitiveBatch->End();
 				m_primitiveBatch->Begin();
@@ -439,7 +439,7 @@ namespace TEN::Renderer
 			}
 
 			// Define renderer vertices.
-			auto rVertices = std::array<RendererVertex, VERTEX_COUNT>{};
+			auto rVertices = std::array<Vertex, VERTEX_COUNT>{};
 			for (int i = 0; i < rVertices.size(); i++)
 			{
 				rVertices[i].Position = Vector3(vertices[i]);
@@ -488,7 +488,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		auto vertices = std::array<RendererVertex, VERTEX_COUNT>{};
+		auto vertices = std::array<Vertex, VERTEX_COUNT>{};
 		auto colorVec4 = Vector4(color.x, color.y, color.z, 1.0f);
 
 		vertices[0].Position = Vector3(-1.0f, 1.0f, 0.0f);
@@ -559,7 +559,7 @@ namespace TEN::Renderer
 		uvEnd.x = uvEnd.x * scale.x + sprite->UV[0].x;
 		uvEnd.y = uvEnd.y * scale.y + sprite->UV[0].y;
 
-		RendererVertex vertices[4];
+		Vertex vertices[4];
 
 		vertices[0].Position.x = -1.0f;
 		vertices[0].Position.y = 1.0f;

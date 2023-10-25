@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 namespace TEN::Renderer
 {

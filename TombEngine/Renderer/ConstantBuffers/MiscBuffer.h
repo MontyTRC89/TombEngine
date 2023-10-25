@@ -1,8 +1,11 @@
 #pragma once
 
-struct alignas(16) CMiscBuffer
+namespace TEN::Renderer::ConstantBuffers
 {
-	Vector2 CausticsStartUV;
-	Vector2 CausticsScale;
-	int Caustics;
-};
+	struct alignas(16) CMiscBuffer
+	{
+		Vector2 CausticsStartUV;
+		Vector2 CausticsScale;
+		int Caustics;
+	};
+}

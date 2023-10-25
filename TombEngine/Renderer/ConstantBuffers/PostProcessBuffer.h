@@ -1,8 +1,11 @@
-struct alignas(16) CPostProcessBuffer
+namespace TEN::Renderer::ConstantBuffers
 {
-	float CinematicBarsHeight;
-	float ScreenFadeFactor;
-	int ViewportWidth;
-	int ViewportHeight;
-	int FXAA;
-};
+	struct alignas(16) CPostProcessBuffer
+	{
+		float CinematicBarsHeight;
+		float ScreenFadeFactor;
+		int ViewportWidth;
+		int ViewportHeight;
+		int FXAA;
+	};
+}

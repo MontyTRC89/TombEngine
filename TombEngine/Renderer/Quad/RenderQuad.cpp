@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include "RenderQuad.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "../Utils.h"
 
 namespace TEN::Renderer
@@ -11,7 +11,7 @@ namespace TEN::Renderer
 
 	void TEN::Renderer::initQuad(ID3D11Device* device)
 	{
-		std::array<RendererVertex, 4> quadVertices;
+		std::array<Vertex, 4> quadVertices;
 		//Bottom Left
 		quadVertices[0].Position = Vector3(-0.5, -0.5, 0);
 		quadVertices[0].Normal = Vector3(-1, -1, 1);
@@ -42,16 +42,16 @@ namespace TEN::Renderer
 		quadVertices[2].IndexInPoly = 2;
 
 		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.ByteWidth = sizeof(RendererVertex) * 4;
+		bufferDesc.ByteWidth = sizeof(Vertex) * 4;
 		bufferDesc.MiscFlags = 0x0;
 		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bufferDesc.CPUAccessFlags = 0x0;
 		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
-		bufferDesc.StructureByteStride = sizeof(RendererVertex);
+		bufferDesc.StructureByteStride = sizeof(Vertex);
 
 		D3D11_SUBRESOURCE_DATA initData = {};
 		initData.pSysMem = quadVertices.data();
-		initData.SysMemPitch = sizeof(RendererVertex) * (unsigned int)quadVertices.size();
+		initData.SysMemPitch = sizeof(Vertex) * (unsigned int)quadVertices.size();
 		Utils::throwIfFailed(device->CreateBuffer(&bufferDesc, &initData, quadVertexBuffer.GetAddressOf()));
 	}
 }

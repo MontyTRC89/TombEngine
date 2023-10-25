@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 #include "Game/animation.h"
 #include "Game/effects/Hair.h"
@@ -291,7 +291,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, RendererPass renderer
 	if (nativeItem->Flags & IFLAG_INVISIBLE)
 		return;
 
-	unsigned int stride = sizeof(RendererVertex);
+	unsigned int stride = sizeof(Vertex);
 	unsigned int offset = 0;
 
 	m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);

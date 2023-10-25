@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -28,10 +28,11 @@
 #include "Math/Math.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/Utils/object_helper.h"
-#include "Renderer/RendererSprite2D.h"
-#include "Renderer/RendererSprites.h"
+#include "Renderer/Structures/RendererSprite2D.h"
+#include "Renderer/Structures/RendererSprite.h"
 #include "Renderer/Quad/RenderQuad.h"
 #include "Specific/level.h"
+#include "Structures/SpriteRenderBucket.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -56,18 +57,6 @@ extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 namespace TEN::Renderer 
 {
 	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
-
-	struct RendererSpriteBucket
-	{
-		RendererSprite* Sprite;
-		BLEND_MODES BlendMode;
-		std::vector<RendererSpriteToDraw> SpritesToDraw;
-
-		bool IsBillboard	= false;
-		bool IsSoftParticle = false;
-
-		SpriteRenderType RenderType;
-	};
 	
 	void Renderer11::DrawLaserBarriers(RenderView& view)
 	{
@@ -835,7 +824,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -964,7 +953,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -1232,7 +1221,7 @@ namespace TEN::Renderer
 		m_context->PSSetShader(m_psInstancedSprites.Get(), nullptr, 0);
 
 		// Set up vertex buffer and parameters.
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -1293,7 +1282,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSprites.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSprites.Get(), nullptr, 0);
 
-		stride = sizeof(RendererVertex);
+		stride = sizeof(Vertex);
 		offset = 0;
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -1327,22 +1316,22 @@ namespace TEN::Renderer
 
 			for (auto& rDrawSprite : spriteBucket.SpritesToDraw)
 			{
-				auto vertex0 = RendererVertex{};
+				auto vertex0 = Vertex{};
 				vertex0.Position = rDrawSprite.vtx1;
 				vertex0.UV = rDrawSprite.Sprite->UV[0];
 				vertex0.Color = rDrawSprite.c1;
 
-				auto vertex1 = RendererVertex{};
+				auto vertex1 = Vertex{};
 				vertex1.Position = rDrawSprite.vtx2;
 				vertex1.UV = rDrawSprite.Sprite->UV[1];
 				vertex1.Color = rDrawSprite.c2;
 
-				auto vertex2 = RendererVertex{};
+				auto vertex2 = Vertex{};
 				vertex2.Position = rDrawSprite.vtx3;
 				vertex2.UV = rDrawSprite.Sprite->UV[2];
 				vertex2.Color = rDrawSprite.c3;
 
-				auto vertex3 = RendererVertex{};
+				auto vertex3 = Vertex{};
 				vertex3.Position = rDrawSprite.vtx4;
 				vertex3.UV = rDrawSprite.Sprite->UV[3];
 				vertex3.Color = rDrawSprite.c4;
@@ -1360,7 +1349,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
 	{	
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->VSSetShader(m_vsSprites.Get(), nullptr, 0);
@@ -1420,7 +1409,7 @@ namespace TEN::Renderer
 		}
 
 		auto* meshPtr = effect->Mesh;
-		auto lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+		auto m_lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
 		for (auto& bucket : meshPtr->Buckets) 
 		{
@@ -1436,7 +1425,7 @@ namespace TEN::Renderer
 			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-			SetBlendMode(lastBlendMode);
+			SetBlendMode(m_lastBlendMode);
 			
 			DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 		}
@@ -1450,7 +1439,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-		UINT stride = sizeof(RendererVertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -1480,9 +1469,9 @@ namespace TEN::Renderer
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		extern std::vector<DebrisFragment> DebrisFragments;
-		std::vector<RendererVertex> vertices;
+		std::vector<Vertex> vertices;
 
-		auto lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+		auto m_lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
 		for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
 		{
@@ -1526,28 +1515,28 @@ namespace TEN::Renderer
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
-				RendererVertex vtx0;
+				Vertex vtx0;
 				vtx0.Position = deb->mesh.Positions[0];
 				vtx0.UV = deb->mesh.TextureCoordinates[0];
 				vtx0.Normal = deb->mesh.Normals[0];
 				vtx0.Color = deb->mesh.Colors[0];
 
-				RendererVertex vtx1;
+				Vertex vtx1;
 				vtx1.Position = deb->mesh.Positions[1];
 				vtx1.UV = deb->mesh.TextureCoordinates[1];
 				vtx1.Normal = deb->mesh.Normals[1];
 				vtx1.Color = deb->mesh.Colors[1];
 
-				RendererVertex vtx2;
+				Vertex vtx2;
 				vtx2.Position = deb->mesh.Positions[2];
 				vtx2.UV = deb->mesh.TextureCoordinates[2];
 				vtx2.Normal = deb->mesh.Normals[2];
 				vtx2.Color = deb->mesh.Colors[2];
 
-				if (lastBlendMode != deb->mesh.blendMode)
+				if (m_lastBlendMode != deb->mesh.blendMode)
 				{
-					lastBlendMode = deb->mesh.blendMode;
-					SetBlendMode(lastBlendMode);
+					m_lastBlendMode = deb->mesh.blendMode;
+					SetBlendMode(m_lastBlendMode);
 				}
 
 				SetCullMode(CULL_MODE_NONE);

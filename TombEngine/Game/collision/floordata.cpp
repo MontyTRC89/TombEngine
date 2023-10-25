@@ -6,7 +6,7 @@
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;

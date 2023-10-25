@@ -3,7 +3,7 @@
 
 #include <CommCtrl.h>
 
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "resource.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Internal/LanguageScript.h"

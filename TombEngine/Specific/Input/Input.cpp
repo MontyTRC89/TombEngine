@@ -13,7 +13,7 @@
 #include "Game/items.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/trutils.h"

@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 #include <execution>
 #include <stack>
@@ -14,13 +14,15 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
 
+using namespace TEN::Renderer::Graphics;
+
 namespace TEN::Renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()
 	{
-		lastBlendMode = BLENDMODE_UNSET;
-		lastCullMode = CULL_MODE_UNSET;
-		lastDepthState = DEPTH_STATE_UNSET;
+		m_lastBlendMode = BLENDMODE_UNSET;
+		m_lastCullMode = CULL_MODE_UNSET;
+		m_lastDepthState = DEPTH_STATE_UNSET;
 
 		m_moveableObjects.resize(ID_NUMBER_OBJECTS);
 		m_spriteSequences.resize(ID_NUMBER_OBJECTS);
@@ -281,14 +283,15 @@ namespace TEN::Renderer
 				bucket.StartIndex = lastIndex;
 				bucket.NumVertices += levelBucket.numQuads * 4 + levelBucket.numTriangles * 3;
 				bucket.NumIndices += levelBucket.numQuads * 6 + levelBucket.numTriangles * 3;
+				bucket.Centre = Vector3::Zero;
 
 				for (auto& poly : levelBucket.polygons)
 				{
 					RendererPolygon newPoly;
 
-					newPoly.shape = poly.shape;
+					newPoly.Shape = poly.shape;
 
-					newPoly.centre = (
+					newPoly.Centre = (
 						room.positions[poly.indices[0]] +
 						room.positions[poly.indices[1]] +
 						room.positions[poly.indices[2]]) / 3.0f;
@@ -305,12 +308,14 @@ namespace TEN::Renderer
 					int baseVertices = lastVertex;
 					for (int k = 0; k < poly.indices.size(); k++)
 					{
-						RendererVertex* vertex = &m_roomsVertices[lastVertex];
+						Vertex* vertex = &m_roomsVertices[lastVertex];
 						int index = poly.indices[k];
 
 						vertex->Position.x = room.x + room.positions[index].x;
 						vertex->Position.y = room.y + room.positions[index].y;
 						vertex->Position.z = room.z + room.positions[index].z;
+
+						bucket.Centre += vertex->Position;
 
 						vertex->Normal = poly.normals[k];
 						vertex->UV = poly.textureCoordinates[k];
@@ -334,7 +339,7 @@ namespace TEN::Renderer
 
 					if (poly.shape == 0)
 					{
-						newPoly.baseIndex = lastIndex;
+						newPoly.BaseIndex = lastIndex;
 
 						m_roomsIndices[lastIndex + 0] = baseVertices + 0;
 						m_roomsIndices[lastIndex + 1] = baseVertices + 1;
@@ -347,7 +352,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						newPoly.baseIndex = lastIndex;
+						newPoly.BaseIndex = lastIndex;
  
 						m_roomsIndices[lastIndex + 0] = baseVertices + 0;
 						m_roomsIndices[lastIndex + 1] = baseVertices + 1;
@@ -358,6 +363,8 @@ namespace TEN::Renderer
 
 					bucket.Polygons.push_back(newPoly);
 				}
+
+				bucket.Centre /= bucket.NumIndices;
 
 				r->Buckets.push_back(bucket);		
 			}
@@ -632,7 +639,7 @@ namespace TEN::Renderer
 
 								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
-									RendererVertex *jointVertex = &m_moveablesVertices[jointBucket->StartVertex + v1];
+									Vertex *jointVertex = &m_moveablesVertices[jointBucket->StartVertex + v1];
 
 									bool isDone = false;
 
@@ -646,7 +653,7 @@ namespace TEN::Renderer
 											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
-												RendererVertex *skinVertex = &m_moveablesVertices[skinBucket->StartVertex + v2];
+												Vertex *skinVertex = &m_moveablesVertices[skinBucket->StartVertex + v2];
 
 												int x1 = m_moveablesVertices[jointBucket->StartVertex + v1].Position.x + jointBone->GlobalTranslation.x;
 												int y1 = m_moveablesVertices[jointBucket->StartVertex + v1].Position.y + jointBone->GlobalTranslation.y;
@@ -907,8 +914,8 @@ namespace TEN::Renderer
 				POLYGON* poly = &levelBucket->polygons[p];
 				RendererPolygon newPoly;
 
-				newPoly.shape = poly->shape;
-				newPoly.centre = (
+				newPoly.Shape = poly->shape;
+				newPoly.Centre = (
 					meshPtr->positions[poly->indices[0]] +
 					meshPtr->positions[poly->indices[1]] +
 					meshPtr->positions[poly->indices[2]]) / 3.0f;
@@ -917,7 +924,7 @@ namespace TEN::Renderer
 
 				for (int k = 0; k < (int)poly->indices.size(); k++)
 				{
-					RendererVertex vertex;
+					Vertex vertex;
 					int v = poly->indices[k];
 
 					vertex.Position.x = meshPtr->positions[v].x;
@@ -963,44 +970,44 @@ namespace TEN::Renderer
 
 				if (poly->shape == 0)
 				{
-					newPoly.baseIndex = *lastIndex;
+					newPoly.BaseIndex = *lastIndex;
 
 					if (obj->Type == 0)
 					{
-						m_moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						m_moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						m_moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 3;
-						m_moveablesIndices[newPoly.baseIndex + 3] = baseVertices + 2;
-						m_moveablesIndices[newPoly.baseIndex + 4] = baseVertices + 3;
-						m_moveablesIndices[newPoly.baseIndex + 5] = baseVertices + 1;
+						m_moveablesIndices[newPoly.BaseIndex + 0] = baseVertices + 0;
+						m_moveablesIndices[newPoly.BaseIndex + 1] = baseVertices + 1;
+						m_moveablesIndices[newPoly.BaseIndex + 2] = baseVertices + 3;
+						m_moveablesIndices[newPoly.BaseIndex + 3] = baseVertices + 2;
+						m_moveablesIndices[newPoly.BaseIndex + 4] = baseVertices + 3;
+						m_moveablesIndices[newPoly.BaseIndex + 5] = baseVertices + 1;
 					}
 					else
 					{
-						m_staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						m_staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						m_staticsIndices[newPoly.baseIndex + 2] = baseVertices + 3;
-						m_staticsIndices[newPoly.baseIndex + 3] = baseVertices + 2;
-						m_staticsIndices[newPoly.baseIndex + 4] = baseVertices + 3;
-						m_staticsIndices[newPoly.baseIndex + 5] = baseVertices + 1;
+						m_staticsIndices[newPoly.BaseIndex + 0] = baseVertices + 0;
+						m_staticsIndices[newPoly.BaseIndex + 1] = baseVertices + 1;
+						m_staticsIndices[newPoly.BaseIndex + 2] = baseVertices + 3;
+						m_staticsIndices[newPoly.BaseIndex + 3] = baseVertices + 2;
+						m_staticsIndices[newPoly.BaseIndex + 4] = baseVertices + 3;
+						m_staticsIndices[newPoly.BaseIndex + 5] = baseVertices + 1;
 					}
 
 					*lastIndex = *lastIndex + 6;
 				}
 				else
 				{
-					newPoly.baseIndex = *lastIndex;
+					newPoly.BaseIndex = *lastIndex;
 
 					if (obj->Type == 0)
 					{
-						m_moveablesIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						m_moveablesIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						m_moveablesIndices[newPoly.baseIndex + 2] = baseVertices + 2;
+						m_moveablesIndices[newPoly.BaseIndex + 0] = baseVertices + 0;
+						m_moveablesIndices[newPoly.BaseIndex + 1] = baseVertices + 1;
+						m_moveablesIndices[newPoly.BaseIndex + 2] = baseVertices + 2;
 					}
 					else
 					{
-						m_staticsIndices[newPoly.baseIndex + 0] = baseVertices + 0;
-						m_staticsIndices[newPoly.baseIndex + 1] = baseVertices + 1;
-						m_staticsIndices[newPoly.baseIndex + 2] = baseVertices + 2;
+						m_staticsIndices[newPoly.BaseIndex + 0] = baseVertices + 0;
+						m_staticsIndices[newPoly.BaseIndex + 1] = baseVertices + 1;
+						m_staticsIndices[newPoly.BaseIndex + 2] = baseVertices + 2;
 					}
 
 					*lastIndex = *lastIndex + 3;

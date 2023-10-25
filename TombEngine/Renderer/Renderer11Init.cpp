@@ -4,7 +4,7 @@
 #include <memory>
 #include <filesystem>
 
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/Quad/RenderQuad.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/configuration.h"
@@ -120,7 +120,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 	m_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
 	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);
-	m_transparentFacesVertices = createVector<RendererVertex>(MAX_TRANSPARENT_VERTICES);
+	m_transparentFacesVertices = createVector<Vertex>(MAX_TRANSPARENT_VERTICES);
 	m_transparentFacesIndices.reserve(MAX_TRANSPARENT_VERTICES); // = createVector<int>(MAX_TRANSPARENT_VERTICES);
 
 	for (int i = 0; i < NUM_ITEMS; i++)
@@ -223,7 +223,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 
 void TEN::Renderer::Renderer11::InitializeSky()
 {
-	RendererVertex vertices[SKY_VERTICES_COUNT];
+	Vertex vertices[SKY_VERTICES_COUNT];
 	int indices[SKY_INDICES_COUNT];
 	int size = SKY_SIZE;
 
@@ -359,7 +359,7 @@ void TEN::Renderer::Renderer11::InitializeScreen(int w, int h, HWND handle, bool
 
 	// Initialize sprite and primitive batches
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_context.Get());
-	m_primitiveBatch = std::make_unique<PrimitiveBatch<RendererVertex>>(m_context.Get());
+	m_primitiveBatch = std::make_unique<PrimitiveBatch<Vertex>>(m_context.Get());
 
 	// Initialize buffers
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
