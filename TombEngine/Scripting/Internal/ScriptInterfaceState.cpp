@@ -5,11 +5,14 @@
 #include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
+#include "Scripting/Internal/TEN/Input/InputHandler.h"
 #include "Scripting/Internal/TEN/Inventory/InventoryHandler.h"
 #include "Scripting/Internal/TEN/Logic/LogicHandler.h"
-#include "Scripting/Internal/TEN/Misc/Miscellaneous.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Strings/StringsHandler.h"
+#include "Scripting/Internal/TEN/Sound/SoundHandler.h"
+#include "Scripting/Internal/TEN/Util/Util.h"
+#include "Scripting/Internal/TEN/View/ViewHandler.h"
 
 using namespace TEN::Scripting::DisplaySprite;
 
@@ -55,6 +58,9 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 
 	// Misc. handlers not assigned above.
 	InventoryHandler::Register(&SolState, RootTable);
-	Misc::Register(&SolState, RootTable);
 	Effects::Register(&SolState, RootTable);
+	Input::Register(&SolState, RootTable);
+	Sound::Register(&SolState, RootTable);
+	Util::Register(&SolState, RootTable);
+	View::Register(&SolState, RootTable);
 }
