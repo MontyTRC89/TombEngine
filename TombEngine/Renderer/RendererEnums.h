@@ -132,7 +132,7 @@ enum class ConstantBufferRegister
 	InstancedSprites = 13
 };
 
-enum class AlphaTestModes
+enum class AlphaTestMode
 {
 	None = 0,
 	GreatherThan = 1,

@@ -306,7 +306,7 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 	BindTexture(TextureRegister::NormalMap, &std::get<1>(moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 
-	SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+	SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 	RendererObject& laraObj = *moveableObjects[ID_LARA];
 	RendererObject& laraSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);

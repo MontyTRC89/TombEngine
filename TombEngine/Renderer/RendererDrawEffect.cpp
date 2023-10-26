@@ -851,7 +851,7 @@ namespace TEN::Renderer
 		short rotationX = 0;
 
 		SetBlendMode(BlendMode::Additive);
-		SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
@@ -979,7 +979,7 @@ namespace TEN::Renderer
 
 				BindStaticLights(rItemPtr->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 				SetBlendMode(BlendMode::Additive);
-				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 				if (creature.MuzzleFlash[0].Delay != 0 && creature.MuzzleFlash[0].Bite.BoneID != -1)
 				{
@@ -1258,11 +1258,11 @@ namespace TEN::Renderer
 
 			if (spriteBucket.BlendMode == BlendMode::AlphaTest)
 			{
-				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD, true);
+				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD, true);
 			}
 			else
 			{
-				SetAlphaTest(AlphaTestModes::None, 0);
+				SetAlphaTest(AlphaTestMode::None, 0);
 			}
 
 			cbInstancedSpriteBuffer.updateData(stInstancedSpriteBuffer, context.Get());
@@ -1305,11 +1305,11 @@ namespace TEN::Renderer
 
 			if (spriteBucket.BlendMode == BlendMode::AlphaTest)
 			{
-				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD, true);
+				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD, true);
 			}
 			else
 			{
-				SetAlphaTest(AlphaTestModes::None, 0);
+				SetAlphaTest(AlphaTestMode::None, 0);
 			}
 
 			primitiveBatch->Begin();
@@ -1374,7 +1374,7 @@ namespace TEN::Renderer
 		SetBlendMode(info->sprite->BlendMode);
 		SetCullMode(CullMode::None);
 		SetDepthState(DepthState::Read);
-		SetAlphaTest(AlphaTestModes::None, 0);
+		SetAlphaTest(AlphaTestMode::None, 0);
 
 		BindTexture(TextureRegister::ColorMap, info->sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
 
@@ -1401,11 +1401,11 @@ namespace TEN::Renderer
 
 		if (rendererPass == RendererPass::Transparent)
 		{
-			SetAlphaTest(AlphaTestModes::None, 1.0f);
+			SetAlphaTest(AlphaTestMode::None, 1.0f);
 		}
 		else
 		{
-			SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 		}
 
 		auto* meshPtr = effect->Mesh;
@@ -1500,11 +1500,11 @@ namespace TEN::Renderer
 
 				if (rendererPass == RendererPass::Transparent)
 				{
-					SetAlphaTest(AlphaTestModes::None, 1.0f);
+					SetAlphaTest(AlphaTestMode::None, 1.0f);
 				}
 				else
 				{
-					SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+					SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 				}
 
 				stStatic.World = world;

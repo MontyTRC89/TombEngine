@@ -200,7 +200,7 @@ namespace TEN::Renderer
 
 			stShadowMap.LightViewProjections[step] = (view * projection);
 
-			SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectNumber);
 
@@ -296,7 +296,7 @@ namespace TEN::Renderer
 			context->IASetInputLayout(inputLayout.Get());
 			context->IASetIndexBuffer(moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 			cbInstancedStaticMeshBuffer.updateData(stInstancedStaticMeshBuffer, context.Get());
 
@@ -580,7 +580,7 @@ namespace TEN::Renderer
 			context->IASetInputLayout(inputLayout.Get());
 			context->IASetIndexBuffer(moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 			cbInstancedStaticMeshBuffer.updateData(stInstancedStaticMeshBuffer, context.Get());
 
@@ -648,7 +648,7 @@ namespace TEN::Renderer
 			context->IASetInputLayout(inputLayout.Get());
 			context->IASetIndexBuffer(moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 			cbInstancedStaticMeshBuffer.updateData(stInstancedStaticMeshBuffer, context.Get());
 
@@ -1322,7 +1322,7 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(info->blendMode);
-		SetAlphaTest(AlphaTestModes::None, 1.0f);
+		SetAlphaTest(AlphaTestMode::None, 1.0f);
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 
@@ -1383,7 +1383,7 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(info->blendMode);	
-		SetAlphaTest(AlphaTestModes::None, 1.0f);
+		SetAlphaTest(AlphaTestMode::None, 1.0f);
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 
@@ -1789,7 +1789,7 @@ namespace TEN::Renderer
 
 		SetBlendMode(info->blendMode);
 		SetDepthState(DepthState::Read);
-		SetAlphaTest(AlphaTestModes::None, 1.0f);
+		SetAlphaTest(AlphaTestMode::None, 1.0f);
 		SetCullMode(CullMode::CounterClockwise);
 
 		int drawnVertices = 0;
@@ -1901,13 +1901,13 @@ namespace TEN::Renderer
 								{
 									SetBlendMode(bucket.BlendMode);
 									SetAlphaTest(
-										(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
+										(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
 										ALPHA_TEST_THRESHOLD);
 								}
 								else
 								{
 									SetBlendMode(BlendMode::AlphaBlend);
-									SetAlphaTest(AlphaTestModes::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
+									SetAlphaTest(AlphaTestMode::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
 								}
 
 								BindTexture(TextureRegister::ColorMap,
@@ -2119,14 +2119,14 @@ namespace TEN::Renderer
 							{
 								SetBlendMode(bucket.BlendMode);
 								SetAlphaTest(
-									bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
+									bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
 									FAST_ALPHA_BLEND_THRESHOLD
 								);
 							}
 							else
 							{
 								SetBlendMode(BlendMode::AlphaBlend);
-								SetAlphaTest(AlphaTestModes::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
+								SetAlphaTest(AlphaTestMode::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
 							}
 
 							// Draw geometry
@@ -2275,7 +2275,7 @@ namespace TEN::Renderer
 
 					// Always render horizon as alpha-blended surface.
 					SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
-					SetAlphaTest(AlphaTestModes::None, ALPHA_TEST_THRESHOLD);
+					SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 					// Draw vertices.
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -2309,7 +2309,7 @@ namespace TEN::Renderer
 			if (rendererPass == RendererPass::ShadowMap)
 			{
 				SetBlendMode(BlendMode::Opaque);
-				SetAlphaTest(AlphaTestModes::None, ALPHA_TEST_THRESHOLD);
+				SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
@@ -2365,13 +2365,13 @@ namespace TEN::Renderer
 					{
 						SetBlendMode(bucket.BlendMode);
 						SetAlphaTest(
-							bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
+							bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
 							ALPHA_TEST_THRESHOLD);
 					}
 					else
 					{
 						SetBlendMode(BlendMode::AlphaBlend);
-						SetAlphaTest(AlphaTestModes::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
+						SetAlphaTest(AlphaTestMode::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
 					}
 
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);

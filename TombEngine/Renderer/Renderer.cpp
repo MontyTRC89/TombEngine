@@ -529,7 +529,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::SetAlphaTest(AlphaTestModes mode, float threshold, bool force)
+	void Renderer::SetAlphaTest(AlphaTestMode mode, float threshold, bool force)
 	{
 		if (stBlending.AlphaTest != (int)mode ||
 			stBlending.AlphaThreshold != threshold ||

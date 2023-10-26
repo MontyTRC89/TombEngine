@@ -431,7 +431,7 @@ namespace TEN::Renderer
 		void SetBlendMode(BlendMode blendMode, bool force = false);
 		void SetDepthState(DepthState depthState, bool force = false);
 		void SetCullMode(CullMode cullMode, bool force = false);
-		void SetAlphaTest(AlphaTestModes mode, float threshold, bool force = false);
+		void SetAlphaTest(AlphaTestMode mode, float threshold, bool force = false);
 		void SetScissor(RendererRectangle rectangle);
 		void ResetAnimations();
 		void ResetScissor();

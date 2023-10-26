@@ -28,7 +28,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Math/Math.h"
-#include "Renderer/RenderView/RenderView.h"
+#include "Renderer/RenderView.h"
 #include "Renderer/Renderer.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"

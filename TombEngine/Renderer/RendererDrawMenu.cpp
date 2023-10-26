@@ -835,7 +835,7 @@ namespace TEN::Renderer
 					Renderer::SetBlendMode(bucket.BlendMode, true);
 				
 				SetAlphaTest(
-					(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
+					(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
 					ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
