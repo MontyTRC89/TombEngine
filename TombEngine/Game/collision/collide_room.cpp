@@ -1164,33 +1164,6 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	return (minHeight + item->Pose.Position.y - height);
 }
 
-void AlterFloorHeight(ItemInfo* item, int height)
-{
-	if (abs(height))
-	{
-		if (height >= 0)
-			height++;
-		else
-			height--;
-	}
-
-	short roomNumber = item->RoomNumber;
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	FloorInfo* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - BLOCK(1), item->Pose.Position.z, &roomNumber);
-
-	floor->FloorCollision.Planes[0].z += height;
-	floor->FloorCollision.Planes[1].z += height;
-
-	auto* box = &g_Level.Boxes[floor->Box];
-	if (box->flags & BLOCKABLE)
-	{
-		if (height >= 0)
-			box->flags &= ~BLOCKED;
-		else
-			box->flags |= BLOCKED;
-	}
-}
-
 int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
