@@ -78,8 +78,8 @@ constexpr auto LARA_HEALTH_MAX		  = 1000.0f;
 constexpr auto LARA_HEALTH_CRITICAL	  = LARA_HEALTH_MAX / 4;
 constexpr auto LARA_POISON_MAX		  = 128.0f;
 constexpr auto LARA_STAMINA_MAX		  = 120.0f;
-constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 constexpr auto LARA_STAMINA_MIN       = LARA_STAMINA_MAX / 10;
+constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
 constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
@@ -96,14 +96,6 @@ constexpr auto SLOPE_DIFFERENCE		= 60;
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;
 extern CollisionInfo LaraCollision;
-
-#define LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] = MESHES(slot, mesh)
-#define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
-#define INIT_LARA_MESHES(mesh, to, from) Lara.meshPtrs[mesh] = LARA_MESHES(to, mesh) = LARA_MESHES(from, mesh)
-
-#define LaraRoutineFunction void(ItemInfo* item, CollisionInfo* coll)
-extern std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
-extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll);
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll);

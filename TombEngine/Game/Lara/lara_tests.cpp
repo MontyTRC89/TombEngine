@@ -44,8 +44,8 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	int y = item->Pose.Position.y - coll->Setup.Height;
 
 	// Get frontal collision data
-	auto frontLeft  = GetCollision(item->Pose.Position.x + xl, y, item->Pose.Position.z + zl, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
-	auto frontRight = GetCollision(item->Pose.Position.x + xr, y, item->Pose.Position.z + zr, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
+	auto frontLeft  = GetCollision(item->Pose.Position.x + xl, y, item->Pose.Position.z + zl, GetRoom(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).roomNumber);
+	auto frontRight = GetCollision(item->Pose.Position.x + xr, y, item->Pose.Position.z + zr, GetRoom(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).roomNumber);
 
 	// If any of the frontal collision results intersects item bounds, return false, because there is material intersection.
 	// This check helps to filter out cases when Lara is formally facing corner but ledge check returns true because probe distance is fixed.
@@ -64,8 +64,8 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
 
 	// Get floor heights at both points
-	auto left = GetCollision(item->Pose.Position.x + xf + xl, y, item->Pose.Position.z + zf + zl, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber).Position.Floor;
-	auto right = GetCollision(item->Pose.Position.x + xf + xr, y, item->Pose.Position.z + zf + zr, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber).Position.Floor;
+	auto left = GetCollision(item->Pose.Position.x + xf + xl, y, item->Pose.Position.z + zf + zl, GetRoom(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).roomNumber).Position.Floor;
+	auto right = GetCollision(item->Pose.Position.x + xf + xr, y, item->Pose.Position.z + zf + zr, GetRoom(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).roomNumber).Position.Floor;
 
 	// If specified, limit vertical search zone only to nearest height
 	if (heightLimit && (abs(left - y) > CLICK(0.5f) || abs(right - y) > CLICK(0.5f)))
@@ -927,10 +927,23 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 		return false;
 
 	int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
-	if (frontFloor <= -CLICK(2) ||
-		frontFloor > CLICK(1.25f) - 4)
+	if (coll->Front.Bridge == NO_ITEM &&
+		(frontFloor <= -CLICK(2) ||
+		frontFloor > CLICK(1.25f) - 4))
 	{
 		return false;
+	}
+
+	//Do extra check if it's a bridge collider:
+	if (coll->Front.Bridge != NO_ITEM)
+	{
+		auto distancePointLara = GetBridgeBorder(coll->Front.Bridge, false) - LaraItem->Pose.Position.y;
+		frontFloor = distancePointLara - 128;
+		if (frontFloor <= -CLICK(2) ||
+			frontFloor > CLICK(1.25f) - 4)
+		{
+			return false;
+		}
 	}
 
 	if (!TestValidLedge(item, coll))
@@ -981,7 +994,11 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
 	}
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+	if (coll->Front.Bridge == NO_ITEM)
+		UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+	else
+		UpdateLaraRoom(item, -LARA_HEIGHT);
+
 	SnapItemToLedge(item, coll, 1.7f);
 
 	item->Pose.Position.y += frontFloor - 5;
