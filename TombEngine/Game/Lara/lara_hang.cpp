@@ -5,7 +5,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
-#include "Game/Lara/Context.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"

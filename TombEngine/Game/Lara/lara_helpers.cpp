@@ -10,7 +10,7 @@
 #include "Game/items.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
-#include "Game/Lara/Context.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"

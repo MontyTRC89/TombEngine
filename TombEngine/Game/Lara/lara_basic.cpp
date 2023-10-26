@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/Hud/Hud.h"
 #include "Game/items.h"
-#include "Game/Lara/Context.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
@@ -1891,17 +1891,17 @@ void lara_as_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::Horizontal;
 
 	player.Control.Count.Run++;
-	if (player.Control.Count.Run > LARA_RUN_JUMP_TIME)
-		player.Control.Count.Run = LARA_RUN_JUMP_TIME;
+	if (player.Control.Count.Run > PLAYER_RUN_JUMP_TIME)
+		player.Control.Count.Run = PLAYER_RUN_JUMP_TIME;
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
-		ModulateLaraLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);
+		HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);
 	}
 
 	if ((player.Control.KeepLow || IsHeld(In::Crouch)) && HasStateDispatch(item, LS_CROUCH_IDLE) &&
-		TestLaraCrouch(item))
+		CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
