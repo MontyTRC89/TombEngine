@@ -843,7 +843,7 @@ namespace TEN::Renderer
 
 		stStatic.Color = Vector4::One;
 		stStatic.AmbientLight = room.AmbientLight;
-		stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+		stStatic.LightMode = (int)LightMode::Static;
 		BindStaticLights(itemPtr->LightsToDraw);
 
 		short length = 0;
@@ -975,7 +975,7 @@ namespace TEN::Renderer
 
 				stStatic.Color = Vector4::One;
 				stStatic.AmbientLight = rRoom.AmbientLight;
-				stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+				stStatic.LightMode = (int)LightMode::Static;
 
 				BindStaticLights(rItemPtr->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 				SetBlendMode(BlendMode::Additive);
@@ -1088,14 +1088,14 @@ namespace TEN::Renderer
 
 		switch (sprite->Type)
 		{
-		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD:
+		case SpriteType::Billboard:
 		{
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
 			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(sprite->pos, Camera.pos.ToVector3(), cameraUp);
 		}
 		break;
 
-		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM:
+		case SpriteType::CustomBillboard:
 		{
 			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
 			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
@@ -1108,7 +1108,7 @@ namespace TEN::Renderer
 		}
 		break;
 
-		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT:
+		case SpriteType::LookAtBillboard:
 		{
 			auto tMatrix = Matrix::CreateTranslation(sprite->pos);
 			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
@@ -1116,7 +1116,7 @@ namespace TEN::Renderer
 		}
 		break;
 
-		case RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D:
+		case SpriteType::ThreeD:
 		default:
 			break;
 		}
@@ -1156,13 +1156,13 @@ namespace TEN::Renderer
 
 		currentSpriteBucket.Sprite = view.SpritesToDraw[0].Sprite;
 		currentSpriteBucket.BlendMode = view.SpritesToDraw[0].BlendMode;
-		currentSpriteBucket.IsBillboard = view.SpritesToDraw[0].Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+		currentSpriteBucket.IsBillboard = view.SpritesToDraw[0].Type != SpriteType::ThreeD;
 		currentSpriteBucket.IsSoftParticle = view.SpritesToDraw[0].SoftParticle;
 		currentSpriteBucket.RenderType = view.SpritesToDraw[0].renderType;
 
 		for (auto& rDrawSprite : view.SpritesToDraw)
 		{
-			bool isBillboard = rDrawSprite.Type != RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+			bool isBillboard = rDrawSprite.Type != SpriteType::ThreeD;
 
 			if (rDrawSprite.Sprite != currentSpriteBucket.Sprite || 
 				rDrawSprite.BlendMode != currentSpriteBucket.BlendMode ||
@@ -1214,8 +1214,8 @@ namespace TEN::Renderer
 
 		BindRenderTargetAsTexture(TextureRegister::DepthMap, &depthMap, SamplerStateRegister::LinearClamp);
 
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetCullMode(CULL_MODE_NONE);
+		SetDepthState(DepthState::Read);
+		SetCullMode(CullMode::None);
 
 		context->VSSetShader(vsInstancedSprites.Get(), nullptr, 0);
 		context->PSSetShader(psInstancedSprites.Get(), nullptr, 0);
@@ -1276,8 +1276,8 @@ namespace TEN::Renderer
 		}
 
 		// Draw 3D sprites.
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetCullMode(CULL_MODE_NONE);
+		SetDepthState(DepthState::Read);
+		SetCullMode(CullMode::None);
 
 		context->VSSetShader(vsSprites.Get(), nullptr, 0);
 		context->PSSetShader(psSprites.Get(), nullptr, 0);
@@ -1372,8 +1372,8 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(info->sprite->BlendMode);
-		SetCullMode(CULL_MODE_NONE);
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CullMode::None);
+		SetDepthState(DepthState::Read);
 		SetAlphaTest(AlphaTestModes::None, 0);
 
 		BindTexture(TextureRegister::ColorMap, info->sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
@@ -1383,7 +1383,7 @@ namespace TEN::Renderer
 		numTransparentDrawCalls++;
 		numSpritesTransparentDrawCalls++;
 
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 	}
 
 	void Renderer::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass) 
@@ -1393,7 +1393,7 @@ namespace TEN::Renderer
 		stStatic.World = effect->World;
 		stStatic.Color = effect->Color;
 		stStatic.AmbientLight = effect->AmbientLight;
-		stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+		stStatic.LightMode = (int)LightMode::Dynamic;
 		BindStaticLights(effect->LightsToDraw);
 		cbStatic.updateData(stStatic, context.Get());
 		BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
@@ -1510,7 +1510,7 @@ namespace TEN::Renderer
 				stStatic.World = world;
 				stStatic.Color = deb->color;
 				stStatic.AmbientLight = rooms[deb->roomNumber].AmbientLight;
-				stStatic.LightMode = deb->lightMode;
+				stStatic.LightMode = (int)deb->lightMode;
 
 				cbStatic.updateData(stStatic, context.Get());
 				BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
@@ -1539,7 +1539,7 @@ namespace TEN::Renderer
 					SetBlendMode(m_lastBlendMode);
 				}
 
-				SetCullMode(CULL_MODE_NONE);
+				SetCullMode(CullMode::None);
 				primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
 				numDrawCalls++;
 				primitiveBatch->End();

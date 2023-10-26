@@ -65,7 +65,7 @@ struct DebrisFragment
 	float friction;
 	float restitution;
 	Vector4 color;
-	LIGHT_MODES lightMode;
+	LightMode lightMode;
 	int roomNumber;
 	int numBounces;
 	bool active;

@@ -134,14 +134,14 @@ namespace TEN::Renderer
 			return;
 
 		// Shadow light found but type is incorrect
-		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
+		if (shadowLight->Type != LightType::Point && shadowLight->Type != LightType::Spot)
 			return; 
 
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 
-		int steps = shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
+		int steps = shadowLight->Type == LightType::Shadow ? 6 : 1;
 		for (int step = 0; step < steps; step++) 
 		{
 			// Bind render target
@@ -173,7 +173,7 @@ namespace TEN::Renderer
 			// Set camera matrices
 			Matrix view;
 			Matrix projection;
-			if (shadowLight->Type == LIGHT_TYPE_POINT)
+			if (shadowLight->Type == LightType::Point)
 			{
 				view = Matrix::CreateLookAt(shadowLight->Position, shadowLight->Position +
 					RenderTargetCube::forwardVectors[step] * BLOCK(10),
@@ -182,7 +182,7 @@ namespace TEN::Renderer
 				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, shadowLight->Out);
 
 			}
-			else if (shadowLight->Type == LIGHT_TYPE_SPOT)
+			else if (shadowLight->Type == LightType::Spot)
 			{
 				view = Matrix::CreateLookAt(shadowLight->Position,
 					shadowLight->Position + shadowLight->Direction * BLOCK(10),
@@ -209,7 +209,7 @@ namespace TEN::Renderer
 			stItem.AmbientLight = item->AmbientLight;
 			memcpy(stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 			for (int k = 0; k < MAX_BONES; k++)
-				stItem.BoneLightModes[k] = LIGHT_MODES::LIGHT_MODE_STATIC;
+				stItem.BoneLightModes[k] = (int)LightMode::Static;
 
 			cbItem.updateData(stItem, context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Item, cbItem.get());
@@ -275,7 +275,7 @@ namespace TEN::Renderer
 			stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].World = world;
 			stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].Ambient = room.AmbientLight;
 			stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].Color = room.AmbientLight;
-			stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].LightMode = (int)LightMode::Dynamic;
 			BindInstancedStaticLights(item->LightsToDraw, gunShellsCount);
 
 			gunShellsCount++;
@@ -375,8 +375,8 @@ namespace TEN::Renderer
 	void Renderer::DrawLinesIn2DSpace()
 	{
 		SetBlendMode(BlendMode::Opaque);
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetCullMode(CULL_MODE_NONE);
+		SetDepthState(DepthState::Read);
+		SetCullMode(CullMode::None);
 
 		context->VSSetShader(vsSolid.Get(), nullptr, 0);
 		context->PSSetShader(psSolid.Get(), nullptr, 0);
@@ -413,7 +413,7 @@ namespace TEN::Renderer
 		primitiveBatch->End();
 
 		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 	}
 
 	void Renderer::DrawSpiders(RenderView& view)
@@ -499,7 +499,7 @@ namespace TEN::Renderer
 		{
 			RendererObject& moveableObj = *moveableObjects[ID_RATS_EMITTER];
 
-			stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
+			stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
 
 			for (int i = 0; i < NUM_RATS; i++)
 			{
@@ -560,7 +560,7 @@ namespace TEN::Renderer
 				stInstancedStaticMeshBuffer.StaticMeshes[batsCount].World = world;
 				stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Ambient = room.AmbientLight;
 				stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Color = Vector4::One;
-				stInstancedStaticMeshBuffer.StaticMeshes[batsCount].LightMode = mesh->LightMode;
+				stInstancedStaticMeshBuffer.StaticMeshes[batsCount].LightMode = (int)mesh->LightMode;
 				BindInstancedStaticLights(room.LightsToDraw, batsCount);
 
 				batsCount++;
@@ -628,7 +628,7 @@ namespace TEN::Renderer
 				stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = worldMatrix;
 				stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
 				stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Color = Vector4::One;
-				stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = mesh.LightMode;
+				stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = (int)mesh.LightMode;
 				BindInstancedStaticLights(room.LightsToDraw, beetleCount);
 
 				beetleCount++;
@@ -690,7 +690,7 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_LOCUSTS];
 			RendererObject& moveableObj = *moveableObjects[ID_LOCUSTS];
 			
-			stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
+			stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
 
 			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
 			{
@@ -728,7 +728,7 @@ namespace TEN::Renderer
 	void Renderer::DrawLines3D(RenderView& view)
 	{
 		SetBlendMode(BlendMode::Additive);
-		SetCullMode(CULL_MODE_NONE);
+		SetCullMode(CullMode::None);
 
 		context->VSSetShader(vsSolid.Get(), nullptr, 0);
 		context->PSSetShader(psSolid.Get(), nullptr, 0);
@@ -755,7 +755,7 @@ namespace TEN::Renderer
 		primitiveBatch->End();
 
 		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 	}
 
 	void Renderer::AddLine3D(const Vector3& target, const Vector3& origin, const Vector4& color)
@@ -996,7 +996,7 @@ namespace TEN::Renderer
 		dynamicLight.Intensity = 1.0f;
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;
-		dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
+		dynamicLight.Type = LightType::Point;
 		dynamicLight.BoundingSphere = BoundingSphere(dynamicLight.Position, dynamicLight.Out);
 		dynamicLight.Luma = Luma(dynamicLight.Color);
 
@@ -1179,7 +1179,7 @@ namespace TEN::Renderer
 					Vector2 uv2;
 					Vector2 uv3;
 
-					if (spr->Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D)
+					if (spr->Type == SpriteType::ThreeD)
 					{
 						p0t = spr->vtx1;
 						p1t = spr->vtx2;
@@ -1251,7 +1251,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 	}
 
 	void Renderer::DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
@@ -1323,8 +1323,8 @@ namespace TEN::Renderer
 
 		SetBlendMode(info->blendMode);
 		SetAlphaTest(AlphaTestModes::None, 1.0f);
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetCullMode(CULL_MODE_CCW);
+		SetDepthState(DepthState::Read);
+		SetCullMode(CullMode::CounterClockwise);
 
 		biggestRoomIndexBuffer = std::fmaxf(biggestRoomIndexBuffer, (int)transparentFacesIndices.size());
 
@@ -1348,7 +1348,7 @@ namespace TEN::Renderer
 			drawnVertices += TRANSPARENT_BUCKET_SIZE;
 		}
 
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 	}
 
 	void Renderer::DrawStaticsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
@@ -1375,7 +1375,7 @@ namespace TEN::Renderer
 			stStatic.World = info->world;
 			stStatic.Color = info->color;
 			stStatic.AmbientLight = info->room->AmbientLight;
-			stStatic.LightMode = staticObjects[info->staticMesh->ObjectNumber]->ObjectMeshes[0]->LightMode;
+			stStatic.LightMode = (int)staticObjects[info->staticMesh->ObjectNumber]->ObjectMeshes[0]->LightMode;
 			BindStaticLights(info->staticMesh->LightsToDraw);
 			cbStatic.updateData(stStatic, context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
@@ -1384,8 +1384,8 @@ namespace TEN::Renderer
 
 		SetBlendMode(info->blendMode);	
 		SetAlphaTest(AlphaTestModes::None, 1.0f);
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetCullMode(CULL_MODE_CCW);
+		SetDepthState(DepthState::Read);
+		SetCullMode(CullMode::CounterClockwise);
 
 		int drawnVertices = 0;
 		int size = (int)transparentFacesIndices.size();
@@ -1440,8 +1440,8 @@ namespace TEN::Renderer
 
 		// Reset GPU state.
 		SetBlendMode(BlendMode::Opaque, true);
-		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
-		SetCullMode(CULL_MODE_CCW, true);
+		SetDepthState(DepthState::Write, true);
+		SetCullMode(CullMode::CounterClockwise, true);
 
 		// Bind and clear render target.
 		context->ClearRenderTargetView(renderTarget.RenderTargetView.Get(), Colors::Black);
@@ -1590,7 +1590,7 @@ namespace TEN::Renderer
 
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 
 		// Bind and clear render target
 
@@ -1603,7 +1603,7 @@ namespace TEN::Renderer
 
 		// Opaque geometry
 		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.FillConstantBuffer(cameraConstantBuffer);
@@ -1732,7 +1732,7 @@ namespace TEN::Renderer
 		memcpy(stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-			stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+			stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 
 		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 		cbItem.updateData(stItem, context.Get());
@@ -1773,7 +1773,7 @@ namespace TEN::Renderer
 			memcpy(stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 
 			for (int k = 0; k < (int)moveableObj.ObjectMeshes.size(); k++)
-				stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+				stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 
 			BindMoveableLights(info->item->LightsToDraw, info->item->RoomNumber, info->item->PrevRoomNumber, info->item->LightFade);
 			cbItem.updateData(stItem, context.Get());
@@ -1788,9 +1788,9 @@ namespace TEN::Renderer
 					SamplerStateRegister::AnisotropicClamp);
 
 		SetBlendMode(info->blendMode);
-		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetDepthState(DepthState::Read);
 		SetAlphaTest(AlphaTestModes::None, 1.0f);
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 
 		int drawnVertices = 0;
 		int size = (int)transparentFacesIndices.size();
@@ -1869,7 +1869,7 @@ namespace TEN::Renderer
 						stInstancedStaticMeshBuffer.StaticMeshes[k].World = current->World;
 						stInstancedStaticMeshBuffer.StaticMeshes[k].Color = current->Color;
 						stInstancedStaticMeshBuffer.StaticMeshes[k].Ambient = room->AmbientLight;
-						stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = refMesh->LightMode;
+						stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = (int)refMesh->LightMode;
 						BindInstancedStaticLights(current->LightsToDraw, k);
 						k++;
 					}

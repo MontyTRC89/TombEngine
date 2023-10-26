@@ -214,7 +214,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.lightMode = (LIGHT_MODES)ReadUInt8();
+		mesh.lightMode = (LightMode)ReadUInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();

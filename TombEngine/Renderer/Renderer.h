@@ -312,8 +312,8 @@ namespace TEN::Renderer
 		// Caching state changes
 		TextureBase* lastTexture;
 		BlendMode lastBlendMode;
-		DEPTH_STATES lastDepthState;
-		CULL_MODES lastCullMode;
+		DepthState lastDepthState;
+		CullMode lastCullMode;
 
 		// Private functions
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);
@@ -429,8 +429,8 @@ namespace TEN::Renderer
 		void RenderItemShadows(RenderView& renderView);
 
 		void SetBlendMode(BlendMode blendMode, bool force = false);
-		void SetDepthState(DEPTH_STATES depthState, bool force = false);
-		void SetCullMode(CULL_MODES cullMode, bool force = false);
+		void SetDepthState(DepthState depthState, bool force = false);
+		void SetCullMode(CullMode cullMode, bool force = false);
 		void SetAlphaTest(AlphaTestModes mode, float threshold, bool force = false);
 		void SetScissor(RendererRectangle rectangle);
 		void ResetAnimations();

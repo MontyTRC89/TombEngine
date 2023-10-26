@@ -21,8 +21,8 @@ namespace TEN::Renderer
 	bool Renderer::PrepareDataForTheRenderer()
 	{
 		lastBlendMode = BlendMode::Unknown;
-		lastCullMode = CULL_MODE_UNSET;
-		lastDepthState = DEPTH_STATE_UNSET;
+		lastCullMode = CullMode::Unknown;
+		lastDepthState = DepthState::Unknown;
 
 		moveableObjects.resize(ID_NUMBER_OBJECTS);
 		spriteSequences.resize(ID_NUMBER_OBJECTS);
@@ -378,16 +378,16 @@ namespace TEN::Renderer
 					RendererLight* light = &r->Lights[l];
 					ROOM_LIGHT* oldLight = &room.lights[l];
 
-					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
+					if (oldLight->type == 0)
 					{
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
 						light->Intensity = oldLight->intensity;
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
 						light->CastShadows = oldLight->castShadows;
-						light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
+						light->Type = LightType::Sun;
 						light->Luma = Luma(light->Color);
 					}
-					else if (oldLight->type == LIGHT_TYPE_POINT)
+					else if (oldLight->type == 1)
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
@@ -395,10 +395,10 @@ namespace TEN::Renderer
 						light->In = oldLight->in;
 						light->Out = oldLight->out;
 						light->CastShadows = oldLight->castShadows;
-						light->Type = LIGHT_TYPE_POINT;
+						light->Type = LightType::Point;
 						light->Luma = Luma(light->Color);
 					}
-					else if (oldLight->type == LIGHT_TYPE_SHADOW)
+					else if (oldLight->type == 3)
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
@@ -406,10 +406,10 @@ namespace TEN::Renderer
 						light->In = oldLight->in;
 						light->Out = oldLight->out;
 						light->CastShadows = false;
-						light->Type = LIGHT_TYPE_SHADOW;
+						light->Type = LightType::Shadow;
 						light->Luma = Luma(light->Color);
 					}
-					else if (oldLight->type == LIGHT_TYPE_SPOT)
+					else if (oldLight->type == 2)
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
@@ -420,17 +420,17 @@ namespace TEN::Renderer
 						light->InRange = oldLight->in;
 						light->OutRange = oldLight->out;
 						light->CastShadows = oldLight->castShadows;
-						light->Type = LIGHT_TYPE_SPOT;
+						light->Type = LightType::Spot;
 						light->Luma = Luma(light->Color);
 					}
-					else if (oldLight->type == LIGHT_TYPE_FOG_BULB)
+					else if (oldLight->type == 4)
 					{  
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b);
 						light->Intensity = oldLight->intensity;
 						light->In = oldLight->in;
 						light->Out = oldLight->out;
-						light->Type = LIGHT_TYPE_FOG_BULB;
+						light->Type = LightType::FogBulb;
 						light->Luma = Luma(light->Color);
 					} 
 
@@ -438,7 +438,7 @@ namespace TEN::Renderer
 					light->LocalIntensity = 0;
 					light->Distance = 0;
 					light->RoomNumber = i;
-					light->AffectNeighbourRooms = light->Type != LIGHT_TYPES::LIGHT_TYPE_SUN;
+					light->AffectNeighbourRooms = light->Type != LightType::Sun;
 
 					oldLight++;
 				}
@@ -888,7 +888,7 @@ namespace TEN::Renderer
 		RendererMesh* mesh = new RendererMesh();
 
 		mesh->Sphere = meshPtr->sphere;
-		mesh->LightMode = LIGHT_MODES(meshPtr->lightMode);
+		mesh->LightMode = meshPtr->lightMode;
 
 		if (meshPtr->positions.empty())
 			return mesh;

@@ -70,7 +70,7 @@ namespace TEN::Renderer
 
 			for (const auto& light : room.Lights)
 			{
-				if (light.Type != LIGHT_TYPE_FOG_BULB)
+				if (light.Type != LightType::FogBulb)
 					continue;
 
 				// Test bigger radius to avoid bad clipping.
@@ -451,7 +451,7 @@ namespace TEN::Renderer
 			// Collect the lights
 			std::vector<RendererLight*> lights;
 			std::vector<RendererLight*> cachedRoomLights;
-			if (obj.ObjectMeshes.front()->LightMode != LIGHT_MODES::LIGHT_MODE_STATIC)
+			if (obj.ObjectMeshes.front()->LightMode != LightMode::Static)
 			{
 				if (mesh->CacheLights || invalidateCache)
 				{
@@ -539,7 +539,7 @@ namespace TEN::Renderer
 					RendererLight* light = &currentRoom.Lights[j];
 
 					// Check only lights different from sun
-					if (light->Type == LIGHT_TYPE_SUN)
+					if (light->Type == LightType::Sun)
 					{
 						// Suns from non-adjacent rooms are not added!
 						if (roomToCheck != roomNumber && (prevRoomNumber != roomToCheck || prevRoomNumber == NO_ROOM))
@@ -551,7 +551,7 @@ namespace TEN::Renderer
 						light->Distance = 0;
 						light->LocalIntensity = 0;
 					}
-					else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
+					else if (light->Type == LightType::Point || light->Type == LightType::Shadow)
 					{
 						float distanceSquared =
 							SQUARE(position.x - light->Position.x) +
@@ -578,7 +578,7 @@ namespace TEN::Renderer
 						light->Distance = distance;
 
 						// If collecting shadows, try to collect shadow casting light
-						if (light->CastShadows && prioritizeShadowLight && light->Type == LIGHT_TYPE_POINT)
+						if (light->CastShadows && prioritizeShadowLight && light->Type == LightType::Point)
 						{
 							if (intensity >= brightest)
 							{
@@ -587,7 +587,7 @@ namespace TEN::Renderer
 							}
 						}
 					}
-					else if (light->Type == LIGHT_TYPE_SPOT)
+					else if (light->Type == LightType::Spot)
 					{
 						float distanceSquared =
 							SQUARE(position.x - light->Position.x) +

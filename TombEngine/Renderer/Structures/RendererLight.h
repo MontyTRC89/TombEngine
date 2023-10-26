@@ -1,5 +1,6 @@
 #pragma once
 #include <SimpleMath.h>
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::Structures
 {
@@ -8,7 +9,7 @@ namespace TEN::Renderer::Structures
 	struct RendererLight
 	{
 		Vector3 Position;
-		unsigned int Type;
+		LightType Type;
 		Vector3 Color;
 		float Intensity;
 		Vector3 Direction;

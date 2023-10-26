@@ -129,8 +129,8 @@ namespace TEN::Renderer
 		context->PSSetShader(psHUDTexture.Get(), nullptr, 0);
 
 		SetBlendMode(BlendMode::Opaque);
-		SetDepthState(DEPTH_STATE_NONE);
-		SetCullMode(CULL_MODE_NONE);
+		SetDepthState(DepthState::None);
+		SetCullMode(CullMode::None);
 
 		BindConstantBufferVS(ConstantBufferRegister::Hud, cbHUD.get());
 
@@ -189,8 +189,8 @@ namespace TEN::Renderer
 		context->PSSetShader(psHUDTexture.Get(), NULL, 0);
 
 		SetBlendMode(BlendMode::Opaque);
-		SetDepthState(DEPTH_STATE_NONE);
-		SetCullMode(CULL_MODE_NONE);
+		SetDepthState(DepthState::None);
+		SetCullMode(CullMode::None);
 
 		BindConstantBufferVS(ConstantBufferRegister::Hud, cbHUD.get());
 		BindTexture(TextureRegister::Hud, &loadingBarBorder, SamplerStateRegister::LinearClamp);
@@ -372,7 +372,7 @@ namespace TEN::Renderer
 	{
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CULL_MODE_NONE);
+		SetCullMode(CullMode::None);
 
 		context->OMSetRenderTargets(1, &target, depthTarget);
 		context->RSSetViewports(1, &viewport);

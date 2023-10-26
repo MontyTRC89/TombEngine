@@ -1,13 +1,13 @@
 #pragma once
 #include "Math/Math.h"
 
-enum LIGHT_TYPES
+enum class LightType
 {
-	LIGHT_TYPE_SUN = 0,
-	LIGHT_TYPE_POINT = 1,
-	LIGHT_TYPE_SPOT = 2,
-	LIGHT_TYPE_SHADOW = 3,
-	LIGHT_TYPE_FOG_BULB = 4
+	Sun = 0,
+	Point = 1,
+	Spot = 2,
+	Shadow = 3,
+	FogBulb = 4
 };
 
 enum class BlendMode
@@ -25,12 +25,12 @@ enum class BlendMode
 	AlphaBlend = 11
 };
 
-enum CULL_MODES
+enum class CullMode
 {
-	CULL_MODE_NONE = 0,
-	CULL_MODE_CW = 1,
-	CULL_MODE_CCW = 2,
-	CULL_MODE_UNSET = -1
+	Unknown = -1,
+	None = 0,
+	Clockwise = 1,
+	CounterClockwise = 2
 };
 
 enum class ShadowMode
@@ -48,39 +48,26 @@ enum class AntialiasingMode
 	High
 };
 
-enum LIGHT_MODES
+enum class LightMode
 {
-	LIGHT_MODE_DYNAMIC,
-	LIGHT_MODE_STATIC
+	Dynamic,
+	Static
 };
 
-enum DEPTH_STATES
+enum class DepthState
 {
-	DEPTH_STATE_WRITE_ZBUFFER = 0,
-	DEPTH_STATE_READ_ONLY_ZBUFFER = 1,
-	DEPTH_STATE_NONE = 2,
-	DEPTH_STATE_UNSET = -1
+	Unknown = -1,
+	Write = 0,
+	Read = 1,
+	None = 2
 };
 
-enum RENDERER_SPRITE_TYPE
+enum class SpriteType
 {
-	SPRITE_TYPE_BILLBOARD,
-	SPRITE_TYPE_3D,
-	SPRITE_TYPE_BILLBOARD_CUSTOM,
-	SPRITE_TYPE_BILLBOARD_LOOKAT
-};
-
-enum RENDERER_POLYGON_SHAPE
-{
-	RENDERER_POLYGON_QUAD,
-	RENDERER_POLYGON_TRIANGLE
-};
-
-enum RENDERER_FADE_STATUS
-{
-	NO_FADE,
-	FADE_IN,
-	FADE_OUT
+	Billboard,
+	ThreeD,
+	CustomBillboard,
+	LookAtBillboard
 };
 
 enum class RendererDebugPage

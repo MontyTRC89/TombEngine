@@ -18,7 +18,7 @@ namespace TEN::Renderer
 
 		RendererSpriteToDraw spr = {};
 
-		spr.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD;
+		spr.Type = SpriteType::Billboard;
 		spr.Sprite = sprite;
 		spr.pos = pos;
 		spr.Rotation = orient2D;
@@ -52,7 +52,7 @@ namespace TEN::Renderer
 
 		RendererSpriteToDraw spr = {};
 
-		spr.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM;
+		spr.Type = SpriteType::CustomBillboard;
 		spr.Sprite = sprite;
 		spr.pos = pos;
 		spr.Rotation = orient2D;
@@ -87,7 +87,7 @@ namespace TEN::Renderer
 
 		RendererSpriteToDraw spr = {};
 
-		spr.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT;
+		spr.Type = SpriteType::LookAtBillboard;
 		spr.Sprite = sprite;
 		spr.pos = pos;
 		spr.Rotation = orient2D;
@@ -129,7 +129,7 @@ namespace TEN::Renderer
 
 		RendererSpriteToDraw spr = {};
 
-		spr.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+		spr.Type = SpriteType::ThreeD;
 		spr.Sprite = sprite;
 		spr.vtx1 = vertex0;
 		spr.vtx2 = vertex1;
@@ -166,7 +166,7 @@ namespace TEN::Renderer
 
 		auto sprite = RendererSpriteToDraw{};
 
-		sprite.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
+		sprite.Type = SpriteType::ThreeD;
 		sprite.Sprite = &whiteSprite;
 		sprite.vtx1 = vertex0;
 		sprite.vtx2 = vertex1;

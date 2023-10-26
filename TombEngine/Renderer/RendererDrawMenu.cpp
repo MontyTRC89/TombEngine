@@ -811,7 +811,7 @@ namespace TEN::Renderer
 			else
 				stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
 
-			stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			stItem.BoneLightModes[n] = (int)LightMode::Dynamic;
 			stItem.Color = Vector4::One;
 			stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
 
@@ -825,8 +825,8 @@ namespace TEN::Renderer
 					continue;
 
 				SetBlendMode(BlendMode::Opaque);
-				SetCullMode(CULL_MODE_CCW);
-				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
+				SetCullMode(CullMode::CounterClockwise);
+				SetDepthState(DepthState::Write);
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 				BindTexture(TextureRegister::NormalMap, &std::get<1>(moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
@@ -944,8 +944,8 @@ namespace TEN::Renderer
 	{
 		// Set basic render states
 		SetBlendMode(BlendMode::Opaque, true);
-		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
-		SetCullMode(CULL_MODE_CCW, true);
+		SetDepthState(DepthState::Write, true);
+		SetCullMode(CullMode::CounterClockwise, true);
 
 		// Bind and clear render target
 		context->OMSetRenderTargets(1, &target, depthTarget);
@@ -1043,7 +1043,7 @@ namespace TEN::Renderer
 	{
 		// Set basic render states
 		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CULL_MODE_CCW);
+		SetCullMode(CullMode::CounterClockwise);
 
 		do
 		{

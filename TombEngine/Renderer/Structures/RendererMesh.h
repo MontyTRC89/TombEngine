@@ -10,7 +10,7 @@ namespace TEN::Renderer::Structures
 
 	struct RendererMesh
 	{
-		LIGHT_MODES LightMode;
+		LightMode LightMode;
 		BoundingSphere Sphere;
 		std::vector<RendererBucket> Buckets;
 		std::vector<Vector3> Positions;

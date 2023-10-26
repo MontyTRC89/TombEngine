@@ -9,7 +9,7 @@ namespace TEN::Renderer::Structures
 
 	struct RendererSpriteToDraw
 	{
-		RENDERER_SPRITE_TYPE Type;
+		SpriteType Type;
 		RendererSprite* Sprite;
 		float Scale;
 		Vector3 pos;

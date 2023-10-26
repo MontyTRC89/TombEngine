@@ -468,30 +468,30 @@ namespace TEN::Renderer
 		{
 		case BlendMode::Opaque:
 		case BlendMode::AlphaTest:
-			SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
+			SetDepthState(DepthState::Write);
 			break;
 
 		default:
-			SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+			SetDepthState(DepthState::Read);
 			break;
 		}
 	}
 
-	void Renderer::SetDepthState(DEPTH_STATES depthState, bool force)
+	void Renderer::SetDepthState(DepthState depthState, bool force)
 	{
 		if (depthState != lastDepthState || force)
 		{
 			switch (depthState)
 			{
-			case DEPTH_STATE_READ_ONLY_ZBUFFER:
+			case DepthState::Read:
 				context->OMSetDepthStencilState(renderStates->DepthRead(), 0xFFFFFFFF);
 				break;
 
-			case DEPTH_STATE_WRITE_ZBUFFER:
+			case DepthState::Write:
 				context->OMSetDepthStencilState(renderStates->DepthDefault(), 0xFFFFFFFF);
 				break;
 
-			case DEPTH_STATE_NONE:
+			case DepthState::None:
 				context->OMSetDepthStencilState(renderStates->DepthNone(), 0xFFFFFFFF);
 				break;
 
@@ -501,7 +501,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::SetCullMode(CULL_MODES cullMode, bool force)
+	void Renderer::SetCullMode(CullMode cullMode, bool force)
 	{
 		if (DebugPage == RendererDebugPage::WireframeMode)
 		{
@@ -513,15 +513,15 @@ namespace TEN::Renderer
 		{
 			switch (cullMode)
 			{
-			case CULL_MODE_NONE:
+			case CullMode::None:
 				context->RSSetState(cullNoneRasterizerState.Get());
 				break;
 
-			case CULL_MODE_CCW:
+			case CullMode::CounterClockwise:
 				context->RSSetState(cullCounterClockwiseRasterizerState.Get());
 				break;
 
-			case CULL_MODE_CW:
+			case CullMode::Clockwise:
 				context->RSSetState(cullClockwiseRasterizerState.Get());
 				break;
 			}
