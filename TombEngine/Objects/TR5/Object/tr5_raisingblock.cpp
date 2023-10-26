@@ -113,7 +113,7 @@ void ControlRaisingBlock(short itemNumber)
 
 std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 {
-	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	auto bboxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 
 	if (bboxHeight.has_value())
 	{
@@ -131,7 +131,7 @@ std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 
 std::optional<int> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
 {
-	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	auto bboxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 
 	if (bboxHeight.has_value())
 		return std::optional{ bboxHeight.value() + 1 };
