@@ -4,7 +4,7 @@
 #include <filesystem>
 
 #include "Renderer/Renderer.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;

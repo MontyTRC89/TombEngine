@@ -2,7 +2,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 /***
 Constants for blend mode IDs.

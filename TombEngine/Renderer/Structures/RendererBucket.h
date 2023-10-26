@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <SimpleMath.h>
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "RendererPolygon.h"
 
 namespace TEN::Renderer::Structures

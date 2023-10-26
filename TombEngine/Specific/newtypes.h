@@ -1,6 +1,6 @@
 #pragma once
 #include "framework.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 struct ROOM_VECTOR 
 {

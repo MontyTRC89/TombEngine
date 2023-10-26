@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 using namespace TEN::Effects::Bubble;
 

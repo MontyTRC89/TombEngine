@@ -14,7 +14,7 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Objects/Effects/Boss.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 

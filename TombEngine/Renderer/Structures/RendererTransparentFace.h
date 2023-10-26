@@ -1,6 +1,6 @@
 #pragma once
 #include <SimpleMath.h>
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererPolygon.h"
 #include "Renderer/Structures/RendererBucket.h"
 #include "Renderer/Structures/RendererItem.h"

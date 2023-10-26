@@ -207,10 +207,10 @@ void ObjectsHandler::AssignLara()
 
 bool ObjectsHandler::NotifyKilled(ItemInfo* key)
 {
-	auto it = m_moveables.find(key);
-	if (std::end(m_moveables) != it)
+	auto it = moveables.find(key);
+	if (std::end(moveables) != it)
 	{
-		for (auto& m : m_moveables[key])
+		for (auto& m : moveables[key])
 			m->Invalidate();
 		
 		return true;
@@ -223,28 +223,28 @@ bool ObjectsHandler::AddMoveableToMap(ItemInfo* key, Moveable* mov)
 {
 	std::unordered_set<Moveable*> movVec;
 	movVec.insert(mov);
-	auto it = m_moveables.find(key);
-	if (std::end(m_moveables) == it)
+	auto it = moveables.find(key);
+	if (std::end(moveables) == it)
 	{
-		return m_moveables.insert(std::pair{ key, movVec }).second;
+		return moveables.insert(std::pair{ key, movVec }).second;
 	}
 	else
 	{
-		m_moveables[key].insert(mov);
+		moveables[key].insert(mov);
 		return true;
 	}
 }
 
 bool ObjectsHandler::RemoveMoveableFromMap(ItemInfo* key, Moveable* mov)
 {
-	auto it = m_moveables.find(key);
-	if (std::end(m_moveables) != it)
+	auto it = moveables.find(key);
+	if (std::end(moveables) != it)
 	{
-		auto& set = m_moveables[key];
+		auto& set = moveables[key];
 
 		bool isErased = static_cast<bool>(set.erase(mov));
 		if (isErased && set.empty())
-			isErased = isErased && static_cast<bool>(m_moveables.erase(key));
+			isErased = isErased && static_cast<bool>(moveables.erase(key));
 		
 		return isErased;
 	}

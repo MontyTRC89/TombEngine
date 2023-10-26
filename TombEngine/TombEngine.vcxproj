@@ -679,6 +679,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\Graphics\IndexBuffer.h" />
     <ClInclude Include="Renderer\Graphics\Texture2DArray.h" />
+    <ClInclude Include="Renderer\Graphics\Vertices\SpriteVertex.h" />
     <ClInclude Include="Renderer\Quad\RenderQuad.h" />
     <ClInclude Include="Renderer\RendererSprite2D.h" />
     <ClInclude Include="Renderer\Graphics\RenderTarget2D.h" />
@@ -686,7 +687,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Graphics\RenderTargetCube.h" />
     <ClInclude Include="Renderer\RenderView\RenderView.h" />
     <ClInclude Include="Renderer\Renderer.h" />
-    <ClInclude Include="Renderer\Renderer11Enums.h" />
+    <ClInclude Include="Renderer\RendererEnums.h" />
     <ClInclude Include="Renderer\RendererBucket.h" />
     <ClInclude Include="Renderer\RendererPolygon.h" />
     <ClInclude Include="Renderer\RendererRectangle.h" />
@@ -1149,19 +1150,19 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Renderer\Renderer.cpp" />
-    <ClCompile Include="Renderer\Renderer11Compatibility.cpp" />
-    <ClCompile Include="Renderer\Renderer11Debug.cpp" />
-    <ClCompile Include="Renderer\Renderer11Draw.cpp" />
-    <ClCompile Include="Renderer\Renderer11Draw2D.cpp" />
-    <ClCompile Include="Renderer\Renderer11DrawEffect.cpp" />
-    <ClCompile Include="Renderer\Renderer11DrawMenu.cpp" />
-    <ClCompile Include="Renderer\Renderer11Frame.cpp" />
-    <ClCompile Include="Renderer\Renderer11Helper.cpp" />
-    <ClCompile Include="Renderer\Renderer11Init.cpp" />
-    <ClCompile Include="Renderer\Renderer11Lara.cpp" />
-    <ClCompile Include="Renderer\Renderer11PostProcess.cpp" />
-    <ClCompile Include="Renderer\Renderer11Settings.cpp" />
-    <ClCompile Include="Renderer\Renderer11String.cpp" />
+    <ClCompile Include="Renderer\RendererCompatibility.cpp" />
+    <ClCompile Include="Renderer\RendererDebug.cpp" />
+    <ClCompile Include="Renderer\RendererDraw.cpp" />
+    <ClCompile Include="Renderer\RendererDraw2D.cpp" />
+    <ClCompile Include="Renderer\RendererDrawEffect.cpp" />
+    <ClCompile Include="Renderer\RendererDrawMenu.cpp" />
+    <ClCompile Include="Renderer\RendererFrame.cpp" />
+    <ClCompile Include="Renderer\RendererHelper.cpp" />
+    <ClCompile Include="Renderer\RendererInit.cpp" />
+    <ClCompile Include="Renderer\RendererLara.cpp" />
+    <ClCompile Include="Renderer\RendererPostProcess.cpp" />
+    <ClCompile Include="Renderer\RendererSettings.cpp" />
+    <ClCompile Include="Renderer\RendererString.cpp" />
     <ClCompile Include="Renderer\RendererSprites.cpp" />
     <ClCompile Include="Renderer\Graphics\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\Graphics\RenderTargetCubeArray.cpp" />

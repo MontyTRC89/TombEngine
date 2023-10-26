@@ -41,7 +41,7 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	void Renderer11::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation)
+	void Renderer::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation)
 	{
 		static auto boneIndices = std::vector<int>{};
 		boneIndices.clear();
@@ -152,9 +152,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
+	void Renderer::UpdateItemAnimations(int itemNumber, bool force)
 	{
-		auto* itemToDraw = &m_items[itemNumber];
+		auto* itemToDraw = &items[itemNumber];
 		auto* nativeItem = &g_Level.Items[itemNumber];
 
 		// TODO: hack for fixing a bug, check again if needed
@@ -171,7 +171,7 @@ namespace TEN::Renderer
 		itemToDraw->DoneAnimations = true;
 
 		auto* obj = &Objects[nativeItem->ObjectNumber];
-		auto& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
+		auto& moveableObj = *moveableObjects[nativeItem->ObjectNumber];
 
 		// Copy meshswaps
 		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
@@ -313,7 +313,7 @@ namespace TEN::Renderer
 			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
 	}
 
-	void Renderer11::UpdateItemAnimations(RenderView& view)
+	void Renderer::UpdateItemAnimations(RenderView& view)
 	{
 		for (const auto* room : view.RoomsToDraw)
 		{
@@ -330,7 +330,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode)
+	void Renderer::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode)
 	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
@@ -341,7 +341,7 @@ namespace TEN::Renderer
 			BuildHierarchyRecursive(obj, childNode, node);
 	}
 
-	void Renderer11::BuildHierarchy(RendererObject *obj)
+	void Renderer::BuildHierarchy(RendererObject *obj)
 	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
@@ -351,21 +351,21 @@ namespace TEN::Renderer
 			BuildHierarchyRecursive(obj, childNode, obj->Skeleton);
 	}
 
-	bool Renderer11::IsFullsScreen() 
+	bool Renderer::IsFullsScreen() 
 	{
-		return (!m_windowed);
+		return (!isWindowed);
 	}
 
-	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov, float farView)
+	void Renderer::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov, float farView)
 	{
 		if (farView < MIN_FAR_VIEW)
 			farView = DEFAULT_FAR_VIEW;
 
-		m_farView = farView;
+		farView = farView;
 		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 	}
 
-	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
+	bool Renderer::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
 	{
 		if (sphereRadius == 0.0f)
 		{
@@ -378,39 +378,39 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
+	void Renderer::FlipRooms(short roomNumber1, short roomNumber2)
 	{
-		std::swap(m_rooms[roomNumber1], m_rooms[roomNumber2]);
+		std::swap(rooms[roomNumber1], rooms[roomNumber2]);
 
-		m_rooms[roomNumber1].RoomNumber = roomNumber1;
-		m_rooms[roomNumber2].RoomNumber = roomNumber2;
+		rooms[roomNumber1].RoomNumber = roomNumber1;
+		rooms[roomNumber2].RoomNumber = roomNumber2;
 
-		m_invalidateCache = true;
+		invalidateCache = true;
 	}
 
-	RendererObject& Renderer11::GetRendererObject(GAME_OBJECT_ID id)
+	RendererObject& Renderer::GetRendererObject(GAME_OBJECT_ID id)
 	{
 		if (id == GAME_OBJECT_ID::ID_LARA || id == GAME_OBJECT_ID::ID_LARA_SKIN)
 		{
-			if (m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
-				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
+			if (moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
+				return moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
 			else
-				return m_moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
+				return moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
 		}
 		else
 		{
-			return m_moveableObjects[id].value();
+			return moveableObjects[id].value();
 		}
 	}
 
-	RendererMesh* Renderer11::GetMesh(int meshIndex)
+	RendererMesh* Renderer::GetMesh(int meshIndex)
 	{
-		return m_meshes[meshIndex];
+		return meshes[meshIndex];
 	}
 
-	int Renderer11::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
+	int Renderer::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
 	{
-		auto* itemToDraw = &m_items[itemNumber];
+		auto* itemToDraw = &items[itemNumber];
 		auto* nativeItem = &g_Level.Items[itemNumber];
 
 		itemToDraw->ItemNumber = itemNumber;
@@ -464,26 +464,26 @@ namespace TEN::Renderer
 		return (int)moveable.ObjectMeshes.size();
 	}
 
-	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
+	void Renderer::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
 	{
 		if (itemNumber == LaraItem->Index)
 		{
-			auto& object = *m_moveableObjects[ID_LARA];
-			*outMatrix = object.AnimationTransforms[jointIndex] * m_LaraWorldMatrix;
+			auto& object = *moveableObjects[ID_LARA];
+			*outMatrix = object.AnimationTransforms[jointIndex] * laraWorldMatrix;
 		}
 		else
 		{
 			UpdateItemAnimations(itemNumber, true);
 			
-			auto* rendererItem = &m_items[itemNumber];
+			auto* rendererItem = &items[itemNumber];
 			auto* nativeItem = &g_Level.Items[itemNumber];
 
-			auto& obj = *m_moveableObjects[nativeItem->ObjectNumber];
+			auto& obj = *moveableObjects[nativeItem->ObjectNumber];
 			*outMatrix = obj.AnimationTransforms[jointIndex] * rendererItem->World;
 		}
 	}
 
-	Vector4 Renderer11::GetPortalRect(Vector4 v, Vector4 vp) 
+	Vector4 Renderer::GetPortalRect(Vector4 v, Vector4 vp) 
 	{
 		auto sp = (v * Vector4(0.5f, 0.5f, 0.5f, 0.5f)
 			+ Vector4(0.5f, 0.5f, 0.5f, 0.5f)) 
@@ -516,12 +516,12 @@ namespace TEN::Renderer
 		return s;
 	}
 
-	Vector2i Renderer11::GetScreenResolution() const
+	Vector2i Renderer::GetScreenResolution() const
 	{
-		return Vector2i(m_screenWidth, m_screenHeight);
+		return Vector2i(screenWidth, screenHeight);
 	}
 
-	std::optional<Vector2> Renderer11::Get2DPosition(const Vector3& pos) const
+	std::optional<Vector2> Renderer::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
@@ -549,9 +549,9 @@ namespace TEN::Renderer
 		return TEN::Utils::ConvertNDCTo2DPosition(Vector2(point));
 	}
 
-	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
+	Vector3 Renderer::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
 	{
-		auto* rendererItem = &m_items[itemNumber];
+		auto* rendererItem = &items[itemNumber];
 
 		rendererItem->ItemNumber = itemNumber;
 
@@ -573,7 +573,7 @@ namespace TEN::Renderer
 		return Vector3::Transform(relOffset, world);
 	}
 
-	void Renderer11::SaveScreenshot()
+	void Renderer::SaveScreenshot()
 	{
 		char buffer[64];
 		time_t rawtime;
@@ -588,7 +588,7 @@ namespace TEN::Renderer
 			std::filesystem::create_directory(screenPath);
 
 		screenPath += buffer;
-		SaveWICTextureToFile(m_context.Get(), m_backBufferTexture, GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
+		SaveWICTextureToFile(context.Get(), backBuffer.Texture.Get(), GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
 			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
 }

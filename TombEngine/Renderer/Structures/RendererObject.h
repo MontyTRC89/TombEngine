@@ -3,7 +3,7 @@
 #include <SimpleMath.h>
 #include "Renderer/Structures/RendererBone.h"
 #include "Renderer/Structures/RendererMesh.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::Structures
 {

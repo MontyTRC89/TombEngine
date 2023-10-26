@@ -66,29 +66,111 @@ namespace TEN::Renderer::Graphics
 		res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
 		throwIfFailed(res);
 
-		D3D11_TEXTURE2D_DESC depthTexDesc = {};
-		depthTexDesc.Width = w;
-		depthTexDesc.Height = h;
-		depthTexDesc.MipLevels = 1;
-		depthTexDesc.ArraySize = 1;
-		depthTexDesc.SampleDesc.Count = sampleCount;
-		depthTexDesc.SampleDesc.Quality = 0;
-		depthTexDesc.Format = depthFormat;
-		depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-		depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		depthTexDesc.CPUAccessFlags = 0;
-		depthTexDesc.MiscFlags = 0;
+		if (depthFormat != DXGI_FORMAT_UNKNOWN)
+		{
+			D3D11_TEXTURE2D_DESC depthTexDesc = {};
+			depthTexDesc.Width = w;
+			depthTexDesc.Height = h;
+			depthTexDesc.MipLevels = 1;
+			depthTexDesc.ArraySize = 1;
+			depthTexDesc.SampleDesc.Count = sampleCount;
+			depthTexDesc.SampleDesc.Quality = 0;
+			depthTexDesc.Format = depthFormat;
+			depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+			depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+			depthTexDesc.CPUAccessFlags = 0;
+			depthTexDesc.MiscFlags = 0;
 
-		res = device->CreateTexture2D(&depthTexDesc, NULL, &DepthStencilTexture);
+			res = device->CreateTexture2D(&depthTexDesc, NULL, &DepthStencilTexture);
+			throwIfFailed(res);
+
+			D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+			dsvDesc.Format = depthTexDesc.Format;
+			dsvDesc.Flags = 0;
+			dsvDesc.ViewDimension = dsvDimension;
+			dsvDesc.Texture2D.MipSlice = 0;
+
+			res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
+			throwIfFailed(res);
+		}
+	}
+
+	RenderTarget2D::RenderTarget2D(ID3D11Device* device, ID3D11Texture2D* texture, DXGI_FORMAT depthFormat)
+	{
+		// Check if antialiasing quality is available, and set it if it is.
+
+		D3D11_SRV_DIMENSION srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		D3D11_DSV_DIMENSION dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		D3D11_RTV_DIMENSION rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		int sampleCount = 1;
+
+		// Now set up render target.
+		Texture = texture;
+
+		D3D11_TEXTURE2D_DESC desc = {};
+		texture->GetDesc(&desc);
+
+		if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
+		{
+			int potentialSampleCount = (g_Configuration.AntialiasingMode == AntialiasingMode::Medium) ? 2 : 4;
+			unsigned int qualityLevels = 0;
+			if (device->CheckMultisampleQualityLevels(desc.Format, potentialSampleCount, &qualityLevels) == S_OK &&
+				qualityLevels > 0)
+			{
+				sampleCount = potentialSampleCount;
+				dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+				rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+				srvDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+			}
+		}
+
+		D3D11_RENDER_TARGET_VIEW_DESC viewDesc;
+		viewDesc.Format = desc.Format;
+		viewDesc.ViewDimension = rtvDimension;
+		viewDesc.Texture2D.MipSlice = 0;
+
+		HRESULT res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &RenderTargetView);
 		throwIfFailed(res);
 
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-		dsvDesc.Format = depthTexDesc.Format;
-		dsvDesc.Flags = 0;
-		dsvDesc.ViewDimension = dsvDimension;
-		dsvDesc.Texture2D.MipSlice = 0;
+		// Setup the description of the shader resource view.
+		if (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
+			shaderDesc.Format = desc.Format;
+			shaderDesc.ViewDimension = srvDimension;
+			shaderDesc.Texture2D.MostDetailedMip = 0;
+			shaderDesc.Texture2D.MipLevels = 1;
 
-		res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
-		throwIfFailed(res);
+			res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
+			throwIfFailed(res);
+		}
+
+		if (depthFormat != DXGI_FORMAT_UNKNOWN)
+		{
+			D3D11_TEXTURE2D_DESC depthTexDesc = {};
+			depthTexDesc.Width = desc.Width;
+			depthTexDesc.Height = desc.Height;
+			depthTexDesc.MipLevels = 1;
+			depthTexDesc.ArraySize = 1;
+			depthTexDesc.SampleDesc.Count = sampleCount;
+			depthTexDesc.SampleDesc.Quality = 0;
+			depthTexDesc.Format = depthFormat;
+			depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+			depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+			depthTexDesc.CPUAccessFlags = 0;
+			depthTexDesc.MiscFlags = 0;
+
+			res = device->CreateTexture2D(&depthTexDesc, NULL, &DepthStencilTexture);
+			throwIfFailed(res);
+
+			D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+			dsvDesc.Format = depthTexDesc.Format;
+			dsvDesc.Flags = 0;
+			dsvDesc.ViewDimension = dsvDimension;
+			dsvDesc.Texture2D.MipSlice = 0;
+
+			res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
+			throwIfFailed(res);
+		}
 	}
 }

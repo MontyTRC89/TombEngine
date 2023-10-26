@@ -5,7 +5,7 @@
 
 namespace TEN::Renderer
 {
-	void Renderer11::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page)
+	void Renderer::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page)
 	{
 		constexpr auto FLAGS = PRINTSTRING_OUTLINE | PRINTSTRING_CENTER;
 
@@ -15,18 +15,18 @@ namespace TEN::Renderer
 		AddString(string, pos, color, scale, FLAGS);
 	}
 
-	void Renderer11::AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags)
+	void Renderer::AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags)
 	{
 		AddString(string, Vector2(x, y), Color(color), 1.0f, flags);
 	}
 
-	void Renderer11::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)
+	void Renderer::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)
 	{
 		constexpr auto BLINK_VALUE_MAX = 1.0f;
 		constexpr auto BLINK_VALUE_MIN = 0.1f;
 		constexpr auto BLINK_TIME_STEP = 0.2f;
 
-		if (m_locked)
+		if (isLocked)
 			return;
 
 		if (string.empty())
@@ -37,7 +37,7 @@ namespace TEN::Renderer
 			auto screenRes = GetScreenResolution();
 			auto factor = Vector2(screenRes.x / SCREEN_SPACE_RES.x, screenRes.y / SCREEN_SPACE_RES.y);
 			float uiScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
-			float fontSpacing = m_gameFont->GetLineSpacing();
+			float fontSpacing = gameFont->GetLineSpacing();
 			float fontScale = REFERENCE_FONT_SIZE / fontSpacing;
 
 			auto stringLines = SplitString(string);
@@ -54,7 +54,7 @@ namespace TEN::Renderer
 				rString.Scale = (uiScale * fontScale) * scale;
 
 				// Measure string.
-				auto size = Vector2(m_gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
+				auto size = Vector2(gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
 				if (flags & PRINTSTRING_CENTER)
 				{
 					rString.X = (pos.x * factor.x) - (size.x / 2.0f);
@@ -72,24 +72,24 @@ namespace TEN::Renderer
 
 				if (flags & PRINTSTRING_BLINK)
 				{
-					rString.Color *= m_blinkColorValue;
+					rString.Color *= blinkColorValue;
 
-					if (!m_isBlinkUpdated)
+					if (!isBlinkUpdated)
 					{
 						// Calculate blink increment based on sine wave.
-						m_blinkColorValue = ((sin(m_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
+						blinkColorValue = ((sin(blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
 
 						// Update blink time.
-						m_blinkTime += BLINK_TIME_STEP;
-						if (m_blinkTime > PI_MUL_2)
-							m_blinkTime -= PI_MUL_2;
+						blinkTime += BLINK_TIME_STEP;
+						if (blinkTime > PI_MUL_2)
+							blinkTime -= PI_MUL_2;
 
-						m_isBlinkUpdated = true;
+						isBlinkUpdated = true;
 					}
 				}
 
 				yOffset += size.y;
-				m_strings.push_back(rString);
+				stringsToDraw.push_back(rString);
 			}
 		}
 		catch (std::exception& ex)
@@ -98,35 +98,35 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawAllStrings()
+	void Renderer::DrawAllStrings()
 	{
-		float shadowOffset = 1.5f / (REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing());
+		float shadowOffset = 1.5f / (REFERENCE_FONT_SIZE / gameFont->GetLineSpacing());
 
-		m_spriteBatch->Begin();
+		spriteBatch->Begin();
 
-		for (const auto& rString : m_strings)
+		for (const auto& rString : stringsToDraw)
 		{
 			// Draw shadow.
 			if (rString.Flags & PRINTSTRING_OUTLINE)
 			{
-				m_gameFont->DrawString(
-					m_spriteBatch.get(), rString.String.c_str(),
+				gameFont->DrawString(
+					spriteBatch.get(), rString.String.c_str(),
 					Vector2(rString.X + shadowOffset * rString.Scale, rString.Y + shadowOffset * rString.Scale),
 					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent,
 					0.0f, Vector4::Zero, rString.Scale);
 			}
 
 			// Draw string.
-			m_gameFont->DrawString(
-				m_spriteBatch.get(), rString.String.c_str(),
+			gameFont->DrawString(
+				spriteBatch.get(), rString.String.c_str(),
 				Vector2(rString.X, rString.Y),
 				Vector4(rString.Color.x, rString.Color.y, rString.Color.z, 1.0f) * ScreenFadeCurrent,
 				0.0f, Vector4::Zero, rString.Scale);
 		}
 
-		m_spriteBatch->End();
+		spriteBatch->End();
 
-		m_isBlinkUpdated = false;
-		m_strings.clear();
+		isBlinkUpdated = false;
+		stringsToDraw.clear();
 	}
 }

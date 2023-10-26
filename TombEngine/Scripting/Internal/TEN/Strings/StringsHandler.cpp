@@ -3,7 +3,7 @@
 
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 
 /***

@@ -16,7 +16,7 @@
 #include "Game/effects/Electricity.h"
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererLight.h"
 #include "RenderView/RenderView.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
@@ -100,232 +100,220 @@ namespace TEN::Renderer
 		RendererHudBar(ID3D11Device* devicePtr, const Vector2& pos, const Vector2& size, int borderSize, std::array<Vector4, COLOR_COUNT> colors);
 	};
 
-	class Renderer11
+	class Renderer
 	{
 	private:
 		// Core DX11 objects
-		ComPtr<ID3D11Device> m_device = nullptr;
-		ComPtr<ID3D11DeviceContext> m_context = nullptr;
-		ComPtr<IDXGISwapChain> m_swapChain = nullptr;
-		std::unique_ptr<CommonStates> m_states = nullptr;
-		ComPtr<ID3D11BlendState> m_subtractiveBlendState = nullptr;
-		ComPtr<ID3D11BlendState> m_screenBlendState = nullptr;
-		ComPtr<ID3D11BlendState> m_lightenBlendState = nullptr;
-		ComPtr<ID3D11BlendState> m_excludeBlendState = nullptr;
-		ComPtr<ID3D11RasterizerState> m_cullCounterClockwiseRasterizerState = nullptr;
-		ComPtr<ID3D11RasterizerState> m_cullClockwiseRasterizerState = nullptr;
-		ComPtr<ID3D11RasterizerState> m_cullNoneRasterizerState = nullptr;
-		ComPtr<ID3D11InputLayout> m_inputLayout = nullptr;
-		D3D11_VIEWPORT m_viewport;
-		D3D11_VIEWPORT m_shadowMapViewport;
-		Viewport m_viewportToolkit;
-
-		// Main back buffer
-		ID3D11RenderTargetView* m_backBufferRTV;
-		ID3D11Texture2D* m_backBufferTexture;
-		ID3D11DepthStencilState* m_depthStencilState;
-		ID3D11DepthStencilView* m_depthStencilView;
-		ID3D11Texture2D* m_depthStencilTexture;
+		ComPtr<ID3D11Device> device = nullptr;
+		ComPtr<ID3D11DeviceContext> context = nullptr;
+		ComPtr<IDXGISwapChain> swapChain = nullptr;
+		std::unique_ptr<CommonStates> renderStates = nullptr;
+		ComPtr<ID3D11BlendState> subtractiveBlendState = nullptr;
+		ComPtr<ID3D11BlendState> screenBlendState = nullptr;
+		ComPtr<ID3D11BlendState> lightenBlendState = nullptr;
+		ComPtr<ID3D11BlendState> excludeBlendState = nullptr;
+		ComPtr<ID3D11RasterizerState> cullCounterClockwiseRasterizerState = nullptr;
+		ComPtr<ID3D11RasterizerState> cullClockwiseRasterizerState = nullptr;
+		ComPtr<ID3D11RasterizerState> cullNoneRasterizerState = nullptr;
+		ComPtr<ID3D11InputLayout> inputLayout = nullptr;
+		D3D11_VIEWPORT viewport;
+		D3D11_VIEWPORT shadowMapViewport;
+		Viewport viewportToolkit;
 
 		// Render targets
-		RenderTarget2D m_dumpScreenRenderTarget;
-		RenderTarget2D m_renderTarget;
-		RenderTarget2D m_currentRenderTarget;
-		RenderTarget2D m_depthMap;
-		RenderTargetCube m_reflectionCubemap;
-		Texture2DArray m_shadowMap;
+		RenderTarget2D backBuffer;
+		RenderTarget2D dumpScreenRenderTarget;
+		RenderTarget2D renderTarget;
+		RenderTarget2D depthMap;
+		RenderTargetCube reflectionCubemap;
+		Texture2DArray shadowMap;
 
 		// Shaders
-		ComPtr<ID3D11VertexShader> m_vsRooms;
-		ComPtr<ID3D11VertexShader> m_vsRooms_Anim;
-		ComPtr<ID3D11PixelShader> m_psRooms;
-		ComPtr<ID3D11VertexShader> m_vsItems;
-		ComPtr<ID3D11PixelShader> m_psItems;
-		ComPtr<ID3D11VertexShader> m_vsHairs;
-		ComPtr<ID3D11PixelShader> m_psHairs;
-		ComPtr<ID3D11VertexShader> m_vsStatics;
-		ComPtr<ID3D11PixelShader> m_psStatics;
-		ComPtr<ID3D11VertexShader> m_vsSky;
-		ComPtr<ID3D11PixelShader> m_psSky;
-		ComPtr<ID3D11VertexShader> m_vsSprites;
-		ComPtr<ID3D11PixelShader> m_psSprites;
-		ComPtr<ID3D11VertexShader> m_vsInstancedSprites;
-		ComPtr<ID3D11PixelShader> m_psInstancedSprites;
-		ComPtr<ID3D11VertexShader> m_vsInstancedStaticMeshes;
-		ComPtr<ID3D11PixelShader> m_psInstancedStaticMeshes;
-		ComPtr<ID3D11VertexShader> m_vsSolid;
-		ComPtr<ID3D11PixelShader> m_psSolid;
-		ComPtr<ID3D11VertexShader> m_vsInventory;
-		ComPtr<ID3D11PixelShader> m_psInventory;
-		ComPtr<ID3D11VertexShader> m_vsFullScreenQuad;
-		ComPtr<ID3D11PixelShader> m_psFullScreenQuad;
-		ComPtr<ID3D11VertexShader> m_vsShadowMap;
-		ComPtr<ID3D11PixelShader> m_psShadowMap;
-		ComPtr<ID3D11VertexShader> m_vsHUD;
-		ComPtr<ID3D11PixelShader> m_psHUDColor;
-		ComPtr<ID3D11PixelShader> m_psHUDTexture;
-		ComPtr<ID3D11PixelShader> m_psHUDBarColor;
+		ComPtr<ID3D11VertexShader> vsRooms;
+		ComPtr<ID3D11VertexShader> vsRooms_Anim;
+		ComPtr<ID3D11PixelShader> psRooms;
+		ComPtr<ID3D11VertexShader> vsItems;
+		ComPtr<ID3D11PixelShader> psItems;
+		ComPtr<ID3D11VertexShader> vsHairs;
+		ComPtr<ID3D11PixelShader> psHairs;
+		ComPtr<ID3D11VertexShader> vsStatics;
+		ComPtr<ID3D11PixelShader> psStatics;
+		ComPtr<ID3D11VertexShader> vsSky;
+		ComPtr<ID3D11PixelShader> psSky;
+		ComPtr<ID3D11VertexShader> vsSprites;
+		ComPtr<ID3D11PixelShader> psSprites;
+		ComPtr<ID3D11VertexShader> vsInstancedSprites;
+		ComPtr<ID3D11PixelShader> psInstancedSprites;
+		ComPtr<ID3D11VertexShader> vsInstancedStaticMeshes;
+		ComPtr<ID3D11PixelShader> psInstancedStaticMeshes;
+		ComPtr<ID3D11VertexShader> vsSolid;
+		ComPtr<ID3D11PixelShader> psSolid;
+		ComPtr<ID3D11VertexShader> vsInventory;
+		ComPtr<ID3D11PixelShader> psInventory;
+		ComPtr<ID3D11VertexShader> vsFullScreenQuad;
+		ComPtr<ID3D11PixelShader> psFullScreenQuad;
+		ComPtr<ID3D11VertexShader> vsShadowMap;
+		ComPtr<ID3D11PixelShader> psShadowMap;
+		ComPtr<ID3D11VertexShader> vsHUD;
+		ComPtr<ID3D11PixelShader> psHUDColor;
+		ComPtr<ID3D11PixelShader> psHUDTexture;
+		ComPtr<ID3D11PixelShader> psHUDBarColor;
 		ComPtr<ID3D11SamplerState> m_shadowSampler;
-		ComPtr<ID3D11VertexShader> m_vsFinalPass;
-		ComPtr<ID3D11PixelShader> m_psFinalPass;
+		ComPtr<ID3D11VertexShader> vsFinalPass;
+		ComPtr<ID3D11PixelShader> psFinalPass;
 
 		// Constant buffers
 		RenderView gameCamera;
-		ConstantBuffer<CCameraMatrixBuffer> m_cbCameraMatrices;
-		CItemBuffer m_stItem;
-		ConstantBuffer<CItemBuffer> m_cbItem;
-		CStaticBuffer m_stStatic;
-		ConstantBuffer<CStaticBuffer> m_cbStatic;
-		CLightBuffer m_stLights;
-		ConstantBuffer<CLightBuffer> m_cbLights;
-		CMiscBuffer m_stMisc;
-		ConstantBuffer<CMiscBuffer> m_cbMisc;
-		CRoomBuffer m_stRoom;
-		ConstantBuffer<CRoomBuffer> m_cbRoom;
-		CAnimatedBuffer m_stAnimated;
-		ConstantBuffer<CAnimatedBuffer> m_cbAnimated;
-		CShadowLightBuffer m_stShadowMap;
-		ConstantBuffer<CShadowLightBuffer> m_cbShadowMap;
-		CHUDBuffer m_stHUD;
-		ConstantBuffer<CHUDBuffer> m_cbHUD;
-		CHUDBarBuffer m_stHUDBar;
-		ConstantBuffer<CHUDBarBuffer> m_cbHUDBar;
-		CSpriteBuffer m_stSprite;
-		ConstantBuffer<CSpriteBuffer> m_cbSprite;
-		CPostProcessBuffer m_stPostProcessBuffer;
-		ConstantBuffer<CPostProcessBuffer> m_cbPostProcessBuffer;
-		CInstancedSpriteBuffer m_stInstancedSpriteBuffer;
-		ConstantBuffer<CInstancedSpriteBuffer> m_cbInstancedSpriteBuffer;
-		CBlendingBuffer m_stBlending;
-		ConstantBuffer<CBlendingBuffer> m_cbBlending;
-		CInstancedStaticMeshBuffer m_stInstancedStaticMeshBuffer;
-		ConstantBuffer<CInstancedStaticMeshBuffer> m_cbInstancedStaticMeshBuffer;
-		CSkyBuffer m_stSky;
-		ConstantBuffer<CSkyBuffer> m_cbSky;
+		ConstantBuffer<CCameraMatrixBuffer> cbCameraMatrices;
+		CItemBuffer stItem;
+		ConstantBuffer<CItemBuffer> cbItem;
+		CStaticBuffer stStatic;
+		ConstantBuffer<CStaticBuffer> cbStatic;
+		CLightBuffer stLights;
+		ConstantBuffer<CLightBuffer> cbLights;
+		CMiscBuffer stMisc;
+		ConstantBuffer<CMiscBuffer> cbMisc;
+		CRoomBuffer stRoom;
+		ConstantBuffer<CRoomBuffer> cbRoom;
+		CAnimatedBuffer stAnimated;
+		ConstantBuffer<CAnimatedBuffer> cbAnimated;
+		CShadowLightBuffer stShadowMap;
+		ConstantBuffer<CShadowLightBuffer> cbShadowMap;
+		CHUDBuffer stHUD;
+		ConstantBuffer<CHUDBuffer> cbHUD;
+		CHUDBarBuffer stHUDBar;
+		ConstantBuffer<CHUDBarBuffer> cbHUDBar;
+		CSpriteBuffer stSprite;
+		ConstantBuffer<CSpriteBuffer> cbSprite;
+		CPostProcessBuffer stPostProcessBuffer;
+		ConstantBuffer<CPostProcessBuffer> cbPostProcessBuffer;
+		CInstancedSpriteBuffer stInstancedSpriteBuffer;
+		ConstantBuffer<CInstancedSpriteBuffer> cbInstancedSpriteBuffer;
+		CBlendingBuffer stBlending;
+		ConstantBuffer<CBlendingBuffer> cbBlending;
+		CInstancedStaticMeshBuffer stInstancedStaticMeshBuffer;
+		ConstantBuffer<CInstancedStaticMeshBuffer> cbInstancedStaticMeshBuffer;
+		CSkyBuffer stSky;
+		ConstantBuffer<CSkyBuffer> cbSky;
 
 		// Primitive batchs
-		std::unique_ptr<SpriteBatch> m_spriteBatch;
-		std::unique_ptr<PrimitiveBatch<Vertex>> m_primitiveBatch;
+		std::unique_ptr<SpriteBatch> spriteBatch;
+		std::unique_ptr<PrimitiveBatch<Vertex>> primitiveBatch;
 
 		// Text
-		std::unique_ptr<SpriteFont> m_gameFont;
-		std::vector<RendererStringToDraw> m_strings;
-		float m_blinkColorValue = 0.0f;
-		float m_blinkTime		  = 0.0f;
-		bool  m_isBlinkUpdated  = false;
+		std::unique_ptr<SpriteFont> gameFont;
+		std::vector<RendererStringToDraw> stringsToDraw;
+		float blinkColorValue = 0.0f;
+		float blinkTime		  = 0.0f;
+		bool  isBlinkUpdated  = false;
 
 		// Graphics resources
-		Texture2D m_logo;
-		Texture2D m_skyTexture;
-		Texture2D m_whiteTexture;
-		RendererSprite m_whiteSprite;
-		Texture2D m_loadingBarBorder;
-		Texture2D m_loadingBarInner;
-		Texture2D m_loadingScreenTexture;
+		Texture2D logoTexture;
+		Texture2D skyTexture;
+		Texture2D whiteTexture;
+		RendererSprite whiteSprite;
+		Texture2D loadingBarBorder;
+		Texture2D loadingBarInner;
+		Texture2D loadingScreenTexture;
 
-		VertexBuffer m_roomsVertexBuffer;
-		IndexBuffer m_roomsIndexBuffer;
-		VertexBuffer m_moveablesVertexBuffer;
-		IndexBuffer m_moveablesIndexBuffer;
-		VertexBuffer m_staticsVertexBuffer;
-		IndexBuffer m_staticsIndexBuffer;
-		VertexBuffer m_skyVertexBuffer;
-		IndexBuffer m_skyIndexBuffer;
+		VertexBuffer roomsVertexBuffer;
+		IndexBuffer roomsIndexBuffer;
+		VertexBuffer moveablesVertexBuffer;
+		IndexBuffer moveablesIndexBuffer;
+		VertexBuffer staticsVertexBuffer;
+		IndexBuffer staticsIndexBuffer;
+		VertexBuffer skyVertexBuffer;
+		IndexBuffer skyIndexBuffer;
 
 		// TODO: used by legacy transaprency, to remove in the new system
-		std::vector<Vertex> m_roomsVertices;
-		std::vector<int> m_roomsIndices;
-		std::vector<Vertex> m_moveablesVertices;
-		std::vector<int> m_moveablesIndices;
-		std::vector<Vertex> m_staticsVertices;
-		std::vector<int> m_staticsIndices;
-		VertexBuffer m_transparentFacesVertexBuffer;
-		IndexBuffer m_transparentFacesIndexBuffer;
-		std::vector<Vertex> m_transparentFacesVertices;
-		fast_vector<int> m_transparentFacesIndices;
-		std::vector<RendererTransparentFace> m_transparentFaces;
+		std::vector<Vertex> roomsVertices;
+		std::vector<int> roomsIndices;
+		std::vector<Vertex> moveablesVertices;
+		std::vector<int> moveablesIndices;
+		std::vector<Vertex> staticsVertices;
+		std::vector<int> staticsIndices;
+		VertexBuffer transparentFacesVertexBuffer;
+		IndexBuffer transparentFacesIndexBuffer;
+		std::vector<Vertex> transparentFacesVertices;
+		fast_vector<int> transparentFacesIndices;
+		std::vector<RendererTransparentFace> transparentFaces;
 
 		// Rooms and collector
-		std::vector<RendererRoom> m_rooms;
-		bool m_invalidateCache;
-		std::vector<short> m_visitedRoomsStack;
+		std::vector<RendererRoom> rooms;
+		bool invalidateCache;
+		std::vector<short> visitedRoomsStack;
 
 		// Lights
-		std::vector<RendererLight> m_dynamicLights;
-		RendererLight* m_shadowLight;
+		std::vector<RendererLight> dynamicLights;
+		RendererLight* shadowLight;
 
 		// Lines
-		std::vector<RendererLine3D> m_lines3DToDraw;
-		std::vector<RendererLine2D> m_lines2DToDraw;
+		std::vector<RendererLine3D> lines3DToDraw;
+		std::vector<RendererLine2D> lines2DToDraw;
 
 		// Textures, objects and sprites
-		std::vector<std::optional<RendererObject>> m_moveableObjects;
-		std::vector<std::optional<RendererObject>> m_staticObjects;
-		std::vector<RendererSprite> m_sprites;
-		std::vector<RendererSpriteSequence> m_spriteSequences;
-		std::unordered_map<int, RendererMesh*> m_meshPointersToMesh;
-		Matrix m_LaraWorldMatrix;
-		std::vector<RendererAnimatedTextureSet> m_animatedTextureSets;
-		int m_currentCausticsFrame;
-		std::vector<RendererMesh*> m_meshes;
-		std::vector<TexturePair> m_roomTextures;
-		std::vector<TexturePair> m_animatedTextures;
-		std::vector<TexturePair> m_moveablesTextures;
-		std::vector<TexturePair> m_staticsTextures;
-		std::vector<Texture2D> m_spritesTextures;
+		std::vector<std::optional<RendererObject>> moveableObjects;
+		std::vector<std::optional<RendererObject>> staticObjects;
+		std::vector<RendererSprite> sprites;
+		std::vector<RendererSpriteSequence> spriteSequences;
+		Matrix laraWorldMatrix;
+		std::vector<RendererAnimatedTextureSet> animatedTextureSets;
+		std::vector<RendererMesh*> meshes;
+		std::vector<TexturePair> roomTextures;
+		std::vector<TexturePair> animatedTextures;
+		std::vector<TexturePair> moveablesTextures;
+		std::vector<TexturePair> staticTextures;
+		std::vector<Texture2D> spritesTextures;
 
 		// Preallocated pools of objects for avoiding new/delete
 		// Items and effects are safe (can't be more than 1024 items in TR), 
 		// lights should be oversized (eventually ignore lights more than MAX_LIGHTS)
-		RendererItem m_items[NUM_ITEMS];
-		RendererEffect m_effects[NUM_ITEMS];
+		RendererItem items[NUM_ITEMS];
+		RendererEffect effects[NUM_ITEMS];
 
 		// Debug variables
-		int m_numDrawCalls = 0;
-		int m_numRoomsDrawCalls = 0;
-		int m_numMoveablesDrawCalls = 0;
-		int m_numStaticsDrawCalls = 0;
-		int m_numSpritesDrawCalls = 0;
-		int m_numTransparentDrawCalls = 0;
-		int m_numRoomsTransparentDrawCalls = 0;
-		int m_numMoveablesTransparentDrawCalls = 0;
-		int m_numStaticsTransparentDrawCalls = 0;
-		int m_numSpritesTransparentDrawCalls = 0;
-		int m_biggestRoomIndexBuffer = 0;
-		int m_numRoomsTransparentPolygons;
-		int m_numPolygons = 0;
-		int m_currentY;
-		int m_dotProducts = 0;
-		int m_numCheckPortalCalls = 0;
-		int m_numGetVisibleRoomsCalls = 0;
+		int numDrawCalls = 0;
+		int numRoomsDrawCalls = 0;
+		int numMoveablesDrawCalls = 0;
+		int numStaticsDrawCalls = 0;
+		int numSpritesDrawCalls = 0;
+		int numTransparentDrawCalls = 0;
+		int numRoomsTransparentDrawCalls = 0;
+		int numMoveablesTransparentDrawCalls = 0;
+		int numStaticsTransparentDrawCalls = 0;
+		int numSpritesTransparentDrawCalls = 0;
+		int biggestRoomIndexBuffer = 0;
+		int numRoomsTransparentPolygons;
+		int numPolygons = 0;
+		int currentY;
+		int numDotProducts = 0;
+		int numCheckPortalCalls = 0;
+		int numGetVisibleRoomsCalls = 0;
 
 		RendererDebugPage DebugPage = RendererDebugPage::None;
 
 		// Times for debug
-		int m_timeUpdate;
-		int m_timeRoomsCollector;
-		int m_timeDraw;
-		int m_timeFrame;
-		float m_fps;
+		int timeUpdate;
+		int timeRoomsCollector;
+		int timeDraw;
+		int timeFrame;
+		float fps;
+		int currentCausticsFrame;
 
 		// Screen settings
-		int m_screenWidth;
-		int m_screenHeight;
-		bool m_windowed;
-		float m_farView = DEFAULT_FAR_VIEW;
+		int screenWidth;
+		int screenHeight;
+		bool isWindowed;
+		float farView = DEFAULT_FAR_VIEW;
 
 		// A flag to prevent extra renderer object addition
-		bool m_locked = false;
+		bool isLocked = false;
 
 		// Caching state changes
 		TextureBase* lastTexture;
-		BLEND_MODES m_lastBlendMode;
-		DEPTH_STATES m_lastDepthState;
-		CULL_MODES m_lastCullMode;
-
-		
-
-
+		BLEND_MODES lastBlendMode;
+		DEPTH_STATES lastDepthState;
+		CULL_MODES lastCullMode;
 
 		// Private functions
 		void BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType);
@@ -480,36 +468,36 @@ namespace TEN::Renderer
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{
-			m_context->DrawIndexed(count, baseIndex, baseVertex);
-			m_numPolygons += count / 3;
-			m_numDrawCalls++;
+			context->DrawIndexed(count, baseIndex, baseVertex);
+			numPolygons += count / 3;
+			numDrawCalls++;
 		}
 
 		inline void DrawIndexedInstancedTriangles(int count, int instances, int baseIndex, int baseVertex)
 		{
-			m_context->DrawIndexedInstanced(count, instances, baseIndex, baseVertex, 0);
-			m_numPolygons += count / 3 * instances;
-			m_numDrawCalls++;
+			context->DrawIndexedInstanced(count, instances, baseIndex, baseVertex, 0);
+			numPolygons += count / 3 * instances;
+			numDrawCalls++;
 		}
 
 		inline void DrawInstancedTriangles(int count, int instances, int baseVertex)
 		{
-			m_context->DrawInstanced(count, instances, baseVertex, 0);
-			m_numPolygons += count / 3 * instances;
-			m_numDrawCalls++;
+			context->DrawInstanced(count, instances, baseVertex, 0);
+			numPolygons += count / 3 * instances;
+			numDrawCalls++;
 		}
 
 		inline void DrawTriangles(int count, int baseVertex)
 		{
-			m_context->Draw(count, baseVertex);
-			m_numPolygons += count / 3;
-			m_numDrawCalls++;
+			context->Draw(count, baseVertex);
+			numPolygons += count / 3;
+			numDrawCalls++;
 		}
 
 		template <typename C>
 		ConstantBuffer<C> CreateConstantBuffer()
 		{
-			return ConstantBuffer<C>(m_device.Get());
+			return ConstantBuffer<C>(device.Get());
 		}
 
 		static bool DoesBlendModeRequireSorting(BLEND_MODES blendMode)
@@ -523,8 +511,8 @@ namespace TEN::Renderer
 		}
 
 	public:
-		Renderer11();
-		~Renderer11();
+		Renderer();
+		~Renderer();
 
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
@@ -587,5 +575,5 @@ namespace TEN::Renderer
 		void CollectDisplaySprites(RenderView& renderView);
 	};
 
-	extern Renderer11 g_Renderer;
+	extern Renderer g_Renderer;
 }

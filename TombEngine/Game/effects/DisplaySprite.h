@@ -1,6 +1,6 @@
 #pragma once
 #include "Objects/game_object_ids.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Effects::DisplaySprite
 {

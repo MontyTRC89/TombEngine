@@ -11,7 +11,7 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 
 using TEN::Renderer::g_Renderer;

@@ -74,7 +74,7 @@ namespace TEN::Renderer
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
 	TEN::Renderer::RendererHudBar* g_SFXVolumeBar	= nullptr;
 
-	void Renderer11::InitializeMenuBars(int y)
+	void Renderer::InitializeMenuBars(int y)
 	{
 		static const auto soundSettingColors = std::array<Vector4, RendererHudBar::COLOR_COUNT>
 		{
@@ -92,12 +92,12 @@ namespace TEN::Renderer
 
 		int shift = MenuVerticalLineSpacing / 2;
 
-		g_MusicVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
+		g_MusicVolumeBar = new RendererHudBar(device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
 		GetNextLinePosition(&y);
-		g_SFXVolumeBar = new RendererHudBar(m_device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
+		g_SFXVolumeBar = new RendererHudBar(device.Get(), Vector2(MenuRightSideEntry, y + shift), RendererHudBar::SIZE_DEFAULT, 1, soundSettingColors);
 	}
 
-	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
+	void Renderer::RenderOptionsMenu(Menu menu, int initialY)
 	{
 		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = SCREEN_SPACE_RES.x - MenuLeftSideEntry;
 		static const auto LEFT_ARROW_STRING				  = std::string("<");
@@ -468,7 +468,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::RenderTitleMenu(Menu menu)
+	void Renderer::RenderTitleMenu(Menu menu)
 	{
 		int y = MenuVerticalBottomCenter;
 		int titleOption = g_Gui.GetSelectedOption();
@@ -534,7 +534,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::RenderPauseMenu(Menu menu)
+	void Renderer::RenderPauseMenu(Menu menu)
 	{
 		int y = 0;
 		auto pauseOption = g_Gui.GetSelectedOption();
@@ -581,7 +581,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::RenderLoadSaveMenu()
+	void Renderer::RenderLoadSaveMenu()
 	{
 		if (!g_GameFlow->IsLoadSaveEnabled())
 		{
@@ -628,7 +628,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::DrawStatistics()
+	void Renderer::DrawStatistics()
 	{
 		char buffer[40];
 
@@ -689,7 +689,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::RenderNewInventory()
+	void Renderer::RenderNewInventory()
 	{
 		g_Gui.DrawCurrentObjectList(LaraItem, RingTypes::Inventory);
 
@@ -703,15 +703,15 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
+	void Renderer::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
 		constexpr auto COUNT_STRING_INF	   = "Inf";
 		constexpr auto COUNT_STRING_OFFSET = Vector2(SCREEN_SPACE_RES.x / 40, 0.0f);
 
 		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
-		m_context->OMGetRenderTargets(1, nullptr, &dsv);
-		m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		context->OMGetRenderTargets(1, nullptr, &dsv);
+		context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Draw display pickup.
 		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
@@ -727,7 +727,7 @@ namespace TEN::Renderer
 	}
 
 	// TODO: Handle opacity
-	void Renderer11::DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float opacity, int meshBits)
+	void Renderer::DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float opacity, int meshBits)
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -752,9 +752,9 @@ namespace TEN::Renderer
 		}
 
 		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(2)), Vector3::Zero, Vector3::Down);
-		auto projMatrix = Matrix::CreateOrthographic(m_screenWidth, m_screenHeight, -BLOCK(1), BLOCK(1));
+		auto projMatrix = Matrix::CreateOrthographic(screenWidth, screenHeight, -BLOCK(1), BLOCK(1));
 
-		auto& moveableObject = m_moveableObjects[objectNumber];
+		auto& moveableObject = moveableObjects[objectNumber];
 		if (!moveableObject)
 			return;
 
@@ -770,24 +770,24 @@ namespace TEN::Renderer
 			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
 		}
 
-		auto pos = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
+		auto pos = viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
 
 		// Set vertex buffer.
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		context->IASetVertexBuffers(0, 1, moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->IASetInputLayout(inputLayout.Get());
+		context->IASetIndexBuffer(moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders.
-		m_context->VSSetShader(m_vsInventory.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psInventory.Get(), nullptr, 0);
+		context->VSSetShader(vsInventory.Get(), nullptr, 0);
+		context->PSSetShader(psInventory.Get(), nullptr, 0);
 
 		// Set matrices.
 		CCameraMatrixBuffer hudCamera;
 		hudCamera.CamDirectionWS = -Vector4::UnitZ;
 		hudCamera.ViewProjection = viewMatrix * projMatrix;
-		m_cbCameraMatrices.updateData(hudCamera, m_context.Get());
-		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
+		cbCameraMatrices.updateData(hudCamera, context.Get());
+		BindConstantBufferVS(CB_CAMERA, cbCameraMatrices.get());
 
 		for (int n = 0; n < (*moveableObject).ObjectMeshes.size(); n++)
 		{
@@ -807,17 +807,17 @@ namespace TEN::Renderer
 			auto worldMatrix = scaleMatrix * rotMatrix * tMatrix;
 
 			if (object.animIndex != -1)
-				m_stItem.World = (*moveableObject).AnimationTransforms[n] * worldMatrix;
+				stItem.World = (*moveableObject).AnimationTransforms[n] * worldMatrix;
 			else
-				m_stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
+				stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
 
-			m_stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
-			m_stItem.Color = Vector4::One;
-			m_stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
+			stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			stItem.Color = Vector4::One;
+			stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
 
-			m_cbItem.updateData(m_stItem, m_context.Get());
-			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
-			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
+			cbItem.updateData(stItem, context.Get());
+			BindConstantBufferVS(CB_ITEM, cbItem.get());
+			BindConstantBufferPS(CB_ITEM, cbItem.get());
 			
 			for (const auto& bucket : mesh->Buckets)
 			{
@@ -828,23 +828,23 @@ namespace TEN::Renderer
 				SetCullMode(CULL_MODE_CCW);
 				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 
-				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 				
 				 if (bucket.BlendMode != BLENDMODE_OPAQUE)
-					Renderer11::SetBlendMode(bucket.BlendMode, true);
+					Renderer::SetBlendMode(bucket.BlendMode, true);
 				
 				SetAlphaTest(
 					(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
 					ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-				m_numMoveablesDrawCalls++;
+				numMoveablesDrawCalls++;
 			}
 		}
 	}
 
-	void Renderer11::RenderTitleImage()
+	void Renderer::RenderTitleImage()
 	{
 		Texture2D texture;
 		SetTextureOrDefault(texture, TEN::Utils::ToWString(g_GameFlow->IntroImagePath.c_str()));
@@ -869,14 +869,14 @@ namespace TEN::Renderer
 				currentFade = std::clamp(currentFade -= FADE_FACTOR, 0.0f, 1.0f);
 			}
 
-			DrawFullScreenImage(texture.ShaderResourceView.Get(), Smoothstep(currentFade), m_backBufferRTV, m_depthStencilView);
+			DrawFullScreenImage(texture.ShaderResourceView.Get(), Smoothstep(currentFade), backBuffer.RenderTargetView.Get(), backBuffer.DepthStencilView.Get());
 			Synchronize();
-			m_swapChain->Present(0, 0);
-			m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			swapChain->Present(0, 0);
+			context->ClearDepthStencilView(backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		}
 	}
 
-	void Renderer11::DrawExamines()
+	void Renderer::DrawExamines()
 	{
 		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
 
@@ -917,7 +917,7 @@ namespace TEN::Renderer
 		object.Scale1 = savedScale;
 	}
 
-	void Renderer11::DrawDiary()
+	void Renderer::DrawDiary()
 	{
 		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
 
@@ -940,7 +940,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer11::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
+	void Renderer::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
 	{
 		// Set basic render states
 		SetBlendMode(BLENDMODE_OPAQUE, true);
@@ -948,31 +948,31 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW, true);
 
 		// Bind and clear render target
-		m_context->OMSetRenderTargets(1, &target, depthTarget);
-		m_context->RSSetViewports(1, &m_viewport);
+		context->OMSetRenderTargets(1, &target, depthTarget);
+		context->RSSetViewports(1, &viewport);
 		ResetScissor();
 
 		if (background != nullptr)
 			DrawFullScreenImage(background, 0.5f, target, depthTarget);
 
-		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		// Set vertex buffer
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		context->IASetVertexBuffers(0, 1, moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->IASetInputLayout(inputLayout.Get());
+		context->IASetIndexBuffer(moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders
-		m_context->VSSetShader(m_vsInventory.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psInventory.Get(), nullptr, 0);
+		context->VSSetShader(vsInventory.Get(), nullptr, 0);
+		context->PSSetShader(psInventory.Get(), nullptr, 0);
 
 		// Set texture
-		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
-		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
 
 		if (CurrentLevel == 0)
 		{
@@ -981,9 +981,9 @@ namespace TEN::Renderer
 
 			if (drawLogo)
 			{
-				float factorX = (float)m_screenWidth / SCREEN_SPACE_RES.x;
-				float factorY = (float)m_screenHeight / SCREEN_SPACE_RES.y;
-				float scale = m_screenWidth > m_screenHeight ? factorX : factorY;
+				float factorX = (float)screenWidth / SCREEN_SPACE_RES.x;
+				float factorY = (float)screenHeight / SCREEN_SPACE_RES.y;
+				float scale = screenWidth > screenHeight ? factorX : factorY;
 
 				int logoLeft   = (SCREEN_SPACE_RES.x / 2) - (LogoWidth / 2);
 				int logoRight  = (SCREEN_SPACE_RES.x / 2) + (LogoWidth / 2);
@@ -995,9 +995,9 @@ namespace TEN::Renderer
 				rect.top    = LogoTop    * scale;
 				rect.bottom = logoBottom * scale;
 
-				m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->NonPremultiplied());
-				m_spriteBatch->Draw(m_logo.ShaderResourceView.Get(), rect, Vector4::One * ScreenFadeCurrent);
-				m_spriteBatch->End();
+				spriteBatch->Begin(SpriteSortMode_BackToFront, renderStates->NonPremultiplied());
+				spriteBatch->Draw(logoTexture.ShaderResourceView.Get(), rect, Vector4::One * ScreenFadeCurrent);
+				spriteBatch->End();
 			}
 
 			RenderTitleMenu(titleMenu);
@@ -1034,12 +1034,12 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::SetLoadingScreen(std::wstring& fileName)
+	void Renderer::SetLoadingScreen(std::wstring& fileName)
 	{
-		SetTextureOrDefault(m_loadingScreenTexture, fileName);
+		SetTextureOrDefault(loadingScreenTexture, fileName);
 	}
 
-	void Renderer11::RenderLoadingScreen(float percentage)
+	void Renderer::RenderLoadingScreen(float percentage)
 	{
 		// Set basic render states
 		SetBlendMode(BLENDMODE_OPAQUE);
@@ -1048,25 +1048,25 @@ namespace TEN::Renderer
 		do
 		{
 			// Clear screen
-			m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-			m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			context->ClearRenderTargetView(backBuffer.RenderTargetView.Get(), Colors::Black);
+			context->ClearDepthStencilView(backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 			// Bind the back buffer
-			m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
-			m_context->RSSetViewports(1, &m_viewport);
+			context->OMSetRenderTargets(1, backBuffer.RenderTargetView.GetAddressOf(), backBuffer.DepthStencilView.Get());
+			context->RSSetViewports(1, &viewport);
 			ResetScissor();
 
 			// Draw the full screen background
-			if (m_loadingScreenTexture.Texture)
+			if (loadingScreenTexture.Texture)
 				DrawFullScreenQuad(
-					m_loadingScreenTexture.ShaderResourceView.Get(),
+					loadingScreenTexture.ShaderResourceView.Get(),
 					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
 
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
 				DrawLoadingBar(percentage);
 
-			m_swapChain->Present(0, 0);
-			m_context->ClearState();
+			swapChain->Present(0, 0);
+			context->ClearState();
 
 			Synchronize();
 			UpdateFadeScreenAndCinematicBars();
@@ -1074,33 +1074,33 @@ namespace TEN::Renderer
 		} while (ScreenFading || !ScreenFadedOut);
 	}
 
-	void Renderer11::RenderInventory()
+	void Renderer::RenderInventory()
 	{
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
-		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-		RenderInventoryScene(m_backBufferRTV, m_depthStencilView, m_dumpScreenRenderTarget.ShaderResourceView.Get());
-		m_swapChain->Present(0, 0);
+		context->ClearDepthStencilView(backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+		context->ClearRenderTargetView(backBuffer.RenderTargetView.Get(), Colors::Black);
+		RenderInventoryScene(backBuffer.RenderTargetView.Get(), backBuffer.DepthStencilView.Get(), dumpScreenRenderTarget.ShaderResourceView.Get());
+		swapChain->Present(0, 0);
 	}
 
-	void Renderer11::RenderTitle()
+	void Renderer::RenderTitle()
 	{
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
-		m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+		context->ClearDepthStencilView(backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+		context->ClearRenderTargetView(backBuffer.RenderTargetView.Get(), Colors::Black);
 
-		RenderScene(m_backBufferRTV, m_depthStencilView, gameCamera);
-		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+		RenderScene(backBuffer.RenderTargetView.Get(), backBuffer.DepthStencilView.Get(), gameCamera);
+		context->ClearDepthStencilView(backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-		RenderInventoryScene(m_backBufferRTV, m_depthStencilView, nullptr);
+		RenderInventoryScene(backBuffer.RenderTargetView.Get(), backBuffer.DepthStencilView.Get(), nullptr);
 		DrawAllStrings();
 
-		m_swapChain->Present(0, 0);
+		swapChain->Present(0, 0);
 	}
 
-	void Renderer11::DrawDebugInfo(RenderView& view)
+	void Renderer::DrawDebugInfo(RenderView& view)
 	{
 		if (CurrentLevel != 0)
 		{
-			m_currentY = 60;
+			currentY = 60;
 
 			ROOM_INFO* r = &g_Level.Rooms[LaraItem->RoomNumber];
 
@@ -1111,31 +1111,31 @@ namespace TEN::Renderer
 
 			case RendererDebugPage::RendererStats:
 				PrintDebugMessage("RENDERER STATS");
-				PrintDebugMessage("FPS: %3.2f", m_fps);
-				PrintDebugMessage("Resolution: %d x %d", m_screenWidth, m_screenHeight);
+				PrintDebugMessage("FPS: %3.2f", fps);
+				PrintDebugMessage("Resolution: %d x %d", screenWidth, screenHeight);
 				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
-				PrintDebugMessage("Update time: %d", m_timeUpdate);
-				PrintDebugMessage("Frame time: %d", m_timeFrame);
+				PrintDebugMessage("Update time: %d", timeUpdate);
+				PrintDebugMessage("Frame time: %d", timeFrame);
 				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
-				PrintDebugMessage("Room collector time: %d", m_timeRoomsCollector);
-				PrintDebugMessage("Draw calls: %d", m_numDrawCalls);
-				PrintDebugMessage("    Rooms: %d", m_numRoomsDrawCalls);
-				PrintDebugMessage("    Movables: %d", m_numMoveablesDrawCalls);
-				PrintDebugMessage("    Statics: %d", m_numStaticsDrawCalls);
-				PrintDebugMessage("    Sprites: %d", m_numSpritesDrawCalls);
-				PrintDebugMessage("Triangles: %d", m_numPolygons);
+				PrintDebugMessage("Room collector time: %d", timeRoomsCollector);
+				PrintDebugMessage("Draw calls: %d", numDrawCalls);
+				PrintDebugMessage("    Rooms: %d", numRoomsDrawCalls);
+				PrintDebugMessage("    Movables: %d", numMoveablesDrawCalls);
+				PrintDebugMessage("    Statics: %d", numStaticsDrawCalls);
+				PrintDebugMessage("    Sprites: %d", numSpritesDrawCalls);
+				PrintDebugMessage("Triangles: %d", numPolygons);
 				PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
-				PrintDebugMessage("Transparent face draw calls: %d", m_numTransparentDrawCalls);
-				PrintDebugMessage("    Rooms: %d", m_numRoomsTransparentDrawCalls);
-				PrintDebugMessage("    Movables: %d", m_numMoveablesTransparentDrawCalls);
-				PrintDebugMessage("    Statics: %d", m_numStaticsTransparentDrawCalls);
-				PrintDebugMessage("    Sprites: %d", m_numSpritesTransparentDrawCalls);
-				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
-				PrintDebugMessage("Transparent room polys: %d", m_numRoomsTransparentPolygons);
+				PrintDebugMessage("Transparent face draw calls: %d", numTransparentDrawCalls);
+				PrintDebugMessage("    Rooms: %d", numRoomsTransparentDrawCalls);
+				PrintDebugMessage("    Movables: %d", numMoveablesTransparentDrawCalls);
+				PrintDebugMessage("    Statics: %d", numStaticsTransparentDrawCalls);
+				PrintDebugMessage("    Sprites: %d", numSpritesTransparentDrawCalls);
+				PrintDebugMessage("Biggest room's index buffer: %d", biggestRoomIndexBuffer);
+				PrintDebugMessage("Transparent room polys: %d", numRoomsTransparentPolygons);
 				PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
-				PrintDebugMessage("    CheckPortal() calls: %d", m_numCheckPortalCalls);
-				PrintDebugMessage("    GetVisibleRooms() calls: %d", m_numGetVisibleRoomsCalls);
-				PrintDebugMessage("    Dot products: %d", m_dotProducts);
+				PrintDebugMessage("    CheckPortal() calls: %d", numCheckPortalCalls);
+				PrintDebugMessage("    GetVisibleRooms() calls: %d", numGetVisibleRoomsCalls);
+				PrintDebugMessage("    Dot products: %d", numDotProducts);
 
 				break;
 
@@ -1226,7 +1226,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::SwitchDebugPage(bool goBack)
+	void Renderer::SwitchDebugPage(bool goBack)
 	{
 		int page = (int)DebugPage;
 		goBack ? --page : ++page;

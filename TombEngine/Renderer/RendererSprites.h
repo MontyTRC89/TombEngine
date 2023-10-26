@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer
 {

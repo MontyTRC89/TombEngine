@@ -4,10 +4,10 @@
 
 namespace TEN::Renderer 
 {
-	void Renderer11::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
+	void Renderer::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 										Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_locked)
+		if (isLocked)
 			return;
 
 		if (scale <= 0.0f)
@@ -37,11 +37,11 @@ namespace TEN::Renderer
 		view.SpritesToDraw.push_back(spr);
 	}
 
-	void Renderer11::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4 &color, float orient2D,
+	void Renderer::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4 &color, float orient2D,
 												   float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& constrainAxis,
 												   bool softParticles, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_locked)
+		if (isLocked)
 			return;
 
 		if (scale <= 0.0f)
@@ -72,11 +72,11 @@ namespace TEN::Renderer
 		view.SpritesToDraw.push_back(spr);
 	}
 
-	void Renderer11::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
+	void Renderer::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
 														 float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& lookAtAxis,
 														 bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_locked)
+		if (isLocked)
 			return;
 
 		if (scale <= 0.0f)
@@ -107,18 +107,18 @@ namespace TEN::Renderer
 		view.SpritesToDraw.push_back(spr);
 	}
 
-	void Renderer11::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+	void Renderer::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							 const Vector4 color, float orient2D, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles,
 							 RenderView& view)
 	{
 		AddQuad(sprite, vertex0, vertex1, vertex2, vertex3, color, color, color, color, orient2D, scale, size, blendMode, softParticles, view, SpriteRenderType::Default);
 	}
 
-	void Renderer11::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+	void Renderer::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							 const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
 							 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_locked)
+		if (isLocked)
 			return;
 
 		if (scale <= 0.0f)
@@ -151,23 +151,23 @@ namespace TEN::Renderer
 		view.SpritesToDraw.push_back(spr);
 	}
 
-	void Renderer11::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+	void Renderer::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 									const Vector4& color, BLEND_MODES blendMode, RenderView& view)
 	{
 		AddColoredQuad(vertex0, vertex1, vertex2, vertex3, color, color, color, color, blendMode, view, SpriteRenderType::Default);
 	}
 
-	void Renderer11::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
+	void Renderer::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 									const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 									BLEND_MODES blendMode, RenderView& view, SpriteRenderType renderType)
 	{
-		if (m_locked)
+		if (isLocked)
 			return;
 
 		auto sprite = RendererSpriteToDraw{};
 
 		sprite.Type = RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D;
-		sprite.Sprite = &m_whiteSprite;
+		sprite.Sprite = &whiteSprite;
 		sprite.vtx1 = vertex0;
 		sprite.vtx2 = vertex1;
 		sprite.vtx3 = vertex2;

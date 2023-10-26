@@ -13,7 +13,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Effects::Bubble;

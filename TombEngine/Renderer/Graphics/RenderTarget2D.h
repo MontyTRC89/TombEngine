@@ -16,7 +16,8 @@ namespace TEN::Renderer::Graphics
 		ComPtr<ID3D11ShaderResourceView> DepthShaderResourceView;
 
 		RenderTarget2D() {};
-		RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat = DXGI_FORMAT_D32_FLOAT);
+		RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat = DXGI_FORMAT_UNKNOWN);
+		RenderTarget2D(ID3D11Device* device, ID3D11Texture2D* texture, DXGI_FORMAT depthFormat = DXGI_FORMAT_UNKNOWN);
 	};
 
 }

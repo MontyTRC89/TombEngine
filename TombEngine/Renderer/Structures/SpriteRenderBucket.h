@@ -1,7 +1,7 @@
 #pragma once
 #include "Renderer/Structures/RendererSprite.h"
 #include "Renderer/Structures/RendererSpriteToDraw.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::Structures
 {
