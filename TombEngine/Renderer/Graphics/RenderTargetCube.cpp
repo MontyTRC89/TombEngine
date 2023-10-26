@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Renderer/Graphics/RenderTargetCube.h"
-#include "Renderer/Utils.h"
+#include "Renderer/RendererUtils.h"
 
 namespace TEN::Renderer::Graphics
 {

@@ -3,7 +3,7 @@
 #include <SimpleMath.h>
 #include "RenderQuad.h"
 #include "Renderer/Renderer.h"
-#include "../Utils.h"
+#include "Renderer/RendererUtils.h"
 
 namespace TEN::Renderer
 {

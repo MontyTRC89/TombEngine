@@ -685,14 +685,13 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Graphics\RenderTarget2D.h" />
     <ClInclude Include="Renderer\Graphics\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\Graphics\RenderTargetCube.h" />
-    <ClInclude Include="Renderer\RenderView\RenderView.h" />
+    <ClInclude Include="Renderer\RenderView.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Renderer\RendererEnums.h" />
     <ClInclude Include="Renderer\RendererBucket.h" />
     <ClInclude Include="Renderer\RendererPolygon.h" />
     <ClInclude Include="Renderer\RendererRectangle.h" />
     <ClInclude Include="Renderer\RendererSpriteVertex.h" />
-    <ClInclude Include="Renderer\RendererSprites.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\Vertex.h" />
     <ClInclude Include="Renderer\Structures\RendererAnimatedTexture.h" />
@@ -723,7 +722,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Graphics\TextureBase.h" />
     <ClInclude Include="Renderer\Structures\RendererTransparentFace.h" />
     <ClInclude Include="Renderer\Structures\SpriteRenderBucket.h" />
-    <ClInclude Include="Renderer\Utils.h" />
+    <ClInclude Include="Renderer\RendererUtils.h" />
     <ClInclude Include="Renderer\Graphics\VertexBuffer.h" />
     <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Objects\ScriptInterfaceObjectsHandler.h" />
@@ -1167,9 +1166,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Renderer\Graphics\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\Graphics\RenderTargetCubeArray.cpp" />
     <ClCompile Include="Renderer\Graphics\RenderTargetCube.cpp" />
-    <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
+    <ClCompile Include="Renderer\RenderView.cpp" />
     <ClCompile Include="Renderer\Graphics\Texture2D.cpp" />
-    <ClCompile Include="Renderer\Utils.cpp" />
+    <ClCompile Include="Renderer\RendererUtils.cpp" />
     <ClCompile Include="Renderer\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Scripting\Internal\LuaHandler.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptAssert.cpp" />

@@ -24,7 +24,7 @@
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
-#include "RenderView/RenderView.h"
+#include "Renderer/RenderView.h"
 #include "Renderer/Renderer.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"

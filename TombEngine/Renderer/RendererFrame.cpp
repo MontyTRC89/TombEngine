@@ -12,7 +12,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "RenderView/RenderView.h"
+#include "Renderer/RenderView.h"
 
 using namespace TEN::Math;
 

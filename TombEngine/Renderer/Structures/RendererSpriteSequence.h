@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "Renderer/RendererSprites.h"
 
 namespace TEN::Renderer::Structures
 {

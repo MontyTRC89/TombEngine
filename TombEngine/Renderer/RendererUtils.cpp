@@ -1,13 +1,11 @@
 #include "framework.h"
-
 #include <codecvt>
 #include <d3dcompiler.h>
 #include <locale>
 #include <iostream>
 #include <winerror.h>
 #include <wrl/client.h>
-
-#include "Renderer/Utils.h"
+#include "Renderer/Renderer.h"
 #include "Specific/trutils.h"
 
 namespace TEN::Renderer::Utils
@@ -17,7 +15,7 @@ namespace TEN::Renderer::Utils
 	using Microsoft::WRL::ComPtr;
 	using std::vector;
 
-	void Utils::throwIfFailed(const HRESULT& res) 
+	void throwIfFailed(const HRESULT& res) 
 	{
 		if (FAILED(res))
 		{
@@ -27,7 +25,7 @@ namespace TEN::Renderer::Utils
 		}
 	}
 
-	void Utils::throwIfFailed(const HRESULT& res, const std::string &info) 
+	void throwIfFailed(const HRESULT& res, const std::string &info) 
 	{
 		if (FAILED(res))
 		{
@@ -37,7 +35,7 @@ namespace TEN::Renderer::Utils
 		}
 	}
 
-	void Utils::throwIfFailed(const HRESULT& res, const std::wstring &info) 
+	void throwIfFailed(const HRESULT& res, const std::wstring &info) 
 	{
 		if (FAILED(res))
 		{

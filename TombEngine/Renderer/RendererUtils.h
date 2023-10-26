@@ -2,6 +2,7 @@
 #include <string>
 #include <winerror.h>
 #include <wrl/client.h>
+#include <d3d11.h>
 
 namespace TEN::Renderer::Utils
 {

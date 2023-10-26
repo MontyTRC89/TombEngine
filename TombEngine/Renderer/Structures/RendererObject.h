@@ -20,8 +20,6 @@ namespace TEN::Renderer::Structures
 		std::vector<RendererBone*> LinearizedBones;
 		bool DoNotDraw;
 		ShadowMode ShadowType;
-		bool HasDataInBucket[NUM_BUCKETS];
-		bool HasDataInAnimatedBucket[NUM_BUCKETS];
 
 		~RendererObject()
 		{

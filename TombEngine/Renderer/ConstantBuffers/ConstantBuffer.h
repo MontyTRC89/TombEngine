@@ -1,6 +1,6 @@
 #pragma once
 #include <d3d11.h>
-#include "Renderer/Utils.h"
+#include "Renderer/RendererUtils.h"
 #include "Game/debug/debug.h"
 
 namespace TEN::Renderer::ConstantBuffers

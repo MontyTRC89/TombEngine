@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Renderer/Graphics/Texture2D.h"
-#include "Renderer/Utils.h"
+#include "Renderer/RendererUtils.h"
 #include <WICTextureLoader.h>
 #include <DDSTextureLoader.h>
 

@@ -16,6 +16,6 @@ namespace TEN::Renderer
 	private:
 
 		void NormalizePlane(int side);
-		std::array<std::array<float, 4>, 6> m_frustum = {};
+		std::array<std::array<float, 4>, 6> frustum = {};
 	};
 }

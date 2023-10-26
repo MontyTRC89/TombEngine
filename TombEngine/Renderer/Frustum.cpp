@@ -27,45 +27,45 @@ namespace TEN::Renderer
 		clip[15] = view._41 * projection._14 + view._42 * projection._24 + view._43 * projection._34 + view._44 * projection._44;
 
 		// This will extract the LEFT side of the frustum.
-		m_frustum[1][0] = clip[3] - clip[0];
-		m_frustum[1][1] = clip[7] - clip[4];
-		m_frustum[1][2] = clip[11] - clip[8];
-		m_frustum[1][3] = clip[15] - clip[12];
+		frustum[1][0] = clip[3] - clip[0];
+		frustum[1][1] = clip[7] - clip[4];
+		frustum[1][2] = clip[11] - clip[8];
+		frustum[1][3] = clip[15] - clip[12];
 		NormalizePlane(1);
 
 		// This will extract the RIGHT side of the frustum.
-		m_frustum[0][0] = clip[3] + clip[0];
-		m_frustum[0][1] = clip[7] + clip[4];
-		m_frustum[0][2] = clip[11] + clip[8];
-		m_frustum[0][3] = clip[15] + clip[12];
+		frustum[0][0] = clip[3] + clip[0];
+		frustum[0][1] = clip[7] + clip[4];
+		frustum[0][2] = clip[11] + clip[8];
+		frustum[0][3] = clip[15] + clip[12];
 		NormalizePlane(0);
 
 		// This will extract the BOTTOM side of the frustum.
-		m_frustum[2][0] = clip[3] + clip[1];
-		m_frustum[2][1] = clip[7] + clip[5];
-		m_frustum[2][2] = clip[11] + clip[9];
-		m_frustum[2][3] = clip[15] + clip[13];
+		frustum[2][0] = clip[3] + clip[1];
+		frustum[2][1] = clip[7] + clip[5];
+		frustum[2][2] = clip[11] + clip[9];
+		frustum[2][3] = clip[15] + clip[13];
 		NormalizePlane(2);
 
 		// This will extract the TOP side of the frustum.
-		m_frustum[3][0] = clip[3] - clip[1];
-		m_frustum[3][1] = clip[7] - clip[5];
-		m_frustum[3][2] = clip[11] - clip[9];
-		m_frustum[3][3] = clip[15] - clip[13];
+		frustum[3][0] = clip[3] - clip[1];
+		frustum[3][1] = clip[7] - clip[5];
+		frustum[3][2] = clip[11] - clip[9];
+		frustum[3][3] = clip[15] - clip[13];
 		NormalizePlane(3);
 
 		// This will extract the BACK side of the frustum.
-		m_frustum[4][0] = clip[3] + clip[2];
-		m_frustum[4][1] = clip[7] + clip[6];
-		m_frustum[4][2] = clip[11] + clip[10];
-		m_frustum[4][3] = clip[15] + clip[14];
+		frustum[4][0] = clip[3] + clip[2];
+		frustum[4][1] = clip[7] + clip[6];
+		frustum[4][2] = clip[11] + clip[10];
+		frustum[4][3] = clip[15] + clip[14];
 		NormalizePlane(4);
 
 		// This will extract the FRONT side of the frustum.
-		m_frustum[5][0] = clip[3] - clip[2];
-		m_frustum[5][1] = clip[7] - clip[6];
-		m_frustum[5][2] = clip[11] - clip[10];
-		m_frustum[5][3] = clip[15] - clip[14];
+		frustum[5][0] = clip[3] - clip[2];
+		frustum[5][1] = clip[7] - clip[6];
+		frustum[5][2] = clip[11] - clip[10];
+		frustum[5][3] = clip[15] - clip[14];
 		NormalizePlane(5);
 	}
 
@@ -73,7 +73,7 @@ namespace TEN::Renderer
 	{
 		for (unsigned int i = 0; i < 6; i++)
 		{
-			if (m_frustum[i][0] * position.x + m_frustum[i][1] * position.y + m_frustum[i][2] * position.z + m_frustum[i][3] <= 0.0f)
+			if (frustum[i][0] * position.x + frustum[i][1] * position.y + frustum[i][2] * position.z + frustum[i][3] <= 0.0f)
 				return false;
 		}
 
@@ -84,7 +84,7 @@ namespace TEN::Renderer
 	{
 		for (unsigned int i = 0; i < 6; i++)
 		{
-			if (m_frustum[i][0] * position.x + m_frustum[i][1] * position.y + m_frustum[i][2] * position.z + m_frustum[i][3] <= -radius)
+			if (frustum[i][0] * position.x + frustum[i][1] * position.y + frustum[i][2] * position.z + frustum[i][3] <= -radius)
 				return false;
 		}
 
@@ -95,14 +95,14 @@ namespace TEN::Renderer
 	{
 		for (unsigned int i = 0; i < 6; i++)
 		{
-			if (m_frustum[i][0] * min.x + m_frustum[i][1] * min.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f &&
-				m_frustum[i][0] * max.x + m_frustum[i][1] * min.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f &&
-				m_frustum[i][0] * min.x + m_frustum[i][1] * max.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f &&
-				m_frustum[i][0] * max.x + m_frustum[i][1] * max.y + m_frustum[i][2] * min.z + m_frustum[i][3] <= 0.0f &&
-				m_frustum[i][0] * min.x + m_frustum[i][1] * min.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f &&
-				m_frustum[i][0] * max.x + m_frustum[i][1] * min.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f &&
-				m_frustum[i][0] * min.x + m_frustum[i][1] * max.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f &&
-				m_frustum[i][0] * max.x + m_frustum[i][1] * max.y + m_frustum[i][2] * max.z + m_frustum[i][3] <= 0.0f)
+			if (frustum[i][0] * min.x + frustum[i][1] * min.y + frustum[i][2] * min.z + frustum[i][3] <= 0.0f &&
+				frustum[i][0] * max.x + frustum[i][1] * min.y + frustum[i][2] * min.z + frustum[i][3] <= 0.0f &&
+				frustum[i][0] * min.x + frustum[i][1] * max.y + frustum[i][2] * min.z + frustum[i][3] <= 0.0f &&
+				frustum[i][0] * max.x + frustum[i][1] * max.y + frustum[i][2] * min.z + frustum[i][3] <= 0.0f &&
+				frustum[i][0] * min.x + frustum[i][1] * min.y + frustum[i][2] * max.z + frustum[i][3] <= 0.0f &&
+				frustum[i][0] * max.x + frustum[i][1] * min.y + frustum[i][2] * max.z + frustum[i][3] <= 0.0f &&
+				frustum[i][0] * min.x + frustum[i][1] * max.y + frustum[i][2] * max.z + frustum[i][3] <= 0.0f &&
+				frustum[i][0] * max.x + frustum[i][1] * max.y + frustum[i][2] * max.z + frustum[i][3] <= 0.0f)
 			{
 				return false;
 			}
@@ -112,10 +112,10 @@ namespace TEN::Renderer
 
 	void Frustum::NormalizePlane(int side)
 	{
-		float magnitude = sqrt(m_frustum[side][0] * m_frustum[side][0] + m_frustum[side][1] * m_frustum[side][1] + m_frustum[side][2] * m_frustum[side][2]);
-		m_frustum[side][0] /= magnitude;
-		m_frustum[side][1] /= magnitude;
-		m_frustum[side][2] /= magnitude;
-		m_frustum[side][3] /= magnitude;
+		float magnitude = sqrt(frustum[side][0] * frustum[side][0] + frustum[side][1] * frustum[side][1] + frustum[side][2] * frustum[side][2]);
+		frustum[side][0] /= magnitude;
+		frustum[side][1] /= magnitude;
+		frustum[side][2] /= magnitude;
+		frustum[side][3] /= magnitude;
 	}
 }

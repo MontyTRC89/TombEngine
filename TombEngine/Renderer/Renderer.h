@@ -18,7 +18,7 @@
 #include "Specific/fast_vector.h"
 #include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererLight.h"
-#include "RenderView/RenderView.h"
+#include "Renderer/RenderView.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
 #include "Renderer/ConstantBuffers/MiscBuffer.h"
