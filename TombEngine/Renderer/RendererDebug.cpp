@@ -41,7 +41,7 @@ namespace TEN::Renderer
 		_vsprintf_l(buffer, message, NULL, args);
 		va_end(args);
 
-		AddString(10, currentY, buffer, 0xFFFFFFFF, PRINTSTRING_OUTLINE);
+		AddString(10, currentY, buffer, 0xFFFFFFFF, (int)PrintStringFlags::Outline);
 
 		currentY += 20;
 	}

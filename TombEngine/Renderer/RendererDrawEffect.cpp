@@ -821,8 +821,8 @@ namespace TEN::Renderer
 		context->VSSetShader(vsStatics.Get(), nullptr, 0);
 		context->PSSetShader(psStatics.Get(), nullptr, 0);
 
-		BindConstantBufferVS(CB_STATIC, cbStatic.get());
-		BindConstantBufferPS(CB_STATIC, cbStatic.get());
+		BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+		BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
@@ -851,7 +851,7 @@ namespace TEN::Renderer
 		short rotationX = 0;
 
 		SetBlendMode(BLENDMODE_ADDITIVE);
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
@@ -905,7 +905,7 @@ namespace TEN::Renderer
 				if (flashBucket.Polygons.size() == 0)
 					continue;
 
-				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 				auto tMatrix = Matrix::CreateTranslation(0, length, zOffset);
 				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(rotationX));
@@ -919,8 +919,8 @@ namespace TEN::Renderer
 
 					stStatic.World = worldMatrix;
 					cbStatic.updateData(stStatic, context.Get());
-					BindConstantBufferVS(CB_STATIC, cbStatic.get());
-					BindConstantBufferPS(CB_STATIC, cbStatic.get());
+					BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+					BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 
 					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 				}
@@ -933,8 +933,8 @@ namespace TEN::Renderer
 
 					stStatic.World = worldMatrix;
 					cbStatic.updateData(stStatic, context.Get());
-					BindConstantBufferVS(CB_STATIC, cbStatic.get());
-					BindConstantBufferPS(CB_STATIC, cbStatic.get());
+					BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+					BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 
 					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 				}
@@ -950,8 +950,8 @@ namespace TEN::Renderer
 		context->VSSetShader(vsStatics.Get(), nullptr, 0);
 		context->PSSetShader(psStatics.Get(), nullptr, 0);
 
-		BindConstantBufferVS(CB_STATIC, cbStatic.get());
-		BindConstantBufferPS(CB_STATIC, cbStatic.get());
+		BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+		BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
@@ -979,7 +979,7 @@ namespace TEN::Renderer
 
 				BindStaticLights(rItemPtr->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 				SetBlendMode(BLENDMODE_ADDITIVE);
-				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 				if (creature.MuzzleFlash[0].Delay != 0 && creature.MuzzleFlash[0].Bite.BoneID != -1)
 				{
@@ -997,7 +997,7 @@ namespace TEN::Renderer
 						if (flashBucket.Polygons.size() == 0)
 							continue;
 
-						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[0].Bite.Position);
 						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
@@ -1014,8 +1014,8 @@ namespace TEN::Renderer
 
 						stStatic.World = worldMatrix;
 						cbStatic.updateData(stStatic, context.Get());
-						BindConstantBufferVS(CB_STATIC, cbStatic.get());
-						BindConstantBufferPS(CB_STATIC, cbStatic.get());
+						BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+						BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
@@ -1036,7 +1036,7 @@ namespace TEN::Renderer
 						if (flashBucket.Polygons.size() == 0)
 							continue;
 
-						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						auto tMatrix = Matrix::CreateTranslation(creature.MuzzleFlash[1].Bite.Position);
 						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
@@ -1053,8 +1053,8 @@ namespace TEN::Renderer
 
 						stStatic.World = worldMatrix;
 						cbStatic.updateData(stStatic, context.Get());
-						BindConstantBufferVS(CB_STATIC, cbStatic.get());
-						BindConstantBufferPS(CB_STATIC, cbStatic.get());
+						BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+						BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
@@ -1182,7 +1182,7 @@ namespace TEN::Renderer
 			}
 				 
 			// HACK: Prevent sprites like Explosionsmoke which have blendmode_subtractive from having laser effects.
-			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType)
+			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType != SpriteRenderType::Default)
 			{
 				// If blend mode requires sorting, save sprite for later.
 				int distance = (rDrawSprite.pos - Camera.pos.ToVector3()).Length();
@@ -1212,7 +1212,7 @@ namespace TEN::Renderer
 		     
 		spriteBuckets.push_back(currentSpriteBucket);
 
-		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &depthMap, SAMPLER_LINEAR_CLAMP);
+		BindRenderTargetAsTexture(TextureRegister::DepthMap, &depthMap, SamplerStateRegister::LinearClamp);
 
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
@@ -1254,20 +1254,20 @@ namespace TEN::Renderer
 			}
 
 			SetBlendMode(spriteBucket.BlendMode);
-			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
 			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
 			{
-				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD, true);
 			}
 			else
 			{
-				SetAlphaTest(ALPHA_TEST_NONE, 0);
+				SetAlphaTest(AlphaTestModes::None, 0);
 			}
 
 			cbInstancedSpriteBuffer.updateData(stInstancedSpriteBuffer, context.Get());
-			BindConstantBufferVS(CB_INSTANCED_SPRITES, cbInstancedSpriteBuffer.get());
-			BindConstantBufferPS(CB_INSTANCED_SPRITES, cbInstancedSpriteBuffer.get());
+			BindConstantBufferVS(ConstantBufferRegister::InstancedSprites, cbInstancedSpriteBuffer.get());
+			BindConstantBufferPS(ConstantBufferRegister::InstancedSprites, cbInstancedSpriteBuffer.get());
 
 			// Draw sprites with instancing.
 			DrawInstancedTriangles(4, (unsigned int)spriteBucket.SpritesToDraw.size(), 0);
@@ -1294,22 +1294,22 @@ namespace TEN::Renderer
 				continue;
 
 			stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
-			stSprite.RenderType = spriteBucket.RenderType;
+			stSprite.RenderType = (int)spriteBucket.RenderType;
 
 			cbSprite.updateData(stSprite, context.Get());
-			BindConstantBufferVS(CB_SPRITE, cbSprite.get());
-			BindConstantBufferPS(CB_SPRITE, cbSprite.get());
+			BindConstantBufferVS(ConstantBufferRegister::Sprite, cbSprite.get());
+			BindConstantBufferPS(ConstantBufferRegister::Sprite, cbSprite.get());
 
 			SetBlendMode(spriteBucket.BlendMode);
-			BindTexture(TEXTURE_COLOR_MAP, spriteBucket.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
 			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
 			{
-				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD, true);
+				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD, true);
 			}
 			else
 			{
-				SetAlphaTest(ALPHA_TEST_NONE, 0);
+				SetAlphaTest(AlphaTestModes::None, 0);
 			}
 
 			primitiveBatch->Begin();
@@ -1364,19 +1364,19 @@ namespace TEN::Renderer
 		if (resetPipeline)
 		{
 			stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
-			stSprite.RenderType = SpriteRenderType::Default;
+			stSprite.RenderType = (int)SpriteRenderType::Default;
 
 			cbSprite.updateData(stSprite, context.Get());
-			BindConstantBufferVS(CB_SPRITE, cbSprite.get());
-			BindConstantBufferPS(CB_SPRITE, cbSprite.get());
+			BindConstantBufferVS(ConstantBufferRegister::Sprite, cbSprite.get());
+			BindConstantBufferPS(ConstantBufferRegister::Sprite, cbSprite.get());
 		}
 
 		SetBlendMode(info->sprite->BlendMode);
 		SetCullMode(CULL_MODE_NONE);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
-		SetAlphaTest(ALPHA_TEST_NONE, 0);
+		SetAlphaTest(AlphaTestModes::None, 0);
 
-		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TextureRegister::ColorMap, info->sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
 
 		DrawTriangles((int)transparentFacesVertices.size(), 0);
 
@@ -1396,16 +1396,16 @@ namespace TEN::Renderer
 		stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		BindStaticLights(effect->LightsToDraw);
 		cbStatic.updateData(stStatic, context.Get());
-		BindConstantBufferVS(CB_STATIC, cbStatic.get());
-		BindConstantBufferPS(CB_STATIC, cbStatic.get());
+		BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+		BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 
 		if (rendererPass == RendererPass::Transparent)
 		{
-			SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+			SetAlphaTest(AlphaTestModes::None, 1.0f);
 		}
 		else
 		{
-			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+			SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
 		}
 
 		auto* meshPtr = effect->Mesh;
@@ -1422,8 +1422,8 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+			BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+			BindTexture(TextureRegister::NormalMap, &std::get<1>(moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 			SetBlendMode(m_lastBlendMode);
 			
@@ -1436,8 +1436,8 @@ namespace TEN::Renderer
 		context->VSSetShader(vsStatics.Get(), nullptr, 0);
 		context->PSSetShader(psStatics.Get(), nullptr, 0);
 
-		BindConstantBufferVS(CB_STATIC, cbStatic.get());
-		BindConstantBufferPS(CB_STATIC, cbStatic.get());
+		BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+		BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
@@ -1465,8 +1465,8 @@ namespace TEN::Renderer
 		context->VSSetShader(vsStatics.Get(), nullptr, 0);
 		context->PSSetShader(psStatics.Get(), nullptr, 0);
 
-		BindConstantBufferVS(CB_STATIC, cbStatic.get());
-		BindConstantBufferPS(CB_STATIC, cbStatic.get());
+		BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
+		BindConstantBufferPS(ConstantBufferRegister::Static, cbStatic.get());
 
 		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<Vertex> vertices;
@@ -1491,20 +1491,20 @@ namespace TEN::Renderer
 
 				if (deb->isStatic) 
 				{
-					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(staticTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(staticTextures[deb->mesh.tex]), SamplerStateRegister::LinearClamp);
 				} 
 				else 
 				{
-					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[deb->mesh.tex]), SamplerStateRegister::LinearClamp);
 				}
 
 				if (rendererPass == RendererPass::Transparent)
 				{
-					SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+					SetAlphaTest(AlphaTestModes::None, 1.0f);
 				}
 				else
 				{
-					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+					SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
 				}
 
 				stStatic.World = world;
@@ -1513,7 +1513,7 @@ namespace TEN::Renderer
 				stStatic.LightMode = deb->lightMode;
 
 				cbStatic.updateData(stStatic, context.Get());
-				BindConstantBufferVS(CB_STATIC, cbStatic.get());
+				BindConstantBufferVS(ConstantBufferRegister::Static, cbStatic.get());
 
 				Vertex vtx0;
 				vtx0.Position = deb->mesh.Positions[0];

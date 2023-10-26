@@ -303,10 +303,10 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	context->PSSetShader(psItems.Get(), nullptr, 0);
 
 	// Set texture
-	BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
-	BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
+	BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+	BindTexture(TextureRegister::NormalMap, &std::get<1>(moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 
-	SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+	SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 	RendererObject& laraObj = *moveableObjects[ID_LARA];
 	RendererObject& laraSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
@@ -323,8 +323,8 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	}
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 	cbItem.updateData(stItem, context.Get());
-	BindConstantBufferVS(CB_ITEM, cbItem.get());
-	BindConstantBufferPS(CB_ITEM, cbItem.get());
+	BindConstantBufferVS(ConstantBufferRegister::Item, cbItem.get());
+	BindConstantBufferPS(ConstantBufferRegister::Item, cbItem.get());
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
@@ -370,8 +370,8 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		}
 
 		cbItem.updateData(stItem, context.Get());
-		BindConstantBufferVS(CB_ITEM, cbItem.get());
-		BindConstantBufferPS(CB_ITEM, cbItem.get());
+		BindConstantBufferVS(ConstantBufferRegister::Item, cbItem.get());
+		BindConstantBufferPS(ConstantBufferRegister::Item, cbItem.get());
 
 		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
 		{

@@ -7,7 +7,7 @@ namespace TEN::Renderer
 {
 	void Renderer::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page)
 	{
-		constexpr auto FLAGS = PRINTSTRING_OUTLINE | PRINTSTRING_CENTER;
+		constexpr auto FLAGS = (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center;
 
 		if (DebugPage != page)
 			return;
@@ -55,11 +55,11 @@ namespace TEN::Renderer
 
 				// Measure string.
 				auto size = Vector2(gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
-				if (flags & PRINTSTRING_CENTER)
+				if (flags & (int)PrintStringFlags::Center)
 				{
 					rString.X = (pos.x * factor.x) - (size.x / 2.0f);
 				}
-				else if (flags & PRINTSTRING_RIGHT)
+				else if (flags & (int)PrintStringFlags::Right)
 				{
 					rString.X = (pos.x * factor.x) - size.x;
 				}
@@ -70,7 +70,7 @@ namespace TEN::Renderer
 
 				rString.Y = (pos.y * uiScale) + yOffset;
 
-				if (flags & PRINTSTRING_BLINK)
+				if (flags & (int)PrintStringFlags::Blink)
 				{
 					rString.Color *= blinkColorValue;
 
@@ -107,7 +107,7 @@ namespace TEN::Renderer
 		for (const auto& rString : stringsToDraw)
 		{
 			// Draw shadow.
-			if (rString.Flags & PRINTSTRING_OUTLINE)
+			if (rString.Flags & (int)PrintStringFlags::Outline)
 			{
 				gameFont->DrawString(
 					spriteBatch.get(), rString.String.c_str(),

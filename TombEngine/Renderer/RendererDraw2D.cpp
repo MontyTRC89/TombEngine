@@ -132,16 +132,16 @@ namespace TEN::Renderer
 		SetDepthState(DEPTH_STATE_NONE);
 		SetCullMode(CULL_MODE_NONE);
 
-		BindConstantBufferVS(CB_HUD, cbHUD.get());
+		BindConstantBufferVS(ConstantBufferRegister::HUD, cbHUD.get());
 
 		RendererSprite* borderSprite = &sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
 		stHUDBar.BarStartUV = borderSprite->UV[0];
 		stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);
 		cbHUDBar.updateData(stHUDBar, context.Get());
-		BindConstantBufferVS(CB_HUD_BAR, cbHUDBar.get());
-		BindConstantBufferPS(CB_HUD_BAR, cbHUDBar.get());
+		BindConstantBufferVS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
+		BindConstantBufferPS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
 		 
-		BindTexture(TEXTURE_HUD, borderSprite->Texture, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TextureRegister::Hud, borderSprite->Texture, SamplerStateRegister::LinearClamp);
 
 		DrawIndexedTriangles(56, 0, 0);
 
@@ -165,10 +165,10 @@ namespace TEN::Renderer
 		stHUDBar.BarScale = Vector2(innerSprite->Width / (float)innerSprite->Texture->Width, innerSprite->Height / (float)innerSprite->Texture->Height);
 		cbHUDBar.updateData(stHUDBar, context.Get());
 
-		BindConstantBufferVS(CB_HUD_BAR, cbHUDBar.get());
-		BindConstantBufferPS(CB_HUD_BAR, cbHUDBar.get());
+		BindConstantBufferVS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
+		BindConstantBufferPS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
 		 
-		BindTexture(TEXTURE_HUD, innerSprite->Texture, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TextureRegister::Hud, innerSprite->Texture, SamplerStateRegister::LinearClamp);
 
 		DrawIndexedTriangles(12, 0, 0);
 	}
@@ -192,14 +192,14 @@ namespace TEN::Renderer
 		SetDepthState(DEPTH_STATE_NONE);
 		SetCullMode(CULL_MODE_NONE);
 
-		BindConstantBufferVS(CB_HUD, cbHUD.get());
-		BindTexture(TEXTURE_HUD, &loadingBarBorder, SAMPLER_LINEAR_CLAMP);
+		BindConstantBufferVS(ConstantBufferRegister::HUD, cbHUD.get());
+		BindTexture(TextureRegister::Hud, &loadingBarBorder, SamplerStateRegister::LinearClamp);
 
 		stHUDBar.BarStartUV = Vector2::Zero;
 		stHUDBar.BarScale = Vector2::One;
 		cbHUDBar.updateData(stHUDBar, context.Get());
-		BindConstantBufferVS(CB_HUD_BAR, cbHUDBar.get());
-		BindConstantBufferPS(CB_HUD_BAR, cbHUDBar.get());
+		BindConstantBufferVS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
+		BindConstantBufferPS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
 
 		DrawIndexedTriangles(56, 0, 0);
 
@@ -217,10 +217,10 @@ namespace TEN::Renderer
 		stHUDBar.Poisoned = false;
 		stHUDBar.Frame = 0;
 		cbHUDBar.updateData(stHUDBar, context.Get());
-		BindConstantBufferVS(CB_HUD_BAR, cbHUDBar.get());
-		BindConstantBufferPS(CB_HUD_BAR, cbHUDBar.get());
+		BindConstantBufferVS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
+		BindConstantBufferPS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
 
-		BindTexture(TEXTURE_HUD, &loadingBarInner, SAMPLER_LINEAR_CLAMP);
+		BindTexture(TextureRegister::Hud, &loadingBarInner, SamplerStateRegister::LinearClamp);
 
 		DrawIndexedTriangles(12, 0, 0);
 	}
@@ -358,9 +358,9 @@ namespace TEN::Renderer
 		stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
 		stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
 		cbPostProcessBuffer.updateData(stPostProcessBuffer, context.Get());
-		BindConstantBufferPS(CB_POSTPROCESS, cbPostProcessBuffer.get());
+		BindConstantBufferPS(ConstantBufferRegister::PostProcess, cbPostProcessBuffer.get());
 
-		BindTexture(TEXTURE_COLOR_MAP, &renderTarget, SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TextureRegister::ColorMap, &renderTarget, SamplerStateRegister::AnisotropicClamp);
 
 		primitiveBatch->Begin();
 		primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
@@ -401,7 +401,7 @@ namespace TEN::Renderer
 			{
 				primitiveBatch->Begin();
 
-				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TextureRegister::ColorMap, spriteToDraw.SpritePtr->Texture, SamplerStateRegister::AnisotropicClamp);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
 			else if (texture2DPtr != spriteToDraw.SpritePtr->Texture || lastBlendMode != spriteToDraw.BlendMode)
@@ -409,7 +409,7 @@ namespace TEN::Renderer
 				primitiveBatch->End();
 				primitiveBatch->Begin();
 
-				BindTexture(TEXTURE_COLOR_MAP, spriteToDraw.SpritePtr->Texture, SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TextureRegister::ColorMap, spriteToDraw.SpritePtr->Texture, SamplerStateRegister::AnisotropicClamp);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
 

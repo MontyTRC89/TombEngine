@@ -63,8 +63,8 @@ namespace TEN::Renderer
 	inline void GetNextBlockPosition(int* value) { *value += MenuVerticalBlockSpacing; }
 
 	// Helper functions to construct string flags
-	inline int SF(bool selected = false) { return PRINTSTRING_OUTLINE | (selected ? PRINTSTRING_BLINK : 0); }
-	inline int SF_Center(bool selected = false) { return PRINTSTRING_OUTLINE | PRINTSTRING_CENTER | (selected ? PRINTSTRING_BLINK : 0); }
+	inline int SF(bool selected = false) { return (int)PrintStringFlags::Outline | (selected ? (int)PrintStringFlags::Blink : 0); }
+	inline int SF_Center(bool selected = false) { return (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center | (selected ? (int)PrintStringFlags::Blink : 0); }
 	
 	// Helper functions to get specific generic strings
 	inline const char* Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
@@ -787,7 +787,7 @@ namespace TEN::Renderer
 		hudCamera.CamDirectionWS = -Vector4::UnitZ;
 		hudCamera.ViewProjection = viewMatrix * projMatrix;
 		cbCameraMatrices.updateData(hudCamera, context.Get());
-		BindConstantBufferVS(CB_CAMERA, cbCameraMatrices.get());
+		BindConstantBufferVS(ConstantBufferRegister::Camera, cbCameraMatrices.get());
 
 		for (int n = 0; n < (*moveableObject).ObjectMeshes.size(); n++)
 		{
@@ -816,8 +816,8 @@ namespace TEN::Renderer
 			stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
 
 			cbItem.updateData(stItem, context.Get());
-			BindConstantBufferVS(CB_ITEM, cbItem.get());
-			BindConstantBufferPS(CB_ITEM, cbItem.get());
+			BindConstantBufferVS(ConstantBufferRegister::Item, cbItem.get());
+			BindConstantBufferPS(ConstantBufferRegister::Item, cbItem.get());
 			
 			for (const auto& bucket : mesh->Buckets)
 			{
@@ -828,14 +828,14 @@ namespace TEN::Renderer
 				SetCullMode(CULL_MODE_CCW);
 				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 
-				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+				BindTexture(TextureRegister::NormalMap, &std::get<1>(moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 				
 				 if (bucket.BlendMode != BLENDMODE_OPAQUE)
 					Renderer::SetBlendMode(bucket.BlendMode, true);
 				
 				SetAlphaTest(
-					(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+					(bucket.BlendMode == BLENDMODE_ALPHATEST) ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
 					ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -971,8 +971,8 @@ namespace TEN::Renderer
 		context->PSSetShader(psInventory.Get(), nullptr, 0);
 
 		// Set texture
-		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
-		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
+		BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+		BindTexture(TextureRegister::NormalMap, &std::get<1>(moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 
 		if (CurrentLevel == 0)
 		{

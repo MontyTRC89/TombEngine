@@ -117,16 +117,16 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 				int flags = 0;
 
 				if (str.m_flags[(size_t)DisplayStringOptions::Center])
-					flags |= PRINTSTRING_CENTER;
+					flags |= (int)PrintStringFlags::Center;
 
 				if (str.m_flags[(size_t)DisplayStringOptions::Right])
-					flags |= PRINTSTRING_RIGHT;
+					flags |= (int)PrintStringFlags::Right;
 
 				if (str.m_flags[(size_t)DisplayStringOptions::Outline])
-					flags |= PRINTSTRING_OUTLINE;
+					flags |= (int)PrintStringFlags::Outline;
 
 				if (str.m_flags[(size_t)DisplayStringOptions::Blink])
-					flags |= PRINTSTRING_BLINK;
+					flags |= (int)PrintStringFlags::Blink;
 
 				m_callbackDrawSring(cstr, str.m_color, str.m_x, str.m_y, flags);
 

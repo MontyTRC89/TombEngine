@@ -137,72 +137,61 @@ enum RendererTransparentFaceType
 	TRANSPARENT_FACE_NONE
 };
 
-enum ConstantBufferRegister
+enum class TextureRegister
 {
-	CameraBuffer = 0,
-	ItemBuffer = 1,
-	LightBuffer = 2,
-	MiscBuffer = 3,
-	ShadowLightBuffer = 4,
-	RoomBuffer = 5,
-	AnimatedTexturesBuffer = 6
+	ColorMap = 0,
+	NormalMap = 1,
+	CausticsMap = 2,
+	ShadowMap = 3,
+	ReflectionMap = 4,
+	Hud = 5,
+	DepthMap = 6
 };
 
-enum TEXTURE_REGISTERS
+enum class SamplerStateRegister
 {
-	TEXTURE_COLOR_MAP = 0,
-	TEXTURE_NORMAL_MAP = 1,
-	TEXTURE_CAUSTICS = 2,
-	TEXTURE_SHADOW_MAP = 3,
-	TEXTURE_REFLECTION_MAP = 4,
-	TEXTURE_HUD = 5,
-	TEXTURE_DEPTH_MAP = 6
+	None = 0,
+	PointWrap = 1,
+	LinearWrap = 2,
+	LinearClamp = 3,
+	AnisotropicWrap = 4,
+	AnisotropicClamp = 5,
+	ShadowMap = 6
 };
 
-enum SAMPLER_STATES
+enum class ConstantBufferRegister
 {
-	SAMPLER_NONE = 0,
-	SAMPLER_POINT_WRAP = 1,
-	SAMPLER_LINEAR_WRAP = 2,
-	SAMPLER_LINEAR_CLAMP = 3,
-	SAMPLER_ANISOTROPIC_WRAP = 4,
-	SAMPLER_ANISOTROPIC_CLAMP = 5,
-	SAMPLER_SHADOW_MAP = 6
+	Camera = 0,
+	Item = 1,
+	InstancedStatics = 3,
+	ShadowLight = 4,
+	Room = 5,
+	AnimatedTextures = 6,
+	PostProcess = 7,
+	Static = 8,
+	Sprite = 9,
+	HUD = 10,
+	HUD_BAR = 11,
+	Blending = 12,
+	InstancedSprites = 13
 };
 
-enum CONSTANT_BUFFERS
+enum class AlphaTestModes
 {
-	CB_CAMERA = 0,
-	CB_ITEM = 1,
-	CB_INSTANCED_STATICS = 3,
-	CB_SHADOW_LIGHT = 4,
-	CB_ROOM = 5,
-	CB_ANIMATED_TEXTURES = 6,
-	CB_POSTPROCESS = 7,
-	CB_STATIC = 8,
-	CB_SPRITE = 9,
-	CB_HUD = 10,
-	CB_HUD_BAR = 11,
-	CB_BLENDING = 12,
-	CB_INSTANCED_SPRITES = 13
+	None = 0,
+	GreatherThan = 1,
+	LessThan = 2
 };
 
-enum ALPHA_TEST_MODES 
+enum class PrintStringFlags
 {
-	ALPHA_TEST_NONE = 0,
-	ALPHA_TEST_GREATER_THAN = 1,
-	ALPHA_TEST_LESS_THAN = 2
+	Center	= (1 << 0),
+	Blink	= (1 << 1),
+	Right	= (1 << 2),
+	Outline	= (1 << 3)
 };
 
-enum PrintStringFlags
-{
-	PRINTSTRING_CENTER	= (1 << 0),
-	PRINTSTRING_BLINK	= (1 << 1),
-	PRINTSTRING_RIGHT	= (1 << 2),
-	PRINTSTRING_OUTLINE	= (1 << 3)
-};
-
-enum RendererPass
+enum class RendererPass
 {
 	ShadowMap,
 	Opaque,
@@ -210,7 +199,7 @@ enum RendererPass
 	CollectSortedFaces
 };
 
-enum SpriteRenderType
+enum class SpriteRenderType
 {
 	Default,
 	LaserBarrier

@@ -274,39 +274,39 @@ namespace TEN::Renderer
 		return fps;
 	}
 
-	void Renderer::BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType)
+	void Renderer::BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType)
 	{
 		context->PSSetShaderResources((UINT)registerType, 1, texture->ShaderResourceView.GetAddressOf());
 
-		if (g_GameFlow->IsPointFilterEnabled() && samplerType != SAMPLER_SHADOW_MAP)
+		if (g_GameFlow->IsPointFilterEnabled() && samplerType != SamplerStateRegister::ShadowMap)
 		{
-			samplerType = SAMPLER_POINT_WRAP;
+			samplerType = SamplerStateRegister::PointWrap;
 		}
 
 		ID3D11SamplerState* samplerState = nullptr;
-		switch (samplerType)  
+		switch (samplerType)
 		{
-		case SAMPLER_ANISOTROPIC_CLAMP:
+		case SamplerStateRegister::AnisotropicClamp:
 			samplerState = renderStates->AnisotropicClamp();
 			break;
 
-		case SAMPLER_ANISOTROPIC_WRAP:
+		case SamplerStateRegister::AnisotropicWrap:
 			samplerState = renderStates->AnisotropicWrap();
 			break;
 
-		case SAMPLER_LINEAR_CLAMP:
+		case SamplerStateRegister::LinearClamp:
 			samplerState = renderStates->LinearClamp();
 			break;
 
-		case SAMPLER_LINEAR_WRAP:
+		case SamplerStateRegister::LinearWrap:
 			samplerState = renderStates->LinearWrap();
 			break;
 
-		case SAMPLER_POINT_WRAP:
+		case SamplerStateRegister::PointWrap:
 			samplerState = renderStates->PointWrap();
 			break;
 
-		case SAMPLER_SHADOW_MAP:
+		case SamplerStateRegister::ShadowMap:
 			samplerState = m_shadowSampler.Get();
 			break;
 
@@ -314,37 +314,37 @@ namespace TEN::Renderer
 			return;
 		}
 
-		context->PSSetSamplers(registerType, 1, &samplerState);
+		context->PSSetSamplers((UINT)registerType, 1, &samplerState);
 	}
 
-	void Renderer::BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType)
+	void Renderer::BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType)
 	{
 		context->PSSetShaderResources((UINT)registerType, 1, target->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
 		switch (samplerType)
 		{
-		case SAMPLER_ANISOTROPIC_CLAMP:
+		case SamplerStateRegister::AnisotropicClamp:
 			samplerState = renderStates->AnisotropicClamp();
 			break;
 
-		case SAMPLER_ANISOTROPIC_WRAP:
+		case SamplerStateRegister::AnisotropicWrap:
 			samplerState = renderStates->AnisotropicWrap();
 			break;
 
-		case SAMPLER_LINEAR_CLAMP:
+		case SamplerStateRegister::LinearClamp:
 			samplerState = renderStates->LinearClamp();
 			break;
 
-		case SAMPLER_LINEAR_WRAP:
+		case SamplerStateRegister::LinearWrap:
 			samplerState = renderStates->LinearWrap();
 			break;
 
-		case SAMPLER_POINT_WRAP:
+		case SamplerStateRegister::PointWrap:
 			samplerState = renderStates->PointWrap();
 			break;
 
-		case SAMPLER_SHADOW_MAP:
+		case SamplerStateRegister::ShadowMap:
 			samplerState = m_shadowSampler.Get();
 			break;
 
@@ -352,7 +352,7 @@ namespace TEN::Renderer
 			return;
 		}
 
-		context->PSSetSamplers(registerType, 1, &samplerState);
+		context->PSSetSamplers((UINT)registerType, 1, &samplerState);
 	}
 
 	void Renderer::BindRoomLights(std::vector<RendererLight*>& lights)
@@ -408,12 +408,12 @@ namespace TEN::Renderer
 		stItem.NumLights = numLights;
 	}
 
-	void Renderer::BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
+	void Renderer::BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer)
 	{
 		context->VSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
 	}
 
-	void Renderer::BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
+	void Renderer::BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer)
 	{
 		context->PSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
 	}
@@ -459,7 +459,7 @@ namespace TEN::Renderer
 
 			stBlending.BlendMode = static_cast<unsigned int>(blendMode);
 			cbBlending.updateData(stBlending, context.Get());
-			BindConstantBufferPS(CB_BLENDING, cbBlending.get());
+			BindConstantBufferPS(ConstantBufferRegister::Blending, cbBlending.get());
 
 			lastBlendMode = blendMode;
 		}
@@ -530,7 +530,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force)
+	void Renderer::SetAlphaTest(AlphaTestModes mode, float threshold, bool force)
 	{
 		if (stBlending.AlphaTest != (int)mode ||
 			stBlending.AlphaThreshold != threshold ||
@@ -539,7 +539,7 @@ namespace TEN::Renderer
 			stBlending.AlphaTest = (int)mode;
 			stBlending.AlphaThreshold = threshold;
 			cbBlending.updateData(stBlending, context.Get());
-			BindConstantBufferPS(CB_BLENDING, cbBlending.get());
+			BindConstantBufferPS(ConstantBufferRegister::Blending, cbBlending.get());
 		}
 	}
 

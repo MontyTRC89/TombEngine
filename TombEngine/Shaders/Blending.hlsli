@@ -3,9 +3,9 @@
 
 #include "./Math.hlsli"
 
-#define ALPHA_TEST_NONE			0
-#define ALPHA_TEST_GREATER_THAN 1
-#define ALPHA_TEST_LESS_THAN	2
+#define AlphaTestModes::None			0
+#define AlphaTestModes::GreatherThan 1
+#define AlphaTestModes::LessThan	2
 
 #define BLENDMODE_OPAQUE	  0,
 #define BLENDMODE_ALPHATEST	  1
@@ -31,11 +31,11 @@ cbuffer BlendingBuffer : register(b12)
 
 void DoAlphaTest(float4 inputColor)
 {
-	if (AlphaTest == ALPHA_TEST_GREATER_THAN && inputColor.w < AlphaThreshold)
+	if (AlphaTest == AlphaTestModes::GreatherThan && inputColor.w < AlphaThreshold)
 	{
 		discard;
 	}
-	else if (AlphaTest == ALPHA_TEST_LESS_THAN && inputColor.w > AlphaThreshold)
+	else if (AlphaTest == AlphaTestModes::LessThan && inputColor.w > AlphaThreshold)
 	{
 		discard;
 	}
