@@ -109,7 +109,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
 		smoke.on = true;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 
 		smoke.x = effectPos.x;
 		smoke.y = effectPos.y;

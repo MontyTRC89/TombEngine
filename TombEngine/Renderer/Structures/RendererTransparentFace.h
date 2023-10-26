@@ -29,12 +29,12 @@ namespace TEN::Renderer::Structures
 		int bone;
 		bool animated;
 		bool doubleSided;
-		BLEND_MODES blendMode;
+		BlendMode blendMode;
 	};
 
 	struct RendererTransparentFace
 	{
-		RendererTransparentFaceType type;
+		TransparentFaceType type;
 		int distance;
 		RendererTransparentFaceInfo info;
 

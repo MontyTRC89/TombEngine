@@ -824,18 +824,18 @@ namespace TEN::Renderer
 				if (bucket.NumVertices == 0)
 					continue;
 
-				SetBlendMode(BLENDMODE_OPAQUE);
+				SetBlendMode(BlendMode::Opaque);
 				SetCullMode(CULL_MODE_CCW);
 				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 				BindTexture(TextureRegister::NormalMap, &std::get<1>(moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 				
-				 if (bucket.BlendMode != BLENDMODE_OPAQUE)
+				 if (bucket.BlendMode != BlendMode::Opaque)
 					Renderer::SetBlendMode(bucket.BlendMode, true);
 				
 				SetAlphaTest(
-					(bucket.BlendMode == BLENDMODE_ALPHATEST) ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
+					(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
 					ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -943,7 +943,7 @@ namespace TEN::Renderer
 	void Renderer::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
 	{
 		// Set basic render states
-		SetBlendMode(BLENDMODE_OPAQUE, true);
+		SetBlendMode(BlendMode::Opaque, true);
 		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
 		SetCullMode(CULL_MODE_CCW, true);
 
@@ -1042,7 +1042,7 @@ namespace TEN::Renderer
 	void Renderer::RenderLoadingScreen(float percentage)
 	{
 		// Set basic render states
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CULL_MODE_CCW);
 
 		do

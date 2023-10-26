@@ -20,7 +20,7 @@ namespace TEN::Renderer
 {
 	bool Renderer::PrepareDataForTheRenderer()
 	{
-		lastBlendMode = BLENDMODE_UNSET;
+		lastBlendMode = BlendMode::Unknown;
 		lastCullMode = CULL_MODE_UNSET;
 		lastDepthState = DEPTH_STATE_UNSET;
 
@@ -277,7 +277,7 @@ namespace TEN::Renderer
 				RendererBucket bucket{};
 
 				bucket.Animated = levelBucket.animated;
-				bucket.BlendMode = static_cast<BLEND_MODES>(levelBucket.blendMode);
+				bucket.BlendMode = static_cast<BlendMode>(levelBucket.blendMode);
 				bucket.Texture = levelBucket.texture;
 				bucket.StartVertex = lastVertex;
 				bucket.StartIndex = lastIndex;
@@ -903,7 +903,7 @@ namespace TEN::Renderer
 			RendererBucket bucket{};
 			bucket.Animated = levelBucket->animated;
 			bucket.Texture = levelBucket->texture;
-			bucket.BlendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);
+			bucket.BlendMode = static_cast<BlendMode>(levelBucket->blendMode);
 			bucket.StartVertex = *lastVertex;
 			bucket.StartIndex = *lastIndex;
 			bucket.NumVertices = levelBucket->numQuads * 4 + levelBucket->numTriangles * 3;

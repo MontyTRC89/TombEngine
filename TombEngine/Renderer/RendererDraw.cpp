@@ -138,7 +138,7 @@ namespace TEN::Renderer
 			return; 
 
 		// Reset GPU state
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CULL_MODE_CCW);
 
 		int steps = shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
@@ -224,7 +224,7 @@ namespace TEN::Renderer
 					if (bucket.NumVertices == 0)
 						continue;
 
-					if (bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE && bucket.BlendMode != BLEND_MODES::BLENDMODE_ALPHATEST)
+					if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
 						continue;
 
 					// Draw vertices
@@ -307,7 +307,7 @@ namespace TEN::Renderer
 
 			for (auto& bucket : mesh->Buckets)
 			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+				if (bucket.NumVertices == 0 && bucket.BlendMode == BlendMode::Opaque)
 				{
 					continue;
 				}
@@ -366,7 +366,7 @@ namespace TEN::Renderer
 					1.0f,
 					{ 32,
 					Vector3::Distance(pos1, pos2) },
-					BLENDMODE_ALPHABLEND,
+					BlendMode::AlphaBlend,
 					d, false, view);
 			}
 		}
@@ -374,7 +374,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawLinesIn2DSpace()
 	{
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
 		SetCullMode(CULL_MODE_NONE);
 
@@ -412,7 +412,7 @@ namespace TEN::Renderer
 
 		primitiveBatch->End();
 
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CULL_MODE_CCW);
 	}
 
@@ -451,9 +451,9 @@ namespace TEN::Renderer
 			effect->SetInt(effect->GetParameterByName(nullptr, "ModelType"), MODEL_TYPE_MOVEABLE);
 
 			if (bucketIndex == RENDERER_BUCKET_SOLID || bucketIndex == RENDERER_BUCKET_SOLID_DS)
-				effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BLENDMODE_OPAQUE);
+				effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BlendMode::Opaque);
 			else
-				effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BLENDMODE_ALPHATEST);
+				effect->SetInt(effect->GetParameterByName(nullptr, "BlendMode"), BlendMode::AlphaTest);
 
 			for (int i = 0; i < NUM_SPIDERS; i++)
 			{
@@ -589,7 +589,7 @@ namespace TEN::Renderer
 
 			for (auto& bucket : mesh->Buckets)
 			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+				if (bucket.NumVertices == 0 && bucket.BlendMode == BlendMode::Opaque)
 				{
 					continue;
 				}
@@ -657,7 +657,7 @@ namespace TEN::Renderer
 
 			for (const auto& bucket : mesh.Buckets)
 			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+				if (bucket.NumVertices == 0 && bucket.BlendMode == BlendMode::Opaque)
 					continue;
 
 				SetBlendMode(bucket.BlendMode);
@@ -727,7 +727,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawLines3D(RenderView& view)
 	{
-		SetBlendMode(BLENDMODE_ADDITIVE);
+		SetBlendMode(BlendMode::Additive);
 		SetCullMode(CULL_MODE_NONE);
 
 		context->VSSetShader(vsSolid.Get(), nullptr, 0);
@@ -754,7 +754,7 @@ namespace TEN::Renderer
 
 		primitiveBatch->End();
 
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CULL_MODE_CCW);
 	}
 
@@ -1070,7 +1070,7 @@ namespace TEN::Renderer
 					else
 					{
 						// If same type, check additional conditions
-						if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM &&
+						if (face->type == TransparentFaceType::Room &&
 							(oldFace->info.room != face->info.room
 								|| oldFace->info.texture != face->info.texture
 								|| oldFace->info.animated != face->info.animated
@@ -1080,7 +1080,7 @@ namespace TEN::Renderer
 							outputPolygons = true;
 							resetPipeline = oldFace->info.room != face->info.room;
 						}
-						else if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE &&
+						else if (oldFace->type == TransparentFaceType::Moveable &&
 							(oldFace->info.blendMode != face->info.blendMode
 								|| oldFace->info.item->ItemNumber != face->info.item->ItemNumber
 								|| transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
@@ -1088,7 +1088,7 @@ namespace TEN::Renderer
 							outputPolygons = true;
 							resetPipeline = oldFace->info.item->ItemNumber != face->info.item->ItemNumber;
 						}
-						else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC &&
+						else if (face->type == TransparentFaceType::Static &&
 							(oldFace->info.blendMode != face->info.blendMode
 								|| oldFace->info.staticMesh->IndexInRoom != face->info.staticMesh->IndexInRoom
 								|| oldFace->info.staticMesh->RoomNumber != face->info.staticMesh->RoomNumber
@@ -1097,7 +1097,7 @@ namespace TEN::Renderer
 							outputPolygons = true;
 							resetPipeline = oldFace->info.staticMesh != face->info.staticMesh;
 						}
-						else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE &&
+						else if (face->type == TransparentFaceType::Sprite &&
 							(oldFace->info.blendMode != face->info.blendMode
 								|| oldFace->info.sprite->SoftParticle != face->info.sprite->SoftParticle
 								|| oldFace->info.sprite->Sprite->Texture != face->info.sprite->Sprite->Texture
@@ -1110,19 +1110,19 @@ namespace TEN::Renderer
 
 					if (outputPolygons)
 					{
-						if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
+						if (oldFace->type == TransparentFaceType::Room)
 						{
 							DrawRoomsSorted(&oldFace->info, resetPipeline, view);
 						}
-						else if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
+						else if (oldFace->type == TransparentFaceType::Moveable)
 						{
 							DrawItemsSorted(&oldFace->info, resetPipeline, view);
 						}
-						else if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
+						else if (oldFace->type == TransparentFaceType::Static)
 						{
 							DrawStaticsSorted(&oldFace->info, resetPipeline, view);
 						}
-						else if (oldFace->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
+						else if (oldFace->type == TransparentFaceType::Sprite)
 						{
 							DrawSpritesSorted(&oldFace->info, resetPipeline, view);
 						}
@@ -1138,25 +1138,25 @@ namespace TEN::Renderer
 				}
 
 				// Accumulate vertices in the buffer
-				if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
+				if (face->type == TransparentFaceType::Room)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
 					transparentFacesIndices.bulk_push_back(roomsIndices.data(), face->info.polygon->BaseIndex, numIndices);
 				}
-				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
+				else if (face->type == TransparentFaceType::Moveable)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
 					transparentFacesIndices.bulk_push_back(moveablesIndices.data(), face->info.polygon->BaseIndex, numIndices);
 				}
-				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
+				else if (face->type == TransparentFaceType::Static)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
 					transparentFacesIndices.bulk_push_back(staticsIndices.data(), face->info.polygon->BaseIndex, numIndices);
 				}
-				else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
+				else if (face->type == TransparentFaceType::Sprite)
 				{
 					// For sprites, we need to compute the corners of the quad and multiply 
 					// by the world matrix that can be an identity (for 3D sprites) or 
@@ -1231,19 +1231,19 @@ namespace TEN::Renderer
 
 				if (f == room.TransparentFacesToDraw.size() - 1)
 				{
-					if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_ROOM)
+					if (face->type == TransparentFaceType::Room)
 					{
 						DrawRoomsSorted(&face->info, true, view);
 					}
-					else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
+					else if (face->type == TransparentFaceType::Moveable)
 					{
 						DrawItemsSorted(&face->info, true, view);
 					}
-					else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
+					else if (face->type == TransparentFaceType::Static)
 					{
 						DrawStaticsSorted(&face->info, true, view);
 					}
-					else if (face->type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
+					else if (face->type == TransparentFaceType::Sprite)
 					{
 						DrawSpritesSorted(&face->info, true, view);
 					}
@@ -1439,7 +1439,7 @@ namespace TEN::Renderer
 		time1 = time2;
 
 		// Reset GPU state.
-		SetBlendMode(BLENDMODE_OPAQUE, true);
+		SetBlendMode(BlendMode::Opaque, true);
 		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
 		SetCullMode(CULL_MODE_CCW, true);
 
@@ -1589,7 +1589,7 @@ namespace TEN::Renderer
 		// Draw shadow map
 
 		// Reset GPU state
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CULL_MODE_CCW);
 
 		// Bind and clear render target
@@ -1602,7 +1602,7 @@ namespace TEN::Renderer
 		ResetScissor();
 
 		// Opaque geometry
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CULL_MODE_CCW);
 
 		CCameraMatrixBuffer cameraConstantBuffer;
@@ -1878,7 +1878,7 @@ namespace TEN::Renderer
 
 					for (auto& bucket : refMesh->Buckets)
 					{
-						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+						if (!((bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest) ^
 							(rendererPass == RendererPass::Transparent)))
 						{
 							continue;
@@ -1893,7 +1893,7 @@ namespace TEN::Renderer
 						{
 							cbInstancedStaticMeshBuffer.updateData(stInstancedStaticMeshBuffer, context.Get());
 
-							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+							int passes = bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 							for (int pass = 0; pass < passes; pass++)
 							{
@@ -1901,12 +1901,12 @@ namespace TEN::Renderer
 								{
 									SetBlendMode(bucket.BlendMode);
 									SetAlphaTest(
-										(bucket.BlendMode == BLENDMODE_ALPHATEST) ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
+										(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
 										ALPHA_TEST_THRESHOLD);
 								}
 								else
 								{
-									SetBlendMode(BLENDMODE_ALPHABLEND);
+									SetBlendMode(BlendMode::AlphaBlend);
 									SetAlphaTest(AlphaTestModes::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
 								}
 
@@ -1960,7 +1960,7 @@ namespace TEN::Renderer
 									float distance = (centre - cameraPosition).Length();
 
 									RendererTransparentFace face;
-									face.type = RendererTransparentFaceType::TRANSPARENT_FACE_STATIC;
+									face.type = TransparentFaceType::Static;
 									face.info.polygon = p;
 									face.distance = distance;
 									face.info.animated = bucket.Animated;
@@ -2091,7 +2091,7 @@ namespace TEN::Renderer
 								int distance = std::max(std::max(std::max(d1, d2), d3), d4);
 
 								RendererTransparentFace face;
-								face.type = RendererTransparentFaceType::TRANSPARENT_FACE_ROOM;
+								face.type = TransparentFaceType::Room;
 								face.info.polygon = p;
 								face.distance = distance;
 								face.info.animated = bucket.Animated;
@@ -2105,13 +2105,13 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+						if (!((bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest) ^
 							(rendererPass == RendererPass::Transparent)))
 						{
 							continue;
 						}
 
-						int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+						int passes = bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 						for (int pass = 0; pass < passes; pass++)
 						{
@@ -2119,13 +2119,13 @@ namespace TEN::Renderer
 							{
 								SetBlendMode(bucket.BlendMode);
 								SetAlphaTest(
-									bucket.BlendMode == BLENDMODE_ALPHATEST ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
+									bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
 									FAST_ALPHA_BLEND_THRESHOLD
 								);
 							}
 							else
 							{
-								SetBlendMode(BLENDMODE_ALPHABLEND);
+								SetBlendMode(BlendMode::AlphaBlend);
 								SetAlphaTest(AlphaTestModes::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
 							}
 
@@ -2215,7 +2215,7 @@ namespace TEN::Renderer
 		context->IASetInputLayout(inputLayout.Get());
 		context->IASetIndexBuffer(skyIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		SetBlendMode(BLENDMODE_ADDITIVE);
+		SetBlendMode(BlendMode::Additive);
 
 		for (int s = 0; s < 2; s++)
 		{
@@ -2274,7 +2274,7 @@ namespace TEN::Renderer
 						SamplerStateRegister::AnisotropicClamp);
 
 					// Always render horizon as alpha-blended surface.
-					SetBlendMode(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? BLEND_MODES::BLENDMODE_ALPHABLEND : bucket.BlendMode);
+					SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
 					SetAlphaTest(AlphaTestModes::None, ALPHA_TEST_THRESHOLD);
 
 					// Draw vertices.
@@ -2308,7 +2308,7 @@ namespace TEN::Renderer
 
 			if (rendererPass == RendererPass::ShadowMap)
 			{
-				SetBlendMode(BLENDMODE_OPAQUE);
+				SetBlendMode(BlendMode::Opaque);
 				SetAlphaTest(AlphaTestModes::None, ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -2330,7 +2330,7 @@ namespace TEN::Renderer
 						int distance = (centre - cameraPos).Length();
 
 						RendererTransparentFace face;
-						face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
+						face.type = TransparentFaceType::Moveable;
 						face.info.polygon = polygonPtr;
 						face.distance = distance;
 						face.info.animated = bucket.Animated;
@@ -2346,13 +2346,13 @@ namespace TEN::Renderer
 			}
 			else
 			{
-				if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+				if (!((bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest) ^
 					(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
 				{
 					continue;
 				}
 
-				int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+				int passes = bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[bucket.Texture]),
 							SamplerStateRegister::AnisotropicClamp);
@@ -2365,12 +2365,12 @@ namespace TEN::Renderer
 					{
 						SetBlendMode(bucket.BlendMode);
 						SetAlphaTest(
-							bucket.BlendMode == BLENDMODE_ALPHATEST ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
+							bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestModes::GreatherThan : AlphaTestModes::None,
 							ALPHA_TEST_THRESHOLD);
 					}
 					else
 					{
-						SetBlendMode(BLENDMODE_ALPHABLEND);
+						SetBlendMode(BlendMode::AlphaBlend);
 						SetAlphaTest(AlphaTestModes::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
 					}
 

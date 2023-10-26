@@ -154,7 +154,7 @@ struct Particle
 	unsigned char fadeToBlack;
 	int sLife;
 	int life;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	unsigned char extras;
 	signed char dynamic;
 	int fxObj;

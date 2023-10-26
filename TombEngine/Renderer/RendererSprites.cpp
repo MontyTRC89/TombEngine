@@ -5,7 +5,7 @@
 namespace TEN::Renderer 
 {
 	void Renderer::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
-										Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
+										Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (isLocked)
 			return;
@@ -38,7 +38,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4 &color, float orient2D,
-												   float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& constrainAxis,
+												   float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
 												   bool softParticles, RenderView& view, SpriteRenderType renderType)
 	{
 		if (isLocked)
@@ -73,7 +73,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
-														 float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& lookAtAxis,
+														 float scale, Vector2 size, BlendMode blendMode, const Vector3& lookAtAxis,
 														 bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (isLocked)
@@ -108,7 +108,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
-							 const Vector4 color, float orient2D, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles,
+							 const Vector4 color, float orient2D, float scale, Vector2 size, BlendMode blendMode, bool softParticles,
 							 RenderView& view)
 	{
 		AddQuad(sprite, vertex0, vertex1, vertex2, vertex3, color, color, color, color, orient2D, scale, size, blendMode, softParticles, view, SpriteRenderType::Default);
@@ -116,7 +116,7 @@ namespace TEN::Renderer
 
 	void Renderer::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							 const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
-							 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
+							 float scale, Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (isLocked)
 			return;
@@ -152,14 +152,14 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
-									const Vector4& color, BLEND_MODES blendMode, RenderView& view)
+									const Vector4& color, BlendMode blendMode, RenderView& view)
 	{
 		AddColoredQuad(vertex0, vertex1, vertex2, vertex3, color, color, color, color, blendMode, view, SpriteRenderType::Default);
 	}
 
 	void Renderer::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 									const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
-									BLEND_MODES blendMode, RenderView& view, SpriteRenderType renderType)
+									BlendMode blendMode, RenderView& view, SpriteRenderType renderType)
 	{
 		if (isLocked)
 			return;

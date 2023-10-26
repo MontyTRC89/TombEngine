@@ -311,7 +311,7 @@ namespace TEN::Renderer
 
 		// Caching state changes
 		TextureBase* lastTexture;
-		BLEND_MODES lastBlendMode;
+		BlendMode lastBlendMode;
 		DEPTH_STATES lastDepthState;
 		CULL_MODES lastCullMode;
 
@@ -428,7 +428,7 @@ namespace TEN::Renderer
 		void RenderShadowMap(RendererItem* item, RenderView& view);
 		void RenderItemShadows(RenderView& renderView);
 
-		void SetBlendMode(BLEND_MODES blendMode, bool force = false);
+		void SetBlendMode(BlendMode blendMode, bool force = false);
 		void SetDepthState(DEPTH_STATES depthState, bool force = false);
 		void SetCullMode(CULL_MODES cullMode, bool force = false);
 		void SetAlphaTest(AlphaTestModes mode, float threshold, bool force = false);
@@ -439,24 +439,24 @@ namespace TEN::Renderer
 		float CalculateFrameRate();
 
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
-					 Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
+					 Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
-					 float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& constrainAxis,
+					 float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
 					 bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
-					 float scale, Vector2 size, BLEND_MODES blendMode, const Vector3& lookAtAxis,
+					 float scale, Vector2 size, BlendMode blendMode, const Vector3& lookAtAxis,
 					 bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
-					 const Vector4 color, float orient2D, float scale, Vector2 size, BLEND_MODES blendMode, bool softParticles,
+					 const Vector4 color, float orient2D, float scale, Vector2 size, BlendMode blendMode, bool softParticles,
 					 RenderView& view);
 		void AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 					 const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
-					 float scale, Vector2 size, BLEND_MODES blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
+					 float scale, Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
-							const Vector4& color, BLEND_MODES blendMode, RenderView& view);
+							const Vector4& color, BlendMode blendMode, RenderView& view);
 		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
-							BLEND_MODES blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
+							BlendMode blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
@@ -500,14 +500,14 @@ namespace TEN::Renderer
 			return ConstantBuffer<C>(device.Get());
 		}
 
-		static bool DoesBlendModeRequireSorting(BLEND_MODES blendMode)
+		static bool DoesBlendModeRequireSorting(BlendMode blendMode)
 		{
-			return (blendMode == BLENDMODE_ALPHABLEND ||
-				    blendMode == BLENDMODE_EXCLUDE ||
-				    blendMode == BLENDMODE_LIGHTEN ||
-				    blendMode == BLENDMODE_SCREEN ||
-				    blendMode == BLENDMODE_SUBTRACTIVE ||
-				    blendMode == BLENDMODE_NOZTEST);
+			return (blendMode == BlendMode::AlphaBlend ||
+				    blendMode == BlendMode::Exclude ||
+				    blendMode == BlendMode::Lighten ||
+				    blendMode == BlendMode::Screen ||
+				    blendMode == BlendMode::Subtractive ||
+				    blendMode == BlendMode::NoDepthTest);
 		}
 
 	public:
@@ -571,7 +571,7 @@ namespace TEN::Renderer
 		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
-							  int priority, BLEND_MODES blendMode, const Vector2& aspectCorrection, RenderView& renderView);
+							  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);
 	};
 

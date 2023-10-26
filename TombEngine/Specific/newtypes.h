@@ -24,7 +24,7 @@ struct POLYGON
 struct BUCKET
 {
 	int texture;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	bool animated;
 	int numQuads;
 	int numTriangles;

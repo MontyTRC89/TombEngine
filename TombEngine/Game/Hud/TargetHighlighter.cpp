@@ -148,7 +148,7 @@ namespace TEN::Hud
 		constexpr auto PRIORITY					 = 0; // TODO: Check later. May interfere with Lua display sprites. -- Sezz 2023.10.06
 		constexpr auto ALIGN_MODE				 = DisplaySpriteAlignMode::Center;
 		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
-		constexpr auto BLEND_MODE				 = BLEND_MODES::BLENDMODE_ALPHABLEND;
+		constexpr auto BLEND_MODE				 = BlendMode::AlphaBlend;
 
 		if (IsOffscreen())
 			return;

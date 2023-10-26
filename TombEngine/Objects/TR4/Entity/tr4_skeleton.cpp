@@ -176,7 +176,7 @@ namespace TEN::Entities::TR4
 		spark->xVel = phd_sin(fx->pos.Orientation.y) * 4096;
 		spark->yVel = 0;
 		spark->zVel = phd_cos(fx->pos.Orientation.y) * 4096;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->friction = 68;
 		spark->flags = 26;
 		spark->rotAng = GetRandomControl() & 0xFFF;

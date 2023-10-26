@@ -362,7 +362,7 @@ namespace TEN::Entities::Vehicles
 			sptr->sLife = random;
 		}
 
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->x = x + (GetRandomControl() & 0xF) - 8;
 		sptr->y = y + (GetRandomControl() & 0xF) - 8;
 		sptr->z = z + (GetRandomControl() & 0xF) - 8;

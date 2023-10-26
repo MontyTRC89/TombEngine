@@ -25,7 +25,7 @@ namespace TEN::Renderer::Structures
 		float Rotation;
 		float Width;
 		float Height;
-		BLEND_MODES BlendMode;
+		BlendMode BlendMode;
 		Vector3 ConstrainAxis;
 		Vector3 LookAtAxis;
 		bool SoftParticle;

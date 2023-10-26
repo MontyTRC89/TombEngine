@@ -50,7 +50,7 @@ namespace TEN::Entities::TR4
                 spark->dB = 0;
                 spark->colFadeSpeed = 4;
                 spark->fadeToBlack = 4;
-                spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+                spark->blendMode = BlendMode::Additive;
                 spark->life = 12;
                 spark->sLife = 12;
                 spark->x = pos.x;

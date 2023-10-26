@@ -1,36 +1,6 @@
 #pragma once
 #include "Math/Math.h"
 
-enum RENDERER_BUCKETS
-{
-	RENDERER_BUCKET_SOLID = 0,
-	RENDERER_BUCKET_TRANSPARENT = 1,
-};
-
-enum RENDERER_PASSES
-{
-	RENDERER_PASS_DEPTH = 0,
-	RENDERER_PASS_DRAW = 1,
-	RENDERER_PASS_SHADOW_MAP = 2,
-	RENDERER_PASS_GBUFFER = 3,
-	RENDERER_PASS_TRANSPARENT = 4,
-	RENDERER_PASS_RECONSTRUCT_DEPTH = 5
-};
-
-enum MODEL_TYPES
-{
-	MODEL_TYPE_HORIZON = 0,
-	MODEL_TYPE_ROOM = 1,
-	MODEL_TYPE_MOVEABLE = 2,
-	MODEL_TYPE_STATIC = 3,
-	MODEL_TYPE_INVENTORY = 4,
-	MODEL_TYPE_PICKUP = 5,
-	MODEL_TYPE_LARA = 6,
-	MODEL_TYPE_SKY = 7,
-	MODEL_TYPE_WATER_SURFACE = 8,
-	MODEL_TYPE_ROOM_UNDERWATER = 9
-};
-
 enum LIGHT_TYPES
 {
 	LIGHT_TYPE_SUN = 0,
@@ -40,20 +10,19 @@ enum LIGHT_TYPES
 	LIGHT_TYPE_FOG_BULB = 4
 };
 
-enum BLEND_MODES
+enum class BlendMode
 {
-	BLENDMODE_UNSET = -1,
-
-	BLENDMODE_OPAQUE = 0,
-	BLENDMODE_ALPHATEST = 1,
-	BLENDMODE_ADDITIVE = 2,
-	BLENDMODE_NOZTEST = 4,
-	BLENDMODE_SUBTRACTIVE = 5,
-	BLENDMODE_WIREFRAME = 6,
-	BLENDMODE_EXCLUDE = 8,
-	BLENDMODE_SCREEN = 9,
-	BLENDMODE_LIGHTEN = 10,
-	BLENDMODE_ALPHABLEND = 11
+	Unknown = -1,
+	Opaque = 0,
+	AlphaTest = 1,
+	Additive = 2,
+	NoDepthTest = 4,
+	Subtractive = 5,
+	Wireframe = 6,
+	Exclude = 8,
+	Screen = 9,
+	Lighten = 10,
+	AlphaBlend = 11
 };
 
 enum CULL_MODES
@@ -128,13 +97,13 @@ enum class RendererDebugPage
 	Count
 };
 
-enum RendererTransparentFaceType
+enum class TransparentFaceType
 {
-	TRANSPARENT_FACE_ROOM,
-	TRANSPARENT_FACE_MOVEABLE,
-	TRANSPARENT_FACE_STATIC,
-	TRANSPARENT_FACE_SPRITE,
-	TRANSPARENT_FACE_NONE
+	Room,
+	Moveable,
+	Static,
+	Sprite,
+	None
 };
 
 enum class TextureRegister
@@ -170,8 +139,8 @@ enum class ConstantBufferRegister
 	PostProcess = 7,
 	Static = 8,
 	Sprite = 9,
-	HUD = 10,
-	HUD_BAR = 11,
+	Hud = 10,
+	HudBar = 11,
 	Blending = 12,
 	InstancedSprites = 13
 };

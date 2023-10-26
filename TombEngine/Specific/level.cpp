@@ -242,7 +242,7 @@ void LoadObjects()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = (BLEND_MODES)ReadUInt8();
+			bucket.blendMode = (BlendMode)ReadUInt8();
 			bucket.animated = ReadBool();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -641,7 +641,7 @@ void ReadRooms()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = (BLEND_MODES)ReadUInt8();
+			bucket.blendMode = (BlendMode)ReadUInt8();
 			bucket.animated = ReadBool();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;

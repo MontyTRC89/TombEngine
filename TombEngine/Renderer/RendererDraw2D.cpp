@@ -128,18 +128,18 @@ namespace TEN::Renderer
 		context->VSSetShader(vsHUD.Get(), nullptr, 0);
 		context->PSSetShader(psHUDTexture.Get(), nullptr, 0);
 
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetDepthState(DEPTH_STATE_NONE);
 		SetCullMode(CULL_MODE_NONE);
 
-		BindConstantBufferVS(ConstantBufferRegister::HUD, cbHUD.get());
+		BindConstantBufferVS(ConstantBufferRegister::Hud, cbHUD.get());
 
 		RendererSprite* borderSprite = &sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
 		stHUDBar.BarStartUV = borderSprite->UV[0];
 		stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);
 		cbHUDBar.updateData(stHUDBar, context.Get());
-		BindConstantBufferVS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
-		BindConstantBufferPS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
+		BindConstantBufferVS(ConstantBufferRegister::HudBar, cbHUDBar.get());
+		BindConstantBufferPS(ConstantBufferRegister::HudBar, cbHUDBar.get());
 		 
 		BindTexture(TextureRegister::Hud, borderSprite->Texture, SamplerStateRegister::LinearClamp);
 
@@ -165,8 +165,8 @@ namespace TEN::Renderer
 		stHUDBar.BarScale = Vector2(innerSprite->Width / (float)innerSprite->Texture->Width, innerSprite->Height / (float)innerSprite->Texture->Height);
 		cbHUDBar.updateData(stHUDBar, context.Get());
 
-		BindConstantBufferVS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
-		BindConstantBufferPS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
+		BindConstantBufferVS(ConstantBufferRegister::HudBar, cbHUDBar.get());
+		BindConstantBufferPS(ConstantBufferRegister::HudBar, cbHUDBar.get());
 		 
 		BindTexture(TextureRegister::Hud, innerSprite->Texture, SamplerStateRegister::LinearClamp);
 
@@ -188,18 +188,18 @@ namespace TEN::Renderer
 		context->VSSetShader(vsHUD.Get(), NULL, 0);
 		context->PSSetShader(psHUDTexture.Get(), NULL, 0);
 
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetDepthState(DEPTH_STATE_NONE);
 		SetCullMode(CULL_MODE_NONE);
 
-		BindConstantBufferVS(ConstantBufferRegister::HUD, cbHUD.get());
+		BindConstantBufferVS(ConstantBufferRegister::Hud, cbHUD.get());
 		BindTexture(TextureRegister::Hud, &loadingBarBorder, SamplerStateRegister::LinearClamp);
 
 		stHUDBar.BarStartUV = Vector2::Zero;
 		stHUDBar.BarScale = Vector2::One;
 		cbHUDBar.updateData(stHUDBar, context.Get());
-		BindConstantBufferVS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
-		BindConstantBufferPS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
+		BindConstantBufferVS(ConstantBufferRegister::HudBar, cbHUDBar.get());
+		BindConstantBufferPS(ConstantBufferRegister::HudBar, cbHUDBar.get());
 
 		DrawIndexedTriangles(56, 0, 0);
 
@@ -217,8 +217,8 @@ namespace TEN::Renderer
 		stHUDBar.Poisoned = false;
 		stHUDBar.Frame = 0;
 		cbHUDBar.updateData(stHUDBar, context.Get());
-		BindConstantBufferVS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
-		BindConstantBufferPS(ConstantBufferRegister::HUD_BAR, cbHUDBar.get());
+		BindConstantBufferVS(ConstantBufferRegister::HudBar, cbHUDBar.get());
+		BindConstantBufferPS(ConstantBufferRegister::HudBar, cbHUDBar.get());
 
 		BindTexture(TextureRegister::Hud, &loadingBarInner, SamplerStateRegister::LinearClamp);
 
@@ -236,7 +236,7 @@ namespace TEN::Renderer
 		auto flashColor = Weather.FlashColor();
 		if (flashColor != Vector3::Zero)
 		{
-			SetBlendMode(BLENDMODE_ADDITIVE);
+			SetBlendMode(BlendMode::Additive);
 			DrawFullScreenQuad(whiteTexture.ShaderResourceView.Get(), flashColor);
 		}
 
@@ -246,7 +246,7 @@ namespace TEN::Renderer
 		if (!Lara.Control.Look.OpticRange && !SpotcamOverlay)
 			return;
 
-		SetBlendMode(BLENDMODE_ALPHABLEND);
+		SetBlendMode(BlendMode::AlphaBlend);
 
 		if (Lara.Control.Look.OpticRange != 0 && !Lara.Control.Look.IsUsingLasersight)
 		{
@@ -256,7 +256,7 @@ namespace TEN::Renderer
 		{
 			DrawFullScreenSprite(&sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex], Vector3::One);
 
-			SetBlendMode(BLENDMODE_OPAQUE);
+			SetBlendMode(BlendMode::Opaque);
 
 			// Draw the aiming point
 			Vertex vertices[4];
@@ -307,7 +307,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 
 		context->RSSetState(cullCounterClockwiseRasterizerState.Get());
 		context->ClearRenderTargetView(target, Colors::Black);
@@ -371,7 +371,7 @@ namespace TEN::Renderer
 		ID3D11DepthStencilView* depthTarget)
 	{
 		// Reset GPU state
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CULL_MODE_NONE);
 
 		context->OMSetRenderTargets(1, &target, depthTarget);
@@ -605,7 +605,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
-									  int priority, BLEND_MODES blendMode, const Vector2& aspectCorrection, RenderView& renderView)
+									  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView)
 	{
 		auto spriteToDraw = RendererDisplaySpriteToDraw{};
 

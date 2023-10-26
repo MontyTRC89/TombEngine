@@ -48,6 +48,6 @@ namespace TEN::Scripting::DisplaySprite
 
 		// Utilities
 		void Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
-				  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode);
+				  sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BlendMode> blendMode);
 	};
 }

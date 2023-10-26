@@ -127,7 +127,7 @@ namespace TEN::Entities::Traps
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 4;
 
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	

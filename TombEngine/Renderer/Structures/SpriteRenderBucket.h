@@ -8,7 +8,7 @@ namespace TEN::Renderer::Structures
 	struct RendererSpriteBucket
 	{
 		RendererSprite* Sprite;
-		BLEND_MODES BlendMode;
+		BlendMode BlendMode;
 		std::vector<RendererSpriteToDraw> SpritesToDraw;
 
 		bool IsBillboard = false;

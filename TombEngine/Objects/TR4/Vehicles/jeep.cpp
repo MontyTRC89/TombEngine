@@ -418,7 +418,7 @@ namespace TEN::Entities::Vehicles
 			spark->sLife = 9;
 		}
 
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->x = (GetRandomControl() & 0xF) + x - 8;
 		spark->y = (GetRandomControl() & 0xF) + y - 8;
 		spark->z = (GetRandomControl() & 0xF) + z - 8;

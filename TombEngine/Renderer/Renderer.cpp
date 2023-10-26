@@ -418,41 +418,41 @@ namespace TEN::Renderer
 		context->PSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
 	}
 
-	void Renderer::SetBlendMode(BLEND_MODES blendMode, bool force)
+	void Renderer::SetBlendMode(BlendMode blendMode, bool force)
 	{
 		if (blendMode != lastBlendMode || force)
 		{
 			switch (blendMode)
 			{
-			case BLENDMODE_ALPHABLEND:
+			case BlendMode::AlphaBlend:
 				context->OMSetBlendState(renderStates->NonPremultiplied(), nullptr, 0xFFFFFFFF);
 				break;
 
-			case BLENDMODE_ALPHATEST:
+			case BlendMode::AlphaTest:
 				context->OMSetBlendState(renderStates->Opaque(), nullptr, 0xFFFFFFFF);
 				break;
 
-			case BLENDMODE_OPAQUE:
+			case BlendMode::Opaque:
 				context->OMSetBlendState(renderStates->Opaque(), nullptr, 0xFFFFFFFF);
 				break;
 
-			case BLENDMODE_SUBTRACTIVE:
+			case BlendMode::Subtractive:
 				context->OMSetBlendState(subtractiveBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
-			case BLENDMODE_ADDITIVE:
+			case BlendMode::Additive:
 				context->OMSetBlendState(renderStates->Additive(), nullptr, 0xFFFFFFFF);
 				break;
 
-			case BLENDMODE_SCREEN:
+			case BlendMode::Screen:
 				context->OMSetBlendState(screenBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
-			case BLENDMODE_LIGHTEN:
+			case BlendMode::Lighten:
 				context->OMSetBlendState(lightenBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 
-			case BLENDMODE_EXCLUDE:
+			case BlendMode::Exclude:
 				context->OMSetBlendState(excludeBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 			}
@@ -466,8 +466,8 @@ namespace TEN::Renderer
 
 		switch (blendMode)
 		{
-		case BLENDMODE_OPAQUE:
-		case BLENDMODE_ALPHATEST:
+		case BlendMode::Opaque:
+		case BlendMode::AlphaTest:
 			SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 			break;
 

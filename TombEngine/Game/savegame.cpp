@@ -1074,7 +1074,7 @@ bool SaveGame::Save(int slot)
 		particleInfo.add_s_life(particle->sLife);
 		particleInfo.add_s_r(particle->sR);
 		particleInfo.add_s_size(particle->sSize);
-		particleInfo.add_blend_mode(particle->blendMode);
+		particleInfo.add_blend_mode((int)particle->blendMode);
 		particleInfo.add_x(particle->x);
 		particleInfo.add_x_vel(particle->sSize);
 		particleInfo.add_y(particle->y);
@@ -1911,7 +1911,7 @@ bool SaveGame::Load(int slot)
 		particle->fadeToBlack = particleInfo->fade_to_black();
 		particle->sLife = particleInfo->s_life();
 		particle->life = particleInfo->life();
-		particle->blendMode = (BLEND_MODES)particleInfo->blend_mode();
+		particle->blendMode = (BlendMode)particleInfo->blend_mode();
 		particle->extras = particleInfo->extras();
 		particle->dynamic = particleInfo->dynamic();
 		particle->fxObj = particleInfo->fx_obj();

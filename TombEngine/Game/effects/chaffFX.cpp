@@ -131,7 +131,7 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 		smoke->sLife = rnd;
 	}
 
-	smoke->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	smoke->blendMode = BlendMode::Additive;
 	
 	smoke->x = pos.x + (GetRandomControl() & 7) - 3;
 	smoke->y = pos.y + (GetRandomControl() & 7) - 3;

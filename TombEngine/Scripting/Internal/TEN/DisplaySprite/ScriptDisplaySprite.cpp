@@ -207,7 +207,7 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
-								   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
+								   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BlendMode> blendMode)
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
 		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
@@ -217,7 +217,7 @@ namespace TEN::Scripting::DisplaySprite
 		constexpr auto DEFAULT_PRIORITY	  = 0;
 		constexpr auto DEFAULT_ALIGN_MODE = DisplaySpriteAlignMode::Center;
 		constexpr auto DEFAULT_SCALE_MODE = DisplaySpriteScaleMode::Fit;
-		constexpr auto DEFAULT_BLEND_MODE = BLENDMODE_ALPHABLEND;
+		constexpr auto DEFAULT_BLEND_MODE = BlendMode::AlphaBlend;
 
 		// Object is not a sprite sequence object; return early.
 		if (ObjectID < GAME_OBJECT_ID::ID_HORIZON || ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)

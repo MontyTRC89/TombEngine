@@ -72,14 +72,14 @@ namespace TEN::Renderer
 					beam.VertexPoints[2], beam.VertexPoints[3],
 					barrier.Color, barrier.Color,
 					barrier.Color, barrier.Color,
-					BLENDMODE_ADDITIVE, view, SpriteRenderType::LaserBarrier);
+					BlendMode::Additive, view, SpriteRenderType::LaserBarrier);
 			}
 		}
 	}
 
 	void Renderer::DrawStreamers(RenderView& view)
 	{
-		constexpr auto BLEND_MODE_DEFAULT = BLENDMODE_ADDITIVE;
+		constexpr auto BLEND_MODE_DEFAULT = BlendMode::Additive;
 
 		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
 		{
@@ -98,7 +98,7 @@ namespace TEN::Renderer
 						// Determine blend mode.
 						auto blendMode = BLEND_MODE_DEFAULT;
 						if (segment.Flags & (int)StreamerFlags::BlendModeAdditive)
-							blendMode = BLENDMODE_ALPHABLEND;
+							blendMode = BlendMode::AlphaBlend;
 
 						if (segment.Flags & (int)StreamerFlags::FadeLeft)
 						{
@@ -178,7 +178,7 @@ namespace TEN::Renderer
 						&sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
 						color,
-						PI_DIV_2, 1.0f, Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);							
+						PI_DIV_2, 1.0f, Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BlendMode::Additive, direction, true, view);							
 				}
 			}				
 		}
@@ -244,7 +244,7 @@ namespace TEN::Renderer
 						&sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
 						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BLENDMODE_ADDITIVE, direction, true, view);
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, direction, true, view);
 				}
 			}
 		}
@@ -262,7 +262,7 @@ namespace TEN::Renderer
 								   Vector3(spark->x, spark->y, spark->z),
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
 								   TO_RAD(spark->rotAng << 4), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
-								   BLENDMODE_ADDITIVE, true, view);
+								   BlendMode::Additive, true, view);
 			}
 		}
 	}
@@ -288,7 +288,7 @@ namespace TEN::Renderer
 							Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
 							TO_RAD(spark->rotAng << 4),
 							spark->scalar,
-							Vector2(spark->size * fire->size, spark->size * fire->size), BLENDMODE_ADDITIVE, true, view);
+							Vector2(spark->size * fire->size, spark->size * fire->size), BlendMode::Additive, true, view);
 					}
 				}
 			}
@@ -466,7 +466,7 @@ namespace TEN::Renderer
 							Vector3(x2Outer, yOuter, z2Outer), 
 							Vector3(x2Inner, yInner, z2Inner), 
 							Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
-							0, 1, { 0, 0 }, BLENDMODE_ADDITIVE, false, view);
+							0, 1, { 0, 0 }, BlendMode::Additive, false, view);
 			}
 		}
 	}
@@ -487,7 +487,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
 				bubble.Position,
-				bubble.Color, 0.0f, 1.0f, bubble.Size / 2, BLENDMODE_ADDITIVE, true, view);
+				bubble.Color, 0.0f, 1.0f, bubble.Size / 2, BlendMode::Additive, true, view);
 		}
 	}
 
@@ -510,7 +510,7 @@ namespace TEN::Renderer
 			AddSpriteBillboardConstrained(
 				&sprites[Objects[ID_DRIP_SPRITE].meshIndex],
 				drip.Position,
-				drip.Color, 0.0f, 1.0f, drip.Size, BLENDMODE_ADDITIVE, -axis, false, view);
+				drip.Color, 0.0f, 1.0f, drip.Size, BlendMode::Additive, -axis, false, view);
 		}
 	}
 
@@ -531,7 +531,7 @@ namespace TEN::Renderer
 			AddSpriteBillboardConstrainedLookAt(
 				&sprites[ripple.SpriteIndex],
 				ripple.Position,
-				color, 0.0f, 1.0f, Vector2(ripple.Size * 2), BLENDMODE_ADDITIVE, ripple.Normal, true, view);
+				color, 0.0f, 1.0f, Vector2(ripple.Size * 2), BlendMode::Additive, ripple.Normal, true, view);
 		}
 	}
 
@@ -559,7 +559,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&sprites[uwBlood.SpriteIndex],
 				uwBlood.Position,
-				color, 0.0f, 1.0f, Vector2(uwBlood.Size, uwBlood.Size) * 2, BLENDMODE_ADDITIVE, true, view);
+				color, 0.0f, 1.0f, Vector2(uwBlood.Size, uwBlood.Size) * 2, BlendMode::Additive, true, view);
 		}
 	}
 
@@ -696,7 +696,7 @@ namespace TEN::Renderer
 							g / 16.0f,
 							b / 16.0f,
 							1.0f),
-						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, false, view);
+						0, 1, { 0,0 }, BlendMode::Additive, false, view);
 				}
 				else if (shockwave->style == (int)ShockwaveStyle::Sophia)
 				{
@@ -712,7 +712,7 @@ namespace TEN::Renderer
 							g / 16.0f,
 							b / 16.0f,
 							1.0f),
-						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+						0, 1, { 0,0 }, BlendMode::Additive, true, view);
 
 				}
 				else if (shockwave->style == (int)ShockwaveStyle::Knockback)
@@ -729,7 +729,7 @@ namespace TEN::Renderer
 							g / 16.0f,
 							b / 16.0f,
 							1.0f),
-						0, 1, { 0,0 }, BLENDMODE_ADDITIVE, true, view);
+						0, 1, { 0,0 }, BlendMode::Additive, true, view);
 				}
 
 				p1 = p2;
@@ -753,7 +753,7 @@ namespace TEN::Renderer
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
 								   TO_RAD(blood->rotAng << 4), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
-								   BLENDMODE_ADDITIVE, true, view);
+								   BlendMode::Additive, true, view);
 			}
 		}
 	}
@@ -779,7 +779,7 @@ namespace TEN::Renderer
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
-					BLENDMODE_ADDITIVE, true, view);
+					BlendMode::Additive, true, view);
 
 				break;
 
@@ -793,7 +793,7 @@ namespace TEN::Renderer
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
-					BLENDMODE_ADDITIVE, true, view);
+					BlendMode::Additive, true, view);
 
 				break;
 
@@ -809,7 +809,7 @@ namespace TEN::Renderer
 					&sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
 					p.Position,
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
-					0.0f, 1.0f, Vector2(RAIN_WIDTH, p.Size), BLENDMODE_ADDITIVE, -v, true, view);
+					0.0f, 1.0f, Vector2(RAIN_WIDTH, p.Size), BlendMode::Additive, -v, true, view);
 
 				break;
 			}
@@ -850,7 +850,7 @@ namespace TEN::Renderer
 		short zOffset = 0;
 		short rotationX = 0;
 
-		SetBlendMode(BLENDMODE_ADDITIVE);
+		SetBlendMode(BlendMode::Additive);
 		SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
@@ -899,7 +899,7 @@ namespace TEN::Renderer
 
 			for (const auto& flashBucket : flashMesh.Buckets) 
 			{
-				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
+				if (flashBucket.BlendMode == BlendMode::Opaque)
 					continue;
 
 				if (flashBucket.Polygons.size() == 0)
@@ -941,7 +941,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 		return true;
 	}
 
@@ -978,7 +978,7 @@ namespace TEN::Renderer
 				stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
 				BindStaticLights(rItemPtr->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
-				SetBlendMode(BLENDMODE_ADDITIVE);
+				SetBlendMode(BlendMode::Additive);
 				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 				if (creature.MuzzleFlash[0].Delay != 0 && creature.MuzzleFlash[0].Bite.BoneID != -1)
@@ -991,7 +991,7 @@ namespace TEN::Renderer
 					
 					for (const auto& flashBucket : flashMoveable.Buckets)
 					{
-						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
+						if (flashBucket.BlendMode == BlendMode::Opaque)
 							continue;
 
 						if (flashBucket.Polygons.size() == 0)
@@ -1030,7 +1030,7 @@ namespace TEN::Renderer
 					
 					for (auto& flashBucket : flashMoveable.Buckets)
 					{
-						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
+						if (flashBucket.BlendMode == BlendMode::Opaque)
 							continue;
 
 						if (flashBucket.Polygons.size() == 0)
@@ -1061,7 +1061,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		SetBlendMode(BLENDMODE_OPAQUE);
+		SetBlendMode(BlendMode::Opaque);
 	}
 
 	Texture2D Renderer::CreateDefaultNormalTexture() 
@@ -1077,7 +1077,7 @@ namespace TEN::Renderer
 			AddQuad(
 				&sprites[footprint.SpriteIndex],
 				footprint.VertexPoints[0], footprint.VertexPoints[1], footprint.VertexPoints[2], footprint.VertexPoints[3],
-				Vector4(footprint.Opacity), 0.0f, 1.0f, Vector2::One, BLENDMODE_SUBTRACTIVE, false, view);
+				Vector4(footprint.Opacity), 0.0f, 1.0f, Vector2::One, BlendMode::Subtractive, false, view);
 		}
 	}
 
@@ -1181,13 +1181,13 @@ namespace TEN::Renderer
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 				 
-			// HACK: Prevent sprites like Explosionsmoke which have blendmode_subtractive from having laser effects.
+			// HACK: Prevent sprites like Explosionsmoke which have BlendMode::Subtractive from having laser effects.
 			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType != SpriteRenderType::Default)
 			{
 				// If blend mode requires sorting, save sprite for later.
 				int distance = (rDrawSprite.pos - Camera.pos.ToVector3()).Length();
 				RendererTransparentFace face;
-				face.type = RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE;
+				face.type = TransparentFaceType::Sprite;
 				face.info.sprite = &rDrawSprite;
 				face.distance = distance;
 				face.info.world = GetWorldMatrixForSprite(&rDrawSprite, view);
@@ -1256,7 +1256,7 @@ namespace TEN::Renderer
 			SetBlendMode(spriteBucket.BlendMode);
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
-			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+			if (spriteBucket.BlendMode == BlendMode::AlphaTest)
 			{
 				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD, true);
 			}
@@ -1303,7 +1303,7 @@ namespace TEN::Renderer
 			SetBlendMode(spriteBucket.BlendMode);
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
-			if (spriteBucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST)
+			if (spriteBucket.BlendMode == BlendMode::AlphaTest)
 			{
 				SetAlphaTest(AlphaTestModes::GreatherThan, ALPHA_TEST_THRESHOLD, true);
 			}
@@ -1409,14 +1409,14 @@ namespace TEN::Renderer
 		}
 
 		auto* meshPtr = effect->Mesh;
-		auto m_lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+		auto m_lastBlendMode = BlendMode::Unknown;
 
 		for (auto& bucket : meshPtr->Buckets) 
 		{
 			if (bucket.NumVertices == 0)
 				continue;
 
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+			if (!((bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest) ^
 				(rendererPass == RendererPass::Transparent)))
 			{
 				continue;
@@ -1471,13 +1471,13 @@ namespace TEN::Renderer
 		extern std::vector<DebrisFragment> DebrisFragments;
 		std::vector<Vertex> vertices;
 
-		auto m_lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+		auto m_lastBlendMode = BlendMode::Unknown;
 
 		for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
 		{
 			if (deb->active) 
 			{
-				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^
+				if (!((deb->mesh.blendMode == BlendMode::Opaque || deb->mesh.blendMode == BlendMode::AlphaTest) ^
 					(rendererPass == RendererPass::Transparent)))
 				{
 					continue;
@@ -1563,7 +1563,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
 				smoke.position,
-				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BLENDMODE_ALPHABLEND, true, view);
+				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BlendMode::AlphaBlend, true, view);
 		}
 	}
 
@@ -1589,7 +1589,7 @@ namespace TEN::Renderer
 			auto height = Lerp(1.0f, 0.0f, normalizedLife);
 			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
-			AddSpriteBillboardConstrained(&sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BLENDMODE_ADDITIVE, -v, false, view);
+			AddSpriteBillboardConstrained(&sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BlendMode::Additive, -v, false, view);
 		}
 	}
 
@@ -1607,7 +1607,7 @@ namespace TEN::Renderer
 				return;
 
 			AddSpriteBillboard(&sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], 
-				e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE, true, view);
+				e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BlendMode::Additive, true, view);
 		}
 	}
 
@@ -1622,7 +1622,7 @@ namespace TEN::Renderer
 			if (!CheckIfSlotExists(s.sequence, "Particle rendering"))
 				continue;
 
-			AddSpriteBillboard(&sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND, true, view);
+			AddSpriteBillboard(&sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BlendMode::AlphaBlend, true, view);
 		}
 	}
 }

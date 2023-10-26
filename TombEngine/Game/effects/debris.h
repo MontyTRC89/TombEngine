@@ -43,7 +43,7 @@ struct ShatterImpactInfo
 
 struct DebrisMesh
 {
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	std::array<Vector3, 3> Positions;
 	std::array<Vector2, 3> TextureCoordinates;
 	std::array<Vector3, 3> Normals;

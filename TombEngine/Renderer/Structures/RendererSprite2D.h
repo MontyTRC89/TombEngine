@@ -17,7 +17,7 @@ namespace TEN::Renderer::Structures
 		Vector4 Color		= Vector4::Zero;
 
 		int			Priority  = 0;
-		BLEND_MODES BlendMode = BLENDMODE_ALPHABLEND;
+		BlendMode BlendMode = BlendMode::AlphaBlend;
 
 		Vector2 AspectCorrection = Vector2::One;
 	};

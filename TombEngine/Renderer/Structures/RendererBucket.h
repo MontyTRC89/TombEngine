@@ -12,7 +12,7 @@ namespace TEN::Renderer::Structures
 	{
 		int Texture;
 		bool Animated;
-		BLEND_MODES BlendMode;
+		BlendMode BlendMode;
 		int StartVertex;
 		int StartIndex;
 		int NumVertices;
