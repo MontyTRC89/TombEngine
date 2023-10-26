@@ -39,6 +39,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Collision::Attractors;
@@ -52,11 +53,13 @@ using namespace TEN::Player;
 
 using TEN::Renderer::g_Renderer;
 
+using PlayerStateRoutine = std::function<void(ItemInfo* item, CollisionInfo* coll)>;
+
 LaraInfo	  Lara			= {};
 ItemInfo*	  LaraItem		= {};
 CollisionInfo LaraCollision = {};
 
-std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
+auto PlayerStateControlRoutines = std::array<PlayerStateRoutine, NUM_LARA_STATES + 1>
 {
 	lara_as_walk_forward,
 	lara_as_run_forward,
@@ -248,9 +251,11 @@ std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,
 	lara_as_null,
 	lara_as_use_puzzle,//189
+	lara_as_pushable_edge_slip,//190
+	lara_as_sprint_slide,//191
 };
 
-std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
+auto PlayerStateCollisionRoutines = std::array<PlayerStateRoutine, NUM_LARA_STATES + 1>
 {
 	lara_col_walk_forward,
 	lara_col_run_forward,
@@ -288,8 +293,8 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_col_surface_idle,//33
 	lara_col_surface_swim_forward,//34
 	lara_col_surface_dive,//35
-	lara_default_col,
-	lara_default_col,
+	lara_void_func,//36
+	lara_void_func,//37
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -442,6 +447,8 @@ std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] 
 	lara_void_func,
 	lara_void_func,
 	lara_default_col,//189
+	lara_void_func,//190
+	lara_col_sprint_slide,//191
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -917,7 +924,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	// Handle player state.
-	lara_control_routines[item->Animation.ActiveState](item, coll);
+	PlayerStateControlRoutines[item->Animation.ActiveState](item, coll);
 
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
@@ -929,7 +936,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 		// Handle player state collision.
 		if (lara->Context.Vehicle == NO_ITEM)
-			lara_collision_routines[item->Animation.ActiveState](item, coll);
+			PlayerStateCollisionRoutines[item->Animation.ActiveState](item, coll);
 	}
 
 	// Handle weapons.
@@ -965,7 +972,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockCeilingSlope = false;
 	coll->Setup.BlockDeathFloorDown = false;
 	coll->Setup.BlockMonkeySwingEdge = false;
-	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
@@ -980,7 +987,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Count.Pose = 0;
 
-	lara_control_routines[item->Animation.ActiveState](item, coll);
+	PlayerStateControlRoutines[item->Animation.ActiveState](item, coll);
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1006,7 +1013,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	DoObjectCollision(item, coll);
 
 	if (lara->Context.Vehicle == NO_ITEM)
-		lara_collision_routines[item->Animation.ActiveState](item, coll);
+		PlayerStateCollisionRoutines[item->Animation.ActiveState](item, coll);
 
 	UpdateLaraRoom(item, LARA_RADIUS);
 
@@ -1051,7 +1058,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Count.Pose = 0;
 
-	lara_control_routines[item->Animation.ActiveState](item, coll);
+	PlayerStateControlRoutines[item->Animation.ActiveState](item, coll);
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1096,7 +1103,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	DoObjectCollision(item, coll);
 
 	if (/*lara->ExtraAnim == -1 &&*/ lara->Context.Vehicle == NO_ITEM)
-		lara_collision_routines[item->Animation.ActiveState](item, coll);
+		PlayerStateCollisionRoutines[item->Animation.ActiveState](item, coll);
 
 	UpdateLaraRoom(item, 0);
 
@@ -1187,8 +1194,8 @@ bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 	auto point = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, zOffset, height, xOffset);
 
 	// Hacky L-shaped Location traversal.
-	item->Location = GetRoom(item->Location, point.x, point.y, point.z);
-	item->Location = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z);
+	item->Location = GetRoom(item->Location, point);
+	item->Location = GetRoom(item->Location, Vector3i(item->Pose.Position.x, point.y, item->Pose.Position.z));
 	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.roomNumber)

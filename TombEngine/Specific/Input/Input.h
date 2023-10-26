@@ -1,20 +1,25 @@
 #pragma once
+#include "Math/Math.h"
 #include "Specific/Input/InputAction.h"
+
+using namespace TEN::Math;
 
 struct ItemInfo;
 
 namespace TEN::Input
 {
-	constexpr int MAX_KEYBOARD_KEYS    = 256;
-	constexpr int MAX_GAMEPAD_KEYS     = 16;
-	constexpr int MAX_GAMEPAD_AXES     = 6;
-	constexpr int MAX_GAMEPAD_POV_AXES = 4;
+	constexpr auto MAX_KEYBOARD_KEYS	= 256;
+	constexpr auto MAX_MOUSE_KEYS		= 8;
+	constexpr auto MAX_GAMEPAD_KEYS		= 16;
+	constexpr auto MAX_MOUSE_POV_AXES	= 6;
+	constexpr auto MAX_GAMEPAD_AXES		= 6;
+	constexpr auto MAX_GAMEPAD_POV_AXES = 4;
 
-	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
+	constexpr auto MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2) + MAX_GAMEPAD_POV_AXES;
 
 	enum XInputButton
 	{
-		XB_START = MAX_KEYBOARD_KEYS,
+		XB_START = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS,
 		XB_SELECT,
 		XB_LSTICK,
 		XB_RSTICK,
@@ -27,7 +32,7 @@ namespace TEN::Input
 		XB_X,
 		XB_Y,
 		XB_LOGO,
-		XB_AXIS_X_POS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS,
+		XB_AXIS_X_POS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES,
 		XB_AXIS_X_NEG,
 		XB_AXIS_Y_POS,
 		XB_AXIS_Y_NEG,
@@ -45,12 +50,12 @@ namespace TEN::Input
 		XB_DPAD_RIGHT
 	};
 
-	enum InputAxis
+	enum class InputAxis
 	{
-		MoveVertical,
-		MoveHorizontal,
-		CameraVertical,
-		CameraHorizontal,
+		Move,
+		Camera,
+		Mouse,
+
 		Count
 	};
 
@@ -80,7 +85,7 @@ namespace TEN::Input
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<QueueState>	ActionQueue;
 	extern std::vector<bool>		KeyMap;
-	extern std::vector<float>		AxisMap;
+	extern std::vector<Vector2>		AxisMap;
 
 	extern const std::vector<std::string>	   g_KeyNames;
 	extern		 std::vector<std::vector<int>> Bindings;
@@ -97,8 +102,9 @@ namespace TEN::Input
     void ApplyDefaultBindings();
     bool ApplyDefaultXInputBindings();
 
-	// TODO: Later, all these global action accessor functions should be tied to a specific controller/player.
-	// Having them loose like this is very inelegant, but since this is only the first iteration, they will do for now. -- Sezz 2022.10.12
+	Vector2 GetCursorDisplayPosition();
+
+	// TODO: Move global query functions to player input object (not happening soon). -- Sezz 2023.08.07
 	void  ClearAction(ActionID actionID);
 	bool  NoAction();
 	bool  IsClicked(ActionID actionID);

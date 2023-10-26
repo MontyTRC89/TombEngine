@@ -14,6 +14,7 @@
 #include "Objects/Generic/Object/generic_bridge.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/polerope.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Objects/Generic/Object/rope.h"
 
 // Switches
@@ -96,6 +97,12 @@ static void StartObject(ObjectInfo* object)
 			object->SetupHitEffect(true);
 		}
 	}
+
+	for (int objectNumber = ID_PUSHABLE_OBJECT1; objectNumber <= ID_PUSHABLE_OBJECT10; objectNumber++)
+		InitPushableObject(object, objectNumber);
+
+	for (int objectNumber = ID_PUSHABLE_OBJECT_CLIMBABLE1; objectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10; objectNumber++)
+		InitPushableObject(object, objectNumber);
 
 	object = &Objects[ID_BRIDGE_FLAT];
 	if (object->loaded)

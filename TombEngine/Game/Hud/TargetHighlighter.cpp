@@ -96,7 +96,7 @@ namespace TEN::Hud
 		// Update orientation.
 		if (IsPrimary)
 		{
-			Orientation += ROT;
+			Orientation += IsActive ? ROT : (ROT * 2);
 		}
 		else
 		{
@@ -114,7 +114,7 @@ namespace TEN::Hud
 		}
 		else
 		{
-			Scale = Lerp(Scale, 0.0f, MORPH_LERP_ALPHA / 2);
+			Scale = Lerp(Scale, 0.0f, MORPH_LERP_ALPHA / 4);
 		}
 
 		// Update color.

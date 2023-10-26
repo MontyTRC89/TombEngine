@@ -12,20 +12,20 @@ Uses screen-space coordinates, with x values specifying the number of pixels fro
 and y values specifying the number of pixels from the top of the window.
 
 Since different players will have different resolutions, you should work in terms of percentages where possible,
-and use @{Misc.ScreenToPercent|ScreenToPercent} and @{Misc.PercentToScreen|PercentToScreen}
+and use @{Util.ScreenToPercent|ScreenToPercent} and @{Util.PercentToScreen|PercentToScreen}
 when you need to use screen-space coordinates.
 
 @tenclass Strings.DisplayString
 @pragma nostrip
 */
 
-UserDisplayString::UserDisplayString(const std::string& key, int x, int y, D3DCOLOR color, const FlagArray& flags, bool translated) :
-	m_key{ key },
-	m_x{ x },
-	m_y{ y },
-	m_color{ color },
-	m_flags{ flags },
-	m_isTranslated{ translated }
+UserDisplayString::UserDisplayString(const std::string& key, int x, int y, D3DCOLOR color, const FlagArray& flags, bool isTranslated) :
+	m_key(key),
+	m_x(x),
+	m_y(y),
+	m_color(color),
+	m_flags(flags),
+	m_isTranslated(isTranslated)
 {
 }
 
@@ -38,18 +38,19 @@ DisplayString::DisplayString()
 }
 
 /*** Create a DisplayString.
-For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}.
+For use in @{ Strings.ShowString | ShowString } and @{ Strings.HideString | HideString }.
 @function DisplayString
-@tparam string str string to print or key of translated string
-@tparam int x x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
-@tparam int y y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
-@tparam Color color the color of the text
-@tparam bool translated if false or omitted, the str argument will be printed.
-If true, the str argument will be the key of a translated string specified in
-strings.lua. __Default: false__.
-@tparam table flags a table of display options. Can be empty or omitted. The possible values and their effects are...
-	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
-	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
+@tparam string string The string to display or key of the translated string.
+@tparam int x X component of the string.
+@tparam int y Y component of the string.
+@tparam Color color The color of the string.
+@tparam bool[opt] translated If false or omitted, the input string argument will be displayed.
+If true, the string argument will be the key of a translated string specified in strings.lua. __Default: false__.
+@tparam table[opt] flags A table of string display options. Can be empty or omitted. The possible values and their effects are:
+	TEN.Strings.DisplayStringOption.CENTER: set the horizontal origin point to the center of the string.
+	TEN.Strings.DisplayStringOption.RIGHT: set the horizontal origin point to right of the string.
+	TEN.Strings.DisplayStringOption.SHADOW: give the string a small shadow.
+	TEN.Strings.DisplayStringOption.BLINK: blink the string.
 __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */
@@ -103,21 +104,21 @@ void DisplayString::Register(sol::table& parent)
 		/// Get the display string's color
 		// @function DisplayString:GetColor
 		// @treturn Color a copy of the display string's color
-		ScriptReserved_GetColor, &DisplayString::GetCol,
+		ScriptReserved_GetColor, &DisplayString::GetColor,
 
 		/// Set the display string's color 
 		// @function DisplayString:SetColor
 		// @tparam Color color the new color of the display string 
-		ScriptReserved_SetColor, &DisplayString::SetCol,
+		ScriptReserved_SetColor, &DisplayString::SetColor,
 
-		/// Get the string key to use. If `translated` is true when @{DisplayString}
+		/// Get the string key to use. If `isTranslated` is true when @{ DisplayString }
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:GetKey
 		// @treturn string a string
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
-		/// Set the string key to use. If `translated` is true when @{DisplayString}
+		/// Set the string key to use. If `isTranslated` is true when @{ DisplayString }
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:SetKey
@@ -128,15 +129,15 @@ void DisplayString::Register(sol::table& parent)
 		/// Set the position of the string.
 		// Screen-space coordinates are expected.
 		// @function DisplayString:SetPosition
-		// @tparam int x x-coordinate of the string
-		// @tparam int y y-coordinate of the string
+		// @tparam int x X component.
+		// @tparam int y Y component.
 		ScriptReserved_SetPosition, &DisplayString::SetPos,
 
 		/// Get the position of the string.
 		// Screen-space coordinates are returned.
 		// @function DisplayString:GetPosition
-		// @treturn int x x-coordinate of the string
-		// @treturn int y y-coordinate of the string
+		// @treturn int x X component.
+		// @treturn int y Y component.
 		ScriptReserved_GetPosition, &DisplayString::GetPos,
 
 		/// Set the display string's flags 
@@ -157,8 +158,7 @@ void DisplayString::Register(sol::table& parent)
 		// @function DisplayString:SetTranslated
 		// @tparam bool shouldTranslate if true, the string's key will be used as the key for the translation that will be displayed.
 		// If false, the key itself will be displayed
-		ScriptReserved_SetTranslated, &DisplayString::SetTranslated
-	);
+		ScriptReserved_SetTranslated, &DisplayString::SetTranslated);
 }
 
 DisplayStringIDType DisplayString::GetID() const
@@ -179,7 +179,7 @@ std::tuple<int, int> DisplayString::GetPos() const
 	return std::make_tuple(displayString.m_x, displayString.m_y);
 }
 	
-void DisplayString::SetCol(const ScriptColor& color)
+void DisplayString::SetColor(const ScriptColor& color)
 {
 	UserDisplayString& displayString = s_getItemCallback(m_id).value();
 	displayString.m_color = color;
@@ -188,10 +188,10 @@ void DisplayString::SetCol(const ScriptColor& color)
 	//s_addItemCallback(m_id, s);
 }
 
-ScriptColor DisplayString::GetCol() 
+ScriptColor DisplayString::GetColor() 
 {
-	UserDisplayString& s = s_getItemCallback(m_id).value();
-	return s.m_color;
+	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	return displayString.m_color;
 }
 
 void DisplayString::SetKey(const std::string& key)

@@ -16,6 +16,14 @@ Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 
 Flow.SetTotalSecretCount(5)
 
+-- Enable/Disable Point Filter (Square, unsmoothed pixels).
+
+Flow.EnablePointFilter(false)
+
+-- Enable/Disable saving and loading of savegames.
+
+Flow.EnableLoadSave(true)
+
 -- Disable/enable flycheat globally
 
 Flow.EnableFlyCheat(true)

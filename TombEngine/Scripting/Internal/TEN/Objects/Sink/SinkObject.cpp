@@ -58,12 +58,12 @@ void Sink::Register(sol::table& parent)
 		// @function Sink:SetStrength
 		// @tparam int strength The sink's new strength
 		ScriptReserved_SetStrength, &Sink::SetStrength
-		);
+	);
 }
 
 Vec3 Sink::GetPos() const
 {
-	return Vec3{ m_sink.Position };
+	return Vec3(m_sink.Position);
 }
 
 void Sink::SetPos(const Vec3& pos)

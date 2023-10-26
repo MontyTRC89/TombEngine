@@ -77,78 +77,82 @@ namespace TEN::Entities::Traps
 
 		switch (item.Animation.ActiveState)
 		{
-			case CRUMBLING_PLATFORM_STATE_SHAKE:
-			{
-				if (item.ItemFlags[0] > 0)
-				{
-					item.ItemFlags[0]--;
-				}
-				else
-				{
-					item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
-					item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
-
-					auto pointColl = GetCollision(item);
-					pointColl.Block->RemoveBridge(itemNumber);
-				}
-			}
-
+		case CRUMBLING_PLATFORM_STATE_IDLE:
 			break;
 
-			case CRUMBLING_PLATFORM_STATE_FALL:
+		case CRUMBLING_PLATFORM_STATE_SHAKE:
+		{
+			if (item.ItemFlags[0] > 0)
 			{
-				short& fallVel = item.ItemFlags[1];
+				item.ItemFlags[0]--;
+			}
+			else
+			{
+				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
+				item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
 
-				// Get point collision.
-				auto box = GameBoundingBox(&item);
 				auto pointColl = GetCollision(item);
-				int relFloorHeight = (item.Pose.Position.y - pointColl.Position.Floor) - box.Y1 ;
-
-				// Airborne.
-				if (relFloorHeight <= fallVel)
-				{
-					fallVel += CRUMBLING_PLATFORM_VELOCITY_ACCEL;
-					if (fallVel > CRUMBLING_PLATFORM_VELOCITY_MAX)
-						fallVel = CRUMBLING_PLATFORM_VELOCITY_MAX;
-
-					item.Pose.Position.y += fallVel;
-				}
-				// Grounded.
-				else
-				{
-					item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_LAND;
-					item.Pose.Position.y = pointColl.Position.Floor;
-				}
-
-				// Update room number.
-				int probedRoomNumber = pointColl.RoomNumber;
-				if (item.RoomNumber != probedRoomNumber)
-					ItemNewRoom(itemNumber, probedRoomNumber);
+				pointColl.Block->RemoveBridge(itemNumber);
 			}
+		}
 
-			break;
+		break;
 
-			case CRUMBLING_PLATFORM_STATE_LAND:
+		case CRUMBLING_PLATFORM_STATE_FALL:
+		{
+			short& fallVel = item.ItemFlags[1];
+
+			// Get point collision.
+			auto box = GameBoundingBox(&item);
+			auto pointColl = GetCollision(item);
+			int relFloorHeight = (item.Pose.Position.y - pointColl.Position.Floor) - box.Y1 ;
+
+			// Airborne.
+			if (relFloorHeight <= fallVel)
 			{
-				// Align to surface.
-				auto radius = Vector2(Objects[item.ObjectNumber].radius);
-				AlignEntityToSurface(&item, radius);
+				fallVel += CRUMBLING_PLATFORM_VELOCITY_ACCEL;
+				if (fallVel > CRUMBLING_PLATFORM_VELOCITY_MAX)
+					fallVel = CRUMBLING_PLATFORM_VELOCITY_MAX;
 
-				// Deactivate.
-				if (TestLastFrame(&item))
-				{
-					RemoveActiveItem(itemNumber);
-					item.Status = ITEM_NOT_ACTIVE;
-				}
+				item.Pose.Position.y += fallVel;
+			}
+			// Grounded.
+			else
+			{
+				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_LAND;
+				item.Pose.Position.y = pointColl.Position.Floor;
 			}
 
-			break;
+			// Update room number.
+			int probedRoomNumber = pointColl.RoomNumber;
+			if (item.RoomNumber != probedRoomNumber)
+				ItemNewRoom(itemNumber, probedRoomNumber);
+		}
 
-			default:
-				TENLog(
-					"Error with crumbling platform with entity ID" + std::to_string(itemNumber) + ". animation state not recognized.",
-					LogLevel::Error, LogConfig::All);
-				break;
+		break;
+
+		case CRUMBLING_PLATFORM_STATE_LAND:
+		{
+			// Align to surface.
+			auto radius = Vector2(Objects[item.ObjectNumber].radius);
+			AlignEntityToSurface(&item, radius);
+
+			// Deactivate.
+			if (TestLastFrame(&item))
+			{
+				RemoveActiveItem(itemNumber);
+				item.Status = ITEM_NOT_ACTIVE;
+			}
+		}
+
+		break;
+
+		default:
+			TENLog(
+				"Error with crumbling platform item " + std::to_string(itemNumber) +
+				": attempted to handle missing state " + std::to_string(item.Animation.ActiveState),
+				LogLevel::Error, LogConfig::All);
+			break;
 		}
 
 		AnimateItem(&item);
@@ -181,7 +185,7 @@ namespace TEN::Entities::Traps
 		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
 			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
 		{
-			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+			auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 			if (boxHeight.has_value())
 				return *boxHeight;
 		}
@@ -196,7 +200,7 @@ namespace TEN::Entities::Traps
 		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
 			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
 		{
-			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+			auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 			if (boxHeight.has_value())
 				return *boxHeight;
 		}

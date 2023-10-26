@@ -45,7 +45,9 @@ using namespace TEN::Entities::TR4;
 
 namespace Save = TEN::Save;
 
-const std::string SAVEGAME_PATH = "Save//";
+constexpr auto SAVEGAME_MAX_SLOT  = 99;
+constexpr auto SAVEGAME_PATH	  = "Save//";
+constexpr auto SAVEGAME_FILE_MASK = "savegame.";
 
 GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
@@ -62,21 +64,20 @@ void SaveGame::LoadSavegameInfos()
 	if (!std::filesystem::is_directory(FullSaveDirectory))
 		return;
 
+	// Reset overall savegame count.
+	LastSaveGame = 0;
+
 	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		auto fileName = FullSaveDirectory + "savegame." + std::to_string(i);
-		auto savegamePtr = fopen(fileName.c_str(), "rb");
-
-		if (savegamePtr == nullptr)
+		if (!DoesSaveGameExist(i, true))
 			continue;
-
-		fclose(savegamePtr);
 
 		SavegameInfos[i].Present = true;
 		SaveGame::LoadHeader(i, &SavegameInfos[i]);
 
-		fclose(savegamePtr);
+		if (SavegameInfos[i].Count > LastSaveGame)
+			LastSaveGame = SavegameInfos[i].Count;
 	}
 }
 
@@ -163,6 +164,35 @@ Vector4 ToVector4(const Save::Vector4* vec)
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
+bool SaveGame::IsSaveGameSlotValid(int slot)
+{
+	if (slot < 0 || slot > SAVEGAME_MAX_SLOT)
+	{
+		TENLog("Attempted to access invalid savegame slot " + std::to_string(slot), LogLevel::Warning);
+		return false;
+	}
+
+	return true;
+}
+
+bool SaveGame::DoesSaveGameExist(int slot, bool silent)
+{
+	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
+	{
+		if (!silent)
+			TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
+
+		return false;
+	}
+
+	return true;
+}
+
+std::string SaveGame::GetSavegameFilename(int slot)
+{
+	return (FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot));
+}
+
 #define SaveVec(Type, Data, TableBuilder, UnionType, SaveType, ConversionFunc) \
 				auto data = std::get<(int)Type>(Data); \
 				TableBuilder vtb{ fbb }; \
@@ -178,7 +208,15 @@ void SaveGame::Init(const std::string& gameDirectory)
 
 bool SaveGame::Save(int slot)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	g_GameScript->OnSave();
+
+	// Savegame infos need to be reloaded so that last savegame counter properly increases.
+	SaveGame::LoadSavegameInfos();
+
+	auto fileName = GetSavegameFilename(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
@@ -547,6 +585,7 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::Minecart> mineOffset;
 		flatbuffers::Offset<Save::UPV> upvOffset;
 		flatbuffers::Offset<Save::Kayak> kayakOffset;
+		flatbuffers::Offset<Save::Pushable> pushableOffset;
 
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
@@ -667,6 +706,44 @@ bool SaveGame::Save(int slot)
 			kayakBuilder.add_water_height(kayak->WaterHeight);
 			kayakOffset = kayakBuilder.Finish();
 		}
+		else if (itemToSerialize.Data.is<PushableInfo>())
+		{
+			auto pushable = (PushableInfo*)itemToSerialize.Data;
+
+			Save::PushableBuilder pushableBuilder{ fbb };
+
+			pushableBuilder.add_pushable_behaviour_state((int)pushable->BehaviorState);
+			pushableBuilder.add_pushable_gravity(pushable->Gravity);
+			pushableBuilder.add_pushable_water_force(pushable->Oscillation);
+
+			pushableBuilder.add_pushable_stack_limit(pushable->Stack.Limit);
+			pushableBuilder.add_pushable_stack_upper(pushable->Stack.ItemNumberAbove);
+			pushableBuilder.add_pushable_stack_lower(pushable->Stack.ItemNumberBelow);
+
+			pushableBuilder.add_pushable_start_x(pushable->StartPos.x);
+			pushableBuilder.add_pushable_start_z(pushable->StartPos.z);
+			pushableBuilder.add_pushable_room_number(pushable->StartPos.RoomNumber);
+
+			pushableBuilder.add_pushable_collider_flag(pushable->UseBridgeCollision);
+
+			pushableBuilder.add_pushable_north_pullable(pushable->EdgeAttribs[0].IsPullable);
+			pushableBuilder.add_pushable_north_pushable(pushable->EdgeAttribs[0].IsPushable);
+			pushableBuilder.add_pushable_north_climbable(pushable->EdgeAttribs[0].IsClimbable);
+
+			pushableBuilder.add_pushable_east_pullable(pushable->EdgeAttribs[1].IsPullable);
+			pushableBuilder.add_pushable_east_pushable(pushable->EdgeAttribs[1].IsPushable);
+			pushableBuilder.add_pushable_east_climbable(pushable->EdgeAttribs[1].IsClimbable);
+
+			pushableBuilder.add_pushable_south_pullable(pushable->EdgeAttribs[2].IsPullable);
+			pushableBuilder.add_pushable_south_pushable(pushable->EdgeAttribs[2].IsPushable);
+			pushableBuilder.add_pushable_south_climbable(pushable->EdgeAttribs[2].IsClimbable);
+
+			pushableBuilder.add_pushable_west_pullable(pushable->EdgeAttribs[3].IsPullable);
+			pushableBuilder.add_pushable_west_pushable(pushable->EdgeAttribs[3].IsPushable);
+			pushableBuilder.add_pushable_west_climbable(pushable->EdgeAttribs[3].IsClimbable);
+
+			pushableOffset = pushableBuilder.Finish();
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			Save::ShortBuilder sb{ fbb };
@@ -749,6 +826,11 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data_type(Save::ItemData::Kayak);
 			serializedItem.add_data(kayakOffset.Union());
 		}
+		else if (itemToSerialize.Data.is<PushableInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Pushable);
+			serializedItem.add_data(pushableOffset.Union());
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Short);
@@ -805,9 +887,9 @@ bool SaveGame::Save(int slot)
 	{
 		Save::EventSetCallCountersBuilder serializedEventSetCallCounter{ fbb };
 
-		serializedEventSetCallCounter.add_on_enter(set.OnEnter.CallCounter);
-		serializedEventSetCallCounter.add_on_inside(set.OnInside.CallCounter);
-		serializedEventSetCallCounter.add_on_leave(set.OnLeave.CallCounter);
+		serializedEventSetCallCounter.add_on_enter(set.Events[(int)VolumeEventType::Enter].CallCounter);
+		serializedEventSetCallCounter.add_on_inside(set.Events[(int)VolumeEventType::Inside].CallCounter);
+		serializedEventSetCallCounter.add_on_leave(set.Events[(int)VolumeEventType::Leave].CallCounter);
 
 		auto serializedEventSetCallCounterOffset = serializedEventSetCallCounter.Finish();
 		serializedEventSetCallCounters.push_back(serializedEventSetCallCounterOffset);
@@ -1207,7 +1289,7 @@ bool SaveGame::Save(int slot)
 				
 			case SavedVarType::Vec3:
 				{
-					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
+					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
 					break;
 				}
 
@@ -1351,7 +1433,13 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	if (!DoesSaveGameExist(slot))
+		return false;
+
+	auto fileName = GetSavegameFilename(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
@@ -1366,7 +1454,6 @@ bool SaveGame::Load(int slot)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
 	// Statistics
-	LastSaveGame = s->header()->count();
 	GameTimer = s->header()->timer();
 
 	Statistics.Game.AmmoHits = s->game()->ammo_hits();
@@ -1739,6 +1826,41 @@ bool SaveGame::Load(int slot)
 			kayak->Velocity = savedKayak->velocity();
 			kayak->WaterHeight = savedKayak->water_height();
 		}
+		else if (item->Data.is <PushableInfo>())
+		{
+			auto* pushable = (PushableInfo*)item->Data;
+			auto* savedPushable = (Save::Pushable*)savedItem->data();
+
+			pushable->BehaviorState = (PushableBehaviourState)savedPushable->pushable_behaviour_state();
+			pushable->Gravity = savedPushable->pushable_gravity();
+			pushable->Oscillation = savedPushable->pushable_water_force();
+
+			pushable->Stack.Limit = savedPushable->pushable_stack_limit();
+			pushable->Stack.ItemNumberAbove = savedPushable->pushable_stack_upper();
+			pushable->Stack.ItemNumberBelow = savedPushable->pushable_stack_lower();
+
+			pushable->StartPos.x = savedPushable->pushable_start_x();
+			pushable->StartPos.z = savedPushable->pushable_start_z();
+			pushable->StartPos.RoomNumber = savedPushable->pushable_room_number();
+
+			pushable->UseBridgeCollision = savedPushable->pushable_collider_flag();
+
+			pushable->EdgeAttribs[0].IsPullable = savedPushable->pushable_north_pullable();
+			pushable->EdgeAttribs[0].IsPushable = savedPushable->pushable_north_pushable();
+			pushable->EdgeAttribs[0].IsClimbable = savedPushable->pushable_north_climbable();
+
+			pushable->EdgeAttribs[1].IsPullable = savedPushable->pushable_east_pullable();
+			pushable->EdgeAttribs[1].IsPushable = savedPushable->pushable_east_pushable();
+			pushable->EdgeAttribs[1].IsClimbable = savedPushable->pushable_east_climbable();
+
+			pushable->EdgeAttribs[2].IsPullable = savedPushable->pushable_south_pullable();
+			pushable->EdgeAttribs[2].IsPushable = savedPushable->pushable_south_pushable();
+			pushable->EdgeAttribs[2].IsClimbable = savedPushable->pushable_south_climbable();
+
+			pushable->EdgeAttribs[3].IsPullable = savedPushable->pushable_west_pullable();
+			pushable->EdgeAttribs[3].IsPushable = savedPushable->pushable_west_pushable();
+			pushable->EdgeAttribs[3].IsClimbable = savedPushable->pushable_west_climbable();
+		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
 			auto* data = savedItem->data();
@@ -1868,9 +1990,9 @@ bool SaveGame::Load(int slot)
 		{
 			auto cc_saved = s->call_counters()->Get(i);
 
-			g_Level.EventSets[i].OnEnter.CallCounter = cc_saved->on_enter();
-			g_Level.EventSets[i].OnInside.CallCounter = cc_saved->on_inside();
-			g_Level.EventSets[i].OnLeave.CallCounter = cc_saved->on_leave();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Enter].CallCounter = cc_saved->on_enter();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Inside].CallCounter = cc_saved->on_inside();
+			g_Level.EventSets[i].Events[(int)VolumeEventType::Leave].CallCounter = cc_saved->on_leave();
 		}
 	}
 
@@ -2133,7 +2255,7 @@ bool SaveGame::Load(int slot)
 				{
 					auto stored = var->u_as_vec3()->vec();
 					SavedVar var;
-					var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+					var.emplace<(int)SavedVarType::Vec3>(ToVector3(stored));
 					loadedVars.push_back(var);
 					break;
 				}
@@ -2206,7 +2328,13 @@ bool SaveGame::Load(int slot)
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	if (!DoesSaveGameExist(slot))
+		return false;
+
+	auto fileName = GetSavegameFilename(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -2230,4 +2358,15 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 	header->Count = s->header()->count();
 
 	return true;
+}
+
+void SaveGame::Delete(int slot)
+{
+	if (!IsSaveGameSlotValid(slot))
+		return;
+
+	if (!DoesSaveGameExist(slot))
+		return;
+
+	std::filesystem::remove(GetSavegameFilename(slot));
 }

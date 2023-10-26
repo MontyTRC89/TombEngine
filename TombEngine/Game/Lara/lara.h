@@ -92,10 +92,9 @@ constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
 constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
 
-// Collision heights
-constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3.0f / 2);
-constexpr auto BAD_JUMP_CEILING	   = (int)CLICK(6.0f / 8);
-constexpr auto SHALLOW_WATER_DEPTH = (int)CLICK(1.0f / 2);
+constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3 / 2.0f);
+constexpr auto BAD_JUMP_CEILING	   = (int)CLICK(6 / 8.0f);
+constexpr auto SHALLOW_WATER_DEPTH = (int)CLICK(1 / 2.0f);
 constexpr auto WADE_DEPTH		   = STEPUP_HEIGHT;
 constexpr auto SWIM_DEPTH		   = CLICK(3) - 38;
 constexpr auto SLOPE_DIFFERENCE	   = 60;
@@ -103,11 +102,6 @@ constexpr auto SLOPE_DIFFERENCE	   = 60;
 extern LaraInfo		 Lara;
 extern ItemInfo*	 LaraItem;
 extern CollisionInfo LaraCollision;
-
-// State machine
-#define LaraRoutineFunction void(ItemInfo* item, CollisionInfo* coll)
-extern std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
-extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll);
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll);
