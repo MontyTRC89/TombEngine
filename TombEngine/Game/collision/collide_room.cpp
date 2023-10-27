@@ -283,8 +283,8 @@ static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSe
 	}
 	else if (collSetup.BlockMonkeySwingEdge)
 	{
-		auto monkeyPointColl = GetCollision(probePos.x, probePos.y + collSetup.Height, probePos.z, realRoomNumber);
-		if (!monkeyPointColl.BottomBlock->Flags.Monkeyswing)
+		auto pointColl = GetCollision(probePos.x, probePos.y + collSetup.Height, probePos.z, realRoomNumber);
+		if (!pointColl.BottomBlock->Flags.Monkeyswing)
 			sectorAttribs.Floor = MAX_HEIGHT;
 	}
 }
@@ -315,7 +315,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	// If unconstrained mode is specified, don't use quadrant.
 	switch ((coll->Setup.Mode == CollisionProbeMode::Quadrants) ? quadrant : -1)
 	{
-	case 0:
+	case NORTH:
 		xFront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront =  coll->Setup.Radius;
 		xLeft  = -coll->Setup.Radius;
@@ -324,7 +324,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight =  coll->Setup.Radius;
 		break;
 
-	case 1:
+	case EAST:
 		xFront =  coll->Setup.Radius;
 		zFront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xLeft  =  coll->Setup.Radius;
@@ -333,7 +333,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight = -coll->Setup.Radius;
 		break;
 
-	case 2:
+	case SOUTH:
 		xFront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront = -coll->Setup.Radius;
 		xLeft  =  coll->Setup.Radius;
@@ -342,7 +342,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight = -coll->Setup.Radius;
 		break;
 
-	case 3:
+	case WEST:
 		xFront = -coll->Setup.Radius;
 		zFront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xLeft  = -coll->Setup.Radius;
@@ -351,7 +351,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight =  coll->Setup.Radius;
 		break;
 
-	// No valid quadrant; return true probe offsets from object rotation.
+	// No valid quadrant; get true probe offsets from object rotation.
 	default: 
 		xFront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
@@ -660,6 +660,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 				break;
 			}
 		}
+
 		coll->CollisionType = (coll->CollisionType == CT_TOP) ? CT_TOP_FRONT : CT_FRONT;
 		return;
 	}
