@@ -39,7 +39,7 @@ namespace TEN::Renderer
 		const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
 		const D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
 
-		vsRooms = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", nullptr, blob);
+		vsRooms = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Rooms.fx"), "VS", "vs_4_0", nullptr, blob);
 
 		// Initialize input layout using first vertex shader.
 		D3D11_INPUT_ELEMENT_DESC inputLayoutItems[] =
@@ -59,37 +59,37 @@ namespace TEN::Renderer
 		};
 		Utils::throwIfFailed(device->CreateInputLayout(inputLayoutItems, 12, blob->GetBufferPointer(), blob->GetBufferSize(), &inputLayout));
 
-		vsRooms_Anim = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
-		psRooms = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Rooms.fx"), "PS", "ps_4_1", nullptr, blob);
-		vsItems = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "VS", "vs_4_0", nullptr, blob);
-		psItems = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Items.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsStatics = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "VS", "vs_4_0", nullptr, blob);
-		psStatics = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Statics.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsHairs = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Hairs.fx"), "VS", "vs_4_0", nullptr, blob);
-		psHairs = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Hairs.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsSky = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Sky.fx"), "VS", "vs_4_0", nullptr, blob);
-		psSky = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Sky.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsSprites = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "VS", "vs_4_0", nullptr, blob);
-		psSprites = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Sprites.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsSolid = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Solid.fx"), "VS", "vs_4_0", nullptr, blob);
-		psSolid = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Solid.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsInventory = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Inventory.fx"), "VS", "vs_4_0", nullptr, blob);
-		psInventory = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_Inventory.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsFullScreenQuad = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "VS", "vs_4_0", nullptr, blob);
-		psFullScreenQuad = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_FullScreenQuad.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsShadowMap = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "VS", "vs_4_0", nullptr, blob);
-		psShadowMap = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_ShadowMap.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsHUD = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_VS_HUD.hlsl"), "VS", "vs_4_0", nullptr, blob);
-		psHUDColor = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSColored", "ps_4_0", nullptr, blob);
-		psHUDTexture = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUD.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
-		psHUDBarColor = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\HUD\\DX11_PS_HUDBar.hlsl"), "PSTextured", "ps_4_0", nullptr, blob);
-		vsFinalPass = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "VS", "vs_4_0", nullptr, blob);
-		psFinalPass = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_FinalPass.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsInstancedStaticMeshes = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "VS", "vs_4_0", nullptr, blob);
-		psInstancedStaticMeshes = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedStatics.fx"), "PS", "ps_4_0", nullptr, blob);
-		vsInstancedSprites = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "VS", "vs_4_0", nullptr, blob);
-		psInstancedSprites = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\DX11_InstancedSprites.fx"), "PS", "ps_4_0", nullptr, blob);
-
+		vsRooms_Anim = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Rooms.fx"), "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
+		psRooms = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\Rooms.fx"), "PS", "ps_4_1", nullptr, blob);
+		vsItems = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Items.fx"), "VS", "vs_4_0", nullptr, blob);
+		psItems = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\Items.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsStatics = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Statics.fx"), "VS", "vs_4_0", nullptr, blob);
+		psStatics = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\Statics.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsHairs = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Hairs.fx"), "VS", "vs_4_0", nullptr, blob);
+		psHairs = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\Hairs.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsSky = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Sky.fx"), "VS", "vs_4_0", nullptr, blob);
+		psSky = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\Sky.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsSprites = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Sprites.fx"), "VS", "vs_4_0", nullptr, blob);
+		psSprites = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\Sprites.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsSolid = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Solid.fx"), "VS", "vs_4_0", nullptr, blob);
+		psSolid = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\Solid.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsInventory = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\Inventory.fx"), "VS", "vs_4_0", nullptr, blob);
+		psInventory = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\Inventory.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsFullScreenQuad = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\FullScreenQuad.fx"), "VS", "vs_4_0", nullptr, blob);
+		psFullScreenQuad = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\FullScreenQuad.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsShadowMap = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\ShadowMap.fx"), "VS", "vs_4_0", nullptr, blob);
+		psShadowMap = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\ShadowMap.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsHUD = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\HUD.hlsl"), "VS", "vs_4_0", nullptr, blob);
+		psHUDColor = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\HUD.hlsl"), "PSColoredHUD", "ps_4_0", nullptr, blob);
+		psHUDTexture = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\HUD.hlsl"), "PSTexturedHUD", "ps_4_0", nullptr, blob);
+		psHUDBarColor = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\HUD.hlsl"), "PSTexturedHUDBar", "ps_4_0", nullptr, blob);
+		vsFinalPass = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\FinalPass.fx"), "VS", "vs_4_0", nullptr, blob);
+		psFinalPass = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\FinalPass.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsInstancedStaticMeshes = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\InstancedStatics.fx"), "VS", "vs_4_0", nullptr, blob);
+		psInstancedStaticMeshes = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\InstancedStatics.fx"), "PS", "ps_4_0", nullptr, blob);
+		vsInstancedSprites = Utils::compileVertexShader(device.Get(), GetAssetPath(L"Shaders\\InstancedSprites.fx"), "VS", "vs_4_0", nullptr, blob);
+		psInstancedSprites = Utils::compilePixelShader(device.Get(), GetAssetPath(L"Shaders\\InstancedSprites.fx"), "PS", "ps_4_0", nullptr, blob);
+ 
 		// Initialize constant buffers
 		cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
 		cbItem = CreateConstantBuffer<CItemBuffer>();
@@ -391,7 +391,7 @@ namespace TEN::Renderer
 	{
 		TENLog("Creating DX11 renderer device...", LogLevel::Info);
 
-		D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_11_0 };
+		D3D_FEATURE_LEVEL levels[] = { D3D_FEATURE_LEVEL_10_1 };
 		D3D_FEATURE_LEVEL featureLevel;
 		HRESULT res;
 
