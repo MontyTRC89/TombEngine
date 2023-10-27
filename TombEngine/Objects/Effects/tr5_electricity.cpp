@@ -207,7 +207,7 @@ void ElectricityWiresControl(short itemNumber)
 				if ((GetRandomControl() & 127) < 16)
 				{
 					SpawnRipple(
-						Vector3(pos.x, floor->GetSurfaceHeight(pos.x, pos.y, pos.z, true), pos.z),
+						Vector3(pos.x, floor->GetSurfaceHeight(pos, true), pos.z),
 						roomNumber,
 						Random::GenerateFloat(32.0f, 40.0f),
 						(int)RippleFlags::LowOpacity);

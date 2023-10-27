@@ -232,7 +232,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 }
 
 std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
@@ -242,5 +242,5 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 }

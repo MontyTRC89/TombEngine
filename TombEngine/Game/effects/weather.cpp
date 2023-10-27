@@ -480,7 +480,7 @@ namespace TEN::Effects::Environment
 
 				auto coll = GetCollision(xPos, yPos, zPos, outsideRoom);
 
-				if (!(coll.Position.Ceiling < yPos || coll.Block->GetRoomNumberAbove(xPos, yPos, zPos).value_or(NO_ROOM) != NO_ROOM))
+				if (!(coll.Position.Ceiling < yPos || coll.Block->GetRoomNumberAbove(Vector3i(xPos, yPos, zPos)).value_or(NO_ROOM) != NO_ROOM))
 					continue;
 
 				auto part = WeatherParticle();
