@@ -289,6 +289,24 @@ static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSe
 	}
 }
 
+static void HandleDiagonalShift(ItemInfo& item, CollisionInfo& coll, const Vector3i& pos, CardinalDirection quadrant, bool isRightShift)
+{
+	int sign = isRightShift ? 1 : -1;
+
+	// Calculate angles.
+	short perpSplitAngle = (ANGLE(90.0f) * quadrant) + (ANGLE(45.0f) * sign);
+	short deltaAngle = abs(Geometry::GetShortestAngle(coll.Setup.ForwardAngle, perpSplitAngle));
+
+	// HACK: Force slight push left to avoid getting stuck.
+	float alpha = 1.0f - ((float)deltaAngle / (float)ANGLE(90.0f));
+	if (alpha >= 0.5f)
+		TranslateItem(&item, perpSplitAngle, item.Animation.Velocity.z * alpha);
+
+	// Set shift.
+	coll.Shift.Position.x += coll.Setup.PrevPosition.x - pos.x;
+	coll.Shift.Position.z += coll.Setup.PrevPosition.z - pos.z;
+};
+
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom)
 {
 	// Player collision has several more precise checks for bridge collisions.
@@ -682,11 +700,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
-			// HACK: Force slight push left to avoid getting stuck.
-			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity.z);
-
-			coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
+			HandleDiagonalShift(*item, *coll, entityPos, (CardinalDirection)quadrant, true);
 		}
 		else
 		{
@@ -706,7 +720,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 		if (coll->DiagonalStepAtLeft())
 		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90.0f); // NOTE: Different from quadrant!
+			// NOTE: Different from quadrant!
+			int quarter = (unsigned short)coll->Setup.ForwardAngle / ANGLE(90.0f);
 			quarter %= 2;
 
 			if (coll->MiddleLeft.HasFlippedDiagonalSplit())
@@ -737,11 +752,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
-			// HACK: Force slight push right to avoid getting stuck.
-			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity.z);
-
-			coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
+			HandleDiagonalShift(*item, *coll, entityPos, (CardinalDirection)quadrant, false);
 		}
 		else
 		{
