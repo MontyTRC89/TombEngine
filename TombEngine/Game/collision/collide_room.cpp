@@ -720,7 +720,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 		if (coll->DiagonalStepAtLeft())
 		{
-			// NOTE: Different from quadrant!
+			// NOTE: Different from quadrant.
 			int quarter = (unsigned short)coll->Setup.ForwardAngle / ANGLE(90.0f);
 			quarter %= 2;
 
