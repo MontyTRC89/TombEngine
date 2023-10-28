@@ -19,20 +19,20 @@ namespace TEN::Collision
 		const int	   RoomNumber = 0;
 
 	private:
-		FloorInfo* SectorPtr	   = nullptr;
-		FloorInfo* TopSectorPtr	   = nullptr;
-		FloorInfo* BottomSectorPtr = nullptr;
+		FloorInfo* _sectorPtr		= nullptr;
+		FloorInfo* _bottomSectorPtr = nullptr;
+		FloorInfo* _topSectorPtr	= nullptr;
 
-		std::optional<int>	   FloorHeight			   = std::nullopt;
-		std::optional<int>	   CeilingHeight		   = std::nullopt;
-		std::optional<Vector3> FloorNormal			   = std::nullopt;
-		std::optional<Vector3> CeilingNormal		   = std::nullopt;
-		std::optional<int>	   FloorBridgeItemNumber   = std::nullopt;
-		std::optional<int>	   CeilingBridgeItemNumber = std::nullopt;
+		std::optional<int>	   _floorHeight				= std::nullopt;
+		std::optional<int>	   _ceilingHeight			= std::nullopt;
+		std::optional<Vector3> _floorNormal				= std::nullopt;
+		std::optional<Vector3> _ceilingNormal			= std::nullopt;
+		std::optional<int>	   _floorBridgeItemNumber	= std::nullopt;
+		std::optional<int>	   _ceilingBridgeItemNumber = std::nullopt;
 
-		std::optional<int> WaterSurfaceHeight = std::nullopt;
-		std::optional<int> WaterTopHeight	  = std::nullopt;
-		std::optional<int> WaterBottomHeight  = std::nullopt;
+		std::optional<int> _waterSurfaceHeight = std::nullopt;
+		std::optional<int> _waterBottomHeight  = std::nullopt;
+		std::optional<int> _waterTopHeight	   = std::nullopt;
 
 	public:
 		// Constructors
@@ -40,8 +40,8 @@ namespace TEN::Collision
 
 		// Getters
 		FloorInfo& GetSector();
-		FloorInfo& GetTopSector();
 		FloorInfo& GetBottomSector();
+		FloorInfo& GetTopSector();
 
 		int		GetFloorHeight();
 		int		GetCeilingHeight();
@@ -51,8 +51,8 @@ namespace TEN::Collision
 		int		GetCeilingBridgeItemNumber();
 
 		int GetWaterSurfaceHeight();
-		int GetWaterTopHeight();
 		int GetWaterBottomHeight();
+		int GetWaterTopHeight();
 
 		// Inquirers
 		bool IsWall();

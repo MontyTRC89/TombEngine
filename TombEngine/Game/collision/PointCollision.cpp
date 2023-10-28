@@ -24,40 +24,20 @@ namespace TEN::Collision
 
 	FloorInfo& PointCollisionData::GetSector()
 	{
-		if (SectorPtr != nullptr)
-			return *SectorPtr;
+		if (_sectorPtr != nullptr)
+			return *_sectorPtr;
 
 		// Set current sector pointer.
 		short probeRoomNumber = RoomNumber;
-		SectorPtr = GetFloor(Position.x, Position.y, Position.z, &probeRoomNumber);
+		_sectorPtr = GetFloor(Position.x, Position.y, Position.z, &probeRoomNumber);
 
-		return *SectorPtr;
-	}
-
-	FloorInfo& PointCollisionData::GetTopSector()
-	{
-		if (TopSectorPtr != nullptr)
-			return *TopSectorPtr;
-
-		// Set top sector pointer.
-		auto* topSectorPtr = &GetSector();
-		auto roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z);
-		while (roomNumberAbove.has_value())
-		{
-			auto& room = g_Level.Rooms[roomNumberAbove.value_or(topSectorPtr->Room)];
-			topSectorPtr = Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
-
-			roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z);
-		}
-		TopSectorPtr = topSectorPtr;
-
-		return *TopSectorPtr;
+		return *_sectorPtr;
 	}
 
 	FloorInfo& PointCollisionData::GetBottomSector()
 	{
-		if (BottomSectorPtr != nullptr)
-			return *BottomSectorPtr;
+		if (_bottomSectorPtr != nullptr)
+			return *_bottomSectorPtr;
 
 		// Set bottom sector pointer.
 		auto* bottomSectorPtr = &GetSector();
@@ -69,128 +49,148 @@ namespace TEN::Collision
 
 			roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(Position.x, Position.y, Position.z);
 		}
-		BottomSectorPtr = bottomSectorPtr;
+		_bottomSectorPtr = bottomSectorPtr;
 
-		return *BottomSectorPtr;
+		return *_bottomSectorPtr;
+	}
+
+	FloorInfo& PointCollisionData::GetTopSector()
+	{
+		if (_topSectorPtr != nullptr)
+			return *_topSectorPtr;
+
+		// Set top sector pointer.
+		auto* topSectorPtr = &GetSector();
+		auto roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z);
+		while (roomNumberAbove.has_value())
+		{
+			auto& room = g_Level.Rooms[roomNumberAbove.value_or(topSectorPtr->Room)];
+			topSectorPtr = Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
+
+			roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position.x, Position.y, Position.z);
+		}
+		_topSectorPtr = topSectorPtr;
+
+		return *_topSectorPtr;
 	}
 
 	int PointCollisionData::GetFloorHeight()
 	{
-		if (FloorHeight.has_value())
-			return *FloorHeight;
+		if (_floorHeight.has_value())
+			return *_floorHeight;
 
 		// Set floor height.
 		auto location = RoomVector(GetSector().Room, Position.y);
-		FloorHeight = Floordata::GetFloorHeight(location, Position.x, Position.z).value_or(NO_HEIGHT);
+		_floorHeight = Floordata::GetFloorHeight(location, Position.x, Position.z).value_or(NO_HEIGHT);
 		
-		return *FloorHeight;
+		return *_floorHeight;
 	}
 	
 	int PointCollisionData::GetCeilingHeight()
 	{
-		if (CeilingHeight.has_value())
-			return *CeilingHeight;
+		if (_ceilingHeight.has_value())
+			return *_ceilingHeight;
 
 		// Set ceiling height.
 		auto location = RoomVector(GetSector().Room, Position.y);
-		CeilingHeight = Floordata::GetCeilingHeight(location, Position.x, Position.z).value_or(NO_HEIGHT);
+		_ceilingHeight = Floordata::GetCeilingHeight(location, Position.x, Position.z).value_or(NO_HEIGHT);
 		
-		return *CeilingHeight;
+		return *_ceilingHeight;
 	}
 
 	Vector3 PointCollisionData::GetFloorNormal()
 	{
-		if (FloorNormal.has_value())
-			return *FloorNormal;
+		if (_floorNormal.has_value())
+			return *_floorNormal;
 
 		// Set floor normal.
 		if (GetFloorBridgeItemNumber() != NO_ITEM)
 		{
-			FloorNormal = GetBridgeNormal(true);
+			_floorNormal = GetBridgeNormal(true);
 		}
 		else
 		{
 			auto floorTilt = GetBottomSector().GetSurfaceTilt(Position.x, Position.z, true);
-			FloorNormal = GetSurfaceNormal(floorTilt, true);
+			_floorNormal = GetSurfaceNormal(floorTilt, true);
 		}
 
-		return *FloorNormal;
+		return *_floorNormal;
 	}
 
 	Vector3 PointCollisionData::GetCeilingNormal()
 	{
-		if (CeilingNormal.has_value())
-			return *CeilingNormal;
+		if (_ceilingNormal.has_value())
+			return *_ceilingNormal;
 
 		// Set ceiling normal.
 		if (GetCeilingBridgeItemNumber() != NO_ITEM)
 		{
-			CeilingNormal = GetBridgeNormal(false);
+			_ceilingNormal = GetBridgeNormal(false);
 		}
 		else
 		{
 			auto ceilingTilt = GetTopSector().GetSurfaceTilt(Position.x, Position.z, false);
-			CeilingNormal = GetSurfaceNormal(ceilingTilt, false);
+			_ceilingNormal = GetSurfaceNormal(ceilingTilt, false);
 		}
 
-		return *CeilingNormal;
+		return *_ceilingNormal;
 	}
 
 	int PointCollisionData::GetFloorBridgeItemNumber()
 	{
-		if (FloorBridgeItemNumber.has_value())
-			return *FloorBridgeItemNumber;
+		if (_floorBridgeItemNumber.has_value())
+			return *_floorBridgeItemNumber;
 
 		// Set floor bridge item number.
 		int floorHeight = GetFloorHeight();
-		FloorBridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);
+		_floorBridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(Position.x, floorHeight, Position.z, true, false);
 
-		return *FloorBridgeItemNumber;
+		return *_floorBridgeItemNumber;
 	}
 	
 	int PointCollisionData::GetCeilingBridgeItemNumber()
 	{
-		if (CeilingBridgeItemNumber.has_value())
-			return *CeilingBridgeItemNumber;
+		if (_ceilingBridgeItemNumber.has_value())
+			return *_ceilingBridgeItemNumber;
 
 		// Set ceiling bridge item number.
 		int ceilingHeight = GetCeilingHeight();
-		CeilingBridgeItemNumber = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);
+		_ceilingBridgeItemNumber = GetTopSector().GetInsideBridgeItemNumber(Position.x, ceilingHeight, Position.z, false, true);
 
-		return *CeilingBridgeItemNumber;
+		return *_ceilingBridgeItemNumber;
 	}
 
 	int PointCollisionData::GetWaterSurfaceHeight()
 	{
-		if (WaterSurfaceHeight.has_value())
-			return *WaterSurfaceHeight;
+		if (_waterSurfaceHeight.has_value())
+			return *_waterSurfaceHeight;
 
 		// Set water surface height.
-		WaterSurfaceHeight = GetWaterSurface(Position.x, Position.y, Position.z, RoomNumber);
+		_waterSurfaceHeight = GetWaterSurface(Position.x, Position.y, Position.z, RoomNumber);
 
-		return *WaterSurfaceHeight;
-	}
-
-	int PointCollisionData::GetWaterTopHeight()
-	{
-		if (WaterTopHeight.has_value())
-			return *WaterTopHeight;
-
-		// Set water top height.
-		WaterTopHeight = GetWaterHeight(Position.x, Position.y, Position.z, RoomNumber);
-
-		return *WaterTopHeight;
+		return *_waterSurfaceHeight;
 	}
 
 	int PointCollisionData::GetWaterBottomHeight()
 	{
-		if (WaterBottomHeight.has_value())
-			return *WaterBottomHeight;
+		if (_waterBottomHeight.has_value())
+			return *_waterBottomHeight;
 
 		// Set water bottom height.
-		WaterBottomHeight = GetWaterDepth(Position.x, Position.y, Position.z, RoomNumber);
+		_waterBottomHeight = GetWaterDepth(Position.x, Position.y, Position.z, RoomNumber);
 
-		return *WaterBottomHeight;
+		return *_waterBottomHeight;
+	}
+
+	int PointCollisionData::GetWaterTopHeight()
+	{
+		if (_waterTopHeight.has_value())
+			return *_waterTopHeight;
+
+		// Set water top height.
+		_waterTopHeight = GetWaterHeight(Position.x, Position.y, Position.z, RoomNumber);
+
+		return *_waterTopHeight;
 	}
 
 	bool PointCollisionData::IsWall()
