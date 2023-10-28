@@ -237,19 +237,19 @@ namespace TEN::Collision
 	// HACK.
 	Vector3 PointCollisionData::GetBridgeNormal(bool isFloor)
 	{
-		constexpr auto ANGLE_STEP = short(ANGLE(45.0f) / 4);
+		constexpr auto ANGLE_STEP = ANGLE(45.0f / 4);
 
-		int itemNumber = isFloor ? GetFloorBridgeItemNumber() : GetCeilingBridgeItemNumber();
-		if (itemNumber == NO_ITEM)
+		int bridgeItemNumber = isFloor ? GetFloorBridgeItemNumber() : GetCeilingBridgeItemNumber();
+		if (bridgeItemNumber == NO_ITEM)
 		{
 			TENLog("PointCollisionData error: invalid bridge item number in GetBridgeNormal().", LogLevel::Warning);
 			return -Vector3::UnitY;
 		}
 
-		const auto& item = g_Level.Items[itemNumber];
+		const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
 
-		auto orient = item.Pose.Orientation;
-		switch (item.ObjectNumber)
+		auto orient = bridgeItem.Pose.Orientation;
+		switch (bridgeItem.ObjectNumber)
 		{
 		default:
 		case ID_BRIDGE_FLAT:
