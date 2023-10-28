@@ -21,7 +21,7 @@ namespace TEN::Renderer::Graphics
 		initData.SysMemPitch = sizeof(Vertex) * numVertices;
 		throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 
-		m_numVertices = numVertices;
+		_numVertices = numVertices;
 	}
 
 	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices)
@@ -34,7 +34,7 @@ namespace TEN::Renderer::Graphics
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer)); 
 
-		m_numVertices = numVertices;
+		_numVertices = numVertices;
 	}
 
 	bool VertexBuffer::Update(ID3D11DeviceContext* context, std::vector<Vertex>& data, int startVertex, int count)

@@ -13,7 +13,7 @@ namespace TEN::Renderer::Graphics
 	class VertexBuffer
 	{
 	private:
-		int m_numVertices;
+		int _numVertices;
 
 	public:
 		ComPtr<ID3D11Buffer> Buffer;

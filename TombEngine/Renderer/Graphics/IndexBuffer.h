@@ -11,7 +11,7 @@ namespace TEN::Renderer::Graphics
 	class IndexBuffer
 	{
 	private:
-		int m_numIndices;
+		int _numIndices;
 
 	public:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> Buffer;

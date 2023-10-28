@@ -79,13 +79,13 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 
 void Renderer::UpdateLaraAnimations(bool force)
 {
-	auto& rItem = items[LaraItem->Index];
+	auto& rItem = _items[LaraItem->Index];
 	rItem.ItemNumber = LaraItem->Index;
 
 	if (!force && rItem.DoneAnimations)
 		return;
 
-	auto& playerObject = *moveableObjects[ID_LARA];
+	auto& playerObject = *_moveableObjects[ID_LARA];
 
 	// Clear extra rotations.
 	for (auto& bone : playerObject.LinearizedBones)
@@ -95,8 +95,8 @@ void Renderer::UpdateLaraAnimations(bool force)
 	auto tMatrix = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 	auto rotMatrix = LaraItem->Pose.Orientation.ToRotationMatrix();
 
-	laraWorldMatrix = rotMatrix * tMatrix;
-	rItem.World = laraWorldMatrix;
+	_laraWorldMatrix = rotMatrix * tMatrix;
+	rItem.World = _laraWorldMatrix;
 
 	// Update extra head and torso rotations.
 	playerObject.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion();
@@ -285,7 +285,7 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	if (CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 
-	auto* item = &items[LaraItem->Index];
+	auto* item = &_items[LaraItem->Index];
 	auto* nativeItem = &g_Level.Items[item->ItemNumber];
 
 	if (nativeItem->Flags & IFLAG_INVISIBLE)
@@ -294,37 +294,37 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	unsigned int stride = sizeof(Vertex);
 	unsigned int offset = 0;
 
-	context->IASetVertexBuffers(0, 1, moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	context->IASetInputLayout(inputLayout.Get());
-	context->IASetIndexBuffer(moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+	_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	_context->IASetInputLayout(_inputLayout.Get());
+	_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-	context->VSSetShader(vsItems.Get(), nullptr, 0);
-	context->PSSetShader(psItems.Get(), nullptr, 0);
+	_context->VSSetShader(_vsItems.Get(), nullptr, 0);
+	_context->PSSetShader(_psItems.Get(), nullptr, 0);
 
 	// Set texture
-	BindTexture(TextureRegister::ColorMap, &std::get<0>(moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
-	BindTexture(TextureRegister::NormalMap, &std::get<1>(moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+	BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+	BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 
 	SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-	RendererObject& laraObj = *moveableObjects[ID_LARA];
+	RendererObject& laraObj = *_moveableObjects[ID_LARA];
 	RendererObject& laraSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 
-	RendererRoom* room = &rooms[LaraItem->RoomNumber];
+	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
-	stItem.World = laraWorldMatrix;
-	stItem.Color = item->Color;
-	stItem.AmbientLight = item->AmbientLight;
-	memcpy(stItem.BonesMatrices, laraObj.AnimationTransforms.data(), laraObj.AnimationTransforms.size() * sizeof(Matrix));
+	_stItem.World = _laraWorldMatrix;
+	_stItem.Color = item->Color;
+	_stItem.AmbientLight = item->AmbientLight;
+	memcpy(_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), laraObj.AnimationTransforms.size() * sizeof(Matrix));
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
+		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
 	}
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
-	cbItem.updateData(stItem, context.Get());
-	BindConstantBufferVS(ConstantBufferRegister::Item, cbItem.get());
-	BindConstantBufferPS(ConstantBufferRegister::Item, cbItem.get());
+	_cbItem.updateData(_stItem, _context.Get());
+	BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
+	BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
@@ -344,7 +344,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 	if (!Objects[ID_HAIR].loaded)
 		return;
 
-	const auto& hairObject = *moveableObjects[ID_HAIR];
+	const auto& hairObject = *_moveableObjects[ID_HAIR];
 
 	// TODO
 	bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
@@ -357,21 +357,21 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 		// First matrix is Lara's head matrix, then all hair unit segment matrices.
 		// Bones are adjusted at load time to account for this.
-		stItem.World = Matrix::Identity;
-		stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * laraWorldMatrix;
+		_stItem.World = Matrix::Identity;
+		_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * _laraWorldMatrix;
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
 			const auto& segment = unit.Segments[i];
 			auto worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * Matrix::CreateTranslation(segment.Position);
 
-			stItem.BonesMatrices[i + 1] = worldMatrix;
-			stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
+			_stItem.BonesMatrices[i + 1] = worldMatrix;
+			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
 		}
 
-		cbItem.updateData(stItem, context.Get());
-		BindConstantBufferVS(ConstantBufferRegister::Item, cbItem.get());
-		BindConstantBufferPS(ConstantBufferRegister::Item, cbItem.get());
+		_cbItem.updateData(_stItem, _context.Get());
+		BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
+		BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 
 		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
 		{
@@ -385,10 +385,10 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass)
 {
-	if (!moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
+	if (!_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 		return;
 
-	RendererObject& laraSkinJoints = *moveableObjects[ID_LARA_SKIN_JOINTS];
+	RendererObject& laraSkinJoints = *_moveableObjects[ID_LARA_SKIN_JOINTS];
 
 	for (int k = 1; k < laraSkinJoints.ObjectMeshes.size(); k++)
 	{
@@ -403,23 +403,23 @@ void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, Re
 	HolsterSlot rightHolsterID = Lara.Control.Weapon.HolsterInfo.RightHolster;
 	HolsterSlot backHolsterID = Lara.Control.Weapon.HolsterInfo.BackHolster;
 
-	if (moveableObjects[static_cast<int>(leftHolsterID)])
+	if (_moveableObjects[static_cast<int>(leftHolsterID)])
 	{
-		RendererObject& holsterSkin = *moveableObjects[static_cast<int>(leftHolsterID)];
+		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(leftHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_LTHIGH];
 		DrawMoveableMesh(itemToDraw, mesh, room, LM_LTHIGH, rendererPass);
 	}
 
-	if (moveableObjects[static_cast<int>(rightHolsterID)])
+	if (_moveableObjects[static_cast<int>(rightHolsterID)])
 	{
-		RendererObject& holsterSkin = *moveableObjects[static_cast<int>(rightHolsterID)];
+		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(rightHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_RTHIGH];
 		DrawMoveableMesh(itemToDraw, mesh, room, LM_RTHIGH, rendererPass);
 	}
 
-	if (backHolsterID != HolsterSlot::Empty && moveableObjects[static_cast<int>(backHolsterID)])
+	if (backHolsterID != HolsterSlot::Empty && _moveableObjects[static_cast<int>(backHolsterID)])
 	{
-		RendererObject& holsterSkin = *moveableObjects[static_cast<int>(backHolsterID)];
+		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(backHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
 		DrawMoveableMesh(itemToDraw, mesh, room, LM_TORSO, rendererPass);
 	}

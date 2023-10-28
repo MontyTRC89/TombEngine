@@ -154,7 +154,7 @@ namespace TEN::Renderer
 
 	void Renderer::UpdateItemAnimations(int itemNumber, bool force)
 	{
-		auto* itemToDraw = &items[itemNumber];
+		auto* itemToDraw = &_items[itemNumber];
 		auto* nativeItem = &g_Level.Items[itemNumber];
 
 		// TODO: hack for fixing a bug, check again if needed
@@ -171,7 +171,7 @@ namespace TEN::Renderer
 		itemToDraw->DoneAnimations = true;
 
 		auto* obj = &Objects[nativeItem->ObjectNumber];
-		auto& moveableObj = *moveableObjects[nativeItem->ObjectNumber];
+		auto& moveableObj = *_moveableObjects[nativeItem->ObjectNumber];
 
 		// Copy meshswaps
 		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
@@ -353,7 +353,7 @@ namespace TEN::Renderer
 
 	bool Renderer::IsFullsScreen() 
 	{
-		return (!isWindowed);
+		return (!_isWindowed);
 	}
 
 	void Renderer::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov, float farView)
@@ -362,7 +362,7 @@ namespace TEN::Renderer
 			farView = DEFAULT_FAR_VIEW;
 
 		farView = farView;
-		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+		_gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 	}
 
 	bool Renderer::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
@@ -380,37 +380,37 @@ namespace TEN::Renderer
 
 	void Renderer::FlipRooms(short roomNumber1, short roomNumber2)
 	{
-		std::swap(rooms[roomNumber1], rooms[roomNumber2]);
+		std::swap(_rooms[roomNumber1], _rooms[roomNumber2]);
 
-		rooms[roomNumber1].RoomNumber = roomNumber1;
-		rooms[roomNumber2].RoomNumber = roomNumber2;
+		_rooms[roomNumber1].RoomNumber = roomNumber1;
+		_rooms[roomNumber2].RoomNumber = roomNumber2;
 
-		invalidateCache = true;
+		_invalidateCache = true;
 	}
 
 	RendererObject& Renderer::GetRendererObject(GAME_OBJECT_ID id)
 	{
 		if (id == GAME_OBJECT_ID::ID_LARA || id == GAME_OBJECT_ID::ID_LARA_SKIN)
 		{
-			if (moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
-				return moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
+			if (_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
+				return _moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
 			else
-				return moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
+				return _moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
 		}
 		else
 		{
-			return moveableObjects[id].value();
+			return _moveableObjects[id].value();
 		}
 	}
 
 	RendererMesh* Renderer::GetMesh(int meshIndex)
 	{
-		return meshes[meshIndex];
+		return _meshes[meshIndex];
 	}
 
 	int Renderer::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
 	{
-		auto* itemToDraw = &items[itemNumber];
+		auto* itemToDraw = &_items[itemNumber];
 		auto* nativeItem = &g_Level.Items[itemNumber];
 
 		itemToDraw->ItemNumber = itemNumber;
@@ -468,17 +468,17 @@ namespace TEN::Renderer
 	{
 		if (itemNumber == LaraItem->Index)
 		{
-			auto& object = *moveableObjects[ID_LARA];
-			*outMatrix = object.AnimationTransforms[jointIndex] * laraWorldMatrix;
+			auto& object = *_moveableObjects[ID_LARA];
+			*outMatrix = object.AnimationTransforms[jointIndex] * _laraWorldMatrix;
 		}
 		else
 		{
 			UpdateItemAnimations(itemNumber, true);
 			
-			auto* rendererItem = &items[itemNumber];
+			auto* rendererItem = &_items[itemNumber];
 			auto* nativeItem = &g_Level.Items[itemNumber];
 
-			auto& obj = *moveableObjects[nativeItem->ObjectNumber];
+			auto& obj = *_moveableObjects[nativeItem->ObjectNumber];
 			*outMatrix = obj.AnimationTransforms[jointIndex] * rendererItem->World;
 		}
 	}
@@ -518,21 +518,21 @@ namespace TEN::Renderer
 
 	Vector2i Renderer::GetScreenResolution() const
 	{
-		return Vector2i(screenWidth, screenHeight);
+		return Vector2i(_screenWidth, _screenHeight);
 	}
 
 	std::optional<Vector2> Renderer::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
-			gameCamera.Camera.WorldPosition.x,
-			gameCamera.Camera.WorldPosition.y,
-			gameCamera.Camera.WorldPosition.z,
+			_gameCamera.Camera.WorldPosition.x,
+			_gameCamera.Camera.WorldPosition.y,
+			_gameCamera.Camera.WorldPosition.z,
 			1.0f);
 		auto cameraDir = Vector4(
-			gameCamera.Camera.WorldDirection.x,
-			gameCamera.Camera.WorldDirection.y,
-			gameCamera.Camera.WorldDirection.z,
+			_gameCamera.Camera.WorldDirection.x,
+			_gameCamera.Camera.WorldDirection.y,
+			_gameCamera.Camera.WorldDirection.z,
 			1.0f);
 		
 		// Point is behind camera; return nullopt.
@@ -540,7 +540,7 @@ namespace TEN::Renderer
 			return std::nullopt;
 
 		// Calculate clip space coords.
-		point = Vector4::Transform(point, gameCamera.Camera.ViewProjection);
+		point = Vector4::Transform(point, _gameCamera.Camera.ViewProjection);
 
 		// Calculate NDC.
 		point /= point.w;
@@ -551,7 +551,7 @@ namespace TEN::Renderer
 
 	Vector3 Renderer::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
 	{
-		auto* rendererItem = &items[itemNumber];
+		auto* rendererItem = &_items[itemNumber];
 
 		rendererItem->ItemNumber = itemNumber;
 
@@ -588,7 +588,7 @@ namespace TEN::Renderer
 			std::filesystem::create_directory(screenPath);
 
 		screenPath += buffer;
-		SaveWICTextureToFile(context.Get(), backBuffer.Texture.Get(), GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
+		SaveWICTextureToFile(_context.Get(), _backBuffer.Texture.Get(), GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
 			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
 }

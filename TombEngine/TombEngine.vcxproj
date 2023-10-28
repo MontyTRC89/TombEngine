@@ -680,7 +680,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Graphics\IndexBuffer.h" />
     <ClInclude Include="Renderer\Graphics\Texture2DArray.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\SpriteVertex.h" />
-    <ClInclude Include="Renderer\Quad\RenderQuad.h" />
     <ClInclude Include="Renderer\RendererSprite2D.h" />
     <ClInclude Include="Renderer\Graphics\RenderTarget2D.h" />
     <ClInclude Include="Renderer\Graphics\RenderTargetCubeArray.h" />
@@ -702,6 +701,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererDoor.h" />
     <ClInclude Include="Renderer\Structures\RendererEffect.h" />
     <ClInclude Include="Renderer\Structures\RendererFogBulb.h" />
+    <ClInclude Include="Renderer\Structures\RendererHudBar.h" />
     <ClInclude Include="Renderer\Structures\RendererItem.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
     <ClInclude Include="Renderer\Structures\RendererLine2D.h" />
@@ -1136,12 +1136,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Utils\VehicleHelpers.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
     <ClCompile Include="Renderer\Graphics\Texture2DArray.cpp" />
-    <ClCompile Include="Renderer\Quad\RenderQuad.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Renderer\Graphics\IndexBuffer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

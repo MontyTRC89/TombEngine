@@ -20,7 +20,6 @@
 #include "Game/Lara/lara_surface.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
-
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
@@ -47,6 +46,7 @@ using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;
 

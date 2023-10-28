@@ -11,15 +11,15 @@ namespace TEN::Renderer
 	void Renderer::ChangeScreenResolution(int width, int height, bool windowed) 
 	{
 		ID3D11RenderTargetView* nullViews[] = { nullptr };
-		context->OMSetRenderTargets(0, nullViews, NULL);
-		context->Flush();
-		context->ClearState();
+		_context->OMSetRenderTargets(0, nullViews, NULL);
+		_context->Flush();
+		_context->ClearState();
 
 		IDXGIOutput* output;
-		Utils::throwIfFailed(swapChain->GetContainingOutput(&output));
+		Utils::throwIfFailed(_swapChain->GetContainingOutput(&output));
 
 		DXGI_SWAP_CHAIN_DESC scd;
-		Utils::throwIfFailed(swapChain->GetDesc(&scd));
+		Utils::throwIfFailed(_swapChain->GetDesc(&scd));
 
 		unsigned int numModes = 1024;
 		DXGI_MODE_DESC modes[1024];
@@ -33,11 +33,11 @@ namespace TEN::Renderer
 				break;
 		}
 
-		Utils::throwIfFailed( swapChain->ResizeTarget(mode));
+		Utils::throwIfFailed( _swapChain->ResizeTarget(mode));
 
-		screenWidth = width;
-		screenHeight = height;
-		isWindowed = windowed;
+		_screenWidth = width;
+		_screenHeight = height;
+		_isWindowed = windowed;
 
 		InitializeScreen(width, height, WindowsHandle, true);
 	}
@@ -64,7 +64,7 @@ namespace TEN::Renderer
 		texture = Texture2D();
 
 		if (std::filesystem::is_regular_file(path))
-			texture = Texture2D(device.Get(), path);
+			texture = Texture2D(_device.Get(), path);
 		else
 		{
 			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;

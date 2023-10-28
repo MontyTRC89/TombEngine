@@ -20,7 +20,7 @@ namespace TEN::Renderer::Graphics
 
 		throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 
-		m_numIndices = numIndices;
+		_numIndices = numIndices;
 	}
 
 	IndexBuffer::IndexBuffer(ID3D11Device* device, int numIndices) 
@@ -34,7 +34,7 @@ namespace TEN::Renderer::Graphics
 
 		throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
 
-		m_numIndices = numIndices;
+		_numIndices = numIndices;
 	}
 
 	bool IndexBuffer::Update(ID3D11DeviceContext* context, std::vector<int>& data, int startIndex, int count)

@@ -42,6 +42,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
+using namespace TEN::Gui;
 
 namespace Save = TEN::Save;
 
