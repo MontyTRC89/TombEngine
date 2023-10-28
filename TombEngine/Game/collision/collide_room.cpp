@@ -291,9 +291,8 @@ static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSe
 
 static void HandleDiagonalShift(ItemInfo& item, CollisionInfo& coll, const Vector3i& pos, CardinalDirection quadrant, bool isRightShift)
 {
-	int sign = isRightShift ? 1 : -1;
-
 	// Calculate angles.
+	int sign = isRightShift ? 1 : -1;
 	short perpSplitAngle = (ANGLE(90.0f) * quadrant) + (ANGLE(45.0f) * sign);
 	short deltaAngle = abs(Geometry::GetShortestAngle(coll.Setup.ForwardAngle, perpSplitAngle));
 
@@ -1178,33 +1177,6 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	int minHeight = precise ? bounds.Y2 : 0;
 
 	return (minHeight + item->Pose.Position.y - height);
-}
-
-void AlterFloorHeight(ItemInfo* item, int height)
-{
-	if (abs(height))
-	{
-		if (height >= 0)
-			height++;
-		else
-			height--;
-	}
-
-	short roomNumber = item->RoomNumber;
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	FloorInfo* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - BLOCK(1), item->Pose.Position.z, &roomNumber);
-
-	floor->FloorCollision.Planes[0].z += height;
-	floor->FloorCollision.Planes[1].z += height;
-
-	auto* box = &g_Level.Boxes[floor->Box];
-	if (box->flags & BLOCKABLE)
-	{
-		if (height >= 0)
-			box->flags &= ~BLOCKED;
-		else
-			box->flags |= BLOCKED;
-	}
 }
 
 int GetWaterSurface(int x, int y, int z, short roomNumber)

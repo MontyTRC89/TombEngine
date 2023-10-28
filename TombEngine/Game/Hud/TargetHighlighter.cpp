@@ -178,8 +178,8 @@ namespace TEN::Hud
 		// Check if target highlighter is enabled.
 		if (!g_Configuration.EnableTargetHighlighter)
 		{
-			if (!Crosshairs.empty())
-				Crosshairs.clear();
+			if (!_crosshairs.empty())
+				_crosshairs.clear();
 
 			return;
 		}
@@ -197,8 +197,8 @@ namespace TEN::Hud
 			itemNumbers.push_back(itemPtr->Index);
 
 			// Find crosshair at item number key.
-			auto it = Crosshairs.find(itemPtr->Index);
-			if (it == Crosshairs.end())
+			auto it = _crosshairs.find(itemPtr->Index);
+			if (it == _crosshairs.end())
 				continue;
 
 			// Set crosshair as primary or peripheral.
@@ -222,10 +222,10 @@ namespace TEN::Hud
 	{
 		//DrawDebug();
 
-		if (Crosshairs.empty())
+		if (_crosshairs.empty())
 			return;
 
-		for (const auto& [itemNumber, crosshair] : Crosshairs)
+		for (const auto& [itemNumber, crosshair] : _crosshairs)
 			crosshair.Draw();
 	}
 
@@ -239,7 +239,7 @@ namespace TEN::Hud
 		constexpr auto TARGET_BONE_ID = 0;
 
 		// No crosshairs to update; return early.
-		if (Crosshairs.empty() && itemNumbers.empty())
+		if (_crosshairs.empty() && itemNumbers.empty())
 			return;
 
 		// Update active crosshairs.
@@ -249,8 +249,8 @@ namespace TEN::Hud
 			auto targetPos = GetJointPosition(item, TARGET_BONE_ID).ToVector3();
 
 			// Update existing active crosshair.
-			auto it = Crosshairs.find(itemNumber);
-			if (it != Crosshairs.end())
+			auto it = _crosshairs.find(itemNumber);
+			if (it != _crosshairs.end())
 			{
 				auto& crosshair = it->second;
 				if (crosshair.IsActive)
@@ -265,7 +265,7 @@ namespace TEN::Hud
 		}
 
 		// Update inactive crosshairs.
-		for (auto& [itemNumber, crosshair] : Crosshairs)
+		for (auto& [itemNumber, crosshair] : _crosshairs)
 		{
 			// Find crosshairs at absent item number keys.
 			if (Contains(itemNumbers, itemNumber))
@@ -286,12 +286,12 @@ namespace TEN::Hud
 		constexpr auto CROSSHAIR_COUNT_MAX = 16;
 
 		// Map is full; clear smallest crosshair.
-		if (Crosshairs.size() >= CROSSHAIR_COUNT_MAX)
+		if (_crosshairs.size() >= CROSSHAIR_COUNT_MAX)
 		{
 			int key = 0;
 			float smallestScale = INFINITY;
 			
-			for (auto& [itemNumber, crosshair] : Crosshairs)
+			for (auto& [itemNumber, crosshair] : _crosshairs)
 			{
 				if (crosshair.Scale < smallestScale)
 				{
@@ -300,12 +300,12 @@ namespace TEN::Hud
 				}
 			}
 
-			Crosshairs.erase(key);
+			_crosshairs.erase(key);
 		}
 
 		// Return new crosshair.
-		Crosshairs.insert({ itemNumber, {} });
-		auto& crosshair = Crosshairs.at(itemNumber);
+		_crosshairs.insert({ itemNumber, {} });
+		auto& crosshair = _crosshairs.at(itemNumber);
 		crosshair = {};
 		return crosshair;
 	}
@@ -348,11 +348,11 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::ClearInactiveCrosshairs()
 	{
-		for (auto it = Crosshairs.begin(); it != Crosshairs.end();)
+		for (auto it = _crosshairs.begin(); it != _crosshairs.end();)
 		{
 			const auto& crosshair = it->second;
 			(!crosshair.IsActive && crosshair.Scale <= EPSILON) ?
-				(it = Crosshairs.erase(it)) : ++it;
+				(it = _crosshairs.erase(it)) : ++it;
 		}
 	}
 
@@ -362,7 +362,7 @@ namespace TEN::Hud
 		unsigned int primaryCount = 0;
 		unsigned int peripheralCount = 0;
 
-		for (const auto& [itemNumber, crosshair] : Crosshairs)
+		for (const auto& [itemNumber, crosshair] : _crosshairs)
 		{
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
 			

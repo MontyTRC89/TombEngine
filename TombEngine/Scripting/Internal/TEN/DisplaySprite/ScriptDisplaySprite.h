@@ -17,13 +17,13 @@ namespace TEN::Scripting::DisplaySprite
 
 	private:
 		// Members
-		GAME_OBJECT_ID ObjectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
-		int			   SpriteID = 0;
+		GAME_OBJECT_ID _objectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   _spriteID = 0;
 
-		Vec2		Position = Vec2(0.0f, 0.0f);
-		float		Rotation = 0.0f;
-		Vec2		Scale	 = Vec2(0.0f, 0.0f);
-		ScriptColor Color	 = ScriptColor(255, 255, 255, 255);
+		Vec2		_position = Vec2(0.0f, 0.0f);
+		float		_rotation = 0.0f;
+		Vec2		_scale	  = Vec2(0.0f, 0.0f);
+		ScriptColor _color	  = ScriptColor(255, 255, 255, 255);
 
 	public:
 		// Constructors

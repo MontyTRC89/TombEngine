@@ -41,22 +41,22 @@ namespace TEN::Effects::Streamer
 		// Apply expansion.
 		if (scaleRate != 0.0f)
 		{
-			auto direction = Orientation.ToDirection();
-			Vertices[0] = Geometry::TranslatePoint(Vertices[0], -direction, scaleRate);
-			Vertices[1] = Geometry::TranslatePoint(Vertices[1], direction, scaleRate);
+			auto dir = Orientation.ToDirection();
+			Vertices[0] = Geometry::TranslatePoint(Vertices[0], -dir, scaleRate);
+			Vertices[1] = Geometry::TranslatePoint(Vertices[1], dir, scaleRate);
 		}
 
 		// Apply directional velocity.
 		if (vel != 0.0f)
 		{
-			auto direction = Orientation.GetAxis();
-			Vertices[0] = Geometry::TranslatePoint(Vertices[0], direction, vel);
-			Vertices[1] = Geometry::TranslatePoint(Vertices[1], direction, vel);
+			auto dir = Orientation.GetAxis();
+			Vertices[0] = Geometry::TranslatePoint(Vertices[0], dir, vel);
+			Vertices[1] = Geometry::TranslatePoint(Vertices[1], dir, vel);
 		}
 	}
 
-	void Streamer::AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-							  float width, float life, float vel, float scaleRate, short rot2D, int flags, unsigned int segmentCount)
+	void Streamer::AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+							  float width, float life, float vel, float scaleRate, short rot, int flags, unsigned int segmentCount)
 	{
 		constexpr auto FADE_IN_COEFF = 3.0f;
 
@@ -68,14 +68,14 @@ namespace TEN::Effects::Streamer
 		float alpha = (segmentCount / lifeMax) * FADE_IN_COEFF;
 		float opacityMax = InterpolateCos(0.0f, color.w, alpha);
 
-		segment.Orientation = AxisAngle(direction, orient2D);
+		segment.Orientation = AxisAngle(dir, orient);
 		segment.Color = Vector4(color.x, color.y, color.z, opacityMax);
 		segment.Life =
 		segment.LifeMax = lifeMax;
 		segment.OpacityMax = opacityMax;
 		segment.Velocity = vel;
 		segment.ScaleRate = scaleRate;
-		segment.Rotation = rot2D;
+		segment.Rotation = rot;
 		segment.Flags = flags;
 		segment.InitializeVertices(pos, width);
 	}
@@ -109,8 +109,8 @@ namespace TEN::Effects::Streamer
 		return Segments.emplace_back();
 	}
 
-	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-									 float width, float life, float vel, float scaleRate, short rot2D, int flags)
+	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+									 float width, float life, float vel, float scaleRate, short rot, int flags)
 	{
 		assertion(Pools.size() <= POOL_COUNT_MAX, "Streamer pool count overflow.");
 
@@ -120,7 +120,7 @@ namespace TEN::Effects::Streamer
 
 		// Get and extend streamer with new segment.
 		auto& streamer = GetStreamer(tag);
-		streamer.AddSegment(pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags, (unsigned int)streamer.Segments.size());
+		streamer.AddSegment(pos, dir, orient, color, width, life, vel, scaleRate, rot, flags, (unsigned int)streamer.Segments.size());
 	}
 
 	void StreamerModule::Update()
@@ -194,18 +194,18 @@ namespace TEN::Effects::Streamer
 			pool.end());
 	}
 
-	void StreamerEffectController::Spawn(int entityNumber, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-								   float width, float life, float vel, float scaleRate, short rot2D, int flags)
+	void StreamerEffectController::Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& direction, short orient, const Vector4& color,
+										 float width, float life, float vel, float scaleRate, short rot, int flags)
 	{
 		assertion(Modules.size() <= MODULE_COUNT_MAX, "Streamer module count overflow.");
 
-		// Return early if module map is full and element with entityNumber key doesn't already exist.
-		if (Modules.size() == MODULE_COUNT_MAX && !Modules.count(entityNumber))
+		// Return early if module map is full and element with itemNumber key doesn't already exist.
+		if (Modules.size() == MODULE_COUNT_MAX && !Modules.count(itemNumber))
 			return;
 
 		// Get module and extend streamer within pool.
-		auto& module = GetModule(entityNumber);
-		module.AddStreamer(tag, pos, direction, orient2D, color, width, life, vel, scaleRate, rot2D, flags);
+		auto& module = GetModule(itemNumber);
+		module.AddStreamer(tag, pos, direction, orient, color, width, life, vel, scaleRate, rot, flags);
 	}
 
 	void StreamerEffectController::Update()
@@ -213,7 +213,7 @@ namespace TEN::Effects::Streamer
 		if (Modules.empty())
 			return;
 
-		for (auto& [entityNumber, module] : Modules)
+		for (auto& [itemNumber, module] : Modules)
 			module.Update();
 
 		ClearInactiveModules();
@@ -224,11 +224,11 @@ namespace TEN::Effects::Streamer
 		*this = {};
 	}
 
-	StreamerModule& StreamerEffectController::GetModule(int entityNumber)
+	StreamerModule& StreamerEffectController::GetModule(int itemNumber)
 	{
-		// Get module at entityNumber key.
-		Modules.insert({ entityNumber, {} });
-		auto& module = Modules.at(entityNumber);
+		// Get module at itemNumber key.
+		Modules.insert({ itemNumber, {} });
+		auto& module = Modules.at(itemNumber);
 		return module;
 	}
 
