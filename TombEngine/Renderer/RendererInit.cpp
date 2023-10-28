@@ -5,7 +5,6 @@
 #include <filesystem>
 
 #include "Renderer/Renderer.h"
-#include "Renderer/Quad/RenderQuad.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/configuration.h"
 #include "Specific/memory/Vector.h"
