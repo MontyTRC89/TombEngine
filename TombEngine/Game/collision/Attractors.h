@@ -44,11 +44,12 @@ namespace TEN::Collision::Attractors
 	{
 	private:
 		// Members
-		AttractorType		 Type		= AttractorType::Edge;
-		std::vector<Vector3> Points		= {};
-		int					 RoomNumber = 0;
-		float				 Length		= 0.0f;
-		BoundingBox			 Box		= BoundingBox(); 
+		AttractorType		 _type		 = AttractorType::Edge;
+		std::vector<Vector3> _points	 = {};
+		int					 _roomNumber = 0;
+
+		float		_length = 0.0f;
+		BoundingBox _box	= BoundingBox(); 
 
 		// TODO: Crashes on init.
 		//std::unordered_map<int, ItemInfo&> AttachedPlayers = {};

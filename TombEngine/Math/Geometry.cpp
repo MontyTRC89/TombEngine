@@ -210,7 +210,7 @@ namespace TEN::Math::Geometry
 		auto maxPoint = Vector3(-INFINITY);
 		auto minPoint = Vector3(INFINITY);
 
-		// Construct AABB.
+		// Determine max and min AABB points.
 		for (const auto& point : points)
 		{
 			maxPoint = Vector3(
@@ -224,7 +224,7 @@ namespace TEN::Math::Geometry
 				std::min(minPoint.z, point.z));
 		}
 
-		// Construct and return axis-aligned bounding box.
+		// Construct and return AABB.
 		auto center = (minPoint + maxPoint) * 0.5f;
 		auto extents = (maxPoint - minPoint) * 0.5f;
 		return BoundingBox(center, extents);

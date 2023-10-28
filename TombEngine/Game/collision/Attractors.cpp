@@ -18,10 +18,9 @@ namespace TEN::Collision::Attractors
 	{
 		assertion(!points.empty(), "Attempted to initialize invalid attractor.");
 
-		Type = type;
-		Points = points;
-		RoomNumber = roomNumber;
-		Box = Geometry::GetBoundingBox(points);
+		_type = type;
+		_points = points;
+		_roomNumber = roomNumber;
 
 		// Cache length.
 		if (points.size() >= 2)
@@ -29,12 +28,15 @@ namespace TEN::Collision::Attractors
 			for (int i = 0; i < (points.size() - 1); i++)
 			{
 				// Get segment points.
-				const auto& origin = Points[i];
-				const auto& target = Points[i + 1];
+				const auto& origin = _points[i];
+				const auto& target = _points[i + 1];
 
-				Length += Vector3::Distance(origin, target);
+				_length += Vector3::Distance(origin, target);
 			}
 		}
+
+		// Cache AABB.
+		_box = Geometry::GetBoundingBox(points);
 
 		//AttachedPlayers = {};
 	}
@@ -42,12 +44,12 @@ namespace TEN::Collision::Attractors
 	Attractor::~Attractor()
 	{
 		// Dereference current attractor held by players.
-		/*for (auto& [entityID, entity] : AttachedPlayers)
+		/*for (auto& [itemNumber, item] : AttachedPlayers)
 		{
-			if (!entity.IsLara())
+			if (!item.IsLara())
 				continue;
 
-			auto& player = GetLaraInfo(entity);
+			auto& player = GetLaraInfo(item);
 
 			if (player.Context.HandsAttractor.AttracPtr == this)
 				player.Context.HandsAttractor.AttracPtr = nullptr;
@@ -59,27 +61,27 @@ namespace TEN::Collision::Attractors
 
 	AttractorType Attractor::GetType() const
 	{
-		return Type;
+		return _type;
 	}
 
 	const std::vector<Vector3>& Attractor::GetPoints() const
 	{
-		return Points;
+		return _points;
 	}
 
 	int Attractor::GetRoomNumber() const
 	{
-		return RoomNumber;
+		return _roomNumber;
 	}
 
 	float Attractor::GetLength() const
 	{
-		return Length;
+		return _length;
 	}
 
 	const BoundingBox& Attractor::GetBox() const
 	{
-		return Box;
+		return _box;
 	}
 
 	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint) const
@@ -91,11 +93,11 @@ namespace TEN::Collision::Attractors
 		auto attracProx = GetProximity(probePoint);
 
 		// Get segment points.
-		const auto& origin = Points[attracProx.SegmentID];
-		const auto& target = Points[attracProx.SegmentID + 1];
+		const auto& origin = _points[attracProx.SegmentID];
+		const auto& target = _points[attracProx.SegmentID + 1];
 
 		// Calculate angles.
-		auto attracOrient = (Points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
+		auto attracOrient = (_points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
 		short headingAngle = attracOrient.y + HEADING_ANGLE_OFFSET;
 		short slopeAngle = attracOrient.x;
 
@@ -118,26 +120,26 @@ namespace TEN::Collision::Attractors
 	AttractorProximityData Attractor::GetProximity(const Vector3& probePoint) const
 	{
 		// Single point exists; return simple attractor proximity data.
-		if (Points.size() == 1)
+		if (_points.size() == 1)
 		{
 			return AttractorProximityData
 			{
-				Points.front(),
-				Vector3::Distance(probePoint, Points.front()),
+				_points.front(),
+				Vector3::Distance(probePoint, _points.front()),
 				0.0f,
 				0
 			};
 		}
 
-		auto attracProx = AttractorProximityData{ Points.front(), INFINITY, 0.0f, 0 };
+		auto attracProx = AttractorProximityData{ _points.front(), INFINITY, 0.0f, 0 };
 		float chainDistTravelled = 0.0f;
 
 		// Find closest point along attractor.
-		for (int i = 0; i < (Points.size() - 1); i++)
+		for (int i = 0; i < (_points.size() - 1); i++)
 		{
 			// Get segment points.
-			const auto& origin = Points[i];
-			const auto& target = Points[i + 1];
+			const auto& origin = _points[i];
+			const auto& target = _points[i + 1];
 
 			auto closestPoint = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
 			float dist = Vector3::Distance(probePoint, closestPoint);
@@ -169,8 +171,8 @@ namespace TEN::Collision::Attractors
 	Vector3 Attractor::GetPointAtChainDistance(float chainDist) const
 	{
 		// Single point exists; return it.
-		if (Points.size() == 1)
-			return Points.front();
+		if (_points.size() == 1)
+			return _points.front();
 		
 		// Normalize distance along attractor.
 		chainDist = NormalizeChainDistance(chainDist);
@@ -178,20 +180,20 @@ namespace TEN::Collision::Attractors
 		// Line distance is outside attractor; return clamped point.
 		if (chainDist <= 0.0f)
 		{
-			return Points.front();
+			return _points.front();
 		}
-		else if (chainDist >= Length)
+		else if (chainDist >= _length)
 		{
-			return Points.back();
+			return _points.back();
 		}
 		
 		// Find point at distance along attractor.
 		float chainDistTravelled = 0.0f;
-		for (int i = 0; i < (Points.size() - 1); i++)
+		for (int i = 0; i < (_points.size() - 1); i++)
 		{
 			// Get segment points.
-			const auto& origin = Points[i];
-			const auto& target = Points[i + 1];
+			const auto& origin = _points[i];
+			const auto& target = _points[i + 1];
 
 			float segmentLength = Vector3::Distance(origin, target);
 			float remainingChainDist = chainDist - chainDistTravelled;
@@ -208,13 +210,13 @@ namespace TEN::Collision::Attractors
 		}
 
 		// FAILSAFE: Return end point.
-		return Points.back();
+		return _points.back();
 	}
 
 	unsigned int Attractor::GetSegmentIDAtChainDistance(float chainDist) const
 	{
 		// Single segment exists; return segment ID 0.
-		if (Points.size() <= 2)
+		if (_points.size() <= 2)
 			return 0;
 
 		// Normalize distance along attractor.
@@ -225,18 +227,18 @@ namespace TEN::Collision::Attractors
 		{
 			return 0;
 		}
-		else if (chainDist >= Length)
+		else if (chainDist >= _length)
 		{
-			return ((int)Points.size() - 1);
+			return ((int)_points.size() - 1);
 		}
 
 		// Find segment at distance along attractor.
 		float chainDistTravelled = 0.0f;
-		for (int i = 0; i < (Points.size() - 1); i++)
+		for (int i = 0; i < (_points.size() - 1); i++)
 		{
 			// Get segment points.
-			const auto& origin = Points[i];
-			const auto& target = Points[i + 1];
+			const auto& origin = _points[i];
+			const auto& target = _points[i + 1];
 
 			// Accumulate distance travelled along attractor.
 			chainDistTravelled += Vector3::Distance(origin, target);
@@ -247,61 +249,63 @@ namespace TEN::Collision::Attractors
 		}
 
 		// FAILSAFE: Return end segment ID.
-		return ((int)Points.size() - 1);
+		return ((int)_points.size() - 1);
 	}
 
 	bool Attractor::IsEdge() const
 	{
-		return (Type == AttractorType::Edge);
+		return (_type == AttractorType::Edge);
 	}
 
 	bool Attractor::IsLooped() const
 	{
 		// Too few points; loop not possible.
-		if (Points.size() <= 2)
+		if (_points.size() <= 2)
 			return false;
 
 		// Test if start and end points occupy roughly same position.
-		return (Vector3::Distance(Points.front(), Points.back()) <= EPSILON);
+		return (Vector3::Distance(_points.front(), _points.back()) <= EPSILON);
 	}
 
-	void Attractor::AttachPlayer(ItemInfo& entity)
+	void Attractor::AttachPlayer(ItemInfo& item)
 	{
-		if (!entity.IsLara())
+		if (!item.IsLara())
 			return;
 
-		//AttachedPlayers.insert({ entity.Index, entity });
+		//AttachedPlayers.insert({ item.Index, item });
 	}
 
-	void Attractor::DetachPlayer(ItemInfo& entity)
+	void Attractor::DetachPlayer(ItemInfo& item)
 	{
-		if (!entity.IsLara())
+		if (!item.IsLara())
 			return;
 
-		//AttachedPlayers.erase(entity.Index);
+		//AttachedPlayers.erase(item.Index);
 	}
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
 	{
 		assertion(!points.empty(), "Attempted to update invalid attractor.");
 
-		Points = points;
-		RoomNumber = roomNumber;
-		Box = Geometry::GetBoundingBox(points);
+		_points = points;
+		_roomNumber = roomNumber;
 
 		// Cache length.
-		Length = 0.0f;
+		_length = 0.0f;
 		if (points.size() >= 2)
 		{
 			for (int i = 0; i < (points.size() - 1); i++)
 			{
 				// Get segment points.
-				const auto& origin = Points[i];
-				const auto& target = Points[i + 1];
+				const auto& origin = _points[i];
+				const auto& target = _points[i + 1];
 
-				Length += Vector3::Distance(origin, target);
+				_length += Vector3::Distance(origin, target);
 			}
 		}
+
+		// Cache AABB.
+		_box = Geometry::GetBoundingBox(points);
 	}
 
 	void Attractor::DrawDebug() const
@@ -315,10 +319,10 @@ namespace TEN::Collision::Attractors
 
 		// Determine label string.
 		auto labelString = std::string();
-		switch (Type)
+		switch (_type)
 		{
 		default:
-			labelString = "Attractor";
+			labelString = "Undefined attractor";
 			break;
 
 		case AttractorType::Edge:
@@ -327,13 +331,13 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Draw debug elements.
-		if (Points.size() >= 2)
+		if (_points.size() >= 2)
 		{
-			for (int i = 0; i < (Points.size() - 1); i++)
+			for (int i = 0; i < (_points.size() - 1); i++)
 			{
 				// Get segment points.
-				const auto& origin = Points[i];
-				const auto& target = Points[i + 1];
+				const auto& origin = _points[i];
+				const auto& target = _points[i + 1];
 
 				// Draw main line.
 				g_Renderer.AddLine3D(origin, target, COLOR_YELLOW);
@@ -355,16 +359,16 @@ namespace TEN::Collision::Attractors
 			}
 
 			// Draw start and end indicator lines.
-			g_Renderer.AddLine3D(Points.front(), Points.front() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
-			g_Renderer.AddLine3D(Points.back(), Points.back() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+			g_Renderer.AddLine3D(_points.front(), _points.front() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+			g_Renderer.AddLine3D(_points.back(), _points.back() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 		}
-		else if (Points.size() == 1)
+		else if (_points.size() == 1)
 		{
 			// Draw sphere.
-			g_Renderer.AddSphere(Points.front(), SPHERE_SCALE, COLOR_YELLOW);
+			g_Renderer.AddSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW);
 
 			// Draw label.
-			auto labelPos2D = g_Renderer.Get2DPosition(Points.front());
+			auto labelPos2D = g_Renderer.Get2DPosition(_points.front());
 			if (labelPos2D.has_value())
 				g_Renderer.AddString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, PRINTSTRING_OUTLINE);
 		}
@@ -373,18 +377,18 @@ namespace TEN::Collision::Attractors
 	float Attractor::NormalizeChainDistance(float chainDist) const
 	{
 		// Distance along attractor is within bounds; return it.
-		if (chainDist >= 0.0f && chainDist <= Length)
+		if (chainDist >= 0.0f && chainDist <= _length)
 			return chainDist;
 
 		// Is looped; wrap distance along attractor.
 		if (IsLooped())
 		{
 			int sign = -std::copysign(1, chainDist);
-			return (chainDist + (Length * sign));
+			return (chainDist + (_length * sign));
 		}
 		
 		// Isn't looped; clamp distance along attractor.
-		return std::clamp(chainDist, 0.0f, Length);
+		return std::clamp(chainDist, 0.0f, _length);
 	}
 
 	// TEMP
@@ -412,8 +416,7 @@ namespace TEN::Collision::Attractors
 		}
 	}
 
-	// TODO: TRAE method of a search algorithm incorporating an R-tree might be ideal here.
-	// Would require a general collision refactor. -- Sezz 2023.07.30
+	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
 	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& probePoint, int roomNumber, float detectRadius)
 	{
 		auto sphere = BoundingSphere(probePoint, detectRadius);
