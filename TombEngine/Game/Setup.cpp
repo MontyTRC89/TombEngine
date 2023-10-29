@@ -101,7 +101,7 @@ void InitializeObjects()
 		obj->waterCreature = false;
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
-		obj->damageType = DamageMode::AnyWeapon;
+		obj->damageType = DamageMode::Any;
 		obj->LotType = LotType::Basic;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
