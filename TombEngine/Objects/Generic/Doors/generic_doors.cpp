@@ -275,7 +275,7 @@ namespace TEN::Entities::Doors
 				doorItem->ItemFlags[0]--;
 				doorItem->Pose.Position.y -= TEN::Entities::Switches::COG_DOOR_SPEED;
 				
-				int y = bounds.Y1 + doorItem->ItemFlags[2] - STEP_SIZE;
+				int y = bounds.Y1 + doorItem->ItemFlags[2] - CLICK(1);
 				if (doorItem->Pose.Position.y < y)
 				{
 					doorItem->Pose.Position.y = y;
@@ -362,7 +362,7 @@ namespace TEN::Entities::Doors
 				{
 					if (!item->itemFlags[0])
 						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
-					item->itemFlags[0] += STEP_SIZE;
+					item->itemFlags[0] += CLICK(1);
 				}
 			}
 			else
@@ -371,7 +371,7 @@ namespace TEN::Entities::Doors
 				{
 					if (item->itemFlags[0] == BLOCK(4))
 						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
-					item->itemFlags[0] -= STEP_SIZE;
+					item->itemFlags[0] -= CLICK(1);
 				}
 				if (!door->opened)
 				{

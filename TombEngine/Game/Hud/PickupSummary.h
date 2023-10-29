@@ -37,7 +37,7 @@ namespace TEN::Hud
 		static constexpr auto DISPLAY_PICKUP_COUNT_ARG_DEFAULT = 1;
 
 		// Members
-		std::vector<DisplayPickup> DisplayPickups = {};
+		std::vector<DisplayPickup> _displayPickups = {};
 
 	public:
 		// Utilities

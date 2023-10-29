@@ -260,7 +260,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->radius = 170;
 			obj->intelligent = true;
-			obj->damageType = DamageMode::ExplosivesOnly;
+			obj->damageType = DamageMode::Explosion;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
 		}
@@ -277,7 +277,7 @@ namespace TEN::Entities
 			obj->radius = 128;
 			obj->explodableMeshbits = 0xA00;
 			obj->intelligent = true;
-			obj->damageType = DamageMode::ExplosivesOnly;
+			obj->damageType = DamageMode::Explosion;
 			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect();
 		}

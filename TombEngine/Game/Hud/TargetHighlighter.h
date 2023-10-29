@@ -55,7 +55,7 @@ namespace TEN::Hud
 	{
 	private:
 		// Members
-		std::unordered_map<int, CrosshairData> Crosshairs = {}; // Key = item number.
+		std::unordered_map<int, CrosshairData> _crosshairs = {}; // Key = item number.
 
 	public:
 		// Utilities
