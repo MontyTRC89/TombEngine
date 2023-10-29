@@ -100,27 +100,27 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, const
 
 sol::object DisplayStringWrapper(const std::string& key, sol::object pos, sol::object size, TypeOrNil<ScriptColor> color, TypeOrNil<bool> isTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
 {
-	// Determine which constructor to call based on the provided arguments
+	// Decipher the arguments
 	Vec2 position = Vec2(0, 0);
 	float scale = 1.0f;
 
-	if (pos.is<Vec2>() && size.is<float>())  //string text, Vector2 pos, float size, Color color, bool translate, flags
+	if (pos.is<Vec2>() && size.is<float>())  //New method (string text, Vector2 pos, float size, Color color, bool translate, flags)
 	{
 		position = pos.as<Vec2>();
 		scale = size.as<float>();
 		
 	}
-	else if (pos.is<int>() && size.is<int>()) //string text, int x, int y, Color color, bool translate, flags
+	else if (pos.is<int>() && size.is<int>()) //Deprecated method (string text, int x, int y, Color color, bool translate, flags)
 	{
 		position = Vec2((float)pos.as<int>(), (float)size.as<int>());
 	}
 	else
 	{
-		// Handle an error.
 		TENLog("Error during the text string creation. Unknown parameters.");
 		return sol::object(state, sol::nil);
 	}
 
+	//Call the constructor
 	std::unique_ptr<DisplayString> displayString = CreateString(key, position, scale, color, isTranslated, flags, state);
 	return sol::make_object(state, displayString.release());
 
