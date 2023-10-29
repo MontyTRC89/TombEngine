@@ -25,12 +25,12 @@ namespace TEN::Hud
 	{
 	private:
 		// Members
-		StatusBar AirBar	  = {};
-		StatusBar ExposureBar = {};
-		StatusBar HealthBar	  = {};
-		StatusBar StaminaBar  = {};
+		StatusBar _airBar	   = {};
+		StatusBar _exposureBar = {};
+		StatusBar _healthBar   = {};
+		StatusBar _staminaBar  = {};
 
-		bool DoFlash = false;
+		bool _doFlash = false;
 
 	public:
 		// Utilities

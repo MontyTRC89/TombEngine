@@ -30,19 +30,19 @@ namespace TEN::Math::Random
 		return Vector2(cos(angle), sin(angle));
 	}
 
-	Vector2 GeneratePoint2DInSquare(const Vector2& pos2D, short orient2D, float apothem)
+	Vector2 GeneratePoint2DInSquare(const Vector2& pos, short orient, float apothem)
 	{
-		auto rotMatrix = Matrix::CreateRotationZ(orient2D);
+		auto rotMatrix = Matrix::CreateRotationZ(orient);
 		auto relPoint = Vector2(
 			GenerateFloat(-apothem, apothem),
 			GenerateFloat(-apothem, apothem));
 
-		return (pos2D + Vector2::Transform(relPoint, rotMatrix));
+		return (pos + Vector2::Transform(relPoint, rotMatrix));
 	}
 	
-	Vector2 GeneratePoint2DInCircle(const Vector2& pos2D, float radius)
+	Vector2 GeneratePoint2DInCircle(const Vector2& pos, float radius)
 	{
-		// Use rejection sampling.
+		// Use rejection sampling method.
 		auto relPoint = Vector2::Zero;
 		do
 		{
@@ -51,7 +51,7 @@ namespace TEN::Math::Random
 				GenerateFloat(-1.0f, 1.0f));
 		} while (relPoint.LengthSquared() > 1.0f);
 
-		return (pos2D + (relPoint * radius));
+		return (pos + (relPoint * radius));
 	}
 
 	Vector3 GenerateDirection()
@@ -59,24 +59,24 @@ namespace TEN::Math::Random
 		float theta = GenerateFloat(0.0f, PI_MUL_2); // Generate angle in full circle.
 		float phi = GenerateFloat(0.0f, PI);		 // Generate angle in sphere's upper half.
 
-		auto direction = Vector3(
+		auto dir = Vector3(
 			sin(phi) * cos(theta),
 			sin(phi) * sin(theta),
 			cos(phi));
-		direction.Normalize();
-		return direction;
+		dir.Normalize();
+		return dir;
 	}
 
-	Vector3 GenerateDirectionInCone(const Vector3& direction, float semiangleInDeg)
+	Vector3 GenerateDirectionInCone(const Vector3& dir, float semiangleInDeg)
 	{
 		float x = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
 		float y = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
 		float z = GenerateFloat(-semiangleInDeg, semiangleInDeg) * RADIAN;
 		auto rotMatrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
 
-		auto directionInCone = Vector3::TransformNormal(direction, rotMatrix);
-		directionInCone.Normalize();
-		return directionInCone;
+		auto dirInCone = Vector3::TransformNormal(dir, rotMatrix);
+		dirInCone.Normalize();
+		return dirInCone;
 	}
 
 	Vector3 GeneratePointInBox(const BoundingOrientedBox& box)
@@ -92,7 +92,7 @@ namespace TEN::Math::Random
 
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere)
 	{
-		// Use rejection sampling.
+		// Use rejection sampling method.
 		auto relPoint = Vector3::Zero;
 		do
 		{
@@ -120,19 +120,19 @@ namespace TEN::Math::Random
 		return (sphere.Center + (relPoint * sphere.Radius));
 	}
 
-	bool TestProbability(float probability)
+	bool TestProbability(float prob)
 	{
-		probability = std::clamp(probability, 0.0f, 1.0f);
+		prob = std::clamp(prob, 0.0f, 1.0f);
 
-		if (probability == 0.0f)
+		if (prob == 0.0f)
 		{
 			return false;
 		}
-		else if (probability == 1.0f)
+		else if (prob == 1.0f)
 		{
 			return true;
 		}
 
-		return (GenerateFloat(0.0f, 1.0f) < probability);
+		return (GenerateFloat(0.0f, 1.0f) < prob);
 	}
 }
