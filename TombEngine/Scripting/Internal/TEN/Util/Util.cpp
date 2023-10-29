@@ -152,6 +152,21 @@ namespace Util
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
+	/// Gets the aspect ratio of the current screen resolution.
+	//@treturn float aspect-ratio of the current screen resolution.
+	//@usage
+	//In order to compare the aspect ratio with other values, it is recommended to round up its value
+	//local aspectRatio = tonumber(string.format("%.2f", TEN.Util.GetScreenAspectRatio()))
+	//
+	//if aspectRatio == 1.78 then
+	//...
+	//end
+	static float GetScreenAspectRatio()
+	{
+		auto screenRes = g_Renderer.GetScreenResolution();
+		return (float(screenRes.x) / float(screenRes.y));
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		auto tableUtil = sol::table(state->lua_state(), sol::create);
@@ -164,6 +179,7 @@ namespace Util
 		tableUtil.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		tableUtil.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);
+		tableUtil.set_function(ScriptReserved_GetAspectRatio, &GetScreenAspectRatio);
 
 		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(tableUtil, ScriptReserved_LogLevel, LOG_LEVEL);
