@@ -98,11 +98,32 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, const
 	return ptr;
 }
 
-// NOTE: Deprecated version for compatibility.
-static std::unique_ptr<DisplayString> CreateStringDeprecated(const std::string& key, int x, int y, TypeOrNil<ScriptColor> color,
-															 TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
+sol::object DisplayStringWrapper(const std::string& key, sol::object pos, sol::object size, TypeOrNil<ScriptColor> color, TypeOrNil<bool> isTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
 {
-	return CreateString(key, Vec2(x, y), 1.0f, color, maybeTranslated, flags, state);
+	// Determine which constructor to call based on the provided arguments
+	Vec2 position = Vec2(0, 0);
+	float scale = 1.0f;
+
+	if (pos.is<Vec2>() && size.is<float>())  //string text, Vector2 pos, float size, Color color, bool translate, flags
+	{
+		position = pos.as<Vec2>();
+		scale = size.as<float>();
+		
+	}
+	else if (pos.is<int>() && size.is<int>()) //string text, int x, int y, Color color, bool translate, flags
+	{
+		position = Vec2((float)pos.as<int>(), (float)size.as<int>());
+	}
+	else
+	{
+		// Handle an error.
+		TENLog("Error during the text string creation. Unknown parameters.");
+		return sol::object(state, sol::nil);
+	}
+
+	std::unique_ptr<DisplayString> displayString = CreateString(key, position, scale, color, isTranslated, flags, state);
+	return sol::make_object(state, displayString.release());
+
 }
 
 DisplayString::~DisplayString()
@@ -114,7 +135,7 @@ void DisplayString::Register(sol::table& parent)
 {
 	parent.new_usertype<DisplayString>(
 		ScriptReserved_DisplayString,
-		sol::call_constructor, sol::overload(&CreateString, &CreateStringDeprecated),
+		sol::call_constructor, &DisplayStringWrapper,
 
 		/// Get the display string's color
 		// @function DisplayString:GetColor
