@@ -56,7 +56,7 @@ __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */
 static std::unique_ptr<DisplayString> CreateString(const std::string& key, const Vec2& pos, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color,
-												   TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
+												   TypeOrNil<bool> isTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
 {
 	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();
@@ -84,7 +84,7 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, const
 		ScriptAssertF(false, "Wrong argument type for {}.new \"flags\" argument; must be a table or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 	}
 
-	if (!IsValidOptionalArg(maybeTranslated))	
+	if (!IsValidOptionalArg(isTranslated))	
 		ScriptAssertF(false, "Wrong argument type for {}.new \"translated\" argument; must be a bool or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 
 	if (!IsValidOptionalArg(color))	
@@ -93,37 +93,36 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, const
 	if (!IsValidOptionalArg(scale))	
 		ScriptAssertF(false, "Wrong argument type for {}.new \"scale\" argument; must be a float or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 
-	auto string = UserDisplayString(key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)), flagArray, USE_IF_HAVE(bool, maybeTranslated, false));
+	auto string = UserDisplayString(key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)), flagArray, USE_IF_HAVE(bool, isTranslated, false));
 	DisplayString::s_setItemCallback(id, string);
 	return ptr;
 }
 
-sol::object DisplayStringWrapper(const std::string& key, sol::object pos, sol::object size, TypeOrNil<ScriptColor> color, TypeOrNil<bool> isTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
+// HACK: Constructor wrapper for DisplayString smart pointer to maintain compatibility with deprecated version calls.
+sol::object DisplayStringWrapper(const std::string& key, sol::object unkArg0, sol::object unkArg1, TypeOrNil<ScriptColor> color,
+								 TypeOrNil<bool> isTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
 {
-	// Decipher the arguments
-	Vec2 position = Vec2(0, 0);
-	float scale = 1.0f;
-
-	if (pos.is<Vec2>() && size.is<float>())  //New method (string text, Vector2 pos, float size, Color color, bool translate, flags)
+	// Regular constructor.
+	if (unkArg0.is<Vec2>() && unkArg1.is<float>())
 	{
-		position = pos.as<Vec2>();
-		scale = size.as<float>();
-		
+		auto pos = (Vec2)unkArg0.as<Vec2>();
+		float scale = unkArg1.as<float>();
+
+		auto displayString = CreateString(key, pos, scale, color, isTranslated, flags, state);
+		return sol::make_object(state, displayString.release());
+
 	}
-	else if (pos.is<int>() && size.is<int>()) //Deprecated method (string text, int x, int y, Color color, bool translate, flags)
+	// Deprecated constructor.
+	else if (unkArg0.is<int>() && unkArg1.is<int>())
 	{
-		position = Vec2((float)pos.as<int>(), (float)size.as<int>());
-	}
-	else
-	{
-		TENLog("Error during the text string creation. Unknown parameters.");
-		return sol::object(state, sol::nil);
+		auto pos = Vec2((float)unkArg0.as<int>(), (float)unkArg1.as<int>());
+
+		auto displayString = CreateString(key, pos, 1.0f, color, isTranslated, flags, state);
+		return sol::make_object(state, displayString.release());
 	}
 
-	//Call the constructor
-	std::unique_ptr<DisplayString> displayString = CreateString(key, position, scale, color, isTranslated, flags, state);
-	return sol::make_object(state, displayString.release());
-
+	TENLog("Failed to create DisplayString. Unknown parameters.");
+	return sol::object(state, sol::nil);
 }
 
 DisplayString::~DisplayString()
