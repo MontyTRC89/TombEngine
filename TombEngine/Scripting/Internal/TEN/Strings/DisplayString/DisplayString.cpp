@@ -55,27 +55,28 @@ If true, the string argument will be the key of a translated string specified in
 __Default: empty__
 @treturn DisplayString A new DisplayString object.
 */
-static std::unique_ptr<DisplayString> CreateString(const std::string& key, const Vec2& pos, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
+static std::unique_ptr<DisplayString> CreateString(const std::string& key, const Vec2& pos, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color,
+												   TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
 {
 	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();
 
 	auto getCallStack = [state]
 	{
-		luaL_traceback(state, state, NULL, 0);
-		std::string traceback{ lua_tostring(state, -1) };
+		luaL_traceback(state, state, nullptr, 0);
+		auto traceback = std::string(lua_tostring(state, -1));
 		lua_pop(state, 1);
 		return traceback;
 	};
 
-	FlagArray f{};
+	auto flagArray = FlagArray{};
 	if (std::holds_alternative<sol::table>(flags))
 	{
 		auto tab = std::get<sol::table>(flags);
 		for (auto& e : tab)
 		{
 			auto i = e.second.as<size_t>();
-			f[i] = true;
+			flagArray[i] = true;
 		}
 	}
 	else if (!std::holds_alternative<sol::nil_t>(flags))
@@ -84,25 +85,24 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, const
 	}
 
 	if (!IsValidOptionalArg(maybeTranslated))	
-	{
 		ScriptAssertF(false, "Wrong argument type for {}.new \"translated\" argument; must be a bool or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
-	}
 
 	if (!IsValidOptionalArg(color))	
-	{
 		ScriptAssertF(false, "Wrong argument type for {}.new \"color\" argument; must be a {} or nil.\n{}", ScriptReserved_DisplayString, ScriptReserved_Color, getCallStack());
-	}
 
 	if (!IsValidOptionalArg(scale))	
-	{
 		ScriptAssertF(false, "Wrong argument type for {}.new \"scale\" argument; must be a float or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
-	}
 
-
-	UserDisplayString ds{ key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255,255,255)), f, USE_IF_HAVE(bool, maybeTranslated, false) };
-
-	DisplayString::s_setItemCallback(id, ds);
+	auto string = UserDisplayString(key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)), flagArray, USE_IF_HAVE(bool, maybeTranslated, false));
+	DisplayString::s_setItemCallback(id, string);
 	return ptr;
+}
+
+// NOTE: Deprecated version for compatibility.
+static std::unique_ptr<DisplayString> CreateStringDeprecated(const std::string& key, int x, int y, TypeOrNil<ScriptColor> color,
+															 TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
+{
+	return CreateString(key, Vec2(x, y), 1.0f, color, maybeTranslated, flags, state);
 }
 
 DisplayString::~DisplayString()
@@ -114,7 +114,7 @@ void DisplayString::Register(sol::table& parent)
 {
 	parent.new_usertype<DisplayString>(
 		ScriptReserved_DisplayString,
-		sol::call_constructor, &CreateString,
+		ScriptReserved_DisplayString, sol::overload(CreateString, CreateStringDeprecated),
 
 		/// Get the display string's color
 		// @function DisplayString:GetColor

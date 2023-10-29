@@ -30,22 +30,23 @@ using FlagArray = std::array<bool, (int)DisplayStringOptions::Count>;
 class UserDisplayString
 {
 public:
-	UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool translated);
+	UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated);
 
 private:
 	UserDisplayString() = default;
 
-	std::string m_key{};
+	std::string m_key = {};
 	Vec2 Position = Vec2(0, 0);
-	D3DCOLOR m_color{ 0xFFFFFFFF };
-	FlagArray m_flags{};
-	float m_scale{ 1.0f };
-	bool m_deleteWhenZero{ false };
+	D3DCOLOR m_color = 0xFFFFFFFF;
+	FlagArray m_flags = {};
+	float m_scale = 1.0f;
+	bool m_deleteWhenZero = false;
 
 	// Seconds
-	float m_timeRemaining{ 0.0f };
-	bool m_isInfinite{ false };
-	bool m_isTranslated{ false };
+	float m_timeRemaining = 0.0f;
+	bool m_isInfinite = false;
+	bool m_isTranslated = false;
+
 	friend class StringsHandler;
 	friend class DisplayString;
 };

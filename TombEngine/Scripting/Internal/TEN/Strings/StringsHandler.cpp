@@ -13,10 +13,10 @@ Display strings.
 */
 
 StringsHandler::StringsHandler(sol::state* lua, sol::table& parent) :
-	LuaHandler{ lua }
+	LuaHandler(lua)
 {
-	sol::table table_strings{ m_lua->lua_state(), sol::create };
-	parent.set(ScriptReserved_Strings, table_strings);
+	auto table = sol::table(m_lua->lua_state(), sol::create);
+	parent.set(ScriptReserved_Strings, table);
 
 /***
 Show some text on-screen.
@@ -27,7 +27,7 @@ If not given, the string will have an "infinite" life, and will show
 until @{HideString} is called or until the level is finished.
 Default: nil (i.e. infinite)
 */
-	table_strings.set_function(ScriptReserved_ShowString, &StringsHandler::ShowString, this);
+	table.set_function(ScriptReserved_ShowString, &StringsHandler::ShowString, this);
 
 /***
 Hide some on-screen text.
@@ -35,7 +35,7 @@ Hide some on-screen text.
 @tparam DisplayString str the string object to hide. Must previously have been shown
 with a call to @{ShowString}, or this function will have no effect.
 */
-	table_strings.set_function(ScriptReserved_HideString, [this](DisplayString const& s) {ShowString(s, 0.0f); });
+	table.set_function(ScriptReserved_HideString, [this](const DisplayString& string) { ShowString(string, 0.0f); });
 
 /***
 Checks if the string is shown
@@ -43,15 +43,15 @@ Checks if the string is shown
 @tparam DisplayString str the string object to be checked
 @treturn bool true if it is shown, false if it is hidden
 */
-	table_strings.set_function(ScriptReserved_IsStringDisplaying, &StringsHandler::IsStringDisplaying, this);
+	table.set_function(ScriptReserved_IsStringDisplaying, &StringsHandler::IsStringDisplaying, this);
 
-	DisplayString::Register(table_strings);
+	DisplayString::Register(table);
 	DisplayString::SetCallbacks(
-		[this](auto && ... param) { return SetDisplayString(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
-		[this](auto && ... param) { return GetDisplayString(std::forward<decltype(param)>(param)...); });
+		[this](auto&& ... param) { return SetDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto&& ... param) { return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
+		[this](auto&& ... param) { return GetDisplayString(std::forward<decltype(param)>(param)...); });
 	
-	MakeReadOnlyTable(table_strings, ScriptReserved_DisplayStringOption, DISPLAY_STRING_OPTION_NAMES);
+	MakeReadOnlyTable(table, ScriptReserved_DisplayStringOption, DISPLAY_STRING_OPTION_NAMES);
 }
 
 std::optional<std::reference_wrapper<UserDisplayString>> StringsHandler::GetDisplayString(DisplayStringIDType id)
