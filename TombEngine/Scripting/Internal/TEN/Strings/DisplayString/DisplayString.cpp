@@ -114,7 +114,7 @@ void DisplayString::Register(sol::table& parent)
 {
 	parent.new_usertype<DisplayString>(
 		ScriptReserved_DisplayString,
-		ScriptReserved_DisplayString, sol::overload(CreateString, CreateStringDeprecated),
+		sol::call_constructor, sol::overload(&CreateString, &CreateStringDeprecated),
 
 		/// Get the display string's color
 		// @function DisplayString:GetColor
