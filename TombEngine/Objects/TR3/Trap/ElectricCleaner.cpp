@@ -61,78 +61,91 @@ namespace TEN::Entities::Traps
 		}
 	}
 
-	static bool IsNextSectorValid(ItemInfo& item, const Vector3& dir)
+	static bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
 	{
-		GameVector detectionPoint = item.Pose.Position + dir * BLOCK(1);
-		detectionPoint.RoomNumber = item.RoomNumber;
+		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(1));
+		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(1));
 
-		auto col = GetCollision(detectionPoint);
-
-		//Is a wall
-		if (col.Block->IsWall(detectionPoint.x, detectionPoint.z))
+		// Test for wall.
+		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
 			return false;
 
-		//Is it a sliding slope?
-		if (col.Position.FloorSlope)
+		// Test for slippery slope.
+		if (pointColl.Position.FloorSlope)
 			return false;
 
-		if (abs(col.FloorTilt.x) == 0 && abs(col.FloorTilt.y) == 0) //Is a flat tile
+		// Flat floor.
+		if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
 		{
-			//Is a 1 click step (higher or lower).
-			int distanceToFloor = abs(col.Position.Floor - item.Pose.Position.y);
-			if (distanceToFloor >= CLICK(1))
+			// Test for step.
+			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
+			if (relFloorHeight >= CLICK(1))
 				return false;
 		}
-		else //Is a slope tile
+		// Sloped floor.
+		else
 		{
-			//Is a 2 click step (higher or lower).
-			int distanceToFloor = abs(col.Position.Floor - item.Pose.Position.y);
-			if (distanceToFloor > CLICK(2))
+			// Half block.
+			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
+			if (relFloorHeight > CLICK(2))
 				return false;
 
 			short slopeAngle = ANGLE(0.0f);
-
-			if (col.FloorTilt.x > 0)
+			if (pointColl.FloorTilt.x > 0)
+			{
 				slopeAngle = -ANGLE(90.0f);
-			else if (col.FloorTilt.x < 0)
+			}
+			else if (pointColl.FloorTilt.x < 0)
+			{
 				slopeAngle = ANGLE(90.0f);
+			}
 
-			if (col.FloorTilt.y > 0 && col.FloorTilt.y > abs(col.FloorTilt.x))
+			if (pointColl.FloorTilt.y > 0 && pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
+			{
 				slopeAngle = ANGLE(180.0f);
-			else if (col.FloorTilt.y < 0 && -col.FloorTilt.y > abs(col.FloorTilt.x))
+			}
+			else if (pointColl.FloorTilt.y < 0 && -pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
+			{
 				slopeAngle = ANGLE(0.0f);
+			}
 
-			auto angleDir = FROM_RAD(atan2(dir.x, dir.z));
-			auto alignment = slopeAngle - angleDir;
+			int angleDir = phd_atan(dir.z, dir.x);
+			int alignAngle = slopeAngle - angleDir;
 
-			//Is slope not aligned with the direction?
-			if ((alignment != 32768) && (alignment != 0) && (alignment != -32768))
+			// Test if slope aspect is not aligned with the direction.
+			if ((alignAngle != 32768) && (alignAngle != 0) && (alignAngle != -32768))
+				return false;
+			
+			// TODO: ANGLE(180.0f) and ANGLE(-180) both returns -32768 due to the short type range (-32,768 to 32,767)
+			//if (alignAngle != ANGLE(180.0f) && alignAngle != 0 && alignAngle != ANGLE(-180.0f))
+				//return false;
+		}
+
+		// Check for diagonal split.
+		if (pointColl.Position.DiagonalStep)
+			return false;
+
+		// Test ceiling height.
+		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+		int cleanerHeight = BLOCK(1);
+		if (relCeilHeight < cleanerHeight)
+			return false;
+
+		// Check for inaccessible sector.
+		if (pointColl.Block->Box == NO_BOX)
+			return false;
+
+		// Check for blocked grey box.
+		if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKABLE)
+		{
+			if (g_Level.Boxes[pointColl.Block->Box].flags& BLOCKED)
 				return false;
 		}
 
-		//Is diagonal floor?
-		if (col.Position.DiagonalStep)
+		// Check for stopper flag.
+		if (pointColl.Block->Stopper)
 			return false;
 
-		//Is ceiling (square or diagonal) high enough?
-		int distanceToCeiling = abs(col.Position.Ceiling - col.Position.Floor);	
-		int cleanerHeight = BLOCK(1); //TODO change it for the collision bounding box height.
-		if (distanceToCeiling < cleanerHeight)
-			return false;
-
-		//Is a non walkable tile? (So there is not any box)
-		if (col.Block->Box == NO_BOX)
-			return false;
-
-		//Is a blocked grey box (So it's an Isolated box)
-		if (g_Level.Boxes[col.Block->Box].flags & BLOCKABLE)
-			return false;
-		
-		//Is a stopper tile? (There is still a shatter object).
-		if (col.Block->Stopper)
-			return false;
-
-		//If nothing of that happened, then it must be a valid sector.
 		return true;
 	}
 
