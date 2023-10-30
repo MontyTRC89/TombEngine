@@ -293,12 +293,12 @@ namespace TEN::Entities::Traps
 
 				int headingAngleDelta = abs(targetHeadingAngle - item.Pose.Orientation.y);
 
-				//Keep rotating
+				// Keep rotating.
 				if (headingAngleDelta > rotRate)
 				{
 					item.Pose.Orientation.y += flagTurnRight ? -rotRate : rotRate;
 				}
-				//End rotation
+				// End rotation.
 				else
 				{
 					item.Pose.Orientation.y = targetHeadingAngle;
@@ -314,7 +314,7 @@ namespace TEN::Entities::Traps
 
 				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y, 0).ToDirection();
 
-				// Not in sector center; continue moving forward. 
+				// Move forward.
 				item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, moveVel);
 
 				if ((item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
@@ -331,10 +331,10 @@ namespace TEN::Entities::Traps
 
 		case ElectricCleanerState::CHOOSE_PATH:
 			{
-				//Do triggers
+				// Do triggers.
 				TestTriggers(&item, true);
 
-				//Search for next direction
+				// Search for next direction.
 				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y, 0).ToDirection();
 				auto rightDir = EulerAngles(0, item.Pose.Orientation.y + ANGLE(90.0f), 0).ToDirection();
 				auto newDir = Vector3::Zero;
@@ -385,12 +385,12 @@ namespace TEN::Entities::Traps
 					auto cross = newDir.Cross(forwardDir);
 					if (cross.y > 0)
 					{
-						//Activate turn right
+						// Activate turn right.
 						item.ItemFlags[1] |= (1 << 0);
 					}
 					else if (cross.y < 0)
 					{
-						//Activate turn left
+						// Activate turn left.
 						item.ItemFlags[1] &= ~(1 << 0);
 					}
 
