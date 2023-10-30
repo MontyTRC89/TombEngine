@@ -15,11 +15,10 @@ using namespace TEN::Effects::Spark;
 // NOTES
 // ItemFlags[0] = rotation rate.
 // ItemFlags[1] = behaviour flags.
-//					0: flagDoDetection
-//					1: flagTurnRight
-//					2: flagPriorityForward
-//					3: flagCounterClockwiseOrder
-//					4: flagStopAfterKill
+//					0: flagTurnRight
+//					1: flagPriorityForward
+//					2: flagCounterClockwiseOrder
+//					3: flagStopAfterKill
 // ItemFlags[2] = movement velocity.
 // ItemFlags[3, 4, 5] = counters for dynamic lights and sparks.
 // ItemFlags[6] = target heading angle.
@@ -35,6 +34,13 @@ namespace TEN::Entities::Traps
 	const auto ElectricCleanerHarmJoints =		std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 	const auto ElectricCleanerWireEndJoints =		std::vector<unsigned int>{ 5, 9, 13 };
 
+	enum ElectricCleanerState
+	{
+		CHOOSE_PATH = 0,
+		ROTATE = 1,
+		MOVE = 2
+	};
+
 	void InitializeElectricCleaner(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
@@ -42,6 +48,8 @@ namespace TEN::Entities::Traps
 		// Align to sector center.
 		item.Pose.Position.x = (item.Pose.Position.x & ~WALL_MASK) | (int)BLOCK(0.5f);
 		item.Pose.Position.z = (item.Pose.Position.z & ~WALL_MASK) | (int)BLOCK(0.5f);
+
+		item.Data = (int)ElectricCleanerState::CHOOSE_PATH;
 
 		// Initialize flags.
 		item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
@@ -53,11 +61,11 @@ namespace TEN::Entities::Traps
 		// Set flagStopAfterKill.
 		if (item.TriggerFlags)
 		{
-			item.ItemFlags[1] &= ~(1 << 4);
+			item.ItemFlags[1] &= ~(1 << 3);
 		}
 		else
 		{
-			item.ItemFlags[1] |= (1 << 4);
+			item.ItemFlags[1] |= (1 << 3);
 		}
 	}
 
@@ -252,11 +260,9 @@ namespace TEN::Entities::Traps
 	void ControlElectricCleaner(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto& object = Objects[item.ObjectNumber];
+		const auto& object = Objects[item.ObjectNumber];
 
-		auto& rotationVel = item.ItemFlags[0];
 		auto& moveVel = item.ItemFlags[2];
-		auto& goalAngle = item.ItemFlags[6];
 
 		if (!TriggerActive(&item))
 		{
@@ -265,103 +271,137 @@ namespace TEN::Entities::Traps
 				moveVel = 0;
 				SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
 			}
-
 			return;
 		}
 
 		if (moveVel <= 0)
 			return;
 
-		auto angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
+		// Get flags.
+		bool flagTurnRight =				((item.ItemFlags[1] & (1 << 0)) != 0);
+		bool flagPriorityForward =			((item.ItemFlags[1] & (1 << 1)) != 0);
+		bool flagCounterClockwiseOrder =	((item.ItemFlags[1] & (1 << 2)) != 0);
 
-		bool flagDoDetection = ((item.ItemFlags[1] & (1 << 0)) != 0);
-		bool flagTurnRight = ((item.ItemFlags[1] & (1 << 1)) != 0);
-		bool flagPriorityForward = ((item.ItemFlags[1] & (1 << 2)) != 0);
-		bool flagAntiClockWiseOrder = ((item.ItemFlags[1] & (1 << 3)) != 0);
+		int& CurrentState = item.Data;
+		short& targetHeadingAngle = item.ItemFlags[6];
 
-		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
-
-		float yaw = TO_RAD(item.Pose.Orientation.y);
-
-		auto forwardDirection = Vector3(sin(yaw), 0, cos(yaw));
-		forwardDirection.Normalize();
-
-		auto rightDirection = Vector3(cos(yaw), 0, -sin(yaw));
-		rightDirection.Normalize();
-
-		if (angleDifference > TO_RAD(rotationVel))
+		switch (CurrentState)
 		{
-			if (flagTurnRight)
-				item.Pose.Orientation.y -= rotationVel;
-			else
-				item.Pose.Orientation.y += rotationVel;
+		case ElectricCleanerState::ROTATE:
+			{
+				short& rotRate = item.ItemFlags[0];
 
-			// Recalculate new difference to check if we should force align with axis for safety check.
-			angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
-			if (angleDifference <= TO_RAD(rotationVel))
-				item.Pose.Orientation.y = goalAngle;
-		}
-		else
-		{
-			if (flagDoDetection &&
-				(item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
-				(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
+				int headingAngleDelta = abs(targetHeadingAngle - item.Pose.Orientation.y);
+
+				//Keep rotating
+				if (headingAngleDelta > rotRate)
+				{
+					item.Pose.Orientation.y += flagTurnRight ? -rotRate : rotRate;
+				}
+				//End rotation
+				else
+				{
+					item.Pose.Orientation.y = targetHeadingAngle;
+					CurrentState = ElectricCleanerState::MOVE;
+				}
+			}
+			break;
+
+		case ElectricCleanerState::MOVE:
+			{
+				auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+				item.Pose.Position.y = pointColl.Position.Floor;
+
+				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y, 0).ToDirection();
+
+				// Not in sector center; continue moving forward. 
+				item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, moveVel);
+
+				if ((item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
+					(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
+				{
+					// Only do turns if it's on a flat floor.
+					if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
+					{
+						CurrentState = ElectricCleanerState::CHOOSE_PATH;
+					}
+				}
+			}
+			break;
+
+		case ElectricCleanerState::CHOOSE_PATH:
 			{
 				//Do triggers
 				TestTriggers(&item, true);
 
 				//Search for next direction
-				Vector3 NewDirection;
-
+				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y, 0).ToDirection();
+				auto rightDir = EulerAngles(0, item.Pose.Orientation.y + ANGLE(90.0f), 0).ToDirection();
+				auto newDir = Vector3::Zero;
+				
 				if (flagPriorityForward)
 				{
-					if (flagAntiClockWiseOrder)			//Forward Right Left
-						NewDirection = GetElectricCleanerMovementDirection(item, forwardDirection, rightDirection, -rightDirection);
-					else								//Forward Left Right
-						NewDirection = GetElectricCleanerMovementDirection(item, forwardDirection, -rightDirection, rightDirection);
+					// Forward, left, right.
+					if (flagCounterClockwiseOrder)
+					{
+						newDir = GetElectricCleanerMovementDirection(item, forwardDir, -rightDir, rightDir);
+					}
+					// Forward, right, left.
+					else
+					{
+						newDir = GetElectricCleanerMovementDirection(item, forwardDir, rightDir, -rightDir);
+					}
 				}
 				else
 				{
-					if (flagAntiClockWiseOrder)			//Right Forward Left
-						NewDirection = GetElectricCleanerMovementDirection(item, rightDirection, forwardDirection, -rightDirection);
-					else								//Left Forward Right
-						NewDirection = GetElectricCleanerMovementDirection(item, -rightDirection, forwardDirection, rightDirection);
+					// Right, forward, left.
+					if (flagCounterClockwiseOrder)
+					{
+						newDir = GetElectricCleanerMovementDirection(item, rightDir, forwardDir, -rightDir);
+					}
+					// Left, forward, right.
+					else
+					{
+						newDir = GetElectricCleanerMovementDirection(item, -rightDir, forwardDir, rightDir);
+					}
 				}
 
-				if (NewDirection == Vector3::Zero) //Return back. (We already know is a valid one because it came from there).
-					NewDirection = -forwardDirection;
+				// Turn back.
+				if (newDir == Vector3::Zero)
+					newDir = -forwardDir;
 
-				//Will turn left or right?
-				auto crossProductResult = NewDirection.Cross(forwardDirection);
-				if (crossProductResult.y > 0)
-					item.ItemFlags[1] |= (1 << 1); // Turn on 1st bit for flagTurnRight.
-				else if (crossProductResult.y < 0)
-					item.ItemFlags[1] &= ~(1 << 1); // Turn off 1st bit for flagTurnRight. (So it'll turn to the left)
+				// Store target heading angle.
+				targetHeadingAngle = phd_atan(newDir.z, newDir.x);
 
-				//Store goal angle to control the rotation.
-				item.ItemFlags[6] = FROM_RAD(atan2(NewDirection.x, NewDirection.z));
-
-				if (item.Pose.Orientation.y - item.ItemFlags[6] == 0)
-					//If it doesn't have to rotate, do forward movement to keep smooth movement.
-					item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
+				// Not rotating; keep moving forward.
+				if (item.Pose.Orientation.y - targetHeadingAngle == 0)
+				{
+					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, moveVel);
+					CurrentState = ElectricCleanerState::MOVE;
+				}
 				else
-					//If it has to rotate, stop detection so it doesn't calculate collisions again while rotating in the same sector.
-					item.ItemFlags[1] &= ~(1 << 0); // Turn off 1st bit for flagDoDetection.
+				{
+					// Set flagTurnRight.		
+					auto cross = newDir.Cross(forwardDir);
+					if (cross.y > 0)
+					{
+						//Activate turn right
+						item.ItemFlags[1] |= (1 << 0);
+					}
+					else if (cross.y < 0)
+					{
+						//Activate turn left
+						item.ItemFlags[1] &= ~(1 << 0);
+					}
+
+					CurrentState = ElectricCleanerState::ROTATE;
+				}
 			}
-			else
-			{
-				item.Pose.Position.y = col.Position.Floor;
+			break;
 
-				//Is not in the center of a tile, keep moving forward. 
-				item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
-
-				auto slope = col.Block->GetSurfaceSlope(0, true);
-
-				if (slope.LengthSquared() > 0) //If it's a slope, don't do turns.
-					item.ItemFlags[1] &= ~(1 << 0);	// Turn off 1st bit for flagDoDetection.
-				else
-					item.ItemFlags[1] |= (1 << 0);	// Turn on 1st bit for flagDoDetection.
-			}
+		default:
+				TENLog("Unknown state in ElectricCleaner object with id: " + item.Index, LogLevel::Warning, LogConfig::All, false);
+			break;
 		}
 
 		AnimateItem(&item);
@@ -388,7 +428,7 @@ namespace TEN::Entities::Traps
 			ItemElectricBurn(laraItem, -1);
 			laraItem->HitPoints = 0;
 
-			bool flagStopAfterKill = ((item.ItemFlags[1] & (1 << 4)) != 0);
+			bool flagStopAfterKill = ((item.ItemFlags[1] & (1 << 3)) != 0);
 			if (flagStopAfterKill)
 				item.ItemFlags[2] = 0;
 
