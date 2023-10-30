@@ -73,8 +73,6 @@ struct OffsetBlendData
 	EulerAngles OrientOffset = EulerAngles::Zero;
 	float		Alpha		 = 0.0f;
 
-	Vector3 PosOffsetDelta = Vector3::Zero;
-
 	void Set(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec = 0.0f);
 	void Clear();
 

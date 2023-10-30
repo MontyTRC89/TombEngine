@@ -88,16 +88,21 @@ using namespace TEN::Math;
 	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
 							  const Vector3i& extraPosOffset, const EulerAngles& extraOrientOffset)
 	{
-		constexpr auto OFFSET_BLEND_ALPHA = 0.4f;
+		constexpr auto OFFSET_BLEND_ALPHA = 0.5f;
 
+		// Calculate relative offsets.
 		auto relPosOffset = basis.PosOffset + extraPosOffset;
 		auto relOrientOffset = basis.OrientOffset + extraOrientOffset;
 
+		// Calculate targets.
 		auto targetPos = Geometry::TranslatePoint(entityTo.Pose.Position, entityTo.Pose.Orientation, relPosOffset);
 		auto targetOrient = entityTo.Pose.Orientation + relOrientOffset;
 
+		// Calculate absolute offsets.
 		auto absPosOffset = (targetPos - entityFrom.Pose.Position).ToVector3();
 		auto absOrientOffset = targetOrient - entityFrom.Pose.Orientation;
+
+		// Set offset blend.
 		entityFrom.OffsetBlend.Set(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
 	}
 

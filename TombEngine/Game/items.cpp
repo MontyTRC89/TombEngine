@@ -46,7 +46,7 @@ void OffsetBlendData::Set(const Vector3& posOffset, const EulerAngles& orientOff
 
 void OffsetBlendData::Clear()
 {
-	*this = OffsetBlendData{};
+	*this = {};
 }
 
 void OffsetBlendData::DrawDebug() const
@@ -60,50 +60,39 @@ void OffsetBlendData::DrawDebug() const
 
 void ItemInfo::HandleOffsetBlend()
 {
-	// TODO: Using frame time for now, but delta time should be used in the future.
-	constexpr auto DELTA_FRAME_TIME = 1.0f;
-
+	constexpr auto TIME_ACTIVE_MAX = 3.0f;
+	
 	OffsetBlend.DrawDebug();
 
-	// Blending is inactive; return early.
+	// Offset blend inactive; return early.
 	if (!OffsetBlend.IsActive)
 		return;
 
-	// Handle delay.
-	if (OffsetBlend.DelayTime != 0.0f)
+	// Update delay.
+	if (OffsetBlend.DelayTime > 0.0f)
 	{
-		OffsetBlend.DelayTime -= DELTA_FRAME_TIME;
+		OffsetBlend.DelayTime -= 1.0f;// DELTA_TIME;
 		if (OffsetBlend.DelayTime < 0.0f)
 			OffsetBlend.DelayTime = 0.0f;
 
 		return;
 	}
 
-	// Calculate position blend step.
+	// Calculate offset steps.
 	auto posOffsetStep = Vector3::Lerp(OffsetBlend.PosOffset, Vector3::Zero, OffsetBlend.Alpha);
-	OffsetBlend.PosOffsetDelta += posOffsetStep - Vector3i(posOffsetStep).ToVector3();
-	auto posOffsetDeltaRounded = Vector3i(OffsetBlend.PosOffsetDelta).ToVector3();
-
-	// Round accumulated delta value to nearest integer and add to position.
-	auto posOffsetDeltaInt = Vector3i(OffsetBlend.PosOffsetDelta);
-	OffsetBlend.PosOffsetDelta -= posOffsetDeltaInt.ToVector3() - OffsetBlend.PosOffsetDelta;
-	Pose.Position += posOffsetDeltaInt;
-
-	// Subtract rounded delta from offset step and apply to position.
-	OffsetBlend.PosOffset -= posOffsetDeltaInt.ToVector3();
-	Pose.Position += Vector3i(posOffsetStep) - posOffsetDeltaInt.ToVector3();
-
-	// Blend orientation.
 	auto orientOffsetStep = EulerAngles::Lerp(OffsetBlend.OrientOffset, EulerAngles::Zero, OffsetBlend.Alpha);
+
+	// Apply offsets.
+	Pose.Position += Vector3i(posOffsetStep);
 	Pose.Orientation += orientOffsetStep;
+
+	// Update offsets.
+	OffsetBlend.PosOffset -= posOffsetStep;
 	OffsetBlend.OrientOffset -= orientOffsetStep;
 
-	// Track time active.
-	OffsetBlend.TimeActive += DELTA_FRAME_TIME;
-
-	// Blending is complete; clear data.
-	if (OffsetBlend.PosOffset.Length() <= EPSILON &&
-		OffsetBlend.OrientOffset == EulerAngles::Zero)
+	// Offset blend complete; clear data.
+	if ((OffsetBlend.PosOffset.Length() <= EPSILON && EulerAngles::Compare(OffsetBlend.OrientOffset, EulerAngles::Zero)) ||
+		OffsetBlend.TimeActive >= (int)round(TIME_ACTIVE_MAX * FPS))
 	{
 		OffsetBlend.Clear();
 	}

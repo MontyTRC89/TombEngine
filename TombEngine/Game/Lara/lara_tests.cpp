@@ -2645,10 +2645,10 @@ bool CanClimbLadderDown(ItemInfo* item, CollisionInfo* coll)
 
 bool CanDismountLadderTop(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto PROBE_DIST		  = BLOCK(1 / 4.0f);
-	constexpr auto LOWER_FLOOR_BOUND  = BLOCK(1 / 16.0f);
-	constexpr auto UPPDER_FLOOR_BOUND = 0;
-	constexpr auto UPPER_CEIL_BOUND	  = -BLOCK(1 / 2.0f);
+	constexpr auto PROBE_DIST		 = BLOCK(1 / 4.0f);
+	constexpr auto LOWER_FLOOR_BOUND = BLOCK(1 / 16.0f);
+	constexpr auto UPPER_FLOOR_BOUND = 0;
+	constexpr auto UPPER_CEIL_BOUND	 = -BLOCK(1 / 2.0f);
 
 	// Get point collision.
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y, PROBE_DIST);
@@ -2660,7 +2660,7 @@ bool CanDismountLadderTop(ItemInfo* item, CollisionInfo* coll)
 
 	// 2) Assess point collision.
 	if ((pointColl.Position.Floor - vPos) <= LOWER_FLOOR_BOUND &&				  // Floor height is within lower floor bound.
-		(pointColl.Position.Floor - vPos) >= UPPDER_FLOOR_BOUND &&				  // Floor height is within upper floor bound.
+		(pointColl.Position.Floor - vPos) >= UPPER_FLOOR_BOUND &&				  // Floor height is within upper floor bound.
 		(pointColl.Position.Ceiling - vPos) < UPPER_CEIL_BOUND &&				  // Ceiling height is within upper ceiling bound.
 		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT) // Space isn't too narrow.
 	{
@@ -2696,7 +2696,7 @@ bool CanDismountLadderBack(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoingLeft)
 {
 	constexpr int PROBE_DIST  = BLOCK(1 / 4.0f);
-	constexpr int BLOOR_BOUND = BLOCK(1 / 16.0f);
+	constexpr int FLOOR_BOUND = BLOCK(1 / 16.0f);
 
 	// Get point collision.
 	auto pointColl = GetCollision(item, item->Pose.Orientation.y + (isGoingLeft ? -ANGLE(90.0f) : ANGLE(90.0f)), PROBE_DIST);
@@ -2707,7 +2707,7 @@ bool TestLaraLadderSideDismount(ItemInfo* item, CollisionInfo* coll, bool isGoin
 		return false;
 
 	// 2) Assess point collision.
-	if (abs(pointColl.Position.Floor - vPos) <= BLOOR_BOUND &&					  // Floor height is within upper/lower floor bound.
+	if (abs(pointColl.Position.Floor - vPos) <= FLOOR_BOUND &&					  // Floor height is within upper/lower floor bound.
 		abs(pointColl.Position.Ceiling - pointColl.Position.Floor) > LARA_HEIGHT) // Space isn't too narrow.
 	{
 		return true;

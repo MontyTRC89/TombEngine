@@ -20,6 +20,9 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
+// NOTES:
+// ItemFlags[0] = is double-sided.
+
 namespace TEN::Entities::Generic
 {
 	constexpr auto LADDER_STEP_HEIGHT				 = CLICK(0.5f);
@@ -169,8 +172,10 @@ namespace TEN::Entities::Generic
 		if (LadderMountTopBackBasis.TestInteraction(laraItem, ladderItem, boundsExtension))
 		return LadderMountType::TopBack;*/
 
+		// Front mount.
 		if (LadderMountFrontBasis.TestInteraction(playerItem, ladderItem, boundsExtension))
 		{
+			// Jump case.
 			if (playerItem.Animation.IsAirborne && playerItem.Animation.Velocity.y > 0.0f)
 			{
 				if (playerItem.Animation.ActiveState == LS_JUMP_UP)
@@ -182,6 +187,7 @@ namespace TEN::Entities::Generic
 					return LadderMountType::JumpReach;
 				}
 			}
+			// Regular case.
 			else
 			{
 				return LadderMountType::Front;
@@ -288,7 +294,7 @@ namespace TEN::Entities::Generic
 		HandleLadderMount(ladderItem, *playerItem, mountType);
 		return;
 		
-		// Mount while grounded.
+		// Grounded mount.
 		if ((IsHeld(In::Action) &&
 			TestState(playerItem->Animation.ActiveState, LadderGroundedMountPlayerStates) &&
 			player.Control.HandStatus == HandStatus::Free) ||
@@ -303,7 +309,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		// Mount while airborne.
+		// Airborne mount.
 		if (IsHeld(In::Action) &&
 			TestState(playerItem->Animation.ActiveState, LadderAirborneMountPlayerStates) &&
 			playerItem->Animation.IsAirborne &&
