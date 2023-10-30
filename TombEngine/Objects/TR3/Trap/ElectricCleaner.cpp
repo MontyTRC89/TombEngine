@@ -149,19 +149,19 @@ namespace TEN::Entities::Traps
 		return true;
 	}
 
-	static Vector3 ElectricCleanerSearchDirections(ItemInfo& item, const Vector3& dir1, const Vector3& dir2, const Vector3& dir3)
+	static Vector3 GetElectricCleanerMovementDirection(const ItemInfo& item, const Vector3& dir0, const Vector3& dir1, const Vector3& dir2)
 	{
+		if (IsNextSectorValid(item, dir0))
+			return dir0;
 		if (IsNextSectorValid(item, dir1))
 			return dir1;
 		if (IsNextSectorValid(item, dir2))
 			return dir2;
-		if (IsNextSectorValid(item, dir3))
-			return dir3;
 
 		return Vector3::Zero;
 	}
 			
-	static void ElectricCleanerToItemCollision(ItemInfo& item)
+	static void HandleElectricCleanerItemCollision(ItemInfo& item)
 	{
 		auto backupPos = item.Pose.Position;
 
@@ -316,16 +316,16 @@ namespace TEN::Entities::Traps
 				if (flagPriorityForward)
 				{
 					if (flagAntiClockWiseOrder)			//Forward Right Left
-						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, rightDirection, -rightDirection);
+						NewDirection = GetElectricCleanerMovementDirection(item, forwardDirection, rightDirection, -rightDirection);
 					else								//Forward Left Right
-						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, -rightDirection, rightDirection);
+						NewDirection = GetElectricCleanerMovementDirection(item, forwardDirection, -rightDirection, rightDirection);
 				}
 				else
 				{
 					if (flagAntiClockWiseOrder)			//Right Forward Left
-						NewDirection = ElectricCleanerSearchDirections(item, rightDirection, forwardDirection, -rightDirection);
+						NewDirection = GetElectricCleanerMovementDirection(item, rightDirection, forwardDirection, -rightDirection);
 					else								//Left Forward Right
-						NewDirection = ElectricCleanerSearchDirections(item, -rightDirection, forwardDirection, rightDirection);
+						NewDirection = GetElectricCleanerMovementDirection(item, -rightDirection, forwardDirection, rightDirection);
 				}
 
 				if (NewDirection == Vector3::Zero) //Return back. (We already know is a valid one because it came from there).
@@ -374,7 +374,7 @@ namespace TEN::Entities::Traps
 		AlignEntityToSurface(&item, radius);
 
 		SpawnElectricCleanerSparks(item);
-		ElectricCleanerToItemCollision(item);
+		HandleElectricCleanerItemCollision(item);
 	}
 
 	void CollideElectricCleaner(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
