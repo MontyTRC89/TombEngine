@@ -56,7 +56,6 @@ namespace TEN::Entities::Traps
 		else
 			item.ItemFlags[1] |= (1 << 4);	// Turn on 1st bit for flagStopAfterKill.
 
-		CollectLevelPushables(MyPushablesList);
 	}
 
 	void ControlElectricCleaner(short itemNumber)
@@ -258,10 +257,6 @@ namespace TEN::Entities::Traps
 		if (col.Block->Stopper)
 			return false;
 
-		//Is there a pushable block?
-		if (CheckPushableList(MyPushablesList, detectionPoint.ToVector3()))
-			return false;
-
 		//If nothing of that happened, then it must be a valid sector.
 		return true;
 	}
@@ -385,38 +380,6 @@ namespace TEN::Entities::Traps
 				spark.room = item.RoomNumber;
 			}
 		}
-	}
-
-	//TODO method to detect pushables while Pushable_Object get refactored.
-
-	void CollectLevelPushables(std::vector <ItemInfo* >& PushablesList)
-	{
-		for (int index = 0; index < g_Level.Items.size(); index++)
-		{
-			ItemInfo* currentItem = &g_Level.Items[index];
-			if (currentItem->ObjectNumber >= (ID_PUSHABLE_OBJECT1) &&
-				currentItem->ObjectNumber <= (ID_PUSHABLE_OBJECT10))
-				PushablesList.push_back(currentItem);
-		}
-	}
-
-	bool CheckPushableList(std::vector <ItemInfo* >& PushablesList, Vector3& refPoint)
-	{
-		auto pushableDistance = INFINITE;
-		for (int index = 0; index < PushablesList.size(); index++)
-		{
-			ItemInfo* currentObj = PushablesList[index];
-			
-			if (currentObj == nullptr)
-				continue;
-
-			auto PushablePos = currentObj->Pose.Position.ToVector3();
-			auto currentDistance = Vector3::Distance(PushablePos, refPoint);
-
-			if (currentDistance < 1024)
-				return true;
-		}
-		return false;
 	}
 
 }

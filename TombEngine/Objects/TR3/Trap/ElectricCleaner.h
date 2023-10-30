@@ -14,8 +14,4 @@ namespace TEN::Entities::Traps
 	void ElectricCleanerToItemCollision(ItemInfo& item);
 	void SpawnElectricCleanerSparks(ItemInfo& item);
 
-	//TODO method to detect pushables while Pushable_Object get refactored.
-	void CollectLevelPushables (std::vector <ItemInfo*>& PushablesList);
-	bool CheckPushableList (std::vector <ItemInfo* >& PushablesList, Vector3& refPoint);
-
 }
