@@ -5,5 +5,5 @@ struct ItemInfo;
 
 namespace TEN::Entities::Generic
 {
-	void CollideLadder(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void CollideLadder(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
 }
