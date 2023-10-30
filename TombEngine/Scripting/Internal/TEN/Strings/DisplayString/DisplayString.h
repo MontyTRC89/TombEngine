@@ -29,6 +29,7 @@ private:
 	friend class StringsHandler;
 	friend class DisplayString;
 
+	// Members
 	std::string _key	  = {};
 	Vec2		_position = Vec2(0, 0);
 	float		_scale	  = 1.0f;
@@ -41,6 +42,7 @@ private:
 	bool _isTranslated	 = false;
 	bool _deleteWhenZero = false;
 
+	// Constructors
 	UserDisplayString() = default;
 
 public:
@@ -55,27 +57,34 @@ using GetItemCallback	 = std::function<std::optional<std::reference_wrapper<User
 class DisplayString
 {
 private:
+	// Members
 	DisplayStringID _id = 0;
 
 public:
 	static void Register(sol::table& parent);
 
+	// Constructors
 	DisplayString();
+
+	// Destructors
 	~DisplayString();
 
+	// Getters
 	DisplayStringID GetID() const;
 	std::string		GetKey() const;
 	Vec2			GetPos() const;
 	float			GetScale() const;
 	ScriptColor		GetColor() const;
 
-	void SetKey(const std::string&);
+	// Setters
+	void SetKey(const std::string& key);
 	void SetPosition(const Vec2& pos);
 	void SetScale(float scale);
 	void SetColor(const ScriptColor&);
 	void SetTranslated(bool isTranslated);
-	void SetFlags(const sol::table&);
+	void SetFlags(const sol::table& flags);
 
+	// Routines
 	static SetItemCallback	  SetItemCallbackRoutine;
 	static RemoveItemCallback RemoveItemCallbackRoutine;
 	static GetItemCallback	  GetItemCallbackRoutine;
