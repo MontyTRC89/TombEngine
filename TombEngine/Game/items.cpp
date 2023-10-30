@@ -101,7 +101,7 @@ void ItemInfo::HandleOffsetBlend()
 	// Track time active.
 	OffsetBlend.TimeActive += DELTA_FRAME_TIME;
 
-	// If blending is complete, clear data.
+	// Blending is complete; clear data.
 	if (OffsetBlend.PosOffset.Length() <= EPSILON &&
 		OffsetBlend.OrientOffset == EulerAngles::Zero)
 	{
