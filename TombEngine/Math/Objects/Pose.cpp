@@ -69,14 +69,14 @@ using namespace TEN::Math;
 		this->Position = Geometry::TranslatePoint(this->Position, orient, offset);
 	}
 
-	void Pose::Translate(const EulerAngles& orient, float distance)
+	void Pose::Translate(const EulerAngles& orient, float dist)
 	{
-		Position = Geometry::TranslatePoint(Position, orient, distance);
+		Position = Geometry::TranslatePoint(Position, orient, dist);
 	}
 
-	void Pose::Translate(const Vector3& direction, float distance)
+	void Pose::Translate(const Vector3& dir, float dist)
 	{
-		Position = Geometry::TranslatePoint(Position, direction, distance);
+		Position = Geometry::TranslatePoint(Position, dir, dist);
 	}
 
 	void Pose::InterpolateConstant(const Pose& toPose, float velocity, short turnRate)

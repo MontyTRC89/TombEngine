@@ -109,93 +109,23 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> floorBorder;
 	std::function<int(short itemNumber)> ceilingBorder;
 
-	// NOTE: ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
-	void SetBoneRotationFlags(int boneNumber, int flags)
-	{
-		g_Level.Bones[boneIndex + (boneNumber * 4)] |= flags;
-	}
-
-	// NOTE: Use if object is alive but not intelligent to set up blood effects.
-	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
-	{
-		// Avoid some objects such as ID_SAS_DYING having None.
-		if (isAlive)
-		{
-			hitEffect = HitEffect::Blood;
-			return;
-		}
-
-		if (intelligent)
-		{
-			if (isSolid && HitPoints > 0)
-			{
-				hitEffect = HitEffect::Richochet;
-			}
-			else if ((damageType != DamageMode::Any && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
-			{
-				hitEffect = HitEffect::Smoke;
-			}
-			else if (damageType == DamageMode::Any && HitPoints > 0)
-			{
-				hitEffect = HitEffect::Blood;
-			}
-		}
-		else if (isSolid && HitPoints <= 0)
-		{
-			hitEffect = HitEffect::Richochet;
-		}
-		else
-		{
-			hitEffect = HitEffect::None;
-		}
-	}
+	void SetBoneRotationFlags(int boneID, int flags);
+	void SetHitEffect(bool isSolid = false, bool isAlive = false);
 };
 
 class ObjectHandler
 {
-	private:
-		ObjectInfo Objects[ID_NUMBER_OBJECTS];
+private:
+	ObjectInfo _objects[ID_NUMBER_OBJECTS];
 
-		ObjectInfo& GetFirstAvailableObject()
-		{
-			for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
-			{
-				if (Objects[i].loaded)
-					return Objects[i];
-			}
+public:
+	void Initialize();
+	bool CheckID(GAME_OBJECT_ID objectID, bool isSilent = false);
 
-			return Objects[0];
-		}
+	ObjectInfo& operator [](int objectID);
 
-	public:
-		void Initialize() 
-		{ 
-			std::memset(Objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
-		}
-
-		bool CheckID(int index, bool isSilent = false)
-		{
-			if (index == GAME_OBJECT_ID::ID_NO_OBJECT || index >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
-			{
-				if (!isSilent)
-				{
-					TENLog("Attempted to access unavailable slot ID (" + std::to_string(index) + "). " +
-						"Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
-				}
-
-				return false;
-			}
-
-			return true;
-		}
-
-		ObjectInfo& operator[](int index) 
-		{
-			if (CheckID(index))
-				return Objects[index];
-		
-			return GetFirstAvailableObject();
-		}
+private:
+	ObjectInfo& GetFirstAvailableObject();
 };
 
 struct StaticInfo

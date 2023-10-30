@@ -184,7 +184,7 @@ namespace TEN::Math::Geometry
 
 		static const auto REF_DIR = Vector3::UnitZ;
 
-		// If vectors are nearly opposite, return orientation 180 degrees around arbitrary axis.
+		// Vectors are nearly opposite; return orientation 180 degrees around arbitrary axis.
 		float dot = REF_DIR.Dot(dir);
 		if (dot < -SINGULARITY_THRESHOLD)
 		{
@@ -197,7 +197,7 @@ namespace TEN::Math::Geometry
 			return axisAngle.ToQuaternion();
 		}
 
-		// If vectors are nearly identical, return identity quaternion.
+		// Vectors are nearly identical; return identity quaternion.
 		if (dot > SINGULARITY_THRESHOLD)
 			return Quaternion::Identity;
 
@@ -226,7 +226,7 @@ namespace TEN::Math::Geometry
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The 2D heading direction vector: X = +sinY, Y = 0, Z = +cosY
+		// 2D heading direction vector: X = +sinY, Y = 0, Z = +cosY
 		auto headingDir = Vector3(sinY, 0.0f, cosY);
 		auto targetDir = target - origin;
 
@@ -244,7 +244,7 @@ namespace TEN::Math::Geometry
 
 		auto refDir = refPoint - origin;
 
-		// The 2D heading direction vector to the 3D reference direction vector: X = +refDirection.x, Y = 0, Z = +refDirection.z
+		// 2D heading direction vector to 3D reference direction vector: X = +refDirection.x, Y = 0, Z = +refDirection.z
 		auto headingDir = Vector3(refDir.x, 0.0f, refDir.z);
 		auto targetDir = target - origin;
 
@@ -268,7 +268,7 @@ namespace TEN::Math::Geometry
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The 2D normal vector to the 2D heading direction vector: X = +cosY, Y = 0, Z = -sinY
+		// 2D normal vector to 2D heading direction vector: X = +cosY, Y = 0, Z = -sinY
 		auto headingNormal = Vector3(cosY, 0.0f, -sinY);
 		auto targetDir = target - origin;
 
@@ -286,7 +286,7 @@ namespace TEN::Math::Geometry
 
 		auto refDir = refPoint - origin;
 
-		// The 2D normal vector to the 3D reference direction vector: X = +refDirection.z, Y = 0, Z = -refDirection.x
+		// 2D normal vector to 3D reference direction vector: X = +refDirection.z, Y = 0, Z = -refDirection.x
 		auto headingNormal = Vector3(refDir.z, 0.0f, -refDir.x);
 		auto targetDir = target - origin;
 

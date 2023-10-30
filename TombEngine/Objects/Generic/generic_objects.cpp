@@ -63,7 +63,7 @@ static void StartObject(ObjectInfo* object)
 			object->ceilingBorder = TrapDoorCeilingBorder;
 			object->floor = TrapDoorFloor;
 			object->ceiling = TrapDoorCeiling;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -79,7 +79,7 @@ static void StartObject(ObjectInfo* object)
 			object->ceilingBorder = TrapDoorCeilingBorder;
 			object->floor = TrapDoorFloor;
 			object->ceiling = TrapDoorCeiling;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -95,7 +95,7 @@ static void StartObject(ObjectInfo* object)
 			object->ceilingBorder = TrapDoorCeilingBorder;
 			object->floor = TrapDoorFloor;
 			object->ceiling = TrapDoorCeiling;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -163,7 +163,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = CogSwitchCollision;
 		object->control = CogSwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_LEVER_SWITCH];
@@ -171,7 +171,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = RailSwitchCollision;
 		object->control = SwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_JUMP_SWITCH];
@@ -179,7 +179,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = JumpSwitchCollision;
 		object->control = SwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	for (int objectNumber = ID_SWITCH_TYPE1; objectNumber <= ID_SWITCH_TYPE16; objectNumber++)
@@ -189,7 +189,7 @@ void StartSwitches(ObjectInfo* object)
 		{
 			object->collision = SwitchCollision;
 			object->control = SwitchControl;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -198,7 +198,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = AirlockSwitchCollision;
 		object->control = SwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_CROWBAR_SWITCH];
@@ -206,7 +206,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = CrowbarSwitchCollision;
 		object->control = SwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_MINECART_SWITCH];
@@ -215,7 +215,7 @@ void StartSwitches(ObjectInfo* object)
 		object->Initialize = InitializeAnimating;
 		object->control = AnimatingControl;
 		object->collision = ObjectCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 		object->shadowType = ShadowMode::All;
 	}
 
@@ -242,7 +242,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->control = TurnSwitchControl;
 		object->collision = TurnSwitchCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH1];
@@ -250,7 +250,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH2];
@@ -258,7 +258,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH3];
@@ -266,7 +266,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	for (int objectID = ID_SHOOT_SWITCH1; objectID <= ID_SHOOT_SWITCH4; objectID++)
@@ -300,7 +300,7 @@ void StartDoors(ObjectInfo* object)
 			object->Initialize = InitializeDoor;
 			object->control = DoorControl;
 			object->collision = DoorCollision;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -309,7 +309,7 @@ void StartDoors(ObjectInfo* object)
 	{
 		object->Initialize = InitializeDoor;
 		object->control = DoorControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_LIFT_DOORS2];
@@ -317,7 +317,7 @@ void StartDoors(ObjectInfo* object)
 	{
 		object->Initialize = InitializeDoor;
 		object->control = DoorControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_SEQUENCE_DOOR1];
@@ -326,7 +326,7 @@ void StartDoors(ObjectInfo* object)
 		object->Initialize = InitializeDoor;
 		object->collision = DoorCollision;
 		object->control = SequenceDoorControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
@@ -337,7 +337,7 @@ void StartDoors(ObjectInfo* object)
 			object->Initialize = InitializeDoor;
 			object->collision = DoubleDoorCollision;
 			object->control = PushPullKickDoorControl;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -349,7 +349,7 @@ void StartDoors(ObjectInfo* object)
 			object->Initialize = InitializeDoor;
 			object->collision = UnderwaterDoorCollision;
 			object->control = PushPullKickDoorControl;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -361,7 +361,7 @@ void StartDoors(ObjectInfo* object)
 			object->Initialize = InitializeDoor;
 			object->collision = PushPullKickDoorCollision;
 			object->control = PushPullKickDoorControl;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -370,7 +370,7 @@ void StartDoors(ObjectInfo* object)
 	{
 		object->Initialize = InitializeSteelDoor;
 		object->collision = SteelDoorCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -414,7 +414,7 @@ void StartTraps(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->collision = PoleCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_BURNING_TORCH_ITEM];
