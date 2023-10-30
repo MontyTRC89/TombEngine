@@ -64,10 +64,10 @@ public:
 	~DisplayString();
 
 	DisplayStringID GetID() const;
-	std::string			GetKey() const;
-	Vec2				GetPos() const;
-	float				GetScale() const;
-	ScriptColor			GetColor() const;
+	std::string		GetKey() const;
+	Vec2			GetPos() const;
+	float			GetScale() const;
+	ScriptColor		GetColor() const;
 
 	void SetKey(const std::string&);
 	void SetPosition(const Vec2& pos);
