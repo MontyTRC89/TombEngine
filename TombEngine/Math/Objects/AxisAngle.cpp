@@ -14,10 +14,10 @@ using namespace TEN::Math;
 
 	AxisAngle::AxisAngle(const Vector3& axis, short angle)
 	{
-		auto axisNorm = axis;
-		axisNorm.Normalize();
+		auto normalizedAxis = axis;
+		normalizedAxis.Normalize();
 
-		Axis = axisNorm;
+		Axis = normalizedAxis;
 		Angle = angle;
 	}
 
@@ -75,10 +75,10 @@ using namespace TEN::Math;
 
 	void AxisAngle::SetAxis(const Vector3& axis)
 	{
-		auto axisNorm = axis;
-		axisNorm.Normalize();
+		auto normalizedAxis = axis;
+		normalizedAxis.Normalize();
 		
-		Axis = axisNorm;
+		Axis = normalizedAxis;
 	}
 
 	void AxisAngle::SetAngle(short angle)
@@ -118,8 +118,8 @@ using namespace TEN::Math;
 	Vector3 AxisAngle::ToDirection() const
 	{
 		// TODO: Works, but need to find a way without EulerAngles. -- Sezz 2023.03.08
-		auto refDirection = Geometry::RotatePoint(Vector3::Right, EulerAngles(Axis));
-		return Geometry::RotatePoint(refDirection, *this);
+		auto refDir = Geometry::RotatePoint(Vector3::Right, EulerAngles(Axis));
+		return Geometry::RotatePoint(refDir, *this);
 	}
 
 	EulerAngles AxisAngle::ToEulerAngles() const

@@ -91,7 +91,7 @@ namespace TEN::Hud
 		float life = round(DisplayPickup::LIFE_MAX * FPS);
 
 		// Increment count of existing display pickup if it exists.
-		for (auto& pickup : DisplayPickups)
+		for (auto& pickup : _displayPickups)
 		{
 			// Ignore already disappearing display pickups.
 			if (pickup.Life <= 0.0f)
@@ -132,17 +132,17 @@ namespace TEN::Hud
 
 	void PickupSummaryController::Update()
 	{
-		if (DisplayPickups.empty())
+		if (_displayPickups.empty())
 			return;
 
 		// Get and apply stack positions as targets.
 		auto stackPositions = GetStackPositions();
 		for (int i = 0; i < stackPositions.size(); i++)
-			DisplayPickups[i].Target = std::move(stackPositions[i]);
+			_displayPickups[i].Target = std::move(stackPositions[i]);
 
 		// Update display pickups.
 		bool isHead = true;
-		for (auto& pickup : DisplayPickups)
+		for (auto& pickup : _displayPickups)
 		{
 			pickup.Update(isHead);
 			isHead = false;
@@ -155,11 +155,11 @@ namespace TEN::Hud
 	{
 		//DrawDebug();
 
-		if (DisplayPickups.empty())
+		if (_displayPickups.empty())
 			return;
 
 		// Draw display pickups.
-		for (const auto& pickup : DisplayPickups)
+		for (const auto& pickup : _displayPickups)
 		{
 			if (pickup.IsOffscreen())
 				continue;
@@ -170,7 +170,7 @@ namespace TEN::Hud
 
 	void PickupSummaryController::Clear()
 	{
-		DisplayPickups.clear();
+		_displayPickups.clear();
 	}
 
 	std::vector<Vector2> PickupSummaryController::GetStackPositions() const
@@ -183,8 +183,8 @@ namespace TEN::Hud
 
 		// Calculate stack positions. 
 		auto stackPositions = std::vector<Vector2>{};
-		stackPositions.resize(DisplayPickups.size());
-		for (int i = 0; i < DisplayPickups.size(); i++)
+		stackPositions.resize(_displayPickups.size());
+		for (int i = 0; i < _displayPickups.size(); i++)
 		{
 			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, SCREEN_SPACE_RES.y);
 			auto pos = (SCREEN_SPACE_RES - relPos) - SCREEN_OFFSET;
@@ -196,29 +196,29 @@ namespace TEN::Hud
 
 	DisplayPickup& PickupSummaryController::GetNewDisplayPickup()
 	{
-		assertion(DisplayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
+		assertion(_displayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
 
 		// Add and return new display pickup.
-		if (DisplayPickups.size() < DISPLAY_PICKUP_COUNT_MAX)
-			return DisplayPickups.emplace_back();
+		if (_displayPickups.size() < DISPLAY_PICKUP_COUNT_MAX)
+			return _displayPickups.emplace_back();
 
 		// Clear and return most recent display pickup.
-		auto& pickup = DisplayPickups.back();
+		auto& pickup = _displayPickups.back();
 		pickup = {};
 		return pickup;
 	}
 
 	void PickupSummaryController::ClearInactiveDisplayPickups()
 	{
-		DisplayPickups.erase(
+		_displayPickups.erase(
 			std::remove_if(
-				DisplayPickups.begin(), DisplayPickups.end(),
+				_displayPickups.begin(), _displayPickups.end(),
 				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen()); }),
-			DisplayPickups.end());
+			_displayPickups.end());
 	}
 
 	void PickupSummaryController::DrawDebug() const
 	{
-		g_Renderer.PrintDebugMessage("Display pickups in summary: %d", DisplayPickups.size());
+		g_Renderer.PrintDebugMessage("Display pickups in summary: %d", _displayPickups.size());
 	}
 }

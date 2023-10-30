@@ -145,7 +145,7 @@ std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
 	if (!item->MeshBits.TestAny() || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 }
 
 std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
@@ -155,7 +155,7 @@ std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
 	if (!item->MeshBits.TestAny() || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 }
 
 int FallingBlockFloorBorder(short itemNumber)

@@ -222,7 +222,7 @@ You will not need to call them manually.
 */
 	tableFlow.set_function(ScriptReserved_SetStrings, &FlowHandler::SetStrings, this);
 
-/*** Get translated string
+/*** Get translated string.
 @function GetString
 @tparam key string key for translated string 
 */
@@ -234,6 +234,12 @@ Specify which translations in the strings table correspond to which languages.
 @tparam tab table array-style table with language names
 */
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
+
+/*** Do FlipMap with specific ID.
+//@function FlipMap
+//@tparam int flipmap (ID of flipmap)
+*/
+	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap);
 
 	ScriptColor::Register(parent);
 	ScriptDisplaySprite::Register(*lua, parent);
@@ -425,6 +431,11 @@ void FlowHandler::EndLevel(std::optional<int> nextLevel)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
 	NextLevel = index;
+}
+
+void FlowHandler::FlipMap(int flipmap)
+{
+	DoFlipMap(flipmap);
 }
 
 void FlowHandler::SaveGame(int slot)

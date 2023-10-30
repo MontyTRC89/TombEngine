@@ -94,19 +94,19 @@
 		return *this;
 	}
 
-	GameVector& GameVector::operator *=(float scale)
+	GameVector& GameVector::operator *=(float scalar)
 	{
-		x *= scale;
-		y *= scale;
-		z *= scale;
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
 		return *this;
 	}
 
-	GameVector& GameVector::operator /=(float scale)
+	GameVector& GameVector::operator /=(float scalar)
 	{
-		x /= scale;
-		y /= scale;
-		z /= scale;
+		x /= scalar;
+		y /= scalar;
+		z /= scalar;
 		return *this;
 	}
 
@@ -125,13 +125,13 @@
 		return GameVector(x * vector.x, y * vector.y, z * vector.z, RoomNumber);
 	}
 
-	GameVector GameVector::operator *(float scale) const
+	GameVector GameVector::operator *(float scalar) const
 	{
-		return GameVector((int)round(x * scale), (int)round(y * scale), (int)round(z * scale), RoomNumber);
+		return GameVector((int)round(x * scalar), (int)round(y * scalar), (int)round(z * scalar), RoomNumber);
 	}
 
-	GameVector GameVector::operator /(float scale) const
+	GameVector GameVector::operator /(float scalar) const
 	{
-		return GameVector((int)round(x / scale), (int)round(y / scale), (int)round(z / scale), RoomNumber);
+		return GameVector((int)round(x / scalar), (int)round(y / scalar), (int)round(z / scalar), RoomNumber);
 	}
 //}
