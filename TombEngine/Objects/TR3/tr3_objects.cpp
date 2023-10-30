@@ -454,8 +454,8 @@ static void StartTrap(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeElectricCleaner;
-		obj->control = ControlElectricCleaner;
-		obj->collision = CollideElectricCleaner;
+		obj->control = ElectricCleanerControl;
+		obj->collision = ElectricCleanerCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->nonLot = 1;
