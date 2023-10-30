@@ -322,9 +322,9 @@ void FloorShake(ItemInfo* item)
 
 void Turn180(ItemInfo* item)
 {
-	item->Pose.Orientation.x = -item->Pose.Orientation.x;
+	item->Pose.Orientation.x *= -1;
 	item->Pose.Orientation.y += ANGLE(180.0f);
-	item->Pose.Orientation.z = -item->Pose.Orientation.z;
+	item->Pose.Orientation.z *= -1;
 }
 
 void Turn90(ItemInfo* item)

@@ -361,6 +361,19 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (TestLaraFall(item, coll))
+	{
+		SetLaraFallAnimation(item);
+		return;
+	}
+
+	if (TestLaraSlide(item, coll))
+	{
+		SetLaraSlideAnimation(item, coll);
+		SetLaraLand(item, coll);
+		return;
+	}
+
 	ShiftItem(item, coll);
 
 	if (TestLaraStep(item, coll))

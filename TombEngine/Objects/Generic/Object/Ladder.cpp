@@ -208,7 +208,7 @@ namespace TEN::Entities::Generic
 		if (playerItem.OffsetBlend.IsActive)
 			player.Context.InteractedItem = ladderItem.Index;
 
-		ModulateLaraTurnRateY(&playerItem, 0, 0, 0);
+		//ModulateLaraTurnRateY(&playerItem, 0, 0, 0);
 
 		auto bounds = GameBoundingBox(&ladderItem);
 

@@ -6,6 +6,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 
 using namespace TEN::Math;
@@ -51,10 +52,13 @@ using namespace TEN::Math;
 		auto orientConstraintAverage = (OrientConstraint.first + OrientConstraint.second) / 2;
 		auto poseFrom = Pose(entityFrom.Pose.Position, entityFrom.Pose.Orientation - orientConstraintAverage); // TODO: Check sign.
 
-		// TODO: May interfere with pickups?
 		// 2) Test if entityFrom is aligned toward entityTo.
-		if (!Geometry::IsPointInFront(poseFrom, entityTo.Pose.Position.ToVector3()))
-			return false;
+		const auto& object = Objects[entityTo.ObjectNumber]; // HACK: Exclude pickups.
+		if (!object.isPickup)
+		{
+			if (!Geometry::IsPointInFront(poseFrom, entityTo.Pose.Position.ToVector3()))
+				return false;
+		}
 
 		// 3) Test if entityFrom's orientation is within interaction constraint.
 		auto deltaOrient = entityFrom.Pose.Orientation - entityTo.Pose.Orientation;
