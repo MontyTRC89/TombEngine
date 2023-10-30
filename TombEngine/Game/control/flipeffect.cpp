@@ -81,7 +81,6 @@ std::function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 
 void ClearSwarmEnemies(ItemInfo* item)
 {
-	ClearSpiders();
 	ClearRats();
 	ClearBeetleSwarm();
 	ClearLocusts();

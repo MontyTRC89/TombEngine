@@ -13,7 +13,7 @@ using namespace TEN::Math;
 //namespace TEN::Collision
 //{
 	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset,
-									   const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
+									   const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint)
 	{
 		PosOffset = posOffset;
 		OrientOffset = orientOffset;
@@ -21,23 +21,21 @@ using namespace TEN::Math;
 		OrientConstraint = orientConstraint;
 	}
 	
-	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds,
-									   const std::pair<EulerAngles, EulerAngles>& orientConstraint)
+	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint)
 	{
 		PosOffset = posOffset;
 		Bounds = bounds;
 		OrientConstraint = orientConstraint;
 	}
 
-	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds,
-									   const std::pair<EulerAngles, EulerAngles>& orientConstraint)
+	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint)
 	{
 		OrientOffset = orientOffset;
 		Bounds = bounds;
 		OrientConstraint = orientConstraint;
 	}
 
-	InteractionBasis::InteractionBasis(const GameBoundingBox& bounds, const std::pair<EulerAngles, EulerAngles>& orientConstraint)
+	InteractionBasis::InteractionBasis(const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint)
 	{
 		Bounds = bounds;
 		OrientConstraint = orientConstraint;
@@ -45,7 +43,8 @@ using namespace TEN::Math;
 
 	bool InteractionBasis::TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const GameBoundingBox& boundsExtension) const
 	{
-		// Avoid overriding active interactions. NOTE: For now, can only check offset blending status.
+		// NOTE: For now, can only check offset blending status.
+		// 1) Avoid overriding active interactions.
 		if (entityFrom.OffsetBlend.IsActive)
 			return false;
 
@@ -53,11 +52,11 @@ using namespace TEN::Math;
 		auto poseFrom = Pose(entityFrom.Pose.Position, entityFrom.Pose.Orientation - orientConstraintAverage); // TODO: Check sign.
 
 		// TODO: May interfere with pickups?
-		// Test if entityFrom is aligned toward entityTo.
+		// 2) Test if entityFrom is aligned toward entityTo.
 		if (!Geometry::IsPointInFront(poseFrom, entityTo.Pose.Position.ToVector3()))
 			return false;
 
-		// Test if entityFrom's orientation is within interaction constraint.
+		// 3) Test if entityFrom's orientation is within interaction constraint.
 		auto deltaOrient = entityFrom.Pose.Orientation - entityTo.Pose.Orientation;
 		if (deltaOrient.x < OrientConstraint.first.x || deltaOrient.x > OrientConstraint.second.x ||
 			deltaOrient.y < OrientConstraint.first.y || deltaOrient.y > OrientConstraint.second.y ||
@@ -66,11 +65,11 @@ using namespace TEN::Math;
 			return false;
 		}
 
-		auto direction = (entityFrom.Pose.Position - entityTo.Pose.Position).ToVector3();
+		auto deltaPos = (entityFrom.Pose.Position - entityTo.Pose.Position).ToVector3();
 		auto rotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Transpose() used as faster equivalent to Invert().
-		auto relPos = Vector3::Transform(direction, rotMatrix);
+		auto relPos = Vector3::Transform(deltaPos, rotMatrix);
 
-		// Test if entityFrom is inside interaction bounds.
+		// 4) Test if entityFrom is inside interaction bounds.
 		auto bounds = Bounds + boundsExtension;
 		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
 			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||

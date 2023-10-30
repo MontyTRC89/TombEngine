@@ -433,7 +433,6 @@ void StartTraps(ObjectInfo* object)
 	object = &Objects[ID_LADDER_DOUBLE_SIDED];
 	if (object->loaded)
 		object->collision = CollideLadder;
-}
 
 	object = &Objects[ID_FALLING_BLOCK];
 	if (object->loaded)

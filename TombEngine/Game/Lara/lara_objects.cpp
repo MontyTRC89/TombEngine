@@ -611,9 +611,9 @@ void lara_as_rope_down(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_ladder_idle()
 void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	//lara->Control.Look.Mode = LookMode::Free;
+	player.Control.Look.Mode = LookMode::Free;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -622,9 +622,6 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
 	}
-
-	if (IsHeld(In::Look) && lara->Control.CanLook)
-		LookUpDown(item);
 
 	if (IsHeld(In::Action))
 	{
@@ -691,13 +688,13 @@ void lara_as_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 // Control: lara_as_ladder_idle()
 void lara_col_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	GetCollisionInfo(coll, item);
 }
@@ -706,9 +703,9 @@ void lara_col_ladder_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_ladder_up()
 void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = *GetLaraInfo(item);
 
-	//lara->Control.Look.Mode = LookMode::Horizonal;
+	player.Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -749,13 +746,13 @@ void lara_as_ladder_up(ItemInfo* item, CollisionInfo* coll)
 // Control: lara_as_ladder_up()
 void lara_col_ladder_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	GetCollisionInfo(coll, item);
 }
@@ -764,9 +761,9 @@ void lara_col_ladder_up(ItemInfo* item, CollisionInfo* coll)
 // Collisiom: lara_col_ladder_down()
 void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	//lara->Control.Look.Mode = LookMode::Horizonal;
+	player.Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -809,13 +806,13 @@ void lara_as_ladder_down(ItemInfo* item, CollisionInfo* coll)
 // Control: lara_as_ladder_down()
 void lara_col_ladder_down(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	GetCollisionInfo(coll, item);
 }

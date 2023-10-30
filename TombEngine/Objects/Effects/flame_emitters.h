@@ -1,8 +1,8 @@
 #pragma once
 
-struct ItemInfo;
+class InteractionBasis;
 struct CollisionInfo;
-struct InteractionBasis;
+struct ItemInfo;
 
 namespace TEN::Entities::Effects
 {

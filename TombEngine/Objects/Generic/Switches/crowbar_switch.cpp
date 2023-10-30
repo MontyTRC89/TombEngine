@@ -63,11 +63,11 @@ namespace TEN::Entities::Switches
 			{
 				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestPlayerEntityInteract(switchItem, laraitem, CrowbarBounds2))
+				if (TestPlayerEntityInteract(switchItem, laraItem, CrowbarBounds2))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (AlignPlayerToEntity(switchItem, laraitem, CrowbarPos2))
+						if (AlignPlayerToEntity(switchItem, laraItem, CrowbarPos2))
 						{
 							doSwitch = 1;
 							laraItem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
@@ -92,11 +92,11 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				if (TestPlayerEntityInteract(switchItem, laraitem, CrowbarBounds))
+				if (TestPlayerEntityInteract(switchItem, laraItem, CrowbarBounds))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (AlignPlayerToEntity(switchItem, laraitem, CrowbarPos))
+						if (AlignPlayerToEntity(switchItem, laraItem, CrowbarPos))
 						{
 							doSwitch = 1;
 							laraItem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;

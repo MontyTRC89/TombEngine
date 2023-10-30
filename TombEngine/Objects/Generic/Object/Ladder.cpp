@@ -160,8 +160,8 @@ namespace TEN::Entities::Generic
 
 		// Define extension for height of interaction bounds.
 		// TODO: Get height of full ladder stack. Must probe above and below for ladder objects. Steal from vertical pole?
-		auto ladderBounds = GameBoundingBox(&ladderItem);
-		auto boundsExtension = GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
+		auto bounds = GameBoundingBox(&ladderItem);
+		auto boundsExtension = GameBoundingBox(0, 0, bounds.Y1, bounds.Y2 + LADDER_STEP_HEIGHT, 0, 0);
 
 		/*if (LadderMountTopFrontBasis.TestInteraction(laraItem, ladderItem, boundsExtension))
 		return LadderMountType::TopFront;

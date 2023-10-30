@@ -28,7 +28,7 @@ namespace TEN::Entities::Generic
 {
 	auto PushableBlockPos = Vector3i::Zero;
 
-	auto PushableBlockBounds = ObjectCollisionBounds
+	auto PushableBlockBounds = InteractionBasis
 	{
 		GameBoundingBox(
 			0, 0,
@@ -138,16 +138,16 @@ namespace TEN::Entities::Generic
 		{
 			// Set pushable bounds.
 			auto bounds = GameBoundingBox(&pushableItem);
-			PushableBlockBounds.BoundingBox.X1 = (bounds.X1 / 2) - 100;
-			PushableBlockBounds.BoundingBox.X2 = (bounds.X2 / 2) + 100;
-			PushableBlockBounds.BoundingBox.Z1 = bounds.Z1 - 200;
-			PushableBlockBounds.BoundingBox.Z2 = 0;
+			PushableBlockBounds.Bounds.X1 = (bounds.X1 / 2) - 100;
+			PushableBlockBounds.Bounds.X2 = (bounds.X2 / 2) + 100;
+			PushableBlockBounds.Bounds.Z1 = bounds.Z1 - 200;
+			PushableBlockBounds.Bounds.Z2 = 0;
 
 			short yOrient = pushableItem.Pose.Orientation.y;
 			pushableItem.Pose.Orientation.y = GetQuadrant(playerItem->Pose.Orientation.y) * ANGLE(90.0f);
 
 			// Within interaction range, calculate target position for alignment.
-			if (TestLaraPosition(PushableBlockBounds, &pushableItem, playerItem))
+			if (TestPlayerEntityInteract(&pushableItem, playerItem, PushableBlockBounds))
 			{
 				int quadrant = GetQuadrant(pushableItem.Pose.Orientation.y);
 				switch (quadrant)
@@ -177,7 +177,7 @@ namespace TEN::Entities::Generic
 				}
 
 				// Align player.
-				if (MoveLaraPosition(PushableBlockPos, &pushableItem, playerItem))
+				if (AlignPlayerToEntity(&pushableItem, playerItem, PushableBlockPos))
 				{
 					SetAnimation(playerItem, LA_PUSHABLE_GRAB);
 					playerItem->Pose.Orientation = pushableItem.Pose.Orientation;

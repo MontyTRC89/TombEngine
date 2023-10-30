@@ -119,12 +119,12 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		short prevYOrient = receptacleItem.Pose.Orientation.y;
 
 		auto bounds = GameBoundingBox(&receptacleItem);
-		PuzzleBounds.BoundingBox.X1 = bounds.X1 - BLOCK(0.25f);
-		PuzzleBounds.BoundingBox.X2 = bounds.X2 + BLOCK(0.25f);
-		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25f);
-		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.25f);
+		PuzzleBounds.Bounds.X1 = bounds.X1 - BLOCK(0.25f);
+		PuzzleBounds.Bounds.X2 = bounds.X2 + BLOCK(0.25f);
+		PuzzleBounds.Bounds.Z1 = bounds.Z1 - BLOCK(0.25f);
+		PuzzleBounds.Bounds.Z2 = bounds.Z2 + BLOCK(0.25f);
 
-		if (TestLaraPosition(PuzzleBounds, &receptacleItem, laraItem))
+		if (TestPlayerEntityInteract(&receptacleItem, laraItem, PuzzleBounds))
 		{
 			if (!player.Control.IsMoving)
 			{
@@ -147,7 +147,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			if (puzzleType != PuzzleType::Cutscene)
 			{
 				auto pos = Vector3i(0, 0, bounds.Z1 - 100);
-				if (!MoveLaraPosition(pos, &receptacleItem, laraItem))
+				if (!AlignPlayerToEntity(&receptacleItem, laraItem, pos))
 				{
 					player.Context.InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
@@ -270,15 +270,15 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		short prevYOrient = receptacleItem.Pose.Orientation.y;
 
 		auto bounds = GameBoundingBox(&receptacleItem);
-		PuzzleBounds.BoundingBox.X1 = bounds.X1 - BLOCK(0.25f);
-		PuzzleBounds.BoundingBox.X2 = bounds.X2 + BLOCK(0.25f);
-		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25f);
-		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.25f);
+		PuzzleBounds.Bounds.X1 = bounds.X1 - BLOCK(0.25f);
+		PuzzleBounds.Bounds.X2 = bounds.X2 + BLOCK(0.25f);
+		PuzzleBounds.Bounds.Z1 = bounds.Z1 - BLOCK(0.25f);
+		PuzzleBounds.Bounds.Z2 = bounds.Z2 + BLOCK(0.25f);
 
-		if (TestLaraPosition(PuzzleBounds, &receptacleItem, laraItem))
+		if (TestPlayerEntityInteract(&receptacleItem, laraItem, PuzzleBounds))
 		{
 			auto pos = Vector3i(0, 0, bounds.Z1 - 100);
-			if (!MoveLaraPosition(pos, &receptacleItem, laraItem))
+			if (!AlignPlayerToEntity(&receptacleItem, laraItem, pos))
 			{
 				player.Context.InteractedItem = itemNumber;
 				g_Gui.SetInventoryItemChosen(NO_ITEM);

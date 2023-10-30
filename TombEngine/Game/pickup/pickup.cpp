@@ -583,10 +583,10 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			return;
 		}
 
-		PlinthPickUpBounds.BoundingBox.X1 = plinthBounds->X1;
-		PlinthPickUpBounds.BoundingBox.X2 = plinthBounds->X2;
-		PlinthPickUpBounds.BoundingBox.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
-		PlinthPickUpBounds.BoundingBox.Z2 = plinthBounds->Z2 + 320;
+		PlinthPickUpBounds.Bounds.X1 = plinthBounds->X1;
+		PlinthPickUpBounds.Bounds.X2 = plinthBounds->X2;
+		PlinthPickUpBounds.Bounds.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
+		PlinthPickUpBounds.Bounds.Z2 = plinthBounds->Z2 + 320;
 		PlinthPickUpPosition.z = -200 - plinthBounds->Z2;
 
 		// HACK: Until we refactor a way plinth collision is detected, this must be here

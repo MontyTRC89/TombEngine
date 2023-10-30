@@ -842,7 +842,7 @@ void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 			{
 				item->Animation.TargetState = LS_HANG;
 				if (IsHeld(In::Forward))
-					SetAnimation(item, LA_LADDER_SHIMMY_UP);
+					SetAnimation(item, LA_WALL_CLIMB_SHIMMY_UP);
 				/*else if (IsHeld(In::Back))
 					SetAnimation(item, LA_LADDER_SHIMMY_DOWN);*/
 			}
