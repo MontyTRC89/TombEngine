@@ -101,8 +101,7 @@ namespace TEN::Collision
 		short headingAngle = Geometry::GetOrientToPoint(poseFrom.Position.ToVector3(), poseTo.Position.ToVector3()).y;
 		int cardinalDir = GetQuadrant(headingAngle - poseFrom.Orientation.y);
 
-		// Return appropriate animation number.
-		int animNumber = 0;
+		// Determine and return alignment animation number.
 		switch (cardinalDir)
 		{
 		default:
