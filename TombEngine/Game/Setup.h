@@ -9,6 +9,24 @@ struct CollisionInfo;
 struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
+constexpr auto GRAVITY		  = 6.0f;
+constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
+
+constexpr auto MAX_STATICS = 1000;
+
+enum JointRotationFlags
+{
+	ROT_X = (1 << 2),
+	ROT_Y = (1 << 3),
+	ROT_Z = (1 << 4)
+};
+
+// Unused.
+enum ShatterFlags
+{
+	NoCollision = (1 << 0),
+	Shatterable = (1 << 1)
+};
 
 // Custom LOT definition for Creature. Used in InitializeSlot() in lot.cpp.
 enum class LotType
@@ -27,35 +45,27 @@ enum class LotType
 	SnowmobileGun // Only 1 block vault allowed and 4 block drop max.
 };
 
-enum JointRotationFlags
-{
-	ROT_X = (1 << 2),
-	ROT_Y = (1 << 3),
-	ROT_Z = (1 << 4)
-};
-
 enum class HitEffect
 {
     None,
     Blood,
     Smoke,
     Richochet,
-	Special,
-    Max
+	Special
 };
 
 enum class DamageMode
 {
-	AnyWeapon,
-	ExplosivesOnly,
-	None
+	None,
+	Any,
+	Explosion
 };
 
-enum ShatterType
+enum class ShatterType
 {
-	SHT_NONE,
-	SHT_FRAGMENT,
-	SHT_EXPLODE
+	None,
+	Fragment,
+	Explode
 };
 
 struct ObjectInfo
@@ -105,8 +115,7 @@ struct ObjectInfo
 		g_Level.Bones[boneIndex + (boneNumber * 4)] |= flags;
 	}
 
-	// Set up hit effect for object based on its value.
-	// Use if object is alive but not intelligent to set up blood effects.
+	// NOTE: Use if object is alive but not intelligent to set up blood effects.
 	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
 	{
 		// Avoid some objects such as ID_SAS_DYING having None.
@@ -122,11 +131,11 @@ struct ObjectInfo
 			{
 				hitEffect = HitEffect::Richochet;
 			}
-			else if ((damageType != DamageMode::AnyWeapon && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+			else if ((damageType != DamageMode::Any && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
 			{
 				hitEffect = HitEffect::Smoke;
 			}
-			else if (damageType == DamageMode::AnyWeapon && HitPoints > 0)
+			else if (damageType == DamageMode::Any && HitPoints > 0)
 			{
 				hitEffect = HitEffect::Blood;
 			}
@@ -183,13 +192,9 @@ class ObjectHandler
 		ObjectInfo& operator[](int index) 
 		{
 			if (CheckID(index))
-			{
 				return Objects[index];
-			}
-			else
-			{
-				return GetFirstAvailableObject();
-			}
+		
+			return GetFirstAvailableObject();
 		}
 };
 
@@ -199,15 +204,9 @@ struct StaticInfo
 	int flags;
 	GameBoundingBox visibilityBox;
 	GameBoundingBox collisionBox;
-	int shatterType;
+	ShatterType shatterType;
 	int shatterSound;
 };
-
-constexpr auto MAX_STATICS = 1000;
-constexpr auto SF_NO_COLLISION = 0x01;
-constexpr auto SF_SHATTERABLE = 0x02;
-constexpr auto GRAVITY = 6.0f;
-constexpr auto SWAMP_GRAVITY = GRAVITY / 3.0f;
 
 extern ObjectHandler Objects;
 extern StaticInfo StaticObjects[MAX_STATICS];

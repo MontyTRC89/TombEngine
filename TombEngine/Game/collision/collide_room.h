@@ -145,7 +145,6 @@ FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
 int GetCeiling(FloorInfo* floor, int x, int y, int z);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
-void AlterFloorHeight(ItemInfo* item, int height);
 
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 int GetWaterSurface(ItemInfo* item);
