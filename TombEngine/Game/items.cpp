@@ -15,11 +15,12 @@
 #include "Math/Math.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
+#include "Specific/trutils.h"
 
 // debug
 #include "Renderer/Renderer11.h"
@@ -30,6 +31,7 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;;
 using namespace TEN::Renderer;
+using namespace TEN::Utils;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 
@@ -246,15 +248,9 @@ void ItemInfo::ResetModelToDefault()
 	}
 }
 
-bool TestState(int refState, const vector<int>& stateList)
+bool TestState(int refState, const vector<int>& stateIds)
 {
-	for (const auto& state : stateList)
-	{
-		if (state == refState)
-			return true;
-	}
-
-	return false;
+	return Contains(stateIds, refState);
 }
 
 static void GameScriptHandleKilled(short itemNumber, bool destroyed)
