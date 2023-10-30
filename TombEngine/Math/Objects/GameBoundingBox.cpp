@@ -66,14 +66,16 @@
 		return ((Vector3(X2, Y2, Z2) - Vector3(X1, Y1, Z1)) / 2);
 	}
 
-	void GameBoundingBox::RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds)
+	void GameBoundingBox::Rotate(const EulerAngles& rot)
 	{
-		auto rotMatrix = orient.ToRotationMatrix();
-		auto boxMin = Vector3(bounds.X1, bounds.Y1, bounds.Z1);
-		auto boxMax = Vector3(bounds.X2, bounds.Y2, bounds.Z2);
+		// Get box min and max values.
+		auto boxMax = Vector3(X2, Y2, Z2);
+		auto boxMin = Vector3(X1, Y1, Z1);
 
-		boxMin = Vector3::Transform(boxMin, rotMatrix);
+		// Rotate min and max values.
+		auto rotMatrix = rot.ToRotationMatrix();
 		boxMax = Vector3::Transform(boxMax, rotMatrix);
+		boxMin = Vector3::Transform(boxMin, rotMatrix);
 
 		X1 = (int)round(boxMin.x);
 		X2 = (int)round(boxMax.x);
@@ -90,7 +92,7 @@
 
 	BoundingOrientedBox GameBoundingBox::ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const
 	{
-		BoundingOrientedBox box;
+		auto box = BoundingOrientedBox();
 		BoundingOrientedBox(GetCenter(), GetExtents(), Vector4::UnitY).Transform(box, 1.0f, orient, pos);
 		return box;
 	}
@@ -127,19 +129,19 @@
 			Z1 - pose.Position.z, Z2 - pose.Position.z);
 	}
 
-	GameBoundingBox GameBoundingBox::operator *(float scale) const
+	GameBoundingBox GameBoundingBox::operator *(float scalar) const
 	{
 		return GameBoundingBox(
-			X1 * scale, X2 * scale,
-			Y1 * scale, Y2 * scale,
-			Z1 * scale, Z2 * scale);
+			X1 * scalar, X2 * scalar,
+			Y1 * scalar, Y2 * scalar,
+			Z1 * scalar, Z2 * scalar);
 	}
 
-	GameBoundingBox GameBoundingBox::operator /(float scale) const
+	GameBoundingBox GameBoundingBox::operator /(float scalar) const
 	{
 		return GameBoundingBox(
-			X1 / scale, X2 / scale,
-			Y1 / scale, Y2 / scale,
-			Z1 / scale, Z2 / scale);
+			X1 / scalar, X2 / scalar,
+			Y1 / scalar, Y2 / scalar,
+			Z1 / scalar, Z2 / scalar);
 	}
 //}

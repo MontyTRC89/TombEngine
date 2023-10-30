@@ -1,7 +1,5 @@
-Version 1.1.1
+Version 1.2
 ==============
-_For objects and sounds that have been made to work with TombEngine please see: https://tombengine.com/docs/resource-downloads/ _
-_For setup instructions please see: https://tombengine.com/docs/ocb-and-setup-instructions/ _
 
 * Fix burning torch not working properly if there are more than 256 objects in a level.
 * Fix grenade and rocket projectiles smoke offset in certain directions.
@@ -15,6 +13,7 @@ _For setup instructions please see: https://tombengine.com/docs/ocb-and-setup-in
 * Fix TR2 doberman crashing the game when killed by explosive weapons.
 * Fix volume change in settings not affecting voice track.
 * Fix several lighting bugs.
+* Fix double drawing additive faces.
 * Fix savegame count not properly increasing.
 * Fix regeneration of non-ammo pickups with OCB 128.
 * Overhaul Pushable blocks:
@@ -41,11 +40,11 @@ _For setup instructions please see: https://tombengine.com/docs/ocb-and-setup-in
 
 Lua API changes:
 * Add DisplaySprite object.
-* Add Flow::EnableLoadSave() function to disable savegames.
-* Add Flow::EnablePointFilter() function to disable bilinear filtering.
-* Add Input:GetCursorDisplayPosition() function to get the position of the cursor.
-* Add Lara::GetAmmoType() function to read the ammo that Lara is using.
-* Add Lara::GetControlLock() and Lara::SetControlLock() functions to handle controls locking.
+* Add Flow:EnableLoadSave() function to disable savegames.
+* Add Flow:EnablePointFilter() function to disable bilinear filtering.
+* Add InputGetCursorDisplayPosition() function to get the position of the cursor.
+* Add Lara:GetAmmoType() function to read the ammo that Lara is using.
+* Add Lara:GetControlLock() and Lara:SetControlLock() functions to handle controls locking.
 * Add Logic.HandleEvent() function to call node events.
 * Add functions to load, save, delete and check existence of savegames.
 * Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.

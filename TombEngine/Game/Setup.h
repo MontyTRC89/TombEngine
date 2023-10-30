@@ -9,6 +9,24 @@ struct CollisionInfo;
 struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
+constexpr auto GRAVITY		  = 6.0f;
+constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
+
+constexpr auto MAX_STATICS = 1000;
+
+enum JointRotationFlags
+{
+	ROT_X = (1 << 2),
+	ROT_Y = (1 << 3),
+	ROT_Z = (1 << 4)
+};
+
+// Unused.
+enum ShatterFlags
+{
+	NoCollision = (1 << 0),
+	Shatterable = (1 << 1)
+};
 
 // Custom LOT definition for Creature. Used in InitializeSlot() in lot.cpp.
 enum class LotType
@@ -27,35 +45,27 @@ enum class LotType
 	SnowmobileGun // Only 1 block vault allowed and 4 block drop max.
 };
 
-enum JointRotationFlags
-{
-	ROT_X = (1 << 2),
-	ROT_Y = (1 << 3),
-	ROT_Z = (1 << 4)
-};
-
 enum class HitEffect
 {
     None,
     Blood,
     Smoke,
     Richochet,
-	Special,
-    Max
+	Special
 };
 
 enum class DamageMode
 {
-	AnyWeapon,
-	ExplosivesOnly,
-	None
+	None,
+	Any,
+	Explosion
 };
 
-enum ShatterType
+enum class ShatterType
 {
-	SHT_NONE,
-	SHT_FRAGMENT,
-	SHT_EXPLODE
+	None,
+	Fragment,
+	Explode
 };
 
 struct ObjectInfo
@@ -99,98 +109,23 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> floorBorder;
 	std::function<int(short itemNumber)> ceilingBorder;
 
-	// NOTE: ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
-	void SetBoneRotationFlags(int boneNumber, int flags)
-	{
-		g_Level.Bones[boneIndex + (boneNumber * 4)] |= flags;
-	}
-
-	// Set up hit effect for object based on its value.
-	// Use if object is alive but not intelligent to set up blood effects.
-	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
-	{
-		// Avoid some objects such as ID_SAS_DYING having None.
-		if (isAlive)
-		{
-			hitEffect = HitEffect::Blood;
-			return;
-		}
-
-		if (intelligent)
-		{
-			if (isSolid && HitPoints > 0)
-			{
-				hitEffect = HitEffect::Richochet;
-			}
-			else if ((damageType != DamageMode::AnyWeapon && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
-			{
-				hitEffect = HitEffect::Smoke;
-			}
-			else if (damageType == DamageMode::AnyWeapon && HitPoints > 0)
-			{
-				hitEffect = HitEffect::Blood;
-			}
-		}
-		else if (isSolid && HitPoints <= 0)
-		{
-			hitEffect = HitEffect::Richochet;
-		}
-		else
-		{
-			hitEffect = HitEffect::None;
-		}
-	}
+	void SetBoneRotationFlags(int boneID, int flags);
+	void SetHitEffect(bool isSolid = false, bool isAlive = false);
 };
 
 class ObjectHandler
 {
-	private:
-		ObjectInfo Objects[ID_NUMBER_OBJECTS];
+private:
+	ObjectInfo _objects[ID_NUMBER_OBJECTS];
 
-		ObjectInfo& GetFirstAvailableObject()
-		{
-			for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
-			{
-				if (Objects[i].loaded)
-					return Objects[i];
-			}
+public:
+	void Initialize();
+	bool CheckID(GAME_OBJECT_ID objectID, bool isSilent = false);
 
-			return Objects[0];
-		}
+	ObjectInfo& operator [](int objectID);
 
-	public:
-		void Initialize() 
-		{ 
-			std::memset(Objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
-		}
-
-		bool CheckID(int index, bool isSilent = false)
-		{
-			if (index == GAME_OBJECT_ID::ID_NO_OBJECT || index >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
-			{
-				if (!isSilent)
-				{
-					TENLog("Attempted to access unavailable slot ID (" + std::to_string(index) + "). " +
-						"Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
-				}
-
-				return false;
-			}
-
-			return true;
-		}
-
-		ObjectInfo& operator[](int index) 
-		{
-			if (CheckID(index))
-			{
-				return Objects[index];
-			}
-			else
-			{
-				return GetFirstAvailableObject();
-			}
-		}
+private:
+	ObjectInfo& GetFirstAvailableObject();
 };
 
 struct StaticInfo
@@ -199,15 +134,9 @@ struct StaticInfo
 	int flags;
 	GameBoundingBox visibilityBox;
 	GameBoundingBox collisionBox;
-	int shatterType;
+	ShatterType shatterType;
 	int shatterSound;
 };
-
-constexpr auto MAX_STATICS = 1000;
-constexpr auto SF_NO_COLLISION = 0x01;
-constexpr auto SF_SHATTERABLE = 0x02;
-constexpr auto GRAVITY = 6.0f;
-constexpr auto SWAMP_GRAVITY = GRAVITY / 3.0f;
 
 extern ObjectHandler Objects;
 extern StaticInfo StaticObjects[MAX_STATICS];

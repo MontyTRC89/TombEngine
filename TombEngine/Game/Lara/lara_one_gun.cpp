@@ -1598,7 +1598,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
-			if (StaticObjects[meshPtr->staticNumber].shatterType == SHT_NONE)
+			if (StaticObjects[meshPtr->staticNumber].shatterType == ShatterType::None)
 				continue;
 
 			meshPtr->HitPoints -= damage;
@@ -1654,7 +1654,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 					if (type != ProjectileType::FlashGrenade && currentObject.damageType != DamageMode::None)
 						DoExplosiveDamage(emitter, *itemPtr, projectile, damage);
 				}
-				else if (currentObject.damageType == DamageMode::AnyWeapon)
+				else if (currentObject.damageType == DamageMode::Any)
 				{
 					if (type == ProjectileType::Poison)
 					{

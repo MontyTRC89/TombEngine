@@ -466,7 +466,7 @@ void LoadObjects()
 
 		StaticObjects[meshID].flags = (short)ReadInt16();
 
-		StaticObjects[meshID].shatterType = (short)ReadInt16();
+		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
 		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
 
