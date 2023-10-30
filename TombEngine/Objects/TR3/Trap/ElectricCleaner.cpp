@@ -12,50 +12,53 @@
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 
-// ItemFlags[0]:		Rotation speed and heading angle.
-// ItemFlags[1]:		Flags, each bit is used to check the status of a flag
-//						b0: flagDoDetection
-//						b1: flagTurnRight
-//						b2: flagPriorityForward
-//						b3: flagAntiClockWiseOrder
-//						b4: flagStopAfterKill - If true the cleaner will stop when kills Lara.
-// ItemFlags[2]:		Movement velocity.
-// ItemFlags[3, 4, 5]:	Counters for dynamic lights and sparks.
-// ItemFlags[6]:		Goal direction angle.
+// NOTES
+// ItemFlags[0] = rotation rate.
+// ItemFlags[1] = behaviour flags.
+//					0: flagDoDetection
+//					1: flagTurnRight
+//					2: flagPriorityForward
+//					3: flagCounterClockwiseOrder
+//					4: flagStopAfterKill
+// ItemFlags[2] = movement velocity.
+// ItemFlags[3, 4, 5] = counters for dynamic lights and sparks.
+// ItemFlags[6] = target heading angle.
 
 // OCB:
-// 0:			  Stop after killing the player.
-// Anything else: Don't stop after killing the player.
+// 0: Stop after killing player, otherwise don't stop.
 
 namespace TEN::Entities::Traps
 {
 	constexpr auto ELECTRIC_CLEANER_VELOCITY  = BLOCK(1 / 16.0f);
-	constexpr auto ELECTRIC_CLEANER_TURN_RATE = 1024;
+	constexpr auto ELECTRIC_CLEANER_TURN_RATE = ANGLE(5.6f);
 
-	const auto ElectricCleanerHarmJoints = std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
-
-	std::vector <ItemInfo*> MyPushablesList = {};
+	const auto ElectricCleanerHarmJoints =		std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+	const auto ElectricCleanerWireEndJoints =		std::vector<unsigned int>{ 5, 9, 13 };
 
 	void InitializeElectricCleaner(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		// Align to the middle of the block.
+		// Align to sector center.
 		item.Pose.Position.x = (item.Pose.Position.x & ~WALL_MASK) | (int)BLOCK(0.5f);
 		item.Pose.Position.z = (item.Pose.Position.z & ~WALL_MASK) | (int)BLOCK(0.5f);
 
-		// Init flags.
+		// Initialize flags.
 		item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 		item.ItemFlags[1] = 0;
 		item.ItemFlags[2] = ELECTRIC_CLEANER_VELOCITY;
 		item.ItemFlags[6] = item.Pose.Orientation.y;
 		item.Collidable = true;
 
+		// Set flagStopAfterKill.
 		if (item.TriggerFlags)
-			item.ItemFlags[1] &= ~(1 << 4);	// Turn off 1st bit for flagStopAfterKill.
+		{
+			item.ItemFlags[1] &= ~(1 << 4);
+		}
 		else
-			item.ItemFlags[1] |= (1 << 4);	// Turn on 1st bit for flagStopAfterKill.
-
+		{
+			item.ItemFlags[1] |= (1 << 4);
+		}
 	}
 
 	void ControlElectricCleaner(short itemNumber)
@@ -335,8 +338,6 @@ namespace TEN::Entities::Traps
 
 	void SpawnElectricCleanerSparks(ItemInfo& item)
 	{
-		static auto wireEndJoints = std::array<int, 3>{ 5, 9, 13 };
-
 		SoundEffect(SFX_TR3_CLEANER_LOOP, &item.Pose);
 
 		auto vel = Vector3i(
@@ -353,7 +354,7 @@ namespace TEN::Entities::Traps
 				else
 					item.ItemFlags[3 + i]--;
 
-				int joint = wireEndJoints[i];
+				int joint = ElectricCleanerWireEndJoints[i];
 				auto pos = GetJointPosition(&item, joint, Vector3i(-160, -8, 16));
 
 				byte c = Random::GenerateInt(0, 64) + 128;
