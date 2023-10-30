@@ -71,7 +71,7 @@ void InitSmashObject(ObjectInfo* object, int objectNumber)
 		object->Initialize = InitializeSmashObject;
 		object->collision = ObjectCollision;
 		object->control = SmashObjectControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -81,7 +81,7 @@ void InitKeyHole(ObjectInfo* object, int objectNumber)
 	if (object->loaded)
 	{
 		object->collision = KeyHoleCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -94,7 +94,7 @@ void InitPuzzleHole(ObjectInfo* object, int objectNumber)
 		object->collision = PuzzleHoleCollision;
 		object->control = AnimatingControl;
 		object->isPuzzleHole = true;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -106,7 +106,7 @@ void InitPuzzleDone(ObjectInfo* object, int objectNumber)
 		object->Initialize = InitializePuzzleDone;
 		object->collision = PuzzleDoneCollision;
 		object->control = AnimatingControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -118,7 +118,7 @@ void InitAnimating(ObjectInfo* object, int objectNumber)
 		object->Initialize = InitializeAnimating;
 		object->control = AnimatingControl;
 		object->collision = ObjectCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -131,7 +131,7 @@ void InitPickup(ObjectInfo* object, int objectNumber)
 		object->collision = PickupCollision;
 		object->control = PickupControl;
 		object->isPickup = true;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -145,7 +145,7 @@ void InitPickup(ObjectInfo* object, int objectNumber, std::function<ControlFunct
 		object->collision = PickupCollision;
 		object->control = (func != nullptr) ? func : PickupControl;
 		object->isPickup = true;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -197,6 +197,6 @@ void InitPushableObject(ObjectInfo* object, int objectNumber)
 		object->ceiling = PushableBridgeCeiling;
 		object->floorBorder = PushableBridgeFloorBorder;
 		object->ceilingBorder = PushableBridgeCeilingBorder;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
