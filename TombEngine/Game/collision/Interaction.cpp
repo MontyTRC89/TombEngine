@@ -97,7 +97,7 @@ using namespace TEN::Math;
 		entityFrom.OffsetBlend.Set(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
 	}
 
-	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& entity)
+	void SetPlayerAlignAnimation(ItemInfo& playerEntity, const ItemInfo& interactedEntity)
 	{
 		auto& player = GetLaraInfo(playerEntity);
 
@@ -112,14 +112,14 @@ using namespace TEN::Math;
 			return;
 		}
 
-		float dist = Vector3i::Distance(playerEntity.Pose.Position, entity.Pose.Position);
-		bool doAlignAnim = ((dist - LARA_ALIGN_VELOCITY) > (LARA_ALIGN_VELOCITY * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
+		float dist = Vector3i::Distance(playerEntity.Pose.Position, interactedEntity.Pose.Position);
 
-		// Skip animating if very close to the object.
+		// Skip animating if player is very close.
+		bool doAlignAnim = ((dist - LARA_ALIGN_VELOCITY) > (LARA_ALIGN_VELOCITY * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
 		if (!doAlignAnim)
 			return;
 
-		short headingAngle = Geometry::GetOrientToPoint(playerEntity.Pose.Position.ToVector3(), entity.Pose.Position.ToVector3()).y;
+		short headingAngle = Geometry::GetOrientToPoint(playerEntity.Pose.Position.ToVector3(), interactedEntity.Pose.Position.ToVector3()).y;
 		int cardinalDir = GetQuadrant(headingAngle - playerEntity.Pose.Orientation.y);
 
 		// Set appropriate animation.
