@@ -433,17 +433,15 @@ void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 void GetLaraDeadlyBounds()
 {
 	auto bounds = GameBoundingBox(LaraItem);
-	auto tBounds = GameBoundingBox::Zero;
-	tBounds.RotateNoPersp(LaraItem->Pose.Orientation, bounds);
+	bounds.Rotate(LaraItem->Pose.Orientation);
 
 	DeadlyBounds = GameBoundingBox(
-		LaraItem->Pose.Position.x + tBounds.X1,
-		LaraItem->Pose.Position.x + tBounds.X2,
-		LaraItem->Pose.Position.y + tBounds.Y1,
-		LaraItem->Pose.Position.y + tBounds.Y2,
-		LaraItem->Pose.Position.z + tBounds.Z1,
-		LaraItem->Pose.Position.z + tBounds.Z2
-	);
+		LaraItem->Pose.Position.x + bounds.X1,
+		LaraItem->Pose.Position.x + bounds.X2,
+		LaraItem->Pose.Position.y + bounds.Y1,
+		LaraItem->Pose.Position.y + bounds.Y2,
+		LaraItem->Pose.Position.z + bounds.Z1,
+		LaraItem->Pose.Position.z + bounds.Z2);
 }
 
 void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
