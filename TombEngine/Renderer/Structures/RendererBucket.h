@@ -2,7 +2,7 @@
 #include <vector>
 #include <SimpleMath.h>
 #include "Renderer/RendererEnums.h"
-#include "RendererPolygon.h"
+#include "Renderer/Structures/RendererPolygon.h"
 
 namespace TEN::Renderer::Structures
 {

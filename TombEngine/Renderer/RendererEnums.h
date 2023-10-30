@@ -152,13 +152,21 @@ enum class RendererPass
 	ShadowMap,
 	Opaque,
 	Transparent,
-	CollectSortedFaces
+	CollectTransparentFaces
 };
 
 enum class SpriteRenderType
 {
 	Default,
 	LaserBarrier
+};
+
+enum class RendererObjectType
+{
+	Room,
+	Moveable, 
+	Static,
+	Sprite
 };
 
 #define SHAPE_RECTANGLE 0

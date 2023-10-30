@@ -29,16 +29,18 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
-
-using namespace std::chrono;
-using namespace TEN::Effects::Hair;
-using namespace TEN::Entities::Generic;
-using namespace TEN::Hud;
+#include "Renderer/Structures/RendererSortableObject.h"
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
 {
+	using namespace std::chrono;
+	using namespace TEN::Effects::Hair;
+	using namespace TEN::Entities::Generic;
+	using namespace TEN::Hud;
+	using namespace TEN::Renderer::Structures;
+
 	void Renderer::RenderBlobShadows(RenderView& renderView)
 	{
 		auto nearestSpheres = std::vector<Sphere>{};
@@ -1511,8 +1513,7 @@ namespace TEN::Renderer
 
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 
-		// Prepare special effects and weather.
-		// NOTE: Functions here merely fill array of sprites to draw.
+		// Collect all sprites (all sorted like transparent faces)
 		DrawFires(view);
 		DrawSmokes(view);
 		DrawSmokeParticles(view);
@@ -1535,26 +1536,21 @@ namespace TEN::Renderer
 		DrawStreamers(view);
 		DrawLaserBarriers(view);
 
-		// Output sprites.
-		DrawSprites(view);
-		DrawLines3D(view);
-
-		// Collect all sorted blend modes faces for later.
-		DrawRooms(view, RendererPass::CollectSortedFaces);
-		DrawItems(view, RendererPass::CollectSortedFaces);
-		DrawStatics(view, RendererPass::CollectSortedFaces);
-
-		// Draw all sorted blend mode faces collected in previous steps.
-		DrawSortedFaces(view);
-
-		// Draw immediate transparent faces (i.e. additive)
+		// Collect all transparent faces
+		DrawRooms(view, RendererPass::CollectTransparentFaces);
+		/*DrawItems(view, RendererPass::Transparent);
+		DrawStatics(view, RendererPass::Transparent);
 		DrawRooms(view, RendererPass::Transparent);
 		DrawItems(view, RendererPass::Transparent);
 		DrawStatics(view, RendererPass::Transparent);
 		DrawEffects(view, RendererPass::Transparent);
 		DrawDebris(view, RendererPass::Transparent);
 		DrawGunFlashes(view);
-		DrawBaddyGunflashes(view);
+		DrawBaddyGunflashes(view);*/
+
+		// Draw transparent faces and lines
+		DrawTransparentFaces(view);
+		DrawLines3D(view);
 
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(target, depthTarget, view);
@@ -1820,7 +1816,7 @@ namespace TEN::Renderer
 			return;
 		}
 		 
-		if (rendererPass != RendererPass::CollectSortedFaces)
+		if (rendererPass != RendererPass::CollectTransparentFaces)
 		{
 			_context->VSSetShader(_vsInstancedStaticMeshes.Get(), NULL, 0);
 			_context->PSSetShader(_psInstancedStaticMeshes.Get(), NULL, 0);
@@ -1982,8 +1978,17 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawRooms(RenderView& view, RendererPass rendererPass)
+	void Renderer::DrawTransparentFaces(RenderView& renderView)
 	{
+		std::sort(
+			renderView.TransparentObjectsToDraw.begin(),
+			renderView.TransparentObjectsToDraw.end(),
+			[](RendererSortableObject& a, RendererSortableObject& b)
+			{
+				return (a.Distance > b.Distance);
+			}
+		);
+
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
@@ -1999,56 +2004,39 @@ namespace TEN::Renderer
 		BindConstantBufferVS(ConstantBufferRegister::Room, _cbRoom.get());
 		BindConstantBufferPS(ConstantBufferRegister::Room, _cbRoom.get());
 
-		// Bind caustics texture.
-		if (!_sprites.empty())
-		{
-			int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
-			int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
-			int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)_sprites.size());
-			BindTexture(TextureRegister::CausticsMap, _sprites[causticsFrame].Texture, SamplerStateRegister::AnisotropicClamp);
-
-			// NOTE: Strange packing due to particular HLSL 16 bytes alignment requirements.
-			RendererSprite* causticsSprite = &_sprites[causticsFrame];
-			_stRoom.CausticsStartUV = causticsSprite->UV[0];
-			_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
-		}
-		
 		// Set shadow map data and bind shadow map texture.
 		if (_shadowLight != nullptr)
 		{
-			memcpy(&_stShadowMap.Light, _shadowLight, sizeof(ShaderLight));
-			_stShadowMap.ShadowMapSize = g_Configuration.ShadowMapSize;
-			_stShadowMap.CastShadows = true;
-
 			BindTexture(TextureRegister::ShadowMap, &_shadowMap, SamplerStateRegister::ShadowMap);
 		}
-		else
+
+		short lastRoomNumber = -1;
+		RendererRoom* room;
+		ROOM_INFO* nativeRoom;
+		int numTransparentFaces = 0;
+
+		for (auto& object : renderView.TransparentObjectsToDraw)
 		{
-			_stShadowMap.CastShadows = false;
-		}
+			if (object.RoomNumber != lastRoomNumber)
+			{
+				room = &_rooms[object.RoomNumber];
+				_cbShadowMap.updateData(_stShadowMap, _context.Get());
 
-		_numRoomsTransparentPolygons = 0;
-		for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
-		{
-			int index = i;
-			RendererRoom* room = view.RoomsToDraw[index];
-			_cbShadowMap.updateData(_stShadowMap, _context.Get());
+				BindConstantBufferPS(ConstantBufferRegister::ShadowLight, _cbShadowMap.get());
+				BindConstantBufferVS(ConstantBufferRegister::ShadowLight, _cbShadowMap.get());
 
-			BindConstantBufferPS(ConstantBufferRegister::ShadowLight, _cbShadowMap.get());
-			BindConstantBufferVS(ConstantBufferRegister::ShadowLight, _cbShadowMap.get());
+				nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+				_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
+				_stRoom.AmbientColor = room->AmbientLight;
+				_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
+				BindRoomLights(renderView.LightsToDraw);
+				_cbRoom.updateData(_stRoom, _context.Get());
 
-			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-			Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
+				SetScissor(room->ClipBounds);
+			}
 
-			_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
-			_stRoom.AmbientColor = room->AmbientLight;
-			_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-			BindRoomLights(view.LightsToDraw);
-			_cbRoom.updateData(_stRoom, _context.Get());
-			 
-			SetScissor(room->ClipBounds);
+			RendererBucket& bucket = room->Buckets[object.BucketNumber];
 
 			for (int animated = 0; animated < 2; animated++)
 			{
@@ -2062,120 +2050,260 @@ namespace TEN::Renderer
 					BindConstantBufferVS(ConstantBufferRegister::AnimatedTextures, _cbAnimated.get());
 				}
 
-				for (auto& bucket : room->Buckets)
+				if (bucket.Animated)
 				{
-					if ((animated == 1) ^ bucket.Animated || bucket.NumVertices == 0)
-					{
-						continue;
-					}
+					_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
+					BindConstantBufferVS(ConstantBufferRegister::AnimatedTextures, _cbAnimated.get());
+				}
+				else
+				{
+					_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
+				}
 
-					if (rendererPass == RendererPass::CollectSortedFaces)
+				SetBlendMode(bucket.BlendMode);
+				SetAlphaTest(AlphaTestMode::None, FAST_ALPHA_BLEND_THRESHOLD);
+
+				// Draw geometry
+				if (bucket.Animated)
+				{
+					BindTexture(TextureRegister::ColorMap,
+						&std::get<0>(_animatedTextures[bucket.Texture]),
+						SamplerStateRegister::AnisotropicClamp);
+					BindTexture(TextureRegister::NormalMap,
+						&std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+					RendererAnimatedTextureSet& set = _animatedTextureSets[bucket.Texture];
+					_stAnimated.NumFrames = set.NumTextures;
+					_stAnimated.Type = 0;
+					_stAnimated.Fps = set.Fps;
+
+					for (unsigned char j = 0; j < set.NumTextures; j++)
 					{
-						if (DoesBlendModeRequireSorting(bucket.BlendMode))
+						if (j >= _stAnimated.Textures.size())
 						{
-							// Collect transparent faces.
-							for (int j = 0; j < bucket.Polygons.size(); j++)
-							{
-								RendererPolygon* p = &bucket.Polygons[j];
-
-								_numRoomsTransparentPolygons++;
-
-								// As polygon distance, for rooms, we use the farthest vertex distance                            
-								int d1 = (_roomsVertices[_roomsIndices[p->BaseIndex + 0]].Position - cameraPosition).Length();
-								int d2 = (_roomsVertices[_roomsIndices[p->BaseIndex + 1]].Position - cameraPosition).Length();
-								int d3 = (_roomsVertices[_roomsIndices[p->BaseIndex + 2]].Position - cameraPosition).Length();
-								int d4 = 0;
-								if (p->Shape == 0)
-									d4 = (_roomsVertices[_roomsIndices[p->BaseIndex + 3]].Position - cameraPosition).Length();
-
-								int distance = std::max(std::max(std::max(d1, d2), d3), d4);
-
-								RendererTransparentFace face;
-								face.type = TransparentFaceType::Room;
-								face.info.polygon = p;
-								face.distance = distance;
-								face.info.animated = bucket.Animated;
-								face.info.texture = bucket.Texture;
-								face.info.room = room;
-								face.info.blendMode = bucket.BlendMode;
-								face.info.bucket = &bucket;
-								room->TransparentFacesToDraw.push_back(face);
-							}
+							TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
+							break;
 						}
+
+						_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
+						_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
+						_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
+						_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
 					}
-					else
+					_cbAnimated.updateData(_stAnimated, _context.Get());
+				}
+				else
+				{
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
+						SamplerStateRegister::AnisotropicClamp);
+					BindTexture(TextureRegister::NormalMap,
+						&std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+				}
+
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+				_numRoomsDrawCalls++;
+
+				numTransparentFaces += bucket.NumIndices / 3;
+			}
+		}
+
+		ResetScissor();
+	}
+
+	void Renderer::DrawRooms(RenderView& view, RendererPass rendererPass)
+	{
+		if (rendererPass == RendererPass::CollectTransparentFaces)
+		{
+			for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
+			{
+				int index = i;
+				RendererRoom* room = view.RoomsToDraw[index];
+
+				for (int animated = 0; animated < 2; animated++)
+				{
+					for (int j = 0; j < room->Buckets.size(); j++)
 					{
-						if (!((bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest) ^
-							(rendererPass == RendererPass::Transparent)))
+						auto& bucket = room->Buckets[j];
+
+						if ((animated == 1) ^ bucket.Animated || bucket.NumVertices == 0)
 						{
 							continue;
 						}
 
-						int passes = bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
-
-						for (int pass = 0; pass < passes; pass++)
+						if (rendererPass == RendererPass::CollectTransparentFaces)
 						{
-							if (pass == 0)
+							if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
 							{
-								SetBlendMode(bucket.BlendMode);
-								SetAlphaTest(
-									bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
-									FAST_ALPHA_BLEND_THRESHOLD
-								);
+								RendererSortableObject object;
+								object.ObjectType = RendererObjectType::Room;
+								object.Centre = bucket.Centre;
+								object.Distance = Vector3::Distance(view.Camera.WorldPosition, bucket.Centre);
+								object.BucketNumber = j;
+								object.RoomNumber = room->RoomNumber;
+
+								view.TransparentObjectsToDraw.push_back(object);
 							}
-							else
-							{
-								SetBlendMode(BlendMode::AlphaBlend);
-								SetAlphaTest(AlphaTestMode::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
-							}
-
-							// Draw geometry
-							if (animated)
-							{
-								BindTexture(TextureRegister::ColorMap,
-											&std::get<0>(_animatedTextures[bucket.Texture]),
-											SamplerStateRegister::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMap,
-											&std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-
-								RendererAnimatedTextureSet& set = _animatedTextureSets[bucket.Texture];
-								_stAnimated.NumFrames = set.NumTextures;
-								_stAnimated.Type = 0;
-								_stAnimated.Fps = set.Fps;
-
-								for (unsigned char j = 0; j < set.NumTextures; j++)
-								{
-									if (j >= _stAnimated.Textures.size())
-									{
-										TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
-										break;
-									}
-
-									_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
-									_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
-									_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
-									_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
-								}
-								_cbAnimated.updateData(_stAnimated, _context.Get());
-							}
-							else
-							{
-								BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
-											SamplerStateRegister::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMap,
-											&std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-							}
-
-							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-							_numRoomsDrawCalls++;
 						}
 					}
 				}
 			}
 		}
+		else
+		{
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
 
-		ResetScissor();
+			// Bind vertex and index buffer.
+			_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			_context->IASetInputLayout(_inputLayout.Get());
+			_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			// Bind pixel shaders.
+			_context->PSSetShader(_psRooms.Get(), nullptr, 0);
+
+			BindConstantBufferVS(ConstantBufferRegister::Room, _cbRoom.get());
+			BindConstantBufferPS(ConstantBufferRegister::Room, _cbRoom.get());
+
+			// Bind caustics texture.
+			if (!_sprites.empty())
+			{
+				int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
+				int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
+				int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)_sprites.size());
+				BindTexture(TextureRegister::CausticsMap, _sprites[causticsFrame].Texture, SamplerStateRegister::AnisotropicClamp);
+
+				// NOTE: Strange packing due to particular HLSL 16 bytes alignment requirements.
+				RendererSprite* causticsSprite = &_sprites[causticsFrame];
+				_stRoom.CausticsStartUV = causticsSprite->UV[0];
+				_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
+			}
+
+			// Set shadow map data and bind shadow map texture.
+			if (_shadowLight != nullptr)
+			{
+				memcpy(&_stShadowMap.Light, _shadowLight, sizeof(ShaderLight));
+				_stShadowMap.ShadowMapSize = g_Configuration.ShadowMapSize;
+				_stShadowMap.CastShadows = true;
+
+				BindTexture(TextureRegister::ShadowMap, &_shadowMap, SamplerStateRegister::ShadowMap);
+			}
+			else
+			{
+				_stShadowMap.CastShadows = false;
+			}
+
+			_numRoomsTransparentPolygons = 0;
+			for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
+			{
+				int index = i;
+				RendererRoom* room = view.RoomsToDraw[index];
+				_cbShadowMap.updateData(_stShadowMap, _context.Get());
+
+				BindConstantBufferPS(ConstantBufferRegister::ShadowLight, _cbShadowMap.get());
+				BindConstantBufferVS(ConstantBufferRegister::ShadowLight, _cbShadowMap.get());
+
+				ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+
+				Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+				Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
+
+				_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
+				_stRoom.AmbientColor = room->AmbientLight;
+				_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
+				BindRoomLights(view.LightsToDraw);
+				_cbRoom.updateData(_stRoom, _context.Get());
+
+				SetScissor(room->ClipBounds);
+
+				for (int animated = 0; animated < 2; animated++)
+				{
+					if (animated == 0)
+					{
+						_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
+					}
+					else
+					{
+						_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
+						BindConstantBufferVS(ConstantBufferRegister::AnimatedTextures, _cbAnimated.get());
+					}
+
+					for (auto& bucket : room->Buckets)
+					{
+						if ((animated == 1) ^ bucket.Animated || bucket.NumVertices == 0)
+						{
+							continue;
+						}
+
+						if (bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest)
+						{
+							int passes = bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+
+							for (int pass = 0; pass < passes; pass++)
+							{
+								if (pass == 0)
+								{
+									SetBlendMode(bucket.BlendMode);
+									SetAlphaTest(
+										bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
+										FAST_ALPHA_BLEND_THRESHOLD
+									);
+								}
+								else
+								{
+									SetBlendMode(BlendMode::AlphaBlend);
+									SetAlphaTest(AlphaTestMode::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
+								}
+
+								// Draw geometry
+								if (animated)
+								{
+									BindTexture(TextureRegister::ColorMap,
+										&std::get<0>(_animatedTextures[bucket.Texture]),
+										SamplerStateRegister::AnisotropicClamp);
+									BindTexture(TextureRegister::NormalMap,
+										&std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+									RendererAnimatedTextureSet& set = _animatedTextureSets[bucket.Texture];
+									_stAnimated.NumFrames = set.NumTextures;
+									_stAnimated.Type = 0;
+									_stAnimated.Fps = set.Fps;
+
+									for (unsigned char j = 0; j < set.NumTextures; j++)
+									{
+										if (j >= _stAnimated.Textures.size())
+										{
+											TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
+											break;
+										}
+
+										_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
+										_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
+										_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
+										_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
+									}
+									_cbAnimated.updateData(_stAnimated, _context.Get());
+								}
+								else
+								{
+									BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
+										SamplerStateRegister::AnisotropicClamp);
+									BindTexture(TextureRegister::NormalMap,
+										&std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								}
+
+								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+								_numRoomsDrawCalls++;
+							}
+						}
+					}
+				}
+			}
+
+			ResetScissor();
+		}
 	}
 	
 	void Renderer::DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget)
@@ -2315,7 +2443,7 @@ namespace TEN::Renderer
 
 				_numMoveablesDrawCalls++;
 			}
-			else if (rendererPass == RendererPass::CollectSortedFaces)
+			else if (rendererPass == RendererPass::CollectTransparentFaces)
 			{
 				if (DoesBlendModeRequireSorting(bucket.BlendMode))
 				{
@@ -2347,7 +2475,7 @@ namespace TEN::Renderer
 			else
 			{
 				if (!((bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest) ^
-					(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
+					(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectTransparentFaces)))
 				{
 					continue;
 				}

@@ -13,6 +13,7 @@
 #include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererEffect.h"
 #include "Renderer/Structures/RendererRoom.h"
+#include "Renderer/Structures/RendererSortableObject.h"
 #include "Renderer/Structures/RendererTransparentFace.h"
 
 namespace TEN::Renderer 
@@ -49,6 +50,7 @@ namespace TEN::Renderer
 		std::vector<RendererSpriteToDraw>			SpritesToDraw		 = {};
 		std::vector<RendererDisplaySpriteToDraw>	DisplaySpritesToDraw = {};
 		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw	 = {};
+		std::vector<RendererSortableObject>			TransparentObjectsToDraw = {};
 
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
