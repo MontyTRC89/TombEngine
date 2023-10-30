@@ -43,25 +43,14 @@ namespace TEN::Collision
 		OrientConstraint = orientConstraint;
 	};
 
-	bool InteractionBasis::TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const GameBoundingBox& boundsExtension) const
+	bool InteractionBasis::TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo,  const GameBoundingBox& boundsExtension) const
 	{
 		// NOTE: For now, can only check offset blend status.
 		// 1) Avoid overriding active interactions.
 		/*if (entityFrom.OffsetBlend.IsActive)
 			return false;*/
 
-		//auto orientConstraintAverage = (OrientConstraint.first + OrientConstraint.second) / 2;
-		//auto poseFrom = Pose(entityFrom.Pose.Position, entityFrom.Pose.Orientation - orientConstraintAverage);
-
-		// TODO: Entities such as pickups don't require this. Entities which have a hardcoded offset, such as the zip line,
-		// fail this check because their origin is behind the interact position. Must pass an InteractionBasis and use PosOffset
-		// to calculate using the interact position.
-		// 2) Test if entityFrom is aligned toward entityTo.
-		/*if (!Geometry::IsPointInFront(poseFrom, entityTo.Pose.Position.ToVector3()))
-			return false;
-		}*/
-
-		// 3) Test if entityFrom's orientation is within interaction constraint.
+		// 2) Test if entityFrom's orientation is within interaction constraint.
 		auto deltaOrient = entityFrom.Pose.Orientation - entityTo.Pose.Orientation;
 		if (deltaOrient.x < OrientConstraint.first.x || deltaOrient.x > OrientConstraint.second.x ||
 			deltaOrient.y < OrientConstraint.first.y || deltaOrient.y > OrientConstraint.second.y ||
@@ -71,10 +60,10 @@ namespace TEN::Collision
 		}
 
 		auto deltaPos = (entityFrom.Pose.Position - entityTo.Pose.Position).ToVector3();
-		auto rotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Transpose() used as faster equivalent to Invert().
-		auto relPos = Vector3::Transform(deltaPos, rotMatrix);
+		auto inverseRotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Transpose() used as faster equivalent to Invert().
+		auto relPos = Vector3::Transform(deltaPos, inverseRotMatrix);
 
-		// 4) Test if entityFrom is inside interaction bounds.
+		// 3) Test if entityFrom is inside interaction bounds.
 		auto bounds = Bounds + boundsExtension;
 		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
 			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||
