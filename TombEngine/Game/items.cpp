@@ -7,19 +7,22 @@
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Renderer/Renderer11.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
+
+// debug
+#include "Renderer/Renderer11.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
@@ -224,10 +227,23 @@ bool ItemInfo::IsCreature() const
 
 void ItemInfo::ResetModelToDefault()
 {
-	Model.BaseMesh = Objects[ObjectNumber].meshIndex;
+	if (Objects[ObjectNumber].nmeshes > 0)
+	{
+		Model.MeshIndex.resize(Objects[ObjectNumber].nmeshes);
+		Model.BaseMesh = Objects[ObjectNumber].meshIndex;
 
-	for (int i = 0; i < Model.MeshIndex.size(); i++)
-		Model.MeshIndex[i] = Model.BaseMesh + i;
+		for (int i = 0; i < Model.MeshIndex.size(); i++)
+			Model.MeshIndex[i] = Model.BaseMesh + i;
+
+		Model.Mutators.resize(Objects[ObjectNumber].nmeshes);
+		for (auto& mutator : Model.Mutators)
+			mutator = {};
+	}
+	else
+	{
+		Model.Mutators.clear();
+		Model.MeshIndex.clear();
+	}
 }
 
 bool TestState(int refState, const vector<int>& stateList)
@@ -272,7 +288,6 @@ void KillItem(short itemNumber)
 		auto* item = &g_Level.Items[itemNumber];
 
 		DetatchSpark(itemNumber, SP_ITEM);
-
 		item->Active = false;
 
 		if (NextItemActive == itemNumber)
@@ -315,7 +330,9 @@ void KillItem(short itemNumber)
 		if (item == Lara.TargetEntity)
 			Lara.TargetEntity = nullptr;
 
-		if (Objects[item->ObjectNumber].floor != nullptr)
+		// AI target generation uses a hack with making a dummy item without ObjectNumber.
+		// Therefore, a check should be done here to prevent access violation.
+		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
 		GameScriptHandleKilled(itemNumber, true);
@@ -629,20 +646,7 @@ void InitializeItem(short itemNumber)
 	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
 	item->BoxNumber = floor->Box;
 
-	if (Objects[item->ObjectNumber].nmeshes > 0)
-	{
-		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
-		item->ResetModelToDefault();
-
-		item->Model.Mutators.resize(Objects[item->ObjectNumber].nmeshes);
-		for (auto& mutator : item->Model.Mutators)
-			mutator = {};
-	}
-	else
-	{
-		item->Model.Mutators.clear();
-		item->Model.MeshIndex.clear();
-	}
+	item->ResetModelToDefault();
 
 	if (Objects[item->ObjectNumber].Initialize != nullptr)
 		Objects[item->ObjectNumber].Initialize(itemNumber);
@@ -786,7 +790,7 @@ ItemInfo* FindItem(GAME_OBJECT_ID objectID)
 int FindItem(ItemInfo* item)
 {
 	if (item == LaraItem)
-		return Lara.ItemNumber;
+		return item->Index;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 		if (item == &g_Level.Items[i])
@@ -804,6 +808,9 @@ void UpdateAllItems()
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		short nextItem = item->NextActive;
+
+		if (!Objects.CheckID(item->ObjectNumber))
+			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
@@ -898,7 +905,8 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
-	if (!object.undead || isExplosive)
+	if ((object.damageType == DamageMode::Any) ||
+		(object.damageType == DamageMode::Explosion && isExplosive))
 	{
 		if (target->HitPoints > 0)
 		{
@@ -934,10 +942,24 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, -5);
+			TriggerShatterSmoke(pos.value().x, pos.value().y, pos.value().z);
 			break;
 		}
 	}
 
 	DoItemHit(&target, damage, isExplosive);
+}
+
+Vector3i GetNearestSectorCenter(const Vector3i& pos)
+{
+	constexpr int SECTOR_SIZE = 1024;
+
+	// Calculate the sector-aligned coordinates.
+	int x = (pos.x / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+	int z = (pos.z / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+
+	// Keep the y-coordinate unchanged.
+	int y = pos.y;
+
+	return Vector3i(x, y, z);
 }

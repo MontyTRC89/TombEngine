@@ -116,12 +116,12 @@ namespace TEN::Entities::Generic
 		// Render collision bounds.
 		auto ladderBounds = GameBoundingBox(&ladderItem);
 		auto collBox = ladderBounds.ToBoundingOrientedBox(ladderItem.Pose);
-		g_Renderer.AddDebugBox(collBox, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddDebugBox(collBox, Vector4(1, 0, 0, 1), RendererDebugPage::None);
 
 		// Render interaction bounds.
 		auto ladderInteractBounds = LadderInteractBounds2D + GameBoundingBox(0, 0, ladderBounds.Y1, ladderBounds.Y2, 0, 0);
 		auto interactBox = ladderInteractBounds.ToBoundingOrientedBox(ladderItem.Pose);
-		g_Renderer.AddDebugBox(interactBox, Vector4(0, 1, 1, 1), RENDERER_DEBUG_PAGE::NO_PAGE);
+		g_Renderer.AddDebugBox(interactBox, Vector4(0, 1, 1, 1), RendererDebugPage::None);
 	}
 
 	void LadderCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

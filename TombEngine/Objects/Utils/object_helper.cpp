@@ -6,7 +6,8 @@
 #include "Game/pickup/pickup.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/puzzles_keys.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Specific/level.h"
 
 void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::string& baseName, const std::string& requiredName)
@@ -17,23 +18,23 @@ void AssignObjectMeshSwap(ObjectInfo& object, int requiredMeshSwap, const std::s
 		TENLog("Slot " + requiredName + " not loaded. Meshswap issues with " + baseName + " may result in incorrect behaviour.", LogLevel::Warning);
 }
 
-bool AssignObjectAnimations(ObjectInfo& object, int requiredObject, const std::string& baseName, const std::string& requiredName)
+bool AssignObjectAnimations(ObjectInfo& object, int requiredObjectID, const std::string& baseName, const std::string& requiredName)
 {
-	// Check if the object has at least 1 animation with more than 1 frame.
+	// Check if object has at least 1 animation with more than 1 frame.
 	const auto& anim = GetAnimData(object.animIndex);
 	if ((anim.frameEnd - anim.frameBase) > 1)
 		return true;
 
 	// Use slot if loaded.
-	const auto& requiredObj = Objects[requiredObject];
-	if (requiredObj.loaded)
+	const auto& requiredObject = Objects[requiredObjectID];
+	if (requiredObject.loaded)
 	{
 		// Check if the required object has at least 1 animation with more than 1 frame.
-		const auto& anim = GetAnimData(requiredObj.animIndex);
-		if ((anim.frameEnd - anim.frameBase) > 1)
+		const auto& newAnim = GetAnimData(requiredObject.animIndex);
+		if ((newAnim.frameEnd - newAnim.frameBase) > 1)
 		{
-			object.animIndex = requiredObj.animIndex;
-			object.frameBase = requiredObj.frameBase;
+			object.animIndex = requiredObject.animIndex;
+			object.frameBase = requiredObject.frameBase;
 			return true;
 		}
 		else
@@ -192,10 +193,10 @@ void InitPushableObject(ObjectInfo* object, int objectNumber)
 		object->Initialize = InitializePushableBlock;
 		object->control = PushableBlockControl;
 		object->collision = PushableBlockCollision;
-		object->floor = PushableBlockFloor;
-		object->ceiling = PushableBlockCeiling;
-		object->floorBorder = PushableBlockFloorBorder;
-		object->ceilingBorder = PushableBlockCeilingBorder;
+		object->floor = PushableBridgeFloor;
+		object->ceiling = PushableBridgeCeiling;
+		object->floorBorder = PushableBridgeFloorBorder;
+		object->ceilingBorder = PushableBridgeCeilingBorder;
 		object->SetupHitEffect(true);
 	}
 }

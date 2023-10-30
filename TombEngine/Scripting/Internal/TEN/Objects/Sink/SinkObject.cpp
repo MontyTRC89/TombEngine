@@ -2,10 +2,10 @@
 #include "framework.h"
 #include "SinkObject.h"
 
-#include "ReservedScriptNames.h"
-#include "ScriptAssert.h"
-#include "ScriptUtil.h"
-#include "Vec3/Vec3.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 /***
 Sink
@@ -17,7 +17,7 @@ Sink
 static auto index_error = index_error_maker(Sink, ScriptReserved_Sink);
 static auto newindex_error = newindex_error_maker(Sink, ScriptReserved_Sink);
 
-Sink::Sink(SinkInfo & ref) : m_sink{ref}
+Sink::Sink(SinkInfo& ref) : m_sink{ref}
 {};
 
 void Sink::Register(sol::table& parent)
@@ -58,12 +58,12 @@ void Sink::Register(sol::table& parent)
 		// @function Sink:SetStrength
 		// @tparam int strength The sink's new strength
 		ScriptReserved_SetStrength, &Sink::SetStrength
-		);
+	);
 }
 
 Vec3 Sink::GetPos() const
 {
-	return Vec3{ m_sink.Position };
+	return Vec3(m_sink.Position);
 }
 
 void Sink::SetPos(const Vec3& pos)

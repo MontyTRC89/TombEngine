@@ -431,7 +431,7 @@ static void StartObject(ObjectInfo* obj)
 	{
 		obj->Initialize = InitializeCorpse;
 		obj->collision = CreatureCollision;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->control = CorpseControl;
 		obj->HitRoutine = CorpseHit;
 		obj->HitPoints = NOT_TARGETABLE;
@@ -454,8 +454,8 @@ static void StartTrap(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeElectricCleaner;
-		obj->control = ElectricCleanerControl;
-		obj->collision = ElectricCleanerCollision;
+		obj->control = ControlElectricCleaner;
+		obj->collision = CollideElectricCleaner;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->nonLot = 1;

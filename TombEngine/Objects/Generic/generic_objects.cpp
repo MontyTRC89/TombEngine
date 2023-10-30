@@ -15,6 +15,7 @@
 #include "Objects/Generic/Object/generic_bridge.h"
 #include "Objects/Generic/Object/Ladder.h"
 #include "Objects/Generic/Object/polerope.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Objects/Generic/Object/rope.h"
 
 // Switches
@@ -39,6 +40,7 @@
 #include "Objects/Generic/Doors/underwater_door.h"
 
 // Traps
+#include "Objects/Generic/Traps/CrumblingPlatform.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Objects/Generic/Traps/falling_block.h"
 
@@ -96,6 +98,12 @@ static void StartObject(ObjectInfo* object)
 			object->SetupHitEffect(true);
 		}
 	}
+
+	for (int objectNumber = ID_PUSHABLE_OBJECT1; objectNumber <= ID_PUSHABLE_OBJECT10; objectNumber++)
+		InitPushableObject(object, objectNumber);
+
+	for (int objectNumber = ID_PUSHABLE_OBJECT_CLIMBABLE1; objectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10; objectNumber++)
+		InitPushableObject(object, objectNumber);
 
 	object = &Objects[ID_BRIDGE_FLAT];
 	if (object->loaded)
@@ -454,9 +462,14 @@ void StartTraps(ObjectInfo* object)
 	object = &Objects[ID_CRUMBLING_FLOOR];
 	if (object->loaded)
 	{
-		object->Initialize = InitializeFallingBlock;
-		object->collision = FallingBlockCollision;
-		object->control = FallingBlockControl;
+		object->Initialize = InitializeCrumblingPlatform;
+		object->control = ControlCrumblingPlatform;
+		object->collision = CollideCrumblingPlatform;
+
+		object->floor = CrumblingPlatformFloor;
+		object->ceiling = CrumblingPlatformCeiling;
+		object->floorBorder = CrumblingPlatformFloorBorder;
+		object->ceilingBorder = CrumblingPlatformCeilingBorder;
 	}
 
 	object = &Objects[ID_PARALLEL_BARS];

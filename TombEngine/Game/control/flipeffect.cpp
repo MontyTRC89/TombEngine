@@ -20,8 +20,7 @@
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
-#include "Objects/TR5/Emitter/tr5_spider_emitter.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Objects/Effects/tr4_locusts.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;
@@ -314,11 +313,11 @@ void FloorShake(ItemInfo* item)
 	int y = abs(item->Pose.Position.y - Camera.pos.y);
 	int z = abs(item->Pose.Position.z - Camera.pos.z);
 
-	if (x < SECTOR(16) &&
-		y < SECTOR(16) &&
-		z < SECTOR(16))
+	if (x < BLOCK(16) &&
+		y < BLOCK(16) &&
+		z < BLOCK(16))
 	{
-		Camera.bounce = 66 * ((SQUARE(x) + SQUARE(y) + SQUARE(z)) / CLICK(1) - SQUARE(SECTOR(1))) / SQUARE(SECTOR(1));
+		Camera.bounce = 66 * ((SQUARE(x) + SQUARE(y) + SQUARE(z)) / CLICK(1) - SQUARE(BLOCK(1))) / SQUARE(BLOCK(1));
 	}
 }
 
@@ -341,7 +340,7 @@ void Turn270(ItemInfo* item)
 
 void FinishLevel(ItemInfo* item)
 {
-	LevelComplete = CurrentLevel + 1;
+	NextLevel = CurrentLevel + 1;
 }
 
 void VoidEffect(ItemInfo* item)

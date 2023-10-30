@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/effects/tomb4fx.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -30,6 +30,9 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
+// NOTE: This fixes body part exploding instantly if entity is on ground.
+constexpr auto BODY_PART_SPAWN_VERTICAL_OFFSET = CLICK(1);
+
 char LaserSightActive = 0;
 char LaserSightCol = 0;
 int NextGunshell = 0;
@@ -43,12 +46,11 @@ int NextSmokeSpark = 0;
 int NextBlood = 0;
 int NextGunShell = 0;
 
-GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; 
-FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE]; 
-SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; 
-GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; 
-BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD]; 
-SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
+FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
+SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
+BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
+SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 FIRE_LIST Fires[MAX_FIRE_LIST];
 
 int GetFreeFireSpark()
@@ -978,7 +980,7 @@ void UpdateGunShells()
 			else
 				gunshell->fallspeed += 6;
 
-			gunshell->pos.Orientation.x += (gunshell->speed >> 1 + 7) * ANGLE(1.0f);
+			gunshell->pos.Orientation.x += ((gunshell->speed / 2) + 7) * ANGLE(1.0f);
 			gunshell->pos.Orientation.y += gunshell->speed * ANGLE(1.0f);
 			gunshell->pos.Orientation.z += ANGLE(23.0f);
 
@@ -1168,7 +1170,7 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	ExplodingDeath(lara->Context.Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
+	ExplodingDeath(lara->Context.Vehicle, BODY_DO_EXPLOSION | BODY_STONE_SOUND);
 	KillItem(lara->Context.Vehicle);
 	vehicle->Status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
@@ -1192,6 +1194,10 @@ void ExplodingDeath(short itemNumber, short flags)
 	
 	auto world = item->Pose.Orientation.ToRotationMatrix();
 
+	// If only BODY_PART_EXPLODE flag exists but not BODY_EXPLODE, add it.
+	if ((flags & BODY_PART_EXPLODE) && !(flags & BODY_DO_EXPLOSION))
+		flags |= BODY_DO_EXPLOSION;
+
 	for (int i = 0; i < obj->nmeshes; i++)
 	{
 		Matrix boneMatrix;
@@ -1203,7 +1209,7 @@ void ExplodingDeath(short itemNumber, short flags)
 
 		item->MeshBits.Clear(i);
 
-		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_EXPLODE)))
+		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_DO_EXPLOSION)))
 		{
 			short fxNumber = CreateNewEffect(item->RoomNumber);
 			if (fxNumber != NO_ITEM)
@@ -1211,26 +1217,26 @@ void ExplodingDeath(short itemNumber, short flags)
 				FX_INFO* fx = &EffectList[fxNumber];
 
 				fx->pos.Position.x = boneMatrix.Translation().x;
-				fx->pos.Position.y = boneMatrix.Translation().y;
+				fx->pos.Position.y = boneMatrix.Translation().y - BODY_PART_SPAWN_VERTICAL_OFFSET;
 				fx->pos.Position.z = boneMatrix.Translation().z;
 
 				fx->roomNumber = item->RoomNumber;
 				fx->pos.Orientation.x = 0;
-				fx->pos.Orientation.y = GetRandomControl() * 2;
+				fx->pos.Orientation.y = Random::GenerateAngle();
 
-				if (!(flags & 0x10))
+				if (!(flags & BODY_NO_RAND_VELOCITY))
 				{
-					if (flags & 0x20)
+					if (flags & BODY_MORE_RAND_VELOCITY)
 						fx->speed = GetRandomControl() >> 12;
 					else
 						fx->speed = GetRandomControl() >> 8;
 				}
 
-				if (flags & 0x40)
+				if (flags & BODY_NO_VERTICAL_VELOCITY)
 					fx->fallspeed = 0;
 				else
 				{
-					if ((flags & 0x80) == 0)
+					if (flags & BODY_LESS_IMPULSE)
 						fx->fallspeed = -(GetRandomControl() >> 8);
 					else
 						fx->fallspeed = -(GetRandomControl() >> 12);

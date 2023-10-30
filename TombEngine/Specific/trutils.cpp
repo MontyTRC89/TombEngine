@@ -1,8 +1,13 @@
 #include "framework.h"
-#include "Specific/trutils.h"
 
 #include <codecvt>
 #include <filesystem>
+
+#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer11Enums.h"
+#include "Specific/trutils.h"
+
+using TEN::Renderer::g_Renderer;
 
 namespace TEN::Utils
 {
@@ -61,7 +66,7 @@ namespace TEN::Utils
 					// it means this is a valid asset folder.
 
 					auto testDir = result + (useCustomSubdirectory ? "/" : "") + testPath;
-					if (std::filesystem::exists(testDir))
+					if (std::filesystem::is_regular_file(testDir))
 						return result;
 				}
 			}
@@ -86,38 +91,52 @@ namespace TEN::Utils
 		return string;
 	}
 
-	std::string ToString(const std::wstring& string)
+	std::string ToString(const std::wstring& wString)
 	{
-		return ToString(string.c_str());
+		return ToString(wString.c_str());
 	}
 
-	std::string ToString(const wchar_t* string)
+	std::string ToString(const wchar_t* wString)
 	{
-		auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>();
-		return converter.to_bytes(std::wstring(string));
+        auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>();
+		return converter.to_bytes(std::wstring(wString));
 	}
 
-	std::wstring ToWString(const std::string& string)
-	{
-		auto cString = string.c_str();
-		int size = MultiByteToWideChar(CP_UTF8, 0, cString, (int)string.size(), nullptr, 0);
-		auto wString = std::wstring(size, 0);
-		MultiByteToWideChar(CP_UTF8, 0, cString, (int)strlen(cString), &wString[0], size);
-		return wString;
-	}
+    std::wstring ToWString(const std::string& string)
+    {
+        auto cString = string.c_str();
+        int size = MultiByteToWideChar(CP_UTF8, 0, cString, (int)string.size(), nullptr, 0);
+        auto wString = std::wstring(size, 0);
+        MultiByteToWideChar(CP_UTF8, 0, cString, (int)strlen(cString), &wString[0], size);
+        return wString;
+    }
 
-	std::wstring ToWString(const char* source)
+	std::wstring ToWString(const char* cString)
 	{
 		wchar_t buffer[UCHAR_MAX];
-		std::mbstowcs(buffer, source, UCHAR_MAX);
+		std::mbstowcs(buffer, cString, UCHAR_MAX);
 		return std::wstring(buffer);
+	}
+
+	std::string ReplaceNewLineSymbols(const std::string& string)
+	{
+		auto result = string;
+		std::string::size_type index = 0;
+
+		while ((index = result.find("\\n", index)) != std::string::npos) 
+		{
+			result.replace(index, 2, "\n");
+			++index;
+		}
+
+		return result;
 	}
 
 	std::vector<std::string> SplitString(const std::string& string)
 	{
 		auto strings = std::vector<std::string>{};
 
-		// String is single line; exit early.
+		// Exit early if string is single line.
 		if (string.find('\n') == std::string::npos)
 		{
 			strings.push_back(string);
@@ -136,9 +155,44 @@ namespace TEN::Utils
 		return strings;
 	}
 
-	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)
-	{
-		char fileName[UCHAR_MAX] = {};
+    Vector2 GetAspectCorrect2DPosition(const Vector2& pos)
+    {
+       constexpr auto DISPLAY_SPACE_ASPECT = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
+
+        auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
+        float screenResAspect = screenRes.x / screenRes.y;
+        float aspectDelta = screenResAspect - DISPLAY_SPACE_ASPECT;
+
+		auto correctedPos = pos;
+        if (aspectDelta > EPSILON)
+        {
+			correctedPos.x *= 1.0f - (aspectDelta / 2);
+        }
+        else if (aspectDelta < -EPSILON)
+        {
+			correctedPos.y *= 1.0f - (aspectDelta / 2);
+        }
+
+        return correctedPos;
+    }
+
+    Vector2 Convert2DPositionToNDC(const Vector2& pos)
+    {
+        return Vector2(
+            ((pos.x * 2) / SCREEN_SPACE_RES.x) - 1.0f,
+            1.0f - ((pos.y * 2) / SCREEN_SPACE_RES.y));
+    }
+
+    Vector2 ConvertNDCTo2DPosition(const Vector2& ndc)
+    {
+        return Vector2(
+            ((ndc.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
+            ((1.0f - ndc.y) * SCREEN_SPACE_RES.y) / 2);
+    }
+
+    std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)
+    {
+        char fileName[UCHAR_MAX] = {};
 
 		if (!GetModuleFileNameA(nullptr, fileName, UCHAR_MAX))
 		{

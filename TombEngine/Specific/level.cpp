@@ -35,8 +35,6 @@ using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 
 char* LevelDataPtr;
-bool IsLevelLoading;
-bool LoadedSuccessfully;
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
 LEVEL g_Level;
@@ -189,15 +187,24 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		for (int i = 0; i < g_Level.NumItems; i++)
-			InitializeItem(i);
+		// Initialize all bridges first.
+		// It is needed because some other items need final floor height to init properly.
+
+		for (int isFloor = 0; isFloor <= 1; isFloor++)
+		{
+			for (int i = 0; i < g_Level.NumItems; i++)
+			{
+				if ((Objects[g_Level.Items[i].ObjectNumber].floor == nullptr) == (bool)isFloor)
+					InitializeItem(i);
+			}
+		}
 	}
 }
 
 void LoadObjects()
 {
-	std::memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
-	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
+	Objects.Initialize();
+	std::memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
 	TENLog("Num meshes: " + std::to_string(numMeshes), LogLevel::Info);
@@ -255,7 +262,7 @@ void LoadObjects()
 				poly.textureCoordinates.resize(count);
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
-				poly.bitangents.resize(count);
+				poly.binormals.resize(count);
 				
 				for (int n = 0; n < count; n++)
 					poly.indices[n] = ReadInt32();
@@ -266,7 +273,7 @@ void LoadObjects()
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
 				for (int n = 0; n < count; n++)
-					poly.bitangents[n] = ReadVector3();
+					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
@@ -376,6 +383,15 @@ void LoadObjects()
 	for (int i = 0; i < numStatics; i++)
 	{
 		int meshID = ReadInt32();
+
+		if (meshID >= MAX_STATICS)
+		{
+			TENLog("Static with ID " + std::to_string(meshID) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ". " +
+				   "Change static mesh ID in WadTool to a value below maximum.", LogLevel::Warning);
+			
+			meshID = 0;
+		}
+
 		StaticObjectsIds.push_back(meshID);
 
 		StaticObjects[meshID].meshNumber = (short)ReadInt32();
@@ -396,7 +412,7 @@ void LoadObjects()
 
 		StaticObjects[meshID].flags = (short)ReadInt16();
 
-		StaticObjects[meshID].shatterType = (short)ReadInt16();
+		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
 		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
 
@@ -644,7 +660,7 @@ void ReadRooms()
 				poly.textureCoordinates.resize(count);
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
-				poly.bitangents.resize(count);
+				poly.binormals.resize(count);
 
 				for (int n = 0; n < count; n++)
 					poly.indices[n] = ReadInt32();
@@ -655,7 +671,7 @@ void ReadRooms()
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
 				for (int n = 0; n < count; n++)
-					poly.bitangents[n] = ReadVector3();
+					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
@@ -985,9 +1001,8 @@ void LoadEventSets()
 		eventSet.Name = ReadString();
 		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		LoadEvent(eventSet.OnEnter);
-		LoadEvent(eventSet.OnInside);
-		LoadEvent(eventSet.OnLeave);
+		for (int eventType = 0; eventType < (int)VolumeEventType::Count; eventType++)
+			LoadEvent(eventSet.Events[eventType]);
 
 		g_Level.EventSets.push_back(eventSet);
 	}
@@ -1021,14 +1036,12 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 		inflateEnd(&strm);
 		return true;
 	}
-	else
-		return false;
+
+	return false;
 }
 
-unsigned int _stdcall LoadLevel(void* data)
+bool LoadLevel(int levelIndex)
 {
-	const int levelIndex = (int)reinterpret_cast<size_t>(data);
-
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
 	auto assetDir = g_GameFlow->GetGameDir();
@@ -1038,6 +1051,7 @@ unsigned int _stdcall LoadLevel(void* data)
 	LevelDataPtr = nullptr;
 	FILE* filePtr = nullptr;
 	char* dataPtr = nullptr;
+	bool LoadedSuccessfully;
 
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(loadingScreenPath);
@@ -1066,8 +1080,8 @@ unsigned int _stdcall LoadLevel(void* data)
 		// Check file header
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
-		else
-			TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+		
+		TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
 		// Check if level version is higher than engine version
 		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
@@ -1178,9 +1192,6 @@ unsigned int _stdcall LoadLevel(void* data)
 		dataPtr = LevelDataPtr = nullptr;
 	}
 
-	// Level loaded
-	IsLevelLoading = false;
-	_endthreadex(1);
 	return LoadedSuccessfully;
 }
 
@@ -1272,27 +1283,17 @@ void LoadBoxes()
 	}
 }
 
-int LoadLevelFile(int levelIndex)
+bool LoadLevelFile(int levelIndex)
 {
 	TENLog("Loading level file...", LogLevel::Info);
 
+	BackupLara();
 	CleanUp();
 	FreeLevel();
 	
-	// Loading level is done is two threads, one for loading level and one for drawing loading screen
-	IsLevelLoading = true;
+	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelIndex);
 
-	_beginthreadex(
-		nullptr,
-		0, 
-		LoadLevel, 
-		reinterpret_cast<void*>((size_t)levelIndex), 
-		0, 
-		nullptr);
-
-	while (IsLevelLoading);
-
-	return LoadedSuccessfully;
+	return LevelLoadTask.get();
 }
 
 void LoadSprites()
@@ -1383,7 +1384,7 @@ void GetAIPickups()
 					object->roomNumber == item->RoomNumber &&
 					object->objectNumber < ID_AI_PATROL2)
 				{
-					item->AIBits = (1 << object->objectNumber - ID_AI_GUARD) & 0x1F;
+					item->AIBits = (1 << (object->objectNumber - ID_AI_GUARD)) & 0x1F;
 					item->ItemFlags[3] = object->triggerFlags;
 
 					if (object->objectNumber != ID_AI_GUARD)
@@ -1412,8 +1413,8 @@ void BuildOutsideRoomsTable()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		int rx = (room->x / SECTOR(1));
-		int rz = (room->z / SECTOR(1));
+		int rx = (room->x / BLOCK(1));
+		int rz = (room->z / BLOCK(1));
 
 		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{

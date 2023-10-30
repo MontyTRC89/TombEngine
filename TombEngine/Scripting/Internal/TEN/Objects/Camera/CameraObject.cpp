@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "Objects/Camera/CameraObject.h"
+#include "CameraObject.h"
 #include "Game/camera.h"
 
-#include "ReservedScriptNames.h"
-#include "ScriptAssert.h"
-#include "ScriptUtil.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
 #include "Specific/LevelCameraInfo.h"
 #include "Specific/level.h"
-#include "Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 /***
 Basic cameras that can point at Lara or at a CAMERA_TARGET.
@@ -22,7 +22,7 @@ static auto newindex_error = newindex_error_maker(CameraObject, ScriptReserved_C
 CameraObject::CameraObject(LevelCameraInfo & ref) : m_camera{ref}
 {};
 
-void CameraObject::Register(sol::table & parent)
+void CameraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<CameraObject>(ScriptReserved_Camera,
 		sol::no_constructor, // ability to spawn new ones could be added later
@@ -68,13 +68,12 @@ void CameraObject::Register(sol::table & parent)
 		/// Active the camera during that frame.
 		// @function Camera:PlayCamera
 		// @tparam[opt] Moveable Target If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.
-		ScriptReserved_PlayCamera, &CameraObject::PlayCamera
-		);
+		ScriptReserved_PlayCamera, &CameraObject::PlayCamera);
 }
 
 Vec3 CameraObject::GetPos() const
 {
-	return Vec3{ m_camera.Position };
+	return Vec3(m_camera.Position);
 }
 
 void CameraObject::SetPos(Vec3 const& pos)

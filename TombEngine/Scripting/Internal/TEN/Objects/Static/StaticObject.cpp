@@ -2,13 +2,13 @@
 #include "framework.h"
 
 #include "Game/effects/debris.h"
-#include "ScriptAssert.h"
-#include "StaticObject.h"
-#include "Vec3/Vec3.h"
-#include "Rotation/Rotation.h"
-#include "Color/Color.h"
-#include "ScriptUtil.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 /***
 Statics
 
@@ -148,7 +148,7 @@ void Static::SetSolid(bool yes)
 
 Vec3 Static::GetPos() const
 {
-	return Vec3{ m_mesh.pos.Position.x, m_mesh.pos.Position.y, m_mesh.pos.Position.z };
+	return Vec3(m_mesh.pos.Position.x, m_mesh.pos.Position.y, m_mesh.pos.Position.z);
 }
 
 void Static::SetPos(Vec3 const& pos)

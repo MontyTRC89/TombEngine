@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Objects/NamedBase.h"
-#include "Objects/Room/RoomObject.h"
-#include "Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/NamedBase.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
 struct LevelCameraInfo;
 
@@ -22,7 +22,7 @@ public:
 	CameraObject& operator=(CameraObject const& other) = delete;
 	CameraObject(CameraObject const& other) = delete;
 
-	static void Register(sol::table &);
+	static void Register(sol::table&);
 	Vec3 GetPos() const;
 	void SetPos(Vec3 const& pos);
 

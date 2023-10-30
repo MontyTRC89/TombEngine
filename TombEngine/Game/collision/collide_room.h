@@ -1,9 +1,9 @@
 #pragma once
+
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 
 struct ItemInfo;
-struct CollisionInfo;
 class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
@@ -11,7 +11,7 @@ enum RoomEnvFlags;
 
 constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
-constexpr auto COLLISION_CHECK_DISTANCE = SECTOR(8);
+constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
 enum CollisionType
 {
@@ -88,12 +88,12 @@ struct CollisionSetup
 	bool EnableObjectPush = false; // Can be pushed by objects.
 	bool EnableSpasm	  = false; // Convulse when pushed.
 
-	// Preserve old parameters to restore later
-	Vector3i	   OldPosition		= Vector3i::Zero;
+	// Preserve previous parameters to restore later.
+	Vector3i	   PrevPosition		= Vector3i::Zero;;
 	GAME_OBJECT_ID PrevAnimObjectID = ID_NO_OBJECT;
-	int			   OldAnimNumber	= 0;
-	int			   OldFrameNumber	= 0;
-	int			   OldState			= 0;
+	int			   PrevAnimNumber	= 0;
+	int			   PrevFrameNumber	= 0;
+	int			   PrevState		= 0;
 };
 
 struct CollisionInfo
@@ -107,12 +107,15 @@ struct CollisionInfo
 	CollisionPosition FrontLeft;    
 	CollisionPosition FrontRight;   
 
-	Vector3i Shift;
+	Pose Shift = Pose::Zero;
 	CollisionType CollisionType;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
 	float NearestLedgeDistance;
+
+	int  LastBridgeItemNumber;
+	Pose LastBridgeItemPose;
 
 	bool HitStatic;
 	bool HitTallObject;
@@ -125,11 +128,14 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
+CollisionResult GetCollision(const ItemInfo& item);
 CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-CollisionResult GetCollision(Vector3i pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAngles& orient, float dist);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
-CollisionResult GetCollision(const GameVector& point);
+CollisionResult GetCollision(const GameVector& pos);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
@@ -141,7 +147,6 @@ FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
 int GetCeiling(FloorInfo* floor, int x, int y, int z);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
-void AlterFloorHeight(ItemInfo* item, int height);
 
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 int GetWaterSurface(ItemInfo* item);

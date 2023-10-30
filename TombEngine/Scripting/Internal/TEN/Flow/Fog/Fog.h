@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Color/Color.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
 
 namespace sol {
 	class state;
@@ -20,5 +20,5 @@ struct Fog
 	void SetColor(ScriptColor const& col);
 	ScriptColor GetColor() const;
 
-	static void Register(sol::table &);
+	static void Register(sol::table&);
 };

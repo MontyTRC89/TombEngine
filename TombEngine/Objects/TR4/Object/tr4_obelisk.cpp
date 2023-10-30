@@ -82,12 +82,12 @@ void ObeliskControl(short itemNumber)
 				pos2.y = item->Pose.Position.y;
 				pos2.x = item->Pose.Position.z + (someNumber * phd_cos(item->Pose.Orientation.z + ANGLE(90.0f)));
 
-				if (abs(pos.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
-					abs(pos.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
-					abs(pos.z - LaraItem->Pose.Position.z) < SECTOR(20) &&
-					abs(pos2.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
-					abs(pos2.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
-					abs(pos2.z - LaraItem->Pose.Position.z) < SECTOR(20))
+				if (abs(pos.x - LaraItem->Pose.Position.x) < BLOCK(20) &&
+					abs(pos.y - LaraItem->Pose.Position.y) < BLOCK(20) &&
+					abs(pos.z - LaraItem->Pose.Position.z) < BLOCK(20) &&
+					abs(pos2.x - LaraItem->Pose.Position.x) < BLOCK(20) &&
+					abs(pos2.y - LaraItem->Pose.Position.y) < BLOCK(20) &&
+					abs(pos2.z - LaraItem->Pose.Position.z) < BLOCK(20))
 				{
 					if (!(GlobalCounter & 3))
 					{
@@ -104,9 +104,9 @@ void ObeliskControl(short itemNumber)
 
 		if (item->ItemFlags[3] >= 256 && item->TriggerFlags == 2)
 		{
-			pos.x = item->Pose.Position.x + SECTOR(8) * phd_sin(item->Pose.Orientation.y);
+			pos.x = item->Pose.Position.x + BLOCK(8) * phd_sin(item->Pose.Orientation.y);
 			pos.y = item->Pose.Position.y;
-			pos.z = item->Pose.Position.z + SECTOR(8) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
+			pos.z = item->Pose.Position.z + BLOCK(8) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 
 			SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &Pose(Vector3i(pos)));
 
@@ -116,12 +116,12 @@ void ObeliskControl(short itemNumber)
 				pos2.y = (GetRandomControl() & 0x3FF) + pos.y - 512;
 				pos2.z = (GetRandomControl() & 0x3FF) + pos.z - 512;
 
-				if (abs(pos.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
-					abs(pos.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
-					abs(pos.z - LaraItem->Pose.Position.z) < SECTOR(20) &&
-					abs(pos2.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
-					abs(pos2.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
-					abs(pos2.z - LaraItem->Pose.Position.z) < SECTOR(20))
+				if (abs(pos.x - LaraItem->Pose.Position.x) < BLOCK(20) &&
+					abs(pos.y - LaraItem->Pose.Position.y) < BLOCK(20) &&
+					abs(pos.z - LaraItem->Pose.Position.z) < BLOCK(20) &&
+					abs(pos2.x - LaraItem->Pose.Position.x) < BLOCK(20) &&
+					abs(pos2.y - LaraItem->Pose.Position.y) < BLOCK(20) &&
+					abs(pos2.z - LaraItem->Pose.Position.z) < BLOCK(20))
 				{
 					if (item->ItemFlags[2] != NO_ITEM)
 					{
@@ -159,7 +159,7 @@ void ObeliskControl(short itemNumber)
 		{
 			item->Pose.Orientation.y -= ANGLE(90.0f);
 
-			if (TrInput & IN_ACTION)
+			if (IsHeld(In::Action))
 			{
 				item->Animation.AnimNumber = obj->animIndex + 1;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;
@@ -172,7 +172,7 @@ void ObeliskControl(short itemNumber)
 		{
 			item->Pose.Orientation.y += ANGLE(90.0f);
 
-			if (!(TrInput & IN_ACTION))
+			if (!IsHeld(In::Action))
 			{
 				item->Animation.AnimNumber = obj->animIndex + 3;
 				item->Animation.FrameNumber = GetAnimData(item).frameBase;

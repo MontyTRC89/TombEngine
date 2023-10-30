@@ -2,10 +2,10 @@
 #include "framework.h"
 
 #include "AIObject.h"
-#include "ScriptAssert.h"
-#include "Vec3/Vec3.h"
-#include "ScriptUtil.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 /***
 AI object
 
@@ -19,7 +19,7 @@ static auto newindex_error = newindex_error_maker(AIObject, ScriptReserved_AIObj
 AIObject::AIObject(AI_OBJECT & ref) : m_aiObject{ref}
 {};
 
-void AIObject::Register(sol::table & parent)
+void AIObject::Register(sol::table& parent)
 {
 	parent.new_usertype<AIObject>(ScriptReserved_AIObject,
 		sol::no_constructor, // ability to spawn new ones could be added later
@@ -96,7 +96,7 @@ void AIObject::Register(sol::table & parent)
 
 Vec3 AIObject::GetPos() const
 {
-	return Vec3{ m_aiObject.pos.Position.x, m_aiObject.pos.Position.y, m_aiObject.pos.Position.z };
+	return Vec3(m_aiObject.pos.Position.x, m_aiObject.pos.Position.y, m_aiObject.pos.Position.z);
 }
 
 void AIObject::SetPos(Vec3 const& pos)

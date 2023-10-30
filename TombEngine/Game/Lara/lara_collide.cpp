@@ -15,8 +15,8 @@
 #include "Objects/Sink.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Input;
 
@@ -47,6 +47,10 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 		item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+	}
+	else if (coll->LastBridgeItemNumber != NO_ITEM)
+	{
+		ShiftItem(item, coll);
 	}
 
 	return false;
@@ -202,8 +206,8 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 {
 	// HACK
-	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
-		coll->Shift.y = 0;
+	if (coll->Shift.Position.y >= 0 && coll->Shift.Position.y <= CLICK(1.25f))
+		coll->Shift.Position.y = 0;
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT ||
 		coll->HitTallObject)
@@ -232,7 +236,7 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 
 void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 {
-	switch (coll->Setup.OldState)
+	switch (coll->Setup.PrevState)
 	{
 	case LS_IDLE:
 	case LS_TURN_RIGHT_SLOW:
@@ -240,11 +244,11 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 	case LS_TURN_RIGHT_FAST:
 	case LS_TURN_LEFT_FAST:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
-		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.ActiveState = coll->Setup.PrevState;
+		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
+		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 		{
 			// Prevent turn lock against walls.
 			if (item->Animation.ActiveState == LS_TURN_RIGHT_SLOW ||
@@ -255,7 +259,7 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 			else
 				item->Animation.TargetState = LS_TURN_LEFT_SLOW;
 		}
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 		{
 			if (item->Animation.ActiveState == LS_TURN_LEFT_SLOW ||
 				item->Animation.ActiveState == LS_TURN_LEFT_FAST)
@@ -284,19 +288,19 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 
 void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 {
-	switch (coll->Setup.OldState)
+	switch (coll->Setup.PrevState)
 	{
 	case LS_CRAWL_IDLE:
 	case LS_CRAWL_TURN_LEFT:
 	case LS_CRAWL_TURN_RIGHT:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
-		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.ActiveState = coll->Setup.PrevState;
+		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
+		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Animation.TargetState = LS_CRAWL_TURN_RIGHT;
 		else
 			item->Animation.TargetState = LS_CRAWL_IDLE;
@@ -320,19 +324,19 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 
 void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 {
-	switch (coll->Setup.OldState)
+	switch (coll->Setup.PrevState)
 	{
 	case LS_MONKEY_IDLE:
 	case LS_MONKEY_TURN_LEFT:
 	case LS_MONKEY_TURN_RIGHT:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.AnimNumber = coll->Setup.OldAnimNumber;
-		item->Animation.FrameNumber = coll->Setup.OldFrameNumber;
-		item->Animation.ActiveState = coll->Setup.OldState;
+		item->Animation.ActiveState = coll->Setup.PrevState;
+		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
+		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 		else
 			item->Animation.TargetState = LS_MONKEY_IDLE;
@@ -364,20 +368,20 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | (BLOCK(1) - snapDistance);
+			item->Pose.Position.x = (coll->Setup.PrevPosition.x & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
 		case EAST:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | snapDistance;
+			item->Pose.Position.z = (coll->Setup.PrevPosition.z & ~WALL_MASK) | snapDistance;
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | snapDistance;
+			item->Pose.Position.x = (coll->Setup.PrevPosition.x & ~WALL_MASK) | snapDistance;
 			return;
 
 		case WEST:
 		default:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | (BLOCK(1) - snapDistance);
+			item->Pose.Position.z = (coll->Setup.PrevPosition.z & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 		}
 	}
@@ -387,20 +391,20 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | snapDistance;
+			item->Pose.Position.x = (coll->Setup.PrevPosition.x & ~WALL_MASK) | snapDistance;
 			return;
 
 		case EAST:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | (BLOCK(1) - snapDistance);
+			item->Pose.Position.z = (coll->Setup.PrevPosition.z & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~WALL_MASK) | (BLOCK(1) - snapDistance);
+			item->Pose.Position.x = (coll->Setup.PrevPosition.x & ~WALL_MASK) | (BLOCK(1) - snapDistance);
 			return;
 
 		case WEST:
 		default:
-			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~WALL_MASK) | snapDistance;
+			item->Pose.Position.z = (coll->Setup.PrevPosition.z & ~WALL_MASK) | snapDistance;
 			return;
 		}
 	}
@@ -468,7 +472,7 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 		coll->Middle.Floor < 0 && coll->Middle.FloorSlope)
 	{
 		item->Animation.Velocity.y = 0;
-		item->Pose.Position = coll->Setup.OldPosition;
+		item->Pose.Position = coll->Setup.PrevPosition;
 	}
 	else if (coll->CollisionType == CT_LEFT)
 		item->Pose.Orientation.y += ANGLE(5.0f);
@@ -593,7 +597,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 
 	case CT_CLAMP:
 		item->Animation.Velocity.y = 0.0f;
-		item->Pose.Position = coll->Setup.OldPosition;
+		item->Pose.Position = coll->Setup.PrevPosition;
 		flag = 2;
 		break;
 	}
@@ -628,8 +632,8 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 		const auto& sink = g_Level.Sinks[lara->Context.WaterCurrentActive - 1];
 
 		short headingAngle = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), sink.Position).y;
-		lara->Context.WaterCurrentPull.x += ((sink.Strength * SECTOR(1) * phd_sin(headingAngle)) - lara->Context.WaterCurrentPull.x) / 16;
-		lara->Context.WaterCurrentPull.z += ((sink.Strength * SECTOR(1) * phd_cos(headingAngle)) - lara->Context.WaterCurrentPull.z) / 16;
+		lara->Context.WaterCurrentPull.x += ((sink.Strength * BLOCK(1) * phd_sin(headingAngle)) - lara->Context.WaterCurrentPull.x) / 16;
+		lara->Context.WaterCurrentPull.z += ((sink.Strength * BLOCK(1) * phd_cos(headingAngle)) - lara->Context.WaterCurrentPull.z) / 16;
 
 		item->Pose.Position.y += (sink.Position.y - item->Pose.Position.y) / 16;
 	}
@@ -663,7 +667,7 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Position.z += lara->Context.WaterCurrentPull.z / 256;
 	lara->Context.WaterCurrentActive = 0;
 
-	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);
+	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.PrevPosition.z, item->Pose.Position.x - coll->Setup.PrevPosition.x);
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	GetCollisionInfo(coll, item, Vector3i(0, 200, 0));
 
@@ -689,7 +693,7 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y += coll->Middle.Floor;
 
 	ShiftItem(item, coll);
-	coll->Setup.OldPosition = item->Pose.Position;
+	coll->Setup.PrevPosition = item->Pose.Position;
 }
 
 bool TestLaraHitCeiling(CollisionInfo* coll)
@@ -708,7 +712,7 @@ void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0.0f;
 	item->Animation.Velocity.z = 0.0f;
-	item->Pose.Position = coll->Setup.OldPosition;
+	item->Pose.Position = coll->Setup.PrevPosition;
 }
 
 bool TestLaraObjectCollision(ItemInfo* item, short headingAngle, int forward, int down, int right)

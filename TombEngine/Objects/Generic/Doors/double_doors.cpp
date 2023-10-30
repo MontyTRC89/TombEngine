@@ -29,7 +29,7 @@ namespace TEN::Entities::Doors
 		GameBoundingBox(
 			-384, 384,
 			0, 0, 
-			-SECTOR(1), SECTOR(0.5f)
+			-BLOCK(1), BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -42,7 +42,7 @@ namespace TEN::Entities::Doors
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* doorItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION &&
+		if (IsHeld(In::Action) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			!laraItem->HitStatus &&

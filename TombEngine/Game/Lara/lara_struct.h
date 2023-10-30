@@ -232,6 +232,8 @@ enum LaraState
 
 	LS_ALIGN_POSITION = 188,
 	LS_REMOVE_PUZZLE = 189,
+	LS_PUSHABLE_EDGE_SLIP = 190,
+	LS_SPRINT_SLIDE = 191,
 
 	NUM_LARA_STATES
 };
@@ -365,8 +367,8 @@ enum LaraAnim
 	LA_ONWATER_DIVE = 119,									// Tread water > underwater
 	LA_PUSHABLE_GRAB = 120,									// Grab pushable object (looped)
 	LA_PUSHABLE_RELEASE = 121,								// Release pushable object
-	LA_PUSHABLE_PULL = 122,									// Pull pushable object (looped)
-	LA_PUSHABLE_PUSH = 123,									// Push pushable object (looped)
+	LA_PUSHABLE_OBJECT_PULL = 122,							// Pull pushable object (looped)
+	LA_PUSHABLE_OBJECT_PUSH = 123,							// Push pushable object (looped)
 	LA_UNDERWATER_DEATH = 124,								// Drowning death
 	LA_STAND_HIT_FRONT = 125,								// Jerk back standing from damage
 	LA_STAND_HIT_BACK = 126,								// Jerk forward standing from damage
@@ -597,9 +599,9 @@ enum LaraAnim
 	LA_PULLEY_PULL = 340,									// Pull pulley
 	LA_PULLEY_RELEASE = 341,								// Pull pulley > stand
 	LA_POLE_TO_STAND = 342,									// Pole > stand
-	LA_POLE_TURN_CLOCKWISE_CONTINUE_UNUSED = 343,				// TODO: remove.
+	LA_PUSHABLE_BLOCK_PULL = 343,							// Pull pushable block
 	LA_POLE_TURN_CLOCKWISE_END = 344,						// Rotate clockwise on pole (2/2)
-	LA_POLE_TURN_COUNTER_CLOCKWISE_CONTINUE_UNUSED = 345,		// TODO: remove.
+	LA_PUSHABLE_BLOCK_PUSH = 345,							// Push pushable block
 	LA_POLE_TURN_COUNTER_CLOCKWISE_END = 346,				// Rotate counter-clockwise on pole (2/2)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_START = 347,				// Push turnswitch clockwise (1/3)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_CONTINUE = 348,			// Push turnswitch clockwise (2/3) 
@@ -618,9 +620,9 @@ enum LaraAnim
 	LA_SHIMMY_RIGHT_CORNER_INNER_90 = 361,				    // Shimmy around inner right corner (90)
 	LA_SHIMMY_RIGHT_CORNER_INNER_45 = 362,					// Shimmy around inner right corner (45)
 	LA_WALL_CLIMB_LEFT_CORNER_OUTER_START = 363,			// Ladder around outer left corner (1/2)
-	LA_WALL_CLIMB_LEFT_CORNER_OUTER_END = 364,				// Ladder around outer left corner (2/2)
+	LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP = 364,
 	LA_WALL_CLIMB_RIGHT_CORNER_OUTER_START = 365,			// Ladder around outer right corner (1/2)
-	LA_WALL_CLIMB_RIGHT_CORNER_OUTER_END = 366,				// Ladder around outer right corner (2/2)
+	LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP = 366,
 	LA_WALL_CLIMB_LEFT_CORNER_INNER_START = 367,			// Ladder around inner left corner (1/2)
 	LA_WALL_CLIMB_LEFT_CORNER_INNER_END = 368,				// Ladder around inner left corner (2/2)
 	LA_WALL_CLIMB_RIGHT_CORNER_INNER_START = 369,			// Ladder around inner right corner (1/2)
@@ -673,9 +675,8 @@ enum LaraAnim
 	LA_JUMPSWITCH_PULL = 414,								// Pull jumpswitch
 	LA_UNDERWATER_CEILING_SWITCH_PULL = 415,				// Pull underwater ceiling switch
 	LA_UNDERWATER_DOOR_OPEN = 416,							// Open underwater_door
-	LA_PUSHABLE_PUSH_TO_STAND = 417,						// Push pushable object (not looped) > stand
-	LA_PUSHABLE_PULL_TO_STAND = 418,						// Pull pushable object (not looped) > stand
-																// TODO: add TR1-3 push/pull anims.
+	LA_PUSHABLE_OBJECT_PUSH_TO_STAND = 417,						// Push pushable object (not looped) > stand
+	LA_PUSHABLE_OBJECT_PULL_TO_STAND = 418,						// Pull pushable object (not looped) > stand
 	LA_CROWBAR_PRY_WALL_FAST = 419,							// Pry item off wall quickly
 	LA_CROWBAR_USE_ON_FLOOR = 420,							// Use crowbar to activate floor lever
 	LA_CRAWL_JUMP_FLIP_DOWN = 421,							// Roll jump down from crawl
@@ -870,10 +871,9 @@ enum LaraAnim
 
 	NUM_LARA_ANIMS,
 
-	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
+	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
 	// 280,
-	// 343, 345,
-	// 364, 366, 368, 370,
+	// 368, 370,
 };
 
 enum LaraExtraAnim
@@ -935,7 +935,28 @@ enum class WeaponAmmoType
 	Ammo2,
 	Ammo3,
 
-	NumAmmoTypes
+	Count
+};
+
+enum class PlayerAmmoType
+{
+	None,
+	Pistol,
+	Revolver,
+	Uzi,
+	ShotgunNormal,
+	ShotgunWide,
+	HK,
+	CrossbowBoltNormal,
+	CrossbowBoltPoison,
+	CrossbowBoltExplosive,
+	GrenadeNormal,
+	GrenadeFrag,
+	GrenadeFlash,
+	Harpoon,
+	Rocket,
+
+	Count
 };
 
 enum class LaraWeaponType
@@ -971,15 +992,6 @@ enum class HolsterSlot
 	RocketLauncher	= ID_ROCKET_ANIM
 };
 
-enum class WaterStatus
-{
-	Dry,
-	Wade,
-	TreadWater,
-	Underwater,
-	FlyCheat
-};
-
 enum class HandStatus
 {
 	Free,
@@ -990,12 +1002,13 @@ enum class HandStatus
 	Special
 };
 
-enum class TorchState
+enum class WaterStatus
 {
-	Holding,
-	Throwing,
-	Dropping,
-	JustLit
+	Dry,
+	Wade,
+	TreadWater,
+	Underwater,
+	FlyCheat
 };
 
 enum class JumpDirection
@@ -1006,6 +1019,22 @@ enum class JumpDirection
 	Back,
 	Left,
 	Right
+};
+
+enum class LookMode
+{
+	None,
+	Vertical,
+	Horizontal,
+	Free
+};
+
+enum class TorchState
+{
+	Holding,
+	Throwing,
+	Dropping,
+	JustLit
 };
 
 struct Ammo
@@ -1127,9 +1156,9 @@ struct CarriedWeaponInfo
 	bool HasLasersight = false; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer   = false; // TODO: Unused and duplicated in LaraInventoryData.
 
-	Ammo				  Ammo[(int)WeaponAmmoType::NumAmmoTypes] = {};
-	WeaponAmmoType		  SelectedAmmo							  = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
-	LaraWeaponTypeCarried WeaponMode							  = LaraWeaponTypeCarried::WTYPE_MISSING;
+	Ammo				  Ammo[(int)WeaponAmmoType::Count] = {};
+	WeaponAmmoType		  SelectedAmmo					   = WeaponAmmoType::Ammo1; // WeaponAmmoType_enum
+	LaraWeaponTypeCarried WeaponMode					   = LaraWeaponTypeCarried::WTYPE_MISSING;
 };
 
 struct ArmInfo
@@ -1154,8 +1183,8 @@ struct FlareData
 
 struct TorchData
 {
-	TorchState State = TorchState::Holding;
 	bool	   IsLit = false;
+	TorchState State = TorchState::Holding;
 };
 
 // TODO: Troye's abandoned dairy feature.
@@ -1222,6 +1251,17 @@ struct LaraCountData
 	unsigned int PositionAdjust = 0;
 	unsigned int Run			= 0;
 	unsigned int Death			= 0;
+};
+
+struct LookControlData
+{
+	LookMode	Mode		= LookMode::None;
+	EulerAngles Orientation = EulerAngles::Zero;
+	EulerAngles	TurnRate	= EulerAngles::Zero;
+
+	short OpticRange		= 0;
+	bool  IsUsingBinoculars = false;
+	bool  IsUsingLasersight = false;
 };
 
 struct WeaponControlData
@@ -1299,6 +1339,7 @@ struct LaraControlData
 	JumpDirection JumpDirection = {};
 	LaraCountData Count			= {};
 
+	LookControlData		 Look	   = {};
 	RopeControlData		 Rope	   = {};
 	SubsuitControlData	 Subsuit   = {};
 	TightropeControlData Tightrope = {};
@@ -1331,14 +1372,14 @@ struct PlayerContextData
 	int			ProjectedFloorHeight = 0;
 	float		CalcJumpVelocity	 = 0;
 	Pose		NextCornerPos		 = Pose::Zero;
-	EulerAngles TargetOrientation	 = EulerAngles::Zero;
+	EulerAngles TargetOrientation	 = EulerAngles::Zero; // TargetOrient
 
 	int		 WaterSurfaceDist	= 0;
 	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
 	Vector3i WaterCurrentPull	= Vector3i::Zero;
 
-	int InteractedItem = 0; // Item number.
-	int Vehicle		   = 0; // Item number.
+	int InteractedItem = 0; // InteractedItemNumber
+	int Vehicle		   = 0; // VehicleItemNumber
 };
 
 struct PlayerEffectData
@@ -1351,17 +1392,16 @@ struct LaraInfo
 {
 	static constexpr auto TARGET_COUNT_MAX = 8;
 
-	int ItemNumber = 0; // TODO: Remove. No longer necessary since ItemInfo already has it. -- Sezz 2023.04.09
-
 	LaraControlData	  Control	= {};
 	PlayerContextData Context	= {};
 	PlayerStatusData  Status	= {};
 	PlayerEffectData  Effect	= {};
 	LaraInventoryData Inventory = {};
 
+	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};
 	TorchData		  Torch = {};
-	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
 
 	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
 	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
@@ -1369,16 +1409,16 @@ struct LaraInfo
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
 
-	ItemInfo*								TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
-	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	 = {};
-	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets	 = {};
+	ItemInfo* TargetEntity = nullptr; // TargetEntityPtr. Should use item number instead?
+	std::array<ItemInfo*, TARGET_COUNT_MAX> TargetList	= {};
+	std::array<ItemInfo*, TARGET_COUNT_MAX> LastTargets = {};
 
 	// TODO: Rewrite and restore spasm effect. Also move to PlayerEffectData?
-	int		 HitFrame	  = 0;		 // Frame index.
-	int		 HitDirection = 0;		 // Cardinal direction.
-	FX_INFO* SpasmEffect  = nullptr; // Not saved.
+	int HitFrame	 = 0; // Frame index.
+	int HitDirection = 0; // Cardinal direction.
 
-	int ExtraAnim = 0; // Item number? Only ever set to NO_ITEM or 1.
+	// Item number? Only ever set to NO_ITEM or 1. Probably anim object ID. Might not be needed since AnimObjectID is kept in item.Animation.
+	int ExtraAnim = 0;
 
 	signed char Location		= 0;
 	signed char HighestLocation = 0;

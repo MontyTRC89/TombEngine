@@ -1,8 +1,12 @@
 #include "framework.h"
 
 #include <algorithm>
+#include <ctime>
+#include <filesystem>
+#include <ScreenGrab.h>
+#include <wincodec.h>
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
@@ -28,6 +32,7 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Math;
 
@@ -310,7 +315,7 @@ namespace TEN::Renderer
 
 	void Renderer11::UpdateItemAnimations(RenderView& view)
 	{
-		for (const auto* room : view.roomsToDraw)
+		for (const auto* room : view.RoomsToDraw)
 		{
 			for (const auto* itemToDraw : room->ItemsToDraw)
 			{
@@ -357,7 +362,7 @@ namespace TEN::Renderer
 			farView = DEFAULT_FAR_VIEW;
 
 		m_farView = farView;
-		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
+		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 	}
 
 	bool Renderer11::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
@@ -415,18 +420,25 @@ namespace TEN::Renderer
 
 		if (!itemToDraw->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
+			{
 				UpdateLaraAnimations(false);
+			}
 			else
+			{
 				UpdateItemAnimations(itemNumber, false);
+			}
 		}
 
-		Matrix world;
-
+		auto world = Matrix::Identity;
 		if (worldSpace & SPHERES_SPACE_WORLD)
+		{
 			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+		}
 		else
+		{
 			world = Matrix::Identity * local;
+		}
 
 		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
 
@@ -454,7 +466,7 @@ namespace TEN::Renderer
 
 	void Renderer11::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
 	{
-		if (itemNumber == Lara.ItemNumber)
+		if (itemNumber == LaraItem->Index)
 		{
 			auto& object = *m_moveableObjects[ID_LARA];
 			*outMatrix = object.AnimationTransforms[jointIndex] * m_LaraWorldMatrix;
@@ -509,34 +521,32 @@ namespace TEN::Renderer
 		return Vector2i(m_screenWidth, m_screenHeight);
 	}
 
-	Vector2 Renderer11::GetScreenSpacePosition(const Vector3& pos) const
+	std::optional<Vector2> Renderer11::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);
 		auto cameraPos = Vector4(
-			gameCamera.camera.WorldPosition.x,
-			gameCamera.camera.WorldPosition.y,
-			gameCamera.camera.WorldPosition.z,
+			gameCamera.Camera.WorldPosition.x,
+			gameCamera.Camera.WorldPosition.y,
+			gameCamera.Camera.WorldPosition.z,
 			1.0f);
-		auto cameraDirection = Vector4(
-			gameCamera.camera.WorldDirection.x,
-			gameCamera.camera.WorldDirection.y,
-			gameCamera.camera.WorldDirection.z,
+		auto cameraDir = Vector4(
+			gameCamera.Camera.WorldDirection.x,
+			gameCamera.Camera.WorldDirection.y,
+			gameCamera.Camera.WorldDirection.z,
 			1.0f);
 		
-		// If point is behind camera, return invalid screen space position.
-		if ((point - cameraPos).Dot(cameraDirection) < 0.0f)
-			return INVALID_2D_POSITION;
+		// Point is behind camera; return nullopt.
+		if ((point - cameraPos).Dot(cameraDir) < 0.0f)
+			return std::nullopt;
 
 		// Calculate clip space coords.
-		point = Vector4::Transform(point, gameCamera.camera.ViewProjection);
+		point = Vector4::Transform(point, gameCamera.Camera.ViewProjection);
 
-		// Calculate normalized device coords.
+		// Calculate NDC.
 		point /= point.w;
 
-		// Calculate and return screen space position.
-		return Vector2(
-			((point.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
-			((1.0f - point.y) * SCREEN_SPACE_RES.y) / 2);
+		// Calculate and return 2D position.
+		return TEN::Utils::ConvertNDCTo2DPosition(Vector2(point));
 	}
 
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
@@ -550,7 +560,7 @@ namespace TEN::Renderer
 
 		if (!rendererItem->DoneAnimations)
 		{
-			if (itemNumber == Lara.ItemNumber)
+			if (itemNumber == LaraItem->Index)
 				UpdateLaraAnimations(false);
 			else
 				UpdateItemAnimations(itemNumber, false);
@@ -561,5 +571,24 @@ namespace TEN::Renderer
 
 		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
+	}
+
+	void Renderer11::SaveScreenshot()
+	{
+		char buffer[64];
+		time_t rawtime;
+
+		time(&rawtime);
+		auto time = localtime(&rawtime);
+		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.png", time);
+
+		auto screenPath = g_GameFlow->GetGameDir() + "Screenshots";
+
+		if (!std::filesystem::is_directory(screenPath))
+			std::filesystem::create_directory(screenPath);
+
+		screenPath += buffer;
+		SaveWICTextureToFile(m_context.Get(), m_backBufferTexture, GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
+			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
 }

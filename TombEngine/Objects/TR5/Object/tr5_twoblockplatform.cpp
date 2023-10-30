@@ -57,7 +57,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			bool onObject = false;
 
 			int height = LaraItem->Pose.Position.y + 1;
-			if (GetBridgeItemIntersect(itemNumber, LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, false).has_value())
+			if (GetBridgeItemIntersect(LaraItem->Pose.Position, itemNumber, false).has_value())
 			{
 				if (LaraItem->Pose.Position.y <= item->Pose.Position.y + 32)
 				{
@@ -102,7 +102,7 @@ std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 	if (!item->MeshBits.TestAny())
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 }
 
 std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z)
@@ -112,7 +112,7 @@ std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int 
 	if (!item->MeshBits.TestAny())
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 }
 
 int TwoBlocksPlatformFloorBorder(short itemNumber)

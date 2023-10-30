@@ -15,9 +15,9 @@
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
-#include "LanguageScript.h"
-#include "ScriptInterfaceState.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Internal/LanguageScript.h"
+#include "Scripting/Include/ScriptInterfaceState.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
@@ -62,14 +62,14 @@ Vector2i GetScreenResolution()
 
 std::vector<Vector2i> GetAllSupportedScreenResolutions()
 {
-	std::vector<Vector2i> result;
+	auto resList = std::vector<Vector2i>{};
 
 	DEVMODE dm = { 0 };
 	dm.dmSize = sizeof(dm);
 	for (int iModeNum = 0; EnumDisplaySettings(NULL, iModeNum, &dm) != 0; iModeNum++)
 	{
 		bool add = true;
-		for (auto m : result)
+		for (auto m : resList)
 		{
 			if (m.x == dm.dmPelsWidth && m.y == dm.dmPelsHeight)
 			{
@@ -79,30 +79,19 @@ std::vector<Vector2i> GetAllSupportedScreenResolutions()
 		}
 		if (add)
 		{
-			Vector2i resolution;
-			resolution.x = dm.dmPelsWidth;
-			resolution.y = dm.dmPelsHeight;
-			result.push_back(resolution);
+			auto res = Vector2i(dm.dmPelsWidth, dm.dmPelsHeight);
+			resList.push_back(res);
 		}
 	}
 
 	std::sort(
-		result.begin(),
-		result.end(),
+		resList.begin(), resList.end(),
 		[](Vector2i& a, Vector2i& b)
 		{
-			if (a.x == b.x)
-			{
-				return (a.y < b.y);
-			}
-			else
-			{
-				return (a.x < b.x);
-			}
-		}
-	);
+			return ((a.x == b.x) ? (a.y < b.y) : (a.x < b.x));
+		});
 
-	return result;
+	return resList;
 }
 
 void DisableDpiAwareness()
@@ -142,9 +131,11 @@ void WinProcMsg()
 
 void CALLBACK HandleWmCommand(unsigned short wParam)
 {
-	if (wParam == 8)
+	if (wParam == WM_KILLFOCUS)
 	{
-		if (!IsLevelLoading)
+		// make sure we suspend the game (if focus is removed) only if the level is not being loaded
+		
+		if (!LevelLoadTask.valid())
 		{
 			SuspendThread((HANDLE)ThreadHandle);
 			g_Renderer.ToggleFullScreen();
@@ -152,7 +143,7 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 
 			if (g_Renderer.IsFullsScreen())
 			{
-				SetCursor(0);
+				SetCursor(nullptr);
 				ShowCursor(false);
 			}
 			else
@@ -203,14 +194,14 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
-			if (!g_Configuration.Windowed)
+			if (!g_Configuration.EnableWindowedMode)
 				g_Renderer.ToggleFullScreen(true);
 
 			if (!DebugMode && ThreadHandle > 0)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
-				ResumeAllSounds();
+				ResumeAllSounds(SoundPauseMode::Global);
 			}
 
 			return 0;
@@ -218,14 +209,14 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		if (!g_Configuration.Windowed)
+		if (!g_Configuration.EnableWindowedMode)
 			ShowWindow(hWnd, SW_MINIMIZE);
 
 		if (!DebugMode)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
-			PauseAllSounds();
+			PauseAllSounds(SoundPauseMode::Global);
 		}
 	}
 
@@ -362,7 +353,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Register main window.
 	if (!RegisterClass(&App.WindowClass))
 	{
-		TENLog("Unable To Register Window Class", LogLevel::Error);
+		TENLog("Unable to register window class.", LogLevel::Error);
 		return 0;
 	}
 
@@ -383,33 +374,41 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	// Set up window dimensions.
-	RECT Rect;
-	Rect.left = 0;
-	Rect.top = 0;
-	Rect.right = g_Configuration.Width;
-	Rect.bottom = g_Configuration.Height;
-	AdjustWindowRect(&Rect, WS_CAPTION, false);
+	RECT rect;
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = g_Configuration.ScreenWidth;
+	rect.bottom = g_Configuration.ScreenHeight;
+	AdjustWindowRect(&rect, WS_CAPTION, false);
 
-	// Make window handle.
+	// Calculate window resolution.
+	auto windowRes = Vector2i(rect.right - rect.left, rect.bottom - rect.top);
+
+	// Get screen resolution of primary monitor.
+	auto screenRes = Vector2i(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+
+	// Calculate centered window position on screen.
+	auto windowPos = (screenRes - windowRes) / 2;
+
+	// Create window handle.
 	App.WindowHandle = CreateWindowEx(
 		0,
 		"TombEngine",
 		g_GameFlow->GetString(STRING_WINDOW_TITLE),
 		WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX,
-		CW_USEDEFAULT, // TODO: change this to center of screen!
-		CW_USEDEFAULT,
-		Rect.right - Rect.left,
-		Rect.bottom - Rect.top,
+		windowPos.x,
+		windowPos.y,
+		windowRes.x,
+		windowRes.y,
 		NULL,
 		NULL,
 		App.hInstance,
-		NULL
-	);
+		NULL);
 
-	// Register window handle
+	// Register window handle.
 	if (!App.WindowHandle)
 	{
-		TENLog("Unable To Create Window. Error: " + std::to_string(GetLastError()), LogLevel::Error);
+		TENLog("Unable to create Window. Error: " + std::to_string(GetLastError()), LogLevel::Error);
 		return 0;
 	}
 	else
@@ -419,19 +418,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	try
 	{
-		// Unlike CoInitialize(), this line prevents event spamming if one of dll fails
+		// Unlike CoInitialize(), this line prevents event spamming if a .dll fails.
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
-		// Initialize the renderer
-		g_Renderer.Initialize(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
+		// Initialize renderer.
+		g_Renderer.Initialize(g_Configuration.ScreenWidth, g_Configuration.ScreenHeight, g_Configuration.EnableWindowedMode, App.WindowHandle);
 
-		// Initialize audio
+		// Initialize audio.
 		Sound_Init(gameDir);
 
-		// Initialize input
+		// Initialize input.
 		InitializeInput(App.WindowHandle);
 
-		// Load level if specified in command line
+		// Load level if specified in command line.
 		CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
 
 		App.bNoFocus = false;
@@ -496,5 +495,4 @@ void WinClose()
 	ShutdownTENLog();
 
 	CoUninitialize();
-
 }

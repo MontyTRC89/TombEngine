@@ -25,10 +25,10 @@ namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SMAN_WAIT_RANGE = SQUARE(BLOCK(4));
 
-	const auto SkidooBiteLeft  = CreatureBiteInfo(Vector3i(240, -80, 540), 0);
-	const auto SkidooBiteRight = CreatureBiteInfo(Vector3i(-240, -80, 540), 0);
-	const auto SkidooBiteSmokeLeft	= CreatureBiteInfo(Vector3i(240, -80, 450), 0);
-	const auto SkidooBiteSmokeRight = CreatureBiteInfo(Vector3i(-240, -80, 450), 0);
+	const auto SkidooBiteLeft  = CreatureBiteInfo(Vector3(240, -80, 540), 0);
+	const auto SkidooBiteRight = CreatureBiteInfo(Vector3(-240, -80, 540), 0);
+	const auto SkidooBiteSmokeLeft	= CreatureBiteInfo(Vector3(240, -80, 450), 0);
+	const auto SkidooBiteSmokeRight = CreatureBiteInfo(Vector3(-240, -80, 450), 0);
 
 	constexpr auto SKIDOO_MAN_TURN_RATE_MIN = ANGLE(2.0f);
 	constexpr auto SKIDOO_MAN_TARGET_ANGLE	= ANGLE(30.0f);
@@ -72,7 +72,7 @@ namespace TEN::Entities::Creatures::TR2
 		InitializeItem(skidooItemNumber); g_Level.NumItems++;
 
 		// Register snowmobile gun for driver to control.
-		riderItem.Data = skidooItemNumber;
+		riderItem.ItemFlags[0] = skidooItemNumber;
 	}
 
 	void InitializeSkidooMan(short itemNumber)
@@ -118,17 +118,17 @@ namespace TEN::Entities::Creatures::TR2
 	void SkidooManControl(short riderItemNumber)
 	{
 		auto& riderItem = g_Level.Items[riderItemNumber];
-		if (!riderItem.Data)
+		if (!riderItem.ItemFlags[0])
 		{
 			// Create snowmobile.
 			CreateSkidooGun(riderItem);
-			if (!riderItem.Data)
+			if (!riderItem.ItemFlags[0])
 				TENLog("Skidoo rider data does not contain skidoo item ID.", LogLevel::Error);
 
 			return;
 		}
 
-		int skidooItemNumber = (short)riderItem.Data;
+		int skidooItemNumber = (short)riderItem.ItemFlags[0];
 		auto* skidooItem = &g_Level.Items[skidooItemNumber];
 
 		if (!skidooItem->Data)

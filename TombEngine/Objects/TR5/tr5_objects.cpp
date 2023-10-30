@@ -49,7 +49,6 @@
 #include "Objects/TR5/Object/tr5_genslot.h"
 #include "Objects/TR5/Object/tr5_highobject.h"
 #include "Objects/TR5/Object/tr5_missile.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Objects/TR5/Object/tr5_raisingblock.h"
 #include "Objects/TR5/Switch/tr5_raisingcog.h"
 #include "Objects/TR5/Object/tr5_teleporter.h"
@@ -257,7 +256,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 512;
 		obj->intelligent = true;
 		obj->waterCreature = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(0, ROT_X);
 		obj->SetBoneRotationFlags(1, ROT_X);
@@ -406,7 +405,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->LotType = LotType::Human;
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
@@ -443,7 +442,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 128;
 		obj->intelligent = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
 		obj->SetupHitEffect(true);
@@ -460,7 +459,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
@@ -623,7 +622,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = ControlGuardian;
 		obj->explodableMeshbits = 6;
 		obj->usingDrawAnimatingItem = false;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->nonLot = true;
 		obj->SetupHitEffect(true);
 	}
@@ -637,7 +636,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->Initialize = InitializeAutoGuns;
 		obj->control = ControlAutoGun;
 		obj->intelligent = true;
-		obj->undead = true;
+		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_Y);
 		obj->SetupHitEffect(true);
@@ -659,9 +658,6 @@ static void StartObject(ObjectInfo *obj)
 
 	for (int objectNumber = ID_SEARCH_OBJECT1; objectNumber <= ID_SEARCH_OBJECT4; objectNumber++)
 		InitSearchObject(obj, objectNumber);
-
-	for (int objectNumber = ID_PUSHABLE_OBJECT1; objectNumber <= ID_PUSHABLE_OBJECT10; objectNumber++)
-		InitPushableObject(obj, objectNumber);
 
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
 	if (obj->loaded)

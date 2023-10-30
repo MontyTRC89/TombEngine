@@ -73,13 +73,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
@@ -91,13 +91,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
@@ -111,7 +111,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -121,7 +121,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
-      <DisableSpecificWarnings>4244;5051;4018;4554;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -158,7 +158,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -168,7 +168,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
-      <DisableSpecificWarnings>4244;5051;4018;4554;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -205,7 +205,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -225,7 +225,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
-      <DisableSpecificWarnings>4244;5051;4018;4554;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -266,7 +267,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -286,7 +287,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
-      <DisableSpecificWarnings>4244;5051;4018;4554;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -321,11 +323,13 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Game\collision\Interaction.h" />
+    <ClInclude Include="Game\effects\Bubble.h" />
+    <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\Hud\PickupSummary.h" />
     <ClInclude Include="Game\Hud\StatusBars.h" />
+    <ClInclude Include="Game\Hud\TargetHighlighter.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -371,7 +375,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\effects\Hair.h" />
     <ClInclude Include="Game\effects\Ripple.h" />
     <ClInclude Include="Game\effects\Streamer.h" />
-    <ClInclude Include="Game\effects\bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\effects\debris.h" />
     <ClInclude Include="Game\effects\effects.h" />
@@ -433,6 +436,14 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\Object\Ladder.h" />
     <ClInclude Include="Objects\Generic\Object\objects.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableBridge.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableCollision.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableEffects.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableInfo.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableObject.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableSound.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableStack.h" />
+    <ClInclude Include="Objects\Generic\Object\Pushable\PushableStates.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
     <ClInclude Include="Objects\Generic\Switches\AirlockSwitch.h" />
     <ClInclude Include="Objects\Generic\Switches\cog_switch.h" />
@@ -444,12 +455,14 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="Objects\Generic\Switches\turn_switch.h" />
     <ClInclude Include="Objects\Generic\Switches\underwater_switch.h" />
+    <ClInclude Include="Objects\Generic\Traps\CrumblingPlatform.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\Generic\generic_objects.h" />
     <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Objects\Sink.h" />
     <ClInclude Include="Objects\TR1\Entity\Cowboy.h" />
+    <ClInclude Include="Objects\TR1\Entity\Kold.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_ape.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bear.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_big_rat.h" />
@@ -457,11 +470,13 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR1\Entity\tr1_doppelganger.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_natla.h" />
+    <ClInclude Include="Objects\TR1\Entity\SkateboardKid.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Objects\TR1\Trap\SlammingDoors.h" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
+    <ClInclude Include="Objects\TR1\Trap\SwingingBlade.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_bird_monster.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
@@ -567,6 +582,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
+    <ClInclude Include="Objects\TR4\Trap\SpikyCeiling.h" />
+    <ClInclude Include="Objects\TR4\Trap\SpikyWall.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_blade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_catwalkblade.h" />
@@ -582,8 +599,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Trap\tr4_sethblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_slicerdicer.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_spikeball.h" />
-    <ClInclude Include="Objects\TR4\Trap\tr4_spikyceiling.h" />
-    <ClInclude Include="Objects\TR4\Trap\tr4_spikywall.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_stargate.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_teethspike.h" />
     <ClInclude Include="Objects\TR4\Vehicles\jeep.h" />
@@ -624,8 +639,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_highobject.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_missile.h" />
-    <ClInclude Include="Objects\TR5\Object\tr5_pushableblock.h" />
-    <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_raisingblock.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_rollingball.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_teleporter.h" />
@@ -645,6 +658,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Utils\object_helper.h" />
     <ClInclude Include="Objects\game_object_ids.h" />
     <ClInclude Include="Objects\objectslist.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\ShaderFogBulb.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\SkyBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffer\ConstantBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AnimatedBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\BlendingBuffer.h" />
@@ -665,6 +680,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h" />
     <ClInclude Include="Renderer\Quad\RenderQuad.h" />
+    <ClInclude Include="Renderer\RendererSprite2D.h" />
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
@@ -681,6 +697,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
     <ClInclude Include="Renderer\Structures\RendererDoor.h" />
+    <ClInclude Include="Renderer\Structures\RendererFogBulb.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
@@ -703,6 +720,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
     <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\AlignModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScaleModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectsFunctions.h" />
@@ -714,14 +734,19 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Settings\Settings.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Input\ActionIDs.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Input\InputHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Inventory\InventoryHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Logic\LevelFunc.h" />
     <ClInclude Include="Scripting\Internal\TEN\Logic\LogicHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\ActionIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\CameraTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Misc\LevelLog.h" />
     <ClInclude Include="Scripting\Internal\TEN\Misc\Miscellaneous.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Misc\SoundTrackTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\AIObject\AIObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Camera\CameraObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\AmmoTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Moveable\MoveableObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\NamedBase.h" />
@@ -735,10 +760,16 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Objects\Static\StaticObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Rotation\Rotation.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Sound\SoundHandler.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Sound\SoundTrackTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Strings\DisplayString\DisplayString.h" />
     <ClInclude Include="Scripting\Internal\TEN\Strings\StringsHandler.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Util\LevelLog.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Util\Util.h" />
     <ClInclude Include="Scripting\Internal\TEN\Vec2\Vec2.h" />
     <ClInclude Include="Scripting\Internal\TEN\Vec3\Vec3.h" />
+    <ClInclude Include="Scripting\Internal\TEN\View\CameraTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\View\ViewHandler.h" />
     <ClInclude Include="Sound\sound.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\BitField.h" />
@@ -778,7 +809,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
-    <ClCompile Include="Game\collision\Interaction.cpp" />
     <ClCompile Include="Game\collision\sphere.cpp" />
     <ClCompile Include="Game\control\box.cpp" />
     <ClCompile Include="Game\control\control.cpp" />
@@ -789,15 +819,16 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\control\volume.cpp" />
     <ClCompile Include="Game\debug\debug.cpp" />
     <ClCompile Include="Game\effects\Blood.cpp" />
-    <ClCompile Include="Game\effects\bubble.cpp" />
+    <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
     <ClCompile Include="Game\effects\debris.cpp" />
-    <ClCompile Include="Game\effects\drip.cpp" />
+    <ClCompile Include="Game\effects\DisplaySprite.cpp" />
+    <ClCompile Include="Game\effects\Drip.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
     <ClCompile Include="Game\effects\Electricity.cpp" />
     <ClCompile Include="Game\effects\explosion.cpp" />
-    <ClCompile Include="Game\effects\footprint.cpp" />
-    <ClCompile Include="Game\effects\hair.cpp" />
+    <ClCompile Include="Game\effects\Footprint.cpp" />
+    <ClCompile Include="Game\effects\Hair.cpp" />
     <ClCompile Include="Game\effects\item_fx.cpp" />
     <ClCompile Include="Game\effects\Ripple.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />
@@ -811,6 +842,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\Hud\PickupSummary.cpp" />
     <ClCompile Include="Game\Hud\StatusBars.cpp" />
+    <ClCompile Include="Game\Hud\TargetHighlighter.cpp" />
     <ClCompile Include="Game\itemdata\creature_info.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\items.cpp" />
@@ -880,6 +912,14 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Object\Ladder.cpp" />
     <ClCompile Include="Objects\Generic\Object\objects.cpp" />
     <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableBridge.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableCollision.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableEffects.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableInfo.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableObject.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableSound.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableStack.cpp" />
+    <ClCompile Include="Objects\Generic\Object\Pushable\PushableStates.cpp" />
     <ClCompile Include="Objects\Generic\Object\rope.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Switches\AirlockSwitch.cpp" />
@@ -893,9 +933,11 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Objects\Generic\Switches\turn_switch.cpp" />
     <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp" />
+    <ClCompile Include="Objects\Generic\Traps\CrumblingPlatform.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
     <ClCompile Include="Objects\TR1\Entity\Cowboy.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\Kold.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_big_rat.cpp" />
@@ -903,11 +945,13 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR1\Entity\tr1_doppelganger.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_giant_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_natla.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\SkateboardKid.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_winged_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SlammingDoors.cpp" />
+    <ClCompile Include="Objects\TR1\Trap\SwingingBlade.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_barracuda.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_bird_monster.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_dragon.cpp" />
@@ -1004,6 +1048,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Object\tr4_senet.cpp" />
     <ClCompile Include="Objects\TR4\Object\WraithTrap.cpp" />
     <ClCompile Include="Objects\TR4\tr4_objects.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\SpikyCeiling.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\SpikyWall.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_birdblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_blade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_catwalkblade.cpp" />
@@ -1019,8 +1065,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Trap\tr4_sethblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_slicerdicer.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_spikeball.cpp" />
-    <ClCompile Include="Objects\TR4\Trap\tr4_spikyceiling.cpp" />
-    <ClCompile Include="Objects\TR4\Trap\tr4_spikywall.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_stargate.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />
@@ -1056,7 +1100,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_highobject.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_missile.cpp" />
-    <ClCompile Include="Objects\TR5\Object\tr5_pushableblock.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_raisingblock.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_rollingball.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_teleporter.cpp" />
@@ -1115,6 +1158,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptUtil.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Color\Color.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Effects\EffectsFunctions.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Animations\Animations.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\FlowHandler.cpp" />
@@ -1124,9 +1168,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Settings\Settings.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Input\InputHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Logic\LogicHandler.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Misc\Miscellaneous.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\AIObject\AIObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Camera\CameraObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.cpp" />
@@ -1138,10 +1182,13 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Scripting\Internal\TEN\Objects\Static\StaticObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Rotation\Rotation.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Sound\SoundHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Strings\DisplayString\DisplayString.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Strings\StringsHandler.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Util\Util.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Vec2\Vec2.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Vec3\Vec3.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\View\ViewHandler.cpp" />
     <ClCompile Include="Sound\sound.cpp" />
     <ClCompile Include="Specific\BitField.cpp" />
     <ClCompile Include="Specific\clock.cpp" />

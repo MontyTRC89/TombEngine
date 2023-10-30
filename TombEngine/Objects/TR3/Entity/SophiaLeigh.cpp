@@ -11,16 +11,16 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
+#include "Game/misc.h"
+#include "Game/setup.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/people.h"
+#include "Game/effects/spark.h"
 #include "Objects/Effects/Boss.h"
 #include "Objects/Effects/enemy_missile.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "misc.h"
-#include "setup.h"
-#include "lara_helpers.h"
-#include "tomb4fx.h"
-#include "people.h"
-#include "Game/effects/spark.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Entities::Effects;
@@ -63,9 +63,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
 
-	const auto SophiaLeighStaffBite = CreatureBiteInfo(Vector3i(-28, 56, 356), 10);
-	const auto SophiaLeighLeftBite	= CreatureBiteInfo(Vector3i(-72, 48, 356), 10);
-	const auto SophiaLeighRightBite = CreatureBiteInfo(Vector3i(16, 48, 304), 10);
+	const auto SophiaLeighStaffBite = CreatureBiteInfo(Vector3(-28, 56, 356), 10);
+	const auto SophiaLeighLeftBite	= CreatureBiteInfo(Vector3(-72, 48, 356), 10);
+	const auto SophiaLeighRightBite = CreatureBiteInfo(Vector3(16, 48, 304), 10);
 
 	struct SophiaData
 	{

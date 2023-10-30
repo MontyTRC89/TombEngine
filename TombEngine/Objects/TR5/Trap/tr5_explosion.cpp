@@ -142,8 +142,8 @@ void ExplosionControl(short itemNumber)
 						TriggerShockwave(&CollidedItems[i]->Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 						CollidedItems[i]->Pose.Position.y += 128;
 						ExplodeItemNode(CollidedItems[i], 0, 0, 80);
-						SmashObject(CollidedItems[i] - g_Level.Items.data());
-						KillItem(CollidedItems[i] - g_Level.Items.data());
+						SmashObject(CollidedItems[i]->Index);
+						KillItem(CollidedItems[i]->Index);
 					}
 					else if (CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE7 && CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE8)
 					{
@@ -161,7 +161,7 @@ void ExplosionControl(short itemNumber)
 				i = 0;
 				while (CollidedMeshes[i])
 				{
-					if (StaticObjects[CollidedMeshes[i]->staticNumber].shatterType != SHT_NONE)
+					if (StaticObjects[CollidedMeshes[i]->staticNumber].shatterType != ShatterType::None)
 					{
 						TriggerExplosionSparks(CollidedMeshes[i]->pos.Position.x, CollidedMeshes[i]->pos.Position.y, CollidedMeshes[i]->pos.Position.z, 3, -2, 0, item->RoomNumber);
 						CollidedMeshes[i]->pos.Position.y -= 128;

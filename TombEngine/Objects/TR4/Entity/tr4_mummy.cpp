@@ -28,8 +28,8 @@ namespace TEN::Entities::TR4
 	constexpr auto MUMMY_WALK_TURN_RATE_MAX	  = ANGLE(7.0f);
 	constexpr auto MUMMY_ATTACK_TURN_RATE_MAX = ANGLE(7.0f);
 
-	const auto MummyBite1 = CreatureBiteInfo(Vector3i::Zero, 11);
-	const auto MummyBite2 = CreatureBiteInfo(Vector3i::Zero, 14);
+	const auto MummyBite1 = CreatureBiteInfo(Vector3::Zero, 11);
+	const auto MummyBite2 = CreatureBiteInfo(Vector3::Zero, 14);
 	const auto MummySwipeAttackJoints = std::vector<unsigned int>{ 11, 14 };
 
 	enum MummyState
@@ -98,7 +98,6 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
-		short tiltAngle = 0;
 		short joint0 = 0;
 		short joint1 = 0;
 		short joint2 = 0;

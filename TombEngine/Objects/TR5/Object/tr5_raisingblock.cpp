@@ -20,8 +20,9 @@ void InitializeRaisingBlock(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->RoomNumber;
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	if(floor->Box != NO_BOX)
+	auto* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+
+	if (floor->Box != NO_BOX)
 		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
 	// Set mutators to EulerAngles identity by default.
@@ -38,6 +39,22 @@ void InitializeRaisingBlock(short itemNumber)
 	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
 }
 
+void ShakeRaisingBlock(ItemInfo* item)
+{
+	SoundEffect(SFX_TR4_RAISING_BLOCK, &item->Pose);
+
+	if (item->TriggerFlags == 0)
+		return;
+
+	if ((item->Pose.Position.ToVector3() - Camera.pos.ToVector3()).Length() < BLOCK(10))
+	{
+		if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
+			Camera.bounce = -32;
+		else
+			Camera.bounce = -16;
+	}
+}
+
 void ControlRaisingBlock(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -46,49 +63,17 @@ void ControlRaisingBlock(short itemNumber)
 	{
 		if (!item->ItemFlags[2])
 		{
-			if (item->ObjectNumber == ID_RAISING_BLOCK1)
-			{
-				if (item->TriggerFlags == -1)
-				{
-					//AlterFloorHeight(item, -255);
-				}
-				else if (item->TriggerFlags == -3)
-				{
-					//AlterFloorHeight(item, -1023);
-				}
-				else
-				{
-					//AlterFloorHeight(item, -item->itemFlags[7]);
-				}
-			}
-			else
-			{
-				//AlterFloorHeight(item, -item->itemFlags[7]);
-			}
-
 			item->ItemFlags[2] = 1;
 		}
 
 		if (item->TriggerFlags < 0)
+		{
 			item->ItemFlags[1] = 1;
+		}
 		else if (item->ItemFlags[1] < 4096)
 		{
-			SoundEffect(SFX_TR4_RAISING_BLOCK, &item->Pose);
-
+			ShakeRaisingBlock(item);
 			item->ItemFlags[1] += 64;
-
-			if (item->TriggerFlags > 0)
-			{
-				if (abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-					abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-					abs(item->Pose.Position.x - Camera.pos.x) < 10240)
-				{
-					if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
-						Camera.bounce = -32;
-					else
-						Camera.bounce = -16;
-				}
-			}
 		}
 	}
 	else if (item->ItemFlags[1] <= 0 || item->TriggerFlags < 0)
@@ -101,22 +86,12 @@ void ControlRaisingBlock(short itemNumber)
 			{
 				if (item->TriggerFlags == -1)
 				{
-					//AlterFloorHeight(item, 255);
 					item->ItemFlags[2] = 0;
 				}
 				else if (item->TriggerFlags == -3)
 				{
-					//AlterFloorHeight(item, 1023);
 					item->ItemFlags[2] = 0;
 				}
-				else
-				{
-					//AlterFloorHeight(item, item->itemFlags[7]);
-				}
-			}
-			else
-			{
-				//AlterFloorHeight(item, item->itemFlags[7]);
 			}
 
 			item->ItemFlags[2] = 0;
@@ -124,21 +99,7 @@ void ControlRaisingBlock(short itemNumber)
 	}
 	else
 	{
-		SoundEffect(SFX_TR4_RAISING_BLOCK, &item->Pose);
-
-		if (item->TriggerFlags >= 0)
-		{
-			if (abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-				abs(item->Pose.Position.x - Camera.pos.x) < 10240 &&
-				abs(item->Pose.Position.x - Camera.pos.x) < 10240)
-			{
-				if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
-					Camera.bounce = -32;
-				else
-					Camera.bounce = -16;
-			}
-		}
-
+		ShakeRaisingBlock(item);
 		item->ItemFlags[1] -= 64;
 	}
 
@@ -152,7 +113,7 @@ void ControlRaisingBlock(short itemNumber)
 
 std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 {
-	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	auto bboxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 
 	if (bboxHeight.has_value())
 	{
@@ -170,7 +131,7 @@ std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
 
 std::optional<int> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
 {
-	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	auto bboxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 
 	if (bboxHeight.has_value())
 		return std::optional{ bboxHeight.value() + 1 };

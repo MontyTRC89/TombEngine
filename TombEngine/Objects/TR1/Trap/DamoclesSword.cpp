@@ -14,24 +14,31 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Traps::TR1
 {
+	// NOTES:
+	// ItemFlags[0] = random turn rate when active.
+	// ItemFlags[1] = calculated forward velocity.
+
 	constexpr auto DAMOCLES_SWORD_DAMAGE = 100;
 
 	constexpr auto DAMOCLES_SWORD_VELOCITY_MIN = BLOCK(1 / 20.0f);
 	constexpr auto DAMOCLES_SWORD_VELOCITY_MAX = BLOCK(1 / 8.0f);
 
 	constexpr auto DAMOCLES_SWORD_IMPALE_DEPTH			  = -BLOCK(1 / 8.0f);
-	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_2D		  = BLOCK(3 / 2.0f);
+	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_2D		  = BLOCK(1.5f);
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL = BLOCK(3);
 
 	constexpr auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto DAMOCLES_SWORD_TURN_RATE_MIN = ANGLE(1.0f);
 
 	void InitializeDamoclesSword(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
+		int sign = Random::TestProbability(0.5f) ? 1 : -1;
+
 		item.Pose.Orientation.y = Random::GenerateAngle();
 		item.Animation.Velocity.y = DAMOCLES_SWORD_VELOCITY_MIN;
-		item.ItemFlags[0] = Random::GenerateAngle(-DAMOCLES_SWORD_TURN_RATE_MAX, DAMOCLES_SWORD_TURN_RATE_MAX); // NOTE: ItemFlags[0] stores random turn rate.
+		item.ItemFlags[0] = Random::GenerateAngle(DAMOCLES_SWORD_TURN_RATE_MIN, DAMOCLES_SWORD_TURN_RATE_MAX) * sign;
 	}
 
 	void ControlDamoclesSword(short itemNumber)
@@ -42,14 +49,14 @@ namespace TEN::Entities::Traps::TR1
 		// Fall toward player.
 		if (item.Animation.IsAirborne)
 		{
-			item.Pose.Orientation.y += item.ItemFlags[0]; // NOTE: ItemFlags[0] stores random turn rate.
+			item.Pose.Orientation.y += item.ItemFlags[0];
 
 			// Calculate vertical velocity.
 			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
 
 			// Translate sword.
 			short headingAngle = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), laraItem.Pose.Position.ToVector3()).y;
-			TranslateItem(&item, headingAngle, item.ItemFlags[1], item.Animation.Velocity.y); // NOTE: ItemFlags[1] stores calculated forward velocity.
+			TranslateItem(&item, headingAngle, item.ItemFlags[1], item.Animation.Velocity.y);
 
 			int vPos = item.Pose.Position.y;
 			auto pointColl = GetCollision(&item);
@@ -63,7 +70,7 @@ namespace TEN::Entities::Traps::TR1
 
 				item.Animation.IsAirborne = false;
 				item.Status = ItemStatus::ITEM_DEACTIVATED;
-				item.ItemFlags[0] = 0; // NOTE: ItemFlags[0] stores random turn rate.
+				item.ItemFlags[0] = 0;
 
 				RemoveActiveItem(itemNumber);
 			}
@@ -74,7 +81,7 @@ namespace TEN::Entities::Traps::TR1
 		// Scan for player.
 		if (item.Pose.Position.y < GetCollision(&item).Position.Floor)
 		{
-			item.Pose.Orientation.y += item.ItemFlags[0]; // NOTE: ItemFlags[0] stores random turn rate.
+			item.Pose.Orientation.y += item.ItemFlags[0];
 
 			// Check vertical position to player.
 			if (item.Pose.Position.y >= laraItem.Pose.Position.y)
@@ -95,7 +102,7 @@ namespace TEN::Entities::Traps::TR1
 			// Drop sword.
 			// TODO: Have 2D velocity also take vertical distance into account.
 			item.Animation.IsAirborne = true;
-			item.ItemFlags[1] = distance2D / 32; // NOTE: ItemFlags[1] stores calculated forward velocity.
+			item.ItemFlags[1] = distance2D / 32;
 			return;
 		}
 	}
@@ -108,7 +115,7 @@ namespace TEN::Entities::Traps::TR1
 			return;
 
 		if (coll->Setup.EnableObjectPush)
-			ItemPushItem(&item, laraItem, coll, false, true);
+			ItemPushItem(&item, laraItem, coll, false, 1);
 
 		if (item.Animation.IsAirborne)
 		{

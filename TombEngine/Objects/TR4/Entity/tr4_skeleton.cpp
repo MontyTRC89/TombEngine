@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 
-	const auto SkeletonBite = CreatureBiteInfo(Vector3i(0, -16, 200), 11);
+	const auto SkeletonBite = CreatureBiteInfo(Vector3(0, -16, 200), 11);
 	const auto SkeletonSwordAttackJoints = std::vector<unsigned int>{ 15, 16 };
 
 	enum SkeletonState
@@ -189,7 +189,7 @@ namespace TEN::Entities::TR4
 		spark->gravity = -4 - (GetRandomControl() & 3);
 		spark->scalar = 3;
 		spark->maxYvel = -4 - (GetRandomControl() & 3);
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 8;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 8;
 		spark->dSize = spark->size * 4;
 	}
 
@@ -650,7 +650,7 @@ namespace TEN::Entities::TR4
 
 							if (abs(pos.x - staticMesh->pos.Position.x) < BLOCK(1) && 
 								abs(pos.z - staticMesh->pos.Position.z) < BLOCK(1) &&
-								StaticObjects[staticMesh->staticNumber].shatterType != SHT_NONE)
+								StaticObjects[staticMesh->staticNumber].shatterType != ShatterType::None)
 							{
 								ShatterObject(0, staticMesh, -128, LaraItem->RoomNumber, 0);
 								SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);

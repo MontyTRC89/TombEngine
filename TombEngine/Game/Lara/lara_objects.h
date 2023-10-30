@@ -25,6 +25,7 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll);
 void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll);
 void lara_as_pushable_pull(ItemInfo* item, CollisionInfo* coll);
 void lara_as_pushable_grab(ItemInfo* item, CollisionInfo* coll);
+void lara_as_pushable_edge_slip(ItemInfo* item, CollisionInfo* coll);
 
 // Pulley
 void lara_as_pulley(ItemInfo* item, CollisionInfo* coll);

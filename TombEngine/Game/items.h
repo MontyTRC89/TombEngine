@@ -47,7 +47,7 @@ enum ItemFlags
 	IFLAG_TRIGGERED       = (1 << 5),
 	IFLAG_CLEAR_BODY	  = (1 << 7),
 	IFLAG_INVISIBLE		  = (1 << 8),
-	IFLAG_ACTIVATION_MASK = 0x3E00, // Bits 9-13 (IFLAG_CODEBITS)
+	IFLAG_ACTIVATION_MASK = (0x1F << 9), // Bits 9-13 (IFLAG_CODEBITS)
 	IFLAG_REVERSE		  = (1 << 14),
 	IFLAG_KILLED		  = (1 << 15)
 };
@@ -165,7 +165,7 @@ struct ItemInfo
 	short TriggerFlags;
 
 	// TODO: Move to CreatureInfo?
-	uint8_t AIBits; // AIObjectType enum.
+	unsigned char AIBits; // AIObjectType enum.
 	short AfterDeath;
 	short CarriedItem;
 
@@ -218,3 +218,5 @@ void DoDamage(ItemInfo* item, int damage);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber);
+
+Vector3i GetNearestSectorCenter(const Vector3i& pos);

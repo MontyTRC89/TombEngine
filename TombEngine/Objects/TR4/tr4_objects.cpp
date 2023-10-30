@@ -55,6 +55,8 @@
 // Switches
 
 // Traps
+#include "Objects/TR4/Trap/SpikyCeiling.h"
+#include "Objects/TR4/Trap/SpikyWall.h"
 #include "Objects/TR4/Trap/tr4_birdblade.h"
 #include "Objects/TR4/Trap/tr4_blade.h"
 #include "Objects/TR4/Trap/tr4_catwalkblade.h"
@@ -69,8 +71,6 @@
 #include "Objects/TR4/Trap/tr4_sethblade.h"
 #include "Objects/TR4/Trap/tr4_slicerdicer.h"
 #include "Objects/TR4/Trap/tr4_spikeball.h"
-#include "Objects/TR4/Trap/tr4_spikywall.h"
-#include "Objects/TR4/Trap/tr4_spikyceiling.h"
 #include "Objects/TR4/Trap/tr4_stargate.h"
 #include "Objects/TR4/Trap/tr4_cog.h"
 #include "Objects/TR4/Trap/tr4_teethspike.h"
@@ -260,7 +260,7 @@ namespace TEN::Entities
 			obj->HitPoints = 15;
 			obj->radius = 170;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::Explosion;
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
 		}
@@ -277,7 +277,7 @@ namespace TEN::Entities
 			obj->radius = 128;
 			obj->explodableMeshbits = 0xA00;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::Explosion;
 			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect();
 		}
@@ -293,7 +293,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_Y);
 			obj->SetupHitEffect();
@@ -310,7 +310,6 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 204;
 			obj->intelligent = true;
-			obj->undead = false;
 			obj->LotType = LotType::Flyer;
 			obj->SetupHitEffect();
 		}
@@ -326,7 +325,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->LotType = LotType::Skeleton;
 			obj->SetupHitEffect(true);
 		}
@@ -342,7 +341,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 341;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(8, ROT_X | ROT_Y | ROT_Z);
 			obj->SetBoneRotationFlags(20, ROT_Y);
 			obj->SetupHitEffect(true);
@@ -413,7 +412,7 @@ namespace TEN::Entities
 			obj->control = SentryGunControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->HitPoints = 30;
 			obj->pivotLength = 50;
 			obj->radius = 204;
@@ -489,7 +488,7 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetupHitEffect();
 		}
 
@@ -571,7 +570,7 @@ namespace TEN::Entities
 			obj->pivotLength = 50;
 			obj->radius = 128;
 			obj->intelligent = true;
-			obj->undead = true;
+			obj->damageType = DamageMode::None;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 			obj->SetupHitEffect();
@@ -634,7 +633,7 @@ namespace TEN::Entities
 			obj->pivotLength = 500;
 			obj->radius = 512;
 			obj->intelligent = true;
-			obj->undead = true; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
+			obj->damageType = DamageMode::None; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
 			obj->LotType = LotType::HumanPlusJumpAndMonkey;
 			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);
@@ -901,15 +900,16 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeSpikyWall;
 			obj->control = ControlSpikyWall;
-			obj->collision = ObjectCollision;
+			obj->collision = CollideSpikyWall;
 			obj->SetupHitEffect(true);
 		}
 
 		obj = &Objects[ID_SPIKY_CEILING];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializeSpikyCeiling;
 			obj->control = ControlSpikyCeiling;
-			obj->collision = TrapCollision;
+			obj->collision = CollideSpikyCeiling;
 			obj->SetupHitEffect(true);
 		}
 

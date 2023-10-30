@@ -61,8 +61,6 @@ namespace TEN::Entities::Vehicles
 	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
 
-	constexpr auto IN_SKIDOO_FIRE = IN_DRAW;
-
 	const std::vector<VehicleMountType> SkidooMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -366,7 +364,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != skidooItem->RoomNumber)
 			{
 				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(laraItem->Index, probe.RoomNumber);
 			}
 
 			AnimateItem(laraItem);
@@ -382,7 +380,7 @@ namespace TEN::Entities::Vehicles
 		if (probe.RoomNumber != skidooItem->RoomNumber)
 		{
 			ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+			ItemNewRoom(laraItem->Index, probe.RoomNumber);
 		}
 
 		if (laraItem->Animation.ActiveState != SKIDOO_STATE_FALLOFF)
@@ -425,6 +423,7 @@ namespace TEN::Entities::Vehicles
 	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch)
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		int maxVelocity = 0;
 		bool drive = false;
@@ -433,13 +432,12 @@ namespace TEN::Entities::Vehicles
 		{
 			*pitch = skidooItem->Animation.Velocity.z + (height - skidooItem->Pose.Position.y);
 
-			if (TrInput & IN_LOOK && skidooItem->Animation.Velocity.z == 0)
-				LookUpDown(laraItem);
+			lara->Control.Look.Mode = (skidooItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 
-			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			if (IsHeld(In::Left) || IsHeld(In::Right))
 				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
 
-			if (TrInput & VEHICLE_IN_REVERSE)
+			if (IsHeld(In::Reverse))
 			{
 				if (skidooItem->Animation.Velocity.z > 0)
 					skidooItem->Animation.Velocity.z -= SKIDOO_VELOCITY_BRAKE_DECEL;
@@ -451,11 +449,11 @@ namespace TEN::Entities::Vehicles
 					drive = true;
 				}
 			}
-			else if (TrInput & VEHICLE_IN_ACCELERATE)
+			else if (IsHeld(In::Accelerate))
 			{
-				if (TrInput & VEHICLE_IN_SPEED)
+				if (IsHeld(In::Speed))
 					maxVelocity = SKIDOO_FAST_VELOCITY_MAX;
-				else if (TrInput & VEHICLE_IN_SLOW)
+				else if (IsHeld(In::Slow))
 					maxVelocity = SKIDOO_SLOW_VELOCITY_MAX;
 				else
 					maxVelocity = SKIDOO_NORMAL_VELOCITY_MAX;
@@ -467,7 +465,7 @@ namespace TEN::Entities::Vehicles
 
 				drive = true;
 			}
-			else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
+			else if (IsHeld(In::Left) || IsHeld(In::Right) &&
 				skidooItem->Animation.Velocity.z >= 0 &&
 				skidooItem->Animation.Velocity.z < SKIDOO_TURN_VELOCITY_MAX)
 			{
@@ -484,7 +482,7 @@ namespace TEN::Entities::Vehicles
 			else
 				skidooItem->Animation.Velocity.z = 0;
 		}
-		else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
+		else if (IsHeld(In::Accelerate) || IsHeld(In::Reverse))
 		{
 			*pitch = skidoo->Pitch + 50;
 			drive = true;
@@ -531,36 +529,36 @@ namespace TEN::Entities::Vehicles
 
 				laraItem->Animation.TargetState = SKIDOO_STATE_IDLE;
 
-				if (TrInput & VEHICLE_IN_DISMOUNT)
+				if (IsHeld(In::Brake))
 				{
-					if (TrInput & VEHICLE_IN_RIGHT &&
+					if (IsHeld(In::Right) &&
 						TestSkidooDismountOK(skidooItem, SKIDOO_STATE_DISMOUNT_RIGHT))
 					{
 						laraItem->Animation.TargetState = SKIDOO_STATE_DISMOUNT_RIGHT;
 						skidooItem->Animation.Velocity.z = 0;
 					}
-					else if (TrInput & VEHICLE_IN_LEFT &&
+					else if (IsHeld(In::Left) &&
 						TestSkidooDismountOK(skidooItem, SKIDOO_STATE_DISMOUNT_LEFT))
 					{
 						laraItem->Animation.TargetState = SKIDOO_STATE_DISMOUNT_LEFT;
 						skidooItem->Animation.Velocity.z = 0;
 					}
 				}
-				else if (TrInput & VEHICLE_IN_LEFT)
+				else if (IsHeld(In::Left))
 				{
 					if (skidooItem->Animation.Velocity.z >= 0)
 						laraItem->Animation.TargetState = SKIDOO_STATE_LEFT;
 					else
 						laraItem->Animation.TargetState = SKIDOO_STATE_RIGHT;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT)
+				else if (IsHeld(In::Right))
 				{
 					if (skidooItem->Animation.Velocity.z >= 0)
 						laraItem->Animation.TargetState = SKIDOO_STATE_RIGHT;
 					else
 						laraItem->Animation.TargetState = SKIDOO_STATE_LEFT;
 				}
-				else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
+				else if (IsHeld(In::Accelerate) || IsHeld(In::Reverse))
 					laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 
 				break;
@@ -571,14 +569,14 @@ namespace TEN::Entities::Vehicles
 
 				if (dead)
 					laraItem->Animation.TargetState = SKIDOO_STATE_FALLOFF;
-				else if (TrInput & VEHICLE_IN_LEFT)
+				else if (IsHeld(In::Left))
 				{
 					if (skidooItem->Animation.Velocity.z >= 0)
 						laraItem->Animation.TargetState = SKIDOO_STATE_LEFT;
 					else
 						laraItem->Animation.TargetState = SKIDOO_STATE_RIGHT;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT)
+				else if (IsHeld(In::Right))
 				{
 					if (skidooItem->Animation.Velocity.z >= 0)
 						laraItem->Animation.TargetState = SKIDOO_STATE_RIGHT;
@@ -591,12 +589,12 @@ namespace TEN::Entities::Vehicles
 			case SKIDOO_STATE_LEFT:
 				if (skidooItem->Animation.Velocity.z >= 0)
 				{
-					if (!(TrInput & VEHICLE_IN_LEFT))
+					if (!IsHeld(In::Left))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 				}
 				else
 				{
-					if (!(TrInput & VEHICLE_IN_RIGHT))
+					if (!IsHeld(In::Right))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 				}
 
@@ -605,12 +603,12 @@ namespace TEN::Entities::Vehicles
 			case SKIDOO_STATE_RIGHT:
 				if (skidooItem->Animation.Velocity.z >= 0)
 				{
-					if (!(TrInput & VEHICLE_IN_RIGHT))
+					if (!IsHeld(In::Right))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 				}
 				else
 				{
-					if (!(TrInput & VEHICLE_IN_LEFT))
+					if (!IsHeld(In::Left))
 						laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE;
 				}
 
@@ -673,7 +671,7 @@ namespace TEN::Entities::Vehicles
 		FindNewTarget(*laraItem, weapon);
 		AimWeapon(*laraItem, lara->RightArm, weapon);
 
-		if (TrInput & IN_SKIDOO_FIRE && !skidooItem->ItemFlags[0])
+		if (IsHeld(In::Fire) && !skidooItem->ItemFlags[0])
 		{
 			auto angles = EulerAngles(
 				lara->RightArm.Orientation.x,
@@ -731,10 +729,10 @@ namespace TEN::Entities::Vehicles
 
 	short DoSkidooShift(ItemInfo* skidooItem, Vector3i* pos, Vector3i* old)
 	{
-		int	x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
+		int	x = pos->x / BLOCK(1);
+		int z = pos->z / BLOCK(1);
+		int xOld = old->x / BLOCK(1);
+		int zOld = old->z / BLOCK(1);
 		int shiftX = pos->x & WALL_MASK;
 		int shiftZ = pos->z & WALL_MASK;
 
@@ -752,7 +750,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				skidooItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				skidooItem->Pose.Position.z += BLOCK(1) - shiftZ;
 				return (skidooItem->Pose.Position.x - pos->x);
 			}
 		}
@@ -765,7 +763,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				skidooItem->Pose.Position.x += SECTOR(1) - shiftX;
+				skidooItem->Pose.Position.x += BLOCK(1) - shiftX;
 				return (pos->z - skidooItem->Pose.Position.z);
 			}
 		}
@@ -780,7 +778,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					z = BLOCK(1) - shiftZ;
 			}
 
 			probe = GetCollision(pos->x, pos->y, old->z, skidooItem->RoomNumber);
@@ -789,7 +787,7 @@ namespace TEN::Entities::Vehicles
 				if (pos->x > old->x)
 					x = -shiftX - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					x = BLOCK(1) - shiftX;
 			}
 
 			if (x && z)

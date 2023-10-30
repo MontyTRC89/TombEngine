@@ -29,7 +29,7 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle);
 
-bool TestLaraWall(ItemInfo* item, int distance, int height, int side = 0);
+bool TestLaraWall(ItemInfo* item, float dist, float height);
 bool TestLaraFacingCorner(ItemInfo* item, short angle, int distance);
 bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance);
 int LaraFloorFront(ItemInfo* item, short angle, int distance);

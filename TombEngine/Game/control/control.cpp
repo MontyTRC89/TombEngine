@@ -13,6 +13,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -62,6 +63,7 @@ using namespace std::chrono;
 using namespace TEN::Effects;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -93,7 +95,7 @@ bool ThreadEnded;
 
 int RequiredStartPos;
 int CurrentLevel;
-int LevelComplete;
+int NextLevel;
 
 int SystemNameHash = 0;
 
@@ -117,6 +119,9 @@ int DrawPhase(bool isTitle)
 	{
 		g_Renderer.Render();
 	}
+
+	// Clear display sprites.
+	ClearDisplaySprites();
 
 	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
@@ -154,6 +159,11 @@ GameStatus ControlPhase(int numFrames)
 		// which assumes 30 iterations per second.
 		g_GameScript->OnControlPhase(DELTA_TIME);
 
+		// Control lock is processed after handling scripts, because builder may want to
+		// process input externally, while still locking Lara from input.
+		if (!isTitle && Lara.Control.Locked)
+			ClearAllActions();
+
 		// Handle inventory / pause / load / save screens.
 		auto result = HandleMenuCalls(isTitle);
 		if (result != GameStatus::None)
@@ -185,7 +195,7 @@ GameStatus ControlPhase(int numFrames)
 		{
 			// Do the standard camera.
 			TrackCameraInit = false;
-			CalculateCamera();
+			CalculateCamera(LaraCollision);
 		}
 
 		// Update oscillator seed.
@@ -218,7 +228,6 @@ GameStatus ControlPhase(int numFrames)
 		UpdateSparkParticles();
 		UpdateSmokeParticles();
 		UpdateSimpleParticles();
-		UpdateDrips();
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
@@ -305,15 +314,11 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeScripting(levelIndex, loadGame);
 	InitializeNodeScripts();
 
+	// Initialize menu and inventory state.
+	g_Gui.Initialize();
+
 	// Initialize game variables and optionally load game.
 	InitializeOrLoadGame(loadGame);
-
-	// Prepare title menu, if necessary.
-	if (isTitle)
-	{
-		g_Gui.SetMenuToDisplay(Menu::Title);
-		g_Gui.SetSelectedOption(0);
-	}
 
 	// DoGameLoop() returns only when level has ended.
 	return DoGameLoop(levelIndex);
@@ -416,6 +421,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearDisplaySprites();
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
@@ -457,14 +463,15 @@ void InitializeScripting(int levelIndex, bool loadGame)
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
 			g_Renderer.AddString(
-				float(x) / float(g_Configuration.Width) * SCREEN_SPACE_RES.x,
-				float(y) / float(g_Configuration.Height) * SCREEN_SPACE_RES.y,
+				float(x) / float(g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
+				float(y) / float(g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y,
 				key.c_str(), col, flags);
 		});
 	}
 
 	// Play default background music.
-	PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
+	if (!loadGame)
+		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
@@ -592,14 +599,11 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 
 void HandleControls(bool isTitle)
 {
-	// Poll keyboard and update input variables.
+	// Poll input devices and update input variables.
 	if (!isTitle)
 	{
-		if (Lara.Control.Locked)
-			ClearAllActions();
-		else
-			// TODO: To allow cutscene skipping later, don't clear Deselect action.
-			UpdateInputActions(LaraItem, true);
+		// TODO: To allow cutscene skipping later, don't clear Deselect action.
+		UpdateInputActions(LaraItem, true);
 	}
 	else
 	{
@@ -616,16 +620,20 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 	// Does the player want to enter inventory?
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-		g_Gui.GetInventoryMode() != InventoryMode::Save)
+		g_Gui.GetInventoryMode() != InventoryMode::Save &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 
 		if (g_Gui.CallInventory(LaraItem, false))
 			result = GameStatus::SaveGame;
 	}
 	else if (IsClicked(In::Load) &&
-			 g_Gui.GetInventoryMode() != InventoryMode::Load)
+		g_Gui.GetInventoryMode() != InventoryMode::Load &&
+		g_GameFlow->IsLoadSaveEnabled())
 	{
+		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -634,25 +642,11 @@ GameStatus HandleMenuCalls(bool isTitle)
 	else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
 			 g_Gui.GetInventoryMode() != InventoryMode::Pause)
 	{
-		g_Renderer.DumpGameScene();
-		g_Gui.SetInventoryMode(InventoryMode::Pause);
-		g_Gui.SetMenuToDisplay(Menu::Pause);
-		g_Gui.SetSelectedOption(0);
-
-		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
-		{
-			g_Gui.DrawInventory();
-			g_Renderer.Synchronize();
-
-			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
-			{
-				result = GameStatus::ExitToTitle;
-				break;
-			}
-		}
+		if (g_Gui.CallPause())
+			result = GameStatus::ExitToTitle;
 	}
-	else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
-			 LaraItem->HitPoints > 0 && !BinocularOn)
+	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
+			 LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))
 			result = GameStatus::LoadGame;
@@ -669,25 +663,30 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 GameStatus HandleGlobalInputEvents(bool isTitle)
 {
+	constexpr auto DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
+	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
+
 	if (isTitle)
 		return GameStatus::None;
 
-	HandleOptics(LaraItem);
-
-	// Is Lara dead?
-	static constexpr int DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
-	static constexpr int DEATH_INPUT_TIMEOUT = 10 * FPS;
-
+	// Check if player dead.
 	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||
 		Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT && !NoAction())
 	{
-		return GameStatus::LaraDead; // Maybe do game over menu like some PSX versions have??
+		// TODO: Maybe do game over menu like some PSX versions have?
+		return GameStatus::LaraDead;
 	}
 
-	// Has level been completed?
-	if (LevelComplete)
+	// Check if level has been completed.
+	// Negative NextLevel indicates that a savegame must be loaded from corresponding slot.
+	if (NextLevel > 0)
 	{
 		return GameStatus::LevelComplete;
+	}
+	else if (NextLevel < 0)
+	{
+		g_GameFlow->SelectedSaveGame = -(NextLevel + 1);
+		return GameStatus::LoadGame;
 	}
 
 	return GameStatus::None;

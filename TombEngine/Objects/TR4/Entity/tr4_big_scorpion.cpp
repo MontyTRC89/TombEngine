@@ -26,8 +26,8 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_SCORPION_ATTACK_RANGE = SQUARE(BLOCK(1.35));
 	constexpr auto BIG_SCORPION_RUN_RANGE	 = SQUARE(BLOCK(2));
 
-	const auto BigScorpionBite1 = CreatureBiteInfo(Vector3i::Zero, 8);
-	const auto BigScorpionBite2 = CreatureBiteInfo(Vector3i::Zero, 23);
+	const auto BigScorpionBite1 = CreatureBiteInfo(Vector3::Zero, 8);
+	const auto BigScorpionBite2 = CreatureBiteInfo(Vector3::Zero, 23);
 	const auto BigScorpionAttackJoints = std::vector<unsigned int>{ 8, 20, 21, 23, 24 };
 
 	enum BigScorpionState

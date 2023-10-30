@@ -1,11 +1,11 @@
 #include "framework.h"
 #include "SoundSourceObject.h"
 
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
 #include "Sound/sound.h"
-#include "ScriptAssert.h"
-#include "ScriptUtil.h"
-#include "Vec3/Vec3.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 /***
 Sound source
 
@@ -61,7 +61,7 @@ void SoundSource::Register(sol::table& parent)
 
 Vec3 SoundSource::GetPos() const
 {
-	return Vec3{ m_soundSource.Position };
+	return Vec3(m_soundSource.Position);
 }
 
 void SoundSource::SetPos(Vec3 const& pos)

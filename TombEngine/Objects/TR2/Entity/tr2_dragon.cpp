@@ -24,14 +24,14 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
-	const auto DragonMouthBite = CreatureBiteInfo(Vector3i(35, 171, 1168), 12);
+	const auto DragonMouthBite = CreatureBiteInfo(Vector3(35, 171, 1168), 12);
 	const auto DragonSwipeAttackJointsLeft  = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
 
 	// TODO: Organise.
 	#define DRAGON_LIVE_TIME (30 * 11)
-	#define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
-	#define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
+	#define DRAGON_CLOSE_RANGE pow(BLOCK(3), 2)
+	#define DRAGON_STATE_IDLE_RANGE pow(BLOCK(6), 2)
 	#define DRAGON_FLAME_SPEED 200
 
 	#define DRAGON_ALMOST_LIVE 100
@@ -39,7 +39,7 @@ namespace TEN::Entities::Creatures::TR2
 	#define BOOM_TIME_MIDDLE 140
 	#define BOOM_TIME_END 150
 
-	#define BARTOLI_RANGE SECTOR(9)
+	#define BARTOLI_RANGE BLOCK(9)
 	#define DRAGON_CLOSE 900
 	#define DRAGON_FAR 2300
 	#define DRAGON_MID ((DRAGON_CLOSE + DRAGON_FAR) / 2)
@@ -183,7 +183,7 @@ namespace TEN::Entities::Creatures::TR2
 				int frame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
 
 				if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
-					TrInput & IN_ACTION &&
+					IsHeld(In::Action) &&
 					item->ObjectNumber == ID_DRAGON_BACK &&
 					!laraItem->Animation.IsAirborne &&
 					shift <= DRAGON_MID &&
@@ -200,7 +200,7 @@ namespace TEN::Entities::Creatures::TR2
 					laraItem->Animation.Velocity.z = 0.0f;
 
 					if (item->RoomNumber != laraItem->RoomNumber)
-						ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
+						ItemNewRoom(laraItem->Index, item->RoomNumber);
 
 					AnimateItem(LaraItem);
 

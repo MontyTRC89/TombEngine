@@ -152,7 +152,7 @@ namespace TEN::Entities::TR4
 			if (TestCollision(item, laraItem))
 			{
 				if (coll->Setup.EnableObjectPush)
-					ItemPushItem(item, laraItem, coll, 0, 0);
+					ItemPushItem(item, laraItem, coll, false, 0);
 			}
 		}
 	}
@@ -236,7 +236,7 @@ namespace TEN::Entities::TR4
 			if (laraInfo->Control.Weapon.GunType != LaraWeaponType::Torch ||
 				laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
 				laraInfo->LeftArm.Locked ||
-				!(TrInput & IN_ACTION) ||
+				!IsHeld(In::Action) ||
 				puzzleItem->TriggerFlags != 1 ||
 				puzzleItem->ItemFlags[0] != 1 ||
 				laraItem->Animation.ActiveState != LS_IDLE ||

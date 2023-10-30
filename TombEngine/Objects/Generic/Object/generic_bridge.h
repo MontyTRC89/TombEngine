@@ -9,42 +9,43 @@ using namespace TEN::Collision::Floordata;
 void InitializeBridge(short itemNumber);
 int GetOffset(short angle, int x, int z);
 
-template <int tilt>
+template <int tiltGrade>
 std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	const auto& item = g_Level.Items[itemNumber];
 
-	if (bboxHeight.has_value() && tilt != 0)
+	auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
+	if (boxHeight.has_value() && tiltGrade != 0)
 	{
-		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + SECTOR(1) / 8);
-		return std::optional{ height };
+		int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, x, z) / 4) + (BLOCK(1) / 8)));
+		return height;
 	}
 
-	return bboxHeight;
+	return boxHeight;
 }
 
-template <int tilt>
+template <int tiltGrade>
 std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	const auto& item = g_Level.Items[itemNumber];
 
-	if (bboxHeight.has_value() && tilt != 0)
+	auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
+	if (boxHeight.has_value() && tiltGrade != 0)
 	{
-		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + SECTOR(1) / 8);
-		return std::optional{ height + CLICK(1) }; // To be customized with Lua
+		int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, x, z) / 4) + (BLOCK(1) / 8)));
+		return (height + CLICK(1));
 	}
-	return bboxHeight;
+
+	return boxHeight;
 }
 
-template <int tilt>
+template <int tiltGrade>
 int BridgeFloorBorder(short itemNumber)
 {
 	return GetBridgeBorder(itemNumber, false);
 }
 
-template <int tilt>
+template <int tiltGrade>
 int BridgeCeilingBorder(short itemNumber)
 {
 	return GetBridgeBorder(itemNumber, true);

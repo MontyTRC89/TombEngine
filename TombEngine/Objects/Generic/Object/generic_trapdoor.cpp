@@ -21,7 +21,7 @@ const InteractionBasis CeilingTrapDoorBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		0, 900,
-		-SECTOR(0.75f), -CLICK(1)
+		-BLOCK(0.75f), -CLICK(1)
 	),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -35,7 +35,7 @@ const InteractionBasis FloorTrapDoorBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		0, 0,
-		-SECTOR(1), -CLICK(1)
+		-BLOCK(1), -CLICK(1)
 	),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -74,7 +74,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 	bool result2 = TestPlayerEntityInteract(trapDoorItem, laraItem, CeilingTrapDoorBounds);
 	laraItem->Pose.Orientation.y += ANGLE(180.0f);
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_JUMP_UP &&
 		laraItem->Animation.IsAirborne &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
@@ -121,7 +121,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if ((TrInput & IN_ACTION &&
+	if ((IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
@@ -232,7 +232,7 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 }
 
 std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
@@ -242,5 +242,5 @@ std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 }

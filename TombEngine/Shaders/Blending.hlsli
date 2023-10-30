@@ -45,11 +45,8 @@ void DoAlphaTest(float4 inputColor)
 	}
 }
 
-float4 DoFog(float4 sourceColor, float4 fogColor, float value)
+float4 DoDistanceFogForPixel(float4 sourceColor, float4 fogColor, float value)
 {
-	if (FogMaxDistance == 0)
-		return sourceColor;
-
 	switch (BlendMode)
 	{
 	case BLENDMODE_ADDITIVE:
@@ -75,6 +72,40 @@ float4 DoFog(float4 sourceColor, float4 fogColor, float value)
 		fogColor.w = sourceColor.w;
 
 	float4 result = lerp(sourceColor, fogColor, value);
+	return result;
+}
+
+float4 DoFogBulbsForPixel(float4 sourceColor, float4 fogColor)
+{
+	switch (BlendMode)
+	{
+	case BLENDMODE_ADDITIVE:
+	case BLENDMODE_SCREEN:
+	case BLENDMODE_LIGHTEN:
+		fogColor.xyz *= Luma(sourceColor);
+		break;
+
+	case BLENDMODE_SUBTRACTIVE:
+	case BLENDMODE_EXCLUDE:
+		fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
+		break;
+
+	case BLENDMODE_ALPHABLEND:
+		fogColor.w = sourceColor.w;
+		break;
+
+	default:
+		break;
+
+	}
+
+	if (fogColor.w > sourceColor.w)
+		fogColor.w = sourceColor.w;
+
+	float4 result = sourceColor;
+
+	result.xyz += saturate(fogColor.xyz);
+
 	return result;
 }
 
@@ -104,7 +135,7 @@ float4 DoLaserBarrierEffect(float3 input, float4 output, float2 uv, float faceFa
 	noisix.x = noisix.x > 0.9 ? 0.7 : noisix.x;
 	noisix.y = noisix.y > 0.9 ? 0.7 : noisix.y;
 	noisix.z = noisix.z > 0.9 ? 0.7 : noisix.z;
-	color.rgb *= noisix + 1.3f;
+	color.rgb += noisix + 0.5f;
 	color.rgb -= noisix + 0.2f;
 
 	float frequency = 0.1;
@@ -130,8 +161,7 @@ float4 DoLaserBarrierEffect(float3 input, float4 output, float2 uv, float faceFa
 
 	noiseValue2 += AnimatedNebula(uv/2, timeUniform * 0.05f);
 	
-	color.rgb -= noiseValue - 0.7f;
-	color.rgb *= noiseValue2 + 1.0f;
+	color.rgb *= noiseValue2 + 0.6f;
 	color.rgb += noiseValue3;
 	color.a *= noiseValue + 0.01f;
 

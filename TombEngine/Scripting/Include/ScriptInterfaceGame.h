@@ -11,7 +11,7 @@ typedef DWORD D3DCOLOR;
 
 using CallbackDrawString = std::function<void(const std::string&, D3DCOLOR, int, int, int)>;
 using VarSaveType = std::variant<bool, double, std::string>;
-using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
+using IndexTable = std::vector<std::pair<unsigned int, unsigned int>>;
 
 struct FuncName
 {
@@ -38,8 +38,8 @@ using SavedVar = std::variant<
 	std::string,
 	double,
 	IndexTable,
-	Vector2i, // Vec2
-	Vector3i, // Vec3
+	Vector2,  // Vec2
+	Vector3,  // Vec3
 	Vector3,  // Rotation
 	D3DCOLOR, // Color
 	FuncName>;

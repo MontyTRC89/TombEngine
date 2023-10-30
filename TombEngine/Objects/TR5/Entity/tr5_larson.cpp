@@ -31,9 +31,9 @@ namespace TEN::Entities::Creatures::TR5
 
 	#define TR5_LARSON_MIN_HP 40
 
-	const auto LarsonGun  = CreatureBiteInfo(Vector3i(-55, 200, 5), 14);
-	const auto PierreGunLeft = CreatureBiteInfo(Vector3i(45, 200, 0), 11);
-	const auto PierreGunRight = CreatureBiteInfo(Vector3i(-40, 200, 0), 14);
+	const auto LarsonGun	  = CreatureBiteInfo(Vector3(-55, 200, 5), 14);
+	const auto PierreGunLeft  = CreatureBiteInfo(Vector3(45, 200, 0), 11);
+	const auto PierreGunRight = CreatureBiteInfo(Vector3(-40, 200, 0), 14);
 
 	void InitializeLarson(short itemNumber)
 	{
@@ -81,6 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
+
 		if (creature->MuzzleFlash[1].Delay != 0)
 			creature->MuzzleFlash[1].Delay--;
 
@@ -132,7 +133,7 @@ namespace TEN::Entities::Creatures::TR5
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
 
-			if (AI.distance < SQUARE(SECTOR(2)) &&
+			if (AI.distance < SQUARE(BLOCK(2)) &&
 				LaraItem->Animation.Velocity.z > 20.0f ||
 				item->HitStatus ||
 				TargetVisible(item, &AI) != 0)
@@ -214,7 +215,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 					item->Animation.RequiredState = STATE_TR5_LARSON_AIM;
 				}
-				else if (!AI.ahead || AI.distance > SQUARE(SECTOR(3)))
+				else if (!AI.ahead || AI.distance > SQUARE(BLOCK(3)))
 				{
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 					item->Animation.RequiredState = STATE_TR5_LARSON_RUN;
@@ -242,7 +243,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 					else if (AI.ahead)
 					{
-						if (AI.distance <= SQUARE(SECTOR(3)))
+						if (AI.distance <= SQUARE(BLOCK(3)))
 						{
 							item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 							item->Animation.RequiredState = STATE_TR5_LARSON_WALK;
@@ -318,7 +319,9 @@ namespace TEN::Entities::Creatures::TR5
 						item->Pose.Orientation.y -= ANGLE(2.0f);
 				}
 				else
+				{
 					item->Pose.Orientation.y += AI.angle;
+				}
 				
 				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
@@ -326,6 +329,7 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						ShotLara(item, &AI, PierreGunLeft, joint0, 20);
 						ShotLara(item, &AI, PierreGunRight, joint0, 20);
+
 						creature->MuzzleFlash[0].Bite = PierreGunLeft;
 						creature->MuzzleFlash[0].Delay = 2;
 						creature->MuzzleFlash[1].Bite = PierreGunRight;
@@ -359,9 +363,9 @@ namespace TEN::Entities::Creatures::TR5
 
 				auto* room = &g_Level.Rooms[roomNumber];
 
-				int x = room->x + (creature->Tosspad / 256 & 0xFF) * SECTOR(1) + 512;
+				int x = room->x + (creature->Tosspad / 256 & 0xFF) * BLOCK(1) + 512;
 				int y = room->minfloor + floorHeight;
-				int z = room->z + (creature->Tosspad & 0xFF) * SECTOR(1) + 512;
+				int z = room->z + (creature->Tosspad & 0xFF) * BLOCK(1) + 512;
 
 				TestTriggers(x, y, z, roomNumber, true);
 

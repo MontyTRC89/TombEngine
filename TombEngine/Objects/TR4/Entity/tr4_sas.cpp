@@ -34,7 +34,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SAS_WALK_RANGE  = SQUARE(BLOCK(2));
 	constexpr auto SAS_SHOOT_RANGE = SQUARE(BLOCK(3));
 
-	const auto SasGunBite = CreatureBiteInfo(Vector3i(0, 420, 80), 7);
+	const auto SasGunBite = CreatureBiteInfo(Vector3(0, 420, 80), 7);
 
 	const auto SasDragBodyPosition = Vector3i(0, 0, -460);
 	const auto SasDragBounds = InteractionBasis

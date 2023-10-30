@@ -3,11 +3,11 @@
 
 /***
 Constants for the type of the Camera.
-@enum Misc.CameraType
+@enum View.CameraType
 @pragma nostrip
 */
 
-/*** Misc.CameraType constants.
+/*** View.CameraType constants.
 
 The following constants are inside CameraType.
 
@@ -18,7 +18,7 @@ The following constants are inside CameraType.
 	HEAVY
 	OBJECT
 
-@section Misc.CameraType
+@section View.CameraType
 */
 
 /*** Table of camera type constants (for use with GetCameraType() function).
@@ -27,10 +27,10 @@ The following constants are inside CameraType.
 
 static const std::unordered_map<std::string, CameraType> CAMERA_TYPE
 {
-	{ "Chase", CameraType::Chase },
-	{ "Fixed", CameraType::Fixed },
-	{ "Look", CameraType::Look },
-	{ "Combat", CameraType::Combat },
-	{ "Heavy", CameraType::Heavy },
-	{ "Object", CameraType::Object }
+	{ "CHASE", CameraType::Chase },
+	{ "FIXED", CameraType::Fixed },
+	{ "LOOK", CameraType::Look },
+	{ "COMBAT", CameraType::Combat },
+	{ "HEAVY", CameraType::Heavy },
+	{ "OBJECT", CameraType::Object }
 };

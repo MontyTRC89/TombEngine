@@ -11,7 +11,7 @@
 #include "Math/Random.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math::Random;
@@ -38,8 +38,6 @@ namespace TEN::Effects::Environment
 	constexpr auto DUST_SPAWN_DENSITY = 300;
 	constexpr auto DUST_LIFE = 40;
 	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
-
-	constexpr auto SKY_POSITION_LIMIT = 9728;
 
 	EnvironmentController Weather;
 
@@ -114,13 +112,13 @@ namespace TEN::Effects::Environment
 				continue;
 
 			SkyCurrentPosition[i] += level->GetSkyLayerSpeed(i);
-			if (SkyCurrentPosition[i] <= SKY_POSITION_LIMIT)
+			if (SkyCurrentPosition[i] <= SKY_SIZE)
 			{
 				if (SkyCurrentPosition[i] < 0)
-					SkyCurrentPosition[i] += SKY_POSITION_LIMIT;
+					SkyCurrentPosition[i] += SKY_SIZE;
 			}
 			else
-				SkyCurrentPosition[i] -= SKY_POSITION_LIMIT;
+				SkyCurrentPosition[i] -= SKY_SIZE;
 		}
 	}
 
@@ -300,8 +298,6 @@ namespace TEN::Effects::Environment
 			{
 				p.CollisionCheckDelay--;
 			}
-
-			auto& r = g_Level.Rooms[p.Room];
 
 			// Check if particle got out of room bounds
 
@@ -484,7 +480,7 @@ namespace TEN::Effects::Environment
 
 				auto coll = GetCollision(xPos, yPos, zPos, outsideRoom);
 
-				if (!(coll.Position.Ceiling < yPos || coll.Block->GetRoomNumberAbove(xPos, yPos, zPos).value_or(NO_ROOM) != NO_ROOM))
+				if (!(coll.Position.Ceiling < yPos || coll.Block->GetRoomNumberAbove(Vector3i(xPos, yPos, zPos)).value_or(NO_ROOM) != NO_ROOM))
 					continue;
 
 				auto part = WeatherParticle();

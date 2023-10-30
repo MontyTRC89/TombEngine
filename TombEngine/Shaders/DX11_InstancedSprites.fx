@@ -2,6 +2,7 @@
 #include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
+#include "./ShaderLight.hlsli"
 
 // NOTE: This shader is used for all opaque or not sorted transparent sprites, that can be instanced for a faster drawing
 
@@ -12,8 +13,10 @@ struct PixelShaderInput
 	float4 Position: SV_POSITION;
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
-	float Fog : FOG;
 	float4 PositionCopy: TEXCOORD2;
+	float4 FogBulbs : TEXCOORD3;
+	float DistanceFog : FOG;
+	uint InstanceID : SV_InstanceID;
 };
 
 struct InstancedSprite
@@ -56,12 +59,10 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.PositionCopy = output.Position;
 	output.Color = Sprites[InstanceID].Color;
 	output.UV = float2(Sprites[InstanceID].UV[0][input.PolyIndex], Sprites[InstanceID].UV[1][input.PolyIndex]);
+	output.InstanceID  = InstanceID;
 
-	float4 d = length(CamPositionWS - worldPosition);
-	if (FogMaxDistance == 0)
-		output.Fog = 1;
-	else
-		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
+	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
 
 	return output;
 }
@@ -82,13 +83,11 @@ float Contrast(float Input, float ContrastPower)
 #endif
 }
 
-float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
+float4 PS(PixelShaderInput input) : SV_TARGET
 {
 	float4 output = Texture.Sample(Sampler, input.UV) * input.Color;
 
-	//DoAlphaTest(output);
-
-	if (Sprites[InstanceID].IsSoftParticle == 1)
+	if (Sprites[input.InstanceID].IsSoftParticle == 1)
 	{
 		float particleDepth = input.PositionCopy.z / input.PositionCopy.w;
 		input.PositionCopy.xy /= input.PositionCopy.w;
@@ -105,7 +104,10 @@ float4 PS(PixelShaderInput input, uint InstanceID : SV_InstanceID) : SV_TARGET
 		output.w = min(output.w, fade);
 	}
 
-	output = DoFog(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.Fog);
+	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
+	output.xyz = saturate(output.xyz);
+
+	output = DoDistanceFogForPixel(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.DistanceFog);
 
 	return output;
 }

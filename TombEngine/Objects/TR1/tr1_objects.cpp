@@ -4,12 +4,14 @@
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/Lara/lara.h"
 #include "Game/missile.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
 // Creatures
 #include "Objects/TR1/Entity/Cowboy.h" // OK
+#include "Objects/TR1/Entity/Kold.h" // OK
 #include "Objects/TR1/Entity/tr1_ape.h" // OK
 #include "Objects/TR1/Entity/tr1_bear.h" // OK
 #include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
@@ -19,11 +21,13 @@
 #include "Objects/TR1/Entity/tr1_big_rat.h" // OK
 #include "Objects/TR1/Entity/tr1_centaur.h" // OK
 #include "Objects/TR1/Entity/tr1_winged_mutant.h" // OK
+#include "Objects/TR1/Entity/SkateboardKid.h" // OK
 #include "Objects/Utils/object_helper.h"
 
 // Traps
 #include "Objects/TR1/Trap/DamoclesSword.h"
 #include "Objects/TR1/Trap/SlammingDoors.h"
+#include "Objects/TR1/Trap/SwingingBlade.h"
 
 using namespace TEN::Entities::Creatures::TR1;
 using namespace TEN::Entities::Traps::TR1;
@@ -102,7 +106,9 @@ static void StartEntity(ObjectInfo* obj)
 		obj->HitPoints = 400;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
+		obj->LotType = LotType::Flyer;
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y); // Torso
+		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y); // Head
 		obj->SetupHitEffect();
 	}
 
@@ -124,14 +130,19 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DOPPELGANGER];
 	if (obj->loaded)
 	{
-		obj->animIndex = Objects[ID_LARA].animIndex; // NOTE: lara is obviously loaded by default.
+		// NOTE: lara is obviously loaded by default.
+		auto& laraObj = Objects[ID_LARA];
+		obj->animIndex = laraObj.animIndex;
+		obj->frameBase = laraObj.frameBase;
 		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
 		obj->shadowType = ShadowMode::All;
-		obj->HitPoints = 1000;
+		obj->HitPoints = LARA_HEALTH_MAX;
 		obj->radius = 102;
-		obj->SetupHitEffect(true);
+		obj->intelligent = true;
+		obj->nonLot = true;
+		obj->SetupHitEffect();
 	}
 
 	obj = &Objects[ID_CENTAUR_MUTANT];
@@ -182,11 +193,43 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
 		obj->SetupHitEffect();
 	}
+
+	obj = &Objects[ID_KOLD];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeKold;
+		obj->control = ControlKold;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->pivotLength = 0;
+		obj->radius = 102;
+		obj->HitPoints = 200;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(1, ROT_Y);
+		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
+		obj->SetupHitEffect();
+	}
+
+	obj = &Objects[ID_SKATEBOARD_KID];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeSkateboardKid;
+		obj->control = ControlSkateboardKid;
+		obj->collision = CreatureCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->pivotLength = 0;
+		obj->radius = 256;
+		obj->HitPoints = 125;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(7, ROT_Y); // Head.
+		obj->SetBoneRotationFlags(0, ROT_Y | ROT_X); // Torso.
+		obj->SetupHitEffect();
+	}
 }
 
 static void StartObject(ObjectInfo* obj)
 {
-	obj = &Objects[ID_BACON_REFERENCE];
+	obj = &Objects[ID_DOPPELGANGER_ORIGIN];
 	if (obj->loaded)
 	{
 		obj->collision = AIPickupCollision;
@@ -215,12 +258,22 @@ static void StartTrap(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->SetupHitEffect(true);
 	}
+
+	obj = &Objects[ID_SWINGING_BLADE];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeSwingingBlade;
+		obj->control = ControlSwingingBlade;
+		obj->collision = GenericSphereBoxCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->SetupHitEffect(true);
+	}
 }
 
 static void StartProjectiles(ObjectInfo* obj)
 {
 	InitProjectile(obj, ControlMissile, ID_PROJ_SHARD);
-	InitProjectile(obj, ControlMissile, ID_PROJ_NATLA);
+	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 }
 

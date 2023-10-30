@@ -24,7 +24,7 @@ bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 	if (1 << node & item->MeshBits.ToPackedBits())
 	{
 		int number = bits;
-		if (number == BODY_EXPLODE)
+		if (number == BODY_DO_EXPLOSION)
 			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
@@ -231,14 +231,14 @@ void UpdateDebris()
 
 			if (deb.worldPosition.y < floor->GetSurfaceHeight(deb.worldPosition.x, deb.worldPosition.z, false))
 			{
-				auto roomNumber = floor->GetRoomNumberAbove(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z).value_or(NO_ROOM);
+				auto roomNumber = floor->GetRoomNumberAbove(Vector3i(deb.worldPosition)).value_or(NO_ROOM);
 				if (roomNumber != NO_ROOM)
 					deb.roomNumber = roomNumber;
 			}
 
 			if (deb.worldPosition.y > floor->GetSurfaceHeight(deb.worldPosition.x, deb.worldPosition.z, true))
 			{
-				auto roomNumber = floor->GetRoomNumberBelow(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z).value_or(NO_ROOM);
+				auto roomNumber = floor->GetRoomNumberBelow(Vector3i(deb.worldPosition)).value_or(NO_ROOM);
 				if (roomNumber != NO_ROOM)
 				{
 					deb.roomNumber = roomNumber;

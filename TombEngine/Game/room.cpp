@@ -11,9 +11,9 @@
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Renderer;
 
-byte FlipStatus = 0;
-int FlipStats[MAX_FLIPMAP];
-int FlipMap[MAX_FLIPMAP];
+bool FlipStatus = false;
+bool FlipStats[MAX_FLIPMAP];
+int  FlipMap[MAX_FLIPMAP];
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
@@ -22,13 +22,17 @@ bool ROOM_INFO::Active()
 	if (flipNumber == NO_ROOM)
 		return true;
 
-	return !(FlipStats[flipNumber] && flippedRoom == NO_ROOM);
+	// Because engine swaps whole room memory block but substitutes flippedRoom,
+	// we have to check both original index and flippedRoom equality, as well as NO_ROOM
+	// in case we are checking non-flipped rooms.
+
+	return (!FlipStats[flipNumber] && flippedRoom != index && flippedRoom != NO_ROOM) ||
+		   ( FlipStats[flipNumber] && flippedRoom == index);
+		   
 }
 
 void DoFlipMap(short group)
 {
-	ROOM_INFO temp;
-
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
 		auto* room = &g_Level.Rooms[i];
@@ -39,12 +43,12 @@ void DoFlipMap(short group)
 
 			auto* flipped = &g_Level.Rooms[room->flippedRoom];
 
-			temp = *room;
+			auto temp = *room;
 			*room = *flipped;
 			*flipped = temp;
 
 			room->flippedRoom = flipped->flippedRoom;
-			flipped->flippedRoom = -1;
+			flipped->flippedRoom = NO_ROOM;
 
 			room->itemNumber = flipped->itemNumber;
 			room->fxNumber = flipped->fxNumber;
@@ -125,8 +129,8 @@ int IsRoomOutside(int x, int y, int z)
 	if (x < 0 || z < 0)
 		return NO_ROOM;
 
-	int xTable = x / SECTOR(1);
-	int zTable = z / SECTOR(1);
+	int xTable = x / BLOCK(1);
+	int zTable = z / BLOCK(1);
 
 	if (OutsideRoomTable[xTable][zTable].empty())
 		return NO_ROOM;
@@ -137,8 +141,8 @@ int IsRoomOutside(int x, int y, int z)
 		auto* room = &g_Level.Rooms[roomNumber];
 
 		if ((y > room->maxceiling && y < room->minfloor) &&
-			(z > (room->z + SECTOR(1)) && z < (room->z + (room->zSize - 1) * SECTOR(1))) &&
-			(x > (room->x + SECTOR(1)) && x < (room->x + (room->xSize - 1) * SECTOR(1))))
+			(z > (room->z + BLOCK(1)) && z < (room->z + (room->zSize - 1) * BLOCK(1))) &&
+			(x > (room->x + BLOCK(1)) && x < (room->x + (room->xSize - 1) * BLOCK(1))))
 		{
 			auto probe = GetCollision(x, y, z, roomNumber);
 
@@ -163,8 +167,8 @@ int IsRoomOutside(int x, int y, int z)
 
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z) 
 {
-	int sectorX = std::clamp(x / SECTOR(1), 0, room->xSize - 1);
-	int sectorZ = std::clamp(z / SECTOR(1), 0, room->zSize - 1);
+	int sectorX = std::clamp(x / BLOCK(1), 0, room->xSize - 1);
+	int sectorZ = std::clamp(z / BLOCK(1), 0, room->zSize - 1);
 
 	int index = sectorZ + sectorX * room->zSize;
 	if (index > room->floor.size()) 
@@ -205,8 +209,10 @@ int FindRoomNumber(Vector3i position, int startRoom)
 	{
 		auto& room = g_Level.Rooms[startRoom];
 		for (auto n : room.neighbors)
+		{
 			if (n != startRoom && IsPointInRoom(position, n) && g_Level.Rooms[n].Active())
 				return n;
+		}
 	}
 
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
@@ -220,36 +226,35 @@ Vector3i GetRoomCenter(int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	auto halfLength = SECTOR(room->xSize) / 2;
-	auto halfDepth = SECTOR(room->zSize) / 2;
+	auto halfLength = BLOCK(room->xSize) / 2;
+	auto halfDepth = BLOCK(room->zSize) / 2;
 	auto halfHeight = (room->maxceiling - room->minfloor) / 2;
 
 	auto center = Vector3i(
 		room->x + halfLength,
 		room->minfloor + halfHeight,
-		room->z + halfDepth
-	);
+		room->z + halfDepth);
 	return center;
 }
 
 std::set<int> GetRoomList(int roomNumber)
 {
-	std::set<int> roomNumberList;
+	auto roomNumberList = std::set<int>{};
 
 	if (g_Level.Rooms.size() <= roomNumber)
 		return roomNumberList;
 
 	roomNumberList.insert(roomNumber);
 
-	auto* room = &g_Level.Rooms[roomNumber];
-	for (size_t i = 0; i < room->doors.size(); i++)
-		roomNumberList.insert(room->doors[i].room);
+	auto* roomPtr = &g_Level.Rooms[roomNumber];
+	for (size_t i = 0; i < roomPtr->doors.size(); i++)
+		roomNumberList.insert(roomPtr->doors[i].room);
 
 	for (int roomNumber : roomNumberList)
 	{
-		room = &g_Level.Rooms[roomNumber];
-		for (size_t j = 0; j < room->doors.size(); j++)
-			roomNumberList.insert(room->doors[j].room);
+		roomPtr = &g_Level.Rooms[roomNumber];
+		for (size_t j = 0; j < roomPtr->doors.size(); j++)
+			roomNumberList.insert(roomPtr->doors[j].room);
 	}
 
 	return roomNumberList;
@@ -259,12 +264,30 @@ void InitializeNeighborRoomList()
 {
 	for (int i = 0; i < g_Level.Rooms.size(); i++)
 	{
-		auto* room = &g_Level.Rooms[i];
+		auto& room = g_Level.Rooms[i];
 
-		room->neighbors.clear();
+		room.neighbors.clear();
 
 		auto roomNumberList = GetRoomList(i);
 		for (int roomNumber : roomNumberList)
-			room->neighbors.push_back(roomNumber);
+			room.neighbors.push_back(roomNumber);
+	}
+
+	// Add flipped variations of itself.
+	for (int i = 0; i < g_Level.Rooms.size(); i++)
+	{
+		auto& room = g_Level.Rooms[i];
+		if (room.flippedRoom == NO_ROOM)
+			continue;
+
+		auto it = std::find(room.neighbors.begin(), room.neighbors.end(), room.flippedRoom);
+		if (it == room.neighbors.end())
+			room.neighbors.push_back(room.flippedRoom);
+
+		auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
+		auto it2 = std::find(flippedRoom.neighbors.begin(), flippedRoom.neighbors.end(), i);
+
+		if (it2 == flippedRoom.neighbors.end())
+			flippedRoom.neighbors.push_back(i);
 	}
 }

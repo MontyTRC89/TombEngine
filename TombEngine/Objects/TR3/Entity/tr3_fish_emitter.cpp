@@ -410,7 +410,7 @@ namespace TEN::Entities::Creatures::TR3
 		int y = abs(pos->Position.y - item->Pose.Position.y);
 		int z = pos->Position.z - item->Pose.Position.z;
 
-		if (x < -distance || x > distance || z < -distance || z > distance || y < -SECTOR(3) || y > SECTOR(3))
+		if (x < -distance || x > distance || z < -distance || z > distance || y < -BLOCK(3) || y > BLOCK(3))
 			return false;
 
 		if ((pow(x, 2) + pow(z, 2)) > pow(distance, 2))

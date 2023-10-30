@@ -36,11 +36,14 @@ enum LIGHT_TYPES
 	LIGHT_TYPE_SUN = 0,
 	LIGHT_TYPE_POINT = 1,
 	LIGHT_TYPE_SPOT = 2,
-	LIGHT_TYPE_SHADOW = 3
+	LIGHT_TYPE_SHADOW = 3,
+	LIGHT_TYPE_FOG_BULB = 4
 };
 
 enum BLEND_MODES
 {
+	BLENDMODE_UNSET = -1,
+
 	BLENDMODE_OPAQUE = 0,
 	BLENDMODE_ALPHATEST = 1,
 	BLENDMODE_ADDITIVE = 2,
@@ -50,8 +53,7 @@ enum BLEND_MODES
 	BLENDMODE_EXCLUDE = 8,
 	BLENDMODE_SCREEN = 9,
 	BLENDMODE_LIGHTEN = 10,
-	BLENDMODE_ALPHABLEND = 11,
-	BLENDMODE_UNSET = -1
+	BLENDMODE_ALPHABLEND = 11
 };
 
 enum CULL_MODES
@@ -112,14 +114,18 @@ enum RENDERER_FADE_STATUS
 	FADE_OUT
 };
 
-enum RENDERER_DEBUG_PAGE
+enum class RendererDebugPage
 {
-	NO_PAGE,
-	RENDERER_STATS,
-	DIMENSION_STATS,
-	LARA_STATS,
-	LOGIC_STATS,
-	WIREFRAME_MODE
+	None,
+	RendererStats,
+	DimensionStats,
+	PlayerStats,
+	InputStats,
+	CollisionStats,
+	PathfindingStats,
+	WireframeMode,
+
+	Count
 };
 
 enum RendererTransparentFaceType
@@ -188,6 +194,22 @@ enum ALPHA_TEST_MODES
 	ALPHA_TEST_LESS_THAN = 2
 };
 
+enum PrintStringFlags
+{
+	PRINTSTRING_CENTER	= (1 << 0),
+	PRINTSTRING_BLINK	= (1 << 1),
+	PRINTSTRING_RIGHT	= (1 << 2),
+	PRINTSTRING_OUTLINE	= (1 << 3)
+};
+
+enum RendererPass
+{
+	ShadowMap,
+	Opaque,
+	Transparent,
+	CollectSortedFaces
+};
+
 constexpr auto TEXTURE_HEIGHT = 256;
 constexpr auto TEXTURE_WIDTH = 256;
 constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);
@@ -210,9 +232,6 @@ constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);
 #define NUM_SPRITES_PER_BUCKET 4096
 #define NUM_LINES_PER_BUCKET 4096
 #define NUM_CAUSTICS_TEXTURES	16
-#define PRINTSTRING_CENTER 1
-#define PRINTSTRING_BLINK 2
-#define PRINTSTRING_OUTLINE	8
 #define PRINTSTRING_COLOR_ORANGE D3DCOLOR_ARGB(255, 216, 117, 49)
 #define PRINTSTRING_COLOR_WHITE D3DCOLOR_ARGB(255, 255, 255, 255)
 #define PRINTSTRING_COLOR_BLACK D3DCOLOR_ARGB(255, 0, 0, 0)
@@ -227,8 +246,8 @@ constexpr auto MAX_LIGHTS = 100;
 constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEP = 1.0f / 10.0f;
 constexpr auto MAX_DYNAMIC_SHADOWS = 1;
 constexpr auto MAX_DYNAMIC_LIGHTS = 1024;
-constexpr auto ITEM_LIGHT_COLLECTION_RADIUS = SECTOR(1);
-constexpr auto CAMERA_LIGHT_COLLECTION_RADIUS = SECTOR(4);
+constexpr auto ITEM_LIGHT_COLLECTION_RADIUS = BLOCK(1);
+constexpr auto CAMERA_LIGHT_COLLECTION_RADIUS = BLOCK(4);
 
 constexpr auto MAX_TRANSPARENT_FACES = 16384;
 constexpr auto MAX_TRANSPARENT_VERTICES = (MAX_TRANSPARENT_FACES * 6);
@@ -240,7 +259,6 @@ constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
 constexpr auto MAX_BONES = 32;
 
 constexpr auto SCREEN_SPACE_RES	   = Vector2(800.0f, 600.0f);
-constexpr auto INVALID_2D_POSITION = Vector2(FLT_MAX);
 constexpr auto REFERENCE_FONT_SIZE = 35.0f;
 constexpr auto HUD_ZERO_Y		   = -SCREEN_SPACE_RES.y;
 
@@ -252,6 +270,12 @@ constexpr auto MIN_FAR_VIEW = 3200.0f;
 constexpr auto DEFAULT_FAR_VIEW = 102400.0f;
 
 constexpr auto INSTANCED_SPRITES_BUCKET_SIZE = 512;
+
+constexpr auto SKY_TILES_COUNT = 20;
+constexpr auto SKY_SIZE = 10240.0f;
+constexpr auto SKY_VERTICES_COUNT = 4 * SKY_TILES_COUNT * SKY_TILES_COUNT;
+constexpr auto SKY_INDICES_COUNT = 6 * SKY_TILES_COUNT * SKY_TILES_COUNT;
+constexpr auto SKY_TRIANGLES_COUNT = 2 * SKY_TILES_COUNT * SKY_TILES_COUNT;
 
 // FUTURE
 /*
