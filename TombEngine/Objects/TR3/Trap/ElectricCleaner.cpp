@@ -59,7 +59,7 @@ namespace TEN::Entities::Traps
 		CollectLevelPushables(MyPushablesList);
 	}
 
-	void ElectricCleanerControl(short itemNumber)
+	void ControlElectricCleaner(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto& object = Objects[item.ObjectNumber];
@@ -278,7 +278,7 @@ namespace TEN::Entities::Traps
 		return Vector3::Zero;
 	}
 
-	void ElectricCleanerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideElectricCleaner(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
