@@ -8,10 +8,4 @@ namespace TEN::Entities::Traps
 	void InitializeElectricCleaner(short itemNumber);
 	void ControlElectricCleaner(short itemNumber);
 	void CollideElectricCleaner(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-
-	bool IsNextSectorValid(ItemInfo& item, const Vector3& dir);
-	Vector3 ElectricCleanerSearchDirections(ItemInfo& item, const Vector3& dir1, const Vector3& dir2, const Vector3& dir3);
-	void ElectricCleanerToItemCollision(ItemInfo& item);
-	void SpawnElectricCleanerSparks(ItemInfo& item);
-
 }

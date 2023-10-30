@@ -61,135 +61,7 @@ namespace TEN::Entities::Traps
 		}
 	}
 
-	void ControlElectricCleaner(short itemNumber)
-	{
-		auto& item = g_Level.Items[itemNumber];
-		auto& object = Objects[item.ObjectNumber];
-		
-		auto& rotationVel = item.ItemFlags[0];
-		auto& moveVel = item.ItemFlags[2];
-		auto& goalAngle = item.ItemFlags[6];
-
-		if (!TriggerActive(&item))
-		{
-			if (moveVel > 0)
-			{
-				moveVel = 0;
-				SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
-			}
-
-			return;
-		}
-
-		if (moveVel <= 0)
-			return;
-
-		auto angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
-
-		bool flagDoDetection		= ((item.ItemFlags[1] & (1 << 0)) != 0);
-		bool flagTurnRight			= ((item.ItemFlags[1] & (1 << 1)) != 0);
-		bool flagPriorityForward	= ((item.ItemFlags[1] & (1 << 2)) != 0);
-		bool flagAntiClockWiseOrder	= ((item.ItemFlags[1] & (1 << 3)) != 0);
-
-		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
-
-		float yaw = TO_RAD(item.Pose.Orientation.y);
-
-		auto forwardDirection = Vector3(sin(yaw), 0, cos(yaw));
-		forwardDirection.Normalize();
-
-		auto rightDirection = Vector3(cos(yaw), 0, -sin(yaw));
-		rightDirection.Normalize();
-		
-		if (angleDifference > TO_RAD(rotationVel))
-		{
-			if (flagTurnRight)
-				item.Pose.Orientation.y -= rotationVel;
-			else
-				item.Pose.Orientation.y += rotationVel;
-
-			// Recalculate new difference to check if we should force align with axis for safety check.
-			angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
-			if (angleDifference <= TO_RAD(rotationVel))
-				item.Pose.Orientation.y = goalAngle;
-		}
-		else
-		{
-			if (flagDoDetection && 
-				(item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
-				(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
-			{
-				//Do triggers
-				TestTriggers(&item, true);
-
-				//Search for next direction
-				Vector3 NewDirection;
-
-				if (flagPriorityForward)			
-				{
-					if (flagAntiClockWiseOrder)			//Forward Right Left
-						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, rightDirection, -rightDirection);
-					else								//Forward Left Right
-						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, -rightDirection, rightDirection);
-				}
-				else
-				{
-					if (flagAntiClockWiseOrder)			//Right Forward Left
-						NewDirection = ElectricCleanerSearchDirections(item, rightDirection, forwardDirection, -rightDirection);
-					else								//Left Forward Right
-						NewDirection = ElectricCleanerSearchDirections(item, -rightDirection, forwardDirection, rightDirection);
-				}
-
-				if (NewDirection == Vector3::Zero) //Return back. (We already know is a valid one because it came from there).
-					NewDirection = -forwardDirection;
-								
-				//Will turn left or right?
-				auto crossProductResult = NewDirection.Cross(forwardDirection);
-				if (crossProductResult.y > 0)
-					item.ItemFlags[1] |= (1 << 1); // Turn on 1st bit for flagTurnRight.
-				else if (crossProductResult.y < 0)
-					item.ItemFlags[1] &= ~(1 << 1); // Turn off 1st bit for flagTurnRight. (So it'll turn to the left)
-				
-				//Store goal angle to control the rotation.
-				item.ItemFlags[6] = FROM_RAD(atan2(NewDirection.x, NewDirection.z));
-
-				if (item.Pose.Orientation.y - item.ItemFlags[6] == 0)
-					//If it doesn't have to rotate, do forward movement to keep smooth movement.
-					item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
-				else
-					//If it has to rotate, stop detection so it doesn't calculate collisions again while rotating in the same sector.
-					item.ItemFlags[1] &= ~(1 << 0); // Turn off 1st bit for flagDoDetection.
-			}
-			else
-			{
-				item.Pose.Position.y = col.Position.Floor;
-
-				//Is not in the center of a tile, keep moving forward. 
-				item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
-
-				auto slope = col.Block->GetSurfaceSlope(0, true);
-
-				if (slope.LengthSquared() > 0) //If it's a slope, don't do turns.
-					item.ItemFlags[1] &= ~(1 << 0);	// Turn off 1st bit for flagDoDetection.
-				else
-					item.ItemFlags[1] |= (1 << 0);	// Turn on 1st bit for flagDoDetection.
-			}
-		}
-
-		AnimateItem(&item);
-
-		int probedRoomNumber = GetCollision(&item).RoomNumber;
-		if (item.RoomNumber != probedRoomNumber)
-			ItemNewRoom(itemNumber, probedRoomNumber);
-
-		auto radius = Vector2(object.radius, object.radius);
-		AlignEntityToSurface(&item, radius);
-
-		SpawnElectricCleanerSparks(item);
-		ElectricCleanerToItemCollision(item);
-	}
-
-	bool IsNextSectorValid(ItemInfo& item, const Vector3& dir)
+	static bool IsNextSectorValid(ItemInfo& item, const Vector3& dir)
 	{
 		GameVector detectionPoint = item.Pose.Position + dir * BLOCK(1);
 		detectionPoint.RoomNumber = item.RoomNumber;
@@ -264,7 +136,7 @@ namespace TEN::Entities::Traps
 		return true;
 	}
 
-	Vector3 ElectricCleanerSearchDirections(ItemInfo& item, const Vector3& dir1, const Vector3& dir2, const Vector3& dir3)
+	static Vector3 ElectricCleanerSearchDirections(ItemInfo& item, const Vector3& dir1, const Vector3& dir2, const Vector3& dir3)
 	{
 		if (IsNextSectorValid(item, dir1))
 			return dir1;
@@ -275,27 +147,8 @@ namespace TEN::Entities::Traps
 
 		return Vector3::Zero;
 	}
-
-	void CollideElectricCleaner(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto& item = g_Level.Items[itemNumber];
-
-		ObjectCollision(itemNumber, laraItem, coll);
-
-		if (item.TouchBits.Test(ElectricCleanerHarmJoints) && item.ItemFlags[2])
-		{
-			ItemElectricBurn(laraItem, -1);
-			laraItem->HitPoints = 0;
-
-			bool flagStopAfterKill = ((item.ItemFlags[1] & (1 << 4)) != 0);
-			if (flagStopAfterKill)
-				item.ItemFlags[2] = 0;
-
-			SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
-		}
-	}
-		
-	void ElectricCleanerToItemCollision(ItemInfo& item)
+			
+	static void ElectricCleanerToItemCollision(ItemInfo& item)
 	{
 		auto backupPos = item.Pose.Position;
 
@@ -336,7 +189,7 @@ namespace TEN::Entities::Traps
 		item.Pose.Position = backupPos;
 	}
 
-	void SpawnElectricCleanerSparks(ItemInfo& item)
+	static void SpawnElectricCleanerSparks(ItemInfo& item)
 	{
 		SoundEffect(SFX_TR3_CLEANER_LOOP, &item.Pose);
 
@@ -383,4 +236,150 @@ namespace TEN::Entities::Traps
 		}
 	}
 
+	void ControlElectricCleaner(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		auto& object = Objects[item.ObjectNumber];
+
+		auto& rotationVel = item.ItemFlags[0];
+		auto& moveVel = item.ItemFlags[2];
+		auto& goalAngle = item.ItemFlags[6];
+
+		if (!TriggerActive(&item))
+		{
+			if (moveVel > 0)
+			{
+				moveVel = 0;
+				SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
+			}
+
+			return;
+		}
+
+		if (moveVel <= 0)
+			return;
+
+		auto angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
+
+		bool flagDoDetection = ((item.ItemFlags[1] & (1 << 0)) != 0);
+		bool flagTurnRight = ((item.ItemFlags[1] & (1 << 1)) != 0);
+		bool flagPriorityForward = ((item.ItemFlags[1] & (1 << 2)) != 0);
+		bool flagAntiClockWiseOrder = ((item.ItemFlags[1] & (1 << 3)) != 0);
+
+		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+		float yaw = TO_RAD(item.Pose.Orientation.y);
+
+		auto forwardDirection = Vector3(sin(yaw), 0, cos(yaw));
+		forwardDirection.Normalize();
+
+		auto rightDirection = Vector3(cos(yaw), 0, -sin(yaw));
+		rightDirection.Normalize();
+
+		if (angleDifference > TO_RAD(rotationVel))
+		{
+			if (flagTurnRight)
+				item.Pose.Orientation.y -= rotationVel;
+			else
+				item.Pose.Orientation.y += rotationVel;
+
+			// Recalculate new difference to check if we should force align with axis for safety check.
+			angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
+			if (angleDifference <= TO_RAD(rotationVel))
+				item.Pose.Orientation.y = goalAngle;
+		}
+		else
+		{
+			if (flagDoDetection &&
+				(item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
+				(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
+			{
+				//Do triggers
+				TestTriggers(&item, true);
+
+				//Search for next direction
+				Vector3 NewDirection;
+
+				if (flagPriorityForward)
+				{
+					if (flagAntiClockWiseOrder)			//Forward Right Left
+						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, rightDirection, -rightDirection);
+					else								//Forward Left Right
+						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, -rightDirection, rightDirection);
+				}
+				else
+				{
+					if (flagAntiClockWiseOrder)			//Right Forward Left
+						NewDirection = ElectricCleanerSearchDirections(item, rightDirection, forwardDirection, -rightDirection);
+					else								//Left Forward Right
+						NewDirection = ElectricCleanerSearchDirections(item, -rightDirection, forwardDirection, rightDirection);
+				}
+
+				if (NewDirection == Vector3::Zero) //Return back. (We already know is a valid one because it came from there).
+					NewDirection = -forwardDirection;
+
+				//Will turn left or right?
+				auto crossProductResult = NewDirection.Cross(forwardDirection);
+				if (crossProductResult.y > 0)
+					item.ItemFlags[1] |= (1 << 1); // Turn on 1st bit for flagTurnRight.
+				else if (crossProductResult.y < 0)
+					item.ItemFlags[1] &= ~(1 << 1); // Turn off 1st bit for flagTurnRight. (So it'll turn to the left)
+
+				//Store goal angle to control the rotation.
+				item.ItemFlags[6] = FROM_RAD(atan2(NewDirection.x, NewDirection.z));
+
+				if (item.Pose.Orientation.y - item.ItemFlags[6] == 0)
+					//If it doesn't have to rotate, do forward movement to keep smooth movement.
+					item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
+				else
+					//If it has to rotate, stop detection so it doesn't calculate collisions again while rotating in the same sector.
+					item.ItemFlags[1] &= ~(1 << 0); // Turn off 1st bit for flagDoDetection.
+			}
+			else
+			{
+				item.Pose.Position.y = col.Position.Floor;
+
+				//Is not in the center of a tile, keep moving forward. 
+				item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
+
+				auto slope = col.Block->GetSurfaceSlope(0, true);
+
+				if (slope.LengthSquared() > 0) //If it's a slope, don't do turns.
+					item.ItemFlags[1] &= ~(1 << 0);	// Turn off 1st bit for flagDoDetection.
+				else
+					item.ItemFlags[1] |= (1 << 0);	// Turn on 1st bit for flagDoDetection.
+			}
+		}
+
+		AnimateItem(&item);
+
+		int probedRoomNumber = GetCollision(&item).RoomNumber;
+		if (item.RoomNumber != probedRoomNumber)
+			ItemNewRoom(itemNumber, probedRoomNumber);
+
+		auto radius = Vector2(object.radius, object.radius);
+		AlignEntityToSurface(&item, radius);
+
+		SpawnElectricCleanerSparks(item);
+		ElectricCleanerToItemCollision(item);
+	}
+
+	void CollideElectricCleaner(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		ObjectCollision(itemNumber, laraItem, coll);
+
+		if (item.TouchBits.Test(ElectricCleanerHarmJoints) && item.ItemFlags[2])
+		{
+			ItemElectricBurn(laraItem, -1);
+			laraItem->HitPoints = 0;
+
+			bool flagStopAfterKill = ((item.ItemFlags[1] & (1 << 4)) != 0);
+			if (flagStopAfterKill)
+				item.ItemFlags[2] = 0;
+
+			SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
+		}
+	}
 }
