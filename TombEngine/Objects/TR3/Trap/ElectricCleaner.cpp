@@ -12,199 +12,292 @@
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 
-// NOTES
-// ItemFlags[0] = rotation rate.
-// ItemFlags[1] = behaviour flags.
-//					0: flagDoDetection
-//					1: flagTurnRight
-//					2: flagPriorityForward
-//					3: flagCounterClockwiseOrder
-//					4: flagStopAfterKill
-// ItemFlags[2] = movement velocity.
-// ItemFlags[3, 4, 5] = counters for dynamic lights and sparks.
-// ItemFlags[6] = target heading angle.
+// ItemFlags[0]:		Rotation speed and heading angle.
+// ItemFlags[1]:		Flags, each bit is used to check the status of a flag
+//						b0: flagDoDetection
+//						b1: flagTurnRight
+//						b2: flagPriorityForward
+//						b3: flagAntiClockWiseOrder
+//						b4: flagStopAfterKill - If true the cleaner will stop when kills Lara.
+// ItemFlags[2]:		Movement velocity.
+// ItemFlags[3, 4, 5]:	Counters for dynamic lights and sparks.
+// ItemFlags[6]:		Goal direction angle.
 
 // OCB:
-// 0: Stop after killing player, otherwise don't stop.
+// 0:			  Stop after killing the player.
+// Anything else: Don't stop after killing the player.
 
 namespace TEN::Entities::Traps
 {
 	constexpr auto ELECTRIC_CLEANER_VELOCITY  = BLOCK(1 / 16.0f);
-	constexpr auto ELECTRIC_CLEANER_TURN_RATE = ANGLE(5.6f);
+	constexpr auto ELECTRIC_CLEANER_TURN_RATE = 1024;
 
-	const auto ElectricCleanerHarmJoints	= std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
-	const auto ElectricCleanerWireEndJoints = std::vector<unsigned int>{ 5, 9, 13 };
+	const auto ElectricCleanerHarmJoints = std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 
-	auto PushableItemPtrs = std::vector<ItemInfo*>{};
-
-	// TODO: Way of detecting pushables after pushables are refactored.
-	static std::vector<ItemInfo*> GetPushableItemPtrs()
-	{
-		auto pushableItemPtrs = std::vector<ItemInfo*>{};
-
-		for (int itemNumber = 0; itemNumber < g_Level.Items.size(); itemNumber++)
-		{
-			auto& item = g_Level.Items[itemNumber];
-
-			if (item.ObjectNumber >= (ID_PUSHABLE_OBJECT1) &&
-				item.ObjectNumber <= (ID_PUSHABLE_OBJECT10))
-			{
-				pushableItemPtrs.push_back(&item);
-			}
-		}
-
-		return pushableItemPtrs;
-	}
+	std::vector <ItemInfo*> MyPushablesList = {};
 
 	void InitializeElectricCleaner(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		// Align to sector center.
+		// Align to the middle of the block.
 		item.Pose.Position.x = (item.Pose.Position.x & ~WALL_MASK) | (int)BLOCK(0.5f);
 		item.Pose.Position.z = (item.Pose.Position.z & ~WALL_MASK) | (int)BLOCK(0.5f);
 
-		// Initialize flags.
+		// Init flags.
 		item.ItemFlags[0] = ELECTRIC_CLEANER_TURN_RATE;
 		item.ItemFlags[1] = 0;
 		item.ItemFlags[2] = ELECTRIC_CLEANER_VELOCITY;
 		item.ItemFlags[6] = item.Pose.Orientation.y;
 		item.Collidable = true;
 
-		// Set flagStopAfterKill.
 		if (item.TriggerFlags)
+			item.ItemFlags[1] &= ~(1 << 4);	// Turn off 1st bit for flagStopAfterKill.
+		else
+			item.ItemFlags[1] |= (1 << 4);	// Turn on 1st bit for flagStopAfterKill.
+
+		CollectLevelPushables(MyPushablesList);
+	}
+
+	void ElectricCleanerControl(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		auto& object = Objects[item.ObjectNumber];
+		
+		auto& rotationVel = item.ItemFlags[0];
+		auto& moveVel = item.ItemFlags[2];
+		auto& goalAngle = item.ItemFlags[6];
+
+		if (!TriggerActive(&item))
 		{
-			item.ItemFlags[1] &= ~(1 << 4);
+			if (moveVel > 0)
+			{
+				moveVel = 0;
+				SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
+			}
+
+			return;
+		}
+
+		if (moveVel <= 0)
+			return;
+
+		auto angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
+
+		bool flagDoDetection		= ((item.ItemFlags[1] & (1 << 0)) != 0);
+		bool flagTurnRight			= ((item.ItemFlags[1] & (1 << 1)) != 0);
+		bool flagPriorityForward	= ((item.ItemFlags[1] & (1 << 2)) != 0);
+		bool flagAntiClockWiseOrder	= ((item.ItemFlags[1] & (1 << 3)) != 0);
+
+		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+		float yaw = TO_RAD(item.Pose.Orientation.y);
+
+		auto forwardDirection = Vector3(sin(yaw), 0, cos(yaw));
+		forwardDirection.Normalize();
+
+		auto rightDirection = Vector3(cos(yaw), 0, -sin(yaw));
+		rightDirection.Normalize();
+		
+		if (angleDifference > TO_RAD(rotationVel))
+		{
+			if (flagTurnRight)
+				item.Pose.Orientation.y -= rotationVel;
+			else
+				item.Pose.Orientation.y += rotationVel;
+
+			// Recalculate new difference to check if we should force align with axis for safety check.
+			angleDifference = abs(TO_RAD(goalAngle) - TO_RAD(item.Pose.Orientation.y));
+			if (angleDifference <= TO_RAD(rotationVel))
+				item.Pose.Orientation.y = goalAngle;
 		}
 		else
 		{
-			item.ItemFlags[1] |= (1 << 4);
+			if (flagDoDetection && 
+				(item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
+				(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
+			{
+				//Do triggers
+				TestTriggers(&item, true);
+
+				//Search for next direction
+				Vector3 NewDirection;
+
+				if (flagPriorityForward)			
+				{
+					if (flagAntiClockWiseOrder)			//Forward Right Left
+						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, rightDirection, -rightDirection);
+					else								//Forward Left Right
+						NewDirection = ElectricCleanerSearchDirections(item, forwardDirection, -rightDirection, rightDirection);
+				}
+				else
+				{
+					if (flagAntiClockWiseOrder)			//Right Forward Left
+						NewDirection = ElectricCleanerSearchDirections(item, rightDirection, forwardDirection, -rightDirection);
+					else								//Left Forward Right
+						NewDirection = ElectricCleanerSearchDirections(item, -rightDirection, forwardDirection, rightDirection);
+				}
+
+				if (NewDirection == Vector3::Zero) //Return back. (We already know is a valid one because it came from there).
+					NewDirection = -forwardDirection;
+								
+				//Will turn left or right?
+				auto crossProductResult = NewDirection.Cross(forwardDirection);
+				if (crossProductResult.y > 0)
+					item.ItemFlags[1] |= (1 << 1); // Turn on 1st bit for flagTurnRight.
+				else if (crossProductResult.y < 0)
+					item.ItemFlags[1] &= ~(1 << 1); // Turn off 1st bit for flagTurnRight. (So it'll turn to the left)
+				
+				//Store goal angle to control the rotation.
+				item.ItemFlags[6] = FROM_RAD(atan2(NewDirection.x, NewDirection.z));
+
+				if (item.Pose.Orientation.y - item.ItemFlags[6] == 0)
+					//If it doesn't have to rotate, do forward movement to keep smooth movement.
+					item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
+				else
+					//If it has to rotate, stop detection so it doesn't calculate collisions again while rotating in the same sector.
+					item.ItemFlags[1] &= ~(1 << 0); // Turn off 1st bit for flagDoDetection.
+			}
+			else
+			{
+				item.Pose.Position.y = col.Position.Floor;
+
+				//Is not in the center of a tile, keep moving forward. 
+				item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
+
+				auto slope = col.Block->GetSurfaceSlope(0, true);
+
+				if (slope.LengthSquared() > 0) //If it's a slope, don't do turns.
+					item.ItemFlags[1] &= ~(1 << 0);	// Turn off 1st bit for flagDoDetection.
+				else
+					item.ItemFlags[1] |= (1 << 0);	// Turn on 1st bit for flagDoDetection.
+			}
 		}
 
-		PushableItemPtrs = GetPushableItemPtrs();
+		AnimateItem(&item);
+
+		int probedRoomNumber = GetCollision(&item).RoomNumber;
+		if (item.RoomNumber != probedRoomNumber)
+			ItemNewRoom(itemNumber, probedRoomNumber);
+
+		auto radius = Vector2(object.radius, object.radius);
+		AlignEntityToSurface(&item, radius);
+
+		SpawnElectricCleanerSparks(item);
+		ElectricCleanerToItemCollision(item);
 	}
 
-	static bool TestPushableCollision(const std::vector<ItemInfo*>& pushableItemPtrs, const Vector3& refPoint)
+	bool IsNextSectorValid(ItemInfo& item, const Vector3& dir)
 	{
-		float pushableDist = INFINITY;
-		for (int itemNumber = 0; itemNumber < pushableItemPtrs.size(); itemNumber++)
-		{
-			const auto& currentItem = *pushableItemPtrs[itemNumber];
-			if (&currentItem == nullptr)
-				continue;
+		GameVector detectionPoint = item.Pose.Position + dir * BLOCK(1);
+		detectionPoint.RoomNumber = item.RoomNumber;
 
-			auto pos = currentItem.Pose.Position.ToVector3();
-			auto dist = Vector3::Distance(pos, refPoint);
+		auto col = GetCollision(detectionPoint);
 
-			if (dist < BLOCK(1))
-				return true;
-		}
-
-		return false;
-	}
-
-	static bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
-	{
-		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(1));
-
-		auto pointColl = GetCollision(projectedPos);
-
-		// Test for wall.
-		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
+		//Is a wall
+		if (col.Block->IsWall(detectionPoint.x, detectionPoint.z))
 			return false;
 
-		// Test for slippery slope.
-		if (pointColl.Position.FloorSlope)
+		//Is it a sliding slope?
+		if (col.Position.FloorSlope)
 			return false;
 
-		// Flat floor.
-		if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
+		if (abs(col.FloorTilt.x) == 0 && abs(col.FloorTilt.y) == 0) //Is a flat tile
 		{
-			// Test for step.
-			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-			if (relFloorHeight >= CLICK(1))
+			//Is a 1 click step (higher or lower).
+			int distanceToFloor = abs(col.Position.Floor - item.Pose.Position.y);
+			if (distanceToFloor >= CLICK(1))
 				return false;
 		}
-		// Sloped floor.
-		else
+		else //Is a slope tile
 		{
-			// Half block.
-			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-			if (relFloorHeight > CLICK(2))
+			//Is a 2 click step (higher or lower).
+			int distanceToFloor = abs(col.Position.Floor - item.Pose.Position.y);
+			if (distanceToFloor > CLICK(2))
 				return false;
 
 			short slopeAngle = ANGLE(0.0f);
 
-			if (pointColl.FloorTilt.x > 0)
-			{
+			if (col.FloorTilt.x > 0)
 				slopeAngle = -ANGLE(90.0f);
-			}
-			else if (pointColl.FloorTilt.x < 0)
-			{
+			else if (col.FloorTilt.x < 0)
 				slopeAngle = ANGLE(90.0f);
-			}
 
-			if (pointColl.FloorTilt.y > 0 && pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
-			{
+			if (col.FloorTilt.y > 0 && col.FloorTilt.y > abs(col.FloorTilt.x))
 				slopeAngle = ANGLE(180.0f);
-			}
-			else if (pointColl.FloorTilt.y < 0 && -pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
-			{
+			else if (col.FloorTilt.y < 0 && -col.FloorTilt.y > abs(col.FloorTilt.x))
 				slopeAngle = ANGLE(0.0f);
-			}
 
-			int angleDir = phd_atan(dir.z, dir.x);
-			int alignAngle = slopeAngle - angleDir;
+			auto angleDir = FROM_RAD(atan2(dir.x, dir.z));
+			auto alignment = slopeAngle - angleDir;
 
-			// Test if slope aspect is not aligned with the direction.
-			if (alignAngle != ANGLE(180.0f) && alignAngle != 0 && alignAngle != ANGLE(-180.0f))
+			//Is slope not aligned with the direction?
+			if ((alignment != 32768) && (alignment != 0) && (alignment != -32768))
 				return false;
 		}
 
-		// Check for diagonal split.
-		if (pointColl.Position.DiagonalStep)
+		//Is diagonal floor?
+		if (col.Position.DiagonalStep)
 			return false;
 
-		// Test ceiling height.
-		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);	
-		int cleanerHeight = BLOCK(1);
-		if (relCeilHeight < cleanerHeight)
+		//Is ceiling (square or diagonal) high enough?
+		int distanceToCeiling = abs(col.Position.Ceiling - col.Position.Floor);	
+		int cleanerHeight = BLOCK(1); //TODO change it for the collision bounding box height.
+		if (distanceToCeiling < cleanerHeight)
 			return false;
 
-		// Check for inaccessible sector.
-		if (pointColl.Block->Box == NO_BOX)
+		//Is a non walkable tile? (So there is not any box)
+		if (col.Block->Box == NO_BOX)
 			return false;
 
-		// Check for blocked grey box.
-		if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKABLE)
+		//Is a blocked grey box (So it's an Isolated box)
+		if (g_Level.Boxes[col.Block->Box].flags & BLOCKABLE)
+			return false;
+		
+		//Is a stopper tile? (There is still a shatter object).
+		if (col.Block->Stopper)
 			return false;
 
-		// Check for stopper flag.
-		if (pointColl.Block->Stopper)
+		//Is there a pushable block?
+		if (CheckPushableList(MyPushablesList, detectionPoint.ToVector3()))
 			return false;
 
-		// Test for pushable object.
-		if (TestPushableCollision(PushableItemPtrs, projectedPos.ToVector3()))
-			return false;
-
+		//If nothing of that happened, then it must be a valid sector.
 		return true;
 	}
 
-	static Vector3 GetElectricCleanerMovementDirection(const ItemInfo& item, const Vector3& dir0, const Vector3& dir1, const Vector3& dir2)
+	Vector3 ElectricCleanerSearchDirections(ItemInfo& item, const Vector3& dir1, const Vector3& dir2, const Vector3& dir3)
 	{
-		if (IsNextSectorValid(item, dir0))
-			return dir0;
-
 		if (IsNextSectorValid(item, dir1))
 			return dir1;
-
 		if (IsNextSectorValid(item, dir2))
 			return dir2;
+		if (IsNextSectorValid(item, dir3))
+			return dir3;
 
 		return Vector3::Zero;
 	}
 
-	static void HandleElectricCleanerItemCollision(ItemInfo& item)
+	void ElectricCleanerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		ObjectCollision(itemNumber, laraItem, coll);
+
+		if (item.TouchBits.Test(ElectricCleanerHarmJoints) && item.ItemFlags[2])
+		{
+			ItemElectricBurn(laraItem, -1);
+			laraItem->HitPoints = 0;
+
+			bool flagStopAfterKill = ((item.ItemFlags[1] & (1 << 4)) != 0);
+			if (flagStopAfterKill)
+				item.ItemFlags[2] = 0;
+
+			SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
+		}
+	}
+		
+	void ElectricCleanerToItemCollision(ItemInfo& item)
 	{
 		auto backupPos = item.Pose.Position;
 
@@ -245,8 +338,10 @@ namespace TEN::Entities::Traps
 		item.Pose.Position = backupPos;
 	}
 
-	static void SpawnElectricCleanerSparks(ItemInfo& item)
+	void SpawnElectricCleanerSparks(ItemInfo& item)
 	{
+		static auto wireEndJoints = std::array<int, 3>{ 5, 9, 13 };
+
 		SoundEffect(SFX_TR3_CLEANER_LOOP, &item.Pose);
 
 		auto vel = Vector3i(
@@ -263,7 +358,7 @@ namespace TEN::Entities::Traps
 				else
 					item.ItemFlags[3 + i]--;
 
-				int joint = ElectricCleanerWireEndJoints[i];
+				int joint = wireEndJoints[i];
 				auto pos = GetJointPosition(&item, joint, Vector3i(-160, -8, 16));
 
 				byte c = Random::GenerateInt(0, 64) + 128;
@@ -292,169 +387,36 @@ namespace TEN::Entities::Traps
 		}
 	}
 
-	void ControlElectricCleaner(short itemNumber)
+	//TODO method to detect pushables while Pushable_Object get refactored.
+
+	void CollectLevelPushables(std::vector <ItemInfo* >& PushablesList)
 	{
-		auto& item = g_Level.Items[itemNumber];
-		const auto& object = Objects[item.ObjectNumber];
-		
-		short& moveVel = item.ItemFlags[2];
-		if (!TriggerActive(&item))
+		for (int index = 0; index < g_Level.Items.size(); index++)
 		{
-			if (moveVel > 0)
-			{
-				moveVel = 0;
-				SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
-			}
-
-			return;
+			ItemInfo* currentItem = &g_Level.Items[index];
+			if (currentItem->ObjectNumber >= (ID_PUSHABLE_OBJECT1) &&
+				currentItem->ObjectNumber <= (ID_PUSHABLE_OBJECT10))
+				PushablesList.push_back(currentItem);
 		}
-
-		if (moveVel <= 0)
-			return;
-
-		// Get flags.
-		bool flagDoDetection		   = ((item.ItemFlags[1] & (1 << 0)) != 0);
-		bool flagTurnRight			   = ((item.ItemFlags[1] & (1 << 1)) != 0);
-		bool flagPriorityForward	   = ((item.ItemFlags[1] & (1 << 2)) != 0);
-		bool flagCounterClockwiseOrder = ((item.ItemFlags[1] & (1 << 3)) != 0);
-
-		short& rotRate = item.ItemFlags[0];
-		short& targetHeadingAngle = item.ItemFlags[6];
-
-		short headingAngleDelta = abs(targetHeadingAngle - item.Pose.Orientation.y);
-		if (headingAngleDelta > rotRate)
-		{
-			item.Pose.Orientation.y += flagTurnRight ? -rotRate : rotRate;
-
-			// Recalculate new dela to check if alignment with axis should be forced for safety check.
-			headingAngleDelta = abs(targetHeadingAngle - item.Pose.Orientation.y);
-			if (headingAngleDelta <= rotRate)
-				item.Pose.Orientation.y = targetHeadingAngle;
-		}
-		else
-		{
-			auto forwardDir = EulerAngles(0, item.Pose.Orientation.y, 0).ToDirection();
-			auto rightDir = EulerAngles(0, item.Pose.Orientation.y + ANGLE(90.0f), 0).ToDirection();
-
-			if (flagDoDetection &&
-				(item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
-				(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
-			{
-				TestTriggers(&item, true);
-
-				// Find new direction.
-				auto newDir = Vector3::Zero;
-				if (flagPriorityForward)			
-				{
-					// Forward, right, left.
-					if (flagCounterClockwiseOrder)
-					{
-						newDir = GetElectricCleanerMovementDirection(item, forwardDir, rightDir, -rightDir);
-					}
-					// Forward, left, right.
-					else
-					{
-						newDir = GetElectricCleanerMovementDirection(item, forwardDir, -rightDir, rightDir);
-					}
-				}
-				else
-				{
-					// Right, forward, left.
-					if (flagCounterClockwiseOrder)
-					{
-						newDir = GetElectricCleanerMovementDirection(item, rightDir, forwardDir, -rightDir);
-					}
-					// Left, forward, right.
-					else
-					{
-						newDir = GetElectricCleanerMovementDirection(item, -rightDir, forwardDir, rightDir);
-					}
-				}
-
-				// Turn back.
-				if (newDir == Vector3::Zero)
-					newDir = -forwardDir;
-
-				// Set flagTurnRight.		
-				auto cross = newDir.Cross(forwardDir);
-				if (cross.y > 0)
-				{
-					item.ItemFlags[1] |= (1 << 1);
-				}
-				else if (cross.y < 0)
-				{
-					item.ItemFlags[1] &= ~(1 << 1);
-				}
-				
-				// Store target heading angle.
-				item.ItemFlags[6] = phd_atan(newDir.z, newDir.x);
-
-				// Not rotating; keep moving forward.
-				if (item.Pose.Orientation.y - item.ItemFlags[6] == 0)
-				{
-					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, moveVel);
-				}
-				// Skip collision detection while rotating on current sector.
-				else
-				{
-					// Unset flagDoDetection.
-					item.ItemFlags[1] &= ~(1 << 0);
-				}
-			}
-			else
-			{
-				auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
-
-				item.Pose.Position.y = pointColl.Position.Floor;
-
-				// Not in sector center; continue moving forward. 
-				item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, moveVel);
-
-				// TODO: Cleaner check.
-				// Slippery slope; don't turn.
-				auto slope = pointColl.Block->GetSurfaceSlope(0, true);
-				if (slope.LengthSquared() > 0)
-				{
-					// Unset flagDoDetection.
-					item.ItemFlags[1] &= ~(1 << 0);
-				}
-				else
-				{
-					// Unset flagDoDetection.
-					item.ItemFlags[1] |= (1 << 0);
-				}
-			}
-		}
-
-		AnimateItem(&item);
-
-		int probedRoomNumber = GetCollision(&item).RoomNumber;
-		if (item.RoomNumber != probedRoomNumber)
-			ItemNewRoom(itemNumber, probedRoomNumber);
-
-		auto radius = Vector2(object.radius, object.radius);
-		AlignEntityToSurface(&item, radius);
-
-		SpawnElectricCleanerSparks(item);
-		HandleElectricCleanerItemCollision(item);
 	}
 
-	void CollideElectricCleaner(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	bool CheckPushableList(std::vector <ItemInfo* >& PushablesList, Vector3& refPoint)
 	{
-		auto& item = g_Level.Items[itemNumber];
-
-		ObjectCollision(itemNumber, laraItem, coll);
-
-		if (item.TouchBits.Test(ElectricCleanerHarmJoints) && item.ItemFlags[2])
+		auto pushableDistance = INFINITE;
+		for (int index = 0; index < PushablesList.size(); index++)
 		{
-			ItemElectricBurn(laraItem, -1);
-			laraItem->HitPoints = 0;
+			ItemInfo* currentObj = PushablesList[index];
+			
+			if (currentObj == nullptr)
+				continue;
 
-			bool flagStopAfterKill = ((item.ItemFlags[1] & (1 << 4)) != 0);
-			if (flagStopAfterKill)
-				item.ItemFlags[2] = 0;
+			auto PushablePos = currentObj->Pose.Position.ToVector3();
+			auto currentDistance = Vector3::Distance(PushablePos, refPoint);
 
-			SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
+			if (currentDistance < 1024)
+				return true;
 		}
+		return false;
 	}
+
 }
