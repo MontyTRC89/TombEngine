@@ -21,12 +21,12 @@ when you need to use screen-space coordinates.
 */
 
 UserDisplayString::UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated) :
-	m_key(key),
-	Position(pos),
-	m_scale(scale),
-	m_color(color),
-	m_flags(flags),
-	m_isTranslated(isTranslated)
+	_key(key),
+	_position(pos),
+	_scale(scale),
+	_color(color),
+	_flags(flags),
+	_isTranslated(isTranslated)
 {
 }
 
@@ -35,7 +35,7 @@ DisplayString::DisplayString()
 	// We don't ever dereference this pointer; it's just
 	// a handy way to get a unique key for a hash map.
 
-	m_id = reinterpret_cast<DisplayStringIDType>(this);
+	_id = reinterpret_cast<DisplayStringID>(this);
 }
 
 /*** Create a DisplayString.
@@ -94,7 +94,7 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, const
 		ScriptAssertF(false, "Wrong argument type for {}.new \"scale\" argument; must be a float or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 
 	auto string = UserDisplayString(key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)), flagArray, USE_IF_HAVE(bool, isTranslated, false));
-	DisplayString::s_setItemCallback(id, string);
+	DisplayString::SetItemCallbackRoutine(id, string);
 	return ptr;
 }
 
@@ -127,7 +127,7 @@ sol::object DisplayStringWrapper(const std::string& key, sol::object unkArg0, so
 
 DisplayString::~DisplayString()
 {
-	s_removeItemCallback(m_id);
+	RemoveItemCallbackRoutine(_id);
 }
 
 void DisplayString::Register(sol::table& parent)
@@ -203,39 +203,39 @@ void DisplayString::Register(sol::table& parent)
 		ScriptReserved_SetTranslated, &DisplayString::SetTranslated);
 }
 
-DisplayStringIDType DisplayString::GetID() const
+DisplayStringID DisplayString::GetID() const
 {
-	return m_id;
+	return _id;
 }
 
 void DisplayString::SetScale(float scale)
 {
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	displayString.m_scale = scale;
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	displayString._scale = scale;
 }
 
 float DisplayString::GetScale() const
 {
-	const UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	return displayString.m_scale;
+	const UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	return displayString._scale;
 }
 
 void DisplayString::SetPosition(const Vec2& pos)
 {
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	displayString.Position = pos;
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	displayString._position = pos;
 }
 
 Vec2 DisplayString::GetPos() const
 {	
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	return displayString.Position;
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	return displayString._position;
 }
 	
 void DisplayString::SetColor(const ScriptColor& color)
 {
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	displayString.m_color = color;
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	displayString._color = color;
 
 	//todo maybe change getItemCallback to return a ref instead? or move its
 	//todo UserDisplayString object? and then move back?
@@ -244,25 +244,25 @@ void DisplayString::SetColor(const ScriptColor& color)
 
 ScriptColor DisplayString::GetColor() const
 {
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	return displayString.m_color;
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	return displayString._color;
 }
 
 void DisplayString::SetKey(const std::string& key)
 {
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	displayString.m_key = key;
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	displayString._key = key;
 }
 
 std::string DisplayString::GetKey() const
 {
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
-	return displayString.m_key;
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	return displayString._key;
 }
 
 void DisplayString::SetFlags(const sol::table& flags) 
 {
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
 
 	auto flagArray = FlagArray {};
 	for (const auto& val : flags)
@@ -271,17 +271,17 @@ void DisplayString::SetFlags(const sol::table& flags)
 		flagArray[i] = true;
 	}
 
-	displayString.m_flags = flagArray;
+	displayString._flags = flagArray;
 }
 
 void DisplayString::SetTranslated(bool isTranslated)
 {
-	UserDisplayString& displayString = s_getItemCallback(m_id).value();
+	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
 	TENLog(isTranslated ? "Translated string " : "Untranslated string " + std::to_string(isTranslated), LogLevel::Info);
-	displayString.m_isTranslated = isTranslated;
+	displayString._isTranslated = isTranslated;
 }
 
-SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserDisplayString)
+SetItemCallback DisplayString::SetItemCallbackRoutine = [](DisplayStringID, UserDisplayString)
 {
 	std::string err = "\"Set string\" callback is not set.";
 	throw TENScriptException(err);
@@ -290,14 +290,14 @@ SetItemCallback DisplayString::s_setItemCallback = [](DisplayStringIDType, UserD
 
 // This is called by a destructor (or will be if we forget to assign it during a refactor)
 // and destructors "must never throw", so we terminate instead.
-RemoveItemCallback DisplayString::s_removeItemCallback = [](DisplayStringIDType)
+RemoveItemCallback DisplayString::RemoveItemCallbackRoutine = [](DisplayStringID)
 {
 	TENLog("\"Remove string\" callback is not set.", LogLevel::Error);
 	std::terminate();
 	return false;
 };
 
-GetItemCallback DisplayString::s_getItemCallback = [](DisplayStringIDType)
+GetItemCallback DisplayString::GetItemCallbackRoutine = [](DisplayStringID)
 {
 	std::string err = "\"Get string\" callback is not set.";
 	throw TENScriptException(err);

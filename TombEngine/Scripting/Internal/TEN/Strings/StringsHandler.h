@@ -6,7 +6,7 @@
 #include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 
-using DisplayStringMap = std::unordered_map<DisplayStringIDType, UserDisplayString>;
+using DisplayStringMap = std::unordered_map<DisplayStringID, UserDisplayString>;
 
 class StringsHandler :
 	public LuaHandler,
@@ -21,10 +21,10 @@ public:
 	void SetCallbackDrawString(CallbackDrawString cb) override;
 	void ProcessDisplayStrings(float deltaTime) override;
 	void ClearDisplayStrings() override;
-	bool SetDisplayString(DisplayStringIDType id, UserDisplayString const& ds);
+	bool SetDisplayString(DisplayStringID id, UserDisplayString const& ds);
 
-	std::optional<std::reference_wrapper<UserDisplayString>> GetDisplayString(DisplayStringIDType id);
-	bool ScheduleRemoveDisplayString(DisplayStringIDType id);
+	std::optional<std::reference_wrapper<UserDisplayString>> GetDisplayString(DisplayStringID id);
+	bool ScheduleRemoveDisplayString(DisplayStringID id);
 
 	void ShowString(DisplayString const&, sol::optional<float> nSeconds);
 

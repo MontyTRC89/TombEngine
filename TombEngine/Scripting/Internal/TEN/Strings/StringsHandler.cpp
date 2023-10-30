@@ -54,7 +54,7 @@ Checks if the string is shown
 	MakeReadOnlyTable(table, ScriptReserved_DisplayStringOption, DISPLAY_STRING_OPTION_NAMES);
 }
 
-std::optional<std::reference_wrapper<UserDisplayString>> StringsHandler::GetDisplayString(DisplayStringIDType id)
+std::optional<std::reference_wrapper<UserDisplayString>> StringsHandler::GetDisplayString(DisplayStringID id)
 {
 	auto it = m_userDisplayStrings.find(id);
 	if (std::cend(m_userDisplayStrings) == it)
@@ -63,13 +63,13 @@ std::optional<std::reference_wrapper<UserDisplayString>> StringsHandler::GetDisp
 	return std::ref(m_userDisplayStrings.at(id));
 }
 
-bool StringsHandler::ScheduleRemoveDisplayString(DisplayStringIDType id)
+bool StringsHandler::ScheduleRemoveDisplayString(DisplayStringID id)
 {
 	auto it = m_userDisplayStrings.find(id);
 	if (std::cend(m_userDisplayStrings) == it)
 		return false;
 
-	it->second.m_deleteWhenZero = true;
+	it->second._deleteWhenZero = true;
 	return true;
 }
 
@@ -78,7 +78,7 @@ void StringsHandler::SetCallbackDrawString(CallbackDrawString cb)
 	m_callbackDrawSring = cb;
 }
 
-bool StringsHandler::SetDisplayString(DisplayStringIDType id, const UserDisplayString& displayString)
+bool StringsHandler::SetDisplayString(DisplayStringID id, const UserDisplayString& displayString)
 {
 	return m_userDisplayStrings.insert_or_assign(id, displayString).second;
 }
@@ -86,15 +86,15 @@ bool StringsHandler::SetDisplayString(DisplayStringIDType id, const UserDisplayS
 void StringsHandler::ShowString(const DisplayString& str, sol::optional<float> numSeconds)
 {
 	auto it = m_userDisplayStrings.find(str.GetID());
-	it->second.m_timeRemaining = numSeconds.value_or(0.0f);
-	it->second.m_isInfinite = !numSeconds.has_value();
+	it->second._timeRemaining = numSeconds.value_or(0.0f);
+	it->second._isInfinite = !numSeconds.has_value();
 }
 
 bool StringsHandler::IsStringDisplaying(const DisplayString& displayString)
 {
 	auto it = m_userDisplayStrings.find(displayString.GetID());
-	bool isAtEndOfLife = (0.0f >= it->second.m_timeRemaining);
-	return (it->second.m_isInfinite ? isAtEndOfLife : !isAtEndOfLife);
+	bool isAtEndOfLife = (0.0f >= it->second._timeRemaining);
+	return (it->second._isInfinite ? isAtEndOfLife : !isAtEndOfLife);
 }
 
 void StringsHandler::ProcessDisplayStrings(float deltaTime)
@@ -103,34 +103,34 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 	while (it != std::end(m_userDisplayStrings))
 	{
 		auto& str = it->second;
-		bool endOfLife = 0.0f >= str.m_timeRemaining;
-		if (str.m_deleteWhenZero && endOfLife)
+		bool endOfLife = 0.0f >= str._timeRemaining;
+		if (str._deleteWhenZero && endOfLife)
 		{
-			ScriptAssertF(!str.m_isInfinite, "The infinite string {} (key \"{}\") went out of scope without being hidden.", it->first, str.m_key);
+			ScriptAssertF(!str._isInfinite, "The infinite string {} (key \"{}\") went out of scope without being hidden.", it->first, str._key);
 			it = m_userDisplayStrings.erase(it);
 		}
 		else
 		{
-			if (!endOfLife || str.m_isInfinite)
+			if (!endOfLife || str._isInfinite)
 			{
-				auto cstr = str.m_isTranslated ? g_GameFlow->GetString(str.m_key.c_str()) : str.m_key.c_str();
+				auto cstr = str._isTranslated ? g_GameFlow->GetString(str._key.c_str()) : str._key.c_str();
 				int flags = 0;
 
-				if (str.m_flags[(size_t)DisplayStringOptions::Center])
+				if (str._flags[(size_t)DisplayStringOptions::Center])
 					flags |= PRINTSTRING_CENTER;
 
-				if (str.m_flags[(size_t)DisplayStringOptions::Right])
+				if (str._flags[(size_t)DisplayStringOptions::Right])
 					flags |= PRINTSTRING_RIGHT;
 
-				if (str.m_flags[(size_t)DisplayStringOptions::Outline])
+				if (str._flags[(size_t)DisplayStringOptions::Outline])
 					flags |= PRINTSTRING_OUTLINE;
 
-				if (str.m_flags[(size_t)DisplayStringOptions::Blink])
+				if (str._flags[(size_t)DisplayStringOptions::Blink])
 					flags |= PRINTSTRING_BLINK;
 
-				m_callbackDrawSring(cstr, str.m_color, str.Position, str.m_scale, flags);
+				m_callbackDrawSring(cstr, str._color, str._position, str._scale, flags);
 
-				str.m_timeRemaining -= deltaTime;
+				str._timeRemaining -= deltaTime;
 			}
 
 			++it;
