@@ -16,7 +16,7 @@ Flow.SetTitleScreenImagePath("Screens\\main.jpg")
 
 Flow.SetTotalSecretCount(5)
 
--- Enable/Disable bilinear filtering.
+-- Enable/Disable Point Filter (Square, unsmoothed pixels).
 
 Flow.EnablePointFilter(false)
 

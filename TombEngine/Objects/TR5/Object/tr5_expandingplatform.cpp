@@ -76,7 +76,7 @@ bool IsOnExpandingPlatform(int itemNumber, int x, int z)
 			return false;
 	}
 
-	return GetBridgeItemIntersect(itemNumber, x, item->Pose.Position.y, z, false).has_value();
+	return GetBridgeItemIntersect(Vector3i(x, item->Pose.Position.y, z), itemNumber, false).has_value();
 }
 
 bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margin)
@@ -129,7 +129,7 @@ bool IsInFrontOfExpandingPlatform(int itemNumber, int x, int y, int z, int margi
 			return false;
 	}
 
-	return GetBridgeItemIntersect(itemNumber, x, item->Pose.Position.y, z, false).has_value();
+	return GetBridgeItemIntersect(Vector3i(x, item->Pose.Position.y, z), itemNumber, false).has_value();
 }
 
 void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
@@ -254,7 +254,7 @@ std::optional<int> ExpandingPlatformFloor(short itemNumber, int x, int y, int z)
 	if (!IsOnExpandingPlatform(itemNumber, x, z))
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
 }
 
 std::optional<int> ExpandingPlatformCeiling(short itemNumber, int x, int y, int z)
@@ -262,7 +262,7 @@ std::optional<int> ExpandingPlatformCeiling(short itemNumber, int x, int y, int 
 	if (!IsOnExpandingPlatform(itemNumber, x, z))
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
 }
 
 int ExpandingPlatformFloorBorder(short itemNumber)

@@ -24,7 +24,6 @@
 	constexpr auto BLOCK = [](auto x) { return (BLOCK_UNIT * x); };
 	constexpr auto CLICK = [](auto x) { return ((BLOCK(1) / 4) * x); };
 
-	constexpr auto STEP_SIZE	  = CLICK(1);
 	constexpr auto WALL_MASK	  = BLOCK(1) - 1;
 	constexpr auto GRID_SNAP_SIZE = (int)BLOCK(1 / 8.0f);
 //}

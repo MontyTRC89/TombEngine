@@ -35,12 +35,12 @@ class Vector3i;
 		GameVector& operator +=(const GameVector& vector);
 		GameVector& operator -=(const GameVector& vector);
 		GameVector& operator *=(const GameVector& vector);
-		GameVector& operator *=(float scale);
-		GameVector& operator /=(float scale);
+		GameVector& operator *=(float scalar);
+		GameVector& operator /=(float scalar);
 		GameVector	operator +(const GameVector& vector) const;
 		GameVector	operator -(const GameVector& vector) const;
 		GameVector	operator *(const GameVector& vector) const;
-		GameVector	operator *(float scale) const;
-		GameVector	operator /(float scale) const;
+		GameVector	operator *(float scalar) const;
+		GameVector	operator /(float scalar) const;
 	};
 //}

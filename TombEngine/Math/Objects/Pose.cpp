@@ -64,20 +64,21 @@ using namespace TEN::Math;
 		Position = Geometry::TranslatePoint(Position, headingAngle, forward, down, right);
 	}
 
-	void Pose::Translate(const EulerAngles& orient, float distance)
+	void Pose::Translate(const EulerAngles& orient, float dist)
 	{
-		Position = Geometry::TranslatePoint(Position, orient, distance);
+		Position = Geometry::TranslatePoint(Position, orient, dist);
 	}
 
-	void Pose::Translate(const Vector3& direction, float distance)
+	void Pose::Translate(const Vector3& dir, float dist)
 	{
-		Position = Geometry::TranslatePoint(Position, direction, distance);
+		Position = Geometry::TranslatePoint(Position, dir, dist);
 	}
 
 	bool Pose::operator ==(const Pose& pose) const
 	{
 		return ((Position == pose.Position) && (Orientation == pose.Orientation));
 	}
+
 	bool Pose::operator !=(const Pose& pose) const
 	{
 		return !(*this == pose);
