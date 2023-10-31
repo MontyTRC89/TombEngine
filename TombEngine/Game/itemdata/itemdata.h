@@ -9,6 +9,7 @@
 #include "Game/itemdata/door_data.h"
 #include "Game/Lara/lara_struct.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/Ladder.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Objects/TR2/Vehicles/speedboat_info.h"
@@ -52,28 +53,30 @@ class ItemData
 		double,
 		long double,
 		std::array<short, 4>,
-		GameVector,
-		DOOR_DATA,
-		PushableInfo,
-		ItemInfo*,
-		LaraInfo*,
+
+		BigGunInfo,
 		CollisionInfo,
 		CreatureInfo,
-		WraithInfo,
+		DOOR_DATA,
+		ElectricalLightInfo,
+		GameVector,
 		GuardianInfo,
-		QuadBikeInfo,
-		BigGunInfo,
-		MotorbikeInfo,
+		ItemInfo*,
 		JeepInfo,
 		KayakInfo,
-		SkidooInfo,
-		UPVInfo,
-		SpeedboatInfo,
-		RubberBoatInfo,
+		LadderObject,
+		LaraInfo*,
 		MinecartInfo,
-		ElectricalLightInfo
-	> data;
-	public:
+		MotorbikeInfo,
+		PushableInfo,
+		QuadBikeInfo,
+		RubberBoatInfo,
+		SkidooInfo,
+		SpeedboatInfo,
+		UPVInfo,
+		WraithInfo> data;
+	
+public:
 	ItemData();
 
 	template<typename D>

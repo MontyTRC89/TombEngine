@@ -26,4 +26,18 @@ namespace TEN::Utils
 		auto it = std::find(vector.begin(), vector.end(), element);
 		return (it != vector.end());
 	}
+
+	template <typename TElement>
+	void PushUnique(std::vector<TElement>& vector, const TElement& element)
+	{
+		if (!Contains(vector, element))
+			vector.push_back(element);
+	}
+
+	template <typename TElement>
+	void Remove(std::vector<TElement>& vector, const TElement& element)
+	{
+		auto it = std::remove(vector.begin(), vector.end(), element);
+		vector.erase(it, vector.end());
+	}
 }

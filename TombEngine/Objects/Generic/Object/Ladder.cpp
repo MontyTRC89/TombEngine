@@ -15,13 +15,19 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
+
+#include <OISKeyboard.h>
+using namespace OIS;
 
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
+using namespace TEN::Utils;
 
 // NOTES:
-// ItemFlags[0] = is double-sided.
+// TriggerFlags:
+//	1: is double-sided.
 
 namespace TEN::Entities::Generic
 {
@@ -115,9 +121,130 @@ namespace TEN::Entities::Generic
 			EulerAngles(-PLAYER_MOUNT_LEAN_ANGLE_THRESHOLD, ANGLE(-90.0f) - LARA_GRAB_THRESHOLD, -PLAYER_MOUNT_LEAN_ANGLE_THRESHOLD),
 			EulerAngles(PLAYER_MOUNT_LEAN_ANGLE_THRESHOLD, ANGLE(-90.0f) + LARA_GRAB_THRESHOLD, PLAYER_MOUNT_LEAN_ANGLE_THRESHOLD)));
 
+	LadderObject::LadderObject(bool isDoubleSided)
+	{
+		_isDoubleSided = isDoubleSided;
+	}
+
+	void LadderObject::AttachItem(ItemInfo& item)
+	{
+		PushUnique(_attachedItems, &item);
+	}
+	
+	void LadderObject::DetachItem(ItemInfo& item)
+	{
+		Remove(_attachedItems, &item);
+	}
+
+	LadderObject& GetLadderObject(ItemInfo& ladderItem)
+	{
+		return (LadderObject&)ladderItem.Data;
+	}
+
+	void InitializeLadder(short itemNumber)
+	{
+		auto& ladderItem = g_Level.Items[itemNumber];
+
+		bool isDoubleSided = ((ladderItem.TriggerFlags & (1 << 0)) == 1);
+
+		ladderItem.Data = LadderObject(isDoubleSided);
+		auto& ladder = GetLadderObject(ladderItem);
+
+		ladder.PrevPose = ladderItem.Pose;
+
+		AddActiveItem(itemNumber);
+	}
+
+	void ControlLadder(short itemNumber)
+	{
+		using Vector3 = SimpleMath::Vector3;
+
+		auto& ladderItem = g_Level.Items[itemNumber];
+		auto& ladder = GetLadderObject(ladderItem);
+
+		//---------------debug
+
+		int step = 30;
+		short angle = ANGLE(3.0f);
+
+		// Move.
+		if (KeyMap[KC_I])
+		{
+			ladderItem.Pose.Position = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation.y, step);
+		}
+		else if (KeyMap[KC_K])
+		{
+			ladderItem.Pose.Position = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation.y, -step);
+		}
+		if (KeyMap[KC_J])
+		{
+			ladderItem.Pose.Position = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation.y, 0.0f, 0.0f, -step);
+		}
+		else if (KeyMap[KC_L])
+		{
+			ladderItem.Pose.Position = Geometry::TranslatePoint(ladderItem.Pose.Position, ladderItem.Pose.Orientation.y, 0.0f, 0.0f, step);
+		}
+
+		// Rotate.
+		if (KeyMap[KC_T])
+		{
+			ladderItem.Pose.Orientation.y += angle;
+		}
+		else if (KeyMap[KC_Y])
+		{
+			ladderItem.Pose.Orientation.y -= angle;
+		}
+
+		if (KeyMap[KC_G])
+		{
+			ladderItem.Pose.Orientation.x -= angle;
+		}
+		else if (KeyMap[KC_H])
+		{
+			ladderItem.Pose.Orientation.x += angle;
+		}
+		if (KeyMap[KC_R])
+		{
+			ladderItem.Pose.Orientation.z -= angle;
+		}
+		else if (KeyMap[KC_E])
+		{
+			ladderItem.Pose.Orientation.z += angle;
+		}
+
+		//--------------------
+
+		UpdateItemRoom(itemNumber);
+
+		// Ladder has moved; 
+		if (ladder.PrevPose != ladderItem.Pose &&
+			!ladder._attachedItems.empty())
+		{
+			auto deltaPos = ladderItem.Pose.Position - ladder.PrevPose.Position;
+			auto deltaOrient = ladderItem.Pose.Orientation - ladder.PrevPose.Orientation;
+
+			// Update attached item poses.
+			for (auto* itemPtr : ladder._attachedItems)
+			{
+				// Adapt position and orientation.
+				itemPtr->Pose.Position += deltaPos;
+				itemPtr->Pose.Orientation += deltaOrient;
+
+				// Rotate with ladder.
+				auto deltaItemPos = (itemPtr->Pose.Position - ladderItem.Pose.Position).ToVector3();
+				auto rotMatrix = deltaOrient.ToRotationMatrix();
+				itemPtr->Pose.Position = ladderItem.Pose.Position + Vector3::Transform(deltaItemPos, rotMatrix);
+
+				UpdateItemRoom(itemPtr->Index);
+			}
+		}
+
+		ladder.PrevPose = ladderItem.Pose;
+	}
+
 	static void DrawLadderDebug(ItemInfo& ladderItem)
 	{
-		// Render collision bounds.
+		// Draw collision bounds.
 		auto bounds = GameBoundingBox(&ladderItem);
 		auto box = bounds.ToBoundingOrientedBox(ladderItem.Pose);
 		g_Renderer.AddDebugBox(box, Vector4(1, 0, 0, 1), RendererDebugPage::None);
@@ -206,8 +333,9 @@ namespace TEN::Entities::Generic
 		return LadderMountType::None;
 	}
 
-	static void HandleLadderMount(const ItemInfo& ladderItem, ItemInfo& playerItem, LadderMountType mountType)
+	static void HandleLadderMount(ItemInfo& ladderItem, ItemInfo& playerItem, LadderMountType mountType)
 	{
+		auto& ladder = GetLadderObject(ladderItem);
 		auto& player = *GetLaraInfo(&playerItem);
 
 		// Avoid interference if already interacting.
@@ -269,6 +397,7 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
+		ladder.AttachItem(playerItem);
 		player.Control.IsMoving = false;
 		player.Control.HandStatus = HandStatus::Busy;
 	}
