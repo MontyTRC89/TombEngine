@@ -141,6 +141,7 @@ static constexpr char ScriptReserved_SetStateNumber[]		= "SetState";
 static constexpr char ScriptReserved_GetOCB[]				= "GetOCB";
 static constexpr char ScriptReserved_SetOCB[]				= "SetOCB";
 static constexpr char ScriptReserved_GetStatus[]			= "GetStatus";
+static constexpr char ScriptReserved_SetStatus[]			= "SetStatus";
 static constexpr char ScriptReserved_GetAIBits[]			= "GetAIBits";
 static constexpr char ScriptReserved_SetAIBits[]			= "SetAIBits";
 static constexpr char ScriptReserved_GetItemFlags[]			= "GetItemFlags";

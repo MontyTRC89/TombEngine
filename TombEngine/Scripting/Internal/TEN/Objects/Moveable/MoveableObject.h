@@ -124,6 +124,7 @@ public:
 	void SetOnCollidedWithRoom(const TypeOrNil<LevelFunc>& cb);
 
 	[[nodiscard]] short GetStatus() const;
+	void SetStatus(int value);
 
 	void Init();
 

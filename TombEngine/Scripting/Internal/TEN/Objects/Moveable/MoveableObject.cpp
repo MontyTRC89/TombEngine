@@ -200,6 +200,16 @@ void Moveable::Register(sol::table& parent)
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
+/// Set the status of object.
+// possible values:
+// <br />0 - not active 
+// <br />1 - active 
+// <br />2 - deactivated 
+// <br />3 - invisible
+// @function Moveable:SetStatus
+// @tparam int value of the desired status 
+	ScriptReserved_SetStatus, & Moveable::SetStatus,
+
 /// Set the name of the function to be called when the moveable is shot by Lara.
 // Note that this will be triggered twice when shot with both pistols at once. 
 // @function Moveable:SetOnHit
@@ -934,6 +944,11 @@ void Moveable::SetRoomNumber(int roomNumber)
 short Moveable::GetStatus() const
 {
 	return m_item->Status;
+}
+
+void Moveable::SetStatus(int value)
+{
+	m_item->Status = value;
 }
 
 /// Get state of specified mesh visibility of object
