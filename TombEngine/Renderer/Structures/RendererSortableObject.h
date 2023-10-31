@@ -11,10 +11,10 @@ namespace TEN::Renderer::Structures
 		RendererObjectType ObjectType;
 		int Distance;
 		Vector3 Centre;
-		short BucketNumber;
-		short RoomNumber;
-		short ItemNumber;
-		short FxNumber;
-		short StaticNumber;
+		RendererBucket* Bucket;
+		RendererRoom* Room;
+		RendererStatic* Static;
+		RendererItem* Item;
+		RendererEffect* Effect;
 	};
 }

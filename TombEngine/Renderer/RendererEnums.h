@@ -163,6 +163,7 @@ enum class SpriteRenderType
 
 enum class RendererObjectType
 {
+	Unknown,
 	Room,
 	Moveable, 
 	Static,

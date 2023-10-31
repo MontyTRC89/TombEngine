@@ -1538,8 +1538,9 @@ namespace TEN::Renderer
 
 		// Collect all transparent faces
 		DrawRooms(view, RendererPass::CollectTransparentFaces);
+		DrawStatics(view, RendererPass::CollectTransparentFaces);
+
 		/*DrawItems(view, RendererPass::Transparent);
-		DrawStatics(view, RendererPass::Transparent);
 		DrawRooms(view, RendererPass::Transparent);
 		DrawItems(view, RendererPass::Transparent);
 		DrawStatics(view, RendererPass::Transparent);
@@ -1874,18 +1875,12 @@ namespace TEN::Renderer
 
 					for (auto& bucket : refMesh->Buckets)
 					{
-						if (!((bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest) ^
-							(rendererPass == RendererPass::Transparent)))
-						{
-							continue;
-						}
-
 						if (bucket.NumVertices == 0)
 						{
 							continue;
 						}
 
-						if (!DoesBlendModeRequireSorting(bucket.BlendMode))
+						if (bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest)
 						{
 							_cbInstancedStaticMeshBuffer.updateData(_stInstancedStaticMeshBuffer, _context.Get());
 
@@ -1925,52 +1920,40 @@ namespace TEN::Renderer
 		{
 			// Collect sorted blend modes faces ordered by room, if transparent pass
 
-			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-
-			for (auto room : view.RoomsToDraw)
+			for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 			{
-				for (auto& msh : room->StaticsToDraw)
+				std::vector<RendererStatic*> statics = it->second;
+
+				RendererStatic* refStatic = statics[0];
+				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				if (refStaticObj.ObjectMeshes.size() == 0)
+					continue;
+
+				RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
+
+				for (int i = 0; i < statics.size(); i++)
 				{
-					RendererObject& staticObj = *_staticObjects[msh->ObjectNumber];
-
-					if (staticObj.ObjectMeshes.size() > 0)
+					for (int j = 0; j < refMesh->Buckets.size(); j++)
 					{
-						RendererMesh* mesh = staticObj.ObjectMeshes[0];
+						auto& bucket = refMesh->Buckets[j];
 
-						for (auto& bucket : mesh->Buckets)
+						if (bucket.NumVertices == 0)
 						{
-							if (bucket.NumVertices == 0)
-							{
-								continue;
-							}
+							continue;
+						}
 
-							if (DoesBlendModeRequireSorting(bucket.BlendMode))
-							{
-								// Collect transparent faces
-								for (int j = 0; j < (int)bucket.Polygons.size(); j++)
-								{
-									RendererPolygon* p = &bucket.Polygons[j];
+						if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
+						{
+							// Collect transparent bucket
+							RendererSortableObject object;
 
-									// As polygon distance, for moveables, we use the averaged distance
-									auto centre = Vector3::Transform(p->Centre, msh->World);
-									float distance = (centre - cameraPosition).Length();
+							object.ObjectType = RendererObjectType::Static;
+							object.Bucket = &bucket;
+							object.Static = statics[i];
+							object.Centre = Vector3::Transform(bucket.Centre, statics[i]->World);
+							object.Distance = Vector3::Distance(object.Centre, view.Camera.WorldPosition);
 
-									RendererTransparentFace face;
-									face.type = TransparentFaceType::Static;
-									face.info.polygon = p;
-									face.distance = distance;
-									face.info.animated = bucket.Animated;
-									face.info.texture = bucket.Texture;
-									face.info.room = room;
-									face.info.staticMesh = msh;
-									face.info.world = msh->World;
-									face.info.position = msh->Pose.Position.ToVector3();
-									face.info.color = msh->Color;
-									face.info.blendMode = bucket.BlendMode;
-									face.info.bucket = &bucket;
-									room->TransparentFacesToDraw.push_back(face);
-								}
-							}
+							view.TransparentObjectsToDraw.push_back(object);
 						}
 					}
 				}
@@ -2010,13 +1993,27 @@ namespace TEN::Renderer
 			BindTexture(TextureRegister::ShadowMap, &_shadowMap, SamplerStateRegister::ShadowMap);
 		}
 
-		short lastRoomNumber = -1;
+		/*short lastRoomNumber = -1;
 		RendererRoom* room;
 		ROOM_INFO* nativeRoom;
 		int numTransparentFaces = 0;
+		RendererObjectType lastObjectType = RendererObjectType::Unknown;
 
-		for (auto& object : renderView.TransparentObjectsToDraw)
+		for (int i = 0; i < renderView.TransparentObjectsToDraw.size(); i++)
 		{
+			auto& object = renderView.TransparentObjectsToDraw[i];
+
+			if (object.ObjectType != lastObjectType || i == renderView.TransparentObjectsToDraw.size() - 1)
+			{
+				if (lastObjectType != RendererObjectType::Unknown)
+				{
+					// Output the polygons
+
+				}
+				// Reset the pipeline
+				if ()
+			}
+
 			if (object.RoomNumber != lastRoomNumber)
 			{
 				room = &_rooms[object.RoomNumber];
@@ -2106,7 +2103,7 @@ namespace TEN::Renderer
 
 				numTransparentFaces += bucket.NumIndices / 3;
 			}
-		}
+		}*/
 
 		ResetScissor();
 	}
@@ -2139,8 +2136,8 @@ namespace TEN::Renderer
 								object.ObjectType = RendererObjectType::Room;
 								object.Centre = bucket.Centre;
 								object.Distance = Vector3::Distance(view.Camera.WorldPosition, bucket.Centre);
-								object.BucketNumber = j;
-								object.RoomNumber = room->RoomNumber;
+								object.Bucket = &bucket;
+								object.Room = room;
 
 								view.TransparentObjectsToDraw.push_back(object);
 							}
