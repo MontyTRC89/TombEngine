@@ -604,8 +604,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case WaterStatus::Underwater:
-			// Disable potential player resurfacing if health is zero or below.
-			// For some reason, originals worked without this condition, but TEN does not. -- Lwmte, 11.08.22
+			// Disable potential player resurfacing if health is <= 0.
+			// Originals worked without this condition, but TEN does not. -- Lwmte, 11.08.22
 			if (item->HitPoints <= 0)
 				break;
 
