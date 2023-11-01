@@ -92,6 +92,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWaterOnHeadspace = false;
 
+	// TODO: Move unrelated handling elsewhere.
+	// Handle environment state transition.
 	if (player.Context.Vehicle == NO_ITEM && player.ExtraAnim == NO_ITEM)
 	{
 		switch (player.Control.WaterStatus)
@@ -138,7 +140,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					else
 					{
 						SetAnimation(item, LA_FREEFALL_DIVE);
-						item->Animation.Velocity.y = (item->Animation.Velocity.y / 8) * 3;
+						item->Animation.Velocity.y = item->Animation.Velocity.y * (3 / 8.0f);
 						item->Pose.Orientation.x = ANGLE(-45.0f);
 					}
 
@@ -288,6 +290,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	auto prevPos = item->Pose.Position;
 
+	// Handle environment state.
 	switch (player.Control.WaterStatus)
 	{
 	case WaterStatus::Dry:
