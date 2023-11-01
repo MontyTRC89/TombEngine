@@ -362,8 +362,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	// Handle player state control.
-	HandlePlayerState(*item, *coll, PlayerStateRoutineType::Control);
+	// Handle player behavior state control.
+	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
 
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
@@ -373,9 +373,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
 
-		// Handle player state collision.
+		// Handle player behavior state collision.
 		if (lara->Context.Vehicle == NO_ITEM)
-			HandlePlayerState(*item, *coll, PlayerStateRoutineType::Collision);
+			HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 	}
 
 	// Handle weapons.
@@ -426,7 +426,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Count.Pose = 0;
 
-	HandlePlayerState(*item, *coll, PlayerStateRoutineType::Control);
+	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -452,7 +452,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	DoObjectCollision(item, coll);
 
 	if (lara->Context.Vehicle == NO_ITEM)
-		HandlePlayerState(*item, *coll, PlayerStateRoutineType::Collision);
+		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, LARA_RADIUS);
 
@@ -497,7 +497,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Count.Pose = 0;
 
-	HandlePlayerState(*item, *coll, PlayerStateRoutineType::Control);
+	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -542,7 +542,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	DoObjectCollision(item, coll);
 
 	if (/*lara->ExtraAnim == -1 &&*/ lara->Context.Vehicle == NO_ITEM)
-		HandlePlayerState(*item, *coll, PlayerStateRoutineType::Collision);
+		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, 0);
 
