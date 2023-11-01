@@ -406,10 +406,10 @@ std::unique_ptr<Moveable> LaraObject::GetInteractedObj() const
 {
 	auto* lara = GetLaraInfo(m_item);
 
-	if (lara->TargetEntity == nullptr)
+	if (lara->Context.InteractedItem == NO_ITEM)
 		return nullptr;
 
-	return std::make_unique<Moveable>(lara->TargetEntity->Index);
+	return std::make_unique<Moveable>(lara->Context.InteractedItem);
 }
 
 /// Get current light state of the torch, if it exists
