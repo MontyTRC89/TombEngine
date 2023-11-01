@@ -460,9 +460,9 @@ void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
 
 void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	const auto& player = GetLaraInfo(*item);
 
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.MoveAngle;
 
 	GetCollisionInfo(coll, item, Vector3i(0, LARA_HEIGHT_TREAD, 0));
 	ShiftItem(item, coll);
@@ -474,14 +474,19 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position = coll->Setup.PrevPosition;
 	}
 	else if (coll->CollisionType == CT_LEFT)
+	{
 		item->Pose.Orientation.y += ANGLE(5.0f);
+	}
 	else if (coll->CollisionType == CT_RIGHT)
+	{
 		item->Pose.Orientation.y -= ANGLE(5.0f);
+	}
 
-	if (GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) - item->Pose.Position.y > -100)
-		TestLaraWaterStepOut(item, coll);
-	else
-		SetLaraSwimDiveAnimation(item);
+	auto pointColl = GetCollision(item);
+	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+
+	if ((pointColl.Position.Floor - item->Pose.Position.y) < SWIM_WATER_DEPTH)
+		TestPlayerWaterStepOut(item, coll);
 }
 
 void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)

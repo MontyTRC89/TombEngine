@@ -511,11 +511,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	int waterDepth = GetWaterDepth(item);
 	int waterHeight = GetWaterHeight(item);
 
-	int heightFromWater;
-	if (waterHeight != NO_HEIGHT)
-		heightFromWater = item->Pose.Position.y - waterHeight;
-	else
-		heightFromWater = NO_HEIGHT;
+	auto pointColl = GetCollision(item);
+	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item->Pose.Position.y, pointColl.Position.Floor) - waterHeight);
 	lara->Context.WaterSurfaceDist = -heightFromWater;
 
 	if (lara->Context.Vehicle == NO_ITEM)
@@ -529,13 +526,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			for (int i = 0; i < NUM_LARA_MESHES; i++)
 				lara->Effect.BubbleNodes[i] = 0.0f;
 
-			if (heightFromWater == NO_HEIGHT || heightFromWater < WADE_DEPTH)
+			if (heightFromWater == NO_HEIGHT || heightFromWater < WADE_WATER_DEPTH)
 				break;
 
 			Camera.targetElevation = ANGLE(-22.0f);
 
 			// Water is deep enough to swim; dispatch dive.
-			if (waterDepth >= SWIM_DEPTH && !isSwamp)
+			if (waterDepth >= SWIM_WATER_DEPTH && !isSwamp)
 			{
 				if (isWater)
 				{
@@ -576,12 +573,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 			// Water is at wade depth; update water status and do special handling.
-			else if (heightFromWater >= WADE_DEPTH)
+			else if (heightFromWater >= WADE_WATER_DEPTH)
 			{
 				lara->Control.WaterStatus = WaterStatus::Wade;
 
 				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
-				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
+				if (waterDepth > (SWIM_WATER_DEPTH - CLICK(1)) &&
 					item->Animation.IsAirborne && !isSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
@@ -607,18 +604,16 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case WaterStatus::Underwater:
-
-			// Disable potential Lara resurfacing if her health is zero or below.
+			// Disable potential player resurfacing if health is zero or below.
 			// For some reason, originals worked without this condition, but TEN does not. -- Lwmte, 11.08.22
-
 			if (item->HitPoints <= 0)
 				break;
 
-			// Determine if Lara's head is above water surface. This is needed to prevent
-			// pre-TR5 bug where Lara would keep submerged until her root mesh (butt) is above water level.
-
-			isWaterOnHeadspace = TestEnvironment(ENV_FLAG_WATER, item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z,
-					 GetCollision(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, item->RoomNumber).RoomNumber);
+			// Determine if player's head is above water surface. Needed to prevent
+			// pre-TR5 bug where player would keep submerged until root mesh was above water level.
+			isWaterOnHeadspace = TestEnvironment(
+				ENV_FLAG_WATER, item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z,
+				GetCollision(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, item->RoomNumber).RoomNumber);
 
 			if (waterDepth == NO_HEIGHT || abs(heightFromWater) >= CLICK(1) || isWaterOnHeadspace ||
 				item->Animation.AnimNumber == LA_UNDERWATER_RESURFACE || item->Animation.AnimNumber == LA_ONWATER_DIVE)
@@ -631,8 +626,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						ResetPlayerLean(item);
 						ResetPlayerFlex(item);
 						item->Animation.IsAirborne = true;
-						item->Animation.Velocity.z = item->Animation.Velocity.y;
 						item->Animation.Velocity.y = 0.0f;
+						item->Animation.Velocity.z = item->Animation.Velocity.y;
 						lara->Control.WaterStatus = WaterStatus::Dry;
 					}
 					else
@@ -665,7 +660,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		case WaterStatus::TreadWater:
 			if (!isWater)
 			{
-				if (heightFromWater <= WADE_DEPTH)
+				if (heightFromWater <= WADE_WATER_DEPTH)
 				{
 					SetAnimation(item, LA_FALL_START);
 					item->Animation.IsAirborne = true;
@@ -688,9 +683,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		case WaterStatus::Wade:
 			Camera.targetElevation = -ANGLE(22.0f);
 
-			if (heightFromWater >= WADE_DEPTH)
+			if (heightFromWater >= WADE_WATER_DEPTH)
 			{
-				if (heightFromWater > SWIM_DEPTH && !isSwamp)
+				if (heightFromWater > SWIM_WATER_DEPTH && !isSwamp)
 				{
 					SetAnimation(item, LA_ONWATER_IDLE);
 					ResetPlayerLean(item);
