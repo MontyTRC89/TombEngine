@@ -19,25 +19,24 @@ namespace TEN::Entities::Creatures::TR2
 {
 	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3(12, 101, 19), 13);
 	const auto YetiBiteRight = CreatureBiteInfo(Vector3(12, 101, 19), 10);
-	const auto YetiAttackJoints1 = std::vector<unsigned int>{ 10, 12 }; // TODO: Rename.
-	const auto YetiAttackJoints2 = std::vector<unsigned int>{ 8, 9, 10 };
+	const auto YetiLeftPunchAttackJoints  = std::vector<unsigned int>{ 8, 9, 10 };
+	const auto YetiRightPunchAttackJoints = std::vector<unsigned int>{ 10, 12 };
 
-	// TODO
 	enum YetiState
 	{
 		YETI_STATE_RUN = 1,
 		YETI_STATE_IDLE = 2,
 		YETI_STATE_WALK = 3,
-		YETI_STATE_ATTACK_IDLE = 4,
-		YETI_STATE_ATTACK_DOUBLE = 5,
-		YETI_STATE_ATTACK_MOVING = 6,
-		YETI_STATE_ROAR = 7,
+		YETI_STATE_ATTACK_IDLE_PUNCH_ATTACK = 4,
+		YETI_STATE_ATTACK_IDLE_SLAM_ATTACK = 5,
+		YETI_STATE_ATTACK_RUN_PUNCH_ATTACK = 6,
+		YETI_STATE_ROAR_START = 7,
 		YETI_STATE_DEATH = 8,
-		YETI_STATE_RAGE = 9,
-		YETI_STATE_CLIMB_2 = 10,
-		YETI_STATE_CLIMB_3 = 11,
-		YETI_STATE_CLIMB_4 = 12,
-		YETI_STATE_FALL_4 = 13,
+		YETI_STATE_ROAR_END = 9,
+		YETI_STATE_CLIMB_UP_2_STEPS = 10,
+		YETI_STATE_CLIMB_UP_3_STEPS = 11,
+		YETI_STATE_CLIMB_UP_4_STEPS = 12,
+		YETI_STATE_CLIMB_DOWN_4_STEPS = 13,
 		YETI_STATE_KILL = 14
 	};
 
@@ -119,7 +118,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case YETI_STATE_ROAR:
+			case YETI_STATE_ROAR_START:
 				if (ai.ahead)
 					headYRot = ai.angle;
 
@@ -147,7 +146,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case YETI_STATE_RAGE:
+			case YETI_STATE_ROAR_END:
 				if (ai.ahead)
 					headYRot = ai.angle;
 
@@ -250,11 +249,11 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case YETI_STATE_ATTACK_IDLE:
+			case YETI_STATE_ATTACK_IDLE_PUNCH_ATTACK:
 				if (ai.ahead)
 					torsoYRot = ai.angle;
 
-				if (!creature->Flags && item->TouchBits.Test(YetiAttackJoints1))
+				if (!creature->Flags && item->TouchBits.Test(YetiRightPunchAttackJoints))
 				{
 					CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 					DoDamage(creature->Enemy, 100);
@@ -266,19 +265,19 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case YETI_STATE_ATTACK_DOUBLE:
+			case YETI_STATE_ATTACK_IDLE_SLAM_ATTACK:
 				creature->MaxTurn = ANGLE(4.0f);
 
 				if (ai.ahead)
 					torsoYRot = ai.angle;
 
 				if (!creature->Flags &&
-					(item->TouchBits.Test(YetiAttackJoints1) || item->TouchBits.Test(YetiAttackJoints2)))
+					(item->TouchBits.Test(YetiRightPunchAttackJoints) || item->TouchBits.Test(YetiLeftPunchAttackJoints)))
 				{
-					if (item->TouchBits.Test(YetiAttackJoints2))
+					if (item->TouchBits.Test(YetiLeftPunchAttackJoints))
 						CreatureEffect(item, YetiBiteLeft, DoBloodSplat);
 
-					if (item->TouchBits.Test(YetiAttackJoints1))
+					if (item->TouchBits.Test(YetiRightPunchAttackJoints))
 						CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 
 					DoDamage(creature->Enemy, 150);
@@ -290,17 +289,17 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case YETI_STATE_ATTACK_MOVING:
+			case YETI_STATE_ATTACK_RUN_PUNCH_ATTACK:
 				if (ai.ahead)
 					torsoYRot = ai.angle;
 
 				if (!creature->Flags &&
-					(item->TouchBits.Test(YetiAttackJoints1) || item->TouchBits.Test(YetiAttackJoints2)))
+					(item->TouchBits.Test(YetiRightPunchAttackJoints) || item->TouchBits.Test(YetiLeftPunchAttackJoints)))
 				{
-					if (item->TouchBits.Test(YetiAttackJoints2))
+					if (item->TouchBits.Test(YetiLeftPunchAttackJoints))
 						CreatureEffect(item, YetiBiteLeft, DoBloodSplat);
 
-					if (item->TouchBits.Test(YetiAttackJoints1))
+					if (item->TouchBits.Test(YetiRightPunchAttackJoints))
 						CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 
 					DoDamage(creature->Enemy, 200);
@@ -312,10 +311,10 @@ namespace TEN::Entities::Creatures::TR2
 
 				break;
 
-			case YETI_STATE_CLIMB_2:
-			case YETI_STATE_CLIMB_3:
-			case YETI_STATE_CLIMB_4:
-			case YETI_STATE_FALL_4:
+			case YETI_STATE_CLIMB_UP_2_STEPS:
+			case YETI_STATE_CLIMB_UP_3_STEPS:
+			case YETI_STATE_CLIMB_UP_4_STEPS:
+			case YETI_STATE_CLIMB_DOWN_4_STEPS:
 				creature->MaxTurn = 0;
 				break;
 

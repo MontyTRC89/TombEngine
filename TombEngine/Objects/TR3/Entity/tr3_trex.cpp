@@ -176,8 +176,8 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TREX_STATE_KILL:
-				creature->MaxTurn = 0;
 				headYRot = 0;
+				creature->MaxTurn = 0;
 				break;
 			}
 		}
