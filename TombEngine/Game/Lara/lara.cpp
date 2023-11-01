@@ -495,7 +495,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	player.Context.WaterSurfaceDist = -water.HeightFromWater;
 
 	if (player.Context.Vehicle == NO_ITEM)
-		WadeSplash(item, water.WaterHeight, water.WaterDepth);
+		SpawnPlayerSplash(*item, water.WaterHeight, water.WaterDepth);
 
 	bool isWaterOnHeadspace = false;
 
@@ -558,7 +558,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			{
 				player.Control.WaterStatus = WaterStatus::Wade;
 
-				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
+				// Make splash ONLY within this particular threshold before swim depth while airborne (SpawnPlayerSplash() above interferes otherwise).
 				if (water.WaterDepth > (SWIM_WATER_DEPTH - CLICK(1)) &&
 					item->Animation.IsAirborne && !water.IsSwamp)
 				{
