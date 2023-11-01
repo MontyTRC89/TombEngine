@@ -31,8 +31,8 @@ namespace TEN::Entities::Traps
 	constexpr auto ELECTRIC_CLEANER_VELOCITY  = BLOCK(1 / 16.0f);
 	constexpr auto ELECTRIC_CLEANER_TURN_RATE = ANGLE(5.6f);
 
-	const auto ElectricCleanerHarmJoints =		std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
-	const auto ElectricCleanerWireEndJoints =		std::vector<unsigned int>{ 5, 9, 13 };
+	const auto ElectricCleanerHarmJoints	= std::vector<unsigned int>{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+	const auto ElectricCleanerWireEndJoints = std::vector<unsigned int>{ 5, 9, 13 };
 
 	enum ElectricCleanerState
 	{
@@ -101,7 +101,7 @@ namespace TEN::Entities::Traps
 			short slopeAngle = ANGLE(0.0f);
 			if (pointColl.FloorTilt.x > 0)
 			{
-				slopeAngle = -ANGLE(90.0f);
+				slopeAngle = ANGLE(-90.0f);
 			}
 			else if (pointColl.FloorTilt.x < 0)
 			{
@@ -117,16 +117,16 @@ namespace TEN::Entities::Traps
 				slopeAngle = ANGLE(0.0f);
 			}
 
-			int angleDir = phd_atan(dir.z, dir.x);
-			int alignAngle = slopeAngle - angleDir;
+			int dirAngle = phd_atan(dir.z, dir.x);
+			int alignAngle = slopeAngle - dirAngle;
 
 			// Test if slope aspect is not aligned with the direction.
-			if ((alignAngle != 32768) && (alignAngle != 0) && (alignAngle != -32768))
+			if (alignAngle != 32768 && alignAngle != 0 && alignAngle != -32768)
 				return false;
-			
+
 			// TODO: ANGLE(180.0f) and ANGLE(-180) both returns -32768 due to the short type range (-32,768 to 32,767)
 			//if (alignAngle != ANGLE(180.0f) && alignAngle != 0 && alignAngle != ANGLE(-180.0f))
-				//return false;
+			//return false;
 		}
 
 		// Check for diagonal split.
@@ -161,8 +161,10 @@ namespace TEN::Entities::Traps
 	{
 		if (IsNextSectorValid(item, dir0))
 			return dir0;
+
 		if (IsNextSectorValid(item, dir1))
 			return dir1;
+
 		if (IsNextSectorValid(item, dir2))
 			return dir2;
 
@@ -271,6 +273,7 @@ namespace TEN::Entities::Traps
 				moveVel = 0;
 				SoundEffect(SFX_TR3_CLEANER_FUSEBOX, &item.Pose);
 			}
+
 			return;
 		}
 
@@ -278,14 +281,14 @@ namespace TEN::Entities::Traps
 			return;
 
 		// Get flags.
-		bool flagTurnRight =				((item.ItemFlags[1] & (1 << 0)) != 0);
-		bool flagPriorityForward =			((item.ItemFlags[1] & (1 << 1)) != 0);
-		bool flagCounterClockwiseOrder =	((item.ItemFlags[1] & (1 << 2)) != 0);
+		bool flagTurnRight			   = ((item.ItemFlags[1] & (1 << 0)) != 0);
+		bool flagPriorityForward	   = ((item.ItemFlags[1] & (1 << 1)) != 0);
+		bool flagCounterClockwiseOrder = ((item.ItemFlags[1] & (1 << 2)) != 0);
 
-		int& CurrentState = item.Data;
+		int& activeState = item.Data;
 		short& targetHeadingAngle = item.ItemFlags[6];
 
-		switch (CurrentState)
+		switch (activeState)
 		{
 		case ElectricCleanerState::ROTATE:
 			{
@@ -293,7 +296,7 @@ namespace TEN::Entities::Traps
 
 				int headingAngleDelta = abs(targetHeadingAngle - item.Pose.Orientation.y);
 
-				// Keep rotating.
+				// Continue rotating.
 				if (headingAngleDelta > rotRate)
 				{
 					item.Pose.Orientation.y += flagTurnRight ? -rotRate : rotRate;
@@ -302,9 +305,10 @@ namespace TEN::Entities::Traps
 				else
 				{
 					item.Pose.Orientation.y = targetHeadingAngle;
-					CurrentState = ElectricCleanerState::MOVE;
+					activeState = ElectricCleanerState::MOVE;
 				}
 			}
+
 			break;
 
 		case ElectricCleanerState::MOVE:
@@ -320,13 +324,12 @@ namespace TEN::Entities::Traps
 				if ((item.Pose.Position.x & WALL_MASK) == BLOCK(0.5f) &&
 					(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
 				{
-					// Only do turns if it's on a flat floor.
+					// Only turn on flat floor.
 					if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
-					{
-						CurrentState = ElectricCleanerState::CHOOSE_PATH;
-					}
+						activeState = ElectricCleanerState::CHOOSE_PATH;
 				}
 			}
+
 			break;
 
 		case ElectricCleanerState::CHOOSE_PATH:
@@ -377,7 +380,7 @@ namespace TEN::Entities::Traps
 				if (item.Pose.Orientation.y - targetHeadingAngle == 0)
 				{
 					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, moveVel);
-					CurrentState = ElectricCleanerState::MOVE;
+					activeState = ElectricCleanerState::MOVE;
 				}
 				else
 				{
@@ -394,13 +397,14 @@ namespace TEN::Entities::Traps
 						item.ItemFlags[1] &= ~(1 << 0);
 					}
 
-					CurrentState = ElectricCleanerState::ROTATE;
+					activeState = ElectricCleanerState::ROTATE;
 				}
 			}
+
 			break;
 
 		default:
-				TENLog("Unknown state in ElectricCleaner object with id: " + item.Index, LogLevel::Warning, LogConfig::All, false);
+			TENLog("Error handling unregistered electric cleaner state " + std::to_string(activeState), LogLevel::Warning, LogConfig::All, false);
 			break;
 		}
 
