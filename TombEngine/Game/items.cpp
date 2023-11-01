@@ -13,6 +13,7 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
@@ -26,8 +27,110 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
+
+void OffsetBlendData::SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float vel, short turnRate, float delayInSec)
+{
+	Mode = OffsetBlendMode::Linear;
+	IsActive = true;
+	DelayTime = std::round(delayInSec / DELTA_TIME);
+	PosOffset = posOffset / vel;
+	OrientOffset = orientOffset / turnRate;
+}
+
+void OffsetBlendData::SetLogarithmic(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
+{
+	alpha = std::clamp(alpha, 0.0f, 1.0f);
+
+	Mode = OffsetBlendMode::Logarithmic;
+	IsActive = true;
+	DelayTime = std::round(delayInSec / DELTA_TIME);
+	PosOffset = posOffset;
+	OrientOffset = orientOffset;
+	Alpha = alpha;
+}
+
+void OffsetBlendData::Clear()
+{
+	*this = {};
+}
+
+void OffsetBlendData::DrawDebug() const
+{
+	g_Renderer.PrintDebugMessage("IsActive: %d", IsActive);
+	g_Renderer.PrintDebugMessage("TimeAcive: %.3f", TimeActive);
+	g_Renderer.PrintDebugMessage("DelayTime: %.3f", DelayTime);
+	g_Renderer.PrintDebugMessage("PosOffset: %.3f, %.3f, %.3f", PosOffset.x, PosOffset.y, PosOffset.z);
+	g_Renderer.PrintDebugMessage("OrientOffset: %.3f, %.3f, %.3f", TO_DEGREES(OrientOffset.x), TO_DEGREES(OrientOffset.y), TO_DEGREES(OrientOffset.z));
+	g_Renderer.PrintDebugMessage("Alpha: %.3f", Alpha);
+}
+
+void ItemInfo::HandleOffsetBlend()
+{
+	constexpr auto TIME_ACTIVE_MAX = 3.0f;
+
+	if (IsLara())
+	{
+		g_Renderer.PrintDebugMessage("Interacted item number: %d", GetLaraInfo(*this).Context.InteractedItem);
+		OffsetBlend.DrawDebug();
+	}
+
+	// Offset blend inactive; return early.
+	if (!OffsetBlend.IsActive)
+		return;
+
+	// Update delay.
+	if (OffsetBlend.DelayTime > 0.0f)
+	{
+		OffsetBlend.DelayTime -= 1.0f;// DELTA_TIME;
+		if (OffsetBlend.DelayTime < 0.0f)
+			OffsetBlend.DelayTime = 0.0f;
+
+		return;
+	}
+
+	// Update time active.
+	OffsetBlend.TimeActive += 1.0f;// DELTA_TIME;
+
+	// Handle offset blend.
+	switch (OffsetBlend.Mode)
+	{
+	default:
+	case OffsetBlendMode::Linear:
+		// TODO
+
+		break;
+
+	case OffsetBlendMode::Logarithmic:
+	{
+		// Calculate offset steps.
+		auto posOffsetStep = Vector3::Lerp(Vector3::Zero, OffsetBlend.PosOffset, OffsetBlend.Alpha);
+		auto orientOffsetStep = EulerAngles::Lerp(EulerAngles::Zero, OffsetBlend.OrientOffset, OffsetBlend.Alpha);
+
+		// TODO: Raycast to test for obstructions.
+		//if (raycastFail)
+		//	OffsetBlend.TimeActive = TIME_ACTIVE_MAX;
+
+		// Apply offsets.
+		Pose.Position += Vector3i(posOffsetStep);
+		Pose.Orientation += orientOffsetStep;
+
+		// Update offsets.
+		OffsetBlend.PosOffset -= posOffsetStep;
+		OffsetBlend.OrientOffset -= orientOffsetStep;
+	}
+		break;
+	}
+
+	// Offset blend complete; clear data.
+	if ((OffsetBlend.PosOffset.Length() <= EPSILON && EulerAngles::Compare(OffsetBlend.OrientOffset, EulerAngles::Zero)) ||
+		OffsetBlend.TimeActive >= (int)round(TIME_ACTIVE_MAX * FPS))
+	{
+		OffsetBlend.Clear();
+	}
+}
 
 bool ItemInfo::TestOcb(short ocbFlags) const
 {

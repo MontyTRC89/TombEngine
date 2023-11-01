@@ -47,6 +47,7 @@ namespace TEN::Traps::TR5
 
 		auto& zipLineItem = g_Level.Items[itemNumber];
 		auto& laraItem = *LaraItem;
+		auto& player = GetLaraInfo(laraItem);
 
 		if (zipLineItem.Status != ITEM_ACTIVE)
 			return;
@@ -101,6 +102,7 @@ namespace TEN::Traps::TR5
 				laraItem.Animation.IsAirborne = true;
 				laraItem.Animation.Velocity.y = zipLineItem.Animation.Velocity.y / 4;
 				laraItem.Animation.Velocity.z = zipLineItem.Animation.Velocity.y;
+				player.Context.InteractedItem = NO_ITEM;
 			}
 
 			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &zipLineItem.Pose);

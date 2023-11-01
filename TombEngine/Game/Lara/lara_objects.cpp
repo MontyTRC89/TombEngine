@@ -928,23 +928,23 @@ void lara_col_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 // ZIP-LINE
 // --------
 
-// State:		LS_ZIP_LINE (70)
-// Collision:	lara_void_func()
+// State:	  LS_ZIP_LINE (70)
+// Collision: lara_void_func()
 void lara_as_zip_line(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	constexpr auto RELEASE_VEL = Vector3(0.0f, 40.0f, 100.0f);
 
-	lara->Control.Look.Mode = LookMode::Free;
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Free;
 	Camera.targetAngle = ANGLE(70.0f);
 
 	if (!IsHeld(In::Action))
 	{
 		item->Animation.TargetState = LS_JUMP_FORWARD;
-		AnimateItem(item);
-
-		item->Animation.Velocity.z = 100;
-		item->Animation.Velocity.y = 40;
+		item->Animation.Velocity = RELEASE_VEL;
 		item->Animation.IsAirborne = true;
-		lara->Control.MoveAngle = item->Pose.Orientation.y;
+		player.Control.MoveAngle = item->Pose.Orientation.y;
+		player.Context.InteractedItem = NO_ITEM;
 	}
 }

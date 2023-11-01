@@ -300,12 +300,15 @@ void AnimateItem(ItemInfo* item)
 		if (!player.Control.IsMoving)
 			TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
+		item->HandleOffsetBlend();
+
 		// Update matrices.
 		g_Renderer.UpdateLaraAnimations(true);
 	}
 	else
 	{
 		TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
+		item->HandleOffsetBlend();
 
 		// Update matrices.
 		g_Renderer.UpdateItemAnimations(item->Index, true);

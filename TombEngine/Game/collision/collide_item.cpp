@@ -431,26 +431,32 @@ bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIte
 
 bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	constexpr auto TURN_RATE = ANGLE(2.0f);
+
+	const auto& object = Objects[item->ObjectNumber];
+	auto& player = GetLaraInfo(*laraItem);
 
 	auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
 	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
 	auto target = Pose(item->Pose.Position + Vector3i(pos), item->Pose.Orientation);
 
-	if (!Objects[item->ObjectNumber].isPickup)
-		return Move3DPosTo3DPos(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
+	if (!object.isPickup)
+	{
+		return Move3DPosTo3DPos(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, TURN_RATE);
+	}
 	else
 	{
-		// Prevent picking up items which can result in so called "flare pickup bug"
-		int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
-		if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
-			return Move3DPosTo3DPos(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
+		auto pointColl = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber);
+
+		// Prevent picking up items which can result in "flare pickup bug".
+		if (abs(pointColl.Position.Floor - laraItem->Pose.Position.y) <= CLICK(2))
+			return Move3DPosTo3DPos(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, TURN_RATE);
 	}
 
-	if (lara->Control.IsMoving)
+	if (player.Control.IsMoving)
 	{
-		lara->Control.IsMoving = false;
-		lara->Control.HandStatus = HandStatus::Free;
+		player.Control.IsMoving = false;
+		player.Control.HandStatus = HandStatus::Free;
 	}
 
 	return false;
@@ -506,6 +512,7 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius)
 	return false;
 }
 
+// Deprecated.
 bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate)
 {
 	auto* lara = GetLaraInfo(item);

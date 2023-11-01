@@ -63,6 +63,31 @@ enum class EffectType
 	Custom
 };
 
+enum class OffsetBlendMode
+{
+	Linear,
+	Logarithmic
+};
+
+struct OffsetBlendData
+{
+	OffsetBlendMode Mode = OffsetBlendMode::Linear;
+
+	bool  IsActive	 = false;
+	float TimeActive = 0.0f;
+	float DelayTime	 = 0.0f;
+
+	Vector3		PosOffset	 = Vector3::Zero;
+	EulerAngles OrientOffset = EulerAngles::Zero;
+	float		Alpha		 = 0.0f;
+
+	void SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float vel, short turnRate, float delayInSec = 0.0f);
+	void SetLogarithmic(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec = 0.0f);
+	void Clear();
+
+	void DrawDebug() const;
+};
+
 struct EntityAnimationData
 {
 	GAME_OBJECT_ID AnimObjectID = ID_NO_OBJECT;
@@ -122,6 +147,8 @@ struct ItemInfo
 	EntityCallbackData Callbacks;
 	EntityModelData Model;
 	EntityEffectData Effect;
+
+	OffsetBlendData OffsetBlend = {};
 	
 	Pose StartPose;
 	Pose Pose;
@@ -149,6 +176,8 @@ struct ItemInfo
 	unsigned char AIBits; // AIObjectType enum.
 	short AfterDeath;
 	short CarriedItem;
+
+	void HandleOffsetBlend();
 
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);

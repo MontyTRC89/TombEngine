@@ -45,10 +45,10 @@ namespace TEN::Collision
 
 	bool InteractionBasis::TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo,  const GameBoundingBox& boundsExtension) const
 	{
-		// NOTE: For now, can only check offset blend status.
+		// NOTE: For now, only checks offset blend status.
 		// 1) Avoid overriding active interactions.
-		/*if (entityFrom.OffsetBlend.IsActive)
-			return false;*/
+		if (entityFrom.OffsetBlend.IsActive)
+			return false;
 
 		// 2) Test if entityFrom's orientation is within interaction constraint.
 		auto deltaOrient = entityFrom.Pose.Orientation - entityTo.Pose.Orientation;
@@ -78,7 +78,7 @@ namespace TEN::Collision
 	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
 							  const Vector3i& extraPosOffset, const EulerAngles& extraOrientOffset)
 	{
-		constexpr auto OFFSET_BLEND_ALPHA = 0.5f;
+		constexpr auto OFFSET_BLEND_ALPHA = 0.4f;
 
 		// Calculate relative offsets.
 		auto relPosOffset = basis.PosOffset + extraPosOffset;
@@ -93,7 +93,16 @@ namespace TEN::Collision
 		auto absOrientOffset = targetOrient - entityFrom.Pose.Orientation;
 
 		// Set offset blend.
-		//entityFrom.OffsetBlend.Set(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
+		entityFrom.OffsetBlend.SetLogarithmic(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
+
+		// Set player parameters.
+		if (entityFrom.IsLara())
+		{
+			auto& player = GetLaraInfo(entityFrom);
+
+			player.Control.HandStatus = HandStatus::Busy;
+			player.Context.InteractedItem = entityTo.Index;
+		}
 	}
 
 	static int GetPlayerAlignAnim(const Pose& poseFrom, const Pose& poseTo)
@@ -153,24 +162,42 @@ namespace TEN::Collision
 								 const PlayerInteractRoutine& interactRoutine)
 	{
 		auto& player = GetLaraInfo(playerEntity);
-
-		if (basis.TestInteraction(playerEntity, interactedEntity))
+		
+		// Shift.
+		if (true)
 		{
-			if (MoveLaraPosition(basis.PosOffset, &interactedEntity, &playerEntity))
+			if (basis.TestInteraction(playerEntity, interactedEntity))
 			{
+				// Avoid overriding active interactions.
+				if (player.Context.InteractedItem != NO_ITEM)
+					return;
+
+				SetEntityInteraction(playerEntity, interactedEntity, basis);
 				interactRoutine(playerEntity, interactedEntity);
-				player.Control.IsMoving = false;
-				player.Control.HandStatus = HandStatus::Busy;
-			}
-			else
-			{
-				player.Context.InteractedItem = interactedEntity.Index;
 			}
 		}
-		else if (player.Control.IsMoving && player.Context.InteractedItem == interactedEntity.Index)
+		// TODO
+		// Walk over.
+		else
 		{
-			player.Control.IsMoving = false;
-			player.Control.HandStatus = HandStatus::Free;
+			if (basis.TestInteraction(playerEntity, interactedEntity))
+			{
+				if (MoveLaraPosition(basis.PosOffset, &interactedEntity, &playerEntity))
+				{
+					interactRoutine(playerEntity, interactedEntity);
+					player.Control.IsMoving = false;
+					player.Control.HandStatus = HandStatus::Busy;
+				}
+				else
+				{
+					player.Context.InteractedItem = interactedEntity.Index;
+				}
+			}
+			else if (player.Control.IsMoving && player.Context.InteractedItem == interactedEntity.Index)
+			{
+				player.Control.IsMoving = false;
+				player.Control.HandStatus = HandStatus::Free;
+			}
 		}
 	}
 }
