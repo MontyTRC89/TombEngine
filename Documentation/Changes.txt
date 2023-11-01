@@ -16,11 +16,13 @@ Version 1.2
 * Fix double drawing additive faces.
 * Fix savegame count not properly increasing.
 * Fix regeneration of non-ammo pickups with OCB 128.
-* Overhaul Pushable blocks:
- - Separate climbable and normal pushable blocks slots.
- - Add new pushable OCB to manipulate pushable block properties.
- - Add new Lara animations for pushing over the block off the edge (both TR1-3 and TR4-5 versions).
- - Fix pushables not working with raising block.
+* Fix vault bug preventing the player from climbing onto ledges out of deeper sections of wade-depth water.
+* Improve head-on wall collision.
+* Overhaul pushables:
+ - Separate climbable and non-climbable pushable object slots.
+ - Add new pushable OCB to manipulate pushable properties.
+ - Add new animations for pushing pushables off edgees (TR1-3 and TR4-5 versions).
+ - Fix pushables not working with raising blocks.
  - Fix miscellaneous pushable bugs.
 * Overhaul look-around feature:
  - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
