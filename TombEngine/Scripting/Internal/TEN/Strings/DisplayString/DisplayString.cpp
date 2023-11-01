@@ -180,7 +180,7 @@ void DisplayString::Register(sol::table& parent)
 		// Screen-space coordinates are returned.
 		// @function DisplayString:GetPosition()
 		// @treturn Vec2 pos Position in pixel coordinates.
-		ScriptReserved_GetPosition, &DisplayString::GetPos,
+		ScriptReserved_GetPosition, &DisplayString::GetPosition,
 
 		/// Set the display string's flags 
 		// @function DisplayString:SetFlags()
@@ -220,13 +220,35 @@ float DisplayString::GetScale() const
 	return displayString._scale;
 }
 
-void DisplayString::SetPosition(const Vec2& pos)
+void DisplayString::SetPosition(const sol::variadic_args& args)
 {
 	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
-	displayString._position = pos;
+
+	if (args.size() == 1)
+	{
+		// Handle the case when a single argument is provided.
+		if (args[0].is<Vec2>()) 
+		{
+			displayString._position = args[0].as<Vec2>();
+		}
+	}
+	else if (args.size() == 2)
+	{
+		// Handle the case when two arguments are provided, assuming they are integers.
+		if (args[0].is<int>() && args[1].is<int>())
+		{
+			int x = args[0].as<int>();
+			int y = args[1].as<int>();
+			displayString._position = Vec2(static_cast<float>(x), static_cast<float>(y));
+		}
+	}
+	else
+	{
+		TENLog("Invalid number of arguments for SetPosition.");
+	}
 }
 
-Vec2 DisplayString::GetPos() const
+Vec2 DisplayString::GetPosition() const
 {	
 	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
 	return displayString._position;

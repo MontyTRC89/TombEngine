@@ -72,13 +72,13 @@ public:
 	// Getters
 	DisplayStringID GetID() const;
 	std::string		GetKey() const;
-	Vec2			GetPos() const;
+	Vec2			GetPosition() const;
 	float			GetScale() const;
 	ScriptColor		GetColor() const;
 
 	// Setters
 	void SetKey(const std::string& key);
-	void SetPosition(const Vec2& pos);
+	void SetPosition(const sol::variadic_args& args);
 	void SetScale(float scale);
 	void SetColor(const ScriptColor&);
 	void SetTranslated(bool isTranslated);
