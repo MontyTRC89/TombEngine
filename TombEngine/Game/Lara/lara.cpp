@@ -533,7 +533,7 @@ static void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, P
 				// HACK: Special case for UPV.
 				if (player.Context.Vehicle != NO_ITEM)
 				{
-					auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
+					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
 					if (vehicleItem.ObjectNumber == ID_UPV)
 					{
 						auto pointColl = GetCollision(&item, 0, 0, CLICK(1));
