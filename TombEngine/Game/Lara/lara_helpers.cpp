@@ -96,6 +96,10 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 {
 	auto& player = GetLaraInfo(item);
 
+	// Update health status.
+	if (TestEnvironment(ENV_FLAG_DAMAGE, &item) && item.HitPoints > 0)
+		item.HitPoints--;
+
 	// Update poison status.
 	if (player.Status.Poison)
 	{
@@ -111,7 +115,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 		player.Status.Stamina++;
 
 	// TODO: Dehardcode values and make cleaner implementation.
-	// Update air, cold, and health status.
+	// Handle environmental status effects.
 	switch (waterStatus)
 	{
 	case WaterStatus::Dry:
@@ -247,6 +251,22 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 
 	default:
 		break;
+	}
+
+	// Update death counter.
+	if (item.HitPoints <= 0)
+	{
+		item.HitPoints = -1;
+
+		if (player.Control.Count.Death == 0)
+			StopSoundTracks(true);
+
+		player.Control.Count.Death++;
+		if ((item.Flags & IFLAG_INVISIBLE))
+		{
+			player.Control.Count.Death++;
+			return;
+		}
 	}
 }
 

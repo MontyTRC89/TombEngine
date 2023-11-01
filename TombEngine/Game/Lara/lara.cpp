@@ -459,7 +459,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		player.Control.Weapon.HasFired = false;
 	}
 
-	// Handle object interation adjustment timer.
+	// Handle object interation adjustment parameters.
 	if (player.Control.IsMoving)
 	{
 		if (player.Control.Count.PositionAdjust > LARA_POSITION_ADJUST_MAX_TIME)
@@ -688,24 +688,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			}
 
 			break;
-		}
-	}
-
-	if (TestEnvironment(ENV_FLAG_DAMAGE, item) && item->HitPoints > 0)
-		item->HitPoints--;
-
-	if (item->HitPoints <= 0)
-	{
-		item->HitPoints = -1;
-
-		if (player.Control.Count.Death == 0)
-			StopSoundTracks(true);
-
-		player.Control.Count.Death++;
-		if ((item->Flags & IFLAG_INVISIBLE))
-		{
-			player.Control.Count.Death++;
-			return;
 		}
 	}
 
