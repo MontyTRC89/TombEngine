@@ -478,7 +478,7 @@ static PlayerWaterData GetPlayerWaterData(ItemInfo& item)
 	};
 }
 
-static void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& waterData)
+static void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& water)
 {
 	auto& player = GetLaraInfo(item);
 
@@ -503,7 +503,7 @@ static void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, P
 	case WaterStatus::Dry:
 	case WaterStatus::Wade:
 		// TODO: Find best height. -- Sezz 2021.11.10
-		if (waterData.IsSwamp && player.Context.WaterSurfaceDist < -(LARA_HEIGHT + 8))
+		if (water.IsSwamp && player.Context.WaterSurfaceDist < -(LARA_HEIGHT + 8))
 		{
 			if (item.HitPoints >= 0)
 			{
@@ -538,8 +538,8 @@ static void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, P
 					{
 						auto pointColl = GetCollision(&item, 0, 0, CLICK(1));
 
-						waterData.IsCold = (waterData.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber));
-						if (waterData.IsCold)
+						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber));
+						if (water.IsCold)
 						{
 							player.Status.Exposure--;
 							if (player.Status.Exposure <= 0)
@@ -559,7 +559,7 @@ static void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, P
 			}
 			else
 			{
-				if (waterData.IsCold)
+				if (water.IsCold)
 				{
 					player.Status.Exposure--;
 					if (player.Status.Exposure <= 0)
@@ -592,7 +592,7 @@ static void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, P
 				player.Status.Air = -1;
 			}
 
-			if (waterData.IsCold)
+			if (water.IsCold)
 			{
 				player.Status.Exposure -= 2;
 				if (player.Status.Exposure <= 0)
@@ -618,7 +618,7 @@ static void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, P
 			if (player.Status.Air > LARA_AIR_MAX)
 				player.Status.Air = LARA_AIR_MAX;
 
-			if (waterData.IsCold)
+			if (water.IsCold)
 			{
 				player.Status.Exposure -= 2;
 				if (player.Status.Exposure <= 0)
@@ -679,11 +679,11 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	HandlePlayerQuickActions(*item);
 	RumbleLaraHealthCondition(item);
 
-	auto waterData = GetPlayerWaterData(*item);
-	player.Context.WaterSurfaceDist = -waterData.HeightFromWater;
+	auto water = GetPlayerWaterData(*item);
+	player.Context.WaterSurfaceDist = -water.HeightFromWater;
 
 	if (player.Context.Vehicle == NO_ITEM)
-		WadeSplash(item, waterData.WaterHeight, waterData.WaterDepth);
+		WadeSplash(item, water.WaterHeight, water.WaterDepth);
 
 	bool isWaterOnHeadspace = false;
 
@@ -695,15 +695,15 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			for (int i = 0; i < NUM_LARA_MESHES; i++)
 				player.Effect.BubbleNodes[i] = 0.0f;
 
-			if (waterData.HeightFromWater == NO_HEIGHT || waterData.HeightFromWater < WADE_WATER_DEPTH)
+			if (water.HeightFromWater == NO_HEIGHT || water.HeightFromWater < WADE_WATER_DEPTH)
 				break;
 
 			Camera.targetElevation = ANGLE(-22.0f);
 
 			// Water is at swim depth; dispatch dive.
-			if (waterData.WaterDepth >= SWIM_WATER_DEPTH && !waterData.IsSwamp)
+			if (water.WaterDepth >= SWIM_WATER_DEPTH && !water.IsSwamp)
 			{
-				if (waterData.IsWater)
+				if (water.IsWater)
 				{
 					item->Pose.Position.y += CLICK(0.5f) - 28; // TODO: Demagic.
 					item->Animation.IsAirborne = false;
@@ -742,13 +742,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 			// Water is at wade depth; update water status and do special handling.
-			else if (waterData.HeightFromWater >= WADE_WATER_DEPTH)
+			else if (water.HeightFromWater >= WADE_WATER_DEPTH)
 			{
 				player.Control.WaterStatus = WaterStatus::Wade;
 
 				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
-				if (waterData.WaterDepth > (SWIM_WATER_DEPTH - CLICK(1)) &&
-					item->Animation.IsAirborne && !waterData.IsSwamp)
+				if (water.WaterDepth > (SWIM_WATER_DEPTH - CLICK(1)) &&
+					item->Animation.IsAirborne && !water.IsSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
 					Splash(item);
@@ -758,12 +758,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				{
 					item->Animation.TargetState = LS_IDLE;
 				}
-				else if (waterData.IsSwamp)
+				else if (water.IsSwamp)
 				{
 					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
 						item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						item->Pose.Position.y = waterData.WaterHeight + (BLOCK(1) - 24); // TODO: Demagic.
+						item->Pose.Position.y = water.WaterHeight + (BLOCK(1) - 24); // TODO: Demagic.
 					}
 
 					SetAnimation(item, LA_WADE);
@@ -784,12 +784,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				ENV_FLAG_WATER, item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z,
 				GetCollision(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, item->RoomNumber).RoomNumber);
 
-			if (waterData.WaterDepth == NO_HEIGHT || abs(waterData.HeightFromWater) >= CLICK(1) || isWaterOnHeadspace ||
+			if (water.WaterDepth == NO_HEIGHT || abs(water.HeightFromWater) >= CLICK(1) || isWaterOnHeadspace ||
 				item->Animation.AnimNumber == LA_UNDERWATER_RESURFACE || item->Animation.AnimNumber == LA_ONWATER_DIVE)
 			{
-				if (!waterData.IsWater)
+				if (!water.IsWater)
 				{
-					if (waterData.WaterDepth == NO_HEIGHT || abs(waterData.HeightFromWater) >= CLICK(1))
+					if (water.WaterDepth == NO_HEIGHT || abs(water.HeightFromWater) >= CLICK(1))
 					{
 						SetAnimation(item, LA_FALL_START);
 						ResetPlayerLean(item);
@@ -805,7 +805,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						ResetPlayerLean(item);
 						ResetPlayerFlex(item);
 						item->Animation.Velocity.y = 0.0f;
-						item->Pose.Position.y = waterData.WaterHeight;
+						item->Pose.Position.y = water.WaterHeight;
 						player.Control.WaterStatus = WaterStatus::TreadWater;
 
 						UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
@@ -818,7 +818,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				ResetPlayerLean(item);
 				ResetPlayerFlex(item);
 				item->Animation.Velocity.y = 0.0f;
-				item->Pose.Position.y = waterData.WaterHeight + 1;
+				item->Pose.Position.y = water.WaterHeight + 1;
 				player.Control.WaterStatus = WaterStatus::TreadWater;
 
 				UpdateLaraRoom(item, 0);
@@ -827,9 +827,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case WaterStatus::TreadWater:
-			if (!waterData.IsWater)
+			if (!water.IsWater)
 			{
-				if (waterData.HeightFromWater <= WADE_WATER_DEPTH)
+				if (water.HeightFromWater <= WADE_WATER_DEPTH)
 				{
 					SetAnimation(item, LA_FALL_START);
 					item->Animation.IsAirborne = true;
@@ -852,16 +852,16 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		case WaterStatus::Wade:
 			Camera.targetElevation = ANGLE(-22.0f);
 
-			if (waterData.HeightFromWater >= WADE_WATER_DEPTH)
+			if (water.HeightFromWater >= WADE_WATER_DEPTH)
 			{
-				if (waterData.HeightFromWater > SWIM_WATER_DEPTH && !waterData.IsSwamp)
+				if (water.HeightFromWater > SWIM_WATER_DEPTH && !water.IsSwamp)
 				{
 					SetAnimation(item, LA_ONWATER_IDLE);
 					ResetPlayerLean(item);
 					ResetPlayerFlex(item);
 					item->Animation.IsAirborne = false;
 					item->Animation.Velocity.y = 0.0f;
-					item->Pose.Position.y += 1 - waterData.HeightFromWater;
+					item->Pose.Position.y += 1 - water.HeightFromWater;
 					player.Control.WaterStatus = WaterStatus::TreadWater;
 
 					UpdateLaraRoom(item, 0);
@@ -897,7 +897,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	HandlePlayerStatusEffects(*item, player.Control.WaterStatus, waterData);
+	HandlePlayerStatusEffects(*item, player.Control.WaterStatus, water);
 
 	auto prevPos = item->Pose.Position;
 
