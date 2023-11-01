@@ -797,6 +797,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						item->HitPoints -= 10;
 					}
 				}
+				else
+				{
+					lara->Status.Exposure++;
+					if (lara->Status.Exposure >= LARA_EXPOSURE_MAX)
+						lara->Status.Exposure = LARA_EXPOSURE_MAX;
+				}
 			}
 		}
 

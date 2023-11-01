@@ -17,6 +17,7 @@ Version 1.2
 * Fix savegame count not properly increasing.
 * Fix regeneration of non-ammo pickups with OCB 128.
 * Fix vault bug preventing the player from climbing onto ledges out of deeper sections of wade-depth water.
+* Fix cold exposure status not recovering in non-cold wade-depth water.
 * Improve head-on wall collision.
 * Overhaul pushables:
  - Separate climbable and non-climbable pushable object slots.
