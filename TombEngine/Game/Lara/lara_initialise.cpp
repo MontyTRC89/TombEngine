@@ -48,6 +48,7 @@ void InitializeLara(bool restore)
 
 	Lara.ExtraAnim = NO_ITEM;
 	Lara.Context.Vehicle = NO_ITEM;
+	Lara.Context.InteractedItem = NO_ITEM;
 	Lara.Location = -1;
 	Lara.HighestLocation = -1;
 	Lara.Control.Rope.Ptr = -1;
