@@ -60,8 +60,8 @@ namespace TEN::Collision
 		}
 
 		auto deltaPos = (entityFrom.Pose.Position - entityTo.Pose.Position).ToVector3();
-		auto inverseRotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Transpose() used as faster equivalent to Invert().
-		auto relPos = Vector3::Transform(deltaPos, inverseRotMatrix);
+		auto invRotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Transpose() used as faster equivalent to Invert().
+		auto relPos = Vector3::Transform(deltaPos, invRotMatrix);
 
 		// 3) Test if entityFrom is inside interaction bounds.
 		auto bounds = Bounds + boundsExtension;
@@ -101,7 +101,7 @@ namespace TEN::Collision
 		short headingAngle = Geometry::GetOrientToPoint(poseFrom.Position.ToVector3(), poseTo.Position.ToVector3()).y;
 		int cardinalDir = GetQuadrant(headingAngle - poseFrom.Orientation.y);
 
-		// Determine and return alignment animation number.
+		// Return alignment anim number.
 		switch (cardinalDir)
 		{
 		default:
@@ -150,7 +150,7 @@ namespace TEN::Collision
 	}
 
 	void HandlePlayerInteraction(ItemInfo& playerEntity, ItemInfo& interactedEntity, const InteractionBasis& basis,
-								 const InteractRoutine& interactRoutine)
+								 const PlayerInteractRoutine& interactRoutine)
 	{
 		auto& player = GetLaraInfo(playerEntity);
 

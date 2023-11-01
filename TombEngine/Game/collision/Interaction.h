@@ -7,8 +7,8 @@ struct ItemInfo;
 
 namespace TEN::Collision
 {
-	using InteractRoutine	   = std::function<void(ItemInfo& playerEntity, ItemInfo& interactedEntity)>;
-	using OrientConstraintPair = std::pair<EulerAngles, EulerAngles>;
+	using PlayerInteractRoutine = std::function<void(ItemInfo& playerEntity, ItemInfo& interactedEntity)>;
+	using OrientConstraintPair	= std::pair<EulerAngles, EulerAngles>;
 
 	class InteractionBasis
 	{
@@ -35,5 +35,5 @@ namespace TEN::Collision
 	void SetPlayerAlignAnim(ItemInfo& playerEntity, const ItemInfo& interactedEntity);
 	
 	void HandlePlayerInteraction(ItemInfo& playerEntity, ItemInfo& interactedEntity, const InteractionBasis& basis,
-								 const InteractRoutine& interactRoutine);
+								 const PlayerInteractRoutine& interactRoutine);
 }

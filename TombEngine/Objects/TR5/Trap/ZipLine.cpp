@@ -42,8 +42,8 @@ namespace TEN::Traps::TR5
 
 	void ControlZipLine(short itemNumber)
 	{
-		constexpr auto VEL_ACCEL   = 5.0f;
-		constexpr auto VEL_MAX	   = 100.0f;
+		constexpr auto VEL_ACCEL = 5.0f;
+		constexpr auto VEL_MAX	 = 100.0f;
 
 		auto& zipLineItem = g_Level.Items[itemNumber];
 		auto& laraItem = *LaraItem;
@@ -110,7 +110,7 @@ namespace TEN::Traps::TR5
 		}
 		else
 		{
-			// "Parent" player to zip line.
+			// Attach player to zip line.
 			if (laraItem.Animation.ActiveState == LS_ZIP_LINE)
 				laraItem.Pose.Position = zipLineItem.Pose.Position;
 
