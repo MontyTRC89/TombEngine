@@ -117,16 +117,13 @@ namespace TEN::Entities::Traps
 				slopeAngle = ANGLE(0.0f);
 			}
 
-			int dirAngle = phd_atan(dir.z, dir.x);
-			int alignAngle = slopeAngle - dirAngle;
+			short dirAngle = phd_atan(dir.z, dir.x);
+			short alignAngle = Geometry::GetShortestAngle(slopeAngle, dirAngle);
 
 			// Test if slope aspect is not aligned with the direction.
-			if (alignAngle != 32768 && alignAngle != 0 && alignAngle != -32768)
+			if (alignAngle != 0 && alignAngle != ANGLE(180.0f))
 				return false;
 
-			// TODO: ANGLE(180.0f) and ANGLE(-180) both returns -32768 due to the short type range (-32,768 to 32,767)
-			//if (alignAngle != ANGLE(180.0f) && alignAngle != 0 && alignAngle != ANGLE(-180.0f))
-			//return false;
 		}
 
 		// Check for diagonal split.
