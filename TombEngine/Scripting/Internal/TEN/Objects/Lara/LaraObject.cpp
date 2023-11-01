@@ -397,6 +397,21 @@ std::unique_ptr<Moveable> LaraObject::GetTarget() const
 	return std::make_unique<Moveable>(lara->TargetEntity->Index);
 }
 
+/// Get current object that Lara is interacting.
+// @function LaraObject:GetInteractedObj
+// @treturn Objects.Moveable current object Lara is interacting with (nil if Lara is not interacting with any object)
+// @usage
+// local interactedObj = Lara:GetInteractedObj()
+std::unique_ptr<Moveable> LaraObject::GetInteractedObj() const
+{
+	auto* lara = GetLaraInfo(m_item);
+
+	if (lara->TargetEntity == nullptr)
+		return nullptr;
+
+	return std::make_unique<Moveable>(lara->TargetEntity->Index);
+}
+
 /// Get current light state of the torch, if it exists
 // @function LaraObject:TorchIsLit
 // @treturn bool is torch currently lit or not? (false if no torch exists)
@@ -432,6 +447,7 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,
+			ScriptReserved_GetInteractedObj, &LaraObject::GetInteractedObj,
 			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
 			sol::base_classes, sol::bases<Moveable>()
 		);

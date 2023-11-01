@@ -48,6 +48,7 @@ public:
 	void SetControlLock(bool value);
 	std::unique_ptr<Moveable> GetVehicle() const;
 	std::unique_ptr<Moveable> GetTarget() const;
+	std::unique_ptr<Moveable> GetInteractedObj() const;
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
