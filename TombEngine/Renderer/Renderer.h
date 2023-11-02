@@ -90,6 +90,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11BlendState> _screenBlendState = nullptr;
 		ComPtr<ID3D11BlendState> _lightenBlendState = nullptr;
 		ComPtr<ID3D11BlendState> _excludeBlendState = nullptr;
+		ComPtr<ID3D11BlendState> _transparencyBlendState = nullptr;
+		ComPtr<ID3D11BlendState> _finalTransparencyBlendState = nullptr;
 		ComPtr<ID3D11RasterizerState> _cullCounterClockwiseRasterizerState = nullptr;
 		ComPtr<ID3D11RasterizerState> _cullClockwiseRasterizerState = nullptr;
 		ComPtr<ID3D11RasterizerState> _cullNoneRasterizerState = nullptr;
@@ -103,6 +105,8 @@ namespace TEN::Renderer
 		RenderTarget2D _dumpScreenRenderTarget;
 		RenderTarget2D _renderTarget;
 		RenderTarget2D _depthMap;
+		RenderTarget2D _transparencyRenderTarget;
+		RenderTarget2D _weightRenderTarget;
 		RenderTargetCube _reflectionCubemap;
 		Texture2DArray _shadowMap;
 
@@ -110,6 +114,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11VertexShader> _vsRooms;
 		ComPtr<ID3D11VertexShader> _vsRoomsAnimatedTextures;
 		ComPtr<ID3D11PixelShader> _psRooms;
+		ComPtr<ID3D11PixelShader> _psRoomsTransparent;
 		ComPtr<ID3D11VertexShader> _vsItems;
 		ComPtr<ID3D11PixelShader> _psItems;
 		ComPtr<ID3D11VertexShader> _vsHairs;
@@ -139,6 +144,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11SamplerState> _shadowSampler;
 		ComPtr<ID3D11VertexShader> _vsFinalPass;
 		ComPtr<ID3D11PixelShader> _psFinalPass;
+		ComPtr<ID3D11VertexShader> _vsTransparentFinalPass;
+		ComPtr<ID3D11PixelShader> _psTransparentFinalPass;
 
 		// Constant buffers
 		RenderView _gameCamera;
@@ -391,9 +398,8 @@ namespace TEN::Renderer
 		void DrawStreamers(RenderView& view);
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
-		void DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);		
-		void RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-			ID3D11ShaderResourceView* background);
+		void DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view);
+		void RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background);
 		void RenderTitleMenu(Menu menu);
 		void RenderPauseMenu(Menu menu);
 		void RenderLoadSaveMenu();
@@ -499,7 +505,7 @@ namespace TEN::Renderer
 		void RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		void DumpGameScene();
 		void RenderInventory();
-		void RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
+		void RenderScene(RenderTarget2D* renderTarget, RenderView& view);
 		void ClearScene();
 		void SaveScreenshot();
 		void PrintDebugMessage(LPCSTR message, ...);

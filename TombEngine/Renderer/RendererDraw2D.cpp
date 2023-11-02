@@ -308,14 +308,14 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawPostprocess(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
+	void Renderer::DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view)
 	{
 		SetBlendMode(BlendMode::Opaque);
 
 		_context->RSSetState(_cullCounterClockwiseRasterizerState.Get());
-		_context->ClearRenderTargetView(target, Colors::Black);
-		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		_context->OMSetRenderTargets(1, &target, depthTarget);
+		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);
+		_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), renderTarget->DepthStencilView.Get());
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 

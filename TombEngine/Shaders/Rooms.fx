@@ -42,11 +42,19 @@ SamplerState NormalTextureSampler : register(s1);
 Texture2D CausticsTexture : register(t2);
 SamplerState CausticsTextureSampler : register(s2);
 
+#ifdef TRANSPARENT
+struct PixelShaderOutput
+{
+	float4 Color: SV_TARGET0;
+	float Weight: SV_TARGET1;
+};
+#else
 struct PixelShaderOutput
 {
 	float4 Color: SV_TARGET0;
 	float4 Depth: SV_TARGET1;
 };
+#endif
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -183,16 +191,32 @@ PixelShaderOutput PS(PixelShaderInput input)
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}
 
-	output.Depth = output.Color.w > 0.0f ?
-		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
-		float4(0.0f, 0.0f, 0.0f, 0.0f);
-
 	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
 	output.Color.xyz = output.Color.xyz * lighting;
 	output.Color.xyz = saturate(output.Color.xyz);
 
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
+
+#ifdef TRANSPARENT
+	float weight = pow (output.Color.w, 1.0f) * clamp(0.3f / (0.00001f + pow(input.PositionCopy.z / input.PositionCopy.w / 200, 4.0f)), 0.01f, 3000);
+
+	float a = min(1.0, output.Color.w) * 8.0f + 0.01f;
+	float b = -input.PositionCopy.z / input.PositionCopy.w * 0.95f + 1.0f;
+
+	/* If your scene has a lot of content very close to the far plane,
+	   then include this line (one rsqrt instruction):
+	   b /= sqrt(1e4 * abs(csZ)); */
+	weight = clamp(a * a * a * pow(10, 8) * b * b * b, 0.01f, 3000.0f);
+
+
+	output.Weight = output.Color.w;
+	output.Color = float4(output.Color.xyz * output.Color.w, output.Color.w) * weight;
+#else
+	output.Depth = output.Color.w > 0.0f ?
+		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
+		float4(0.0f, 0.0f, 0.0f, 0.0f);
+#endif
 
 	return output;
 }

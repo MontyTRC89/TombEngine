@@ -309,6 +309,14 @@ namespace TEN::Renderer
 			case BlendMode::Exclude:
 				_context->OMSetBlendState(_excludeBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
+
+			case BlendMode::TransparentPass:
+				_context->OMSetBlendState(_transparencyBlendState.Get(), nullptr, 0xFFFFFFFF);
+				break;
+
+			case BlendMode::FinalTransparentPass:
+				_context->OMSetBlendState(_finalTransparencyBlendState.Get(), nullptr, 0xFFFFFFFF);
+				break;
 			}
 
 			_stBlending.BlendMode = static_cast<unsigned int>(blendMode);

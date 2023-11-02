@@ -22,7 +22,9 @@ enum class BlendMode
 	Exclude = 8,
 	Screen = 9,
 	Lighten = 10,
-	AlphaBlend = 11
+	AlphaBlend = 11,
+	TransparentPass = 12,
+	FinalTransparentPass = 13
 };
 
 enum class CullMode
@@ -152,7 +154,8 @@ enum class RendererPass
 	ShadowMap,
 	Opaque,
 	Transparent,
-	CollectTransparentFaces
+	CollectTransparentFaces,
+	Additive
 };
 
 enum class SpriteRenderType

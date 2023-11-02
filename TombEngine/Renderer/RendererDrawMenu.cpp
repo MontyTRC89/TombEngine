@@ -940,7 +940,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, ID3D11ShaderResourceView* background)
+	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background)
 	{
 		// Set basic render states
 		SetBlendMode(BlendMode::Opaque, true);
@@ -948,14 +948,16 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::CounterClockwise, true);
 
 		// Bind and clear render target
-		_context->OMSetRenderTargets(1, &target, depthTarget);
+		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), renderTarget->DepthStencilView.Get());
 		_context->RSSetViewports(1, &_viewport);
 		ResetScissor();
 
 		if (background != nullptr)
-			DrawFullScreenImage(background, 0.5f, target, depthTarget);
+		{
+			DrawFullScreenImage(background->ShaderResourceView.Get(), 0.5f, renderTarget->RenderTargetView.Get(), renderTarget->DepthStencilView.Get());
+		}
 
-		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
@@ -1078,7 +1080,7 @@ namespace TEN::Renderer
 	{
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
-		RenderInventoryScene(_backBuffer.RenderTargetView.Get(), _backBuffer.DepthStencilView.Get(), _dumpScreenRenderTarget.ShaderResourceView.Get());
+		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget);
 		_swapChain->Present(0, 0);
 	}
 
@@ -1087,10 +1089,10 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
-		RenderScene(_backBuffer.RenderTargetView.Get(), _backBuffer.DepthStencilView.Get(), _gameCamera);
+		RenderScene(&_backBuffer, _gameCamera);
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-		RenderInventoryScene(_backBuffer.RenderTargetView.Get(), _backBuffer.DepthStencilView.Get(), nullptr);
+		RenderInventoryScene(&_backBuffer, nullptr);
 		DrawAllStrings();
 
 		_swapChain->Present(0, 0);

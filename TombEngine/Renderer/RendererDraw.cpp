@@ -1410,7 +1410,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
+	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view)
 	{
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -1536,11 +1536,23 @@ namespace TEN::Renderer
 		DrawStreamers(view);
 		DrawLaserBarriers(view);
 
-		// Collect all transparent faces
-		DrawRooms(view, RendererPass::CollectTransparentFaces);
-		DrawStatics(view, RendererPass::CollectTransparentFaces);
+		DrawRooms(view, RendererPass::Additive);
 
-		/*DrawItems(view, RendererPass::Transparent);
+		// Collect all transparent faces
+		_context->ClearRenderTargetView(_transparencyRenderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->ClearRenderTargetView(_weightRenderTarget.RenderTargetView.Get(), Colors::White);
+
+		pRenderViewPtrs[0] = _transparencyRenderTarget.RenderTargetView.Get();
+		pRenderViewPtrs[1] = _weightRenderTarget.RenderTargetView.Get();
+		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
+
+		SetBlendMode(BlendMode::TransparentPass);
+		SetDepthState(DepthState::Read);
+
+		DrawRooms(view, RendererPass::Transparent);
+		/*DrawStatics(view, RendererPass::CollectTransparentFaces);
+
+		DrawItems(view, RendererPass::Transparent);
 		DrawRooms(view, RendererPass::Transparent);
 		DrawItems(view, RendererPass::Transparent);
 		DrawStatics(view, RendererPass::Transparent);
@@ -1549,12 +1561,63 @@ namespace TEN::Renderer
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);*/
 
+		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), nullptr);
+
+		_context->RSSetState(_cullCounterClockwiseRasterizerState.Get());
+		_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
+
+		Vertex vertices[4];
+
+		vertices[0].Position.x = -1.0f;
+		vertices[0].Position.y = 1.0f;
+		vertices[0].Position.z = 0.0f;
+		vertices[0].UV.x = 0.0f;
+		vertices[0].UV.y = 0.0f;
+		vertices[0].Color = Vector4::One;
+
+		vertices[1].Position.x = 1.0f;
+		vertices[1].Position.y = 1.0f;
+		vertices[1].Position.z = 0.0f;
+		vertices[1].UV.x = 1.0f;
+		vertices[1].UV.y = 0.0f;
+		vertices[1].Color = Vector4::One;
+
+		vertices[2].Position.x = 1.0f;
+		vertices[2].Position.y = -1.0f;
+		vertices[2].Position.z = 0.0f;
+		vertices[2].UV.x = 1.0f;
+		vertices[2].UV.y = 1.0f;
+		vertices[2].Color = Vector4::One;
+
+		vertices[3].Position.x = -1.0f;
+		vertices[3].Position.y = -1.0f;
+		vertices[3].Position.z = 0.0f;
+		vertices[3].UV.x = 0.0f;
+		vertices[3].UV.y = 1.0f;
+		vertices[3].Color = Vector4::One;
+
+		_context->VSSetShader(_vsTransparentFinalPass.Get(), nullptr, 0);
+		_context->PSSetShader(_psTransparentFinalPass.Get(), nullptr, 0);
+		 
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_inputLayout.Get());
+
+		BindTexture((TextureRegister)1, &_transparencyRenderTarget, SamplerStateRegister::PointWrap);
+		BindTexture((TextureRegister)2, &_weightRenderTarget, SamplerStateRegister::PointWrap);
+
+		SetBlendMode(BlendMode::FinalTransparentPass);
+		
+		_primitiveBatch->Begin();
+		_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		_primitiveBatch->End();
+
 		// Draw transparent faces and lines
-		DrawTransparentFaces(view);
+		//DrawTransparentFaces(view);
 		DrawLines3D(view);
 
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
-		DrawPostprocess(target, depthTarget, view);
+		DrawPostprocess(renderTarget, view);
 
 		// Draw GUI elements at end.
 		DrawLinesIn2DSpace();
@@ -1613,8 +1676,7 @@ namespace TEN::Renderer
 
 	void Renderer::DumpGameScene()
 	{
-		RenderScene(_dumpScreenRenderTarget.RenderTargetView.Get(), _dumpScreenRenderTarget.DepthStencilView.Get(),
-					_gameCamera);
+		RenderScene(&_dumpScreenRenderTarget, _gameCamera);
 	}
 
 	void Renderer::DrawItems(RenderView& view, RendererPass rendererPass)
@@ -2110,7 +2172,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawRooms(RenderView& view, RendererPass rendererPass)
 	{
-		if (rendererPass == RendererPass::CollectTransparentFaces)
+		/*if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
 			for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
 			{
@@ -2146,7 +2208,7 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		else
+		else*/
 		{
 			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
@@ -2156,9 +2218,6 @@ namespace TEN::Renderer
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			_context->IASetInputLayout(_inputLayout.Get());
 			_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-			// Bind pixel shaders.
-			_context->PSSetShader(_psRooms.Get(), nullptr, 0);
 
 			BindConstantBufferVS(ConstantBufferRegister::Room, _cbRoom.get());
 			BindConstantBufferPS(ConstantBufferRegister::Room, _cbRoom.get());
@@ -2233,68 +2292,105 @@ namespace TEN::Renderer
 							continue;
 						}
 
-						if (bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest)
+						if (rendererPass == RendererPass::Opaque)
 						{
-							int passes = bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
-
-							for (int pass = 0; pass < passes; pass++)
+							if (!(bucket.BlendMode == BlendMode::Opaque ||
+								bucket.BlendMode == BlendMode::AlphaTest /*||
+								bucket.BlendMode == BlendMode::AlphaBlend*/))
 							{
-								if (pass == 0)
-								{
-									SetBlendMode(bucket.BlendMode);
-									SetAlphaTest(
-										bucket.BlendMode == BlendMode::AlphaTest ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
-										FAST_ALPHA_BLEND_THRESHOLD
-									);
-								}
-								else
-								{
-									SetBlendMode(BlendMode::AlphaBlend);
-									SetAlphaTest(AlphaTestMode::LessThan, FAST_ALPHA_BLEND_THRESHOLD);
-								}
+								continue;
+							}
 
-								// Draw geometry
-								if (animated)
-								{
-									BindTexture(TextureRegister::ColorMap,
-										&std::get<0>(_animatedTextures[bucket.Texture]),
-										SamplerStateRegister::AnisotropicClamp);
-									BindTexture(TextureRegister::NormalMap,
-										&std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							_context->PSSetShader(_psRooms.Get(), nullptr, 0);
 
-									RendererAnimatedTextureSet& set = _animatedTextureSets[bucket.Texture];
-									_stAnimated.NumFrames = set.NumTextures;
-									_stAnimated.Type = 0;
-									_stAnimated.Fps = set.Fps;
+							SetBlendMode(bucket.BlendMode);
+							SetDepthState(DepthState::Write);
+							SetAlphaTest(
+								bucket.BlendMode == BlendMode::AlphaTest || bucket.BlendMode == BlendMode::AlphaBlend ?
+								AlphaTestMode::GreatherThan : AlphaTestMode::None,
+								FAST_ALPHA_BLEND_THRESHOLD
+							);
+						}
+						else if (rendererPass == RendererPass::Additive)
+						{
+							if (!(bucket.BlendMode == BlendMode::Additive))
+							{
+								continue;
+							}
+							 
+							_context->PSSetShader(_psRooms.Get(), nullptr, 0);
 
-									for (unsigned char j = 0; j < set.NumTextures; j++)
-									{
-										if (j >= _stAnimated.Textures.size())
-										{
-											TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
-											break;
-										}
+							SetBlendMode(bucket.BlendMode);
+							SetDepthState(DepthState::Read);
+							SetAlphaTest(
+								AlphaTestMode::None,
+								FAST_ALPHA_BLEND_THRESHOLD
+							);
+						}
+						else if (rendererPass == RendererPass::Transparent)
+						{
+							if (bucket.BlendMode == BlendMode::Opaque ||
+								bucket.BlendMode == BlendMode::AlphaTest || 
+								bucket.BlendMode == BlendMode::Additive)
+							{
+								continue;
+							}
 
-										_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
-										_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
-										_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
-										_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
-									}
-									_cbAnimated.updateData(_stAnimated, _context.Get());
-								}
-								else
-								{
-									BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
-										SamplerStateRegister::AnisotropicClamp);
-									BindTexture(TextureRegister::NormalMap,
-										&std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-								}
+							_context->PSSetShader(_psRoomsTransparent.Get(), nullptr, 0);
 
-								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-								_numRoomsDrawCalls++;
+							SetBlendMode(BlendMode::TransparentPass);
+							SetDepthState(DepthState::Read);
+					 
+							if (bucket.BlendMode == BlendMode::Additive)
+							{
+								SetAlphaTest(AlphaTestMode::None, FAST_ALPHA_BLEND_THRESHOLD);
+							}
+							else
+							{
+								SetAlphaTest(AlphaTestMode::None, FAST_ALPHA_BLEND_THRESHOLD);
 							}
 						}
+
+						// Draw geometry
+						if (animated)
+						{
+							BindTexture(TextureRegister::ColorMap,
+								&std::get<0>(_animatedTextures[bucket.Texture]),
+								SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap,
+								&std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+							RendererAnimatedTextureSet& set = _animatedTextureSets[bucket.Texture];
+							_stAnimated.NumFrames = set.NumTextures;
+							_stAnimated.Type = 0;
+							_stAnimated.Fps = set.Fps;
+
+							for (unsigned char j = 0; j < set.NumTextures; j++)
+							{
+								if (j >= _stAnimated.Textures.size())
+								{
+									TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
+									break;
+								}
+
+								_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
+								_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
+								_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
+								_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
+							}
+							_cbAnimated.updateData(_stAnimated, _context.Get());
+						}
+						else
+						{
+							BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
+								SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap,
+								&std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						}
+
+						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+						_numRoomsDrawCalls++;
 					}
 				}
 			}
@@ -2417,7 +2513,7 @@ namespace TEN::Renderer
 	void Renderer::Render()
 	{
 		//RenderToCubemap(reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
-		RenderScene(_backBuffer.RenderTargetView.Get(), _backBuffer.DepthStencilView.Get(), _gameCamera);
+		RenderScene(&_backBuffer, _gameCamera);
 		_context->ClearState();
 		_swapChain->Present(1, 0);
 	}
