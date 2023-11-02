@@ -47,12 +47,11 @@ namespace TEN::Collision::Attractors
 		AttractorType		 _type		 = AttractorType::Edge;
 		std::vector<Vector3> _points	 = {};
 		int					 _roomNumber = 0;
+		float				 _length	 = 0.0f;
+		BoundingBox			 _box		 = BoundingBox(); 
 
-		float		_length = 0.0f;
-		BoundingBox _box	= BoundingBox(); 
-
-		// TODO: Crashes on init.
-		//std::unordered_map<int, ItemInfo&> AttachedPlayers = {};
+		// TODO
+		//std::unordered_map<int, ItemInfo*> _attachedPlayers = {}; // Key = item number
 
 	public:
 		// Constructors
@@ -80,14 +79,17 @@ namespace TEN::Collision::Attractors
 		bool IsLooped() const;
 
 		// Helpers
-		void AttachPlayer(ItemInfo& entity);
-		void DetachPlayer(ItemInfo& entity);
 		void Update(const std::vector<Vector3>& points, int roomNumber);
+		void AttachPlayer(ItemInfo& itemNumber);
+		void DetachPlayer(ItemInfo& itemNumber);
+
 		void DrawDebug() const;
 
 	private:
 		// Helpers
 		float NormalizeChainDistance(float chainDist) const;
+		void  CacheLength();
+		void  CacheBox();
 	};
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,

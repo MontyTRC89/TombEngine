@@ -22,42 +22,20 @@ namespace TEN::Collision::Attractors
 		_type = type;
 		_points = points;
 		_roomNumber = roomNumber;
-
-		// Cache length.
-		if (points.size() >= 2)
-		{
-			for (int i = 0; i < (points.size() - 1); i++)
-			{
-				// Get segment points.
-				const auto& origin = _points[i];
-				const auto& target = _points[i + 1];
-
-				_length += Vector3::Distance(origin, target);
-			}
-		}
-
-		// Cache AABB.
-		_box = Geometry::GetBoundingBox(points);
-
-		//AttachedPlayers = {};
+		CacheLength();
+		CacheBox();
 	}
 
 	Attractor::~Attractor()
 	{
 		// Dereference current attractor held by players.
-		/*for (auto& [itemNumber, item] : AttachedPlayers)
+		for (auto& [itemNumber, itemPtr] : _attachedPlayers)
 		{
-			if (!item.IsLara())
-				continue;
-
-			auto& player = GetLaraInfo(item);
+			auto& player = GetLaraInfo(*itemPtr);
 
 			if (player.Context.HandsAttractor.AttracPtr == this)
 				player.Context.HandsAttractor.AttracPtr = nullptr;
-
-			if (player.Context.FeetAttractor.AttracPtr == this)
-				player.Context.FeetAttractor.AttracPtr = nullptr;
-		}*/
+		}
 	}
 
 	AttractorType Attractor::GetType() const
@@ -268,45 +246,32 @@ namespace TEN::Collision::Attractors
 		return (Vector3::Distance(_points.front(), _points.back()) <= EPSILON);
 	}
 
-	void Attractor::AttachPlayer(ItemInfo& item)
-	{
-		if (!item.IsLara())
-			return;
-
-		//AttachedPlayers.insert({ item.Index, item });
-	}
-
-	void Attractor::DetachPlayer(ItemInfo& item)
-	{
-		if (!item.IsLara())
-			return;
-
-		//AttachedPlayers.erase(item.Index);
-	}
-
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
 	{
 		assertion(!points.empty(), "Attempted to update invalid attractor.");
 
 		_points = points;
 		_roomNumber = roomNumber;
+		CacheLength();
+		CacheBox();
+	}
 
-		// Cache length.
-		_length = 0.0f;
-		if (points.size() >= 2)
-		{
-			for (int i = 0; i < (points.size() - 1); i++)
-			{
-				// Get segment points.
-				const auto& origin = _points[i];
-				const auto& target = _points[i + 1];
+	// TODO
+	void Attractor::AttachPlayer(ItemInfo& playerItem)
+	{
+		if (!playerItem.IsLara())
+			return;
 
-				_length += Vector3::Distance(origin, target);
-			}
-		}
+		//_attachedPlayers.insert({ playerItem.Index, &playerItem });
+	}
 
-		// Cache AABB.
-		_box = Geometry::GetBoundingBox(points);
+	// TODO
+	void Attractor::DetachPlayer(ItemInfo& playerItem)
+	{
+		if (!playerItem.IsLara())
+			return;
+
+		//_attachedPlayers.erase(playerItem.Index);
 	}
 
 	void Attractor::DrawDebug() const
@@ -406,6 +371,29 @@ namespace TEN::Collision::Attractors
 		
 		// Isn't looped; clamp distance along attractor.
 		return std::clamp(chainDist, 0.0f, _length);
+	}
+
+	void Attractor::CacheLength()
+	{
+		float length = 0.0f;
+		if (_points.size() >= 2)
+		{
+			for (int i = 0; i < (_points.size() - 1); i++)
+			{
+				// Get segment points.
+				const auto& origin = _points[i];
+				const auto& target = _points[i + 1];
+
+				length += Vector3::Distance(origin, target);
+			}
+		}
+
+		_length = length;
+	}
+
+	void Attractor::CacheBox()
+	{
+		_box = Geometry::GetBoundingBox(_points);
 	}
 
 	// TEMP

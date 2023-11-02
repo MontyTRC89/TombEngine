@@ -1352,10 +1352,8 @@ struct DebugAttractorData
 // TODO: Savegame for attractors.
 struct PlayerContextData
 {
-	DebugAttractorData DebugAttracs = {};
-
 	PlayerAttractorData HandsAttractor = {};
-	PlayerAttractorData FeetAttractor  = {};
+	DebugAttractorData	DebugAttracs   = {};
 
 	int			CalcJumpVelocity	 = 0;
 	int			ProjectedFloorHeight = 0;
@@ -1372,15 +1370,6 @@ struct PlayerContextData
 
 struct LaraInfo
 {
-	~LaraInfo()
-	{
-		/*if (Context.HandsAttractor.AttracPtr != nullptr)
-			Context.HandsAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);
-
-		if (Context.FeetAttractor.AttracPtr != nullptr)
-			Context.FeetAttractor.AttracPtr->DetachPlayer(g_Level.Items[ItemNumber]);*/
-	}
-
 	static constexpr auto TARGET_COUNT_MAX = 8;
 
 	LaraControlData	  Control	= {};
@@ -1414,4 +1403,12 @@ struct LaraInfo
 	signed char Location		= 0;
 	signed char HighestLocation = 0;
 	signed char LocationPad		= 0;
+
+	// TODO
+	~LaraInfo()
+	{
+		// TODO: Entity polymorphism. Shouldn't use LaraItem here.
+		/*if (Context.HandsAttractor.AttracPtr != nullptr)
+			Context.HandsAttractor.AttracPtr->DetachPlayer(g_Level.Items[LaraItem->Index]);*/
+	}
 };

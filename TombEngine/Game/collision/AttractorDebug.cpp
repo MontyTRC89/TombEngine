@@ -10,6 +10,8 @@
 
 using namespace TEN::Input;
 
+// NOTE: Temporary file.
+
 namespace TEN::Collision::Attractors
 {
 	static void InitAttractors(ItemInfo& item)

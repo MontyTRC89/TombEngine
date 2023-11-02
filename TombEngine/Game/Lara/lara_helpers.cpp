@@ -1634,11 +1634,8 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	item.Animation.IsAirborne = true;
 	item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 	player.Control.HandStatus = HandStatus::Free;
-
-	//player.Context.HandsAttractor.AttracPtr->DetachPlayer(item);
-	//player.Context.FeetAttractor.AttracPtr->DetachPlayer(item);
+	player.Context.HandsAttractor.AttracPtr->DetachPlayer(item);
 	player.Context.HandsAttractor.Clear();
-	player.Context.FeetAttractor.Clear();
 }
 
 void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
