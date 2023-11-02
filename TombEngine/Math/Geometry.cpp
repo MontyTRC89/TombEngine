@@ -25,19 +25,19 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), orient, relOffset.ToVector3()));
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float distance)
+	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float dist)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, dist));
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, const AxisAngle& orient, float distance)
+	Vector3i TranslatePoint(const Vector3i& point, const AxisAngle& orient, float dist)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), orient, distance));
+		return Vector3i(TranslatePoint(point.ToVector3(), orient, dist));
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, const Vector3& direction, float distance)
+	Vector3i TranslatePoint(const Vector3i& point, const Vector3& dir, float dist)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), direction, distance));
+		return Vector3i(TranslatePoint(point.ToVector3(), dir, dist));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
@@ -63,29 +63,29 @@ namespace TEN::Math::Geometry
 	}
 
 	// NOTE: Roll (Z axis) of EulerAngles orientation is disregarded.
-	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float distance)
+	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float dist)
 	{
-		if (distance == 0.0f)
+		if (dist == 0.0f)
 			return point;
 
-		auto direction = orient.ToDirection();
-		return TranslatePoint(point, direction, distance);
+		auto dir = orient.ToDirection();
+		return TranslatePoint(point, dir, dist);
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, const AxisAngle& orient, float distance)
+	Vector3 TranslatePoint(const Vector3& point, const AxisAngle& orient, float dist)
 	{
-		auto direction = orient.ToDirection();
-		return TranslatePoint(point, direction, distance);
+		auto dir = orient.ToDirection();
+		return TranslatePoint(point, dir, dist);
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, const Vector3& direction, float distance)
+	Vector3 TranslatePoint(const Vector3& point, const Vector3& dir, float dist)
 	{
-		if (distance == 0.0f)
+		if (dist == 0.0f)
 			return point;
 
-		auto directionNorm = direction;
-		directionNorm.Normalize();
-		return (point + (directionNorm * distance));
+		auto normalizedDir = dir;
+		normalizedDir.Normalize();
+		return (point + (normalizedDir * dist));
 	}
 
 	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rot)
@@ -136,19 +136,19 @@ namespace TEN::Math::Geometry
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		auto direction = linePoint1 - linePoint0;
-		float distanceAlpha = direction.Dot(origin - linePoint0) / direction.Dot(direction);
+		auto dir = linePoint1 - linePoint0;
+		float distAlpha = dir.Dot(origin - linePoint0) / dir.Dot(dir);
 
-		if (distanceAlpha < 0.0f)
+		if (distAlpha < 0.0f)
 		{
 			return linePoint0;
 		}
-		else if (distanceAlpha > 1.0f)
+		else if (distAlpha > 1.0f)
 		{
 			return linePoint1;
 		}
 
-		return (linePoint0 + (direction * distanceAlpha));
+		return (linePoint0 + (dir * distAlpha));
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
@@ -159,7 +159,7 @@ namespace TEN::Math::Geometry
 		return EulerAngles(target - origin);
 	}
 
-	EulerAngles GetRelOrientToNormal(short orient2D, const Vector3& normal, const Vector3& gravity)
+	EulerAngles GetRelOrientToNormal(short orient, const Vector3& normal, const Vector3& gravity)
 	{
 		// TODO: Consider gravity direction.
 
@@ -167,49 +167,50 @@ namespace TEN::Math::Geometry
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(normal);
 
-		short deltaAngle = Geometry::GetShortestAngle(orient2D, aspectAngle);
+		short deltaAngle = Geometry::GetShortestAngle(orient, aspectAngle);
 		float sinDeltaAngle = phd_sin(deltaAngle);
 		float cosDeltaAngle = phd_cos(deltaAngle);
 
 		// Calculate relative orientation adhering to normal.
 		return EulerAngles(
 			-slopeAngle * cosDeltaAngle,
-			orient2D,
+			orient,
 			slopeAngle * sinDeltaAngle);
 	}
 
-	Quaternion ConvertDirectionToQuat(const Vector3& direction)
+	Quaternion ConvertDirectionToQuat(const Vector3& dir)
 	{
 		constexpr auto SINGULARITY_THRESHOLD = 1.0f - EPSILON;
 
-		static const auto REF_DIRECTION = Vector3::UnitZ;
+		static const auto REF_DIR = Vector3::UnitZ;
 
-		// If vectors are nearly opposite, return orientation 180 degrees around arbitrary axis.
-		float dot = REF_DIRECTION.Dot(direction);
+		// Vectors are nearly opposite; return orientation 180 degrees around arbitrary axis.
+		float dot = REF_DIR.Dot(dir);
 		if (dot < -SINGULARITY_THRESHOLD)
 		{
-			auto axis = Vector3::UnitX.Cross(REF_DIRECTION);
+			auto axis = Vector3::UnitX.Cross(REF_DIR);
 			if (axis.LengthSquared() < EPSILON)
-				axis = Vector3::UnitY.Cross(REF_DIRECTION);
+				axis = Vector3::UnitY.Cross(REF_DIR);
 			axis.Normalize();
 
 			auto axisAngle = AxisAngle(axis, FROM_RAD(PI));
 			return axisAngle.ToQuaternion();
 		}
 
-		// If vectors are nearly identical, return identity quaternion.
+		// Vectors are nearly identical; return identity quaternion.
 		if (dot > SINGULARITY_THRESHOLD)
 			return Quaternion::Identity;
 
 		// Calculate axis-angle and return converted quaternion.
-		auto axisAngle = AxisAngle(REF_DIRECTION.Cross(direction), FROM_RAD(acos(dot)));
+		auto axisAngle = AxisAngle(REF_DIR.Cross(dir), FROM_RAD(acos(dot)));
 		return axisAngle.ToQuaternion();
 	}
 
 	Vector3 ConvertQuatToDirection(const Quaternion& quat)
 	{
-		static const auto refDirection = Vector3::UnitZ;
-		return Vector3::Transform(refDirection, quat);
+		static const auto REF_DIR = Vector3::UnitZ;
+
+		return Vector3::Transform(REF_DIR, quat);
 	}
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
@@ -225,11 +226,11 @@ namespace TEN::Math::Geometry
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The 2D heading direction vector: X = +sinY, Y = 0, Z = +cosY
-		auto headingDirection = Vector3(sinY, 0.0f, cosY);
-		auto targetDirection = target - origin;
+		// 2D heading direction vector: X = +sinY, Y = 0, Z = +cosY
+		auto headingDir = Vector3(sinY, 0.0f, cosY);
+		auto targetDir = target - origin;
 
-		float dot = headingDirection.Dot(targetDirection);
+		float dot = headingDir.Dot(targetDir);
 		if (dot > 0.0f)
 			return true;
 
@@ -241,13 +242,13 @@ namespace TEN::Math::Geometry
 		if (origin == target)
 			return false;
 
-		auto refDirection = refPoint - origin;
+		auto refDir = refPoint - origin;
 
-		// The 2D heading direction vector to the 3D reference direction vector: X = +refDirection.x, Y = 0, Z = +refDirection.z
-		auto headingDirection = Vector3(refDirection.x, 0.0f, refDirection.z);
-		auto targetDirection = target - origin;
+		// 2D heading direction vector to 3D reference direction vector: X = +refDirection.x, Y = 0, Z = +refDirection.z
+		auto headingDir = Vector3(refDir.x, 0.0f, refDir.z);
+		auto targetDir = target - origin;
 
-		float dot = headingDirection.Dot(targetDirection);
+		float dot = headingDir.Dot(targetDir);
 		if (dot > 0.0f)
 			return true;
 
@@ -267,11 +268,11 @@ namespace TEN::Math::Geometry
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// The 2D normal vector to the 2D heading direction vector: X = +cosY, Y = 0, Z = -sinY
+		// 2D normal vector to 2D heading direction vector: X = +cosY, Y = 0, Z = -sinY
 		auto headingNormal = Vector3(cosY, 0.0f, -sinY);
-		auto targetDirection = target - origin;
+		auto targetDir = target - origin;
 
-		float dot = headingNormal.Dot(targetDirection);
+		float dot = headingNormal.Dot(targetDir);
 		if (dot > 0.0f)
 			return true;
 
@@ -283,13 +284,13 @@ namespace TEN::Math::Geometry
 		if (origin == target)
 			return false;
 
-		auto refDirection = refPoint - origin;
+		auto refDir = refPoint - origin;
 
-		// The 2D normal vector to the 3D reference direction vector: X = +refDirection.z, Y = 0, Z = -refDirection.x
-		auto headingNormal = Vector3(refDirection.z, 0.0f, -refDirection.x);
-		auto targetDirection = target - origin;
+		// 2D normal vector to 3D reference direction vector: X = +refDirection.z, Y = 0, Z = -refDirection.x
+		auto headingNormal = Vector3(refDir.z, 0.0f, -refDir.x);
+		auto targetDir = target - origin;
 
-		float dot = headingNormal.Dot(targetDirection);
+		float dot = headingNormal.Dot(targetDir);
 		if (dot > 0.0f)
 			return true;
 

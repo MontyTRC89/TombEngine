@@ -131,12 +131,12 @@ namespace TEN::Scripting::DisplaySprite
 	*/
 	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
 	{
-		ObjectID = objectID;
-		SpriteID = spriteID;
-		Position = pos;
-		Rotation = rot;
-		Scale = scale;
-		Color = color;
+		_objectID = objectID;
+		_spriteID = spriteID;
+		_position = pos;
+		_rotation = rot;
+		_scale = scale;
+		_color = color;
 	}
 
 	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale)
@@ -148,62 +148,62 @@ namespace TEN::Scripting::DisplaySprite
 
 	GAME_OBJECT_ID ScriptDisplaySprite::GetObjectID() const
 	{
-		return ObjectID;
+		return _objectID;
 	}
 
 	int ScriptDisplaySprite::GetSpriteID() const
 	{
-		return SpriteID;
+		return _spriteID;
 	}
 
 	Vec2 ScriptDisplaySprite::GetPosition() const
 	{
-		return Position;
+		return _position;
 	}
 
 	float ScriptDisplaySprite::GetRotation() const
 	{
-		return Rotation;
+		return _rotation;
 	}
 
 	Vec2 ScriptDisplaySprite::GetScale() const
 	{
-		return Scale;
+		return _scale;
 	}
 
 	ScriptColor ScriptDisplaySprite::GetColor() const
 	{
-		return Color;
+		return _color;
 	}
 
 	void ScriptDisplaySprite::SetObjectID(GAME_OBJECT_ID objectID)
 	{
-		ObjectID = objectID;
+		_objectID = objectID;
 	}
 
 	void ScriptDisplaySprite::SetSpriteID(int spriteID)
 	{
-		SpriteID = spriteID;
+		_spriteID = spriteID;
 	}
 
 	void ScriptDisplaySprite::SetPosition(const Vec2& pos)
 	{
-		Position = pos;
+		_position = pos;
 	}
 
 	void ScriptDisplaySprite::SetRotation(float rot)
 	{
-		Rotation = rot;
+		_rotation = rot;
 	}
 
 	void ScriptDisplaySprite::SetScale(const Vec2& scale)
 	{
-		Scale = scale;
+		_scale = scale;
 	}
 
 	void ScriptDisplaySprite::SetColor(const ScriptColor& color)
 	{
-		Color = color;
+		_color = color;
 	}
 
 	void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
@@ -220,31 +220,31 @@ namespace TEN::Scripting::DisplaySprite
 		constexpr auto DEFAULT_BLEND_MODE = BLENDMODE_ALPHABLEND;
 
 		// Object is not a sprite sequence object; return early.
-		if (ObjectID < GAME_OBJECT_ID::ID_HORIZON || ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+		if (_objectID < GAME_OBJECT_ID::ID_HORIZON || _objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
-			TENLog("Attempted to draw display sprite from non-sprite sequence object " + std::to_string(ObjectID), LogLevel::Warning);
+			TENLog("Attempted to draw display sprite from non-sprite sequence object " + std::to_string(_objectID), LogLevel::Warning);
 			return;
 		}
 
 		// Sprite missing or sequence not found; return early.
-		const auto& object = Objects[ObjectID];
-		if (!object.loaded || SpriteID >= abs(object.nmeshes))
+		const auto& object = Objects[_objectID];
+		if (!object.loaded || _spriteID >= abs(object.nmeshes))
 		{
 			TENLog(
-				"Attempted to draw missing sprite " + std::to_string(SpriteID) +
-				" from sprite sequence object " + std::to_string(ObjectID) +
+				"Attempted to draw missing sprite " + std::to_string(_spriteID) +
+				" from sprite sequence object " + std::to_string(_objectID) +
 				" as display sprite.",
 				LogLevel::Warning);
 			return;
 		}
 
-		auto convertedPos = Vector2(Position.x, Position.y) * POS_CONVERSION_COEFF;
-		short convertedRot = ANGLE(Rotation);
-		auto convertedScale = Vector2(Scale.x, Scale.y) * SCALE_CONVERSION_COEFF;
-		auto convertedColor = Vector4(Color.GetR(), Color.GetG(), Color.GetB(), Color.GetA()) / UCHAR_MAX;
+		auto convertedPos = Vector2(_position.x, _position.y) * POS_CONVERSION_COEFF;
+		short convertedRot = ANGLE(_rotation);
+		auto convertedScale = Vector2(_scale.x, _scale.y) * SCALE_CONVERSION_COEFF;
+		auto convertedColor = Vector4(_color.GetR(), _color.GetG(), _color.GetB(), _color.GetA()) / UCHAR_MAX;
 
 		AddDisplaySprite(
-			ObjectID, SpriteID,
+			_objectID, _spriteID,
 			convertedPos, convertedRot, convertedScale, convertedColor,
 			priority.value_or(DEFAULT_PRIORITY),
 			alignMode.value_or(DEFAULT_ALIGN_MODE),

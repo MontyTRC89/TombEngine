@@ -116,7 +116,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			{
 				if (itemNumber < 0)
 				{
-					if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+					if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
 					{
 						ShatterImpactData.impactDirection = directionNorm;
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
