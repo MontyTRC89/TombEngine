@@ -95,8 +95,8 @@ constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
 constexpr auto STEPUP_HEIGHT	   = (int)CLICK(3 / 2.0f);
 constexpr auto BAD_JUMP_CEILING	   = (int)CLICK(6 / 8.0f);
 constexpr auto SHALLOW_WATER_DEPTH = (int)CLICK(1 / 2.0f);
-constexpr auto WADE_DEPTH		   = STEPUP_HEIGHT;
-constexpr auto SWIM_DEPTH		   = CLICK(3) - 38;
+constexpr auto WADE_WATER_DEPTH	   = STEPUP_HEIGHT;
+constexpr auto SWIM_WATER_DEPTH	   = CLICK(2.75f);
 constexpr auto SLOPE_DIFFERENCE	   = 60;
 
 extern LaraInfo		 Lara;

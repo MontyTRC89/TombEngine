@@ -1877,7 +1877,9 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 					}
 				}
 				else if (coll->Setup.EnableObjectPush)
+				{
 					ItemPushItem(item, laraItem, coll, false, 1);
+				}
 			}
 		}
 
@@ -1904,15 +1906,19 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 			// HACK: Shatter statics only by non-harmless vehicles.
 			if (!doPlayerCollision && 
 				!harmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				StaticObjects[mesh.staticNumber].shatterType != SHT_NONE)
+				StaticObjects[mesh.staticNumber].shatterType != ShatterType::None)
 			{
 				SoundEffect(GetShatterSound(mesh.staticNumber), &mesh.pos);
 				ShatterObject(nullptr, &mesh, -128, laraItem->RoomNumber, 0);
 			}
 			else if (coll->Setup.EnableObjectPush)
+			{
 				ItemPushStatic(laraItem, mesh, coll);
+			}
 			else
+			{
 				continue;
+			}
 		}
 	}
 

@@ -161,7 +161,7 @@ void ExplosionControl(short itemNumber)
 				i = 0;
 				while (CollidedMeshes[i])
 				{
-					if (StaticObjects[CollidedMeshes[i]->staticNumber].shatterType != SHT_NONE)
+					if (StaticObjects[CollidedMeshes[i]->staticNumber].shatterType != ShatterType::None)
 					{
 						TriggerExplosionSparks(CollidedMeshes[i]->pos.Position.x, CollidedMeshes[i]->pos.Position.y, CollidedMeshes[i]->pos.Position.z, 3, -2, 0, item->RoomNumber);
 						CollidedMeshes[i]->pos.Position.y -= 128;

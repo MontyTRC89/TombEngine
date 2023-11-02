@@ -5,95 +5,108 @@
 
 namespace TEN::Math::Solvers
 {
-	std::pair<float, float> SolveQuadratic(float a, float b, float c)
+	std::optional<QuadraticSolution> SolveQuadratic(float a, float b, float c)
 	{
-		auto result = std::pair(INFINITY, INFINITY);
-
-		if (abs(a) < FLT_EPSILON)
+		if (abs(a) < EPSILON)
 		{
-			if (abs(b) < FLT_EPSILON)
-				return result; // Zero solutions.
+			// 0 solutions.
+			if (abs(b) < EPSILON)
+				return std::nullopt;
 
-			result.first = -c / b;
-			result.second = result.first;
-			return result; // One solution.
+			// 1 solution.
+			float root = -c / b;
+			return QuadraticSolution{ root, root };
 		}
 
+		// 0 solutions.
 		float discriminant = SQUARE(b) - (4.0f * a * c);
 		if (discriminant < 0.0f)
-			return result; // Zero solutions.
+			return std::nullopt;
 
 		float inv2a = 1.0f / (2.0f * a);
 
-		if (discriminant < FLT_EPSILON)
+		// 1 solution.
+		if (discriminant < EPSILON)
 		{
-			result.first = -b * inv2a;
-			result.second = result.first;
-			return result; // One solution.
+			float root = -b * inv2a;
+			return QuadraticSolution{ root, root };
 		}
 
+		// 2 solutions.
 		discriminant = sqrt(discriminant);
-		result.first = (-b - discriminant) * inv2a;
-		result.second = (-b + discriminant) * inv2a;
-		return result; // Two solutions.
+		float root0 = (-b - discriminant) * inv2a;
+		float root1 = (-b + discriminant) * inv2a;
+		return QuadraticSolution{ root0, root1 };
 	}
 
-	bool SolveIK2D(const Vector2& target, float length0, float length1, Vector2& middle)
+	IK2DSolution SolveIK2D(const Vector2& origin, const Vector2& target, float length0, float length1)
 	{
-		float length = target.Length();
-		if (length > (length0 + length1))
-			return false;
+		auto scaledTarget = target;
+		auto lengthMax = length0 + length1;
+		auto dir = target - origin;
+		dir.Normalize();
 
-		bool flipXY = (target.x < target.y);
-		float a = flipXY ? target.y : target.x;
-		float b = flipXY ? target.x : target.y;
-		assert(abs(a) > FLT_EPSILON);
+		// Check if target is within reach.
+		float dist = Vector2::Distance(origin, target);
+		if (dist > lengthMax)
+			scaledTarget = origin + (dir * lengthMax);
+
+		// Ensure line slope is well defined.
+		bool flipXY = (scaledTarget.x < scaledTarget.y);
+
+		float a = flipXY ? (scaledTarget.y - origin.y) : (scaledTarget.x - origin.x);
+		float b = flipXY ? (scaledTarget.x - origin.x) : (scaledTarget.y - origin.y);
+		assertion(abs(a) >= EPSILON, "SolveIK2D() failed.");
 
 		float m = ((SQUARE(length0) - SQUARE(length1)) + (SQUARE(a) + SQUARE(b))) / (2.0f * a);
 		float n = b / a;
-		auto quadratic = SolveQuadratic(1.0f + SQUARE(n), -2.0f * (m * n), SQUARE(m) - SQUARE(length0));
 
-		if (quadratic.first != INFINITY && quadratic.second != INFINITY)
+		auto quadraticSol = SolveQuadratic(1.0f + SQUARE(n), -2.0f * (m * n), SQUARE(m) - SQUARE(length0));
+		auto middle = Vector2::Zero;
+
+		// Solution is valid; define middle accurately.
+		if (quadraticSol.has_value())
 		{
-			middle.x = flipXY ? quadratic.second : (m - (n * quadratic.second));
-			middle.y = flipXY ? (m - (n * quadratic.second)) : quadratic.second;
-			return true;
+			middle = origin + (flipXY ?
+				Vector2(quadraticSol->Root1, (m - (n * quadraticSol->Root1))) :
+				Vector2(quadraticSol->Root0, (m - (n * quadraticSol->Root0))));
+		}
+		// Solution is invalid: define middle as point on line segment between origin and target.
+		else
+		{
+			middle = origin + (dir * length0);
 		}
 
-		middle = target * (length0 / length);
-		return false;
+		return IK2DSolution{ origin, middle, scaledTarget };
 	}
 
-	bool SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1, Vector3& middle)
+	IK3DSolution SolveIK3D(const Vector3& origin, const Vector3& target, const Vector3& pole, float length0, float length1)
 	{
-		auto directionNorm = target - origin;
-		directionNorm.Normalize();
-		auto normal = directionNorm.Cross(pole - origin);
+		auto dir = (target - origin);
+		dir.Normalize();
+		auto normal = dir.Cross(pole - origin);
 		normal.Normalize();
 
-		// TODO: Check what this means.
-		Matrix matrix;
-		auto normalCrossDirectionNorm = normal.Cross(directionNorm);
-		matrix._11 = normalCrossDirectionNorm.x;
-		matrix._12 = normalCrossDirectionNorm.y;
-		matrix._13 = normalCrossDirectionNorm.z;
-		matrix._21 = directionNorm.x;
-		matrix._22 = directionNorm.y;
-		matrix._23 = directionNorm.z;
-		matrix._31 = normal.x;
-		matrix._32 = normal.y;
-		matrix._33 = normal.z;
-		matrix._41 = origin.x;
-		matrix._42 = origin.y;
-		matrix._43 = origin.z;
-		matrix._44 = 1.0f;
+		// Construct transform matrix.
+		auto tMatrix = Matrix(
+			Vector4(normal.Cross(dir)),
+			Vector4(dir),
+			Vector4(normal),
+			Vector4(origin.x, origin.y, origin.z, 1.0f));
 
-		auto middle2D = Vector2(middle);
-		bool result = SolveIK2D(Vector2(Vector3::Transform(target, matrix.Invert())), length0, length1, middle2D);
+		// Get relative 2D IK solution.
+		auto inverseMatrix = tMatrix.Invert();
+		auto relTarget = Vector3::Transform(target, inverseMatrix);
+		auto ikSolution2D = SolveIK2D(Vector2::Zero, Vector2(relTarget), length0, length1);
 
-		middle = Vector3(middle2D);
-		middle = Vector3::Transform(middle, matrix);
+		// Calculate absolute middle position.
+		auto relMiddle = Vector3(ikSolution2D.Middle.x, ikSolution2D.Middle.y, 0.0f);
+		auto middle = Vector3::Transform(relMiddle, tMatrix);
 
-		return result;
+		// Calculate absolute end position.
+		auto localEnd = Vector3(ikSolution2D.End.x, ikSolution2D.End.y, 0.0f);
+		auto end = Vector3::Transform(localEnd, tMatrix);
+
+		return IK3DSolution{ origin, middle, end };
 	}
 }

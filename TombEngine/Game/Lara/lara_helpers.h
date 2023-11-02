@@ -1,10 +1,22 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
+enum class WaterStatus;
 struct ItemInfo;
 struct CollisionInfo;
 struct LaraInfo;
 struct VaultTestResult;
+
+struct PlayerWaterData
+{
+	bool IsWater = false;
+	bool IsSwamp = false;
+	bool IsCold	 = false;
+
+	int WaterDepth		= 0;
+	int WaterHeight		= 0;
+	int HeightFromWater = 0;
+};
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -13,6 +25,7 @@ struct VaultTestResult;
 
 // Utilities
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
+void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& water);
 void HandlePlayerQuickActions(ItemInfo& item);
 bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -- Sezz 2023.08.22
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
@@ -36,6 +49,7 @@ LaraInfo& GetLaraInfo(ItemInfo& item);
 const LaraInfo& GetLaraInfo(const ItemInfo& item);
 LaraInfo*& GetLaraInfo(ItemInfo* item);
 
+PlayerWaterData	   GetPlayerWaterData(ItemInfo& item);
 std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& coll);
 short			   GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 

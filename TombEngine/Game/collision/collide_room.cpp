@@ -290,11 +290,28 @@ static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSe
 	}
 	else if (collSetup.BlockMonkeySwingEdge)
 	{
-		auto monkeyPointColl = GetCollision(probePos.x, probePos.y + collSetup.Height, probePos.z, realRoomNumber);
-		if (!monkeyPointColl.BottomBlock->Flags.Monkeyswing)
+		auto pointColl = GetCollision(probePos.x, probePos.y + collSetup.Height, probePos.z, realRoomNumber);
+		if (!pointColl.BottomBlock->Flags.Monkeyswing)
 			sectorAttribs.Floor = MAX_HEIGHT;
 	}
 }
+
+static void HandleDiagonalShift(ItemInfo& item, CollisionInfo& coll, const Vector3i& pos, CardinalDirection quadrant, bool isRightShift)
+{
+	// Calculate angles.
+	int sign = isRightShift ? 1 : -1;
+	short perpSplitAngle = (ANGLE(90.0f) * quadrant) + (ANGLE(45.0f) * sign);
+	short deltaAngle = abs(Geometry::GetShortestAngle(coll.Setup.ForwardAngle, perpSplitAngle));
+
+	// HACK: Force slight push left to avoid getting stuck.
+	float alpha = 1.0f - ((float)deltaAngle / (float)ANGLE(90.0f));
+	if (alpha >= 0.5f)
+		TranslateItem(&item, perpSplitAngle, item.Animation.Velocity.z * alpha);
+
+	// Set shift.
+	coll.Shift.Position.x += coll.Setup.PrevPosition.x - pos.x;
+	coll.Shift.Position.z += coll.Setup.PrevPosition.z - pos.z;
+};
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom)
 {
@@ -322,7 +339,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	// If unconstrained mode is specified, don't use quadrant.
 	switch ((coll->Setup.Mode == CollisionProbeMode::Quadrants) ? quadrant : -1)
 	{
-	case 0:
+	case NORTH:
 		xFront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront =  coll->Setup.Radius;
 		xLeft  = -coll->Setup.Radius;
@@ -331,7 +348,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight =  coll->Setup.Radius;
 		break;
 
-	case 1:
+	case EAST:
 		xFront =  coll->Setup.Radius;
 		zFront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xLeft  =  coll->Setup.Radius;
@@ -340,7 +357,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight = -coll->Setup.Radius;
 		break;
 
-	case 2:
+	case SOUTH:
 		xFront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront = -coll->Setup.Radius;
 		xLeft  =  coll->Setup.Radius;
@@ -349,7 +366,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight = -coll->Setup.Radius;
 		break;
 
-	case 3:
+	case WEST:
 		xFront = -coll->Setup.Radius;
 		zFront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xLeft  = -coll->Setup.Radius;
@@ -358,7 +375,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight =  coll->Setup.Radius;
 		break;
 
-	// No valid quadrant; return true probe offsets from object rotation.
+	// No valid quadrant; get true probe offsets from object rotation.
 	default: 
 		xFront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
@@ -643,6 +660,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->CollisionType = CT_TOP;
 	}
 
+	// Shift away from front wall.
 	if (coll->Front.Floor > coll->Setup.LowerFloorBound ||
 		coll->Front.Floor < coll->Setup.UpperFloorBound ||
 		coll->Front.Ceiling > coll->Setup.LowerCeilingBound ||
@@ -658,20 +676,18 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		{
 			switch (quadrant)
 			{
-			case 0:
-			case 2:
-				coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
+			case NORTH:
+			case SOUTH:
 				coll->Shift.Position.z += FindGridShift(entityPos.z + zFront, entityPos.z);
 				break;
 
-			case 1:
-			case 3:
+			case EAST:
+			case WEST:
 				coll->Shift.Position.x += FindGridShift(entityPos.x + xFront, entityPos.x);
-				coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
 				break;
-
 			}
 		}
+
 		coll->CollisionType = (coll->CollisionType == CT_TOP) ? CT_TOP_FRONT : CT_FRONT;
 		return;
 	}
@@ -684,6 +700,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		return;
 	}
 
+	// Shift away from left wall.
 	if (coll->MiddleLeft.Floor > coll->Setup.LowerFloorBound ||
 		coll->MiddleLeft.Floor < coll->Setup.UpperFloorBound ||
 		coll->MiddleLeft.Ceiling > coll->Setup.LowerCeilingBound ||
@@ -692,23 +709,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
-			// HACK: Force slight push-out to the left side to avoid stucking
-			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity.z);
-
-			coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
+			HandleDiagonalShift(*item, *coll, entityPos, (CardinalDirection)quadrant, true);
 		}
 		else
 		{
 			switch (quadrant)
 			{
-			case 0:
-			case 2:
+			case NORTH:
+			case SOUTH:
 				coll->Shift.Position.x += FindGridShift(entityPos.x + xLeft, entityPos.x + xFront);
 				break;
 
-			case 1:
-			case 3:
+			case EAST:
+			case WEST:
 				coll->Shift.Position.z += FindGridShift(entityPos.z + zLeft, entityPos.z + zFront);
 				break;
 			}
@@ -716,7 +729,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 		if (coll->DiagonalStepAtLeft())
 		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90.0f); // NOTE: Different from quadrant!
+			// NOTE: Different from quadrant.
+			int quarter = (unsigned short)coll->Setup.ForwardAngle / ANGLE(90.0f);
 			quarter %= 2;
 
 			if (coll->MiddleLeft.HasFlippedDiagonalSplit())
@@ -738,6 +752,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		return;
 	}
 
+	// Shift away from right wall.
 	if (coll->MiddleRight.Floor > coll->Setup.LowerFloorBound ||
 		coll->MiddleRight.Floor < coll->Setup.UpperFloorBound ||
 		coll->MiddleRight.Ceiling > coll->Setup.LowerCeilingBound ||
@@ -746,23 +761,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
-			// HACK: Force slight push out to the right side to avoid getting stuck.
-			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity.z);
-
-			coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
+			HandleDiagonalShift(*item, *coll, entityPos, (CardinalDirection)quadrant, false);
 		}
 		else
 		{
 			switch (quadrant)
 			{
-			case 0:
-			case 2:
+			case NORTH:
+			case SOUTH:
 				coll->Shift.Position.x += FindGridShift(entityPos.x + xRight, entityPos.x + xFront);
 				break;
 
-			case 1:
-			case 3:
+			case EAST:
+			case WEST:
 				coll->Shift.Position.z += FindGridShift(entityPos.z + zRight, entityPos.z + zFront);
 				break;
 			}
@@ -1188,33 +1199,6 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	int minHeight = precise ? bounds.Y2 : 0;
 
 	return (minHeight + item->Pose.Position.y - height);
-}
-
-void AlterFloorHeight(ItemInfo* item, int height)
-{
-	if (abs(height))
-	{
-		if (height >= 0)
-			height++;
-		else
-			height--;
-	}
-
-	short roomNumber = item->RoomNumber;
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	FloorInfo* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - BLOCK(1), item->Pose.Position.z, &roomNumber);
-
-	floor->FloorCollision.Planes[0].z += height;
-	floor->FloorCollision.Planes[1].z += height;
-
-	auto* box = &g_Level.Boxes[floor->Box];
-	if (box->flags & BLOCKABLE)
-	{
-		if (height >= 0)
-			box->flags &= ~BLOCKED;
-		else
-			box->flags |= BLOCKED;
-	}
 }
 
 int GetWaterSurface(int x, int y, int z, short roomNumber)

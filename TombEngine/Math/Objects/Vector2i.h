@@ -31,12 +31,12 @@ namespace TEN::Math
 		Vector2i& operator +=(const Vector2i& vector);
 		Vector2i& operator -=(const Vector2i& vector);
 		Vector2i& operator *=(const Vector2i& vector);
-		Vector2i& operator *=(float scale);
-		Vector2i& operator /=(float scale);
+		Vector2i& operator *=(float scalar);
+		Vector2i& operator /=(float scalar);
 		Vector2i  operator +(const Vector2i& vector) const;
 		Vector2i  operator -(const Vector2i& vector) const;
 		Vector2i  operator *(const Vector2i& vector) const;
-		Vector2i  operator *(float scale) const;
-		Vector2i  operator /(float scale) const;
+		Vector2i  operator *(float scalar) const;
+		Vector2i  operator /(float scalar) const;
 	};
 }
