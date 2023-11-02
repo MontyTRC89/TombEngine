@@ -56,7 +56,7 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = BLOCK(1);
 
-	if (item->Animation.FrameNumber == (GetAnimData(*item).frameEnd - 1))
+	if (TestLastFrame(item))
 		lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -64,34 +64,40 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 // SWITCH
 // ------
 
-// State:		LS_SWITCH_DOWN (40), LS_DOVE_SWITCH (126)
-// Collision:	lara_default_col()
+// State:	  LS_SWITCH_DOWN (40), LS_DOVE_SWITCH (126)
+// Collision: lara_default_col()
 void lara_as_switch_on(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::None;
+	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
 	Camera.targetDistance = BLOCK(1);
 	Camera.speed = 6;
+
+	if (TestLastFrame(item))
+		player.Context.InteractedItem = NO_ITEM;
 }
 
-// State:		LS_SWITCH_DOWN (40), LS_DOVE_SWITCH (126)
-// Collision:	lara_default_col()
+// State:	  LS_SWITCH_DOWN (40), LS_DOVE_SWITCH (126)
+// Collision: lara_default_col()
 void lara_as_switch_off(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::None;
+	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(80.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
 	Camera.targetDistance = BLOCK(1);
 	Camera.speed = 6;
+
+	if (TestLastFrame(item))
+		player.Context.InteractedItem = NO_ITEM;
 }
 
 // State:	LS_ROUND_HANDLE (95)

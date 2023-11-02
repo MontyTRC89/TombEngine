@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Interaction.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -11,10 +12,21 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
-{ 
+{
+	const auto UNDERWATER_WALL_SWITCH_BASIS = InteractionBasis(
+		Vector3i(0, 0, 108),
+		GameBoundingBox(
+			-BLOCK(3 / 8.0f), BLOCK(3 / 8.0f),
+			-BLOCK(3 / 8.0f), BLOCK(3 / 8.0f),
+			0, BLOCK(3 / 4.0f)),
+		std::pair(
+			EulerAngles(-LARA_GRAB_THRESHOLD, -LARA_GRAB_THRESHOLD, -LARA_GRAB_THRESHOLD) * 2,
+			EulerAngles(LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD) * 2));
+
 	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
 	const ObjectCollisionBounds UnderwaterSwitchBounds =
 	{
@@ -53,51 +65,66 @@ namespace TEN::Entities::Switches
 
 	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* switchItem = &g_Level.Items[itemNumber];
+		const auto& switchItem = g_Level.Items[itemNumber];
 
-		if (switchItem->TriggerFlags == 0)
+		if (switchItem.TriggerFlags == 0)
+		{
 			WallUnderwaterSwitchCollision(itemNumber, laraItem, coll);
+		}
 		else
+		{
 			CeilingUnderwaterSwitchCollision(itemNumber, laraItem, coll);
+		}
 	}
 
-	void WallUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	static bool CanPlayerUseUnderwaterWallSwitch(const ItemInfo& playerItem, const ItemInfo& switchItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* switchItem = &g_Level.Items[itemNumber];
+		auto& player = GetLaraInfo(playerItem);
 
-		if (IsHeld(In::Action) &&
-			switchItem->Status == ITEM_NOT_ACTIVE &&
-			lara->Control.WaterStatus == WaterStatus::Underwater &&
-			lara->Control.HandStatus == HandStatus::Free &&
-			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE)
+		// Check switch status.
+		if (switchItem.Status != ITEM_NOT_ACTIVE)
+			return false;
+
+		// Test for player input action.
+		if (!IsHeld(In::Action))
+			return false;
+
+		// Check player status.
+		if (playerItem.Animation.ActiveState != LS_UNDERWATER_IDLE ||
+			player.Control.WaterStatus != WaterStatus::Underwater ||
+			player.Control.HandStatus != HandStatus::Free)
 		{
-			if (TestLaraPosition(UnderwaterSwitchBounds, switchItem, laraItem))
-			{
-				if (switchItem->Animation.ActiveState == SWITCH_ON ||
-					switchItem->Animation.ActiveState == SWITCH_OFF)
-				{
-					if (MoveLaraPosition(UnderwaterSwitchPos, switchItem, laraItem))
-					{
-						laraItem->Animation.Velocity.y = 0;
-						laraItem->Animation.TargetState = LS_SWITCH_DOWN;
-
-						do
-						{
-							AnimateItem(laraItem);
-						} while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
-
-						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
-						lara->Control.HandStatus = HandStatus::Busy;
-						switchItem->Animation.TargetState = switchItem->Animation.ActiveState != SWITCH_ON;
-						switchItem->Status = ITEM_ACTIVE;
-
-						AddActiveItem(itemNumber);
-						AnimateItem(switchItem);
-					}
-				}
-			}
+			return false;
 		}
+
+		return true;
+	}
+
+	static void InteractUnderwaterWallSwitch(ItemInfo& playerItem, ItemInfo& switchItem)
+	{
+		auto& player = GetLaraInfo(playerItem);
+
+		if (switchItem.Animation.ActiveState != SWITCH_ON &&
+			switchItem.Animation.ActiveState != SWITCH_OFF)
+		{
+			return;
+		}
+
+		AddActiveItem(switchItem.Index);
+		switchItem.Status = ITEM_ACTIVE;
+		switchItem.Animation.TargetState = (switchItem.Animation.ActiveState != SWITCH_ON);
+
+		playerItem.Animation.TargetState = LS_SWITCH_DOWN;
+		playerItem.Animation.Velocity.y = 0.0f;
+		player.Control.HandStatus = HandStatus::Busy;
+	}
+
+	void WallUnderwaterSwitchCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	{
+		auto& switchItem = g_Level.Items[itemNumber];
+
+		if (CanPlayerUseUnderwaterWallSwitch(*playerItem, switchItem))
+			HandlePlayerInteraction(*playerItem, switchItem, UNDERWATER_WALL_SWITCH_BASIS, InteractUnderwaterWallSwitch);
 	}
 
 	void CeilingUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

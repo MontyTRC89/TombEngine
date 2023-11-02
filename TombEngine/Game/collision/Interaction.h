@@ -28,6 +28,8 @@ namespace TEN::Collision
 
 		// Inquirers
 		bool TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const GameBoundingBox& boundsExtension = GameBoundingBox::Zero) const;
+	
+		void DrawDebug(const ItemInfo& item) const;
 	};
 
 	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,

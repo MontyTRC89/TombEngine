@@ -27,8 +27,8 @@ namespace TEN::Traps::TR5
 			-CLICK(1), CLICK(1),
 			BLOCK(0.25f), BLOCK(0.5f)),
 		std::pair(
-			EulerAngles(ANGLE(-10.0f), ANGLE(-25.0f), ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(25.0f), ANGLE(10.0f)))
+			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 	};
 
 	void InitializeZipLine(short itemNumber)
@@ -125,7 +125,11 @@ namespace TEN::Traps::TR5
 	{
 		auto& player = GetLaraInfo(playerItem);
 
-		// Test for input action.
+		// Check zip line status.
+		if (zipLineItem.Status != ITEM_NOT_ACTIVE)
+			return false;
+
+		// Test for player input action.
 		if (!IsHeld(In::Action))
 			return false;
 
@@ -160,10 +164,6 @@ namespace TEN::Traps::TR5
 	{
 		auto& zipLineItem = g_Level.Items[itemNumber];
 		auto& player = GetLaraInfo(*playerItem);
-
-		// Check zip line status.
-		if (zipLineItem.Status != ITEM_NOT_ACTIVE)
-			return;
 
 		// Interact with zip line.
 		if (CanPlayerUseZipLine(*playerItem, zipLineItem))

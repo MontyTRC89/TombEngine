@@ -9,8 +9,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Renderer/Renderer11.h"
 
 using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision
 {
@@ -45,12 +47,21 @@ namespace TEN::Collision
 
 	bool InteractionBasis::TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo,  const GameBoundingBox& boundsExtension) const
 	{
-		// NOTE: For now, only checks offset blend status.
-		// 1) Avoid overriding active interactions.
+		DrawDebug(entityTo);
+
+		// 1) Avoid overriding active player interactions.
+		if (entityFrom.IsLara())
+		{
+			const auto& player = GetLaraInfo(entityFrom);
+			if (player.Context.InteractedItem != NO_ITEM)
+				return false;
+		}
+
+		// 2) Avoid overriding active offset blend.
 		if (entityFrom.OffsetBlend.IsActive)
 			return false;
 
-		// 2) Test if entityFrom's orientation is within interaction constraint.
+		// 3) Test if entityFrom's orientation is within interaction constraint.
 		auto deltaOrient = entityFrom.Pose.Orientation - entityTo.Pose.Orientation;
 		if (deltaOrient.x < OrientConstraint.first.x || deltaOrient.x > OrientConstraint.second.x ||
 			deltaOrient.y < OrientConstraint.first.y || deltaOrient.y > OrientConstraint.second.y ||
@@ -63,7 +74,7 @@ namespace TEN::Collision
 		auto invRotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Transpose() used as faster equivalent to Invert().
 		auto relPos = Vector3::Transform(deltaPos, invRotMatrix);
 
-		// 3) Test if entityFrom is inside interaction bounds.
+		// 4) Test if entityFrom is inside interaction bounds.
 		auto bounds = Bounds + boundsExtension;
 		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
 			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||
@@ -75,10 +86,25 @@ namespace TEN::Collision
 		return true;
 	}
 
+	void InteractionBasis::DrawDebug(const ItemInfo& item) const
+	{
+		constexpr auto COLL_BOX_COLOR	  = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+		constexpr auto INTERACT_BOX_COLOR = Vector4(0.0f, 1.0f, 1.0f, 1.0f);
+
+		// Draw collision box.
+		auto bounds = GameBoundingBox(&item);
+		auto box = bounds.ToBoundingOrientedBox(item.Pose);
+		g_Renderer.AddDebugBox(box, COLL_BOX_COLOR, RendererDebugPage::None);
+
+		// Draw interaction box.
+		auto interactBox = Bounds.ToBoundingOrientedBox(item.Pose);
+		g_Renderer.AddDebugBox(interactBox, INTERACT_BOX_COLOR, RendererDebugPage::None);
+	}
+
 	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
 							  const Vector3i& extraPosOffset, const EulerAngles& extraOrientOffset)
 	{
-		constexpr auto OFFSET_BLEND_ALPHA = 0.4f;
+		constexpr auto OFFSET_BLEND_ALPHA = 0.3f;
 
 		// Calculate relative offsets.
 		auto relPosOffset = basis.PosOffset + extraPosOffset;
@@ -168,9 +194,10 @@ namespace TEN::Collision
 		{
 			if (basis.TestInteraction(playerEntity, interactedEntity))
 			{
+				// TODO: Currently unreliable because IteractedItem is frequently not reset.
 				// Avoid overriding active interactions.
-				if (player.Context.InteractedItem != NO_ITEM)
-					return;
+				/*if (player.Context.InteractedItem != NO_ITEM)
+					return;*/
 
 				SetEntityInteraction(playerEntity, interactedEntity, basis);
 				interactRoutine(playerEntity, interactedEntity);
