@@ -26,16 +26,17 @@ namespace TEN::Collision::Attractors
 		CacheBox();
 	}
 
+	// TODO
 	Attractor::~Attractor()
 	{
 		// Dereference current attractor held by players.
-		for (auto& [itemNumber, itemPtr] : _attachedPlayers)
+		/*for (auto& [itemNumber, itemPtr] : _attachedPlayers)
 		{
 			auto& player = GetLaraInfo(*itemPtr);
 
 			if (player.Context.HandsAttractor.AttracPtr == this)
 				player.Context.HandsAttractor.AttracPtr = nullptr;
-		}
+		}*/
 	}
 
 	AttractorType Attractor::GetType() const
