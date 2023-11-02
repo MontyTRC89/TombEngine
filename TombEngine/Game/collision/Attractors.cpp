@@ -69,29 +69,20 @@ namespace TEN::Collision::Attractors
 		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
 		constexpr auto FORWARD_FACING_ANGLE_THRESHOLD = ANGLE(90.0f);
 
-		// Get attractor proximity data.
-		auto attracProx = GetProximity(probePoint);
-
-		// Get segment points.
-		const auto& origin = _points[attracProx.SegmentID];
-		const auto& target = _points[attracProx.SegmentID + 1];
-
-		// Calculate angles.
-		auto attracOrient = (_points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
-		short headingAngle = attracOrient.y + HEADING_ANGLE_OFFSET;
-		short slopeAngle = attracOrient.x;
-
-		// Determine inquiries.
-		bool isFacingForward = (abs(Geometry::GetShortestAngle(headingAngle, orient.y)) <= FORWARD_FACING_ANGLE_THRESHOLD);
-		bool isInFront = Geometry::IsPointInFront(basePos, attracProx.Intersection, orient);
-
 		// Create attractor collision data.
 		auto attracColl = AttractorCollisionData(*this);
-		attracColl.Proximity = attracProx;
-		attracColl.HeadingAngle = headingAngle;
-		attracColl.SlopeAngle = slopeAngle;
-		attracColl.IsFacingForward = isFacingForward;
-		attracColl.IsInFront = isInFront;
+		attracColl.Proximity = GetProximity(probePoint);
+
+		// Calculate segment orientation.
+		const auto& origin = _points[attracColl.Proximity.SegmentID];
+		const auto& target = _points[attracColl.Proximity.SegmentID + 1];
+		auto attracOrient = (_points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
+
+		// Fill remaining collision data.
+		attracColl.HeadingAngle = attracOrient.y + HEADING_ANGLE_OFFSET;
+		attracColl.SlopeAngle = attracOrient.x;
+		attracColl.IsFacingForward = (abs(Geometry::GetShortestAngle(attracColl.HeadingAngle, orient.y)) <= FORWARD_FACING_ANGLE_THRESHOLD);
+		attracColl.IsInFront = Geometry::IsPointInFront(basePos, attracColl.Proximity.Intersection, orient);
 
 		// Return attractor collision data.
 		return attracColl;
