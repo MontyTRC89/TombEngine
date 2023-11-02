@@ -532,7 +532,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
-static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, const Context::EdgeCatchData& catchData)
+static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, Context::EdgeCatchData& catchData)
 {
 	auto& player = GetLaraInfo(item);
 

@@ -35,8 +35,8 @@ namespace TEN::Entities::Generic
 			-CLICK(0.25f), 0,
 			0, 0),
 		std::pair(
-			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
+			EulerAngles(ANGLE(-10.0f), -PLAYER_INTERACT_ANGLE_CONSTRAINT, ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), PLAYER_INTERACT_ANGLE_CONSTRAINT, ANGLE(10.0f)))
 	};
 
 	std::vector<PushableAnimSet> PushableAnimSets =

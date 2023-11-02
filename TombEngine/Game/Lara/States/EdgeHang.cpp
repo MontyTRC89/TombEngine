@@ -34,13 +34,14 @@ namespace TEN::Player
 	};
 
 	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																					 const Attractor& currentAttrac, const Vector3& probePoint)
+																					 Attractor& currentAttrac, const Vector3& probePoint)
 	{
 		constexpr auto CONNECT_DIST_THRESHOLD = BLOCK(1 / 64.0f);
 		constexpr auto CORNER_ANGLE_MAX		  = ANGLE(30.0f);
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, probePoint, CONNECT_DIST_THRESHOLD);
+		auto currentAttracColl = currentAttrac.GetCollision(item.Pose.Position.ToVector3(), item.Pose.Orientation, probePoint);
 
 		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
@@ -57,7 +58,6 @@ namespace TEN::Player
 				continue;
 
 			// 3) Test sharp corner.
-			auto currentAttracColl = currentAttrac.GetCollision(item.Pose.Position.ToVector3(), item.Pose.Orientation, probePoint);
 			if (Geometry::GetShortestAngle(attracColl.HeadingAngle, currentAttracColl.HeadingAngle) > CORNER_ANGLE_MAX)
 				continue;
 
@@ -75,11 +75,11 @@ namespace TEN::Player
 		return *attracCollPtr;
 	}
 
-	static std::optional<EdgeHangAttractorCollisionData> GetEdgeHangAttractorCollisions(const ItemInfo& item, const CollisionInfo& coll,
+	static std::optional<EdgeHangAttractorCollisionData> GetEdgeHangAttractorCollisions(ItemInfo& item, const CollisionInfo& coll,
 																						float sideOffset = 0.0f)
 	{
-		const auto& player = GetLaraInfo(item);
-		const auto& handsAttrac = player.Context.HandsAttractor;
+		auto& player = GetLaraInfo(item);
+		auto& handsAttrac = player.Context.HandsAttractor;
 
 		const auto& points = handsAttrac.AttracPtr->GetPoints();
 		float length = handsAttrac.AttracPtr->GetLength();
@@ -90,6 +90,8 @@ namespace TEN::Player
 		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
 		bool isLooped = handsAttrac.AttracPtr->IsLooped();
+
+		auto& thing = *player.Context.HandsAttractor.AttracPtr;
 
 		// TODO: Horrible, organise later.
 		// Get connecting attractors just in case.

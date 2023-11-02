@@ -28,8 +28,8 @@ namespace TEN::Player::Context
 
 	struct EdgeCatchData
 	{
-		const Attractor* AttracPtr = nullptr;
-		EdgeType Type = EdgeType::Ledge; // TODO: Won't be needed later.
+		Attractor* AttracPtr = nullptr;
+		EdgeType   Type		 = EdgeType::Ledge; // TODO: Won't be needed later.
 
 		Vector3 IntersectPoint = Vector3::Zero;
 		float	ChainDistance  = 0.0f;

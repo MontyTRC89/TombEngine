@@ -232,7 +232,7 @@ namespace TEN::Player::Context
 
 		auto relOffset = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
 		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
-		float radius = std::max<float>(coll.Setup.Radius, item.Animation.Velocity.z);
+		float radius = std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length());
 
 		// Get attractor collisions.
 		auto refPoint = item.Pose.Position.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
@@ -277,16 +277,16 @@ namespace TEN::Player::Context
 
 			// Get point collision off side of edge.
 			auto pointColl = GetCollision(
-				Vector3i(attracColl.Proximity.IntersectPoint), attracColl.Attrac.GetRoomNumber(),
+				Vector3i(attracColl.Proximity.Intersection), attracColl.Attrac.GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 5) Test if edge is high enough off the ground.
-			int floorToEdgeHeight = abs(attracColl.Proximity.IntersectPoint.y - pointColl.Position.Floor);
+			int floorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - pointColl.Position.Floor);
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
-			int relEdgeHeight = attracColl.Proximity.IntersectPoint.y - vPos;
+			int relEdgeHeight = attracColl.Proximity.Intersection.y - vPos;
 
 			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
 			int lowerBound = isMovingUp ? 0 : (int)round(item.Animation.Velocity.y);
@@ -334,7 +334,7 @@ namespace TEN::Player::Context
 		{
 			&attracColl->Attrac,
 			EdgeType::Ledge,
-			attracColl->Proximity.IntersectPoint,
+			attracColl->Proximity.Intersection,
 			attracColl->Proximity.ChainDistance,
 			headingAngle
 		};

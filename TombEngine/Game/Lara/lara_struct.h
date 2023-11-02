@@ -1327,10 +1327,10 @@ struct PlayerStatusData
 
 struct PlayerAttractorData
 {
-	const Attractor* AttracPtr = nullptr;
-	float ChainDistance = 0.0f;
+	Attractor* AttracPtr	 = nullptr;
+	float	   ChainDistance = 0.0f;
 
-	void Set(const Attractor& attrac, float chainDist)
+	void Set(Attractor& attrac, float chainDist)
 	{
 		AttracPtr = &attrac;
 		ChainDistance = chainDist;

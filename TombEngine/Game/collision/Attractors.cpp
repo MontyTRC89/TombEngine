@@ -84,7 +84,7 @@ namespace TEN::Collision::Attractors
 		return _box;
 	}
 
-	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint) const
+	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint)
 	{
 		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
 		constexpr auto FORWARD_FACING_ANGLE_THRESHOLD = ANGLE(90.0f);
@@ -392,18 +392,18 @@ namespace TEN::Collision::Attractors
 	}
 
 	// TEMP
-	static std::vector<const Attractor*> GetDebugAttractorPtrs(const ItemInfo& item)
+	static std::vector<Attractor*> GetDebugAttractorPtrs(ItemInfo& item)
 	{
 		auto& player = GetLaraInfo(item);
 
-		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
+		auto nearbyAttracPtrs = std::vector<Attractor*>{};
 		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac0);
 		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac1);
 		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac2);
 		return nearbyAttracPtrs;
 	}
 
-	static void DrawDebugAttractorBounds(const BoundingSphere& sphere, std::vector<const Attractor*> attracPtrs)
+	static void DrawDebugAttractorBounds(const BoundingSphere& sphere, std::vector<Attractor*> attracPtrs)
 	{
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
 
@@ -417,26 +417,26 @@ namespace TEN::Collision::Attractors
 	}
 
 	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
-	static std::vector<const Attractor*> GetNearbyAttractorPtrs(const Vector3& probePoint, int roomNumber, float detectRadius)
+	static std::vector<Attractor*> GetNearbyAttractorPtrs(const Vector3& probePoint, int roomNumber, float detectRadius)
 	{
 		auto sphere = BoundingSphere(probePoint, detectRadius);
-		auto nearbyAttracPtrs = std::vector<const Attractor*>{};
+		auto nearbyAttracPtrs = std::vector<Attractor*>{};
 
 		// TEMP
 		// Get debug attractors.
 		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
-		for (const auto* attracPtr : debugAttracPtrs)
+		for (auto* attracPtr : debugAttracPtrs)
 		{
 			if (sphere.Intersects(attracPtr->GetBox()))
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
 		// Get attractors in neighboring rooms.
-		const auto& room = g_Level.Rooms[roomNumber];
+		auto& room = g_Level.Rooms[roomNumber];
 		for (int roomNumber : room.neighbors)
 		{
-			const auto& subRoom = g_Level.Rooms[roomNumber];
-			for (const auto& attrac : subRoom.Attractors)
+			auto& subRoom = g_Level.Rooms[roomNumber];
+			for (auto& attrac : subRoom.Attractors)
 			{
 				if (sphere.Intersects(attrac.GetBox()))
 					nearbyAttracPtrs.push_back(&attrac);
@@ -444,7 +444,7 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Get bridge attractors.
-		for (const auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
+		for (auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
 		{
 			if (sphere.Intersects(attrac.GetBox()))
 				nearbyAttracPtrs.push_back(&attrac);
@@ -466,7 +466,7 @@ namespace TEN::Collision::Attractors
 
 		// Get attractor collisions sorted by distance.
 		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
-		for (const auto* attracPtr : nearbyAttracPtrs)
+		for (auto* attracPtr : nearbyAttracPtrs)
 		{
 			auto attracColl = attracPtr->GetCollision(basePos, orient, probePoint);
 
