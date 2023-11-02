@@ -353,7 +353,7 @@ enum LaraAnim
 	LA_STAND_HIT_BACK = 126,								// Jerk forward standing from damage
 	LA_STAND_HIT_LEFT = 127,								// Jerk right standing from damage
 	LA_STAND_HIT_RIGHT = 128,								// Jerk left standing from damage
-	LA_WATERLEVER_PULL = 129,								// Pull underwater lever
+	LA_UNDERWATER_SWITCH_PULL = 129,						// Pull underwater lever
 	LA_UNDERWATER_PICKUP = 130,								// Pickup underwater
 	LA_USE_KEY = 131,										// Use key
 	LA_ONWATER_DEATH = 132,									// Treading death

@@ -129,7 +129,7 @@ namespace TEN::Traps::TR5
 		if (zipLineItem.Status != ITEM_NOT_ACTIVE)
 			return false;
 
-		// Test for player input action.
+		// Check for player input action.
 		if (!IsHeld(In::Action))
 			return false;
 

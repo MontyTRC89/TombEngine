@@ -39,6 +39,7 @@ namespace TEN::Entities::Switches
 			EulerAngles(-ANGLE(90.0f), -(LARA_GRAB_THRESHOLD * 2), -(LARA_GRAB_THRESHOLD * 2)),
 			EulerAngles(LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD * 2, LARA_GRAB_THRESHOLD * 2)));
 	
+	// TODO: Orient constraint not working.
 	const auto UNDERWATER_CEILING_SWITCH_BACK_BASIS = InteractionBasis(
 		Vector3i(0, -736, -416),
 		EulerAngles(0, ANGLE(180.0f), 0),
@@ -47,22 +48,8 @@ namespace TEN::Entities::Switches
 			-BLOCK(17 / 16.0f), -BLOCK(1 / 2.0f),
 			0, BLOCK(1 / 2.0f)),
 		std::pair(
-			EulerAngles(-ANGLE(90.0f), -(LARA_GRAB_THRESHOLD * 2), -(LARA_GRAB_THRESHOLD * 2)),
-			EulerAngles(LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD * 2, LARA_GRAB_THRESHOLD * 2)));
-
-	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		const auto& switchItem = g_Level.Items[itemNumber];
-
-		if (switchItem.TriggerFlags == 0)
-		{
-			CollideUnderwaterWallSwitch(itemNumber, laraItem, coll);
-		}
-		else
-		{
-			CollideUnderwaterCeilingSwitch(itemNumber, laraItem, coll);
-		}
-	}
+			EulerAngles(-ANGLE(90.0f), -(LARA_GRAB_THRESHOLD * 2) + ANGLE(180.0f), -(LARA_GRAB_THRESHOLD * 2)),
+			EulerAngles(LARA_GRAB_THRESHOLD, (LARA_GRAB_THRESHOLD * 2) + ANGLE(180.0f), LARA_GRAB_THRESHOLD * 2)));
 
 	static bool CanPlayerUseUnderwaterWallSwitch(const ItemInfo& playerItem, const ItemInfo& switchItem)
 	{
@@ -72,7 +59,7 @@ namespace TEN::Entities::Switches
 		if (switchItem.Status != ITEM_NOT_ACTIVE)
 			return false;
 
-		// Test for player input action.
+		// Check for player input action.
 		if (!IsHeld(In::Action))
 			return false;
 
@@ -101,9 +88,8 @@ namespace TEN::Entities::Switches
 		switchItem.Animation.TargetState = (switchItem.Animation.ActiveState != SWITCH_ON);
 		AddActiveItem(switchItem.Index);
 
-		SetAnimation(playerItem, LA_WATERLEVER_PULL);
+		SetAnimation(playerItem, LA_UNDERWATER_SWITCH_PULL);
 		playerItem.Animation.TargetState = LS_UNDERWATER_IDLE;
-		playerItem.Animation.Velocity.y = 0.0f;
 	}
 
 	void CollideUnderwaterWallSwitch(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
@@ -125,7 +111,7 @@ namespace TEN::Entities::Switches
 			return false;
 		}
 
-		// Test for player input action.
+		// Check for player input action.
 		if (!IsHeld(In::Action))
 			return false;
 
@@ -143,13 +129,12 @@ namespace TEN::Entities::Switches
 
 	static void InteractUnderwaterCeilingSwitch(ItemInfo& playerItem, ItemInfo& switchItem)
 	{
-		switchItem.Animation.TargetState = SWITCH_ON;
 		switchItem.Status = ITEM_ACTIVE;
+		switchItem.Animation.TargetState = SWITCH_ON;
 		AddActiveItem(switchItem.Index);
 
 		SetAnimation(playerItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
 		playerItem.Animation.TargetState = LS_UNDERWATER_IDLE;
-		playerItem.Animation.Velocity.y = 0.0f;
 	}
 
 	void CollideUnderwaterCeilingSwitch(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)

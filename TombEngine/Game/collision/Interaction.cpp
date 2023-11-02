@@ -105,7 +105,7 @@ namespace TEN::Collision
 	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
 							  const Vector3i& extraPosOffset, const EulerAngles& extraOrientOffset)
 	{
-		constexpr auto OFFSET_BLEND_ALPHA = 0.3f;
+		constexpr auto OFFSET_BLEND_LOG_ALPHA = 0.25f;
 
 		// Calculate relative offsets.
 		auto relPosOffset = basis.PosOffset + extraPosOffset;
@@ -121,7 +121,7 @@ namespace TEN::Collision
 
 		// Set entity parameters.
 		entityFrom.Animation.Velocity = Vector3::Zero;
-		entityFrom.OffsetBlend.SetLogarithmic(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
+		entityFrom.OffsetBlend.SetLogarithmic(absPosOffset, absOrientOffset, OFFSET_BLEND_LOG_ALPHA);
 
 		// Set player parameters.
 		if (entityFrom.IsLara())

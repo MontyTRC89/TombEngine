@@ -124,10 +124,13 @@ void ItemInfo::HandleOffsetBlend()
 		break;
 	}
 
-	// Offset blend complete; clear data.
+	// Offset blend complete; apply remainig values and clear data.
 	if ((OffsetBlend.PosOffset.Length() <= EPSILON && EulerAngles::Compare(OffsetBlend.OrientOffset, EulerAngles::Zero)) ||
 		OffsetBlend.TimeActive >= (int)round(TIME_ACTIVE_MAX * FPS))
 	{
+		Pose.Position += OffsetBlend.PosOffset;
+		Pose.Orientation += OffsetBlend.OrientOffset;
+
 		OffsetBlend.Clear();
 	}
 }
