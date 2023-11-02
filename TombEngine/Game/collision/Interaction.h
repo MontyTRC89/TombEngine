@@ -36,6 +36,6 @@ namespace TEN::Collision
 							  const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Zero);
 	void SetPlayerAlignAnim(ItemInfo& playerEntity, const ItemInfo& interactedEntity);
 	
-	void HandlePlayerInteraction(ItemInfo& playerEntity, ItemInfo& interactedEntity, const InteractionBasis& basis,
+	bool HandlePlayerInteraction(ItemInfo& playerEntity, ItemInfo& interactedEntity, const InteractionBasis& basis,
 								 const PlayerInteractRoutine& interactRoutine);
 }

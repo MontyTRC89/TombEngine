@@ -49,6 +49,7 @@ namespace TEN::Collision
 	{
 		DrawDebug(entityTo);
 
+		// TODO: Currently unreliable because IteractedItem is frequently not reset.
 		// 1) Avoid overriding active player interactions.
 		if (entityFrom.IsLara())
 		{
@@ -86,18 +87,18 @@ namespace TEN::Collision
 		return true;
 	}
 
-	void InteractionBasis::DrawDebug(const ItemInfo& item) const
+	void InteractionBasis::DrawDebug(const ItemInfo& entity) const
 	{
 		constexpr auto COLL_BOX_COLOR	  = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 		constexpr auto INTERACT_BOX_COLOR = Vector4(0.0f, 1.0f, 1.0f, 1.0f);
 
 		// Draw collision box.
-		auto bounds = GameBoundingBox(&item);
-		auto box = bounds.ToBoundingOrientedBox(item.Pose);
+		auto bounds = GameBoundingBox(&entity);
+		auto box = bounds.ToBoundingOrientedBox(entity.Pose);
 		g_Renderer.AddDebugBox(box, COLL_BOX_COLOR, RendererDebugPage::None);
 
 		// Draw interaction box.
-		auto interactBox = Bounds.ToBoundingOrientedBox(item.Pose);
+		auto interactBox = Bounds.ToBoundingOrientedBox(entity.Pose);
 		g_Renderer.AddDebugBox(interactBox, INTERACT_BOX_COLOR, RendererDebugPage::None);
 	}
 
@@ -118,7 +119,8 @@ namespace TEN::Collision
 		auto absPosOffset = (targetPos - entityFrom.Pose.Position).ToVector3();
 		auto absOrientOffset = targetOrient - entityFrom.Pose.Orientation;
 
-		// Set offset blend.
+		// Set entity parameters.
+		entityFrom.Animation.Velocity = Vector3::Zero;
 		entityFrom.OffsetBlend.SetLogarithmic(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
 
 		// Set player parameters.
@@ -126,6 +128,7 @@ namespace TEN::Collision
 		{
 			auto& player = GetLaraInfo(entityFrom);
 
+			player.Control.TurnRate = 0;
 			player.Control.HandStatus = HandStatus::Busy;
 			player.Context.InteractedItem = entityTo.Index;
 		}
@@ -184,7 +187,8 @@ namespace TEN::Collision
 		player.Control.Count.PositionAdjust = 0;
 	}
 
-	void HandlePlayerInteraction(ItemInfo& playerEntity, ItemInfo& interactedEntity, const InteractionBasis& basis,
+	// TODO: Don't return bool.
+	bool HandlePlayerInteraction(ItemInfo& playerEntity, ItemInfo& interactedEntity, const InteractionBasis& basis,
 								 const PlayerInteractRoutine& interactRoutine)
 	{
 		auto& player = GetLaraInfo(playerEntity);
@@ -194,13 +198,10 @@ namespace TEN::Collision
 		{
 			if (basis.TestInteraction(playerEntity, interactedEntity))
 			{
-				// TODO: Currently unreliable because IteractedItem is frequently not reset.
-				// Avoid overriding active interactions.
-				/*if (player.Context.InteractedItem != NO_ITEM)
-					return;*/
-
 				SetEntityInteraction(playerEntity, interactedEntity, basis);
 				interactRoutine(playerEntity, interactedEntity);
+
+				return true;
 			}
 		}
 		// TODO
@@ -225,6 +226,10 @@ namespace TEN::Collision
 				player.Control.IsMoving = false;
 				player.Control.HandStatus = HandStatus::Free;
 			}
+
+			return true;
 		}
+
+		return false;
 	}
 }

@@ -19,6 +19,7 @@ namespace TEN::Entities::Switches
 {
 	const auto UNDERWATER_WALL_SWITCH_BASIS = InteractionBasis(
 		Vector3i(0, 0, 108),
+		EulerAngles::Zero,
 		GameBoundingBox(
 			-BLOCK(3 / 8.0f), BLOCK(3 / 8.0f),
 			-BLOCK(3 / 8.0f), BLOCK(3 / 8.0f),
@@ -27,41 +28,27 @@ namespace TEN::Entities::Switches
 			EulerAngles(-LARA_GRAB_THRESHOLD, -LARA_GRAB_THRESHOLD, -LARA_GRAB_THRESHOLD) * 2,
 			EulerAngles(LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD) * 2));
 
-	const auto UnderwaterSwitchPos = Vector3i(0, 0, 108);
-	const ObjectCollisionBounds UnderwaterSwitchBounds =
-	{
+	const auto UNDERWATER_CEILING_SWITCH_FRONT_BASIS = InteractionBasis(
+		Vector3i(0, -736, -416),
+		EulerAngles::Zero,
 		GameBoundingBox(
-			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			0, BLOCK(3 / 4.0f)),
-		std::pair(
-			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
-			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f)))
-	};
-
-	const auto CeilingUnderwaterSwitchPos1 = Vector3i(0, -736, -416);
-	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds1 =
-	{
-		GameBoundingBox(
-			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(17.0f / 16), -BLOCK(1 / 2.0f),
+			-BLOCK(3 / 8.0f), BLOCK(3 / 8.0f),
+			-BLOCK(17 / 16.0f), -BLOCK(1 / 2.0f),
 			-BLOCK(1 / 2.0f), 0),
 		std::pair(
-			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
-			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f)))
-	};
-
-	const auto CeilingUnderwaterSwitchPos2 = Vector3i(0, -736, 416);
-	const ObjectCollisionBounds CeilingUnderwaterSwitchBounds2 =
-	{
+			EulerAngles(-ANGLE(90.0f), -(LARA_GRAB_THRESHOLD * 2), -(LARA_GRAB_THRESHOLD * 2)),
+			EulerAngles(LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD * 2, LARA_GRAB_THRESHOLD * 2)));
+	
+	const auto UNDERWATER_CEILING_SWITCH_BACK_BASIS = InteractionBasis(
+		Vector3i(0, -736, -416),
+		EulerAngles(0, ANGLE(180.0f), 0),
 		GameBoundingBox(
-			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(17.0f / 16), -BLOCK(1 / 2.0f),
+			-BLOCK(3 / 8.0f), BLOCK(3 / 8.0f),
+			-BLOCK(17 / 16.0f), -BLOCK(1 / 2.0f),
 			0, BLOCK(1 / 2.0f)),
 		std::pair(
-			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
-			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f)))
-	};
+			EulerAngles(-ANGLE(90.0f), -(LARA_GRAB_THRESHOLD * 2), -(LARA_GRAB_THRESHOLD * 2)),
+			EulerAngles(LARA_GRAB_THRESHOLD, LARA_GRAB_THRESHOLD * 2, LARA_GRAB_THRESHOLD * 2)));
 
 	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -69,11 +56,11 @@ namespace TEN::Entities::Switches
 
 		if (switchItem.TriggerFlags == 0)
 		{
-			WallUnderwaterSwitchCollision(itemNumber, laraItem, coll);
+			CollideUnderwaterWallSwitch(itemNumber, laraItem, coll);
 		}
 		else
 		{
-			CeilingUnderwaterSwitchCollision(itemNumber, laraItem, coll);
+			CollideUnderwaterCeilingSwitch(itemNumber, laraItem, coll);
 		}
 	}
 
@@ -90,14 +77,14 @@ namespace TEN::Entities::Switches
 			return false;
 
 		// Check player status.
-		if (playerItem.Animation.ActiveState != LS_UNDERWATER_IDLE ||
-			player.Control.WaterStatus != WaterStatus::Underwater ||
-			player.Control.HandStatus != HandStatus::Free)
+		if (playerItem.Animation.ActiveState == LS_UNDERWATER_IDLE &&
+			player.Control.WaterStatus == WaterStatus::Underwater &&
+			player.Control.HandStatus == HandStatus::Free)
 		{
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	static void InteractUnderwaterWallSwitch(ItemInfo& playerItem, ItemInfo& switchItem)
@@ -110,16 +97,16 @@ namespace TEN::Entities::Switches
 			return;
 		}
 
-		AddActiveItem(switchItem.Index);
 		switchItem.Status = ITEM_ACTIVE;
 		switchItem.Animation.TargetState = (switchItem.Animation.ActiveState != SWITCH_ON);
+		AddActiveItem(switchItem.Index);
 
-		playerItem.Animation.TargetState = LS_SWITCH_DOWN;
+		SetAnimation(playerItem, LA_WATERLEVER_PULL);
+		playerItem.Animation.TargetState = LS_UNDERWATER_IDLE;
 		playerItem.Animation.Velocity.y = 0.0f;
-		player.Control.HandStatus = HandStatus::Busy;
 	}
 
-	void WallUnderwaterSwitchCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	void CollideUnderwaterWallSwitch(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& switchItem = g_Level.Items[itemNumber];
 
@@ -127,60 +114,61 @@ namespace TEN::Entities::Switches
 			HandlePlayerInteraction(*playerItem, switchItem, UNDERWATER_WALL_SWITCH_BASIS, InteractUnderwaterWallSwitch);
 	}
 
-	void CeilingUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	static bool CanPlayerUseUnderwaterCeilingSwitch(const ItemInfo& playerItem, const ItemInfo& switchItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* switchItem = &g_Level.Items[itemNumber];
+		auto& player = GetLaraInfo(playerItem);
 
-		bool doInteraction = false;
-
-		if ((IsHeld(In::Action) &&
-			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
-			laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE &&
-			lara->Control.WaterStatus == WaterStatus::Underwater &&
-			lara->Control.HandStatus == HandStatus::Free &&
-			switchItem->Animation.ActiveState == SWITCH_OFF) ||
-			(lara->Control.IsMoving && lara->Context.InteractedItem == itemNumber))
+		// Check switch status.
+		if (switchItem.Status != ITEM_NOT_ACTIVE ||
+			switchItem.Animation.ActiveState != SWITCH_OFF)
 		{
-			if (TestLaraPosition(CeilingUnderwaterSwitchBounds1, switchItem, laraItem))
-			{
-				if (MoveLaraPosition(CeilingUnderwaterSwitchPos1, switchItem, laraItem))
-					doInteraction = true;
-				else
-					lara->Context.InteractedItem = itemNumber;
-			}
-			else
-			{
-				laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
+			return false;
+		}
 
-				if (TestLaraPosition(CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
-				{
-					if (MoveLaraPosition(CeilingUnderwaterSwitchPos2, switchItem, laraItem))
-						doInteraction = true;
-					else
-						lara->Context.InteractedItem = itemNumber;
-				}
+		// Test for player input action.
+		if (!IsHeld(In::Action))
+			return false;
 
-				laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
-			}
+		// Check player status.
+		if (playerItem.Animation.ActiveState == LS_UNDERWATER_IDLE &&
+			playerItem.Animation.AnimNumber == LA_UNDERWATER_IDLE &&
+			player.Control.WaterStatus == WaterStatus::Underwater &&
+			player.Control.HandStatus == HandStatus::Free)
+		{
+			return true;
+		}
 
-			if (doInteraction)
-			{
-				SetAnimation(laraItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
-				laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
-				laraItem->Animation.Velocity.y = 0;
-				lara->Control.IsMoving = false;
-				lara->Control.HandStatus = HandStatus::Busy;
-				switchItem->Animation.TargetState = SWITCH_ON;
-				switchItem->Status = ITEM_ACTIVE;
+		return false;
+	}
 
-				AddActiveItem(itemNumber);
+	static void InteractUnderwaterCeilingSwitch(ItemInfo& playerItem, ItemInfo& switchItem)
+	{
+		switchItem.Animation.TargetState = SWITCH_ON;
+		switchItem.Status = ITEM_ACTIVE;
+		AddActiveItem(switchItem.Index);
 
-				ForcedFixedCamera.x = switchItem->Pose.Position.x - BLOCK(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
-				ForcedFixedCamera.y = switchItem->Pose.Position.y - BLOCK(1);
-				ForcedFixedCamera.z = switchItem->Pose.Position.z - BLOCK(1) * phd_cos(switchItem->Pose.Orientation.y + ANGLE(90.0f));
-				ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
-			}
+		SetAnimation(playerItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
+		playerItem.Animation.TargetState = LS_UNDERWATER_IDLE;
+		playerItem.Animation.Velocity.y = 0.0f;
+
+		/*auto cameraPos = Geometry::TranslatePoint(switchItem.Pose.Position, switchItem.Pose.Orientation.y + ANGLE(90.0f), BLOCK(1));
+		ForcedFixedCamera.x = cameraPos.x;
+		ForcedFixedCamera.y = cameraPos.y;
+		ForcedFixedCamera.z = cameraPos.z;
+		ForcedFixedCamera.RoomNumber = switchItem.RoomNumber;*/
+	}
+
+	void CollideUnderwaterCeilingSwitch(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	{
+		auto& switchItem = g_Level.Items[itemNumber];
+
+		if (CanPlayerUseUnderwaterCeilingSwitch(*playerItem, switchItem))
+		{
+			if (HandlePlayerInteraction(*playerItem, switchItem, UNDERWATER_CEILING_SWITCH_FRONT_BASIS, InteractUnderwaterCeilingSwitch))
+				return;
+
+			if (HandlePlayerInteraction(*playerItem, switchItem, UNDERWATER_CEILING_SWITCH_BACK_BASIS, InteractUnderwaterCeilingSwitch))
+				return;
 		}
 	}
 }
