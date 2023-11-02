@@ -150,12 +150,6 @@ namespace TEN::Entities::Switches
 		SetAnimation(playerItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
 		playerItem.Animation.TargetState = LS_UNDERWATER_IDLE;
 		playerItem.Animation.Velocity.y = 0.0f;
-
-		/*auto cameraPos = Geometry::TranslatePoint(switchItem.Pose.Position, switchItem.Pose.Orientation.y + ANGLE(90.0f), BLOCK(1));
-		ForcedFixedCamera.x = cameraPos.x;
-		ForcedFixedCamera.y = cameraPos.y;
-		ForcedFixedCamera.z = cameraPos.z;
-		ForcedFixedCamera.RoomNumber = switchItem.RoomNumber;*/
 	}
 
 	void CollideUnderwaterCeilingSwitch(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
