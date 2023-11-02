@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/collision/Attractors.h"
 
+#include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -310,12 +311,22 @@ namespace TEN::Collision::Attractors
 
 	void Attractor::DrawDebug() const
 	{
-		constexpr auto LABEL_SCALE			 = 0.8f;
 		constexpr auto LABEL_OFFSET			 = Vector3(0.0f, -CLICK(0.25f), 0.0f);
 		constexpr auto INDICATOR_LINE_LENGTH = 50.0f;
 		constexpr auto SPHERE_SCALE			 = 15.0f;
 		constexpr auto COLOR_GREEN			 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
 		constexpr auto COLOR_YELLOW			 = Vector4(1.0f, 1.0f, 0.4f, 1.0f);
+
+		auto getLabelScale = [](const Vector3& cameraPos, const Vector3& labelPos)
+		{
+			constexpr auto RANGE		   = BLOCK(10);
+			constexpr auto LABEL_SCALE_MAX = 0.8f;
+			constexpr auto LABEL_SCALE_MIN = 0.2f;
+
+			float cameraDist = Vector3::Distance(cameraPos, labelPos);
+			float alpha = cameraDist / RANGE;
+			return Lerp(LABEL_SCALE_MAX, LABEL_SCALE_MIN, alpha);
+		};
 
 		// Determine label string.
 		auto labelString = std::string();
@@ -350,12 +361,14 @@ namespace TEN::Collision::Attractors
 				g_Renderer.AddLine3D(origin, origin + (dir * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 				g_Renderer.AddLine3D(target, target + (dir * INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
+				// Determine label parameters.
 				auto labelPos = ((origin + target) / 2) + LABEL_OFFSET;
 				auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
+				float labelScale = getLabelScale(Camera.pos.ToVector3(), labelPos);
 
 				// Draw label.
 				if (labelPos2D.has_value())
-					g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, 0, RendererDebugPage::CollisionStats);
+					g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, 0, RendererDebugPage::CollisionStats);
 			}
 
 			// Draw start and end indicator lines.
@@ -367,10 +380,14 @@ namespace TEN::Collision::Attractors
 			// Draw sphere.
 			g_Renderer.AddSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW);
 
+			// Determine label parameters.
+			auto labelPos = _points.front();
+			auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
+			float labelScale = getLabelScale(Camera.pos.ToVector3(), labelPos);
+
 			// Draw label.
-			auto labelPos2D = g_Renderer.Get2DPosition(_points.front());
 			if (labelPos2D.has_value())
-				g_Renderer.AddString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), LABEL_SCALE, PRINTSTRING_OUTLINE);
+				g_Renderer.AddString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, PRINTSTRING_OUTLINE);
 		}
 	}
 
