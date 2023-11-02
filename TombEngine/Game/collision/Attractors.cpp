@@ -64,10 +64,25 @@ namespace TEN::Collision::Attractors
 		return _box;
 	}
 
+	bool Attractor::IsEdge() const
+	{
+		return (_type == AttractorType::Edge);
+	}
+
+	bool Attractor::IsLooped() const
+	{
+		// Too few points; loop not possible.
+		if (_points.size() <= 2)
+			return false;
+
+		// Test if start and end points occupy roughly same position.
+		return (Vector3::Distance(_points.front(), _points.back()) <= EPSILON);
+	}
+
 	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint)
 	{
 		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
-		constexpr auto FORWARD_FACING_ANGLE_THRESHOLD = ANGLE(90.0f);
+		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
 
 		// Create attractor collision data.
 		auto attracColl = AttractorCollisionData(*this);
@@ -81,62 +96,11 @@ namespace TEN::Collision::Attractors
 		// Fill remaining collision data.
 		attracColl.HeadingAngle = attracOrient.y + HEADING_ANGLE_OFFSET;
 		attracColl.SlopeAngle = attracOrient.x;
-		attracColl.IsFacingForward = (abs(Geometry::GetShortestAngle(attracColl.HeadingAngle, orient.y)) <= FORWARD_FACING_ANGLE_THRESHOLD);
+		attracColl.IsFacingForward = (abs(Geometry::GetShortestAngle(attracColl.HeadingAngle, orient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD);
 		attracColl.IsInFront = Geometry::IsPointInFront(basePos, attracColl.Proximity.Intersection, orient);
 
 		// Return attractor collision data.
 		return attracColl;
-	}
-
-	AttractorProximityData Attractor::GetProximity(const Vector3& probePoint) const
-	{
-		// Single point exists; return simple attractor proximity data.
-		if (_points.size() == 1)
-		{
-			return AttractorProximityData
-			{
-				_points.front(),
-				Vector3::Distance(probePoint, _points.front()),
-				0.0f,
-				0
-			};
-		}
-
-		auto attracProx = AttractorProximityData{ _points.front(), INFINITY, 0.0f, 0 };
-		float chainDistTravelled = 0.0f;
-
-		// Find closest point along attractor.
-		for (int i = 0; i < (_points.size() - 1); i++)
-		{
-			// Get segment points.
-			const auto& origin = _points[i];
-			const auto& target = _points[i + 1];
-
-			auto closestPoint = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
-			float dist = Vector3::Distance(probePoint, closestPoint);
-
-			// Found new closest point; update proximity data.
-			if (dist < attracProx.Distance)
-			{
-				chainDistTravelled += Vector3::Distance(origin, closestPoint);
-
-				attracProx.Intersection = closestPoint;
-				attracProx.Distance = dist;
-				attracProx.ChainDistance += chainDistTravelled;
-				attracProx.SegmentID = i;
-
-				// Restart accumulation of distance travelled along attractor.
-				chainDistTravelled = Vector3::Distance(closestPoint, target);
-				continue;
-			}
-
-			// Accumulate distance travelled along attractor since last closest point.
-			float segmentLength = Vector3::Distance(origin, target);
-			chainDistTravelled += segmentLength;
-		}
-
-		// Return proximity data.
-		return attracProx;
 	}
 
 	Vector3 Attractor::GetPointAtChainDistance(float chainDist) const
@@ -221,21 +185,6 @@ namespace TEN::Collision::Attractors
 
 		// FAILSAFE: Return end segment ID.
 		return ((int)_points.size() - 1);
-	}
-
-	bool Attractor::IsEdge() const
-	{
-		return (_type == AttractorType::Edge);
-	}
-
-	bool Attractor::IsLooped() const
-	{
-		// Too few points; loop not possible.
-		if (_points.size() <= 2)
-			return false;
-
-		// Test if start and end points occupy roughly same position.
-		return (Vector3::Distance(_points.front(), _points.back()) <= EPSILON);
 	}
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
@@ -348,20 +297,71 @@ namespace TEN::Collision::Attractors
 		}
 	}
 
+	AttractorProximityData Attractor::GetProximity(const Vector3& probePoint) const
+	{
+		// Single point exists; return simple attractor proximity data.
+		if (_points.size() == 1)
+		{
+			return AttractorProximityData
+			{
+				_points.front(),
+				Vector3::Distance(probePoint, _points.front()),
+				0.0f,
+				0
+			};
+		}
+
+		auto attracProx = AttractorProximityData{ _points.front(), INFINITY, 0.0f, 0 };
+		float chainDistTravelled = 0.0f;
+
+		// Find closest point along attractor.
+		for (int i = 0; i < (_points.size() - 1); i++)
+		{
+			// Get segment points.
+			const auto& origin = _points[i];
+			const auto& target = _points[i + 1];
+
+			auto closestPoint = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
+			float dist = Vector3::Distance(probePoint, closestPoint);
+
+			// Found new closest point; update proximity data.
+			if (dist < attracProx.Distance)
+			{
+				chainDistTravelled += Vector3::Distance(origin, closestPoint);
+
+				attracProx.Intersection = closestPoint;
+				attracProx.Distance = dist;
+				attracProx.ChainDistance += chainDistTravelled;
+				attracProx.SegmentID = i;
+
+				// Restart accumulation of distance travelled along attractor.
+				chainDistTravelled = Vector3::Distance(closestPoint, target);
+				continue;
+			}
+
+			// Accumulate distance travelled along attractor since last closest point.
+			float segmentLength = Vector3::Distance(origin, target);
+			chainDistTravelled += segmentLength;
+		}
+
+		// Return proximity data.
+		return attracProx;
+	}
+
 	float Attractor::NormalizeChainDistance(float chainDist) const
 	{
 		// Distance along attractor is within bounds; return it.
 		if (chainDist >= 0.0f && chainDist <= _length)
 			return chainDist;
 
-		// Is looped; wrap distance along attractor.
+		// Looped; wrap distance along attractor.
 		if (IsLooped())
 		{
 			int sign = -std::copysign(1, chainDist);
 			return (chainDist + (_length * sign));
 		}
 		
-		// Isn't looped; clamp distance along attractor.
+		// Not looped; clamp distance along attractor.
 		return std::clamp(chainDist, 0.0f, _length);
 	}
 

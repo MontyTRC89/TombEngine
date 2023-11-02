@@ -68,17 +68,15 @@ namespace TEN::Collision::Attractors
 		float						GetLength() const;
 		const BoundingBox&			GetBox() const;
 
-		// Utilities
-		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint);
-		AttractorProximityData GetProximity(const Vector3& probePoint) const;
-		Vector3				   GetPointAtChainDistance(float chainDist) const;
-		unsigned int		   GetSegmentIDAtChainDistance(float chainDist) const;
-
 		// Inquirers
 		bool IsEdge() const;
 		bool IsLooped() const;
 
-		// Helpers
+		// Utilities
+		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint);
+		Vector3				   GetPointAtChainDistance(float chainDist) const;
+		unsigned int		   GetSegmentIDAtChainDistance(float chainDist) const;
+
 		void Update(const std::vector<Vector3>& points, int roomNumber);
 		void AttachPlayer(ItemInfo& itemNumber);
 		void DetachPlayer(ItemInfo& itemNumber);
@@ -87,6 +85,7 @@ namespace TEN::Collision::Attractors
 
 	private:
 		// Helpers
+		AttractorProximityData GetProximity(const Vector3& probePoint) const;
 		float NormalizeChainDistance(float chainDist) const;
 		void  CacheLength();
 		void  CacheBox();

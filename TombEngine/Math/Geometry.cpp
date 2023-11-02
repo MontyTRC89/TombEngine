@@ -160,7 +160,7 @@ namespace TEN::Math::Geometry
 
 		auto lineDir = linePoint1 - linePoint0;
 
-		// Calculate alpha from 2D projection of line on Y axis.
+		// Calculate alpha from 2D projection of line on XZ plane.
 		auto lineDir2D = Vector3(lineDir.x, 0.0f, lineDir.z);
 		float alpha = lineDir2D.Dot(origin - linePoint0) / lineDir2D.Dot(lineDir2D);
 
