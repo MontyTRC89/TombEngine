@@ -55,7 +55,7 @@ namespace TEN::Collision::Attractors
 
 	public:
 		// Constructors
-		Attractor() {}; // TODO: Remove. This ctor is for debug only.
+		Attractor() {}; // Debug only.
 		Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
 		// Destructors
@@ -96,7 +96,4 @@ namespace TEN::Collision::Attractors
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& probePoint, float detectRadius);
 
 	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop = true);
-	
-	// Debug
-	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl);
 }

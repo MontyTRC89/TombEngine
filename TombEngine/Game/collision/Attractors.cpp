@@ -10,6 +10,9 @@
 #include "Renderer/Renderer11.h"
 #include "Specific/level.h"
 
+// Debug
+#include "Game/collision/AttractorDebug.h"
+
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -283,8 +286,8 @@ namespace TEN::Collision::Attractors
 			g_Renderer.AddLine3D(_points.front(), Geometry::TranslatePoint(_points.front(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 			g_Renderer.AddLine3D(_points.back(), Geometry::TranslatePoint(_points.back(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
-			// Draw box.
-			auto box = BoundingOrientedBox(_box.Center, _box.Extents, Quaternion::Identity);
+			// Draw AABB.
+			//auto box = BoundingOrientedBox(_box.Center, _box.Extents, Quaternion::Identity);
 			//g_Renderer.AddDebugBox(box, Vector4::One, RendererDebugPage::CollisionStats);
 		}
 		else if (_points.size() == 1)
@@ -305,7 +308,7 @@ namespace TEN::Collision::Attractors
 
 	AttractorProximityData Attractor::GetProximity(const Vector3& probePoint) const
 	{
-		// Single point exists; return simple attractor proximity data.
+		// 1 point exists; return simple attractor proximity data.
 		if (_points.size() == 1)
 		{
 			return AttractorProximityData
@@ -392,22 +395,6 @@ namespace TEN::Collision::Attractors
 	void Attractor::CacheBox()
 	{
 		_box = Geometry::GetBoundingBox(_points);
-	}
-
-	// Debug
-	static std::vector<Attractor*> GetDebugAttractorPtrs(ItemInfo& item)
-	{
-		auto& player = GetLaraInfo(item);
-
-		auto nearbyAttracPtrs = std::vector<Attractor*>{};
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac0);
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac1);
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac2);
-
-		for (auto& attrac : player.Context.DebugAttracs.Attracs)
-			nearbyAttracPtrs.push_back(&attrac);
-
-		return nearbyAttracPtrs;
 	}
 
 	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
@@ -503,85 +490,5 @@ namespace TEN::Collision::Attractors
 
 		// Generate attractor.
 		return Attractor(type, points, roomNumber);
-	}
-
-	static Attractor GenerateBridgeAttractor(const ItemInfo& bridge)
-	{
-		constexpr auto TILT_STEP = CLICK(1);
-
-		// Get bounding box.
-		auto box = GameBoundingBox(&bridge).ToBoundingOrientedBox(bridge.Pose);
-
-		// Determine tilt offset.
-		int tiltOffset = 0;
-		switch (bridge.ObjectNumber)
-		{
-		default:
-		case ID_BRIDGE_FLAT:
-			break;
-
-		case ID_BRIDGE_TILT1:
-			tiltOffset = TILT_STEP;
-			break;
-
-		case ID_BRIDGE_TILT2:
-			tiltOffset = TILT_STEP * 2;
-			break;
-
-		case ID_BRIDGE_TILT3:
-			tiltOffset = TILT_STEP * 3;
-			break;
-
-		case ID_BRIDGE_TILT4:
-			tiltOffset = TILT_STEP * 4;
-			break;
-		}
-
-		// Determine relative corner points.
-		auto point0 = Vector3(box.Extents.x, -box.Extents.y + tiltOffset, box.Extents.z);
-		auto point1 = Vector3(-box.Extents.x, -box.Extents.y, box.Extents.z);
-		auto point2 = Vector3(-box.Extents.x, -box.Extents.y, -box.Extents.z);
-		auto point3 = Vector3(box.Extents.x, -box.Extents.y + tiltOffset, -box.Extents.z);
-
-		// Calculate absolute corner points.
-		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
-		auto points = std::vector<Vector3>
-		{
-			box.Center + Vector3::Transform(point0, rotMatrix),
-			box.Center + Vector3::Transform(point1, rotMatrix),
-			box.Center + Vector3::Transform(point2, rotMatrix),
-			box.Center + Vector3::Transform(point3, rotMatrix)
-		};
-
-		// Generate and return attractor.
-		return GenerateAttractorFromPoints(points, bridge.RoomNumber, AttractorType::Edge);
-	}
-
-	// Debug
-	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl)
-	{
-		// Invalid sector; return empty vector.
-		if (pointColl.Position.Floor == NO_HEIGHT)
-			return {};
-
-		auto attracs = std::vector<Attractor>{};
-
-		// Generate bridge attractors.
-		for (int bridgeItemNumber : pointColl.BottomBlock->BridgeItemNumbers)
-		{
-			const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-			attracs.push_back(GenerateBridgeAttractor(bridgeItem));
-		}
-
-		// Generate floor attractors.
-		auto pointGroups = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
-		for (const auto& points : pointGroups)
-		{
-			if (!points.empty())
-				attracs.push_back(GenerateAttractorFromPoints(points, pointColl.RoomNumber, AttractorType::Edge));
-		}
-
-		// Return generated attractors.
-		return attracs;
 	}
 }
