@@ -190,7 +190,8 @@ namespace TEN::Collision::Attractors
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
 	{
-		assertion(!points.empty(), "Attempted to update invalid attractor.");
+		if (points.empty())
+			TENLog("Attempted to update invalid attractor.", LogLevel::Warning);
 
 		_points = points;
 		_roomNumber = roomNumber;
@@ -281,6 +282,10 @@ namespace TEN::Collision::Attractors
 			// Draw start and end indicator lines.
 			g_Renderer.AddLine3D(_points.front(), Geometry::TranslatePoint(_points.front(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 			g_Renderer.AddLine3D(_points.back(), Geometry::TranslatePoint(_points.back(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+
+			// Draw box.
+			auto box = BoundingOrientedBox(_box.Center, _box.Extents, Quaternion::Identity);
+			//g_Renderer.AddDebugBox(box, Vector4::One, RendererDebugPage::CollisionStats);
 		}
 		else if (_points.size() == 1)
 		{
@@ -405,20 +410,6 @@ namespace TEN::Collision::Attractors
 		return nearbyAttracPtrs;
 	}
 
-	// Debug
-	static void DrawDebugAttractorBounds(const BoundingSphere& sphere, std::vector<Attractor*> attracPtrs)
-	{
-		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
-
-		for (const auto* attracPtr : attracPtrs)
-		{
-			const auto& box = attracPtr->GetBox();
-			auto orientedBox = BoundingOrientedBox(box.Center, box.Extents, Quaternion::Identity);
-
-			g_Renderer.AddDebugBox(orientedBox, Vector4::One, RendererDebugPage::CollisionStats);
-		}
-	}
-
 	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
 	static std::vector<Attractor*> GetNearbyAttractorPtrs(const Vector3& probePoint, int roomNumber, float detectRadius)
 	{
@@ -453,7 +444,8 @@ namespace TEN::Collision::Attractors
 				nearbyAttracPtrs.push_back(&attrac);
 		}
 
-		DrawDebugAttractorBounds(sphere, nearbyAttracPtrs);
+		// Draw debug sphere.
+		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
 
 		// Return pointers to approximately nearby attractors from sphere-AABB tests.
 		return nearbyAttracPtrs;
