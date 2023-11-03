@@ -265,10 +265,6 @@ void Moveable::Register(sol::table& parent)
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
 
-	/// Get the end frame number of the moveable's active animation.
-	// This is the "End Frame" set in WADTool for the animation.
-	// @function Moveable:GetEndFrame()
-	// @treturn int End frame number of the active animation.	
 	ScriptReserved_GetEndFrame, &Moveable::GetEndFrame,
 
 /// Set the object's velocity to specified value.
@@ -872,6 +868,10 @@ void Moveable::SetFrameNumber(int frameNumber)
 	}
 }
 
+/// Get the end frame number of the moveable's active animation.
+// This is the "End Frame" set in WADTool for the animation.
+// @function Moveable:GetEndFrame()
+// @treturn int End frame number of the active animation.	
 int Moveable::GetEndFrame() const
 {
 	const auto& anim = GetAnimData(*m_item);
