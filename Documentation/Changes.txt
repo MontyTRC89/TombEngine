@@ -48,7 +48,7 @@ Lua API changes:
 * Add Lara:GetAmmoType() function to read the ammo that Lara is using.
 * Add Lara:GetControlLock() and Lara:SetControlLock() functions to handle controls locking.
 * Add Moveable:GetEndFrame() function to read the "EndFrame" value of the current moveable animation
-* Add Util.GetScreenAspectRatio() function to read the aspect ratio value of the current screen resolution
+* Add Util.GetDisplayAspectRatio() function to read the aspect ratio value of the current screen resolution
 * Add Logic.HandleEvent() function to call node events.
 * Add Input.GetCursorDisplayPosition() function to get the position of the cursor.
 * Add functions to load, save, delete and check existence of savegames.
