@@ -97,6 +97,6 @@ namespace TEN::Collision::Attractors
 
 	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop = true);
 	
-	// TEMP
-	std::optional<Attractor> GenerateSectorAttractor(const CollisionResult& pointColl);
+	// Debug
+	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl);
 }

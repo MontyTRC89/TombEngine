@@ -130,9 +130,10 @@ class FloorInfo
 		int	 TriggerIndex = 0;
 		bool Stopper	  = true;
 
-		// Getters
-		std::vector<Vector3> GetSurfaceVertices(int x, int z, bool isFloor);
+		// Debug
+		std::vector<std::vector<Vector3>> GetSurfaceVertices(int x, int z, bool isFloor);
 
+		// Getters
 		int		GetSurfacePlaneIndex(int x, int z, bool isFloor) const;
 		Vector2 GetSurfaceTilt(int x, int z, bool isFloor) const;
 
@@ -144,6 +145,7 @@ class FloorInfo
 		std::optional<int> GetRoomNumberBelow(const Vector3i& pos) const;
 		std::optional<int> GetRoomNumberAtSide() const;
 
+		int GetSurfaceHeight(int planeIndex, int x, int z, bool isFloor) const;
 		int GetSurfaceHeight(int x, int z, bool isFloor) const;
 		int GetSurfaceHeight(const Vector3i& pos, bool isFloor) const;
 		int GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const;

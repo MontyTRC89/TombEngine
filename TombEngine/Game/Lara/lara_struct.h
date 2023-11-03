@@ -1347,6 +1347,8 @@ struct DebugAttractorData
 	Attractor Attrac0 = {};
 	Attractor Attrac1 = {};
 	Attractor Attrac2 = {};
+
+	std::vector<Attractor> Attracs = {};
 };
 
 // TODO: Savegame for attractors.

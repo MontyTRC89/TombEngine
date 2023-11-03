@@ -389,7 +389,7 @@ namespace TEN::Collision::Attractors
 		_box = Geometry::GetBoundingBox(_points);
 	}
 
-	// TEMP
+	// Debug
 	static std::vector<Attractor*> GetDebugAttractorPtrs(ItemInfo& item)
 	{
 		auto& player = GetLaraInfo(item);
@@ -398,9 +398,14 @@ namespace TEN::Collision::Attractors
 		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac0);
 		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac1);
 		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac2);
+
+		for (auto& attrac : player.Context.DebugAttracs.Attracs)
+			nearbyAttracPtrs.push_back(&attrac);
+
 		return nearbyAttracPtrs;
 	}
 
+	// Debug
 	static void DrawDebugAttractorBounds(const BoundingSphere& sphere, std::vector<Attractor*> attracPtrs)
 	{
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
@@ -561,21 +566,30 @@ namespace TEN::Collision::Attractors
 	}
 
 	// Debug
-	std::optional<Attractor> GenerateSectorAttractor(const CollisionResult& pointColl)
+	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl)
 	{
-		// Invalid sector; return nullopt.
+		// Invalid sector; return empty vector.
 		if (pointColl.Position.Floor == NO_HEIGHT)
-			return std::nullopt;
+			return {};
 
-		// Generate and return bridge attractor.
-		if (pointColl.Position.Bridge >= 0)
+		auto attracs = std::vector<Attractor>{};
+
+		// Generate bridge attractors.
+		for (int bridgeItemNumber : pointColl.BottomBlock->BridgeItemNumbers)
 		{
-			const auto& bridge = g_Level.Items[pointColl.Position.Bridge];
-			return GenerateBridgeAttractor(bridge);
+			const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+			attracs.push_back(GenerateBridgeAttractor(bridgeItem));
 		}
 
-		// Generate and return floor attractor.
-		auto points = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
-		return GenerateAttractorFromPoints(points, pointColl.RoomNumber, AttractorType::Edge);
+		// Generate floor attractors.
+		auto pointGroups = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+		for (const auto& points : pointGroups)
+		{
+			if (!points.empty())
+				attracs.push_back(GenerateAttractorFromPoints(points, pointColl.RoomNumber, AttractorType::Edge));
+		}
+
+		// Return generated attractors.
+		return attracs;
 	}
 }

@@ -14,96 +14,162 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 
-// debug
+// -----debug
 #include "Renderer/Renderer11.h"
 using TEN::Renderer::g_Renderer;
+//-----
 
-std::vector<Vector3> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
+// Debug
+std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 {
-	constexpr auto TILT_STEP  = CLICK(1);
-	constexpr auto HALF_BLOCK = BLOCK(0.5f);
+	constexpr auto TRIANGLE_POINT_COUNT = 3;
+	constexpr auto QUAD_POINT_COUNT		= 4;
 
 	const auto& surfaceColl = isFloor ? FloorCollision : CeilingCollision;
 
-	auto sectorCenter2D = GetSectorCenter(x, z);
+	const auto& room = g_Level.Rooms[Room];
+	auto roomPos = GetRoomPosition(Room, x, z);
 
-	int surfaceHeight = IsSurfaceSplit(isFloor) ? GetSurfaceHeight(x, z, isFloor) : GetSurfaceHeight(sectorCenter2D.x, sectorCenter2D.y, isFloor);
-	auto tiltOffset = GetSurfaceTilt(x, z, isFloor) * TILT_STEP;
-	int offset = (tiltOffset.x + tiltOffset.y) / 2;
+	auto pointGroups = std::vector<std::vector<Vector3>>{};
 
-	// Calculate corner heights.
-	float vertex0Height = surfaceHeight - (tiltOffset.x + tiltOffset.y) + offset;
-	float vertex1Height = surfaceHeight - tiltOffset.y + offset;
-	float vertex2Height = surfaceHeight + offset;
-	float vertex3Height = surfaceHeight - tiltOffset.x + offset;
-
-	auto sectorCenter = Vector3(sectorCenter2D.x, 0.0f, sectorCenter2D.y);
-
-	// Calculate base corner vertices.
-	auto vertex0 = sectorCenter + Vector3(HALF_BLOCK, 0.0f, HALF_BLOCK);
-	auto vertex1 = sectorCenter + Vector3(-HALF_BLOCK, 0.0f, HALF_BLOCK);
-	auto vertex2 = sectorCenter + Vector3(-HALF_BLOCK, 0.0f, -HALF_BLOCK);
-	auto vertex3 = sectorCenter + Vector3(HALF_BLOCK, 0.0f, -HALF_BLOCK);
-
-	// Handle split sector.
-	// TODO: Bugged. Range isn't always right.
+	// Get line points.
 	if (IsSurfaceSplit(isFloor))
 	{
-		if (surfaceColl.SplitAngle == SurfaceCollisionData::SPLIT_ANGLE_0)
+		// Get points0.
+		auto points0 = std::vector<Vector3>{};
+		for (int i = 0; i < TRIANGLE_POINT_COUNT; i++)
 		{
-			g_Renderer.PrintDebugMessage("%.3f", Vector2i::Distance(Vector2i(vertex1.x, vertex1.z), Vector2i(x, z)));
-			g_Renderer.PrintDebugMessage("%.3f", (BLOCK(0.5f) * SQRT_2));
+			int x = roomPos.x * BLOCK(1);
+			int z = roomPos.y * BLOCK(1);
 
-			if (Vector2i::Distance(Vector2i(vertex1.x, vertex1.z), Vector2i(x, z)) <= (BLOCK(0.5f) * SQRT_2))
+			if (FloorCollision.SplitAngle == SurfaceCollisionData::SPLIT_ANGLE_0)
 			{
-				return std::vector<Vector3>
+				if (i == 0)
 				{
-					Vector3(vertex0.x, vertex0Height, vertex0.z),
-					Vector3(vertex1.x, vertex1Height, vertex1.z),
-					Vector3(vertex2.x, vertex2Height, vertex2.z),
-				};
+					x += 1;
+					z += 1;
+				}
+				else if (i == 1)
+				{
+					x += BLOCK(1) - 1;
+					z += BLOCK(1) - 1;
+				}
+				else if (i == 2)
+				{
+					x += 1;
+					z += BLOCK(1) - 1;
+				}
 			}
 			else
 			{
-				return std::vector<Vector3>
+				if (i == 0)
 				{
-					Vector3(vertex0.x, vertex0Height, vertex0.z),
-					Vector3(vertex2.x, vertex2Height, vertex2.z),
-					Vector3(vertex3.x, vertex3Height, vertex3.z)
-				};
+					x += BLOCK(1) - 1;
+					z += 1;
+				}
+				else if (i == 1)
+				{
+					x += BLOCK(1) - 1;
+					z += BLOCK(1) - 1;
+				}
+				else if (i == 2)
+				{
+					x += 1;
+					z += BLOCK(1) - 1;
+				}
 			}
+
+			points0.push_back(Vector3(x + room.x, GetSurfaceHeight(0, x, z, true), z + room.z));
 		}
-		else
+
+		// Get points1.
+		auto points1 = std::vector<Vector3>{};
+		for (int i = 0; i < TRIANGLE_POINT_COUNT; i++)
 		{
-			if (Vector2i::Distance(Vector2i(vertex0.x, vertex0.z), Vector2i(x, z)) <= (BLOCK(0.5f) * SQRT_2))
+			int x = roomPos.x * BLOCK(1);
+			int z = roomPos.y * BLOCK(1);
+
+			if (FloorCollision.SplitAngle == SurfaceCollisionData::SPLIT_ANGLE_0)
 			{
-				return std::vector<Vector3>
+				if (i == 0)
 				{
-					Vector3(vertex0.x, vertex0Height, vertex0.z),
-					Vector3(vertex1.x, vertex1Height, vertex1.z),
-					Vector3(vertex3.x, vertex3Height, vertex3.z)
-				};
+					x += 1;
+					z += 1;
+				}
+				else if (i == 1)
+				{
+					x += BLOCK(1) - 1;
+					z += 1;
+				}
+				else if (i == 2)
+				{
+					x += BLOCK(1) - 1;
+					z += BLOCK(1) - 1;
+				}
 			}
 			else
 			{
-				return std::vector<Vector3>
+				if (i == 0)
 				{
-					Vector3(vertex1.x, vertex1Height, vertex1.z),
-					Vector3(vertex2.x, vertex2Height, vertex2.z),
-					Vector3(vertex3.x, vertex3Height, vertex3.z)
-				};
+					x += 1;
+					z += 1;
+				}
+				else if (i == 1)
+				{
+					x += BLOCK(1) - 1;
+					z += 1;
+				}
+				else if (i == 2)
+				{
+					x += 1;
+					z += BLOCK(1) - 1;
+				}
 			}
+
+			points1.push_back(Vector3(x + room.x, GetSurfaceHeight(1, x, z, true), z + room.z));
 		}
+
+		pointGroups.push_back(points0);
+		pointGroups.push_back(points1);
+		return pointGroups;
 	}
-
-	// Return vertices.
-	return std::vector<Vector3>
+	else
 	{
-		Vector3(vertex0.x, vertex0Height, vertex0.z),
-		Vector3(vertex1.x, vertex1Height, vertex1.z),
-		Vector3(vertex2.x, vertex2Height, vertex2.z),
-		Vector3(vertex3.x, vertex3Height, vertex3.z)
-	};
+		int x = roomPos.x * BLOCK(1);
+		int z = roomPos.y * BLOCK(1);
+
+		// TODO: Wrong offset.
+		// Set points.
+		auto points = std::vector<Vector3>{};
+		for (int i = 0; i < QUAD_POINT_COUNT; i++)
+		{
+			if (i == 0)
+			{
+				x += 1;
+				z += 1;
+			}
+			else if (i == 1)
+			{
+				x += BLOCK(1) - 1;
+				z += 1;
+			}
+			else if (i == 2)
+			{
+				x += BLOCK(1) - 1;
+				z += BLOCK(1) - 1;
+			}
+			else if (i == 3)
+			{
+				x += 1;
+				z += BLOCK(1) - 1;
+			}
+
+			points.push_back(Vector3(x + room.x, GetSurfaceHeight(0, x, z, true), z + room.z));
+		}
+
+		pointGroups.push_back(points);
+		return pointGroups;
+	}
 }
 
 int FloorInfo::GetSurfacePlaneIndex(int x, int z, bool isFloor) const
@@ -253,6 +319,21 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(const Vector3i& pos) const
 std::optional<int> FloorInfo::GetRoomNumberAtSide() const
 {
 	return ((WallPortal != NO_ROOM) ? std::optional(WallPortal) : std::nullopt);
+}
+
+int FloorInfo::GetSurfaceHeight(int planeIndex, int x, int z, bool isFloor) const
+{
+	const auto& planes = isFloor ? FloorCollision.Planes : CeilingCollision.Planes;
+
+	// Get surface plane.
+	const auto& plane = planes[planeIndex];
+
+	auto point = GetSectorPoint(x, z);
+
+	// Return surface height.
+	return ((plane.x * point.x) +
+			(plane.y * point.y/*z*/) +
+			plane.z);
 }
 
 int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
