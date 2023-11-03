@@ -75,8 +75,9 @@ namespace TEN::Collision::Attractors
 		if (_points.size() <= 2)
 			return false;
 
-		// Test if start and end points occupy roughly same position.
-		return (Vector3::Distance(_points.front(), _points.back()) <= EPSILON);
+		// Test if start and end points occupy same approximate position.
+		float dist = Vector3::Distance(_points.front(), _points.back());
+		return (dist <= EPSILON);
 	}
 
 	AttractorCollisionData Attractor::GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint)
@@ -218,8 +219,8 @@ namespace TEN::Collision::Attractors
 	void Attractor::DrawDebug() const
 	{
 		constexpr auto LABEL_OFFSET			 = Vector3(0.0f, -CLICK(0.25f), 0.0f);
-		constexpr auto INDICATOR_LINE_LENGTH = 50.0f;
-		constexpr auto SPHERE_SCALE			 = 15.0f;
+		constexpr auto INDICATOR_LINE_LENGTH = BLOCK(1 / 20.0f);
+		constexpr auto SPHERE_SCALE			 = BLOCK(1 / 64.0f);
 		constexpr auto COLOR_GREEN			 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
 		constexpr auto COLOR_YELLOW			 = Vector4(1.0f, 1.0f, 0.4f, 1.0f);
 
@@ -264,8 +265,8 @@ namespace TEN::Collision::Attractors
 				auto dir = orient.ToDirection();
 
 				// Draw segment heading indicator lines.
-				g_Renderer.AddLine3D(origin, origin + (dir * INDICATOR_LINE_LENGTH), COLOR_GREEN);
-				g_Renderer.AddLine3D(target, target + (dir * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddLine3D(origin, Geometry::TranslatePoint(origin, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddLine3D(target, Geometry::TranslatePoint(target, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
 				// Determine label parameters.
 				auto labelPos = ((origin + target) / 2) + LABEL_OFFSET;
