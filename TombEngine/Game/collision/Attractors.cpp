@@ -279,8 +279,8 @@ namespace TEN::Collision::Attractors
 			}
 
 			// Draw start and end indicator lines.
-			g_Renderer.AddLine3D(_points.front(), _points.front() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
-			g_Renderer.AddLine3D(_points.back(), _points.back() + (-Vector3::UnitY * INDICATOR_LINE_LENGTH), COLOR_GREEN);
+			g_Renderer.AddLine3D(_points.front(), Geometry::TranslatePoint(_points.front(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+			g_Renderer.AddLine3D(_points.back(), Geometry::TranslatePoint(_points.back(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 		}
 		else if (_points.size() == 1)
 		{
@@ -442,7 +442,7 @@ namespace TEN::Collision::Attractors
 		}
 
 		// Get bridge attractors.
-		for (auto& [bridgeID, attrac] : g_Level.BridgeAttractors)
+		for (auto& [itemNumber, attrac] : g_Level.BridgeAttractors)
 		{
 			if (sphere.Intersects(attrac.GetBox()))
 				nearbyAttracPtrs.push_back(&attrac);
