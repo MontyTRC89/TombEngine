@@ -10,13 +10,13 @@ namespace TEN::Scripting::DisplaySprite
 {
 	/***
 	Constants for display sprite align modes.
-	@enum DisplaySprite.AlignMode
+	@enum DisplaySpriteEnum.AlignMode
 	@pragma nostrip
 	*/
 
-	/*** DisplaySprite.AlignMode constants.
+	/*** DisplaySpriteEnum.AlignMode constants.
 
-	The following constants are inside AlignMode.
+	The following constants are inside DisplaySpriteEnum.AlignMode.
 
 	CENTER
 	CENTER_TOP
@@ -28,7 +28,7 @@ namespace TEN::Scripting::DisplaySprite
 	BOTTOM_LEFT
 	BOTTOM_RIGHT
 
-	@section DisplaySprite.AlignMode
+	@section DisplaySpriteEnum.AlignMode
 	*/
 
 	/*** Table of display sprite align modes.

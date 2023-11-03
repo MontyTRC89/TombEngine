@@ -10,19 +10,19 @@ namespace TEN::Scripting::DisplaySprite
 {
 	/***
 	Constants for display sprite scale modes.
-	@enum DisplaySprite.ScaleMode
+	@enum DisplaySpriteEnum.ScaleMode
 	@pragma nostrip
 	*/
 
-	/*** DisplaySprite.ScaleMode constants.
+	/*** DisplaySpriteEnum.ScaleMode constants.
 
-	The following constants are inside DisplaySprite.ScaleMode.
+	The following constants are inside DisplaySpriteEnum.ScaleMode.
 
 	FIT
 	FILL
 	STRETCH
 
-	@section DisplaySprite.ScaleMode
+	@section DisplaySpriteEnum.ScaleMode
 	*/
 
 	/*** Table of display sprite scale modes.
