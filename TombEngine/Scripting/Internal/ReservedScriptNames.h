@@ -16,8 +16,6 @@ static constexpr char ScriptReserved_Util[]				= "Util";
 static constexpr char ScriptReserved_Effects[]			= "Effects";
 
 // Classes
-static constexpr char ScriptReserved_Moveable[]			= "Moveable";
-static constexpr char ScriptReserved_Lara[]				= "Lara";
 static constexpr char ScriptReserved_Static[]			= "Static";
 static constexpr char ScriptReserved_Camera[]			= "Camera";
 static constexpr char ScriptReserved_Sink[]				= "Sink";
@@ -29,6 +27,15 @@ static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Vec2[]				= "Vec2";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
+
+// Moveable object
+static constexpr char ScriptReserved_Moveable[]			= "Moveable";
+static constexpr char ScriptReserved_MoveableEnum[]		= "MoveableEnum";
+static constexpr char ScriptReserved_MoveableStatus[]	= "Status";
+
+// Player object
+static constexpr char ScriptReserved_Lara[]							= "Lara";
+static constexpr char ScriptReserved_GetPlayerInteractedMoveable[]	= "GetInteractedMoveable";
 
 // DisplaySprite object
 static constexpr char ScriptReserved_DisplaySprite[]				= "DisplaySprite";
