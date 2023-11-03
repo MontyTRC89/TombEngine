@@ -53,7 +53,7 @@ public:
 
 	std::unique_ptr<Moveable> GetVehicle() const;
 	std::unique_ptr<Moveable> GetTarget() const;
-	std::unique_ptr<Moveable> GetInteractedMoveable() const;
+	std::unique_ptr<Moveable> GetPlayerInteractedMoveable() const;
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	int GetAmmoType() const;

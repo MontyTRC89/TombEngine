@@ -402,7 +402,7 @@ std::unique_ptr<Moveable> LaraObject::GetTarget() const
 // @treturn Objects.Moveable Interacted moveable (nil if the player is not interacting with a moveable).
 // @usage
 // local interactedMoveable = Lara:GetInteractedMoveable()
-std::unique_ptr<Moveable> LaraObject::GetInteractedMoveable() const
+std::unique_ptr<Moveable> LaraObject::GetPlayerInteractedMoveable() const
 {
 	const auto& player = GetLaraInfo(*m_item);
 
@@ -447,7 +447,7 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,
-			ScriptReserved_GetInteractedMoveable, &LaraObject::GetInteractedMoveable,
+			ScriptReserved_GetPlayerInteractedMoveable, &LaraObject::GetPlayerInteractedMoveable,
 			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
 			sol::base_classes, sol::bases<Moveable>()
 		);
