@@ -397,12 +397,12 @@ std::unique_ptr<Moveable> LaraObject::GetTarget() const
 	return std::make_unique<Moveable>(lara->TargetEntity->Index);
 }
 
-/// Get current object that Lara is interacting.
-// @function LaraObject:GetInteractedObj
-// @treturn Objects.Moveable current object Lara is interacting with (nil if Lara is not interacting with any object)
+/// Get current moveable that Lara is interacting.
+// @function LaraObject:GetInteractedMoveable
+// @treturn Objects.Moveable current moveable object that Lara is interacting with (nil if Lara is not interacting with any)
 // @usage
-// local interactedObj = Lara:GetInteractedObj()
-std::unique_ptr<Moveable> LaraObject::GetInteractedObj() const
+// local interactedMoveableObj = Lara:GetInteractedMoveable()
+std::unique_ptr<Moveable> LaraObject::GetInteractedMoveable() const
 {
 	auto* lara = GetLaraInfo(m_item);
 
@@ -447,7 +447,7 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,
-			ScriptReserved_GetInteractedObj, &LaraObject::GetInteractedObj,
+			ScriptReserved_GetInteractedMoveable, &LaraObject::GetInteractedMoveable,
 			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
 			sol::base_classes, sol::bases<Moveable>()
 		);
