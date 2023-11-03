@@ -188,27 +188,27 @@ void Moveable::Register(sol::table& parent)
 /// Get current moveable effect
 // @function Moveable:GetEffect
 // @treturn Effects.EffectID effect type currently assigned to moveable.
-	ScriptReserved_GetEffect, & Moveable::GetEffect,
+	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
-/// Get the status of object.
-// possible values:
-// <br />0 - not active 
-// <br />1 - active 
-// <br />2 - deactivated 
-// <br />3 - invisible
-// @function Moveable:GetStatus
-// @treturn int a number representing the status of the object
+	/// Get the moveable's status.
+	// Possible values:
+	// <br />0 - inactive
+	// <br />1 - active
+	// <br />2 - deactivated
+	// <br />3 - invisible
+	// @function Moveable:GetStatus
+	// @treturn int The moveable's status.
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
-/// Set the status of object.
-// possible values:
-// <br />0 - not active 
-// <br />1 - active 
-// <br />2 - deactivated 
+/// Set the moveable's status.
+// Possible values:
+// <br />0 - inactive
+// <br />1 - active
+// <br />2 - deactivated
 // <br />3 - invisible
 // @function Moveable:SetStatus
-// @tparam int value of the desired status 
-	ScriptReserved_SetStatus, & Moveable::SetStatus,
+// @tparam int status The new status of the moveable.
+	ScriptReserved_SetStatus, &Moveable::SetStatus,
 
 /// Set the name of the function to be called when the moveable is shot by Lara.
 // Note that this will be triggered twice when shot with both pistols at once. 
