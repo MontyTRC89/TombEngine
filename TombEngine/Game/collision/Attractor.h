@@ -68,5 +68,5 @@ namespace TEN::Collision::Attractor
 	};
 
 	// TEMP
-	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl);
+	std::vector<Attractor> GenerateSectorAttractors(const ItemInfo& item);
 }

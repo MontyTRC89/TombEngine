@@ -127,7 +127,7 @@ namespace TEN::Collision::Attractor
 
 		// Generate sector attractor.
 		auto pointColl = GetCollision(item);
-		auto attracs = GenerateSectorAttractors(pointColl);
+		auto attracs = GenerateSectorAttractors(item);
 
 		player.Context.DebugAttracs.Attracs = attracs;
 

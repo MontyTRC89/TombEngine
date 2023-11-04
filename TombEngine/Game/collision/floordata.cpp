@@ -22,22 +22,22 @@ using TEN::Renderer::g_Renderer;
 // Debug
 std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
 {
-	constexpr auto TRIANGLE_POINT_COUNT = 3;
-	constexpr auto QUAD_POINT_COUNT		= 4;
+	constexpr auto TRIANGLE_VERTEX_COUNT = 3;
+	constexpr auto QUAD_VERTEX_COUNT	 = 4;
 
 	const auto& surfaceColl = isFloor ? FloorCollision : CeilingCollision;
 
 	const auto& room = g_Level.Rooms[Room];
 	auto roomPos = GetRoomPosition(Room, x, z);
 
-	auto pointGroups = std::vector<std::vector<Vector3>>{};
+	auto vertexGroups = std::vector<std::vector<Vector3>>{};
 
-	// Get line points.
+	// Get triangle vertices.
 	if (IsSurfaceSplit(isFloor))
 	{
-		// Get points0.
-		auto points0 = std::vector<Vector3>{};
-		for (int i = 0; i < TRIANGLE_POINT_COUNT; i++)
+		// Get vertices0.
+		auto vertices0 = std::vector<Vector3>{};
+		for (int i = 0; i < TRIANGLE_VERTEX_COUNT; i++)
 		{
 			int x = roomPos.x * BLOCK(1);
 			int z = roomPos.y * BLOCK(1);
@@ -79,12 +79,12 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 				}
 			}
 
-			points0.push_back(Vector3(x + room.x, GetSurfaceHeight(0, x, z, true), z + room.z));
+			vertices0.push_back(Vector3(x + room.x, GetSurfaceHeight(0, x, z, true), z + room.z));
 		}
 
-		// Get points1.
-		auto points1 = std::vector<Vector3>{};
-		for (int i = 0; i < TRIANGLE_POINT_COUNT; i++)
+		// Get vertices1.
+		auto vertices1 = std::vector<Vector3>{};
+		for (int i = 0; i < QUAD_VERTEX_COUNT; i++)
 		{
 			int x = roomPos.x * BLOCK(1);
 			int z = roomPos.y * BLOCK(1);
@@ -126,18 +126,19 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 				}
 			}
 
-			points1.push_back(Vector3(x + room.x, GetSurfaceHeight(1, x, z, true), z + room.z));
+			vertices1.push_back(Vector3(x + room.x, GetSurfaceHeight(1, x, z, true), z + room.z));
 		}
 
-		pointGroups.push_back(points0);
-		pointGroups.push_back(points1);
-		return pointGroups;
+		vertexGroups.push_back(vertices0);
+		vertexGroups.push_back(vertices1);
+		return vertexGroups;
 	}
+	// Get quad vertices.
 	else
 	{
-		// Set points.
-		auto points = std::vector<Vector3>{};
-		for (int i = 0; i < QUAD_POINT_COUNT; i++)
+		// Set vertices.
+		auto vertices = std::vector<Vector3>{};
+		for (int i = 0; i < QUAD_VERTEX_COUNT; i++)
 		{
 			int x = roomPos.x * BLOCK(1);
 			int z = roomPos.y * BLOCK(1);
@@ -163,11 +164,11 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 				z += BLOCK(1) - 1;
 			}
 
-			points.push_back(Vector3(x + room.x, GetSurfaceHeight(0, x, z, true), z + room.z));
+			vertices.push_back(Vector3(x + room.x, GetSurfaceHeight(0, x, z, true), z + room.z));
 		}
 
-		pointGroups.push_back(points);
-		return pointGroups;
+		vertexGroups.push_back(vertices);
+		return vertexGroups;
 	}
 }
 

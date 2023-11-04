@@ -368,29 +368,56 @@ namespace TEN::Collision::Attractor
 	}
 
 	// TEMP
-	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl)
+	std::vector<Attractor> GenerateSectorAttractors(const ItemInfo& item)
 	{
-		// Invalid sector; return empty vector.
-		if (pointColl.Position.Floor == NO_HEIGHT)
-			return {};
+		constexpr auto RANGE	  = BLOCK(3);
+		constexpr auto HALF_BLOCK = BLOCK(0.5f);
 
 		auto attracs = std::vector<Attractor>{};
 
-		// Generate bridge attractors.
-		for (int bridgeItemNumber : pointColl.BottomBlock->BridgeItemNumbers)
-		{
-			const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-			attracs.push_back(GenerateBridgeAttractor(bridgeItem));
-		}
+		const auto& room = g_Level.Rooms[item.RoomNumber];
+		int minX = std::max(item.Pose.Position.x - RANGE, room.x) / BLOCK(1);
+		int maxX = std::min(item.Pose.Position.x + RANGE, room.x + (room.xSize * BLOCK(1))) / BLOCK(1);
+		int minZ = std::max(item.Pose.Position.z - RANGE, room.z) / BLOCK(1);
+		int maxZ = std::min(item.Pose.Position.z + RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
 
-		// Generate floor attractors.
-		auto pointGroups = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
-		for (auto& points : pointGroups)
+		auto visitedBridgeItemNumbers = std::set<int>{};
+		for (int x = minX; x < maxX; x++)
 		{
-			if (!points.empty())
+			for (int z = minZ; z < maxZ; z++)
 			{
-				points.push_back(points.front());
-				attracs.push_back(Attractor(AttractorType::Edge, points, pointColl.RoomNumber));
+				auto pos = Vector3(BLOCK(x), item.Pose.Position.y, BLOCK(z));
+				auto pointColl = GetCollision(pos + Vector3(HALF_BLOCK, 0.0f, HALF_BLOCK), item.RoomNumber);
+
+				// Check for invalid sector.
+				if (pointColl.Position.Floor == NO_HEIGHT)
+					continue;
+
+				// Generate bridge attractors.
+				for (int bridgeItemNumber : pointColl.BottomBlock->BridgeItemNumbers)
+				{
+					// Check if bridge was already accounted for.
+					auto it = visitedBridgeItemNumbers.find(bridgeItemNumber);
+					if (it != visitedBridgeItemNumbers.end())
+						continue;
+
+					const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+					attracs.push_back(GenerateBridgeAttractor(bridgeItem));
+
+					// Track visited bridges.
+					visitedBridgeItemNumbers.insert(bridgeItemNumber);
+				}
+
+				// Generate floor attractors.
+				auto vertexGroups = pointColl.BottomBlock->GetSurfaceVertices(pos.x, pos.z, true);
+				for (auto& vertices : vertexGroups)
+				{
+					if (!vertices.empty())
+					{
+						vertices.push_back(vertices.front());
+						attracs.push_back(Attractor(AttractorType::Edge, vertices, pointColl.RoomNumber));
+					}
+				}
 			}
 		}
 
