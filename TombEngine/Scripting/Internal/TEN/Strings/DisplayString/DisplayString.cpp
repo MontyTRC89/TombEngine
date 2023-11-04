@@ -222,29 +222,27 @@ float DisplayString::GetScale() const
 
 void DisplayString::SetPosition(const sol::variadic_args& args)
 {
-	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
+	auto& displayString = GetItemCallbackRoutine(_id).value();
 
 	if (args.size() == 1)
 	{
-		// Handle the case when a single argument is provided.
+		// Handle case when single argument provided.
 		if (args[0].is<Vec2>()) 
-		{
 			displayString._position = args[0].as<Vec2>();
-		}
 	}
 	else if (args.size() == 2)
 	{
-		// Handle the case when two arguments are provided, assuming they are integers.
+		// Handle case when two arguments provided, assuming they are integers.
 		if (args[0].is<int>() && args[1].is<int>())
 		{
 			int x = args[0].as<int>();
 			int y = args[1].as<int>();
-			displayString._position = Vec2(static_cast<float>(x), static_cast<float>(y));
+			displayString._position = Vec2((int)x, (int)y);
 		}
 	}
 	else
 	{
-		TENLog("Invalid number of arguments for SetPosition.");
+		TENLog("Invalid arguments in SetPosition() call.");
 	}
 }
 
