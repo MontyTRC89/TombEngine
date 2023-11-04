@@ -80,15 +80,15 @@ namespace View
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
 	}
 
-	///Get the display resolution's aspect ratio.
-	//@function GetAspectRatio
-	//@treturn float Display resolution's aspect ratio.
-	//@usage
-	//To compare the aspect ratio with other values, it is recommended to round its value.
-	//<br />local aspectRatio = tonumber(string.format("%.2f", TEN.Util.GetDisplayAspectRatio()))
-	//<br />if aspectRatio == 1.78 then
-	//<br />...
-	//<br />end
+	/// Get the display resolution's aspect ratio.
+	// @function GetAspectRatio
+	// @treturn float Display resolution's aspect ratio.
+	// @usage
+	// To compare the aspect ratio with other values, it is recommended to round its value.
+	// <br />local aspectRatio = tonumber(string.format("%.2f", TEN.Util.GetDisplayAspectRatio()))
+	// <br />if aspectRatio == 1.78 then
+	// <br />	...
+	// <br />end
 	static float GetDisplayAspectRatio()
 	{
 		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
