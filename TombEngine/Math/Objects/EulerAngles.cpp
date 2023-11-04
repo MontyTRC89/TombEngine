@@ -12,13 +12,13 @@ using namespace TEN::Math;
 //{
 	const EulerAngles EulerAngles::Zero = EulerAngles(0, 0, 0);
 
-	EulerAngles::EulerAngles(const Vector3& direction)
+	EulerAngles::EulerAngles(const Vector3& dir)
 	{
-		auto directionNorm = direction;
-		directionNorm.Normalize();
+		auto normalizedDir = dir;
+		normalizedDir.Normalize();
 
-		x = FROM_RAD(-asin(directionNorm.y));
-		y = FROM_RAD(atan2(directionNorm.x, directionNorm.z));
+		x = FROM_RAD(-asin(normalizedDir.y));
+		y = FROM_RAD(atan2(normalizedDir.x, normalizedDir.z));
 		z = 0;
 	}
 
@@ -191,19 +191,19 @@ using namespace TEN::Math;
 		return *this;
 	}
 
-	EulerAngles& EulerAngles::operator *=(float scale)
+	EulerAngles& EulerAngles::operator *=(float scalar)
 	{
-		x *= scale;
-		y *= scale;
-		z *= scale;
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
 		return *this;
 	}
 
-	EulerAngles& EulerAngles::operator /=(float scale)
+	EulerAngles& EulerAngles::operator /=(float scalar)
 	{
-		x /= scale;
-		y /= scale;
-		z /= scale;
+		x /= scalar;
+		y /= scalar;
+		z /= scalar;
 		return *this;
 	}
 
@@ -222,14 +222,14 @@ using namespace TEN::Math;
 		return EulerAngles(x * eulers.x, y * eulers.y, z * eulers.z);
 	}
 
-	EulerAngles EulerAngles::operator *(float scale) const
+	EulerAngles EulerAngles::operator *(float scalar) const
 	{
-		return EulerAngles((short)round(x * scale), (short)round(y * scale), (short)round(z * scale));
+		return EulerAngles((short)round(x * scalar), (short)round(y * scalar), (short)round(z * scalar));
 	}
 
-	EulerAngles EulerAngles::operator /(float scale) const
+	EulerAngles EulerAngles::operator /(float scalar) const
 	{
-		return EulerAngles((short)round(x / scale), (short)round(y / scale), (short)round(z / scale));
+		return EulerAngles((short)round(x / scalar), (short)round(y / scalar), (short)round(z / scalar));
 	}
 
 	float EulerAngles::ClampAlpha(float alpha)

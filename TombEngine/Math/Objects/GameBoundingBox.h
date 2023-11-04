@@ -36,7 +36,7 @@ struct ObjectInfo;
 		Vector3 GetExtents() const;
 
 		// Utilities
-		void RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds);
+		void Rotate(const EulerAngles& rot);
 
 		// Converters
 		BoundingOrientedBox ToBoundingOrientedBox(const Pose& pose) const;
@@ -47,7 +47,7 @@ struct ObjectInfo;
 		GameBoundingBox operator +(const Pose& pose) const;
 		GameBoundingBox operator -(const GameBoundingBox& bounds) const;
 		GameBoundingBox operator -(const Pose& pose) const;
-		GameBoundingBox operator *(float scale) const;
-		GameBoundingBox operator /(float scale) const;
+		GameBoundingBox operator *(float scalar) const;
+		GameBoundingBox operator /(float scalar) const;
 	};
 //}

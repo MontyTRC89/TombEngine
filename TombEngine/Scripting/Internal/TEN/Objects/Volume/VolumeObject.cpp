@@ -111,12 +111,13 @@ bool Volume::GetActive() const
 
 Vec3 Volume::GetPos() const
 {
-	return Vec3{ (int)m_volume.Box.Center.x, (int)m_volume.Box.Center.y, (int)m_volume.Box.Center.z };
+	return Vec3(m_volume.Box.Center.x, m_volume.Box.Center.y, m_volume.Box.Center.z);
 }
 
 void Volume::SetPos(const Vec3& pos)
 {
-	m_volume.Box.Center = m_volume.Sphere.Center = Vector3i(pos).ToVector3();
+	m_volume.Box.Center =
+	m_volume.Sphere.Center = Vector3i(pos).ToVector3();
 }
 
 Rotation Volume::GetRot() const

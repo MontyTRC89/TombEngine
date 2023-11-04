@@ -19,7 +19,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Collision::Room;
@@ -2135,9 +2135,6 @@ void InitializeItemBoxData()
 	for (int i = 0; i < g_Level.Items.size(); i++)
 	{
 		auto* currentItem = &g_Level.Items[i];
-
-		if (currentItem->Active && currentItem->Data.is<PushableInfo>())
-			ClearMovableBlockSplitters(currentItem->Pose.Position, currentItem->RoomNumber);
 	}
 
 	for (auto& room : g_Level.Rooms)

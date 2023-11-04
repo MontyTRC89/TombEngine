@@ -133,7 +133,8 @@ namespace TEN::Entities::TR4
                         {
                             target = &g_Level.Items[targetItem];
 
-                            if (target->ObjectNumber >= ID_PUSHABLE_OBJECT1 && target->ObjectNumber <= ID_PUSHABLE_OBJECT10)
+                            if (    (target->ObjectNumber >= ID_PUSHABLE_OBJECT1 && target->ObjectNumber <= ID_PUSHABLE_OBJECT10) ||
+                                    (target->ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && target->ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10))
                             {
                                 if (item->Pose.Position.x == target->Pose.Position.x &&
                                     item->Pose.Position.z == target->Pose.Position.z)
