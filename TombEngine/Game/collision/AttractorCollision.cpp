@@ -110,6 +110,18 @@ namespace TEN::Collision::Attractor
 		auto sphere = BoundingSphere(probePoint, detectRadius);
 		auto nearbyAttracPtrs = std::vector<Attractor*>{};
 
+		// Draw debug sphere.
+		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
+
+		// TEMP
+		// Get debug attractors.
+		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
+		for (auto* attracPtr : debugAttracPtrs)
+		{
+			if (sphere.Intersects(attracPtr->GetBox()))
+				nearbyAttracPtrs.push_back(attracPtr);
+		}
+
 		// Get attractors in neighboring rooms.
 		auto& room = g_Level.Rooms[roomNumber];
 		for (int roomNumber : room.neighbors)
@@ -122,25 +134,21 @@ namespace TEN::Collision::Attractor
 			}
 		}
 
-		// TODO: Way of dealing with dynamic attractors.
+		// TODO: Way of dealing with dynamic bridge attractors. Potential solution:
+		// 1) Run through all sectors in each neighboring room.
+		// 2) Collect unique bridge item numbers in a std::set.
+		// 3) Get bridge ItemData variant BridgeObject (TODO).
+		// 4) Get the attractor contained in the BridgeObject.
+		// Bridge construction/destruction ends up simple.
+		// The Initialize() function generates the attractor, Control() updates it if the Pose has changed,
+		// and the destructor cleans up by detaching players.
+
 		// Get bridge attractors.
 		for (auto& [itemNumber, attrac] : g_Level.BridgeAttractors)
 		{
 			if (sphere.Intersects(attrac.GetBox()))
 				nearbyAttracPtrs.push_back(&attrac);
 		}
-
-		// TEMP
-		// Get debug attractors.
-		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
-		for (auto* attracPtr : debugAttracPtrs)
-		{
-			if (sphere.Intersects(attracPtr->GetBox()))
-				nearbyAttracPtrs.push_back(attracPtr);
-		}
-
-		// Draw debug sphere.
-		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
 
 		// Return pointers to approximately nearby attractors from sphere-AABB tests.
 		return nearbyAttracPtrs;
