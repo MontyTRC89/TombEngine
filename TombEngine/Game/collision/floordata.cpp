@@ -135,14 +135,14 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 	}
 	else
 	{
-		int x = roomPos.x * BLOCK(1);
-		int z = roomPos.y * BLOCK(1);
-
 		// TODO: Wrong offset.
 		// Set points.
 		auto points = std::vector<Vector3>{};
 		for (int i = 0; i < QUAD_POINT_COUNT; i++)
 		{
+			int x = roomPos.x * BLOCK(1);
+			int z = roomPos.y * BLOCK(1);
+
 			if (i == 0)
 			{
 				x += 1;
