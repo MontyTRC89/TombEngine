@@ -57,7 +57,7 @@ Lua API changes:
 * Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.
 * Fix activation of a flipped room when using SetPos() script command or position change node.
 * Add extra parameter to GiveItem() function to optionally display an inventory item given to the player in the pickup summary.
-* The DisplayString constructor now takes a "scale" parameter allowing you to resize text.
+* Update DisplayString constructor to take a "scale" parameter, allowing for the resizing of text.
 * The DisplayString constructor's "color" parameter is now optional.
 * Add DisplayString::SetScale() function to resize text.
 * Add DisplayString::GetScale() function to get text scale.
