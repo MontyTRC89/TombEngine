@@ -42,7 +42,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/winmain.h"
 
-using namespace TEN::Collision::Attractors;
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;

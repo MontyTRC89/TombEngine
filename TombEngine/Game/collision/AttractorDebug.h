@@ -3,11 +3,7 @@
 struct CollisionResult;
 struct ItemInfo;
 
-namespace TEN::Collision::Attractors
+namespace TEN::Collision::Attractor
 {
-	class Attractor;
-
 	void HandleAttractorDebug(ItemInfo& item);
-	std::vector<Attractor*> GetDebugAttractorPtrs(ItemInfo& item);
-	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl);;
 }

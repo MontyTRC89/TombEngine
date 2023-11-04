@@ -1,6 +1,6 @@
 #pragma once
 #include "framework.h"
-#include "Game/collision/Attractors.h"
+#include "Game/collision/Attractor.h"
 #include "Game/collision/floordata.h"
 #include "Math/Math.h"
 #include "Specific/newtypes.h"
@@ -8,7 +8,7 @@
 enum class ReverbType;
 struct TriggerVolume;
 
-using namespace TEN::Collision::Attractors;
+using namespace TEN::Collision::Attractor;
 
 constexpr auto MAX_FLIPMAP	= 256;
 constexpr auto NUM_ROOMS	= 1024;

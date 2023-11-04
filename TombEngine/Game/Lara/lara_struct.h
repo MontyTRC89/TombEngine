@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/collision/Attractors.h"
+#include "Game/collision/Attractor.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
@@ -8,7 +8,7 @@ struct FX_INFO;
 struct ItemInfo;
 namespace TEN::Renderer { struct RendererMesh; };
 
-using namespace TEN::Collision::Attractors;
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Math;
 
 // Inventory object constants

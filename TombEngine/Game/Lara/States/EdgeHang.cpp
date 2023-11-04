@@ -2,6 +2,7 @@
 #include "Game/Lara/States/EdgeHang.h"
 
 #include "Game/camera.h"
+#include "Game/collision/AttractorCollision.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
@@ -13,6 +14,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Input;
 
 //------Debug
@@ -41,7 +43,7 @@ namespace TEN::Player
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, probePoint, CONNECT_DIST_THRESHOLD);
-		auto currentAttracColl = currentAttrac.GetCollision(item.Pose.Position.ToVector3(), item.Pose.Orientation, probePoint);
+		auto currentAttracColl = GetAttractorCollision(currentAttrac, item.Pose.Position.ToVector3(), item.Pose.Orientation, probePoint);
 
 		const AttractorCollisionData* attracCollPtr = nullptr;
 		float closestDist = INFINITY;
@@ -145,15 +147,15 @@ namespace TEN::Player
 
 		// Get attractor collisions.
 		auto attracCollCenter = ((chainDistCenter <= 0.0f || chainDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
-			connectingAttracCollCenter->Attrac.GetCollision(basePos, orient, pointCenter) :
-			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointCenter);
+			GetAttractorCollision(connectingAttracCollCenter->Attrac, basePos, orient, pointCenter) :
+			GetAttractorCollision(*handsAttrac.AttracPtr, basePos, orient, pointCenter);
 
 		auto attracCollLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->Attrac.GetCollision(basePos, orient, pointLeft) :
-			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointLeft);
+			GetAttractorCollision(connectingAttracCollLeft->Attrac, basePos, orient, pointLeft) :
+			GetAttractorCollision(*handsAttrac.AttracPtr, basePos, orient, pointLeft);
 		auto attracCollRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->Attrac.GetCollision(basePos, orient, pointLeft) :
-			handsAttrac.AttracPtr->GetCollision(basePos, orient, pointRight);
+			GetAttractorCollision(connectingAttracCollRight->Attrac, basePos, orient, pointLeft) :
+			GetAttractorCollision(*handsAttrac.AttracPtr, basePos, orient, pointRight);
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);

@@ -1,10 +1,9 @@
 #pragma once
 
-class EulerAngles;
 struct CollisionResult;
 struct ItemInfo;
 
-namespace TEN::Collision::Attractors
+namespace TEN::Collision::Attractor
 {
 	class Attractor;
 
@@ -17,27 +16,6 @@ namespace TEN::Collision::Attractors
 		ZipLine,
 		Tightrope,
 		Pinnacle*/
-	};
-
-	struct AttractorProximityData
-	{
-		Vector3		 Intersection  = Vector3::Zero;
-		float		 Distance	   = 0.0f;
-		float		 ChainDistance = 0.0f;
-		unsigned int SegmentID	   = 0;
-	};
-
-	struct AttractorCollisionData
-	{
-		Attractor& Attrac;
-
-		AttractorProximityData Proximity = {};
-		short HeadingAngle	  = 0;
-		short SlopeAngle	  = 0;
-		bool  IsFacingForward = false;
-		bool  IsInFront		  = false;
-
-		AttractorCollisionData(Attractor& attrac) : Attrac(attrac) {};
 	};
 
 	class Attractor
@@ -73,9 +51,8 @@ namespace TEN::Collision::Attractors
 		bool IsLooped() const;
 
 		// Utilities
-		AttractorCollisionData GetCollision(const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint);
-		Vector3				   GetPointAtChainDistance(float chainDist) const;
-		unsigned int		   GetSegmentIDAtChainDistance(float chainDist) const;
+		Vector3		 GetPointAtChainDistance(float chainDist) const;
+		unsigned int GetSegmentIDAtChainDistance(float chainDist) const;
 
 		void Update(const std::vector<Vector3>& points, int roomNumber);
 		void AttachPlayer(ItemInfo& itemNumber);
@@ -85,15 +62,11 @@ namespace TEN::Collision::Attractors
 
 	private:
 		// Helpers
-		AttractorProximityData GetProximity(const Vector3& probePoint) const;
 		float NormalizeChainDistance(float chainDist) const;
 		void  CacheLength();
 		void  CacheBox();
 	};
 
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
-															   const Vector3& probePoint, float detectRadius);
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& probePoint, float detectRadius);
-
-	Attractor GenerateAttractorFromPoints(std::vector<Vector3> points, int roomNumber, AttractorType type, bool isClosedLoop = true);
+	// TEMP
+	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl);
 }

@@ -3,7 +3,8 @@
 
 #include <ois/OISKeyboard.h>
 
-#include "Game/collision/Attractors.h"
+#include "Game/collision/Attractor.h"
+#include "Game/collision/AttractorCollision.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -13,7 +14,7 @@ using namespace TEN::Input;
 
 // NOTE: Temporary file.
 
-namespace TEN::Collision::Attractors
+namespace TEN::Collision::Attractor
 {
 	static void InitAttractors(ItemInfo& item)
 	{
@@ -47,12 +48,12 @@ namespace TEN::Collision::Attractors
 
 			angle += STEP_ANGLE;
 		}
+		points.push_back(points.front());
 
 		if (isOuter)
 			std::reverse(points.begin(), points.end());
 
-		auto attrac = GenerateAttractorFromPoints(points, item.RoomNumber, AttractorType::Edge);
-		player.Context.DebugAttracs.Attrac2 = attrac;
+		player.Context.DebugAttracs.Attrac2 = Attractor(AttractorType::Edge, points, item.RoomNumber);
 	}
 
 	static void SetDebugAttractors(ItemInfo& item)
@@ -134,97 +135,5 @@ namespace TEN::Collision::Attractors
 		auto attracColls = GetAttractorCollisions(item, item.Pose.Position.ToVector3(), BLOCK(5));
 		for (const auto& attracColl : attracColls)
 			attracColl.Attrac.DrawDebug();
-	}
-
-	std::vector<Attractor*> GetDebugAttractorPtrs(ItemInfo& item)
-	{
-		auto& player = GetLaraInfo(item);
-
-		auto nearbyAttracPtrs = std::vector<Attractor*>{};
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac0);
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac1);
-		nearbyAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac2);
-
-		for (auto& attrac : player.Context.DebugAttracs.Attracs)
-			nearbyAttracPtrs.push_back(&attrac);
-
-		return nearbyAttracPtrs;
-	}
-
-	static Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem)
-	{
-		constexpr auto TILT_STEP = CLICK(1);
-
-		// Determine tilt offset.
-		int tiltOffset = 0;
-		switch (bridgeItem.ObjectNumber)
-		{
-		default:
-		case ID_BRIDGE_FLAT:
-			break;
-
-		case ID_BRIDGE_TILT1:
-			tiltOffset = TILT_STEP;
-			break;
-
-		case ID_BRIDGE_TILT2:
-			tiltOffset = TILT_STEP * 2;
-			break;
-
-		case ID_BRIDGE_TILT3:
-			tiltOffset = TILT_STEP * 3;
-			break;
-
-		case ID_BRIDGE_TILT4:
-			tiltOffset = TILT_STEP * 4;
-			break;
-		}
-
-		// Determine relative corner points.
-		auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
-		auto point0 = Vector3(box.Extents.x, -box.Extents.y + tiltOffset, box.Extents.z);
-		auto point1 = Vector3(-box.Extents.x, -box.Extents.y, box.Extents.z);
-		auto point2 = Vector3(-box.Extents.x, -box.Extents.y, -box.Extents.z);
-		auto point3 = Vector3(box.Extents.x, -box.Extents.y + tiltOffset, -box.Extents.z);
-
-		// Calculate absolute corner points.
-		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
-		auto points = std::vector<Vector3>
-		{
-			box.Center + Vector3::Transform(point0, rotMatrix),
-			box.Center + Vector3::Transform(point1, rotMatrix),
-			box.Center + Vector3::Transform(point2, rotMatrix),
-			box.Center + Vector3::Transform(point3, rotMatrix)
-		};
-
-		// Generate and return attractor.
-		return GenerateAttractorFromPoints(points, bridgeItem.RoomNumber, AttractorType::Edge);
-	}
-
-	std::vector<Attractor> GenerateSectorAttractors(const CollisionResult& pointColl)
-	{
-		// Invalid sector; return empty vector.
-		if (pointColl.Position.Floor == NO_HEIGHT)
-			return {};
-
-		auto attracs = std::vector<Attractor>{};
-
-		// Generate bridge attractors.
-		for (int bridgeItemNumber : pointColl.BottomBlock->BridgeItemNumbers)
-		{
-			const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-			attracs.push_back(GenerateBridgeAttractor(bridgeItem));
-		}
-
-		// Generate floor attractors.
-		auto pointGroups = pointColl.BottomBlock->GetSurfaceVertices(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
-		for (const auto& points : pointGroups)
-		{
-			if (!points.empty())
-				attracs.push_back(GenerateAttractorFromPoints(points, pointColl.RoomNumber, AttractorType::Edge));
-		}
-
-		// Return generated attractors.
-		return attracs;
 	}
 }
