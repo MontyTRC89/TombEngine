@@ -152,8 +152,6 @@ namespace Util
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
-
-
 	void Register(sol::state* state, sol::table& parent)
 	{
 		auto tableUtil = sol::table(state->lua_state(), sol::create);
