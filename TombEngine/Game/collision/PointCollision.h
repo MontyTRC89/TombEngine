@@ -56,12 +56,16 @@ namespace TEN::Collision
 
 		// Inquirers
 		bool IsWall();
-		bool IsSlipperyFloor(short slopeAngleMin = DEFAULT_SLIPPERY_FLOOR_SLOPE_ANGLE);
-		bool IsSlipperyCeiling(short slopeAngleMin = DEFAULT_SLIPPERY_CEILING_SLOPE_ANGLE);
-		bool IsDiagonalStep();
-		bool HasDiagonalSplit();
-		bool HasFlippedDiagonalSplit();
-		bool HasEnvironmentFlag(RoomEnvFlags envFlag);
+		bool IsIllegalFloor(short slopeAngleMin = DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE);
+		bool IsIllegalCeiling(short slopeAngleMin = DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE);
+		bool IsDiagonalFloorStep();
+		bool IsDiagonalCeilingStep();
+		bool IsFloorDiagonalSplit();
+		bool IsCeilingDiagonalSplit();
+		bool IsFloorFlippedDiagonalSplit();
+		bool IsCeilingFlippedDiagonalSplit();
+
+		bool TestEnvironmentFlag(RoomEnvFlags envFlag);
 
 	private:
 		// Helpers

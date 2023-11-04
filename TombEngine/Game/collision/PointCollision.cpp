@@ -199,36 +199,53 @@ namespace TEN::Collision
 				GetFloorHeight() <= GetCeilingHeight());
 	}
 
-	bool PointCollisionData::IsSlipperyFloor(short slopeAngleMin)
+	bool PointCollisionData::IsIllegalFloor(short slopeAngleMin)
 	{
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
 		return (abs(slopeAngle) >= slopeAngleMin);
 	}
 
-	bool PointCollisionData::IsSlipperyCeiling(short slopeAngleMin)
+	bool PointCollisionData::IsIllegalCeiling(short slopeAngleMin)
 	{
 		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
 		return (abs(slopeAngle) >= slopeAngleMin);
 	}
 
-	bool PointCollisionData::IsDiagonalStep()
+	bool PointCollisionData::IsDiagonalFloorStep()
 	{
 		return GetBottomSector().IsSurfaceDiagonalStep(true);
 	}
+	
+	bool PointCollisionData::IsDiagonalCeilingStep()
+	{
+		return GetTopSector().IsSurfaceDiagonalStep(false);
+	}
 
-	bool PointCollisionData::HasDiagonalSplit()
+	bool PointCollisionData::IsFloorDiagonalSplit()
 	{
 		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
 		return (splitAngle == SurfaceCollisionData::SPLIT_ANGLE_0 || splitAngle == SurfaceCollisionData::SPLIT_ANGLE_1);
 	}
-
-	bool PointCollisionData::HasFlippedDiagonalSplit()
+	
+	bool PointCollisionData::IsCeilingDiagonalSplit()
 	{
-		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
-		return (HasDiagonalSplit() && splitAngle == SurfaceCollisionData::SPLIT_ANGLE_1);
+		float splitAngle = GetTopSector().CeilingCollision.SplitAngle;
+		return (splitAngle == SurfaceCollisionData::SPLIT_ANGLE_0 || splitAngle == SurfaceCollisionData::SPLIT_ANGLE_1);
 	}
 
-	bool PointCollisionData::HasEnvironmentFlag(RoomEnvFlags envFlag)
+	bool PointCollisionData::IsFloorFlippedDiagonalSplit()
+	{
+		float splitAngle = GetBottomSector().FloorCollision.SplitAngle;
+		return (IsDiagonalFloorStep() && splitAngle == SurfaceCollisionData::SPLIT_ANGLE_1);
+	}
+	
+	bool PointCollisionData::IsCeilingFlippedDiagonalSplit()
+	{
+		float splitAngle = GetTopSector().CeilingCollision.SplitAngle;
+		return (IsDiagonalCeilingStep() && splitAngle == SurfaceCollisionData::SPLIT_ANGLE_1);
+	}
+
+	bool PointCollisionData::TestEnvironmentFlag(RoomEnvFlags envFlag)
 	{
 		const auto& room = g_Level.Rooms[RoomNumber];
 		return ((room.flags & envFlag) == envFlag);

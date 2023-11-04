@@ -130,9 +130,9 @@ static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& poin
 	collResult.Position.Ceiling = pointColl.GetCeilingHeight();
 	collResult.Position.Bridge = pointColl.GetFloorBridgeItemNumber();
 	collResult.Position.SplitAngle = pointColl.GetBottomSector().FloorCollision.SplitAngle;
-	collResult.Position.FloorSlope = pointColl.IsSlipperyFloor();
-	collResult.Position.CeilingSlope = pointColl.IsSlipperyCeiling();
-	collResult.Position.DiagonalStep = pointColl.IsDiagonalStep();
+	collResult.Position.FloorSlope = pointColl.IsIllegalFloor();
+	collResult.Position.CeilingSlope = pointColl.IsIllegalCeiling();
+	collResult.Position.DiagonalStep = pointColl.IsDiagonalFloorStep();
 
 	// NOTE: Bridge tilts ignored by old method.
 	collResult.FloorTilt = pointColl.GetBottomSector().GetSurfaceTilt(pointColl.Position.x, pointColl.Position.z, true);
