@@ -13,14 +13,36 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
-	static AttractorProximityData GetAttractorProximity(const Attractor& attrac, const Vector3& probePoint)
+	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint) :
+		Attrac(attrac)
 	{
-		const auto& points = attrac.GetPoints();
+		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
+		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
+
+		// Fill proximity data.
+		Proximity = GetProximity(probePoint);
+
+		// Calculate segment orientation.
+		const auto& points = Attrac.GetPoints();
+		const auto& origin = points[Proximity.SegmentID];
+		const auto& target = points[Proximity.SegmentID + 1];
+		auto attracOrient = (points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
+
+		// Fill remaining collision data.
+		HeadingAngle = attracOrient.y + HEADING_ANGLE_OFFSET;
+		SlopeAngle = attracOrient.x;
+		IsFacingForward = (abs(Geometry::GetShortestAngle(HeadingAngle, orient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD);
+		IsInFront = Geometry::IsPointInFront(basePos, Proximity.Intersection, orient);
+	}
+
+	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& probePoint) const
+	{
+		const auto& points = Attrac.GetPoints();
 
 		// 1 point exists; return simple attractor proximity data.
 		if (points.size() == 1)
 		{
-			return AttractorProximityData
+			return ProximityData
 			{
 				points.front(),
 				Vector3::Distance(probePoint, points.front()),
@@ -29,7 +51,7 @@ namespace TEN::Collision::Attractor
 			};
 		}
 
-		auto attracProx = AttractorProximityData{ points.front(), INFINITY, 0.0f, 0 };
+		auto attracProx = ProximityData{ points.front(), INFINITY, 0.0f, 0 };
 		float chainDistTravelled = 0.0f;
 
 		// Find closest point along attractor.
@@ -68,30 +90,7 @@ namespace TEN::Collision::Attractor
 
 	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint)
 	{
-		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
-		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
-
-		const auto& points = attrac.GetPoints();
-
-		// Create attractor collision.
-		auto attracColl = AttractorCollisionData(attrac);
-
-		// Fill attractor proximity.
-		attracColl.Proximity = GetAttractorProximity(attrac, probePoint);
-
-		// Calculate segment orientation.
-		const auto& origin = points[attracColl.Proximity.SegmentID];
-		const auto& target = points[attracColl.Proximity.SegmentID + 1];
-		auto attracOrient = (points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
-
-		// Fill remaining collision data.
-		attracColl.HeadingAngle = attracOrient.y + HEADING_ANGLE_OFFSET;
-		attracColl.SlopeAngle = attracOrient.x;
-		attracColl.IsFacingForward = (abs(Geometry::GetShortestAngle(attracColl.HeadingAngle, orient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD);
-		attracColl.IsInFront = Geometry::IsPointInFront(basePos, attracColl.Proximity.Intersection, orient);
-
-		// Return attractor collision.
-		return attracColl;
+		return AttractorCollisionData(attrac, basePos, orient, probePoint);
 	}
 
 	// Debug
