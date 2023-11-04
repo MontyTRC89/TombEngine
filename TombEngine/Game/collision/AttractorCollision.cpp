@@ -39,16 +39,11 @@ namespace TEN::Collision::Attractor
 	{
 		const auto& points = Attrac.GetPoints();
 
-		// 1 point exists; return simple attractor proximity data.
+		// 1 point exists; return simple proximity data.
 		if (points.size() == 1)
 		{
-			return ProximityData
-			{
-				points.front(),
-				Vector3::Distance(probePoint, points.front()),
-				0.0f,
-				0
-			};
+			float dist = Vector3::Distance(probePoint, points.front());
+			return ProximityData{ points.front(), dist, 0.0f, 0 };
 		}
 
 		auto attracProx = ProximityData{ points.front(), INFINITY, 0.0f, 0 };
