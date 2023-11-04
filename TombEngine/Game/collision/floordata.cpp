@@ -135,7 +135,6 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 	}
 	else
 	{
-		// TODO: Wrong offset.
 		// Set points.
 		auto points = std::vector<Vector3>{};
 		for (int i = 0; i < QUAD_POINT_COUNT; i++)
