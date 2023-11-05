@@ -75,6 +75,7 @@
   <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
   <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
   <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -99,20 +100,20 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#GiveItem">GiveItem(item[, count])</a></td>
-	<td class="summary">Add x of an item to the inventory.</td>
+	<td class="name" ><a href="#GiveItem">GiveItem(objectID[, count][, addToPickupSummary])</a></td>
+	<td class="summary">Add an item to the player's inventory.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#TakeItem">TakeItem(item[, count])</a></td>
-	<td class="summary">Remove x of a certain item from the inventory.</td>
+	<td class="name" ><a href="#TakeItem">TakeItem(Object[, count])</a></td>
+	<td class="summary">Remove an item from the player's inventory.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetItemCount">GetItemCount(item)</a></td>
-	<td class="summary">Get the amount the player holds of an item.</td>
+	<td class="name" ><a href="#GetItemCount">GetItemCount(objectID)</a></td>
+	<td class="summary">Get the amount of an item held in the player's inventory.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetItemCount">SetItemCount(item, count)</a></td>
-	<td class="summary">Set the amount of a certain item the player has in the inventory.</td>
+	<td class="name" ><a href="#SetItemCount">SetItemCount(objectID, count)</a></td>
+	<td class="summary">Set the amount of an item in the player's inventory.</td>
 	</tr>
 </table>
 
@@ -125,27 +126,27 @@
     <dl class="function">
     <dt>
     <a name = "GiveItem"></a>
-    <strong>GiveItem(item[, count])</strong>
+    <strong>GiveItem(objectID[, count][, addToPickupSummary])</strong>
     </dt>
     <dd>
-    Add x of an item to the inventory.
-Omitting the second argument will give the "default" amount of the item
-(i.e. the amount the player would get from a pickup of that type).
-For example, giving crossbow ammo without specifying the number would give the player
-10 instead.
-Has no effect if the player has an infinite number of that item.
+    Add an item to the player's inventory.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">item</span>
+        <li><span class="parameter">objectID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         the item to be added
+         Object ID of the item to add.
         </li>
         <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-         the number of items to add (default: the amount you would get from a pickup)
+         The amount of items to add. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">addToPickupSummary</span>
+            <span class="types"><span class="type">bool</span></span>
+         If true, display the item in the pickup summary. Default is false.
          (<em>optional</em>)
         </li>
     </ul>
@@ -157,24 +158,22 @@ Has no effect if the player has an infinite number of that item.
 </dd>
     <dt>
     <a name = "TakeItem"></a>
-    <strong>TakeItem(item[, count])</strong>
+    <strong>TakeItem(Object[, count])</strong>
     </dt>
     <dd>
-    Remove x of a certain item from the inventory.
-As in <a href="../1 modules/Inventory.html#GiveItem">GiveItem</a>, omitting the count will remove the "default" amount of that item.
-Has no effect if the player has an infinite number of the item.
+    Remove an item from the player's inventory.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">item</span>
+        <li><span class="parameter">Object</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         the item to be removed
+         ID of the item to remove.
         </li>
         <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-         the number of items to remove (default: the amount you would get from a pickup)
+         The amount of items to remove. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.
          (<em>optional</em>)
         </li>
     </ul>
@@ -186,18 +185,18 @@ Has no effect if the player has an infinite number of the item.
 </dd>
     <dt>
     <a name = "GetItemCount"></a>
-    <strong>GetItemCount(item)</strong>
+    <strong>GetItemCount(objectID)</strong>
     </dt>
     <dd>
-    Get the amount the player holds of an item.
+    Get the amount of an item held in the player's inventory.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">item</span>
+        <li><span class="parameter">objectID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         the ID item to check
+         Object ID of the item to check.
         </li>
     </ul>
 
@@ -205,7 +204,7 @@ Has no effect if the player has an infinite number of the item.
     <ol>
 
            <span class="types"><span class="type">int</span></span>
-        the amount of the item the player has in the inventory. -1 indicates an infinite amount of that item.
+        The amount of items. -1 indicates infinity.
     </ol>
 
 
@@ -214,23 +213,22 @@ Has no effect if the player has an infinite number of the item.
 </dd>
     <dt>
     <a name = "SetItemCount"></a>
-    <strong>SetItemCount(item, count)</strong>
+    <strong>SetItemCount(objectID, count)</strong>
     </dt>
     <dd>
-    Set the amount of a certain item the player has in the inventory.
-Similar to <a href="../1 modules/Inventory.html#GiveItem">GiveItem</a> but replaces with the new amount instead of adding it.
+    Set the amount of an item in the player's inventory.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">item</span>
+        <li><span class="parameter">objectID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         the ID of the item to be set.
+         Object ID of the item amount to set.
         </li>
         <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-         the number of items the player will have. A value of -1 will give an infinite amount of that item.
+         The amount of items to set. -1 indicates infinity.
         </li>
     </ul>
 
@@ -246,7 +244,7 @@ Similar to <a href="../1 modules/Inventory.html#GiveItem">GiveItem</a> but repla
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-07-20 12:10:11 </i>
+<i style="float:right;">Last updated 2023-09-30 13:48:57 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

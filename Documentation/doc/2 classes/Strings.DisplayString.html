@@ -75,6 +75,7 @@
   <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
   <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
   <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -104,7 +105,7 @@ when you need to use screen-space coordinates.</p>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#DisplayString">DisplayString(str, x, y, color, translated, flags)</a></td>
+	<td class="name" ><a href="#DisplayString">DisplayString(string, x, y[, scale][, color][, translated][, flags])</a></td>
 	<td class="summary">Create a DisplayString.</td>
 	</tr>
 	<tr>
@@ -122,6 +123,14 @@ when you need to use screen-space coordinates.</p>
 	<tr>
 	<td class="name" ><a href="#DisplayString:SetKey">DisplayString:SetKey(string)</a></td>
 	<td class="summary">Set the string key to use.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#DisplayString:SetScale">DisplayString:SetScale(scale)</a></td>
+	<td class="summary">Set the scale of the string.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#DisplayString:GetScale">DisplayString:GetScale()</a></td>
+	<td class="summary">Get the scale of the string.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#DisplayString:SetPosition">DisplayString:SetPosition(x, y)</a></td>
@@ -150,45 +159,54 @@ when you need to use screen-space coordinates.</p>
     <dl class="function">
     <dt>
     <a name = "DisplayString"></a>
-    <strong>DisplayString(str, x, y, color, translated, flags)</strong>
+    <strong>DisplayString(string, x, y[, scale][, color][, translated][, flags])</strong>
     </dt>
     <dd>
     Create a DisplayString.
-For use in <a href="../1 modules/Strings.html#ShowString">ShowString</a> and <a href="../1 modules/Strings.html#HideString">HideString</a>.
+For use in <a href="../1 modules/Strings.html#ShowString"> ShowString </a> and <a href="../1 modules/Strings.html#HideString"> HideString </a>.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">str</span>
+        <li><span class="parameter">string</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         string to print or key of translated string
+         The string to display or key of the translated string.
         </li>
         <li><span class="parameter">x</span>
             <span class="types"><span class="type">int</span></span>
-         x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
+         X component of the string.
         </li>
         <li><span class="parameter">y</span>
             <span class="types"><span class="type">int</span></span>
-         y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
+         Y component of the string.
+        </li>
+        <li><span class="parameter">scale</span>
+            <span class="types"><span class="type">float</span></span>
+         size of the string, relative to the default size. <strong>Default: 1.0</strong>
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         the color of the text
+         the color of the text. <strong>Default: white</strong>
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">translated</span>
             <span class="types"><span class="type">bool</span></span>
-         if false or omitted, the str argument will be printed.
-If true, the str argument will be the key of a translated string specified in
-strings.lua. <strong>Default: false</strong>.
+         If false or omitted, the input string argument will be displayed.
+If true, the string argument will be the key of a translated string specified in strings.lua. <strong>Default: false</strong>.
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">flags</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         a table of display options. Can be empty or omitted. The possible values and their effects are...</p>
-<pre><code>TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
-TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
+         A table of string display options. Can be empty or omitted. The possible values and their effects are:</p>
+<pre><code>TEN.Strings.DisplayStringOption.CENTER: set the horizontal origin point to the center of the string.
+TEN.Strings.DisplayStringOption.RIGHT: set the horizontal origin point to right of the string.
+TEN.Strings.DisplayStringOption.SHADOW: give the string a small shadow.
+TEN.Strings.DisplayStringOption.BLINK: blink the string.
 </code></pre>
 <p><strong>Default: empty</strong>
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -262,7 +280,7 @@ TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        a string
+        the string to use
     </ol>
 
 
@@ -288,6 +306,49 @@ TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "DisplayString:SetScale"></a>
+    <strong>DisplayString:SetScale(scale)</strong>
+    </dt>
+    <dd>
+    Set the scale of the string.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">scale</span>
+            <span class="types"><span class="type">float</span></span>
+         the new scale of the text, relative to the default size
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "DisplayString:GetScale"></a>
+    <strong>DisplayString:GetScale()</strong>
+    </dt>
+    <dd>
+    Get the scale of the string.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        scale of the string
+    </ol>
 
 
 
@@ -335,10 +396,10 @@ TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
     <ol>
         <li>
            <span class="types"><span class="type">int</span></span>
-        x x-coordinate of the string</li>
+        x-coordinate of the string</li>
         <li>
            <span class="types"><span class="type">int</span></span>
-        y y-coordinate of the string</li>
+        y-coordinate of the string</li>
     </ol>
 
 
@@ -408,7 +469,7 @@ varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW, TEN.Strings.
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-07-20 12:10:11 </i>
+<i style="float:right;">Last updated 2023-09-30 13:48:57 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
