@@ -146,10 +146,10 @@ namespace TEN::Collision::Attractor
 
 		// Get attractors in neighboring rooms.
 		auto& room = g_Level.Rooms[roomNumber];
-		for (int roomNumber : room.neighbors)
+		for (int neighborRoomNumber : room.neighbors)
 		{
 			// Get room attractors.
-			auto& neighborRoom = g_Level.Rooms[roomNumber];
+			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 			for (auto& attrac : neighborRoom.Attractors)
 			{
 				if (sphere.Intersects(attrac.GetBox()))
