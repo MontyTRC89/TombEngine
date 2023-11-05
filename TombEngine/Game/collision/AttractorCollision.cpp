@@ -184,7 +184,7 @@ namespace TEN::Collision::Attractor
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
-		// Get pointers to approximately nearby attractors from sphere-AABB tests.
+		// Get pointers to approximately nearby attractors.
 		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(probePoint, roomNumber, detectRadius);
 
 		// Get attractor collisions sorted by distance.
@@ -204,7 +204,7 @@ namespace TEN::Collision::Attractor
 		attracColls.reserve(std::min((int)attracCollMap.size(), COLL_COUNT_MAX));
 
 		// Move attractor collisions from map to capped vector.
-		int count = 0;
+		unsigned int count = 0;
 		for (auto& [dist, attracColl] : attracCollMap)
 		{
 			attracColls.push_back(std::move(attracColl));
