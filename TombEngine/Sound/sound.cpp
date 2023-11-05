@@ -631,11 +631,11 @@ void StopSoundTracks(bool excludeAmbience)
 {
 	for (int i = 0; i < (int)SoundTrackType::Count; i++)
 	{
-		auto mode = (SoundTrackType)i;
-		if (excludeAmbience && mode == SoundTrackType::BGM)
+		auto type = (SoundTrackType)i;
+		if (excludeAmbience && type == SoundTrackType::BGM)
 			continue;
 
-		StopSoundTrack((SoundTrackType)i, SOUND_XFADETIME_ONESHOT);
+		StopSoundTrack(type, SOUND_XFADETIME_ONESHOT);
 	}
 }
 

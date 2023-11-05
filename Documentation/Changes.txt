@@ -16,11 +16,16 @@ Version 1.2
 * Fix double drawing additive faces.
 * Fix savegame count not properly increasing.
 * Fix regeneration of non-ammo pickups with OCB 128.
-* Overhaul Pushable blocks:
- - Separate climbable and normal pushable blocks slots.
- - Add new pushable OCB to manipulate pushable block properties.
- - Add new Lara animations for pushing over the block off the edge (both TR1-3 and TR4-5 versions).
- - Fix pushables not working with raising block.
+* Fix vault bug preventing the player from climbing onto ledges out of deeper sections of wade-depth water.
+* Fix cold exposure status not recovering in non-cold wade-depth water.
+* Fix non-elevated combat camera.
+* Fix camera snap when disengaging the look-around mode.
+* Improve head-on wall collision.
+* Overhaul pushables:
+ - Separate climbable and non-climbable pushable object slots.
+ - Add new pushable OCB to manipulate pushable properties.
+ - Add new animations for pushing pushables off edgees (TR1-3 and TR4-5 versions).
+ - Fix pushables not working with raising blocks.
  - Fix miscellaneous pushable bugs.
 * Overhaul look-around feature:
  - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
@@ -42,14 +47,14 @@ Lua API changes:
 * Add DisplaySprite object.
 * Add Flow:EnableLoadSave() function to disable savegames.
 * Add Flow:EnablePointFilter() function to disable bilinear filtering.
-* Add InputGetCursorDisplayPosition() function to get the position of the cursor.
 * Add Lara:GetAmmoType() function to read the ammo that Lara is using.
 * Add Lara:GetControlLock() and Lara:SetControlLock() functions to handle controls locking.
 * Add Logic.HandleEvent() function to call node events.
+* Add Input.GetCursorDisplayPosition() function to get the position of the cursor.
 * Add functions to load, save, delete and check existence of savegames.
 * Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.
 * Make Vec2 and Vec3 objects float-based instead of integer-based.
-* Split and organise functions in `Misc` namespace to appropriate new namespaces.
+* Split and organize functions in `Misc` namespace to appropriate new namespaces.
 * Add Vec2/Vec3 arithmetic for division with a number and multiplication with another Vec2/Vec3.
 * Add various Vec2/Vec3 operations such as Normalize() or Lerp().
 * Add log messages warnings to functions AddCallback and RemoveCallback.
