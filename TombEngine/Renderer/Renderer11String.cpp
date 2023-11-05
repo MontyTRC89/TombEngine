@@ -65,7 +65,9 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					rString.X = pos.x * factor.x;
+					// Calculate indentation to account for string scaling.
+					auto indent = m_gameFont->FindGlyph(line.at(0))->XAdvance * rString.Scale;
+					rString.X = pos.x * factor.x + indent;
 				}
 
 				rString.Y = (pos.y * uiScale) + yOffset;
