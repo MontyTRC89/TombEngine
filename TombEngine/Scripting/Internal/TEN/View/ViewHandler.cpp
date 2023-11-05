@@ -83,13 +83,7 @@ namespace View
 	/// Get the display resolution's aspect ratio.
 	// @function GetAspectRatio
 	// @treturn float Display resolution's aspect ratio.
-	// @usage
-	// To compare the aspect ratio with other values, it is recommended to round its value.
-	// <br />local aspectRatio = tonumber(string.format("%.2f", TEN.Util.GetDisplayAspectRatio()))
-	// <br />if aspectRatio == 1.78 then
-	// <br />	...
-	// <br />end
-	static float GetDisplayAspectRatio()
+	static float GetAspectRatio()
 	{
 		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 		return (screenRes.x / screenRes.y);
@@ -157,7 +151,7 @@ namespace View
 		//@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
 		tableView.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
-		tableView.set_function(ScriptReserved_GetDisplayAspectRatio, &GetDisplayAspectRatio);
+		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_CameraType, CAMERA_TYPE);
