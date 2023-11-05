@@ -134,6 +134,7 @@ static constexpr char ScriptReserved_GetSlotHP[]			= "GetSlotHP";
 static constexpr char ScriptReserved_GetVelocity[]			= "GetVelocity";
 static constexpr char ScriptReserved_SetVelocity[]			= "SetVelocity";
 static constexpr char ScriptReserved_GetFrameNumber[]		= "GetFrame";
+static constexpr char ScriptReserved_GetEndFrame[]			= "GetEndFrame";
 static constexpr char ScriptReserved_SetFrameNumber[]		= "SetFrame";
 static constexpr char ScriptReserved_GetAnimNumber[]		= "GetAnim";
 static constexpr char ScriptReserved_SetAnimNumber[]		= "SetAnim";
@@ -260,6 +261,7 @@ static constexpr char ScriptReserved_CalculateDistance[]			= "CalculateDistance"
 static constexpr char ScriptReserved_CalculateHorizontalDistance[]	= "CalculateHorizontalDistance";
 static constexpr char ScriptReserved_PercentToScreen[]				= "PercentToScreen";
 static constexpr char ScriptReserved_ScreenToPercent[]				= "ScreenToPercent";
+static constexpr char ScriptReserved_GetAspectRatio[]				= "GetAspectRatio";
 static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 
 static constexpr char ScriptReserved_AddCallback[]					= "AddCallback";
