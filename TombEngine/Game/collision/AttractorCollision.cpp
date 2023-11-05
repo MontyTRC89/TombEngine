@@ -89,9 +89,9 @@ namespace TEN::Collision::Attractor
 	}
 
 	// Debug
-	static std::vector<Attractor*> GetDebugAttractorPtrs(ItemInfo& item)
+	static std::vector<Attractor*> GetDebugAttractorPtrs()
 	{
-		auto& player = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*LaraItem);
 
 		auto debugAttracPtrs = std::vector<Attractor*>{};
 		debugAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac0);
@@ -115,20 +115,24 @@ namespace TEN::Collision::Attractor
 
 		// TEMP
 		// Get debug attractors.
-		auto debugAttracPtrs = GetDebugAttractorPtrs(*LaraItem);
+		auto debugAttracPtrs = GetDebugAttractorPtrs();
 		for (auto* attracPtr : debugAttracPtrs)
 		{
 			if (sphere.Intersects(attracPtr->GetBox()))
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
-		// TODO: Way of dealing with dynamic bridge attractors. Potential O(n + k) solution:
+		// TODO: Way of dealing with dynamic bridge attractors.
+		// 
+		// O(n * k) solution:
+		// (n = avg. sector count, k = avg. bridge count)
 		// 1) Run through all sectors in each neighboring room.
 		// 2) Collect unique bridge item numbers in std::set.
 		// 3) Get bridge ItemData variant BridgeObject (TODO).
 		// 4) Get attractor contained in BridgeObject.
 		// 
-		// Possible optimization to O(k) + relatively cheap arithmetic overhead:
+		// Possible optimization to O(m * k) + relatively cheap arithmetic overhead:
+		// (m = avg. subset sector count, k = avg. bridge count)
 		// - Calculate nearby sector room positions in 3x3 vicinity.
 		// - Derive sector IDs from these room positions.
 		// - Collect bridge item numbers of only these sectors.
