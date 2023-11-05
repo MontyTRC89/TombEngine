@@ -105,7 +105,6 @@ struct LEVEL
 	std::vector<ROOM_INFO> Rooms	  = {};
 	std::vector<short>	   FloorData  = {};
 	std::vector<SinkInfo>  Sinks	  = {};
-	std::unordered_map<int, Attractor> BridgeAttractors = {}; // Key = bridge ID
 
 	// Pathfinding data
 	std::vector<BOX_INFO> Boxes	   = {};

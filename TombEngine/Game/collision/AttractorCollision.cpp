@@ -122,32 +122,53 @@ namespace TEN::Collision::Attractor
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
+		// TODO: Way of dealing with dynamic bridge attractors. Potential O(n + k) solution:
+		// 1) Run through all sectors in each neighboring room.
+		// 2) Collect unique bridge item numbers in std::set.
+		// 3) Get bridge ItemData variant BridgeObject (TODO).
+		// 4) Get attractor contained in BridgeObject.
+		// 
+		// Possible optimization to O(k) + relatively cheap arithmetic overhead:
+		// - Calculate nearby sector room positions in 3x3 vicinity.
+		// - Derive sector IDs from these room positions.
+		// - Collect bridge item numbers of only these sectors.
+		// 
+		// Bridge construction/destruction ends up simple.
+		// - Initialize() generates bridge attractor.
+		// - Control() updates attractor if Pose has changed.
+		// - Destructor cleans up by detaching players.
+
+		auto bridgeItemNumbers = std::set<int>{};
+
 		// Get attractors in neighboring rooms.
 		auto& room = g_Level.Rooms[roomNumber];
 		for (int roomNumber : room.neighbors)
 		{
-			auto& neightborRoom = g_Level.Rooms[roomNumber];
-			for (auto& attrac : neightborRoom.Attractors)
+			// Get room attractors.
+			auto& neighborRoom = g_Level.Rooms[roomNumber];
+			for (auto& attrac : neighborRoom.Attractors)
 			{
 				if (sphere.Intersects(attrac.GetBox()))
 					nearbyAttracPtrs.push_back(&attrac);
 			}
+
+			// Get bridge item numbers.
+			for (auto& sector : neighborRoom.floor)
+			{
+				for (int bridgeItemNumber : sector.BridgeItemNumbers)
+					bridgeItemNumbers.insert(bridgeItemNumber);
+			}
 		}
 
-		// TODO: Way of dealing with dynamic bridge attractors. Potential solution:
-		// 1) Run through all sectors in each neighboring room.
-		// 2) Collect unique bridge item numbers in a std::set.
-		// 3) Get bridge ItemData variant BridgeObject (TODO).
-		// 4) Get the attractor contained in the BridgeObject.
-		// Bridge construction/destruction ends up simple.
-		// The Initialize() function generates the attractor, Control() updates it if the Pose has changed,
-		// and the destructor cleans up by detaching players.
-
 		// Get bridge attractors.
-		for (auto& [itemNumber, attrac] : g_Level.BridgeAttractors)
+		for (int bridgeItemNumber : bridgeItemNumbers)
 		{
+			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+			/*auto& bridge = GetBridgeObject(bridgeItem);
+
+			auto& attrac = bridge.Attractor;
 			if (sphere.Intersects(attrac.GetBox()))
-				nearbyAttracPtrs.push_back(&attrac);
+				nearbyAttracPtrs.push_back(&attrac);*/
 		}
 
 		// Return pointers to approximately nearby attractors from sphere-AABB tests.
