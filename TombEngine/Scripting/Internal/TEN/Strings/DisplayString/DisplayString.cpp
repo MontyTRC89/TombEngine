@@ -228,7 +228,7 @@ void DisplayString::SetPosition(const sol::variadic_args& args)
 	{
 		// Handle case when single argument provided.
 		if (args[0].is<Vec2>()) 
-			displayString._position = args[0].as<Vec2>();
+			displayString.get()._position = args[0].as<Vec2>();
 	}
 	else if (args.size() == 2)
 	{
@@ -237,7 +237,7 @@ void DisplayString::SetPosition(const sol::variadic_args& args)
 		{
 			int x = args[0].as<int>();
 			int y = args[1].as<int>();
-			displayString._position = Vec2((int)x, (int)y);
+			displayString.get()._position = Vec2((int)x, (int)y);
 		}
 	}
 	else
