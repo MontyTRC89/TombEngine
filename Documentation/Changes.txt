@@ -1,5 +1,5 @@
 Version 1.2
-==============
+===========
 
 * Fix burning torch not working properly if there are more than 256 objects in a level.
 * Fix grenade and rocket projectiles smoke offset in certain directions.
@@ -44,6 +44,8 @@ Version 1.2
 * Add settings for Mouse Sensitivity and Mouse Smoothing (not used in-game yet).
 
 Lua API changes:
+* Split and organize functions in `Misc` namespace to appropriate new namespaces.
+* Make Vec2 and Vec3 objects float-based instead of integer-based.
 * Add DisplaySprite object.
 * Add Flow:EnableLoadSave() function to disable savegames.
 * Add Flow:EnablePointFilter() function to disable bilinear filtering.
@@ -54,19 +56,17 @@ Lua API changes:
 * Add Logic.HandleEvent() function to call node events.
 * Add Input.GetCursorDisplayPosition() function to get the cursor's position.
 * Add functions to load, save, delete and check existence of savegames.
+* Add extra parameter to GiveItem() function to optionally display an inventory item given to the player in the pickup summary.
 * Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.
-* Make Vec2 and Vec3 objects float-based instead of integer-based.
-* Split and organize functions in `Misc` namespace to appropriate new namespaces.
-* Add Vec2/Vec3 arithmetic for division with a number and multiplication with another Vec2/Vec3.
-* Add various Vec2/Vec3 operators and methods, such as Normalize() and Lerp().
 * Add log messages warnings to functions AddCallback and RemoveCallback.
+* Add Vec2 and Vec3 arithmetic for division with a number and multiplication with another Vec2 or Vec3.
+* Add various Vec2 and Vec3 operators and methods, such as Normalize() and Lerp().
 * Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
 * Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.
 * Fix activation of a flipped room when using SetPos() script command or position change node.
 * Fix Sound:PlaySoundEffect() function when used without optional position argument.
-* Add extra parameter to GiveItem() function to optionally display an inventory item given to the player in the pickup summary.
 * Update DisplayString constructor to take a "scale" parameter, allowing for the resizing of text.
-* The DisplayString constructor's "color" parameter is now optional.
+* Make DisplayString constructor's "color" parameter optional.
 * Add DisplayString::SetScale() function to resize text.
 * Add DisplayString::GetScale() function to get text scale.
 
