@@ -128,26 +128,6 @@ int LaraObject::GetStamina() const
 	return lara->Status.Stamina;
 }
 
-/// Set control lock. All controls will be locked, however, they are still available to read in Lua scripts.
-// @function LaraObject:SetControlLock
-// @tparam bool whether set or not set control lock. 
-// @usage
-// Lara:SetControlLock(true)
-void LaraObject::SetControlLock(bool value)
-{
-	GetLaraInfo(m_item)->Control.Locked = value;
-}
-
-/// Get control lock for Lara.
-// @function LaraObject:GetControlLock
-// @treturn bool current control lock value
-// @usage
-// local areControlsLocked = Lara:GetControlLock()
-bool LaraObject::GetControlLock() const
-{
-	return GetLaraInfo(m_item)->Control.Locked;
-}
-
 /// Get the moveable's airborne status
 // @function Moveable:GetAirborne
 // @treturn (bool) true if Lara state must react to aerial forces.
@@ -421,8 +401,6 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetStamina, &LaraObject::GetStamina,
 			ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
 			ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
-			ScriptReserved_SetControlLock, &LaraObject::SetControlLock,
-			ScriptReserved_GetControlLock, &LaraObject::GetControlLock,
 			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
 			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,
