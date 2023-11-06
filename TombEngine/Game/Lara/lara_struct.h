@@ -680,7 +680,7 @@ enum LaraAnim
 	LA_PICKUP_SARCOPHAGUS = 439,							// Pickup from sarcophagus
 	LA_DRAG_BODY = 440,										// Drag dead body
 	LA_BINOCULARS_IDLE = 441,								// Stand, looking through binoculars
-	LA_BIG_SCORPION_DEATH = 442,							// Big scorpion death
+	LA_UNUSED_442 = 442,
 	LA_ELEVATOR_RECOVER = 443,								// Recover from elevator crash
 																// TODO: 443 is also taken by SETH_DEATH, currently absent from default WAD.
 	LA_MECHANICAL_BEETLE_USE = 444,							// Wind mechanical beetle, place on floor
@@ -841,7 +841,9 @@ enum LaraExtraAnim
 	LEA_STRIKE_GONG = 11,
 	LEA_WILLARD_DEATH = 12,
 	LEA_TRAIN_DEATH_END = 13,
-	LEA_SETH_DEATH = 14
+	LEA_SETH_DEATH = 14,
+	LEA_YETI_DEATH = 15,
+	LEA_BIG_SCORPION_DEATH = 16
 };
 #pragma endregion
 
