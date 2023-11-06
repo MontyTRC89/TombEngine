@@ -393,6 +393,7 @@ void Renderer11::InitializeCommonTextures()
 {
 	// Initialize font.
 	auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
+
 	if (!std::filesystem::is_regular_file(fontPath))
 		throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");
 

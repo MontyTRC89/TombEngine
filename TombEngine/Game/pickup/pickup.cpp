@@ -827,6 +827,9 @@ void RegeneratePickups()
 			case ID_SHOTGUN_AMMO2_ITEM:
 				ammo = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2];
 				break;
+
+			default:
+				continue; // Don't regenerate anything but ammo.
 			}
 
 			if (ammo == 0)
@@ -1087,9 +1090,7 @@ void InitializePickup(short itemNumber)
 			{
 				// Automatically align pickups to the floor surface.
 				auto pointColl = GetCollision(item);
-				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(
-					item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
-					true, true);
+				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(item->Pose.Position, true, true);
 
 				if (bridgeItemNumber != NO_ITEM)
 				{

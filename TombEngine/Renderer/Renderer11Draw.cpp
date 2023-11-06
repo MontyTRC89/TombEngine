@@ -372,7 +372,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawLines2D()
+	void Renderer11::DrawLinesIn2DSpace()
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
@@ -539,9 +539,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawBats(RenderView& view)
 	{
 		if (!Objects[ID_BATS_EMITTER].loaded)
-		{
 			return;
-		}
 
 		RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 
@@ -607,47 +605,43 @@ namespace TEN::Renderer
 			}
 		}
 	}
-
 	void Renderer11::DrawScarabs(RenderView& view)
 	{
 		if (!Objects[ID_LITTLE_BEETLE].loaded)
-		{
 			return;
-		}
 
-		RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
+		const auto& mesh = *GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 
-		int littleBeetlesCount = 0;
-
+		unsigned int beetleCount = 0;
 		for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 		{
-			auto* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
+			const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
 
-			if (beetle->On)
+			if (beetle.On)
 			{
-				RendererRoom& room = m_rooms[beetle->RoomNumber];
+				auto& room = m_rooms[beetle.RoomNumber];
 
-				Matrix translation = Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-				Matrix rotation = beetle->Pose.Orientation.ToRotationMatrix();
-				Matrix world = rotation * translation;
+				auto tMatrix = Matrix::CreateTranslation(beetle.Pose.Position.x, beetle.Pose.Position.y, beetle.Pose.Position.z);
+				auto rotMatrix = beetle.Pose.Orientation.ToRotationMatrix();
+				auto worldMatrix = rotMatrix * tMatrix;
 
-				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].World = world;
-				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].Ambient = room.AmbientLight;
-				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].Color = Vector4::One;
-				m_stInstancedStaticMeshBuffer.StaticMeshes[littleBeetlesCount].LightMode = mesh->LightMode;
-				BindInstancedStaticLights(room.LightsToDraw, littleBeetlesCount);
+				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = worldMatrix;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Color = Vector4::One;
+				m_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = mesh.LightMode;
+				BindInstancedStaticLights(room.LightsToDraw, beetleCount);
 
-				littleBeetlesCount++;
+				beetleCount++;
 			}
 		}
 
-		if (littleBeetlesCount > 0)
+		if (beetleCount > 0)
 		{
 			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), nullptr, 0);
 			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), nullptr, 0);
 
-			UINT stride = sizeof(RendererVertex);
-			UINT offset = 0;
+			unsigned int stride = sizeof(RendererVertex);
+			unsigned int offset = 0;
 
 			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -661,19 +655,17 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 			BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 
-			for (auto& bucket : mesh->Buckets)
+			for (const auto& bucket : mesh.Buckets)
 			{
 				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
-				{
 					continue;
-				}
 
 				SetBlendMode(bucket.BlendMode);
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
 
-				DrawIndexedInstancedTriangles(bucket.NumIndices, littleBeetlesCount, bucket.StartIndex, 0);
+				DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
 
 				m_numStaticsDrawCalls++;
 			}
@@ -1418,15 +1410,15 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
-		ResetDebugVariables();
-		m_Locked = false;
-		 
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
 
-		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+		ResetDebugVariables();
+		m_Locked = false;
+		 
+		auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
-		// Prepare the scene to draw
+		// Prepare scene to draw.
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
 		auto timeRoomsCollector = std::chrono::high_resolution_clock::now();
@@ -1446,39 +1438,38 @@ namespace TEN::Renderer
 		m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
 
-		// Reset GPU state
+		// Reset GPU state.
 		SetBlendMode(BLENDMODE_OPAQUE, true);
 		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
 		SetCullMode(CULL_MODE_CCW, true);
 
-		// Bind and clear render target
+		// Bind and clear render target.
 		m_context->ClearRenderTargetView(m_renderTarget.RenderTargetView.Get(), Colors::Black);
 		m_context->ClearDepthStencilView(m_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		m_context->ClearRenderTargetView(m_depthMap.RenderTargetView.Get(), Colors::White);
 		m_context->ClearDepthStencilView(m_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		ID3D11RenderTargetView* m_pRenderViews[2]; 
-		m_pRenderViews[0] = m_renderTarget.RenderTargetView.Get(); 
-		m_pRenderViews[1] = m_depthMap.RenderTargetView.Get(); 
-		m_context->OMSetRenderTargets(2, &m_pRenderViews[0], m_renderTarget.DepthStencilView.Get());
+		ID3D11RenderTargetView* pRenderViewPtrs[2]; 
+		pRenderViewPtrs[0] = m_renderTarget.RenderTargetView.Get(); 
+		pRenderViewPtrs[1] = m_depthMap.RenderTargetView.Get(); 
+		m_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], m_renderTarget.DepthStencilView.Get());
 
 		m_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
-		// The camera constant buffer contains matrices, camera position, fog values and other 
-		// things that are shared for all shaders
+		// Camera constant buffer contains matrices, camera position, fog values, and other things that are shared for all shaders.
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.fillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.Frame = GlobalCounter;
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 
-		if (level->GetFogEnabled())
+		if (level.GetFogEnabled())
 		{
-			auto fogCol = level->GetFogColor();
-			cameraConstantBuffer.FogColor = Vector4(fogCol.GetR() / 255.0f, fogCol.GetG() / 255.0f, fogCol.GetB() / 255.0f, 1.0f);
-			cameraConstantBuffer.FogMinDistance = level->GetFogMinDistance();
-			cameraConstantBuffer.FogMaxDistance = level->GetFogMaxDistance();
+			auto fogColor = level.GetFogColor();
+			cameraConstantBuffer.FogColor = Vector4(fogColor.GetR() / 255.0f, fogColor.GetG() / 255.0f, fogColor.GetB() / 255.0f, 1.0f);
+			cameraConstantBuffer.FogMinDistance = level.GetFogMinDistance();
+			cameraConstantBuffer.FogMaxDistance = level.GetFogMaxDistance();
 		}
 		else
 		{
@@ -1502,10 +1493,10 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());
 		
-		// Draw the horizon and the sky
+		// Draw horizon and sky.
 		DrawHorizonAndSky(view, m_renderTarget.DepthStencilView.Get());
 		
-		// Draw opaque and alpha test faces
+		// Draw opaque and alpha faces.
 		DrawRooms(view, RendererPass::Opaque);
 		DrawItems(view, RendererPass::Opaque);
 		DrawStatics(view, RendererPass::Opaque);
@@ -1518,11 +1509,10 @@ namespace TEN::Renderer
 		DrawLocusts(view);
 		DrawDebris(view, RendererPass::Opaque);
 
-		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(),
-			m_renderTarget.DepthStencilView.Get());
+		m_context->OMSetRenderTargets(1, m_renderTarget.RenderTargetView.GetAddressOf(), m_renderTarget.DepthStencilView.Get());
 
-		// Do special effects and weather 
-		// NOTE: functions here just fill the sprites to draw array
+		// Prepare special effects and weather.
+		// NOTE: Functions here merely fill array of sprites to draw.
 		DrawFires(view);
 		DrawSmokes(view);
 		DrawSmokeParticles(view);
@@ -1545,11 +1535,19 @@ namespace TEN::Renderer
 		DrawStreamers(view);
 		DrawLaserBarriers(view);
 
-		// Here is where we actually output sprites
+		// Output sprites.
 		DrawSprites(view);
 		DrawLines3D(view);
 
-		// Draw immediately additive and unsorted blended faces, and collect all sorted blend modes faces for later
+		// Collect all sorted blend modes faces for later.
+		DrawRooms(view, RendererPass::CollectSortedFaces);
+		DrawItems(view, RendererPass::CollectSortedFaces);
+		DrawStatics(view, RendererPass::CollectSortedFaces);
+
+		// Draw all sorted blend mode faces collected in previous steps.
+		DrawSortedFaces(view);
+
+		// Draw immediate transparent faces (i.e. additive)
 		DrawRooms(view, RendererPass::Transparent);
 		DrawItems(view, RendererPass::Transparent);
 		DrawStatics(view, RendererPass::Transparent);
@@ -1558,18 +1556,20 @@ namespace TEN::Renderer
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
-		// Draw all sorted blend mode faces collected in the previous steps
-		DrawSortedFaces(view);
-
+		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(target, depthTarget, view);
 
-		// Draw GUI stuff at the end
-		DrawLines2D();
+		// Draw GUI elements at end.
+		DrawLinesIn2DSpace();
 
 		// Draw HUD.
 		g_Hud.Draw(*LaraItem);
 
-		// Draw binoculars or lasersight
+		// Draw display sprites sorted by priority.
+		CollectDisplaySprites(view);
+		DrawDisplaySprites(view);
+
+		// Draw binoculars or lasersight.
 		DrawOverlays(view); 
 
 		time2 = std::chrono::high_resolution_clock::now();
@@ -1820,112 +1820,115 @@ namespace TEN::Renderer
 			return;
 		}
 		 
-		m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), NULL, 0);
-		m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), NULL, 0);
-
-		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
-
-		BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
-		BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
-
-		// Bind vertex and index buffer
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
+		if (rendererPass != RendererPass::CollectSortedFaces)
 		{
-			std::vector<RendererStatic*> statics = it->second;
+			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), NULL, 0);
+			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), NULL, 0);
 
-			RendererStatic* refStatic = statics[0];
-			RendererObject& refStaticObj = *m_staticObjects[refStatic->ObjectNumber];
-			if (refStaticObj.ObjectMeshes.size() == 0)
-				continue;
+			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-			RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
+			BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
+			BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 
-			int staticsCount = (int)statics.size();
-			int bucketSize = INSTANCED_STATIC_MESH_BUCKET_SIZE;
-			int baseStaticIndex = 0;
+			// Bind vertex and index buffer
+			UINT stride = sizeof(RendererVertex);
+			UINT offset = 0;
 
-			while (baseStaticIndex < staticsCount)
+			m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 			{
-				int k = 0;
-				int instanceCount = std::min(bucketSize, staticsCount - baseStaticIndex);
-				int max = std::min(baseStaticIndex + bucketSize, staticsCount);
+				std::vector<RendererStatic*> statics = it->second;
 
-				for (int s = baseStaticIndex; s < max; s++)
+				RendererStatic* refStatic = statics[0];
+				RendererObject& refStaticObj = *m_staticObjects[refStatic->ObjectNumber];
+				if (refStaticObj.ObjectMeshes.size() == 0)
+					continue;
+
+				RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
+
+				int staticsCount = (int)statics.size();
+				int bucketSize = INSTANCED_STATIC_MESH_BUCKET_SIZE;
+				int baseStaticIndex = 0;
+
+				while (baseStaticIndex < staticsCount)
 				{
-					RendererStatic* current = statics[s];
-					RendererRoom* room = &m_rooms[current->RoomNumber];
+					int k = 0;
+					int instanceCount = std::min(bucketSize, staticsCount - baseStaticIndex);
+					int max = std::min(baseStaticIndex + bucketSize, staticsCount);
 
-					m_stInstancedStaticMeshBuffer.StaticMeshes[k].World = current->World;
-					m_stInstancedStaticMeshBuffer.StaticMeshes[k].Color = current->Color;
-					m_stInstancedStaticMeshBuffer.StaticMeshes[k].Ambient = room->AmbientLight;
-					m_stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = refMesh->LightMode;
-					BindInstancedStaticLights(current->LightsToDraw, k);
-					k++;
-				}
-				 
-				baseStaticIndex += bucketSize;
-
-				for (auto& bucket : refMesh->Buckets)
-				{
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+					for (int s = baseStaticIndex; s < max; s++)
 					{
-						continue;
+						RendererStatic* current = statics[s];
+						RendererRoom* room = &m_rooms[current->RoomNumber];
+
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].World = current->World;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].Color = current->Color;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].Ambient = room->AmbientLight;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = refMesh->LightMode;
+						BindInstancedStaticLights(current->LightsToDraw, k);
+						k++;
 					}
 
-					if (bucket.NumVertices == 0)
+					baseStaticIndex += bucketSize;
+
+					for (auto& bucket : refMesh->Buckets)
 					{
-						continue;
-					}
-
-					if (!DoesBlendModeRequireSorting(bucket.BlendMode))
-					{
-						m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
-
-						int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
-
-						for (int pass = 0; pass < passes; pass++)
+						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+							(rendererPass == RendererPass::Transparent)))
 						{
-							if (pass == 0)
+							continue;
+						}
+
+						if (bucket.NumVertices == 0)
+						{
+							continue;
+						}
+
+						if (!DoesBlendModeRequireSorting(bucket.BlendMode))
+						{
+							m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
+
+							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+
+							for (int pass = 0; pass < passes; pass++)
 							{
-								SetBlendMode(bucket.BlendMode);
-								SetAlphaTest(
-									bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
-									ALPHA_TEST_THRESHOLD
-								);
+								if (pass == 0)
+								{
+									SetBlendMode(bucket.BlendMode);
+									SetAlphaTest(
+										(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+										ALPHA_TEST_THRESHOLD);
+								}
+								else
+								{
+									SetBlendMode(BLENDMODE_ALPHABLEND);
+									SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
+								}
+
+								BindTexture(TEXTURE_COLOR_MAP,
+									&std::get<0>(m_staticsTextures[bucket.Texture]),
+									SAMPLER_ANISOTROPIC_CLAMP);
+								BindTexture(TEXTURE_NORMAL_MAP,
+									&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+
+								DrawIndexedInstancedTriangles(bucket.NumIndices, instanceCount, bucket.StartIndex, 0);
+
+								m_numStaticsDrawCalls++;
 							}
-							else
-							{
-								SetBlendMode(BLENDMODE_ALPHABLEND);
-								SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
-							}
-
-							BindTexture(TEXTURE_COLOR_MAP,
-								&std::get<0>(m_staticsTextures[bucket.Texture]),
-								SAMPLER_ANISOTROPIC_CLAMP);
-							BindTexture(TEXTURE_NORMAL_MAP,
-								&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-
-							DrawIndexedInstancedTriangles(bucket.NumIndices, instanceCount, bucket.StartIndex, 0);
-
-							m_numStaticsDrawCalls++;
 						}
 					}
 				}
 			}
 		}
-
-		// Collect sorted blend modes faces ordered by room, if transparent pass
-		if (rendererPass == RendererPass::Transparent)
+		else
 		{
+			// Collect sorted blend modes faces ordered by room, if transparent pass
+
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 			for (auto room : view.RoomsToDraw)
@@ -1940,11 +1943,6 @@ namespace TEN::Renderer
 
 						for (auto& bucket : mesh->Buckets)
 						{
-							if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
-							{
-								continue;
-							}
-
 							if (bucket.NumVertices == 0)
 							{
 								continue;
@@ -1989,19 +1987,19 @@ namespace TEN::Renderer
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
-		// Bind vertex and index buffer
+		// Bind vertex and index buffer.
 		m_context->IASetVertexBuffers(0, 1, m_roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Bind pixel shaders
+		// Bind pixel shaders.
 		m_context->PSSetShader(m_psRooms.Get(), nullptr, 0);
 
 		BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
 		BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 
-		// Bind caustics texture
+		// Bind caustics texture.
 		if (!m_sprites.empty())
 		{
 			int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
@@ -2009,13 +2007,13 @@ namespace TEN::Renderer
 			int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)m_sprites.size());
 			BindTexture(TEXTURE_CAUSTICS, m_sprites[causticsFrame].Texture, SAMPLER_ANISOTROPIC_CLAMP);
 
-			// Strange packing due to particular HLSL 16 bytes alignment requirements
+			// NOTE: Strange packing due to particular HLSL 16 bytes alignment requirements.
 			RendererSprite* causticsSprite = &m_sprites[causticsFrame];
 			m_stRoom.CausticsStartUV = causticsSprite->UV[0];
 			m_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
 		}
 		
-		// Set shadow map data and bind shadow map texture
+		// Set shadow map data and bind shadow map texture.
 		if (m_shadowLight != nullptr)
 		{
 			memcpy(&m_stShadowMap.Light, m_shadowLight, sizeof(ShaderLight));
@@ -2071,44 +2069,48 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
+					if (rendererPass == RendererPass::CollectSortedFaces)
 					{
-						continue;
-					}
-
-					if (DoesBlendModeRequireSorting(bucket.BlendMode))
-					{
-						// Collect transparent faces
-						for (int j = 0; j < bucket.Polygons.size(); j++)
+						if (DoesBlendModeRequireSorting(bucket.BlendMode))
 						{
-							RendererPolygon* p = &bucket.Polygons[j];
+							// Collect transparent faces.
+							for (int j = 0; j < bucket.Polygons.size(); j++)
+							{
+								RendererPolygon* p = &bucket.Polygons[j];
 
-							m_numRoomsTransparentPolygons++;
+								m_numRoomsTransparentPolygons++;
 
-							// As polygon distance, for rooms, we use the farthest vertex distance                            
-							int d1 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
-							int d2 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
-							int d3 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
-							int d4 = 0;
-							if (p->shape == 0)
-								d4 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
+								// As polygon distance, for rooms, we use the farthest vertex distance                            
+								int d1 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
+								int d2 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
+								int d3 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
+								int d4 = 0;
+								if (p->shape == 0)
+									d4 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
 
-							int distance = std::max(std::max(std::max(d1, d2), d3), d4);
+								int distance = std::max(std::max(std::max(d1, d2), d3), d4);
 
-							RendererTransparentFace face;
-							face.type = RendererTransparentFaceType::TRANSPARENT_FACE_ROOM;
-							face.info.polygon = p;
-							face.distance = distance;
-							face.info.animated = bucket.Animated;
-							face.info.texture = bucket.Texture;
-							face.info.room = room;
-							face.info.blendMode = bucket.BlendMode;
-							face.info.bucket = &bucket;
-							room->TransparentFacesToDraw.push_back(face);
+								RendererTransparentFace face;
+								face.type = RendererTransparentFaceType::TRANSPARENT_FACE_ROOM;
+								face.info.polygon = p;
+								face.distance = distance;
+								face.info.animated = bucket.Animated;
+								face.info.texture = bucket.Texture;
+								face.info.room = room;
+								face.info.blendMode = bucket.BlendMode;
+								face.info.bucket = &bucket;
+								room->TransparentFacesToDraw.push_back(face);
+							}
 						}
 					}
 					else
 					{
+						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+							(rendererPass == RendererPass::Transparent)))
+						{
+							continue;
+						}
+
 						int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
 						for (int pass = 0; pass < passes; pass++)
@@ -2178,20 +2180,20 @@ namespace TEN::Renderer
 	
 	void Renderer11::DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget)
 	{
-		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
+		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
 		bool anyOutsideRooms = false;
 		for (int k = 0; k < renderView.RoomsToDraw.size(); k++)
 		{
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[renderView.RoomsToDraw[k]->RoomNumber];
-			if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
+			const auto& nativeRoom = g_Level.Rooms[renderView.RoomsToDraw[k]->RoomNumber];
+			if (nativeRoom.flags & ENV_FLAG_OUTSIDE)
 			{
 				anyOutsideRooms = true;
 				break;
 			}
 		}
 
-		if (!level->Horizon || !anyOutsideRooms)
+		if (!levelPtr->Horizon || !anyOutsideRooms)
 			return;
 
 		if (Lara.Control.Look.OpticRange != 0)
@@ -2201,7 +2203,7 @@ namespace TEN::Renderer
 		UINT offset = 0;
 
 		// Draw sky.
-		Matrix rotation = Matrix::CreateRotationX(PI);
+		auto rotation = Matrix::CreateRotationX(PI);
 
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
@@ -2221,9 +2223,9 @@ namespace TEN::Renderer
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
-				Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
+				auto translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
 					Camera.pos.y - 1536.0f, Camera.pos.z);
-				Matrix world = rotation * translation;
+				auto world = rotation * translation;
 
 				m_stSky.World = (rotation * translation);
 				m_stSky.Color = weather.SkyColor(s);
@@ -2239,7 +2241,7 @@ namespace TEN::Renderer
 
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
-		// Draw horizon
+		// Draw horizon.
 		if (m_moveableObjects[ID_HORIZON].has_value())
 		{
 			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -2247,7 +2249,7 @@ namespace TEN::Renderer
 			m_context->IASetInputLayout(m_inputLayout.Get());
 			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			RendererObject& moveableObj = *m_moveableObjects[ID_HORIZON];
+			auto& moveableObj = *m_moveableObjects[ID_HORIZON];
 
 			m_stSky.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			m_stSky.Color = Vector4::One;
@@ -2259,9 +2261,9 @@ namespace TEN::Renderer
 
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
-				RendererMesh* mesh = moveableObj.ObjectMeshes[k];
+				auto* meshPtr = moveableObj.ObjectMeshes[k];
 
-				for (auto& bucket : mesh->Buckets)
+				for (auto& bucket : meshPtr->Buckets)
 				{
 					if (bucket.NumVertices == 0)
 						continue;
@@ -2271,11 +2273,11 @@ namespace TEN::Renderer
 					BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
 						SAMPLER_ANISOTROPIC_CLAMP);
 
-					// Always render horizon as alpha-blended surface
+					// Always render horizon as alpha-blended surface.
 					SetBlendMode(bucket.BlendMode == BLEND_MODES::BLENDMODE_ALPHATEST ? BLEND_MODES::BLENDMODE_ALPHABLEND : bucket.BlendMode);
 					SetAlphaTest(ALPHA_TEST_NONE, ALPHA_TEST_THRESHOLD);
 
-					// Draw vertices
+					// Draw vertices.
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
 					m_numMoveablesDrawCalls++;
@@ -2283,7 +2285,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		// Clear just the Z-buffer so we can start drawing on top of the horizon
+		// Clear just the Z-buffer to start drawing on top of horizon.
 		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
@@ -2297,19 +2299,12 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RendererPass rendererPass)
 	{
-		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto cameraPos = Camera.pos.ToVector3();
 
 		for (auto& bucket : mesh->Buckets)
 		{
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ (rendererPass == RendererPass::Transparent)))
-			{
-				continue;
-			}
-
 			if (bucket.NumVertices == 0)
-			{
 				continue;
-			}
 
 			if (rendererPass == RendererPass::ShadowMap)
 			{
@@ -2320,34 +2315,43 @@ namespace TEN::Renderer
 
 				m_numMoveablesDrawCalls++;
 			}
-			else if (DoesBlendModeRequireSorting(bucket.BlendMode))
+			else if (rendererPass == RendererPass::CollectSortedFaces)
 			{
-				// Collect transparent faces
-				for (int j = 0; j < bucket.Polygons.size(); j++)
+				if (DoesBlendModeRequireSorting(bucket.BlendMode))
 				{
-					RendererPolygon* p = &bucket.Polygons[j];
+					// Collect transparent faces
+					for (int j = 0; j < bucket.Polygons.size(); j++)
+					{
+						auto* polygonPtr = &bucket.Polygons[j];
 
-					// As polygon distance, for moveables, we use the averaged distance
-					Vector3 centre = Vector3::Transform(
-						p->centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
-					int distance = (centre - cameraPosition).Length();
+						// Use averaged distance as polygon distance for moveables.
+						auto centre = Vector3::Transform(
+							polygonPtr->centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
+						int distance = (centre - cameraPos).Length();
 
-					RendererTransparentFace face;
-					face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
-					face.info.polygon = p;
-					face.distance = distance;
-					face.info.animated = bucket.Animated;
-					face.info.texture = bucket.Texture;
-					face.info.room = room;
-					face.info.item = itemToDraw;
-					face.info.color = itemToDraw->Color;
-					face.info.blendMode = bucket.BlendMode;
-					face.info.bucket = &bucket;
-					room->TransparentFacesToDraw.push_back(face);
+						RendererTransparentFace face;
+						face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
+						face.info.polygon = polygonPtr;
+						face.distance = distance;
+						face.info.animated = bucket.Animated;
+						face.info.texture = bucket.Texture;
+						face.info.room = room;
+						face.info.item = itemToDraw;
+						face.info.color = itemToDraw->Color;
+						face.info.blendMode = bucket.BlendMode;
+						face.info.bucket = &bucket;
+						room->TransparentFacesToDraw.push_back(face);
+					}
 				}
 			}
 			else
 			{
+				if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+					(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
+				{
+					continue;
+				}
+
 				int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
@@ -2362,8 +2366,7 @@ namespace TEN::Renderer
 						SetBlendMode(bucket.BlendMode);
 						SetAlphaTest(
 							bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
-							ALPHA_TEST_THRESHOLD
-						);
+							ALPHA_TEST_THRESHOLD);
 					}
 					else
 					{

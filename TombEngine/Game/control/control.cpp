@@ -13,6 +13,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -62,6 +63,7 @@ using namespace std::chrono;
 using namespace TEN::Effects;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -117,6 +119,9 @@ int DrawPhase(bool isTitle)
 	{
 		g_Renderer.Render();
 	}
+
+	// Clear display sprites.
+	ClearDisplaySprites();
 
 	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
@@ -416,6 +421,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
+	ClearDisplaySprites();
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
@@ -454,12 +460,13 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	{
 		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level->ScriptFileName);
 		g_GameScript->InitCallbacks();
-		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		g_GameStringsHandler->SetCallbackDrawString([](const std::string& key, D3DCOLOR color, const Vec2& pos, float scale, int flags)
 		{
 			g_Renderer.AddString(
-				float(x) / float(g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
-				float(y) / float(g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y,
-				key.c_str(), col, flags);
+				key,
+				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * SCREEN_SPACE_RES.x),
+				((float)pos.y / (float)g_Configuration.ScreenHeight * SCREEN_SPACE_RES.y)),
+				Color(color), scale, flags);
 		});
 	}
 

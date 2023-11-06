@@ -43,8 +43,8 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	int y = item->Pose.Position.y - coll->Setup.Height;
 
 	// Get frontal collision data
-	auto frontLeft  = GetCollision(item->Pose.Position.x + xl, y, item->Pose.Position.z + zl, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
-	auto frontRight = GetCollision(item->Pose.Position.x + xr, y, item->Pose.Position.z + zr, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
+	auto frontLeft  = GetCollision(item->Pose.Position.x + xl, y, item->Pose.Position.z + zl, GetRoom(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).roomNumber);
+	auto frontRight = GetCollision(item->Pose.Position.x + xr, y, item->Pose.Position.z + zr, GetRoom(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).roomNumber);
 
 	// If any of the frontal collision results intersects item bounds, return false, because there is material intersection.
 	// This check helps to filter out cases when Lara is formally facing corner but ledge check returns true because probe distance is fixed.
@@ -63,8 +63,8 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
 
 	// Get floor heights at both points
-	auto left = GetCollision(item->Pose.Position.x + xf + xl, y, item->Pose.Position.z + zf + zl, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber).Position.Floor;
-	auto right = GetCollision(item->Pose.Position.x + xf + xr, y, item->Pose.Position.z + zf + zr, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber).Position.Floor;
+	auto left = GetCollision(item->Pose.Position.x + xf + xl, y, item->Pose.Position.z + zf + zl, GetRoom(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).roomNumber).Position.Floor;
+	auto right = GetCollision(item->Pose.Position.x + xf + xr, y, item->Pose.Position.z + zf + zr, GetRoom(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).roomNumber).Position.Floor;
 
 	// If specified, limit vertical search zone only to nearest height
 	if (heightLimit && (abs(left - y) > CLICK(0.5f) || abs(right - y) > CLICK(0.5f)))
@@ -877,34 +877,39 @@ CollisionResult LaraCeilingCollisionFront(ItemInfo* item, short angle, int dista
 	return probe;
 }
 
-bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll)
+bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
+
+	// Get point collision.
+	auto pointColl = GetCollision(item);
+	int vPos = item->Pose.Position.y;
 
 	if (coll->CollisionType == CT_FRONT ||
-		coll->Middle.FloorSlope ||
-		coll->Middle.Floor >= 0)
+		pointColl.Position.FloorSlope ||
+		(pointColl.Position.Floor - vPos) <= 0)
 	{
 		return false;
 	}
 
-	if (coll->Middle.Floor >= -CLICK(0.5f))
+	if ((pointColl.Position.Floor - vPos) >= -CLICK(0.5f))
+	{
 		SetAnimation(item, LA_STAND_IDLE);
+	}
 	else
 	{
 		SetAnimation(item, LA_ONWATER_TO_WADE_1_STEP);
 		item->Animation.TargetState = LS_IDLE;
 	}
 
-	item->Pose.Position.y += coll->Middle.Floor + CLICK(2.75f) - 9;
+	item->Pose.Position.y = pointColl.Position.Floor;
 	UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
 
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.z = 0;
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
+	ResetPlayerLean(item);
+	item->Animation.Velocity.y = 0.0f;
+	item->Animation.Velocity.z = 0.0f;
 	item->Animation.IsAirborne = false;
-	lara->Control.WaterStatus = WaterStatus::Wade;
+	player.Control.WaterStatus = WaterStatus::Wade;
 
 	return true;
 }
@@ -926,10 +931,24 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 		return false;
 
 	int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
-	if (frontFloor <= -CLICK(2) ||
-		frontFloor > CLICK(1.25f) - 4)
+	if (coll->Front.Bridge == NO_ITEM &&
+		(frontFloor <= -CLICK(2) ||
+		frontFloor > CLICK(1.25f) - 4))
 	{
 		return false;
+	}
+
+	// Extra bridge check.
+	if (coll->Front.Bridge != NO_ITEM)
+	{
+		int bridgeBorder = GetBridgeBorder(coll->Front.Bridge, false) - item->Pose.Position.y;
+		
+		frontFloor = bridgeBorder - CLICK(0.5f);
+		if (frontFloor <= -CLICK(2) ||
+			frontFloor > CLICK(1.25f) - 4)
+		{
+			return false;
+		}
 	}
 
 	if (!TestValidLedge(item, coll))
@@ -980,7 +999,11 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
 	}
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+	if (coll->Front.Bridge == NO_ITEM)
+		UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+	else
+		UpdateLaraRoom(item, -LARA_HEIGHT);
+
 	SnapItemToLedge(item, coll, 1.7f);
 
 	item->Pose.Position.y += frontFloor - 5;
@@ -1067,29 +1090,27 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	auto probe = GetCollision(item);
-	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
+	auto pointColl = GetCollision(item);
+	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, pointColl.RoomNumber);
 
 	if (waterDepth == NO_HEIGHT)
 	{
-		item->Animation.Velocity.y = 0;
+		item->Animation.Velocity.y = 0.0f;
 		item->Pose.Position = coll->Setup.PrevPosition;
 	}
-	// Height check was at CLICK(2) before but changed to this 
-	// because now Lara surfaces on a head level, not mid-body level.
-	else if (waterDepth <= LARA_HEIGHT - LARA_HEADROOM / 2)
+
+	else if (waterDepth <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
+		ResetPlayerLean(item);
 		item->Animation.TargetState = LS_IDLE;
-		item->Pose.Position.y = probe.Position.Floor;
-		item->Pose.Orientation.x = 0;
-		item->Pose.Orientation.z = 0;
+		item->Pose.Position.y = pointColl.Position.Floor;
 		item->Animation.IsAirborne = false;
-		item->Animation.Velocity.z = 0;
-		item->Animation.Velocity.y = 0;
-		lara->Control.WaterStatus = WaterStatus::Wade;
+		item->Animation.Velocity.y = 0.0f;
+		item->Animation.Velocity.z = 0.0f;
+		player.Control.WaterStatus = WaterStatus::Wade;
 	}
 }
 

@@ -76,19 +76,18 @@ most can just be ignored (see usage).
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
 	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@int[opt] room room ID item is in (default: calculated automatically)
+	@int[opt] roomID room ID item is in (default: calculated automatically)
 	@int[opt=0] animNumber anim number
 	@int[opt=0] frameNumber frame number
 	@int[opt=10] hp HP of item
 	@int[opt=0] OCB ocb of item (default 0)
-	@tparam[opt] table AIBits table with AI bits (default {0,0,0,0,0,0})
+	@tparam[opt] table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
 	@treturn Moveable A new Moveable object (a wrapper around the new object)
 	@usage 
 	local item = Moveable(
 		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Vec3(18907, 0, 21201)
-		)
+		Vec3(18907, 0, 21201))
 	*/
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
@@ -265,6 +264,8 @@ void Moveable::Register(sol::table& parent)
 // @function Moveable:GetFrame
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
+
+	ScriptReserved_GetEndFrame, &Moveable::GetEndFrame,
 
 /// Set the object's velocity to specified value.
 // In most cases, only Z and Y components are used as forward and vertical velocity.
@@ -554,7 +555,7 @@ bool Moveable::SetName(const std::string& id)
 // @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
-	return Vec3(m_item->Pose);
+	return Vec3(m_item->Pose.Position);
 }
 
 /// Set the moveable's position
@@ -567,7 +568,7 @@ Vec3 Moveable::GetPos() const
 void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	auto prevPos = m_item->Pose.Position.ToVector3();
-	pos.StoreInPose(m_item->Pose);
+	m_item->Pose.Position = pos.ToVector3i();
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
@@ -865,6 +866,16 @@ void Moveable::SetFrameNumber(int frameNumber)
 	{
 		ScriptWarn("Not setting frame number.");
 	}
+}
+
+/// Get the end frame number of the moveable's active animation.
+// This is the "End Frame" set in WADTool for the animation.
+// @function Moveable:GetEndFrame()
+// @treturn int End frame number of the active animation.	
+int Moveable::GetEndFrame() const
+{
+	const auto& anim = GetAnimData(*m_item);
+	return (anim.frameEnd - anim.frameBase);
 }
 
 bool Moveable::GetActive() const

@@ -70,7 +70,7 @@ void SaveGame::LoadSavegameInfos()
 	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		if (!DoesSaveGameExist(i))
+		if (!DoesSaveGameExist(i, true))
 			continue;
 
 		SavegameInfos[i].Present = true;
@@ -175,11 +175,13 @@ bool SaveGame::IsSaveGameSlotValid(int slot)
 	return true;
 }
 
-bool SaveGame::DoesSaveGameExist(int slot)
+bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 {
 	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
 	{
-		TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
+		if (!silent)
+			TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
+
 		return false;
 	}
 
@@ -583,6 +585,7 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::Minecart> mineOffset;
 		flatbuffers::Offset<Save::UPV> upvOffset;
 		flatbuffers::Offset<Save::Kayak> kayakOffset;
+		flatbuffers::Offset<Save::Pushable> pushableOffset;
 
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
@@ -703,6 +706,44 @@ bool SaveGame::Save(int slot)
 			kayakBuilder.add_water_height(kayak->WaterHeight);
 			kayakOffset = kayakBuilder.Finish();
 		}
+		else if (itemToSerialize.Data.is<PushableInfo>())
+		{
+			auto pushable = (PushableInfo*)itemToSerialize.Data;
+
+			Save::PushableBuilder pushableBuilder{ fbb };
+
+			pushableBuilder.add_pushable_behaviour_state((int)pushable->BehaviorState);
+			pushableBuilder.add_pushable_gravity(pushable->Gravity);
+			pushableBuilder.add_pushable_water_force(pushable->Oscillation);
+
+			pushableBuilder.add_pushable_stack_limit(pushable->Stack.Limit);
+			pushableBuilder.add_pushable_stack_upper(pushable->Stack.ItemNumberAbove);
+			pushableBuilder.add_pushable_stack_lower(pushable->Stack.ItemNumberBelow);
+
+			pushableBuilder.add_pushable_start_x(pushable->StartPos.x);
+			pushableBuilder.add_pushable_start_z(pushable->StartPos.z);
+			pushableBuilder.add_pushable_room_number(pushable->StartPos.RoomNumber);
+
+			pushableBuilder.add_pushable_collider_flag(pushable->UseBridgeCollision);
+
+			pushableBuilder.add_pushable_north_pullable(pushable->EdgeAttribs[0].IsPullable);
+			pushableBuilder.add_pushable_north_pushable(pushable->EdgeAttribs[0].IsPushable);
+			pushableBuilder.add_pushable_north_climbable(pushable->EdgeAttribs[0].IsClimbable);
+
+			pushableBuilder.add_pushable_east_pullable(pushable->EdgeAttribs[1].IsPullable);
+			pushableBuilder.add_pushable_east_pushable(pushable->EdgeAttribs[1].IsPushable);
+			pushableBuilder.add_pushable_east_climbable(pushable->EdgeAttribs[1].IsClimbable);
+
+			pushableBuilder.add_pushable_south_pullable(pushable->EdgeAttribs[2].IsPullable);
+			pushableBuilder.add_pushable_south_pushable(pushable->EdgeAttribs[2].IsPushable);
+			pushableBuilder.add_pushable_south_climbable(pushable->EdgeAttribs[2].IsClimbable);
+
+			pushableBuilder.add_pushable_west_pullable(pushable->EdgeAttribs[3].IsPullable);
+			pushableBuilder.add_pushable_west_pushable(pushable->EdgeAttribs[3].IsPushable);
+			pushableBuilder.add_pushable_west_climbable(pushable->EdgeAttribs[3].IsClimbable);
+
+			pushableOffset = pushableBuilder.Finish();
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			Save::ShortBuilder sb{ fbb };
@@ -784,6 +825,11 @@ bool SaveGame::Save(int slot)
 		{
 			serializedItem.add_data_type(Save::ItemData::Kayak);
 			serializedItem.add_data(kayakOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<PushableInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Pushable);
+			serializedItem.add_data(pushableOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -1243,7 +1289,7 @@ bool SaveGame::Save(int slot)
 				
 			case SavedVarType::Vec3:
 				{
-					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
+					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
 					break;
 				}
 
@@ -1780,6 +1826,41 @@ bool SaveGame::Load(int slot)
 			kayak->Velocity = savedKayak->velocity();
 			kayak->WaterHeight = savedKayak->water_height();
 		}
+		else if (item->Data.is <PushableInfo>())
+		{
+			auto* pushable = (PushableInfo*)item->Data;
+			auto* savedPushable = (Save::Pushable*)savedItem->data();
+
+			pushable->BehaviorState = (PushableBehaviourState)savedPushable->pushable_behaviour_state();
+			pushable->Gravity = savedPushable->pushable_gravity();
+			pushable->Oscillation = savedPushable->pushable_water_force();
+
+			pushable->Stack.Limit = savedPushable->pushable_stack_limit();
+			pushable->Stack.ItemNumberAbove = savedPushable->pushable_stack_upper();
+			pushable->Stack.ItemNumberBelow = savedPushable->pushable_stack_lower();
+
+			pushable->StartPos.x = savedPushable->pushable_start_x();
+			pushable->StartPos.z = savedPushable->pushable_start_z();
+			pushable->StartPos.RoomNumber = savedPushable->pushable_room_number();
+
+			pushable->UseBridgeCollision = savedPushable->pushable_collider_flag();
+
+			pushable->EdgeAttribs[0].IsPullable = savedPushable->pushable_north_pullable();
+			pushable->EdgeAttribs[0].IsPushable = savedPushable->pushable_north_pushable();
+			pushable->EdgeAttribs[0].IsClimbable = savedPushable->pushable_north_climbable();
+
+			pushable->EdgeAttribs[1].IsPullable = savedPushable->pushable_east_pullable();
+			pushable->EdgeAttribs[1].IsPushable = savedPushable->pushable_east_pushable();
+			pushable->EdgeAttribs[1].IsClimbable = savedPushable->pushable_east_climbable();
+
+			pushable->EdgeAttribs[2].IsPullable = savedPushable->pushable_south_pullable();
+			pushable->EdgeAttribs[2].IsPushable = savedPushable->pushable_south_pushable();
+			pushable->EdgeAttribs[2].IsClimbable = savedPushable->pushable_south_climbable();
+
+			pushable->EdgeAttribs[3].IsPullable = savedPushable->pushable_west_pullable();
+			pushable->EdgeAttribs[3].IsPushable = savedPushable->pushable_west_pushable();
+			pushable->EdgeAttribs[3].IsClimbable = savedPushable->pushable_west_climbable();
+		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
 			auto* data = savedItem->data();
@@ -2174,7 +2255,7 @@ bool SaveGame::Load(int slot)
 				{
 					auto stored = var->u_as_vec3()->vec();
 					SavedVar var;
-					var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+					var.emplace<(int)SavedVarType::Vec3>(ToVector3(stored));
 					loadedVars.push_back(var);
 					break;
 				}

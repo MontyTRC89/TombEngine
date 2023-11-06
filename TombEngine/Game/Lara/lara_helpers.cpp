@@ -92,6 +92,184 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.IsMonkeySwinging = false;
 }
 
+void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& water)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Update health status.
+	if (TestEnvironment(ENV_FLAG_DAMAGE, &item) && item.HitPoints > 0)
+		item.HitPoints--;
+
+	// Update poison status.
+	if (player.Status.Poison)
+	{
+		if (player.Status.Poison > LARA_POISON_MAX)
+			player.Status.Poison = LARA_POISON_MAX;
+
+		if (!(Wibble & 0xFF))
+			item.HitPoints -= player.Status.Poison;
+	}
+
+	// Update stamina status.
+	if (player.Status.Stamina < LARA_STAMINA_MAX && item.Animation.ActiveState != LS_SPRINT)
+		player.Status.Stamina++;
+
+	// TODO: Dehardcode values and make cleaner implementation.
+	// Handle environmental status effects.
+	switch (waterStatus)
+	{
+	case WaterStatus::Dry:
+	case WaterStatus::Wade:
+		// TODO: Find best height. -- Sezz 2021.11.10
+		if (water.IsSwamp && player.Context.WaterSurfaceDist < -(LARA_HEIGHT + 8))
+		{
+			if (item.HitPoints >= 0)
+			{
+				player.Status.Air -= 6;
+				if (player.Status.Air < 0)
+				{
+					player.Status.Air = -1;
+					item.HitPoints -= 10;
+				}
+			}
+		}
+		else if (player.Status.Air < LARA_AIR_MAX && item.HitPoints >= 0)
+		{
+			// HACK: Special case for UPV.
+			if (player.Context.Vehicle == NO_ITEM)
+			{
+				player.Status.Air += 10;
+				if (player.Status.Air > LARA_AIR_MAX)
+					player.Status.Air = LARA_AIR_MAX;
+			}
+		}
+
+		if (item.HitPoints >= 0)
+		{
+			if (player.Control.WaterStatus == WaterStatus::Dry)
+			{
+				// HACK: Special case for UPV.
+				if (player.Context.Vehicle != NO_ITEM)
+				{
+					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
+					if (vehicleItem.ObjectNumber == ID_UPV)
+					{
+						auto pointColl = GetCollision(&item, 0, 0, CLICK(1));
+
+						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber));
+						if (water.IsCold)
+						{
+							player.Status.Exposure--;
+							if (player.Status.Exposure <= 0)
+							{
+								player.Status.Exposure = 0;
+								item.HitPoints -= 10;
+							}
+						}
+					}
+				}
+				else
+				{
+					player.Status.Exposure++;
+					if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+						player.Status.Exposure = LARA_EXPOSURE_MAX;
+				}
+			}
+			else
+			{
+				if (water.IsCold)
+				{
+					player.Status.Exposure--;
+					if (player.Status.Exposure <= 0)
+					{
+						player.Status.Exposure = 0;
+						item.HitPoints -= 10;
+					}
+				}
+				else
+				{
+					player.Status.Exposure++;
+					if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+						player.Status.Exposure = LARA_EXPOSURE_MAX;
+				}
+			}
+		}
+
+		break;
+
+	case WaterStatus::Underwater:
+		if (item.HitPoints >= 0)
+		{
+			const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
+			if (level.GetLaraType() != LaraType::Divesuit)
+				player.Status.Air--;
+
+			if (player.Status.Air < 0)
+			{
+				item.HitPoints -= 5;
+				player.Status.Air = -1;
+			}
+
+			if (water.IsCold)
+			{
+				player.Status.Exposure -= 2;
+				if (player.Status.Exposure <= 0)
+				{
+					player.Status.Exposure = 0;
+					item.HitPoints -= 10;
+				}
+			}
+			else
+			{
+				player.Status.Exposure++;
+				if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+					player.Status.Exposure = LARA_EXPOSURE_MAX;
+			}
+		}
+
+		break;
+
+	case WaterStatus::TreadWater:
+		if (item.HitPoints >= 0)
+		{
+			player.Status.Air += 10;
+			if (player.Status.Air > LARA_AIR_MAX)
+				player.Status.Air = LARA_AIR_MAX;
+
+			if (water.IsCold)
+			{
+				player.Status.Exposure -= 2;
+				if (player.Status.Exposure <= 0)
+				{
+					player.Status.Exposure = 0;
+					item.HitPoints -= 10;
+				}
+			}
+		}
+
+		break;
+
+	default:
+		break;
+	}
+
+	// Update death counter.
+	if (item.HitPoints <= 0)
+	{
+		item.HitPoints = -1;
+
+		if (player.Control.Count.Death == 0)
+			StopSoundTracks(true);
+
+		player.Control.Count.Death++;
+		if ((item.Flags & IFLAG_INVISIBLE))
+		{
+			player.Control.Count.Death++;
+			return;
+		}
+	}
+}
+
 static void UsePlayerMedipack(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
@@ -357,6 +535,17 @@ static void SetPlayerOptics(ItemInfo* item)
 	AlterFOV(LastFOV);
 }
 
+static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
+{
+	constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
+	constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
+
+	if (opticRange == 0)
+		return turnRate;
+
+	return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
+};
+
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 {
 	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
@@ -364,17 +553,6 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
 	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
 	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
-
-	auto normalizeTurnRate = [](short turnRate, short opticRange)
-	{
-		constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
-		constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
-
-		if (opticRange == 0)
-			return turnRate;
-
-		return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
-	};
 
 	auto& player = GetLaraInfo(item);
 
@@ -427,14 +605,14 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
 	{
-		axisCoeff.x = AxisMap[InputAxis::MoveVertical];
+		axisCoeff.x = AxisMap[(int)InputAxis::Move].y;
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
-		axisCoeff.y = AxisMap[InputAxis::MoveHorizontal];
+		axisCoeff.y = AxisMap[(int)InputAxis::Move].x;
 	}
 
 	// Determine turn rate base values.
@@ -442,8 +620,8 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	short turnRateAccel = isSlow ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
 
 	// Normalize turn rate base values.
-	turnRateMax = normalizeTurnRate(turnRateMax, player.Control.Look.OpticRange);
-	turnRateAccel = normalizeTurnRate(turnRateAccel, player.Control.Look.OpticRange);
+	turnRateMax = NormalizeLookAroundTurnRate(turnRateMax, player.Control.Look.OpticRange);
+	turnRateAccel = NormalizeLookAroundTurnRate(turnRateAccel, player.Control.Look.OpticRange);
 
 	// Modulate turn rates.
 	player.Control.Look.TurnRate = EulerAngles(
@@ -539,8 +717,8 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 	int jointIndex = 0;
 	for (auto& node : player.Effect.DripNodes)
 	{
-		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
-		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		auto pos = GetJointPosition(&item, jointIndex);
+		int roomNumber = GetRoom(item.Location, pos).roomNumber;
 		jointIndex++;
 
 		// Node underwater; set max wetness value.
@@ -558,7 +736,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 		float chance = (node / PLAYER_DRIP_NODE_MAX) / 2;
 		if (Random::TestProbability(chance))
 		{
-			SpawnWetnessDrip(pos, item.RoomNumber);
+			SpawnWetnessDrip(pos.ToVector3(), item.RoomNumber);
 
 			node -= 1.0f;
 			if (node <= 0.0f)
@@ -576,8 +754,8 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 	int jointIndex = 0;
 	for (auto& node : player.Effect.BubbleNodes)
 	{
-		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
-		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		auto pos = GetJointPosition(&item, jointIndex);
+		int roomNumber = GetRoom(item.Location, pos).roomNumber;
 		jointIndex++;
 
 		// Node inactive; continue.
@@ -593,7 +771,7 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 		if (Random::TestProbability(chance))
 		{
 			unsigned int count = (int)round(node * BUBBLE_COUNT_MULT);
-			SpawnDiveBubbles(pos, roomNumber, count);
+			SpawnDiveBubbles(pos.ToVector3(), roomNumber, count);
 
 			node -= 1.0f;
 			if (node <= 0.0f)
@@ -825,6 +1003,25 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 	return (LaraInfo*&)firstPlayerItem.Data;
 }
 
+PlayerWaterData GetPlayerWaterData(ItemInfo& item)
+{
+	bool isWater = TestEnvironment(ENV_FLAG_WATER, &item);
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
+	bool isCold = TestEnvironment(ENV_FLAG_COLD, &item);
+
+	int waterDepth = GetWaterDepth(&item);
+	int waterHeight = GetWaterHeight(&item);
+
+	auto pointColl = GetCollision(item);
+	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.Position.Floor) - waterHeight);
+
+	return PlayerWaterData
+	{
+		isWater, isSwamp, isCold,
+		waterDepth, waterHeight, heightFromWater
+	};
+}
+
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
@@ -862,14 +1059,14 @@ void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, s
 {
 	auto* lara = GetLaraInfo(item);
 
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
+	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::Move].y, invert);
 }
 
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
@@ -1000,7 +1197,7 @@ void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	if (!item->Animation.Velocity.z)
 		return;
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
@@ -1017,7 +1214,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 	if (!item->Animation.Velocity.z)
 		return;
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 

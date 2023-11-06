@@ -4,12 +4,10 @@
 
 #include "Game/control/volumeactivator.h"
 #include "Game/room.h"
-#include "Scripting/Include/VarMapVal.h"
 #include "Specific/level.h"
 
 typedef DWORD D3DCOLOR;
 
-using CallbackDrawString = std::function<void(const std::string&, D3DCOLOR, int, int, int)>;
 using VarSaveType = std::variant<bool, double, std::string>;
 using IndexTable = std::vector<std::pair<unsigned int, unsigned int>>;
 
@@ -39,7 +37,7 @@ using SavedVar = std::variant<
 	double,
 	IndexTable,
 	Vector2,  // Vec2
-	Vector3i, // Vec3
+	Vector3,  // Vec3
 	Vector3,  // Rotation
 	D3DCOLOR, // Color
 	FuncName>;

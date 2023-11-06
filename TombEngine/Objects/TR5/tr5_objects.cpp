@@ -49,7 +49,6 @@
 #include "Objects/TR5/Object/tr5_genslot.h"
 #include "Objects/TR5/Object/tr5_highobject.h"
 #include "Objects/TR5/Object/tr5_missile.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Objects/TR5/Object/tr5_raisingblock.h"
 #include "Objects/TR5/Switch/tr5_raisingcog.h"
 #include "Objects/TR5/Object/tr5_teleporter.h"
@@ -101,7 +100,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SWAT];
@@ -119,7 +118,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_GUARD1];
@@ -138,7 +137,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SWAT_PLUS];
@@ -158,7 +157,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MAFIA];
@@ -179,7 +178,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SCIENTIST];
@@ -200,7 +199,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_GUARD2];
@@ -221,7 +220,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_GUARD3];
@@ -242,7 +241,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_ATTACK_SUB];
@@ -277,7 +276,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_LION];
@@ -293,7 +292,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetBoneRotationFlags(19, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_DOBERMAN];
@@ -308,7 +307,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 256;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(19, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_HUSKIE];
@@ -323,7 +322,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->radius = 256;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(19, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_REAPER];
@@ -339,7 +338,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->intelligent = true;
 		obj->waterCreature = true;
 		obj->LotType = LotType::Water;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MAFIA2];
@@ -358,7 +357,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->meshSwapSlot = ID_MESHSWAP_MAFIA2;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_PIERRE];
@@ -375,7 +374,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_LARSON];
@@ -392,7 +391,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_CYBORG];
@@ -411,7 +410,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->meshSwapSlot = ID_MESHSWAP_HITMAN;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_SNIPER];
@@ -428,7 +427,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_GUARD_LASER];
@@ -446,7 +445,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_HYDRA];
@@ -463,7 +462,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_IMP];
@@ -480,7 +479,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->meshSwapSlot = ID_MESHSWAP_IMP;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Z);
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_WILLOWISP];
@@ -497,7 +496,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Flyer;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Z);
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_BROWN_BEAST];
@@ -513,7 +512,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Z);
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_LAGOON_WITCH];
@@ -531,7 +530,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Z);
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_INVISIBLE_GHOST];
@@ -548,7 +547,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_RATS_EMITTER];
@@ -591,7 +590,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	for (int i = 0; i < 2; i++)
@@ -611,7 +610,7 @@ static void StartEntity(ObjectInfo *obj)
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 			obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-			obj->SetupHitEffect(true);
+			obj->SetHitEffect(true);
 		}
 	}
 
@@ -625,7 +624,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->usingDrawAnimatingItem = false;
 		obj->damageType = DamageMode::None;
 		obj->nonLot = true;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	InitAnimating(obj, ID_LASERHEAD_BASE);
@@ -640,7 +639,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_Y);
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_GUNSHIP];
@@ -649,7 +648,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->control = ControlGunShip;
 		obj->SetBoneRotationFlags(0, ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X);
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 }
 
@@ -660,9 +659,6 @@ static void StartObject(ObjectInfo *obj)
 	for (int objectNumber = ID_SEARCH_OBJECT1; objectNumber <= ID_SEARCH_OBJECT4; objectNumber++)
 		InitSearchObject(obj, objectNumber);
 
-	for (int objectNumber = ID_PUSHABLE_OBJECT1; objectNumber <= ID_PUSHABLE_OBJECT10; objectNumber++)
-		InitPushableObject(obj, objectNumber);
-
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
 	if (obj->loaded)
 	{
@@ -672,7 +668,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->ceiling = TwoBlocksPlatformCeiling;
 		obj->floorBorder = TwoBlocksPlatformFloorBorder;
 		obj->ceilingBorder = TwoBlocksPlatformCeilingBorder;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	for (int objectNumber = ID_RAISING_BLOCK1; objectNumber <= ID_RAISING_BLOCK4; objectNumber++)
@@ -686,7 +682,7 @@ static void StartObject(ObjectInfo *obj)
 			obj->ceiling = RaisingBlockCeiling;
 			obj->floorBorder = RaisingBlockFloorBorder;
 			obj->ceilingBorder = RaisingBlockCeilingBorder;
-			obj->SetupHitEffect(true);
+			obj->SetHitEffect(true);
 		}
 	}
 
@@ -699,7 +695,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->ceiling = ExpandingPlatformCeiling;
 		obj->floorBorder = ExpandingPlatformFloorBorder;
 		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_ELECTRICAL_LIGHT];
@@ -861,7 +857,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->Initialize = InitializeZipLine;
 		obj->collision = CollideZipLine;
 		obj->control = ControlZipLine;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_PROPELLER_H];
@@ -869,7 +865,7 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeVentilator;
 		obj->control = VentilatorControl;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_PROPELLER_V];
@@ -877,7 +873,7 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeVentilator;
 		obj->control = VentilatorControl;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_ELECTRICAL_CABLES];
@@ -892,7 +888,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->Initialize = InitializeRomeHammer;
 		obj->collision = GenericSphereBoxCollision;
 		obj->control = AnimatingControl;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_FALLING_CEILING];
@@ -908,7 +904,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = RollingBallCollision;
 		obj->control = RollingBallControl;
 		obj->shadowType = ShadowMode::All;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 	
 	obj = &Objects[ID_CLASSIC_ROLLING_BALL];
@@ -917,7 +913,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->Initialize = InitializeClassicRollingBall;
 		obj->control = ClassicRollingBallControl;
 		obj->collision = ClassicRollingBallCollision;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_BIG_ROLLING_BALL];
@@ -926,7 +922,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = ClassicRollingBallCollision;
 		obj->control = ClassicRollingBallControl;
 		obj->Initialize = InitializeClassicRollingBall;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_GEN_SLOT3];
@@ -972,7 +968,7 @@ static void StartSwitch(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeRaisingCog;
 		obj->control = RaisingCogControl;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_CROWDOVE_SWITCH];
@@ -981,7 +977,7 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->Initialize = InitializeCrowDoveSwitch;
 		obj->collision = CrowDoveSwitchCollision;
 		obj->control = CrowDoveSwitchControl;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_WRECKING_BALL];
@@ -990,7 +986,7 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->Initialize = InitializeWreckingBall;
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 }
 
