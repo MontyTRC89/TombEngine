@@ -6,6 +6,7 @@ Version 1.2
 * Fix projectiles flying through animating objects.
 * Fix harpoon gun doing enormous damage on enemies.
 * Fix train death animation.
+* Fix various camera issues with unique death animations.
 * Fix zipline not following correct trajectory.
 * Fix TR1 wolf damage value inflicted on a close bite attack.
 * Fix TR1 bear various original AI issues.
