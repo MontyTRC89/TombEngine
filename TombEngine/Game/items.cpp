@@ -745,8 +745,21 @@ void UpdateAllItems()
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
-			if (Objects[item->ObjectNumber].control)
+			// TODO: Temporary.
+			auto prevPose = item->Pose;
+
+			if (Objects[item->ObjectNumber].control != nullptr)
 				Objects[item->ObjectNumber].control(itemNumber);
+
+			// TODO: Temporary.
+			if (item->Pose != prevPose)
+			{
+				if (item->Attractor.has_value())
+				{
+					auto attrac = GenerateBridgeAttractor(*item);
+					item->Attractor->Update(attrac.GetPoints(), attrac.GetRoomNumber());
+				}
+			}
 
 			TestVolumes(itemNumber);
 			ProcessEffects(item);
