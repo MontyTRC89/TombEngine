@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/items.h"
 
+#include "Game/collision/Attractor.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
@@ -24,6 +25,7 @@
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -570,8 +572,15 @@ void InitializeItem(short itemNumber)
 
 	item->ResetModelToDefault();
 
-	if (Objects[item->ObjectNumber].Initialize != nullptr)
+	const auto& object = Objects[item->ObjectNumber];
+	
+	if (object.Initialize != nullptr)
 		Objects[item->ObjectNumber].Initialize(itemNumber);
+
+	// TODO: Temporary.
+	// Initialize bridge attractor.
+	if (object.floor != nullptr)
+		item->Attractor = GenerateBridgeAttractor(*item);
 }
 
 short CreateItem()

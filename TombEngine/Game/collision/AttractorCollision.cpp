@@ -164,15 +164,16 @@ namespace TEN::Collision::Attractor
 			}
 		}
 
+		// TODO
 		// Get bridge attractors.
 		for (int bridgeItemNumber : bridgeItemNumbers)
 		{
 			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-			/*auto& bridge = GetBridgeObject(bridgeItem);
+			//auto& bridge = GetBridgeObject(bridgeItem);
 
-			auto& attrac = bridge.Attractor;
+			auto& attrac = *bridgeItem.Attractor;//bridge.Attractor;
 			if (sphere.Intersects(attrac.GetBox()))
-				nearbyAttracPtrs.push_back(&attrac);*/
+				nearbyAttracPtrs.push_back(&attrac);
 		}
 
 		// Return pointers to approximately nearby attractors from sphere-AABB tests.

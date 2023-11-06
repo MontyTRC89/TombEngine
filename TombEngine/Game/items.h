@@ -10,6 +10,8 @@
 #include "Specific/newtypes.h"
 #include "Specific/BitField.h"
 
+namespace TEN::Collision::Attractor { class Attractor; };
+
 using namespace TEN::Utils;
 
 constexpr auto NO_ITEM		  = -1;
@@ -149,6 +151,9 @@ struct ItemInfo
 	unsigned char AIBits; // AIObjectType enum.
 	short AfterDeath;
 	short CarriedItem;
+
+	// TODO: Temporary.
+	std::optional<Attractor> Attractor = std::nullopt;
 
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);

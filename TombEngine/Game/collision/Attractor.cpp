@@ -316,7 +316,7 @@ namespace TEN::Collision::Attractor
 		_box = Geometry::GetBoundingBox(_points);
 	}
 
-	static Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem)
+	Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem)
 	{
 		constexpr auto TILT_STEP = CLICK(1);
 
@@ -381,7 +381,7 @@ namespace TEN::Collision::Attractor
 		int minZ = std::max(item.Pose.Position.z - RANGE, room.z) / BLOCK(1);
 		int maxZ = std::min(item.Pose.Position.z + RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
 
-		auto visitedBridgeItemNumbers = std::set<int>{};
+		//auto visitedBridgeItemNumbers = std::set<int>{};
 		for (int x = minX; x < maxX; x++)
 		{
 			for (int z = minZ; z < maxZ; z++)
@@ -394,7 +394,7 @@ namespace TEN::Collision::Attractor
 					continue;
 
 				// Generate bridge attractors.
-				for (int bridgeItemNumber : pointColl.BottomBlock->BridgeItemNumbers)
+				/*for (int bridgeItemNumber : pointColl.BottomBlock->BridgeItemNumbers)
 				{
 					// Check if bridge was already accounted for.
 					auto it = visitedBridgeItemNumbers.find(bridgeItemNumber);
@@ -406,7 +406,7 @@ namespace TEN::Collision::Attractor
 
 					// Track visited bridges.
 					visitedBridgeItemNumbers.insert(bridgeItemNumber);
-				}
+				}*/
 
 				// Generate floor attractors.
 				auto vertexGroups = pointColl.BottomBlock->GetSurfaceVertices(pos.x, pos.z, true);

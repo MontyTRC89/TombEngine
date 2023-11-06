@@ -67,6 +67,8 @@ namespace TEN::Collision::Attractor
 		void  CacheBox();
 	};
 
+	Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem);
+
 	// TEMP
 	std::vector<Attractor> GenerateSectorAttractors(const ItemInfo& item);
 }
