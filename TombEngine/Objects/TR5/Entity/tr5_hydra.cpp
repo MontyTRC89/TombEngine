@@ -155,9 +155,9 @@ namespace TEN::Entities::Creatures::TR5
 		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 		spark->maxYvel = 0;
 		spark->gravity = -8 - (GetRandomControl() & 7);
-		spark->scalar = 0;
+		spark->scalar = 4;
 		spark->dSize = 4;
-		spark->sSize = spark->size = (frame * ((GetRandomControl() & 0xF) + 16)) / 16;
+		spark->sSize = spark->size = (frame * ((GetRandomControl() & 0xF) + 32)) / 16;
 	}
 
 	void HydraControl(short itemNumber)

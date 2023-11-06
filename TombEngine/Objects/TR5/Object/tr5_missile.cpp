@@ -133,7 +133,7 @@ void MissileControl(short itemNumber)
 		else
 		{
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave(&fx->pos, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 2, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&fx->pos, 48, 240, 48, 128, 64, 0, 24, EulerAngles::Zero, 2, true, false, (int)ShockwaveStyle::Normal);
 		}
 		
 		KillEffect(itemNumber);
@@ -172,7 +172,7 @@ void MissileControl(short itemNumber)
 		{
 			// HYDRA hit effect
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave(&fx->pos, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&fx->pos, 48, 240, 48, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
 			if (LaraItem->HitPoints >= 500)
 				DoDamage(LaraItem, 300);
 			else
