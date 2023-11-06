@@ -379,7 +379,7 @@ namespace TEN::Entities::TR4
 
 				if (LaraItem->HitPoints < 0)
 				{
-					SethKillAttack(item, LaraItem);
+					CreatureKill(item, SETH_ANIM_KILL_ATTACK_END, LEA_SETH_DEATH, SETH_STATE_KILL_ATTACK_END, LS_DEATH);
 					ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 6 * FPS);
 					creature.MaxTurn = 0;
 					return;
@@ -654,36 +654,5 @@ namespace TEN::Entities::TR4
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
 		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + flags;
-	}
-
-	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem)
-	{
-		auto& lara = *GetLaraInfo(laraItem);
-
-		SetAnimation(item, SETH_ANIM_KILL_ATTACK_END);
-
-		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_SETH_DEATH );
-		laraItem->Animation.IsAirborne = false;
-		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
-
-		if (item->RoomNumber != laraItem->RoomNumber)
-			ItemNewRoom(laraItem->Index, item->RoomNumber);
-
-		AnimateItem(laraItem);
-		laraItem->HitPoints = -1;
-		lara.ExtraAnim = 1;
-		lara.HitDirection = -1;
-		lara.Status.Air = -1;
-		lara.Control.HandStatus = HandStatus::Busy;
-		lara.Control.Weapon.GunType = LaraWeaponType::None;
-
-		Camera.pos.RoomNumber = laraItem->RoomNumber;
-		Camera.type = CameraType::Fixed;
-		ForcedFixedCamera.x = item->Pose.Position.x + ((BLOCK(2) * phd_sin(item->Pose.Orientation.y)));
-		ForcedFixedCamera.y = item->Pose.Position.y - BLOCK(1);
-		ForcedFixedCamera.z = item->Pose.Position.z + ((BLOCK(2) * phd_cos(item->Pose.Orientation.y)));
-		ForcedFixedCamera.RoomNumber = item->RoomNumber;
-		UseForcedFixedCamera = true;
-
 	}
 }

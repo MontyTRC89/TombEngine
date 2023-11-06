@@ -128,7 +128,7 @@ int LaraObject::GetStamina() const
 	return lara->Status.Stamina;
 }
 
-/// Set control lock for Lara.
+/// Set control lock. All controls will be locked, however, they are still available to read in Lua scripts.
 // @function LaraObject:SetControlLock
 // @tparam bool whether set or not set control lock. 
 // @usage

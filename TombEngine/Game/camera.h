@@ -115,4 +115,4 @@ void UpdateFadeScreenAndCinematicBars();
 void UpdateMikePos(const ItemInfo& item);
 void ClearObjCamera();
 
-float GetParticleDistanceFade(Vector3i position);
+float GetParticleDistanceFade(const Vector3i& pos);

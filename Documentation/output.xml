@@ -433,8 +433,35 @@ __(not yet implemented)__</description>
 
 <function>
 	<module>Flow</module>
+	<name>EnableLoadSave</name>
+	<summary>Enable or disable saving and loading of savegames.</summary>
+	<parameters>
+		<parameter>
+			<name>enabled</name>
+			<type>bool</type>
+			<description>true or false.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
 	<name>EnableFlyCheat</name>
 	<summary>Enable or disable DOZY mode (fly cheat).</summary>
+	<description>Must be true or false</description>
+	<parameters>
+		<parameter>
+			<name>enabled</name>
+			<type>bool</type>
+			<description>true or false</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>EnablePointFilter</name>
+	<summary>Enable or disable point texture filter.</summary>
 	<description>Must be true or false</description>
 	<parameters>
 		<parameter>
@@ -504,6 +531,45 @@ level count, jumps to title.</description>
 			<name>index</name>
 			<type>int</type>
 			<description>level index (default 0)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>SaveGame</name>
+	<summary>Save the game to a savegame slot.</summary>
+	<parameters>
+		<parameter>
+			<name>slotID</name>
+			<type>int</type>
+			<description>ID of the savegame slot to save to.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>LoadGame</name>
+	<summary>Load the game from a savegame slot.</summary>
+	<parameters>
+		<parameter>
+			<name>slotID</name>
+			<type>int</type>
+			<description>ID of the savegame slot to load from.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>DeleteSaveGame</name>
+	<summary>Delete a savegame.</summary>
+	<parameters>
+		<parameter>
+			<name>slotID</name>
+			<type>int</type>
+			<description>ID of the savegame slot to clear.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -665,13 +731,13 @@ level count, jumps to title.</description>
 Corresponds to an entry in strings.lua.</description>
 		</parameter>
 		<parameter>
-			<name>slot</name>
+			<name>objectID</name>
 			<type>Objects.ObjID</type>
-			<description>slot of inventory object to change</description>
+			<description>object ID of the inventory object to change</description>
 		</parameter>
 		<parameter>
 			<name>yOffset</name>
-			<type>int</type>
+			<type>float</type>
 			<description>y-axis offset (positive values move the item down).<br />
 A value of about 100 will cause the item to display directly below its usual position.</description>
 		</parameter>
@@ -685,12 +751,12 @@ and a value of 2 will cause the item to render at twice the size.</description>
 		<parameter>
 			<name>rot</name>
 			<type>Rotation</type>
-			<description>rotation about x, y, and z axes</description>
+			<description>rotation around x, y, and z axes</description>
 		</parameter>
 		<parameter>
 			<name>axis</name>
 			<type>RotationAxis</type>
-			<description>Axis to rotate about when the item is being looked at in the inventory.<br />
+			<description>Axis to rotate around when the item is observed at in the inventory.<br />
 Note that this is entirely separate from the `rot` field described above.
 Must one of the following:
 	X
@@ -761,22 +827,22 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 <function>
 	<module>Inventory</module>
 	<name>GiveItem</name>
-	<summary>Add x of an item to the inventory.</summary>
-	<description>Omitting the second argument will give the "default" amount of the item
-(i.e. the amount the player would get from a pickup of that type).
-For example, giving crossbow ammo without specifying the number would give the player
-10 instead.
-Has no effect if the player has an infinite number of that item.</description>
+	<summary>Add an item to the player's inventory.</summary>
 	<parameters>
 		<parameter>
-			<name>item</name>
+			<name>objectID</name>
 			<type>Objects.ObjID</type>
-			<description>the item to be added</description>
+			<description>Object ID of the item to add.</description>
 		</parameter>
 		<parameter>
 			<name>count</name>
 			<type>int</type>
-			<description>the number of items to add (default: the amount you would get from a pickup)</description>
+			<description>The amount of items to add. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.</description>
+		</parameter>
+		<parameter>
+			<name>addToPickupSummary</name>
+			<type>bool</type>
+			<description>If true, display the item in the pickup summary. Default is false.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -784,19 +850,17 @@ Has no effect if the player has an infinite number of that item.</description>
 <function>
 	<module>Inventory</module>
 	<name>TakeItem</name>
-	<summary>Remove x of a certain item from the inventory.</summary>
-	<description>As in @{GiveItem}, omitting the count will remove the "default" amount of that item.
-Has no effect if the player has an infinite number of the item.</description>
+	<summary>Remove an item from the player's inventory.</summary>
 	<parameters>
 		<parameter>
-			<name>item</name>
+			<name>Object</name>
 			<type>Objects.ObjID</type>
-			<description>the item to be removed</description>
+			<description>ID of the item to remove.</description>
 		</parameter>
 		<parameter>
 			<name>count</name>
 			<type>int</type>
-			<description>the number of items to remove (default: the amount you would get from a pickup)</description>
+			<description>The amount of items to remove. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -804,18 +868,18 @@ Has no effect if the player has an infinite number of the item.</description>
 <function>
 	<module>Inventory</module>
 	<name>GetItemCount</name>
-	<summary>Get the amount the player holds of an item.</summary>
+	<summary>Get the amount of an item held in the player's inventory.</summary>
 	<parameters>
 		<parameter>
-			<name>item</name>
+			<name>objectID</name>
 			<type>Objects.ObjID</type>
-			<description>the ID item to check</description>
+			<description>Object ID of the item to check.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>int</type>
-			<description>the amount of the item the player has in the inventory. -1 indicates an infinite amount of that item.</description>
+			<description>The amount of items. -1 indicates infinity.</description>
 		</return>
 	</returns>
 </function>
@@ -823,18 +887,17 @@ Has no effect if the player has an infinite number of the item.</description>
 <function>
 	<module>Inventory</module>
 	<name>SetItemCount</name>
-	<summary>Set the amount of a certain item the player has in the inventory.</summary>
-	<description>Similar to @{GiveItem} but replaces with the new amount instead of adding it.</description>
+	<summary>Set the amount of an item in the player's inventory.</summary>
 	<parameters>
 		<parameter>
-			<name>item</name>
+			<name>objectID</name>
 			<type>Objects.ObjID</type>
-			<description>the ID of the item to be set.</description>
+			<description>Object ID of the item amount to set.</description>
 		</parameter>
 		<parameter>
 			<name>count</name>
 			<type>int</type>
-			<description>the number of items the player will have. A value of -1 will give an infinite amount of that item.</description>
+			<description>The amount of items to set. -1 indicates infinity.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -872,6 +935,29 @@ Has no effect if the player has an infinite number of the item.</description>
 			<name>LevelFunc</name>
 			<type>func</type>
 			<description>the function to remove; must be in the LevelFuncs hierarchy.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Logic</module>
+	<name>HandleEvent</name>
+	<summary>Attempt to find an event set and exectute a particular event from it.</summary>
+	<parameters>
+		<parameter>
+			<name>string</name>
+			<type>name</type>
+			<description>Name of the event set to find.</description>
+		</parameter>
+		<parameter>
+			<name>EventType</name>
+			<type>type</type>
+			<description>Event to execute.</description>
+		</parameter>
+		<parameter>
+			<name>Moveable</name>
+			<type>activator</type>
+			<description>Optional activator. Default is the player object.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1735,6 +1821,33 @@ Returns nil if no voice track is playing or no subtitle present.</description>
 
 <function>
 	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>SetControlLock</name>
+	<summary>Set control lock for Lara.</summary>
+	<parameters>
+		<parameter>
+			<name>whether</name>
+			<type>bool</type>
+			<description>set or not set control lock.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetControlLock</name>
+	<summary>Get control lock for Lara.</summary>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>current control lock value</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
 	<caller>Moveable</caller>
 	<name>GetAirborne</name>
 	<summary>Get the moveable's airborne status</summary>
@@ -1829,6 +1942,19 @@ Returns nil if no voice track is playing or no subtitle present.</description>
 			<description>true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetAmmoType</name>
+	<summary>Get player weapon ammo type.</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>player weapon ammo type</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -3811,41 +3937,47 @@ most can just be ignored (see usage).</description>
 	<module>Strings.DisplayString</module>
 	<name>DisplayString</name>
 	<summary>Create a DisplayString.</summary>
-	<description>For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}.</description>
+	<description>For use in @{Strings.ShowString | ShowString } and @{Strings.HideString | HideString }.</description>
 	<parameters>
 		<parameter>
-			<name>str</name>
+			<name>string</name>
 			<type>string</type>
-			<description>string to print or key of translated string</description>
+			<description>The string to display or key of the translated string.</description>
 		</parameter>
 		<parameter>
 			<name>x</name>
 			<type>int</type>
-			<description>x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)</description>
+			<description>X component of the string.</description>
 		</parameter>
 		<parameter>
 			<name>y</name>
 			<type>int</type>
-			<description>y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)</description>
+			<description>Y component of the string.</description>
+		</parameter>
+		<parameter>
+			<name>scale</name>
+			<type>float</type>
+			<description>size of the string, relative to the default size. __Default: 1.0__</description>
 		</parameter>
 		<parameter>
 			<name>color</name>
 			<type>Color</type>
-			<description>the color of the text</description>
+			<description>the color of the text. __Default: white__</description>
 		</parameter>
 		<parameter>
 			<name>translated</name>
 			<type>bool</type>
-			<description>if false or omitted, the str argument will be printed.
-If true, the str argument will be the key of a translated string specified in
-strings.lua. __Default: false__.</description>
+			<description>If false or omitted, the input string argument will be displayed.
+If true, the string argument will be the key of a translated string specified in strings.lua. __Default: false__.</description>
 		</parameter>
 		<parameter>
 			<name>flags</name>
 			<type>table</type>
-			<description>a table of display options. Can be empty or omitted. The possible values and their effects are...
-	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
-	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
+			<description>A table of string display options. Can be empty or omitted. The possible values and their effects are:
+	TEN.Strings.DisplayStringOption.CENTER: set the horizontal origin point to the center of the string.
+	TEN.Strings.DisplayStringOption.RIGHT: set the horizontal origin point to right of the string.
+	TEN.Strings.DisplayStringOption.SHADOW: give the string a small shadow.
+	TEN.Strings.DisplayStringOption.BLINK: blink the string.
 __Default: empty__</description>
 		</parameter>
 	</parameters>
@@ -3895,7 +4027,7 @@ __Default: empty__</description>
 	<returns>
 		<return>
 			<type>string</type>
-			<description>a string</description>
+			<description>the string to use</description>
 		</return>
 	</returns>
 </function>
@@ -3915,6 +4047,33 @@ __Default: empty__</description>
 			<description>the new key for the display string</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>SetScale</name>
+	<summary>Set the scale of the string.</summary>
+	<parameters>
+		<parameter>
+			<name>scale</name>
+			<type>float</type>
+			<description>the new scale of the text, relative to the default size</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Strings.DisplayString</module>
+	<caller>DisplayString</caller>
+	<name>GetScale</name>
+	<summary>Get the scale of the string.</summary>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>scale of the string</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -3946,11 +4105,11 @@ __Default: empty__</description>
 	<returns>
 		<return>
 			<type>int</type>
-			<description>x x-coordinate of the string</description>
+			<description>x-coordinate of the string</description>
 		</return>
 		<return>
 			<type>int</type>
-			<description>y y-coordinate of the string</description>
+			<description>y-coordinate of the string</description>
 		</return>
 	</returns>
 </function>
@@ -4042,14 +4201,12 @@ with a call to @{ShowString}, or this function will have no effect.</description
 	<module>Vec2</module>
 	<caller>Vec2</caller>
 	<name>ToLength</name>
-	<summary>Modify this vector so that it becomes close to the requested length.</summary>
-	<description>Note that since the engine uses integers instead of floating-point
-numbers, this will be less accurate at smaller lengths.</description>
+	<summary>Modify to match input length.</summary>
 	<parameters>
 		<parameter>
 			<name>length</name>
 			<type>float</type>
-			<description>the new length to set the vector to.</description>
+			<description>new length to set.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -4060,19 +4217,19 @@ numbers, this will be less accurate at smaller lengths.</description>
 	<parameters>
 		<parameter>
 			<name>X</name>
-			<type>int</type>
+			<type>float</type>
 			<description>x coordinate</description>
 		</parameter>
 		<parameter>
 			<name>Y</name>
-			<type>int</type>
+			<type>float</type>
 			<description>y coordinate</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>Vec2</type>
-			<description>A Vec2 object.</description>
+			<description>A Vec2 object</description>
 		</return>
 	</returns>
 </function>
@@ -4091,7 +4248,7 @@ numbers, this will be less accurate at smaller lengths.</description>
 	<returns>
 		<return>
 			<type>string</type>
-			<description>A string showing the x, y, and z values of the Vec2</description>
+			<description>A string showing the x and y values of the Vec2</description>
 		</return>
 	</returns>
 </function>

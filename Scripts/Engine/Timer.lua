@@ -34,7 +34,7 @@ local Timer
 
 local unpausedColor = TEN.Color(255, 255, 255)
 local pausedColor = TEN.Color(255, 255, 0)
-local str = TEN.Strings.DisplayString("TIMER", 0, 0, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
+local str = TEN.Strings.DisplayString("TIMER", Vec2 (0, 0), 1, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
 
 
 Timer = {
