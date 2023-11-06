@@ -21,6 +21,7 @@ Version 1.2
 * Fix cold exposure status not recovering in non-cold wade-depth water.
 * Fix non-elevated combat camera.
 * Fix camera snap when disengaging the look-around mode.
+* Fix TR4 mapper not being visible.
 * Improve head-on wall collision.
 * Overhaul pushables:
  - Separate climbable and non-climbable pushable object slots.
