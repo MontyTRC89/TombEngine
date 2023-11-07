@@ -60,6 +60,7 @@ public:
 	void SetAnimNumber(int animNumber);
 
 	[[nodiscard]] int GetFrameNumber() const;
+	[[nodiscard]] int GetEndFrame() const;
 	void SetFrameNumber(int frameNumber);
 
 	[[nodiscard]] Vec3 GetVelocity() const;
