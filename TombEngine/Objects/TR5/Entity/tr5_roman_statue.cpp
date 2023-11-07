@@ -28,12 +28,14 @@ namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER = 2.0f;
 	constexpr auto ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF	   = 2.0f;
+	constexpr auto ROMAN_STATUE_SHOCKWAVE_LIGHT_DURATION   = 42;
 
 	const auto RomanStatueBite = CreatureBiteInfo(Vector3::Zero, 15);
 
 	struct RomanStatueInfo
 	{
 		Vector3i Position = Vector3i::Zero;
+		Vector3i lightpos = Vector3i::Zero;
 		Electricity* EnergyArcs[8] = {};
 		unsigned int Count = 0;
 	};
@@ -316,6 +318,13 @@ namespace TEN::Entities::Creatures::TR5
 		if (prevMeshSwapBits != item->Model.MeshIndex)
 			SetAnimation(item, STATUE_ANIM_RECOIL);
 
+		//lighteffect for shockwave attack	
+		if (item->ItemFlags[3])
+		{
+			TriggerDynamicLight(RomanStatueData.lightpos.x, RomanStatueData.lightpos.y, RomanStatueData.lightpos.z, item->ItemFlags[3], 0, (GetRandomControl() & 0x1F) + 128 / 2, (GetRandomControl() & 0x3F) + 128);
+			item->ItemFlags[3]--;
+		}
+
 		if (item->HitPoints > 0)
 		{
 			creature->Enemy = LaraItem;
@@ -584,13 +593,17 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (item->Animation.FrameNumber == GetAnimData(item).frameBase + 34 && item->Animation.ActiveState == 3)
 						{
-							if (item->ItemFlags[0])
+							if (item->ItemFlags[0])							
 								item->ItemFlags[0]--;
-
+							
 							TriggerShockwave((Pose*)&pos1, 16, 160, 96, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
 							pos1.y -= 64;
+							RomanStatueData.lightpos = Vector3i(pos1.x, pos1.y - 64, pos1.z);
 							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+							TriggerDynamicLight(RomanStatueData.lightpos.x, RomanStatueData.lightpos.y, RomanStatueData.lightpos.z, 26, 0, 105, 255);
+
+							item->ItemFlags[3] = ROMAN_STATUE_SHOCKWAVE_LIGHT_DURATION;
 						}
 
 						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
@@ -601,12 +614,26 @@ namespace TEN::Entities::Creatures::TR5
 							if (deltaFrame > 16)
 								deltaFrame = 16;
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame);
+
+							if (item->ItemFlags[3])
+							{
+								TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 8, 0, color / 4, color / 2);
+							}
+							else
+							{
+								TriggerDynamicLight(pos1.x, pos1.y - 64, pos1.z, 18, 0, color / 4, color / 2);
+							}
 						}
 						else
 						{
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame2);
+
+							if (item->ItemFlags[3])
+							{
+								TriggerDynamicLight(RomanStatueData.lightpos.x, RomanStatueData.lightpos.y, RomanStatueData.lightpos.z, 16, 0, 105, 255);
+							}
 						}
-					}
+					}									
 				}
 
 				break;
