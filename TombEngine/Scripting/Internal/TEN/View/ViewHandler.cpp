@@ -5,6 +5,7 @@
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"
 #include "Game/spotcam.h"
+#include "Renderer/Renderer11.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -13,6 +14,7 @@
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::Environment;
+using TEN::Renderer::g_Renderer;
 
 /***
 Functions to manage camera and game view.
@@ -78,6 +80,15 @@ namespace View
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
 	}
 
+	/// Get the display resolution's aspect ratio.
+	// @function GetAspectRatio
+	// @treturn float Display resolution's aspect ratio.
+	static float GetAspectRatio()
+	{
+		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
+		return (screenRes.x / screenRes.y);
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		sol::table tableView{ state->lua_state(), sol::create };
@@ -139,6 +150,8 @@ namespace View
 		//@tparam Color color (default Color(255, 255, 255))
 		//@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
 		tableView.set_function(ScriptReserved_FlashScreen, &FlashScreen);
+
+		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
 
 		LuaHandler handler{ state };
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_CameraType, CAMERA_TYPE);
