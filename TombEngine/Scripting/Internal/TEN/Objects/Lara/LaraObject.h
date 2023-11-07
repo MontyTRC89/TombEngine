@@ -34,34 +34,27 @@ static const std::unordered_map<std::string, HandStatus> HandStatusMap
 class LaraObject : public Moveable
 {
 public:
-	static void Register(sol::table& parent);
-
 	void SetPoison(sol::optional<int> potency);
-	void SetAir(sol::optional<int> air);
-	void SetStamina(sol::optional<int> value);
-	void SetWet(sol::optional<int> wetness);
-	void SetAirborne(bool newAirborne);
-	void SetControlLock(bool value);
-	void SetWeaponType(LaraWeaponType weaponType, bool activate);
-
 	int GetPoison() const;
+	void SetAir(sol::optional<int> air);
 	int GetAir() const;
+	void SetStamina(sol::optional<int> value);
 	int GetStamina() const;
+	void SetWet(sol::optional<int> wetness);
 	int GetWet() const;
-	bool GetAirborne() const;
-	bool GetControlLock() const;
-
+	[[nodiscard]] bool GetAirborne() const;
+	void SetAirborne(bool newAirborne);
 	std::unique_ptr<Moveable> GetVehicle() const;
 	std::unique_ptr<Moveable> GetTarget() const;
 	std::unique_ptr<Moveable> GetPlayerInteractedMoveable() const;
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
+	void SetWeaponType(LaraWeaponType weaponType, bool activate);
 	int GetAmmoType() const;
 	int GetAmmoCount() const;
-
 	void UndrawWeapon();
 	void ThrowAwayTorch();
 	bool TorchIsLit() const;
-
+	static void Register(sol::table& parent);
 	using Moveable::Moveable;
 };
