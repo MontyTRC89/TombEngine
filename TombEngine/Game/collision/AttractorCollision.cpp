@@ -154,11 +154,10 @@ namespace TEN::Collision::Attractor
 					nearbyAttracPtrs.push_back(&attrac);
 			}
 
-			// Run through neighbor sectors.
+			// Get bridge item numbers.
 			auto roomGridCoords = GetNeighborRoomGridCoords(Vector3i(probePoint), neighborRoomNumber, SECTOR_SEARCH_DEPTH);
 			for (const auto& roomGridCoord : roomGridCoords)
 			{
-				// Get bridge item numbers.
 				const auto& sector = GetFloor(neighborRoomNumber, roomGridCoord);
 				for (int bridgeItemNumber : sector.BridgeItemNumbers)
 					bridgeItemNumbers.insert(bridgeItemNumber);
