@@ -128,8 +128,8 @@ namespace TEN::Collision::Attractor
 
 		// TODO: Way of dealing with dynamic bridge attractors.
 		// 
-		// O(m * k) + relatively cheap arithmetic overhead:
-		// (m = avg. subset sector count, k = avg. bridge count)
+		// O(m * l * k) + relatively cheap arithmetic overhead:
+		// (m = avg. subset room count, l = avg. subset sector count, k = avg. bridge count)
 		// 1) Get room grid coords in 3x3 vicinity, derive sector IDs.
 		// 2) Collect unique bridge item numbers from sectors into std::set.
 		// 3) Get bridge ItemData variant BridgeObject (TODO).
