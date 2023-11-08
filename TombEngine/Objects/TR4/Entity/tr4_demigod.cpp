@@ -734,7 +734,7 @@ namespace TEN::Entities::TR4
 					pos.y -= 64;
 					TriggerShockwave((Pose*)&pos, 24, 88, 200, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, (int)ShockwaveStyle::Normal);
 
-					auto lightColor = Color(0.0f, 0.4f, 1.0f);
+					auto lightColor = Color(1.0f, 0.4f, 0.2f);
 					SpawnDynamicLight(Demigod1Data.LightPosition.ToVector3(), lightColor, 0.1f);
 
 					item->ItemFlags[3] = (int)round(DEMIGOD1_SHOCKWAVE_LIGHT_DURATION * FPS);
