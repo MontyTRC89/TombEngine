@@ -386,7 +386,7 @@ namespace TEN::Collision::Attractor
 			auto roomGridCoords = GetNeighborRoomGridCoords(item.Pose.Position, neighborRoomNumber, SECTOR_SEARCH_DEPTH);
 			for (const auto& roomGridCoord : roomGridCoords)
 			{
-				auto pos = Vector3i(BLOCK(roomGridCoord.x), item.Pose.Position.y, BLOCK(roomGridCoord.y));
+				auto pos = Vector3i(BLOCK(roomGridCoord.x) + neighborRoom.x, item.Pose.Position.y, BLOCK(roomGridCoord.y) + neighborRoom.z);
 				auto pointColl = GetCollision(pos, neighborRoomNumber);
 
 				// Check for invalid sector.
