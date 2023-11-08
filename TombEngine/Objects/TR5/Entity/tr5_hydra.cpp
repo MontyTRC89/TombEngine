@@ -26,6 +26,7 @@ namespace TEN::Entities::Creatures::TR5
 		HYDRA_STATE_IDLE = 0,
 		HYDRA_STATE_BITE_ATTACK_1 = 1,
 		HYDRA_STATE_AIM = 2,
+		HYDRA_STATE_SHOOT = 3,
 		HYDRA_STATE_HURT = 4,
 		HYDRA_STATE_BITE_ATTACK_2 = 7,
 		HYDRA_STATE_BITE_ATTACK_3 = 8,
@@ -265,7 +266,10 @@ namespace TEN::Entities::Creatures::TR5
 						distance = sqrt(AI.distance);
 						damage = 5 - distance / BLOCK(1);
 
-						if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
+						if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+							Lara.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+							Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
+							Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 							damage *= 3;
 
 						if (damage > 0)
@@ -290,7 +294,10 @@ namespace TEN::Entities::Creatures::TR5
 
 					damage = 6 - sqrt(AI.distance) / 1024;
 
-					if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
+					if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::Revolver) 
 						damage *= 3;
 
 					if ((GetRandomControl() & 0xF) < damage &&
@@ -318,7 +325,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				break;
 
-			case 3:
+			case HYDRA_STATE_SHOOT:
 				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
 					auto pos1 = GetJointPosition(item, 10, Vector3i(0, 1024, 40));
