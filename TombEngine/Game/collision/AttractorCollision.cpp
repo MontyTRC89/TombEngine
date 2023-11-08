@@ -126,45 +126,30 @@ namespace TEN::Collision::Attractor
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
-		// TODO: Way of dealing with dynamic bridge attractors.
-		// 
-		// O(m * l * k) + relatively cheap arithmetic overhead:
-		// (m = avg. subset room count, l = avg. subset sector count, k = avg. bridge count)
-		// 1) Get room grid coords in 3x3 vicinity, derive sector IDs.
-		// 2) Collect unique bridge item numbers from sectors into std::set.
-		// 3) Get bridge ItemData variant BridgeObject (TODO).
-		// 4) Get attractor contained in BridgeObject.
-		// 
-		// Bridge construction/destruction ends up simple.
-		// - Initialize() generates bridge attractor.
-		// - Control() updates attractor if Pose has changed.
-		// - Destructor cleans up by detaching players.
-
-		auto bridgeItemNumbers = std::set<int>{};
-
 		// Run through neighbor rooms.
 		auto& room = g_Level.Rooms[roomNumber];
 		for (int neighborRoomNumber : room.neighbors)
 		{
-			// Get room attractors.
+			// Collect room attractors.
 			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 			for (auto& attrac : neighborRoom.Attractors)
 			{
 				if (sphere.Intersects(attrac.GetBox()))
 					nearbyAttracPtrs.push_back(&attrac);
 			}
-
-			// Get bridge item numbers.
-			auto roomGridCoords = GetNeighborRoomGridCoords(Vector3i(probePoint), neighborRoomNumber, SECTOR_SEARCH_DEPTH);
-			for (const auto& roomGridCoord : roomGridCoords)
-			{
-				const auto& sector = GetFloor(neighborRoomNumber, roomGridCoord);
-				for (int bridgeItemNumber : sector.BridgeItemNumbers)
-					bridgeItemNumbers.insert(bridgeItemNumber);
-			}
 		}
 
-		// Get bridge attractors.
+		auto bridgeItemNumbers = std::set<int>{};
+
+		// Collect bridge item numbers.
+		auto sectorPtrs = GetNeighborSectorPtrs(Vector3i(probePoint), roomNumber, SECTOR_SEARCH_DEPTH);
+		for (auto* sectorPtr : sectorPtrs)
+		{
+			for (int bridgeItemNumber : sectorPtr->BridgeItemNumbers)
+				bridgeItemNumbers.insert(bridgeItemNumber);
+		}
+
+		// Collect bridge attractors.
 		for (int bridgeItemNumber : bridgeItemNumbers)
 		{
 			auto& bridgeItem = g_Level.Items[bridgeItemNumber];

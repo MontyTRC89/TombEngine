@@ -542,6 +542,59 @@ namespace TEN::Collision::Floordata
 		return roomGridCoord;
 	}
 
+	std::vector<Vector2i> GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth)
+	{
+		auto originRoomGridCoord = GetRoomGridCoord(roomNumber, pos.x, pos.z, false);
+
+		// Determine room grid coord bounds.
+		auto roomGridCoordMax = Vector2i(
+			originRoomGridCoord.x + searchDepth,
+			originRoomGridCoord.y + searchDepth);
+		auto roomGridCoordMin = Vector2i(
+			originRoomGridCoord.x - searchDepth,
+			originRoomGridCoord.y - searchDepth);
+
+		const auto& room = g_Level.Rooms[roomNumber];
+
+		// Collect room grid coords.
+		auto roomGridCoords = std::vector<Vector2i>{};
+		for (int x = roomGridCoordMin.x; x <= roomGridCoordMax.x; x++)
+		{
+			// Test if out of room X range.
+			if (x <= 0 || x >= (room.xSize - 1))
+				continue;
+
+			for (int z = roomGridCoordMin.y; z <= roomGridCoordMax.y; z++)
+			{
+				// Test if out of room Z range.
+				if (z <= 0 || z >= (room.zSize - 1))
+					continue;
+
+				roomGridCoords.push_back(Vector2i(x, z));
+			}
+		}
+
+		return roomGridCoords;
+	}
+
+	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth)
+	{
+		auto sectorPtrs = std::vector<FloorInfo*>{};
+
+		// Run through neighbor rooms.
+		auto& room = g_Level.Rooms[roomNumber];
+		for (int neighborRoomNumber : room.neighbors)
+		{
+			// Collect neighbor sector pointers.
+			auto roomGridCoords = GetNeighborRoomGridCoords(pos, neighborRoomNumber, searchDepth);
+			for (const auto& roomGridCoord : roomGridCoords)
+				sectorPtrs.push_back(&GetFloor(neighborRoomNumber, roomGridCoord));
+		}
+
+		// Return neighbor sector pointers.
+		return sectorPtrs;
+	}
+
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomPos)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
@@ -1121,41 +1174,6 @@ namespace TEN::Collision::Floordata
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials)
 	{
 		return Contains(materials, refMaterial);
-	}
-
-	std::vector<Vector2i> GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth)
-	{
-		auto originRoomGridCoord = GetRoomGridCoord(roomNumber, pos.x, pos.z, false);
-
-		// Determine room grid coord bounds.
-		auto roomGridCoordMax = Vector2i(
-			originRoomGridCoord.x + searchDepth,
-			originRoomGridCoord.y + searchDepth);
-		auto roomGridCoordMin = Vector2i(
-			originRoomGridCoord.x - searchDepth,
-			originRoomGridCoord.y - searchDepth);
-
-		const auto& room = g_Level.Rooms[roomNumber];
-
-		// Collect room grid coords.
-		auto roomGridCoords = std::vector<Vector2i>{};
-		for (int x = roomGridCoordMin.x; x <= roomGridCoordMax.x; x++)
-		{
-			// Test if out of room X range.
-			if (x <= 0 || x >= (room.xSize - 1))
-				continue;
-
-			for (int z = roomGridCoordMin.y; z <= roomGridCoordMax.y; z++)
-			{
-				// Test if out of room Z range.
-				if (z <= 0 || z >= (room.zSize - 1))
-					continue;
-
-				roomGridCoords.push_back(Vector2i(x, z));
-			}
-		}
-
-		return roomGridCoords;
 	}
 
 	static void DrawSectorFlagLabel(const Vector3& pos, const std::string& string, const Vector4& color, float verticalOffset)

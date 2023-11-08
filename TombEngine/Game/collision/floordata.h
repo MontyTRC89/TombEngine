@@ -174,7 +174,9 @@ namespace TEN::Collision::Floordata
 	Vector2i GetSectorCenter(int x, int z);
 	Vector2i GetSectorPoint(int x, int z);
 	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
-	
+	std::vector<Vector2i>	GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
+	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
+
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomPos);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
@@ -198,8 +200,6 @@ namespace TEN::Collision::Floordata
 	void			   UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
-	
-	std::vector<Vector2i> GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
 
 	void DrawNearbySectorFlags(const ItemInfo& item);
 }
