@@ -28,7 +28,7 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 	const auto& surfaceColl = isFloor ? FloorCollision : CeilingCollision;
 
 	const auto& room = g_Level.Rooms[Room];
-	auto roomPos = GetRoomPosition(Room, x, z);
+	auto roomGridCoord = GetRoomGridCoord(Room, x, z);
 
 	auto vertexGroups = std::vector<std::vector<Vector3>>{};
 
@@ -39,8 +39,8 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 		auto vertices0 = std::vector<Vector3>{};
 		for (int i = 0; i < TRIANGLE_VERTEX_COUNT; i++)
 		{
-			int x = roomPos.x * BLOCK(1);
-			int z = roomPos.y * BLOCK(1);
+			int x = BLOCK(roomGridCoord.x);
+			int z = BLOCK(roomGridCoord.y);
 
 			if (FloorCollision.SplitAngle == SurfaceCollisionData::SPLIT_ANGLE_0)
 			{
@@ -86,8 +86,8 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 		auto vertices1 = std::vector<Vector3>{};
 		for (int i = 0; i < QUAD_VERTEX_COUNT; i++)
 		{
-			int x = roomPos.x * BLOCK(1);
-			int z = roomPos.y * BLOCK(1);
+			int x = BLOCK(roomGridCoord.x);
+			int z = BLOCK(roomGridCoord.y);
 
 			if (FloorCollision.SplitAngle == SurfaceCollisionData::SPLIT_ANGLE_0)
 			{
@@ -140,8 +140,8 @@ std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bo
 		auto vertices = std::vector<Vector3>{};
 		for (int i = 0; i < QUAD_VERTEX_COUNT; i++)
 		{
-			int x = roomPos.x * BLOCK(1);
-			int z = roomPos.y * BLOCK(1);
+			int x = BLOCK(roomGridCoord.x);
+			int z = BLOCK(roomGridCoord.y);
 
 			if (i == 0)
 			{
@@ -520,32 +520,26 @@ namespace TEN::Collision::Floordata
 		return Vector2i{xPoint, yPoint};
 	}
 
-	Vector2i GetRoomPosition(int roomNumber, int x, int z)
+	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
-		const auto zRoom = (z - room.z) / BLOCK(1);
-		const auto xRoom = (x - room.x) / BLOCK(1);
-		auto pos = Vector2i{xRoom, zRoom};
 
-		if (pos.x < 0)
-		{
-			pos.x = 0;
-		}
-		else if (pos.x > room.xSize - 1)
-		{
-			pos.x = room.xSize - 1;
-		}
+		// Calculate room grid coord.
+		auto roomGridCoord = Vector2i((x - room.x) / BLOCK(1), (z - room.z) / BLOCK(1));
+		if (x < room.x)
+			roomGridCoord.x -= 1;
+		if (z < room.z)
+			roomGridCoord.y -= 1;
 
-		if (pos.y < 0)
+		// Clamp room grid coord to room bounds (if applicable).
+		if (clampToBounds)
 		{
-			pos.y = 0;
-		}
-		else if (pos.y > room.zSize - 1)
-		{
-			pos.y = room.zSize - 1;
+			roomGridCoord.x = std::clamp(roomGridCoord.x, 0, room.xSize - 1);
+			roomGridCoord.y = std::clamp(roomGridCoord.y, 0, room.zSize - 1);
 		}
 
-		return pos;
+		// Return room position.
+		return roomGridCoord;
 	}
 
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomPos)
@@ -556,7 +550,7 @@ namespace TEN::Collision::Floordata
 
 	FloorInfo& GetFloor(int roomNumber, int x, int z)
 	{
-		return GetFloor(roomNumber, GetRoomPosition(roomNumber, x, z));
+		return GetFloor(roomNumber, GetRoomGridCoord(roomNumber, x, z));
 	}
 
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber)
@@ -1129,6 +1123,41 @@ namespace TEN::Collision::Floordata
 		return Contains(materials, refMaterial);
 	}
 
+	std::vector<Vector2i> GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth)
+	{
+		auto originRoomGridCoord = GetRoomGridCoord(roomNumber, pos.x, pos.z, false);
+
+		// Determine room grid coord bounds.
+		auto roomGridCoordMax = Vector2i(
+			originRoomGridCoord.x + searchDepth,
+			originRoomGridCoord.y + searchDepth);
+		auto roomGridCoordMin = Vector2i(
+			originRoomGridCoord.x - searchDepth,
+			originRoomGridCoord.y - searchDepth);
+
+		const auto& room = g_Level.Rooms[roomNumber];
+
+		// Collect room grid coords.
+		auto roomGridCoords = std::vector<Vector2i>{};
+		for (int x = roomGridCoordMin.x; x <= roomGridCoordMax.x; x++)
+		{
+			// Test if out of room X range.
+			if (x <= 0 || x >= (room.xSize - 1))
+				continue;
+
+			for (int z = roomGridCoordMin.y; z <= roomGridCoordMax.y; z++)
+			{
+				// Test if out of room Z range.
+				if (z <= 0 || z >= (room.zSize - 1))
+					continue;
+
+				roomGridCoords.push_back(Vector2i(x, z));
+			}
+		}
+
+		return roomGridCoords;
+	}
+
 	static void DrawSectorFlagLabel(const Vector3& pos, const std::string& string, const Vector4& color, float verticalOffset)
 	{
 		constexpr auto LABEL_SCALE = 0.8f;
@@ -1148,8 +1177,8 @@ namespace TEN::Collision::Floordata
 
 	void DrawNearbySectorFlags(const ItemInfo& item)
 	{
-		constexpr auto DRAW_RANGE	  = BLOCK(3);
-		constexpr auto STRING_SPACING = -20.0f;
+		constexpr auto SECTOR_SEARCH_DEPTH = 2;
+		constexpr auto STRING_SPACING	   = -20.0f;
 
 		constexpr auto STOPPER_COLOR				 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
 		constexpr auto DEATH_COLOR					 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
@@ -1157,26 +1186,25 @@ namespace TEN::Collision::Floordata
 		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Vector4(0.4f, 0.4f, 1.0f, 1.0f);
 		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
 		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
-		
-		// Only check sectors in player's vicinity.
-		const auto& room = g_Level.Rooms[item.RoomNumber];
-		int minX = std::max(item.Pose.Position.x - DRAW_RANGE, room.x) / BLOCK(1);
-		int maxX = std::min(item.Pose.Position.x + DRAW_RANGE, room.x + (room.xSize * BLOCK(1))) / BLOCK(1);
-		int minZ = std::max(item.Pose.Position.z - DRAW_RANGE, room.z) / BLOCK(1);
-		int maxZ = std::min(item.Pose.Position.z + DRAW_RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
-		
+
+		// Get point collision.
 		auto pointColl = GetCollision(item);
 		auto pos = item.Pose.Position.ToVector3();
 
-		// Draw sector flag labels.
-		for (int x = minX; x < maxX; x++)
+		// Run through neighboring rooms.
+		const auto& room = g_Level.Rooms[item.RoomNumber];
+		for (int neighborRoomNumber : room.neighbors)
 		{
-			for (int z = minZ; z < maxZ; z++)
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+			// Run through neighbor sectors.
+			auto roomGridCoords = GetNeighborRoomGridCoords(item.Pose.Position, neighborRoomNumber, SECTOR_SEARCH_DEPTH);
+			for (const auto& roomGridCoord : roomGridCoords)
 			{
-				pos.x = BLOCK(x);
-				pos.z = BLOCK(z);
-				
-				pointColl = GetCollision(pos, item.RoomNumber);
+				pos.x = BLOCK(roomGridCoord.x) + neighborRoom.x;
+				pos.z = BLOCK(roomGridCoord.y) + neighborRoom.z;
+
+				pointColl = GetCollision(pos, neighborRoomNumber);
 				pos.y = pointColl.Position.Floor;
 
 				float verticalOffset = STRING_SPACING;
@@ -1187,7 +1215,7 @@ namespace TEN::Collision::Floordata
 					DrawSectorFlagLabel(pos, "Stopper", STOPPER_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
-				
+
 				// Death
 				if (pointColl.Block->Flags.Death)
 				{

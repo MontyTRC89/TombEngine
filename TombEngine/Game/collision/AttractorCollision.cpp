@@ -2,12 +2,14 @@
 #include "Game/collision/AttractorCollision.h"
 
 #include "Game/collision/Attractor.h"
+#include "Game/collision/floordata.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
 #include "Renderer/Renderer11.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -107,6 +109,8 @@ namespace TEN::Collision::Attractor
 	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
 	static std::vector<Attractor*> GetNearbyAttractorPtrs(const Vector3& probePoint, int roomNumber, float detectRadius)
 	{
+		constexpr auto SECTOR_SEARCH_DEPTH = 1;
+
 		auto sphere = BoundingSphere(probePoint, detectRadius);
 		auto nearbyAttracPtrs = std::vector<Attractor*>{};
 
@@ -124,18 +128,12 @@ namespace TEN::Collision::Attractor
 
 		// TODO: Way of dealing with dynamic bridge attractors.
 		// 
-		// O(n * k) solution:
-		// (n = avg. sector count, k = avg. bridge count)
-		// 1) Run through all sectors in each neighboring room.
-		// 2) Collect unique bridge item numbers in std::set.
+		// O(m * k) + relatively cheap arithmetic overhead:
+		// (m = avg. subset sector count, k = avg. bridge count)
+		// 1) Get room grid coords in 3x3 vicinity, derive sector IDs.
+		// 2) Collect unique bridge item numbers from sectors into std::set.
 		// 3) Get bridge ItemData variant BridgeObject (TODO).
 		// 4) Get attractor contained in BridgeObject.
-		// 
-		// Possible optimization to O(m * k) + relatively cheap arithmetic overhead:
-		// (m = avg. subset sector count, k = avg. bridge count)
-		// - Calculate nearby sector room positions in 3x3 vicinity.
-		// - Derive sector IDs from these room positions.
-		// - Collect bridge item numbers of only these sectors.
 		// 
 		// Bridge construction/destruction ends up simple.
 		// - Initialize() generates bridge attractor.
@@ -144,7 +142,7 @@ namespace TEN::Collision::Attractor
 
 		auto bridgeItemNumbers = std::set<int>{};
 
-		// Get attractors in neighboring rooms.
+		// Run through neighbor rooms.
 		auto& room = g_Level.Rooms[roomNumber];
 		for (int neighborRoomNumber : room.neighbors)
 		{
@@ -156,15 +154,17 @@ namespace TEN::Collision::Attractor
 					nearbyAttracPtrs.push_back(&attrac);
 			}
 
-			// Get bridge item numbers.
-			for (auto& sector : neighborRoom.floor)
+			// Run through neighbor sectors.
+			auto roomGridCoords = GetNeighborRoomGridCoords(Vector3i(probePoint), neighborRoomNumber, SECTOR_SEARCH_DEPTH);
+			for (const auto& roomGridCoord : roomGridCoords)
 			{
+				// Get bridge item numbers.
+				const auto& sector = GetFloor(neighborRoomNumber, roomGridCoord);
 				for (int bridgeItemNumber : sector.BridgeItemNumbers)
 					bridgeItemNumbers.insert(bridgeItemNumber);
 			}
 		}
 
-		// TODO
 		// Get bridge attractors.
 		for (int bridgeItemNumber : bridgeItemNumbers)
 		{

@@ -173,7 +173,7 @@ namespace TEN::Collision::Floordata
 
 	Vector2i GetSectorCenter(int x, int z);
 	Vector2i GetSectorPoint(int x, int z);
-	Vector2i GetRoomPosition(int roomNumber, int x, int z);
+	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
 	
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomPos);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
@@ -199,5 +199,7 @@ namespace TEN::Collision::Floordata
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
 	
+	std::vector<Vector2i> GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
+
 	void DrawNearbySectorFlags(const ItemInfo& item);
 }

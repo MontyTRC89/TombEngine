@@ -2,11 +2,13 @@
 #include "Game/collision/Attractor.h"
 
 #include "Game/camera.h"
+#include "Game/collision/floordata.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -257,8 +259,8 @@ namespace TEN::Collision::Attractor
 			g_Renderer.AddLine3D(_points.back(), Geometry::TranslatePoint(_points.back(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
 			// Draw AABB.
-			//auto box = BoundingOrientedBox(_box.Center, _box.Extents, Quaternion::Identity);
-			//g_Renderer.AddDebugBox(box, Vector4::One, RendererDebugPage::CollisionStats);
+			/*auto box = BoundingOrientedBox(_box.Center, _box.Extents, Quaternion::Identity);
+			g_Renderer.AddDebugBox(box, Vector4::One, RendererDebugPage::CollisionStats);*/
 		}
 		else if (_points.size() == 1)
 		{
@@ -370,23 +372,22 @@ namespace TEN::Collision::Attractor
 	// TEMP
 	std::vector<Attractor> GenerateSectorAttractors(const ItemInfo& item)
 	{
-		constexpr auto RANGE	  = BLOCK(3);
-		constexpr auto HALF_BLOCK = BLOCK(0.5f);
+		constexpr auto SECTOR_SEARCH_DEPTH = 2;
 
 		auto attracs = std::vector<Attractor>{};
 
+		// Run through neighbor rooms.
 		const auto& room = g_Level.Rooms[item.RoomNumber];
-		int minX = std::max(item.Pose.Position.x - RANGE, room.x) / BLOCK(1);
-		int maxX = std::min(item.Pose.Position.x + RANGE, room.x + (room.xSize * BLOCK(1))) / BLOCK(1);
-		int minZ = std::max(item.Pose.Position.z - RANGE, room.z) / BLOCK(1);
-		int maxZ = std::min(item.Pose.Position.z + RANGE, room.z + (room.zSize * BLOCK(1))) / BLOCK(1);
-
-		for (int x = minX; x < maxX; x++)
+		for (int neighborRoomNumber : room.neighbors)
 		{
-			for (int z = minZ; z < maxZ; z++)
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+			// Run through neighbor sectors.
+			auto roomGridCoords = GetNeighborRoomGridCoords(item.Pose.Position, neighborRoomNumber, SECTOR_SEARCH_DEPTH);
+			for (const auto& roomGridCoord : roomGridCoords)
 			{
-				auto pos = Vector3(BLOCK(x), item.Pose.Position.y, BLOCK(z));
-				auto pointColl = GetCollision(pos + Vector3(HALF_BLOCK, 0.0f, HALF_BLOCK), item.RoomNumber);
+				auto pos = Vector3i(BLOCK(roomGridCoord.x), item.Pose.Position.y, BLOCK(roomGridCoord.y));
+				auto pointColl = GetCollision(pos, neighborRoomNumber);
 
 				// Check for invalid sector.
 				if (pointColl.Position.Floor == NO_HEIGHT)
