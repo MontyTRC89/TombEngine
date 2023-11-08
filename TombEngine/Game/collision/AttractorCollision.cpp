@@ -109,7 +109,7 @@ namespace TEN::Collision::Attractor
 	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
 	static std::vector<Attractor*> GetNearbyAttractorPtrs(const Vector3& probePoint, int roomNumber, float detectRadius)
 	{
-		constexpr auto SECTOR_SEARCH_DEPTH = 1;
+		constexpr auto SECTOR_SEARCH_DEPTH = 2;
 
 		auto sphere = BoundingSphere(probePoint, detectRadius);
 		auto nearbyAttracPtrs = std::vector<Attractor*>{};
