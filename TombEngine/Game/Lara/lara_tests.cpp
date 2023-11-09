@@ -32,7 +32,7 @@ using namespace TEN::Renderer;
 
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 {
-	return (abs(short(testAngle - item.Pose.Orientation.y)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
+	return (abs(Geometry::GetShortestAngle(item.Pose.Orientation.y, testAngle)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
 }
 
 bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll)
