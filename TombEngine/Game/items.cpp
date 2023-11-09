@@ -423,6 +423,17 @@ void KillEffect(short fxNumber)
 		fx->nextFx = NextFxFree;
 		NextFxFree = fxNumber;
 	}
+
+	// HACK: Garbage collect nextFx if no active effects were detected.
+	// This fixes random crashes after spawining multiple FXs (like body part).
+
+	if (NextFxActive == NO_ITEM)
+	{
+		NextFxFree = 0;
+
+		for (auto& fx : EffectList)
+			fx.nextActive = NO_ITEM;
+	}
 }
 
 short CreateNewEffect(short roomNumber) 
