@@ -58,7 +58,7 @@ Lua API changes:
 * Add Input.GetCursorDisplayPosition() function to get the cursor's position.
 * Add functions to load, save, delete and check existence of savegames.
 * Add Lara:GetAmmoType() function to read the ammo that player is using.
-* Add Moveable:GetEndFrame() function to get the end frame number of a moveable's active animation.
+* Add Moveable:GetEndFrame() function to get the end frame number of a moveable's current animation.
 * Add extra parameter to GiveItem() function to optionally display an inventory item given to the player in the pickup summary.
 * Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.
 * Add log messages warnings to functions AddCallback and RemoveCallback.
