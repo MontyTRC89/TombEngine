@@ -239,11 +239,8 @@ namespace TEN::Player::Context
 		float detectRadius = OFFSET_RADIUS(radius);
 		auto attracColls = GetAttractorCollisions(item, refPoint, detectRadius);
 
-		const AttractorCollisionData* attracCollPtr = nullptr;
-		float closestDist = INFINITY;
-		bool hasEnd = false;
-
 		// Assess attractor collision.
+		bool hasEnd = false;
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check if attractor is edge type.
@@ -296,22 +293,13 @@ namespace TEN::Player::Context
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
-				// Track closest attractor.
-				if (attracColl.Proximity.Distance < closestDist)
-				{
-					attracCollPtr = &attracColl;
-					closestDist = attracColl.Proximity.Distance;
-				}
-
-				continue;
+				// Return closest edge attractor.
+				return attracColl;
 			}
 		}
 
 		// No edge found; return nullopt.
-		if (attracCollPtr == nullptr)
-			return std::nullopt;
-
-		return *attracCollPtr;
+		return std::nullopt;
 	}
 
 	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll)

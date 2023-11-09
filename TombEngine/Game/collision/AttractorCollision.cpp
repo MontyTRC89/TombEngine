@@ -171,7 +171,7 @@ namespace TEN::Collision::Attractor
 		// Get pointers to approximately nearby attractors.
 		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(probePoint, roomNumber, detectRadius);
 
-		// Get attractor collisions sorted by distance.
+		// Collect attractor collisions sorted by distance in multimap.
 		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
@@ -198,7 +198,7 @@ namespace TEN::Collision::Attractor
 				break;
 		}
 
-		// Return attractor collisions.
+		// Return attractor collisions sorted by distance.
 		return attracColls;
 	}
 

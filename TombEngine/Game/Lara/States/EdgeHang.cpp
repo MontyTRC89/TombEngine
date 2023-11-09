@@ -45,9 +45,6 @@ namespace TEN::Player
 		auto attracColls = GetAttractorCollisions(item, probePoint, CONNECT_DIST_THRESHOLD);
 		auto currentAttracColl = GetAttractorCollision(currentAttrac, item.Pose.Position.ToVector3(), item.Pose.Orientation, probePoint);
 
-		const AttractorCollisionData* attracCollPtr = nullptr;
-		float closestDist = INFINITY;
-
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
@@ -63,18 +60,12 @@ namespace TEN::Player
 			if (Geometry::GetShortestAngle(attracColl.HeadingAngle, currentAttracColl.HeadingAngle) > CORNER_ANGLE_MAX)
 				continue;
 
-			// Track closest attractor.
-			if (attracColl.Proximity.Distance < closestDist)
-			{
-				attracCollPtr = &attracColl;
-				closestDist = attracColl.Proximity.Distance;
-			}
+			// Return closest connecting attractor.
+			return attracColl;
 		}
 
-		if (attracCollPtr == nullptr)
-			return std::nullopt;
-
-		return *attracCollPtr;
+		// No connecting attractor found; return nullopt.
+		return std::nullopt;
 	}
 
 	static std::optional<EdgeHangAttractorCollisionData> GetEdgeHangAttractorCollisions(ItemInfo& item, const CollisionInfo& coll,
