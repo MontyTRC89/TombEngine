@@ -239,7 +239,7 @@ Specify which translations in the strings table correspond to which languages.
 //@function FlipMap
 //@tparam int flipmap (ID of flipmap)
 */
-	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap);
+	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap, this);
 
 	ScriptColor::Register(parent);
 	ScriptDisplaySprite::Register(*lua, parent);
