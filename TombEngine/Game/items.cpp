@@ -428,12 +428,7 @@ void KillEffect(short fxNumber)
 	// This fixes random crashes after spawining multiple FXs (like body part).
 
 	if (NextFxActive == NO_ITEM)
-	{
-		NextFxFree = 0;
-
-		for (auto& fx : EffectList)
-			fx.nextActive = NO_ITEM;
-	}
+		InitializeFXArray();
 }
 
 short CreateNewEffect(short roomNumber) 
@@ -458,7 +453,7 @@ short CreateNewEffect(short roomNumber)
 	return fxNumber;
 }
 
-void InitializeFXArray(int allocateMemory)
+void InitializeFXArray()
 {
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
