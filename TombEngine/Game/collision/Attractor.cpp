@@ -394,7 +394,7 @@ namespace TEN::Collision::Attractor
 					continue;
 
 				// Generate floor attractors.
-				auto vertexGroups = pointColl.BottomBlock->GetSurfaceVertices(pos.x, pos.z, true);
+				auto vertexGroups = pointColl.BottomBlock->GetSurfaceVertexGroups(pos.x, pos.z, true);
 				for (auto& vertices : vertexGroups)
 				{
 					if (!vertices.empty())

@@ -118,7 +118,7 @@ namespace TEN::Collision::Attractor
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
 
 		// TEMP
-		// Get debug attractors.
+		// Collect debug attractors.
 		auto debugAttracPtrs = GetDebugAttractorPtrs();
 		for (auto* attracPtr : debugAttracPtrs)
 		{
@@ -126,11 +126,10 @@ namespace TEN::Collision::Attractor
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
-		// Run through neighbor rooms.
+		// Collect room attractors in neighbor rooms.
 		auto& room = g_Level.Rooms[roomNumber];
 		for (int neighborRoomNumber : room.neighbors)
 		{
-			// Collect room attractors.
 			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 			for (auto& attrac : neighborRoom.Attractors)
 			{
@@ -141,7 +140,7 @@ namespace TEN::Collision::Attractor
 
 		auto bridgeItemNumbers = std::set<int>{};
 
-		// Collect bridge item numbers.
+		// Collect bridge item numbers in neighbor sectors.
 		auto sectorPtrs = GetNeighborSectorPtrs(Vector3i(probePoint), roomNumber, SECTOR_SEARCH_DEPTH);
 		for (auto* sectorPtr : sectorPtrs)
 		{

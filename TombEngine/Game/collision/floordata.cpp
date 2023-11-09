@@ -20,7 +20,7 @@ using TEN::Renderer::g_Renderer;
 //-----
 
 // Debug
-std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertices(int x, int z, bool isFloor)
+std::vector<std::vector<Vector3>> FloorInfo::GetSurfaceVertexGroups(int x, int z, bool isFloor)
 {
 	constexpr auto TRIANGLE_VERTEX_COUNT = 3;
 	constexpr auto QUAD_VERTEX_COUNT	 = 4;
@@ -538,7 +538,6 @@ namespace TEN::Collision::Floordata
 			roomGridCoord.y = std::clamp(roomGridCoord.y, 0, room.zSize - 1);
 		}
 
-		// Return room position.
 		return roomGridCoord;
 	}
 
@@ -593,10 +592,12 @@ namespace TEN::Collision::Floordata
 		return sectorPtrs;
 	}
 
-	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomPos)
+	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
-		return room.floor[(room.zSize * roomPos.x) + roomPos.y];
+
+		int sectorID = (room.zSize * roomGridCoord.x) + roomGridCoord.y;
+		return room.floor[sectorID];
 	}
 
 	FloorInfo& GetFloor(int roomNumber, int x, int z)

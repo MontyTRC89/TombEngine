@@ -131,7 +131,7 @@ class FloorInfo
 		bool Stopper	  = true;
 
 		// Debug
-		std::vector<std::vector<Vector3>> GetSurfaceVertices(int x, int z, bool isFloor);
+		std::vector<std::vector<Vector3>> GetSurfaceVertexGroups(int x, int z, bool isFloor);
 
 		// Getters
 		int		GetSurfacePlaneIndex(int x, int z, bool isFloor) const;
@@ -177,7 +177,7 @@ namespace TEN::Collision::Floordata
 	std::vector<Vector2i>	GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
 	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
 
-	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomPos);
+	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
 	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);
