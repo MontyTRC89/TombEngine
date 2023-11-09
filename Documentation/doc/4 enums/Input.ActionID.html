@@ -48,7 +48,7 @@
   <li>    <a href="../2 classes/DisplaySprite.html">DisplaySprite</a></li>
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
-  <li>    <here>Flow.InventoryItem</here></li>
+  <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
@@ -77,7 +77,7 @@
   <li>    <a href="../4 enums/DisplaySprite.ScaleMode.html">DisplaySprite.ScaleMode</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
+  <li>    <here>Input.ActionID</here></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
@@ -96,18 +96,18 @@
 
 <div id="content">
 
-<h1>Class <code>Flow.InventoryItem</code></h1>
-<p>Represents the properties of an object as it appears in the inventory.</p>
+<h1>Enum <code>Input.ActionID</code></h1>
+<p>Constants for action key IDs.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Input_ActionID_constants">Input.ActionID constants </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#InventoryItem">InventoryItem(nameKey, objectID, yOffset, scale, rot, axis, meshBits, action)</a></td>
-	<td class="summary">Create an InventoryItem.</td>
+	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
+	<td class="summary">Table of action ID constants (for use with KeyIsHeld / KeyIsHit / etc commands).</td>
 	</tr>
 </table>
 
@@ -115,78 +115,73 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header has-description"><a name="Input_ActionID_constants"></a>Input.ActionID constants </h2>
 
+          <div class="section-description">
+
+
+
+<p>The following constants are inside ActionID.</p>
+
+<pre><code>FORWARD
+BACK
+LEFT
+RIGHT
+STEP_LEFT
+STEP_RIGHT
+WALK
+SPRINT
+CROUCH
+JUMP
+ROLL
+ACTION
+DRAW
+LOOK
+
+ACCELERATE
+REVERSE
+SPEED
+SLOW
+BRAKE
+FIRE
+
+FLARE
+SMALL_MEDIPACK
+LARGE_MEDIPACK
+PREVIOUS_WEAPON
+NEXT_WEAPON
+WEAPON_1
+WEAPON_2
+WEAPON_3
+WEAPON_4
+WEAPON_5
+WEAPON_6
+WEAPON_7
+WEAPON_8
+WEAPON_9
+WEAPON_10
+
+SELECT
+DESELECT
+PAUSE
+INVENTORY
+SAVE
+LOAD
+</code></pre>
+
+
+          </div>
     <dl class="function">
     <dt>
-    <a name = "InventoryItem"></a>
-    <strong>InventoryItem(nameKey, objectID, yOffset, scale, rot, axis, meshBits, action)</strong>
+    <a name = "CONSTANT_STRING_HERE"></a>
+    <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
-    Create an InventoryItem.
+    Table of action ID constants (for use with KeyIsHeld / KeyIsHit / etc commands).
 
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">nameKey</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         key for the item's (localised) name.<br />
-Corresponds to an entry in strings.lua.
-        </li>
-        <li><span class="parameter">objectID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         object ID of the inventory object to change
-        </li>
-        <li><span class="parameter">yOffset</span>
-            <span class="types"><span class="type">float</span></span>
-         y-axis offset (positive values move the item down).<br />
-A value of about 100 will cause the item to display directly below its usual position.
-        </li>
-        <li><span class="parameter">scale</span>
-            <span class="types"><span class="type">float</span></span>
-         item size (1 being standard size).<br />
-A value of 0.5 will cause the item to render at half the size,
-and a value of 2 will cause the item to render at twice the size.
-        </li>
-        <li><span class="parameter">rot</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         rotation around x, y, and z axes
-        </li>
-        <li><span class="parameter">axis</span>
-            <span class="types"><span class="type">RotationAxis</span></span>
-         Axis to rotate around when the item is observed at in the inventory.<br />
-Note that this is entirely separate from the <code>rot</code> field described above.
-Must one of the following:</p>
-<pre><code>X
-Y
-Z
-</code></pre>
-<p>e.g. <code>myItem.rotAxisWhenCurrent = RotationAxis.X</code>
-        </li>
-        <li><span class="parameter">meshBits</span>
-            <span class="types"><span class="type">int</span></span>
-         <strong>Not currently implemented</strong> (will have no effect regardless of what you set it to)
-        </li>
-        <li><span class="parameter">action</span>
-            <span class="types"><span class="type">ItemAction</span></span>
-         is this usable, equippable, combineable or examinable?<br/>
-Must be one of:</p>
-<pre><code>EQUIP
-USE
-COMBINE
-EXAMINE
-</code></pre>
-<p>e.g. <code>myItem.action = ItemAction.EXAMINE</code>
-        </li>
-    </ul>
 
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../2 classes/Flow.InventoryItem.html#InventoryItem">InventoryItem</a></span>
-        an InventoryItem
-    </ol>
 
 
 
