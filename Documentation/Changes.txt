@@ -12,7 +12,8 @@ Version 1.2
 * Fix TR1 bear various original AI issues.
 * Fix TR2 knife thrower AI.
 * Fix TR2 doberman crashing the game when killed by explosive weapons.
-* Fix exploding enemies sometimes crashing the game.
+* Fix random crashes when killing exploding enemies.
+* Fix random crashes in battle with more than 8 enemies.
 * Fix volume change in settings not affecting voice track.
 * Fix several lighting bugs.
 * Fix double drawing additive faces.
