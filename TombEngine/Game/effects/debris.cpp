@@ -8,7 +8,6 @@
 #include "Math/Random.h"
 #include "Math/Math.h"
 
-using std::vector;
 using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 
@@ -17,7 +16,7 @@ SHATTER_ITEM ShatterItem;
 short SmashedMeshCount;
 MESH_INFO* SmashedMesh[32];
 short SmashedMeshRoom[32];
-vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
+std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
 
 bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 {
