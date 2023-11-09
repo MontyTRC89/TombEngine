@@ -230,14 +230,9 @@ namespace TEN::Player::Context
 	{
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
 
-		auto relOffset = Vector3(0.0f, -coll.Setup.Height, coll.Setup.Radius);
-		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
-		float radius = std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length());
-
 		// Get attractor collisions.
-		auto refPoint = item.Pose.Position.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
-		float detectRadius = OFFSET_RADIUS(radius);
-		auto attracColls = GetAttractorCollisions(item, refPoint, detectRadius);
+		float detectRadius = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
+		auto attracColls = GetAttractorCollisions(item, coll.Setup.Radius, -coll.Setup.Height, 0.0f, detectRadius);
 
 		// Assess attractor collision.
 		bool hasEnd = false;

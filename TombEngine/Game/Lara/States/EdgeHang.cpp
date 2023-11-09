@@ -42,8 +42,8 @@ namespace TEN::Player
 		constexpr auto CORNER_ANGLE_MAX		  = ANGLE(30.0f);
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, probePoint, CONNECT_DIST_THRESHOLD);
-		auto currentAttracColl = GetAttractorCollision(currentAttrac, item.Pose.Position.ToVector3(), item.Pose.Orientation, probePoint);
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, probePoint, CONNECT_DIST_THRESHOLD);
+		auto currentAttracColl = GetAttractorCollision(currentAttrac, item.Pose.Position.ToVector3(), item.Pose.Orientation.y, probePoint);
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -83,8 +83,6 @@ namespace TEN::Player
 		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
 		bool isLooped = handsAttrac.AttracPtr->IsLooped();
-
-		auto& thing = *player.Context.HandsAttractor.AttracPtr;
 
 		// TODO: Horrible, organise later.
 		// Get connecting attractors just in case.
@@ -133,20 +131,20 @@ namespace TEN::Player
 			connectingAttracCollRight->Attrac.GetPointAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (chainDistRight - length)) :
 			handsAttrac.AttracPtr->GetPointAtChainDistance(chainDistRight);
 
-		auto basePos = item.Pose.Position.ToVector3();
-		auto orient = item.Pose.Orientation;
+		auto pos = item.Pose.Position.ToVector3();
+		auto headingAngle = item.Pose.Orientation.y;
 
 		// Get attractor collisions.
 		auto attracCollCenter = ((chainDistCenter <= 0.0f || chainDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
-			GetAttractorCollision(connectingAttracCollCenter->Attrac, basePos, orient, pointCenter) :
-			GetAttractorCollision(*handsAttrac.AttracPtr, basePos, orient, pointCenter);
+			GetAttractorCollision(connectingAttracCollCenter->Attrac, pos, headingAngle, pointCenter) :
+			GetAttractorCollision(*handsAttrac.AttracPtr, pos, headingAngle, pointCenter);
 
 		auto attracCollLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			GetAttractorCollision(connectingAttracCollLeft->Attrac, basePos, orient, pointLeft) :
-			GetAttractorCollision(*handsAttrac.AttracPtr, basePos, orient, pointLeft);
+			GetAttractorCollision(connectingAttracCollLeft->Attrac, pos, headingAngle, pointLeft) :
+			GetAttractorCollision(*handsAttrac.AttracPtr, pos, headingAngle, pointLeft);
 		auto attracCollRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			GetAttractorCollision(connectingAttracCollRight->Attrac, basePos, orient, pointLeft) :
-			GetAttractorCollision(*handsAttrac.AttracPtr, basePos, orient, pointRight);
+			GetAttractorCollision(connectingAttracCollRight->Attrac, pos, headingAngle, pointLeft) :
+			GetAttractorCollision(*handsAttrac.AttracPtr, pos, headingAngle, pointRight);
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);

@@ -132,7 +132,7 @@ namespace TEN::Collision::Attractor
 		player.Context.DebugAttracs.Attracs = attracs;
 
 		// Draw debug.
-		auto attracColls = GetAttractorCollisions(item, item.Pose.Position.ToVector3(), BLOCK(5));
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(5));
 		for (const auto& attracColl : attracColls)
 			attracColl.Attrac.DrawDebug();
 	}

@@ -15,7 +15,7 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
-	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint) :
+	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, const Vector3& pos, short headingAngle, const Vector3& probePoint) :
 		Attrac(attrac)
 	{
 		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
@@ -23,6 +23,8 @@ namespace TEN::Collision::Attractor
 
 		// Fill proximity data.
 		Proximity = GetProximity(probePoint);
+
+		auto orient = EulerAngles(0, headingAngle, 0);
 
 		// Calculate segment orientation.
 		const auto& points = Attrac.GetPoints();
@@ -34,7 +36,7 @@ namespace TEN::Collision::Attractor
 		HeadingAngle = attracOrient.y + HEADING_ANGLE_OFFSET;
 		SlopeAngle = attracOrient.x;
 		IsFacingForward = (abs(Geometry::GetShortestAngle(HeadingAngle, orient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD);
-		IsInFront = Geometry::IsPointInFront(basePos, Proximity.Intersection, orient);
+		IsInFront = Geometry::IsPointInFront(pos, Proximity.Intersection, orient);
 	}
 
 	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& probePoint) const
@@ -85,9 +87,9 @@ namespace TEN::Collision::Attractor
 		return attracProx;
 	}
 
-	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& basePos, const EulerAngles& orient, const Vector3& probePoint)
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& pos, short headingAngle, const Vector3& probePoint)
 	{
-		return AttractorCollisionData(attrac, basePos, orient, probePoint);
+		return AttractorCollisionData(attrac, pos, headingAngle, probePoint);
 	}
 
 	// Debug
@@ -163,7 +165,7 @@ namespace TEN::Collision::Attractor
 		return nearbyAttracPtrs;
 	}
 
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& basePos, int roomNumber, const EulerAngles& orient,
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
 															   const Vector3& probePoint, float detectRadius)
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
@@ -175,7 +177,7 @@ namespace TEN::Collision::Attractor
 		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
-			auto attracColl = GetAttractorCollision(*attracPtr, basePos, orient, probePoint);
+			auto attracColl = GetAttractorCollision(*attracPtr, pos, headingAngle, probePoint);
 
 			// Filter out non-intersections.
 			if (attracColl.Proximity.Distance > detectRadius)
@@ -202,8 +204,29 @@ namespace TEN::Collision::Attractor
 		return attracColls;
 	}
 
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, const Vector3& probePoint, float detectRadius)
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, const Vector3& dir,
+															   float dist, float detectRadius)
 	{
-		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation, probePoint, detectRadius);
+		short headingAngle = EulerAngles(dir).y;
+		auto probePoint = Geometry::TranslatePoint(pos, dir, dist);
+
+		return GetAttractorCollisions(pos, roomNumber, headingAngle, probePoint, detectRadius);
+	}
+
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
+															   float forward, float down, float right, float detectRadius)
+	{
+		auto relOffset = Vector3(right, down, forward);
+		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
+		auto probePoint = pos + Vector3::Transform(relOffset, rotMatrix);
+
+		return GetAttractorCollisions(pos, roomNumber, headingAngle, probePoint, detectRadius);
+	}
+
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, float forward, float down, float right, float detectRadius)
+	{
+		return GetAttractorCollisions(
+			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
+			forward, down, right, detectRadius);
 	}
 }
