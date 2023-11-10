@@ -335,7 +335,8 @@ namespace TEN::Entities::Generic
 		pushableColl.CeilingHeight = pointColl.Position.Ceiling;
 
 		// Above water.
-		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
+		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) ||
+			TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
 		{
 			pushable.WaterSurfaceHeight = waterHeight;
 

@@ -1183,7 +1183,7 @@ void CalculateCamera(const CollisionInfo& coll)
 			LastTarget.z = Camera.target.z;
 			LastTarget.RoomNumber = Camera.target.RoomNumber;
 
-			y -= CLICK(0.25f);
+			y -= CLICK(1);
 		}
 
 		Camera.target.RoomNumber = item->RoomNumber;

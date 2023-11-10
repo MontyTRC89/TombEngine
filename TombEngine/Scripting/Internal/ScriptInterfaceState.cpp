@@ -2,7 +2,6 @@
 #include "Scripting/Include/ScriptInterfaceState.h"
 
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
 #include "Scripting/Internal/TEN/Input/InputHandler.h"
@@ -13,8 +12,6 @@
 #include "Scripting/Internal/TEN/Sound/SoundHandler.h"
 #include "Scripting/Internal/TEN/Util/Util.h"
 #include "Scripting/Internal/TEN/View/ViewHandler.h"
-
-using namespace TEN::Scripting::DisplaySprite;
 
 static sol::state SolState;
 static sol::table RootTable;
@@ -62,5 +59,5 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 	Input::Register(&SolState, RootTable);
 	Sound::Register(&SolState, RootTable);
 	Util::Register(&SolState, RootTable);
-	View::Register(&SolState, RootTable);
+	TEN::Scripting::View::Register(&SolState, RootTable);
 }

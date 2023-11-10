@@ -8,12 +8,16 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
-using namespace TEN::Effects::DisplaySprite;
 using TEN::Renderer::g_Renderer;
+
+/***
+Represents a display sprite.
+
+@tenclass View.DisplaySprite
+@pragma nostrip
+*/
 
 namespace TEN::Scripting::DisplaySprite
 {
@@ -43,14 +47,6 @@ namespace TEN::Scripting::DisplaySprite
 			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
 			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
 			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
-
-		auto table = sol::table(state.lua_state(), sol::create);
-		parent.set(ScriptReserved_DisplaySpriteEnum, table);
-		
-		// Register enums.
-		auto handler = LuaHandler(&state);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
 	/// Create a DisplaySprite object.
@@ -60,7 +56,7 @@ namespace TEN::Scripting::DisplaySprite
 	// @tparam Vec2 pos Display position in percent.
 	// @tparam float rot Rotation in degrees.
 	// @tparam Vec2 scale Horizontal and vertical scale in percent. Scaling is interpreted by the DisplaySpriteEnum.ScaleMode passed to the Draw() function call.
-	// @tparam Color color[opt] Color. __Default: Color(255, 255, 255, 255)__
+	// @tparam[opt] Color color Color. __Default: Color(255, 255, 255, 255)__
 	// @treturn DisplaySprite A new DisplaySprite object.
 	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
 	{
@@ -177,10 +173,10 @@ namespace TEN::Scripting::DisplaySprite
 
 	/// Draw the display sprite in display space for the current frame.
 	// @function DisplaySprite:Draw
-	// @tparam Objects.ObjID[opt] priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
-	// @tparam DisplaySprite.AlignMode[opt] alignMode Align mode interpreting an offset from the sprite's position. __Default: DisplaySprite.AlignMode.CENTER__
-	// @tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: DisplaySprite.ScaleMode.FIT__
-	// @tparam Effects.BlendID[opt] blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
+	// @tparam[opt] Objects.ObjID priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
+	// @tparam[opt] View.AlignMode alignMode Align mode interpreting an offset from the sprite's position. __Default: View.AlignMode.CENTER__
+	// @tparam[opt] View.ScaleMode scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: View.ScaleMode.FIT__
+	// @tparam[opt] Effects.BlendID blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
 	void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
 								   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
 	{

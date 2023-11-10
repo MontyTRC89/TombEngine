@@ -41,7 +41,7 @@
   <li>    <a href="../1 modules/Sound.html">Sound</a></li>
   <li>    <a href="../1 modules/Strings.html">Strings</a></li>
   <li>    <a href="../1 modules/Util.html">Util</a></li>
-  <li>    <a href="../1 modules/View.html">View</a></li>
+  <li>    <here>View</here></li>
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
@@ -67,7 +67,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
-  <li>    <here>Rotation</here></li>
+  <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
   <li>    <a href="../3 primitive classes/Vec2.html">Vec2</a></li>
   <li>    <a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
@@ -96,39 +96,50 @@
 
 <div id="content">
 
-<h1>Primitive Class <code>Rotation</code></h1>
-<p>Represents a degree-based 3D rotation.</p>
-<p>All values are clamped to the range [0.0, 360.0].</p>
+<h1>Table <code>View</code></h1>
+<p>Functions to manage camera and game view.</p>
+<p>
+
+</p>
 
 
-<h2><a href="#Members">Members</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#x">x</a></td>
-	<td class="summary">(float) X angle component.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#y">y</a></td>
-	<td class="summary">(float) Y angle component.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#z">z</a></td>
-	<td class="summary">(float) Z angle component.</td>
-	</tr>
-</table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Rotation">Rotation(x, y, z)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="name" ><a href="#GetAspectRatio">GetAspectRatio()</a></td>
+	<td class="summary">Get the display resolution's aspect ratio.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#__tostring">__tostring(rotation)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="name" ><a href="#FadeIn">FadeIn(speed)</a></td>
+	<td class="summary">Do a full-screen fade-in from black.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#FadeOut">FadeOut(speed)</a></td>
+	<td class="summary">Do a full-screen fade-to-black.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetCineBars">SetCineBars(height, speed)</a></td>
+	<td class="summary">Move black cinematic bars in from the top and bottom of the game window.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetFOV">SetFOV(angle)</a></td>
+	<td class="summary">Set field of view.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCameraType">GetCameraType()</a></td>
+	<td class="summary">Shows the mode of the game camera.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#PlayFlyBy">PlayFlyBy(flyby)</a></td>
+	<td class="summary">Enable FlyBy with specific ID</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ResetObjCamera">ResetObjCamera()</a></td>
+	<td class="summary">Reset object camera back to Lara and deactivate object camera.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#FlashScreen">FlashScreen(color, speed)</a></td>
+	<td class="summary">Flash screen.</td>
 	</tr>
 </table>
 
@@ -136,90 +147,24 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Members"></a>Members</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "x"></a>
-    <strong>x</strong>
-    </dt>
-    <dd>
-    (float) X angle component.
-
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "y"></a>
-    <strong>y</strong>
-    </dt>
-    <dd>
-    (float) Y angle component.
-
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "z"></a>
-    <strong>z</strong>
-    </dt>
-    <dd>
-    (float) Z angle component.
-
-
-
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "Rotation"></a>
-    <strong>Rotation(x, y, z)</strong>
+    <a name = "GetAspectRatio"></a>
+    <strong>GetAspectRatio()</strong>
     </dt>
     <dd>
+    Get the display resolution's aspect ratio.
 
 
 
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">x</span>
-            <span class="types"><span class="type">float</span></span>
-         X angle component.
-        </li>
-        <li><span class="parameter">y</span>
-            <span class="types"><span class="type">float</span></span>
-         Y angle component.
-        </li>
-        <li><span class="parameter">z</span>
-            <span class="types"><span class="type">float</span></span>
-         Z angle component.
-        </li>
-    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-        A Rotation.
+           <span class="types"><span class="type">float</span></span>
+        Display resolution's aspect ratio.
     </ol>
 
 
@@ -227,30 +172,184 @@
 
 </dd>
     <dt>
-    <a name = "__tostring"></a>
-    <strong>__tostring(rotation)</strong>
+    <a name = "FadeIn"></a>
+    <strong>FadeIn(speed)</strong>
     </dt>
     <dd>
-
-
-
+    Do a full-screen fade-in from black.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">rotation</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         this Rotation.
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
         </li>
     </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "FadeOut"></a>
+    <strong>FadeOut(speed)</strong>
+    </dt>
+    <dd>
+    Do a full-screen fade-to-black.  The screen will remain black until a call to FadeIn.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetCineBars"></a>
+    <strong>SetCineBars(height, speed)</strong>
+    </dt>
+    <dd>
+    Move black cinematic bars in from the top and bottom of the game window.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">height</span>
+            <span class="types"><span class="type">float</span></span>
+          <strong>(default 30)</strong> Percentage of the screen to be covered
+        </li>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         <strong>(default 30)</strong> Coverage percent per second
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetFOV"></a>
+    <strong>SetFOV(angle)</strong>
+    </dt>
+    <dd>
+    Set field of view.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">angle</span>
+            <span class="types"><span class="type">float</span></span>
+         in degrees (clamped to [10, 170])
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetCameraType"></a>
+    <strong>GetCameraType()</strong>
+    </dt>
+    <dd>
+    Shows the mode of the game camera.
+
+
+
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        A string showing the X, Y, and Z angle components of the Rotation.
+           <span class="types"><a class="type" href="../4 enums/View.CameraType.html#">CameraType</a></span>
+        value used by the Main Camera.
     </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.OnControlPhase = <span class="keyword">function</span>()
+	<span class="keyword">if</span> (View.GetCameraType() == CameraType.Combat) <span class="keyword">then</span>
+		<span class="comment">--Do your Actions here.
+</span>	<span class="keyword">end</span>
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "PlayFlyBy"></a>
+    <strong>PlayFlyBy(flyby)</strong>
+    </dt>
+    <dd>
+    Enable FlyBy with specific ID
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">flyby</span>
+            <span class="types"><span class="type">short</span></span>
+         (ID of flyby)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ResetObjCamera"></a>
+    <strong>ResetObjCamera()</strong>
+    </dt>
+    <dd>
+    Reset object camera back to Lara and deactivate object camera.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "FlashScreen"></a>
+    <strong>FlashScreen(color, speed)</strong>
+    </dt>
+    <dd>
+    Flash screen.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">color</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         (default Color(255, 255, 255))
+        </li>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
+        </li>
+    </ul>
+
 
 
 

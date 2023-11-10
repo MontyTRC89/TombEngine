@@ -19,7 +19,7 @@
 using TEN::Renderer::g_Renderer;
 
 /// Utility functions for various calculations.
-// @tentable Utils 
+// @tentable Util
 // @pragma nostrip
 
 namespace Util
@@ -87,7 +87,7 @@ namespace Util
 	}
 
 	/// Translate a pair display position coordinates to pixel coordinates.
-	//To be used with @{ Strings.DisplayString:SetPosition } and @{ Strings.DisplayString }.
+	//To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.
 	//@function PercentToScreen
 	//@tparam float x X component of the display position.
 	//@tparam float y Y component of the display position.
@@ -113,7 +113,7 @@ namespace Util
 	}
 
 	/// Translate a pair of pixel coordinates to display position coordinates.
-	//To be used with @{ Strings.DisplayString:GetPosition }.
+	//To be used with @{Strings.DisplayString:GetPosition}.
 	//@function ScreenToPercent
 	//@tparam int x X pixel coordinate to translate to display position.
 	//@tparam int y Y pixel coordinate to translate to display position.

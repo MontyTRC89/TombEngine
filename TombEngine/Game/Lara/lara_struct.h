@@ -1374,7 +1374,7 @@ struct PlayerContextData
 
 struct LaraInfo
 {
-	static constexpr auto TARGET_COUNT_MAX = 8;
+	static constexpr auto TARGET_COUNT_MAX = 16;
 
 	LaraControlData	  Control	= {};
 	PlayerContextData Context	= {};

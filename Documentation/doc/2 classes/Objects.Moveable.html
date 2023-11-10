@@ -34,14 +34,18 @@
 <ul class="nowrap">
   <li>    <a href="../1 modules/Effects.html">Effects</a></li>
   <li>    <a href="../1 modules/Flow.html">Flow</a></li>
+  <li>    <a href="../1 modules/Input.html">Input</a></li>
   <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
-  <li>    <a href="../1 modules/Misc.html">Misc</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
+  <li>    <a href="../1 modules/Sound.html">Sound</a></li>
   <li>    <a href="../1 modules/Strings.html">Strings</a></li>
+  <li>    <a href="../1 modules/Util.html">Util</a></li>
+  <li>    <a href="../1 modules/View.html">View</a></li>
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="../2 classes/DisplaySprite.html">DisplaySprite</a></li>
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
@@ -69,16 +73,18 @@
 </ul>
 <h2>4 Enums</h2>
 <ul class="nowrap">
+  <li>    <a href="../4 enums/DisplaySprite.AlignMode.html">DisplaySprite.AlignMode</a></li>
+  <li>    <a href="../4 enums/DisplaySprite.ScaleMode.html">DisplaySprite.ScaleMode</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
-  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
-  <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
-  <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
+  <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
+  <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -99,7 +105,7 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Moveable">Moveable(object, name, position[, rotation][, room][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</a></td>
+	<td class="name" ><a href="#Moveable">Moveable(object, name, position[, rotation][, roomID][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</a></td>
 	<td class="summary">For more information on each parameter, see the
 associated getters and setters.</td>
 	</tr>
@@ -299,6 +305,10 @@ associated getters and setters.</td>
  (or more than one) had suddenly spawned beneath their feet.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:GetEndFrame">Moveable:GetEndFrame()</a></td>
+	<td class="summary">Get the end frame number of the moveable's active animation.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:GetRoom">Moveable:GetRoom()</a></td>
 	<td class="summary">Get the current room of the object</td>
 	</tr>
@@ -370,7 +380,7 @@ associated getters and setters.</td>
     <dl class="function">
     <dt>
     <a name = "Moveable"></a>
-    <strong>Moveable(object, name, position[, rotation][, room][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</strong>
+    <strong>Moveable(object, name, position[, rotation][, roomID][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</strong>
     </dt>
     <dd>
     For more information on each parameter, see the
@@ -398,7 +408,7 @@ most can just be ignored (see usage).
          rotation about x, y, and z axes (default Rotation(0, 0, 0))
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">room</span>
+        <li><span class="parameter">roomID</span>
             <span class="types"><span class="type">int</span></span>
          room ID item is in (default: calculated automatically)
          (<em>optional</em>)
@@ -425,7 +435,7 @@ most can just be ignored (see usage).
         </li>
         <li><span class="parameter">AIBits</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         table with AI bits (default {0,0,0,0,0,0})
+         table with AI bits (default { 0, 0, 0, 0, 0, 0 })
          (<em>optional</em>)
         </li>
     </ul>
@@ -444,8 +454,7 @@ most can just be ignored (see usage).
         <pre class="example"><span class="keyword">local</span> item = Moveable(
 	TEN.Objects.ObjID.PISTOLS_ITEM, <span class="comment">-- object id
 </span>	<span class="string">"test"</span>, <span class="comment">-- name
-</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>)
-	)</pre>
+</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>))</pre>
     </ul>
 
 </dd>
@@ -1551,6 +1560,28 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 
 </dd>
     <dt>
+    <a name = "Moveable:GetEndFrame"></a>
+    <strong>Moveable:GetEndFrame()</strong>
+    </dt>
+    <dd>
+    Get the end frame number of the moveable's active animation.
+ This is the "End Frame" set in WADTool for the animation.()
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        End frame number of the active animation.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:GetRoom"></a>
     <strong>Moveable:GetRoom()</strong>
     </dt>
@@ -1861,7 +1892,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-09-30 13:48:57 </i>
+<i style="float:right;">Last updated 2023-11-09 18:25:22 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

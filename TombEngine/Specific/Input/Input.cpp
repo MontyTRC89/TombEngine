@@ -86,15 +86,14 @@ namespace TEN::Input
 			"",				"",				"",				"",				"",				"",				"",				"",
 			"",				"",				"",				"",				"",				"",				"",				"",
 
-			"Left-Click",	"Right-Click",	"Middle-Click",	"Mouse 4",		"Mouse 5",		"Mouse 6",		"Mouse 7",		"Mouse 8",
-
 			"Joy 1", 		"Joy 2",		"Joy 3",		"Joy 4", 		"Joy 5",		"Joy 6", 		"Joy 7",		"Joy 8",
 			"Joy 9",		"Joy 10",		"Joy 11",		"Joy 12",		"Joy 13",		"Joy 14",		"Joy 15",		"Joy 16",
 
-			"Mouse X-",		"Mouse X+",		"Mouse Y-",		"Mouse Y+",		"Mouse Z-",		"Mouse Z+",
-
 			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+",
-			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
+			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right",
+
+			"Left-Click",	"Right-Click",	"Middle-Click",	"Mouse 4",		"Mouse 5",		"Mouse 6",		"Mouse 7",		"Mouse 8",
+			"Mouse X-",		"Mouse X+",		"Mouse Y-",		"Mouse Y+",		"Mouse Z-",		"Mouse Z+"
 	};
 
 	// Binding rows:
@@ -113,9 +112,9 @@ namespace TEN::Input
 	const auto DefaultXInputBindings = std::vector<int>
 	{
 		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_LSTICK, XB_RSTICK, XB_RSHIFT, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_X, XB_B, XB_A, XB_Y, XB_LSHIFT,
-		XB_A, XB_AXIS_X_POS, XB_AXIS_RTRIGGER_NEG, XB_RSHIFT, XB_X, XB_AXIS_LTRIGGER_NEG,
-		XB_DPAD_DOWN, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-		KC_RETURN, XB_SELECT, XB_START, XB_SELECT, KC_F5, KC_F6
+		XB_A, XB_B, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_X, XB_RSHIFT,
+		XB_DPAD_DOWN, XB_DPAD_RIGHT, XB_DPAD_LEFT, KC_LBRACKET, XB_DPAD_UP, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
+		XB_A, XB_Y, XB_START, XB_SELECT, KC_F5, KC_F6
 	};
 
 	std::vector<std::vector<int>> Bindings =
@@ -406,11 +405,11 @@ namespace TEN::Input
 
 			// Poll buttons.
 			for (int i = 0; i < MAX_MOUSE_KEYS; i++)
-				KeyMap[MAX_KEYBOARD_KEYS + i] = state.buttonDown((MouseButtonID)i);
+				KeyMap[ACTION_OFFSET_MOUSE + i] = state.buttonDown((MouseButtonID)i);
 
 			// Register multiple directional keypresses mapped to mouse axes.
-			int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS;
-			for (int pass = 0; pass < MAX_MOUSE_POV_AXES; pass++)
+			int baseIndex = ACTION_OFFSET_MOUSE + MAX_MOUSE_KEYS;
+			for (int pass = 0; pass < MAX_MOUSE_AXES; pass++)
 			{
 				switch (pass)
 				{
@@ -490,7 +489,7 @@ namespace TEN::Input
 
 			// Poll buttons.
 			for (int key = 0; key < state.mButtons.size(); key++)
-				KeyMap[MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + key] = state.mButtons[key];
+				KeyMap[ACTION_OFFSET_GAMEPAD + key] = state.mButtons[key];
 
 			// Poll axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
@@ -512,8 +511,8 @@ namespace TEN::Input
 				float scaledValue = (abs(normalizedValue) * AXIS_SCALE) + AXIS_OFFSET;
 
 				// Calculate and reset discrete input slots.
-				int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
-				int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
+				int negKeyIndex = ACTION_OFFSET_GAMEPAD + MAX_GAMEPAD_KEYS + (axis * 2);
+				int posKeyIndex = ACTION_OFFSET_GAMEPAD + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
@@ -563,7 +562,7 @@ namespace TEN::Input
 					continue;
 
 				// Register multiple directional keypresses mapped to analog axes.
-				int baseIndex = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2);
+				int baseIndex = ACTION_OFFSET_GAMEPAD + MAX_GAMEPAD_KEYS + (MAX_GAMEPAD_AXES * 2);
 				for (int pass = 0; pass < MAX_GAMEPAD_POV_AXES; pass++)
 				{
 					switch (pass)

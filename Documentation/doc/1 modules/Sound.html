@@ -38,7 +38,7 @@
   <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
-  <li>    <a href="../1 modules/Sound.html">Sound</a></li>
+  <li>    <here>Sound</here></li>
   <li>    <a href="../1 modules/Strings.html">Strings</a></li>
   <li>    <a href="../1 modules/Util.html">Util</a></li>
   <li>    <a href="../1 modules/View.html">View</a></li>
@@ -57,7 +57,7 @@
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
   <li>    <a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
-  <li>    <here>Objects.Room</here></li>
+  <li>    <a href="../2 classes/Objects.Room.html">Objects.Room</a></li>
   <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
   <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
@@ -96,8 +96,8 @@
 
 <div id="content">
 
-<h1>Class <code>Objects.Room</code></h1>
-<p>Rooms</p>
+<h1>Table <code>Sound</code></h1>
+<p>Functions for sound management.</p>
 <p>
 
 </p>
@@ -106,36 +106,44 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Room:GetActive">Room:GetActive()</a></td>
-	<td class="summary">Determine whether the room is active or not</td>
+	<td class="name" ><a href="#PlayAudioTrack">PlayAudioTrack(name, type)</a></td>
+	<td class="summary">Play an audio track</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:GetReverbType">Room:GetReverbType()</a></td>
-	<td class="summary">Get the room's reverb type.</td>
+	<td class="name" ><a href="#SetAmbientTrack">SetAmbientTrack(name)</a></td>
+	<td class="summary">Set and play an ambient track</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:SetReverbType">Room:SetReverbType(new)</a></td>
-	<td class="summary">Set the room's reverb type.</td>
+	<td class="name" ><a href="#StopAudioTracks">StopAudioTracks()</a></td>
+	<td class="summary">Stop any audio tracks currently playing</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:GetName">Room:GetName()</a></td>
-	<td class="summary">Get the room's unique string identifier.</td>
+	<td class="name" ><a href="#StopAudioTrack">StopAudioTrack(type)</a></td>
+	<td class="summary">Stop audio track that is currently playing</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:SetName">Room:SetName(name)</a></td>
-	<td class="summary">Set the room's name (its unique string identifier).</td>
+	<td class="name" ><a href="#GetAudioTrackLoudness">GetAudioTrackLoudness(type)</a></td>
+	<td class="summary">Get current loudness level for specified track type</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:GetFlag">Room:GetFlag(flagID)</a></td>
-	<td class="summary">Get the room's specified flag value (true or false).</td>
+	<td class="name" ><a href="#PlaySound">PlaySound(sound[, position])</a></td>
+	<td class="summary">Play sound effect</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:SetFlag">Room:SetFlag(flagID, the)</a></td>
-	<td class="summary">Set the room's specified flag value.</td>
+	<td class="name" ><a href="#StopSound">StopSound(sound)</a></td>
+	<td class="summary">Stop sound effect</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:IsTagPresent">Room:IsTagPresent(tag)</a></td>
-	<td class="summary">Checks if specified tag is set for this room.</td>
+	<td class="name" ><a href="#IsSoundPlaying">IsSoundPlaying(Sound)</a></td>
+	<td class="summary">Check if the sound effect is playing</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsAudioTrackPlaying">IsAudioTrackPlaying(Track)</a></td>
+	<td class="summary">Check if the audio track is playing</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCurrentSubtitle">GetCurrentSubtitle()</a></td>
+	<td class="summary">Get current subtitle string for a voice track currently playing.</td>
 	</tr>
 </table>
 
@@ -147,61 +155,23 @@
 
     <dl class="function">
     <dt>
-    <a name = "Room:GetActive"></a>
-    <strong>Room:GetActive()</strong>
+    <a name = "PlayAudioTrack"></a>
+    <strong>PlayAudioTrack(name, type)</strong>
     </dt>
     <dd>
-    Determine whether the room is active or not
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        true if the room is active
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Room:GetReverbType"></a>
-    <strong>Room:GetReverbType()</strong>
-    </dt>
-    <dd>
-    Get the room's reverb type.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../4 enums/Objects.RoomReverb.html#">RoomReverb</a></span>
-        room's reverb type
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Room:SetReverbType"></a>
-    <strong>Room:SetReverbType(new)</strong>
-    </dt>
-    <dd>
-    Set the room's reverb type.
+    Play an audio track
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">new</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.RoomReverb.html#">RoomReverb</a></span>
-         reverb type of the room
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         of track (without file extension) to play
+        </li>
+        <li><span class="parameter">type</span>
+            <span class="types"><a class="type" href="../4 enums/Sound.SoundTrackType.html#">SoundTrackType</a></span>
+         of the audio track to play
         </li>
     </ul>
 
@@ -211,11 +181,193 @@
 
 </dd>
     <dt>
-    <a name = "Room:GetName"></a>
-    <strong>Room:GetName()</strong>
+    <a name = "SetAmbientTrack"></a>
+    <strong>SetAmbientTrack(name)</strong>
     </dt>
     <dd>
-    Get the room's unique string identifier.
+    Set and play an ambient track
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         of track (without file extension) to play
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "StopAudioTracks"></a>
+    <strong>StopAudioTracks()</strong>
+    </dt>
+    <dd>
+    Stop any audio tracks currently playing
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "StopAudioTrack"></a>
+    <strong>StopAudioTrack(type)</strong>
+    </dt>
+    <dd>
+    Stop audio track that is currently playing
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">type</span>
+            <span class="types"><a class="type" href="../4 enums/Sound.SoundTrackType.html#">SoundTrackType</a></span>
+         of the audio track
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetAudioTrackLoudness"></a>
+    <strong>GetAudioTrackLoudness(type)</strong>
+    </dt>
+    <dd>
+    Get current loudness level for specified track type
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">type</span>
+            <span class="types"><a class="type" href="../4 enums/Sound.SoundTrackType.html#">SoundTrackType</a></span>
+         of the audio track
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        current loudness of a specified audio track
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PlaySound"></a>
+    <strong>PlaySound(sound[, position])</strong>
+    </dt>
+    <dd>
+    Play sound effect
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sound</span>
+            <span class="types"><span class="type">int</span></span>
+         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+        </li>
+        <li><span class="parameter">position</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "StopSound"></a>
+    <strong>StopSound(sound)</strong>
+    </dt>
+    <dd>
+    Stop sound effect
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sound</span>
+            <span class="types"><span class="type">int</span></span>
+         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsSoundPlaying"></a>
+    <strong>IsSoundPlaying(Sound)</strong>
+    </dt>
+    <dd>
+    Check if the sound effect is playing
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Sound</span>
+            <span class="types"><span class="type">int</span></span>
+         ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsAudioTrackPlaying"></a>
+    <strong>IsAudioTrackPlaying(Track)</strong>
+    </dt>
+    <dd>
+    Check if the audio track is playing
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Track</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         filename to check. Should be without extension and without full directory path.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetCurrentSubtitle"></a>
+    <strong>GetCurrentSubtitle()</strong>
+    </dt>
+    <dd>
+    Get current subtitle string for a voice track currently playing.
+Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
+Returns nil if no voice track is playing or no subtitle present.
 
 
 
@@ -224,111 +376,7 @@
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the room's name
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Room:SetName"></a>
-    <strong>Room:SetName(name)</strong>
-    </dt>
-    <dd>
-    Set the room's name (its unique string identifier).
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         The room's new name
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Room:GetFlag"></a>
-    <strong>Room:GetFlag(flagID)</strong>
-    </dt>
-    <dd>
-    Get the room's specified flag value (true or false).
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">flagID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.RoomFlagID.html#">RoomFlagID</a></span>
-         The room's flag ID
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        the room's specified flag value
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Room:SetFlag"></a>
-    <strong>Room:SetFlag(flagID, the)</strong>
-    </dt>
-    <dd>
-    Set the room's specified flag value.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">flagID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.RoomFlagID.html#">RoomFlagID</a></span>
-         The room's flag ID
-        </li>
-        <li><span class="parameter">the</span>
-            <span class="types"><span class="type">bool</span></span>
-         room's new flag value
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Room:IsTagPresent"></a>
-    <strong>Room:IsTagPresent(tag)</strong>
-    </dt>
-    <dd>
-    Checks if specified tag is set for this room.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">tag</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         A text tag to check (case sensitive)
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        true if tag is present, false if not
+        current subtitle string
     </ol>
 
 
