@@ -8,19 +8,17 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
-using namespace TEN::Effects::DisplaySprite;
 using TEN::Renderer::g_Renderer;
 
 /***
-Represents a screen-space display sprite.
+Represents a display sprite.
 
-@tenclass DisplaySprite
+@tenclass View.DisplaySprite
 @pragma nostrip
 */
+
 namespace TEN::Scripting::DisplaySprite
 {
 	void ScriptDisplaySprite::Register(sol::state& state, sol::table& parent)
@@ -49,14 +47,6 @@ namespace TEN::Scripting::DisplaySprite
 			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
 			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
 			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
-
-		auto table = sol::table(state.lua_state(), sol::create);
-		parent.set(ScriptReserved_DisplaySpriteEnum, table);
-		
-		// Register enums.
-		auto handler = LuaHandler(&state);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumScaleMode, DISPLAY_SPRITE_SCALE_MODES);
 	}
 
 	/// Create a DisplaySprite object.
