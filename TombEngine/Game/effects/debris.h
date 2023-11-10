@@ -73,7 +73,7 @@ struct DebrisFragment
 };
 
 extern SHATTER_ITEM ShatterItem;
-extern std::vector<DebrisFragment> DebrisFragments;
+extern std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
 extern ShatterImpactInfo ShatterImpactData;
 extern short SmashedMeshCount;
 extern MESH_INFO* SmashedMesh[32];

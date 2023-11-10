@@ -110,7 +110,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (objOnLos < 0 && GetRandomControl() & 1)
 				{
-					if (StaticObjects[hitMesh->staticNumber].shatterType != SHT_NONE)
+					if (StaticObjects[hitMesh->staticNumber].shatterType != ShatterType::None)
 					{
 						ShatterObject(0, hitMesh, 64, target.RoomNumber, 0);
 						TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, target.RoomNumber, true);

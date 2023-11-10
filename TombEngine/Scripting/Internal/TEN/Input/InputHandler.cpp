@@ -15,7 +15,7 @@ using namespace TEN::Input;
 // @tentable Input
 // @pragma nostrip
 
-namespace Input
+namespace TEN::Scripting::Input
 {
 	/// Vibrate the game controller if the function is available and the setting is on.
 	// @function Vibrate

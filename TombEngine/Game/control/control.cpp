@@ -305,7 +305,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Initialize items, effects, lots, and cameras.
 	HairEffect.Initialize();
-	InitializeFXArray(true);
+	InitializeFXArray();
 	InitializeCamera();
 	InitializeSpotCamSequences(isTitle);
 	InitializeItemBoxData();
@@ -460,12 +460,13 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	{
 		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level->ScriptFileName);
 		g_GameScript->InitCallbacks();
-		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		g_GameStringsHandler->SetCallbackDrawString([](const std::string& key, D3DCOLOR color, const Vec2& pos, float scale, int flags)
 		{
 			g_Renderer.AddString(
-				float(x) / float(g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
-				float(y) / float(g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y,
-				key.c_str(), col, flags);
+				key,
+				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * SCREEN_SPACE_RES.x),
+				((float)pos.y / (float)g_Configuration.ScreenHeight * SCREEN_SPACE_RES.y)),
+				Color(color), scale, flags);
 		});
 	}
 

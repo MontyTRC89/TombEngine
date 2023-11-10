@@ -832,7 +832,7 @@ namespace TEN::Entities::Vehicles
 
 		bool drive = false; // Never changes?
 
-		if (!IsHeld(In::Speed) &&
+		if (!IsHeld(In::Faster) &&
 			!quadBike->Velocity && !quadBike->CanStartDrift)
 		{
 			quadBike->CanStartDrift = true;
@@ -840,7 +840,7 @@ namespace TEN::Entities::Vehicles
 		else if (quadBike->Velocity)
 			quadBike->CanStartDrift = false;
 
-		if (!IsHeld(In::Speed))
+		if (!IsHeld(In::Faster))
 			quadBike->DriftStarting = false;
 
 		if (!quadBike->DriftStarting)
@@ -861,7 +861,7 @@ namespace TEN::Entities::Vehicles
 			// Driving forward.
 			if (quadBike->Velocity > 0)
 			{
-				if (IsHeld(In::Speed) &&
+				if (IsHeld(In::Faster) &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity > MIN_DRIFT_VELOCITY)
 				{
@@ -897,7 +897,7 @@ namespace TEN::Entities::Vehicles
 			// Driving back.
 			else if (quadBike->Velocity < 0)
 			{
-				if (IsHeld(In::Speed) &&
+				if (IsHeld(In::Faster) &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity < (-MIN_DRIFT_VELOCITY + 0x800))
 				{
@@ -934,7 +934,7 @@ namespace TEN::Entities::Vehicles
 			// Driving back / braking.
 			if (IsHeld(In::Reverse))
 			{
-				if (IsHeld(In::Speed) &&
+				if (IsHeld(In::Faster) &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
 				{
 					quadBike->DriftStarting = true;
@@ -952,7 +952,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else if (IsHeld(In::Accelerate))
 			{
-				if (IsHeld(In::Speed) &&
+				if (IsHeld(In::Faster) &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
 				{
 					quadBike->DriftStarting = true;

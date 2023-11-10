@@ -1236,43 +1236,58 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void WadeSplash(ItemInfo* item, int wh, int wd)
+// TODO: Better implementation.
+void SpawnPlayerSplash(const ItemInfo& item, int waterHeight, int waterDepth)
 {
-	auto probe1 = GetCollision(item);
-	auto probe2 = GetCollision(probe1.Block, item->Pose.Position.x, probe1.Position.Ceiling, item->Pose.Position.z);
+	// Get point collision.
+	auto pointColl0 = GetCollision(item);
+	auto pointColl1 = GetCollision(pointColl0.Block, item.Pose.Position.x, pointColl0.Position.Ceiling, item.Pose.Position.z);
 	
-	if (!TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) ||
-		 TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) == TestEnvironment(ENV_FLAG_WATER, probe2.RoomNumber))
+	if (!TestEnvironment(ENV_FLAG_WATER, pointColl0.RoomNumber) ||
+		 TestEnvironment(ENV_FLAG_WATER, pointColl0.RoomNumber) == TestEnvironment(ENV_FLAG_WATER, pointColl1.RoomNumber))
+	{
+		return;
+	}
+
+	const auto& bounds = GetBestFrame(item).BoundingBox;
+	if (item.Pose.Position.y + bounds.Y1 > waterHeight)
 		return;
 
-	const auto& bounds = GetBestFrame(*item).BoundingBox;
-	if (item->Pose.Position.y + bounds.Y1 > wh)
+	if (item.Pose.Position.y + bounds.Y2 < waterHeight)
 		return;
 
-	if (item->Pose.Position.y + bounds.Y2 < wh)
-		return;
-
-	if (item->Animation.Velocity.y <= 0.0f || wd >= 474 || SplashCount != 0)
+	if (item.Animation.Velocity.y <= 0.0f || waterDepth >= 474 || SplashCount != 0)
 	{
 		if (!(Wibble & 0xF))
 		{
-			if (!(GetRandomControl() & 0xF) || item->Animation.ActiveState != LS_IDLE)
+			if (!(GetRandomControl() & 0xF) || item.Animation.ActiveState != LS_IDLE)
 			{
-				if (item->Animation.ActiveState != LS_IDLE)
-					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
+				if (item.Animation.ActiveState != LS_IDLE)
+				{
+					SpawnRipple(
+						Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z),
+						item.RoomNumber, 112 + (GetRandomControl() & 15),
+						(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
+				}
 				else
-					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::LowOpacity);
+				{
+					SpawnRipple(
+						Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z),
+						item.RoomNumber, 112 + (GetRandomControl() & 15),
+						(int)RippleFlags::LowOpacity);
+				}
 			}
 		}
 	}
 	else
 	{
-		SplashSetup.y = wh - 1;
-		SplashSetup.x = item->Pose.Position.x;
-		SplashSetup.z = item->Pose.Position.z;
+		SplashSetup.x = item.Pose.Position.x;
+		SplashSetup.y = waterHeight - 1;
+		SplashSetup.z = item.Pose.Position.z;
 		SplashSetup.innerRadius = 16;
-		SplashSetup.splashPower = item->Animation.Velocity.z;
-		SetupSplash(&SplashSetup, probe1.RoomNumber);
+		SplashSetup.splashPower = item.Animation.Velocity.z;
+
+		SetupSplash(&SplashSetup, pointColl0.RoomNumber);
 		SplashCount = 16;
 	}
 }

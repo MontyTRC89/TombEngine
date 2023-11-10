@@ -12,7 +12,7 @@
 // @tentable Sound
 // @pragma nostrip
 
-namespace Sound
+namespace TEN::Scripting::Sound
 {
 	/// Play an audio track
 	//@function PlayAudioTrack
@@ -62,10 +62,9 @@ namespace Sound
 	//@function PlaySound
 	//@tparam int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
 	////@tparam[opt] Vec3 position The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.
-	static void PlaySoundEffect(int id, sol::optional<Vec3> p)
+	static void PlaySoundEffect(int soundID, sol::optional<Vec3> pos)
 	{
-		auto pose = Pose(Vector3i(p.value().x, p.value().y, p.value().z));
-		SoundEffect(id, p.has_value() ? &pose : nullptr, SoundEnvironment::Always);
+		SoundEffect(soundID, pos.has_value() ? &Pose(pos->ToVector3i()) : nullptr, SoundEnvironment::Always);
 	}
 
 	/// Stop sound effect

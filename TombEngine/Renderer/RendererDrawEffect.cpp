@@ -1214,34 +1214,34 @@ namespace TEN::Renderer
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
 
-		extern std::vector<DebrisFragment> DebrisFragments;
+		extern std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
 		std::vector<Vertex> vertices;
 
 		auto m_lastBlendMode = BlendMode::Unknown;
 
-		for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
+		for (auto& deb : DebrisFragments)
 		{
-			if (deb->active) 
+			if (deb.active) 
 			{
-				if (!((deb->mesh.blendMode == BlendMode::Opaque || deb->mesh.blendMode == BlendMode::AlphaTest) ^
+				if (!((deb.mesh.blendMode == BlendMode::Opaque || deb.mesh.blendMode == BlendMode::AlphaTest) ^
 					(rendererPass == RendererPass::Transparent)))
 				{
 					continue;
 				}
 
-				auto translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
-				auto rotation = Matrix::CreateFromQuaternion(deb->rotation);
+				auto translation = Matrix::CreateTranslation(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z);
+				auto rotation = Matrix::CreateFromQuaternion(deb.rotation);
 				auto world = rotation * translation;
 
 				_primitiveBatch->Begin();
 
-				if (deb->isStatic) 
+				if (deb.isStatic) 
 				{
-					BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[deb->mesh.tex]), SamplerStateRegister::LinearClamp);
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[deb.mesh.tex]), SamplerStateRegister::LinearClamp);
 				} 
 				else 
 				{
-					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[deb->mesh.tex]), SamplerStateRegister::LinearClamp);
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[deb.mesh.tex]), SamplerStateRegister::LinearClamp);
 				}
 
 				if (rendererPass == RendererPass::Transparent)
@@ -1254,33 +1254,33 @@ namespace TEN::Renderer
 				}
 
 				_stStatic.World = world;
-				_stStatic.Color = deb->color;
-				_stStatic.AmbientLight = _rooms[deb->roomNumber].AmbientLight;
-				_stStatic.LightMode = (int)deb->lightMode;
+				_stStatic.Color = deb.color;
+				_stStatic.AmbientLight = _rooms[deb.roomNumber].AmbientLight;
+				_stStatic.LightMode = (int)deb.lightMode;
 
 				_cbStatic.updateData(_stStatic, _context.Get());
 
 				Vertex vtx0;
-				vtx0.Position = deb->mesh.Positions[0];
-				vtx0.UV = deb->mesh.TextureCoordinates[0];
-				vtx0.Normal = deb->mesh.Normals[0];
-				vtx0.Color = deb->mesh.Colors[0];
+				vtx0.Position = deb.mesh.Positions[0];
+				vtx0.UV = deb.mesh.TextureCoordinates[0];
+				vtx0.Normal = deb.mesh.Normals[0];
+				vtx0.Color = deb.mesh.Colors[0];
 
 				Vertex vtx1;
-				vtx1.Position = deb->mesh.Positions[1];
-				vtx1.UV = deb->mesh.TextureCoordinates[1];
-				vtx1.Normal = deb->mesh.Normals[1];
-				vtx1.Color = deb->mesh.Colors[1];
+				vtx1.Position = deb.mesh.Positions[1];
+				vtx1.UV = deb.mesh.TextureCoordinates[1];
+				vtx1.Normal = deb.mesh.Normals[1];
+				vtx1.Color = deb.mesh.Colors[1];
 
 				Vertex vtx2;
-				vtx2.Position = deb->mesh.Positions[2];
-				vtx2.UV = deb->mesh.TextureCoordinates[2];
-				vtx2.Normal = deb->mesh.Normals[2];
-				vtx2.Color = deb->mesh.Colors[2];
+				vtx2.Position = deb.mesh.Positions[2];
+				vtx2.UV = deb.mesh.TextureCoordinates[2];
+				vtx2.Normal = deb.mesh.Normals[2];
+				vtx2.Color = deb.mesh.Colors[2];
 
-				if (m_lastBlendMode != deb->mesh.blendMode)
+				if (m_lastBlendMode != deb.mesh.blendMode)
 				{
-					m_lastBlendMode = deb->mesh.blendMode;
+					m_lastBlendMode = deb.mesh.blendMode;
 					SetBlendMode(m_lastBlendMode);
 				}
 

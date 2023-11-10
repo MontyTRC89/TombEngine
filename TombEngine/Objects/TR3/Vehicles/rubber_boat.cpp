@@ -545,10 +545,10 @@ namespace TEN::Entities::Vehicles
 				else if (IsHeld(In::Accelerate))
 				{
 					int maxVelocity;
-					if (IsHeld(In::Speed))
+					if (IsHeld(In::Faster))
 						maxVelocity = RBOAT_FAST_VELOCITY_MAX;
 					else
-						maxVelocity = (IsHeld(In::Slow)) ? RBOAT_SLOW_VELOCITY_MAX : RBOAT_NORMAL_VELOCITY_MAX;
+						maxVelocity = (IsHeld(In::Slower)) ? RBOAT_SLOW_VELOCITY_MAX : RBOAT_NORMAL_VELOCITY_MAX;
 
 					if (rBoatItem->Animation.Velocity.z < maxVelocity)
 						rBoatItem->Animation.Velocity.z += (RBOAT_VELOCITY_ACCEL / 2 + 1) + (RBOAT_VELOCITY_ACCEL * rBoatItem->Animation.Velocity.z) / (maxVelocity * 2);
