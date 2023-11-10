@@ -22,7 +22,7 @@ using TEN::Renderer::g_Renderer;
 // @tentable Util
 // @pragma nostrip
 
-namespace Util
+namespace TEN::Scripting::Util
 {
 	/// Determine if there is a clear line of sight between two positions.
 	// NOTE: Limited to room geometry. Objects are ignored.

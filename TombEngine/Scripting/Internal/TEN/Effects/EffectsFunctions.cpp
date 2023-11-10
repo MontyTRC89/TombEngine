@@ -34,7 +34,7 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 
-namespace Effects
+namespace TEN::Scripting::Effects
 {
 	///Emit a lightning arc.
 	//@function EmitLightningArc

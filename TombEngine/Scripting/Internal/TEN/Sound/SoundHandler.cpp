@@ -12,7 +12,7 @@
 // @tentable Sound
 // @pragma nostrip
 
-namespace Sound
+namespace TEN::Scripting::Sound
 {
 	/// Play an audio track
 	//@function PlayAudioTrack

@@ -54,10 +54,10 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 	SolState.set(ScriptReserved_TEN, RootTable);
 
 	// Misc. handlers not assigned above.
-	InventoryHandler::Register(&SolState, RootTable);
-	Effects::Register(&SolState, RootTable);
-	Input::Register(&SolState, RootTable);
-	Sound::Register(&SolState, RootTable);
-	Util::Register(&SolState, RootTable);
+	TEN::Scripting::InventoryHandler::Register(&SolState, RootTable);
+	TEN::Scripting::Effects::Register(&SolState, RootTable);
+	TEN::Scripting::Input::Register(&SolState, RootTable);
+	TEN::Scripting::Sound::Register(&SolState, RootTable);
+	TEN::Scripting::Util::Register(&SolState, RootTable);
 	TEN::Scripting::View::Register(&SolState, RootTable);
 }

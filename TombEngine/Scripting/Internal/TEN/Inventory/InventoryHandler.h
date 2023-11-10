@@ -1,7 +1,7 @@
 #pragma once
 #include "framework.h"
 
-namespace InventoryHandler
+namespace TEN::Scripting::InventoryHandler
 {
 	void Register(sol::state* state, sol::table& parent);
 };
