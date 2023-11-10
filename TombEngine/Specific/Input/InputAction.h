@@ -23,8 +23,8 @@ namespace TEN::Input
 		// Vehicle actions
 		Accelerate,
 		Reverse,
-		Speed,
-		Slow,
+		Faster,
+		Slower,
 		Brake,
 		Fire,
 
