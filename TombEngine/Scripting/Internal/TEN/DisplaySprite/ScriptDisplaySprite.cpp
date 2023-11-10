@@ -34,19 +34,19 @@ namespace TEN::Scripting::DisplaySprite
 			ctors(),
 			sol::call_constructor, ctors(),
 
-			ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
-			ScriptReserved_DisplayStringGetSpriteID, &ScriptDisplaySprite::GetSpriteID,
-			ScriptReserved_DisplayStringGetPosition, &ScriptDisplaySprite::GetPosition,
-			ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
-			ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
-			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
-			ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
-			ScriptReserved_DisplayStringSetSpriteID, &ScriptDisplaySprite::SetSpriteID,
-			ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
-			ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
-			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
-			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
-			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
+		ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
+		ScriptReserved_DisplayStringGetSpriteID, &ScriptDisplaySprite::GetSpriteID,
+		ScriptReserved_DisplayStringGetPosition, &ScriptDisplaySprite::GetPosition,
+		ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
+		ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
+		ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
+		ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
+		ScriptReserved_DisplayStringSetSpriteID, &ScriptDisplaySprite::SetSpriteID,
+		ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
+		ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
+		ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
+		ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
+		ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
 	}
 
 	/// Create a DisplaySprite object.
