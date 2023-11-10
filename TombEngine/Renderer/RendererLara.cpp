@@ -295,8 +295,6 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	unsigned int offset = 0;
 
 	_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-	_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	_context->IASetInputLayout(_inputLayout.Get());
 	_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	_context->VSSetShader(_vsItems.Get(), nullptr, 0);
@@ -323,8 +321,6 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	}
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 	_cbItem.updateData(_stItem, _context.Get());
-	BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
-	BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
@@ -370,8 +366,6 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		}
 
 		_cbItem.updateData(_stItem, _context.Get());
-		BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
-		BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 
 		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
 		{

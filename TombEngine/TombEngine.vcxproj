@@ -722,7 +722,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Graphics\Texture2D.h" />
     <ClInclude Include="Renderer\Graphics\TextureBase.h" />
     <ClInclude Include="Renderer\Structures\RendererTransparentFace.h" />
-    <ClInclude Include="Renderer\Structures\SpriteRenderBucket.h" />
+    <ClInclude Include="Renderer\Structures\RendererSpriteBucket.h" />
     <ClInclude Include="Renderer\RendererUtils.h" />
     <ClInclude Include="Renderer\Graphics\VertexBuffer.h" />
     <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
@@ -1473,6 +1473,11 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\TransparentFinalPass.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\GBuffer.fx">
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>

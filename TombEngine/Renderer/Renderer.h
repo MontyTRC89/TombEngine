@@ -59,6 +59,7 @@
 #include "Renderer/Structures/RendererLine3D.h"
 #include "Renderer/Structures/RendererMesh.h"
 #include "Renderer/Structures/RendererSpriteSequence.h"
+#include "Renderer/Structures/RendererSpriteBucket.h"
 #include "Renderer/Structures/RendererLine2D.h"
 #include "Renderer/Structures/RendererHudBar.h"
 
@@ -301,6 +302,8 @@ namespace TEN::Renderer
 		DepthState _lastDepthState;
 		CullMode _lastCullMode;
 
+		std::vector<RendererSpriteBucket> _spriteBuckets;
+
 		// Private functions
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);
 		void BindRoomLights(std::vector<RendererLight*>& lights);
@@ -362,7 +365,7 @@ namespace TEN::Renderer
 		void DrawEffects(RenderView& view, RendererPass rendererPass);
 		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
 		void DrawSplashes(RenderView& view);
-		void DrawSprites(RenderView& view);
+		void DrawSprites(RenderView& view, RendererPass rendererPass);
 		void DrawDisplaySprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
 		void DrawLines3D(RenderView& view);
@@ -414,6 +417,7 @@ namespace TEN::Renderer
 		void SetCullMode(CullMode cullMode, bool force = false);
 		void SetAlphaTest(AlphaTestMode mode, float threshold, bool force = false);
 		void SetScissor(RendererRectangle rectangle);
+		void SortAndPrepareSprites(RenderView& view);
 		void ResetAnimations();
 		void ResetScissor();
 		void ResetDebugVariables();

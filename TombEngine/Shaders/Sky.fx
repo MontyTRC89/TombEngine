@@ -4,7 +4,7 @@
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 
-cbuffer StaticMatrixBuffer : register(b8)
+cbuffer SkyBuffer : register(b2)
 {
 	float4x4 World;
 	float4 Color;
