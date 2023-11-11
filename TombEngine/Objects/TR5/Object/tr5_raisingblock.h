@@ -1,8 +1,12 @@
 #pragma once
 
+class Vector3i;
+struct ItemInfo;
+
 void InitializeRaisingBlock(short itemNumber);
 void ControlRaisingBlock(short itemNumber);
-std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z);
-std::optional<int> RaisingBlockCeiling(short itemNumber, int x, int y, int z);
-int RaisingBlockFloorBorder(short itemNumber);
-int RaisingBlockCeilingBorder(short itemNumber);
+
+std::optional<int> GetRaisingBlockFloorHeight(const ItemInfo& item, const Vector3i& pos);
+std::optional<int> GetRaisingBlockCeilingHeight(const ItemInfo& item, const Vector3i& pos);
+int GetRaisingBlockFloorBorder(const ItemInfo& item);
+int GetRaisingBlockCeilingBorder(const ItemInfo& item);

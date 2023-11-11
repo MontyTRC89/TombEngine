@@ -215,11 +215,11 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	int GetPushableHeight(ItemInfo& item)
+	int GetPushableHeight(const ItemInfo& item)
 	{
-		int heightBoundingBox = -GameBoundingBox(&item).Y1;
-		int heightWorldAligned = (heightBoundingBox / CLICK(0.5)) * CLICK(0.5);
-		return heightWorldAligned;
+		int boxHeight = -GameBoundingBox(&item).Y1;
+		int worldAlignedHeight = (boxHeight / CLICK(0.5)) * CLICK(0.5);
+		return worldAlignedHeight;
 	}
 
 	void SetPushableStopperFlag(bool isStopper, const Vector3i& pos, int roomNumber)
