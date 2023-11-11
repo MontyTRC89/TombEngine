@@ -114,6 +114,13 @@ float3 UnpackNormalMap(float4 n)
 	return n.xyz;
 }
 
+float3 PackNormal(float3 n)
+{
+	n = (n + 1.0f) * 0.5f;
+	n.z = 0;
+	return n.xyz;
+}
+
 PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;

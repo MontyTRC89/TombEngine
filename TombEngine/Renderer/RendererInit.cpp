@@ -90,7 +90,8 @@ namespace TEN::Renderer
 		_psInstancedSprites = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\InstancedSprites.fx"), "PS", "ps_5_0", nullptr, blob);
 		_vsTransparentFinalPass = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\TransparentFinalPass.fx"), "VS", "vs_5_0", nullptr, blob);
 		_psTransparentFinalPass = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\TransparentFinalPass.fx"), "PS", "ps_5_0", nullptr, blob);
-
+		_psGBuffer = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\GBuffer.fx"), "PS", "ps_5_0", nullptr, blob);
+   
 		const D3D_SHADER_MACRO transparentDefines[] = { "TRANSPARENT", "", nullptr, nullptr };
 		_psRoomsTransparent = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\Rooms.fx"), "PS", "ps_5_0", &transparentDefines[0], blob);
 
@@ -414,6 +415,9 @@ namespace TEN::Renderer
 		_depthMap = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
 		_reflectionCubemap = RenderTargetCube(_device.Get(), 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 		_shadowMap = Texture2DArray(_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D24_UNORM_S8_UINT);
+		
+		_normalMapRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
+		_depthRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT);
 
 		// Initialize sprite and primitive batches
 		_spriteBatch = std::make_unique<SpriteBatch>(_context.Get());

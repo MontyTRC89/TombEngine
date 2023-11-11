@@ -1442,11 +1442,6 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(_depthMap.RenderTargetView.Get(), Colors::White);
 		_context->ClearDepthStencilView(_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		ID3D11RenderTargetView* pRenderViewPtrs[2]; 
-		pRenderViewPtrs[0] = _renderTarget.RenderTargetView.Get(); 
-		pRenderViewPtrs[1] = _depthMap.RenderTargetView.Get(); 
-		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
-
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
@@ -1469,8 +1464,8 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
+		// Set fog bulbs
 		cameraConstantBuffer.NumFogBulbs = (int)view.FogBulbsToDraw.size();
-
 		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
 		{
 			cameraConstantBuffer.FogBulbs[i].Position = view.FogBulbsToDraw[i].Position;
@@ -1479,12 +1474,33 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogBulbs[i].Color = view.FogBulbsToDraw[i].Color;
 			cameraConstantBuffer.FogBulbs[i].SquaredCameraToFogBulbDistance = SQUARE(view.FogBulbsToDraw[i].Distance);
 			cameraConstantBuffer.FogBulbs[i].FogBulbToCameraVector = view.FogBulbsToDraw[i].FogBulbToCameraVector;
-		}
-		
+		}		
 		_cbCameraMatrices.updateData(cameraConstantBuffer, _context.Get());
 		
+		ID3D11RenderTargetView* pRenderViewPtrs[2];
+
+		// Bind the main render target
+		pRenderViewPtrs[0] = _renderTarget.RenderTargetView.Get();
+		pRenderViewPtrs[1] = _depthMap.RenderTargetView.Get();
+		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
+
 		// Draw horizon and sky.
 		DrawHorizonAndSky(view, _renderTarget.DepthStencilView.Get());
+		 
+		// Build G-Buffer (Normals + Depth)
+		_context->ClearRenderTargetView(_normalMapRenderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->ClearRenderTargetView(_depthRenderTarget.RenderTargetView.Get(), Colors::White);
+
+		pRenderViewPtrs[0] = _normalMapRenderTarget.RenderTargetView.Get();
+		pRenderViewPtrs[1] = _depthRenderTarget.RenderTargetView.Get();
+		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
+
+		DrawRooms(view, RendererPass::GBuffer);
+
+		// Bind the main render target again
+		pRenderViewPtrs[0] = _renderTarget.RenderTargetView.Get();
+		pRenderViewPtrs[1] = _depthMap.RenderTargetView.Get();
+		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
 		
 		// Draw opaque and alpha faces.
 		DrawRooms(view, RendererPass::Opaque);
@@ -1993,6 +2009,11 @@ namespace TEN::Renderer
 		}
 	}
 
+	void Renderer::BuildGBuffer(RenderView& renderView)
+	{
+		
+	}
+
 	void Renderer::DrawTransparentFaces(RenderView& renderView)
 	{
 		std::sort(
@@ -2173,6 +2194,15 @@ namespace TEN::Renderer
 		}
 		else*/
 		{
+			if (rendererPass == RendererPass::GBuffer)
+			{
+				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+			}
+			else
+			{
+				_context->PSSetShader(_psRooms.Get(), nullptr, 0);
+			}
+
 			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
 
@@ -2249,30 +2279,28 @@ namespace TEN::Renderer
 						if (rendererPass == RendererPass::Opaque)
 						{
 							if (!(bucket.BlendMode == BlendMode::Opaque ||
-								bucket.BlendMode == BlendMode::AlphaTest /*||
-								bucket.BlendMode == BlendMode::AlphaBlend*/))
+								bucket.BlendMode == BlendMode::AlphaTest))
 							{
 								continue;
 							}
 
-							_context->PSSetShader(_psRooms.Get(), nullptr, 0);
-
 							SetBlendMode(bucket.BlendMode);
 							SetDepthState(DepthState::Write);
 							SetAlphaTest(
-								bucket.BlendMode == BlendMode::AlphaTest || bucket.BlendMode == BlendMode::AlphaBlend ?
+								bucket.BlendMode == BlendMode::AlphaTest ?
 								AlphaTestMode::GreatherThan : AlphaTestMode::None,
 								FAST_ALPHA_BLEND_THRESHOLD
 							);
 						}
 						else if (rendererPass == RendererPass::Additive)
 						{
+							continue; 
+
 							if (!(bucket.BlendMode == BlendMode::Additive))
 							{
 								continue;
 							}
 							 
-							_context->PSSetShader(_psRooms.Get(), nullptr, 0);
 
 							SetBlendMode(bucket.BlendMode);
 							SetDepthState(DepthState::Read);
@@ -2283,14 +2311,14 @@ namespace TEN::Renderer
 						}
 						else if (rendererPass == RendererPass::Transparent)
 						{
+							continue;
+
 							if (bucket.BlendMode == BlendMode::Opaque ||
 								bucket.BlendMode == BlendMode::AlphaTest || 
 								bucket.BlendMode == BlendMode::Additive)
 							{
 								continue;
 							}
-
-							_context->PSSetShader(_psRoomsTransparent.Get(), nullptr, 0);
 
 							SetBlendMode(BlendMode::TransparentPass);
 							SetDepthState(DepthState::Read);

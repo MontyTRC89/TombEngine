@@ -102,6 +102,9 @@ namespace TEN::Renderer
 		Viewport _viewportToolkit;
 
 		// Render targets
+		RenderTarget2D _normalMapRenderTarget;
+		RenderTarget2D _depthRenderTarget;
+
 		RenderTarget2D _backBuffer;
 		RenderTarget2D _dumpScreenRenderTarget;
 		RenderTarget2D _renderTarget;
@@ -147,6 +150,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psFinalPass;
 		ComPtr<ID3D11VertexShader> _vsTransparentFinalPass;
 		ComPtr<ID3D11PixelShader> _psTransparentFinalPass;
+		ComPtr<ID3D11PixelShader> _psGBuffer;
 
 		// Constant buffers
 		RenderView _gameCamera;
@@ -313,6 +317,7 @@ namespace TEN::Renderer
 		void BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType);
 		void BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
+		void BuildGBuffer(RenderView& view);
 		void BuildHierarchy(RendererObject* obj);
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void UpdateAnimation(RendererItem* item, RendererObject& obj, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation = false);

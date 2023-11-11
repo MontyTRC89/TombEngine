@@ -2,6 +2,7 @@
 #include <SimpleMath.h>
 #include "Renderer/ConstantBuffers/ShaderLight.h"
 #include "Renderer/ConstantBuffers/ShaderFogBulb.h"
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::ConstantBuffers
 {
@@ -34,7 +35,7 @@ namespace TEN::Renderer::ConstantBuffers
 		alignas(4) float FarPlane;
 
 		alignas(4) int NumFogBulbs;
-		ShaderFogBulb FogBulbs[32];
+		ShaderFogBulb FogBulbs[MAX_FOG_BULBS_DRAW];
 	};
 }
 

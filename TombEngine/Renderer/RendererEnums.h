@@ -156,7 +156,8 @@ enum class RendererPass
 	Opaque,
 	Transparent,
 	CollectTransparentFaces,
-	Additive
+	Additive,
+	GBuffer
 };
 
 enum class SpriteRenderType
