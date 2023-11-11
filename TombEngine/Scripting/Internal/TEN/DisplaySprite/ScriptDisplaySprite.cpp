@@ -173,7 +173,7 @@ namespace TEN::Scripting::DisplaySprite
 
 	/// Draw the display sprite in display space for the current frame.
 	// @function DisplaySprite:Draw
-	// @tparam[opt] Objects.ObjID priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
+	// @tparam[opt] int priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
 	// @tparam[opt] View.AlignMode alignMode Align mode interpreting an offset from the sprite's position. __Default: View.AlignMode.CENTER__
 	// @tparam[opt] View.ScaleMode scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: View.ScaleMode.FIT__
 	// @tparam[opt] Effects.BlendID blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
