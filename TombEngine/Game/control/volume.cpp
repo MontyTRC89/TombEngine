@@ -56,6 +56,22 @@ namespace TEN::Control::Volumes
 		return BoundingOrientedBox(pos, Vector3(coll.Radius, pBounds.Extents.y, coll.Radius), rot);
 	}
 
+	void HandleAllEvents(VolumeEventType type, VolumeActivator& activator)
+	{
+		// HACK: Speedhack to only process looped events which are actually existing.
+
+		if (type == VolumeEventType::Loop)
+		{
+			for (int setIndex : g_Level.LoopedEventSetIndices)
+				HandleEvent(g_Level.EventSets[setIndex].Events[(int)type], activator);
+		}
+		else
+		{
+			for (auto& set : g_Level.EventSets)
+				HandleEvent(set.Events[(int)type], activator);
+		}
+	}
+
 	void HandleEvent(VolumeEvent& event, VolumeActivator& activator)
 	{
 		if (event.Function.empty() || event.CallCounter == 0)
@@ -252,25 +268,13 @@ namespace TEN::Control::Volumes
 		unsigned int nodeCount = 0;
 		for (const auto& set : g_Level.EventSets)
 		{
-			if ((set.Events[(int)VolumeEventType::Enter].Mode == VolumeEventMode::Nodes) && 
-				!set.Events[(int)VolumeEventType::Enter].Data.empty())
+			for (const auto& evt : set.Events)
 			{
-				g_GameScript->ExecuteString(set.Events[(int)VolumeEventType::Enter].Data);
-				nodeCount++;
-			}
-
-			if ((set.Events[(int)VolumeEventType::Inside].Mode == VolumeEventMode::Nodes) &&
-				!set.Events[(int)VolumeEventType::Inside].Data.empty())
-			{
-				g_GameScript->ExecuteString(set.Events[(int)VolumeEventType::Inside].Data);
-				nodeCount++;
-			}				
-
-			if ((set.Events[(int)VolumeEventType::Leave].Mode == VolumeEventMode::Nodes) && 
-				!set.Events[(int)VolumeEventType::Leave].Data.empty())
-			{
-				g_GameScript->ExecuteString(set.Events[(int)VolumeEventType::Leave].Data);
-				nodeCount++;
+				if ((evt.Mode == VolumeEventMode::Nodes) && !evt.Data.empty())
+				{
+					g_GameScript->ExecuteString(evt.Data);
+					nodeCount++;
+				}
 			}
 		}
 

@@ -122,6 +122,7 @@ struct LEVEL
 	// Misc. data
 	std::vector<LevelCameraInfo> Cameras   = {};
 	std::vector<VolumeEventSet>	 EventSets = {};
+	std::vector<int>			 LoopedEventSetIndices = {};
 	std::vector<AI_OBJECT>		 AIObjects = {};
 	std::vector<SPRITE>			 Sprites   = {};
 

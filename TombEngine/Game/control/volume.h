@@ -45,6 +45,7 @@ namespace TEN::Control::Volumes
 
 	void HandleEvent(VolumeEvent& event, VolumeActivator& activator);
 	bool HandleEvent(const std::string& name, VolumeEventType eventType, VolumeActivator activator);
+	void HandleAllEvents(VolumeEventType type, VolumeActivator& activator);
 	void InitializeNodeScripts();
 }
 

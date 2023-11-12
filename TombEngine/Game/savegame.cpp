@@ -212,6 +212,7 @@ bool SaveGame::Save(int slot)
 		return false;
 
 	g_GameScript->OnSave();
+	HandleAllEvents(VolumeEventType::Save, (VolumeActivator)LaraItem->Index);
 
 	// Savegame infos need to be reloaded so that last savegame counter properly increases.
 	SaveGame::LoadSavegameInfos();

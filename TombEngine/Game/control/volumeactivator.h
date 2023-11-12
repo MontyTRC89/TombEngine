@@ -25,6 +25,11 @@ namespace TEN::Control::Volumes
 		Enter,
 		Inside,
 		Leave,
+		Loop,
+		Load,
+		Save,
+		Start,
+		End,
 
 		Count
 	};

@@ -880,6 +880,7 @@ void FreeLevel()
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
 	g_Level.EventSets.resize(0);
+	g_Level.LoopedEventSetIndices.resize(0);
 	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)

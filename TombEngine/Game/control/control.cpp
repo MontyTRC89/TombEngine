@@ -78,6 +78,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Control::Volumes;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -154,10 +155,9 @@ GameStatus ControlPhase(int numFrames)
 		// overwritten by script API methods.
 		HandleControls(isTitle);
 
-		// This might not be the exact amount of time that has passed, but giving it a
-		// value of 1/30 keeps it in lock-step with the rest of the game logic,
-		// which assumes 30 iterations per second.
+		// Handle loop functions and node events.
 		g_GameScript->OnControlPhase(DELTA_TIME);
+		HandleAllEvents(VolumeEventType::Loop, (VolumeActivator)LaraItem->Index);
 
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
@@ -478,6 +478,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
 	g_GameScript->OnEnd(reason);
+	HandleAllEvents(VolumeEventType::End, (VolumeActivator)LaraItem->Index);
+
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
@@ -509,6 +511,7 @@ void InitializeOrLoadGame(bool loadGame)
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
+		HandleAllEvents(VolumeEventType::Load, (VolumeActivator)LaraItem->Index);
 	}
 	else
 	{
@@ -530,6 +533,7 @@ void InitializeOrLoadGame(bool loadGame)
 		}
 
 		g_GameScript->OnStart();
+		HandleAllEvents(VolumeEventType::Start, (VolumeActivator)LaraItem->Index);
 	}
 }
 
