@@ -120,10 +120,9 @@ namespace TEN::Entities::Traps
 			short dirAngle = phd_atan(dir.z, dir.x);
 			short alignAngle = Geometry::GetShortestAngle(slopeAngle, dirAngle);
 
-			// Test if slope aspect is not aligned with the direction.
+			// Test if slope aspect is aligned with direction.
 			if (alignAngle != 0 && alignAngle != ANGLE(180.0f))
 				return false;
-
 		}
 
 		// Check for diagonal split.
