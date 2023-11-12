@@ -89,7 +89,7 @@ namespace TEN::Entities::Traps
 		bool flagPriorityForward	= ((item.ItemFlags[1] & (1 << 2)) != 0);
 		bool flagAntiClockWiseOrder	= ((item.ItemFlags[1] & (1 << 3)) != 0);
 
-		auto col = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+		auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 		float yaw = TO_RAD(item.Pose.Orientation.y);
 
@@ -160,17 +160,20 @@ namespace TEN::Entities::Traps
 			}
 			else
 			{
-				item.Pose.Position.y = col.Position.Floor;
+				item.Pose.Position.y = pointColl.Position.Floor;
 
 				//Is not in the center of a tile, keep moving forward. 
 				item.Pose.Position = item.Pose.Position + forwardDirection * moveVel;
 
-				auto slope = col.Block->GetSurfaceSlope(0, true);
-
-				if (slope.LengthSquared() > 0) //If it's a slope, don't do turns.
+				auto floorNormal = pointColl.BottomBlock->GetSurfaceNormal(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+				if (floorNormal != -Vector3::UnitY) //If it's a slope, don't do turns.
+				{
 					item.ItemFlags[1] &= ~(1 << 0);	// Turn off 1st bit for flagDoDetection.
+				}
 				else
+				{
 					item.ItemFlags[1] |= (1 << 0);	// Turn on 1st bit for flagDoDetection.
+				}
 			}
 		}
 

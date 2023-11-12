@@ -20,14 +20,7 @@ struct ItemInfo;
 // Triangle:		Surface subdivision.
 // Wall:			Inferred from a floor or ceiling with max height. Note that true "walls" don't exist in floordata.
 
-// The way floordata "planes" are stored is non-standard.
-// Instead of a Plane object with a normal + distance,
-// they use a Vector3 object with data laid out as follows:
-// x: X tilt grade (0.25f = 1/4 block).
-// y: Z tilt grade (0.25f = 1/4 block).
-// z: Plane's absolute height at the sector's center (i.e. distance in regular plane terms).
-
-constexpr auto WALL_PLANE = Vector3(0, 0, -CLICK(127));
+const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
 
 enum class MaterialType
 {
@@ -63,22 +56,28 @@ enum class ClimbDirectionFlags
 	West  = (1 << 11)
 };
 
-struct SurfaceCollisionData
+struct SectorSurfaceTriangleData
 {
-private:
-	static constexpr auto SURFACE_TRIANGLE_COUNT = 2;
-
-public:
-	static constexpr auto SPLIT_ANGLE_0 = 45.0f * RADIAN;
-	static constexpr auto SPLIT_ANGLE_1 = 135.0f * RADIAN;
-
-	float SplitAngle = 0.0f;
-
-	std::array<int, SURFACE_TRIANGLE_COUNT>		Portals = {};
-	std::array<Vector3, SURFACE_TRIANGLE_COUNT> Planes	= {};
+	Plane		 Plane			   = {};
+	int			 PortalRoomNumber  = 0;
+	short		 IllegalSlopeAngle = 0;
+	MaterialType Material		   = MaterialType::Stone;
 };
 
-struct CollisionBlockFlagData
+struct SectorSurfaceData
+{
+private:
+	static constexpr auto TRIANGLE_COUNT = 2;
+
+public:
+	static constexpr auto SPLIT_ANGLE_0 = ANGLE(45.0f);
+	static constexpr auto SPLIT_ANGLE_1 = ANGLE(135.0f);
+
+	short SplitAngle = 0;
+	std::array<SectorSurfaceTriangleData, TRIANGLE_COUNT> Triangles = {};
+};
+
+struct SectorFlagData
 {
 	bool Death		 = false;
 	bool Monkeyswing = false;
@@ -116,66 +115,65 @@ struct CollisionBlockFlagData
 	}
 };
 
-// Collision block
+// SectorData
 class FloorInfo
 {
-	public:
-		// Components
-		int					   Room				 = 0; // RoomNumber
-		int					   WallPortal		 = 0; // Number of room through wall portal (only one)?
-		SurfaceCollisionData   FloorCollision	 = {};
-		SurfaceCollisionData   CeilingCollision  = {};
-		CollisionBlockFlagData Flags			 = {};
-		std::set<int>		   BridgeItemNumbers = {};
+public:
+	// Components
+	int				  RoomNumber		   = 0;
+	int				  WallPortalRoomNumber = 0;
+	SectorSurfaceData FloorSurface		   = {};
+	SectorSurfaceData CeilingSurface	   = {};
+	std::set<int>	  BridgeItemNumbers	   = {};
+	SectorFlagData	  Flags				   = {};
 
-		MaterialType Material = MaterialType::Stone;
+	int	 Box		  = 0;
+	int	 TriggerIndex = 0;
+	bool Stopper	  = true;
 
-		int	 Box		  = 0;
-		int	 TriggerIndex = 0;
-		bool Stopper	  = true;
+	// Getters
+	const SectorSurfaceTriangleData& GetSurfaceTriangle(int x, int z, bool isFloor) const;
+	int		GetSurfaceTriangleID(int x, int z, bool isFloor) const;
+	Vector3 GetSurfaceNormal(int x, int z, bool isFloor) const;
+	Vector3 GetSurfaceNormal(int triangleID, bool isFloor) const;
+	short	GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
+	MaterialType GetSurfaceMaterial(int x, int z, bool isFloor) const;
 
-		// Getters
-		int		GetSurfacePlaneIndex(int x, int z, bool isFloor) const;
-		Vector2 GetSurfaceTilt(int x, int z, bool isFloor) const;
+	std::optional<int> GetRoomNumberAbove(int triangleID) const;
+	std::optional<int> GetRoomNumberAbove(int x, int z) const;
+	std::optional<int> GetRoomNumberAbove(const Vector3i& pos) const;
+	std::optional<int> GetRoomNumberBelow(int triangleID) const;
+	std::optional<int> GetRoomNumberBelow(int x, int z) const;
+	std::optional<int> GetRoomNumberBelow(const Vector3i& pos) const;
+	std::optional<int> GetRoomNumberAtSide() const;
 
-		std::optional<int> GetRoomNumberAbove(int planeIndex) const;
-		std::optional<int> GetRoomNumberAbove(int x, int z) const;
-		std::optional<int> GetRoomNumberAbove(const Vector3i& pos) const;
-		std::optional<int> GetRoomNumberBelow(int planeIndex) const;
-		std::optional<int> GetRoomNumberBelow(int x, int z) const;
-		std::optional<int> GetRoomNumberBelow(const Vector3i& pos) const;
-		std::optional<int> GetRoomNumberAtSide() const;
+	// TEMP
+	int GetSurfaceHeight(int triangleID, int x, int z, bool isFloor, bool tempJustHere) const;
 
-		int GetSurfaceHeight(int x, int z, bool isFloor) const;
-		int GetSurfaceHeight(const Vector3i& pos, bool isFloor) const;
-		int GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const;
+	int GetSurfaceHeight(int x, int z, bool isFloor) const;
+	int GetSurfaceHeight(const Vector3i& pos, bool isFloor) const;
+	int GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const;
 
-		Vector2 GetSurfaceSlope(int planeIndex, bool isFloor) const;
-		Vector2 GetSurfaceSlope(int x, int z, bool isFloor) const;
+	// Inquirers
+	bool IsSurfaceSplit(bool isFloor) const;
+	bool IsSurfaceDiagonalStep(bool isFloor) const;
+	bool IsSurfaceSplitPortal(bool isFloor) const;
+	bool IsWall(int planeID) const;
+	bool IsWall(int x, int z) const;
 
-		// Inquirers
-		bool IsSurfaceSplit(bool isFloor) const;
-		bool IsSurfaceDiagonalStep(bool isFloor) const;
-		bool IsSurfaceSplitPortal(bool isFloor) const;
-		bool IsWall(int planeIndex) const;
-		bool IsWall(int x, int z) const;
-
-		// Bridge methods
-		int	 GetInsideBridgeItemNumber(const Vector3i& pos, bool floorBorder, bool ceilingBorder) const;
-		void AddBridge(int itemNumber);
-		void RemoveBridge(int itemNumber);
+	// Bridge utilities
+	int	 GetInsideBridgeItemNumber(const Vector3i& pos, bool floorBorder, bool ceilingBorder) const;
+	void AddBridge(int itemNumber);
+	void RemoveBridge(int itemNumber);
 };
 
 namespace TEN::Collision::Floordata
 {
-	// TODO: Use normals natively.
-	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor);
-
-	Vector2i GetSectorPoint(int x, int z);
-	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
+	Vector2i GetSectorPoint(int x, int z);Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
 	std::vector<Vector2i>	GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
 	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
-
+	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor);
+	
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);

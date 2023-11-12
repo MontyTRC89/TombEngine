@@ -14,54 +14,78 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 
-int FloorInfo::GetSurfacePlaneIndex(int x, int z, bool isFloor) const
+const SectorSurfaceTriangleData& FloorInfo::GetSurfaceTriangle(int x, int z, bool isFloor) const
 {
-	// Calculate bias.
-	auto point = GetSectorPoint(x, z).ToVector2();
-	auto rotMatrix = Matrix::CreateRotationZ(isFloor ? FloorCollision.SplitAngle : CeilingCollision.SplitAngle);
-	Vector2::Transform(point, rotMatrix, point);
-
-	// Determine and return plane index.
-	return ((point.x < 0) ? 0 : 1);
+	int triangleID = GetSurfaceTriangleID(x, z, isFloor);
+	auto& triangles = isFloor ? FloorSurface.Triangles : CeilingSurface.Triangles;
+	return triangles[triangleID];
 }
 
-Vector2 FloorInfo::GetSurfaceTilt(int x, int z, bool isFloor) const
+int FloorInfo::GetSurfaceTriangleID(int x, int z, bool isFloor) const
 {
-	// Get surface plane.
-	const auto& planes = isFloor ? FloorCollision.Planes : CeilingCollision.Planes;
-	int planeIndex = GetSurfacePlaneIndex(x, z, true); // TODO: Check why it only looks at floor planes.
-	auto plane = planes[planeIndex];
+	// Calculate bias.
+	auto sectorPoint = GetSectorPoint(x, z).ToVector2();
+	auto rotMatrix = Matrix::CreateRotationZ(isFloor ? TO_RAD(FloorSurface.SplitAngle) : TO_RAD(CeilingSurface.SplitAngle));
+	float bias = Vector2::Transform(sectorPoint, rotMatrix).x;
 
-	// Calculate and return plane tilt.
-	return Vector2(
-		-int((plane.x * BLOCK(1)) / CLICK(1)),
-		-int((plane.y * BLOCK(1)) / CLICK(1)));
+	// Return triangle ID according to bias.
+	return ((bias < 0.0f) ? 0 : 1);
+}
+
+Vector3 FloorInfo::GetSurfaceNormal(int x, int z, bool isFloor) const
+{
+	const auto& triangle = GetSurfaceTriangle(x, z, isFloor);
+	return triangle.Plane.Normal();
+}
+
+Vector3 FloorInfo::GetSurfaceNormal(int triangleID, bool isFloor) const
+{
+	// Get triangle.
+	const auto& triangles = isFloor ? FloorSurface.Triangles : CeilingSurface.Triangles;
+	const auto& triangle = triangles[triangleID];
+
+	// Return plane normal.
+	return triangle.Plane.Normal();
+}
+
+short FloorInfo::GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const
+{
+	const auto& triangle = GetSurfaceTriangle(x, z, isFloor);
+	return triangle.IllegalSlopeAngle;
+}
+
+MaterialType FloorInfo::GetSurfaceMaterial(int x, int z, bool isFloor) const
+{
+	const auto& triangle = GetSurfaceTriangle(x, z, isFloor);
+	return triangle.Material;
 }
 
 bool FloorInfo::IsSurfaceSplit(bool isFloor) const
 {
-	const auto& planes = isFloor ? FloorCollision.Planes : CeilingCollision.Planes;
-	bool arePlanesDifferent = (planes[0] != planes[1]);
+	const auto& triangles = isFloor ? FloorSurface.Triangles : CeilingSurface.Triangles;
 
-	// Check if surface planes are different and portal is split.
-	return (arePlanesDifferent || IsSurfaceSplitPortal(isFloor));
+	// Check if surface planes aren't equal or portal is split.
+	bool arePlanesEqual = (triangles[0].Plane == triangles[1].Plane);
+	return (!arePlanesEqual || IsSurfaceSplitPortal(isFloor));
 }
 
 bool FloorInfo::IsSurfaceDiagonalStep(bool isFloor) const
 {
-	// Check if surface is split.
+	// 1) Test if surface is split.
 	if (!IsSurfaceSplit(isFloor))
 		return false;
 
-	const auto& surfaceColl = isFloor ? FloorCollision : CeilingCollision;
+	const auto& surface = isFloor ? FloorSurface : CeilingSurface;
 	
-	// Check if ??
-	if (round(surfaceColl.Planes[0].z) == round(surfaceColl.Planes[1].z))
+	// 2) Test if plane distances are equal.
+	float dist0 = surface.Triangles[0].Plane.D();
+	float dist1 = surface.Triangles[1].Plane.D();
+	if (dist0 == dist1)
 		return false;
 
-	// Check if ??
-	if (surfaceColl.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_0 &&
-		surfaceColl.SplitAngle != SurfaceCollisionData::SPLIT_ANGLE_1)
+	// 3) Test if split angle is aligned diagonal.
+	if (surface.SplitAngle != SectorSurfaceData::SPLIT_ANGLE_0 &&
+		surface.SplitAngle != SectorSurfaceData::SPLIT_ANGLE_1)
 	{
 		return false;
 	}
@@ -71,14 +95,13 @@ bool FloorInfo::IsSurfaceDiagonalStep(bool isFloor) const
 
 bool FloorInfo::IsSurfaceSplitPortal(bool isFloor) const
 {
-	// Check if surface portals are different.
-	const auto& portals = isFloor ? FloorCollision.Portals : CeilingCollision.Portals;
-	return (portals[0] != portals[1]);
+	const auto& triangles = isFloor ? FloorSurface.Triangles : CeilingSurface.Triangles;
+	return (triangles[0].PortalRoomNumber != triangles[1].PortalRoomNumber);
 }
 
-std::optional<int> FloorInfo::GetRoomNumberBelow(int planeIndex) const
+std::optional<int> FloorInfo::GetRoomNumberBelow(int triangleID) const
 {
-	int roomNumber = FloorCollision.Portals[planeIndex];
+	int roomNumber = FloorSurface.Triangles[triangleID].PortalRoomNumber;
 	if (roomNumber != NO_ROOM)
 		return roomNumber;
 
@@ -87,8 +110,8 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(int planeIndex) const
 
 std::optional<int> FloorInfo::GetRoomNumberBelow(int x, int z) const
 {
-	int planeIndex = GetSurfacePlaneIndex(x, z, true);
-	return GetRoomNumberBelow(planeIndex);
+	int triangleID = GetSurfaceTriangleID(x, z, true);
+	return GetRoomNumberBelow(triangleID);
 }
 
 std::optional<int> FloorInfo::GetRoomNumberBelow(const Vector3i& pos) const
@@ -121,9 +144,9 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(const Vector3i& pos) const
 	return GetRoomNumberBelow(pos.x, pos.z);
 }
 
-std::optional<int> FloorInfo::GetRoomNumberAbove(int planeIndex) const
+std::optional<int> FloorInfo::GetRoomNumberAbove(int triangleID) const
 {
-	int roomNumber = CeilingCollision.Portals[planeIndex];
+	int roomNumber = CeilingSurface.Triangles[triangleID].PortalRoomNumber;
 	if (roomNumber != NO_ROOM)
 		return roomNumber;
 
@@ -132,8 +155,8 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(int planeIndex) const
 
 std::optional<int> FloorInfo::GetRoomNumberAbove(int x, int z) const
 {
-	int planeIndex = GetSurfacePlaneIndex(x, z, false);
-	return GetRoomNumberAbove(planeIndex);
+	int triangleID = GetSurfaceTriangleID(x, z, false);
+	return GetRoomNumberAbove(triangleID);
 }
 
 std::optional<int> FloorInfo::GetRoomNumberAbove(const Vector3i& pos) const
@@ -168,26 +191,48 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(const Vector3i& pos) const
 
 std::optional<int> FloorInfo::GetRoomNumberAtSide() const
 {
-	if (WallPortal != NO_ROOM)
-		return WallPortal;
-	
+	if (WallPortalRoomNumber != NO_ROOM)
+		return WallPortalRoomNumber;
+
 	return std::nullopt;
+}
+
+// TEMP
+int FloorInfo::GetSurfaceHeight(int triangleID, int x, int z, bool isFloor, bool tempJustHere) const
+{
+	// Get triangle.
+	const auto& surface = isFloor ? FloorSurface : CeilingSurface;
+	const auto& triangle = surface.Triangles[triangleID];
+
+	// MICRO-OPTIMIZATION: Triangle is flat; return plane height.
+	auto normal = triangle.Plane.Normal();
+	if (normal == Vector3::UnitY || normal == -Vector3::UnitY)
+		return triangle.Plane.D();
+
+	// Calculate relative plane height at intersection using plane equation.
+	auto sectorPoint = GetSectorPoint(x, z);
+	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
+
+	// Return surface height.
+	return (triangle.Plane.D() + relPlaneHeight);
 }
 
 int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 {
-	const auto& planes = isFloor ? FloorCollision.Planes : CeilingCollision.Planes;
+	// Get triangle.
+	const auto& triangle = GetSurfaceTriangle(x, z, isFloor);
 
-	// Get surface plane.
-	int planeIndex = GetSurfacePlaneIndex(x, z, isFloor);
-	const auto& plane = planes[planeIndex];
+	// MICRO-OPTIMIZATION: Triangle is flat; return plane height.
+	auto normal = triangle.Plane.Normal();
+	if (normal == Vector3::UnitY || normal == -Vector3::UnitY)
+		return triangle.Plane.D();
 
-	auto point = GetSectorPoint(x, z);
+	// Calculate relative plane height at intersection using plane equation.
+	auto sectorPoint = GetSectorPoint(x, z);
+	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
 
 	// Return surface height.
-	return ((plane.x * point.x) +
-			(plane.y * point.y) +
-			plane.z);
+	return (triangle.Plane.D() + relPlaneHeight);
 }
 
 int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
@@ -273,29 +318,18 @@ int FloorInfo::GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const
 	return GetSurfaceHeight(pos, isFloor);
 }
 
-Vector2 FloorInfo::GetSurfaceSlope(int planeIndex, bool isFloor) const
+bool FloorInfo::IsWall(int triangleID) const
 {
-	const auto& plane = isFloor ? FloorCollision.Planes[planeIndex] : CeilingCollision.Planes[planeIndex];
-	return Vector2(plane.x, plane.y);
-}
+	bool areSplitAnglesEqual = (FloorSurface.SplitAngle == CeilingSurface.SplitAngle);
+	bool arePlanesEqual = (FloorSurface.Triangles[triangleID].Plane == CeilingSurface.Triangles[triangleID].Plane);
 
-Vector2 FloorInfo::GetSurfaceSlope(int x, int z, bool isFloor) const
-{
-	int planeIndex = GetSurfacePlaneIndex(x, z, isFloor);
-	return GetSurfaceSlope(planeIndex, isFloor);
-}
-
-bool FloorInfo::IsWall(int planeIndex) const
-{
-	bool areSplitAnglesEqual = (FloorCollision.SplitAngle == CeilingCollision.SplitAngle);
-	bool arePlanesEqual = (FloorCollision.Planes[planeIndex] == CeilingCollision.Planes[planeIndex]);
 	return (areSplitAnglesEqual && arePlanesEqual);
 }
 
 bool FloorInfo::IsWall(int x, int z) const
 {
-	int planeIndex = GetSurfacePlaneIndex(x, z, true);
-	return IsWall(planeIndex);
+	int triangleID = GetSurfaceTriangleID(x, z, true);
+	return IsWall(triangleID);
 }
 
 int FloorInfo::GetInsideBridgeItemNumber(const Vector3i& pos, bool testFloorBorder, bool testCeilingBorder) const
@@ -344,20 +378,27 @@ void FloorInfo::RemoveBridge(int itemNumber)
 
 namespace TEN::Collision::Floordata
 {
-	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor)
-	{
-		int sign = isFloor ? -1 : 1;
-		auto normal = Vector3(tilt.x / 4, 1.0f, tilt.y / 4) * sign;
-		normal.Normalize();
-		return normal;
-	}
-
 	Vector2i GetSectorPoint(int x, int z)
 	{
-		const auto xPoint = x % BLOCK(1) - BLOCK(1) / 2;
-		const auto yPoint = z % BLOCK(1) - BLOCK(1) / 2;
+		return Vector2i(
+			x % BLOCK(1) - BLOCK(1) / 2,
+			z % BLOCK(1) - BLOCK(1) / 2);
+	}
 
-		return Vector2i{xPoint, yPoint};
+	// NOTE: Tilts are deprecated, but until all conversions are complete
+	// this function will remain useful.
+	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor)
+	{
+		// Calculate tilt values based on normal.
+		float xTilt = normal.x * 4;
+		float zTilt = normal.z * 4;
+
+		// Scale tilt values to appropriate range.
+		int xTiltGrade = (int)round(xTilt * (CLICK(1) / BLOCK(1)));
+		int zTiltGrade = (int)round(zTilt * (CLICK(1) / BLOCK(1)));
+
+		// Return tilt.
+		return Vector2i(xTiltGrade, zTiltGrade);
 	}
 
 	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds)
@@ -436,6 +477,7 @@ namespace TEN::Collision::Floordata
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 
+		// Get and return sector.
 		int sectorID = (room.zSize * roomGridCoord.x) + roomGridCoord.y;
 		return room.floor[sectorID];
 	}

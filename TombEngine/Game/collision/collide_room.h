@@ -63,6 +63,9 @@ struct CollisionResult
 	CollisionPosition Position;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
+
+	Vector3 FloorNormal;
+	Vector3 CeilingNormal;
 };
 
 struct CollisionSetup
@@ -107,6 +110,8 @@ struct CollisionInfo
 
 	Pose Shift = Pose::Zero;
 	CollisionType CollisionType;
+	Vector3 FloorNormal;
+	Vector3 CeilingNormal;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;

@@ -23,8 +23,8 @@ bool ROOM_INFO::Active()
 		return true;
 
 	// Because engine swaps whole room memory block but substitutes flippedRoom,
-	// we have to check both original index and flippedRoom equality, as well as NO_ROOM
-	// in case we are checking non-flipped rooms.
+	// must check both original index and flippedRoom equality, as well as NO_ROOM
+	// in case checking non-flipped rooms.
 
 	return (!FlipStats[flipNumber] && flippedRoom != index && flippedRoom != NO_ROOM) ||
 		   ( FlipStats[flipNumber] && flippedRoom == index);
@@ -58,10 +58,10 @@ void DoFlipMap(short group)
 			g_Renderer.FlipRooms(i, room->flippedRoom);
 
 			for (auto& fd : room->floor)
-				fd.Room = i;
+				fd.RoomNumber = i;
 
 			for (auto& fd : flipped->floor)
-				fd.Room = room->flippedRoom;
+				fd.RoomNumber = room->flippedRoom;
 		}
 	}
 
