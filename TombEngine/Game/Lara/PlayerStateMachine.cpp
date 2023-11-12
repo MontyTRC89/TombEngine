@@ -262,7 +262,7 @@ namespace TEN::Entities::Player
 			}
 
 		default:
-			TENLog("Error handling invalid player behavior state routine type " + std::to_string((int)routineType), LogLevel::Warning);
+			TENLog("Error handling invalid player behavior state routine type " + std::to_string((int)routineType) + ".", LogLevel::Warning);
 			return;
 		}
 
