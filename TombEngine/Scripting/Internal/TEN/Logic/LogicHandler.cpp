@@ -163,6 +163,8 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	tableLogic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
 	tableLogic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
 	tableLogic.set_function(ScriptReserved_HandleEvent, &LogicHandler::HandleEvent, this);
+	tableLogic.set_function(ScriptReserved_EnableEvent, &LogicHandler::EnableEvent, this);
+	tableLogic.set_function(ScriptReserved_DisableEvent, &LogicHandler::DisableEvent, this);
 
 	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, LEVEL_END_REASONS);
 	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, CALLBACK_POINTS);
@@ -279,13 +281,29 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 */
 void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator)
 {
-	bool success = TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? 
-					(VolumeActivator)activator.value().GetIndex() : nullptr);
-	if (!success)
-	{
-		TENLog("Error: event " + name + " could not be executed. Check if event with such name exists in project.",
-			   LogLevel::Error, LogConfig::All, false);
-	}
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (VolumeActivator)activator.value().GetIndex() : nullptr);
+}
+
+/*** Attempt to find an event set and enable specified event in it.
+
+@function EnableEvent
+@tparam name string Name of the event set to find.
+@tparam type EventType Event to enable.
+*/
+void LogicHandler::EnableEvent(const std::string& name, VolumeEventType type)
+{
+	TEN::Control::Volumes::SetEventState(name, type, true);
+}
+
+/*** Attempt to find an event set and disable specified event in it.
+
+@function DisableEvent
+@tparam name string Name of the event set to find.
+@tparam type EventType Event to disable.
+*/
+void LogicHandler::DisableEvent(const std::string& name, VolumeEventType type)
+{
+	TEN::Control::Volumes::SetEventState(name, type, false);
 }
 
 void LogicHandler::ResetLevelTables()

@@ -74,7 +74,7 @@ namespace TEN::Control::Volumes
 
 	void HandleEvent(VolumeEvent& event, VolumeActivator& activator)
 	{
-		if (event.Function.empty() || event.CallCounter == 0)
+		if (event.Function.empty() || event.CallCounter == 0 || event.CallCounter < NO_CALL_COUNTER)
 			return;
 
 		g_GameScript->ExecuteFunction(event.Function, activator, event.Data);
@@ -107,7 +107,31 @@ namespace TEN::Control::Volumes
 			HandleEvent(lastEventSetPtr->Events[(int)eventType], activator);
 			return true;
 		}
-	
+
+		TENLog("Error: event " + name + " could not be executed. Check if event with such name exists in project.",
+				LogLevel::Error, LogConfig::All, false);
+		return false;
+	}
+
+	bool SetEventState(const std::string& name, VolumeEventType eventType, bool enabled)
+	{
+		for (auto& eventSet : g_Level.EventSets)
+		{
+			if (eventSet.Name == name)
+			{
+				auto& event = eventSet.Events[(int)eventType];
+				bool disabled = eventSet.Events[(int)eventType].CallCounter < NO_CALL_COUNTER;
+
+				// Flip the call counter to indicate that it is currently disabled.
+				if ((enabled && disabled) || (!enabled && !disabled))
+					eventSet.Events[(int)eventType].CallCounter += enabled ? SHRT_MAX : -SHRT_MAX;
+
+				return true;
+			}
+		}
+
+		TENLog("Error: state for event " + name + " could not be set. Check if event with such name exists in project.",
+			LogLevel::Error, LogConfig::All, false);
 		return false;
 	}
 

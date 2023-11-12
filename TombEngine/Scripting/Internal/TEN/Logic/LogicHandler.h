@@ -124,6 +124,8 @@ public:
 	void AddCallback(CallbackPoint point, const LevelFunc& levelFunc);
 	void RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc);
 	void HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator);
+	void EnableEvent(const std::string& name, VolumeEventType type);
+	void DisableEvent(const std::string& name, VolumeEventType type);
 
 	void ResetScripts(bool clearGameVars) override;
 	void ShortenTENCalls() override;
