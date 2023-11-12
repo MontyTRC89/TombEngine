@@ -294,8 +294,6 @@ void InitializeNeighborRoomList()
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
-		
-		room.neighbors.clear();
 		room.neighbors = GetNeighborRoomNumbers(roomNumber, NEIGHBOR_ROOM_SEARCH_DEPTH);
 	}
 
