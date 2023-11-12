@@ -979,7 +979,7 @@ namespace TEN::Renderer
 			auto titleMenu = g_Gui.GetMenuToDisplay();
 			bool drawLogo = (titleMenu == Menu::Title || titleMenu == Menu::Options);
 
-			if (drawLogo)
+			if (drawLogo && m_logo.Texture != nullptr)
 			{
 				float factorX = (float)m_screenWidth / DISPLAY_SPACE_RES.x;
 				float factorY = (float)m_screenHeight / DISPLAY_SPACE_RES.y;
