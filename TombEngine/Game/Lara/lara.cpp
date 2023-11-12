@@ -45,6 +45,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	for (int r : g_Level.Rooms[item->RoomNumber].neighbors)
+		g_Renderer.PrintDebugMessage("%d", r);
+
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{

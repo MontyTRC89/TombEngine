@@ -254,30 +254,35 @@ Vector3i GetRoomCenter(int roomNumber)
 		room.z + halfDepth);
 }
 
-static std::set<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::set<int>& visitedRoomNumbers = std::set<int>{})
+static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{})
 {
 	// No rooms exist; return empty set.
 	if (g_Level.Rooms.size() <= roomNumber)
 		return {};
 
 	// Collect current room number as neighbor of itself.
-	auto neighborRoomNumbers = std::set<int>{};
-	visitedRoomNumbers.insert(roomNumber);
+	visitedRoomNumbers.push_back(roomNumber);
 
 	// Search depth limit reached; return empty set.
 	if (searchDepth == 0)
-		return neighborRoomNumbers;
+		return {};
+
+	auto neighborRoomNumbers = std::vector<int>{};
 
 	// Recursively collect neighbors of current neighbor.
 	const auto& room = g_Level.Rooms[roomNumber];
 	for (int doorID = 0; doorID < room.doors.size(); doorID++) 
 	{
 		int neighborRoomNumber = room.doors[doorID].room;
-		neighborRoomNumbers.insert(neighborRoomNumber);
+		neighborRoomNumbers.push_back(neighborRoomNumber);
 
 		auto recNeighborRoomNumbers = GetNeighborRoomNumbers(neighborRoomNumber, searchDepth - 1, visitedRoomNumbers);
-		neighborRoomNumbers.insert(recNeighborRoomNumbers.begin(), recNeighborRoomNumbers.end());
+		neighborRoomNumbers.insert(neighborRoomNumbers.end(), recNeighborRoomNumbers.begin(), recNeighborRoomNumbers.end());
 	}
+
+	// Sort and clean collection.
+	std::sort(neighborRoomNumbers.begin(), neighborRoomNumbers.end());
+	neighborRoomNumbers.erase(std::unique(neighborRoomNumbers.begin(), neighborRoomNumbers.end()), neighborRoomNumbers.end());
 
 	return neighborRoomNumbers;
 }
@@ -291,10 +296,7 @@ void InitializeNeighborRoomList()
 		auto& room = g_Level.Rooms[roomNumber];
 		
 		room.neighbors.clear();
-
-		auto neighborRoomNumbers = GetNeighborRoomNumbers(roomNumber, NEIGHBOR_ROOM_SEARCH_DEPTH);
-		for (int neighborRoomNumber : neighborRoomNumbers)
-			room.neighbors.push_back(neighborRoomNumber);
+		room.neighbors = GetNeighborRoomNumbers(roomNumber, NEIGHBOR_ROOM_SEARCH_DEPTH);
 	}
 
 	// Add flipped variations of itself.
