@@ -299,7 +299,8 @@ static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 static constexpr char ScriptReserved_TorchIsLit[]					= "TorchIsLit";
 static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
 static constexpr char ScriptReserved_GetDisplayPosition[]			= "GetDisplayPosition";
-static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDisplayPosition";
+static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDisplayPosition"; // Deprecated
+static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";

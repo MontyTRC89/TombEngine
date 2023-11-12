@@ -814,7 +814,7 @@ namespace TEN::Input
 		}
 	}
 
-	Vector2 GetCursor2DPosition()
+	Vector2 GetMouse2DPosition()
 	{
 		const auto& state = OisMouse->getMouseState();
 
