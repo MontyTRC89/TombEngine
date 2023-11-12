@@ -83,8 +83,8 @@ namespace TEN::Scripting::Util
 			return sol::nullopt;
 
 		return Vec2(
-			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
-			(displayPos->y / SCREEN_SPACE_RES.y) * 100);
+			(displayPos->x / DISPLAY_SPACE_RES.x) * 100,
+			(displayPos->y / DISPLAY_SPACE_RES.y) * 100);
 	}
 
 	/// Translate a pair display position coordinates to pixel coordinates.

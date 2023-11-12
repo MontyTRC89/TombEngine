@@ -96,7 +96,7 @@ namespace TEN::Scripting::Input
 		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
 
 		auto cursorPos = TEN::Input::GetCursorDisplayPosition();
-		cursorPos = Vector2(cursorPos.x / SCREEN_SPACE_RES.x, cursorPos.y / SCREEN_SPACE_RES.y) * 100;
+		cursorPos = Vector2(cursorPos.x / DISPLAY_SPACE_RES.x, cursorPos.y / DISPLAY_SPACE_RES.y) * 100;
 		return Vec2(cursorPos);
 	}
 

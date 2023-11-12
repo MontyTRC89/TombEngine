@@ -34,7 +34,7 @@ namespace TEN::Hud
 		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 		float screenResAspect = screenRes.x / screenRes.y;
 
-		return ((((SCREEN_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale)) * screenResAspect);
+		return ((((DISPLAY_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale)) * screenResAspect);
 	}
 
 	Vector2 CrosshairData::GetPositionOffset(short orientOffset) const
@@ -70,8 +70,8 @@ namespace TEN::Hud
 		float screenEdgeThreshold = GetRadius();
 		return (Position->x <= -screenEdgeThreshold ||
 				Position->y <= -screenEdgeThreshold ||
-				Position->x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
-				Position->y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
+				Position->x >= (DISPLAY_SPACE_RES.x + screenEdgeThreshold) ||
+				Position->y >= (DISPLAY_SPACE_RES.y + screenEdgeThreshold));
 	}
 
 	void CrosshairData::Update(const Vector3& targetPos, bool isActive, bool doPulse)

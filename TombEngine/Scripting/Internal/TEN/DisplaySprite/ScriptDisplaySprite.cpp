@@ -182,7 +182,7 @@ namespace TEN::Scripting::DisplaySprite
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
 		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
-		constexpr auto POS_CONVERSION_COEFF	  = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
+		constexpr auto POS_CONVERSION_COEFF	  = Vector2(DISPLAY_SPACE_RES.x / 100, DISPLAY_SPACE_RES.y / 100);
 		constexpr auto SCALE_CONVERSION_COEFF = 0.01f;
 
 		constexpr auto DEFAULT_PRIORITY	  = 0;

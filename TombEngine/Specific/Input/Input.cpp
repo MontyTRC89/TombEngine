@@ -460,8 +460,8 @@ namespace TEN::Input
 			// Normalize raw mouse axis values to range [-1.0f, 1.0f].
 			auto rawAxes = Vector2(state.X.rel, state.Y.rel);
 			auto normAxes = Vector2(
-				(((rawAxes.x - -SCREEN_SPACE_RES.x) * 2) / (SCREEN_SPACE_RES.x - -SCREEN_SPACE_RES.x)) - 1.0f,
-				(((rawAxes.y - -SCREEN_SPACE_RES.y) * 2) / (SCREEN_SPACE_RES.y - -SCREEN_SPACE_RES.y)) - 1.0f);
+				(((rawAxes.x - -DISPLAY_SPACE_RES.x) * 2) / (DISPLAY_SPACE_RES.x - -DISPLAY_SPACE_RES.x)) - 1.0f,
+				(((rawAxes.y - -DISPLAY_SPACE_RES.y) * 2) / (DISPLAY_SPACE_RES.y - -DISPLAY_SPACE_RES.y)) - 1.0f);
 
 			// Apply sensitivity and smoothing.
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
@@ -820,7 +820,7 @@ namespace TEN::Input
 
 		auto areaRes = Vector2(state.width, state.height);
 		auto areaPos = Vector2(state.X.abs, state.Y.abs);
-		return (SCREEN_SPACE_RES * (areaPos / areaRes));
+		return (DISPLAY_SPACE_RES * (areaPos / areaRes));
 	}
 
 	void ClearAction(ActionID actionID)
