@@ -968,7 +968,7 @@ namespace TEN::Entities::Vehicles
 		else
 			motorbike->Revs = 0;
 
-		if (IsHeld(In::Speed) && IsHeld(In::Accelerate) && 
+		if (IsHeld(In::Faster) && IsHeld(In::Accelerate) && 
 			(motorbike->Flags & MOTORBIKE_FLAG_NITRO))
 		{
 			if (lara->Status.Stamina > 10)

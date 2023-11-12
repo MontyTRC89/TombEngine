@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.1.0 Lua API</title>
+    <title>TombEngine 1.2 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -34,14 +34,18 @@
 <ul class="nowrap">
   <li>    <a href="../1 modules/Effects.html">Effects</a></li>
   <li>    <a href="../1 modules/Flow.html">Flow</a></li>
+  <li>    <a href="../1 modules/Input.html">Input</a></li>
   <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
-  <li>    <a href="../1 modules/Misc.html">Misc</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
+  <li>    <a href="../1 modules/Sound.html">Sound</a></li>
   <li>    <a href="../1 modules/Strings.html">Strings</a></li>
+  <li>    <a href="../1 modules/Util.html">Util</a></li>
+  <li>    <a href="../1 modules/View.html">View</a></li>
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
@@ -71,14 +75,16 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
-  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
-  <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
-  <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
+  <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
+  <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
+  <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -91,31 +97,29 @@
 <div id="content">
 
 <h1>Primitive Class <code>Rotation</code></h1>
-<p>Represents a rotation.</p>
-<p>Rotations are specifed as a combination of individual
-angles, in degrees, about each axis.
-All values will be clamped to [0.0f, 360.0f].</p>
+<p>Represents a degree-based 3D rotation.</p>
+<p>All values are clamped to the range [0.0, 360.0].</p>
 
 
 <h2><a href="#Members">Members</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#x">x</a></td>
-	<td class="summary">(float) rotation about x axis</td>
+	<td class="summary">(float) X angle component.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#y">y</a></td>
-	<td class="summary">(float) rotation about y axis</td>
+	<td class="summary">(float) Y angle component.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#z">z</a></td>
-	<td class="summary">(float) rotation about z axis</td>
+	<td class="summary">(float) Z angle component.</td>
 	</tr>
 </table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Rotation">Rotation(X, Y, Z)</a></td>
+	<td class="name" ><a href="#Rotation">Rotation(x, y, z)</a></td>
 	<td class="summary">
 
 </td>
@@ -140,7 +144,7 @@ All values will be clamped to [0.0f, 360.0f].</p>
     <strong>x</strong>
     </dt>
     <dd>
-    (float) rotation about x axis
+    (float) X angle component.
 
 
 
@@ -155,7 +159,7 @@ All values will be clamped to [0.0f, 360.0f].</p>
     <strong>y</strong>
     </dt>
     <dd>
-    (float) rotation about y axis
+    (float) Y angle component.
 
 
 
@@ -170,7 +174,7 @@ All values will be clamped to [0.0f, 360.0f].</p>
     <strong>z</strong>
     </dt>
     <dd>
-    (float) rotation about z axis
+    (float) Z angle component.
 
 
 
@@ -186,7 +190,7 @@ All values will be clamped to [0.0f, 360.0f].</p>
     <dl class="function">
     <dt>
     <a name = "Rotation"></a>
-    <strong>Rotation(X, Y, Z)</strong>
+    <strong>Rotation(x, y, z)</strong>
     </dt>
     <dd>
 
@@ -197,17 +201,17 @@ All values will be clamped to [0.0f, 360.0f].</p>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">X</span>
+        <li><span class="parameter">x</span>
             <span class="types"><span class="type">float</span></span>
-         rotation about x axis
+         X angle component.
         </li>
-        <li><span class="parameter">Y</span>
+        <li><span class="parameter">y</span>
             <span class="types"><span class="type">float</span></span>
-         rotation about y axis
+         Y angle component.
         </li>
-        <li><span class="parameter">Z</span>
+        <li><span class="parameter">z</span>
             <span class="types"><span class="type">float</span></span>
-         rotation about z axis
+         Z angle component.
         </li>
     </ul>
 
@@ -215,7 +219,7 @@ All values will be clamped to [0.0f, 360.0f].</p>
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-        A Rotation object.
+        A Rotation.
     </ol>
 
 
@@ -237,7 +241,7 @@ All values will be clamped to [0.0f, 360.0f].</p>
     <ul>
         <li><span class="parameter">rotation</span>
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         this rotation
+         this Rotation.
         </li>
     </ul>
 
@@ -245,7 +249,7 @@ All values will be clamped to [0.0f, 360.0f].</p>
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        A string showing the x, y, and z values of the rotation
+        A string showing the X, Y, and Z angle components of the Rotation.
     </ol>
 
 
@@ -259,7 +263,7 @@ All values will be clamped to [0.0f, 360.0f].</p>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-09-30 13:48:57 </i>
+<i style="float:right;">Last updated 2023-11-11 12:12:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

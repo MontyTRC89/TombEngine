@@ -10,10 +10,15 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
+#include "Scripting/Internal/TEN/View/ScaleModes.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::Environment;
+using namespace TEN::Scripting::DisplaySprite;
+using namespace TEN::Scripting::View;
 using TEN::Renderer::g_Renderer;
 
 /***
@@ -22,7 +27,7 @@ Functions to manage camera and game view.
 @pragma nostrip
 */
 
-namespace View
+namespace TEN::Scripting::View
 {
 	static void FadeOut(TypeOrNil<float> speed)
 	{
@@ -91,7 +96,7 @@ namespace View
 
 	void Register(sol::state* state, sol::table& parent)
 	{
-		sol::table tableView{ state->lua_state(), sol::create };
+		auto tableView = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_View, tableView);
 
 		///Do a full-screen fade-in from black.
@@ -110,7 +115,7 @@ namespace View
 
 		///Move black cinematic bars in from the top and bottom of the game window.
 		//@function SetCineBars
-		//@tparam float height  __(default 30)__ Percentage of the screen to be covered
+		//@tparam float height __(default 30)__ Percentage of the screen to be covered
 		//@tparam float speed __(default 30)__ Coverage percent per second
 		tableView.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 
@@ -144,7 +149,6 @@ namespace View
 		//@function ResetObjCamera
 		tableView.set_function(ScriptReserved_ResetObjCamera, &ResetObjCamera);
 
-
 		/// Flash screen.
 		//@function FlashScreen
 		//@tparam Color color (default Color(255, 255, 255))
@@ -153,7 +157,13 @@ namespace View
 
 		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
 
-		LuaHandler handler{ state };
+		// Register types.
+		ScriptDisplaySprite::Register(*state, parent);
+
+		// Register enums.
+		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_CameraType, CAMERA_TYPE);
+		handler.MakeReadOnlyTable(tableView, ScriptReserved_AlignMode, ALIGN_MODES);
+		handler.MakeReadOnlyTable(tableView, ScriptReserved_ScaleMode, SCALE_MODES);
 	}
 };

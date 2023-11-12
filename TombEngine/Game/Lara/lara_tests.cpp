@@ -941,7 +941,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	// Extra bridge check.
 	if (coll->Front.Bridge != NO_ITEM)
 	{
-		int bridgeBorder = GetBridgeBorder(coll->Front.Bridge, false) - item->Pose.Position.y;
+		int bridgeBorder = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
 		
 		frontFloor = bridgeBorder - CLICK(0.5f);
 		if (frontFloor <= -CLICK(2) ||

@@ -79,10 +79,10 @@ namespace TEN::Entities::Generic
 
 		// Read OCB flags.
 		int ocb = pushableItem.TriggerFlags;
-		pushable.CanFall			  = (ocb & (1 << 0)) != 0;			 // Bit 0.
-		pushable.DoCenterAlign		  = (ocb & (1 << 1)) != 1;			 // Bit 1.
-		pushable.IsBuoyant			  = (ocb & (1 << 2)) != 0;			 // Bit 2.
-		pushable.AnimSetID = ((ocb & (1 << 3)) != 0) ? 1 : 0; // Bit 3.
+		pushable.CanFall				= (ocb & (1 << 0)) != 0;			// Bit 0.
+		pushable.DoCenterAlign			= (ocb & (1 << 1)) == 0;			// Bit 1.
+		pushable.IsBuoyant				= (ocb & (1 << 2)) != 0;			// Bit 2.
+		pushable.AnimSetID				= ((ocb & (1 << 3)) != 0) ? 1 : 0;	// Bit 3.
 
 		pushableItem.Status = ITEM_ACTIVE;
 		AddActiveItem(itemNumber);
@@ -215,11 +215,11 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	int GetPushableHeight(ItemInfo& item)
+	int GetPushableHeight(const ItemInfo& item)
 	{
-		int heightBoundingBox = -GameBoundingBox(&item).Y1;
-		int heightWorldAligned = (heightBoundingBox / CLICK(0.5)) * CLICK(0.5);
-		return heightWorldAligned;
+		int boxHeight = -GameBoundingBox(&item).Y1;
+		int worldAlignedHeight = (boxHeight / CLICK(0.5)) * CLICK(0.5);
+		return worldAlignedHeight;
 	}
 
 	void SetPushableStopperFlag(bool isStopper, const Vector3i& pos, int roomNumber)

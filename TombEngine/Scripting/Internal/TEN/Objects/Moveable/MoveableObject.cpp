@@ -80,7 +80,7 @@ most can just be ignored (see usage).
 	@int[opt=0] animNumber anim number
 	@int[opt=0] frameNumber frame number
 	@int[opt=10] hp HP of item
-	@int[opt=0] OCB ocb of item (default 0)
+	@int[opt=0] OCB ocb of item
 	@tparam[opt] table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
 	@treturn Moveable A new Moveable object (a wrapper around the new object)
 	@usage 
@@ -587,8 +587,8 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 	}
 
 	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.floor != nullptr || object.ceiling != nullptr)
-		UpdateBridgeItem((int)m_item->Index);
+	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+		UpdateBridgeItem(*m_item);
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -618,8 +618,8 @@ void Moveable::SetRot(const Rotation& rot)
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
 
 	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.floor != nullptr || object.ceiling != nullptr)
-		UpdateBridgeItem(m_item->Index);
+	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+		UpdateBridgeItem(*m_item);
 }
 
 /// Get current HP (hit points/health points)

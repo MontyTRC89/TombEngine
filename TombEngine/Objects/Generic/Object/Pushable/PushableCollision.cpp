@@ -128,16 +128,14 @@ namespace TEN::Entities::Generic
 			if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
 				continue;
 
-			if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr) //??
+			if (Objects[CollidedItems[i]->ObjectNumber].GetFloorHeight == nullptr)
 				return false;
 
-			auto& object = Objects[CollidedItems[i]->ObjectNumber];
-			int collidedIndex = CollidedItems[i] - g_Level.Items.data(); // Index of CollidedItems[i].
+			const auto& object = Objects[CollidedItems[i]->ObjectNumber];
+			const auto& item = g_Level.Items[CollidedItems[i]->Index];
 
-			auto colPos = CollidedItems[i]->Pose.Position;
-
-			// Check if floor function returns nullopt.
-			if (object.floor(collidedIndex, colPos.x, colPos.y, colPos.z) == std::nullopt)
+			auto pos = CollidedItems[i]->Pose.Position;
+			if (!object.GetFloorHeight(item, pos).has_value())
 				return false;
 		}
 
@@ -210,17 +208,17 @@ namespace TEN::Entities::Generic
 			if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
 				continue;
 
-			if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr)
+			if (!Objects[CollidedItems[i]->ObjectNumber].GetFloorHeight)
 			{
 				return false;
 			}
 			else
 			{
 				const auto& object = Objects[CollidedItems[i]->ObjectNumber];
-				int collidedItemNumber = CollidedItems[i] - g_Level.Items.data();
-
+				const auto& item = g_Level.Items[CollidedItems[i]->Index];
+				
 				auto pos = CollidedItems[i]->Pose.Position;
-				if (object.floor(collidedItemNumber, pos.x, pos.y, pos.z) == std::nullopt)
+				if (!object.GetFloorHeight(item, pos).has_value())
 					return false;
 			}
 		}
@@ -335,7 +333,8 @@ namespace TEN::Entities::Generic
 		pushableColl.CeilingHeight = pointColl.Position.Ceiling;
 
 		// Above water.
-		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
+		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) ||
+			TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
 		{
 			pushable.WaterSurfaceHeight = waterHeight;
 
