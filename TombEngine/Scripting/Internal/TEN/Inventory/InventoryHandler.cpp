@@ -14,7 +14,7 @@ Inventory manipulation
 @pragma nostrip
 */
 
-namespace InventoryHandler
+namespace TEN::Scripting::InventoryHandler
 {
 	/// Add an item to the player's inventory.
 	//@function GiveItem

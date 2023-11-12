@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.1.0 Lua API</title>
+    <title>TombEngine 1.2 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -34,14 +34,18 @@
 <ul class="nowrap">
   <li>    <a href="../1 modules/Effects.html">Effects</a></li>
   <li>    <a href="../1 modules/Flow.html">Flow</a></li>
+  <li>    <a href="../1 modules/Input.html">Input</a></li>
   <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
-  <li>    <a href="../1 modules/Misc.html">Misc</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
+  <li>    <a href="../1 modules/Sound.html">Sound</a></li>
   <li>    <a href="../1 modules/Strings.html">Strings</a></li>
+  <li>    <a href="../1 modules/Util.html">Util</a></li>
+  <li>    <a href="../1 modules/View.html">View</a></li>
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
@@ -71,14 +75,16 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
-  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
-  <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
-  <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
+  <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
+  <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
+  <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -98,14 +104,14 @@
 and y values specifying the number of pixels from the top of the window.</p>
 
 <p>Since different players will have different resolutions, you should work in terms of percentages where possible,
-and use <a href="../1 modules/Misc.html#ScreenToPercent">ScreenToPercent</a> and <a href="../1 modules/Misc.html#PercentToScreen">PercentToScreen</a>
+and use <a href="../1 modules/Util.html#ScreenToPercent">ScreenToPercent</a> and <a href="../1 modules/Util.html#PercentToScreen">PercentToScreen</a>
 when you need to use screen-space coordinates.</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#DisplayString">DisplayString(string, x, y[, scale][, color][, translated][, flags])</a></td>
+	<td class="name" ><a href="#DisplayString">DisplayString(string, Position[, scale][, color][, translated][, flags])</a></td>
 	<td class="summary">Create a DisplayString.</td>
 	</tr>
 	<tr>
@@ -133,7 +139,7 @@ when you need to use screen-space coordinates.</p>
 	<td class="summary">Get the scale of the string.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#DisplayString:SetPosition">DisplayString:SetPosition(x, y)</a></td>
+	<td class="name" ><a href="#DisplayString:SetPosition">DisplayString:SetPosition(pos)</a></td>
 	<td class="summary">Set the position of the string.</td>
 	</tr>
 	<tr>
@@ -159,11 +165,11 @@ when you need to use screen-space coordinates.</p>
     <dl class="function">
     <dt>
     <a name = "DisplayString"></a>
-    <strong>DisplayString(string, x, y[, scale][, color][, translated][, flags])</strong>
+    <strong>DisplayString(string, Position[, scale][, color][, translated][, flags])</strong>
     </dt>
     <dd>
     Create a DisplayString.
-For use in <a href="../1 modules/Strings.html#ShowString"> ShowString </a> and <a href="../1 modules/Strings.html#HideString"> HideString </a>.
+For use in <a href="../1 modules/Strings.html#ShowString">ShowString</a> and <a href="../1 modules/Strings.html#HideString">HideString</a>.
 
 
 
@@ -173,13 +179,9 @@ For use in <a href="../1 modules/Strings.html#ShowString"> ShowString </a> and <
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
          The string to display or key of the translated string.
         </li>
-        <li><span class="parameter">x</span>
-            <span class="types"><span class="type">int</span></span>
-         X component of the string.
-        </li>
-        <li><span class="parameter">y</span>
-            <span class="types"><span class="type">int</span></span>
-         Y component of the string.
+        <li><span class="parameter">Position</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+         of the string in pixel coordinates.
         </li>
         <li><span class="parameter">scale</span>
             <span class="types"><span class="type">float</span></span>
@@ -269,9 +271,9 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
     <strong>DisplayString:GetKey()</strong>
     </dt>
     <dd>
-    Get the string key to use.  If <code>translated</code> is true when <a href="../2 classes/Strings.DisplayString.html#DisplayString">DisplayString</a>
+    Get the string key to use.  If <code>isTranslated</code> is true when <a href="../2 classes/Strings.DisplayString.html#DisplayString">DisplayString</a>
  is called, this will be the string key for the translation that will be displayed.
- If false or omitted, this will be the string that's displayed.
+ If false or omitted, this will be the string that's displayed.()
 
 
 
@@ -292,9 +294,9 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
     <strong>DisplayString:SetKey(string)</strong>
     </dt>
     <dd>
-    Set the string key to use.  If <code>translated</code> is true when <a href="../2 classes/Strings.DisplayString.html#DisplayString">DisplayString</a>
+    Set the string key to use.  If <code>isTranslated</code> is true when <a href="../2 classes/Strings.DisplayString.html#DisplayString">DisplayString</a>
  is called, this will be the string key for the translation that will be displayed.
- If false or omitted, this will be the string that's displayed.
+ If false or omitted, this will be the string that's displayed.()
 
 
 
@@ -316,7 +318,7 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
     <strong>DisplayString:SetScale(scale)</strong>
     </dt>
     <dd>
-    Set the scale of the string.
+    Set the scale of the string. ()
 
 
 
@@ -324,7 +326,7 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
     <ul>
         <li><span class="parameter">scale</span>
             <span class="types"><span class="type">float</span></span>
-         the new scale of the text, relative to the default size
+         New scale of the string relative to the default size.
         </li>
     </ul>
 
@@ -338,7 +340,7 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
     <strong>DisplayString:GetScale()</strong>
     </dt>
     <dd>
-    Get the scale of the string.
+    Get the scale of the string. ()
 
 
 
@@ -347,7 +349,7 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
     <ol>
 
            <span class="types"><span class="type">float</span></span>
-        scale of the string
+        Scale.
     </ol>
 
 
@@ -356,23 +358,19 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
 </dd>
     <dt>
     <a name = "DisplayString:SetPosition"></a>
-    <strong>DisplayString:SetPosition(x, y)</strong>
+    <strong>DisplayString:SetPosition(pos)</strong>
     </dt>
     <dd>
     Set the position of the string.
- Screen-space coordinates are expected.
+ Screen-space coordinates are expected.()
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">x</span>
-            <span class="types"><span class="type">int</span></span>
-         x-coordinate of the string
-        </li>
-        <li><span class="parameter">y</span>
-            <span class="types"><span class="type">int</span></span>
-         y-coordinate of the string
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+         New position in pixel coordinates.
         </li>
     </ul>
 
@@ -387,19 +385,16 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
     </dt>
     <dd>
     Get the position of the string.
- Screen-space coordinates are returned.
+ Screen-space coordinates are returned.()
 
 
 
 
     <h3>Returns:</h3>
     <ol>
-        <li>
-           <span class="types"><span class="type">int</span></span>
-        x-coordinate of the string</li>
-        <li>
-           <span class="types"><span class="type">int</span></span>
-        y-coordinate of the string</li>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+        pos Position in pixel coordinates.
     </ol>
 
 
@@ -411,7 +406,7 @@ TEN.Strings.DisplayStringOption.BLINK: blink the string.
     <strong>DisplayString:SetFlags(table)</strong>
     </dt>
     <dd>
-    Set the display string's flags
+    Set the display string's flags ()
 
 
 
@@ -469,7 +464,7 @@ varDisplayString:SetFlags({ TEN.Strings.DisplayStringOption.SHADOW, TEN.Strings.
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-09-30 13:48:57 </i>
+<i style="float:right;">Last updated 2023-11-11 12:12:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -26,13 +26,13 @@ constexpr auto FALLINGBLOCK_CRUMBLE_DELAY		= 100;
 
 void InitializeFallingBlock(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	g_Level.Items[itemNumber].MeshBits = 1;
-	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
+	item.MeshBits = 1;
+	TEN::Collision::Floordata::UpdateBridgeItem(item);
 
 	// Set mutators to EulerAngles identity by default.
-	for (auto& mutator : item->Model.Mutators)
+	for (auto& mutator : item.Model.Mutators)
 		mutator.Rotation = EulerAngles::Zero;
 }
 
@@ -139,31 +139,28 @@ void FallingBlockControl(short itemNumber)
 	}
 }
 
-std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
+std::optional<int> GetFallingBlockFloorHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	ItemInfo* item = &g_Level.Items[itemNumber];
-	if (!item->MeshBits.TestAny() || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
+	if (!item.MeshBits.TestAny() || item.ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
+	return GetBridgeItemIntersect(item, pos, false);
 }
 
-std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> GetFallingBlockCeilingHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	ItemInfo* item = &g_Level.Items[itemNumber];
-
-	if (!item->MeshBits.TestAny() || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
+	if (!item.MeshBits.TestAny() || item.ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
+	return GetBridgeItemIntersect(item, pos, true);
 }
 
-int FallingBlockFloorBorder(short itemNumber)
+int GetFallingBlockFloorBorder(const ItemInfo& item)
 {
-	return GetBridgeBorder(itemNumber, false);
+	return GetBridgeBorder(item, false);
 }
 
-int FallingBlockCeilingBorder(short itemNumber)
+int GetFallingBlockCeilingBorder(const ItemInfo& item)
 {
-	return GetBridgeBorder(itemNumber, true);
+	return GetBridgeBorder(item, true);
 }

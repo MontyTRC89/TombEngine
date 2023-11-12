@@ -316,7 +316,9 @@ namespace TEN::Entities::Generic
 					int foundStack = SearchNearPushablesStack(pushableItem.Index);
 					StackPushable(pushableItem.Index, foundStack);
 
-					pushable.SoundState = PushableSoundState::Stop;
+					//TODO: Adjust a better solution that work too for the pushables block animations.
+					if (pushable.AnimSetID == 0)
+						pushable.SoundState = PushableSoundState::Stop;
 				}
 				else if (playerItem.Animation.ActiveState == LS_PUSHABLE_PUSH && pushable.IsOnEdge)
 				{
