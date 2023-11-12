@@ -18,7 +18,7 @@ struct ItemInfo;
 // Sector point:	Relative 2D position within a sector (range [0, BLOCK(1)) on each axis).
 // Surface:			Floor or ceiling consisting of two triangles.
 // Triangle:		Surface subdivision.
-// Wall:			Inferred from a floor or ceiling with max height. Note that true "walls" don't exist in floordata.
+// Wall:			Inferred from a high floor or ceiling. Note that true "walls" don't exist in floordata.
 
 const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
 
