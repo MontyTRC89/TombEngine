@@ -21,7 +21,7 @@ namespace TEN::Hud
 	float CrosshairData::GetScale(float cameraDist) const
 	{
 		constexpr auto RANGE			   = BLOCK(10);
-		constexpr auto CROSSHAIR_SCALE_MAX = 0.15f;
+		constexpr auto CROSSHAIR_SCALE_MAX = 0.12f;
 		constexpr auto CROSSHAIR_SCALE_MIN = CROSSHAIR_SCALE_MAX / 3;
 
 		auto alpha = cameraDist / RANGE;
@@ -78,8 +78,8 @@ namespace TEN::Hud
 	{
 		constexpr auto ROT					   = ANGLE(2.0f);
 		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
-		constexpr auto SCALE_PRIMARY		   = 0.75f;
-		constexpr auto SCALE_PERIPHERAL		   = 0.5f;
+		constexpr auto SCALE_PRIMARY		   = 1.0f;
+		constexpr auto SCALE_PERIPHERAL		   = 0.8f;
 		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f;
 		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f;
 		constexpr auto PULSE_SCALE_MAX		   = 1.3f;
