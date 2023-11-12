@@ -3,6 +3,9 @@ Version 1.3
 
 * Fix crash if title logo is removed from Textures folder.
 * Fix crash if unknown player state ID is encountered.
+* Fix bug with OCB 2 on pushables.
+* Fix pushables "stop" sound bug.
+* Fix pushables camera during edge slips bug.
 
 Version 1.2
 ===========
