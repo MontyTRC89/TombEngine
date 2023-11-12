@@ -27,14 +27,6 @@ namespace TEN::Entities::TR4
 	constexpr auto DEMIGOD1_WALK_RANGE					   = SQUARE(BLOCK(3));
 	constexpr auto DEMIGOD2_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
 	constexpr auto DEMIGOD3_RADIAL_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(5));
-	constexpr auto DEMIGOD1_SHOCKWAVE_LIGHT_DURATION = 1.0f;
-
-	struct Demigod1Info
-	{
-		Vector3i LightPosition = Vector3i::Zero;
-	};
-
-	Demigod1Info Demigod1Data;
 
 	enum DemigodState
 	{
@@ -439,19 +431,6 @@ namespace TEN::Entities::TR4
 				joint3 = AI.angle / 2;
 			}
 
-			// Spawn shockwave light.
-			if (item->ItemFlags[3])
-			{
-				auto color = Color(
-					1.0f,
-					Random::GenerateFloat(0.90f, 1.0f),
-					Random::GenerateFloat(0.90f, 1.0f));
-				float falloff = item->ItemFlags[3] / (float)UCHAR_MAX;
-				SpawnDynamicLight(Demigod1Data.LightPosition.ToVector3(), color, falloff);
-
-				item->ItemFlags[3]--;
-			}
-
 			switch (item->Animation.ActiveState)
 			{
 			case DEMIGOD_STATE_IDLE:
@@ -727,17 +706,14 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - CLICK(0.5f);
 
-					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, (int)ShockwaveStyle::Normal);
+					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, false, (int)ShockwaveStyle::Normal);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
-					Demigod1Data.LightPosition = Vector3i(pos.x, pos.y, pos.z);
 					pos.y -= 64;
-					TriggerShockwave((Pose*)&pos, 24, 88, 200, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, (int)ShockwaveStyle::Normal);
+					TriggerShockwave((Pose*)&pos, 24, 88, 200, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, true, (int)ShockwaveStyle::Normal);
 
 					auto lightColor = Color(1.0f, 0.4f, 0.2f);
-					SpawnDynamicLight(Demigod1Data.LightPosition.ToVector3(), lightColor, 0.1f);
-
-					item->ItemFlags[3] = (int)round(DEMIGOD1_SHOCKWAVE_LIGHT_DURATION * FPS);
+					SpawnDynamicLight(pos.ToVector3(), lightColor, 0.1f);
 
 					Camera.bounce = -128;
 

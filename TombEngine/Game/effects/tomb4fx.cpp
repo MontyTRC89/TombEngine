@@ -1266,7 +1266,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style)
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, bool light, int style)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1291,6 +1291,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->life = life;
 		sptr->sLife = life;
 		sptr->fadeIn = fadein;
+		sptr->light = light;
 		
 		sptr->sr = 0;
 		sptr->sg = 0;
@@ -1299,7 +1300,7 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 
 		if (sound)
 			SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
-	}	
+	}		
 }
 
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel)
@@ -1366,6 +1367,13 @@ void UpdateShockwaves()
 			continue;
 
 		shockwave.life--;
+
+		if (shockwave.light)
+		{
+			auto lightColor = Color((float)shockwave.r / UCHAR_MAX, (float)shockwave.g / UCHAR_MAX, (float)shockwave.b / UCHAR_MAX);
+			auto pos = Vector3(shockwave.x, shockwave.y, shockwave.z);
+			SpawnDynamicLight(pos, lightColor, (float)shockwave.life / UCHAR_MAX);
+		}
 
 		if (shockwave.style != (int)ShockwaveStyle::Knockback)
 		{

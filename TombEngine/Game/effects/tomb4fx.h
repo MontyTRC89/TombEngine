@@ -79,6 +79,7 @@ struct SHOCKWAVE_STRUCT
 	short speed;
 	short sLife;
 	bool fadeIn = false;
+	bool light = false;
 	int style;
 };
 
@@ -248,7 +249,7 @@ void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 void ExplodingDeath(short itemNumber, short flags); // BODY_ flags
 int GetFreeShockwave();
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style);
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, bool light, int style);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);
