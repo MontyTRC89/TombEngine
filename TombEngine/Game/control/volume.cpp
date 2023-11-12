@@ -19,6 +19,7 @@ using TEN::Renderer::g_Renderer;
 namespace TEN::Control::Volumes
 {
 	constexpr auto CAM_SIZE = 32;
+	constexpr auto EVENT_STATE_MASK = SHRT_MAX;
 
 	bool TestVolumeContainment(const TriggerVolume& volume, const BoundingOrientedBox& box, short roomNumber)
 	{
@@ -124,7 +125,7 @@ namespace TEN::Control::Volumes
 
 				// Flip the call counter to indicate that it is currently disabled.
 				if ((enabled && disabled) || (!enabled && !disabled))
-					eventSet.Events[(int)eventType].CallCounter += enabled ? SHRT_MAX : -SHRT_MAX;
+					eventSet.Events[(int)eventType].CallCounter += enabled ? EVENT_STATE_MASK : -EVENT_STATE_MASK;
 
 				return true;
 			}
