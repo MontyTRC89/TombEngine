@@ -1006,6 +1006,9 @@ void LoadEventSets()
 			LoadEvent(eventSet.Events[eventType]);
 
 		g_Level.EventSets.push_back(eventSet);
+
+		if (!eventSet.Events[(int)VolumeEventType::Loop].Function.empty())
+			g_Level.LoopedEventSetIndices.push_back(i);
 	}
 }
 
