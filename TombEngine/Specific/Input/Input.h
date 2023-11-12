@@ -105,7 +105,7 @@ namespace TEN::Input
     void ApplyDefaultBindings();
     bool ApplyDefaultXInputBindings();
 
-	Vector2 GetCursorDisplayPosition();
+	Vector2 GetCursor2DPosition();
 
 	// TODO: Move global query functions to player input object (not happening soon). -- Sezz 2023.08.07
 	void  ClearAction(ActionID actionID);
