@@ -253,6 +253,7 @@ namespace TEN::Entities::Player
 				controlRoutine(&item, &coll);
 				return;
 			}
+			break;
 
 		case PlayerBehaviorStateRoutineType::Collision:
 			if (collRoutine != nullptr)
@@ -260,10 +261,7 @@ namespace TEN::Entities::Player
 				collRoutine(&item, &coll);
 				return;
 			}
-
-		default:
-			TENLog("Error handling invalid player behavior state routine type " + std::to_string((int)routineType) + ".", LogLevel::Warning);
-			return;
+			break;
 		}
 
 		TENLog("Error handling unregistered player behavior state " + std::to_string(item.Animation.ActiveState) + ".", LogLevel::Warning);
