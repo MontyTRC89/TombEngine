@@ -248,20 +248,18 @@ namespace TEN::Entities::Player
 		switch (routineType)
 		{
 		case PlayerBehaviorStateRoutineType::Control:
-			if (controlRoutine != nullptr)
-			{
-				controlRoutine(&item, &coll);
-				return;
-			}
-			break;
+			if (controlRoutine == nullptr)
+				break;
+
+			controlRoutine(&item, &coll);
+			return;
 
 		case PlayerBehaviorStateRoutineType::Collision:
-			if (collRoutine != nullptr)
-			{
-				collRoutine(&item, &coll);
-				return;
-			}
-			break;
+			if (collRoutine == nullptr)
+				break;
+
+			collRoutine(&item, &coll);
+			return;
 		}
 
 		TENLog("Error handling unregistered player behavior state " + std::to_string(item.Animation.ActiveState) + ".", LogLevel::Warning);
