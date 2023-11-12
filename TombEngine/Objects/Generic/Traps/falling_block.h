@@ -1,13 +1,14 @@
 #pragma once
-#include <optional>
 
+class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 
 void InitializeFallingBlock(short itemNumber);
 void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void FallingBlockControl(short itemNumber);
-std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z);
-std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z);
-int FallingBlockFloorBorder(short itemNumber);
-int FallingBlockCeilingBorder(short itemNumber);
+
+std::optional<int> GetFallingBlockFloorHeight(const ItemInfo& item, const Vector3i& pos);
+std::optional<int> GetFallingBlockCeilingHeight(const ItemInfo& item, const Vector3i& pos);
+int GetFallingBlockFloorBorder(const ItemInfo& item);
+int GetFallingBlockCeilingBorder(const ItemInfo& item);

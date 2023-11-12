@@ -39,7 +39,7 @@ DisplayString::DisplayString()
 }
 
 /*** Create a DisplayString.
-For use in @{ Strings.ShowString | ShowString } and @{Strings.HideString | HideString }.
+For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}.
 @function DisplayString
 @tparam string string The string to display or key of the translated string.
 @tparam Vec2 Position of the string in pixel coordinates.
@@ -146,14 +146,14 @@ void DisplayString::Register(sol::table& parent)
 		// @tparam Color color the new color of the display string 
 		ScriptReserved_SetColor, &DisplayString::SetColor,
 
-		/// Get the string key to use. If `isTranslated` is true when @{ DisplayString }
+		/// Get the string key to use. If `isTranslated` is true when @{DisplayString}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:GetKey()
 		// @treturn string the string to use
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
-		/// Set the string key to use. If `isTranslated` is true when @{ DisplayString }
+		/// Set the string key to use. If `isTranslated` is true when @{DisplayString}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function DisplayString:SetKey()

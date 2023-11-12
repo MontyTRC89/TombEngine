@@ -49,8 +49,8 @@ void Vec2::Register(sol::table& parent)
 
 /// Create a Vec2 object.
 // @function Vec2(x, y)
-// @float x X component.
-// @float y Y component.
+// @tparam float x X component.
+// @tparam float y Y component.
 // @treturn Vec2 A new Vec2 object.
 Vec2::Vec2(float x, float y)
 {
@@ -60,7 +60,7 @@ Vec2::Vec2(float x, float y)
 
 /// Create a Vec2 object.
 // @function Vec(value)
-// @float value X and Z component.
+// @tparam float value X and Z component.
 // @treturn Vec2 A new Vec2 object.
 Vec2::Vec2(float value)
 {

@@ -193,10 +193,10 @@ void InitPushableObject(ObjectInfo* object, int objectNumber)
 		object->Initialize = InitializePushableBlock;
 		object->control = PushableBlockControl;
 		object->collision = PushableBlockCollision;
-		object->floor = PushableBridgeFloor;
-		object->ceiling = PushableBridgeCeiling;
-		object->floorBorder = PushableBridgeFloorBorder;
-		object->ceilingBorder = PushableBridgeCeilingBorder;
+		object->GetFloorHeight = GetPushableBridgeFloorHeight;
+		object->GetCeilingHeight = GetPushableBridgeCeilingHeight;
+		object->GetFloorBorder = GetPushableBridgeFloorBorder;
+		object->GetCeilingBorder = GetPushableBridgeCeilingBorder;
 		object->SetHitEffect(true);
 	}
 }

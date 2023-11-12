@@ -305,7 +305,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Initialize items, effects, lots, and cameras.
 	HairEffect.Initialize();
-	InitializeFXArray(true);
+	InitializeFXArray();
 	InitializeCamera();
 	InitializeSpotCamSequences(isTitle);
 	InitializeItemBoxData();
@@ -464,8 +464,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 		{
 			g_Renderer.AddString(
 				key,
-				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * SCREEN_SPACE_RES.x),
-				((float)pos.y / (float)g_Configuration.ScreenHeight * SCREEN_SPACE_RES.y)),
+				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * DISPLAY_SPACE_RES.x),
+				((float)pos.y / (float)g_Configuration.ScreenHeight * DISPLAY_SPACE_RES.y)),
 				Color(color), scale, flags);
 		});
 	}

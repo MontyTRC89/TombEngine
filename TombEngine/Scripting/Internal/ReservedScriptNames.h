@@ -53,9 +53,6 @@ static constexpr char ScriptReserved_DisplayStringSetRotation[]		= "SetRotation"
 static constexpr char ScriptReserved_DisplayStringSetScale[]		= "SetScale";
 static constexpr char ScriptReserved_DisplayStringSetColor[]		= "SetColor";
 static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
-static constexpr char ScriptReserved_DisplaySpriteEnum[]			= "DisplaySpriteEnum";
-static constexpr char ScriptReserved_DisplaySpriteEnumAlignMode[]	= "AlignMode";
-static constexpr char ScriptReserved_DisplaySpriteEnumScaleMode[]	= "ScaleMode";
 
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
@@ -310,7 +307,8 @@ static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 static constexpr char ScriptReserved_TorchIsLit[]					= "TorchIsLit";
 static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
 static constexpr char ScriptReserved_GetDisplayPosition[]			= "GetDisplayPosition";
-static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDisplayPosition";
+static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDisplayPosition"; // Deprecated
+static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
@@ -326,6 +324,8 @@ static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOpti
 static constexpr char ScriptReserved_CallbackPoint[]			= "CallbackPoint";
 static constexpr char ScriptReserved_EndReason[]				= "EndReason";
 static constexpr char ScriptReserved_EventType[]				= "EventType";
+static constexpr char ScriptReserved_AlignMode[]				= "AlignMode";
+static constexpr char ScriptReserved_ScaleMode[]				= "ScaleMode";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";

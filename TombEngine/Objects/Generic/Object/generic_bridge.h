@@ -1,23 +1,23 @@
 #pragma once
-#include "Math/Math.h"
-#include "Specific/level.h"
-#include "Game/items.h"
 #include "Game/collision/floordata.h"
+#include "Game/items.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+
+class Vector3i;
+struct ItemInfo;
 
 void InitializeBridge(short itemNumber);
 int GetOffset(short angle, int x, int z);
 
 template <int tiltGrade>
-std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)
+std::optional<int> GetBridgeFloorHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	const auto& item = g_Level.Items[itemNumber];
-
-	auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
+	auto boxHeight = GetBridgeItemIntersect(item, pos, false);
 	if (boxHeight.has_value() && tiltGrade != 0)
 	{
-		int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, x, z) / 4) + (BLOCK(1) / 8)));
+		int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, pos.x, pos.z) / 4) + (BLOCK(1 / 8.0f))));
 		return height;
 	}
 
@@ -25,14 +25,12 @@ std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)
 }
 
 template <int tiltGrade>
-std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> GetBridgeCeilingHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	const auto& item = g_Level.Items[itemNumber];
-
-	auto boxHeight = GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
+	auto boxHeight = GetBridgeItemIntersect(item, pos, true);
 	if (boxHeight.has_value() && tiltGrade != 0)
 	{
-		int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, x, z) / 4) + (BLOCK(1) / 8)));
+		int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, pos.x, pos.z) / 4) + (BLOCK(1 / 8.0f))));
 		return (height + CLICK(1));
 	}
 
@@ -40,13 +38,13 @@ std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
 }
 
 template <int tiltGrade>
-int BridgeFloorBorder(short itemNumber)
+int GetBridgeFloorBorder(const ItemInfo& item)
 {
-	return GetBridgeBorder(itemNumber, false);
+	return GetBridgeBorder(item, false);
 }
 
 template <int tiltGrade>
-int BridgeCeilingBorder(short itemNumber)
+int GetBridgeCeilingBorder(const ItemInfo& item)
 {
-	return GetBridgeBorder(itemNumber, true);
+	return GetBridgeBorder(item, true);
 }

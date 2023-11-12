@@ -208,7 +208,7 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
-	// 174-188 reserved for "true" ladders. DO NOT add anything here. -- Sezz 2023.04.16
+	// 174-188 reserved for ladder object. -- Sezz 2023.04.16
 
 	LS_REMOVE_PUZZLE = 189,
 	LS_PUSHABLE_EDGE_SLIP = 190,
@@ -816,7 +816,7 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
-	// 569-598 reserved for "true" ladders. DO NOT add anything here. -- Sezz 2023.04.16
+	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 
@@ -1341,7 +1341,7 @@ struct PlayerEffectData
 
 struct LaraInfo
 {
-	static constexpr auto TARGET_COUNT_MAX = 8;
+	static constexpr auto TARGET_COUNT_MAX = 16;
 
 	LaraControlData	  Control	= {};
 	PlayerContextData Context	= {};
