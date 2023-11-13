@@ -141,76 +141,82 @@ namespace TEN::Control::Volumes
 		if (roomNumber == NO_ROOM)
 			return;
 
-		auto& room = g_Level.Rooms[roomNumber];
-
-		for (auto& volume : room.triggerVolumes)
+		for (int currentRoomIndex : g_Level.Rooms[roomNumber].neighbors)
 		{
-			if (!volume.Enabled)
-				continue;
+			auto& room = g_Level.Rooms[currentRoomIndex];
 
-			if (volume.EventSetIndex == NO_EVENT_SET)
-				continue;
-
-			auto& set = g_Level.EventSets[volume.EventSetIndex];
-
-			if (((int)set.Activators & (int)activatorFlag) != (int)activatorFlag)
-				continue;
-
-			VolumeState* entryPtr = nullptr;
-
-			for (int j = (int)volume.StateQueue.size() - 1; j >= 0; j--)
+			for (auto& volume : room.triggerVolumes)
 			{
-				auto& candidate = volume.StateQueue[j];
+				if (!volume.Enabled)
+					continue;
 
-				if (candidate.Status == VolumeStateStatus::Leaving)
+				if (!volume.DetectInAdjacentRooms && currentRoomIndex != roomNumber)
+					continue;
+
+				if (volume.EventSetIndex == NO_EVENT_SET)
+					continue;
+
+				auto& set = g_Level.EventSets[volume.EventSetIndex];
+
+				if (((int)set.Activators & (int)activatorFlag) != (int)activatorFlag)
+					continue;
+
+				VolumeState* entryPtr = nullptr;
+
+				for (int j = (int)volume.StateQueue.size() - 1; j >= 0; j--)
 				{
-					if ((GameTimer - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
-						candidate.Status = VolumeStateStatus::Outside;
+					auto& candidate = volume.StateQueue[j];
+
+					if (candidate.Status == VolumeStateStatus::Leaving)
+					{
+						if ((GameTimer - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
+							candidate.Status = VolumeStateStatus::Outside;
+					}
+					else if (candidate.Status != VolumeStateStatus::Outside)
+					{
+						if (candidate.Activator == activator)
+							entryPtr = &candidate;
+					}
+
+					volume.StateQueue.erase(std::remove_if(volume.StateQueue.begin(), volume.StateQueue.end(),
+						[](const VolumeState& obj) { return obj.Status == VolumeStateStatus::Outside; }),
+						volume.StateQueue.end());
 				}
-				else if (candidate.Status != VolumeStateStatus::Outside)
+
+				if (TestVolumeContainment(volume, box, roomNumber))
 				{
-					if (candidate.Activator == activator)
-						entryPtr = &candidate;
+					if (entryPtr == nullptr)
+					{
+						volume.StateQueue.push_back(
+							VolumeState
+							{
+								VolumeStateStatus::Entering,
+								activator,
+								GameTimer
+							});
+
+						HandleEvent(set.Events[(int)VolumeEventType::Enter], activator);
+					}
+					else
+					{
+						entryPtr->Status = VolumeStateStatus::Inside;
+						entryPtr->Timestamp = GameTimer;
+
+						HandleEvent(set.Events[(int)VolumeEventType::Inside], activator);
+					}
 				}
-
-				volume.StateQueue.erase(std::remove_if(volume.StateQueue.begin(), volume.StateQueue.end(), 
-					[](const VolumeState& obj) { return obj.Status == VolumeStateStatus::Outside; }),
-					volume.StateQueue.end());
-			}
-
-			if (TestVolumeContainment(volume, box, roomNumber))
-			{
-				if (entryPtr == nullptr)
+				else if (entryPtr != nullptr)
 				{
-					volume.StateQueue.push_back(
-						VolumeState
-						{ 
-							VolumeStateStatus::Entering,
-							activator,
-							GameTimer 
-						});
+					// Only fire leave event when a certain timeout has passed.
+					// This helps to filter out borderline cases when moving around volumes.
 
-					HandleEvent(set.Events[(int)VolumeEventType::Enter], activator);
-				}
-				else
-				{
-					entryPtr->Status = VolumeStateStatus::Inside;
-					entryPtr->Timestamp = GameTimer;
+					if ((GameTimer - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
+					{
+						entryPtr->Status = VolumeStateStatus::Leaving;
+						entryPtr->Timestamp = GameTimer;
 
-					HandleEvent(set.Events[(int)VolumeEventType::Inside], activator);
-				}
-			}
-			else if (entryPtr != nullptr)
-			{
-				// Only fire leave event when a certain timeout has passed.
-				// This helps to filter out borderline cases when moving around volumes.
-
-				if ((GameTimer - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
-				{
-					entryPtr->Status = VolumeStateStatus::Leaving;
-					entryPtr->Timestamp = GameTimer;
-
-					HandleEvent(set.Events[(int)VolumeEventType::Leave], activator);
+						HandleEvent(set.Events[(int)VolumeEventType::Leave], activator);
+					}
 				}
 			}
 		}
