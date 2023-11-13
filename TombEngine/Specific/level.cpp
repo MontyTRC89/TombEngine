@@ -807,6 +807,8 @@ void ReadRooms()
 			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
 			volume.Enabled = ReadBool();
+			volume.DetectInAdjacentRooms = ReadBool();
+
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 

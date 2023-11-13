@@ -53,7 +53,8 @@ namespace TEN::Control::Volumes
 // TODO: Move into namespace and deal with errors.
 struct TriggerVolume
 {
-	bool Enabled	   = true;
+	bool Enabled = true;
+	bool DetectInAdjacentRooms = false;
 	int	 EventSetIndex = 0;
 
 	std::string Name = {};
