@@ -1579,37 +1579,30 @@ namespace TEN::Renderer
 
 		DrawRooms(view, RendererPass::GBuffer);
 		DrawItems(view, RendererPass::GBuffer);
-		
 		DrawStatics(view, RendererPass::GBuffer);
 		DrawSpiders(view, RendererPass::GBuffer);
 		DrawScarabs(view, RendererPass::GBuffer);
 		DrawGunShells(view, RendererPass::GBuffer);
 		DrawBats(view, RendererPass::GBuffer);
-
 		DrawEffects(view, RendererPass::GBuffer);
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
-		DrawDebris(view, RendererPass::GBuffer);
 
 		// Bind the main render target again
-		pRenderViewPtrs[0] = _renderTarget.RenderTargetView.Get();
-		pRenderViewPtrs[1] = _depthMap.RenderTargetView.Get();
-		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
+		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 		
 		// Draw opaque and alpha faces.
 		DrawRooms(view, RendererPass::Opaque);
 		DrawItems(view, RendererPass::Opaque);
 		DrawStatics(view, RendererPass::Opaque);
-		DrawEffects(view, RendererPass::Opaque);
-		DrawGunShells(view, RendererPass::Opaque);
-		DrawBats(view, RendererPass::Opaque);
-		DrawRats(view, RendererPass::Opaque);
 		DrawSpiders(view, RendererPass::Opaque);
 		DrawScarabs(view, RendererPass::Opaque);
+		DrawGunShells(view, RendererPass::Opaque);
+		DrawBats(view, RendererPass::Opaque);
+		DrawEffects(view, RendererPass::Opaque);
+		DrawRats(view, RendererPass::Opaque);
 		DrawLocusts(view, RendererPass::Opaque);
 		DrawDebris(view, RendererPass::Opaque);
-
-		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 
 		// Collect all sprites (all sorted like transparent faces)
 		DrawFires(view);

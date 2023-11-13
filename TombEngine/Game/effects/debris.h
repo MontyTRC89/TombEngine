@@ -70,6 +70,7 @@ struct DebrisFragment
 	int numBounces;
 	bool active;
 	bool isStatic;
+	Matrix Transform;
 };
 
 extern SHATTER_ITEM ShatterItem;
