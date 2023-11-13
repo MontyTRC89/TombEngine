@@ -56,7 +56,7 @@ constexpr auto LARA_ALIGN_VELOCITY	  = 12; // TODO: Float.
 constexpr auto LARA_FREEFALL_VELOCITY	= 126.0f;
 constexpr auto LARA_DAMAGE_VELOCITY		= 141.0f;
 constexpr auto LARA_DEATH_VELOCITY		= 155.0f;
-constexpr auto LARA_DIVE_DEATH_VELOCITY	= 134.0f;
+constexpr auto LARA_DIVE_DEATH_VELOCITY = 134.0f;
 constexpr auto LARA_TERMINAL_VELOCITY	= CLICK(10);
 
 constexpr auto LARA_SWIM_VELOCITY_ACCEL		   = 2.0f;
