@@ -377,13 +377,13 @@ namespace TEN::Renderer
 		void DrawLinesIn2DSpace();
 		void DrawOverlays(RenderView& view);
 		void DrawRopes(RenderView& view);
-		void DrawBats(RenderView& view);
-		void DrawRats(RenderView& view);
-		void DrawScarabs(RenderView& view);
-		void DrawSpiders(RenderView& view);
+		void DrawBats(RenderView& view, RendererPass rendererPass);
+		void DrawRats(RenderView& view, RendererPass rendererPass);
+		void DrawScarabs(RenderView& view, RendererPass rendererPass);
+		void DrawSpiders(RenderView& view, RendererPass rendererPass);
 		bool DrawGunFlashes(RenderView& view);
-		void DrawGunShells(RenderView& view);
-		void DrawLocusts(RenderView& view);
+		void DrawGunShells(RenderView& view, RendererPass rendererPass);
+		void DrawLocusts(RenderView& view, RendererPass rendererPass);
 		void DrawStatistics();
 		void DrawExamines();
 		void DrawDiary();
@@ -422,6 +422,7 @@ namespace TEN::Renderer
 		void SetCullMode(CullMode cullMode, bool force = false);
 		void SetAlphaTest(AlphaTestMode mode, float threshold, bool force = false);
 		void SetScissor(RendererRectangle rectangle);
+		bool SetupBlendModeAndAlphaTest(BlendMode blendMode, RendererPass rendererPass, int drawPass);
 		void SortAndPrepareSprites(RenderView& view);
 		void ResetAnimations();
 		void ResetScissor();

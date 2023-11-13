@@ -1153,35 +1153,30 @@ namespace TEN::Renderer
 		BindStaticLights(effect->LightsToDraw);
 		_cbStatic.updateData(_stStatic, _context.Get());
 
-		if (rendererPass == RendererPass::Transparent)
-		{
-			SetAlphaTest(AlphaTestMode::None, 1.0f);
-		}
-		else
-		{
-			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
-		}
-
 		auto* meshPtr = effect->Mesh;
 		auto m_lastBlendMode = BlendMode::Unknown;
 
 		for (auto& bucket : meshPtr->Buckets) 
 		{
 			if (bucket.NumVertices == 0)
-				continue;
-
-			if (!((bucket.BlendMode == BlendMode::Opaque || bucket.BlendMode == BlendMode::AlphaTest) ^
-				(rendererPass == RendererPass::Transparent)))
 			{
 				continue;
 			}
 
-			BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-			BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+			int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
 
-			SetBlendMode(m_lastBlendMode);
-			
-			DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+			for (int p = 0; p < passes; p++)
+			{
+				if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+				{
+					continue;
+				}
+
+				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+			}
 		}
 	}
 

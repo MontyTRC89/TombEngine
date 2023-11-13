@@ -67,7 +67,7 @@ namespace TEN::Renderer
 		{
 			if (!g_Level.Rooms[room.RoomNumber].Active())
 				continue;
-
+			      
 			for (const auto& light : room.Lights)
 			{
 				if (light.Type != LightType::FogBulb)

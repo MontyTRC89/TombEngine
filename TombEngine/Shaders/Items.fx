@@ -23,15 +23,17 @@ cbuffer ItemBuffer : register(b1)
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
-	float3 Normal: NORMAL;
 	float3 WorldPosition: POSITION;
+	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
-	float Sheen: SHEEN;
+	float Sheen : SHEEN;
 	float4 PositionCopy: TEXCOORD2;
 	float4 FogBulbs : TEXCOORD3;
 	float DistanceFog : FOG;
-	unsigned int Bone: BONE;
+	float3 Tangent: TANGENT;
+	float3 Binormal: BINORMAL;
+	unsigned int Bone : BONE;
 };
 
 struct PixelShaderOutput
@@ -44,7 +46,7 @@ Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
 Texture2D NormalTexture : register(t1);
-SamplerState NormalSampler : register(s1);
+SamplerState NormalTextureSampler : register(s1);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -52,10 +54,8 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	float4x4 world = mul(Bones[input.Bone], World);
 
-	float3 normal = (mul(float4(input.Normal, 0.0f), world).xyz);
 	float3 worldPosition = (mul(float4(input.Position, 1.0f), world).xyz);
 
-	output.Normal = normal;
 	output.UV = input.UV;
 	output.WorldPosition = worldPosition;
 
@@ -71,10 +71,21 @@ PixelShaderInput VS(VertexShaderInput input)
     output.Sheen = input.Effects.w;
 	output.Bone = input.Bone;
 
+	output.Normal = normalize(mul(input.Normal, (float3x3)world).xyz);
+	output.Tangent = normalize(mul(input.Tangent, (float3x3)world).xyz);
+	output.Binormal = normalize(mul(input.Binormal, (float3x3)world).xyz);
+
 	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
 	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
 
 	return output;
+}
+
+float3 UnpackNormalMap(float4 n)
+{
+	n = n * 2.0f - 1.0f;
+	n.z = saturate(1.0f - dot(n.xy, n.xy));
+	return n.xyz;
 }
 
 PixelShaderOutput PS(PixelShaderInput input)
@@ -87,7 +98,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float4 tex = Texture.Sample(Sampler, input.UV);	
     DoAlphaTest(tex);
 
-	float3 normal = normalize(input.Normal);
+	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
+	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
+	normal = normalize(mul(normal, TBN));
 
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(

@@ -23,8 +23,7 @@ enum class BlendMode
 	Screen = 9,
 	Lighten = 10,
 	AlphaBlend = 11,
-	TransparentPass = 12,
-	FinalTransparentPass = 13
+	FastAlphaBlend = 12
 };
 
 enum class CullMode

@@ -24,14 +24,16 @@ cbuffer InstancedStaticMeshBuffer : register(b3)
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
-	float3 Normal: NORMAL;
 	float3 WorldPosition: POSITION;
+	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
 	float Sheen : SHEEN;
 	float4 PositionCopy: TEXCOORD2;
 	float4 FogBulbs : TEXCOORD3;
 	float DistanceFog : FOG;
+	float3 Tangent: TANGENT;
+	float3 Binormal: BINORMAL;
 	uint InstanceID : SV_InstanceID;
 };
 
@@ -44,11 +46,12 @@ struct PixelShaderOutput
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
+Texture2D NormalTexture : register(t1);
+SamplerState NormalTextureSampler : register(s1);
+
 PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 {
 	PixelShaderInput output;
-
-	float3 normal = (mul(float4(input.Normal, 0.0f), StaticMeshes[InstanceID].World).xyz);
 
 	float wibble = Wibble(input.Effects.xyz, input.Hash);
 	float3 pos = Move(input.Position, input.Effects.xyz, wibble);
@@ -57,7 +60,6 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	float4 worldPosition = (mul(float4(pos, 1.0f), StaticMeshes[InstanceID].World));
 
 	output.Position = mul(worldPosition, ViewProjection);
-	output.Normal = normal;
 	output.UV = input.UV;
 	output.WorldPosition = worldPosition;
 	output.Color = float4(col, input.Color.w);
@@ -66,10 +68,21 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 	output.Sheen = input.Effects.w;
 	output.InstanceID = InstanceID;
 
+	output.Normal = normalize(mul(input.Normal, (float3x3)StaticMeshes[InstanceID].World).xyz);
+	output.Tangent = normalize(mul(input.Tangent, (float3x3)StaticMeshes[InstanceID].World).xyz);
+	output.Binormal = normalize(mul(input.Binormal, (float3x3)StaticMeshes[InstanceID].World).xyz);
+
 	output.FogBulbs = DoFogBulbsForVertex(worldPosition);
 	output.DistanceFog = DoDistanceFogForVertex(worldPosition);
 
 	return output;
+}
+
+float3 UnpackNormalMap(float4 n)
+{
+	n = n * 2.0f - 1.0f;
+	n.z = saturate(1.0f - dot(n.xy, n.xy));
+	return n.xyz;
 }
 
 PixelShaderOutput PS(PixelShaderInput input)
@@ -82,7 +95,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 	uint mode = StaticMeshes[input.InstanceID].LightInfo.y;
 	uint numLights = StaticMeshes[input.InstanceID].LightInfo.x;
 
-	float3 normal = normalize(input.Normal);
+	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
+	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
+	normal = normalize(mul(normal, TBN));
 
 	float3 color = (mode == 0) ?
 		CombineLights(

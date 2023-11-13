@@ -15,7 +15,7 @@ namespace TEN::Renderer::ConstantBuffers
 
 	struct alignas(16) CAnimatedBuffer
 	{
-		std::array<AnimatedFrame, 128> Textures;
+		std::array<AnimatedFrame, 256> Textures;
 		uint32_t NumFrames;
 		uint32_t Fps;
 		uint32_t Type;
