@@ -228,16 +228,14 @@ namespace TEN::Player
 		auto dir = target - origin;
 		dir.Normalize();
 
-		// 4) Assess ray-static collision.
+		// 4) Assess static LOS.
 		auto staticLos = GetStaticObjectLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
 		if (staticLos.has_value())
 			return false;
 
-		// 5) Assess level geometry ray collision.
+		// 5) Assess room LOS.
 		if (!LOS(&origin0, &target0) || !LOS(&origin1, &target1))
 			return false;
-
-		// TODO: Assess hard object geometry ray collision.
 
 		int relFloorHeight = pointColl.Position.Floor - vPos;
 		int relCeilHeight = pointColl.Position.Ceiling - vPos;
