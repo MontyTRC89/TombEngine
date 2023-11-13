@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_yeti.h"
 
+#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -18,19 +19,32 @@ namespace TEN::Entities::Creatures::TR2
 {
 	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3(12, 101, 19), 13);
 	const auto YetiBiteRight = CreatureBiteInfo(Vector3(12, 101, 19), 10);
-	const auto YetiAttackJoints1 = std::vector<unsigned int>{ 10, 12 }; // TODO: Rename.
-	const auto YetiAttackJoints2 = std::vector<unsigned int>{ 8, 9, 10 };
+	const auto YetiLeftPunchAttackJoints  = std::vector<unsigned int>{ 8, 9, 10 };
+	const auto YetiRightPunchAttackJoints = std::vector<unsigned int>{ 10, 12 };
 
-	// TODO
 	enum YetiState
 	{
-
+		YETI_STATE_RUN = 1,
+		YETI_STATE_IDLE = 2,
+		YETI_STATE_WALK = 3,
+		YETI_STATE_ATTACK_IDLE_PUNCH_ATTACK = 4,
+		YETI_STATE_ATTACK_IDLE_SLAM_ATTACK = 5,
+		YETI_STATE_ATTACK_RUN_PUNCH_ATTACK = 6,
+		YETI_STATE_ROAR_START = 7,
+		YETI_STATE_DEATH = 8,
+		YETI_STATE_ROAR_END = 9,
+		YETI_STATE_CLIMB_UP_2_STEPS = 10,
+		YETI_STATE_CLIMB_UP_3_STEPS = 11,
+		YETI_STATE_CLIMB_UP_4_STEPS = 12,
+		YETI_STATE_CLIMB_DOWN_4_STEPS = 13,
+		YETI_STATE_KILL = 14
 	};
 
 	// TODO
 	enum YetiAnim
 	{
-
+		YETI_ANIM_DEATH = 31,
+		YETI_ANIM_KILL = 36
 	};
 
 	void InitializeYeti(short itemNumber)
@@ -47,76 +61,72 @@ namespace TEN::Entities::Creatures::TR2
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* info = GetCreatureInfo(item);
+		auto* creature = GetCreatureInfo(item);
 
-		bool isLaraAlive = LaraItem->HitPoints > 0;
+		bool isPlayerAlive = LaraItem->HitPoints > 0;
 
-		short angle = 0;
-		short tilt = 0;
-		short head = 0;
-		short torso = 0;
+		short headingAngle = 0;
+		short tiltAngle = 0;
+		short headYRot = 0;
+		short torsoYRot = 0;
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 8)
-			{
-				item->Animation.AnimNumber = 31;
-				item->Animation.FrameNumber = 0;
-				item->Animation.ActiveState = 8;
-			}
+			if (item->Animation.ActiveState != YETI_STATE_DEATH)
+				SetAnimation(item, YETI_ANIM_DEATH);
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 
-			angle = CreatureTurn(item, info->MaxTurn);
+			headingAngle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
-			case 2:
-				info->MaxTurn = 0;
-				info->Flags = 0;
+			case YETI_STATE_IDLE:
+				creature->MaxTurn = 0;
+				creature->Flags = 0;
 
-				if (AI.ahead)
-					head = AI.angle;
+				if (ai.ahead)
+					headYRot = ai.angle;
 
-				if (info->Mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = 1;
 				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (info->Mood == MoodType::Bored)
+				else if (creature->Mood == MoodType::Bored)
 				{
-					if (Random::TestProbability(1 / 128.0f) || !isLaraAlive)
+					if (Random::TestProbability(1 / 128.0f) || !isPlayerAlive)
 						item->Animation.TargetState = 7;
 					else if (Random::TestProbability(1 / 64.0f))
 						item->Animation.TargetState = 9;
 					else if (Random::TestProbability(0.025f))
 						item->Animation.TargetState = 3;
 				}
-				else if (AI.ahead && AI.distance < pow(BLOCK(0.5f), 2) && Random::TestProbability(1 / 2.0f))
+				else if (ai.ahead && ai.distance < pow(BLOCK(0.5f), 2) && Random::TestProbability(1 / 2.0f))
 					item->Animation.TargetState = 4;
-				else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
+				else if (ai.ahead && ai.distance < pow(CLICK(1), 2))
 					item->Animation.TargetState = 5;
-				else if (info->Mood == MoodType::Stalk)
+				else if (creature->Mood == MoodType::Stalk)
 					item->Animation.TargetState = 3;
 				else
 					item->Animation.TargetState = 1;
 
 				break;
 
-			case 7:
-				if (AI.ahead)
-					head = AI.angle;
+			case YETI_STATE_ROAR_START:
+				if (ai.ahead)
+					headYRot = ai.angle;
 
-				if (info->Mood == MoodType::Escape || item->HitStatus)
+				if (creature->Mood == MoodType::Escape || item->HitStatus)
 					item->Animation.TargetState = 2;
-				else if (info->Mood == MoodType::Bored)
+				else if (creature->Mood == MoodType::Bored)
 				{
-					if (isLaraAlive)
+					if (isPlayerAlive)
 					{
 						if (Random::TestProbability(1 / 128.0f))
 							item->Animation.TargetState = 2;
@@ -130,22 +140,30 @@ namespace TEN::Entities::Creatures::TR2
 					}
 				}
 				else if (Random::TestProbability(1 / 64.0f))
+				{
 					item->Animation.TargetState = 2;
+				}
 
 				break;
 
-			case 9:
-				if (AI.ahead)
-					head = AI.angle;
+			case YETI_STATE_ROAR_END:
+				if (ai.ahead)
+					headYRot = ai.angle;
 
-				if (info->Mood == MoodType::Escape || item->HitStatus)
-					item->Animation.TargetState = 2;
-				else if (info->Mood == MoodType::Bored)
+				if (creature->Mood == MoodType::Escape || item->HitStatus)
 				{
-					if (Random::TestProbability(1 / 128.0f) || !isLaraAlive)
+					item->Animation.TargetState = 2;
+				}
+				else if (creature->Mood == MoodType::Bored)
+				{
+					if (Random::TestProbability(1 / 128.0f) || !isPlayerAlive)
+					{
 						item->Animation.TargetState = 7;
+					}
 					else if (Random::TestProbability(1 / 64.0f))
+					{
 						item->Animation.TargetState = 2;
+					}
 					else if (Random::TestProbability(0.025f))
 					{
 						item->Animation.TargetState = 2;
@@ -153,21 +171,25 @@ namespace TEN::Entities::Creatures::TR2
 					}
 				}
 				else if (Random::TestProbability(1 / 64.0f))
+				{
 					item->Animation.TargetState = 2;
+				}
 
 				break;
 
-			case 3:
-				info->MaxTurn = ANGLE(4.0f);
+			case YETI_STATE_WALK:
+				creature->MaxTurn = ANGLE(4.0f);
 
-				if (AI.ahead)
-					head = AI.angle;
+				if (ai.ahead)
+					headYRot = ai.angle;
 
-				if (info->Mood == MoodType::Escape)
-					item->Animation.TargetState = 1;
-				else if (info->Mood == MoodType::Bored)
+				if (creature->Mood == MoodType::Escape)
 				{
-					if (Random::TestProbability(1 / 128.0f) || !isLaraAlive)
+					item->Animation.TargetState = 1;
+				}
+				else if (creature->Mood == MoodType::Bored)
+				{
+					if (Random::TestProbability(1 / 128.0f) || !isPlayerAlive)
 					{
 						item->Animation.TargetState = 2;
 						item->Animation.RequiredState = 7;
@@ -178,115 +200,138 @@ namespace TEN::Entities::Creatures::TR2
 						item->Animation.RequiredState = 9;
 					}
 					else if (Random::TestProbability(0.025f))
+					{
 						item->Animation.TargetState = 2;
+					}
 				}
-				else if (info->Mood == MoodType::Attack)
+				else if (creature->Mood == MoodType::Attack)
 				{
-					if (AI.ahead && AI.distance < pow(CLICK(1), 2))
+					if (ai.ahead && ai.distance < pow(CLICK(1), 2))
+					{
 						item->Animation.TargetState = 2;
-					else if (AI.distance < pow(BLOCK(2), 2))
+					}
+					else if (ai.distance < pow(BLOCK(2), 2))
+					{
 						item->Animation.TargetState = 1;
+					}
 				}
 
 				break;
 
-			case 1:
-				tilt = angle / 4;
-				info->MaxTurn = ANGLE(6.0f);
-				info->Flags = 0;
+			case YETI_STATE_RUN:
+				tiltAngle = headingAngle / 4;
+				creature->MaxTurn = ANGLE(6.0f);
+				creature->Flags = 0;
 
-				if (AI.ahead)
-					head = AI.angle;
+				if (ai.ahead)
+					headYRot = ai.angle;
 
-				if (info->Mood == MoodType::Escape)
+				if (creature->Mood == MoodType::Escape)
+				{
 					break;
-				else if (info->Mood == MoodType::Bored)
+				}
+				else if (creature->Mood == MoodType::Bored)
+				{
 					item->Animation.TargetState = 3;
-				else if (AI.ahead && AI.distance < pow(CLICK(1), 2))
+				}
+				else if (ai.ahead && ai.distance < pow(CLICK(1), 2))
+				{
 					item->Animation.TargetState = 2;
-				else if (AI.ahead && AI.distance < pow(BLOCK(2), 2))
+				}
+				else if (ai.ahead && ai.distance < pow(BLOCK(2), 2))
+				{
 					item->Animation.TargetState = 6;
-				else if (info->Mood == MoodType::Stalk)
+				}
+				else if (creature->Mood == MoodType::Stalk)
+				{
 					item->Animation.TargetState = 3;
+				}
 
 				break;
 
-			case 4:
-				if (AI.ahead)
-					torso = AI.angle;
+			case YETI_STATE_ATTACK_IDLE_PUNCH_ATTACK:
+				if (ai.ahead)
+					torsoYRot = ai.angle;
 
-				if (!info->Flags && item->TouchBits.Test(YetiAttackJoints1))
+				if (!creature->Flags && item->TouchBits.Test(YetiRightPunchAttackJoints))
 				{
 					CreatureEffect(item, YetiBiteRight, DoBloodSplat);
-					DoDamage(info->Enemy, 100);
-					info->Flags = 1;
+					DoDamage(creature->Enemy, 100);
+					creature->Flags = 1;
+
+					if (LaraItem->HitPoints <= 0)
+						CreatureKill(item, YETI_ANIM_KILL, LEA_YETI_DEATH, YETI_ANIM_DEATH, LS_DEATH);
 				}
 
 				break;
 
-			case 5:
-				info->MaxTurn = ANGLE(4.0f);
+			case YETI_STATE_ATTACK_IDLE_SLAM_ATTACK:
+				creature->MaxTurn = ANGLE(4.0f);
 
-				if (AI.ahead)
-					torso = AI.angle;
+				if (ai.ahead)
+					torsoYRot = ai.angle;
 
-				if (!info->Flags &&
-					(item->TouchBits.Test(YetiAttackJoints1) || item->TouchBits.Test(YetiAttackJoints2)))
+				if (!creature->Flags &&
+					(item->TouchBits.Test(YetiRightPunchAttackJoints) || item->TouchBits.Test(YetiLeftPunchAttackJoints)))
 				{
-					if (item->TouchBits.Test(YetiAttackJoints2))
+					if (item->TouchBits.Test(YetiLeftPunchAttackJoints))
 						CreatureEffect(item, YetiBiteLeft, DoBloodSplat);
 
-					if (item->TouchBits.Test(YetiAttackJoints1))
+					if (item->TouchBits.Test(YetiRightPunchAttackJoints))
 						CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 
-					DoDamage(info->Enemy, 150);
-					info->Flags = 1;
+					DoDamage(creature->Enemy, 150);
+					creature->Flags = 1;
+
+					if (LaraItem->HitPoints <= 0)
+						CreatureKill(item, YETI_ANIM_KILL, LEA_YETI_DEATH, YETI_ANIM_DEATH, LS_DEATH);
 				}
 
 				break;
 
-			case 6:
-				if (AI.ahead)
-					torso = AI.angle;
+			case YETI_STATE_ATTACK_RUN_PUNCH_ATTACK:
+				if (ai.ahead)
+					torsoYRot = ai.angle;
 
-				if (!info->Flags &&
-					(item->TouchBits.Test(YetiAttackJoints1) || item->TouchBits.Test(YetiAttackJoints2)))
+				if (!creature->Flags &&
+					(item->TouchBits.Test(YetiRightPunchAttackJoints) || item->TouchBits.Test(YetiLeftPunchAttackJoints)))
 				{
-					if (item->TouchBits.Test(YetiAttackJoints2))
+					if (item->TouchBits.Test(YetiLeftPunchAttackJoints))
 						CreatureEffect(item, YetiBiteLeft, DoBloodSplat);
 
-					if (item->TouchBits.Test(YetiAttackJoints1))
+					if (item->TouchBits.Test(YetiRightPunchAttackJoints))
 						CreatureEffect(item, YetiBiteRight, DoBloodSplat);
 
-					DoDamage(info->Enemy, 200);
-					info->Flags = 1;
+					DoDamage(creature->Enemy, 200);
+					creature->Flags = 1;
+
+					if (LaraItem->HitPoints <= 0)
+						CreatureKill(item, YETI_ANIM_KILL, LEA_YETI_DEATH, YETI_ANIM_DEATH, LS_DEATH);
 				}
 
 				break;
 
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-				info->MaxTurn = 0;
+			case YETI_STATE_CLIMB_UP_2_STEPS:
+			case YETI_STATE_CLIMB_UP_3_STEPS:
+			case YETI_STATE_CLIMB_UP_4_STEPS:
+			case YETI_STATE_CLIMB_DOWN_4_STEPS:
+				creature->MaxTurn = 0;
+				break;
+
+			case YETI_STATE_KILL:
+				creature->MaxTurn = 0;
+
 				break;
 			}
 		}
 
-		if (!isLaraAlive)
-		{
-			info->MaxTurn = 0;
-			CreatureKill(item, 31, 0, 14, 103); // TODO: add yeti state enum and lara extra state enum
-			return;
-		}
-
-		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, torso);
-		CreatureJoint(item, 1, head);
+		CreatureTilt(item, tiltAngle);
+		CreatureJoint(item, 0, torsoYRot);
+		CreatureJoint(item, 1, headYRot);
 
 		if (item->Animation.ActiveState < 10)
 		{
-			switch (CreatureVault(itemNumber, angle, 2, 300))
+			switch (CreatureVault(itemNumber, headingAngle, 2, 300))
 			{
 			case 2:
 				item->Animation.AnimNumber = 34;
@@ -314,6 +359,8 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 		else
-			CreatureAnimation(itemNumber, angle, tilt);
+		{
+			CreatureAnimation(itemNumber, headingAngle, tiltAngle);
+		}
 	}
 }

@@ -33,8 +33,8 @@ The following constants are inside ActionID.
 
 	ACCELERATE
 	REVERSE
-	SPEED
-	SLOW
+	FASTER
+	SLOWER
 	BRAKE
 	FIRE
 
@@ -87,8 +87,8 @@ static const std::unordered_map<std::string, ActionID> ACTION_IDS
 
 	{ "ACCELERATE", In::Accelerate },
 	{ "REVERSE", In::Reverse },
-	{ "SPEED", In::Speed },
-	{ "SLOW", In::Slow },
+	{ "FASTER", In::Faster },
+	{ "SLOWER", In::Slower },
 	{ "BRAKE", In::Brake },
 	{ "FIRE", In::Fire },
 

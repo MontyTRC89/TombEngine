@@ -111,7 +111,7 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 	m_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
-	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, SCREEN_SPACE_RES.x, 0, SCREEN_SPACE_RES.y, 0, 1.0f);
+	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, DISPLAY_SPACE_RES.x, 0, DISPLAY_SPACE_RES.y, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
 	m_currentCausticsFrame = 0;
 
@@ -393,6 +393,7 @@ void Renderer11::InitializeCommonTextures()
 {
 	// Initialize font.
 	auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
+
 	if (!std::filesystem::is_regular_file(fontPath))
 		throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");
 

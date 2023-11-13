@@ -1,10 +1,10 @@
 #pragma once
 #include "Game/control/box.h"
-#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 
+class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 
@@ -97,17 +97,18 @@ struct ObjectInfo
 
 	std::vector<AnimData> Animations = {};
 
-	std::function<void(short itemNumber)> Initialize;
-	std::function<void(short itemNumber)> control;
-	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
+	std::function<void(short itemNumber)> Initialize = nullptr;
+	std::function<void(short itemNumber)> control = nullptr;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision = nullptr;
 
-	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
-	std::function<void(ItemInfo* item)> drawRoutine;
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine = nullptr;
+	std::function<void(ItemInfo* item)> drawRoutine = nullptr;
 
-	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> floor;
-	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> ceiling;
-	std::function<int(short itemNumber)> floorBorder;
-	std::function<int(short itemNumber)> ceilingBorder;
+	// Bridge routines
+	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
+	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;
+	std::function<int(const ItemInfo& item)> GetFloorBorder	  = nullptr;
+	std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
 
 	void SetBoneRotationFlags(int boneID, int flags);
 	void SetHitEffect(bool isSolid = false, bool isAlive = false);

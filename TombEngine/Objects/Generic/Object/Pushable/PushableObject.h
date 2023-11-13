@@ -34,7 +34,7 @@ namespace TEN::Entities::Generic
 	void PushableBlockControl(int itemNumber);
 	void PushableBlockCollision(int itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
 
-	int GetPushableHeight(ItemInfo& item);
+	int GetPushableHeight(const ItemInfo& item);
 
 	void SetPushableStopperFlag(bool isStopper, const Vector3i& pos, int roomNumber);
 }

@@ -209,7 +209,7 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
-	// 174-188 reserved for "true" ladders. DO NOT add anything here. -- Sezz 2023.04.16
+	// 174-188 reserved for ladder object. -- Sezz 2023.04.16
 
 	LS_REMOVE_PUZZLE = 189,
 	LS_PUSHABLE_EDGE_SLIP = 190,
@@ -681,7 +681,7 @@ enum LaraAnim
 	LA_PICKUP_SARCOPHAGUS = 439,							// Pickup from sarcophagus
 	LA_DRAG_BODY = 440,										// Drag dead body
 	LA_BINOCULARS_IDLE = 441,								// Stand, looking through binoculars
-	LA_BIG_SCORPION_DEATH = 442,							// Big scorpion death
+	LA_UNUSED_442 = 442,
 	LA_ELEVATOR_RECOVER = 443,								// Recover from elevator crash
 																// TODO: 443 is also taken by SETH_DEATH, currently absent from default WAD.
 	LA_MECHANICAL_BEETLE_USE = 444,							// Wind mechanical beetle, place on floor
@@ -817,7 +817,7 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
-	// 569-598 reserved for "true" ladders. DO NOT add anything here. -- Sezz 2023.04.16
+	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 
@@ -842,7 +842,9 @@ enum LaraExtraAnim
 	LEA_STRIKE_GONG = 11,
 	LEA_WILLARD_DEATH = 12,
 	LEA_TRAIN_DEATH_END = 13,
-	LEA_SETH_DEATH = 14
+	LEA_SETH_DEATH = 14,
+	LEA_YETI_DEATH = 15,
+	LEA_BIG_SCORPION_DEATH = 16
 };
 #pragma endregion
 
@@ -1340,7 +1342,7 @@ struct PlayerEffectData
 
 struct LaraInfo
 {
-	static constexpr auto TARGET_COUNT_MAX = 8;
+	static constexpr auto TARGET_COUNT_MAX = 16;
 
 	LaraControlData	  Control	= {};
 	PlayerContextData Context	= {};

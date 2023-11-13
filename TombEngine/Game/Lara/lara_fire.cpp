@@ -912,8 +912,11 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			orient.x <= weaponInfo.LockOrientConstraint.second.x &&
 			orient.y <= weaponInfo.LockOrientConstraint.second.y)
 		{
+			if (targetCount >= player.TARGET_COUNT_MAX - 1)
+				break;
+
 			player.TargetList[targetCount] = &item;
-			++targetCount;
+			targetCount++;
 
 			if (distance < closestDistance &&
 				abs(orient.y) < (closestHeadingAngle + ANGLE(15.0f)))

@@ -1708,8 +1708,8 @@ bool SaveGame::Load(int slot)
 			item->Animation.AnimNumber = savedItem->anim_number();
 		}
 
-		if (obj->floor != nullptr)
-			UpdateBridgeItem(i);
+		if (obj->GetFloorHeight != nullptr)
+			UpdateBridgeItem(g_Level.Items[i]);
 
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)

@@ -179,7 +179,7 @@ short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
 void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
-void InitializeFXArray(int allocateMemory);
+void InitializeFXArray();
 short CreateNewEffect(short roomNumber);
 void KillEffect(short fxNumber);
 void InitializeItem(short itemNumber);
