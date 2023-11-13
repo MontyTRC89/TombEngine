@@ -6,10 +6,12 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
+#include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Math;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
@@ -204,9 +206,9 @@ bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 {
 	const auto& room = g_Level.Rooms[roomNumber];
 
-	if (pos.z >= (room.z + BLOCK(1)) && pos.z <= (room.z + ((room.zSize - 1) * BLOCK(1))) &&
-		pos.x >= (room.x + BLOCK(1)) && pos.x <= (room.x + ((room.xSize - 1) * BLOCK(1))) &&
-		pos.y <= room.minfloor && pos.y > room.maxceiling) // NOTE: Up is -Y, hence Y should be "less" than floor.
+	if (pos.z >= (room.z + BLOCK(1)) && pos.z <= (room.z + BLOCK(room.zSize - 1)) &&
+		pos.y <= room.minfloor && pos.y > room.maxceiling &&
+		pos.x >= (room.x + BLOCK(1)) && pos.x <= (room.x + BLOCK(room.xSize - 1)))
 	{
 		return true;
 	}
@@ -256,14 +258,14 @@ Vector3i GetRoomCenter(int roomNumber)
 
 static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{})
 {
-	// No rooms exist; return empty set.
+	// No rooms exist; return empty vector.
 	if (g_Level.Rooms.size() <= roomNumber)
 		return {};
 
 	// Collect current room number as neighbor of itself.
 	visitedRoomNumbers.push_back(roomNumber);
 
-	// Search depth limit reached; return empty set.
+	// Search depth limit reached; return empty vector.
 	if (searchDepth == 0)
 		return {};
 

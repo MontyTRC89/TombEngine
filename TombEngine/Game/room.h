@@ -1,11 +1,13 @@
 #pragma once
-#include "framework.h"
-#include "Game/collision/floordata.h"
 #include "Math/Math.h"
-#include "Specific/newtypes.h"
+
+using namespace TEN::Math;
 
 enum GAME_OBJECT_ID : short;
 enum class ReverbType;
+class FloorInfo;
+class GameBoundingBox;
+struct BUCKET;
 struct TriggerVolume;
 
 constexpr auto MAX_FLIPMAP	= 256;
