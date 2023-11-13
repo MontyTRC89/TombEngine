@@ -63,24 +63,27 @@ struct SHOCKWAVE_STRUCT
 	int x;
 	int y;
 	int z;
-	short innerRad;
-	short outerRad;
 	short xRot;
 	short yRot;
 	short zRot;
-	short damage;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
 	unsigned char sr;
 	unsigned char sg;
 	unsigned char sb;
+
+	short innerRad;
+	short outerRad;
+
 	unsigned char life;
-	short speed;
 	short sLife;
-	bool fadeIn = false;
-	bool light = false;
+	short speed;
+	short damage;
 	int style;
+
+	bool fadeIn = false;
+	bool HasLight = false;
 };
 
 struct GUNSHELL_STRUCT

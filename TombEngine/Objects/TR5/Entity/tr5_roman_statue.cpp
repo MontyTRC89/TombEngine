@@ -33,7 +33,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	struct RomanStatueInfo
 	{
-		Vector3i Position	   = Vector3i::Zero;
+		Vector3i Position = Vector3i::Zero;
 		Electricity* EnergyArcs[8] = {};
 		unsigned int Count = 0;
 	};
@@ -586,7 +586,7 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
-							
+
 							TriggerShockwave(&Pose(pos1), 16, 160, 96, 0, color / 2, color, 48, EulerAngles::Zero, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
 
@@ -595,7 +595,7 @@ namespace TEN::Entities::Creatures::TR5
 							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Zero, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							
 							auto lightColor = Color(0.4f, 0.3f, 0.0f);
-							SpawnDynamicLight(pos.ToVector3(), lightColor, 0.04f);						
+							SpawnDynamicLight(pos.ToVector3(), lightColor, 0.04f);
 						}
 
 						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;

@@ -217,7 +217,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			joint0 = -joint1;
 
-			int distance, damage, frame;
+			int dist, damage, frame;
 			short roomNumber;
 
 			switch (item->Animation.ActiveState)
@@ -263,14 +263,16 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (item->HitStatus && AI.distance < pow(CLICK(7), 2))
 					{
-						distance = sqrt(AI.distance);
-						damage = 5 - distance / BLOCK(1);
+						dist = sqrt(AI.distance);
+						damage = 5 - (dist / BLOCK(1));
 
 						if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Uzi ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
 							Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
+						{
 							damage *= 3;
+						}
 
 						if (damage > 0)
 						{
@@ -298,7 +300,9 @@ namespace TEN::Entities::Creatures::TR5
 						Lara.Control.Weapon.GunType == LaraWeaponType::Uzi ||
 						Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
 						Lara.Control.Weapon.GunType == LaraWeaponType::Revolver) 
+					{
 						damage *= 3;
+					}
 
 					if ((GetRandomControl() & 0xF) < damage &&
 						AI.distance < SQUARE(BLOCK(10)) && damage > 0)
@@ -310,9 +314,13 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				if (item->TriggerFlags == 1)
+				{
 					tilt = -ANGLE(2.8f);
+				}
 				else if (item->TriggerFlags == 2)
+				{
 					tilt = ANGLE(2.8f);
+				}
 
 				if (!(GlobalCounter & 3))
 				{
