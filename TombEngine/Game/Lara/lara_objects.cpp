@@ -56,7 +56,7 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = BLOCK(1);
 
-	if (item->Animation.FrameNumber == (GetAnimData(*item).Keyframes.size() - 2))
+	if (item->Animation.FrameNumber == (GetAnimData(*item).EndFrameNumber - 1))
 		lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -262,7 +262,7 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (item->Animation.AnimNumber == LA_PULLEY_RELEASE &&
-		item->Animation.FrameNumber == (GetAnimData(*item).Keyframes.size() - 2))
+		item->Animation.FrameNumber == (GetAnimData(*item).EndFrameNumber - 1))
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 	}

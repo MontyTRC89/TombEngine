@@ -73,7 +73,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
 
-	if (item->Animation.FrameNumber == (GetAnimData(*item).Keyframes.size() - 2))
+	if (item->Animation.FrameNumber == (GetAnimData(*item).EndFrameNumber - 1))
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 
