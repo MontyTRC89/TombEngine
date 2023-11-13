@@ -198,7 +198,7 @@ namespace TEN::Player
 		if (setup.TestDeathFloor && pointColl.Block->Flags.Death)
 			return false;
 
-		// Raycast setup at upper floor bound.
+		// LOS setup at upper floor bound.
 		auto origin0 = GameVector(
 			item.Pose.Position.x,
 			(vPos + setup.UpperFloorBound) - 1,
@@ -210,7 +210,7 @@ namespace TEN::Player
 			pointColl.Coordinates.z,
 			item.RoomNumber);
 
-		// Raycast setup at lowest ceiling bound (player height).
+		// LOS setup at lowest ceiling bound (player height).
 		auto origin1 = GameVector(
 			item.Pose.Position.x,
 			vPosTop + 1,
@@ -222,7 +222,7 @@ namespace TEN::Player
 			pointColl.Coordinates.z,
 			item.RoomNumber);
 
-		// Prepare data for static object LOS.
+		// Calculate LOS direction.
 		auto origin = target0.ToVector3();
 		auto target = target1.ToVector3();
 		auto dir = target - origin;
