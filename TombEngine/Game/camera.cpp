@@ -531,9 +531,9 @@ void ChaseCamera(ItemInfo* item)
 
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
 
+	// HACK: Prevent camera from shaking in swamps.
 	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
-		//HACK: I included an offset to avoid the camera shacking during the swamp.
-		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1) + BLOCK (1.4f);
+		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1.15f);
 
 	int y = Camera.target.y;
 	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.RoomNumber);
