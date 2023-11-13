@@ -782,7 +782,7 @@ namespace TEN::Player
 
 	bool CanLand(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// 1) Check airborne status and Y velocity.
+		// 1) Check airborne status and vertical velocity.
 		if (!item.Animation.IsAirborne || item.Animation.Velocity.y < 0.0f)
 			return false;
 
@@ -790,11 +790,12 @@ namespace TEN::Player
 		if (TestEnvironment(ENV_FLAG_SWAMP, &item))
 			return true;
 
-		int vPos = item.Pose.Position.y;
+		// Get point collision.
 		auto pointColl = GetCollision(&item);
+		int vPos = item.Pose.Position.y;
 
 		// 3) Assess point collision.
-		if ((pointColl.Position.Floor - vPos) <= item.Animation.Velocity.y)
+		if ((pointColl.Position.Floor - vPos) <= item.Animation.Velocity.y) // Floor height is above projected vertical position.
 			return true;
 
 		return false;
