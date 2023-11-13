@@ -289,10 +289,10 @@ namespace TEN::Entities::Creatures::TR3
 				item->ItemFlags[3] = 1;
 			}
 
-			if (item->Animation.FrameNumber >= GetAnimData(*item).EndFrameNumber)
+			if (TestLastFrame(*item))
 			{
-				// Block frame until mesh is swapped.
-				item->Animation.FrameNumber = GetAnimData(*item).EndFrameNumber - 1;
+				// Block last frame until mesh is swapped.
+				item->Animation.FrameNumber -= 1;
 
 				if (DoShivaMeshSwap(*item, true))
 					CreatureDie(itemNumber, false);
