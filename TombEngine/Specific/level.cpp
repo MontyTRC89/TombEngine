@@ -140,7 +140,7 @@ std::string ReadString()
 {
 	auto numBytes = ReadLEB128(false);
 
-	if (!numBytes)
+	if (numBytes <= 0)
 		return std::string();
 	else
 	{
