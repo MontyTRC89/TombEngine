@@ -806,6 +806,7 @@ void ReadRooms()
 			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
 			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
+			volume.Enabled = ReadBool();
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
