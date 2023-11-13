@@ -162,6 +162,8 @@ namespace TEN::Player
 
 	static bool TestGroundMovementSetup(const ItemInfo& item, const CollisionInfo& coll, const GroundMovementSetupData& setup, bool isCrawling = false)
 	{
+		constexpr auto SLOPE_ASPECT_ANGLE_DELTA_MAX = ANGLE(90.0f);
+
 		// HACK: coll.Setup.Radius and coll.Setup.Height are set only in lara_col functions and then reset by LaraAboveWater() to defaults.
 		// This means they will store the wrong values for any context assessment functions called in crouch/crawl lara_as routines.
 		// If states become objects, a dedicated state init function should eliminate the need for the isCrawling parameter. -- Sezz 2022.03.16
@@ -173,12 +175,27 @@ namespace TEN::Player
 		int vPos = item.Pose.Position.y;
 		int vPosTop = vPos - playerHeight;
 
-		bool isSlipperySlopeDown = setup.TestSlipperySlopeBelow ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor > vPos)) : false;
-		bool isSlipperySlopeUp	 = setup.TestSlipperySlopeAbove ? (pointColl.Position.FloorSlope && (pointColl.Position.Floor < vPos)) : false;
-		bool isDeathFloor		 = setup.TestDeathFloor			? pointColl.Block->Flags.Death										   : false;
+		// Calculate slope aspect delta angle.
+		auto floorNormal = GetSurfaceNormal(pointColl.FloorTilt, true);
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+		short aspectAngleDelta = Geometry::GetShortestAngle(setup.HeadingAngle, aspectAngle);
 
-		// 2) Check for slippery floor slope or death floor (if applicable).
-		if (isSlipperySlopeDown || isSlipperySlopeUp || isDeathFloor)
+		// 1) Check for slippery slope below floor (if applicable).
+		if (setup.TestSlipperySlopeBelow &&
+			(pointColl.Position.FloorSlope && abs(aspectAngleDelta) <= SLOPE_ASPECT_ANGLE_DELTA_MAX))
+		{
+			return false;
+		}
+		
+		// 1) Check for slippery slope above floor (if applicable).
+		if (setup.TestSlipperySlopeAbove &&
+			(pointColl.Position.FloorSlope && abs(aspectAngleDelta) >= SLOPE_ASPECT_ANGLE_DELTA_MAX))
+		{
+			return false;
+		}
+
+		// 3) Check for death floor (if applicable).
+		if (setup.TestDeathFloor && pointColl.Block->Flags.Death)
 			return false;
 
 		// Raycast setup at upper floor bound.
@@ -211,12 +228,12 @@ namespace TEN::Player
 		auto dir = target - origin;
 		dir.Normalize();
 
-		// 3) Assess ray-static collision.
+		// 4) Assess ray-static collision.
 		auto staticLos = GetStaticObjectLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
 		if (staticLos.has_value())
 			return false;
 
-		// 4) Assess level geometry ray collision.
+		// 5) Assess level geometry ray collision.
 		if (!LOS(&origin0, &target0) || !LOS(&origin1, &target1))
 			return false;
 
@@ -226,7 +243,7 @@ namespace TEN::Player
 		int relCeilHeight = pointColl.Position.Ceiling - vPos;
 		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
-		// 5) Assess point collision.
+		// 6) Assess point collision.
 		if (relFloorHeight <= setup.LowerFloorBound && // Floor height is above lower floor bound.
 			relFloorHeight >= setup.UpperFloorBound && // Floor height is below upper floor bound.
 			relCeilHeight < -playerHeight &&		   // Ceiling height is above player height.
