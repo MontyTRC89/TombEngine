@@ -60,8 +60,6 @@ namespace TEN::Entities::Effects
 		)
 	};
 
-	bool FlameEmitterFlags[8];
-
 	void BurnNearbyItems(ItemInfo* item, int radius)
 	{
 		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
@@ -94,9 +92,10 @@ namespace TEN::Entities::Effects
 			// Jet flame
 			if (item->TriggerFlags < 0)
 			{
-				short flags = -item->TriggerFlags;
-				if ((flags & 7) == 2 || (flags & 7) == 7)
+				short ocb = -item->TriggerFlags;
+				if ((ocb & 7) == 2 || (ocb & 7) == 7)
 				{
+					//Constant flames
 					SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 					TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
 					TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
@@ -106,58 +105,64 @@ namespace TEN::Entities::Effects
 				}
 				else
 				{
-					if (item->ItemFlags[0])
+					//Intermittent flames
+					auto& pauseTimer = item->ItemFlags[0];
+					auto& jetFlameVelocity = item->ItemFlags[1];
+					auto& alphaSmallFlame = item->ItemFlags[2];
+					auto& flameTimer = item->ItemFlags[3];
+					
+
+					if (pauseTimer)
 					{
-						if (item->ItemFlags[1])
-							item->ItemFlags[1] = item->ItemFlags[1] - (item->ItemFlags[1] >> 2);
+						if (jetFlameVelocity)
+							jetFlameVelocity = jetFlameVelocity - (jetFlameVelocity / 4);
 
-						if (item->ItemFlags[2] < 256)
-							item->ItemFlags[2] += 8;
+						if (alphaSmallFlame > 0)
+							alphaSmallFlame -= 8;
+						else
+							alphaSmallFlame = 0;
 
-						item->ItemFlags[0]--;
-						if (item->ItemFlags[0] == 1)
-							item->ItemFlags[3] = (GetRandomControl() & 0x3F) + 150;
+						pauseTimer--;
+						if (pauseTimer == 1)
+							flameTimer = (GetRandomControl() & 0x3F) + 150;
 					}
 					else
 					{
-						if (!--item->ItemFlags[3])
+						if (!--flameTimer)
 						{
-							if (flags >> 3)
-								item->ItemFlags[0] = (GetRandomControl() & 0x1F) + 30 * (flags >> 3);
-							else
-								item->ItemFlags[0] = (GetRandomControl() & 0x3F) + 60;
+							pauseTimer = (ocb % 8 == 0)?						//If pauseTimer is multiple of 8
+								(GetRandomControl() & 0x3F) + 60 :				//Then do a pause of 60 frames plus random 0-63
+								(GetRandomControl() & 0x1F) + 30 * (ocb / 8);	//Else do a pause of 30 * ocb/8 frames plus random 0-31
 						}
 
-						if (item->ItemFlags[2])
-							item->ItemFlags[2] -= 8;
+						if (alphaSmallFlame < 255)
+							alphaSmallFlame += 8;
+						else
+							alphaSmallFlame = 255;
 
-						if (item->ItemFlags[1] > -8192)
-							item->ItemFlags[1] -= 512;
+						if (jetFlameVelocity > -8192)
+							jetFlameVelocity -= 512;
 					}
 
-					if (item->ItemFlags[2])
-						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 0.5f, item->ItemFlags[2]);
+					if (alphaSmallFlame < 255)
+						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 0.5f, alphaSmallFlame);
 
-					if (item->ItemFlags[1])
+					if (jetFlameVelocity)
 					{
 						SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 
-						if (item->ItemFlags[1] <= -8192)
+						if (jetFlameVelocity <= -8192)
 							TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
 						else
-							TriggerSuperJetFlame(item, item->ItemFlags[1], GlobalCounter & 1);
+							TriggerSuperJetFlame(item, jetFlameVelocity, GlobalCounter & 1);
 
 						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
-							(-item->ItemFlags[1] >> 10) - (GetRandomControl() & 1) + 16,
+							(-jetFlameVelocity >> 10) - (GetRandomControl() & 1) + 16,
 							(GetRandomControl() & 0x3F) + 192,
 							(GetRandomControl() & 0x1F) + 96, 0);
 					}
 					else
 					{
-						byte r = (GetRandomControl() & 0x3F) + 192;
-						byte g = (GetRandomControl() & 0x1F) + 96;
-						byte falloff = 10 - (GetRandomControl() & 1);
-
 						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 							10 - (GetRandomControl() & 1),
 							(GetRandomControl() & 0x3F) + 192,
@@ -169,9 +174,6 @@ namespace TEN::Entities::Effects
 			}
 			else
 			{
-				if (item->TriggerFlags < 8)
-					FlameEmitterFlags[item->TriggerFlags] = true;
-
 				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f, 0);
 
 				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
@@ -184,11 +186,6 @@ namespace TEN::Entities::Effects
 				if ((Wibble & 0x04) && Random::TestProbability(1 / 2.0f))
 					BurnNearbyItems(item, FLAME_RADIUS);
 			}
-		}
-		else
-		{
-			if (item->TriggerFlags > 0 && item->TriggerFlags < 8)
-				FlameEmitterFlags[item->TriggerFlags] = false;
 		}
 	}
 
@@ -295,7 +292,7 @@ namespace TEN::Entities::Effects
 		if (item->TriggerFlags < 0)
 		{
 			item->ItemFlags[0] = (GetRandomControl() & 0x3F) + 90;
-			item->ItemFlags[2] = 256;
+			item->ItemFlags[2] = 255; //Alpha value
 
 			if (((-item->TriggerFlags) & 7) == 7)
 			{
