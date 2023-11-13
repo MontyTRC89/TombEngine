@@ -347,7 +347,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->Animation.AnimNumber = 0;
 		item->Animation.FrameNumber = 0;
 		item->Animation.ActiveState =
-		item->Animation.TargetState = GetAnimData(*item).State;
+		item->Animation.TargetState = GetAnimData(*item).StateID;
 		item->Animation.RequiredState = NO_STATE;
 		item->ResetModelToDefault();
 

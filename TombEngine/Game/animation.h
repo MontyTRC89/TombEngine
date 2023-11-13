@@ -76,7 +76,8 @@ void AnimateItem(ItemInfo* item);
 
 // Inquirers
 bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
-bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt);
+bool TestLastFrame(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
+bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Deprecated.
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
 
 // Entity translation

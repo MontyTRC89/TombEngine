@@ -876,7 +876,7 @@ void Moveable::SetFrameNumber(int frameNumber)
 int Moveable::GetEndFrame() const
 {
 	const auto& anim = GetAnimData(*m_item);
-	return (anim.frameEnd - anim.frameBase);
+	return anim.EndFrameNumber;
 }
 
 bool Moveable::GetActive() const

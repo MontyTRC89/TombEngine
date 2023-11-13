@@ -2080,7 +2080,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_1_STEP_CROUCH;
-			vaultResult.Success = HasStateDispatch(*item, vaultResult.TargetState);
+			vaultResult.Success = TestStateDispatch(*item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -2089,7 +2089,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS;
-			vaultResult.Success = HasStateDispatch(*item, vaultResult.TargetState);
+			vaultResult.Success = TestStateDispatch(*item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -2099,7 +2099,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 			g_GameFlow->HasCrawlExtended())
 		{
 			vaultResult.TargetState = LS_VAULT_2_STEPS_CROUCH;
-			vaultResult.Success = HasStateDispatch(*item, vaultResult.TargetState);
+			vaultResult.Success = TestStateDispatch(*item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -2108,7 +2108,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS;
-			vaultResult.Success = HasStateDispatch(*item, vaultResult.TargetState);
+			vaultResult.Success = TestStateDispatch(*item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -2118,7 +2118,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 			g_GameFlow->HasCrawlExtended())
 		{
 			vaultResult.TargetState = LS_VAULT_3_STEPS_CROUCH;
-			vaultResult.Success = HasStateDispatch(*item, vaultResult.TargetState);
+			vaultResult.Success = TestStateDispatch(*item, vaultResult.TargetState);
 			return vaultResult;
 		}
 
@@ -2127,7 +2127,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 		if (vaultResult.Success)
 		{
 			vaultResult.TargetState = LS_AUTO_JUMP;
-			vaultResult.Success = HasStateDispatch(*item, vaultResult.TargetState);
+			vaultResult.Success = TestStateDispatch(*item, vaultResult.TargetState);
 			return vaultResult;
 		}
 	}
@@ -2141,7 +2141,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 		g_GameFlow->HasMonkeyAutoJump())
 	{
 		vaultResult.TargetState = LS_AUTO_JUMP;
-		vaultResult.Success = HasStateDispatch(*item, vaultResult.TargetState);
+		vaultResult.Success = TestStateDispatch(*item, vaultResult.TargetState);
 		return vaultResult;
 	}
 	
@@ -2319,7 +2319,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 		else USE_FEATURE_IF_CPP20([[likely]])
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
 
-		crawlVaultResult.Success = HasStateDispatch(*item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = TestStateDispatch(*item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2332,7 +2332,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 		else USE_FEATURE_IF_CPP20([[likely]])
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
 
-		crawlVaultResult.Success = HasStateDispatch(*item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = TestStateDispatch(*item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2341,7 +2341,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	if (crawlVaultResult.Success)
 	{
 		crawlVaultResult.TargetState = LS_CRAWL_STEP_UP;
-		crawlVaultResult.Success = HasStateDispatch(*item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = TestStateDispatch(*item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -2350,7 +2350,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	if (crawlVaultResult.Success)
 	{
 		crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
-		crawlVaultResult.Success = HasStateDispatch(*item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = TestStateDispatch(*item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 

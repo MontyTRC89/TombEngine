@@ -225,18 +225,23 @@ bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
 	return false;
 }
 
-bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
+bool TestLastFrame(const ItemInfo& item, std::optional<int> animNumber)
 {
 	if (!animNumber.has_value())
-		animNumber = item->Animation.AnimNumber;
+		animNumber = item.Animation.AnimNumber;
 
 	// Animation number mismatch; return early.
-	if (item->Animation.AnimNumber != *animNumber)
+	if (item.Animation.AnimNumber != *animNumber)
 		return false;
 
 	// FAILSAFE: Frames beyond real end frame also count.
-	const auto& anim = GetAnimData(item->Animation.AnimObjectID, *animNumber);
-	return (item->Animation.FrameNumber >= anim.EndFrameNumber);
+	const auto& anim = GetAnimData(item.Animation.AnimObjectID, *animNumber);
+	return (item.Animation.FrameNumber >= anim.EndFrameNumber);
+}
+
+bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
+{
+	return TestLastFrame(*item, animNumber);
 }
 
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber)

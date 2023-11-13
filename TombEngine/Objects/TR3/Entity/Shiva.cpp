@@ -289,11 +289,10 @@ namespace TEN::Entities::Creatures::TR3
 				item->ItemFlags[3] = 1;
 			}
 
-			// TODO: Mesh swaps after death don't work properly.
-			if (TestLastFrame(item))
+			if (item->Animation.FrameNumber >= GetAnimData(*item).EndFrameNumber)
 			{
 				// Block frame until mesh is swapped.
-				item->Animation.FrameNumber = GetAnimData(*item).EndFrameNumber;
+				item->Animation.FrameNumber = GetAnimData(*item).EndFrameNumber - 1;
 
 				if (DoShivaMeshSwap(*item, true))
 					CreatureDie(itemNumber, false);
