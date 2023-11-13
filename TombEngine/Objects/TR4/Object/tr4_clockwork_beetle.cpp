@@ -31,7 +31,7 @@ void ClockworkBeetleControl(short itemNumber)
 			beetle->Pose.Position = pos;
 			beetle->Status = ITEM_ACTIVE;
 			beetle->Pose.Orientation.y = LaraItem->Pose.Orientation.y;
-			beetle->Pose.Orientation.z = -0x31C4;
+			beetle->Pose.Orientation.z = ANGLE(-70.0f);
 			return;
 		}
 
@@ -88,10 +88,8 @@ void ClockworkBeetleControl(short itemNumber)
 		{
 			int x, z;
 
-			x = (beetle->Pose.Position.x & -CLICK(2)) | 0x200;
-			z = (beetle->Pose.Position.z & -CLICK(2)) | 0x200;
-			x -= beetle->Pose.Position.x;
-			z -= beetle->Pose.Position.z;
+			x = ((beetle->Pose.Position.x & -CLICK(2)) | CLICK(2)) - beetle->Pose.Position.x;
+			z = ((beetle->Pose.Position.z & -CLICK(2)) | CLICK(2)) - beetle->Pose.Position.z;
 
 			if (x <= -8 || z <= -8 || x >= 8 || z >= 8)
 			{
@@ -369,7 +367,7 @@ void UseClockworkBeetle(short flag)
 						}
 					}
 
-					item->ItemFlags[1] = item2->Pose.Orientation.y + 0x8000;
+					item->ItemFlags[1] = item2->Pose.Orientation.y + ANGLE(180.0f);
 
 					if (item2->ItemFlags[0])
 						item->ItemFlags[0] = 0;

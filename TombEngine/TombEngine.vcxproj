@@ -330,8 +330,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Hud\PickupSummary.h" />
     <ClInclude Include="Game\Hud\StatusBars.h" />
     <ClInclude Include="Game\Hud\TargetHighlighter.h" />
-    <ClInclude Include="Game\Lara\PlayerContext.h" />
-    <ClInclude Include="Game\Lara\PlayerContextData.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -392,6 +390,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
     <ClInclude Include="Game\items.h" />
+    <ClInclude Include="Game\Lara\PlayerContext.h" />
+    <ClInclude Include="Game\Lara\PlayerContextData.h" />
+    <ClInclude Include="Game\Lara\PlayerStateMachine.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
     <ClInclude Include="Game\people.h" />
@@ -721,8 +722,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
     <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
-    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\AlignModes.h" />
-    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScaleModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
@@ -769,7 +768,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Util\Util.h" />
     <ClInclude Include="Scripting\Internal\TEN\Vec2\Vec2.h" />
     <ClInclude Include="Scripting\Internal\TEN\Vec3\Vec3.h" />
+    <ClInclude Include="Scripting\Internal\TEN\View\AlignModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\CameraTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\View\ScaleModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\ViewHandler.h" />
     <ClInclude Include="Sound\sound.h" />
     <ClInclude Include="Sound\sound_effects.h" />
@@ -847,7 +848,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\itemdata\creature_info.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\items.cpp" />
-    <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
@@ -869,6 +869,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\Lara\lara_two_guns.cpp" />
+    <ClCompile Include="Game\Lara\PlayerContext.cpp" />
+    <ClCompile Include="Game\Lara\PlayerStateMachine.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\missile.cpp" />
     <ClCompile Include="Game\people.cpp" />

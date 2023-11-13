@@ -131,6 +131,7 @@ CollisionResult GetCollision(const ItemInfo* item);
 CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAngles& orient, float dist);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(const GameVector& pos);

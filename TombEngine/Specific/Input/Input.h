@@ -9,17 +9,20 @@ struct ItemInfo;
 namespace TEN::Input
 {
 	constexpr auto MAX_KEYBOARD_KEYS	= 256;
-	constexpr auto MAX_MOUSE_KEYS		= 8;
 	constexpr auto MAX_GAMEPAD_KEYS		= 16;
-	constexpr auto MAX_MOUSE_POV_AXES	= 6;
 	constexpr auto MAX_GAMEPAD_AXES		= 6;
 	constexpr auto MAX_GAMEPAD_POV_AXES = 4;
+	constexpr auto MAX_MOUSE_KEYS		= 8;
+	constexpr auto MAX_MOUSE_AXES		= 6;
 
-	constexpr auto MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES + (MAX_GAMEPAD_AXES * 2) + MAX_GAMEPAD_POV_AXES;
+	constexpr auto ACTION_OFFSET_GAMEPAD = MAX_KEYBOARD_KEYS;
+	constexpr auto ACTION_OFFSET_MOUSE	 = ACTION_OFFSET_GAMEPAD + MAX_GAMEPAD_KEYS + (MAX_GAMEPAD_AXES * 2) + MAX_GAMEPAD_POV_AXES;
+
+	constexpr auto MAX_INPUT_SLOTS = ACTION_OFFSET_MOUSE + MAX_MOUSE_KEYS + MAX_MOUSE_AXES;
 
 	enum XInputButton
 	{
-		XB_START = MAX_KEYBOARD_KEYS + MAX_MOUSE_KEYS,
+		XB_START = ACTION_OFFSET_GAMEPAD,
 		XB_SELECT,
 		XB_LSTICK,
 		XB_RSTICK,
@@ -32,7 +35,7 @@ namespace TEN::Input
 		XB_X,
 		XB_Y,
 		XB_LOGO,
-		XB_AXIS_X_POS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_MOUSE_POV_AXES,
+		XB_AXIS_X_POS = ACTION_OFFSET_GAMEPAD + MAX_GAMEPAD_KEYS,
 		XB_AXIS_X_NEG,
 		XB_AXIS_Y_POS,
 		XB_AXIS_Y_NEG,
@@ -102,7 +105,7 @@ namespace TEN::Input
     void ApplyDefaultBindings();
     bool ApplyDefaultXInputBindings();
 
-	Vector2 GetCursorDisplayPosition();
+	Vector2 GetMouse2DPosition();
 
 	// TODO: Move global query functions to player input object (not happening soon). -- Sezz 2023.08.07
 	void  ClearAction(ActionID actionID);

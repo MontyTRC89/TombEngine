@@ -94,6 +94,184 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.IsMonkeySwinging = false;
 }
 
+void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& water)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Update health status.
+	if (TestEnvironment(ENV_FLAG_DAMAGE, &item) && item.HitPoints > 0)
+		item.HitPoints--;
+
+	// Update poison status.
+	if (player.Status.Poison)
+	{
+		if (player.Status.Poison > LARA_POISON_MAX)
+			player.Status.Poison = LARA_POISON_MAX;
+
+		if (!(Wibble & 0xFF))
+			item.HitPoints -= player.Status.Poison;
+	}
+
+	// Update stamina status.
+	if (player.Status.Stamina < LARA_STAMINA_MAX && item.Animation.ActiveState != LS_SPRINT)
+		player.Status.Stamina++;
+
+	// TODO: Dehardcode values and make cleaner implementation.
+	// Handle environmental status effects.
+	switch (waterStatus)
+	{
+	case WaterStatus::Dry:
+	case WaterStatus::Wade:
+		// TODO: Find best height. -- Sezz 2021.11.10
+		if (water.IsSwamp && player.Context.WaterSurfaceDist < -(LARA_HEIGHT + 8))
+		{
+			if (item.HitPoints >= 0)
+			{
+				player.Status.Air -= 6;
+				if (player.Status.Air < 0)
+				{
+					player.Status.Air = -1;
+					item.HitPoints -= 10;
+				}
+			}
+		}
+		else if (player.Status.Air < LARA_AIR_MAX && item.HitPoints >= 0)
+		{
+			// HACK: Special case for UPV.
+			if (player.Context.Vehicle == NO_ITEM)
+			{
+				player.Status.Air += 10;
+				if (player.Status.Air > LARA_AIR_MAX)
+					player.Status.Air = LARA_AIR_MAX;
+			}
+		}
+
+		if (item.HitPoints >= 0)
+		{
+			if (player.Control.WaterStatus == WaterStatus::Dry)
+			{
+				// HACK: Special case for UPV.
+				if (player.Context.Vehicle != NO_ITEM)
+				{
+					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
+					if (vehicleItem.ObjectNumber == ID_UPV)
+					{
+						auto pointColl = GetCollision(&item, 0, 0, CLICK(1));
+
+						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber));
+						if (water.IsCold)
+						{
+							player.Status.Exposure--;
+							if (player.Status.Exposure <= 0)
+							{
+								player.Status.Exposure = 0;
+								item.HitPoints -= 10;
+							}
+						}
+					}
+				}
+				else
+				{
+					player.Status.Exposure++;
+					if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+						player.Status.Exposure = LARA_EXPOSURE_MAX;
+				}
+			}
+			else
+			{
+				if (water.IsCold)
+				{
+					player.Status.Exposure--;
+					if (player.Status.Exposure <= 0)
+					{
+						player.Status.Exposure = 0;
+						item.HitPoints -= 10;
+					}
+				}
+				else
+				{
+					player.Status.Exposure++;
+					if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+						player.Status.Exposure = LARA_EXPOSURE_MAX;
+				}
+			}
+		}
+
+		break;
+
+	case WaterStatus::Underwater:
+		if (item.HitPoints >= 0)
+		{
+			const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
+			if (level.GetLaraType() != LaraType::Divesuit)
+				player.Status.Air--;
+
+			if (player.Status.Air < 0)
+			{
+				item.HitPoints -= 5;
+				player.Status.Air = -1;
+			}
+
+			if (water.IsCold)
+			{
+				player.Status.Exposure -= 2;
+				if (player.Status.Exposure <= 0)
+				{
+					player.Status.Exposure = 0;
+					item.HitPoints -= 10;
+				}
+			}
+			else
+			{
+				player.Status.Exposure++;
+				if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+					player.Status.Exposure = LARA_EXPOSURE_MAX;
+			}
+		}
+
+		break;
+
+	case WaterStatus::TreadWater:
+		if (item.HitPoints >= 0)
+		{
+			player.Status.Air += 10;
+			if (player.Status.Air > LARA_AIR_MAX)
+				player.Status.Air = LARA_AIR_MAX;
+
+			if (water.IsCold)
+			{
+				player.Status.Exposure -= 2;
+				if (player.Status.Exposure <= 0)
+				{
+					player.Status.Exposure = 0;
+					item.HitPoints -= 10;
+				}
+			}
+		}
+
+		break;
+
+	default:
+		break;
+	}
+
+	// Update death counter.
+	if (item.HitPoints <= 0)
+	{
+		item.HitPoints = -1;
+
+		if (player.Control.Count.Death == 0)
+			StopSoundTracks(true);
+
+		player.Control.Count.Death++;
+		if ((item.Flags & IFLAG_INVISIBLE))
+		{
+			player.Control.Count.Death++;
+			return;
+		}
+	}
+}
+
 static void UsePlayerMedipack(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
@@ -865,6 +1043,25 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 
 	auto& firstPlayerItem = *FindItem(ID_LARA);
 	return (LaraInfo*&)firstPlayerItem.Data;
+}
+
+PlayerWaterData GetPlayerWaterData(ItemInfo& item)
+{
+	bool isWater = TestEnvironment(ENV_FLAG_WATER, &item);
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
+	bool isCold = TestEnvironment(ENV_FLAG_COLD, &item);
+
+	int waterDepth = GetWaterDepth(&item);
+	int waterHeight = GetWaterHeight(&item);
+
+	auto pointColl = GetCollision(item);
+	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.Position.Floor) - waterHeight);
+
+	return PlayerWaterData
+	{
+		isWater, isSwamp, isCold,
+		waterDepth, waterHeight, heightFromWater
+	};
 }
 
 JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll)

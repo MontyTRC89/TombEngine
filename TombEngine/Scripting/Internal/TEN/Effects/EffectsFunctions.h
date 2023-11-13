@@ -2,7 +2,7 @@
 
 namespace sol { class state; };
 
-namespace Effects
+namespace TEN::Scripting::Effects
 {
 	void Register(sol::state* lua, sol::table&);
 };

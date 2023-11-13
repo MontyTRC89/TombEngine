@@ -1,10 +1,10 @@
 #pragma once
 #include "Game/control/box.h"
-#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/level.h"
 
+class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 
@@ -97,105 +97,36 @@ struct ObjectInfo
 
 	DWORD explodableMeshbits;
 
-	std::function<void(short itemNumber)> Initialize;
-	std::function<void(short itemNumber)> control;
-	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
+	std::function<void(short itemNumber)> Initialize = nullptr;
+	std::function<void(short itemNumber)> control = nullptr;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision = nullptr;
 
-	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
-	std::function<void(ItemInfo* item)> drawRoutine;
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine = nullptr;
+	std::function<void(ItemInfo* item)> drawRoutine = nullptr;
 
-	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> floor;
-	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> ceiling;
-	std::function<int(short itemNumber)> floorBorder;
-	std::function<int(short itemNumber)> ceilingBorder;
+	// Bridge routines
+	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
+	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;
+	std::function<int(const ItemInfo& item)> GetFloorBorder	  = nullptr;
+	std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
 
-	// NOTE: ROT_X/Y/Z allows bones to be rotated with CreatureJoint().
-	void SetBoneRotationFlags(int boneNumber, int flags)
-	{
-		g_Level.Bones[boneIndex + (boneNumber * 4)] |= flags;
-	}
-
-	// NOTE: Use if object is alive but not intelligent to set up blood effects.
-	void SetupHitEffect(bool isSolid = false, bool isAlive = false)
-	{
-		// Avoid some objects such as ID_SAS_DYING having None.
-		if (isAlive)
-		{
-			hitEffect = HitEffect::Blood;
-			return;
-		}
-
-		if (intelligent)
-		{
-			if (isSolid && HitPoints > 0)
-			{
-				hitEffect = HitEffect::Richochet;
-			}
-			else if ((damageType != DamageMode::Any && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
-			{
-				hitEffect = HitEffect::Smoke;
-			}
-			else if (damageType == DamageMode::Any && HitPoints > 0)
-			{
-				hitEffect = HitEffect::Blood;
-			}
-		}
-		else if (isSolid && HitPoints <= 0)
-		{
-			hitEffect = HitEffect::Richochet;
-		}
-		else
-		{
-			hitEffect = HitEffect::None;
-		}
-	}
+	void SetBoneRotationFlags(int boneID, int flags);
+	void SetHitEffect(bool isSolid = false, bool isAlive = false);
 };
 
 class ObjectHandler
 {
-	private:
-		ObjectInfo Objects[ID_NUMBER_OBJECTS];
+private:
+	ObjectInfo _objects[ID_NUMBER_OBJECTS];
 
-		ObjectInfo& GetFirstAvailableObject()
-		{
-			for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
-			{
-				if (Objects[i].loaded)
-					return Objects[i];
-			}
+public:
+	void Initialize();
+	bool CheckID(GAME_OBJECT_ID objectID, bool isSilent = false);
 
-			return Objects[0];
-		}
+	ObjectInfo& operator [](int objectID);
 
-	public:
-		void Initialize() 
-		{ 
-			std::memset(Objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
-		}
-
-		bool CheckID(int index, bool isSilent = false)
-		{
-			if (index == GAME_OBJECT_ID::ID_NO_OBJECT || index >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
-			{
-				if (!isSilent)
-				{
-					TENLog("Attempted to access unavailable slot ID (" + std::to_string(index) + "). " +
-						"Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
-				}
-
-				return false;
-			}
-
-			return true;
-		}
-
-		ObjectInfo& operator[](int index) 
-		{
-			if (CheckID(index))
-				return Objects[index];
-		
-			return GetFirstAvailableObject();
-		}
+private:
+	ObjectInfo& GetFirstAvailableObject();
 };
 
 struct StaticInfo

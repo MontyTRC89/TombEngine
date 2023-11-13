@@ -89,8 +89,8 @@ constexpr auto CRAWL_STEPUP_HEIGHT	= CLICK(1) - 1;
 constexpr auto MONKEY_STEPUP_HEIGHT = (int)CLICK(1.25f);
 constexpr auto BAD_JUMP_CEILING		= (int)CLICK(0.75f);
 constexpr auto SHALLOW_WATER_DEPTH	= (int)CLICK(0.5f);
-constexpr auto WADE_DEPTH			= STEPUP_HEIGHT;
-constexpr auto SWIM_DEPTH			= CLICK(3) - 38;
+constexpr auto WADE_WATER_DEPTH		= STEPUP_HEIGHT;
+constexpr auto SWIM_WATER_DEPTH		= CLICK(2.75f);
 constexpr auto SLOPE_DIFFERENCE		= 60;
 
 extern LaraInfo Lara;

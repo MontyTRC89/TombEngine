@@ -75,10 +75,10 @@ void AddRoomFlipItems(ROOM_INFO* room)
 {
 	for (short linkNumber = room->itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
 	{
-		auto* item = &g_Level.Items[linkNumber];
+		const auto& item = g_Level.Items[linkNumber];
 
-		if (Objects[item->ObjectNumber].floor != nullptr)
-			UpdateBridgeItem(linkNumber);
+		if (Objects[item.ObjectNumber].GetFloorHeight != nullptr)
+			UpdateBridgeItem(item);
 	}
 }
 
@@ -96,8 +96,8 @@ void RemoveRoomFlipItems(ROOM_INFO* room)
 			KillItem(linkNumber);
 		}
 
-		if (Objects[item->ObjectNumber].floor != nullptr)
-			UpdateBridgeItem(linkNumber, true);
+		if (Objects[item->ObjectNumber].GetFloorHeight != nullptr)
+			UpdateBridgeItem(*item, true);
 	}
 }
 
