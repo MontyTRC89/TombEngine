@@ -311,7 +311,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	using Vector3 = DirectX::SimpleMath::Vector3;
 	Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
 
 	if (DebugMode)
