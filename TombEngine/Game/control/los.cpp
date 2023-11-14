@@ -288,125 +288,60 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	return hasHit;
 }
 
-int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject)
+static bool DoRayBox(const GameVector& origin, const GameVector& target, const GameBoundingBox& bounds,
+					 const Pose& objectPose, Vector3i& hitPos, int closestItemNumber)
 {
-	ClosestItem = NO_LOS_ITEM;
-	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
+	auto box = bounds.ToBoundingOrientedBox(objectPose);
 
-	for (int r = 0; r < NumberLosRooms; ++r)
-	{
-		Pose pos;
-		auto* room = &g_Level.Rooms[LosRooms[r]];
+	auto rayOrigin = origin.ToVector3();
+	auto rayDir = (target - origin).ToVector3();
+	rayDir.Normalize();
 
-		for (int m = 0; m < room->mesh.size(); m++)
-		{
-			auto* meshp = &room->mesh[m];
-
-			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
-			{
-				pos.Position = meshp->pos.Position;
-				pos.Orientation.y = meshp->pos.Orientation.y;
-
-				if (DoRayBox(origin, target, &GetBoundsAccurate(*meshp, false), &pos, vec, -1 - meshp->staticNumber))
-				{
-					*mesh = meshp;
-					target->RoomNumber = LosRooms[r];
-				}
-			}
-		}
-
-		for (short linkNumber = room->itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
-		{
-			auto* item = &g_Level.Items[linkNumber];
-
-			if ((item->Status == ITEM_DEACTIVATED) || (item->Status == ITEM_INVISIBLE))
-				continue;
-
-			if ((priorityObject != GAME_OBJECT_ID::ID_NO_OBJECT) && (item->ObjectNumber != priorityObject))
-				continue;
-
-			if ((item->ObjectNumber != ID_LARA) && (Objects[item->ObjectNumber].collision == nullptr))
-				continue;
-
-			if ((item->ObjectNumber == ID_LARA) && (priorityObject != ID_LARA))
-				continue;
-
-			auto box = GameBoundingBox(item);
-
-			pos.Position = item->Pose.Position;
-			pos.Orientation.y = item->Pose.Orientation.y;
-
-			if (DoRayBox(origin, target, &box, &pos, vec, linkNumber))
-				target->RoomNumber = LosRooms[r];
-		}
-	}
-
-	vec->x = ClosestCoord.x;
-	vec->y = ClosestCoord.y;
-	vec->z = ClosestCoord.z;
-
-	return ClosestItem;
-}
-
-bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose* itemOrStaticPos, Vector3i* hitPos, short closesItemNumber)
-{
-	// Ray
-	FXMVECTOR rayOrigin = { (float)origin->x, (float)origin->y, (float)origin->z };
-	FXMVECTOR rayTarget = { (float)target->x, (float)target->y, (float)target->z };
-	FXMVECTOR rayDirection = { (float)(target->x - origin->x), (float)(target->y - origin->y), (float)(target->z - origin->z) };
-	XMVECTOR rayDirectionNorm = XMVector3Normalize(rayDirection);
-
-	// Create the bounding box for raw collision detection
-	auto oBox = box->ToBoundingOrientedBox(*itemOrStaticPos);
-
-	// Get the collision with the bounding box
-	float distance;
-	bool collided = oBox.Intersects(rayOrigin, rayDirectionNorm, distance);
-
-	// If no collision happened, then don't test spheres
-	if (!collided)
+	// Don't test spheres if no intersection.
+	float dist = 0.0f;
+	if (rayDir == Vector3::Zero || !box.Intersects(rayOrigin, rayDir, dist))
 		return false;
 
-	// Get the raw collision point
-	Vector3 collidedPoint = rayOrigin + distance * rayDirectionNorm;
-	hitPos->x = collidedPoint.x - itemOrStaticPos->Position.x;
-	hitPos->y = collidedPoint.y - itemOrStaticPos->Position.y;
-	hitPos->z = collidedPoint.z - itemOrStaticPos->Position.z;
+	// Get raw collision point.
+	auto collidedPoint = Geometry::TranslatePoint(rayOrigin, rayDir, dist);
+	hitPos.x = collidedPoint.x - objectPose.Position.x;
+	hitPos.y = collidedPoint.y - objectPose.Position.y;
+	hitPos.z = collidedPoint.z - objectPose.Position.z;
 
-	// Now in the case of items we need to test single spheres
+	// Test single spheres in case of items.
 	int meshIndex = 0;
 	int bit = 0;
 	int sp = -2;
-	float minDistance = std::numeric_limits<float>::max();
+	float minDist = INFINITY;
 
-	if (closesItemNumber < 0)
+	if (closestItemNumber < 0)
 	{
-		// Static meshes don't require further tests
+		// Static meshes don't require further tests.
 		sp = -1;
-		minDistance = distance;
+		minDist = dist;
 	}
 	else
 	{
-		// For items instead we need to test spheres
-		ItemInfo* item = &g_Level.Items[closesItemNumber];
-		ObjectInfo* obj = &Objects[item->ObjectNumber];
+		// Test spheres instead for items.
+		auto* item = &g_Level.Items[closestItemNumber];
+		auto* object = &Objects[item->ObjectNumber];
 
-		// Get the transformed sphere of meshes
+		// Get transformed mesh sphere.
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 		SPHERE spheres[34];
 		memcpy(spheres, CreatureSpheres, sizeof(SPHERE) * 34);
 
-		if (obj->nmeshes <= 0)
+		if (object->nmeshes <= 0)
 			return false;
 
-		meshIndex = obj->meshIndex;
+		meshIndex = object->meshIndex;
 
-		for (int i = 0; i < obj->nmeshes; i++)
+		for (int i = 0; i < object->nmeshes; i++)
 		{
-			// If mesh is visible...
+			// If mesh is visible.
 			if (item->MeshBits & (1 << i))
 			{
-				SPHERE* sphere = &CreatureSpheres[i];
+				auto* sphere = &CreatureSpheres[i];
 
 				// TODO: this approach is the correct one but, again, Core's math is a mystery and this test was meant
 				// to fail deliberately in some way. I've so added again Core's legacy test for allowing the current game logic
@@ -436,12 +371,12 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 
 				Vector3i p[4];
 
-				p[1].x = origin->x;
-				p[1].y = origin->y;
-				p[1].z = origin->z;
-				p[2].x = target->x;
-				p[2].y = target->y;
-				p[2].z = target->z;
+				p[1].x = origin.x;
+				p[1].y = origin.y;
+				p[1].z = origin.z;
+				p[2].x = target.x;
+				p[2].y = target.y;
+				p[2].z = target.z;
 				p[3].x = sphere->x;
 				p[3].y = sphere->y;
 				p[3].z = sphere->z;
@@ -476,16 +411,16 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 
 					if (distance < SQUARE(sphere->r))
 					{
-						dx = SQUARE(sphere->x - origin->x);
-						dy = SQUARE(sphere->y - origin->y);
-						dz = SQUARE(sphere->z - origin->z);
+						dx = SQUARE(sphere->x - origin.x);
+						dy = SQUARE(sphere->y - origin.y);
+						dz = SQUARE(sphere->z - origin.z);
 
 						distance = dx + dy + dz;
 
-						if (distance < minDistance)
+						if (distance < minDist)
 						{
-							minDistance = distance;
-							meshIndex = obj->meshIndex + i;
+							minDist = distance;
+							meshIndex = object->meshIndex + i;
 							bit = 1 << i;
 							sp = i;
 						}
@@ -498,20 +433,20 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 			return false;
 	}
 
-	if (distance >= ClosestDist)
+	if (dist >= ClosestDist)
 		return false;
 
-	// Setup test result
-	ClosestCoord.x = hitPos->x + itemOrStaticPos->Position.x;
-	ClosestCoord.y = hitPos->y + itemOrStaticPos->Position.y;
-	ClosestCoord.z = hitPos->z + itemOrStaticPos->Position.z;
-	ClosestDist = distance;
-	ClosestItem = closesItemNumber;
+	// Set up test result.
+	ClosestCoord.x = hitPos.x + objectPose.Position.x;
+	ClosestCoord.y = hitPos.y + objectPose.Position.y;
+	ClosestCoord.z = hitPos.z + objectPose.Position.z;
+	ClosestDist = dist;
+	ClosestItem = closestItemNumber;
 
-	// If collided object is an item, then setup the shatter item data struct
+	// If collided object is item, set up shatter item data struct.
 	if (sp >= 0)
 	{
-		ItemInfo* item = &g_Level.Items[closesItemNumber];
+		auto* item = &g_Level.Items[closestItemNumber];
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 
@@ -526,6 +461,65 @@ bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose
 	}
 
 	return true;
+}
+
+int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject)
+{
+	ClosestItem = NO_LOS_ITEM;
+	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
+
+	for (int r = 0; r < NumberLosRooms; ++r)
+	{
+		auto* room = &g_Level.Rooms[LosRooms[r]];
+
+		auto pose = Pose::Zero;
+
+		for (int m = 0; m < room->mesh.size(); m++)
+		{
+			auto* meshp = &room->mesh[m];
+
+			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
+			{
+				auto bounds = GetBoundsAccurate(*meshp, false);
+				pose = Pose(meshp->pos.Position, EulerAngles(0, meshp->pos.Orientation.y, 0));
+
+				if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp->staticNumber))
+				{
+					*mesh = meshp;
+					target->RoomNumber = LosRooms[r];
+				}
+			}
+		}
+
+		for (short linkNumber = room->itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+		{
+			auto* item = &g_Level.Items[linkNumber];
+
+			if ((item->Status == ITEM_DEACTIVATED) || (item->Status == ITEM_INVISIBLE))
+				continue;
+
+			if ((priorityObject != GAME_OBJECT_ID::ID_NO_OBJECT) && (item->ObjectNumber != priorityObject))
+				continue;
+
+			if ((item->ObjectNumber != ID_LARA) && (Objects[item->ObjectNumber].collision == nullptr))
+				continue;
+
+			if ((item->ObjectNumber == ID_LARA) && (priorityObject != ID_LARA))
+				continue;
+
+			auto bounds = GameBoundingBox(item);
+			pose = Pose(item->Pose.Position, EulerAngles(0, item->Pose.Orientation.y, 0));
+
+			if (DoRayBox(*origin, *target, bounds, pose, *vec, linkNumber))
+				target->RoomNumber = LosRooms[r];
+		}
+	}
+
+	vec->x = ClosestCoord.x;
+	vec->y = ClosestCoord.y;
+	vec->z = ClosestCoord.z;
+
+	return ClosestItem;
 }
 
 bool LOS(GameVector* origin, GameVector* target)
