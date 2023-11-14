@@ -155,7 +155,7 @@ public:
 	bool IsSurfaceSplit(bool isFloor) const;
 	bool IsSurfaceDiagonalStep(bool isFloor) const;
 	bool IsSurfaceSplitPortal(bool isFloor) const;
-	bool IsWall(int planeID) const;
+	bool IsWall(int triangleID) const;
 	bool IsWall(int x, int z) const;
 
 	// Bridge utilities
@@ -166,11 +166,14 @@ public:
 
 namespace TEN::Collision::Floordata
 {
-	Vector2i GetSectorPoint(int x, int z);Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
+	// Deprecated
+	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor);
+
+	Vector2i				GetSectorPoint(int x, int z);
+	Vector2i				GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
 	std::vector<Vector2i>	GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
 	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
-	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor);
-	
+
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);

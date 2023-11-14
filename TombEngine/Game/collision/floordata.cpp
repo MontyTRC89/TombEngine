@@ -358,15 +358,7 @@ void FloorInfo::RemoveBridge(int itemNumber)
 
 namespace TEN::Collision::Floordata
 {
-	Vector2i GetSectorPoint(int x, int z)
-	{
-		return Vector2i(
-			x % BLOCK(1) - BLOCK(1) / 2,
-			z % BLOCK(1) - BLOCK(1) / 2);
-	}
-
-	// NOTE: Tilts are deprecated, but until all conversions are complete
-	// this function will remain useful.
+	// NOTE: Tilts are deprecated, but until all conversions are complete this function will remain useful.
 	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor)
 	{
 		// Calculate tilt values based on normal.
@@ -379,6 +371,13 @@ namespace TEN::Collision::Floordata
 
 		// Return tilt.
 		return Vector2i(xTiltGrade, zTiltGrade);
+	}
+
+	Vector2i GetSectorPoint(int x, int z)
+	{
+		return Vector2i(
+			x % BLOCK(1) - BLOCK(1) / 2,
+			z % BLOCK(1) - BLOCK(1) / 2);
 	}
 
 	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds)
