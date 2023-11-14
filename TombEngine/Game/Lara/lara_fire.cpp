@@ -58,6 +58,16 @@ const auto FlarePoseStates = std::vector<int>
 	LS_SOFT_SPLAT
 };
 
+const auto FlarePoseAnimationExceptions = std::vector<int>
+{
+	LA_WATERLEVER_PULL,
+	LA_BUTTON_GIANT_PUSH,
+	LA_BUTTON_LARGE_PUSH,
+	LA_JUMPSWITCH_PULL,
+	LA_UNDERWATER_CEILING_SWITCH_PULL,
+	LA_VALVE_TURN
+};
+
 WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
 	// No weapon
@@ -781,6 +791,19 @@ void HandleWeapon(ItemInfo& laraItem)
 			if (laraItem.Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
 				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
+
+				//Test Animations Exceptions for flare pose
+
+				const auto currentLaraAnim = laraItem.Animation.AnimNumber;
+				for (const auto& currentExceptionAnim : FlarePoseAnimationExceptions)
+				{
+					if (currentLaraAnim == currentExceptionAnim)
+					{
+						player.Flare.ControlLeft = false;
+						break;
+					}
+				}
+
 				DoFlareInHand(laraItem, player.Flare.Life);
 				SetFlareArm(laraItem, player.LeftArm.FrameNumber);
 			}
