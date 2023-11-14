@@ -889,10 +889,10 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 			if (player.Control.WaterStatus != WaterStatus::FlyCheat)
 			{
 				SetAnimation(item, LA_FLY_CHEAT);
+				ResetPlayerFlex(&item);
 				item.Animation.IsAirborne = false;
 				item.HitPoints = LARA_HEALTH_MAX;
 
-				ResetPlayerFlex(&item);
 				player.Control.WaterStatus = WaterStatus::FlyCheat;
 				player.Control.Count.Death = 0;
 				player.Status.Air = LARA_AIR_MAX;
