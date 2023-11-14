@@ -17,10 +17,176 @@
 #include "Specific/Input/Input.h"
 
 int NumberLosRooms;
-short LosRooms[20];
+int LosRooms[20];
 int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
+
+static int xLOS(const GameVector& origin, GameVector& target)
+{
+	int dx = target.x - origin.x;
+	if (!dx)
+		return 1;
+
+	int dy = BLOCK(target.y - origin.y) / dx;
+	int dz = BLOCK(target.z - origin.z) / dx;
+
+	NumberLosRooms = 1;
+	LosRooms[0] = origin.RoomNumber;
+
+	short roomNumber0 = origin.RoomNumber;
+	short roomNumber1 = origin.RoomNumber;
+
+	bool isNegative = (dx < 0);
+	int sign = (isNegative ? -1 : 1);
+
+	int x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
+	int y = (((x - origin.x) * dy) / BLOCK(1)) + origin.y;
+	int z = (((x - origin.x) * dz) / BLOCK(1)) + origin.z;
+
+	int flag = 1;
+	while (isNegative ? (x > target.x) : (x < target.x))
+	{
+		g_Renderer.AddSphere(Vector3(x, y, z), 20, Vector4(0, 0, 1, 1));
+
+		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
+		if (roomNumber0 != roomNumber1)
+		{
+			roomNumber1 = roomNumber0;
+			LosRooms[NumberLosRooms] = roomNumber0;
+			++NumberLosRooms;
+		}
+
+		if (y > GetFloorHeight(sectorPtr, x, y, z) ||
+			y < GetCeiling(sectorPtr, x, y, z))
+		{
+			flag = -1;
+			break;
+		}
+
+		sectorPtr = GetFloor(x + sign, y, z, &roomNumber0);
+		if (roomNumber0 != roomNumber1)
+		{
+			roomNumber1 = roomNumber0;
+			LosRooms[NumberLosRooms] = roomNumber0;
+			++NumberLosRooms;
+		}
+
+		if (y > GetFloorHeight(sectorPtr, x + sign, y, z) ||
+			y < GetCeiling(sectorPtr, x + sign, y, z))
+		{
+			flag = 0;
+			break;
+		}
+
+		x += BLOCK(1) * sign;
+		y += dy * sign;
+		z += dz * sign;
+	}
+
+	if (flag != 1)
+		target = GameVector(x, y, z, target.RoomNumber);
+
+	target.RoomNumber = flag ? roomNumber0 : roomNumber1;
+	return flag;
+}
+
+static int zLOS(const GameVector& origin, GameVector& target)
+{
+	int dz = target.z - origin.z;
+	if (!dz)
+		return 1;
+
+	int dx = BLOCK(target.x - origin.x) / dz;
+	int dy = BLOCK(target.y - origin.y) / dz;
+
+	NumberLosRooms = 1;
+	LosRooms[0] = origin.RoomNumber;
+
+	short roomNumber0 = origin.RoomNumber;
+	short roomNumber1 = origin.RoomNumber;
+
+	bool isNegative = (dz < 0);
+	int sign = (isNegative ? -1 : 1);
+
+	int z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
+	int x = (((z - origin.z) * dx) / BLOCK(1)) + origin.x;
+	int y = (((z - origin.z) * dy) / BLOCK(1)) + origin.y;
+
+	int flag = 1;
+	while (isNegative ? (z > target.z) : (z < target.z))
+	{
+		g_Renderer.AddSphere(Vector3(x, y, z), 20, Vector4(1, 0, 0, 1));
+
+		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
+		if (roomNumber0 != roomNumber1)
+		{
+			roomNumber1 = roomNumber0;
+			LosRooms[NumberLosRooms] = roomNumber0;
+			++NumberLosRooms;
+		}
+
+		if (y > GetFloorHeight(sectorPtr, x, y, z) ||
+			y < GetCeiling(sectorPtr, x, y, z))
+		{
+			flag = -1;
+			break;
+		}
+
+		sectorPtr = GetFloor(x, y, z + sign, &roomNumber0);
+		if (roomNumber0 != roomNumber1)
+		{
+			roomNumber1 = roomNumber0;
+			LosRooms[NumberLosRooms] = roomNumber0;
+			++NumberLosRooms;
+		}
+
+		if (y > GetFloorHeight(sectorPtr, x, y, z + sign) ||
+			y < GetCeiling(sectorPtr, x, y, z + sign))
+		{
+			flag = 0;
+			break;
+		}
+
+		x += dx * sign;
+		y += dy * sign;
+		z += BLOCK(1) * sign;
+	}
+
+	if (flag != 1)
+		target = GameVector(x, y, z, target.RoomNumber);
+
+	target.RoomNumber = flag ? roomNumber0 : roomNumber1;
+	return flag;
+}
+
+bool LOS(GameVector* origin, GameVector* target)
+{
+	int losAxis0 = 0;
+	int losAxis1 = 0;
+
+	target->RoomNumber = origin->RoomNumber;
+	if (abs(target->z - origin->z) > abs(target->x - origin->x))
+	{
+		losAxis0 = xLOS(*origin, *target);
+		losAxis1 = zLOS(*origin, *target);
+	}
+	else
+	{
+		losAxis0 = zLOS(*origin, *target);
+		losAxis1 = xLOS(*origin, *target);
+	}
+
+	if (losAxis1)
+	{
+		const auto& sector = *GetFloor(target->x, target->y, target->z, &target->RoomNumber);
+
+		if (ClipTarget(origin, target) && losAxis0 == 1 && losAxis1 == 1)
+			return true;
+	}
+
+	return false;
+}
 
 bool ClipTarget(GameVector* origin, GameVector* target)
 {
@@ -520,272 +686,6 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 	vec->z = ClosestCoord.z;
 
 	return ClosestItem;
-}
-
-bool LOS(GameVector* origin, GameVector* target)
-{
-	int result1, result2;
-
-	target->RoomNumber = origin->RoomNumber;
-	if (abs(target->z - origin->z) > abs(target->x - origin->x))
-	{
-		result1 = xLOS(origin, target);
-		result2 = zLOS(origin, target);
-	}
-	else
-	{
-		result1 = zLOS(origin, target);
-		result2 = xLOS(origin, target);
-	}
-
-	if (result2)
-	{
-		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
-		if (ClipTarget(origin, target) && result1 == 1 && result2 == 1)
-			return true;
-	}
-
-	return false;
-}
-
-int xLOS(GameVector* origin, GameVector* target)
-{
-	int dx = target->x - origin->x;
-	if (!dx)
-		return 1;
-
-	int dy = ((target->y - origin->y) << 10) / dx;
-	int dz = ((target->z - origin->z) << 10) / dx;
-
-	NumberLosRooms = 1;
-	LosRooms[0] = origin->RoomNumber;
-
-	short room = origin->RoomNumber;
-	short room2 = origin->RoomNumber;
-
-	int flag = 1;
-	if (dx < 0)
-	{
-		int x = origin->x & 0xFFFFFC00;
-		int y = ((x - origin->x) * dy >> 10) + origin->y;
-		int z = ((x - origin->x) * dz >> 10) + origin->z;
-
-		while (x > target->x)
-		{
-			auto* floor = GetFloor(x, y, z, &room);
-			if (room != room2)
-			{
-				room2 = room;
-				LosRooms[NumberLosRooms] = room;
-				++NumberLosRooms;
-			}
-
-			if (y > GetFloorHeight(floor, x, y, z) || y < GetCeiling(floor, x, y, z))
-			{
-				flag = -1;
-				break;
-			}
-
-			floor = GetFloor(x - 1, y, z, &room);
-			if (room != room2)
-			{
-				room2 = room;
-				LosRooms[NumberLosRooms] = room;
-				++NumberLosRooms;
-			}
-
-			if (y > GetFloorHeight(floor, x - 1, y, z) || y < GetCeiling(floor, x - 1, y, z))
-			{
-				flag = 0;
-				break;
-			}
-
-			x -= BLOCK(1);
-			y -= dy;
-			z -= dz;
-		}
-
-		if (flag != 1)
-		{
-			target->x = x;
-			target->y = y;
-			target->z = z;
-		}
-
-		target->RoomNumber = flag ? room : room2;
-	}
-	else
-	{
-		int x = origin->x | 0x3FF;
-		int y = ((x - origin->x) * dy >> 10) + origin->y;
-		int z = ((x - origin->x) * dz >> 10) + origin->z;
-
-		while (x < target->x)
-		{
-			auto* floor = GetFloor(x, y, z, &room);
-			if (room != room2)
-			{
-				room2 = room;
-				LosRooms[NumberLosRooms] = room;
-				++NumberLosRooms;
-			}
-
-			if (y > GetFloorHeight(floor, x, y, z) || y < GetCeiling(floor, x, y, z))
-			{
-				flag = -1;
-				break;
-			}
-
-			floor = GetFloor(x + 1, y, z, &room);
-			if (room != room2)
-			{
-				room2 = room;
-				LosRooms[NumberLosRooms] = room;
-				++NumberLosRooms;
-			}
-
-			if (y > GetFloorHeight(floor, x + 1, y, z) || y < GetCeiling(floor, x + 1, y, z))
-			{
-				flag = 0;
-				break;
-			}
-
-			x += BLOCK(1);
-			y += dy;
-			z += dz;
-		}
-
-		if (flag != 1)
-		{
-			target->x = x;
-			target->y = y;
-			target->z = z;
-		}
-
-		target->RoomNumber = flag ? room : room2;
-	}
-
-	return flag;
-}
-
-int zLOS(GameVector* origin, GameVector* target)
-{
-	int dz = target->z - origin->z;
-	if (!dz)
-		return 1;
-
-	int dx = ((target->x - origin->x) << 10) / dz;
-	int dy = ((target->y - origin->y) << 10) / dz;
-
-	NumberLosRooms = 1;
-	LosRooms[0] = origin->RoomNumber;
-
-	short room = origin->RoomNumber;
-	short room2 = origin->RoomNumber;
-
-	int flag = 1;
-	if (dz < 0)
-	{
-		int z = origin->z & 0xFFFFFC00;
-		int x = ((z - origin->z) * dx >> 10) + origin->x;
-		int y = ((z - origin->z) * dy >> 10) + origin->y;
-
-		while (z > target->z)
-		{
-			auto* floor = GetFloor(x, y, z, &room);
-			if (room != room2)
-			{
-				room2 = room;
-				LosRooms[NumberLosRooms] = room;
-				++NumberLosRooms;
-			}
-
-			if (y > GetFloorHeight(floor, x, y, z) || y < GetCeiling(floor, x, y, z))
-			{
-				flag = -1;
-				break;
-			}
-
-			floor = GetFloor(x, y, z - 1, &room);
-			if (room != room2)
-			{
-				room2 = room;
-				LosRooms[NumberLosRooms] = room;
-				++NumberLosRooms;
-			}
-
-			if (y > GetFloorHeight(floor, x, y, z - 1) || y < GetCeiling(floor, x, y, z - 1))
-			{
-				flag = 0;
-				break;
-			}
-
-			z -= BLOCK(1);
-			x -= dx;
-			y -= dy;
-		}
-
-		if (flag != 1)
-		{
-			target->x = x;
-			target->y = y;
-			target->z = z;
-		}
-
-		target->RoomNumber = flag ? room : room2;
-	}
-	else
-	{
-		int z = origin->z | 0x3FF;
-		int x = ((z - origin->z) * dx >> 10) + origin->x;
-		int y = ((z - origin->z) * dy >> 10) + origin->y;
-
-		while (z < target->z)
-		{
-			auto* floor = GetFloor(x, y, z, &room);
-			if (room != room2)
-			{
-				room2 = room;
-				LosRooms[NumberLosRooms] = room;
-				++NumberLosRooms;
-			}
-
-			if (y > GetFloorHeight(floor, x, y, z) || y < GetCeiling(floor, x, y, z))
-			{
-				flag = -1;
-				break;
-			}
-
-			floor = GetFloor(x, y, z + 1, &room);
-			if (room != room2)
-			{
-				room2 = room;
-				LosRooms[NumberLosRooms] = room;
-				++NumberLosRooms;
-			}
-
-			if (y > GetFloorHeight(floor, x, y, z + 1) || y < GetCeiling(floor, x, y, z + 1))
-			{
-				flag = 0;
-				break;
-			}
-
-			z += BLOCK(1);
-			x += dx;
-			y += dy;
-		}
-
-		if (flag != 1)
-		{
-			target->x = x;
-			target->y = y;
-			target->z = z;
-		}
-
-		target->RoomNumber = flag ? room : room2;
-	}
-
-	return flag;
 }
 
 bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
