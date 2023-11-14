@@ -320,12 +320,22 @@ namespace TEN::Entities::Generic
 			pointColl = GetCollision(item);
 			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
+			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
+			{
+				waterHeight = g_Level.Rooms[item.RoomNumber].maxceiling;
+			}
+
 			AddPushableBridge(item);
 		}
 		else
 		{
 			pointColl = GetCollision(item);
 			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
+			{
+				waterHeight = g_Level.Rooms[item.RoomNumber].maxceiling;
+			}
 		}
 
 		auto pushableColl = PushableCollisionData{};
