@@ -909,21 +909,21 @@ int Moveable::GetRoomNumber() const
 	return m_item->RoomNumber;
 }
 
-/// Set room number of object 
-// Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
+/// Set the room ID of a moveable.
+// Use this if not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
 // @function Moveable:SetRoomNumber
-// @tparam int ID the ID of the new room 
+// @tparam int roomID New room's ID.
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoomNumber(destinationRoom)
-// sas:SetPosition(destinationPosition, false)
+// sas:SetRoomNumber(newRoomID)
+// sas:SetPosition(newPos, false)
 void Moveable::SetRoomNumber(int roomNumber)
 {	
-	const size_t nRooms = g_Level.Rooms.size();
-	if (roomNumber < 0 || (size_t)roomNumber >= nRooms)
+	int roomCount = (int)g_Level.Rooms.size();
+	if (roomNumber < 0 || roomNumber >= roomCount)
 	{
-		ScriptAssertF(false, "Invalid room number: {}. Value must be in range [0, {})", roomNumber, nRooms);
-		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
+		ScriptAssertF(false, "Invalid room ID {}. Value must be in range [0, {})", roomNumber, roomCount);
+		TENLog("Room ID will not be set.", LogLevel::Warning, LogConfig::All);
 		return;
 	}
 
@@ -935,11 +935,9 @@ void Moveable::SetRoomNumber(int roomNumber)
 	{
 		ItemNewRoom(m_num, roomNumber);
 
-		// HACK: For Lara, we need to manually force Location.roomNumber to new one,
-		// or else camera won't be updated properly.
-
+		// HACK: Must manually force new Location.RoomNumber for player, otherwise camera doesn't update properly.
 		if (m_item->IsLara())
-			m_item->Location.roomNumber = roomNumber;
+			m_item->Location.RoomNumber = roomNumber;
 	}
 }
 
