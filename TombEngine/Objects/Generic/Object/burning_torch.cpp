@@ -96,6 +96,7 @@ namespace TEN::Entities::Generic
 				laraItem->Animation.ActiveState != LS_JUMP_BACK &&
 				laraItem->Animation.ActiveState != LS_JUMP_LEFT &&
 				laraItem->Animation.ActiveState != LS_JUMP_RIGHT ||
+				lara->Control.WaterStatus == WaterStatus::TreadWater ||
 				lara->Control.WaterStatus == WaterStatus::Underwater)
 			{
 				lara->LeftArm.Locked = true;
