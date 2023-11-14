@@ -20,101 +20,106 @@ using namespace TEN::Input;
 
 void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
 	if (IsHeld(In::Forward))
+	{
 		item->Pose.Orientation.x -= ANGLE(3.0f);
+	}
 	else if (IsHeld(In::Back))
+	{
 		item->Pose.Orientation.x += ANGLE(3.0f);
+	}
 
 	if (IsHeld(In::Left))
+	{
 		ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
+	}
 	else if (IsHeld(In::Right))
+	{
 		ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
+	}
 
 	if (IsHeld(In::Action))
 		TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
 
 	if (IsHeld(In::Jump))
 	{
-		item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL * 2;
-		if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX * 2)
-			item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 2;
+		float velCoeff = IsHeld(In::Sprint) ? 2.5f : 1.0f;
+
+		item->Animation.Velocity.y += (LARA_SWIM_VELOCITY_ACCEL * 4) * velCoeff;
+		if (item->Animation.Velocity.y > (LARA_SWIM_VELOCITY_MAX * 2) * velCoeff)
+			item->Animation.Velocity.y = (LARA_SWIM_VELOCITY_MAX * 2) * velCoeff;
 	}
 	else
 	{
 		if (item->Animation.Velocity.y >= LARA_SWIM_VELOCITY_ACCEL)
-			item->Animation.Velocity.y -= item->Animation.Velocity.y / 8;
-		else
-			item->Animation.Velocity.y = 0;
-	}
-}
-
-void LaraCheatyBits(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (g_GameFlow->IsFlyCheatEnabled())
-	{
-		static bool dbFlyCheat = true;
-		if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 		{
-			if (lara->Context.Vehicle == NO_ITEM)
-			{
-				LaraCheatGetStuff(item);
-				DelsGiveLaraItemsCheat(item);
-
-				item->Pose.Position.y -= CLICK(0.5f);
-
-				if (lara->Control.WaterStatus != WaterStatus::FlyCheat)
-				{
-					SetAnimation(item, LA_DOZY);
-					item->Animation.IsAirborne = false;
-					item->Animation.Velocity.y = 30;
-					item->Pose.Orientation.x = ANGLE(30.0f);
-					item->HitPoints = LARA_HEALTH_MAX;
-
-					ResetPlayerFlex(item);
-					lara->Control.WaterStatus = WaterStatus::FlyCheat;
-					lara->Control.Count.Death = 0;
-					lara->Status.Air = LARA_AIR_MAX;
-					lara->Status.Poison = 0;
-					lara->Status.Stamina = LARA_STAMINA_MAX;
-				}
-			}
-			else
-				SayNo();
+			item->Animation.Velocity.y -= item->Animation.Velocity.y / 8;
 		}
-		dbFlyCheat = KeyMap[OIS::KeyCode::KC_O] ? false : true;
+		else
+		{
+			item->Animation.Velocity.y = 0.0f;
+		}
 	}
 }
 
-void LaraCheatGetStuff(ItemInfo* item)
+static void GivePlayerItemsCheat(ItemInfo& item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(item);
 
-	lara->Inventory.TotalFlares = -1;
-	lara->Inventory.TotalSmallMedipacks = -1;
-	lara->Inventory.TotalLargeMedipacks = -1;
+	for (int i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
+			player.Inventory.Puzzles[i] = true;
+
+		player.Inventory.PuzzlesCombo[2 * i] = false;
+		player.Inventory.PuzzlesCombo[(92 * i) + 1] = false;
+	}
+
+	for (int i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_KEY_ITEM1 + i].loaded)
+			player.Inventory.Keys[i] = true;
+
+		player.Inventory.KeysCombo[2 * i] = false;
+		player.Inventory.KeysCombo[(2 * i) + 1] = false;
+	}
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
+			player.Inventory.Pickups[i] = true;
+
+		player.Inventory.PickupsCombo[2 * i] = false;
+		player.Inventory.PickupsCombo[(2 * i) + 1] = false;
+	}
+}
+
+static void GivePlayerWeaponsCheat(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	player.Inventory.TotalFlares = -1;
+	player.Inventory.TotalSmallMedipacks = -1;
+	player.Inventory.TotalLargeMedipacks = -1;
 
 	if (Objects[ID_CROWBAR_ITEM].loaded)
-		lara->Inventory.HasCrowbar = true;
+		player.Inventory.HasCrowbar = true;
 
 	if (Objects[ID_LASERSIGHT_ITEM].loaded)
-		lara->Inventory.HasLasersight = true;
+		player.Inventory.HasLasersight = true;
 
 	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
-		lara->Inventory.BeetleComponents |= BEETLECOMP_FLAG_BEETLE;
+		player.Inventory.BeetleComponents |= BEETLECOMP_FLAG_BEETLE;
 
 	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
-		lara->Inventory.SmallWaterskin = 1;
+		player.Inventory.SmallWaterskin = 1;
 
 	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
-		lara->Inventory.BigWaterskin = 1;
+		player.Inventory.BigWaterskin = 1;
 
 	if (Objects[ID_PISTOLS_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::Pistol];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Pistol];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -125,7 +130,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_REVOLVER_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::Revolver];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Revolver];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -136,7 +141,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_UZI_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::Uzi];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Uzi];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -147,7 +152,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_SHOTGUN_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::Shotgun];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Shotgun];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -159,7 +164,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_HARPOON_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::HarpoonGun];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::HarpoonGun];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -170,7 +175,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_GRENADE_GUN_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::GrenadeLauncher];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -182,7 +187,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_ROCKET_LAUNCHER_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::RocketLauncher];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::RocketLauncher];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -193,7 +198,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_HK_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::HK];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::HK];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -205,7 +210,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 	if (Objects[ID_CROSSBOW_ITEM].loaded)
 	{
-		auto& weapon = lara->Weapons[(int)LaraWeaponType::Crossbow];
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Crossbow];
 
 		weapon.Present = true;
 		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -217,34 +222,39 @@ void LaraCheatGetStuff(ItemInfo* item)
 	}
 }
 
-void DelsGiveLaraItemsCheat(ItemInfo* item)
+void HandlePlayerFlyCheat(ItemInfo& item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(item);
 
-	for (int i = 0; i < 8; ++i)
+	if (!g_GameFlow->IsFlyCheatEnabled())
+		return;
+
+	static bool dbFlyCheat = true;
+	if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 	{
-		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
-			lara->Inventory.Puzzles[i] = true;
+		if (player.Context.Vehicle == NO_ITEM)
+		{
+			GivePlayerItemsCheat(item);
+			GivePlayerWeaponsCheat(item);
 
-		lara->Inventory.PuzzlesCombo[2 * i] = false;
-		lara->Inventory.PuzzlesCombo[2 * i + 1] = false;
+			if (player.Control.WaterStatus != WaterStatus::FlyCheat)
+			{
+				SetAnimation(item, LA_DOZY);
+				item.Animation.IsAirborne = false;
+				item.HitPoints = LARA_HEALTH_MAX;
+
+				ResetPlayerFlex(&item);
+				player.Control.WaterStatus = WaterStatus::FlyCheat;
+				player.Control.Count.Death = 0;
+				player.Status.Air = LARA_AIR_MAX;
+				player.Status.Poison = 0;
+				player.Status.Stamina = LARA_STAMINA_MAX;
+			}
+		}
+		else
+		{
+			SayNo();
+		}
 	}
-
-	for (int i = 0; i < 8; ++i)
-	{
-		if (Objects[ID_KEY_ITEM1 + i].loaded)
-			lara->Inventory.Keys[i] = true;
-
-		lara->Inventory.KeysCombo[2 * i] = false;
-		lara->Inventory.KeysCombo[2 * i + 1] = false;
-	}
-
-	for (int i = 0; i < 3; ++i)
-	{
-		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
-			lara->Inventory.Pickups[i] = true;
-
-		lara->Inventory.PickupsCombo[2 * i] = false;
-		lara->Inventory.PickupsCombo[2 * i + 1] = false;
-	}
+	dbFlyCheat = !KeyMap[OIS::KeyCode::KC_O];
 }

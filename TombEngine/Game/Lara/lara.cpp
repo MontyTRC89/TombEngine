@@ -593,18 +593,16 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	if (isTitle && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 
-	// HACK: backup controls until proper control lock 
-	// is implemented -- Lwmte, 07.12.22
-
+	// HACK: backup controls until proper control lock is implemented -- Lwmte, 07.12.22
 	auto actionMap = ActionMap;
 
 	if (isTitle)
 		ClearAllActions();
 
-	// Control Lara.
+	// Control player.
 	InItemControlLoop = true;
 	LaraControl(item, &LaraCollision);
-	LaraCheatyBits(item);
+	HandlePlayerFlyCheat(*item);
 	InItemControlLoop = false;
 	KillMoveItems();
 
