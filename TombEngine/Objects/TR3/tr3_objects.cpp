@@ -8,6 +8,7 @@
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR3/Entity/gun_turret.h"
 #include "Objects/TR3/Entity/Compsognathus.h" // OK
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
@@ -330,6 +331,19 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
 		obj->SetHitEffect();
+	}
+
+	obj = &Objects[ID_GUN_TURRET];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitialiseGunTurret;
+		obj->control = GunTurretControl;
+		obj->HitRoutine = GunTurretHit;
+		obj->HitPoints = 28;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(0, ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_PUNA_BOSS];
