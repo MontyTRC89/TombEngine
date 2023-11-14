@@ -115,7 +115,7 @@ namespace TEN::Entities::Effects
 					if (pauseTimer)
 					{
 						if (jetFlameVelocity)
-							jetFlameVelocity = jetFlameVelocity - (jetFlameVelocity / 4);
+							jetFlameVelocity = jetFlameVelocity - (jetFlameVelocity >> 2);
 
 						if (alphaSmallFlame > 0)
 							alphaSmallFlame -= 8;
@@ -130,9 +130,9 @@ namespace TEN::Entities::Effects
 					{
 						if (!--flameTimer)
 						{
-							pauseTimer = (ocb % 8 == 0)?						//If pauseTimer is multiple of 8
+							pauseTimer = (ocb >> 3)?						//If pauseTimer is multiple of 8
 								(GetRandomControl() & 0x3F) + 60 :				//Then do a pause of 60 frames plus random 0-63
-								(GetRandomControl() & 0x1F) + 30 * (ocb / 8);	//Else do a pause of 30 * ocb/8 frames plus random 0-31
+								(GetRandomControl() & 0x1F) + 30 * (ocb >> 3);	//Else do a pause of 30 * ocb/8 frames plus random 0-31
 						}
 
 						if (alphaSmallFlame < 255)
