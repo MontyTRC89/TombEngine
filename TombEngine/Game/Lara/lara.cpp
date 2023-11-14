@@ -571,17 +571,17 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 			(player.Context.WaterSurfaceDist > 0 && player.Context.WaterSurfaceDist != NO_HEIGHT))
 		{
 			SetAnimation(item, LA_UNDERWATER_IDLE);
-			ResetPlayerFlex(item);
 			player.Control.WaterStatus = WaterStatus::Underwater;
 		}
 		else
 		{
 			SetAnimation(item, LA_STAND_IDLE);
-			ResetPlayerFlex(item);
 			item->Pose.Orientation.x = 0;
 			item->Pose.Orientation.z = 0;
 			player.Control.WaterStatus = WaterStatus::Dry;
 		}
+
+		ResetPlayerFlex(item);
 
 		InitializeLaraMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
