@@ -221,7 +221,6 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	// TODO: No GetRandomControl().
 	// TODO: Demagic.
 	// TODO: Smoke and sparks.
 	static void SpawnDragonFireBreath(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
@@ -247,11 +246,11 @@ namespace TEN::Entities::Creatures::TR2
 			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex;
 
 			fire.on = true;
-			fire.sR = 255 - (GetRandomControl() & 0x1F);
+			fire.sR = 255 - Random::GenerateInt(0, 31);
 			fire.sG = 64;
 			fire.sB = 38;
-			fire.dR = 128 + (GetRandomControl() & 0x3F);
-			fire.dG = 80 + (GetRandomControl() & 0x3F);
+			fire.dR = 128 + Random::GenerateInt(0, 63);
+			fire.dG = 80 + Random::GenerateInt(0, 63);
 			fire.dB = 32;
 			fire.colFadeSpeed = 12;
 			fire.fadeToBlack = 8;
@@ -261,7 +260,7 @@ namespace TEN::Entities::Creatures::TR2
 			fire.y = pos.y;
 			fire.z = pos.z;
 
-			int v = (GetRandomControl() & 0x3F) + 192;
+			int v = Random::GenerateInt(0, 63) + 192;
 			fire.life =
 			fire.sLife = v / 6;
 
@@ -270,12 +269,12 @@ namespace TEN::Entities::Creatures::TR2
 			fire.zVel = v * (dir.z) / 10;
 
 			fire.friction = 85;
-			fire.gravity = -16 - (GetRandomControl() & 0x1F);
+			fire.gravity = -16 - Random::GenerateInt(0, 31);
 			fire.maxYvel = 0;
 			fire.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
 			fire.scalar = 6;
-			fire.dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
+			fire.dSize = (v * Random::GenerateFloat(60.0f, 67.0f)) / 256;
 			fire.sSize = fire.dSize / 4;
 			fire.size = fire.dSize;
 		}

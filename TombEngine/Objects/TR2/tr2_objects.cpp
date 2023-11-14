@@ -451,7 +451,7 @@ static void StartEntity(ObjectInfo* obj)
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_FRONT");
 		obj->collision = CollideDragon;
 		obj->radius = 256;
-		obj->SetupHitEffect(false, true);
+		obj->SetHitEffect(false, true);
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];
