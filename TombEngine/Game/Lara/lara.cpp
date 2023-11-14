@@ -345,7 +345,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Handle look-around.
-	if (((IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None) ||
+	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
 			(lara->Control.Look.IsUsingBinoculars || lara->Control.Look.IsUsingLasersight)) &&
 		lara->ExtraAnim == NO_ITEM)
 	{
@@ -415,7 +415,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
-	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
+	// Handle look-around.
+	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 	{
 		HandlePlayerLookAround(*item);
 	}
@@ -486,7 +487,8 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
-	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
+	// Handle look-around.
+	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 	{
 		HandlePlayerLookAround(*item);
 	}

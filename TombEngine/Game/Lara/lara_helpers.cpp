@@ -424,14 +424,18 @@ bool CanPlayerLookAround(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// 1) Check if drawn weapon has lasersight.
+	// 1) Check if look mode is not None.
+	if (player.Control.Look.Mode == LookMode::None)
+		return false;
+
+	// 2) Check if drawn weapon has lasersight.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
 	{
 		return true;
 	}
 
-	// 2) Test for switchable target.
+	// 3) Test for switchable target.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
@@ -497,7 +501,7 @@ static void SetPlayerOptics(ItemInfo* item)
 		breakOptics = false;
 	}
 
-	// If lasersight, and Look is not pressed, exit optics.
+	// If lasersight and Look is not held, exit optics.
 	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
 		breakOptics = true;
 
@@ -517,6 +521,7 @@ static void SetPlayerOptics(ItemInfo* item)
 			player.Control.Look.IsUsingBinoculars = true;
 			player.Control.Look.IsUsingLasersight = true;
 			player.Inventory.IsBusy = true;
+
 			BinocularOldCamera = Camera.oldType;
 			return;
 		}
@@ -525,7 +530,7 @@ static void SetPlayerOptics(ItemInfo* item)
 	if (!breakOptics)
 		return;
 
-	// Noth using optics; return early.
+	// Not using optics; return early.
 	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
 		return;
 
@@ -559,9 +564,6 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
 
 	auto& player = GetLaraInfo(item);
-
-	if (!CanPlayerLookAround(item))
-		return;
 
 	// Set optics.
 	Camera.type = CameraType::Look;
