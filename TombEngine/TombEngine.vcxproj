@@ -711,6 +711,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererPolygon.h" />
     <ClInclude Include="Renderer\Structures\RendererRectangle.h" />
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\Structures\RendererRoomAmbientMap.h" />
     <ClInclude Include="Renderer\Structures\RendererRoomNode.h" />
     <ClInclude Include="Renderer\Structures\RendererSortableObject.h" />
     <ClInclude Include="Renderer\Structures\RendererSprite.h" />
@@ -1478,6 +1479,11 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\GBuffer.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\RoomAmbient.fx">
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>

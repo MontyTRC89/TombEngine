@@ -102,7 +102,9 @@ enum class TextureRegister
 	ShadowMap = 3,
 	ReflectionMap = 4,
 	Hud = 5,
-	DepthMap = 6
+	DepthMap = 6,
+	EnvironmentMapFront = 7,
+	EnvironmentMapBack = 8
 };
 
 enum class SamplerStateRegister
@@ -156,7 +158,8 @@ enum class RendererPass
 	Transparent,
 	CollectTransparentFaces,
 	Additive,
-	GBuffer
+	GBuffer,
+	RoomAmbient
 };
 
 enum class SpriteRenderType
@@ -232,3 +235,6 @@ constexpr auto MAX_ITEMS_DRAW = 128;
 constexpr auto MAX_LIGHTS_DRAW = 48;
 constexpr auto MAX_FOG_BULBS_DRAW = 32;
 constexpr auto MAX_SPRITES_DRAW = 512;
+
+constexpr auto ROOM_AMBIENT_MAP_SIZE = 128;
+constexpr auto MAX_ROOM_AMBIENT_MAPS = 10;

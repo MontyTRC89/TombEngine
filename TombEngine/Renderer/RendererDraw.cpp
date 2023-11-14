@@ -1517,12 +1517,41 @@ namespace TEN::Renderer
 		_context->IASetInputLayout(_inputLayout.Get());
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+		int ambientMapCacheIndex = -1;
+		for (int i = 0; i < MAX_ROOM_AMBIENT_MAPS; i++)
+		{
+			if (_roomAmbientMapsCache[i].RoomNumber == LaraItem->RoomNumber)
+			{
+				ambientMapCacheIndex = i;
+				break;
+			}
+		}
+
+		if (ambientMapCacheIndex == -1)
+		{
+			for (int i = 0; i < MAX_ROOM_AMBIENT_MAPS; i++)
+			{
+				if (_roomAmbientMapsCache[i].RoomNumber == NO_ROOM)
+				{
+					ambientMapCacheIndex = i;
+					break;
+				}
+			}
+
+			if (ambientMapCacheIndex == -1)
+			{
+				ambientMapCacheIndex = 0;
+			}
+
+			_roomAmbientMapsCache[ambientMapCacheIndex].RoomNumber = LaraItem->RoomNumber;
+
+			RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Front, LaraItem->Pose.Position.ToVector3(), 1);
+			RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Back, LaraItem->Pose.Position.ToVector3(), -1);
+		}
+
 		// Bind and clear render target.
 		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-		_context->ClearRenderTargetView(_depthMap.RenderTargetView.Get(), Colors::White);
-		_context->ClearDepthStencilView(_depthMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
@@ -1562,9 +1591,7 @@ namespace TEN::Renderer
 		ID3D11RenderTargetView* pRenderViewPtrs[2];
 
 		// Bind the main render target
-		pRenderViewPtrs[0] = _renderTarget.RenderTargetView.Get();
-		pRenderViewPtrs[1] = _depthMap.RenderTargetView.Get();
-		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
+		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 
 		// Draw horizon and sky.
 		DrawHorizonAndSky(view, _renderTarget.DepthStencilView.Get());
@@ -1670,43 +1697,250 @@ namespace TEN::Renderer
 		time2 = std::chrono::high_resolution_clock::now();
 		_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
+
+
+		_spriteBatch->Begin();
 		
+		RECT rect;
+		rect.left = 0;
+		rect.top = 0;
+		rect.right = 512;
+		rect.bottom = 512;
+
+		_spriteBatch->Draw(_roomAmbientMapsCache[ambientMapCacheIndex].Front.ShaderResourceView.Get(), rect);
+
+		rect.left = 0;
+		rect.top = 512;
+		rect.right = 512;
+		rect.bottom = 1024;
+
+		_spriteBatch->Draw(_roomAmbientMapsCache[ambientMapCacheIndex].Back.ShaderResourceView.Get(), rect);
+
+		_spriteBatch->End();
+
 		DrawDebugInfo(view);
 		DrawAllStrings();
 
 		ClearScene();
 	}
 
-	void Renderer::RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-									   RenderView& view)
+	void Renderer::RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere)
 	{
-		CollectRooms(view, true);
-		// Draw shadow map
+		// Reset GPU state
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
 
+		// Bind and clear render target
+		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::CornflowerBlue);
+		_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), renderTarget->DepthStencilView.Get());
+
+		D3D11_VIEWPORT viewport;
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = ROOM_AMBIENT_MAP_SIZE;
+		viewport.Height = ROOM_AMBIENT_MAP_SIZE;
+		viewport.MinDepth = 0;
+		viewport.MaxDepth = 1;
+
+		_context->RSSetViewports(1, &viewport);
+
+		D3D11_RECT rects[1];
+		rects[0].left = 0;
+		rects[0].right = ROOM_AMBIENT_MAP_SIZE;
+		rects[0].top = 0;
+		rects[0].bottom = ROOM_AMBIENT_MAP_SIZE;
+
+		_context->RSSetScissorRects(1, rects);
+
+		// Opaque geometry
+		SetBlendMode(BlendMode::Opaque);
+
+		if (emisphere == -1)
+		{
+			SetCullMode(CullMode::CounterClockwise);
+		}
+		else
+		{
+			SetCullMode(CullMode::Clockwise);
+		}
+
+		RenderView view = RenderView(&Camera, 0, PI / 2.0f, 32, DEFAULT_FAR_VIEW, ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE);
+
+		CCameraMatrixBuffer cameraConstantBuffer;
+		cameraConstantBuffer.View = Matrix::CreateLookAt(position, position + Vector3(0, 0, 1024), -Vector3::UnitY);
+		cameraConstantBuffer.Emisphere = emisphere;
+		view.FillConstantBuffer(cameraConstantBuffer);
+		_cbCameraMatrices.updateData(cameraConstantBuffer, _context.Get());
+
+		DrawHorizonAndSky(view, _renderTarget.DepthStencilView.Get());
+
+		_context->VSSetShader(_vsRoomAmbient.Get(), nullptr, 0);
+		_context->PSSetShader(_psRoomAmbient.Get(), nullptr, 0);
+
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+		// Bind vertex and index buffer.
+		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		for (int i = 0; i < _rooms.size(); i++)
+		{
+			int index = i;
+			RendererRoom* room = &_rooms[index];
+			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+
+			cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[_rooms[i].RoomNumber].flags & ENV_FLAG_WATER;
+			_cbCameraMatrices.updateData(cameraConstantBuffer, _context.Get());
+
+			_stRoom.Caustics = 0;
+			_stRoom.AmbientColor = room->AmbientLight;
+			_stRoom.NumRoomLights = 0;
+			_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
+			_cbRoom.updateData(_stRoom, _context.Get());
+
+			for (auto& bucket : room->Buckets)
+			{
+				if (bucket.NumVertices == 0)
+				{
+					continue;
+				}
+
+				SetBlendMode(bucket.BlendMode);
+				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+
+				if (bucket.Animated)
+				{
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_animatedTextures[bucket.Texture]),
+						SamplerStateRegister::AnisotropicClamp);
+				}
+				else
+				{
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
+						SamplerStateRegister::AnisotropicClamp);
+				}
+
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+				_numRoomsDrawCalls++;
+			}
+		}
+
+		ResetScissor();
+		SetCullMode(CullMode::CounterClockwise);
+	}
+
+	void Renderer::RenderSimpleScene(RenderTarget2D renderTarget, int emisphere, RenderView& view)
+	{
+		//CollectRooms(view, true);
+		// Draw shadow map
+		 
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
 		// Bind and clear render target
 
-		_context->ClearRenderTargetView(target, Colors::Black);
-		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		_context->OMSetRenderTargets(1, &target, depthTarget);
+		_context->ClearRenderTargetView(renderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->ClearDepthStencilView(renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		_context->OMSetRenderTargets(1, renderTarget.RenderTargetView.GetAddressOf(), renderTarget.DepthStencilView.Get());
 
-		_context->RSSetViewports(1, &view.Viewport);
-		ResetScissor();
+		D3D11_VIEWPORT viewport;
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = 64;
+		viewport.Height = 64;
+		viewport.MinDepth = 0;
+		viewport.MaxDepth = 1;
+
+		_context->RSSetViewports(1, &viewport);
+	
+		D3D11_RECT rects[1];
+		rects[0].left = 0;
+		rects[0].right = 64;
+		rects[0].top = 0;
+		rects[0].bottom = 64;
+
+		_context->RSSetScissorRects(1, rects);
 
 		// Opaque geometry
 		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
+
+		if (emisphere == -1)
+		{
+			SetCullMode(CullMode::CounterClockwise);
+		}
+		else
+		{
+			SetCullMode(CullMode::Clockwise);
+		}
 
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.FillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
+		cameraConstantBuffer.View = Matrix::CreateLookAt(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z),
+			Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z + 1024), -Vector3::UnitY);
+		cameraConstantBuffer.Emisphere = emisphere;
 		_cbCameraMatrices.updateData(cameraConstantBuffer, _context.Get());
 		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
-		DrawHorizonAndSky(view, depthTarget);
-		DrawRooms(view, RendererPass::Opaque);
+		DrawHorizonAndSky(view, _renderTarget.DepthStencilView.Get());
+
+		_context->VSSetShader(_vsRoomAmbient.Get(), nullptr, 0);
+		_context->PSSetShader(_psRoomAmbient.Get(), nullptr, 0);
+
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+		// Bind vertex and index buffer.
+		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		for (int i = 0; i < _rooms.size(); i++)
+		{
+			int index = i;
+			RendererRoom* room = &_rooms[index];
+			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+
+			_stRoom.Caustics = 0;
+			_stRoom.AmbientColor = room->AmbientLight;
+			_stRoom.NumRoomLights = 0;
+
+			_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
+			_cbRoom.updateData(_stRoom, _context.Get());
+
+			//SetScissor(room->ClipBounds);
+
+			for (auto& bucket : room->Buckets)
+			{
+				if (bucket.NumVertices == 0)
+				{
+					continue;
+				}
+
+				SetBlendMode(bucket.BlendMode);
+				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+
+				if (bucket.Animated)
+				{
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_animatedTextures[bucket.Texture]),
+						SamplerStateRegister::AnisotropicClamp);
+				}
+				else
+				{
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
+						SamplerStateRegister::AnisotropicClamp);
+				}
+
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+				_numRoomsDrawCalls++;
+			}
+
+			ResetScissor();
+		}
+
+		SetCullMode(CullMode::CounterClockwise);
 	}
 
 	void Renderer::DumpGameScene()
@@ -2468,11 +2702,11 @@ namespace TEN::Renderer
 				for (auto& bucket : meshPtr->Buckets)
 				{
 					if (bucket.NumVertices == 0)
+					{
 						continue;
+					}
 
 					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-						SamplerStateRegister::AnisotropicClamp);
-					BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]),
 						SamplerStateRegister::AnisotropicClamp);
 
 					// Always render horizon as alpha-blended surface.

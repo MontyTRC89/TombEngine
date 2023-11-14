@@ -62,6 +62,7 @@
 #include "Renderer/Structures/RendererSpriteBucket.h"
 #include "Renderer/Structures/RendererLine2D.h"
 #include "Renderer/Structures/RendererHudBar.h"
+#include "Renderer/Structures/RendererRoomAmbientMap.h"
 
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
@@ -104,11 +105,9 @@ namespace TEN::Renderer
 		// Render targets
 		RenderTarget2D _normalMapRenderTarget;
 		RenderTarget2D _depthRenderTarget;
-
 		RenderTarget2D _backBuffer;
 		RenderTarget2D _dumpScreenRenderTarget;
 		RenderTarget2D _renderTarget;
-		RenderTarget2D _depthMap;
 		RenderTarget2D _transparencyRenderTarget;
 		RenderTarget2D _weightRenderTarget;
 		RenderTargetCube _reflectionCubemap;
@@ -151,6 +150,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11VertexShader> _vsTransparentFinalPass;
 		ComPtr<ID3D11PixelShader> _psTransparentFinalPass;
 		ComPtr<ID3D11PixelShader> _psGBuffer;
+		ComPtr<ID3D11VertexShader> _vsRoomAmbient;
+		ComPtr<ID3D11PixelShader> _psRoomAmbient;
 
 		// Constant buffers
 		RenderView _gameCamera;
@@ -307,6 +308,7 @@ namespace TEN::Renderer
 		CullMode _lastCullMode;
 
 		std::vector<RendererSpriteBucket> _spriteBuckets;
+		std::vector<RendererRoomAmbientMap> _roomAmbientMapsCache;
 
 		// Private functions
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);
@@ -512,7 +514,8 @@ namespace TEN::Renderer
 		void Lock();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
-		void RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
+		void RenderSimpleScene(RenderTarget2D renderTarget, int emisphere, RenderView& view);
+		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();
 		void RenderInventory();
 		void RenderScene(RenderTarget2D* renderTarget, RenderView& view);

@@ -26,6 +26,7 @@ namespace TEN::Renderer::ConstantBuffers
 		alignas(16) unsigned int Frame;
 		alignas(4) unsigned int RoomNumber;
 		alignas(4) unsigned int CameraUnderwater;
+		alignas(4) int Emisphere;
 		//--
 		alignas(16) Vector4 FogColor;
 		alignas(4) int FogMinDistance;

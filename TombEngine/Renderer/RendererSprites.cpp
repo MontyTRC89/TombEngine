@@ -286,7 +286,7 @@ namespace TEN::Renderer
 			return;
 		}
 
-		BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthMap, SamplerStateRegister::LinearClamp);
+		BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::None);

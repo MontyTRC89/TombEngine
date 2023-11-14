@@ -43,6 +43,13 @@ SamplerState NormalTextureSampler : register(s1);
 Texture2D CausticsTexture : register(t2);
 SamplerState CausticsTextureSampler : register(s2);
 
+Texture2D AmbientMapFrontTexture : register(t7);
+SamplerState AmbientMapFrontSampler : register(s7);
+
+Texture2D AmbientMapBackTexture : register(t8);
+SamplerState AmbientMapBackSampler : register(s8);
+
+
 struct PixelShaderOutput
 {
 	float4 Color: SV_TARGET0;
@@ -118,7 +125,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	PixelShaderOutput output;
 
 	output.Color = Texture.Sample(Sampler, input.UV);
-	
+
 	DoAlphaTest(output.Color);
 
 	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
