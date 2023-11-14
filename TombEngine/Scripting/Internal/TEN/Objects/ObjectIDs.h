@@ -1191,7 +1191,6 @@ Table of constants.
 @table PickupConstants
 */
 
-// TODO: Keys should be IDs, not name strings.
 static const std::unordered_map<std::string, GAME_OBJECT_ID> OBJECT_ID_NAME_MAP
 {
 	{ "LARA", ID_LARA },
