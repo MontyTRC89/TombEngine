@@ -47,8 +47,6 @@ static int xLOS(const GameVector& origin, GameVector& target)
 	int flag = 1;
 	while (isNegative ? (x > target.x) : (x < target.x))
 	{
-		g_Renderer.AddSphere(Vector3(x, y, z), 20, Vector4(0, 0, 1, 1));
-
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
 		{
@@ -116,8 +114,6 @@ static int zLOS(const GameVector& origin, GameVector& target)
 	int flag = 1;
 	while (isNegative ? (z > target.z) : (z < target.z))
 	{
-		g_Renderer.AddSphere(Vector3(x, y, z), 20, Vector4(1, 0, 0, 1));
-
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
 		{
@@ -179,7 +175,7 @@ bool LOS(GameVector* origin, GameVector* target)
 
 	if (losAxis1)
 	{
-		const auto& sector = *GetFloor(target->x, target->y, target->z, &target->RoomNumber);
+		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
 		if (ClipTarget(origin, target) && losAxis0 == 1 && losAxis1 == 1)
 			return true;
