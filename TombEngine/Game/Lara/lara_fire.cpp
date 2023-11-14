@@ -793,7 +793,6 @@ void HandleWeapon(ItemInfo& laraItem)
 				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
 
 				//Test Animations Exceptions for flare pose
-
 				const auto currentLaraAnim = laraItem.Animation.AnimNumber;
 				for (const auto& currentExceptionAnim : FlarePoseAnimationExceptions)
 				{
