@@ -197,26 +197,6 @@ std::optional<int> FloorInfo::GetRoomNumberAtSide() const
 	return std::nullopt;
 }
 
-// TEMP
-int FloorInfo::GetSurfaceHeight(int triangleID, int x, int z, bool isFloor, bool tempJustHere) const
-{
-	// Get triangle.
-	const auto& surface = isFloor ? FloorSurface : CeilingSurface;
-	const auto& triangle = surface.Triangles[triangleID];
-
-	// MICRO-OPTIMIZATION: Triangle is flat; return plane height.
-	auto normal = triangle.Plane.Normal();
-	if (normal == Vector3::UnitY || normal == -Vector3::UnitY)
-		return triangle.Plane.D();
-
-	// Calculate relative plane height at intersection using plane equation.
-	auto sectorPoint = GetSectorPoint(x, z);
-	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
-
-	// Return surface height.
-	return (triangle.Plane.D() + relPlaneHeight);
-}
-
 int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 {
 	// Get triangle.

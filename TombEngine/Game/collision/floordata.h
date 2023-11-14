@@ -147,9 +147,6 @@ public:
 	std::optional<int> GetRoomNumberBelow(const Vector3i& pos) const;
 	std::optional<int> GetRoomNumberAtSide() const;
 
-	// TEMP
-	int GetSurfaceHeight(int triangleID, int x, int z, bool isFloor, bool tempJustHere) const;
-
 	int GetSurfaceHeight(int x, int z, bool isFloor) const;
 	int GetSurfaceHeight(const Vector3i& pos, bool isFloor) const;
 	int GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const;
