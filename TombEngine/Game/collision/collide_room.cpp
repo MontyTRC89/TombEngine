@@ -176,7 +176,7 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3&
 	auto point = Geometry::TranslatePoint(pos, dir, dist);
 
 	short tempRoomNumber = roomNumber;
-	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->RoomNumber, pos.y };
 	int adjacentRoomNumber = GetRoom(location, Vector3i(pos.x, point.y, pos.z)).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }

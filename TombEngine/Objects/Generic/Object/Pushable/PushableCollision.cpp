@@ -94,7 +94,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		// 5) Test floor slope. TODO: Check slope angles of normals directly.
-		if ((pointColl.Block->GetSurfaceNormal(0, true) != -Vector3::UnitY) || (pointColl.Block->GetSurfaceNormal(1, true) != Vector3::UnitY))
+		if ((pointColl.Block->GetSurfaceNormal(0, true) != -Vector3::UnitY) || (pointColl.Block->GetSurfaceNormal(1, true) != -Vector3::UnitY))
 			return false;
 
 		// Check for stopper flag.
