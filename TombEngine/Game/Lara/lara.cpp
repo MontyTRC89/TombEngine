@@ -555,36 +555,37 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	item->HitPoints = LARA_HEALTH_MAX;
-	lara->Status.Air = LARA_AIR_MAX;
-	lara->Status.Exposure = LARA_EXPOSURE_MAX;
-	lara->Status.Poison = 0;
-	lara->Status.Stamina = LARA_STAMINA_MAX;
+	player.Status.Air = LARA_AIR_MAX;
+	player.Status.Exposure = LARA_EXPOSURE_MAX;
+	player.Status.Poison = 0;
+	player.Status.Stamina = LARA_STAMINA_MAX;
 	
 	LaraUnderwater(item, coll);
 
 	if (IsHeld(In::Walk) && !IsHeld(In::Look))
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara->Context.WaterSurfaceDist > 0 && lara->Context.WaterSurfaceDist != NO_HEIGHT))
+		if (TestEnvironment(ENV_FLAG_WATER, item) ||
+			(player.Context.WaterSurfaceDist > 0 && player.Context.WaterSurfaceDist != NO_HEIGHT))
 		{
 			SetAnimation(item, LA_UNDERWATER_IDLE);
 			ResetPlayerFlex(item);
-			lara->Control.WaterStatus = WaterStatus::Underwater;
+			player.Control.WaterStatus = WaterStatus::Underwater;
 		}
 		else
 		{
-			SetAnimation(item, LA_STAND_SOLID);
+			SetAnimation(item, LA_STAND_IDLE);
+			ResetPlayerFlex(item);
 			item->Pose.Orientation.x = 0;
 			item->Pose.Orientation.z = 0;
-			ResetPlayerFlex(item);
-			lara->Control.WaterStatus = WaterStatus::Dry;
+			player.Control.WaterStatus = WaterStatus::Dry;
 		}
 
 		InitializeLaraMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
-		lara->Control.HandStatus = HandStatus::Free;
+		player.Control.HandStatus = HandStatus::Free;
 	}
 }
 
