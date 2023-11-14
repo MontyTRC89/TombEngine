@@ -1,3 +1,5 @@
+//DEPRECATED CODE, ONLY FOR REFERENCE, TO BE DELETED BY THE END OF THE BRANCH
+
 #pragma once
 
 struct CollisionInfo;

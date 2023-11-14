@@ -517,6 +517,8 @@ namespace TEN::Entities::Creatures::TR2
 		SyncDragonBackSegment(item);
 	}
 
+
+	// TODO: Fix, now this function is activating also in the back part, causing a crash due broken pointers to another non-existent backItem.
 	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];

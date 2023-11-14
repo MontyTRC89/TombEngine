@@ -1,3 +1,6 @@
+//DEPRECATED CODE, ONLY FOR REFERENCE, TO BE DELETED BY THE END OF THE BRANCH
+
+
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_dragon.h"
 
