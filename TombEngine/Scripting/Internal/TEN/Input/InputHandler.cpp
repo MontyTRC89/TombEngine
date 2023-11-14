@@ -88,14 +88,14 @@ namespace TEN::Scripting::Input
 	}
 
 	/// Get the display position of the cursor in percent.
-	// @function GetCursorDisplayPosition()
+	// @function GetMouseDisplayPosition()
 	// @treturn Vec2 Cursor display position in percent.
-	static Vec2 GetCursorDisplayPosition()
+	static Vec2 GetMouseDisplayPosition()
 	{
 		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
 		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
 
-		auto cursorPos = GetCursor2DPosition();
+		auto cursorPos = GetMouse2DPosition();
 		cursorPos = Vector2(cursorPos.x / DISPLAY_SPACE_RES.x, cursorPos.y / DISPLAY_SPACE_RES.y) * 100;
 		return Vec2(cursorPos);
 	}
@@ -111,7 +111,8 @@ namespace TEN::Scripting::Input
 		table.set_function(ScriptReserved_KeyPush, &KeyPush);
 		table.set_function(ScriptReserved_KeyClear, &KeyClear);
 
-		table.set_function(ScriptReserved_GetCursorDisplayPosition, &GetCursorDisplayPosition);
+		table.set_function(ScriptReserved_GetMouseDisplayPosition, &GetMouseDisplayPosition);
+		table.set_function(ScriptReserved_GetCursorDisplayPosition, &GetMouseDisplayPosition);
 
 		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(table, ScriptReserved_ActionID, ACTION_IDS);
