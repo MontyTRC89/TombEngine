@@ -519,11 +519,8 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	item.Animation.TargetState = WEAPON_STATE_UNDRAW;
 	item.Pose = laraItem.Pose;
 
+	// TODO: Weapon undraw animation is bugged when attempting to undraw weapon while shooting.
 	AnimateItem(&item);
-
-	// TODO: Fix is elsewhere.
-	if ((item.Animation.AnimNumber != 0 && item.Animation.FrameNumber != 0) && item.Animation.AnimNumber != 3)
-		return;
 
 	if (item.Status == ITEM_DEACTIVATED)
 	{

@@ -478,9 +478,20 @@ static void ClearPlayerTargets(ItemInfo& playerItem)
 	player.LastTargets.fill(nullptr);
 }
 
+//debug-----
+#include "Renderer/Renderer11.h"
+using TEN::Renderer::g_Renderer;
+//--------
+
 void HandleWeapon(ItemInfo& laraItem)
 {
 	auto& player = *GetLaraInfo(&laraItem);
+
+	//debug-----
+	g_Renderer.PrintDebugMessage("%d", player.LeftArm.AnimObjectID);
+	g_Renderer.PrintDebugMessage("%d", player.LeftArm.AnimNumber);
+	g_Renderer.PrintDebugMessage("%d", player.LeftArm.FrameNumber);
+	//--------
 
 	if (player.LeftArm.GunFlash > 0)
 		--player.LeftArm.GunFlash;
