@@ -131,6 +131,7 @@ CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAngles& orient, float dist);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(const GameVector& pos);
@@ -145,7 +146,6 @@ FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
 int GetCeiling(FloorInfo* floor, int x, int y, int z);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
-void AlterFloorHeight(ItemInfo* item, int height);
 
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 int GetWaterSurface(ItemInfo* item);

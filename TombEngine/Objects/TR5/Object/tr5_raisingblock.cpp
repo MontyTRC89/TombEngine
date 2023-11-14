@@ -9,11 +9,13 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Math;
 
 void InitializeRaisingBlock(short itemNumber)
 {
@@ -36,7 +38,7 @@ void InitializeRaisingBlock(short itemNumber)
 		item->Status = ITEM_ACTIVE;
 	}
 
-	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
+	TEN::Collision::Floordata::UpdateBridgeItem(*item);
 }
 
 void ShakeRaisingBlock(ItemInfo* item)
@@ -107,44 +109,45 @@ void ControlRaisingBlock(short itemNumber)
 	if (item->TriggerFlags > -1)
 	{
 		for (auto& mutator : item->Model.Mutators)
-			mutator.Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
+			mutator.Scale = Vector3(1.0f, item->ItemFlags[1] / BLOCK(4.0f), 1.0f);
 	}
 }
 
-std::optional<int> RaisingBlockFloor(short itemNumber, int x, int y, int z)
+std::optional<int> GetRaisingBlockFloorHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
-
+	auto bboxHeight = GetBridgeItemIntersect(item, pos, false);
 	if (bboxHeight.has_value())
 	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		auto bounds = GameBoundingBox(item);
+		auto bounds = GameBoundingBox(&item);
 		int height = bounds.GetHeight();
 
-		int currentHeight = item->Pose.Position.y - height * item->ItemFlags[1] / 4096;
-		return std::optional{ currentHeight };
+		int currentHeight = item.Pose.Position.y - ((height * item.ItemFlags[1]) / BLOCK(4));
+		return currentHeight;
 	}
 
 	return bboxHeight;
 }
 
-std::optional<int> RaisingBlockCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> GetRaisingBlockCeilingHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	auto bboxHeight = GetBridgeItemIntersect(item, pos, true);
 
 	if (bboxHeight.has_value())
-		return std::optional{ bboxHeight.value() + 1 };
+	{
+		return (bboxHeight.value() + 1);
+	}
 	else 
+	{
 		return bboxHeight;
+	}
 }
 
-int RaisingBlockFloorBorder(short itemNumber)
+int GetRaisingBlockFloorBorder(const ItemInfo& item)
 {
-	return GetBridgeBorder(itemNumber, false);
+	return GetBridgeBorder(item, false);
 }
 
-int RaisingBlockCeilingBorder(short itemNumber)
+int GetRaisingBlockCeilingBorder(const ItemInfo& item)
 {
-	return GetBridgeBorder(itemNumber, true);
+	return GetBridgeBorder(item, true);
 }

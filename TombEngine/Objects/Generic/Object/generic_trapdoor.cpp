@@ -1,32 +1,34 @@
 #include "framework.h"
 #include "Objects/Generic/Object/generic_trapdoor.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/collision/floordata.h"
-#include "Specific/Input/Input.h"
+
+#include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
-#include "Specific/level.h"
-#include "Game/animation.h"
-#include "Game/items.h"
-#include "Renderer/Renderer11.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
+#include "Renderer/Renderer11.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
-using namespace TEN::Input;
-using namespace TEN::Renderer;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Input;
+using namespace TEN::Math;
+using namespace TEN::Renderer;
 
 const ObjectCollisionBounds CeilingTrapDoorBounds =
 {
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		0, 900,
-		-BLOCK(0.75f), -CLICK(1)
-	),
+		-BLOCK(0.75f), -CLICK(1)),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-	)
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 };
 const auto CeilingTrapDoorPos = Vector3i(0, 1056, -480);
 
@@ -35,19 +37,18 @@ const ObjectCollisionBounds FloorTrapDoorBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		0, 0,
-		-BLOCK(1), -CLICK(1)
-	),
+		-BLOCK(1), -CLICK(1)),
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-	)
+		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 };
 static auto FloorTrapDoorPos = Vector3i(0, 0, -655);
 
 void InitializeTrapDoor(short itemNumber)
 {
-	auto* trapDoorItem = &g_Level.Items[itemNumber];
-	TEN::Collision::Floordata::UpdateBridgeItem(itemNumber);
+	const auto& trapDoorItem = g_Level.Items[itemNumber];
+
+	UpdateBridgeItem(trapDoorItem);
 	CloseTrapDoor(itemNumber);
 }
 
@@ -175,13 +176,7 @@ void TrapDoorControl(short itemNumber)
 	if (TriggerActive(trapDoorItem))
 	{
 		if (!trapDoorItem->Animation.ActiveState && trapDoorItem->TriggerFlags >= 0)
-		{
 			trapDoorItem->Animation.TargetState = 1;
-		}
-		else if (trapDoorItem->Animation.FrameNumber == GetAnimData(trapDoorItem).frameEnd && CurrentLevel == 14 && trapDoorItem->ObjectNumber == ID_TRAPDOOR1)
-		{
-			trapDoorItem->Status = ITEM_INVISIBLE;
-		}
 	}
 	else
 	{
@@ -215,32 +210,28 @@ void OpenTrapDoor(short itemNumber)
 	trapDoorItem->ItemFlags[2] = 0;
 }
 
-int TrapDoorFloorBorder(short itemNumber)
+std::optional<int> GetTrapDoorFloorHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	return GetBridgeBorder(itemNumber, false);
-}
-
-int TrapDoorCeilingBorder(short itemNumber)
-{
-	return GetBridgeBorder(itemNumber, true);
-}
-
-std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
-{
-	auto* trapDoorItem = &g_Level.Items[itemNumber];
-
-	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
+	if (!item.MeshBits.TestAny() || item.ItemFlags[2] == 0)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
+	return GetBridgeItemIntersect(item, pos, false);
 }
 
-std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> GetTrapDoorCeilingHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	auto* trapDoorItem = &g_Level.Items[itemNumber];
-
-	if (!trapDoorItem->MeshBits.TestAny() || trapDoorItem->ItemFlags[2] == 0)
+	if (!item.MeshBits.TestAny() || item.ItemFlags[2] == 0)
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
+	return GetBridgeItemIntersect(item, pos, true);
+}
+
+int GetTrapDoorFloorBorder(const ItemInfo& item)
+{
+	return GetBridgeBorder(item, false);
+}
+
+int GetTrapDoorCeilingBorder(const ItemInfo& item)
+{
+	return GetBridgeBorder(item, true);
 }

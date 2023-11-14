@@ -14,6 +14,7 @@
 #include "Objects/Generic/Object/generic_bridge.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/polerope.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Objects/Generic/Object/rope.h"
 
 // Switches
@@ -55,13 +56,13 @@ static void StartObject(ObjectInfo* object)
 		if (object->loaded)
 		{
 			object->Initialize = InitializeTrapDoor;
-			object->collision = TrapDoorCollision;
 			object->control = TrapDoorControl;
-			object->floorBorder = TrapDoorFloorBorder;
-			object->ceilingBorder = TrapDoorCeilingBorder;
-			object->floor = TrapDoorFloor;
-			object->ceiling = TrapDoorCeiling;
-			object->SetupHitEffect(true);
+			object->collision = TrapDoorCollision;
+			object->GetFloorBorder = GetTrapDoorFloorBorder;
+			object->GetCeilingBorder = GetTrapDoorCeilingBorder;
+			object->GetFloorHeight = GetTrapDoorFloorHeight;
+			object->GetCeilingHeight = GetTrapDoorCeilingHeight;
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -71,13 +72,13 @@ static void StartObject(ObjectInfo* object)
 		if (object->loaded)
 		{
 			object->Initialize = InitializeTrapDoor;
-			object->collision = FloorTrapDoorCollision;
 			object->control = TrapDoorControl;
-			object->floorBorder = TrapDoorFloorBorder;
-			object->ceilingBorder = TrapDoorCeilingBorder;
-			object->floor = TrapDoorFloor;
-			object->ceiling = TrapDoorCeiling;
-			object->SetupHitEffect(true);
+			object->collision = FloorTrapDoorCollision;
+			object->GetFloorHeight = GetTrapDoorFloorHeight;
+			object->GetCeilingHeight = GetTrapDoorCeilingHeight;
+			object->GetFloorBorder = GetTrapDoorFloorBorder;
+			object->GetCeilingBorder = GetTrapDoorCeilingBorder;
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -87,64 +88,70 @@ static void StartObject(ObjectInfo* object)
 		if (object->loaded)
 		{
 			object->Initialize = InitializeTrapDoor;
-			object->collision = CeilingTrapDoorCollision;
 			object->control = TrapDoorControl;
-			object->floorBorder = TrapDoorFloorBorder;
-			object->ceilingBorder = TrapDoorCeilingBorder;
-			object->floor = TrapDoorFloor;
-			object->ceiling = TrapDoorCeiling;
-			object->SetupHitEffect(true);
+			object->collision = CeilingTrapDoorCollision;
+			object->GetFloorHeight = GetTrapDoorFloorHeight;
+			object->GetCeilingHeight = GetTrapDoorCeilingHeight;
+			object->GetFloorBorder = GetTrapDoorFloorBorder;
+			object->GetCeilingBorder = GetTrapDoorCeilingBorder;
+			object->SetHitEffect(true);
 		}
 	}
+
+	for (int objectNumber = ID_PUSHABLE_OBJECT1; objectNumber <= ID_PUSHABLE_OBJECT10; objectNumber++)
+		InitPushableObject(object, objectNumber);
+
+	for (int objectNumber = ID_PUSHABLE_OBJECT_CLIMBABLE1; objectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10; objectNumber++)
+		InitPushableObject(object, objectNumber);
 
 	object = &Objects[ID_BRIDGE_FLAT];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<0>;
-		object->ceiling = BridgeCeiling<0>;
-		object->floorBorder = BridgeFloorBorder<0>;
-		object->ceilingBorder = BridgeCeilingBorder<0>;
+		object->GetFloorHeight = GetBridgeFloorHeight<0>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<0>;
+		object->GetFloorBorder = GetBridgeFloorBorder<0>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<0>;
 	}
 
 	object = &Objects[ID_BRIDGE_TILT1];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<1>;
-		object->ceiling = BridgeCeiling<1>;
-		object->floorBorder = BridgeFloorBorder<1>;
-		object->ceilingBorder = BridgeCeilingBorder<1>;
+		object->GetFloorHeight = GetBridgeFloorHeight<1>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<1>;
+		object->GetFloorBorder = GetBridgeFloorBorder<1>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<1>;
 	}
 
 	object = &Objects[ID_BRIDGE_TILT2];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<2>;
-		object->ceiling = BridgeCeiling<2>;
-		object->floorBorder = BridgeFloorBorder<2>;
-		object->ceilingBorder = BridgeCeilingBorder<2>;
+		object->GetFloorHeight = GetBridgeFloorHeight<2>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<2>;
+		object->GetFloorBorder = GetBridgeFloorBorder<2>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<2>;
 	}
 
 	object = &Objects[ID_BRIDGE_TILT3];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<3>;
-		object->ceiling = BridgeCeiling<3>;
-		object->floorBorder = BridgeFloorBorder<3>;
-		object->ceilingBorder = BridgeCeilingBorder<3>;
+		object->GetFloorHeight = GetBridgeFloorHeight<3>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<3>;
+		object->GetFloorBorder = GetBridgeFloorBorder<3>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<3>;
 	}
 
 	object = &Objects[ID_BRIDGE_TILT4];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeBridge;
-		object->floor = BridgeFloor<4>;
-		object->ceiling = BridgeCeiling<4>;
-		object->floorBorder = BridgeFloorBorder<4>;
-		object->ceilingBorder = BridgeCeilingBorder<4>;
+		object->GetFloorHeight = GetBridgeFloorHeight<4>;
+		object->GetCeilingHeight = GetBridgeCeilingHeight<4>;
+		object->GetFloorBorder = GetBridgeFloorBorder<4>;
+		object->GetCeilingBorder = GetBridgeCeilingBorder<4>;
 	}
 }
 
@@ -155,7 +162,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = CogSwitchCollision;
 		object->control = CogSwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_LEVER_SWITCH];
@@ -163,7 +170,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = RailSwitchCollision;
 		object->control = SwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_JUMP_SWITCH];
@@ -171,7 +178,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = JumpSwitchCollision;
 		object->control = SwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	for (int objectNumber = ID_SWITCH_TYPE1; objectNumber <= ID_SWITCH_TYPE16; objectNumber++)
@@ -181,7 +188,7 @@ void StartSwitches(ObjectInfo* object)
 		{
 			object->collision = SwitchCollision;
 			object->control = SwitchControl;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -190,7 +197,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = AirlockSwitchCollision;
 		object->control = SwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_CROWBAR_SWITCH];
@@ -198,7 +205,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = CrowbarSwitchCollision;
 		object->control = SwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_MINECART_SWITCH];
@@ -207,17 +214,27 @@ void StartSwitches(ObjectInfo* object)
 		object->Initialize = InitializeAnimating;
 		object->control = AnimatingControl;
 		object->collision = ObjectCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 		object->shadowType = ShadowMode::All;
 	}
 
-	for (int objectNumber = ID_UNDERWATER_SWITCH1; objectNumber <= ID_UNDERWATER_SWITCH4; objectNumber++)
+	for (int objectID = ID_UNDERWATER_WALL_SWITCH_1; objectID <= ID_UNDERWATER_WALL_SWITCH_2; objectID++)
 	{
-		object = &Objects[objectNumber];
+		object = &Objects[objectID];
 		if (object->loaded)
 		{
 			object->control = SwitchControl;
-			object->collision = UnderwaterSwitchCollision;
+			object->collision = CollideUnderwaterWallSwitch;
+		}
+	}
+
+	for (int objectID = ID_UNDERWATER_CEILING_SWITCH_1; objectID <= ID_UNDERWATER_CEILING_SWITCH_2; objectID++)
+	{
+		object = &Objects[objectID];
+		if (object->loaded)
+		{
+			object->control = SwitchControl;
+			object->collision = CollideUnderwaterCeilingSwitch;
 		}
 	}
 
@@ -234,7 +251,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->control = TurnSwitchControl;
 		object->collision = TurnSwitchCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH1];
@@ -242,7 +259,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH2];
@@ -250,7 +267,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_SEQUENCE_SWITCH3];
@@ -258,7 +275,7 @@ void StartSwitches(ObjectInfo* object)
 	{
 		object->collision = FullBlockSwitchCollision;
 		object->control = FullBlockSwitchControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	for (int objectID = ID_SHOOT_SWITCH1; objectID <= ID_SHOOT_SWITCH4; objectID++)
@@ -292,7 +309,7 @@ void StartDoors(ObjectInfo* object)
 			object->Initialize = InitializeDoor;
 			object->control = DoorControl;
 			object->collision = DoorCollision;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -301,7 +318,7 @@ void StartDoors(ObjectInfo* object)
 	{
 		object->Initialize = InitializeDoor;
 		object->control = DoorControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_LIFT_DOORS2];
@@ -309,7 +326,7 @@ void StartDoors(ObjectInfo* object)
 	{
 		object->Initialize = InitializeDoor;
 		object->control = DoorControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_SEQUENCE_DOOR1];
@@ -318,7 +335,7 @@ void StartDoors(ObjectInfo* object)
 		object->Initialize = InitializeDoor;
 		object->collision = DoorCollision;
 		object->control = SequenceDoorControl;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	for (int i = ID_DOUBLE_DOORS1; i <= ID_DOUBLE_DOORS4; i++)
@@ -329,7 +346,7 @@ void StartDoors(ObjectInfo* object)
 			object->Initialize = InitializeDoor;
 			object->collision = DoubleDoorCollision;
 			object->control = PushPullKickDoorControl;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -341,7 +358,7 @@ void StartDoors(ObjectInfo* object)
 			object->Initialize = InitializeDoor;
 			object->collision = UnderwaterDoorCollision;
 			object->control = PushPullKickDoorControl;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -353,7 +370,7 @@ void StartDoors(ObjectInfo* object)
 			object->Initialize = InitializeDoor;
 			object->collision = PushPullKickDoorCollision;
 			object->control = PushPullKickDoorControl;
-			object->SetupHitEffect(true);
+			object->SetHitEffect(true);
 		}
 	}
 
@@ -362,7 +379,7 @@ void StartDoors(ObjectInfo* object)
 	{
 		object->Initialize = InitializeSteelDoor;
 		object->collision = SteelDoorCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 }
 
@@ -406,7 +423,7 @@ void StartTraps(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->collision = PoleCollision;
-		object->SetupHitEffect(true);
+		object->SetHitEffect(true);
 	}
 
 	object = &Objects[ID_BURNING_TORCH_ITEM];
@@ -422,24 +439,24 @@ void StartTraps(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->Initialize = InitializeFallingBlock;
-		object->collision = FallingBlockCollision;
 		object->control = FallingBlockControl;
-		object->floor = FallingBlockFloor;
-		object->ceiling = FallingBlockCeiling;
-		object->floorBorder = FallingBlockFloorBorder;
-		object->ceilingBorder = FallingBlockCeilingBorder;
+		object->collision = FallingBlockCollision;
+		object->GetFloorHeight = GetFallingBlockFloorHeight;
+		object->GetCeilingHeight = GetFallingBlockCeilingHeight;
+		object->GetFloorBorder = GetFallingBlockFloorBorder;
+		object->GetCeilingBorder = GetFallingBlockCeilingBorder;
 	}
 
 	object = &Objects[ID_FALLING_BLOCK2];
 	if (object->loaded)
 	{
 		object->Initialize = InitializeFallingBlock;
-		object->collision = FallingBlockCollision;
 		object->control = FallingBlockControl;
-		object->floor = FallingBlockFloor;
-		object->ceiling = FallingBlockCeiling;
-		object->floorBorder = FallingBlockFloorBorder;
-		object->ceilingBorder = FallingBlockCeilingBorder;
+		object->collision = FallingBlockCollision;
+		object->GetFloorHeight = GetFallingBlockFloorHeight;
+		object->GetCeilingHeight = GetFallingBlockCeilingHeight;
+		object->GetFloorBorder = GetFallingBlockFloorBorder;
+		object->GetCeilingBorder = GetFallingBlockCeilingBorder;
 	}
 
 	object = &Objects[ID_CRUMBLING_FLOOR];
@@ -448,11 +465,10 @@ void StartTraps(ObjectInfo* object)
 		object->Initialize = InitializeCrumblingPlatform;
 		object->control = ControlCrumblingPlatform;
 		object->collision = CollideCrumblingPlatform;
-
-		object->floor = CrumblingPlatformFloor;
-		object->ceiling = CrumblingPlatformCeiling;
-		object->floorBorder = CrumblingPlatformFloorBorder;
-		object->ceilingBorder = CrumblingPlatformCeilingBorder;
+		object->GetFloorHeight = GetCrumblingPlatformFloorHeight;
+		object->GetCeilingHeight = GetCrumblingPlatformCeilingHeight;
+		object->GetFloorBorder = GetCrumblingPlatformFloorBorder;
+		object->GetCeilingBorder = GetCrumblingPlatformCeilingBorder;
 	}
 
 	object = &Objects[ID_PARALLEL_BARS];

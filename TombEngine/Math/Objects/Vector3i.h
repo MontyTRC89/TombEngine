@@ -32,12 +32,12 @@
 		Vector3i& operator +=(const Vector3i& vector);
 		Vector3i& operator -=(const Vector3i& vector);
 		Vector3i& operator *=(const Vector3i& vector);
-		Vector3i& operator *=(float scale);
-		Vector3i& operator /=(float scale);
+		Vector3i& operator *=(float scalar);
+		Vector3i& operator /=(float scalar);
 		Vector3i  operator +(const Vector3i& vector) const;
 		Vector3i  operator -(const Vector3i& vector) const;
 		Vector3i  operator *(const Vector3i& vector) const;
-		Vector3i  operator *(float scale) const;
-		Vector3i  operator /(float scale) const;
+		Vector3i  operator *(float scalar) const;
+		Vector3i  operator /(float scalar) const;
 	};
 //}

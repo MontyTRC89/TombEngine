@@ -8,17 +8,22 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
-using namespace TEN::Effects::DisplaySprite;
 using TEN::Renderer::g_Renderer;
+
+/***
+Represents a display sprite.
+
+@tenclass View.DisplaySprite
+@pragma nostrip
+*/
 
 namespace TEN::Scripting::DisplaySprite
 {
 	void ScriptDisplaySprite::Register(sol::state& state, sol::table& parent)
 	{
+		// NOTE: Single constructor with a sol::optional argument for the color doesn't work, hence the two constructors. -- Sezz 2023.10.19
 		using ctors = sol::constructors<
 			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&, const ScriptColor&),
 			ScriptDisplaySprite(GAME_OBJECT_ID, int, const Vec2&, float, const Vec2&)>;
@@ -29,114 +34,38 @@ namespace TEN::Scripting::DisplaySprite
 			ctors(),
 			sol::call_constructor, ctors(),
 
-			/*** Get the object ID of the sprite sequence object used by the display sprite.
-			@function DisplaySprite:GetObjectID()
-			@treturn Objects.ObjID Sprite sequence object ID.
-			*/
-			ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
-
-			/*** Get the sprite ID in the sprite sequence object used by the display sprite.
-			@function DisplaySprite:GetSpriteID()
-			@treturn int Sprite ID in the sprite sequence object.
-			*/
-			ScriptReserved_DisplayStringGetSpriteID, &ScriptDisplaySprite::GetSpriteID,
-
-			/*** Get the display position of the display sprite in percent.
-			@function DisplaySprite:GetPosition()
-			@treturn Vec2 Display position in percent.
-			*/
-			ScriptReserved_DisplayStringGetPosition, &ScriptDisplaySprite::GetPosition,
-
-			/*** Get the rotation of the display sprite in degrees.
-			@function DisplaySprite:GetRotation()
-			@treturn float Rotation in degrees.
-			*/
-			ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
-
-			/*** Get the horizontal and vertical scale of the display sprite in percent.
-			@function DisplaySprite:GetScale()
-			@treturn Vec2 Horizontal and vertical scale in percent.
-			*/
-			ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
-
-			/*** Get the color of the display sprite.
-			@function DisplaySprite:GetColor()
-			@treturn Color Color.
-			*/
-			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
-
-			/*** Set the sprite sequence object ID used by the display sprite.
-			@function DisplaySprite:SetObjectID(Objects.ObjID)
-			@tparam Objects.ObjID New sprite sequence object ID.
-			*/
-			ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
-
-			/*** Set the sprite ID in the sprite sequence object used by the display sprite.
-			@function DisplaySprite:SetSpriteID(int)
-			@tparam int New sprite ID in the sprite sequence object.
-			*/
-			ScriptReserved_DisplayStringSetSpriteID, &ScriptDisplaySprite::SetSpriteID,
-
-			/*** Set the display position of the display sprite in percent.
-			@function DisplaySprite:SetPosition(Vec2)
-			@tparam Vec2 New display position in percent.
-			*/
-			ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
-
-			/*** Set the rotation of the display sprite in degrees.
-			@function DisplaySprite:SetRotation(float)
-			@tparam float New rotation in degrees.
-			*/
-			ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
-
-			/*** Set the horizontal and vertical scale of the display sprite in percent.
-			@function DisplaySprite:SetScale(Vec2)
-			@tparam float New horizontal and vertical scale in percent.
-			*/
-			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
-
-			/*** Set the color of the display sprite.
-			@function DisplaySprite:SetColor(Color)
-			@tparam float New color.
-			*/
-			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
-			
-			/*** Draw the display sprite in display space for the current frame.
-			@function DisplaySprite:Draw
-			@tparam Objects.ObjID[opt] priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
-			@tparam DisplaySprite.AlignMode[opt] alignMode Align mode interpreting an offset from the sprite's position. __Default: DisplaySprite.AlignMode.CENTER__
-			@tparam DisplaySprite.ScaleMode[opt] scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: DisplaySprite.ScaleMode.FIT__
-			@tparam Effects.BlendID[opt] blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
-			*/
-			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
-
-		auto table = sol::table(state.lua_state(), sol::create);
-		parent.set(ScriptReserved_DisplaySpriteEnum, table);
-		
-		// Register enums.
-		auto handler = LuaHandler(&state);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumAlignMode, DISPLAY_SPRITE_ALIGN_MODES);
-		handler.MakeReadOnlyTable(table, ScriptReserved_DisplaySpriteEnumScaleMode, DISPLAY_SPRITE_SCALE_MODES);
+		ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
+		ScriptReserved_DisplayStringGetSpriteID, &ScriptDisplaySprite::GetSpriteID,
+		ScriptReserved_DisplayStringGetPosition, &ScriptDisplaySprite::GetPosition,
+		ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
+		ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
+		ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
+		ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
+		ScriptReserved_DisplayStringSetSpriteID, &ScriptDisplaySprite::SetSpriteID,
+		ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
+		ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
+		ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
+		ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
+		ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
 	}
 
-	/*** Create a DisplaySprite.
-	@function DisplaySprite
-	@tparam Objects.ObjID ID of the sprite sequence object.
-	@tparam int int spriteID ID of the sprite in the sequence.
-	@tparam Vec2 pos Display position in percent.
-	@tparam float rot Rotation in degrees.
-	@tparam Vec2 scale Horizontal and vertical scale in percent. Scaling is interpreted by the DisplaySpriteEnum.ScaleMode passed to the Draw() function call.
-	@tparam Color color[opt] Color. __Default: Color(255, 255, 255, 255)__
-	@treturn DisplaySprite A new DisplaySprite object.
-	*/
+	/// Create a DisplaySprite object.
+	// @function DisplaySprite
+	// @tparam Objects.ObjID ID of the sprite sequence object.
+	// @tparam int int spriteID ID of the sprite in the sequence.
+	// @tparam Vec2 pos Display position in percent.
+	// @tparam float rot Rotation in degrees.
+	// @tparam Vec2 scale Horizontal and vertical scale in percent. Scaling is interpreted by the DisplaySpriteEnum.ScaleMode passed to the Draw() function call.
+	// @tparam[opt] Color color Color. __Default: Color(255, 255, 255, 255)__
+	// @treturn DisplaySprite A new DisplaySprite object.
 	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
 	{
-		ObjectID = objectID;
-		SpriteID = spriteID;
-		Position = pos;
-		Rotation = rot;
-		Scale = scale;
-		Color = color;
+		_objectID = objectID;
+		_spriteID = spriteID;
+		_position = pos;
+		_rotation = rot;
+		_scale = scale;
+		_color = color;
 	}
 
 	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale)
@@ -146,72 +75,114 @@ namespace TEN::Scripting::DisplaySprite
 		*this = ScriptDisplaySprite(objectID, spriteID, pos, rot, scale, DEFAULT_COLOR);
 	}
 
+	/// Get the object ID of the sprite sequence object used by the display sprite.
+	// @function DisplaySprite:GetObjectID()
+	// @treturn Objects.ObjID Sprite sequence object ID.
 	GAME_OBJECT_ID ScriptDisplaySprite::GetObjectID() const
 	{
-		return ObjectID;
+		return _objectID;
 	}
 
+	/// Get the sprite ID in the sprite sequence object used by the display sprite.
+	// @function DisplaySprite:GetSpriteID()
+	// @treturn int Sprite ID in the sprite sequence object.
 	int ScriptDisplaySprite::GetSpriteID() const
 	{
-		return SpriteID;
+		return _spriteID;
 	}
 
+	/// Get the display position of the display sprite in percent.
+	// @function DisplaySprite:GetPosition()
+	// @treturn Vec2 Display position in percent.
 	Vec2 ScriptDisplaySprite::GetPosition() const
 	{
-		return Position;
+		return _position;
 	}
 
+	/// Get the rotation of the display sprite in degrees.
+	// @function DisplaySprite:GetRotation()
+	// @treturn float Rotation in degrees.
 	float ScriptDisplaySprite::GetRotation() const
 	{
-		return Rotation;
+		return _rotation;
 	}
 
+	/// Get the horizontal and vertical scale of the display sprite in percent.
+	// @function DisplaySprite:GetScale()
+	// @treturn Vec2 Horizontal and vertical scale in percent.
 	Vec2 ScriptDisplaySprite::GetScale() const
 	{
-		return Scale;
+		return _scale;
 	}
 
+	/// Get the color of the display sprite.
+	// @function DisplaySprite:GetColor()
+	// @treturn Color Color.
 	ScriptColor ScriptDisplaySprite::GetColor() const
 	{
-		return Color;
+		return _color;
 	}
 
+	/// Set the sprite sequence object ID used by the display sprite.
+	// @function DisplaySprite:SetObjectID(Objects.ObjID)
+	// @tparam Objects.ObjID New sprite sequence object ID.
 	void ScriptDisplaySprite::SetObjectID(GAME_OBJECT_ID objectID)
 	{
-		ObjectID = objectID;
+		_objectID = objectID;
 	}
 
+	/// Set the sprite ID in the sprite sequence object used by the display sprite.
+	// @function DisplaySprite:SetSpriteID(int)
+	// @tparam int New sprite ID in the sprite sequence object.
 	void ScriptDisplaySprite::SetSpriteID(int spriteID)
 	{
-		SpriteID = spriteID;
+		_spriteID = spriteID;
 	}
 
+	/// Set the display position of the display sprite in percent.
+	// @function DisplaySprite:SetPosition(Vec2)
+	// @tparam Vec2 New display position in percent.
 	void ScriptDisplaySprite::SetPosition(const Vec2& pos)
 	{
-		Position = pos;
+		_position = pos;
 	}
 
+	/// Set the rotation of the display sprite in degrees.
+	// @function DisplaySprite:SetRotation(float)
+	// @tparam float New rotation in degrees.
 	void ScriptDisplaySprite::SetRotation(float rot)
 	{
-		Rotation = rot;
+		_rotation = rot;
 	}
 
+	/// Set the horizontal and vertical scale of the display sprite in percent.
+	// @function DisplaySprite:SetScale(Vec2)
+	// @tparam float New horizontal and vertical scale in percent.
 	void ScriptDisplaySprite::SetScale(const Vec2& scale)
 	{
-		Scale = scale;
+		_scale = scale;
 	}
 
+	/// Set the color of the display sprite.
+	// @function DisplaySprite:SetColor(Color)
+	// @tparam float New color.
 	void ScriptDisplaySprite::SetColor(const ScriptColor& color)
 	{
-		Color = color;
+		_color = color;
 	}
 
+	/// Draw the display sprite in display space for the current frame.
+	// @function DisplaySprite:Draw
+	// @tparam[opt] int priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
+	// @tparam[opt] View.AlignMode alignMode Align mode interpreting an offset from the sprite's position. __Default: View.AlignMode.CENTER__
+	// @tparam[opt] View.ScaleMode scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: View.ScaleMode.FIT__
+	// @tparam[opt] Effects.BlendID blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
 	void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
 								   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
 		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
-		constexpr auto POS_CONVERSION_COEFF	  = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
+		constexpr auto POS_CONVERSION_COEFF	  = Vector2(DISPLAY_SPACE_RES.x / 100, DISPLAY_SPACE_RES.y / 100);
 		constexpr auto SCALE_CONVERSION_COEFF = 0.01f;
 
 		constexpr auto DEFAULT_PRIORITY	  = 0;
@@ -220,31 +191,31 @@ namespace TEN::Scripting::DisplaySprite
 		constexpr auto DEFAULT_BLEND_MODE = BLENDMODE_ALPHABLEND;
 
 		// Object is not a sprite sequence object; return early.
-		if (ObjectID < GAME_OBJECT_ID::ID_HORIZON || ObjectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+		if (_objectID < GAME_OBJECT_ID::ID_HORIZON || _objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
-			TENLog("Attempted to draw display sprite from non-sprite sequence object " + std::to_string(ObjectID), LogLevel::Warning);
+			TENLog("Attempted to draw display sprite from non-sprite sequence object " + std::to_string(_objectID), LogLevel::Warning);
 			return;
 		}
 
 		// Sprite missing or sequence not found; return early.
-		const auto& object = Objects[ObjectID];
-		if (!object.loaded || SpriteID >= abs(object.nmeshes))
+		const auto& object = Objects[_objectID];
+		if (!object.loaded || _spriteID >= abs(object.nmeshes))
 		{
 			TENLog(
-				"Attempted to draw missing sprite " + std::to_string(SpriteID) +
-				" from sprite sequence object " + std::to_string(ObjectID) +
+				"Attempted to draw missing sprite " + std::to_string(_spriteID) +
+				" from sprite sequence object " + std::to_string(_objectID) +
 				" as display sprite.",
 				LogLevel::Warning);
 			return;
 		}
 
-		auto convertedPos = Vector2(Position.x, Position.y) * POS_CONVERSION_COEFF;
-		short convertedRot = ANGLE(Rotation);
-		auto convertedScale = Vector2(Scale.x, Scale.y) * SCALE_CONVERSION_COEFF;
-		auto convertedColor = Vector4(Color.GetR(), Color.GetG(), Color.GetB(), Color.GetA()) / UCHAR_MAX;
+		auto convertedPos = Vector2(_position.x, _position.y) * POS_CONVERSION_COEFF;
+		short convertedRot = ANGLE(_rotation);
+		auto convertedScale = Vector2(_scale.x, _scale.y) * SCALE_CONVERSION_COEFF;
+		auto convertedColor = Vector4(_color.GetR(), _color.GetG(), _color.GetB(), _color.GetA()) / UCHAR_MAX;
 
 		AddDisplaySprite(
-			ObjectID, SpriteID,
+			_objectID, _spriteID,
 			convertedPos, convertedRot, convertedScale, convertedColor,
 			priority.value_or(DEFAULT_PRIORITY),
 			alignMode.value_or(DEFAULT_ALIGN_MODE),

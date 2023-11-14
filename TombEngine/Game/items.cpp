@@ -254,8 +254,8 @@ void KillItem(short const itemNumber)
 
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
-		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && Objects[item->ObjectNumber].floor != nullptr)
-			UpdateBridgeItem(itemNumber, true);
+		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && Objects[item->ObjectNumber].GetFloorHeight != nullptr)
+			UpdateBridgeItem(*item, true);
 
 		GameScriptHandleKilled(itemNumber, true);
 
@@ -423,6 +423,12 @@ void KillEffect(short fxNumber)
 		fx->nextFx = NextFxFree;
 		NextFxFree = fxNumber;
 	}
+
+	// HACK: Garbage collect nextFx if no active effects were detected.
+	// This fixes random crashes after spawining multiple FXs (like body part).
+
+	if (NextFxActive == NO_ITEM)
+		InitializeFXArray();
 }
 
 short CreateNewEffect(short roomNumber) 
@@ -447,7 +453,7 @@ short CreateNewEffect(short roomNumber)
 	return fxNumber;
 }
 
-void InitializeFXArray(int allocateMemory)
+void InitializeFXArray()
 {
 	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
@@ -827,8 +833,8 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
-	if ((object.damageType == DamageMode::AnyWeapon) ||
-		(object.damageType == DamageMode::ExplosivesOnly && isExplosive))
+	if ((object.damageType == DamageMode::Any) ||
+		(object.damageType == DamageMode::Explosion && isExplosive))
 	{
 		if (target->HitPoints > 0)
 		{
@@ -870,4 +876,18 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 	}
 
 	DoItemHit(&target, damage, isExplosive);
+}
+
+Vector3i GetNearestSectorCenter(const Vector3i& pos)
+{
+	constexpr int SECTOR_SIZE = 1024;
+
+	// Calculate the sector-aligned coordinates.
+	int x = (pos.x / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+	int z = (pos.z / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+
+	// Keep the y-coordinate unchanged.
+	int y = pos.y;
+
+	return Vector3i(x, y, z);
 }

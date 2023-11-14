@@ -7,9 +7,11 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Lara/PlayerStateMachine.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Entities::Player;
 using namespace TEN::Hud;
 
 LaraInfo lBackup = {};
@@ -33,8 +35,8 @@ void InitializeLara(bool restore)
 
 	LaraItem->Data = &Lara;
 	LaraItem->Collidable = false;
-	LaraItem->Location.roomNumber = LaraItem->RoomNumber;
-	LaraItem->Location.yNumber = LaraItem->Pose.Position.y;
+	LaraItem->Location.RoomNumber = LaraItem->RoomNumber;
+	LaraItem->Location.Height = LaraItem->Pose.Position.y;
 
 	Lara.Status.Air = LARA_AIR_MAX;
 	Lara.Status.Exposure = LARA_EXPOSURE_MAX;
@@ -64,6 +66,7 @@ void InitializeLara(bool restore)
 		LaraItem->HitPoints = LARA_HEALTH_MAX;
 	}
 
+	InitializePlayerStateMachine();
 	InitializeLaraMeshes(LaraItem);
 	InitializeLaraAnims(LaraItem);
 

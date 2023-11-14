@@ -8,17 +8,12 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
-
-using namespace TEN::Scripting::DisplaySprite;
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -222,7 +217,7 @@ You will not need to call them manually.
 */
 	tableFlow.set_function(ScriptReserved_SetStrings, &FlowHandler::SetStrings, this);
 
-/*** Get translated string
+/*** Get translated string.
 @function GetString
 @tparam key string key for translated string 
 */
@@ -235,8 +230,13 @@ Specify which translations in the strings table correspond to which languages.
 */
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
+/*** Do FlipMap with specific ID.
+//@function FlipMap
+//@tparam int flipmap (ID of flipmap)
+*/
+	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap, this);
+
 	ScriptColor::Register(parent);
-	ScriptDisplaySprite::Register(*lua, parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);
@@ -425,6 +425,11 @@ void FlowHandler::EndLevel(std::optional<int> nextLevel)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
 	NextLevel = index;
+}
+
+void FlowHandler::FlipMap(int flipmap)
+{
+	DoFlipMap(flipmap);
 }
 
 void FlowHandler::SaveGame(int slot)

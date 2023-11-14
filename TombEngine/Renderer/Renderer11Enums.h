@@ -120,7 +120,7 @@ enum class RendererDebugPage
 	RendererStats,
 	DimensionStats,
 	PlayerStats,
-	LogicStats,
+	InputStats,
 	CollisionStats,
 	PathfindingStats,
 	WireframeMode,
@@ -258,9 +258,9 @@ constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
 
 constexpr auto MAX_BONES = 32;
 
-constexpr auto SCREEN_SPACE_RES	   = Vector2(800.0f, 600.0f);
+constexpr auto DISPLAY_SPACE_RES   = Vector2(800.0f, 600.0f);
 constexpr auto REFERENCE_FONT_SIZE = 35.0f;
-constexpr auto HUD_ZERO_Y		   = -SCREEN_SPACE_RES.y;
+constexpr auto HUD_ZERO_Y		   = -DISPLAY_SPACE_RES.y;
 
 constexpr auto UNDERWATER_FOG_MIN_DISTANCE = 4;
 constexpr auto UNDERWATER_FOG_MAX_DISTANCE = 30;

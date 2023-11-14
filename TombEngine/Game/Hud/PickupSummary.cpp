@@ -14,12 +14,12 @@ namespace TEN::Hud
 	bool DisplayPickup::IsOffscreen() const
 	{
 		constexpr auto SCREEN_THRESHOLD_COEFF = 0.1f;
-		constexpr auto SCREEN_THRESHOLD		  = Vector2(SCREEN_SPACE_RES.x * SCREEN_THRESHOLD_COEFF, SCREEN_SPACE_RES.y * SCREEN_THRESHOLD_COEFF);
+		constexpr auto SCREEN_THRESHOLD		  = Vector2(DISPLAY_SPACE_RES.x * SCREEN_THRESHOLD_COEFF, DISPLAY_SPACE_RES.y * SCREEN_THRESHOLD_COEFF);
 
 		if (Position.x <= -SCREEN_THRESHOLD.x ||
 			Position.y <= -SCREEN_THRESHOLD.y ||
-			Position.x >= (SCREEN_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
-			Position.y >= (SCREEN_SPACE_RES.y + SCREEN_THRESHOLD.y))
+			Position.x >= (DISPLAY_SPACE_RES.x + SCREEN_THRESHOLD.x) ||
+			Position.y >= (DISPLAY_SPACE_RES.y + SCREEN_THRESHOLD.y))
 		{
 			return true;
 		}
@@ -32,7 +32,7 @@ namespace TEN::Hud
 		constexpr auto LIFE_BUFFER		   = 0.2f;
 		constexpr auto SCALE_MAX		   = 0.4f;
 		constexpr auto SCALE_MIN		   = 0.25f;
-		constexpr auto HIDE_VEL_MAX		   = SCREEN_SPACE_RES.x * 0.03f;
+		constexpr auto HIDE_VEL_MAX		   = DISPLAY_SPACE_RES.x * 0.03f;
 		constexpr auto HIDE_VEL_ACCEL	   = HIDE_VEL_MAX / 4;
 		constexpr auto POS_LERP_ALPHA	   = 0.2f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
@@ -91,7 +91,7 @@ namespace TEN::Hud
 		float life = round(DisplayPickup::LIFE_MAX * FPS);
 
 		// Increment count of existing display pickup if it exists.
-		for (auto& pickup : DisplayPickups)
+		for (auto& pickup : _displayPickups)
 		{
 			// Ignore already disappearing display pickups.
 			if (pickup.Life <= 0.0f)
@@ -132,17 +132,17 @@ namespace TEN::Hud
 
 	void PickupSummaryController::Update()
 	{
-		if (DisplayPickups.empty())
+		if (_displayPickups.empty())
 			return;
 
 		// Get and apply stack positions as targets.
 		auto stackPositions = GetStackPositions();
 		for (int i = 0; i < stackPositions.size(); i++)
-			DisplayPickups[i].Target = std::move(stackPositions[i]);
+			_displayPickups[i].Target = std::move(stackPositions[i]);
 
 		// Update display pickups.
 		bool isHead = true;
-		for (auto& pickup : DisplayPickups)
+		for (auto& pickup : _displayPickups)
 		{
 			pickup.Update(isHead);
 			isHead = false;
@@ -155,11 +155,11 @@ namespace TEN::Hud
 	{
 		//DrawDebug();
 
-		if (DisplayPickups.empty())
+		if (_displayPickups.empty())
 			return;
 
 		// Draw display pickups.
-		for (const auto& pickup : DisplayPickups)
+		for (const auto& pickup : _displayPickups)
 		{
 			if (pickup.IsOffscreen())
 				continue;
@@ -170,7 +170,7 @@ namespace TEN::Hud
 
 	void PickupSummaryController::Clear()
 	{
-		DisplayPickups.clear();
+		_displayPickups.clear();
 	}
 
 	std::vector<Vector2> PickupSummaryController::GetStackPositions() const
@@ -178,16 +178,16 @@ namespace TEN::Hud
 		constexpr auto STACK_HEIGHT_MAX	   = 6;
 		constexpr auto SCREEN_SCALE_COEFF  = 1 / 7.0f;
 		constexpr auto SCREEN_OFFSET_COEFF = 1 / 7.0f;
-		constexpr auto SCREEN_SCALE		   = Vector2(SCREEN_SPACE_RES.x * SCREEN_SCALE_COEFF, SCREEN_SPACE_RES.y * SCREEN_SCALE_COEFF);
-		constexpr auto SCREEN_OFFSET	   = Vector2(SCREEN_SPACE_RES.y * SCREEN_OFFSET_COEFF);
+		constexpr auto SCREEN_SCALE		   = Vector2(DISPLAY_SPACE_RES.x * SCREEN_SCALE_COEFF, DISPLAY_SPACE_RES.y * SCREEN_SCALE_COEFF);
+		constexpr auto SCREEN_OFFSET	   = Vector2(DISPLAY_SPACE_RES.y * SCREEN_OFFSET_COEFF);
 
 		// Calculate stack positions. 
 		auto stackPositions = std::vector<Vector2>{};
-		stackPositions.resize(DisplayPickups.size());
-		for (int i = 0; i < DisplayPickups.size(); i++)
+		stackPositions.resize(_displayPickups.size());
+		for (int i = 0; i < _displayPickups.size(); i++)
 		{
-			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, SCREEN_SPACE_RES.y);
-			auto pos = (SCREEN_SPACE_RES - relPos) - SCREEN_OFFSET;
+			auto relPos = (i < STACK_HEIGHT_MAX) ? (Vector2(0.0f, i) * SCREEN_SCALE) : Vector2(0.0f, DISPLAY_SPACE_RES.y);
+			auto pos = (DISPLAY_SPACE_RES - relPos) - SCREEN_OFFSET;
 			stackPositions[i] = pos;
 		}
 
@@ -196,29 +196,29 @@ namespace TEN::Hud
 
 	DisplayPickup& PickupSummaryController::GetNewDisplayPickup()
 	{
-		assertion(DisplayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
+		assertion(_displayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
 
 		// Add and return new display pickup.
-		if (DisplayPickups.size() < DISPLAY_PICKUP_COUNT_MAX)
-			return DisplayPickups.emplace_back();
+		if (_displayPickups.size() < DISPLAY_PICKUP_COUNT_MAX)
+			return _displayPickups.emplace_back();
 
 		// Clear and return most recent display pickup.
-		auto& pickup = DisplayPickups.back();
+		auto& pickup = _displayPickups.back();
 		pickup = {};
 		return pickup;
 	}
 
 	void PickupSummaryController::ClearInactiveDisplayPickups()
 	{
-		DisplayPickups.erase(
+		_displayPickups.erase(
 			std::remove_if(
-				DisplayPickups.begin(), DisplayPickups.end(),
+				_displayPickups.begin(), _displayPickups.end(),
 				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen()); }),
-			DisplayPickups.end());
+			_displayPickups.end());
 	}
 
 	void PickupSummaryController::DrawDebug() const
 	{
-		g_Renderer.PrintDebugMessage("Display pickups in summary: %d", DisplayPickups.size());
+		g_Renderer.PrintDebugMessage("Display pickups in summary: %d", _displayPickups.size());
 	}
 }

@@ -35,7 +35,7 @@ namespace TEN::Renderer
 		try
 		{
 			auto screenRes = GetScreenResolution();
-			auto factor = Vector2(screenRes.x / SCREEN_SPACE_RES.x, screenRes.y / SCREEN_SPACE_RES.y);
+			auto factor = Vector2(screenRes.x / DISPLAY_SPACE_RES.x, screenRes.y / DISPLAY_SPACE_RES.y);
 			float uiScale = (screenRes.x > screenRes.y) ? factor.y : factor.x;
 			float fontSpacing = m_gameFont->GetLineSpacing();
 			float fontScale = REFERENCE_FONT_SIZE / fontSpacing;
@@ -65,7 +65,9 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					rString.X = pos.x * factor.x;
+					// Calculate indentation to account for string scaling.
+					auto indent = m_gameFont->FindGlyph(line.at(0))->XAdvance * rString.Scale;
+					rString.X = pos.x * factor.x + indent;
 				}
 
 				rString.Y = (pos.y * uiScale) + yOffset;

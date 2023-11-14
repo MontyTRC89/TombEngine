@@ -125,7 +125,7 @@ struct ItemInfo
 	
 	Pose StartPose;
 	Pose Pose;
-	ROOM_VECTOR Location;
+	RoomVector Location;
 	short RoomNumber;
 	int Floor;
 
@@ -179,7 +179,7 @@ short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
 void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
-void InitializeFXArray(int allocateMemory);
+void InitializeFXArray();
 short CreateNewEffect(short roomNumber);
 void KillEffect(short fxNumber);
 void InitializeItem(short itemNumber);
@@ -197,3 +197,5 @@ void DoDamage(ItemInfo* item, int damage);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber);
+
+Vector3i GetNearestSectorCenter(const Vector3i& pos);

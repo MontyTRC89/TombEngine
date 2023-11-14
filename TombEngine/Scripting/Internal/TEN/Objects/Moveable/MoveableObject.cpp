@@ -80,7 +80,7 @@ most can just be ignored (see usage).
 	@int[opt=0] animNumber anim number
 	@int[opt=0] frameNumber frame number
 	@int[opt=10] hp HP of item
-	@int[opt=0] OCB ocb of item (default 0)
+	@int[opt=0] OCB ocb of item
 	@tparam[opt] table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
 	@treturn Moveable A new Moveable object (a wrapper around the new object)
 	@usage 
@@ -264,6 +264,8 @@ void Moveable::Register(sol::table& parent)
 // @function Moveable:GetFrame
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
+
+	ScriptReserved_GetEndFrame, &Moveable::GetEndFrame,
 
 /// Set the object's velocity to specified value.
 // In most cases, only Z and Y components are used as forward and vertical velocity.
@@ -553,7 +555,7 @@ bool Moveable::SetName(const std::string& id)
 // @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
-	return Vec3(m_item->Pose);
+	return Vec3(m_item->Pose.Position);
 }
 
 /// Set the moveable's position
@@ -566,7 +568,7 @@ Vec3 Moveable::GetPos() const
 void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	auto prevPos = m_item->Pose.Position.ToVector3();
-	pos.StoreInPose(m_item->Pose);
+	m_item->Pose.Position = pos.ToVector3i();
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
@@ -585,8 +587,8 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 	}
 
 	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.floor != nullptr || object.ceiling != nullptr)
-		UpdateBridgeItem((int)m_item->Index);
+	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+		UpdateBridgeItem(*m_item);
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -616,8 +618,8 @@ void Moveable::SetRot(const Rotation& rot)
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
 
 	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.floor != nullptr || object.ceiling != nullptr)
-		UpdateBridgeItem(m_item->Index);
+	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+		UpdateBridgeItem(*m_item);
 }
 
 /// Get current HP (hit points/health points)
@@ -866,6 +868,16 @@ void Moveable::SetFrameNumber(int frameNumber)
 	}
 }
 
+/// Get the end frame number of the moveable's active animation.
+// This is the "End Frame" set in WADTool for the animation.
+// @function Moveable:GetEndFrame()
+// @treturn int End frame number of the active animation.	
+int Moveable::GetEndFrame() const
+{
+	const auto& anim = GetAnimData(*m_item);
+	return (anim.frameEnd - anim.frameBase);
+}
+
 bool Moveable::GetActive() const
 {
 	return m_item->Active;
@@ -897,21 +909,21 @@ int Moveable::GetRoomNumber() const
 	return m_item->RoomNumber;
 }
 
-/// Set room number of object 
-// Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
+/// Set the room ID of a moveable.
+// Use this if not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
 // @function Moveable:SetRoomNumber
-// @tparam int ID the ID of the new room 
+// @tparam int roomID New room's ID.
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoomNumber(destinationRoom)
-// sas:SetPosition(destinationPosition, false)
+// sas:SetRoomNumber(newRoomID)
+// sas:SetPosition(newPos, false)
 void Moveable::SetRoomNumber(int roomNumber)
 {	
-	const size_t nRooms = g_Level.Rooms.size();
-	if (roomNumber < 0 || (size_t)roomNumber >= nRooms)
+	int roomCount = (int)g_Level.Rooms.size();
+	if (roomNumber < 0 || roomNumber >= roomCount)
 	{
-		ScriptAssertF(false, "Invalid room number: {}. Value must be in range [0, {})", roomNumber, nRooms);
-		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
+		ScriptAssertF(false, "Invalid room ID {}. Value must be in range [0, {})", roomNumber, roomCount);
+		TENLog("Room ID will not be set.", LogLevel::Warning, LogConfig::All);
 		return;
 	}
 
@@ -923,11 +935,9 @@ void Moveable::SetRoomNumber(int roomNumber)
 	{
 		ItemNewRoom(m_num, roomNumber);
 
-		// HACK: For Lara, we need to manually force Location.roomNumber to new one,
-		// or else camera won't be updated properly.
-
+		// HACK: Must manually force new Location.RoomNumber for player, otherwise camera doesn't update properly.
 		if (m_item->IsLara())
-			m_item->Location.roomNumber = roomNumber;
+			m_item->Location.RoomNumber = roomNumber;
 	}
 }
 

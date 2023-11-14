@@ -194,7 +194,7 @@ void LoadItems()
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
-				if ((Objects[g_Level.Items[i].ObjectNumber].floor == nullptr) == (bool)isFloor)
+				if ((Objects[g_Level.Items[i].ObjectNumber].GetFloorHeight == nullptr) == (bool)isFloor)
 					InitializeItem(i);
 			}
 		}
@@ -412,7 +412,7 @@ void LoadObjects()
 
 		StaticObjects[meshID].flags = (short)ReadInt16();
 
-		StaticObjects[meshID].shatterType = (short)ReadInt16();
+		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
 		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
 

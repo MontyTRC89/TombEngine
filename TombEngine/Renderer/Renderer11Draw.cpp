@@ -1814,112 +1814,115 @@ namespace TEN::Renderer
 			return;
 		}
 		 
-		m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), NULL, 0);
-		m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), NULL, 0);
-
-		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
-
-		BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
-		BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
-
-		// Bind vertex and index buffer
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
+		if (rendererPass != RendererPass::CollectSortedFaces)
 		{
-			std::vector<RendererStatic*> statics = it->second;
+			m_context->VSSetShader(m_vsInstancedStaticMeshes.Get(), NULL, 0);
+			m_context->PSSetShader(m_psInstancedStaticMeshes.Get(), NULL, 0);
 
-			RendererStatic* refStatic = statics[0];
-			RendererObject& refStaticObj = *m_staticObjects[refStatic->ObjectNumber];
-			if (refStaticObj.ObjectMeshes.size() == 0)
-				continue;
+			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-			RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
+			BindConstantBufferVS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
+			BindConstantBufferPS(CB_INSTANCED_STATICS, m_cbInstancedStaticMeshBuffer.get());
 
-			int staticsCount = (int)statics.size();
-			int bucketSize = INSTANCED_STATIC_MESH_BUCKET_SIZE;
-			int baseStaticIndex = 0;
+			// Bind vertex and index buffer
+			UINT stride = sizeof(RendererVertex);
+			UINT offset = 0;
 
-			while (baseStaticIndex < staticsCount)
+			m_context->IASetVertexBuffers(0, 1, m_staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 			{
-				int k = 0;
-				int instanceCount = std::min(bucketSize, staticsCount - baseStaticIndex);
-				int max = std::min(baseStaticIndex + bucketSize, staticsCount);
+				std::vector<RendererStatic*> statics = it->second;
 
-				for (int s = baseStaticIndex; s < max; s++)
+				RendererStatic* refStatic = statics[0];
+				RendererObject& refStaticObj = *m_staticObjects[refStatic->ObjectNumber];
+				if (refStaticObj.ObjectMeshes.size() == 0)
+					continue;
+
+				RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
+
+				int staticsCount = (int)statics.size();
+				int bucketSize = INSTANCED_STATIC_MESH_BUCKET_SIZE;
+				int baseStaticIndex = 0;
+
+				while (baseStaticIndex < staticsCount)
 				{
-					RendererStatic* current = statics[s];
-					RendererRoom* room = &m_rooms[current->RoomNumber];
+					int k = 0;
+					int instanceCount = std::min(bucketSize, staticsCount - baseStaticIndex);
+					int max = std::min(baseStaticIndex + bucketSize, staticsCount);
 
-					m_stInstancedStaticMeshBuffer.StaticMeshes[k].World = current->World;
-					m_stInstancedStaticMeshBuffer.StaticMeshes[k].Color = current->Color;
-					m_stInstancedStaticMeshBuffer.StaticMeshes[k].Ambient = room->AmbientLight;
-					m_stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = refMesh->LightMode;
-					BindInstancedStaticLights(current->LightsToDraw, k);
-					k++;
-				}
-				 
-				baseStaticIndex += bucketSize;
-
-				for (auto& bucket : refMesh->Buckets)
-				{
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
-						(rendererPass == RendererPass::Transparent)))
+					for (int s = baseStaticIndex; s < max; s++)
 					{
-						continue;
+						RendererStatic* current = statics[s];
+						RendererRoom* room = &m_rooms[current->RoomNumber];
+
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].World = current->World;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].Color = current->Color;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].Ambient = room->AmbientLight;
+						m_stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = refMesh->LightMode;
+						BindInstancedStaticLights(current->LightsToDraw, k);
+						k++;
 					}
 
-					if (bucket.NumVertices == 0)
+					baseStaticIndex += bucketSize;
+
+					for (auto& bucket : refMesh->Buckets)
 					{
-						continue;
-					}
-
-					if (!DoesBlendModeRequireSorting(bucket.BlendMode))
-					{
-						m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
-
-						int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
-
-						for (int pass = 0; pass < passes; pass++)
+						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+							(rendererPass == RendererPass::Transparent)))
 						{
-							if (pass == 0)
+							continue;
+						}
+
+						if (bucket.NumVertices == 0)
+						{
+							continue;
+						}
+
+						if (!DoesBlendModeRequireSorting(bucket.BlendMode))
+						{
+							m_cbInstancedStaticMeshBuffer.updateData(m_stInstancedStaticMeshBuffer, m_context.Get());
+
+							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
+
+							for (int pass = 0; pass < passes; pass++)
 							{
-								SetBlendMode(bucket.BlendMode);
-								SetAlphaTest(
-									(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
-									ALPHA_TEST_THRESHOLD);
+								if (pass == 0)
+								{
+									SetBlendMode(bucket.BlendMode);
+									SetAlphaTest(
+										(bucket.BlendMode == BLENDMODE_ALPHATEST) ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
+										ALPHA_TEST_THRESHOLD);
+								}
+								else
+								{
+									SetBlendMode(BLENDMODE_ALPHABLEND);
+									SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
+								}
+
+								BindTexture(TEXTURE_COLOR_MAP,
+									&std::get<0>(m_staticsTextures[bucket.Texture]),
+									SAMPLER_ANISOTROPIC_CLAMP);
+								BindTexture(TEXTURE_NORMAL_MAP,
+									&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+
+								DrawIndexedInstancedTriangles(bucket.NumIndices, instanceCount, bucket.StartIndex, 0);
+
+								m_numStaticsDrawCalls++;
 							}
-							else
-							{
-								SetBlendMode(BLENDMODE_ALPHABLEND);
-								SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
-							}
-
-							BindTexture(TEXTURE_COLOR_MAP,
-								&std::get<0>(m_staticsTextures[bucket.Texture]),
-								SAMPLER_ANISOTROPIC_CLAMP);
-							BindTexture(TEXTURE_NORMAL_MAP,
-								&std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
-
-							DrawIndexedInstancedTriangles(bucket.NumIndices, instanceCount, bucket.StartIndex, 0);
-
-							m_numStaticsDrawCalls++;
 						}
 					}
 				}
 			}
 		}
-
-		// Collect sorted blend modes faces ordered by room, if transparent pass
-		if (rendererPass == RendererPass::CollectSortedFaces)
+		else
 		{
+			// Collect sorted blend modes faces ordered by room, if transparent pass
+
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 			for (auto room : view.RoomsToDraw)
@@ -2060,45 +2063,48 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
-						(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
+					if (rendererPass == RendererPass::CollectSortedFaces)
 					{
-						continue;
-					}
-
-					if (rendererPass == RendererPass::CollectSortedFaces && DoesBlendModeRequireSorting(bucket.BlendMode))
-					{
-						// Collect transparent faces.
-						for (int j = 0; j < bucket.Polygons.size(); j++)
+						if (DoesBlendModeRequireSorting(bucket.BlendMode))
 						{
-							RendererPolygon* p = &bucket.Polygons[j];
+							// Collect transparent faces.
+							for (int j = 0; j < bucket.Polygons.size(); j++)
+							{
+								RendererPolygon* p = &bucket.Polygons[j];
 
-							m_numRoomsTransparentPolygons++;
+								m_numRoomsTransparentPolygons++;
 
-							// As polygon distance, for rooms, we use the farthest vertex distance                            
-							int d1 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
-							int d2 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
-							int d3 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
-							int d4 = 0;
-							if (p->shape == 0)
-								d4 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
+								// As polygon distance, for rooms, we use the farthest vertex distance                            
+								int d1 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();
+								int d2 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 1]].Position - cameraPosition).Length();
+								int d3 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 2]].Position - cameraPosition).Length();
+								int d4 = 0;
+								if (p->shape == 0)
+									d4 = (m_roomsVertices[m_roomsIndices[p->baseIndex + 3]].Position - cameraPosition).Length();
 
-							int distance = std::max(std::max(std::max(d1, d2), d3), d4);
+								int distance = std::max(std::max(std::max(d1, d2), d3), d4);
 
-							RendererTransparentFace face;
-							face.type = RendererTransparentFaceType::TRANSPARENT_FACE_ROOM;
-							face.info.polygon = p;
-							face.distance = distance;
-							face.info.animated = bucket.Animated;
-							face.info.texture = bucket.Texture;
-							face.info.room = room;
-							face.info.blendMode = bucket.BlendMode;
-							face.info.bucket = &bucket;
-							room->TransparentFacesToDraw.push_back(face);
+								RendererTransparentFace face;
+								face.type = RendererTransparentFaceType::TRANSPARENT_FACE_ROOM;
+								face.info.polygon = p;
+								face.distance = distance;
+								face.info.animated = bucket.Animated;
+								face.info.texture = bucket.Texture;
+								face.info.room = room;
+								face.info.blendMode = bucket.BlendMode;
+								face.info.bucket = &bucket;
+								room->TransparentFacesToDraw.push_back(face);
+							}
 						}
 					}
 					else
 					{
+						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+							(rendererPass == RendererPass::Transparent)))
+						{
+							continue;
+						}
+
 						int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
 						for (int pass = 0; pass < passes; pass++)
@@ -2291,12 +2297,6 @@ namespace TEN::Renderer
 
 		for (auto& bucket : mesh->Buckets)
 		{
-			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
-				(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
-			{
-				continue;
-			}
-
 			if (bucket.NumVertices == 0)
 				continue;
 
@@ -2309,34 +2309,43 @@ namespace TEN::Renderer
 
 				m_numMoveablesDrawCalls++;
 			}
-			else if (rendererPass == RendererPass::CollectSortedFaces && DoesBlendModeRequireSorting(bucket.BlendMode))
+			else if (rendererPass == RendererPass::CollectSortedFaces)
 			{
-				// Collect transparent faces
-				for (int j = 0; j < bucket.Polygons.size(); j++)
+				if (DoesBlendModeRequireSorting(bucket.BlendMode))
 				{
-					auto* polygonPtr = &bucket.Polygons[j];
+					// Collect transparent faces
+					for (int j = 0; j < bucket.Polygons.size(); j++)
+					{
+						auto* polygonPtr = &bucket.Polygons[j];
 
-					// Use averaged distance as polygon distance for moveables.
-					auto centre = Vector3::Transform(
-						polygonPtr->centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
-					int distance = (centre - cameraPos).Length();
+						// Use averaged distance as polygon distance for moveables.
+						auto centre = Vector3::Transform(
+							polygonPtr->centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
+						int distance = (centre - cameraPos).Length();
 
-					RendererTransparentFace face;
-					face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
-					face.info.polygon = polygonPtr;
-					face.distance = distance;
-					face.info.animated = bucket.Animated;
-					face.info.texture = bucket.Texture;
-					face.info.room = room;
-					face.info.item = itemToDraw;
-					face.info.color = itemToDraw->Color;
-					face.info.blendMode = bucket.BlendMode;
-					face.info.bucket = &bucket;
-					room->TransparentFacesToDraw.push_back(face);
+						RendererTransparentFace face;
+						face.type = RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE;
+						face.info.polygon = polygonPtr;
+						face.distance = distance;
+						face.info.animated = bucket.Animated;
+						face.info.texture = bucket.Texture;
+						face.info.room = room;
+						face.info.item = itemToDraw;
+						face.info.color = itemToDraw->Color;
+						face.info.blendMode = bucket.BlendMode;
+						face.info.bucket = &bucket;
+						room->TransparentFacesToDraw.push_back(face);
+					}
 				}
 			}
 			else
 			{
+				if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^
+					(rendererPass == RendererPass::Transparent || rendererPass == RendererPass::CollectSortedFaces)))
+				{
+					continue;
+				}
+
 				int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),

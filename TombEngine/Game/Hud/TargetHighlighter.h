@@ -16,7 +16,7 @@ namespace TEN::Hud
 	public:
 		// Constants
 		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.2f, 0.2f, 0.9f);
-		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+		static constexpr auto COLOR_GRAY	= Vector4(0.7f, 0.7f, 0.7f, 0.7f);
 		static constexpr auto SEGMENT_COUNT = 4;
 
 		// Members
@@ -55,7 +55,7 @@ namespace TEN::Hud
 	{
 	private:
 		// Members
-		std::unordered_map<int, CrosshairData> Crosshairs = {}; // Key = item number.
+		std::unordered_map<int, CrosshairData> _crosshairs = {}; // Key = item number.
 
 	public:
 		// Utilities

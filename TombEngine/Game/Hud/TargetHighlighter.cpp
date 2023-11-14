@@ -21,7 +21,7 @@ namespace TEN::Hud
 	float CrosshairData::GetScale(float cameraDist) const
 	{
 		constexpr auto RANGE			   = BLOCK(10);
-		constexpr auto CROSSHAIR_SCALE_MAX = 0.15f;
+		constexpr auto CROSSHAIR_SCALE_MAX = 0.12f;
 		constexpr auto CROSSHAIR_SCALE_MIN = CROSSHAIR_SCALE_MAX / 3;
 
 		auto alpha = cameraDist / RANGE;
@@ -34,7 +34,7 @@ namespace TEN::Hud
 		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 		float screenResAspect = screenRes.x / screenRes.y;
 
-		return ((((SCREEN_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale)) * screenResAspect);
+		return ((((DISPLAY_SPACE_RES.x * Scale) / 2) * (RadiusScale * PulseScale)) * screenResAspect);
 	}
 
 	Vector2 CrosshairData::GetPositionOffset(short orientOffset) const
@@ -70,16 +70,16 @@ namespace TEN::Hud
 		float screenEdgeThreshold = GetRadius();
 		return (Position->x <= -screenEdgeThreshold ||
 				Position->y <= -screenEdgeThreshold ||
-				Position->x >= (SCREEN_SPACE_RES.x + screenEdgeThreshold) ||
-				Position->y >= (SCREEN_SPACE_RES.y + screenEdgeThreshold));
+				Position->x >= (DISPLAY_SPACE_RES.x + screenEdgeThreshold) ||
+				Position->y >= (DISPLAY_SPACE_RES.y + screenEdgeThreshold));
 	}
 
 	void CrosshairData::Update(const Vector3& targetPos, bool isActive, bool doPulse)
 	{
 		constexpr auto ROT					   = ANGLE(2.0f);
 		constexpr auto ALIGN_ANGLE_STEP		   = ANGLE(360.0f / SEGMENT_COUNT);
-		constexpr auto SCALE_PRIMARY		   = 0.75f;
-		constexpr auto SCALE_PERIPHERAL		   = 0.5f;
+		constexpr auto SCALE_PRIMARY		   = 1.0f;
+		constexpr auto SCALE_PERIPHERAL		   = 0.8f;
 		constexpr auto RADIUS_SCALE_PRIMARY	   = 0.5f;
 		constexpr auto RADIUS_SCALE_PERIPHERAL = 0.25f;
 		constexpr auto PULSE_SCALE_MAX		   = 1.3f;
@@ -96,7 +96,7 @@ namespace TEN::Hud
 		// Update orientation.
 		if (IsPrimary)
 		{
-			Orientation += ROT;
+			Orientation += IsActive ? ROT : (ROT * 2);
 		}
 		else
 		{
@@ -114,7 +114,7 @@ namespace TEN::Hud
 		}
 		else
 		{
-			Scale = Lerp(Scale, 0.0f, MORPH_LERP_ALPHA / 2);
+			Scale = Lerp(Scale, 0.0f, MORPH_LERP_ALPHA / 4);
 		}
 
 		// Update color.
@@ -178,8 +178,8 @@ namespace TEN::Hud
 		// Check if target highlighter is enabled.
 		if (!g_Configuration.EnableTargetHighlighter)
 		{
-			if (!Crosshairs.empty())
-				Crosshairs.clear();
+			if (!_crosshairs.empty())
+				_crosshairs.clear();
 
 			return;
 		}
@@ -197,8 +197,8 @@ namespace TEN::Hud
 			itemNumbers.push_back(itemPtr->Index);
 
 			// Find crosshair at item number key.
-			auto it = Crosshairs.find(itemPtr->Index);
-			if (it == Crosshairs.end())
+			auto it = _crosshairs.find(itemPtr->Index);
+			if (it == _crosshairs.end())
 				continue;
 
 			// Set crosshair as primary or peripheral.
@@ -222,10 +222,10 @@ namespace TEN::Hud
 	{
 		//DrawDebug();
 
-		if (Crosshairs.empty())
+		if (_crosshairs.empty())
 			return;
 
-		for (const auto& [itemNumber, crosshair] : Crosshairs)
+		for (const auto& [itemNumber, crosshair] : _crosshairs)
 			crosshair.Draw();
 	}
 
@@ -239,7 +239,7 @@ namespace TEN::Hud
 		constexpr auto TARGET_BONE_ID = 0;
 
 		// No crosshairs to update; return early.
-		if (Crosshairs.empty() && itemNumbers.empty())
+		if (_crosshairs.empty() && itemNumbers.empty())
 			return;
 
 		// Update active crosshairs.
@@ -249,8 +249,8 @@ namespace TEN::Hud
 			auto targetPos = GetJointPosition(item, TARGET_BONE_ID).ToVector3();
 
 			// Update existing active crosshair.
-			auto it = Crosshairs.find(itemNumber);
-			if (it != Crosshairs.end())
+			auto it = _crosshairs.find(itemNumber);
+			if (it != _crosshairs.end())
 			{
 				auto& crosshair = it->second;
 				if (crosshair.IsActive)
@@ -265,7 +265,7 @@ namespace TEN::Hud
 		}
 
 		// Update inactive crosshairs.
-		for (auto& [itemNumber, crosshair] : Crosshairs)
+		for (auto& [itemNumber, crosshair] : _crosshairs)
 		{
 			// Find crosshairs at absent item number keys.
 			if (Contains(itemNumbers, itemNumber))
@@ -286,12 +286,12 @@ namespace TEN::Hud
 		constexpr auto CROSSHAIR_COUNT_MAX = 16;
 
 		// Map is full; clear smallest crosshair.
-		if (Crosshairs.size() >= CROSSHAIR_COUNT_MAX)
+		if (_crosshairs.size() >= CROSSHAIR_COUNT_MAX)
 		{
 			int key = 0;
 			float smallestScale = INFINITY;
 			
-			for (auto& [itemNumber, crosshair] : Crosshairs)
+			for (auto& [itemNumber, crosshair] : _crosshairs)
 			{
 				if (crosshair.Scale < smallestScale)
 				{
@@ -300,12 +300,12 @@ namespace TEN::Hud
 				}
 			}
 
-			Crosshairs.erase(key);
+			_crosshairs.erase(key);
 		}
 
 		// Return new crosshair.
-		Crosshairs.insert({ itemNumber, {} });
-		auto& crosshair = Crosshairs.at(itemNumber);
+		_crosshairs.insert({ itemNumber, {} });
+		auto& crosshair = _crosshairs.at(itemNumber);
 		crosshair = {};
 		return crosshair;
 	}
@@ -348,11 +348,11 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::ClearInactiveCrosshairs()
 	{
-		for (auto it = Crosshairs.begin(); it != Crosshairs.end();)
+		for (auto it = _crosshairs.begin(); it != _crosshairs.end();)
 		{
 			const auto& crosshair = it->second;
 			(!crosshair.IsActive && crosshair.Scale <= EPSILON) ?
-				(it = Crosshairs.erase(it)) : ++it;
+				(it = _crosshairs.erase(it)) : ++it;
 		}
 	}
 
@@ -362,7 +362,7 @@ namespace TEN::Hud
 		unsigned int primaryCount = 0;
 		unsigned int peripheralCount = 0;
 
-		for (const auto& [itemNumber, crosshair] : Crosshairs)
+		for (const auto& [itemNumber, crosshair] : _crosshairs)
 		{
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
 			

@@ -34,6 +34,87 @@ using namespace TEN::Entities::Switches;
 ObjectHandler Objects;
 StaticInfo StaticObjects[MAX_STATICS];
 
+void ObjectHandler::Initialize() 
+{ 
+	std::memset(_objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
+}
+
+bool ObjectHandler::CheckID(GAME_OBJECT_ID objectID, bool isSilent)
+{
+	if (objectID == GAME_OBJECT_ID::ID_NO_OBJECT || objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+	{
+		if (!isSilent)
+		{
+			TENLog(
+				"Attempted to access unavailable slot ID (" + std::to_string(objectID) + "). " +
+				"Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+ObjectInfo& ObjectHandler::operator [](int objectID) 
+{
+	if (CheckID((GAME_OBJECT_ID)objectID))
+		return _objects[objectID];
+
+	return GetFirstAvailableObject();
+}
+
+ObjectInfo& ObjectHandler::GetFirstAvailableObject()
+{
+	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
+	{
+		if (_objects[i].loaded)
+			return _objects[i];
+	}
+
+	return _objects[0];
+}
+
+// NOTE: JointRotationFlags allows bones to be rotated with CreatureJoint().
+void ObjectInfo::SetBoneRotationFlags(int boneID, int flags)
+{
+	g_Level.Bones[boneIndex + (boneID * 4)] |= flags;
+}
+
+// NOTE: Use if object is alive, but not intelligent, to set up blood effects.
+void ObjectInfo::SetHitEffect(bool isSolid, bool isAlive)
+{
+	// Avoid some objects such as ID_SAS_DYING having None.
+	if (isAlive)
+	{
+		hitEffect = HitEffect::Blood;
+		return;
+	}
+
+	if (intelligent)
+	{
+		if (isSolid && HitPoints > 0)
+		{
+			hitEffect = HitEffect::Richochet;
+		}
+		else if ((damageType != DamageMode::Any && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+		{
+			hitEffect = HitEffect::Smoke;
+		}
+		else if (damageType == DamageMode::Any && HitPoints > 0)
+		{
+			hitEffect = HitEffect::Blood;
+		}
+	}
+	else if (isSolid && HitPoints <= 0)
+	{
+		hitEffect = HitEffect::Richochet;
+	}
+	else
+	{
+		hitEffect = HitEffect::None;
+	}
+}
 
 void InitializeGameFlags()
 {
@@ -87,8 +168,8 @@ void InitializeObjects()
 		obj->Initialize = nullptr;
 		obj->collision = nullptr;
 		obj->control = nullptr;
-		obj->floor = nullptr;
-		obj->ceiling = nullptr;
+		obj->GetFloorHeight = nullptr;
+		obj->GetCeilingHeight = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
 		obj->HitRoutine = DefaultItemHit;
 		obj->pivotLength = 0;
@@ -101,7 +182,7 @@ void InitializeObjects()
 		obj->waterCreature = false;
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
-		obj->damageType = DamageMode::AnyWeapon;
+		obj->damageType = DamageMode::Any;
 		obj->LotType = LotType::Basic;
 		obj->meshSwapSlot = NO_ITEM;
 		obj->isPickup = false;
