@@ -445,56 +445,58 @@ namespace TEN::Collision::Floordata
 		return GetFloor(roomNumber, GetRoomGridCoord(roomNumber, x, z));
 	}
 
-	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber)
+	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumberPtr)
 	{
-		auto floor = &GetFloor(roomNumber, x, z);
+		auto* sectorPtr = &GetFloor(roomNumber, x, z);
 
-		auto roomSide = floor->GetRoomNumberAtSide();
-		while (roomSide)
+		auto sideRoomNumber = sectorPtr->GetRoomNumberAtSide();
+		while (sideRoomNumber.has_value())
 		{
-			roomNumber = *roomSide;
-			floor = &GetFloor(roomNumber, x, z);
-			roomSide = floor->GetRoomNumberAtSide();
+			roomNumber = *sideRoomNumber;
+			sectorPtr = &GetFloor(roomNumber, x, z);
+			sideRoomNumber = sectorPtr->GetRoomNumberAtSide();
 		}
 
-		if (sideRoomNumber)
-			*sideRoomNumber = roomNumber;
+		if (sideRoomNumberPtr != nullptr)
+			*sideRoomNumberPtr = roomNumber;
 
-		return *floor;
+		return *sectorPtr;
 	}
 
-	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber)
+	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumberPtr)
 	{
-		auto floor = &GetFloorSide(roomNumber, x, z, bottomRoomNumber);
-		auto wall = floor->IsWall(x, z);
-		while (wall)
+		auto* sectorPtr = &GetFloorSide(roomNumber, x, z, bottomRoomNumberPtr);
+		
+		bool isWall = sectorPtr->IsWall(x, z);
+		while (isWall)
 		{
-			const auto roomBelow = floor->GetRoomNumberBelow(x, z);
-			if (!roomBelow)
+			auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(x, z);
+			if (!roomNumberBelow.has_value())
 				break;
 
-			floor = &GetFloorSide(*roomBelow, x, z, bottomRoomNumber);
-			wall = floor->IsWall(x, z);
+			sectorPtr = &GetFloorSide(*roomNumberBelow, x, z, bottomRoomNumberPtr);
+			isWall = sectorPtr->IsWall(x, z);
 		}
 
-		return *floor;
+		return *sectorPtr;
 	}
 
-	FloorInfo& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumber)
+	FloorInfo& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumberPtr)
 	{
-		auto floor = &GetFloorSide(roomNumber, x, z, topRoomNumber);
-		auto wall = floor->IsWall(x, z);
-		while (wall)
+		auto* sectorPtr = &GetFloorSide(roomNumber, x, z, topRoomNumberPtr);
+		
+		bool isWall = sectorPtr->IsWall(x, z);
+		while (isWall)
 		{
-			const auto roomAbove = floor->GetRoomNumberAbove(x, z);
-			if (!roomAbove)
+			auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(x, z);
+			if (!roomNumberAbove)
 				break;
 
-			floor = &GetFloorSide(*roomAbove, x, z, topRoomNumber);
-			wall = floor->IsWall(x, z);
+			sectorPtr = &GetFloorSide(*roomNumberAbove, x, z, topRoomNumberPtr);
+			isWall = sectorPtr->IsWall(x, z);
 		}
 
-		return *floor;
+		return *sectorPtr;
 	}
 
 	std::optional<int> GetTopHeight(FloorInfo& startSector, Vector3i pos, int* topRoomNumberPtr, FloorInfo** topSectorPtr)
@@ -548,37 +550,38 @@ namespace TEN::Collision::Floordata
 		}
 		while (sectorPtr->GetInsideBridgeItemNumber(pos, true, false) >= 0);
 
-		if (bottomRoomNumberPtr)
+		if (bottomRoomNumberPtr != nullptr)
 			*bottomRoomNumberPtr = roomNumber;
 
-		if (bottomSectorPtr)
+		if (bottomSectorPtr != nullptr)
 			*bottomSectorPtr = sectorPtr;
 
 		return pos.y;
 	}
 
-	std::optional<int> GetFloorHeight(const ROOM_VECTOR& location, int x, int z)
+	std::optional<int> GetFloorHeight(const RoomVector& location, int x, int z)
 	{
-		auto floor = &GetFloorSide(location.roomNumber, x, z);
-		auto y = location.yNumber;
-		auto direction = 0;
+		auto* sectorPtr = &GetFloorSide(location.RoomNumber, x, z);
 
-		if (floor->IsWall(x, z))
+		int y = location.Height;
+		int direction = 0;
+
+		if (sectorPtr->IsWall(x, z))
 		{
-			floor = &GetTopFloor(location.roomNumber, x, z);
+			sectorPtr = &GetTopFloor(location.RoomNumber, x, z);
 
-			if (!floor->IsWall(x, z))
+			if (!sectorPtr->IsWall(x, z))
 			{
-				y = floor->GetSurfaceHeight(x, z, true);
+				y = sectorPtr->GetSurfaceHeight(x, z, true);
 				direction = -1;
 			}
 			else
 			{
-				floor = &GetBottomFloor(location.roomNumber, x, z);
+				sectorPtr = &GetBottomFloor(location.RoomNumber, x, z);
 
-				if (!floor->IsWall(x, z))
+				if (!sectorPtr->IsWall(x, z))
 				{
-					y = floor->GetSurfaceHeight(x, z, false);
+					y = sectorPtr->GetSurfaceHeight(x, z, false);
 					direction = 1;
 				}
 				else
@@ -588,65 +591,66 @@ namespace TEN::Collision::Floordata
 			}
 		}
 
-		const auto floorHeight = floor->GetSurfaceHeight(Vector3i(x, y, z), true);
-		const auto ceilingHeight = floor->GetSurfaceHeight(Vector3i(x, y, z), false);
+		int floorHeight = sectorPtr->GetSurfaceHeight(Vector3i(x, y, z), true);
+		int ceilingHeight = sectorPtr->GetSurfaceHeight(Vector3i(x, y, z), false);
 
 		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (floor->GetInsideBridgeItemNumber(Vector3i(x, y, z), y == ceilingHeight, y == floorHeight) >= 0)
+		if (sectorPtr->GetInsideBridgeItemNumber(Vector3i(x, y, z), y == ceilingHeight, y == floorHeight) >= 0)
 		{
 			if (direction <= 0)
 			{
-				auto height = GetTopHeight(*floor, Vector3i(x, y, z));
-				if (height)
-					return height;
+				auto topHeight = GetTopHeight(*sectorPtr, Vector3i(x, y, z));
+				if (topHeight.has_value())
+					return topHeight;
 			}
 
 			if (direction >= 0)
 			{
-				auto height = GetBottomHeight(*floor, Vector3i(x, y, z), nullptr, &floor);
-				if (!height)
+				auto bottomHeight = GetBottomHeight(*sectorPtr, Vector3i(x, y, z), nullptr, &sectorPtr);
+				if (!bottomHeight.has_value())
 					return std::nullopt;
 
-				y = *height;
+				y = *bottomHeight;
 			}
 		}
 
 		if (direction >= 0)
 		{
-			auto roomBelow = floor->GetRoomNumberBelow(Vector3i(x, y, z));
-			while (roomBelow)
+			auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(Vector3i(x, y, z));
+			while (roomNumberBelow.has_value())
 			{
-				floor = &GetFloorSide(*roomBelow, x, z);
-				roomBelow = floor->GetRoomNumberBelow(Vector3i(x, y, z));
+				sectorPtr = &GetFloorSide(*roomNumberBelow, x, z);
+				roomNumberBelow = sectorPtr->GetRoomNumberBelow(Vector3i(x, y, z));
 			}
 		}
 
-		return floor->GetSurfaceHeight(Vector3i(x, y, z), true);
+		return sectorPtr->GetSurfaceHeight(Vector3i(x, y, z), true);
 	}
 
-	std::optional<int> GetCeilingHeight(const ROOM_VECTOR& location, int x, int z)
+	std::optional<int> GetCeilingHeight(const RoomVector& location, int x, int z)
 	{
-		auto floor = &GetFloorSide(location.roomNumber, x, z);
-		auto y = location.yNumber;
-		auto direction = 0;
+		auto* sectorPtr = &GetFloorSide(location.RoomNumber, x, z);
 
-		if (floor->IsWall(x, z))
+		int y = location.Height;
+		int direction = 0;
+
+		if (sectorPtr->IsWall(x, z))
 		{
-			floor = &GetBottomFloor(location.roomNumber, x, z);
+			sectorPtr = &GetBottomFloor(location.RoomNumber, x, z);
 
-			if (!floor->IsWall(x, z))
+			if (!sectorPtr->IsWall(x, z))
 			{
-				y = floor->GetSurfaceHeight(x, z, false);
+				y = sectorPtr->GetSurfaceHeight(x, z, false);
 				direction = 1;
 			}
 			else
 			{
-				floor = &GetTopFloor(location.roomNumber, x, z);
+				sectorPtr = &GetTopFloor(location.RoomNumber, x, z);
 
-				if (!floor->IsWall(x, z))
+				if (!sectorPtr->IsWall(x, z))
 				{
-					y = floor->GetSurfaceHeight(x, z, true);
+					y = sectorPtr->GetSurfaceHeight(x, z, true);
 					direction = -1;
 				}
 				else
@@ -656,179 +660,183 @@ namespace TEN::Collision::Floordata
 			}
 		}
 
-		const auto floorHeight = floor->GetSurfaceHeight(Vector3i(x, y, z), true);
-		const auto ceilingHeight = floor->GetSurfaceHeight(Vector3i(x, y, z), false);
+		int floorHeight = sectorPtr->GetSurfaceHeight(Vector3i(x, y, z), true);
+		int ceilingHeight = sectorPtr->GetSurfaceHeight(Vector3i(x, y, z), false);
 
 		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (floor->GetInsideBridgeItemNumber(Vector3i(x, y, z), y == ceilingHeight, y == floorHeight) >= 0)
+		if (sectorPtr->GetInsideBridgeItemNumber(Vector3i(x, y, z), y == ceilingHeight, y == floorHeight) >= 0)
 		{
 			if (direction >= 0)
 			{
-				auto height = GetBottomHeight(*floor, Vector3i(x, y, z));
-				if (height)
-					return height;
+				auto bottomHeight = GetBottomHeight(*sectorPtr, Vector3i(x, y, z));
+				if (bottomHeight.has_value())
+					return bottomHeight;
 			}
 
 			if (direction <= 0)
 			{
-				auto height = GetTopHeight(*floor, Vector3i(x, y, z), nullptr, &floor);
-				if (!height)
+				auto topHeight = GetTopHeight(*sectorPtr, Vector3i(x, y, z), nullptr, &sectorPtr);
+				if (!topHeight.has_value())
 					return std::nullopt;
 
-				y = *height;
+				y = *topHeight;
 			}
 		}
 
 		if (direction <= 0)
 		{
-			auto roomAbove = floor->GetRoomNumberAbove(Vector3i(x, y, z));
-			while (roomAbove)
+			auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(Vector3i(x, y, z));
+			while (roomNumberAbove.has_value())
 			{
-				floor = &GetFloorSide(*roomAbove, x, z);
-				roomAbove = floor->GetRoomNumberAbove(Vector3i(x, y, z));
+				sectorPtr = &GetFloorSide(*roomNumberAbove, x, z);
+				roomNumberAbove = sectorPtr->GetRoomNumberAbove(Vector3i(x, y, z));
 			}
 		}
 
-		return floor->GetSurfaceHeight(Vector3i(x, y, z), false);
+		return sectorPtr->GetSurfaceHeight(Vector3i(x, y, z), false);
 	}
 
-	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, const Vector3i& pos)
+	std::optional<RoomVector> GetBottomRoom(RoomVector location, const Vector3i& pos)
 	{
-		auto floor = &GetFloorSide(location.roomNumber, pos.x, pos.z, &location.roomNumber);
+		auto* sectorPtr = &GetFloorSide(location.RoomNumber, pos.x, pos.z, &location.RoomNumber);
 
-		if (floor->IsWall(pos.x, pos.z))
+		if (sectorPtr->IsWall(pos.x, pos.z))
 		{
-			floor = &GetBottomFloor(location.roomNumber, pos.x, pos.z, &location.roomNumber);
+			sectorPtr = &GetBottomFloor(location.RoomNumber, pos.x, pos.z, &location.RoomNumber);
 
-			if (floor->IsWall(pos.x, pos.z))
+			if (sectorPtr->IsWall(pos.x, pos.z))
 				return std::nullopt;
 
-			location.yNumber = floor->GetSurfaceHeight(pos.x, pos.z, false);
+			location.Height = sectorPtr->GetSurfaceHeight(pos.x, pos.z, false);
 		}
 
-		auto floorHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), true);
-		auto ceilingHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), false);
+		int floorHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), true);
+		int ceilingHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), false);
 
-		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
+		location.Height = std::clamp(location.Height, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (floor->GetInsideBridgeItemNumber(Vector3i(pos.x, location.yNumber, pos.z), location.yNumber == ceilingHeight, location.yNumber == floorHeight) >= 0)
+		bool testFloorBorder = (location.Height == ceilingHeight);
+		bool testCeilBorder = (location.Height == floorHeight);
+		int insideBridgeItemNumber = sectorPtr->GetInsideBridgeItemNumber(Vector3i(pos.x, location.Height, pos.z), testFloorBorder, testCeilBorder);
+
+		if (insideBridgeItemNumber != NO_ITEM)
 		{
-			const auto height = GetBottomHeight(*floor, Vector3i(pos.x, location.yNumber, pos.z), &location.roomNumber, &floor);
-			if (!height)
+			auto bottomHeight = GetBottomHeight(*sectorPtr, Vector3i(pos.x, location.Height, pos.z), &location.RoomNumber, &sectorPtr);
+			if (!bottomHeight.has_value())
 				return std::nullopt;
 
-			location.yNumber = *height;
+			location.Height = *bottomHeight;
 		}
 
-		floorHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), true);
-		ceilingHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), false);
-
-		if (pos.y < ceilingHeight && floor->GetRoomNumberAbove(Vector3i(pos.x, location.yNumber, pos.z)))
+		ceilingHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), false);
+		if (pos.y < ceilingHeight && sectorPtr->GetRoomNumberAbove(Vector3i(pos.x, location.Height, pos.z)))
 			return std::nullopt;
 
+		floorHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), true);
 		if (pos.y <= floorHeight)
 		{
-			location.yNumber = std::max(pos.y, ceilingHeight);
+			location.Height = std::max(pos.y, ceilingHeight);
 			return location;
 		}
 
-		auto roomBelow = floor->GetRoomNumberBelow(Vector3i(pos.x, location.yNumber, pos.z));
-		while (roomBelow)
+		auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(Vector3i(pos.x, location.Height, pos.z));
+		while (roomNumberBelow.has_value())
 		{
-			floor = &GetFloorSide(*roomBelow, pos.x, pos.z, &location.roomNumber);
-			location.yNumber = floor->GetSurfaceHeight(pos.x, pos.z, false);
+			sectorPtr = &GetFloorSide(*roomNumberBelow, pos.x, pos.z, &location.RoomNumber);
+			location.Height = sectorPtr->GetSurfaceHeight(pos.x, pos.z, false);
 
-			floorHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), true);
-			ceilingHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), false);
-
-			if (pos.y < ceilingHeight && floor->GetRoomNumberAbove(Vector3i(pos.x, location.yNumber, pos.z)))
+			ceilingHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), false);
+			if (pos.y < ceilingHeight && sectorPtr->GetRoomNumberAbove(Vector3i(pos.x, location.Height, pos.z)))
 				return std::nullopt;
 
+			floorHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), true);
 			if (pos.y <= floorHeight)
 			{
-				location.yNumber = std::max(pos.y, ceilingHeight);
+				location.Height = std::max(pos.y, ceilingHeight);
 				return location;
 			}
 
-			roomBelow = floor->GetRoomNumberBelow(Vector3i(pos.x, location.yNumber, pos.z));
+			roomNumberBelow = sectorPtr->GetRoomNumberBelow(Vector3i(pos.x, location.Height, pos.z));
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<ROOM_VECTOR> GetTopRoom(ROOM_VECTOR location, const Vector3i& pos)
+	std::optional<RoomVector> GetTopRoom(RoomVector location, const Vector3i& pos)
 	{
-		auto floor = &GetFloorSide(location.roomNumber, pos.x, pos.z, &location.roomNumber);
+		auto* sectorPtr = &GetFloorSide(location.RoomNumber, pos.x, pos.z, &location.RoomNumber);
 
-		if (floor->IsWall(pos.x, pos.z))
+		if (sectorPtr->IsWall(pos.x, pos.z))
 		{
-			floor = &GetTopFloor(location.roomNumber, pos.x, pos.z, &location.roomNumber);
+			sectorPtr = &GetTopFloor(location.RoomNumber, pos.x, pos.z, &location.RoomNumber);
 
-			if (floor->IsWall(pos.x, pos.z))
+			if (sectorPtr->IsWall(pos.x, pos.z))
 				return std::nullopt;
 
-			location.yNumber = floor->GetSurfaceHeight(pos.x, pos.z, true);
+			location.Height = sectorPtr->GetSurfaceHeight(pos.x, pos.z, true);
 		}
 
-		auto floorHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), true);
-		auto ceilingHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), false);
+		int floorHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), true);
+		int ceilingHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), false);
 
-		location.yNumber = std::clamp(location.yNumber, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
+		location.Height = std::clamp(location.Height, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (floor->GetInsideBridgeItemNumber(Vector3i(pos.x, location.yNumber, pos.z), location.yNumber == ceilingHeight, location.yNumber == floorHeight) >= 0)
+		bool testFloorBorder = (location.Height == ceilingHeight);
+		bool testCeilBorder = (location.Height == floorHeight);
+		int insideBridgeItemNumber = sectorPtr->GetInsideBridgeItemNumber(Vector3i(pos.x, location.Height, pos.z), testFloorBorder, testCeilBorder);
+
+		if (insideBridgeItemNumber != NO_ITEM)
 		{
-			const auto height = GetTopHeight(*floor, Vector3i(pos.x, location.yNumber, pos.z), &location.roomNumber, &floor);
-			if (!height)
+			auto topHeight = GetTopHeight(*sectorPtr, Vector3i(pos.x, location.Height, pos.z), &location.RoomNumber, &sectorPtr);
+			if (!topHeight.has_value())
 				return std::nullopt;
 
-			location.yNumber = *height;
+			location.Height = *topHeight;
 		}
 
-		floorHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), true);
-		ceilingHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), false);
-
-		if (pos.y > floorHeight && floor->GetRoomNumberBelow(Vector3i(pos.x, location.yNumber, pos.z)))
+		floorHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), true);
+		if (pos.y > floorHeight && sectorPtr->GetRoomNumberBelow(Vector3i(pos.x, location.Height, pos.z)))
 			return std::nullopt;
 
+		ceilingHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), false);
 		if (pos.y >= ceilingHeight)
 		{
-			location.yNumber = std::min(pos.y, floorHeight);
+			location.Height = std::min(pos.y, floorHeight);
 			return location;
 		}
 
-		auto roomAbove = floor->GetRoomNumberAbove(Vector3i(pos.x, location.yNumber, pos.z));
-		while (roomAbove)
+		auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(Vector3i(pos.x, location.Height, pos.z));
+		while (roomNumberAbove.has_value())
 		{
-			floor = &GetFloorSide(*roomAbove, pos.x, pos.z, &location.roomNumber);
-			location.yNumber = floor->GetSurfaceHeight(pos.x, pos.z, true);
+			sectorPtr = &GetFloorSide(*roomNumberAbove, pos.x, pos.z, &location.RoomNumber);
+			location.Height = sectorPtr->GetSurfaceHeight(pos.x, pos.z, true);
 
-			floorHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), true);
-			ceilingHeight = floor->GetSurfaceHeight(Vector3i(pos.x, location.yNumber, pos.z), false);
-
-			if (pos.y > floorHeight && floor->GetRoomNumberBelow(Vector3i(pos.x, location.yNumber, pos.z)))
+			floorHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), true);
+			if (pos.y > floorHeight && sectorPtr->GetRoomNumberBelow(Vector3i(pos.x, location.Height, pos.z)))
 				return std::nullopt;
 
+			ceilingHeight = sectorPtr->GetSurfaceHeight(Vector3i(pos.x, location.Height, pos.z), false);
 			if (pos.y >= ceilingHeight)
 			{
-				location.yNumber = std::min(pos.y, floorHeight);
+				location.Height = std::min(pos.y, floorHeight);
 				return location;
 			}
 
-			roomAbove = floor->GetRoomNumberAbove(Vector3i(pos.x, location.yNumber, pos.z));
+			roomNumberAbove = sectorPtr->GetRoomNumberAbove(Vector3i(pos.x, location.Height, pos.z));
 		}
 
 		return std::nullopt;
 	}
 
-	ROOM_VECTOR GetRoom(ROOM_VECTOR location, const Vector3i& pos)
+	RoomVector GetRoom(RoomVector location, const Vector3i& pos)
 	{
-		const auto locationBelow = GetBottomRoom(location, pos);
-		if (locationBelow)
+		auto locationBelow = GetBottomRoom(location, pos);
+		if (locationBelow.has_value())
 			return *locationBelow;
 
-		const auto locationAbove = GetTopRoom(location, pos);
-		if (locationAbove)
+		auto locationAbove = GetTopRoom(location, pos);
+		if (locationAbove.has_value())
 			return *locationAbove;
 
 		return location;
@@ -836,84 +844,86 @@ namespace TEN::Collision::Floordata
 
 	void AddBridge(int itemNumber, int x, int z)
 	{
-		const auto& item = g_Level.Items[itemNumber];
+		const auto& bridgeItem = g_Level.Items[itemNumber];
+		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		if (!Objects.CheckID(item.ObjectNumber))
+		if (!Objects.CheckID(bridgeItem.ObjectNumber))
 			return;
 
-		x += item.Pose.Position.x;
-		z += item.Pose.Position.z;
+		x += bridgeItem.Pose.Position.x;
+		z += bridgeItem.Pose.Position.z;
 
-		auto floor = &GetFloorSide(item.RoomNumber, x, z);
-		floor->AddBridge(itemNumber);
+		auto sectorPtr = &GetFloorSide(bridgeItem.RoomNumber, x, z);
+		sectorPtr->AddBridge(itemNumber);
 
-		if (Objects[item.ObjectNumber].GetFloorBorder != nullptr)
+		if (bridgeObject.GetFloorBorder != nullptr)
 		{
-			int floorBorder = Objects[item.ObjectNumber].GetFloorBorder(item);
-			while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
+			int floorBorder = bridgeObject.GetFloorBorder(bridgeItem);
+			while (floorBorder <= sectorPtr->GetSurfaceHeight(x, z, false))
 			{
-				const auto roomAbove = floor->GetRoomNumberAbove(x, z);
-				if (!roomAbove.has_value())
+				auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(x, z);
+				if (!roomNumberAbove.has_value())
 					break;
 
-				floor = &GetFloorSide(*roomAbove, x, z);
-				floor->AddBridge(itemNumber);
+				sectorPtr = &GetFloorSide(*roomNumberAbove, x, z);
+				sectorPtr->AddBridge(itemNumber);
 			}
 		}
 		
-		if (Objects[item.ObjectNumber].GetCeilingBorder != nullptr)
+		if (bridgeObject.GetCeilingBorder != nullptr)
 		{
-			int ceilingBorder = Objects[item.ObjectNumber].GetCeilingBorder(item);
-			while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
+			int ceilingBorder = bridgeObject.GetCeilingBorder(bridgeItem);
+			while (ceilingBorder >= sectorPtr->GetSurfaceHeight(x, z, true))
 			{
-				const auto roomBelow = floor->GetRoomNumberBelow(x, z);
-				if (!roomBelow.has_value())
+				auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(x, z);
+				if (!roomNumberBelow.has_value())
 					break;
 
-				floor = &GetFloorSide(*roomBelow, x, z);
-				floor->AddBridge(itemNumber);
+				sectorPtr = &GetFloorSide(*roomNumberBelow, x, z);
+				sectorPtr->AddBridge(itemNumber);
 			}
 		}
 	}
 
 	void RemoveBridge(int itemNumber, int x, int z)
 	{
-		const auto& item = g_Level.Items[itemNumber];
+		const auto& bridgeItem = g_Level.Items[itemNumber];
+		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
 
-		if (!Objects.CheckID(item.ObjectNumber))
+		if (!Objects.CheckID(bridgeItem.ObjectNumber))
 			return;
 
-		x += item.Pose.Position.x;
-		z += item.Pose.Position.z;
+		x += bridgeItem.Pose.Position.x;
+		z += bridgeItem.Pose.Position.z;
 
-		auto* floor = &GetFloorSide(item.RoomNumber, x, z);
-		floor->RemoveBridge(itemNumber);
+		auto* sectroPtr = &GetFloorSide(bridgeItem.RoomNumber, x, z);
+		sectroPtr->RemoveBridge(itemNumber);
 
-		if (Objects[item.ObjectNumber].GetFloorBorder != nullptr)
+		if (bridgeObject.GetFloorBorder != nullptr)
 		{
-			int floorBorder = Objects[item.ObjectNumber].GetFloorBorder(item);
-			while (floorBorder <= floor->GetSurfaceHeight(x, z, false))
+			int floorBorder = bridgeObject.GetFloorBorder(bridgeItem);
+			while (floorBorder <= sectroPtr->GetSurfaceHeight(x, z, false))
 			{
-				const auto roomAbove = floor->GetRoomNumberAbove(x, z);
-				if (!roomAbove.has_value())
+				auto roomNumberAbove = sectroPtr->GetRoomNumberAbove(x, z);
+				if (!roomNumberAbove.has_value())
 					break;
 
-				floor = &GetFloorSide(*roomAbove, x, z);
-				floor->RemoveBridge(itemNumber);
+				sectroPtr = &GetFloorSide(*roomNumberAbove, x, z);
+				sectroPtr->RemoveBridge(itemNumber);
 			}
 		}
 
-		if (Objects[item.ObjectNumber].GetCeilingBorder != nullptr)
+		if (bridgeObject.GetCeilingBorder != nullptr)
 		{
-			int ceilingBorder = Objects[item.ObjectNumber].GetCeilingBorder(item);
-			while (ceilingBorder >= floor->GetSurfaceHeight(x, z, true))
+			int ceilingBorder = bridgeObject.GetCeilingBorder(bridgeItem);
+			while (ceilingBorder >= sectroPtr->GetSurfaceHeight(x, z, true))
 			{
-				const auto roomBelow = floor->GetRoomNumberBelow(x, z);
-				if (!roomBelow.has_value())
+				auto roomNumberBelow = sectroPtr->GetRoomNumberBelow(x, z);
+				if (!roomNumberBelow.has_value())
 					break;
 
-				floor = &GetFloorSide(*roomBelow, x, z);
-				floor->RemoveBridge(itemNumber);
+				sectroPtr = &GetFloorSide(*roomNumberBelow, x, z);
+				sectroPtr->RemoveBridge(itemNumber);
 			}
 		}
 	}

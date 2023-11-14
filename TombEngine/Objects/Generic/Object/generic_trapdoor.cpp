@@ -176,13 +176,7 @@ void TrapDoorControl(short itemNumber)
 	if (TriggerActive(trapDoorItem))
 	{
 		if (!trapDoorItem->Animation.ActiveState && trapDoorItem->TriggerFlags >= 0)
-		{
 			trapDoorItem->Animation.TargetState = 1;
-		}
-		else if (trapDoorItem->Animation.FrameNumber == GetAnimData(trapDoorItem).frameEnd && CurrentLevel == 14 && trapDoorItem->ObjectNumber == ID_TRAPDOOR1)
-		{
-			trapDoorItem->Status = ITEM_INVISIBLE;
-		}
 	}
 	else
 	{

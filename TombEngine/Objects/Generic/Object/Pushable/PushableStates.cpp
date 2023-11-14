@@ -316,7 +316,7 @@ namespace TEN::Entities::Generic
 					int foundStack = SearchNearPushablesStack(pushableItem.Index);
 					StackPushable(pushableItem.Index, foundStack);
 
-					//TODO: Adjust a better solution that work too for the pushables block animations.
+					// TODO: Better solution that also works with pushable block anims.
 					if (pushable.AnimSetID == 0)
 						pushable.SoundState = PushableSoundState::Stop;
 				}
@@ -336,7 +336,6 @@ namespace TEN::Entities::Generic
 				playerItem.Animation.TargetState = LS_IDLE;
 				player.Context.InteractedItem = NO_ITEM;
 				return;
-			break;
 
 			case PushableEnvironmentType::SlopedFloor:
 				// TODO: If slippery slope, link to slide state.
