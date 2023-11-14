@@ -139,7 +139,7 @@ namespace TEN::Entities::TR4
 				// Don't clear.
 				if (TestLastFrame(item))
 				{
-					item->Animation.FrameNumber = GetAnimData(*item).EndFrameNumber;
+					item->Animation.FrameNumber = GetAnimData(*item).EndFrameNumber - 1;
 					item->Collidable = false;
 				}
 			}

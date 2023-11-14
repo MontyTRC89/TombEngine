@@ -121,10 +121,13 @@ namespace TEN::Entities::Creatures::TR1
 				item.Animation.IsAirborne = false;
 				item.Animation.Velocity.y = 0.0f;
 
+				// TODO: Check.
 				const auto& anim = GetAnimData(item);
 				if (item.Animation.AnimNumber == LA_FREEFALL_DEATH &&
-					item.Animation.FrameNumber >= anim.EndFrameNumber) // TODO: Check.
+					item.Animation.FrameNumber >= (anim.EndFrameNumber - 1))
+				{
 					item.ItemFlags[7] = 2;
+				}
 			}
 
 			break;
