@@ -25,7 +25,7 @@ Vector3i ClosestCoord;
 static int xLOS(const GameVector& origin, GameVector& target)
 {
 	int dx = target.x - origin.x;
-	if (!dx)
+	if (dx == 0)
 		return 1;
 
 	int dy = BLOCK(target.y - origin.y) / dx;
@@ -92,7 +92,7 @@ static int xLOS(const GameVector& origin, GameVector& target)
 static int zLOS(const GameVector& origin, GameVector& target)
 {
 	int dz = target.z - origin.z;
-	if (!dz)
+	if (dz == 0)
 		return 1;
 
 	int dx = BLOCK(target.x - origin.x) / dz;
