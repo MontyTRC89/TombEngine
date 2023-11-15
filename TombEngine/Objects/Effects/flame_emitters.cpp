@@ -95,7 +95,7 @@ namespace TEN::Entities::Effects
 				short ocb = -item->TriggerFlags;
 				if ((ocb & 7) == 2 || (ocb & 7) == 7)
 				{
-					//Constant flames
+					// Constant flames.
 					SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 					TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
 					TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
@@ -105,22 +105,25 @@ namespace TEN::Entities::Effects
 				}
 				else
 				{
-					//Intermittent flames
+					// Intermittent flames.
 					auto& pauseTimer = item->ItemFlags[0];
-					auto& jetFlameVelocity = item->ItemFlags[1];
-					auto& alphaSmallFlame = item->ItemFlags[2];
+					auto& jetFlameVel = item->ItemFlags[1];
+					auto& smallFlameAlpha = item->ItemFlags[2];
 					auto& flameTimer = item->ItemFlags[3];
-					
 
 					if (pauseTimer)
 					{
-						if (jetFlameVelocity)
-							jetFlameVelocity = jetFlameVelocity - (jetFlameVelocity >> 2);
+						if (jetFlameVel)
+							jetFlameVel = jetFlameVel - (jetFlameVel >> 2);
 
-						if (alphaSmallFlame > 0)
-							alphaSmallFlame -= 8;
+						if (smallFlameAlpha > 0)
+						{
+							smallFlameAlpha -= 8;
+						}
 						else
-							alphaSmallFlame = 0;
+						{
+							smallFlameAlpha = 0;
+						}
 
 						pauseTimer--;
 						if (pauseTimer == 1)
@@ -130,34 +133,42 @@ namespace TEN::Entities::Effects
 					{
 						if (!--flameTimer)
 						{
-							pauseTimer = (ocb >> 3)?						//If pauseTimer is multiple of 8
-								(GetRandomControl() & 0x3F) + 60 :				//Then do a pause of 60 frames plus random 0-63
-								(GetRandomControl() & 0x1F) + 30 * (ocb >> 3);	//Else do a pause of 30 * ocb/8 frames plus random 0-31
+							pauseTimer = ((ocb / 8) != 0) ?
+								Random::GenerateInt(2 * FPS, 4 * FPS) :						   // Pause of 2 to 4 seconds.
+								Random::GenerateInt((ocb / 8) * FPS, FPS + ((ocb / 8 * FPS))); // Pause of 1 second * (ocb / 8) to 1 second plus 1 second * (ocb / 8).
 						}
 
-						if (alphaSmallFlame < 255)
-							alphaSmallFlame += 8;
+						if (smallFlameAlpha < UCHAR_MAX)
+						{
+							smallFlameAlpha += 8;
+						}
 						else
-							alphaSmallFlame = 255;
+						{
+							smallFlameAlpha = UCHAR_MAX;
+						}
 
-						if (jetFlameVelocity > -8192)
-							jetFlameVelocity -= 512;
+						if (jetFlameVel > -BLOCK(8))
+							jetFlameVel -= BLOCK(0.5f);
 					}
 
-					if (alphaSmallFlame < 255)
-						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 0.5f, alphaSmallFlame);
+					if (smallFlameAlpha < UCHAR_MAX)
+						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 0.5f, smallFlameAlpha);
 
-					if (jetFlameVelocity)
+					if (jetFlameVel)
 					{
 						SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 
-						if (jetFlameVelocity <= -8192)
-							TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
+						if (jetFlameVel <= -BLOCK(8))
+						{
+							TriggerSuperJetFlame(item, -BLOCK(0.25f) - (BLOCK(3) * GlobalCounter & 0x1C00), GlobalCounter & 1);
+						}
 						else
-							TriggerSuperJetFlame(item, jetFlameVelocity, GlobalCounter & 1);
+						{
+							TriggerSuperJetFlame(item, jetFlameVel, GlobalCounter & 1);
+						}
 
 						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
-							(-jetFlameVelocity >> 10) - (GetRandomControl() & 1) + 16,
+							(-jetFlameVel >> 10) - (GetRandomControl() & 1) + 16,
 							(GetRandomControl() & 0x3F) + 192,
 							(GetRandomControl() & 0x1F) + 96, 0);
 					}
@@ -254,21 +265,21 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.x += phd_sin(item->Pose.Orientation.y - ANGLE(180)) * (CLICK(1) / FPS);
 					item->Pose.Position.z += phd_cos(item->Pose.Orientation.y - ANGLE(180)) * (CLICK(1) / FPS);
 
-					auto probe = GetCollision(item);
+					auto pointColl = GetCollision(item);
 
-					if (TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber) ||
-						probe.Position.Floor - item->Pose.Position.y > CLICK(2) ||
-						probe.Position.Floor == NO_HEIGHT)
+					if (TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber) ||
+						pointColl.Position.Floor - item->Pose.Position.y > CLICK(2) ||
+						pointColl.Position.Floor == NO_HEIGHT)
 					{
 						Weather.Flash(255, 128, 0, 0.03f);
 						KillItem(itemNumber);
 						return;
 					}
 
-					if (item->RoomNumber != probe.RoomNumber)
-						ItemNewRoom(itemNumber, probe.RoomNumber);
+					if (item->RoomNumber != pointColl.RoomNumber)
+						ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
-					item->Pose.Position.y = probe.Position.Floor;
+					item->Pose.Position.y = pointColl.Position.Floor;
 
 					if (Wibble & 7)
 						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, FlameType::Medium);
@@ -292,7 +303,7 @@ namespace TEN::Entities::Effects
 		if (item->TriggerFlags < 0)
 		{
 			item->ItemFlags[0] = (GetRandomControl() & 0x3F) + 90;
-			item->ItemFlags[2] = 255; //Alpha value
+			item->ItemFlags[2] = UCHAR_MAX;
 
 			if (((-item->TriggerFlags) & 7) == 7)
 			{

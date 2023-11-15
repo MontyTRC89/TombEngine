@@ -684,7 +684,6 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 		if (laraItem->Animation.ActiveState == LS_CROUCH_IDLE)
 		{
-
 			if (!AlignLaraPosition(PickUpPosition, item, laraItem))
 				break;
 

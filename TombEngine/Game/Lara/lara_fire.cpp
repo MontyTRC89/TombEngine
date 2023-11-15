@@ -29,10 +29,12 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 
 int FlashGrenadeAftershockTimer = 0;
 
@@ -58,7 +60,7 @@ const auto FlarePoseStates = std::vector<int>
 	LS_SOFT_SPLAT
 };
 
-const auto FlarePoseAnimationExceptions = std::vector<int>
+const auto UnavailableFlarePoseAnims = std::vector<int>
 {
 	LA_WATERLEVER_PULL,
 	LA_BUTTON_GIANT_PUSH,
@@ -792,15 +794,10 @@ void HandleWeapon(ItemInfo& laraItem)
 			{
 				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
 
-				//Test Animations Exceptions for flare pose
-				const auto currentLaraAnim = laraItem.Animation.AnimNumber;
-				for (const auto& currentExceptionAnim : FlarePoseAnimationExceptions)
+				if (Contains(UnavailableFlarePoseAnims, laraItem.Animation.AnimNumber))
 				{
-					if (currentLaraAnim == currentExceptionAnim)
-					{
-						player.Flare.ControlLeft = false;
-						break;
-					}
+					player.Flare.ControlLeft = false;
+					break;
 				}
 
 				DoFlareInHand(laraItem, player.Flare.Life);
