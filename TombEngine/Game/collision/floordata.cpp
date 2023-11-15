@@ -405,13 +405,20 @@ namespace TEN::Collision::Floordata
 	{
 		auto originRoomGridCoord = GetRoomGridCoord(roomNumber, pos.x, pos.z, false);
 
-		// Determine room grid coord bounds.
+		// Determine search area bounds.
 		int xMax = originRoomGridCoord.x + searchDepth;
 		int xMin = originRoomGridCoord.x - searchDepth;
 		int zMax = originRoomGridCoord.y + searchDepth;
 		int zMin = originRoomGridCoord.y - searchDepth;
 
 		const auto& room = g_Level.Rooms[roomNumber];
+
+		// Search area out of range; return empty vector.
+		if (xMax <= 0 || xMin >= (room.xSize - 1) ||
+			xMax <= 0 || xMin >= (room.xSize - 1))
+		{
+			return {};
+		}
 
 		// Collect room grid coords.
 		auto roomGridCoords = std::vector<Vector2i>{};
