@@ -89,7 +89,7 @@ namespace TEN::Entities::Effects
 
 		if (TriggerActive(item))
 		{
-			// Jet flame
+			// Jet flame.
 			if (item->TriggerFlags < 0)
 			{
 				short ocb = -item->TriggerFlags;
@@ -133,7 +133,7 @@ namespace TEN::Entities::Effects
 					{
 						if (!--flameTimer)
 						{
-							pauseTimer = ((ocb / 8) != 0) ?
+							pauseTimer = ((ocb % 8) != 0) ?
 								Random::GenerateInt(2 * FPS, 4 * FPS) :						   // Pause of 2 to 4 seconds.
 								Random::GenerateInt((ocb / 8) * FPS, FPS + ((ocb / 8 * FPS))); // Pause of 1 second * (ocb / 8) to 1 second plus 1 second * (ocb / 8).
 						}
@@ -185,6 +185,7 @@ namespace TEN::Entities::Effects
 			}
 			else
 			{
+				// Normal flames.
 				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f, 0);
 
 				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
