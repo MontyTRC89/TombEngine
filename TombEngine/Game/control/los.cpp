@@ -77,7 +77,7 @@ static int xLOS(const GameVector& origin, GameVector& target)
 			break;
 		}
 
-		x += BLOCK(1) * sign;
+		x += BLOCK(sign);
 		y += dy * sign;
 		z += dz * sign;
 	}
@@ -146,7 +146,7 @@ static int zLOS(const GameVector& origin, GameVector& target)
 
 		x += dx * sign;
 		y += dy * sign;
-		z += BLOCK(1) * sign;
+		z += BLOCK(sign);
 	}
 
 	if (flag != 1)
