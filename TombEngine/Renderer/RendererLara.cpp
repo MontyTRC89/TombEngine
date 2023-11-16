@@ -318,15 +318,15 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 		if (!nativeItem->MeshBits.Test(k))
 			continue;
 
-		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, rendererPass);
+		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
 	}
 
-	DrawLaraHolsters(item, room, rendererPass);
-	DrawLaraJoints(item, room, rendererPass);
-	DrawLaraHair(item, room, rendererPass);
+	DrawLaraHolsters(item, room, view, rendererPass);
+	DrawLaraJoints(item, room, view, rendererPass);
+	DrawLaraHair(item, room, view, rendererPass);
 }
 
-void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass)
+void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
 	if (!Objects[ID_HAIR].loaded)
 		return;
@@ -361,14 +361,14 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
 		{
 			auto& rMesh = *hairObject.ObjectMeshes[i];
-			DrawMoveableMesh(itemToDraw, &rMesh, room, i, rendererPass);
+			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
 		}
 
 		isHead = false;
 	}
 }
 
-void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass)
+void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
 	if (!_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 		return;
@@ -378,11 +378,11 @@ void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, Rend
 	for (int k = 1; k < laraSkinJoints.ObjectMeshes.size(); k++)
 	{
 		RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
-		DrawMoveableMesh(itemToDraw, mesh, room, k, rendererPass);
+		DrawMoveableMesh(itemToDraw, mesh, room, k, view, rendererPass);
 	}
 }
 
-void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RendererPass rendererPass)
+void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
 	HolsterSlot leftHolsterID = Lara.Control.Weapon.HolsterInfo.LeftHolster;
 	HolsterSlot rightHolsterID = Lara.Control.Weapon.HolsterInfo.RightHolster;
@@ -392,20 +392,20 @@ void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, Re
 	{
 		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(leftHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_LTHIGH];
-		DrawMoveableMesh(itemToDraw, mesh, room, LM_LTHIGH, rendererPass);
+		DrawMoveableMesh(itemToDraw, mesh, room, LM_LTHIGH, view, rendererPass);
 	}
 
 	if (_moveableObjects[static_cast<int>(rightHolsterID)])
 	{
 		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(rightHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_RTHIGH];
-		DrawMoveableMesh(itemToDraw, mesh, room, LM_RTHIGH, rendererPass);
+		DrawMoveableMesh(itemToDraw, mesh, room, LM_RTHIGH, view, rendererPass);
 	}
 
 	if (backHolsterID != HolsterSlot::Empty && _moveableObjects[static_cast<int>(backHolsterID)])
 	{
 		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(backHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
-		DrawMoveableMesh(itemToDraw, mesh, room, LM_TORSO, rendererPass);
+		DrawMoveableMesh(itemToDraw, mesh, room, LM_TORSO, view, rendererPass);
 	}
 }

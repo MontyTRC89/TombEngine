@@ -240,9 +240,9 @@ namespace TEN::Renderer
 			{
 				RendererRoom& room = _rooms[item->RoomNumber];
 
-				DrawLaraHolsters(item, &room, RendererPass::ShadowMap);
-				DrawLaraJoints(item, &room, RendererPass::ShadowMap);
-				DrawLaraHair(item, &room, RendererPass::ShadowMap);
+				DrawLaraHolsters(item, &room, renderView, RendererPass::ShadowMap);
+				DrawLaraJoints(item, &room, renderView, RendererPass::ShadowMap);
+				DrawLaraHair(item, &room, renderView, RendererPass::ShadowMap);
 			}
 		}
 	}
@@ -319,7 +319,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawRopes(RenderView& view)
+	void Renderer::PrepareRopes(RenderView& view)
 	{
 		for (auto& rope : Ropes)
 		{
@@ -1479,6 +1479,29 @@ namespace TEN::Renderer
 		CollectLightsForCamera();
 		RenderItemShadows(view);
 
+		// Prepare all sprites for later
+		PrepareFires(view);
+		PrepareSmokes(view);
+		PrepareSmokeParticles(view);
+		PrepareSimpleParticles(view);
+		PrepareSparkParticles(view);
+		PrepareExplosionParticles(view);
+		PrepareFootprints(view);
+		PrepareBlood(view);
+		PrepareWeatherParticles(view);
+		PrepareParticles(view);
+		PrepareBubbles(view);
+		PrepareDrips(view);
+		PrepareRipples(view);
+		PrepareUnderwaterBloodParticles(view);
+		PrepareSplashes(view);
+		PrepareShockwaves(view);
+		PrepareElectricity(view);
+		PrepareHelicalLasers(view);
+		PrepareRopes(view);
+		PrepareStreamers(view);
+		PrepareLaserBarriers(view);
+
 		auto time2 = std::chrono::high_resolution_clock::now();
 		_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
@@ -1607,30 +1630,26 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::Opaque);
 		DrawDebris(view, RendererPass::Opaque);
 
-		// Collect all sprites (all sorted like transparent faces)
-		DrawFires(view);
-		DrawSmokes(view);
-		DrawSmokeParticles(view);
-		DrawSimpleParticles(view);
-		DrawSparkParticles(view);
-		DrawExplosionParticles(view);
-		DrawFootprints(view);
-		DrawBlood(view);
-		DrawWeatherParticles(view);
-		DrawParticles(view);
-		DrawBubbles(view);
-		DrawDrips(view);
-		DrawRipples(view);
-		DrawUnderwaterBloodParticles(view);
-		DrawSplashes(view);
-		DrawShockwaves(view);
-		DrawElectricity(view);
-		DrawHelicalLasers(view);
-		DrawRopes(view);
-		DrawStreamers(view);
-		DrawLaserBarriers(view);
-
+		// Draw additive faces
 		DrawRooms(view, RendererPass::Additive);
+		DrawItems(view, RendererPass::Additive);
+		DrawStatics(view, RendererPass::Additive);
+		DrawSpiders(view, RendererPass::Additive);
+		DrawScarabs(view, RendererPass::Additive);
+		DrawBats(view, RendererPass::Additive);
+		DrawEffects(view, RendererPass::Additive);
+		DrawRats(view, RendererPass::Additive);
+		DrawLocusts(view, RendererPass::Additive);
+		DrawDebris(view, RendererPass::Additive);
+
+		// Collect all non-commutative transparent faces
+		DrawRooms(view, RendererPass::CollectTransparentFaces);
+		DrawItems(view, RendererPass::CollectTransparentFaces);
+		DrawStatics(view, RendererPass::CollectTransparentFaces);
+
+		// HACK: we draw gunflashes after everything because they are very near to the camera
+		DrawGunFlashes(view);
+		DrawBaddyGunflashes(view);
 
 		// Collect all transparent faces
 		/*DrawStatics(view, RendererPass::CollectTransparentFaces);
@@ -2082,7 +2101,7 @@ namespace TEN::Renderer
 			if (!(nativeItem->MeshBits & (1 << k)))
 				continue;
 
-			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, rendererPass);
+			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, view, rendererPass);
 		}
 	}
 
@@ -2272,7 +2291,10 @@ namespace TEN::Renderer
 							continue;
 						}
 
-						if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
+						if (bucket.BlendMode != BlendMode::Opaque && 
+							bucket.BlendMode != BlendMode::AlphaTest &&
+							bucket.BlendMode != BlendMode::Additive &&
+							bucket.BlendMode != BlendMode::FastAlphaBlend)
 						{
 							// Collect transparent bucket
 							RendererSortableObject object;
@@ -2438,7 +2460,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawRooms(RenderView& view, RendererPass rendererPass)
 	{
-		/*if (rendererPass == RendererPass::CollectTransparentFaces)
+		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
 			for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
 			{
@@ -2458,7 +2480,10 @@ namespace TEN::Renderer
 
 						if (rendererPass == RendererPass::CollectTransparentFaces)
 						{
-							if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
+							if (bucket.BlendMode != BlendMode::Opaque && 
+								bucket.BlendMode != BlendMode::AlphaTest &&
+								bucket.BlendMode != BlendMode::Additive &&
+								bucket.BlendMode != BlendMode::FastAlphaBlend)
 							{
 								RendererSortableObject object;
 								object.ObjectType = RendererObjectType::Room;
@@ -2474,7 +2499,7 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		else*/
+		else
 		{
 			if (rendererPass == RendererPass::GBuffer)
 			{
@@ -2740,72 +2765,76 @@ namespace TEN::Renderer
 		_swapChain->Present(1, 0);
 	}
 
-	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RendererPass rendererPass)
+	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass)
 	{
 		auto cameraPos = Camera.pos.ToVector3();
 
-		for (auto& bucket : mesh->Buckets)
+		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			if (bucket.NumVertices == 0)
-				continue;
-
-			if (rendererPass == RendererPass::ShadowMap)
+			for (int j = 0; j < mesh->Buckets.size(); j++)
 			{
-				SetBlendMode(BlendMode::Opaque);
-				SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
+				auto& bucket = mesh->Buckets[j];
 
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-				_numMoveablesDrawCalls++;
-			}
-			else if (rendererPass == RendererPass::CollectTransparentFaces)
-			{
-				if (DoesBlendModeRequireSorting(bucket.BlendMode))
+				if (rendererPass == RendererPass::CollectTransparentFaces)
 				{
-					// Collect transparent faces
-					for (int j = 0; j < bucket.Polygons.size(); j++)
+					if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
 					{
-						auto* polygonPtr = &bucket.Polygons[j];
-
-						// Use averaged distance as polygon distance for moveables.
 						auto centre = Vector3::Transform(
-							polygonPtr->Centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
+							bucket.Centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
 						int distance = (centre - cameraPos).Length();
 
-						RendererTransparentFace face;
-						face.type = TransparentFaceType::Moveable;
-						face.info.polygon = polygonPtr;
-						face.distance = distance;
-						face.info.animated = bucket.Animated;
-						face.info.texture = bucket.Texture;
-						face.info.room = room;
-						face.info.item = itemToDraw;
-						face.info.color = itemToDraw->Color;
-						face.info.blendMode = bucket.BlendMode;
-						face.info.bucket = &bucket;
-						room->TransparentFacesToDraw.push_back(face);
+						RendererSortableObject object;
+						object.ObjectType = RendererObjectType::Moveable;
+						object.Centre = bucket.Centre;
+						object.Distance = distance;
+						object.Bucket = &bucket;
+						object.Room = room;
+						object.Mesh = mesh;
+						object.BoneIndex = boneIndex;
+
+						view.TransparentObjectsToDraw.push_back(object);
 					}
 				}
 			}
-			else
+		}
+		else
+		{
+			for (auto& bucket : mesh->Buckets)
 			{
-				int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
-
-				for (int p = 0; p < passes; p++)
+				if (bucket.NumVertices == 0)
 				{
-					if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-					{
-						continue;
-					}
+					continue;
+				}
 
-					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-						SamplerStateRegister::AnisotropicClamp);
-					BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]),
-						SamplerStateRegister::AnisotropicClamp);
+				if (rendererPass == RendererPass::ShadowMap)
+				{
+					SetBlendMode(BlendMode::Opaque);
+					SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
 					_numMoveablesDrawCalls++;
+				}
+				else
+				{
+					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+
+					for (int p = 0; p < passes; p++)
+					{
+						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						{
+							continue;
+						}
+
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
+							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]),
+							SamplerStateRegister::AnisotropicClamp);
+
+						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+						_numMoveablesDrawCalls++;
+					}
 				}
 			}
 		}

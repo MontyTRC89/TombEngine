@@ -60,7 +60,7 @@ namespace TEN::Renderer
 
 	constexpr auto ELECTRICITY_RANGE_MAX = BLOCK(24);
 		
-	void Renderer::DrawLaserBarriers(RenderView& view)
+	void Renderer::PrepareLaserBarriers(RenderView& view)
 	{
 		if (LaserBarriers.empty())
 			return;
@@ -79,7 +79,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawStreamers(RenderView& view)
+	void Renderer::PrepareStreamers(RenderView& view)
 	{
 		constexpr auto BLEND_MODE_DEFAULT = BlendMode::Additive;
 
@@ -135,7 +135,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawHelicalLasers(RenderView& view)
+	void Renderer::PrepareHelicalLasers(RenderView& view)
 	{
 		if (HelicalLasers.empty())
 			return;
@@ -186,7 +186,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawElectricity(RenderView& view)
+	void Renderer::PrepareElectricity(RenderView& view)
 	{
 		if (ElectricityArcs.empty())
 			return;
@@ -252,7 +252,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawSmokes(RenderView& view) 
+	void Renderer::PrepareSmokes(RenderView& view) 
 	{
 		for (int i = 0; i < 32; i++) 
 		{
@@ -270,7 +270,7 @@ namespace TEN::Renderer
 	}
 
 
-	void Renderer::DrawFires(RenderView& view) 
+	void Renderer::PrepareFires(RenderView& view) 
 	{
 		for (int k = 0; k < MAX_FIRE_LIST; k++) 
 		{
@@ -297,7 +297,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawParticles(RenderView& view)
+	void Renderer::PrepareParticles(RenderView& view)
 	{
 		for (int i = 0; i < ParticleNodeOffsetIDs::NodeMax; i++)
 			NodeOffsets[i].gotIt = false;
@@ -405,7 +405,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawSplashes(RenderView& view) 
+	void Renderer::PrepareSplashes(RenderView& view) 
 	{
 		constexpr size_t NUM_POINTS = 9;
 
@@ -473,7 +473,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawBubbles(RenderView& view) 
+	void Renderer::PrepareBubbles(RenderView& view) 
 	{
 		if (Bubbles.empty())
 			return;
@@ -493,7 +493,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawDrips(RenderView& view)
+	void Renderer::PrepareDrips(RenderView& view)
 	{
 		if (Drips.empty())
 			return;
@@ -516,7 +516,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawRipples(RenderView& view) 
+	void Renderer::PrepareRipples(RenderView& view) 
 	{
 		if (Ripples.empty())
 			return;
@@ -537,7 +537,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawUnderwaterBloodParticles(RenderView& view)
+	void Renderer::PrepareUnderwaterBloodParticles(RenderView& view)
 	{
 		if (UnderwaterBloodParticles.empty())
 			return;
@@ -565,7 +565,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawShockwaves(RenderView& view)
+	void Renderer::PrepareShockwaves(RenderView& view)
 	{
 		unsigned char r = 0;
 		unsigned char g = 0;
@@ -740,7 +740,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawBlood(RenderView& view) 
+	void Renderer::PrepareBlood(RenderView& view) 
 	{
 		for (int i = 0; i < 32; i++) 
 		{
@@ -760,7 +760,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawWeatherParticles(RenderView& view) 
+	void Renderer::PrepareWeatherParticles(RenderView& view) 
 	{
 		constexpr auto RAIN_WIDTH = 4.0f;
 
@@ -1054,7 +1054,7 @@ namespace TEN::Renderer
 		return Texture2D(_device.Get(), 1, 1, data.data());
 	}
 
-	void Renderer::DrawFootprints(RenderView& view) 
+	void Renderer::PrepareFootprints(RenderView& view) 
 	{
 		for (const auto& footprint : Footprints)
 		{
@@ -1279,7 +1279,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawSmokeParticles(RenderView& view)
+	void Renderer::PrepareSmokeParticles(RenderView& view)
 	{
 		using TEN::Effects::Smoke::SmokeParticles;
 		using TEN::Effects::Smoke::SmokeParticle;
@@ -1299,7 +1299,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawSparkParticles(RenderView& view)
+	void Renderer::PrepareSparkParticles(RenderView& view)
 	{
 		using TEN::Effects::Spark::SparkParticle;
 		using TEN::Effects::Spark::SparkParticles;
@@ -1325,7 +1325,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawExplosionParticles(RenderView& view)
+	void Renderer::PrepareExplosionParticles(RenderView& view)
 	{
 		using TEN::Effects::Explosion::explosionParticles;
 		using TEN::Effects::Explosion::ExplosionParticle;
@@ -1343,7 +1343,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawSimpleParticles(RenderView& view)
+	void Renderer::PrepareSimpleParticles(RenderView& view)
 	{
 		using namespace TEN::Effects;
 

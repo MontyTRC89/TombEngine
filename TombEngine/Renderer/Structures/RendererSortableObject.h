@@ -11,10 +11,12 @@ namespace TEN::Renderer::Structures
 		RendererObjectType ObjectType;
 		int Distance;
 		Vector3 Centre;
+		RendererMesh* Mesh;
 		RendererBucket* Bucket;
 		RendererRoom* Room;
 		RendererStatic* Static;
 		RendererItem* Item;
 		RendererEffect* Effect;
+		int BoneIndex;
 	};
 }
