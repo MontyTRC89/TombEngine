@@ -258,13 +258,17 @@ Vector3i GetRoomCenter(int roomNumber)
 
 static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{})
 {
-	// No rooms exist; return empty vector.
+	// Invalid room; return empty vector.
 	if (g_Level.Rooms.size() <= roomNumber)
 		return {};
 
-	// Search depth limit reached; return current room.
-	if (searchDepth == 0)
+	// 1 room exists; return it.
+	if (g_Level.Rooms.size() == 1)
 		return std::vector<int>{ roomNumber };
+
+	// Search depth limit reached; return empty vector.
+	if (searchDepth == 0)
+		return {};
 
 	// Collect current room number as neighbor of itself.
 	visitedRoomNumbers.push_back(roomNumber);
