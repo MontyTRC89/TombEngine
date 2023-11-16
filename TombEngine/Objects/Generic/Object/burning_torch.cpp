@@ -40,9 +40,9 @@ namespace TEN::Entities::Generic
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = Random::GenerateInt(24, 31);
 
-		spark->x = Random::GenerateInt(-23, -8);
+		spark->x = Random::GenerateInt(-8, 8);
 		spark->y = 0;
-		spark->z = Random::GenerateInt(-23, -8);
+		spark->z = Random::GenerateInt(-8, 8);
 
 		spark->xVel = Random::GenerateInt(-128, 128);
 		spark->yVel = Random::GenerateInt(-31, -16);
@@ -52,7 +52,6 @@ namespace TEN::Entities::Generic
 
 		spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_DEF | SP_SCALE;
 
-		spark->rotAng = Random::GenerateInt(0, 4095);
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 		if (Random::GenerateInt(0, 1))
