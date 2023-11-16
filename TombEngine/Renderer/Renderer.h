@@ -4,6 +4,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+#include <PostProcess.h>
 #include "Math/Math.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
@@ -111,6 +112,10 @@ namespace TEN::Renderer
 		RenderTarget2D _transparencyRenderTarget;
 		RenderTarget2D _weightRenderTarget;
 		RenderTargetCube _reflectionCubemap;
+		RenderTarget2D _tempRoomAmbientRenderTarget1;
+		RenderTarget2D _tempRoomAmbientRenderTarget2;
+		RenderTarget2D _tempRoomAmbientRenderTarget3;
+		RenderTarget2D _tempRoomAmbientRenderTarget4;
 		Texture2DArray _shadowMap;
 
 		// Shaders
@@ -151,6 +156,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psTransparentFinalPass;
 		ComPtr<ID3D11PixelShader> _psGBuffer;
 		ComPtr<ID3D11VertexShader> _vsRoomAmbient;
+		ComPtr<ID3D11VertexShader> _vsRoomAmbientSky;
 		ComPtr<ID3D11PixelShader> _psRoomAmbient;
 
 		// Constant buffers
@@ -308,7 +314,7 @@ namespace TEN::Renderer
 		CullMode _lastCullMode;
 
 		std::vector<RendererSpriteBucket> _spriteBuckets;
-		std::vector<RendererRoomAmbientMap> _roomAmbientMapsCache;
+		std::unique_ptr<BasicPostProcess> _postProcess;
 
 		// Private functions
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);
@@ -514,7 +520,6 @@ namespace TEN::Renderer
 		void Lock();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
-		void RenderSimpleScene(RenderTarget2D renderTarget, int emisphere, RenderView& view);
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();
 		void RenderInventory();

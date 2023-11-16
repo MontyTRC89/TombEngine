@@ -19,6 +19,13 @@ cbuffer RoomBuffer : register(b5)
 	int Padding;
 };
 
+cbuffer SkyBuffer : register(b2)
+{
+	float4x4 World;
+	float4 Color;
+	int ApplyFogBulbs;
+};
+
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
@@ -36,7 +43,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	PixelShaderInput output;
 
 	// Transform vertex to DP-space
-	output.Position = mul(float4(input.Position, 1.0f), View);
+	output.Position = mul(float4(input.Position, 1.0f), DualParaboloidView);
 	output.Position /= output.Position.w;
 
 	// For the back-map z has to be inverted
@@ -57,6 +64,36 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	output.UV = input.UV;
 	output.Color = input.Color;
+
+	return output;
+}
+
+PixelShaderInput VSSky(VertexShaderInput input)
+{
+	PixelShaderInput output;
+
+	// Transform vertex to DP-space
+	output.Position = mul(mul(float4(input.Position, 1.0f), World), DualParaboloidView);
+	output.Position /= output.Position.w;
+
+	// For the back-map z has to be inverted
+	output.Position.z *= Emisphere;
+
+	float L = length(output.Position.xyz);
+
+	output.Position /= L;
+
+	output.ClipDepth = output.Position.z;
+
+	output.Position.x /= output.Position.z + 1.0f;
+	output.Position.y /= output.Position.z + 1.0f;
+
+	// Set z for z-buffering and neutralize w
+	output.Position.z = (L - NearPlane) / (FarPlane - NearPlane);
+	output.Position.w = 1.0f;
+
+	output.UV = input.UV;
+	output.Color = Color;
 
 	return output;
 }

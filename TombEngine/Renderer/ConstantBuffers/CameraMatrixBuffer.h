@@ -16,6 +16,8 @@ namespace TEN::Renderer::ConstantBuffers
 		//--
 		alignas(16) Matrix InverseProjection;
 		//--
+		alignas(16) Matrix DualParaboloidView;
+		//--
 		alignas(16) Vector4 CamPositionWS;
 		//--
 		alignas(16) Vector4 CamDirectionWS;

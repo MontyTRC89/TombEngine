@@ -174,7 +174,7 @@ namespace TEN::Renderer
 	void Renderer::BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType)
 	{
 		_context->PSSetShaderResources((UINT)registerType, 1, target->ShaderResourceView.GetAddressOf());
-
+		  
 		ID3D11SamplerState* samplerState = nullptr;
 		switch (samplerType)
 		{
@@ -207,7 +207,7 @@ namespace TEN::Renderer
 		}
 
 		_context->PSSetSamplers((UINT)registerType, 1, &samplerState);
-	}
+	} 
 
 	void Renderer::BindRoomLights(std::vector<RendererLight*>& lights)
 	{

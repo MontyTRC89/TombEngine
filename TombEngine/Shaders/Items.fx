@@ -47,6 +47,12 @@ SamplerState Sampler : register(s0);
 Texture2D NormalTexture : register(t1);
 SamplerState NormalTextureSampler : register(s1);
 
+Texture2D AmbientMapFrontTexture : register(t7);
+SamplerState AmbientMapFrontSampler : register(s7);
+
+Texture2D AmbientMapBackTexture : register(t8);
+SamplerState AmbientMapBackSampler : register(s8);
+
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
@@ -101,9 +107,32 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
 	normal = normalize(mul(normal, TBN));
 
+	float3 positionInParaboloidSpace = mul(float4(input.WorldPosition, 1.0f), DualParaboloidView);
+	float L = length(positionInParaboloidSpace);
+	positionInParaboloidSpace /= L;
+
+	float3 ambientLight = AmbientLight.xyz;
+
+	/*if (positionInParaboloidSpace.z >= 0.0f)
+	{
+		float2 paraboloidUV;
+		paraboloidUV.x = (positionInParaboloidSpace.x / (1.0f + positionInParaboloidSpace.z)) * 0.5f + 0.5f;
+		paraboloidUV.y = 1.0f - ((positionInParaboloidSpace.y / (1.0f + positionInParaboloidSpace.z)) * 0.5f + 0.5f);
+
+		ambientLight = AmbientMapFrontTexture.Sample(AmbientMapFrontSampler, paraboloidUV).xyz;
+	}
+	else
+	{	
+		float2 paraboloidUV;
+		paraboloidUV.x = (positionInParaboloidSpace.x / (1.0f - positionInParaboloidSpace.z)) * 0.5f + 0.5f;
+		paraboloidUV.y = 1.0f - ((positionInParaboloidSpace.y / (1.0f - positionInParaboloidSpace.z)) * 0.5f + 0.5f);
+
+		ambientLight = AmbientMapBackTexture.Sample(AmbientMapBackSampler, paraboloidUV).xyz;
+	}*/
+
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(
-			AmbientLight.xyz,
+			ambientLight,
 			input.Color.xyz,
 			tex.xyz, 
 			input.WorldPosition,
