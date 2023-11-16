@@ -79,16 +79,16 @@ namespace TEN::Collision::Attractor
 		return (dist <= EPSILON);
 	}
 
-	Vector3 Attractor::GetPointAtChainDistance(float chainDist) const
+	Vector3 Attractor::GetIntersectionAtChainDistance(float chainDist) const
 	{
-		// Single point exists; return it.
+		// Single point exists; return simple intersection.
 		if (_points.size() == 1)
 			return _points.front();
 		
 		// Normalize distance along attractor.
 		chainDist = NormalizeChainDistance(chainDist);
 
-		// Line distance is outside attractor; return clamped point.
+		// Line distance is outside attractor; return clamped intersection.
 		if (chainDist <= 0.0f)
 		{
 			return _points.front();
@@ -98,7 +98,7 @@ namespace TEN::Collision::Attractor
 			return _points.back();
 		}
 		
-		// Find point at distance along attractor.
+		// Find intersection at distance along attractor.
 		float chainDistTravelled = 0.0f;
 		for (int i = 0; i < (_points.size() - 1); i++)
 		{
@@ -109,7 +109,7 @@ namespace TEN::Collision::Attractor
 			float segmentLength = Vector3::Distance(origin, target);
 			float remainingChainDist = chainDist - chainDistTravelled;
 
-			// Found segment of distance along attractor; return interpolated point.
+			// Found segment of distance along attractor; return intersection.
 			if (remainingChainDist <= segmentLength)
 			{
 				float alpha = remainingChainDist / segmentLength;

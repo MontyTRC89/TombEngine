@@ -53,28 +53,28 @@ namespace TEN::Collision::Attractor
 		auto attracProx = ProximityData{ points.front(), INFINITY, 0.0f, 0 };
 		float chainDistTravelled = 0.0f;
 
-		// Find closest point along attractor.
+		// Find closest intersection along attractor.
 		for (int i = 0; i < (points.size() - 1); i++)
 		{
 			// Get segment points.
 			const auto& origin = points[i];
 			const auto& target = points[i + 1];
 
-			auto closestPoint = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
-			float dist = Vector3::Distance(probePoint, closestPoint);
+			auto intersection = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
+			float dist = Vector3::Distance(probePoint, intersection);
 
-			// Found new closest point; update proximity data.
+			// Found new closest intersection; update proximity data.
 			if (dist < attracProx.Distance)
 			{
-				chainDistTravelled += Vector3::Distance(origin, closestPoint);
+				chainDistTravelled += Vector3::Distance(origin, intersection);
 
-				attracProx.Intersection = closestPoint;
+				attracProx.Intersection = intersection;
 				attracProx.Distance = dist;
 				attracProx.ChainDistance += chainDistTravelled;
 				attracProx.SegmentID = i;
 
 				// Restart accumulation of distance travelled along attractor.
-				chainDistTravelled = Vector3::Distance(closestPoint, target);
+				chainDistTravelled = Vector3::Distance(intersection, target);
 				continue;
 			}
 

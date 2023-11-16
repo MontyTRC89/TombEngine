@@ -51,7 +51,7 @@ namespace TEN::Collision::Attractor
 		bool IsLooped() const;
 
 		// Utilities
-		Vector3		 GetPointAtChainDistance(float chainDist) const;
+		Vector3		 GetIntersectionAtChainDistance(float chainDist) const;
 		unsigned int GetSegmentIDAtChainDistance(float chainDist) const;
 
 		void Update(const std::vector<Vector3>& points, int roomNumber);
