@@ -1502,6 +1502,8 @@ namespace TEN::Renderer
 		PrepareStreamers(view);
 		PrepareLaserBarriers(view);
 
+		SortAndPrepareSprites(view);
+
 		auto time2 = std::chrono::high_resolution_clock::now();
 		_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
@@ -1613,7 +1615,7 @@ namespace TEN::Renderer
 		DrawEffects(view, RendererPass::GBuffer);
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
-
+		
 		// Bind the main render target again
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 		
@@ -1629,6 +1631,7 @@ namespace TEN::Renderer
 		DrawRats(view, RendererPass::Opaque);
 		DrawLocusts(view, RendererPass::Opaque);
 		DrawDebris(view, RendererPass::Opaque);
+		DrawSprites(view, RendererPass::Opaque);
 
 		// Draw additive faces
 		DrawRooms(view, RendererPass::Additive);
@@ -1641,6 +1644,7 @@ namespace TEN::Renderer
 		DrawRats(view, RendererPass::Additive);
 		DrawLocusts(view, RendererPass::Additive);
 		DrawDebris(view, RendererPass::Additive);
+		DrawSprites(view, RendererPass::Additive);
 
 		// Collect all non-commutative transparent faces
 		DrawRooms(view, RendererPass::CollectTransparentFaces);

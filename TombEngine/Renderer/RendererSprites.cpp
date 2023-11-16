@@ -292,6 +292,7 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::None);
 
 		_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
+		_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
 
 		// Set up vertex buffer and parameters.
 		UINT stride = sizeof(Vertex);
@@ -301,6 +302,11 @@ namespace TEN::Renderer
 		for (auto& spriteBucket : _spriteBuckets)
 		{
 			if (spriteBucket.SpritesToDraw.size() == 0 || !spriteBucket.IsBillboard)
+			{
+				continue;
+			}
+
+			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
 			{
 				continue;
 			}
@@ -341,6 +347,7 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::None);
 
 		_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
+		_context->PSSetShader(_psSprites.Get(), nullptr, 0);
 
 		stride = sizeof(Vertex);
 		offset = 0;
@@ -349,6 +356,11 @@ namespace TEN::Renderer
 		for (auto& spriteBucket : _spriteBuckets)
 		{
 			if (spriteBucket.SpritesToDraw.empty() || spriteBucket.IsBillboard)
+			{
+				continue;
+			}
+
+			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
 			{
 				continue;
 			}
