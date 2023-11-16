@@ -774,7 +774,7 @@ namespace TEN::Renderer
 		for (const auto& tri : _triangles3DToDraw)
 		{
 			auto rVertices = std::vector<RendererVertex>{};
-			rVertices.reserve(RendererTriangle3D::VERTEX_COUNT);
+			rVertices.reserve(tri.Vertices.size());
 
 			for (const auto& vertex : tri.Vertices)
 			{
