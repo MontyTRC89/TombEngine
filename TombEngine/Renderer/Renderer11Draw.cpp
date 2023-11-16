@@ -1120,16 +1120,17 @@ namespace TEN::Renderer
 		// Construct sphere.
 		if (isWireframe)
 		{
-			auto prevPoints = std::array<Vector3, AXIS_COUNT>{};
+			auto prevVertices = std::array<Vector3, AXIS_COUNT>{};
 			for (int i = 0; i < (SUBDIVISION_COUNT / 4); i++)
 			{
 				float x = sin(STEP_ANGLE * i) * radius;
 				float z = cos(STEP_ANGLE * i) * radius;
+
 				float angle = 0.0f;
 
 				for (int j = 0; j < SUBDIVISION_COUNT; j++)
 				{
-					auto points = std::array<Vector3, AXIS_COUNT>
+					auto vertices = std::array<Vector3, AXIS_COUNT>
 					{
 						center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
 						center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
@@ -1138,11 +1139,11 @@ namespace TEN::Renderer
 
 					if (j > 0)
 					{
-						for (int k = 0; k < points.size(); k++)
-							AddDebugLine(prevPoints[k], points[k], color);
+						for (int k = 0; k < vertices.size(); k++)
+							AddDebugLine(prevVertices[k], vertices[k], color);
 					}
 
-					prevPoints = points;
+					prevVertices = vertices;
 					angle += PI_MUL_2 / (SUBDIVISION_COUNT - 1);
 				}
 			}
