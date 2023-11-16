@@ -455,6 +455,8 @@ namespace TEN::Entities::Generic
 				pushableItem.Pose.Position.y = pushableColl.FloorHeight;
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 				pushable.BehaviorState = PushableBehaviourState::Idle;
+
+				AddPushableBridge(pushableItem);
 				break;
 
 			case PushableEnvironmentType::Water:
