@@ -247,13 +247,6 @@ namespace TEN::Renderer
 		}
 	};
 
-	struct RendererLine3D
-	{
-		Vector3 Start;
-		Vector3 End;
-		Vector4 Color;
-	};
-
 	struct RendererLine2D
 	{
 		Vector2 Origin = Vector2::Zero;
@@ -261,10 +254,25 @@ namespace TEN::Renderer
 		Vector4 Color  = Vector4::Zero;
 	};
 
+	struct RendererLine3D
+	{
+		Vector3 Start = Vector3::Zero;
+		Vector3 End	  = Vector3::Zero;
+		Vector4 Color = Vector3::Zero;
+	};
+
 	struct RendererRect2D
 	{
 		RECT Rectangle;
 		Vector4 Color;
+	};
+	
+	struct RendererTriangle3D
+	{
+		static constexpr auto VERTEX_COUNT = 3;
+
+		std::array<Vector3, VERTEX_COUNT> Vertices = {};
+		Vector4 Color = Vector3::Zero;
 	};
 
 	class Renderer11
@@ -422,8 +430,9 @@ namespace TEN::Renderer
 		std::vector<RendererLight> m_dynamicLights;
 		RendererLight* m_shadowLight;
 
-		std::vector<RendererLine3D> m_lines3DToDraw;
-		std::vector<RendererLine2D> m_lines2DToDraw;
+		std::vector<RendererLine2D>		m_lines2DToDraw	   = {};
+		std::vector<RendererLine3D>		m_lines3DToDraw	   = {};
+		std::vector<RendererTriangle3D> _triangles3DToDraw = {};
 
 		std::vector<std::optional<RendererObject>> m_moveableObjects;
 		std::vector<std::optional<RendererObject>> m_staticObjects;
@@ -558,6 +567,7 @@ namespace TEN::Renderer
 		void DrawDisplaySprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
 		void DrawLines3D(RenderView& view);
+		void DrawTriangles3D(RenderView& view);
 		void DrawLinesIn2DSpace();
 		void DrawOverlays(RenderView& view);
 		void DrawRopes(RenderView& view);
@@ -725,8 +735,8 @@ namespace TEN::Renderer
 		void AddLine3D(const Vector3& origin, const Vector3& target, const Vector4& color);
 		void AddReticle(const Vector3& center, float radius, const Vector4& color);
 		void AddDebugReticle(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page);
-		void AddBox(const Vector3 min, const Vector3& max, const Vector4& color);
-		void AddBox(Vector3* corners, const Vector4& color);
+		void AddBox(const Vector3 min, const Vector3& max, const Vector4& color, bool isOutline = true);
+		void AddBox(Vector3* corners, const Vector4& color, bool isOutline = true);
 		void AddDebugBox(const BoundingOrientedBox& box, const Vector4& color, RendererDebugPage page);
 		void AddDebugBox(const Vector3& min, const Vector3& max, const Vector4& color, RendererDebugPage page);
 		void AddSphere(const Vector3& center, float radius, const Vector4& color);

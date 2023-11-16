@@ -758,6 +758,42 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 	}
 
+	void Renderer11::DrawTriangles3D(RenderView& view)
+	{
+		SetBlendMode(BLENDMODE_ADDITIVE);
+		SetCullMode(CULL_MODE_NONE);
+
+		m_context->VSSetShader(m_vsSolid.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psSolid.Get(), nullptr, 0);
+
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+
+		m_primitiveBatch->Begin();
+
+		for (const auto& tri : _triangles3DToDraw)
+		{
+			auto rVertices = std::vector<RendererVertex>{};
+			rVertices.reserve(RendererTriangle3D::VERTEX_COUNT);
+
+			for (const auto& vertex : tri.Vertices)
+			{
+				auto rVertex = RendererVertex{};
+				rVertex.Position = vertex;
+				rVertex.Color = tri.Color;
+
+				rVertices.push_back(rVertex);
+			}
+
+			m_primitiveBatch->DrawTriangle(rVertices[0], rVertices[1], rVertices[2]);
+		}
+
+		m_primitiveBatch->End();
+
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
+	}
+
 	void Renderer11::AddLine3D(const Vector3& target, const Vector3& origin, const Vector4& color)
 	{
 		if (m_Locked)
@@ -842,115 +878,193 @@ namespace TEN::Renderer
 		AddSphere(center, radius, color);
 	}
 
-	void Renderer11::AddBox(Vector3* corners, const Vector4& color)
+	void Renderer11::AddBox(Vector3* corners, const Vector4& color, bool isOutline)
 	{
 		if (m_Locked)
 			return;
 
-		for (int i = 0; i < 12; i++)
+		if (isOutline)
 		{
-			RendererLine3D line;
-
-			switch (i)
+			for (int i = 0; i < 12; i++)
 			{
-			case 0: line.Start = corners[0];
-				line.End = corners[1];
-				break;
-			case 1: line.Start = corners[1];
-				line.End = corners[2];
-				break;
-			case 2: line.Start = corners[2];
-				line.End = corners[3];
-				break;
-			case 3: line.Start = corners[3];
-				line.End = corners[0];
-				break;
+				auto line = RendererLine3D{};
 
-			case 4: line.Start = corners[4];
-				line.End = corners[5];
-				break;
-			case 5: line.Start = corners[5];
-				line.End = corners[6];
-				break;
-			case 6: line.Start = corners[6];
-				line.End = corners[7];
-				break;
-			case 7: line.Start = corners[7];
-				line.End = corners[4];
-				break;
+				switch (i)
+				{
+				case 0: line.Start = corners[0];
+					line.End = corners[1];
+					break;
+				case 1: line.Start = corners[1];
+					line.End = corners[2];
+					break;
+				case 2: line.Start = corners[2];
+					line.End = corners[3];
+					break;
+				case 3: line.Start = corners[3];
+					line.End = corners[0];
+					break;
 
-			case 8: line.Start = corners[0];
-				line.End = corners[4];
-				break;
-			case 9: line.Start = corners[1];
-				line.End = corners[5];
-				break;
-			case 10: line.Start = corners[2];
-				line.End = corners[6];
-				break;
-			case 11: line.Start = corners[3];
-				line.End = corners[7];
-				break;
+				case 4: line.Start = corners[4];
+					line.End = corners[5];
+					break;
+				case 5: line.Start = corners[5];
+					line.End = corners[6];
+					break;
+				case 6: line.Start = corners[6];
+					line.End = corners[7];
+					break;
+				case 7: line.Start = corners[7];
+					line.End = corners[4];
+					break;
+
+				case 8: line.Start = corners[0];
+					line.End = corners[4];
+					break;
+				case 9: line.Start = corners[1];
+					line.End = corners[5];
+					break;
+				case 10: line.Start = corners[2];
+					line.End = corners[6];
+					break;
+				case 11: line.Start = corners[3];
+					line.End = corners[7];
+					break;
+				}
+
+				line.Color = color;
+
+				m_lines3DToDraw.push_back(line);
 			}
+		}
+		else
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				auto tri0 = RendererTriangle3D{};
+				auto tri1 = RendererTriangle3D{};
 
-			line.Color = color;
-			m_lines3DToDraw.push_back(line);
+				switch (i)
+				{
+				case 0:
+					tri0.Vertices = { corners[0], corners[1], corners[2] };
+					tri1.Vertices = { corners[0], corners[2], corners[3] };
+					break;
+
+				case 1:
+					tri0.Vertices = { corners[4], corners[5], corners[6] };
+					tri1.Vertices = { corners[4], corners[6], corners[7] };
+					break;
+
+				case 2:
+					tri0.Vertices = { corners[0], corners[1], corners[4] };
+					tri1.Vertices = { corners[1], corners[4], corners[5] };
+					break;
+
+				case 3:
+					tri0.Vertices = { corners[1], corners[2], corners[5] };
+					tri1.Vertices = { corners[2], corners[5], corners[6] };
+					break;
+
+				case 4:
+					tri0.Vertices = { corners[2], corners[3], corners[6] };
+					tri1.Vertices = { corners[3], corners[6], corners[7] };
+					break;
+
+				case 5:
+					tri0.Vertices = { corners[0], corners[3], corners[4] };
+					tri1.Vertices = { corners[3], corners[4], corners[7] };
+					break;
+				}
+
+				tri0.Color = color;
+				tri1.Color = color;
+
+				_triangles3DToDraw.push_back(tri0);
+				_triangles3DToDraw.push_back(tri1);
+			}
 		}
 	}
 
-	void Renderer11::AddBox(const Vector3 min, const Vector3& max, const Vector4& color)
+	void Renderer11::AddBox(const Vector3 min, const Vector3& max, const Vector4& color, bool isOutline)
 	{
 		if (m_Locked)
 			return;
 
-		for (int i = 0; i < 12; i++)
+		if (isOutline)
 		{
-			RendererLine3D line;
-
-			switch (i)
+			for (int i = 0; i < 12; i++)
 			{
-			case 0: line.Start = Vector3(min.x, min.y, min.z);
-				line.End = Vector3(min.x, min.y, max.z);
-				break;
-			case 1: line.Start = Vector3(min.x, min.y, max.z);
-				line.End = Vector3(max.x, min.y, max.z);
-				break;
-			case 2: line.Start = Vector3(max.x, min.y, max.z);
-				line.End = Vector3(max.x, min.y, min.z);
-				break;
-			case 3: line.Start = Vector3(max.x, min.y, min.z);
-				line.End = Vector3(min.x, min.y, min.z);
-				break;
+				RendererLine3D line;
 
-			case 4: line.Start = Vector3(min.x, max.y, min.z);
-				line.End = Vector3(min.x, max.y, max.z);
-				break;
-			case 5: line.Start = Vector3(min.x, max.y, max.z);
-				line.End = Vector3(max.x, max.y, max.z);
-				break;
-			case 6: line.Start = Vector3(max.x, max.y, max.z);
-				line.End = Vector3(max.x, max.y, min.z);
-				break;
-			case 7: line.Start = Vector3(max.x, max.y, min.z);
-				line.End = Vector3(min.x, max.y, min.z);
-				break;
+				switch (i)
+				{
+				case 0: line.Start = Vector3(min.x, min.y, min.z);
+					line.End = Vector3(min.x, min.y, max.z);
+					break;
+				case 1: line.Start = Vector3(min.x, min.y, max.z);
+					line.End = Vector3(max.x, min.y, max.z);
+					break;
+				case 2: line.Start = Vector3(max.x, min.y, max.z);
+					line.End = Vector3(max.x, min.y, min.z);
+					break;
+				case 3: line.Start = Vector3(max.x, min.y, min.z);
+					line.End = Vector3(min.x, min.y, min.z);
+					break;
 
-			case 8: line.Start = Vector3(min.x, min.y, min.z);
-				line.End = Vector3(min.x, max.y, min.z);
-				break;
-			case 9: line.Start = Vector3(min.x, min.y, max.z);
-				line.End = Vector3(min.x, max.y, max.z);
-				break;
-			case 10: line.Start = Vector3(max.x, min.y, max.z);
-				line.End = Vector3(max.x, max.y, max.z);
-				break;
-			case 11: line.Start = Vector3(max.x, min.y, min.z);
-				line.End = Vector3(max.x, max.y, min.z);
-				break;
+				case 4: line.Start = Vector3(min.x, max.y, min.z);
+					line.End = Vector3(min.x, max.y, max.z);
+					break;
+				case 5: line.Start = Vector3(min.x, max.y, max.z);
+					line.End = Vector3(max.x, max.y, max.z);
+					break;
+				case 6: line.Start = Vector3(max.x, max.y, max.z);
+					line.End = Vector3(max.x, max.y, min.z);
+					break;
+				case 7: line.Start = Vector3(max.x, max.y, min.z);
+					line.End = Vector3(min.x, max.y, min.z);
+					break;
+
+				case 8: line.Start = Vector3(min.x, min.y, min.z);
+					line.End = Vector3(min.x, max.y, min.z);
+					break;
+				case 9: line.Start = Vector3(min.x, min.y, max.z);
+					line.End = Vector3(min.x, max.y, max.z);
+					break;
+				case 10: line.Start = Vector3(max.x, min.y, max.z);
+					line.End = Vector3(max.x, max.y, max.z);
+					break;
+				case 11: line.Start = Vector3(max.x, min.y, min.z);
+					line.End = Vector3(max.x, max.y, min.z);
+					break;
+				}
+
+				line.Color = color;
+
+				m_lines3DToDraw.push_back(line);
 			}
+		}
+		else
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				auto tri0 = RendererTriangle3D{};
+				auto tri1 = RendererTriangle3D{};
 
-			line.Color = color;
-			m_lines3DToDraw.push_back(line);
+				switch (i)
+				{
+				case 0:
+					tri0.Vertices = { min, Vector3(max.x, min.x, min.x), Vector3(max.x, max.y, min.z) };
+					tri0.Vertices = { min, Vector3(min.x, max.x, min.x), Vector3(max.x, max.y, min.z) };
+
+				
+				}
+
+				tri0.Color = color;
+				tri1.Color = color;
+
+				_triangles3DToDraw.push_back(tri0);
+				_triangles3DToDraw.push_back(tri1);
+			}
 		}
 	}
 
@@ -961,7 +1075,7 @@ namespace TEN::Renderer
 
 		Vector3 corners[8];
 		box.GetCorners(corners);
-		AddBox(corners, color);
+		AddBox(corners, color, false);
 	}
 
 	void Renderer11::AddDebugBox(const Vector3& min, const Vector3& max, const Vector4& color, RendererDebugPage page)
@@ -1538,6 +1652,7 @@ namespace TEN::Renderer
 		// Output sprites.
 		DrawSprites(view);
 		DrawLines3D(view);
+		DrawTriangles3D(view);
 
 		// Collect all sorted blend modes faces for later.
 		DrawRooms(view, RendererPass::CollectSortedFaces);

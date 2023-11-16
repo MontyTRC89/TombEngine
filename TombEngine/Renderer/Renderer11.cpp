@@ -58,8 +58,9 @@ namespace TEN::Renderer
 
 	void Renderer11::ClearSceneItems()
 	{
-		m_lines3DToDraw.clear();
 		m_lines2DToDraw.clear();
+		m_lines3DToDraw.clear();
+		_triangles3DToDraw.clear();
 		gameCamera.clear();
 	}
 
