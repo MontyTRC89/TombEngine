@@ -8,7 +8,7 @@ Version 1.3
 * Fix pushable camera bug during edge slip.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Improve dozy collision.
-* Add fast speed for dozy mode by pressing sprint key.
+* Add fast speed for dozy mode by holding sprint key.
 
 Version 1.2
 ===========
