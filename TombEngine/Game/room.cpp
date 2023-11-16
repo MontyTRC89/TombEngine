@@ -262,12 +262,12 @@ static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int sear
 	if (g_Level.Rooms.size() <= roomNumber)
 		return {};
 
+	// Search depth limit reached; return current room.
+	if (searchDepth == 0)
+		return std::vector<int>{ roomNumber };
+
 	// Collect current room number as neighbor of itself.
 	visitedRoomNumbers.push_back(roomNumber);
-
-	// Search depth limit reached; return empty vector.
-	if (searchDepth == 0)
-		return {};
 
 	auto neighborRoomNumbers = std::vector<int>{};
 
