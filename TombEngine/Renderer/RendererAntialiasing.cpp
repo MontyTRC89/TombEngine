@@ -28,7 +28,7 @@ namespace TEN::Renderer
 
 		_context->VSSetShader(_SMAAEdgeDetectionVS.Get(), nullptr, 0);
 		_context->PSSetShader(_SMAAColorEdgeDetectionPS.Get(), nullptr, 0);
-
+		 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_SMAATriangleInputLayout.Get());
 

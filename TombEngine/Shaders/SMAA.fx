@@ -26,7 +26,7 @@
  * SOFTWARE.
  */
 
-cbuffer SMAABuffer : register(b0)
+cbuffer SMAABuffer : register(b13)
 {
     /**
      * This is only required for temporal modes (SMAA T2x).
