@@ -262,10 +262,6 @@ static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int sear
 	if (g_Level.Rooms.size() <= roomNumber)
 		return {};
 
-	// 1 room exists; return it.
-	if (g_Level.Rooms.size() == 1)
-		return std::vector<int>{ roomNumber };
-
 	// Search depth limit reached; return empty vector.
 	if (searchDepth == 0)
 		return {};
@@ -277,13 +273,20 @@ static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int sear
 
 	// Recursively collect neighbors of current neighbor.
 	const auto& room = g_Level.Rooms[roomNumber];
-	for (int doorID = 0; doorID < room.doors.size(); doorID++) 
+	if (room.doors.empty())
 	{
-		int neighborRoomNumber = room.doors[doorID].room;
-		neighborRoomNumbers.push_back(neighborRoomNumber);
+		neighborRoomNumbers.push_back(roomNumber);
+	}
+	else
+	{
+		for (int doorID = 0; doorID < room.doors.size(); doorID++)
+		{
+			int neighborRoomNumber = room.doors[doorID].room;
+			neighborRoomNumbers.push_back(neighborRoomNumber);
 
-		auto recNeighborRoomNumbers = GetNeighborRoomNumbers(neighborRoomNumber, searchDepth - 1, visitedRoomNumbers);
-		neighborRoomNumbers.insert(neighborRoomNumbers.end(), recNeighborRoomNumbers.begin(), recNeighborRoomNumbers.end());
+			auto recNeighborRoomNumbers = GetNeighborRoomNumbers(neighborRoomNumber, searchDepth - 1, visitedRoomNumbers);
+			neighborRoomNumbers.insert(neighborRoomNumbers.end(), recNeighborRoomNumbers.begin(), recNeighborRoomNumbers.end());
+		}
 	}
 
 	// Sort and clean collection.
