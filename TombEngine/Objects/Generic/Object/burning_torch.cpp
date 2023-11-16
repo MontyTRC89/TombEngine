@@ -30,43 +30,46 @@ namespace TEN::Entities::Generic
 
 		spark->sR = 255;
 		spark->sB = 48;
-		spark->sG = (GetRandomControl() & 0x1F) + 48;
-		spark->dR = (GetRandomControl() & 0x3F) - 64;
+		spark->sG = Random::GenerateFloat(0.2f, 0.3f) * UCHAR_MAX;
+		spark->dR = Random::GenerateFloat(-0.25f, 0.0f) * UCHAR_MAX;
 		spark->dB = 32;
-		spark->dG = (GetRandomControl() & 0x3F) + -128;
+		spark->dG = spark->dG = Random::GenerateFloat(-0.5f, -0.25f) * UCHAR_MAX;
 
 		spark->fadeToBlack = 8;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 12;
+		spark->colFadeSpeed = Random::GenerateInt(12, 15);
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->life = spark->sLife = (GetRandomControl() & 7) + 24;
+		spark->life = spark->sLife = Random::GenerateInt(24, 31);
 
-		spark->x = (GetRandomControl() & 0xF) - 8;
+		spark->x = Random::GenerateInt(-23, -8);
 		spark->y = 0;
-		spark->z = (GetRandomControl() & 0xF) - 8;
+		spark->z = Random::GenerateInt(-23, -8);
 
-		spark->xVel = (GetRandomControl() & 0xFF) - 128;
-		spark->yVel = -16 - (GetRandomControl() & 0xF);
-		spark->zVel = (GetRandomControl() & 0xFF) - 128;
+		spark->xVel = Random::GenerateInt(-128, 128);
+		spark->yVel = Random::GenerateInt(-31, -16);
+		spark->zVel = Random::GenerateInt(-128, 128);
 
 		spark->friction = 5;
 
 		spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_DEF | SP_SCALE;
 
-		spark->rotAng = GetRandomControl() & 0xFFF;
+		spark->rotAng = Random::GenerateInt(0, 4095);
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -16 - (GetRandomControl() & 0xF);
+		if (Random::GenerateInt(0, 1))
+			spark->rotAdd = Random::GenerateFloat(-0.16f / 127.0f, 0.0f) * SCHAR_MAX;
 		else
-			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
+			spark->rotAdd = Random::GenerateFloat(0.0f, 0.16f) * SCHAR_MAX;
 
-		spark->gravity = -16 - (GetRandomControl() & 0x1F);
+		spark->gravity = Random::GenerateInt (-31, -16);
 		spark->nodeNumber = node;
-		spark->maxYvel = -16 - (GetRandomControl() & 7);
+		spark->maxYvel = Random::GenerateFloat(-0.16f, 0.0f) * SCHAR_MAX;
 		spark->fxObj = fxObject;
 		spark->scalar = 1;
-		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 80;
+		spark->sSize = spark->size = Random::GenerateFloat(64, 150);
 		spark->dSize = spark->size / 8;
+
+		auto spriteOffset = GameTimer % Objects[ID_FIRE_SPRITES].nmeshes;
+		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
 	}
 
 	void DoFlameTorch()
@@ -177,7 +180,11 @@ namespace TEN::Entities::Generic
 		if (lara->Torch.IsLit)
 		{
 			auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(-32, 64, 256));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
+			short light_falloff = Random::GenerateInt (11, 12);
+			byte light_r = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
+			byte light_g = Random::GenerateFloat(0.38f, 0.5f) * UCHAR_MAX;
+			byte light_b = 0;
+			TriggerDynamicLight(pos.x, pos.y, pos.z, light_falloff, light_r, light_g, light_b);
 
 			if (!(Wibble & 3))
 				TriggerTorchFlame(laraItem->Index, 0);
@@ -265,7 +272,11 @@ namespace TEN::Entities::Generic
 
 		if (item->ItemFlags[3])
 		{
-			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 12 - (GetRandomControl() & 1), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 96, 0);
+			short light_falloff = Random::GenerateInt(11, 12);
+			byte light_r = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
+			byte light_g = Random::GenerateFloat(0.38f, 0.5f) * UCHAR_MAX;
+			byte light_b = 0;
+			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, light_falloff, light_r, light_g, light_b);
 			
 			if (!(Wibble & 7))
 				TriggerTorchFlame(itemNumber, 1);
