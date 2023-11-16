@@ -1108,9 +1108,8 @@ namespace TEN::Renderer
 	void Renderer11::AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
 		constexpr auto AXIS_COUNT		 = 3;
-		constexpr auto SUBDIVISION_COUNT = 32;
-		constexpr auto STEP_COUNT		 = 4;
-		constexpr auto STEP_ANGLE		 = PI / STEP_COUNT;
+		constexpr auto SUBDIVISION_COUNT = 16;
+		constexpr auto STEP_ANGLE		 = PI / (SUBDIVISION_COUNT / 4);
 
 		if (m_Locked)
 			return;
@@ -1118,31 +1117,68 @@ namespace TEN::Renderer
 		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
 			return;
 
-		auto prevPoints = std::array<Vector3, AXIS_COUNT>{};
-
-		for (int i = 0; i < STEP_COUNT; i++)
+		// Construct sphere.
+		if (isWireframe)
 		{
-			float x = sin(STEP_ANGLE * i) * radius;
-			float z = cos(STEP_ANGLE * i) * radius;
-			float angle = 0.0f;
-
-			for (int j = 0; j < SUBDIVISION_COUNT; j++)
+			auto prevPoints = std::array<Vector3, AXIS_COUNT>{};
+			for (int i = 0; i < (SUBDIVISION_COUNT / 4); i++)
 			{
-				auto points = std::array<Vector3, AXIS_COUNT>
-				{
-					center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
-					center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
-					center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
-				};
+				float x = sin(STEP_ANGLE * i) * radius;
+				float z = cos(STEP_ANGLE * i) * radius;
+				float angle = 0.0f;
 
-				if (j > 0)
+				for (int j = 0; j < SUBDIVISION_COUNT; j++)
 				{
-					for (int k = 0; k < points.size(); k++)
-						AddDebugLine(prevPoints[k], points[k], color);
+					auto points = std::array<Vector3, AXIS_COUNT>
+					{
+						center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
+						center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
+						center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
+					};
+
+					if (j > 0)
+					{
+						for (int k = 0; k < points.size(); k++)
+							AddDebugLine(prevPoints[k], points[k], color);
+					}
+
+					prevPoints = points;
+					angle += PI_MUL_2 / (SUBDIVISION_COUNT - 1);
 				}
+			}
+		}
+		else
+		{
+			auto vertices = std::vector<Vector3>{};
+			for (int i = 0; i <= SUBDIVISION_COUNT; i++)
+			{
+				float pitch = ((float)i / SUBDIVISION_COUNT) * PI;
+				float y = cos(pitch) * radius;
+				float radiusAtY = sin(pitch) * radius;
 
-				prevPoints = points;
-				angle += PI_MUL_2 / (SUBDIVISION_COUNT - 1);
+				for (int j = 0; j < SUBDIVISION_COUNT; j++)
+				{
+					float theta = ((float)j / SUBDIVISION_COUNT) * PI_MUL_2;
+					float x = cos(theta) * radiusAtY;
+					float z = sin(theta) * radiusAtY;
+
+					auto vertex = center + Vector3(x, y, z);
+					vertices.push_back(vertex);
+				}
+			}
+
+			for (int i = 0; i < SUBDIVISION_COUNT; i++)
+			{
+				for (int j = 0; j < SUBDIVISION_COUNT; j++)
+				{
+					int index0 = i * SUBDIVISION_COUNT + j;
+					int index1 = ((i + 1) * SUBDIVISION_COUNT) + j;
+					int index2 = ((i + 1) * SUBDIVISION_COUNT) + (j + 1) % SUBDIVISION_COUNT;
+					int index3 = (i * SUBDIVISION_COUNT) + ((j + 1) % SUBDIVISION_COUNT);
+
+					AddDebugTriangle(vertices[index0], vertices[index1], vertices[index2], color);
+					AddDebugTriangle(vertices[index0], vertices[index2], vertices[index3], color);
+				}
 			}
 		}
 	}
