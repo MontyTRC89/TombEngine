@@ -64,6 +64,8 @@
 #include "Renderer/Structures/RendererLine2D.h"
 #include "Renderer/Structures/RendererHudBar.h"
 #include "Renderer/Structures/RendererRoomAmbientMap.h"
+#include "Renderer/ConstantBuffers/SMAABuffer.h"
+#include "Renderer/Graphics/Vertices/SMAAVertex.h"
 
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
@@ -109,9 +111,7 @@ namespace TEN::Renderer
 		RenderTarget2D _backBuffer;
 		RenderTarget2D _dumpScreenRenderTarget;
 		RenderTarget2D _renderTarget;
-		RenderTarget2D _transparencyRenderTarget;
-		RenderTarget2D _weightRenderTarget;
-		RenderTargetCube _reflectionCubemap;
+		RenderTarget2D _tempRenderTarget;
 		RenderTarget2D _tempRoomAmbientRenderTarget1;
 		RenderTarget2D _tempRoomAmbientRenderTarget2;
 		RenderTarget2D _tempRoomAmbientRenderTarget3;
@@ -192,6 +192,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CInstancedStaticMeshBuffer> _cbInstancedStaticMeshBuffer;
 		CSkyBuffer _stSky;
 		ConstantBuffer<CSkyBuffer> _cbSky;
+		CSMAABuffer _stSMAABuffer;
+		ConstantBuffer<CSMAABuffer> _cbSMAABuffer;
 
 		// Primitive batchs
 		std::unique_ptr<SpriteBatch> _spriteBatch;
@@ -316,7 +318,37 @@ namespace TEN::Renderer
 		std::vector<RendererSpriteBucket> _spriteBuckets;
 		std::unique_ptr<BasicPostProcess> _postProcess;
 
+		// Antialiasing
+		Texture2D _SMAAAreaTexture;
+		Texture2D _SMAASearchTexture;
+		RenderTarget2D _SMAAVelocityRenderTarget;
+		RenderTarget2D _SMAASceneRenderTarget;
+		RenderTarget2D _SMAASceneSRGBRenderTarget;
+		RenderTarget2D _SMAATempRenderTargets[2];
+		RenderTarget2D _SMAATempSRGBRenderTargets[2];
+		RenderTarget2D _SMAAPreviousRenderTargets[2];
+		RenderTarget2D _SMAADepthRenderTarget;
+		RenderTarget2D _SMAAEdgesRenderTarget;
+		RenderTarget2D _SMAABlendRenderTarget;
+
+		ComPtr<ID3D11VertexShader> _SMAAEdgeDetectionVS;
+		ComPtr<ID3D11PixelShader> _SMAALumaEdgeDetectionPS;
+		ComPtr<ID3D11PixelShader> _SMAAColorEdgeDetectionPS;
+		ComPtr<ID3D11PixelShader> _SMAADepthEdgeDetectionPS;
+		ComPtr<ID3D11VertexShader> _SMAABlendingWeightCalculationVS;
+		ComPtr<ID3D11PixelShader> _SMAABlendingWeightCalculationPS;
+		ComPtr<ID3D11VertexShader> _SMAANeighborhoodBlendingVS;
+		ComPtr<ID3D11PixelShader> _SMAANeighborhoodBlendingPS;
+
+		std::unique_ptr<PrimitiveBatch<SMAAVertex>> _SMAAprimitiveBatch;
+		ComPtr<ID3D11InputLayout> _SMAATriangleInputLayout;
+
+		ComPtr<ID3D11VertexShader> _vsFXAA;
+		ComPtr<ID3D11PixelShader> _psFXAA;
+
 		// Private functions
+		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
+		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);
 		void BindRoomLights(std::vector<RendererLight*>& lights);
 		void BindStaticLights(std::vector<RendererLight*>& lights);

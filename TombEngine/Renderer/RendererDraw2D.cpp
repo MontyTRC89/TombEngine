@@ -312,7 +312,12 @@ namespace TEN::Renderer
 	{
 		SetBlendMode(BlendMode::Opaque);
 
-		_context->RSSetState(_cullCounterClockwiseRasterizerState.Get());
+		_context->VSSetShader(_vsFinalPass.Get(), nullptr, 0);
+		_context->PSSetShader(_psFinalPass.Get(), nullptr, 0);
+
+		SetCullMode(CullMode::CounterClockwise);
+		SetBlendMode(BlendMode::Opaque);
+
 		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);
 		_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), renderTarget->DepthStencilView.Get());
@@ -349,13 +354,10 @@ namespace TEN::Renderer
 		vertices[3].UV.y = 1.0f;
 		vertices[3].Color = Vector4::One;
 
-		_context->VSSetShader(_vsFinalPass.Get(), nullptr, 0);
-		_context->PSSetShader(_psFinalPass.Get(), nullptr, 0);
-
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 
-		_stPostProcessBuffer.FXAA = g_Configuration.AntialiasingMode == AntialiasingMode::Low ? 1 : 0;
+		_stPostProcessBuffer.FXAA = 0;
 		_stPostProcessBuffer.ViewportWidth = _screenWidth;
 		_stPostProcessBuffer.ViewportHeight = _screenHeight;
 		_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;

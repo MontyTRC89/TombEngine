@@ -1500,6 +1500,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(ConstantBufferRegister::Blending, _cbBlending.get());
 		BindConstantBufferVS(ConstantBufferRegister::InstancedSprites, _cbInstancedSpriteBuffer.get());
 		BindConstantBufferVS(ConstantBufferRegister::Sky, _cbSky.get());
+		BindConstantBufferVS(ConstantBufferRegister::PostProcess, _cbPostProcessBuffer.get());
 
 		BindConstantBufferPS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 		BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
@@ -1512,6 +1513,7 @@ namespace TEN::Renderer
 		BindConstantBufferPS(ConstantBufferRegister::Blending, _cbBlending.get());
 		BindConstantBufferPS(ConstantBufferRegister::InstancedSprites, _cbInstancedSpriteBuffer.get());
 		BindConstantBufferPS(ConstantBufferRegister::Sky, _cbSky.get());
+		BindConstantBufferPS(ConstantBufferRegister::PostProcess, _cbPostProcessBuffer.get());
 
 		// Set up vertex parameters.
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -1651,6 +1653,20 @@ namespace TEN::Renderer
 		// Draw transparent faces and lines
 		//DrawTransparentFaces(view);
 		DrawLines3D(view);
+
+		// Apply antialiasing
+		switch (g_Configuration.AntialiasingMode)
+		{
+		case AntialiasingMode::None:
+			break;
+		case AntialiasingMode::Low:
+			ApplyFXAA(&_renderTarget, view);
+			break;
+		case AntialiasingMode::Medium:
+		case AntialiasingMode::High:
+			ApplySMAA(&_renderTarget, view);
+			break;
+		}
 
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(renderTarget, view);

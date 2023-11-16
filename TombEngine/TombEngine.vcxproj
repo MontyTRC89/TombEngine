@@ -660,6 +660,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\ConstantBuffers\ShaderFogBulb.h" />
     <ClInclude Include="Renderer\ConstantBuffers\SkyBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ConstantBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\SMAABuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AnimatedBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\BlendingBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\CameraMatrixBuffer.h" />
@@ -679,6 +680,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\Graphics\IndexBuffer.h" />
     <ClInclude Include="Renderer\Graphics\Texture2DArray.h" />
+    <ClInclude Include="Renderer\Graphics\Vertices\SMAAVertex.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\SpriteVertex.h" />
     <ClInclude Include="Renderer\RendererSprite2D.h" />
     <ClInclude Include="Renderer\Graphics\RenderTarget2D.h" />
@@ -695,6 +697,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Graphics\Vertices\Vertex.h" />
     <ClInclude Include="Renderer\Structures\RendererAnimatedTexture.h" />
     <ClInclude Include="Renderer\Structures\RendererAnimatedTextureSet.h" />
+    <ClInclude Include="Renderer\SMAA\AreaTex.h" />
+    <ClInclude Include="Renderer\SMAA\SearchTex.h" />
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
     <ClInclude Include="Renderer\Structures\RendererBucket.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
@@ -1145,6 +1149,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Renderer\Renderer.cpp" />
+    <ClCompile Include="Renderer\RendererAntialiasing.cpp" />
     <ClCompile Include="Renderer\RendererCompatibility.cpp" />
     <ClCompile Include="Renderer\RendererDebug.cpp" />
     <ClCompile Include="Renderer\RendererDraw.cpp" />
@@ -1234,6 +1239,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <FileType>Text</FileType>
     </None>
     <None Include="Shaders\Blending.hlsli" />
+    <None Include="Shaders\SMAA.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -1473,17 +1481,20 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\TransparentFinalPass.fx">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Shaders\GBuffer.fx">
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\RoomAmbient.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Shaders\SMAA.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\FXAA.fx">
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>
