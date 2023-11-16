@@ -256,9 +256,9 @@ namespace TEN::Renderer
 
 	struct RendererLine3D
 	{
-		Vector3 Start = Vector3::Zero;
-		Vector3 End	  = Vector3::Zero;
-		Vector4 Color = Vector3::Zero;
+		Vector3 Origin = Vector3::Zero;
+		Vector3 Target = Vector3::Zero;
+		Vector4 Color  = Vector3::Zero;
 	};
 
 	struct RendererRect2D
@@ -733,16 +733,21 @@ namespace TEN::Renderer
 		void SetFullScreen();
 		bool IsFullsScreen();
 		void RenderTitleImage();
-		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color);
-		void AddLine3D(const Vector3& origin, const Vector3& target, const Vector4& color);
-		void AddReticle(const Vector3& center, float radius, const Vector4& color);
-		void AddDebugReticle(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page);
-		void AddBox(const Vector3 min, const Vector3& max, const Vector4& color, bool isOutline = true);
-		void AddBox(Vector3* corners, const Vector4& color, bool isOutline = true);
-		void AddDebugBox(const BoundingOrientedBox& box, const Vector4& color, RendererDebugPage page);
-		void AddDebugBox(const Vector3& min, const Vector3& max, const Vector4& color, RendererDebugPage page);
-		void AddSphere(const Vector3& center, float radius, const Vector4& color);
-		void AddDebugSphere(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page);
+
+		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+		
+		void AddDebugLine(const Vector3& origin, const Vector3& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+		void AddDebugTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+		void AddDebugReticle(const Vector3& center, const Quaternion& orient, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugBox(const std::array<Vector3, 8>& corners, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugBox(const Vector3& min, const Vector3& max, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugBox(const BoundingOrientedBox& box, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugBox(const BoundingBox& box, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugCone(const Vector3& center, const Quaternion& orient, float radius, float length, const Vector4& color, RendererDebugPage page, bool isWireframe);
+		void AddDebugCylinder(const Vector3& center, const Quaternion& orient, float radius, float length, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		
 		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);

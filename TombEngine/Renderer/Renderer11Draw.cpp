@@ -738,18 +738,17 @@ namespace TEN::Renderer
 
 		m_primitiveBatch->Begin();
 
-		for (int i = 0; i < m_lines3DToDraw.size(); i++)
+		for (const auto& line : m_lines3DToDraw)
 		{
-			RendererLine3D* line = &m_lines3DToDraw[i];
+			auto vertex0 = RendererVertex{};
+			vertex0.Position = line.Origin;
+			vertex0.Color = line.Color;
 
-			RendererVertex v1;
-			v1.Position = line->Start;
-			v1.Color = line->Color;
+			auto vertex1 = RendererVertex{};
+			vertex1.Position = line.Target;
+			vertex1.Color = line.Color;
 
-			RendererVertex v2;
-			v2.Position = line->End;
-			v2.Color = line->Color;
-			m_primitiveBatch->DrawLine(v1, v2);
+			m_primitiveBatch->DrawLine(vertex0, vertex1);
 		}
 
 		m_primitiveBatch->End();
@@ -794,44 +793,319 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 	}
 
-	void Renderer11::AddLine3D(const Vector3& target, const Vector3& origin, const Vector4& color)
+	void Renderer11::AddDebugLine(const Vector3& origin, const Vector3& target, const Color& color, RendererDebugPage page)
 	{
 		if (m_Locked)
 			return;
 
-		RendererLine3D line;
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
 
-		line.Start = target;
-		line.End = origin;
+		auto line = RendererLine3D{};
+		line.Origin = origin;
+		line.Target = target;
 		line.Color = color;
 
 		m_lines3DToDraw.push_back(line);
 	}
 
-	void Renderer11::AddReticle(const Vector3& center, float radius, const Vector4& color)
+	void Renderer11::AddDebugTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Color& color, RendererDebugPage page)
 	{
-		auto origin0 = center + Vector3(radius, 0.0f, 0.0f);
-		auto target0 = center + Vector3(-radius, 0.0f, 0.0f);
-		AddLine3D(origin0, target0, color);
-
-		auto origin1 = center + Vector3(0.0f, radius, 0.0f);
-		auto target1 = center + Vector3(0.0f, -radius, 0.0f);
-		AddLine3D(origin1, target1, color);
-
-		auto origin2 = center + Vector3(0.0f, 0.0f, radius);
-		auto target2 = center + Vector3(0.0f, 0.0f, -radius);
-		AddLine3D(origin2, target2, color);
-	}
-
-	void Renderer11::AddDebugReticle(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page)
-	{
-		if (!DebugMode || DebugPage != page)
+		if (m_Locked)
 			return;
 
-		AddReticle(center, radius, color);
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto tri = RendererTriangle3D{};
+		tri.Vertices = { vertex0, vertex1, vertex2 };
+		tri.Color = color;
+
+		_triangles3DToDraw.push_back(tri);
 	}
 
-	void Renderer11::AddSphere(const Vector3& center, float radius, const Vector4& color)
+	void Renderer11::AddDebugReticle(const Vector3& center, const Quaternion& orient, float radius, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto rotMatrix = Matrix::CreateFromQuaternion(orient);
+
+		auto origin0 = center + Vector3::Transform(Vector3(radius, 0.0f, 0.0f), rotMatrix);
+		auto target0 = center + Vector3::Transform(Vector3(-radius, 0.0f, 0.0f), rotMatrix);
+		AddDebugLine(origin0, target0, color);
+
+		auto origin1 = center + Vector3::Transform(Vector3(0.0f, radius, 0.0f), rotMatrix);
+		auto target1 = center + Vector3::Transform(Vector3(0.0f, -radius, 0.0f), rotMatrix);
+		AddDebugLine(origin1, target1, color);
+
+		auto origin2 = center + Vector3::Transform(Vector3(0.0f, 0.0f, radius), rotMatrix);
+		auto target2 = center + Vector3::Transform(Vector3(0.0f, 0.0f, -radius), rotMatrix);
+		AddDebugLine(origin2, target2, color);
+	}
+
+	void Renderer11::AddDebugBox(const std::array<Vector3, 8>& corners, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto LINE_COUNT  = 12;
+		constexpr auto PLANE_COUNT = 6;
+
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
+		// Construct box.
+		if (isWireframe)
+		{
+			for (int i = 0; i < LINE_COUNT; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					AddDebugLine(corners[0], corners[1], color, page);
+					break;
+				case 1:
+					AddDebugLine(corners[1], corners[2], color, page);
+					break;
+				case 2:
+					AddDebugLine(corners[2], corners[3], color, page);
+					break;
+				case 3:
+					AddDebugLine(corners[3], corners[0], color, page);
+					break;
+
+				case 4:
+					AddDebugLine(corners[4], corners[5], color, page);
+					break;
+				case 5:
+					AddDebugLine(corners[5], corners[6], color, page);
+					break;
+				case 6:
+					AddDebugLine(corners[6], corners[7], color, page);
+					break;
+				case 7:
+					AddDebugLine(corners[7], corners[4], color, page);
+					break;
+
+				case 8:
+					AddDebugLine(corners[0], corners[4], color, page);
+					break;
+				case 9:
+					AddDebugLine(corners[1], corners[5], color, page);
+					break;
+				case 10:
+					AddDebugLine(corners[2], corners[6], color, page);
+					break;
+				case 11:
+					AddDebugLine(corners[3], corners[7], color, page);
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < PLANE_COUNT; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					AddDebugTriangle(corners[0], corners[1], corners[2], color, page);
+					AddDebugTriangle(corners[0], corners[2], corners[3], color, page);
+					break;
+
+				case 1:
+					AddDebugTriangle(corners[4], corners[5], corners[6], color, page);
+					AddDebugTriangle(corners[4], corners[6], corners[7], color, page);
+					break;
+
+				case 2:
+					AddDebugTriangle(corners[0], corners[1], corners[4], color, page);
+					AddDebugTriangle(corners[1], corners[4], corners[5], color, page);
+					break;
+
+				case 3:
+					AddDebugTriangle(corners[1], corners[2], corners[5], color, page);
+					AddDebugTriangle(corners[2], corners[5], corners[6], color, page);
+					break;
+
+				case 4:
+					AddDebugTriangle(corners[2], corners[3], corners[6], color, page);
+					AddDebugTriangle(corners[3], corners[6], corners[7], color, page);
+					break;
+
+				case 5:
+					AddDebugTriangle(corners[0], corners[3], corners[4], color, page);
+					AddDebugTriangle(corners[3], corners[4], corners[7], color, page);
+					break;
+				}
+			}
+		}
+	}
+
+	void Renderer11::AddDebugBox(const Vector3& min, const Vector3& max, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto box = BoundingBox((max + min) / 2, (max - min) / 2);
+		AddDebugBox(box, color, page, isWireframe);
+	}
+
+	void Renderer11::AddDebugBox(const BoundingOrientedBox& box, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto CORNER_COUNT = 8;
+
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto corners = std::array<Vector3, CORNER_COUNT>{};
+		box.GetCorners(corners.data());
+
+		AddDebugBox(corners, color, page, isWireframe);
+	}
+
+	void Renderer11::AddDebugBox(const BoundingBox& box, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto CORNER_COUNT = 8;
+
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto corners = std::array<Vector3, CORNER_COUNT>{};
+		box.GetCorners(corners.data());
+
+		AddDebugBox(corners, color, page, isWireframe);
+	}
+
+	void Renderer11::AddDebugCone(const Vector3& center, const Quaternion& orient, float radius, float length, const Vector4& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto SUBDIVISION_COUNT = 32;
+
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto rotMatrix = Matrix::CreateFromQuaternion(orient);
+
+		auto baseVertices = std::vector<Vector3>{};
+		baseVertices.reserve(SUBDIVISION_COUNT);
+		float angle = 0.0f;
+
+		// Calculate base circle vertices.
+		for (int i = 0; i <= SUBDIVISION_COUNT; i++)
+		{
+			float sinAngle = sin(angle);
+			float cosAngle = cos(angle);
+
+			auto vertex = center + Vector3::Transform(Vector3(radius * sinAngle, radius * cosAngle, 0.0f), rotMatrix);
+			baseVertices.push_back(vertex);
+
+			angle += PI_MUL_2 / SUBDIVISION_COUNT;
+		}
+
+		auto dir = Geometry::ConvertQuatToDirection(orient);
+		auto topVertex = Geometry::TranslatePoint(center, dir, length);
+
+		// Construct cone.
+		for (int i = 0; i < baseVertices.size(); i++)
+		{
+			const auto& vertex0 = baseVertices[i];
+			const auto& vertex1 = baseVertices[(i == (baseVertices.size() - 1)) ? 0 : (i + 1)];
+
+			if (isWireframe)
+			{
+				AddDebugLine(vertex0, vertex1, color);
+
+				if ((i % (SUBDIVISION_COUNT / 8)) == 0)
+					AddDebugLine(vertex0, topVertex, color);
+			}
+			else
+			{
+				AddDebugTriangle(vertex0, vertex1, center, color);
+				AddDebugTriangle(vertex0, vertex1, topVertex, color);
+			}
+		}
+	}
+
+	void Renderer11::AddDebugCylinder(const Vector3& center, const Quaternion& orient, float radius, float length, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto SUBDIVISION_COUNT = 32;
+
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto rotMatrix = Matrix::CreateFromQuaternion(orient);
+
+		auto baseVertices = std::vector<Vector3>{};
+		baseVertices.reserve(SUBDIVISION_COUNT);
+		float angle = 0.0f;
+
+		// Calculate base circle vertices.
+		for (int i = 0; i <= SUBDIVISION_COUNT; i++)
+		{
+			float sinAngle = sin(angle);
+			float cosAngle = cos(angle);
+
+			auto vertex = center + Vector3::Transform(Vector3(radius * sinAngle, radius * cosAngle, 0.0f), rotMatrix);
+			baseVertices.push_back(vertex);
+
+			angle += PI_MUL_2 / SUBDIVISION_COUNT;
+		}
+
+		auto dir = Geometry::ConvertQuatToDirection(orient);
+
+		// Calculate top circle vertices.
+		auto topVertices = baseVertices;
+		for (auto& vertex : topVertices)
+			vertex = Geometry::TranslatePoint(vertex, dir, length);
+
+		// Construct cylinder.
+		auto topVertex = Geometry::TranslatePoint(center, dir, length);
+		for (int i = 0; i < baseVertices.size(); i++)
+		{
+			const auto& baseVertex0 = baseVertices[i];
+			const auto& baseVertex1 = baseVertices[(i == (baseVertices.size() - 1)) ? 0 : (i + 1)];
+			
+			const auto& topVertex0 = topVertices[i];
+			const auto& topVertex1 = topVertices[(i == (topVertices.size() - 1)) ? 0 : (i + 1)];
+
+			if (isWireframe)
+			{
+				AddDebugLine(baseVertex0, baseVertex1, color);
+				AddDebugLine(topVertex0, topVertex1, color);
+
+				if ((i % (SUBDIVISION_COUNT / 8)) == 0)
+					AddDebugLine(baseVertex0, topVertex0, color);
+			}
+			else
+			{
+				AddDebugTriangle(baseVertex0, baseVertex1, center, color);
+				AddDebugTriangle(topVertex0, topVertex1, topVertex, color);
+				AddDebugTriangle(baseVertex0, baseVertex1, topVertex1, color);
+				AddDebugTriangle(baseVertex0, topVertex0, topVertex1, color);
+			}
+		}
+	}
+
+	void Renderer11::AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
 		constexpr auto AXIS_COUNT		 = 3;
 		constexpr auto SUBDIVISION_COUNT = 32;
@@ -839,6 +1113,9 @@ namespace TEN::Renderer
 		constexpr auto STEP_ANGLE		 = PI / STEP_COUNT;
 
 		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
 			return;
 
 		auto prevPoints = std::array<Vector3, AXIS_COUNT>{};
@@ -861,7 +1138,7 @@ namespace TEN::Renderer
 				if (j > 0)
 				{
 					for (int k = 0; k < points.size(); k++)
-						AddLine3D(prevPoints[k], points[k], color);
+						AddDebugLine(prevPoints[k], points[k], color);
 				}
 
 				prevPoints = points;
@@ -870,220 +1147,15 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::AddDebugSphere(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page)
-	{
-		if (!DebugMode || DebugPage != page)
-			return;
-
-		AddSphere(center, radius, color);
-	}
-
-	void Renderer11::AddBox(Vector3* corners, const Vector4& color, bool isOutline)
+	void Renderer11::AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
 		if (m_Locked)
 			return;
 
-		if (isOutline)
-		{
-			for (int i = 0; i < 12; i++)
-			{
-				auto line = RendererLine3D{};
-
-				switch (i)
-				{
-				case 0: line.Start = corners[0];
-					line.End = corners[1];
-					break;
-				case 1: line.Start = corners[1];
-					line.End = corners[2];
-					break;
-				case 2: line.Start = corners[2];
-					line.End = corners[3];
-					break;
-				case 3: line.Start = corners[3];
-					line.End = corners[0];
-					break;
-
-				case 4: line.Start = corners[4];
-					line.End = corners[5];
-					break;
-				case 5: line.Start = corners[5];
-					line.End = corners[6];
-					break;
-				case 6: line.Start = corners[6];
-					line.End = corners[7];
-					break;
-				case 7: line.Start = corners[7];
-					line.End = corners[4];
-					break;
-
-				case 8: line.Start = corners[0];
-					line.End = corners[4];
-					break;
-				case 9: line.Start = corners[1];
-					line.End = corners[5];
-					break;
-				case 10: line.Start = corners[2];
-					line.End = corners[6];
-					break;
-				case 11: line.Start = corners[3];
-					line.End = corners[7];
-					break;
-				}
-
-				line.Color = color;
-
-				m_lines3DToDraw.push_back(line);
-			}
-		}
-		else
-		{
-			for (int i = 0; i < 6; i++)
-			{
-				auto tri0 = RendererTriangle3D{};
-				auto tri1 = RendererTriangle3D{};
-
-				switch (i)
-				{
-				case 0:
-					tri0.Vertices = { corners[0], corners[1], corners[2] };
-					tri1.Vertices = { corners[0], corners[2], corners[3] };
-					break;
-
-				case 1:
-					tri0.Vertices = { corners[4], corners[5], corners[6] };
-					tri1.Vertices = { corners[4], corners[6], corners[7] };
-					break;
-
-				case 2:
-					tri0.Vertices = { corners[0], corners[1], corners[4] };
-					tri1.Vertices = { corners[1], corners[4], corners[5] };
-					break;
-
-				case 3:
-					tri0.Vertices = { corners[1], corners[2], corners[5] };
-					tri1.Vertices = { corners[2], corners[5], corners[6] };
-					break;
-
-				case 4:
-					tri0.Vertices = { corners[2], corners[3], corners[6] };
-					tri1.Vertices = { corners[3], corners[6], corners[7] };
-					break;
-
-				case 5:
-					tri0.Vertices = { corners[0], corners[3], corners[4] };
-					tri1.Vertices = { corners[3], corners[4], corners[7] };
-					break;
-				}
-
-				tri0.Color = color;
-				tri1.Color = color;
-
-				_triangles3DToDraw.push_back(tri0);
-				_triangles3DToDraw.push_back(tri1);
-			}
-		}
-	}
-
-	void Renderer11::AddBox(const Vector3 min, const Vector3& max, const Vector4& color, bool isOutline)
-	{
-		if (m_Locked)
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
 			return;
 
-		if (isOutline)
-		{
-			for (int i = 0; i < 12; i++)
-			{
-				RendererLine3D line;
-
-				switch (i)
-				{
-				case 0: line.Start = Vector3(min.x, min.y, min.z);
-					line.End = Vector3(min.x, min.y, max.z);
-					break;
-				case 1: line.Start = Vector3(min.x, min.y, max.z);
-					line.End = Vector3(max.x, min.y, max.z);
-					break;
-				case 2: line.Start = Vector3(max.x, min.y, max.z);
-					line.End = Vector3(max.x, min.y, min.z);
-					break;
-				case 3: line.Start = Vector3(max.x, min.y, min.z);
-					line.End = Vector3(min.x, min.y, min.z);
-					break;
-
-				case 4: line.Start = Vector3(min.x, max.y, min.z);
-					line.End = Vector3(min.x, max.y, max.z);
-					break;
-				case 5: line.Start = Vector3(min.x, max.y, max.z);
-					line.End = Vector3(max.x, max.y, max.z);
-					break;
-				case 6: line.Start = Vector3(max.x, max.y, max.z);
-					line.End = Vector3(max.x, max.y, min.z);
-					break;
-				case 7: line.Start = Vector3(max.x, max.y, min.z);
-					line.End = Vector3(min.x, max.y, min.z);
-					break;
-
-				case 8: line.Start = Vector3(min.x, min.y, min.z);
-					line.End = Vector3(min.x, max.y, min.z);
-					break;
-				case 9: line.Start = Vector3(min.x, min.y, max.z);
-					line.End = Vector3(min.x, max.y, max.z);
-					break;
-				case 10: line.Start = Vector3(max.x, min.y, max.z);
-					line.End = Vector3(max.x, max.y, max.z);
-					break;
-				case 11: line.Start = Vector3(max.x, min.y, min.z);
-					line.End = Vector3(max.x, max.y, min.z);
-					break;
-				}
-
-				line.Color = color;
-
-				m_lines3DToDraw.push_back(line);
-			}
-		}
-		else
-		{
-			for (int i = 0; i < 6; i++)
-			{
-				auto tri0 = RendererTriangle3D{};
-				auto tri1 = RendererTriangle3D{};
-
-				switch (i)
-				{
-				case 0:
-					tri0.Vertices = { min, Vector3(max.x, min.x, min.x), Vector3(max.x, max.y, min.z) };
-					tri0.Vertices = { min, Vector3(min.x, max.x, min.x), Vector3(max.x, max.y, min.z) };
-
-				
-				}
-
-				tri0.Color = color;
-				tri1.Color = color;
-
-				_triangles3DToDraw.push_back(tri0);
-				_triangles3DToDraw.push_back(tri1);
-			}
-		}
-	}
-
-	void Renderer11::AddDebugBox(const BoundingOrientedBox& box, const Vector4& color, RendererDebugPage page)
-	{
-		if (!DebugMode || DebugPage != page)
-			return;
-
-		Vector3 corners[8];
-		box.GetCorners(corners);
-		AddBox(corners, color, false);
-	}
-
-	void Renderer11::AddDebugBox(const Vector3& min, const Vector3& max, const Vector4& color, RendererDebugPage page)
-	{
-		if (DebugPage != page)
-			return;
-
-		AddBox(min, max, color);
+		AddDebugSphere(sphere.Center, sphere.Radius, color, page, isWireframe);
 	}
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)

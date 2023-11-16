@@ -45,8 +45,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	auto box = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
-	g_Renderer.AddDebugBox(box, Vector4(0.5f, 1, 0, 0.3f), RendererDebugPage::None);
+	// -------------------
+	
+	g_Renderer.AddDebugCylinder(item->Pose.Position.ToVector3() + Vector3(0, -1, 0), Geometry::ConvertDirectionToQuat(-Vector3::UnitY), 150, BLOCK(0.75f), Vector4(1, 1, 0, 0.2f), RendererDebugPage::None, false);
+
+	//auto box = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+	//g_Renderer.AddDebugBox(box, Vector4(0.5f, 1, 0, 0.3f), RendererDebugPage::None);
+
+	//-----------------
 
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)

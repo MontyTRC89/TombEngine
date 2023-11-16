@@ -975,7 +975,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto ray = Ray(Vector3(eX, cY, eZ), direction);
 
 			// Debug ray direction.
-			// g_Renderer.AddLine3D(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
+			// g_Renderer.AddDebugLine(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
 
 			// Keep origin ray to calculate true centerpoint distance to ledge later.
 			if (p == 0)
