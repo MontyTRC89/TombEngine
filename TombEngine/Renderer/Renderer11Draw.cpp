@@ -1019,7 +1019,7 @@ namespace TEN::Renderer
 		}
 
 		auto dir = Geometry::ConvertQuatToDirection(orient);
-		auto topVertex = Geometry::TranslatePoint(center, dir, length);
+		auto topCenter = Geometry::TranslatePoint(center, dir, length);
 
 		// Construct cone.
 		for (int i = 0; i < baseVertices.size(); i++)
@@ -1032,12 +1032,12 @@ namespace TEN::Renderer
 				AddDebugLine(vertex0, vertex1, color);
 
 				if ((i % (SUBDIVISION_COUNT / 8)) == 0)
-					AddDebugLine(vertex0, topVertex, color);
+					AddDebugLine(vertex0, topCenter, color);
 			}
 			else
 			{
 				AddDebugTriangle(vertex0, vertex1, center, color);
-				AddDebugTriangle(vertex0, vertex1, topVertex, color);
+				AddDebugTriangle(vertex0, vertex1, topCenter, color);
 			}
 		}
 	}
@@ -1078,7 +1078,7 @@ namespace TEN::Renderer
 			vertex = Geometry::TranslatePoint(vertex, dir, length);
 
 		// Construct cylinder.
-		auto topVertex = Geometry::TranslatePoint(center, dir, length);
+		auto topCenter = Geometry::TranslatePoint(center, dir, length);
 		for (int i = 0; i < baseVertices.size(); i++)
 		{
 			const auto& baseVertex0 = baseVertices[i];
@@ -1098,7 +1098,7 @@ namespace TEN::Renderer
 			else
 			{
 				AddDebugTriangle(baseVertex0, baseVertex1, center, color);
-				AddDebugTriangle(topVertex0, topVertex1, topVertex, color);
+				AddDebugTriangle(topVertex0, topVertex1, topCenter, color);
 				AddDebugTriangle(baseVertex0, baseVertex1, topVertex1, color);
 				AddDebugTriangle(baseVertex0, topVertex0, topVertex1, color);
 			}
