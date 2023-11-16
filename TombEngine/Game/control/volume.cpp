@@ -145,6 +145,9 @@ namespace TEN::Control::Volumes
 		{
 			auto& room = g_Level.Rooms[currentRoomIndex];
 
+			if (!room.Active())
+				continue;
+
 			for (auto& volume : room.triggerVolumes)
 			{
 				if (!volume.Enabled)
