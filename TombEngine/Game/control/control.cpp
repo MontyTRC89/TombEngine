@@ -478,8 +478,27 @@ void InitializeScripting(int levelIndex, bool loadGame)
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
 	g_GameScript->OnEnd(reason);
-	HandleAllEvents(VolumeEventType::End, (VolumeActivator)LaraItem->Index);
+	switch (reason)
+	{
+		case GameStatus::LevelComplete:
+			HandleAllEvents(VolumeEventType::End, (VolumeActivator)LaraItem->Index);
+			TENLog("VolumeEventType::End", LogLevel::Info);
+			break;
+		case GameStatus::LoadGame:
+			HandleAllEvents(VolumeEventType::BeforeLoad, (VolumeActivator)LaraItem->Index);
+			TENLog("VolumeEventType::BeforeLoad", LogLevel::Info);
+			break;
+		case GameStatus::ExitToTitle:
+			HandleAllEvents(VolumeEventType::ExitToTitle, (VolumeActivator)LaraItem->Index);
+			TENLog("VolumeEventType::ExitToTitle", LogLevel::Info);
+			break;
+		case GameStatus::LaraDead:
+			HandleAllEvents(VolumeEventType::LaraDeath, (VolumeActivator)LaraItem->Index);
+			TENLog("VolumeEventType::LaraDeath", LogLevel::Info);
+			break;
 
+	}
+		
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 

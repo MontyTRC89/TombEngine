@@ -30,6 +30,9 @@ namespace TEN::Control::Volumes
 		Save,
 		Start,
 		End,
+		BeforeLoad,
+		ExitToTitle,
+		LaraDeath,
 
 		Count
 	};
