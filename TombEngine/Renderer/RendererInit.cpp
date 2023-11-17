@@ -129,18 +129,12 @@ namespace TEN::Renderer
 		_dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
 		_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 		_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
-		_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);
-		_transparentFacesVertices = createVector<Vertex>(MAX_TRANSPARENT_VERTICES);
-		_transparentFacesIndices.reserve(MAX_TRANSPARENT_VERTICES); // = createVector<int>(MAX_TRANSPARENT_VERTICES);
 
 		for (int i = 0; i < NUM_ITEMS; i++)
 		{
 			_items[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 			_effects[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 		}
-
-		_transparentFacesVertexBuffer = VertexBuffer(_device.Get(), TRANSPARENT_BUCKET_SIZE);
-		_transparentFacesIndexBuffer = IndexBuffer(_device.Get(), TRANSPARENT_BUCKET_SIZE);
 
 		D3D11_BLEND_DESC blendStateDesc{};
 		blendStateDesc.AlphaToCoverageEnable = false;

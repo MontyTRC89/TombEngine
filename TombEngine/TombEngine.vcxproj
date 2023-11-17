@@ -726,7 +726,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Graphics\Texture2D.h" />
     <ClInclude Include="Renderer\Graphics\TextureBase.h" />
-    <ClInclude Include="Renderer\Structures\RendererTransparentFace.h" />
     <ClInclude Include="Renderer\Structures\RendererSpriteBucket.h" />
     <ClInclude Include="Renderer\RendererUtils.h" />
     <ClInclude Include="Renderer\Graphics\VertexBuffer.h" />

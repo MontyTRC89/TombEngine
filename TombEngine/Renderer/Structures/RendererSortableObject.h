@@ -1,6 +1,13 @@
 #pragma once
 #include <SimpleMath.h>
 #include "Renderer/RendererEnums.h"
+#include "Renderer/Structures/RendererBucket.h"
+#include "Renderer/Structures/RendererMesh.h"
+#include "Renderer/Structures/RendererItem.h"
+#include "Renderer/Structures/RendererStatic.h"
+#include "Renderer/Structures/RendererRoom.h"
+#include "Renderer/Structures/RendererEffect.h"
+#include "Renderer/Structures/RendererSpriteToDraw.h"
 
 namespace TEN::Renderer::Structures
 {
@@ -17,6 +24,6 @@ namespace TEN::Renderer::Structures
 		RendererStatic* Static;
 		RendererItem* Item;
 		RendererEffect* Effect;
-		int BoneIndex;
+		RendererSpriteToDraw* Sprite;
 	};
 }

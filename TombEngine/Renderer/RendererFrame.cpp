@@ -32,7 +32,6 @@ namespace TEN::Renderer
 			                         
 			room.ItemsToDraw.clear();        
 			room.EffectsToDraw.clear();
-			room.TransparentFacesToDraw.clear();
 			room.StaticsToDraw.clear();
 			room.LightsToDraw.clear();
 			room.Visited = false;

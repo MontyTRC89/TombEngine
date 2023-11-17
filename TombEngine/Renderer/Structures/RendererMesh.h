@@ -6,6 +6,7 @@
 
 namespace TEN::Renderer::Structures
 {
+	using namespace DirectX;
 	using namespace DirectX::SimpleMath;
 
 	struct RendererMesh

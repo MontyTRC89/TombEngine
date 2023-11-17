@@ -1,5 +1,8 @@
 #pragma once
+#include <SimpleMath.h>
 #include "Math/Math.h"
+
+using namespace DirectX::SimpleMath;
 
 enum class LightType
 {

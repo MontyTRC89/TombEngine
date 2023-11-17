@@ -8,7 +8,6 @@
 #include "Renderer/Structures/RendererItem.h"
 #include "Renderer/Structures/RendererEffect.h"
 #include "Renderer/Structures/RendererStatic.h"
-#include "Renderer/Structures/RendererTransparentFace.h"
 #include "Renderer/Structures/RendererDoor.h"
 
 namespace TEN::Renderer::Structures
@@ -29,7 +28,6 @@ namespace TEN::Renderer::Structures
 		std::vector<RendererItem*> ItemsToDraw;
 		std::vector<RendererEffect*> EffectsToDraw;
 		std::vector<RendererStatic*> StaticsToDraw;
-		std::vector<RendererTransparentFace> TransparentFacesToDraw;
 		std::vector<RendererLight*> LightsToDraw;
 		std::vector<RendererDoor> Doors;
 		BoundingBox BoundingBox;

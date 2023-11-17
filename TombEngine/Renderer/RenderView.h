@@ -6,7 +6,6 @@
 #include "Specific/memory/LinearArrayBuffer.h"
 #include "Renderer/Structures/RendererSprite2D.h"
 #include "Renderer/Structures/RendererSprite.h"
-#include "Renderer/Structures/RendererTransparentFace.h"
 #include "Renderer/Structures/RendererFogBulb.h"
 #include "Renderer/Structures/RendererStatic.h"
 #include "Renderer/Structures/RendererItem.h"
@@ -14,7 +13,7 @@
 #include "Renderer/Structures/RendererEffect.h"
 #include "Renderer/Structures/RendererRoom.h"
 #include "Renderer/Structures/RendererSortableObject.h"
-#include "Renderer/Structures/RendererTransparentFace.h"
+#include "Renderer/Structures/RendererSpriteToDraw.h"
 
 namespace TEN::Renderer 
 {

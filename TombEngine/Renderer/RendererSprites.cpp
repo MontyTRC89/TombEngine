@@ -247,29 +247,21 @@ namespace TEN::Renderer
 				currentSpriteBucket.SpritesToDraw.clear();
 			}
 
-			// HACK: Prevent sprites like Explosionsmoke which have BlendMode::Subtractive from having laser effects.
-			if (DoesBlendModeRequireSorting(rDrawSprite.BlendMode) && currentSpriteBucket.RenderType != SpriteRenderType::Default)
+			if (rDrawSprite.BlendMode != BlendMode::Opaque &&
+				rDrawSprite.BlendMode != BlendMode::Additive && 
+				rDrawSprite.BlendMode != BlendMode::AlphaTest)
 			{
-				// If blend mode requires sorting, save sprite for later.
 				int distance = (rDrawSprite.pos - Camera.pos.ToVector3()).Length();
-				RendererTransparentFace face;
-				face.type = TransparentFaceType::Sprite;
-				face.info.sprite = &rDrawSprite;
-				face.distance = distance;
-				face.info.world = GetWorldMatrixForSprite(&rDrawSprite, view);
-				face.info.blendMode = rDrawSprite.BlendMode;
 
-				for (int j = 0; j < view.RoomsToDraw.size(); j++)
-				{
-					int roomNumber = view.RoomsToDraw[j]->RoomNumber;
-					if (g_Level.Rooms[roomNumber].Active() && IsPointInRoom(Vector3i(rDrawSprite.pos), roomNumber))
-					{
-						view.RoomsToDraw[j]->TransparentFacesToDraw.push_back(face);
-						break;
-					}
-				}
+				RendererSortableObject object;
+				object.ObjectType = RendererObjectType::Sprite;
+				object.Centre = rDrawSprite.pos;
+				object.Distance = distance;
+				object.Sprite = &rDrawSprite;
+				//face.info.world = GetWorldMatrixForSprite(&rDrawSprite, view);
+
+				view.TransparentObjectsToDraw.push_back(object);
 			}
-			// Add sprite to current bucket.
 			else
 			{
 				currentSpriteBucket.SpritesToDraw.push_back(rDrawSprite);
@@ -424,6 +416,103 @@ namespace TEN::Renderer
 
 		// Set up vertex parameters.
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
+
+	void Renderer::DrawSingleSprite(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view)
+	{
+		if (object->Sprite->Type != SpriteType::ThreeD)
+		{
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+
+			SetDepthState(DepthState::Read);
+			SetCullMode(CullMode::None);
+			SetBlendMode(object->Sprite->BlendMode);
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+
+			_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
+			_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
+
+			// Set up vertex buffer and parameters.
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(object->Sprite, view);
+			_stInstancedSpriteBuffer.Sprites[0].Color = object->Sprite->color;
+			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
+			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;
+
+			// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].x = object->Sprite->Sprite->UV[0].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].y = object->Sprite->Sprite->UV[1].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].z = object->Sprite->Sprite->UV[2].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].w = object->Sprite->Sprite->UV[3].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].x = object->Sprite->Sprite->UV[0].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].y = object->Sprite->Sprite->UV[1].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].z = object->Sprite->Sprite->UV[2].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].w = object->Sprite->Sprite->UV[3].y;
+
+			BindTexture(TextureRegister::ColorMap, object->Sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
+
+			_cbInstancedSpriteBuffer.updateData(_stInstancedSpriteBuffer, _context.Get());
+
+			// Draw sprites with instancing.
+			DrawInstancedTriangles(4, 1, 0);
+
+			_numSpritesDrawCalls++;
+		}
+		else
+		{
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+
+			SetDepthState(DepthState::Read);
+			SetCullMode(CullMode::None);
+			SetBlendMode(object->Sprite->BlendMode);
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+
+			_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
+			_context->PSSetShader(_psSprites.Get(), nullptr, 0);
+
+			_stSprite.IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;
+			_stSprite.RenderType = (int)object->Sprite->renderType;
+			_cbSprite.updateData(_stSprite, _context.Get());
+
+			BindTexture(TextureRegister::ColorMap, object->Sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
+
+			_primitiveBatch->Begin();
+
+				auto vertex0 = Vertex{};
+				vertex0.Position = object->Sprite->vtx1;
+				vertex0.UV = object->Sprite->Sprite->UV[0];
+				vertex0.Color = object->Sprite->c1;
+
+				auto vertex1 = Vertex{};
+				vertex1.Position = object->Sprite->vtx2;
+				vertex1.UV = object->Sprite->Sprite->UV[1];
+				vertex1.Color = object->Sprite->c2;
+
+				auto vertex2 = Vertex{};
+				vertex2.Position = object->Sprite->vtx3;
+				vertex2.UV = object->Sprite->Sprite->UV[2];
+				vertex2.Color = object->Sprite->c3;
+
+				auto vertex3 = Vertex{};
+				vertex3.Position = object->Sprite->vtx4;
+				vertex3.UV = object->Sprite->Sprite->UV[3];
+				vertex3.Color = object->Sprite->c4;
+
+				_primitiveBatch->DrawTriangle(vertex0, vertex1, vertex3);
+				_primitiveBatch->DrawTriangle(vertex1, vertex2, vertex3);
+
+			_primitiveBatch->End();
+
+			_numSpritesDrawCalls++;
+			_numDrawCalls++;
+		}
 	}
 }
 

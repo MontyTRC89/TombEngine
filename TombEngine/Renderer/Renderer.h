@@ -49,7 +49,6 @@
 #include "Structures/RendererAnimatedTexture.h"
 #include "Structures/RendererAnimatedTextureSet.h"
 #include "Structures/RendererRoom.h"
-#include "Structures/RendererTransparentFace.h"
 #include "Renderer/Graphics/Texture2D.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Renderer/Graphics/RenderTarget2D.h"
@@ -66,6 +65,7 @@
 #include "Renderer/Structures/RendererRoomAmbientMap.h"
 #include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Renderer/Graphics/Vertices/SMAAVertex.h"
+#include "Renderer/Structures/RendererObject.h"
 
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
@@ -225,18 +225,12 @@ namespace TEN::Renderer
 		IndexBuffer _skyIndexBuffer;
 		VertexBuffer _quadVertexBuffer;
 
-		// TODO: used by legacy transaprency, to remove in the new system
 		std::vector<Vertex> _roomsVertices;
 		std::vector<int> _roomsIndices;
 		std::vector<Vertex> _moveablesVertices;
 		std::vector<int> _moveablesIndices;
 		std::vector<Vertex> _staticsVertices;
 		std::vector<int> _staticsIndices;
-		VertexBuffer _transparentFacesVertexBuffer;
-		IndexBuffer _transparentFacesIndexBuffer;
-		std::vector<Vertex> _transparentFacesVertices;
-		fast_vector<int> _transparentFacesIndices;
-		std::vector<RendererTransparentFace> _transparentFaces;
 
 		// Rooms and collector
 		std::vector<RendererRoom> _rooms;
@@ -409,7 +403,10 @@ namespace TEN::Renderer
 		void DrawSprites(RenderView& view, RendererPass rendererPass);
 		void DrawDisplaySprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
-		void DrawRoomBucket(RendererSortableObject* object, RenderView& view);
+		void DrawRoomBucket(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
+		void DrawItemBucket(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
+		void DrawStaticBucket(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
+		void DrawSingleSprite(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
 		void DrawLines3D(RenderView& view);
 		void DrawLinesIn2DSpace();
 		void DrawOverlays(RenderView& view);
