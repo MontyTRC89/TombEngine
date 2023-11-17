@@ -832,16 +832,22 @@ void ReadRooms()
 		// TODO: Wait for Nickelony.
 		// Load room attractors.
 		/*int attracCount = ReadInt32();
-		for (int j = 0; j < attracCount; j++)
+		for (int attracID = 0; attracID < attracCount; attracID++)
 		{
 			auto type = (AttractorType)ReadInt32();
 			auto points = std::vector<Vector3>{};
 
 			int pointCount = ReadInt32();
 			points.reserve(pointCount);
-			for (int k = 0; k < pointCount; k++)
+			for (int pointID = 0; pointID < pointCount; pointID++)
 				points.push_back(ReadVector3());
 
+			if (points.empty())
+			{
+				TENLog("Failed to load invalid attractor " + std::to_string(attracID) + " in room " + std::to_string(room.index), LogLevel::Warning);
+				continue;
+			}
+		
 			room.Attractors.push_back(Attractor(type, points, room.index));
 		}*/
 
