@@ -11,13 +11,13 @@ struct ItemInfo;
 // Floor:			Lower surface of a sector.
 // Floordata:		Name of the engine's level geometry collision system composed of rooms with sectors.
 // Location:		Vertical location within a room. TODO: Refine this concept and use a better name.
-// Plane:			Mathematical representation of one of two surface triangles.
+// Plane:			Mathematical representation of one of two surface tris.
 // Portal:			Link from one room to another allowing traversal between them.
 // Room number:		Unique ID of a room.
 // Room grid coord: Relative 2D grid coordinate of a room (e.g. [0, 0] denotes the first sector).
 // Sector/block:	Collision data describing a single grid division within a room.
 // Sector point:	Relative 2D position within a sector (range [0, BLOCK(1)) on each axis).
-// Surface:			Floor or ceiling consisting of two triangles.
+// Surface:			Floor or ceiling consisting of two tris.
 // Triangle:		Surface subdivision.
 // Wall:			Inferred from a high floor or ceiling. Note that true "walls" don't exist in floordata, only surface heights.
 
@@ -153,14 +153,14 @@ public:
 	const SectorSurfaceTriangleData& GetSurfaceTriangle(int x, int z, bool isFloor) const;
 	int		GetSurfaceTriangleID(int x, int z, bool isFloor) const;
 	Vector3 GetSurfaceNormal(int x, int z, bool isFloor) const;
-	Vector3 GetSurfaceNormal(int triangleID, bool isFloor) const;
+	Vector3 GetSurfaceNormal(int triID, bool isFloor) const;
 	short	GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
 	MaterialType GetSurfaceMaterial(int x, int z, bool isFloor) const;
 
-	std::optional<int> GetRoomNumberAbove(int triangleID) const;
+	std::optional<int> GetRoomNumberAbove(int triID) const;
 	std::optional<int> GetRoomNumberAbove(int x, int z) const;
 	std::optional<int> GetRoomNumberAbove(const Vector3i& pos) const;
-	std::optional<int> GetRoomNumberBelow(int triangleID) const;
+	std::optional<int> GetRoomNumberBelow(int triID) const;
 	std::optional<int> GetRoomNumberBelow(int x, int z) const;
 	std::optional<int> GetRoomNumberBelow(const Vector3i& pos) const;
 	std::optional<int> GetRoomNumberAtSide() const;
@@ -173,7 +173,7 @@ public:
 	bool IsSurfaceSplit(bool isFloor) const;
 	bool IsSurfaceDiagonalStep(bool isFloor) const;
 	bool IsSurfaceSplitPortal(bool isFloor) const;
-	bool IsWall(int triangleID) const;
+	bool IsWall(int triID) const;
 	bool IsWall(int x, int z) const;
 
 	// Bridge utilities
