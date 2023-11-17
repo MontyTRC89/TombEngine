@@ -636,7 +636,11 @@ namespace TEN::Collision::Floordata
 
 		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (sectorPtr->GetInsideBridgeItemNumber(Vector3i(x, y, z), y == ceilingHeight, y == floorHeight) >= 0)
+		bool testFloorBorder = (y == ceilingHeight);
+		bool testCeilBorder = (y == floorHeight);
+		int insideBridgeItemNumber = sectorPtr->GetInsideBridgeItemNumber(Vector3i(x, y, z), testFloorBorder, testCeilBorder);
+
+		if (insideBridgeItemNumber != NO_ITEM)
 		{
 			if (direction <= 0)
 			{
@@ -705,7 +709,11 @@ namespace TEN::Collision::Floordata
 
 		y = std::clamp(y, std::min(ceilingHeight, floorHeight), std::max(ceilingHeight, floorHeight));
 
-		if (sectorPtr->GetInsideBridgeItemNumber(Vector3i(x, y, z), y == ceilingHeight, y == floorHeight) >= 0)
+		bool testFloorBorder = (y == ceilingHeight);
+		bool testCeilBorder = (y == floorHeight);
+		int insideBridgeItemNumber = sectorPtr->GetInsideBridgeItemNumber(Vector3i(x, y, z), testFloorBorder, testCeilBorder);
+
+		if (insideBridgeItemNumber != NO_ITEM)
 		{
 			if (direction >= 0)
 			{
@@ -893,7 +901,7 @@ namespace TEN::Collision::Floordata
 		x += bridgeItem.Pose.Position.x;
 		z += bridgeItem.Pose.Position.z;
 
-		auto sectorPtr = &GetFloorSide(bridgeItem.RoomNumber, x, z);
+		auto* sectorPtr = &GetFloorSide(bridgeItem.RoomNumber, x, z);
 		sectorPtr->AddBridge(itemNumber);
 
 		if (bridgeObject.GetFloorBorder != nullptr)
@@ -936,34 +944,34 @@ namespace TEN::Collision::Floordata
 		x += bridgeItem.Pose.Position.x;
 		z += bridgeItem.Pose.Position.z;
 
-		auto* sectroPtr = &GetFloorSide(bridgeItem.RoomNumber, x, z);
-		sectroPtr->RemoveBridge(itemNumber);
+		auto* sectorPtr = &GetFloorSide(bridgeItem.RoomNumber, x, z);
+		sectorPtr->RemoveBridge(itemNumber);
 
 		if (bridgeObject.GetFloorBorder != nullptr)
 		{
 			int floorBorder = bridgeObject.GetFloorBorder(bridgeItem);
-			while (floorBorder <= sectroPtr->GetSurfaceHeight(x, z, false))
+			while (floorBorder <= sectorPtr->GetSurfaceHeight(x, z, false))
 			{
-				auto roomNumberAbove = sectroPtr->GetRoomNumberAbove(x, z);
+				auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(x, z);
 				if (!roomNumberAbove.has_value())
 					break;
 
-				sectroPtr = &GetFloorSide(*roomNumberAbove, x, z);
-				sectroPtr->RemoveBridge(itemNumber);
+				sectorPtr = &GetFloorSide(*roomNumberAbove, x, z);
+				sectorPtr->RemoveBridge(itemNumber);
 			}
 		}
 
 		if (bridgeObject.GetCeilingBorder != nullptr)
 		{
 			int ceilingBorder = bridgeObject.GetCeilingBorder(bridgeItem);
-			while (ceilingBorder >= sectroPtr->GetSurfaceHeight(x, z, true))
+			while (ceilingBorder >= sectorPtr->GetSurfaceHeight(x, z, true))
 			{
-				auto roomNumberBelow = sectroPtr->GetRoomNumberBelow(x, z);
+				auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(x, z);
 				if (!roomNumberBelow.has_value())
 					break;
 
-				sectroPtr = &GetFloorSide(*roomNumberBelow, x, z);
-				sectroPtr->RemoveBridge(itemNumber);
+				sectorPtr = &GetFloorSide(*roomNumberBelow, x, z);
+				sectorPtr->RemoveBridge(itemNumber);
 			}
 		}
 	}
