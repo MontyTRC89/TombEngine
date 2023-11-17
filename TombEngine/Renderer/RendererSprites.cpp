@@ -286,18 +286,8 @@ namespace TEN::Renderer
 			return;
 		}
 
-		BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
-
-		SetDepthState(DepthState::Read);
-		SetCullMode(CullMode::None);
-
-		_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
-		_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
-
-		// Set up vertex buffer and parameters.
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		// Draw instanced sprites
+		bool wasGPUSet = false;
 
 		for (auto& spriteBucket : _spriteBuckets)
 		{
@@ -309,6 +299,26 @@ namespace TEN::Renderer
 			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
 			{
 				continue;
+			}
+
+			if (!wasGPUSet)
+			{
+				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+
+				SetDepthState(DepthState::Read);
+				SetCullMode(CullMode::None);
+
+				_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
+				_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
+
+				// Set up vertex buffer and parameters.
+				UINT stride = sizeof(Vertex);
+				UINT offset = 0;
+				_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+
+				wasGPUSet = true;
 			}
 
 			// Prepare constant buffer for instanced sprites.
@@ -342,16 +352,8 @@ namespace TEN::Renderer
 			_numSpritesDrawCalls++;
 		}
 
-		// Draw 3D sprites.
-		SetDepthState(DepthState::Read);
-		SetCullMode(CullMode::None);
-
-		_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
-		_context->PSSetShader(_psSprites.Get(), nullptr, 0);
-
-		stride = sizeof(Vertex);
-		offset = 0;
-		_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		// Draw 3D non instanced sprites
+		wasGPUSet = false;
 
 		for (auto& spriteBucket : _spriteBuckets)
 		{
@@ -365,22 +367,26 @@ namespace TEN::Renderer
 				continue;
 			}
 
+			if (!wasGPUSet)
+			{
+				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+
+				SetDepthState(DepthState::Read);
+				SetCullMode(CullMode::None);
+
+				_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
+				_context->PSSetShader(_psSprites.Get(), nullptr, 0);
+
+				wasGPUSet = true;
+			}
+
 			_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
 			_stSprite.RenderType = (int)spriteBucket.RenderType;
-
 			_cbSprite.updateData(_stSprite, _context.Get());
 
-			SetBlendMode(spriteBucket.BlendMode);
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
-
-			if (spriteBucket.BlendMode == BlendMode::AlphaTest)
-			{
-				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD, true);
-			}
-			else
-			{
-				SetAlphaTest(AlphaTestMode::None, 0);
-			}
 
 			_primitiveBatch->Begin();
 
@@ -415,7 +421,9 @@ namespace TEN::Renderer
 			_numSpritesDrawCalls++;
 			_numDrawCalls++;
 		}
-	}
 
+		// Set up vertex parameters.
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
 }
 
