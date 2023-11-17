@@ -6,6 +6,7 @@
 
 #include "Game/animation.h"
 #include "Game/animation.h"
+#include "Game/collision/Attractor.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -31,6 +32,7 @@
 
 using TEN::Renderer::g_Renderer;
 
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 
@@ -826,6 +828,22 @@ void ReadRooms()
 		room.itemNumber = NO_ITEM;
 		room.fxNumber = NO_ITEM;
 		room.index = i;
+
+		// TODO: Wait for Nickelony.
+		// Load room attractors.
+		/*int attracCount = ReadInt32();
+		for (int j = 0; j < attracCount; j++)
+		{
+			auto type = (AttractorType)ReadInt32();
+			auto points = std::vector<Vector3>{};
+
+			int pointCount = ReadInt32();
+			points.reserve(pointCount);
+			for (int k = 0; k < pointCount; k++)
+				points.push_back(ReadVector3());
+
+			room.Attractors.push_back(Attractor(type, points, room.index));
+		}*/
 
 		g_GameScriptEntities->AddName(room.name, room);
 	}
