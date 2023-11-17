@@ -372,7 +372,8 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawLinesIn2DSpace()
+	// TODO: Not working.
+	void Renderer11::DrawLines2D()
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
@@ -387,27 +388,26 @@ namespace TEN::Renderer
 
 		m_primitiveBatch->Begin();
 
-		for (const auto& line : m_lines2DToDraw)
+		for (const auto& line : _lines2DToDraw)
 		{
-			auto v1 = RendererVertex();
-			v1.Position.x = line.Origin.x;
-			v1.Position.y = line.Origin.y;
-			v1.Position.z = 1.0f;
-			v1.Color = line.Color;
+			auto vertex0 = RendererVertex{};
+			vertex0.Position.x = line.Origin.x;
+			vertex0.Position.y = line.Origin.y;
+			vertex0.Position.z = 1.0f;
+			vertex0.Color = line.Color;
 
-			auto v2 = RendererVertex();
-			v2.Position.x = line.Target.x;
-			v2.Position.y = line.Target.y;
-			v2.Position.z = 1.0f;
-			v2.Color = line.Color;
+			auto vertex1 = RendererVertex{};
+			vertex1.Position.x = line.Target.x;
+			vertex1.Position.y = line.Target.y;
+			vertex1.Position.z = 1.0f;
+			vertex1.Color = line.Color;
 
-			v1.Position = Vector3::Transform(v1.Position, worldMatrix);
-			v2.Position = Vector3::Transform(v2.Position, worldMatrix);
+			vertex0.Position = Vector3::Transform(vertex0.Position, worldMatrix);
+			vertex1.Position = Vector3::Transform(vertex1.Position, worldMatrix);
+			vertex0.Position.z = 0.5f;
+			vertex1.Position.z = 0.5f;
 
-			v1.Position.z = 0.5f;
-			v2.Position.z = 0.5f;
-
-			m_primitiveBatch->DrawLine(v1, v2);
+			m_primitiveBatch->DrawLine(vertex0, vertex1);
 		}
 
 		m_primitiveBatch->End();
@@ -738,7 +738,7 @@ namespace TEN::Renderer
 
 		m_primitiveBatch->Begin();
 
-		for (const auto& line : m_lines3DToDraw)
+		for (const auto& line : _lines3DToDraw)
 		{
 			auto vertex0 = RendererVertex{};
 			vertex0.Position = line.Origin;
@@ -806,7 +806,7 @@ namespace TEN::Renderer
 		line.Target = target;
 		line.Color = color;
 
-		m_lines3DToDraw.push_back(line);
+		_lines3DToDraw.push_back(line);
 	}
 
 	void Renderer11::AddDebugTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Color& color, RendererDebugPage page)
@@ -1784,7 +1784,7 @@ namespace TEN::Renderer
 		DrawPostprocess(target, depthTarget, view);
 
 		// Draw GUI elements at end.
-		DrawLinesIn2DSpace();
+		DrawLines2D();
 
 		// Draw HUD.
 		g_Hud.Draw(*LaraItem);

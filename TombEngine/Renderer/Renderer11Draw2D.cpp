@@ -12,6 +12,7 @@
 #include "Objects/game_object_ids.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Environment;
@@ -227,8 +228,14 @@ namespace TEN::Renderer
 
 	void Renderer11::AddLine2D(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page)
 	{
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
 		auto line = RendererLine2D{ origin, target, color };
-		m_lines2DToDraw.push_back(line);
+		_lines2DToDraw.push_back(line);
 	}
 
 	void Renderer11::DrawOverlays(RenderView& view)

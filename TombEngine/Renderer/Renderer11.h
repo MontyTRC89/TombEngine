@@ -432,8 +432,8 @@ namespace TEN::Renderer
 		std::vector<RendererLight> m_dynamicLights;
 		RendererLight* m_shadowLight;
 
-		std::vector<RendererLine2D>		m_lines2DToDraw	   = {};
-		std::vector<RendererLine3D>		m_lines3DToDraw	   = {};
+		std::vector<RendererLine2D>		_lines2DToDraw	   = {};
+		std::vector<RendererLine3D>		_lines3DToDraw	   = {};
 		std::vector<RendererTriangle3D> _triangles3DToDraw = {};
 
 		std::vector<std::optional<RendererObject>> m_moveableObjects;
@@ -570,7 +570,7 @@ namespace TEN::Renderer
 		void DrawSortedFaces(RenderView& view);
 		void DrawLines3D(RenderView& view);
 		void DrawTriangles3D(RenderView& view);
-		void DrawLinesIn2DSpace();
+		void DrawLines2D();
 		void DrawOverlays(RenderView& view);
 		void DrawRopes(RenderView& view);
 		void DrawBats(RenderView& view);
