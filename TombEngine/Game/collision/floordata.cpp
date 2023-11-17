@@ -361,23 +361,20 @@ namespace TEN::Collision::Floordata
 	// NOTE: Tilts are deprecated, but until all conversions are complete this function will remain useful.
 	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor)
 	{
-		// Calculate tilt values based on normal.
-		float xTilt = normal.x * 4;
-		float zTilt = normal.z * 4;
-
-		// Scale tilt values to appropriate range.
-		int xTiltGrade = (int)round(xTilt * (CLICK(1) / BLOCK(1)));
-		int zTiltGrade = (int)round(zTilt * (CLICK(1) / BLOCK(1)));
+		// Calculate tilt values from normal.
+		int xTilt = (int)round((normal.x * 4) * (CLICK(1) / BLOCK(1)));
+		int zTilt = (int)round((normal.z * 4) * (CLICK(1) / BLOCK(1)));
 
 		// Return tilt.
-		return Vector2i(xTiltGrade, zTiltGrade);
+		return Vector2i(xTilt, zTilt);
 	}
 
 	Vector2i GetSectorPoint(int x, int z)
 	{
+		// Return relative 2D point in range [0, BLOCK(1)).
 		return Vector2i(
-			x % BLOCK(1) - BLOCK(1) / 2,
-			z % BLOCK(1) - BLOCK(1) / 2);
+			(x % BLOCK(1)) - (int)BLOCK(0.5f),
+			(z % BLOCK(1)) - (int)BLOCK(0.5f));
 	}
 
 	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds)
@@ -463,7 +460,6 @@ namespace TEN::Collision::Floordata
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 
-		// Get and return sector.
 		int sectorID = (room.zSize * roomGridCoord.x) + roomGridCoord.y;
 		return room.floor[sectorID];
 	}
