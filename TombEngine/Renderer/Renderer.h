@@ -207,7 +207,7 @@ namespace TEN::Renderer
 		bool  _isBlinkUpdated  = false;
 
 		// Graphics resources
-		Texture2D _logoTexture;
+		Texture2D _logo;
 		Texture2D _skyTexture;
 		Texture2D _whiteTexture;
 		RendererSprite _whiteSprite;

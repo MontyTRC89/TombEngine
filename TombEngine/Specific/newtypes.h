@@ -2,12 +2,6 @@
 #include "framework.h"
 #include "Renderer/RendererEnums.h"
 
-struct ROOM_VECTOR 
-{
-	int roomNumber;
-	int yNumber;
-};
-
 struct POLYGON
 {
 	int shape;

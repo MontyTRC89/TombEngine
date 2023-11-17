@@ -33,8 +33,8 @@ using namespace TEN::Utils;
 namespace TEN::Gui
 {
 	constexpr int LINE_HEIGHT	  = 25;
-	constexpr int PHD_CENTER_X	  = SCREEN_SPACE_RES.x / 2;
-	constexpr int PHD_CENTER_Y	  = SCREEN_SPACE_RES.y / 2;
+	constexpr int PHD_CENTER_X	  = DISPLAY_SPACE_RES.x / 2;
+	constexpr int PHD_CENTER_Y	  = DISPLAY_SPACE_RES.y / 2;
 	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
 
 	constexpr auto VOLUME_MAX			 = 100;
@@ -3110,11 +3110,11 @@ namespace TEN::Gui
 					int objectNumber;
 					if (ringType == RingTypes::Inventory)
 					{
-						objectNumber = int(PHD_CENTER_Y - (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.5);
+						objectNumber = int(PHD_CENTER_Y - (DISPLAY_SPACE_RES.y + 1) * 0.0625 * 2.5);
 					}
 					else
 					{
-						objectNumber = int(PHD_CENTER_Y + (SCREEN_SPACE_RES.y + 1) * 0.0625 * 2.0);
+						objectNumber = int(PHD_CENTER_Y + (DISPLAY_SPACE_RES.y + 1) * 0.0625 * 2.0);
 					}
 
 					g_Renderer.AddString(PHD_CENTER_X, objectNumber, textBuffer, PRINTSTRING_COLOR_YELLOW, (int)PrintStringFlags::Center | (int)PrintStringFlags::Outline);

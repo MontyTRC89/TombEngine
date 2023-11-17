@@ -68,6 +68,7 @@ namespace TEN::Scripting::Util
 	}
 
 	/// Get the projected display space position of a 3D world position. Returns nil if the world position is behind the camera view.
+	// @function GetDisplayPosition
 	// @tparam Vec3 worldPos 3D world position.
 	// @return Vec2 Projected display space position in percent.
 	// @usage 
@@ -82,8 +83,8 @@ namespace TEN::Scripting::Util
 			return sol::nullopt;
 
 		return Vec2(
-			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
-			(displayPos->y / SCREEN_SPACE_RES.y) * 100);
+			(displayPos->x / DISPLAY_SPACE_RES.x) * 100,
+			(displayPos->y / DISPLAY_SPACE_RES.y) * 100);
 	}
 
 	/// Translate a pair display position coordinates to pixel coordinates.

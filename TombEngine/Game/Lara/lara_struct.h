@@ -146,7 +146,7 @@ enum LaraState
 	LS_ROPE_UNKNOWN = 115,
 	LS_CORRECT_POSITION = 116,
 	LS_DOUBLEDOOR_PUSH = 117,
-	LS_DOZY = 118,
+	LS_FLY_CHEAT = 118,
 
 	// TR5
 	LS_TIGHTROPE_IDLE = 119,
@@ -207,7 +207,7 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
-	// 174-188 reserved for "true" ladders. DO NOT add anything here. -- Sezz 2023.04.16
+	// 174-188 reserved for ladder object. -- Sezz 2023.04.16
 
 	LS_REMOVE_PUZZLE = 189,
 	LS_PUSHABLE_EDGE_SLIP = 190,
@@ -683,7 +683,7 @@ enum LaraAnim
 	LA_ELEVATOR_RECOVER = 443,								// Recover from elevator crash
 																// TODO: 443 is also taken by SETH_DEATH, currently absent from default WAD.
 	LA_MECHANICAL_BEETLE_USE = 444,							// Wind mechanical beetle, place on floor
-	LA_DOZY = 445,											// DOZY fly cheat
+	LA_FLY_CHEAT = 445,										// Fly cheat
 
 	// TR5
 	LA_TIGHTROPE_WALK = 446,								// Tightrope walk (looped)
@@ -815,7 +815,7 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
-	// 569-598 reserved for "true" ladders. DO NOT add anything here. -- Sezz 2023.04.16
+	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 

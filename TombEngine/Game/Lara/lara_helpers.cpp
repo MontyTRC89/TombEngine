@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Game/Lara/lara_helpers.h"
 
+#include <OISKeyboard.h>
+
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -10,6 +12,7 @@
 #include "Game/items.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
+#include "Game/GuiObjects.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
@@ -36,6 +39,7 @@ using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Gui;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -420,14 +424,18 @@ bool CanPlayerLookAround(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// 1) Check if drawn weapon has lasersight.
+	// 1) Check if look mode is not None.
+	if (player.Control.Look.Mode == LookMode::None)
+		return false;
+
+	// 2) Check if drawn weapon has lasersight.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
 	{
 		return true;
 	}
 
-	// 2) Test for switchable target.
+	// 3) Test for switchable target.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
@@ -493,7 +501,7 @@ static void SetPlayerOptics(ItemInfo* item)
 		breakOptics = false;
 	}
 
-	// If lasersight, and Look is not pressed, exit optics.
+	// If lasersight and Look is not held, exit optics.
 	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
 		breakOptics = true;
 
@@ -513,6 +521,7 @@ static void SetPlayerOptics(ItemInfo* item)
 			player.Control.Look.IsUsingBinoculars = true;
 			player.Control.Look.IsUsingLasersight = true;
 			player.Inventory.IsBusy = true;
+
 			BinocularOldCamera = Camera.oldType;
 			return;
 		}
@@ -521,7 +530,7 @@ static void SetPlayerOptics(ItemInfo* item)
 	if (!breakOptics)
 		return;
 
-	// Noth using optics; return early.
+	// Not using optics; return early.
 	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
 		return;
 
@@ -555,9 +564,6 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
 
 	auto& player = GetLaraInfo(item);
-
-	if (!CanPlayerLookAround(item))
-		return;
 
 	// Set optics.
 	Camera.type = CameraType::Look;
@@ -707,6 +713,203 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
+static void GivePlayerItemsCheat(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	for (int i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
+			player.Inventory.Puzzles[i] = true;
+
+		player.Inventory.PuzzlesCombo[2 * i] = false;
+		player.Inventory.PuzzlesCombo[(92 * i) + 1] = false;
+	}
+
+	for (int i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_KEY_ITEM1 + i].loaded)
+			player.Inventory.Keys[i] = true;
+
+		player.Inventory.KeysCombo[2 * i] = false;
+		player.Inventory.KeysCombo[(2 * i) + 1] = false;
+	}
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
+			player.Inventory.Pickups[i] = true;
+
+		player.Inventory.PickupsCombo[2 * i] = false;
+		player.Inventory.PickupsCombo[(2 * i) + 1] = false;
+	}
+}
+
+static void GivePlayerWeaponsCheat(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	player.Inventory.TotalFlares = -1;
+	player.Inventory.TotalSmallMedipacks = -1;
+	player.Inventory.TotalLargeMedipacks = -1;
+
+	if (Objects[ID_CROWBAR_ITEM].loaded)
+		player.Inventory.HasCrowbar = true;
+
+	if (Objects[ID_LASERSIGHT_ITEM].loaded)
+		player.Inventory.HasLasersight = true;
+
+	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
+		player.Inventory.BeetleComponents |= BEETLECOMP_FLAG_BEETLE;
+
+	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
+		player.Inventory.SmallWaterskin = 1;
+
+	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
+		player.Inventory.BigWaterskin = 1;
+
+	if (Objects[ID_PISTOLS_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Pistol];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_REVOLVER_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Revolver];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_UZI_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Uzi];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_SHOTGUN_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Shotgun];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
+	}
+
+	if (Objects[ID_HARPOON_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::HarpoonGun];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_GRENADE_GUN_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::GrenadeLauncher];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].SetInfinite(true);
+	}
+
+	if (Objects[ID_ROCKET_LAUNCHER_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::RocketLauncher];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_HK_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::HK];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_CROSSBOW_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Crossbow];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].SetInfinite(true);
+	}
+}
+
+void HandlePlayerFlyCheat(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	if (!g_GameFlow->IsFlyCheatEnabled())
+		return;
+
+	static bool dbFlyCheat = true;
+	if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
+	{
+		if (player.Context.Vehicle == NO_ITEM)
+		{
+			GivePlayerItemsCheat(item);
+			GivePlayerWeaponsCheat(item);
+
+			if (player.Control.WaterStatus != WaterStatus::FlyCheat)
+			{
+				SetAnimation(item, LA_FLY_CHEAT);
+				ResetPlayerFlex(&item);
+				item.Animation.IsAirborne = false;
+				item.HitPoints = LARA_HEALTH_MAX;
+
+				player.Control.WaterStatus = WaterStatus::FlyCheat;
+				player.Control.Count.Death = 0;
+				player.Status.Air = LARA_AIR_MAX;
+				player.Status.Poison = 0;
+				player.Status.Stamina = LARA_STAMINA_MAX;
+			}
+		}
+		else
+		{
+			SayNo();
+		}
+	}
+	dbFlyCheat = !KeyMap[OIS::KeyCode::KC_O];
+}
+
 void HandlePlayerWetnessDrips(ItemInfo& item)
 {
 	auto& player = *GetLaraInfo(&item);
@@ -718,7 +921,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 	for (auto& node : player.Effect.DripNodes)
 	{
 		auto pos = GetJointPosition(&item, jointIndex);
-		int roomNumber = GetRoom(item.Location, pos).roomNumber;
+		int roomNumber = GetRoom(item.Location, pos).RoomNumber;
 		jointIndex++;
 
 		// Node underwater; set max wetness value.
@@ -755,7 +958,7 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 	for (auto& node : player.Effect.BubbleNodes)
 	{
 		auto pos = GetJointPosition(&item, jointIndex);
-		int roomNumber = GetRoom(item.Location, pos).roomNumber;
+		int roomNumber = GetRoom(item.Location, pos).RoomNumber;
 		jointIndex++;
 
 		// Node inactive; continue.

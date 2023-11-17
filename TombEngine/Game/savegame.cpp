@@ -1643,8 +1643,8 @@ bool SaveGame::Load(int slot)
 		{
 			LaraItem->Data = nullptr;
 			LaraItem = item;
-			LaraItem->Location.roomNumber = savedItem->room_number();
-			LaraItem->Location.yNumber = item->Pose.Position.y;
+			LaraItem->Location.RoomNumber = savedItem->room_number();
+			LaraItem->Location.Height = item->Pose.Position.y;
 			LaraItem->Data = &Lara;
 		}
 
@@ -1710,8 +1710,8 @@ bool SaveGame::Load(int slot)
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
 		}
 
-		if (obj->floor != nullptr)
-			UpdateBridgeItem(i);
+		if (obj->GetFloorHeight != nullptr)
+			UpdateBridgeItem(g_Level.Items[i]);
 
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)

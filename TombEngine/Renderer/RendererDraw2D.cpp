@@ -628,7 +628,7 @@ namespace TEN::Renderer
 
 	void Renderer::CollectDisplaySprites(RenderView& renderView)
 	{
-		constexpr auto DISPLAY_SPACE_ASPECT = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
+		constexpr auto DISPLAY_SPACE_ASPECT = DISPLAY_SPACE_RES.x / DISPLAY_SPACE_RES.y;
 
 		// Calculate screen aspect ratio.
 		auto screenRes = GetScreenResolution().ToVector2();
@@ -654,14 +654,14 @@ namespace TEN::Renderer
 			case DisplaySpriteScaleMode::Fit:
 				if (screenResAspect >= spriteAspect)
 				{
-					halfSize = (Vector2(SCREEN_SPACE_RES.y) * displaySprite.Scale) / 2;
+					halfSize = (Vector2(DISPLAY_SPACE_RES.y) * displaySprite.Scale) / 2;
 					halfSize.x *= (spriteAspect >= 1.0f) ? spriteAspect : (1.0f / spriteAspect);
 					
 					aspectCorrection.x = 1.0f / aspectCorrectionBase;
 				}
 				else
 				{
-					halfSize = (Vector2(SCREEN_SPACE_RES.x) * displaySprite.Scale) / 2;
+					halfSize = (Vector2(DISPLAY_SPACE_RES.x) * displaySprite.Scale) / 2;
 					halfSize.y *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
 
 					aspectCorrection.y = aspectCorrectionBase;
@@ -671,14 +671,14 @@ namespace TEN::Renderer
 			case DisplaySpriteScaleMode::Fill:
 				if (screenResAspect >= spriteAspect)
 				{
-					halfSize = (Vector2(SCREEN_SPACE_RES.x) * displaySprite.Scale) / 2;
+					halfSize = (Vector2(DISPLAY_SPACE_RES.x) * displaySprite.Scale) / 2;
 					halfSize.y *= (spriteAspect >= 1.0f) ? (1.0f / spriteAspect) : spriteAspect;
 
 					aspectCorrection.y = aspectCorrectionBase;
 				}
 				else
 				{
-					halfSize = (Vector2(SCREEN_SPACE_RES.y) * displaySprite.Scale) / 2;
+					halfSize = (Vector2(DISPLAY_SPACE_RES.y) * displaySprite.Scale) / 2;
 					halfSize.x *= (spriteAspect >= 1.0f) ? spriteAspect : (1.0f / spriteAspect);
 
 					aspectCorrection.x = 1.0f / aspectCorrectionBase;
@@ -688,14 +688,14 @@ namespace TEN::Renderer
 			case DisplaySpriteScaleMode::Stretch:
 				if (screenResAspect >= 1.0f)
 				{
-					halfSize = (SCREEN_SPACE_RES.x * displaySprite.Scale) / 2;
+					halfSize = (DISPLAY_SPACE_RES.x * displaySprite.Scale) / 2;
 					halfSize.y *= (screenResAspect >= 1.0f) ? (1.0f / screenResAspect) : screenResAspect;
 
 					aspectCorrection.y = aspectCorrectionBase;
 				}
 				else
 				{
-					halfSize = (Vector2(SCREEN_SPACE_RES.y) * displaySprite.Scale) / 2;
+					halfSize = (Vector2(DISPLAY_SPACE_RES.y) * displaySprite.Scale) / 2;
 					halfSize.x *= (screenResAspect >= 1.0f) ? (1.0f / screenResAspect) : screenResAspect;
 
 					aspectCorrection.x = 1.0f / aspectCorrectionBase;

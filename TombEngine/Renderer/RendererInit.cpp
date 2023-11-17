@@ -121,7 +121,7 @@ namespace TEN::Renderer
 		_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 		_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
 		_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
-		_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, SCREEN_SPACE_RES.x, 0, SCREEN_SPACE_RES.y, 0, 1.0f);
+		_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, DISPLAY_SPACE_RES.x, 0, DISPLAY_SPACE_RES.y, 0, 1.0f);
 		_cbHUD.updateData(_stHUD, _context.Get());
 		_currentCausticsFrame = 0;
 
@@ -523,7 +523,7 @@ namespace TEN::Renderer
 		_gameFont = std::make_unique<SpriteFont>(_device.Get(), fontPath.c_str());
 
 		// Initialize common textures.
-		SetTextureOrDefault(_logoTexture, GetAssetPath(L"Textures/Logo.png"));
+		SetTextureOrDefault(_logo, GetAssetPath(L"Textures/Logo.png"));
 		SetTextureOrDefault(_loadingBarBorder, GetAssetPath(L"Textures/LoadingBarBorder.png"));
 		SetTextureOrDefault(_loadingBarInner, GetAssetPath(L"Textures/LoadingBarInner.png"));
 		SetTextureOrDefault(_whiteTexture, GetAssetPath(L"Textures/WhiteSprite.png"));

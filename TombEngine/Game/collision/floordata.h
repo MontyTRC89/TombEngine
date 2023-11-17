@@ -4,18 +4,23 @@
 
 using namespace TEN::Math;
 
-// Ceiling:		  Upper surface of a sector.
-// Floor:		  Lower surface of a sector.
-// Floordata:	  Name of the engine's level geometry collision system composed of rooms with sectors.
-// Plane:		  Mathematical representation of one of two surface triangles.
-// Portal:		  Link from one room to another allowing traversal between them.
-// Room number:	  Unique ID of a room.
-// Room position: Relative grid coordinates of room sectors.
-// Sector/block:  Collision data describing a single grid division within a room.
-// Surface:		  Floor or ceiling consisting of two triangles.
-// Triangle:	  Surface subdivision.
-// Wall:		  Inferred from a floor or ceiling with max height. Note that true "walls" don't exist in floordata.
-// 
+struct ItemInfo;
+
+// GLOSSARY OF TERMS
+// Ceiling:			Upper surface of a sector.
+// Floor:			Lower surface of a sector.
+// Floordata:		Name of the engine's level geometry collision system composed of rooms with sectors.
+// Location:		Vertical location within a room. TODO: Refine this concept and use a better name.
+// Plane:			Mathematical representation of one of two surface triangles.
+// Portal:			Link from one room to another allowing traversal between them.
+// Room number:		Unique ID of a room.
+// Room grid coord: Relative 2D grid coordinate of a room (e.g. [0, 0] denotes the first sector).
+// Sector/block:	Collision data describing a single grid division within a room.
+// Sector point:	Relative 2D position within a sector (range [0, BLOCK(1)) on each axis).
+// Surface:			Floor or ceiling consisting of two triangles.
+// Triangle:		Surface subdivision.
+// Wall:			Inferred from a high floor or ceiling. Note that true "walls" don't exist in floordata, only surface heights.
+
 // The way floordata "planes" are stored is non-standard.
 // Instead of a Plane object with a normal + distance,
 // they use a Vector3 object with data laid out as follows:
@@ -57,6 +62,23 @@ enum class ClimbDirectionFlags
 	East  = (1 << 9),
 	South = (1 << 10),
 	West  = (1 << 11)
+};
+
+// NOTE: Describes vertical room location.
+class RoomVector 
+{
+public:
+	// Members
+	int RoomNumber = 0;
+	int Height	   = 0;
+	
+	// Constructors
+	RoomVector() {};
+	RoomVector(int roomNumber, int height)
+	{
+		RoomNumber = roomNumber;
+		Height = height;
+	}
 };
 
 struct SurfaceCollisionData
@@ -168,9 +190,11 @@ namespace TEN::Collision::Floordata
 	Vector3 GetSurfaceNormal(const Vector2& tilt, bool isFloor);
 
 	Vector2i GetSectorPoint(int x, int z);
-	Vector2i GetRoomPosition(int roomNumber, int x, int z);
-	
-	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomPos);
+	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
+	std::vector<Vector2i>	GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
+	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
+
+	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
 	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
 	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);
@@ -178,19 +202,19 @@ namespace TEN::Collision::Floordata
 	
 	std::optional<int> GetTopHeight(FloorInfo& startSector, Vector3i pos, int* topRoomNumberPtr = nullptr, FloorInfo** topSectorPtr = nullptr);
 	std::optional<int> GetBottomHeight(FloorInfo& startSector, Vector3i pos, int* bottomRoomNumberPtr = nullptr, FloorInfo** bottomSectorPtr = nullptr);
-	std::optional<int> GetFloorHeight(const ROOM_VECTOR& location, int x, int z);
-	std::optional<int> GetCeilingHeight(const ROOM_VECTOR& location, int x, int z);
+	std::optional<int> GetFloorHeight(const RoomVector& location, int x, int z);
+	std::optional<int> GetCeilingHeight(const RoomVector& location, int x, int z);
 	
-	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, const Vector3i& pos);
-	std::optional<ROOM_VECTOR> GetTopRoom(ROOM_VECTOR location, const Vector3i& pos);
-	ROOM_VECTOR				   GetRoom(ROOM_VECTOR location, const Vector3i& pos);
+	std::optional<RoomVector> GetBottomRoom(RoomVector location, const Vector3i& pos);
+	std::optional<RoomVector> GetTopRoom(RoomVector location, const Vector3i& pos);
+	RoomVector				  GetRoom(RoomVector location, const Vector3i& pos);
 
 	void AddBridge(int itemNumber, int x = 0, int z = 0);
 	void RemoveBridge(int itemNumber, int x = 0, int z = 0);
 
-	std::optional<int> GetBridgeItemIntersect(const Vector3i& pos, int itemNumber, bool useBottomHeight);
-	int				   GetBridgeBorder(int itemNumber, bool bottom);
-	void			   UpdateBridgeItem(int itemNumber, bool forceRemoval = false);
+	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight);
+	int	 GetBridgeBorder(const ItemInfo& item, bool isBottom);
+	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval = false);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
 	

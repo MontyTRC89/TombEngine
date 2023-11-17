@@ -1,6 +1,8 @@
 #include "framework.h"
-#include "tr5_twoblockplatform.h"
-#include "Specific/level.h"
+#include "Objects/TR5/Object/tr5_twoblockplatform.h"
+
+#include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -8,20 +10,22 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Renderer/Renderer.h"
+
+using namespace TEN::Renderer;
+using namespace TEN::Collision::Floordata;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
-using namespace TEN::Collision::Floordata;
-
-void InitializeTwoBlocksPlatform(short itemNumber)
+void InitializeTwoBlockPlatform(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	item->ItemFlags[0] = item->Pose.Position.y;
-	item->ItemFlags[1] = 1;
-	UpdateBridgeItem(itemNumber);
+	item.ItemFlags[0] = item.Pose.Position.y;
+	item.ItemFlags[1] = 1;
+	UpdateBridgeItem(item);
 }
 
-void TwoBlocksPlatformControl(short itemNumber)
+void TwoBlockPlatformControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -33,13 +37,17 @@ void TwoBlocksPlatformControl(short itemNumber)
 			int speed = item->TriggerFlags & 0xF;
 
 			if (item->Pose.Position.y > goalHeight)
+			{
 				item->Pose.Position.y -= speed;
+			}
 			else
+			{
 				return;
+			}
 
-			int DistanceToPortal = *&g_Level.Rooms[item->RoomNumber].maxceiling - item->Pose.Position.y;
-			if (DistanceToPortal <= speed)
-				UpdateBridgeItem(itemNumber);
+			int distToPortal = *&g_Level.Rooms[item->RoomNumber].maxceiling - item->Pose.Position.y;
+			if (distToPortal <= speed)
+				UpdateBridgeItem(*item);
 
 			auto probe = GetCollision(item);
 
@@ -47,9 +55,9 @@ void TwoBlocksPlatformControl(short itemNumber)
 
 			if (probe.RoomNumber != item->RoomNumber)
 			{
-				UpdateBridgeItem(itemNumber, true);
+				UpdateBridgeItem(*item, true);
 				ItemNewRoom(itemNumber, probe.RoomNumber);
-				UpdateBridgeItem(itemNumber);
+				UpdateBridgeItem(*item);
 			}
 		}
 		else
@@ -57,7 +65,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 			bool onObject = false;
 
 			int height = LaraItem->Pose.Position.y + 1;
-			if (GetBridgeItemIntersect(LaraItem->Pose.Position, itemNumber, false).has_value())
+			if (GetBridgeItemIntersect(*item, LaraItem->Pose.Position, false).has_value())
 			{
 				if (LaraItem->Pose.Position.y <= item->Pose.Position.y + 32)
 				{
@@ -67,14 +75,20 @@ void TwoBlocksPlatformControl(short itemNumber)
 			}
 
 			if (onObject && LaraItem->Animation.AnimNumber != LA_HOP_BACK_CONTINUE)
+			{
 				item->ItemFlags[1] = 1;
+			}
 			else
+			{
 				item->ItemFlags[1] = -1;
+			}
 
 			if (item->ItemFlags[1] < 0)
 			{
 				if (item->Pose.Position.y <= item->ItemFlags[0])
+				{
 					item->ItemFlags[1] = 1;
+				}
 				else
 				{
 					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose);
@@ -84,7 +98,9 @@ void TwoBlocksPlatformControl(short itemNumber)
 			else if (item->ItemFlags[1] > 0)
 			{
 				if (item->Pose.Position.y >= item->ItemFlags[0] + 128)
+				{
 					item->ItemFlags[1] = -1;
+				}
 				else
 				{
 					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose);
@@ -95,32 +111,28 @@ void TwoBlocksPlatformControl(short itemNumber)
 	}
 }
 
-std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
+std::optional<int> GetTwoBlockPlatformFloorHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	auto* item = &g_Level.Items[itemNumber];
-
-	if (!item->MeshBits.TestAny())
+	if (!item.MeshBits.TestAny())
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, false);
+	return GetBridgeItemIntersect(item, pos, false);
 }
 
-std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z)
+std::optional<int> GetTwoBlockPlatformCeilingHeight(const ItemInfo& item, const Vector3i& pos)
 {
-	auto* item = &g_Level.Items[itemNumber];
-
-	if (!item->MeshBits.TestAny())
+	if (!item.MeshBits.TestAny())
 		return std::nullopt;
 
-	return GetBridgeItemIntersect(Vector3i(x, y, z), itemNumber, true);
+	return GetBridgeItemIntersect(item, pos, true);
 }
 
-int TwoBlocksPlatformFloorBorder(short itemNumber)
+int GetTwoBlockPlatformFloorBorder(const ItemInfo& item)
 {
-	return GetBridgeBorder(itemNumber, false);
+	return GetBridgeBorder(item, false);
 }
 
-int TwoBlocksPlatformCeilingBorder(short itemNumber)
+int GetTwoBlockPlatformCeilingBorder(const ItemInfo& item)
 {
-	return GetBridgeBorder(itemNumber, true);
+	return GetBridgeBorder(item, true);
 }
