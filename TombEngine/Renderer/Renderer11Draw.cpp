@@ -824,7 +824,7 @@ namespace TEN::Renderer
 		_triangles3DToDraw.push_back(tri);
 	}
 
-	void Renderer11::AddDebugReticle(const Vector3& center, const Quaternion& orient, float radius, const Color& color, RendererDebugPage page, bool isWireframe)
+	void Renderer11::AddDebugTarget(const Vector3& center, const Quaternion& orient, float radius, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
 		if (m_Locked)
 			return;
