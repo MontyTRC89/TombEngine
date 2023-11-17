@@ -387,11 +387,7 @@ namespace TEN::Renderer
 		void PrepareLaserBarriers(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
-		void DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
-		void DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
-		void DrawStaticsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawItems(RenderView& view, RendererPass rendererPass);
-		void DrawItemsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
 		void DrawTransparentFaces(RenderView& renderView);
@@ -413,6 +409,7 @@ namespace TEN::Renderer
 		void DrawSprites(RenderView& view, RendererPass rendererPass);
 		void DrawDisplaySprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
+		void DrawRoomBucket(RendererSortableObject* object, RenderView& view);
 		void DrawLines3D(RenderView& view);
 		void DrawLinesIn2DSpace();
 		void DrawOverlays(RenderView& view);

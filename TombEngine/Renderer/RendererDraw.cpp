@@ -1080,379 +1080,6 @@ namespace TEN::Renderer
 		CalculateFrameRate();
 	}
 
-	void Renderer::DrawSortedFaces(RenderView& view)
-	{
-		std::for_each(std::execution::par_unseq,
-					  view.RoomsToDraw.begin(),
-					  view.RoomsToDraw.end(),
-					  [](RendererRoom* room)
-					  {
-						  std::sort(
-							  room->TransparentFacesToDraw.begin(),
-							  room->TransparentFacesToDraw.end(),
-							  [](RendererTransparentFace& a, RendererTransparentFace& b)
-							  {
-								  return (a.distance > b.distance);
-							  }
-						  );
-					  }
-		);
-
-		for (int r = (int)view.RoomsToDraw.size() - 1; r >= 0; r--)
-		{
-			RendererRoom& room = *view.RoomsToDraw[r];
-
-			_transparentFacesVertices.clear();
-			_transparentFacesIndices.clear();
-
-			bool outputPolygons = false;
-			bool resetPipeline = true;
-
-			for (int f = 0; f < room.TransparentFacesToDraw.size(); f++)
-			{
-				RendererTransparentFace* face = &room.TransparentFacesToDraw[f];
-
-				if (f > 0)
-				{
-					RendererTransparentFace* oldFace = &room.TransparentFacesToDraw[f - 1];
-
-					// Check if it's time to output polygons
-					if (face->type != oldFace->type)
-					{
-						outputPolygons = true;
-						resetPipeline = true;
-					}
-					else
-					{
-						// If same type, check additional conditions
-						if (face->type == TransparentFaceType::Room &&
-							(oldFace->info.room != face->info.room
-								|| oldFace->info.texture != face->info.texture
-								|| oldFace->info.animated != face->info.animated
-								|| oldFace->info.blendMode != face->info.blendMode
-								|| _transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
-						{
-							outputPolygons = true;
-							resetPipeline = oldFace->info.room != face->info.room;
-						}
-						else if (oldFace->type == TransparentFaceType::Moveable &&
-							(oldFace->info.blendMode != face->info.blendMode
-								|| oldFace->info.item->ItemNumber != face->info.item->ItemNumber
-								|| _transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
-						{
-							outputPolygons = true;
-							resetPipeline = oldFace->info.item->ItemNumber != face->info.item->ItemNumber;
-						}
-						else if (face->type == TransparentFaceType::Static &&
-							(oldFace->info.blendMode != face->info.blendMode
-								|| oldFace->info.staticMesh->IndexInRoom != face->info.staticMesh->IndexInRoom
-								|| oldFace->info.staticMesh->RoomNumber != face->info.staticMesh->RoomNumber
-								|| _transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
-						{
-							outputPolygons = true;
-							resetPipeline = oldFace->info.staticMesh != face->info.staticMesh;
-						}
-						else if (face->type == TransparentFaceType::Sprite &&
-							(oldFace->info.blendMode != face->info.blendMode
-								|| oldFace->info.sprite->SoftParticle != face->info.sprite->SoftParticle
-								|| oldFace->info.sprite->Sprite->Texture != face->info.sprite->Sprite->Texture
-								|| _transparentFacesVertices.size() + 6 > MAX_TRANSPARENT_VERTICES))
-						{
-							outputPolygons = true;
-							resetPipeline = oldFace->info.sprite->Sprite->Texture != face->info.sprite->Sprite->Texture;
-						}
-					}
-
-					if (outputPolygons)
-					{
-						if (oldFace->type == TransparentFaceType::Room)
-						{
-							DrawRoomsSorted(&oldFace->info, resetPipeline, view);
-						}
-						else if (oldFace->type == TransparentFaceType::Moveable)
-						{
-							DrawItemsSorted(&oldFace->info, resetPipeline, view);
-						}
-						else if (oldFace->type == TransparentFaceType::Static)
-						{
-							DrawStaticsSorted(&oldFace->info, resetPipeline, view);
-						}
-						else if (oldFace->type == TransparentFaceType::Sprite)
-						{
-							DrawSpritesSorted(&oldFace->info, resetPipeline, view);
-						}
-
-						outputPolygons = false;
-						_transparentFacesVertices.clear();
-						_transparentFacesIndices.clear();
-					}
-				}
-				else
-				{
-					resetPipeline = true;
-				}
-
-				// Accumulate vertices in the buffer
-				if (face->type == TransparentFaceType::Room)
-				{
-					// For rooms, we already pass world coordinates, just copy vertices
-					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
-					_transparentFacesIndices.bulk_push_back(_roomsIndices.data(), face->info.polygon->BaseIndex, numIndices);
-				}
-				else if (face->type == TransparentFaceType::Moveable)
-				{
-					// For rooms, we already pass world coordinates, just copy vertices
-					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
-					_transparentFacesIndices.bulk_push_back(_moveablesIndices.data(), face->info.polygon->BaseIndex, numIndices);
-				}
-				else if (face->type == TransparentFaceType::Static)
-				{
-					// For rooms, we already pass world coordinates, just copy vertices
-					int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
-					_transparentFacesIndices.bulk_push_back(_staticsIndices.data(), face->info.polygon->BaseIndex, numIndices);
-				}
-				else if (face->type == TransparentFaceType::Sprite)
-				{
-					// For sprites, we need to compute the corners of the quad and multiply 
-					// by the world matrix that can be an identity (for 3D sprites) or 
-					// a billboard matrix. We transform vertices on the CPU because 
-					// CPUs nowadays are fast enough and we save draw calls, in fact 
-					// each sprite would require a different world matrix and then 
-					// we would fall in the case 1 poly = 1 draw call (worst case scenario).
-					// For the same reason, we store also color directly there and we simply 
-					// pass a Vector4::One as color to the shader.
-
-					RendererSpriteToDraw* spr = face->info.sprite;
-
-					Vector3 p0t;
-					Vector3 p1t;
-					Vector3 p2t;
-					Vector3 p3t;
-
-					Vector2 uv0;
-					Vector2 uv1;
-					Vector2 uv2;
-					Vector2 uv3;
-
-					if (spr->Type == SpriteType::ThreeD)
-					{
-						p0t = spr->vtx1;
-						p1t = spr->vtx2;
-						p2t = spr->vtx3;
-						p3t = spr->vtx4;
-
-
-					}
-					else
-					{
-						p0t = Vector3(-0.5, 0.5, 0);
-						p1t = Vector3(0.5, 0.5, 0);
-						p2t = Vector3(0.5, -0.5, 0);
-						p3t = Vector3(-0.5, -0.5, 0);
-					}
-
-					uv0 = spr->Sprite->UV[0];
-					uv1 = spr->Sprite->UV[1];
-					uv2 = spr->Sprite->UV[2];
-					uv3 = spr->Sprite->UV[3];
-
-					Vertex v0;
-					v0.Position = Vector3::Transform(p0t, face->info.world);
-					v0.UV = uv0;
-					v0.Color = spr->c1;
-
-					Vertex v1;
-					v1.Position = Vector3::Transform(p1t, face->info.world);
-					v1.UV = uv1;
-					v1.Color = spr->c2;
-
-					Vertex v2;
-					v2.Position = Vector3::Transform(p2t, face->info.world);
-					v2.UV = uv2;
-					v2.Color = spr->c3;
-
-					Vertex v3;
-					v3.Position = Vector3::Transform(p3t, face->info.world);
-					v3.UV = uv3;
-					v3.Color = spr->c4;
-
-					_transparentFacesVertices.push_back(v0);
-					_transparentFacesVertices.push_back(v1);
-					_transparentFacesVertices.push_back(v3);
-					_transparentFacesVertices.push_back(v2);
-					_transparentFacesVertices.push_back(v3);
-					_transparentFacesVertices.push_back(v1);
-				}
-
-				if (f == room.TransparentFacesToDraw.size() - 1)
-				{
-					if (face->type == TransparentFaceType::Room)
-					{
-						DrawRoomsSorted(&face->info, true, view);
-					}
-					else if (face->type == TransparentFaceType::Moveable)
-					{
-						DrawItemsSorted(&face->info, true, view);
-					}
-					else if (face->type == TransparentFaceType::Static)
-					{
-						DrawStaticsSorted(&face->info, true, view);
-					}
-					else if (face->type == TransparentFaceType::Sprite)
-					{
-						DrawSpritesSorted(&face->info, true, view);
-					}
-				}
-			}
-		}
-
-		SetCullMode(CullMode::CounterClockwise);
-	}
-
-	void Renderer::DrawRoomsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
-	{
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[info->room->RoomNumber];
-
-		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-
-		// Set shaders
-		if (!info->animated)
-		{
-			_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
-		}
-		else
-		{
-			_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
-		}
-
-		_context->PSSetShader(_psRooms.Get(), nullptr, 0);
-
-		// Set texture
-		if (resetPipeline)
-		{
-			_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
-			_stRoom.AmbientColor = info->room->AmbientLight;
-			_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-			BindRoomLights(view.LightsToDraw);
-			_cbRoom.updateData(_stRoom, _context.Get());
-		}
-
-		// Draw geometry
-		if (info->animated)
-		{
-			BindTexture(TextureRegister::ColorMap, &std::get<0>(_animatedTextures[info->texture]),
-				SamplerStateRegister::AnisotropicClamp);
-			BindTexture(TextureRegister::NormalMap, &std::get<1>(_animatedTextures[info->texture]),
-				SamplerStateRegister::AnisotropicClamp);
-
-			RendererAnimatedTextureSet& set = _animatedTextureSets[info->texture];
-			_stAnimated.NumFrames = set.NumTextures;
-			_stAnimated.Type = 0;
-			_stAnimated.Fps = set.Fps;
-
-			for (unsigned char i = 0; i < set.NumTextures; i++)
-			{
-				auto& tex = set.Textures[i];
-				_stAnimated.Textures[i].topLeft = set.Textures[i].UV[0];
-				_stAnimated.Textures[i].topRight = set.Textures[i].UV[1];
-				_stAnimated.Textures[i].bottomRight = set.Textures[i].UV[2];
-				_stAnimated.Textures[i].bottomLeft = set.Textures[i].UV[3];
-			}
-			_cbAnimated.updateData(_stAnimated, _context.Get());
-		}
-		else
-		{
-			BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[info->texture]),
-				SamplerStateRegister::AnisotropicClamp);
-			BindTexture(TextureRegister::NormalMap, &std::get<1>(_roomTextures[info->texture]),
-				SamplerStateRegister::AnisotropicClamp);
-		}
-
-		SetBlendMode(info->blendMode);
-		SetAlphaTest(AlphaTestMode::None, 1.0f);
-		SetDepthState(DepthState::Read);
-		SetCullMode(CullMode::CounterClockwise);
-
-		_biggestRoomIndexBuffer = std::fmaxf(_biggestRoomIndexBuffer, (int)_transparentFacesIndices.size());
-
-		int drawnVertices = 0;
-		int size = (int)_transparentFacesIndices.size();
-
-		while (drawnVertices < size)
-		{
-			int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > size
-				? size - drawnVertices
-				: TRANSPARENT_BUCKET_SIZE);
-
-			_transparentFacesIndexBuffer.Update(_context.Get(), _transparentFacesIndices, drawnVertices, count);
-			_context->IASetIndexBuffer(_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-			DrawIndexedTriangles(count, 0, 0);
-
-			_numTransparentDrawCalls++;
-			_numRoomsTransparentDrawCalls++;
-
-			drawnVertices += TRANSPARENT_BUCKET_SIZE;
-		}
-
-		SetCullMode(CullMode::CounterClockwise);
-	}
-
-	void Renderer::DrawStaticsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
-	{
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		_context->IASetVertexBuffers(0, 1, _staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-
-		// Set shaders
-		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
-
-		// Set texture
-		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[info->bucket->Texture]),
-					SamplerStateRegister::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMap, &std::get<1>(_staticTextures[info->bucket->Texture]),
-					SamplerStateRegister::AnisotropicClamp);
-
-		if (resetPipeline)
-		{
-			_stStatic.World = info->world;
-			_stStatic.Color = info->color;
-			_stStatic.AmbientLight = info->room->AmbientLight;
-			_stStatic.LightMode = (int)_staticObjects[info->staticMesh->ObjectNumber]->ObjectMeshes[0]->LightMode;
-			BindStaticLights(info->staticMesh->LightsToDraw);
-			_cbStatic.updateData(_stStatic, _context.Get());
-		}
-
-		SetBlendMode(info->blendMode);	
-		SetAlphaTest(AlphaTestMode::None, 1.0f);
-		SetDepthState(DepthState::Read);
-		SetCullMode(CullMode::CounterClockwise);
-
-		int drawnVertices = 0;
-		int size = (int)_transparentFacesIndices.size();
-
-		while (drawnVertices < size)
-		{
-			int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > size
-							 ? size - drawnVertices
-							 : TRANSPARENT_BUCKET_SIZE);
-
-			_transparentFacesIndexBuffer.Update(_context.Get(), _transparentFacesIndices, drawnVertices, count);
-			_context->IASetIndexBuffer(_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-			DrawIndexedTriangles(count, 0, 0);
-
-			_numTransparentDrawCalls++;
-			_numStaticsTransparentDrawCalls++;
-
-			drawnVertices += TRANSPARENT_BUCKET_SIZE;
-		}
-	}
-
 	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view)
 	{
 		using ns = std::chrono::nanoseconds;
@@ -1651,30 +1278,14 @@ namespace TEN::Renderer
 		DrawItems(view, RendererPass::CollectTransparentFaces);
 		DrawStatics(view, RendererPass::CollectTransparentFaces);
 
+		// Draw sorted faces
+		DrawSortedFaces(view);
+
 		// HACK: we draw gunflashes after everything because they are very near to the camera
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
-		// Collect all transparent faces
-		/*DrawStatics(view, RendererPass::CollectTransparentFaces);
-
-		DrawItems(view, RendererPass::Transparent);
-		DrawRooms(view, RendererPass::Transparent);
-		DrawItems(view, RendererPass::Transparent);
-		DrawStatics(view, RendererPass::Transparent);
-		DrawEffects(view, RendererPass::Transparent);
-		DrawDebris(view, RendererPass::Transparent);
-		DrawGunFlashes(view);
-		DrawBaddyGunflashes(view);*/
-
-		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), nullptr);
-
-		_context->RSSetState(_cullCounterClockwiseRasterizerState.Get());
-		_context->RSSetViewports(1, &view.Viewport);
-		ResetScissor();
-
 		// Draw transparent faces and lines
-		//DrawTransparentFaces(view);
 		DrawLines3D(view);
 
 		// Apply antialiasing
@@ -2106,67 +1717,6 @@ namespace TEN::Renderer
 				continue;
 
 			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, view, rendererPass);
-		}
-	}
-
-	void Renderer::DrawItemsSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
-	{
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-
-		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-
-		ItemInfo* nativeItem = &g_Level.Items[info->item->ItemNumber];
-		RendererRoom& room = _rooms[nativeItem->RoomNumber];
-		RendererObject& moveableObj = *_moveableObjects[nativeItem->ObjectNumber];
-
-		// Set shaders
-		_context->VSSetShader(_vsItems.Get(), nullptr, 0);
-		_context->PSSetShader(_psItems.Get(), nullptr, 0);
-
-		if (resetPipeline)
-		{
-			_stItem.World = info->item->World;
-			_stItem.Color = info->color;
-			_stItem.AmbientLight = info->item->AmbientLight;
-			memcpy(_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
-
-			for (int k = 0; k < (int)moveableObj.ObjectMeshes.size(); k++)
-				_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
-
-			BindMoveableLights(info->item->LightsToDraw, info->item->RoomNumber, info->item->PrevRoomNumber, info->item->LightFade);
-			_cbItem.updateData(_stItem, _context.Get());
-		}
-
-		// Set texture
-		BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[info->bucket->Texture]),
-					SamplerStateRegister::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[info->bucket->Texture]),
-					SamplerStateRegister::AnisotropicClamp);
-
-		SetBlendMode(info->blendMode);
-		SetDepthState(DepthState::Read);
-		SetAlphaTest(AlphaTestMode::None, 1.0f);
-		SetCullMode(CullMode::CounterClockwise);
-
-		int drawnVertices = 0;
-		int size = (int)_transparentFacesIndices.size();
-
-		while (drawnVertices < size)
-		{
-			int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > size
-							 ? size - drawnVertices
-							 : TRANSPARENT_BUCKET_SIZE);
-
-			_transparentFacesIndexBuffer.Update(_context.Get(), _transparentFacesIndices, drawnVertices, count);
-			_context->IASetIndexBuffer(_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-			DrawIndexedTriangles(count, 0, 0);
-
-			_numTransparentDrawCalls++;
-			_numStaticsTransparentDrawCalls++;
-
-			drawnVertices += TRANSPARENT_BUCKET_SIZE;
 		}
 	}
 
@@ -2906,5 +2456,355 @@ namespace TEN::Renderer
 		}
 
 		return true;
+	}
+
+	void Renderer::DrawSortedFaces(RenderView& view)
+	{
+		std::sort(
+			view.TransparentObjectsToDraw.begin(),
+			view.TransparentObjectsToDraw.end(),
+			[](RendererSortableObject& a, RendererSortableObject& b)
+			{
+				return (a.Distance > b.Distance);
+			}
+		);
+
+		for (int i = 0; i < view.TransparentObjectsToDraw.size(); i++)
+		{
+			RendererSortableObject* object = &view.TransparentObjectsToDraw[i];
+
+			switch (object->ObjectType)
+			{
+			case RendererObjectType::Room:
+				DrawRoomBucket(object, view);
+				break;
+
+			case RendererObjectType::Moveable:
+
+				break;
+
+			case RendererObjectType::Static:
+
+				break;
+
+			case RendererObjectType::Sprite:
+
+				break;
+			}
+		}
+
+		/*_transparentFacesVertices.clear();
+		_transparentFacesIndices.clear();
+
+		bool outputPolygons = false;
+		bool resetPipeline = true;
+
+		for (int o = 0; o < view.TransparentObjectsToDraw.size(); o++)
+		{
+			RendererSortableObject* object = &view.TransparentObjectsToDraw[o];
+
+			if (o > 0)
+			{
+				RendererSortableObject* oldObject = &view.TransparentObjectsToDraw[o - 1];
+
+				// Check if it's time to output polygons
+				if (object->ObjectType != oldObject->ObjectType)
+				{
+					outputPolygons = true;
+					resetPipeline = true;
+				}
+				else
+				{
+					// If same type, check additional conditions
+					if (face->type == TransparentFaceType::Room &&
+						(oldFace->info.room != face->info.room
+							|| oldFace->info.texture != face->info.texture
+							|| oldFace->info.animated != face->info.animated
+							|| oldFace->info.blendMode != face->info.blendMode
+							|| _transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+					{
+						outputPolygons = true;
+						resetPipeline = oldFace->info.room != face->info.room;
+					}
+					else if (oldFace->type == TransparentFaceType::Moveable &&
+						(oldFace->info.blendMode != face->info.blendMode
+							|| oldFace->info.item->ItemNumber != face->info.item->ItemNumber
+							|| _transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+					{
+						outputPolygons = true;
+						resetPipeline = oldFace->info.item->ItemNumber != face->info.item->ItemNumber;
+					}
+					else if (face->type == TransparentFaceType::Static &&
+						(oldFace->info.blendMode != face->info.blendMode
+							|| oldFace->info.staticMesh->IndexInRoom != face->info.staticMesh->IndexInRoom
+							|| oldFace->info.staticMesh->RoomNumber != face->info.staticMesh->RoomNumber
+							|| _transparentFacesIndices.size() + (face->info.polygon->Shape ? 3 : 6) > MAX_TRANSPARENT_VERTICES))
+					{
+						outputPolygons = true;
+						resetPipeline = oldFace->info.staticMesh != face->info.staticMesh;
+					}
+					else if (face->type == TransparentFaceType::Sprite &&
+						(oldFace->info.blendMode != face->info.blendMode
+							|| oldFace->info.sprite->SoftParticle != face->info.sprite->SoftParticle
+							|| oldFace->info.sprite->Sprite->Texture != face->info.sprite->Sprite->Texture
+							|| _transparentFacesVertices.size() + 6 > MAX_TRANSPARENT_VERTICES))
+					{
+						outputPolygons = true;
+						resetPipeline = oldFace->info.sprite->Sprite->Texture != face->info.sprite->Sprite->Texture;
+					}
+				}
+
+				if (outputPolygons)
+				{
+					if (oldFace->type == TransparentFaceType::Room)
+					{
+						DrawRoomsSorted(&oldFace->info, resetPipeline, view);
+					}
+					else if (oldFace->type == TransparentFaceType::Moveable)
+					{
+						DrawItemsSorted(&oldFace->info, resetPipeline, view);
+					}
+					else if (oldFace->type == TransparentFaceType::Static)
+					{
+						DrawStaticsSorted(&oldFace->info, resetPipeline, view);
+					}
+					else if (oldFace->type == TransparentFaceType::Sprite)
+					{
+						DrawSpritesSorted(&oldFace->info, resetPipeline, view);
+					}
+
+					outputPolygons = false;
+					_transparentFacesVertices.clear();
+					_transparentFacesIndices.clear();
+				}
+			}
+			else
+			{
+				resetPipeline = true;
+			}
+
+			// Accumulate vertices in the buffer
+			if (face->type == TransparentFaceType::Room)
+			{
+				// For rooms, we already pass world coordinates, just copy vertices
+				int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
+				_transparentFacesIndices.bulk_push_back(_roomsIndices.data(), face->info.polygon->BaseIndex, numIndices);
+			}
+			else if (face->type == TransparentFaceType::Moveable)
+			{
+				// For rooms, we already pass world coordinates, just copy vertices
+				int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
+				_transparentFacesIndices.bulk_push_back(_moveablesIndices.data(), face->info.polygon->BaseIndex, numIndices);
+			}
+			else if (face->type == TransparentFaceType::Static)
+			{
+				// For rooms, we already pass world coordinates, just copy vertices
+				int numIndices = (face->info.polygon->Shape == 0 ? 6 : 3);
+				_transparentFacesIndices.bulk_push_back(_staticsIndices.data(), face->info.polygon->BaseIndex, numIndices);
+			}
+			else if (face->type == TransparentFaceType::Sprite)
+			{
+				// For sprites, we need to compute the corners of the quad and multiply 
+				// by the world matrix that can be an identity (for 3D sprites) or 
+				// a billboard matrix. We transform vertices on the CPU because 
+				// CPUs nowadays are fast enough and we save draw calls, in fact 
+				// each sprite would require a different world matrix and then 
+				// we would fall in the case 1 poly = 1 draw call (worst case scenario).
+				// For the same reason, we store also color directly there and we simply 
+				// pass a Vector4::One as color to the shader.
+
+				RendererSpriteToDraw* spr = face->info.sprite;
+
+				Vector3 p0t;
+				Vector3 p1t;
+				Vector3 p2t;
+				Vector3 p3t;
+
+				Vector2 uv0;
+				Vector2 uv1;
+				Vector2 uv2;
+				Vector2 uv3;
+
+				if (spr->Type == SpriteType::ThreeD)
+				{
+					p0t = spr->vtx1;
+					p1t = spr->vtx2;
+					p2t = spr->vtx3;
+					p3t = spr->vtx4;
+
+
+				}
+				else
+				{
+					p0t = Vector3(-0.5, 0.5, 0);
+					p1t = Vector3(0.5, 0.5, 0);
+					p2t = Vector3(0.5, -0.5, 0);
+					p3t = Vector3(-0.5, -0.5, 0);
+				}
+
+				uv0 = spr->Sprite->UV[0];
+				uv1 = spr->Sprite->UV[1];
+				uv2 = spr->Sprite->UV[2];
+				uv3 = spr->Sprite->UV[3];
+
+				Vertex v0;
+				v0.Position = Vector3::Transform(p0t, face->info.world);
+				v0.UV = uv0;
+				v0.Color = spr->c1;
+
+				Vertex v1;
+				v1.Position = Vector3::Transform(p1t, face->info.world);
+				v1.UV = uv1;
+				v1.Color = spr->c2;
+
+				Vertex v2;
+				v2.Position = Vector3::Transform(p2t, face->info.world);
+				v2.UV = uv2;
+				v2.Color = spr->c3;
+
+				Vertex v3;
+				v3.Position = Vector3::Transform(p3t, face->info.world);
+				v3.UV = uv3;
+				v3.Color = spr->c4;
+
+				_transparentFacesVertices.push_back(v0);
+				_transparentFacesVertices.push_back(v1);
+				_transparentFacesVertices.push_back(v3);
+				_transparentFacesVertices.push_back(v2);
+				_transparentFacesVertices.push_back(v3);
+				_transparentFacesVertices.push_back(v1);
+			}
+
+			if (f == room.TransparentFacesToDraw.size() - 1)
+			{
+				if (face->type == TransparentFaceType::Room)
+				{
+					DrawRoomsSorted(&face->info, true, view);
+				}
+				else if (face->type == TransparentFaceType::Moveable)
+				{
+					DrawItemsSorted(&face->info, true, view);
+				}
+				else if (face->type == TransparentFaceType::Static)
+				{
+					DrawStaticsSorted(&face->info, true, view);
+				}
+				else if (face->type == TransparentFaceType::Sprite)
+				{
+					DrawSpritesSorted(&face->info, true, view);
+				}
+			}
+		}*/
+
+		SetCullMode(CullMode::CounterClockwise);
+	}
+
+	void Renderer::DrawRoomBucket(RendererSortableObject* object, RenderView& view)
+	{
+		if (object->Bucket->NumVertices == 0)
+		{
+			return;
+		}
+
+		ROOM_INFO* nativeRoom = &g_Level.Rooms[object->Room->RoomNumber];
+
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+		// Bind vertex and index buffer.
+		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		// Bind caustics texture.
+		if (!_sprites.empty())
+		{
+			int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
+			int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
+			int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)_sprites.size());
+			BindTexture(TextureRegister::CausticsMap, _sprites[causticsFrame].Texture, SamplerStateRegister::AnisotropicClamp);
+
+			// NOTE: Strange packing due to particular HLSL 16 bytes alignment requirements.
+			RendererSprite* causticsSprite = &_sprites[causticsFrame];
+			_stRoom.CausticsStartUV = causticsSprite->UV[0];
+			_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
+		}
+
+		// Set shadow map data and bind shadow map texture.
+		if (_shadowLight != nullptr)
+		{
+			memcpy(&_stShadowMap.Light, _shadowLight, sizeof(ShaderLight));
+			_stShadowMap.ShadowMapSize = g_Configuration.ShadowMapSize;
+			_stShadowMap.CastShadows = true;
+
+			BindTexture(TextureRegister::ShadowMap, &_shadowMap, SamplerStateRegister::ShadowMap);
+		}
+		else
+		{
+			_stShadowMap.CastShadows = false;
+		}
+		_cbShadowMap.updateData(_stShadowMap, _context.Get());
+
+		_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
+		_stRoom.AmbientColor = object->Room->AmbientLight;
+		BindRoomLights(view.LightsToDraw);
+		_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
+		_cbRoom.updateData(_stRoom, _context.Get());
+
+		SetScissor(object->Room->ClipBounds);
+
+		if (object->Bucket->Animated == 0)
+		{
+			_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
+		}
+		else
+		{
+			_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
+		}
+
+		SetBlendMode(object->Bucket->BlendMode);
+		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+
+		// Draw geometry
+		if (object->Bucket->Animated)
+		{
+			BindTexture(TextureRegister::ColorMap,
+				&std::get<0>(_animatedTextures[object->Bucket->Texture]),
+				SamplerStateRegister::AnisotropicClamp);
+			BindTexture(TextureRegister::NormalMap,
+				&std::get<1>(_animatedTextures[object->Bucket->Texture]), SamplerStateRegister::AnisotropicClamp);
+
+			RendererAnimatedTextureSet& set = _animatedTextureSets[object->Bucket->Texture];
+			_stAnimated.NumFrames = set.NumTextures;
+			_stAnimated.Type = 0;
+			_stAnimated.Fps = set.Fps;
+
+			for (unsigned char j = 0; j < set.NumTextures; j++)
+			{
+				if (j >= _stAnimated.Textures.size())
+				{
+					TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
+					break;
+				}
+
+				_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
+				_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
+				_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
+				_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
+			}
+			_cbAnimated.updateData(_stAnimated, _context.Get());
+		}
+		else
+		{
+			BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[object->Bucket->Texture]),
+				SamplerStateRegister::AnisotropicClamp);
+			BindTexture(TextureRegister::NormalMap,
+				&std::get<1>(_roomTextures[object->Bucket->Texture]), SamplerStateRegister::AnisotropicClamp);
+		}
+
+		DrawIndexedTriangles(object->Bucket->NumIndices, object->Bucket->StartIndex, 0);
+
+		_numRoomsDrawCalls++;
+
+		ResetScissor();
 	}
 }

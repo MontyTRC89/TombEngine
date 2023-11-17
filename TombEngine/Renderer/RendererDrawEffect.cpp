@@ -1108,41 +1108,6 @@ namespace TEN::Renderer
 		return spriteMatrix;
 	}
 
-	void Renderer::DrawSpritesSorted(RendererTransparentFaceInfo* info, bool resetPipeline, RenderView& view)
-	{	
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-
-		_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
-		_context->PSSetShader(_psSprites.Get(), nullptr, 0);
-
-		_transparentFacesVertexBuffer.Update(_context.Get(), _transparentFacesVertices, 0, (int)_transparentFacesVertices.size());
-		  
-		_context->IASetVertexBuffers(0, 1, _transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-
-		if (resetPipeline)
-		{
-			_stSprite.IsSoftParticle = info->sprite->SoftParticle ? 1 : 0;
-			_stSprite.RenderType = (int)SpriteRenderType::Default;
-
-			_cbSprite.updateData(_stSprite, _context.Get());
-		}
-
-		SetBlendMode(info->sprite->BlendMode);
-		SetCullMode(CullMode::None);
-		SetDepthState(DepthState::Read);
-		SetAlphaTest(AlphaTestMode::None, 0);
-
-		BindTexture(TextureRegister::ColorMap, info->sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
-
-		DrawTriangles((int)_transparentFacesVertices.size(), 0);
-
-		_numTransparentDrawCalls++;
-		_numSpritesTransparentDrawCalls++;
-
-		SetCullMode(CullMode::CounterClockwise);
-	}
-
 	void Renderer::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass) 
 	{
 		const auto& room = _rooms[effect->RoomNumber];
