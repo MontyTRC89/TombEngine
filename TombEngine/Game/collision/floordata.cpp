@@ -976,21 +976,23 @@ namespace TEN::Collision::Floordata
 		}
 	}
 
-	// Gets precise floor/ceiling height from object's bounding box.
+	// Get precise floor/ceiling height from object's bounding box.
 	// Animated objects are also supported, although horizontal collision shifting is unstable.
 	// Method: get accurate bounds in world transform by converting to OBB, then do a ray test
 	// on top or bottom (depending on test side) to determine if box is present at a particular point.
 	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight)
 	{
-		auto bounds = GameBoundingBox(&item);
-		auto dxBounds = bounds.ToBoundingOrientedBox(item.Pose);
+		constexpr auto VERTICAL_MARGIN = 4;
 
-		// Introduce slight vertical margin just in case.
-		auto origin = Vector3(pos.x, pos.y + (useBottomHeight ? 4 : -4), pos.z);
+		auto bounds = GameBoundingBox(&item);
+		auto box = bounds.ToBoundingOrientedBox(item.Pose);
+		
+		auto origin = Vector3(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z);
 		auto dir = useBottomHeight ? -Vector3::UnitY : Vector3::UnitY;
 
+		// Ray intersects box; return bridge box height.
 		float dist = 0.0f;
-		if (dxBounds.Intersects(origin, dir, dist))
+		if (box.Intersects(origin, dir, dist))
 			return (item.Pose.Position.y + (useBottomHeight ? bounds.Y2 : bounds.Y1));
 
 		return std::nullopt;
@@ -1006,7 +1008,7 @@ namespace TEN::Collision::Floordata
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
 	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval)
 	{
-		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(1 / 2.0f));
+		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(0.5f));
 
 		if (!Objects.CheckID(item.ObjectNumber))
 			return;
@@ -1018,51 +1020,51 @@ namespace TEN::Collision::Floordata
 		if (item.Flags & IFLAG_KILLED)
 			forceRemoval = true;
 
-		// Get real OBB of bridge in world space.
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		// Get bridge OBB.
+		auto bridgeBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
-		// Get corners of a projected OBB
-		Vector3 corners[8];
-		box.GetCorners(corners); // corners[0], corners[1], corners[4] corners[5]
+		// Get bridge OBB corners.
+		auto corners = std::array<Vector3, 8>{};
+		bridgeBox.GetCorners(corners.data()); // corners[0], corners[1], corners[4] corners[5]
 
-		auto room = &g_Level.Rooms[item.RoomNumber];
+		const auto& room = g_Level.Rooms[item.RoomNumber];
 
-		// Get min/max of projected AABB.
-		auto minX = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / BLOCK(1));
-		auto minZ = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / BLOCK(1));
-		auto maxX =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / BLOCK(1));
-		auto maxZ =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room->z) / BLOCK(1));
+		// Get projected AABB min and max of bridge OBB.
+		float xMin = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
+		float zMin = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
+		float xMax =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
+		float zMax =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
 
-		// Run through all blocks enclosed in AABB.
-		for (int x = 0; x < room->xSize; x++)
+		// Run through all sectors enclosed in projected bridge AABB.
+		for (int x = 0; x < room.xSize; x++)
 		{
-			for (int z = 0; z < room->zSize; z++)
+			for (int z = 0; z < room.zSize; z++)
 			{
-				float pX = room->x + (x * BLOCK(1)) + BLOCK(0.5f);
-				float pZ = room->z + (z * BLOCK(1)) + BLOCK(0.5f);
+				float pX = (room.x + BLOCK(x)) + BLOCK(0.5f);
+				float pZ = (room.z + BLOCK(z)) + BLOCK(0.5f);
 				float offX = pX - item.Pose.Position.x;
 				float offZ = pZ - item.Pose.Position.z;
 
 				// Clean previous bridge state.
 				RemoveBridge(item.Index, offX, offZ);
 
-				// If in sweeping mode, don't try readding to block.
+				// In sweep mode; don't try readding to sector.
 				if (forceRemoval)
 					continue;
 
-				// If block isn't in enclosed AABB space, ignore precise check.
-				if (x < minX || z < minZ ||
-					x > maxX || z > maxZ)
+				// Sector is outside enclosed AABB space; ignore precise check.
+				if (x < xMin || z < zMin ||
+					x > xMax || z > zMax)
 				{
 					continue;
 				}
 
-				// Block is in enclosed AABB space; do more precise test.
-				// Construct block bounding box within same plane as bridge bounding box and test intersection.
-				auto blockBox = BoundingOrientedBox(Vector3(pX, box.Center.y, pZ), SECTOR_EXTENTS, Vector4::UnitY);
+				// Sector is in enclosed bridge AABB space; do more precise test.
+				// Construct OBB within same plane as bridge OBB and test intersection.
+				auto sectorBox = BoundingOrientedBox(Vector3(pX, bridgeBox.Center.y, pZ), SECTOR_EXTENTS, Vector4::UnitY);
 
 				// Add bridge to current sector if intersection is valid.
-				if (box.Intersects(blockBox))
+				if (bridgeBox.Intersects(sectorBox))
 					AddBridge(item.Index, offX, offZ);
 			}
 		}
