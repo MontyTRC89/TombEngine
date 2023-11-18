@@ -147,7 +147,7 @@ namespace TEN::Effects::Drip
 					pointColl.RoomNumber,
 					Random::GenerateFloat(RIPPLE_SIZE_GROUND_MIN, RIPPLE_SIZE_GROUND_MAX),
 					(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity | (int)RippleFlags::OnGround,
-					GetSurfaceNormal(pointColl.FloorTilt, true));
+					pointColl.FloorNormal);
 
 				drip.Life = 0.0f;
 				continue;

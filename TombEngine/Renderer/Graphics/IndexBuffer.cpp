@@ -1,3 +1,4 @@
+#include "framework.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 
 namespace TEN::Renderer::Graphics

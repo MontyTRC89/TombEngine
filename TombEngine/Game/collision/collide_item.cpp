@@ -743,7 +743,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
-	if (lara != nullptr && lara->Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
+	if (lara != nullptr && lara->Control.Count.PositionAdjust > (PLAYER_POSITION_ADJUST_MAX_TIME / 6))
 	{
 		lara->Control.IsMoving = false;
 		lara->Control.HandStatus = HandStatus::Free;
@@ -865,7 +865,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
-	if (item->IsLara() && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
+	if (item->IsLara() && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (PLAYER_POSITION_ADJUST_MAX_TIME / 6))
 	{
 		auto* lara = GetLaraInfo(item);
 		lara->Control.IsMoving = false;
@@ -2010,4 +2010,36 @@ void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		ObjectCollision(itemNumber, playerItem, coll);
 	}
+}
+
+std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
+{
+	// Run through neighboring rooms.
+	const auto& roomNumbers = g_Level.Rooms[roomNumber].neighbors;
+	for (int roomNumber : g_Level.Rooms[roomNumber].neighbors)
+	{
+		// Get room.
+		const auto& room = g_Level.Rooms[roomNumber];
+		if (!room.Active())
+			continue;
+
+		// Run through statics.
+		for (const auto& staticObject : g_Level.Rooms[roomNumber].mesh)
+		{
+			// Check if static is visible.
+			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Check if static is solid (if applicable).
+			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
+				continue;
+
+			// Test ray-box intersection.
+			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+			if (box.Intersects(origin, dir, dist))
+				return Geometry::TranslatePoint(origin, dir, dist);
+		}
+	}
+
+	return std::nullopt;
 }

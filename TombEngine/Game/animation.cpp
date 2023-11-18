@@ -312,7 +312,7 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool HasStateDispatch(ItemInfo* item, int targetState)
+bool HasStateDispatch(const ItemInfo* item, int targetState)
 {
 	const auto& anim = GetAnimData(*item);
 

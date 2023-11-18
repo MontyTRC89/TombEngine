@@ -7,8 +7,11 @@ Version 1.3
 * Fix pushable "stop" sound bug.
 * Fix pushable camera bug during edge slip.
 * Separate underwater wall and ceiling switch objects into two slots each.
+* Fix Hydra flame not showing when charging.
+* fix shockwave light for hammer god.
 * Improve fly cheat collision.
 * Add fast speed for fly cheat by holding Sprint input action.
+* Allow walking on slopes when wading in water. (Like in quicksand)
 
 Version 1.2
 ===========
