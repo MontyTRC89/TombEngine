@@ -111,9 +111,15 @@ namespace TEN::Entities::Generic
 						pushable.BehaviorState = PushableBehaviourState::Float;
 						pushable.Gravity = 0.0f;
 					}
+					else
+					{
+						pushable.BehaviorState = PushableBehaviourState::UnderwaterIdle;
+					}
 				}
-
-				HandlePushableRippleEffect(pushableItem);
+				else
+				{
+					HandlePushableRippleEffect(pushableItem);
+				}
 			}
 			break;
 
