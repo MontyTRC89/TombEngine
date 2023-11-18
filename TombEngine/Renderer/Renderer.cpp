@@ -123,7 +123,7 @@ namespace TEN::Renderer
 			count = 0;
 		}
 
-		fps = fps;
+		_fps = fps;
 
 		return fps;
 	}
