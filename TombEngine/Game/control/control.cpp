@@ -480,23 +480,25 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 	g_GameScript->OnEnd(reason);
 	switch (reason)
 	{
-		case GameStatus::LevelComplete:
-			HandleAllEvents(VolumeEventType::End, (VolumeActivator)LaraItem->Index);
-			TENLog("VolumeEventType::End", LogLevel::Info);
-			break;
-		case GameStatus::LoadGame:
-			HandleAllEvents(VolumeEventType::BeforeLoad, (VolumeActivator)LaraItem->Index);
-			TENLog("VolumeEventType::BeforeLoad", LogLevel::Info);
-			break;
-		case GameStatus::ExitToTitle:
-			HandleAllEvents(VolumeEventType::ExitToTitle, (VolumeActivator)LaraItem->Index);
-			TENLog("VolumeEventType::ExitToTitle", LogLevel::Info);
-			break;
-		case GameStatus::LaraDead:
-			HandleAllEvents(VolumeEventType::LaraDeath, (VolumeActivator)LaraItem->Index);
-			TENLog("VolumeEventType::LaraDeath", LogLevel::Info);
-			break;
-
+	case GameStatus::LevelComplete:
+		HandleAllEvents(VolumeEventType::End, (VolumeActivator)LaraItem->Index);
+		TENLog("VolumeEventType::End", LogLevel::Info);
+		break;
+		
+	case GameStatus::LoadGame:
+		HandleAllEvents(VolumeEventType::BeforeLoad, (VolumeActivator)LaraItem->Index);
+		TENLog("VolumeEventType::BeforeLoad", LogLevel::Info);
+		break;
+		
+	case GameStatus::ExitToTitle:
+		HandleAllEvents(VolumeEventType::ExitToTitle, (VolumeActivator)LaraItem->Index);
+		TENLog("VolumeEventType::ExitToTitle", LogLevel::Info);
+		break;
+		
+	case GameStatus::LaraDead:
+		HandleAllEvents(VolumeEventType::PlayerDeath, (VolumeActivator)LaraItem->Index);
+		TENLog("VolumeEventType::PlayerDeath", LogLevel::Info);
+		break;
 	}
 		
 	g_GameScript->FreeLevelScripts();
