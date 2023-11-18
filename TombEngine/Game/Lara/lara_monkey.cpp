@@ -7,6 +7,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
@@ -17,6 +18,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
+using namespace TEN::Player;
 
 // -----------------------------
 // MONKEY SWING
@@ -45,8 +47,9 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	// Overhang hook.
 	SlopeMonkeyExtra(item, coll);
 
+	// NOTE: Shimmy locks orientation.
 	if ((IsHeld(In::Left) &&
-			!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))) ||	// Shimmy locks orientation.
+			!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))) ||
 		(IsHeld(In::Right) &&
 			!(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))))
 	{
@@ -88,18 +91,26 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
 			if (TestLaraMonkeyShimmyLeft(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
 		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
 			if (TestLaraMonkeyShimmyRight(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
@@ -134,8 +145,8 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
-	coll->Setup.LowerCeilingBound = CLICK(1.25f);
-	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;
+	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
@@ -143,18 +154,19 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
 	
-	// HACK: Prevent ShiftItem() from causing an instantaneous snap, thereby interfering with DoLaraMonkeyStep(), when going down a step. @Sezz 2022.01.28
-	if (coll->Shift.Position.y >= 0 && coll->Shift.Position.y <= CLICK(1.25f))
+	// HACK: Prevent ShiftItem() from causing an instantaneous snap,
+	// thereby interfering with DoLaraMonkeyStep() when going down a step. @Sezz 2022.01.28
+	if (coll->Shift.Position.y >= 0 && coll->Shift.Position.y <= MONKEY_STEPUP_HEIGHT)
 		coll->Shift.Position.y = 0;
 	ShiftItem(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -215,8 +227,8 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
-	coll->Setup.LowerCeilingBound = CLICK(1.25f);
-	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;
+	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
@@ -227,13 +239,13 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -288,8 +300,8 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
-	coll->Setup.LowerCeilingBound = CLICK(1.25f);
-	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;
+	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
@@ -300,13 +312,13 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -376,13 +388,13 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -408,7 +420,8 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsHeld(In::Walk))	// WALK locks orientation.
+	// NOTE: Walk locks orientation.
+	if (!IsHeld(In::Walk))
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
@@ -452,13 +465,13 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeMonkey(item, coll))
 		LaraCollideStopMonkey(item, coll);
 
-	if (TestLaraMonkeyFall(item, coll))
+	if (CanFallFromMonkeySwing(*item, *coll))
 	{
 		SetLaraMonkeyFallAnimation(item);
 		return;
 	}
 
-	if (TestLaraMonkeyStep(item, coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -530,18 +543,26 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
 			if (TestLaraMonkeyShimmyLeft(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
 		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
 			if (TestLaraMonkeyShimmyRight(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
@@ -610,18 +631,26 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
 			if (TestLaraMonkeyShimmyLeft(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}
 		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
 			if (TestLaraMonkeyShimmyRight(item, coll))
+			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			}
 			else
+			{
 				item->Animation.TargetState = LS_MONKEY_IDLE;
+			}
 
 			return;
 		}

@@ -1231,6 +1231,16 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
+// TODO: Rname to SpawnDynamicLight().
+void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff)
+{
+	g_Renderer.AddDynamicLight(
+		pos.x, pos.y, pos.z,
+		falloff * UCHAR_MAX,
+		color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
+}
+
+// Deprecated. Use above version instead.
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);

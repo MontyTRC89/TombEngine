@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/Lara/PlayerContext.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
@@ -8,6 +9,8 @@ struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
 namespace TEN::Renderer { struct RendererMesh; };
+
+using namespace TEN::Player;
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
@@ -1161,41 +1164,6 @@ struct DiaryInfo
 	unsigned int CurrentPage			= 0;
 };
 
-struct LaraInventoryData
-{
-	bool IsBusy	 = false;
-	bool OldBusy = false;
-
-	DiaryInfo Diary = {};
-
-	byte BeetleLife;
-	int BeetleComponents; // BeetleComponentFlags enum
-	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
-	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
-
-	// TODO: Rename prefixes back to "Num".
-	int TotalSmallMedipacks;
-	int TotalLargeMedipacks;
-	int TotalFlares;
-	unsigned int TotalSecrets;
-
-	bool HasBinoculars = false;
-	bool HasCrowbar	   = false;
-	bool HasTorch	   = false;
-	bool HasLasersight = false;
-	bool HasSilencer   = false; // TODO: Unused.
-
-	// TODO: Convert to bools.
-	int Puzzles[NUM_PUZZLES]			= {};
-	int Keys[NUM_KEYS]					= {};
-	int Pickups[NUM_PICKUPS]			= {};
-	int Examines[NUM_EXAMINES]			= {};
-	int PuzzlesCombo[NUM_PUZZLES * 2]	= {};
-	int KeysCombo[NUM_KEYS * 2]			= {};
-	int PickupsCombo[NUM_PICKUPS * 2]	= {};
-	int ExaminesCombo[NUM_EXAMINES * 2] = {};
-};
-
 struct LaraCountData
 {
 	unsigned int Pose			= 0;
@@ -1213,26 +1181,6 @@ struct LookControlData
 	short OpticRange		= 0;
 	bool  IsUsingBinoculars = false;
 	bool  IsUsingLasersight = false;
-};
-
-struct WeaponControlData
-{
-	LaraWeaponType GunType		  = LaraWeaponType::None;
-	LaraWeaponType RequestGunType = LaraWeaponType::None;
-	LaraWeaponType LastGunType	  = LaraWeaponType::None;
-	HolsterInfo	   HolsterInfo	  = {};
-	
-	short WeaponItem = -1;
-	bool  HasFired	 = false;
-	bool  Fired		 = false;
-
-	bool UziLeft  = false;
-	bool UziRight = false;
-
-	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
-	unsigned int NumShotsFired = 0;
-	float		 Interval	   = 0.0f;
-	float		 Timer		   = 0.0f;
 };
 
 struct RopeControlData
@@ -1259,15 +1207,6 @@ struct RopeControlData
 	int Count = 0;
 };
 
-// TODO: Give tightrope a property for difficulty?
-struct TightropeControlData
-{
-	short		 TightropeItem	 = 0;
-	bool		 CanDismount	 = false;
-	float		 Balance		 = 0.0f;
-	unsigned int TimeOnTightrope = 0;
-};
-
 struct SubsuitControlData
 {
 	short XRot = 0;
@@ -1280,7 +1219,36 @@ struct SubsuitControlData
 	unsigned short HitCount = 0;
 };
 
-struct LaraControlData
+// TODO: Give tightrope a property for difficulty?
+struct TightropeControlData
+{
+	short		 TightropeItem	 = 0;
+	bool		 CanDismount	 = false;
+	float		 Balance		 = 0.0f;
+	unsigned int TimeOnTightrope = 0;
+};
+
+struct WeaponControlData
+{
+	LaraWeaponType GunType		  = LaraWeaponType::None;
+	LaraWeaponType RequestGunType = LaraWeaponType::None;
+	LaraWeaponType LastGunType	  = LaraWeaponType::None;
+	HolsterInfo	   HolsterInfo	  = {};
+
+	short WeaponItem = -1;
+	bool  HasFired	 = false;
+	bool  Fired		 = false;
+
+	bool UziLeft  = false;
+	bool UziRight = false;
+
+	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
+	unsigned int NumShotsFired = 0;
+	float		 Interval	   = 0.0f;
+	float		 Timer		   = 0.0f;
+};
+
+struct PlayerControlData
 {
 	short MoveAngle = 0;
 	short TurnRate	= 0;
@@ -1297,12 +1265,12 @@ struct LaraControlData
 	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
-	bool Locked			  = false; // IsLocked
+	bool IsLocked		  = false;
 	bool IsLow			  = false;
 	bool IsMonkeySwinging = false;
 	bool IsMoving		  = false;
-	bool RunJumpQueued	  = false; // IsRunJumpQueued
-	bool KeepLow		  = false; // IsInLowSpace
+	bool IsRunJumpQueued  = false;
+	bool KeepLow		  = false;
 
 	bool CanClimbLadder = false;
 	bool CanLook		= false;
@@ -1318,36 +1286,55 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
-struct PlayerContextData
-{
-	int			ProjectedFloorHeight = 0;
-	float		CalcJumpVelocity	 = 0;
-	Pose		NextCornerPos		 = Pose::Zero;
-	EulerAngles TargetOrientation	 = EulerAngles::Zero; // TargetOrient
-
-	int		 WaterSurfaceDist	= 0;
-	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	= Vector3i::Zero;
-
-	int InteractedItem = 0; // InteractedItemNumber
-	int Vehicle		   = 0; // VehicleItemNumber
-};
-
 struct PlayerEffectData
 {
 	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
 	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
 };
 
+struct PlayerInventoryData
+{
+	bool IsBusy	 = false;
+	bool OldBusy = false;
+
+	DiaryInfo Diary = {};
+
+	byte BeetleLife;
+	int BeetleComponents; // BeetleComponentFlags enum
+	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
+	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
+
+	// TODO: Rename prefixes back to "Num".
+	int TotalSmallMedipacks;
+	int TotalLargeMedipacks;
+	int TotalFlares;
+	unsigned int TotalSecrets;
+
+	bool HasBinoculars = false;
+	bool HasCrowbar	   = false;
+	bool HasTorch	   = false;
+	bool HasLasersight = false;
+	bool HasSilencer   = false; // TODO: Unused.
+
+	int Puzzles[NUM_PUZZLES]			= {};
+	int Keys[NUM_KEYS]					= {};
+	int Pickups[NUM_PICKUPS]			= {};
+	int Examines[NUM_EXAMINES]			= {};
+	int PuzzlesCombo[NUM_PUZZLES * 2]	= {};
+	int KeysCombo[NUM_KEYS * 2]			= {};
+	int PickupsCombo[NUM_PICKUPS * 2]	= {};
+	int ExaminesCombo[NUM_EXAMINES * 2] = {};
+};
+
 struct LaraInfo
 {
 	static constexpr auto TARGET_COUNT_MAX = 16;
 
-	LaraControlData	  Control	= {};
-	PlayerContextData Context	= {};
-	PlayerStatusData  Status	= {};
-	PlayerEffectData  Effect	= {};
-	LaraInventoryData Inventory = {};
+	PlayerContext		Context	  = PlayerContext();
+	PlayerControlData	Control	  = {};
+	PlayerStatusData	Status	  = {};
+	PlayerEffectData	Effect	  = {};
+	PlayerInventoryData Inventory = {};
 
 	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};
