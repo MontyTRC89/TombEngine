@@ -11,13 +11,13 @@ struct ItemInfo;
 // Floor:			Lower surface of a sector.
 // Floordata:		Name of the engine's level geometry collision system composed of rooms with sectors.
 // Location:		Vertical location within a room. TODO: Refine this concept and use a better name.
-// Plane:			Mathematical representation of one of two surface tris.
+// Plane:			Mathematical representation of one of two surface triangles.
 // Portal:			Link from one room to another allowing traversal between them.
 // Room number:		Unique ID of a room.
 // Room grid coord: Relative 2D grid coordinate of a room (e.g. [0, 0] denotes the first sector).
 // Sector/block:	Collision data describing a single grid division within a room.
 // Sector point:	Relative 2D position within a sector (range [0, BLOCK(1)) on each axis).
-// Surface:			Floor or ceiling consisting of two tris.
+// Surface:			Floor or ceiling consisting of two triangles.
 // Triangle:		Surface subdivision.
 // Wall:			Inferred from a high floor or ceiling. Note that true "walls" don't exist in floordata, only surface heights.
 
