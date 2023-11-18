@@ -130,13 +130,13 @@ CollisionResult GetCollision(const ItemInfo& item)
 }
 
 // Deprecated.
-CollisionResult GetCollision(ItemInfo* item)
+CollisionResult GetCollision(const ItemInfo* item)
 {
 	return GetCollision(*item);
 }
 
 // Overload used to probe point collision parameters from a given item's position.
-CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down, float right)
+CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = item->RoomNumber;
 
@@ -1414,7 +1414,7 @@ bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber)
 	return TestEnvironment(environmentType, GetCollision(pos.x, pos.y, pos.z, roomNumber).RoomNumber);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
+bool TestEnvironment(RoomEnvFlags environmentType, const ItemInfo* item)
 {
 	return TestEnvironment(environmentType, item->RoomNumber);
 }

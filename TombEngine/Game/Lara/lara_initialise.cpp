@@ -34,6 +34,8 @@ void InitializeLara(bool restore)
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	LaraItem->Data = &Lara;
+	Lara.Context = PlayerContext(*LaraItem, LaraCollision);
+
 	LaraItem->Collidable = false;
 	LaraItem->Location.RoomNumber = LaraItem->RoomNumber;
 	LaraItem->Location.Height = LaraItem->Pose.Position.y;

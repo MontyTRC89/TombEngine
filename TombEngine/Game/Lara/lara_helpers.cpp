@@ -13,6 +13,7 @@
 #include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
 #include "Game/GuiObjects.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
@@ -35,13 +36,14 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
-using namespace TEN::Collision::Floordata;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Player;
 using namespace TEN::Renderer;
 
 // -----------------------------
@@ -54,7 +56,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
+	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && CanStrikeAfkPose(*item, *coll) &&
 		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
@@ -71,7 +73,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState(item->Animation.ActiveState))
-		lara->Control.RunJumpQueued = false;
+		lara->Control.IsRunJumpQueued = false;
 
 	// Reset lean.
 	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
@@ -713,6 +715,46 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
+void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
+{
+	if (!item->Animation.Velocity.z)
+		return;
+
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	int sign = copysign(1, axisCoeff);
+	short maxAngleNormalized = maxAngle * axisCoeff;
+
+	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+		maxAngleNormalized *= 0.6f;
+
+	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
+}
+
+void HandlePlayerCrawlFlex(ItemInfo& item)
+{
+	constexpr auto FLEX_RATE_ANGLE = ANGLE(2.25f);
+	constexpr auto FLEX_ANGLE_MAX  = ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
+
+	auto& player = GetLaraInfo(item);
+
+	// Check if player is moving.
+	if (item.Animation.Velocity.z == 0.0f)
+		return;
+
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	int sign = copysign(1, axisCoeff);
+	short maxAngleNormalized = FLEX_ANGLE_MAX * axisCoeff;
+
+	if (abs(player.ExtraTorsoRot.z) < FLEX_ANGLE_MAX)
+		player.ExtraTorsoRot.z += std::min<short>(FLEX_RATE_ANGLE, abs(maxAngleNormalized - player.ExtraTorsoRot.z) / 6) * sign;
+
+	if (!IsHeld(In::Look) && item.Animation.ActiveState != LS_CRAWL_BACK)
+	{
+		player.ExtraHeadRot.z = player.ExtraTorsoRot.z / 2;
+		player.ExtraHeadRot.y = player.ExtraHeadRot.z;
+	}
+}
+
 static void GivePlayerItemsCheat(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
@@ -1000,20 +1042,20 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 		SpawnBubble(pos, item->RoomNumber);
 }
 
-// TODO: This approach may cause undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
+// TODO: This approach may present undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
 // Potential solutions:
 // 1. Consider floor tilt when translating objects.
 // 2. Object parenting. -- Sezz 2022.10.28
-void EasePlayerVerticalPosition(ItemInfo* item, int height)
+void EasePlayerElevation(ItemInfo* item, int relHeight)
 {
 	constexpr auto LINEAR_RATE_MIN = 50.0f;
 
 	// Check for wall.
-	if (height == NO_HEIGHT)
+	if (relHeight == NO_HEIGHT)
 		return;
 
 	// Handle swamp case.
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && relHeight > 0)
 	{
 		item->Pose.Position.y += SWAMP_GRAVITY;
 		return;
@@ -1021,24 +1063,24 @@ void EasePlayerVerticalPosition(ItemInfo* item, int height)
 
 	// Handle regular case.
 	float linearRate = std::max(LINEAR_RATE_MIN, abs(item->Animation.Velocity.z));
-	if (abs(height) > linearRate)
+	if (abs(relHeight) > linearRate)
 	{
-		int sign = std::copysign(1, height);
-		item->Pose.Position.y += linearRate * sign;
+		int sign = std::copysign(1, relHeight);
+		item->Pose.Position.y += (int)round(linearRate * sign);
+		return;
 	}
-	else
-	{
-		item->Pose.Position.y += height;
-	}
+
+	// Snap elevation.
+	item->Pose.Position.y += relHeight;
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
-void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
+void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 {
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
-		if (TestLaraStepUp(item, coll))
+		if (CanStepUp(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
 			if (GetStateDispatch(item, GetAnimData(*item)))
@@ -1047,7 +1089,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TestLaraStepDown(item, coll))
+		else if (CanStepDown(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_DOWN;
 			if (GetStateDispatch(item, GetAnimData(*item)))
@@ -1058,12 +1100,12 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	EasePlayerVerticalPosition(item, coll->Middle.Floor);
+	EasePlayerElevation(item, coll->Middle.Floor);
 }
 
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 {
-	EasePlayerVerticalPosition(item, coll->Middle.Ceiling);
+	EasePlayerElevation(item, coll->Middle.Ceiling);
 }
 
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
@@ -1225,6 +1267,32 @@ PlayerWaterData GetPlayerWaterData(ItemInfo& item)
 	};
 }
 
+JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll)
+{
+	if (IsHeld(In::Forward) && CanJumpForward(item, coll))
+	{
+		return JumpDirection::Forward;
+	}
+	else if (IsHeld(In::Back) && CanJumpBackward(item, coll))
+	{
+		return JumpDirection::Back;
+	}
+	else if (IsHeld(In::Left) && CanJumpLeft(item, coll))
+	{
+		return JumpDirection::Left;
+	}
+	else if (IsHeld(In::Right) && CanJumpRight(item, coll))
+	{
+		return JumpDirection::Right;
+	}
+	else if (CanJumpUp(item, coll))
+	{
+		return JumpDirection::Up;
+	}
+
+	return JumpDirection::None;
+}
+
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
@@ -1246,12 +1314,15 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
 {
+	// Determine sign.
 	axisCoeff *= invert ? -1 : 1;
 	int sign = std::copysign(1, axisCoeff);
 
+	// Normalize min and max turn rates according to axis coefficient.
 	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
 
+	// Calculate and return new turn rate.
 	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNorm, maxTurnRateNorm);
 	return (newTurnRate * sign);
@@ -1277,6 +1348,27 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 	}
 
 	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
+}
+
+static short ResetPlayerTurnRate(short turnRate, short decelRate)
+{
+	int sign = std::copysign(1, turnRate);
+	if (abs(turnRate) > decelRate)
+		return (turnRate - (decelRate * sign));
+
+	return 0;
+}
+
+void ResetPlayerTurnRateX(ItemInfo& item, short decelRate)
+{
+	auto& player = GetLaraInfo(item);
+	player.Control.TurnRate/*.x*/ = ResetPlayerTurnRate(player.Control.TurnRate/*.x*/, decelRate);
+}
+
+void ResetPlayerTurnRateY(ItemInfo& item, short decelRate)
+{
+	auto& player = GetLaraInfo(item);
+	player.Control.TurnRate/*.y*/ = ResetPlayerTurnRate(player.Control.TurnRate/*.y*/, decelRate);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
@@ -1395,43 +1487,6 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	}
 }
 
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
-{
-	if (!item->Animation.Velocity.z)
-		return;
-
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
-
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		maxAngleNormalized *= 0.6f;
-
-	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
-}
-
-void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (!item->Animation.Velocity.z)
-		return;
-
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
-
-	if (abs(lara->ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
-		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
-
-	if (!IsHeld(In::Look) &&
-		item->Animation.ActiveState != LS_CRAWL_BACK)
-	{
-		lara->ExtraHeadRot.z = lara->ExtraTorsoRot.z / 2;
-		lara->ExtraHeadRot.y = lara->ExtraHeadRot.z;
-	}
-}
-
 // TODO: Unused; I will pick this back up later. -- Sezz 2022.06.22
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 {
@@ -1471,85 +1526,30 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	item->Pose.Orientation += extraRot * alpha;
 }
 
-void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
+void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& vaultResult)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (IsHeld(In::Forward) &&
-		TestLaraJumpForward(item, coll))
-	{
-		lara->Control.JumpDirection = JumpDirection::Forward;
-	}
-	else if (IsHeld(In::Back) &&
-		TestLaraJumpBack(item, coll))
-	{
-		lara->Control.JumpDirection = JumpDirection::Back;
-	}
-	else if (IsHeld(In::Left) &&
-		TestLaraJumpLeft(item, coll))
-	{
-		lara->Control.JumpDirection = JumpDirection::Left;
-	}
-	else if (IsHeld(In::Right) &&
-		TestLaraJumpRight(item, coll))
-	{
-		lara->Control.JumpDirection = JumpDirection::Right;
-	}
-	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		lara->Control.JumpDirection = JumpDirection::Up;
-	else
-		lara->Control.JumpDirection = JumpDirection::None;
-}
+	ResetPlayerTurnRateY(*item);
+	player.Context.ProjectedFloorHeight = vaultResult.Height;
 
-// TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
-// RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. -- Sezz 2022.01.22
-void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y;
-	int distance = BLOCK(1);
-	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
-
-	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
-		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
-		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		lara->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);
-	}
-	else
-		lara->Control.RunJumpQueued = false;
-}
-
-void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult)
-{
-	auto* lara = GetLaraInfo(item);
-
-	lara->Context.ProjectedFloorHeight = vaultResult.Height;
-	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
-	lara->Control.TurnRate = 0;
+	if (vaultResult.SetBusyHands)
+		player.Control.HandStatus = HandStatus::Busy;
 
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+		player.Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 	else
 	{
-		lara->Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+		player.Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)
 	{
-		int height = lara->Context.ProjectedFloorHeight - item->Pose.Position.y;
-		if (height > -CLICK(3.5f))
-			height = -CLICK(3.5f);
-		else if (height < -CLICK(7.5f))
-			height = -CLICK(7.5f);
-
-		// TODO: Find a better formula for this that won't require the above block.
-		lara->Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * (height));
+		int jumpHeight = player.Context.ProjectedFloorHeight - item->Pose.Position.y;
+		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(jumpHeight);
 	}
 }
 
@@ -1742,13 +1742,12 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
 	}
 }
 
-void ResetPlayerLean(ItemInfo* item, float alpha, bool resetRoll, bool resetPitch)
+void ResetPlayerLean(ItemInfo* item, float alpha, bool resetZAxisLean, bool resetXAxisLean)
 {
-	if (resetRoll)
-		item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, item->Pose.Orientation.y, 0), alpha);
+	short xTargetOrient = resetXAxisLean ? 0 : item->Pose.Orientation.x;
+	short zTargetOrient = resetZAxisLean ? 0 : item->Pose.Orientation.z;
 
-	if (resetPitch)
-		item->Pose.Orientation.Lerp(EulerAngles(0, item->Pose.Orientation.y, item->Pose.Orientation.z), alpha);
+	item->Pose.Orientation.Lerp(EulerAngles(xTargetOrient, item->Pose.Orientation.y, zTargetOrient), alpha);
 }
 
 void ResetPlayerFlex(ItemInfo* item, float alpha)
@@ -1805,4 +1804,17 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 	bool doPulse = ((GlobalCounter & 0x0F) % 0x0F == 1);
 	if (doPulse)
 		Rumble(POWER, DELAY);
+}
+
+// NOTE: Formula uses kinematic equation of motion for vertical motion under constant acceleration.
+float GetPlayerJumpVelocity(float jumpHeight)
+{
+	constexpr auto JUMP_HEIGHT_MAX	= -CLICK(7.5f);
+	constexpr auto JUMP_HEIGHT_MIN	= -CLICK(3.5f);
+	constexpr auto A2				= -9600.0f;
+	constexpr auto UNIT_CONV_FACTOR = 12.0f;
+	constexpr auto OFFSET			= -3.0f;
+
+	jumpHeight = std::clamp(jumpHeight, JUMP_HEIGHT_MAX, JUMP_HEIGHT_MIN);
+	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }
