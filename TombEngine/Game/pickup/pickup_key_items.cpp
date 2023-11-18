@@ -9,13 +9,13 @@ template <size_t N> struct KeyPickupInfo
 {
 	// the array in the LaraInfo struct that holds the amount of
 	// each type of key item (puzzle, key, examine, combos, etc)
-	int(LaraInventoryData::* arr)[N];
+	int(PlayerInventoryData::* arr)[N];
 	// The range of GAME_OBJECT_IDs that correspond to each type
 	// of key item
 	// ID of first and last objects of this type
 	GAME_OBJECT_ID min;
 	GAME_OBJECT_ID max;
-	constexpr KeyPickupInfo<N>(int(LaraInventoryData::* a_array)[N], GAME_OBJECT_ID a_min, GAME_OBJECT_ID a_max) : arr{ a_array }, min{ a_min }, max{ a_max } {};
+	constexpr KeyPickupInfo<N>(int(PlayerInventoryData::* a_array)[N], GAME_OBJECT_ID a_min, GAME_OBJECT_ID a_max) : arr{ a_array }, min{ a_min }, max{ a_max } {};
 };
 
 static constexpr int kDefaultPickupAmount = 1;
@@ -23,14 +23,14 @@ static constexpr int kDefaultPickupAmount = 1;
 // This has to be a tuple since the pointers-to-arrays all have different types
 // due to differing array sizes.
 static constexpr std::tuple kKeyPickupInfos = std::make_tuple( 
-	KeyPickupInfo { &LaraInventoryData::Puzzles, ID_PUZZLE_ITEM1, ID_PUZZLE_ITEM16 },
-	KeyPickupInfo { &LaraInventoryData::PuzzlesCombo, ID_PUZZLE_ITEM1_COMBO1, ID_PUZZLE_ITEM16_COMBO2 },
-	KeyPickupInfo { &LaraInventoryData::Keys, ID_KEY_ITEM1, ID_KEY_ITEM16 },
-	KeyPickupInfo { &LaraInventoryData::KeysCombo, ID_KEY_ITEM1_COMBO1, ID_KEY_ITEM16_COMBO2 },
-	KeyPickupInfo { &LaraInventoryData::Pickups, ID_PICKUP_ITEM1, ID_PICKUP_ITEM16 },
-	KeyPickupInfo { &LaraInventoryData::PickupsCombo, ID_PICKUP_ITEM1_COMBO1, ID_PICKUP_ITEM16_COMBO2 },
-	KeyPickupInfo { &LaraInventoryData::Examines, ID_EXAMINE1, ID_EXAMINE8 },
-	KeyPickupInfo { &LaraInventoryData::ExaminesCombo, ID_EXAMINE1_COMBO1, ID_EXAMINE8_COMBO2 });
+	KeyPickupInfo { &PlayerInventoryData::Puzzles, ID_PUZZLE_ITEM1, ID_PUZZLE_ITEM16 },
+	KeyPickupInfo { &PlayerInventoryData::PuzzlesCombo, ID_PUZZLE_ITEM1_COMBO1, ID_PUZZLE_ITEM16_COMBO2 },
+	KeyPickupInfo { &PlayerInventoryData::Keys, ID_KEY_ITEM1, ID_KEY_ITEM16 },
+	KeyPickupInfo { &PlayerInventoryData::KeysCombo, ID_KEY_ITEM1_COMBO1, ID_KEY_ITEM16_COMBO2 },
+	KeyPickupInfo { &PlayerInventoryData::Pickups, ID_PICKUP_ITEM1, ID_PICKUP_ITEM16 },
+	KeyPickupInfo { &PlayerInventoryData::PickupsCombo, ID_PICKUP_ITEM1_COMBO1, ID_PICKUP_ITEM16_COMBO2 },
+	KeyPickupInfo { &PlayerInventoryData::Examines, ID_EXAMINE1, ID_EXAMINE8 },
+	KeyPickupInfo { &PlayerInventoryData::ExaminesCombo, ID_EXAMINE1_COMBO1, ID_EXAMINE8_COMBO2 });
 
 static constexpr auto nInfos = std::tuple_size<decltype(kKeyPickupInfos)>{};
 

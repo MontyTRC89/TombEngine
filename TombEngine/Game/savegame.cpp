@@ -465,14 +465,14 @@ bool SaveGame::Save(int slot)
 	control.add_count(countOffset);
 	control.add_hand_status((int)Lara.Control.HandStatus);
 	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
-	control.add_is_locked(Lara.Control.Locked);
+	control.add_is_locked(Lara.Control.IsLocked);
 	control.add_is_low(Lara.Control.IsLow);
 	control.add_is_moving(Lara.Control.IsMoving);
-	control.add_is_run_jump_queued(Lara.Control.RunJumpQueued);
-	control.add_jump_direction((int)Lara.Control.JumpDirection);
+	control.add_is_run_jump_queued(Lara.Control.IsRunJumpQueued);
+	control.add_count(countOffset);
 	control.add_keep_low(Lara.Control.KeepLow);
 	control.add_look(lookControlOffset);
-	control.add_move_angle(Lara.Control.MoveAngle);
+	control.add_is_low(Lara.Control.IsLow);
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
 	control.add_tightrope(tightropeControlOffset);
@@ -1642,8 +1642,8 @@ bool SaveGame::Load(int slot)
 		{
 			LaraItem->Data = nullptr;
 			LaraItem = item;
-			LaraItem->Location.roomNumber = savedItem->room_number();
-			LaraItem->Location.yNumber = item->Pose.Position.y;
+			LaraItem->Location.RoomNumber = savedItem->room_number();
+			LaraItem->Location.Height = item->Pose.Position.y;
 			LaraItem->Data = &Lara;
 		}
 
@@ -2067,9 +2067,9 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Look.Orientation = ToEulerAngles(s->lara()->control()->look()->orientation());
 	Lara.Control.Look.TurnRate = ToEulerAngles(s->lara()->control()->look()->turn_rate());
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
-	Lara.Control.RunJumpQueued = s->lara()->control()->is_run_jump_queued();
+	Lara.Control.IsRunJumpQueued = s->lara()->control()->is_run_jump_queued();
 	Lara.Control.TurnRate = s->lara()->control()->turn_rate();
-	Lara.Control.Locked = s->lara()->control()->is_locked();
+	Lara.Control.IsLocked = s->lara()->control()->is_locked();
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
 	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();
 	Lara.Control.Weapon.HasFired = s->lara()->control()->weapon()->has_fired();

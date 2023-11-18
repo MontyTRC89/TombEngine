@@ -7,6 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
@@ -19,6 +20,7 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Input;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // COLLISION TEST FUNCTIONS
@@ -86,8 +88,10 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (coll->Middle.Floor <= CLICK(1))
 			{
-				if (TestLaraSlide(item, coll))
+				if (CanSlide(*item, *coll))
+				{
 					SetLaraSlideAnimation(item, coll);
+				}
 				else
 				{
 					SetAnimation(item, LA_LAND);
@@ -244,9 +248,9 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 	case LS_TURN_RIGHT_FAST:
 	case LS_TURN_LEFT_FAST:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.ActiveState = coll->Setup.PrevState;
 		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
+		item->Animation.ActiveState = coll->Setup.PrevState;
 
 		if (IsHeld(In::Left))
 		{
@@ -294,9 +298,9 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 	case LS_CRAWL_TURN_LEFT:
 	case LS_CRAWL_TURN_RIGHT:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.ActiveState = coll->Setup.PrevState;
 		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
+		item->Animation.ActiveState = coll->Setup.PrevState;
 
 		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
@@ -330,9 +334,9 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 	case LS_MONKEY_TURN_LEFT:
 	case LS_MONKEY_TURN_RIGHT:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.ActiveState = coll->Setup.PrevState;
 		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
+		item->Animation.ActiveState = coll->Setup.PrevState;
 
 		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
@@ -495,7 +499,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 
 	auto prevPose = item->Pose;
 
-	if (item->Pose.Orientation.x < -ANGLE(90.0f) ||
+	if (item->Pose.Orientation.x < ANGLE(-90.0f) ||
 		item->Pose.Orientation.x > ANGLE(90.0f))
 	{
 		lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
@@ -507,8 +511,8 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 	}
 
-	int height = LARA_HEIGHT * phd_sin(item->Pose.Orientation.x);
-	height = abs(height);
+	int height = abs(LARA_HEIGHT * phd_sin(item->Pose.Orientation.x));
+	auto offset = Vector3i(0, height / 2, 0);
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 	if (height < ((level->GetLaraType() == LaraType::Divesuit) << 6) + 200)
@@ -517,20 +521,19 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -CLICK(0.25f);
 	coll->Setup.Height = height;
 
-	GetCollisionInfo(coll, item, Vector3i(0, height / 2, 0));
+	GetCollisionInfo(coll, item, offset);
 
-	auto c1 = *coll;
-	c1.Setup.ForwardAngle += ANGLE(45.0f);
-	GetCollisionInfo(&c1, item, Vector3i(0, height / 2, 0));
+	auto coll0 = *coll;
+	coll0.Setup.ForwardAngle += ANGLE(45.0f);
+	GetCollisionInfo(&coll0, item, offset);
 
-	auto c2 = *coll;
-	c2.Setup.ForwardAngle -= ANGLE(45.0f);
-	GetCollisionInfo(&c2, item, Vector3i(0, height / 2, 0));
+	auto coll1 = *coll;
+	coll1.Setup.ForwardAngle -= ANGLE(45.0f);
+	GetCollisionInfo(&coll1, item, offset);
 
 	ShiftItem(item, coll);
 
 	int flag = 0;
-
 	switch (coll->CollisionType)
 	{
 	case CT_FRONT:
@@ -539,13 +542,21 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			if (item->Pose.Orientation.x >= -ANGLE(25.0f))
 			{
 				if (item->Pose.Orientation.x > ANGLE(5.0f))
+				{
 					item->Pose.Orientation.x += ANGLE(0.5f);
+				}
 				else if (item->Pose.Orientation.x < -ANGLE(5.0f))
+				{
 					item->Pose.Orientation.x -= ANGLE(0.5f);
+				}
 				else if (item->Pose.Orientation.x > 0)
+				{
 					item->Pose.Orientation.x += 45;
+				}
 				else if (item->Pose.Orientation.x < 0)
+				{
 					item->Pose.Orientation.x -= 45;
+				}
 				else
 				{
 					item->Animation.Velocity.y = 0;
@@ -564,14 +575,22 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			flag = 1;
 		}
 
-		if (c1.CollisionType == CT_LEFT)
+		if (coll0.CollisionType == CT_LEFT)
+		{
 			item->Pose.Orientation.y += ANGLE(2.0f);
-		else if (c1.CollisionType == CT_RIGHT)
+		}
+		else if (coll0.CollisionType == CT_RIGHT)
+		{
 			item->Pose.Orientation.y -= ANGLE(2.0f);
-		else if (c2.CollisionType == CT_LEFT)
+		}
+		else if (coll1.CollisionType == CT_LEFT)
+		{
 			item->Pose.Orientation.y += ANGLE(2.0f);
-		else if (c2.CollisionType == CT_RIGHT)
+		}
+		else if (coll1.CollisionType == CT_RIGHT)
+		{
 			item->Pose.Orientation.y -= ANGLE(2.0f);
+		}
 
 		break;
 
@@ -623,7 +642,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			return;
 	}
 
-	if (lara->Control.WaterStatus != WaterStatus::FlyCheat && lara->ExtraAnim == NO_ITEM)
+	if (lara->ExtraAnim == NO_ITEM)
 		TestLaraWaterDepth(item, coll);
 }
 

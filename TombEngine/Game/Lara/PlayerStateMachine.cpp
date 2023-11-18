@@ -38,8 +38,8 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_JUMP_FORWARD] = std::pair(lara_as_jump_forward, lara_col_jump_forward);
 		PlayerBehaviorStateRoutines[LS_POSE] = std::pair(lara_as_pose, lara_col_idle);
 		PlayerBehaviorStateRoutines[LS_RUN_BACK] = std::pair(lara_as_run_back, lara_col_run_back);
-		PlayerBehaviorStateRoutines[LS_TURN_RIGHT_SLOW] = std::pair(lara_as_turn_right_slow, lara_col_turn_right_slow);
-		PlayerBehaviorStateRoutines[LS_TURN_LEFT_SLOW] = std::pair(lara_as_turn_left_slow, lara_col_turn_left_slow);
+		PlayerBehaviorStateRoutines[LS_TURN_RIGHT_SLOW] = std::pair(lara_as_turn_slow, lara_col_turn_slow);
+		PlayerBehaviorStateRoutines[LS_TURN_LEFT_SLOW] = std::pair(lara_as_turn_slow, lara_col_turn_slow);
 		PlayerBehaviorStateRoutines[LS_DEATH] = std::pair(lara_as_death, lara_col_death);
 		PlayerBehaviorStateRoutines[LS_FREEFALL] = std::pair(lara_as_freefall, lara_col_freefall);
 		PlayerBehaviorStateRoutines[LS_HANG] = std::pair(lara_as_hang, lara_col_hang);
@@ -52,7 +52,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_UNDERWATER_SWIM_FORWARD] = std::pair(lara_as_underwater_swim_forward, lara_col_underwater_swim_forward);
 		PlayerBehaviorStateRoutines[LS_UNDERWATER_INERTIA] = std::pair(lara_as_underwater_inertia, lara_col_underwater_inertia);
 		PlayerBehaviorStateRoutines[LS_GRABBING] = std::pair(lara_as_controlled_no_look, lara_default_col);
-		PlayerBehaviorStateRoutines[LS_TURN_RIGHT_FAST] = std::pair(lara_as_turn_right_fast, lara_col_turn_right_fast);
+		PlayerBehaviorStateRoutines[LS_TURN_RIGHT_FAST] = std::pair(lara_as_turn_fast, lara_col_turn_fast);
 		PlayerBehaviorStateRoutines[LS_STEP_RIGHT] = std::pair(lara_as_step_right, lara_col_step_right);
 		PlayerBehaviorStateRoutines[LS_STEP_LEFT] = std::pair(lara_as_step_left, lara_col_step_left);
 		PlayerBehaviorStateRoutines[LS_ROLL_180_BACKWARD] = std::pair(lara_as_roll_180_back, lara_col_roll_180_back);
@@ -150,7 +150,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_ROPE_UNKNOWN] = std::pair(lara_as_rope_idle, lara_col_rope_swing);
 		PlayerBehaviorStateRoutines[LS_CORRECT_POSITION] = std::pair(lara_void_func, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_DOUBLEDOOR_PUSH] = std::pair(lara_as_controlled, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_DOZY] = std::pair(lara_as_swimcheat, lara_col_underwater_swim_forward);
+		PlayerBehaviorStateRoutines[LS_FLY_CHEAT] = std::pair(lara_as_fly_cheat, lara_col_fly_cheat);
 		PlayerBehaviorStateRoutines[LS_TIGHTROPE_IDLE] = std::pair(lara_as_tightrope_idle, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_TIGHTROPE_TURN_180] = std::pair(lara_as_controlled_no_look, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_TIGHTROPE_WALK] = std::pair(lara_as_tightrope_walk, lara_default_col);
@@ -184,7 +184,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_SLOPE_CLIMB_FALL] = std::pair(lara_as_slopefall, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_LADDER_DISMOUNT_LEFT] = std::pair(lara_as_climb_stepoff_left, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_LADDER_DISMOUNT_RIGHT] = std::pair(lara_as_climb_stepoff_right, lara_default_col);
-		PlayerBehaviorStateRoutines[LS_TURN_LEFT_FAST] = std::pair(lara_as_turn_left_fast, lara_col_turn_left_fast);
+		PlayerBehaviorStateRoutines[LS_TURN_LEFT_FAST] = std::pair(lara_as_turn_fast, lara_col_turn_fast);
 		PlayerBehaviorStateRoutines[LS_CRAWL_EXIT_STEP_DOWN] = std::pair(lara_as_controlled, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_CRAWL_EXIT_JUMP] = std::pair(lara_as_controlled, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_CRAWL_EXIT_FLIP] = std::pair(lara_as_controlled, lara_default_col);
@@ -225,7 +225,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[188] = std::pair(lara_as_null, lara_void_func);
 
 		PlayerBehaviorStateRoutines[LS_REMOVE_PUZZLE] = std::pair(lara_as_use_puzzle, lara_default_col);
-		PlayerBehaviorStateRoutines[LS_PUSHABLE_EDGE_SLIP] = std::pair(lara_as_null, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_PUSHABLE_EDGE_SLIP] = std::pair(lara_as_pushable_edge_slip, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_SPRINT_SLIDE] = std::pair(lara_as_sprint_slide, lara_col_sprint_slide);
 	}
 
