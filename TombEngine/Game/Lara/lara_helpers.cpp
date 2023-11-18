@@ -43,7 +43,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Player;
+using namespace TEN::Entities::Player;
 using namespace TEN::Renderer;
 
 // -----------------------------

@@ -17,7 +17,7 @@
 
 using namespace TEN::Input;
 using namespace TEN::Entities::Generic;
-using namespace TEN::Player;
+using namespace TEN::Entities::Player;
 
 // -----------------------------------
 // MISCELLANEOUS INTERACTABLE OBJECT

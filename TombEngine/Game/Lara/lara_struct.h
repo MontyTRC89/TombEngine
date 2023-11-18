@@ -10,7 +10,7 @@ struct FX_INFO;
 struct ItemInfo;
 namespace TEN::Renderer { struct RendererMesh; };
 
-using namespace TEN::Player;
+using namespace TEN::Entities::Player;
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;

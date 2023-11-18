@@ -18,7 +18,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
-using namespace TEN::Player;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // MONKEY SWING

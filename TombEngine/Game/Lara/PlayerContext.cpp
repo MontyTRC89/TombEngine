@@ -16,7 +16,7 @@
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 
-namespace TEN::Player
+namespace TEN::Entities::Player
 {
 	PlayerContext::PlayerContext(const ItemInfo& item, const CollisionInfo& coll)
 	{

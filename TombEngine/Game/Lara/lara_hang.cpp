@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Input;
-using namespace TEN::Player;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // LEDGE HANG

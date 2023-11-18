@@ -8,7 +8,7 @@ struct LaraInfo;
 
 using namespace TEN::Math;
 
-namespace TEN::Player
+namespace TEN::Entities::Player
 {
 	class PlayerContext
 	{
