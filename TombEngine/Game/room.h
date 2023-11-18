@@ -1,10 +1,13 @@
 #pragma once
-#include "framework.h"
-#include "Game/collision/floordata.h"
 #include "Math/Math.h"
-#include "Specific/newtypes.h"
 
+using namespace TEN::Math;
+
+enum GAME_OBJECT_ID : short;
 enum class ReverbType;
+class FloorInfo;
+class GameBoundingBox;
+struct BUCKET;
 struct TriggerVolume;
 
 constexpr auto MAX_FLIPMAP	= 256;
@@ -143,16 +146,15 @@ struct ROOM_INFO
 	bool Active() const;
 };
 
-void DoFlipMap(short group);
+void DoFlipMap(int group);
 void AddRoomFlipItems(ROOM_INFO* room);
 void RemoveRoomFlipItems(ROOM_INFO* room);
-bool IsObjectInRoom(short roomNumber, short objectNumber);
-bool IsPointInRoom(Vector3i pos, int roomNumber);
-int FindRoomNumber(Vector3i pos, int startRoom = NO_ROOM);
+bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID);
+bool IsPointInRoom(const Vector3i& pos, int roomNumber);
+int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_ROOM);
 Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
-std::set<int> GetRoomList(int roomNumber);
 void InitializeNeighborRoomList();
 
-GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool visibility);
+GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox);
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z);

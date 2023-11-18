@@ -150,7 +150,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_ROPE_UNKNOWN] = std::pair(lara_as_rope_idle, lara_col_rope_swing);
 		PlayerBehaviorStateRoutines[LS_CORRECT_POSITION] = std::pair(lara_void_func, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_DOUBLEDOOR_PUSH] = std::pair(lara_as_controlled, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_DOZY] = std::pair(lara_as_swimcheat, lara_col_underwater_swim_forward);
+		PlayerBehaviorStateRoutines[LS_FLY_CHEAT] = std::pair(lara_as_fly_cheat, lara_col_fly_cheat);
 		PlayerBehaviorStateRoutines[LS_TIGHTROPE_IDLE] = std::pair(lara_as_tightrope_idle, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_TIGHTROPE_TURN_180] = std::pair(lara_as_controlled_no_look, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_TIGHTROPE_WALK] = std::pair(lara_as_tightrope_walk, lara_default_col);
