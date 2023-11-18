@@ -263,7 +263,7 @@ namespace TEN::Entities::Creatures::TR1
 			pos.Position.y -= CLICK(3);
 			TriggerExplosionSparks(pos.Position.x, pos.Position.y, pos.Position.z, 3, -2, 0, item->RoomNumber);
 			TriggerExplosionSparks(pos.Position.x, pos.Position.y, pos.Position.z, 3, -1, 0, item->RoomNumber);
-			TriggerShockwave(&pos, 48, 304, (GetRandomControl() & 0x1F) + 112, 128, 32, 32, 32, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&pos, 48, 304, (GetRandomControl() & 0x1F) + 112, 128, 32, 32, 32, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 			
 			SoundEffect(SFX_TR1_ATLANTEAN_EXPLODE, &item->Pose);
 			return;
