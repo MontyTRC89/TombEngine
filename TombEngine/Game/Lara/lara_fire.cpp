@@ -797,7 +797,6 @@ void HandleWeapon(ItemInfo& laraItem)
 				if (Contains(UnavailableFlarePoseAnims, laraItem.Animation.AnimNumber))
 				{
 					player.Flare.ControlLeft = false;
-					break;
 				}
 
 				DoFlareInHand(laraItem, player.Flare.Life);
