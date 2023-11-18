@@ -19,12 +19,14 @@
 #include "Renderer/Renderer.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Entities::Player;
 using namespace TEN::Renderer;
+using namespace TEN::Utils;
 
 // -----------------------------
 // TEST FUNCTIONS
@@ -1117,13 +1119,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList)
 {
-	for (const auto& weaponType : weaponTypeList)
-	{
-		if (weaponType == refWeaponType)
-			return true;
-	}
-
-	return false;
+	return Contains(weaponTypeList, refWeaponType);
 }
 
 static std::vector<LaraWeaponType> StandingWeaponTypes
