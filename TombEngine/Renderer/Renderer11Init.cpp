@@ -117,8 +117,9 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 
 	// Preallocate lists
 	m_dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
-	m_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
-	m_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
+	_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
+	_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
+	_triangles3DToDraw = createVector<RendererTriangle3D>(TRIANGLE_3D_COUNT_MAX);
 	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);
 	m_transparentFacesVertices = createVector<RendererVertex>(MAX_TRANSPARENT_VERTICES);
 	m_transparentFacesIndices.reserve(MAX_TRANSPARENT_VERTICES); // = createVector<int>(MAX_TRANSPARENT_VERTICES);

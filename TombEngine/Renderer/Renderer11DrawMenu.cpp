@@ -577,7 +577,7 @@ namespace TEN::Renderer
 			break;
 		}
 
-		DrawLinesIn2DSpace();
+		DrawLines2D();
 		DrawAllStrings();
 	}
 
