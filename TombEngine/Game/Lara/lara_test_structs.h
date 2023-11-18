@@ -29,7 +29,6 @@ struct VaultTestSetup
 
 struct VaultTestResult
 {
-	bool Success;
 	int Height;
 	bool SetBusyHands;
 	bool SnapToLedge;

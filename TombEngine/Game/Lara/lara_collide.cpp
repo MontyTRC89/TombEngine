@@ -7,6 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
@@ -19,6 +20,7 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Input;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // COLLISION TEST FUNCTIONS
@@ -86,8 +88,10 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (coll->Middle.Floor <= CLICK(1))
 			{
-				if (TestLaraSlide(item, coll))
+				if (CanSlide(*item, *coll))
+				{
 					SetLaraSlideAnimation(item, coll);
+				}
 				else
 				{
 					SetAnimation(item, LA_LAND);
@@ -244,9 +248,9 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 	case LS_TURN_RIGHT_FAST:
 	case LS_TURN_LEFT_FAST:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.ActiveState = coll->Setup.PrevState;
 		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
+		item->Animation.ActiveState = coll->Setup.PrevState;
 
 		if (IsHeld(In::Left))
 		{
@@ -294,9 +298,9 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 	case LS_CRAWL_TURN_LEFT:
 	case LS_CRAWL_TURN_RIGHT:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.ActiveState = coll->Setup.PrevState;
 		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
+		item->Animation.ActiveState = coll->Setup.PrevState;
 
 		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
@@ -330,9 +334,9 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 	case LS_MONKEY_TURN_LEFT:
 	case LS_MONKEY_TURN_RIGHT:
 		item->Animation.AnimObjectID = coll->Setup.PrevAnimObjectID;
-		item->Animation.ActiveState = coll->Setup.PrevState;
 		item->Animation.AnimNumber = coll->Setup.PrevAnimNumber;
 		item->Animation.FrameNumber = coll->Setup.PrevFrameNumber;
+		item->Animation.ActiveState = coll->Setup.PrevState;
 
 		if (IsHeld(In::Left))
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;

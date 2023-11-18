@@ -5,6 +5,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
@@ -13,6 +14,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Input;
+using namespace TEN::Entities::Player;
 
 // -----------------------------
 // LEDGE HANG
@@ -128,7 +130,7 @@ void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		// TODO: Allow direction locking just like with standing jumps. Needs new ledge jump prepare state? -- Sezz 24.10.2022
-		if (IsHeld(In::Jump) && TestLaraLedgeJump(item, coll))
+		if (IsHeld(In::Jump) && CanPerformLedgeJump(*item, *coll))
 		{
 			if (IsHeld(In::Back))
 				item->Animation.TargetState = LS_JUMP_FORWARD;
