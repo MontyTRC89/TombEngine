@@ -1373,7 +1373,7 @@ void UpdateShockwaves()
 		{
 			auto lightColor = Color(shockwave.r / (float)UCHAR_MAX, shockwave.g / (float)UCHAR_MAX, shockwave.b / (float)UCHAR_MAX);
 			auto pos = Vector3(shockwave.x, shockwave.y, shockwave.z);
-			SpawnDynamicLight(pos, lightColor, shockwave.life / (float)UCHAR_MAX);
+			TriggerDynamicLight(pos, lightColor, shockwave.life / (float)UCHAR_MAX);
 		}
 
 		if (shockwave.style != (int)ShockwaveStyle::Knockback)
