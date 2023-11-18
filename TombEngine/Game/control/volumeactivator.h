@@ -32,7 +32,7 @@ namespace TEN::Control::Volumes
 		End,
 		BeforeLoad,
 		ExitToTitle,
-		LaraDeath,
+		PlayerDeath,
 
 		Count
 	};
