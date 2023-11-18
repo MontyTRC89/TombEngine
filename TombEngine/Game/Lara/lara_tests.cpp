@@ -1115,7 +1115,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool TestLaraWeaponType(LaraWeaponType refWeaponType, const vector<LaraWeaponType>& weaponTypeList)
+bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList)
 {
 	for (const auto& weaponType : weaponTypeList)
 	{
@@ -1145,7 +1145,7 @@ bool IsStandingWeapon(const ItemInfo* item, LaraWeaponType weaponType)
 
 bool IsVaultState(int state)
 {
-	static const vector<int> vaultStates
+	static const std::vector<int> vaultStates
 	{
 		LS_VAULT,
 		LS_VAULT_2_STEPS,
@@ -1160,7 +1160,7 @@ bool IsVaultState(int state)
 
 bool IsJumpState(int state)
 {
-	static const vector<int> jumpStates
+	static const std::vector<int> jumpStates
 	{
 		LS_JUMP_FORWARD,
 		LS_JUMP_BACK,
@@ -1178,7 +1178,7 @@ bool IsJumpState(int state)
 
 bool IsRunJumpQueueableState(int state)
 {
-	static const auto RUN_JUMP_QUEUABLE_STATES = vector<int>
+	static const auto RUN_JUMP_QUEUABLE_STATES = std::vector<int>
 	{
 		LS_RUN_FORWARD,
 		LS_SPRINT,
@@ -1191,7 +1191,7 @@ bool IsRunJumpQueueableState(int state)
 
 bool IsRunJumpCountableState(int state)
 {
-	static const vector<int> runningJumpTimerStates
+	static const std::vector<int> runningJumpTimerStates
 	{
 		LS_WALK_FORWARD,
 		LS_RUN_FORWARD,
