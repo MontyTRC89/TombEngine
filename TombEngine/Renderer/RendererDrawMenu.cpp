@@ -1102,9 +1102,14 @@ namespace TEN::Renderer
 	{
 		if (CurrentLevel != 0)
 		{
-			_currentY = 60;
+			_currentY = 20;
 
 			ROOM_INFO* r = &g_Level.Rooms[LaraItem->RoomNumber];
+
+			float aspectRatio = _screenWidth / (float)_screenHeight;
+			int thumbWidth = _screenWidth / 6;
+			RECT rect;
+			int thumbY = 0;
 
 			switch (_debugPage)
 			{
@@ -1120,24 +1125,66 @@ namespace TEN::Renderer
 				PrintDebugMessage("Frame time: %d", _timeFrame);
 				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
 				PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
-				PrintDebugMessage("Draw calls: %d", _numDrawCalls);
+				PrintDebugMessage("TOTAL Draw calls: %d", _numDrawCalls);
 				PrintDebugMessage("    Rooms: %d", _numRoomsDrawCalls);
 				PrintDebugMessage("    Movables: %d", _numMoveablesDrawCalls);
 				PrintDebugMessage("    Statics: %d", _numStaticsDrawCalls);
+				PrintDebugMessage("    Instanced Statics: %d", _numInstancedStaticsDrawCalls);
 				PrintDebugMessage("    Sprites: %d", _numSpritesDrawCalls);
-				PrintDebugMessage("Triangles: %d", _numPolygons);
+				PrintDebugMessage("    Instanced Sprites: %d", _numInstancedSpritesDrawCalls);
+				PrintDebugMessage("TOTAL Triangles: %d", _numTriangles);
 				PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
-				PrintDebugMessage("Transparent face draw calls: %d", _numTransparentDrawCalls);
-				PrintDebugMessage("    Rooms: %d", _numRoomsTransparentDrawCalls);
-				PrintDebugMessage("    Movables: %d", _numMoveablesTransparentDrawCalls);
-				PrintDebugMessage("    Statics: %d", _numStaticsTransparentDrawCalls);
-				PrintDebugMessage("    Sprites: %d", _numSpritesTransparentDrawCalls);
-				PrintDebugMessage("Biggest room's index buffer: %d", _biggestRoomIndexBuffer);
-				PrintDebugMessage("Transparent room polys: %d", _numRoomsTransparentPolygons);
+				PrintDebugMessage("SORTED Draw calls: %d", (_numSortedRoomsDrawCalls + _numSortedMoveablesDrawCalls + _numSortedStaticsDrawCalls
+					+ _numSortedSpritesDrawCalls));
+				PrintDebugMessage("    Rooms: %d", _numSortedRoomsDrawCalls);
+				PrintDebugMessage("    Movables: %d", _numSortedMoveablesDrawCalls);
+				PrintDebugMessage("    Statics: %d", _numSortedStaticsDrawCalls);
+				PrintDebugMessage("    Sprites: %d", _numSortedSpritesDrawCalls);
+				PrintDebugMessage("SHADOW MAPS Draw calls: %d", _numShadowMapDrawCalls);
+				PrintDebugMessage("DEBRIS Draw calls: %d", _numDebrisDrawCalls);
 				PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
 				PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
 				PrintDebugMessage("    Dot products: %d", _numDotProducts);
+
+				_spriteBatch->Begin();
+
+				rect.left = _screenWidth - thumbWidth;
+				rect.top = thumbY;
+				rect.right = rect.left+ thumbWidth;
+				rect.bottom = rect.top+thumbWidth / aspectRatio;
+
+				_spriteBatch->Draw(_normalMapRenderTarget.ShaderResourceView.Get(), rect);
+				thumbY += thumbWidth / aspectRatio;
+
+				rect.left = _screenWidth - thumbWidth;
+				rect.top = thumbY;
+				rect.right = rect.left + thumbWidth;
+				rect.bottom = rect.top + thumbWidth / aspectRatio;
+
+				_spriteBatch->Draw(_depthRenderTarget.ShaderResourceView.Get(), rect);
+				thumbY += thumbWidth / aspectRatio;
+
+				if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
+				{
+					rect.left = _screenWidth - thumbWidth;
+					rect.top = thumbY;
+					rect.right = rect.left + thumbWidth;
+					rect.bottom = rect.top + thumbWidth / aspectRatio;
+
+					_spriteBatch->Draw(_SMAAEdgesRenderTarget.ShaderResourceView.Get(), rect);
+					thumbY += thumbWidth / aspectRatio;
+
+					rect.left = _screenWidth - thumbWidth;
+					rect.top = thumbY;
+					rect.right = rect.left + thumbWidth;
+					rect.bottom = rect.top + thumbWidth / aspectRatio;
+
+					_spriteBatch->Draw(_SMAABlendRenderTarget.ShaderResourceView.Get(), rect);
+					thumbY += thumbWidth / aspectRatio;
+				}
+
+				_spriteBatch->End();
 
 				break;
 

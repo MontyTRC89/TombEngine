@@ -267,22 +267,32 @@ namespace TEN::Renderer
 
 		// Debug variables
 		int _numDrawCalls = 0;
+
 		int _numRoomsDrawCalls = 0;
+		int _numSortedRoomsDrawCalls = 0;
 		int _numMoveablesDrawCalls = 0;
+		int _numSortedMoveablesDrawCalls = 0;
 		int _numStaticsDrawCalls = 0;
+		int _numInstancedStaticsDrawCalls = 0;
+		int _numSortedStaticsDrawCalls = 0;
 		int _numSpritesDrawCalls = 0;
-		int _numTransparentDrawCalls = 0;
-		int _numRoomsTransparentDrawCalls = 0;
-		int _numMoveablesTransparentDrawCalls = 0;
-		int _numStaticsTransparentDrawCalls = 0;
-		int _numSpritesTransparentDrawCalls = 0;
-		int _biggestRoomIndexBuffer = 0;
-		int _numRoomsTransparentPolygons;
-		int _numPolygons = 0;
-		int _currentY;
+		int _numInstancedSpritesDrawCalls = 0;
+		int _numSortedSpritesDrawCalls = 0;
+
+		int _numLinesDrawCalls = 0;
+
+		int _numTriangles = 0;
+		int _numSortedTriangles = 0;
+
+		int _numShadowMapDrawCalls = 0;
+		int _numDebrisDrawCalls = 0;
+		int _numEffectsDrawCalls = 0;
+
 		int _numDotProducts = 0;
 		int _numCheckPortalCalls = 0;
 		int _numGetVisibleRoomsCalls = 0;
+
+		int _currentY;
 
 		RendererDebugPage _debugPage = RendererDebugPage::None;
 
@@ -351,7 +361,6 @@ namespace TEN::Renderer
 		void BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType);
 		void BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
-		void BuildGBuffer(RenderView& view);
 		void BuildHierarchy(RendererObject* obj);
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void UpdateAnimation(RendererItem* item, RendererObject& obj, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation = false);
@@ -384,7 +393,6 @@ namespace TEN::Renderer
 		void DrawItems(RenderView& view, RendererPass rendererPass);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
-		void DrawTransparentFaces(RenderView& renderView);
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, RendererPass rendererPass);
 		void DrawLara(RenderView& view, RendererPass rendererPass);
@@ -492,28 +500,28 @@ namespace TEN::Renderer
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{
 			_context->DrawIndexed(count, baseIndex, baseVertex);
-			_numPolygons += count / 3;
+			_numTriangles += count / 3;
 			_numDrawCalls++;
 		}
 
 		inline void DrawIndexedInstancedTriangles(int count, int instances, int baseIndex, int baseVertex)
 		{
 			_context->DrawIndexedInstanced(count, instances, baseIndex, baseVertex, 0);
-			_numPolygons += count / 3 * instances;
+			_numTriangles += (count / 3 * instances) * (count % 4 == 0 ? 2 : 1);
 			_numDrawCalls++;
 		}
 
 		inline void DrawInstancedTriangles(int count, int instances, int baseVertex)
 		{
 			_context->DrawInstanced(count, instances, baseVertex, 0);
-			_numPolygons += count / 3 * instances;
+			_numTriangles += (count / 3 * instances) * (count % 4 == 0 ? 2 : 1);
 			_numDrawCalls++;
 		}
 
 		inline void DrawTriangles(int count, int baseVertex)
 		{
 			_context->Draw(count, baseVertex);
-			_numPolygons += count / 3;
+			_numTriangles += count / 3;
 			_numDrawCalls++;
 		}
 

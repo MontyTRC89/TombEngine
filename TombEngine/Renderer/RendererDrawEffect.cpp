@@ -918,6 +918,8 @@ namespace TEN::Renderer
 					_cbStatic.updateData(_stStatic, _context.Get());
 
 					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+
+					_numMoveablesDrawCalls++;
 				}
 
 				if (Lara.RightArm.GunFlash)
@@ -930,6 +932,8 @@ namespace TEN::Renderer
 					_cbStatic.updateData(_stStatic, _context.Get());
 
 					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+
+					_numMoveablesDrawCalls++;
 				}
 			}
 		}
@@ -1002,7 +1006,10 @@ namespace TEN::Renderer
 
 						_stStatic.World = worldMatrix;
 						_cbStatic.updateData(_stStatic, _context.Get());
+
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+
+						_numMoveablesDrawCalls++;
 					}
 				}
 
@@ -1039,7 +1046,10 @@ namespace TEN::Renderer
 
 						_stStatic.World = worldMatrix;
 						_cbStatic.updateData(_stStatic, _context.Get());
+
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+
+						_numMoveablesDrawCalls++;
 					}
 				}
 			}
@@ -1141,7 +1151,9 @@ namespace TEN::Renderer
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0); 
+				
+				_numEffectsDrawCalls++;
 			}
 		}
 	}
@@ -1200,8 +1212,6 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					_primitiveBatch->Begin();
-
 					if (deb.isStatic)
 					{
 						BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[deb.mesh.tex]), SamplerStateRegister::LinearClamp);
@@ -1236,9 +1246,13 @@ namespace TEN::Renderer
 					vtx2.Normal = deb.mesh.Normals[2];
 					vtx2.Color = deb.mesh.Colors[2];
 
+					_primitiveBatch->Begin();
 					_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
-					_numDrawCalls++;
 					_primitiveBatch->End();
+
+					_numDebrisDrawCalls++;
+					_numDrawCalls++;
+					_numTriangles++;
 				}
 			}
 		}

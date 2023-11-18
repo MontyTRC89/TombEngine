@@ -10,20 +10,32 @@ namespace TEN::Renderer
 		_timeFrame = 0;
 		_timeRoomsCollector = 0;
 		_numDrawCalls = 0;
+
 		_numRoomsDrawCalls = 0;
+		_numSortedRoomsDrawCalls = 0;
 		_numMoveablesDrawCalls = 0;
+		_numSortedMoveablesDrawCalls = 0;
 		_numStaticsDrawCalls = 0;
+		_numInstancedStaticsDrawCalls = 0;
+		_numSortedStaticsDrawCalls = 0;
 		_numSpritesDrawCalls = 0;
-		_numTransparentDrawCalls = 0;
-		_numRoomsTransparentDrawCalls = 0;
-		_numMoveablesTransparentDrawCalls = 0;
-		_numStaticsTransparentDrawCalls = 0;
-		_numSpritesTransparentDrawCalls = 0;
-		_biggestRoomIndexBuffer = 0;
-		_numPolygons = 0;
+		_numInstancedSpritesDrawCalls = 0;
+		_numSortedSpritesDrawCalls = 0;
+
+		_numLinesDrawCalls = 0;
+
+		_numTriangles = 0;
+		_numSortedTriangles = 0;
+
+		_numShadowMapDrawCalls = 0;
+		_numDebrisDrawCalls = 0;
+		_numEffectsDrawCalls = 0;
+
+		_numDotProducts = 0;
 		_numCheckPortalCalls = 0;
 		_numGetVisibleRoomsCalls = 0;
-		_numDotProducts = 0;
+
+		_currentY;
 	}
 
 	bool Renderer::PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)

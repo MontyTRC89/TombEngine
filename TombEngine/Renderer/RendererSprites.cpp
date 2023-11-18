@@ -3,12 +3,12 @@
 #include "Renderer/Structures/RendererSpriteBucket.h"
 #include "Renderer/Renderer.h"
 
-namespace TEN::Renderer 
+namespace TEN::Renderer
 {
 	using namespace TEN::Renderer::Structures;
 
 	void Renderer::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
-										Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
+		Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (_isLocked)
 			return;
@@ -40,9 +40,9 @@ namespace TEN::Renderer
 		view.SpritesToDraw.push_back(spr);
 	}
 
-	void Renderer::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4 &color, float orient2D,
-												   float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
-												   bool softParticles, RenderView& view, SpriteRenderType renderType)
+	void Renderer::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
+		float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
+		bool softParticles, RenderView& view, SpriteRenderType renderType)
 	{
 		if (_isLocked)
 			return;
@@ -76,8 +76,8 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
-														 float scale, Vector2 size, BlendMode blendMode, const Vector3& lookAtAxis,
-														 bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
+		float scale, Vector2 size, BlendMode blendMode, const Vector3& lookAtAxis,
+		bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (_isLocked)
 			return;
@@ -111,15 +111,15 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
-							 const Vector4 color, float orient2D, float scale, Vector2 size, BlendMode blendMode, bool softParticles,
-							 RenderView& view)
+		const Vector4 color, float orient2D, float scale, Vector2 size, BlendMode blendMode, bool softParticles,
+		RenderView& view)
 	{
 		AddQuad(sprite, vertex0, vertex1, vertex2, vertex3, color, color, color, color, orient2D, scale, size, blendMode, softParticles, view, SpriteRenderType::Default);
 	}
 
 	void Renderer::AddQuad(RendererSprite* sprite, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
-							 const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
-							 float scale, Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
+		const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
+		float scale, Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (_isLocked)
 			return;
@@ -155,14 +155,14 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
-									const Vector4& color, BlendMode blendMode, RenderView& view)
+		const Vector4& color, BlendMode blendMode, RenderView& view)
 	{
 		AddColoredQuad(vertex0, vertex1, vertex2, vertex3, color, color, color, color, blendMode, view, SpriteRenderType::Default);
 	}
 
 	void Renderer::AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
-									const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
-									BlendMode blendMode, RenderView& view, SpriteRenderType renderType)
+		const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
+		BlendMode blendMode, RenderView& view, SpriteRenderType renderType)
 	{
 		if (_isLocked)
 			return;
@@ -248,7 +248,7 @@ namespace TEN::Renderer
 			}
 
 			if (rDrawSprite.BlendMode != BlendMode::Opaque &&
-				rDrawSprite.BlendMode != BlendMode::Additive && 
+				rDrawSprite.BlendMode != BlendMode::Additive &&
 				rDrawSprite.BlendMode != BlendMode::AlphaTest)
 			{
 				int distance = (rDrawSprite.pos - Camera.pos.ToVector3()).Length();
@@ -341,7 +341,7 @@ namespace TEN::Renderer
 			// Draw sprites with instancing.
 			DrawInstancedTriangles(4, (unsigned int)spriteBucket.SpritesToDraw.size(), 0);
 
-			_numSpritesDrawCalls++;
+			_numInstancedSpritesDrawCalls++;
 		}
 
 		// Draw 3D non instanced sprites
@@ -406,12 +406,13 @@ namespace TEN::Renderer
 
 				_primitiveBatch->DrawTriangle(vertex0, vertex1, vertex3);
 				_primitiveBatch->DrawTriangle(vertex1, vertex2, vertex3);
+
+				_numTriangles += 2;
+				_numSpritesDrawCalls += 2;
+				_numDrawCalls += 2;
 			}
 
 			_primitiveBatch->End();
-
-			_numSpritesDrawCalls++;
-			_numDrawCalls++;
 		}
 
 		// Set up vertex parameters.
@@ -461,7 +462,8 @@ namespace TEN::Renderer
 			// Draw sprites with instancing.
 			DrawInstancedTriangles(4, 1, 0);
 
-			_numSpritesDrawCalls++;
+			_numSortedSpritesDrawCalls++;
+			_numSortedTriangles += 2;
 		}
 		else
 		{
@@ -483,35 +485,35 @@ namespace TEN::Renderer
 
 			BindTexture(TextureRegister::ColorMap, object->Sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
 
+			auto vertex0 = Vertex{};
+			vertex0.Position = object->Sprite->vtx1;
+			vertex0.UV = object->Sprite->Sprite->UV[0];
+			vertex0.Color = object->Sprite->c1;
+
+			auto vertex1 = Vertex{};
+			vertex1.Position = object->Sprite->vtx2;
+			vertex1.UV = object->Sprite->Sprite->UV[1];
+			vertex1.Color = object->Sprite->c2;
+
+			auto vertex2 = Vertex{};
+			vertex2.Position = object->Sprite->vtx3;
+			vertex2.UV = object->Sprite->Sprite->UV[2];
+			vertex2.Color = object->Sprite->c3;
+
+			auto vertex3 = Vertex{};
+			vertex3.Position = object->Sprite->vtx4;
+			vertex3.UV = object->Sprite->Sprite->UV[3];
+			vertex3.Color = object->Sprite->c4;
+
 			_primitiveBatch->Begin();
-
-				auto vertex0 = Vertex{};
-				vertex0.Position = object->Sprite->vtx1;
-				vertex0.UV = object->Sprite->Sprite->UV[0];
-				vertex0.Color = object->Sprite->c1;
-
-				auto vertex1 = Vertex{};
-				vertex1.Position = object->Sprite->vtx2;
-				vertex1.UV = object->Sprite->Sprite->UV[1];
-				vertex1.Color = object->Sprite->c2;
-
-				auto vertex2 = Vertex{};
-				vertex2.Position = object->Sprite->vtx3;
-				vertex2.UV = object->Sprite->Sprite->UV[2];
-				vertex2.Color = object->Sprite->c3;
-
-				auto vertex3 = Vertex{};
-				vertex3.Position = object->Sprite->vtx4;
-				vertex3.UV = object->Sprite->Sprite->UV[3];
-				vertex3.Color = object->Sprite->c4;
-
-				_primitiveBatch->DrawTriangle(vertex0, vertex1, vertex3);
-				_primitiveBatch->DrawTriangle(vertex1, vertex2, vertex3);
-
+			_primitiveBatch->DrawTriangle(vertex0, vertex1, vertex3);
+			_primitiveBatch->DrawTriangle(vertex1, vertex2, vertex3);
 			_primitiveBatch->End();
 
-			_numSpritesDrawCalls++;
-			_numDrawCalls++;
+			_numSortedSpritesDrawCalls += 2;
+			_numDrawCalls += 2;
+			_numTriangles += 2;
+			_numSortedTriangles += 2;
 		}
 	}
 }
