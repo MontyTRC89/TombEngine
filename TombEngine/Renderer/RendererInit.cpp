@@ -116,7 +116,7 @@ namespace TEN::Renderer
 		_cbSky = CreateConstantBuffer<CSkyBuffer>();
 		_cbSMAABuffer = CreateConstantBuffer<CSMAABuffer>();
 
-		//Prepare HUD Constant buffer  
+		// Prepare HUD Constant buffer  
 		_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
 		_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 		_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
@@ -127,8 +127,9 @@ namespace TEN::Renderer
 
 		// Preallocate lists
 		_dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
-		_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 		_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
+		_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
+		_triangles3DToDraw = createVector<RendererTriangle3D>(MAX_TRIANGLES_3D);
 
 		for (int i = 0; i < NUM_ITEMS; i++)
 		{

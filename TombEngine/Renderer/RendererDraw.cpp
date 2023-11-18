@@ -369,12 +369,12 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawLinesIn2DSpace()
+	void Renderer::DrawLines2D()
 	{
 		SetBlendMode(BlendMode::Opaque);
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::None);
-
+		
 		_context->VSSetShader(_vsSolid.Get(), nullptr, 0);
 		_context->PSSetShader(_psSolid.Get(), nullptr, 0);
 		auto worldMatrix = Matrix::CreateOrthographicOffCenter(0, _screenWidth, _screenHeight, 0, _viewport.MinDepth, _viewport.MaxDepth);
@@ -385,25 +385,22 @@ namespace TEN::Renderer
 
 		for (const auto& line : _lines2DToDraw)
 		{
-			auto v1 = Vertex();
-			v1.Position.x = line.Origin.x;
-			v1.Position.y = line.Origin.y;
-			v1.Position.z = 1.0f;
-			v1.Color = line.Color;
+			auto vertex0 = Vertex{};
+			vertex0.Position.x = line.Origin.x;
+			vertex0.Position.y = line.Origin.y;
+			vertex0.Position.z = 1.0f;
+			vertex0.Color = line.Color;
 
-			auto v2 = Vertex();
-			v2.Position.x = line.Target.x;
-			v2.Position.y = line.Target.y;
-			v2.Position.z = 1.0f;
-			v2.Color = line.Color;
+			auto vertex1 = Vertex{};
+			vertex1.Position.x = line.Target.x;
+			vertex1.Position.y = line.Target.y;
+			vertex1.Position.z = 1.0f;
+			vertex1.Color = line.Color;
 
-			v1.Position = Vector3::Transform(v1.Position, worldMatrix);
-			v2.Position = Vector3::Transform(v2.Position, worldMatrix);
-
-			v1.Position.z = 0.5f;
-			v2.Position.z = 0.5f;
-
-			_primitiveBatch->DrawLine(v1, v2);
+			vertex0.Position = Vector3::Transform(vertex0.Position, worldMatrix);
+			vertex1.Position = Vector3::Transform(vertex1.Position, worldMatrix);
+			vertex0.Position.z = 0.5f;
+			vertex1.Position.z = 0.5f;
 
 			_numLinesDrawCalls++;
 			_numDrawCalls++;
@@ -796,18 +793,17 @@ namespace TEN::Renderer
 
 		_primitiveBatch->Begin();
 
-		for (int i = 0; i < _lines3DToDraw.size(); i++)
+		for (const auto& line : _lines3DToDraw)
 		{
-			RendererLine3D* line = &_lines3DToDraw[i];
+			auto vertex0 = Vertex{};
+			vertex0.Position = line.Origin;
+			vertex0.Color = line.Color;
 
-			Vertex v1;
-			v1.Position = line->Start;
-			v1.Color = line->Color;
+			auto vertex1 = Vertex{};
+			vertex1.Position = line.Target;
+			vertex1.Color = line.Color;
 
-			Vertex v2;
-			v2.Position = line->End;
-			v2.Color = line->Color;
-			_primitiveBatch->DrawLine(v1, v2);
+			_primitiveBatch->DrawLine(vertex0, vertex1);
 
 			_numLinesDrawCalls++;
 			_numDrawCalls++;
@@ -819,218 +815,445 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::CounterClockwise);
 	}
 
-	void Renderer::AddLine3D(const Vector3& target, const Vector3& origin, const Vector4& color)
+	void Renderer::DrawTriangles3D(RenderView& view)
+	{
+		SetBlendMode(BlendMode::Additive);
+		SetCullMode(CullMode::None);
+
+		_context->VSSetShader(_vsSolid.Get(), nullptr, 0);
+		_context->PSSetShader(_psSolid.Get(), nullptr, 0);
+
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_inputLayout.Get());
+
+		_primitiveBatch->Begin();
+
+		for (const auto& tri : _triangles3DToDraw)
+		{
+			auto rVertices = std::vector<Vertex>{};
+			rVertices.reserve(tri.Vertices.size());
+
+			for (const auto& vertex : tri.Vertices)
+			{
+				auto rVertex = Vertex{};
+				rVertex.Position = vertex;
+				rVertex.Color = tri.Color;
+
+				rVertices.push_back(rVertex);
+			}
+
+			_primitiveBatch->DrawTriangle(rVertices[0], rVertices[1], rVertices[2]);
+
+			_numLinesDrawCalls++;
+			_numDrawCalls++;
+		}
+
+		_primitiveBatch->End();
+
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
+	}
+
+	void Renderer::AddDebugLine(const Vector3& origin, const Vector3& target, const Color& color, RendererDebugPage page)
 	{
 		if (_isLocked)
 			return;
 
-		RendererLine3D line;
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
 
-		line.Start = target;
-		line.End = origin;
+		auto line = RendererLine3D{};
+		line.Origin = origin;
+		line.Target = target;
 		line.Color = color;
 
 		_lines3DToDraw.push_back(line);
 	}
 
-	void Renderer::AddReticle(const Vector3& center, float radius, const Vector4& color)
+	void Renderer::AddDebugTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Color& color, RendererDebugPage page)
 	{
-		auto origin0 = center + Vector3(radius, 0.0f, 0.0f);
-		auto target0 = center + Vector3(-radius, 0.0f, 0.0f);
-		AddLine3D(origin0, target0, color);
-
-		auto origin1 = center + Vector3(0.0f, radius, 0.0f);
-		auto target1 = center + Vector3(0.0f, -radius, 0.0f);
-		AddLine3D(origin1, target1, color);
-
-		auto origin2 = center + Vector3(0.0f, 0.0f, radius);
-		auto target2 = center + Vector3(0.0f, 0.0f, -radius);
-		AddLine3D(origin2, target2, color);
-	}
-
-	void Renderer::AddDebugReticle(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page)
-	{
-		if (!DebugMode || _debugPage != page)
+		if (_isLocked)
 			return;
 
-		AddReticle(center, radius, color);
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto tri = RendererTriangle3D{};
+		tri.Vertices = { vertex0, vertex1, vertex2 };
+		tri.Color = color;
+
+		_triangles3DToDraw.push_back(tri);
 	}
 
-	void Renderer::AddSphere(const Vector3& center, float radius, const Vector4& color)
+	void Renderer::AddDebugTarget(const Vector3& center, const Quaternion& orient, float radius, const Color& color, RendererDebugPage page)
+	{
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto rotMatrix = Matrix::CreateFromQuaternion(orient);
+
+		auto origin0 = center + Vector3::Transform(Vector3(radius, 0.0f, 0.0f), rotMatrix);
+		auto target0 = center + Vector3::Transform(Vector3(-radius, 0.0f, 0.0f), rotMatrix);
+		AddDebugLine(origin0, target0, color);
+
+		auto origin1 = center + Vector3::Transform(Vector3(0.0f, radius, 0.0f), rotMatrix);
+		auto target1 = center + Vector3::Transform(Vector3(0.0f, -radius, 0.0f), rotMatrix);
+		AddDebugLine(origin1, target1, color);
+
+		auto origin2 = center + Vector3::Transform(Vector3(0.0f, 0.0f, radius), rotMatrix);
+		auto target2 = center + Vector3::Transform(Vector3(0.0f, 0.0f, -radius), rotMatrix);
+		AddDebugLine(origin2, target2, color);
+	}
+
+	void Renderer::AddDebugBox(const std::array<Vector3, 8>& corners, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto LINE_COUNT  = 12;
+		constexpr auto PLANE_COUNT = 6;
+
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
+		// Construct box.
+		if (isWireframe)
+		{
+			for (int i = 0; i < LINE_COUNT; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					AddDebugLine(corners[0], corners[1], color, page);
+					break;
+				case 1:
+					AddDebugLine(corners[1], corners[2], color, page);
+					break;
+				case 2:
+					AddDebugLine(corners[2], corners[3], color, page);
+					break;
+				case 3:
+					AddDebugLine(corners[3], corners[0], color, page);
+					break;
+
+				case 4:
+					AddDebugLine(corners[4], corners[5], color, page);
+					break;
+				case 5:
+					AddDebugLine(corners[5], corners[6], color, page);
+					break;
+				case 6:
+					AddDebugLine(corners[6], corners[7], color, page);
+					break;
+				case 7:
+					AddDebugLine(corners[7], corners[4], color, page);
+					break;
+
+				case 8:
+					AddDebugLine(corners[0], corners[4], color, page);
+					break;
+				case 9:
+					AddDebugLine(corners[1], corners[5], color, page);
+					break;
+				case 10:
+					AddDebugLine(corners[2], corners[6], color, page);
+					break;
+				case 11:
+					AddDebugLine(corners[3], corners[7], color, page);
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < PLANE_COUNT; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					AddDebugTriangle(corners[0], corners[1], corners[2], color, page);
+					AddDebugTriangle(corners[0], corners[2], corners[3], color, page);
+					break;
+
+				case 1:
+					AddDebugTriangle(corners[4], corners[5], corners[6], color, page);
+					AddDebugTriangle(corners[4], corners[6], corners[7], color, page);
+					break;
+
+				case 2:
+					AddDebugTriangle(corners[0], corners[1], corners[4], color, page);
+					AddDebugTriangle(corners[1], corners[4], corners[5], color, page);
+					break;
+
+				case 3:
+					AddDebugTriangle(corners[1], corners[2], corners[5], color, page);
+					AddDebugTriangle(corners[2], corners[5], corners[6], color, page);
+					break;
+
+				case 4:
+					AddDebugTriangle(corners[2], corners[3], corners[6], color, page);
+					AddDebugTriangle(corners[3], corners[6], corners[7], color, page);
+					break;
+
+				case 5:
+					AddDebugTriangle(corners[0], corners[3], corners[4], color, page);
+					AddDebugTriangle(corners[3], corners[4], corners[7], color, page);
+					break;
+				}
+			}
+		}
+	}
+
+	void Renderer::AddDebugBox(const Vector3& min, const Vector3& max, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto box = BoundingBox((max + min) / 2, (max - min) / 2);
+		AddDebugBox(box, color, page, isWireframe);
+	}
+
+	void Renderer::AddDebugBox(const BoundingOrientedBox& box, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto CORNER_COUNT = 8;
+
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto corners = std::array<Vector3, CORNER_COUNT>{};
+		box.GetCorners(corners.data());
+
+		AddDebugBox(corners, color, page, isWireframe);
+	}
+
+	void Renderer::AddDebugBox(const BoundingBox& box, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto CORNER_COUNT = 8;
+
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto corners = std::array<Vector3, CORNER_COUNT>{};
+		box.GetCorners(corners.data());
+
+		AddDebugBox(corners, color, page, isWireframe);
+	}
+
+	void Renderer::AddDebugCone(const Vector3& center, const Quaternion& orient, float radius, float length, const Vector4& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto SUBDIVISION_COUNT = 32;
+
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto rotMatrix = Matrix::CreateFromQuaternion(orient);
+
+		auto baseVertices = std::vector<Vector3>{};
+		baseVertices.reserve(SUBDIVISION_COUNT);
+		float angle = 0.0f;
+
+		// Calculate base circle vertices.
+		for (int i = 0; i <= SUBDIVISION_COUNT; i++)
+		{
+			float sinAngle = sin(angle);
+			float cosAngle = cos(angle);
+
+			auto vertex = center + Vector3::Transform(Vector3(radius * sinAngle, radius * cosAngle, 0.0f), rotMatrix);
+			baseVertices.push_back(vertex);
+
+			angle += PI_MUL_2 / SUBDIVISION_COUNT;
+		}
+
+		auto dir = Geometry::ConvertQuatToDirection(orient);
+		auto topCenter = Geometry::TranslatePoint(center, dir, length);
+
+		// Construct cone.
+		for (int i = 0; i < baseVertices.size(); i++)
+		{
+			const auto& vertex0 = baseVertices[i];
+			const auto& vertex1 = baseVertices[(i == (baseVertices.size() - 1)) ? 0 : (i + 1)];
+
+			if (isWireframe)
+			{
+				AddDebugLine(vertex0, vertex1, color);
+
+				if ((i % (SUBDIVISION_COUNT / 8)) == 0)
+					AddDebugLine(vertex0, topCenter, color);
+			}
+			else
+			{
+				AddDebugTriangle(vertex0, vertex1, center, color);
+				AddDebugTriangle(vertex0, vertex1, topCenter, color);
+			}
+		}
+	}
+
+	void Renderer::AddDebugCylinder(const Vector3& center, const Quaternion& orient, float radius, float length, const Color& color, RendererDebugPage page, bool isWireframe)
+	{
+		constexpr auto SUBDIVISION_COUNT = 32;
+
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
+		auto rotMatrix = Matrix::CreateFromQuaternion(orient);
+
+		auto baseVertices = std::vector<Vector3>{};
+		baseVertices.reserve(SUBDIVISION_COUNT);
+		float angle = 0.0f;
+
+		// Calculate base circle vertices.
+		for (int i = 0; i <= SUBDIVISION_COUNT; i++)
+		{
+			float sinAngle = sin(angle);
+			float cosAngle = cos(angle);
+
+			auto vertex = center + Vector3::Transform(Vector3(radius * sinAngle, radius * cosAngle, 0.0f), rotMatrix);
+			baseVertices.push_back(vertex);
+
+			angle += PI_MUL_2 / SUBDIVISION_COUNT;
+		}
+
+		auto dir = Geometry::ConvertQuatToDirection(orient);
+
+		// Calculate top circle vertices.
+		auto topVertices = baseVertices;
+		for (auto& vertex : topVertices)
+			vertex = Geometry::TranslatePoint(vertex, dir, length);
+
+		// Construct cylinder.
+		auto topCenter = Geometry::TranslatePoint(center, dir, length);
+		for (int i = 0; i < baseVertices.size(); i++)
+		{
+			const auto& baseVertex0 = baseVertices[i];
+			const auto& baseVertex1 = baseVertices[(i == (baseVertices.size() - 1)) ? 0 : (i + 1)];
+
+			const auto& topVertex0 = topVertices[i];
+			const auto& topVertex1 = topVertices[(i == (topVertices.size() - 1)) ? 0 : (i + 1)];
+
+			if (isWireframe)
+			{
+				AddDebugLine(baseVertex0, baseVertex1, color);
+				AddDebugLine(topVertex0, topVertex1, color);
+
+				if ((i % (SUBDIVISION_COUNT / 8)) == 0)
+					AddDebugLine(baseVertex0, topVertex0, color);
+			}
+			else
+			{
+				AddDebugTriangle(baseVertex0, baseVertex1, center, color);
+				AddDebugTriangle(topVertex0, topVertex1, topCenter, color);
+				AddDebugTriangle(baseVertex0, baseVertex1, topVertex1, color);
+				AddDebugTriangle(baseVertex0, topVertex0, topVertex1, color);
+			}
+		}
+	}
+
+	void Renderer::AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
 		constexpr auto AXIS_COUNT		 = 3;
-		constexpr auto SUBDIVISION_COUNT = 32;
-		constexpr auto STEP_COUNT		 = 4;
-		constexpr auto STEP_ANGLE		 = PI / STEP_COUNT;
+		constexpr auto SUBDIVISION_COUNT = 16;
+		constexpr auto STEP_ANGLE		 = PI / (SUBDIVISION_COUNT / 4);
 
 		if (_isLocked)
 			return;
 
-		auto prevPoints = std::array<Vector3, AXIS_COUNT>{};
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
 
-		for (int i = 0; i < STEP_COUNT; i++)
+		// Construct sphere.
+		if (isWireframe)
 		{
-			float x = sin(STEP_ANGLE * i) * radius;
-			float z = cos(STEP_ANGLE * i) * radius;
-			float angle = 0.0f;
-
-			for (int j = 0; j < SUBDIVISION_COUNT; j++)
+			auto prevVertices = std::array<Vector3, AXIS_COUNT>{};
+			for (int i = 0; i < (SUBDIVISION_COUNT / 4); i++)
 			{
-				auto points = std::array<Vector3, AXIS_COUNT>
-				{
-					center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
-					center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
-					center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
-				};
+				float x = sin(STEP_ANGLE * i) * radius;
+				float z = cos(STEP_ANGLE * i) * radius;
 
-				if (j > 0)
+				float angle = 0.0f;
+
+				for (int j = 0; j < SUBDIVISION_COUNT; j++)
 				{
-					for (int k = 0; k < points.size(); k++)
-						AddLine3D(prevPoints[k], points[k], color);
+					auto vertices = std::array<Vector3, AXIS_COUNT>
+					{
+						center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
+							center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
+							center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
+					};
+
+					if (j > 0)
+					{
+						for (int k = 0; k < vertices.size(); k++)
+							AddDebugLine(prevVertices[k], vertices[k], color);
+					}
+
+					prevVertices = vertices;
+					angle += PI_MUL_2 / (SUBDIVISION_COUNT - 1);
 				}
+			}
+		}
+		else
+		{
+			auto vertices = std::vector<Vector3>{};
+			for (int i = 0; i <= SUBDIVISION_COUNT; i++)
+			{
+				float pitch = ((float)i / SUBDIVISION_COUNT) * PI;
+				float y = cos(pitch) * radius;
+				float radiusAtY = sin(pitch) * radius;
 
-				prevPoints = points;
-				angle += PI_MUL_2 / (SUBDIVISION_COUNT - 1);
+				for (int j = 0; j < SUBDIVISION_COUNT; j++)
+				{
+					float theta = ((float)j / SUBDIVISION_COUNT) * PI_MUL_2;
+					float x = cos(theta) * radiusAtY;
+					float z = sin(theta) * radiusAtY;
+
+					auto vertex = center + Vector3(x, y, z);
+					vertices.push_back(vertex);
+				}
+			}
+
+			for (int i = 0; i < SUBDIVISION_COUNT; i++)
+			{
+				for (int j = 0; j < SUBDIVISION_COUNT; j++)
+				{
+					int index0 = i * SUBDIVISION_COUNT + j;
+					int index1 = ((i + 1) * SUBDIVISION_COUNT) + j;
+					int index2 = ((i + 1) * SUBDIVISION_COUNT) + (j + 1) % SUBDIVISION_COUNT;
+					int index3 = (i * SUBDIVISION_COUNT) + ((j + 1) % SUBDIVISION_COUNT);
+
+					AddDebugTriangle(vertices[index0], vertices[index1], vertices[index2], color);
+					AddDebugTriangle(vertices[index0], vertices[index2], vertices[index3], color);
+				}
 			}
 		}
 	}
 
-	void Renderer::AddDebugSphere(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page)
-	{
-		if (!DebugMode || _debugPage != page)
-			return;
-
-		AddSphere(center, radius, color);
-	}
-
-	void Renderer::AddBox(Vector3* corners, const Vector4& color)
+	void Renderer::AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
 		if (_isLocked)
 			return;
 
-		for (int i = 0; i < 12; i++)
-		{
-			RendererLine3D line;
-
-			switch (i)
-			{
-			case 0: line.Start = corners[0];
-				line.End = corners[1];
-				break;
-			case 1: line.Start = corners[1];
-				line.End = corners[2];
-				break;
-			case 2: line.Start = corners[2];
-				line.End = corners[3];
-				break;
-			case 3: line.Start = corners[3];
-				line.End = corners[0];
-				break;
-
-			case 4: line.Start = corners[4];
-				line.End = corners[5];
-				break;
-			case 5: line.Start = corners[5];
-				line.End = corners[6];
-				break;
-			case 6: line.Start = corners[6];
-				line.End = corners[7];
-				break;
-			case 7: line.Start = corners[7];
-				line.End = corners[4];
-				break;
-
-			case 8: line.Start = corners[0];
-				line.End = corners[4];
-				break;
-			case 9: line.Start = corners[1];
-				line.End = corners[5];
-				break;
-			case 10: line.Start = corners[2];
-				line.End = corners[6];
-				break;
-			case 11: line.Start = corners[3];
-				line.End = corners[7];
-				break;
-			}
-
-			line.Color = color;
-			_lines3DToDraw.push_back(line);
-		}
-	}
-
-	void Renderer::AddBox(const Vector3 min, const Vector3& max, const Vector4& color)
-	{
-		if (_isLocked)
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
 			return;
 
-		for (int i = 0; i < 12; i++)
-		{
-			RendererLine3D line;
-
-			switch (i)
-			{
-			case 0: line.Start = Vector3(min.x, min.y, min.z);
-				line.End = Vector3(min.x, min.y, max.z);
-				break;
-			case 1: line.Start = Vector3(min.x, min.y, max.z);
-				line.End = Vector3(max.x, min.y, max.z);
-				break;
-			case 2: line.Start = Vector3(max.x, min.y, max.z);
-				line.End = Vector3(max.x, min.y, min.z);
-				break;
-			case 3: line.Start = Vector3(max.x, min.y, min.z);
-				line.End = Vector3(min.x, min.y, min.z);
-				break;
-
-			case 4: line.Start = Vector3(min.x, max.y, min.z);
-				line.End = Vector3(min.x, max.y, max.z);
-				break;
-			case 5: line.Start = Vector3(min.x, max.y, max.z);
-				line.End = Vector3(max.x, max.y, max.z);
-				break;
-			case 6: line.Start = Vector3(max.x, max.y, max.z);
-				line.End = Vector3(max.x, max.y, min.z);
-				break;
-			case 7: line.Start = Vector3(max.x, max.y, min.z);
-				line.End = Vector3(min.x, max.y, min.z);
-				break;
-
-			case 8: line.Start = Vector3(min.x, min.y, min.z);
-				line.End = Vector3(min.x, max.y, min.z);
-				break;
-			case 9: line.Start = Vector3(min.x, min.y, max.z);
-				line.End = Vector3(min.x, max.y, max.z);
-				break;
-			case 10: line.Start = Vector3(max.x, min.y, max.z);
-				line.End = Vector3(max.x, max.y, max.z);
-				break;
-			case 11: line.Start = Vector3(max.x, min.y, min.z);
-				line.End = Vector3(max.x, max.y, min.z);
-				break;
-			}
-
-			line.Color = color;
-			_lines3DToDraw.push_back(line);
-		}
-	}
-
-	void Renderer::AddDebugBox(const BoundingOrientedBox& box, const Vector4& color, RendererDebugPage page)
-	{
-		if (!DebugMode || _debugPage != page)
-			return;
-
-		Vector3 corners[8];
-		box.GetCorners(corners);
-		AddBox(corners, color);
-	}
-
-	void Renderer::AddDebugBox(const Vector3& min, const Vector3& max, const Vector4& color, RendererDebugPage page)
-	{
-		if (_debugPage != page)
-			return;
-
-		AddBox(min, max, color);
+		AddDebugSphere(sphere.Center, sphere.Radius, color, page, isWireframe);
 	}
 
 	void Renderer::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
@@ -1110,7 +1333,7 @@ namespace TEN::Renderer
 		CollectLightsForCamera();
 		RenderItemShadows(view);
 
-		// Prepare all sprites for later
+		// Prepare all sprites for later.
 		PrepareFires(view);
 		PrepareSmokes(view);
 		PrepareSmokeParticles(view);
@@ -1133,7 +1356,7 @@ namespace TEN::Renderer
 		PrepareStreamers(view);
 		PrepareLaserBarriers(view);
 
-		// Sprites are grouped in buckets for instancing. Non commutative sprites are collected for later stage.
+		// Sprites grouped in buckets for instancing. Non-commutative sprites collected for later stage.
 		SortAndPrepareSprites(view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
@@ -1176,7 +1399,7 @@ namespace TEN::Renderer
 		_context->IASetInputLayout(_inputLayout.Get());
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// TODO: needs improvements before enabling it
+		// TODO: Needs improvements before enabling it.
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Front, LaraItem->Pose.Position.ToVector3(), 1);
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Back, LaraItem->Pose.Position.ToVector3(), -1);
 
@@ -1188,7 +1411,7 @@ namespace TEN::Renderer
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
-		// Camera constant buffer contains matrices, camera position, fog values, and other things that are shared for all shaders.
+		// Camera constant buffer contains matrices, camera position, fog values, and other things shared for all shaders.
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.FillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.Frame = GlobalCounter;
@@ -1208,7 +1431,7 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
-		// Set fog bulbs
+		// Set fog bulbs.
 		cameraConstantBuffer.NumFogBulbs = (int)view.FogBulbsToDraw.size();
 		for (int i = 0; i < view.FogBulbsToDraw.size(); i++)
 		{
@@ -1224,13 +1447,13 @@ namespace TEN::Renderer
 		
 		ID3D11RenderTargetView* pRenderViewPtrs[2];
 
-		// Bind the main render target
+		// Bind main render target.
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 
 		// Draw horizon and sky.
 		DrawHorizonAndSky(view, _renderTarget.DepthStencilView.Get());
 		 
-		// Build G-Buffer (Normals + Depth)
+		// Build G-Buffer (Normals + Depth).
 		_context->ClearRenderTargetView(_normalMapRenderTarget.RenderTargetView.Get(), Colors::Black);
 		_context->ClearRenderTargetView(_depthRenderTarget.RenderTargetView.Get(), Colors::White);
 
@@ -1249,11 +1472,11 @@ namespace TEN::Renderer
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
 		
-		// Bind the main render target again
-		// At this point, the main depth buffer is already filled and we'll avoid overdraw in the following steps
+		// Bind main render target again.
+		// At this point, main depth buffer is already filled and avoids overdraw in following steps.
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 		
-		// Draw opaque, alpha test and fast alpha blend faces.
+		// Draw opaque, alpha test, and fast alpha blend faces.
 		DrawRooms(view, RendererPass::Opaque);
 		DrawItems(view, RendererPass::Opaque);
 		DrawStatics(view, RendererPass::Opaque);
@@ -1267,7 +1490,7 @@ namespace TEN::Renderer
 		DrawDebris(view, RendererPass::Opaque);
 		DrawSprites(view, RendererPass::Opaque);
 
-		// Draw additive faces
+		// Draw additive faces.
 		DrawRooms(view, RendererPass::Additive);
 		DrawItems(view, RendererPass::Additive);
 		DrawStatics(view, RendererPass::Additive);
@@ -1280,30 +1503,33 @@ namespace TEN::Renderer
 		DrawDebris(view, RendererPass::Additive);
 		DrawSprites(view, RendererPass::Additive);
 
-		// Collect all non-commutative transparent faces
-		// NOTE: bats, rats and similar objects are so small that artifacts are not noticeable so they are drawn in the previous steps
+		// Collect all non-commutative transparent faces.
+		// NOTE: Bats, ratsa and similar objects are so small that artifacts are not noticeable, so they are drawn in previous steps.
 		DrawRooms(view, RendererPass::CollectTransparentFaces);
 		DrawItems(view, RendererPass::CollectTransparentFaces);
 		DrawStatics(view, RendererPass::CollectTransparentFaces);
 
-		// Draw sorted faces
+		// Draw sorted faces.
 		DrawSortedFaces(view);
 
-		// HACK: we draw gunflashes after everything because they are very near to the camera
+		// HACK: Draw gunflashes after everything because they are very near the camera.
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
-		// Draw lines
+		// Draw 3D debug lines and trianges.
 		DrawLines3D(view);
+		DrawTriangles3D(view);
 
-		// Apply antialiasing
+		// Apply antialiasing.
 		switch (g_Configuration.AntialiasingMode)
 		{
 		case AntialiasingMode::None:
 			break;
+
 		case AntialiasingMode::Low:
 			ApplyFXAA(&_renderTarget, view);
 			break;
+
 		case AntialiasingMode::Medium:
 		case AntialiasingMode::High:
 			ApplySMAA(&_renderTarget, view);
@@ -1313,8 +1539,8 @@ namespace TEN::Renderer
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(renderTarget, view);
 
-		// Draw GUI elements at end.
-		DrawLinesIn2DSpace();
+		// Draw 2D debug lines.
+		DrawLines2D();
 
 		// Draw HUD.
 		g_Hud.Draw(*LaraItem);
@@ -1323,7 +1549,7 @@ namespace TEN::Renderer
 		CollectDisplaySprites(view);
 		DrawDisplaySprites(view);
 
-		// Draw binoculars or lasersight.
+		// Draw binoculars or lasersight overlay.
 		DrawOverlays(view); 
 
 		time2 = std::chrono::high_resolution_clock::now();

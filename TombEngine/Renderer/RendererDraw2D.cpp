@@ -1,6 +1,7 @@
 #include "framework.h"
+
 #include <SimpleMath.h>
-#include "Renderer/Renderer.h"
+
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
@@ -11,8 +12,10 @@
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Objects/Utils/object_helper.h"
-#include "Specific/trutils.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/Structures/RendererHudBar.h"
+#include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 TEN::Renderer::RendererHudBar* g_AirBar;
 TEN::Renderer::RendererHudBar* g_ExposureBar;
@@ -228,8 +231,14 @@ namespace TEN::Renderer
 		DrawIndexedTriangles(12, 0, 0);
 	}
 
-	void Renderer::AddLine2D(const Vector2& origin, const Vector2& target, const Color& color)
+	void Renderer::AddLine2D(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page)
 	{
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
+			return;
+
 		auto line = RendererLine2D{ origin, target, color };
 		_lines2DToDraw.push_back(line);
 	}

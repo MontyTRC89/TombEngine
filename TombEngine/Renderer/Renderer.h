@@ -57,6 +57,7 @@
 #include "Renderer/Structures/RendererItem.h"
 #include "Renderer/Structures/RendererEffect.h"
 #include "Renderer/Structures/RendererLine3D.h"
+#include "Renderer/Structures/RendererTriangle3D.h"
 #include "Renderer/Structures/RendererMesh.h"
 #include "Renderer/Structures/RendererSpriteSequence.h"
 #include "Renderer/Structures/RendererSpriteBucket.h"
@@ -77,8 +78,8 @@ namespace TEN::Renderer
 	using namespace TEN::Effects::Electricity;
 	using namespace TEN::Gui;
 	using namespace TEN::Hud;
-	using namespace TEN::Renderer::Graphics;
 	using namespace TEN::Renderer::ConstantBuffers;
+	using namespace TEN::Renderer::Graphics;
 	using namespace TEN::Renderer::Structures;
 
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
@@ -242,8 +243,9 @@ namespace TEN::Renderer
 		RendererLight* _shadowLight;
 
 		// Lines
-		std::vector<RendererLine3D> _lines3DToDraw;
-		std::vector<RendererLine2D> _lines2DToDraw;
+		std::vector<RendererLine2D>		_lines2DToDraw	   = {};
+		std::vector<RendererLine3D>		_lines3DToDraw	   = {};
+		std::vector<RendererTriangle3D> _triangles3DToDraw = {};
 
 		// Textures, objects and sprites
 		std::vector<std::optional<RendererObject>> _moveableObjects;
@@ -415,8 +417,9 @@ namespace TEN::Renderer
 		void DrawItemBucket(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
 		void DrawStaticBucket(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
 		void DrawSingleSprite(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
+		void DrawLines2D();
 		void DrawLines3D(RenderView& view);
-		void DrawLinesIn2DSpace();
+		void DrawTriangles3D(RenderView& view);
 		void DrawOverlays(RenderView& view);
 		void PrepareRopes(RenderView& view);
 		void DrawBats(RenderView& view, RendererPass rendererPass);
@@ -470,6 +473,7 @@ namespace TEN::Renderer
 		void ResetScissor();
 		void ResetDebugVariables();
 		float CalculateFrameRate();
+
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 					 Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 		void AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
@@ -489,6 +493,7 @@ namespace TEN::Renderer
 		void AddColoredQuad(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3,
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 							BlendMode blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
+
 		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
 		RendererMesh* GetMesh(int meshIndex);
@@ -576,16 +581,21 @@ namespace TEN::Renderer
 		void SetFullScreen();
 		bool IsFullsScreen();
 		void RenderTitleImage();
-		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color);
-		void AddLine3D(const Vector3& origin, const Vector3& target, const Vector4& color);
-		void AddReticle(const Vector3& center, float radius, const Vector4& color);
-		void AddDebugReticle(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page);
-		void AddBox(const Vector3 min, const Vector3& max, const Vector4& color);
-		void AddBox(Vector3* corners, const Vector4& color);
-		void AddDebugBox(const BoundingOrientedBox& box, const Vector4& color, RendererDebugPage page);
-		void AddDebugBox(const Vector3& min, const Vector3& max, const Vector4& color, RendererDebugPage page);
-		void AddSphere(const Vector3& center, float radius, const Vector4& color);
-		void AddDebugSphere(const Vector3& center, float radius, const Vector4& color, RendererDebugPage page);
+
+		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+
+		void AddDebugLine(const Vector3& origin, const Vector3& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+		void AddDebugTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+		void AddDebugTarget(const Vector3& center, const Quaternion& orient, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+		void AddDebugBox(const std::array<Vector3, 8>& corners, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugBox(const Vector3& min, const Vector3& max, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugBox(const BoundingOrientedBox& box, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugBox(const BoundingBox& box, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugCone(const Vector3& center, const Quaternion& orient, float radius, float length, const Vector4& color, RendererDebugPage page, bool isWireframe);
+		void AddDebugCylinder(const Vector3& center, const Quaternion& orient, float radius, float length, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+
 		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);
@@ -596,9 +606,11 @@ namespace TEN::Renderer
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
+
 		Vector2i			   GetScreenResolution() const;
 		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
 		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+		
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 							  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);
