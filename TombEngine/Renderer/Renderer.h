@@ -150,11 +150,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psHUDColor;
 		ComPtr<ID3D11PixelShader> _psHUDTexture;
 		ComPtr<ID3D11PixelShader> _psHUDBarColor;
-		ComPtr<ID3D11SamplerState> _shadowSampler;
 		ComPtr<ID3D11VertexShader> _vsFinalPass;
 		ComPtr<ID3D11PixelShader> _psFinalPass;
-		ComPtr<ID3D11VertexShader> _vsTransparentFinalPass;
-		ComPtr<ID3D11PixelShader> _psTransparentFinalPass;
 		ComPtr<ID3D11PixelShader> _psGBuffer;
 		ComPtr<ID3D11VertexShader> _vsRoomAmbient;
 		ComPtr<ID3D11VertexShader> _vsRoomAmbientSky;
@@ -323,16 +320,13 @@ namespace TEN::Renderer
 
 		std::vector<RendererSpriteBucket> _spriteBuckets;
 		std::unique_ptr<BasicPostProcess> _postProcess;
+		ComPtr<ID3D11SamplerState> _shadowSampler;
 
 		// Antialiasing
 		Texture2D _SMAAAreaTexture;
 		Texture2D _SMAASearchTexture;
-		RenderTarget2D _SMAAVelocityRenderTarget;
 		RenderTarget2D _SMAASceneRenderTarget;
 		RenderTarget2D _SMAASceneSRGBRenderTarget;
-		RenderTarget2D _SMAATempRenderTargets[2];
-		RenderTarget2D _SMAATempSRGBRenderTargets[2];
-		RenderTarget2D _SMAAPreviousRenderTargets[2];
 		RenderTarget2D _SMAADepthRenderTarget;
 		RenderTarget2D _SMAAEdgesRenderTarget;
 		RenderTarget2D _SMAABlendRenderTarget;

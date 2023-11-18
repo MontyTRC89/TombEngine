@@ -88,8 +88,6 @@ namespace TEN::Renderer
 		_psInstancedStaticMeshes = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\InstancedStatics.fx"), "PS", "ps_5_0", nullptr, blob);
 		_vsInstancedSprites = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\InstancedSprites.fx"), "VS", "vs_5_0", nullptr, blob);
 		_psInstancedSprites = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\InstancedSprites.fx"), "PS", "ps_5_0", nullptr, blob);
-		_vsTransparentFinalPass = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\TransparentFinalPass.fx"), "VS", "vs_5_0", nullptr, blob);
-		_psTransparentFinalPass = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\TransparentFinalPass.fx"), "PS", "ps_5_0", nullptr, blob);
 		_psGBuffer = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\GBuffer.fx"), "PS", "ps_5_0", nullptr, blob);
 		_vsRoomAmbient = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\RoomAmbient.fx"), "VS", "vs_5_0", nullptr, blob);
 		_vsRoomAmbientSky = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\RoomAmbient.fx"), "VSSky", "vs_5_0", nullptr, blob);
