@@ -112,6 +112,7 @@ namespace TEN::Renderer
 		RenderTarget2D _backBuffer;
 		RenderTarget2D _dumpScreenRenderTarget;
 		RenderTarget2D _renderTarget;
+		RenderTarget2D _postProcessRenderTarget[2];
 		RenderTarget2D _tempRenderTarget;
 		RenderTarget2D _tempRoomAmbientRenderTarget1;
 		RenderTarget2D _tempRoomAmbientRenderTarget2;
@@ -345,6 +346,9 @@ namespace TEN::Renderer
 
 		ComPtr<ID3D11VertexShader> _vsFXAA;
 		ComPtr<ID3D11PixelShader> _psFXAA;
+
+		// Post process
+		PostProcessColorScheme _postProcessColorScheme = PostProcessColorScheme::Normal;
 
 		// Private functions
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
