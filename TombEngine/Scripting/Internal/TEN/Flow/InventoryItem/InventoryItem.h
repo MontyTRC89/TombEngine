@@ -19,7 +19,22 @@ static const std::unordered_map<std::string, ItemOptions> ITEM_MENU_ACTIONS
 	{ "USE", ItemOptions::OPT_USE },
 	{ "EQUIP", ItemOptions::OPT_EQUIP },
 	{ "EXAMINE", ItemOptions::OPT_EXAMINABLE },
-	{ "COMBINE", ItemOptions::OPT_COMBINABLE }
+	{ "COMBINE", ItemOptions::OPT_COMBINABLE },
+	{ "SEPARATE", ItemOptions::OPT_SEPERABLE },
+	{ "LOAD", ItemOptions::OPT_LOAD },
+	{ "SAVE", ItemOptions::OPT_SAVE },
+	{ "STATS", ItemOptions::OPT_STATS },
+	{ "DIARY", ItemOptions::OPT_DIARY },
+	{ "ALWAYS_COMBINE", ItemOptions::OPT_ALWAYS_COMBINE },
+	{ "AMMO_PISTOLS", ItemOptions::OPT_CHOOSE_AMMO_PISTOLS },
+	{ "AMMO_SHOTGUN", ItemOptions::OPT_CHOOSE_AMMO_SHOTGUN },
+	{ "AMMO_UZI", ItemOptions::OPT_CHOOSE_AMMO_UZI },
+	{ "AMMO_REVOLVER", ItemOptions::OPT_CHOOSE_AMMO_REVOLVER },
+	{ "AMMO_HARPOON", ItemOptions::OPT_CHOOSE_AMMO_HARPOON },
+	{ "AMMO_CROSSBOW", ItemOptions::OPT_CHOOSE_AMMO_CROSSBOW },
+	{ "AMMO_HK", ItemOptions::OPT_CHOOSE_AMMO_HK },
+	{ "AMMO_GRENADEGUN", ItemOptions::OPT_CHOOSE_AMMO_GRENADEGUN },
+	{ "AMMO_ROCKET", ItemOptions::OPT_CHOOSE_AMMO_ROCKET }
 };
 
 struct InventoryItem
