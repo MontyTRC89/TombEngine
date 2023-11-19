@@ -587,10 +587,15 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
 
-							TriggerShockwave((Pose*)&pos1, 16, 160, 96, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+							TriggerShockwave(&Pose(pos1), 16, 160, 96, 0, color / 2, color, 48, EulerAngles::Zero, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
+
 							pos1.y -= 64;
-							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+
+							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Zero, 1, true, false, true, (int)ShockwaveStyle::Normal);
+							
+							auto lightColor = Color(0.4f, 0.3f, 0.0f);
+							TriggerDynamicLight(pos.ToVector3(), lightColor, 0.04f);
 						}
 
 						deltaFrame = item->Animation.FrameNumber;
@@ -600,11 +605,27 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (deltaFrame > 16)
 								deltaFrame = 16;
+
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame);
+
+							if (item->ItemFlags[3])
+							{
+								TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 8, 0, color / 4, color / 2);
+							}
+							else
+							{
+								TriggerDynamicLight(pos1.x, pos1.y - 64, pos1.z, 18, 0, color / 4, color / 2);
+							}
 						}
 						else
 						{
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame2);
+
+							if (item->ItemFlags[3])
+							{
+								auto lightColor = Color(0.0f, 0.4f, 1.0f);
+								TriggerDynamicLight(pos.ToVector3(), lightColor, 0.06f);
+							}
 						}
 					}
 				}

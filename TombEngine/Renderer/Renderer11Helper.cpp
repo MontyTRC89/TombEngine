@@ -458,7 +458,7 @@ namespace TEN::Renderer
 			// Spheres debug
 			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
 			// auto v2 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			// AddLine3D(v1, v2, Vector4::One);
+			// AddDebugLine(v1, v2, Vector4::One);
 		}
 
 		return (int)moveable.ObjectMeshes.size();

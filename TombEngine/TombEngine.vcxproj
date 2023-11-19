@@ -323,7 +323,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Game\Animation\Commands.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
@@ -391,6 +390,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
     <ClInclude Include="Game\items.h" />
+    <ClInclude Include="Game\Lara\PlayerContext.h" />
+    <ClInclude Include="Game\Lara\PlayerContextData.h" />
     <ClInclude Include="Game\Lara\PlayerStateMachine.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
@@ -806,7 +807,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Game\animation.cpp" />
-    <ClCompile Include="Game\Animation\Commands.cpp" />
     <ClCompile Include="Game\camera.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
@@ -869,6 +869,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\Lara\lara_two_guns.cpp" />
+    <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\Lara\PlayerStateMachine.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\missile.cpp" />
