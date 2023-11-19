@@ -2011,36 +2011,3 @@ void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 		ObjectCollision(itemNumber, playerItem, coll);
 	}
 }
-
-// TODO: Extend to be a more general, simple, all-in-one LOS function with a variety of flags for what to detect.
-std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
-{
-	// Run through neighboring rooms.
-	const auto& room = g_Level.Rooms[roomNumber];
-	for (int neighborRoomNumber : room.neighbors)
-	{
-		// Get neighbor room.
-		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-		if (!neighborRoom.Active())
-			continue;
-
-		// Run through statics.
-		for (const auto& staticObject : g_Level.Rooms[neighborRoomNumber].mesh)
-		{
-			// Check if static is visible.
-			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
-				continue;
-
-			// Check if static is solid (if applicable).
-			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
-				continue;
-
-			// Test ray-box intersection.
-			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-			if (box.Intersects(origin, dir, dist))
-				return Geometry::TranslatePoint(origin, dir, dist);
-		}
-	}
-
-	return std::nullopt;
-}
