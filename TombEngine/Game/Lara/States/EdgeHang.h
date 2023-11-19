@@ -3,7 +3,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-namespace TEN::Player
+namespace TEN::Entities::Player
 {
 	void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll);
 	void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll);

@@ -79,7 +79,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<name>DisplaySprite</name>
 	<summary>Create a DisplaySprite object.</summary>
 	<parameters>
@@ -123,7 +123,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>GetObjectID</name>
 	<summary>Get the object ID of the sprite sequence object used by the display sprite.</summary>
@@ -137,7 +137,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>GetSpriteID</name>
 	<summary>Get the sprite ID in the sprite sequence object used by the display sprite.</summary>
@@ -151,7 +151,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>GetPosition</name>
 	<summary>Get the display position of the display sprite in percent.</summary>
@@ -165,7 +165,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>GetRotation</name>
 	<summary>Get the rotation of the display sprite in degrees.</summary>
@@ -179,7 +179,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>GetScale</name>
 	<summary>Get the horizontal and vertical scale of the display sprite in percent.</summary>
@@ -193,7 +193,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>GetColor</name>
 	<summary>Get the color of the display sprite.</summary>
@@ -207,7 +207,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>SetObjectID</name>
 	<summary>Set the sprite sequence object ID used by the display sprite.</summary>
@@ -222,7 +222,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>SetSpriteID</name>
 	<summary>Set the sprite ID in the sprite sequence object used by the display sprite.</summary>
@@ -237,7 +237,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>SetPosition</name>
 	<summary>Set the display position of the display sprite in percent.</summary>
@@ -252,7 +252,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>SetRotation</name>
 	<summary>Set the rotation of the display sprite in degrees.</summary>
@@ -267,7 +267,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>SetScale</name>
 	<summary>Set the horizontal and vertical scale of the display sprite in percent.</summary>
@@ -282,7 +282,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>SetColor</name>
 	<summary>Set the color of the display sprite.</summary>
@@ -297,7 +297,7 @@
 </function>
 
 <function>
-	<module>DisplaySprite</module>
+	<module>View.DisplaySprite</module>
 	<caller>DisplaySprite</caller>
 	<name>Draw</name>
 	<summary>Draw the display sprite in display space for the current frame.</summary>
@@ -309,13 +309,13 @@
 		</parameter>
 		<parameter>
 			<name>alignMode</name>
-			<type>DisplaySprite.AlignMode</type>
-			<description>Align mode interpreting an offset from the sprite's position. __Default: DisplaySprite.AlignMode.CENTER__</description>
+			<type>View.AlignMode</type>
+			<description>Align mode interpreting an offset from the sprite's position. __Default: View.AlignMode.CENTER__</description>
 		</parameter>
 		<parameter>
 			<name>scaleMode</name>
-			<type>DisplaySprite.ScaleMode</type>
-			<description>Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: DisplaySprite.ScaleMode.FIT__</description>
+			<type>View.ScaleMode</type>
+			<description>Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: View.ScaleMode.FIT__</description>
 		</parameter>
 		<parameter>
 			<name>blendMode</name>

@@ -94,7 +94,7 @@ namespace TEN::Entities::Generic
 			return false;
 
 		// 5) Test floor slope. TODO: Check slope angles of normals directly.
-		if ((pointColl.Block->GetSurfaceSlope(0, true) != Vector2::Zero) || (pointColl.Block->GetSurfaceSlope(1, true) != Vector2::Zero))
+		if ((pointColl.Block->GetSurfaceNormal(0, true) != -Vector3::UnitY) || (pointColl.Block->GetSurfaceNormal(1, true) != -Vector3::UnitY))
 			return false;
 
 		// Check for stopper flag.
@@ -128,16 +128,14 @@ namespace TEN::Entities::Generic
 			if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
 				continue;
 
-			if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr) //??
+			if (Objects[CollidedItems[i]->ObjectNumber].GetFloorHeight == nullptr)
 				return false;
 
-			auto& object = Objects[CollidedItems[i]->ObjectNumber];
-			int collidedIndex = CollidedItems[i] - g_Level.Items.data(); // Index of CollidedItems[i].
+			const auto& object = Objects[CollidedItems[i]->ObjectNumber];
+			const auto& item = g_Level.Items[CollidedItems[i]->Index];
 
-			auto colPos = CollidedItems[i]->Pose.Position;
-
-			// Check if floor function returns nullopt.
-			if (object.floor(collidedIndex, colPos.x, colPos.y, colPos.z) == std::nullopt)
+			auto pos = CollidedItems[i]->Pose.Position;
+			if (!object.GetFloorHeight(item, pos).has_value())
 				return false;
 		}
 
@@ -210,17 +208,17 @@ namespace TEN::Entities::Generic
 			if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
 				continue;
 
-			if (Objects[CollidedItems[i]->ObjectNumber].floor == nullptr)
+			if (!Objects[CollidedItems[i]->ObjectNumber].GetFloorHeight)
 			{
 				return false;
 			}
 			else
 			{
 				const auto& object = Objects[CollidedItems[i]->ObjectNumber];
-				int collidedItemNumber = CollidedItems[i] - g_Level.Items.data();
-
+				const auto& item = g_Level.Items[CollidedItems[i]->Index];
+				
 				auto pos = CollidedItems[i]->Pose.Position;
-				if (object.floor(collidedItemNumber, pos.x, pos.y, pos.z) == std::nullopt)
+				if (!object.GetFloorHeight(item, pos).has_value())
 					return false;
 			}
 		}
@@ -364,8 +362,7 @@ namespace TEN::Entities::Generic
 			// Grounded.
 			else
 			{
-				auto floorNormal = GetSurfaceNormal(pointColl.FloorTilt, true);
-				auto floorSlopeAngle = Geometry::GetSurfaceSlopeAngle(floorNormal);
+				auto floorSlopeAngle = Geometry::GetSurfaceSlopeAngle(pointColl.FloorNormal);
 
 				if (floorSlopeAngle == 0)
 				{

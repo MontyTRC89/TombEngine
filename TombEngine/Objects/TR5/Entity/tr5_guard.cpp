@@ -262,7 +262,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		case GuardOcb::RopeDownFast:
 			SetAnimation(item, GUARD_ANIM_ROPE_DOWN_FAST);
-			item->Pose.Position.y = GetCollision(item).Position.Ceiling - BLOCK(2);
+			item->Pose.Position.y = GetCollision(*item).Position.Ceiling - BLOCK(2);
 			break;
 
 		case GuardOcb::WaitOnWall:

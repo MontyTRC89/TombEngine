@@ -6,11 +6,11 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
-#include "Game/Lara/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
@@ -22,7 +22,7 @@ using namespace TEN::Input;
 using namespace TEN::Renderer;
 //------
 
-namespace TEN::Player
+namespace TEN::Entities::Player
 {
 	// notes:
 	// 1. get shimmy context data (ShimmyData with attractor collisions).
@@ -91,7 +91,7 @@ namespace TEN::Player
 		auto connectingAttracCollRight = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.HandsAttractor.AttracPtr, points.back());
 
 		// Get points.
-		auto pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(chainDistCenter);
+		auto pointCenter = handsAttrac.AttracPtr->GetIntersectionAtChainDistance(chainDistCenter);
 		if (!isLooped)
 		{
 			if (connectingAttracCollCenter.has_value())
@@ -100,12 +100,12 @@ namespace TEN::Player
 				if (chainDistCenter <= 0.0f)
 				{
 					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + chainDistCenter;
-					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtChainDistance(transitLineDist);
+					pointCenter = connectingAttracCollCenter->Attrac.GetIntersectionAtChainDistance(transitLineDist);
 				}
 				else if (chainDistCenter >= length)
 				{
 					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + (chainDistCenter - length);
-					pointCenter = connectingAttracCollCenter->Attrac.GetPointAtChainDistance(transitLineDist);
+					pointCenter = connectingAttracCollCenter->Attrac.GetIntersectionAtChainDistance(transitLineDist);
 				}
 			}
 			else
@@ -113,11 +113,11 @@ namespace TEN::Player
 				// Get point within boundary of current attractor.
 				if (chainDistLeft <= 0.0f && !connectingAttracCollLeft.has_value())
 				{
-					pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(coll.Setup.Radius);
+					pointCenter = handsAttrac.AttracPtr->GetIntersectionAtChainDistance(coll.Setup.Radius);
 				}
 				else if (chainDistRight >= length && !connectingAttracCollRight.has_value())
 				{
-					pointCenter = handsAttrac.AttracPtr->GetPointAtChainDistance(length - coll.Setup.Radius);
+					pointCenter = handsAttrac.AttracPtr->GetIntersectionAtChainDistance(length - coll.Setup.Radius);
 				}
 
 				// TODO: Unreachable segments on current attractor. Too steep, angle difference to great.
@@ -125,11 +125,11 @@ namespace TEN::Player
 		}
 
 		auto pointLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->Attrac.GetPointAtChainDistance(connectingAttracCollLeft->Proximity.ChainDistance + chainDistLeft) :
-			handsAttrac.AttracPtr->GetPointAtChainDistance(chainDistLeft);
+			connectingAttracCollLeft->Attrac.GetIntersectionAtChainDistance(connectingAttracCollLeft->Proximity.ChainDistance + chainDistLeft) :
+			handsAttrac.AttracPtr->GetIntersectionAtChainDistance(chainDistLeft);
 		auto pointRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->Attrac.GetPointAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (chainDistRight - length)) :
-			handsAttrac.AttracPtr->GetPointAtChainDistance(chainDistRight);
+			connectingAttracCollRight->Attrac.GetIntersectionAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (chainDistRight - length)) :
+			handsAttrac.AttracPtr->GetIntersectionAtChainDistance(chainDistRight);
 
 		auto pos = item.Pose.Position.ToVector3();
 		auto headingAngle = item.Pose.Orientation.y;
@@ -148,9 +148,9 @@ namespace TEN::Player
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
-		g_Renderer.AddLine3D(attracCollCenter.Proximity.Intersection, attracCollCenter.Proximity.Intersection + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
-		g_Renderer.AddLine3D(attracCollLeft.Proximity.Intersection, attracCollLeft.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
-		g_Renderer.AddLine3D(attracCollRight.Proximity.Intersection, attracCollRight.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddDebugLine(attracCollCenter.Proximity.Intersection, attracCollCenter.Proximity.Intersection + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddDebugLine(attracCollLeft.Proximity.Intersection, attracCollLeft.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddDebugLine(attracCollRight.Proximity.Intersection, attracCollRight.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
 
 		short angleDelta = Geometry::GetShortestAngle(attracCollCenter.HeadingAngle, (sideOffset >= 0.0f) ? attracCollRight.HeadingAngle : attracCollLeft.HeadingAngle);
 		g_Renderer.PrintDebugMessage("Angle delta: %.3f", TO_DEGREES(angleDelta));
@@ -254,7 +254,7 @@ namespace TEN::Player
 				return;
 			}
 
-			if (IsHeld(In::Jump) && Context::CanPerformLedgeJump(*item, *coll))
+			if (IsHeld(In::Jump) && CanPerformLedgeJump(*item, *coll))
 			{
 				if (IsHeld(In::Back))
 				{
@@ -270,18 +270,18 @@ namespace TEN::Player
 
 			if (IsHeld(In::Forward))
 			{
-				if (Context::CanClimbLedgeToCrouch(*item, *coll))
+				if (CanClimbLedgeToCrouch(*item, *coll))
 				{
 					item->Animation.TargetState = LS_HANG_TO_CROUCH;
 					return;
 				}
-				else if (Context::CanClimbLedgeToStand(*item, *coll))
+				else if (CanClimbLedgeToStand(*item, *coll))
 				{
 					if (IsHeld(In::Crouch))
 					{
 						item->Animation.TargetState = LS_HANG_TO_CROUCH;
 					}
-					else if (IsHeld(In::Walk) && Context::CanPerformLedgeHandstand(*item, *coll))
+					else if (IsHeld(In::Walk) && CanPerformLedgeHandstand(*item, *coll))
 					{
 						item->Animation.TargetState = LS_HANDSTAND;
 					}
@@ -293,7 +293,7 @@ namespace TEN::Player
 					return;
 				}
 
-				if (Context::CanShimmyUp(*item, *coll))
+				if (CanShimmyUp(*item, *coll))
 				{
 					// TODO: State dispatch.
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
@@ -302,7 +302,7 @@ namespace TEN::Player
 			}
 			else if (IsHeld(In::Back))
 			{
-				if (Context::CanShimmyDown(*item, *coll))
+				if (CanShimmyDown(*item, *coll))
 				{
 					// TODO: State dispatch.
 					SetAnimation(item, LA_LADDER_SHIMMY_UP);
@@ -312,7 +312,7 @@ namespace TEN::Player
 
 			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
-				if (Context::CanShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_LEFT))
+				if (CanShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_LEFT))
 				{
 					item->Animation.TargetState = LS_SHIMMY_LEFT;
 					return;
@@ -327,7 +327,7 @@ namespace TEN::Player
 			}
 			else if (IsHeld(In::Right) || IsHeld(In::StepRight))
 			{
-				if (Context::CanShimmyRight(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_RIGHT))
+				if (CanShimmyRight(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_RIGHT))
 				{
 					item->Animation.TargetState = LS_SHIMMY_RIGHT;
 					return;

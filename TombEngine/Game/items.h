@@ -127,7 +127,7 @@ struct ItemInfo
 	
 	Pose StartPose;
 	Pose Pose;
-	ROOM_VECTOR Location;
+	RoomVector Location;
 	short RoomNumber;
 	int Floor;
 

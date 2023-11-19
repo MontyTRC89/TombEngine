@@ -34,19 +34,19 @@ namespace TEN::Scripting::DisplaySprite
 			ctors(),
 			sol::call_constructor, ctors(),
 
-			ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
-			ScriptReserved_DisplayStringGetSpriteID, &ScriptDisplaySprite::GetSpriteID,
-			ScriptReserved_DisplayStringGetPosition, &ScriptDisplaySprite::GetPosition,
-			ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
-			ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
-			ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
-			ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
-			ScriptReserved_DisplayStringSetSpriteID, &ScriptDisplaySprite::SetSpriteID,
-			ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
-			ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
-			ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
-			ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
-			ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
+		ScriptReserved_DisplayStringGetObjectID, &ScriptDisplaySprite::GetObjectID,
+		ScriptReserved_DisplayStringGetSpriteID, &ScriptDisplaySprite::GetSpriteID,
+		ScriptReserved_DisplayStringGetPosition, &ScriptDisplaySprite::GetPosition,
+		ScriptReserved_DisplayStringGetRotation, &ScriptDisplaySprite::GetRotation,
+		ScriptReserved_DisplayStringGetScale, &ScriptDisplaySprite::GetScale,
+		ScriptReserved_DisplayStringGetColor, &ScriptDisplaySprite::GetColor,
+		ScriptReserved_DisplayStringSetObjectID, &ScriptDisplaySprite::SetObjectID,
+		ScriptReserved_DisplayStringSetSpriteID, &ScriptDisplaySprite::SetSpriteID,
+		ScriptReserved_DisplayStringSetPosition, &ScriptDisplaySprite::SetPosition,
+		ScriptReserved_DisplayStringSetRotation, &ScriptDisplaySprite::SetRotation,
+		ScriptReserved_DisplayStringSetScale, &ScriptDisplaySprite::SetScale,
+		ScriptReserved_DisplayStringSetColor, &ScriptDisplaySprite::SetColor,
+		ScriptReserved_DisplaySpriteDraw, &ScriptDisplaySprite::Draw);
 	}
 
 	/// Create a DisplaySprite object.
@@ -173,7 +173,7 @@ namespace TEN::Scripting::DisplaySprite
 
 	/// Draw the display sprite in display space for the current frame.
 	// @function DisplaySprite:Draw
-	// @tparam[opt] Objects.ObjID priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
+	// @tparam[opt] int priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
 	// @tparam[opt] View.AlignMode alignMode Align mode interpreting an offset from the sprite's position. __Default: View.AlignMode.CENTER__
 	// @tparam[opt] View.ScaleMode scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: View.ScaleMode.FIT__
 	// @tparam[opt] Effects.BlendID blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
@@ -182,7 +182,7 @@ namespace TEN::Scripting::DisplaySprite
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
 		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
-		constexpr auto POS_CONVERSION_COEFF	  = Vector2(SCREEN_SPACE_RES.x / 100, SCREEN_SPACE_RES.y / 100);
+		constexpr auto POS_CONVERSION_COEFF	  = Vector2(DISPLAY_SPACE_RES.x / 100, DISPLAY_SPACE_RES.y / 100);
 		constexpr auto SCALE_CONVERSION_COEFF = 0.01f;
 
 		constexpr auto DEFAULT_PRIORITY	  = 0;

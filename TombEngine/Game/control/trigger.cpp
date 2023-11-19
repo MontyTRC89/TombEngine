@@ -312,7 +312,7 @@ void RefreshCamera(short type, short* data)
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollision(x, y, z, floor->Room).BottomBlock; 
+	auto bottomBlock = GetCollision(x, y, z, floor->RoomNumber).BottomBlock; 
 
 	if (bottomBlock->TriggerIndex == -1)
 		return nullptr;
@@ -834,45 +834,57 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	auto block = GetCollision(item).BottomBlock;
-	bool isLara = item->IsLara();
+	auto pointColl = GetCollision(item);
+	auto* sectorPtr = GetCollision(item).BottomBlock;
+
+	bool isPlayer = item->IsLara();
 
 	// Monkeyswing and climb (only for Lara)
-	if (isLara)
+	if (isPlayer)
 	{
 		auto* lara = GetLaraInfo(item);
 
 		// Set climb status
-		if (TestLaraNearClimbableWall(item, block))
+		if (TestLaraNearClimbableWall(item, sectorPtr))
 			lara->Control.CanClimbLadder = true;
 		else
 			lara->Control.CanClimbLadder = false;
 
 		// Set monkeyswing status
-		lara->Control.CanMonkeySwing = block->Flags.Monkeyswing;
+		lara->Control.CanMonkeySwing = sectorPtr->Flags.Monkeyswing;
 	}
 
 	// Burn or drown item
-	if (block->Flags.Death && item->Pose.Position.y == item->Floor)
+	if (sectorPtr->Flags.Death && item->Pose.Position.y == item->Floor)
 	{
-		if (isLara)
+		if (isPlayer)
 		{
 			if (!IsJumpState((LaraState)item->Animation.ActiveState) || 
 				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
 			{
 				// To allow both lava and rapids in same level, also check floor material flag.
-				if (block->Material == MaterialType::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded)
+				if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water &&
+					Objects[ID_KAYAK_LARA_ANIMS].loaded)
+				{
 					KayakLaraRapidsDrown(item);
+				}
 				else
+				{
 					LavaBurn(item);
+				}
 			}
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (block->Material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, block->Room))
+			if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water ||
+				TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sectorPtr->RoomNumber))
+			{
 				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+			}
 			else
+			{
 				ItemBurn(item);
+			}
 		}
 	}
 }

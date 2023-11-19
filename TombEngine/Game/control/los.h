@@ -5,11 +5,9 @@
 
 constexpr auto NO_LOS_ITEM = INT_MAX;
 
-bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push);
-bool LOS(GameVector* origin, GameVector* target);
-int xLOS(GameVector* origin, GameVector* target);
-int zLOS(GameVector* origin, GameVector* target);
-bool ClipTarget(GameVector* origin, GameVector* target);
+bool LOS(const GameVector* origin, GameVector* target);
 bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, bool isFiring);
-int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject = GAME_OBJECT_ID::ID_NO_OBJECT);
-bool DoRayBox(GameVector* origin, GameVector* target, GameBoundingBox* box, Pose* itemOrStaticPos, Vector3i* hitPos, short closesItemNumber);
+int	 ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject = GAME_OBJECT_ID::ID_NO_OBJECT);
+bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push);
+
+std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid);

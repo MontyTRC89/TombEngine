@@ -234,15 +234,15 @@ namespace TEN::Collision::Attractor
 				const auto& target = _points[i + 1];
 
 				// Draw main line.
-				g_Renderer.AddLine3D(origin, target, COLOR_YELLOW);
+				g_Renderer.AddDebugLine(origin, target, COLOR_YELLOW);
 
 				auto orient = Geometry::GetOrientToPoint(origin, target);
 				orient.y += ANGLE(90.0f);
 				auto dir = orient.ToDirection();
 
 				// Draw segment heading indicator lines.
-				g_Renderer.AddLine3D(origin, Geometry::TranslatePoint(origin, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN);
-				g_Renderer.AddLine3D(target, Geometry::TranslatePoint(target, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
 				// Determine label parameters.
 				auto labelPos = ((origin + target) / 2) + LABEL_OFFSET;
@@ -255,8 +255,8 @@ namespace TEN::Collision::Attractor
 			}
 
 			// Draw start and end indicator lines.
-			g_Renderer.AddLine3D(_points.front(), Geometry::TranslatePoint(_points.front(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
-			g_Renderer.AddLine3D(_points.back(), Geometry::TranslatePoint(_points.back(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+			g_Renderer.AddDebugLine(_points.front(), Geometry::TranslatePoint(_points.front(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+			g_Renderer.AddDebugLine(_points.back(), Geometry::TranslatePoint(_points.back(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
 			// Draw AABB.
 			/*auto box = BoundingOrientedBox(_box.Center, _box.Extents, Quaternion::Identity);
@@ -265,7 +265,7 @@ namespace TEN::Collision::Attractor
 		else if (_points.size() == 1)
 		{
 			// Draw sphere.
-			g_Renderer.AddSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW);
+			g_Renderer.AddDebugSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW);
 
 			// Determine label parameters.
 			auto labelPos = _points.front();

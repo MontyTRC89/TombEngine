@@ -109,17 +109,20 @@ short FindBridge(int tiltGrade, short orient, Vector3i& pos, int* returnHeight, 
 		{
 			if (ceilingMinY || ceilingMaxY)
 			{
-				if (Objects[bridgeItem->ObjectNumber].ceiling == nullptr)
+				if (Objects[bridgeItem->ObjectNumber].GetCeilingHeight == nullptr)
 					continue;
 
-				*returnHeight = Objects[bridgeItem->ObjectNumber].ceiling(i, pos.x, pos.y, pos.z).value_or(NO_HEIGHT);
+				const auto& item = g_Level.Items[i];
+				*returnHeight = Objects[bridgeItem->ObjectNumber].GetCeilingHeight(item, pos).value_or(NO_HEIGHT);
 				
-				int ceilingDistance = *returnHeight - pos.y;
-				if (ceilingDistance >= ceilingMinY && ceilingDistance <= ceilingMaxY)
+				int ceilingDist = *returnHeight - pos.y;
+				if (ceilingDist >= ceilingMinY && ceilingDist <= ceilingMaxY)
 					return i;
 			}
 			else
+			{
 				return i;
+			}
 		}
 	}
 

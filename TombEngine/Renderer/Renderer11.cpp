@@ -58,8 +58,9 @@ namespace TEN::Renderer
 
 	void Renderer11::ClearSceneItems()
 	{
-		m_lines3DToDraw.clear();
-		m_lines2DToDraw.clear();
+		_lines2DToDraw.clear();
+		_lines3DToDraw.clear();
+		_triangles3DToDraw.clear();
 		gameCamera.clear();
 	}
 
@@ -122,7 +123,7 @@ namespace TEN::Renderer
 		};
 
 		auto hudBorderSize = Vector2(
-			borderSize * (SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y),
+			borderSize * (DISPLAY_SPACE_RES.x / DISPLAY_SPACE_RES.y),
 			borderSize);
 
 		auto barBorderVertices = std::array<Vector3, 16>

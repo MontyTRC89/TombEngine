@@ -1,9 +1,12 @@
 #pragma once
-#include "Game/items.h"
 
-void InitializeTwoBlocksPlatform(short itemNumber);
-void TwoBlocksPlatformControl(short itemNumber);
-std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z);
-std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z);
-int TwoBlocksPlatformFloorBorder(short itemNumber);
-int TwoBlocksPlatformCeilingBorder(short itemNumber);
+class Vector3i;
+struct ItemInfo;
+
+void InitializeTwoBlockPlatform(short itemNumber);
+void TwoBlockPlatformControl(short itemNumber);
+
+std::optional<int> GetTwoBlockPlatformFloorHeight(const ItemInfo& item, const Vector3i& pos);
+std::optional<int> GetTwoBlockPlatformCeilingHeight(const ItemInfo& item, const Vector3i& pos);
+int GetTwoBlockPlatformFloorBorder(const ItemInfo& item);
+int GetTwoBlockPlatformCeilingBorder(const ItemInfo& item);
