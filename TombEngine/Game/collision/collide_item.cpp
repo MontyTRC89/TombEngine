@@ -2012,19 +2012,20 @@ void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	}
 }
 
+// TODO: Extend to be a more general, simple, all-in-one LOS function with a variety of flags for what to detect.
 std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
 {
 	// Run through neighboring rooms.
-	const auto& roomNumbers = g_Level.Rooms[roomNumber].neighbors;
-	for (int roomNumber : g_Level.Rooms[roomNumber].neighbors)
+	const auto& room = g_Level.Rooms[roomNumber];
+	for (int neighborRoomNumber : room.neighbors)
 	{
-		// Get room.
-		const auto& room = g_Level.Rooms[roomNumber];
-		if (!room.Active())
+		// Get neighbor room.
+		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+		if (!neighborRoom.Active())
 			continue;
 
 		// Run through statics.
-		for (const auto& staticObject : g_Level.Rooms[roomNumber].mesh)
+		for (const auto& staticObject : g_Level.Rooms[neighborRoomNumber].mesh)
 		{
 			// Check if static is visible.
 			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))

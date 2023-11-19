@@ -19,8 +19,8 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
-using namespace TEN::Input;
 using namespace TEN::Entities::Player;
+using namespace TEN::Input;
 
 // -----------------------------
 // COLLISION TEST FUNCTIONS
