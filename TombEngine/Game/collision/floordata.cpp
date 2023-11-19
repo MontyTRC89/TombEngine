@@ -952,7 +952,7 @@ namespace TEN::Collision::Floordata
 		if (bridge.GetFloorBorder != nullptr)
 		{
 			int floorBorder = bridge.GetFloorBorder(bridgeItem);
-			while (floorBorder <= sectroPtr->GetSurfaceHeight(x, z, false))
+			while (floorBorder <= sectorPtr->GetSurfaceHeight(x, z, false))
 			{
 				auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(x, z);
 				if (!roomNumberAbove.has_value())
@@ -966,7 +966,7 @@ namespace TEN::Collision::Floordata
 		if (bridge.GetCeilingBorder != nullptr)
 		{
 			int ceilingBorder = bridge.GetCeilingBorder(bridgeItem);
-			while (ceilingBorder >= sectroPtr->GetSurfaceHeight(x, z, true))
+			while (ceilingBorder >= sectorPtr->GetSurfaceHeight(x, z, true))
 			{
 				auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(x, z);
 				if (!roomNumberBelow.has_value())
