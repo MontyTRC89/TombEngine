@@ -280,4 +280,4 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
 
-void SpawnDynamicLight(const Vector3& pos, const Color& color, float falloff);
+void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);

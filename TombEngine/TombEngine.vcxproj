@@ -390,6 +390,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
     <ClInclude Include="Game\items.h" />
+    <ClInclude Include="Game\Lara\PlayerContext.h" />
+    <ClInclude Include="Game\Lara\PlayerContextData.h" />
     <ClInclude Include="Game\Lara\PlayerStateMachine.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
@@ -734,6 +736,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Settings\Settings.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Input\ActionIDs.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Input\InputHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Inventory\InventoryHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Logic\LevelFunc.h" />
     <ClInclude Include="Scripting\Internal\TEN\Logic\LogicHandler.h" />
@@ -867,6 +871,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\Lara\lara_two_guns.cpp" />
+    <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\Lara\PlayerStateMachine.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\missile.cpp" />

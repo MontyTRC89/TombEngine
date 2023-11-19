@@ -55,7 +55,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	// Handle object interation adjustment parameters.
 	if (player.Control.IsMoving)
 	{
-		if (player.Control.Count.PositionAdjust > LARA_POSITION_ADJUST_MAX_TIME)
+		if (player.Control.Count.PositionAdjust > PLAYER_POSITION_ADJUST_MAX_TIME)
 		{
 			player.Control.IsMoving = false;
 			player.Control.HandStatus = HandStatus::Free;
@@ -68,7 +68,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		player.Control.Count.PositionAdjust = 0;
 	}
 
-	if (!player.Control.Locked)
+	if (!player.Control.IsLocked)
 		player.LocationPad = -1;
 
 	// FAILSAFE: Force hand status reset.
@@ -584,7 +584,6 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		ResetPlayerFlex(item);
-
 		InitializeLaraMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
 		player.Control.HandStatus = HandStatus::Free;

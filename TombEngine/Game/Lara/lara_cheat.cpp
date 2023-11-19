@@ -58,9 +58,44 @@ namespace TEN::Entities::Player
 		}
 	}
 
-	// TODO: Avoid hooking into swim state.
 	void lara_col_fly_cheat(ItemInfo* item, CollisionInfo* coll)
 	{
-		lara_col_underwater_swim_forward(item, coll);
+		auto& player = GetLaraInfo(*item);
+
+		if (item->Pose.Orientation.x < ANGLE(-90.0f) ||
+			item->Pose.Orientation.x > ANGLE(90.0f))
+		{
+			player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+			coll->Setup.ForwardAngle = item->Pose.Orientation.y - ANGLE(180.0f);
+		}
+		else
+		{
+			player.Control.MoveAngle = item->Pose.Orientation.y;
+			coll->Setup.ForwardAngle = item->Pose.Orientation.y;
+		}
+
+		int height = abs(LARA_HEIGHT * phd_sin(item->Pose.Orientation.x));
+		auto offset = Vector3i(0, height / 2, 0);
+
+		coll->Setup.UpperFloorBound = -CLICK(0.25f);
+		coll->Setup.Height = height;
+
+		GetCollisionInfo(coll, item, offset);
+
+		auto coll0 = *coll;
+		coll0.Setup.ForwardAngle += ANGLE(45.0f);
+		GetCollisionInfo(&coll0, item, offset);
+
+		auto coll1 = *coll;
+		coll1.Setup.ForwardAngle -= ANGLE(45.0f);
+		GetCollisionInfo(&coll1, item, offset);
+
+		ShiftItem(item, coll);
+
+		if (coll->Middle.Floor < 0 &&
+			coll->Middle.Floor != NO_HEIGHT)
+		{
+			item->Pose.Position.y += coll->Middle.Floor;
+		}
 	}
 }
