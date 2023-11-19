@@ -36,7 +36,7 @@ using namespace TEN::Input;
 using namespace TEN::Utils;
 
 // TODO: Confirm list.
-static const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
+const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 {
 	ID_EXPANDING_PLATFORM,
 	ID_SQUISHY_BLOCK1,

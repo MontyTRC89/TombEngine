@@ -1025,9 +1025,9 @@ namespace TEN::Collision::Floordata
 		// Get bridge OBB.
 		auto bridgeBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
-		// Get bridge OBB corners.
+		// Get bridge OBB corners. NOTE: only 0, 1, 4, 5 are relevant.
 		auto corners = std::array<Vector3, 8>{};
-		bridgeBox.GetCorners(corners.data()); // corners[0], corners[1], corners[4] corners[5]
+		bridgeBox.GetCorners(corners.data());
 
 		const auto& room = g_Level.Rooms[item.RoomNumber];
 
@@ -1037,7 +1037,7 @@ namespace TEN::Collision::Floordata
 		float xMax =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
 		float zMax =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
 
-		// Run through all sectors enclosed in projected bridge AABB.
+		// Run through sectors enclosed in projected bridge AABB.
 		for (int x = 0; x < room.xSize; x++)
 		{
 			for (int z = 0; z < room.zSize; z++)
