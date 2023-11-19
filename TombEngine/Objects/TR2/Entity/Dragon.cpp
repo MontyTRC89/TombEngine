@@ -295,6 +295,9 @@ namespace TEN::Entities::Creatures::TR2
 
 		bool isTargetAhead = false;
 
+		// If OCB is 1, the Player will need to pick the dagger to can kill the dragon
+		bool flagDaggerDeath = (item.TriggerFlags == 1) ? true : false;
+
 		if (item.HitPoints <= 0)
 		{
 			if (item.Animation.ActiveState != DRAGON_STATE_DEFEAT)
@@ -315,6 +318,12 @@ namespace TEN::Entities::Creatures::TR2
 
 					if (timer == DRAGON_LIVE_TIME + DRAGON_ALMOST_LIVE)
 						item.HitPoints = Objects[ID_DRAGON_FRONT].HitPoints / 2;
+
+					if (!flagDaggerDeath)
+					{
+						if (item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_DEFEATED))
+							timer = -1;
+					}
 				}
 				// Death.
 				else
@@ -543,7 +552,9 @@ namespace TEN::Entities::Creatures::TR2
 		}
 
 		//TODO: Polish Dagger Interaction
-		if (frontItem.Animation.ActiveState == DRAGON_STATE_DEFEAT)
+		if	(frontItem.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
+			 frontItem.TriggerFlags == 1
+			)
 		{
 			// TODO: No trig.
 			int rx = playerItem->Pose.Position.x - frontItem.Pose.Position.x;
