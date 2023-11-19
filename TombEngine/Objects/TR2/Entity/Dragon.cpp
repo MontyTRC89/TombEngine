@@ -129,7 +129,7 @@ namespace TEN::Entities::Creatures::TR2
 		backBoneItem.MeshBits = 0xFF3FFFFF;
 	}
 
-	static void InitializeDragonBack(ItemInfo& item)
+	static void InitializeDragonBack(ItemInfo& frontItem)
 	{
 		int backItemNumber = CreateItem();
 		if (backItemNumber == NO_ITEM)
@@ -141,16 +141,16 @@ namespace TEN::Entities::Creatures::TR2
 
 		SetAnimation(backItem, DRAGON_ANIM_IDLE);
 
-		// TODO: Check if necessary.
 		backItem.ObjectNumber = ID_DRAGON_BACK;
-		backItem.Pose = item.Pose;
-		backItem.RoomNumber = item.RoomNumber;
-		backItem.Model.Color = item.Model.Color;
-		backItem.MeshBits.Clear(DragonBackSpineJoints); // TODO: Check what this is.
+		backItem.Pose = frontItem.Pose;
+		backItem.RoomNumber = frontItem.RoomNumber;
+		backItem.Model.Color = frontItem.Model.Color;
+		backItem.MeshBits.Clear(DragonBackSpineJoints); // TODO: Check what this is. Check if necessary.
+
 		InitializeItem(backItem.Index);
 
-		// Store item number of back segment.
-		item.ItemFlags[0] = backItemNumber;
+		// Link front item to dragon back half item number.
+		frontItem.ItemFlags[0] = backItemNumber;
 	}
 
 	void InitializeDragon(short itemNumber)
@@ -165,13 +165,13 @@ namespace TEN::Entities::Creatures::TR2
 		InitializeDragonBack(item);
 	}
 
-	static void SyncDragonBackSegment(ItemInfo& item)
+	static void SyncDragonBackSegment(ItemInfo& frontItem)
 	{
-		short& backItemNumber = item.ItemFlags[0];
+		short& backItemNumber = frontItem.ItemFlags[0];
 		auto& backItem = g_Level.Items[backItemNumber];
 
 		// Sync destruction.
-		backItem.Status = item.Status;
+		backItem.Status = frontItem.Status;
 		if (backItem.Status == ITEM_DEACTIVATED)
 		{
 			KillItem(backItem.Index);
@@ -180,12 +180,12 @@ namespace TEN::Entities::Creatures::TR2
 		}
 
 		// Sync animation.
-		SetAnimation(backItem, GetAnimNumber(item), GetFrameNumber(item));
+		SetAnimation(backItem, GetAnimNumber(frontItem), GetFrameNumber(frontItem));
 
 		// Sync position.
-		backItem.Pose = item.Pose;
-		if (backItem.RoomNumber != item.RoomNumber)
-			ItemNewRoom(backItem.Index, item.RoomNumber);
+		backItem.Pose = frontItem.Pose;
+		if (backItem.RoomNumber != frontItem.RoomNumber)
+			ItemNewRoom(backItem.Index, frontItem.RoomNumber);
 	}
 
 	static void SpawnDragonLightEffect(const ItemInfo& item, DragonLightEffectType type)
@@ -223,6 +223,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	// TODO: Demagic.
 	// TODO: Smoke and sparks.
+	// TODO: Animate flame sprite sequence.
 	static void SpawnDragonFireBreath(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
 	{
 		constexpr auto FIRE_COUNT = 3;
@@ -242,15 +243,14 @@ namespace TEN::Entities::Creatures::TR2
 			dir.Normalize();
 			dir *= vel;
 
-			// TODO: Animate sprite. Can't be done here.
 			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex;
 
 			fire.on = true;
-			fire.sR = 255 - Random::GenerateInt(0, 31);
+			fire.sR = Random::GenerateFloat(0.85f, 1.0f) * UCHAR_MAX;
 			fire.sG = 64;
 			fire.sB = 38;
-			fire.dR = 128 + Random::GenerateInt(0, 63);
-			fire.dG = 80 + Random::GenerateInt(0, 63);
+			fire.dR = Random::GenerateFloat(0.5f, 0.75f) * UCHAR_MAX;
+			fire.dG = Random::GenerateFloat(0.31f, 0.56f) * UCHAR_MAX;
 			fire.dB = 32;
 			fire.colFadeSpeed = 12;
 			fire.fadeToBlack = 8;
@@ -260,7 +260,7 @@ namespace TEN::Entities::Creatures::TR2
 			fire.y = pos.y;
 			fire.z = pos.z;
 
-			int v = Random::GenerateInt(0, 63) + 192;
+			int v = Random::GenerateInt(192, 255);
 			fire.life =
 			fire.sLife = v / 6;
 
@@ -269,7 +269,7 @@ namespace TEN::Entities::Creatures::TR2
 			fire.zVel = v * (dir.z) / 10;
 
 			fire.friction = 85;
-			fire.gravity = -16 - Random::GenerateInt(0, 31);
+			fire.gravity = -Random::GenerateInt(-16, 16);
 			fire.maxYvel = 0;
 			fire.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
