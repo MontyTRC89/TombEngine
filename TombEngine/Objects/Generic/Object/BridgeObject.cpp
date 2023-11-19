@@ -7,11 +7,6 @@
 
 namespace TEN::Entities::Generic
 {
-	BridgeObject::~BridgeObject()
-	{
-		//Attractor.~Attractor();
-	}
-
 	const BridgeObject& GetBridgeObject(const ItemInfo& item)
 	{
 		// HACK: Pushable bridges.
