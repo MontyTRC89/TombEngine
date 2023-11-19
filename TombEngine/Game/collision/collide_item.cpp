@@ -2011,35 +2011,3 @@ void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 		ObjectCollision(itemNumber, playerItem, coll);
 	}
 }
-
-std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
-{
-	// Run through neighboring rooms.
-	const auto& roomNumbers = g_Level.Rooms[roomNumber].neighbors;
-	for (int roomNumber : g_Level.Rooms[roomNumber].neighbors)
-	{
-		// Get room.
-		const auto& room = g_Level.Rooms[roomNumber];
-		if (!room.Active())
-			continue;
-
-		// Run through statics.
-		for (const auto& staticObject : g_Level.Rooms[roomNumber].mesh)
-		{
-			// Check if static is visible.
-			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
-				continue;
-
-			// Check if static is solid (if applicable).
-			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
-				continue;
-
-			// Test ray-box intersection.
-			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-			if (box.Intersects(origin, dir, dist))
-				return Geometry::TranslatePoint(origin, dir, dist);
-		}
-	}
-
-	return std::nullopt;
-}
