@@ -144,9 +144,11 @@ namespace TEN::Entities::Creatures::TR2
 		backItem.RoomNumber = frontItem.RoomNumber;
 		backItem.Model.Color = frontItem.Model.Color;
 		backItem.MeshBits.Clear(DragonBackSpineJoints); // TODO: Check what this is. Check if necessary.
-
+		
 		InitializeItem(backItem.Index);
 		SetAnimation(backItem, DRAGON_ANIM_IDLE);
+
+		backItem.Status = ITEM_INVISIBLE;
 
 		// Link front item to dragon back half item number.
 		frontItem.ItemFlags[0] = backItemNumber;
