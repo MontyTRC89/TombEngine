@@ -85,7 +85,7 @@ namespace TEN::Entities::Creatures::TR2
 			Random::GenerateFloat(0.4f, 0.5f),
 			Random::GenerateFloat(0.2f, 0.3f));
 		float lightFalloff = Random::GenerateFloat(0.1f, 0.4f);
-		SpawnDynamicLight(lightPos, lightColor, lightFalloff);
+		TriggerDynamicLight(lightPos, lightColor, lightFalloff);
 		
 		// Handle transformation.
 		if (effectTimer == TRANSFORM_EFFECT_1_TIME)
