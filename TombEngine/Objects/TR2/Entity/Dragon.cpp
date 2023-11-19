@@ -151,6 +151,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		// Link front item to dragon back half item number.
 		frontItem.ItemFlags[0] = backItemNumber;
+		backItem.ItemFlags[0] = NO_ITEM;
 	}
 
 	void InitializeDragon(short itemNumber)
@@ -521,29 +522,34 @@ namespace TEN::Entities::Creatures::TR2
 	// TODO: Fix, now this function is activating also in the back part, causing a crash due broken pointers to another non-existent backItem.
 	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
-		auto& item = g_Level.Items[itemNumber];
-		short& backItemNumber = item.ItemFlags[0];
+		auto& frontItem = g_Level.Items[itemNumber];
+		
+		if (frontItem.ItemFlags[0] == NO_ITEM)
+			return;
+		
+		short& backItemNumber = frontItem.ItemFlags[0];
 		auto& backItem = g_Level.Items[backItemNumber];
 
-		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
+		if (!TestBoundsCollide(&frontItem, playerItem, coll->Setup.Radius))
 		{
 			if (!TestBoundsCollide(&backItem, playerItem, coll->Setup.Radius))
 				return;
 		}
 
-		if (!TestCollision(&item, playerItem))
+		if (!TestCollision(&frontItem, playerItem))
 		{
 			if (!TestCollision(&backItem, playerItem))
 				return;
 		}
 
-		if (item.Animation.ActiveState == DRAGON_STATE_DEFEAT)
+		//TODO: Polish Dagger Interaction
+		if (frontItem.Animation.ActiveState == DRAGON_STATE_DEFEAT)
 		{
 			// TODO: No trig.
-			int rx = playerItem->Pose.Position.x - item.Pose.Position.x;
-			int rz = playerItem->Pose.Position.z - item.Pose.Position.z;
-			float sinY = phd_sin(item.Pose.Orientation.y);
-			float cosY = phd_cos(item.Pose.Orientation.y);
+			int rx = playerItem->Pose.Position.x - frontItem.Pose.Position.x;
+			int rz = playerItem->Pose.Position.z - frontItem.Pose.Position.z;
+			float sinY = phd_sin(frontItem.Pose.Orientation.y);
+			float cosY = phd_cos(frontItem.Pose.Orientation.y);
 
 			int sideShift = rx * sinY + rz * cosY;
 			if (sideShift > DRAGON_LCOL && sideShift < DRAGON_RCOL)
@@ -552,16 +558,16 @@ namespace TEN::Entities::Creatures::TR2
 				if (shift <= DRAGON_DISTANCE_NEAR && shift >= DRAGON_DISTANCE_FAR)
 					return;
 
-				int angle = playerItem->Pose.Orientation.y - item.Pose.Orientation.y;
+				int angle = playerItem->Pose.Orientation.y - frontItem.Pose.Orientation.y;
 
-				int animNumber = item.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
-				int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+				int animNumber = frontItem.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
+				int frameNumber = frontItem.Animation.FrameNumber - GetAnimData(frontItem).frameBase;
 
 				if ((animNumber == DRAGON_ANIM_DEFEATED ||
 						(animNumber == (DRAGON_ANIM_DEFEATED + 1) && frameNumber <= DRAGON_ALMOST_LIVE)) &&
 					IsHeld(In::Action) &&
 					!playerItem->Animation.IsAirborne &&
-					item.ObjectNumber == ID_DRAGON_BACK &&
+					frontItem.ObjectNumber == ID_DRAGON_BACK &&
 					shift <= DRAGON_MID &&
 					shift > (DRAGON_DISTANCE_NEAR - 350) &&
 					sideShift > -350 &&
@@ -590,13 +596,13 @@ namespace TEN::Entities::Creatures::TR2
 					
 					playerItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;*/
 
-					if (item.ObjectNumber == ID_DRAGON_FRONT)
+					if (frontItem.ObjectNumber == ID_DRAGON_FRONT)
 					{
 						backItemNumber = NO_ITEM;
 					}
-					else if (item.ObjectNumber == ID_DRAGON_BACK)
+					else if (frontItem.ObjectNumber == ID_DRAGON_BACK)
 					{
-						auto frontItemNumber = item.NextItem;
+						auto frontItemNumber = frontItem.NextItem;
 						auto& frontPart = g_Level.Items[frontItemNumber];
 						backItemNumber = NO_ITEM;
 					}
@@ -621,6 +627,6 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		ItemPushItem(&item, playerItem, coll, 1, 0);
+		ItemPushItem(&frontItem, playerItem, coll, 1, 0);
 	}
 }

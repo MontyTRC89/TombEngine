@@ -483,7 +483,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR2\Entity\Dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_bird_monster.h" />
-    <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_eagle_or_crow.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_knife_thrower.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_mercenary.h" />
@@ -961,7 +960,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR2\Entity\Dragon.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_barracuda.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_bird_monster.cpp" />
-    <ClCompile Include="Objects\TR2\Entity\tr2_dragon.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_eagle_or_crow.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_knife_thrower.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_mercenary.cpp" />
