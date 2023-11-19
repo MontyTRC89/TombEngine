@@ -1,10 +1,12 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/Dragon.h"
 
+#include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
@@ -282,6 +284,30 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
+	static void SpawnDragonShockwave (ItemInfo& item, int jointIndex)
+	{
+		auto pos = GetJointPosition(item, jointIndex, Vector3i(0, -8, 0));
+
+		if (item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_ATTACK_LEFT_2) ||
+			item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_ATTACK_RIGHT_2))
+		{
+			if (GetFrameNumber(item) == GetFrameCount(item.Animation.AnimNumber))
+			{
+				short roomNumber = item.RoomNumber;
+				FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+				int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+				if (height == NO_HEIGHT)
+					pos.y = pos.y - CLICK(0.5f);
+				else
+					pos.y = height - CLICK(0.5f);
+
+				TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, false, (int)ShockwaveStyle::Normal);
+
+				Camera.bounce = -128;
+			}
+		}
+	}
+
 	void ControlDragon(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
@@ -363,7 +389,7 @@ namespace TEN::Entities::Creatures::TR2
 			isTargetAhead = (ai.ahead && ai.distance > DRAGON_NEAR_RANGE && ai.distance < DRAGON_IDLE_RANGE);
 
 			if (item.TouchBits.TestAny())
-				DoDamage(creature.Enemy, DRAGON_CONTACT_DAMAGE);
+				DoDamage(creature.Enemy, DRAGON_CONTACT_DAMAGE); 
 
 			switch (item.Animation.ActiveState)
 			{
@@ -411,6 +437,7 @@ namespace TEN::Entities::Creatures::TR2
 					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature.Flags = 0;
 				}
+				SpawnDragonShockwave(item, DragonSwipeAttackJointsLeft[3]);
 
 				break;
 
@@ -420,6 +447,7 @@ namespace TEN::Entities::Creatures::TR2
 					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature.Flags = 0;
 				}
+				SpawnDragonShockwave(item, DragonSwipeAttackJointsRight[3]);
 
 				break;
 
@@ -468,7 +496,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case DRAGON_STATE_TURN_LEFT:
-				item.Pose.Orientation.y += -(ANGLE(1.0f) - headingAngle);
+				item.Pose.Orientation.y -= ANGLE(1.0f) - headingAngle;
 				creature.Flags = 0;
 				break;
 
@@ -528,40 +556,25 @@ namespace TEN::Entities::Creatures::TR2
 		SyncDragonBackSegment(item);
 	}
 
-
-	// TODO: Fix, now this function is activating also in the back part, causing a crash due broken pointers to another non-existent backItem.
+	// NOTE: This function is used by both Dragon objects, front and back part.
 	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
-		auto& frontItem = g_Level.Items[itemNumber];
 		
-		if (frontItem.ItemFlags[0] == NO_ITEM)
+		auto& item = g_Level.Items[itemNumber];
+
+		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius) ||
+			!TestCollision(&item, playerItem))
 			return;
-		
-		short& backItemNumber = frontItem.ItemFlags[0];
-		auto& backItem = g_Level.Items[backItemNumber];
-
-		if (!TestBoundsCollide(&frontItem, playerItem, coll->Setup.Radius))
-		{
-			if (!TestBoundsCollide(&backItem, playerItem, coll->Setup.Radius))
-				return;
-		}
-
-		if (!TestCollision(&frontItem, playerItem))
-		{
-			if (!TestCollision(&backItem, playerItem))
-				return;
-		}
 
 		//TODO: Polish Dagger Interaction
-		if	(frontItem.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
-			 frontItem.TriggerFlags == 1
-			)
+		if	(item.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
+			item.TriggerFlags == 1)
 		{
 			// TODO: No trig.
-			int rx = playerItem->Pose.Position.x - frontItem.Pose.Position.x;
-			int rz = playerItem->Pose.Position.z - frontItem.Pose.Position.z;
-			float sinY = phd_sin(frontItem.Pose.Orientation.y);
-			float cosY = phd_cos(frontItem.Pose.Orientation.y);
+			int rx = playerItem->Pose.Position.x - item.Pose.Position.x;
+			int rz = playerItem->Pose.Position.z - item.Pose.Position.z;
+			float sinY = phd_sin(item.Pose.Orientation.y);
+			float cosY = phd_cos(item.Pose.Orientation.y);
 
 			int sideShift = rx * sinY + rz * cosY;
 			if (sideShift > DRAGON_LCOL && sideShift < DRAGON_RCOL)
@@ -570,16 +583,16 @@ namespace TEN::Entities::Creatures::TR2
 				if (shift <= DRAGON_DISTANCE_NEAR && shift >= DRAGON_DISTANCE_FAR)
 					return;
 
-				int angle = playerItem->Pose.Orientation.y - frontItem.Pose.Orientation.y;
+				int angle = playerItem->Pose.Orientation.y - item.Pose.Orientation.y;
 
-				int animNumber = frontItem.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
-				int frameNumber = frontItem.Animation.FrameNumber - GetAnimData(frontItem).frameBase;
+				int animNumber = item.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
+				int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 
 				if ((animNumber == DRAGON_ANIM_DEFEATED ||
 						(animNumber == (DRAGON_ANIM_DEFEATED + 1) && frameNumber <= DRAGON_ALMOST_LIVE)) &&
 					IsHeld(In::Action) &&
 					!playerItem->Animation.IsAirborne &&
-					frontItem.ObjectNumber == ID_DRAGON_BACK &&
+					item.ObjectNumber == ID_DRAGON_BACK &&
 					shift <= DRAGON_MID &&
 					shift > (DRAGON_DISTANCE_NEAR - 350) &&
 					sideShift > -350 &&
@@ -608,13 +621,14 @@ namespace TEN::Entities::Creatures::TR2
 					
 					playerItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;*/
 
-					if (frontItem.ObjectNumber == ID_DRAGON_FRONT)
+					short& backItemNumber = item.ItemFlags[0];
+					if (item.ObjectNumber == ID_DRAGON_FRONT)
 					{
 						backItemNumber = NO_ITEM;
 					}
-					else if (frontItem.ObjectNumber == ID_DRAGON_BACK)
+					else if (item.ObjectNumber == ID_DRAGON_BACK)
 					{
-						auto frontItemNumber = frontItem.NextItem;
+						auto frontItemNumber = item.NextItem;
 						auto& frontPart = g_Level.Items[frontItemNumber];
 						backItemNumber = NO_ITEM;
 					}
@@ -639,6 +653,6 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		ItemPushItem(&frontItem, playerItem, coll, 1, 0);
+		ItemPushItem(&item, playerItem, coll, 1, 2);
 	}
 }
