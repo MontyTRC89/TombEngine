@@ -5,6 +5,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
+#include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Objects/Generic/Object/Pushable/PushableStack.h"
@@ -12,6 +13,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -128,14 +130,14 @@ namespace TEN::Entities::Generic
 			if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
 				continue;
 
-			if (Objects[CollidedItems[i]->ObjectNumber].GetFloorHeight == nullptr)
+			if (!CollidedItems[i]->IsBridge())
 				return false;
 
-			const auto& object = Objects[CollidedItems[i]->ObjectNumber];
 			const auto& item = g_Level.Items[CollidedItems[i]->Index];
+			const auto& bridge = GetBridgeObject(item);
 
 			auto pos = CollidedItems[i]->Pose.Position;
-			if (!object.GetFloorHeight(item, pos).has_value())
+			if (!bridge.GetFloorHeight(item, pos).has_value())
 				return false;
 		}
 
@@ -208,17 +210,17 @@ namespace TEN::Entities::Generic
 			if (Objects[CollidedItems[i]->ObjectNumber].isPickup)
 				continue;
 
-			if (!Objects[CollidedItems[i]->ObjectNumber].GetFloorHeight)
+			if (CollidedItems[i]->IsBridge())
 			{
 				return false;
 			}
 			else
 			{
-				const auto& object = Objects[CollidedItems[i]->ObjectNumber];
 				const auto& item = g_Level.Items[CollidedItems[i]->Index];
-				
+				const auto& bridge = GetBridgeObject(item);
+
 				auto pos = CollidedItems[i]->Pose.Position;
-				if (!object.GetFloorHeight(item, pos).has_value())
+				if (!bridge.GetFloorHeight(item, pos).has_value())
 					return false;
 			}
 		}

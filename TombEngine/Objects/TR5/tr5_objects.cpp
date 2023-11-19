@@ -664,10 +664,6 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeTwoBlockPlatform;
 		obj->control = TwoBlockPlatformControl;
-		obj->GetFloorHeight = GetTwoBlockPlatformFloorHeight;
-		obj->GetCeilingHeight = GetTwoBlockPlatformCeilingHeight;
-		obj->GetFloorBorder = GetTwoBlockPlatformFloorBorder;
-		obj->GetCeilingBorder = GetTwoBlockPlatformCeilingBorder;
 		obj->SetHitEffect(true);
 	}
 
@@ -678,10 +674,6 @@ static void StartObject(ObjectInfo *obj)
 		{
 			obj->Initialize = InitializeRaisingBlock;
 			obj->control = ControlRaisingBlock;
-			obj->GetFloorHeight = GetRaisingBlockFloorHeight;
-			obj->GetCeilingHeight = GetRaisingBlockCeilingHeight;
-			obj->GetFloorBorder = GetRaisingBlockFloorBorder;
-			obj->GetCeilingBorder = GetRaisingBlockCeilingBorder;
 			obj->SetHitEffect(true);
 		}
 	}
@@ -691,10 +683,6 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeExpandingPlatform;
 		obj->control = ControlExpandingPlatform;
-		obj->GetFloorHeight = GetExpandingPlatformFloorHeight;
-		obj->GetCeilingHeight = GetExpandingPlatformCeilingHeight;
-		obj->GetFloorBorder = ExpandingPlatformFloorBorder;
-		obj->GetCeilingBorder = ExpandingPlatformCeilingBorder;
 		obj->SetHitEffect(true);
 	}
 
@@ -704,8 +692,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = ElectricalLightControl;
 		obj->Initialize = InitializeElectricalLight;
 		obj->meshSwapSlot = ID_ELECTRICAL_LIGHT;
-		//obj->drawRoutine = nullptr;
-		//obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_PULSE_LIGHT];

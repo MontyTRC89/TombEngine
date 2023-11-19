@@ -586,8 +586,7 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 		}
 	}
 
-	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
 }
 
@@ -617,8 +616,7 @@ void Moveable::SetRot(const Rotation& rot)
 	m_item->Pose.Orientation.y = ANGLE(rot.y);
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
 
-	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
 }
 
