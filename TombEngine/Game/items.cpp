@@ -633,6 +633,11 @@ short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectNumber)
 
 		spawn->Status = ITEM_NOT_ACTIVE;
 	}
+	else
+	{
+		TENLog("Failed to create new item.", LogLevel::Warning);
+		itemNumber = NO_ITEM;
+	}
 
 	return itemNumber;
 }

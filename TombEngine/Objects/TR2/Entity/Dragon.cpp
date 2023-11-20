@@ -100,7 +100,6 @@ namespace TEN::Entities::Creatures::TR2
 		DRAGON_ANIM_RECOVER = 23
 	};
 
-	// TODO: Check.
 	static void InitializeDragonBones(short frontItemNumber)
 	{
 		const auto& frontItem = g_Level.Items[frontItemNumber];
@@ -108,53 +107,27 @@ namespace TEN::Entities::Creatures::TR2
 		int backItemNumber = frontItem.ItemFlags[0];
 		const auto& backItem = g_Level.Items[backItemNumber];
 
-		int frontBoneItemNumber = CreateItem();
-		int backBoneItemNumber = CreateItem();
+		int frontBoneItemNumber = SpawnItem(frontItem, ID_DRAGON_BONE_FRONT);
+		int backBoneItemNumber = SpawnItem(frontItem, ID_DRAGON_BONE_BACK);
+
 		if (backBoneItemNumber == NO_ITEM || frontBoneItemNumber == NO_ITEM)
+		{
+			TENLog("Failed to create dragon skeleton objects.", LogLevel::Warning);
 			return;
-
-		auto& frontBoneItem = g_Level.Items[frontBoneItemNumber];
-		auto& backBoneItem = g_Level.Items[backBoneItemNumber];
-
-		frontBoneItem.ObjectNumber = ID_DRAGON_BONE_FRONT;
-		frontBoneItem.Pose = frontItem.Pose;
-		frontBoneItem.Pose.Orientation.x = 0;
-		frontBoneItem.Pose.Orientation.z = 0;
-		frontBoneItem.RoomNumber = frontItem.RoomNumber;
-		frontBoneItem.Model.Color = frontItem.Model.Color;
-		InitializeItem(frontBoneItemNumber);
-
-		backBoneItem.ObjectNumber = ID_DRAGON_BONE_BACK;
-		backBoneItem.Pose = backItem.Pose;
-		backBoneItem.Pose.Orientation.x = 0;
-		backBoneItem.Pose.Orientation.z = 0;
-		backBoneItem.RoomNumber = backItem.RoomNumber;
-		backBoneItem.Model.Color = backItem.Model.Color;
-		InitializeItem(backBoneItemNumber);
-
-		frontBoneItem.MeshBits = 0xFF3FFFFF;
-		backBoneItem.MeshBits = 0xFF3FFFFF;
+		}
 	}
 
 	static void InitializeDragonBack(ItemInfo& frontItem)
 	{
-		int backItemNumber = CreateItem();
+		int backItemNumber = SpawnItem(frontItem, ID_DRAGON_BACK);
+		
 		if (backItemNumber == NO_ITEM)
 		{
 			TENLog("Failed to create dragon back body segment.", LogLevel::Warning);
 			return;
 		}
+
 		auto& backItem = g_Level.Items[backItemNumber];
-
-		backItem.ObjectNumber = ID_DRAGON_BACK;
-		backItem.Pose = frontItem.Pose;
-		backItem.RoomNumber = frontItem.RoomNumber;
-		backItem.Model.Color = frontItem.Model.Color;
-		backItem.MeshBits.Clear(DragonBackSpineJoints); // TODO: Check what this is. Check if necessary.
-		
-		InitializeItem(backItem.Index);
-		SetAnimation(backItem, DRAGON_ANIM_IDLE);
-
 		backItem.Status = ITEM_INVISIBLE;
 
 		// Store back body segment item number.
