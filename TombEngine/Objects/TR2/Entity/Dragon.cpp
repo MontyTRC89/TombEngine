@@ -619,7 +619,7 @@ namespace TEN::Entities::Creatures::TR2
 
 					AnimateItem(&playerItem);
 
-					// Setting ItemFlags[1] to negative value will dragon defeat status and triggers death.
+					// Setting ItemFlags[1] to negative value sets defeat status and triggers death.
 					item.ItemFlags[1] = -1 * (100 - GetFrameCount(playerItem.Animation.AnimNumber));
 				}
 				else
