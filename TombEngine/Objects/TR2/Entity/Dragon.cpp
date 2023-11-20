@@ -573,15 +573,15 @@ namespace TEN::Entities::Creatures::TR2
 		SyncDragonBackSegment(item);
 	}
 
-	static void TriggerDaggerPickup(ItemInfo& item, ItemInfo* playerItem)
+	static void HandleDaggerPickup(ItemInfo& item, ItemInfo& playerItem)
 	{
-		auto& player = GetLaraInfo(*playerItem);
+		auto& player = GetLaraInfo(playerItem);
 
 		if ((IsHeld(In::Action) &&
 			(item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_DEFEATED) ||
 			(item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_RECOVER) && GetFrameNumber(item) <= DRAGON_ALMOST_LIVE)) &&
-			playerItem->Animation.ActiveState == LS_IDLE &&
-			playerItem->Animation.AnimNumber == LA_STAND_IDLE &&
+			playerItem.Animation.ActiveState == LS_IDLE &&
+			playerItem.Animation.AnimNumber == LA_STAND_IDLE &&
 			player.Control.HandStatus == HandStatus::Free) ||
 			player.Control.IsMoving && player.Context.InteractedItem == item.Index )
 		{
@@ -595,32 +595,32 @@ namespace TEN::Entities::Creatures::TR2
 			DragonDaggerPos.x = bounds.X2 - BLOCK(2.5f);
 			DragonDaggerPos.z = bounds.Z1 + BLOCK(0.9f);
 
-			if (TestLaraPosition(DragonDaggerBounds, &item, playerItem))
+			if (TestLaraPosition(DragonDaggerBounds, &item, &playerItem))
 			{
 				// HACK: Use dragon item copy to manipulate orientation.
 				auto itemCopy = item;
 				itemCopy.Pose.Orientation.y = itemCopy.Pose.Orientation.y + ANGLE(90.0f);
 
-				if (MoveLaraPosition(DragonDaggerPos, &itemCopy, playerItem))
+				if (MoveLaraPosition(DragonDaggerPos, &itemCopy, &playerItem))
 				{
 					// TODO: Reimplement dagger pickup animation when state transitions
 					// from ID_LARA_EXTRA_ANIMS to ID_LARA are possible. -- Adngel 2023.10.03
 					
 					//SetAnimation(*playerItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
-					//playerItem->Pose = item.Pose;
+					//playerItem.Pose = item.Pose;
 
 					// Temporarily use small button push animation.
-					SetAnimation(*playerItem, LA_BUTTON_SMALL_PUSH);
+					SetAnimation(playerItem, LA_BUTTON_SMALL_PUSH);
 
-					ResetPlayerFlex(playerItem);
-					playerItem->Animation.FrameNumber = GetAnimData(playerItem).frameBase;
+					ResetPlayerFlex(&playerItem);
+					playerItem.Animation.FrameNumber = GetAnimData(playerItem).frameBase;
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
 
-					AnimateItem(playerItem);
+					AnimateItem(&playerItem);
 
 					// Setting ItemFlags[1] to negative value will dragon defeat status and triggers death.
-					item.ItemFlags[1] = -1 * (100 - GetFrameCount(playerItem->Animation.AnimNumber));
+					item.ItemFlags[1] = -1 * (100 - GetFrameCount(playerItem.Animation.AnimNumber));
 				}
 				else
 				{
@@ -644,7 +644,7 @@ namespace TEN::Entities::Creatures::TR2
 			item.TriggerFlags == 1)
 		{
 			if (item.ObjectNumber == ID_DRAGON_FRONT)
-				TriggerDaggerPickup(item, playerItem);
+				HandleDaggerPickup(item, *playerItem);
 		}
 
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius) ||
