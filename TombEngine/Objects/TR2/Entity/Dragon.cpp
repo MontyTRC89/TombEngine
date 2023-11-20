@@ -8,6 +8,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
@@ -22,6 +23,16 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
+	ObjectCollisionBounds DragonDaggerBounds =
+	{
+		GameBoundingBox::Zero,
+		std::pair(
+			EulerAngles(ANGLE(-10.0f), ANGLE(-45.0f), ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), ANGLE(45.0f), ANGLE(10.0f)))
+	};
+
+	auto DragonDaggerPos = Vector3i::Zero;
+
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
 	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
@@ -556,102 +567,84 @@ namespace TEN::Entities::Creatures::TR2
 		SyncDragonBackSegment(item);
 	}
 
+	static void TriggerDaggerPickup(ItemInfo& item, ItemInfo* playerItem)
+	{
+		auto& player = *GetLaraInfo(playerItem);
+
+		//Check conditions.
+		if (	(IsHeld(In::Action) &&
+				(item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_DEFEATED) ||
+				 (item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_RECOVER) && GetFrameNumber(item) <= DRAGON_ALMOST_LIVE)) &&
+				playerItem->Animation.ActiveState == LS_IDLE &&
+				playerItem->Animation.AnimNumber == LA_STAND_IDLE &&
+				player.Control.HandStatus == HandStatus::Free ) ||
+				player.Control.IsMoving && player.Context.InteractedItem == item.Index )
+		{
+			auto bounds = GameBoundingBox(&item);
+
+			DragonDaggerBounds.BoundingBox.X1 = bounds.X1 - BLOCK(1.0f);
+			DragonDaggerBounds.BoundingBox.X2 = bounds.X2 + BLOCK(1.0f);
+			DragonDaggerBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(1.0f);
+			DragonDaggerBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(1.0f);
+			
+			DragonDaggerPos.x = bounds.X2 - BLOCK(2.5f);
+			DragonDaggerPos.z = bounds.Z1 + BLOCK(0.9f);
+
+			if (TestLaraPosition(DragonDaggerBounds, &item, playerItem))
+			{
+				// HACK: I used a fake copy of the dragon item to can manipulate the orientation.
+				// Maybe could be useful an overload of MoveLaraPosition that allows set a different orientation?
+				ItemInfo itemFakeCopy = item;
+				itemFakeCopy.Pose.Orientation.y = itemFakeCopy.Pose.Orientation.y + ANGLE(90);
+				if (MoveLaraPosition(DragonDaggerPos, &itemFakeCopy, playerItem))
+				{
+					// TODO: Reimplement dagger pickup animation when state transitions
+					// from ID_LARA_EXTRA_ANIMS to ID_LARA are possible. -- Adngel 2023.10.03
+					
+					//SetAnimation(*playerItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
+					//playerItem->Pose = item.Pose;
+
+					// Meanwhile it will use the small button push animation.
+					SetAnimation(*playerItem, LA_BUTTON_SMALL_PUSH);
+
+					ResetPlayerFlex(playerItem);
+					playerItem->Animation.FrameNumber = GetAnimData(playerItem).frameBase;
+					player.Control.IsMoving = false;
+					player.Control.HandStatus = HandStatus::Busy;
+
+					AnimateItem(playerItem);
+
+					// Setting ItemFlags[1] to a negative value, will stop the dragon defeat status and will trigger the death routine.
+					item.ItemFlags[1] = -1 * (100 - GetFrameCount(playerItem->Animation.AnimNumber));
+				}
+				else
+				{
+					player.Context.InteractedItem = item.Index;
+				}
+			}
+			else if (player.Control.IsMoving && player.Context.InteractedItem == item.Index)
+			{
+				player.Control.IsMoving = false;
+				player.Control.HandStatus = HandStatus::Free;
+			}
+		}
+	}
+
 	// NOTE: This function is used by both Dragon objects, front and back part.
 	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
-		
 		auto& item = g_Level.Items[itemNumber];
+
+		if	(item.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
+			item.TriggerFlags == 1)
+		{
+			if (item.ObjectNumber == ID_DRAGON_FRONT)
+				TriggerDaggerPickup(item, playerItem);
+		}
 
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius) ||
 			!TestCollision(&item, playerItem))
 			return;
-
-		//TODO: Polish Dagger Interaction
-		if	(item.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
-			item.TriggerFlags == 1)
-		{
-			// TODO: No trig.
-			int rx = playerItem->Pose.Position.x - item.Pose.Position.x;
-			int rz = playerItem->Pose.Position.z - item.Pose.Position.z;
-			float sinY = phd_sin(item.Pose.Orientation.y);
-			float cosY = phd_cos(item.Pose.Orientation.y);
-
-			int sideShift = rx * sinY + rz * cosY;
-			if (sideShift > DRAGON_LCOL && sideShift < DRAGON_RCOL)
-			{
-				int shift = rx * cosY - rz * sinY;
-				if (shift <= DRAGON_DISTANCE_NEAR && shift >= DRAGON_DISTANCE_FAR)
-					return;
-
-				int angle = playerItem->Pose.Orientation.y - item.Pose.Orientation.y;
-
-				int animNumber = item.Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
-				int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
-
-				if ((animNumber == DRAGON_ANIM_DEFEATED ||
-						(animNumber == (DRAGON_ANIM_DEFEATED + 1) && frameNumber <= DRAGON_ALMOST_LIVE)) &&
-					IsHeld(In::Action) &&
-					!playerItem->Animation.IsAirborne &&
-					item.ObjectNumber == ID_DRAGON_BACK &&
-					shift <= DRAGON_MID &&
-					shift > (DRAGON_DISTANCE_NEAR - 350) &&
-					sideShift > -350 &&
-					sideShift < 350 &&
-					angle > (ANGLE(45.0f) - ANGLE(30.0f)) &&
-					angle < (ANGLE(45.0f) + ANGLE(30.0f)))
-				{
-					SetAnimation(*playerItem, LA_BUTTON_SMALL_PUSH);
-					AnimateItem(LaraItem);
-
-					// TODO: Reimplement dagger pickup animation when state transitions
-					// from ID_LARA_EXTRA_ANIMS to ID_LARA are possible. -- Adngel 2023.10.03
-					/*SetAnimation(*playerItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
-					playerItem->Pose = item.Pose;
-					playerItem->Animation.IsAirborne = false;
-					playerItem->Animation.Velocity.y = 0.0f;
-					playerItem->Animation.Velocity.z = 0.0f;
-
-					if (item.RoomNumber != playerItem->RoomNumber)
-						ItemNewRoom(playerItem->Index, item.RoomNumber);*/
-					
-					// TODO: Check. This code was used in old dagger pickup method.
-					/*Lara.ExtraAnim = 1;
-					Lara.Control.HandStatus = HandStatus::Busy;
-					Lara.HitDirection = -1;
-					
-					playerItem->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_EXTRA_ANIMS].meshIndex + LM_RHAND;*/
-
-					short& backItemNumber = item.ItemFlags[0];
-					if (item.ObjectNumber == ID_DRAGON_FRONT)
-					{
-						backItemNumber = NO_ITEM;
-					}
-					else if (item.ObjectNumber == ID_DRAGON_BACK)
-					{
-						auto frontItemNumber = item.NextItem;
-						auto& frontPart = g_Level.Items[frontItemNumber];
-						backItemNumber = NO_ITEM;
-					}
-						
-					return;
-				}
-
-				if (shift < DRAGON_MID)
-				{
-					shift = DRAGON_DISTANCE_NEAR - shift;
-				}
-				else
-				{
-					shift = DRAGON_DISTANCE_FAR - shift;
-				}
-
-				// TODO: Check. This code was used in old dagger pickup method.
-				/*laraItem->Pose.Position.x += shift * cosY;
-				laraItem->Pose.Position.z -= shift * sinY;*/
-
-				return;
-			}
-		}
 
 		ItemPushItem(&item, playerItem, coll, 1, 2);
 	}
