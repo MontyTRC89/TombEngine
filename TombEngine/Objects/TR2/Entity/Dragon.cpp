@@ -642,14 +642,20 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (item.ObjectNumber == ID_DRAGON_FRONT)
 				HandleDaggerPickup(item, *playerItem);
+
+			auto& player = *GetLaraInfo(playerItem);
+
+			if (player.Control.IsMoving &&
+				player.Context.InteractedItem == item.Index ||
+				playerItem->Animation.AnimNumber == GetAnimIndex(item, LA_BUTTON_SMALL_PUSH))
+				return;
+			else
+				CreatureCollision(itemNumber, playerItem, coll);
+
 		}
 		else
 		{
-			if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius) ||
-				!TestCollision(&item, playerItem))
-				return;
-
-			ItemPushItem(&item, playerItem, coll, 1, 0);
+			CreatureCollision(itemNumber, playerItem, coll);
 		}
 	}
 }
