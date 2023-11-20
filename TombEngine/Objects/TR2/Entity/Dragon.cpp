@@ -638,7 +638,7 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	// NOTE: This function is used by both Dragon objects, front and back part.
+	// NOTE: Used by dragon front and back body segment items.
 	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
