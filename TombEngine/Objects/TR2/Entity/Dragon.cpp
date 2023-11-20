@@ -27,8 +27,8 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		GameBoundingBox::Zero,
 		std::pair(
-			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
+			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD + ANGLE(90) , ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD + ANGLE(90), ANGLE(10.0f)))
 	};
 
 	auto DragonDaggerPos = Vector3i::Zero;
@@ -643,11 +643,13 @@ namespace TEN::Entities::Creatures::TR2
 			if (item.ObjectNumber == ID_DRAGON_FRONT)
 				HandleDaggerPickup(item, *playerItem);
 		}
+		else
+		{
+			if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius) ||
+				!TestCollision(&item, playerItem))
+				return;
 
-		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius) ||
-			!TestCollision(&item, playerItem))
-			return;
-
-		ItemPushItem(&item, playerItem, coll, 1, 0);
+			ItemPushItem(&item, playerItem, coll, 1, 0);
+		}
 	}
 }
