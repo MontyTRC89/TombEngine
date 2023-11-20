@@ -89,17 +89,16 @@ namespace TEN::Collision
 
 	void InteractionBasis::DrawDebug(const ItemInfo& entity) const
 	{
-		constexpr auto COLL_BOX_COLOR	  = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
-		constexpr auto INTERACT_BOX_COLOR = Vector4(0.0f, 1.0f, 1.0f, 1.0f);
+		constexpr auto COLL_BOX_COLOR	  = Color(1.0f, 0.0f, 0.0f, 1.0f);
+		constexpr auto INTERACT_BOX_COLOR = Color(0.0f, 1.0f, 1.0f, 1.0f);
 
 		// Draw collision box.
-		auto bounds = GameBoundingBox(&entity);
-		auto box = bounds.ToBoundingOrientedBox(entity.Pose);
-		g_Renderer.AddDebugBox(box, COLL_BOX_COLOR, RendererDebugPage::None);
+		auto collBox = GameBoundingBox(&entity).ToBoundingOrientedBox(entity.Pose);
+		g_Renderer.AddDebugBox(collBox, COLL_BOX_COLOR);
 
 		// Draw interaction box.
 		auto interactBox = Bounds.ToBoundingOrientedBox(entity.Pose);
-		g_Renderer.AddDebugBox(interactBox, INTERACT_BOX_COLOR, RendererDebugPage::None);
+		g_Renderer.AddDebugBox(interactBox, INTERACT_BOX_COLOR);
 	}
 
 	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
