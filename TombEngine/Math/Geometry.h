@@ -41,6 +41,8 @@ namespace TEN::Math::Geometry
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 	EulerAngles GetRelOrientToNormal(short orient, const Vector3& normal, const Vector3& gravity = Vector3::UnitY);
 
+	BoundingOrientedBox GetExpandedBoundingOrientedBox(const BoundingOrientedBox& box, const BoundingOrientedBox& expansionBox);
+
 	// Converters
 	Quaternion ConvertDirectionToQuat(const Vector3& dir);
 	Vector3	   ConvertQuatToDirection(const Quaternion& quat);
@@ -52,4 +54,5 @@ namespace TEN::Math::Geometry
 	bool IsPointOnLeft(const Pose& pose, const Vector3& target);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
+	bool IsPointInBox(const Vector3& point, const BoundingOrientedBox& box);
 }

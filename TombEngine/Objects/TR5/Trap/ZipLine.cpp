@@ -25,7 +25,7 @@ namespace TEN::Traps::TR5
 		GameBoundingBox(
 			-BLOCK(0.25f), BLOCK(0.25f),
 			-CLICK(1), CLICK(1),
-			BLOCK(0.25f), BLOCK(0.5f)),
+			BLOCK(0.25f), BLOCK(0.5f)).ToBoundingOrientedBox(Pose::Zero),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
 			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))

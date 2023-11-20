@@ -564,6 +564,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 	player.Status.Exposure = LARA_EXPOSURE_MAX;
 	player.Status.Poison = 0;
 	player.Status.Stamina = LARA_STAMINA_MAX;
+	player.Context.InteractedItem = NO_ITEM;
 	
 	LaraUnderwater(item, coll);
 

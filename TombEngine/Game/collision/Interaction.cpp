@@ -17,50 +17,79 @@ using TEN::Renderer::g_Renderer;
 namespace TEN::Collision
 {
 	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset,
-									   const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint)
+									   const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint)
 	{
 		PosOffset = posOffset;
 		OrientOffset = orientOffset;
-		Bounds = bounds;
+		Box = box;
 		OrientConstraint = orientConstraint;
 	}
 	
-	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint)
+	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint)
 	{
 		PosOffset = posOffset;
-		Bounds = bounds;
+		Box = box;
 		OrientConstraint = orientConstraint;
 	}
 
-	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint)
+	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint)
 	{
 		OrientOffset = orientOffset;
-		Bounds = bounds;
+		Box = box;
 		OrientConstraint = orientConstraint;
 	}
 
-	InteractionBasis::InteractionBasis(const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint)
+	InteractionBasis::InteractionBasis(const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint)
 	{
-		Bounds = bounds;
+		Box = box;
 		OrientConstraint = orientConstraint;
 	};
 
-	bool InteractionBasis::TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo,  const GameBoundingBox& boundsExtension) const
+	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset,
+									   const GameBoundingBox& box, const OrientConstraintPair& orientConstraint)
+	{
+		PosOffset = posOffset;
+		OrientOffset = orientOffset;
+		Box = box.ToBoundingOrientedBox(Pose::Zero);
+		OrientConstraint = orientConstraint;
+	}
+	
+	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint)
+	{
+		PosOffset = posOffset;
+		Box = box.ToBoundingOrientedBox(Pose::Zero);
+		OrientConstraint = orientConstraint;
+	}
+
+	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint)
+	{
+		OrientOffset = orientOffset;
+		Box = box.ToBoundingOrientedBox(Pose::Zero);
+		OrientConstraint = orientConstraint;
+	}
+
+	InteractionBasis::InteractionBasis(const GameBoundingBox& box, const OrientConstraintPair& orientConstraint)
+	{
+		Box = box.ToBoundingOrientedBox(Pose::Zero);
+		OrientConstraint = orientConstraint;
+	};
+
+	bool InteractionBasis::TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, std::optional<BoundingOrientedBox> expansionBox) const
 	{
 		DrawDebug(entityTo);
 
-		// TODO: Currently unreliable because IteractedItem is frequently not reset.
-		// 1) Avoid overriding active player interactions.
+		// 1) Avoid overriding active offset blend.
+		if (entityFrom.OffsetBlend.IsActive)
+			return false;
+
+		// TODO: Currently unreliable because IteractedItem is frequently not reset after completed interactions.
+		// 2) Avoid overriding active player interactions.
 		if (entityFrom.IsLara())
 		{
 			const auto& player = GetLaraInfo(entityFrom);
 			if (player.Context.InteractedItem != NO_ITEM)
 				return false;
 		}
-
-		// 2) Avoid overriding active offset blend.
-		if (entityFrom.OffsetBlend.IsActive)
-			return false;
 
 		// 3) Test if entityFrom's orientation is within interaction constraint.
 		auto deltaOrient = entityFrom.Pose.Orientation - entityTo.Pose.Orientation;
@@ -71,18 +100,31 @@ namespace TEN::Collision
 			return false;
 		}
 
+		// Calculate box-relative position.
 		auto deltaPos = (entityFrom.Pose.Position - entityTo.Pose.Position).ToVector3();
-		auto invRotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Transpose(); // NOTE: Transpose() used as faster equivalent to Invert().
+		auto invRotMatrix = entityTo.Pose.Orientation.ToRotationMatrix().Invert();
 		auto relPos = Vector3::Transform(deltaPos, invRotMatrix);
 
-		// 4) Test if entityFrom is inside interaction bounds.
-		auto bounds = Bounds + boundsExtension;
-		if (relPos.x < bounds.X1 || relPos.x > bounds.X2 ||
-			relPos.y < bounds.Y1 || relPos.y > bounds.Y2 ||
-			relPos.z < bounds.Z1 || relPos.z > bounds.Z2)
+		// Calculate box min and max.
+		auto box = expansionBox.has_value() ? Geometry::GetExpandedBoundingOrientedBox(Box, *expansionBox) : Box;
+		auto max = box.Center + box.Extents;
+		auto min = box.Center - box.Extents;
+
+		// 4) Test if entityFrom is inside interaction box.
+		if (relPos.x < min.x || relPos.x > max.x ||
+			relPos.y < min.y || relPos.y > max.y ||
+			relPos.z < min.z || relPos.z > max.z)
 		{
 			return false;
 		}
+
+		// TODO: Not working.
+		/*box = expansionBox.has_value() ? Geometry::GetExpandedBoundingOrientedBox(Box, *expansionBox) : Box;
+		box.Center = Vector3::Transform(box.Center, box.Orientation) + entityTo.Pose.Position.ToVector3();
+
+		// 4) Test if entityFrom's position intersects interaction box.
+		if (!Geometry::IsPointInBox(deltaPos, box))
+			return false;*/
 
 		return true;
 	}
@@ -96,8 +138,12 @@ namespace TEN::Collision
 		auto collBox = GameBoundingBox(&entity).ToBoundingOrientedBox(entity.Pose);
 		g_Renderer.AddDebugBox(collBox, COLL_BOX_COLOR);
 
+		auto rotMatrix = entity.Pose.Orientation.ToRotationMatrix();
+		auto relCenter = Vector3::Transform(Box.Center, rotMatrix);
+		auto orient = entity.Pose.Orientation.ToQuaternion();
+
 		// Draw interaction box.
-		auto interactBox = Bounds.ToBoundingOrientedBox(entity.Pose);
+		auto interactBox = BoundingOrientedBox(entity.Pose.Position.ToVector3() + relCenter, Box.Extents, orient);
 		g_Renderer.AddDebugBox(interactBox, INTERACT_BOX_COLOR);
 	}
 

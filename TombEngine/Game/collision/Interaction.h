@@ -16,18 +16,25 @@ namespace TEN::Collision
 		// Members
 		Vector3i			 PosOffset		  = Vector3i::Zero;
 		EulerAngles			 OrientOffset	  = EulerAngles::Zero;
-		GameBoundingBox		 Bounds			  = GameBoundingBox::Zero;
+		BoundingOrientedBox	 Box			  = BoundingOrientedBox();
 		OrientConstraintPair OrientConstraint = OrientConstraintPair(EulerAngles::Zero, EulerAngles::Zero);
 
 		// Constructors
-		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& bounds,
+		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const BoundingOrientedBox& box,
 						 const OrientConstraintPair& orientConstraint);
-		InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint);
-		InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint);
-		InteractionBasis(const GameBoundingBox& bounds, const OrientConstraintPair& orientConstraint);
+		InteractionBasis(const Vector3i& posOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
+		InteractionBasis(const EulerAngles& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
+		InteractionBasis(const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
+
+		// TODO: Deprecated constructors.
+		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& box,
+						 const OrientConstraintPair& orientConstraint);
+		InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
+		InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
+		InteractionBasis(const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
 
 		// Inquirers
-		bool TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, const GameBoundingBox& boundsExtension = GameBoundingBox::Zero) const;
+		bool TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, std::optional<BoundingOrientedBox> expansionBox = std::nullopt) const;
 	
 		// Utilities
 		void DrawDebug(const ItemInfo& item) const;

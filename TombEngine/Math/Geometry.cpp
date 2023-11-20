@@ -178,6 +178,16 @@ namespace TEN::Math::Geometry
 			slopeAngle * sinDeltaAngle);
 	}
 
+	BoundingOrientedBox GetExpandedBoundingOrientedBox(const BoundingOrientedBox& box, const BoundingOrientedBox& expansionBox)
+	{
+		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
+
+		return BoundingOrientedBox(
+			box.Center + Vector3::Transform(expansionBox.Center, rotMatrix),
+			box.Extents + expansionBox.Extents,
+			box.Orientation);
+	}
+
 	Quaternion ConvertDirectionToQuat(const Vector3& dir)
 	{
 		constexpr auto SINGULARITY_THRESHOLD = 1.0f - EPSILON;
@@ -293,6 +303,27 @@ namespace TEN::Math::Geometry
 		float dot = headingNormal.Dot(targetDir);
 		if (dot > 0.0f)
 			return true;
+
+		return false;
+	}
+
+	bool IsPointInBox(const Vector3& point, const BoundingOrientedBox& box)
+	{
+		// Calculate box-relative point.
+		auto invRotMatrix = Matrix::CreateFromQuaternion(box.Orientation).Invert();
+		auto relPoint = Vector3::Transform(point, invRotMatrix);
+
+		// Calculate box max and min.
+		auto max = box.Center + box.Extents;
+		auto min = box.Center - box.Extents;
+
+		// Test if point intersects box.
+		if (relPoint.x >= min.x && relPoint.x <= max.x &&
+			relPoint.y >= min.y && relPoint.y <= max.y &&
+			relPoint.z >= min.z && relPoint.z <= max.z)
+		{
+			return true;
+		}
 
 		return false;
 	}
