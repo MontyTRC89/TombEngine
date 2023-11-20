@@ -47,9 +47,9 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto DRAGON_DISTANCE_NEAR = 900;
 	constexpr auto DRAGON_DISTANCE_FAR	= 2300;
-	constexpr auto DRAGON_MID	= ((DRAGON_DISTANCE_NEAR + DRAGON_DISTANCE_FAR) / 2);
-	constexpr auto DRAGON_LCOL	= -CLICK(2);
-	constexpr auto DRAGON_RCOL	= CLICK(2);
+	constexpr auto DRAGON_MID			= (DRAGON_DISTANCE_NEAR + DRAGON_DISTANCE_FAR) / 2;
+	constexpr auto DRAGON_LCOL			= -CLICK(2);
+	constexpr auto DRAGON_RCOL			= CLICK(2);
 
 	const auto DragonMouthBite = CreatureBiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
 	const auto DragonBackSpineJoints		= std::vector<unsigned int>{ 21, 22, 23 };
@@ -147,7 +147,7 @@ namespace TEN::Entities::Creatures::TR2
 		int backItemNumber = CreateItem();
 		if (backItemNumber == NO_ITEM)
 		{
-			TENLog("Failed to create dragon back.", LogLevel::Warning);
+			TENLog("Failed to create dragon back body segment.", LogLevel::Warning);
 			return;
 		}
 		auto& backItem = g_Level.Items[backItemNumber];
@@ -163,7 +163,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		backItem.Status = ITEM_INVISIBLE;
 
-		// Link front item to dragon back half item number.
+		// Store back body segment item number.
 		frontItem.ItemFlags[0] = backItemNumber;
 		backItem.ItemFlags[0] = NO_ITEM;
 	}
@@ -260,22 +260,22 @@ namespace TEN::Entities::Creatures::TR2
 
 			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex;
 
-			fire.on = true;
-			fire.sR = Random::GenerateFloat(0.85f, 1.0f) * UCHAR_MAX;
-			fire.sG = 64;
-			fire.sB = 38;
-			fire.dR = Random::GenerateFloat(0.5f, 0.75f) * UCHAR_MAX;
-			fire.dG = Random::GenerateFloat(0.31f, 0.56f) * UCHAR_MAX;
-			fire.dB = 32;
-			fire.colFadeSpeed = 12;
-			fire.fadeToBlack = 8;
-			fire.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-			
 			fire.x = pos.x;
 			fire.y = pos.y;
 			fire.z = pos.z;
 
-			int v = Random::GenerateInt(192, 255);
+			fire.on = true;
+			fire.sR = Random::GenerateFloat(0.85f, 1.0f) * UCHAR_MAX;
+			fire.sG = 0.25f * UCHAR_MAX;
+			fire.sB = 0.15f * UCHAR_MAX;
+			fire.dR = Random::GenerateFloat(0.5f, 0.75f) * UCHAR_MAX;
+			fire.dG = Random::GenerateFloat(0.3f, 0.6f) * UCHAR_MAX;
+			fire.dB = 0.15f * UCHAR_MAX;
+			fire.colFadeSpeed = 12;
+			fire.fadeToBlack = 8;
+			fire.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			
+			int v = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
 			fire.life =
 			fire.sLife = v / 6;
 
@@ -289,13 +289,13 @@ namespace TEN::Entities::Creatures::TR2
 			fire.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
 			fire.scalar = 6;
-			fire.dSize = (v * Random::GenerateFloat(60.0f, 67.0f)) / 256;
+			fire.dSize = (v * Random::GenerateFloat(60.0f, 67.0f)) / BLOCK(0.25f);
 			fire.sSize = fire.dSize / 4;
 			fire.size = fire.dSize;
 		}
 	}
 
-	static void SpawnDragonShockwave (ItemInfo& item, int jointIndex)
+	static void SpawnDragonShockwave(const ItemInfo& item, int jointIndex)
 	{
 		auto pos = GetJointPosition(item, jointIndex, Vector3i(0, -8, 0));
 
@@ -304,15 +304,19 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (GetFrameNumber(item) == GetFrameCount(item.Animation.AnimNumber))
 			{
-				short roomNumber = item.RoomNumber;
-				FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-				int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
-				if (height == NO_HEIGHT)
-					pos.y = pos.y - CLICK(0.5f);
-				else
-					pos.y = height - CLICK(0.5f);
+				auto pointColl = GetCollision(pos, item.RoomNumber);
 
-				TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, false, (int)ShockwaveStyle::Normal);
+				if (pointColl.Position.Floor == NO_HEIGHT)
+				{
+					pos.y -= CLICK(0.5f);
+				}
+				else
+				{
+					pos.y = pointColl.Position.Floor - CLICK(0.5f);
+				}
+
+				auto pose = Pose(pos, EulerAngles::Zero);
+				TriggerShockwave(&pose, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, false, (int)ShockwaveStyle::Normal);
 
 				Camera.bounce = -128;
 			}
@@ -333,7 +337,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		bool isTargetAhead = false;
 
-		// If OCB is 1, the Player will need to pick the dagger to can kill the dragon
+		// NOTE: OCB 1 = player must retrieve dagger to kill dragon.
 		bool flagDaggerDeath = (item.TriggerFlags == 1) ? true : false;
 
 		if (item.HitPoints <= 0)
@@ -400,7 +404,7 @@ namespace TEN::Entities::Creatures::TR2
 			isTargetAhead = (ai.ahead && ai.distance > DRAGON_NEAR_RANGE && ai.distance < DRAGON_IDLE_RANGE);
 
 			if (item.TouchBits.TestAny())
-				DoDamage(creature.Enemy, DRAGON_CONTACT_DAMAGE); 
+				DoDamage(creature.Enemy, DRAGON_CONTACT_DAMAGE);
 
 			switch (item.Animation.ActiveState)
 			{
@@ -448,6 +452,7 @@ namespace TEN::Entities::Creatures::TR2
 					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature.Flags = 0;
 				}
+
 				SpawnDragonShockwave(item, DragonSwipeAttackJointsLeft[3]);
 
 				break;
@@ -458,6 +463,7 @@ namespace TEN::Entities::Creatures::TR2
 					DoDamage(creature.Enemy, DRAGON_SWIPE_ATTACK_DAMAGE);
 					creature.Flags = 0;
 				}
+
 				SpawnDragonShockwave(item, DragonSwipeAttackJointsRight[3]);
 
 				break;
@@ -569,16 +575,15 @@ namespace TEN::Entities::Creatures::TR2
 
 	static void TriggerDaggerPickup(ItemInfo& item, ItemInfo* playerItem)
 	{
-		auto& player = *GetLaraInfo(playerItem);
+		auto& player = GetLaraInfo(*playerItem);
 
-		//Check conditions.
-		if (	(IsHeld(In::Action) &&
-				(item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_DEFEATED) ||
-				 (item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_RECOVER) && GetFrameNumber(item) <= DRAGON_ALMOST_LIVE)) &&
-				playerItem->Animation.ActiveState == LS_IDLE &&
-				playerItem->Animation.AnimNumber == LA_STAND_IDLE &&
-				player.Control.HandStatus == HandStatus::Free ) ||
-				player.Control.IsMoving && player.Context.InteractedItem == item.Index )
+		if ((IsHeld(In::Action) &&
+			(item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_DEFEATED) ||
+			(item.Animation.AnimNumber == GetAnimIndex(item, DRAGON_ANIM_RECOVER) && GetFrameNumber(item) <= DRAGON_ALMOST_LIVE)) &&
+			playerItem->Animation.ActiveState == LS_IDLE &&
+			playerItem->Animation.AnimNumber == LA_STAND_IDLE &&
+			player.Control.HandStatus == HandStatus::Free) ||
+			player.Control.IsMoving && player.Context.InteractedItem == item.Index )
 		{
 			auto bounds = GameBoundingBox(&item);
 
@@ -592,11 +597,11 @@ namespace TEN::Entities::Creatures::TR2
 
 			if (TestLaraPosition(DragonDaggerBounds, &item, playerItem))
 			{
-				// HACK: I used a fake copy of the dragon item to can manipulate the orientation.
-				// Maybe could be useful an overload of MoveLaraPosition that allows set a different orientation?
-				ItemInfo itemFakeCopy = item;
-				itemFakeCopy.Pose.Orientation.y = itemFakeCopy.Pose.Orientation.y + ANGLE(90);
-				if (MoveLaraPosition(DragonDaggerPos, &itemFakeCopy, playerItem))
+				// HACK: Use dragon item copy to manipulate orientation.
+				auto itemCopy = item;
+				itemCopy.Pose.Orientation.y = itemCopy.Pose.Orientation.y + ANGLE(90.0f);
+
+				if (MoveLaraPosition(DragonDaggerPos, &itemCopy, playerItem))
 				{
 					// TODO: Reimplement dagger pickup animation when state transitions
 					// from ID_LARA_EXTRA_ANIMS to ID_LARA are possible. -- Adngel 2023.10.03
@@ -604,7 +609,7 @@ namespace TEN::Entities::Creatures::TR2
 					//SetAnimation(*playerItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
 					//playerItem->Pose = item.Pose;
 
-					// Meanwhile it will use the small button push animation.
+					// Temporarily use small button push animation.
 					SetAnimation(*playerItem, LA_BUTTON_SMALL_PUSH);
 
 					ResetPlayerFlex(playerItem);
@@ -614,7 +619,7 @@ namespace TEN::Entities::Creatures::TR2
 
 					AnimateItem(playerItem);
 
-					// Setting ItemFlags[1] to a negative value, will stop the dragon defeat status and will trigger the death routine.
+					// Setting ItemFlags[1] to negative value will dragon defeat status and triggers death.
 					item.ItemFlags[1] = -1 * (100 - GetFrameCount(playerItem->Animation.AnimNumber));
 				}
 				else
