@@ -19,6 +19,8 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto TRANSFORM_EFFECT_2_TIME = 115;
 	constexpr auto TRANSFORM_EFFECT_3_TIME = 130;
 
+	constexpr auto EXPLOSION_LIVE_TIME = 100;
+
 	void InitializeBartoli(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
@@ -31,20 +33,16 @@ namespace TEN::Entities::Creatures::TR2
 
 	static void SpawnBartoliTransformEffect(const ItemInfo& item, GAME_OBJECT_ID objectID)
 	{
-		int expItemNumber = CreateItem();
-		auto& expItem = g_Level.Items[expItemNumber];
-
-		expItem.ObjectNumber = objectID;
-		expItem.Pose.Position = item.Pose.Position + Vector3i(0, CLICK(1), 0);
-		expItem.RoomNumber = item.RoomNumber;
-		expItem.Model.Color = item.Model.Color;
-
-		InitializeItem(expItemNumber);
-		AddActiveItem(expItemNumber);
-
+		int explosionItemNumber = SpawnItem(item, objectID);
+		
+		//Activates the new item
+		AddActiveItem(explosionItemNumber);
+		auto& explosionItem = g_Level.Items[explosionItemNumber];
+		explosionItem.Status = ITEM_ACTIVE;
+		
 		// Time before fading away.
-		expItem.Timer = 100;
-		expItem.Status = ITEM_ACTIVE;
+		explosionItem.Timer = EXPLOSION_LIVE_TIME;
+		
 	}
 
 	void ControlBartoli(short itemNumber)
@@ -100,20 +98,14 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM3);
 			KillItem(itemNumber);
+			
+			int newItemNumber = SpawnItem(item, (GAME_OBJECT_ID)transformObjectID);
+			
+			//Activates the new item
+			AddActiveItem(newItemNumber);
+			auto& newItem = g_Level.Items[newItemNumber];
+			newItem.Status = ITEM_ACTIVE;
 
-			int transformItemNumber = CreateItem();
-			if (transformItemNumber == NO_ITEM)
-				return;
-
-			auto& transformItem = g_Level.Items[transformItemNumber];
-
-			transformItem.ObjectNumber = (GAME_OBJECT_ID)transformObjectID;
-			transformItem.Pose = item.Pose;
-			transformItem.RoomNumber = item.RoomNumber;
-			transformItem.Model.Color = Vector4::One;
-
-			InitializeItem(transformItemNumber);
-			AddActiveItem(transformItemNumber);
 		}
 	}
 
