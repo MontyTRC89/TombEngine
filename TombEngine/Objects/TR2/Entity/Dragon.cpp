@@ -129,6 +129,9 @@ namespace TEN::Entities::Creatures::TR2
 
 		auto& backItem = g_Level.Items[backItemNumber];
 		backItem.Status = ITEM_INVISIBLE;
+		
+		// Mark the bone meshes 21, 23 and 23 for they don't be rendered.
+		backItem.MeshBits.Clear(DragonBackSpineJoints);
 
 		// Store back body segment item number.
 		frontItem.ItemFlags[0] = backItemNumber;
