@@ -23,7 +23,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
-	ObjectCollisionBounds DragonDaggerBounds =
+	auto DragonDaggerBounds = ObjectCollisionBounds
 	{
 		GameBoundingBox::Zero,
 		std::pair(
