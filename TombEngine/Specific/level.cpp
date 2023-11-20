@@ -194,7 +194,7 @@ void LoadItems()
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
-				if ((Objects[g_Level.Items[i].ObjectNumber].floor == nullptr) == (bool)isFloor)
+				if ((Objects[g_Level.Items[i].ObjectNumber].GetFloorHeight == nullptr) == (bool)isFloor)
 					InitializeItem(i);
 			}
 		}
@@ -599,19 +599,43 @@ void LoadTextures()
 	ReadBytes(g_Level.SkyTexture.colorMapData.data(), size);
 }
 
+// The way floordata "planes" were previously stored was non-standard.
+// Instead of a Plane object with a normal + distance,
+// they used a Vector3 object with data laid out as follows:
+// x: X tilt grade (0.25f = 1/4 block).
+// y: Z tilt grade (0.25f = 1/4 block).
+// z: Plane's absolute height at the sector's center (i.e. distance in regular plane terms).
+static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
+{
+	// Calculate normal from tilt grades.
+	int sign = isFloor ? -1 : 1;
+	auto normal = Vector3(-fakePlane.x, 1.0f, -fakePlane.y) * sign;
+	normal.Normalize();
+
+	// Determine distance.
+	float dist = fakePlane.z;
+
+	// Return plane.
+	return Plane(normal, dist);
+}
+
 void ReadRooms()
 {
-	int numRooms = ReadInt32();
-	TENLog("Num rooms: " + std::to_string(numRooms), LogLevel::Info);
+	constexpr auto ILLEGAL_FLOOR_SLOPE_ANGLE	= ANGLE(45.0f * 0.75f);
+	constexpr auto ILLEGAL_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
 
-	g_Level.Rooms.reserve(numRooms);
-	for (int i = 0; i < numRooms; i++)
+	int roomCount = ReadInt32();
+	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
+
+	g_Level.Rooms.reserve(roomCount);
+	for (int i = 0; i < roomCount; i++)
 	{
 		auto& room = g_Level.Rooms.emplace_back();
 		
 		room.name = ReadString();
-		int numTags = ReadInt32();
-		for (int j = 0; j < numTags; j++)
+
+		int tagCount = ReadInt32();
+		for (int j = 0; j < tagCount; j++)
 			room.tags.push_back(ReadString());
 		
 		room.x = ReadInt32();
@@ -620,25 +644,25 @@ void ReadRooms()
 		room.minfloor = ReadInt32();
 		room.maxceiling = ReadInt32();
 
-		int numVertices = ReadInt32();
+		int vertexCount = ReadInt32();
 
-		room.positions.reserve(numVertices);
-		for (int j = 0; j < numVertices; j++)
+		room.positions.reserve(vertexCount);
+		for (int j = 0; j < vertexCount; j++)
 			room.positions.push_back(ReadVector3());
 
-		room.colors.reserve(numVertices);
-		for (int j = 0; j < numVertices; j++)
+		room.colors.reserve(vertexCount);
+		for (int j = 0; j < vertexCount; j++)
 			room.colors.push_back(ReadVector3());
 
-		room.effects.reserve(numVertices);
-		for (int j = 0; j < numVertices; j++)
+		room.effects.reserve(vertexCount);
+		for (int j = 0; j < vertexCount; j++)
 			room.effects.push_back(ReadVector3());
 
-		int numBuckets = ReadInt32();
-		room.buckets.reserve(numBuckets);
-		for (int j = 0; j < numBuckets; j++)
+		int bucketCount = ReadInt32();
+		room.buckets.reserve(bucketCount);
+		for (int j = 0; j < bucketCount; j++)
 		{
-			BUCKET bucket;
+			auto bucket = BUCKET{};
 
 			bucket.texture = ReadInt32();
 			bucket.blendMode = (BLEND_MODES)ReadUInt8();
@@ -646,15 +670,16 @@ void ReadRooms()
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
 
-			int numPolygons = ReadInt32();
-			bucket.polygons.reserve(numPolygons);
-			for (int k = 0; k < numPolygons; k++)
+			int polyCount = ReadInt32();
+			bucket.polygons.reserve(polyCount);
+			for (int k = 0; k < polyCount; k++)
 			{
-				POLYGON poly;
+				auto poly = POLYGON{};
 				
 				poly.shape = ReadInt32();
 				poly.animatedSequence = ReadInt32();
 				poly.animatedFrame = ReadInt32();
+
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
 				poly.textureCoordinates.resize(count);
@@ -662,84 +687,84 @@ void ReadRooms()
 				poly.tangents.resize(count);
 				poly.binormals.resize(count);
 
-				for (int n = 0; n < count; n++)
-					poly.indices[n] = ReadInt32();
+				for (int l = 0; l < count; l++)
+					poly.indices[l] = ReadInt32();
+
 				for (int n = 0; n < count; n++)
 					poly.textureCoordinates[n] = ReadVector2();
+
 				for (int n = 0; n < count; n++)
 					poly.normals[n] = ReadVector3();
+
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
+
 				for (int n = 0; n < count; n++)
 					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
-				if (poly.shape == 0)
-					bucket.numQuads++;
-				else
-					bucket.numTriangles++;
+				(poly.shape == 0) ? bucket.numQuads++ : bucket.numTriangles++;
 			}
 
 			room.buckets.push_back(bucket);
 		}
 
-		int numPortals = ReadInt32();
-		for (int j = 0; j < numPortals; j++)
+		int portalCount = ReadInt32();
+		for (int j = 0; j < portalCount; j++)
 			LoadPortal(room);
 
 		room.zSize = ReadInt32();
 		room.xSize = ReadInt32();
 
 		room.floor.reserve(room.zSize * room.xSize);
-
-		for (int j = 0; j < room.zSize * room.xSize; j++)
+		for (int j = 0; j < (room.zSize * room.xSize); j++)
 		{
-			FloorInfo floor;
+			auto sector = FloorInfo{};
 
-			floor.TriggerIndex = ReadInt32();
-			floor.Box = ReadInt32();
-			floor.Material = (MaterialType)ReadInt32();
-			floor.Stopper = (bool)ReadInt32();
+			sector.TriggerIndex = ReadInt32();
+			sector.Box = ReadInt32();
 
-			floor.FloorCollision.SplitAngle = ReadFloat();
-			floor.FloorCollision.Portals[0] = ReadInt32();
-			floor.FloorCollision.Portals[1] = ReadInt32();
-			floor.FloorCollision.Planes[0].x = ReadFloat();
-			floor.FloorCollision.Planes[0].y = ReadFloat();
-			floor.FloorCollision.Planes[0].z = ReadFloat();
-			floor.FloorCollision.Planes[1].x = ReadFloat();
-			floor.FloorCollision.Planes[1].y = ReadFloat();
-			floor.FloorCollision.Planes[1].z = ReadFloat();
-			floor.CeilingCollision.SplitAngle = ReadFloat();
-			floor.CeilingCollision.Portals[0] = ReadInt32();
-			floor.CeilingCollision.Portals[1] = ReadInt32();
-			floor.CeilingCollision.Planes[0].x = ReadFloat();
-			floor.CeilingCollision.Planes[0].y = ReadFloat();
-			floor.CeilingCollision.Planes[0].z = ReadFloat();
-			floor.CeilingCollision.Planes[1].x = ReadFloat();
-			floor.CeilingCollision.Planes[1].y = ReadFloat();
-			floor.CeilingCollision.Planes[1].z = ReadFloat();
-			floor.WallPortal = ReadInt32();
+			sector.FloorSurface.Triangles[0].Material =
+			sector.FloorSurface.Triangles[1].Material =
+			sector.CeilingSurface.Triangles[0].Material =
+			sector.CeilingSurface.Triangles[1].Material = (MaterialType)ReadInt32();
 
-			floor.Flags.Death = ReadBool();
-			floor.Flags.Monkeyswing = ReadBool();
-			floor.Flags.ClimbNorth = ReadBool();
-			floor.Flags.ClimbSouth = ReadBool();
-			floor.Flags.ClimbEast = ReadBool();
-			floor.Flags.ClimbWest = ReadBool();
-			floor.Flags.MarkTriggerer = ReadBool();
-			floor.Flags.MarkTriggererActive = 0; // TODO: IT NEEDS TO BE WRITTEN/READ FROM SAVEGAMES!
-			floor.Flags.MarkBeetle = ReadBool();
+			sector.Stopper = (bool)ReadInt32();
 
-			floor.Room = i;
+			sector.FloorSurface.SplitAngle = FROM_RAD(ReadFloat());
+			sector.FloorSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+			sector.FloorSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+			sector.FloorSurface.Triangles[0].PortalRoomNumber = ReadInt32();
+			sector.FloorSurface.Triangles[1].PortalRoomNumber = ReadInt32();
+			sector.FloorSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
+			sector.FloorSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 
-			room.floor.push_back(floor);
+			sector.CeilingSurface.SplitAngle = FROM_RAD(ReadFloat());
+			sector.CeilingSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+			sector.CeilingSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+			sector.CeilingSurface.Triangles[0].PortalRoomNumber = ReadInt32();
+			sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
+			sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
+			sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
+
+			sector.WallPortalRoomNumber = ReadInt32();
+			sector.Flags.Death = ReadBool();
+			sector.Flags.Monkeyswing = ReadBool();
+			sector.Flags.ClimbNorth = ReadBool();
+			sector.Flags.ClimbSouth = ReadBool();
+			sector.Flags.ClimbEast = ReadBool();
+			sector.Flags.ClimbWest = ReadBool();
+			sector.Flags.MarkTriggerer = ReadBool();
+			sector.Flags.MarkTriggererActive = 0; // TODO: Needs to be written to and read from savegames.
+			sector.Flags.MarkBeetle = ReadBool();
+
+			sector.RoomNumber = i;
+
+			room.floor.push_back(sector);
 		}
 
-		room.ambient.x = ReadFloat();
-		room.ambient.y = ReadFloat();
-		room.ambient.z = ReadFloat();
+		room.ambient = ReadVector3();
 
 		int numLights = ReadInt32();
 		room.lights.reserve(numLights);

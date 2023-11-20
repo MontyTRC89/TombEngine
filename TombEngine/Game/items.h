@@ -152,7 +152,7 @@ struct ItemInfo
 	
 	Pose StartPose;
 	Pose Pose;
-	ROOM_VECTOR Location;
+	RoomVector Location;
 	short RoomNumber;
 	int Floor;
 
@@ -208,7 +208,7 @@ short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
 void RemoveActiveItem(short itemNumber, bool killed = true);
 void RemoveDrawnItem(short itemNumber);
-void InitializeFXArray(int allocateMemory);
+void InitializeFXArray();
 short CreateNewEffect(short roomNumber);
 void KillEffect(short fxNumber);
 void InitializeItem(short itemNumber);

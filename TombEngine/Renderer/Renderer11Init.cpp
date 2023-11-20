@@ -111,14 +111,15 @@ void TEN::Renderer::Renderer11::Initialize(int w, int h, bool windowed, HWND han
 	m_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 	m_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
 	m_stHUD.View = Matrix::CreateLookAt(Vector3::Zero, Vector3(0, 0, 1), Vector3(0, -1, 0));
-	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, SCREEN_SPACE_RES.x, 0, SCREEN_SPACE_RES.y, 0, 1.0f);
+	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, DISPLAY_SPACE_RES.x, 0, DISPLAY_SPACE_RES.y, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
 	m_currentCausticsFrame = 0;
 
 	// Preallocate lists
 	m_dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
-	m_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
-	m_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
+	_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
+	_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
+	_triangles3DToDraw = createVector<RendererTriangle3D>(TRIANGLE_3D_COUNT_MAX);
 	m_transparentFaces = createVector<RendererTransparentFace>(MAX_TRANSPARENT_FACES);
 	m_transparentFacesVertices = createVector<RendererVertex>(MAX_TRANSPARENT_VERTICES);
 	m_transparentFacesIndices.reserve(MAX_TRANSPARENT_VERTICES); // = createVector<int>(MAX_TRANSPARENT_VERTICES);
@@ -393,6 +394,7 @@ void Renderer11::InitializeCommonTextures()
 {
 	// Initialize font.
 	auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
+
 	if (!std::filesystem::is_regular_file(fontPath))
 		throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");
 

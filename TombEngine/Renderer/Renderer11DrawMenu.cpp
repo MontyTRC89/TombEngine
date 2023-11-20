@@ -40,9 +40,9 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalTop = 11;
-	constexpr auto MenuVerticalDisplaySettings = 200;
-	constexpr auto MenuVerticalOtherSettings = 130;
+	constexpr auto MenuVerticalControls = 30;
+	constexpr auto MenuVerticalDisplaySettings = 160;
+	constexpr auto MenuVerticalOtherSettings = 70;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
@@ -99,10 +99,10 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderOptionsMenu(Menu menu, int initialY)
 	{
-		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = SCREEN_SPACE_RES.x - MenuLeftSideEntry;
+		constexpr auto	  RIGHT_ARROW_X_OFFSET			  = DISPLAY_SPACE_RES.x - MenuLeftSideEntry;
 		static const auto LEFT_ARROW_STRING				  = std::string("<");
 		static const auto RIGHT_ARROW_STRING			  = std::string(">");
-		static const auto CONTROL_SETTINGS_BLOCK_Y_OFFSET = (MenuVerticalNarrowLineSpacing * (int)QuickActionStrings.size()) + (MenuVerticalBlockSpacing * 2);
+		static const auto CONTROL_SETTINGS_BLOCK_Y_OFFSET = (MenuVerticalNarrowLineSpacing * (int)QuickActionStrings.size()) + (MenuVerticalBlockSpacing * 2.5f);
 
 		int y = 0;
 		auto titleOption = g_Gui.GetSelectedOption();
@@ -244,7 +244,7 @@ namespace TEN::Renderer
 			// Thumbstick camera
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
-			GetNextLinePosition(&y);
+			GetNextBlockPosition(&y);
 
 			// Mouse sensitivity
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
@@ -267,7 +267,7 @@ namespace TEN::Renderer
 		case Menu::GeneralActions:
 			{
 				// Set up needed parameters.
-				y = MenuVerticalTop;
+				y = MenuVerticalControls;
 
 				// Arrows
 				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
@@ -284,7 +284,7 @@ namespace TEN::Renderer
 
 					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
-						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_WHITE, SF(true));
 					}
 					else
 					{
@@ -314,7 +314,7 @@ namespace TEN::Renderer
 		case Menu::VehicleActions:
 			{
 				// Set up needed parameters.
-				y = MenuVerticalTop;
+				y = MenuVerticalControls;
 
 				// Arrows
 				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
@@ -334,7 +334,7 @@ namespace TEN::Renderer
 
 					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
-						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_WHITE, SF(true));
 					}
 					else
 					{
@@ -370,7 +370,7 @@ namespace TEN::Renderer
 		case Menu::QuickActions:
 			{
 				// Set up needed parameters.
-				y = MenuVerticalTop;
+				y = MenuVerticalControls;
 
 				// Arrows
 				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
@@ -390,7 +390,7 @@ namespace TEN::Renderer
 
 					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
-						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_WHITE, SF(true));
 					}
 					else
 					{
@@ -420,7 +420,7 @@ namespace TEN::Renderer
 		case Menu::MenuActions:
 			{
 				// Setup needed parameters.
-				y = MenuVerticalTop;
+				y = MenuVerticalControls;
 
 				// Arrows
 				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
@@ -439,7 +439,7 @@ namespace TEN::Renderer
 
 					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 					{
-						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_WHITE, SF(true));
 					}
 					else
 					{
@@ -577,7 +577,7 @@ namespace TEN::Renderer
 			break;
 		}
 
-		DrawLinesIn2DSpace();
+		DrawLines2D();
 		DrawAllStrings();
 	}
 
@@ -706,7 +706,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawDisplayPickup(const DisplayPickup& pickup)
 	{
 		constexpr auto COUNT_STRING_INF	   = "Inf";
-		constexpr auto COUNT_STRING_OFFSET = Vector2(SCREEN_SPACE_RES.x / 40, 0.0f);
+		constexpr auto COUNT_STRING_OFFSET = Vector2(DISPLAY_SPACE_RES.x / 40, 0.0f);
 
 		// Clear only Z-buffer to draw on top of the scene.
 		ID3D11DepthStencilView* dsv;
@@ -736,8 +736,8 @@ namespace TEN::Renderer
 
 		auto screenRes = GetScreenResolution();
 		auto factor = Vector2(
-			screenRes.x / SCREEN_SPACE_RES.x,
-			screenRes.y / SCREEN_SPACE_RES.y);
+			screenRes.x / DISPLAY_SPACE_RES.x,
+			screenRes.y / DISPLAY_SPACE_RES.y);
 
 		pos2D *= factor;
 		scale *= (factor.x > factor.y) ? factor.y : factor.x;
@@ -979,14 +979,14 @@ namespace TEN::Renderer
 			auto titleMenu = g_Gui.GetMenuToDisplay();
 			bool drawLogo = (titleMenu == Menu::Title || titleMenu == Menu::Options);
 
-			if (drawLogo)
+			if (drawLogo && m_logo.Texture != nullptr)
 			{
-				float factorX = (float)m_screenWidth / SCREEN_SPACE_RES.x;
-				float factorY = (float)m_screenHeight / SCREEN_SPACE_RES.y;
+				float factorX = (float)m_screenWidth / DISPLAY_SPACE_RES.x;
+				float factorY = (float)m_screenHeight / DISPLAY_SPACE_RES.y;
 				float scale = m_screenWidth > m_screenHeight ? factorX : factorY;
 
-				int logoLeft   = (SCREEN_SPACE_RES.x / 2) - (LogoWidth / 2);
-				int logoRight  = (SCREEN_SPACE_RES.x / 2) + (LogoWidth / 2);
+				int logoLeft   = (DISPLAY_SPACE_RES.x / 2) - (LogoWidth / 2);
+				int logoRight  = (DISPLAY_SPACE_RES.x / 2) + (LogoWidth / 2);
 				int logoBottom = LogoTop + LogoHeight;
 
 				RECT rect;
@@ -1144,7 +1144,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 				PrintDebugMessage("Orient: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 				PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
+				PrintDebugMessage("Room location: %d %d", LaraItem->Location.RoomNumber, LaraItem->Location.Height);
 				PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
 				PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
 				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * BLOCK(1), r->z + r->zSize * BLOCK(1));
@@ -1195,7 +1195,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
 				PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
 				PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
-				PrintDebugMessage("Cursor pos: %.3f, %.3f", GetCursorDisplayPosition().x, GetCursorDisplayPosition().y);
+				PrintDebugMessage("Cursor pos: %.3f, %.3f", GetMouse2DPosition().x, GetMouse2DPosition().y);
 			}
 				break;
 
