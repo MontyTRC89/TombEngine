@@ -646,6 +646,6 @@ namespace TEN::Entities::Creatures::TR2
 			!TestCollision(&item, playerItem))
 			return;
 
-		ItemPushItem(&item, playerItem, coll, 1, 2);
+		ItemPushItem(&item, playerItem, coll, 1, 0);
 	}
 }
