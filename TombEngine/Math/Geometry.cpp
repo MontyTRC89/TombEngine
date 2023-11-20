@@ -311,16 +311,12 @@ namespace TEN::Math::Geometry
 	{
 		// Calculate box-relative point.
 		auto invRotMatrix = Matrix::CreateFromQuaternion(box.Orientation).Invert();
-		auto relPoint = Vector3::Transform(point, invRotMatrix);
-
-		// Calculate box max and min.
-		auto max = box.Center + box.Extents;
-		auto min = box.Center - box.Extents;
+		auto relPoint = Vector3::Transform(box.Center - point, invRotMatrix);
 
 		// Test if point intersects box.
-		if (relPoint.x >= min.x && relPoint.x <= max.x &&
-			relPoint.y >= min.y && relPoint.y <= max.y &&
-			relPoint.z >= min.z && relPoint.z <= max.z)
+		if (relPoint.x >= -box.Extents.x && relPoint.x <= box.Extents.x &&
+			relPoint.y >= -box.Extents.y && relPoint.y <= box.Extents.y &&
+			relPoint.z >= -box.Extents.z && relPoint.z <= box.Extents.z)
 		{
 			return true;
 		}
