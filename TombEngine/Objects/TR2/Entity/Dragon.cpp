@@ -27,8 +27,8 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		GameBoundingBox::Zero,
 		std::pair(
-			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD + ANGLE(90) , ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD + ANGLE(90), ANGLE(10.0f)))
+			EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD + ANGLE(90.0f) , ANGLE(-10.0f)),
+			EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD + ANGLE(90.0f), ANGLE(10.0f)))
 	};
 
 	auto DragonDaggerPos = Vector3i::Zero;
