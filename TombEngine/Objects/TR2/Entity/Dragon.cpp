@@ -45,12 +45,6 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_LIVE_TIME	  = 30 * 11;
 	constexpr auto DRAGON_ALMOST_LIVE = 100;
 
-	constexpr auto DRAGON_DISTANCE_NEAR = 900;
-	constexpr auto DRAGON_DISTANCE_FAR	= 2300;
-	constexpr auto DRAGON_MID			= (DRAGON_DISTANCE_NEAR + DRAGON_DISTANCE_FAR) / 2;
-	constexpr auto DRAGON_LCOL			= -CLICK(2);
-	constexpr auto DRAGON_RCOL			= CLICK(2);
-
 	const auto DragonMouthBite = CreatureBiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
 	const auto DragonBackSpineJoints		= std::vector<unsigned int>{ 21, 22, 23 };
 	const auto DragonSwipeAttackJointsLeft	= std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
