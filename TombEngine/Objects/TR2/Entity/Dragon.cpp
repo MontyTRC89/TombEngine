@@ -100,10 +100,8 @@ namespace TEN::Entities::Creatures::TR2
 		DRAGON_ANIM_RECOVER = 23
 	};
 
-	static void InitializeDragonBones(short itemNumber)
+	static void InitializeDragonBones(const ItemInfo& item)
 	{
-		const auto& item = g_Level.Items[itemNumber];
-
 		int frontBoneItemNumber = SpawnItem(item, ID_DRAGON_BONE_FRONT);
 		int backBoneItemNumber = SpawnItem(item, ID_DRAGON_BONE_BACK);
 
@@ -342,7 +340,7 @@ namespace TEN::Entities::Creatures::TR2
 
 					if (timer == -100)
 					{
-						InitializeDragonBones (itemNumber);
+						InitializeDragonBones (item);
 					}
 					else if (timer == -200)
 					{
