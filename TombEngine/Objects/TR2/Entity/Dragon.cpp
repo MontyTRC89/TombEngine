@@ -597,11 +597,11 @@ namespace TEN::Entities::Creatures::TR2
 
 			if (TestLaraPosition(DragonDaggerBounds, &item, &playerItem))
 			{
-				// HACK: Use dragon item copy to manipulate orientation.
-				auto itemCopy = item;
-				itemCopy.Pose.Orientation.y = itemCopy.Pose.Orientation.y + ANGLE(90.0f);
+				// HACK: Temporarily change orientation.
+				short yOrient = item.Pose.Orientation.y;
+				item.Pose.Orientation.y += ANGLE(90.0f);
 
-				if (MoveLaraPosition(DragonDaggerPos, &itemCopy, &playerItem))
+				if (MoveLaraPosition(DragonDaggerPos, &item, &playerItem))
 				{
 					// TODO: Reimplement dagger pickup animation when state transitions
 					// from ID_LARA_EXTRA_ANIMS to ID_LARA are possible. -- Adngel 2023.10.03
@@ -626,6 +626,9 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					player.Context.InteractedItem = item.Index;
 				}
+
+				// Restore orientation.
+				item.Pose.Orientation.y = yOrient;
 			}
 			else if (player.Control.IsMoving && player.Context.InteractedItem == item.Index)
 			{
