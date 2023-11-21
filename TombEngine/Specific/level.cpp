@@ -621,7 +621,7 @@ static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
 
 void ReadRooms()
 {
-	constexpr auto ILLEGAL_FLOOR_SLOPE_ANGLE	= ANGLE(45.0f * 0.75f);
+	constexpr auto ILLEGAL_FLOOR_SLOPE_ANGLE   = ANGLE(36.0f);
 	constexpr auto ILLEGAL_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
 
 	int roomCount = ReadInt32();
