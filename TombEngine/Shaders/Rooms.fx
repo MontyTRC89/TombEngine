@@ -43,6 +43,9 @@ SamplerState NormalTextureSampler : register(s1);
 Texture2D CausticsTexture : register(t2);
 SamplerState CausticsTextureSampler : register(s2);
 
+Texture2D SSAOTexture : register(t9);
+SamplerState SSAOSampler : register(s9);
+
 struct PixelShaderOutput
 {
 	float4 Color: SV_TARGET0;
@@ -128,6 +131,16 @@ PixelShaderOutput PS(PixelShaderInput input)
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
 
+	float occlusion = 1.0f;
+	if (SSAO == 1)
+	{
+		float2 samplePosition;
+		samplePosition = input.PositionCopy.xy / input.PositionCopy.w;               // perspective divide
+		samplePosition = samplePosition * 0.5f + 0.5f; // transform to range 0.0 - 1.0  
+		samplePosition.y = 1.0f - samplePosition.y;
+		occlusion = pow(SSAOTexture.Sample(SSAOSampler, samplePosition).x, SSAOExponent);
+	}
+
 	if (CastShadows)
 	{
         if (Light.Type == LT_POINT)
@@ -191,7 +204,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	}
 
 	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
-	output.Color.xyz = output.Color.xyz * lighting;
+	output.Color.xyz = output.Color.xyz * lighting * occlusion;
 	output.Color.xyz = saturate(output.Color.xyz);
 
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));

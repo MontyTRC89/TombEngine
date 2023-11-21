@@ -171,7 +171,8 @@ enum class TextureRegister
 	Hud = 5,
 	DepthMap = 6,
 	EnvironmentMapFront = 7,
-	EnvironmentMapBack = 8
+	EnvironmentMapBack = 8,
+	SSAO = 9
 };
 
 enum class SamplerStateRegister

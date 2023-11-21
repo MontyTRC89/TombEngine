@@ -26,7 +26,7 @@ SamplerState NormalTextureSampler : register(s1);
 struct PixelShaderOutput
 {
 	float4 Normals: SV_TARGET0;
-	float Depth: SV_TARGET1;
+	//float4 PositionsAndDepth: SV_TARGET1;
 };
 
 float3 UnpackNormalMap(float4 n)
@@ -52,11 +52,13 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
 	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
-	normal = PackNormal(normalize(mul(normal, TBN)));
+	normal = (normalize(mul(mul(normal, TBN), (float3x3)View)));
 
 	output.Normals.xyz = normal;
-	output.Normals.w = 1.0f;
-	output.Depth = color.w > 0.0f ? input.PositionCopy.z / input.PositionCopy.w : 0.0f;
+	output.Normals.w = color.w > 0.0f ? input.PositionCopy.z / input.PositionCopy.w : 0.0f;
+	//output.Normals.w = 1.0f;
+	//output.PositionsAndDepth.xyz = mul(float4(input.WorldPosition, 1.0f), View).xyz;
+	//output.PositionsAndDepth.w = color.w > 0.0f ? input.PositionCopy.z / input.PositionCopy.w : 0.0f;
 
 	return output;
 }

@@ -53,6 +53,9 @@ SamplerState AmbientMapFrontSampler : register(s7);
 Texture2D AmbientMapBackTexture : register(t8);
 SamplerState AmbientMapBackSampler : register(s8);
 
+Texture2D SSAOTexture : register(t9);
+SamplerState SSAOSampler : register(s9);
+
 PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
@@ -130,6 +133,16 @@ PixelShaderOutput PS(PixelShaderInput input)
 		ambientLight = AmbientMapBackTexture.Sample(AmbientMapBackSampler, paraboloidUV).xyz;
 	}*/
 
+	float occlusion = 1.0f;
+	if (SSAO == 1)
+	{
+		float2 samplePosition;
+		samplePosition = input.PositionCopy.xy / input.PositionCopy.w;               // perspective divide
+		samplePosition = samplePosition * 0.5f + 0.5f; // transform to range 0.0 - 1.0  
+		samplePosition.y = 1.0f - samplePosition.y;
+		occlusion = pow(SSAOTexture.Sample(SSAOSampler, samplePosition).x, SSAOExponent);
+	}
+
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(
 			ambientLight,
@@ -143,7 +156,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 			input.FogBulbs.w) :
 		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
-	output.Color = saturate(float4(color, tex.w));
+	output.Color = saturate(float4(color * occlusion, tex.w));
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 

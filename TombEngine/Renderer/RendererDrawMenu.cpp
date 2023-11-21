@@ -1146,25 +1146,33 @@ namespace TEN::Renderer
 				PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
 				PrintDebugMessage("    Dot products: %d", _numDotProducts);
-
+				 
 				_spriteBatch->Begin();
 
 				rect.left = _screenWidth - thumbWidth;
 				rect.top = thumbY;
 				rect.right = rect.left+ thumbWidth;
 				rect.bottom = rect.top+thumbWidth / aspectRatio;
-
-				_spriteBatch->Draw(_normalMapRenderTarget.ShaderResourceView.Get(), rect);
+				  
+				_spriteBatch->Draw(_normalsRenderTarget.ShaderResourceView.Get(), rect);
 				thumbY += thumbWidth / aspectRatio;
 
 				rect.left = _screenWidth - thumbWidth;
 				rect.top = thumbY;
 				rect.right = rect.left + thumbWidth;
 				rect.bottom = rect.top + thumbWidth / aspectRatio;
+				   
+				//_spriteBatch->Draw(_positionsAndDepthRenderTarget.ShaderResourceView.Get(), rect);
+				//thumbY += thumbWidth / aspectRatio;
 
-				_spriteBatch->Draw(_depthRenderTarget.ShaderResourceView.Get(), rect);
+				rect.left = _screenWidth - thumbWidth;
+				rect.top = thumbY;
+				rect.right = rect.left + thumbWidth;
+				rect.bottom = rect.top + thumbWidth / aspectRatio;
+
+				_spriteBatch->Draw(_SSAORenderTarget.ShaderResourceView.Get(), rect);
 				thumbY += thumbWidth / aspectRatio;
-
+				  
 				if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
 				{
 					rect.left = _screenWidth - thumbWidth;

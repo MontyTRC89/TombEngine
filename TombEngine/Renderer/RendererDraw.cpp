@@ -1309,6 +1309,8 @@ namespace TEN::Renderer
 
 	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view)
 	{
+		_SSAO = true;
+
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
 
@@ -1425,11 +1427,14 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogMinDistance = level.GetFogMinDistance();
 			cameraConstantBuffer.FogMaxDistance = level.GetFogMaxDistance();
 		}
-		else
+		else 
 		{
 			cameraConstantBuffer.FogMaxDistance = 0;
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
+
+		cameraConstantBuffer.SSAO = _SSAO ? 1 : 0;
+		cameraConstantBuffer.SSAOExponent = 2;
 
 		// Set fog bulbs.
 		cameraConstantBuffer.NumFogBulbs = (int)view.FogBulbsToDraw.size();
@@ -1454,12 +1459,12 @@ namespace TEN::Renderer
 		DrawHorizonAndSky(view, _renderTarget.DepthStencilView.Get());
 		 
 		// Build G-Buffer (Normals + Depth).
-		_context->ClearRenderTargetView(_normalMapRenderTarget.RenderTargetView.Get(), Colors::Black);
-		_context->ClearRenderTargetView(_depthRenderTarget.RenderTargetView.Get(), Colors::White);
+		_context->ClearRenderTargetView(_normalsRenderTarget.RenderTargetView.Get(), Colors::Black);
+		//_context->ClearRenderTargetView(_positionsAndDepthRenderTarget.RenderTargetView.Get(), Colors::Black);
 
-		pRenderViewPtrs[0] = _normalMapRenderTarget.RenderTargetView.Get();
-		pRenderViewPtrs[1] = _depthRenderTarget.RenderTargetView.Get();
-		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
+		pRenderViewPtrs[0] = _normalsRenderTarget.RenderTargetView.Get();
+		//pRenderViewPtrs[1] = _positionsAndDepthRenderTarget.RenderTargetView.Get();
+		_context->OMSetRenderTargets(1, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
 
 		DrawRooms(view, RendererPass::GBuffer);
 		DrawItems(view, RendererPass::GBuffer);
@@ -1471,7 +1476,51 @@ namespace TEN::Renderer
 		DrawEffects(view, RendererPass::GBuffer);
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
+
+		// Calculate SSAO
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
+		SetDepthState(DepthState::Write);
+
+		_context->VSSetShader(_vsSSAO.Get(), nullptr, 0);
+		_context->PSSetShader(_psSSAO.Get(), nullptr, 0);
+
+		SetCullMode(CullMode::CounterClockwise);
+		SetBlendMode(BlendMode::Opaque);
+
+		_context->ClearRenderTargetView(_SSAORenderTarget.RenderTargetView.Get(), Colors::White);
+		_context->OMSetRenderTargets(1, _SSAORenderTarget.RenderTargetView.GetAddressOf(), nullptr);
+		_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
+
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_inputLayout.Get());
+
+		//BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_positionsAndDepthRenderTarget, SamplerStateRegister::PointWrap);
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_normalsRenderTarget, SamplerStateRegister::PointWrap);
+		BindTexture(static_cast<TextureRegister>(2), &_SSAONoiseTexture, SamplerStateRegister::PointWrap);
+
+		memcpy(_stPostProcessBuffer.SSAOKernel, _SSAOKernel.data(), 16 * _SSAOKernel.size());
+		_cbPostProcessBuffer.updateData(_stPostProcessBuffer, _context.Get());
 		
+		_primitiveBatch->Begin();
+		_primitiveBatch->DrawQuad(_fullscreenQuadVertices[0], _fullscreenQuadVertices[1], _fullscreenQuadVertices[2], _fullscreenQuadVertices[3]);
+		_primitiveBatch->End();
+
+		// Blur SSAO
+		_context->ClearRenderTargetView(_tempRenderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->OMSetRenderTargets(1, _tempRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
+		_postProcess->SetEffect(BasicPostProcess::GaussianBlur_5x5);
+		_postProcess->SetSourceTexture(_SSAORenderTarget.ShaderResourceView.Get());
+		_postProcess->Process(_context.Get());
+		
+		SetBlendMode(BlendMode::Opaque, true);
+		SetCullMode(CullMode::CounterClockwise, true);
+		SetDepthState(DepthState::Write, true);
+
+		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
+		BindConstantBufferPS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
+
 		// Bind main render target again.
 		// At this point, main depth buffer is already filled and avoids overdraw in following steps.
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
@@ -1511,7 +1560,7 @@ namespace TEN::Renderer
 
 		// Draw sorted faces.
 		DrawSortedFaces(view);
-
+		    
 		// HACK: Draw gunflashes after everything because they are very near the camera.
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
@@ -1843,6 +1892,8 @@ namespace TEN::Renderer
 			_context->PSSetShader(_psItems.Get(), nullptr, 0);
 		}
 
+		BindRenderTargetAsTexture(TextureRegister::SSAO, &_tempRenderTarget, SamplerStateRegister::PointWrap);
+
 		for (auto room : view.RoomsToDraw)
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
@@ -1979,6 +2030,8 @@ namespace TEN::Renderer
 			UINT offset = 0;
 			_context->IASetVertexBuffers(0, 1, _staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+			
+			BindRenderTargetAsTexture(TextureRegister::SSAO, &_tempRenderTarget, SamplerStateRegister::PointWrap);
 
 			for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 			{
@@ -2192,6 +2245,9 @@ namespace TEN::Renderer
 
 				_cbShadowMap.updateData(_stShadowMap, _context.Get());
 			}
+
+			if (_SSAO)
+				BindRenderTargetAsTexture(TextureRegister::SSAO, &_tempRenderTarget, SamplerStateRegister::PointWrap);
 
 			for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
 			{

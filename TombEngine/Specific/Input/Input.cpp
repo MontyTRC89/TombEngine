@@ -655,6 +655,9 @@ namespace TEN::Input
 		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
 			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
 		dbDebugPage = !(KeyMap[KC_F10] || KeyMap[KC_F11]);
+
+		if (KeyMap[KC_F9])
+			g_Renderer.ToggleSSAO();
 	}
 
 	static void UpdateRumble()

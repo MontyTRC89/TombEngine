@@ -18,7 +18,7 @@ namespace TEN::Renderer::Graphics
 
 		Texture2D() = default;
 		Texture2D(ID3D11Device* device, int width, int height, byte* data);
-		Texture2D(ID3D11Device* device, int width, int height, DXGI_FORMAT format, int pitch, const unsigned char* data);
+		Texture2D(ID3D11Device* device, int width, int height, DXGI_FORMAT format, int pitch, const void* data);
 		Texture2D(ID3D11Device* device, const std::wstring& fileName);
 		Texture2D(ID3D11Device* device, byte* data, int length);
 

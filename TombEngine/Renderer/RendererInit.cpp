@@ -10,6 +10,7 @@
 #include "Specific/winmain.h"
 #include "Renderer/SMAA/AreaTex.h"
 #include "Renderer/SMAA/SearchTex.h"
+#include <random>
 
 extern GameConfiguration g_Configuration;
 
@@ -94,6 +95,8 @@ namespace TEN::Renderer
 		_psRoomAmbient = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\RoomAmbient.fx"), "PS", "ps_5_0", nullptr, blob);
 		_vsFXAA = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\FXAA.fx"), "VS", "vs_5_0", nullptr, blob);
 		_psFXAA = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\FXAA.fx"), "PS", "ps_5_0", nullptr, blob);
+		_vsSSAO = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\SSAO.fx"), "VS", "vs_5_0", nullptr, blob);
+		_psSSAO = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\SSAO.fx"), "PS", "ps_5_0", nullptr, blob);
 
 		const D3D_SHADER_MACRO transparentDefines[] = { "TRANSPARENT", "", nullptr, nullptr };
 		_psRoomsTransparent = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\Rooms.fx"), "PS", "ps_5_0", &transparentDefines[0], blob);
@@ -261,6 +264,69 @@ namespace TEN::Renderer
 		_SMAAAreaTexture = Texture2D(_device.Get(), AREATEX_WIDTH, AREATEX_HEIGHT, DXGI_FORMAT_R8G8_UNORM, AREATEX_PITCH, areaTexBytes);
 		_SMAASearchTexture = Texture2D(_device.Get(), SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, DXGI_FORMAT_R8_UNORM, SEARCHTEX_PITCH, searchTexBytes);
 
+		// SSAO
+		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
+		std::default_random_engine generator;
+		for (unsigned int i = 0; i < 64; ++i)
+		{
+			Vector4 sample(
+				randomFloats(generator) * 2.0 - 1.0,
+				randomFloats(generator) * 2.0 - 1.0,
+				randomFloats(generator),
+				1.0f
+			);
+			sample.Normalize();
+			sample *= randomFloats(generator);
+
+			float scale = (float)i / 64.0;
+			scale = Lerp(0.1f, 1.0f, scale * scale);
+			sample *= scale;
+			sample.w = 1.0f;
+
+			_SSAOKernel.push_back(sample);
+		}
+
+		std::vector<Vector4> SSAONoise;
+		for (unsigned int i = 0; i < 16; i++)
+		{
+			Vector4 noise(
+				randomFloats(generator) * 2.0 - 1.0,
+				randomFloats(generator) * 2.0 - 1.0,
+				0.0f,
+				1.0f);
+			SSAONoise.push_back(noise);
+		}
+
+		_SSAONoiseTexture = Texture2D(_device.Get(), 4, 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 4 * 4 * 4, SSAONoise.data());
+
+		_fullscreenQuadVertices[0].Position.x = -1.0f;
+		_fullscreenQuadVertices[0].Position.y = 1.0f;
+		_fullscreenQuadVertices[0].Position.z = 0.0f;
+		_fullscreenQuadVertices[0].UV.x = 0.0f;
+		_fullscreenQuadVertices[0].UV.y = 0.0f;
+		_fullscreenQuadVertices[0].Color = Vector4::One;
+
+		_fullscreenQuadVertices[1].Position.x = 1.0f;
+		_fullscreenQuadVertices[1].Position.y = 1.0f;
+		_fullscreenQuadVertices[1].Position.z = 0.0f;
+		_fullscreenQuadVertices[1].UV.x = 1.0f;
+		_fullscreenQuadVertices[1].UV.y = 0.0f;
+		_fullscreenQuadVertices[1].Color = Vector4::One;
+
+		_fullscreenQuadVertices[2].Position.x = 1.0f;
+		_fullscreenQuadVertices[2].Position.y = -1.0f;
+		_fullscreenQuadVertices[2].Position.z = 0.0f;
+		_fullscreenQuadVertices[2].UV.x = 1.0f;
+		_fullscreenQuadVertices[2].UV.y = 1.0f;
+		_fullscreenQuadVertices[2].Color = Vector4::One;
+
+		_fullscreenQuadVertices[3].Position.x = -1.0f;
+		_fullscreenQuadVertices[3].Position.y = -1.0f;
+		_fullscreenQuadVertices[3].Position.z = 0.0f;
+		_fullscreenQuadVertices[3].UV.x = 0.0f;
+		_fullscreenQuadVertices[3].UV.y = 1.0f;
+		_fullscreenQuadVertices[3].Color = Vector4::One;
+
 		InitializeGameBars();
 		InitQuad();
 		InitializeSky();
@@ -423,8 +489,9 @@ namespace TEN::Renderer
 		_tempRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
 		_dumpScreenRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
 		_shadowMap = Texture2DArray(_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D24_UNORM_S8_UINT);
-		_normalMapRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
-		_depthRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false);
+		_normalsRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32G32B32A32_FLOAT, false);
+		//_positionsAndDepthRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32G32B32A32_FLOAT, false);
+		_SSAORenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
 
 		// Initialize sprite and primitive batches
 		_spriteBatch = std::make_unique<SpriteBatch>(_context.Get());
@@ -520,14 +587,14 @@ namespace TEN::Renderer
 		auto fontPath = GetAssetPath(L"Textures/Font.spritefont");
 		if (!std::filesystem::is_regular_file(fontPath))
 			throw std::runtime_error("Font not found; path " + TEN::Utils::ToString(fontPath) + " is missing.");
-
+		     
 		_gameFont = std::make_unique<SpriteFont>(_device.Get(), fontPath.c_str());
 
 		// Initialize common textures.
 		SetTextureOrDefault(_logo, GetAssetPath(L"Textures/Logo.png"));
 		SetTextureOrDefault(_loadingBarBorder, GetAssetPath(L"Textures/LoadingBarBorder.png"));
 		SetTextureOrDefault(_loadingBarInner, GetAssetPath(L"Textures/LoadingBarInner.png"));
-		SetTextureOrDefault(_whiteTexture, GetAssetPath(L"Textures/WhiteSprite.png"));
+		SetTextureOrDefault(_whiteTexture, GetAssetPath(L"Textures/WhiteSprite.png")); 
 
 		_whiteSprite.Height = _whiteTexture.Height;
 		_whiteSprite.Width = _whiteTexture.Width;

@@ -9,17 +9,28 @@ cbuffer CameraMatrixBuffer : register(b0)
 	float4x4 DualParaboloidView;
 	float4 CamPositionWS;
 	float4 CamDirectionWS;
+	//--
 	float2 ViewSize;
 	float2 InvViewSize;
+	//--
 	unsigned int Frame;
 	unsigned int RoomNumber;
 	unsigned int CameraUnderwater;
 	int Emisphere;
+	//--
+	int SSAO;
+	int SSAOExponent;
+	float2 Padding1;
+	//--
 	float4 FogColor;
+	//--
 	int FogMinDistance;
 	int FogMaxDistance;
 	float NearPlane;
-	float FarPlane;		
+	float FarPlane;
+	//--
 	int NumFogBulbs;
+	float3 Padding2;
+	//--
 	ShaderFogBulb FogBulbs[MAX_FOG_BULBS];
 };

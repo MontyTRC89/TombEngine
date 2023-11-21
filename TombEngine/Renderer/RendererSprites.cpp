@@ -291,13 +291,13 @@ namespace TEN::Renderer
 			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
 			{
 				continue;
-			}
+			}     
 
 			if (!wasGPUSet)
 			{
 				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_positionsAndDepthRenderTarget, SamplerStateRegister::LinearClamp);
 
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
@@ -363,7 +363,7 @@ namespace TEN::Renderer
 			{
 				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_positionsAndDepthRenderTarget, SamplerStateRegister::LinearClamp);
 
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
@@ -425,7 +425,7 @@ namespace TEN::Renderer
 		{
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_positionsAndDepthRenderTarget, SamplerStateRegister::LinearClamp);
 
 			SetDepthState(DepthState::Read);
 			SetCullMode(CullMode::None);
@@ -458,7 +458,7 @@ namespace TEN::Renderer
 			BindTexture(TextureRegister::ColorMap, object->Sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
 
 			_cbInstancedSpriteBuffer.updateData(_stInstancedSpriteBuffer, _context.Get());
-
+			 
 			// Draw sprites with instancing.
 			DrawInstancedTriangles(4, 1, 0);
 
@@ -469,7 +469,7 @@ namespace TEN::Renderer
 		{
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_positionsAndDepthRenderTarget, SamplerStateRegister::LinearClamp);
 
 			SetDepthState(DepthState::Read);
 			SetCullMode(CullMode::None);

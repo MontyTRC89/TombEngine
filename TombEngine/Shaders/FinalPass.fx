@@ -11,7 +11,7 @@ cbuffer PostProcessBuffer : register(b7)
 	float ScreenFadeFactor;
 	int ViewportWidth;
 	int ViewportHeight;
-	int FXAA;
+	float4 SSAOKernel[64];
 };
 
 struct PixelShaderInput

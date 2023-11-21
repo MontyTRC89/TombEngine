@@ -40,7 +40,7 @@ namespace TEN::Renderer::Graphics
 		throwIfFailed(device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf()));
 	}
 
-	Texture2D::Texture2D(ID3D11Device* device, int width, int height, DXGI_FORMAT format, int pitch, const unsigned char* data)
+	Texture2D::Texture2D(ID3D11Device* device, int width, int height, DXGI_FORMAT format, int pitch, const void* data)
 	{
 		Width = width;
 		Height = height;

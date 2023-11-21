@@ -4,6 +4,7 @@
 #include <SpriteFont.h>
 #include <PrimitiveBatch.h>
 #include <d3d9types.h>
+#include <SimpleMath.h>
 #include <PostProcess.h>
 #include "Math/Math.h"
 #include "Game/control/box.h"
@@ -81,6 +82,7 @@ namespace TEN::Renderer
 	using namespace TEN::Renderer::ConstantBuffers;
 	using namespace TEN::Renderer::Graphics;
 	using namespace TEN::Renderer::Structures;
+	using namespace DirectX::SimpleMath;
 
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 
@@ -107,8 +109,8 @@ namespace TEN::Renderer
 		Viewport _viewportToolkit;
 
 		// Render targets
-		RenderTarget2D _normalMapRenderTarget;
-		RenderTarget2D _depthRenderTarget;
+		RenderTarget2D _normalsRenderTarget;
+		RenderTarget2D _positionsAndDepthRenderTarget;
 		RenderTarget2D _backBuffer;
 		RenderTarget2D _dumpScreenRenderTarget;
 		RenderTarget2D _renderTarget;
@@ -349,6 +351,15 @@ namespace TEN::Renderer
 
 		// Post process
 		PostProcessColorScheme _postProcessColorScheme = PostProcessColorScheme::Normal;
+		Vertex _fullscreenQuadVertices[4];
+
+		// SSAO
+		ComPtr<ID3D11VertexShader> _vsSSAO;
+		ComPtr<ID3D11PixelShader> _psSSAO;
+		Texture2D _SSAONoiseTexture;
+		RenderTarget2D _SSAORenderTarget;
+		std::vector<Vector4> _SSAOKernel;
+		bool _SSAO;
 
 		// Private functions
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
@@ -612,6 +623,12 @@ namespace TEN::Renderer
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 							  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);
+
+		inline void ToggleSSAO()
+		{
+			if (!_SSAO)
+				_SSAO = true;
+		}
 	};
 
 	extern Renderer g_Renderer;
