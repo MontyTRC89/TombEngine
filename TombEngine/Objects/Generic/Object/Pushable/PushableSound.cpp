@@ -65,7 +65,7 @@ namespace TEN::Entities::Generic
 	{
 		// Get floor material.
 		auto pointColl = GetCollision(pushableItem);
-		auto material = pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+		auto material = pointColl.BottomBlock->Material;
 
 		switch (soundType)
 		{
