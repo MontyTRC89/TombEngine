@@ -32,7 +32,8 @@ namespace TEN::Renderer::ConstantBuffers
 		//--
 		int SSAO;
 		int SSAOExponent;
-		Vector2 Padding1;
+		float AspectRatio;
+		float TanHalfFOV;
 		//--
 		Vector4 FogColor;
 		//--

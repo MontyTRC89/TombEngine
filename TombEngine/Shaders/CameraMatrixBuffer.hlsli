@@ -20,7 +20,8 @@ cbuffer CameraMatrixBuffer : register(b0)
 	//--
 	int SSAO;
 	int SSAOExponent;
-	float2 Padding1;
+	float AspectRatio;
+	float TanHalfFOV;
 	//--
 	float4 FogColor;
 	//--

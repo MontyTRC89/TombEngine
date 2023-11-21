@@ -25,7 +25,7 @@ namespace TEN::Renderer
 		Viewport.MinDepth = 0;
 		Viewport.MaxDepth = 1;
 	}
-
+	 
 	void RenderView::FillConstantBuffer(CCameraMatrixBuffer& bufferToFill)
 	{
 		bufferToFill.Projection = Camera.Projection;
@@ -39,6 +39,8 @@ namespace TEN::Renderer
 		bufferToFill.RoomNumber = Camera.RoomNumber;
 		bufferToFill.NearPlane = Camera.NearPlane;
 		bufferToFill.FarPlane = Camera.FarPlane;
+		bufferToFill.AspectRatio = Camera.ViewSize.x / Camera.ViewSize.y;
+		bufferToFill.TanHalfFOV = tanf(DEG_TO_RAD(Camera.FOV / 2.0f));
 	}
 
 	void RenderView::Clear() 
@@ -76,6 +78,7 @@ namespace TEN::Renderer
 		Frustum.Update(View, Projection);
 		NearPlane = n;
 		FarPlane = f;
+		FOV = fov;
 	}
 
 	RenderViewCamera::RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int room, int width, int height, float fov, float n, float f) 
@@ -92,5 +95,6 @@ namespace TEN::Renderer
 		Frustum.Update(View, Projection);
 		NearPlane = n;
 		FarPlane = f;
+		FOV = fov;
 	}
 }

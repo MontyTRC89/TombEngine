@@ -297,7 +297,7 @@ namespace TEN::Renderer
 			{
 				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_positionsAndDepthRenderTarget, SamplerStateRegister::LinearClamp);
+				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
 
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
@@ -363,7 +363,7 @@ namespace TEN::Renderer
 			{
 				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_positionsAndDepthRenderTarget, SamplerStateRegister::LinearClamp);
+				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
 
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
@@ -425,7 +425,7 @@ namespace TEN::Renderer
 		{
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_positionsAndDepthRenderTarget, SamplerStateRegister::LinearClamp);
+			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
 
 			SetDepthState(DepthState::Read);
 			SetCullMode(CullMode::None);
@@ -469,7 +469,7 @@ namespace TEN::Renderer
 		{
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_positionsAndDepthRenderTarget, SamplerStateRegister::LinearClamp);
+			BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
 
 			SetDepthState(DepthState::Read);
 			SetCullMode(CullMode::None);

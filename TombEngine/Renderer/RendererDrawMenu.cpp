@@ -1162,7 +1162,7 @@ namespace TEN::Renderer
 				rect.right = rect.left + thumbWidth;
 				rect.bottom = rect.top + thumbWidth / aspectRatio;
 				   
-				//_spriteBatch->Draw(_positionsAndDepthRenderTarget.ShaderResourceView.Get(), rect);
+				//_spriteBatch->Draw(_depthRenderTarget.ShaderResourceView.Get(), rect);
 				//thumbY += thumbWidth / aspectRatio;
 
 				rect.left = _screenWidth - thumbWidth;

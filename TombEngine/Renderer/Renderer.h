@@ -110,7 +110,7 @@ namespace TEN::Renderer
 
 		// Render targets
 		RenderTarget2D _normalsRenderTarget;
-		RenderTarget2D _positionsAndDepthRenderTarget;
+		RenderTarget2D _depthRenderTarget;
 		RenderTarget2D _backBuffer;
 		RenderTarget2D _dumpScreenRenderTarget;
 		RenderTarget2D _renderTarget;
@@ -390,6 +390,7 @@ namespace TEN::Renderer
 		void ClearSceneItems();
 		void ClearDynamicLights();
 		void ClearShadowMap();
+		void CalculateSSAO(RenderView& view);
 		void UpdateItemAnimations(RenderView& view);
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 		void InitializeScreen(int w, int h, HWND handle, bool reset);

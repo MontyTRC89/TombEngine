@@ -1460,11 +1460,11 @@ namespace TEN::Renderer
 		 
 		// Build G-Buffer (Normals + Depth).
 		_context->ClearRenderTargetView(_normalsRenderTarget.RenderTargetView.Get(), Colors::Black);
-		//_context->ClearRenderTargetView(_positionsAndDepthRenderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->ClearRenderTargetView(_depthRenderTarget.RenderTargetView.Get(), Colors::Black);
 
 		pRenderViewPtrs[0] = _normalsRenderTarget.RenderTargetView.Get();
-		//pRenderViewPtrs[1] = _positionsAndDepthRenderTarget.RenderTargetView.Get();
-		_context->OMSetRenderTargets(1, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
+		pRenderViewPtrs[1] = _depthRenderTarget.RenderTargetView.Get();
+		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
 
 		DrawRooms(view, RendererPass::GBuffer);
 		DrawItems(view, RendererPass::GBuffer);
@@ -1478,46 +1478,12 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::GBuffer);
 
 		// Calculate SSAO
-		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
-		SetDepthState(DepthState::Write);
+		CalculateSSAO(view);
 
-		_context->VSSetShader(_vsSSAO.Get(), nullptr, 0);
-		_context->PSSetShader(_psSSAO.Get(), nullptr, 0);
-
-		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(BlendMode::Opaque);
-
-		_context->ClearRenderTargetView(_SSAORenderTarget.RenderTargetView.Get(), Colors::White);
-		_context->OMSetRenderTargets(1, _SSAORenderTarget.RenderTargetView.GetAddressOf(), nullptr);
-		_context->RSSetViewports(1, &view.Viewport);
-		ResetScissor();
-
-		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_context->IASetInputLayout(_inputLayout.Get());
-
-		//BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_positionsAndDepthRenderTarget, SamplerStateRegister::PointWrap);
-		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_normalsRenderTarget, SamplerStateRegister::PointWrap);
-		BindTexture(static_cast<TextureRegister>(2), &_SSAONoiseTexture, SamplerStateRegister::PointWrap);
-
-		memcpy(_stPostProcessBuffer.SSAOKernel, _SSAOKernel.data(), 16 * _SSAOKernel.size());
-		_cbPostProcessBuffer.updateData(_stPostProcessBuffer, _context.Get());
-		
-		_primitiveBatch->Begin();
-		_primitiveBatch->DrawQuad(_fullscreenQuadVertices[0], _fullscreenQuadVertices[1], _fullscreenQuadVertices[2], _fullscreenQuadVertices[3]);
-		_primitiveBatch->End();
-
-		// Blur SSAO
-		_context->ClearRenderTargetView(_tempRenderTarget.RenderTargetView.Get(), Colors::Black);
-		_context->OMSetRenderTargets(1, _tempRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
-		_postProcess->SetEffect(BasicPostProcess::GaussianBlur_5x5);
-		_postProcess->SetSourceTexture(_SSAORenderTarget.ShaderResourceView.Get());
-		_postProcess->Process(_context.Get());
-		
 		SetBlendMode(BlendMode::Opaque, true);
 		SetCullMode(CullMode::CounterClockwise, true);
 		SetDepthState(DepthState::Write, true);
-
+		 
 		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 		BindConstantBufferPS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 
@@ -2816,5 +2782,44 @@ namespace TEN::Renderer
 
 		_numSortedStaticsDrawCalls++;
 		_numSortedTriangles += object->Bucket->NumIndices / 3;
+	}
+
+	void Renderer::CalculateSSAO(RenderView& view)
+	{
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
+		SetDepthState(DepthState::Write);
+
+		_context->VSSetShader(_vsSSAO.Get(), nullptr, 0);
+		_context->PSSetShader(_psSSAO.Get(), nullptr, 0);
+
+		SetCullMode(CullMode::CounterClockwise);
+		SetBlendMode(BlendMode::Opaque);
+
+		_context->ClearRenderTargetView(_SSAORenderTarget.RenderTargetView.Get(), Colors::White);
+		_context->OMSetRenderTargets(1, _SSAORenderTarget.RenderTargetView.GetAddressOf(), nullptr);
+		_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
+
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_inputLayout.Get());
+
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_depthRenderTarget, SamplerStateRegister::PointWrap);
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_normalsRenderTarget, SamplerStateRegister::PointWrap);
+		BindTexture(static_cast<TextureRegister>(2), &_SSAONoiseTexture, SamplerStateRegister::PointWrap);
+
+		memcpy(_stPostProcessBuffer.SSAOKernel, _SSAOKernel.data(), 16 * _SSAOKernel.size());
+		_cbPostProcessBuffer.updateData(_stPostProcessBuffer, _context.Get());
+
+		_primitiveBatch->Begin();
+		_primitiveBatch->DrawQuad(_fullscreenQuadVertices[0], _fullscreenQuadVertices[1], _fullscreenQuadVertices[2], _fullscreenQuadVertices[3]);
+		_primitiveBatch->End();
+
+		// Blur SSAO
+		_context->ClearRenderTargetView(_tempRenderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->OMSetRenderTargets(1, _tempRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
+		_postProcess->SetEffect(BasicPostProcess::GaussianBlur_5x5);
+		_postProcess->SetSourceTexture(_SSAORenderTarget.ShaderResourceView.Get());
+		_postProcess->Process(_context.Get());		
 	}
 }
