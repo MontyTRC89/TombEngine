@@ -61,10 +61,10 @@ void DoFlipMap(int group)
 			g_Renderer.FlipRooms(roomNumber, room.flippedRoom);
 
 			for (auto& sector : room.floor)
-				sector.RoomNumber = roomNumber;
+				sector.Room = roomNumber;
 
 			for (auto& sector : flippedRoom.floor)
-				sector.RoomNumber = room.flippedRoom;
+				sector.Room = room.flippedRoom;
 		}
 	}
 
