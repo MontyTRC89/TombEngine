@@ -13,6 +13,11 @@
 #include "Specific/level.h"
 #include "Objects/TR5/Entity/AutoGun.h"
 
+// NOTES:
+// item.ItemFlags[0]: flag to duplicate the shooting light diffusion.
+// item.ItemFlags[3]: flag to indicate if the turret is hostile or neutral.
+
+
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto GUN_TURRET_SHOT_DAMAGE = 5;
@@ -93,7 +98,7 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureAIInfo(&item, &AI);
 		tilt = AI.xAngle;
 
-		auto origin = GameVector(item.Pose.Position, item.RoomNumber);
+		auto origin = GameVector(GetJointPosition(&item, 2), item.RoomNumber);
 		auto target = GameVector(GetJointPosition(&laraItem, LM_TORSO), laraItem.RoomNumber);
 		bool los = LOS(&origin, &target);
 
@@ -117,7 +122,10 @@ namespace TEN::Entities::Creatures::TR3
 					
 
 					pos = GetJointPosition(item, GunTurretLeftBite);
-					TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item.ItemFlags[0] + 8, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
+					auto colorRed =		Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
+					auto colorGreen =	Random::GenerateFloat(0.5f, 0.6f) * UCHAR_MAX;
+					auto colorBlue =	Random::GenerateFloat(0.0f, 0.25f) * UCHAR_MAX;
+					TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item.ItemFlags[0] + 8, colorRed, colorGreen, colorBlue);
 
 					gun.MuzzleFlash[0].Bite = GunTurretLeftBite;
 					gun.MuzzleFlash[0].SwitchToMuzzle2 = true;
@@ -136,7 +144,10 @@ namespace TEN::Entities::Creatures::TR3
 					DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), laraItem.RoomNumber);
 
 					pos = GetJointPosition(item, GunTurretRightBite);
-					TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item.ItemFlags[0] + 8, (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, (GetRandomControl() & 0x3F));
+					auto colorRed =		Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
+					auto colorGreen =	Random::GenerateFloat(0.5f, 0.6f) * UCHAR_MAX;
+					auto colorBlue =	Random::GenerateFloat(0.0f, 0.25f) * UCHAR_MAX;
+					TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item.ItemFlags[0] + 8, colorRed, colorGreen, colorBlue);
 
 					gun.MuzzleFlash[1].Bite = GunTurretRightBite;
 					gun.MuzzleFlash[1].SwitchToMuzzle2 = true;
