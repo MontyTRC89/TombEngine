@@ -1989,7 +1989,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		// TODO: Rewrite player spasm effect.
 		return;
 
-		const auto& bounds = GetBestFrame(*item).BoundingBox;
+		const auto& bounds = GameBoundingBox(item);
 		if (bounds.GetHeight() > CLICK(1))
 		{
 			auto* lara = GetLaraInfo(laraItem);
