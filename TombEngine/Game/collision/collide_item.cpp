@@ -648,6 +648,8 @@ bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 // NOTE: Previously ItemPushLara().
 bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool enableSpasm, char bigPush)
 {
+	constexpr auto SOFT_PUSH_LERP_ALPHA = 0.25f;
+
 	const auto& object = Objects[item->ObjectNumber];
 
 	auto deltaPos = item2->Pose.Position - item->Pose.Position;
@@ -700,13 +702,17 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 		relDeltaPos.z -= bottom;
 	}
 
+	// Lerp to new position.
 	auto newDeltaPos = Vector3i(Vector3::Transform(relDeltaPos.ToVector3(), rotMatrix.Invert()));
 	if (object.intelligent)
 	{
-		// TODO: Improve sphere-based pushes.
+		// TODO: Improve sphere-dependent pushes.
 		// Current sphere-box push combination is extremely unstable with large creatures such as the TR2 dragon. -- Sezz 2023.11.21
+		// Possible solution: lerp to the position where a sphere's edge is tangential to the nearest box edge.
+		// Must somehow determine the best sphere to reference. The one which pushes the farthest?
+		// Also, clamp distance to the box edge to avoid overshooting.
 
-		item2->Pose.Position += ((item->Pose.Position + newDeltaPos) - item2->Pose.Position) * 0.25f;
+		item2->Pose.Position.Lerp(item->Pose.Position + newDeltaPos, SOFT_PUSH_LERP_ALPHA);
 	}
 	else
 	{
@@ -1808,12 +1814,14 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 	if (Objects[laraItem->ObjectNumber].intelligent)
 		return;
 
-	for (auto i : g_Level.Rooms[laraItem->RoomNumber].neighbors)
+	const auto& room = g_Level.Rooms[laraItem->RoomNumber];
+	for (int neighborRoomNumber : room.neighbors)
 	{
-		if (!g_Level.Rooms[i].Active())
+		auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+		if (!neighborRoom.Active())
 			continue;
 
-		int nextItem = g_Level.Rooms[i].itemNumber;
+		int nextItem = neighborRoom.itemNumber;
 		while (nextItem != NO_ITEM)
 		{
 			auto* item = &g_Level.Items[nextItem];
@@ -1891,37 +1899,35 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 			}
 		}
 
-		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
+		for (auto& staticObject : neighborRoom.mesh)
 		{
-			auto& mesh = g_Level.Rooms[i].mesh[j];
-
-			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
 			// For Lara, solid static mesh collisions are directly managed by GetCollisionInfo,
 			// so we bypass them here to avoid interference.
-			if (doPlayerCollision && (mesh.flags & StaticMeshFlags::SM_SOLID))
+			if (doPlayerCollision && (staticObject.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			if (Vector3i::Distance(mesh.pos.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(staticObject.pos.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
-			if (!TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))
+			if (!TestBoundsCollideStatic(laraItem, staticObject, coll->Setup.Radius))
 				continue;
 
 			coll->HitStatic = true;
 
-			// HACK: Shatter statics only by non-harmless vehicles.
+			// HACK: Shatter statics only by harmful vehicles.
 			if (!doPlayerCollision && 
 				!isHarmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				StaticObjects[mesh.staticNumber].shatterType != ShatterType::None)
+				StaticObjects[staticObject.staticNumber].shatterType != ShatterType::None)
 			{
-				SoundEffect(GetShatterSound(mesh.staticNumber), &mesh.pos);
-				ShatterObject(nullptr, &mesh, -128, laraItem->RoomNumber, 0);
+				SoundEffect(GetShatterSound(staticObject.staticNumber), &staticObject.pos);
+				ShatterObject(nullptr, &staticObject, -128, laraItem->RoomNumber, 0);
 			}
 			else if (coll->Setup.EnableObjectPush)
 			{
-				ItemPushStatic(laraItem, mesh, coll);
+				ItemPushStatic(laraItem, staticObject, coll);
 			}
 			else
 			{
@@ -1930,11 +1936,12 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 		}
 	}
 
+	// TODO: Rewrite player spasm effect.
 	if (doPlayerCollision)
 	{
-		auto* lara = GetLaraInfo(laraItem);
-		if (lara->HitDirection == -1)
-			lara->HitFrame = 0;
+		auto& player = GetLaraInfo(*laraItem);
+		if (player.HitDirection == -1)
+			player.HitFrame = 0;
 	}
 }
 
