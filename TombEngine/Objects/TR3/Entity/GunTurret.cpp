@@ -48,11 +48,12 @@ namespace TEN::Entities::Creatures::TR3
 	void ControlGunTurret(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto& turret = *GetCreatureInfo(&item);
 		auto& playerItem = *LaraItem;
 
 		if (!CreatureActive(itemNumber))
 			return;
+
+		auto& turret = *GetCreatureInfo(&item);
 
 		if (item.HitStatus || item.HitPoints < GUN_TURRET_HIT_POINTS_MAX)
 			item.ItemFlags[3] = 1;
