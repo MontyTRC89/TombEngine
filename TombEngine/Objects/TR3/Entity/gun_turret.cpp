@@ -26,21 +26,21 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum GunTurretAnim
 	{
-		AUTOGUN_ANIM_FIRE = 0,
-		AUTOGUN_ANIM_IDLE = 1
+		AUTO_GUN_ANIM_FIRE = 0,
+		AUTO_GUN_ANIM_IDLE = 1
 	};
 
 	enum GunTurretState
 	{
-		AUTOGUN_STATE_FIRE = 0,
-		AUTOGUN_STATE_IDLE = 1
+		AUTO_GUN_STATE_FIRE = 0,
+		AUTO_GUN_STATE_IDLE = 1
 	};
 
 	void InitializeGunTurret(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		SetAnimation(item, AUTOGUN_ANIM_IDLE);
+		SetAnimation(item, AUTO_GUN_ANIM_IDLE);
 		item.ItemFlags[0] = 0;
 		item.ItemFlags[3] = 0;		
 	}
@@ -93,10 +93,10 @@ namespace TEN::Entities::Creatures::TR3
 
 		switch (item.Animation.ActiveState)
 		{
-		case AUTOGUN_STATE_FIRE:
+		case AUTO_GUN_STATE_FIRE:
 			if (!los)
 			{
-				item.Animation.TargetState = AUTOGUN_STATE_IDLE;
+				item.Animation.TargetState = AUTO_GUN_STATE_IDLE;
 			}
 			else if (item.Animation.FrameNumber == GetAnimData(item).frameBase)
 			{
@@ -153,16 +153,16 @@ namespace TEN::Entities::Creatures::TR3
 
 			break;
 
-		case AUTOGUN_STATE_IDLE:
+		case AUTO_GUN_STATE_IDLE:
 			if (los && item.ItemFlags[0] == 0)
-				item.Animation.TargetState = AUTOGUN_STATE_FIRE;
+				item.Animation.TargetState = AUTO_GUN_STATE_FIRE;
 
 			else if (item.ItemFlags[0])
 			{
 				if (item.AIBits == MODIFY)
 				{
 					item.ItemFlags[0] = 1;
-					item.Animation.TargetState = AUTOGUN_STATE_FIRE;
+					item.Animation.TargetState = AUTO_GUN_STATE_FIRE;
 				}
 				else
 				{
