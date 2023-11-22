@@ -10,13 +10,11 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Objects/TR5/Entity/AutoGun.h"
 #include "Specific/level.h"
 
 // NOTES:
-// item.ItemFlags[0]: flag to duplicate the shooting light diffusion.
-// item.ItemFlags[3]: flag to indicate if the turret is hostile or neutral.
-
+// ItemFlags[0]: duplicate shooting light diffusion.
+// ItemFlags[3]: indicate if turret is hostile or neutral.
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -93,8 +91,6 @@ namespace TEN::Entities::Creatures::TR3
 		auto target = GameVector(GetJointPosition(&playerItem, LM_TORSO), playerItem.RoomNumber);
 		bool los = LOS(&origin, &target);
 
-		auto pos = Vector3i::Zero;
-
 		switch (item.Animation.ActiveState)
 		{
 		case AUTOGUN_STATE_FIRE:
@@ -106,7 +102,7 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				item.ItemFlags[0] = 1;
 
-				if (!(turret.MuzzleFlash[0].Delay) )
+				if (turret.MuzzleFlash[0].Delay == 0)
 				{
 					DoDamage(&playerItem, GUN_TURRET_SHOT_DAMAGE);
 
@@ -114,12 +110,12 @@ namespace TEN::Entities::Creatures::TR3
 					float bloodVel = Random::GenerateFloat(4.0f, 8.0f);
 					DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), playerItem.RoomNumber);
 
-					pos = GetJointPosition(item, GunTurretLeftBite);
-					auto color = Color(
+					auto lightPos = GetJointPosition(item, GunTurretLeftBite);
+					auto lightColor = Color(
 						Random::GenerateFloat(0.75f, 1.0f),
 						Random::GenerateFloat(0.5f, 0.6f),
 						Random::GenerateFloat(0.0f, 0.25f));
-					TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item.ItemFlags[0] + 8, color.R() * UCHAR_MAX, color.G() * UCHAR_MAX, color.B() * UCHAR_MAX);
+					TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, 2 * item.ItemFlags[0] + 8, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 
 					turret.MuzzleFlash[0].Bite = GunTurretLeftBite;
 					turret.MuzzleFlash[0].SwitchToMuzzle2 = true;
@@ -129,7 +125,7 @@ namespace TEN::Entities::Creatures::TR3
 					turret.MuzzleFlash[0].Delay = 1;
 				}
 
-				if (!(turret.MuzzleFlash[1].Delay))
+				if (turret.MuzzleFlash[1].Delay == 0)
 				{
 					DoDamage(&playerItem, GUN_TURRET_SHOT_DAMAGE);
 
@@ -137,12 +133,12 @@ namespace TEN::Entities::Creatures::TR3
 					float bloodVel = Random::GenerateFloat(4.0f, 8.0f);
 					DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), playerItem.RoomNumber);
 
-					pos = GetJointPosition(item, GunTurretRightBite);
-					auto color = Color(
+					auto lightPos = GetJointPosition(item, GunTurretRightBite);
+					auto lightColor = Color(
 						Random::GenerateFloat(0.75f, 1.0f),
 						Random::GenerateFloat(0.5f, 0.6f),
 						Random::GenerateFloat(0.0f, 0.25f));
-					TriggerDynamicLight(pos.x, pos.y, pos.z, 2 * item.ItemFlags[0] + 8, color.R() * UCHAR_MAX, color.G() * UCHAR_MAX, color.B() * UCHAR_MAX);
+					TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, 2 * item.ItemFlags[0] + 8, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 
 					turret.MuzzleFlash[1].Bite = GunTurretRightBite;
 					turret.MuzzleFlash[1].SwitchToMuzzle2 = true;
@@ -158,7 +154,7 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 
 		case AUTOGUN_STATE_IDLE:
-			if (los && !item.ItemFlags[0])
+			if (los && item.ItemFlags[0] == 0)
 				item.Animation.TargetState = AUTOGUN_STATE_FIRE;
 
 			else if (item.ItemFlags[0])
@@ -170,8 +166,8 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					item.ItemFlags[1] = 0;
 					item.ItemFlags[0] = 0;
+					item.ItemFlags[1] = 0;
 					turret.Flags |= 0;
 				}
 			}
