@@ -336,8 +336,8 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_GUN_TURRET];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitialiseGunTurret;
-		obj->control = GunTurretControl;
+		obj->Initialize = InitializeGunTurret;
+		obj->control = ControlGunTurret;
 		obj->collision = CreatureCollision;
 		obj->HitRoutine = GunTurretHit;
 		obj->HitPoints = 28;
