@@ -175,7 +175,7 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 		}
 
-		short deltaAngle = Geometry::GetShortestAngle(ai.angle, turret.JointRotation[0]);
+		short deltaAngle = Geometry::GetShortestAngle(turret.JointRotation[0], ai.angle);
 		if (deltaAngle > ANGLE(10.0f))
 		{
 			deltaAngle = ANGLE(10.0f);
