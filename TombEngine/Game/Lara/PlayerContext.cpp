@@ -176,7 +176,8 @@ namespace TEN::Entities::Player
 		int vPosTop = vPos - playerHeight;
 
 		// Calculate slope aspect delta angle.
-		short aspectAngle = Geometry::GetSurfaceAspectAngle(pointColl.FloorNormal);
+		auto floorNormal = GetSurfaceNormal(pointColl.FloorTilt, true);
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 		short aspectAngleDelta = Geometry::GetShortestAngle(setup.HeadingAngle, aspectAngle);
 
 		// 1) Check for slippery slope below floor (if applicable).
@@ -333,7 +334,7 @@ namespace TEN::Entities::Player
 			setup = GroundMovementSetupData
 			{
 				short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
-				(int)CLICK(1.25f), -(int)CLICK(1.25f) // NOTE: Bounds defined by sidestep left/right states.
+				(int)CLICK(0.8f), -(int)CLICK(0.8f) // NOTE: Bounds defined by sidestep left/right states.
 			};
 		}
 

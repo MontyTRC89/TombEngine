@@ -40,10 +40,10 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
+using namespace TEN::Entities::Player;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Entities::Player;
 using namespace TEN::Renderer;
 
 // -----------------------------
@@ -1305,7 +1305,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either:
 	// a) the surface aspect angle (extended slides), or
 	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorNormal);
+	headingAngle = Geometry::GetSurfaceAspectAngle(GetSurfaceNormal(probe.FloorTilt, true));
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
@@ -1518,7 +1518,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Determine relative orientation adhering to floor normal.
-	auto floorNormal = GetCollision(item).FloorNormal;
+	auto floorNormal = GetSurfaceNormal(GetCollision(item).FloorTilt, true);
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.
@@ -1609,8 +1609,20 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 	static short oldAngle = 1;
 
-	short aspectAngle = Geometry::GetSurfaceAspectAngle(coll->FloorNormal);
-	short angle = GetQuadrant(aspectAngle) * ANGLE(90.0f);
+	if (abs(coll->FloorTilt.x) <= 2 && abs(coll->FloorTilt.y) <= 2)
+		return;
+
+	short angle = ANGLE(0.0f);
+	if (coll->FloorTilt.x > 2)
+		angle = -ANGLE(90.0f);
+	else if (coll->FloorTilt.x < -2)
+		angle = ANGLE(90.0f);
+
+	if (coll->FloorTilt.y > 2 && coll->FloorTilt.y > abs(coll->FloorTilt.x))
+		angle = ANGLE(180.0f);
+	else if (coll->FloorTilt.y < -2 && -coll->FloorTilt.y > abs(coll->FloorTilt.x))
+		angle = ANGLE(0.0f);
+
 	short delta = angle - item->Pose.Orientation.y;
 
 	ShiftItem(item, coll);

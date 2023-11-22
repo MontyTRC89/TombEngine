@@ -21,9 +21,6 @@ struct SinkInfo;
 struct BOX_INFO;
 struct OVERLAP;
 
-#define AddPtr(p, t, n) p = (t*)((char*)(p) + (ptrdiff_t)(n));
-#define MESHES(slot, mesh) (Objects[slot].meshIndex + mesh)
-
 struct TEXTURE
 {
 	int width;
