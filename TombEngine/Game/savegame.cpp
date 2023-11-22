@@ -469,10 +469,10 @@ bool SaveGame::Save(int slot)
 	control.add_is_low(Lara.Control.IsLow);
 	control.add_is_moving(Lara.Control.IsMoving);
 	control.add_is_run_jump_queued(Lara.Control.IsRunJumpQueued);
-	control.add_count(countOffset);
+	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_keep_low(Lara.Control.KeepLow);
 	control.add_look(lookControlOffset);
-	control.add_is_low(Lara.Control.IsLow);
+	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
 	control.add_tightrope(tightropeControlOffset);
