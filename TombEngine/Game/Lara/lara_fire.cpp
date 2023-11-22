@@ -795,9 +795,7 @@ void HandleWeapon(ItemInfo& laraItem)
 				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
 
 				if (Contains(UnavailableFlarePoseAnims, laraItem.Animation.AnimNumber))
-				{
 					player.Flare.ControlLeft = false;
-				}
 
 				DoFlareInHand(laraItem, player.Flare.Life);
 				SetFlareArm(laraItem, player.LeftArm.FrameNumber);

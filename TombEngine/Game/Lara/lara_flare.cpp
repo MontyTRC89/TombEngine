@@ -318,7 +318,6 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 	flareItem.RoomNumber = laraItem.RoomNumber;
 
 	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(-16, 32, 42));
-
 	if (objectID == ID_BURNING_TORCH_ITEM && laraItem.Animation.ActiveState == LS_CROUCH_IDLE)
 		pos.y -= CLICK(0.5f);
 

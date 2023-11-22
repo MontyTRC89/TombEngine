@@ -67,7 +67,7 @@ namespace TEN::Entities::Generic
 		spark->sSize = spark->size = Random::GenerateFloat(64, 150);
 		spark->dSize = spark->size / 8;
 
-		auto spriteOffset = GameTimer % Objects[ID_FIRE_SPRITES].nmeshes;
+		int spriteOffset = GameTimer % Objects[ID_FIRE_SPRITES].nmeshes;
 		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
 	}
 
@@ -179,11 +179,12 @@ namespace TEN::Entities::Generic
 		if (lara->Torch.IsLit)
 		{
 			auto pos = GetJointPosition(laraItem, LM_LHAND, Vector3i(-32, 64, 256));
-			short light_falloff = Random::GenerateInt (11, 12);
-			byte light_r = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
-			byte light_g = Random::GenerateFloat(0.38f, 0.5f) * UCHAR_MAX;
-			byte light_b = 0;
-			TriggerDynamicLight(pos.x, pos.y, pos.z, light_falloff, light_r, light_g, light_b);
+			auto lightColor = Color(
+				Random::GenerateFloat(0.75f, 1.0f),
+				Random::GenerateFloat(0.4f, 0.5f),
+				0.0f);
+			float lightFalloff = Random::GenerateFloat(0.04f, 0.045f);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 
 			if (!(Wibble & 3))
 				TriggerTorchFlame(laraItem->Index, 0);
@@ -264,18 +265,21 @@ namespace TEN::Entities::Generic
 				}
 			}
 			else if (CollidedMeshes[0])
+			{
 				ItemPushStatic(item, *CollidedMeshes[0], &LaraCollision);
+			}
 			
 			item->Animation.Velocity.z = -int(item->Animation.Velocity.z / 1.5f);
 		}
 
 		if (item->ItemFlags[3])
 		{
-			short light_falloff = Random::GenerateInt(11, 12);
-			byte light_r = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
-			byte light_g = Random::GenerateFloat(0.38f, 0.5f) * UCHAR_MAX;
-			byte light_b = 0;
-			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, light_falloff, light_r, light_g, light_b);
+			auto lightColor = Color(
+				Random::GenerateFloat(0.75f, 1.0f),
+				Random::GenerateFloat(0.4f, 0.5f),
+				0.0f);
+			float lightFalloff = Random::GenerateFloat(0.04f, 0.045f);
+			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 			
 			if (!(Wibble & 7))
 				TriggerTorchFlame(itemNumber, 1);
