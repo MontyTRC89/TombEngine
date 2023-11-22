@@ -505,7 +505,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR2\Vehicles\speedboat_info.h" />
     <ClInclude Include="Objects\TR2\tr2_objects.h" />
     <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
-    <ClInclude Include="Objects\TR3\Entity\gun_turret.h" />
+    <ClInclude Include="Objects\TR3\Entity\GunTurret.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
@@ -979,7 +979,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
     <ClCompile Include="Objects\TR2\Vehicles\speedboat.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\gun_turret.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\GunTurret.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />

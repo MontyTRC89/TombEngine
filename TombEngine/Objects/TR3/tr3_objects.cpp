@@ -8,8 +8,8 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR3/Entity/gun_turret.h"
 #include "Objects/TR3/Entity/Compsognathus.h" // OK
+#include "Objects/TR3/Entity/GunTurret.h"
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/Shiva.h" // OK
