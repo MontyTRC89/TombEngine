@@ -16,6 +16,11 @@
 
 using namespace TEN::Math;
 
+// NOTES:
+// ItemFlags[0]: X axis orientation.
+// ItemFlags[1]: Y axis orientation.
+// ItemFlags[2]: barrel turn rate.
+
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto AUTO_GUN_SHOT_DAMAGE			= 20;
@@ -69,15 +74,15 @@ namespace TEN::Entities::Creatures::TR5
 			auto orientTo = los ? Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) : item.Pose.Orientation;
 			orient.Lerp(orientTo, AUTO_GUN_ORIENT_LERP_ALPHA);
 
-			item.ItemFlags[0] = orient.x; // NOTE: ItemFlags[0] stores X axis orientation.
-			item.ItemFlags[1] = orient.y; // NOTE: ItemFlags[1] stores Y axis orientation.
+			item.ItemFlags[0] = orient.x;
+			item.ItemFlags[1] = orient.y;
 
 			auto deltaAngle = orient - orientTo;
 
 			// Handle joint rotation.
 			autoGun.JointRotation[0] = orient.y;
 			autoGun.JointRotation[1] = orient.x;
-			autoGun.JointRotation[2] += item.ItemFlags[2]; // NOTE: ItemFlags[2] stores barrel turn rate.
+			autoGun.JointRotation[2] += item.ItemFlags[2];
 
 			// Fire gunshot.
 			if (los &&
