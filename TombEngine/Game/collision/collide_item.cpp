@@ -1929,9 +1929,10 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			}
 			else if (coll->Setup.EnableObjectPush)
 			{
+				// TODO: Test. Might have player walking through objects in edge cases.
 				// Avoid interfering with player object interactions.
-				if (isPlayer && !GetLaraInfo(*item).Control.IsMoving)
-					continue;
+				/*if (isPlayer && !GetLaraInfo(*item).Control.IsMoving)
+					continue;*/
 
 				ItemPushStatic(item, staticObject, coll);
 			}
