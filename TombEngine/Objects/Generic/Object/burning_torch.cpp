@@ -28,17 +28,19 @@ namespace TEN::Entities::Generic
 
 		spark->on = true;
 
-		spark->sR = 255;
-		spark->sB = 48;
+		spark->sR = 1.0f * UCHAR_MAX;
+		spark->sB = 0.2f * UCHAR_MAX;
 		spark->sG = Random::GenerateFloat(0.2f, 0.3f) * UCHAR_MAX;
 		spark->dR = Random::GenerateFloat(-0.25f, 0.0f) * UCHAR_MAX;
-		spark->dB = 32;
-		spark->dG = spark->dG = Random::GenerateFloat(-0.5f, -0.25f) * UCHAR_MAX;
+		spark->dB = 0.1f * UCHAR_MAX;
+		spark->dG =
+		spark->dG = Random::GenerateFloat(-0.5f, -0.25f) * UCHAR_MAX;
 
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = Random::GenerateInt(12, 15);
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->life = spark->sLife = Random::GenerateInt(24, 31);
+		spark->life =
+		spark->sLife = Random::GenerateInt(24, 31);
 
 		spark->x = Random::GenerateInt(-8, 8);
 		spark->y = 0;
@@ -54,7 +56,7 @@ namespace TEN::Entities::Generic
 
 		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
-		if (Random::GenerateInt(0, 1))
+		if (Random::TestProbability(1 / 2.0f))
 			spark->rotAdd = Random::GenerateFloat(-0.16f / 127.0f, 0.0f) * SCHAR_MAX;
 		else
 			spark->rotAdd = Random::GenerateFloat(0.0f, 0.16f) * SCHAR_MAX;
@@ -64,7 +66,8 @@ namespace TEN::Entities::Generic
 		spark->maxYvel = Random::GenerateFloat(-0.16f, 0.0f) * SCHAR_MAX;
 		spark->fxObj = fxObject;
 		spark->scalar = 1;
-		spark->sSize = spark->size = Random::GenerateFloat(64, 150);
+		spark->sSize =
+		spark->size = Random::GenerateFloat(64, 150);
 		spark->dSize = spark->size / 8;
 
 		int spriteOffset = GameTimer % Objects[ID_FIRE_SPRITES].nmeshes;
