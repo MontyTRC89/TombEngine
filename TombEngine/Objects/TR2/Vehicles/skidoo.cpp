@@ -689,8 +689,7 @@ namespace TEN::Entities::Vehicles
 
 	void DoSnowEffect(ItemInfo* skidooItem)
 	{
-		auto pointColl = GetCollision(skidooItem);
-		auto material = pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+		auto material = GetCollision(skidooItem).BottomBlock->Material;
 		if (material != MaterialType::Ice && material != MaterialType::Snow)
 			return;
 
