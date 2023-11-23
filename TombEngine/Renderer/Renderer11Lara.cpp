@@ -316,6 +316,8 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, RendererPass renderer
 	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Color = item->Color;
 	m_stItem.AmbientLight = item->AmbientLight;
+	m_stItem.VerticalPortalHeight = item->VerticalPortalHeight;
+	m_stItem.SecondAmbientLight = item->SecondAmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), laraObj.AnimationTransforms.size() * sizeof(Matrix));
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{

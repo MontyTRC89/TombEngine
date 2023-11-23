@@ -388,6 +388,7 @@ namespace TEN::Renderer
 
 			CalculateLightFades(newItem);
 			CollectLightsForItem(newItem);
+			CalculateSecondAmbientLight(newItem);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
@@ -748,6 +749,31 @@ namespace TEN::Renderer
 
 		// Multiply calculated ambient light by object tint
 		item->AmbientLight *= nativeItem->Model.Color;
+	}
+
+	void Renderer11::CalculateSecondAmbientLight(RendererItem* item)
+	{
+		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
+
+
+		int waterSurface = GetWaterSurface(nativeItem);
+
+		if (waterSurface != NO_HEIGHT)
+		{
+			auto probePos = Vector3i(nativeItem->Pose.Position.x, waterSurface - CLICK(1), nativeItem->Pose.Position.z);
+			auto probe = GetCollision(probePos, nativeItem->RoomNumber);
+
+			item->SecondAmbientLight = m_rooms[probe.RoomNumber].AmbientLight;
+			item->VerticalPortalHeight = waterSurface;
+		}
+		else
+		{
+			item->SecondAmbientLight = Vector4::Zero;
+			item->VerticalPortalHeight = INT16_MIN;
+		}
+
+		// Multiply calculated ambient light by object tint
+		item->SecondAmbientLight *= nativeItem->Model.Color;
 	}
 
 	void Renderer11::CollectLightsForRoom(short roomNumber, RenderView &renderView)

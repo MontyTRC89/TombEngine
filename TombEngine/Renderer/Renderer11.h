@@ -150,6 +150,8 @@ namespace TEN::Renderer
 		int PrevRoomNumber = NO_ROOM;
 		Vector4 Color;
 		Vector4 AmbientLight;
+		int VerticalPortalHeight;
+		Vector4 SecondAmbientLight;
 		std::vector<RendererLight*> LightsToDraw;
 		float LightFade;
 
@@ -526,6 +528,7 @@ namespace TEN::Renderer
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
 		void CollectLightsForCamera();
 		void CalculateLightFades(RendererItem* item);
+		void CalculateSecondAmbientLight(RendererItem* item);
 		void CollectEffects(short roomNumber);
 		void ClearSceneItems();
 		void ClearDynamicLights();

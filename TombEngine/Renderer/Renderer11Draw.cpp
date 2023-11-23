@@ -1953,6 +1953,8 @@ namespace TEN::Renderer
 		m_stItem.World = item->World;
 		m_stItem.Color = item->Color;
 		m_stItem.AmbientLight = item->AmbientLight;
+		m_stItem.VerticalPortalHeight = item->VerticalPortalHeight;
+		m_stItem.SecondAmbientLight = item->SecondAmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)

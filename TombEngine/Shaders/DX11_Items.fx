@@ -15,9 +15,11 @@ cbuffer ItemBuffer : register(b1)
 	float4x4 Bones[MAX_BONES];
 	float4 Color;
 	float4 AmbientLight;
+	float4 SecondAmbientLight;
 	int4 BoneLightModes[MAX_BONES / 4];
 	ShaderLight ItemLights[MAX_LIGHTS_PER_ITEM];
 	int NumItemLights;
+	int VerticalPortalHeight;
 };
 
 struct PixelShaderInput
@@ -88,16 +90,21 @@ PixelShaderOutput PS(PixelShaderInput input)
     DoAlphaTest(tex);
 
 	float3 normal = normalize(input.Normal);
+	
+	float3 FinalAmbientLight = AmbientLight.xyz;
+
+	if (input.WorldPosition.y < VerticalPortalHeight)
+		FinalAmbientLight = SecondAmbientLight.xyz;
 
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(
-			AmbientLight.xyz,
+			FinalAmbientLight,
 			input.Color.xyz,
-			tex.xyz, 
+			tex.xyz,
 			input.WorldPosition,
-			normal, 
+			normal,
 			input.Sheen,
-			ItemLights, 
+			ItemLights,
 			NumItemLights,
 			input.FogBulbs.w) :
 		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
