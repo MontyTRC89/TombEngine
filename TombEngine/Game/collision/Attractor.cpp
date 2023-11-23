@@ -215,17 +215,31 @@ namespace TEN::Collision::Attractor
 		auto labelString = std::string();
 		switch (_type)
 		{
-		default:
-			labelString = "Undefined attractor";
-			break;
-
 		case AttractorType::Edge:
 			labelString = "Edge";
+			break;
+
+		default:
+			labelString = "Undefined attractor";
 			break;
 		}
 
 		// Draw debug elements.
-		if (_points.size() >= 2)
+		if (_points.size() == 1)
+		{
+			// Draw sphere.
+			g_Renderer.AddDebugSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW, RendererDebugPage::CollisionStats, false);
+
+			// Determine label parameters.
+			auto labelPos = _points.front();
+			auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
+			float labelScale = getLabelScale(Camera.pos.ToVector3(), labelPos);
+
+			// Draw label.
+			if (labelPos2D.has_value())
+				g_Renderer.AddString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, PRINTSTRING_OUTLINE);
+		}
+		else
 		{
 			for (int i = 0; i < (_points.size() - 1); i++)
 			{
@@ -259,20 +273,6 @@ namespace TEN::Collision::Attractor
 
 			// Draw AABB.
 			//g_Renderer.AddDebugBox(_box, Vector4::One, RendererDebugPage::CollisionStats);
-		}
-		else if (_points.size() == 1)
-		{
-			// Draw sphere.
-			g_Renderer.AddDebugSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW, RendererDebugPage::CollisionStats, false);
-
-			// Determine label parameters.
-			auto labelPos = _points.front();
-			auto labelPos2D = g_Renderer.Get2DPosition(labelPos);
-			float labelScale = getLabelScale(Camera.pos.ToVector3(), labelPos);
-
-			// Draw label.
-			if (labelPos2D.has_value())
-				g_Renderer.AddString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, PRINTSTRING_OUTLINE);
 		}
 	}
 
