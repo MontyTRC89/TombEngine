@@ -236,8 +236,7 @@ namespace TEN::Collision::Attractor
 				// Draw main line.
 				g_Renderer.AddDebugLine(origin, target, COLOR_YELLOW);
 
-				auto orient = Geometry::GetOrientToPoint(origin, target);
-				orient.y += ANGLE(90.0f);
+				auto orient = EulerAngles(0, Geometry::GetOrientToPoint(origin, target).y + ANGLE(90.0f), 0);
 				auto dir = orient.ToDirection();
 
 				// Draw segment heading indicator lines.
@@ -259,13 +258,12 @@ namespace TEN::Collision::Attractor
 			g_Renderer.AddDebugLine(_points.back(), Geometry::TranslatePoint(_points.back(), -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
 
 			// Draw AABB.
-			/*auto box = BoundingOrientedBox(_box.Center, _box.Extents, Quaternion::Identity);
-			g_Renderer.AddDebugBox(box, Vector4::One, RendererDebugPage::CollisionStats);*/
+			//g_Renderer.AddDebugBox(_box, Vector4::One, RendererDebugPage::CollisionStats);
 		}
 		else if (_points.size() == 1)
 		{
 			// Draw sphere.
-			g_Renderer.AddDebugSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW);
+			g_Renderer.AddDebugSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW, RendererDebugPage::CollisionStats, false);
 
 			// Determine label parameters.
 			auto labelPos = _points.front();
