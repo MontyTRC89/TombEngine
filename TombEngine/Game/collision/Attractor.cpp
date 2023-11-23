@@ -237,7 +237,7 @@ namespace TEN::Collision::Attractor
 
 			// Draw label.
 			if (labelPos2D.has_value())
-				g_Renderer.AddString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, PRINTSTRING_OUTLINE);
+				g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, PRINTSTRING_OUTLINE, RendererDebugPage::CollisionStats);
 		}
 		else
 		{
