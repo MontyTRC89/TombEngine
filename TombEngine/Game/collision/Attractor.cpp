@@ -345,23 +345,21 @@ namespace TEN::Collision::Attractor
 			break;
 		}
 
-		// Determine relative corner points.
+		// Get corners.
+		auto corners = std::array<Vector3, 8>{};
 		auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
-		auto point0 = Vector3(box.Extents.x, -box.Extents.y + tiltOffset, box.Extents.z);
-		auto point1 = Vector3(-box.Extents.x, -box.Extents.y, box.Extents.z);
-		auto point2 = Vector3(-box.Extents.x, -box.Extents.y, -box.Extents.z);
-		auto point3 = Vector3(box.Extents.x, -box.Extents.y + tiltOffset, -box.Extents.z);
+		box.GetCorners(corners.data());
 
-		// Calculate absolute corner points.
-		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
+		// Collect relevent points.
+		auto offset = Vector3(0.0f, tiltOffset, 0.0f);
 		auto points = std::vector<Vector3>
 		{
-			box.Center + Vector3::Transform(point0, rotMatrix),
-			box.Center + Vector3::Transform(point1, rotMatrix),
-			box.Center + Vector3::Transform(point2, rotMatrix),
-			box.Center + Vector3::Transform(point3, rotMatrix)
+			corners[0],
+			corners[4],
+			corners[5] + offset,
+			corners[1] + offset,
+			corners[0]
 		};
-		points.push_back(points.front());
 
 		// Return bridge attractor.
 		return Attractor(AttractorType::Edge, points, bridgeItem.RoomNumber);
