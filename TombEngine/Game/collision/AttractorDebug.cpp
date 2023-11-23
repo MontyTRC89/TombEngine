@@ -125,12 +125,6 @@ namespace TEN::Collision::Attractor
 
 		SetDebugAttractors(item);
 
-		// Generate sector attractor.
-		auto pointColl = GetCollision(item);
-		auto attracs = GenerateSectorAttractors(item);
-
-		player.Context.DebugAttracs.Attracs = attracs;
-
 		// Draw debug.
 		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(5));
 		for (const auto& attracColl : attracColls)

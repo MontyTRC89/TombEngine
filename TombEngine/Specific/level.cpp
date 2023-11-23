@@ -844,19 +844,8 @@ void ReadRooms()
 			g_GameScriptEntities->AddName(volume.Name, volume);
 		}
 
-		room.flippedRoom = ReadInt32();
-		room.flags = ReadInt32();
-		room.meshEffect = ReadInt32();
-		room.reverbType = (ReverbType)ReadInt32();
-		room.flipNumber = ReadInt32();
-
-		room.itemNumber = NO_ITEM;
-		room.fxNumber = NO_ITEM;
-		room.index = i;
-
-		// TODO: Wait for Nickelony.
-		// Load room attractors.
-		/*int attracCount = ReadInt32();
+		// Load attractors.
+		int attracCount = ReadInt32();
 		for (int j = 0; j < attracCount; j++)
 		{
 			auto type = (AttractorType)ReadInt32();
@@ -869,12 +858,31 @@ void ReadRooms()
 
 			if (points.empty())
 			{
-				TENLog("Failed to load invalid attractor " + std::to_string(j) + " in room " + std::to_string(room.index), LogLevel::Warning);
+				TENLog("Failed to load invalid attractor " + std::to_string(j) + " in room " + std::to_string(i), LogLevel::Warning);
 				continue;
 			}
-		
-			room.Attractors.push_back(Attractor(type, points, room.index));
-		}*/
+
+			/*for (auto& point : points)
+			{
+				point.y *= -1;
+				point.y *= 0.25f;
+				point *= BLOCK(1);
+				point.y += room.minfloor;
+				point += Vector3(room.x, 0.0f, room.z);
+			}*/
+
+			room.Attractors.push_back(Attractor(type, points, i));
+		}
+
+		room.flippedRoom = ReadInt32();
+		room.flags = ReadInt32();
+		room.meshEffect = ReadInt32();
+		room.reverbType = (ReverbType)ReadInt32();
+		room.flipNumber = ReadInt32();
+
+		room.itemNumber = NO_ITEM;
+		room.fxNumber = NO_ITEM;
+		room.index = i;
 
 		g_GameScriptEntities->AddName(room.name, room);
 	}

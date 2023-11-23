@@ -149,9 +149,6 @@ public:
 	int	 TriggerIndex = 0;
 	bool Stopper	  = true;
 
-	// Debug
-	std::vector<std::vector<Vector3>> GetSurfaceVertexGroups(int x, int z, bool isFloor);
-
 	// Getters
 	const SectorSurfaceTriangleData& GetSurfaceTriangle(int x, int z, bool isFloor) const;
 	int		GetSurfaceTriangleID(int x, int z, bool isFloor) const;

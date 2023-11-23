@@ -368,45 +368,4 @@ namespace TEN::Collision::Attractor
 		// Return bridge attractor.
 		return Attractor(AttractorType::Edge, points, bridgeItem.RoomNumber);
 	}
-
-	// TEMP
-	std::vector<Attractor> GenerateSectorAttractors(const ItemInfo& item)
-	{
-		constexpr auto SECTOR_SEARCH_DEPTH = 2;
-
-		auto attracs = std::vector<Attractor>{};
-
-		// Run through neighbor rooms.
-		const auto& room = g_Level.Rooms[item.RoomNumber];
-		for (int neighborRoomNumber : room.neighbors)
-		{
-			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-
-			// Run through neighbor sectors.
-			auto roomGridCoords = GetNeighborRoomGridCoords(item.Pose.Position, neighborRoomNumber, SECTOR_SEARCH_DEPTH);
-			for (const auto& roomGridCoord : roomGridCoords)
-			{
-				auto pos = Vector3i(BLOCK(roomGridCoord.x) + neighborRoom.x, item.Pose.Position.y, BLOCK(roomGridCoord.y) + neighborRoom.z);
-				auto pointColl = GetCollision(pos, neighborRoomNumber);
-
-				// Check for invalid sector.
-				if (pointColl.Position.Floor == NO_HEIGHT)
-					continue;
-
-				// Generate floor attractors.
-				auto vertexGroups = pointColl.BottomBlock->GetSurfaceVertexGroups(pos.x, pos.z, true);
-				for (auto& vertices : vertexGroups)
-				{
-					if (!vertices.empty())
-					{
-						vertices.push_back(vertices.front());
-						attracs.push_back(Attractor(AttractorType::Edge, vertices, pointColl.RoomNumber));
-					}
-				}
-			}
-		}
-
-		// Return generated attractors.
-		return attracs;
-	}
 }

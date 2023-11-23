@@ -2,9 +2,10 @@
 #include "Game/Lara/PlayerContextData.h"
 #include "Math/Math.h"
 
-//debug
+//----debug
 #include "Game/collision/Attractor.h"
 using namespace TEN::Collision::Attractor;
+//----
 
 struct CollisionInfo;
 struct ItemInfo;
@@ -40,8 +41,6 @@ namespace TEN::Entities::Player
 		Attractor Attrac0 = {};
 		Attractor Attrac1 = {};
 		Attractor Attrac2 = {};
-
-		std::vector<Attractor> Attracs = {};
 	};
 
 	// TODO: Savegame for attractors.
