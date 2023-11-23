@@ -352,7 +352,7 @@ namespace TEN::Collision::Attractor
 		auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
 		box.GetCorners(corners.data());
 
-		// Collect relevent points.
+		// Collect relevant points.
 		auto offset = Vector3(0.0f, tiltOffset, 0.0f);
 		auto points = std::vector<Vector3>
 		{
