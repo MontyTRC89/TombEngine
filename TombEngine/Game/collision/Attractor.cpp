@@ -197,8 +197,8 @@ namespace TEN::Collision::Attractor
 		constexpr auto LABEL_OFFSET			 = Vector3(0.0f, -CLICK(0.25f), 0.0f);
 		constexpr auto INDICATOR_LINE_LENGTH = BLOCK(1 / 20.0f);
 		constexpr auto SPHERE_SCALE			 = BLOCK(1 / 64.0f);
-		constexpr auto COLOR_GREEN			 = Color(0.4f, 1.0f, 0.4f);
 		constexpr auto COLOR_YELLOW			 = Color(1.0f, 1.0f, 0.4f);
+		constexpr auto COLOR_GREEN			 = Color(0.4f, 1.0f, 0.4f);
 
 		auto getLabelScale = [](const Vector3& cameraPos, const Vector3& labelPos)
 		{
