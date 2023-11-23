@@ -684,11 +684,11 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Graphics\IndexBuffer.h" />
     <ClInclude Include="Renderer\Graphics\RenderTarget2D.h" />
     <ClInclude Include="Renderer\Graphics\RenderTargetCube.h" />
-    <ClInclude Include="Renderer\Graphics\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\Graphics\Texture2D.h" />
     <ClInclude Include="Renderer\Graphics\Texture2DArray.h" />
     <ClInclude Include="Renderer\Graphics\TextureBase.h" />
     <ClInclude Include="Renderer\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Renderer\Graphics\Vertices\PostProcessVertex.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\SMAAVertex.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\SpriteVertex.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\Vertex.h" />
@@ -1146,13 +1146,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Utils\object_helper.cpp" />
     <ClCompile Include="Objects\Utils\VehicleHelpers.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
-    <ClCompile Include="Renderer\Graphics\IndexBuffer.cpp" />
-    <ClCompile Include="Renderer\Graphics\RenderTarget2D.cpp" />
-    <ClCompile Include="Renderer\Graphics\RenderTargetCube.cpp" />
-    <ClCompile Include="Renderer\Graphics\RenderTargetCubeArray.cpp" />
-    <ClCompile Include="Renderer\Graphics\Texture2D.cpp" />
-    <ClCompile Include="Renderer\Graphics\Texture2DArray.cpp" />
-    <ClCompile Include="Renderer\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Renderer\RendererAntialiasing.cpp" />
     <ClCompile Include="Renderer\RendererCompatibility.cpp" />
@@ -1239,6 +1232,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <FileType>Text</FileType>
     </None>
     <None Include="Shaders\Blending.hlsli" />
+    <None Include="Shaders\ConstantBuffers.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="Shaders\SMAA.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -1500,6 +1496,11 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\SSAO.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PostProcess.fx">
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>

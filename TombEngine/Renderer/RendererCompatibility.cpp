@@ -18,6 +18,8 @@ using namespace TEN::Renderer::Graphics;
 
 namespace TEN::Renderer
 {
+	template class VertexBuffer<Vertex>;
+
 	bool Renderer::PrepareDataForTheRenderer()
 	{
 		_lastBlendMode = BlendMode::Unknown;
@@ -443,7 +445,7 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		_roomsVertexBuffer = VertexBuffer(_device.Get(), (int)_roomsVertices.size(), _roomsVertices.data());
+		_roomsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_roomsVertices.size(), &_roomsVertices[0]);
 		_roomsIndexBuffer = IndexBuffer(_device.Get(), (int)_roomsIndices.size(), _roomsIndices.data());
 
 		std::for_each(std::execution::par_unseq,
@@ -787,7 +789,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		_moveablesVertexBuffer = VertexBuffer(_device.Get(), (int)_moveablesVertices.size(), _moveablesVertices.data());
+		_moveablesVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_moveablesVertices.size(), &_moveablesVertices[0]);
 		_moveablesIndexBuffer = IndexBuffer(_device.Get(), (int)_moveablesIndices.size(), _moveablesIndices.data());
 
 		TENLog("Preparing static mesh data...", LogLevel::Info);
@@ -828,16 +830,8 @@ namespace TEN::Renderer
 			_staticObjects[StaticObjectsIds[i]] = staticObject;
 		}
 
-		if (_staticsVertices.size() > 0)
-		{
-			_staticsVertexBuffer = VertexBuffer(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());
-			_staticsIndexBuffer = IndexBuffer(_device.Get(), (int)_staticsIndices.size(), _staticsIndices.data());
-		}
-		else
-		{
-			_staticsVertexBuffer = VertexBuffer(_device.Get(), 1);
-			_staticsIndexBuffer = IndexBuffer(_device.Get(), 1);
-		}
+		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());
+		_staticsIndexBuffer = IndexBuffer(_device.Get(), (int)_staticsIndices.size(), _staticsIndices.data());
 
 		TENLog("Preparing sprite data...", LogLevel::Info);
 		

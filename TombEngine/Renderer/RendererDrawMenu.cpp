@@ -1170,7 +1170,7 @@ namespace TEN::Renderer
 				rect.right = rect.left + thumbWidth;
 				rect.bottom = rect.top + thumbWidth / aspectRatio;
 
-				_spriteBatch->Draw(_SSAORenderTarget.ShaderResourceView.Get(), rect);
+				_spriteBatch->Draw(_SSAOBlurredRenderTarget.ShaderResourceView.Get(), rect);
 				thumbY += thumbWidth / aspectRatio;
 				  
 				if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)

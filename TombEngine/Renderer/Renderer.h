@@ -68,6 +68,7 @@
 #include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Renderer/Graphics/Vertices/SMAAVertex.h"
 #include "Renderer/Structures/RendererObject.h"
+#include "Graphics/Vertices/PostProcessVertex.h"
 
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
@@ -216,15 +217,15 @@ namespace TEN::Renderer
 		Texture2D _loadingBarInner;
 		Texture2D _loadingScreenTexture;
 
-		VertexBuffer _roomsVertexBuffer;
+		VertexBuffer<Vertex> _roomsVertexBuffer;
 		IndexBuffer _roomsIndexBuffer;
-		VertexBuffer _moveablesVertexBuffer;
+		VertexBuffer<Vertex> _moveablesVertexBuffer;
 		IndexBuffer _moveablesIndexBuffer;
-		VertexBuffer _staticsVertexBuffer;
+		VertexBuffer<Vertex> _staticsVertexBuffer;
 		IndexBuffer _staticsIndexBuffer;
-		VertexBuffer _skyVertexBuffer;
+		VertexBuffer<Vertex> _skyVertexBuffer;
 		IndexBuffer _skyIndexBuffer;
-		VertexBuffer _quadVertexBuffer;
+		VertexBuffer<Vertex> _quadVertexBuffer;
 
 		std::vector<Vertex> _roomsVertices;
 		std::vector<int> _roomsIndices;
@@ -352,12 +353,20 @@ namespace TEN::Renderer
 		// Post process
 		PostProcessColorScheme _postProcessColorScheme = PostProcessColorScheme::Normal;
 		Vertex _fullscreenQuadVertices[4];
+		VertexBuffer<PostProcessVertex> _fullscreenTriangleVertexBuffer;
+		ComPtr<ID3D11InputLayout> _fullscreenTriangleInputLayout = nullptr;
+		ComPtr<ID3D11VertexShader> _vsPostProcess;
+		ComPtr<ID3D11PixelShader> _psPostProcessCopy;
+		ComPtr<ID3D11PixelShader> _psPostProcessSepia;
+		ComPtr<ID3D11PixelShader> _psPostProcessMonochrome;
 
 		// SSAO
 		ComPtr<ID3D11VertexShader> _vsSSAO;
 		ComPtr<ID3D11PixelShader> _psSSAO;
+		ComPtr<ID3D11PixelShader> _psSSAOBlur;
 		Texture2D _SSAONoiseTexture;
 		RenderTarget2D _SSAORenderTarget;
+		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
 		bool _SSAO;
 

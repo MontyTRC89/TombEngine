@@ -15,10 +15,10 @@ namespace TEN::Renderer::Structures
 		static constexpr auto COLOR_COUNT = 5;
 		static constexpr auto SIZE_DEFAULT = Vector2(150.0f, 10.0f);
 
-		VertexBuffer VertexBufferBorder = VertexBuffer();
-		IndexBuffer	 IndexBufferBorder = IndexBuffer();
-		VertexBuffer InnerVertexBuffer = VertexBuffer();
-		IndexBuffer	 InnerIndexBuffer = IndexBuffer();
+		VertexBuffer<Vertex> VertexBufferBorder;
+		IndexBuffer	 IndexBufferBorder;
+		VertexBuffer<Vertex> InnerVertexBuffer;
+		IndexBuffer	 InnerIndexBuffer;
 
 		/*
 			Initializes status bar for rendering. Coordinates are set in screen space.
@@ -159,7 +159,7 @@ namespace TEN::Renderer::Structures
 				vertices[i].Bone = 0.0f;
 			}
 
-			InnerVertexBuffer = VertexBuffer(devicePtr, (int)vertices.size(), vertices.data());
+			InnerVertexBuffer = VertexBuffer<Vertex>(devicePtr, (int)vertices.size(), &vertices[0]);
 			InnerIndexBuffer = IndexBuffer(devicePtr, (int)barIndices.size(), barIndices.data());
 
 			auto borderVertices = std::array<Vertex, barBorderVertices.size()>{};
@@ -172,7 +172,7 @@ namespace TEN::Renderer::Structures
 				borderVertices[i].Bone = 0.0f;
 			}
 
-			VertexBufferBorder = VertexBuffer(devicePtr, (int)borderVertices.size(), borderVertices.data());
+			VertexBufferBorder = VertexBuffer<Vertex>(devicePtr, (int)borderVertices.size(), &borderVertices[0]);
 			IndexBufferBorder = IndexBuffer(devicePtr, (int)barBorderIndices.size(), barBorderIndices.data());
 		}
 	};

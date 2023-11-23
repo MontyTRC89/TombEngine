@@ -95,8 +95,8 @@ namespace TEN::Renderer
 		_psRoomAmbient = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\RoomAmbient.fx"), "PS", "ps_5_0", nullptr, blob);
 		_vsFXAA = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\FXAA.fx"), "VS", "vs_5_0", nullptr, blob);
 		_psFXAA = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\FXAA.fx"), "PS", "ps_5_0", nullptr, blob);
-		_vsSSAO = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\SSAO.fx"), "VS", "vs_5_0", nullptr, blob);
 		_psSSAO = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\SSAO.fx"), "PS", "ps_5_0", nullptr, blob);
+		_psSSAOBlur = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\SSAO.fx"), "PSBlur", "ps_5_0", nullptr, blob);
 
 		const D3D_SHADER_MACRO transparentDefines[] = { "TRANSPARENT", "", nullptr, nullptr };
 		_psRoomsTransparent = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\Rooms.fx"), "PS", "ps_5_0", &transparentDefines[0], blob);
@@ -327,6 +327,32 @@ namespace TEN::Renderer
 		_fullscreenQuadVertices[3].UV.y = 1.0f;
 		_fullscreenQuadVertices[3].Color = Vector4::One;
 
+		// Initialise post-process stuff
+		PostProcessVertex vertices[3];
+
+		vertices[0].Position = Vector3(-1.0f, -1.0f, 1.0f);
+		vertices[1].Position = Vector3(-1.0f, 3.0f, 1.0f);
+		vertices[2].Position = Vector3(3.0f, -1.0f, 1.0f);
+
+		vertices[0].UV = Vector2(0.0f, 1.0f);
+		vertices[1].UV = Vector2(0.0f, -1.0f);
+		vertices[2].UV = Vector2(2.0f, 1.0f);
+
+		_fullscreenTriangleVertexBuffer = VertexBuffer<PostProcessVertex>(_device.Get(), 3, &vertices[0]);
+
+		_vsPostProcess = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "VS", "vs_5_0", nullptr, blob);
+
+		D3D11_INPUT_ELEMENT_DESC postProcessInputLayoutItems[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		};
+		Utils::throwIfFailed(_device->CreateInputLayout(postProcessInputLayoutItems, 2, blob->GetBufferPointer(), blob->GetBufferSize(), &_fullscreenTriangleInputLayout));
+
+		_psPostProcessCopy = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSCopy", "ps_5_0", nullptr, blob);
+		_psPostProcessSepia = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSSepia", "ps_5_0", nullptr, blob);
+		_psPostProcessMonochrome = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSMonochrome", "ps_5_0", nullptr, blob);
+
 		InitializeGameBars();
 		InitQuad();
 		InitializeSky();
@@ -368,7 +394,7 @@ namespace TEN::Renderer
 		quadVertices[2].Color = Vector4(1, 1, 1, 1);
 		quadVertices[2].IndexInPoly = 2;
 
-		_quadVertexBuffer = VertexBuffer(_device.Get(), 4, quadVertices.data());
+		_quadVertexBuffer = VertexBuffer<Vertex>(_device.Get(), 4, quadVertices.data());
 	}
 
 	void Renderer::InitializeSky()
@@ -443,7 +469,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		_skyVertexBuffer = VertexBuffer(_device.Get(), SKY_VERTICES_COUNT, vertices);
+		_skyVertexBuffer = VertexBuffer<Vertex>(_device.Get(), SKY_VERTICES_COUNT, vertices);
 		_skyIndexBuffer = IndexBuffer(_device.Get(), SKY_INDICES_COUNT, indices);
 	}
 
@@ -492,6 +518,7 @@ namespace TEN::Renderer
 		_depthRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false);
 		_normalsRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32G32B32A32_FLOAT, false);
 		_SSAORenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+		_SSAOBlurredRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
 
 		// Initialize sprite and primitive batches
 		_spriteBatch = std::make_unique<SpriteBatch>(_context.Get());

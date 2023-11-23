@@ -1,6 +1,15 @@
 #include "./VertexInput.hlsli"
 #include "./CameraMatrixBuffer.hlsli"
 
+cbuffer PostProcessBuffer : register(b7)
+{
+    float CinematicBarsHeight;
+    float ScreenFadeFactor;
+    int ViewportWidth;
+    int ViewportHeight;
+    float4 SSAOKernel[64];
+};
+
 struct PixelShaderInput
 {
     float4 Position: SV_POSITION;
@@ -16,24 +25,8 @@ SamplerState NormalsSampler : register(s1);
 Texture2D NoiseTexture : register(t2);
 SamplerState NoiseSampler : register(s2);
 
-cbuffer PostProcessBuffer : register(b7)
-{
-    float CinematicBarsHeight;
-    float ScreenFadeFactor;
-    int ViewportWidth;
-    int ViewportHeight;
-    float4 SSAOKernel[64];
-};
-
-PixelShaderInput VS(VertexShaderInput input)
-{
-    PixelShaderInput output;
-
-    output.Position = float4(input.Position, 1.0f);
-    output.UV = input.UV;
-
-    return output;
-}
+Texture2D SSAOTexture : register(t9);
+SamplerState SSAOSampler : register(s9);
 
 float3 DecodeNormal(float3 n)
 {
@@ -52,7 +45,7 @@ float3 ReconstructPositionFromDepth(float2 uv)
     return position.xyz / position.w;
 }
 
-float4 PS(PixelShaderInput input) : SV_Target
+float PS(PixelShaderInput input) : SV_Target
 {
     float4 output;
 
@@ -91,4 +84,21 @@ float4 PS(PixelShaderInput input) : SV_Target
     occlusion = 1.0 - (occlusion / kernelSize);
 
     return occlusion;
+}
+
+float PSBlur(PixelShaderInput input) : SV_Target
+{
+    float2 texelSize = 1.0f / ViewSize;
+    float result = 0.0f;
+
+    for (int x = -2; x < 2; x++)
+    {
+        for (int y = -2; y < 2; y++)
+        {
+            float2 offset = float2(x, y) * texelSize;
+            result += SSAOTexture.Sample(SSAOSampler, input.UV + offset).x;
+        }
+    }
+    
+    return (result / (4.0 * 4.0));
 }
