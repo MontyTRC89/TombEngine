@@ -295,17 +295,19 @@ namespace TEN::Collision::Attractor
 
 	void Attractor::CacheLength()
 	{
-		float length = 0.0f;
-		if (_points.size() >= 2)
-		{
-			for (int i = 0; i < (_points.size() - 1); i++)
-			{
-				// Get segment points.
-				const auto& origin = _points[i];
-				const auto& target = _points[i + 1];
+		// Single point exists; set 0 length.
+		if (_points.size() == 1)
+			_length = 0.0f;
 
-				length += Vector3::Distance(origin, target);
-			}
+		float length = 0.0f;
+		for (int i = 0; i < (_points.size() - 1); i++)
+		{
+			// Get segment points.
+			const auto& origin = _points[i];
+			const auto& target = _points[i + 1];
+
+			// Accumulate length.
+			length += Vector3::Distance(origin, target);
 		}
 
 		_length = length;
