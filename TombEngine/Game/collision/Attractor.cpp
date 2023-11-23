@@ -202,9 +202,9 @@ namespace TEN::Collision::Attractor
 
 		auto getLabelScale = [](const Vector3& cameraPos, const Vector3& labelPos)
 		{
-			constexpr auto RANGE		   = BLOCK(10);
+			constexpr auto RANGE		   = BLOCK(5);
 			constexpr auto LABEL_SCALE_MAX = 0.8f;
-			constexpr auto LABEL_SCALE_MIN = 0.2f;
+			constexpr auto LABEL_SCALE_MIN = 0.4f;
 
 			float cameraDist = Vector3::Distance(cameraPos, labelPos);
 			float alpha = cameraDist / RANGE;
