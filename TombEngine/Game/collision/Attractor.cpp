@@ -75,8 +75,8 @@ namespace TEN::Collision::Attractor
 			return false;
 
 		// Test if start and end points occupy same approximate position.
-		float dist = Vector3::Distance(_points.front(), _points.back());
-		return (dist <= EPSILON);
+		float distSqr = Vector3::DistanceSquared(_points.front(), _points.back());
+		return (distSqr <= EPSILON);
 	}
 
 	Vector3 Attractor::GetIntersectionAtChainDistance(float chainDist) const
