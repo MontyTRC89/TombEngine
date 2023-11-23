@@ -49,7 +49,7 @@ float PS(PixelShaderInput input) : SV_Target
 {
     float4 output;
 
-    float2 noiseScale = float2(ViewSize.x / 4.0f, ViewSize.y / 4.0f);
+    float2 noiseScale = float2(ViewportWidth / 4.0f, ViewportHeight / 4.0f);
 
     float3 position = ReconstructPositionFromDepth(input.UV);
     float3 normal = (NormalsTexture.Sample(NormalsSampler, input.UV).xyz);
@@ -88,7 +88,7 @@ float PS(PixelShaderInput input) : SV_Target
 
 float PSBlur(PixelShaderInput input) : SV_Target
 {
-    float2 texelSize = 1.0f / ViewSize;
+    float2 texelSize = 1.0f / float2(ViewportWidth, ViewportHeight);
     float result = 0.0f;
 
     for (int x = -2; x < 2; x++)

@@ -1486,6 +1486,9 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Write);
+
+		_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
 		 
 		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 		BindConstantBufferPS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
@@ -2793,14 +2796,33 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Write);
 
+		// Common vertex shader to all full screen effects
 		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
 
+		// SSAO pixel shader
 		_context->PSSetShader(_psSSAO.Get(), nullptr, 0);
 
 		_context->ClearRenderTargetView(_SSAORenderTarget.RenderTargetView.Get(), Colors::White);
 		_context->OMSetRenderTargets(1, _SSAORenderTarget.RenderTargetView.GetAddressOf(), nullptr);
-		_context->RSSetViewports(1, &view.Viewport);
-		ResetScissor();
+
+		// Need to set correctly the viewport because SSAO is done at 1/4 screen resolution
+		D3D11_VIEWPORT viewport;
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = _screenWidth / 2.0f;
+		viewport.Height = _screenHeight / 2.0f;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		_context->RSSetViewports(1, &viewport);
+	
+		D3D11_RECT rects[1];
+		rects[0].left = 0;
+		rects[0].right = viewport.Width;
+		rects[0].top = 0;
+		rects[0].bottom = viewport.Height;
+
+		_context->RSSetScissorRects(1, rects);
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
@@ -2808,7 +2830,6 @@ namespace TEN::Renderer
 		UINT stride = sizeof(PostProcessVertex);
 		UINT offset = 0;
 
-		// Bind vertex and index buffer.
 		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
 		BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_depthRenderTarget, SamplerStateRegister::PointWrap);
@@ -2822,6 +2843,7 @@ namespace TEN::Renderer
 
 		DrawTriangles(3, 0);
 
+		// Blur step
 		_context->PSSetShader(_psSSAOBlur.Get(), nullptr, 0);
 
 		_context->ClearRenderTargetView(_SSAOBlurredRenderTarget.RenderTargetView.Get(), Colors::Black);
