@@ -862,15 +862,6 @@ void ReadRooms()
 				continue;
 			}
 
-			/*for (auto& point : points)
-			{
-				point.y *= -1;
-				point.y *= 0.25f;
-				point *= BLOCK(1);
-				point.y += room.minfloor;
-				point += Vector3(room.x, 0.0f, room.z);
-			}*/
-
 			room.Attractors.push_back(Attractor(type, points, i));
 		}
 
