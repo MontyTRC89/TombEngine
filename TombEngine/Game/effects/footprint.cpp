@@ -171,7 +171,7 @@ namespace TEN::Effects::Footprint
 			return;
 
 		// Get and emit footstep sound for floor material.
-		auto sfx = GetFootprintSfx(pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true));
+		auto sfx = GetFootprintSfx(pointColl.BottomBlock->Material);
 		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS) // HACK: Must be here until reference WAD2 is revised.
 		{
 			auto pose = item.Pose;
@@ -179,10 +179,10 @@ namespace TEN::Effects::Footprint
 		}
 
 		// Check floor material.
-		if (!TestMaterial(pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true), FootprintMaterials))
+		if (!TestMaterial(pointColl.BottomBlock->Material, FootprintMaterials))
 			return;
 
-		auto vertexPoints = GetFootprintVertexPoints(item, posData.Position, pointColl.FloorNormal);
+		auto vertexPoints = GetFootprintVertexPoints(item, posData.Position, GetSurfaceNormal(pointColl.FloorTilt, true));
 
 		// Test floor continuity.
 		if (!TestFootprintFloor(item, posData.Position, vertexPoints))
