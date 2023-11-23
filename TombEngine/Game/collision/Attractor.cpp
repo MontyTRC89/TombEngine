@@ -196,7 +196,7 @@ namespace TEN::Collision::Attractor
 	{
 		constexpr auto LABEL_OFFSET			 = Vector3(0.0f, -CLICK(0.25f), 0.0f);
 		constexpr auto INDICATOR_LINE_LENGTH = BLOCK(1 / 20.0f);
-		constexpr auto SPHERE_SCALE			 = BLOCK(1 / 64.0f);
+		constexpr auto SPHERE_RADIUS		 = BLOCK(1 / 52.0f);
 		constexpr auto COLOR_YELLOW			 = Color(1.0f, 1.0f, 0.4f);
 		constexpr auto COLOR_GREEN			 = Color(0.4f, 1.0f, 0.4f);
 
@@ -228,7 +228,7 @@ namespace TEN::Collision::Attractor
 		if (_points.size() == 1)
 		{
 			// Draw sphere.
-			g_Renderer.AddDebugSphere(_points.front(), SPHERE_SCALE, COLOR_YELLOW, RendererDebugPage::CollisionStats, false);
+			g_Renderer.AddDebugSphere(_points.front(), SPHERE_RADIUS, Color(COLOR_YELLOW.R(), COLOR_YELLOW.G(), COLOR_YELLOW.B(), 0.2f), RendererDebugPage::CollisionStats, false);
 
 			// Determine label parameters.
 			auto labelPos = _points.front();
