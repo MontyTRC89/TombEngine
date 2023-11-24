@@ -141,7 +141,7 @@ namespace TEN::Math::Geometry
 		auto line = linePoint1 - linePoint0;
 		float alpha = line.Dot(origin - linePoint0) / line.Dot(line);
 
-		// Clamp distance alpha.
+		// Closest point out of line range; return start or end point.
 		if (alpha <= 0.0f)
 		{
 			return linePoint0;
@@ -174,7 +174,7 @@ namespace TEN::Math::Geometry
 		// Calculate alpha from line projection.
 		float alpha = linePerp.Dot(originPerp - linePoint0) / linePerp.Dot(linePerp);
 
-		// Clamp distance alpha.
+		// Closest point out of line range; return start or end point.
 		if (alpha <= 0.0f)
 		{
 			return linePoint0;
