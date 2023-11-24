@@ -66,7 +66,6 @@
 #include "Renderer/Structures/RendererHudBar.h"
 #include "Renderer/Structures/RendererRoomAmbientMap.h"
 #include "Renderer/ConstantBuffers/SMAABuffer.h"
-#include "Renderer/Graphics/Vertices/SMAAVertex.h"
 #include "Renderer/Structures/RendererObject.h"
 #include "Graphics/Vertices/PostProcessVertex.h"
 
@@ -341,9 +340,6 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _SMAABlendingWeightCalculationPS;
 		ComPtr<ID3D11VertexShader> _SMAANeighborhoodBlendingVS;
 		ComPtr<ID3D11PixelShader> _SMAANeighborhoodBlendingPS;
-
-		std::unique_ptr<PrimitiveBatch<SMAAVertex>> _SMAAprimitiveBatch;
-		ComPtr<ID3D11InputLayout> _SMAATriangleInputLayout;
 
 		ComPtr<ID3D11VertexShader> _vsFXAA;
 		ComPtr<ID3D11PixelShader> _psFXAA;

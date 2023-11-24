@@ -510,15 +510,15 @@ namespace TEN::Renderer
 		_backBuffer = RenderTarget2D(_device.Get(), backBufferTexture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 		                
 		_renderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
-		_postProcessRenderTarget[0] = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
-		_postProcessRenderTarget[1] = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
-		_tempRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+		_postProcessRenderTarget[0] = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
+		_postProcessRenderTarget[1] = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
+		_tempRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_dumpScreenRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
 		_shadowMap = Texture2DArray(_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D24_UNORM_S8_UINT);
-		_depthRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false);
-		_normalsRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32G32B32A32_FLOAT, false);
-		_SSAORenderTarget = RenderTarget2D(_device.Get(), w / 2.0f, h / 2.0f, DXGI_FORMAT_R8G8B8A8_UNORM, false);
-		_SSAOBlurredRenderTarget = RenderTarget2D(_device.Get(), w / 2.0f, h / 2.0f, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+		_depthRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false, DXGI_FORMAT_UNKNOWN);
+		_normalsRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32G32B32A32_FLOAT, false, DXGI_FORMAT_UNKNOWN);
+		_SSAORenderTarget = RenderTarget2D(_device.Get(), w / 2.0f, h / 2.0f, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
+		_SSAOBlurredRenderTarget = RenderTarget2D(_device.Get(), w / 2.0f, h / 2.0f, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 
 		// Initialize sprite and primitive batches
 		_spriteBatch = std::make_unique<SpriteBatch>(_context.Get());
@@ -545,10 +545,10 @@ namespace TEN::Renderer
 		// Low AA is done with FXAA, Medium - High AA are done with SMAA.
 		if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
 		{
-			_SMAASceneRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+			_SMAASceneRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, true, DXGI_FORMAT_UNKNOWN);
 			_SMAASceneSRGBRenderTarget = RenderTarget2D(_device.Get(), &_SMAASceneRenderTarget, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-			_SMAAEdgesRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8_UNORM, false);
-			_SMAABlendRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+			_SMAAEdgesRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8_UNORM, false, DXGI_FORMAT_UNKNOWN);
+			_SMAABlendRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 			
 			auto string = std::stringstream{};
 			auto defines = std::vector<D3D10_SHADER_MACRO>{};
@@ -586,23 +586,6 @@ namespace TEN::Renderer
 			_SMAAEdgeDetectionVS = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\SMAA.fx"), "DX11_SMAAEdgeDetectionVS", "vs_5_0", defines.data(), blob);
 			_SMAABlendingWeightCalculationVS = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\SMAA.fx"), "DX11_SMAABlendingWeightCalculationVS", "vs_5_0", defines.data(), blob);
 			_SMAANeighborhoodBlendingVS = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\SMAA.fx"), "DX11_SMAANeighborhoodBlendingVS", "vs_5_0", defines.data(), blob);
-
-			const D3D11_INPUT_ELEMENT_DESC layout[] =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,	  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			};
-			unsigned int numElements = sizeof(layout) / sizeof(D3D10_INPUT_ELEMENT_DESC);
-
-			Utils::throwIfFailed(
-				_device->CreateInputLayout(
-					layout,
-					numElements,
-					blob->GetBufferPointer(),
-					blob->GetBufferSize(),
-					_SMAATriangleInputLayout.GetAddressOf()));
-
-			_SMAAprimitiveBatch = std::make_unique<PrimitiveBatch<SMAAVertex>>(_context.Get());
 		}
 
 		SetFullScreen();

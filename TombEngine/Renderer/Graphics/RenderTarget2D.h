@@ -21,7 +21,7 @@ namespace TEN::Renderer::Graphics
 
 		RenderTarget2D() {};
 
-		RenderTarget2D(ID3D11Device* device, int width, int height, DXGI_FORMAT colorFormat, bool isTypeless, DXGI_FORMAT depthFormat = DXGI_FORMAT_D32_FLOAT)
+		RenderTarget2D(ID3D11Device* device, int width, int height, DXGI_FORMAT colorFormat, bool isTypeless, DXGI_FORMAT depthFormat)
 		{
 			// Check if antialiasing quality is available and set it if it is.
 			auto srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -63,30 +63,33 @@ namespace TEN::Renderer::Graphics
 			res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
 			throwIfFailed(res);
 
-			auto depthTexDesc = D3D11_TEXTURE2D_DESC{};
-			depthTexDesc.Width = width;
-			depthTexDesc.Height = height;
-			depthTexDesc.MipLevels = 1;
-			depthTexDesc.ArraySize = 1;
-			depthTexDesc.SampleDesc.Count = 1;
-			depthTexDesc.SampleDesc.Quality = 0;
-			depthTexDesc.Format = depthFormat;
-			depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
-			depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-			depthTexDesc.CPUAccessFlags = 0;
-			depthTexDesc.MiscFlags = 0;
+			if (depthFormat != DXGI_FORMAT_UNKNOWN)
+			{
+				auto depthTexDesc = D3D11_TEXTURE2D_DESC{};
+				depthTexDesc.Width = width;
+				depthTexDesc.Height = height;
+				depthTexDesc.MipLevels = 1;
+				depthTexDesc.ArraySize = 1;
+				depthTexDesc.SampleDesc.Count = 1;
+				depthTexDesc.SampleDesc.Quality = 0;
+				depthTexDesc.Format = depthFormat;
+				depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+				depthTexDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+				depthTexDesc.CPUAccessFlags = 0;
+				depthTexDesc.MiscFlags = 0;
 
-			res = device->CreateTexture2D(&depthTexDesc, NULL, &DepthStencilTexture);
-			throwIfFailed(res);
+				res = device->CreateTexture2D(&depthTexDesc, NULL, &DepthStencilTexture);
+				throwIfFailed(res);
 
-			auto dsvDesc = D3D11_DEPTH_STENCIL_VIEW_DESC{};
-			dsvDesc.Format = depthTexDesc.Format;
-			dsvDesc.Flags = 0;
-			dsvDesc.ViewDimension = dsvDimension;
-			dsvDesc.Texture2D.MipSlice = 0;
+				auto dsvDesc = D3D11_DEPTH_STENCIL_VIEW_DESC{};
+				dsvDesc.Format = depthTexDesc.Format;
+				dsvDesc.Flags = 0;
+				dsvDesc.ViewDimension = dsvDimension;
+				dsvDesc.Texture2D.MipSlice = 0;
 
-			res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
-			throwIfFailed(res);
+				res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
+				throwIfFailed(res);
+			}
 		}
 
 		// Constructor is for sharing same texture resource of another render target.

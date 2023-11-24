@@ -689,7 +689,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Graphics\TextureBase.h" />
     <ClInclude Include="Renderer\Graphics\VertexBuffer.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\PostProcessVertex.h" />
-    <ClInclude Include="Renderer\Graphics\Vertices\SMAAVertex.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\SpriteVertex.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\Vertex.h" />
     <ClInclude Include="Renderer\Renderer.h" />
