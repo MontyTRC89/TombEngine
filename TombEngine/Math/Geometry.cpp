@@ -303,7 +303,7 @@ namespace TEN::Math::Geometry
 
 		auto refDir = refPoint - origin;
 
-		// 2D heading direction vector to 3D reference direction vector: X = +refDirection.x, Y = 0, Z = +refDirection.z
+		// 2D heading direction vector to 3D reference direction vector: X = +refDir.x, Y = 0, Z = +refDir.z
 		auto headingDir = Vector3(refDir.x, 0.0f, refDir.z);
 		auto targetDir = target - origin;
 
@@ -339,7 +339,7 @@ namespace TEN::Math::Geometry
 
 		auto refDir = refPoint - origin;
 
-		// 2D normal vector to 3D reference direction vector: X = +refDirection.z, Y = 0, Z = -refDirection.x
+		// 2D normal vector to 3D reference direction vector: X = +refDir.z, Y = 0, Z = -refDir.x
 		auto headingNormal = Vector3(refDir.z, 0.0f, -refDir.x);
 		auto targetDir = target - origin;
 
