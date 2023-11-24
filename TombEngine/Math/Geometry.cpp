@@ -270,9 +270,7 @@ namespace TEN::Math::Geometry
 
 	Vector3 ConvertQuatToDirection(const Quaternion& quat)
 	{
-		static const auto REF_DIR = Vector3::UnitZ;
-
-		return Vector3::Transform(REF_DIR, quat);
+		return Vector3::Transform(Vector3::UnitZ, quat);
 	}
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
