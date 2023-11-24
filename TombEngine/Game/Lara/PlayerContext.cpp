@@ -1246,7 +1246,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 2) Test if edge slope is slippery.
-			if (abs(attracColl.SlopeAngle) >= SLIPPERY_FLOOR_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 3) Test catch angle.
@@ -1300,7 +1300,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<EdgeCatchData> GetLedgeCatchData(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<EdgeCatchData> GetAttractorEdgeCatch(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -1326,7 +1326,7 @@ namespace TEN::Entities::Player
 		};
 	}
 
-	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
+	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 	{
 		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
 
@@ -1378,33 +1378,28 @@ namespace TEN::Entities::Player
 			relEdgeHeight >= 0)							  // Edge height is below upper height bound.
 		{
 			auto offset = Vector3(0.0f, edgeHeight, 0.0f);
-			return EdgeCatchData
-			{
-				nullptr,
-				EdgeType::ClimbableWall,
-				offset
-			};
+			return EdgeCatchData{ nullptr, EdgeType::ClimbableWall, offset };
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<EdgeCatchData> GetEdgeCatchData(ItemInfo& item, CollisionInfo& coll)
+	std::optional<EdgeCatchData> GetEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 	{
-		// 1) Get and return ledge catch data (if valid).
-		auto ledgeCatchData = GetLedgeCatchData(item, coll);
-		if (ledgeCatchData.has_value())
-			return ledgeCatchData;
+		// 1) Get and return edge catch (if valid).
+		auto eedgeCatch = GetAttractorEdgeCatch(item, coll);
+		if (eedgeCatch.has_value())
+			return eedgeCatch;
 
-		// 2) Get and return climbable wall edge catch data (if valid).
-		auto wallEdgeCatchData = GetClimbableWallEdgeCatchData(item, coll);
-		if (wallEdgeCatchData.has_value())
-			return wallEdgeCatchData;
+		// 2) Get and return climbable wall edge catch (if valid).
+		auto wallEdgeCatch = GetClimbableWallEdgeCatch(item, coll);
+		if (wallEdgeCatch.has_value())
+			return wallEdgeCatch;
 
 		return std::nullopt;
 	}
 
-	std::optional<MonkeySwingCatchData> GetMonkeySwingCatchData(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<MonkeySwingCatchData> GetMonkeySwingCatch(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
 		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
@@ -1442,7 +1437,7 @@ namespace TEN::Entities::Player
 	}
 
 	// TODO
-	std::optional<ShimmyData> GetShimmyData(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ShimmyData> GetShimmy(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		return std::nullopt;
 	}

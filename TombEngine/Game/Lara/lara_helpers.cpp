@@ -822,18 +822,18 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 		return false;
 
 	// Catch monkey swing.
-	auto monkeyCatchData = GetMonkeySwingCatchData(item, coll);
-	if (monkeyCatchData.has_value())
+	auto monkeyCatch = GetMonkeySwingCatch(item, coll);
+	if (monkeyCatch.has_value())
 	{
-		SetPlayerMonkeySwingCatch(item, coll, *monkeyCatchData);
+		SetPlayerMonkeySwingCatch(item, coll, *monkeyCatch);
 		return true;
 	}
 
 	// Catch edge (ledge or climbable wall edge).
-	auto edgeCatchData = GetEdgeCatchData(item, coll);
-	if (edgeCatchData.has_value())
+	auto edgeCatch = GetEdgeCatch(item, coll);
+	if (edgeCatch.has_value())
 	{
-		SetPlayerEdgeCatch(item, coll, *edgeCatchData);
+		SetPlayerEdgeCatch(item, coll, *edgeCatch);
 		return true;
 	}
 

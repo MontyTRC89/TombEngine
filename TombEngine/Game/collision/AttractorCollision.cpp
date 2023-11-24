@@ -60,8 +60,11 @@ namespace TEN::Collision::Attractor
 			const auto& origin = points[i];
 			const auto& target = points[i + 1];
 
+			// Calculate Y-perpendicular intersection and 2D distance.
 			auto intersection = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
-			float dist = Vector3::Distance(probePoint, intersection);
+			float dist = Vector2::Distance(
+				Vector2(probePoint.x, probePoint.z),
+				Vector2(intersection.x, intersection.z));
 
 			// Found new closest intersection; update proximity data.
 			if (dist < attracProx.Distance)

@@ -188,7 +188,7 @@ namespace TEN::Entities::Player
 		}
 
 		// Test segment slope angle.
-		if (edgeAttracColls->Center.SlopeAngle >= SLIPPERY_FLOOR_SLOPE_ANGLE)
+		if (edgeAttracColls->Center.SlopeAngle >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 		{
 			player.Control.IsHanging = false;
 			return;
