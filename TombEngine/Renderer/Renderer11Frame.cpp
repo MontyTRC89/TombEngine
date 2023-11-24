@@ -716,17 +716,19 @@ namespace TEN::Renderer
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
+		int nativeItemRoomNumber = GetCollision(nativeItem).RoomNumber;
+
 		// Interpolate ambient light between rooms
 		if (item->PrevRoomNumber == NO_ROOM)
 		{
-			item->PrevRoomNumber = nativeItem->RoomNumber;
-			item->RoomNumber = nativeItem->RoomNumber;
+			item->PrevRoomNumber = nativeItemRoomNumber;
+			item->RoomNumber = nativeItemRoomNumber;
 			item->LightFade = 1.0f;
 		}
-		else if (nativeItem->RoomNumber != item->RoomNumber)
+		else if (nativeItemRoomNumber != item->RoomNumber)
 		{
 			item->PrevRoomNumber = item->RoomNumber;
-			item->RoomNumber = nativeItem->RoomNumber;
+			item->RoomNumber = nativeItemRoomNumber;
 			item->LightFade = 0.0f;
 		}
 		else if (item->LightFade < 1.0f)
@@ -736,7 +738,7 @@ namespace TEN::Renderer
 		}
 
 		if (item->PrevRoomNumber == NO_ROOM || item->LightFade == 1.0f)
-			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
+			item->AmbientLight = m_rooms[nativeItemRoomNumber].AmbientLight;
 		else
 		{
 			auto prev = m_rooms[item->PrevRoomNumber].AmbientLight;
