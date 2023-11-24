@@ -151,7 +151,7 @@ namespace TEN::Math::Geometry
 			return linePoint1;
 		}
 
-		// Return closes point on line.
+		// Return closest point on line.
 		return (linePoint0 + (line * alpha));
 	}
 
@@ -184,7 +184,7 @@ namespace TEN::Math::Geometry
 			return linePoint1;
 		}
 
-		// Return point on line perpendicular to input axis.
+		// Return closest point on line perpendicular to input axis.
 		return (linePoint0 + (line * alpha));
 	}
 
