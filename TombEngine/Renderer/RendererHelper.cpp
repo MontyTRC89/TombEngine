@@ -542,6 +542,10 @@ namespace TEN::Renderer
 		// Calculate clip space coords.
 		point = Vector4::Transform(point, _gameCamera.Camera.ViewProjection);
 
+		// w is close to 0; return nullopt.
+		if (std::abs(point.w) <= EPSILON)
+			return std::nullopt;
+
 		// Calculate NDC.
 		point /= point.w;
 
