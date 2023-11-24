@@ -1387,9 +1387,9 @@ namespace TEN::Entities::Player
 	std::optional<EdgeCatchData> GetEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 	{
 		// 1) Get and return edge catch (if valid).
-		auto eedgeCatch = GetAttractorEdgeCatch(item, coll);
-		if (eedgeCatch.has_value())
-			return eedgeCatch;
+		auto edgeCatch = GetAttractorEdgeCatch(item, coll);
+		if (edgeCatch.has_value())
+			return edgeCatch;
 
 		// 2) Get and return climbable wall edge catch (if valid).
 		auto wallEdgeCatch = GetClimbableWallEdgeCatch(item, coll);
