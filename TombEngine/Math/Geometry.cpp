@@ -45,9 +45,9 @@ namespace TEN::Math::Geometry
 		if (forward == 0.0f && down == 0.0f && right == 0.0f)
 			return point;
 
-		auto orient = EulerAngles(0, headingAngle, 0);
+		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
 		auto relOffset = Vector3(right, down, forward);
-		return TranslatePoint(point, orient, relOffset);
+		return (point + Vector3::Transform(relOffset, rotMatrix));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset)
@@ -83,9 +83,11 @@ namespace TEN::Math::Geometry
 		if (dist == 0.0f)
 			return point;
 
-		auto normalizedDir = dir;
-		normalizedDir.Normalize();
-		return (point + (normalizedDir * dist));
+		// Ensure direction is normalized.
+		auto dirNorm = dir;
+		dirNorm.Normalize();
+
+		return (point + (dirNorm * dist));
 	}
 
 	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rot)
@@ -136,8 +138,8 @@ namespace TEN::Math::Geometry
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		auto lineDir = linePoint1 - linePoint0;
-		float alpha = lineDir.Dot(origin - linePoint0) / lineDir.Dot(lineDir);
+		auto line = linePoint1 - linePoint0;
+		float alpha = line.Dot(origin - linePoint0) / line.Dot(line);
 
 		// Clamp distance alpha.
 		if (alpha <= 0.0f)
@@ -150,19 +152,27 @@ namespace TEN::Math::Geometry
 		}
 
 		// Return closes point on line.
-		return (linePoint0 + (lineDir * alpha));
+		return (linePoint0 + (line * alpha));
 	}
 
-	Vector3 GetClosestPointOnLinePerp(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
+	Vector3 GetClosestPointOnLinePerp(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1, const Vector3& axis)
 	{
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		auto lineDir = linePoint1 - linePoint0;
+		// Ensure axis is normalized.
+		auto axisNorm = axis;
+		axisNorm.Normalize();
 
-		// Calculate alpha from 2D projection of line on XZ plane.
-		auto lineDir2D = Vector3(lineDir.x, 0.0f, lineDir.z);
-		float alpha = lineDir2D.Dot(origin - linePoint0) / lineDir2D.Dot(lineDir2D);
+		// Calculate line.
+		auto line = linePoint1 - linePoint0;
+
+		// Project line and origin onto plane perpendicular to input axis.
+		auto linePerp = line - (axisNorm * line.Dot(axisNorm));
+		auto originPerp = origin - (axisNorm * origin.Dot(axisNorm));
+
+		// Calculate alpha from line projection.
+		float alpha = linePerp.Dot(originPerp - linePoint0) / linePerp.Dot(linePerp);
 
 		// Clamp distance alpha.
 		if (alpha <= 0.0f)
@@ -174,8 +184,8 @@ namespace TEN::Math::Geometry
 			return linePoint1;
 		}
 
-		// Return point on line perpendicular to Y axis.
-		return (linePoint0 + (lineDir * alpha));
+		// Return point on line perpendicular to input axis.
+		return (linePoint0 + (line * alpha));
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
