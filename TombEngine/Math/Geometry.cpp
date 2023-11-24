@@ -293,10 +293,7 @@ namespace TEN::Math::Geometry
 		auto targetDir = target - origin;
 
 		float dot = headingDir.Dot(targetDir);
-		if (dot > 0.0f)
-			return true;
-
-		return false;
+		return (dot > 0.0f);
 	}
 
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
@@ -311,10 +308,7 @@ namespace TEN::Math::Geometry
 		auto targetDir = target - origin;
 
 		float dot = headingDir.Dot(targetDir);
-		if (dot > 0.0f)
-			return true;
-
-		return false;
+		return (dot > 0.0f);
 	}
 
 	bool IsPointOnLeft(const Pose& pose, const Vector3& target)
@@ -335,10 +329,7 @@ namespace TEN::Math::Geometry
 		auto targetDir = target - origin;
 
 		float dot = headingNormal.Dot(targetDir);
-		if (dot > 0.0f)
-			return true;
-
-		return false;
+		return (dot > 0.0f);
 	}
 
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
@@ -353,9 +344,6 @@ namespace TEN::Math::Geometry
 		auto targetDir = target - origin;
 
 		float dot = headingNormal.Dot(targetDir);
-		if (dot > 0.0f)
-			return true;
-
-		return false;
+		return (dot > 0.0f);
 	}
 }
