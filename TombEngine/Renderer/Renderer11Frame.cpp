@@ -729,7 +729,15 @@ namespace TEN::Renderer
 		{
 			item->PrevRoomNumber = item->RoomNumber;
 			item->RoomNumber = nativeItemRoomNumber;
-			item->LightFade = 0.0f;
+
+			if (item->VerticalPortalHeight == NO_HEIGHT)
+			{
+				item->LightFade = 0.0f;
+			}
+			else
+			{
+				item->LightFade = (nativeItem->Pose.Position.y < item->VerticalPortalHeight)? 0.0f : 1.0f;
+			}
 		}
 		else if (item->LightFade < 1.0f)
 		{
@@ -771,7 +779,7 @@ namespace TEN::Renderer
 		else
 		{
 			item->SecondAmbientLight = Vector4::Zero;
-			item->VerticalPortalHeight = INT16_MIN;
+			item->VerticalPortalHeight = NO_HEIGHT;
 		}
 
 		// Multiply calculated ambient light by object tint
