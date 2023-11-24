@@ -102,14 +102,6 @@ namespace TEN::Renderer
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
-
-		// TODO: temp
-		/*_context->ClearRenderTargetView(renderTarget.RenderTargetView.Get(), clearColor);
-		_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), renderTarget->DepthStencilView.Get());
-		_postProcess->SetEffect(BasicPostProcess::Copy);
-		_postProcess->SetSourceTexture(renderTarget->ShaderResourceView.Get());
-		_postProcess->Process(_context.Get());*/
 	}
 
 	void Renderer::ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view)

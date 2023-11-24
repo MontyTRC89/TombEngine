@@ -6,49 +6,32 @@ namespace TEN::Renderer
 {
 	void Renderer::DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view)
 	{
-		Vertex vertices[4];
-
-		vertices[0].Position.x = -1.0f;
-		vertices[0].Position.y = 1.0f;
-		vertices[0].Position.z = 0.0f;
-		vertices[0].UV.x = 0.0f;
-		vertices[0].UV.y = 0.0f;
-		vertices[0].Color = Vector4::One;
-
-		vertices[1].Position.x = 1.0f;
-		vertices[1].Position.y = 1.0f;
-		vertices[1].Position.z = 0.0f;
-		vertices[1].UV.x = 1.0f;
-		vertices[1].UV.y = 0.0f;
-		vertices[1].Color = Vector4::One;
-
-		vertices[2].Position.x = 1.0f;
-		vertices[2].Position.y = -1.0f;
-		vertices[2].Position.z = 0.0f;
-		vertices[2].UV.x = 1.0f;
-		vertices[2].UV.y = 1.0f;
-		vertices[2].Color = Vector4::One;
-
-		vertices[3].Position.x = -1.0f;
-		vertices[3].Position.y = -1.0f;
-		vertices[3].Position.z = 0.0f;
-		vertices[3].UV.x = 0.0f;
-		vertices[3].UV.y = 1.0f;
-		vertices[3].Color = Vector4::One;
-
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Write);
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
+		// Common vertex shader to all fullscreen effects
+		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
+
+		// We draw a fullscreen triangle
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
+
+		UINT stride = sizeof(PostProcessVertex);
+		UINT offset = 0;
+
+		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+
 		// Copy render target to post process render target.
 		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		_context->ClearRenderTargetView(_postProcessRenderTarget[0].RenderTargetView.Get(), clearColor);
 		_context->OMSetRenderTargets(1, _postProcessRenderTarget[0].RenderTargetView.GetAddressOf(), nullptr);
-		_postProcess->SetEffect(BasicPostProcess::Copy);
-		_postProcess->SetSourceTexture(_renderTarget.ShaderResourceView.Get());
-		_postProcess->Process(_context.Get());
+
+		_context->PSSetShader(_psPostProcessCopy.Get(), nullptr, 0);
+		BindRenderTargetAsTexture(TextureRegister::ColorMap, &_renderTarget, SamplerStateRegister::PointWrap);
+		DrawTriangles(3, 0);
 
 		// Let's do ping-pong between the two post-process render targets
 		int currentRenderTarget = 0;
@@ -59,40 +42,37 @@ namespace TEN::Renderer
 		{
 			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
 			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
-			_postProcess->SetEffect(_postProcessColorScheme == PostProcessColorScheme::Sepia ? BasicPostProcess::Sepia : BasicPostProcess::Monochrome);
-			_postProcess->SetSourceTexture(_postProcessRenderTarget[currentRenderTarget].ShaderResourceView.Get());
-			_postProcess->Process(_context.Get());
+			
+			if (_postProcessColorScheme == PostProcessColorScheme::Sepia)
+			{
+				_context->PSSetShader(_psPostProcessSepia.Get(), nullptr, 0);
+			}
+			else
+			{
+				_context->PSSetShader(_psPostProcessMonochrome.Get(), nullptr, 0);
+			}
+
+			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
+			DrawTriangles(3, 0);
 
 			destinationRenderTarget = 0;
 			currentRenderTarget = 1;
 		}  
 
 		// Do the final pass
-		_context->VSSetShader(_vsFinalPass.Get(), nullptr, 0);
-		_context->PSSetShader(_psFinalPass.Get(), nullptr, 0);
-
-		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(BlendMode::Opaque);
+		_context->PSSetShader(_psPostProcessFinalPass.Get(), nullptr, 0);
 
 		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);
 		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), nullptr);
-		_context->RSSetViewports(1, &view.Viewport);
-		ResetScissor();
-
-		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_context->IASetInputLayout(_inputLayout.Get());
 
 		_stPostProcessBuffer.ViewportWidth = _screenWidth;
 		_stPostProcessBuffer.ViewportHeight = _screenHeight;
 		_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
 		_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
 		_cbPostProcessBuffer.updateData(_stPostProcessBuffer, _context.Get());
-		BindConstantBufferPS(ConstantBufferRegister::PostProcess, _cbPostProcessBuffer.get());
 
-		BindTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::AnisotropicClamp);
+		BindTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 
-		_primitiveBatch->Begin();
-		_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
-		_primitiveBatch->End();
+		DrawTriangles(3, 0);
 	}
 }

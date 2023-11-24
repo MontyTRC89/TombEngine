@@ -1147,7 +1147,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
 				PrintDebugMessage("    Dot products: %d", _numDotProducts);
 				 
-				_spriteBatch->Begin();
+				_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque()); 
 
 				rect.left = _screenWidth - thumbWidth;
 				rect.top = thumbY;

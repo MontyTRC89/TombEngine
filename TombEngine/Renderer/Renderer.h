@@ -154,8 +154,6 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psHUDColor;
 		ComPtr<ID3D11PixelShader> _psHUDTexture;
 		ComPtr<ID3D11PixelShader> _psHUDBarColor;
-		ComPtr<ID3D11VertexShader> _vsFinalPass;
-		ComPtr<ID3D11PixelShader> _psFinalPass;
 		ComPtr<ID3D11PixelShader> _psGBuffer;
 		ComPtr<ID3D11VertexShader> _vsRoomAmbient;
 		ComPtr<ID3D11VertexShader> _vsRoomAmbientSky;
@@ -359,6 +357,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psPostProcessCopy;
 		ComPtr<ID3D11PixelShader> _psPostProcessSepia;
 		ComPtr<ID3D11PixelShader> _psPostProcessMonochrome;
+		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
 
 		// SSAO
 		ComPtr<ID3D11VertexShader> _vsSSAO;

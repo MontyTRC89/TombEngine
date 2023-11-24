@@ -2850,7 +2850,7 @@ namespace TEN::Renderer
 		_context->OMSetRenderTargets(1, _SSAOBlurredRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 
 		BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAORenderTarget, SamplerStateRegister::PointWrap);
-
+ 
 		DrawTriangles(3, 0);
 	}
 }

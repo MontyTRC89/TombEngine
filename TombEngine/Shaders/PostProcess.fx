@@ -1,3 +1,5 @@
+
+
 cbuffer PostProcessBuffer : register(b7)
 {
     float CinematicBarsHeight;
@@ -11,12 +13,14 @@ struct VertexShaderInput
 {
     float3 Position: POSITION0;
     float2 UV: TEXCOORD0;
+    float4 Color: COLOR0;
 };
 
 struct PixelShaderInput
 {
     float4 Position: SV_POSITION;
     float2 UV: TEXCOORD0;
+    float4 Color: COLOR0;
 };
 
 Texture2D ColorTexture : register(t0);
@@ -28,6 +32,7 @@ PixelShaderInput VS(VertexShaderInput input)
 
     output.Position = float4(input.Position, 1.0f);
     output.UV = input.UV;
+    output.Color = input.Color;
 
     return output;
 }
@@ -61,4 +66,26 @@ float4 PSMonochrome(PixelShaderInput input) : SV_Target
     float3 output = dot(color.rgb, grayscale);
 
     return float4(output, color.a);
+}
+
+float4 PSFinalPass(PixelShaderInput input) : SV_TARGET
+{
+    float4 output = ColorTexture.Sample(ColorSampler, input.UV);
+
+    float3 colorMul = min(input.Color.xyz, 1.0f);
+
+    float y = input.Position.y / ViewportHeight;
+
+    if (y > 1.0f - CinematicBarsHeight ||
+        y < 0.0f + CinematicBarsHeight)
+    {
+        output = float4(0, 0, 0, 1);
+    }
+    else
+    {
+        output.xyz = output.xyz * colorMul.xyz * ScreenFadeFactor;
+        output.w = 1.0f;
+    }
+
+    return output;
 }
