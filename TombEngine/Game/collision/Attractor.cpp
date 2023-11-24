@@ -99,7 +99,7 @@ namespace TEN::Collision::Attractor
 		}
 		
 		// Find intersection at distance along attractor.
-		float chainDistTravelled = 0.0f;
+		float chainDistTraveled = 0.0f;
 		for (int i = 0; i < (_points.size() - 1); i++)
 		{
 			// Get segment points.
@@ -107,7 +107,7 @@ namespace TEN::Collision::Attractor
 			const auto& target = _points[i + 1];
 
 			float segmentLength = Vector3::Distance(origin, target);
-			float remainingChainDist = chainDist - chainDistTravelled;
+			float remainingChainDist = chainDist - chainDistTraveled;
 
 			// Found segment of distance along attractor; return intersection.
 			if (remainingChainDist <= segmentLength)
@@ -116,8 +116,8 @@ namespace TEN::Collision::Attractor
 				return Vector3::Lerp(origin, target, alpha);
 			}
 
-			// Accumulate distance travelled along attractor.
-			chainDistTravelled += segmentLength;
+			// Accumulate distance traveled along attractor.
+			chainDistTraveled += segmentLength;
 		}
 
 		// FAILSAFE: Return end point.
@@ -144,18 +144,18 @@ namespace TEN::Collision::Attractor
 		}
 
 		// Find segment at distance along attractor.
-		float chainDistTravelled = 0.0f;
+		float chainDistTraveled = 0.0f;
 		for (int i = 0; i < (_points.size() - 1); i++)
 		{
 			// Get segment points.
 			const auto& origin = _points[i];
 			const auto& target = _points[i + 1];
 
-			// Accumulate distance travelled along attractor.
-			chainDistTravelled += Vector3::Distance(origin, target);
+			// Accumulate distance traveled along attractor.
+			chainDistTraveled += Vector3::Distance(origin, target);
 
 			// Segment found; return segment ID.
-			if (chainDistTravelled >= chainDist)
+			if (chainDistTraveled >= chainDist)
 				return i;
 		}
 

@@ -51,7 +51,7 @@ namespace TEN::Collision::Attractor
 		}
 
 		auto attracProx = ProximityData{ points.front(), INFINITY, 0.0f, 0 };
-		float chainDistTravelled = 0.0f;
+		float chainDistTraveled = 0.0f;
 
 		// Find closest intersection along attractor.
 		for (int i = 0; i < (points.size() - 1); i++)
@@ -62,29 +62,32 @@ namespace TEN::Collision::Attractor
 
 			// Calculate Y-perpendicular intersection and 2D distance.
 			auto intersection = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
-			float dist = Vector2::Distance(
+			float distSqr = Vector2::DistanceSquared(
 				Vector2(probePoint.x, probePoint.z),
 				Vector2(intersection.x, intersection.z));
 
 			// Found new closest intersection; update proximity data.
-			if (dist < attracProx.Distance)
+			if (distSqr < attracProx.Distance)
 			{
-				chainDistTravelled += Vector3::Distance(origin, intersection);
+				chainDistTraveled += Vector3::Distance(origin, intersection);
 
 				attracProx.Intersection = intersection;
-				attracProx.Distance = dist;
-				attracProx.ChainDistance += chainDistTravelled;
+				attracProx.Distance = distSqr;
+				attracProx.ChainDistance += chainDistTraveled;
 				attracProx.SegmentID = i;
 
-				// Restart accumulation of distance travelled along attractor.
-				chainDistTravelled = Vector3::Distance(intersection, target);
+				// Restart accumulation of distance traveled along attractor.
+				chainDistTraveled = Vector3::Distance(intersection, target);
 				continue;
 			}
 
-			// Accumulate distance travelled along attractor since last closest point.
+			// Accumulate distance traveled along attractor since last closest point.
 			float segmentLength = Vector3::Distance(origin, target);
-			chainDistTravelled += segmentLength;
+			chainDistTraveled += segmentLength;
 		}
+
+		// Root final distance.
+		attracProx.Distance = sqrt(attracProx.Distance);
 
 		// Return proximity data.
 		return attracProx;
