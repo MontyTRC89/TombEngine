@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/AutoGunMip.h"
+#include "Objects/TR3/Entity/TwoTurretAutoGun.h"
 
 #include "Game/control/box.h"
 #include "Game/control/los.h"
