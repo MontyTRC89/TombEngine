@@ -302,7 +302,7 @@ namespace TEN::Entities::Generic
 				// Check if push/pull must stop.
 				if (!PushableAnimSets[pushable.AnimSetID].EnableAnimLoop ||
 					!IsHeld(In::Action) ||
-					!PushableMovementConditions(pushableItem, !isPlayerPulling, isPlayerPulling) ||
+					!TestPushableMovementConditions(pushableItem, !isPlayerPulling, isPlayerPulling) ||
 					!IsPushableValid(pushableItem))
 				{
 					playerItem.Animation.TargetState = LS_IDLE;
