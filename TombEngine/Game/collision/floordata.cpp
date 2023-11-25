@@ -202,13 +202,9 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 	// Get triangle.
 	const auto& tri = GetSurfaceTriangle(x, z, isFloor);
 
-	// MICRO-OPTIMIZATION: Triangle is flat; return plane height.
-	auto normal = tri.Plane.Normal();
-	if (normal == Vector3::UnitY || normal == -Vector3::UnitY)
-		return tri.Plane.D();
-
 	// Calculate relative plane height at intersection using plane equation.
 	auto sectorPoint = GetSectorPoint(x, z);
+	auto normal = tri.Plane.Normal();
 	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
 
 	// Return surface height.
@@ -301,9 +297,10 @@ int FloorInfo::GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const
 bool FloorInfo::IsWall(int triID) const
 {
 	bool areSplitAnglesEqual = (FloorSurface.SplitAngle == CeilingSurface.SplitAngle);
-	bool arePlanesEqual = (FloorSurface.Triangles[triID].Plane == CeilingSurface.Triangles[triID].Plane);
+	bool areNormalsParallel = (FloorSurface.Triangles[triID].Plane.Normal() == -CeilingSurface.Triangles[triID].Plane.Normal());
+	bool areDistsEqual = (FloorSurface.Triangles[triID].Plane.D() == CeilingSurface.Triangles[triID].Plane.D());
 
-	return (areSplitAnglesEqual && arePlanesEqual);
+	return (areSplitAnglesEqual && areNormalsParallel && areDistsEqual);
 }
 
 bool FloorInfo::IsWall(int x, int z) const
