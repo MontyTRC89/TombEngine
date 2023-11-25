@@ -29,7 +29,7 @@
 
 	Vector3i Vector3i::Lerp(const Vector3i& origin, const Vector3i& target, float alpha)
 	{
-		Vector3i(Vector3::Lerp(origin.ToVector3(), target.ToVector3(), alpha));
+		return Vector3i(Vector3::Lerp(origin.ToVector3(), target.ToVector3(), alpha));
 	}
 
 	Vector3 Vector3i::ToVector3() const

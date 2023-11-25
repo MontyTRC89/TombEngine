@@ -1823,30 +1823,30 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 		if (!neighborRoom.Active())
 			continue;
 
-		int nextItem = neighborRoom.itemNumber;
-		while (nextItem != NO_ITEM)
+		int nextItemNumber = neighborRoom.itemNumber;
+		while (nextItemNumber != NO_ITEM)
 		{
-			auto* item = &g_Level.Items[nextItem];
-			int itemNumber = nextItem;
+			auto& linkItem = g_Level.Items[nextItemNumber];
+			int itemNumber = nextItemNumber;
 
 			// HACK: For some reason, sometimes an infinite loop may happen here.
-			if (nextItem == item->NextItem)
+			if (nextItemNumber == linkItem.NextItem)
 				break;
 
-			nextItem = item->NextItem;
+			nextItemNumber = linkItem.NextItem;
 
-			if (item == item)
+			if (&linkItem == item)
 				continue;
 
-			if (!(item->Collidable && item->Status != ITEM_INVISIBLE))
+			if (!(linkItem.Collidable && linkItem.Status != ITEM_INVISIBLE))
 				continue;
 
-			auto* object = &Objects[item->ObjectNumber];
+			const auto& object = Objects[linkItem.ObjectNumber];
 
-			if (object->collision == nullptr)
+			if (object.collision == nullptr)
 				continue;
 
-			if (Vector3i::Distance(item->Pose.Position, item->Pose.Position) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(linkItem.Pose.Position, item->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
 			if (isPlayer)
@@ -1854,49 +1854,49 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 				// Objects' own collision routines were almost universally written only for
 				// managing collisions with Lara and nothing else. Until all of these routines
 				// are refactored (which won't happen anytime soon), we need this differentiation.
-				object->collision(itemNumber, item, coll);
+				object.collision(itemNumber, item, coll);
 			}
 			else
 			{
 				if (!TestBoundsCollide(item, item, coll->Setup.Radius))
 					continue;
 
-				// Guess if object is a nullmesh or invisible object by existence of draw routine.
-				if (object->drawRoutine == nullptr)
+				// Infer object is nullmesh or invisible object by valid draw routine.
+				if (object.drawRoutine == nullptr)
 					continue;
 
 				// Pickups are also not processed.
-				if (object->isPickup)
+				if (object.isPickup)
 					continue;
 
 				// If colliding object is an enemy, kill it.
-				if (object->intelligent)
+				if (object.intelligent)
 				{
-					// Don't try to kill already dead or non-targetable enemies.
+					// Don't try killing already dead or non-targetable enemies.
 					if (item->HitPoints <= 0 || item->HitPoints == NOT_TARGETABLE)
 						continue;
 
 					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
 					{
-						// If vehicle is harmless or speed is too low, just push the enemy.
-						ItemPushItem(item, item, coll, false, 0);
+						// If vehicle is harmless or speed is too low, just push enemy.
+						ItemPushItem(item, &linkItem, coll, false, 0);
 						continue;
 					}
 					else
 					{
 						DoDamage(item, INT_MAX);
 						DoLotsOfBlood(
-							item->Pose.Position.x,
+							linkItem.Pose.Position.x,
 							item->Pose.Position.y - CLICK(1),
-							item->Pose.Position.z,
+							linkItem.Pose.Position.z,
 							item->Animation.Velocity.z,
 							item->Pose.Orientation.y,
-							item->RoomNumber, 3);
+							linkItem.RoomNumber, 3);
 					}
 				}
 				else if (coll->Setup.EnableObjectPush)
 				{
-					ItemPushItem(item, item, coll, false, 1);
+					ItemPushItem(item, &linkItem, coll, false, 1);
 				}
 			}
 		}
