@@ -29,8 +29,8 @@ struct PixelShaderInput
 Texture2D Texture : register(t0);
 SamplerState Sampler : register(s0);
 
-Texture2D PositionsAndDepthTexture : register(t6);
-SamplerState PositionsAndDepthSampler : register(s6);
+Texture2D DepthTexture : register(t6);
+SamplerState DepthSampler : register(s6);
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -62,7 +62,7 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		input.PositionCopy.xy /= input.PositionCopy.w;
 
 		float2 texCoord = 0.5f * (float2(input.PositionCopy.x, -input.PositionCopy.y) + 1.0f);
-		float sceneDepth = PositionsAndDepthTexture.Sample(PositionsAndDepthSampler, texCoord).w;
+		float sceneDepth = DepthTexture.Sample(DepthSampler, texCoord).x;
 
 		sceneDepth = LinearizeDepth(sceneDepth, NearPlane, FarPlane);
 		particleDepth = LinearizeDepth(particleDepth, NearPlane, FarPlane);

@@ -52,7 +52,7 @@ float PS(PixelShaderInput input) : SV_Target
     float2 noiseScale = float2(ViewportWidth / 4.0f, ViewportHeight / 4.0f);
 
     float3 position = ReconstructPositionFromDepth(input.UV);
-    float3 normal = (NormalsTexture.Sample(NormalsSampler, input.UV).xyz);
+    float3 normal = DecodeNormal(NormalsTexture.Sample(NormalsSampler, input.UV).xyz);
     float3 randomVec = NoiseTexture.Sample(NoiseSampler, input.UV * noiseScale).xyz;
 
     float3 tangent = normalize(randomVec - normal * dot(randomVec, normal));

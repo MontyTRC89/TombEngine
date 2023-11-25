@@ -1460,7 +1460,7 @@ namespace TEN::Renderer
 		 
 		// Build G-Buffer (Normals + Depth).
 		_context->ClearRenderTargetView(_normalsRenderTarget.RenderTargetView.Get(), Colors::Black);
-		_context->ClearRenderTargetView(_depthRenderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->ClearRenderTargetView(_depthRenderTarget.RenderTargetView.Get(), Colors::White);
 
 		pRenderViewPtrs[0] = _normalsRenderTarget.RenderTargetView.Get();
 		pRenderViewPtrs[1] = _depthRenderTarget.RenderTargetView.Get();

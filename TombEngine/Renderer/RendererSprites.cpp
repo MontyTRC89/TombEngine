@@ -297,7 +297,7 @@ namespace TEN::Renderer
 			{
 				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::PointWrap);
 
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
@@ -363,7 +363,7 @@ namespace TEN::Renderer
 			{
 				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::LinearClamp);
+				BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::PointWrap);
 
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
@@ -373,7 +373,7 @@ namespace TEN::Renderer
 
 				wasGPUSet = true;
 			}
-
+			
 			_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
 			_stSprite.RenderType = (int)spriteBucket.RenderType;
 			_cbSprite.updateData(_stSprite, _context.Get());

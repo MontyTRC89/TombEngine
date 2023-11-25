@@ -29,14 +29,14 @@ struct PixelShaderOutput
 	float Depth: SV_TARGET1;
 };
 
-float3 UnpackNormalMap(float4 n)
+float3 DecodeNormalMap(float4 n)
 {
 	n = n * 2.0f - 1.0f;
 	n.z = saturate(1.0f - dot(n.xy, n.xy));
 	return n.xyz;
 }
 
-float3 PackNormal(float3 n)
+float3 EncodeNormal(float3 n)
 {
 	n = (n + 1.0f) * 0.5f;
 	return n.xyz;
@@ -51,11 +51,10 @@ PixelShaderOutput PS(PixelShaderInput input)
 	DoAlphaTest(color);
 
 	float3x3 TBN = float3x3(input.Tangent, input.Binormal, input.Normal);
-	float3 normal = UnpackNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
-	normal = (normalize(mul(mul(normal, TBN), (float3x3)View)));
+	float3 normal = DecodeNormalMap(NormalTexture.Sample(NormalTextureSampler, input.UV));
+	normal = EncodeNormal(normalize(mul(mul(normal, TBN), (float3x3)View)));
 
 	output.Normals.xyz = normal;
-	output.Normals.w = color.w > 0.0f ? input.PositionCopy.z / input.PositionCopy.w : 0.0f;
 	output.Depth = color.w > 0.0f ? input.PositionCopy.z / input.PositionCopy.w : 0.0f;
 
 	return output;
