@@ -504,8 +504,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR2\Vehicles\speedboat.h" />
     <ClInclude Include="Objects\TR2\Vehicles\speedboat_info.h" />
     <ClInclude Include="Objects\TR2\tr2_objects.h" />
+    <ClInclude Include="Objects\TR3\Entity\AutoGunMip.h" />
     <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
-    <ClInclude Include="Objects\TR3\Entity\GunTurret.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
@@ -611,7 +611,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR5\Emitter\tr5_rats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_spider_emitter.h" />
-    <ClInclude Include="Objects\TR5\Entity\AutoGun.h" />
+    <ClInclude Include="Objects\TR5\Entity\AutoGunVci.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_brownbeast.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_chef.h" />
@@ -978,8 +978,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR2\Trap\tr2_springboard.cpp" />
     <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
     <ClCompile Include="Objects\TR2\Vehicles\speedboat.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\AutoGunMip.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\GunTurret.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
@@ -1075,7 +1075,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR5\Emitter\tr5_rats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_spider_emitter.cpp" />
-    <ClCompile Include="Objects\TR5\Entity\AutoGun.cpp" />
+    <ClCompile Include="Objects\TR5\Entity\AutoGunVci.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_brownbeast.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_chef.cpp" />

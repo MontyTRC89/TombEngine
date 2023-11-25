@@ -8,8 +8,8 @@
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR3/Entity/AutoGunMip.h"
 #include "Objects/TR3/Entity/Compsognathus.h" // OK
-#include "Objects/TR3/Entity/GunTurret.h"
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/Shiva.h" // OK
@@ -333,13 +333,13 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetHitEffect();
 	}
 
-	obj = &Objects[ID_GUN_TURRET];
+	obj = &Objects[ID_AUTO_GUN_MIP];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeGunTurret;
-		obj->control = ControlGunTurret;
+		obj->Initialize = InitializeAutoGunMip;
+		obj->control = ControlAutoGunMip;
 		obj->collision = CreatureCollision;
-		obj->HitRoutine = GunTurretHit;
+		obj->HitRoutine = HitAutoGunMip;
 		obj->HitPoints = 28;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_Y);
