@@ -13,7 +13,8 @@ namespace TEN::Collision::Attractor
 		struct ProximityData
 		{
 			Vector3		 Intersection  = Vector3::Zero;
-			float		 Distance	   = 0.0f;
+			float		 Distance2D	   = 0.0f;
+			float		 Distance3D	   = 0.0f;
 			float		 ChainDistance = 0.0f;
 			unsigned int SegmentID	   = 0;
 		};

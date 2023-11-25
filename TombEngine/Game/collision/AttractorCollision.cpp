@@ -43,14 +43,15 @@ namespace TEN::Collision::Attractor
 	{
 		const auto& points = Attrac.GetPoints();
 
-		// 1 point exists; return simple proximity data.
+		// Single point exists; return simple proximity data.
 		if (points.size() == 1)
 		{
-			float dist = Vector3::Distance(probePoint, points.front());
-			return ProximityData{ points.front(), dist, 0.0f, 0 };
+			float dist2D = Vector2::Distance(Vector2(probePoint.x, probePoint.z), Vector2(points.front().x, points.front().z));
+			float dist3D = Vector3::Distance(probePoint, points.front());
+			return ProximityData{ points.front(), dist2D, dist3D, 0.0f, 0 };
 		}
 
-		auto attracProx = ProximityData{ points.front(), INFINITY, 0.0f, 0 };
+		auto attracProx = ProximityData{ points.front(), INFINITY, INFINITY, 0.0f, 0 };
 		float chainDistTraveled = 0.0f;
 
 		// Find closest intersection along attractor.
@@ -62,17 +63,18 @@ namespace TEN::Collision::Attractor
 
 			// Calculate Y-perpendicular intersection and 2D distance.
 			auto intersection = Geometry::GetClosestPointOnLinePerp(probePoint, origin, target);
-			float distSqr = Vector2::DistanceSquared(
-				Vector2(probePoint.x, probePoint.z),
-				Vector2(intersection.x, intersection.z));
+			float dist2DSqr = Vector2::DistanceSquared(Vector2(probePoint.x, probePoint.z), Vector2(intersection.x, intersection.z));
+			float dist3DSqr = Vector3::DistanceSquared(probePoint, intersection);
 
-			// Found new closest intersection; update proximity data.
-			if (distSqr < attracProx.Distance)
+			// Found new closest intersection by 2D then 3D distance; update proximity data.
+			if (dist2DSqr < attracProx.Distance2D ||
+				(dist2DSqr == attracProx.Distance2D && attracProx.Distance3D < dist3DSqr))
 			{
 				chainDistTraveled += Vector3::Distance(origin, intersection);
 
 				attracProx.Intersection = intersection;
-				attracProx.Distance = distSqr;
+				attracProx.Distance2D = dist2DSqr;
+				attracProx.Distance3D = dist3DSqr;
 				attracProx.ChainDistance += chainDistTraveled;
 				attracProx.SegmentID = i;
 
@@ -86,8 +88,9 @@ namespace TEN::Collision::Attractor
 			chainDistTraveled += segmentLength;
 		}
 
-		// Root final distance.
-		attracProx.Distance = sqrt(attracProx.Distance);
+		// Root final distances.
+		attracProx.Distance2D = sqrt(attracProx.Distance2D);
+		attracProx.Distance3D = sqrt(attracProx.Distance3D);
 
 		// Return proximity data.
 		return attracProx;
@@ -176,34 +179,36 @@ namespace TEN::Collision::Attractor
 		// Get pointers to approximately nearby attractors.
 		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(probePoint, roomNumber, detectRadius);
 
-		// Collect attractor collisions sorted by distance in multimap.
-		auto attracCollMap = std::multimap<float, AttractorCollisionData>{};
+		// Collect attractor collisions.
+		auto attracColls = std::vector<AttractorCollisionData>{};
+		attracColls.reserve(nearbyAttracPtrs.size());
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
 			auto attracColl = GetAttractorCollision(*attracPtr, pos, headingAngle, probePoint);
 
 			// Filter out non-intersections.
-			if (attracColl.Proximity.Distance > detectRadius)
+			if (attracColl.Proximity.Distance2D > detectRadius)
 				continue;
 
-			attracCollMap.insert({ attracColl.Proximity.Distance, std::move(attracColl) });
-		}
-
-		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(std::min((int)attracCollMap.size(), COLL_COUNT_MAX));
-
-		// Move attractor collisions from map to capped vector.
-		unsigned int count = 0;
-		for (auto& [dist, attracColl] : attracCollMap)
-		{
 			attracColls.push_back(std::move(attracColl));
-
-			count++;
-			if (count >= COLL_COUNT_MAX)
-				break;
 		}
 
-		// Return attractor collisions sorted by distance.
+		// Sort collisions by 2D then 3D distance.
+		std::sort(
+			attracColls.begin(), attracColls.end(),
+			[](const auto& attracColl0, const auto& attracColl1)
+			{
+				if (attracColl0.Proximity.Distance2D == attracColl1.Proximity.Distance2D)
+					return (attracColl0.Proximity.Distance3D < attracColl1.Proximity.Distance3D);
+				
+				return (attracColl0.Proximity.Distance2D < attracColl1.Proximity.Distance2D);
+			});
+
+		// Trim collection.
+		if (attracColls.size() > COLL_COUNT_MAX)
+			attracColls.resize(COLL_COUNT_MAX);
+
+		// Return attractor collisions in capped vector sorted by 2D then 3D distance.
 		return attracColls;
 	}
 
