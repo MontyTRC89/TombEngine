@@ -187,7 +187,7 @@ namespace TEN::Collision::Attractor
 			auto attracColl = GetAttractorCollision(*attracPtr, pos, headingAngle, probePoint);
 
 			// Filter out non-intersections.
-			if (attracColl.Proximity.Distance2D > detectRadius)
+			if (attracColl.Proximity.Distance3D > detectRadius)
 				continue;
 
 			attracColls.push_back(std::move(attracColl));
