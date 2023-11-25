@@ -985,33 +985,57 @@ void LoadAIObjects()
 	}
 }
 
-void LoadEvent(VolumeEvent& event)
+void LoadEvent(VolumeEventSet& eventSet)
 {
-	event.Mode = (VolumeEventMode)ReadInt32();
-	event.Function = ReadString();
-	event.Data = ReadString();
-	event.CallCounter = ReadInt32();
+	int eventType = ReadInt32();
+	auto& evt = eventSet.Events[eventType];
+
+	evt.Mode = (VolumeEventMode)ReadInt32();
+	evt.Function = ReadString();
+	evt.Data = ReadString();
+	evt.CallCounter = ReadInt32();
 }
 
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
-	TENLog("Num event sets: " + std::to_string(eventSetCount), LogLevel::Info);
+	if (eventSetCount == 0)
+		return;
 
-	for (int i = 0; i < eventSetCount; i++)
+	int globalEventSetCount = ReadInt32();
+	TENLog("Num global event sets: " + std::to_string(globalEventSetCount), LogLevel::Info);
+
+	for (int i = 0; i < globalEventSetCount; i++)
+	{
+		auto eventSet = VolumeEventSet();
+
+		eventSet.Name = ReadString();
+
+		int eventCount = ReadInt32();
+		for (int j = 0; j < eventCount; j++)
+			LoadEvent(eventSet);
+
+		g_Level.EventSets.push_back(eventSet);
+
+		if (!eventSet.Events[(int)VolumeEventType::Loop].Function.empty())
+			g_Level.LoopedEventSetIndices.push_back(i);
+	}
+
+	int volumeEventSetCount = ReadInt32();
+	TENLog("Num volume event sets: " + std::to_string(volumeEventSetCount), LogLevel::Info);
+
+	for (int i = 0; i < volumeEventSetCount; i++)
 	{
 		auto eventSet = VolumeEventSet();
 
 		eventSet.Name = ReadString();
 		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		for (int eventType = 0; eventType < (int)VolumeEventType::Count; eventType++)
-			LoadEvent(eventSet.Events[eventType]);
+		int eventCount = ReadInt32();
+		for (int j = 0; j < eventCount; j++)
+			LoadEvent(eventSet);
 
 		g_Level.EventSets.push_back(eventSet);
-
-		if (!eventSet.Events[(int)VolumeEventType::Loop].Function.empty())
-			g_Level.LoopedEventSetIndices.push_back(i);
 	}
 }
 
