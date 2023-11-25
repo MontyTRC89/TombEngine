@@ -8,7 +8,7 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR3/Entity/TwoTurretAutoGun.h"
+#include "Objects/TR3/Entity/TwinAutoGun.h"
 #include "Objects/TR3/Entity/Compsognathus.h" // OK
 #include "Objects/TR3/Entity/Lizard.h" // OK
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
@@ -333,7 +333,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetHitEffect();
 	}
 
-	obj = &Objects[ID_TWO_TURRET_AUTO_GUN];
+	obj = &Objects[ID_TWIN_AUTO_GUN];
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeAutoGunMip;

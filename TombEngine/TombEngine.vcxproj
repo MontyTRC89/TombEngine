@@ -512,7 +512,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_claw_mutant.h" />
-    <ClInclude Include="Objects\TR3\Entity\TwoTurretAutoGun.h" />
+    <ClInclude Include="Objects\TR3\Entity\TwinAutoGun.h" />
     <ClInclude Include="Objects\TR3\Entity\WaspMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_civvy.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_cobra.h" />
@@ -1000,7 +1000,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_trex.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tribesman.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\TwoTurretAutoGun.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\TwinAutoGun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\WaspMutant.cpp" />
     <ClCompile Include="Objects\TR3\Object\corpse.cpp" />
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />
