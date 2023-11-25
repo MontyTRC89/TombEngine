@@ -690,12 +690,14 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			{
 			case NORTH:
 			case SOUTH:
+				coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
 				coll->Shift.Position.z += FindGridShift(entityPos.z + zFront, entityPos.z);
 				break;
 
 			case EAST:
 			case WEST:
 				coll->Shift.Position.x += FindGridShift(entityPos.x + xFront, entityPos.x);
+				coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
 				break;
 			}
 		}
