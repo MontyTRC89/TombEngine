@@ -5,7 +5,6 @@
 enum RoomEnvFlags;
 class FloorInfo;
 struct ItemInfo;
-struct RoomVector;
 
 using namespace TEN::Math;
 

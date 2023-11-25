@@ -161,7 +161,7 @@ GameStatus ControlPhase(int numFrames)
 
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
-		if (!isTitle && Lara.Control.Locked)
+		if (!isTitle && Lara.Control.IsLocked)
 			ClearAllActions();
 
 		// Handle inventory / pause / load / save screens.
@@ -305,7 +305,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Initialize items, effects, lots, and cameras.
 	HairEffect.Initialize();
-	InitializeFXArray(true);
+	InitializeFXArray();
 	InitializeCamera();
 	InitializeSpotCamSequences(isTitle);
 	InitializeItemBoxData();
@@ -402,7 +402,7 @@ void CleanUp()
 	Wibble = 0;
 
 	// Needs to be cleared, otherwise controls will lock if user exits to title while playing flyby with locked controls.
-	Lara.Control.Locked = false;
+	Lara.Control.IsLocked = false;
 
 	// Resets lightning and wind parameters to avoid holding over previous weather to new level.
 	Weather.Clear();
@@ -460,12 +460,13 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	{
 		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level->ScriptFileName);
 		g_GameScript->InitCallbacks();
-		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		g_GameStringsHandler->SetCallbackDrawString([](const std::string& key, D3DCOLOR color, const Vec2& pos, float scale, int flags)
 		{
 			g_Renderer.AddString(
-				float(x) / float(g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
-				float(y) / float(g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y,
-				key.c_str(), col, flags);
+				key,
+				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * DISPLAY_SPACE_RES.x),
+				((float)pos.y / (float)g_Configuration.ScreenHeight * DISPLAY_SPACE_RES.y)),
+				Color(color), scale, flags);
 		});
 	}
 

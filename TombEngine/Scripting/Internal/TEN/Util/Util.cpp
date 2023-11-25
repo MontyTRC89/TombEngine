@@ -19,10 +19,10 @@
 using TEN::Renderer::g_Renderer;
 
 /// Utility functions for various calculations.
-// @tentable Utils 
+// @tentable Util
 // @pragma nostrip
 
-namespace Util
+namespace TEN::Scripting::Util
 {
 	/// Determine if there is a clear line of sight between two positions.
 	// NOTE: Limited to room geometry. Objects are ignored.
@@ -68,6 +68,7 @@ namespace Util
 	}
 
 	/// Get the projected display space position of a 3D world position. Returns nil if the world position is behind the camera view.
+	// @function GetDisplayPosition
 	// @tparam Vec3 worldPos 3D world position.
 	// @return Vec2 Projected display space position in percent.
 	// @usage 
@@ -82,12 +83,12 @@ namespace Util
 			return sol::nullopt;
 
 		return Vec2(
-			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
-			(displayPos->y / SCREEN_SPACE_RES.y) * 100);
+			(displayPos->x / DISPLAY_SPACE_RES.x) * 100,
+			(displayPos->y / DISPLAY_SPACE_RES.y) * 100);
 	}
 
 	/// Translate a pair display position coordinates to pixel coordinates.
-	//To be used with @{ Strings.DisplayString:SetPosition } and @{ Strings.DisplayString }.
+	//To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.
 	//@function PercentToScreen
 	//@tparam float x X component of the display position.
 	//@tparam float y Y component of the display position.
@@ -113,7 +114,7 @@ namespace Util
 	}
 
 	/// Translate a pair of pixel coordinates to display position coordinates.
-	//To be used with @{ Strings.DisplayString:GetPosition }.
+	//To be used with @{Strings.DisplayString:GetPosition}.
 	//@function ScreenToPercent
 	//@tparam int x X pixel coordinate to translate to display position.
 	//@tparam int y Y pixel coordinate to translate to display position.

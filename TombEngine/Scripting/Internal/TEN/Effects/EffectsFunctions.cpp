@@ -34,7 +34,7 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 
-namespace Effects
+namespace TEN::Scripting::Effects
 {
 	///Emit a lightning arc.
 	//@function EmitLightningArc
@@ -250,7 +250,7 @@ namespace Effects
 			&pose, innerRad, outerRad, spd,
 			color.GetR(), color.GetG(), color.GetB(),
 			lifeInFrames, EulerAngles(ANGLE(ang), 0.0f, 0.0f),
-			(short)doDamage, true, false, (int)ShockwaveStyle::Normal);
+			(short)doDamage, true, false, false, (int)ShockwaveStyle::Normal);
 	}
 
 /***Emit dynamic light that lasts for a single frame.

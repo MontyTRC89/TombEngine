@@ -682,8 +682,8 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeMapper;
 			obj->control = MapperControl;
-			obj->drawRoutine = nullptr;
 			obj->SetHitEffect(true);
+			obj->shadowType = ShadowMode::All;
 		}
 
 		obj = &Objects[ID_ELEMENT_PUZZLE];

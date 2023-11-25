@@ -302,7 +302,7 @@ namespace TEN::Entities::Generic
 				// Check if push/pull must stop.
 				if (!PushableAnimSets[pushable.AnimSetID].EnableAnimLoop ||
 					!IsHeld(In::Action) ||
-					!PushableMovementConditions(pushableItem, !isPlayerPulling, isPlayerPulling) ||
+					!TestPushableMovementConditions(pushableItem, !isPlayerPulling, isPlayerPulling) ||
 					!IsPushableValid(pushableItem))
 				{
 					playerItem.Animation.TargetState = LS_IDLE;
@@ -316,7 +316,9 @@ namespace TEN::Entities::Generic
 					int foundStack = SearchNearPushablesStack(pushableItem.Index);
 					StackPushable(pushableItem.Index, foundStack);
 
-					pushable.SoundState = PushableSoundState::Stop;
+					// TODO: Better solution that also works with pushable block anims.
+					if (pushable.AnimSetID == 0)
+						pushable.SoundState = PushableSoundState::Stop;
 				}
 				else if (playerItem.Animation.ActiveState == LS_PUSHABLE_PUSH && pushable.IsOnEdge)
 				{
@@ -334,7 +336,6 @@ namespace TEN::Entities::Generic
 				playerItem.Animation.TargetState = LS_IDLE;
 				player.Context.InteractedItem = NO_ITEM;
 				return;
-			break;
 
 			case PushableEnvironmentType::SlopedFloor:
 				// TODO: If slippery slope, link to slide state.

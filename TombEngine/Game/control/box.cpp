@@ -575,17 +575,17 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 		ItemNewRoom(playerItem.Index, creatureItem->RoomNumber);
 
 	AnimateItem(&playerItem);
-
-	player.ExtraAnim = 1;
+	playerItem.HitPoints = -1;
 	player.Control.HandStatus = HandStatus::Busy;
 	player.Control.Weapon.GunType = LaraWeaponType::None;
+	player.ExtraAnim = 1;
 	player.HitDirection = -1;
 
-	Camera.pos.RoomNumber = playerItem.RoomNumber; 
-	Camera.type = CameraType::Chase;
+	Camera.pos.RoomNumber = playerItem.RoomNumber;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetElevation = ANGLE(-25.0f);
+	Camera.targetDistance = BLOCK(2);
 }
 
 short CreatureEffect2(ItemInfo* item, const CreatureBiteInfo& bite, short velocity, short angle, std::function<CreatureEffectFunction> func)

@@ -122,13 +122,11 @@ namespace TEN::Math::Random
 
 	bool TestProbability(float prob)
 	{
-		prob = std::clamp(prob, 0.0f, 1.0f);
-
-		if (prob == 0.0f)
+		if (prob <= 0.0f)
 		{
 			return false;
 		}
-		else if (prob == 1.0f)
+		else if (prob >= 1.0f)
 		{
 			return true;
 		}
