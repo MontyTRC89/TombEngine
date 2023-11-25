@@ -134,13 +134,13 @@ static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& poin
 	collResult.Position.Ceiling = pointColl.GetCeilingHeight();
 	collResult.Position.Bridge = pointColl.GetFloorBridgeItemNumber();
 	collResult.Position.SplitAngle = pointColl.GetBottomSector().FloorSurface.SplitAngle;
-	collResult.Position.FloorSlope = pointColl.IsIllegalFloor();
+	collResult.Position.FloorSlope = collResult.Position.Bridge == NO_ITEM && pointColl.IsIllegalFloor();
 	collResult.Position.CeilingSlope = pointColl.IsIllegalCeiling();
 	collResult.Position.DiagonalStep = pointColl.IsDiagonalFloorStep();
 
 	// NOTE: Bridge tilts ignored by old method.
-	collResult.FloorTilt = GetSurfaceTilt(pointColl.GetBottomSector().GetSurfaceNormal(pointColl.Position.x, pointColl.Position.z, true), true).ToVector2();
-	collResult.CeilingTilt = GetSurfaceTilt(pointColl.GetTopSector().GetSurfaceNormal(pointColl.Position.x, pointColl.Position.z, false), false).ToVector2();
+	collResult.FloorTilt = GetSurfaceTilt(pointColl.GetFloorNormal(), true).ToVector2();
+	collResult.CeilingTilt = GetSurfaceTilt(pointColl.GetCeilingNormal(), false).ToVector2();
 
 	return collResult;
 }
@@ -219,12 +219,15 @@ CollisionResult GetCollision(const GameVector& pos)
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
+	auto pointColl = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber);
+	return ConvertPointCollDataToCollResult(pointColl);
+
 	auto result = CollisionResult{};
 
 	result.Coordinates = Vector3i(x, y, z);
 	result.Position.Floor = GetFloorHeight(RoomVector(floor->RoomNumber, y), x, z).value_or(NO_HEIGHT);
 	result.Position.Ceiling = GetCeilingHeight(RoomVector(floor->RoomNumber, y), x, z).value_or(NO_HEIGHT);
-
+	
 	result.Block = floor;
 	while (floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
 	{
