@@ -31,7 +31,7 @@ namespace TEN::Renderer::Graphics
 			D3D11_BUFFER_DESC desc = {};
 
 			desc.Usage = D3D11_USAGE_DYNAMIC;
-			desc.ByteWidth = sizeof(CVertex) * numVertices;
+			desc.ByteWidth = sizeof(CVertex) * (numVertices > 0 ? numVertices : 1);
 			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 

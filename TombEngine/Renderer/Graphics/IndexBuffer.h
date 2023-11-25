@@ -24,7 +24,7 @@ namespace TEN::Renderer::Graphics
 			D3D11_BUFFER_DESC desc = {};
 
 			desc.Usage = D3D11_USAGE_DYNAMIC;
-			desc.ByteWidth = sizeof(int) * numIndices;
+			desc.ByteWidth = sizeof(int) * (numIndices > 0 ? numIndices : 1);
 			desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
