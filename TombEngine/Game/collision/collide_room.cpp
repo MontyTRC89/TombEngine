@@ -137,10 +137,12 @@ static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& poin
 	collResult.Position.FloorSlope = collResult.Position.Bridge == NO_ITEM && pointColl.IsIllegalFloor();
 	collResult.Position.CeilingSlope = pointColl.IsIllegalCeiling();
 	collResult.Position.DiagonalStep = pointColl.IsDiagonalFloorStep();
+	collResult.FloorNormal = pointColl.GetFloorNormal();
+	collResult.CeilingNormal = pointColl.GetCeilingNormal();
 
 	// NOTE: Bridge tilts ignored by old method.
-	collResult.FloorTilt = GetSurfaceTilt(pointColl.GetFloorNormal(), true).ToVector2();
-	collResult.CeilingTilt = GetSurfaceTilt(pointColl.GetCeilingNormal(), false).ToVector2();
+	collResult.FloorTilt = GetSurfaceTilt(collResult.FloorNormal, true).ToVector2();
+	collResult.CeilingTilt = GetSurfaceTilt(collResult.CeilingNormal, false).ToVector2();
 
 	return collResult;
 }

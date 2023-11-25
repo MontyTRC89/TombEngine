@@ -199,14 +199,14 @@ namespace TEN::Collision
 
 	bool PointCollisionData::IsIllegalFloor(short slopeAngleMin)
 	{
-		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
-		return (abs(slopeAngle) >= FROM_RAD(GetBottomSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, true)));
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
+		return (abs(slopeAngle) >= GetBottomSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, true));
 	}
 
 	bool PointCollisionData::IsIllegalCeiling(short slopeAngleMin)
 	{
-		auto slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
-		return (abs(slopeAngle) >= FROM_RAD(GetTopSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, false)));
+		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
+		return (abs(slopeAngle) >= GetTopSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, false));
 	}
 
 	bool PointCollisionData::IsDiagonalFloorStep()
