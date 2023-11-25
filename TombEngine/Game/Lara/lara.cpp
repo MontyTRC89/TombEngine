@@ -55,7 +55,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	// Handle object interation adjustment parameters.
 	if (player.Control.IsMoving)
 	{
-		if (player.Control.Count.PositionAdjust > LARA_POSITION_ADJUST_MAX_TIME)
+		if (player.Control.Count.PositionAdjust > PLAYER_POSITION_ADJUST_MAX_TIME)
 		{
 			player.Control.IsMoving = false;
 			player.Control.HandStatus = HandStatus::Free;
@@ -68,7 +68,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		player.Control.Count.PositionAdjust = 0;
 	}
 
-	if (!player.Control.Locked)
+	if (!player.Control.IsLocked)
 		player.LocationPad = -1;
 
 	// FAILSAFE: Force hand status reset.
@@ -345,7 +345,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Handle look-around.
-	if (((IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None) ||
+	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
 			(lara->Control.Look.IsUsingBinoculars || lara->Control.Look.IsUsingLasersight)) &&
 		lara->ExtraAnim == NO_ITEM)
 	{
@@ -415,7 +415,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
-	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
+	// Handle look-around.
+	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 	{
 		HandlePlayerLookAround(*item);
 	}
@@ -486,7 +487,8 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
-	if (IsHeld(In::Look) && lara->Control.Look.Mode != LookMode::None)
+	// Handle look-around.
+	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 	{
 		HandlePlayerLookAround(*item);
 	}
@@ -541,7 +543,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	DoObjectCollision(item, coll);
 
-	if (/*lara->ExtraAnim == -1 &&*/ lara->Context.Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_ITEM)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, 0);
@@ -555,36 +557,36 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	item->HitPoints = LARA_HEALTH_MAX;
-	lara->Status.Air = LARA_AIR_MAX;
-	lara->Status.Exposure = LARA_EXPOSURE_MAX;
-	lara->Status.Poison = 0;
-	lara->Status.Stamina = LARA_STAMINA_MAX;
+	player.Status.Air = LARA_AIR_MAX;
+	player.Status.Exposure = LARA_EXPOSURE_MAX;
+	player.Status.Poison = 0;
+	player.Status.Stamina = LARA_STAMINA_MAX;
 	
 	LaraUnderwater(item, coll);
 
 	if (IsHeld(In::Walk) && !IsHeld(In::Look))
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara->Context.WaterSurfaceDist > 0 && lara->Context.WaterSurfaceDist != NO_HEIGHT))
+		if (TestEnvironment(ENV_FLAG_WATER, item) ||
+			(player.Context.WaterSurfaceDist > 0 && player.Context.WaterSurfaceDist != NO_HEIGHT))
 		{
 			SetAnimation(item, LA_UNDERWATER_IDLE);
-			ResetPlayerFlex(item);
-			lara->Control.WaterStatus = WaterStatus::Underwater;
+			player.Control.WaterStatus = WaterStatus::Underwater;
 		}
 		else
 		{
-			SetAnimation(item, LA_STAND_SOLID);
+			SetAnimation(item, LA_STAND_IDLE);
 			item->Pose.Orientation.x = 0;
 			item->Pose.Orientation.z = 0;
-			ResetPlayerFlex(item);
-			lara->Control.WaterStatus = WaterStatus::Dry;
+			player.Control.WaterStatus = WaterStatus::Dry;
 		}
 
+		ResetPlayerFlex(item);
 		InitializeLaraMeshes(item);
 		item->HitPoints = LARA_HEALTH_MAX;
-		lara->Control.HandStatus = HandStatus::Free;
+		player.Control.HandStatus = HandStatus::Free;
 	}
 }
 
@@ -593,18 +595,16 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	if (isTitle && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 
-	// HACK: backup controls until proper control lock 
-	// is implemented -- Lwmte, 07.12.22
-
+	// HACK: backup controls until proper control lock is implemented -- Lwmte, 07.12.22
 	auto actionMap = ActionMap;
 
 	if (isTitle)
 		ClearAllActions();
 
-	// Control Lara.
+	// Control player.
 	InItemControlLoop = true;
 	LaraControl(item, &LaraCollision);
-	LaraCheatyBits(item);
+	HandlePlayerFlyCheat(*item);
 	InItemControlLoop = false;
 	KillMoveItems();
 

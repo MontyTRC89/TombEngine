@@ -458,7 +458,7 @@ namespace TEN::Renderer
 			// Spheres debug
 			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
 			// auto v2 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			// AddLine3D(v1, v2, Vector4::One);
+			// AddDebugLine(v1, v2, Vector4::One);
 		}
 
 		return (int)moveable.ObjectMeshes.size();
@@ -541,6 +541,10 @@ namespace TEN::Renderer
 
 		// Calculate clip space coords.
 		point = Vector4::Transform(point, gameCamera.Camera.ViewProjection);
+
+		// w is close to 0; return nullopt.
+		if (std::abs(point.w) <= EPSILON)
+			return std::nullopt;
 
 		// Calculate NDC.
 		point /= point.w;

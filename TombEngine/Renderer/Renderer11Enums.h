@@ -222,11 +222,14 @@ constexpr auto TEXTURE_PAGE = (TEXTURE_HEIGHT * TEXTURE_WIDTH);
 #define GET_ATLAS_PAGE_Y(p) floor((p) / NUM_TEXTURE_PAGES_PER_ROW) * 256.0f
 #define SHAPE_RECTANGLE 0
 #define SHAPE_TRIANGLE	1
-#define MAX_VERTICES 200000
-#define MAX_INDICES 400000
-#define MAX_RECTS_2D 32
-#define MAX_LINES_2D 256
-#define MAX_LINES_3D 16384
+
+constexpr auto MAX_VERTICES = 200000;
+constexpr auto MAX_INDICES = 400000;
+constexpr auto MAX_RECTS_2D = 32;
+constexpr auto MAX_LINES_2D = 256;
+constexpr auto MAX_LINES_3D = 16384;
+constexpr auto TRIANGLE_3D_COUNT_MAX = 16384;
+
 #define NUM_BUCKETS 4
 #define AMBIENT_CUBE_MAP_SIZE 64
 #define NUM_SPRITES_PER_BUCKET 4096

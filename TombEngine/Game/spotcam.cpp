@@ -137,7 +137,7 @@ void InitializeSpotCam(short Sequence)
 	SpotcamTimer = 0;
 	SpotcamPaused = false;
 	SpotcamLoopCnt = 0;
-	Lara.Control.Locked = false;
+	Lara.Control.IsLocked = false;
 
 	LaraAir = Lara.Status.Air;
 
@@ -174,7 +174,7 @@ void InitializeSpotCam(short Sequence)
 
 	if ((spotcam->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
-		Lara.Control.Locked = true;
+		Lara.Control.IsLocked = true;
 		SetCinematicBars(1.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 	}
 
@@ -359,7 +359,7 @@ void CalculateSpotCameras()
 
 	CAMERA_INFO backup;
 
-	if (Lara.Control.Locked)
+	if (Lara.Control.IsLocked)
 	{
 		LaraItem->HitPoints = LaraHealth;
 		Lara.Status.Air = LaraAir;
@@ -558,14 +558,14 @@ void CalculateSpotCameras()
 				else
 				{
 					if (SpotCam[CurrentSplineCamera].flags & SCF_REENABLE_LARA_CONTROLS)
-						Lara.Control.Locked = false;
+						Lara.Control.IsLocked = false;
 
 					if (SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS)
 					{						
 						if (CurrentLevel)
 							SetCinematicBars(1.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
-						Lara.Control.Locked = true;
+						Lara.Control.IsLocked = true;
 					}
 
 					int sp2 = 0;
@@ -665,7 +665,7 @@ void CalculateSpotCameras()
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
 					UseSpotCam = false;
-					Lara.Control.Locked = false;
+					Lara.Control.IsLocked = false;
 					CheckTrigger = false;
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
@@ -785,7 +785,7 @@ void CalculateSpotCameras()
 		SetScreenFadeIn(FADE_SCREEN_SPEED);
 		SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 		UseSpotCam = false;
-		Lara.Control.Locked = false;
+		Lara.Control.IsLocked = false;
 		Camera.speed = 1;
 		AlterFOV(LastFOV);
 		CalculateCamera(LaraCollision);
@@ -793,98 +793,6 @@ void CalculateSpotCameras()
 	}
 }
 
-#if 0
-// Monty's version.
-int Spline(int x, int* knots, int nk)
-{
-	/*int num = nk - 1;
-
-	float gamma[100];
-	float delta[100];
-	float D[100]; 
-
-	gamma[0] = 1.0f / 2.0f;
-	for (int i = 1; i < num; i++)
-		gamma[i] = 1.0f / (4.0f - gamma[i - 1]);
-
-	gamma[num] = 1.0f / (2.0f - gamma[num - 1]);
-
-	float p0 = knots[0];
-	float p1 = knots[1];
-
-	delta[0] = 3.0f * (p1 - p0) * gamma[0];
-
-	for (int i = 1; i < num; i++)
-	{
-		p0 = knots[i - 1];
-		p1 = knots[i + 1];
-		delta[i] = (3.0f * (p1 - p0) - delta[i - 1]) * gamma[i];
-	}
-
-	p0 = knots[num - 1];
-	p1 = knots[num];
-
-	delta[num] = (3.0f * (p1 - p0) - delta[num - 1]) * gamma[num];
-
-	D[num] = delta[num];
-	for (int i = num - 1; i >= 0; i--)
-		D[i] = delta[i] - gamma[i] * D[i + 1];
-
-	p0 = knots[0];
-	p1 = knots[1];
-
-	float a = p0;
-	float b = D[0];
-	float c = 3 * (p1 - p0) - 2 * D[0] - D[1];
-	float d = 2 * (p0 - p1) + D[0] + D[1];
-
-	return ((((d * x) + c) * x + b) * x + a);
-
-	/*int num = nk - 1;
-
-	float gamma = 0;
-	float delta = 0;
-	float D = 0;
-
-	gamma = 1.0f / 2.0f;
-	for (int i = 1; i < num; i++)
-		gamma[i] = 1.0f / (4.0f - gamma[i - 1]);
-
-	gamma[num] = 1.0f / (2.0f - gamma[num - 1]);
-
-	float p0 = knots[0];
-	float p1 = knots[1];
-
-	delta[0] = 3.0f * (p1 - p0) * gamma[0];
-
-	for (int i = 1; i < num; i++)
-	{
-		p0 = knots[i - 1];
-		p1 = knots[i + 1];
-		delta[i] = (3.0f * (p1 - p0) - delta[i - 1]) * gamma[i];
-	}
-
-	p0 = points[num - 1];
-	p1 = points[num];
-
-	delta[num] = (3.0f * (p1 - p0) - delta[num - 1]) * gamma[num];
-
-	D[num] = delta[num];
-	for (int i = num - 1; i >= 0; i--)
-		D[i] = delta[i] - gamma[i] * D[i + 1];
-
-	float D1 = 
-	float D0 = delta - gamma * D1;
-
-	float a = p0;
-	float b = D;
-	float c = 3 * (p1 - p0) - 2 * D0 - D1;
-	float d = 2 * (p0 - p1) + D0 + D1;
-
-	return ((((d * x) + c) * x + b) * x + a);
-	*/
-}
-#else
 // Core's version. Proper decompilation by ChocolateFan
 int Spline(int x, int* knots, int nk)
 {
@@ -900,4 +808,3 @@ int Spline(int x, int* knots, int nk)
 
 	return ((__int64)x * (((__int64)x * (((__int64)x * c1 >> 16) + c2) >> 16) + (k[2] >> 1) + ((-k[0] - 1) >> 1)) >> 16) + k[1];
 }
-#endif
