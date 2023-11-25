@@ -129,8 +129,6 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psRoomsTransparent;
 		ComPtr<ID3D11VertexShader> _vsItems;
 		ComPtr<ID3D11PixelShader> _psItems;
-		ComPtr<ID3D11VertexShader> _vsHairs;
-		ComPtr<ID3D11PixelShader> _psHairs;
 		ComPtr<ID3D11VertexShader> _vsStatics;
 		ComPtr<ID3D11PixelShader> _psStatics;
 		ComPtr<ID3D11VertexShader> _vsSky;
