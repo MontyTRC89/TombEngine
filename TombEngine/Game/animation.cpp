@@ -116,7 +116,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
 					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
 
-					int itemGroundRoomNumber = GetCollision(item).RoomNumber;
+					int roomNumberAtPos = GetCollision(item).RoomNumber;
 
 					if (item.IsLara())
 					{
@@ -131,16 +131,16 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 					}
 					else
 					{
-						if (itemGroundRoomNumber == NO_ROOM)
+						if (roomNumberAtPos == NO_ROOM)
 						{
 							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
-						else if (TestEnvironment(ENV_FLAG_WATER, itemGroundRoomNumber))
+						else if (TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos))
 						{
-							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, itemGroundRoomNumber)))
+							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos)))
 								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
-						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, itemGroundRoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, itemGroundRoomNumber)))
+						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos) && !TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos)))
 						{
 							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
 						}
