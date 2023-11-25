@@ -176,8 +176,7 @@ namespace TEN::Entities::Player
 		int vPosTop = vPos - playerHeight;
 
 		// Calculate slope aspect delta angle.
-		auto floorNormal = GetSurfaceNormal(pointColl.FloorTilt, true);
-		short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
+		short aspectAngle = Geometry::GetSurfaceAspectAngle(pointColl.FloorNormal);
 		short aspectAngleDelta = Geometry::GetShortestAngle(setup.HeadingAngle, aspectAngle);
 
 		// 1) Check for slippery slope below floor (if applicable).
