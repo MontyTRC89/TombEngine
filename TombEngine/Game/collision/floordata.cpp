@@ -358,12 +358,15 @@ namespace TEN::Collision::Floordata
 	// NOTE: Tilts are deprecated, but until all conversions are complete this function will remain useful.
 	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor)
 	{
-		// Calculate tilt values from normal.
-		int xTilt = (int)round((normal.x * 4) * (CLICK(1) / BLOCK(1)));
-		int zTilt = (int)round((normal.z * 4) * (CLICK(1) / BLOCK(1)));
+		// Scale normal to original fake plane length.
+		float scaleFactor = 1.0f / normal.y;
+		auto scaledNormal = normal * scaleFactor;
 
-		// Return tilt.
-		return Vector2i(xTilt, zTilt);
+		// Calculate and return tilt.
+		auto sign = isFloor ? 1 : -1;
+		return Vector2i(
+			round(scaledNormal.x * 4),
+			round(scaledNormal.z * 4)) * sign;
 	}
 
 	Vector2i GetSectorPoint(int x, int z)
