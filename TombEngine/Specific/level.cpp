@@ -400,10 +400,30 @@ void LoadObjects()
 
 					case AnimCommandType::SoundEffect:
 					{
-						int soundID = ReadInt32();
+						int soundData = ReadInt32();
 						int frameNumber = ReadInt32();
 
-						command = std::make_unique<SoundEffectCommand>(soundID, frameNumber);
+						bool playInWater = ((soundData & 0x8000) != 0);
+						bool playOnLand = ((soundData & 0x4000) != 0);
+						bool playAlways = ((playInWater && playOnLand) || (!playInWater && !playOnLand));
+
+						int soundID = soundData & 0x3FFF;
+						auto envCond = SoundEffectEnvCondition::Always;
+
+						if (playAlways)
+						{
+							envCond = SoundEffectEnvCondition::Always;
+						}
+						else if (playInWater)
+						{
+							envCond = SoundEffectEnvCondition::Water;
+						}
+						else if (playOnLand)
+						{
+							envCond = SoundEffectEnvCondition::Land;
+						}
+
+						command = std::make_unique<SoundEffectCommand>(soundID, frameNumber, envCond);
 					}
 						break;
 

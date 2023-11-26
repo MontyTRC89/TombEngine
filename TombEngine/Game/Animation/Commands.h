@@ -16,6 +16,15 @@ namespace TEN::Animation
 		Flipeffect
 	};
 
+	enum class SoundEffectEnvCondition
+	{
+		Always,
+		Land,
+		Water,
+		Swamp,
+		Underwater
+	};
+
 	// Abstract base class used by high-level animation command classes.
 	class AnimCommand abstract
 	{
@@ -62,9 +71,10 @@ namespace TEN::Animation
 	private:
 		const int SoundID	  = 0;
 		const int FrameNumber = 0;
+		const SoundEffectEnvCondition EnvCondition = SoundEffectEnvCondition::Always;
 
 	public:
-		SoundEffectCommand(int soundID, int frameNumber) : SoundID(soundID), FrameNumber(frameNumber) {};
+		SoundEffectCommand(int soundID, int frameNumber, SoundEffectEnvCondition envCond) : SoundID(soundID), FrameNumber(frameNumber), EnvCondition(envCond) {};
 		void Execute(ItemInfo& item, bool isFrameBased) const override;
 	};
 
