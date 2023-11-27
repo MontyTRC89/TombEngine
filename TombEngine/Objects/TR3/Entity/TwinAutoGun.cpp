@@ -18,34 +18,34 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto AUTO_GUN_MIP_SHOT_DAMAGE	   = 5;
-	constexpr auto AUTO_GUN_MIP_HIT_POINTS_MAX = 28;
+	constexpr auto TWIN_AUTO_GUN_SHOT_DAMAGE	= 5;
+	constexpr auto TWIN_AUTO_GUN_HIT_POINTS_MAX = 28;
 
-	const auto AutoGunMipLeftBite  = CreatureBiteInfo(110, -30, 530, 2);
-	const auto AutoGunMipRightBite = CreatureBiteInfo(-110, -30, 530, 2);
+	const auto TwinAutoGunLeftBite	= CreatureBiteInfo(110, -30, 530, 2);
+	const auto TwinAutoGunRightBite = CreatureBiteInfo(-110, -30, 530, 2);
 
-	enum GunTurretAnim
+	enum TwinAutoGunAnim
 	{
-		AUTO_GUN_MIP_ANIM_FIRE = 0,
-		AUTO_GUN_MIP_ANIM_IDLE = 1
+		TWIN_AUTO_GUN_ANIM_FIRE = 0,
+		TWIN_AUTO_GUN_ANIM_IDLE = 1
 	};
 
-	enum GunTurretState
+	enum TwinAutoGunState
 	{
-		AUTO_GUN_MIP_STATE_FIRE = 0,
-		AUTO_GUN_MIP_STATE_IDLE = 1
+		TWIN_AUTO_GUN_STATE_FIRE = 0,
+		TWIN_AUTO_GUN_STATE_IDLE = 1
 	};
 
-	void InitializeAutoGunMip(short itemNumber)
+	void InitializeTwinAutoGun(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		SetAnimation(item, AUTO_GUN_MIP_ANIM_IDLE);
+		SetAnimation(item, TWIN_AUTO_GUN_ANIM_IDLE);
 		item.ItemFlags[0] = 0;
 		item.ItemFlags[3] = 0;		
 	}
 
-	void ControlAutoGunMip(short itemNumber)
+	void ControlTwinAutoGun(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto& playerItem = *LaraItem;
@@ -55,7 +55,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto& autoGun = *GetCreatureInfo(&item);
 
-		if (item.HitStatus || item.HitPoints < AUTO_GUN_MIP_HIT_POINTS_MAX)
+		if (item.HitStatus || item.HitPoints < TWIN_AUTO_GUN_HIT_POINTS_MAX)
 			item.ItemFlags[3] = 1;
 
 		if (autoGun.MuzzleFlash[0].Delay >= 1)
@@ -94,10 +94,10 @@ namespace TEN::Entities::Creatures::TR3
 
 		switch (item.Animation.ActiveState)
 		{
-		case AUTO_GUN_MIP_STATE_FIRE:
+		case TWIN_AUTO_GUN_STATE_FIRE:
 			if (!los)
 			{
-				item.Animation.TargetState = AUTO_GUN_MIP_STATE_IDLE;
+				item.Animation.TargetState = TWIN_AUTO_GUN_STATE_IDLE;
 			}
 			else if (item.Animation.FrameNumber == GetAnimData(item).frameBase)
 			{
@@ -105,20 +105,20 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (autoGun.MuzzleFlash[0].Delay == 0)
 				{
-					DoDamage(&playerItem, AUTO_GUN_MIP_SHOT_DAMAGE);
+					DoDamage(&playerItem, TWIN_AUTO_GUN_SHOT_DAMAGE);
 
 					auto bloodPos = GetJointPosition(&playerItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
 					float bloodVel = Random::GenerateFloat(4.0f, 8.0f);
 					DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), playerItem.RoomNumber);
 
-					auto lightPos = GetJointPosition(item, AutoGunMipLeftBite);
+					auto lightPos = GetJointPosition(item, TwinAutoGunLeftBite);
 					auto lightColor = Color(
 						Random::GenerateFloat(0.75f, 1.0f),
 						Random::GenerateFloat(0.5f, 0.6f),
 						Random::GenerateFloat(0.0f, 0.25f));
 					TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, 2 * item.ItemFlags[0] + 8, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 
-					autoGun.MuzzleFlash[0].Bite = AutoGunMipLeftBite;
+					autoGun.MuzzleFlash[0].Bite = TwinAutoGunLeftBite;
 					autoGun.MuzzleFlash[0].SwitchToMuzzle2 = true;
 					autoGun.MuzzleFlash[0].ApplyXRotation = false;
 					autoGun.MuzzleFlash[0].ApplyZRotation = true;
@@ -128,20 +128,20 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (autoGun.MuzzleFlash[1].Delay == 0)
 				{
-					DoDamage(&playerItem, AUTO_GUN_MIP_SHOT_DAMAGE);
+					DoDamage(&playerItem, TWIN_AUTO_GUN_SHOT_DAMAGE);
 
 					auto bloodPos = GetJointPosition(&playerItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
 					float bloodVel = Random::GenerateFloat(4.0f, 8.0f);
 					DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), playerItem.RoomNumber);
 
-					auto lightPos = GetJointPosition(item, AutoGunMipRightBite);
+					auto lightPos = GetJointPosition(item, TwinAutoGunRightBite);
 					auto lightColor = Color(
 						Random::GenerateFloat(0.75f, 1.0f),
 						Random::GenerateFloat(0.5f, 0.6f),
 						Random::GenerateFloat(0.0f, 0.25f));
 					TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, 2 * item.ItemFlags[0] + 8, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 
-					autoGun.MuzzleFlash[1].Bite = AutoGunMipRightBite;
+					autoGun.MuzzleFlash[1].Bite = TwinAutoGunRightBite;
 					autoGun.MuzzleFlash[1].SwitchToMuzzle2 = true;
 					autoGun.MuzzleFlash[1].ApplyXRotation = false;
 					autoGun.MuzzleFlash[1].ApplyZRotation = true;
@@ -154,16 +154,16 @@ namespace TEN::Entities::Creatures::TR3
 
 			break;
 
-		case AUTO_GUN_MIP_STATE_IDLE:
+		case TWIN_AUTO_GUN_STATE_IDLE:
 			if (los && item.ItemFlags[0] == 0)
-				item.Animation.TargetState = AUTO_GUN_MIP_STATE_FIRE;
+				item.Animation.TargetState = TWIN_AUTO_GUN_STATE_FIRE;
 
 			else if (item.ItemFlags[0])
 			{
 				if (item.AIBits == MODIFY)
 				{
 					item.ItemFlags[0] = 1;
-					item.Animation.TargetState = AUTO_GUN_MIP_STATE_FIRE;
+					item.Animation.TargetState = TWIN_AUTO_GUN_STATE_FIRE;
 				}
 				else
 				{
@@ -191,7 +191,7 @@ namespace TEN::Entities::Creatures::TR3
 		AnimateItem(&item);
 	}
 
-	void HitAutoGunMip(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	void HitTwinAutoGun(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
 		DefaultItemHit(target, source, pos, damage, isExplosive, jointIndex);
 	}

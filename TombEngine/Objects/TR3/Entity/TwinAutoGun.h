@@ -5,7 +5,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	void InitializeAutoGunMip(short itemNumber);
-	void ControlAutoGunMip(short itemNumber);
-	void HitAutoGunMip(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
+	void InitializeTwinAutoGun(short itemNumber);
+	void ControlTwinAutoGun(short itemNumber);
+	void HitTwinAutoGun(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 }
