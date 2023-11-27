@@ -49,11 +49,11 @@ namespace TEN::Entities::Player
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Filter out current attractor.
-			if (&attracColl.Attrac == &currentAttrac)
+			if (attracColl.AttracPtr == &currentAttrac)
 				continue;
 
 			// 2) Check if attractor is edge type.
-			if (!attracColl.Attrac.IsEdge())
+			if (!attracColl.AttracPtr->IsEdge())
 				continue;
 
 			// 3) Test sharp corner.
@@ -100,12 +100,12 @@ namespace TEN::Entities::Player
 				if (chainDistCenter <= 0.0f)
 				{
 					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + chainDistCenter;
-					pointCenter = connectingAttracCollCenter->Attrac.GetIntersectionAtChainDistance(transitLineDist);
+					pointCenter = connectingAttracCollCenter->AttracPtr->GetIntersectionAtChainDistance(transitLineDist);
 				}
 				else if (chainDistCenter >= length)
 				{
 					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + (chainDistCenter - length);
-					pointCenter = connectingAttracCollCenter->Attrac.GetIntersectionAtChainDistance(transitLineDist);
+					pointCenter = connectingAttracCollCenter->AttracPtr->GetIntersectionAtChainDistance(transitLineDist);
 				}
 			}
 			else
@@ -125,10 +125,10 @@ namespace TEN::Entities::Player
 		}
 
 		auto pointLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->Attrac.GetIntersectionAtChainDistance(connectingAttracCollLeft->Proximity.ChainDistance + chainDistLeft) :
+			connectingAttracCollLeft->AttracPtr->GetIntersectionAtChainDistance(connectingAttracCollLeft->Proximity.ChainDistance + chainDistLeft) :
 			handsAttrac.AttracPtr->GetIntersectionAtChainDistance(chainDistLeft);
 		auto pointRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->Attrac.GetIntersectionAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (chainDistRight - length)) :
+			connectingAttracCollRight->AttracPtr->GetIntersectionAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (chainDistRight - length)) :
 			handsAttrac.AttracPtr->GetIntersectionAtChainDistance(chainDistRight);
 
 		auto pos = item.Pose.Position.ToVector3();
@@ -136,14 +136,14 @@ namespace TEN::Entities::Player
 
 		// Get attractor collisions.
 		auto attracCollCenter = ((chainDistCenter <= 0.0f || chainDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
-			GetAttractorCollision(connectingAttracCollCenter->Attrac, pos, headingAngle, pointCenter) :
+			GetAttractorCollision(*connectingAttracCollCenter->AttracPtr, pos, headingAngle, pointCenter) :
 			GetAttractorCollision(*handsAttrac.AttracPtr, pos, headingAngle, pointCenter);
 
 		auto attracCollLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			GetAttractorCollision(connectingAttracCollLeft->Attrac, pos, headingAngle, pointLeft) :
+			GetAttractorCollision(*connectingAttracCollLeft->AttracPtr, pos, headingAngle, pointLeft) :
 			GetAttractorCollision(*handsAttrac.AttracPtr, pos, headingAngle, pointLeft);
 		auto attracCollRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			GetAttractorCollision(connectingAttracCollRight->Attrac, pos, headingAngle, pointLeft) :
+			GetAttractorCollision(*connectingAttracCollRight->AttracPtr, pos, headingAngle, pointLeft) :
 			GetAttractorCollision(*handsAttrac.AttracPtr, pos, headingAngle, pointRight);
 
 		// ----------Debug
@@ -217,7 +217,7 @@ namespace TEN::Entities::Player
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
-		player.Context.HandsAttractor.Set(edgeAttracColls->Center.Attrac, edgeAttracColls->Center.Proximity.ChainDistance);
+		player.Context.HandsAttractor.Set(*edgeAttracColls->Center.AttracPtr, edgeAttracColls->Center.Proximity.ChainDistance);
 	}
 
 	// State:	  LS_HANG_IDLE (10)

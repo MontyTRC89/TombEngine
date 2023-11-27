@@ -15,19 +15,19 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
-	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, const Vector3& pos, short headingAngle, const Vector3& probePoint) :
-		Attrac(attrac)
+	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, const Vector3& pos, short headingAngle, const Vector3& probePoint)
 	{
 		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
 		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
 
-		// Fill proximity data.
+		// Set attractor  pointer and fill proximity data.
+		AttracPtr = &attrac;
 		Proximity = GetProximity(probePoint);
 
 		auto orient = EulerAngles(0, headingAngle, 0);
 
 		// Calculate segment orientation.
-		const auto& points = Attrac.GetPoints();
+		const auto& points = AttracPtr->GetPoints();
 		const auto& origin = points[Proximity.SegmentID];
 		const auto& target = points[Proximity.SegmentID + 1];
 		auto attracOrient = (points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
@@ -41,7 +41,7 @@ namespace TEN::Collision::Attractor
 
 	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& probePoint) const
 	{
-		const auto& points = Attrac.GetPoints();
+		const auto& points = AttracPtr->GetPoints();
 
 		// Single point exists; return simple proximity data.
 		if (points.size() == 1)
@@ -204,9 +204,13 @@ namespace TEN::Collision::Attractor
 				return (attracColl0.Proximity.Distance2D < attracColl1.Proximity.Distance2D);
 			});
 
+		// TODO: Avoid copying! std::vector's resize() method doesn't like pointers?
 		// Trim collection.
 		if (attracColls.size() > COLL_COUNT_MAX)
-			attracColls.resize(COLL_COUNT_MAX);
+		{
+			auto resizedColls = std::vector<AttractorCollisionData>(attracColls.begin(), attracColls.begin() + COLL_COUNT_MAX);
+			attracColls.swap(resizedColls);
+		}
 
 		// Return attractor collisions in capped vector sorted by 2D then 3D distance.
 		return attracColls;

@@ -1241,7 +1241,7 @@ namespace TEN::Entities::Player
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check if attractor is edge type.
-			if (!attracColl.Attrac.IsEdge())
+			if (!attracColl.AttracPtr->IsEdge())
 				continue;
 
 			// 2) Test if edge slope is slippery.
@@ -1259,19 +1259,19 @@ namespace TEN::Entities::Player
 			// 4) Test for seam between connecting attractors.
 			if (!hasEnd &&
 				(attracColl.Proximity.ChainDistance <= EPSILON ||
-					(attracColl.Attrac.GetLength() - attracColl.Proximity.ChainDistance) <= EPSILON))
+					(attracColl.AttracPtr->GetLength() - attracColl.Proximity.ChainDistance) <= EPSILON))
 			{
 				// Track ends.
 				hasEnd = true;
 
 				// 4.1) Test for looped attractor.
-				if (!attracColl.Attrac.IsLooped())
+				if (!attracColl.AttracPtr->IsLooped())
 					continue;
 			}
 
 			// Get point collision off side of edge.
 			auto pointColl = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection), attracColl.Attrac.GetRoomNumber(),
+				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 5) Test if edge is high enough off the ground.
@@ -1310,14 +1310,14 @@ namespace TEN::Entities::Player
 
 		// TODO: Accuracy.
 		// Calculate heading angle.
-		auto pointLeft = attracColl->Attrac.GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance - coll.Setup.Radius);
-		auto pointRight = attracColl->Attrac.GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance + coll.Setup.Radius);
+		auto pointLeft = attracColl->AttracPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance - coll.Setup.Radius);
+		auto pointRight = attracColl->AttracPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
 		return EdgeCatchData
 		{
-			&attracColl->Attrac,
+			attracColl->AttracPtr,
 			EdgeType::Ledge,
 			attracColl->Proximity.Intersection,
 			attracColl->Proximity.ChainDistance,

@@ -21,7 +21,7 @@ namespace TEN::Collision::Attractor
 
 	public:
 		// Members
-		Attractor& Attrac;
+		Attractor* AttracPtr = nullptr;
 
 		ProximityData Proximity		  = {};
 		short		  HeadingAngle	  = 0;
