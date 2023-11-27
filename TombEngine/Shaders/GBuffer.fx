@@ -10,6 +10,7 @@ struct PixelShaderInput
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
+	float Sheen : SHEEN;
 	float4 PositionCopy : TEXCOORD1;
 	float4 FogBulbs : TEXCOORD2;
 	float DistanceFog : FOG;

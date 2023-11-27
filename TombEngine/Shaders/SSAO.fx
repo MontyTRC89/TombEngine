@@ -61,8 +61,8 @@ float PS(PixelShaderInput input) : SV_Target
 
     float occlusion = 0.0f;
     int kernelSize = 64;
-    float radius = 128.0f;
-    float bias = 8.0f;
+    float radius = 64.0f;
+    float bias = 4.0f;
 
     for (int i = 0; i < kernelSize; ++i)
     {

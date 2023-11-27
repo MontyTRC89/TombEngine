@@ -2809,8 +2809,8 @@ namespace TEN::Renderer
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = _screenWidth / 2.0f;
-		viewport.Height = _screenHeight / 2.0f;
+		viewport.Width = _screenWidth;
+		viewport.Height = _screenHeight;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 
@@ -2828,7 +2828,7 @@ namespace TEN::Renderer
 		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
 
 		UINT stride = sizeof(PostProcessVertex);
-		UINT offset = 0;
+		UINT offset = 0; 
 
 		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
@@ -2836,8 +2836,8 @@ namespace TEN::Renderer
 		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_normalsRenderTarget, SamplerStateRegister::PointWrap);
 		BindTexture(static_cast<TextureRegister>(2), &_SSAONoiseTexture, SamplerStateRegister::PointWrap);
 
-		_stPostProcessBuffer.ViewportWidth = _screenWidth / 2.0f;
-		_stPostProcessBuffer.ViewportHeight = _screenHeight / 2.0f;
+		_stPostProcessBuffer.ViewportWidth = viewport.Width;
+		_stPostProcessBuffer.ViewportHeight = viewport.Height;
 		memcpy(_stPostProcessBuffer.SSAOKernel, _SSAOKernel.data(), 16 * _SSAOKernel.size());
 		_cbPostProcessBuffer.updateData(_stPostProcessBuffer, _context.Get());
 
