@@ -16,6 +16,11 @@
 
 using namespace TEN::Math;
 
+// NOTES:
+// ItemFlags[0]: X axis orientation.
+// ItemFlags[1]: Y axis orientation.
+// ItemFlags[2]: barrel turn rate.
+
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto AUTO_GUN_SHOT_DAMAGE			= 20;
@@ -29,10 +34,10 @@ namespace TEN::Entities::Creatures::TR5
 
 	const auto AutoGunChassisJoints		= std::vector<unsigned int>{ 0, 1, 2, 3, 4, 5, 6, 11, 12};
 	const auto AutoGunBodyJoints		= std::vector<unsigned int>{ 7, 9 };
-	const auto AutoGunClosedHatchJoints	= std::vector<unsigned int>{ 10 };
+	const auto AutoGunClosedHatchJoints = std::vector<unsigned int>{ 10 };
 	const auto AutoGunFlashJoints		= std::vector<unsigned int>{ 8 };
 
-	void InitializeAutoGuns(short itemNumber)
+	void InitializeAutoGun(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = std::array<short, 4>();
@@ -43,10 +48,42 @@ namespace TEN::Entities::Creatures::TR5
 		item.MeshBits.Set(AutoGunChassisJoints);
 	}
 
+	static void SpawnAutoGunSmoke(const Vector3& pos, char shade)
+	{
+		auto& smoke = SmokeSparks[GetFreeSmokeSpark()];
+
+		auto sphere = BoundingSphere(pos, BLOCK(1 / 64.0f));
+		auto smokePos = Random::GeneratePointInSphere(sphere);
+
+		smoke.on = true;
+		smoke.sShade = 0;
+		smoke.dShade = shade;
+		smoke.colFadeSpeed = 4;
+		smoke.fadeToBlack = 32;
+		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.life = smoke.sLife = Random::GenerateInt(40, 44);
+		smoke.x = smokePos.x;
+		smoke.y = smokePos.y;
+		smoke.z = smokePos.z;
+		smoke.xVel = 0;
+		smoke.yVel = 0;
+		smoke.zVel = 0;
+		smoke.friction = 4;
+		smoke.flags = SP_ROTATE;
+		smoke.rotAng = Random::GenerateInt(0, 4096);
+		smoke.rotAdd = Random::GenerateInt(-32, 32);
+		smoke.maxYvel = 0;
+		smoke.gravity = Random::GenerateInt(-4, -8);
+		smoke.mirror = 0;
+		smoke.dSize = Random::GenerateInt(24, 40);
+		smoke.sSize = smoke.dSize / 4;
+		smoke.size = smoke.dSize / 4;
+	}
+
 	void ControlAutoGun(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto& laraItem = *LaraItem;
+		auto& playerItem = *LaraItem;
 		
 		if (!TriggerActive(&item))
 			return;
@@ -61,7 +98,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			// Assess line of sight.
 			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
-			auto target = GameVector(GetJointPosition(&laraItem, LM_TORSO), laraItem.RoomNumber);
+			auto target = GameVector(GetJointPosition(&playerItem, LM_TORSO), playerItem.RoomNumber);
 			bool los = LOS(&origin, &target);
 
 			// Interpolate orientation.
@@ -69,15 +106,15 @@ namespace TEN::Entities::Creatures::TR5
 			auto orientTo = los ? Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) : item.Pose.Orientation;
 			orient.Lerp(orientTo, AUTO_GUN_ORIENT_LERP_ALPHA);
 
-			item.ItemFlags[0] = orient.x; // NOTE: ItemFlags[0] stores X axis orientation.
-			item.ItemFlags[1] = orient.y; // NOTE: ItemFlags[1] stores Y axis orientation.
+			item.ItemFlags[0] = orient.x;
+			item.ItemFlags[1] = orient.y;
 
 			auto deltaAngle = orient - orientTo;
 
 			// Handle joint rotation.
 			autoGun.JointRotation[0] = orient.y;
 			autoGun.JointRotation[1] = orient.x;
-			autoGun.JointRotation[2] += item.ItemFlags[2]; // NOTE: ItemFlags[2] stores barrel turn rate.
+			autoGun.JointRotation[2] += item.ItemFlags[2];
 
 			// Fire gunshot.
 			if (los &&
@@ -96,11 +133,11 @@ namespace TEN::Entities::Creatures::TR5
 					// Spawn blood.
 					if (Random::TestProbability(AUTO_GUN_BLOOD_EFFECT_CHANCE))
 					{
-						DoDamage(&laraItem, AUTO_GUN_SHOT_DAMAGE);
+						DoDamage(&playerItem, AUTO_GUN_SHOT_DAMAGE);
 
-						auto bloodPos = GetJointPosition(&laraItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
+						auto bloodPos = GetJointPosition(&playerItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
 						float bloodVel = Random::GenerateFloat(4.0f, 8.0f);
-						DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), laraItem.RoomNumber);
+						DoBloodSplat(bloodPos.x, bloodPos.y, bloodPos.z, bloodVel, Random::GenerateAngle(), playerItem.RoomNumber);
 					}
 					// Spawn ricochet. TODO: Simplify.
 					else
@@ -163,37 +200,5 @@ namespace TEN::Entities::Creatures::TR5
 
 			AnimateItem(&item);
 		}		
-	}
-
-	void SpawnAutoGunSmoke(const Vector3& pos, char shade)
-	{
-		auto& smoke = SmokeSparks[GetFreeSmokeSpark()];
-
-		auto sphere = BoundingSphere(pos, BLOCK(1 / 64.0f));
-		auto smokePos = Random::GeneratePointInSphere(sphere);
-
-		smoke.on = true;
-		smoke.sShade = 0;
-		smoke.dShade = shade;
-		smoke.colFadeSpeed = 4;
-		smoke.fadeToBlack = 32;
-		smoke.blendMode = BlendMode::Additive;
-		smoke.life = smoke.sLife = Random::GenerateInt(40, 44);
-		smoke.x = smokePos.x;
-		smoke.y = smokePos.y;
-		smoke.z = smokePos.z;
-		smoke.xVel = 0;
-		smoke.yVel = 0;
-		smoke.zVel = 0;
-		smoke.friction = 4;
-		smoke.flags = SP_ROTATE;
-		smoke.rotAng = Random::GenerateInt(0, 4096);
-		smoke.rotAdd = Random::GenerateInt(-32, 32);
-		smoke.maxYvel = 0;
-		smoke.gravity = Random::GenerateInt(-4, -8);
-		smoke.mirror = 0;
-		smoke.dSize = Random::GenerateInt(24, 40);
-		smoke.sSize = smoke.dSize / 4;
-		smoke.size = smoke.dSize / 4;
 	}
 }
