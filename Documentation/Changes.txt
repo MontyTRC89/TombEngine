@@ -6,6 +6,7 @@ Version 1.3
 * Fix bug with OCB 2 on pushables.
 * Fix pushable "stop" sound bug.
 * Fix pushable camera bug during edge slip.
+* Fix lack of water splash in certain scenarios.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Fix Hydra flame not showing when charging.
 * fix shockwave light for hammer god.
