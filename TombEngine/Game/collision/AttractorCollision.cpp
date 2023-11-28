@@ -204,13 +204,9 @@ namespace TEN::Collision::Attractor
 				return (attracColl0.Proximity.Distance2D < attracColl1.Proximity.Distance2D);
 			});
 
-		// TODO: Avoid copying! std::vector's resize() method doesn't like pointers?
 		// Trim collection.
 		if (attracColls.size() > COLL_COUNT_MAX)
-		{
-			auto resizedColls = std::vector<AttractorCollisionData>(attracColls.begin(), attracColls.begin() + COLL_COUNT_MAX);
-			attracColls.swap(resizedColls);
-		}
+			attracColls.resize(COLL_COUNT_MAX);
 
 		// Return attractor collisions in capped vector sorted by 2D then 3D distance.
 		return attracColls;

@@ -30,6 +30,7 @@ namespace TEN::Collision::Attractor
 		bool		  IsInFront		  = false;
 
 		// Constructors
+		AttractorCollisionData() {};
 		AttractorCollisionData(Attractor& attrac, const Vector3& pos, short headingAngle, const Vector3& probePoint);
 
 	private:
