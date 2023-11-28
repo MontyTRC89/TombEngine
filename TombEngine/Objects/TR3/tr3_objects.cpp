@@ -13,6 +13,7 @@
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
+#include "Objects/TR3/Entity/TwinAutoGun.h"
 #include "Objects/TR3/Entity/WaspMutant.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
@@ -330,6 +331,20 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
 		obj->SetHitEffect();
+	}
+
+	obj = &Objects[ID_TWIN_AUTO_GUN];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeTwinAutoGun;
+		obj->control = ControlTwinAutoGun;
+		obj->collision = CreatureCollision;
+		obj->HitRoutine = HitTwinAutoGun;
+		obj->HitPoints = 28;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(0, ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_PUNA_BOSS];
