@@ -645,26 +645,25 @@ bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 	}
 }
 
-// NOTE: Previously ItemPushLara().
-bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool enableSpasm, char bigPush)
+bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool enableSpasm, char bigPushFlags)
 {
 	constexpr auto SOFT_PUSH_LERP_ALPHA = 0.25f;
 
-	const auto& object = Objects[item->ObjectNumber];
+	const auto& object = Objects[item0->ObjectNumber];
 
-	auto deltaPos = item2->Pose.Position - item->Pose.Position;
+	auto deltaPos = item1->Pose.Position - item0->Pose.Position;
 
 	// Rotate relative position into item frame.
-	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(-item->Pose.Orientation.y));
+	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(-item0->Pose.Orientation.y));
 	auto relDeltaPos = Vector3i(Vector3::Transform(deltaPos.ToVector3(), rotMatrix));
 
-	const auto& bounds = (bigPush & 2) ? GlobalCollisionBounds : GameBoundingBox(item);
+	const auto& bounds = (bigPushFlags & 2) ? GlobalCollisionBounds : GameBoundingBox(item0);
 	int minX = bounds.X1;
 	int maxX = bounds.X2;
 	int minZ = bounds.Z1;
 	int maxZ = bounds.Z2;
 
-	if (bigPush & 1)
+	if (bigPushFlags & 1)
 	{
 		minX -= coll->Setup.Radius;
 		maxX += coll->Setup.Radius;
@@ -680,26 +679,27 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 		return false;
 	}
 
+	int front = maxZ - relDeltaPos.z;
+	int back = relDeltaPos.z - minZ;
 	int left = relDeltaPos.x - minX;
-	int top = maxZ - relDeltaPos.z;
-	int bottom = relDeltaPos.z - minZ;
 	int right = maxX - relDeltaPos.x;
 
-	if (right <= left && right <= top && right <= bottom)
+	// Account for collision radius.
+	if (right <= left && right <= front && right <= back)
 	{
 		relDeltaPos.x += right;
 	}
-	else if (left <= right && left <= top && left <= bottom)
+	else if (left <= right && left <= front && left <= back)
 	{
 		relDeltaPos.x -= left;
 	}
-	else if (top <= left && top <= right && top <= bottom)
+	else if (front <= left && front <= right && front <= back)
 	{
-		relDeltaPos.z += top;
+		relDeltaPos.z += front;
 	}
 	else
 	{
-		relDeltaPos.z -= bottom;
+		relDeltaPos.z -= back;
 	}
 
 	// Lerp to new position.
@@ -708,27 +708,28 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	{
 		// TODO: Improve sphere-dependent pushes.
 		// Current sphere-box push combination is extremely unstable with large creatures such as the TR2 dragon. -- Sezz 2023.11.21
-		// Possible solution: lerp to the position where a sphere's edge is tangential to the nearest box edge.
-		// Must somehow determine the best sphere to reference. The one which pushes the farthest?
-		// Also, clamp distance to the box edge to avoid overshooting.
+		// Possible solution: lerp to the position of a sphere's tangent toward the nearest box edge.
+		// Must somehow determine the best sphere to reference. Maybe the one which pushes farthest?
+		// Also, clamp distance the box edge to avoid overshooting.
 
-		item2->Pose.Position.Lerp(item->Pose.Position + newDeltaPos, SOFT_PUSH_LERP_ALPHA);
+		item1->Pose.Position.Lerp(item0->Pose.Position + newDeltaPos, SOFT_PUSH_LERP_ALPHA);
 	}
+	// Snap to new position.
 	else
 	{
-		item2->Pose.Position = item->Pose.Position + newDeltaPos;
+		item1->Pose.Position = item0->Pose.Position + newDeltaPos;
 	}
 
-	if (item2->IsLara() && enableSpasm && bounds.GetHeight() > CLICK(1))
+	if (item1->IsLara() && enableSpasm && bounds.GetHeight() > CLICK(1))
 	{
-		auto& player = GetLaraInfo(*item2);
+		auto& player = GetLaraInfo(*item1);
 
 		// TODO: Rewrite player spasm effect.
 		player.HitDirection = NORTH;
 		player.HitFrame = 0;
 		
 		// Dummy hurt call for sound.
-		DoDamage(item2, 0); 
+		DoDamage(item1, 0); 
 	}
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -737,24 +738,24 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool ena
 	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
 	short headingAngle = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.PrevPosition.z, item2->Pose.Position.x - coll->Setup.PrevPosition.x);
-	GetCollisionInfo(coll, item2);
+	coll->Setup.ForwardAngle = phd_atan(item1->Pose.Position.z - coll->Setup.PrevPosition.z, item1->Pose.Position.x - coll->Setup.PrevPosition.x);
+	GetCollisionInfo(coll, item1);
 	coll->Setup.ForwardAngle = headingAngle;
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.PrevPosition = item2->Pose.Position;
+		coll->Setup.PrevPosition = item1->Pose.Position;
 	}
 	else
 	{
-		item2->Pose.Position.x = coll->Setup.PrevPosition.x;
-		item2->Pose.Position.z = coll->Setup.PrevPosition.z;
+		item1->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item1->Pose.Position.z = coll->Setup.PrevPosition.z;
 	}
 
 	// If player is interacting with an item, cancel it.
-	if (item2->IsLara())
+	if (item1->IsLara())
 	{
-		auto& player = GetLaraInfo(*item2);
+		auto& player = GetLaraInfo(*item1);
 
 		if (player.Control.Count.PositionAdjust > (PLAYER_POSITION_ADJUST_MAX_TIME / 6))
 		{
