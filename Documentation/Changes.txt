@@ -6,12 +6,15 @@ Version 1.3
 * Fix bug with OCB 2 on pushables.
 * Fix pushable "stop" sound bug.
 * Fix pushable camera bug during edge slip.
+* Fix lack of water splash in certain scenarios.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Fix Hydra flame not showing when charging.
 * fix shockwave light for hammer god.
 * Improve fly cheat collision.
 * Add fast speed for fly cheat by holding Sprint input action.
 * Allow walking on slopes when wading in water. (Like in quicksand)
+* Add Twin turret gun from TR3.
+* Port Winston from TR3.
 
 Version 1.2
 ===========
