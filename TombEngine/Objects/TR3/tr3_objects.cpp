@@ -14,6 +14,7 @@
 #include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
 #include "Objects/TR3/Entity/WaspMutant.h" // OK
+#include "Objects/TR3/Entity/Winston.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_claw_mutant.h" // OK
@@ -393,6 +394,19 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Z);
 		obj->SetBoneRotationFlags(7, ROT_Y);
+		obj->SetHitEffect();
+	}
+
+	obj = &Objects[ID_WINSTON];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeCreature;
+		obj->control = ControlWinston;
+		obj->collision = ObjectCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->HitPoints = 20;
+		obj->radius = 102;
+		obj->intelligent = true;
 		obj->SetHitEffect();
 	}
 }
