@@ -114,29 +114,29 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
 				int soundEnvFlag = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment flag.
 
-				// Get sound environment from flag.
-				auto soundEnv = SoundEnvironment::Always;
+				// Get required sound environment from flag.
+				auto requiredSoundEnv = SoundEnvironment::Always;
 				switch (soundEnvFlag)
 				{
 				default:
 				case 0:
-					soundEnv = SoundEnvironment::Always;
+					requiredSoundEnv = SoundEnvironment::Always;
 					break;
 
 				case (1 << 14):
-					soundEnv = SoundEnvironment::DryLand;
+					requiredSoundEnv = SoundEnvironment::DryLand;
 					break;
 
 				case (1 << 15):
-					soundEnv = SoundEnvironment::WetLand;
+					requiredSoundEnv = SoundEnvironment::WetLand;
 					break;
 
 				case (1 << 12):
-					soundEnv = SoundEnvironment::Swamp;
+					requiredSoundEnv = SoundEnvironment::Swamp;
 					break;
 
 				case (1 << 13):
-					soundEnv = SoundEnvironment::Underwater;
+					requiredSoundEnv = SoundEnvironment::Underwater;
 					break;
 				}
 
@@ -145,16 +145,16 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
 
 				// Get sound environment for sound effect.
-				auto soundEffectEnv = std::optional<SoundEnvironment>(std::nullopt);
-				switch (soundEnv)
+				auto soundEnv = std::optional<SoundEnvironment>(std::nullopt);
+				switch (requiredSoundEnv)
 				{
 				case SoundEnvironment::Always:
-					soundEffectEnv = SoundEnvironment::Always;
+					soundEnv = SoundEnvironment::Always;
 					break;
 
 				case SoundEnvironment::DryLand:
 					if (!isWater && !isSwamp)
-						soundEffectEnv = SoundEnvironment::DryLand;
+						soundEnv = SoundEnvironment::DryLand;
 
 					break;
 
@@ -163,26 +163,26 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 					{
 						// HACK: Must update assets before changing to SoundEnvironment::WetLand for water creatures.
 						const auto& object = Objects[item.ObjectNumber];
-						soundEffectEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::WetLand;
+						soundEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::WetLand;
 					}
 
 					break;
 
 				case SoundEnvironment::Swamp:
 					if (isSwamp)
-						soundEffectEnv = SoundEnvironment::Swamp;
+						soundEnv = SoundEnvironment::Swamp;
 
 					break;
 
 				case SoundEnvironment::Underwater:
 					if (isWater)
-						soundEffectEnv = SoundEnvironment::Underwater;
+						soundEnv = SoundEnvironment::Underwater;
 
 					break;
 				}
 
-				if (soundEffectEnv.has_value())
-					SoundEffect(soundID, &item.Pose, *soundEffectEnv);
+				if (soundEnv.has_value())
+					SoundEffect(soundID, &item.Pose, *soundEnv);
 			}
 
 			commandDataPtr += 2;
