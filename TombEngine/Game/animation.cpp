@@ -153,7 +153,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 					break;
 
 				case SoundEnvironment::DryLand:
-					if (!isWater)
+					if (!isWater && !isSwamp)
 						soundEffectEnv = SoundEnvironment::DryLand;
 
 					break;
