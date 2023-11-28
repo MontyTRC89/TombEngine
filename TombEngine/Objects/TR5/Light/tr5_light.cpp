@@ -182,7 +182,7 @@ void ElectricalLightControl(short itemNumber)
 
 			intensity = item->ItemFlags[1] - Random::GenerateInt(0, 128);
 			if (intensity > 64)
-				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Pose, SoundEnvironment::Land, 1.0f, intensity / 192.0f);
+				SoundEffect(SFX_TR5_ELECTRIC_LIGHT_CRACKLES, &item->Pose, SoundEnvironment::DryLand, 1.0f, intensity / 192.0f);
 		}
 		else
 		{

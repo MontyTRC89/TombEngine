@@ -48,9 +48,11 @@ enum class SoundTrackType
 
 enum class SoundEnvironment
 {
-	Land,
-	Water,
-	Always
+	Always,
+	DryLand,
+	WetLand,
+	Swamp,
+	Underwater
 };
 
 enum class SoundPlayMode
@@ -151,7 +153,7 @@ struct SoundSourceInfo
 extern std::map<std::string, int> SoundTrackMap;
 extern std::unordered_map<int, SoundTrackInfo> SoundTracks;
 
-bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition = SoundEnvironment::Land, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
+bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition = SoundEnvironment::DryLand, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();

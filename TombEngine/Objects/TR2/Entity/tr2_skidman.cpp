@@ -293,7 +293,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			creature->JointRotation[0] = (creature->JointRotation[0] == 1) ? 2 : 1;
 			DoSnowEffect(skidooItem);
-			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &skidooItem->Pose, SoundEnvironment::Land, 0.5f + skidooItem->Animation.Velocity.z / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
+			SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &skidooItem->Pose, SoundEnvironment::DryLand, 0.5f + skidooItem->Animation.Velocity.z / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 		}
 
 		CreatureAnimation(skidooItemNumber, headingAngle, 0);

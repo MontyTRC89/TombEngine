@@ -48,7 +48,7 @@ void ControlMissile(short fxNumber)
 	auto& fx = EffectList[fxNumber];
 
 	auto isUnderwater = TestEnvironment(ENV_FLAG_WATER, fx.roomNumber);
-	auto soundFXType = isUnderwater ? SoundEnvironment::Water : SoundEnvironment::Land;
+	auto soundFXType = isUnderwater ? SoundEnvironment::WetLand : SoundEnvironment::DryLand;
 
 	if (fx.objectNumber == ID_SCUBA_HARPOON && isUnderwater &&
 		fx.pos.Orientation.x > ANGLE(-67.5f))

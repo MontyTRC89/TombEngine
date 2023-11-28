@@ -144,7 +144,7 @@ void ControlBodyPart(short fxNumber)
 						}
 						else if (fx->flag2 & BODY_GIBS)
 						{
-							SoundEffect(SFX_TR4_LARA_THUD, &fx->pos, SoundEnvironment::Land, GenerateFloat(0.8f, 1.2f));
+							SoundEffect(SFX_TR4_LARA_THUD, &fx->pos, SoundEnvironment::DryLand, GenerateFloat(0.8f, 1.2f));
 						}
 					}
 				}

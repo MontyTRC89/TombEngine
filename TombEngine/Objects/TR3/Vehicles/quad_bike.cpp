@@ -1142,7 +1142,7 @@ namespace TEN::Entities::Vehicles
 			else if (quadBike->Pitch > 0xA000)
 				quadBike->Pitch = 0xA000;
 
-			SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_MOVE, &quadBikeItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(quadBike->Pitch) / (float)MAX_VELOCITY);
+			SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_MOVE, &quadBikeItem->Pose, SoundEnvironment::DryLand, 0.5f + (float)abs(quadBike->Pitch) / (float)MAX_VELOCITY);
 		}
 		else
 		{

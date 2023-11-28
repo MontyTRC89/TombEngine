@@ -110,43 +110,71 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 		case AnimCommandType::SoundEffect:
 			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
 			{
+				// Get sound ID and sound environment from packed data.
+				int soundID = commandDataPtr[1] & 0xFFF;		// Exclude last 4 bits for sound ID.
+				int soundEnvFlags = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment.
+
 				if (!Objects[item.ObjectNumber].waterCreature)
 				{
-					bool playInWater = (commandDataPtr[1] & 0x8000) != 0;
-					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
-					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
+					auto soundEnv = SoundEnvironment::Always;
+					switch (soundEnvFlags)
+					{
+					case 0:
+						soundEnv = SoundEnvironment::Always;
+						break;
+
+					case (1 << 14):
+						soundEnv = SoundEnvironment::DryLand;
+						break;
+
+					case (1 << 15):
+						soundEnv = SoundEnvironment::WetLand;
+						break;
+
+					case (1 << 12):
+						soundEnv = SoundEnvironment::Swamp;
+						break;
+
+					case (1 << 13):
+						soundEnv = SoundEnvironment::Underwater;
+						break;
+					}
 
 					if (item.IsLara())
 					{
-						auto& player = GetLaraInfo(item);
+						const auto& player = GetLaraInfo(item);
 
-						if (playAlways ||
-							(playOnLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
+						if (soundEnv == SoundEnvironment::Always ||
+							(soundEnv == SoundEnvironment::DryLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
+							(soundEnv == SoundEnvironment::WetLand && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
 						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
+							SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
 						}
 					}
 					else
 					{
 						if (item.RoomNumber == NO_ROOM)
 						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
+							SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
 						}
 						else if (TestEnvironment(ENV_FLAG_WATER, &item))
 						{
-							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
+							if (soundEnv == SoundEnvironment::Always ||
+								(soundEnv == SoundEnvironment::WetLand && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
+							{
+								SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
+							}
 						}
-						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
+						else if (soundEnv == SoundEnvironment::Always ||
+							(soundEnv == SoundEnvironment::DryLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
 						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
+							SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
 						}
 					}
 				}
 				else
 				{
-					SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
+					SoundEffect(soundID, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::WetLand : SoundEnvironment::DryLand);
 				}
 			}
 

@@ -589,7 +589,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 			}
 			else
 			{
-				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
+				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::DryLand, 0.9f);
 			}
 		}
 		else if ((IsHeld(In::StepRight) && !IsHeld(In::StepLeft)) ||
@@ -602,7 +602,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 			}
 			else
 			{
-				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
+				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::DryLand, 1.0f);
 			}
 		}
 	}
@@ -1029,7 +1029,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 {
 	constexpr auto BUBBLE_COUNT_MAX = 3;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::WetLand);
 
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1483,7 +1483,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / BLOCK(8);
 		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / BLOCK(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
-		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
+		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::WetLand, 1.0f + (mul1 + mul2), vol);
 	}
 }
 

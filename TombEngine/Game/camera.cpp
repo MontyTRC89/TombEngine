@@ -1543,7 +1543,7 @@ void UpdateMikePos(const ItemInfo& item)
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
-		SoundEffect(SFX_TR5_KLAXON, nullptr, SoundEnvironment::Land, 0.25f);
+		SoundEffect(SFX_TR5_KLAXON, nullptr, SoundEnvironment::DryLand, 0.25f);
 
 	if (RumbleTimer >= 0)
 		RumbleTimer++;

@@ -1207,14 +1207,14 @@ namespace TEN::Entities::Vehicles
 			else if (motorbike->Pitch > MOTORBIKE_PITCH_MAX)
 				motorbike->Pitch = MOTORBIKE_PITCH_MAX;
 
-			SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::Land, 0.7f + motorbike->Pitch / 24756.0f);
+			SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::DryLand, 0.7f + motorbike->Pitch / 24756.0f);
 		}
 		else
 		{
 			if (drive != -1)
 			{
 				SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_IDLE, &motorbikeItem->Pose);
-				SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::Land, 0.7f + motorbike->Pitch / 24756.0f, 0.5f);
+				SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::DryLand, 0.7f + motorbike->Pitch / 24756.0f, 0.5f);
 			}
 
 			motorbike->Pitch = 0;

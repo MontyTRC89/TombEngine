@@ -924,9 +924,9 @@ namespace TEN::Entities::Vehicles
 		rBoat->Pitch += ((pitch - rBoat->Pitch) / 4);
 
 		if (rBoatItem->Animation.Velocity.z > 8)
-			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_MOVING, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
+			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_MOVING, &rBoatItem->Pose, SoundEnvironment::DryLand, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
 		else if (drive)
-			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_IDLE, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
+			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_IDLE, &rBoatItem->Pose, SoundEnvironment::DryLand, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
 
 		if (lara->Context.Vehicle != itemNumber)
 			return;

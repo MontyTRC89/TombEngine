@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR3
 						ShotLara(item, &AI, MPGunBite, extraTorsoRot.y, 32);
 						creature->MuzzleFlash[0].Bite = MPGunBite;
 						creature->MuzzleFlash[0].Delay = 2;
-						SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, SoundEnvironment::Land, 1.0f, 0.7f);
+						SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, SoundEnvironment::DryLand, 1.0f, 0.7f);
 					}
 				}
 			}

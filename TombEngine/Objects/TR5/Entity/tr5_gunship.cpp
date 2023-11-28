@@ -82,7 +82,7 @@ namespace TEN::Entities::Creatures::TR5
 				item->MeshBits &= 0xFEFF;
 
 			if (GunShipCounter < 15)
-				SoundEffect(SFX_TR4_HK_FIRE, &item->Pose, SoundEnvironment::Land, 0.8f);
+				SoundEffect(SFX_TR4_HK_FIRE, &item->Pose, SoundEnvironment::DryLand, 0.8f);
 
 			if (!(GlobalCounter & 1))
 				return AnimateItem(item);

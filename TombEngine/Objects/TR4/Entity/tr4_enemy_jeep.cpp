@@ -372,7 +372,7 @@ namespace TEN::Entities::TR4
 				item->Animation.Velocity.y = 0;
 			}
 
-			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / BLOCK(8)); // TODO: Check actual sound!
+			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::DryLand, 1.0f + (float)item->ItemFlags[0] / BLOCK(8)); // TODO: Check actual sound!
 		}
 	}
 }

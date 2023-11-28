@@ -84,7 +84,7 @@ namespace TEN::Entities::Creatures::TR5
 				abs(deltaAngle.x) <= AUTO_GUN_FIRE_CONSTRAINT_ANGLE &&
 				abs(deltaAngle.y) <= AUTO_GUN_FIRE_CONSTRAINT_ANGLE)
 			{
-				SoundEffect(SFX_TR4_HK_FIRE, &item.Pose, SoundEnvironment::Land, 0.8f);
+				SoundEffect(SFX_TR4_HK_FIRE, &item.Pose, SoundEnvironment::DryLand, 0.8f);
 
 				if (GlobalCounter & 1)
 				{

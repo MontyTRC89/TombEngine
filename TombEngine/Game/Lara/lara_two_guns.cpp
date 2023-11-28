@@ -165,7 +165,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 
 						if (!hasFired)
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 0.9f, 0.3f);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::DryLand, 0.9f, 0.3f);
 							SoundEffect(weapon.SampleNum, &laraItem.Pose);
 							hasFired = true;
 						}
