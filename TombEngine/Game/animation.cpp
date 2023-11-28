@@ -110,15 +110,17 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 		case AnimCommandType::SoundEffect:
 			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
 			{
-				// Get sound ID and sound environment from packed data.
-				int soundID = commandDataPtr[1] & 0xFFF;		// Exclude last 4 bits for sound ID.
-				int soundEnvFlags = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment.
+				// Get sound ID and sound environment flag from packed data.
+				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
+				int soundEnvFlag = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment flag.
 
 				if (!Objects[item.ObjectNumber].waterCreature)
 				{
+					// Get sound environment.
 					auto soundEnv = SoundEnvironment::Always;
-					switch (soundEnvFlags)
+					switch (soundEnvFlag)
 					{
+					default:
 					case 0:
 						soundEnv = SoundEnvironment::Always;
 						break;

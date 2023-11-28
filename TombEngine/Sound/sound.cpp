@@ -157,12 +157,13 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	if (BASS_GetDevice() == -1)
 		return false;
 
+	// TODO: Adjust logic for new way.
 	if (condition != SoundEnvironment::Always)
 	{
-		// Get current camera room's environment
+		// Get camera environment.
 		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) ? SoundEnvironment::WetLand : SoundEnvironment::DryLand;
 
-		// Don't play effect if effect's environment isn't the same as camera position's environment
+		// Skip playing if sound effect environment doesn't match camera environment.
 		if (condition != cameraCondition)
 			return false;
 	}
@@ -174,16 +175,17 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		TENLog("Missing sound effect: " + std::to_string(effectID), LogLevel::Warning);
+		TENLog("Missing sound effect " + std::to_string(effectID), LogLevel::Warning);
 		g_Level.SoundMap[effectID] = -2;
 		return false;
 	}
 	else if (sampleIndex == -2)
+	{
 		return false;
+	}
 
-	SampleInfo* sampleInfo = &g_Level.SoundDetails[sampleIndex];
-
-	if (sampleInfo->Number < 0)
+	const auto& sample = g_Level.SoundDetails[sampleIndex];
+	if (sample.Number < 0)
 	{
 		TENLog("No valid samples count for effect " + std::to_string(sampleIndex), LogLevel::Warning);
 		return false;
@@ -193,7 +195,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	DWORD sampleFlags = SOUND_SAMPLE_FLAGS;
 
 	// Effect's chance to play.
-	if ((sampleInfo->Randomness) && ((GetRandomControl() & UCHAR_MAX) > sampleInfo->Randomness))
+	if (sample.Randomness && ((GetRandomControl() & UCHAR_MAX) > sample.Randomness))
 		return false;
 
 	// Apply 3D attrib only to sound with position property
@@ -201,19 +203,19 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 		sampleFlags |= BASS_SAMPLE_3D;
 
 	// Set & randomize volume (if needed)
-	float gain = (static_cast<float>(sampleInfo->Volume) / UCHAR_MAX) * std::clamp(gainMultiplier, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);
-	if ((sampleInfo->Flags & SOUND_FLAG_RND_GAIN))
+	float gain = (static_cast<float>(sample.Volume) / UCHAR_MAX) * std::clamp(gainMultiplier, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);
+	if ((sample.Flags & SOUND_FLAG_RND_GAIN))
 		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX))* SOUND_MAX_GAIN_CHANGE;
 
 	// Set and randomize pitch and additionally multiply by provided value (for vehicles etc)
-	float pitch = (1.0f + static_cast<float>(sampleInfo->Pitch) / 127.0f) * std::clamp(pitchMultiplier, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);
+	float pitch = (1.0f + static_cast<float>(sample.Pitch) / 127.0f) * std::clamp(pitchMultiplier, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);
 
 	// Randomize pitch (if needed)
-	if ((sampleInfo->Flags & SOUND_FLAG_RND_PITCH))
+	if ((sample.Flags & SOUND_FLAG_RND_PITCH))
 		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f) * SOUND_MAX_PITCH_CHANGE * 2.0f;
 
 	// Calculate sound radius and distance to sound
-	float radius = (float)(sampleInfo->Radius) * BLOCK(1);
+	float radius = (float)(sample.Radius) * BLOCK(1);
 	float distance = Sound_DistanceToListener(position);
 
 	// Don't play sound if it's too far from listener's position.
@@ -227,7 +229,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	int existingChannel = Sound_EffectIsPlaying(effectID, position);
 
 	// Select behaviour based on effect playback type (bytes 0-1 of flags field)
-	auto playType = (SoundPlayMode)(sampleInfo->Flags & 3);
+	auto playType = (SoundPlayMode)(sample.Flags & 3);
 	switch (playType)
 	{
 	case SoundPlayMode::Normal:
@@ -256,11 +258,11 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 
 	// Randomly select arbitrary sample from the list, if more than one is present
 	int sampleToPlay = 0;
-	int numSamples = (sampleInfo->Flags >> 2) & 15;
+	int numSamples = (sample.Flags >> 2) & 15;
 	if (numSamples == 1)
-		sampleToPlay = sampleInfo->Number;
+		sampleToPlay = sample.Number;
 	else
-		sampleToPlay = sampleInfo->Number + (int)((GetRandomControl() * numSamples) >> 15);
+		sampleToPlay = sample.Number + (int)((GetRandomControl() * numSamples) >> 15);
 
 	// Get free channel to play sample
 	int freeSlot = Sound_GetFreeSlot();
