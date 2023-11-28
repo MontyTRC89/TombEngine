@@ -88,7 +88,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	player.Context.WaterSurfaceDist = -water.HeightFromWater;
 
 	if (player.Context.Vehicle == NO_ITEM)
-		SpawnPlayerSplash(*item, water.WaterHeight, water.WaterDepth);
+		SpawnPlayerWaterSurfaceEffects(*item, water.WaterHeight, water.WaterDepth);
 
 	bool isWaterOnHeadspace = false;
 
@@ -145,7 +145,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					}
 
 					ResetPlayerFlex(item);
-					Splash(item);
 				}
 			}
 			// Water is at wade depth; update water status and do special handling.
@@ -158,7 +157,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->Animation.IsAirborne && !water.IsSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
-					Splash(item);
 				}
 				// Player is grounded; don't splash again.
 				else if (!item->Animation.IsAirborne)
