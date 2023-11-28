@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR5/Entity/AutoGunVci.h"
+#include "Objects/TR5/Entity/AutoGun.h"
 
 #include "Game/animation.h"
 #include "Game/collision/sphere.h"
@@ -23,32 +23,32 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {
-	constexpr auto AUTO_GUN_VCI_SHOT_DAMAGE			= 20;
-	constexpr auto AUTO_GUN_VCI_BLOOD_EFFECT_CHANCE = 3 / 4.0f;
+	constexpr auto AUTO_GUN_SHOT_DAMAGE			= 20;
+	constexpr auto AUTO_GUN_BLOOD_EFFECT_CHANCE = 3 / 4.0f;
 
-	constexpr auto AUTO_GUN_VCI_ORIENT_LERP_ALPHA	  = 0.1f;
-	constexpr auto AUTO_GUN_VCI_BARREL_TURN_RATE	  = ANGLE(0.35f);
-	constexpr auto AUTO_GUN_VCI_FIRE_CONSTRAINT_ANGLE = ANGLE(5.6f);
+	constexpr auto AUTO_GUN_ORIENT_LERP_ALPHA	  = 0.1f;
+	constexpr auto AUTO_GUN_BARREL_TURN_RATE	  = ANGLE(0.35f);
+	constexpr auto AUTO_GUN_FIRE_CONSTRAINT_ANGLE = ANGLE(5.6f);
 
-	constexpr auto AUTO_GUN_VCI_BARREL_JOINT_INDEX = 9;
+	constexpr auto AUTO_GUN_BARREL_JOINT_INDEX = 9;
 
-	const auto AutoGunVciChassisJoints	   = std::vector<unsigned int>{ 0, 1, 2, 3, 4, 5, 6, 11, 12};
-	const auto AutoGunVciBodyJoints		   = std::vector<unsigned int>{ 7, 9 };
-	const auto AutoGunVciClosedHatchJoints = std::vector<unsigned int>{ 10 };
-	const auto AutoGunVciFlashJoints	   = std::vector<unsigned int>{ 8 };
+	const auto AutoGunChassisJoints		= std::vector<unsigned int>{ 0, 1, 2, 3, 4, 5, 6, 11, 12};
+	const auto AutoGunBodyJoints		= std::vector<unsigned int>{ 7, 9 };
+	const auto AutoGunClosedHatchJoints = std::vector<unsigned int>{ 10 };
+	const auto AutoGunFlashJoints		= std::vector<unsigned int>{ 8 };
 
-	void InitializeAutoGunVci(short itemNumber)
+	void InitializeAutoGun(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		item.Data = std::array<short, 4>();
 
 		item.Status = ITEM_NOT_ACTIVE;
-		item.MeshBits.Clear(AutoGunVciFlashJoints);
-		item.MeshBits.Set(AutoGunVciBodyJoints);
-		item.MeshBits.Set(AutoGunVciChassisJoints);
+		item.MeshBits.Clear(AutoGunFlashJoints);
+		item.MeshBits.Set(AutoGunBodyJoints);
+		item.MeshBits.Set(AutoGunChassisJoints);
 	}
 
-	static void SpawnAutoGunVciSmoke(const Vector3& pos, char shade)
+	static void SpawnAutoGunSmoke(const Vector3& pos, char shade)
 	{
 		auto& smoke = SmokeSparks[GetFreeSmokeSpark()];
 
@@ -80,7 +80,7 @@ namespace TEN::Entities::Creatures::TR5
 		smoke.size = smoke.dSize / 4;
 	}
 
-	void ControlAutoGunVci(short itemNumber)
+	void ControlAutoGun(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto& playerItem = *LaraItem;
@@ -93,8 +93,8 @@ namespace TEN::Entities::Creatures::TR5
 			auto& autoGun = *GetCreatureInfo(&item);
 
 			// Set visible meshes.
-			item.MeshBits.Set(AutoGunVciClosedHatchJoints);
-			item.MeshBits.Clear(AutoGunVciChassisJoints);
+			item.MeshBits.Set(AutoGunClosedHatchJoints);
+			item.MeshBits.Clear(AutoGunChassisJoints);
 
 			// Assess line of sight.
 			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
@@ -104,7 +104,7 @@ namespace TEN::Entities::Creatures::TR5
 			// Interpolate orientation.
 			auto orient = EulerAngles(item.ItemFlags[0], item.ItemFlags[1], 0);
 			auto orientTo = los ? Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3()) : item.Pose.Orientation;
-			orient.Lerp(orientTo, AUTO_GUN_VCI_ORIENT_LERP_ALPHA);
+			orient.Lerp(orientTo, AUTO_GUN_ORIENT_LERP_ALPHA);
 
 			item.ItemFlags[0] = orient.x;
 			item.ItemFlags[1] = orient.y;
@@ -118,22 +118,22 @@ namespace TEN::Entities::Creatures::TR5
 
 			// Fire gunshot.
 			if (los &&
-				abs(deltaAngle.x) <= AUTO_GUN_VCI_FIRE_CONSTRAINT_ANGLE &&
-				abs(deltaAngle.y) <= AUTO_GUN_VCI_FIRE_CONSTRAINT_ANGLE)
+				abs(deltaAngle.x) <= AUTO_GUN_FIRE_CONSTRAINT_ANGLE &&
+				abs(deltaAngle.y) <= AUTO_GUN_FIRE_CONSTRAINT_ANGLE)
 			{
 				SoundEffect(SFX_TR4_HK_FIRE, &item.Pose, SoundEnvironment::Land, 0.8f);
 
 				if (GlobalCounter & 1)
 				{
-					item.MeshBits.Set(AutoGunVciFlashJoints);
+					item.MeshBits.Set(AutoGunFlashJoints);
 
 					auto lightColor = Vector3(Random::GenerateFloat(0.75f, 0.85f), Random::GenerateFloat(0.5f, 0.6f), 0.0f) * 255;
 					TriggerDynamicLight(origin.x, origin.y, origin.z, 10, lightColor.x, lightColor.y, lightColor.z);
 
 					// Spawn blood.
-					if (Random::TestProbability(AUTO_GUN_VCI_BLOOD_EFFECT_CHANCE))
+					if (Random::TestProbability(AUTO_GUN_BLOOD_EFFECT_CHANCE))
 					{
-						DoDamage(&playerItem, AUTO_GUN_VCI_SHOT_DAMAGE);
+						DoDamage(&playerItem, AUTO_GUN_SHOT_DAMAGE);
 
 						auto bloodPos = GetJointPosition(&playerItem, Random::GenerateInt(0, NUM_LARA_MESHES - 1));
 						float bloodVel = Random::GenerateFloat(4.0f, 8.0f);
@@ -174,29 +174,29 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else
 				{
-					item.MeshBits.Clear(AutoGunVciFlashJoints);
+					item.MeshBits.Clear(AutoGunFlashJoints);
 				}
 
-				if (item.ItemFlags[2] < AUTO_GUN_VCI_FIRE_CONSTRAINT_ANGLE)
-					item.ItemFlags[2] += AUTO_GUN_VCI_BARREL_TURN_RATE;
+				if (item.ItemFlags[2] < AUTO_GUN_FIRE_CONSTRAINT_ANGLE)
+					item.ItemFlags[2] += AUTO_GUN_BARREL_TURN_RATE;
 			}
 			// Reset barrel.
 			else
 			{
 				if (item.ItemFlags[2] != 0)
-					item.ItemFlags[2] -= AUTO_GUN_VCI_BARREL_TURN_RATE;
+					item.ItemFlags[2] -= AUTO_GUN_BARREL_TURN_RATE;
 
-				item.MeshBits.Clear(AutoGunVciFlashJoints);
+				item.MeshBits.Clear(AutoGunFlashJoints);
 			}
 
 			if (item.ItemFlags[2] != 0)
-				SpawnAutoGunVciSmoke(GetJointPosition(&item, AUTO_GUN_VCI_BARREL_JOINT_INDEX).ToVector3(), item.ItemFlags[2] / 16);
+				SpawnAutoGunSmoke(GetJointPosition(&item, AUTO_GUN_BARREL_JOINT_INDEX).ToVector3(), item.ItemFlags[2] / 16);
 		}
 		else
 		{
-			item.MeshBits.Set(AutoGunVciChassisJoints);
-			item.MeshBits.Clear(AutoGunVciClosedHatchJoints);
-			item.MeshBits.Clear(AutoGunVciFlashJoints);
+			item.MeshBits.Set(AutoGunChassisJoints);
+			item.MeshBits.Clear(AutoGunClosedHatchJoints);
+			item.MeshBits.Clear(AutoGunFlashJoints);
 
 			AnimateItem(&item);
 		}		

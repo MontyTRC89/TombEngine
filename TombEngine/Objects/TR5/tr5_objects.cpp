@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR5/Entity/AutoGunVci.h"		 // OK
+#include "Objects/TR5/Entity/AutoGun.h"		 // OK
 #include "Objects/TR5/Entity/HeavyGuard.h"		 // OK
 #include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
 #include "Objects/TR5/Entity/tr5_chef.h"		 // OK
@@ -633,8 +633,8 @@ static void StartEntity(ObjectInfo *obj)
 	obj = &Objects[ID_AUTO_GUN_VCI];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeAutoGunVci;
-		obj->control = ControlAutoGunVci;
+		obj->Initialize = InitializeAutoGun;
+		obj->control = ControlAutoGun;
 		obj->intelligent = true;
 		obj->damageType = DamageMode::None;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
