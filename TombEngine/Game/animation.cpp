@@ -114,70 +114,75 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
 				int soundEnvFlag = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment flag.
 
-				if (!Objects[item.ObjectNumber].waterCreature)
+				// Get sound environment from flag.
+				auto soundEnv = SoundEnvironment::Always;
+				switch (soundEnvFlag)
 				{
-					// Get sound environment.
-					auto soundEnv = SoundEnvironment::Always;
-					switch (soundEnvFlag)
-					{
-					default:
-					case 0:
-						soundEnv = SoundEnvironment::Always;
-						break;
+				default:
+				case 0:
+					soundEnv = SoundEnvironment::Always;
+					break;
 
-					case (1 << 14):
-						soundEnv = SoundEnvironment::DryLand;
-						break;
+				case (1 << 14):
+					soundEnv = SoundEnvironment::DryLand;
+					break;
 
-					case (1 << 15):
-						soundEnv = SoundEnvironment::WetLand;
-						break;
+				case (1 << 15):
+					soundEnv = SoundEnvironment::WetLand;
+					break;
 
-					case (1 << 12):
-						soundEnv = SoundEnvironment::Swamp;
-						break;
+				case (1 << 12):
+					soundEnv = SoundEnvironment::Swamp;
+					break;
 
-					case (1 << 13):
-						soundEnv = SoundEnvironment::Underwater;
-						break;
-					}
-
-					if (item.IsLara())
-					{
-						const auto& player = GetLaraInfo(item);
-
-						if (soundEnv == SoundEnvironment::Always ||
-							(soundEnv == SoundEnvironment::DryLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-							(soundEnv == SoundEnvironment::WetLand && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
-						{
-							SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						if (item.RoomNumber == NO_ROOM)
-						{
-							SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (TestEnvironment(ENV_FLAG_WATER, &item))
-						{
-							if (soundEnv == SoundEnvironment::Always ||
-								(soundEnv == SoundEnvironment::WetLand && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-							{
-								SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
-							}
-						}
-						else if (soundEnv == SoundEnvironment::Always ||
-							(soundEnv == SoundEnvironment::DryLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
-						{
-							SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
-						}
-					}
+				case (1 << 13):
+					soundEnv = SoundEnvironment::Underwater;
+					break;
 				}
-				else
+
+				int roomNumberAtPos = GetCollision(item).RoomNumber;
+				bool isWater = TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos);
+				bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
+
+				// Get sound environment for sound effect.
+				auto soundEffectEnv = std::optional<SoundEnvironment>(std::nullopt);
+				switch (soundEnv)
 				{
-					SoundEffect(soundID, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::WetLand : SoundEnvironment::DryLand);
+				case SoundEnvironment::Always:
+					soundEffectEnv = SoundEnvironment::Always;
+					break;
+
+				case SoundEnvironment::DryLand:
+					if (!isWater)
+						soundEffectEnv = SoundEnvironment::DryLand;
+
+					break;
+
+				case SoundEnvironment::WetLand:
+					if (isWater)
+					{
+						// HACK: Must update assets before changing to SoundEnvironment::WetLand for water creatures.
+						const auto& object = Objects[item.ObjectNumber];
+						soundEffectEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::WetLand;
+					}
+
+					break;
+
+				case SoundEnvironment::Swamp:
+					if (isSwamp)
+						soundEffectEnv = SoundEnvironment::Swamp;
+
+					break;
+
+				case SoundEnvironment::Underwater:
+					if (isWater)
+						soundEffectEnv = SoundEnvironment::Underwater;
+
+					break;
 				}
+
+				if (soundEffectEnv.has_value())
+					SoundEffect(soundID, &item.Pose, *soundEffectEnv);
 			}
 
 			commandDataPtr += 2;
