@@ -10,10 +10,13 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
+
+using namespace TEN::Math;
 
 HSAMPLE BASS_SamplePointer[SOUND_MAX_SAMPLES];
 HSTREAM BASS_3D_Mixdown;
@@ -205,14 +208,14 @@ bool SoundEffect(int soundID, Pose* pose, SoundEnvironment soundEnv, float pitch
 	// Set and randomize volume (if needed).
 	float gain = ((float)sample.Volume / UCHAR_MAX) * std::clamp(gainMult, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);
 	if ((sample.Flags & SOUND_FLAG_RND_GAIN))
-		gain -= ((float)GetRandomControl() / (float)RAND_MAX) * SOUND_MAX_GAIN_CHANGE;
+		gain -= Random::GenerateFloat(0.0f, 1.0f) * SOUND_MAX_GAIN_CHANGE;
 
 	// Set and randomize pitch and additionally multiply by provided value (e.g. for vehicles).
 	float pitch = (1.0f + ((float)sample.Pitch / 127.0f)) * std::clamp(pitchMult, SOUND_MIN_PARAM_MULTIPLIER, SOUND_MAX_PARAM_MULTIPLIER);
 
 	// Randomize pitch (if needed)
 	if ((sample.Flags & SOUND_FLAG_RND_PITCH))
-		pitch += (((float)GetRandomControl() / (float)RAND_MAX) - 0.5f) * (SOUND_MAX_PITCH_CHANGE * 2);
+		pitch += Random::GenerateFloat(-0.5f, 0.5f) * (SOUND_MAX_PITCH_CHANGE * 2);
 
 	// Calculate sound radius and distance to sound.
 	float radius = BLOCK(sample.Radius);
