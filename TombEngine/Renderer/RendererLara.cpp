@@ -311,7 +311,7 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
 	}
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
-	_cbItem.updateData(_stItem, _context.Get());
+	_cbItem.UpdateData(_stItem, _context.Get());
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
@@ -356,7 +356,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
 		}
 
-		_cbItem.updateData(_stItem, _context.Get());
+		_cbItem.UpdateData(_stItem, _context.Get());
 
 		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
 		{

@@ -786,7 +786,7 @@ namespace TEN::Renderer
 		CCameraMatrixBuffer hudCamera;
 		hudCamera.CamDirectionWS = -Vector4::UnitZ;
 		hudCamera.ViewProjection = viewMatrix * projMatrix;
-		_cbCameraMatrices.updateData(hudCamera, _context.Get());
+		_cbCameraMatrices.UpdateData(hudCamera, _context.Get());
 		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 
 		for (int n = 0; n < (*moveableObject).ObjectMeshes.size(); n++)
@@ -815,7 +815,7 @@ namespace TEN::Renderer
 			_stItem.Color = Vector4::One;
 			_stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
 
-			_cbItem.updateData(_stItem, _context.Get());
+			_cbItem.UpdateData(_stItem, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
 			BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 			

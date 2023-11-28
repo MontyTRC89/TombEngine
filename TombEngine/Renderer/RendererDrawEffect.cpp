@@ -915,7 +915,7 @@ namespace TEN::Renderer
 					worldMatrix = rotMatrix * worldMatrix;
 
 					_stStatic.World = worldMatrix;
-					_cbStatic.updateData(_stStatic, _context.Get());
+					_cbStatic.UpdateData(_stStatic, _context.Get());
 
 					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 
@@ -929,7 +929,7 @@ namespace TEN::Renderer
 					worldMatrix = rotMatrix * worldMatrix;
 
 					_stStatic.World = worldMatrix;
-					_cbStatic.updateData(_stStatic, _context.Get());
+					_cbStatic.UpdateData(_stStatic, _context.Get());
 
 					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 
@@ -1005,7 +1005,7 @@ namespace TEN::Renderer
 							worldMatrix = rotMatrixZ * worldMatrix;
 
 						_stStatic.World = worldMatrix;
-						_cbStatic.updateData(_stStatic, _context.Get());
+						_cbStatic.UpdateData(_stStatic, _context.Get());
 
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 
@@ -1045,7 +1045,7 @@ namespace TEN::Renderer
 							worldMatrix = rotMatrixZ * worldMatrix;
 
 						_stStatic.World = worldMatrix;
-						_cbStatic.updateData(_stStatic, _context.Get());
+						_cbStatic.UpdateData(_stStatic, _context.Get());
 
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 
@@ -1127,7 +1127,7 @@ namespace TEN::Renderer
 		_stStatic.AmbientLight = effect->AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Dynamic;
 		BindStaticLights(effect->LightsToDraw);
-		_cbStatic.updateData(_stStatic, _context.Get());
+		_cbStatic.UpdateData(_stStatic, _context.Get());
 
 		auto* meshPtr = effect->Mesh;
 		auto m_lastBlendMode = BlendMode::Unknown;
@@ -1226,7 +1226,7 @@ namespace TEN::Renderer
 					_stStatic.AmbientLight = _rooms[deb.roomNumber].AmbientLight;
 					_stStatic.LightMode = (int)deb.lightMode;
 
-					_cbStatic.updateData(_stStatic, _context.Get());
+					_cbStatic.UpdateData(_stStatic, _context.Get());
 
 					Vertex vtx0;
 					vtx0.Position = deb.mesh.Positions[0];

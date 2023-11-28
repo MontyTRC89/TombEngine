@@ -313,7 +313,7 @@ namespace TEN::Renderer
 			}
 
 			_stBlending.BlendMode = static_cast<unsigned int>(blendMode);
-			_cbBlending.updateData(_stBlending, _context.Get());
+			_cbBlending.UpdateData(_stBlending, _context.Get());
 			BindConstantBufferPS(ConstantBufferRegister::Blending, _cbBlending.get());
 
 			_lastBlendMode = blendMode;
@@ -393,7 +393,7 @@ namespace TEN::Renderer
 		{
 			_stBlending.AlphaTest = (int)mode;
 			_stBlending.AlphaThreshold = threshold;
-			_cbBlending.updateData(_stBlending, _context.Get());
+			_cbBlending.UpdateData(_stBlending, _context.Get());
 			BindConstantBufferPS(ConstantBufferRegister::Blending, _cbBlending.get());
 		}
 	}

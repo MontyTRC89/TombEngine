@@ -9,14 +9,14 @@
 
 cbuffer RoomBuffer : register(b5)
 {
+	int Water;
+	int Caustics;
+	int NumRoomLights;
+	int Padding;
 	float2 CausticsStartUV;
 	float2 CausticsScale;
 	float4 AmbientColor;
 	ShaderLight RoomLights[MAX_LIGHTS_PER_ROOM];
-	int NumRoomLights;
-	int Water;
-	int Caustics;
-	int Padding;
 };
 
 struct PixelShaderInput

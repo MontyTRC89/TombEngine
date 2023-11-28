@@ -197,7 +197,7 @@ namespace TEN::Renderer
 
 			CCameraMatrixBuffer shadowProjection;
 			shadowProjection.ViewProjection = view * projection;
-			_cbCameraMatrices.updateData(shadowProjection, _context.Get());
+			_cbCameraMatrices.UpdateData(shadowProjection, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 
 			_stShadowMap.LightViewProjections[step] = (view * projection);
@@ -213,7 +213,7 @@ namespace TEN::Renderer
 			for (int k = 0; k < MAX_BONES; k++)
 				_stItem.BoneLightModes[k] = (int)LightMode::Static;
 
-			_cbItem.updateData(_stItem, _context.Get());
+			_cbItem.UpdateData(_stItem, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
 			BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 
@@ -298,7 +298,7 @@ namespace TEN::Renderer
 			SetBlendMode(BlendMode::Opaque);
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			_cbInstancedStaticMeshBuffer.updateData(_stInstancedStaticMeshBuffer, _context.Get());
+			_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
 
 			auto* mesh = moveableObject.ObjectMeshes[0];
 
@@ -499,8 +499,16 @@ namespace TEN::Renderer
 
 		if (activeRatsExist)
 		{
-			_context->VSSetShader(_vsStatics.Get(), NULL, 0);
-			_context->PSSetShader(_psStatics.Get(), NULL, 0);
+			if (rendererPass == RendererPass::GBuffer)
+			{
+				_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
+				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+			}
+			else
+			{
+				_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
+				_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+			}
 
 			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
@@ -529,7 +537,7 @@ namespace TEN::Renderer
 						BindStaticLights(_rooms[rat->RoomNumber].LightsToDraw);
 					}
 
-					_cbStatic.updateData(_stStatic, _context.Get());
+					_cbStatic.UpdateData(_stStatic, _context.Get());
 
 					for (auto& bucket : mesh->Buckets)
 					{
@@ -595,8 +603,16 @@ namespace TEN::Renderer
 
 		if (batsCount > 0)
 		{
-			_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-			_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
+			if (rendererPass == RendererPass::GBuffer)
+			{
+				_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+			}
+			else
+			{
+				_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
+				_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
+			}
 
 			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
@@ -604,7 +620,7 @@ namespace TEN::Renderer
 			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			_cbInstancedSpriteBuffer.updateData(_stInstancedSpriteBuffer, _context.Get());
+			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
 
 			for (auto& bucket : mesh->Buckets)
 			{
@@ -666,8 +682,16 @@ namespace TEN::Renderer
 
 		if (beetleCount > 0)
 		{
-			_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-			_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
+			if (rendererPass == RendererPass::GBuffer)
+			{
+				_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+			}
+			else
+			{
+				_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
+				_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
+			}
 
 			unsigned int stride = sizeof(Vertex);
 			unsigned int offset = 0;
@@ -675,7 +699,7 @@ namespace TEN::Renderer
 			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			_cbInstancedSpriteBuffer.updateData(_stInstancedSpriteBuffer, _context.Get());
+			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
 
 			for (const auto& bucket : mesh.Buckets)
 			{
@@ -725,8 +749,16 @@ namespace TEN::Renderer
 
 		if (activeLocustsExist)
 		{
-			_context->VSSetShader(_vsStatics.Get(), NULL, 0);
-			_context->PSSetShader(_psStatics.Get(), NULL, 0);
+			if (rendererPass == RendererPass::GBuffer)
+			{
+				_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
+				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+			}
+			else
+			{
+				_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
+				_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+			}
 
 			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
@@ -750,7 +782,7 @@ namespace TEN::Renderer
 					_stStatic.World = locust->Transform;
 					_stStatic.Color = Vector4::One;
 					_stStatic.AmbientLight = _rooms[locust->roomNumber].AmbientLight;
-					_cbStatic.updateData(_stStatic, _context.Get());
+					_cbStatic.UpdateData(_stStatic, _context.Get());
 
 					for (auto& bucket : mesh->Buckets)
 					{
@@ -1448,7 +1480,7 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogBulbs[i].FogBulbToCameraVector = view.FogBulbsToDraw[i].FogBulbToCameraVector;
 		}		
 
-		_cbCameraMatrices.updateData(cameraConstantBuffer, _context.Get());
+		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
 		
 		ID3D11RenderTargetView* pRenderViewPtrs[2];
 
@@ -1632,7 +1664,7 @@ namespace TEN::Renderer
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(position, position + Vector3(0, 0, 1024), -Vector3::UnitY);
 		cameraConstantBuffer.Emisphere = emisphere;
 		view.FillConstantBuffer(cameraConstantBuffer);
-		_cbCameraMatrices.updateData(cameraConstantBuffer, _context.Get());
+		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
 
 		// Draw horizon and the sky
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
@@ -1673,7 +1705,7 @@ namespace TEN::Renderer
 					_stSky.Color = weather.SkyColor(s);
 					_stSky.ApplyFogBulbs = s == 0 ? 1 : 0;
 
-					_cbSky.updateData(_stSky, _context.Get());
+					_cbSky.UpdateData(_stSky, _context.Get());
 
 					DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 				}
@@ -1693,7 +1725,7 @@ namespace TEN::Renderer
 				_stSky.Color = Vector4::One;
 				_stSky.ApplyFogBulbs = 1;
 
-				_cbSky.updateData(_stSky, _context.Get());
+				_cbSky.UpdateData(_stSky, _context.Get());
 
 				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 				{
@@ -1747,15 +1779,15 @@ namespace TEN::Renderer
 			{
 				continue;
 			}
-
+			  
 			cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[_rooms[i].RoomNumber].flags & ENV_FLAG_WATER;
-			_cbCameraMatrices.updateData(cameraConstantBuffer, _context.Get());
+			_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
 
 			_stRoom.Caustics = 0;
 			_stRoom.AmbientColor = room->AmbientLight;
 			_stRoom.NumRoomLights = 0;
 			_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-			_cbRoom.updateData(_stRoom, _context.Get());
+			_cbRoom.UpdateData(_stRoom, _context.Get());
 
 			for (auto& bucket : room->Buckets)
 			{
@@ -1852,15 +1884,15 @@ namespace TEN::Renderer
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Set shaders
-		_context->VSSetShader(_vsItems.Get(), nullptr, 0);
-
+		// Set shaders	
 		if (rendererPass == RendererPass::GBuffer)
 		{
+			_context->VSSetShader(_vsGBufferItems.Get(), nullptr, 0);
 			_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
 		}
 		else
 		{
+			_context->VSSetShader(_vsItems.Get(), nullptr, 0);
 			_context->PSSetShader(_psItems.Get(), nullptr, 0);
 		}
 
@@ -1941,13 +1973,13 @@ namespace TEN::Renderer
 		_stAnimated.Textures[0].bottomLeft  = Vector2(minX, maxY);
 		_stAnimated.Textures[0].bottomRight = Vector2(maxX, maxY);
 		
-		_cbAnimated.updateData(_stAnimated, _context.Get());
+		_cbAnimated.UpdateData(_stAnimated, _context.Get());
 
 		DrawAnimatingItem(item, view, rendererPass);
 
 		// Reset animated buffer after rendering just in case
 		_stAnimated.Fps = _stAnimated.NumFrames = _stAnimated.Type = 0;
-		_cbAnimated.updateData(_stAnimated, _context.Get());
+		_cbAnimated.UpdateData(_stAnimated, _context.Get());
 	}
 
 	void Renderer::DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass)
@@ -1966,7 +1998,7 @@ namespace TEN::Renderer
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 
 		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
-		_cbItem.updateData(_stItem, _context.Get());
+		_cbItem.UpdateData(_stItem, _context.Get());
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
@@ -1986,14 +2018,14 @@ namespace TEN::Renderer
 		 
 		if (rendererPass != RendererPass::CollectTransparentFaces)
 		{
-			_context->VSSetShader(_vsInstancedStaticMeshes.Get(), NULL, 0);
-
 			if (rendererPass == RendererPass::GBuffer)
 			{
+				_context->VSSetShader(_vsGBufferInstancedStatics.Get(), NULL, 0);
 				_context->PSSetShader(_psGBuffer.Get(), NULL, 0);
 			}
 			else
 			{
+				_context->VSSetShader(_vsInstancedStaticMeshes.Get(), NULL, 0);
 				_context->PSSetShader(_psInstancedStaticMeshes.Get(), NULL, 0);
 			}
 
@@ -2041,7 +2073,7 @@ namespace TEN::Renderer
 							BindInstancedStaticLights(current->LightsToDraw, k);
 						}
 
-						_cbInstancedStaticMeshBuffer.updateData(_stInstancedStaticMeshBuffer, _context.Get());
+						_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
 
 						k++;
 					}
@@ -2171,6 +2203,7 @@ namespace TEN::Renderer
 		{
 			if (rendererPass == RendererPass::GBuffer)
 			{
+				_context->VSSetShader(_vsGBufferRooms.Get(), nullptr, 0);
 				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
 			}
 			else
@@ -2215,20 +2248,19 @@ namespace TEN::Renderer
 					_stShadowMap.CastShadows = false;
 				}
 
-				_cbShadowMap.updateData(_stShadowMap, _context.Get());
+				_cbShadowMap.UpdateData(_stShadowMap, _context.Get());
 			}
 
-			if (_SSAO)
+			if (_SSAO && rendererPass != RendererPass::GBuffer)
+			{
 				BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAOBlurredRenderTarget, SamplerStateRegister::PointWrap);
+			}
 
 			for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
 			{
 				int index = i;
 				RendererRoom* room = view.RoomsToDraw[index];
 				ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];				
-
-				//Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-				//Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
 
 				if (rendererPass != RendererPass::GBuffer)
 				{
@@ -2238,19 +2270,22 @@ namespace TEN::Renderer
 				}
 
 				_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-				_cbRoom.updateData(_stRoom, _context.Get());
+				_cbRoom.UpdateData(_stRoom, _context.Get());
 
 				SetScissor(room->ClipBounds);
 
 				for (int animated = 0; animated < 2; animated++)
 				{
-					if (animated == 0)
+					if (rendererPass != RendererPass::GBuffer)
 					{
-						_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
-					}
-					else
-					{
-						_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
+						if (animated == 0)
+						{
+							_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
+						}
+						else
+						{
+							_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
+						}
 					}
 
 					for (auto& bucket : room->Buckets)
@@ -2301,7 +2336,7 @@ namespace TEN::Renderer
 									_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
 									_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
 								}
-								_cbAnimated.updateData(_stAnimated, _context.Get());
+								_cbAnimated.UpdateData(_stAnimated, _context.Get());
 							}
 							else
 							{
@@ -2374,7 +2409,7 @@ namespace TEN::Renderer
 				_stSky.Color = weather.SkyColor(s);
 				_stSky.ApplyFogBulbs = s == 0 ? 1 : 0;
 
-				_cbSky.updateData(_stSky, _context.Get());
+				_cbSky.UpdateData(_stSky, _context.Get());
 
 				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 
@@ -2396,7 +2431,7 @@ namespace TEN::Renderer
 			_stSky.Color = Vector4::One;
 			_stSky.ApplyFogBulbs = 1;
 
-			_cbSky.updateData(_stSky, _context.Get());
+			_cbSky.UpdateData(_stSky, _context.Get());
 
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
@@ -2636,7 +2671,7 @@ namespace TEN::Renderer
 		_stRoom.AmbientColor = object->Room->AmbientLight;
 		BindRoomLights(view.LightsToDraw);
 		_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
-		_cbRoom.updateData(_stRoom, _context.Get());
+		_cbRoom.UpdateData(_stRoom, _context.Get());
 
 		SetScissor(object->Room->ClipBounds);
 
@@ -2679,7 +2714,7 @@ namespace TEN::Renderer
 				_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
 				_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
 			}
-			_cbAnimated.updateData(_stAnimated, _context.Get());
+			_cbAnimated.UpdateData(_stAnimated, _context.Get());
 		}
 		else
 		{
@@ -2735,7 +2770,7 @@ namespace TEN::Renderer
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 
 		BindMoveableLights(object->Item->LightsToDraw, object->Item->RoomNumber, object->Item->PrevRoomNumber, object->Item->LightFade);
-		_cbItem.updateData(_stItem, _context.Get());
+		_cbItem.UpdateData(_stItem, _context.Get());
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[object->Bucket->Texture]),
 			SamplerStateRegister::AnisotropicClamp);
@@ -2777,7 +2812,7 @@ namespace TEN::Renderer
 		_stStatic.AmbientLight = _rooms[object->Static->RoomNumber].AmbientLight;
 		_stStatic.LightMode = (int)object->Mesh->LightMode;
 			BindStaticLights(object->Static->LightsToDraw);
-		_cbStatic.updateData(_stStatic, _context.Get());
+		_cbStatic.UpdateData(_stStatic, _context.Get());
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[object->Bucket->Texture]),
 			SamplerStateRegister::AnisotropicClamp);
@@ -2839,7 +2874,7 @@ namespace TEN::Renderer
 		_stPostProcessBuffer.ViewportWidth = viewport.Width;
 		_stPostProcessBuffer.ViewportHeight = viewport.Height;
 		memcpy(_stPostProcessBuffer.SSAOKernel, _SSAOKernel.data(), 16 * _SSAOKernel.size());
-		_cbPostProcessBuffer.updateData(_stPostProcessBuffer, _context.Get());
+		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
 
 		DrawTriangles(3, 0);
 

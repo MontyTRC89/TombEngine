@@ -69,7 +69,7 @@ namespace TEN::Renderer
 		_stPostProcessBuffer.ViewportHeight = _screenHeight;
 		_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
 		_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
-		_cbPostProcessBuffer.updateData(_stPostProcessBuffer, _context.Get());
+		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
 
 		BindTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 

@@ -336,7 +336,7 @@ namespace TEN::Renderer
 
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
-			_cbInstancedSpriteBuffer.updateData(_stInstancedSpriteBuffer, _context.Get());
+			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
 
 			// Draw sprites with instancing.
 			DrawInstancedTriangles(4, (unsigned int)spriteBucket.SpritesToDraw.size(), 0);
@@ -376,7 +376,7 @@ namespace TEN::Renderer
 			
 			_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
 			_stSprite.RenderType = (int)spriteBucket.RenderType;
-			_cbSprite.updateData(_stSprite, _context.Get());
+			_cbSprite.UpdateData(_stSprite, _context.Get());
 
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
@@ -457,7 +457,7 @@ namespace TEN::Renderer
 
 			BindTexture(TextureRegister::ColorMap, object->Sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
 
-			_cbInstancedSpriteBuffer.updateData(_stInstancedSpriteBuffer, _context.Get());
+			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
 			 
 			// Draw sprites with instancing.
 			DrawInstancedTriangles(4, 1, 0);
@@ -481,7 +481,7 @@ namespace TEN::Renderer
 
 			_stSprite.IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;
 			_stSprite.RenderType = (int)object->Sprite->renderType;
-			_cbSprite.updateData(_stSprite, _context.Get());
+			_cbSprite.UpdateData(_stSprite, _context.Get());
 
 			BindTexture(TextureRegister::ColorMap, object->Sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
 

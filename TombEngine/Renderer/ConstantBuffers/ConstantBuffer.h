@@ -28,7 +28,7 @@ namespace TEN::Renderer::ConstantBuffers
 			return buffer.GetAddressOf();
 		}
 
-		void updateData(CBuff& data, ID3D11DeviceContext* ctx)
+		void UpdateData(CBuff& data, ID3D11DeviceContext* ctx)
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedResource;
 			HRESULT res = ctx->Map(buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
