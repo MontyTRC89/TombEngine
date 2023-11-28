@@ -1,6 +1,10 @@
 #include "./VertexInput.hlsli"
 #include "./CameraMatrixBuffer.hlsli"
 
+#define SIGMA 3.0
+#define BSIGMA 0.3
+#define MSIZE 5
+
 cbuffer PostProcessBuffer : register(b7)
 {
     float CinematicBarsHeight;
@@ -86,19 +90,49 @@ float PS(PixelShaderInput input) : SV_Target
     return occlusion;
 }
 
+float normpdf(float x, float sigma)
+{
+    return 0.39894 * exp(-0.5 * x * x / (sigma * sigma)) / sigma;
+}
+
 float PSBlur(PixelShaderInput input) : SV_Target
 {
     float2 texelSize = 1.0f / float2(ViewportWidth, ViewportHeight);
     float result = 0.0f;
 
-    for (int x = -2; x < 2; x++)
+    const int kernelSize = (MSIZE - 1) / 2;
+    float kernel[MSIZE];
+    float bZ = 0.0;
+
+    // Create the 1-D kernel
+    for (int j = 0; j <= kernelSize; j++)
     {
-        for (int y = -2; y < 2; y++)
+        kernel[kernelSize + j] = kernel[kernelSize - j] = normpdf(float(j), SIGMA);
+    }
+
+    float color;
+    float baseColor = SSAOTexture.Sample(SSAOSampler, input.UV).x;
+    float gfactor;
+    float bfactor;
+    float bZnorm = 1.0 / normpdf(0.0, BSIGMA);
+
+    // Read out the texels
+    for (int i = -kernelSize; i <= kernelSize; i++)
+    {
+        for (int j = -kernelSize; j <= kernelSize; j++)
         {
-            float2 offset = float2(x, y) * texelSize;
-            result += SSAOTexture.Sample(SSAOSampler, input.UV + offset).x;
+            // Color at pixel in the neighborhood
+            float2 offset = float2(i, j) * texelSize;
+            color = SSAOTexture.Sample(SSAOSampler, input.UV + offset).x;
+
+            // Compute both the gaussian smoothed and bilateral
+            gfactor = kernel[kernelSize + j] * kernel[kernelSize + i];
+            bfactor = normpdf(color - baseColor, BSIGMA) * bZnorm * gfactor;
+            bZ += bfactor;
+
+            result += bfactor * color;
         }
     }
-    
-    return (result / (4.0 * 4.0));
+
+    return (result / bZ);
 }
