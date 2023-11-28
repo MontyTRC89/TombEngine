@@ -195,7 +195,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if ((ai.distance > WINSTON_IDLE_RANGE || !ai.ahead) && item.Animation.TargetState != WINSTON_STATE_WALK_FORWARD)
 				{
 					item.Animation.TargetState = WINSTON_STATE_WALK_FORWARD;
-					SoundEffect(SFX_TR2_WINSTON_CUPS, &item.Pose);
+					SoundEffect(SFX_TR3_WINSTON_CUPS, &item.Pose);
 				}
 
 				break;
@@ -220,8 +220,8 @@ namespace TEN::Entities::Creatures::TR3
 					{
 						creature.Flags |= 1;
 
-						SoundEffect(SFX_TR2_WINSTON_SURPRISED, &item.Pose);
-						SoundEffect(SFX_TR2_WINSTON_SHUFFLE, &item.Pose);
+						SoundEffect(SFX_TR3_WINSTON_SURPRISED, &item.Pose);
+						SoundEffect(SFX_TR3_WINSTON_SHUFFLE, &item.Pose);
 					}
 				}
 
@@ -289,7 +289,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 
 		if (Random::TestProbability(1 / 128.0f))
-			SoundEffect(SFX_TR2_WINSTON_SHUFFLE, &item.Pose);
+			SoundEffect(SFX_TR3_WINSTON_SHUFFLE, &item.Pose);
 
 		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
