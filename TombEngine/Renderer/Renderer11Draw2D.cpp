@@ -724,7 +724,7 @@ namespace TEN::Renderer
 			case DisplaySpriteAlignMode::CenterLeft:
 				offset = Vector2(halfSize.x, 0.0f);
 				break;
-				
+
 			case DisplaySpriteAlignMode::CenterRight:
 				offset = Vector2(-halfSize.x, 0.0f);
 				break;
@@ -745,7 +745,10 @@ namespace TEN::Renderer
 				offset = Vector2(-halfSize.x, -halfSize.y);
 				break;
 			}
-			offset *= aspectCorrection;
+
+			// Rotate position offset according to orientation.
+			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(displaySprite.Orientation));
+			offset = Vector2::Transform(offset, rotMatrix) * aspectCorrection;
 
 			AddDisplaySprite(
 				sprite,
