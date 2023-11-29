@@ -52,11 +52,11 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd }
 };
 
-static const std::unordered_map<std::string, VolumeEventType> EVENT_TYPES
+static const std::unordered_map<std::string, EventType> EVENT_TYPES
 {
-	{ ScriptReserved_OnEnter, VolumeEventType::Enter },
-	{ ScriptReserved_OnInside, VolumeEventType::Inside },
-	{ ScriptReserved_OnLeave, VolumeEventType::Leave }
+	{ ScriptReserved_OnEnter, EventType::Enter },
+	{ ScriptReserved_OnInside, EventType::Inside },
+	{ ScriptReserved_OnLeave, EventType::Leave }
 };
 
 enum class LevelEndReason
@@ -279,9 +279,9 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 @tparam type EventType Event to execute.
 @tparam activator Moveable Optional activator. Default is the player object.
 */
-void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator)
+void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (VolumeActivator)activator.value().GetIndex() : nullptr);
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : nullptr);
 }
 
 /*** Attempt to find an event set and enable specified event in it.
@@ -290,7 +290,7 @@ void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, so
 @tparam name string Name of the event set to find.
 @tparam type EventType Event to enable.
 */
-void LogicHandler::EnableEvent(const std::string& name, VolumeEventType type)
+void LogicHandler::EnableEvent(const std::string& name, EventType type)
 {
 	TEN::Control::Volumes::SetEventState(name, type, true);
 }
@@ -301,7 +301,7 @@ void LogicHandler::EnableEvent(const std::string& name, VolumeEventType type)
 @tparam name string Name of the event set to find.
 @tparam type EventType Event to disable.
 */
-void LogicHandler::DisableEvent(const std::string& name, VolumeEventType type)
+void LogicHandler::DisableEvent(const std::string& name, EventType type)
 {
 	TEN::Control::Volumes::SetEventState(name, type, false);
 }
@@ -878,7 +878,7 @@ void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short i
 	func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
 }
 
-void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::VolumeActivator activator, const std::string& arguments)
+void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::Activator activator, const std::string& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
 	if (std::holds_alternative<short>(activator))

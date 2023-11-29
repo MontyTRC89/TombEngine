@@ -6,10 +6,10 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
+#include "Game/control/event.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
-#include "Game/control/volumeactivator.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -212,7 +212,7 @@ bool SaveGame::Save(int slot)
 		return false;
 
 	g_GameScript->OnSave();
-	HandleAllEvents(VolumeEventType::Save, (VolumeActivator)LaraItem->Index);
+	HandleAllEvents(EventType::Save, (Activator)LaraItem->Index);
 
 	// Savegame infos need to be reloaded so that last savegame counter properly increases.
 	SaveGame::LoadSavegameInfos();
@@ -884,13 +884,13 @@ bool SaveGame::Save(int slot)
 
 	// Event set call counters
 	std::vector<flatbuffers::Offset<Save::EventSetCallCounters>> serializedEventSetCallCounters{};
-	for (auto& set : g_Level.EventSets)
+	for (auto& set : g_Level.VolumeEventSets)
 	{
 		Save::EventSetCallCountersBuilder serializedEventSetCallCounter{ fbb };
 
-		serializedEventSetCallCounter.add_on_enter(set.Events[(int)VolumeEventType::Enter].CallCounter);
-		serializedEventSetCallCounter.add_on_inside(set.Events[(int)VolumeEventType::Inside].CallCounter);
-		serializedEventSetCallCounter.add_on_leave(set.Events[(int)VolumeEventType::Leave].CallCounter);
+		serializedEventSetCallCounter.add_on_enter(set.Events[(int)EventType::Enter].CallCounter);
+		serializedEventSetCallCounter.add_on_inside(set.Events[(int)EventType::Inside].CallCounter);
+		serializedEventSetCallCounter.add_on_leave(set.Events[(int)EventType::Leave].CallCounter);
 
 		auto serializedEventSetCallCounterOffset = serializedEventSetCallCounter.Finish();
 		serializedEventSetCallCounters.push_back(serializedEventSetCallCounterOffset);
@@ -1985,15 +1985,15 @@ bool SaveGame::Load(int slot)
 		fx.flag2 = fx_saved->flag2();
 	}
 
-	if (g_Level.EventSets.size() == s->call_counters()->size())
+	if (g_Level.VolumeEventSets.size() == s->call_counters()->size())
 	{
 		for (int i = 0; i < s->call_counters()->size(); ++i)
 		{
 			auto cc_saved = s->call_counters()->Get(i);
 
-			g_Level.EventSets[i].Events[(int)VolumeEventType::Enter].CallCounter = cc_saved->on_enter();
-			g_Level.EventSets[i].Events[(int)VolumeEventType::Inside].CallCounter = cc_saved->on_inside();
-			g_Level.EventSets[i].Events[(int)VolumeEventType::Leave].CallCounter = cc_saved->on_leave();
+			g_Level.VolumeEventSets[i].Events[(int)EventType::Enter].CallCounter = cc_saved->on_enter();
+			g_Level.VolumeEventSets[i].Events[(int)EventType::Inside].CallCounter = cc_saved->on_inside();
+			g_Level.VolumeEventSets[i].Events[(int)EventType::Leave].CallCounter = cc_saved->on_leave();
 		}
 	}
 

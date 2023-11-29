@@ -882,7 +882,7 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
-	g_Level.EventSets.resize(0);
+	g_Level.VolumeEventSets.resize(0);
 	g_Level.LoopedEventSetIndices.resize(0);
 	g_Level.Items.resize(0);
 
@@ -985,18 +985,18 @@ void LoadAIObjects()
 	}
 }
 
-void LoadEvent(VolumeEventSet& eventSet)
+void LoadEvent(EventSet& eventSet)
 {
 	int eventType = ReadInt32();
 	auto& evt = eventSet.Events[eventType];
 
-	evt.Mode = (VolumeEventMode)ReadInt32();
+	evt.Mode = (EventMode)ReadInt32();
 	evt.Function = ReadString();
 	evt.Data = ReadString();
 	evt.CallCounter = ReadInt32();
 }
 
-void LoadEventSets()
+void LoadVolumeEventSets()
 {
 	int eventSetCount = ReadInt32();
 	if (eventSetCount == 0)
@@ -1007,7 +1007,7 @@ void LoadEventSets()
 
 	for (int i = 0; i < globalEventSetCount; i++)
 	{
-		auto eventSet = VolumeEventSet();
+		auto eventSet = EventSet();
 
 		eventSet.Name = ReadString();
 
@@ -1015,9 +1015,9 @@ void LoadEventSets()
 		for (int j = 0; j < eventCount; j++)
 			LoadEvent(eventSet);
 
-		g_Level.EventSets.push_back(eventSet);
+		g_Level.GlobalEventSets.push_back(eventSet);
 
-		if (!eventSet.Events[(int)VolumeEventType::Loop].Function.empty())
+		if (!eventSet.Events[(int)EventType::Loop].Function.empty())
 			g_Level.LoopedEventSetIndices.push_back(i);
 	}
 
@@ -1026,16 +1026,16 @@ void LoadEventSets()
 
 	for (int i = 0; i < volumeEventSetCount; i++)
 	{
-		auto eventSet = VolumeEventSet();
+		auto eventSet = EventSet();
 
 		eventSet.Name = ReadString();
-		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
+		eventSet.Activators = (ActivatorFlags)ReadInt32();
 
 		int eventCount = ReadInt32();
 		for (int j = 0; j < eventCount; j++)
 			LoadEvent(eventSet);
 
-		g_Level.EventSets.push_back(eventSet);
+		g_Level.VolumeEventSets.push_back(eventSet);
 	}
 }
 
@@ -1177,7 +1177,7 @@ bool LoadLevel(int levelIndex)
 		LoadItems();
 		LoadAIObjects();
 
-		LoadEventSets();
+		LoadVolumeEventSets();
 
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);

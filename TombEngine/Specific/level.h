@@ -1,6 +1,6 @@
 #pragma once
 #include "Game/animation.h"
-#include "Game/control/volumeactivator.h"
+#include "Game/control/event.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/room.h"
@@ -121,7 +121,8 @@ struct LEVEL
 
 	// Misc. data
 	std::vector<LevelCameraInfo> Cameras   = {};
-	std::vector<VolumeEventSet>	 EventSets = {};
+	std::vector<EventSet>		 GlobalEventSets = {};
+	std::vector<EventSet>		 VolumeEventSets = {};
 	std::vector<int>			 LoopedEventSetIndices = {};
 	std::vector<AI_OBJECT>		 AIObjects = {};
 	std::vector<SPRITE>			 Sprites   = {};

@@ -366,7 +366,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\control\lot.h" />
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
-    <ClInclude Include="Game\control\volumeactivator.h" />
+    <ClInclude Include="Game\control\event.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\Blood.h" />
     <ClInclude Include="Game\effects\Drip.h" />
