@@ -205,6 +205,12 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
+	if (IsHeld(In::Action))
+	{
+		if (HandlePlayerJumpCatch(*item, *coll))
+			return;
+	}
+
 	if (CanLand(*item, *coll))
 	{
 		DoLaraFallDamage(item);
@@ -217,12 +223,6 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 	{
 		item->Animation.TargetState = LS_FREEFALL;
 		return;
-	}
-
-	if (IsHeld(In::Action))
-	{
-		if (HandlePlayerJumpCatch(*item, *coll))
-			return;
 	}
 
 	item->Animation.TargetState = LS_REACH;
@@ -570,6 +570,12 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	if (IsHeld(In::Action))
+	{
+		if (HandlePlayerJumpCatch(*item, *coll))
+			return;
+	}
+
 	if (CanLand(*item, *coll))
 	{
 		item->Animation.TargetState = (item->HitPoints <= 0) ? LS_DEATH : LS_IDLE;
@@ -598,12 +604,6 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 	else
 	{
 		item->Animation.Velocity.z = (item->Animation.Velocity.z < 0.0f) ? -VEL_ACCEL : VEL_ACCEL;
-	}
-
-	if (IsHeld(In::Action))
-	{
-		if (HandlePlayerJumpCatch(*item, *coll))
-			return;
 	}
 
 	if (item->Animation.Velocity.z < 0.0f)
