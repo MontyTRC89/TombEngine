@@ -157,7 +157,7 @@ GameStatus ControlPhase(int numFrames)
 
 		// Handle loop functions and node events.
 		g_GameScript->OnControlPhase(DELTA_TIME);
-		HandleAllEvents(EventType::Loop, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
@@ -478,7 +478,7 @@ void InitializeScripting(int levelIndex, bool loadGame)
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
 	g_GameScript->OnEnd(reason);
-	HandleAllEvents(EventType::End, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
 
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
@@ -511,7 +511,7 @@ void InitializeOrLoadGame(bool loadGame)
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
-		HandleAllEvents(EventType::Load, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Load, (Activator)LaraItem->Index);
 	}
 	else
 	{
@@ -533,7 +533,7 @@ void InitializeOrLoadGame(bool loadGame)
 		}
 
 		g_GameScript->OnStart();
-		HandleAllEvents(EventType::Start, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Start, (Activator)LaraItem->Index);
 	}
 }
 

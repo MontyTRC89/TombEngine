@@ -57,7 +57,7 @@ namespace TEN::Control::Volumes
 		return BoundingOrientedBox(pos, Vector3(coll.Radius, pBounds.Extents.y, coll.Radius), rot);
 	}
 
-	void HandleAllEvents(EventType type, Activator& activator)
+	void HandleAllGlobalEvents(EventType type, Activator& activator)
 	{
 		// HACK: Speedhack to only process looped events which are actually existing.
 
@@ -68,9 +68,25 @@ namespace TEN::Control::Volumes
 		}
 		else
 		{
-			for (auto& set : g_Level.VolumeEventSets)
+			for (auto& set : g_Level.GlobalEventSets)
 				HandleEvent(set.Events[(int)type], activator);
 		}
+	}
+
+	EventSet* FindEventSet(const std::string& name)
+	{
+		for (auto& eventSet : g_Level.GlobalEventSets)
+			if (eventSet.Name == name)
+				return &eventSet;
+
+		for (auto& eventSet : g_Level.VolumeEventSets)
+			if (eventSet.Name == name)
+				return &eventSet;
+
+		TENLog("Error: event " + name + " could not be found. Check if event with such name exists in project.",
+			LogLevel::Error, LogConfig::All, false);
+
+		return nullptr;
 	}
 
 	void HandleEvent(Event& event, Activator& activator)
@@ -92,16 +108,7 @@ namespace TEN::Control::Volumes
 			lastEventSetPtr = nullptr;
 
 		if (lastEventSetPtr == nullptr)
-		{
-			for (auto& eventSet : g_Level.VolumeEventSets)
-			{
-				if (eventSet.Name == name)
-				{
-					lastEventSetPtr = &eventSet;
-					break;
-				}
-			}
-		}
+			lastEventSetPtr = FindEventSet(name);
 
 		if (lastEventSetPtr != nullptr)
 		{
@@ -109,31 +116,24 @@ namespace TEN::Control::Volumes
 			return true;
 		}
 
-		TENLog("Error: event " + name + " could not be executed. Check if event with such name exists in project.",
-				LogLevel::Error, LogConfig::All, false);
 		return false;
 	}
 
 	bool SetEventState(const std::string& name, EventType eventType, bool enabled)
 	{
-		for (auto& eventSet : g_Level.VolumeEventSets)
-		{
-			if (eventSet.Name == name)
-			{
-				auto& event = eventSet.Events[(int)eventType];
-				bool disabled = eventSet.Events[(int)eventType].CallCounter < NO_CALL_COUNTER;
+		auto* eventSet = FindEventSet(name);
 
-				// Flip the call counter to indicate that it is currently disabled.
-				if ((enabled && disabled) || (!enabled && !disabled))
-					eventSet.Events[(int)eventType].CallCounter += enabled ? EVENT_STATE_MASK : -EVENT_STATE_MASK;
+		if (eventSet == nullptr)
+			return false;
 
-				return true;
-			}
-		}
+		auto& event = eventSet->Events[(int)eventType];
+		bool disabled = eventSet->Events[(int)eventType].CallCounter < NO_CALL_COUNTER;
 
-		TENLog("Error: state for event " + name + " could not be set. Check if event with such name exists in project.",
-			LogLevel::Error, LogConfig::All, false);
-		return false;
+		// Flip the call counter to indicate that it is currently disabled.
+		if ((enabled && disabled) || (!enabled && !disabled))
+			eventSet->Events[(int)eventType].CallCounter += enabled ? EVENT_STATE_MASK : -EVENT_STATE_MASK;
+
+		return true;
 	}
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator)
