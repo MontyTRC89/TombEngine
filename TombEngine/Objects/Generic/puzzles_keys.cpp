@@ -445,6 +445,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	if (triggerIndexPtr == nullptr)
 		return;
 
+	int animation;
 	short triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
@@ -483,14 +484,21 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 			if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
 			{
-				if (triggerType != TRIGGER_TYPES::SWITCH)
+				if (triggerType = TRIGGER_TYPES::SWITCH )
 				{
+					keyHoleItem->ItemFlags[1] = true;
+				}
+
+				if (keyHoleItem->TriggerFlags < 0)
+				{
+					animation = abs(keyHoleItem->TriggerFlags);
 					RemoveObjectFromInventory(GAME_OBJECT_ID(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
 				}
 				else
 				{
-					keyHoleItem->ItemFlags[1] = true;
+					animation = keyHoleItem->TriggerFlags;
 				}
+
 
 				if (keyHoleItem->TriggerFlags == 0)
 				{
@@ -498,7 +506,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				}
 				else
 				{
-					laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+					laraItem->Animation.AnimNumber = animation;
 				}
 				
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
