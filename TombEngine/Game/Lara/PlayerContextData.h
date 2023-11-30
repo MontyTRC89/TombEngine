@@ -58,9 +58,9 @@ namespace TEN::Entities::Player
 		Attractor* AttracPtr = nullptr;
 		EdgeType   Type		 = EdgeType::Ledge; // TODO: Won't be needed later.
 
-		Vector3 IntersectPoint = Vector3::Zero;
-		float	ChainDistance  = 0.0f;
-		short	HeadingAngle   = 0;
+		Vector3 Intersection  = Vector3::Zero;
+		float	ChainDistance = 0.0f;
+		short	HeadingAngle  = 0;
 	};
 
 	struct MonkeySwingCatchData
@@ -81,7 +81,7 @@ namespace TEN::Entities::Player
 		int	  FloorToCeilHeightMax = 0;
 		int	  GapHeightMin		   = 0;
 
-		bool TestSlipperySlope = false;
+		bool TestIllegalSlope = false;
 	};
 
 	// Old

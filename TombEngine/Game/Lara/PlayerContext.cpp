@@ -1023,9 +1023,9 @@ namespace TEN::Entities::Player
 		int gapHeight = abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor);
 
 		// TODO: This check fails for no reason.
-		// 1) Test for slippery slope (if applicable).
-		bool isSlipperySlope = setup.TestSlipperySlope ? pointCollFront.Position.FloorSlope : false;
-		if (isSlipperySlope)
+		// 1) Test for illegal slope (if applicable).
+		bool isIllegalSlope = setup.TestIllegalSlope ? pointCollFront.Position.FloorSlope : false;
+		if (isIllegalSlope)
 			return false;
 
 		// 2) Test for object blocking ledge.

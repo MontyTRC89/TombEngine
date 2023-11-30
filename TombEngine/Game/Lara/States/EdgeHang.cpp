@@ -30,9 +30,9 @@ namespace TEN::Entities::Player
 
 	struct EdgeHangAttractorCollisionData
 	{
-		AttractorCollisionData Center;
-		AttractorCollisionData Left;
-		AttractorCollisionData Right;
+		AttractorCollisionData Center = {};
+		AttractorCollisionData Left	  = {};
+		AttractorCollisionData Right  = {};
 	};
 
 	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
@@ -171,7 +171,7 @@ namespace TEN::Entities::Player
 
 		auto& player = GetLaraInfo(item);
 
-		// Check for hands attractor.
+		// End hang if hands attractor doesn't exist.
 		if (player.Context.HandsAttractor.AttracPtr == nullptr)
 		{
 			player.Control.IsHanging = false;
@@ -202,7 +202,7 @@ namespace TEN::Entities::Player
 		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
 		item.Pose.Orientation.Lerp(player.Context.TargetOrientation, ORIENT_LERP_ALPHA);
 
-		// Determine target point (correctly handles positioning at inner bends).
+		// Determine target point with accurate consideration of inner bends.
 		auto targetPoint = edgeAttracColls->Center.Proximity.Intersection;
 		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Left.Proximity.Intersection, player.Context.TargetOrientation) &&
 			!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Right.Proximity.Intersection, player.Context.TargetOrientation))
