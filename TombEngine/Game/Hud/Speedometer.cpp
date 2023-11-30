@@ -14,13 +14,13 @@ namespace TEN::Hud
 {
 	void SpeedometerController::UpdateValue(float value)
 	{
-		_hasValueUpdated = true;
 		_value = std::clamp(value, 0.0f, 1.0f);
+		_hasValueUpdated = true;
 	}
 
 	void SpeedometerController::Update()
 	{
-		constexpr auto DIAL_ANGLE_MAX		 = 270.0f;
+		constexpr auto DIAL_ANGLE_MAX		 = ANGLE(179.0f);
 		constexpr auto DIAL_ANGLE_LERP_ALPHA = 0.25f;
 		constexpr auto FADE_TIME			 = 0.2f;
 
@@ -28,11 +28,10 @@ namespace TEN::Hud
 			return;
 
 		// Update life and updated value status.
-		_life += _hasValueUpdated ? 1.0f : -1.0f;
-		_life = std::clamp(_life, 0.0f, LIFE_MAX * FPS);
+		_life = std::clamp(_life + (_hasValueUpdated ? 1.0f : -1.0f), 0.0f, LIFE_MAX * FPS);
 		_hasValueUpdated = false;
 
-		// Ensure value alawys reaches 0.
+		// Ensure value resets to 0.
 		if (_life <= 0.0f)
 			_value = 0.0f;
 
@@ -44,6 +43,7 @@ namespace TEN::Hud
 	void SpeedometerController::Draw() const
 	{
 		constexpr auto POS						 = Vector2(DISPLAY_SPACE_RES.x - (DISPLAY_SPACE_RES.x / 6), DISPLAY_SPACE_RES.y - (DISPLAY_SPACE_RES.y / 5));
+		constexpr auto ORIENT_OFFSET			 = ANGLE(90.0f);
 		constexpr auto SCALE					 = Vector2(0.2f);
 		constexpr auto SPRITE_SEQUENCE_OBJECT_ID = ID_SPEEDOMETER;
 		constexpr auto DIAL_ELEMENT_SPRITE_ID	 = 0;
@@ -55,7 +55,7 @@ namespace TEN::Hud
 
 		DrawDebug();
 
-		if (_life == 0.0f)
+		if (_life <= 0.0f)
 			return;
 
 		auto color = Color(1.0f, 1.0f, 1.0f, _opacity);
@@ -69,7 +69,7 @@ namespace TEN::Hud
 		// Draw pointer.
 		AddDisplaySprite(
 			SPRITE_SEQUENCE_OBJECT_ID, POINTER_ELEMENT_SPRITE_ID,
-			POS, ANGLE(_pointerAngle), SCALE / 2, color,
+			POS, _pointerAngle + ORIENT_OFFSET, SCALE / 2, color,
 			POINTER_PRIORITY, DisplaySpriteAlignMode::CenterTop, SCALE_MODE, BLEND_MODE);
 	}
 
