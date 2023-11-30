@@ -5,9 +5,11 @@
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
+#include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
@@ -292,5 +294,22 @@ namespace TEN::Entities::Creatures::TR3
 			SoundEffect(SFX_TR3_WINSTON_SHUFFLE, &item.Pose);
 
 		CreatureAnimation(itemNumber, headingAngle, 0);
+	}
+
+	void WinstonHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	{
+		const auto& player = *GetLaraInfo(&source);
+		const auto& object = Objects[target.ObjectNumber];
+
+		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
+		{
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			SoundEffect(SFX_TR3_WINSTON_CUPS, &target.Pose);
+		}
+
+		if (pos.has_value())
+		{
+			DoItemHit(&target, damage, isExplosive, false);
+		}	
 	}
 }

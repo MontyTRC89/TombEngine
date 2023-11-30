@@ -403,6 +403,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->Initialize = InitializeCreature;
 		obj->control = ControlWinston;
 		obj->collision = ObjectCollision;
+		obj->HitRoutine = WinstonHit;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 20;
 		obj->radius = 102;
