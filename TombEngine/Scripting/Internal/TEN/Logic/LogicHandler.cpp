@@ -56,7 +56,12 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 {
 	{ ScriptReserved_OnEnter, EventType::Enter },
 	{ ScriptReserved_OnInside, EventType::Inside },
-	{ ScriptReserved_OnLeave, EventType::Leave }
+	{ ScriptReserved_OnLeave, EventType::Leave },
+	{ ScriptReserved_OnLeave, EventType::Loop },
+	{ ScriptReserved_OnLeave, EventType::Load },
+	{ ScriptReserved_OnLeave, EventType::Save },
+	{ ScriptReserved_OnLeave, EventType::Start },
+	{ ScriptReserved_OnLeave, EventType::End }
 };
 
 enum class LevelEndReason
@@ -225,8 +230,8 @@ i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be
 Any returned value will be discarded.
 
 @function AddCallback
-@tparam point CallbackPoint When should the callback be called?
-@tparam function func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+@tparam CallbackPoint point When should the callback be called?
+@tparam LevelFunc func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
 @usage
 	LevelFuncs.MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
@@ -255,8 +260,8 @@ void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 Will have no effect if the function was not registered as a callback
 
 @function RemoveCallback
-@tparam point CallbackPoint The callback point the function was registered with. See @{AddCallback}
-@tparam func LevelFunc the function to remove; must be in the LevelFuncs hierarchy.
+@tparam CallbackPoint point The callback point the function was registered with. See @{AddCallback}
+@tparam LevelFunc func The function to remove; must be in the LevelFuncs hierarchy.
 @usage
 	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
 */
@@ -275,9 +280,9 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 /*** Attempt to find an event set and exectute a particular event from it.
 
 @function HandleEvent
-@tparam name string Name of the event set to find.
-@tparam type EventType Event to execute.
-@tparam activator Moveable Optional activator. Default is the player object.
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to execute.
+@tparam Moveable activator Optional activator. Default is the player object.
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
@@ -287,8 +292,8 @@ void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::opt
 /*** Attempt to find an event set and enable specified event in it.
 
 @function EnableEvent
-@tparam name string Name of the event set to find.
-@tparam type EventType Event to enable.
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to enable.
 */
 void LogicHandler::EnableEvent(const std::string& name, EventType type)
 {
@@ -298,8 +303,8 @@ void LogicHandler::EnableEvent(const std::string& name, EventType type)
 /*** Attempt to find an event set and disable specified event in it.
 
 @function DisableEvent
-@tparam name string Name of the event set to find.
-@tparam type EventType Event to disable.
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to disable.
 */
 void LogicHandler::DisableEvent(const std::string& name, EventType type)
 {
