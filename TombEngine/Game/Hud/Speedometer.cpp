@@ -42,15 +42,15 @@ namespace TEN::Hud
 
 	void SpeedometerController::Draw() const
 	{
-		constexpr auto POS						 = Vector2(DISPLAY_SPACE_RES.x - (DISPLAY_SPACE_RES.x / 6), DISPLAY_SPACE_RES.y - (DISPLAY_SPACE_RES.y / 5));
+		constexpr auto POS						 = Vector2(DISPLAY_SPACE_RES.x - (DISPLAY_SPACE_RES.x / 6), DISPLAY_SPACE_RES.y - (DISPLAY_SPACE_RES.y / 10));
 		constexpr auto ORIENT_OFFSET			 = ANGLE(90.0f);
-		constexpr auto SCALE					 = Vector2(0.2f);
+		constexpr auto SCALE					 = Vector2(0.25f);
 		constexpr auto SPRITE_SEQUENCE_OBJECT_ID = ID_SPEEDOMETER;
 		constexpr auto DIAL_ELEMENT_SPRITE_ID	 = 0;
 		constexpr auto POINTER_ELEMENT_SPRITE_ID = 1;
 		constexpr auto DIAL_PRIORITY			 = 0;
 		constexpr auto POINTER_PRIORITY			 = 1;
-		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
+		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fit;
 		constexpr auto BLEND_MODE				 = BLEND_MODES::BLENDMODE_ALPHABLEND;
 
 		DrawDebug();
