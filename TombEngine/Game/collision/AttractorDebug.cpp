@@ -29,8 +29,8 @@ namespace TEN::Collision::Attractor
 
 	static void SpawnAttractorPentagon(ItemInfo& item, bool isOuter)
 	{
-		constexpr auto RADIUS	  = BLOCK(0.5f);
-		constexpr auto STEP_COUNT = 5;
+		constexpr auto RADIUS	  = BLOCK(0.4f);
+		constexpr auto STEP_COUNT = 32;
 		constexpr auto STEP_ANGLE = PI_MUL_2 / STEP_COUNT;
 		constexpr auto REL_OFFSET = Vector3(0.0f, 0.0f, RADIUS);
 

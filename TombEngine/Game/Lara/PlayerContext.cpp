@@ -1237,7 +1237,6 @@ namespace TEN::Entities::Player
 		auto attracColls = GetAttractorCollisions(item, coll.Setup.Radius, -coll.Setup.Height, 0.0f, detectRadius);
 
 		// Assess attractor collision.
-		bool hasEnd = false;
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check if attractor is edge type.
@@ -1255,28 +1254,19 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// TODO: Accuracy. Or maybe snap to within bounds, but use offset blending.
-			// 4) Test for seam between connecting attractors.
-			if (!hasEnd &&
-				(attracColl.Proximity.ChainDistance <= EPSILON ||
-					(attracColl.AttracPtr->GetLength() - attracColl.Proximity.ChainDistance) <= EPSILON))
-			{
-				// Track ends.
-				hasEnd = true;
-
-				// 4.1) Test for looped attractor.
-				if (!attracColl.AttracPtr->IsLooped())
-					continue;
-			}
-
 			// Get point collision off side of edge.
 			auto pointColl = GetCollision(
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 5) Test if edge is high enough off the ground.
-			int floorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - pointColl.Position.Floor);
+			// 4) Test if edge is high enough off the ground.
+			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
+				continue;
+
+			// 5) Test if ceiling is higher than edge.
+			int ceilToEdgeHeight = (pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y);
+			if (ceilToEdgeHeight >= 0)
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
@@ -1290,12 +1280,12 @@ namespace TEN::Entities::Player
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
-				// Return closest edge attractor.
+				// Return closest edge attractor collision.
 				return attracColl;
 			}
 		}
 
-		// No edge found; return nullopt.
+		// No edge attractor collision; return nullopt.
 		return std::nullopt;
 	}
 
@@ -1308,8 +1298,7 @@ namespace TEN::Entities::Player
 		if (!attracColl.has_value())
 			return std::nullopt;
 
-		// TODO: Accuracy.
-		// Calculate heading angle.
+		// Calculate heading angle. NOTE: Less accurate if edge catch spans connecting attractors.
 		auto pointLeft = attracColl->AttracPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance - coll.Setup.Radius);
 		auto pointRight = attracColl->AttracPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
