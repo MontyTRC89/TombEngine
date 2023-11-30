@@ -48,7 +48,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.Velocity.z)
 	{
 		float value = item->Animation.Velocity.z / 50.0f;
-		g_Hud.Speedometer.UpdateValue(value);
+		//g_Hud.Speedometer.UpdateValue(value);
 	}
 
 	// Alert nearby creatures.

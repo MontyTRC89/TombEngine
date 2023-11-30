@@ -24,8 +24,11 @@ namespace TEN::Hud
 		constexpr auto DIAL_ANGLE_LERP_ALPHA = 0.25f;
 		constexpr auto FADE_TIME			 = 0.2f;
 
-		if (_life <= 0.0f && _value <= 0.0f && _pointerAngle <= 0.0f)
+		if (!_hasValueUpdated && _life <= 0.0f &&
+			_value <= 0.0f && _pointerAngle <= 0.0f)
+		{
 			return;
+		}
 
 		// Update life and updated value status.
 		_life = std::clamp(_life + (_hasValueUpdated ? 1.0f : -1.0f), 0.0f, LIFE_MAX * FPS);
