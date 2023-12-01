@@ -20,7 +20,7 @@ namespace TEN::Hud
 
 	void SpeedometerController::Update()
 	{
-		constexpr auto DIAL_ANGLE_MAX		 = ANGLE(179.0f);
+		constexpr auto DIAL_ANGLE_MAX		 = ANGLE(120.0f);
 		constexpr auto DIAL_ANGLE_LERP_ALPHA = 0.25f;
 		constexpr auto FADE_TIME			 = 0.2f;
 
@@ -47,16 +47,13 @@ namespace TEN::Hud
 	{
 		constexpr auto POS						 = Vector2(DISPLAY_SPACE_RES.x - (DISPLAY_SPACE_RES.x / 6), DISPLAY_SPACE_RES.y - (DISPLAY_SPACE_RES.y / 10));
 		constexpr auto ORIENT_OFFSET			 = ANGLE(90.0f);
-		constexpr auto SCALE					 = Vector2(0.25f);
-		constexpr auto SPRITE_SEQUENCE_OBJECT_ID = ID_SPEEDOMETER;
+		constexpr auto SCALE					 = Vector2(0.35f);
 		constexpr auto DIAL_ELEMENT_SPRITE_ID	 = 0;
 		constexpr auto POINTER_ELEMENT_SPRITE_ID = 1;
 		constexpr auto DIAL_PRIORITY			 = 0;
 		constexpr auto POINTER_PRIORITY			 = 1;
-		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fit;
-		constexpr auto BLEND_MODE				 = BLEND_MODES::BLENDMODE_ALPHABLEND;
 
-		DrawDebug();
+		//DrawDebug();
 
 		if (_life <= 0.0f)
 			return;
@@ -65,15 +62,15 @@ namespace TEN::Hud
 
 		// Draw dial.
 		AddDisplaySprite(
-			SPRITE_SEQUENCE_OBJECT_ID, DIAL_ELEMENT_SPRITE_ID,
+			ID_SPEEDOMETER, DIAL_ELEMENT_SPRITE_ID,
 			POS, 0, SCALE, color,
-			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, SCALE_MODE, BLEND_MODE);
+			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
 
 		// Draw pointer.
 		AddDisplaySprite(
-			SPRITE_SEQUENCE_OBJECT_ID, POINTER_ELEMENT_SPRITE_ID,
-			POS, _pointerAngle + ORIENT_OFFSET, SCALE / 2, color,
-			POINTER_PRIORITY, DisplaySpriteAlignMode::CenterTop, SCALE_MODE, BLEND_MODE);
+			ID_SPEEDOMETER, POINTER_ELEMENT_SPRITE_ID,
+			POS, _pointerAngle + ORIENT_OFFSET, SCALE, color,
+			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
 	}
 
 	void SpeedometerController::Clear()

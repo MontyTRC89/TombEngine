@@ -45,12 +45,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	if (item->Animation.Velocity.z)
-	{
-		float value = item->Animation.Velocity.z / 50.0f;
-		//g_Hud.Speedometer.UpdateValue(value);
-	}
-
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{
