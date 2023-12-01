@@ -1034,8 +1034,7 @@ namespace TEN::Entities::Player
 			return false;
 
 		// 3) Test for valid ledge.
-		if (!TestValidLedge(&item, &coll))
-			return false;
+		// TODO: Attractors.
 
 		// 4) Assess point collision.
 		if (relFloorHeight <= ABS_FLOOR_BOUND &&			   // Floor height is within lower/upper floor bounds.
@@ -1325,8 +1324,9 @@ namespace TEN::Entities::Player
 		if (!player.Control.CanClimbLadder)
 			return std::nullopt;
 
+		// TODO.
 		// 2) Test for valid ledge on climbable wall.
-		if (!TestValidLedge(&item, &coll, true))
+		//if (!TestValidLedge(&item, &coll, true))
 			return std::nullopt;
 
 		// 3) Test movement direction.
@@ -1356,9 +1356,10 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 		}
 
+		// TODO
 		// 6) Test if climbable wall is valid.
 		bool isClimbableWall = TestLaraHangOnClimbableWall(&item, &coll);
-		if (!isClimbableWall && !TestValidLedge(&item, &coll, true, true))
+		//if (!isClimbableWall && !TestValidLedge(&item, &coll, true, true))
 			return std::nullopt;
 
 		// 7) Assess point collision to wall edge.

@@ -83,18 +83,4 @@ namespace TEN::Entities::Player
 
 		bool TestIllegalSlope = false;
 	};
-
-	// Old
-	enum class CornerType
-	{
-		None,
-		Inner,
-		Outer
-	};
-	struct CornerShimmyData
-	{
-		bool Success			= false;
-		Pose RealPositionResult = Pose::Zero;
-		Pose ProbeResult		= Pose::Zero;
-	};
 }

@@ -887,12 +887,10 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 
 		TranslateItem(item, item->Pose.Orientation.y, -BLOCK(1.0f / 4));
 		GetCollisionInfo(coll, item);
-		AlignEntityToEdge(item, coll);
 		SetAnimation(item, LA_HANG_IDLE);
 
-		// TODO: Snap properly.
-		GetCollisionInfo(coll, item);
-		//item->Pose.Position.y += coll->Front.Floor - GameBoundingBox(item).Y1 - 20;
+		// TODO: Attractors.
+
 		player.Control.HandStatus = HandStatus::Busy;
 	}
 }

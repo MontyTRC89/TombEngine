@@ -15,18 +15,10 @@ using namespace TEN::Entities::Player;
 // -----------------------------
 
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle);
-bool HandlePlayerEdgeHang(ItemInfo& item, CollisionInfo& coll);
-
-bool TestValidLedge(const ItemInfo* item, const CollisionInfo* coll, bool ignoreHeadroom = false, bool heightLimit = false);
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
-
-bool			 TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
-CornerType		 TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, short testAngle);
-CornerShimmyData TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, short testAngle, bool isOuter);
-bool			 TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short testAngle);
 
 bool TestLaraWall(const ItemInfo* item, float dist, float height);
 bool TestLaraFacingCorner(const ItemInfo* item, short headingAngle, float dist);

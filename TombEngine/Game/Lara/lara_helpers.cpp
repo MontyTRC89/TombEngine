@@ -1378,9 +1378,10 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 	return JumpDirection::None;
 }
 
+// TODO
 std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& coll)
 {
-	if (IsHeld(In::Left) || IsHeld(In::StepLeft))
+	/*if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 	{
 		switch (TestLaraHangCorner(&item, &coll, ANGLE(-90.0f)))
 		{
@@ -1419,7 +1420,7 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 		case CornerType::Outer:
 			return LS_SHIMMY_45_OUTER_RIGHT;
 		}
-	}
+	}*/
 
 	return std::nullopt;
 }

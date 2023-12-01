@@ -53,7 +53,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 2) Check if attractor is edge type.
-			if (!attracColl.AttracPtr->IsEdge())
+			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
 				continue;
 
 			// 3) Test sharp corner.

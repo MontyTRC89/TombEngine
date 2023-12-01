@@ -35,12 +35,6 @@ enum class CollisionProbeMode
 	FreeFlat
 };
 
-struct LedgeData
-{
-	short Angle	   = 0;
-	float Distance = 0.0f;
-};
-
 struct CollisionPosition
 {
 	int Floor;
@@ -128,8 +122,8 @@ struct CollisionInfo
 
 	bool TriangleAtRight()	   { return ((MiddleRight.SplitAngle != 0.0f) && (MiddleRight.SplitAngle == Middle.SplitAngle)); }
 	bool TriangleAtLeft()	   { return ((MiddleLeft.SplitAngle != 0.0f) && (MiddleLeft.SplitAngle == Middle.SplitAngle)); }
-	bool DiagonalStepAtRight() { return (MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90.0f))); }
-	bool DiagonalStepAtLeft()  { return (MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f))); }
+	bool DiagonalStepAtRight() { return (MiddleRight.DiagonalStep && TriangleAtRight()); } // TODO: Check.
+	bool DiagonalStepAtLeft()  { return (MiddleLeft.DiagonalStep && TriangleAtLeft()); } // TODO: Check.
 };
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
@@ -149,8 +143,6 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
 int	GetQuadrant(short angle);
 
-LedgeData GetNearestLedgeData(const ItemInfo& item, const CollisionInfo& coll);
-
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
 int GetCeiling(FloorInfo* floor, int x, int y, int z);
@@ -166,7 +158,6 @@ int GetWaterHeight(ItemInfo* item);
 int  FindGridShift(int x, int z);
 void ShiftItem(ItemInfo* item, CollisionInfo* coll);
 void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, float radiusCoeff = 0.0f, bool doSnap = false);
-void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, short headingAngle, float radiusCoeff = 0.0f);
 void SnapEntityToGrid(ItemInfo* item, CollisionInfo* coll);
 
 void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, short constraintAngle = ANGLE(70.0f));
