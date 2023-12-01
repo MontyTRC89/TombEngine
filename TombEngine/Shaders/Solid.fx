@@ -1,4 +1,4 @@
-#include "./CameraMatrixBuffer.hlsli"
+#include "./CBCamera.hlsli"
 #include "./VertexInput.hlsli"
 
 struct PixelShaderInput

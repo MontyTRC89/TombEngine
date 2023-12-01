@@ -12,9 +12,13 @@ namespace TEN::Renderer::ConstantBuffers
 	struct alignas(16) InstancedStaticMesh
 	{
 		Matrix World;
+		//--
 		Vector4 Color;
+		//--
 		Vector4 Ambient;
+		//--
 		ShaderLight Lights[8];
+		//--
 		int NumLights;
 		int LightMode;
 		int Padding1;

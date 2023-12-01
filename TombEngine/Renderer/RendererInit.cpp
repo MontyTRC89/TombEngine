@@ -106,7 +106,6 @@ namespace TEN::Renderer
 		_cbItem = CreateConstantBuffer<CItemBuffer>();
 		_cbStatic = CreateConstantBuffer<CStaticBuffer>();
 		_cbLights = CreateConstantBuffer<CLightBuffer>();
-		_cbMisc = CreateConstantBuffer<CMiscBuffer>();
 		_cbShadowMap = CreateConstantBuffer<CShadowLightBuffer>();
 		_cbRoom = CreateConstantBuffer<CRoomBuffer>();
 		_cbAnimated = CreateConstantBuffer<CAnimatedBuffer>();
@@ -114,7 +113,6 @@ namespace TEN::Renderer
 		_cbBlending = CreateConstantBuffer<CBlendingBuffer>();
 		_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
 		_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
-		_cbSky = CreateConstantBuffer<CSkyBuffer>();
 		_cbSMAABuffer = CreateConstantBuffer<CSMAABuffer>();
 
 		// Prepare HUD Constant buffer  

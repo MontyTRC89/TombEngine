@@ -10,6 +10,7 @@ namespace TEN::Renderer::ConstantBuffers
 		float ScreenFadeFactor;
 		int ViewportWidth;
 		int ViewportHeight;
+		//--
 		Vector4 SSAOKernel[64];
 	};
 }

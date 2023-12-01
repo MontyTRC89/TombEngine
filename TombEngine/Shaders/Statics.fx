@@ -1,19 +1,10 @@
 #include "./Math.hlsli"
-#include "./CameraMatrixBuffer.hlsli"
+#include "./CBCamera.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./VertexEffects.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Blending.hlsli"
-
-cbuffer StaticMatrixBuffer : register(b8)
-{
-	float4x4 World;
-	float4 Color;
-	float4 AmbientLight;
-	ShaderLight StaticLights[MAX_LIGHTS_PER_ITEM];
-	int NumStaticLights;
-	int LightType;
-};
+#include "./CBStatic.hlsli"
 
 struct PixelShaderInput
 {

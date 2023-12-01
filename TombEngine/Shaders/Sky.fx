@@ -1,15 +1,9 @@
-#include "./CameraMatrixBuffer.hlsli"
+#include "./CBCamera.hlsli"
 #include "./Blending.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
-
-cbuffer SkyBuffer : register(b2)
-{
-	float4x4 World;
-	float4 Color;
-	int ApplyFogBulbs;
-};
+#include "./CBStatic.hlsli"
 
 struct PixelShaderInput
 {

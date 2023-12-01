@@ -4,8 +4,7 @@
 
 namespace TEN::Renderer::ConstantBuffers
 {
-	using DirectX::SimpleMath::Matrix;
-	using DirectX::SimpleMath::Vector4;
+	using namespace DirectX::SimpleMath;
 
 	struct alignas(16) CSpriteBuffer
 	{

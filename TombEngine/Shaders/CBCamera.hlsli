@@ -1,6 +1,6 @@
 #include "./Math.hlsli"
 
-cbuffer CameraMatrixBuffer : register(b0)
+cbuffer CBCamera : register(b0)
 {
 	float4x4 ViewProjection;
 	float4x4 View;

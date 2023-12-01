@@ -1413,7 +1413,6 @@ namespace TEN::Renderer
 		BindConstantBufferVS(ConstantBufferRegister::Sprite, _cbSprite.get());
 		BindConstantBufferVS(ConstantBufferRegister::Blending, _cbBlending.get());
 		BindConstantBufferVS(ConstantBufferRegister::InstancedSprites, _cbInstancedSpriteBuffer.get());
-		BindConstantBufferVS(ConstantBufferRegister::Sky, _cbSky.get());
 		BindConstantBufferVS(ConstantBufferRegister::PostProcess, _cbPostProcessBuffer.get());
 
 		BindConstantBufferPS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
@@ -1426,7 +1425,6 @@ namespace TEN::Renderer
 		BindConstantBufferPS(ConstantBufferRegister::Sprite, _cbSprite.get());
 		BindConstantBufferPS(ConstantBufferRegister::Blending, _cbBlending.get());
 		BindConstantBufferPS(ConstantBufferRegister::InstancedSprites, _cbInstancedSpriteBuffer.get());
-		BindConstantBufferPS(ConstantBufferRegister::Sky, _cbSky.get());
 		BindConstantBufferPS(ConstantBufferRegister::PostProcess, _cbPostProcessBuffer.get());
 
 		// Set up vertex parameters.
@@ -1701,11 +1699,10 @@ namespace TEN::Renderer
 						Camera.pos.y - 1536.0f, Camera.pos.z);
 					auto world = rotation * translation;
 
-					_stSky.World = (rotation * translation);
-					_stSky.Color = weather.SkyColor(s);
-					_stSky.ApplyFogBulbs = s == 0 ? 1 : 0;
-
-					_cbSky.UpdateData(_stSky, _context.Get());
+					_stStatic.World = (rotation * translation);
+					_stStatic.Color = weather.SkyColor(s);
+					_stStatic.ApplyFogBulbs = s == 0 ? 1 : 0;
+					_cbStatic.UpdateData(_stStatic, _context.Get());
 
 					DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 				}
@@ -1721,11 +1718,10 @@ namespace TEN::Renderer
 
 				auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-				_stSky.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
-				_stSky.Color = Vector4::One;
-				_stSky.ApplyFogBulbs = 1;
-
-				_cbSky.UpdateData(_stSky, _context.Get());
+				_stStatic.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
+				_stStatic.Color = Vector4::One;
+				_stStatic.ApplyFogBulbs = 1;
+				_cbStatic.UpdateData(_stStatic, _context.Get());
 
 				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 				{
@@ -1968,10 +1964,10 @@ namespace TEN::Renderer
 
 		// We need only top/bottom Y coordinate for UVRotate, but we pass whole
 		// rectangle anyway, in case later we may want to implement different UVRotate modes.
-		_stAnimated.Textures[0].topLeft     = Vector2(minX, minY);
-		_stAnimated.Textures[0].topRight    = Vector2(maxX, minY);
-		_stAnimated.Textures[0].bottomLeft  = Vector2(minX, maxY);
-		_stAnimated.Textures[0].bottomRight = Vector2(maxX, maxY);
+		_stAnimated.Textures[0].TopLeft     = Vector2(minX, minY);
+		_stAnimated.Textures[0].TopRight    = Vector2(maxX, minY);
+		_stAnimated.Textures[0].BottomLeft  = Vector2(minX, maxY);
+		_stAnimated.Textures[0].BottomRight = Vector2(maxX, maxY);
 		
 		_cbAnimated.UpdateData(_stAnimated, _context.Get());
 
@@ -2331,10 +2327,10 @@ namespace TEN::Renderer
 										break;
 									}
 
-									_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
-									_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
-									_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
-									_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
+									_stAnimated.Textures[j].TopLeft = set.Textures[j].UV[0];
+									_stAnimated.Textures[j].TopRight = set.Textures[j].UV[1];
+									_stAnimated.Textures[j].BottomRight = set.Textures[j].UV[2];
+									_stAnimated.Textures[j].BottomLeft = set.Textures[j].UV[3];
 								}
 								_cbAnimated.UpdateData(_stAnimated, _context.Get());
 							}
@@ -2405,11 +2401,10 @@ namespace TEN::Renderer
 					Camera.pos.y - 1536.0f, Camera.pos.z);
 				auto world = rotation * translation;
 
-				_stSky.World = (rotation * translation);
-				_stSky.Color = weather.SkyColor(s);
-				_stSky.ApplyFogBulbs = s == 0 ? 1 : 0;
-
-				_cbSky.UpdateData(_stSky, _context.Get());
+				_stStatic.World = (rotation * translation);
+				_stStatic.Color = weather.SkyColor(s);
+				_stStatic.ApplyFogBulbs = s == 0 ? 1 : 0;
+				_cbStatic.UpdateData(_stStatic, _context.Get());
 
 				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 
@@ -2427,12 +2422,11 @@ namespace TEN::Renderer
 
 			auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-			_stSky.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-			_stSky.Color = Vector4::One;
-			_stSky.ApplyFogBulbs = 1;
-
-			_cbSky.UpdateData(_stSky, _context.Get());
-
+			_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			_stStatic.Color = Vector4::One;
+			_stStatic.ApplyFogBulbs = 1;
+			_cbStatic.UpdateData(_stStatic, _context.Get());
+			 
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
 				auto* meshPtr = moveableObj.ObjectMeshes[k];
@@ -2510,7 +2504,7 @@ namespace TEN::Renderer
 				{
 					continue;
 				}
-
+				
 				if (rendererPass == RendererPass::ShadowMap)
 				{
 					SetBlendMode(BlendMode::Opaque);
@@ -2709,10 +2703,10 @@ namespace TEN::Renderer
 					break;
 				}
 
-				_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
-				_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
-				_stAnimated.Textures[j].bottomRight = set.Textures[j].UV[2];
-				_stAnimated.Textures[j].bottomLeft = set.Textures[j].UV[3];
+				_stAnimated.Textures[j].TopLeft = set.Textures[j].UV[0];
+				_stAnimated.Textures[j].TopRight = set.Textures[j].UV[1];
+				_stAnimated.Textures[j].BottomRight = set.Textures[j].UV[2];
+				_stAnimated.Textures[j].BottomLeft = set.Textures[j].UV[3];
 			}
 			_cbAnimated.UpdateData(_stAnimated, _context.Get());
 		}

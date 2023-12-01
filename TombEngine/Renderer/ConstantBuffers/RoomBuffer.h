@@ -1,17 +1,24 @@
 #pragma once
 #include <SimpleMath.h>
+#include "Renderer/ConstantBuffers/ShaderLight.h"
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::ConstantBuffers
 {
+	using namespace DirectX::SimpleMath;
+
 	struct alignas(16) CRoomBuffer
 	{
 		int Water;
 		int Caustics;
 		int NumRoomLights;
 		int Padding;
-		DirectX::SimpleMath::Vector2 CausticsStartUV;
-		DirectX::SimpleMath::Vector2 CausticsScale;
-		DirectX::SimpleMath::Vector4 AmbientColor;
+		//--
+		Vector2 CausticsStartUV;
+		Vector2 CausticsScale;
+		//--
+		Vector4 AmbientColor;
+		//--
 		ShaderLight RoomLights[MAX_LIGHTS_PER_ROOM];
 	};
 }

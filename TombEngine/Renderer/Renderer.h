@@ -22,7 +22,6 @@
 #include "Renderer/RenderView.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
-#include "Renderer/ConstantBuffers/MiscBuffer.h"
 #include "Renderer/ConstantBuffers/HUDBarBuffer.h"
 #include "Renderer/ConstantBuffers/HUDBuffer.h"
 #include "Renderer/ConstantBuffers/ShadowLightBuffer.h"
@@ -46,7 +45,6 @@
 #include "Renderer/Structures/RendererSprite.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Structures/RendererDoor.h"
-#include "Renderer/ConstantBuffers/SkyBuffer.h"
 #include "Structures/RendererAnimatedTexture.h"
 #include "Structures/RendererAnimatedTextureSet.h"
 #include "Structures/RendererRoom.h"
@@ -169,8 +167,6 @@ namespace TEN::Renderer
 		ConstantBuffer<CStaticBuffer> _cbStatic;
 		CLightBuffer _stLights;
 		ConstantBuffer<CLightBuffer> _cbLights;
-		CMiscBuffer _stMisc;
-		ConstantBuffer<CMiscBuffer> _cbMisc;
 		CRoomBuffer _stRoom;
 		ConstantBuffer<CRoomBuffer> _cbRoom;
 		CAnimatedBuffer _stAnimated;
@@ -191,8 +187,6 @@ namespace TEN::Renderer
 		ConstantBuffer<CBlendingBuffer> _cbBlending;
 		CInstancedStaticMeshBuffer _stInstancedStaticMeshBuffer;
 		ConstantBuffer<CInstancedStaticMeshBuffer> _cbInstancedStaticMeshBuffer;
-		CSkyBuffer _stSky;
-		ConstantBuffer<CSkyBuffer> _cbSky;
 		CSMAABuffer _stSMAABuffer;
 		ConstantBuffer<CSMAABuffer> _cbSMAABuffer;
 
