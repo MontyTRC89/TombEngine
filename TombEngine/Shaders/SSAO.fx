@@ -1,5 +1,5 @@
 #include "./VertexInput.hlsli"
-#include "./CameraMatrixBuffer.hlsli"
+#include "./CBCamera.hlsli"
 
 #define SIGMA 3.0
 #define BSIGMA 0.3
