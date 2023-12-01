@@ -63,11 +63,6 @@ namespace TEN::Collision::Attractor
 		return _box;
 	}
 
-	bool Attractor::IsEdge() const
-	{
-		return (_type == AttractorType::Edge);
-	}
-
 	bool Attractor::IsLooped() const
 	{
 		// Too few points; loop not possible.

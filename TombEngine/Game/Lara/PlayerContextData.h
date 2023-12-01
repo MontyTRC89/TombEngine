@@ -11,7 +11,7 @@ namespace TEN::Entities::Player
 {
 	enum class EdgeType
 	{
-		Ledge,
+		Attractor,
 		ClimbableWall
 	};
 
@@ -56,7 +56,7 @@ namespace TEN::Entities::Player
 	struct EdgeCatchData
 	{
 		Attractor* AttracPtr = nullptr;
-		EdgeType   Type		 = EdgeType::Ledge; // TODO: Won't be needed later.
+		EdgeType   Type		 = EdgeType::Attractor; // TODO: Won't be needed later.
 
 		Vector3 Intersection  = Vector3::Zero;
 		float	ChainDistance = 0.0f;

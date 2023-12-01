@@ -47,7 +47,6 @@ namespace TEN::Collision::Attractor
 		const BoundingBox&			GetBox() const;
 
 		// Inquirers
-		bool IsEdge() const;
 		bool IsLooped() const;
 
 		// Utilities

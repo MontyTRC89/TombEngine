@@ -1240,10 +1240,10 @@ namespace TEN::Entities::Player
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check if attractor is edge type.
-			if (!attracColl.AttracPtr->IsEdge())
+			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
 				continue;
 
-			// 2) Test if edge slope is slippery.
+			// 2) Test if edge slope is illegal.
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
@@ -1254,12 +1254,12 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// Get point collision off side of edge.
+			// Get point collision off edge side.
 			auto pointColl = GetCollision(
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 4) Test if edge is high enough off the ground.
+			// 4) Test if edge is high enough off ground.
 			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
@@ -1298,6 +1298,7 @@ namespace TEN::Entities::Player
 		if (!attracColl.has_value())
 			return std::nullopt;
 
+		// TODO: Not needed? Handled by hang function.
 		// Calculate heading angle. NOTE: Less accurate if edge catch spans connecting attractors.
 		auto pointLeft = attracColl->AttracPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance - coll.Setup.Radius);
 		auto pointRight = attracColl->AttracPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance + coll.Setup.Radius);
@@ -1307,7 +1308,7 @@ namespace TEN::Entities::Player
 		return EdgeCatchData
 		{
 			attracColl->AttracPtr,
-			EdgeType::Ledge,
+			EdgeType::Attractor,
 			attracColl->Proximity.Intersection,
 			attracColl->Proximity.ChainDistance,
 			headingAngle
@@ -1374,16 +1375,17 @@ namespace TEN::Entities::Player
 
 	std::optional<EdgeCatchData> GetEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 	{
-		// 1) Get and return edge catch (if valid).
+		// 1) Get and return edge catch.
 		auto edgeCatch = GetAttractorEdgeCatch(item, coll);
 		if (edgeCatch.has_value())
 			return edgeCatch;
 
-		// 2) Get and return climbable wall edge catch (if valid).
+		// 2) Get and return climbable wall edge catch.
 		auto wallEdgeCatch = GetClimbableWallEdgeCatch(item, coll);
 		if (wallEdgeCatch.has_value())
 			return wallEdgeCatch;
 
+		// No valid edge catch; return nullopt.
 		return std::nullopt;
 	}
 
@@ -1414,9 +1416,8 @@ namespace TEN::Entities::Player
 
 		// 3) Assess point collision.
 		if (abs(relCeilHeight) <= ABS_CEIL_BOUND &&		  // Ceiling height is within lower/upper ceiling bounds.
-			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height isn't too narrow.
+			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height is wide enough.
 		{
-			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
 			int monkeyHeight = pointColl.Position.Ceiling;
 			return MonkeySwingCatchData{ monkeyHeight };
 		}
