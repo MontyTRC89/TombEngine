@@ -56,6 +56,7 @@ struct GameConfiguration
 	int		   ShadowMapSize	  = DEFAULT_SHADOW_MAP_SIZE;
 	int		   ShadowBlobsMax	  = DEFAULT_SHADOW_BLOBS_MAX;
 	bool	   EnableCaustics	  = false;
+	bool	   EnableAmbientOcclusion = false;
 	AntialiasingMode AntialiasingMode = AntialiasingMode::None;
 
 	// Sound

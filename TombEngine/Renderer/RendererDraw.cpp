@@ -1341,8 +1341,6 @@ namespace TEN::Renderer
 
 	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view)
 	{
-		_SSAO = true;
-
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
 
@@ -1463,7 +1461,7 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
-		cameraConstantBuffer.SSAO = _SSAO ? 1 : 0;
+		cameraConstantBuffer.SSAO = g_Configuration.EnableAmbientOcclusion ? 1 : 0;
 		cameraConstantBuffer.SSAOExponent = 2;
 
 		// Set fog bulbs.
@@ -2247,7 +2245,7 @@ namespace TEN::Renderer
 				_cbShadowMap.UpdateData(_stShadowMap, _context.Get());
 			}
 
-			if (_SSAO && rendererPass != RendererPass::GBuffer)
+			if (g_Configuration.EnableAmbientOcclusion && rendererPass != RendererPass::GBuffer)
 			{
 				BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAOBlurredRenderTarget, SamplerStateRegister::PointWrap);
 			}

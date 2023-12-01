@@ -359,7 +359,6 @@ namespace TEN::Renderer
 		RenderTarget2D _SSAORenderTarget;
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
-		bool _SSAO;
 
 		// Private functions
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
@@ -624,12 +623,6 @@ namespace TEN::Renderer
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 							  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);
-
-		inline void ToggleSSAO()
-		{
-			if (!_SSAO)
-				_SSAO = true;
-		}
 	};
 
 	extern Renderer g_Renderer;

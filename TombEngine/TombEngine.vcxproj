@@ -1234,9 +1234,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <None Include="Shaders\CBStatic.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="Shaders\ConstantBuffers.hlsli">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
     <None Include="Shaders\SMAA.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
