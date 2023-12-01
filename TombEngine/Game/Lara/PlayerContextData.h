@@ -6,7 +6,6 @@ namespace TEN::Collision::Attractor { class Attractor; }
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Math;
 
-
 namespace TEN::Entities::Player
 {
 	enum class EdgeType
@@ -51,6 +50,30 @@ namespace TEN::Entities::Player
 		float Distance	   = 0.0f;
 
 		bool TestWadeStatus = true;
+	};
+
+	struct VaultSetupData
+	{
+		int LowerEdgeBound			  = 0;
+		int UpperEdgeBound			  = 0;
+		int LedgeFloorToCeilHeightMin = 0;
+		int LedgeFloorToCeilHeightMax = 0;
+		int EdgeToCeilHeightMin		  = 0;
+
+		bool TestSwampDepth = false;
+	};
+
+	struct VaultContextData
+	{
+		Attractor* AttracPtr = nullptr;
+
+		int		TargetStateID = 0;
+		Vector3 Intersection  = Vector3::Zero;
+		short	EdgeAngle	  = 0;
+
+		bool SetBusyHands	 = false;
+		bool SnapToLedge	 = false;
+		bool SetJumpVelocity = false;
 	};
 
 	struct EdgeCatchData

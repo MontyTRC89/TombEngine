@@ -49,17 +49,8 @@ bool TestLaraMonkeyBack(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
 
-std::optional<VaultTestResult> TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup);
-std::optional<VaultTestResult> TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll);
-std::optional<VaultTestResult> TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll);
-std::optional<VaultTestResult> TestLaraVault1StepToCrouch(ItemInfo* item, CollisionInfo* coll);
-std::optional<VaultTestResult> TestLaraVault2StepsToCrouch(ItemInfo* item, CollisionInfo* coll);
-std::optional<VaultTestResult> TestLaraVault3StepsToCrouch(ItemInfo* item, CollisionInfo* coll);
-std::optional<VaultTestResult> TestLaraLedgeAutoJump(ItemInfo* item, CollisionInfo* coll);
 std::optional<VaultTestResult> TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll);
 std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll);
-std::optional<VaultTestResult> TestLaraMonkeyAutoJump(ItemInfo* item, CollisionInfo* coll);
-std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll);
 bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll);
 
 CrawlVaultTestResult TestLaraCrawlVaultTolerance(ItemInfo* item, CollisionInfo* coll, CrawlVaultTestSetup testSetup);

@@ -1,12 +1,14 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
+namespace TEN::Entities::Player{ struct VaultContextData; };
 enum class JumpDirection;
 enum class WaterStatus;
 struct ItemInfo;
 struct CollisionInfo;
 struct LaraInfo;
-struct VaultTestResult;
+
+using namespace TEN::Entities::Player;
 
 struct PlayerWaterData
 {
@@ -73,7 +75,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 // Setters
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
-void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& vaultResult);
+void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContextData& vaultContext);
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);
 void SetLaraFallBackAnimation(ItemInfo* item);

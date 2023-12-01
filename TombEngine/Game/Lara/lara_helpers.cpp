@@ -1658,29 +1658,29 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	item->Pose.Orientation += extraRot * alpha;
 }
 
-void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& vaultResult)
+void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContextData& vaultContext)
 {
-	auto& player = GetLaraInfo(*item);
+	auto& player = GetLaraInfo(item);
 
-	ResetPlayerTurnRateY(*item);
-	player.Context.ProjectedFloorHeight = vaultResult.Height;
+	ResetPlayerTurnRateY(item);
+	player.Context.ProjectedFloorHeight = vaultContext.Intersection.y;
 
-	if (vaultResult.SetBusyHands)
+	if (vaultContext.SetBusyHands)
 		player.Control.HandStatus = HandStatus::Busy;
 
-	if (vaultResult.SnapToLedge)
+	if (vaultContext.SnapToLedge)
 	{
-		AlignEntityToEdge(item, coll, 0.2f, false);
-		player.Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+		//AlignEntityToEdge(item, coll, 0.2f, false);
+		player.Context.TargetOrientation = EulerAngles(0, vaultContext.EdgeAngle, 0);
 	}
 	else
 	{
-		player.Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+		player.Context.TargetOrientation = EulerAngles(0, item.Pose.Orientation.y, 0);
 	}
 
-	if (vaultResult.SetJumpVelocity)
+	if (vaultContext.SetJumpVelocity)
 	{
-		int jumpHeight = player.Context.ProjectedFloorHeight - item->Pose.Position.y;
+		int jumpHeight = player.Context.ProjectedFloorHeight - item.Pose.Position.y;
 		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(jumpHeight);
 	}
 }

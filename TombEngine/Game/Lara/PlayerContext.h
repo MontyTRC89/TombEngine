@@ -147,6 +147,7 @@ namespace TEN::Entities::Player
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Context data getters
+	std::optional<VaultContextData>		GetVaultContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeCatchData>		GetEdgeCatch(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchData> GetMonkeySwingCatch(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ShimmyData>			GetShimmy(const ItemInfo& item, const CollisionInfo& coll);

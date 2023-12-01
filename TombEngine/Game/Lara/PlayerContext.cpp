@@ -1227,6 +1227,410 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
+	static std::optional<AttractorCollisionData> GetVaultEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																				const VaultSetupData& setup,
+																				const std::vector<AttractorCollisionData>& attracColls,
+																				bool testLedge = true)
+	{
+		constexpr auto SWAMP_DEPTH_MAX = -CLICK(3);
+
+		const auto& player = GetLaraInfo(item);
+
+		// 1) Test swamp depth (if applicable).
+		if (setup.TestSwampDepth)
+		{
+			if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < SWAMP_DEPTH_MAX)
+				return std::nullopt;
+		}
+
+		// 2) Assess attractor collision.
+		for (const auto& attracColl : attracColls)
+		{
+			// 2.1) Check if attractor is edge type.
+			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
+				continue;
+
+			// 2.2) Test if edge is within range.
+			float range = OFFSET_RADIUS(coll.Setup.Radius);
+			if (attracColl.Proximity.Distance2D > range)
+				continue;
+
+			// 2.3) Test if edge slope is illegal.
+			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+				continue;
+
+			// 2.4) Test vault position and angle.
+			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
+				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			{
+				continue;
+			}
+
+			// 2.5) Test if relative edge height is within edge intersection bounds.
+			auto relEdgeHeight = attracColl.Proximity.Intersection.y - item.Pose.Position.y;
+			if (relEdgeHeight >= setup.LowerEdgeBound || // Player-to-edge height is within lower edge bound.
+				relEdgeHeight < setup.UpperEdgeBound)	 // Player-to-edge height is within upper edge bound.
+			{
+				continue;
+			}
+
+			// Get point collision at edge front.
+			auto pointCollFront = GetCollision(
+				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius);
+
+			// TODO: This can be wrong. Range with the previous check may misalign. Prevents vault cheese, but better to leave out.
+			// 2.6) Test if edge height is within attractor intersection edge intersection bounds.
+			/*int floorToEdgeHeight = pointCollFront.Position.Floor - attracColl.Proximity.Intersection.y;
+			if (floorToEdgeHeight >= setup.LowerEdgeBound || // Floor-to-edge height is within lower edge bound.
+				floorToEdgeHeight < setup.UpperEdgeBound)	 // Floor-to-edge height is within upper edge bound.
+			{
+				continue;
+			}*/
+
+			// 2.7) Test if ceiling is adequately higher than edge.
+			int ceilToEdgeHeight = abs(pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y);
+			if (ceilToEdgeHeight < setup.EdgeToCeilHeightMin)
+				continue;
+
+			// Get point collision at edge back.
+			auto pointCollBack = GetCollision(
+				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, coll.Setup.Radius);
+
+			if (testLedge)
+			{
+				// 2.8) Test for illegal slope on ledge.
+				if (pointCollBack.Position.FloorSlope)
+					continue;
+
+				// 2.9) Test ledge floor height.
+				int absLedgeFloorHeight = abs(pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y);
+				if (absLedgeFloorHeight > STEPUP_HEIGHT)
+					continue;
+
+				// 2.10) Test ledge floor-to-ceiling height.
+				int ledgeFloorToCeilHeight = abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor);
+				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
+					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
+				{
+					continue;
+				}
+			}
+
+			return attracColl;
+		}
+
+		// No valid edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
+	const std::optional<VaultContextData> Get2StepToStandVaultContext(const ItemInfo& item, const CollisionInfo& coll,
+																	  const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = VaultSetupData
+		{
+			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge range.
+			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
+			CLICK(1),						   // Edge-to-ceil height minimum.
+			false							   // Test swamp depth.
+		};
+		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
+
+		// Get vault edge attractor collision.
+		auto edgeAttracColl = GetVaultEdgeAttractorCollision(item, coll, SETUP, attracColls);
+		if (!edgeAttracColl.has_value())
+			return std::nullopt;
+
+		// Create and return vault context.
+		auto vaultContext = VaultContextData{};
+		vaultContext.AttracPtr = edgeAttracColl->AttracPtr;
+		vaultContext.Intersection = edgeAttracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		vaultContext.EdgeAngle = edgeAttracColl->HeadingAngle;
+		vaultContext.SetBusyHands = true;
+		vaultContext.SnapToLedge = true;
+		vaultContext.SetJumpVelocity = false;
+
+		return vaultContext;
+	}
+	
+	const std::optional<VaultContextData> Get3StepToStandVaultContext(const ItemInfo& item, const CollisionInfo& coll,
+																	  const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = VaultSetupData
+		{
+			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge range.
+			LARA_HEIGHT, -MAX_HEIGHT,			  // Ledge floor-to-ceil range.
+			CLICK(1),							  // Edge-to-ceil height minimum.
+			false								  // Test swamp depth.
+		};
+		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
+
+		// Get vault edge attractor collision.
+		auto edgeAttracColl = GetVaultEdgeAttractorCollision(item, coll, SETUP, attracColls);
+		if (!edgeAttracColl.has_value())
+			return std::nullopt;
+
+		// Create and return vault context.
+		auto vaultContext = VaultContextData{};
+		vaultContext.AttracPtr = edgeAttracColl->AttracPtr;
+		vaultContext.Intersection = edgeAttracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		vaultContext.EdgeAngle = edgeAttracColl->HeadingAngle;
+		vaultContext.SetBusyHands = true;
+		vaultContext.SnapToLedge = true;
+		vaultContext.SetJumpVelocity = false;
+
+		return vaultContext;
+	}
+	
+	const std::optional<VaultContextData> Get1StepToCrouchVaultContext(const ItemInfo& item, const CollisionInfo& coll,
+																	   const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = VaultSetupData
+		{
+			0, -STEPUP_HEIGHT,				// Edge range.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Ledge floor-to-ceil range.
+			CLICK(1),						// Edge-to-ceil height minimum.
+			false							// Test swamp depth.
+		};
+		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(1), 0.0f);
+
+		// Get vault edge attractor collision.
+		auto edgeAttracColl = GetVaultEdgeAttractorCollision(item, coll, SETUP, attracColls);
+		if (!edgeAttracColl.has_value())
+			return std::nullopt;
+
+		// Create and return vault context.
+		auto vaultContext = VaultContextData{};
+		vaultContext.AttracPtr = edgeAttracColl->AttracPtr;
+		vaultContext.Intersection = edgeAttracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		vaultContext.EdgeAngle = edgeAttracColl->HeadingAngle;
+		vaultContext.SetBusyHands = true;
+		vaultContext.SnapToLedge = true;
+		vaultContext.SetJumpVelocity = false;
+
+		return vaultContext;
+	}
+	
+	const std::optional<VaultContextData> Get2StepToCrouchVaultContext(const ItemInfo& item, const CollisionInfo& coll,
+																	   const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = VaultSetupData
+		{
+			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge range.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	   // Ledge floor-to-ceil range.
+			CLICK(1),						   // Edge-to-ceil height minimum.
+			false							   // Test swamp depth.
+		};
+		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
+
+		// Get vault edge attractor collision.
+		auto edgeAttracColl = GetVaultEdgeAttractorCollision(item, coll, SETUP, attracColls);
+		if (!edgeAttracColl.has_value())
+			return std::nullopt;
+
+		// Create and return vault context.
+		auto vaultContext = VaultContextData{};
+		vaultContext.AttracPtr = edgeAttracColl->AttracPtr;
+		vaultContext.Intersection = edgeAttracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		vaultContext.EdgeAngle = edgeAttracColl->HeadingAngle;
+		vaultContext.SetBusyHands = true;
+		vaultContext.SnapToLedge = true;
+		vaultContext.SetJumpVelocity = false;
+
+		return vaultContext;
+	}
+	
+	const std::optional<VaultContextData> Get3StepToCrouchVaultContext(const ItemInfo& item, const CollisionInfo& coll,
+																	   const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = VaultSetupData
+		{
+			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge range.
+			LARA_HEIGHT_CRAWL, -LARA_HEIGHT,	  // Ledge floor-to-ceil range.
+			CLICK(1),							  // Edge-to-ceil height minimum.
+			false								  // Test swamp depth.
+		};
+		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
+
+		// Get vault edge attractor collision.
+		auto edgeAttracColl = GetVaultEdgeAttractorCollision(item, coll, SETUP, attracColls);
+		if (!edgeAttracColl.has_value())
+			return std::nullopt;
+
+		// Create and return vault context.
+		auto vaultContext = VaultContextData{};
+		vaultContext.AttracPtr = edgeAttracColl->AttracPtr;
+		vaultContext.Intersection = edgeAttracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		vaultContext.EdgeAngle = edgeAttracColl->HeadingAngle;
+		vaultContext.SetBusyHands = true;
+		vaultContext.SnapToLedge = true;
+		vaultContext.SetJumpVelocity = false;
+
+		return vaultContext;
+	}
+	
+	const std::optional<VaultContextData> GetAutoJumpVaultContext(const ItemInfo& item, const CollisionInfo& coll,
+																  const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = VaultSetupData
+		{
+			-(int)CLICK(3.5f), -(int)CLICK(7.5f), // Edge range
+			0, -MAX_HEIGHT,						  // Ledge floor-to-ceil range
+			1,									  // Edge-to-ceil height minumum
+			false								  // Test swamp depth
+		};
+
+		// Get vault edge attractor collision.
+		auto edgeAttracColl = GetVaultEdgeAttractorCollision(item, coll, SETUP, attracColls, false);
+		if (!edgeAttracColl.has_value())
+			return std::nullopt;
+
+		// Create and return vault context.
+		auto vaultContext = VaultContextData{};
+		vaultContext.AttracPtr = edgeAttracColl->AttracPtr;
+		vaultContext.Intersection = edgeAttracColl->Proximity.Intersection;
+		vaultContext.EdgeAngle = edgeAttracColl->HeadingAngle;
+		vaultContext.SetBusyHands = false;
+		vaultContext.SnapToLedge = true;
+		vaultContext.SetJumpVelocity = false;
+
+		return vaultContext;
+	}
+
+	static std::optional<VaultContextData> GetAutoJumpMonkeySwingVaultContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto LOWER_CEIL_BOUND = -LARA_HEIGHT_MONKEY;
+		constexpr auto UPPER_CEIL_BOUND = -CLICK(7);
+
+		const auto& player = GetLaraInfo(item);
+
+		if (!g_GameFlow->HasMonkeyAutoJump())
+			return std::nullopt;
+
+		// Get point collision.
+		auto pointColl = GetCollision(item);
+		int vPos = item.Pose.Position.y;
+
+		// Assess point collision.
+		if (player.Control.CanMonkeySwing &&							 // Monkey swing sector flag set.
+			(pointColl.Position.Ceiling - vPos) < -LARA_HEIGHT_MONKEY && // Ceiling height is within lower ceiling bound.
+			(pointColl.Position.Ceiling - vPos) >= -CLICK(7))			 // Ceiling height is within upper ceiling bound.
+		{
+			// Create and return vault context.
+			auto vaultContext = VaultContextData{};
+			vaultContext.Intersection = Vector3(item.Pose.Position.x, pointColl.Position.Ceiling, item.Pose.Position.z);
+			vaultContext.SetBusyHands = false;
+			vaultContext.SnapToLedge = false;
+			vaultContext.SetJumpVelocity = false;
+
+			return vaultContext;
+		}
+
+		return std::nullopt;
+	}
+	std::optional<VaultContextData> GetVaultContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(2);
+
+		const auto& player = GetLaraInfo(item);
+
+		// Check hand status.
+		if (player.Control.HandStatus != HandStatus::Free)
+			return std::nullopt;
+
+		// Test swamp depth.
+		//if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < -CLICK(3))
+		//	return std::nullopt;
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(item, coll.Setup.Radius, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+
+		auto vaultContext = std::optional<VaultContextData>();
+
+		// Vault to crouch up 1 step.
+		vaultContext = Get1StepToCrouchVaultContext(item, coll, attracColls);
+		if (vaultContext.has_value())
+		{
+			vaultContext->TargetStateID = LS_VAULT_1_STEP_CROUCH;
+			if (!HasStateDispatch(&item, vaultContext->TargetStateID))
+				return std::nullopt;
+
+			return vaultContext;
+		}
+
+		// Vault up 2 steps to stand.
+		vaultContext = Get2StepToStandVaultContext(item, coll, attracColls);
+		if (vaultContext.has_value())
+		{
+			vaultContext->TargetStateID = LS_VAULT_2_STEPS;
+			if (!HasStateDispatch(&item, vaultContext->TargetStateID))
+				return std::nullopt;
+
+			return vaultContext;
+		}
+
+		// Vault to crouch up 2 steps.
+		vaultContext = Get2StepToCrouchVaultContext(item, coll, attracColls);
+		if (vaultContext.has_value())
+		{
+			vaultContext->TargetStateID = LS_VAULT_2_STEPS_CROUCH;
+			if (!HasStateDispatch(&item, vaultContext->TargetStateID))
+				return std::nullopt;
+
+			return vaultContext;
+		}
+
+		// Vault to stand up 3 steps.
+		vaultContext = Get3StepToStandVaultContext(item, coll, attracColls);
+		if (vaultContext.has_value())
+		{
+			vaultContext->TargetStateID = LS_VAULT_3_STEPS;
+			if (!HasStateDispatch(&item, vaultContext->TargetStateID))
+				return std::nullopt;
+
+			return vaultContext;
+		}
+
+		// Vault to crouch up 3 steps.
+		vaultContext = Get3StepToCrouchVaultContext(item, coll, attracColls);
+		if (vaultContext.has_value())
+		{
+			vaultContext->TargetStateID = LS_VAULT_3_STEPS_CROUCH;
+			if (!HasStateDispatch(&item, vaultContext->TargetStateID))
+				return std::nullopt;
+
+			return vaultContext;
+		}
+
+		// Vault auto jump.
+		vaultContext = GetAutoJumpVaultContext(item, coll, attracColls);
+		if (vaultContext.has_value())
+		{
+			vaultContext->TargetStateID = LS_AUTO_JUMP;
+			if (!HasStateDispatch(&item, vaultContext->TargetStateID))
+				return std::nullopt;
+
+			return vaultContext;
+		}
+
+		// TODO: Move ladder checks here when ladders are less prone to breaking.
+		// In this case, they fail due to a reliance on ShiftItem(). -- Sezz 2021.02.05
+
+		// Vault auto jump to monkey swing.
+		vaultContext = GetAutoJumpMonkeySwingVaultContext(item, coll);
+		if (vaultContext.has_value())
+		{
+			vaultContext->TargetStateID = LS_AUTO_JUMP;
+			if (!HasStateDispatch(&item, vaultContext->TargetStateID))
+				return std::nullopt;
+
+			return vaultContext;
+		}
+
+		return std::nullopt;
+	}
+
 	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
@@ -1246,14 +1650,14 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 3) Test catch angle.
+			// 3) Test catch position and angle.
 			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
 				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 			{
 				continue;
 			}
 
-			// Get point collision off edge side.
+			// Get point collision at edge front.
 			auto pointColl = GetCollision(
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
@@ -1284,7 +1688,7 @@ namespace TEN::Entities::Player
 			}
 		}
 
-		// No edge attractor collision; return nullopt.
+		// No valid edge attractor collision; return nullopt.
 		return std::nullopt;
 	}
 
