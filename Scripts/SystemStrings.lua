@@ -116,6 +116,7 @@ local strings =
 	window_title = { "TombEngine" },
 	windowed = { "Windowed" },
 	unlimited = { "Unlimited %s" },
+	ambient_occlusion = { "Ambient Occlusion" }
 }
 
 TEN.Flow.SetStrings(strings)
