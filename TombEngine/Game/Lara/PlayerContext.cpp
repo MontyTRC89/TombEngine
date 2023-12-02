@@ -1273,7 +1273,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// Get point collision at edge front.
+			// Get point collision ahead of edge.
 			auto pointCollFront = GetCollision(
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
@@ -1295,10 +1295,10 @@ namespace TEN::Entities::Player
 			// Assess ledge behind attractor (if applicable).
 			if (setup.TestLedge)
 			{
-				// Get point collision at edge back.
+				// Get point collision behind edge.
 				auto pointCollBack = GetCollision(
 					Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
-					attracColl.HeadingAngle, coll.Setup.Radius * 2);
+					attracColl.HeadingAngle, coll.Setup.Radius);
 
 				// 2.8) Test for illegal slope on ledge.
 				if (pointCollBack.Position.FloorSlope)
@@ -1334,11 +1334,11 @@ namespace TEN::Entities::Player
 			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
 			CLICK(1),						   // Edge-to-ceil height minimum.
 			false,							   // Test swamp depth.
-			false							   // Test ledge.
+			true							   // Test ledge.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
 
-		// Get vault edge attractor collision.
+		// Get edge vault attractor collision.
 		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
 		if (!attracColl.has_value())
 			return std::nullopt;
@@ -1365,11 +1365,11 @@ namespace TEN::Entities::Player
 			LARA_HEIGHT, -MAX_HEIGHT,			  // Ledge floor-to-ceil range.
 			CLICK(1),							  // Edge-to-ceil height minimum.
 			false,								  // Test swamp depth.
-			false								  // Test ledge.
+			true								  // Test ledge.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
 
-		// Get vault edge attractor collision.
+		// Get edge vault attractor collision.
 		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
 		if (!attracColl.has_value())
 			return std::nullopt;
@@ -1396,11 +1396,11 @@ namespace TEN::Entities::Player
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Ledge floor-to-ceil range.
 			CLICK(1),						// Edge-to-ceil height minimum.
 			false,							// Test swamp depth.
-			false							// Test ledge.
+			true							// Test ledge.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(1), 0.0f);
 
-		// Get vault edge attractor collision.
+		// Get edge vault attractor collision.
 		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
 		if (!attracColl.has_value())
 			return std::nullopt;
@@ -1427,11 +1427,11 @@ namespace TEN::Entities::Player
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	   // Ledge floor-to-ceil range.
 			CLICK(1),						   // Edge-to-ceil height minimum.
 			false,							   // Test swamp depth.
-			false							   // Test ledge.
+			true							   // Test ledge.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
 
-		// Get vault edge attractor collision.
+		// Get edge vault attractor collision.
 		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
 		if (!attracColl.has_value())
 			return std::nullopt;
@@ -1458,11 +1458,11 @@ namespace TEN::Entities::Player
 			LARA_HEIGHT_CRAWL, -LARA_HEIGHT,	  // Ledge floor-to-ceil range.
 			CLICK(1),							  // Edge-to-ceil height minimum.
 			false,								  // Test swamp depth.
-			false								  // Test ledge.
+			true								  // Test ledge.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
 
-		// Get vault edge attractor collision.
+		// Get edge vault attractor collision.
 		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
 		if (!attracColl.has_value())
 			return std::nullopt;
@@ -1489,10 +1489,10 @@ namespace TEN::Entities::Player
 			0, -MAX_HEIGHT,						  // Ledge floor-to-ceil range.
 			(int)CLICK(1 / 256.0f),				  // Edge-to-ceil height minumum.
 			false,								  // Test swamp depth.
-			true								  // Test ledge.
+			false								  // Test ledge.
 		};
 
-		// Get vault edge attractor collision.
+		// Get edge vault attractor collision.
 		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
 		if (!attracColl.has_value())
 			return std::nullopt;
@@ -1510,7 +1510,7 @@ namespace TEN::Entities::Player
 		return context;
 	}
 
-	static std::optional<VaultContextData> GetAutoJumpMonkeySwingVaultContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<VaultContextData> GetAutoJumpMonkeySwingVaultContext(const ItemInfo& item)
 	{
 		constexpr auto LOWER_CEIL_BOUND = -LARA_HEIGHT_MONKEY;
 		constexpr auto UPPER_CEIL_BOUND = -CLICK(7);
@@ -1522,12 +1522,12 @@ namespace TEN::Entities::Player
 
 		// Get point collision.
 		auto pointColl = GetCollision(item);
-		int vPos = item.Pose.Position.y;
+		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
 
 		// Assess point collision.
-		if (player.Control.CanMonkeySwing &&							 // Monkey swing sector flag set.
-			(pointColl.Position.Ceiling - vPos) < -LARA_HEIGHT_MONKEY && // Ceiling height is within lower ceiling bound.
-			(pointColl.Position.Ceiling - vPos) >= -CLICK(7))			 // Ceiling height is within upper ceiling bound.
+		if (player.Control.CanMonkeySwing &&	// Valid monkey swing is above.
+			relCeilHeight < LOWER_CEIL_BOUND && // Ceiling height is within lower ceiling bound.
+			relCeilHeight >= UPPER_CEIL_BOUND)	// Ceiling height is within upper ceiling bound.
 		{
 			// Create and return vault context.
 			auto context = VaultContextData{};
@@ -1544,6 +1544,7 @@ namespace TEN::Entities::Player
 
 		return std::nullopt;
 	}
+
 	std::optional<VaultContextData> GetVaultContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(2);
@@ -1553,10 +1554,6 @@ namespace TEN::Entities::Player
 		// Check hand status.
 		if (player.Control.HandStatus != HandStatus::Free)
 			return std::nullopt;
-
-		// Test swamp depth.
-		//if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < -CLICK(3))
-		//	return std::nullopt;
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, coll.Setup.Radius, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
@@ -1627,7 +1624,7 @@ namespace TEN::Entities::Player
 		// In this case, they fail due to a reliance on ShiftItem(). -- Sezz 2021.02.05
 
 		// Vault auto jump to monkey swing.
-		context = GetAutoJumpMonkeySwingVaultContext(item, coll);
+		context = GetAutoJumpMonkeySwingVaultContext(item);
 		if (context.has_value())
 		{
 			if (!HasStateDispatch(&item, context->TargetStateID))
@@ -1665,7 +1662,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// Get point collision at edge front.
+			// Get point collision ahead of edge.
 			auto pointColl = GetCollision(
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
