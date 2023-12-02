@@ -389,10 +389,9 @@ table Pendulum {
 	node: int32;
 }
 
-table EventSetCallCounters {
-	on_enter: int32;
-	on_inside: int32;
-	on_leave: int32;
+table EventSet {
+	index: int32;
+	call_counters: [int32];
 }
 
 table VolumeState {
@@ -530,11 +529,14 @@ table SaveGame {
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
 	volumes: [Volume];
-	call_counters: [EventSetCallCounters];
+	global_event_sets: [EventSet];
+	volume_event_sets: [EventSet];
 	script_vars: UnionVec;
-	//at the moment there is no real reason to save the pre_start and
-	//post_start callbacks as OnStart will have already be called when a save
-	//is loaded, but we'll store them anyway for completeness
+	
+	// At the moment there is no real reason to save the pre_start and
+	// post_start callbacks as OnStart will have already be called when a save
+	// is loaded, but we'll store them anyway for completeness.
+	
 	callbacks_pre_start: [string];
 	callbacks_post_start: [string];
 	callbacks_pre_end: [string];
@@ -545,6 +547,6 @@ table SaveGame {
 	callbacks_post_load: [string];
 	callbacks_pre_control: [string];
 	callbacks_post_control: [string];
-	}
+}
 
 root_type TEN.Save.SaveGame;
