@@ -1635,18 +1635,18 @@ namespace TEN::Entities::Player
 		float detectRadius = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
 		auto attracColls = GetAttractorCollisions(item, coll.Setup.Radius, -coll.Setup.Height, 0.0f, detectRadius);
 
-		// Assess attractor collision.
+		// 1) Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
-			// 1) Check if attractor is edge type.
+			// 1.1) Check if attractor is edge type.
 			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
 				continue;
 
-			// 2) Test if edge slope is illegal.
+			// 1.2) Test if edge slope is illegal.
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 3) Test catch position and angle.
+			// 1.3) Test catch position and angle.
 			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
 				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 			{
@@ -1658,12 +1658,12 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 4) Test if edge is high enough off ground.
+			// 1.4) Test if edge is high enough off ground.
 			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
-			// 5) Test if ceiling is higher than edge.
+			// 1.5) Test if ceiling is higher than edge.
 			int ceilToEdgeHeight = (pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y);
 			if (ceilToEdgeHeight >= 0)
 				continue;
@@ -1675,7 +1675,7 @@ namespace TEN::Entities::Player
 			int lowerBound = isMovingUp ? 0 : (int)round(item.Animation.Velocity.y);
 			int upperBound = isMovingUp ? (int)round(item.Animation.Velocity.y) : 0;
 
-			// 6) Assess catch trajectory.
+			// 1.6) Assess catch trajectory.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
