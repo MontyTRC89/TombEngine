@@ -92,7 +92,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	player.Context.WaterSurfaceDist = -water.HeightFromWater;
 
 	if (player.Context.Vehicle == NO_ITEM)
-		SpawnPlayerSplash(*item, water.WaterHeight, water.WaterDepth);
+		SpawnPlayerWaterSurfaceEffects(*item, water.WaterHeight, water.WaterDepth);
 
 	bool isWaterOnHeadspace = false;
 
@@ -149,7 +149,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					}
 
 					ResetPlayerFlex(item);
-					Splash(item);
 				}
 			}
 			// Water is at wade depth; update water status and do special handling.
@@ -162,7 +161,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->Animation.IsAirborne && !water.IsSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
-					Splash(item);
 				}
 				// Player is grounded; don't splash again.
 				else if (!item->Animation.IsAirborne)
@@ -639,7 +637,7 @@ bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 	// Hacky L-shaped Location traversal.
 	item->Location = GetRoom(item->Location, point);
 	item->Location = GetRoom(item->Location, Vector3i(item->Pose.Position.x, point.y, item->Pose.Position.z));
-	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
+	item->Floor = GetSurfaceHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z, true).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.RoomNumber)
 	{

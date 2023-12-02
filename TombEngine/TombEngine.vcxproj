@@ -323,9 +323,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Game\collision\Attractor.h" />
-    <ClInclude Include="Game\collision\AttractorCollision.h" />
-    <ClInclude Include="Game\collision\AttractorDebug.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
@@ -396,7 +393,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\PlayerContext.h" />
     <ClInclude Include="Game\Lara\PlayerContextData.h" />
     <ClInclude Include="Game\Lara\PlayerStateMachine.h" />
-    <ClInclude Include="Game\Lara\States\EdgeHang.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
     <ClInclude Include="Game\people.h" />
@@ -516,6 +512,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_claw_mutant.h" />
+    <ClInclude Include="Objects\TR3\Entity\TwinAutoGun.h" />
     <ClInclude Include="Objects\TR3\Entity\WaspMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_civvy.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_cobra.h" />
@@ -812,9 +809,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </ClCompile>
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\camera.cpp" />
-    <ClCompile Include="Game\collision\Attractor.cpp" />
-    <ClCompile Include="Game\collision\AttractorCollision.cpp" />
-    <ClCompile Include="Game\collision\AttractorDebug.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
@@ -863,6 +857,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_crawl.cpp" />
     <ClCompile Include="Game\Lara\lara_fire.cpp" />
     <ClCompile Include="Game\Lara\lara_flare.cpp" />
+    <ClCompile Include="Game\Lara\lara_hang.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_initialise.cpp" />
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
@@ -877,7 +872,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_two_guns.cpp" />
     <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\Lara\PlayerStateMachine.cpp" />
-    <ClCompile Include="Game\Lara\States\EdgeHang.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\missile.cpp" />
     <ClCompile Include="Game\people.cpp" />
@@ -1006,6 +1000,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_trex.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tribesman.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\TwinAutoGun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\WaspMutant.cpp" />
     <ClCompile Include="Objects\TR3\Object\corpse.cpp" />
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />
