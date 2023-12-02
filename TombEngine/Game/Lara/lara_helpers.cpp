@@ -755,7 +755,7 @@ void HandlePlayerCrawlFlex(ItemInfo& item)
 	}
 }
 
-static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchData& catchData)
+static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchContextData& catchData)
 {
 	auto& player = GetLaraInfo(item);
 
@@ -798,7 +798,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchDat
 	player.Context.HandsAttractor.ChainDistance = catchData.ChainDistance;
 }
 
-static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const MonkeySwingCatchData& catchData)
+static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const MonkeySwingCatchContextData& catchData)
 {
 	auto& player = GetLaraInfo(item);
 
@@ -822,7 +822,7 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 		return false;
 
 	// Catch monkey swing.
-	auto monkeyCatch = GetMonkeySwingCatch(item, coll);
+	auto monkeyCatch = GetMonkeySwingCatchContext(item, coll);
 	if (monkeyCatch.has_value())
 	{
 		SetPlayerMonkeySwingCatch(item, coll, *monkeyCatch);
@@ -830,7 +830,7 @@ bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
 	}
 
 	// Catch edge (ledge or climbable wall edge).
-	auto edgeCatch = GetEdgeCatch(item, coll);
+	auto edgeCatch = GetEdgeCatchContext(item, coll);
 	if (edgeCatch.has_value())
 	{
 		SetPlayerEdgeCatch(item, coll, *edgeCatch);

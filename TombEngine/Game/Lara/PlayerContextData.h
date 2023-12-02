@@ -14,18 +14,6 @@ namespace TEN::Entities::Player
 		ClimbableWall
 	};
 
-	enum ShimmyType
-	{
-		Up,
-		Down,
-		Left,
-		LeftInnerCorner,
-		LeftOuterCorner,
-		Right,
-		RightInnerCorner,
-		RightOuterCorner
-	};
-
 	struct GroundMovementSetupData
 	{
 		short HeadingAngle	  = 0;
@@ -76,7 +64,7 @@ namespace TEN::Entities::Player
 		bool SetJumpVelocity = false;
 	};
 
-	struct EdgeCatchData
+	struct EdgeCatchContextData
 	{
 		Attractor* AttracPtr = nullptr;
 		EdgeType   Type		 = EdgeType::Attractor; // TODO: Won't be needed later.
@@ -86,15 +74,9 @@ namespace TEN::Entities::Player
 		short	HeadingAngle  = 0;
 	};
 
-	struct MonkeySwingCatchData
+	struct MonkeySwingCatchContextData
 	{
 		int Height = 0;
-	};
-
-	struct ShimmyData
-	{
-		ShimmyType Type			= ShimmyType::Up;
-		short	   HeadingAngle = 0;
 	};
 
 	struct LedgeClimbSetupData

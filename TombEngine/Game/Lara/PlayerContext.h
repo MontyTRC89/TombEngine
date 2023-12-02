@@ -15,9 +15,9 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Player
 {
-	struct EdgeCatchData;
-	struct MonkeySwingCatchData;
-	struct ShimmyData;
+	struct EdgeCatchContextData;
+	struct MonkeySwingCatchContextData;
+	struct ShimmyContextData;
 
 	struct PlayerAttractorData
 	{
@@ -147,8 +147,7 @@ namespace TEN::Entities::Player
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Context data getters
-	std::optional<VaultContextData>		GetVaultContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeCatchData>		GetEdgeCatch(ItemInfo& item, CollisionInfo& coll);
-	std::optional<MonkeySwingCatchData> GetMonkeySwingCatch(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ShimmyData>			GetShimmy(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<VaultContextData>			   GetVaultContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
+	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 }

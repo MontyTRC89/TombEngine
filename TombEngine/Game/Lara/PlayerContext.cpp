@@ -1688,7 +1688,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<EdgeCatchData> GetAttractorEdgeCatch(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<EdgeCatchContextData> GetAttractorEdgeCatch(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -1704,7 +1704,7 @@ namespace TEN::Entities::Player
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
-		return EdgeCatchData
+		return EdgeCatchContextData
 		{
 			attracColl->AttracPtr,
 			EdgeType::Attractor,
@@ -1714,7 +1714,7 @@ namespace TEN::Entities::Player
 		};
 	}
 
-	static std::optional<EdgeCatchData> GetClimbableWallEdgeCatch(ItemInfo& item, CollisionInfo& coll)
+	static std::optional<EdgeCatchContextData> GetClimbableWallEdgeCatch(ItemInfo& item, CollisionInfo& coll)
 	{
 		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
 
@@ -1768,13 +1768,13 @@ namespace TEN::Entities::Player
 			relEdgeHeight >= 0)							  // Edge height is below upper height bound.
 		{
 			auto offset = Vector3(0.0f, edgeHeight, 0.0f);
-			return EdgeCatchData{ nullptr, EdgeType::ClimbableWall, offset };
+			return EdgeCatchContextData{ nullptr, EdgeType::ClimbableWall, offset };
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<EdgeCatchData> GetEdgeCatch(ItemInfo& item, CollisionInfo& coll)
+	std::optional<EdgeCatchContextData> GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll)
 	{
 		// 1) Get and return edge catch.
 		auto edgeCatch = GetAttractorEdgeCatch(item, coll);
@@ -1790,7 +1790,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<MonkeySwingCatchData> GetMonkeySwingCatch(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
 		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
@@ -1820,15 +1820,9 @@ namespace TEN::Entities::Player
 			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height is wide enough.
 		{
 			int monkeyHeight = pointColl.Position.Ceiling;
-			return MonkeySwingCatchData{ monkeyHeight };
+			return MonkeySwingCatchContextData{ monkeyHeight };
 		}
 
-		return std::nullopt;
-	}
-
-	// TODO
-	std::optional<ShimmyData> GetShimmy(const ItemInfo& item, const CollisionInfo& coll)
-	{
 		return std::nullopt;
 	}
 }
