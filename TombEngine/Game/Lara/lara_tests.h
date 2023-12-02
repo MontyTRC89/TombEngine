@@ -41,14 +41,6 @@ bool IsJumpState(int state);
 bool IsRunJumpQueueableState(int state);
 bool IsRunJumpCountableState(int state);
 
-bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup = false);
-
-bool TestLaraMonkeyMoveTolerance(ItemInfo* item, CollisionInfo* coll, MonkeyMoveTestSetup testSetup);
-bool TestLaraMonkeyForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
-
 std::optional<VaultTestResult> TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll);
 std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll);
 bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll);

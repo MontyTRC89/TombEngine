@@ -578,7 +578,7 @@ namespace TEN::Entities::Player
 		return TestGroundMovementSetup(item, coll, setup, true);
 	}
 
-	bool CanPerformMonkeyStep(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanPerformMonkeySwingStep(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto LOWER_CEIL_BOUND = MONKEY_STEPUP_HEIGHT;
 		constexpr auto UPPER_CEIL_BOUND = -MONKEY_STEPUP_HEIGHT;
@@ -732,7 +732,7 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool CanMonkeyForward(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanMonkeySwingForward(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		auto setup = MonkeySwingMovementSetupData
 		{
@@ -743,7 +743,7 @@ namespace TEN::Entities::Player
 		return TestMonkeySwingSetup(item, coll, setup);
 	}
 
-	bool CanMonkeyBackward(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanMonkeySwingBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		auto setup = MonkeySwingMovementSetupData
 		{
@@ -759,18 +759,18 @@ namespace TEN::Entities::Player
 		auto setup = MonkeySwingMovementSetupData
 		{
 			short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
-			(int)CLICK(0.5f), (int)-CLICK(0.5f) // NOTE: Bounds defined by monkey shimmy left/right states.
+			(int)CLICK(0.5f), -(int)CLICK(0.5f) // NOTE: Bounds defined by monkey shimmy left/right states.
 		};
 
 		return TestMonkeySwingSetup(item, coll, setup);
 	}
 
-	bool CanMonkeyShimmyLeft(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanMonkeySwingShimmyLeft(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		return TestMonkeyShimmy(item, coll, false);
 	}
 
-	bool CanMonkeyShimmyRight(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanMonkeySwingShimmyRight(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		return TestMonkeyShimmy(item, coll, true);
 	}
