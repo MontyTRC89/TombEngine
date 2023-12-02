@@ -1455,7 +1455,7 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = VaultSetupData
 		{
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
-			LARA_HEIGHT_CRAWL, -LARA_HEIGHT,	  // Ledge floor-to-ceil range.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		  // Ledge floor-to-ceil range.
 			CLICK(1),							  // Edge-to-ceil height minimum.
 			false,								  // Test swamp depth.
 			true								  // Test ledge.

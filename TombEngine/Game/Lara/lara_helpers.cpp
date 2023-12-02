@@ -1670,7 +1670,9 @@ void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContex
 
 	if (vaultContext.SnapToLedge)
 	{
-		//AlignEntityToEdge(item, coll, 0.2f, false);
+		auto intersection = Vector3i(vaultContext.Intersection.x, item.Pose.Position.y, vaultContext.Intersection.z);
+
+		item.Pose.Position = Geometry::TranslatePoint(intersection, vaultContext.EdgeAngle, -coll.Setup.Radius);
 		player.Context.TargetOrientation = EulerAngles(0, vaultContext.EdgeAngle, 0);
 	}
 	else
