@@ -489,7 +489,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					keyHoleItem->ItemFlags[1] = true;
 				}
 
-				if (keyHoleItem->TriggerFlags < 0)
+				if (keyHoleItem->TriggerFlags <= 0)
 				{
 					animation = abs(keyHoleItem->TriggerFlags);
 					RemoveObjectFromInventory(GAME_OBJECT_ID(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
