@@ -1278,16 +1278,7 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// TODO: This can be wrong. Range with the previous check may misalign. Prevents vault cheese, but better to leave out.
-			// 2.6) Test if edge height is within attractor intersection edge intersection bounds.
-			/*int floorToEdgeHeight = pointCollFront.Position.Floor - attracColl.Proximity.Intersection.y;
-			if (floorToEdgeHeight >= setup.LowerEdgeBound || // Floor-to-edge height is within lower edge bound.
-				floorToEdgeHeight < setup.UpperEdgeBound)	 // Floor-to-edge height is within upper edge bound.
-			{
-				continue;
-			}*/
-
-			// 2.7) Test if ceiling is adequately higher than edge.
+			// 2.6) Test if ceiling is adequately higher than edge.
 			int ceilToEdgeHeight = abs(pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y);
 			if (ceilToEdgeHeight < setup.EdgeToCeilHeightMin)
 				continue;
@@ -1300,16 +1291,16 @@ namespace TEN::Entities::Player
 					Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 					attracColl.HeadingAngle, coll.Setup.Radius);
 
-				// 2.8) Test for illegal slope on ledge.
+				// 2.7) Test for illegal slope on ledge.
 				if (pointCollBack.Position.FloorSlope)
 					continue;
 
-				// 2.9) Test ledge floor height.
+				// 2.8) Test ledge floor height.
 				int absLedgeFloorHeight = abs(pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y);
 				if (absLedgeFloorHeight > STEPUP_HEIGHT)
 					continue;
 
-				// 2.10) Test ledge floor-to-ceiling height.
+				// 2.9) Test ledge floor-to-ceiling height.
 				int ledgeFloorToCeilHeight = abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor);
 				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
 					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
