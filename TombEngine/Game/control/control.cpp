@@ -481,16 +481,16 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 	switch (reason)
 	{
 	case GameStatus::LoadGame:
-		HandleAllGlobalEvents(EventType::BeforeLoad, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::LoadGame, (Activator)LaraItem->Index);
 		break;
 	case GameStatus::ExitToTitle:
 		HandleAllGlobalEvents(EventType::ExitToTitle, (Activator)LaraItem->Index);
 		break;
 	case GameStatus::LaraDead:
-		HandleAllGlobalEvents(EventType::Death, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::LaraDead, (Activator)LaraItem->Index);
 		break;
 	case GameStatus::LevelComplete:
-		HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::LevelComplete, (Activator)LaraItem->Index);
 		break;
 	default:
 		break;

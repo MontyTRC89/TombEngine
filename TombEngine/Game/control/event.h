@@ -40,10 +40,10 @@ namespace TEN::Control::Volumes
 		Load,
 		Save,
 		Start,
-		End,
-		BeforeLoad,
+		LevelComplete,
+		LoadGame,
 		ExitToTitle,
-		Death,
+		LaraDead,
 
 		Count
 	};
