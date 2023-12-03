@@ -161,7 +161,7 @@ GameStatus ControlPhase(int numFrames)
 
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
-		if (!isTitle && Lara.Control.Locked)
+		if (!isTitle && Lara.Control.IsLocked)
 			ClearAllActions();
 
 		// Handle inventory / pause / load / save screens.
@@ -402,7 +402,7 @@ void CleanUp()
 	Wibble = 0;
 
 	// Needs to be cleared, otherwise controls will lock if user exits to title while playing flyby with locked controls.
-	Lara.Control.Locked = false;
+	Lara.Control.IsLocked = false;
 
 	// Resets lightning and wind parameters to avoid holding over previous weather to new level.
 	Weather.Clear();

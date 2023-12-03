@@ -27,7 +27,7 @@ namespace TEN::Entities::Generic
 	bool IsValidForPlayer(const ItemInfo& pushableItem);
 
 	bool PushableIdleConditions(ItemInfo& pushableItem);
-	bool PushableMovementConditions(ItemInfo& pushableItem, bool hasPushAction, bool hasPullAction);
+	bool TestPushableMovementConditions(ItemInfo& pushableItem, bool hasPushAction, bool hasPullAction);
 
 	PushableCollisionData GetPushableCollision(ItemInfo& item);
 }

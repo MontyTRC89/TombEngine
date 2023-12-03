@@ -12,6 +12,7 @@
 #include "Objects/game_object_ids.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Environment;
@@ -225,10 +226,16 @@ namespace TEN::Renderer
 		DrawIndexedTriangles(12, 0, 0);
 	}
 
-	void Renderer11::AddLine2D(const Vector2& origin, const Vector2& target, const Color& color)
+	void Renderer11::AddLine2D(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page)
 	{
+		if (m_Locked)
+			return;
+
+		if (!DebugMode || (DebugPage != page && page != RendererDebugPage::None))
+			return;
+
 		auto line = RendererLine2D{ origin, target, color };
-		m_lines2DToDraw.push_back(line);
+		_lines2DToDraw.push_back(line);
 	}
 
 	void Renderer11::DrawOverlays(RenderView& view)
@@ -717,7 +724,7 @@ namespace TEN::Renderer
 			case DisplaySpriteAlignMode::CenterLeft:
 				offset = Vector2(halfSize.x, 0.0f);
 				break;
-				
+
 			case DisplaySpriteAlignMode::CenterRight:
 				offset = Vector2(-halfSize.x, 0.0f);
 				break;
@@ -738,7 +745,10 @@ namespace TEN::Renderer
 				offset = Vector2(-halfSize.x, -halfSize.y);
 				break;
 			}
-			offset *= aspectCorrection;
+
+			// Rotate position offset according to orientation.
+			auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(displaySprite.Orientation));
+			offset = Vector2::Transform(offset, rotMatrix) * aspectCorrection;
 
 			AddDisplaySprite(
 				sprite,
