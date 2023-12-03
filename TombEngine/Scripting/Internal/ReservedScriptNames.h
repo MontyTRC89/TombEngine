@@ -83,6 +83,11 @@ static constexpr char ScriptReserved_PostControlPhase[] = "POSTCONTROLPHASE";
 static constexpr char ScriptReserved_OnEnter[]	= "ENTER";
 static constexpr char ScriptReserved_OnInside[] = "INSIDE";
 static constexpr char ScriptReserved_OnLeave[]	= "LEAVE";
+static constexpr char ScriptReserved_OnLoad[] = "LOAD";
+static constexpr char ScriptReserved_OnSave[] = "SAVE";
+static constexpr char ScriptReserved_OnStart[] = "START";
+static constexpr char ScriptReserved_OnEnd[] = "END";
+static constexpr char ScriptReserved_OnLoop[] = "LOOP";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";

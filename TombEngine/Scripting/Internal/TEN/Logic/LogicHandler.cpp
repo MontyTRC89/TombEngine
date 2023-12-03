@@ -57,11 +57,11 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 	{ ScriptReserved_OnEnter, EventType::Enter },
 	{ ScriptReserved_OnInside, EventType::Inside },
 	{ ScriptReserved_OnLeave, EventType::Leave },
-	{ ScriptReserved_OnLeave, EventType::Loop },
-	{ ScriptReserved_OnLeave, EventType::Load },
-	{ ScriptReserved_OnLeave, EventType::Save },
-	{ ScriptReserved_OnLeave, EventType::Start },
-	{ ScriptReserved_OnLeave, EventType::End }
+	{ ScriptReserved_OnLoop, EventType::Loop },
+	{ ScriptReserved_OnLoad, EventType::Load },
+	{ ScriptReserved_OnSave, EventType::Save },
+	{ ScriptReserved_OnStart, EventType::Start },
+	{ ScriptReserved_OnEnd, EventType::End }
 };
 
 enum class LevelEndReason
