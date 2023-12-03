@@ -157,11 +157,11 @@ GameStatus ControlPhase(int numFrames)
 
 		// Handle loop functions and node events.
 		g_GameScript->OnControlPhase(DELTA_TIME);
-		HandleAllEvents(VolumeEventType::Loop, (VolumeActivator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
-		if (!isTitle && Lara.Control.Locked)
+		if (!isTitle && Lara.Control.IsLocked)
 			ClearAllActions();
 
 		// Handle inventory / pause / load / save screens.
@@ -402,7 +402,7 @@ void CleanUp()
 	Wibble = 0;
 
 	// Needs to be cleared, otherwise controls will lock if user exits to title while playing flyby with locked controls.
-	Lara.Control.Locked = false;
+	Lara.Control.IsLocked = false;
 
 	// Resets lightning and wind parameters to avoid holding over previous weather to new level.
 	Weather.Clear();
@@ -478,29 +478,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
 	g_GameScript->OnEnd(reason);
-	switch (reason)
-	{
-	case GameStatus::LevelComplete:
-		HandleAllEvents(VolumeEventType::End, (VolumeActivator)LaraItem->Index);
-		TENLog("VolumeEventType::End", LogLevel::Info);
-		break;
-		
-	case GameStatus::LoadGame:
-		HandleAllEvents(VolumeEventType::BeforeLoad, (VolumeActivator)LaraItem->Index);
-		TENLog("VolumeEventType::BeforeLoad", LogLevel::Info);
-		break;
-		
-	case GameStatus::ExitToTitle:
-		HandleAllEvents(VolumeEventType::ExitToTitle, (VolumeActivator)LaraItem->Index);
-		TENLog("VolumeEventType::ExitToTitle", LogLevel::Info);
-		break;
-		
-	case GameStatus::LaraDead:
-		HandleAllEvents(VolumeEventType::PlayerDeath, (VolumeActivator)LaraItem->Index);
-		TENLog("VolumeEventType::PlayerDeath", LogLevel::Info);
-		break;
-	}
-		
+	HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
@@ -532,7 +511,7 @@ void InitializeOrLoadGame(bool loadGame)
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
-		HandleAllEvents(VolumeEventType::Load, (VolumeActivator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Load, (Activator)LaraItem->Index);
 	}
 	else
 	{
@@ -554,7 +533,7 @@ void InitializeOrLoadGame(bool loadGame)
 		}
 
 		g_GameScript->OnStart();
-		HandleAllEvents(VolumeEventType::Start, (VolumeActivator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Start, (Activator)LaraItem->Index);
 	}
 }
 
