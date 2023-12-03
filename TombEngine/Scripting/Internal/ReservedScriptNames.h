@@ -80,14 +80,14 @@ static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
 static constexpr char ScriptReserved_PostControlPhase[] = "POSTCONTROLPHASE";
 
 // Event types
-static constexpr char ScriptReserved_OnEnter[]	= "ENTER";
-static constexpr char ScriptReserved_OnInside[] = "INSIDE";
-static constexpr char ScriptReserved_OnLeave[]	= "LEAVE";
-static constexpr char ScriptReserved_OnLoad[] = "LOAD";
-static constexpr char ScriptReserved_OnSave[] = "SAVE";
-static constexpr char ScriptReserved_OnStart[] = "START";
-static constexpr char ScriptReserved_OnEnd[] = "END";
-static constexpr char ScriptReserved_OnLoop[] = "LOOP";
+static constexpr char ScriptReserved_EventOnEnter[]	= "ENTER";
+static constexpr char ScriptReserved_EventOnInside[] = "INSIDE";
+static constexpr char ScriptReserved_EventOnLeave[]	= "LEAVE";
+static constexpr char ScriptReserved_EventOnLoad[] = "LOAD";
+static constexpr char ScriptReserved_EventOnSave[] = "SAVE";
+static constexpr char ScriptReserved_EventOnStart[] = "START";
+static constexpr char ScriptReserved_EventOnEnd[] = "END";
+static constexpr char ScriptReserved_EventOnLoop[] = "LOOP";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";

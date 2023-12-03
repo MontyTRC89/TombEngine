@@ -54,14 +54,14 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 
 static const std::unordered_map<std::string, EventType> EVENT_TYPES
 {
-	{ ScriptReserved_OnEnter, EventType::Enter },
-	{ ScriptReserved_OnInside, EventType::Inside },
-	{ ScriptReserved_OnLeave, EventType::Leave },
-	{ ScriptReserved_OnLoop, EventType::Loop },
-	{ ScriptReserved_OnLoad, EventType::Load },
-	{ ScriptReserved_OnSave, EventType::Save },
-	{ ScriptReserved_OnStart, EventType::Start },
-	{ ScriptReserved_OnEnd, EventType::End }
+	{ ScriptReserved_EventOnEnter, EventType::Enter },
+	{ ScriptReserved_EventOnInside, EventType::Inside },
+	{ ScriptReserved_EventOnLeave, EventType::Leave },
+	{ ScriptReserved_EventOnLoop, EventType::Loop },
+	{ ScriptReserved_EventOnLoad, EventType::Load },
+	{ ScriptReserved_EventOnSave, EventType::Save },
+	{ ScriptReserved_EventOnStart, EventType::Start },
+	{ ScriptReserved_EventOnEnd, EventType::End }
 };
 
 enum class LevelEndReason
