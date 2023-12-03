@@ -35,6 +35,9 @@ namespace TEN::Collision::Attractor
 
 			if (player.Context.HandsAttractor.AttracPtr == this)
 				player.Context.HandsAttractor.AttracPtr = nullptr;
+
+			if (player.Context.VaultAttractor.AttracPtr == this)
+				player.Context.VaultAttractor.AttracPtr = nullptr;
 		}*/
 	}
 

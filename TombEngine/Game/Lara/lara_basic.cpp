@@ -96,7 +96,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_HANG_TO_STAND ||
 		item->Animation.AnimNumber == LA_HANG_TO_CROUCH)
 	{
-		item->Pose.Orientation.Lerp(Lara.Context.TargetOrientation, 0.4f);
+		item->Pose.Orientation.Lerp(Lara.Context.TargetOrientation, 0.25f);
 	}
 }
 

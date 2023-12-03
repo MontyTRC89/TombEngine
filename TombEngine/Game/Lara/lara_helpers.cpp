@@ -1193,22 +1193,6 @@ void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 	EasePlayerElevation(item, coll->Middle.Ceiling);
 }
 
-void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
-{
-	coll->Setup.ForwardAngle = item->Pose.Orientation.y + ANGLE(180.0f);
-	GetCollisionInfo(coll, item);
-
-	AlignEntityToEdge(item, coll);
-	LaraResetGravityStatus(item, coll);
-
-	// Bridges behave differently.
-	if (coll->Middle.Bridge < 0)
-	{
-		TranslateItem(item, item->Pose.Orientation.y, -LARA_RADIUS_CRAWL);
-		item->Pose.Orientation.y += ANGLE(180.0f);
-	}
-}
-
 void DoLaraTightropeBalance(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
@@ -1658,6 +1642,19 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	item->Pose.Orientation += extraRot * alpha;
 }
 
+// NOTE: Formula uses kinematic equation of motion for vertical motion under constant acceleration.
+static float GetPlayerJumpVelocity(float jumpHeight)
+{
+	constexpr auto JUMP_HEIGHT_MAX	= -CLICK(7.5f);
+	constexpr auto JUMP_HEIGHT_MIN	= -CLICK(3.5f);
+	constexpr auto A2				= -9600.0f;
+	constexpr auto UNIT_CONV_FACTOR = 12.0f;
+	constexpr auto OFFSET			= -3.0f;
+
+	jumpHeight = std::clamp(jumpHeight, JUMP_HEIGHT_MAX, JUMP_HEIGHT_MIN);
+	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
+}
+
 void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContextData& vaultContext)
 {
 	auto& player = GetLaraInfo(item);
@@ -1666,9 +1663,14 @@ void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContex
 	ResetPlayerFlex(&item);
 	player.Context.ProjectedFloorHeight = vaultContext.Intersection.y;
 
+	// Reference attractor if relevant to climb action.
+	if (vaultContext.AttracPtr != nullptr)
+		player.Context.VaultAttractor.Attach(item, *vaultContext.AttracPtr, vaultContext.ChainDistance);
+
 	if (vaultContext.SetBusyHands)
 		player.Control.HandStatus = HandStatus::Busy;
 
+	// Snap to edge (if applicable).
 	if (vaultContext.SnapToEdge)
 	{
 		auto target = Vector3i(vaultContext.Intersection.x, item.Pose.Position.y, vaultContext.Intersection.z);
@@ -1681,6 +1683,7 @@ void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContex
 		player.Context.TargetOrientation = EulerAngles(0, item.Pose.Orientation.y, 0);
 	}
 
+	// Set jump velocity (if applicable).
 	if (vaultContext.SetJumpVelocity)
 	{
 		int jumpHeight = player.Context.ProjectedFloorHeight - item.Pose.Position.y;
@@ -1826,8 +1829,7 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	item.Animation.IsAirborne = true;
 	item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 	player.Control.HandStatus = HandStatus::Free;
-	player.Context.HandsAttractor.AttracPtr->DetachPlayer(item);
-	player.Context.HandsAttractor.Clear();
+	player.Context.HandsAttractor.Detach(item);
 }
 
 void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
@@ -1955,17 +1957,4 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 	bool doPulse = ((GlobalCounter & 0x0F) % 0x0F == 1);
 	if (doPulse)
 		Rumble(POWER, DELAY);
-}
-
-// NOTE: Formula uses kinematic equation of motion for vertical motion under constant acceleration.
-float GetPlayerJumpVelocity(float jumpHeight)
-{
-	constexpr auto JUMP_HEIGHT_MAX	= -CLICK(7.5f);
-	constexpr auto JUMP_HEIGHT_MIN	= -CLICK(3.5f);
-	constexpr auto A2				= -9600.0f;
-	constexpr auto UNIT_CONV_FACTOR = 12.0f;
-	constexpr auto OFFSET			= -3.0f;
-
-	jumpHeight = std::clamp(jumpHeight, JUMP_HEIGHT_MAX, JUMP_HEIGHT_MIN);
-	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }

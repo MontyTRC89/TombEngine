@@ -579,25 +579,6 @@ namespace TEN::Entities::Player
 		return TestGroundMovementSetup(item, coll, setup, true);
 	}
 
-	bool TestLaraCrawlToHang(ItemInfo& item, const CollisionInfo& coll)
-	{
-		int y = item.Pose.Position.y;
-		int distance = CLICK(1.2f);
-		auto probe = GetCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), distance, -LARA_HEIGHT_CRAWL);
-
-		bool objectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
-
-		if (!objectCollided &&										// No obstruction.
-			(probe.Position.Floor - y) >= LARA_HEIGHT_STRETCH &&	// Highest floor bound.
-			(probe.Position.Ceiling - y) <= -CLICK(0.75f) &&		// Gap is optically permissive.
-			probe.Position.Floor != NO_HEIGHT)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
 	bool CanPerformMonkeySwingStep(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto LOWER_CEIL_BOUND = MONKEY_STEPUP_HEIGHT;
@@ -1312,7 +1293,7 @@ namespace TEN::Entities::Player
 			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
 			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 2.6) Test if ceiling is higher than edge.
+			// 2.6) Test if ceiling is adequately higher than edge.
 			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
@@ -1874,6 +1855,88 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	std::optional<VaultContextData> GetCrawlToHangVaultContext(ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto SETUP = VaultSetupData
+		{
+			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
+			0, 0,		// Ledge floor-to-ceil range (irrelevant).
+			-(int)CLICK(0.6f),					// Edge-to-ceil height lower bound.
+			false,								// Test edge front (irrelevant).
+			false,								// Test swamp depth (irrelevant).
+			false,								// Test ledge heights (irrelevant).
+			false								// Test ledge illegal slope (irrelevant).
+		};
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+
+		const auto& player = GetLaraInfo(item);
+		
+		// 1) Test for object collision.
+		bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
+		if (isObjectCollided)
+			return std::nullopt;
+
+		// 2) Assess attractor collision.
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		for (const auto& attracColl : attracColls)
+		{
+			// 2.1) Check if attractor is edge type.
+			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
+				continue;
+
+			// 2.2) Test if edge is within range.
+			float range = OFFSET_RADIUS(coll.Setup.Radius);
+			if (attracColl.Proximity.Distance2D > range)
+				continue;
+
+			// 2.3) Test if edge slope is illegal.
+			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+				continue;
+
+			// TODO
+			// 2.4) Test relation to edge intersection.
+			if (/*!attracColl.IsInFront || attracColl.IsFacingForward ||
+				*/!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			{
+				continue;
+			}
+
+			auto pointCollFront = GetCollision(
+				attracColl.Proximity.Intersection, attracColl.AttracPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius);
+			
+			// TODO
+			// 2.5) Test if relative edge height is within edge intersection bounds.
+			auto relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor;
+			if (relEdgeHeight >= SETUP.LowerEdgeBound || // Floor-to-edge height is within lower edge bound.
+				relEdgeHeight < SETUP.UpperEdgeBound)	 // Floor-to-edge height is within upper edge bound.
+			{
+				//continue;
+			}
+
+			// 2.6) Test if ceiling is adequately higher than edge.
+			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			if (edgeToCeilHeight > SETUP.LowerEdgeToCeilBound)
+				continue;
+
+			// Create and return crawl to hang vault context.
+			auto context = VaultContextData{};
+			context.AttracPtr = attracColl.AttracPtr;
+			context.Intersection = Vector3(attracColl.Proximity.Intersection.x, item.Pose.Position.y, attracColl.Proximity.Intersection.z);
+			context.ChainDistance = attracColl.Proximity.ChainDistance;
+			context.HeadingAngle = attracColl.HeadingAngle + ANGLE(180.0f);
+			context.TargetStateID = LS_CRAWL_TO_HANG;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
+
+			return context;
+		}
+
+		// No valid edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
 	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
@@ -1911,7 +1974,7 @@ namespace TEN::Entities::Player
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
-			// 1.5) Test if ceiling is higher than edge.
+			// 1.5) Test if ceiling is adequately higher than edge.
 			int edgeToCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;

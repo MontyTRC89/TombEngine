@@ -24,15 +24,18 @@ namespace TEN::Entities::Player
 		Attractor* AttracPtr	 = nullptr;
 		float	   ChainDistance = 0.0f;
 
-		void Set(Attractor& attrac, float chainDist)
+		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
 		{
 			AttracPtr = &attrac;
 			ChainDistance = chainDist;
+			//AttracPtr->AttackPlayer(playerItem);
 		}
 
-		void Clear()
+		void Detach(ItemInfo& playerItem)
 		{
-			*this = {};
+			AttracPtr = nullptr;
+			ChainDistance = 0.0f;
+			//AttracPtr->DetachPlayer(playerItem);
 		};
 	};
 
@@ -108,7 +111,6 @@ namespace TEN::Entities::Player
 	bool CanCrouchRoll(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanCrawlForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanCrawlBackward(const ItemInfo& item, const CollisionInfo& coll);
-	bool TestLaraCrawlToHang(ItemInfo& item, const CollisionInfo& coll);
 
 	// Monkey swing contexts
 	bool CanPerformMonkeySwingStep(const ItemInfo& item, const CollisionInfo& coll);
@@ -151,6 +153,7 @@ namespace TEN::Entities::Player
 	// Context data getters
 	std::optional<VaultContextData>			   GetStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<VaultContextData>			   GetCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<VaultContextData>			   GetCrawlToHangVaultContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 }

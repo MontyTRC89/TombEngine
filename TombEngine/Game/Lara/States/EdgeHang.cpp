@@ -217,7 +217,7 @@ namespace TEN::Entities::Player
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
-		player.Context.HandsAttractor.Set(*edgeAttracColls->Center.AttracPtr, edgeAttracColls->Center.Proximity.ChainDistance);
+		player.Context.HandsAttractor.Attach(item, *edgeAttracColls->Center.AttracPtr, edgeAttracColls->Center.Proximity.ChainDistance);
 	}
 
 	// State:	  LS_HANG_IDLE (10)

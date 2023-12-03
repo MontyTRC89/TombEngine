@@ -54,8 +54,8 @@ namespace TEN::Collision::Attractor
 		unsigned int GetSegmentIDAtChainDistance(float chainDist) const;
 
 		void Update(const std::vector<Vector3>& points, int roomNumber);
-		void AttachPlayer(ItemInfo& itemNumber);
-		void DetachPlayer(ItemInfo& itemNumber);
+		void AttachPlayer(ItemInfo& playerItem);
+		void DetachPlayer(ItemInfo& playerItem);
 
 		void DrawDebug() const;
 

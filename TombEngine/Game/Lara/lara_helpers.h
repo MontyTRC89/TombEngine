@@ -44,7 +44,6 @@ void HandlePlayerAirBubbles(ItemInfo* item);
 void EasePlayerElevation(ItemInfo* item, int relHeight);
 void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
-void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll);
 void DoLaraTightropeBalance(ItemInfo* item);
 void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
@@ -92,5 +91,3 @@ void ResetPlayerFlex(ItemInfo* item, float alpha = 1.0f);
 void ResetPlayerLookAround(ItemInfo& item, float alpha = 0.1f);
 
 void RumbleLaraHealthCondition(ItemInfo* item);
-
-float GetPlayerJumpVelocity(float height);

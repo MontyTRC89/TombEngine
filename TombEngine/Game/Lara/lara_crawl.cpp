@@ -481,11 +481,15 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::Back))
 		{
-			if (IsHeld(In::Action) && TestLaraCrawlToHang(*item, *coll))
+			if (IsHeld(In::Action))
 			{
-				item->Animation.TargetState = LS_CRAWL_TO_HANG;
-				DoLaraCrawlToHangSnap(item, coll);
-				return;
+				auto climbContext = GetCrawlToHangVaultContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerVault(*item, *coll, *climbContext);
+					return;
+				}
 			}
 
 			if (CanCrawlBackward(*item, *coll))
@@ -892,7 +896,7 @@ void lara_col_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	const auto& player = GetLaraInfo(*item);
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -900,22 +904,8 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = BLOCK(1);
 
 	ResetPlayerLean(item, 1 / 6.0f);
+	item->Pose.Orientation.Lerp(player.Context.TargetOrientation + EulerAngles(0, ANGLE(180.0f), 0), 0.25f);
 
 	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
-	{
-		player.Control.MoveAngle = item->Pose.Orientation.y;
-		coll->Setup.Height = LARA_HEIGHT_STRETCH;
-		coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-		coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-		coll->Setup.ForwardAngle = player.Control.MoveAngle;
-
-		TranslateItem(item, item->Pose.Orientation.y, -BLOCK(1.0f / 4));
-		GetCollisionInfo(coll, item);
 		SetAnimation(item, LA_HANG_IDLE);
-
-		// TODO: Attractors.
-
-		player.Control.HandStatus = HandStatus::Busy;
-	}
 }
