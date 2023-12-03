@@ -478,7 +478,23 @@ void InitializeScripting(int levelIndex, bool loadGame)
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
 	g_GameScript->OnEnd(reason);
-	HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+	switch (reason)
+	{
+	case GameStatus::LoadGame:
+		HandleAllGlobalEvents(EventType::BeforeLoad, (Activator)LaraItem->Index);
+		break;
+	case GameStatus::ExitToTitle:
+		HandleAllGlobalEvents(EventType::ExitToTitle, (Activator)LaraItem->Index);
+		break;
+	case GameStatus::LaraDead:
+		HandleAllGlobalEvents(EventType::Death, (Activator)LaraItem->Index);
+		break;
+	case GameStatus::LevelComplete:
+		HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+		break;
+	default:
+		break;
+	}
 
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();

@@ -41,6 +41,9 @@ namespace TEN::Control::Volumes
 		Save,
 		Start,
 		End,
+		BeforeLoad,
+		ExitToTitle,
+		Death,
 
 		Count
 	};
