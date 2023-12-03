@@ -480,7 +480,6 @@ static std::vector<LaraWeaponType> StandingWeaponTypes
 	LaraWeaponType::Shotgun,
 	LaraWeaponType::HK,
 	LaraWeaponType::Crossbow,
-	LaraWeaponType::Torch,
 	LaraWeaponType::GrenadeLauncher,
 	LaraWeaponType::HarpoonGun,
 	LaraWeaponType::RocketLauncher,
