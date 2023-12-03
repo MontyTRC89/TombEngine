@@ -788,8 +788,8 @@ void CreatureHealth(ItemInfo* item)
 		auto bounds = GameBoundingBox(item);
 		auto height = item->Pose.Position.y - GetWaterHeight(item);
 
-		//if (abs(bounds.Y1 + bounds.Y2) < height)
-			//DoDamage(item, INT_MAX);
+		if (abs(bounds.Y1 + bounds.Y2) < height)
+			DoDamage(item, INT_MAX);
 	}
 }
 
