@@ -48,8 +48,10 @@ namespace TEN::Entities::Player
 		int LedgeFloorToCeilHeightMax = 0;
 		int LowerEdgeToCeilBound	  = 0;
 
-		bool TestSwampDepth = false;
-		bool TestLedge		= false;
+		bool TestEdgeFront		   = false;
+		bool TestSwampDepth		   = false;
+		bool TestLedgeHeights	   = false;
+		bool TestLedgeIllegalSlope = false;
 	};
 
 	struct VaultContextData

@@ -9,6 +9,8 @@ struct CollisionInfo;
 // Control & Collision Functions
 // -----------------------------
 
+void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll);
+
 // -------
 // CROUCH:
 // -------

@@ -33,6 +33,9 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = BLOCK(1);
 	Camera.flags = CF_FOLLOW_CENTER;
 
+	EasePlayerElevation(item, player.Context.ProjectedFloorHeight - item->Pose.Position.y);
+	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.25f);
+
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
@@ -578,6 +581,18 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsHeld(In::Forward))
 		{
+			if (IsHeld(In::Action) || IsHeld(In::Jump))
+			{
+				// TODO: Not working in this state.
+				auto vaultContext = GetCrawlVaultContext(*item, *coll);
+				if (vaultContext.has_value())
+				{
+					item->Animation.TargetState = vaultContext->TargetStateID;
+					SetPlayerVault(*item, *coll, *vaultContext);
+					return;
+				}
+			}
+
 			item->Animation.TargetState = LS_CRAWL_FORWARD;
 			return;
 		}

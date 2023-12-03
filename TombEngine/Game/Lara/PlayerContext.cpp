@@ -1279,11 +1279,22 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 2.4) Test vault position and angle.
-			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
-				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			// 2.4) Test relation to edge intersection.
+			if (setup.TestEdgeFront)
 			{
-				continue;
+				if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
+					!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+				{
+					continue;
+				}
+			}
+			else
+			{
+				if (!attracColl.IsInFront || attracColl.IsFacingForward ||
+					!TestPlayerInteractAngle(item, attracColl.HeadingAngle + ANGLE(180.0f)))
+				{
+					continue;
+				}
 			}
 
 			// 2.5) Test if relative edge height is within edge intersection bounds.
@@ -1304,30 +1315,33 @@ namespace TEN::Entities::Player
 			if (ceilToEdgeHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
-			// Assess ledge behind attractor (if applicable).
-			if (setup.TestLedge)
+			// Get point collision behind edge.
+			auto pointCollBack = GetCollision(
+				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, coll.Setup.Radius);
+
+			// Assess ledge heights (if applicable).
+			if (setup.TestLedgeHeights)
 			{
-				// Get point collision behind edge.
-				auto pointCollBack = GetCollision(
-					Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
-					attracColl.HeadingAngle, coll.Setup.Radius);
-
-				// 2.7) Test for illegal slope on ledge.
-				if (pointCollBack.Position.FloorSlope)
-					continue;
-
-				// 2.8) Test ledge floor height.
+				// 2.7) Test ledge floor height.
 				int absLedgeFloorHeight = abs(pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y);
 				if (absLedgeFloorHeight > LEDGE_FLOOR_HEIGHT_TOLERANCE)
 					continue;
 
-				// 2.9) Test ledge floor-to-ceiling height.
+				// 2.8) Test ledge floor-to-ceiling height.
 				int ledgeFloorToCeilHeight = abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor);
 				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
 					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
 				{
 					continue;
 				}
+			}
+
+			// 2.9) Test for illegal slope on ledge (if applicable).
+			if (setup.TestLedgeIllegalSlope)
+			{
+				if (pointCollBack.Position.FloorSlope)
+					continue;
 			}
 
 			return attracColl;
@@ -1345,8 +1359,10 @@ namespace TEN::Entities::Player
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
 			-CLICK(1),						   // Edge-to-ceil height lower bound.
+			true,							   // Test edge front.
 			false,							   // Test swamp depth.
-			true							   // Test ledge.
+			true,							   // Test ledge heights.
+			true							   // Test ledge illegal slope.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
 
@@ -1376,8 +1392,10 @@ namespace TEN::Entities::Player
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			  // Ledge floor-to-ceil range.
 			-CLICK(1),							  // Edge-to-ceil height lower bound.
+			true,								  // Test edge front.
 			false,								  // Test swamp depth.
-			true								  // Test ledge.
+			true,								  // Test ledge heights.
+			true								  // Test ledge illegal slope.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
 
@@ -1407,8 +1425,10 @@ namespace TEN::Entities::Player
 			0, -STEPUP_HEIGHT,				// Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Ledge floor-to-ceil range.
 			-CLICK(1),						// Edge-to-ceil height lower bound.
+			true,							// Test edge front.
 			false,							// Test swamp depth.
-			true							// Test ledge.
+			true,							// Test ledge heights.
+			true							// Test ledge illegal slope.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(1), 0.0f);
 
@@ -1438,8 +1458,10 @@ namespace TEN::Entities::Player
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	   // Ledge floor-to-ceil range.
 			-CLICK(1),						   // Edge-to-ceil height lower bound.
+			true,							   // Test edge front.
 			false,							   // Test swamp depth.
-			true							   // Test ledge.
+			true,							   // Test ledge heights.
+			true							   // Test ledge illegal slope.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
 
@@ -1469,8 +1491,10 @@ namespace TEN::Entities::Player
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		  // Ledge floor-to-ceil range.
 			-CLICK(1),							  // Edge-to-ceil height lower bound.
+			true,								  // Test edge front.
 			false,								  // Test swamp depth.
-			true								  // Test ledge.
+			true,								  // Test ledge heights.
+			true								  // Test ledge illegal slope.
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
 
@@ -1503,8 +1527,10 @@ namespace TEN::Entities::Player
 			-(int)CLICK(3.5f), -(int)CLICK(7.5f), // Edge height bounds.
 			0, -MAX_HEIGHT,						  // Ledge floor-to-ceil range.
 			-(int)CLICK(1 / 256.0f),			  // Edge-to-ceil height minumum.
+			true,								  // Test edge front.
 			false,								  // Test swamp depth.
-			false								  // Test ledge.
+			false,								  // Test ledge heights.
+			false								  // Test ledge illegal slope.
 		};
 
 		const auto& player = GetLaraInfo(item);
@@ -1674,8 +1700,10 @@ namespace TEN::Entities::Player
 			-CRAWL_STEPUP_HEIGHT, -STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		  // Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),					  // Edge-to-ceil height lower bound.
+			true,								  // Test edge front.
 			false,								  // Test swamp depth.
-			true								  // Test ledge.
+			true,								  // Test ledge heights.
+			true								  // Test ledge illegal slope.
 		};
 
 		// Get edge vault attractor collision.
@@ -1686,7 +1714,7 @@ namespace TEN::Entities::Player
 		// Create and return crawl vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection;
+		context.Target = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
 		context.HeadingAngle = attracColl->HeadingAngle;
 		context.TargetStateID = LS_CRAWL_STEP_UP;
 		context.SetBusyHands = true;
@@ -1701,11 +1729,13 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto SETUP = VaultSetupData
 		{
-			-STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		 // Ledge floor-to-ceil range.
-			-(int)CLICK(0.6f),					 // Edge-to-ceil height lower bound.
-			false,								 // Test swamp depth.
-			true								 // Test ledge.
+			STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		// Ledge floor-to-ceil range.
+			-(int)CLICK(0.6f),					// Edge-to-ceil height lower bound.
+			false,								// Test edge front.
+			false,								// Test swamp depth.
+			true,								// Test ledge heights.
+			true								// Test ledge illegal slope.
 		};
 
 		// Get edge vault attractor collision.
@@ -1716,8 +1746,8 @@ namespace TEN::Entities::Player
 		// Create and return crawl vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection;
-		context.HeadingAngle = attracColl->HeadingAngle;
+		context.Target = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+		context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
 		context.TargetStateID = LS_CRAWL_STEP_DOWN;
 		context.SetBusyHands = true;
 		context.SnapToLedge = true;
@@ -1731,11 +1761,13 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto SETUP = VaultSetupData
 		{
-			STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,			// Ledge floor-to-ceil range.
-			-(int)CLICK(1.25f),					// Edge-to-ceil height lower bound.
-			false,								// Test swamp depth.
-			true								// Test ledge.
+			STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT, // Edge height bounds.
+			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
+			-(int)CLICK(1.25f),					 // Edge-to-ceil height lower bound.
+			true,								 // Test edge front.
+			false,								 // Test swamp depth.
+			true,								 // Test ledge heights.
+			false								 // Test ledge illegal slope.
 		};
 
 		// Get edge vault attractor collision.
@@ -1764,8 +1796,10 @@ namespace TEN::Entities::Player
 			NO_LOWER_BOUND, STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,	   // Ledge floor-to-ceil range.
 			-(int)CLICK(1.25f),			   // Edge-to-ceil height lower bound.
+			true,						   // Test edge front.
 			false,						   // Test swamp depth.
-			true						   // Test ledge.
+			true,						   // Test ledge heights.
+			false						   // Test ledge illegal slope.
 		};
 
 		// Get edge vault attractor collision.
@@ -1858,7 +1892,7 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 1.3) Test catch position and angle.
+			// 1.3) Test relation to edge intersection.
 			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
 				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 			{

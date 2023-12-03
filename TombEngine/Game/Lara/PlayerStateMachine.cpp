@@ -193,8 +193,8 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_SLOPE_CLIMB_START] = std::pair(lara_as_sclimbstart, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_SLOPE_CLIMB_STOP] = std::pair(lara_as_sclimbstop, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_SLOPE_CLIMB_END] = std::pair(lara_as_sclimbend, lara_default_col);
-		PlayerBehaviorStateRoutines[LS_CRAWL_STEP_UP] = std::pair(lara_as_null, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_CRAWL_STEP_DOWN] = std::pair(lara_as_null, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_CRAWL_STEP_UP] = std::pair(lara_as_crawl_vault, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_CRAWL_STEP_DOWN] = std::pair(lara_as_crawl_vault, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_MONKEY_BACK] = std::pair(lara_as_monkey_back, lara_col_monkey_back);
 		PlayerBehaviorStateRoutines[LS_VAULT] = std::pair(lara_as_vault, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_VAULT_2_STEPS] = std::pair(lara_as_vault, lara_void_func);

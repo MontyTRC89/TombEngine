@@ -1675,7 +1675,6 @@ void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContex
 
 		item.Pose.Position = Geometry::TranslatePoint(target, vaultContext.HeadingAngle, -coll.Setup.Radius);
 		player.Context.TargetOrientation = EulerAngles(0, vaultContext.HeadingAngle, 0);
-		item.Pose.Orientation = EulerAngles(0, vaultContext.HeadingAngle, 0);
 	}
 	else
 	{
