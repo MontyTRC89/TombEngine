@@ -161,6 +161,7 @@ void LoadBoxes();
 void LoadSamples();
 void LoadSoundSources();
 void LoadAnimatedTextures();
+void LoadEventSets();
 void LoadAIObjects();
 
 void LoadPortal(ROOM_INFO& room);

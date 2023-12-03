@@ -989,6 +989,13 @@ void LoadAIObjects()
 void LoadEvent(EventSet& eventSet)
 {
 	int eventType = ReadInt32();
+
+	if (eventType >= (int)EventType::Count)
+	{
+		TENLog("Unknown event type detected for event set " + eventSet.Name + ". Fall back to default.", LogLevel::Warning);
+		eventType = (int)EventType::Enter;
+	}
+
 	auto& evt = eventSet.Events[eventType];
 
 	evt.Mode = (EventMode)ReadInt32();
@@ -997,7 +1004,7 @@ void LoadEvent(EventSet& eventSet)
 	evt.CallCounter = ReadInt32();
 }
 
-void LoadVolumeEventSets()
+void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
 	if (eventSetCount == 0)
@@ -1178,7 +1185,7 @@ bool LoadLevel(int levelIndex)
 		LoadItems();
 		LoadAIObjects();
 
-		LoadVolumeEventSets();
+		LoadEventSets();
 
 		LoadSamples();
 		g_Renderer.UpdateProgress(80);
