@@ -1664,14 +1664,14 @@ void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContex
 
 	ResetPlayerTurnRateY(item);
 	ResetPlayerFlex(&item);
-	player.Context.ProjectedFloorHeight = vaultContext.Target.y;
+	player.Context.ProjectedFloorHeight = vaultContext.Intersection.y;
 
 	if (vaultContext.SetBusyHands)
 		player.Control.HandStatus = HandStatus::Busy;
 
-	if (vaultContext.SnapToLedge)
+	if (vaultContext.SnapToEdge)
 	{
-		auto target = Vector3i(vaultContext.Target.x, item.Pose.Position.y, vaultContext.Target.z);
+		auto target = Vector3i(vaultContext.Intersection.x, item.Pose.Position.y, vaultContext.Intersection.z);
 
 		item.Pose.Position = Geometry::TranslatePoint(target, vaultContext.HeadingAngle, -coll.Setup.Radius);
 		player.Context.TargetOrientation = EulerAngles(0, vaultContext.HeadingAngle, 0);

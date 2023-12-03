@@ -1254,6 +1254,9 @@ namespace TEN::Entities::Player
 		constexpr auto SWAMP_DEPTH_MAX				= -CLICK(3);
 		constexpr auto LEDGE_FLOOR_HEIGHT_TOLERANCE = CLICK(1);
 
+		// HACK: Offset required for proper bridge surface height detection. Floordata should be revised for proper handling.
+		constexpr auto PROBE_POINT_OFFSET = Vector3(0.0f, -CLICK(1), 0.0f);
+		
 		const auto& player = GetLaraInfo(item);
 
 		// 1) Test swamp depth (if applicable).
@@ -1306,19 +1309,16 @@ namespace TEN::Entities::Player
 			}
 
 			// Get point collision ahead of edge.
-			auto pointCollFront = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, -coll.Setup.Radius);
+			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
+			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 2.6) Test if ceiling is adequately higher than edge.
-			int ceilToEdgeHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
-			if (ceilToEdgeHeight > setup.LowerEdgeToCeilBound)
+			// 2.6) Test if ceiling is higher than edge.
+			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
 			// Get point collision behind edge.
-			auto pointCollBack = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, coll.Setup.Radius);
+			auto pointCollBack = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, coll.Setup.Radius);
 
 			// Assess ledge heights (if applicable).
 			if (setup.TestLedgeHeights)
@@ -1374,11 +1374,12 @@ namespace TEN::Entities::Player
 		// Create and return standing vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.ChainDistance = attracColl->Proximity.ChainDistance;
 		context.HeadingAngle = attracColl->HeadingAngle;
 		context.TargetStateID = LS_VAULT_2_STEPS;
 		context.SetBusyHands = true;
-		context.SnapToLedge = true;
+		context.SnapToEdge = true;
 		context.SetJumpVelocity = false;
 
 		return context;
@@ -1407,11 +1408,12 @@ namespace TEN::Entities::Player
 		// Create and return standing vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.ChainDistance = attracColl->Proximity.ChainDistance;
 		context.HeadingAngle = attracColl->HeadingAngle;
 		context.TargetStateID = LS_VAULT_3_STEPS;
 		context.SetBusyHands = true;
-		context.SnapToLedge = true;
+		context.SnapToEdge = true;
 		context.SetJumpVelocity = false;
 
 		return context;
@@ -1440,11 +1442,12 @@ namespace TEN::Entities::Player
 		// Create and return standing vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.ChainDistance = attracColl->Proximity.ChainDistance;
 		context.HeadingAngle = attracColl->HeadingAngle;
 		context.TargetStateID = LS_VAULT_1_STEP_CROUCH;
 		context.SetBusyHands = true;
-		context.SnapToLedge = true;
+		context.SnapToEdge = true;
 		context.SetJumpVelocity = false;
 
 		return context;
@@ -1473,11 +1476,12 @@ namespace TEN::Entities::Player
 		// Create and return standing vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.ChainDistance = attracColl->Proximity.ChainDistance;
 		context.HeadingAngle = attracColl->HeadingAngle;
 		context.TargetStateID = LS_VAULT_2_STEPS_CROUCH;
 		context.SetBusyHands = true;
-		context.SnapToLedge = true;
+		context.SnapToEdge = true;
 		context.SetJumpVelocity = false;
 
 		return context;
@@ -1506,11 +1510,12 @@ namespace TEN::Entities::Player
 		// Create and return standing vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+		context.ChainDistance = attracColl->Proximity.ChainDistance;
 		context.HeadingAngle = attracColl->HeadingAngle;
 		context.TargetStateID = LS_VAULT_3_STEPS_CROUCH;
 		context.SetBusyHands = true;
-		context.SnapToLedge = true;
+		context.SnapToEdge = true;
 		context.SetJumpVelocity = false;
 
 		return context;
@@ -1541,11 +1546,12 @@ namespace TEN::Entities::Player
 		{
 			auto context = VaultContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Target = attracColl->Proximity.Intersection;
+			context.Intersection = attracColl->Proximity.Intersection;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.HeadingAngle = attracColl->HeadingAngle;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.SetBusyHands = false;
-			context.SnapToLedge = true;
+			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
 
 			return context;
@@ -1566,11 +1572,12 @@ namespace TEN::Entities::Player
 		{
 			auto context = VaultContextData{};
 			context.AttracPtr = nullptr;
-			context.Target = Vector3(item.Pose.Position.x, pointColl.Position.Ceiling, item.Pose.Position.z);
+			context.Intersection = Vector3(item.Pose.Position.x, pointColl.Position.Ceiling, item.Pose.Position.z);
+			context.ChainDistance = 0.0f;
 			context.HeadingAngle = item.Pose.Orientation.y;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.SetBusyHands = false;
-			context.SnapToLedge = false;
+			context.SnapToEdge = false;
 			context.SetJumpVelocity = false;
 
 			return context;
@@ -1648,50 +1655,6 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	struct CrawlVaultTestSetup
-	{
-		int LowerFloorBound;
-		int UpperFloorBound;
-		int ClampMin;
-		int GapMin;
-
-		int CrossDist;
-		int DestDist;
-		int FloorBound;
-		bool CheckSlope = true;
-		bool CheckDeath = true;
-	};
-
-	/*std::optional<CrawlVaultTestResult> TestLaraCrawlVaultTolerance(ItemInfo* item, CollisionInfo* coll, CrawlVaultTestSetup testSetup)
-	{
-		int y = item->Pose.Position.y;
-		auto probeA = GetCollision(item, item->Pose.Orientation.y, testSetup.CrossDist, -LARA_HEIGHT_CRAWL);	// Crossing.
-		auto probeB = GetCollision(item, item->Pose.Orientation.y, testSetup.DestDist, -LARA_HEIGHT_CRAWL);		// Approximate destination.
-		auto probeMiddle = GetCollision(item);
-
-		bool isSlope = testSetup.CheckSlope ? probeB.Position.FloorSlope : false;
-		bool isDeath = testSetup.CheckDeath ? probeB.Block->Flags.Death : false;
-
-		// Check for slope or death sector (if applicable).
-		if (isSlope || isDeath)
-			return CrawlVaultTestResult{ false };
-
-		// Assess point collision.
-		if ((probeA.Position.Floor - y) <= testSetup.LowerFloorBound &&							// Within lower floor bound.
-			(probeA.Position.Floor - y) >= testSetup.UpperFloorBound &&							// Within upper floor bound.
-			abs(probeA.Position.Ceiling - probeA.Position.Floor) > testSetup.ClampMin &&		// Crossing clamp limit.
-			abs(probeB.Position.Ceiling - probeB.Position.Floor) > testSetup.ClampMin &&		// Destination clamp limit.
-			abs(probeMiddle.Position.Ceiling - probeA.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going up).
-			abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going down).
-			abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.FloorBound &&		// Crossing/destination floor height difference suggests continuous crawl surface.
-			(probeA.Position.Ceiling - y) < -testSetup.GapMin)									// Ceiling height is permissive.
-		{
-			return CrawlVaultTestResult{ true };
-		}
-
-		return std::nullopt;
-	}*/
-
 	std::optional<VaultContextData> Get1StepUpCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll,
 																const std::vector<AttractorCollisionData>& attracColls)
 	{
@@ -1714,11 +1677,12 @@ namespace TEN::Entities::Player
 		// Create and return crawl vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+		context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+		context.ChainDistance = attracColl->Proximity.ChainDistance;
 		context.HeadingAngle = attracColl->HeadingAngle;
 		context.TargetStateID = LS_CRAWL_STEP_UP;
 		context.SetBusyHands = true;
-		context.SnapToLedge = true;
+		context.SnapToEdge = true;
 		context.SetJumpVelocity = false;
 
 		return context;
@@ -1746,11 +1710,12 @@ namespace TEN::Entities::Player
 		// Create and return crawl vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+		context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+		context.ChainDistance = attracColl->Proximity.ChainDistance;
 		context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
 		context.TargetStateID = LS_CRAWL_STEP_DOWN;
 		context.SetBusyHands = true;
-		context.SnapToLedge = true;
+		context.SnapToEdge = true;
 		context.SetJumpVelocity = false;
 
 		return context;
@@ -1764,7 +1729,7 @@ namespace TEN::Entities::Player
 			STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
 			-(int)CLICK(1.25f),					 // Edge-to-ceil height lower bound.
-			true,								 // Test edge front.
+			false,								 // Test edge front.
 			false,								 // Test swamp depth.
 			true,								 // Test ledge heights.
 			false								 // Test ledge illegal slope.
@@ -1778,11 +1743,12 @@ namespace TEN::Entities::Player
 		// Create and return crawl vault context.
 		auto context = VaultContextData{};
 		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection;
-		context.HeadingAngle = attracColl->HeadingAngle;
+		context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+		context.ChainDistance = attracColl->Proximity.ChainDistance;
+		context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
 		context.TargetStateID = LS_CRAWL_EXIT_STEP_DOWN;
 		context.SetBusyHands = true;
-		context.SnapToLedge = true;
+		context.SnapToEdge = true;
 		context.SetJumpVelocity = false;
 
 		return context;
@@ -1796,28 +1762,63 @@ namespace TEN::Entities::Player
 			NO_LOWER_BOUND, STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,	   // Ledge floor-to-ceil range.
 			-(int)CLICK(1.25f),			   // Edge-to-ceil height lower bound.
-			true,						   // Test edge front.
+			false,						   // Test edge front.
 			false,						   // Test swamp depth.
 			true,						   // Test ledge heights.
 			false						   // Test ledge illegal slope.
 		};
 
-		// Get edge vault attractor collision.
+		// 1) Get attractor crawl vault context.
 		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		if (attracColl.has_value())
+		{
+			auto context = VaultContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
+			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_EXIT_FLIP : LS_CRAWL_EXIT_JUMP;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		// Create and return crawl vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Target = attracColl->Proximity.Intersection;
-		context.HeadingAngle = attracColl->HeadingAngle;
-		context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_EXIT_FLIP : LS_CRAWL_EXIT_JUMP;
-		context.SetBusyHands = true;
-		context.SnapToLedge = true;
-		context.SetJumpVelocity = false;
+			return context;
+		}
 
-		return context;
+		auto pointCollCenter = GetCollision(item);
+		auto pointCollFront = GetCollision(&item, item.Pose.Orientation.y, BLOCK(0.25f), -coll.Setup.Height);
+		int relFloorHeight = pointCollFront.Position.Floor - item.Pose.Position.y;
+
+		// TODO
+		// 2) Get crawl vault context in special case of illegal slope.
+		if (pointCollFront.Position.FloorSlope)
+		{
+			if (true
+				/*relFloorHeight <= SETUP.LowerEdgeBound &&							// Within lower floor bound.
+				relFloorHeight >= SETUP.UpperEdgeBound &&							// Within upper floor bound.
+				
+				abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > testSetup.ClampMin &&		// Crossing clamp limit.
+				abs(pointCollCenter.Position.Ceiling - probeB.Position.Floor) > testSetup.ClampMin &&		// Destination clamp limit.
+				abs(probeMiddle.Position.Ceiling - pointCollFront.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going up).
+				abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going down).
+				abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.FloorBound &&		// Crossing/destination floor height difference suggests continuous crawl surface.
+				(probeA.Position.Ceiling - y) < -testSetup.GapMin*/)									// Ceiling height is permissive.
+			{
+				auto context = VaultContextData{};
+				context.AttracPtr = nullptr;
+				context.Intersection = item.Pose.Position.ToVector3();
+				context.ChainDistance = 0.0f;
+				context.HeadingAngle = item.Pose.Orientation.y;
+				context.TargetStateID = LS_CRAWL_EXIT_JUMP;
+				context.SetBusyHands = true;
+				context.SnapToEdge = false;
+				context.SetJumpVelocity = false;
+
+				return context;
+			}
+		}
+
+		return std::nullopt;
 	}
 
 	std::optional<VaultContextData> GetCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll)
@@ -1900,8 +1901,9 @@ namespace TEN::Entities::Player
 			}
 
 			// Get point collision ahead of edge.
+			auto probePoint = Vector3i(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.y - CLICK(1), attracColl.Proximity.Intersection.z);
 			auto pointColl = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
+				probePoint, attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 1.4) Test if edge is high enough off ground.
@@ -1910,8 +1912,8 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 1.5) Test if ceiling is higher than edge.
-			int ceilToEdgeHeight = (pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y);
-			if (ceilToEdgeHeight >= 0)
+			int edgeToCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			if (edgeToCeilHeight >= 0)
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;

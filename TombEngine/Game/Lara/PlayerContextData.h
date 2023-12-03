@@ -57,12 +57,13 @@ namespace TEN::Entities::Player
 	struct VaultContextData
 	{
 		Attractor* AttracPtr	 = nullptr;
-		Vector3	   Target		 = Vector3::Zero;
+		Vector3	   Intersection	 = Vector3::Zero;
+		float	   ChainDistance = 0.0f;
 		short	   HeadingAngle	 = 0;
 		int		   TargetStateID = 0;
 
 		bool SetBusyHands	 = false;
-		bool SnapToLedge	 = false;
+		bool SnapToEdge		 = false;
 		bool SetJumpVelocity = false;
 	};
 

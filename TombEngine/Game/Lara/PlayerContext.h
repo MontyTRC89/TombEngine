@@ -56,6 +56,7 @@ namespace TEN::Entities::Player
 	public:
 		// Members
 		PlayerAttractorData HandsAttractor = {};
+		PlayerAttractorData VaultAttractor = {};
 		DebugAttractorData	DebugAttracs   = {};
 
 		int			ProjectedFloorHeight = 0; // Used for primitive offset blend. TODO: Real offset blend feature + object parenting. -- Sezz 2023.09.27
