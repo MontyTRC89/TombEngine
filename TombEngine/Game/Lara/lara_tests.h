@@ -45,14 +45,6 @@ std::optional<VaultTestResult> TestLaraLadderAutoJump(ItemInfo* item, CollisionI
 std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll);
 bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll);
 
-CrawlVaultTestResult TestLaraCrawlVaultTolerance(ItemInfo* item, CollisionInfo* coll, CrawlVaultTestSetup testSetup);
-CrawlVaultTestResult TestLaraCrawlUpStep(ItemInfo* item, CollisionInfo* coll);
-CrawlVaultTestResult TestLaraCrawlDownStep(ItemInfo* item, CollisionInfo* coll);
-CrawlVaultTestResult TestLaraCrawlExitDownStep(ItemInfo* item, CollisionInfo* coll);
-CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll);
-CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrawlToHang(ItemInfo* item, CollisionInfo* coll);
-
 bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset = 0.0f);
 bool TestLaraPoleUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll);

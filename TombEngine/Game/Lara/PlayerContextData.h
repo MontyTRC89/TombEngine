@@ -46,7 +46,7 @@ namespace TEN::Entities::Player
 		int UpperEdgeBound			  = 0;
 		int LedgeFloorToCeilHeightMin = 0;
 		int LedgeFloorToCeilHeightMax = 0;
-		int EdgeToCeilHeightMin		  = 0;
+		int LowerEdgeToCeilBound	  = 0;
 
 		bool TestSwampDepth = false;
 		bool TestLedge		= false;
@@ -55,8 +55,8 @@ namespace TEN::Entities::Player
 	struct VaultContextData
 	{
 		Attractor* AttracPtr	 = nullptr;
-		Vector3	   Intersection	 = Vector3::Zero;
-		short	   EdgeAngle	 = 0;
+		Vector3	   Target		 = Vector3::Zero;
+		short	   HeadingAngle	 = 0;
 		int		   TargetStateID = 0;
 
 		bool SetBusyHands	 = false;

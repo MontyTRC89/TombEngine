@@ -378,16 +378,38 @@ void lara_col_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 // CRAWL:
 // ------
 
+void SetupPlayerCrawlIdle(ItemInfo& item, CollisionInfo& coll)
+{
+	auto& player = GetLaraInfo(item);
+
+	item.Animation.Velocity.y = 0.0;
+	item.Animation.IsAirborne = false;
+	player.Control.Look.Mode = LookMode::Free;
+	player.Control.KeepLow = IsInLowSpace(item, coll);
+	player.Control.IsLow = true;
+	player.Control.MoveAngle = item.Pose.Orientation.y;
+	player.ExtraTorsoRot.x = 0;
+	player.ExtraTorsoRot.y = 0;
+	coll.Setup.ForwardAngle = player.Control.MoveAngle;
+	coll.Setup.Radius = LARA_RADIUS_CRAWL;
+	coll.Setup.Height = LARA_HEIGHT_CRAWL;
+	coll.Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
+	coll.Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
+	coll.Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
+	coll.Setup.BlockFloorSlopeUp = true;
+	coll.Setup.BlockFloorSlopeDown = true;
+	coll.Setup.EnableObjectPush = true;
+	coll.Setup.EnableSpasm = false;
+	Camera.targetDistance = BLOCK(1);
+}
+
 // State:	  LS_CRAWL_IDLE (80)
 // Collision: lara_col_crawl_idle()
 void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.Look.Mode = LookMode::Free;
-	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	SetupPlayerCrawlIdle(*item, *coll);
 
 	AlignLaraToSurface(item);
 
@@ -437,14 +459,15 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsHeld(In::Forward))
 		{
-			auto crawlVaultContext = TestLaraCrawlVault(item, coll);
-
-			if ((IsHeld(In::Action) || IsHeld(In::Jump)) && crawlVaultContext.Success)
+			if (IsHeld(In::Action) || IsHeld(In::Jump))
 			{
-				item->Animation.TargetState = crawlVaultContext.TargetState;
-				ResetPlayerTurnRateY(*item);
-				ResetPlayerFlex(item);
-				return;
+				auto vaultContext = GetCrawlVaultContext(*item, *coll);
+				if (vaultContext.has_value())
+				{
+					item->Animation.TargetState = vaultContext->TargetStateID;
+					SetPlayerVault(*item, *coll, *vaultContext);
+					return;
+				}
 			}
 
 			if (CanCrawlForward(*item, *coll))
@@ -455,7 +478,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::Back))
 		{
-			if (IsHeld(In::Action) && TestLaraCrawlToHang(item, coll))
+			if (IsHeld(In::Action) && TestLaraCrawlToHang(*item, *coll))
 			{
 				item->Animation.TargetState = LS_CRAWL_TO_HANG;
 				DoLaraCrawlToHangSnap(item, coll);
@@ -494,21 +517,8 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	item->Animation.Velocity.y = 0.0;
-	item->Animation.IsAirborne = false;
-	player.Control.KeepLow = IsInLowSpace(*item, *coll);
-	player.Control.IsLow = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
-	player.ExtraTorsoRot.x = 0;
-	player.ExtraTorsoRot.y = 0;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
-	coll->Setup.Radius = LARA_RADIUS_CRAWL;
-	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
-	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
-	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockFloorSlopeDown = true;
+	SetupPlayerCrawlIdle(*item, *coll);
+
 	GetCollisionInfo(coll, item);
 
 	if (CanFall(*item, *coll))

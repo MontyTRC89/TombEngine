@@ -167,7 +167,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetVaultContext(*item, *coll);
+			auto vaultContext = GetStandingVaultContext(*item, *coll);
 			if (vaultContext.has_value())
 			{
 				item->Animation.TargetState = vaultContext->TargetStateID;
@@ -304,7 +304,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetVaultContext(*item, *coll);
+			auto vaultContext = GetStandingVaultContext(*item, *coll);
 			if (vaultContext.has_value())
 			{
 				item->Animation.TargetState = vaultContext->TargetStateID;
@@ -496,7 +496,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetVaultContext(*item, *coll);
+			auto vaultContext = GetStandingVaultContext(*item, *coll);
 			if (vaultContext.has_value())
 			{
 				item->Animation.TargetState = vaultContext->TargetStateID;
@@ -826,7 +826,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetVaultContext(*item, *coll);
+			auto vaultContext = GetStandingVaultContext(*item, *coll);
 			if (vaultContext.has_value())
 			{
 				item->Animation.TargetState = vaultContext->TargetStateID;
@@ -1165,7 +1165,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetVaultContext(*item, *coll);
+			auto vaultContext = GetStandingVaultContext(*item, *coll);
 			if (vaultContext.has_value())
 			{
 				item->Animation.TargetState = vaultContext->TargetStateID;
@@ -1615,7 +1615,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetVaultContext(*item, *coll);
+			auto vaultContext = GetStandingVaultContext(*item, *coll);
 			if (vaultContext.has_value())
 			{
 				item->Animation.TargetState = vaultContext->TargetStateID;
@@ -1734,7 +1734,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action) && CanVaultFromSprint(*item, *coll))
 		{
-			auto vaultContext = GetVaultContext(*item, *coll);
+			auto vaultContext = GetStandingVaultContext(*item, *coll);
 			if (vaultContext.has_value())
 			{
 				item->Animation.TargetState = vaultContext->TargetStateID;

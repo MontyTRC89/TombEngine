@@ -107,6 +107,7 @@ namespace TEN::Entities::Player
 	bool CanCrouchRoll(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanCrawlForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanCrawlBackward(const ItemInfo& item, const CollisionInfo& coll);
+	bool TestLaraCrawlToHang(ItemInfo& item, const CollisionInfo& coll);
 
 	// Monkey swing contexts
 	bool CanPerformMonkeySwingStep(const ItemInfo& item, const CollisionInfo& coll);
@@ -147,7 +148,8 @@ namespace TEN::Entities::Player
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Context data getters
-	std::optional<VaultContextData>			   GetVaultContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<VaultContextData>			   GetStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<VaultContextData>			   GetCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 }
