@@ -797,8 +797,12 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 
 			// Test ray-box intersection.
 			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-			if (box.Intersects(origin, dir, dist))
-				return Geometry::TranslatePoint(origin, dir, dist);
+			float intersectDist = 0.0f;
+			if (box.Intersects(origin, dir, intersectDist))
+			{
+				if (intersectDist <= dist)
+					return Geometry::TranslatePoint(origin, dir, dist);
+			}
 		}
 	}
 
