@@ -903,9 +903,9 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 			const auto& bridgePos = bridgeItem.Pose.Position;
 
 			// Calculate offset.
-			auto relOffset = (item.Pose.Position - bridgePos).ToVector3();
+			auto deltaPos = (item.Pose.Position - bridgePos).ToVector3();
 			auto rotMatrix = deltaPose.Orientation.ToRotationMatrix();
-			auto offset = bridgePos.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
+			auto offset = bridgePos.ToVector3() + Vector3::Transform(deltaPos, rotMatrix);
 
 			deltaPose.Position -= item.Pose.Position - Vector3i(offset);
 		   

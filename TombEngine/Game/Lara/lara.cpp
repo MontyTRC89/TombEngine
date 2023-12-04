@@ -49,6 +49,16 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	HandleAttractorDebug(*item);
 
+	if (coll->LastBridgeItemNumber != NO_ITEM)
+	{
+		auto& bridgeItem = g_Level.Items[coll->LastBridgeItemNumber];
+
+		bridgeItem.Pose.Orientation.y += ANGLE(2.0f);
+
+		if (bridgeItem.Attractor.has_value())
+			bridgeItem.Attractor->Update(GenerateBridgeAttractor(bridgeItem).GetPoints(), bridgeItem.RoomNumber);
+	}
+
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{

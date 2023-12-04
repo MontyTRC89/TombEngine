@@ -57,7 +57,8 @@ namespace TEN::Entities::Player
 	struct VaultContextData
 	{
 		Attractor* AttracPtr	 = nullptr;
-		Vector3	   Intersection	 = Vector3::Zero;
+		Vector3	   Intersection	 = Vector3::Zero; // TODO: Can be calculated from chain distance.
+		//Vector3	   Offset		 = Vector3::Zero;
 		float	   ChainDistance = 0.0f;
 		short	   HeadingAngle	 = 0;
 		int		   TargetStateID = 0;

@@ -902,10 +902,14 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
 	Camera.targetDistance = BLOCK(1);
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	ResetPlayerLean(item, 1 / 6.0f);
 	item->Pose.Orientation.Lerp(player.Context.TargetOrientation + EulerAngles(0, ANGLE(180.0f), 0), 0.25f);
 
 	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
+	{
 		SetAnimation(item, LA_HANG_IDLE);
+		item->Pose.Position.y = player.Context.ProjectedFloorHeight + LARA_HEIGHT_STRETCH;
+	}
 }

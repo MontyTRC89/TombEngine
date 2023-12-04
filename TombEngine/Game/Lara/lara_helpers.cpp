@@ -780,7 +780,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchCon
 	// Calculate position.
 	auto catchPoint = (catchData.Type == EdgeType::ClimbableWall) ?
 		Vector3(item.Pose.Position.x, catchData.Intersection.y, item.Pose.Position.z) : catchData.Intersection;
-	auto pos = catchPoint + Vector3(0.0f, coll.Setup.Height, 0.0f); // TODO: Weird with reach catch.
+	auto pos = catchPoint + Vector3(0.0f, /*coll.Setup.Height*/LARA_HEIGHT_STRETCH, 0.0f); // TODO: Weird with reach catch.
 	pos = Geometry::TranslatePoint(pos, catchData.HeadingAngle, -coll.Setup.Radius);
 
 	ResetPlayerFlex(&item);
