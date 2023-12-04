@@ -134,6 +134,7 @@ struct ItemInfo
 	bool LookedAt;
 	bool Collidable;
 	bool InDrawRoom;
+	bool Targetable = true;
 
 	int BoxNumber;
 	int Timer;

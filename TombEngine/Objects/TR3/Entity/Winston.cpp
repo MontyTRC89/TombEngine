@@ -90,6 +90,15 @@ namespace TEN::Entities::Creatures::TR3
 
 		short headingAngle = CreatureTurn(&item, creature.MaxTurn);
 
+		if (item.TriggerFlags)
+		{ 
+			item.Targetable = true;
+		}
+		else
+		{
+			item.Targetable = false;
+		}
+
 		if (item.HitPoints <= 0)
 		{
 			creature.MaxTurn = 0;
