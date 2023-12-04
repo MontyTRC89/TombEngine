@@ -72,66 +72,6 @@ namespace TEN::Entities::Creatures::TR3
 		WINSTON_ANIM_DEFEAT_END = 20
 	};
 
-	void OldControlWinston(short itemNumber)
-	{
-		if (!CreatureActive(itemNumber))
-			return;
-
-		auto& item = g_Level.Items[itemNumber];
-		auto& creature = *GetCreatureInfo(&item);
-
-		AI_INFO ai;
-		CreatureAIInfo(&item, &ai);
-		GetCreatureMood(&item, &ai, 1);
-		CreatureMood(&item, &ai, 1);
-
-		short headingAngle = CreatureTurn(&item, creature.MaxTurn);
-
-		if (item.Animation.ActiveState == WINSTON_STATE_IDLE)
-		{
-			if ((ai.distance > WINSTON_IDLE_RANGE || !ai.ahead) && item.Animation.TargetState != WINSTON_STATE_WALK_FORWARD)
-			{
-				item.Animation.TargetState = WINSTON_STATE_WALK_FORWARD;
-				//SoundEffect(SFX_WILARD_STAB, &item.Pose, SFX_DEFAULT);
-			}
-		}
-		else if (ai.distance < WINSTON_IDLE_RANGE)
-		{
-			if (ai.ahead)
-			{
-				item.Animation.TargetState = WINSTON_STATE_IDLE;
-
-				if (creature.Flags & 1)
-					creature.Flags--;
-			}
-			else if (!(creature.Flags & 1))
-			{
-				//SoundEffect(SFX_WILARD_ODD_NOISE, &item.Pose, SFX_DEFAULT);
-				//SoundEffect(SFX_LITTLE_SUB_START, &item.Pose, SFX_DEFAULT);
-				creature.Flags |= 1;
-			}
-		}
-
-		if (item.TouchBits.TestAny())
-		{
-			if (!(creature.Flags & 2))
-			{
-				//SoundEffect(SFX_LITTLE_SUB_LOOP, &item.Pose, SFX_DEFAULT);
-				//SoundEffect(SFX_LITTLE_SUB_START, &item.Pose, SFX_DEFAULT);
-				creature.Flags |= 2;
-			}
-		}
-		else if (creature.Flags & 2)
-		{
-			creature.Flags -= 2;
-		}
-
-		//if (Random::TestProbability(1 / 128.0f))
-			//SoundEffect(SFX_LITTLE_SUB_START, &item.Pose, SFX_DEFAULT);
-
-		CreatureAnimation(itemNumber, headingAngle, 0);
-	}
-
 	void ControlWinston(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
