@@ -910,10 +910,6 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 		if (item.HitPoints <= 0)
 			continue;
 
-		// Check if creature is targetable
-		if (!item.Targetable)
-			continue;
-
 		// Check distance.
 		float distance = Vector3::Distance(origin.ToVector3(), item.Pose.Position.ToVector3());
 		if (distance > maxDistance)
