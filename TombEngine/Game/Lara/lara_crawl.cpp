@@ -909,7 +909,6 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	Camera.flags = CF_FOLLOW_CENTER;
 
 	ResetPlayerLean(item, 1 / 6.0f);
-	//item->Pose.Orientation.Lerp(player.Context.TargetOrientation + EulerAngles(0, ANGLE(180.0f), 0), 0.25f);
 
 	if (player.Context.Attractor.Ptr != nullptr)
 	{
