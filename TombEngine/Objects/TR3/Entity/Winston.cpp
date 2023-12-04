@@ -134,7 +134,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			default:
-				SetAnimation(item, ID_ARMY_WINSTON, 16);
+				SetAnimation(item, WINSTON_ANIM_DEFEAT_START);
 				defeatTimer = WINSTON_DEFEAT_TIMER_MAX;
 				break;
 			}
@@ -150,14 +150,18 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = WINSTON_STATE_BRUSH_OFF;
 				}
-				else if (player.TargetEntity == &item)
+				else if (player.TargetEntity == &item && item.TriggerFlags)
 				{
 					item.Animation.TargetState = WINSTON_STATE_GUARD_MID;
 				}
 				else if ((ai.distance > WINSTON_IDLE_RANGE || !ai.ahead) && item.Animation.TargetState != WINSTON_STATE_WALK_FORWARD)
 				{
 					item.Animation.TargetState = WINSTON_STATE_WALK_FORWARD;
-					SoundEffect(SFX_TR3_WINSTON_CUPS, &item.Pose);
+
+					if (item.TriggerFlags)
+					{
+						SoundEffect(SFX_TR3_WINSTON_CUPS, &item.Pose);
+					}
 				}
 
 				break;
