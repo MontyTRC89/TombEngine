@@ -5,6 +5,7 @@
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/camera.h"
+#include "Game/collision/AttractorCollision.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
@@ -36,6 +37,7 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
@@ -321,30 +323,34 @@ static void UsePlayerMedipack(ItemInfo& item)
 
 void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 {
-	constexpr auto ORIENT_LERP_ALPHA = 0.25f;
+	constexpr auto INV_LERP_ALPHA = 1.0f - 0.25f;
 
 	auto& player = GetLaraInfo(item);
 
-	// No attractor; return early.
+	// No attractor attachment; return early.
 	if (player.Context.Attractor.Ptr == nullptr)
 		return;
 
-	const auto& points = player.Context.Attractor.Ptr->GetPoints();
+	// Get attractor collision.
+	auto& attrac = *player.Context.Attractor.Ptr;
+	auto probePoint = attrac.GetIntersectionAtChainDistance(player.Context.Attractor.ChainDistance);
+	auto attracColl = GetAttractorCollision(attrac, probePoint);
 
-	// Get intersection and segment ID.
-	auto intersection = player.Context.Attractor.Ptr->GetIntersectionAtChainDistance(player.Context.Attractor.ChainDistance);
-	int segmentID = player.Context.Attractor.Ptr->GetSegmentIDAtChainDistance(player.Context.Attractor.ChainDistance);
+	// Calculate adjusted intersection.
+	auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
+	auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(player.Context.Attractor.RelPosOffset, rotMatrix);
 
-	// Calculate segment heading angle.
-	auto orient = (points.size() == 1) ? item.Pose.Orientation : Geometry::GetOrientToPoint(points[segmentID], points[segmentID + 1]);
-	short headingAngle = orient.y - ANGLE(90.0f);
+	// Calculate adjusted heading angle.
+	short adjustedHeadingAngle = attracColl.HeadingAngle + player.Context.Attractor.RelOrientOffset.y;
 
 	// Update player pose.
 	item.Pose = Pose(
-		Geometry::TranslatePoint(intersection, headingAngle, LARA_RADIUS_CRAWL), // TODO: Use coll.Setup.Radius.
-		EulerAngles(0, headingAngle, 0) - player.Context.OrientOffset);
+		adjustedIntersect - Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
+		EulerAngles(0, adjustedHeadingAngle, 0) + player.Context.Attractor.RelDeltaOrient);
 
-	player.Context.OrientOffset *= 1.0f - ORIENT_LERP_ALPHA;
+	// Update relative deltas.
+	player.Context.Attractor.RelDeltaPos *= INV_LERP_ALPHA;
+	player.Context.Attractor.RelDeltaOrient *= INV_LERP_ALPHA;
 }
 
 static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
@@ -1694,13 +1700,36 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 
 	// Reference attractor if relevant to climb action.
 	if (vaultContext.AttracPtr != nullptr)
-		player.Context.Attractor.Attach(item, *vaultContext.AttracPtr, vaultContext.ChainDistance);
+	{
+		// Get attractor collision.
+		auto probePoint = vaultContext.AttracPtr->GetIntersectionAtChainDistance(vaultContext.ChainDistance);
+		auto attracColl = GetAttractorCollision(*vaultContext.AttracPtr, probePoint);
+
+		// Calculate adjusted intersection.
+		auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
+		auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(vaultContext.RelPosOffset, rotMatrix);
+
+		// TODO: Check if must use inverse matrix.
+		// Calculate relative delta position.
+		auto deltaPos = adjustedIntersect - item.Pose.Position.ToVector3();
+		auto relDeltaPos = Vector3::Transform(deltaPos, rotMatrix/*.Invert()*/);
+
+		// Calculate relative delta orientation.
+		short deltaHeadingAngle = Geometry::GetShortestAngle(attracColl.HeadingAngle, item.Pose.Orientation.y);
+		auto relDeltaOrient = EulerAngles(0, deltaHeadingAngle, 0);
+
+		// Attach player to attractor.
+		player.Context.Attractor.Attach(
+			item, *vaultContext.AttracPtr, vaultContext.ChainDistance,
+			vaultContext.RelPosOffset, vaultContext.RelOrientOffset,
+			relDeltaPos, relDeltaOrient);
+	}
 
 	if (vaultContext.SetBusyHands)
 		player.Control.HandStatus = HandStatus::Busy;
 
 	// Snap to edge (if applicable).
-	if (vaultContext.SnapToEdge)
+	/*if (vaultContext.SnapToEdge)
 	{
 		auto target = Vector3i(vaultContext.Intersection.x, item.Pose.Position.y, vaultContext.Intersection.z);
 
@@ -1711,7 +1740,7 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	else
 	{
 		player.Context.OrientOffset = EulerAngles::Zero;
-	}
+	}*/
 
 	// Set jump velocity (if applicable).
 	if (vaultContext.SetJumpVelocity)

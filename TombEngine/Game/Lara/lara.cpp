@@ -49,9 +49,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	HandleAttractorDebug(*item);
 
+	static int bridgeItemNumber = NO_ITEM;
 	if (coll->LastBridgeItemNumber != NO_ITEM)
+		bridgeItemNumber = coll->LastBridgeItemNumber;
+
+	if (bridgeItemNumber != NO_ITEM)
 	{
-		auto& bridgeItem = g_Level.Items[coll->LastBridgeItemNumber];
+		auto& bridgeItem = g_Level.Items[bridgeItemNumber];
 
 		bridgeItem.Pose.Orientation.y += ANGLE(2.0f);
 

@@ -39,6 +39,7 @@ namespace TEN::Collision::Attractor
 	};
 
 	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& pos, short headingAngle, const Vector3& probePoint);
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& probePoint);
 	
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
 															   const Vector3& probePoint, float detectRadius);

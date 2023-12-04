@@ -33,8 +33,6 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = BLOCK(1);
 	Camera.flags = CF_FOLLOW_CENTER;
 
-	EasePlayerElevation(item, player.Context.ProjectedFloorHeight - item->Pose.Position.y);
-	//item->Pose.Orientation.Lerp(player.Context.OrientOffset, 0.25f);
 	HandlePlayerAttractorParent(*item, *coll);
 
 	item->Animation.TargetState = LS_CRAWL_IDLE;

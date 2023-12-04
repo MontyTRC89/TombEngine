@@ -110,12 +110,6 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	EasePlayerElevation(item, player.Context.ProjectedFloorHeight - item->Pose.Position.y);
-	/*item->Pose.Position = Vector3::Lerp(
-		item->Pose.Position.ToVector3(),
-		Vector3(item->Pose.Position.x, player.Context.ProjectedFloorHeight - item->Pose.Position.y, item->Pose.Position.z),
-		0.25f);*/
-	//item->Pose.Orientation.Lerp(player.Context.OrientOffset, 0.25f);
 	HandlePlayerAttractorParent(*item, *coll);
 
 	item->Animation.TargetState = LS_IDLE;

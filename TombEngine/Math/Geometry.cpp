@@ -281,7 +281,7 @@ namespace TEN::Math::Geometry
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		if (origin == target)
-			return false;
+			return true;
 
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
@@ -297,7 +297,7 @@ namespace TEN::Math::Geometry
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
 		if (origin == target)
-			return false;
+			return true;
 
 		auto refDir = refPoint - origin;
 
@@ -317,7 +317,7 @@ namespace TEN::Math::Geometry
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		if (origin == target)
-			return false;
+			return true;
 
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
@@ -333,7 +333,7 @@ namespace TEN::Math::Geometry
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
 		if (origin == target)
-			return false;
+			return true;
 
 		auto refDir = refPoint - origin;
 

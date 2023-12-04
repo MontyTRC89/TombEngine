@@ -58,8 +58,11 @@ namespace TEN::Entities::Player
 	{
 		Attractor* AttracPtr	 = nullptr;
 		Vector3	   Intersection	 = Vector3::Zero; // TODO: Can be calculated from chain distance.
-		//Vector3	   Offset		 = Vector3::Zero;
 		float	   ChainDistance = 0.0f;
+
+		Vector3		RelPosOffset	= Vector3::Zero;
+		EulerAngles RelOrientOffset = EulerAngles::Zero;
+
 		short	   HeadingAngle	 = 0;
 		int		   TargetStateID = 0;
 

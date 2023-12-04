@@ -21,24 +21,21 @@ namespace TEN::Entities::Player
 
 	struct PlayerAttractorData
 	{
-		Attractor*	Ptr			  = nullptr;
-		float		ChainDistance = 0.0f;
-		Vector3		PosOffset	  = Vector3::Zero;
-		EulerAngles OrientOffset  = EulerAngles::Zero;
+		Attractor*	Ptr				= nullptr;
+		float		ChainDistance	= 0.0f;
 
-		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
-		{
-			Ptr = &attrac;
-			ChainDistance = chainDist;
-			//AttracPtr->AttackPlayer(playerItem);
-		}
+		// TODO: Use std::optional. Don't need pos offset for auto jump.
+		Vector3		RelPosOffset	= Vector3::Zero;
+		EulerAngles RelOrientOffset = EulerAngles::Zero;
 
-		void Detach(ItemInfo& playerItem)
-		{
-			Ptr = nullptr;
-			ChainDistance = 0.0f;
-			//AttracPtr->DetachPlayer(playerItem);
-		};
+		Vector3		RelDeltaPos	   = Vector3::Zero;
+		EulerAngles RelDeltaOrient = EulerAngles::Zero;
+
+		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
+					const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
+					const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient);
+		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist);
+		void Detach(ItemInfo& playerItem);
 	};
 
 	struct DebugAttractorData

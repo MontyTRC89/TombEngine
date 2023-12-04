@@ -101,6 +101,11 @@ namespace TEN::Collision::Attractor
 		return AttractorCollisionData(attrac, pos, headingAngle, probePoint);
 	}
 
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& probePoint)
+	{
+		return AttractorCollisionData(attrac, probePoint, 0, probePoint);
+	}
+
 	// Debug
 	static std::vector<Attractor*> GetDebugAttractorPtrs()
 	{

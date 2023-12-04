@@ -21,6 +21,33 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Player
 {
+	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
+		const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
+		const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient)
+	{
+		Ptr = &attrac;
+		ChainDistance = chainDist;
+		RelPosOffset = relPosOffset;
+		RelOrientOffset = relOrientOffset;
+		RelDeltaPos = relDeltaPos;
+		RelDeltaOrient = relDeltaOrient;
+		//AttracPtr->AttackPlayer(playerItem);
+	}
+
+	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
+	{
+		Ptr = &attrac;
+		ChainDistance = chainDist;
+		//AttracPtr->AttackPlayer(playerItem);
+	}
+
+	void PlayerAttractorData::Detach(ItemInfo& playerItem)
+	{
+		Ptr = nullptr;
+		ChainDistance = 0.0f;
+		//AttracPtr->DetachPlayer(playerItem);
+	};
+
 	PlayerContext::PlayerContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);
@@ -1345,7 +1372,7 @@ namespace TEN::Entities::Player
 			true,							   // Test ledge heights.
 			true							   // Test ledge illegal slope.
 		};
-		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
+		constexpr auto VERTICAL_OFFSET = CLICK(2);
 
 		// Get standing vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -1353,9 +1380,9 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
 			context.SetBusyHands = true;
 			context.SnapToEdge = true;
@@ -1454,7 +1481,7 @@ namespace TEN::Entities::Player
 
 		// Get standing vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
+		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
@@ -1932,9 +1959,9 @@ namespace TEN::Entities::Player
 			// Create and return crawl to hang vault context.
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl.AttracPtr;
-			context.Intersection = Vector3(attracColl.Proximity.Intersection.x, item.Pose.Position.y, attracColl.Proximity.Intersection.z);
 			context.ChainDistance = attracColl.Proximity.ChainDistance;
-			context.HeadingAngle = attracColl.HeadingAngle + ANGLE(180.0f);
+			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_TO_HANG;
 			context.SetBusyHands = true;
 			context.SnapToEdge = true;
