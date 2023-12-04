@@ -495,12 +495,12 @@ bool IsVaultState(int state)
 {
 	static const std::vector<int> vaultStates
 	{
-		LS_VAULT,
-		LS_VAULT_2_STEPS,
-		LS_VAULT_3_STEPS,
-		LS_VAULT_1_STEP_CROUCH,
-		LS_VAULT_2_STEPS_CROUCH,
-		LS_VAULT_3_STEPS_CROUCH,
+		LS_STAND_VAULT,
+		LS_STAND_VAULT_2_STEPS_UP,
+		LS_STAND_VAULT_3_STEPS_UP,
+		LS_STAND_VAULT_1_STEP_UP_TO_CROUCH,
+		LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH,
+		LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH,
 		LS_AUTO_JUMP
 	};
 	return TestState(state, vaultStates);
@@ -624,7 +624,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 
 		ShiftItem(item, coll);
 		SnapEntityToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-		lara->Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+		lara->Context.OrientOffset = EulerAngles(0, item->Pose.Orientation.y, 0);
 		AnimateItem(item);
 
 		return true;

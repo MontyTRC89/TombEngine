@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
-namespace TEN::Entities::Player{ struct VaultContextData; };
+namespace TEN::Entities::Player{ struct ClimbContextData; };
 enum class JumpDirection;
 enum class WaterStatus;
 struct ItemInfo;
@@ -29,6 +29,7 @@ struct PlayerWaterData
 // Utilities
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& water);
+void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll);
 void HandlePlayerQuickActions(ItemInfo& item);
 bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -- Sezz 2023.08.22
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
@@ -74,7 +75,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 // Setters
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
-void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContextData& vaultContext);
+void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& vaultContext);
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);
 void SetLaraFallBackAnimation(ItemInfo* item);

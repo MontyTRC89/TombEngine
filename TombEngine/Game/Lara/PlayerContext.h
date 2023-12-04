@@ -21,8 +21,10 @@ namespace TEN::Entities::Player
 
 	struct PlayerAttractorData
 	{
-		Attractor* Ptr			 = nullptr;
-		float	   ChainDistance = 0.0f;
+		Attractor*	Ptr			  = nullptr;
+		float		ChainDistance = 0.0f;
+		Vector3		PosOffset	  = Vector3::Zero;
+		EulerAngles OrientOffset  = EulerAngles::Zero;
 
 		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
 		{
@@ -64,7 +66,7 @@ namespace TEN::Entities::Player
 		int			ProjectedFloorHeight = 0; // Used for primitive offset blend. TODO: Real offset blend feature + object parenting. -- Sezz 2023.09.27
 		float		CalcJumpVelocity	 = 0;
 		Pose		NextCornerPos		 = Pose::Zero;
-		EulerAngles TargetOrientation	 = EulerAngles::Zero;
+		EulerAngles OrientOffset		 = EulerAngles::Zero;
 
 		int		 WaterSurfaceDist	= 0;
 		short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
@@ -150,9 +152,10 @@ namespace TEN::Entities::Player
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Context data getters
-	std::optional<VaultContextData>			   GetStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<VaultContextData>			   GetCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<VaultContextData>			   GetCrawlToHangVaultContext(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>			   GetStandClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>			   GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>			   GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll); // TODO
+	std::optional<ClimbContextData>			   GetCrawlToHangClimbContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 }

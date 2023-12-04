@@ -319,6 +319,34 @@ static void UsePlayerMedipack(ItemInfo& item)
 	}
 }
 
+void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
+{
+	constexpr auto ORIENT_LERP_ALPHA = 0.25f;
+
+	auto& player = GetLaraInfo(item);
+
+	// No attractor; return early.
+	if (player.Context.Attractor.Ptr == nullptr)
+		return;
+
+	const auto& points = player.Context.Attractor.Ptr->GetPoints();
+
+	// Get intersection and segment ID.
+	auto intersection = player.Context.Attractor.Ptr->GetIntersectionAtChainDistance(player.Context.Attractor.ChainDistance);
+	int segmentID = player.Context.Attractor.Ptr->GetSegmentIDAtChainDistance(player.Context.Attractor.ChainDistance);
+
+	// Calculate segment heading angle.
+	auto orient = (points.size() == 1) ? item.Pose.Orientation : Geometry::GetOrientToPoint(points[segmentID], points[segmentID + 1]);
+	short headingAngle = orient.y - ANGLE(90.0f);
+
+	// Update player pose.
+	item.Pose = Pose(
+		Geometry::TranslatePoint(intersection, headingAngle, LARA_RADIUS_CRAWL), // TODO: Use coll.Setup.Radius.
+		EulerAngles(0, headingAngle, 0) - player.Context.OrientOffset);
+
+	player.Context.OrientOffset *= 1.0f - ORIENT_LERP_ALPHA;
+}
+
 static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
 {
 	static const auto SCROLL_WEAPON_TYPES = std::vector<LaraWeaponType>
@@ -790,7 +818,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchCon
 	player.Control.HandStatus = HandStatus::Busy;
 
 	short targetHeadingAngle = (catchData.Type == EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.HeadingAngle;
-	player.Context.TargetOrientation = EulerAngles(0, targetHeadingAngle, 0);
+	player.Context.OrientOffset = EulerAngles(0, targetHeadingAngle, 0);
 
 	// Set attractor attachment.
 	catchData.AttracPtr->AttachPlayer(item);
@@ -1024,6 +1052,7 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 
 				player.Control.WaterStatus = WaterStatus::FlyCheat;
 				player.Control.Count.Death = 0;
+				player.Context.Attractor.Detach(item);
 				player.Status.Air = LARA_AIR_MAX;
 				player.Status.Poison = 0;
 				player.Status.Stamina = LARA_STAMINA_MAX;
@@ -1655,7 +1684,7 @@ static float GetPlayerJumpVelocity(float jumpHeight)
 	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }
 
-void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContextData& vaultContext)
+void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& vaultContext)
 {
 	auto& player = GetLaraInfo(item);
 
@@ -1675,16 +1704,13 @@ void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContex
 	{
 		auto target = Vector3i(vaultContext.Intersection.x, item.Pose.Position.y, vaultContext.Intersection.z);
 
+		// TODO: Offset blend.
 		item.Pose.Position = Geometry::TranslatePoint(target, vaultContext.HeadingAngle, -coll.Setup.Radius);
-		
-		// TODO: Old way. Adopt relative orientation offsets like below.
-		//player.Context.TargetOrientation = EulerAngles(0, vaultContext.HeadingAngle, 0);
-
-		player.Context.TargetOrientation = EulerAngles(0, vaultContext.HeadingAngle + ANGLE(180.0f), 0) - item.Pose.Orientation;
+		player.Context.OrientOffset = EulerAngles(0, vaultContext.HeadingAngle + ANGLE(180.0f), 0) - item.Pose.Orientation;
 	}
 	else
 	{
-		player.Context.TargetOrientation = EulerAngles(0, item.Pose.Orientation.y, 0);
+		player.Context.OrientOffset = EulerAngles::Zero;
 	}
 
 	// Set jump velocity (if applicable).

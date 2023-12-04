@@ -3,7 +3,6 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/AttractorCollision.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
@@ -18,7 +17,6 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::Attractor;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 
@@ -36,7 +34,8 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 	Camera.flags = CF_FOLLOW_CENTER;
 
 	EasePlayerElevation(item, player.Context.ProjectedFloorHeight - item->Pose.Position.y);
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.25f);
+	//item->Pose.Orientation.Lerp(player.Context.OrientOffset, 0.25f);
+	HandlePlayerAttractorParent(*item, *coll);
 
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
@@ -466,11 +465,11 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (IsHeld(In::Action) || IsHeld(In::Jump))
 			{
-				auto vaultContext = GetCrawlVaultContext(*item, *coll);
-				if (vaultContext.has_value())
+				auto climbContext = GetCrawlClimbContext(*item, *coll);
+				if (climbContext.has_value())
 				{
-					item->Animation.TargetState = vaultContext->TargetStateID;
-					SetPlayerVault(*item, *coll, *vaultContext);
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -485,11 +484,11 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (IsHeld(In::Action))
 			{
-				auto climbContext = GetCrawlToHangVaultContext(*item, *coll);
+				auto climbContext = GetCrawlToHangClimbContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
-					SetPlayerVault(*item, *coll, *climbContext);
+					SetPlayerClimb(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -590,11 +589,11 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Action) || IsHeld(In::Jump))
 			{
 				// TODO: Not working in this state.
-				auto vaultContext = GetCrawlVaultContext(*item, *coll);
-				if (vaultContext.has_value())
+				auto climbContext = GetCrawlClimbContext(*item, *coll);
+				if (climbContext.has_value())
 				{
-					item->Animation.TargetState = vaultContext->TargetStateID;
-					SetPlayerVault(*item, *coll, *vaultContext);
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -909,15 +908,5 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	Camera.flags = CF_FOLLOW_CENTER;
 
 	ResetPlayerLean(item, 1 / 6.0f);
-
-	if (player.Context.Attractor.Ptr != nullptr)
-	{
-		auto intersection = player.Context.Attractor.Ptr->GetIntersectionAtChainDistance(player.Context.Attractor.ChainDistance);
-		auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, intersection, 0, intersection);
-
-		item->Pose.Position = Geometry::TranslatePoint(intersection, attracColl.HeadingAngle, LARA_RADIUS_CRAWL);
-		item->Pose.Orientation = EulerAngles(0, attracColl.HeadingAngle, 0) - player.Context.TargetOrientation;
-
-		player.Context.TargetOrientation *= 1.0f - ORIENT_LERP_ALPHA;
-	}
+	HandlePlayerAttractorParent(*item, *coll);
 }

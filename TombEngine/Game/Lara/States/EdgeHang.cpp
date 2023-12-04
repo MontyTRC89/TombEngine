@@ -199,13 +199,13 @@ namespace TEN::Entities::Player
 		auto headingAngle = orient.y - ANGLE(90.0f);
 
 		// Align orientation.
-		player.Context.TargetOrientation = EulerAngles(0, headingAngle, 0);
-		item.Pose.Orientation.Lerp(player.Context.TargetOrientation, ORIENT_LERP_ALPHA);
+		player.Context.OrientOffset = EulerAngles(0, headingAngle, 0);
+		item.Pose.Orientation.Lerp(player.Context.OrientOffset, ORIENT_LERP_ALPHA);
 
 		// Determine target point with accurate consideration of inner bends.
 		auto targetPoint = edgeAttracColls->Center.Proximity.Intersection;
-		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Left.Proximity.Intersection, player.Context.TargetOrientation) &&
-			!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Right.Proximity.Intersection, player.Context.TargetOrientation))
+		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Left.Proximity.Intersection, player.Context.OrientOffset) &&
+			!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Right.Proximity.Intersection, player.Context.OrientOffset))
 		{
 			targetPoint = (edgeAttracColls->Left.Proximity.Intersection + edgeAttracColls->Right.Proximity.Intersection) / 2;
 		}

@@ -1228,8 +1228,8 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	static std::optional<AttractorCollisionData> GetEdgeVaultAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																				const VaultSetupData& setup,
+	static std::optional<AttractorCollisionData> GetEdgeClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																				const ClimbSetupData& setup,
 																				const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SWAMP_DEPTH_MAX				= -CLICK(3);
@@ -1332,10 +1332,10 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<VaultContextData> Get2StepToStandStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																			  const std::vector<AttractorCollisionData>& attracColls)
+	const std::optional<ClimbContextData> GetStandVault2StepsUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
@@ -1347,29 +1347,30 @@ namespace TEN::Entities::Player
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
 
-		// Get edge vault attractor collision.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		// Get standing vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle;
+			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		// Create and return standing vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
-		context.ChainDistance = attracColl->Proximity.ChainDistance;
-		context.HeadingAngle = attracColl->HeadingAngle;
-		context.TargetStateID = LS_VAULT_2_STEPS;
-		context.SetBusyHands = true;
-		context.SnapToEdge = true;
-		context.SetJumpVelocity = false;
+			return context;
+		}
 
-		return context;
+		return std::nullopt;
 	}
 	
-	const std::optional<VaultContextData> Get3StepToStandStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																			  const std::vector<AttractorCollisionData>& attracColls)
+	const std::optional<ClimbContextData> GetStandVault3StepsUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			  // Ledge floor-to-ceil range.
@@ -1381,29 +1382,30 @@ namespace TEN::Entities::Player
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
 
-		// Get edge vault attractor collision.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		// Get standing vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle;
+			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		// Create and return standing vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
-		context.ChainDistance = attracColl->Proximity.ChainDistance;
-		context.HeadingAngle = attracColl->HeadingAngle;
-		context.TargetStateID = LS_VAULT_3_STEPS;
-		context.SetBusyHands = true;
-		context.SnapToEdge = true;
-		context.SetJumpVelocity = false;
+			return context;
+		}
 
-		return context;
+		return std::nullopt;
 	}
 	
-	const std::optional<VaultContextData> Get1StepToCrouchStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																			   const std::vector<AttractorCollisionData>& attracColls)
+	const std::optional<ClimbContextData> GetStandVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																				   const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			0, -STEPUP_HEIGHT,				// Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Ledge floor-to-ceil range.
@@ -1415,29 +1417,30 @@ namespace TEN::Entities::Player
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(1), 0.0f);
 
-		// Get edge vault attractor collision.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		// Get standing vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle;
+			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		// Create and return standing vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
-		context.ChainDistance = attracColl->Proximity.ChainDistance;
-		context.HeadingAngle = attracColl->HeadingAngle;
-		context.TargetStateID = LS_VAULT_1_STEP_CROUCH;
-		context.SetBusyHands = true;
-		context.SnapToEdge = true;
-		context.SetJumpVelocity = false;
+			return context;
+		}
 
-		return context;
+		return std::nullopt;
 	}
 	
-	const std::optional<VaultContextData> Get2StepToCrouchStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																			   const std::vector<AttractorCollisionData>& attracColls)
+	const std::optional<ClimbContextData> GetStandVault2StepsUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	   // Ledge floor-to-ceil range.
@@ -1449,29 +1452,30 @@ namespace TEN::Entities::Player
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
 
-		// Get edge vault attractor collision.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
+		// Get standing vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (!attracColl.has_value())
-			return std::nullopt;
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle;
+			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		// Create and return standing vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
-		context.ChainDistance = attracColl->Proximity.ChainDistance;
-		context.HeadingAngle = attracColl->HeadingAngle;
-		context.TargetStateID = LS_VAULT_2_STEPS_CROUCH;
-		context.SetBusyHands = true;
-		context.SnapToEdge = true;
-		context.SetJumpVelocity = false;
+			return context;
+		}
 
-		return context;
+		return std::nullopt;
 	}
 	
-	const std::optional<VaultContextData> Get3StepToCrouchStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																			   const std::vector<AttractorCollisionData>& attracColls)
+	const std::optional<ClimbContextData> GetStandVault3StepsUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		  // Ledge floor-to-ceil range.
@@ -1483,32 +1487,33 @@ namespace TEN::Entities::Player
 		};
 		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
 
-		// Get edge vault attractor collision.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		// Get standing vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle;
+			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		// Create and return standing vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
-		context.ChainDistance = attracColl->Proximity.ChainDistance;
-		context.HeadingAngle = attracColl->HeadingAngle;
-		context.TargetStateID = LS_VAULT_3_STEPS_CROUCH;
-		context.SetBusyHands = true;
-		context.SnapToEdge = true;
-		context.SetJumpVelocity = false;
+			return context;
+		}
 
-		return context;
+		return std::nullopt;
 	}
 	
-	const std::optional<VaultContextData> GetAutoJumpStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																		  const std::vector<AttractorCollisionData>& attracColls)
+	const std::optional<ClimbContextData> GetAutoJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																  const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto LOWER_CEIL_BOUND = -LARA_HEIGHT_MONKEY;
 		constexpr auto UPPER_CEIL_BOUND = -CLICK(7);
 
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			-(int)CLICK(3.5f), -(int)CLICK(7.5f), // Edge height bounds.
 			0, -MAX_HEIGHT,						  // Ledge floor-to-ceil range.
@@ -1521,11 +1526,11 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		// 1) Get auto jump to edge standing vault context.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
+		// 1) Get auto jump to edge standing vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
-			auto context = VaultContextData{};
+			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
 			context.Intersection = attracColl->Proximity.Intersection;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
@@ -1546,12 +1551,12 @@ namespace TEN::Entities::Player
 		auto pointColl = GetCollision(item);
 		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
 
-		// 2) Get auto jump to monkey swing standing vault context.
+		// 2) Get auto jump to monkey swing standing vault climb context.
 		if (player.Control.CanMonkeySwing &&	// Player is standing below monkey swing.
 			relCeilHeight < LOWER_CEIL_BOUND && // Ceiling height is within lower ceiling bound.
 			relCeilHeight >= UPPER_CEIL_BOUND)	// Ceiling height is within upper ceiling bound.
 		{
-			auto context = VaultContextData{};
+			auto context = ClimbContextData{};
 			context.AttracPtr = nullptr;
 			context.Intersection = Vector3(item.Pose.Position.x, pointColl.Position.Ceiling, item.Pose.Position.z);
 			context.ChainDistance = 0.0f;
@@ -1567,7 +1572,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<VaultContextData> GetStandingVaultContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(2);
 
@@ -1580,50 +1585,50 @@ namespace TEN::Entities::Player
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
-		auto context = std::optional<VaultContextData>();
+		auto context = std::optional<ClimbContextData>();
 
-		// Vault to crouch up 1 step.
-		context = Get1StepToCrouchStandingVaultContext(item, coll, attracColls);
+		// 1) Standing vault 1 step up to crouch.
+		context = GetStandVault1StepUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// Vault up 2 steps to stand.
-		context = Get2StepToStandStandingVaultContext(item, coll, attracColls);
+		// 2) Standing vault 2 steps up to crouch.
+		context = GetStandVault2StepsUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// Vault to crouch up 2 steps.
-		context = Get2StepToCrouchStandingVaultContext(item, coll, attracColls);
+		// 3) Standing vault 2 steps up.
+		context = GetStandVault2StepsUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// Vault to stand up 3 steps.
-		context = Get3StepToStandStandingVaultContext(item, coll, attracColls);
+		// 4) Standing vault 3 steps up to crouch.
+		context = GetStandVault3StepsUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// Vault to crouch up 3 steps.
-		context = Get3StepToCrouchStandingVaultContext(item, coll, attracColls);
+		// 5) Standing vault 3 steps up.
+		context = GetStandVault3StepsUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// Vault auto jump.
-		context = GetAutoJumpStandingVaultContext(item, coll, attracColls);
+		// 6) Vault auto jump.
+		context = GetAutoJumpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
@@ -1636,10 +1641,10 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<VaultContextData> Get1StepUpCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																const std::vector<AttractorCollisionData>& attracColls)
+	std::optional<ClimbContextData> GetCrawlVault1StepUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																	 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			-CRAWL_STEPUP_HEIGHT, -STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		  // Ledge floor-to-ceil range.
@@ -1650,29 +1655,31 @@ namespace TEN::Entities::Player
 			true								  // Test ledge illegal slope.
 		};
 
-		// Get edge vault attractor collision.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		// Get crawling vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
 
-		// Create and return crawl vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
-		context.ChainDistance = attracColl->Proximity.ChainDistance;
-		context.HeadingAngle = attracColl->HeadingAngle;
-		context.TargetStateID = LS_CRAWL_STEP_UP;
-		context.SetBusyHands = true;
-		context.SnapToEdge = true;
-		context.SetJumpVelocity = false;
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle;
+			context.TargetStateID = LS_CRAWL_STEP_UP;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		return context;
+			return context;
+		}
+
+		return std::nullopt;
 	}
 
-	std::optional<VaultContextData> Get1StepDownCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																  const std::vector<AttractorCollisionData>& attracColls)
+	std::optional<ClimbContextData> GetCrawlVault1StepDownClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																	   const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		// Ledge floor-to-ceil range.
@@ -1683,29 +1690,30 @@ namespace TEN::Entities::Player
 			true								// Test ledge illegal slope.
 		};
 
-		// Get edge vault attractor collision.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		// Get crawling vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
+			context.TargetStateID = LS_CRAWL_STEP_DOWN;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		// Create and return crawl vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
-		context.ChainDistance = attracColl->Proximity.ChainDistance;
-		context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
-		context.TargetStateID = LS_CRAWL_STEP_DOWN;
-		context.SetBusyHands = true;
-		context.SnapToEdge = true;
-		context.SetJumpVelocity = false;
+			return context;
+		}
 
-		return context;
+		return std::nullopt;
 	}
 	
-	std::optional<VaultContextData> Get1StepDownToStandCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-																		 const std::vector<AttractorCollisionData>& attracColls)
+	std::optional<ClimbContextData> GetCrawlVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			  const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
@@ -1716,29 +1724,30 @@ namespace TEN::Entities::Player
 			false								 // Test ledge illegal slope.
 		};
 
-		// Get edge vault attractor collision.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		// Get crawling vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
+			context.TargetStateID = LS_CRAWL_EXIT_STEP_DOWN;
+			context.SetBusyHands = true;
+			context.SnapToEdge = true;
+			context.SetJumpVelocity = false;
 
-		// Create and return crawl vault context.
-		auto context = VaultContextData{};
-		context.AttracPtr = attracColl->AttracPtr;
-		context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
-		context.ChainDistance = attracColl->Proximity.ChainDistance;
-		context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
-		context.TargetStateID = LS_CRAWL_EXIT_STEP_DOWN;
-		context.SetBusyHands = true;
-		context.SnapToEdge = true;
-		context.SetJumpVelocity = false;
+			return context;
+		}
 
-		return context;
+		return std::nullopt;
 	}
 	
-	std::optional<VaultContextData> GetJumpCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll,
-															 const std::vector<AttractorCollisionData>& attracColls)
+	std::optional<ClimbContextData> GetCrawlVaultJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																  const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			NO_LOWER_BOUND, STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,	   // Ledge floor-to-ceil range.
@@ -1749,11 +1758,11 @@ namespace TEN::Entities::Player
 			false						   // Test ledge illegal slope.
 		};
 
-		// 1) Get attractor crawl vault context.
-		auto attracColl = GetEdgeVaultAttractorCollision(item, coll, SETUP, attracColls);
+		// 1) Get edge crawl vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
-			auto context = VaultContextData{};
+			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
 			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
@@ -1771,7 +1780,7 @@ namespace TEN::Entities::Player
 		int relFloorHeight = pointCollFront.Position.Floor - item.Pose.Position.y;
 
 		// TODO
-		// 2) Get crawl vault context in special case of illegal slope.
+		// 2) Get illegal slope crawl vault climb context (special case).
 		if (pointCollFront.Position.FloorSlope)
 		{
 			if (true
@@ -1785,7 +1794,7 @@ namespace TEN::Entities::Player
 				abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.FloorBound &&		// Crossing/destination floor height difference suggests continuous crawl surface.
 				(probeA.Position.Ceiling - y) < -testSetup.GapMin*/)									// Ceiling height is permissive.
 			{
-				auto context = VaultContextData{};
+				auto context = ClimbContextData{};
 				context.AttracPtr = nullptr;
 				context.Intersection = item.Pose.Position.ToVector3();
 				context.ChainDistance = 0.0f;
@@ -1802,7 +1811,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<VaultContextData> GetCrawlVaultContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
@@ -1811,16 +1820,17 @@ namespace TEN::Entities::Player
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
-		auto context = std::optional<VaultContextData>();
+		auto context = std::optional<ClimbContextData>();
 
-		// Crawl vault down 1 step to stand.
-		context = Get1StepDownToStandCrawlVaultContext(item, coll, attracColls);
+		// 1) Crawling vault down 1 step to stand.
+		context = GetCrawlVault1StepDownToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (!IsHeld(In::Crouch) && HasStateDispatch(&item, context->TargetStateID))
 				return context;
 
-			context = Get1StepDownCrawlVaultContext(item, coll, attracColls);
+			// 2) Crawling vault down 1 step.
+			context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
 			if (context.has_value())
 			{
 				if (HasStateDispatch(&item, context->TargetStateID))
@@ -1828,24 +1838,24 @@ namespace TEN::Entities::Player
 			}
 		}
 
-		// Crawl vault exit jump.
-		context = GetJumpCrawlVaultContext(item, coll, attracColls);
+		// 3) Crawling vault jump.
+		context = GetCrawlVaultJumpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// Crawl vault up 1 step.
-		context = Get1StepUpCrawlVaultContext(item, coll, attracColls);
+		// 4) Crawling vault up 1 step.
+		context = GetCrawlVault1StepUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// Crawl vault down 1 step.
-		context = Get1StepDownCrawlVaultContext(item, coll, attracColls);
+		// 5) Crawling vault down 1 step.
+		context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
@@ -1855,9 +1865,9 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<VaultContextData> GetCrawlToHangVaultContext(ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetCrawlToHangClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto SETUP = VaultSetupData
+		constexpr auto SETUP = ClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			0, 0,		// Ledge floor-to-ceil range (irrelevant).
@@ -1920,7 +1930,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// Create and return crawl to hang vault context.
-			auto context = VaultContextData{};
+			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl.AttracPtr;
 			context.Intersection = Vector3(attracColl.Proximity.Intersection.x, item.Pose.Position.y, attracColl.Proximity.Intersection.z);
 			context.ChainDistance = attracColl.Proximity.ChainDistance;
@@ -1945,18 +1955,18 @@ namespace TEN::Entities::Player
 		float detectRadius = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
 		auto attracColls = GetAttractorCollisions(item, coll.Setup.Radius, -coll.Setup.Height, 0.0f, detectRadius);
 
-		// 1) Assess attractor collision.
+		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
-			// 1.1) Check if attractor is edge type.
+			// 1) Check if attractor is edge type.
 			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
 				continue;
 
-			// 1.2) Test if edge slope is illegal.
+			// 2) Test if edge slope is illegal.
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 1.3) Test relation to edge intersection.
+			// 3) Test relation to edge intersection.
 			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
 				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 			{
@@ -1969,12 +1979,12 @@ namespace TEN::Entities::Player
 				probePoint, attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 1.4) Test if edge is high enough off ground.
+			// 4) Test if edge is high enough off ground.
 			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
-			// 1.5) Test if ceiling is adequately higher than edge.
+			// 5) Test if ceiling is adequately higher than edge.
 			int edgeToCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;
@@ -1986,7 +1996,7 @@ namespace TEN::Entities::Player
 			int lowerBound = isMovingUp ? 0 : (int)round(item.Animation.Velocity.y);
 			int upperBound = isMovingUp ? (int)round(item.Animation.Velocity.y) : 0;
 
-			// 1.6) Assess catch trajectory.
+			// 6) Assess catch trajectory.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{

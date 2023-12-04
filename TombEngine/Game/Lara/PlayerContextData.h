@@ -40,7 +40,7 @@ namespace TEN::Entities::Player
 		bool TestWadeStatus = true;
 	};
 
-	struct VaultSetupData
+	struct ClimbSetupData
 	{
 		int LowerEdgeBound			  = 0;
 		int UpperEdgeBound			  = 0;
@@ -54,7 +54,7 @@ namespace TEN::Entities::Player
 		bool TestLedgeIllegalSlope = false;
 	};
 
-	struct VaultContextData
+	struct ClimbContextData
 	{
 		Attractor* AttracPtr	 = nullptr;
 		Vector3	   Intersection	 = Vector3::Zero; // TODO: Can be calculated from chain distance.

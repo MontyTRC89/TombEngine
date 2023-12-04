@@ -96,7 +96,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_HANG_TO_STAND ||
 		item->Animation.AnimNumber == LA_HANG_TO_CROUCH)
 	{
-		item->Pose.Orientation.Lerp(Lara.Context.TargetOrientation, 0.25f);
+		item->Pose.Orientation.Lerp(Lara.Context.OrientOffset, 0.25f);
 	}
 }
 
@@ -115,7 +115,8 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.ToVector3(),
 		Vector3(item->Pose.Position.x, player.Context.ProjectedFloorHeight - item->Pose.Position.y, item->Pose.Position.z),
 		0.25f);*/
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.25f);
+	//item->Pose.Orientation.Lerp(player.Context.OrientOffset, 0.25f);
+	HandlePlayerAttractorParent(*item, *coll);
 
 	item->Animation.TargetState = LS_IDLE;
 }
@@ -130,7 +131,7 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.4f);
+	item->Pose.Orientation.Lerp(player.Context.OrientOffset, 0.4f);
 }
 
 // ---------------
@@ -171,11 +172,11 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetStandingVaultContext(*item, *coll);
-			if (vaultContext.has_value())
+			auto climbContext = GetStandClimbContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = vaultContext->TargetStateID;
-				SetPlayerVault(*item, *coll, *vaultContext);
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
 				return;
 			}
 		}
@@ -308,11 +309,11 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetStandingVaultContext(*item, *coll);
-			if (vaultContext.has_value())
+			auto climbContext = GetStandClimbContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = vaultContext->TargetStateID;
-				SetPlayerVault(*item, *coll, *vaultContext);
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
 				return;
 			}
 		}
@@ -500,11 +501,11 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetStandingVaultContext(*item, *coll);
-			if (vaultContext.has_value())
+			auto climbContext = GetStandClimbContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = vaultContext->TargetStateID;
-				SetPlayerVault(*item, *coll, *vaultContext);
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
 				return;
 			}
 		}
@@ -830,11 +831,11 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetStandingVaultContext(*item, *coll);
-			if (vaultContext.has_value())
+			auto climbContext = GetStandClimbContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = vaultContext->TargetStateID;
-				SetPlayerVault(*item, *coll, *vaultContext);
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
 				return;
 			}
 		}
@@ -1169,11 +1170,11 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetStandingVaultContext(*item, *coll);
-			if (vaultContext.has_value())
+			auto climbContext = GetStandClimbContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = vaultContext->TargetStateID;
-				SetPlayerVault(*item, *coll, *vaultContext);
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
 				return;
 			}
 		}
@@ -1619,11 +1620,11 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto vaultContext = GetStandingVaultContext(*item, *coll);
-			if (vaultContext.has_value())
+			auto climbContext = GetStandClimbContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = vaultContext->TargetStateID;
-				SetPlayerVault(*item, *coll, *vaultContext);
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
 				return;
 			}
 		}
@@ -1738,11 +1739,11 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action) && CanVaultFromSprint(*item, *coll))
 		{
-			auto vaultContext = GetStandingVaultContext(*item, *coll);
-			if (vaultContext.has_value())
+			auto climbContext = GetStandClimbContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = vaultContext->TargetStateID;
-				SetPlayerVault(*item, *coll, *vaultContext);
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
 				return;
 			}
 		}
