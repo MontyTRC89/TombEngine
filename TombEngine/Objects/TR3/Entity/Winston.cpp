@@ -34,40 +34,40 @@ namespace TEN::Entities::Creatures::TR3
 		// No state 0.
 		WINSTON_STATE_IDLE = 1,
 		WINSTON_STATE_WALK_FORWARD = 2,
-		WINSTON_STATE_GUARD_1 = 3,
-		WINSTON_STATE_GUARD_2 = 4, // Unused.
-		WINSTON_STATE_GUARD_3 = 5, // Unused.
-		WINSTON_STATE_RECOIL_1 = 6,
-		WINSTON_STATE_RECOIL_2 = 7, // Unused.
-		WINSTON_STATE_RECOIL_3 = 8, // Unused.
+		WINSTON_STATE_GUARD_MID = 3,
+		WINSTON_STATE_GUARD_LOW = 4, // Unused.
+		WINSTON_STATE_GUARD_HIGH = 5, // Unused.
+		WINSTON_STATE_RECOIL_MID = 6,
+		WINSTON_STATE_RECOIL_LOW = 7, // Unused.
+		WINSTON_STATE_RECOIL_HIGH = 8, // Unused.
 		WINSTON_STATE_DEFEAT_CONTINUE = 9,
 		WINSTON_STATE_DEFEAT_START = 10,
-		WINSTON_STATE_DEFEAT_RECOVER = 11,
+		WINSTON_STATE_DEFEAT_TO_IDLE = 11,
 		WINSTON_STATE_BRUSH_OFF = 12,
 		WINSTON_STATE_DEFEAT_END = 13
 	};
 
 	enum WinstonAnim
 	{
-		WINSTON_ANIM_WALK = 0,
-		WINSTON_ANIM_WALK_TO_STOP = 1,
+		WINSTON_ANIM_WALK_FORWARD = 0,
+		WINSTON_ANIM_WALK_FORWARD_TO_IDLE = 1,
 		WINSTON_ANIM_IDLE = 2,
-		WINSTON_ANIM_REPOSITION = 3,
-		WINSTON_ANIM_IDLE_TO_GUARD = 4,
-		WINSTON_ANIM_MID_GUARD = 5,
-		WINSTON_ANIM_MID_RECOIL = 6,
-		WINSTON_ANIM_MID_RECOIL_TO_IDLE = 7,
-		WINSTON_ANIM_MID_TO_LOW_GUARD = 8,
-		WINSTON_ANIM_LOW_GUARD = 9,
-		WINSTON_ANIM_LOW_RECOIL = 10,
-		WINSTON_ANIM_LOW_TO_MID_GUARD = 11,
-		WINSTON_ANIM_MID_TO_HIGH_GUARD = 12,
-		WINSTON_ANIM_HIGH_GUARD = 13,
-		WINSTON_ANIM_HIGH_RECOIL = 14,
-		WINSTON_ANIM_HIGH_TO_MID_GUARD = 15,
-		WINSTON_ANIM_DEFEAT = 16,
-		WINSTON_ANIM_DEFEAT_FLOOR = 17,
-		WINSTON_ANIM_DEFEAT_FLOOR_TO_IDLE = 18,
+		WINSTON_ANIM_IDLE_TO_WALK_FORWARD = 3,
+		WINSTON_ANIM_IDLE_TO_GUARD_MID = 4,
+		WINSTON_ANIM_GUARD_MID = 5,
+		WINSTON_ANIM_RECOIL_MID = 6,
+		WINSTON_ANIM_RECOIL_MID_TO_IDLE = 7,
+		WINSTON_ANIM_GUARD_MID_TO_LOW = 8,
+		WINSTON_ANIM_GUARD_LOW = 9,
+		WINSTON_ANIM_RECOIL_LOW = 10,
+		WINSTON_ANIM_GUARD_LOW_TO_MID = 11,
+		WINSTON_ANIM_GUARD_MID_TO_HIGH = 12,
+		WINSTON_ANIM_GUARD_HIGH = 13,
+		WINSTON_ANIM_RECOIL_HIGH = 14,
+		WINSTON_ANIM_GUARD_HIGH_TO_MID = 15,
+		WINSTON_ANIM_DEFEAT_START = 16,
+		WINSTON_ANIM_DEFEAT_CONT = 17,
+		WINSTON_ANIM_DEFEAT_TO_IDLE = 18,
 		WINSTON_ANIM_BRUSH_OFF = 19,
 		WINSTON_ANIM_DEFEAT_END = 20
 	};
@@ -171,7 +171,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				break;
 
-			case WINSTON_STATE_DEFEAT_RECOVER:
+			case WINSTON_STATE_DEFEAT_TO_IDLE:
 				item.HitPoints = WINSTON_RECOVER_HIT_POINTS;
 
 				if (Random::TestProbability(1 / 2.0f))
@@ -188,7 +188,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					defeatTimer--;
 					if (defeatTimer < 0)
-						item.Animation.TargetState = WINSTON_STATE_DEFEAT_RECOVER;
+						item.Animation.TargetState = WINSTON_STATE_DEFEAT_TO_IDLE;
 				}
 
 				break;
@@ -212,7 +212,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (player.TargetEntity == &item)
 				{
-					item.Animation.TargetState = WINSTON_STATE_GUARD_1;
+					item.Animation.TargetState = WINSTON_STATE_GUARD_MID;
 				}
 				else if ((ai.distance > WINSTON_IDLE_RANGE || !ai.ahead) && item.Animation.TargetState != WINSTON_STATE_WALK_FORWARD)
 				{
@@ -249,7 +249,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				break;
 
-			case WINSTON_STATE_GUARD_1:
+			case WINSTON_STATE_GUARD_MID:
 				creature.MaxTurn = WINSTON_TURN_RATE_MAX;
 
 				if (item.Animation.RequiredState != NO_STATE)
@@ -257,7 +257,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (item.HitStatus)
 				{
-					item.Animation.TargetState = WINSTON_STATE_RECOIL_1;
+					item.Animation.TargetState = WINSTON_STATE_RECOIL_MID;
 				}
 				else if (player.TargetEntity != &item)
 				{
@@ -266,18 +266,18 @@ namespace TEN::Entities::Creatures::TR3
 
 				break;
 
-			case WINSTON_STATE_GUARD_2:
+			case WINSTON_STATE_GUARD_LOW:
 				creature.MaxTurn = WINSTON_TURN_RATE_MAX;
 
 				if (item.Animation.RequiredState != NO_STATE)
 					item.Animation.TargetState = item.Animation.RequiredState;
 
 				if (item.HitStatus)
-					item.Animation.TargetState = WINSTON_STATE_RECOIL_2;
+					item.Animation.TargetState = WINSTON_STATE_RECOIL_LOW;
 
 				break;
 
-			case WINSTON_STATE_GUARD_3:
+			case WINSTON_STATE_GUARD_HIGH:
 				creature.MaxTurn = WINSTON_TURN_RATE_MAX;
 
 				if (item.Animation.RequiredState != NO_STATE)
@@ -285,22 +285,22 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (item.HitStatus)
 				{
-					item.Animation.TargetState = WINSTON_STATE_RECOIL_3;
+					item.Animation.TargetState = WINSTON_STATE_RECOIL_HIGH;
 				}
 				else if (player.TargetEntity == &item)
 				{
-					item.Animation.TargetState = WINSTON_STATE_GUARD_1;
+					item.Animation.TargetState = WINSTON_STATE_GUARD_MID;
 				}
 
 				break;
 
-			case WINSTON_STATE_RECOIL_1:
-				item.Animation.RequiredState = Random::TestProbability(1 / 2.0f) ? WINSTON_STATE_GUARD_3 : WINSTON_STATE_GUARD_2;
+			case WINSTON_STATE_RECOIL_MID:
+				item.Animation.RequiredState = Random::TestProbability(1 / 2.0f) ? WINSTON_STATE_GUARD_HIGH : WINSTON_STATE_GUARD_LOW;
 				break;
 
-			case WINSTON_STATE_RECOIL_2:
-			case WINSTON_STATE_RECOIL_3:
-				item.Animation.RequiredState = WINSTON_STATE_GUARD_1;
+			case WINSTON_STATE_RECOIL_LOW:
+			case WINSTON_STATE_RECOIL_HIGH:
+				item.Animation.RequiredState = WINSTON_STATE_GUARD_MID;
 				break;
 
 			case WINSTON_STATE_BRUSH_OFF:
