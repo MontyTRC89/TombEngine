@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/AttractorCollision.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
@@ -17,6 +18,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 
@@ -896,7 +898,9 @@ void lara_col_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 {
-	const auto& player = GetLaraInfo(*item);
+	constexpr auto ORIENT_LERP_ALPHA = 0.25f;
+
+	auto& player = GetLaraInfo(*item);
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -905,11 +909,16 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	Camera.flags = CF_FOLLOW_CENTER;
 
 	ResetPlayerLean(item, 1 / 6.0f);
-	item->Pose.Orientation.Lerp(player.Context.TargetOrientation + EulerAngles(0, ANGLE(180.0f), 0), 0.25f);
+	//item->Pose.Orientation.Lerp(player.Context.TargetOrientation + EulerAngles(0, ANGLE(180.0f), 0), 0.25f);
 
-	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
+	if (player.Context.Attractor.Ptr != nullptr)
 	{
-		SetAnimation(item, LA_HANG_IDLE);
-		item->Pose.Position.y = player.Context.ProjectedFloorHeight + LARA_HEIGHT_STRETCH;
+		auto intersection = player.Context.Attractor.Ptr->GetIntersectionAtChainDistance(player.Context.Attractor.ChainDistance);
+		auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, intersection, 0, intersection);
+
+		item->Pose.Position = Geometry::TranslatePoint(intersection, attracColl.HeadingAngle, LARA_RADIUS_CRAWL);
+		item->Pose.Orientation = EulerAngles(0, attracColl.HeadingAngle, 0) - player.Context.TargetOrientation;
+
+		player.Context.TargetOrientation *= 1.0f - ORIENT_LERP_ALPHA;
 	}
 }

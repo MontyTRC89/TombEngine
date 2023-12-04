@@ -794,8 +794,8 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchCon
 
 	// Set attractor attachment.
 	catchData.AttracPtr->AttachPlayer(item);
-	player.Context.HandsAttractor.AttracPtr = catchData.AttracPtr;
-	player.Context.HandsAttractor.ChainDistance = catchData.ChainDistance;
+	player.Context.Attractor.Ptr = catchData.AttracPtr;
+	player.Context.Attractor.ChainDistance = catchData.ChainDistance;
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const MonkeySwingCatchContextData& catchData)
@@ -1665,7 +1665,7 @@ void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContex
 
 	// Reference attractor if relevant to climb action.
 	if (vaultContext.AttracPtr != nullptr)
-		player.Context.VaultAttractor.Attach(item, *vaultContext.AttracPtr, vaultContext.ChainDistance);
+		player.Context.Attractor.Attach(item, *vaultContext.AttracPtr, vaultContext.ChainDistance);
 
 	if (vaultContext.SetBusyHands)
 		player.Control.HandStatus = HandStatus::Busy;
@@ -1676,7 +1676,11 @@ void SetPlayerVault(ItemInfo& item, const CollisionInfo& coll, const VaultContex
 		auto target = Vector3i(vaultContext.Intersection.x, item.Pose.Position.y, vaultContext.Intersection.z);
 
 		item.Pose.Position = Geometry::TranslatePoint(target, vaultContext.HeadingAngle, -coll.Setup.Radius);
-		player.Context.TargetOrientation = EulerAngles(0, vaultContext.HeadingAngle, 0);
+		
+		// TODO: Old way. Adopt relative orientation offsets like below.
+		//player.Context.TargetOrientation = EulerAngles(0, vaultContext.HeadingAngle, 0);
+
+		player.Context.TargetOrientation = EulerAngles(0, vaultContext.HeadingAngle + ANGLE(180.0f), 0) - item.Pose.Orientation;
 	}
 	else
 	{
@@ -1829,7 +1833,7 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	item.Animation.IsAirborne = true;
 	item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 	player.Control.HandStatus = HandStatus::Free;
-	player.Context.HandsAttractor.Detach(item);
+	player.Context.Attractor.Detach(item);
 }
 
 void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)

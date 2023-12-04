@@ -21,19 +21,19 @@ namespace TEN::Entities::Player
 
 	struct PlayerAttractorData
 	{
-		Attractor* AttracPtr	 = nullptr;
+		Attractor* Ptr			 = nullptr;
 		float	   ChainDistance = 0.0f;
 
 		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
 		{
-			AttracPtr = &attrac;
+			Ptr = &attrac;
 			ChainDistance = chainDist;
 			//AttracPtr->AttackPlayer(playerItem);
 		}
 
 		void Detach(ItemInfo& playerItem)
 		{
-			AttracPtr = nullptr;
+			Ptr = nullptr;
 			ChainDistance = 0.0f;
 			//AttracPtr->DetachPlayer(playerItem);
 		};
@@ -58,9 +58,8 @@ namespace TEN::Entities::Player
 
 	public:
 		// Members
-		PlayerAttractorData HandsAttractor = {};
-		PlayerAttractorData VaultAttractor = {};
-		DebugAttractorData	DebugAttracs   = {};
+		PlayerAttractorData Attractor	 = {};
+		DebugAttractorData	DebugAttracs = {};
 
 		int			ProjectedFloorHeight = 0; // Used for primitive offset blend. TODO: Real offset blend feature + object parenting. -- Sezz 2023.09.27
 		float		CalcJumpVelocity	 = 0;
