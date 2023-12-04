@@ -348,7 +348,7 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 		adjustedIntersect - Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
 		EulerAngles(0, adjustedHeadingAngle, 0) + player.Context.Attractor.RelDeltaOrient);
 
-	// Update relative deltas.
+	// Inverse lerp relative deltas toward 0.
 	player.Context.Attractor.RelDeltaPos *= INV_LERP_ALPHA;
 	player.Context.Attractor.RelDeltaOrient *= INV_LERP_ALPHA;
 }

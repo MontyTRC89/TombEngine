@@ -32,6 +32,7 @@ namespace TEN::Collision::Attractor
 		// Constructors
 		AttractorCollisionData() {};
 		AttractorCollisionData(Attractor& attrac, const Vector3& pos, short headingAngle, const Vector3& probePoint);
+		AttractorCollisionData::AttractorCollisionData(Attractor& attrac, float chainDist, const Vector3& refPoint);
 
 	private:
 		// Helpers

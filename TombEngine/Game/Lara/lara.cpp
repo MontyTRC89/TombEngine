@@ -43,9 +43,16 @@ LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 
+//---------debug
+#include <OISKeyboard.h>
+#include "Specific/Input/Input.h"
+//----------
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
+
+	//---------debug
 
 	HandleAttractorDebug(*item);
 
@@ -55,13 +62,50 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	if (bridgeItemNumber != NO_ITEM)
 	{
+		constexpr auto TRANSLATE_STEP = BLOCK(0.1f);
+
 		auto& bridgeItem = g_Level.Items[bridgeItemNumber];
 
-		bridgeItem.Pose.Orientation.y += ANGLE(2.0f);
+		// Z
+		if (KeyMap[OIS::KeyCode::KC_I])
+		{
+			bridgeItem.Pose.Position.z += TRANSLATE_STEP;
+		}
+		else if (KeyMap[OIS::KeyCode::KC_K])
+		{
+			bridgeItem.Pose.Position.z -= TRANSLATE_STEP;
+		}
+
+		// X
+		if (KeyMap[OIS::KeyCode::KC_J])
+		{
+			bridgeItem.Pose.Position.x += TRANSLATE_STEP;
+		}
+		else if (KeyMap[OIS::KeyCode::KC_L])
+		{
+			bridgeItem.Pose.Position.x -= TRANSLATE_STEP;
+		}
+		
+		// Y
+		if (KeyMap[OIS::KeyCode::KC_N])
+		{
+			bridgeItem.Pose.Position.y += TRANSLATE_STEP;
+		}
+		else if (KeyMap[OIS::KeyCode::KC_M])
+		{
+			bridgeItem.Pose.Position.y -= TRANSLATE_STEP;
+		}
+
+		// Rotate.
+		if (KeyMap[OIS::KeyCode::KC_B])
+			bridgeItem.Pose.Orientation.y += ANGLE(2.0f);
+
 
 		if (bridgeItem.Attractor.has_value())
 			bridgeItem.Attractor->Update(GenerateBridgeAttractor(bridgeItem).GetPoints(), bridgeItem.RoomNumber);
 	}
+
+	//----------
 
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
