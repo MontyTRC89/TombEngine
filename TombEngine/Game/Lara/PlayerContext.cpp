@@ -1316,17 +1316,17 @@ namespace TEN::Entities::Player
 				}
 			}
 
+			// Get point collision in front of edge.
+			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
+			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
+
 			// 2.5) Test if relative edge height is within edge intersection bounds.
-			auto relEdgeHeight = attracColl.Proximity.Intersection.y - item.Pose.Position.y;
+			int relEdgeHeight = (setup.TestEdgeFront ? attracColl.Proximity.Intersection.y : pointCollFront.Position.Floor) - item.Pose.Position.y;
 			if (relEdgeHeight >= setup.LowerEdgeBound || // Player-to-edge height is within lower edge bound.
 				relEdgeHeight < setup.UpperEdgeBound)	 // Player-to-edge height is within upper edge bound.
 			{
 				continue;
 			}
-
-			// Get point collision in front of edge.
-			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
-			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 2.6) Test if ceiling is adequately higher than edge.
 			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
@@ -1339,13 +1339,15 @@ namespace TEN::Entities::Player
 			// Assess ledge heights (if applicable).
 			if (setup.TestLedgeHeights)
 			{
+				// TODO: Maybe not necessary? Edge is already good climb candidate by this point.
 				// 2.7) Test ledge floor height.
 				int absLedgeFloorHeight = abs(pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y);
 				if (absLedgeFloorHeight > LEDGE_FLOOR_HEIGHT_TOLERANCE)
 					continue;
 
 				// 2.8) Test ledge floor-to-ceiling height.
-				int ledgeFloorToCeilHeight = abs(pointCollBack.Position.Ceiling - pointCollBack.Position.Floor);
+				const auto& pointCollHeights = setup.TestEdgeFront ? pointCollBack.Position : pointCollFront.Position;
+				int ledgeFloorToCeilHeight = abs(pointCollHeights.Ceiling - pointCollHeights.Floor);
 				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
 					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
 				{
@@ -1741,7 +1743,7 @@ namespace TEN::Entities::Player
 			context.TargetStateID = LS_CRAWL_STEP_DOWN;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
+			context.SetAttractorParent = false; // TODO: Offset blend.
 
 			return context;
 		}
@@ -1775,7 +1777,7 @@ namespace TEN::Entities::Player
 			context.TargetStateID = LS_CRAWL_EXIT_STEP_DOWN;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
+			context.SetAttractorParent = false; // TODO: Offset blend.
 
 			return context;
 		}
@@ -1809,7 +1811,7 @@ namespace TEN::Entities::Player
 			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_EXIT_FLIP : LS_CRAWL_EXIT_JUMP;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
+			context.SetAttractorParent = false; // TODO: Offset blend.
 
 			return context;
 		}
