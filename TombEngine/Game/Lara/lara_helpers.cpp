@@ -1704,6 +1704,18 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	ResetPlayerTurnRateY(item);
 	ResetPlayerFlex(&item);
 
+	// Set busy hand status (if applicable).
+	if (climbContext.SetBusyHands)
+		player.Control.HandStatus = HandStatus::Busy;
+
+	// Set jump velocity (if applicable).
+	if (climbContext.SetJumpVelocity)
+		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(climbContext.RelPosOffset.y);
+
+	// No attractor parent; return early.
+	if (climbContext.AttracPtr == nullptr)
+		return;
+
 	// Get attractor collision.
 	auto probePoint = climbContext.AttracPtr->GetIntersectionAtChainDistance(climbContext.ChainDistance);
 	auto attracColl = GetAttractorCollision(*climbContext.AttracPtr, probePoint);
@@ -1712,41 +1724,46 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
 	auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
 
-	// Calculate absolute delta position and orientation.
-	//auto deltaPos = item.Pose.Position.ToVector3() - adjustedIntersect;
-	auto deltaPos = adjustedIntersect - item.Pose.Position.ToVector3();
-
-	// Set attractor parent.
-	if (climbContext.SetAttractorParent)
+	// Set alignment.
+	switch (climbContext.AlignType)
 	{
-		if (climbContext.AttracPtr != nullptr)
-		{
-			// Calculate relative delta position and orientation.
-			auto relDeltaPos = Vector3::Transform(deltaPos, rotMatrix);
-			short deltaHeadingAngle = Geometry::GetShortestAngle(attracColl.HeadingAngle, item.Pose.Orientation.y);
-			auto relDeltaOrient = EulerAngles(0, deltaHeadingAngle, 0);
+	default:
+	case ClimbContextAlignType::None:
+		break;
 
-			// Attach player to attractor.
-			player.Context.Attractor.Attach(
-				item, *climbContext.AttracPtr, climbContext.ChainDistance,
-				climbContext.RelPosOffset, climbContext.RelOrientOffset,
-				relDeltaPos, relDeltaOrient);
-		}
+	case ClimbContextAlignType::AttractorParent:
+	{
+		// Calculate relative delta position.
+		auto deltaPos = adjustedIntersect - item.Pose.Position.ToVector3();
+		auto relDeltaPos = Vector3::Transform(deltaPos, rotMatrix);
+
+		// Calculate relative delta orientation.
+		short deltaHeadingAngle = Geometry::GetShortestAngle(attracColl.HeadingAngle, item.Pose.Orientation.y);
+		auto relDeltaOrient = EulerAngles(0, deltaHeadingAngle, 0);
+
+		// Attach player to attractor.
+		player.Context.Attractor.Attach(
+			item, *climbContext.AttracPtr, climbContext.ChainDistance,
+			climbContext.RelPosOffset, climbContext.RelOrientOffset,
+			relDeltaPos, relDeltaOrient);
 	}
-	// Set offset blend.
-	else
+		break;
+
+	case ClimbContextAlignType::OffsetBlend:
 	{
+		// Calculate position offset.
+		auto posOffset = adjustedIntersect - item.Pose.Position.ToVector3();
+
+		// Calculate orientation offset.
 		short headingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);
 		short deltaHeadingAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, attracColl.HeadingAngle + headingAngleOffset);
-		item.OffsetBlend.SetLogarithmic(deltaPos, EulerAngles(0, deltaHeadingAngle, 0), OFFSET_BLEND_LERP_ALPHA);
+		auto orientOffset = EulerAngles(0, deltaHeadingAngle, 0);
+
+		// Set offset blend.
+		item.OffsetBlend.SetLogarithmic(posOffset, orientOffset, OFFSET_BLEND_LERP_ALPHA);
 	}
-
-	if (climbContext.SetBusyHands)
-		player.Control.HandStatus = HandStatus::Busy;
-
-	// Set jump velocity (if applicable).
-	if (climbContext.SetJumpVelocity)
-		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(climbContext.RelPosOffset.y);
+		break;
+	}
 }
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)

@@ -73,8 +73,8 @@ void ItemInfo::HandleOffsetBlend()
 
 	if (IsLara())
 	{
-		g_Renderer.PrintDebugMessage("Interacted item number: %d", GetLaraInfo(*this).Context.InteractedItem);
-		OffsetBlend.DrawDebug();
+		//g_Renderer.PrintDebugMessage("Interacted item number: %d", GetLaraInfo(*this).Context.InteractedItem);
+		//OffsetBlend.DrawDebug();
 	}
 
 	// Offset blend inactive; return early.

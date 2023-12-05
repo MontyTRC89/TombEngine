@@ -1282,6 +1282,8 @@ namespace TEN::Entities::Player
 				return std::nullopt;
 		}
 
+		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+
 		// 2) Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
@@ -1290,8 +1292,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 2.2) Test if edge is within 2D range.
-			float range = OFFSET_RADIUS(coll.Setup.Radius);
-			if (attracColl.Proximity.Distance2D > range)
+			if (attracColl.Proximity.Distance2D > range2D)
 				continue;
 
 			// 2.3) Test if edge slope is illegal.
@@ -1401,9 +1402,9 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
 			context.IsInFront = attracColl->IsFacingForward;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1436,10 +1437,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1472,10 +1473,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1508,10 +1509,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1544,10 +1545,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1588,9 +1589,9 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.IsInFront = attracColl->IsFacingForward;
+			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.SetBusyHands = false;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1614,10 +1615,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, -relCeilHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
-			context.IsInFront = attracColl->IsFacingForward;
+			context.AlignType = ClimbContextAlignType::None;
+			context.IsInFront = true;
 			context.SetBusyHands = false;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1627,6 +1628,7 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetStandClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_PROBE_FORWARD = BLOCK(1 / (float)BLOCK(1));
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(2);
 
 		const auto& player = GetLaraInfo(item);
@@ -1636,7 +1638,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
 		auto context = std::optional<ClimbContextData>();
 
@@ -1720,10 +1722,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_STEP_UP;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1755,10 +1757,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_STEP_DOWN;
+			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1790,10 +1792,10 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = LS_CRAWL_EXIT_STEP_DOWN;
+			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1825,10 +1827,10 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_EXIT_FLIP : LS_CRAWL_EXIT_JUMP;
+			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1858,10 +1860,10 @@ namespace TEN::Entities::Player
 				context.RelPosOffset = Vector3::Zero;
 				context.RelOrientOffset = EulerAngles::Zero;
 				context.TargetStateID = LS_CRAWL_EXIT_JUMP;
+				context.AlignType = ClimbContextAlignType::OffsetBlend;
 				context.IsInFront = true;
 				context.SetBusyHands = true;
 				context.SetJumpVelocity = false;
-				context.SetAttractorParent = false;
 
 				return context;
 			}
@@ -1872,12 +1874,13 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_PROBE_FORWARD = BLOCK(1 / (float)BLOCK(1));
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
 		const auto& player = GetLaraInfo(item);
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
 		auto context = std::optional<ClimbContextData>();
 
@@ -1926,6 +1929,8 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetCrawlToHangClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_PROBE_FORWARD = BLOCK(1 / (float)BLOCK(1));
+
 		constexpr auto SETUP = ClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
@@ -1945,8 +1950,10 @@ namespace TEN::Entities::Player
 		if (isObjectCollided)
 			return std::nullopt;
 
+		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+
 		// 2) Assess attractor collision.
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 		for (const auto& attracColl : attracColls)
 		{
 			// 2.1) Check if attractor is edge type.
@@ -1954,8 +1961,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 2.2) Test if edge is within 2D range.
-			float range = OFFSET_RADIUS(coll.Setup.Radius);
-			if (attracColl.Proximity.Distance2D > range)
+			if (attracColl.Proximity.Distance2D > range2D)
 				continue;
 
 			// 2.3) Test if edge slope is illegal.
@@ -1996,10 +2002,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_TO_HANG;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl.IsFacingForward; // TODO: Check.
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -2008,11 +2014,13 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	// TODO
 	std::optional<ClimbContextData> GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_PROBE_FORWARD = BLOCK(1 / (float)BLOCK(1));
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
 		// 1) Test for object collision.
 		/*bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
@@ -2025,11 +2033,14 @@ namespace TEN::Entities::Player
 
 	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_PROBE_FORWARD		= BLOCK(1 / (float)BLOCK(1));
+		constexpr auto ATTRAC_DETECT_RADIUS		= BLOCK(0.5f);
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
 
 		// Get attractor collisions.
-		float detectRadius = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
-		auto attracColls = GetAttractorCollisions(item, coll.Setup.Radius, -coll.Setup.Height, 0.0f, detectRadius);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
+
+		float range2D = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2038,11 +2049,15 @@ namespace TEN::Entities::Player
 			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
 				continue;
 
-			// 2) Test if edge slope is illegal.
+			// 2) Test if edge is within 2D range.
+			if (attracColl.Proximity.Distance2D > range2D)
+				continue;
+
+			// 3) Test if edge slope is illegal.
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 3) Test relation to edge intersection.
+			// 4) Test relation to edge intersection.
 			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
 				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 			{
@@ -2055,12 +2070,12 @@ namespace TEN::Entities::Player
 				probePoint, attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 4) Test if edge is high enough off ground.
+			// 5) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
-			// 5) Test if ceiling in front is adequately higher than edge.
+			// 6) Test if ceiling in front is adequately higher than edge.
 			int edgeToCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;
@@ -2068,15 +2083,14 @@ namespace TEN::Entities::Player
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
 			int relEdgeHeight = attracColl.Proximity.Intersection.y - vPos;
 
-			bool isMovingUp = (item.Animation.Velocity.y <= 0.0f);
-			int lowerBound = isMovingUp ? 0 : (int)round(item.Animation.Velocity.y);
-			int upperBound = isMovingUp ? (int)round(item.Animation.Velocity.y) : 0;
+			bool isFalling = (item.Animation.Velocity.y >= 0.0f);
+			int lowerBound = isFalling ? (int)round(item.Animation.Velocity.y) : 0;
+			int upperBound = isFalling ? 0 : (int)round(item.Animation.Velocity.y);
 
-			// 6) Assess catch trajectory.
+			// 7) Test catch trajectory.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
-				// Return closest edge attractor collision.
 				return attracColl;
 			}
 		}

@@ -42,8 +42,8 @@ namespace TEN::Entities::Player
 		constexpr auto CORNER_ANGLE_MAX		  = ANGLE(30.0f);
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, probePoint, CONNECT_DIST_THRESHOLD);
-		auto currentAttracColl = GetAttractorCollision(currentAttrac, item.Pose.Position.ToVector3(), item.Pose.Orientation.y, probePoint);
+		auto attracColls = GetAttractorCollisions(probePoint, item.RoomNumber, item.Pose.Orientation.y, CONNECT_DIST_THRESHOLD);
+		auto currentAttracColl = GetAttractorCollision(currentAttrac, probePoint, item.Pose.Orientation.y);
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -131,20 +131,19 @@ namespace TEN::Entities::Player
 			connectingAttracCollRight->AttracPtr->GetIntersectionAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (chainDistRight - length)) :
 			handsAttrac.Ptr->GetIntersectionAtChainDistance(chainDistRight);
 
-		auto pos = item.Pose.Position.ToVector3();
 		auto headingAngle = item.Pose.Orientation.y;
 
 		// Get attractor collisions.
 		auto attracCollCenter = ((chainDistCenter <= 0.0f || chainDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
-			GetAttractorCollision(*connectingAttracCollCenter->AttracPtr, pos, headingAngle, pointCenter) :
-			GetAttractorCollision(*handsAttrac.Ptr, pos, headingAngle, pointCenter);
+			GetAttractorCollision(*connectingAttracCollCenter->AttracPtr, pointCenter, headingAngle) :
+			GetAttractorCollision(*handsAttrac.Ptr, pointCenter, headingAngle);
 
 		auto attracCollLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			GetAttractorCollision(*connectingAttracCollLeft->AttracPtr, pos, headingAngle, pointLeft) :
-			GetAttractorCollision(*handsAttrac.Ptr, pos, headingAngle, pointLeft);
+			GetAttractorCollision(*connectingAttracCollLeft->AttracPtr, pointLeft, headingAngle) :
+			GetAttractorCollision(*handsAttrac.Ptr, pointLeft, headingAngle);
 		auto attracCollRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			GetAttractorCollision(*connectingAttracCollRight->AttracPtr, pos, headingAngle, pointLeft) :
-			GetAttractorCollision(*handsAttrac.Ptr, pos, headingAngle, pointRight);
+			GetAttractorCollision(*connectingAttracCollRight->AttracPtr, pointLeft, headingAngle) :
+			GetAttractorCollision(*handsAttrac.Ptr, pointRight, headingAngle);
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);

@@ -14,6 +14,13 @@ namespace TEN::Entities::Player
 		ClimbableWall
 	};
 
+	enum class ClimbContextAlignType
+	{
+		None,
+		AttractorParent,
+		OffsetBlend
+	};
+
 	struct GroundMovementSetupData
 	{
 		short HeadingAngle	  = 0;
@@ -62,10 +69,11 @@ namespace TEN::Entities::Player
 		EulerAngles RelOrientOffset = EulerAngles::Zero;
 		int			TargetStateID = 0;
 
+		ClimbContextAlignType AlignType = ClimbContextAlignType::None;
+
 		bool IsInFront			= false;
 		bool SetBusyHands		= false;
 		bool SetJumpVelocity	= false;
-		bool SetAttractorParent = false;
 	};
 
 	struct EdgeCatchContextData
