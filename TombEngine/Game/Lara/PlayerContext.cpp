@@ -1976,7 +1976,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_TO_HANG;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = true;
 
