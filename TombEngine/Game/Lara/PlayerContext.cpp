@@ -1289,7 +1289,7 @@ namespace TEN::Entities::Player
 			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
 				continue;
 
-			// 2.2) Test if edge is within range.
+			// 2.2) Test if edge is within 2D range.
 			float range = OFFSET_RADIUS(coll.Setup.Radius);
 			if (attracColl.Proximity.Distance2D > range)
 				continue;
@@ -1331,7 +1331,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// 2.6) Test if ceiling is adequately higher than edge.
+			// 2.6) Test if ceiling in front is adequately higher than edge.
 			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
@@ -1339,11 +1339,11 @@ namespace TEN::Entities::Player
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, coll.Setup.Radius);
 
-			// Assess ledge heights (if applicable).
+			// 2.7) Test ledge floor-to-ceiling height (if applicable).
 			if (setup.TestLedgeHeights)
 			{
-				// 2.7) Test ledge floor-to-ceiling height.
 				const auto& pointCollHeights = setup.TestEdgeFront ? pointCollBack.Position : pointCollFront.Position;
+
 				int ledgeFloorToCeilHeight = abs(pointCollHeights.Ceiling - pointCollHeights.Floor);
 				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
 					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
@@ -1953,7 +1953,7 @@ namespace TEN::Entities::Player
 			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
 				continue;
 
-			// 2.2) Test if edge is within range.
+			// 2.2) Test if edge is within 2D range.
 			float range = OFFSET_RADIUS(coll.Setup.Radius);
 			if (attracColl.Proximity.Distance2D > range)
 				continue;
@@ -1984,7 +1984,7 @@ namespace TEN::Entities::Player
 				//continue;
 			}
 
-			// 2.6) Test if ceiling is adequately higher than edge.
+			// 2.6) Test if ceiling in front is adequately higher than edge.
 			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > SETUP.LowerEdgeToCeilBound)
 				continue;
@@ -2060,7 +2060,7 @@ namespace TEN::Entities::Player
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
-			// 5) Test if ceiling is adequately higher than edge.
+			// 5) Test if ceiling in front is adequately higher than edge.
 			int edgeToCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;
