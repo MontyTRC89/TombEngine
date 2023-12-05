@@ -149,8 +149,8 @@ namespace TEN::Entities::Player
 	// Context data getters
 	std::optional<ClimbContextData>			   GetStandClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData>			   GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>			   GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll); // TODO
 	std::optional<ClimbContextData>			   GetCrawlToHangClimbContext(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>			   GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 }

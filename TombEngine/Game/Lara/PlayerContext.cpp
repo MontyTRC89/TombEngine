@@ -1324,7 +1324,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// Get point collision ahead of edge.
+			// Get point collision in front of edge.
 			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
 			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
 
@@ -1909,12 +1909,12 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = ClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			0, 0,		// Ledge floor-to-ceil range (irrelevant).
-			-(int)CLICK(0.6f),					// Edge-to-ceil height lower bound.
-			false,								// Test edge front (irrelevant).
-			false,								// Test swamp depth (irrelevant).
-			false,								// Test ledge heights (irrelevant).
-			false								// Test ledge illegal slope (irrelevant).
+			0, -MAX_HEIGHT,					  // Ledge floor-to-ceil range (irrelevant).
+			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
+			false,							  // Test edge front (irrelevant).
+			false,							  // Test swamp depth (irrelevant).
+			false,							  // Test ledge heights (irrelevant).
+			false							  // Test ledge illegal slope (irrelevant).
 		};
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
@@ -1950,6 +1950,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
+			// Get point collision in front of edge.
 			auto pointCollFront = GetCollision(
 				attracColl.Proximity.Intersection, attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
@@ -1986,6 +1987,21 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	std::optional<ClimbContextData> GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+
+		// 1) Test for object collision.
+		/*bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
+		if (isObjectCollided)
+			return std::nullopt;*/
+
+		// No valid edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
 	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
@@ -2012,7 +2028,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// Get point collision ahead of edge.
+			// Get point collision in front of edge.
 			auto probePoint = Vector3i(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.y - CLICK(1), attracColl.Proximity.Intersection.z);
 			auto pointColl = GetCollision(
 				probePoint, attracColl.AttracPtr->GetRoomNumber(),
