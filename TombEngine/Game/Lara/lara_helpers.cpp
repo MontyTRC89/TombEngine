@@ -327,7 +327,7 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 
 	auto& player = GetLaraInfo(item);
 
-	// No attractor attachment; return early.
+	// No attractor parent; return early.
 	if (player.Context.Attractor.Ptr == nullptr)
 		return;
 
@@ -1691,33 +1691,38 @@ static float GetPlayerJumpVelocity(float jumpHeight)
 	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }
 
+// TODO: Cleaner math.
 void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& climbContext)
 {
+	constexpr auto OFFSET_BLEND_LERP_ALPHA = 0.25f;
+
 	auto& player = GetLaraInfo(item);
+
+	// FAILSAFE: Clear residual attractor parent.
+	player.Context.Attractor.Detach(item);
 
 	ResetPlayerTurnRateY(item);
 	ResetPlayerFlex(&item);
+
+	// Get attractor collision.
+	auto probePoint = climbContext.AttracPtr->GetIntersectionAtChainDistance(climbContext.ChainDistance);
+	auto attracColl = GetAttractorCollision(*climbContext.AttracPtr, probePoint);
+
+	// Calculate adjusted intersection.
+	auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
+	auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
+
+	// Calculate absolute delta position and orientation.
+	//auto deltaPos = item.Pose.Position.ToVector3() - adjustedIntersect;
+	auto deltaPos = adjustedIntersect - item.Pose.Position.ToVector3();
 
 	// Set attractor parent.
 	if (climbContext.SetAttractorParent)
 	{
 		if (climbContext.AttracPtr != nullptr)
 		{
-			// Get attractor collision.
-			auto probePoint = climbContext.AttracPtr->GetIntersectionAtChainDistance(climbContext.ChainDistance);
-			auto attracColl = GetAttractorCollision(*climbContext.AttracPtr, probePoint);
-
-			// Calculate adjusted intersection.
-			auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
-			auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
-
-			// TODO: Check if must use inverse matrix.
-			// Calculate relative delta position.
-			//auto deltaPos = item.Pose.Position.ToVector3() - adjustedIntersect;
-			auto deltaPos = adjustedIntersect - item.Pose.Position.ToVector3();
+			// Calculate relative delta position and orientation.
 			auto relDeltaPos = Vector3::Transform(deltaPos, rotMatrix);
-
-			// Calculate relative delta orientation.
 			short deltaHeadingAngle = Geometry::GetShortestAngle(attracColl.HeadingAngle, item.Pose.Orientation.y);
 			auto relDeltaOrient = EulerAngles(0, deltaHeadingAngle, 0);
 
@@ -1729,10 +1734,11 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 		}
 	}
 	// Set offset blend.
-	// TODO: Port offset blend feature from ladder branch.
 	else
 	{
-		player.Context.Attractor.Detach(item);
+		short headingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);
+		short deltaHeadingAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, attracColl.HeadingAngle + headingAngleOffset);
+		item.OffsetBlend.SetLogarithmic(deltaPos, EulerAngles(0, deltaHeadingAngle, 0), OFFSET_BLEND_LERP_ALPHA);
 	}
 
 	if (climbContext.SetBusyHands)

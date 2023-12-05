@@ -62,6 +62,7 @@ namespace TEN::Entities::Player
 		EulerAngles RelOrientOffset = EulerAngles::Zero;
 		int			TargetStateID = 0;
 
+		bool IsInFront			= false;
 		bool SetBusyHands		= false;
 		bool SetJumpVelocity	= false;
 		bool SetAttractorParent = false;

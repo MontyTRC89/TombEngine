@@ -124,8 +124,6 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-
-	item->Pose.Orientation.Lerp(player.Context.OrientOffset, 0.4f);
 }
 
 // ---------------

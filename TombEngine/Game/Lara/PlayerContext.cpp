@@ -1317,6 +1317,8 @@ namespace TEN::Entities::Player
 			}
 
 			// TODO: Point collision probing is wrong. Won't traverse rooms correctly.
+			// Potential solution. Probe from player's position and room. Combine player/intersect delta pos and RelPosOffset.
+			
 			// Get point collision in front of edge.
 			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
 			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
@@ -1353,14 +1355,12 @@ namespace TEN::Entities::Player
 			// 2.8) Test for illegal slope on ledge (if applicable).
 			if (setup.TestLedgeIllegalSlope)
 			{
-				if (pointCollBack.Position.FloorSlope)
+				if (setup.TestEdgeFront ? pointCollBack.Position.FloorSlope : pointCollFront.Position.FloorSlope)
 					continue;
 			}
 
-			const auto& pointColl = setup.TestEdgeFront ? pointCollBack : pointCollFront;
-			auto origin = setup.TestEdgeFront ?
-				Vector3(pointCollFront.Coordinates.x, pointCollFront.Position.Floor, pointCollFront.Coordinates.z) :
-				Vector3(pointCollBack.Coordinates.x, pointCollBack.Position.Floor, pointCollBack.Coordinates.z);
+			const auto& staticPointColl = setup.TestEdgeFront ? pointCollBack : pointCollFront;
+			auto origin = Vector3(staticPointColl.Coordinates.x, staticPointColl.Position.Floor, staticPointColl.Coordinates.z);
 
 			// TODO: Check.
 			// 2.9) Test for static object.
@@ -1400,6 +1400,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = true;
@@ -1435,6 +1436,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = true;
@@ -1470,6 +1472,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = true;
@@ -1505,6 +1508,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = true;
@@ -1540,6 +1544,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = true;
@@ -1579,12 +1584,13 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, relEdgeHeight, -coll.Setup.Radius);//Vector3::Zero; for offset blend
+			context.RelPosOffset = Vector3(0.0f, -relEdgeHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = false;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = true;
+			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1605,9 +1611,10 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttracPtr = nullptr;
 			context.ChainDistance = 0.0f;
-			context.RelPosOffset = Vector3(0.0f, relCeilHeight, -coll.Setup.Radius);//Vector3::Zero; for offset blend
+			context.RelPosOffset = Vector3(0.0f, -relCeilHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = false;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = false;
@@ -1713,6 +1720,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_STEP_UP;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = true;
@@ -1747,9 +1755,10 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_STEP_DOWN;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = false; // TODO: Offset blend.
+			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1781,9 +1790,10 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = LS_CRAWL_EXIT_STEP_DOWN;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = false; // TODO: Offset blend.
+			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1815,9 +1825,10 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_EXIT_FLIP : LS_CRAWL_EXIT_JUMP;
+			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-			context.SetAttractorParent = false; // TODO: Offset blend.
+			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1847,6 +1858,7 @@ namespace TEN::Entities::Player
 				context.RelPosOffset = Vector3::Zero;
 				context.RelOrientOffset = EulerAngles::Zero;
 				context.TargetStateID = LS_CRAWL_EXIT_JUMP;
+				context.IsInFront = true;
 				context.SetBusyHands = true;
 				context.SetJumpVelocity = false;
 				context.SetAttractorParent = false;
@@ -1984,6 +1996,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_TO_HANG;
+			context.IsInFront = attracColl.IsFacingForward; // TODO: Check.
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 			context.SetAttractorParent = true;
