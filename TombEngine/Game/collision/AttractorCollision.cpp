@@ -108,6 +108,10 @@ namespace TEN::Collision::Attractor
 				attracProx.ChainDistance += chainDistTraveled;
 				attracProx.SegmentID = i;
 
+				// Closest possible intersection found; break loop.
+				if (attracProx.Distance2D == 0.0f && attracProx.Distance3D == 0.0f)
+					break;
+
 				// Restart accumulation of distance traveled along attractor.
 				chainDistTraveled = Vector3::Distance(intersection, target);
 				continue;

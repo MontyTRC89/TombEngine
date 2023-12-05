@@ -345,6 +345,7 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 
 	// Update player pose.
 	item.Pose = Pose(
+		//adjustedIntersect + Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
 		adjustedIntersect - Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
 		EulerAngles(0, adjustedHeadingAngle, 0) + player.Context.Attractor.RelDeltaOrient);
 
@@ -1690,64 +1691,56 @@ static float GetPlayerJumpVelocity(float jumpHeight)
 	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }
 
-void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& vaultContext)
+void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& climbContext)
 {
 	auto& player = GetLaraInfo(item);
 
 	ResetPlayerTurnRateY(item);
 	ResetPlayerFlex(&item);
-	player.Context.ProjectedFloorHeight = vaultContext.Intersection.y;
 
-	// Reference attractor if relevant to climb action.
-	if (vaultContext.AttracPtr != nullptr)
+	// Set attractor parent.
+	if (climbContext.SetAttractorParent)
 	{
-		// Get attractor collision.
-		auto probePoint = vaultContext.AttracPtr->GetIntersectionAtChainDistance(vaultContext.ChainDistance);
-		auto attracColl = GetAttractorCollision(*vaultContext.AttracPtr, probePoint);
+		if (climbContext.AttracPtr != nullptr)
+		{
+			// Get attractor collision.
+			auto probePoint = climbContext.AttracPtr->GetIntersectionAtChainDistance(climbContext.ChainDistance);
+			auto attracColl = GetAttractorCollision(*climbContext.AttracPtr, probePoint);
 
-		// Calculate adjusted intersection.
-		auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
-		auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(vaultContext.RelPosOffset, rotMatrix);
+			// Calculate adjusted intersection.
+			auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
+			auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
 
-		// TODO: Check if must use inverse matrix.
-		// Calculate relative delta position.
-		auto deltaPos = adjustedIntersect - item.Pose.Position.ToVector3();
-		auto relDeltaPos = Vector3::Transform(deltaPos, rotMatrix/*.Invert()*/);
+			// TODO: Check if must use inverse matrix.
+			// Calculate relative delta position.
+			//auto deltaPos = item.Pose.Position.ToVector3() - adjustedIntersect;
+			auto deltaPos = adjustedIntersect - item.Pose.Position.ToVector3();
+			auto relDeltaPos = Vector3::Transform(deltaPos, rotMatrix);
 
-		// Calculate relative delta orientation.
-		short deltaHeadingAngle = Geometry::GetShortestAngle(attracColl.HeadingAngle, item.Pose.Orientation.y);
-		auto relDeltaOrient = EulerAngles(0, deltaHeadingAngle, 0);
+			// Calculate relative delta orientation.
+			short deltaHeadingAngle = Geometry::GetShortestAngle(attracColl.HeadingAngle, item.Pose.Orientation.y);
+			auto relDeltaOrient = EulerAngles(0, deltaHeadingAngle, 0);
 
-		// Attach player to attractor.
-		player.Context.Attractor.Attach(
-			item, *vaultContext.AttracPtr, vaultContext.ChainDistance,
-			vaultContext.RelPosOffset, vaultContext.RelOrientOffset,
-			relDeltaPos, relDeltaOrient);
+			// Attach player to attractor.
+			player.Context.Attractor.Attach(
+				item, *climbContext.AttracPtr, climbContext.ChainDistance,
+				climbContext.RelPosOffset, climbContext.RelOrientOffset,
+				relDeltaPos, relDeltaOrient);
+		}
 	}
-
-	if (vaultContext.SetBusyHands)
-		player.Control.HandStatus = HandStatus::Busy;
-
-	// Snap to edge (if applicable).
-	/*if (vaultContext.SnapToEdge)
-	{
-		auto target = Vector3i(vaultContext.Intersection.x, item.Pose.Position.y, vaultContext.Intersection.z);
-
-		// TODO: Offset blend.
-		item.Pose.Position = Geometry::TranslatePoint(target, vaultContext.HeadingAngle, -coll.Setup.Radius);
-		player.Context.OrientOffset = EulerAngles(0, vaultContext.HeadingAngle + ANGLE(180.0f), 0) - item.Pose.Orientation;
-	}
+	// Set offset blend.
+	// TODO: Port offset blend feature from ladder branch.
 	else
 	{
-		player.Context.OrientOffset = EulerAngles::Zero;
-	}*/
+
+	}
+
+	if (climbContext.SetBusyHands)
+		player.Control.HandStatus = HandStatus::Busy;
 
 	// Set jump velocity (if applicable).
-	if (vaultContext.SetJumpVelocity)
-	{
-		int jumpHeight = player.Context.ProjectedFloorHeight - item.Pose.Position.y;
-		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(jumpHeight);
-	}
+	if (climbContext.SetJumpVelocity)
+		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(climbContext.RelPosOffset.y);
 }
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)

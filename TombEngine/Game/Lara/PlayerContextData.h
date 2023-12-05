@@ -56,19 +56,15 @@ namespace TEN::Entities::Player
 
 	struct ClimbContextData
 	{
-		Attractor* AttracPtr	 = nullptr;
-		Vector3	   Intersection	 = Vector3::Zero; // TODO: Can be calculated from chain distance.
-		float	   ChainDistance = 0.0f;
-
+		Attractor*	AttracPtr		= nullptr;
+		float		ChainDistance	= 0.0f;
 		Vector3		RelPosOffset	= Vector3::Zero;
 		EulerAngles RelOrientOffset = EulerAngles::Zero;
+		int			TargetStateID = 0;
 
-		short	   HeadingAngle	 = 0;
-		int		   TargetStateID = 0;
-
-		bool SetBusyHands	 = false;
-		bool SnapToEdge		 = false;
-		bool SetJumpVelocity = false;
+		bool SetBusyHands		= false;
+		bool SetJumpVelocity	= false;
+		bool SetAttractorParent = false;
 	};
 
 	struct EdgeCatchContextData

@@ -22,9 +22,7 @@ namespace TEN::Entities::Player
 	struct PlayerAttractorData
 	{
 		Attractor*	Ptr				= nullptr;
-		float		ChainDistance	= 0.0f;
-
-		// TODO: Use std::optional. Don't need pos offset for auto jump.
+		float		ChainDistance   = 0.0f;
 		Vector3		RelPosOffset	= Vector3::Zero;
 		EulerAngles RelOrientOffset = EulerAngles::Zero;
 

@@ -75,7 +75,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 // Setters
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
-void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& vaultContext);
+void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& climbContext);
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);
 void SetLaraFallBackAnimation(ItemInfo* item);

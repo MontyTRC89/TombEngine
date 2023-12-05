@@ -22,8 +22,8 @@ using namespace TEN::Input;
 namespace TEN::Entities::Player
 {
 	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
-		const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
-		const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient)
+									 const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
+									 const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient)
 	{
 		Ptr = &attrac;
 		ChainDistance = chainDist;
@@ -31,20 +31,28 @@ namespace TEN::Entities::Player
 		RelOrientOffset = relOrientOffset;
 		RelDeltaPos = relDeltaPos;
 		RelDeltaOrient = relDeltaOrient;
-		//AttracPtr->AttackPlayer(playerItem);
+		//AttracPtr->Attachlayer(playerItem);
 	}
 
 	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
 	{
 		Ptr = &attrac;
 		ChainDistance = chainDist;
-		//AttracPtr->AttackPlayer(playerItem);
+		RelPosOffset = Vector3::Zero;
+		RelOrientOffset = EulerAngles::Zero;
+		RelDeltaPos = Vector3::Zero;
+		RelDeltaOrient = EulerAngles::Zero;
+		//AttracPtr->AttachPlayer(playerItem);
 	}
 
 	void PlayerAttractorData::Detach(ItemInfo& playerItem)
 	{
 		Ptr = nullptr;
 		ChainDistance = 0.0f;
+		RelPosOffset = Vector3::Zero;
+		RelOrientOffset = EulerAngles::Zero;
+		RelDeltaPos = Vector3::Zero;
+		RelDeltaOrient = EulerAngles::Zero;
 		//AttracPtr->DetachPlayer(playerItem);
 	};
 
@@ -1385,8 +1393,8 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1407,7 +1415,7 @@ namespace TEN::Entities::Player
 			true,								  // Test ledge heights.
 			true								  // Test ledge illegal slope.
 		};
-		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
+		constexpr auto VERTICAL_OFFSET = CLICK(3);
 
 		// Get standing vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -1415,13 +1423,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1442,7 +1450,7 @@ namespace TEN::Entities::Player
 			true,							// Test ledge heights.
 			true							// Test ledge illegal slope.
 		};
-		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(1), 0.0f);
+		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
 		// Get standing vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -1450,13 +1458,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1477,7 +1485,7 @@ namespace TEN::Entities::Player
 			true,							   // Test ledge heights.
 			true							   // Test ledge illegal slope.
 		};
-		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(2), 0.0f);
+		constexpr auto VERTICAL_OFFSET = CLICK(2);
 
 		// Get standing vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -1485,13 +1493,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1512,7 +1520,7 @@ namespace TEN::Entities::Player
 			true,								  // Test ledge heights.
 			true								  // Test ledge illegal slope.
 		};
-		constexpr auto INTERSECT_OFFSET = Vector3(0.0f, CLICK(3), 0.0f);
+		constexpr auto VERTICAL_OFFSET = CLICK(3);
 
 		// Get standing vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -1520,13 +1528,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = attracColl->Proximity.Intersection + INTERSECT_OFFSET;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1534,6 +1542,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
+	// TODO: Don't parent to attractor. Use offset blend instead.
 	const std::optional<ClimbContextData> GetAutoJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																  const std::vector<AttractorCollisionData>& attracColls)
 	{
@@ -1557,15 +1566,17 @@ namespace TEN::Entities::Player
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
+			int relEdgeHeight = attracColl->Proximity.Intersection.y - item.Pose.Position.y;
+
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = attracColl->Proximity.Intersection;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle;
+			context.RelPosOffset = Vector3(0.0f, relEdgeHeight, -coll.Setup.Radius);//Vector3::Zero; for offset blend
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.SetBusyHands = false;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1585,13 +1596,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = nullptr;
-			context.Intersection = Vector3(item.Pose.Position.x, pointColl.Position.Ceiling, item.Pose.Position.z);
 			context.ChainDistance = 0.0f;
-			context.HeadingAngle = item.Pose.Orientation.y;
+			context.RelPosOffset = Vector3(0.0f, relCeilHeight, -coll.Setup.Radius);//Vector3::Zero; for offset blend
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.SetBusyHands = false;
-			context.SnapToEdge = false;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = false;
 
 			return context;
 		}
@@ -1681,6 +1692,7 @@ namespace TEN::Entities::Player
 			true,								  // Test ledge heights.
 			true								  // Test ledge illegal slope.
 		};
+		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
 		// Get crawling vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -1689,13 +1701,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_STEP_UP;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1723,13 +1735,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
+			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_STEP_DOWN;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1757,13 +1769,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
 			context.TargetStateID = LS_CRAWL_EXIT_STEP_DOWN;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1791,13 +1803,13 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttracPtr = attracColl->AttracPtr;
-			context.Intersection = Vector3(attracColl->Proximity.Intersection.x, item.Pose.Position.y, attracColl->Proximity.Intersection.z);
+			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.HeadingAngle = attracColl->HeadingAngle + ANGLE(180.0f);
 			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_EXIT_FLIP : LS_CRAWL_EXIT_JUMP;
 			context.SetBusyHands = true;
-			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
@@ -1823,13 +1835,13 @@ namespace TEN::Entities::Player
 			{
 				auto context = ClimbContextData{};
 				context.AttracPtr = nullptr;
-				context.Intersection = item.Pose.Position.ToVector3();
 				context.ChainDistance = 0.0f;
-				context.HeadingAngle = item.Pose.Orientation.y;
+				context.RelPosOffset = Vector3::Zero;
+				context.RelOrientOffset = EulerAngles::Zero;
 				context.TargetStateID = LS_CRAWL_EXIT_JUMP;
 				context.SetBusyHands = true;
-				context.SnapToEdge = false;
 				context.SetJumpVelocity = false;
+				context.SetAttractorParent = false;
 
 				return context;
 			}
@@ -1966,6 +1978,7 @@ namespace TEN::Entities::Player
 			context.SetBusyHands = true;
 			context.SnapToEdge = true;
 			context.SetJumpVelocity = false;
+			context.SetAttractorParent = true;
 
 			return context;
 		}
