@@ -1732,7 +1732,7 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	// TODO: Port offset blend feature from ladder branch.
 	else
 	{
-
+		player.Context.Attractor.Detach(item);
 	}
 
 	if (climbContext.SetBusyHands)

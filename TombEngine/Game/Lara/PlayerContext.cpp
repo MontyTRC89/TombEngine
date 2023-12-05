@@ -1316,6 +1316,7 @@ namespace TEN::Entities::Player
 				}
 			}
 
+			// TODO: Point collision probing is wrong. Won't traverse rooms correctly.
 			// Get point collision in front of edge.
 			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
 			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
@@ -1339,13 +1340,7 @@ namespace TEN::Entities::Player
 			// Assess ledge heights (if applicable).
 			if (setup.TestLedgeHeights)
 			{
-				// TODO: Maybe not necessary? Edge is already good climb candidate by this point.
-				// 2.7) Test ledge floor height.
-				int absLedgeFloorHeight = abs(pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y);
-				if (absLedgeFloorHeight > LEDGE_FLOOR_HEIGHT_TOLERANCE)
-					continue;
-
-				// 2.8) Test ledge floor-to-ceiling height.
+				// 2.7) Test ledge floor-to-ceiling height.
 				const auto& pointCollHeights = setup.TestEdgeFront ? pointCollBack.Position : pointCollFront.Position;
 				int ledgeFloorToCeilHeight = abs(pointCollHeights.Ceiling - pointCollHeights.Floor);
 				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
@@ -1355,12 +1350,23 @@ namespace TEN::Entities::Player
 				}
 			}
 
-			// 2.9) Test for illegal slope on ledge (if applicable).
+			// 2.8) Test for illegal slope on ledge (if applicable).
 			if (setup.TestLedgeIllegalSlope)
 			{
 				if (pointCollBack.Position.FloorSlope)
 					continue;
 			}
+
+			const auto& pointColl = setup.TestEdgeFront ? pointCollBack : pointCollFront;
+			auto origin = setup.TestEdgeFront ?
+				Vector3(pointCollFront.Coordinates.x, pointCollFront.Position.Floor, pointCollFront.Coordinates.z) :
+				Vector3(pointCollBack.Coordinates.x, pointCollBack.Position.Floor, pointCollBack.Coordinates.z);
+
+			// TODO: Check.
+			// 2.9) Test for static object.
+			auto staticLos = GetStaticObjectLos(origin, attracColl.AttracPtr->GetRoomNumber(), -Vector3::UnitY, coll.Setup.Height, false);
+			if (staticLos.has_value())
+				continue;
 
 			return attracColl;
 		}
