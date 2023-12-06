@@ -21,6 +21,7 @@ namespace TEN::Collision::Attractor
 		_type = type;
 		_points = points;
 		_roomNumber = roomNumber;
+		CacheSegmentLengths();
 		CacheLength();
 		CacheBox();
 	}
@@ -54,6 +55,11 @@ namespace TEN::Collision::Attractor
 	int Attractor::GetRoomNumber() const
 	{
 		return _roomNumber;
+	}
+
+	const std::vector<float>& Attractor::GetSegmentLengths() const
+	{
+		return _segmentLengths;
 	}
 
 	float Attractor::GetLength() const
@@ -100,16 +106,16 @@ namespace TEN::Collision::Attractor
 		float chainDistTraveled = 0.0f;
 		for (int i = 0; i < (_points.size() - 1); i++)
 		{
-			// Get segment points.
-			const auto& origin = _points[i];
-			const auto& target = _points[i + 1];
-
-			float segmentLength = Vector3::Distance(origin, target);
+			float segmentLength = _segmentLengths[i];
 			float remainingChainDist = chainDist - chainDistTraveled;
 
 			// Found segment of distance along attractor; return intersection.
 			if (remainingChainDist <= segmentLength)
 			{
+				// Get segment points.
+				const auto& origin = _points[i];
+				const auto& target = _points[i + 1];
+
 				float alpha = remainingChainDist / segmentLength;
 				return Vector3::Lerp(origin, target, alpha);
 			}
@@ -145,12 +151,8 @@ namespace TEN::Collision::Attractor
 		float chainDistTraveled = 0.0f;
 		for (int i = 0; i < (_points.size() - 1); i++)
 		{
-			// Get segment points.
-			const auto& origin = _points[i];
-			const auto& target = _points[i + 1];
-
 			// Accumulate distance traveled along attractor.
-			chainDistTraveled += Vector3::Distance(origin, target);
+			chainDistTraveled += _segmentLengths[i];
 
 			// Segment found; return segment ID.
 			if (chainDistTraveled >= chainDist)
@@ -158,7 +160,7 @@ namespace TEN::Collision::Attractor
 		}
 
 		// FAILSAFE: Return end segment ID.
-		return ((int)_points.size() - 1);
+		return int(_points.size() - 1);
 	}
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
@@ -168,6 +170,7 @@ namespace TEN::Collision::Attractor
 
 		_points = points;
 		_roomNumber = roomNumber;
+		CacheSegmentLengths();
 		CacheLength();
 		CacheBox();
 	}
@@ -291,23 +294,34 @@ namespace TEN::Collision::Attractor
 		return std::clamp(chainDist, 0.0f, _length);
 	}
 
-	void Attractor::CacheLength()
+	void Attractor::CacheSegmentLengths()
 	{
-		// Single point exists; set 0 length.
-		if (_points.size() == 1)
-			_length = 0.0f;
+		// Clear segment lengths.
+		_segmentLengths = {};
 
-		float length = 0.0f;
+		// Single point exists; return early.
+		if (_points.size() == 1)
+			return;
+
+		// Collect segment lengths.
 		for (int i = 0; i < (_points.size() - 1); i++)
 		{
 			// Get segment points.
 			const auto& origin = _points[i];
 			const auto& target = _points[i + 1];
 
-			// Accumulate length.
-			length += Vector3::Distance(origin, target);
+			// Add segment length.
+			_segmentLengths.push_back(Vector3::Distance(origin, target));
 		}
-
+	}
+	
+	void Attractor::CacheLength()
+	{
+		// Accumulate length.
+		float length = 0.0f;
+		for (float segmentLength : _segmentLengths)
+			length += segmentLength;
+		
 		_length = length;
 	}
 

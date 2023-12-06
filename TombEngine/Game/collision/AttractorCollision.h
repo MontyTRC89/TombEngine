@@ -37,15 +37,20 @@ namespace TEN::Collision::Attractor
 
 		// Constructors
 		AttractorCollisionData() {};
-		AttractorCollisionData(Attractor& attrac, int segmentID, const Vector3& pos, short headingAngle);
+		AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle);
 
 	private:
 		// Helpers
-		ProximityData GetProximity(const Vector3& pos, int segmentID) const;
+		ProximityData GetProximity(const Vector3& pos, unsigned int segmentID) const;
 	};
 
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, float chainDist, short headingAngle);
+
+	// TODO: Make static.
 	std::vector<AttractorCollisionData> GetAttractorSegmentCollisions(Attractor& attrac, const Vector3& pos, short headingAngle);
-	AttractorCollisionData				GetClosestAttractorSegmentCollision(const Vector3& pos, std::vector<AttractorCollisionData>& segmentColls);
+
+	// TODO: Irrelevant. Remove.
+	AttractorCollisionData GetClosestAttractorSegmentCollision(const Vector3& pos, std::vector<AttractorCollisionData>& segmentColls);
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float detectRadius);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,

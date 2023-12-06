@@ -15,7 +15,7 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
-	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, int segmentID, const Vector3& pos, short headingAngle)
+	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle)
 	{
 		auto refOrient = EulerAngles(0, headingAngle, 0);
 
@@ -36,7 +36,7 @@ namespace TEN::Collision::Attractor
 		IsInFront = Geometry::IsPointInFront(pos, Proximity.Intersection, refOrient);
 	}
 
-	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, int segmentID) const
+	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, unsigned int segmentID) const
 	{
 		const auto& points = AttracPtr->GetPoints();
 
@@ -50,15 +50,15 @@ namespace TEN::Collision::Attractor
 
 		// Find intersection on attractor segment.
 		float chainDistTraveled = 0.0f;
-		for (int i = 0; i <= segmentID; i++)
+		for (unsigned int i = 0; i <= segmentID; i++)
 		{
-			// Get segment points.
-			const auto& origin = points[i];
-			const auto& target = points[i + 1];
-
 			// Target segment reached.
 			if (i == segmentID)
 			{
+				// Get segment points.
+				const auto& origin = points[i];
+				const auto& target = points[i + 1];
+
 				// Calculate Y-perpendicular intersection.
 				auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target);
 
@@ -78,7 +78,7 @@ namespace TEN::Collision::Attractor
 			}
 
 			// Accumulate distance traveled along attractor.
-			float segmentLength = Vector3::Distance(origin, target);
+			float segmentLength = AttracPtr->GetSegmentLengths()[i];
 			chainDistTraveled += segmentLength;
 		}
 
@@ -86,6 +86,14 @@ namespace TEN::Collision::Attractor
 		return ProximityData{};
 	}
 
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, float chainDist, short headingAngle)
+	{
+		unsigned int segmentID = attrac.GetSegmentIDAtChainDistance(chainDist);
+		auto pos = attrac.GetIntersectionAtChainDistance(chainDist);
+
+		return AttractorCollisionData(attrac, segmentID, pos, headingAngle);
+	}
+	
 	std::vector<AttractorCollisionData> GetAttractorSegmentCollisions(Attractor& attrac, const Vector3& pos, short headingAngle)
 	{
 		// Collect segment collisions.

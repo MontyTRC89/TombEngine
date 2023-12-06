@@ -22,11 +22,12 @@ namespace TEN::Collision::Attractor
 	{
 	private:
 		// Members
-		AttractorType		 _type		 = AttractorType::Edge;
-		std::vector<Vector3> _points	 = {};
-		int					 _roomNumber = 0;
-		float				 _length	 = 0.0f;
-		BoundingBox			 _box		 = BoundingBox(); 
+		AttractorType		 _type			 = AttractorType::Edge;
+		std::vector<Vector3> _points		 = {};
+		int					 _roomNumber	 = 0;
+		std::vector<float>	 _segmentLengths = {};
+		float				 _length		 = 0.0f;
+		BoundingBox			 _box			 = BoundingBox();
 
 		// TODO: Crashes on init.
 		//std::unordered_map<int, ItemInfo*> _attachedPlayers = {}; // Key = item number
@@ -43,6 +44,7 @@ namespace TEN::Collision::Attractor
 		AttractorType				GetType() const;
 		const std::vector<Vector3>& GetPoints() const;
 		int							GetRoomNumber() const;
+		const std::vector<float>&	GetSegmentLengths() const;
 		float						GetLength() const;
 		const BoundingBox&			GetBox() const;
 
@@ -62,6 +64,7 @@ namespace TEN::Collision::Attractor
 	private:
 		// Helpers
 		float NormalizeChainDistance(float chainDist) const;
+		void  CacheSegmentLengths();
 		void  CacheLength();
 		void  CacheBox();
 	};

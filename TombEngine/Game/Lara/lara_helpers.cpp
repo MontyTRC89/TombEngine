@@ -331,11 +331,8 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 	if (player.Context.Attractor.Ptr == nullptr)
 		return;
 
-	// Get attractor segment collision.
-	auto& attrac = *player.Context.Attractor.Ptr;
-	auto probePoint = attrac.GetIntersectionAtChainDistance(player.Context.Attractor.ChainDistance);
-	auto segmentColls = GetAttractorSegmentCollisions(attrac, probePoint, item.Pose.Orientation.y);
-	auto attracColl = GetClosestAttractorSegmentCollision(probePoint, segmentColls);
+	// Get attractor collision.
+	auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
 
 	// Calculate adjusted intersection.
 	auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
@@ -1718,9 +1715,7 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 		return;
 
 	// Get attractor collision.
-	auto probePoint = climbContext.AttracPtr->GetIntersectionAtChainDistance(climbContext.ChainDistance);
-	auto segmentColls = GetAttractorSegmentCollisions(*climbContext.AttracPtr, probePoint, item.Pose.Orientation.y);
-	auto attracColl = GetClosestAttractorSegmentCollision(probePoint, segmentColls);
+	auto attracColl = GetAttractorCollision(*climbContext.AttracPtr, climbContext.ChainDistance, item.Pose.Orientation.y);
 
 	// Calculate adjusted intersection.
 	auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
