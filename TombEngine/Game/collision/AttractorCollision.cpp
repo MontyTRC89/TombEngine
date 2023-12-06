@@ -17,14 +17,11 @@ namespace TEN::Collision::Attractor
 {
 	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, const Vector3& pos, short headingAngle)
 	{
-		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
-		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
+		auto refOrient = EulerAngles(0, headingAngle, 0);
 
 		// Set attractor pointer and fill proximity data.
 		AttracPtr = &attrac;
-		Proximity = GetProximity(pos);
-
-		auto refOrient = EulerAngles(0, headingAngle, 0);
+		Proximity = GetProximity(pos, refOrient);
 
 		// Calculate segment orientation.
 		const auto& points = AttracPtr->GetPoints();
@@ -38,38 +35,14 @@ namespace TEN::Collision::Attractor
 		IsFacingForward = (abs(Geometry::GetShortestAngle(HeadingAngle, refOrient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD);
 		IsInFront = Geometry::IsPointInFront(pos, Proximity.Intersection, refOrient);
 	}
-	
-	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, float chainDist, const Vector3& refPoint)
+
+	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, const EulerAngles& refOrient) const
 	{
-		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
-		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
+		// NOTE: Sum of weights must be 1.
+		constexpr auto WEIGHT_2D_DIST	  = 0.6f;
+		constexpr auto WEIGHT_3D_DIST	  = 0.3f;
+		constexpr auto WEIGHT_DELTA_ANGLE = 0.1f;
 
-		// Set attractor  pointer.
-		AttracPtr = &attrac;
-
-		// Fill proximity data.
-		auto pos = AttracPtr->GetIntersectionAtChainDistance(chainDist);
-		Proximity = GetProximity(pos);
-
-		auto dir = pos - refPoint;
-		dir.Normalize();
-		auto orient = EulerAngles(dir);
-
-		// Calculate segment orientation.
-		const auto& points = AttracPtr->GetPoints();
-		const auto& origin = points[Proximity.SegmentID];
-		const auto& target = points[Proximity.SegmentID + 1];
-		auto attracOrient = (points.size() == 1) ? orient : Geometry::GetOrientToPoint(origin, target);
-
-		// Fill remaining collision data.
-		HeadingAngle = attracOrient.y + HEADING_ANGLE_OFFSET;
-		SlopeAngle = attracOrient.x;
-		IsFacingForward = (abs(Geometry::GetShortestAngle(HeadingAngle, orient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD);
-		IsInFront = Geometry::IsPointInFront(refPoint, Proximity.Intersection, orient);
-	}
-
-	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos) const
-	{
 		const auto& points = AttracPtr->GetPoints();
 
 		// Single point exists; return simple proximity data.
@@ -81,6 +54,7 @@ namespace TEN::Collision::Attractor
 		}
 
 		auto attracProx = ProximityData{ points.front(), INFINITY, INFINITY, 0.0f, 0 };
+		float bestWeightScore = INFINITY;
 		float chainDistTraveled = 0.0f;
 
 		// Find closest intersection along attractor.
@@ -95,10 +69,19 @@ namespace TEN::Collision::Attractor
 			float dist2DSqr = Vector2::DistanceSquared(Vector2(pos.x, pos.z), Vector2(intersection.x, intersection.z));
 			float dist3DSqr = Vector3::DistanceSquared(pos, intersection);
 
-			// Found new closest intersection by 2D then 3D distance; update proximity data.
-			if (dist2DSqr < attracProx.Distance2D ||
-				(dist2DSqr == attracProx.Distance2D && attracProx.Distance3D < dist3DSqr))
+			// TODO: Result is wrong.
+			// Calculate delta angle.
+			auto segmentOrient = Geometry::GetOrientToPoint(origin, target);
+			short deltaAngle = abs(Geometry::GetShortestAngle(refOrient.y, segmentOrient.y));// +HEADING_ANGLE_OFFSET));
+
+			// TODO: Adjust weights. Delta angle weight should have only just enough influence to account for convex attractor setups.
+			// Calculate criterion weight score.
+			float weightScore = (WEIGHT_2D_DIST * dist2DSqr) + (WEIGHT_3D_DIST * dist3DSqr) + (WEIGHT_DELTA_ANGLE * deltaAngle);
+
+			// Found new best intersection by criterion weight score; update proximity data.
+			if (weightScore < bestWeightScore)
 			{
+				bestWeightScore = weightScore;
 				chainDistTraveled += Vector3::Distance(origin, intersection);
 
 				attracProx.Intersection = intersection;

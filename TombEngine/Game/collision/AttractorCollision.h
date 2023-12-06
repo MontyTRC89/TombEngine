@@ -1,6 +1,8 @@
 #pragma once
+#include "Math/Math.h"
 
-class EulerAngles;
+using namespace TEN::Math;
+
 struct ItemInfo;
 
 namespace TEN::Collision::Attractor
@@ -10,6 +12,10 @@ namespace TEN::Collision::Attractor
 	class AttractorCollisionData
 	{
 	private:
+		// Constants
+		static constexpr auto HEADING_ANGLE_OFFSET			 = ANGLE(-90.0f);
+		static constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
+
 		struct ProximityData
 		{
 			Vector3		 Intersection  = Vector3::Zero;
@@ -32,11 +38,10 @@ namespace TEN::Collision::Attractor
 		// Constructors
 		AttractorCollisionData() {};
 		AttractorCollisionData(Attractor& attrac, const Vector3& pos, short headingAngle);
-		AttractorCollisionData(Attractor& attrac, float chainDist, const Vector3& refPoint);
 
 	private:
 		// Helpers
-		ProximityData GetProximity(const Vector3& pos) const;
+		ProximityData GetProximity(const Vector3& pos, const EulerAngles& refOrient) const;
 	};
 
 	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& pos, short headingAngle);

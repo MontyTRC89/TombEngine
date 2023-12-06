@@ -1628,7 +1628,6 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetStandClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto ATTRAC_PROBE_FORWARD = BLOCK(1 / (float)BLOCK(1));
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(2);
 
 		const auto& player = GetLaraInfo(item);
@@ -1638,7 +1637,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
 		auto context = std::optional<ClimbContextData>();
 
@@ -1874,13 +1873,12 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto ATTRAC_PROBE_FORWARD = BLOCK(1 / (float)BLOCK(1));
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
 		const auto& player = GetLaraInfo(item);
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
 		auto context = std::optional<ClimbContextData>();
 
@@ -1929,8 +1927,6 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetCrawlToHangClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto ATTRAC_PROBE_FORWARD = BLOCK(1 / (float)BLOCK(1));
-
 		constexpr auto SETUP = ClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
@@ -1953,7 +1949,7 @@ namespace TEN::Entities::Player
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 
 		// 2) Assess attractor collision.
-		auto attracColls = GetAttractorCollisions(item, -ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 		for (const auto& attracColl : attracColls)
 		{
 			// 2.1) Check if attractor is edge type.
@@ -2017,10 +2013,9 @@ namespace TEN::Entities::Player
 	// TODO
 	std::optional<ClimbContextData> GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto ATTRAC_PROBE_FORWARD = BLOCK(1 / (float)BLOCK(1));
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
 		// 1) Test for object collision.
 		/*bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
@@ -2038,7 +2033,7 @@ namespace TEN::Entities::Player
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, 0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
 
 		float range2D = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
 
