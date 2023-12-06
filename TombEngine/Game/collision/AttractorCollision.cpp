@@ -38,10 +38,10 @@ namespace TEN::Collision::Attractor
 
 	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, const EulerAngles& refOrient) const
 	{
-		// NOTE: Sum of weights must be 1.
-		constexpr auto WEIGHT_2D_DIST	  = 0.6f;
-		constexpr auto WEIGHT_3D_DIST	  = 0.3f;
-		constexpr auto WEIGHT_DELTA_ANGLE = 0.1f;
+		// NOTE: Weights sum must be 1.
+		constexpr auto WEIGHT_2D_DIST	  = 0.3f;
+		constexpr auto WEIGHT_3D_DIST	  = 0.2f;
+		constexpr auto WEIGHT_DELTA_ANGLE = 0.4f;
 
 		const auto& points = AttracPtr->GetPoints();
 
@@ -57,6 +57,8 @@ namespace TEN::Collision::Attractor
 		float bestWeightScore = INFINITY;
 		float chainDistTraveled = 0.0f;
 
+		short deltaAngle2 = 0;
+
 		// Find closest intersection along attractor.
 		for (int i = 0; i < (points.size() - 1); i++)
 		{
@@ -69,14 +71,16 @@ namespace TEN::Collision::Attractor
 			float dist2DSqr = Vector2::DistanceSquared(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
 			float dist3DSqr = Vector3::DistanceSquared(pos, intersect);
 
-			// TODO: Result is wrong.
+			// TODO: Reverse
 			// Calculate delta angle.
 			auto segmentOrient = Geometry::GetOrientToPoint(origin, target);
-			short deltaAngle = abs(Geometry::GetShortestAngle(refOrient.y, segmentOrient.y));// +HEADING_ANGLE_OFFSET));
-
-			// TODO: Adjust weights. Delta angle weight should have only just enough influence to account for convex attractor setups.
+			short deltaAngle0 = abs(Geometry::GetShortestAngle(refOrient.y, segmentOrient.y + HEADING_ANGLE_OFFSET));
+			short deltaAngle1 = abs(Geometry::GetShortestAngle(refOrient.y, segmentOrient.y + HEADING_ANGLE_OFFSET + ANGLE(180.0f)));
+			
 			// Calculate criterion weight score.
-			float weightScore = (WEIGHT_2D_DIST * dist2DSqr) + (WEIGHT_3D_DIST * dist3DSqr) + (WEIGHT_DELTA_ANGLE * deltaAngle);
+			float weightScore = (dist2DSqr * WEIGHT_2D_DIST) +
+								(dist3DSqr * WEIGHT_3D_DIST) +
+								std::min((deltaAngle0 * WEIGHT_DELTA_ANGLE), (deltaAngle1 * WEIGHT_DELTA_ANGLE));
 
 			// Found new best intersection by criterion weight score; update proximity data.
 			if (weightScore < bestWeightScore)
@@ -115,11 +119,6 @@ namespace TEN::Collision::Attractor
 	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& pos, short headingAngle)
 	{
 		return AttractorCollisionData(attrac, pos, headingAngle);
-	}
-
-	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& probePoint)
-	{
-		return AttractorCollisionData(attrac, probePoint, 0);
 	}
 
 	// Debug
