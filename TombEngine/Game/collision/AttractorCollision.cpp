@@ -15,13 +15,13 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
-	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, const Vector3& pos, short headingAngle)
+	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, int segmentID, const Vector3& pos, short headingAngle)
 	{
 		auto refOrient = EulerAngles(0, headingAngle, 0);
 
 		// Set attractor pointer and fill proximity data.
 		AttracPtr = &attrac;
-		Proximity = GetProximity(pos, refOrient);
+		Proximity = GetProximity(pos, segmentID);
 
 		// Calculate segment orientation.
 		const auto& points = AttracPtr->GetPoints();
@@ -36,13 +36,8 @@ namespace TEN::Collision::Attractor
 		IsInFront = Geometry::IsPointInFront(pos, Proximity.Intersection, refOrient);
 	}
 
-	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, const EulerAngles& refOrient) const
+	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, int segmentID) const
 	{
-		// NOTE: Weights sum must be 1.
-		constexpr auto WEIGHT_2D_DIST	  = 0.3f;
-		constexpr auto WEIGHT_3D_DIST	  = 0.2f;
-		constexpr auto WEIGHT_DELTA_ANGLE = 0.4f;
-
 		const auto& points = AttracPtr->GetPoints();
 
 		// Single point exists; return simple proximity data.
@@ -53,72 +48,70 @@ namespace TEN::Collision::Attractor
 			return ProximityData{ points.front(), dist2D, dist3D, 0.0f, 0 };
 		}
 
-		auto attracProx = ProximityData{ points.front(), INFINITY, INFINITY, 0.0f, 0 };
-		float bestWeightScore = INFINITY;
+		// Find intersection on attractor segment.
 		float chainDistTraveled = 0.0f;
-
-		short deltaAngle2 = 0;
-
-		// Find closest intersection along attractor.
-		for (int i = 0; i < (points.size() - 1); i++)
+		for (int i = 0; i <= segmentID; i++)
 		{
 			// Get segment points.
 			const auto& origin = points[i];
 			const auto& target = points[i + 1];
 
-			// Calculate Y-perpendicular intersection and 2D distance.
-			auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target);
-			float dist2DSqr = Vector2::DistanceSquared(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
-			float dist3DSqr = Vector3::DistanceSquared(pos, intersect);
-
-			// TODO: Reverse
-			// Calculate delta angle.
-			auto segmentOrient = Geometry::GetOrientToPoint(origin, target);
-			short deltaAngle0 = abs(Geometry::GetShortestAngle(refOrient.y, segmentOrient.y + HEADING_ANGLE_OFFSET));
-			short deltaAngle1 = abs(Geometry::GetShortestAngle(refOrient.y, segmentOrient.y + HEADING_ANGLE_OFFSET + ANGLE(180.0f)));
-			
-			// Calculate criterion weight score.
-			float weightScore = (dist2DSqr * WEIGHT_2D_DIST) +
-								(dist3DSqr * WEIGHT_3D_DIST) +
-								std::min((deltaAngle0 * WEIGHT_DELTA_ANGLE), (deltaAngle1 * WEIGHT_DELTA_ANGLE));
-
-			// Found new best intersection by criterion weight score; update proximity data.
-			if (weightScore < bestWeightScore)
+			// Target segment reached.
+			if (i == segmentID)
 			{
-				bestWeightScore = weightScore;
+				// Calculate Y-perpendicular intersection.
+				auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target);
+
+				// Accumulate final distance traveled along attractor.
 				chainDistTraveled += Vector3::Distance(origin, intersect);
 
+				// Create proximity data.
+				auto attracProx = ProximityData{};
 				attracProx.Intersection = intersect;
-				attracProx.Distance2D = dist2DSqr;
-				attracProx.Distance3D = dist3DSqr;
-				attracProx.ChainDistance += chainDistTraveled;
-				attracProx.SegmentID = i;
+				attracProx.Distance2D = Vector2::Distance(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
+				attracProx.Distance3D = Vector3::Distance(pos, intersect);
+				attracProx.ChainDistance = chainDistTraveled;
+				attracProx.SegmentID = segmentID;
 
-				// Closest possible intersection found; exit loop.
-				if (attracProx.Distance2D == 0.0f && attracProx.Distance3D == 0.0f)
-					break;
-
-				// Restart accumulation of distance traveled along attractor.
-				chainDistTraveled = Vector3::Distance(intersect, target);
-				continue;
+				// Return proximity data.
+				return attracProx;
 			}
 
-			// Accumulate distance traveled along attractor since last closest point.
+			// Accumulate distance traveled along attractor.
 			float segmentLength = Vector3::Distance(origin, target);
 			chainDistTraveled += segmentLength;
 		}
 
-		// Root final distances.
-		attracProx.Distance2D = sqrt(attracProx.Distance2D);
-		attracProx.Distance3D = sqrt(attracProx.Distance3D);
-
-		// Return proximity data.
-		return attracProx;
+		// FAILSAFE: Return empty proximity data.
+		return ProximityData{};
 	}
 
-	AttractorCollisionData GetAttractorCollision(Attractor& attrac, const Vector3& pos, short headingAngle)
+	std::vector<AttractorCollisionData> GetAttractorSegmentCollisions(Attractor& attrac, const Vector3& pos, short headingAngle)
 	{
-		return AttractorCollisionData(attrac, pos, headingAngle);
+		// Collect segment collisions.
+		auto attracColls = std::vector<AttractorCollisionData>{};
+		for (int i = 0; i < (attrac.GetPoints().size() - 1); i++)
+			attracColls.push_back(AttractorCollisionData(attrac, i, pos, headingAngle));
+	
+		// Return segment collisions.
+		return attracColls;
+	}
+
+	AttractorCollisionData GetClosestAttractorSegmentCollision(const Vector3& pos, std::vector<AttractorCollisionData>& segmentColls)
+	{
+		float closestDist = INFINITY;
+		AttractorCollisionData* attracCollPtr = nullptr;
+
+		for (auto& segmentColl : segmentColls)
+		{
+			if (segmentColl.Proximity.Distance3D < closestDist)
+			{
+				closestDist = segmentColl.Proximity.Distance3D;
+				attracCollPtr = &segmentColl;
+			}
+		}
+
+		return *attracCollPtr;
 	}
 
 	// Debug
@@ -203,13 +196,16 @@ namespace TEN::Collision::Attractor
 		attracColls.reserve(nearbyAttracPtrs.size());
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
-			auto attracColl = GetAttractorCollision(*attracPtr, pos, headingAngle);
+			// Run through segment collisions.
+			auto attracSegmentColls = GetAttractorSegmentCollisions(*attracPtr, pos, headingAngle);
+			for (auto& attracColl : attracSegmentColls)
+			{
+				// Filter out non-intersections.
+				if (attracColl.Proximity.Distance3D > detectRadius)
+					continue;
 
-			// Filter out non-intersections.
-			if (attracColl.Proximity.Distance3D > detectRadius)
-				continue;
-
-			attracColls.push_back(std::move(attracColl));
+				attracColls.push_back(std::move(attracColl));
+			}
 		}
 
 		// Sort collisions by 2D then 3D distance.
