@@ -1712,7 +1712,7 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	if (climbContext.SetJumpVelocity)
 		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(climbContext.RelPosOffset.y);
 
-	// No attractor parent; return early.
+	// No attractor; return early.
 	if (climbContext.AttracPtr == nullptr)
 		return;
 
@@ -1755,8 +1755,8 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 		auto posOffset = adjustedIntersect - item.Pose.Position.ToVector3();
 
 		// Calculate orientation offset.
-		short headingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);
-		short deltaHeadingAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, attracColl.HeadingAngle + headingAngleOffset);
+		short attracHeadingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);
+		short deltaHeadingAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, attracColl.HeadingAngle + attracHeadingAngleOffset);
 		auto orientOffset = EulerAngles(0, deltaHeadingAngle, 0);
 
 		// Set offset blend.

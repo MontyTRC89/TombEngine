@@ -1953,7 +1953,7 @@ namespace TEN::Entities::Player
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 
 		// 2) Assess attractor collision.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, -ATTRAC_PROBE_FORWARD, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 		for (const auto& attracColl : attracColls)
 		{
 			// 2.1) Check if attractor is edge type.
