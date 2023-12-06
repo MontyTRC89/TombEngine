@@ -65,9 +65,9 @@ namespace TEN::Collision::Attractor
 			const auto& target = points[i + 1];
 
 			// Calculate Y-perpendicular intersection and 2D distance.
-			auto intersection = Geometry::GetClosestPointOnLinePerp(pos, origin, target);
-			float dist2DSqr = Vector2::DistanceSquared(Vector2(pos.x, pos.z), Vector2(intersection.x, intersection.z));
-			float dist3DSqr = Vector3::DistanceSquared(pos, intersection);
+			auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target);
+			float dist2DSqr = Vector2::DistanceSquared(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
+			float dist3DSqr = Vector3::DistanceSquared(pos, intersect);
 
 			// TODO: Result is wrong.
 			// Calculate delta angle.
@@ -82,9 +82,9 @@ namespace TEN::Collision::Attractor
 			if (weightScore < bestWeightScore)
 			{
 				bestWeightScore = weightScore;
-				chainDistTraveled += Vector3::Distance(origin, intersection);
+				chainDistTraveled += Vector3::Distance(origin, intersect);
 
-				attracProx.Intersection = intersection;
+				attracProx.Intersection = intersect;
 				attracProx.Distance2D = dist2DSqr;
 				attracProx.Distance3D = dist3DSqr;
 				attracProx.ChainDistance += chainDistTraveled;
@@ -95,7 +95,7 @@ namespace TEN::Collision::Attractor
 					break;
 
 				// Restart accumulation of distance traveled along attractor.
-				chainDistTraveled = Vector3::Distance(intersection, target);
+				chainDistTraveled = Vector3::Distance(intersect, target);
 				continue;
 			}
 
