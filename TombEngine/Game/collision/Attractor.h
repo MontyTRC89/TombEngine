@@ -59,7 +59,7 @@ namespace TEN::Collision::Attractor
 		void AttachPlayer(ItemInfo& playerItem);
 		void DetachPlayer(ItemInfo& playerItem);
 
-		void DrawDebug() const;
+		void DrawDebug(unsigned int segmentID) const;
 
 	private:
 		// Helpers
