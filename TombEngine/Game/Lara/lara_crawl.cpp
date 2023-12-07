@@ -685,6 +685,18 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Back))
 		{
+			if (IsHeld(In::Action))
+			{
+				// TODO: Not working in this state.
+				auto climbContext = GetCrawlToHangClimbContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *coll, *climbContext);
+					return;
+				}
+			}
+
 			item->Animation.TargetState = LS_CRAWL_BACK;
 			return;
 		}
@@ -770,16 +782,46 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward) && CanCrawlForward(*item, *coll))
+		if (IsHeld(In::Forward))
 		{
-			item->Animation.TargetState = LS_CRAWL_FORWARD;
-			return;
+			if (IsHeld(In::Action) || IsHeld(In::Jump))
+			{
+				// TODO: Not working in this state.
+				auto climbContext = GetCrawlClimbContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *coll, *climbContext);
+					return;
+				}
+			}
+
+			if (CanCrawlForward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_CRAWL_FORWARD;
+				return;
+			}
 		}
 
-		if (IsHeld(In::Back) && CanCrawlBackward(*item, *coll))
+		if (IsHeld(In::Back))
 		{
-			item->Animation.TargetState = LS_CRAWL_BACK;
-			return;
+			if (IsHeld(In::Action))
+			{
+				// TODO: Not working in this state.
+				auto climbContext = GetCrawlToHangClimbContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *coll, *climbContext);
+					return;
+				}
+			}
+
+			if (CanCrawlBackward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_CRAWL_BACK;
+				return;
+			}
 		}
 
 		if (IsHeld(In::Left))
@@ -831,16 +873,46 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward) && CanCrawlForward(*item, *coll))
+		if (IsHeld(In::Forward))
 		{
-			item->Animation.TargetState = LS_CRAWL_FORWARD;
-			return;
+			if (IsHeld(In::Action) || IsHeld(In::Jump))
+			{
+				// TODO: Not working in this state.
+				auto climbContext = GetCrawlClimbContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *coll, *climbContext);
+					return;
+				}
+			}
+
+			if (CanCrawlForward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_CRAWL_FORWARD;
+				return;
+			}
 		}
 
-		if (IsHeld(In::Back) && CanCrawlBackward(*item, *coll))
+		if (IsHeld(In::Back))
 		{
-			item->Animation.TargetState = LS_CRAWL_BACK;
-			return;
+			if (IsHeld(In::Action))
+			{
+				// TODO: Not working in this state.
+				auto climbContext = GetCrawlToHangClimbContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *coll, *climbContext);
+					return;
+				}
+			}
+
+			if (CanCrawlBackward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_CRAWL_BACK;
+				return;
+			}
 		}
 
 		if (IsHeld(In::Right))

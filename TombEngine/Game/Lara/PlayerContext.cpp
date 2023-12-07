@@ -1720,7 +1720,7 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_CRAWL_STEP_UP;
+			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
@@ -1755,7 +1755,7 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
-			context.TargetStateID = LS_CRAWL_STEP_DOWN;
+			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
@@ -1790,7 +1790,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.TargetStateID = LS_CRAWL_EXIT_STEP_DOWN;
+			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
@@ -1825,7 +1825,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_EXIT_FLIP : LS_CRAWL_EXIT_JUMP;
+			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_VAULT_JUMP_FLIP : LS_CRAWL_VAULT_JUMP;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
@@ -1840,32 +1840,29 @@ namespace TEN::Entities::Player
 
 		// TODO
 		// 2) Get illegal slope crawl vault climb context (special case).
-		if (pointCollFront.Position.FloorSlope)
-		{
-			if (true
-				/*relFloorHeight <= SETUP.LowerEdgeBound &&							// Within lower floor bound.
-				relFloorHeight >= SETUP.UpperEdgeBound &&							// Within upper floor bound.
+		if (true
+			/*relFloorHeight <= SETUP.LowerEdgeBound &&							// Within lower floor bound.
+			relFloorHeight >= SETUP.UpperEdgeBound &&							// Within upper floor bound.
 				
-				abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > testSetup.ClampMin &&		// Crossing clamp limit.
-				abs(pointCollCenter.Position.Ceiling - probeB.Position.Floor) > testSetup.ClampMin &&		// Destination clamp limit.
-				abs(probeMiddle.Position.Ceiling - pointCollFront.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going up).
-				abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going down).
-				abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.FloorBound &&		// Crossing/destination floor height difference suggests continuous crawl surface.
-				(probeA.Position.Ceiling - y) < -testSetup.GapMin*/)									// Ceiling height is permissive.
-			{
-				auto context = ClimbContextData{};
-				context.AttracPtr = nullptr;
-				context.ChainDistance = 0.0f;
-				context.RelPosOffset = Vector3::Zero;
-				context.RelOrientOffset = EulerAngles::Zero;
-				context.TargetStateID = LS_CRAWL_EXIT_JUMP;
-				context.AlignType = ClimbContextAlignType::OffsetBlend;
-				context.IsInFront = true;
-				context.SetBusyHands = true;
-				context.SetJumpVelocity = false;
+			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > testSetup.ClampMin &&		// Crossing clamp limit.
+			abs(pointCollCenter.Position.Ceiling - probeB.Position.Floor) > testSetup.ClampMin &&		// Destination clamp limit.
+			abs(probeMiddle.Position.Ceiling - pointCollFront.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going up).
+			abs(probeA.Position.Ceiling - probeMiddle.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going down).
+			abs(probeA.Position.Floor - probeB.Position.Floor) <= testSetup.FloorBound &&		// Crossing/destination floor height difference suggests continuous crawl surface.
+			(probeA.Position.Ceiling - y) < -testSetup.GapMin*/)									// Ceiling height is permissive.
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = nullptr;
+			context.ChainDistance = 0.0f;
+			context.RelPosOffset = Vector3::Zero;
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_CRAWL_VAULT_JUMP;
+			context.AlignType = ClimbContextAlignType::OffsetBlend;
+			context.IsInFront = true;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
 
-				return context;
-			}
+			return context;
 		}
 
 		return std::nullopt;
