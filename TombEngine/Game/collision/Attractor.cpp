@@ -160,13 +160,13 @@ namespace TEN::Collision::Attractor
 		}
 
 		// FAILSAFE: Return end segment ID.
-		return int(_points.size() - 1);
+		return unsigned int(_points.size() - 1);
 	}
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
 	{
 		if (points.empty())
-			TENLog("Attempted to update invalid attractor.", LogLevel::Warning);
+			TENLog("Attempted to update attractor to invalid state.", LogLevel::Warning);
 
 		_points = points;
 		_roomNumber = roomNumber;
@@ -297,7 +297,7 @@ namespace TEN::Collision::Attractor
 	void Attractor::CacheSegmentLengths()
 	{
 		// Clear segment lengths.
-		_segmentLengths = {};
+		_segmentLengths.clear();
 
 		// Single point exists; return early.
 		if (_points.size() == 1)

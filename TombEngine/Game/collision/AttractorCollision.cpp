@@ -17,17 +17,22 @@ namespace TEN::Collision::Attractor
 {
 	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle)
 	{
-		auto refOrient = EulerAngles(0, headingAngle, 0);
+		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
+		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
 
-		// Set attractor pointer and fill proximity data.
+		const auto& points = attrac.GetPoints();
+
+		// FAILSAFE: Clamp segment ID.
+		segmentID = std::clamp(segmentID, 0u, std::min(segmentID, unsigned int(points.size() - 2)));
+
+		// Set attractor pointer and get proximity data.
 		AttracPtr = &attrac;
 		Proximity = GetProximity(pos, segmentID);
 
-		// Calculate segment orientation.
-		const auto& points = AttracPtr->GetPoints();
+		// Calculate orientations.
+		auto refOrient = EulerAngles(0, headingAngle, 0);
 		auto segmentOrient = (points.size() == 1) ?
-			refOrient :
-			Geometry::GetOrientToPoint(points[Proximity.SegmentID], points[Proximity.SegmentID + 1]);
+			refOrient : Geometry::GetOrientToPoint(points[Proximity.SegmentID], points[Proximity.SegmentID + 1]);
 
 		// Fill remaining collision data.
 		HeadingAngle = segmentOrient.y + HEADING_ANGLE_OFFSET;
@@ -86,6 +91,11 @@ namespace TEN::Collision::Attractor
 		return ProximityData{};
 	}
 
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle)
+	{
+		return AttractorCollisionData(attrac, segmentID, pos, headingAngle);
+	}
+
 	AttractorCollisionData GetAttractorCollision(Attractor& attrac, float chainDist, short headingAngle)
 	{
 		unsigned int segmentID = attrac.GetSegmentIDAtChainDistance(chainDist);
@@ -94,34 +104,6 @@ namespace TEN::Collision::Attractor
 		return AttractorCollisionData(attrac, segmentID, pos, headingAngle);
 	}
 	
-	std::vector<AttractorCollisionData> GetAttractorSegmentCollisions(Attractor& attrac, const Vector3& pos, short headingAngle)
-	{
-		// Collect segment collisions.
-		auto attracColls = std::vector<AttractorCollisionData>{};
-		for (int i = 0; i < (attrac.GetPoints().size() - 1); i++)
-			attracColls.push_back(AttractorCollisionData(attrac, i, pos, headingAngle));
-	
-		// Return segment collisions.
-		return attracColls;
-	}
-
-	AttractorCollisionData GetClosestAttractorSegmentCollision(const Vector3& pos, std::vector<AttractorCollisionData>& segmentColls)
-	{
-		float closestDist = INFINITY;
-		AttractorCollisionData* attracCollPtr = nullptr;
-
-		for (auto& segmentColl : segmentColls)
-		{
-			if (segmentColl.Proximity.Distance3D < closestDist)
-			{
-				closestDist = segmentColl.Proximity.Distance3D;
-				attracCollPtr = &segmentColl;
-			}
-		}
-
-		return *attracCollPtr;
-	}
-
 	// Debug
 	static std::vector<Attractor*> GetDebugAttractorPtrs()
 	{
@@ -204,10 +186,12 @@ namespace TEN::Collision::Attractor
 		attracColls.reserve(nearbyAttracPtrs.size());
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
-			// Run through segment collisions.
-			auto attracSegmentColls = GetAttractorSegmentCollisions(*attracPtr, pos, headingAngle);
-			for (auto& attracColl : attracSegmentColls)
+			// Get collisions for each attractor segment.
+			unsigned int segmentCount = std::clamp(int(attracPtr->GetPoints().size() - 1), 0, int(attracPtr->GetPoints().size() - 1));
+			for (unsigned int i = 0; i < segmentCount; i++)
 			{
+				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle);
+
 				// Filter out non-intersections.
 				if (attracColl.Proximity.Distance3D > detectRadius)
 					continue;
