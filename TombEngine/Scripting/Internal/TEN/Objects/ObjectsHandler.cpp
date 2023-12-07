@@ -25,7 +25,7 @@ Moveables, statics, cameras, and so on.
 
 ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 	m_handler(lua),
-	m_table_objects(sol::table{m_handler.GetState()->lua_state(), sol::create})
+	m_table_objects(sol::table(m_handler.GetState()->lua_state(), sol::create))
 {
 	parent.set(ScriptReserved_Objects, m_table_objects);
 
@@ -119,7 +119,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 
 	LaraObject::Register(m_table_objects);
 
-	Moveable::Register(m_table_objects);
+	Moveable::Register(*lua, m_table_objects);
 	Moveable::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
