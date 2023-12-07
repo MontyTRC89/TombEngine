@@ -1215,6 +1215,7 @@ namespace TEN::Renderer
 				break;
 
 			case RendererDebugPage::AttractorStats:
+				PrintDebugMessage("ATTRACTOR STATS");
 				break;
 				
 			case RendererDebugPage::PathfindingStats:

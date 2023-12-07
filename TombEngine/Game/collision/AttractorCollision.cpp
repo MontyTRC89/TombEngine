@@ -233,8 +233,16 @@ namespace TEN::Collision::Attractor
 
 	void DrawNearbyAttractors(const ItemInfo& item)
 	{
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(5));
+		auto uniqueAttracPtrs = std::set<Attractor*>{};
+
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(8));
 		for (const auto& attracColl : attracColls)
+		{
+			uniqueAttracPtrs.insert(attracColl.AttracPtr);
 			attracColl.AttracPtr->DrawDebug(attracColl.Proximity.SegmentID);
+		}
+
+		g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());
+		g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
 	}
 }
