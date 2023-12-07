@@ -1641,7 +1641,7 @@ namespace TEN::Entities::Player
 
 		auto context = std::optional<ClimbContextData>();
 
-		// 1) Standing vault 1 step up to crouch.
+		// 1) Stand vault 1 step up to crouch.
 		context = GetStandVault1StepUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1649,7 +1649,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 2) Standing vault 2 steps up to crouch.
+		// 2) Stand vault 2 steps up to crouch.
 		context = GetStandVault2StepsUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1657,7 +1657,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 3) Standing vault 2 steps up.
+		// 3) Stand vault 2 steps up.
 		context = GetStandVault2StepsUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1665,7 +1665,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 4) Standing vault 3 steps up to crouch.
+		// 4) Stand vault 3 steps up to crouch.
 		context = GetStandVault3StepsUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1673,7 +1673,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 5) Standing vault 3 steps up.
+		// 5) Stand vault 3 steps up.
 		context = GetStandVault3StepsUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1857,7 +1857,7 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3::Zero;
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_VAULT_JUMP;
-			context.AlignType = ClimbContextAlignType::OffsetBlend;
+			context.AlignType = ClimbContextAlignType::None;
 			context.IsInFront = true;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
@@ -1879,14 +1879,14 @@ namespace TEN::Entities::Player
 
 		auto context = std::optional<ClimbContextData>();
 
-		// 1) Crawling vault down 1 step to stand.
+		// 1) Crawl vault down 1 step to stand.
 		context = GetCrawlVault1StepDownToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (!IsHeld(In::Crouch) && HasStateDispatch(&item, context->TargetStateID))
 				return context;
 
-			// 2) Crawling vault down 1 step.
+			// 2) Crawl vault down 1 step.
 			context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
 			if (context.has_value())
 			{
@@ -1895,7 +1895,7 @@ namespace TEN::Entities::Player
 			}
 		}
 
-		// 3) Crawling vault jump.
+		// 3) Crawl vault jump.
 		context = GetCrawlVaultJumpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1903,7 +1903,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 4) Crawling vault up 1 step.
+		// 4) Crawl vault up 1 step.
 		context = GetCrawlVault1StepUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1911,7 +1911,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 5) Crawling vault down 1 step.
+		// 5) Crawl vault down 1 step.
 		context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
