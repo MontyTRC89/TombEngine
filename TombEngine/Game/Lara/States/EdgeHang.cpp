@@ -149,12 +149,12 @@ namespace TEN::Entities::Player
 
 		// ----------Debug
 		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
-		g_Renderer.AddDebugLine(attracCollCenter.Proximity.Intersection, attracCollCenter.Proximity.Intersection + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA);
-		g_Renderer.AddDebugLine(attracCollLeft.Proximity.Intersection, attracCollLeft.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
-		g_Renderer.AddDebugLine(attracCollRight.Proximity.Intersection, attracCollRight.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA);
+		g_Renderer.AddDebugLine(attracCollCenter.Proximity.Intersection, attracCollCenter.Proximity.Intersection + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA, RendererDebugPage::AttractorStats);
+		g_Renderer.AddDebugLine(attracCollLeft.Proximity.Intersection, attracCollLeft.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA, RendererDebugPage::AttractorStats);
+		g_Renderer.AddDebugLine(attracCollRight.Proximity.Intersection, attracCollRight.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA, RendererDebugPage::AttractorStats);
 
 		short angleDelta = Geometry::GetShortestAngle(attracCollCenter.HeadingAngle, (sideOffset >= 0.0f) ? attracCollRight.HeadingAngle : attracCollLeft.HeadingAngle);
-		g_Renderer.PrintDebugMessage("Angle delta: %.3f", TO_DEGREES(angleDelta));
+		g_Renderer.PrintDebugMessage("Angle delta: %.3f", TO_DEGREES(angleDelta), RendererDebugPage::AttractorStats);
 		//------------
 		
 		// Return attractor collisions at three points.

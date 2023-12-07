@@ -2,6 +2,7 @@
 #include "Renderer/Renderer11.h"
 
 #include "Game/animation.h"
+#include "Game/collision/AttractorCollision.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/Gui.h"
@@ -15,7 +16,9 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
+#include "Game/collision/AttractorCollision.h"
 
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Gui;
 using namespace TEN::Hud;
 using namespace TEN::Input;
@@ -1209,6 +1212,14 @@ namespace TEN::Renderer
 				PrintDebugMessage("Front ceil: %d", LaraCollision.Front.Ceiling);
 				PrintDebugMessage("Front left ceil: %d", LaraCollision.FrontLeft.Ceiling);
 				PrintDebugMessage("Front right ceil: %d", LaraCollision.FrontRight.Ceiling);
+				break;
+
+			case RendererDebugPage::AttractorStats:
+			{
+				auto attracColls = GetAttractorCollisions(*LaraItem, 0.0f, 0.0f, 0.0f, BLOCK(10));
+				for (const auto& attracColl : attracColls)
+					attracColl.AttracPtr->DrawDebug(attracColl.Proximity.SegmentID);
+			}
 				break;
 				
 			case RendererDebugPage::PathfindingStats:

@@ -121,7 +121,7 @@ namespace TEN::Collision::Attractor
 		auto nearbyAttracPtrs = std::vector<Attractor*>{};
 
 		// Draw debug sphere.
-		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::CollisionStats);
+		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
 
 		// TEMP
 		// Collect debug attractors.

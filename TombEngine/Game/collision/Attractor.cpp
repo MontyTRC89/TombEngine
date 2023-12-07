@@ -193,6 +193,7 @@ namespace TEN::Collision::Attractor
 		//_attachedPlayers.erase(playerItem.Index);
 	}
 
+	// TODO: Lines not drawing.
 	void Attractor::DrawDebug(unsigned int segmentID) const
 	{
 		constexpr auto LABEL_OFFSET			 = Vector3(0.0f, -CLICK(0.25f), 0.0f);
@@ -229,7 +230,7 @@ namespace TEN::Collision::Attractor
 		if (_points.size() == 1)
 		{
 			// Draw sphere.
-			g_Renderer.AddDebugSphere(_points.front(), SPHERE_RADIUS, Color(COLOR_YELLOW.R(), COLOR_YELLOW.G(), COLOR_YELLOW.B(), 0.2f), RendererDebugPage::CollisionStats, false);
+			g_Renderer.AddDebugSphere(_points.front(), SPHERE_RADIUS, Color(COLOR_YELLOW.R(), COLOR_YELLOW.G(), COLOR_YELLOW.B(), 0.2f), RendererDebugPage::AttractorStats, false);
 
 			// Determine label parameters.
 			auto labelPos = _points.front();
@@ -238,7 +239,7 @@ namespace TEN::Collision::Attractor
 
 			// Draw label.
 			if (labelPos2D.has_value())
-				g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, PRINTSTRING_OUTLINE, RendererDebugPage::CollisionStats);
+				g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, PRINTSTRING_OUTLINE, RendererDebugPage::AttractorStats);
 		}
 		else
 		{
@@ -247,14 +248,14 @@ namespace TEN::Collision::Attractor
 			const auto& target = _points[segmentID + 1];
 
 			// Draw main line.
-			g_Renderer.AddDebugLine(origin, target, COLOR_YELLOW);
+			g_Renderer.AddDebugLine(origin, target, COLOR_YELLOW, RendererDebugPage::AttractorStats);
 
 			auto orient = EulerAngles(0, Geometry::GetOrientToPoint(origin, target).y + ANGLE(90.0f), 0);
 			auto dir = orient.ToDirection();
 
 			// Draw segment heading indicator lines.
-			g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN);
-			g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+			g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
+			g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 
 			// Determine label parameters.
 			auto labelPos = ((origin + target) / 2) + LABEL_OFFSET;
@@ -263,18 +264,18 @@ namespace TEN::Collision::Attractor
 
 			// Draw label.
 			if (labelPos2D.has_value())
-				g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, 0, RendererDebugPage::CollisionStats);
+				g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, 0, RendererDebugPage::AttractorStats);
 
 			// Draw start indicator line.
 			if (segmentID == 0)
-				g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 			
 			// Draw end indicator line
 			if (segmentID == (_points.size() - 2))
-				g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN);
+				g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 
 			// Draw AABB.
-			//g_Renderer.AddDebugBox(_box, Vector4::One, RendererDebugPage::CollisionStats);
+			//g_Renderer.AddDebugBox(_box, Vector4::One, RendererDebugPage::AttractorStats);
 		}
 	}
 
