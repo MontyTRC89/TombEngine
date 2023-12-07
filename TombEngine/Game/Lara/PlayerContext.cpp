@@ -2016,7 +2016,7 @@ namespace TEN::Entities::Player
 					return false;
 			}
 			else
-				SetAnimation(item, LA_WATER_TREAD_1_STEP_UP_TO_STAND);
+				SetAnimation(item, LA_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND);
 		}
 		else if (frontFloor > CLICK(0.5f))
 		{
@@ -2089,7 +2089,7 @@ namespace TEN::Entities::Player
 			context.SetJumpVelocity = false;
 
 			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_WATER_TREAD_1_STEP_UP_TO_STAND);
+			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND);
 
 			return context;
 		}
