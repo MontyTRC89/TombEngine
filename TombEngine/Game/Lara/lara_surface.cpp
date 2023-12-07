@@ -20,6 +20,21 @@ using namespace TEN::Input;
 // Control & Collision Functions
 // -----------------------------
 
+// State:	  LS_WATER_TREAD_VAULT (55)
+// Collision: lara_void_func()
+void lara_as_water_tread_vault(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::None;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.laraNode = LM_HIPS; // Forces camera to follow player instead of snapping.
+
+	HandlePlayerAttractorParent(*item, *coll);
+}
+
 // State:		LS_ONWATER_DIVE (35)
 // Collision:	lara_col_surface_dive()
 void lara_as_surface_dive(ItemInfo* item, CollisionInfo* coll)
@@ -120,6 +135,20 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
+	if (IsHeld(In::Forward))
+	{
+		if (IsHeld(In::Action))
+		{
+			auto climbContext = GetWaterTreadClimbContext(*item, *coll);
+			if (climbContext.has_value())
+			{
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
+				return;
+			}
+		}
+	}
+
 	if (!IsHeld(In::Forward))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
 
@@ -140,7 +169,7 @@ void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
-	TestLaraWaterClimbOut(item, coll);
+	//TestLaraWaterClimbOut(item, coll);
 	TestLaraLadderClimbOut(item, coll);
 }
 
@@ -262,17 +291,4 @@ void lara_col_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	LaraSurfaceCollision(item, coll);
-}
-
-// State:		LS_ONWATER_EXIT (55)
-// Collision:	lara_default_col()
-void lara_as_surface_climb_out(ItemInfo* item, CollisionInfo* coll)
-{
-	auto& player = GetLaraInfo(*item);
-
-	player.Control.Look.Mode = LookMode::None;
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpasm = false;
-	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.laraNode = LM_HIPS;	// Forces the camera to follow Lara instead of snapping.
 }

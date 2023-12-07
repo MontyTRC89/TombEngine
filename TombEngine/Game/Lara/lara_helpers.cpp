@@ -1698,6 +1698,7 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	// FAILSAFE: Clear residual attractor parent.
 	player.Context.Attractor.Detach(item);
 
+	player.Control.WaterStatus = WaterStatus::Dry;
 	ResetPlayerTurnRateY(item);
 	ResetPlayerFlex(&item);
 

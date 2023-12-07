@@ -82,7 +82,7 @@ enum LaraState
 	LS_SWAN_DIVE = 52,
 	LS_FREEFALL_DIVE = 53,
 	LS_HANDSTAND = 54,
-	LS_ONWATER_EXIT = 55,
+	LS_WATER_TREAD_VAULT = 55,
 
 	// TR2
 	LS_LADDER_IDLE = 56,
@@ -338,7 +338,7 @@ enum LaraAnim
 	LA_UNDERWATER_IDLE = 108,								// Underwater idle (looped)
 	LA_UNDERWARER_IDLE_TO_SWIM = 109,						// Underwater idle > swim forward underwater
 	LA_ONWATER_IDLE = 110,									// Tread water idle (looped)
-	LA_ONWATER_TO_STAND_1_STEP = 111,						// Pull up 1 step from tread > stand
+	LA_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND = 111,			// Vault up 1 step from tread > stand
 	LA_FREEFALL_DIVE = 112,									// Freefall > underwater
 	LA_ONWATER_DIVE_ALTERNATE_1_UNUSED = 113,				// Tread water > underwater
 	LA_UNDERWATER_RESURFACE = 114,							// Underwater > tread water

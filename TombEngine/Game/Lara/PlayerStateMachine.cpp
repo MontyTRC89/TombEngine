@@ -87,7 +87,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_SWAN_DIVE] = std::pair(lara_as_swan_dive, lara_col_swan_dive);
 		PlayerBehaviorStateRoutines[LS_FREEFALL_DIVE] = std::pair(lara_as_freefall_dive, lara_col_freefall_dive);
 		PlayerBehaviorStateRoutines[LS_HANDSTAND] = std::pair(lara_as_handstand, lara_default_col);
-		PlayerBehaviorStateRoutines[LS_ONWATER_EXIT] = std::pair(lara_as_surface_climb_out, lara_default_col);
+		PlayerBehaviorStateRoutines[LS_WATER_TREAD_VAULT] = std::pair(lara_as_water_tread_vault, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_LADDER_IDLE] = std::pair(lara_as_climb_idle, lara_col_climb_idle);
 		PlayerBehaviorStateRoutines[LS_LADDER_UP] = std::pair(lara_as_climb_up, lara_col_climb_up);
 		PlayerBehaviorStateRoutines[LS_LADDER_LEFT] = std::pair(lara_as_climb_left, lara_col_climb_left);

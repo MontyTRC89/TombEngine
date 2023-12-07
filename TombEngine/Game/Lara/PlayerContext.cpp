@@ -1626,7 +1626,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetStandClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandingClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(2);
 
@@ -1923,7 +1923,228 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetCrawlToHangClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
+	{
+		auto& player = GetLaraInfo(*item);
+
+		// Get point collision.
+		auto pointColl = GetCollision(item);
+		int vPos = item->Pose.Position.y;
+
+		if (coll->CollisionType == CT_FRONT ||
+			pointColl.Position.FloorSlope ||
+			(pointColl.Position.Floor - vPos) <= 0)
+		{
+			return false;
+		}
+
+		if ((pointColl.Position.Floor - vPos) >= -CLICK(0.5f))
+		{
+			SetAnimation(item, LA_STAND_IDLE);
+		}
+		else
+		{
+			SetAnimation(item, LA_ONWATER_TO_WADE_1_STEP);
+			item->Animation.TargetState = LS_IDLE;
+		}
+
+		item->Pose.Position.y = pointColl.Position.Floor;
+		UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
+
+		ResetPlayerLean(item);
+		item->Animation.Velocity.y = 0.0f;
+		item->Animation.Velocity.z = 0.0f;
+		item->Animation.IsAirborne = false;
+		player.Control.WaterStatus = WaterStatus::Wade;
+
+		return true;
+	}
+
+	bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
+	{
+		auto* player = GetLaraInfo(item);
+
+		if (coll->CollisionType != CT_FRONT || !IsHeld(In::Action))
+			return false;
+
+		if (player->Control.HandStatus != HandStatus::Free &&
+			(player->Control.HandStatus != HandStatus::WeaponReady || player->Control.Weapon.GunType != LaraWeaponType::Flare))
+		{
+			return false;
+		}
+
+		if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
+			return false;
+
+		int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
+		if (coll->Front.Bridge == NO_ITEM &&
+			(frontFloor <= -CLICK(2) ||
+				frontFloor > CLICK(1.25f) - 4))
+		{
+			return false;
+		}
+
+		// Extra bridge check.
+		/*if (coll->Front.Bridge != NO_ITEM)
+		{
+		int bridgeBorder = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
+
+		frontFloor = bridgeBorder - CLICK(0.5f);
+		if (frontFloor <= -CLICK(2) ||
+		frontFloor > CLICK(1.25f) - 4)
+		{
+		return false;
+		}
+		}*/
+
+		// TODO: Reference attractor for water exit.
+
+		TestForObjectOnLedge(item, coll);
+		if (coll->HitStatic)
+			return false;
+
+		auto probe = GetCollision(item, coll->Setup.ForwardAngle, CLICK(2), -CLICK(1));
+		int headroom = probe.Position.Floor - probe.Position.Ceiling;
+
+		if (frontFloor <= -CLICK(1))
+		{
+			if (headroom < LARA_HEIGHT)
+			{
+				if (g_GameFlow->HasCrawlExtended())
+					SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
+				else
+					return false;
+			}
+			else
+				SetAnimation(item, LA_WATER_TREAD_1_STEP_UP_TO_STAND);
+		}
+		else if (frontFloor > CLICK(0.5f))
+		{
+			if (headroom < LARA_HEIGHT)
+			{
+				if (g_GameFlow->HasCrawlExtended())
+					SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
+				else
+					return false;
+			}
+			else
+				SetAnimation(item, LA_ONWATER_TO_STAND_M1_STEP);
+		}
+
+		else
+		{
+			if (headroom < LARA_HEIGHT)
+			{
+				if (g_GameFlow->HasCrawlExtended())
+					SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
+				else
+					return false;
+			}
+			else
+				SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
+		}
+
+		UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+		AlignEntityToEdge(item, coll, 1.7f);
+
+		item->Pose.Position.y += frontFloor - 5;
+		item->Animation.ActiveState = LS_WATER_TREAD_VAULT;
+		item->Animation.IsAirborne = false;
+		item->Animation.Velocity.z = 0;
+		item->Animation.Velocity.y = 0;
+		player->Control.TurnRate = 0;
+		player->Control.HandStatus = HandStatus::Busy;
+		player->Control.WaterStatus = WaterStatus::Dry;
+		return true;
+	}
+
+	std::optional<ClimbContextData> GetWaterTreadVault1StepUpToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+		const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			-CLICK(1), -STEPUP_HEIGHT, // Edge height bounds.
+			LARA_HEIGHT, -MAX_HEIGHT,  // Ledge floor-to-ceil range.
+			-CLICK(1),				   // Edge-to-ceil height lower bound.
+			true,					   // Test edge front.
+			false,					   // Test swamp depth.
+			true,					   // Test ledge heights.
+			true					   // Test ledge illegal slope.
+		};
+		constexpr auto VERTICAL_OFFSET = CLICK(1);
+
+		// Get standing vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			// TODO: State dispatch.
+			SetAnimation(LaraItem, LA_WATER_TREAD_1_STEP_UP_TO_STAND);
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	// TODO
+	std::optional<ClimbContextData> GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+
+		const auto& player = GetLaraInfo(item);
+
+		// Check hand status.
+		if (player.Control.HandStatus != HandStatus::Free)
+			return std::nullopt;
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+
+		auto context = std::optional<ClimbContextData>();
+
+		context = GetWaterTreadVault1StepUpToStandClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+			return context;
+		}
+
+
+		// No valid edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
+	// TODO
+	std::optional<ClimbContextData> GetSafeEdgeDescentClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+
+		// Create and return crawl to hang vault context.
+		auto context = ClimbContextData{};
+		//context.AttracPtr = attracColl.AttracPtr;
+		//context.ChainDistance = attracColl.Proximity.ChainDistance;
+		context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+		context.RelOrientOffset = EulerAngles::Zero;
+		context.TargetStateID = LS_CRAWL_TO_HANG;
+		context.AlignType = ClimbContextAlignType::AttractorParent;
+		//context.IsInFront = attracColl.IsFacingForward; // TODO: Check.
+		context.SetBusyHands = true;
+		context.SetJumpVelocity = false;
+
+		return context;
+	}
+
+	std::optional<ClimbContextData> GetCrawlEdgeDescentClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1939,6 +2160,7 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 		
+		// TODO: Better way. Use GetStaticObjectLos().
 		// 1) Test for object collision.
 		bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
 		if (isObjectCollided)
@@ -2003,22 +2225,6 @@ namespace TEN::Entities::Player
 
 			return context;
 		}
-
-		// No valid edge attractor collision; return nullopt.
-		return std::nullopt;
-	}
-
-	// TODO
-	std::optional<ClimbContextData> GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll)
-	{
-		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
-
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
-
-		// 1) Test for object collision.
-		/*bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
-		if (isObjectCollided)
-			return std::nullopt;*/
 
 		// No valid edge attractor collision; return nullopt.
 		return std::nullopt;

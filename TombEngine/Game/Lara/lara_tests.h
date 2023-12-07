@@ -29,8 +29,6 @@ int	 LaraCeilingFront(ItemInfo* item, short angle, int distance, int height);
 CollisionResult LaraCollisionFront(ItemInfo* item, short angle, int distance);
 CollisionResult LaraCeilingCollisionFront(ItemInfo* item, short angle, int distance, int height);
 
-bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll);
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 

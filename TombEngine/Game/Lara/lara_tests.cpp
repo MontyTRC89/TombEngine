@@ -242,192 +242,62 @@ CollisionResult LaraCeilingCollisionFront(ItemInfo* item, short angle, int dista
 	return probe;
 }
 
-bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
+bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto& player = *GetLaraInfo(item);
 
-	// Get point collision.
-	auto pointColl = GetCollision(item);
-	int vPos = item->Pose.Position.y;
+	if (!IsHeld(In::Action) || !player.Control.CanClimbLadder || coll->CollisionType != CT_FRONT)
+		return false;
 
-	if (coll->CollisionType == CT_FRONT ||
-		pointColl.Position.FloorSlope ||
-		(pointColl.Position.Floor - vPos) <= 0)
+	if (player.Control.HandStatus != HandStatus::Free &&
+		(player.Control.HandStatus != HandStatus::WeaponReady || player.Control.Weapon.GunType != LaraWeaponType::Flare))
 	{
 		return false;
 	}
 
-	if ((pointColl.Position.Floor - vPos) >= -CLICK(0.5f))
-	{
-		SetAnimation(item, LA_STAND_IDLE);
-	}
-	else
-	{
-		SetAnimation(item, LA_ONWATER_TO_WADE_1_STEP);
-		item->Animation.TargetState = LS_IDLE;
-	}
-
-	item->Pose.Position.y = pointColl.Position.Floor;
-	UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
-
-	ResetPlayerLean(item);
-	item->Animation.Velocity.y = 0.0f;
-	item->Animation.Velocity.z = 0.0f;
-	item->Animation.IsAirborne = false;
-	player.Control.WaterStatus = WaterStatus::Wade;
-
-	return true;
-}
-
-bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (coll->CollisionType != CT_FRONT || !IsHeld(In::Action))
-		return false;
-
-	if (lara->Control.HandStatus != HandStatus::Free &&
-		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != LaraWeaponType::Flare))
-	{
-		return false;
-	}
-
-	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
-		return false;
-
-	int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
-	if (coll->Front.Bridge == NO_ITEM &&
-		(frontFloor <= -CLICK(2) ||
-		frontFloor > CLICK(1.25f) - 4))
-	{
-		return false;
-	}
-
-	// Extra bridge check.
-	if (coll->Front.Bridge != NO_ITEM)
-	{
-		int bridgeBorder = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
-		
-		frontFloor = bridgeBorder - CLICK(0.5f);
-		if (frontFloor <= -CLICK(2) ||
-			frontFloor > CLICK(1.25f) - 4)
-		{
-			return false;
-		}
-	}
-
-	// TODO: Reference attractor for water exit.
-
-	TestForObjectOnLedge(item, coll);
-	if (coll->HitStatic)
-		return false;
-
-	auto probe = GetCollision(item, coll->Setup.ForwardAngle, CLICK(2), -CLICK(1));
-	int headroom = probe.Position.Floor - probe.Position.Ceiling;
-
-	if (frontFloor <= -CLICK(1))
-	{
-		if (headroom < LARA_HEIGHT)
-		{
-			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
-			else
-				return false;
-		}
-		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_1_STEP);
-	}
-	else if (frontFloor > CLICK(0.5f))
-	{
-		if (headroom < LARA_HEIGHT)
-		{
-			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
-			else
-				return false;
-		}
-		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_M1_STEP);
-	}
-
-	else
-	{
-		if (headroom < LARA_HEIGHT)
-		{
-			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
-			else
-				return false;
-		}
-		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
-	}
-
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
-	AlignEntityToEdge(item, coll, 1.7f);
-
-	item->Pose.Position.y += frontFloor - 5;
-	item->Animation.ActiveState = LS_ONWATER_EXIT;
-	item->Animation.IsAirborne = false;
-	item->Animation.Velocity.z = 0;
-	item->Animation.Velocity.y = 0;
-	lara->Control.TurnRate = 0;
-	lara->Control.HandStatus = HandStatus::Busy;
-	lara->Control.WaterStatus = WaterStatus::Dry;
-	return true;
-}
-
-bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function for water to ladder move
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (!IsHeld(In::Action) || !lara->Control.CanClimbLadder || coll->CollisionType != CT_FRONT)
-	{
-		return false;
-	}
-
-	if (lara->Control.HandStatus != HandStatus::Free &&
-		(lara->Control.HandStatus != HandStatus::WeaponReady || lara->Control.Weapon.GunType != LaraWeaponType::Flare))
-	{
-		return false;
-	}
-
-	// HACK: Reduce probe radius, because free forward probe mode makes ladder tests to fail in some cases.
+	// HACK: Reduce probe radius. Free forward probe mode makes ladder tests fail in some cases.
 	coll->Setup.Radius *= 0.8f; 
 
 	if (!TestLaraClimbIdle(item, coll))
 		return false;
 
-	short facing = item->Pose.Orientation.y;
+	short headingAngle = item->Pose.Orientation.y;
+	if (headingAngle >= ANGLE(-35.0f) && headingAngle <= ANGLE(35.0f))
+	{
+		headingAngle = 0;
+	}
+	else if (headingAngle >= ANGLE(55.0f) && headingAngle <= ANGLE(125.0f))
+	{
+		headingAngle = ANGLE(90.0f);
+	}
+	else if (headingAngle >= ANGLE(145.0f) || headingAngle <= ANGLE(-145.0f))
+	{
+		headingAngle = ANGLE(180.0f);
+	}
+	else if (headingAngle >= ANGLE(-125.0f) && headingAngle <= ANGLE(-55.0f))
+	{
+		headingAngle = ANGLE(-90.0f);
+	}
 
-	if (facing >= -ANGLE(35.0f) && facing <= ANGLE(35.0f))
-		facing = 0;
-	else if (facing >= ANGLE(55.0f) && facing <= ANGLE(125.0f))
-		facing = ANGLE(90.0f);
-	else if (facing >= ANGLE(145.0f) || facing <= -ANGLE(145.0f))
-		facing = ANGLE(180.0f);
-	else if (facing >= -ANGLE(125.0f) && facing <= -ANGLE(55.0f))
-		facing = -ANGLE(90.0f);
-
-	if (facing & 0x3FFF)
+	if (headingAngle & 0x3FFF)
 		return false;
 
-	switch ((unsigned short)facing / ANGLE(90.0f))
+	switch ((unsigned short)headingAngle / ANGLE(90.0f))
 	{
 	case NORTH:
-		item->Pose.Position.z = (item->Pose.Position.z | WALL_MASK) - LARA_RADIUS - 1;
+		item->Pose.Position.z = (item->Pose.Position.z | WALL_MASK) - (LARA_RADIUS - 1);
 		break;
 
 	case EAST:
-		item->Pose.Position.x = (item->Pose.Position.x | WALL_MASK) - LARA_RADIUS - 1;
+		item->Pose.Position.x = (item->Pose.Position.x | WALL_MASK) - (LARA_RADIUS - 1);
 		break;
 
 	case SOUTH:
-		item->Pose.Position.z = (item->Pose.Position.z & -BLOCK(1)) + LARA_RADIUS + 1;
+		item->Pose.Position.z = (item->Pose.Position.z & -BLOCK(1)) + (LARA_RADIUS + 1);
 		break;
 
 	case WEST:
-		item->Pose.Position.x = (item->Pose.Position.x & -BLOCK(1)) + LARA_RADIUS + 1;
+		item->Pose.Position.x = (item->Pose.Position.x & -BLOCK(1)) + (LARA_RADIUS + 1);
 		break;
 	}
 
@@ -435,13 +305,13 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	item->Animation.TargetState = LS_LADDER_IDLE;
 	AnimateItem(item);
 
-	item->Pose.Position.y -= 10; // Otherwise she falls back into the water.
-	item->Pose.Orientation = EulerAngles(0, facing, 0);
+	item->Pose.Position.y -= 10; // NOTE: Offset required or player will fall back in water.
+	item->Pose.Orientation = EulerAngles(0, headingAngle, 0);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity = Vector3::Zero;
-	lara->Control.TurnRate = 0;
-	lara->Control.HandStatus = HandStatus::Busy;
-	lara->Control.WaterStatus = WaterStatus::Dry;
+	player.Control.TurnRate = 0;
+	player.Control.HandStatus = HandStatus::Busy;
+	player.Control.WaterStatus = WaterStatus::Dry;
 	return true;
 }
 
