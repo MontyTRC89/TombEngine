@@ -48,4 +48,6 @@ namespace TEN::Collision::Attractor
 															   float forward, float down, float right, float detectRadius);
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, float forward, float down, float right, float detectRadius);
+
+	void DrawNearbyAttractors(const ItemInfo& item);
 }

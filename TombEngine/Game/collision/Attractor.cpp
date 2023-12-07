@@ -193,7 +193,6 @@ namespace TEN::Collision::Attractor
 		//_attachedPlayers.erase(playerItem.Index);
 	}
 
-	// TODO: Lines not drawing.
 	void Attractor::DrawDebug(unsigned int segmentID) const
 	{
 		constexpr auto LABEL_OFFSET			 = Vector3(0.0f, -CLICK(0.25f), 0.0f);
@@ -230,7 +229,7 @@ namespace TEN::Collision::Attractor
 		if (_points.size() == 1)
 		{
 			// Draw sphere.
-			g_Renderer.AddDebugSphere(_points.front(), SPHERE_RADIUS, Color(COLOR_YELLOW.R(), COLOR_YELLOW.G(), COLOR_YELLOW.B(), 0.2f), RendererDebugPage::AttractorStats, false);
+			g_Renderer.AddDebugSphere(_points.front(), SPHERE_RADIUS, Color(COLOR_YELLOW.R(), COLOR_YELLOW.G(), COLOR_YELLOW.B(), 0.3f), RendererDebugPage::AttractorStats, false);
 
 			// Determine label parameters.
 			auto labelPos = _points.front();

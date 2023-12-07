@@ -1215,11 +1215,6 @@ namespace TEN::Renderer
 				break;
 
 			case RendererDebugPage::AttractorStats:
-			{
-				auto attracColls = GetAttractorCollisions(*LaraItem, 0.0f, 0.0f, 0.0f, BLOCK(10));
-				for (const auto& attracColl : attracColls)
-					attracColl.AttracPtr->DrawDebug(attracColl.Proximity.SegmentID);
-			}
 				break;
 				
 			case RendererDebugPage::PathfindingStats:

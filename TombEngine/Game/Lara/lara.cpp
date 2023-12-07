@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
+#include "Game/collision/AttractorCollision.h"
 #include "Game/collision/AttractorDebug.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
@@ -377,6 +378,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	{
 		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 		DrawNearbySectorFlags(*item);
+		DrawNearbyAttractors(*item);
 	}
 }
 

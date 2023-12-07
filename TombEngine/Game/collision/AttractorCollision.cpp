@@ -230,4 +230,11 @@ namespace TEN::Collision::Attractor
 			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
 			forward, down, right, detectRadius);
 	}
+
+	void DrawNearbyAttractors(const ItemInfo& item)
+	{
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(5));
+		for (const auto& attracColl : attracColls)
+			attracColl.AttracPtr->DrawDebug(attracColl.Proximity.SegmentID);
+	}
 }

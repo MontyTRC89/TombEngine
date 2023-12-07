@@ -27,10 +27,10 @@ namespace TEN::Collision::Attractor
 		player.Context.DebugAttracs.Attrac2 = Attractor(AttractorType::Edge, points, item.RoomNumber);
 	}
 
-	static void SpawnAttractorPentagon(ItemInfo& item, bool isOuter)
+	static void SpawnAttractorCircle(ItemInfo& item, bool isOuter)
 	{
 		constexpr auto RADIUS	  = BLOCK(0.4f);
-		constexpr auto STEP_COUNT = 32;
+		constexpr auto STEP_COUNT = 16;
 		constexpr auto STEP_ANGLE = PI_MUL_2 / STEP_COUNT;
 		constexpr auto REL_OFFSET = Vector3(0.0f, 0.0f, RADIUS);
 
@@ -98,9 +98,9 @@ namespace TEN::Collision::Attractor
 
 		// Spawn attractor pentagon.
 		if (KeyMap[OIS::KeyCode::KC_T])
-			SpawnAttractorPentagon(item, true);
+			SpawnAttractorCircle(item, true);
 		if (KeyMap[OIS::KeyCode::KC_Y])
-			SpawnAttractorPentagon(item, false);
+			SpawnAttractorCircle(item, false);
 
 		// Modify pentagon point.
 		if (KeyMap[OIS::KeyCode::KC_U])
