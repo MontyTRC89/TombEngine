@@ -181,13 +181,13 @@ namespace TEN::Collision::Attractor
 		attracColls.reserve(nearbyAttracPtrs.size());
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
-			// Get collisions for each attractor segment.
+			// Get collisions for each segment.
 			unsigned int segmentIDMax = std::max(int(attracPtr->GetPoints().size() - 2), 0);
 			for (unsigned int i = 0; i <= segmentIDMax; i++)
 			{
 				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle);
 
-				// Filter out non-intersections.
+				// Filter out non-intersection.
 				if (attracColl.Proximity.Distance3D > detectRadius)
 					continue;
 

@@ -74,7 +74,7 @@ namespace TEN::Collision::Attractor
 
 	bool Attractor::IsLooped() const
 	{
-		// Too few points; loop not possible.
+		// Single segment exists; loop not possible.
 		if (_points.size() <= 2)
 			return false;
 
@@ -144,7 +144,7 @@ namespace TEN::Collision::Attractor
 		}
 		else if (chainDist >= _length)
 		{
-			return ((int)_points.size() - 1);
+			return unsigned int(_points.size() - 2);
 		}
 
 		// Find segment at distance along attractor.
@@ -160,7 +160,7 @@ namespace TEN::Collision::Attractor
 		}
 
 		// FAILSAFE: Return end segment ID.
-		return unsigned int(_points.size() - 1);
+		return unsigned int(_points.size() - 2);
 	}
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)

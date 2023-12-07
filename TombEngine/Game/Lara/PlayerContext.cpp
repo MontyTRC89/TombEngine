@@ -1840,7 +1840,8 @@ namespace TEN::Entities::Player
 
 		// TODO
 		// 2) Get illegal slope crawl vault climb context (special case).
-		if (true
+		if (pointCollFront.Position.FloorSlope &&
+			true
 			/*relFloorHeight <= SETUP.LowerEdgeBound &&							// Within lower floor bound.
 			relFloorHeight >= SETUP.UpperEdgeBound &&							// Within upper floor bound.
 				
