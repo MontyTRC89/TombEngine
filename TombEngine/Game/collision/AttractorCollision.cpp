@@ -53,39 +53,34 @@ namespace TEN::Collision::Attractor
 			return ProximityData{ points.front(), dist2D, dist3D, 0.0f, 0 };
 		}
 
-		// Find intersection on attractor segment.
+		// Accumulate distance traveled along attractor toward intersection.
 		float chainDistTraveled = 0.0f;
-		for (unsigned int i = 0; i <= segmentID; i++)
+		for (unsigned int i = 0; i < segmentID; i++)
 		{
-			// Target segment reached.
-			if (i == segmentID)
-			{
-				// Get segment points.
-				const auto& origin = points[i];
-				const auto& target = points[i + 1];
-
-				// Calculate Y-perpendicular intersection.
-				auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target);
-
-				// Accumulate final distance traveled along attractor.
-				chainDistTraveled += Vector3::Distance(origin, intersect);
-
-				// Create proximity data.
-				auto attracProx = ProximityData{};
-				attracProx.Intersection = intersect;
-				attracProx.Distance2D = Vector2::Distance(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
-				attracProx.Distance3D = Vector3::Distance(pos, intersect);
-				attracProx.ChainDistance = chainDistTraveled;
-				attracProx.SegmentID = segmentID;
-
-				// Return proximity data.
-				return attracProx;
-			}
-
-			// Accumulate distance traveled along attractor.
 			float segmentLength = AttracPtr->GetSegmentLengths()[i];
 			chainDistTraveled += segmentLength;
 		}
+
+		// Get segment points.
+		const auto& origin = points[segmentID];
+		const auto& target = points[segmentID + 1];
+
+		// Calculate Y-perpendicular intersection.
+		auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target);
+
+		// Accumulate final distance traveled along attractor toward intersection.
+		chainDistTraveled += Vector3::Distance(origin, intersect);
+
+		// Create proximity data.
+		auto attracProx = ProximityData{};
+		attracProx.Intersection = intersect;
+		attracProx.Distance2D = Vector2::Distance(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
+		attracProx.Distance3D = Vector3::Distance(pos, intersect);
+		attracProx.ChainDistance = chainDistTraveled;
+		attracProx.SegmentID = segmentID;
+
+		// Return proximity data.
+		return attracProx;
 
 		// FAILSAFE: Return empty proximity data.
 		return ProximityData{};
