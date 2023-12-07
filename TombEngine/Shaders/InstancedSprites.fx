@@ -98,7 +98,9 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		particleDepth = LinearizeDepth(particleDepth, NearPlane, FarPlane);
 
 		if (particleDepth - sceneDepth > 0.01f)
+		{
 			discard;
+		}
 
 		float fade = (sceneDepth - particleDepth) * 1024.0f;
 		output.w = min(output.w, fade);

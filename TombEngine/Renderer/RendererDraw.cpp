@@ -1814,6 +1814,8 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Write, true);
 		SetBlendMode(BlendMode::Opaque, true);
 
+		// TODO: to finish
+		/*
 		// Smooth the ambient map with guassian 5x5 filter
 		_context->ClearRenderTargetView(_tempRoomAmbientRenderTarget1.RenderTargetView.Get(), Colors::Black);
 		_context->ClearDepthStencilView(_tempRoomAmbientRenderTarget1.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -1862,7 +1864,7 @@ namespace TEN::Renderer
 
 		SetCullMode(CullMode::CounterClockwise, true);
 		SetDepthState(DepthState::Write, true);
-		SetBlendMode(BlendMode::Opaque, true);
+		SetBlendMode(BlendMode::Opaque, true);*/
 	}
 
 	void Renderer::DumpGameScene()

@@ -316,7 +316,7 @@ namespace TEN::Renderer
 		CullMode _lastCullMode;
 
 		std::vector<RendererSpriteBucket> _spriteBuckets;
-		std::unique_ptr<BasicPostProcess> _postProcess;
+
 		ComPtr<ID3D11SamplerState> _shadowSampler;
 
 		// Antialiasing
@@ -341,8 +341,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psFXAA;
 
 		// Post process
-		PostProcessColorScheme _postProcessColorScheme = PostProcessColorScheme::Normal;
-		Vertex _fullscreenQuadVertices[4];
+		PostProcessColorEffect _postProcessColorEffect = PostProcessColorEffect::Normal;
 		VertexBuffer<PostProcessVertex> _fullscreenTriangleVertexBuffer;
 		ComPtr<ID3D11InputLayout> _fullscreenTriangleInputLayout = nullptr;
 		ComPtr<ID3D11VertexShader> _vsPostProcess;
@@ -509,7 +508,10 @@ namespace TEN::Renderer
 		Texture2D CreateDefaultNormalTexture();
 		Vector4 GetPortalRect(Vector4 v, Vector4 vp);
 		bool SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius);
-		void InitQuad();
+		void InitializeSpriteQuad();
+		void InitializePostProcess();
+		void CreateSSAONoiseTexture();
+		void InitializeAmbientOcclusion();
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{
@@ -623,6 +625,7 @@ namespace TEN::Renderer
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 							  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);
+		void SetPostProcessColorEffect(PostProcessColorEffect colorScheme);
 	};
 
 	extern Renderer g_Renderer;

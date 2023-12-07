@@ -22,6 +22,7 @@ constexpr auto REGKEY_SHADOW_MAP_SIZE	   = "ShadowMapSize";
 constexpr auto REGKEY_SHADOW_BLOBS_MAX	   = "ShadowBlobsMax";
 constexpr auto REGKEY_ENABLE_CAUSTICS	   = "EnableCaustics";
 constexpr auto REGKEY_ANTIALIASING_MODE	   = "AntialiasingMode";
+constexpr auto REGKEY_AMBIENT_OCCLUSION	   = "AmbientOcclusion";
 
 // Sound keys
 constexpr auto REGKEY_SOUND_DEVICE	= "SoundDevice";

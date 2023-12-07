@@ -1,13 +1,6 @@
-
-
-cbuffer PostProcessBuffer : register(b7)
-{
-    float CinematicBarsHeight;
-    float ScreenFadeFactor;
-    int ViewportWidth;
-    int ViewportHeight;
-    float4 SSAOKernel[64];
-};
+#include "./CBPostProcess.hlsli"
+#include "./CBCamera.hlsli"
+#include "./Math.hlsli"
 
 struct VertexShaderInput
 {
@@ -21,6 +14,7 @@ struct PixelShaderInput
     float4 Position: SV_POSITION;
     float2 UV: TEXCOORD0;
     float4 Color: COLOR0;
+    float4 PositionCopy: TEXCOORD1;
 };
 
 Texture2D ColorTexture : register(t0);
@@ -33,6 +27,7 @@ PixelShaderInput VS(VertexShaderInput input)
     output.Position = float4(input.Position, 1.0f);
     output.UV = input.UV;
     output.Color = input.Color;
+    output.PositionCopy = output.Position;
 
     return output;
 }

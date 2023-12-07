@@ -1,18 +1,10 @@
 #include "./VertexInput.hlsli"
 #include "./CBCamera.hlsli"
+#include "./CBPostProcess.hlsli"
 
 #define SIGMA 3.0
 #define BSIGMA 0.3
 #define MSIZE 5
-
-cbuffer PostProcessBuffer : register(b7)
-{
-    float CinematicBarsHeight;
-    float ScreenFadeFactor;
-    int ViewportWidth;
-    int ViewportHeight;
-    float4 SSAOKernel[64];
-};
 
 struct PixelShaderInput
 {

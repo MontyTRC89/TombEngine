@@ -38,18 +38,24 @@ namespace TEN::Renderer
 		int destinationRenderTarget = 1;
 
 		// Apply color scheme
-		if (_postProcessColorScheme != PostProcessColorScheme::Normal)
+		if (_postProcessColorEffect != PostProcessColorEffect::Normal)
 		{
 			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
 			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
 			
-			if (_postProcessColorScheme == PostProcessColorScheme::Sepia)
+			switch (_postProcessColorEffect)
 			{
+			case PostProcessColorEffect::Sepia:
 				_context->PSSetShader(_psPostProcessSepia.Get(), nullptr, 0);
-			}
-			else
-			{
+				break;
+
+			case PostProcessColorEffect::Monochrome:
 				_context->PSSetShader(_psPostProcessMonochrome.Get(), nullptr, 0);
+				break;
+				 
+			default:
+				return;
+
 			}
 
 			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
@@ -74,5 +80,10 @@ namespace TEN::Renderer
 		BindTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 
 		DrawTriangles(3, 0);
+	}
+
+	void Renderer::SetPostProcessColorEffect(PostProcessColorEffect colorScheme)
+	{
+		_postProcessColorEffect = colorScheme;
 	}
 }

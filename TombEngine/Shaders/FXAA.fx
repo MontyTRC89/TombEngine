@@ -1,18 +1,10 @@
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
+#include "./CBPostProcess.hlsli"
 
 #define FXAA_SPAN_MAX	8.0
 #define FXAA_REDUCE_MUL 1.0/4.0
 #define FXAA_REDUCE_MIN 1.0/64.0
-
-cbuffer PostProcessBuffer : register(b7)
-{
-	float CinematicBarsHeight;
-	float ScreenFadeFactor;
-	int ViewportWidth;
-	int ViewportHeight;
-	int FXAA;
-};
 
 struct PixelShaderInput
 {

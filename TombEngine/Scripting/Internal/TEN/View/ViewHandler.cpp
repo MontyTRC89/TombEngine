@@ -14,6 +14,7 @@
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
+#include "Scripting/Internal/TEN/View/PostProcessColorEffects.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::Environment;
@@ -95,6 +96,11 @@ namespace TEN::Scripting::View
 		return (screenRes.x / screenRes.y);
 	}
 
+	static void SetPostProcessColorEffect(PostProcessColorEffect effect)
+	{
+		g_Renderer.SetPostProcessColorEffect(effect);
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		auto tableView = sol::table(state->lua_state(), sol::create);
@@ -141,6 +147,11 @@ namespace TEN::Scripting::View
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 
+		///Sets the post-process color effect, like sepia or monochrome.
+		//@function SetPostProcessColorEffect
+		//@tparam The View.PostProcessColorEffect value to set.
+		tableView.set_function(ScriptReserved_SetPostProcessColorEffect, &SetPostProcessColorEffect);
+
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
 		//@tparam short flyby (ID of flyby)
@@ -166,5 +177,6 @@ namespace TEN::Scripting::View
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_CameraType, CAMERA_TYPE);
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_AlignMode, ALIGN_MODES);
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_ScaleMode, SCALE_MODES);
+		handler.MakeReadOnlyTable(tableView, ScriptReserved_postProcessColorEffect, POSTPROCESS_COLOR_EFFECTS);
 	}
 };
