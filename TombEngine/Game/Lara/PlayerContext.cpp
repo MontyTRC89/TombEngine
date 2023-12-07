@@ -1591,7 +1591,7 @@ namespace TEN::Entities::Player
 			context.IsInFront = attracColl->IsFacingForward;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.SetBusyHands = false;
-			context.SetJumpVelocity = false;
+			context.SetJumpVelocity = true;
 
 			return context;
 		}
@@ -1618,7 +1618,7 @@ namespace TEN::Entities::Player
 			context.AlignType = ClimbContextAlignType::None;
 			context.IsInFront = true;
 			context.SetBusyHands = false;
-			context.SetJumpVelocity = false;
+			context.SetJumpVelocity = true;
 
 			return context;
 		}

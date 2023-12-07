@@ -343,7 +343,6 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 
 	// Update player pose.
 	item.Pose = Pose(
-		//adjustedIntersect + Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
 		adjustedIntersect - Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
 		EulerAngles(0, adjustedHeadingAngle, 0) + player.Context.Attractor.RelDeltaOrient);
 
@@ -1708,7 +1707,7 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 
 	// Set jump velocity (if applicable).
 	if (climbContext.SetJumpVelocity)
-		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(climbContext.RelPosOffset.y);
+		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(-climbContext.RelPosOffset.y);
 
 	// No attractor; return early.
 	if (climbContext.AttracPtr == nullptr)
