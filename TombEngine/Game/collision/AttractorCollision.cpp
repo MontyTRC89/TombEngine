@@ -182,8 +182,8 @@ namespace TEN::Collision::Attractor
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
 			// Get collisions for each attractor segment.
-			unsigned int segmentCount = std::clamp(int(attracPtr->GetPoints().size() - 1), 0, int(attracPtr->GetPoints().size() - 1));
-			for (unsigned int i = 0; i < segmentCount; i++)
+			unsigned int segmentIDMax = std::max(int(attracPtr->GetPoints().size() - 2), 0);
+			for (unsigned int i = 0; i <= segmentIDMax; i++)
 			{
 				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle);
 
@@ -242,7 +242,7 @@ namespace TEN::Collision::Attractor
 			attracColl.AttracPtr->DrawDebug(attracColl.Proximity.SegmentID);
 		}
 
-		g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());
-		g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
+		//g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());
+		//g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
 	}
 }
