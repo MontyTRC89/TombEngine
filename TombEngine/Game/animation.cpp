@@ -108,7 +108,8 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			break;
 
 		case AnimCommandType::SoundEffect:
-			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+			int frameNumber = commandDataPtr[0];
+			if (isFrameBased && item.Animation.FrameNumber == frameNumber)
 			{
 				// Get sound ID and sound environment flag from packed data.
 				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
