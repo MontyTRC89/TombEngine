@@ -344,12 +344,12 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 
 	// Update player pose.
 	item.Pose = Pose(
-		offsetIntersect + Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
-		offsetOrient + player.Context.Attractor.RelDeltaOrient);
+		offsetIntersect + Vector3::Transform(player.Context.Attractor.RelDeltaPos * INV_LERP_ALPHA, rotMatrix),
+		offsetOrient + (player.Context.Attractor.RelDeltaOrient * INV_LERP_ALPHA));
 
-	// Inverse lerp relative deltas toward 0.
-	player.Context.Attractor.RelDeltaPos *= INV_LERP_ALPHA;
-	player.Context.Attractor.RelDeltaOrient *= INV_LERP_ALPHA;
+	// Recalculate relative delta position and orientation.
+	player.Context.Attractor.RelDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - offsetIntersect, rotMatrix.Invert());
+	player.Context.Attractor.RelDeltaOrient = item.Pose.Orientation - attracOrient;
 }
 
 static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
@@ -1689,7 +1689,6 @@ static float GetPlayerJumpVelocity(float jumpHeight)
 	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }
 
-// TODO: Cleaner math.
 void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& climbContext)
 {
 	constexpr auto OFFSET_BLEND_LERP_ALPHA = 0.25f;
@@ -1750,9 +1749,8 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 		auto posOffset = offsetIntersect - item.Pose.Position.ToVector3();
 
 		// Calculate orientation offset.
-		short attracHeadingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);
-		short deltaHeadingAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, attracColl.HeadingAngle + attracHeadingAngleOffset);
-		auto orientOffset = EulerAngles(0, deltaHeadingAngle, 0);
+		short headingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);
+		auto orientOffset = EulerAngles(0, attracColl.HeadingAngle + headingAngleOffset, 0) - item.Pose.Orientation;
 
 		// Set offset blend.
 		item.OffsetBlend.SetLogarithmic(posOffset, orientOffset, OFFSET_BLEND_LERP_ALPHA);
