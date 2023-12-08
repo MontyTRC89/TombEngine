@@ -1941,6 +1941,10 @@ namespace TEN::Entities::Player
 		};
 		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 
+		// Crouch action held and extended crawl moveset enabled; return nullopt.
+		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
+			return std::nullopt;
+
 		// Get water tread vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
@@ -1978,6 +1982,10 @@ namespace TEN::Entities::Player
 			true,								 // Test ledge heights.
 			true								 // Test ledge illegal slope.
 		};
+
+		// Crouch action held and extended crawl moveset enabled; return nullopt.
+		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
+			return std::nullopt;
 
 		// Get water tread vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -2018,6 +2026,10 @@ namespace TEN::Entities::Player
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
+		// Crouch action held and extended crawl moveset enabled; return nullopt.
+		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
+			return std::nullopt;
+
 		// Get water tread vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
@@ -2048,7 +2060,7 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = ClimbSetupData
 		{
 			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
-			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	 // Ledge floor-to-ceil range.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,	 // Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),				 // Edge-to-ceil height lower bound.
 			true,							 // Test edge front.
 			false,							 // Test swamp depth.
@@ -2091,7 +2103,7 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = ClimbSetupData
 		{
 			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
-			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		 // Ledge floor-to-ceil range.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		 // Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),					 // Edge-to-ceil height lower bound.
 			true,								 // Test edge front.
 			false,								 // Test swamp depth.
@@ -2133,7 +2145,7 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = ClimbSetupData
 		{
 			-CLICK(1), -STEPUP_HEIGHT,		// Edge height bounds.
-			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Ledge floor-to-ceil range.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT, // Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),				// Edge-to-ceil height lower bound.
 			true,							// Test edge front.
 			false,							// Test swamp depth.
@@ -2200,8 +2212,7 @@ namespace TEN::Entities::Player
 		UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
 
 		ResetPlayerLean(item);
-		item->Animation.Velocity.y = 0.0f;
-		item->Animation.Velocity.z = 0.0f;
+		item->Animation.Velocity = Vector3::Zero;
 		item->Animation.IsAirborne = false;
 		player.Control.WaterStatus = WaterStatus::Wade;
 
@@ -2223,15 +2234,7 @@ namespace TEN::Entities::Player
 
 		auto context = std::optional<ClimbContextData>();
 
-		// 1) Water tread vault 1 step down to crouch.
-		context = GetWaterTreadVault1StepDownToCrouchClimbContext(item, coll, attracColls);
-		if (context.has_value())
-		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
-				return context;
-		}
-
-		// 2) Water tread vault 1 step down to stand.
+		// 1) Water tread vault 1 step down to stand.
 		context = GetWaterTreadVault1StepDownToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2239,30 +2242,31 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 3) Water tread vault 0 steps to crouch.
-		context = GetWaterTreadVault0StepsToCrouchClimbContext(item, coll, attracColls);
+		// 2) Water tread vault 1 step down to crouch.
+		context = GetWaterTreadVault1StepDownToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
-		// 4) Water tread vault 0 steps to stand.
+
+		// 3) Water tread vault 0 steps to stand.
 		context = GetWaterTreadVault0StepsToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
-		
-		// 5) Water tread vault up 1 step up to crouch.
-		context = GetWaterTreadVault1StepUpToCrouchClimbContext(item, coll, attracColls);
+
+		// 4) Water tread vault 0 steps to crouch.
+		context = GetWaterTreadVault0StepsToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
-		
-		// 6) Water tread vault up 1 step up to stand.
+
+		// 5) Water tread vault up 1 step up to stand.
 		context = GetWaterTreadVault1StepUpToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2270,6 +2274,14 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
+		// 6) Water tread vault up 1 step up to crouch.
+		context = GetWaterTreadVault1StepUpToCrouchClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+		
 		// No valid edge attractor collision; return nullopt.
 		return std::nullopt;
 	}
