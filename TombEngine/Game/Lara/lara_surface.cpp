@@ -20,7 +20,7 @@ using namespace TEN::Input;
 // Control & Collision Functions
 // -----------------------------
 
-// State:	  LS_WATER_TREAD_VAULT (55)
+// State:	  LS_TREAD_WATER_VAULT (55)
 // Collision: lara_void_func()
 void lara_as_water_tread_vault(ItemInfo* item, CollisionInfo* coll)
 {
@@ -87,7 +87,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetWaterTreadClimbContext(*item, *coll);
+			auto climbContext = GetTreadWaterClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
@@ -150,7 +150,7 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetWaterTreadClimbContext(*item, *coll);
+			auto climbContext = GetTreadWaterClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;

@@ -1926,7 +1926,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetWaterTreadVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+	const std::optional<ClimbContextData> GetTreadWaterVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																						 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
@@ -1945,7 +1945,7 @@ namespace TEN::Entities::Player
 		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
 			return std::nullopt;
 
-		// Get water tread vault climb context.
+		// Get tread water vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
@@ -1954,14 +1954,14 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_DOWN_TO_STAND;
+			//context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
 			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_DOWN_TO_STAND);
+			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND);
 
 			return context;
 		}
@@ -1969,7 +1969,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetWaterTreadVault0StepsToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+	const std::optional<ClimbContextData> GetTreadWaterVault0StepsToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					  const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
@@ -1987,7 +1987,7 @@ namespace TEN::Entities::Player
 		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
 			return std::nullopt;
 
-		// Get water tread vault climb context.
+		// Get tread water vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
@@ -1996,14 +1996,14 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_WATER_TREAD_VAULT_0_STEPS_TO_STAND;
+			//context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
 			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_0_STEPS_TO_STAND);
+			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_0_STEPS_TO_STAND);
 
 			return context;
 		}
@@ -2011,7 +2011,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetWaterTreadVault1StepUpToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+	const std::optional<ClimbContextData> GetTreadWaterVault1StepUpToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					   const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
@@ -2030,7 +2030,7 @@ namespace TEN::Entities::Player
 		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
 			return std::nullopt;
 
-		// Get water tread vault climb context.
+		// Get tread water vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
@@ -2039,14 +2039,14 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND;
+			//context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
 			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND);
+			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND);
 
 			return context;
 		}
@@ -2054,7 +2054,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetWaterTreadVault1StepDownToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+	const std::optional<ClimbContextData> GetTreadWaterVault1StepDownToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																						  const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
@@ -2073,7 +2073,7 @@ namespace TEN::Entities::Player
 		if (!g_GameFlow->HasCrawlExtended())
 			return std::nullopt;
 
-		// Get water tread vault climb context.
+		// Get tread water vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
@@ -2082,14 +2082,14 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_DOWN_TO_CROUCH;
+			//context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
 			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_DOWN_TO_CROUCH);
+			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH);
 
 			return context;
 		}
@@ -2097,7 +2097,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetWaterTreadVault0StepsToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+	const std::optional<ClimbContextData> GetTreadWaterVault0StepsToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					   const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
@@ -2115,7 +2115,7 @@ namespace TEN::Entities::Player
 		if (!g_GameFlow->HasCrawlExtended())
 			return std::nullopt;
 
-		// Get water tread vault climb context.
+		// Get tread water vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
@@ -2124,14 +2124,14 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_WATER_TREAD_VAULT_0_STEPS_TO_CROUCH;
+			//context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
 			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_0_STEPS_TO_CROUCH);
+			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH);
 
 			return context;
 		}
@@ -2139,7 +2139,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetWaterTreadVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+	const std::optional<ClimbContextData> GetTreadWaterVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																						const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
@@ -2158,7 +2158,7 @@ namespace TEN::Entities::Player
 		if (!g_GameFlow->HasCrawlExtended())
 			return std::nullopt;
 
-		// Get water tread vault climb context.
+		// Get tread water vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
@@ -2167,14 +2167,14 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_UP_TO_CROUCH;
+			//context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
 			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_UP_TO_CROUCH);
+			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH);
 
 			return context;
 		}
@@ -2219,7 +2219,7 @@ namespace TEN::Entities::Player
 		return true;
 	}
 
-	std::optional<ClimbContextData> GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetTreadWaterClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
@@ -2235,7 +2235,7 @@ namespace TEN::Entities::Player
 		auto context = std::optional<ClimbContextData>();
 
 		// 1) Water tread vault 1 step down to stand.
-		context = GetWaterTreadVault1StepDownToStandClimbContext(item, coll, attracColls);
+		context = GetTreadWaterVault1StepDownToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
@@ -2243,7 +2243,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 2) Water tread vault 1 step down to crouch.
-		context = GetWaterTreadVault1StepDownToCrouchClimbContext(item, coll, attracColls);
+		context = GetTreadWaterVault1StepDownToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
@@ -2251,7 +2251,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 3) Water tread vault 0 steps to stand.
-		context = GetWaterTreadVault0StepsToStandClimbContext(item, coll, attracColls);
+		context = GetTreadWaterVault0StepsToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
@@ -2259,7 +2259,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 4) Water tread vault 0 steps to crouch.
-		context = GetWaterTreadVault0StepsToCrouchClimbContext(item, coll, attracColls);
+		context = GetTreadWaterVault0StepsToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
@@ -2267,7 +2267,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 5) Water tread vault up 1 step up to stand.
-		context = GetWaterTreadVault1StepUpToStandClimbContext(item, coll, attracColls);
+		context = GetTreadWaterVault1StepUpToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
@@ -2275,7 +2275,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 6) Water tread vault up 1 step up to crouch.
-		context = GetWaterTreadVault1StepUpToCrouchClimbContext(item, coll, attracColls);
+		context = GetTreadWaterVault1StepUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))

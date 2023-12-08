@@ -82,7 +82,7 @@ enum LaraState
 	LS_SWAN_DIVE = 52,
 	LS_FREEFALL_DIVE = 53,
 	LS_HANDSTAND = 54,
-	LS_WATER_TREAD_VAULT = 55,
+	LS_TREAD_WATER_VAULT = 55,
 
 	// TR2
 	LS_LADDER_IDLE = 56,
@@ -217,6 +217,12 @@ enum LaraState
 	LS_REMOVE_PUZZLE = 189,
 	LS_PUSHABLE_EDGE_SLIP = 190,
 	LS_SPRINT_SLIDE = 191,
+	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND = 192,
+	LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND = 193,
+	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND = 194,
+	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH = 195,
+	LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH = 196,
+	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH = 197,
 
 	NUM_LARA_STATES
 };
@@ -338,7 +344,7 @@ enum LaraAnim
 	LA_UNDERWATER_IDLE = 108,								// Underwater idle (looped)
 	LA_UNDERWARER_IDLE_TO_SWIM = 109,						// Underwater idle > swim forward underwater
 	LA_ONWATER_IDLE = 110,									// Tread water idle (looped)
-	LA_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND = 111,			// Vault up 1 step from tread > stand
+	LA_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND = 111,			// Vault up 1 step from tread > stand
 	LA_FREEFALL_DIVE = 112,									// Freefall > underwater
 	LA_ONWATER_DIVE_ALTERNATE_1_UNUSED = 113,				// Tread water > underwater
 	LA_UNDERWATER_RESURFACE = 114,							// Underwater > tread water
@@ -424,9 +430,9 @@ enum LaraAnim
 	LA_LADDER_SHIMMY_DOWN = 188,							// Descend ladder hanging
 	LA_DISCARD_FLARE = 189,									// Throw flare standing
 	LA_ONWATER_TO_WADE_1_STEP = 190,						// Tread water up a step > wade
-	LA_WATER_TREAD_VAULT_0_STEPS_TO_STAND = 191,			// Pull up from tread > stand
+	LA_TREAD_WATER_VAULT_0_STEPS_TO_STAND = 191,			// Pull up from tread > stand
 	LA_UNDERWATER_TO_STAND = 192,							// Underwater > stand
-	LA_WATER_TREAD_VAULT_1_STEP_DOWN_TO_STAND = 193,		// Pull up on lower step from tread > stand
+	LA_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND = 193,		// Pull up on lower step from tread > stand
 	LA_LADDER_TO_HANG_DOWN = 194,							// Descend ladder > hang
 																// TODO: this links to regular hang at 96. Address this?
 	LA_SWITCH_SMALL_DOWN = 195,								// Activate small switch
@@ -729,9 +735,9 @@ enum LaraAnim
 	LA_CRAWL_JUMP_DOWN = 478,								// Jump down 2 steps and beyond from crawl > fall
 	LA_CRAWL_STEP_UP = 479,									// Crawl up step > crawl idle
 	LA_CRAWL_STEP_DOWN = 480,								// Crawl down step > crawl idle
-	LA_WATER_TREAD_VAULT_1_STEP_UP_TO_CROUCH = 481,			// Pull up 1 step from tread > stand
-	LA_WATER_TREAD_VAULT_0_STEPS_TO_CROUCH = 482,			// Pull up flat step from tread > stand
-	LA_WATER_TREAD_VAULT_1_STEP_DOWN_TO_CROUCH = 483,		// Pull up lower step from tread > stand
+	LA_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH = 481,			// Pull up 1 step from tread > stand
+	LA_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH = 482,			// Pull up flat step from tread > stand
+	LA_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH = 483,		// Pull up lower step from tread > stand
 	LA_LADDER_TO_MONKEY = 484,								// Ladder idle > monkey swing idle
 	LA_ONWATER_TURN_180_START = 485,						// Tread water 180 turn (1/2)
 	LA_ONWATER_TURN_180_END = 486,							// Tread water 180 turn (2/2)
