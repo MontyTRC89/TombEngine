@@ -1376,8 +1376,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetStandVault2StepsUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																			const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetStandVault2StepsUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1412,8 +1412,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetStandVault3StepsUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																			const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetStandVault3StepsUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1448,8 +1448,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetStandVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																				   const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetStandVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1484,8 +1484,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetStandVault2StepsUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																					const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetStandVault2StepsUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1520,8 +1520,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetStandVault3StepsUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																					const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetStandVault3StepsUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1556,8 +1556,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetAutoJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																  const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetAutoJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																   const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto LOWER_CEIL_BOUND = -LARA_HEIGHT_MONKEY;
 		constexpr auto UPPER_CEIL_BOUND = -CLICK(7);
@@ -1694,8 +1694,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetCrawlVault1StepDownClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																			 const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetCrawlVault1StepDownClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			  const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1729,8 +1729,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetCrawlVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																					const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetCrawlVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1764,8 +1764,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetCrawlVault1StepUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																		   const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetCrawlVault1StepUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1801,8 +1801,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetCrawlVaultJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																		const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetCrawlVaultJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																		 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1926,8 +1926,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetTreadWaterVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																						 const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetTreadWaterVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																						  const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1966,8 +1966,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetTreadWaterVault0StepsToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																					  const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetTreadWaterVault0StepsToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					   const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -2005,8 +2005,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	const std::optional<ClimbContextData> GetTreadWaterVault1StepUpToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																					   const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetTreadWaterVault1StepUpToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																						const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -2045,8 +2045,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetTreadWaterVault1StepDownToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																						  const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetTreadWaterVault1StepDownToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																						   const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -2085,8 +2085,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetTreadWaterVault0StepsToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																					   const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetTreadWaterVault0StepsToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																						const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -2124,8 +2124,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const std::optional<ClimbContextData> GetTreadWaterVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																						const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetTreadWaterVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																						 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
