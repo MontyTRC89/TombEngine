@@ -2220,7 +2220,7 @@ namespace TEN::Entities::Player
 		context = GetTreadWaterVault1StepDownToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
@@ -2228,7 +2228,7 @@ namespace TEN::Entities::Player
 		context = GetTreadWaterVault1StepDownToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
@@ -2236,7 +2236,7 @@ namespace TEN::Entities::Player
 		context = GetTreadWaterVault0StepsToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
@@ -2244,7 +2244,7 @@ namespace TEN::Entities::Player
 		context = GetTreadWaterVault0StepsToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
@@ -2252,7 +2252,7 @@ namespace TEN::Entities::Player
 		context = GetTreadWaterVault1StepUpToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
@@ -2260,7 +2260,7 @@ namespace TEN::Entities::Player
 		context = GetTreadWaterVault1StepUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 		
