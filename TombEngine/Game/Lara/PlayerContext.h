@@ -157,5 +157,4 @@ namespace TEN::Entities::Player
 
 	// TEMP
 	bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll);
-	bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
 }

@@ -333,18 +333,19 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 
 	// Get attractor collision.
 	auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
+	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
 
-	// Calculate adjusted intersection.
-	auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
-	auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(player.Context.Attractor.RelPosOffset, rotMatrix);
+	// Calculate offset intersection.
+	auto rotMatrix = attracOrient.ToRotationMatrix();
+	auto offsetIntersect = attracColl.Proximity.Intersection + Vector3::Transform(player.Context.Attractor.RelPosOffset, rotMatrix);
 
-	// Calculate adjusted heading angle.
-	short adjustedHeadingAngle = attracColl.HeadingAngle + player.Context.Attractor.RelOrientOffset.y;
+	// Calculate offset orientation.
+	auto offsetOrient = attracOrient + player.Context.Attractor.RelOrientOffset;
 
 	// Update player pose.
 	item.Pose = Pose(
-		adjustedIntersect - Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
-		EulerAngles(0, adjustedHeadingAngle, 0) + player.Context.Attractor.RelDeltaOrient);
+		offsetIntersect + Vector3::Transform(player.Context.Attractor.RelDeltaPos, rotMatrix),
+		offsetOrient + player.Context.Attractor.RelDeltaOrient);
 
 	// Inverse lerp relative deltas toward 0.
 	player.Context.Attractor.RelDeltaPos *= INV_LERP_ALPHA;
@@ -1716,10 +1717,11 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 
 	// Get attractor collision.
 	auto attracColl = GetAttractorCollision(*climbContext.AttracPtr, climbContext.ChainDistance, item.Pose.Orientation.y);
+	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
 
-	// Calculate adjusted intersection.
-	auto rotMatrix = EulerAngles(0, attracColl.HeadingAngle, 0).ToRotationMatrix();
-	auto adjustedIntersect = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
+	// Calculate offset intersection.
+	auto rotMatrix = attracOrient.ToRotationMatrix();
+	auto offsetIntersect = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
 
 	// Set alignment.
 	switch (climbContext.AlignType)
@@ -1730,13 +1732,9 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 
 	case ClimbContextAlignType::AttractorParent:
 	{
-		// Calculate relative delta position.
-		auto deltaPos = adjustedIntersect - item.Pose.Position.ToVector3();
-		auto relDeltaPos = Vector3::Transform(deltaPos, rotMatrix);
-
-		// Calculate relative delta orientation.
-		short deltaHeadingAngle = Geometry::GetShortestAngle(attracColl.HeadingAngle, item.Pose.Orientation.y);
-		auto relDeltaOrient = EulerAngles(0, deltaHeadingAngle, 0);
+		// Calculate relative delta position and orientation.
+		auto relDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - offsetIntersect, rotMatrix.Invert());
+		auto relDeltaOrient = item.Pose.Orientation - attracOrient;
 
 		// Attach player to attractor.
 		player.Context.Attractor.Attach(
@@ -1749,7 +1747,7 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	case ClimbContextAlignType::OffsetBlend:
 	{
 		// Calculate position offset.
-		auto posOffset = adjustedIntersect - item.Pose.Position.ToVector3();
+		auto posOffset = offsetIntersect - item.Pose.Position.ToVector3();
 
 		// Calculate orientation offset.
 		short attracHeadingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);
