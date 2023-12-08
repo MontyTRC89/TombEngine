@@ -85,6 +85,17 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Forward))
 	{
+		if (IsHeld(In::Action))
+		{
+			auto climbContext = GetWaterTreadClimbContext(*item, *coll);
+			if (climbContext.has_value())
+			{
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
+				return;
+			}
+		}
+
 		item->Animation.TargetState = LS_ONWATER_FORWARD;
 		return;
 	}

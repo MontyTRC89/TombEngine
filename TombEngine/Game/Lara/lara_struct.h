@@ -424,9 +424,9 @@ enum LaraAnim
 	LA_LADDER_SHIMMY_DOWN = 188,							// Descend ladder hanging
 	LA_DISCARD_FLARE = 189,									// Throw flare standing
 	LA_ONWATER_TO_WADE_1_STEP = 190,						// Tread water up a step > wade
-	LA_ONWATER_TO_STAND_0_STEP = 191,						// Pull up from tread > stand
+	LA_WATER_TREAD_VAULT_0_STEPS_TO_STAND = 191,			// Pull up from tread > stand
 	LA_UNDERWATER_TO_STAND = 192,							// Underwater > stand
-	LA_ONWATER_TO_STAND_M1_STEP = 193,						// Pull up on lower step from tread > stand
+	LA_WATER_TREAD_VAULT_1_STEP_DOWN_TO_STAND = 193,		// Pull up on lower step from tread > stand
 	LA_LADDER_TO_HANG_DOWN = 194,							// Descend ladder > hang
 																// TODO: this links to regular hang at 96. Address this?
 	LA_SWITCH_SMALL_DOWN = 195,								// Activate small switch
@@ -729,9 +729,9 @@ enum LaraAnim
 	LA_CRAWL_JUMP_DOWN = 478,								// Jump down 2 steps and beyond from crawl > fall
 	LA_CRAWL_STEP_UP = 479,									// Crawl up step > crawl idle
 	LA_CRAWL_STEP_DOWN = 480,								// Crawl down step > crawl idle
-	LA_ONWATER_TO_CROUCH_1_STEP = 481,						// Pull up 1 step from tread > stand
-	LA_ONWATER_TO_CROUCH_0_STEP = 482,						// Pull up flat step from tread > stand
-	LA_ONWATER_TO_CROUCH_M1_STEP = 483,						// Pull up lower step from tread > stand
+	LA_WATER_TREAD_VAULT_1_STEP_UP_TO_CROUCH = 481,			// Pull up 1 step from tread > stand
+	LA_WATER_TREAD_VAULT_0_STEPS_TO_CROUCH = 482,			// Pull up flat step from tread > stand
+	LA_WATER_TREAD_VAULT_1_STEP_DOWN_TO_CROUCH = 483,		// Pull up lower step from tread > stand
 	LA_LADDER_TO_MONKEY = 484,								// Ladder idle > monkey swing idle
 	LA_ONWATER_TURN_180_START = 485,						// Tread water 180 turn (1/2)
 	LA_ONWATER_TURN_180_END = 486,							// Tread water 180 turn (2/2)

@@ -1695,10 +1695,10 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 
 	auto& player = GetLaraInfo(item);
 
-	// FAILSAFE: Clear residual attractor parent.
-	player.Context.Attractor.Detach(item);
-
+	item.Animation.Velocity = Vector3::Zero;
+	player.Control.TurnRate = 0;
 	player.Control.WaterStatus = WaterStatus::Dry;
+	player.Context.Attractor.Detach(item);
 	ResetPlayerTurnRateY(item);
 	ResetPlayerFlex(&item);
 

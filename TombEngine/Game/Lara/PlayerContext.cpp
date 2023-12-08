@@ -1556,7 +1556,6 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	// TODO: Don't parent to attractor. Use offset blend instead.
 	const std::optional<ClimbContextData> GetAutoJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																  const std::vector<AttractorCollisionData>& attracColls)
 	{
@@ -1695,8 +1694,78 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetCrawlVault1StepUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																	 const std::vector<AttractorCollisionData>& attracColls)
+	const std::optional<ClimbContextData> GetCrawlVault1StepDownClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			 const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		// Ledge floor-to-ceil range.
+			-(int)CLICK(0.6f),					// Edge-to-ceil height lower bound.
+			false,								// Test edge front.
+			false,								// Test swamp depth.
+			true,								// Test ledge heights.
+			true								// Test ledge illegal slope.
+		};
+
+		// Get crawling vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
+			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN;
+			context.AlignType = ClimbContextAlignType::OffsetBlend;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	const std::optional<ClimbContextData> GetCrawlVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT, // Edge height bounds.
+			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
+			-(int)CLICK(1.25f),					 // Edge-to-ceil height lower bound.
+			false,								 // Test edge front.
+			false,								 // Test swamp depth.
+			true,								 // Test ledge heights.
+			false								 // Test ledge illegal slope.
+		};
+
+		// Get crawling vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN_TO_STAND;
+			context.AlignType = ClimbContextAlignType::OffsetBlend;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+	
+	const std::optional<ClimbContextData> GetCrawlVault1StepUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																		   const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1732,78 +1801,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetCrawlVault1StepDownClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																	   const std::vector<AttractorCollisionData>& attracColls)
-	{
-		constexpr auto SETUP = ClimbSetupData
-		{
-			STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		// Ledge floor-to-ceil range.
-			-(int)CLICK(0.6f),					// Edge-to-ceil height lower bound.
-			false,								// Test edge front.
-			false,								// Test swamp depth.
-			true,								// Test ledge heights.
-			true								// Test ledge illegal slope.
-		};
-
-		// Get crawling vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
-		if (attracColl.has_value())
-		{
-			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
-			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN;
-			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.IsInFront = attracColl->IsFacingForward;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
-
-			return context;
-		}
-
-		return std::nullopt;
-	}
-	
-	std::optional<ClimbContextData> GetCrawlVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																			  const std::vector<AttractorCollisionData>& attracColls)
-	{
-		constexpr auto SETUP = ClimbSetupData
-		{
-			STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
-			-(int)CLICK(1.25f),					 // Edge-to-ceil height lower bound.
-			false,								 // Test edge front.
-			false,								 // Test swamp depth.
-			true,								 // Test ledge heights.
-			false								 // Test ledge illegal slope.
-		};
-
-		// Get crawling vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
-		if (attracColl.has_value())
-		{
-			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
-			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN_TO_STAND;
-			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.IsInFront = attracColl->IsFacingForward;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
-
-			return context;
-		}
-
-		return std::nullopt;
-	}
-	
-	std::optional<ClimbContextData> GetCrawlVaultJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																  const std::vector<AttractorCollisionData>& attracColls)
+	const std::optional<ClimbContextData> GetCrawlVaultJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																		const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SETUP = ClimbSetupData
 		{
@@ -1844,7 +1843,7 @@ namespace TEN::Entities::Player
 			true
 			/*relFloorHeight <= SETUP.LowerEdgeBound &&							// Within lower floor bound.
 			relFloorHeight >= SETUP.UpperEdgeBound &&							// Within upper floor bound.
-				
+
 			abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor) > testSetup.ClampMin &&		// Crossing clamp limit.
 			abs(pointCollCenter.Position.Ceiling - probeB.Position.Floor) > testSetup.ClampMin &&		// Destination clamp limit.
 			abs(probeMiddle.Position.Ceiling - pointCollFront.Position.Floor) >= testSetup.GapMin &&	// Gap is optically permissive (going up).
@@ -1875,6 +1874,10 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
+		// Extended crawl moveset disabled; return nullopt.
+		if (!g_GameFlow->HasCrawlExtended())
+			return std::nullopt;
+
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
 
@@ -1896,7 +1899,15 @@ namespace TEN::Entities::Player
 			}
 		}
 
-		// 3) Crawl vault jump.
+		// 3) Crawl vault down 1 step.
+		context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
+		// 4) Crawl vault jump.
 		context = GetCrawlVaultJumpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1904,16 +1915,8 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 4) Crawl vault up 1 step.
+		// 5) Crawl vault up 1 step.
 		context = GetCrawlVault1StepUpClimbContext(item, coll, attracColls);
-		if (context.has_value())
-		{
-			if (HasStateDispatch(&item, context->TargetStateID))
-				return context;
-		}
-
-		// 5) Crawl vault down 1 step.
-		context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
@@ -1923,6 +1926,251 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	const std::optional<ClimbContextData> GetWaterTreadVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																						 const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
+			LARA_HEIGHT, -MAX_HEIGHT,		 // Ledge floor-to-ceil range.
+			-CLICK(1),						 // Edge-to-ceil height lower bound.
+			true,							 // Test edge front.
+			false,							 // Test swamp depth.
+			true,							 // Test ledge heights.
+			true							 // Test ledge illegal slope.
+		};
+		constexpr auto VERTICAL_OFFSET = -CLICK(1);
+
+		// Get water tread vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_DOWN_TO_STAND;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			// TODO: State dispatch.
+			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_DOWN_TO_STAND);
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+	
+	const std::optional<ClimbContextData> GetWaterTreadVault0StepsToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					  const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
+			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
+			-CLICK(1),							 // Edge-to-ceil height lower bound.
+			true,								 // Test edge front.
+			false,								 // Test swamp depth.
+			true,								 // Test ledge heights.
+			true								 // Test ledge illegal slope.
+		};
+
+		// Get water tread vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			//context.TargetStateID = LS_WATER_TREAD_VAULT_0_STEPS_TO_STAND;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			// TODO: State dispatch.
+			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_0_STEPS_TO_STAND);
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+	
+	const std::optional<ClimbContextData> GetWaterTreadVault1StepUpToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					   const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			-(int)CLICK(0.5f), -STEPUP_HEIGHT, // Edge height bounds.
+			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
+			-CLICK(1),						   // Edge-to-ceil height lower bound.
+			true,							   // Test edge front.
+			false,							   // Test swamp depth.
+			true,							   // Test ledge heights.
+			true							   // Test ledge illegal slope.
+		};
+		constexpr auto VERTICAL_OFFSET = CLICK(1);
+
+		// Get water tread vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			// TODO: State dispatch.
+			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND);
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	const std::optional<ClimbContextData> GetWaterTreadVault1StepDownToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																						  const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	 // Ledge floor-to-ceil range.
+			-(int)CLICK(0.6f),				 // Edge-to-ceil height lower bound.
+			true,							 // Test edge front.
+			false,							 // Test swamp depth.
+			true,							 // Test ledge heights.
+			true							 // Test ledge illegal slope.
+		};
+		constexpr auto VERTICAL_OFFSET = -CLICK(1);
+
+		// Extended crawl moveset disabled; return nullopt.
+		if (!g_GameFlow->HasCrawlExtended())
+			return std::nullopt;
+
+		// Get water tread vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_DOWN_TO_CROUCH;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			// TODO: State dispatch.
+			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_DOWN_TO_CROUCH);
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	const std::optional<ClimbContextData> GetWaterTreadVault0StepsToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					   const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		 // Ledge floor-to-ceil range.
+			-(int)CLICK(0.6f),					 // Edge-to-ceil height lower bound.
+			true,								 // Test edge front.
+			false,								 // Test swamp depth.
+			true,								 // Test ledge heights.
+			true								 // Test ledge illegal slope.
+		};
+
+		// Extended crawl moveset disabled; return nullopt.
+		if (!g_GameFlow->HasCrawlExtended())
+			return std::nullopt;
+
+		// Get water tread vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			//context.TargetStateID = LS_WATER_TREAD_VAULT_0_STEPS_TO_CROUCH;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			// TODO: State dispatch.
+			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_0_STEPS_TO_CROUCH);
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	const std::optional<ClimbContextData> GetWaterTreadVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																						const std::vector<AttractorCollisionData>& attracColls)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			-CLICK(1), -STEPUP_HEIGHT,		// Edge height bounds.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Ledge floor-to-ceil range.
+			-(int)CLICK(0.6f),				// Edge-to-ceil height lower bound.
+			true,							// Test edge front.
+			false,							// Test swamp depth.
+			true,							// Test ledge heights.
+			true							// Test ledge illegal slope.
+		};
+		constexpr auto VERTICAL_OFFSET = CLICK(1);
+
+		// Extended crawl moveset disabled; return nullopt.
+		if (!g_GameFlow->HasCrawlExtended())
+			return std::nullopt;
+
+		// Get water tread vault climb context.
+		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttracPtr = attracColl->AttracPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_UP_TO_CROUCH;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			// TODO: State dispatch.
+			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_UP_TO_CROUCH);
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	// TODO: Refactor.
 	bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
@@ -1960,144 +2208,6 @@ namespace TEN::Entities::Player
 		return true;
 	}
 
-	bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
-	{
-		auto* player = GetLaraInfo(item);
-
-		if (coll->CollisionType != CT_FRONT || !IsHeld(In::Action))
-			return false;
-
-		if (player->Control.HandStatus != HandStatus::Free &&
-			(player->Control.HandStatus != HandStatus::WeaponReady || player->Control.Weapon.GunType != LaraWeaponType::Flare))
-		{
-			return false;
-		}
-
-		if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
-			return false;
-
-		int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
-		if (coll->Front.Bridge == NO_ITEM &&
-			(frontFloor <= -CLICK(2) ||
-				frontFloor > CLICK(1.25f) - 4))
-		{
-			return false;
-		}
-
-		// Extra bridge check.
-		/*if (coll->Front.Bridge != NO_ITEM)
-		{
-		int bridgeBorder = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
-
-		frontFloor = bridgeBorder - CLICK(0.5f);
-		if (frontFloor <= -CLICK(2) ||
-		frontFloor > CLICK(1.25f) - 4)
-		{
-		return false;
-		}
-		}*/
-
-		// TODO: Reference attractor for water exit.
-
-		TestForObjectOnLedge(item, coll);
-		if (coll->HitStatic)
-			return false;
-
-		auto probe = GetCollision(item, coll->Setup.ForwardAngle, CLICK(2), -CLICK(1));
-		int headroom = probe.Position.Floor - probe.Position.Ceiling;
-
-		if (frontFloor <= -CLICK(1))
-		{
-			if (headroom < LARA_HEIGHT)
-			{
-				if (g_GameFlow->HasCrawlExtended())
-					SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
-				else
-					return false;
-			}
-			else
-				SetAnimation(item, LA_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND);
-		}
-		else if (frontFloor > CLICK(0.5f))
-		{
-			if (headroom < LARA_HEIGHT)
-			{
-				if (g_GameFlow->HasCrawlExtended())
-					SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
-				else
-					return false;
-			}
-			else
-				SetAnimation(item, LA_ONWATER_TO_STAND_M1_STEP);
-		}
-
-		else
-		{
-			if (headroom < LARA_HEIGHT)
-			{
-				if (g_GameFlow->HasCrawlExtended())
-					SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
-				else
-					return false;
-			}
-			else
-				SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
-		}
-
-		UpdateLaraRoom(item, -LARA_HEIGHT / 2);
-		AlignEntityToEdge(item, coll, 1.7f);
-
-		item->Pose.Position.y += frontFloor - 5;
-		item->Animation.ActiveState = LS_WATER_TREAD_VAULT;
-		item->Animation.IsAirborne = false;
-		item->Animation.Velocity.z = 0;
-		item->Animation.Velocity.y = 0;
-		player->Control.TurnRate = 0;
-		player->Control.HandStatus = HandStatus::Busy;
-		player->Control.WaterStatus = WaterStatus::Dry;
-		return true;
-	}
-
-	std::optional<ClimbContextData> GetWaterTreadVault1StepUpToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-		const std::vector<AttractorCollisionData>& attracColls)
-	{
-		constexpr auto SETUP = ClimbSetupData
-		{
-			-CLICK(1), -STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,  // Ledge floor-to-ceil range.
-			-CLICK(1),				   // Edge-to-ceil height lower bound.
-			true,					   // Test edge front.
-			false,					   // Test swamp depth.
-			true,					   // Test ledge heights.
-			true					   // Test ledge illegal slope.
-		};
-		constexpr auto VERTICAL_OFFSET = CLICK(1);
-
-		// Get standing vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
-		if (attracColl.has_value())
-		{
-			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND;
-			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
-
-			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_WATER_TREAD_VAULT_1_STEP_UP_TO_STAND);
-
-			return context;
-		}
-
-		return std::nullopt;
-	}
-
-	// TODO
 	std::optional<ClimbContextData> GetWaterTreadClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
@@ -2113,13 +2223,52 @@ namespace TEN::Entities::Player
 
 		auto context = std::optional<ClimbContextData>();
 
+		// 1) Water tread vault 1 step down to crouch.
+		context = GetWaterTreadVault1StepDownToCrouchClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
+		// 2) Water tread vault 1 step down to stand.
+		context = GetWaterTreadVault1StepDownToStandClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
+		// 3) Water tread vault 0 steps to crouch.
+		context = GetWaterTreadVault0StepsToCrouchClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+		// 4) Water tread vault 0 steps to stand.
+		context = GetWaterTreadVault0StepsToStandClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+		
+		// 5) Water tread vault up 1 step up to crouch.
+		context = GetWaterTreadVault1StepUpToCrouchClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+		
+		// 6) Water tread vault up 1 step up to stand.
 		context = GetWaterTreadVault1StepUpToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			//if (HasStateDispatch(&item, context->TargetStateID))
-			return context;
+				return context;
 		}
-
 
 		// No valid edge attractor collision; return nullopt.
 		return std::nullopt;
