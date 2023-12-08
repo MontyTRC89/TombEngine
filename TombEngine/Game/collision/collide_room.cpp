@@ -24,17 +24,6 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 	coll->Shift = Vector3i::Zero;
 }
 
-void AlignEntityToEdge(ItemInfo* item, CollisionInfo* coll, float radiusCoeff, bool doSnap)
-{
-	auto& player = GetLaraInfo(*item);
-
-	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * radiusCoeff));
-	player.Context.OrientOffset = EulerAngles(0, coll->NearestLedgeAngle, 0);
-
-	if (doSnap)
-		item->Pose.Orientation = player.Context.OrientOffset;
-}
-
 // TODO
 void SnapEntityToGrid(ItemInfo* item, CollisionInfo* coll)
 {

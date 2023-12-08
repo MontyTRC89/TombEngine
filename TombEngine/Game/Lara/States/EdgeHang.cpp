@@ -474,5 +474,7 @@ namespace TEN::Entities::Player
 		// Setup
 		coll->Setup.EnableObjectPush = false;
 		coll->Setup.EnableSpasm = false;
+
+		HandlePlayerAttractorParent(*item, *coll);
 	}
 }

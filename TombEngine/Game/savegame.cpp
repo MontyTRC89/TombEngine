@@ -447,6 +447,34 @@ bool SaveGame::Save(int slot)
 	weaponControl.add_num_shots_fired(Lara.Control.Weapon.NumShotsFired);
 	auto weaponControlOffset = weaponControl.Finish();
 
+	// TODO: Saving attractors.
+	if (Lara.Context.Attractor.Ptr != nullptr)
+	{
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
+		{
+			const auto& room = g_Level.Rooms[i];
+			for (const auto& attrac : room.Attractors)
+			{
+				if (&attrac == Lara.Context.Attractor.Ptr)
+				{
+					// Save room attractor.
+				}
+			}
+		}
+
+		for (int i = 0; i < g_Level.Items.size(); i++)
+		{
+			const auto& item = g_Level.Items[i];
+			if (item.Attractor.has_value())
+			{
+				if (&*item.Attractor == Lara.Context.Attractor.Ptr)
+				{
+					// Save bridge attractor.
+				}
+			}
+		}
+	}
+
 	Save::PlayerContextDataBuilder context{ fbb };
 	context.add_calc_jump_velocity(Lara.Context.CalcJumpVelocity);
 	context.add_interacted_item_number(Lara.Context.InteractedItem);

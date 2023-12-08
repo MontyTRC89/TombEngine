@@ -96,6 +96,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_HANG_TO_STAND ||
 		item->Animation.AnimNumber == LA_HANG_TO_CROUCH)
 	{
+		HandlePlayerAttractorParent(*item, *coll);
 		item->Pose.Orientation.Lerp(Lara.Context.OrientOffset, 0.25f);
 	}
 }

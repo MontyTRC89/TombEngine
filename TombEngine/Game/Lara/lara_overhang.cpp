@@ -1134,7 +1134,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 				{
 					if (item->Animation.TargetState != LS_LADDER_IDLE)
 					{
-						AlignEntityToEdge(item, coll);
+						//AlignEntityToEdge(item, coll);
 						item->Animation.TargetState = LS_LADDER_IDLE;
 					}
 				}

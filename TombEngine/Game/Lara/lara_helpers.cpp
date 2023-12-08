@@ -331,7 +331,7 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 	if (player.Context.Attractor.Ptr == nullptr)
 		return;
 
-	// Get attractor collision.
+	// Get parent attractor collision.
 	auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
 	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
 
