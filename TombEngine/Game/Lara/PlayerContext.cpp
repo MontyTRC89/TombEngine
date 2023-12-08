@@ -1942,7 +1942,7 @@ namespace TEN::Entities::Player
 		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 
 		// Crouch action held and extended crawl moveset enabled; return nullopt.
-		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
+		if (IsHeld(In::Crouch) && g_GameFlow->HasCrawlExtended())
 			return std::nullopt;
 
 		// Get tread water vault climb context.
@@ -1954,14 +1954,11 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND;
+			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-
-			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND);
 
 			return context;
 		}
@@ -1984,7 +1981,7 @@ namespace TEN::Entities::Player
 		};
 
 		// Crouch action held and extended crawl moveset enabled; return nullopt.
-		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
+		if (IsHeld(In::Crouch) && g_GameFlow->HasCrawlExtended())
 			return std::nullopt;
 
 		// Get tread water vault climb context.
@@ -1996,14 +1993,11 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND;
+			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-
-			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_0_STEPS_TO_STAND);
 
 			return context;
 		}
@@ -2027,7 +2021,7 @@ namespace TEN::Entities::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
 		// Crouch action held and extended crawl moveset enabled; return nullopt.
-		if (g_GameFlow->HasCrawlExtended() && IsHeld(In::Crouch))
+		if (IsHeld(In::Crouch) && g_GameFlow->HasCrawlExtended())
 			return std::nullopt;
 
 		// Get tread water vault climb context.
@@ -2039,14 +2033,11 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND;
+			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-
-			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND);
 
 			return context;
 		}
@@ -2082,14 +2073,11 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH;
+			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-
-			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH);
 
 			return context;
 		}
@@ -2124,14 +2112,11 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH;
+			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-
-			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH);
 
 			return context;
 		}
@@ -2167,14 +2152,11 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			//context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH;
+			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
-
-			// TODO: State dispatch.
-			SetAnimation(LaraItem, LA_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH);
 
 			return context;
 		}
