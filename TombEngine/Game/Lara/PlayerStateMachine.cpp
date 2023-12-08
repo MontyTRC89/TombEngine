@@ -227,6 +227,12 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_REMOVE_PUZZLE] = std::pair(lara_as_use_puzzle, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_PUSHABLE_EDGE_SLIP] = std::pair(lara_as_pushable_edge_slip, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_SPRINT_SLIDE] = std::pair(lara_as_sprint_slide, lara_col_sprint_slide);
+		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND] = std::pair(lara_as_surface_climb_out, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND] = std::pair(lara_as_surface_climb_out, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND] = std::pair(lara_as_surface_climb_out, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH] = std::pair(lara_as_surface_climb_out, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH] = std::pair(lara_as_surface_climb_out, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH] = std::pair(lara_as_surface_climb_out, lara_void_func);
 	}
 
 	void HandlePlayerBehaviorState(ItemInfo& item, CollisionInfo& coll, PlayerBehaviorStateRoutineType routineType)
