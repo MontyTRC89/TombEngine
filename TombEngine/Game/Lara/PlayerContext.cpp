@@ -2409,11 +2409,9 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// Get point collision in front of edge.
-			auto probePoint = Vector3i(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.y - CLICK(1), attracColl.Proximity.Intersection.z);
-			auto pointColl = GetCollision(
-				probePoint, attracColl.AttracPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, -coll.Setup.Radius);
+			// Get point collision in front of edge. NOTE: Vertical offset required for correct bridge collision.
+			auto point = Vector3i(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.y - CLICK(1), attracColl.Proximity.Intersection.z);
+			auto pointColl = GetCollision(point, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 5) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;
@@ -2425,6 +2423,21 @@ namespace TEN::Entities::Player
 			if (edgeToCeilHeight >= 0)
 				continue;
 
+			// Get water heights.
+			int waterHeight = GetWaterHeight(pointColl.Coordinates.x, pointColl.Coordinates.y, pointColl.Coordinates.z, pointColl.RoomNumber);
+			int waterDepth = GetWaterDepth(pointColl.Coordinates.x, pointColl.Coordinates.y, pointColl.Coordinates.z, pointColl.RoomNumber);
+
+			// 7) Test if edge is high enough from water surface (if applicable).
+			if (waterHeight != NO_HEIGHT && waterDepth != NO_HEIGHT)
+			{
+				int waterToEdgeHeight = waterHeight - attracColl.Proximity.Intersection.y;
+				if (waterToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN &&
+					waterDepth >= attracColl.Proximity.Intersection.y)
+				{
+					continue;
+				}
+			}
+
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
 			int relEdgeHeight = attracColl.Proximity.Intersection.y - vPos;
 
@@ -2433,7 +2446,7 @@ namespace TEN::Entities::Player
 			int lowerBound = isFalling ? (int)ceil(projVerticalVel) : 0;
 			int upperBound = isFalling ? 0 : (int)floor(projVerticalVel);
 
-			// 7) Test catch trajectory.
+			// 8) Test catch trajectory.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
