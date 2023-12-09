@@ -2,6 +2,7 @@
 #include "Game/collision/collide_room.h"
 
 namespace TEN::Entities::Player{ struct ClimbContextData; };
+namespace TEN::Entities::Player{ struct WaterTreadStepOutContextData; };
 enum class JumpDirection;
 enum class WaterStatus;
 struct ItemInfo;
@@ -76,6 +77,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
 void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& climbContext);
+void SetPlayerTreadWaterStepOut(ItemInfo& item, const WaterTreadStepOutContextData& stepOutContext);
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);
 void SetLaraFallBackAnimation(ItemInfo* item);

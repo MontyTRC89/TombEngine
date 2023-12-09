@@ -479,18 +479,12 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (coll->CollisionType == CT_LEFT)
 	{
-		item->Pose.Orientation.y += ANGLE(5.0f);
+		item->Pose.Orientation.y += ANGLE(3.0f);
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
-		item->Pose.Orientation.y -= ANGLE(5.0f);
+		item->Pose.Orientation.y -= ANGLE(3.0f);
 	}
-
-	auto pointColl = GetCollision(item);
-	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-
-	if ((pointColl.Position.Floor - item->Pose.Position.y) < SWIM_WATER_DEPTH)
-		TestPlayerWaterStepOut(item, coll);
 }
 
 void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)

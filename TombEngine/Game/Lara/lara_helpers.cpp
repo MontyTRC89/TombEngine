@@ -1759,6 +1759,18 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	}
 }
 
+void SetPlayerTreadWaterStepOut(ItemInfo& item, const WaterTreadStepOutContextData& stepOutContext)
+{
+	auto& player = GetLaraInfo(item);
+
+	ResetPlayerLean(&item);
+	SetAnimation(item, stepOutContext.TargetStateID); // TODO
+	item.Pose.Position.y = stepOutContext.FloorHeight;
+	item.Animation.Velocity = Vector3::Zero;
+	item.Animation.IsAirborne = false;
+	player.Control.WaterStatus = WaterStatus::Wade;
+}
+
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
 	// Avoid clearing forward velocity when hitting the ground running.

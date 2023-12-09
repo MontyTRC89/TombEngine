@@ -100,4 +100,10 @@ namespace TEN::Entities::Player
 
 		bool TestIllegalSlope = false;
 	};
+
+	struct WaterTreadStepOutContextData
+	{
+		int FloorHeight	  = 0;
+		int TargetStateID = 0;
+	};
 }

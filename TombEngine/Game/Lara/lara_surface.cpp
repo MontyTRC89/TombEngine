@@ -68,6 +68,14 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	if (stepOutContext.has_value())
+	{
+		//item->Animation.TargetState = stepOutContext->TargetStateID;
+		SetPlayerTreadWaterStepOut(*item, *stepOutContext);
+		return;
+	}
+
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
@@ -143,6 +151,14 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	if (stepOutContext.has_value())
+	{
+		//item->Animation.TargetState = stepOutContext->TargetStateID;
+		SetPlayerTreadWaterStepOut(*item, *stepOutContext);
+		return;
+	}
+
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
@@ -180,7 +196,6 @@ void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
-	//TestLaraWaterClimbOut(item, coll);
 	TestLaraLadderClimbOut(item, coll);
 }
 
@@ -195,6 +210,14 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_WATER_DEATH;
+		return;
+	}
+
+	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	if (stepOutContext.has_value())
+	{
+		//item->Animation.TargetState = stepOutContext->TargetStateID;
+		SetPlayerTreadWaterStepOut(*item, *stepOutContext);
 		return;
 	}
 
@@ -239,6 +262,14 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	if (stepOutContext.has_value())
+	{
+		//item->Animation.TargetState = stepOutContext->TargetStateID;
+		SetPlayerTreadWaterStepOut(*item, *stepOutContext);
+		return;
+	}
+
 	if (!IsHeld(In::Walk))	// WALK locks orientation.
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
@@ -277,6 +308,14 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_WATER_DEATH;
+		return;
+	}
+
+	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	if (stepOutContext.has_value())
+	{
+		//item->Animation.TargetState = stepOutContext->TargetStateID;
+		SetPlayerTreadWaterStepOut(*item, *stepOutContext);
 		return;
 	}
 

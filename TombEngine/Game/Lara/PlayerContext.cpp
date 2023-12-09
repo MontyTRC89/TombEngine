@@ -2179,43 +2179,6 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Refactor.
-	bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
-	{
-		auto& player = GetLaraInfo(*item);
-
-		// Get point collision.
-		auto pointColl = GetCollision(item);
-		int vPos = item->Pose.Position.y;
-
-		if (coll->CollisionType == CT_FRONT ||
-			pointColl.Position.FloorSlope ||
-			(pointColl.Position.Floor - vPos) <= 0)
-		{
-			return false;
-		}
-
-		if ((pointColl.Position.Floor - vPos) >= -CLICK(0.5f))
-		{
-			SetAnimation(item, LA_STAND_IDLE);
-		}
-		else
-		{
-			SetAnimation(item, LA_ONWATER_TO_WADE_1_STEP);
-			item->Animation.TargetState = LS_IDLE;
-		}
-
-		item->Pose.Position.y = pointColl.Position.Floor;
-		UpdateLaraRoom(item, -(STEPUP_HEIGHT - 3));
-
-		ResetPlayerLean(item);
-		item->Animation.Velocity = Vector3::Zero;
-		item->Animation.IsAirborne = false;
-		player.Control.WaterStatus = WaterStatus::Wade;
-
-		return true;
-	}
-
 	std::optional<ClimbContextData> GetTreadWaterClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
@@ -2281,6 +2244,31 @@ namespace TEN::Entities::Player
 		
 		// No valid edge attractor collision; return nullopt.
 		return std::nullopt;
+	}
+
+	std::optional<WaterTreadStepOutContextData> GetPlayerTreadWaterStepOutContext(const ItemInfo& item)
+	{
+		auto& player = GetLaraInfo(item);
+
+		// Get point collision.
+		auto pointColl = GetCollision(item);
+		int vPos = item.Pose.Position.y;
+
+		// Assess water height.
+		if ((pointColl.Position.Floor - item.Pose.Position.y) >= SWIM_WATER_DEPTH)
+			return std::nullopt;
+
+		if ((pointColl.Position.Floor - vPos) <= 0)
+			return std::nullopt;
+
+		if ((pointColl.Position.Floor - vPos) >= CLICK(1))
+		{
+			return WaterTreadStepOutContextData{ pointColl.Position.Floor, LA_STAND_IDLE };
+		}
+		else
+		{
+			return WaterTreadStepOutContextData{ pointColl.Position.Floor, LA_ONWATER_TO_WADE_1_STEP };
+		}
 	}
 
 	// TODO
@@ -2440,8 +2428,8 @@ namespace TEN::Entities::Player
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
 			int relEdgeHeight = attracColl.Proximity.Intersection.y - vPos;
 
-			bool isFalling = (item.Animation.Velocity.y >= 0.0f);
 			float projVerticalVel = item.Animation.Velocity.y + GetEffectiveGravity(item.Animation.Velocity.y);
+			bool isFalling = (projVerticalVel >= 0.0f);
 			int lowerBound = isFalling ? (int)ceil(projVerticalVel) : 0;
 			int upperBound = isFalling ? 0 : (int)floor(projVerticalVel);
 

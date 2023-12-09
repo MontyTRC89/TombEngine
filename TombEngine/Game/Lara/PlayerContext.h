@@ -149,14 +149,12 @@ namespace TEN::Entities::Player
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Context data getters
-	std::optional<ClimbContextData>			   GetStandingClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>			   GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>			   GetTreadWaterClimbContext(ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>			   GetSafeEdgeDescentClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>			   GetCrawlEdgeDescentClimbContext(ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
-	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
-
-	// TEMP
-	bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll);
+	std::optional<ClimbContextData>				GetStandingClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>				GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>				GetTreadWaterClimbContext(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<WaterTreadStepOutContextData> GetPlayerTreadWaterStepOutContext(const ItemInfo& item);
+	std::optional<ClimbContextData>				GetSafeEdgeDescentClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>				GetCrawlEdgeDescentClimbContext(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<EdgeCatchContextData>			GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
+	std::optional<MonkeySwingCatchContextData>	GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 }
