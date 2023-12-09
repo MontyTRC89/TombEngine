@@ -1,13 +1,13 @@
 #include "framework.h"
 #include "Game/Lara/PlayerContext.h"
 
+#include "Game/animation.h"
 #include "Game/collision/AttractorCollision.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
-#include "Game/Setup.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
@@ -2439,7 +2439,7 @@ namespace TEN::Entities::Player
 			int relEdgeHeight = attracColl.Proximity.Intersection.y - vPos;
 
 			bool isFalling = (item.Animation.Velocity.y >= 0.0f);
-			float projVerticalVel = item.Animation.Velocity.y + ((item.Animation.Velocity.y >= CLICK(0.5f)) ? 1.0f : GRAVITY);
+			float projVerticalVel = item.Animation.Velocity.y + GetEffectiveGravity(item.Animation.Velocity.y);
 			int lowerBound = isFalling ? (int)ceil(projVerticalVel) : 0;
 			int upperBound = isFalling ? 0 : (int)floor(projVerticalVel);
 
