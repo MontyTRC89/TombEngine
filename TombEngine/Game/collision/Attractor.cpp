@@ -29,12 +29,7 @@ namespace TEN::Collision::Attractor
 
 	Attractor::~Attractor()
 	{
-		// Detach player.
-		if (_attachedPlayerItemNumber != NO_ITEM)
-		{
-			auto& playerItem = g_Level.Items[_attachedPlayerItemNumber];
-			DetachPlayer(playerItem);
-		}
+		DetachAllPlayers();
 	}
 
 	AttractorType Attractor::GetType() const
@@ -180,19 +175,19 @@ namespace TEN::Collision::Attractor
 
 	void Attractor::DetachPlayer(ItemInfo& playerItem)
 	{
-		if (!playerItem.IsLara())
+		if (playerItem.Index == _attachedPlayerItemNumber)
+			_attachedPlayerItemNumber = NO_ITEM;
+	}
+
+	void Attractor::DetachAllPlayers()
+	{
+		if (_attachedPlayerItemNumber == NO_ITEM)
 			return;
 
+		auto& playerItem = g_Level.Items[_attachedPlayerItemNumber];
 		auto& player = GetLaraInfo(playerItem);
 
-		player.Context.Attractor.Ptr = nullptr;
-		player.Context.Attractor.ChainDistance = 0.0f;
-		player.Context.Attractor.RelPosOffset = Vector3::Zero;
-		player.Context.Attractor.RelOrientOffset = EulerAngles::Zero;
-		player.Context.Attractor.RelDeltaPos = Vector3::Zero;
-		player.Context.Attractor.RelDeltaOrient = EulerAngles::Zero;
-
-		_attachedPlayerItemNumber = NO_ITEM;
+		player.Context.Attractor.Detach(playerItem);
 	}
 
 	void Attractor::DrawDebug(unsigned int segmentID) const

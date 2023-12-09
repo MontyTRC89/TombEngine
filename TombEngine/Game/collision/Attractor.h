@@ -29,6 +29,8 @@ namespace TEN::Collision::Attractor
 		float				 _length		 = 0.0f;
 		BoundingBox			 _box			 = BoundingBox();
 
+		// TODO: std::set doesn't work.
+		//std::set<int> _attachedPlayerItemNumebrs = {};
 		int _attachedPlayerItemNumber = -1;
 
 	public:
@@ -57,6 +59,7 @@ namespace TEN::Collision::Attractor
 		void Update(const std::vector<Vector3>& points, int roomNumber);
 		void AttachPlayer(ItemInfo& playerItem);
 		void DetachPlayer(ItemInfo& playerItem);
+		void DetachAllPlayers();
 
 		void DrawDebug(unsigned int segmentID) const;
 

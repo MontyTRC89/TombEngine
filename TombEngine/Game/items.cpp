@@ -358,14 +358,11 @@ void KillItem(short const itemNumber)
 		if (item == Lara.TargetEntity)
 			Lara.TargetEntity = nullptr;
 
+		// Clear bridges.
+		// AI target generation uses hack with making dummy item without ObjectNumber.
+		// Therefore, check must be done to prevent access violation.
 		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && Objects[item->ObjectNumber].GetFloorHeight != nullptr)
-		{
-			// AI target generation uses hack with making dummy item without ObjectNumber.
-			// Therefore, check must be done to prevent access violation.
 			UpdateBridgeItem(*item, true);
-
-			item->Attractor = std::nullopt;
-		}
 
 		GameScriptHandleKilled(itemNumber, true);
 

@@ -67,9 +67,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 		auto& bridgeItem = g_Level.Items[bridgeItemNumber];
 
-		// Kill
+		// Force detachment.
 		if (KeyMap[OIS::KeyCode::KC_V])
-			KillItem(bridgeItemNumber);
+			bridgeItem.Attractor->DetachAllPlayers();
 
 		// Z
 		if (KeyMap[OIS::KeyCode::KC_I])

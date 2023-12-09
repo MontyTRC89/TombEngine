@@ -46,6 +46,10 @@ void DoFlipMap(int group)
 		{
 			RemoveRoomFlipItems(&room);
 
+			// Detach players from attractors.
+			for (auto& attrac : room.Attractors)
+				attrac.DetachAllPlayers();
+
 			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
 
 			std::swap(room, flippedRoom);
@@ -94,7 +98,7 @@ void RemoveRoomFlipItems(ROOM_INFO* room)
 	// Run through linked items.
 	for (int itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
 	{
-		const auto& item = g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
 		if (item.Flags & ONESHOT &&
@@ -105,9 +109,12 @@ void RemoveRoomFlipItems(ROOM_INFO* room)
 			KillItem(itemNumber);
 		}
 
-		// Item is bridge; update relevant sectors.
-		if (Objects[item.ObjectNumber].GetFloorHeight != nullptr)
+		// Clear bridge.
+		if (object.GetFloorHeight != nullptr)
+		{
 			UpdateBridgeItem(item, true);
+			item.Attractor->DetachAllPlayers();
+		}
 	}
 }
 

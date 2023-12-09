@@ -23,7 +23,6 @@ namespace TEN::Entities::Player
 {
 	PlayerAttractorData::~PlayerAttractorData()
 	{
-		// TODO: Polymorphism to avoid global.
 		if (Ptr != nullptr)
 			Ptr->DetachPlayer(*LaraItem);
 	}
@@ -44,20 +43,29 @@ namespace TEN::Entities::Player
 
 	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
 	{
+		attrac.AttachPlayer(playerItem);
+
 		Ptr = &attrac;
 		ChainDistance = chainDist;
 		RelPosOffset = Vector3::Zero;
 		RelOrientOffset = EulerAngles::Zero;
 		RelDeltaPos = Vector3::Zero;
 		RelDeltaOrient = EulerAngles::Zero;
-
-		Ptr->AttachPlayer(playerItem);
 	}
 
 	void PlayerAttractorData::Detach(ItemInfo& playerItem)
 	{
-		if (Ptr != nullptr)
-			Ptr->DetachPlayer(playerItem);
+		if (Ptr == nullptr)
+			return;
+
+		Ptr->DetachPlayer(playerItem);
+
+		Ptr = nullptr;
+		ChainDistance = 0.0f;
+		RelPosOffset = Vector3::Zero;
+		RelOrientOffset = EulerAngles::Zero;
+		RelDeltaPos = Vector3::Zero;
+		RelDeltaOrient = EulerAngles::Zero;
 	};
 
 	PlayerContext::PlayerContext(const ItemInfo& item, const CollisionInfo& coll)
