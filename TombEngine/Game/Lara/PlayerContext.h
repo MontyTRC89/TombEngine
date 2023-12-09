@@ -29,6 +29,8 @@ namespace TEN::Entities::Player
 		Vector3		RelDeltaPos	   = Vector3::Zero;
 		EulerAngles RelDeltaOrient = EulerAngles::Zero;
 
+		~PlayerAttractorData();
+
 		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
 					const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
 					const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient);

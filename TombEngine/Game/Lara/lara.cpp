@@ -67,6 +67,10 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 		auto& bridgeItem = g_Level.Items[bridgeItemNumber];
 
+		// Kill
+		if (KeyMap[OIS::KeyCode::KC_V])
+			KillItem(bridgeItemNumber);
+
 		// Z
 		if (KeyMap[OIS::KeyCode::KC_I])
 		{

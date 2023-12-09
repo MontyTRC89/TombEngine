@@ -21,6 +21,13 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Player
 {
+	PlayerAttractorData::~PlayerAttractorData()
+	{
+		// TODO: Polymorphism to avoid global.
+		if (Ptr != nullptr)
+			Ptr->DetachPlayer(*LaraItem);
+	}
+
 	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
 									 const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
 									 const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient)
@@ -31,7 +38,8 @@ namespace TEN::Entities::Player
 		RelOrientOffset = relOrientOffset;
 		RelDeltaPos = relDeltaPos;
 		RelDeltaOrient = relDeltaOrient;
-		//AttracPtr->Attachlayer(playerItem);
+
+		Ptr->AttachPlayer(playerItem);
 	}
 
 	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
@@ -42,18 +50,14 @@ namespace TEN::Entities::Player
 		RelOrientOffset = EulerAngles::Zero;
 		RelDeltaPos = Vector3::Zero;
 		RelDeltaOrient = EulerAngles::Zero;
-		//AttracPtr->AttachPlayer(playerItem);
+
+		Ptr->AttachPlayer(playerItem);
 	}
 
 	void PlayerAttractorData::Detach(ItemInfo& playerItem)
 	{
-		Ptr = nullptr;
-		ChainDistance = 0.0f;
-		RelPosOffset = Vector3::Zero;
-		RelOrientOffset = EulerAngles::Zero;
-		RelDeltaPos = Vector3::Zero;
-		RelDeltaOrient = EulerAngles::Zero;
-		//AttracPtr->DetachPlayer(playerItem);
+		if (Ptr != nullptr)
+			Ptr->DetachPlayer(playerItem);
 	};
 
 	PlayerContext::PlayerContext(const ItemInfo& item, const CollisionInfo& coll)

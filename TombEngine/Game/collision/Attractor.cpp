@@ -5,6 +5,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer11.h"
 
@@ -17,7 +18,7 @@ namespace TEN::Collision::Attractor
 	Attractor::Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
 	{
 		assertion(!points.empty(), "Attempted to initialize invalid attractor.");
-
+		
 		_type = type;
 		_points = points;
 		_roomNumber = roomNumber;
@@ -26,20 +27,14 @@ namespace TEN::Collision::Attractor
 		CacheBox();
 	}
 
-	// TODO
 	Attractor::~Attractor()
 	{
-		// Dereference current attractor held by players.
-		/*for (auto& [itemNumber, itemPtr] : _attachedPlayers)
+		// Detach player.
+		if (_attachedPlayerItemNumber != NO_ITEM)
 		{
-			auto& player = GetLaraInfo(*itemPtr);
-
-			if (player.Context.HandsAttractor.AttracPtr == this)
-				player.Context.HandsAttractor.AttracPtr = nullptr;
-
-			if (player.Context.VaultAttractor.AttracPtr == this)
-				player.Context.VaultAttractor.AttracPtr = nullptr;
-		}*/
+			auto& playerItem = g_Level.Items[_attachedPlayerItemNumber];
+			DetachPlayer(playerItem);
+		}
 	}
 
 	AttractorType Attractor::GetType() const
@@ -175,22 +170,29 @@ namespace TEN::Collision::Attractor
 		CacheBox();
 	}
 
-	// TODO
 	void Attractor::AttachPlayer(ItemInfo& playerItem)
 	{
 		if (!playerItem.IsLara())
 			return;
 
-		//_attachedPlayers.insert({ playerItem.Index, &playerItem });
+		_attachedPlayerItemNumber = playerItem.Index;
 	}
 
-	// TODO
 	void Attractor::DetachPlayer(ItemInfo& playerItem)
 	{
 		if (!playerItem.IsLara())
 			return;
 
-		//_attachedPlayers.erase(playerItem.Index);
+		auto& player = GetLaraInfo(playerItem);
+
+		player.Context.Attractor.Ptr = nullptr;
+		player.Context.Attractor.ChainDistance = 0.0f;
+		player.Context.Attractor.RelPosOffset = Vector3::Zero;
+		player.Context.Attractor.RelOrientOffset = EulerAngles::Zero;
+		player.Context.Attractor.RelDeltaPos = Vector3::Zero;
+		player.Context.Attractor.RelDeltaOrient = EulerAngles::Zero;
+
+		_attachedPlayerItemNumber = NO_ITEM;
 	}
 
 	void Attractor::DrawDebug(unsigned int segmentID) const

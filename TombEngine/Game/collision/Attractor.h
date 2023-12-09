@@ -29,8 +29,7 @@ namespace TEN::Collision::Attractor
 		float				 _length		 = 0.0f;
 		BoundingBox			 _box			 = BoundingBox();
 
-		// TODO: Crashes on init.
-		//std::unordered_map<int, ItemInfo*> _attachedPlayers = {}; // Key = item number
+		int _attachedPlayerItemNumber = -1;
 
 	public:
 		// Constructors
