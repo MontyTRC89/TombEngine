@@ -2378,7 +2378,6 @@ namespace TEN::Entities::Player
 
 	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto ATTRAC_PROBE_FORWARD		= BLOCK(1 / (float)BLOCK(1));
 		constexpr auto ATTRAC_DETECT_RADIUS		= BLOCK(0.5f);
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
 
