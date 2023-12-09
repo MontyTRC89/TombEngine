@@ -93,6 +93,10 @@ struct PlayerStatusData;
 struct PlayerStatusDataBuilder;
 struct PlayerStatusDataT;
 
+struct PlayerAttractorData;
+struct PlayerAttractorDataBuilder;
+struct PlayerAttractorDataT;
+
 struct PlayerContextData;
 struct PlayerContextDataBuilder;
 struct PlayerContextDataT;
@@ -3899,8 +3903,144 @@ struct PlayerStatusData::Traits {
 
 flatbuffers::Offset<PlayerStatusData> CreatePlayerStatusData(flatbuffers::FlatBufferBuilder &_fbb, const PlayerStatusDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct PlayerAttractorDataT : public flatbuffers::NativeTable {
+  typedef PlayerAttractorData TableType;
+  int32_t bridge_item_number = 0;
+  float chain_distance = 0.0f;
+  std::unique_ptr<TEN::Save::EulerAngles> rel_delta_orient{};
+  std::unique_ptr<TEN::Save::Vector3> rel_delta_pos{};
+  std::unique_ptr<TEN::Save::EulerAngles> rel_orient_offset{};
+  std::unique_ptr<TEN::Save::Vector3> rel_pos_offset{};
+  int32_t room_number = 0;
+  int32_t room_attrac_id = 0;
+};
+
+struct PlayerAttractorData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef PlayerAttractorDataT NativeTableType;
+  typedef PlayerAttractorDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BRIDGE_ITEM_NUMBER = 4,
+    VT_CHAIN_DISTANCE = 6,
+    VT_REL_DELTA_ORIENT = 8,
+    VT_REL_DELTA_POS = 10,
+    VT_REL_ORIENT_OFFSET = 12,
+    VT_REL_POS_OFFSET = 14,
+    VT_ROOM_NUMBER = 16,
+    VT_ROOM_ATTRAC_ID = 18
+  };
+  int32_t bridge_item_number() const {
+    return GetField<int32_t>(VT_BRIDGE_ITEM_NUMBER, 0);
+  }
+  float chain_distance() const {
+    return GetField<float>(VT_CHAIN_DISTANCE, 0.0f);
+  }
+  const TEN::Save::EulerAngles *rel_delta_orient() const {
+    return GetStruct<const TEN::Save::EulerAngles *>(VT_REL_DELTA_ORIENT);
+  }
+  const TEN::Save::Vector3 *rel_delta_pos() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_REL_DELTA_POS);
+  }
+  const TEN::Save::EulerAngles *rel_orient_offset() const {
+    return GetStruct<const TEN::Save::EulerAngles *>(VT_REL_ORIENT_OFFSET);
+  }
+  const TEN::Save::Vector3 *rel_pos_offset() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_REL_POS_OFFSET);
+  }
+  int32_t room_number() const {
+    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
+  int32_t room_attrac_id() const {
+    return GetField<int32_t>(VT_ROOM_ATTRAC_ID, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_BRIDGE_ITEM_NUMBER) &&
+           VerifyField<float>(verifier, VT_CHAIN_DISTANCE) &&
+           VerifyField<TEN::Save::EulerAngles>(verifier, VT_REL_DELTA_ORIENT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_REL_DELTA_POS) &&
+           VerifyField<TEN::Save::EulerAngles>(verifier, VT_REL_ORIENT_OFFSET) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_REL_POS_OFFSET) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_ATTRAC_ID) &&
+           verifier.EndTable();
+  }
+  PlayerAttractorDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(PlayerAttractorDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<PlayerAttractorData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const PlayerAttractorDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct PlayerAttractorDataBuilder {
+  typedef PlayerAttractorData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_bridge_item_number(int32_t bridge_item_number) {
+    fbb_.AddElement<int32_t>(PlayerAttractorData::VT_BRIDGE_ITEM_NUMBER, bridge_item_number, 0);
+  }
+  void add_chain_distance(float chain_distance) {
+    fbb_.AddElement<float>(PlayerAttractorData::VT_CHAIN_DISTANCE, chain_distance, 0.0f);
+  }
+  void add_rel_delta_orient(const TEN::Save::EulerAngles *rel_delta_orient) {
+    fbb_.AddStruct(PlayerAttractorData::VT_REL_DELTA_ORIENT, rel_delta_orient);
+  }
+  void add_rel_delta_pos(const TEN::Save::Vector3 *rel_delta_pos) {
+    fbb_.AddStruct(PlayerAttractorData::VT_REL_DELTA_POS, rel_delta_pos);
+  }
+  void add_rel_orient_offset(const TEN::Save::EulerAngles *rel_orient_offset) {
+    fbb_.AddStruct(PlayerAttractorData::VT_REL_ORIENT_OFFSET, rel_orient_offset);
+  }
+  void add_rel_pos_offset(const TEN::Save::Vector3 *rel_pos_offset) {
+    fbb_.AddStruct(PlayerAttractorData::VT_REL_POS_OFFSET, rel_pos_offset);
+  }
+  void add_room_number(int32_t room_number) {
+    fbb_.AddElement<int32_t>(PlayerAttractorData::VT_ROOM_NUMBER, room_number, 0);
+  }
+  void add_room_attrac_id(int32_t room_attrac_id) {
+    fbb_.AddElement<int32_t>(PlayerAttractorData::VT_ROOM_ATTRAC_ID, room_attrac_id, 0);
+  }
+  explicit PlayerAttractorDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<PlayerAttractorData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<PlayerAttractorData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<PlayerAttractorData> CreatePlayerAttractorData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t bridge_item_number = 0,
+    float chain_distance = 0.0f,
+    const TEN::Save::EulerAngles *rel_delta_orient = 0,
+    const TEN::Save::Vector3 *rel_delta_pos = 0,
+    const TEN::Save::EulerAngles *rel_orient_offset = 0,
+    const TEN::Save::Vector3 *rel_pos_offset = 0,
+    int32_t room_number = 0,
+    int32_t room_attrac_id = 0) {
+  PlayerAttractorDataBuilder builder_(_fbb);
+  builder_.add_room_attrac_id(room_attrac_id);
+  builder_.add_room_number(room_number);
+  builder_.add_rel_pos_offset(rel_pos_offset);
+  builder_.add_rel_orient_offset(rel_orient_offset);
+  builder_.add_rel_delta_pos(rel_delta_pos);
+  builder_.add_rel_delta_orient(rel_delta_orient);
+  builder_.add_chain_distance(chain_distance);
+  builder_.add_bridge_item_number(bridge_item_number);
+  return builder_.Finish();
+}
+
+struct PlayerAttractorData::Traits {
+  using type = PlayerAttractorData;
+  static auto constexpr Create = CreatePlayerAttractorData;
+};
+
+flatbuffers::Offset<PlayerAttractorData> CreatePlayerAttractorData(flatbuffers::FlatBufferBuilder &_fbb, const PlayerAttractorDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct PlayerContextDataT : public flatbuffers::NativeTable {
   typedef PlayerContextData TableType;
+  std::unique_ptr<TEN::Save::PlayerAttractorDataT> attractor{};
   int32_t calc_jump_velocity = 0;
   int32_t interacted_item_number = 0;
   std::unique_ptr<TEN::Save::Pose> next_corner_pose{};
@@ -3917,16 +4057,20 @@ struct PlayerContextData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef PlayerContextDataBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_CALC_JUMP_VELOCITY = 4,
-    VT_INTERACTED_ITEM_NUMBER = 6,
-    VT_NEXT_CORNER_POSE = 8,
-    VT_PROJECTED_FLOOR_HEIGHT = 10,
-    VT_TARGET_ORIENT = 12,
-    VT_VEHICLE_ITEM_NUMBER = 14,
-    VT_WATER_CURRENT_ACTIVE = 16,
-    VT_WATER_CURRENT_PULL = 18,
-    VT_WATER_SURFACE_DIST = 20
+    VT_ATTRACTOR = 4,
+    VT_CALC_JUMP_VELOCITY = 6,
+    VT_INTERACTED_ITEM_NUMBER = 8,
+    VT_NEXT_CORNER_POSE = 10,
+    VT_PROJECTED_FLOOR_HEIGHT = 12,
+    VT_TARGET_ORIENT = 14,
+    VT_VEHICLE_ITEM_NUMBER = 16,
+    VT_WATER_CURRENT_ACTIVE = 18,
+    VT_WATER_CURRENT_PULL = 20,
+    VT_WATER_SURFACE_DIST = 22
   };
+  const TEN::Save::PlayerAttractorData *attractor() const {
+    return GetPointer<const TEN::Save::PlayerAttractorData *>(VT_ATTRACTOR);
+  }
   int32_t calc_jump_velocity() const {
     return GetField<int32_t>(VT_CALC_JUMP_VELOCITY, 0);
   }
@@ -3956,6 +4100,8 @@ struct PlayerContextData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ATTRACTOR) &&
+           verifier.VerifyTable(attractor()) &&
            VerifyField<int32_t>(verifier, VT_CALC_JUMP_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_INTERACTED_ITEM_NUMBER) &&
            VerifyField<TEN::Save::Pose>(verifier, VT_NEXT_CORNER_POSE) &&
@@ -3976,6 +4122,9 @@ struct PlayerContextDataBuilder {
   typedef PlayerContextData Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_attractor(flatbuffers::Offset<TEN::Save::PlayerAttractorData> attractor) {
+    fbb_.AddOffset(PlayerContextData::VT_ATTRACTOR, attractor);
+  }
   void add_calc_jump_velocity(int32_t calc_jump_velocity) {
     fbb_.AddElement<int32_t>(PlayerContextData::VT_CALC_JUMP_VELOCITY, calc_jump_velocity, 0);
   }
@@ -4016,6 +4165,7 @@ struct PlayerContextDataBuilder {
 
 inline flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<TEN::Save::PlayerAttractorData> attractor = 0,
     int32_t calc_jump_velocity = 0,
     int32_t interacted_item_number = 0,
     const TEN::Save::Pose *next_corner_pose = 0,
@@ -4035,6 +4185,7 @@ inline flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(
   builder_.add_next_corner_pose(next_corner_pose);
   builder_.add_interacted_item_number(interacted_item_number);
   builder_.add_calc_jump_velocity(calc_jump_velocity);
+  builder_.add_attractor(attractor);
   return builder_.Finish();
 }
 
@@ -8688,6 +8839,53 @@ inline flatbuffers::Offset<PlayerStatusData> CreatePlayerStatusData(flatbuffers:
       _stamina);
 }
 
+inline PlayerAttractorDataT *PlayerAttractorData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<PlayerAttractorDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void PlayerAttractorData::UnPackTo(PlayerAttractorDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = bridge_item_number(); _o->bridge_item_number = _e; }
+  { auto _e = chain_distance(); _o->chain_distance = _e; }
+  { auto _e = rel_delta_orient(); if (_e) _o->rel_delta_orient = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
+  { auto _e = rel_delta_pos(); if (_e) _o->rel_delta_pos = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = rel_orient_offset(); if (_e) _o->rel_orient_offset = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
+  { auto _e = rel_pos_offset(); if (_e) _o->rel_pos_offset = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = room_number(); _o->room_number = _e; }
+  { auto _e = room_attrac_id(); _o->room_attrac_id = _e; }
+}
+
+inline flatbuffers::Offset<PlayerAttractorData> PlayerAttractorData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PlayerAttractorDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatePlayerAttractorData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<PlayerAttractorData> CreatePlayerAttractorData(flatbuffers::FlatBufferBuilder &_fbb, const PlayerAttractorDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PlayerAttractorDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _bridge_item_number = _o->bridge_item_number;
+  auto _chain_distance = _o->chain_distance;
+  auto _rel_delta_orient = _o->rel_delta_orient ? _o->rel_delta_orient.get() : 0;
+  auto _rel_delta_pos = _o->rel_delta_pos ? _o->rel_delta_pos.get() : 0;
+  auto _rel_orient_offset = _o->rel_orient_offset ? _o->rel_orient_offset.get() : 0;
+  auto _rel_pos_offset = _o->rel_pos_offset ? _o->rel_pos_offset.get() : 0;
+  auto _room_number = _o->room_number;
+  auto _room_attrac_id = _o->room_attrac_id;
+  return TEN::Save::CreatePlayerAttractorData(
+      _fbb,
+      _bridge_item_number,
+      _chain_distance,
+      _rel_delta_orient,
+      _rel_delta_pos,
+      _rel_orient_offset,
+      _rel_pos_offset,
+      _room_number,
+      _room_attrac_id);
+}
+
 inline PlayerContextDataT *PlayerContextData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<PlayerContextDataT>();
   UnPackTo(_o.get(), _resolver);
@@ -8697,6 +8895,7 @@ inline PlayerContextDataT *PlayerContextData::UnPack(const flatbuffers::resolver
 inline void PlayerContextData::UnPackTo(PlayerContextDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = attractor(); if (_e) _o->attractor = std::unique_ptr<TEN::Save::PlayerAttractorDataT>(_e->UnPack(_resolver)); }
   { auto _e = calc_jump_velocity(); _o->calc_jump_velocity = _e; }
   { auto _e = interacted_item_number(); _o->interacted_item_number = _e; }
   { auto _e = next_corner_pose(); if (_e) _o->next_corner_pose = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
@@ -8716,6 +8915,7 @@ inline flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(flatbuffer
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PlayerContextDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _attractor = _o->attractor ? CreatePlayerAttractorData(_fbb, _o->attractor.get(), _rehasher) : 0;
   auto _calc_jump_velocity = _o->calc_jump_velocity;
   auto _interacted_item_number = _o->interacted_item_number;
   auto _next_corner_pose = _o->next_corner_pose ? _o->next_corner_pose.get() : 0;
@@ -8727,6 +8927,7 @@ inline flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(flatbuffer
   auto _water_surface_dist = _o->water_surface_dist;
   return TEN::Save::CreatePlayerContextData(
       _fbb,
+      _attractor,
       _calc_jump_velocity,
       _interacted_item_number,
       _next_corner_pose,

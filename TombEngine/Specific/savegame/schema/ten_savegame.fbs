@@ -262,7 +262,19 @@ table PlayerStatusData {
 	stamina: int32;
 }
 
+table PlayerAttractorData {
+	bridge_item_number: int32;
+	chain_distance: float;
+	rel_delta_orient: EulerAngles;
+	rel_delta_pos: Vector3;
+	rel_orient_offset: EulerAngles;
+	rel_pos_offset: Vector3;
+	room_number: int32;
+	room_attrac_id: int32;
+}
+
 table PlayerContextData {
+	attractor: PlayerAttractorData;
 	calc_jump_velocity: int32;
 	interacted_item_number: int32;
 	next_corner_pose: Pose;

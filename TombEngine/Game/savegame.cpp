@@ -317,6 +317,62 @@ bool SaveGame::Save(int slot)
 	subsuitVelocity.push_back(Lara.Control.Subsuit.Velocity[1]);
 	auto subsuitVelocityOffset = fbb.CreateVector(subsuitVelocity);
 
+	// Store room or bridge attractor.
+	int roomNumber = NO_ROOM;
+	int roomAttracID = -1;
+	int bridgeItemNumber = NO_ITEM;
+	if (Lara.Context.Attractor.Ptr != nullptr)
+	{
+		// Find room attractor.
+		bool hasRoomAttrac = false;
+		for (int i = 0; i < g_Level.Rooms.size(); i++)
+		{
+			if (hasRoomAttrac)
+				break;
+
+			const auto& room = g_Level.Rooms[i];
+			for (int j = 0; j < room.Attractors.size(); j++)
+			{
+				const auto& attrac = room.Attractors[j];
+				if (&attrac == Lara.Context.Attractor.Ptr)
+				{
+					roomNumber = i;
+					roomAttracID = j;
+
+					hasRoomAttrac = true;
+					break;
+				}
+			}
+		}
+
+		// Find bridge attractor.
+		if (!hasRoomAttrac)
+		{
+			for (const auto& item : g_Level.Items)
+			{
+				if (item.Attractor.has_value())
+				{
+					if (&*item.Attractor == Lara.Context.Attractor.Ptr)
+					{
+						bridgeItemNumber = item.Index;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	Save::PlayerAttractorDataBuilder playerAttractorData{ fbb };
+	playerAttractorData.add_bridge_item_number(bridgeItemNumber);
+	playerAttractorData.add_chain_distance(Lara.Context.Attractor.ChainDistance);
+	playerAttractorData.add_rel_delta_orient(&FromEulerAngles(Lara.Context.Attractor.RelDeltaOrient));
+	playerAttractorData.add_rel_delta_pos(&FromVector3(Lara.Context.Attractor.RelDeltaPos));
+	playerAttractorData.add_rel_orient_offset(&FromEulerAngles(Lara.Context.Attractor.RelOrientOffset));
+	playerAttractorData.add_rel_pos_offset(&FromVector3(Lara.Context.Attractor.RelPosOffset));
+	playerAttractorData.add_room_attrac_id(roomAttracID);
+	playerAttractorData.add_room_number(roomNumber);
+	auto playerAttractorDataOffset = playerAttractorData.Finish();
+
 	Save::HolsterInfoBuilder holsterInfo{ fbb };
 	holsterInfo.add_back_holster((int)Lara.Control.Weapon.HolsterInfo.BackHolster);
 	holsterInfo.add_left_holster((int)Lara.Control.Weapon.HolsterInfo.LeftHolster);
@@ -447,35 +503,8 @@ bool SaveGame::Save(int slot)
 	weaponControl.add_num_shots_fired(Lara.Control.Weapon.NumShotsFired);
 	auto weaponControlOffset = weaponControl.Finish();
 
-	// TODO: Saving attractors.
-	if (Lara.Context.Attractor.Ptr != nullptr)
-	{
-		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{
-			const auto& room = g_Level.Rooms[i];
-			for (const auto& attrac : room.Attractors)
-			{
-				if (&attrac == Lara.Context.Attractor.Ptr)
-				{
-					// Save room attractor.
-				}
-			}
-		}
-
-		for (int i = 0; i < g_Level.Items.size(); i++)
-		{
-			const auto& item = g_Level.Items[i];
-			if (item.Attractor.has_value())
-			{
-				if (&*item.Attractor == Lara.Context.Attractor.Ptr)
-				{
-					// Save bridge attractor.
-				}
-			}
-		}
-	}
-
 	Save::PlayerContextDataBuilder context{ fbb };
+	context.add_attractor(playerAttractorDataOffset);
 	context.add_calc_jump_velocity(Lara.Context.CalcJumpVelocity);
 	context.add_interacted_item_number(Lara.Context.InteractedItem);
 	context.add_next_corner_pose(&FromPose(Lara.Context.NextCornerPos));
@@ -1727,7 +1756,14 @@ bool SaveGame::Load(int slot)
 
 		if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8 &&
 			(item->Flags & ONESHOT))
+		{
 			item->MeshBits = 0x00100;
+		}
+
+		// TODO: Temporary.
+		// Initialize bridge attractor.
+		if (Objects[item->ObjectNumber].GetFloorHeight != nullptr)
+			item->Attractor = GenerateBridgeAttractor(*item);
 
 		// Now some post-load specific hacks for objects
 		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 && item->ObjectNumber <= ID_PUZZLE_HOLE16 &&
@@ -2065,6 +2101,28 @@ bool SaveGame::Load(int slot)
 	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
 		Lara.Effect.DripNodes[i] = s->lara()->effect()->drip_nodes()->Get(i);
 
+	int roomNumber = s->lara()->context()->attractor()->room_number();
+	int roomAttracID = s->lara()->context()->attractor()->room_attrac_id();
+	int bridgeItemNumber = s->lara()->context()->attractor()->bridge_item_number();
+
+	// Retrieve attractor pointer.
+	Attractor* attracPtr = nullptr;
+	if (roomNumber != NO_ROOM)
+	{
+		attracPtr = &g_Level.Rooms[roomNumber].Attractors[roomAttracID];
+	}
+	else if (bridgeItemNumber != NO_ITEM)
+	{
+		if (g_Level.Items[bridgeItemNumber].Attractor.has_value())
+			attracPtr = &*g_Level.Items[bridgeItemNumber].Attractor;
+	}
+
+	Lara.Context.Attractor.ChainDistance = s->lara()->context()->attractor()->chain_distance();
+	Lara.Context.Attractor.Ptr = attracPtr;
+	Lara.Context.Attractor.RelDeltaOrient = ToEulerAngles(s->lara()->context()->attractor()->rel_delta_orient());
+	Lara.Context.Attractor.RelDeltaPos = ToVector3(s->lara()->context()->attractor()->rel_delta_pos());
+	Lara.Context.Attractor.RelOrientOffset = ToEulerAngles(s->lara()->context()->attractor()->rel_orient_offset());
+	Lara.Context.Attractor.RelPosOffset = ToVector3(s->lara()->context()->attractor()->rel_pos_offset());
 	Lara.Context.CalcJumpVelocity = s->lara()->context()->calc_jump_velocity();
 	Lara.Context.WaterCurrentActive = s->lara()->context()->water_current_active();
 	Lara.Context.WaterCurrentPull.x = s->lara()->context()->water_current_pull()->x();
