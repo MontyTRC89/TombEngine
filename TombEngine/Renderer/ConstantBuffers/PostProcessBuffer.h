@@ -11,6 +11,9 @@ namespace TEN::Renderer::ConstantBuffers
 		int ViewportWidth;
 		int ViewportHeight;
 		//--
+		float EffectStrength;
+		Vector3 Padding;
+		//--
 		Vector4 SSAOKernel[64];
 	};
 }

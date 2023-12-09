@@ -96,9 +96,9 @@ namespace TEN::Scripting::View
 		return (screenRes.x / screenRes.y);
 	}
 
-	static void SetPostProcessColorEffect(PostProcessColorEffect effect)
+	static void SetPostProcessColorEffect(PostProcessColorEffect effect, TypeOrNil<float> strength)
 	{
-		g_Renderer.SetPostProcessColorEffect(effect);
+		g_Renderer.SetPostProcessColorEffect(effect, std::clamp((float)USE_IF_HAVE(float, strength, 1.0), 0.0f, 1.0f));
 	}
 
 	void Register(sol::state* state, sol::table& parent)
@@ -150,6 +150,7 @@ namespace TEN::Scripting::View
 		///Sets the post-process color effect, like sepia or monochrome.
 		//@function SetPostProcessColorEffect
 		//@tparam The View.PostProcessColorEffect value to set.
+		//@tparam float strength (default 1.0). How much the effect is strong.
 		tableView.set_function(ScriptReserved_SetPostProcessColorEffect, &SetPostProcessColorEffect);
 
 		///Enable FlyBy with specific ID

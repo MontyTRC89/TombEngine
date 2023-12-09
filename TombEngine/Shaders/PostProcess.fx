@@ -50,6 +50,8 @@ float4 PSSepia(PixelShaderInput input) : SV_Target
     output.g = dot(color.rgb, green);
     output.b = dot(color.rgb, blue);
 
+    output.rgb = lerp(color.rgb, output.rgb, EffectStrength);
+
     return float4(output, color.a);
 }
 
@@ -59,6 +61,8 @@ float4 PSMonochrome(PixelShaderInput input) : SV_Target
 
     float3 grayscale = float3(0.2125f, 0.7154f, 0.0721f);
     float3 output = dot(color.rgb, grayscale);
+
+    output.rgb = lerp(color.rgb, output.rgb, EffectStrength);
 
     return float4(output, color.a);
 }

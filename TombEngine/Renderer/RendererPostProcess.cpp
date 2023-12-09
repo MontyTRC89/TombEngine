@@ -12,6 +12,13 @@ namespace TEN::Renderer
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
+		_stPostProcessBuffer.ViewportWidth = _screenWidth;
+		_stPostProcessBuffer.ViewportHeight = _screenHeight;
+		_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
+		_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
+		_stPostProcessBuffer.EffectStrength = _postProcessColorEffectStrength;
+		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
+
 		// Common vertex shader to all fullscreen effects
 		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
 
@@ -71,19 +78,14 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);
 		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), nullptr);
 
-		_stPostProcessBuffer.ViewportWidth = _screenWidth;
-		_stPostProcessBuffer.ViewportHeight = _screenHeight;
-		_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
-		_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
-		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
-
 		BindTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 
 		DrawTriangles(3, 0);
 	}
 
-	void Renderer::SetPostProcessColorEffect(PostProcessColorEffect colorScheme)
+	void Renderer::SetPostProcessColorEffect(PostProcessColorEffect colorScheme, float strength)
 	{
 		_postProcessColorEffect = colorScheme;
+		_postProcessColorEffectStrength = strength;
 	}
 }

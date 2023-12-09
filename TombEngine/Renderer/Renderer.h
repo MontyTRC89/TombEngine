@@ -342,6 +342,7 @@ namespace TEN::Renderer
 
 		// Post process
 		PostProcessColorEffect _postProcessColorEffect = PostProcessColorEffect::Normal;
+		float _postProcessColorEffectStrength = 1.0f;
 		VertexBuffer<PostProcessVertex> _fullscreenTriangleVertexBuffer;
 		ComPtr<ID3D11InputLayout> _fullscreenTriangleInputLayout = nullptr;
 		ComPtr<ID3D11VertexShader> _vsPostProcess;
@@ -625,7 +626,7 @@ namespace TEN::Renderer
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 							  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);
-		void SetPostProcessColorEffect(PostProcessColorEffect colorScheme);
+		void SetPostProcessColorEffect(PostProcessColorEffect colorEffect, float strength);
 	};
 
 	extern Renderer g_Renderer;
