@@ -30,8 +30,8 @@ namespace TEN::Renderer::ConstantBuffers
 		unsigned int CameraUnderwater;
 		int Emisphere;
 		//--
-		int SSAO;
-		int SSAOExponent;
+		int AmbientOcclusion;
+		int AmbientOcclusionExponent;
 		float AspectRatio;
 		float TanHalfFOV;
 		//--

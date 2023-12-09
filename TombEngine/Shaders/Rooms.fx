@@ -132,13 +132,13 @@ PixelShaderOutput PS(PixelShaderInput input)
 	bool doLights = true;
 
 	float occlusion = 1.0f;
-	if (SSAO == 1)
+	if (AmbientOcclusion == 1)
 	{
 		float2 samplePosition;
 		samplePosition = input.PositionCopy.xy / input.PositionCopy.w;               // perspective divide
 		samplePosition = samplePosition * 0.5f + 0.5f; // transform to range 0.0 - 1.0  
 		samplePosition.y = 1.0f - samplePosition.y;
-		occlusion = pow(SSAOTexture.Sample(SSAOSampler, samplePosition).x, SSAOExponent);
+		occlusion = pow(SSAOTexture.Sample(SSAOSampler, samplePosition).x, AmbientOcclusionExponent);
 	}
 
 	if (CastShadows)

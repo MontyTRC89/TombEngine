@@ -1388,7 +1388,7 @@ namespace TEN::Renderer
 		PrepareStreamers(view);
 		PrepareLaserBarriers(view);
 
-		// Sprites grouped in buckets for instancing. Non-commutative sprites collected for later stage.
+		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected for a later stage.
 		SortAndPrepareSprites(view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
@@ -1461,8 +1461,8 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
-		cameraConstantBuffer.SSAO = g_Configuration.EnableAmbientOcclusion ? 1 : 0;
-		cameraConstantBuffer.SSAOExponent = 2;
+		cameraConstantBuffer.AmbientOcclusion = g_Configuration.EnableAmbientOcclusion ? 1 : 0;
+		cameraConstantBuffer.AmbientOcclusionExponent = 2;
 
 		// Set fog bulbs.
 		cameraConstantBuffer.NumFogBulbs = (int)view.FogBulbsToDraw.size();
@@ -1505,8 +1505,11 @@ namespace TEN::Renderer
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
 
-		// Calculate SSAO
-		CalculateSSAO(view);
+		// Calculate ambient occlusion
+		if (g_Configuration.EnableAmbientOcclusion)
+		{
+			CalculateSSAO(view);
+		}
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -1517,10 +1520,7 @@ namespace TEN::Renderer
 
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
-		 
-		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
-		BindConstantBufferPS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
-
+		
 		// Bind main render target again.
 		// At this point, main depth buffer is already filled and avoids overdraw in following steps.
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
@@ -1553,7 +1553,8 @@ namespace TEN::Renderer
 		DrawSprites(view, RendererPass::Additive);
 
 		// Collect all non-commutative transparent faces.
-		// NOTE: Bats, ratsa and similar objects are so small that artifacts are not noticeable, so they are drawn in previous steps.
+		// NOTE: Bats, rats and similar objects are so small that artifacts are not noticeable, so they are drawn in previous steps.
+		// NOTE 2: Sorted sprites are already collected at the beginning of the frame.
 		DrawRooms(view, RendererPass::CollectTransparentFaces);
 		DrawItems(view, RendererPass::CollectTransparentFaces);
 		DrawStatics(view, RendererPass::CollectTransparentFaces);
