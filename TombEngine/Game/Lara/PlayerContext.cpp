@@ -796,8 +796,10 @@ namespace TEN::Entities::Player
 
 	bool CanLand(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		float projVerticalVel = item.Animation.Velocity.y + GetEffectiveGravity(item.Animation.Velocity.y);
+
 		// 1) Check airborne status and vertical velocity.
-		if (!item.Animation.IsAirborne || item.Animation.Velocity.y < 0.0f)
+		if (!item.Animation.IsAirborne || projVerticalVel < 0.0f)
 			return false;
 
 		// 2) Check for swamp.
@@ -809,7 +811,6 @@ namespace TEN::Entities::Player
 		int vPos = item.Pose.Position.y;
 
 		// 3) Assess point collision.
-		float projVerticalVel = item.Animation.Velocity.y + GetEffectiveGravity(item.Animation.Velocity.y);
 		if ((pointColl.Position.Floor - vPos) <= projVerticalVel) // Floor height is above projected vertical position.
 			return true;
 
