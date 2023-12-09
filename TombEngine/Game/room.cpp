@@ -34,73 +34,29 @@ bool ROOM_INFO::Active() const
 		   ( FlipStats[flipNumber] && flippedRoom == index);
 }
 
-void DoFlipMap(int group)
-{
-	// Run through rooms.
-	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
-	{
-		auto& room = g_Level.Rooms[roomNumber];
-
-		// Handle flipmap.
-		if (room.flippedRoom >= 0 && room.flipNumber == group)
-		{
-			RemoveRoomFlipItems(&room);
-
-			// Detach players from attractors.
-			for (auto& attrac : room.Attractors)
-				attrac.DetachAllPlayers();
-
-			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
-
-			std::swap(room, flippedRoom);
-
-			room.flippedRoom = flippedRoom.flippedRoom;
-			flippedRoom.flippedRoom = NO_ROOM;
-
-			room.itemNumber = flippedRoom.itemNumber;
-			room.fxNumber = flippedRoom.fxNumber;
-
-			AddRoomFlipItems(&room);
-
-			g_Renderer.FlipRooms(roomNumber, room.flippedRoom);
-
-			for (auto& sector : room.floor)
-				sector.RoomNumber = roomNumber;
-
-			for (auto& sector : flippedRoom.floor)
-				sector.RoomNumber = room.flippedRoom;
-		}
-	}
-
-	FlipStatus =
-	FlipStats[group] = !FlipStats[group];
-
-	for (auto& creature : ActiveCreatures)
-		creature->LOT.TargetBox = NO_BOX;
-}
-
-void AddRoomFlipItems(ROOM_INFO* room)
+static void AddRoomFlipItems(const ROOM_INFO& room)
 {
 	// Run through linked items.
-	for (int itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	for (int itemNumber = room.itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
-		// Item is bridge; update relevant sectors.
+		// Add bridges.
 		if (object.GetFloorHeight != nullptr)
 			UpdateBridgeItem(item);
 	}
 }
 
-void RemoveRoomFlipItems(ROOM_INFO* room)
+static void RemoveRoomFlipItems(const ROOM_INFO& room)
 {
 	// Run through linked items.
-	for (int itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	for (int itemNumber = room.itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
 	{
-		auto& item = g_Level.Items[itemNumber];
+		const auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
+		// Kill item.
 		if (item.Flags & ONESHOT &&
 			item.HitPoints != NOT_TARGETABLE &&
 			item.HitPoints <= 0 &&
@@ -116,6 +72,52 @@ void RemoveRoomFlipItems(ROOM_INFO* room)
 			item.Attractor->DetachAllPlayers();
 		}
 	}
+}
+
+void DoFlipMap(int group)
+{
+	// Run through rooms.
+	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
+	{
+		auto& room = g_Level.Rooms[roomNumber];
+
+		// Handle flipmap.
+		if (room.flippedRoom >= 0 && room.flipNumber == group)
+		{
+			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
+
+			RemoveRoomFlipItems(room);
+
+			// Detach players from attractors.
+			for (auto& attrac : room.Attractors)
+				attrac.DetachAllPlayers();
+
+			// Swap rooms.
+			std::swap(room, flippedRoom);
+			room.flippedRoom = flippedRoom.flippedRoom;
+			flippedRoom.flippedRoom = NO_ROOM;
+			room.itemNumber = flippedRoom.itemNumber;
+			room.fxNumber = flippedRoom.fxNumber;
+
+			AddRoomFlipItems(room);
+
+			g_Renderer.FlipRooms(roomNumber, room.flippedRoom);
+
+			// Update active room sectors.
+			for (auto& sector : room.floor)
+				sector.RoomNumber = roomNumber;
+
+			// Update flipped room sectors.
+			for (auto& sector : flippedRoom.floor)
+				sector.RoomNumber = room.flippedRoom;
+		}
+	}
+
+	FlipStatus =
+	FlipStats[group] = !FlipStats[group];
+
+	for (auto& creature : ActiveCreatures)
+		creature->LOT.TargetBox = NO_BOX;
 }
 
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID)
