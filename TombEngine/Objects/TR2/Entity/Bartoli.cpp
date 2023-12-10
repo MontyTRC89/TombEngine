@@ -67,7 +67,10 @@ namespace TEN::Entities::Creatures::TR2
 					return;
 			}
 
-			transformObjectID = ID_DRAGON_FRONT;
+			if (item.ItemFlags[0] == 0)
+				transformObjectID = ID_DRAGON_FRONT;
+			else
+				transformObjectID = item.ItemFlags[0];
 		}
 
 		AnimateItem(&item);
