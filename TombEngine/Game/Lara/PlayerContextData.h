@@ -55,8 +55,8 @@ namespace TEN::Entities::Player
 		int LedgeFloorToCeilHeightMax = 0;
 		int LowerEdgeToCeilBound	  = 0;
 
-		bool TestEdgeFront		   = false;
 		bool TestSwampDepth		   = false;
+		bool TestEdgeFront		   = false;
 		bool TestLedgeHeights	   = false;
 		bool TestLedgeIllegalSlope = false;
 	};

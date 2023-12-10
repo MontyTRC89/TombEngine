@@ -1336,8 +1336,9 @@ namespace TEN::Entities::Player
 			// Potential solution: probe from player's position and room. Combine player/intersect RelDeltaPos and RelPosOffset.
 			
 			// Get point collision behind edge.
-			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
-			auto pointCollBack = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
+			auto pointCollBack = GetCollision(
+				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			// 2.5) Test if relative edge height is within edge intersection bounds.
 			int relEdgeHeight = (setup.TestEdgeFront ? attracColl.Proximity.Intersection.y : pointCollBack.Position.Floor) - item.Pose.Position.y;
@@ -1353,7 +1354,9 @@ namespace TEN::Entities::Player
 				continue;
 
 			// Get point collision in front of edge.
-			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, coll.Setup.Radius);
+			auto pointCollFront = GetCollision(
+				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			// Test ledge heights (if applicable).
 			if (setup.TestLedgeHeights)
@@ -1368,15 +1371,12 @@ namespace TEN::Entities::Player
 					continue;
 				}
 
-				// TODO: Check for edge back.
 				// 2.8) Test ledge floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
 					int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - ledgePointColl.Position.Floor);
 					if (ledgeFloorToEdgeHeight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
-					{
 						continue;
-					}
 				}
 			}
 
@@ -1411,8 +1411,8 @@ namespace TEN::Entities::Player
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
 			-CLICK(1),						   // Edge-to-ceil height lower bound.
-			true,							   // Test edge front.
 			false,							   // Test swamp depth.
+			true,							   // Test edge front.
 			true,							   // Test ledge heights.
 			true							   // Test ledge illegal slope.
 		};
@@ -1447,8 +1447,8 @@ namespace TEN::Entities::Player
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			  // Ledge floor-to-ceil range.
 			-CLICK(1),							  // Edge-to-ceil height lower bound.
-			true,								  // Test edge front.
 			false,								  // Test swamp depth.
+			true,								  // Test edge front.
 			true,								  // Test ledge heights.
 			true								  // Test ledge illegal slope.
 		};
@@ -1483,8 +1483,8 @@ namespace TEN::Entities::Player
 			0, -STEPUP_HEIGHT,				// Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Ledge floor-to-ceil range.
 			-CLICK(1),						// Edge-to-ceil height lower bound.
-			true,							// Test edge front.
 			false,							// Test swamp depth.
+			true,							// Test edge front.
 			true,							// Test ledge heights.
 			true							// Test ledge illegal slope.
 		};
@@ -1519,8 +1519,8 @@ namespace TEN::Entities::Player
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	   // Ledge floor-to-ceil range.
 			-CLICK(1),						   // Edge-to-ceil height lower bound.
-			true,							   // Test edge front.
 			false,							   // Test swamp depth.
+			true,							   // Test edge front.
 			true,							   // Test ledge heights.
 			true							   // Test ledge illegal slope.
 		};
@@ -1555,8 +1555,8 @@ namespace TEN::Entities::Player
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		  // Ledge floor-to-ceil range.
 			-CLICK(1),							  // Edge-to-ceil height lower bound.
-			true,								  // Test edge front.
 			false,								  // Test swamp depth.
+			true,								  // Test edge front.
 			true,								  // Test ledge heights.
 			true								  // Test ledge illegal slope.
 		};
@@ -1594,8 +1594,8 @@ namespace TEN::Entities::Player
 			-(int)CLICK(3.5f), -(int)CLICK(7.5f), // Edge height bounds.
 			0, -MAX_HEIGHT,						  // Ledge floor-to-ceil range.
 			-(int)CLICK(1 / 256.0f),			  // Edge-to-ceil height minumum.
-			true,								  // Test edge front.
 			false,								  // Test swamp depth.
+			true,								  // Test edge front.
 			false,								  // Test ledge heights.
 			false								  // Test ledge illegal slope.
 		};
@@ -1729,8 +1729,8 @@ namespace TEN::Entities::Player
 			STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		// Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),					// Edge-to-ceil height lower bound.
-			false,								// Test edge front.
 			false,								// Test swamp depth.
+			false,								// Test edge front.
 			true,								// Test ledge heights.
 			true								// Test ledge illegal slope.
 		};
@@ -1764,8 +1764,8 @@ namespace TEN::Entities::Player
 			STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
 			-(int)CLICK(1.25f),					 // Edge-to-ceil height lower bound.
-			false,								 // Test edge front.
 			false,								 // Test swamp depth.
+			false,								 // Test edge front.
 			true,								 // Test ledge heights.
 			false								 // Test ledge illegal slope.
 		};
@@ -1799,8 +1799,8 @@ namespace TEN::Entities::Player
 			-CRAWL_STEPUP_HEIGHT, -STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		  // Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),					  // Edge-to-ceil height lower bound.
-			true,								  // Test edge front.
 			false,								  // Test swamp depth.
+			true,								  // Test edge front.
 			true,								  // Test ledge heights.
 			true								  // Test ledge illegal slope.
 		};
@@ -1836,8 +1836,8 @@ namespace TEN::Entities::Player
 			NO_LOWER_BOUND, STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,	   // Ledge floor-to-ceil range.
 			-(int)CLICK(1.25f),			   // Edge-to-ceil height lower bound.
-			false,						   // Test edge front.
 			false,						   // Test swamp depth.
+			false,						   // Test edge front.
 			true,						   // Test ledge heights.
 			false						   // Test ledge illegal slope.
 		};
@@ -1961,8 +1961,8 @@ namespace TEN::Entities::Player
 			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,		 // Ledge floor-to-ceil range.
 			-CLICK(1),						 // Edge-to-ceil height lower bound.
-			true,							 // Test edge front.
 			false,							 // Test swamp depth.
+			true,							 // Test edge front.
 			true,							 // Test ledge heights.
 			true							 // Test ledge illegal slope.
 		};
@@ -2001,8 +2001,8 @@ namespace TEN::Entities::Player
 			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
 			-CLICK(1),							 // Edge-to-ceil height lower bound.
-			true,								 // Test edge front.
 			false,								 // Test swamp depth.
+			true,								 // Test edge front.
 			true,								 // Test ledge heights.
 			true								 // Test ledge illegal slope.
 		};
@@ -2040,8 +2040,8 @@ namespace TEN::Entities::Player
 			-(int)CLICK(0.5f), -STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
 			-CLICK(1),						   // Edge-to-ceil height lower bound.
-			true,							   // Test edge front.
 			false,							   // Test swamp depth.
+			true,							   // Test edge front.
 			true,							   // Test ledge heights.
 			true							   // Test ledge illegal slope.
 		};
@@ -2080,8 +2080,8 @@ namespace TEN::Entities::Player
 			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,	 // Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),				 // Edge-to-ceil height lower bound.
-			true,							 // Test edge front.
 			false,							 // Test swamp depth.
+			true,							 // Test edge front.
 			true,							 // Test ledge heights.
 			true							 // Test ledge illegal slope.
 		};
@@ -2120,8 +2120,8 @@ namespace TEN::Entities::Player
 			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		 // Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),					 // Edge-to-ceil height lower bound.
-			true,								 // Test edge front.
 			false,								 // Test swamp depth.
+			true,								 // Test edge front.
 			true,								 // Test ledge heights.
 			true								 // Test ledge illegal slope.
 		};
@@ -2159,8 +2159,8 @@ namespace TEN::Entities::Player
 			-CLICK(1), -STEPUP_HEIGHT,		// Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT, // Ledge floor-to-ceil range.
 			-(int)CLICK(0.6f),				// Edge-to-ceil height lower bound.
-			true,							// Test edge front.
 			false,							// Test swamp depth.
+			true,							// Test edge front.
 			true,							// Test ledge heights.
 			true							// Test ledge illegal slope.
 		};
@@ -2309,8 +2309,8 @@ namespace TEN::Entities::Player
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			0, -MAX_HEIGHT,					  // Ledge floor-to-ceil range (irrelevant).
 			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
-			false,							  // Test edge front (irrelevant).
 			false,							  // Test swamp depth (irrelevant).
+			false,							  // Test edge front (irrelevant).
 			false,							  // Test ledge heights (irrelevant).
 			false							  // Test ledge illegal slope (irrelevant).
 		};
