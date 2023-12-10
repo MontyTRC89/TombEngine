@@ -617,7 +617,7 @@ void InitializeItemArray(int totalItem)
 	NextItemFree = g_Level.NumItems;
 }
 
-short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
+short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectNumber)
 {
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -625,13 +625,19 @@ short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 		auto* spawn = &g_Level.Items[itemNumber];
 
 		spawn->ObjectNumber = objectNumber;
-		spawn->RoomNumber = item->RoomNumber;
-		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
+		spawn->RoomNumber = item.RoomNumber;
+		memcpy(&spawn->Pose, &item.Pose, sizeof(Pose));
+		spawn->Model.Color = Vector4::One;
 
 		InitializeItem(itemNumber);
 
 		spawn->Status = ITEM_NOT_ACTIVE;
 		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+	}
+	else
+	{
+		TENLog("Failed to create new item.", LogLevel::Warning);
+		itemNumber = NO_ITEM;
 	}
 
 	return itemNumber;

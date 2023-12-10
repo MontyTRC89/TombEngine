@@ -196,6 +196,6 @@ int FindItem(ItemInfo* item);
 void DoDamage(ItemInfo* item, int damage);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
-short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber);
+short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectNumber);
 
 Vector3i GetNearestSectorCenter(const Vector3i& pos);
