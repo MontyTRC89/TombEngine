@@ -181,9 +181,8 @@ namespace TEN::Collision::Attractor
 		attracColls.reserve(nearbyAttracPtrs.size());
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
-			// Get collisions for each segment.
-			unsigned int segmentIDMax = std::max(int(attracPtr->GetPoints().size() - 2), 0);
-			for (unsigned int i = 0; i <= segmentIDMax; i++)
+			// Get collisions for every segment.
+			for (int i = 0; i <= std::max(0, int(attracPtr->GetPoints().size() - 2)); i++)
 			{
 				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle);
 
@@ -222,6 +221,11 @@ namespace TEN::Collision::Attractor
 		auto probePoint = pos + Vector3::Transform(relOffset, rotMatrix);
 
 		return GetAttractorCollisions(probePoint, roomNumber, headingAngle, detectRadius);
+	}
+
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, float detectRadius)
+	{
+		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, detectRadius);
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, float forward, float down, float right, float detectRadius)

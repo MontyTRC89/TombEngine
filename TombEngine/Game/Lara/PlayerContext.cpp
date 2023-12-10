@@ -1282,8 +1282,8 @@ namespace TEN::Entities::Player
 																				const ClimbSetupData& setup,
 																				const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SWAMP_DEPTH_MAX				= -CLICK(3);
-		constexpr auto LEDGE_FLOOR_HEIGHT_TOLERANCE = CLICK(1);
+		constexpr auto SWAMP_DEPTH_MAX				  = -CLICK(3);
+		constexpr auto LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX = CRAWL_STEPUP_HEIGHT;
 
 		// HACK: Offset required for proper bridge surface height detection. Floordata should be revised for proper handling.
 		constexpr auto PROBE_POINT_OFFSET = Vector3(0.0f, -CLICK(1), 0.0f);
@@ -1355,20 +1355,32 @@ namespace TEN::Entities::Player
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, coll.Setup.Radius);
 
-			// 2.7) Test ledge floor-to-ceiling height (if applicable).
+			// Test ledge heights (if applicable).
 			if (setup.TestLedgeHeights)
 			{
 				const auto& pointCollHeights = setup.TestEdgeFront ? pointCollBack.Position : pointCollFront.Position;
 
+				// 2.7) Test ledge floor-to-ceiling height.
 				int ledgeFloorToCeilHeight = abs(pointCollHeights.Ceiling - pointCollHeights.Floor);
 				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
 					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
 				{
 					continue;
 				}
+
+				// TODO: Check.
+				// 2.8) Test ledge floor-to-edge height if approaching from front.
+				if (setup.TestEdgeFront)
+				{
+					int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - pointCollHeights.Floor);
+					if (ledgeFloorToEdgeHeight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
+					{
+						continue;
+					}
+				}
 			}
 
-			// 2.8) Test for illegal slope on ledge (if applicable).
+			// 2.9) Test for illegal slope on ledge (if applicable).
 			if (setup.TestLedgeIllegalSlope)
 			{
 				if (setup.TestEdgeFront ? pointCollBack.Position.FloorSlope : pointCollFront.Position.FloorSlope)
@@ -1379,7 +1391,7 @@ namespace TEN::Entities::Player
 			auto origin = Vector3(staticPointColl.Coordinates.x, staticPointColl.Position.Floor, staticPointColl.Coordinates.z);
 
 			// TODO: Check.
-			// 2.9) Test for static object.
+			// 2.10) Test for static object.
 			auto staticLos = GetStaticObjectLos(origin, attracColl.AttracPtr->GetRoomNumber(), -Vector3::UnitY, coll.Setup.Height, false);
 			if (staticLos.has_value())
 				continue;
@@ -1651,7 +1663,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
 
 		auto context = std::optional<ClimbContextData>();
 
@@ -1894,7 +1906,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
 
 		auto context = std::optional<ClimbContextData>();
 
@@ -2190,7 +2202,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
 
 		auto context = std::optional<ClimbContextData>();
 
@@ -2315,7 +2327,7 @@ namespace TEN::Entities::Player
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 
 		// 2) Assess attractor collision.
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
 		for (const auto& attracColl : attracColls)
 		{
 			// 2.1) Check if attractor is edge type.
