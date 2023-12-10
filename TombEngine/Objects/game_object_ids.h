@@ -996,7 +996,6 @@ enum GAME_OBJECT_ID : short
 	ID_SFX_BAR_TEXTURE,
 	// NOTE: 1378 - 1379 reserved for blood effects. -- Sezz 2023.05.29
 	ID_CROSSHAIR = 1380,
-	ID_SPEEDOMETER,
 
 	ID_PANEL_BORDER = 1400,
 	ID_PANEL_MIDDLE,

@@ -324,7 +324,6 @@ namespace TEN::Entities::Vehicles
 
 			default:
 				drive = SkidooUserControl(skidooItem, laraItem, height, &pitch);
-				HandleVehicleSpeedometer(skidooItem->Animation.Velocity.z, SKIDOO_FAST_VELOCITY_MAX);
 				break;
 			}
 		}

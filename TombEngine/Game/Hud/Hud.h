@@ -1,6 +1,5 @@
 #pragma once
 #include "Game/Hud/PickupSummary.h"
-#include "Game/Hud/Speedometer.h"
 #include "Game/Hud/StatusBars.h"
 #include "Game/Hud/TargetHighlighter.h"
 
@@ -14,7 +13,6 @@ namespace TEN::Hud
 		// Members
 		StatusBarsController		StatusBars		  = {};
 		PickupSummaryController		PickupSummary	  = {};
-		SpeedometerController		Speedometer		  = {};
 		TargetHighlighterController TargetHighlighter = {};
 
 		// Utilities
