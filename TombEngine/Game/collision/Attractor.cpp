@@ -303,9 +303,12 @@ namespace TEN::Collision::Attractor
 		// Clear segment lengths.
 		_segmentLengths.clear();
 
-		// Single point exists; return early.
+		// Single point exists.
 		if (_points.size() == 1)
+		{
+			_segmentLengths.push_back(0.0f);
 			return;
+		}
 
 		// Collect segment lengths.
 		for (int i = 0; i < (_points.size() - 1); i++)
@@ -334,7 +337,7 @@ namespace TEN::Collision::Attractor
 		_box = Geometry::GetBoundingBox(_points);
 	}
 
-	Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem)
+	std::vector<Vector3> GetBridgeAttractorPoints(const ItemInfo& bridgeItem)
 	{
 		constexpr auto TILT_STEP = CLICK(1);
 
@@ -370,7 +373,7 @@ namespace TEN::Collision::Attractor
 
 		// Collect relevant points.
 		auto offset = Vector3(0.0f, tiltOffset, 0.0f);
-		auto points = std::vector<Vector3>
+		return std::vector<Vector3>
 		{
 			corners[0],
 			corners[4],
@@ -378,8 +381,11 @@ namespace TEN::Collision::Attractor
 			corners[1] + offset,
 			corners[0]
 		};
+	}
 
-		// Return bridge attractor.
+	Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem)
+	{
+		auto points = GetBridgeAttractorPoints(bridgeItem);
 		return Attractor(AttractorType::Edge, points, bridgeItem.RoomNumber);
 	}
 }

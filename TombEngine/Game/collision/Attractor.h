@@ -68,5 +68,6 @@ namespace TEN::Collision::Attractor
 		void  CacheBox();
 	};
 
-	Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem);
+	std::vector<Vector3> GetBridgeAttractorPoints(const ItemInfo& bridgeItem);
+	Attractor			 GenerateBridgeAttractor(const ItemInfo& bridgeItem);
 }

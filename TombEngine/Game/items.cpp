@@ -866,10 +866,7 @@ void UpdateAllItems()
 			if (item->Pose != prevPose)
 			{
 				if (item->Attractor.has_value())
-				{
-					auto attrac = GenerateBridgeAttractor(*item);
-					item->Attractor->Update(attrac.GetPoints(), attrac.GetRoomNumber());
-				}
+					item->Attractor->Update(GetBridgeAttractorPoints(*item), item->RoomNumber);
 			}
 
 			TestVolumes(itemNumber);
