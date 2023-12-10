@@ -166,12 +166,12 @@ GameStatus ControlPhase(int numFrames)
 
 		// Handle inventory / pause / load / save screens.
 		auto result = HandleMenuCalls(isTitle);
-		if (result != GameStatus::None)
+		if (result != GameStatus::Normal)
 			return result;
 
 		// Handle global input events.
 		result = HandleGlobalInputEvents(isTitle);
-		if (result != GameStatus::None)
+		if (result != GameStatus::Normal)
 			return result;
 
 		// Queued input actions are read again and cleared after UI 
@@ -266,7 +266,7 @@ GameStatus ControlPhase(int numFrames)
 	auto time2 = std::chrono::high_resolution_clock::now();
 	ControlPhaseTime = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 
-	return GameStatus::None;
+	return GameStatus::Normal;
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -618,7 +618,7 @@ void HandleControls(bool isTitle)
 
 GameStatus HandleMenuCalls(bool isTitle)
 {
-	auto result = GameStatus::None;
+	auto result = GameStatus::Normal;
 
 	if (isTitle || ScreenFading)
 		return result;
@@ -657,7 +657,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 			result = GameStatus::LoadGame;
 	}
 
-	if (result != GameStatus::None)
+	if (result != GameStatus::Normal)
 	{
 		StopAllSounds();
 		StopRumble();
@@ -672,7 +672,7 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
 
 	if (isTitle)
-		return GameStatus::None;
+		return GameStatus::Normal;
 
 	// Check if player dead.
 	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||
@@ -694,5 +694,5 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 		return GameStatus::LoadGame;
 	}
 
-	return GameStatus::None;
+	return GameStatus::Normal;
 }
