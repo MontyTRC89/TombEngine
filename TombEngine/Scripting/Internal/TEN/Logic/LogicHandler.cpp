@@ -5,6 +5,7 @@
 
 #include "Game/control/volume.h"
 #include "Game/effects/Electricity.h"
+#include "Game/Lara/lara.h"
 #include "Game/savegame.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -286,7 +287,7 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : nullptr);
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)LaraItem->Index);
 }
 
 /*** Attempt to find an event set and enable specified event in it.
