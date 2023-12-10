@@ -296,4 +296,45 @@ namespace TEN::Math::Geometry
 
 		return false;
 	}
+
+	bool IsPointInBox(const Vector3& point, const BoundingBox& box)
+	{
+		// Calculate box-relative point.
+		auto relPoint = box.Center - point;
+
+		// Test if point intersects box.
+		if (relPoint.x >= -box.Extents.x && relPoint.x <= box.Extents.x &&
+			relPoint.y >= -box.Extents.y && relPoint.y <= box.Extents.y &&
+			relPoint.z >= -box.Extents.z && relPoint.z <= box.Extents.z)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool IsPointInBox(const Vector3& point, const BoundingOrientedBox& box)
+	{
+		// Calculate box-relative point.
+		auto invRotMatrix = Matrix::CreateFromQuaternion(box.Orientation).Invert();
+		auto relPoint = Vector3::Transform(box.Center - point, invRotMatrix);
+
+		// Test if point intersects box.
+		if (relPoint.x >= -box.Extents.x && relPoint.x <= box.Extents.x &&
+			relPoint.y >= -box.Extents.y && relPoint.y <= box.Extents.y &&
+			relPoint.z >= -box.Extents.z && relPoint.z <= box.Extents.z)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool IsPointInSphere(const Vector3& point, const BoundingSphere& sphere)
+	{
+		float distSqr = Vector3::DistanceSquared(point, sphere.Center);
+		float radiusSqr = SQUARE(sphere.Radius);
+
+		return (distSqr <= radiusSqr);
+	}
 }

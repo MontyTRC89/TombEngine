@@ -6,6 +6,7 @@
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/Hud/Hud.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
@@ -15,6 +16,7 @@
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Effects::Streamer;
+using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -386,5 +388,11 @@ namespace TEN::Entities::Vehicles
 			vehicleItem.Index, (int)tagRight,
 			positions.second, direction, orient2D, COLOR,
 			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeRight);
+	}
+
+	void HandleVehicleSpeedometer(float vel, float velMax)
+	{
+		float value = abs(vel / velMax);
+		g_Hud.Speedometer.UpdateValue(value);
 	}
 }
