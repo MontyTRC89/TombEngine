@@ -29,9 +29,7 @@ namespace TEN::Collision::Attractor
 		float				 _length		 = 0.0f;
 		BoundingBox			 _box			 = BoundingBox();
 
-		// TODO: std::set doesn't work.
-		std::set<int> _attachedPlayerItemNumebrs = {};
-		int _attachedPlayerItemNumber = -1;
+		std::set<int> _attachedPlayerItemNumbers = {};
 
 	public:
 		// Constructors

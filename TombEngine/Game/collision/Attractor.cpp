@@ -168,26 +168,32 @@ namespace TEN::Collision::Attractor
 	void Attractor::AttachPlayer(ItemInfo& playerItem)
 	{
 		if (!playerItem.IsLara())
+		{
+			TENLog("Attempted to attach non-player item to attractor.", LogLevel::Warning);
 			return;
+		}
 
-		_attachedPlayerItemNumber = playerItem.Index;
+		_attachedPlayerItemNumbers.insert(playerItem.Index);
 	}
 
 	void Attractor::DetachPlayer(ItemInfo& playerItem)
 	{
-		if (playerItem.Index == _attachedPlayerItemNumber)
-			_attachedPlayerItemNumber = NO_ITEM;
+		_attachedPlayerItemNumbers.erase(playerItem.Index);
 	}
 
 	void Attractor::DetachAllPlayers()
 	{
-		if (_attachedPlayerItemNumber == NO_ITEM)
-			return;
+		// TODO: Crashes trying to loop?
+		return;
 
-		auto& playerItem = g_Level.Items[_attachedPlayerItemNumber];
-		auto& player = GetLaraInfo(playerItem);
+		for (int itemNumber : _attachedPlayerItemNumbers)
+		{
+			auto& playerItem = g_Level.Items[itemNumber];
+			auto& player = GetLaraInfo(playerItem);
 
-		player.Context.Attractor.Detach(playerItem);
+			if (player.Context.Attractor.Ptr != nullptr)
+				player.Context.Attractor.Detach(playerItem);
+		}
 	}
 
 	void Attractor::DrawDebug(unsigned int segmentID) const
