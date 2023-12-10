@@ -29,10 +29,10 @@ using namespace TEN::Input;
 // Collision:	lara_col_monkey_idle()
 void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.Look.Mode = LookMode::Free;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	lara->Control.Look.Mode = LookMode::Free;
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -56,12 +56,12 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 2);
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
-			player.Control.HandStatus = HandStatus::Free;
+			lara->Control.HandStatus = HandStatus::Free;
 			return;
 		}
 
@@ -77,12 +77,12 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward) && CanMonkeySwingForward(*item, *coll))
+		if (IsHeld(In::Forward) && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (IsHeld(In::Back) && CanMonkeySwingBackward(*item, *coll))
+		else if (IsHeld(In::Back) && TestLaraMonkeyBack(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -90,7 +90,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
-			if (CanMonkeySwingShimmyLeft(*item, *coll))
+			if (TestLaraMonkeyShimmyLeft(item, coll))
 			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			}
@@ -103,7 +103,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
-			if (CanMonkeySwingShimmyRight(*item, *coll))
+			if (TestLaraMonkeyShimmyRight(item, coll))
 			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			}
@@ -138,10 +138,10 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_idle()
 void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.IsMonkeySwinging = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.IsMonkeySwinging = true;
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.IsAirborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
@@ -149,7 +149,7 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -166,7 +166,7 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (CanPerformMonkeySwingStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -177,10 +177,10 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_forward()
 void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.Look.Mode = LookMode::Horizontal;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	lara->Control.Look.Mode = LookMode::Horizontal;
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -195,7 +195,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
 		{
@@ -221,17 +221,17 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_forward()
 void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.IsMonkeySwinging = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.IsMonkeySwinging = true;
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;
 	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -245,7 +245,7 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (CanPerformMonkeySwingStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -256,10 +256,10 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_back()
 void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.Look.Mode = LookMode::Horizontal;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	lara->Control.Look.Mode = LookMode::Horizontal;
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -274,7 +274,7 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::Back))
 		{
@@ -294,17 +294,17 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_back()
 void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.IsMonkeySwinging = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+	lara->Control.IsMonkeySwinging = true;
+	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;
 	coll->Setup.UpperCeilingBound = -MONKEY_STEPUP_HEIGHT;
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -318,7 +318,7 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (CanPerformMonkeySwingStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -329,10 +329,10 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_shimmy_left()
 void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.Look.Mode = LookMode::Vertical;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	lara->Control.Look.Mode = LookMode::Vertical;
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -350,7 +350,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
@@ -370,17 +370,17 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_shimmy_left()
 void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.IsMonkeySwinging = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	lara->Control.IsMonkeySwinging = true;
+	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
 	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -394,7 +394,7 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (CanPerformMonkeySwingStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -405,10 +405,10 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_shimmy_right()
 void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.Look.Mode = LookMode::Vertical;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	lara->Control.Look.Mode = LookMode::Vertical;
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -427,7 +427,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
@@ -447,17 +447,17 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_shimmy_right()
 void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.IsMonkeySwinging = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+	lara->Control.IsMonkeySwinging = true;
+	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
 	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
 	coll->Setup.BlockCeilingSlope = true;
 	coll->Setup.BlockMonkeySwingEdge = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS;
 	coll->Setup.Height = LARA_HEIGHT_MONKEY;
 	GetCollisionInfo(coll, item);
@@ -471,7 +471,7 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (CanPerformMonkeySwingStep(*item, *coll))
+	if (CanPerformMonkeyStep(*item, *coll))
 	{
 		DoLaraMonkeyStep(item, coll);
 		return;
@@ -482,9 +482,9 @@ void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_as_monkey_turn_180()
 void lara_as_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.Look.Mode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -505,10 +505,10 @@ void lara_col_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_turn_left()
 void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.Look.Mode = LookMode::Vertical;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	lara->Control.Look.Mode = LookMode::Vertical;
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -520,21 +520,21 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
-			player.Control.HandStatus = HandStatus::Free;
+			lara->Control.HandStatus = HandStatus::Free;
 			return;
 		}
 
-		if (IsHeld(In::Forward) && CanMonkeySwingForward(*item, *coll))
+		if (IsHeld(In::Forward) && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (IsHeld(In::Back) && CanMonkeySwingBackward(*item, *coll))
+		else if (IsHeld(In::Back) && TestLaraMonkeyBack(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -542,7 +542,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
-			if (CanMonkeySwingShimmyLeft(*item, *coll))
+			if (TestLaraMonkeyShimmyLeft(item, coll))
 			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			}
@@ -555,7 +555,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
-			if (CanMonkeySwingShimmyRight(*item, *coll))
+			if (TestLaraMonkeyShimmyRight(item, coll))
 			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			}
@@ -593,10 +593,10 @@ void lara_col_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_turn_right()
 void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
+	auto* lara = GetLaraInfo(item);
 
-	player.Control.Look.Mode = LookMode::Vertical;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	lara->Control.Look.Mode = LookMode::Vertical;
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetElevation = -ANGLE(5.0f);
@@ -608,21 +608,21 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsHeld(In::Action) && lara->Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::Jump))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
-			player.Control.HandStatus = HandStatus::Free;
+			lara->Control.HandStatus = HandStatus::Free;
 			return;
 		}
 
-		if (IsHeld(In::Forward) && CanMonkeySwingForward(*item, *coll))
+		if (IsHeld(In::Forward) && TestLaraMonkeyForward(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
-		else if (IsHeld(In::Back) && CanMonkeySwingBackward(*item, *coll))
+		else if (IsHeld(In::Back) && TestLaraMonkeyBack(item, coll))
 		{
 			item->Animation.TargetState = LS_MONKEY_BACK;
 			return;
@@ -630,7 +630,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
 		{
-			if (CanMonkeySwingShimmyLeft(*item, *coll))
+			if (TestLaraMonkeyShimmyLeft(item, coll))
 			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			}
@@ -643,7 +643,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
 		{
-			if (CanMonkeySwingShimmyRight(*item, *coll))
+			if (TestLaraMonkeyShimmyRight(item, coll))
 			{
 				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			}

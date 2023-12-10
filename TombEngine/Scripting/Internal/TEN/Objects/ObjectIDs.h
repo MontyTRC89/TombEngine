@@ -1401,7 +1401,7 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "IMP", ID_IMP },
 	{ "IMP_ROCK", ID_IMP_ROCK },
 	{ "GUNSHIP", ID_GUNSHIP },
-	{ "AUTOGUN", ID_AUTO_GUN_VCI },
+	{ "AUTOGUN", ID_AUTOGUN },
 	{ "ROMAN_GOD1", ID_ROMAN_GOD1 },
 	{ "ROMAN_GOD2", ID_ROMAN_GOD2 },
 	{ "LAGOON_WITCH", ID_LAGOON_WITCH },

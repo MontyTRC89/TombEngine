@@ -14,7 +14,6 @@ namespace TEN::Hud
 	void HudController::Update(const ItemInfo& playerItem)
 	{
 		TargetHighlighter.Update(playerItem);
-		Speedometer.Update();
 		PickupSummary.Update();
 		StatusBars.Update(playerItem);
 	}
@@ -22,7 +21,6 @@ namespace TEN::Hud
 	void HudController::Draw(const ItemInfo& playerItem) const
 	{
 		TargetHighlighter.Draw();
-		Speedometer.Draw();
 		PickupSummary.Draw();
 		StatusBars.Draw(playerItem);
 	}
@@ -30,7 +28,6 @@ namespace TEN::Hud
 	void HudController::Clear()
 	{
 		TargetHighlighter.Clear();
-		Speedometer.Clear();
 		PickupSummary.Clear();
 		StatusBars.Clear();
 	}

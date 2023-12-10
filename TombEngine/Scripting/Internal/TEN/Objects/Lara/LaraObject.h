@@ -4,33 +4,33 @@
 
 static const std::unordered_map<std::string, LaraWeaponType> LaraWeaponTypeMap
 {
-	{ "NONE", LaraWeaponType::None },
-	{ "PISTOLS", LaraWeaponType::Pistol },
-	{ "REVOLVER", LaraWeaponType::Revolver },
-	{ "UZI", LaraWeaponType::Uzi },
-	{ "SHOTGUN", LaraWeaponType::Shotgun },
-	{ "HK", LaraWeaponType::HK },
-	{ "CROSSBOW", LaraWeaponType::Crossbow },
-	{ "FLARE", LaraWeaponType::Flare },
-	{ "TORCH", LaraWeaponType::Torch },
-	{ "GRENADELAUNCHER", LaraWeaponType::GrenadeLauncher },
-	{ "HARPOONGUN", LaraWeaponType::HarpoonGun },
-	{ "ROCKETLAUNCHER", LaraWeaponType::RocketLauncher },
-	{ "SNOWMOBILE", LaraWeaponType::Snowmobile },
-	{ "NUMWEAPONS", LaraWeaponType::NumWeapons}
+	{"NONE", LaraWeaponType::None},
+	{"PISTOLS", LaraWeaponType::Pistol},
+	{"REVOLVER", LaraWeaponType::Revolver},
+	{"UZI", LaraWeaponType::Uzi},
+	{"SHOTGUN", LaraWeaponType::Shotgun},
+	{"HK", LaraWeaponType::HK},
+	{"CROSSBOW", LaraWeaponType::Crossbow},
+	{"FLARE", LaraWeaponType::Flare},
+	{"TORCH", LaraWeaponType::Torch},
+	{"GRENADELAUNCHER", LaraWeaponType::GrenadeLauncher},
+	{"HARPOONGUN", LaraWeaponType::HarpoonGun},
+	{"ROCKETLAUNCHER", LaraWeaponType::RocketLauncher},
+	{"SNOWMOBILE", LaraWeaponType::Snowmobile},
+	{"NUMWEAPONS", LaraWeaponType::NumWeapons}
 };
 
 static const std::unordered_map<std::string, HandStatus> HandStatusMap
 {
-	{ "FREE", HandStatus::Free },
-	{ "BUSY", HandStatus::Busy },
-	{ "WEAPONDRAW", HandStatus::WeaponDraw },
-	{ "WEAPONUNDRAW", HandStatus::WeaponUndraw },
-	{ "WEAPONREADY", HandStatus::WeaponReady },
-	{ "SPECIAL", HandStatus::Special }
+	{"FREE", HandStatus::Free},
+	{"BUSY", HandStatus::Busy},
+	{"WEAPONDRAW", HandStatus::WeaponDraw},
+	{"WEAPONUNDRAW", HandStatus::WeaponUndraw},
+	{"WEAPONREADY", HandStatus::WeaponReady},
+	{"SPECIAL", HandStatus::Special},
 };
 
-// TODO: Organise.
+
 class LaraObject : public Moveable
 {
 public:
@@ -46,7 +46,6 @@ public:
 	void SetAirborne(bool newAirborne);
 	std::unique_ptr<Moveable> GetVehicle() const;
 	std::unique_ptr<Moveable> GetTarget() const;
-	std::unique_ptr<Moveable> GetPlayerInteractedMoveable() const;
 	HandStatus GetHandStatus() const;
 	LaraWeaponType GetWeaponType() const;
 	void SetWeaponType(LaraWeaponType weaponType, bool activate);
@@ -58,3 +57,4 @@ public:
 	static void Register(sol::table& parent);
 	using Moveable::Moveable;
 };
+

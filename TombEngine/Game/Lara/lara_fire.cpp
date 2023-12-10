@@ -29,12 +29,10 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Specific/trutils.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Utils;
 
 int FlashGrenadeAftershockTimer = 0;
 
@@ -58,16 +56,6 @@ const auto FlarePoseStates = std::vector<int>
 	LS_CROUCH_TURN_LEFT,
 	LS_CROUCH_TURN_RIGHT,
 	LS_SOFT_SPLAT
-};
-
-const auto UnavailableFlarePoseAnims = std::vector<int>
-{
-	LA_WATERLEVER_PULL,
-	LA_BUTTON_GIANT_PUSH,
-	LA_BUTTON_LARGE_PUSH,
-	LA_JUMPSWITCH_PULL,
-	LA_UNDERWATER_CEILING_SWITCH_PULL,
-	LA_VALVE_TURN
 };
 
 WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
@@ -793,10 +781,6 @@ void HandleWeapon(ItemInfo& laraItem)
 			if (laraItem.Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
 				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
-
-				if (Contains(UnavailableFlarePoseAnims, laraItem.Animation.AnimNumber))
-					player.Flare.ControlLeft = false;
-
 				DoFlareInHand(laraItem, player.Flare.Life);
 				SetFlareArm(laraItem, player.LeftArm.FrameNumber);
 			}

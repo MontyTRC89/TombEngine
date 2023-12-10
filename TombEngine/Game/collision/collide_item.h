@@ -38,7 +38,7 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius);
-bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool enableSpasm, char bigPushFlags);
+bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool enableSpasm, char bigPush);
 bool ItemPushItem(ItemInfo* item, ItemInfo* item2);
 bool ItemPushStatic(ItemInfo* laraItem, const MESH_INFO& mesh, CollisionInfo* coll);
 void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);

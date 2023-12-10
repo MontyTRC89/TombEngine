@@ -128,8 +128,6 @@ const AnimFrame*	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
 const AnimFrame*	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
 const AnimFrame&	GetBestFrame(const ItemInfo& item);
 
-float GetEffectiveGravity(float verticalVel);
-
 int GetAnimNumber(const ItemInfo& item);
 int GetAnimIndex(const ItemInfo& item, int animNumber);
 

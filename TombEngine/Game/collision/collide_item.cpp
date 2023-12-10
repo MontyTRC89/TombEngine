@@ -645,25 +645,27 @@ bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 	}
 }
 
-bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool enableSpasm, char bigPushFlags)
+// NOTE: Previously ItemPushLara().
+bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool enableSpasm, char bigPush)
 {
-	constexpr auto SOFT_PUSH_LERP_ALPHA = 0.25f;
+	float sinY = phd_sin(item->Pose.Orientation.y);
+	float cosY = phd_cos(item->Pose.Orientation.y);
 
-	const auto& object = Objects[item0->ObjectNumber];
+	// Get direction vector from item to player.
+	auto direction = item2->Pose.Position - item->Pose.Position;
 
-	auto deltaPos = item1->Pose.Position - item0->Pose.Position;
+	// Rotate Lara vector into item frame.
+	int rx = (direction.x * cosY) - (direction.z * sinY);
+	int rz = (direction.z * cosY) + (direction.x * sinY);
 
-	// Rotate relative position into item frame.
-	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(-item0->Pose.Orientation.y));
-	auto relDeltaPos = Vector3i(Vector3::Transform(deltaPos.ToVector3(), rotMatrix));
+	const auto& bounds = (bigPush & 2) ? GlobalCollisionBounds : GetBestFrame(*item).BoundingBox;
 
-	const auto& bounds = (bigPushFlags & 2) ? GlobalCollisionBounds : GameBoundingBox(item0);
 	int minX = bounds.X1;
 	int maxX = bounds.X2;
 	int minZ = bounds.Z1;
 	int maxZ = bounds.Z2;
 
-	if (bigPushFlags & 1)
+	if (bigPush & 1)
 	{
 		minX -= coll->Setup.Radius;
 		maxX += coll->Setup.Radius;
@@ -671,65 +673,48 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 		maxZ += coll->Setup.Radius;
 	}
 
-	// Big enemies.
-	if (abs(deltaPos.x) > BLOCK(4.5f) || abs(deltaPos.z) > BLOCK(4.5f) ||
-		relDeltaPos.x <= minX || relDeltaPos.x >= maxX ||
-		relDeltaPos.z <= minZ || relDeltaPos.z >= maxZ)
+	// Big enemies
+	if (abs(direction.x) > BLOCK(4.5f) || abs(direction.z) > BLOCK(4.5f) ||
+		rx <= minX || rx >= maxX ||
+		rz <= minZ || rz >= maxZ)
 	{
 		return false;
 	}
 
-	int front = maxZ - relDeltaPos.z;
-	int back = relDeltaPos.z - minZ;
-	int left = relDeltaPos.x - minX;
-	int right = maxX - relDeltaPos.x;
+	int left = rx - minX;
+	int top = maxZ - rz;
+	int bottom = rz - minZ;
+	int right = maxX - rx;
 
-	// Account for collision radius.
-	if (right <= left && right <= front && right <= back)
-	{
-		relDeltaPos.x += right;
-	}
-	else if (left <= right && left <= front && left <= back)
-	{
-		relDeltaPos.x -= left;
-	}
-	else if (front <= left && front <= right && front <= back)
-	{
-		relDeltaPos.z += front;
-	}
+	if (right <= left && right <= top && right <= bottom)
+		rx += right;
+	else if (left <= right && left <= top && left <= bottom)
+		rx -= left;
+	else if (top <= left && top <= right && top <= bottom)
+		rz += top;
 	else
-	{
-		relDeltaPos.z -= back;
-	}
+		rz -= bottom;
 
-	// Lerp to new position.
-	auto newDeltaPos = Vector3i(Vector3::Transform(relDeltaPos.ToVector3(), rotMatrix.Invert()));
-	if (object.intelligent)
-	{
-		// TODO: Improve sphere-dependent pushes.
-		// Current sphere-box push combination is extremely unstable with large creatures such as the TR2 dragon. -- Sezz 2023.11.21
-		// Possible solution: lerp to the position of a sphere's tangent toward the nearest box edge.
-		// Must somehow determine the best sphere to reference. Maybe the one which pushes farthest?
-		// Also, clamp distance the box edge to avoid overshooting.
+	item2->Pose.Position.x = item->Pose.Position.x + (rx * cosY) + (rz * sinY);
+	item2->Pose.Position.z = item->Pose.Position.z + (rz * cosY) - (rx * sinY);
 
-		item1->Pose.Position.Lerp(item0->Pose.Position + newDeltaPos, SOFT_PUSH_LERP_ALPHA);
-	}
-	// Snap to new position.
-	else
-	{
-		item1->Pose.Position = item0->Pose.Position + newDeltaPos;
-	}
+	auto* lara = item2->IsLara() ? GetLaraInfo(item2) : nullptr;
 
-	if (item1->IsLara() && enableSpasm && bounds.GetHeight() > CLICK(1))
+	if (lara != nullptr && enableSpasm && (bounds.Y2 - bounds.Y1) > CLICK(1))
 	{
-		auto& player = GetLaraInfo(*item1);
+		rx = (bounds.X1 + bounds.X2) / 2;
+		rz = (bounds.Z1 + bounds.Z2) / 2;
 
-		// TODO: Rewrite player spasm effect.
-		player.HitDirection = NORTH;
-		player.HitFrame = 0;
-		
-		// Dummy hurt call for sound.
-		DoDamage(item1, 0); 
+		direction.x -= (rx * cosY) + (rz * sinY);
+		direction.z -= (rz * cosY) - (rx * sinY);
+
+		// TODO: Is this phd_atan() call a mistake?
+		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(direction.z, direction.z) - ANGLE(135.0f)) / ANGLE(90.0f);
+		DoDamage(item2, 0); // Dummy hurt call. Only for ooh sound!
+
+		lara->HitFrame++;
+		if (lara->HitFrame > 34)
+			lara->HitFrame = 34;
 	}
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -737,31 +722,31 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
-	short headingAngle = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item1->Pose.Position.z - coll->Setup.PrevPosition.z, item1->Pose.Position.x - coll->Setup.PrevPosition.x);
-	GetCollisionInfo(coll, item1);
+	auto headingAngle = coll->Setup.ForwardAngle;
+	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.PrevPosition.z, item2->Pose.Position.x - coll->Setup.PrevPosition.x);
+
+	GetCollisionInfo(coll, item2);
+
 	coll->Setup.ForwardAngle = headingAngle;
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.PrevPosition = item1->Pose.Position;
+		coll->Setup.PrevPosition = item2->Pose.Position;
+
+		// Commented because causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"
+		// UpdateLaraRoom(item2, -10);
 	}
 	else
 	{
-		item1->Pose.Position.x = coll->Setup.PrevPosition.x;
-		item1->Pose.Position.z = coll->Setup.PrevPosition.z;
+		item2->Pose.Position.x = coll->Setup.PrevPosition.x;
+		item2->Pose.Position.z = coll->Setup.PrevPosition.z;
 	}
 
-	// If player is interacting with an item, cancel it.
-	if (item1->IsLara())
+	// If Lara is in the process of aligning to an object, cancel it.
+	if (lara != nullptr && lara->Control.Count.PositionAdjust > (PLAYER_POSITION_ADJUST_MAX_TIME / 6))
 	{
-		auto& player = GetLaraInfo(*item1);
-
-		if (player.Control.Count.PositionAdjust > (PLAYER_POSITION_ADJUST_MAX_TIME / 6))
-		{
-			player.Control.IsMoving = false;
-			player.Control.HandStatus = HandStatus::Free;
-		}
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
 	}
 
 	return true;
@@ -1796,146 +1781,139 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	item->Pose.Position.y -= radius;
 }
 
-void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 {
-	const auto& player = GetLaraInfo(*item);
+	laraItem->HitStatus = false;
+	coll->HitStatic     = false;
 
-	item->HitStatus = false;
-	coll->HitStatic = false;
+	bool doPlayerCollision = laraItem->IsLara();
+	bool harmless = !doPlayerCollision && (laraItem->Data.is<KayakInfo>() || laraItem->Data.is<UPVInfo>());
 
-	bool isPlayer = item->IsLara();
-	bool isHarmless = !isPlayer && (item->Data.is<KayakInfo>() || item->Data.is<UPVInfo>());
-
-	if (isPlayer)
+	if (doPlayerCollision)
 	{
-		GetLaraInfo(*item).HitDirection = -1;
+		GetLaraInfo(laraItem)->HitDirection = -1;
 
-		if (item->HitPoints <= 0)
+		if (laraItem->HitPoints <= 0)
 			return;
 	}
 
-	if (Objects[item->ObjectNumber].intelligent)
+	if (Objects[laraItem->ObjectNumber].intelligent)
 		return;
 
-	const auto& room = g_Level.Rooms[item->RoomNumber];
-	for (int neighborRoomNumber : room.neighbors)
+	for (auto i : g_Level.Rooms[laraItem->RoomNumber].neighbors)
 	{
-		auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-		if (!neighborRoom.Active())
+		if (!g_Level.Rooms[i].Active())
 			continue;
 
-		int nextItemNumber = neighborRoom.itemNumber;
-		while (nextItemNumber != NO_ITEM)
+		int nextItem = g_Level.Rooms[i].itemNumber;
+		while (nextItem != NO_ITEM)
 		{
-			auto& linkItem = g_Level.Items[nextItemNumber];
-			int itemNumber = nextItemNumber;
+			auto* item = &g_Level.Items[nextItem];
+			int itemNumber = nextItem;
 
 			// HACK: For some reason, sometimes an infinite loop may happen here.
-			if (nextItemNumber == linkItem.NextItem)
+			if (nextItem == item->NextItem)
 				break;
 
-			nextItemNumber = linkItem.NextItem;
+			nextItem = item->NextItem;
 
-			if (&linkItem == item)
+			if (item == laraItem)
 				continue;
 
-			if (!(linkItem.Collidable && linkItem.Status != ITEM_INVISIBLE))
+			if (!(item->Collidable && item->Status != ITEM_INVISIBLE))
 				continue;
 
-			const auto& object = Objects[linkItem.ObjectNumber];
+			auto* object = &Objects[item->ObjectNumber];
 
-			if (object.collision == nullptr)
+			if (object->collision == nullptr)
 				continue;
 
-			if (Vector3i::Distance(linkItem.Pose.Position, item->Pose.Position) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(item->Pose.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
-			if (isPlayer)
+			if (doPlayerCollision)
 			{
 				// Objects' own collision routines were almost universally written only for
 				// managing collisions with Lara and nothing else. Until all of these routines
 				// are refactored (which won't happen anytime soon), we need this differentiation.
-				object.collision(itemNumber, item, coll);
+				object->collision(itemNumber, laraItem, coll);
 			}
 			else
 			{
-				if (!TestBoundsCollide(item, item, coll->Setup.Radius))
+				if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 					continue;
 
-				// Infer object is nullmesh or invisible object by valid draw routine.
-				if (object.drawRoutine == nullptr)
+				// Guess if object is a nullmesh or invisible object by existence of draw routine.
+				if (object->drawRoutine == nullptr)
 					continue;
 
 				// Pickups are also not processed.
-				if (object.isPickup)
+				if (object->isPickup)
 					continue;
 
 				// If colliding object is an enemy, kill it.
-				if (object.intelligent)
+				if (object->intelligent)
 				{
-					// Don't try killing already dead or non-targetable enemies.
+					// Don't try to kill already dead or non-targetable enemies.
 					if (item->HitPoints <= 0 || item->HitPoints == NOT_TARGETABLE)
 						continue;
 
-					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
+					if (harmless || abs(laraItem->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
 					{
-						// If vehicle is harmless or speed is too low, just push enemy.
-						ItemPushItem(item, &linkItem, coll, false, 0);
+						// If vehicle is harmless or speed is too low, just push the enemy.
+						ItemPushItem(laraItem, item, coll, false, 0);
 						continue;
 					}
 					else
 					{
 						DoDamage(item, INT_MAX);
 						DoLotsOfBlood(
-							linkItem.Pose.Position.x,
-							item->Pose.Position.y - CLICK(1),
-							linkItem.Pose.Position.z,
-							item->Animation.Velocity.z,
-							item->Pose.Orientation.y,
-							linkItem.RoomNumber, 3);
+							item->Pose.Position.x,
+							laraItem->Pose.Position.y - CLICK(1),
+							item->Pose.Position.z,
+							laraItem->Animation.Velocity.z,
+							laraItem->Pose.Orientation.y,
+							item->RoomNumber, 3);
 					}
 				}
 				else if (coll->Setup.EnableObjectPush)
 				{
-					ItemPushItem(item, &linkItem, coll, false, 1);
+					ItemPushItem(item, laraItem, coll, false, 1);
 				}
 			}
 		}
 
-		for (auto& staticObject : neighborRoom.mesh)
+		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
 		{
-			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+			auto& mesh = g_Level.Rooms[i].mesh[j];
+
+			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
 			// For Lara, solid static mesh collisions are directly managed by GetCollisionInfo,
 			// so we bypass them here to avoid interference.
-			if (isPlayer && (staticObject.flags & StaticMeshFlags::SM_SOLID))
+			if (doPlayerCollision && (mesh.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			if (Vector3i::Distance(staticObject.pos.Position, item->Pose.Position) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(mesh.pos.Position, laraItem->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
-			if (!TestBoundsCollideStatic(item, staticObject, coll->Setup.Radius))
+			if (!TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))
 				continue;
 
 			coll->HitStatic = true;
 
-			// HACK: Shatter statics only by harmful vehicles.
-			if (!isPlayer && 
-				!isHarmless && abs(item->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				StaticObjects[staticObject.staticNumber].shatterType != ShatterType::None)
+			// HACK: Shatter statics only by non-harmless vehicles.
+			if (!doPlayerCollision && 
+				!harmless && abs(laraItem->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
+				StaticObjects[mesh.staticNumber].shatterType != ShatterType::None)
 			{
-				SoundEffect(GetShatterSound(staticObject.staticNumber), &staticObject.pos);
-				ShatterObject(nullptr, &staticObject, -128, item->RoomNumber, 0);
+				SoundEffect(GetShatterSound(mesh.staticNumber), &mesh.pos);
+				ShatterObject(nullptr, &mesh, -128, laraItem->RoomNumber, 0);
 			}
 			else if (coll->Setup.EnableObjectPush)
 			{
-				// TODO: Test. Might have player walking through objects in edge cases.
-				// Avoid interfering with player object interactions.
-				/*if (isPlayer && !GetLaraInfo(*item).Control.IsMoving)
-					continue;*/
-
-				ItemPushStatic(item, staticObject, coll);
+				ItemPushStatic(laraItem, mesh, coll);
 			}
 			else
 			{
@@ -1944,12 +1922,11 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	// TODO: Rewrite player spasm effect.
-	if (isPlayer)
+	if (doPlayerCollision)
 	{
-		auto& player = GetLaraInfo(*item);
-		if (player.HitDirection == -1)
-			player.HitFrame = 0;
+		auto* lara = GetLaraInfo(laraItem);
+		if (lara->HitDirection == -1)
+			lara->HitFrame = 0;
 	}
 }
 
@@ -1989,21 +1966,31 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 	bool waterPlayerCollision = doPlayerCollision && GetLaraInfo(laraItem)->Control.WaterStatus >= WaterStatus::TreadWater;
 
 	if (waterPlayerCollision || coll->Setup.EnableObjectPush)
-	{
 		ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
-	}
 	else if (doPlayerCollision && coll->Setup.EnableSpasm)
 	{
-		// TODO: Rewrite player spasm effect.
-		return;
+		int x = laraItem->Pose.Position.x - item->Pose.Position.x;
+		int z = laraItem->Pose.Position.z - item->Pose.Position.z;
 
-		const auto& bounds = GameBoundingBox(item);
+		float sinY = phd_sin(item->Pose.Orientation.y);
+		float cosY = phd_cos(item->Pose.Orientation.y);
+
+		const auto& bounds = GetBestFrame(*item).BoundingBox;
+		int rx = (bounds.X1 + bounds.X2) / 2;
+		int rz = (bounds.X2 + bounds.Z2) / 2;
+
 		if (bounds.GetHeight() > CLICK(1))
 		{
 			auto* lara = GetLaraInfo(laraItem);
 
-			lara->HitDirection = NORTH;
-			lara->HitFrame = 0;
+			int angle = (laraItem->Pose.Orientation.y - phd_atan(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - ANGLE(135.0f)) / ANGLE(90.0f);
+
+			lara->HitDirection = (short)angle;
+
+			// TODO: Check if a second Lara.hitFrame++ is required. -- TokyoSU					
+			lara->HitFrame++;
+			if (lara->HitFrame > 30)
+				lara->HitFrame = 30;
 		}
 	}
 }

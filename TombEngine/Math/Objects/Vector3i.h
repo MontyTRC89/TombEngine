@@ -19,10 +19,8 @@
 				  Vector3i(const Vector3& vector);
 
 		// Utilities
-		static float	Distance(const Vector3i& origin, const Vector3i& target);
-		static float	DistanceSquared(const Vector3i& origin, const Vector3i& target);
-		void			Lerp(const Vector3i& target, float alpha);
-		static Vector3i Lerp(const Vector3i& origin, const Vector3i& target, float alpha);
+		static float Distance(const Vector3i& origin, const Vector3i& target);
+		static float DistanceSquared(const Vector3i& origin, const Vector3i& target);
 
 		// Converters
 		Vector3 ToVector3() const;

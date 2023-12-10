@@ -684,6 +684,9 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 		if (laraItem->Animation.ActiveState == LS_CROUCH_IDLE)
 		{
+			if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
+				break;
+
 			if (!AlignLaraPosition(PickUpPosition, item, laraItem))
 				break;
 

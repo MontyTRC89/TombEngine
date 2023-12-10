@@ -19,8 +19,6 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
-constexpr auto VERTICAL_VELOCITY_GRAVITY_THRESHOLD = CLICK(0.5f);
-
 // NOTE: 0 frames counts as 1.
 static unsigned int GetNonZeroFrameCount(const AnimData& anim)
 {
@@ -252,7 +250,7 @@ void AnimateItem(ItemInfo* item)
 					item->Animation.Velocity.z = 0.0f;
 				}
 
-				if (item->Animation.Velocity.y > VERTICAL_VELOCITY_GRAVITY_THRESHOLD)
+				if (item->Animation.Velocity.y > 128.0f)
 					item->Animation.Velocity.y /= 2;
 				item->Animation.Velocity.y -= item->Animation.Velocity.y / 4;
 
@@ -262,7 +260,7 @@ void AnimateItem(ItemInfo* item)
 			}
 			else
 			{
-				item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
+				item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
 				item->Animation.Velocity.z += animAccel.z;
 
 				item->Pose.Position.y += item->Animation.Velocity.y;
@@ -270,7 +268,7 @@ void AnimateItem(ItemInfo* item)
 		}
 		else
 		{
-			item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
+			item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
 			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
@@ -535,11 +533,6 @@ const AnimFrame& GetBestFrame(const ItemInfo& item)
 {
 	auto frameData = GetFrameInterpData(item);
 	return ((frameData.Alpha <= 0.5f) ? *frameData.FramePtr0 : *frameData.FramePtr1);
-}
-
-float GetEffectiveGravity(float verticalVel)
-{
-	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
 }
 
 int GetAnimNumber(const ItemInfo& item)

@@ -19,5 +19,5 @@ namespace TEN::Math::Random
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere);
 	Vector3 GeneratePointOnSphere(const BoundingSphere& sphere);
 
-	bool TestProbability(float prob);
+	bool TestProbability(float probab);
 }

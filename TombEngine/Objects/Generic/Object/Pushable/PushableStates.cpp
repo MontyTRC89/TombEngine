@@ -111,15 +111,9 @@ namespace TEN::Entities::Generic
 						pushable.BehaviorState = PushableBehaviourState::Float;
 						pushable.Gravity = 0.0f;
 					}
-					else
-					{
-						pushable.BehaviorState = PushableBehaviourState::UnderwaterIdle;
-					}
 				}
-				else
-				{
-					HandlePushableRippleEffect(pushableItem);
-				}
+
+				HandlePushableRippleEffect(pushableItem);
 			}
 			break;
 
@@ -460,8 +454,6 @@ namespace TEN::Entities::Generic
 				pushableItem.Pose.Position.y = pushableColl.FloorHeight;
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 				pushable.BehaviorState = PushableBehaviourState::Idle;
-
-				AddPushableBridge(pushableItem);
 				break;
 
 			case PushableEnvironmentType::Water:

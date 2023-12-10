@@ -22,16 +22,6 @@
 		return Vector3::DistanceSquared(origin.ToVector3(), target.ToVector3());
 	}
 
-	void Vector3i::Lerp(const Vector3i& target, float alpha)
-	{
-		*this = Lerp(*this, target, alpha);
-	}
-
-	Vector3i Vector3i::Lerp(const Vector3i& origin, const Vector3i& target, float alpha)
-	{
-		return Vector3i(Vector3::Lerp(origin.ToVector3(), target.ToVector3(), alpha));
-	}
-
 	Vector3 Vector3i::ToVector3() const
 	{
 		return Vector3(x, y, z);

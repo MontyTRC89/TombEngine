@@ -1130,7 +1130,6 @@ namespace TEN::Entities::Vehicles
 
 			default:
 				drive = QuadUserControl(quadBikeItem, probe.Position.Floor, &pitch);
-				HandleVehicleSpeedometer(quadBikeItem->Animation.Velocity.z, MAX_VELOCITY / (float)VEHICLE_VELOCITY_SCALE);
 				break;
 			}
 		}
