@@ -632,7 +632,6 @@ short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectNumber)
 		InitializeItem(itemNumber);
 
 		spawn->Status = ITEM_NOT_ACTIVE;
-		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 	}
 	else
 	{
