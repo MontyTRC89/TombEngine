@@ -357,11 +357,18 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::SetCullMode(CullMode cullMode, bool force)
-	{
+	{ 
 		if (_debugPage == RendererDebugPage::WireframeMode)
 		{
-			_context->RSSetState(_renderStates->Wireframe());
-			return;
+			if (!_doingFullscreenPass)
+			{
+				_context->RSSetState(_renderStates->Wireframe());
+				return;
+			}
+			else
+			{
+				force = true;
+			}
 		}
 
 		if (cullMode != _lastCullMode || force)

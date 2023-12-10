@@ -1346,7 +1346,8 @@ namespace TEN::Renderer
 
 		ResetDebugVariables();
 		_isLocked = false;
-		 
+		_doingFullscreenPass = false;
+
 		auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
 		// Prepare scene to draw.
@@ -1434,7 +1435,7 @@ namespace TEN::Renderer
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Back, LaraItem->Pose.Position.ToVector3(), -1);
 
 		// Bind and clear render target.
-		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), _debugPage == RendererDebugPage::WireframeMode ? Colors::White : Colors::Black);
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Reset viewport and scissor
@@ -1508,7 +1509,9 @@ namespace TEN::Renderer
 		// Calculate ambient occlusion
 		if (g_Configuration.EnableAmbientOcclusion)
 		{
+			_doingFullscreenPass = true;
 			CalculateSSAO(view);
+			_doingFullscreenPass = false;
 		}
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1569,6 +1572,8 @@ namespace TEN::Renderer
 		// Draw 3D debug lines and trianges.
 		DrawLines3D(view);
 		DrawTriangles3D(view);
+		
+		_doingFullscreenPass = true;
 
 		// Apply antialiasing.
 		switch (g_Configuration.AntialiasingMode)
@@ -1588,6 +1593,8 @@ namespace TEN::Renderer
 
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 		DrawPostprocess(renderTarget, view);
+
+		_doingFullscreenPass = false;
 
 		// Draw 2D debug lines.
 		DrawLines2D();

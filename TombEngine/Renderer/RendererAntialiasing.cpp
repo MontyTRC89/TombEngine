@@ -7,6 +7,12 @@ namespace TEN::Renderer
 {
 	void Renderer::ApplySMAA(RenderTarget2D* renderTarget, RenderView& view)
 	{
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
+		SetDepthState(DepthState::Write);
+		_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
+
 		// Common vertex shader to all fullscreen effects
 		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
 
