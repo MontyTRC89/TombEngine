@@ -72,13 +72,13 @@ namespace TEN::Collision::Attractor
 		if (KeyMap[OIS::KeyCode::KC_E])
 		{
 			auto pos0 = attracPoint;
-			auto pos1 = player.Context.DebugAttracs.Attrac0.GetPoints().empty() ? pos0 : player.Context.DebugAttracs.Attrac0.GetPoints().back();
+			auto pos1 = player.Context.DebugAttracs.Attrac0->GetPoints().empty() ? pos0 : player.Context.DebugAttracs.Attrac0->GetPoints().back();
 			player.Context.DebugAttracs.Attrac0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 		if (KeyMap[OIS::KeyCode::KC_R])
 		{
 			auto pos1 = attracPoint;
-			auto pos0 = player.Context.DebugAttracs.Attrac0.GetPoints().empty() ? pos1 : player.Context.DebugAttracs.Attrac0.GetPoints().front();
+			auto pos0 = player.Context.DebugAttracs.Attrac0->GetPoints().empty() ? pos1 : player.Context.DebugAttracs.Attrac0->GetPoints().front();
 			player.Context.DebugAttracs.Attrac0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 
@@ -86,13 +86,13 @@ namespace TEN::Collision::Attractor
 		if (KeyMap[OIS::KeyCode::KC_Q])
 		{
 			auto pos0 = attracPoint;
-			auto pos1 = player.Context.DebugAttracs.Attrac1.GetPoints().empty() ? pos0 : player.Context.DebugAttracs.Attrac1.GetPoints().back();
+			auto pos1 = player.Context.DebugAttracs.Attrac1->GetPoints().empty() ? pos0 : player.Context.DebugAttracs.Attrac1->GetPoints().back();
 			player.Context.DebugAttracs.Attrac1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 		if (KeyMap[OIS::KeyCode::KC_W])
 		{
 			auto pos1 = attracPoint;
-			auto pos0 = player.Context.DebugAttracs.Attrac1.GetPoints().empty() ? pos1 : player.Context.DebugAttracs.Attrac1.GetPoints().front();
+			auto pos0 = player.Context.DebugAttracs.Attrac1->GetPoints().empty() ? pos1 : player.Context.DebugAttracs.Attrac1->GetPoints().front();
 			player.Context.DebugAttracs.Attrac1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 
@@ -106,9 +106,9 @@ namespace TEN::Collision::Attractor
 		if (KeyMap[OIS::KeyCode::KC_U])
 		{
 			auto pos = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
-			auto points = player.Context.DebugAttracs.Attrac2.GetPoints();
+			auto points = player.Context.DebugAttracs.Attrac2->GetPoints();
 			points[1] = pos;
-			player.Context.DebugAttracs.Attrac2.Update(points, player.Context.DebugAttracs.Attrac2.GetRoomNumber());
+			player.Context.DebugAttracs.Attrac2->Update(points, player.Context.DebugAttracs.Attrac2->GetRoomNumber());
 		}
 	}
 

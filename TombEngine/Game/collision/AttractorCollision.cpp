@@ -105,9 +105,9 @@ namespace TEN::Collision::Attractor
 		auto& player = GetLaraInfo(*LaraItem);
 
 		auto debugAttracPtrs = std::vector<Attractor*>{};
-		debugAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac0);
-		debugAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac1);
-		debugAttracPtrs.push_back(&player.Context.DebugAttracs.Attrac2);
+		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac0);
+		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac1);
+		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac2);
 
 		return debugAttracPtrs;
 	}

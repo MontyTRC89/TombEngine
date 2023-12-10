@@ -30,12 +30,11 @@ namespace TEN::Collision::Attractor
 		BoundingBox			 _box			 = BoundingBox();
 
 		// TODO: std::set doesn't work.
-		//std::set<int> _attachedPlayerItemNumebrs = {};
+		std::set<int> _attachedPlayerItemNumebrs = {};
 		int _attachedPlayerItemNumber = -1;
 
 	public:
 		// Constructors
-		Attractor() {}; // Debug only.
 		Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
 		// Destructors

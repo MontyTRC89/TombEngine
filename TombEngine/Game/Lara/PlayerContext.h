@@ -41,9 +41,9 @@ namespace TEN::Entities::Player
 
 	struct DebugAttractorData
 	{
-		Attractor Attrac0 = {};
-		Attractor Attrac1 = {};
-		Attractor Attrac2 = {};
+		std::optional<Attractor> Attrac0 = std::nullopt;
+		std::optional<Attractor> Attrac1 = std::nullopt;
+		std::optional<Attractor> Attrac2 = std::nullopt;
 	};
 
 	// TODO: Savegame for attractors.

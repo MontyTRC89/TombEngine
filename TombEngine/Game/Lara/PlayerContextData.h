@@ -2,6 +2,7 @@
 #include "Math/Math.h"
 
 namespace TEN::Collision::Attractor { class Attractor; }
+enum LaraState;
 
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Math;
