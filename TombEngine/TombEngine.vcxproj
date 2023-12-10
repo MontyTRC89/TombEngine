@@ -331,6 +331,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\Hud\PickupSummary.h" />
+    <ClInclude Include="Game\Hud\Speedometer.h" />
     <ClInclude Include="Game\Hud\StatusBars.h" />
     <ClInclude Include="Game\Hud\TargetHighlighter.h" />
     <ClInclude Include="Game\Lara\lara.h" />
@@ -341,6 +342,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\lara_crawl.h" />
     <ClInclude Include="Game\Lara\lara_fire.h" />
     <ClInclude Include="Game\Lara\lara_flare.h" />
+    <ClInclude Include="Game\Lara\lara_hang.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_initialise.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
@@ -850,6 +852,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\GuiObjects.cpp" />
     <ClCompile Include="Game\Hud\Hud.cpp" />
     <ClCompile Include="Game\Hud\PickupSummary.cpp" />
+    <ClCompile Include="Game\Hud\Speedometer.cpp" />
     <ClCompile Include="Game\Hud\StatusBars.cpp" />
     <ClCompile Include="Game\Hud\TargetHighlighter.cpp" />
     <ClCompile Include="Game\itemdata\creature_info.cpp" />
@@ -863,6 +866,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_crawl.cpp" />
     <ClCompile Include="Game\Lara\lara_fire.cpp" />
     <ClCompile Include="Game\Lara\lara_flare.cpp" />
+    <ClCompile Include="Game\Lara\lara_hang.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_initialise.cpp" />
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
