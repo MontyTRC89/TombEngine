@@ -10,9 +10,11 @@
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR2/Entity/Bartoli.h" // OK
+#include "Objects/TR2/Entity/Dragon.h" // OK
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
 #include "Objects/TR2/Entity/tr2_bird_monster.h" // OK
-#include "Objects/TR2/Entity/tr2_dragon.h" // OK
+//#include "Objects/TR2/Entity/tr2_dragon.h" // OK
 #include "Objects/TR2/Entity/tr2_eagle_or_crow.h" // OK
 #include "Objects/TR2/Entity/tr2_knife_thrower.h" // OK
 #include "Objects/TR2/Entity/tr2_mercenary.h" // OK
