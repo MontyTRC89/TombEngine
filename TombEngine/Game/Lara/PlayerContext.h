@@ -18,6 +18,7 @@ namespace TEN::Entities::Player
 	struct EdgeCatchContextData;
 	struct MonkeySwingCatchContextData;
 	struct ShimmyContextData;
+	struct VaultTestResult; // Old
 
 	struct PlayerAttractorData
 	{
@@ -157,4 +158,9 @@ namespace TEN::Entities::Player
 	std::optional<ClimbContextData>				GetCrawlEdgeDescentClimbContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeCatchContextData>			GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData>	GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
+
+	// TEMP
+	std::optional<VaultTestResult> TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll);
+	std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll);
+	bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll);
 }

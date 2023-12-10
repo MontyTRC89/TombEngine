@@ -39,10 +39,6 @@ bool IsJumpState(int state);
 bool IsRunJumpQueueableState(int state);
 bool IsRunJumpCountableState(int state);
 
-std::optional<VaultTestResult> TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll);
-std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll);
-bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll);
-
 bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, float offset = 0.0f);
 bool TestLaraPoleUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraPoleDown(ItemInfo* item, CollisionInfo* coll);

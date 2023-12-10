@@ -24,26 +24,26 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 	coll->Shift = Vector3i::Zero;
 }
 
-// TODO
-void SnapEntityToGrid(ItemInfo* item, CollisionInfo* coll)
+void SnapEntityToGrid(ItemInfo& item, const CollisionInfo& coll)
 {
-	int direction = GetQuadrant(item->Pose.Orientation.y);
-	switch (direction)
+	int quadrant = GetQuadrant(item.Pose.Orientation.y);
+	switch (quadrant)
 	{
+	default:
 	case NORTH:
-		item->Pose.Position.z = (item->Pose.Position.z | WALL_MASK) - coll->Setup.Radius;
+		item.Pose.Position.z = (item.Pose.Position.z | WALL_MASK) - coll.Setup.Radius;
 		break;
 
 	case EAST:
-		item->Pose.Position.x = (item->Pose.Position.x | WALL_MASK) - coll->Setup.Radius;
+		item.Pose.Position.x = (item.Pose.Position.x | WALL_MASK) - coll.Setup.Radius;
 		break;
 
 	case SOUTH:
-		item->Pose.Position.z = (item->Pose.Position.z & ~WALL_MASK) + coll->Setup.Radius;
+		item.Pose.Position.z = (item.Pose.Position.z & ~WALL_MASK) + coll.Setup.Radius;
 		break;
 
 	case WEST:
-		item->Pose.Position.x = (item->Pose.Position.x & ~WALL_MASK) + coll->Setup.Radius;
+		item.Pose.Position.x = (item.Pose.Position.x & ~WALL_MASK) + coll.Setup.Radius;
 		break;
 	}
 }

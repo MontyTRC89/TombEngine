@@ -808,7 +808,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchCon
 
 	// HACK: Until fragile climbable wall code is refactored, snap must align exactly to grid.
 	if (catchData.Type == EdgeType::ClimbableWall)
-		SnapEntityToGrid(&item, &coll);
+		SnapEntityToGrid(item, coll);
 
 	// Calculate position.
 	auto catchPoint = (catchData.Type == EdgeType::ClimbableWall) ?
@@ -825,10 +825,25 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchCon
 	short targetHeadingAngle = (catchData.Type == EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.HeadingAngle;
 	player.Context.OrientOffset = EulerAngles(0, targetHeadingAngle, 0);
 
-	// Set attractor attachment.
-	catchData.AttracPtr->AttachPlayer(item);
-	player.Context.Attractor.Ptr = catchData.AttracPtr;
-	player.Context.Attractor.ChainDistance = catchData.ChainDistance;
+	// TODO: Redo attractor parenting for edge catch.
+	
+	// Get attractor collision.
+	auto attracColl = GetAttractorCollision(*catchData.AttracPtr, catchData.ChainDistance, item.Pose.Orientation.y);
+	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
+
+	// Calculate offset intersection.
+	auto rotMatrix = attracOrient.ToRotationMatrix();
+	auto offsetIntersect = attracColl.Proximity.Intersection + Vector3::Transform(Vector3(0.0f, -LARA_HEIGHT_STRETCH, -coll.Setup.Radius), rotMatrix);
+
+	// Calculate relative delta position and orientation.
+	auto relDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - offsetIntersect, rotMatrix.Invert());
+	auto relDeltaOrient = item.Pose.Orientation - attracOrient;
+
+	// Attach player to attractor.
+	player.Context.Attractor.Attach(
+		item, *catchData.AttracPtr, catchData.ChainDistance,
+		Vector3(0.0f, -LARA_HEIGHT_STRETCH, -coll.Setup.Radius), EulerAngles::Zero,
+		relDeltaPos, relDeltaOrient);
 }
 
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const MonkeySwingCatchContextData& catchData)

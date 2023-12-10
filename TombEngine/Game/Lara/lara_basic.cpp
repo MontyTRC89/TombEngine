@@ -84,6 +84,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+// TODO: Maybe make new state LS_CLIMB_LEDGE for special case of attractor parent.
 void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -94,10 +95,10 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 
 	// HACK: Continue aligning to edge while pulling up.
 	if (item->Animation.AnimNumber == LA_HANG_TO_STAND ||
+		item->Animation.AnimNumber == LA_HANG_HANDSTAND ||
 		item->Animation.AnimNumber == LA_HANG_TO_CROUCH)
 	{
 		HandlePlayerAttractorParent(*item, *coll);
-		item->Pose.Orientation.Lerp(Lara.Context.OrientOffset, 0.25f);
 	}
 }
 
