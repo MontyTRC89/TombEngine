@@ -1283,7 +1283,7 @@ namespace TEN::Entities::Player
 																				const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SWAMP_DEPTH_MAX				  = -CLICK(3);
-		constexpr auto LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX = CRAWL_STEPUP_HEIGHT;
+		constexpr auto LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX = CLICK(0.5f);
 
 		// HACK: Offset required for proper bridge surface height detection. Floordata should be revised for proper handling.
 		constexpr auto PROBE_POINT_OFFSET = Vector3(0.0f, -CLICK(1), 0.0f);
@@ -1332,15 +1332,15 @@ namespace TEN::Entities::Player
 				}
 			}
 
-			// TODO: Point collision probing is wrong. Won't traverse rooms correctly.
-			// Potential solution. Probe from player's position and room. Combine player/intersect delta pos and RelPosOffset.
+			// TODO: Point collision probing may traverse rooms correctly if bridges cross rooms.
+			// Potential solution: probe from player's position and room. Combine player/intersect RelDeltaPos and RelPosOffset.
 			
-			// Get point collision in front of edge.
+			// Get point collision behind edge.
 			auto probePoint = Vector3i(attracColl.Proximity.Intersection) + PROBE_POINT_OFFSET;
-			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
+			auto pointCollBack = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 2.5) Test if relative edge height is within edge intersection bounds.
-			int relEdgeHeight = (setup.TestEdgeFront ? attracColl.Proximity.Intersection.y : pointCollFront.Position.Floor) - item.Pose.Position.y;
+			int relEdgeHeight = (setup.TestEdgeFront ? attracColl.Proximity.Intersection.y : pointCollBack.Position.Floor) - item.Pose.Position.y;
 			if (relEdgeHeight >= setup.LowerEdgeBound || // Player-to-edge height is within lower edge bound.
 				relEdgeHeight < setup.UpperEdgeBound)	 // Player-to-edge height is within upper edge bound.
 			{
@@ -1348,31 +1348,31 @@ namespace TEN::Entities::Player
 			}
 
 			// 2.6) Test if ceiling in front is adequately higher than edge.
-			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
-			// Get point collision behind edge.
-			auto pointCollBack = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, coll.Setup.Radius);
+			// Get point collision in front of edge.
+			auto pointCollFront = GetCollision(probePoint, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, coll.Setup.Radius);
 
 			// Test ledge heights (if applicable).
 			if (setup.TestLedgeHeights)
 			{
-				const auto& pointCollHeights = setup.TestEdgeFront ? pointCollBack.Position : pointCollFront.Position;
+				const auto& ledgePointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
 
 				// 2.7) Test ledge floor-to-ceiling height.
-				int ledgeFloorToCeilHeight = abs(pointCollHeights.Ceiling - pointCollHeights.Floor);
+				int ledgeFloorToCeilHeight = abs(ledgePointColl.Position.Ceiling - ledgePointColl.Position.Floor);
 				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
 					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
 				{
 					continue;
 				}
 
-				// TODO: Check.
+				// TODO: Check for edge back.
 				// 2.8) Test ledge floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
-					int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - pointCollHeights.Floor);
+					int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - ledgePointColl.Position.Floor);
 					if (ledgeFloorToEdgeHeight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
 					{
 						continue;
@@ -1383,11 +1383,11 @@ namespace TEN::Entities::Player
 			// 2.9) Test for illegal slope on ledge (if applicable).
 			if (setup.TestLedgeIllegalSlope)
 			{
-				if (setup.TestEdgeFront ? pointCollBack.Position.FloorSlope : pointCollFront.Position.FloorSlope)
+				if (setup.TestEdgeFront ? pointCollFront.Position.FloorSlope : pointCollBack.Position.FloorSlope)
 					continue;
 			}
 
-			const auto& staticPointColl = setup.TestEdgeFront ? pointCollBack : pointCollFront;
+			const auto& staticPointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
 			auto origin = Vector3(staticPointColl.Coordinates.x, staticPointColl.Position.Floor, staticPointColl.Coordinates.z);
 
 			// TODO: Check.
