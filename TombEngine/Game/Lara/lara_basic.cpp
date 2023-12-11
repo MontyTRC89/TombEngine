@@ -93,6 +93,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
+	// TODO: Make proper states for these.
 	// HACK: Continue aligning to edge while pulling up.
 	if (item->Animation.AnimNumber == LA_HANG_TO_STAND ||
 		item->Animation.AnimNumber == LA_HANG_HANDSTAND ||
@@ -115,6 +116,20 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	HandlePlayerAttractorParent(*item, *coll);
 
 	item->Animation.TargetState = LS_IDLE;
+}
+
+void lara_as_stand_edge_descent(ItemInfo* item, CollisionInfo* coll)
+{
+	constexpr auto ORIENT_LERP_ALPHA = 0.25f;
+
+	auto& player = GetLaraInfo(*item);
+
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetAngle = 0;
+	Camera.flags = CF_FOLLOW_CENTER;
+
+	HandlePlayerAttractorParent(*item, *coll);
 }
 
 // State:	  LS_AUTO_JUMP (62)
@@ -495,6 +510,12 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
+			// TODO
+			//if (IsHeld(In::Walk))
+			//{
+			//	// Other descent.
+			//}
+
 			auto climbContext = GetStandingClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
@@ -533,6 +554,17 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Back))
 	{
+		if (IsHeld(In::Action) && IsHeld(In::Walk))
+		{
+			auto climbContext = GetStandEdgeDescentClimbContext(*item, *coll);
+			if (climbContext.has_value())
+			{
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerClimb(*item, *coll, *climbContext);
+				return;
+			}
+		}
+
 		if (CanWadeBackward(*item, *coll))
 		{
 			item->Animation.TargetState = LS_WALK_BACK;

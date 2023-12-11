@@ -2280,23 +2280,127 @@ namespace TEN::Entities::Player
 		}
 	}
 
-	// TODO
-	std::optional<ClimbContextData> GetSafeEdgeDescentClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																		 const std::vector<AttractorCollisionData>& attracColls)
 	{
+		return std::nullopt;
+	}
+	
+	std::optional<ClimbContextData> GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																		const std::vector<AttractorCollisionData>& attracColls)
+	{
+		return std::nullopt;
+	}
 
-		// Create and return crawl to hang vault context.
-		auto context = ClimbContextData{};
-		//context.AttracPtr = attracColl.AttracPtr;
-		//context.ChainDistance = attracColl.Proximity.ChainDistance;
-		context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
-		context.RelOrientOffset = EulerAngles::Zero;
-		context.TargetStateID = LS_CRAWL_TO_HANG;
-		context.AlignType = ClimbContextAlignType::AttractorParent;
-		//context.IsInFront = attracColl.IsFacingForward; // TODO: Check.
-		context.SetBusyHands = true;
-		context.SetJumpVelocity = false;
+	std::optional<ClimbContextData> GetStandEdgeDescentBackFlipClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			const std::vector<AttractorCollisionData>& attracColls)
+	{
+		return std::nullopt;
+	}
 
-		return context;
+	// TODO: Idea
+	// EdgeVaultClimbSetupData
+	// EdgeDescentClimbSetupData
+	// Edge vaulting encompasses stand vaults, crawl vaults, tread water vaults.
+	// Edge descending encompasses stand front and back descents, crawl front and back descents.
+	// Each has its own setup struct and dedicated common attractor collision assessment function, but both share ClimbContextData.
+	// This way code remains shared, but not an excessive amount of it, eliminating irrelevant tests
+	// specific to each climb scenario.
+
+	std::optional<ClimbContextData> GetStandEdgeDescentClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto SETUP = ClimbSetupData
+		{
+			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
+			0, -MAX_HEIGHT,					  // Ledge floor-to-ceil range (irrelevant).
+			-CLICK(1),						  // Edge-to-ceil height lower bound.
+			false,							  // Test swamp depth (irrelevant).
+			false,							  // Test edge front (irrelevant).
+			false,							  // Test ledge heights (irrelevant).
+			false							  // Test ledge illegal slope (irrelevant).
+		};
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+
+		const auto& player = GetLaraInfo(item);
+
+		// TODO: Better way. Use GetStaticObjectLos().
+		// 1) Test for object collision.
+		/*bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
+		if (isObjectCollided)
+			return std::nullopt;*/
+
+		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+
+		// 2) Assess attractor collision.
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
+		for (const auto& attracColl : attracColls)
+		{
+			// 2.1) Check if attractor is edge type.
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
+				continue;
+
+			// 2.2) Test if edge is within 2D range.
+			if (attracColl.Proximity.Distance2D > range2D)
+				continue;
+
+			// 2.3) Test if edge slope is illegal.
+			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+				continue;
+
+			// TODO
+			// 2.4) Test relation to edge intersection.
+			if (/*!attracColl.IsInFront || attracColl.IsFacingForward ||
+				*/!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			{
+				continue;
+			}
+
+			// Get point collision in front of edge.
+			auto pointCollFront = GetCollision(
+				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius);
+
+			// TODO
+			// 2.5) Test if relative edge height is within edge intersection bounds.
+			auto relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor;
+			if (relEdgeHeight >= SETUP.LowerEdgeBound || // Floor-to-edge height is within lower edge bound.
+				relEdgeHeight < SETUP.UpperEdgeBound)	 // Floor-to-edge height is within upper edge bound.
+			{
+				//continue;
+			}
+
+			// 2.6) Test if ceiling in front is adequately higher than edge.
+			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			if (edgeToCeilHeight > SETUP.LowerEdgeToCeilBound)
+				continue;
+
+			// Create and return crawl to hang vault context.
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl.AttractorPtr;
+			context.ChainDistance = attracColl.Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = IsHeld(In::Sprint) ? LS_STAND_EDGE_DESCENT_BACK_FLIP : LS_STAND_EDGE_DESCENT_BACK;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl.IsFacingForward; // TODO: Check.
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			return context;
+		}
+
+		// No valid edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
+	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
 	}
 
 	std::optional<ClimbContextData> GetCrawlEdgeDescentClimbContext(ItemInfo& item, const CollisionInfo& coll)

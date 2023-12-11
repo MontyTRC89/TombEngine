@@ -223,6 +223,10 @@ enum LaraState
 	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH = 195,
 	LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH = 196,
 	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH = 197,
+	LS_STAND_EDGE_DESCENT = 198,
+	LS_STAND_EDGE_DESCENT_FRONT = 199,
+	LS_STAND_EDGE_DESCENT_BACK = 200,
+	LS_STAND_EDGE_DESCENT_BACK_FLIP = 201,
 
 	NUM_LARA_STATES
 };
@@ -531,9 +535,8 @@ enum LaraAnim
 	LA_MONKEY_TURN_RIGHT_TO_IDLE_LATE = 286,						// Turn right on monkey swing > monkey swing idle, 2nd opportunity
 	LA_HANG_TO_CROUCH = 287,										// Pull up from hang > crouch
 	LA_HANG_TO_CROUCH_END = 288,									// Pull up from hang > crouch (2/2)
-	LA_CRAWL_TO_HANG_START = 289,									// Crawl > hang (1/3)
-	LA_CRAWL_TO_HANG_CONTINUE = 290,								// Crawl > hang (2/3)
-																		// TODO: position commands in 302 may be stacked in 290, so can remove 302?
+	LA_CRAWL_TO_EDGE_HANG = 289,									// Crawl > edge hang
+	LA_CRAWL_TO_HANG_CONTINUE = 290,								// TODO: Remove.
 	LA_CROUCH_PICKUP = 291,											// Crouching pickup
 	LA_CRAWL_PICKUP = 292,											// Crawling pickup
 	LA_CROUCH_HIT_BACK = 293,										// Jerk back crouching from damage
@@ -545,7 +548,7 @@ enum LaraAnim
 	LA_CRAWL_HIT_LEFT = 299,										// Jerk left crawling from damage
 	LA_CRAWL_HIT_RIGHT = 300,										// Jerk right crawling from damage
 	LA_CRAWL_DEATH = 301,											// Crawl death
-	LA_CRAWL_TO_HANG_END = 302,										// Crawl > hang (3/3)
+	LA_CRAWL_TO_HANG_END = 302,										// TODO: Remove.
 	LA_STAND_TO_CROUCH_ABORT = 303,									// Stand > crouch abort
 	LA_RUN_TO_CROUCH_LEFT_START = 304,								// Run > crouch, left foot first (1/2)
 	LA_RUN_TO_CROUCH_RIGHT_START = 305,								// Run > crouch, right foot first (1/2)
@@ -828,10 +831,15 @@ enum LaraAnim
 
 	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
+	LA_STAND_TO_EDGE_HANG_FRONT = 599,
+	LA_STAND_TO_EDGE_HANG_BACK = 600,
+	LA_STAND_TO_EDGE_HANG_BACK_FLIP = 601,
+
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
 	// 280,
+	// 290, 302,
 	// 368, 370,
 };
 
