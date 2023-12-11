@@ -15,7 +15,7 @@ struct ROOM_INFO;
 
 enum class GameStatus
 {
-	None,
+	Normal,
 	NewGame,
 	LoadGame,
 	SaveGame,

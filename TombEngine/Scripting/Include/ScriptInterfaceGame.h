@@ -2,7 +2,7 @@
 #include <functional>
 #include <string>
 
-#include "Game/control/volumeactivator.h"
+#include "Game/control/event.h"
 #include "Game/room.h"
 #include "Specific/level.h"
 
@@ -63,7 +63,7 @@ public:
 	virtual void ResetScripts(bool clearGameVars) = 0;
 	virtual void ExecuteScriptFile(const std::string& luaFileName) = 0;
 	virtual void ExecuteString(const std::string& command) = 0;
-	virtual void ExecuteFunction(const std::string& luaFuncName, TEN::Control::Volumes::VolumeActivator, const std::string& arguments) = 0;
+	virtual void ExecuteFunction(const std::string& luaFuncName, TEN::Control::Volumes::Activator, const std::string& arguments) = 0;
 	virtual void ExecuteFunction(const std::string& luaFuncName, short idOne, short idTwo = 0) = 0;
 
 	virtual void GetVariables(std::vector<SavedVar>& vars) = 0;

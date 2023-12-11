@@ -14,6 +14,7 @@ Version 1.3
 * FIx Lara not being able to pickup a torch whilst crouching.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Improve fly cheat collision.
+* Add global events.
 * Add fast speed for fly cheat by holding Sprint input action.
 * Allow walking on slopes when wading in water (similar to quicksand rooms).
 * Allow Lara to pull certain levers with both hands whilst holding a flare.
@@ -26,7 +27,7 @@ Version 1.3
 
 Lua API changes:
 * Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
-* Add Moveable:SetStatus() to set the current status of the moveable
+* Add Moveable:SetStatus() to set the current status of the moveable.
 
 Version 1.2
 ===========

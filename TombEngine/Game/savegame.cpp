@@ -6,10 +6,10 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
+#include "Game/control/event.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
-#include "Game/control/volumeactivator.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -213,6 +213,7 @@ bool SaveGame::Save(int slot)
 		return false;
 
 	g_GameScript->OnSave();
+	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
 
 	// Savegame infos need to be reloaded so that last savegame counter properly increases.
 	SaveGame::LoadSavegameInfos();
@@ -882,21 +883,6 @@ bool SaveGame::Save(int slot)
 	}
 	auto serializedEffectsOffset = fbb.CreateVector(serializedEffects);
 
-	// Event set call counters
-	std::vector<flatbuffers::Offset<Save::EventSetCallCounters>> serializedEventSetCallCounters{};
-	for (auto& set : g_Level.EventSets)
-	{
-		Save::EventSetCallCountersBuilder serializedEventSetCallCounter{ fbb };
-
-		serializedEventSetCallCounter.add_on_enter(set.Events[(int)VolumeEventType::Enter].CallCounter);
-		serializedEventSetCallCounter.add_on_inside(set.Events[(int)VolumeEventType::Inside].CallCounter);
-		serializedEventSetCallCounter.add_on_leave(set.Events[(int)VolumeEventType::Leave].CallCounter);
-
-		auto serializedEventSetCallCounterOffset = serializedEventSetCallCounter.Finish();
-		serializedEventSetCallCounters.push_back(serializedEventSetCallCounterOffset);
-	}
-	auto serializedEventSetCallCountersOffset = fbb.CreateVector(serializedEventSetCallCounters);
-
 	// Soundtrack playheads
 	std::vector<flatbuffers::Offset<Save::Soundtrack>> soundtracks;
 	for (int j = 0; j < (int)SoundTrackType::Count; j++)
@@ -1033,6 +1019,46 @@ bool SaveGame::Save(int slot)
 	}
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
 	auto volumesOffset = fbb.CreateVector(volumes);
+
+	// Global event sets
+	std::vector<flatbuffers::Offset<Save::EventSet>> globalEventSets{};
+	for (int j = 0; j < g_Level.GlobalEventSets.size(); j++)
+	{
+		std::vector<int> callCounters = {};
+
+		for (int k = 0; k < g_Level.GlobalEventSets[j].Events.size(); k++)
+			callCounters.push_back(g_Level.GlobalEventSets[j].Events[k].CallCounter);
+
+		auto vec = fbb.CreateVector(callCounters);
+
+		Save::EventSetBuilder eventSet{ fbb };
+
+		eventSet.add_index(j);
+		eventSet.add_call_counters(vec);
+
+		globalEventSets.push_back(eventSet.Finish());
+	}
+	auto globalEventSetsOffset = fbb.CreateVector(globalEventSets);
+
+	// Volume event sets
+	std::vector<flatbuffers::Offset<Save::EventSet>> volumeEventSets{};
+	for (int j = 0; j < g_Level.VolumeEventSets.size(); j++)
+	{
+		std::vector<int> callCounters = {};
+
+		for (int k = 0; k < g_Level.VolumeEventSets[j].Events.size(); k++)
+			callCounters.push_back(g_Level.VolumeEventSets[j].Events[k].CallCounter);
+
+		auto vec = fbb.CreateVector(callCounters);
+
+		Save::EventSetBuilder eventSet{ fbb };
+
+		eventSet.add_index(j);
+		eventSet.add_call_counters(vec);
+
+		volumeEventSets.push_back(eventSet.Finish());
+	}
+	auto volumeEventSetsOffset = fbb.CreateVector(volumeEventSets);
 
 	// Particles
 	std::vector<flatbuffers::Offset<Save::ParticleInfo>> particles;
@@ -1389,7 +1415,8 @@ bool SaveGame::Save(int slot)
 	sgb.add_scarabs(scarabsOffset);
 	sgb.add_sinks(sinksOffset);
 	sgb.add_flyby_cameras(flybyCamerasOffset);
-	sgb.add_call_counters(serializedEventSetCallCountersOffset);
+	sgb.add_global_event_sets(globalEventSetsOffset);
+	sgb.add_volume_event_sets(volumeEventSetsOffset);
 
 	if (Lara.Control.Rope.Ptr != -1)
 	{
@@ -1985,15 +2012,23 @@ bool SaveGame::Load(int slot)
 		fx.flag2 = fx_saved->flag2();
 	}
 
-	if (g_Level.EventSets.size() == s->call_counters()->size())
+	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
 	{
-		for (int i = 0; i < s->call_counters()->size(); ++i)
+		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
 		{
-			auto cc_saved = s->call_counters()->Get(i);
+			auto set_saved = s->volume_event_sets()->Get(i);
+			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
+				g_Level.VolumeEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
+		}
+	}
 
-			g_Level.EventSets[i].Events[(int)VolumeEventType::Enter].CallCounter = cc_saved->on_enter();
-			g_Level.EventSets[i].Events[(int)VolumeEventType::Inside].CallCounter = cc_saved->on_inside();
-			g_Level.EventSets[i].Events[(int)VolumeEventType::Leave].CallCounter = cc_saved->on_leave();
+	if (g_Level.GlobalEventSets.size() == s->global_event_sets()->size())
+	{
+		for (int i = 0; i < s->global_event_sets()->size(); ++i)
+		{
+			auto set_saved = s->global_event_sets()->Get(i);
+			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
+				g_Level.GlobalEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
 		}
 	}
 
