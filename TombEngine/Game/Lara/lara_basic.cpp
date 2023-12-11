@@ -181,7 +181,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetStandingClimbContext(*item, *coll);
+			auto climbContext = GetStandVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
@@ -318,7 +318,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetStandingClimbContext(*item, *coll);
+			auto climbContext = GetStandVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
@@ -516,7 +516,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			//	// Other descent.
 			//}
 
-			auto climbContext = GetStandingClimbContext(*item, *coll);
+			auto climbContext = GetStandVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
@@ -857,7 +857,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetStandingClimbContext(*item, *coll);
+			auto climbContext = GetStandVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
@@ -1196,7 +1196,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetStandingClimbContext(*item, *coll);
+			auto climbContext = GetStandVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
@@ -1646,7 +1646,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetStandingClimbContext(*item, *coll);
+			auto climbContext = GetStandVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
@@ -1765,7 +1765,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action) && CanVaultFromSprint(*item, *coll))
 		{
-			auto climbContext = GetStandingClimbContext(*item, *coll);
+			auto climbContext = GetStandVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;

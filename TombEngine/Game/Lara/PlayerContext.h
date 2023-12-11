@@ -149,17 +149,21 @@ namespace TEN::Entities::Player
 	// Object interaction contexts
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
-	// Context data getters
-	std::optional<ClimbContextData>				GetStandingClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>				GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>				GetTreadWaterClimbContext(ItemInfo& item, const CollisionInfo& coll);
+	// Edge vault climb contexts
+	std::optional<ClimbContextData>				GetStandVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>				GetCrawlVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>				GetTreadWaterVaultClimbContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<WaterTreadStepOutContextData> GetTreadWaterStepOutContext(const ItemInfo& item);
-	std::optional<ClimbContextData>				GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>				GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>				GetCrawlEdgeDescentFrontClimbContext(ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>				GetCrawlEdgeDescentBackClimbContext(ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeCatchContextData>			GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
-	std::optional<MonkeySwingCatchContextData>	GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
+
+	// Edge descent climb contexts
+	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(ItemInfo& item, const CollisionInfo& coll);
+
+	// Catch contexts
+	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
+	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// TEMP
 	std::optional<WallClimbContextData> GetAutoJumpWallClimbContext(const ItemInfo& item, const CollisionInfo& coll);

@@ -95,7 +95,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetTreadWaterClimbContext(*item, *coll);
+			auto climbContext = GetTreadWaterVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
@@ -166,7 +166,7 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			auto climbContext = GetTreadWaterClimbContext(*item, *coll);
+			auto climbContext = GetTreadWaterVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;

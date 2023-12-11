@@ -1653,7 +1653,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetStandingClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(2);
 
@@ -1900,7 +1900,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetCrawlVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
@@ -2188,7 +2188,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetTreadWaterClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetTreadWaterVaultClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
@@ -2337,8 +2337,7 @@ namespace TEN::Entities::Player
 	}
 
 	// TODO: implement.
-	static std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																				const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		return std::nullopt;
 	}
@@ -2386,7 +2385,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO
+	// TODO: implement.
 	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
 		return std::nullopt;

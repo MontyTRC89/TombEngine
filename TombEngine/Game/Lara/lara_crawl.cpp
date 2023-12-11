@@ -463,7 +463,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (IsHeld(In::Action) || IsHeld(In::Jump))
 			{
-				auto climbContext = GetCrawlClimbContext(*item, *coll);
+				auto climbContext = GetCrawlVaultClimbContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
@@ -587,7 +587,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Action) || IsHeld(In::Jump))
 			{
 				// TODO: Not working in this state.
-				auto climbContext = GetCrawlClimbContext(*item, *coll);
+				auto climbContext = GetCrawlVaultClimbContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
@@ -787,7 +787,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Action) || IsHeld(In::Jump))
 			{
 				// TODO: Not working in this state.
-				auto climbContext = GetCrawlClimbContext(*item, *coll);
+				auto climbContext = GetCrawlVaultClimbContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
@@ -878,7 +878,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Action) || IsHeld(In::Jump))
 			{
 				// TODO: Not working in this state.
-				auto climbContext = GetCrawlClimbContext(*item, *coll);
+				auto climbContext = GetCrawlVaultClimbContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
