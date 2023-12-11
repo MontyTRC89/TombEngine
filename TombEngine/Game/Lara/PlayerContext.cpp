@@ -1334,13 +1334,19 @@ namespace TEN::Entities::Player
 
 			// TODO: Point collision probing may traverse rooms correctly if bridges cross rooms.
 			// Potential solution: probe from player's position and room. Combine player/intersect RelDeltaPos and RelPosOffset.
-			
+
+			// TODO: Test for overhang blockng edge.
+			// 2.5) Test if intersection is blocked by ceiling.
+			/*auto pointCollCenter = GetCollision(Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber());
+			if (pointCollCenter.Position.Ceiling > attracColl.Proximity.Intersection.y)
+				continue;*/
+
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
-			// 2.5) Test if relative edge height is within edge intersection bounds.
+			// 2.6) Test if relative edge height is within edge intersection bounds.
 			int relEdgeHeight = (setup.TestEdgeFront ? attracColl.Proximity.Intersection.y : pointCollBack.Position.Floor) - item.Pose.Position.y;
 			if (relEdgeHeight >= setup.LowerEdgeBound || // Player-to-edge height is within lower edge bound.
 				relEdgeHeight < setup.UpperEdgeBound)	 // Player-to-edge height is within upper edge bound.
@@ -1348,7 +1354,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// 2.6) Test if ceiling in front is adequately higher than edge.
+			// 2.7) Test if ceiling in front is adequately higher than edge.
 			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
@@ -1363,7 +1369,7 @@ namespace TEN::Entities::Player
 			{
 				const auto& ledgePointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
 
-				// 2.7) Test ledge floor-to-ceiling height.
+				// 2.8) Test ledge floor-to-ceiling height.
 				int ledgeFloorToCeilHeight = abs(ledgePointColl.Position.Ceiling - ledgePointColl.Position.Floor);
 				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
 					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
@@ -1371,7 +1377,7 @@ namespace TEN::Entities::Player
 					continue;
 				}
 
-				// 2.8) Test ledge floor-to-edge height if approaching from front.
+				// 2.9) Test ledge floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
 					int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - ledgePointColl.Position.Floor);
@@ -1380,7 +1386,7 @@ namespace TEN::Entities::Player
 				}
 			}
 
-			// 2.9) Test for illegal slope on ledge (if applicable).
+			// 2.10) Test for illegal slope on ledge (if applicable).
 			if (setup.TestLedgeIllegalSlope)
 			{
 				if (setup.TestEdgeFront ? pointCollFront.Position.FloorSlope : pointCollBack.Position.FloorSlope)
@@ -1391,7 +1397,7 @@ namespace TEN::Entities::Player
 			auto origin = Vector3(staticPointColl.Coordinates.x, staticPointColl.Position.Floor, staticPointColl.Coordinates.z);
 
 			// TODO: Check.
-			// 2.10) Test for static object.
+			// 2.11) Test for static object.
 			auto staticLos = GetStaticObjectLos(origin, attracColl.AttracPtr->GetRoomNumber(), -Vector3::UnitY, coll.Setup.Height, false);
 			if (staticLos.has_value())
 				continue;
