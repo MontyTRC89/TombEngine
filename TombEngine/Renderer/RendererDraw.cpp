@@ -2153,6 +2153,7 @@ namespace TEN::Renderer
 							object.Static = statics[i];
 							object.Centre = Vector3::Transform(bucket.Centre, statics[i]->World);
 							object.Distance = Vector3::Distance(object.Centre, view.Camera.WorldPosition);
+							object.Mesh = refMesh;
 
 							view.TransparentObjectsToDraw.push_back(object);
 						}

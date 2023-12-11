@@ -139,41 +139,41 @@ Texture2D searchTex : register(t8);
 /**
  * Function wrappers
  */
-void DX11_SMAAEdgeDetectionVS(float4 position : POSITION,
+void DX11_SMAAEdgeDetectionVS(float3 position : POSITION,
     out float4 svPosition : SV_POSITION,
     inout float2 texcoord : TEXCOORD0,
     out float4 offset[3] : TEXCOORD1) {
-    svPosition = position;
+    svPosition = float4(position, 1.0f);
     SMAAEdgeDetectionVS(texcoord, offset);
 }
 
-void DX11_SMAABlendingWeightCalculationVS(float4 position : POSITION,
+void DX11_SMAABlendingWeightCalculationVS(float3 position : POSITION,
     out float4 svPosition : SV_POSITION,
     inout float2 texcoord : TEXCOORD0,
     out float2 pixcoord : TEXCOORD1,
     out float4 offset[3] : TEXCOORD2) {
-    svPosition = position;
+    svPosition = float4(position, 1.0f);
     SMAABlendingWeightCalculationVS(texcoord, pixcoord, offset);
 }
 
-void DX11_SMAANeighborhoodBlendingVS(float4 position : POSITION,
+void DX11_SMAANeighborhoodBlendingVS(float3 position : POSITION,
     out float4 svPosition : SV_POSITION,
     inout float2 texcoord : TEXCOORD0,
     out float4 offset : TEXCOORD1) {
-    svPosition = position;
+    svPosition = float4(position, 1.0f);
     SMAANeighborhoodBlendingVS(texcoord, offset);
 }
 
-void DX11_SMAAResolveVS(float4 position : POSITION,
+void DX11_SMAAResolveVS(float3 position : POSITION,
     out float4 svPosition : SV_POSITION,
     inout float2 texcoord : TEXCOORD0) {
-    svPosition = position;
+    svPosition = float4(position, 1.0f);
 }
 
-void DX11_SMAASeparateVS(float4 position : POSITION,
+void DX11_SMAASeparateVS(float3 position : POSITION,
     out float4 svPosition : SV_POSITION,
     inout float2 texcoord : TEXCOORD0) {
-    svPosition = position;
+    svPosition = float4(position, 1.0f);
 }
 
 float2 DX11_SMAALumaEdgeDetectionPS(float4 position : SV_POSITION,
