@@ -26,7 +26,7 @@ namespace TEN::Collision::Attractor
 		segmentID = std::clamp(segmentID, 0u, std::min(segmentID, unsigned int(points.size() - 2)));
 
 		// Set attractor pointer and get proximity data.
-		AttracPtr = &attrac;
+		AttractorPtr = &attrac;
 		Proximity = GetProximity(pos, segmentID);
 
 		// Calculate orientations.
@@ -43,7 +43,7 @@ namespace TEN::Collision::Attractor
 
 	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, unsigned int segmentID) const
 	{
-		const auto& points = AttracPtr->GetPoints();
+		const auto& points = AttractorPtr->GetPoints();
 
 		// Single point exists; return simple proximity data.
 		if (points.size() == 1)
@@ -57,7 +57,7 @@ namespace TEN::Collision::Attractor
 		float chainDistTraveled = 0.0f;
 		for (unsigned int i = 0; i < segmentID; i++)
 		{
-			float segmentLength = AttracPtr->GetSegmentLengths()[i];
+			float segmentLength = AttractorPtr->GetSegmentLengths()[i];
 			chainDistTraveled += segmentLength;
 		}
 
@@ -242,8 +242,8 @@ namespace TEN::Collision::Attractor
 		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(8));
 		for (const auto& attracColl : attracColls)
 		{
-			uniqueAttracPtrs.insert(attracColl.AttracPtr);
-			attracColl.AttracPtr->DrawDebug(attracColl.Proximity.SegmentID);
+			uniqueAttracPtrs.insert(attracColl.AttractorPtr);
+			attracColl.AttractorPtr->DrawDebug(attracColl.Proximity.SegmentID);
 		}
 
 		//g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());

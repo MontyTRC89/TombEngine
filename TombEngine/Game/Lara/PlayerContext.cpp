@@ -24,14 +24,16 @@ namespace TEN::Entities::Player
 {
 	PlayerAttractorData::~PlayerAttractorData()
 	{
-		if (Ptr != nullptr)
-			Ptr->DetachPlayer(*LaraItem);
+		// TODO: Polymorphism to avoid global.
+		Detach(*LaraItem);
 	}
 
 	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
 									 const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
 									 const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient)
 	{
+		Detach(playerItem);
+
 		Ptr = &attrac;
 		ChainDistance = chainDist;
 		RelPosOffset = relPosOffset;
@@ -44,14 +46,7 @@ namespace TEN::Entities::Player
 
 	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
 	{
-		attrac.AttachPlayer(playerItem);
-
-		Ptr = &attrac;
-		ChainDistance = chainDist;
-		RelPosOffset = Vector3::Zero;
-		RelOrientOffset = EulerAngles::Zero;
-		RelDeltaPos = Vector3::Zero;
-		RelDeltaOrient = EulerAngles::Zero;
+		Attach(playerItem, attrac, chainDist, Vector3::Zero, EulerAngles::Zero, Vector3::Zero, EulerAngles::Zero);
 	}
 
 	void PlayerAttractorData::Detach(ItemInfo& playerItem)
@@ -1303,7 +1298,7 @@ namespace TEN::Entities::Player
 		for (const auto& attracColl : attracColls)
 		{
 			// 2.1) Check if attractor is edge type.
-			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
 				continue;
 
 			// 2.2) Test if edge is within 2D range.
@@ -1343,7 +1338,7 @@ namespace TEN::Entities::Player
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
+				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			// 2.6) Test if relative edge height is within edge intersection bounds.
@@ -1361,7 +1356,7 @@ namespace TEN::Entities::Player
 
 			// Get point collision in front of edge.
 			auto pointCollFront = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber(),
+				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			// Test ledge heights (if applicable).
@@ -1398,7 +1393,7 @@ namespace TEN::Entities::Player
 
 			// TODO: Check.
 			// 2.11) Test for static object.
-			auto staticLos = GetStaticObjectLos(origin, attracColl.AttracPtr->GetRoomNumber(), -Vector3::UnitY, coll.Setup.Height, false);
+			auto staticLos = GetStaticObjectLos(origin, attracColl.AttractorPtr->GetRoomNumber(), -Vector3::UnitY, coll.Setup.Height, false);
 			if (staticLos.has_value())
 				continue;
 
@@ -1429,7 +1424,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1465,7 +1460,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1501,7 +1496,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1537,7 +1532,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1573,7 +1568,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1615,7 +1610,7 @@ namespace TEN::Entities::Player
 			int relEdgeHeight = attracColl->Proximity.Intersection.y - item.Pose.Position.y;
 
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, -relEdgeHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1746,7 +1741,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
@@ -1781,7 +1776,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
@@ -1818,7 +1813,7 @@ namespace TEN::Entities::Player
 
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1853,7 +1848,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
@@ -1983,7 +1978,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2022,7 +2017,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2062,7 +2057,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2102,7 +2097,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2141,7 +2136,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2181,7 +2176,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2337,7 +2332,7 @@ namespace TEN::Entities::Player
 		for (const auto& attracColl : attracColls)
 		{
 			// 2.1) Check if attractor is edge type.
-			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
 				continue;
 
 			// 2.2) Test if edge is within 2D range.
@@ -2358,7 +2353,7 @@ namespace TEN::Entities::Player
 
 			// Get point collision in front of edge.
 			auto pointCollFront = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttracPtr->GetRoomNumber(),
+				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 			
 			// TODO
@@ -2377,7 +2372,7 @@ namespace TEN::Entities::Player
 
 			// Create and return crawl to hang vault context.
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl.AttracPtr;
+			context.AttractorPtr = attracColl.AttractorPtr;
 			context.ChainDistance = attracColl.Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2408,7 +2403,7 @@ namespace TEN::Entities::Player
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check if attractor is edge type.
-			if (attracColl.AttracPtr->GetType() != AttractorType::Edge)
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
 				continue;
 
 			// 2) Test if edge is within 2D range.
@@ -2428,7 +2423,7 @@ namespace TEN::Entities::Player
 
 			// Get point collision in front of edge. NOTE: Vertical offset required for correct bridge collision.
 			auto point = Vector3i(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.y - CLICK(1), attracColl.Proximity.Intersection.z);
-			auto pointColl = GetCollision(point, attracColl.AttracPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
+			auto pointColl = GetCollision(point, attracColl.AttractorPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 5) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;
@@ -2486,14 +2481,14 @@ namespace TEN::Entities::Player
 
 		// TODO: Not needed? Handled by hang function.
 		// Calculate heading angle. NOTE: Less accurate if edge catch spans connecting attractors.
-		auto pointLeft = attracColl->AttracPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance - coll.Setup.Radius);
-		auto pointRight = attracColl->AttracPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance + coll.Setup.Radius);
+		auto pointLeft = attracColl->AttractorPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance - coll.Setup.Radius);
+		auto pointRight = attracColl->AttractorPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance + coll.Setup.Radius);
 		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
 
 		// Return edge catch data.
 		return EdgeCatchContextData
 		{
-			attracColl->AttracPtr,
+			attracColl->AttractorPtr,
 			EdgeType::Attractor,
 			attracColl->Proximity.Intersection,
 			attracColl->Proximity.ChainDistance,
