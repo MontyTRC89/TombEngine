@@ -18,7 +18,7 @@ namespace TEN::Entities::Player
 	struct EdgeCatchContextData;
 	struct MonkeySwingCatchContextData;
 	struct ShimmyContextData;
-	struct VaultTestResult; // Old
+	struct WallClimbContextData; // Old
 
 	struct PlayerAttractorData
 	{
@@ -160,7 +160,7 @@ namespace TEN::Entities::Player
 	std::optional<MonkeySwingCatchContextData>	GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// TEMP
-	std::optional<VaultTestResult> TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll);
-	std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll);
-	bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll);
+	std::optional<WallClimbContextData> GetAutoJumpWallClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<WallClimbContextData> GetMountWallClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	bool								HandleWallClimb(ItemInfo& item, CollisionInfo& coll);
 }

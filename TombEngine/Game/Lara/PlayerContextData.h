@@ -108,13 +108,13 @@ namespace TEN::Entities::Player
 		int TargetStateID = 0;
 	};
 
-	// TODO: Deprecated, but still used by climbable wall test functions for now.
-	struct VaultTestResult
+	// TODO: Temporary.
+	struct WallClimbContextData
 	{
-		int Height;
-		bool SetBusyHands;
-		bool SnapToLedge;
-		bool SetJumpVelocity;
-		LaraState TargetState;
+		int	 Height			 = 0;
+		bool SetBusyHands	 = 0;
+		bool SnapToLedge	 = 0;
+		bool SetJumpVelocity = 0;
+		int	 TargetState	 = 0;
 	};
 }

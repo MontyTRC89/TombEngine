@@ -230,7 +230,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestAndDoLaraLadderClimb(item, coll))
+	if (HandleWallClimb(*item, *coll))
 		return;
 
 	if (LaraDeflectEdge(item, coll))
@@ -370,7 +370,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestAndDoLaraLadderClimb(item, coll))
+	if (HandleWallClimb(*item, *coll))
 		return;
 
 	if (LaraDeflectEdge(item, coll))
@@ -657,7 +657,7 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestAndDoLaraLadderClimb(item, coll))
+	if (HandleWallClimb(*item, *coll))
 		return;
 
 	ShiftItem(item, coll);
@@ -1660,7 +1660,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestAndDoLaraLadderClimb(item, coll))
+	if (HandleWallClimb(*item, *coll))
 		return;
 
 	if (LaraDeflectEdge(item, coll))
@@ -1825,7 +1825,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (TestAndDoLaraLadderClimb(item, coll))
+	if (HandleWallClimb(*item, *coll))
 		return;
 
 	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
