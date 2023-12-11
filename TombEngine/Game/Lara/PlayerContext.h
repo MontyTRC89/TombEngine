@@ -153,9 +153,11 @@ namespace TEN::Entities::Player
 	std::optional<ClimbContextData>				GetStandingClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData>				GetCrawlClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData>				GetTreadWaterClimbContext(ItemInfo& item, const CollisionInfo& coll);
-	std::optional<WaterTreadStepOutContextData> GetPlayerTreadWaterStepOutContext(const ItemInfo& item);
-	std::optional<ClimbContextData>				GetStandEdgeDescentClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>				GetCrawlEdgeDescentClimbContext(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<WaterTreadStepOutContextData> GetTreadWaterStepOutContext(const ItemInfo& item);
+	std::optional<ClimbContextData>				GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>				GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>				GetCrawlEdgeDescentFrontClimbContext(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData>				GetCrawlEdgeDescentBackClimbContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeCatchContextData>			GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData>	GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 

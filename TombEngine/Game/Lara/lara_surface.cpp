@@ -68,7 +68,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	auto stepOutContext = GetTreadWaterStepOutContext(*item);
 	if (stepOutContext.has_value())
 	{
 		//item->Animation.TargetState = stepOutContext->TargetStateID;
@@ -151,7 +151,7 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	auto stepOutContext = GetTreadWaterStepOutContext(*item);
 	if (stepOutContext.has_value())
 	{
 		//item->Animation.TargetState = stepOutContext->TargetStateID;
@@ -213,7 +213,7 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	auto stepOutContext = GetTreadWaterStepOutContext(*item);
 	if (stepOutContext.has_value())
 	{
 		//item->Animation.TargetState = stepOutContext->TargetStateID;
@@ -262,7 +262,7 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	auto stepOutContext = GetTreadWaterStepOutContext(*item);
 	if (stepOutContext.has_value())
 	{
 		//item->Animation.TargetState = stepOutContext->TargetStateID;
@@ -311,7 +311,7 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	auto stepOutContext = GetPlayerTreadWaterStepOutContext(*item);
+	auto stepOutContext = GetTreadWaterStepOutContext(*item);
 	if (stepOutContext.has_value())
 	{
 		//item->Animation.TargetState = stepOutContext->TargetStateID;

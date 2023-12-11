@@ -1273,9 +1273,9 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	static std::optional<AttractorCollisionData> GetEdgeClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																				const ClimbSetupData& setup,
-																				const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<AttractorCollisionData> GetEdgeVaultClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																					 const EdgeVaultClimbSetupData& setup,
+																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto SWAMP_DEPTH_MAX				  = -CLICK(3);
 		constexpr auto LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX = CLICK(0.5f);
@@ -1407,7 +1407,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetStandVault2StepsUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
@@ -1420,7 +1420,7 @@ namespace TEN::Entities::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(2);
 
 		// Get standing vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1443,7 +1443,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetStandVault3StepsUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			  // Ledge floor-to-ceil range.
@@ -1456,7 +1456,7 @@ namespace TEN::Entities::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(3);
 
 		// Get standing vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1479,7 +1479,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetStandVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			0, -STEPUP_HEIGHT,				// Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Ledge floor-to-ceil range.
@@ -1492,7 +1492,7 @@ namespace TEN::Entities::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
 		// Get standing vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1515,7 +1515,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetStandVault2StepsUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	   // Ledge floor-to-ceil range.
@@ -1528,7 +1528,7 @@ namespace TEN::Entities::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(2);
 
 		// Get standing vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1551,7 +1551,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetStandVault3StepsUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		  // Ledge floor-to-ceil range.
@@ -1564,7 +1564,7 @@ namespace TEN::Entities::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(3);
 
 		// Get standing vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1590,7 +1590,7 @@ namespace TEN::Entities::Player
 		constexpr auto LOWER_CEIL_BOUND = -LARA_HEIGHT_MONKEY;
 		constexpr auto UPPER_CEIL_BOUND = -CLICK(7);
 
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(3.5f), -(int)CLICK(7.5f), // Edge height bounds.
 			0, -MAX_HEIGHT,						  // Ledge floor-to-ceil range.
@@ -1604,7 +1604,7 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 
 		// 1) Get auto jump to edge standing vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			int relEdgeHeight = attracColl->Proximity.Intersection.y - item.Pose.Position.y;
@@ -1725,7 +1725,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetCrawlVault1StepDownClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			  const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		// Ledge floor-to-ceil range.
@@ -1737,7 +1737,7 @@ namespace TEN::Entities::Player
 		};
 
 		// Get crawling vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1760,7 +1760,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetCrawlVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
@@ -1776,7 +1776,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get crawling vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1799,7 +1799,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetCrawlVault1StepUpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-CRAWL_STEPUP_HEIGHT, -STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		  // Ledge floor-to-ceil range.
@@ -1812,7 +1812,7 @@ namespace TEN::Entities::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
 		// Get crawling vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 
 		{
@@ -1836,7 +1836,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetCrawlVaultJumpClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																		 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			NO_LOWER_BOUND, STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,	   // Ledge floor-to-ceil range.
@@ -1848,7 +1848,7 @@ namespace TEN::Entities::Player
 		};
 
 		// 1) Get edge crawl vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1953,7 +1953,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetTreadWaterVault1StepDownToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																						  const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,		 // Ledge floor-to-ceil range.
@@ -1970,7 +1970,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get tread water vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -1993,7 +1993,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetTreadWaterVault0StepsToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					   const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,			 // Ledge floor-to-ceil range.
@@ -2009,7 +2009,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get tread water vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -2032,7 +2032,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetTreadWaterVault1StepUpToStandClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																						const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(0.5f), -STEPUP_HEIGHT, // Edge height bounds.
 			LARA_HEIGHT, -MAX_HEIGHT,		   // Ledge floor-to-ceil range.
@@ -2049,7 +2049,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get tread water vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -2072,7 +2072,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetTreadWaterVault1StepDownToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																						   const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,	 // Ledge floor-to-ceil range.
@@ -2089,7 +2089,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get tread water vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -2112,7 +2112,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetTreadWaterVault0StepsToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																						const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		 // Ledge floor-to-ceil range.
@@ -2128,7 +2128,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get tread water vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -2151,7 +2151,7 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetTreadWaterVault1StepUpToCrouchClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																						 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-CLICK(1), -STEPUP_HEIGHT,		// Edge height bounds.
 			LARA_HEIGHT_CRAWL, -MAX_HEIGHT, // Ledge floor-to-ceil range.
@@ -2168,7 +2168,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get tread water vault climb context.
-		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
+		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -2255,7 +2255,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<WaterTreadStepOutContextData> GetPlayerTreadWaterStepOutContext(const ItemInfo& item)
+	std::optional<WaterTreadStepOutContextData> GetTreadWaterStepOutContext(const ItemInfo& item)
 	{
 		auto& player = GetLaraInfo(item);
 
@@ -2280,24 +2280,69 @@ namespace TEN::Entities::Player
 		}
 	}
 
-	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																		 const std::vector<AttractorCollisionData>& attracColls)
+	// TODO: implement fully
+	static std::optional<AttractorCollisionData> GetEdgeDescentClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																					   const EdgeDescentClimbSetupData& setup,
+																					   const std::vector<AttractorCollisionData>& attracColls)
+	{
+		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+
+		// Assess attractor collision.
+		for (const auto& attracColl : attracColls)
+		{
+			// 1) Check if attractor is edge type.
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
+				continue;
+
+			// 2) Test if edge is within 2D range.
+			if (attracColl.Proximity.Distance2D > range2D)
+				continue;
+
+			// 3) Test if edge slope is illegal.
+			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+				continue;
+
+			// TODO
+			// 4) Test relation to edge intersection.
+			if (/*!attracColl.IsInFront || attracColl.IsFacingForward ||
+				*/!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			{
+				continue;
+			}
+
+			// Get point collision in front of edge.
+			auto pointCollFront = GetCollision(
+				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius);
+
+			// TODO
+			// 5) Test if relative edge height is within edge intersection bounds.
+			auto relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor;
+			if (relEdgeHeight >= setup.LowerEdgeBound || // Floor-to-edge height is within lower edge bound.
+				relEdgeHeight < setup.UpperEdgeBound)	 // Floor-to-edge height is within upper edge bound.
+			{
+				//continue;
+			}
+
+			// 6) Test if ceiling in front is adequately higher than edge.
+			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
+				continue;
+
+			return attracColl;
+		}
+
+		// No valid edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
+	// TODO: implement.
+	static std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																				const std::vector<AttractorCollisionData>& attracColls)
 	{
 		return std::nullopt;
 	}
 	
-	std::optional<ClimbContextData> GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																		const std::vector<AttractorCollisionData>& attracColls)
-	{
-		return std::nullopt;
-	}
-
-	std::optional<ClimbContextData> GetStandEdgeDescentBackFlipClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																			const std::vector<AttractorCollisionData>& attracColls)
-	{
-		return std::nullopt;
-	}
-
 	// TODO: Idea
 	// EdgeVaultClimbSetupData
 	// EdgeDescentClimbSetupData
@@ -2307,92 +2352,41 @@ namespace TEN::Entities::Player
 	// This way code remains shared, but not an excessive amount of it, eliminating irrelevant tests
 	// specific to each climb scenario.
 
-	std::optional<ClimbContextData> GetStandEdgeDescentClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			0, -MAX_HEIGHT,					  // Ledge floor-to-ceil range (irrelevant).
 			-CLICK(1),						  // Edge-to-ceil height lower bound.
-			false,							  // Test swamp depth (irrelevant).
-			false,							  // Test edge front (irrelevant).
-			false,							  // Test ledge heights (irrelevant).
-			false							  // Test ledge illegal slope (irrelevant).
 		};
-		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
-		const auto& player = GetLaraInfo(item);
-
-		// TODO: Better way. Use GetStaticObjectLos().
-		// 1) Test for object collision.
-		/*bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
-		if (isObjectCollided)
-			return std::nullopt;*/
-
-		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
-
-		// 2) Assess attractor collision.
+		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
-		for (const auto& attracColl : attracColls)
+
+		// Get standing back edge descent climb context.
+		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
 		{
-			// 2.1) Check if attractor is edge type.
-			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
-				continue;
-
-			// 2.2) Test if edge is within 2D range.
-			if (attracColl.Proximity.Distance2D > range2D)
-				continue;
-
-			// 2.3) Test if edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
-				continue;
-
-			// TODO
-			// 2.4) Test relation to edge intersection.
-			if (/*!attracColl.IsInFront || attracColl.IsFacingForward ||
-				*/!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-			{
-				continue;
-			}
-
-			// Get point collision in front of edge.
-			auto pointCollFront = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, -coll.Setup.Radius);
-
-			// TODO
-			// 2.5) Test if relative edge height is within edge intersection bounds.
-			auto relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor;
-			if (relEdgeHeight >= SETUP.LowerEdgeBound || // Floor-to-edge height is within lower edge bound.
-				relEdgeHeight < SETUP.UpperEdgeBound)	 // Floor-to-edge height is within upper edge bound.
-			{
-				//continue;
-			}
-
-			// 2.6) Test if ceiling in front is adequately higher than edge.
-			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
-			if (edgeToCeilHeight > SETUP.LowerEdgeToCeilBound)
-				continue;
-
 			// Create and return crawl to hang vault context.
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl.AttractorPtr;
-			context.ChainDistance = attracColl.Proximity.ChainDistance;
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = IsHeld(In::Sprint) ? LS_STAND_EDGE_DESCENT_BACK_FLIP : LS_STAND_EDGE_DESCENT_BACK;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl.IsFacingForward; // TODO: Check.
+			context.IsInFront = attracColl->IsFacingForward; // TODO: Check.
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
 			return context;
 		}
 
-		// No valid edge attractor collision; return nullopt.
 		return std::nullopt;
 	}
 
+	// TODO
 	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
 		return std::nullopt;
@@ -2400,92 +2394,35 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
-		return std::nullopt;
-	}
-
-	std::optional<ClimbContextData> GetCrawlEdgeDescentClimbContext(ItemInfo& item, const CollisionInfo& coll)
-	{
-		constexpr auto SETUP = ClimbSetupData
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			0, -MAX_HEIGHT,					  // Ledge floor-to-ceil range (irrelevant).
 			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
-			false,							  // Test swamp depth (irrelevant).
-			false,							  // Test edge front (irrelevant).
-			false,							  // Test ledge heights (irrelevant).
-			false							  // Test ledge illegal slope (irrelevant).
 		};
-		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
-		const auto& player = GetLaraInfo(item);
-		
-		// TODO: Better way. Use GetStaticObjectLos().
-		// 1) Test for object collision.
-		bool isObjectCollided = TestLaraObjectCollision(&item, item.Pose.Orientation.y + ANGLE(180.0f), CLICK(1.2f), -LARA_HEIGHT_CRAWL);
-		if (isObjectCollided)
-			return std::nullopt;
-
-		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
-
-		// 2) Assess attractor collision.
+		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
-		for (const auto& attracColl : attracColls)
+
+		// Get crawl back edge descent climb context.
+		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
 		{
-			// 2.1) Check if attractor is edge type.
-			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
-				continue;
-
-			// 2.2) Test if edge is within 2D range.
-			if (attracColl.Proximity.Distance2D > range2D)
-				continue;
-
-			// 2.3) Test if edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
-				continue;
-
-			// TODO
-			// 2.4) Test relation to edge intersection.
-			if (/*!attracColl.IsInFront || attracColl.IsFacingForward ||
-				*/!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-			{
-				continue;
-			}
-
-			// Get point collision in front of edge.
-			auto pointCollFront = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, -coll.Setup.Radius);
-			
-			// TODO
-			// 2.5) Test if relative edge height is within edge intersection bounds.
-			auto relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor;
-			if (relEdgeHeight >= SETUP.LowerEdgeBound || // Floor-to-edge height is within lower edge bound.
-				relEdgeHeight < SETUP.UpperEdgeBound)	 // Floor-to-edge height is within upper edge bound.
-			{
-				//continue;
-			}
-
-			// 2.6) Test if ceiling in front is adequately higher than edge.
-			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
-			if (edgeToCeilHeight > SETUP.LowerEdgeToCeilBound)
-				continue;
-
 			// Create and return crawl to hang vault context.
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl.AttractorPtr;
-			context.ChainDistance = attracColl.Proximity.ChainDistance;
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_TO_HANG;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl.IsFacingForward; // TODO: Check.
+			context.IsInFront = attracColl->IsFacingForward; // TODO: Check.
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
 			return context;
 		}
 
-		// No valid edge attractor collision; return nullopt.
 		return std::nullopt;
 	}
 

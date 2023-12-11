@@ -48,7 +48,7 @@ namespace TEN::Entities::Player
 		bool TestWadeStatus = true;
 	};
 
-	struct ClimbSetupData
+	struct EdgeVaultClimbSetupData
 	{
 		int LowerEdgeBound			  = 0;
 		int UpperEdgeBound			  = 0;
@@ -60,6 +60,13 @@ namespace TEN::Entities::Player
 		bool TestEdgeFront		   = false;
 		bool TestLedgeHeights	   = false;
 		bool TestLedgeIllegalSlope = false;
+	};
+
+	struct EdgeDescentClimbSetupData
+	{
+		int LowerEdgeBound		 = 0;
+		int UpperEdgeBound		 = 0;
+		int LowerEdgeToCeilBound = 0;
 	};
 
 	struct ClimbContextData
