@@ -2666,6 +2666,8 @@ namespace TEN::Renderer
 		// Bind vertex and index buffer.
 		if (lastObjectType != RendererObjectType::Room)
 		{
+			_context->PSSetShader(_psRooms.Get(), nullptr, 0);
+
 			_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		}
