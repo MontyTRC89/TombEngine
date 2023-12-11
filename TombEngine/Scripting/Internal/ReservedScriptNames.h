@@ -57,7 +57,8 @@ static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
 static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";
-static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase";
+static constexpr char ScriptReserved_OnLoop[]			= "OnLoop";
+static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase"; // DEPRECATED
 static constexpr char ScriptReserved_OnSave[]			= "OnSave";
 static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
 
@@ -76,8 +77,8 @@ static constexpr char ScriptReserved_PreSave[]			= "PRESAVE";
 static constexpr char ScriptReserved_PostSave[]			= "POSTSAVE";
 static constexpr char ScriptReserved_PreLoad[]			= "PRELOAD";
 static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
-static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
-static constexpr char ScriptReserved_PostControlPhase[] = "POSTCONTROLPHASE";
+static constexpr char ScriptReserved_PreLoop[]			= "PRELOOP";
+static constexpr char ScriptReserved_PostLoop[]			= "POSTLOOP";
 
 // Event types
 static constexpr char ScriptReserved_OnEnter[]	= "ENTER";

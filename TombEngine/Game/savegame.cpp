@@ -1329,8 +1329,8 @@ bool SaveGame::Save(int slot)
 	std::vector<std::string> callbackVecPreLoad;
 	std::vector<std::string> callbackVecPostLoad;
 
-	std::vector<std::string> callbackVecPreControl;
-	std::vector<std::string> callbackVecPostControl;
+	std::vector<std::string> callbackVecPreLoop;
+	std::vector<std::string> callbackVecPostLoop;
 
 	g_GameScript->GetCallbackStrings(
 		callbackVecPreStart,
@@ -1341,8 +1341,8 @@ bool SaveGame::Save(int slot)
 		callbackVecPostSave,
 		callbackVecPreLoad,
 		callbackVecPostLoad,
-		callbackVecPreControl,
-		callbackVecPostControl);
+		callbackVecPreLoop,
+		callbackVecPostLoop);
 
 	auto stringsCallbackPreStart = fbb.CreateVectorOfStrings(callbackVecPreStart);
 	auto stringsCallbackPostStart = fbb.CreateVectorOfStrings(callbackVecPostStart);
@@ -1352,8 +1352,8 @@ bool SaveGame::Save(int slot)
 	auto stringsCallbackPostSave = fbb.CreateVectorOfStrings(callbackVecPostSave);
 	auto stringsCallbackPreLoad = fbb.CreateVectorOfStrings(callbackVecPreLoad);
 	auto stringsCallbackPostLoad = fbb.CreateVectorOfStrings(callbackVecPostLoad);
-	auto stringsCallbackPreControl = fbb.CreateVectorOfStrings(callbackVecPreControl);
-	auto stringsCallbackPostControl = fbb.CreateVectorOfStrings(callbackVecPostControl);
+	auto stringsCallbackPreLoop = fbb.CreateVectorOfStrings(callbackVecPreLoop);
+	auto stringsCallbackPostLoop = fbb.CreateVectorOfStrings(callbackVecPostLoop);
 
 	Save::SaveGameBuilder sgb{ fbb };
 
@@ -1411,8 +1411,8 @@ bool SaveGame::Save(int slot)
 	sgb.add_callbacks_pre_load(stringsCallbackPreLoad);
 	sgb.add_callbacks_post_load(stringsCallbackPostLoad);
 
-	sgb.add_callbacks_pre_control(stringsCallbackPreControl);
-	sgb.add_callbacks_post_control(stringsCallbackPostControl);
+	sgb.add_callbacks_pre_loop(stringsCallbackPreLoop);
+	sgb.add_callbacks_post_loop(stringsCallbackPostLoop);
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -2308,8 +2308,8 @@ bool SaveGame::Load(int slot)
 	auto callbacksPreLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_load);
 	auto callbacksPostLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_load);
 
-	auto callbacksPreControlVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_control);
-	auto callbacksPostControlVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_control);
+	auto callbacksPreLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_loop);
+	auto callbacksPostLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_loop);
 
 	g_GameScript->SetCallbackStrings(
 		callbacksPreStartVec,
@@ -2320,8 +2320,8 @@ bool SaveGame::Load(int slot)
 		callbacksPostSaveVec,
 		callbacksPreLoadVec,
 		callbacksPostLoadVec,
-		callbacksPreControlVec,
-		callbacksPostControlVec);
+		callbacksPreLoopVec,
+		callbacksPostLoopVec);
 
 	return true;
 }

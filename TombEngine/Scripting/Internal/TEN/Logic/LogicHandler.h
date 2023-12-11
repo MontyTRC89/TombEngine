@@ -53,7 +53,7 @@ private:
 
 	sol::protected_function	m_onStart{};
 	sol::protected_function	m_onLoad{};
-	sol::protected_function	m_onControlPhase{};
+	sol::protected_function	m_onLoop{};
 	sol::protected_function	m_onSave{};
 	sol::protected_function	m_onEnd{};
 
@@ -65,8 +65,8 @@ private:
 	std::unordered_set<std::string> m_callbacksPostStart;
 	std::unordered_set<std::string> m_callbacksPreEnd;
 	std::unordered_set<std::string> m_callbacksPostEnd;
-	std::unordered_set<std::string> m_callbacksPreControl;
-	std::unordered_set<std::string> m_callbacksPostControl;
+	std::unordered_set<std::string> m_callbacksPreLoop;
+	std::unordered_set<std::string> m_callbacksPostLoop;
 
 	std::unordered_map<CallbackPoint, std::unordered_set<std::string> *> m_callbacks;
 
@@ -148,8 +148,8 @@ public:
 							const std::vector<std::string>& postSave, 
 							const std::vector<std::string>& preLoad,   
 							const std::vector<std::string>& postLoad, 
-							const std::vector<std::string>& preControl,   
-							const std::vector<std::string>& posControl) override;
+							const std::vector<std::string>& preLoop,   
+							const std::vector<std::string>& postLoop) override;
 
 	void GetCallbackStrings(std::vector<std::string>& preStart,
 							std::vector<std::string>& postStart,
@@ -159,13 +159,13 @@ public:
 							std::vector<std::string>& postSave,
 							std::vector<std::string>& preLoad,
 							std::vector<std::string>& postLoad,
-							std::vector<std::string>& preControl,
-							std::vector<std::string>& postControl) const override;
+							std::vector<std::string>& preLoop,
+							std::vector<std::string>& postLoop) const override;
 
 	void InitCallbacks() override;
 	void OnStart() override;
 	void OnLoad() override;
-	void OnControlPhase(float deltaTime) override;
+	void OnLoop(float deltaTime, bool postLoop) override;
 	void OnSave() override;
 	void OnEnd(GameStatus reason) override;
 };
