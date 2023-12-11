@@ -59,7 +59,7 @@ float4 PSMonochrome(PixelShaderInput input) : SV_Target
 {
     float4 color = ColorTexture.Sample(ColorSampler, input.UV);
 
-	float luma = Luma(color.rgb);
+    float luma = Luma(color.rgb);
     float3 output = lerp(color.rgb, float3(luma, luma, luma), EffectStrength);
 
     return float4(output, color.a);
