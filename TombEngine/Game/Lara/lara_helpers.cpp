@@ -1726,11 +1726,11 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(-climbContext.RelPosOffset.y);
 
 	// No attractor; return early.
-	if (climbContext.AttracPtr == nullptr)
+	if (climbContext.AttractorPtr == nullptr)
 		return;
 
 	// Get attractor collision.
-	auto attracColl = GetAttractorCollision(*climbContext.AttracPtr, climbContext.ChainDistance, item.Pose.Orientation.y);
+	auto attracColl = GetAttractorCollision(*climbContext.AttractorPtr, climbContext.ChainDistance, item.Pose.Orientation.y);
 	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
 
 	// Calculate offset intersection.
@@ -1752,7 +1752,7 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 
 		// Attach player to attractor.
 		player.Context.Attractor.Attach(
-			item, *climbContext.AttracPtr, climbContext.ChainDistance,
+			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset,
 			relDeltaPos, relDeltaOrient);
 	}

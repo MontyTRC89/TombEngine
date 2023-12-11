@@ -1429,7 +1429,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1465,7 +1465,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1501,7 +1501,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1537,7 +1537,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1573,7 +1573,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1615,7 +1615,7 @@ namespace TEN::Entities::Player
 			int relEdgeHeight = attracColl->Proximity.Intersection.y - item.Pose.Position.y;
 
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, -relEdgeHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1642,7 +1642,7 @@ namespace TEN::Entities::Player
 			relCeilHeight >= UPPER_CEIL_BOUND)	// Ceiling height is within upper ceiling bound.
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = nullptr;
+			context.AttractorPtr = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, -relCeilHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1746,7 +1746,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
@@ -1781,7 +1781,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
@@ -1818,7 +1818,7 @@ namespace TEN::Entities::Player
 
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1853,7 +1853,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
@@ -1885,7 +1885,7 @@ namespace TEN::Entities::Player
 			(probeA.Position.Ceiling - y) < -testSetup.GapMin*/)									// Ceiling height is permissive.
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = nullptr;
+			context.AttractorPtr = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3::Zero;
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -1983,7 +1983,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2022,7 +2022,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2062,7 +2062,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2102,7 +2102,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2141,7 +2141,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2181,7 +2181,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl->AttracPtr;
+			context.AttractorPtr = attracColl->AttracPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
@@ -2377,7 +2377,7 @@ namespace TEN::Entities::Player
 
 			// Create and return crawl to hang vault context.
 			auto context = ClimbContextData{};
-			context.AttracPtr = attracColl.AttracPtr;
+			context.AttractorPtr = attracColl.AttracPtr;
 			context.ChainDistance = attracColl.Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
