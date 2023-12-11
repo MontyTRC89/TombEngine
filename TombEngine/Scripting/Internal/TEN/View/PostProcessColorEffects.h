@@ -15,6 +15,7 @@ The following constants are inside PostProcessColorEffect.
 	NORMAL
 	SEPIA
 	MONOCHROME
+	NEGATIVE
 
 @section View.PostProcessColorEffect
 */
@@ -27,5 +28,6 @@ static const std::unordered_map<std::string, PostProcessColorEffect> POSTPROCESS
 {
 	{ "NORMAL", PostProcessColorEffect::Normal },
 	{ "SEPIA", PostProcessColorEffect::Sepia },
-	{ "MONOCHROME", PostProcessColorEffect::Monochrome }
+	{ "MONOCHROME", PostProcessColorEffect::Monochrome },
+	{ "NEGATIVE", PostProcessColorEffect::Negative }
 };

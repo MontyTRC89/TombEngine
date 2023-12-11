@@ -59,6 +59,10 @@ namespace TEN::Renderer
 			case PostProcessColorEffect::Monochrome:
 				_context->PSSetShader(_psPostProcessMonochrome.Get(), nullptr, 0);
 				break;
+
+			case PostProcessColorEffect::Negative:
+				_context->PSSetShader(_psPostProcessNegative.Get(), nullptr, 0);
+				break;
 				 
 			default:
 				return;

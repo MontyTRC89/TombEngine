@@ -59,12 +59,25 @@ float4 PSMonochrome(PixelShaderInput input) : SV_Target
 {
     float4 color = ColorTexture.Sample(ColorSampler, input.UV);
 
-    float3 grayscale = float3(0.2125f, 0.7154f, 0.0721f);
-    float3 output = dot(color.rgb, grayscale);
-
-    output.rgb = lerp(color.rgb, output.rgb, EffectStrength);
+	float luma = Luma(color.rgb);
+    float3 output = lerp(color.rgb, float3(luma, luma, luma), EffectStrength);
 
     return float4(output, color.a);
+}
+
+float4 PSNegative(PixelShaderInput input) : SV_Target
+{
+	float4 color = ColorTexture.Sample(ColorSampler, input.UV);
+
+	float3 negated;
+	negated.r = 1.0f - color.r;
+	negated.g = 1.0f - color.g;
+	negated.b = 1.0f - color.b;
+
+	float luma = Luma(negated);
+	float3 output = lerp(color.rgb, float3(luma, luma, luma), EffectStrength);
+
+	return float4(output, color.a);
 }
 
 float4 PSFinalPass(PixelShaderInput input) : SV_TARGET

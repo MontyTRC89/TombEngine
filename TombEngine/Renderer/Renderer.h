@@ -349,6 +349,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psPostProcessCopy;
 		ComPtr<ID3D11PixelShader> _psPostProcessSepia;
 		ComPtr<ID3D11PixelShader> _psPostProcessMonochrome;
+		ComPtr<ID3D11PixelShader> _psPostProcessNegative;
 		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
 		bool _doingFullscreenPass = false;
 

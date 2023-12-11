@@ -278,5 +278,6 @@ enum class PostProcessColorEffect
 {
 	Normal = 0,
 	Sepia = 1,
-	Monochrome = 2
+	Monochrome = 2,
+	Negative = 3
 };
