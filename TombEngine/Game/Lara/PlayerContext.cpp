@@ -1771,6 +1771,10 @@ namespace TEN::Entities::Player
 			false								 // Test ledge illegal slope.
 		};
 
+		// Crouch action held; return nullopt.
+		if (IsHeld(In::Crouch))
+			return std::nullopt;
+
 		// Get crawling vault climb context.
 		auto attracColl = GetEdgeClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
@@ -1915,19 +1919,11 @@ namespace TEN::Entities::Player
 		context = GetCrawlVault1StepDownToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
-			if (!IsHeld(In::Crouch) && HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
-
-			// 2) Crawl vault down 1 step.
-			context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
-			if (context.has_value())
-			{
-				if (HasStateDispatch(&item, context->TargetStateID))
-					return context;
-			}
 		}
 
-		// 3) Crawl vault down 1 step.
+		// 2) Crawl vault down 1 step.
 		context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1935,7 +1931,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 4) Crawl vault jump.
+		// 3) Crawl vault jump.
 		context = GetCrawlVaultJumpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1943,7 +1939,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 5) Crawl vault up 1 step.
+		// 4) Crawl vault up 1 step.
 		context = GetCrawlVault1StepUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
