@@ -2743,7 +2743,7 @@ namespace TEN::Renderer
 		}
 
 		SetDepthState(DepthState::Read);
-		SetCullMode(CullMode::None);
+		SetCullMode(CullMode::CounterClockwise);
 		SetBlendMode(object->Bucket->BlendMode);
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
@@ -2794,7 +2794,7 @@ namespace TEN::Renderer
 		}
 
 		SetDepthState(DepthState::Read);
-		SetCullMode(CullMode::None);
+		SetCullMode(CullMode::CounterClockwise);
 		SetBlendMode(object->Bucket->BlendMode);
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
