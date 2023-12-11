@@ -5,6 +5,7 @@
 
 #include "Game/control/volume.h"
 #include "Game/effects/Electricity.h"
+#include "Game/Lara/lara.h"
 #include "Game/savegame.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -52,11 +53,16 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd }
 };
 
-static const std::unordered_map<std::string, VolumeEventType> EVENT_TYPES
+static const std::unordered_map<std::string, EventType> EVENT_TYPES
 {
-	{ ScriptReserved_OnEnter, VolumeEventType::Enter },
-	{ ScriptReserved_OnInside, VolumeEventType::Inside },
-	{ ScriptReserved_OnLeave, VolumeEventType::Leave }
+	{ ScriptReserved_EventOnEnter, EventType::Enter },
+	{ ScriptReserved_EventOnInside, EventType::Inside },
+	{ ScriptReserved_EventOnLeave, EventType::Leave },
+	{ ScriptReserved_EventOnLoop, EventType::Loop },
+	{ ScriptReserved_EventOnLoad, EventType::Load },
+	{ ScriptReserved_EventOnSave, EventType::Save },
+	{ ScriptReserved_EventOnStart, EventType::Start },
+	{ ScriptReserved_EventOnEnd, EventType::End }
 };
 
 enum class LevelEndReason
@@ -163,6 +169,8 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	tableLogic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
 	tableLogic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
 	tableLogic.set_function(ScriptReserved_HandleEvent, &LogicHandler::HandleEvent, this);
+	tableLogic.set_function(ScriptReserved_EnableEvent, &LogicHandler::EnableEvent, this);
+	tableLogic.set_function(ScriptReserved_DisableEvent, &LogicHandler::DisableEvent, this);
 
 	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, LEVEL_END_REASONS);
 	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, CALLBACK_POINTS);
@@ -223,8 +231,8 @@ i.e. if you register `MyFunc` and `MyFunc2` with `PRELOOP`, both will be called 
 Any returned value will be discarded.
 
 @function AddCallback
-@tparam point CallbackPoint When should the callback be called?
-@tparam function func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+@tparam CallbackPoint point When should the callback be called?
+@tparam LevelFunc func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
 @usage
 	LevelFuncs.MyFunc = function(dt) print(dt) end
 	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.MyFunc)
@@ -253,8 +261,8 @@ void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 Will have no effect if the function was not registered as a callback
 
 @function RemoveCallback
-@tparam point CallbackPoint The callback point the function was registered with. See @{AddCallback}
-@tparam func LevelFunc the function to remove; must be in the LevelFuncs hierarchy.
+@tparam CallbackPoint point The callback point the function was registered with. See @{AddCallback}
+@tparam LevelFunc func The function to remove; must be in the LevelFuncs hierarchy.
 @usage
 	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.MyFunc)
 */
@@ -273,19 +281,35 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 /*** Attempt to find an event set and exectute a particular event from it.
 
 @function HandleEvent
-@tparam name string Name of the event set to find.
-@tparam type EventType Event to execute.
-@tparam activator Moveable Optional activator. Default is the player object.
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to execute.
+@tparam Moveable activator Optional activator. Default is the player object.
 */
-void LogicHandler::HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator)
+void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	bool success = TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? 
-					(VolumeActivator)activator.value().GetIndex() : nullptr);
-	if (!success)
-	{
-		TENLog("Error: event " + name + " could not be executed. Check if event with such name exists in project.",
-			   LogLevel::Error, LogConfig::All, false);
-	}
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)LaraItem->Index);
+}
+
+/*** Attempt to find an event set and enable specified event in it.
+
+@function EnableEvent
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to enable.
+*/
+void LogicHandler::EnableEvent(const std::string& name, EventType type)
+{
+	TEN::Control::Volumes::SetEventState(name, type, true);
+}
+
+/*** Attempt to find an event set and disable specified event in it.
+
+@function DisableEvent
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to disable.
+*/
+void LogicHandler::DisableEvent(const std::string& name, EventType type)
+{
+	TEN::Control::Volumes::SetEventState(name, type, false);
 }
 
 void LogicHandler::ResetLevelTables()
@@ -860,7 +884,7 @@ void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short i
 	func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
 }
 
-void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::VolumeActivator activator, const std::string& arguments)
+void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::Activator activator, const std::string& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
 	if (std::holds_alternative<short>(activator))

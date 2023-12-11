@@ -81,9 +81,14 @@ static constexpr char ScriptReserved_PreLoop[]			= "PRELOOP";
 static constexpr char ScriptReserved_PostLoop[]			= "POSTLOOP";
 
 // Event types
-static constexpr char ScriptReserved_OnEnter[]	= "ENTER";
-static constexpr char ScriptReserved_OnInside[] = "INSIDE";
-static constexpr char ScriptReserved_OnLeave[]	= "LEAVE";
+static constexpr char ScriptReserved_EventOnEnter[]	= "ENTER";
+static constexpr char ScriptReserved_EventOnInside[] = "INSIDE";
+static constexpr char ScriptReserved_EventOnLeave[]	= "LEAVE";
+static constexpr char ScriptReserved_EventOnLoad[] = "LOAD";
+static constexpr char ScriptReserved_EventOnSave[] = "SAVE";
+static constexpr char ScriptReserved_EventOnStart[] = "START";
+static constexpr char ScriptReserved_EventOnEnd[] = "END";
+static constexpr char ScriptReserved_EventOnLoop[] = "LOOP";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
@@ -271,6 +276,8 @@ static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 static constexpr char ScriptReserved_AddCallback[]					= "AddCallback";
 static constexpr char ScriptReserved_RemoveCallback[]				= "RemoveCallback";
 static constexpr char ScriptReserved_HandleEvent[]					= "HandleEvent";
+static constexpr char ScriptReserved_EnableEvent[]					= "EnableEvent";
+static constexpr char ScriptReserved_DisableEvent[]					= "DisableEvent";
 
 static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
