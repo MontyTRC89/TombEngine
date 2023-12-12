@@ -321,7 +321,7 @@ static void UsePlayerMedipack(ItemInfo& item)
 	}
 }
 
-void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
+void HandlePlayerAttractorParent(ItemInfo& item)
 {
 	constexpr auto LERP_ALPHA = 0.25f;
 
@@ -1702,7 +1702,7 @@ static float GetPlayerJumpVelocity(float jumpHeight)
 	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }
 
-void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& climbContext)
+void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 {
 	constexpr auto OFFSET_BLEND_LERP_ALPHA = 0.25f;
 

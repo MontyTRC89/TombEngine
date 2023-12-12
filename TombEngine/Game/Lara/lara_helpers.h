@@ -30,7 +30,7 @@ struct PlayerWaterData
 // Utilities
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& water);
-void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll);
+void HandlePlayerAttractorParent(ItemInfo& item);
 void HandlePlayerQuickActions(ItemInfo& item);
 bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -- Sezz 2023.08.22
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
@@ -76,7 +76,7 @@ void AlignLaraToSurface(ItemInfo* item, float alpha = 0.15f);
 // Setters
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
-void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& climbContext);
+void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext);
 void SetPlayerTreadWaterStepOut(ItemInfo& item, const WaterTreadStepOutContextData& stepOutContext);
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);

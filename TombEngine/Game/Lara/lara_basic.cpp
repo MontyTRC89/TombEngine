@@ -99,7 +99,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.AnimNumber == LA_HANG_HANDSTAND ||
 		item->Animation.AnimNumber == LA_HANG_TO_CROUCH)
 	{
-		HandlePlayerAttractorParent(*item, *coll);
+		HandlePlayerAttractorParent(*item);
 	}
 }
 
@@ -113,7 +113,7 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	HandlePlayerAttractorParent(*item, *coll);
+	HandlePlayerAttractorParent(*item);
 
 	item->Animation.TargetState = LS_IDLE;
 }
@@ -129,7 +129,7 @@ void lara_as_stand_edge_descent(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetAngle = 0;
 	Camera.flags = CF_FOLLOW_CENTER;
 
-	HandlePlayerAttractorParent(*item, *coll);
+	HandlePlayerAttractorParent(*item);
 }
 
 // State:	  LS_AUTO_JUMP (62)
@@ -185,7 +185,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
@@ -322,7 +322,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
@@ -516,7 +516,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
-					SetPlayerClimb(*item, *coll, *climbContext);
+					SetPlayerClimb(*item, *climbContext);
 					return;
 				}
 			}
@@ -525,7 +525,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
@@ -565,7 +565,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
@@ -866,7 +866,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
@@ -1205,7 +1205,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
@@ -1655,7 +1655,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
@@ -1774,7 +1774,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}

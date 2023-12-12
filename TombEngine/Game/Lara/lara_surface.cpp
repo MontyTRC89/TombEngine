@@ -32,7 +32,7 @@ void lara_as_water_tread_vault(ItemInfo* item, CollisionInfo* coll)
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.laraNode = LM_HIPS; // Forces camera to follow player instead of snapping.
 
-	HandlePlayerAttractorParent(*item, *coll);
+	HandlePlayerAttractorParent(*item);
 }
 
 // State:		LS_ONWATER_DIVE (35)
@@ -99,7 +99,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
@@ -170,7 +170,7 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerClimb(*item, *coll, *climbContext);
+				SetPlayerClimb(*item, *climbContext);
 				return;
 			}
 		}
