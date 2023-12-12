@@ -1757,15 +1757,11 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 	}
 		break;
 
-	// TODO: Check orientOffset calculation.
 	case ClimbContextAlignType::OffsetBlend:
 	{
-		// Calculate position offset.
+		// Calculate offsets.
 		auto posOffset = targetPos - item.Pose.Position.ToVector3();
-
-		// Calculate orientation offset.
-		short headingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);
-		auto orientOffset = EulerAngles(0, attracColl.HeadingAngle + headingAngleOffset, 0) - item.Pose.Orientation;
+		auto orientOffset = targetOrient - item.Pose.Orientation;
 
 		// Set offset blend.
 		item.OffsetBlend.SetLogarithmic(posOffset, orientOffset, OFFSET_BLEND_LERP_ALPHA);

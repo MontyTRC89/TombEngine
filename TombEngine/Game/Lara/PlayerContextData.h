@@ -75,13 +75,12 @@ namespace TEN::Entities::Player
 		float		ChainDistance	= 0.0f;
 		Vector3		RelPosOffset	= Vector3::Zero;
 		EulerAngles RelOrientOffset = EulerAngles::Zero;
-		int			TargetStateID = 0;
+		int			TargetStateID	= 0;
 
 		ClimbContextAlignType AlignType = ClimbContextAlignType::None;
 
-		bool IsInFront			= false;
-		bool SetBusyHands		= false;
-		bool SetJumpVelocity	= false;
+		bool SetBusyHands	 = false;
+		bool SetJumpVelocity = false;
 	};
 
 	struct EdgeCatchContextData

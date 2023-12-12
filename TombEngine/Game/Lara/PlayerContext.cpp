@@ -1429,7 +1429,6 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
@@ -1466,7 +1465,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1502,7 +1500,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1538,7 +1535,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1574,7 +1570,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1615,7 +1610,6 @@ namespace TEN::Entities::Player
 			context.RelPosOffset = Vector3(0.0f, -relEdgeHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.SetBusyHands = false;
 			context.SetJumpVelocity = true;
@@ -1643,7 +1637,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.AlignType = ClimbContextAlignType::None;
-			context.IsInFront = true;
 			context.SetBusyHands = false;
 			context.SetJumpVelocity = true;
 
@@ -1743,11 +1736,10 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1781,12 +1773,11 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1823,7 +1814,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1853,12 +1843,11 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_VAULT_JUMP_FLIP : LS_CRAWL_VAULT_JUMP;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1890,7 +1879,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_VAULT_JUMP;
 			context.AlignType = ClimbContextAlignType::None;
-			context.IsInFront = true;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -1980,7 +1968,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2019,7 +2006,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2059,7 +2045,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2099,7 +2084,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2138,7 +2122,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2178,7 +2161,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2366,7 +2348,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_STAND_EDGE_DESCENT_FRONT;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward; // TODO: Check. Rename to IsFacingForward?
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2399,7 +2380,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = IsHeld(In::Sprint) ? LS_STAND_EDGE_DESCENT_BACK_FLIP : LS_STAND_EDGE_DESCENT_BACK;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward; // TODO: Check. Rename to IsFacingForward?
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2433,7 +2413,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_EDGE_DESCENT_FRONT;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward; // TODO: Check. Rename to IsFacingForward?
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2466,7 +2445,6 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_TO_HANG;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward; // TODO: Check.
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
