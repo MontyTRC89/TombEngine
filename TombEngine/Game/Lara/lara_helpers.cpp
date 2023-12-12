@@ -323,7 +323,7 @@ static void UsePlayerMedipack(ItemInfo& item)
 
 void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 {
-	constexpr auto INV_LERP_ALPHA = 1.0f - 0.25f;
+	constexpr auto LERP_ALPHA = 0.25f;
 
 	auto& player = GetLaraInfo(item);
 
@@ -342,8 +342,8 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 
 	// Update player pose.
 	item.Pose = Pose(
-		targetPos + Vector3::Transform(player.Context.Attractor.RelDeltaPos * INV_LERP_ALPHA, rotMatrix),
-		targetOrient + (player.Context.Attractor.RelDeltaOrient * INV_LERP_ALPHA));
+		targetPos + Vector3::Transform(Vector3::Lerp(player.Context.Attractor.RelDeltaPos, Vector3::Zero, LERP_ALPHA), rotMatrix),
+		targetOrient + EulerAngles::Lerp(player.Context.Attractor.RelDeltaOrient, EulerAngles::Zero, LERP_ALPHA));
 
 	// Recalculate relative delta position and orientation.
 	player.Context.Attractor.RelDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - targetPos, rotMatrix.Invert());
