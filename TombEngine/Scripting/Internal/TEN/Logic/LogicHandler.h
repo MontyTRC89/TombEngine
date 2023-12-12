@@ -123,7 +123,9 @@ public:
 
 	void AddCallback(CallbackPoint point, const LevelFunc& levelFunc);
 	void RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc);
-	void HandleEvent(const std::string& name, VolumeEventType type, sol::optional<Moveable&> activator);
+	void HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator);
+	void EnableEvent(const std::string& name, EventType type);
+	void DisableEvent(const std::string& name, EventType type);
 
 	void ResetScripts(bool clearGameVars) override;
 	void ShortenTENCalls() override;
@@ -132,7 +134,7 @@ public:
 
 	void ExecuteScriptFile(const std::string& luaFilename) override;
 	void ExecuteString(const std::string& command) override;
-	void ExecuteFunction(const std::string& name, TEN::Control::Volumes::VolumeActivator, const std::string& arguments) override;
+	void ExecuteFunction(const std::string& name, TEN::Control::Volumes::Activator, const std::string& arguments) override;
 
 	void ExecuteFunction(const std::string& name, short idOne, short idTwo) override;
 
