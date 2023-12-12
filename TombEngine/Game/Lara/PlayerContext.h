@@ -158,8 +158,8 @@ namespace TEN::Entities::Player
 	// Edge descent climb contexts
 	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Catch contexts
 	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);

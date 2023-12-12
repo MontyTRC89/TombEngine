@@ -2304,12 +2304,13 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
+			// TODO: Front standing edge descent.
 			// TODO: Make these dynamic for all attractor collision getters.
 			// 4) Test relation to edge intersection.
 			if (attracColl.IsInFront || !attracColl.IsFacingForward ||
 				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 			{
-				continue;
+				//continue;
 			}
 
 			// Get point collision behind edge.
@@ -2342,21 +2343,39 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: implement.
-	static std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+		constexpr auto SETUP = EdgeDescentClimbSetupData
+		{
+			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
+			-CLICK(1)						  // Edge-to-ceil height lower bound.
+		};
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
+
+		// Get standing front edge descent climb context.
+		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
+			context.TargetStateID = LS_STAND_EDGE_DESCENT_FRONT;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward; // TODO: Check. Rename to IsFacingForward?
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			return context;
+		}
+
 		return std::nullopt;
 	}
 	
-	// TODO: Idea
-	// EdgeVaultClimbSetupData
-	// EdgeDescentClimbSetupData
-	// Edge vaulting encompasses stand vaults, crawl vaults, tread water vaults.
-	// Edge descending encompasses stand front and back descents, crawl front and back descents.
-	// Each has its own setup struct and dedicated common attractor collision assessment function, but both share ClimbContextData.
-	// This way code remains shared, but not an excessive amount of it, eliminating irrelevant tests
-	// specific to each climb scenario.
-
 	std::optional<ClimbContextData> GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
@@ -2373,7 +2392,6 @@ namespace TEN::Entities::Player
 		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
-			// Create and return crawl to hang vault context.
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
@@ -2391,13 +2409,41 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: implement.
-	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	// TODO: Animation.
+	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+		constexpr auto SETUP = EdgeDescentClimbSetupData
+		{
+			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
+			-CLICK(1)						  // Edge-to-ceil height lower bound.
+		};
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
+
+		// Get standing front edge descent climb context.
+		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_STAND_EDGE_DESCENT_FRONT;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsInFront = attracColl->IsFacingForward; // TODO: Check. Rename to IsFacingForward?
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			return context;
+		}
+
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeDescentClimbSetupData
@@ -2413,7 +2459,6 @@ namespace TEN::Entities::Player
 		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
-			// Create and return crawl to hang vault context.
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;

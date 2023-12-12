@@ -331,25 +331,23 @@ void HandlePlayerAttractorParent(ItemInfo& item, const CollisionInfo& coll)
 	if (player.Context.Attractor.Ptr == nullptr)
 		return;
 
+	// TODO: Check if this heading is correct. While its correctness is not relevant to this function, should be diligent.
 	// Get parent attractor collision.
 	auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
-	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
 
-	// Calculate offset intersection.
-	auto rotMatrix = attracOrient.ToRotationMatrix();
-	auto offsetIntersect = attracColl.Proximity.Intersection + Vector3::Transform(player.Context.Attractor.RelPosOffset, rotMatrix);
-
-	// Calculate offset orientation.
-	auto offsetOrient = attracOrient + player.Context.Attractor.RelOrientOffset;
+	// Calculate targets.
+	auto targetOrient = EulerAngles(0, attracColl.HeadingAngle, 0) + player.Context.Attractor.RelOrientOffset;
+	auto rotMatrix = targetOrient.ToRotationMatrix();
+	auto targetPos = attracColl.Proximity.Intersection + Vector3::Transform(player.Context.Attractor.RelPosOffset, rotMatrix);
 
 	// Update player pose.
 	item.Pose = Pose(
-		offsetIntersect + Vector3::Transform(player.Context.Attractor.RelDeltaPos * INV_LERP_ALPHA, rotMatrix),
-		offsetOrient + (player.Context.Attractor.RelDeltaOrient * INV_LERP_ALPHA));
+		targetPos + Vector3::Transform(player.Context.Attractor.RelDeltaPos * INV_LERP_ALPHA, rotMatrix),
+		targetOrient + (player.Context.Attractor.RelDeltaOrient * INV_LERP_ALPHA));
 
 	// Recalculate relative delta position and orientation.
-	player.Context.Attractor.RelDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - offsetIntersect, rotMatrix.Invert());
-	player.Context.Attractor.RelDeltaOrient = item.Pose.Orientation - attracOrient;
+	player.Context.Attractor.RelDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - targetPos, rotMatrix.Invert());
+	player.Context.Attractor.RelDeltaOrient = item.Pose.Orientation - targetOrient;
 }
 
 static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
@@ -1729,13 +1727,14 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	if (climbContext.AttractorPtr == nullptr)
 		return;
 
+	// TODO: Check if this heading is correct. While its correctness is not relevant to this function, should be diligent.
 	// Get attractor collision.
 	auto attracColl = GetAttractorCollision(*climbContext.AttractorPtr, climbContext.ChainDistance, item.Pose.Orientation.y);
-	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
 
-	// Calculate offset intersection.
-	auto rotMatrix = attracOrient.ToRotationMatrix();
-	auto offsetIntersect = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
+	// Calculate targets.
+	auto targetOrient = EulerAngles(0, attracColl.HeadingAngle, 0) + climbContext.RelOrientOffset;
+	auto rotMatrix = targetOrient.ToRotationMatrix();
+	auto targetPos = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
 
 	// Set alignment.
 	switch (climbContext.AlignType)
@@ -1747,8 +1746,8 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	case ClimbContextAlignType::AttractorParent:
 	{
 		// Calculate relative delta position and orientation.
-		auto relDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - offsetIntersect, rotMatrix.Invert());
-		auto relDeltaOrient = item.Pose.Orientation - attracOrient;
+		auto relDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - targetPos, rotMatrix.Invert());
+		auto relDeltaOrient = item.Pose.Orientation - targetOrient;
 
 		// Attach player to attractor.
 		player.Context.Attractor.Attach(
@@ -1758,10 +1757,11 @@ void SetPlayerClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContex
 	}
 		break;
 
+	// TODO: Check orientOffset calculation.
 	case ClimbContextAlignType::OffsetBlend:
 	{
 		// Calculate position offset.
-		auto posOffset = offsetIntersect - item.Pose.Position.ToVector3();
+		auto posOffset = targetPos - item.Pose.Position.ToVector3();
 
 		// Calculate orientation offset.
 		short headingAngleOffset = climbContext.IsInFront ? 0 : ANGLE(180.0f);

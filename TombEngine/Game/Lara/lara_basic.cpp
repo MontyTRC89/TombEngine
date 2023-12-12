@@ -510,11 +510,16 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action))
 		{
-			// TODO
-			//if (IsHeld(In::Walk))
-			//{
-			//	// Other descent.
-			//}
+			if (IsHeld(In::Walk))
+			{
+				auto climbContext = GetStandEdgeDescentFrontClimbContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *coll, *climbContext);
+					return;
+				}
+			}
 
 			auto climbContext = GetStandVaultClimbContext(*item, *coll);
 			if (climbContext.has_value())
