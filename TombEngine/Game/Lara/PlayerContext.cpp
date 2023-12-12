@@ -2409,14 +2409,14 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Animation.
+	// TODO: Needs animation.
 	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-CLICK(1)						  // Edge-to-ceil height lower bound.
+			-(int)CLICK(0.6f)				  // Edge-to-ceil height lower bound.
 		};
 
 		// Get attractor collisions.
