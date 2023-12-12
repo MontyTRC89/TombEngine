@@ -1349,7 +1349,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// 2.7) Test if ceiling in front is adequately higher than edge.
+			// 2.7) Test if ceiling behind is adequately higher than edge.
 			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
@@ -2285,6 +2285,8 @@ namespace TEN::Entities::Player
 																					   const EdgeDescentClimbSetupData& setup,
 																					   const std::vector<AttractorCollisionData>& attracColls)
 	{
+		constexpr auto ABS_EDGE_BOUND = CLICK(0.5f);
+
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 
 		// Assess attractor collision.
@@ -2302,30 +2304,34 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// TODO
+			// TODO: Make these dynamic for all attractor collision getters.
 			// 4) Test relation to edge intersection.
-			if (/*!attracColl.IsInFront || attracColl.IsFacingForward ||
-				*/!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
+			if (attracColl.IsInFront || !attracColl.IsFacingForward ||
+				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
 			{
 				continue;
 			}
 
-			// Get point collision in front of edge.
-			auto pointCollFront = GetCollision(
+			// Get point collision behind edge.
+			auto pointCollBack = GetCollision(
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// TODO
-			// 5) Test if relative edge height is within edge intersection bounds.
-			auto relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor;
+			// TODO: Add to other functions.
+			// 5) Test if player vertical position is adequately close to edge.
+			if (abs(attracColl.Proximity.Intersection.y - item.Pose.Position.y) > ABS_EDGE_BOUND)
+				continue;
+
+			// 6) Test if relative edge height is within edge intersection bounds.
+			int relEdgeHeight = pointCollBack.Position.Floor - item.Pose.Position.y;
 			if (relEdgeHeight >= setup.LowerEdgeBound || // Floor-to-edge height is within lower edge bound.
 				relEdgeHeight < setup.UpperEdgeBound)	 // Floor-to-edge height is within upper edge bound.
 			{
-				//continue;
+				continue;
 			}
 
-			// 6) Test if ceiling in front is adequately higher than edge.
-			int edgeToCeilHeight = pointCollFront.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			// 7) Test if ceiling in behind is adequately higher than edge.
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
@@ -2357,7 +2363,7 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-CLICK(1),						  // Edge-to-ceil height lower bound.
+			-CLICK(1)						  // Edge-to-ceil height lower bound.
 		};
 
 		// Get attractor collisions.
@@ -2375,7 +2381,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = IsHeld(In::Sprint) ? LS_STAND_EDGE_DESCENT_BACK_FLIP : LS_STAND_EDGE_DESCENT_BACK;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.IsInFront = attracColl->IsFacingForward; // TODO: Check.
+			context.IsInFront = attracColl->IsFacingForward; // TODO: Check. Rename to IsFacingForward?
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
 
@@ -2397,7 +2403,7 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
+			-(int)CLICK(0.6f)				  // Edge-to-ceil height lower bound.
 		};
 
 		// Get attractor collisions.
@@ -2466,7 +2472,7 @@ namespace TEN::Entities::Player
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
-			// 6) Test if ceiling in front is adequately higher than edge.
+			// 6) Test if ceiling in behind is adequately higher than edge.
 			int edgeToCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;

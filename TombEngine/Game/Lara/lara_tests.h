@@ -15,6 +15,7 @@ using namespace TEN::Entities::Player;
 // -----------------------------
 
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle);
+bool TestPlayerInteractAngle(short playerHeadingAngle, short testAngle);
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);

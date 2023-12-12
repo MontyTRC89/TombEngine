@@ -39,6 +39,11 @@ bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle)
 	return (abs(Geometry::GetShortestAngle(item.Pose.Orientation.y, testAngle)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
 }
 
+bool TestPlayerInteractAngle(short playerHeadingAngle, short testAngle)
+{
+	return (abs(Geometry::GetShortestAngle(playerHeadingAngle, testAngle)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
+}
+
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
 {
 	int shiftRight = 0;
