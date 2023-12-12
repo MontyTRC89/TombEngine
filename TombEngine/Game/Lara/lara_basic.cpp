@@ -1892,7 +1892,7 @@ void lara_as_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);
 	}
 
-	if ((player.Control.KeepLow || IsHeld(In::Crouch)) && HasStateDispatch(item, LS_CROUCH_IDLE) &&
+	if ((player.Control.KeepLow || IsHeld(In::Crouch)) && TestStateDispatch(*item, LS_CROUCH_IDLE) &&
 		CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;

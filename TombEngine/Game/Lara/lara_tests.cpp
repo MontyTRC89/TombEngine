@@ -1127,7 +1127,6 @@ static std::vector<LaraWeaponType> StandingWeaponTypes
 	LaraWeaponType::Shotgun,
 	LaraWeaponType::HK,
 	LaraWeaponType::Crossbow,
-	LaraWeaponType::Torch,
 	LaraWeaponType::GrenadeLauncher,
 	LaraWeaponType::HarpoonGun,
 	LaraWeaponType::RocketLauncher,
@@ -1196,189 +1195,6 @@ bool IsRunJumpCountableState(int state)
 		LS_JUMP_FORWARD
 	};
 	return TestState(state, runningJumpTimerStates);
-}
-
-// TODO: This function should become obsolete with more accurate and accessible collision detection in the future.
-// For now, it supersedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
-bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup)
-{
-	// HACK: coll->Setup.Radius and coll->Setup.Height are set in
-	// lara_col functions, then reset by LaraAboveWater() to defaults.
-	// This means they store the wrong values for move tests called in crawl lara_as functions.
-	// When states become objects, collision setup should occur at the beginning of each state, eliminating the need
-	// for the useCrawlSetup argument. @Sezz 2022.03.16
-	int laraRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : coll->Setup.Radius;
-	int laraHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
-
-	int y = item->Pose.Position.y;
-	int distance = OFFSET_RADIUS(laraRadius);
-	auto probe = GetCollision(item, testSetup.Angle, distance, -laraHeight);
-
-	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
-	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
-	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
-
-	auto start1 = GameVector(
-		item->Pose.Position.x,
-		y + testSetup.UpperFloorBound - 1,
-		item->Pose.Position.z,
-		item->RoomNumber
-	);
-
-	auto end1 = GameVector(
-		probe.Coordinates.x,
-		y + testSetup.UpperFloorBound - 1,
-		probe.Coordinates.z,
-		item->RoomNumber
-	);
-
-	auto start2 = GameVector(
-		item->Pose.Position.x,
-		y - laraHeight + 1,
-		item->Pose.Position.z,
-		item->RoomNumber
-	);
-
-	auto end2 = GameVector(
-		probe.Coordinates.x,
-		probe.Coordinates.y + 1,
-		probe.Coordinates.z,
-		item->RoomNumber
-	);
-
-	// Discard walls.
-	if (probe.Position.Floor == NO_HEIGHT)
-		return false;
-
-	// Check for slope or death sector (if applicable).
-	if (isSlopeDown || isSlopeUp || isDeath)
-		return false;
-
-	// Assess ray/room collision.
-	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
-		return false;
-
-	// Assess point/room collision.
-	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&			// Within lower floor bound.
-		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&			// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -laraHeight &&						// Within lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > laraHeight)	// Space is not a clamp.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraMonkeyMoveTolerance(ItemInfo* item, CollisionInfo* coll, MonkeyMoveTestSetup testSetup)
-{
-	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
-	int distance = OFFSET_RADIUS(coll->Setup.Radius);
-	auto probe = GetCollision(item, testSetup.Angle, distance);
-
-	auto start1 = GameVector(
-		item->Pose.Position.x,
-		y + testSetup.LowerCeilingBound + 1,
-		item->Pose.Position.z,
-		item->RoomNumber
-	);
-
-	auto end1 = GameVector(
-		probe.Coordinates.x,
-		probe.Coordinates.y - LARA_HEIGHT_MONKEY + testSetup.LowerCeilingBound + 1,
-		probe.Coordinates.z,
-		item->RoomNumber
-	);
-
-	auto start2 = GameVector(
-		item->Pose.Position.x,
-		y + LARA_HEIGHT_MONKEY - 1,
-		item->Pose.Position.z,
-		item->RoomNumber
-	);
-
-	auto end2 = GameVector(
-		probe.Coordinates.x,
-		probe.Coordinates.y - 1,
-		probe.Coordinates.z,
-		item->RoomNumber
-	);
-
-	// Discard walls.
-	if (probe.Position.Ceiling == NO_HEIGHT)
-		return false;
-
-	// Check for ceiling slope.
-	if (probe.Position.CeilingSlope)
-		return false;
-
-	// Assess ray/room collision.
-	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
-		return false;
-
-	// Assess point/room collision.
-	if (probe.BottomBlock->Flags.Monkeyswing &&										// Is monkey sector.
-		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Within highest floor bound.
-		(probe.Position.Ceiling - y) <= testSetup.LowerCeilingBound &&				// Within lower ceiling bound.
-		(probe.Position.Ceiling - y) >= testSetup.UpperCeilingBound &&				// Within upper ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT_MONKEY)	// Space is not a clamp.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraMonkeyForward(ItemInfo* item, CollisionInfo* coll)
-{
-	// Using Lower/UpperCeilingBound defined in monkey forward collision function.
-
-	MonkeyMoveTestSetup testSetup
-	{
-		item->Pose.Orientation.y,
-		int(CLICK(1.25f)), int(-CLICK(1.25f))
-	};
-
-	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
-}
-
-bool TestLaraMonkeyBack(ItemInfo* item, CollisionInfo* coll)
-{
-	// Using Lower/UpperCeilingBound defined in monkey back collision function.
-
-	MonkeyMoveTestSetup testSetup
-	{
-		item->Pose.Orientation.y + ANGLE(180.0f),
-		int(CLICK(1.25f)), int(-CLICK(1.25f))
-	};
-
-	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
-}
-
-bool TestLaraMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll)
-{
-	// Using Lower/UpperCeilingBound defined in monkey shimmy left collision function.
-
-	MonkeyMoveTestSetup testSetup
-	{
-		item->Pose.Orientation.y - ANGLE(90.0f),
-		int(CLICK(0.5f)), int(-CLICK(0.5f))
-	};
-
-	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
-}
-
-bool TestLaraMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll)
-{
-	// Using Lower/UpperCeilingBound defined in monkey shimmy right collision function.
-
-	MonkeyMoveTestSetup testSetup
-	{
-		item->Pose.Orientation.y + ANGLE(90.0f),
-		int(CLICK(0.5f)), int(-CLICK(0.5f))
-	};
-
-	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
 }
 
 std::optional<VaultTestResult> TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup)
@@ -1656,7 +1472,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value())
 		{
 			vaultResult->TargetState = LS_VAULT_1_STEP_CROUCH;
-			if (!TestStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1667,7 +1483,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value())
 		{
 			vaultResult->TargetState = LS_VAULT_2_STEPS;
-			if (!TestStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1678,7 +1494,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value() && g_GameFlow->HasCrawlExtended())
 		{
 			vaultResult->TargetState = LS_VAULT_2_STEPS_CROUCH;
-			if (!TestStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1689,7 +1505,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value())
 		{
 			vaultResult->TargetState = LS_VAULT_3_STEPS;
-			if (!TestStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1700,7 +1516,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value() && g_GameFlow->HasCrawlExtended())
 		{
 			vaultResult->TargetState = LS_VAULT_3_STEPS_CROUCH;
-			if (!TestStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1711,7 +1527,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value())
 		{
 			vaultResult->TargetState = LS_AUTO_JUMP;
-			if (!TestStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1726,7 +1542,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 	if (vaultResult.has_value() && g_GameFlow->HasMonkeyAutoJump())
 	{
 		vaultResult->TargetState = LS_AUTO_JUMP;
-		if (!TestStateDispatch(item, vaultResult->TargetState))
+		if (!TestStateDispatch(*item, vaultResult->TargetState))
 			return std::nullopt;
 
 		return vaultResult;

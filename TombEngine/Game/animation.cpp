@@ -19,6 +19,8 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
+constexpr auto VERTICAL_VELOCITY_GRAVITY_THRESHOLD = CLICK(0.5f);
+
 // TODO: Arm anim object in savegame.
 
 KeyframeInterpData::KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
@@ -140,7 +142,7 @@ void AnimateItem(ItemInfo* item)
 					item->Animation.Velocity.z = 0.0f;
 				}
 
-				if (item->Animation.Velocity.y > 128.0f)
+				if (item->Animation.Velocity.y > VERTICAL_VELOCITY_GRAVITY_THRESHOLD)
 					item->Animation.Velocity.y /= 2;
 				item->Animation.Velocity.y -= item->Animation.Velocity.y / 4;
 
@@ -150,7 +152,7 @@ void AnimateItem(ItemInfo* item)
 			}
 			else
 			{
-				item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
+				item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
 				item->Animation.Velocity.z += animAccel.z;
 
 				item->Pose.Position.y += item->Animation.Velocity.y;
@@ -158,7 +160,7 @@ void AnimateItem(ItemInfo* item)
 		}
 		else
 		{
-			item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
+			item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
 			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
@@ -371,6 +373,11 @@ const KeyframeData& GetClosestKeyframe(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
 	return anim.GetClosestKeyframe(item.Animation.FrameNumber);
+}
+
+float GetEffectiveGravity(float verticalVel)
+{
+	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
 }
 
 int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)

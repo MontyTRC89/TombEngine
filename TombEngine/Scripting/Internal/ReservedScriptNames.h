@@ -16,8 +16,6 @@ static constexpr char ScriptReserved_Util[]				= "Util";
 static constexpr char ScriptReserved_Effects[]			= "Effects";
 
 // Classes
-static constexpr char ScriptReserved_Moveable[]			= "Moveable";
-static constexpr char ScriptReserved_Lara[]				= "Lara";
 static constexpr char ScriptReserved_Static[]			= "Static";
 static constexpr char ScriptReserved_Camera[]			= "Camera";
 static constexpr char ScriptReserved_Sink[]				= "Sink";
@@ -30,6 +28,15 @@ static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Vec2[]				= "Vec2";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
+
+// Moveable object
+static constexpr char ScriptReserved_Moveable[]			= "Moveable";
+static constexpr char ScriptReserved_MoveableEnum[]		= "MoveableEnum";
+static constexpr char ScriptReserved_MoveableStatus[]	= "Status";
+
+// Player object
+static constexpr char ScriptReserved_Lara[]							= "Lara";
+static constexpr char ScriptReserved_GetPlayerInteractedMoveable[]	= "GetInteractedMoveable";
 
 // DisplaySprite object
 static constexpr char ScriptReserved_DisplaySprite[]				= "DisplaySprite";
@@ -73,9 +80,14 @@ static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
 static constexpr char ScriptReserved_PostControlPhase[] = "POSTCONTROLPHASE";
 
 // Event types
-static constexpr char ScriptReserved_OnEnter[]	= "ENTER";
-static constexpr char ScriptReserved_OnInside[] = "INSIDE";
-static constexpr char ScriptReserved_OnLeave[]	= "LEAVE";
+static constexpr char ScriptReserved_EventOnEnter[]	= "ENTER";
+static constexpr char ScriptReserved_EventOnInside[] = "INSIDE";
+static constexpr char ScriptReserved_EventOnLeave[]	= "LEAVE";
+static constexpr char ScriptReserved_EventOnLoad[] = "LOAD";
+static constexpr char ScriptReserved_EventOnSave[] = "SAVE";
+static constexpr char ScriptReserved_EventOnStart[] = "START";
+static constexpr char ScriptReserved_EventOnEnd[] = "END";
+static constexpr char ScriptReserved_EventOnLoop[] = "LOOP";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
@@ -138,6 +150,7 @@ static constexpr char ScriptReserved_SetStateNumber[]		= "SetState";
 static constexpr char ScriptReserved_GetOCB[]				= "GetOCB";
 static constexpr char ScriptReserved_SetOCB[]				= "SetOCB";
 static constexpr char ScriptReserved_GetStatus[]			= "GetStatus";
+static constexpr char ScriptReserved_SetStatus[]			= "SetStatus";
 static constexpr char ScriptReserved_GetAIBits[]			= "GetAIBits";
 static constexpr char ScriptReserved_SetAIBits[]			= "SetAIBits";
 static constexpr char ScriptReserved_GetItemFlags[]			= "GetItemFlags";
@@ -262,6 +275,8 @@ static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 static constexpr char ScriptReserved_AddCallback[]					= "AddCallback";
 static constexpr char ScriptReserved_RemoveCallback[]				= "RemoveCallback";
 static constexpr char ScriptReserved_HandleEvent[]					= "HandleEvent";
+static constexpr char ScriptReserved_EnableEvent[]					= "EnableEvent";
+static constexpr char ScriptReserved_DisableEvent[]					= "DisableEvent";
 
 static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
