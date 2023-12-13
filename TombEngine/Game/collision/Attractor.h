@@ -10,7 +10,8 @@ namespace TEN::Collision::Attractor
 	enum class AttractorType
 	{
 		Edge,
-		/*VerticalPole, // """""""""Polerope"""""""""
+		/*WallEdge, // Maybe for wall climbing.
+		VerticalPole, // """""""""Polerope"""""""""
 		HorizontalPole, // TODO: AOD pipe shimmy + pipe crawl.
 		SwingPole,
 		ZipLine,

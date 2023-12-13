@@ -2673,31 +2673,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<WallClimbContextData> GetAutoJumpWallClimbContext(const ItemInfo& item, const CollisionInfo& coll)
-	{
-		const auto& player = GetLaraInfo(item);
-
-		auto pointCollCenter = GetCollision(item);
-		auto pointCollFront = GetCollision(&item, coll.NearestLedgeAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
-		int vPos = item.Pose.Position.y;
-
-		// Test ledge angle.
-		if (!TestPlayerInteractAngle(item, coll.NearestLedgeAngle))
-			return std::nullopt;
-
-		if (player.Control.CanClimbLadder &&								// Ladder sector flag set.
-			(pointCollCenter.Position.Ceiling - vPos) <= -CLICK(6.5f) &&		// Within lowest middle ceiling bound. (Synced with TestLaraLadderMount())
-			((pointCollFront.Position.Floor - vPos) <= -CLICK(6.5f) ||			// Floor height is appropriate, OR
-				(pointCollFront.Position.Ceiling - vPos) > -CLICK(6.5f)) &&		// Ceiling height is appropriate. (Synced with TestLaraLadderMount())
-			coll.NearestLedgeDistance <= coll.Setup.Radius)			// Appropriate distance from wall.
-		{
-			return WallClimbContextData{ pointCollCenter.Position.Ceiling, false, true, true };
-		}
-
-		return std::nullopt;
-	}
-
-	static std::optional<WallClimbContextData> GetMountWallClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<WallClimbContextData> GetWallVaultAutoJumpWallClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -2706,63 +2682,96 @@ namespace TEN::Entities::Player
 		auto pointCollFront = GetCollision(&item, coll.NearestLedgeAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
 		int vPos = item.Pose.Position.y;
 
-		// Test ledge angle.
-		if (!TestPlayerInteractAngle(item, coll.NearestLedgeAngle))
-			return std::nullopt;
-
-		if (player.Control.CanClimbLadder &&							 // Climbable wall available.
-			(pointCollCenter.Position.Ceiling - vPos) <= -CLICK(4.5f) && // Within lower middle ceiling bound.
-			(pointCollCenter.Position.Ceiling - vPos) > -CLICK(6.5f) &&	 // Within upper middle ceiling bound.
-			(pointCollCenter.Position.Floor - vPos) > -CLICK(6.5f) &&	 // Within upper middle floor bound. (Synced with edge auto jump)
-			(pointCollFront.Position.Ceiling - vPos) <= -CLICK(4.5f) &&	 // Within lowest front ceiling bound.
-			coll.NearestLedgeDistance <= coll.Setup.Radius)				 // Appropriate distance from wall.
+		// Assess point collision.
+		if ((pointCollCenter.Position.Ceiling - vPos) <= -CLICK(6.5f) &&  // Ceiling height is within lowest middle ceiling bound.
+			((pointCollFront.Position.Floor - vPos) <= -CLICK(6.5f) ||	  // Floor height is appropriate.
+				(pointCollFront.Position.Ceiling - vPos) > -CLICK(6.5f))) // Ceiling height is appropriate.
 		{
-			return WallClimbContextData{ NO_HEIGHT, true, true, false };
+			auto context = WallClimbContextData{};
+			context.Height = pointCollCenter.Position.Ceiling;
+			return context;
 		}
 
 		return std::nullopt;
 	}
 
-	bool HandleWallClimb(ItemInfo& item, CollisionInfo& coll)
+	static std::optional<WallClimbContextData> GetWallVaultMountWallClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		const auto& player = GetLaraInfo(item);
+
+		// Get point collision.
+		auto pointCollCenter = GetCollision(item);
+		auto pointCollFront = GetCollision(&item, coll.NearestLedgeAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
+		int vPos = item.Pose.Position.y;
+
+		// Assess point collision.
+		if ((pointCollCenter.Position.Ceiling - vPos) <= -CLICK(4.5f) && // Ceiling height is within lower center ceiling bound.
+			(pointCollCenter.Position.Ceiling - vPos) > -CLICK(6.5f) &&	 // Ceiling height is within upper center ceiling bound.
+			(pointCollCenter.Position.Floor - vPos) > -CLICK(6.5f) &&	 // Floor height is within upper center floor bound.
+			(pointCollFront.Position.Ceiling - vPos) <= -CLICK(4.5f))	 // Ceiling height is within lowest front ceiling bound.
+		{
+			auto context = WallClimbContextData{};
+			context.Height = 0;
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	bool HandleClimbableWallVault(ItemInfo& item, CollisionInfo& coll)
+	{
+		constexpr auto SWAMP_DEPTH_MAX = -CLICK(3);
+
 		auto& player = GetLaraInfo(item);
 
-		if (!IsHeld(In::Action) || !IsHeld(In::Forward) || player.Control.HandStatus != HandStatus::Free)
+		// 1) Test for Action and Forward input actions.
+		if (!IsHeld(In::Action) || !IsHeld(In::Forward))
 			return false;
 
-		if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < -CLICK(3))
+		// 2) Test swamp depth.
+		if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < SWAMP_DEPTH_MAX)
 			return false;
 
-		// Auto jump to ladder.
-		auto context = GetAutoJumpWallClimbContext(item, coll);
+		// 3) Check hand status.
+		if (player.Control.HandStatus != HandStatus::Free)
+			return false;
+
+		// 4) Check if wall is climbable.
+		if (!player.Control.CanClimbLadder)
+			return false;
+
+		// 5) Test relation to wall.
+		short wallHeadingAngle = GetQuadrant(item.Pose.Orientation.y) * ANGLE(90.0f);
+		if (!TestPlayerInteractAngle(item, wallHeadingAngle))
+			return false;
+
+		// 6) Wall vault auto jump.
+		auto context = GetWallVaultAutoJumpWallClimbContext(item, coll);
 		if (context.has_value())
 		{
-			// TODO: Somehow harmonise CalculatedJumpVelocity to work for both edge and wall auto jumps, because otherwise there will be a need for an odd workaround in the future.
-			player.Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((context->Height - item.Pose.Position.y + CLICK(0.2f)), -CLICK(7.1f)));
-			SetAnimation(item, LA_STAND_SOLID);
-			item.Animation.TargetState = LS_JUMP_UP;
+			SetAnimation(item, LA_STAND_TO_JUMP_PREPARE);
+			item.Pose.Orientation.y = wallHeadingAngle;
 			player.Control.TurnRate = 0;
+			player.Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((context->Height - item.Pose.Position.y + CLICK(0.2f)), -CLICK(7.1f)));
 
-			ShiftItem(&item, &coll);
-			SnapEntityToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-			player.Context.OrientOffset = EulerAngles(0, item.Pose.Orientation.y, 0);
-			AnimateItem(&item);
+			// HACK: Snap to grid.
+			SnapEntityToGrid(item, coll);
 
 			return true;
 		}
 
-		// Mount ladder.
-		context = GetMountWallClimbContext(item, coll);
+		// 7) Wall vault mount.
+		context = GetWallVaultMountWallClimbContext(item, coll);
 		if (context.has_value() && TestLaraClimbIdle(&item, &coll))
 		{
-			SetAnimation(item, LA_STAND_SOLID);
+			SetAnimation(item, LA_STAND_TO_LADDER);
 			item.Animation.TargetState = LS_LADDER_IDLE;
+			item.Pose.Orientation.y = wallHeadingAngle;
 			player.Control.HandStatus = HandStatus::Busy;
 			player.Control.TurnRate = 0;
 
-			ShiftItem(&item, &coll);
-			SnapEntityToGrid(item, coll); // HACK: Until fragile ladder code is refactored, must snap to grid.
-			AnimateItem(&item);
+			// HACK: Snap to grid.
+			SnapEntityToGrid(item, coll);
 
 			return true;
 		}

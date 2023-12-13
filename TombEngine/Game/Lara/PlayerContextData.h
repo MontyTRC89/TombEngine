@@ -117,10 +117,6 @@ namespace TEN::Entities::Player
 	// TODO: Temporary.
 	struct WallClimbContextData
 	{
-		int	 Height			 = 0;
-		bool SetBusyHands	 = 0;
-		bool SnapToLedge	 = 0;
-		bool SetJumpVelocity = 0;
-		int	 TargetState	 = 0;
+		int Height = 0;
 	};
 }

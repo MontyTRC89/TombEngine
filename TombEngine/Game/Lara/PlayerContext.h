@@ -165,8 +165,6 @@ namespace TEN::Entities::Player
 	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 
-	// TEMP
-	std::optional<WallClimbContextData> GetAutoJumpWallClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<WallClimbContextData> GetMountWallClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	bool								HandleWallClimb(ItemInfo& item, CollisionInfo& coll);
+	// Wall climb contexts
+	bool HandleClimbableWallVault(ItemInfo& item, CollisionInfo& coll);
 }
