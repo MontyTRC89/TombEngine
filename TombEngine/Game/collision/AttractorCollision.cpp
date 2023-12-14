@@ -182,7 +182,7 @@ namespace TEN::Collision::Attractor
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
 			// Get collisions for every segment.
-			for (int i = 0; i <= (attracPtr->GetSegmentCount() - 1); i++)
+			for (int i = 0; i < attracPtr->GetSegmentCount(); i++)
 			{
 				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle);
 
