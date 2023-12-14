@@ -203,11 +203,12 @@ namespace TEN::Collision::Attractor
 
 	void Attractor::DrawDebug(unsigned int segmentID) const
 	{
-		constexpr auto LABEL_OFFSET			 = Vector3(0.0f, -CLICK(0.25f), 0.0f);
-		constexpr auto INDICATOR_LINE_LENGTH = BLOCK(1 / 20.0f);
-		constexpr auto SPHERE_RADIUS		 = BLOCK(1 / 52.0f);
-		constexpr auto COLOR_YELLOW			 = Color(1.0f, 1.0f, 0.4f);
-		constexpr auto COLOR_GREEN			 = Color(0.4f, 1.0f, 0.4f);
+		constexpr auto LABEL_OFFSET				= Vector3(0.0f, -CLICK(0.25f), 0.0f);
+		constexpr auto INDICATOR_LINE_LENGTH	= BLOCK(1 / 20.0f);
+		constexpr auto SPHERE_RADIUS			= BLOCK(1 / 52.0f);
+		constexpr auto COLOR_YELLOW_OPAQUE		= Color(1.0f, 1.0f, 0.4f);
+		constexpr auto COLOR_YELLOW_TRANSLUCENT = Color(1.0f, 1.0f, 0.4f, 0.3f);
+		constexpr auto COLOR_GREEN				= Color(0.4f, 1.0f, 0.4f);
 
 		auto getLabelScale = [](const Vector3& cameraPos, const Vector3& labelPos)
 		{
@@ -229,7 +230,7 @@ namespace TEN::Collision::Attractor
 			break;
 
 		default:
-			labelString = "Undefined attractor";
+			labelString = "Unknown attractor";
 			break;
 		}
 
@@ -237,7 +238,7 @@ namespace TEN::Collision::Attractor
 		if (_points.size() == 1)
 		{
 			// Draw sphere.
-			g_Renderer.AddDebugSphere(_points.front(), SPHERE_RADIUS, Color(COLOR_YELLOW.R(), COLOR_YELLOW.G(), COLOR_YELLOW.B(), 0.3f), RendererDebugPage::AttractorStats, false);
+			g_Renderer.AddDebugSphere(_points.front(), SPHERE_RADIUS, COLOR_YELLOW_TRANSLUCENT, RendererDebugPage::AttractorStats, false);
 
 			// Determine label parameters.
 			auto labelPos = _points.front();
@@ -255,7 +256,7 @@ namespace TEN::Collision::Attractor
 			const auto& target = _points[segmentID + 1];
 
 			// Draw main line.
-			g_Renderer.AddDebugLine(origin, target, COLOR_YELLOW, RendererDebugPage::AttractorStats);
+			g_Renderer.AddDebugLine(origin, target, COLOR_YELLOW_OPAQUE, RendererDebugPage::AttractorStats);
 
 			auto orient = EulerAngles(0, Geometry::GetOrientToPoint(origin, target).y + ANGLE(90.0f), 0);
 			auto dir = orient.ToDirection();
