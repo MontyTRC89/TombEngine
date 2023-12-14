@@ -47,14 +47,14 @@ namespace TEN::Collision::Attractor
 		return _roomNumber;
 	}
 
-	const std::vector<float>& Attractor::GetSegmentLengths() const
-	{
-		return _segmentLengths;
-	}
-
 	float Attractor::GetLength() const
 	{
 		return _length;
+	}
+
+	const std::vector<float>& Attractor::GetSegmentLengths() const
+	{
+		return _segmentLengths;
 	}
 
 	const BoundingBox& Attractor::GetBox() const

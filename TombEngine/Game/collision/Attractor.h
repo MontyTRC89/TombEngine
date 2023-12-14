@@ -43,8 +43,8 @@ namespace TEN::Collision::Attractor
 		AttractorType				GetType() const;
 		const std::vector<Vector3>& GetPoints() const;
 		int							GetRoomNumber() const;
-		const std::vector<float>&	GetSegmentLengths() const;
 		float						GetLength() const;
+		const std::vector<float>&	GetSegmentLengths() const;
 		const BoundingBox&			GetBox() const;
 
 		// Inquirers
