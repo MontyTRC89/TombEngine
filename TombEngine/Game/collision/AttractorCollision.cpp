@@ -109,6 +109,9 @@ namespace TEN::Collision::Attractor
 		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac1);
 		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac2);
 
+		for (auto& attrac : player.Context.DebugAttracs.Attracs)
+			debugAttracPtrs.push_back(&attrac);
+
 		return debugAttracPtrs;
 	}
 

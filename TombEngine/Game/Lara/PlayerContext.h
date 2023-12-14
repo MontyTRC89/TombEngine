@@ -44,6 +44,8 @@ namespace TEN::Entities::Player
 		std::optional<Attractor> Attrac0 = std::nullopt;
 		std::optional<Attractor> Attrac1 = std::nullopt;
 		std::optional<Attractor> Attrac2 = std::nullopt;
+
+		std::vector<Attractor> Attracs = {};
 	};
 
 	// TODO: Savegame for attractors.

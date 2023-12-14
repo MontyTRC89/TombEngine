@@ -8,11 +8,23 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Math/Math.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 // NOTE: Temporary file.
+
+// Controls:
+// Q: Spawn edge attractor A point 0.
+// W: Spawn edge attractor A point 1.
+// E: Spawn edge attractor B point 0.
+// R: Spawn edge attractor B point 1.
+// T: Spawn outer edge attractor circle.
+// Y: Spawn inner edge attractor circle.
+// U: Modify edge attractor circle point.
+// I: Spawn wall edge attractor stack.
 
 namespace TEN::Collision::Attractor
 {
@@ -25,6 +37,9 @@ namespace TEN::Collision::Attractor
 		player.Context.DebugAttracs.Attrac0 = Attractor(AttractorType::Edge, points, item.RoomNumber);
 		player.Context.DebugAttracs.Attrac1 = Attractor(AttractorType::Edge, points, item.RoomNumber);
 		player.Context.DebugAttracs.Attrac2 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+
+		for (int i = 0; i < 8; i++)
+			player.Context.DebugAttracs.Attracs.push_back(Attractor(AttractorType::Edge, points, item.RoomNumber));
 	}
 
 	static void SpawnAttractorCircle(ItemInfo& item, bool isOuter)
@@ -69,13 +84,13 @@ namespace TEN::Collision::Attractor
 		auto attracPoint = basePos + offset;
 
 		// Set debug attractor 0.
-		if (KeyMap[OIS::KeyCode::KC_E])
+		if (KeyMap[OIS::KeyCode::KC_Q])
 		{
 			auto pos0 = attracPoint;
 			auto pos1 = player.Context.DebugAttracs.Attrac0->GetPoints().empty() ? pos0 : player.Context.DebugAttracs.Attrac0->GetPoints().back();
 			player.Context.DebugAttracs.Attrac0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
-		if (KeyMap[OIS::KeyCode::KC_R])
+		if (KeyMap[OIS::KeyCode::KC_W])
 		{
 			auto pos1 = attracPoint;
 			auto pos0 = player.Context.DebugAttracs.Attrac0->GetPoints().empty() ? pos1 : player.Context.DebugAttracs.Attrac0->GetPoints().front();
@@ -83,32 +98,50 @@ namespace TEN::Collision::Attractor
 		}
 
 		// Set debug attractor 1.
-		if (KeyMap[OIS::KeyCode::KC_Q])
+		if (KeyMap[OIS::KeyCode::KC_E])
 		{
 			auto pos0 = attracPoint;
 			auto pos1 = player.Context.DebugAttracs.Attrac1->GetPoints().empty() ? pos0 : player.Context.DebugAttracs.Attrac1->GetPoints().back();
 			player.Context.DebugAttracs.Attrac1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
-		if (KeyMap[OIS::KeyCode::KC_W])
+		if (KeyMap[OIS::KeyCode::KC_R])
 		{
 			auto pos1 = attracPoint;
 			auto pos0 = player.Context.DebugAttracs.Attrac1->GetPoints().empty() ? pos1 : player.Context.DebugAttracs.Attrac1->GetPoints().front();
 			player.Context.DebugAttracs.Attrac1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 
-		// Spawn attractor pentagon.
+		// Spawn attractor circle.
 		if (KeyMap[OIS::KeyCode::KC_T])
 			SpawnAttractorCircle(item, true);
 		if (KeyMap[OIS::KeyCode::KC_Y])
 			SpawnAttractorCircle(item, false);
 
-		// Modify pentagon point.
+		// Modify circle point.
 		if (KeyMap[OIS::KeyCode::KC_U])
 		{
 			auto pos = LaraItem->Pose.Position.ToVector3() + Vector3::Transform(Vector3(0.0f, -CLICK(5), LARA_RADIUS), rotMatrix);
 			auto points = player.Context.DebugAttracs.Attrac2->GetPoints();
 			points[1] = pos;
 			player.Context.DebugAttracs.Attrac2->Update(points, player.Context.DebugAttracs.Attrac2->GetRoomNumber());
+		}
+
+		// Spawn climbable wall attractor stack.
+		if (KeyMap[OIS::KeyCode::KC_G])
+		{
+			auto vPos = Vector3(item.Pose.Position.x, floor(item.Pose.Position.y / CLICK(1)) * CLICK(1), item.Pose.Position.z);
+			int inc = 0;
+			for (auto& attrac : player.Context.DebugAttracs.Attracs)
+			{
+				auto points = std::vector<Vector3>
+				{
+					Geometry::TranslatePoint(vPos, item.Pose.Orientation.y, 100, inc, -BLOCK(0.5f)),
+					Geometry::TranslatePoint(vPos, item.Pose.Orientation.y, 100, inc, BLOCK(0.5f)),
+				};
+				inc -= CLICK(1);
+
+				attrac = Attractor(AttractorType::WallEdge, points, item.RoomNumber);
+			}
 		}
 	}
 
