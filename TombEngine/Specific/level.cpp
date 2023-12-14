@@ -848,6 +848,14 @@ void ReadRooms()
 		// NOTE: Level format contains only dummy data for now. -- Sezz 2023.12.14
 		// Load attractors.
 		int attracCount = ReadInt32();
+		for (int j = 0; j < attracCount; j++)
+		{
+			auto type = ReadInt32();
+
+			int pointCount = ReadInt32();
+			for (int k = 0; k < pointCount; k++)
+				ReadVector3();
+		}
 
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();
