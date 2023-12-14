@@ -848,24 +848,6 @@ void ReadRooms()
 		// NOTE: Level format contains only dummy data for now. -- Sezz 2023.12.14
 		// Load attractors.
 		int attracCount = ReadInt32();
-		/*for (int j = 0; j < attracCount; j++)
-		{
-			auto type = (AttractorType)ReadInt32();
-			auto points = std::vector<Vector3>{};
-
-			int pointCount = ReadInt32();
-			points.reserve(pointCount);
-			for (int k = 0; k < pointCount; k++)
-				points.push_back(ReadVector3());
-
-			if (points.empty())
-			{
-				TENLog("Failed to load invalid attractor " + std::to_string(j) + " in room " + std::to_string(i), LogLevel::Warning);
-				continue;
-			}
-
-			room.Attractors.push_back(Attractor(type, points, i));
-		}*/
 
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();
