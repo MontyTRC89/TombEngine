@@ -20,6 +20,7 @@ Version 1.3
 * Allow walking on slopes when wading in water (similar to quicksand).
 * Allow player to pull certain levers with both hands when holding a flare.
 * Port twin auto gun from TR3.
+* Add speedometer for vehicles such as: motorbike, Jeep.
 * Accurately rotate display sprites around their pivot.
 * Slightly revise keyhole OCB to account for either keeping or losing the key:
   - Positive OCB - play anim number and keep key in inventory.
