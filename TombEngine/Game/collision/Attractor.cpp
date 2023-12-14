@@ -65,7 +65,7 @@ namespace TEN::Collision::Attractor
 	bool Attractor::IsLooped() const
 	{
 		// Single segment exists; loop not possible.
-		if (_points.size() <= 2)
+		if (GetSegmentCount() == 1)
 			return false;
 
 		// Test if start and end points occupy same approximate position.
@@ -73,12 +73,52 @@ namespace TEN::Collision::Attractor
 		return (distSqr <= EPSILON);
 	}
 
+	unsigned int Attractor::GetSegmentCount() const
+	{
+		return std::max<unsigned int>(_points.size() - 1, 1);
+	}
+
+	unsigned int Attractor::GetSegmentIDAtChainDistance(float chainDist) const
+	{
+		// Single segment exists; return segment ID 0.
+		if (GetSegmentCount() == 1)
+			return 0;
+
+		// Normalize distance along attractor.
+		chainDist = NormalizeChainDistance(chainDist);
+
+		// Chain distance is on attractor edge; return clamped segment ID.
+		if (chainDist <= 0.0f)
+		{
+			return 0;
+		}
+		else if (chainDist >= _length)
+		{
+			return (GetSegmentCount() - 1);
+		}
+
+		// Find segment at distance along attractor.
+		float chainDistTraveled = 0.0f;
+		for (int i = 0; i < GetSegmentCount(); i++)
+		{
+			// Accumulate distance traveled along attractor.
+			chainDistTraveled += _segmentLengths[i];
+
+			// Segment found; return segment ID.
+			if (chainDistTraveled >= chainDist)
+				return i;
+		}
+
+		// FAILSAFE: Return end segment ID.
+		return (GetSegmentCount() - 1);
+	}
+
 	Vector3 Attractor::GetIntersectionAtChainDistance(float chainDist) const
 	{
 		// Single point exists; return simple intersection.
 		if (_points.size() == 1)
 			return _points.front();
-		
+
 		// Normalize distance along attractor.
 		chainDist = NormalizeChainDistance(chainDist);
 
@@ -91,10 +131,10 @@ namespace TEN::Collision::Attractor
 		{
 			return _points.back();
 		}
-		
+
 		// Find intersection at distance along attractor.
 		float chainDistTraveled = 0.0f;
-		for (int i = 0; i < (_points.size() - 1); i++)
+		for (int i = 0; i < GetSegmentCount(); i++)
 		{
 			float segmentLength = _segmentLengths[i];
 			float remainingChainDist = chainDist - chainDistTraveled;
@@ -116,41 +156,6 @@ namespace TEN::Collision::Attractor
 
 		// FAILSAFE: Return end point.
 		return _points.back();
-	}
-
-	unsigned int Attractor::GetSegmentIDAtChainDistance(float chainDist) const
-	{
-		// Single segment exists; return segment ID 0.
-		if (_points.size() <= 2)
-			return 0;
-
-		// Normalize distance along attractor.
-		chainDist = NormalizeChainDistance(chainDist);
-
-		// Chain distance is on attractor edge; return clamped segment ID.
-		if (chainDist <= 0.0f)
-		{
-			return 0;
-		}
-		else if (chainDist >= _length)
-		{
-			return unsigned int(_points.size() - 2);
-		}
-
-		// Find segment at distance along attractor.
-		float chainDistTraveled = 0.0f;
-		for (int i = 0; i < (_points.size() - 1); i++)
-		{
-			// Accumulate distance traveled along attractor.
-			chainDistTraveled += _segmentLengths[i];
-
-			// Segment found; return segment ID.
-			if (chainDistTraveled >= chainDist)
-				return i;
-		}
-
-		// FAILSAFE: Return end segment ID.
-		return unsigned int(_points.size() - 2);
 	}
 
 	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
@@ -273,7 +278,7 @@ namespace TEN::Collision::Attractor
 				g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 			
 			// Draw end indicator line
-			if (segmentID == (_points.size() - 2))
+			if (segmentID == (GetSegmentCount() - 1))
 				g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 
 			// Draw AABB.
@@ -303,7 +308,7 @@ namespace TEN::Collision::Attractor
 		// Clear segment lengths.
 		_segmentLengths.clear();
 
-		// Single point exists.
+		// Single point exists; cache single segment length of 0.
 		if (_points.size() == 1)
 		{
 			_segmentLengths.push_back(0.0f);
@@ -311,7 +316,7 @@ namespace TEN::Collision::Attractor
 		}
 
 		// Collect segment lengths.
-		for (int i = 0; i < (_points.size() - 1); i++)
+		for (int i = 0; i < GetSegmentCount(); i++)
 		{
 			// Get segment points.
 			const auto& origin = _points[i];

@@ -23,7 +23,7 @@ namespace TEN::Collision::Attractor
 		const auto& points = attrac.GetPoints();
 
 		// FAILSAFE: Clamp segment ID.
-		segmentID = std::clamp(segmentID, 0u, std::min(segmentID, unsigned int(points.size() - 2)));
+		segmentID = std::clamp<unsigned int>(segmentID, 0, attrac.GetSegmentCount() - 1);
 
 		// Set attractor pointer and get proximity data.
 		AttractorPtr = &attrac;
@@ -182,7 +182,7 @@ namespace TEN::Collision::Attractor
 		for (auto* attracPtr : nearbyAttracPtrs)
 		{
 			// Get collisions for every segment.
-			for (int i = 0; i <= std::max(0, int(attracPtr->GetPoints().size() - 2)); i++)
+			for (int i = 0; i <= (attracPtr->GetSegmentCount() - 1); i++)
 			{
 				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle);
 
