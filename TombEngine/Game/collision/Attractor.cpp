@@ -231,6 +231,7 @@ namespace TEN::Collision::Attractor
 
 		case AttractorType::WallEdge:
 			labelString = "Wall Edge";
+			break;
 
 		default:
 			labelString = "Unknown attractor";
