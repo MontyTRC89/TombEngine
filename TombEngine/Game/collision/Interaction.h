@@ -7,7 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Collision
 {
-	using PlayerInteractRoutine = std::function<void(ItemInfo& playerEntity, ItemInfo& interactedEntity)>;
+	using PlayerInteractRoutine = std::function<void(ItemInfo& playerItem, ItemInfo& interactedItem)>;
 	using OrientConstraintPair	= std::pair<EulerAngles, EulerAngles>;
 
 	class InteractionBasis
@@ -34,16 +34,16 @@ namespace TEN::Collision
 		InteractionBasis(const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
 
 		// Inquirers
-		bool TestInteraction(const ItemInfo& entityFrom, const ItemInfo& entityTo, std::optional<BoundingOrientedBox> expansionBox = std::nullopt) const;
+		bool TestInteraction(const ItemInfo& itemFrom, const ItemInfo& itemTo, std::optional<BoundingOrientedBox> expansionBox = std::nullopt) const;
 	
 		// Utilities
 		void DrawDebug(const ItemInfo& item) const;
 	};
 
-	void SetEntityInteraction(ItemInfo& entityFrom, const ItemInfo& entityTo, const InteractionBasis& basis,
-							  const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Zero);
-	void SetPlayerAlignAnim(ItemInfo& playerEntity, const ItemInfo& interactedEntity);
+	void SetItemInteraction(ItemInfo& itemFrom, const ItemInfo& itemTo, const InteractionBasis& basis,
+							const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Zero);
+	void SetPlayerAlignAnim(ItemInfo& playerItem, const ItemInfo& interactedItem);
 	
-	bool HandlePlayerInteraction(ItemInfo& playerEntity, ItemInfo& interactedEntity, const InteractionBasis& basis,
+	bool HandlePlayerInteraction(ItemInfo& playerItem, ItemInfo& interactedItem, const InteractionBasis& basis,
 								 const PlayerInteractRoutine& interactRoutine);
 }
