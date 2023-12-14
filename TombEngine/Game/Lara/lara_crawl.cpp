@@ -873,6 +873,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
 	Camera.targetDistance = BLOCK(1);
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	ResetPlayerLean(item, 1 / 6.0f);
 

@@ -1697,14 +1697,15 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump) || player.Control.IsRunJumpQueued)
 	{
-		if ((IsHeld(In::Sprint) && !IsHeld(In::Walk)) && CanSprintJumpForward(*item, *coll))
-		{
-			item->Animation.TargetState = LS_JUMP_FORWARD;
-			return;
-		}
-		else
+		// TODO: CanSprintJumpForward() should handle HasSprintJump() check.
+		if (IsHeld(In::Walk) || !g_GameFlow->HasSprintJump())
 		{
 			item->Animation.TargetState = LS_SPRINT_DIVE;
+			return;
+		}
+		else if (IsHeld(In::Sprint) && CanSprintJumpForward(*item, *coll))
+		{
+			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
 		}
 
