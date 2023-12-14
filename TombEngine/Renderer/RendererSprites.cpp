@@ -464,6 +464,8 @@ namespace TEN::Renderer
 
 			_numSortedSpritesDrawCalls++;
 			_numSortedTriangles += 2;
+
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		}
 		else
 		{
