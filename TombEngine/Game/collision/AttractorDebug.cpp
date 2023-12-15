@@ -24,7 +24,7 @@ using namespace TEN::Math;
 // T: Spawn outer edge attractor circle.
 // Y: Spawn inner edge attractor circle.
 // U: Modify edge attractor circle point.
-// I: Spawn wall edge attractor stack.
+// G: Spawn wall edge attractor stack.
 
 namespace TEN::Collision::Attractor
 {

@@ -83,9 +83,11 @@ namespace TEN::Entities::Player
 		bool SetJumpVelocity = false;
 	};
 
+	// TODO: Maybe not needed. Can reuse ClimbContextData.
 	struct EdgeCatchContextData
 	{
 		Attractor* AttracPtr = nullptr;
+
 		EdgeType   Type		 = EdgeType::Attractor; // TODO: Won't be needed later.
 
 		Vector3 Intersection  = Vector3::Zero;

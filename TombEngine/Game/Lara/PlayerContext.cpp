@@ -1297,9 +1297,13 @@ namespace TEN::Entities::Player
 		// 2) Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
-			// 2.1) Check if attractor is edge type.
-			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
+			// TODO: Find highest for auto jump.
+			// 2.1) Check if attractor is edge or wall edge type.
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
+				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
+			{
 				continue;
+			}
 
 			// 2.2) Test if edge is within 2D range.
 			if (attracColl.Proximity.Distance2D > range2D)
@@ -2274,9 +2278,12 @@ namespace TEN::Entities::Player
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
-			// 1) Check if attractor is edge type.
-			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
+			// 1) Check if attractor is edge or wall edge type.
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
+				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
+			{
 				continue;
+			}
 
 			// 2) Test if edge is within 2D range.
 			if (attracColl.Proximity.Distance2D > range2D)
@@ -2467,9 +2474,12 @@ namespace TEN::Entities::Player
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
-			// 1) Check if attractor is edge type.
-			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
+			// 1) Check if attractor is edge or wall edge type.
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
+				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
+			{
 				continue;
+			}
 
 			// 2) Test if edge is within 2D range.
 			if (attracColl.Proximity.Distance2D > range2D)
