@@ -143,7 +143,7 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		int steps = _shadowLight->Type == LightType::Shadow ? 6 : 1;
+		int steps = _shadowLight->Type == LightType::Point ? 6 : 1;
 		for (int step = 0; step < steps; step++) 
 		{
 			// Bind render target
@@ -232,7 +232,7 @@ namespace TEN::Renderer
 					// Draw vertices
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
-					_numMoveablesDrawCalls++;
+					_numShadowMapDrawCalls++;
 				}
 			}
 
