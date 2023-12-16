@@ -203,7 +203,7 @@ namespace TEN::Collision::Attractor
 
 	void Attractor::DrawDebug(unsigned int segmentID) const
 	{
-		constexpr auto LABEL_OFFSET				= Vector3(0.0f, -CLICK(0.25f), 0.0f);
+		constexpr auto LABEL_OFFSET				= Vector3(0.0f, -CLICK(0.5f), 0.0f);
 		constexpr auto INDICATOR_LINE_LENGTH	= BLOCK(1 / 20.0f);
 		constexpr auto SPHERE_RADIUS			= BLOCK(1 / 52.0f);
 		constexpr auto COLOR_YELLOW_OPAQUE		= Color(1.0f, 1.0f, 0.4f);
