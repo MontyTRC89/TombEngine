@@ -1315,21 +1315,10 @@ namespace TEN::Entities::Player
 
 			// TODO: Add RelHeadingAngle to deal with this more cleanly.
 			// 2.4) Test relation to edge intersection.
-			if (setup.TestEdgeFront)
+			if (!attracColl.IsInFront ||
+				!TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle + (setup.TestEdgeFront ? ANGLE(0.0f) : ANGLE(180.0f))))
 			{
-				if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
-					!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-				{
-					continue;
-				}
-			}
-			else
-			{
-				if (!attracColl.IsInFront || attracColl.IsFacingForward ||
-					!TestPlayerInteractAngle(item, attracColl.HeadingAngle + ANGLE(180.0f)))
-				{
-					continue;
-				}
+				continue;
 			}
 
 			// TODO: Point collision probing may traverse rooms correctly if bridges cross rooms.
@@ -2313,11 +2302,13 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// TODO: More straighforward setup.
 			// TODO: Make these dynamic for all attractor collision getters.
 			// 4) Test relation to edge intersection.
-			if (attracColl.IsInFront || !TestPlayerInteractAngle(item.Pose.Orientation.y + setup.RelHeadingAngle, attracColl.HeadingAngle))
+			if (!attracColl.IsInFront ||
+				!TestPlayerInteractAngle(item.Pose.Orientation.y + setup.RelHeadingAngle + ANGLE(180.0f), attracColl.HeadingAngle))
+			{
 				continue;
+			}
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
@@ -2351,13 +2342,12 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TODO: Deal with silly ANGLE() workaround.
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-CLICK(1),						  // Edge-to-ceil height lower bound.
-			ANGLE(179.0f) + ANGLE(1.0f)		  // Relative heading angle.
+			ANGLE(0.0f)						  // Relative heading angle.
 		};
 
 		// Get attractor collisions.
@@ -2392,7 +2382,7 @@ namespace TEN::Entities::Player
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-CLICK(1),						  // Edge-to-ceil height lower bound.
-			ANGLE(0.0f)						  // Relative heading angle.
+			ANGLE(179.0f) + ANGLE(1.0f)		  // Relative heading angle.
 		};
 
 		// Get attractor collisions.
@@ -2462,11 +2452,14 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-(int)CLICK(0.6f)				  // Edge-to-ceil height lower bound.
+			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
+			ANGLE(179.0f) + ANGLE(1.0f)		  // Relative heading angle.
 		};
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(
+			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
+			ATTRAC_DETECT_RADIUS);
 
 		// Get crawl back edge descent climb context.
 		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -2517,11 +2510,8 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 4) Test relation to edge intersection.
-			if (!attracColl.IsInFront || !attracColl.IsFacingForward ||
-				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-			{
+			if (!attracColl.IsInFront || !TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle))
 				continue;
-			}
 
 			// Get point collision in front of edge. NOTE: Vertical offset required for correct bridge collision.
 			auto point = Vector3i(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.y - CLICK(1), attracColl.Proximity.Intersection.z);
@@ -2779,7 +2769,7 @@ namespace TEN::Entities::Player
 
 		// 5) Test relation to wall.
 		short wallHeadingAngle = GetQuadrant(item.Pose.Orientation.y) * ANGLE(90.0f);
-		if (!TestPlayerInteractAngle(item, wallHeadingAngle))
+		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, wallHeadingAngle))
 			return false;
 
 		// 6) Wall vault auto jump.
