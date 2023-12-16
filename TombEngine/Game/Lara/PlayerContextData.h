@@ -67,6 +67,8 @@ namespace TEN::Entities::Player
 		int LowerEdgeBound		 = 0;
 		int UpperEdgeBound		 = 0;
 		int LowerEdgeToCeilBound = 0;
+
+		short RelHeadingAngle = 0;
 	};
 
 	struct ClimbContextData

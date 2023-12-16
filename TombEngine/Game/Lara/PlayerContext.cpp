@@ -1313,6 +1313,7 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
+			// TODO: Add RelHeadingAngle to deal with this more cleanly.
 			// 2.4) Test relation to edge intersection.
 			if (setup.TestEdgeFront)
 			{
@@ -1334,11 +1335,8 @@ namespace TEN::Entities::Player
 			// TODO: Point collision probing may traverse rooms correctly if bridges cross rooms.
 			// Potential solution: probe from player's position and room. Combine player/intersect RelDeltaPos and RelPosOffset.
 
-			// TODO: Test for overhang blockng edge.
+			// TODO: Test for overhang blocking edge, e.g. rotated bridge case.
 			// 2.5) Test if intersection is blocked by ceiling.
-			/*auto pointCollCenter = GetCollision(Vector3i(attracColl.Proximity.Intersection), attracColl.AttracPtr->GetRoomNumber());
-			if (pointCollCenter.Position.Ceiling > attracColl.Proximity.Intersection.y)
-				continue;*/
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
@@ -2289,7 +2287,6 @@ namespace TEN::Entities::Player
 		}
 	}
 
-	// TODO: implement fully
 	static std::optional<AttractorCollisionData> GetEdgeDescentClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
 																					   const EdgeDescentClimbSetupData& setup,
 																					   const std::vector<AttractorCollisionData>& attracColls)
@@ -2316,14 +2313,11 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// TODO: Front standing edge descent.
+			// TODO: More straighforward setup.
 			// TODO: Make these dynamic for all attractor collision getters.
 			// 4) Test relation to edge intersection.
-			if (attracColl.IsInFront || !attracColl.IsFacingForward ||
-				!TestPlayerInteractAngle(item, attracColl.HeadingAngle))
-			{
-				//continue;
-			}
+			if (attracColl.IsInFront || !TestPlayerInteractAngle(item.Pose.Orientation.y + setup.RelHeadingAngle, attracColl.HeadingAngle))
+				continue;
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
@@ -2343,7 +2337,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// 7) Test if ceiling in behind is adequately higher than edge.
+			// 7) Test if ceiling behind is adequately higher than edge.
 			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
@@ -2357,15 +2351,19 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		// TODO: Deal with silly ANGLE() workaround.
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-CLICK(1)						  // Edge-to-ceil height lower bound.
+			-CLICK(1),						  // Edge-to-ceil height lower bound.
+			ANGLE(179.0f) + ANGLE(1.0f)		  // Relative heading angle.
 		};
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(
+			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
+			ATTRAC_DETECT_RADIUS);
 
 		// Get standing front edge descent climb context.
 		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -2393,11 +2391,14 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-CLICK(1)						  // Edge-to-ceil height lower bound.
+			-CLICK(1),						  // Edge-to-ceil height lower bound.
+			ANGLE(0.0f)						  // Relative heading angle.
 		};
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(
+			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
+			ATTRAC_DETECT_RADIUS);
 
 		// Get standing back edge descent climb context.
 		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -2426,11 +2427,14 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeDescentClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-(int)CLICK(0.6f)				  // Edge-to-ceil height lower bound.
+			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
+			ANGLE(0.0f)						  // Relative heading angle.
 		};
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(
+			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
+			ATTRAC_DETECT_RADIUS);
 
 		// Get standing front edge descent climb context.
 		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -2528,7 +2532,7 @@ namespace TEN::Entities::Player
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
-			// 6) Test if ceiling in behind is adequately higher than edge.
+			// 6) Test if ceiling behind is adequately higher than edge.
 			int edgeToCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;

@@ -37,7 +37,7 @@ namespace TEN::Collision::Attractor
 		// Fill remaining collision data.
 		HeadingAngle = segmentOrient.y + HEADING_ANGLE_OFFSET;
 		SlopeAngle = segmentOrient.x;
-		IsFacingForward = (abs(Geometry::GetShortestAngle(HeadingAngle, refOrient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD);
+		IsFacingForward = (abs(Geometry::GetShortestAngle(HeadingAngle, refOrient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD); // TODO: Faulty? Also maybe unnecessary.
 		IsInFront = Geometry::IsPointInFront(pos, Proximity.Intersection, refOrient);
 	}
 
@@ -222,15 +222,18 @@ namespace TEN::Collision::Attractor
 		auto relOffset = Vector3(right, down, forward);
 		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
 		auto probePoint = pos + Vector3::Transform(relOffset, rotMatrix);
+		int probeRoomNumber = GetCollision(pos, roomNumber, headingAngle, forward, down, right).RoomNumber;
 
-		return GetAttractorCollisions(probePoint, roomNumber, headingAngle, detectRadius);
+		return GetAttractorCollisions(probePoint, probeRoomNumber, headingAngle, detectRadius);
 	}
 
+	// TODO: Remove.
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, float detectRadius)
 	{
 		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, detectRadius);
 	}
 
+	// TODO: Remove.
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, float forward, float down, float right, float detectRadius)
 	{
 		return GetAttractorCollisions(
