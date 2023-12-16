@@ -568,6 +568,11 @@ namespace TEN::Gui
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) + 1);
 
 				break;
+
+			case DisplaySettingsOption::AmbientOcclusion:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
+				break;
 			}
 		}
 
