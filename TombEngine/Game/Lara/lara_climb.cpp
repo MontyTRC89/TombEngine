@@ -52,12 +52,12 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 		yShift = 0;
 		break;
 
-	case 28:
-	case 29:
+	case 23:
+	case 24:
 		yShift = CLICK(1);
 		break;
 
-	case 57:
+	case 45:
 		yShift = CLICK(2);
 		break;
 
@@ -138,9 +138,9 @@ void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 
 		if (frame == 0)
 			yShift = 0;
-		else if (frame == 28 || frame == 29)
+		else if (frame == 23 || frame == 24)
 			yShift = -CLICK(1);
-		else if (frame == 57)
+		else if (frame == 45)
 			yShift = -CLICK(2);
 		else
 			return;

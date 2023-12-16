@@ -129,7 +129,7 @@ namespace TEN::Collision::Attractor
 		// Spawn climbable wall attractor stack.
 		if (KeyMap[OIS::KeyCode::KC_G])
 		{
-			auto vPos = Vector3(item.Pose.Position.x, floor(item.Pose.Position.y / CLICK(1)) * CLICK(1), item.Pose.Position.z);
+			auto vPos = Vector3(item.Pose.Position.x, (floor(item.Pose.Position.y / CLICK(1)) * CLICK(1)) - CLICK(1), item.Pose.Position.z);
 			int inc = 0;
 			for (auto& attrac : player.Context.DebugAttracs.Attracs)
 			{

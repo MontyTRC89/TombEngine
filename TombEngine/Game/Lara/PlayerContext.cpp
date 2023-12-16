@@ -1363,6 +1363,7 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
+			// TODO: Rename.
 			// Test ledge heights (if applicable).
 			if (setup.TestLedgeHeights)
 			{
@@ -1383,23 +1384,23 @@ namespace TEN::Entities::Player
 					if (ledgeFloorToEdgeHeight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
 						continue;
 				}
+
+				const auto& staticPointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
+				auto origin = Vector3(staticPointColl.Coordinates.x, staticPointColl.Position.Floor, staticPointColl.Coordinates.z);
+
+				// TODO: Check.
+				// 2.10) Test for static object.
+				auto staticLos = GetStaticObjectLos(origin, attracColl.AttractorPtr->GetRoomNumber(), -Vector3::UnitY, coll.Setup.Height, false);
+				if (staticLos.has_value())
+					continue;
 			}
 
-			// 2.10) Test for illegal slope on ledge (if applicable).
+			// 2.11) Test for illegal slope on ledge (if applicable).
 			if (setup.TestLedgeIllegalSlope)
 			{
 				if (setup.TestEdgeFront ? pointCollFront.Position.FloorSlope : pointCollBack.Position.FloorSlope)
 					continue;
 			}
-
-			const auto& staticPointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
-			auto origin = Vector3(staticPointColl.Coordinates.x, staticPointColl.Position.Floor, staticPointColl.Coordinates.z);
-
-			// TODO: Check.
-			// 2.11) Test for static object.
-			auto staticLos = GetStaticObjectLos(origin, attracColl.AttractorPtr->GetRoomNumber(), -Vector3::UnitY, coll.Setup.Height, false);
-			if (staticLos.has_value())
-				continue;
 
 			return attracColl;
 		}
@@ -1602,7 +1603,7 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		// 1) Get auto jump to edge standing vault climb context.
+		// 1) Get auto jump to edge climb context.
 		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
@@ -1629,7 +1630,7 @@ namespace TEN::Entities::Player
 		auto pointColl = GetCollision(item);
 		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
 
-		// 2) Get auto jump to monkey swing standing vault climb context.
+		// 2) Get auto jump to monkey swing climb context.
 		if (player.Control.CanMonkeySwing &&	// Player is standing below monkey swing.
 			relCeilHeight < LOWER_CEIL_BOUND && // Ceiling height is within lower ceiling bound.
 			relCeilHeight >= UPPER_CEIL_BOUND)	// Ceiling height is within upper ceiling bound.
@@ -1645,6 +1646,23 @@ namespace TEN::Entities::Player
 			context.SetJumpVelocity = true;
 
 			return context;
+		}
+
+		return std::nullopt;
+	}
+	
+	// TODO
+	static std::optional<ClimbContextData> GetClimbableWallMountClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																			 const std::vector<AttractorCollisionData>& attracColls)
+	{
+		const auto& player = GetLaraInfo(item);
+
+		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+		int vPos = round(item.Pose.Position.y / CLICK(1)) * CLICK(1);
+
+		for (auto& attrac : attracColls)
+		{
+
 		}
 
 		return std::nullopt;
@@ -1705,7 +1723,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 6) Vault auto jump.
+		// 6) Auto jump.
 		context = GetAutoJumpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1713,8 +1731,13 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// TODO: Move ladder checks here when ladders are less prone to breaking.
-		// In this case, they fail due to a reliance on ShiftItem(). -- Sezz 2021.02.05
+		// 7) Mount climbable wall.
+		context = GetClimbableWallMountClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
 
 		return std::nullopt;
 	}
