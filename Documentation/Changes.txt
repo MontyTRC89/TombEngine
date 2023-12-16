@@ -27,17 +27,6 @@ Version 1.3
   - Negative OCB: play anim number and lose key.
   - OCB 0 - play default animation and lose key.
 
-* Animation changes:
-42
-43
-50
-51
-52
-474
-475
-476
-543
-
 Lua API changes:
 * Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
 * Add Moveable:SetStatus() to set the current status of the moveable.
