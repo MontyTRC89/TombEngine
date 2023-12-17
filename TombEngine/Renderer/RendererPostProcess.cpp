@@ -16,7 +16,8 @@ namespace TEN::Renderer
 		_stPostProcessBuffer.ViewportHeight = _screenHeight;
 		_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
 		_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
-		_stPostProcessBuffer.EffectStrength = _postProcessColorEffectStrength;
+		_stPostProcessBuffer.EffectStrength = _postProcessStrength;
+		_stPostProcessBuffer.Tint = _postProcessTint;
 		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
 
 		// Common vertex shader to all fullscreen effects
@@ -45,28 +46,27 @@ namespace TEN::Renderer
 		int destinationRenderTarget = 1;
 
 		// Apply color scheme
-		if (_postProcessColorEffect != PostProcessColorEffect::Normal)
+		if (_postProcessMode != PostProcessMode::None)
 		{
 			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
 			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
 			
-			switch (_postProcessColorEffect)
+			switch (_postProcessMode)
 			{
-			case PostProcessColorEffect::Sepia:
-				_context->PSSetShader(_psPostProcessSepia.Get(), nullptr, 0);
-				break;
-
-			case PostProcessColorEffect::Monochrome:
+			case PostProcessMode::Monochrome:
 				_context->PSSetShader(_psPostProcessMonochrome.Get(), nullptr, 0);
 				break;
 
-			case PostProcessColorEffect::Negative:
+			case PostProcessMode::Negative:
 				_context->PSSetShader(_psPostProcessNegative.Get(), nullptr, 0);
+				break;
+
+			case PostProcessMode::Exclusion:
+				_context->PSSetShader(_psPostProcessExclusion.Get(), nullptr, 0);
 				break;
 				 
 			default:
 				return;
-
 			}
 
 			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
@@ -87,9 +87,33 @@ namespace TEN::Renderer
 		DrawTriangles(3, 0);
 	}
 
-	void Renderer::SetPostProcessColorEffect(PostProcessColorEffect colorScheme, float strength)
+	PostProcessMode Renderer::GetPostProcessMode()
 	{
-		_postProcessColorEffect = colorScheme;
-		_postProcessColorEffectStrength = strength;
+		return _postProcessMode;
+	}
+
+	float Renderer::GetPostProcessStrength()
+	{
+		return _postProcessStrength;
+	}
+
+	Vector3 Renderer::GetPostProcessTint()
+	{
+		return _postProcessTint;
+	}
+
+	void Renderer::SetPostProcessMode(PostProcessMode mode)
+	{
+		_postProcessMode = mode;
+	}
+
+	void Renderer::SetPostProcessStrength(float strength)
+	{
+		_postProcessStrength = strength;
+	}
+
+	void Renderer::SetPostProcessTint(Vector3 tint)
+	{
+		_postProcessTint = tint;
 	}
 }

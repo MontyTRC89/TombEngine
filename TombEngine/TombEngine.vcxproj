@@ -773,6 +773,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\AmmoTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Moveable\MoveableObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Moveable\MoveableStatuses.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\NamedBase.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\ObjectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\ObjectsHandler.h" />
@@ -794,7 +795,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Vec3\Vec3.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\AlignModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\CameraTypes.h" />
-    <ClInclude Include="Scripting\Internal\TEN\View\PostProcessColorEffects.h" />
+    <ClInclude Include="Scripting\Internal\TEN\View\PostProcessEffects.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\ScaleModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\ViewHandler.h" />
     <ClInclude Include="Sound\sound.h" />

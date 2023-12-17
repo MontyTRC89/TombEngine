@@ -34,6 +34,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include "Renderer/Renderer.h"
 
 using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
@@ -43,6 +44,7 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Gui;
+using namespace TEN::Renderer;
 
 namespace Save = TEN::Save;
 
@@ -1395,6 +1397,9 @@ bool SaveGame::Save(int slot)
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
 	sgb.add_next_fx_active(NextFxActive);
+	sgb.add_postprocess_mode((int)g_Renderer.GetPostProcessMode());
+	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
+	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
@@ -1586,6 +1591,11 @@ bool SaveGame::Load(int slot)
 		assertion(i < ActionQueue.size(), "Action queue size was changed");
 		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
 	}
+
+	// Restore postprocess effects
+	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
+	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
+	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
 
 	// Restore soundtracks
 	for (int i = 0; i < s->soundtracks()->size(); i++)

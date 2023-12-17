@@ -525,6 +525,9 @@ table SaveGame {
 	action_queue: [int32];
 	soundtracks: [Soundtrack];
 	cd_flags: [int32];
+	postprocess_mode: int32;
+	postprocess_strength: float;
+	postprocess_tint: Vector3;
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;

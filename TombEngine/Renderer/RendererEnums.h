@@ -274,10 +274,10 @@ enum class SMAAInput
 	SMAA_INPUT_COUNT = SMAA_INPUT_DEPTH
 };
 
-enum class PostProcessColorEffect
+enum class PostProcessMode
 {
-	Normal = 0,
-	Sepia = 1,
-	Monochrome = 2,
-	Negative = 3
+	None = 0,
+	Monochrome = 1,
+	Negative = 2,
+	Exclusion = 3
 };

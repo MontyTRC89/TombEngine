@@ -37,24 +37,6 @@ float4 PSCopy(PixelShaderInput input) : SV_Target
     return ColorTexture.Sample(ColorSampler, input.UV);
 }
 
-float4 PSSepia(PixelShaderInput input) : SV_Target
-{
-    float4 color = ColorTexture.Sample(ColorSampler, input.UV);
-
-    float3 red = float3(0.393f, 0.769f, 0.189f);
-    float3 green = float3(0.349f, 0.686f, 0.168f);
-    float3 blue = float3(0.272f, 0.534f, 0.131f);
-
-    float3 output;
-    output.r = dot(color.rgb, red);
-    output.g = dot(color.rgb, green);
-    output.b = dot(color.rgb, blue);
-
-    output.rgb = lerp(color.rgb, output.rgb, EffectStrength);
-
-    return float4(output, color.a);
-}
-
 float4 PSMonochrome(PixelShaderInput input) : SV_Target
 {
     float4 color = ColorTexture.Sample(ColorSampler, input.UV);
@@ -69,13 +51,18 @@ float4 PSNegative(PixelShaderInput input) : SV_Target
 {
 	float4 color = ColorTexture.Sample(ColorSampler, input.UV);
 
-	float3 negated;
-	negated.r = 1.0f - color.r;
-	negated.g = 1.0f - color.g;
-	negated.b = 1.0f - color.b;
-
-	float luma = Luma(negated);
+	float luma = Luma(1.0f - color);
 	float3 output = lerp(color.rgb, float3(luma, luma, luma), EffectStrength);
+
+	return float4(output, color.a);
+}
+
+float4 PSExclusion(PixelShaderInput input) : SV_Target
+{
+	float4 color = ColorTexture.Sample(ColorSampler, input.UV);
+
+	float3 exColor = color.xyz + (1.0f - color.xyz) - 2.0f * color.xyz * (1.0f - color.xyz);
+	float3 output = lerp(color.rgb, exColor, EffectStrength);
 
 	return float4(output, color.a);
 }
@@ -98,6 +85,8 @@ float4 PSFinalPass(PixelShaderInput input) : SV_TARGET
         output.xyz = output.xyz * colorMul.xyz * ScreenFadeFactor;
         output.w = 1.0f;
     }
+
+	output.xyz = output.xyz * Tint;
 
     return output;
 }

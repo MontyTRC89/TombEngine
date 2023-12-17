@@ -14,7 +14,7 @@
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
-#include "Scripting/Internal/TEN/View/PostProcessColorEffects.h"
+#include "Scripting/Internal/TEN/View/PostProcessEffects.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::Environment;
@@ -96,9 +96,26 @@ namespace TEN::Scripting::View
 		return (screenRes.x / screenRes.y);
 	}
 
-	static void SetPostProcessColorEffect(PostProcessColorEffect effect, TypeOrNil<float> strength)
+	static void SetPostProcessMode(PostProcessMode mode)
 	{
-		g_Renderer.SetPostProcessColorEffect(effect, std::clamp((float)USE_IF_HAVE(float, strength, 1.0), 0.0f, 1.0f));
+		g_Renderer.SetPostProcessMode(mode);
+	}
+
+	static void SetPostProcessStrength(TypeOrNil<float> strength)
+	{
+		g_Renderer.SetPostProcessStrength(std::clamp((float)USE_IF_HAVE(float, strength, 1.0), 0.0f, 1.0f));
+	}
+
+	static void SetPostProcessTint(const ScriptColor& color)
+	{
+		// Tint value must be normalized, because overbright color values cause postprocessing to fail and
+		// flood the screen with a single color channel that is overflown.
+
+		auto vec = (Vector3)color;
+		vec.x = std::clamp(vec.x, 0.0f, 1.0f);
+		vec.y = std::clamp(vec.y, 0.0f, 1.0f);
+		vec.z = std::clamp(vec.z, 0.0f, 1.0f);
+		g_Renderer.SetPostProcessTint(vec);
 	}
 
 	void Register(sol::state* state, sol::table& parent)
@@ -147,11 +164,20 @@ namespace TEN::Scripting::View
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 
-		///Sets the post-process color effect, like sepia or monochrome.
-		//@function SetPostProcessColorEffect
-		//@tparam The View.PostProcessColorEffect value to set.
-		//@tparam float strength (default 1.0). How much the effect is strong.
-		tableView.set_function(ScriptReserved_SetPostProcessColorEffect, &SetPostProcessColorEffect);
+		///Sets the post-process effect mode, like negative or monochrome.
+		//@function SetPostProcessMode
+		//@tparam View.PostProcessMode effect type to set.
+		tableView.set_function(ScriptReserved_SetPostProcessMode, &SetPostProcessMode);
+
+		///Sets the post-process effect strength.
+		//@function SetPostProcessStrength
+		//@tparam float strength (default 1.0). How strong the effect is.
+		tableView.set_function(ScriptReserved_SetPostProcessStrength, &SetPostProcessStrength);
+
+		///Sets the post-process tint.
+		//@function SetPostProcessTint
+		//@tparam Color tint value to use.
+		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
 
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
@@ -178,6 +204,6 @@ namespace TEN::Scripting::View
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_CameraType, CAMERA_TYPE);
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_AlignMode, ALIGN_MODES);
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_ScaleMode, SCALE_MODES);
-		handler.MakeReadOnlyTable(tableView, ScriptReserved_postProcessColorEffect, POSTPROCESS_COLOR_EFFECTS);
+		handler.MakeReadOnlyTable(tableView, ScriptReserved_PostProcessMode, POSTPROCESS_MODES);
 	}
 };

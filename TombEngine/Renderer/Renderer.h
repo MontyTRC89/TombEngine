@@ -341,15 +341,17 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psFXAA;
 
 		// Post process
-		PostProcessColorEffect _postProcessColorEffect = PostProcessColorEffect::Normal;
-		float _postProcessColorEffectStrength = 1.0f;
+		PostProcessMode _postProcessMode = PostProcessMode::None;
+		float _postProcessStrength = 1.0f;
+		Vector3 _postProcessTint = Vector3::One;
+
 		VertexBuffer<PostProcessVertex> _fullscreenTriangleVertexBuffer;
 		ComPtr<ID3D11InputLayout> _fullscreenTriangleInputLayout = nullptr;
 		ComPtr<ID3D11VertexShader> _vsPostProcess;
 		ComPtr<ID3D11PixelShader> _psPostProcessCopy;
-		ComPtr<ID3D11PixelShader> _psPostProcessSepia;
 		ComPtr<ID3D11PixelShader> _psPostProcessMonochrome;
 		ComPtr<ID3D11PixelShader> _psPostProcessNegative;
+		ComPtr<ID3D11PixelShader> _psPostProcessExclusion;
 		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
 		bool _doingFullscreenPass = false;
 
@@ -628,7 +630,13 @@ namespace TEN::Renderer
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 							  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);
-		void SetPostProcessColorEffect(PostProcessColorEffect colorEffect, float strength);
+
+		PostProcessMode	GetPostProcessMode();
+		void			SetPostProcessMode(PostProcessMode mode);
+		float			GetPostProcessStrength();
+		void			SetPostProcessStrength(float strength);
+		Vector3			GetPostProcessTint();
+		void			SetPostProcessTint(Vector3 color);
 	};
 
 	extern Renderer g_Renderer;

@@ -8,7 +8,7 @@ cbuffer CBPostProcess : register(b7)
     int ViewportHeight;
     //--
     float EffectStrength;
-    float3 Padding;
+    float3 Tint;
     //--
     float4 SSAOKernel[64];
 };
