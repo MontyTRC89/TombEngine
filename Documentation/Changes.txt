@@ -5,6 +5,7 @@ Version 1.3
 * Fix crash if unknown player state ID is encountered.
 * Fix bug with OCB 2 on pushables, and some other pushable bugs.
 * Fix pushable camera bug during edge slip.
+* Fix lever switch turn off alignment animation. 
 * Fix lack of water splash in certain scenarios.
 * Fix hydra flame not showing when charging.
 * Fix shockwave light for hammer god.
