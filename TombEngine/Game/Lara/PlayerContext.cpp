@@ -2276,9 +2276,9 @@ namespace TEN::Entities::Player
 		}
 	}
 
-	static std::optional<AttractorCollisionData> GetEdgeDescentClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																					   const EdgeDescentClimbSetupData& setup,
-																					   const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<AttractorCollisionData> GetEdgeHangClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																					const EdgeHangClimbSetupData& setup,
+																					const std::vector<AttractorCollisionData>& attracColls)
 	{
 		constexpr auto ABS_EDGE_BOUND = CLICK(0.5f);
 
@@ -2340,10 +2340,10 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandEdgeHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
-		constexpr auto SETUP = EdgeDescentClimbSetupData
+		constexpr auto SETUP = EdgeHangClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-CLICK(1),						  // Edge-to-ceil height lower bound.
@@ -2355,8 +2355,8 @@ namespace TEN::Entities::Player
 			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
 			ATTRAC_DETECT_RADIUS);
 
-		// Get standing front edge descent climb context.
-		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
+		// Get standing front edge hang climb context.
+		auto attracColl = GetEdgeHangClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -2375,10 +2375,10 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 	
-	std::optional<ClimbContextData> GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandEdgeHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
-		constexpr auto SETUP = EdgeDescentClimbSetupData
+		constexpr auto SETUP = EdgeHangClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-CLICK(1),						  // Edge-to-ceil height lower bound.
@@ -2390,8 +2390,8 @@ namespace TEN::Entities::Player
 			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
 			ATTRAC_DETECT_RADIUS);
 
-		// Get standing back edge descent climb context.
-		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
+		// Get standing back edge hang climb context.
+		auto attracColl = GetEdgeHangClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -2411,10 +2411,10 @@ namespace TEN::Entities::Player
 	}
 
 	// TODO: Needs animation.
-	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetCrawlEdgeHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
-		constexpr auto SETUP = EdgeDescentClimbSetupData
+		constexpr auto SETUP = EdgeHangClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
@@ -2426,8 +2426,8 @@ namespace TEN::Entities::Player
 			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
 			ATTRAC_DETECT_RADIUS);
 
-		// Get standing front edge descent climb context.
-		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
+		// Get standing front edge hang climb context.
+		auto attracColl = GetEdgeHangClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -2446,10 +2446,10 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetCrawlEdgeHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
-		constexpr auto SETUP = EdgeDescentClimbSetupData
+		constexpr auto SETUP = EdgeHangClimbSetupData
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
@@ -2461,8 +2461,8 @@ namespace TEN::Entities::Player
 			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
 			ATTRAC_DETECT_RADIUS);
 
-		// Get crawl back edge descent climb context.
-		auto attracColl = GetEdgeDescentClimbAttractorCollision(item, coll, SETUP, attracColls);
+		// Get crawl back edge hang climb context.
+		auto attracColl = GetEdgeHangClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};

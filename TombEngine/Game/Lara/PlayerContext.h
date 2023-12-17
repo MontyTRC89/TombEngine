@@ -157,11 +157,11 @@ namespace TEN::Entities::Player
 	std::optional<ClimbContextData>				GetTreadWaterVaultClimbContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<WaterTreadStepOutContextData> GetTreadWaterStepOutContext(const ItemInfo& item);
 
-	// Edge descent climb contexts
-	std::optional<ClimbContextData> GetStandEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetStandEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetCrawlEdgeDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetCrawlEdgeDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	// Edge hang climb contexts
+	std::optional<ClimbContextData> GetStandEdgeHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetStandEdgeHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetCrawlEdgeHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetCrawlEdgeHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Catch contexts
 	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);

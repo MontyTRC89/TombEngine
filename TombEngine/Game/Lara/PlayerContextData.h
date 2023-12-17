@@ -62,7 +62,7 @@ namespace TEN::Entities::Player
 		bool TestLedgeIllegalSlope = false;
 	};
 
-	struct EdgeDescentClimbSetupData
+	struct EdgeHangClimbSetupData
 	{
 		int LowerEdgeBound		 = 0;
 		int UpperEdgeBound		 = 0;
