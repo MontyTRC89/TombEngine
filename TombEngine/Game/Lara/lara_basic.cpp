@@ -688,6 +688,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 		if (IsWakeActionHeld())
 		{
 			item->Animation.TargetState = LS_IDLE;
+			player.Control.Count.Pose = 0;
 			return;
 		}
 
@@ -696,6 +697,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	item->Animation.TargetState = LS_IDLE;
+	player.Control.Count.Pose = 0;
 }
 
 // State:	  LS_RUN_BACK (5)
