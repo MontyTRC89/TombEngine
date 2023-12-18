@@ -2637,7 +2637,7 @@ namespace TEN::Entities::Player
 			int lowerBound = isFalling ? (int)ceil(projVerticalVel) : 0;
 			int upperBound = isFalling ? 0 : (int)floor(projVerticalVel);
 
-			// 8) Ensure player is falling if attractor is wall edge.
+			// 8) SPECIAL CASE: Test if player is falling if attractor is wall edge.
 			if (attracColl.AttractorPtr->GetType() == AttractorType::WallEdge &&
 				!isFalling)
 			{
