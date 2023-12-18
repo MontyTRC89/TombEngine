@@ -36,7 +36,7 @@ Version 1.3
 Lua API changes:
 * Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
 * Add Moveable:SetStatus() to set the current status of the moveable.
-* Add View:GetCameraUnderwater() to check underwater status of the camera.
+* Add View:GetCameraRoom() to get a room where camera is currently placed.
 
 Version 1.2
 ===========
