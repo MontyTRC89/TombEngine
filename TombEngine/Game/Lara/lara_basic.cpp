@@ -512,7 +512,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (IsHeld(In::Walk))
 			{
-				auto climbContext = GetStandEdgeHangFrontClimbContext(*item, *coll);
+				auto climbContext = GetStandToHangFrontClimbContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
@@ -561,7 +561,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Action) && IsHeld(In::Walk))
 		{
-			auto climbContext = GetStandEdgeHangBackClimbContext(*item, *coll);
+			auto climbContext = GetStandToHangBackClimbContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;

@@ -2377,7 +2377,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetStandEdgeHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetStandToHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangClimbSetupData
@@ -2411,8 +2411,8 @@ namespace TEN::Entities::Player
 
 		return std::nullopt;
 	}
-	
-	std::optional<ClimbContextData> GetStandEdgeHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+
+	std::optional<ClimbContextData> GetStandToHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangClimbSetupData
@@ -2448,7 +2448,7 @@ namespace TEN::Entities::Player
 	}
 
 	// TODO: Needs animation.
-	std::optional<ClimbContextData> GetCrawlEdgeHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetCrawlToHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangClimbSetupData
@@ -2483,7 +2483,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetCrawlEdgeHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetCrawlToHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangClimbSetupData
