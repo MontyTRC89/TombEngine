@@ -1698,7 +1698,7 @@ namespace TEN::Entities::Player
 
 		// Get point collision.
 		auto pointCollCenter = GetCollision(item);
-		auto pointCollFront = GetCollision(&item, coll.NearestLedgeAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
+		auto pointCollFront = GetCollision(&item, wallHeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
 		int vPos = item.Pose.Position.y;
 
 		// 4) Assess point collision.
