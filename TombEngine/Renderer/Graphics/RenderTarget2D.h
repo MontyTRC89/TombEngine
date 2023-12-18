@@ -23,7 +23,6 @@ namespace TEN::Renderer::Graphics
 
 		RenderTarget2D(ID3D11Device* device, int width, int height, DXGI_FORMAT colorFormat, bool isTypeless, DXGI_FORMAT depthFormat)
 		{
-			// Check if antialiasing quality is available and set it if it is.
 			auto srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			auto dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			auto rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -123,8 +122,6 @@ namespace TEN::Renderer::Graphics
 
 		RenderTarget2D(ID3D11Device* device, ID3D11Texture2D* texture, DXGI_FORMAT depthFormat)
 		{
-			// Check if antialiasing quality is available, and set it if it is.
-
 			D3D11_SRV_DIMENSION srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			D3D11_DSV_DIMENSION dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			D3D11_RTV_DIMENSION rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;

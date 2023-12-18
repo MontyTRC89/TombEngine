@@ -190,7 +190,7 @@ namespace TEN::Renderer
 		CSMAABuffer _stSMAABuffer;
 		ConstantBuffer<CSMAABuffer> _cbSMAABuffer;
 
-		// Primitive batchs
+		// Primitive batches
 		std::unique_ptr<SpriteBatch> _spriteBatch;
 		std::unique_ptr<PrimitiveBatch<Vertex>> _primitiveBatch;
 
