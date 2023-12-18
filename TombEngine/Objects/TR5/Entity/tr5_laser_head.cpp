@@ -609,10 +609,10 @@ namespace TEN::Entities::Creatures::TR5
 		g_Level.Items[guardian.PuzzleItem].Pose.Position.y = item.Pose.Position.y;
 		TestTriggers(&item, true);
 
-		SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item.Pose, SoundEnvironment::DryLand, 0.5f);
-		SoundEffect(SFX_TR4_EXPLOSION2, &item.Pose, SoundEnvironment::DryLand, 1.25f);
+		SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item.Pose, SoundEnvironment::Land, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item.Pose, SoundEnvironment::Land, 1.25f);
 		SoundEffect(SFX_TR4_EXPLOSION1, &item.Pose);
-		SoundEffect(SFX_TR4_EXPLOSION1, &item.Pose, SoundEnvironment::DryLand, 0.25f);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item.Pose, SoundEnvironment::Land, 0.25f);
 
 		KillItem(itemNumber);
 	}

@@ -125,11 +125,11 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 					break;
 
 				case (1 << 14):
-					requiredSoundEnv = SoundEnvironment::DryLand;
+					requiredSoundEnv = SoundEnvironment::Land;
 					break;
 
 				case (1 << 15):
-					requiredSoundEnv = SoundEnvironment::WetLand;
+					requiredSoundEnv = SoundEnvironment::ShallowWater;
 					break;
 
 				case (1 << 12):
@@ -146,25 +146,25 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
 
 				// Get sound environment for sound effect.
-				auto soundEnv = std::optional<SoundEnvironment>(std::nullopt);
+				auto soundEnv = std::optional<SoundEnvironment>();
 				switch (requiredSoundEnv)
 				{
 				case SoundEnvironment::Always:
 					soundEnv = SoundEnvironment::Always;
 					break;
 
-				case SoundEnvironment::DryLand:
+				case SoundEnvironment::Land:
 					if (!isWater && !isSwamp)
-						soundEnv = SoundEnvironment::DryLand;
+						soundEnv = SoundEnvironment::Land;
 
 					break;
 
-				case SoundEnvironment::WetLand:
+				case SoundEnvironment::ShallowWater:
 					if (isWater)
 					{
-						// HACK: Must update assets before changing to SoundEnvironment::WetLand for water creatures.
+						// HACK: Must update assets before removing this exception for water creatures.
 						const auto& object = Objects[item.ObjectNumber];
-						soundEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::WetLand;
+						soundEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::ShallowWater;
 					}
 
 					break;

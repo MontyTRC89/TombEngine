@@ -225,7 +225,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 							player.Control.Weapon.Timer = 1.0f;
 							item.Animation.TargetState = WEAPON_STATE_RECOIL;
 
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::DryLand, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 						}
 
@@ -251,7 +251,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		}
 		else if (player.Control.Weapon.Timer != 0.0f)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::DryLand, 1.0f, 0.4f);
+			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 			SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 		}
 		else if (weaponType == LaraWeaponType::Shotgun && !IsHeld(In::Action) && !player.LeftArm.Locked)
@@ -306,7 +306,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 							player.Control.Weapon.Timer = 1.0f;
 							item.Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::DryLand, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 						}
 
@@ -332,7 +332,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		}
 		else if (player.Control.Weapon.Timer != 0.0f)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::DryLand, 1.0f, 0.4f);
+			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 			SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 		}
 
@@ -426,7 +426,7 @@ void FireShotgun(ItemInfo& laraItem)
 
 		player.RightArm.GunFlash = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::WetLand : SoundEnvironment::DryLand);
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::ShallowWater : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem.Pose);
 
 		Rumble(0.5f, 0.2f);
@@ -1242,7 +1242,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 
 			if (playSound)
 			{
-				SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::DryLand, 1.0f, 0.4f);
+				SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 				SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 			}
@@ -1469,7 +1469,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 
 	AlertNearbyGuards(&item);
 
-	SoundEffect(SFX_TR4_EXPLOSION1, &item.Pose, SoundEnvironment::DryLand, 0.7f, 0.5f);
+	SoundEffect(SFX_TR4_EXPLOSION1, &item.Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 	SoundEffect(SFX_TR4_EXPLOSION2, &item.Pose);
 }
 

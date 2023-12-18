@@ -924,7 +924,7 @@ namespace TEN::Entities::Vehicles
 				bool moving = (abs(speedboatItem->Animation.Velocity.z) > 8 || speedboat->TurnRate);
 				int fx = accelerating ? SFX_TR2_VEHICLE_SPEEDBOAT_ACCELERATE : (moving ? SFX_TR2_VEHICLE_SPEEDBOAT_MOVING : SFX_TR2_VEHICLE_SPEEDBOAT_IDLE);
 				float pitch  = idle ? 1.0f : 1.0f + speedboat->Pitch / (float)SPEEDBOAT_NORMAL_VELOCITY_MAX / 4.0f;
-				SoundEffect(fx, &speedboatItem->Pose, SoundEnvironment::DryLand, pitch);
+				SoundEffect(fx, &speedboatItem->Pose, SoundEnvironment::Land, pitch);
 			}
 		}
 		else

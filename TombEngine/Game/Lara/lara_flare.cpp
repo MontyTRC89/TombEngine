@@ -258,7 +258,7 @@ void DrawFlare(ItemInfo& laraItem)
 				SoundEffect(
 					SFX_TR4_FLARE_IGNITE_DRY,
 					&laraItem.Pose,
-					TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::WetLand : SoundEnvironment::DryLand);
+					TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::ShallowWater : SoundEnvironment::Land);
 			}
 
 			DoFlareInHand(laraItem, player.Flare.Life);

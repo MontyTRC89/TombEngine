@@ -18,6 +18,13 @@
 
 using namespace TEN::Math;
 
+enum SoundSourceFlags
+{
+	SS_FLAG_PLAY_FLIP_ROOM = 1 << 13,
+	SS_FLAG_PLAY_BASE_ROOM = 1 << 14,
+	SS_FLAG_PLAY_ALWAYS	   = 1 << 15
+};
+
 HSAMPLE BASS_SamplePointer[SOUND_MAX_SAMPLES];
 HSTREAM BASS_3D_Mixdown;
 HFX     BASS_FXHandler[(int)SoundFilter::Count];
@@ -1070,13 +1077,8 @@ int GetShatterSound(int shatterID)
 		return SFX_TR4_SMASH_ROCK;
 }
 
-// TODO: Revise flags.
 void PlaySoundSources()
 {
-	static constexpr int PLAY_ALWAYS    = 0x8000;
-	static constexpr int PLAY_BASE_ROOM = 0x4000;
-	static constexpr int PLAY_FLIP_ROOM = 0x2000;
-
 	for (const auto& soundSource : g_Level.SoundSources)
 	{
 		int group = soundSource.Flags & 0x1FFF;
@@ -1084,9 +1086,8 @@ void PlaySoundSources()
 		if (group >= MAX_FLIPMAP)
 			continue;
 
-		bool flipStat = FlipStats[group];
-		if ((!flipStat && (soundSource.Flags & PLAY_FLIP_ROOM)) ||
-			(flipStat && (soundSource.Flags & PLAY_BASE_ROOM)))
+		if ((!FlipStats[group] && (soundSource.Flags & SS_FLAG_PLAY_FLIP_ROOM)) ||
+			(FlipStats[group] && (soundSource.Flags & SS_FLAG_PLAY_BASE_ROOM)))
 		{
 			continue;
 		}

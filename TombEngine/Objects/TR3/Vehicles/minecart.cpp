@@ -464,7 +464,7 @@ namespace TEN::Entities::Vehicles
 			if (minecart->VerticalVelocity)
 				StopSoundEffect(SFX_TR3_VEHICLE_MINECART_TRACK_LOOP);
 			else
-				SoundEffect(SFX_TR3_VEHICLE_MINECART_TRACK_LOOP, &minecartItem->Pose, SoundEnvironment::DryLand, 1.0f + ((float)minecartItem->Animation.Velocity.z / BLOCK(8))); // TODO: check actual sound!
+				SoundEffect(SFX_TR3_VEHICLE_MINECART_TRACK_LOOP, &minecartItem->Pose, SoundEnvironment::Land, 1.0f + ((float)minecartItem->Animation.Velocity.z / BLOCK(8))); // TODO: check actual sound!
 		}
 
 		if (minecart->Flags & (MINECART_FLAG_TURNING_LEFT | MINECART_FLAG_TURNING_RIGHT))
