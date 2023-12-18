@@ -40,13 +40,14 @@ constexpr auto LARA_CRAWL_FLEX_RATE = ANGLE(2.25f);
 constexpr auto LARA_CRAWL_FLEX_MAX	= ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
 
 // Heights
-constexpr auto LARA_HEIGHT		   = CLICK(3) - 1; // Height in regular states.
-constexpr auto LARA_HEIGHT_CRAWL   = 350;		   // Height in crawl and crouch states.
-constexpr auto LARA_HEIGHT_MONKEY  = 850;		   // Height in monkey swing states.
-constexpr auto LARA_HEIGHT_TREAD   = 700;		   // Height in water surface tread states.
-constexpr auto LARA_HEIGHT_STRETCH = 870;		   // Height in jump up and edge hang states.
-constexpr auto LARA_HEIGHT_SURFACE = 800;		   // Height when resurfacing water.
-constexpr auto LARA_HEADROOM	   = 160;
+constexpr auto LARA_HEIGHT			  = CLICK(3) - 1; // Height in regular states.
+constexpr auto LARA_HEIGHT_CRAWL	  = 350;		  // Height in crawl and crouch states.
+constexpr auto PLAYER_HEIGHT_WALL_CLIMB = 550;		  // Height in wall climb states.
+constexpr auto LARA_HEIGHT_MONKEY	  = 850;		  // Height in monkey swing states.
+constexpr auto LARA_HEIGHT_TREAD	  = 700;		  // Height in water surface tread states.
+constexpr auto LARA_HEIGHT_STRETCH	  = 870;		  // Height in jump up and edge hang states.
+constexpr auto LARA_HEIGHT_SURFACE	  = 800;		  // Height when resurfacing water.
+constexpr auto LARA_HEADROOM		  = 160;
 
 // Radii
 constexpr auto LARA_RADIUS			  = 100;

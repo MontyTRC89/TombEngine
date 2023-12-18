@@ -43,36 +43,10 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 	if (LaraCheckForLetGo(item, coll) || !TestAnimNumber(*item, LA_LADDER_DOWN))
 		return;
 
-	int frame = item->Animation.FrameNumber - GetAnimData(item->ObjectNumber, LA_LADDER_DOWN).frameBase;
-	int yShift = 0;
-
-	switch (frame)
-	{
-	case 0:
-		yShift = 0;
-		break;
-
-	case 23:
-	case 24:
-		yShift = CLICK(1);
-		break;
-
-	case 45:
-		yShift = CLICK(2);
-		break;
-
-	default:
-		return;
-	}
-
-	item->Pose.Position.y += yShift + CLICK(1);
-
 	int shiftLeft = 0;
 	int shiftRight = 0;
 	int resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shiftRight);
 	int resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + LADDER_TEST_DISTANCE), -CLICK(2), CLICK(2), &shiftLeft);
-
-	item->Pose.Position.y -= CLICK(1);
 
 	if (IsHeld(In::Back) &&
 		resultRight != 0 && resultLeft != 0 &&
@@ -83,7 +57,6 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 			if (shiftRight < 0 != shiftLeft < 0)
 			{
 				item->Animation.TargetState = LS_LADDER_IDLE;
-				AnimateItem(item);
 				return;
 			}
 
@@ -98,22 +71,16 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_LADDER_IDLE);
 			item->Animation.TargetState = LS_HANG_IDLE;
-
-			AnimateItem(item);
 		}
 		else
 		{
 			item->Animation.TargetState = LS_LADDER_DOWN;
-			item->Pose.Position.y -= yShift;
 		}
 
 		return;
 	}
 
 	item->Animation.TargetState = LS_LADDER_IDLE;
-
-	if (yShift != 0)
-		AnimateItem(item);
 }
 
 void lara_as_climb_down(ItemInfo* item, CollisionInfo* coll)
@@ -128,65 +95,44 @@ void lara_as_climb_down(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!LaraCheckForLetGo(item, coll) && TestAnimNumber(*item, LA_LADDER_UP))
+	if (LaraCheckForLetGo(item, coll) && TestAnimNumber(*item, LA_LADDER_UP))
+		return;
+
+	int shiftRight = 0;
+	int shiftLeft = 0;
+	int ledgeRight = 0;
+	int ledgeLeft = 0;
+	int resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, &shiftRight, &ledgeRight);
+	int resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -(coll->Setup.Radius + LADDER_TEST_DISTANCE), &shiftLeft, &ledgeLeft);
+
+	if (IsHeld(In::Forward) && resultRight && resultLeft)
 	{
-		int frame = item->Animation.FrameNumber - GetAnimData(item->ObjectNumber, LA_LADDER_UP).frameBase;
-		int yShift;
-		int resultRight, resultLeft;
-		int shiftRight, shiftLeft;
-		int ledgeRight, ledgeLeft;
-
-		if (frame == 0)
-			yShift = 0;
-		else if (frame == 23 || frame == 24)
-			yShift = -CLICK(1);
-		else if (frame == 45)
-			yShift = -CLICK(2);
-		else
-			return;
-
-		item->Pose.Position.y += yShift - CLICK(1);
-
-		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -(coll->Setup.Radius + LADDER_TEST_DISTANCE), &shiftLeft, &ledgeLeft);
-
-		item->Pose.Position.y += CLICK(1);
-		 
-		if (IsHeld(In::Forward) && resultRight && resultLeft)
-		{
-			if (resultRight < 0 || resultLeft < 0)
-			{
-				item->Animation.TargetState = LS_LADDER_IDLE;
-
-				AnimateItem(item);
-
-				if (abs(ledgeRight - ledgeLeft) <= LADDER_TEST_DISTANCE)
-				{
-					if (resultRight != -1 || resultLeft != -1)
-					{
-						item->Animation.TargetState = LS_LADDER_TO_CROUCH;
-						item->Animation.RequiredState = LS_CROUCH_IDLE;
-					}
-					else
-					{
-						item->Animation.TargetState = LS_GRABBING;
-						item->Pose.Position.y += (ledgeRight + ledgeLeft) / 2 - CLICK(1);
-					}
-				}
-			}
-			else
-			{
-				item->Animation.TargetState = LS_LADDER_UP;
-				item->Pose.Position.y -= yShift;
-			}
-		}
-		else
+		if (resultRight < 0 || resultLeft < 0)
 		{
 			item->Animation.TargetState = LS_LADDER_IDLE;
 
-			if (yShift != 0)
-				AnimateItem(item);
+			if (abs(ledgeRight - ledgeLeft) <= LADDER_TEST_DISTANCE)
+			{
+				if (resultRight != -1 || resultLeft != -1)
+				{
+					item->Animation.TargetState = LS_LADDER_TO_CROUCH;
+					item->Animation.RequiredState = LS_CROUCH_IDLE;
+				}
+				else
+				{
+					item->Animation.TargetState = LS_GRABBING;
+					item->Pose.Position.y += (ledgeRight + ledgeLeft) / 2 - CLICK(1);
+				}
+			}
 		}
+		else
+		{
+			item->Animation.TargetState = LS_LADDER_UP;
+		}
+	}
+	else
+	{
+		item->Animation.TargetState = LS_LADDER_IDLE;
 	}
 }
 
