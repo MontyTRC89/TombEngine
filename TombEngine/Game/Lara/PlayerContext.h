@@ -18,7 +18,6 @@ namespace TEN::Entities::Player
 	struct EdgeCatchContextData;
 	struct MonkeySwingCatchContextData;
 	struct ShimmyContextData;
-	struct WallClimbContextData; // Old
 
 	struct PlayerAttractorData
 	{
@@ -166,7 +165,4 @@ namespace TEN::Entities::Player
 	// Catch contexts
 	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
-
-	// Wall climb contexts
-	bool HandleClimbableWallVault(ItemInfo& item, CollisionInfo& coll);
 }

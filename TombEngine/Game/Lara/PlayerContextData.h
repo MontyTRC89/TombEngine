@@ -118,10 +118,4 @@ namespace TEN::Entities::Player
 		int FloorHeight	  = 0;
 		int TargetStateID = 0;
 	};
-
-	// TODO: Temporary.
-	struct WallClimbContextData
-	{
-		int Height = 0;
-	};
 }
