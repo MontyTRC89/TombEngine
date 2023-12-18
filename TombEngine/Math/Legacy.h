@@ -15,7 +15,7 @@ constexpr short ANGLE(float degrees)
 {
 	constexpr auto SHORTS_TO_ONE_DEGREE = 65536.0f / 360.0f;
 
-	return short(degrees * SHORTS_TO_ONE_DEGREE);
+	return (short)unsigned short(degrees * SHORTS_TO_ONE_DEGREE);
 }
 
 constexpr short FROM_RAD(float radians)

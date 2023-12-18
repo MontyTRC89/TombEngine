@@ -2433,7 +2433,7 @@ namespace TEN::Entities::Player
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-CLICK(1),						  // Edge-to-ceil height lower bound.
-			ANGLE(179.0f) + ANGLE(1.0f)		  // Relative heading angle.
+			ANGLE(180.0f)					  // Relative heading angle.
 		};
 
 		// Get attractor collisions.
@@ -2504,7 +2504,7 @@ namespace TEN::Entities::Player
 		{
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
-			ANGLE(179.0f) + ANGLE(1.0f)		  // Relative heading angle.
+			ANGLE(180.0f)					  // Relative heading angle.
 		};
 
 		// Get attractor collisions.
