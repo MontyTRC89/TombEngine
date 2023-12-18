@@ -81,9 +81,6 @@ namespace TEN::Collision::Attractor
 
 		// Return proximity data.
 		return attracProx;
-
-		// FAILSAFE: Return empty proximity data.
-		return ProximityData{};
 	}
 
 	AttractorCollisionData GetAttractorCollision(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle)
@@ -245,7 +242,7 @@ namespace TEN::Collision::Attractor
 	{
 		auto uniqueAttracPtrs = std::set<Attractor*>{};
 
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(8));
+		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(5));
 		for (const auto& attracColl : attracColls)
 		{
 			uniqueAttracPtrs.insert(attracColl.AttractorPtr);
