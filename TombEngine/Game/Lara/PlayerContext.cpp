@@ -1665,90 +1665,72 @@ namespace TEN::Entities::Player
 
 		return std::nullopt;
 	}
-	
-	// TODO
+
+	// TODO: Currently still using legacy climbable wall flags.
 	static std::optional<ClimbContextData> GetClimbableWallMountClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
+		constexpr auto SWAMP_DEPTH_MAX = -CLICK(3);
+
 		const auto& player = GetLaraInfo(item);
 
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
-		int vPos = round(item.Pose.Position.y / CLICK(1)) * CLICK(1);
+		//int vPos = round(item.Pose.Position.y / CLICK(1)) * CLICK(1);
 
 		// TODO: Find 4 stacked WallEdge attractors.
-
 		for (auto& attrac : attracColls)
 		{
 			break;
-
-			auto context = ClimbContextData{};
-			context.AttractorPtr = nullptr;
-			context.ChainDistance = 0.0f;
-			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_AUTO_JUMP;
-			context.AlignType = ClimbContextAlignType::None;
-			context.SetBusyHands = false;
-			context.SetJumpVelocity = true;
-
-			return context;
 		}
 
-		return std::nullopt;
-	}
+		// 1) Check if wall is climbable.
+		if (!player.Control.CanClimbLadder)
+			return std::nullopt;
 
-	static bool CanMountClimbableWall(const ItemInfo& item, const CollisionInfo& coll)
-	{
-		const auto& player = GetLaraInfo(item);
+		// 2) Test swamp depth.
+		if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < SWAMP_DEPTH_MAX)
+			return std::nullopt;
+
+		// 3) Test relation to wall.
+		short wallHeadingAngle = GetQuadrant(item.Pose.Orientation.y) * ANGLE(90.0f);
+		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, wallHeadingAngle))
+			return std::nullopt;
 
 		// Get point collision.
 		auto pointCollCenter = GetCollision(item);
 		auto pointCollFront = GetCollision(&item, coll.NearestLedgeAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
 		int vPos = item.Pose.Position.y;
 
-		// Assess point collision.
-		if ((pointCollCenter.Position.Ceiling - vPos) <= -CLICK(4.5f) && // Ceiling height is within lower center ceiling bound.
-			(pointCollCenter.Position.Ceiling - vPos) > -CLICK(6.5f) &&	 // Ceiling height is within upper center ceiling bound.
-			(pointCollCenter.Position.Floor - vPos) > -CLICK(6.5f) &&	 // Floor height is within upper center floor bound.
-			(pointCollFront.Position.Ceiling - vPos) <= -CLICK(4.5f))	 // Ceiling height is within lowest front ceiling bound.
+		// 4) Assess point collision.
+		if ((pointCollCenter.Position.Ceiling - vPos) > -CLICK(4.5f) ||	 // Ceiling height is within lower center ceiling bound.
+			(pointCollCenter.Position.Ceiling - vPos) <= -CLICK(6.5f) || // Ceiling height is within upper center ceiling bound.
+			(pointCollCenter.Position.Floor - vPos) <= -CLICK(6.5f) ||	 // Floor height is within upper center floor bound.
+			(pointCollFront.Position.Ceiling - vPos) > -CLICK(4.5f))	 // Ceiling height is within lowest front ceiling bound.
 		{
-			return true;
+			return std::nullopt;
 		}
 
-		return false;
-	}
+		auto& nonConstPlayerItem = *LaraItem;
+		auto& nonConstPlayerColl = LaraCollision;
 
-	static bool HandleClimbableWallMount(ItemInfo& item, CollisionInfo& coll)
-	{
-		constexpr auto SWAMP_DEPTH_MAX = -CLICK(3);
+		// 5) Test and set climbable wall mount.
+		if (!TestLaraClimbIdle(&nonConstPlayerItem, &nonConstPlayerColl))
+			return std::nullopt;
 
-		auto& player = GetLaraInfo(item);
+		SnapEntityToGrid(nonConstPlayerItem, coll);
+		nonConstPlayerItem.Pose.Orientation.y = wallHeadingAngle;
 
-		// 1) Check if wall is climbable.
-		if (!player.Control.CanClimbLadder)
-			return false;
+		auto context = ClimbContextData{};
+		context.AttractorPtr = nullptr;
+		context.ChainDistance = 0.0f;
+		context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+		context.RelOrientOffset = EulerAngles::Zero;
+		context.TargetStateID = LS_LADDER_IDLE;
+		context.AlignType = ClimbContextAlignType::None;
+		context.SetBusyHands = true;
+		context.SetJumpVelocity = false;
 
-		// 2) Test swamp depth.
-		if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < SWAMP_DEPTH_MAX)
-			return false;
-
-		// 3) Test relation to wall.
-		short wallHeadingAngle = GetQuadrant(item.Pose.Orientation.y) * ANGLE(90.0f);
-		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, wallHeadingAngle))
-			return false;
-
-		// 4) Mount climbable wall.
-		if (CanMountClimbableWall(item, coll) && TestLaraClimbIdle(&item, &coll))
-		{
-			SnapEntityToGrid(item, coll);
-			SetAnimation(item, LA_STAND_TO_LADDER);
-			item.Pose.Orientation.y = wallHeadingAngle;
-			player.Control.HandStatus = HandStatus::Busy;
-			player.Control.TurnRate = 0;
-			return true;
-		}
-
-		return false;
+		return context;
 	}
 
 	std::optional<ClimbContextData> GetStandVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll)
@@ -1813,10 +1795,6 @@ namespace TEN::Entities::Player
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
-
-		// HACK: Legacy climbable wall mount.
-		if (HandleClimbableWallMount(*LaraItem, LaraCollision))
-			return std::nullopt;
 
 		// 7) Auto jump.
 		context = GetAutoJumpClimbContext(item, coll, attracColls);
