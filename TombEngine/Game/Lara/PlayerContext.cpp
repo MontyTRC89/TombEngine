@@ -1618,7 +1618,7 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		// 1) Get auto jump to edge climb context.
+		// 1) Get edge auto jump climb context.
 		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
@@ -1653,7 +1653,7 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttractorPtr = nullptr;
 			context.ChainDistance = 0.0f;
-			context.RelPosOffset = Vector3(0.0f, -relCeilHeight, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3::Zero;
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.AlignType = ClimbContextAlignType::None;
@@ -1675,9 +1675,23 @@ namespace TEN::Entities::Player
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 		int vPos = round(item.Pose.Position.y / CLICK(1)) * CLICK(1);
 
+		// TODO: Find 4 stacked WallEdge attractors.
+
 		for (auto& attrac : attracColls)
 		{
+			break;
 
+			auto context = ClimbContextData{};
+			context.AttractorPtr = nullptr;
+			context.ChainDistance = 0.0f;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_AUTO_JUMP;
+			context.AlignType = ClimbContextAlignType::None;
+			context.SetBusyHands = false;
+			context.SetJumpVelocity = true;
+
+			return context;
 		}
 
 		return std::nullopt;
@@ -1694,7 +1708,7 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, ATTRAC_DETECT_RADIUS);
 
 		auto context = std::optional<ClimbContextData>();
 
@@ -1738,16 +1752,16 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 6) Auto jump.
-		context = GetAutoJumpClimbContext(item, coll, attracColls);
+		// 6) Mount climbable wall.
+		context = GetClimbableWallMountClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// 7) Mount climbable wall.
-		context = GetClimbableWallMountClimbContext(item, coll, attracColls);
+		// 7) Auto jump.
+		context = GetAutoJumpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
@@ -2587,7 +2601,14 @@ namespace TEN::Entities::Player
 			int lowerBound = isFalling ? (int)ceil(projVerticalVel) : 0;
 			int upperBound = isFalling ? 0 : (int)floor(projVerticalVel);
 
-			// 8) Test catch trajectory.
+			// 8) Ensure player is falling if attractor is wall edge.
+			if (attracColl.AttractorPtr->GetType() == AttractorType::WallEdge &&
+				!isFalling)
+			{
+				return std::nullopt;
+			}
+
+			// 9) Test catch trajectory.
 			if (relEdgeHeight <= lowerBound && // Edge height is above lower height bound.
 				relEdgeHeight >= upperBound)   // Edge height is below upper height bound.
 			{
