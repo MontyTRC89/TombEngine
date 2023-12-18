@@ -11,6 +11,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
@@ -67,10 +68,10 @@ namespace TEN::Scripting::View
 	{
 		return Camera.oldType;
 	}
-
-	static bool GetCameraUnderwater()
+	
+	static std::unique_ptr<Room> GetCameraRoom()
 	{
-		return Camera.underwater;
+		return std::make_unique<Room>(g_Level.Rooms[Camera.pos.RoomNumber]);
 	}
 
 	static void ResetObjCamera()
@@ -145,10 +146,10 @@ namespace TEN::Scripting::View
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 
-		///Checks if camera is placed underwater or not.
-		//@function GetCameraUnderwater
-		//@treturn bool underwater if camera is underwater or not.
-		tableView.set_function(ScriptReserved_GetCameraUnderwater, &GetCameraUnderwater);
+		///Gets current room where camera is positioned.
+		//@function GetCameraRoom
+		//@treturn Objects.Room current room of the camera
+		tableView.set_function(ScriptReserved_GetCameraRoom, &GetCameraRoom);
 		
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
