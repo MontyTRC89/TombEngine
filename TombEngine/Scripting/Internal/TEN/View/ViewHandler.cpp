@@ -68,6 +68,11 @@ namespace TEN::Scripting::View
 		return Camera.oldType;
 	}
 
+	static bool GetCameraUnderwater()
+	{
+		return Camera.underwater;
+	}
+
 	static void ResetObjCamera()
 	{
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
@@ -140,6 +145,11 @@ namespace TEN::Scripting::View
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 
+		///Checks if camera is placed underwater or not.
+		//@function GetCameraUnderwater
+		//@treturn bool underwater if camera is underwater or not.
+		tableView.set_function(ScriptReserved_GetCameraUnderwater, &GetCameraUnderwater);
+		
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
 		//@tparam short flyby (ID of flyby)
