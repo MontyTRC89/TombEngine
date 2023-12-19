@@ -2656,26 +2656,32 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<EdgeCatchContextData> GetEdgeJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<ClimbContextData> GetEdgeJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		const auto& player = GetLaraInfo(item);
+		constexpr auto VERTICAL_OFFSET = LARA_HEIGHT_STRETCH;
 
-		// Get edge catch attractor collision.
+		// Return edge catch climb context.
 		auto attracColl = GetEdgeCatchAttractorCollision(item, coll);
-		if (!attracColl.has_value())
-			return std::nullopt;
+		if (attracColl.has_value())
 
-		// Return edge catch context.
-		return EdgeCatchContextData
 		{
-			attracColl->AttractorPtr,
-			attracColl->Proximity.Intersection,
-			attracColl->Proximity.ChainDistance,
-			attracColl->HeadingAngle
-		};
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_HANG_IDLE;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
+
+			return context;
+		}
+
+		return std::nullopt;
 	}
 
-	static std::optional<MonkeySwingCatchContextData> GetMonkeySwingJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<MonkeySwingJumpCatchClimbContextData> GetMonkeySwingJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
 		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
@@ -2704,22 +2710,25 @@ namespace TEN::Entities::Player
 		if (abs(relCeilHeight) <= ABS_CEIL_BOUND &&		  // Ceiling height is within lower/upper ceiling bounds.
 			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height is wide enough.
 		{
-			int monkeyHeight = pointColl.Position.Ceiling;
-			return MonkeySwingCatchContextData{ monkeyHeight };
+			auto monkeyCatchContext = MonkeySwingJumpCatchClimbContextData{};
+			monkeyCatchContext.CeilingHeight = pointColl.Position.Ceiling;
+			monkeyCatchContext.TargetStateID = LS_MONKEY_IDLE;
+
+			return monkeyCatchContext;
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<JumpCatchContextData> GetJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<JumpCatchClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto edgeCatchContext = GetEdgeJumpCatchContext(item, coll);
-		if (edgeCatchContext.has_value())
-			return edgeCatchContext;
+		auto edgeCatchClimbContext = GetEdgeJumpCatchClimbContext(item, coll);
+		if (edgeCatchClimbContext.has_value())
+			return edgeCatchClimbContext;
 
-		auto monkeyCatchContext = GetMonkeySwingJumpCatchContext(item, coll);
-		if (monkeyCatchContext.has_value())
-			return monkeyCatchContext;
+		auto monkeyCatchClimbContext = GetMonkeySwingJumpCatchContext(item, coll);
+		if (monkeyCatchClimbContext.has_value())
+			return monkeyCatchClimbContext;
 
 		return std::nullopt;
 	}

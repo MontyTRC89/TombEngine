@@ -80,19 +80,10 @@ namespace TEN::Entities::Player
 		bool SetJumpVelocity = false;
 	};
 
-	// TODO: Maybe not needed. Can reuse ClimbContextData.
-	struct EdgeCatchContextData
+	struct MonkeySwingJumpCatchClimbContextData
 	{
-		Attractor* AttracPtr = nullptr;
-
-		Vector3 Intersection  = Vector3::Zero;
-		float	ChainDistance = 0.0f;
-		short	HeadingAngle  = 0;
-	};
-
-	struct MonkeySwingCatchContextData
-	{
-		int Height = 0;
+		int CeilingHeight = 0;
+		int TargetStateID = 0;
 	};
 
 	struct LedgeClimbSetupData
@@ -107,11 +98,9 @@ namespace TEN::Entities::Player
 
 	struct WaterTreadStepOutContextData
 	{
-		int FloorHeight	  = 0;
-		int TargetStateID = 0;
+		int FloorHeight = 0;
+		int AnimNumber	= 0;
 	};
 
-	using JumpCatchContextData = std::variant<
-		EdgeCatchContextData,
-		MonkeySwingCatchContextData>;
+	using JumpCatchClimbContextData = std::variant<ClimbContextData, MonkeySwingJumpCatchClimbContextData>;
 }
