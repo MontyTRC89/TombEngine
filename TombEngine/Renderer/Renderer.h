@@ -516,7 +516,7 @@ namespace TEN::Renderer
 		void InitializeSpriteQuad();
 		void InitializePostProcess();
 		void CreateSSAONoiseTexture();
-		void InitializeAmbientOcclusion();
+		void InitializeSMAA();
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{

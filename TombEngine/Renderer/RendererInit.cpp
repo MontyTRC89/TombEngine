@@ -524,13 +524,13 @@ namespace TEN::Renderer
 		// Low AA is done with FXAA, Medium - High AA are done with SMAA.
 		if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
 		{
-			InitializeAmbientOcclusion();
+			InitializeSMAA();
 		}
 
 		SetFullScreen();
 	}
 
-	void Renderer::InitializeAmbientOcclusion()
+	void Renderer::InitializeSMAA()
 	{
 		int w = _screenWidth;
 		int h = _screenHeight;
