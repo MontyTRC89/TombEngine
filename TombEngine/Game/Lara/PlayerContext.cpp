@@ -44,21 +44,6 @@ namespace TEN::Entities::Player
 		Ptr->AttachPlayer(playerItem);
 	}
 
-	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
-									 const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
-	{
-		Detach(playerItem);
-
-		Ptr = &attrac;
-		ChainDistance = chainDist;
-		RelPosOffset = relPosOffset;
-		RelOrientOffset = relOrientOffset;
-		RelDeltaPos = Vector3::Zero;
-		RelDeltaOrient = EulerAngles::Zero;
-
-		Ptr->AttachPlayer(playerItem);
-	}
-
 	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
 	{
 		Attach(playerItem, attrac, chainDist, Vector3::Zero, EulerAngles::Zero, Vector3::Zero, EulerAngles::Zero);

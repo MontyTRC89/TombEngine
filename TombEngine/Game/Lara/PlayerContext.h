@@ -30,8 +30,6 @@ namespace TEN::Entities::Player
 		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
 					const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
 					const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient);
-		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
-					const Vector3& relPosOffset, const EulerAngles& relOrientOffset);
 		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist);
 		void Detach(ItemInfo& playerItem);
 	};
