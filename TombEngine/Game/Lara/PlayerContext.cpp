@@ -1128,7 +1128,7 @@ namespace TEN::Entities::Player
 		// Get point collision in front of edge. NOTE: Height offset required for correct bridge collision.
 		auto pointCollFront = GetCollision(
 			attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
-			item.Pose.Orientation.y, coll.Setup.Radius, -CLICK(1));
+			attracColl.HeadingAngle, coll.Setup.Radius, -CLICK(1));
 
 		// TODO: This check fails for no reason.
 		// 2) Test for illegal slope (if applicable).
@@ -1159,7 +1159,7 @@ namespace TEN::Entities::Player
 		// Get point collision behind edge.
 		auto pointCollBack = GetCollision(
 			attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
-			item.Pose.Orientation.y, -coll.Setup.Radius);
+			attracColl.HeadingAngle, -coll.Setup.Radius);
 
 		// 6) Test if ceiling behind is adequately higher than edge.
 		int edgeToCeilHeight = pointCollBack.Position.Ceiling - pointCollFront.Position.Floor;
