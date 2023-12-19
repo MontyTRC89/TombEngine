@@ -53,6 +53,13 @@ using namespace TEN::Renderer;
 // For State Control & Collision
 // -----------------------------
 
+struct AttractorParentTargetData
+{
+	Vector3		Position	   = Vector3::Zero;
+	EulerAngles Orientation	   = EulerAngles::Zero;
+	Matrix		RotationMatrix = Matrix::Identity;
+};
+
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
@@ -321,6 +328,22 @@ static void UsePlayerMedipack(ItemInfo& item)
 	}
 }
 
+static AttractorParentTargetData GetAttractorParentTarget(const ItemInfo& item, Attractor& attrac, float chainDist,
+														   const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
+{
+	// TODO: Check if this heading is correct. While its correctness is not relevant to this function, should be diligent.
+	// Get attractor collision.
+	auto attracColl = GetAttractorCollision(attrac, chainDist, item.Pose.Orientation.y);
+
+	// Calculate target.
+	auto orient = EulerAngles(0, attracColl.HeadingAngle, 0) + relOrientOffset;
+	auto rotMatrix = orient.ToRotationMatrix();
+	auto pos = attracColl.Proximity.Intersection + Vector3::Transform(relPosOffset, rotMatrix);
+
+	// Return parent target.
+	return AttractorParentTargetData{ pos, orient, rotMatrix };
+}
+
 void HandlePlayerAttractorParent(ItemInfo& item)
 {
 	constexpr auto LERP_ALPHA = 0.25f;
@@ -331,23 +354,19 @@ void HandlePlayerAttractorParent(ItemInfo& item)
 	if (player.Context.Attractor.Ptr == nullptr)
 		return;
 
-	// TODO: Check if this heading is correct. While its correctness is not relevant to this function, should be diligent.
-	// Get parent attractor collision.
-	auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
-
-	// Calculate targets.
-	auto targetOrient = EulerAngles(0, attracColl.HeadingAngle, 0) + player.Context.Attractor.RelOrientOffset;
-	auto rotMatrix = targetOrient.ToRotationMatrix();
-	auto targetPos = attracColl.Proximity.Intersection + Vector3::Transform(player.Context.Attractor.RelPosOffset, rotMatrix);
+	// Get parent target.
+	auto target = GetAttractorParentTarget(
+		item, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance,
+		player.Context.Attractor.RelPosOffset, player.Context.Attractor.RelOrientOffset);
 
 	// Update player pose.
 	item.Pose = Pose(
-		targetPos + Vector3::Transform(Vector3::Lerp(player.Context.Attractor.RelDeltaPos, Vector3::Zero, LERP_ALPHA), rotMatrix),
-		targetOrient + EulerAngles::Lerp(player.Context.Attractor.RelDeltaOrient, EulerAngles::Zero, LERP_ALPHA));
+		target.Position + Vector3::Transform(Vector3::Lerp(player.Context.Attractor.RelDeltaPos, Vector3::Zero, LERP_ALPHA), target.RotationMatrix),
+		target.Orientation + EulerAngles::Lerp(player.Context.Attractor.RelDeltaOrient, EulerAngles::Zero, LERP_ALPHA));
 
 	// Recalculate relative delta position and orientation.
-	player.Context.Attractor.RelDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - targetPos, rotMatrix.Invert());
-	player.Context.Attractor.RelDeltaOrient = item.Pose.Orientation - targetOrient;
+	player.Context.Attractor.RelDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - target.Position, target.RotationMatrix.Invert());
+	player.Context.Attractor.RelDeltaOrient = item.Pose.Orientation - target.Orientation;
 }
 
 static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
@@ -1727,15 +1746,6 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 	if (climbContext.AttractorPtr == nullptr)
 		return;
 
-	// TODO: Check if this heading is correct. While its correctness is not relevant to this function, should be diligent.
-	// Get attractor collision.
-	auto attracColl = GetAttractorCollision(*climbContext.AttractorPtr, climbContext.ChainDistance, item.Pose.Orientation.y);
-
-	// Calculate targets.
-	auto targetOrient = EulerAngles(0, attracColl.HeadingAngle, 0) + climbContext.RelOrientOffset;
-	auto rotMatrix = targetOrient.ToRotationMatrix();
-	auto targetPos = attracColl.Proximity.Intersection + Vector3::Transform(climbContext.RelPosOffset, rotMatrix);
-
 	// Set alignment.
 	switch (climbContext.AlignType)
 	{
@@ -1745,9 +1755,14 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 	case ClimbContextAlignType::AttractorParent:
 	{
+		// Get parent target.
+		auto target = GetAttractorParentTarget(
+			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
+			climbContext.RelPosOffset, climbContext.RelOrientOffset);
+
 		// Calculate relative delta position and orientation.
-		auto relDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - targetPos, rotMatrix.Invert());
-		auto relDeltaOrient = item.Pose.Orientation - targetOrient;
+		auto relDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - target.Position, target.RotationMatrix.Invert());
+		auto relDeltaOrient = item.Pose.Orientation - target.Orientation;
 
 		// Attach player to attractor.
 		player.Context.Attractor.Attach(
@@ -1759,9 +1774,14 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 	case ClimbContextAlignType::OffsetBlend:
 	{
+		// Get parent target.
+		auto target = GetAttractorParentTarget(
+			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
+			climbContext.RelPosOffset, climbContext.RelOrientOffset);
+
 		// Calculate offsets.
-		auto posOffset = targetPos - item.Pose.Position.ToVector3();
-		auto orientOffset = targetOrient - item.Pose.Orientation;
+		auto posOffset = target.Position - item.Pose.Position.ToVector3();
+		auto orientOffset = target.Orientation - item.Pose.Orientation;
 
 		// Set offset blend.
 		item.OffsetBlend.SetLogarithmic(posOffset, orientOffset, OFFSET_BLEND_LERP_ALPHA);
