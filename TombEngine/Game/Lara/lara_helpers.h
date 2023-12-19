@@ -3,6 +3,7 @@
 
 namespace TEN::Entities::Player{ struct ClimbContextData; };
 namespace TEN::Entities::Player{ struct WaterTreadStepOutContextData; };
+namespace TEN::Entities::Player{ using JumpCatchContextData = std::variant<struct EdgeCatchContextData, struct MonkeySwingCatchContextData>; };
 enum class JumpDirection;
 enum class WaterStatus;
 struct ItemInfo;
@@ -37,7 +38,6 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerCrawlFlex(ItemInfo& item);
-bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll);
 void HandlePlayerFlyCheat(ItemInfo& item);
 void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
@@ -78,6 +78,7 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
 void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext);
 void SetPlayerTreadWaterStepOut(ItemInfo& item, const WaterTreadStepOutContextData& stepOutContext);
+void SetPlayerJumpCatch(ItemInfo& item, const CollisionInfo& coll, const JumpCatchContextData& catchContext);
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);
 void SetLaraFallBackAnimation(ItemInfo* item);

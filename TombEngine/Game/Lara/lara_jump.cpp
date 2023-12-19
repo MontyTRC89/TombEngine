@@ -207,8 +207,13 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Action))
 	{
-		if (HandlePlayerJumpCatch(*item, *coll))
+		auto catchContext = GetJumpCatchContext(*item, *coll);
+		if (catchContext.has_value())
+		{
+			//item->Animation.TargetState = catchContext->TargetStateID;
+			SetPlayerJumpCatch(*item, *coll, *catchContext);
 			return;
+		}
 	}
 
 	if (CanLand(*item, *coll))
@@ -572,8 +577,13 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Action))
 	{
-		if (HandlePlayerJumpCatch(*item, *coll))
+		auto catchContext = GetJumpCatchContext(*item, *coll);
+		if (catchContext.has_value())
+		{
+			//item->Animation.TargetState = catchContext->TargetStateID;
+			SetPlayerJumpCatch(*item, *coll, *catchContext);
 			return;
+		}
 	}
 
 	if (CanLand(*item, *coll))

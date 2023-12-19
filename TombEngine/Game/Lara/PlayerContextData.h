@@ -110,4 +110,8 @@ namespace TEN::Entities::Player
 		int FloorHeight	  = 0;
 		int TargetStateID = 0;
 	};
+
+	using JumpCatchContextData = std::variant<
+		EdgeCatchContextData,
+		MonkeySwingCatchContextData>;
 }

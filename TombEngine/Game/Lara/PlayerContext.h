@@ -15,10 +15,6 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Player
 {
-	struct EdgeCatchContextData;
-	struct MonkeySwingCatchContextData;
-	struct ShimmyContextData;
-
 	struct PlayerAttractorData
 	{
 		Attractor*	Ptr				= nullptr;
@@ -150,19 +146,18 @@ namespace TEN::Entities::Player
 	// Object interaction contexts
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
-	// Edge vault climb contexts
+	// Vault climb contexts
 	std::optional<ClimbContextData>				GetStandVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData>				GetCrawlVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData>				GetTreadWaterVaultClimbContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<WaterTreadStepOutContextData> GetTreadWaterStepOutContext(const ItemInfo& item);
 
-	// Edge hang climb contexts
+	// To hang climb contexts
 	std::optional<ClimbContextData> GetStandToHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetStandToHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetCrawlToHangFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetCrawlToHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
-	// Catch contexts
-	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
+	// Jump catch contexts
+	std::optional<JumpCatchContextData> GetJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 }

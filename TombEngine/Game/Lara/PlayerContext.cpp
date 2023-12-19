@@ -2656,7 +2656,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<EdgeCatchContextData> GetEdgeCatchContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<EdgeCatchContextData> GetEdgeJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -2665,23 +2665,17 @@ namespace TEN::Entities::Player
 		if (!attracColl.has_value())
 			return std::nullopt;
 
-		// TODO: Not needed? Handled by hang function.
-		// Calculate heading angle. NOTE: Less accurate if edge catch spans connecting attractors.
-		auto pointLeft = attracColl->AttractorPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance - coll.Setup.Radius);
-		auto pointRight = attracColl->AttractorPtr->GetIntersectionAtChainDistance(attracColl->Proximity.ChainDistance + coll.Setup.Radius);
-		short headingAngle = Geometry::GetOrientToPoint(pointLeft, pointRight).y - ANGLE(90.0f);
-
-		// Return edge catch data.
+		// Return edge catch context.
 		return EdgeCatchContextData
 		{
 			attracColl->AttractorPtr,
 			attracColl->Proximity.Intersection,
 			attracColl->Proximity.ChainDistance,
-			headingAngle
+			attracColl->HeadingAngle
 		};
 	}
 
-	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<MonkeySwingCatchContextData> GetMonkeySwingJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
 		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
@@ -2713,6 +2707,19 @@ namespace TEN::Entities::Player
 			int monkeyHeight = pointColl.Position.Ceiling;
 			return MonkeySwingCatchContextData{ monkeyHeight };
 		}
+
+		return std::nullopt;
+	}
+
+	std::optional<JumpCatchContextData> GetJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		auto edgeCatchContext = GetEdgeJumpCatchContext(item, coll);
+		if (edgeCatchContext.has_value())
+			return edgeCatchContext;
+
+		auto monkeyCatchContext = GetMonkeySwingJumpCatchContext(item, coll);
+		if (monkeyCatchContext.has_value())
+			return monkeyCatchContext;
 
 		return std::nullopt;
 	}

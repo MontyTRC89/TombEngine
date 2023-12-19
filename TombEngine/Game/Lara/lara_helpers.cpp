@@ -805,101 +805,6 @@ void HandlePlayerCrawlFlex(ItemInfo& item)
 	}
 }
 
-static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchContextData& catchData)
-{
-	auto& player = GetLaraInfo(item);
-
-	// Set catch animation.
-	if (item.Animation.ActiveState == LS_JUMP_UP)
-	{
-		SetAnimation(&item, LA_JUMP_UP_TO_HANG);
-	}
-	else if (CanSwingOnLedge(item, coll))
-	{
-		SetAnimation(&item, LA_REACH_TO_HANG_OSCILLATE);
-	}
-	else
-	{
-		SetAnimation(&item, LA_REACH_TO_HANG);
-	}
-
-	// Calculate position.
-	auto catchPoint = catchData.Intersection;
-	auto pos = catchPoint + Vector3(0.0f, /*coll.Setup.Height*/LARA_HEIGHT_STRETCH, 0.0f); // TODO: Weird with reach catch.
-	pos = Geometry::TranslatePoint(pos, catchData.HeadingAngle, -coll.Setup.Radius);
-
-	ResetPlayerFlex(&item);
-	item.Animation.IsAirborne = false;
-	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position = pos;
-	player.Control.HandStatus = HandStatus::Busy;
-
-	short targetHeadingAngle = catchData.HeadingAngle;
-	player.Context.OrientOffset = EulerAngles(0, targetHeadingAngle, 0);
-
-	// TODO: Redo attractor parenting for edge catch.
-	
-	// Get attractor collision.
-	auto attracColl = GetAttractorCollision(*catchData.AttracPtr, catchData.ChainDistance, item.Pose.Orientation.y);
-	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
-
-	// Calculate offset intersection.
-	auto rotMatrix = attracOrient.ToRotationMatrix();
-	auto offsetIntersect = attracColl.Proximity.Intersection + Vector3::Transform(Vector3(0.0f, -LARA_HEIGHT_STRETCH, -coll.Setup.Radius), rotMatrix);
-
-	// Calculate relative delta position and orientation.
-	auto relDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - offsetIntersect, rotMatrix.Invert());
-	auto relDeltaOrient = item.Pose.Orientation - attracOrient;
-
-	// Attach player to attractor.
-	player.Context.Attractor.Attach(
-		item, *catchData.AttracPtr, catchData.ChainDistance,
-		Vector3(0.0f, -LARA_HEIGHT_STRETCH, -coll.Setup.Radius), EulerAngles::Zero,
-		relDeltaPos, relDeltaOrient);
-}
-
-static void SetPlayerMonkeySwingCatch(ItemInfo& item, CollisionInfo& coll, const MonkeySwingCatchContextData& catchData)
-{
-	auto& player = GetLaraInfo(item);
-
-	// TODO: Address hardcoding.
-	int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
-	SetAnimation(&item, animNumber);
-
-	ResetPlayerFlex(&item);
-	item.Animation.IsAirborne = false;
-	item.Animation.Velocity = Vector3::Zero;
-	item.Pose.Position.y = catchData.Height + LARA_HEIGHT_MONKEY;
-	player.Control.HandStatus = HandStatus::Busy;
-}
-
-bool HandlePlayerJumpCatch(ItemInfo& item, CollisionInfo& coll)
-{
-	const auto& player = GetLaraInfo(item);
-
-	// Check player status.
-	if (player.Control.HandStatus != HandStatus::Free || coll.HitStatic)
-		return false;
-
-	// Catch monkey swing.
-	auto monkeyCatch = GetMonkeySwingCatchContext(item, coll);
-	if (monkeyCatch.has_value())
-	{
-		SetPlayerMonkeySwingCatch(item, coll, *monkeyCatch);
-		return true;
-	}
-
-	// Catch edge (ledge or climbable wall edge).
-	auto edgeCatch = GetEdgeCatchContext(item, coll);
-	if (edgeCatch.has_value())
-	{
-		SetPlayerEdgeCatch(item, coll, *edgeCatch);
-		return true;
-	}
-
-	return false;
-}
-
 static void GivePlayerItemsCheat(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
@@ -1799,6 +1704,88 @@ void SetPlayerTreadWaterStepOut(ItemInfo& item, const WaterTreadStepOutContextDa
 	item.Animation.Velocity = Vector3::Zero;
 	item.Animation.IsAirborne = false;
 	player.Control.WaterStatus = WaterStatus::Wade;
+}
+
+static void SetPlayerEdgeCatch(ItemInfo& item, const CollisionInfo& coll, const EdgeCatchContextData& context)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Set catch animation.
+	if (item.Animation.ActiveState == LS_JUMP_UP)
+	{
+		SetAnimation(&item, LA_JUMP_UP_TO_HANG);
+	}
+	else if (CanSwingOnLedge(item, coll))
+	{
+		SetAnimation(&item, LA_REACH_TO_HANG_OSCILLATE);
+	}
+	else
+	{
+		SetAnimation(&item, LA_REACH_TO_HANG);
+	}
+
+	// Calculate position.
+	auto catchPoint = context.Intersection;
+	auto pos = catchPoint + Vector3(0.0f, /*coll.Setup.Height*/LARA_HEIGHT_STRETCH, 0.0f); // TODO: Weird with reach catch.
+	pos = Geometry::TranslatePoint(pos, context.HeadingAngle, -coll.Setup.Radius);
+
+	ResetPlayerFlex(&item);
+	item.Animation.IsAirborne = false;
+	item.Animation.Velocity = Vector3::Zero;
+	item.Pose.Position = pos;
+	player.Control.HandStatus = HandStatus::Busy;
+
+	short targetHeadingAngle = context.HeadingAngle;
+	player.Context.OrientOffset = EulerAngles(0, targetHeadingAngle, 0);
+
+	// TODO: Redo attractor parenting for edge catch.
+
+	// Get attractor collision.
+	auto attracColl = GetAttractorCollision(*context.AttracPtr, context.ChainDistance, item.Pose.Orientation.y);
+	auto attracOrient = EulerAngles(0, attracColl.HeadingAngle, 0);
+
+	// Calculate offset intersection.
+	auto rotMatrix = attracOrient.ToRotationMatrix();
+	auto offsetIntersect = attracColl.Proximity.Intersection + Vector3::Transform(Vector3(0.0f, -LARA_HEIGHT_STRETCH, -coll.Setup.Radius), rotMatrix);
+
+	// Calculate relative delta position and orientation.
+	auto relDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - offsetIntersect, rotMatrix.Invert());
+	auto relDeltaOrient = item.Pose.Orientation - attracOrient;
+
+	// Attach player to attractor.
+	player.Context.Attractor.Attach(
+		item, *context.AttracPtr, context.ChainDistance,
+		Vector3(0.0f, -LARA_HEIGHT_STRETCH, -coll.Setup.Radius), EulerAngles::Zero,
+		relDeltaPos, relDeltaOrient);
+}
+
+static void SetPlayerMonkeySwingCatch(ItemInfo& item, const CollisionInfo& coll, const MonkeySwingCatchContextData& context)
+{
+	auto& player = GetLaraInfo(item);
+
+	// TODO: Address hardcoding.
+	int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
+	SetAnimation(&item, animNumber);
+
+	ResetPlayerFlex(&item);
+	item.Animation.IsAirborne = false;
+	item.Animation.Velocity = Vector3::Zero;
+	item.Pose.Position.y = context.Height + LARA_HEIGHT_MONKEY;
+	player.Control.HandStatus = HandStatus::Busy;
+}
+
+void SetPlayerJumpCatch(ItemInfo& item, const CollisionInfo& coll, const JumpCatchContextData& catchContext)
+{
+	if (std::holds_alternative<EdgeCatchContextData>(catchContext))
+	{
+		auto edgeCatchContext = std::get<EdgeCatchContextData>(catchContext);
+		SetPlayerEdgeCatch(item, coll, edgeCatchContext);
+	}
+	else if (std::holds_alternative<MonkeySwingCatchContextData>(catchContext))
+	{
+		auto monkeyCatchContext = std::get<MonkeySwingCatchContextData>(catchContext);
+		SetPlayerMonkeySwingCatch(item, coll, monkeyCatchContext);
+	}
 }
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
