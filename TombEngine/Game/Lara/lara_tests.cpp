@@ -156,36 +156,6 @@ bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance)
 	return (result0 && result1);
 }
 
-int LaraFloorFront(ItemInfo* item, short angle, int distance)
-{
-	return LaraCollisionFront(item, angle, distance).Position.Floor;
-}
-
-int LaraCeilingFront(ItemInfo* item, short angle, int distance, int height)
-{
-	return LaraCeilingCollisionFront(item, angle, distance, height).Position.Ceiling;
-}
-
-CollisionResult LaraCollisionFront(ItemInfo* item, short angle, int distance)
-{
-	auto probe = GetCollision(item, angle, distance, -LARA_HEIGHT);
-
-	if (probe.Position.Floor != NO_HEIGHT)
-		probe.Position.Floor -= item->Pose.Position.y;
-
-	return probe;
-}
-
-CollisionResult LaraCeilingCollisionFront(ItemInfo* item, short angle, int distance, int height)
-{
-	auto probe = GetCollision(item, angle, distance, -height);
-
-	if (probe.Position.Ceiling != NO_HEIGHT)
-		probe.Position.Ceiling += height - item->Pose.Position.y;
-
-	return probe;
-}
-
 bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = *GetLaraInfo(item);

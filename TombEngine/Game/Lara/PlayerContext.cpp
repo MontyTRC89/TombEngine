@@ -1054,46 +1054,6 @@ namespace TEN::Entities::Player
 		return (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT || IsInLowSpace(item, coll));
 	}
 
-	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setup)
-	{
-		constexpr auto ABS_FLOOR_BOUND = CLICK(0.8);
-
-		// Get point collision.
-		int probeHeight = -(LARA_HEIGHT_STRETCH + ABS_FLOOR_BOUND);
-		auto pointCollCenter = GetCollision(&item);
-		auto pointCollFront = GetCollision(&item, setup.HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), probeHeight);
-
-		int vPosTop = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
-		int relFloorHeight = abs(pointCollFront.Position.Floor - vPosTop);
-		int floorToCeilHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
-		int gapHeight = abs(pointCollCenter.Position.Ceiling - pointCollFront.Position.Floor);
-
-		// TODO: This check fails for no reason.
-		// 1) Test for illegal slope (if applicable).
-		bool isIllegalSlope = setup.TestIllegalSlope ? pointCollFront.Position.FloorSlope : false;
-		if (isIllegalSlope)
-			return false;
-
-		// 2) Test for object blocking ledge.
-		TestForObjectOnLedge(&item, &coll);
-		if (coll.HitStatic)
-			return false;
-
-		// 3) Test for valid ledge.
-		// TODO: Attractors.
-
-		// 4) Assess point collision.
-		if (relFloorHeight <= ABS_FLOOR_BOUND &&			   // Floor height is within lower/upper floor bounds.
-			floorToCeilHeight > setup.FloorToCeilHeightMin &&  // Floor-to-ceiling height isn't too narrow.
-			floorToCeilHeight <= setup.FloorToCeilHeightMax && // Floor-to-ceiling height isn't too wide.
-			gapHeight >= setup.GapHeightMin)				   // Gap height is permissive.
-		{
-			return true;
-		}
-
-		return false;
-	}	
-
 	bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto UPPER_FLOOR_BOUND = 0;
@@ -1118,7 +1078,7 @@ namespace TEN::Entities::Player
 
 	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto LEDGE_HEIGHT_MIN = CLICK(2);
+		constexpr auto WALL_HEIGHT_MIN = CLICK(2);
 
 		// 1) Check if ledge jumps are enabled.
 		if (!g_GameFlow->HasLedgeJumps())
@@ -1127,7 +1087,7 @@ namespace TEN::Entities::Player
 		// Ray collision setup at minimum ledge height.
 		auto origin = GameVector(
 			item.Pose.Position.x,
-			(item.Pose.Position.y - LARA_HEIGHT_STRETCH) + LEDGE_HEIGHT_MIN,
+			(item.Pose.Position.y - LARA_HEIGHT_STRETCH) + WALL_HEIGHT_MIN,
 			item.Pose.Position.z,
 			item.RoomNumber);
 		auto target = GameVector(
@@ -1151,43 +1111,98 @@ namespace TEN::Entities::Player
 		return true;
 	}
 
+	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setup)
+	{
+		constexpr auto LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX = CLICK(0.5f);
+
+		const auto& player = GetLaraInfo(item);
+
+		// 1) Check for attractor parent.
+		if (player.Context.Attractor.Ptr == nullptr)
+			return false;
+
+		// Get attractor collision.
+		auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
+
+		// TODO: Probe from player.
+		// Get point collision in front of edge. NOTE: Height offset required for correct bridge collision.
+		auto pointCollFront = GetCollision(
+			attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+			item.Pose.Orientation.y, coll.Setup.Radius, -CLICK(1));
+
+		// TODO: This check fails for no reason.
+		// 2) Test for illegal slope (if applicable).
+		if (setup.TestIllegalSlope)
+		{
+			if (pointCollFront.Position.FloorSlope)
+				return false;
+		}
+
+		// 3) Test for object blocking ledge.
+		TestForObjectOnLedge(&item, &coll);
+		if (coll.HitStatic)
+			return false;
+
+		// 4) Test ledge floor-to-edge height.
+		int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor);
+		if (ledgeFloorToEdgeHeight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
+			return false;
+		
+		// 5) Test ledge floor-to-ceiling height.
+		int ledgeFloorToCeilHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
+		if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin || // Floor-to-ceiling height isn't too narrow.
+			ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)	 // Floor-to-ceiling height isn't too wide.
+		{
+			return false;
+		}
+
+		// Get point collision behind edge.
+		auto pointCollBack = GetCollision(
+			attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+			item.Pose.Orientation.y, -coll.Setup.Radius);
+
+		// 6) Test if ceiling behind is adequately higher than edge.
+		int edgeToCeilHeight = pointCollBack.Position.Ceiling - pointCollFront.Position.Floor;
+		if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
+			return false;
+
+		return true;
+	}	
+
 	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll)
 	{
-		auto setup = LedgeClimbSetupData
+		constexpr auto SETUP = LedgeClimbSetupData
 		{
-			item.Pose.Orientation.y,
 			LARA_HEIGHT, -MAX_HEIGHT,
 			CLICK(3),
 			false
 		};
 
-		return TestLedgeClimbSetup(item, coll, setup);
+		return TestLedgeClimbSetup(item, coll, SETUP);
 	}
 
 	bool CanClimbLedgeToCrouch(const ItemInfo& item, CollisionInfo& coll)
 	{
-		auto setup = LedgeClimbSetupData
+		constexpr auto SETUP = LedgeClimbSetupData
 		{
-			item.Pose.Orientation.y,
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT,
 			(int)CLICK(0.6f),
 			true
 		};
 
-		return TestLedgeClimbSetup(item, coll, setup);
+		return TestLedgeClimbSetup(item, coll, SETUP);
 	}
 
 	bool CanClimbLedgeToStand(const ItemInfo& item, CollisionInfo& coll)
 	{
-		auto setup = LedgeClimbSetupData
+		constexpr auto SETUP = LedgeClimbSetupData
 		{
-			item.Pose.Orientation.y,
 			LARA_HEIGHT, -MAX_HEIGHT,
 			CLICK(1),
 			false
 		};
 
-		return TestLedgeClimbSetup(item, coll, setup);
+		return TestLedgeClimbSetup(item, coll, SETUP);
 	}
 
 	bool CanShimmyUp(const ItemInfo& item, const CollisionInfo& coll)
@@ -1256,6 +1271,22 @@ namespace TEN::Entities::Player
 		return true;
 
 		//return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
+	}
+
+	// TODO
+	void GetClimbableWallShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+
+	}
+	
+	void GetHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+
+	}
+	
+	void GetHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+
 	}
 
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll)
@@ -2432,9 +2463,9 @@ namespace TEN::Entities::Player
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangClimbSetupData
 		{
+			ANGLE(0.0f),					  // Relative heading angle.
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-CLICK(1),						  // Edge-to-ceil height lower bound.
-			ANGLE(0.0f)						  // Relative heading angle.
+			-CLICK(1)						  // Edge-to-ceil height lower bound.
 		};
 
 		// Get attractor collisions.
@@ -2467,9 +2498,9 @@ namespace TEN::Entities::Player
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangClimbSetupData
 		{
+			ANGLE(180.0f),					  // Relative heading angle.
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-CLICK(1),						  // Edge-to-ceil height lower bound.
-			ANGLE(180.0f)					  // Relative heading angle.
+			-CLICK(1)						  // Edge-to-ceil height lower bound.
 		};
 
 		// Get attractor collisions.
@@ -2503,9 +2534,9 @@ namespace TEN::Entities::Player
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangClimbSetupData
 		{
+			ANGLE(0.0f),					  // Relative heading angle.
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
-			ANGLE(0.0f)						  // Relative heading angle.
+			-(int)CLICK(0.6f)				  // Edge-to-ceil height lower bound.
 		};
 
 		// Get attractor collisions.
@@ -2538,9 +2569,9 @@ namespace TEN::Entities::Player
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangClimbSetupData
 		{
+			ANGLE(180.0f),					  // Relative heading angle.
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
-			-(int)CLICK(0.6f),				  // Edge-to-ceil height lower bound.
-			ANGLE(180.0f)					  // Relative heading angle.
+			-(int)CLICK(0.6f)				  // Edge-to-ceil height lower bound.
 		};
 
 		// Get attractor collisions.
@@ -2570,8 +2601,9 @@ namespace TEN::Entities::Player
 
 	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto ATTRAC_DETECT_RADIUS		= BLOCK(0.5f);
-		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN = LARA_HEIGHT_STRETCH;
+		constexpr auto ATTRAC_DETECT_RADIUS		  = BLOCK(0.5f);
+		constexpr auto POINT_COLL_VERTICAL_OFFSET = -CLICK(1);
+		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN	  = LARA_HEIGHT_STRETCH;
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, 0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
@@ -2600,9 +2632,10 @@ namespace TEN::Entities::Player
 			if (!attracColl.IsInFront || !TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle))
 				continue;
 
-			// Get point collision in front of edge. NOTE: Vertical offset required for correct bridge collision.
-			auto point = Vector3i(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.y - CLICK(1), attracColl.Proximity.Intersection.z);
-			auto pointColl = GetCollision(point, attracColl.AttractorPtr->GetRoomNumber(), attracColl.HeadingAngle, -coll.Setup.Radius);
+			// Get point collision in front of edge.
+			auto pointColl = GetCollision(
+				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius, 0.0f, POINT_COLL_VERTICAL_OFFSET);
 
 			// 5) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;

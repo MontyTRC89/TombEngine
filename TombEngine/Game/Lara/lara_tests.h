@@ -23,11 +23,6 @@ bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
 bool TestLaraWall(const ItemInfo* item, float dist, float height);
 bool TestLaraFacingCorner(const ItemInfo* item, short headingAngle, float dist);
 bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance);
-int	 LaraFloorFront(ItemInfo* item, short angle, int distance);
-int	 LaraCeilingFront(ItemInfo* item, short angle, int distance, int height);
-
-CollisionResult LaraCollisionFront(ItemInfo* item, short angle, int distance);
-CollisionResult LaraCeilingCollisionFront(ItemInfo* item, short angle, int distance, int height);
 
 bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll);
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);

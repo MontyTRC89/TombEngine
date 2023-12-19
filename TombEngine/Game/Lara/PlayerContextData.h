@@ -59,11 +59,11 @@ namespace TEN::Entities::Player
 
 	struct EdgeHangClimbSetupData
 	{
+		short RelHeadingAngle = 0;
+
 		int LowerEdgeBound		 = 0;
 		int UpperEdgeBound		 = 0;
 		int LowerEdgeToCeilBound = 0;
-
-		short RelHeadingAngle = 0;
 	};
 
 	struct ClimbContextData
@@ -88,10 +88,9 @@ namespace TEN::Entities::Player
 
 	struct LedgeClimbSetupData
 	{
-		short HeadingAngle		   = 0;
-		int	  FloorToCeilHeightMin = 0;
-		int	  FloorToCeilHeightMax = 0;
-		int	  GapHeightMin		   = 0;
+		int LedgeFloorToCeilHeightMin = 0;
+		int LedgeFloorToCeilHeightMax = 0;
+		int LowerEdgeToCeilBound	  = 0;
 
 		bool TestIllegalSlope = false;
 	};
