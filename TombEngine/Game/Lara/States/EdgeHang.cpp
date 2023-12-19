@@ -214,14 +214,11 @@ namespace TEN::Entities::Player
 							Vector3::Transform(targetPos - edgeAttracColls->Center.Proximity.Intersection, rotMatrix);
 		auto relOrientOffset = targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0);
 
-		player.Context.Attractor.Ptr = edgeAttracColls->Center.AttractorPtr;
-		player.Context.Attractor.ChainDistance = edgeAttracColls->Center.Proximity.ChainDistance;
-		player.Context.Attractor.RelPosOffset = relPosOffset;
-		player.Context.Attractor.RelOrientOffset = relOrientOffset;
-
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
-		//player.Context.Attractor.Update(edgeAttracColls->Center.Proximity.ChainDistance, relPosOffset, relOrientOffset);
+		player.Context.Attractor.Update(
+			item, edgeAttracColls->Center.AttractorPtr, edgeAttracColls->Center.Proximity.ChainDistance,
+			relPosOffset, relOrientOffset);
 
 		HandlePlayerAttractorParent(item);
 	}

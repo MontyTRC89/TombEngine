@@ -64,6 +64,15 @@ namespace TEN::Entities::Player
 		RelDeltaOrient = EulerAngles::Zero;
 	};
 
+	void PlayerAttractorData::Update(ItemInfo& playerItem, Attractor& attrac, float chainDist,
+									 const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
+	{
+		Attach(
+			playerItem, attrac, chainDist,
+			relPosOffset, relOrientOffset,
+			RelDeltaPos, RelDeltaOrient);
+	}
+
 	PlayerContext::PlayerContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);

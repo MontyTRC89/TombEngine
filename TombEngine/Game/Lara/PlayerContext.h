@@ -32,6 +32,8 @@ namespace TEN::Entities::Player
 					const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient);
 		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist);
 		void Detach(ItemInfo& playerItem);
+
+		void Update(Attractor& attrac, float chainDist);
 	};
 
 	struct DebugAttractorData
