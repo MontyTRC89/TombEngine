@@ -1742,10 +1742,6 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 	if (climbContext.SetJumpVelocity)
 		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(-climbContext.RelPosOffset.y);
 
-	// No attractor; return early.
-	if (climbContext.AttractorPtr == nullptr)
-		return;
-
 	// Set alignment.
 	switch (climbContext.AlignType)
 	{
@@ -1755,6 +1751,10 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 	case ClimbContextAlignType::AttractorParent:
 	{
+		// No attractor; break.
+		if (climbContext.AttractorPtr == nullptr)
+			break;
+
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
 			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
@@ -1774,6 +1774,10 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 	case ClimbContextAlignType::OffsetBlend:
 	{
+		// No attractor; break.
+		if (climbContext.AttractorPtr == nullptr)
+			break;
+
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
 			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
