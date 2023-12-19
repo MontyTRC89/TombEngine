@@ -54,8 +54,11 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 2) Check if attractor is edge type.
-			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge)
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
+				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
+			{
 				continue;
+			}
 
 			// 3) Test sharp corner.
 			if (Geometry::GetShortestAngle(attracColl.HeadingAngle, currentAttracColl.HeadingAngle) > CORNER_ANGLE_MAX)
@@ -168,8 +171,6 @@ namespace TEN::Entities::Player
 
 	void HandlePlayerEdgeMovement(ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
 	{
-		constexpr auto ORIENT_LERP_ALPHA = 0.5f;
-
 		auto& player = GetLaraInfo(item);
 
 		// End hang if hands attractor doesn't exist.
@@ -195,30 +196,34 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		// Calculate heading angle.
-		auto orient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.Intersection, edgeAttracColls->Right.Proximity.Intersection);
-		auto headingAngle = orient.y - ANGLE(90.0f);
+		// Calculate target orientation.
+		auto targetOrient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.Intersection, edgeAttracColls->Right.Proximity.Intersection);
+		targetOrient.y -= ANGLE(90.0f);
 
-		// Align orientation.
-		player.Context.OrientOffset = EulerAngles(0, headingAngle, 0);
-		item.Pose.Orientation.Lerp(player.Context.OrientOffset, ORIENT_LERP_ALPHA);
-
-		// Determine target point with accurate consideration of inner bends.
-		auto targetPoint = edgeAttracColls->Center.Proximity.Intersection;
-		if (!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Left.Proximity.Intersection, player.Context.OrientOffset) &&
-			!Geometry::IsPointInFront(targetPoint, edgeAttracColls->Right.Proximity.Intersection, player.Context.OrientOffset))
+		// Calculate target position.
+		auto targetPos = edgeAttracColls->Center.Proximity.Intersection;
+		if (!Geometry::IsPointInFront(targetPos, edgeAttracColls->Left.Proximity.Intersection, targetOrient) &&
+			!Geometry::IsPointInFront(targetPos, edgeAttracColls->Right.Proximity.Intersection, targetOrient))
 		{
-			targetPoint = (edgeAttracColls->Left.Proximity.Intersection + edgeAttracColls->Right.Proximity.Intersection) / 2;
+			targetPos = (edgeAttracColls->Left.Proximity.Intersection + edgeAttracColls->Right.Proximity.Intersection) / 2;
 		}
 
-		// Align position.
-		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
-		auto relOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
-		item.Pose.Position = targetPoint + Vector3::Transform(relOffset, rotMatrix);
+		// Calculate relative position and orientation offsets.
+		auto rotMatrix = targetOrient.ToRotationMatrix();
+		auto relPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius) +
+							Vector3::Transform(targetPos - edgeAttracColls->Center.Proximity.Intersection, rotMatrix);
+		auto relOrientOffset = targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0);
+
+		player.Context.Attractor.Ptr = edgeAttracColls->Center.AttractorPtr;
+		player.Context.Attractor.ChainDistance = edgeAttracColls->Center.Proximity.ChainDistance;
+		player.Context.Attractor.RelPosOffset = relPosOffset;
+		player.Context.Attractor.RelOrientOffset = relOrientOffset;
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
-		player.Context.Attractor.Attach(item, *edgeAttracColls->Center.AttractorPtr, edgeAttracColls->Center.Proximity.ChainDistance);
+		//player.Context.Attractor.Update(edgeAttracColls->Center.Proximity.ChainDistance, relPosOffset, relOrientOffset);
+
+		HandlePlayerAttractorParent(item);
 	}
 
 	// State:	  LS_HANG_IDLE (10)
