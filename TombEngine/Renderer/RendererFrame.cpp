@@ -441,8 +441,7 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			auto length = Vector3(mesh->VisibilityBox.Extents).Length() * mesh->Scale;
-			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, length))
+			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, mesh->VisibilitySphereRadius))
 			{
 				continue;
 			}
@@ -455,14 +454,14 @@ namespace TEN::Renderer
 				if (mesh->CacheLights || _invalidateCache)
 				{
 					// Collect all lights and return also cached light for the next frames
-					CollectLights(mesh->Pose.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, false, &cachedRoomLights, &lights);
+					CollectLights(mesh->Pose.Position.ToVector3(), mesh->VisibilitySphereRadius, room.RoomNumber, NO_ROOM, false, false, &cachedRoomLights, &lights);
 					mesh->CacheLights = false;
 					mesh->CachedRoomLights = cachedRoomLights;
 				}
 				else
 				{
 					// Collecy only dynamic lights and use cached lights from rooms
-					CollectLights(mesh->Pose.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, true, &mesh->CachedRoomLights, &lights);
+					CollectLights(mesh->Pose.Position.ToVector3(), mesh->VisibilitySphereRadius, room.RoomNumber, NO_ROOM, false, true, &mesh->CachedRoomLights, &lights);
 				}
 			}
 			mesh->LightsToDraw = lights;
