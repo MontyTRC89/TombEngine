@@ -87,67 +87,6 @@ bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor)
 	return ((256 << (GetQuadrant(item->Pose.Orientation.y))) & GetClimbFlags(floor));
 }
 
-bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-	int shift, result;
-
-	if (!lara->Control.CanClimbLadder)
-		return false;
-
-	if (item->Animation.Velocity.y < 0)
-		return false;
-
-	// HACK: Climb wall tests are highly fragile and depend on quadrant shifts.
-	// Until climb wall tests are fully refactored, we need to recalculate CollisionInfo.
-
-	auto coll2 = *coll;
-	coll2.Setup.Mode = CollisionProbeMode::Quadrants;
-	GetCollisionInfo(&coll2, item);
-
-	switch (GetQuadrant(item->Pose.Orientation.y))
-	{
-	case NORTH:
-	case SOUTH:
-		item->Pose.Position.z += coll2.Shift.Position.z;
-		break;
-
-	case EAST:
-	case WEST:
-		item->Pose.Position.x += coll2.Shift.Position.x;
-		break;
-
-	default:
-		break;
-	}
-
-	auto bounds = GameBoundingBox(item);
-
-	if (lara->Control.MoveAngle != item->Pose.Orientation.y)
-	{
-		int l = LaraCeilingFront(item, item->Pose.Orientation.y, 0, 0);
-		int r = LaraCeilingFront(item, lara->Control.MoveAngle, CLICK(0.5f), 0);
-
-		if (abs(l - r) > SLOPE_DIFFERENCE)
-			return false;
-	}
-
-	if (LaraTestClimbPos(item, LARA_RADIUS, LARA_RADIUS, bounds.Y1, bounds.GetHeight(), &shift) &&
-		LaraTestClimbPos(item, LARA_RADIUS, -LARA_RADIUS, bounds.Y1, bounds.GetHeight(), &shift))
-	{
-		result = LaraTestClimbPos(item, LARA_RADIUS, 0, bounds.Y1, bounds.GetHeight(), &shift);
-		if (result)
-		{
-			if (result != 1)
-				item->Pose.Position.y += shift;
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
 bool TestLaraWall(const ItemInfo* item, float dist, float height)
 {
 	auto origin = GameVector(

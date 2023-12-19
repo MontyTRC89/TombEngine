@@ -9,12 +9,6 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Player
 {
-	enum class EdgeType
-	{
-		Attractor,
-		ClimbableWall
-	};
-
 	enum class ClimbContextAlignType
 	{
 		None,
@@ -90,8 +84,6 @@ namespace TEN::Entities::Player
 	struct EdgeCatchContextData
 	{
 		Attractor* AttracPtr = nullptr;
-
-		EdgeType   Type		 = EdgeType::Attractor; // TODO: Won't be needed later.
 
 		Vector3 Intersection  = Vector3::Zero;
 		float	ChainDistance = 0.0f;

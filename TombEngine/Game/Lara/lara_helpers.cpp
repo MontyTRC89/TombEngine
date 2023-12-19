@@ -823,13 +823,8 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchCon
 		SetAnimation(&item, LA_REACH_TO_HANG);
 	}
 
-	// HACK: Until fragile climbable wall code is refactored, snap must align exactly to grid.
-	if (catchData.Type == EdgeType::ClimbableWall)
-		SnapEntityToGrid(item, coll);
-
 	// Calculate position.
-	auto catchPoint = (catchData.Type == EdgeType::ClimbableWall) ?
-		Vector3(item.Pose.Position.x, catchData.Intersection.y, item.Pose.Position.z) : catchData.Intersection;
+	auto catchPoint = catchData.Intersection;
 	auto pos = catchPoint + Vector3(0.0f, /*coll.Setup.Height*/LARA_HEIGHT_STRETCH, 0.0f); // TODO: Weird with reach catch.
 	pos = Geometry::TranslatePoint(pos, catchData.HeadingAngle, -coll.Setup.Radius);
 
@@ -839,7 +834,7 @@ static void SetPlayerEdgeCatch(ItemInfo& item, CollisionInfo& coll, EdgeCatchCon
 	item.Pose.Position = pos;
 	player.Control.HandStatus = HandStatus::Busy;
 
-	short targetHeadingAngle = (catchData.Type == EdgeType::ClimbableWall) ? coll.NearestLedgeAngle : catchData.HeadingAngle;
+	short targetHeadingAngle = catchData.HeadingAngle;
 	player.Context.OrientOffset = EulerAngles(0, targetHeadingAngle, 0);
 
 	// TODO: Redo attractor parenting for edge catch.

@@ -18,7 +18,6 @@ bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle);
 bool TestPlayerInteractAngle(short playerHeadingAngle, short testAngle);
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
 
 bool TestLaraWall(const ItemInfo* item, float dist, float height);

@@ -163,6 +163,6 @@ namespace TEN::Entities::Player
 	std::optional<ClimbContextData> GetCrawlToHangBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Catch contexts
-	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(ItemInfo& item, CollisionInfo& coll);
+	std::optional<EdgeCatchContextData>		   GetEdgeCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<MonkeySwingCatchContextData> GetMonkeySwingCatchContext(const ItemInfo& item, const CollisionInfo& coll);
 }
