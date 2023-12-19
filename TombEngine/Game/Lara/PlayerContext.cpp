@@ -1150,8 +1150,8 @@ namespace TEN::Entities::Player
 		
 		// 5) Test ledge floor-to-ceiling height.
 		int ledgeFloorToCeilHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
-		if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin || // Floor-to-ceiling height isn't too narrow.
-			ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)	 // Floor-to-ceiling height isn't too wide.
+		if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
+			ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
 		{
 			return false;
 		}
