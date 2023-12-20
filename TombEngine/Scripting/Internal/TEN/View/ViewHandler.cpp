@@ -12,6 +12,7 @@
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
@@ -71,6 +72,16 @@ namespace TEN::Scripting::View
 		return Camera.oldType;
 	}
 	
+	static Vec3 GetCameraPosition()
+	{
+		return Vec3(Camera.pos.ToVector3());
+	}
+
+	static Vec3 GetCameraTarget()
+	{
+		return Vec3(Camera.target.ToVector3());
+	}
+
 	static std::unique_ptr<Room> GetCameraRoom()
 	{
 		return std::make_unique<Room>(g_Level.Rooms[Camera.pos.RoomNumber]);
@@ -189,7 +200,17 @@ namespace TEN::Scripting::View
 		//@function SetPostProcessTint
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
-		
+
+		///Gets current camera position.
+		//@function GetCameraPosition
+		//@treturn Vec3 current camera position
+		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
+
+		///Gets current camera target.
+		//@function GetCameraTarget
+		//@treturn Vec3 current camera target
+		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
+
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
 		//@tparam short flyby (ID of flyby)
