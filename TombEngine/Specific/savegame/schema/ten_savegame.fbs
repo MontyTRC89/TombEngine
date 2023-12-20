@@ -545,8 +545,8 @@ table SaveGame {
 	callbacks_post_save: [string];
 	callbacks_pre_load: [string];
 	callbacks_post_load: [string];
-	callbacks_pre_control: [string];
-	callbacks_post_control: [string];
+	callbacks_pre_loop: [string];
+	callbacks_post_loop: [string];
 }
 
 root_type TEN.Save.SaveGame;
