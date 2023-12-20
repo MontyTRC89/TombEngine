@@ -32,6 +32,7 @@ Lua API changes:
 * Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
 * Add Moveable:SetStatus() to set the current status of the moveable.
 * Add View:GetCameraPosition(), View:GetCameraTarget() and View:GetCameraRoom() functions.
+* Add Room:GetColor() to get room's ambient light color.
 
 Version 1.2
 ===========
