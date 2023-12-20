@@ -10,6 +10,8 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
 #include "Scripting/Internal/TEN/Util/LevelLog.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
@@ -24,6 +26,23 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Scripting::Util
 {
+	// Internal function for getting clipped ray for 2D ray tests
+	static std::pair<GameVector, GameVector> GetRayFrom2DPosition(Vector2 screenPos)
+	{
+		auto realScreenPos = Vector2(
+			(screenPos.x * DISPLAY_SPACE_RES.x) / 100.0f,
+			(screenPos.y * DISPLAY_SPACE_RES.y) / 100.0f);
+
+		auto pos = g_Renderer.GetRay(realScreenPos);
+
+		auto origin = GameVector(pos.first, Camera.pos.RoomNumber);
+		auto target = GameVector(pos.second, Camera.pos.RoomNumber);
+
+		LOS(&origin, &target);
+		return std::pair<GameVector, GameVector>(origin, target);
+	}
+
+
 	/// Determine if there is a clear line of sight between two positions.
 	// NOTE: Limited to room geometry. Objects are ignored.
 	// @function HasLineOfSight()
@@ -85,6 +104,41 @@ namespace TEN::Scripting::Util
 		return Vec2(
 			(displayPos->x / DISPLAY_SPACE_RES.x) * 100,
 			(displayPos->y / DISPLAY_SPACE_RES.y) * 100);
+	}
+
+	/// Pick a moveable by the given display position.
+	// @function PickMoveableByDisplayPosition
+	// @tparam Vec2 Display space position in percent.
+	// @treturn Objects.Moveable Picked moveable (nil if no moveable was found under the cursor).
+	static sol::optional <std::unique_ptr<Moveable>> PickMoveable(const Vec2& screenPos)
+	{
+		auto ray = GetRayFrom2DPosition(screenPos);
+
+		auto vector = Vector3i::Zero;
+		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, nullptr, GAME_OBJECT_ID::ID_LARA);
+
+		if (itemNumber == NO_LOS_ITEM || itemNumber < 0)
+			return sol::nullopt;
+
+		return std::make_unique<Moveable>(itemNumber);
+	}
+
+	/// Pick a static mesh by the given display position.
+	// @function PickStaticByDisplayPosition
+	// @tparam Vec2 Display space position in percent.
+	// @treturn Objects.Static Picked static mesh (nil if no static mesh was found under the cursor).
+	static sol::optional <std::unique_ptr<Static>> PickStatic(const Vec2& screenPos)
+	{
+		auto ray = GetRayFrom2DPosition(screenPos);
+
+		MESH_INFO* mesh = nullptr;
+		auto vector = Vector3i::Zero;
+		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, &mesh, GAME_OBJECT_ID::ID_LARA);
+
+		if (itemNumber == NO_LOS_ITEM || itemNumber >= 0)
+			return sol::nullopt;
+
+		return std::make_unique<Static>(*mesh);
 	}
 
 	/// Translate a pair display position coordinates to pixel coordinates.
@@ -162,6 +216,8 @@ namespace TEN::Scripting::Util
 		tableUtil.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 		tableUtil.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
 		tableUtil.set_function(ScriptReserved_GetDisplayPosition, &GetDisplayPosition);
+		tableUtil.set_function(ScriptReserved_PickMoveable, &PickMoveable);
+		tableUtil.set_function(ScriptReserved_PickStatic, &PickStatic);
 		tableUtil.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		tableUtil.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);

@@ -553,6 +553,18 @@ namespace TEN::Renderer
 		return TEN::Utils::ConvertNDCTo2DPosition(Vector2(point));
 	}
 
+	std::pair<Vector3, Vector3> Renderer11::GetRay(const Vector2& pos) const
+	{
+		auto screenRes = GetScreenResolution();
+		const Vector2 factor = Vector2(screenRes.x / DISPLAY_SPACE_RES.x, screenRes.y / DISPLAY_SPACE_RES.y);
+
+		auto pos2D = factor * pos;
+		auto nearPoint = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 0.0f), gameCamera.Camera.Projection, gameCamera.Camera.View, Matrix::Identity);
+		auto farPoint  = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), gameCamera.Camera.Projection, gameCamera.Camera.View, Matrix::Identity);
+
+		return std::pair<Vector3, Vector3>(nearPoint, farPoint);
+	}
+
 	Vector3 Renderer11::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
 	{
 		auto* rendererItem = &m_items[itemNumber];

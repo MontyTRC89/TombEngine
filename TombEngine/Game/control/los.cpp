@@ -644,19 +644,22 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 
 		auto pose = Pose::Zero;
 
-		for (int m = 0; m < room->mesh.size(); m++)
+		if (mesh)
 		{
-			auto* meshp = &room->mesh[m];
-
-			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
+			for (int m = 0; m < room->mesh.size(); m++)
 			{
-				auto bounds = GetBoundsAccurate(*meshp, false);
-				pose = Pose(meshp->pos.Position, EulerAngles(0, meshp->pos.Orientation.y, 0));
+				auto* meshp = &room->mesh[m];
 
-				if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp->staticNumber))
+				if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
 				{
-					*mesh = meshp;
-					target->RoomNumber = LosRooms[r];
+					auto bounds = GetBoundsAccurate(*meshp, false);
+					pose = Pose(meshp->pos.Position, EulerAngles(0, meshp->pos.Orientation.y, 0));
+
+					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp->staticNumber))
+					{
+						*mesh = meshp;
+						target->RoomNumber = LosRooms[r];
+					}
 				}
 			}
 		}

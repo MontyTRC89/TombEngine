@@ -759,9 +759,10 @@ namespace TEN::Renderer
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
 
-		Vector2i			   GetScreenResolution() const;
-		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
-		Vector3				   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+		Vector2i					GetScreenResolution() const;
+		std::optional<Vector2>		Get2DPosition(const Vector3& pos) const;
+		std::pair<Vector3, Vector3> GetRay(const Vector2& pos) const;
+		Vector3						GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 							  int priority, BLEND_MODES blendMode, const Vector2& aspectCorrection, RenderView& renderView);
