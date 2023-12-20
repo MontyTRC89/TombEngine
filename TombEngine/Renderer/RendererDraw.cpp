@@ -1339,7 +1339,7 @@ namespace TEN::Renderer
 		CalculateFrameRate();
 	}
 
-	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view)
+	void Renderer::RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view)
 	{
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -1572,23 +1572,30 @@ namespace TEN::Renderer
 		// Draw 3D debug lines and trianges.
 		DrawLines3D(view);
 		DrawTriangles3D(view);
+
+		// Draw HUD.
+		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		g_Hud.Draw(*LaraItem);
 		
 		_doingFullscreenPass = true;
 
 		// Apply antialiasing.
-		switch (g_Configuration.AntialiasingMode)
+		if (doAntialiasing)
 		{
-		case AntialiasingMode::None:
-			break;
+			switch (g_Configuration.AntialiasingMode)
+			{
+			case AntialiasingMode::None:
+				break;
 
-		case AntialiasingMode::Low:
-			ApplyFXAA(&_renderTarget, view);
-			break;
+			case AntialiasingMode::Low:
+				ApplyFXAA(&_renderTarget, view);
+				break;
 
-		case AntialiasingMode::Medium:
-		case AntialiasingMode::High:
-			ApplySMAA(&_renderTarget, view);
-			break;
+			case AntialiasingMode::Medium:
+			case AntialiasingMode::High:
+				ApplySMAA(&_renderTarget, view);
+				break;
+			}
 		}
 
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
@@ -1598,9 +1605,6 @@ namespace TEN::Renderer
 
 		// Draw 2D debug lines.
 		DrawLines2D();
-
-		// Draw HUD.
-		g_Hud.Draw(*LaraItem);
 
 		// Draw display sprites sorted by priority.
 		CollectDisplaySprites(view);
@@ -1877,7 +1881,7 @@ namespace TEN::Renderer
 
 	void Renderer::DumpGameScene()
 	{
-		RenderScene(&_dumpScreenRenderTarget, _gameCamera);
+		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
 	}
 
 	void Renderer::DrawItems(RenderView& view, RendererPass rendererPass)
@@ -2469,7 +2473,7 @@ namespace TEN::Renderer
 	void Renderer::Render()
 	{
 		//RenderToCubemap(reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
-		RenderScene(&_backBuffer, _gameCamera);
+		RenderScene(&_backBuffer, true, _gameCamera);
 		_context->ClearState();
 		_swapChain->Present(1, 0);
 	}

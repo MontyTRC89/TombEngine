@@ -116,4 +116,33 @@ namespace TEN::Renderer
 	{
 		_postProcessTint = tint;
 	}
+
+	void Renderer::CopyRenderTarget(RenderTarget2D* source, RenderTarget2D* dest, RenderView& view)
+	{
+		SetBlendMode(BlendMode::Opaque, true);
+		SetCullMode(CullMode::CounterClockwise, true);
+		SetDepthState(DepthState::Write, true);
+		_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
+
+		// Common vertex shader to all fullscreen effects
+		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
+
+		// We draw a fullscreen triangle
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
+
+		UINT stride = sizeof(PostProcessVertex);
+		UINT offset = 0;
+
+		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+
+		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		_context->ClearRenderTargetView(dest->RenderTargetView.Get(), clearColor);
+		_context->OMSetRenderTargets(1, dest->RenderTargetView.GetAddressOf(), nullptr);
+
+		_context->PSSetShader(_psPostProcessCopy.Get(), nullptr, 0);
+		BindRenderTargetAsTexture(TextureRegister::ColorMap, source, SamplerStateRegister::PointWrap);
+		DrawTriangles(3, 0);
+	}
 }

@@ -486,6 +486,7 @@ namespace TEN::Renderer
 		void ResetScissor();
 		void ResetDebugVariables();
 		float CalculateFrameRate();
+		void CopyRenderTarget(RenderTarget2D* source, RenderTarget2D* dest, RenderView& view);
 
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 					 Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
@@ -578,7 +579,7 @@ namespace TEN::Renderer
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();
 		void RenderInventory();
-		void RenderScene(RenderTarget2D* renderTarget, RenderView& view);
+		void RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view);
 		void ClearScene();
 		void SaveScreenshot();
 		void PrintDebugMessage(LPCSTR message, ...);

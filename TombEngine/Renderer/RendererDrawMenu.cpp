@@ -713,12 +713,6 @@ namespace TEN::Renderer
 		constexpr auto COUNT_STRING_INF	   = "Inf";
 		constexpr auto COUNT_STRING_OFFSET = Vector2(DISPLAY_SPACE_RES.x / 40, 0.0f);
 
-		// Clear only Z-buffer to draw on top of the scene.
-		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-		// Bind and clear render target
-		_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
-
 		// Draw display pickup.
 		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
 
@@ -954,16 +948,16 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::CounterClockwise, true);
 
 		// Bind and clear render target
-		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), renderTarget->DepthStencilView.Get());
+		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 		_context->RSSetViewports(1, &_viewport);
 		ResetScissor();
 
 		if (background != nullptr)
 		{
-			DrawFullScreenImage(background->ShaderResourceView.Get(), 0.5f, renderTarget->RenderTargetView.Get(), renderTarget->DepthStencilView.Get());
+			DrawFullScreenImage(background->ShaderResourceView.Get(), 0.5f, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
 		}
 
-		_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
@@ -1040,6 +1034,25 @@ namespace TEN::Renderer
 				break;
 			}
 		}
+
+		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+		switch (g_Configuration.AntialiasingMode)
+		{
+		case AntialiasingMode::None:
+			break;
+
+		case AntialiasingMode::Low:
+			ApplyFXAA(&_renderTarget, _gameCamera);
+			break;
+
+		case AntialiasingMode::Medium:
+		case AntialiasingMode::High:
+			ApplySMAA(&_renderTarget, _gameCamera);
+			break;
+		}
+
+		CopyRenderTarget(&_renderTarget, renderTarget, _gameCamera);
 	}
 
 	void Renderer::SetLoadingScreen(std::wstring& fileName)
@@ -1095,7 +1108,7 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
-		RenderScene(&_backBuffer, _gameCamera);
+		RenderScene(&_backBuffer, false, _gameCamera);
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		RenderInventoryScene(&_backBuffer, nullptr);
