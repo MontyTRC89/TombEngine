@@ -300,75 +300,82 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 	return true;
 }
 
-void TestForObjectOnLedge(const ItemInfo* item, CollisionInfo* coll)
+bool TestForObjectOnLedge(const ItemInfo& item, const CollisionInfo& coll)
 {
-	int height = GameBoundingBox(item).GetHeight();
+	constexpr auto PASS_COUNT = 3;
 
-	for (int i = 0; i < 3; i++)
+	// Calculate ray origins.
+	int down = -coll.Setup.Height + CLICK(1);
+	auto origins = std::array<Vector3, PASS_COUNT>
 	{
-		auto sinHeading = (i != 1) ? (phd_sin(coll->Setup.ForwardAngle + ANGLE((i * 90.0f) - 90.0f))) : 0;
-		auto cosHeading = (i != 1) ? (phd_cos(coll->Setup.ForwardAngle + ANGLE((i * 90.0f) - 90.0f))) : 0;
+		Geometry::TranslatePoint(item.Pose.Position.ToVector3(), coll.Setup.ForwardAngle, 0.0f, down, -coll.Setup.Radius),
+		Geometry::TranslatePoint(item.Pose.Position.ToVector3(), coll.Setup.ForwardAngle, 0.0f, down, 0.0f),
+		Geometry::TranslatePoint(item.Pose.Position.ToVector3(), coll.Setup.ForwardAngle, 0.0f, down, coll.Setup.Radius)
+	};
 
-		auto origin = Vector3(
-			item->Pose.Position.x + (sinHeading * (coll->Setup.Radius)),
-			item->Pose.Position.y - (height + CLICK(1)),
-			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius)));
-		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
-		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
+	//for (const auto& origin : origins)
+	//	g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
 
-		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
+	// Calculate ray direction.
+	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(coll.Setup.ForwardAngle));
+	auto dir = (Matrix::CreateTranslation(Vector3::UnitZ) * rotMatrix).Translation();
 
-		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+	// Run through neighbor rooms.
+	const auto& room = g_Level.Rooms[item.RoomNumber];
+	for (int roomNumber : room.neighbors)
+	{
+		const auto& neighborRoom = g_Level.Rooms[roomNumber];
+		if (!neighborRoom.Active())
+			continue;
+
+		// 1) Test item collision.
+		int collidedItemNumber = neighborRoom.itemNumber;
+		while (collidedItemNumber != NO_ITEM)
 		{
-			if (!g_Level.Rooms[i].Active())
-				continue;
+			const auto& collidedItem = g_Level.Items[collidedItemNumber];
+			const auto& collidedObject = Objects[collidedItem.ObjectNumber];
 
-			int itemNumber = g_Level.Rooms[i].itemNumber;
-			while (itemNumber != NO_ITEM)
+			if (collidedObject.intelligent || collidedObject.isPickup || collidedObject.collision == nullptr ||
+				!collidedItem.Collidable || collidedItem.Status == ITEM_INVISIBLE)
 			{
-				auto* item2 = &g_Level.Items[itemNumber];
-				auto* object = &Objects[item2->ObjectNumber];
-
-				if (object->isPickup || object->collision == nullptr || !item2->Collidable || item2->Status == ITEM_INVISIBLE)
-				{
-					itemNumber = item2->NextItem;
-					continue;
-				}
-
-				if (Vector3i::Distance(item->Pose.Position, item2->Pose.Position) < COLLISION_CHECK_DISTANCE)
-				{
-					auto box = GameBoundingBox(item2).ToBoundingOrientedBox(item2->Pose);
-					float distance;
-
-					if (box.Intersects(origin, direction, distance) && distance < (coll->Setup.Radius * 2))
-					{
-						coll->HitStatic = true;
-						return;
-					}
-				}
-
-				itemNumber = item2->NextItem;
+				collidedItemNumber = collidedItem.NextItem;
+				continue;
 			}
 
-			for (auto& mesh : g_Level.Rooms[i].mesh)
+			if (Vector3i::Distance(item.Pose.Position, collidedItem.Pose.Position) < COLLISION_CHECK_DISTANCE)
 			{
-				if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
-					continue;
-
-				if (Vector3i::Distance(item->Pose.Position, mesh.pos.Position) < COLLISION_CHECK_DISTANCE)
+				auto box = GameBoundingBox(&collidedItem).ToBoundingOrientedBox(collidedItem.Pose);
+				for (const auto& origin : origins)
 				{
-					const auto& bBox = GetBoundsAccurate(mesh, false).ToBoundingOrientedBox(mesh.pos);
-					float distance;
+					float dist = 0.0f;
+					if (box.Intersects(origin, dir, dist) && dist < (coll.Setup.Radius * 2))
+						return true;
+				}
+			}
 
-					if (bBox.Intersects(origin, direction, distance) && distance < (coll->Setup.Radius * 2))
-					{
-						coll->HitStatic = true;
-						return;
-					}
+			collidedItemNumber = collidedItem.NextItem;
+		}
+
+		// 2) Test static collision.
+		for (auto& staticObject : neighborRoom.mesh)
+		{
+			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			if (Vector3i::Distance(item.Pose.Position, staticObject.pos.Position) < COLLISION_CHECK_DISTANCE)
+			{
+				const auto& box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+				for (const auto& origin : origins)
+				{
+					float dist = 0.0f;
+					if (box.Intersects(origin, dir, dist) && dist < (coll.Setup.Radius * 2))
+						return true;
 				}
 			}
 		}
 	}
+
+	return false;
 }
 
 bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)

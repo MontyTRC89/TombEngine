@@ -1145,8 +1145,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 3) Test for object blocking ledge.
-		TestForObjectOnLedge(&item, &coll);
-		if (coll.HitStatic)
+		if (TestForObjectOnLedge(item, coll))
 			return false;
 
 		// 4) Test ledge floor-to-edge height.
