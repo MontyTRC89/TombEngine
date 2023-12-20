@@ -1314,8 +1314,8 @@ namespace TEN::Entities::Player
 																					 const EdgeVaultClimbSetupData& setup,
 																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SWAMP_DEPTH_MAX				  = -CLICK(3);
-		constexpr auto LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX = CLICK(0.5f);
+		constexpr auto SWAMP_DEPTH_MAX			  = -CLICK(3);
+		constexpr auto REL_FLOOR_HEIGHT_THRESHOLD = CLICK(0.5f);
 
 		// HACK: Offset required for proper bridge surface height detection. Floordata should be revised for proper handling.
 		constexpr auto PROBE_POINT_OFFSET = Vector3(0.0f, -CLICK(1), 0.0f);
@@ -1376,10 +1376,13 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
+			int relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollBack.Position.Floor;
+			int relPlayerFloorHeight = abs(item.Pose.Position.y - (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Proximity.Intersection.y));
+
 			// 2.6) Test if relative edge height is within edge intersection bounds.
-			int relEdgeHeight = (setup.TestEdgeFront ? attracColl.Proximity.Intersection.y : pointCollBack.Position.Floor) - item.Pose.Position.y;
-			if (relEdgeHeight >= setup.LowerEdgeBound || // Player-to-edge height is within lower edge bound.
-				relEdgeHeight < setup.UpperEdgeBound)	 // Player-to-edge height is within upper edge bound.
+			if (relEdgeHeight >= setup.LowerEdgeBound ||		   // Floor-to-edge height is within lower edge bound.
+				relEdgeHeight < setup.UpperEdgeBound ||			   // Floor-to-edge height is within upper edge bound.
+				relPlayerFloorHeight > REL_FLOOR_HEIGHT_THRESHOLD) // Player-to-floor height is within threshold.
 			{
 				continue;
 			}
@@ -1407,31 +1410,12 @@ namespace TEN::Entities::Player
 					continue;
 				}
 
-				// TODO: Not great. Should consider detal segmetn angles and connecting attractors.
+				// TODO: Check.
 				// 2.9) Test ledge floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
-					// Test center.
 					int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - ledgePointColl.Position.Floor);
-					if (ledgeFloorToEdgeHeight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
-						continue;
-
-					auto pointCollFrontLeft = GetCollision(
-						Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
-						attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y, -coll.Setup.Radius);
-
-					// Test left.
-					int ledgeFloorToEdgeHeightLeft = abs(attracColl.Proximity.Intersection.y - pointCollFrontLeft.Position.Floor);
-					if (ledgeFloorToEdgeHeightLeft > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
-						continue;
-
-					auto pointCollFrontRight = GetCollision(
-						Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
-						attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y, coll.Setup.Radius);
-
-					// Test right.
-					int ledgeFloorToEdgeHeightRight = abs(attracColl.Proximity.Intersection.y - pointCollFrontRight.Position.Floor);
-					if (ledgeFloorToEdgeHeightRight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
+					if (ledgeFloorToEdgeHeight > REL_FLOOR_HEIGHT_THRESHOLD)
 						continue;
 				}
 
