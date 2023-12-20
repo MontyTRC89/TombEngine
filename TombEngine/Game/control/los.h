@@ -11,3 +11,4 @@ int	 ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_IN
 bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push);
 
 std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid);
+std::pair<GameVector, GameVector> GetRayFrom2DPosition(Vector2 screenPos);

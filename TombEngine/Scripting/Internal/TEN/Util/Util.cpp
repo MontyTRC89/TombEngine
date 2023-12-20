@@ -26,23 +26,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Scripting::Util
 {
-	// Internal function for getting clipped ray for 2D ray tests
-	static std::pair<GameVector, GameVector> GetRayFrom2DPosition(Vector2 screenPos)
-	{
-		auto realScreenPos = Vector2(
-			(screenPos.x * DISPLAY_SPACE_RES.x) / 100.0f,
-			(screenPos.y * DISPLAY_SPACE_RES.y) / 100.0f);
-
-		auto pos = g_Renderer.GetRay(realScreenPos);
-
-		auto origin = GameVector(pos.first, Camera.pos.RoomNumber);
-		auto target = GameVector(pos.second, Camera.pos.RoomNumber);
-
-		LOS(&origin, &target);
-		return std::pair<GameVector, GameVector>(origin, target);
-	}
-
-
 	/// Determine if there is a clear line of sight between two positions.
 	// NOTE: Limited to room geometry. Objects are ignored.
 	// @function HasLineOfSight()
