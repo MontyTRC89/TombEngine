@@ -44,11 +44,6 @@ namespace TEN::Entities::Player
 		Ptr->AttachPlayer(playerItem);
 	}
 
-	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist)
-	{
-		Attach(playerItem, attrac, chainDist, Vector3::Zero, EulerAngles::Zero, Vector3::Zero, EulerAngles::Zero);
-	}
-
 	void PlayerAttractorData::Detach(ItemInfo& playerItem)
 	{
 		if (Ptr == nullptr)
