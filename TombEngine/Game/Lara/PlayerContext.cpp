@@ -1438,16 +1438,19 @@ namespace TEN::Entities::Player
 			// 2.12) Track highest or return lowest attractor collision.
 			if (setup.FindHighest)
 			{
+				if (highestAttracCollPtr == nullptr)
+				{
+					highestAttracCollPtr = &attracColl;
+					continue;
+				}
+
 				if (attracColl.Proximity.Intersection.y < highestAttracCollPtr->Proximity.Intersection.y)
 				{
 					// Ensure attractors are stacked exactly.
-					if (highestAttracCollPtr != nullptr)
-					{
-						auto highest2DIntersect = Vector2(highestAttracCollPtr->Proximity.Intersection.x, highestAttracCollPtr->Proximity.Intersection.z);
-						auto current2DIntersect = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
-						if (Vector2::DistanceSquared(highest2DIntersect, current2DIntersect) > EPSILON)
-							continue;
-					}
+					auto highest2DIntersect = Vector2(highestAttracCollPtr->Proximity.Intersection.x, highestAttracCollPtr->Proximity.Intersection.z);
+					auto current2DIntersect = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
+					if (Vector2::DistanceSquared(highest2DIntersect, current2DIntersect) > EPSILON)
+						continue;
 
 					highestAttracCollPtr = &attracColl;
 				}
