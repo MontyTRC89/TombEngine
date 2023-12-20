@@ -943,6 +943,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::None;
+	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 

@@ -537,9 +537,11 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Assess player status.
-		if (player.Control.WaterStatus != WaterStatus::Wade &&			  // Player is wading.
-			(player.Control.HandStatus == HandStatus::Free ||			  // Player hands are free.
-				!IsStandingWeapon(&item, player.Control.Weapon.GunType))) // OR player is wielding a non-standing weapon.
+		if (player.Control.WaterStatus != WaterStatus::Wade && // Player is wading.
+			!((player.Control.HandStatus == HandStatus::WeaponReady ||
+				player.Control.HandStatus == HandStatus::WeaponDraw ||
+				player.Control.HandStatus == HandStatus::WeaponUndraw) &&
+				IsStandingWeapon(&item, player.Control.Weapon.GunType))) // OR player is wielding a non-standing weapon.
 		{
 			return true;
 		}

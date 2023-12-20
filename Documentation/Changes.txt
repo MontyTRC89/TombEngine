@@ -3,32 +3,36 @@ Version 1.3
 
 * Fix crash if title logo is removed from Textures folder.
 * Fix crash if unknown player state ID is encountered.
-* Fix bug with OCB 2 on pushables.
-* Fix miscellaneous pushable bugs.
+* Fix bug with OCB 2 on pushables, and some other pushable bugs.
 * Fix pushable camera bug during edge slip.
+* Fix lever switch turn off alignment animation. 
 * Fix lack of water splash in certain scenarios.
 * Fix hydra flame not showing when charging.
 * Fix shockwave light for hammer god.
-* FIx camera shaking whilst in quicksand in some cases.
+* FIx camera shaking in some cases when the player is in quicksand room.
 * Fix certain flame emitter OCBs emitting fire in wrong directions.
-* FIx Lara not being able to pickup a torch whilst crouching.
+* Fix player not being able to pick up a torch when crouching.
+* Fix jittery camera when performing crawl-to-hang.
+* Fix Lara not being able to crawl if two-handed weapon (Shotgun, HK etc) is currently equipped.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Improve fly cheat collision.
 * Add global events.
 * Add fast speed for fly cheat by holding Sprint input action.
-* Allow walking on slopes when wading in water (similar to quicksand rooms).
-* Allow Lara to pull certain levers with both hands whilst holding a flare.
+* Allow walking on slopes when wading in water (similar to quicksand).
+* Allow player to pull certain levers with both hands when holding a flare.
 * Port twin auto gun from TR3.
-* Add speedometer for vehicles such as: motorbike, Jeep.
-* Accurately rotate display sprites around their pivot.
-* Slightly revise keyhole OCB to account for either keeping or losing the key:
-  - Positive OCB - play anim number and keep key in inventory.
-  - Negative OCB - play anim number and loose key in inventory.
-  - OCB 0 - play default animation and loose the key in inventory
+* Add speedometer to vehicles.
+* Accurately rotate display sprites around the pivot defined by the align mode.
+* Revise keyhole OCBs to account for keeping or losing keys:
+  - Positive OCB: play anim number and keep key.
+  - Negative OCB: play anim number and lose key.
+  - OCB 0 - play default animation and lose key.
 
 Lua API changes:
 * Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
 * Add Moveable:SetStatus() to set the current status of the moveable.
+* Add View:GetCameraPosition(), View:GetCameraTarget() and View:GetCameraRoom() functions.
+* Add Room:GetColor() to get room's ambient light color.
 
 Version 1.2
 ===========
