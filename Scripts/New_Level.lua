@@ -12,7 +12,7 @@ LevelFuncs.OnSave = function() end
 
 -- Called on every frame of the game
 -- dt stands for "delta time", and holds the time in seconds since the last call to OnControlPhase
-LevelFuncs.OnControlPhase = function(dt) end
+LevelFuncs.OnLoop = function(dt) end
 
 -- Called when level is ended, either after leveljump, quitting to title or loading game
 LevelFuncs.OnEnd = function() end
