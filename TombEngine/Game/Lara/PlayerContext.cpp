@@ -1119,7 +1119,7 @@ namespace TEN::Entities::Player
 
 	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setup)
 	{
-		constexpr auto LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX = CLICK(0.5f);
+		constexpr auto REL_FLOOR_HEIGHT_THRESHOLD = CLICK(0.5f);
 
 		const auto& player = GetLaraInfo(item);
 
@@ -1151,7 +1151,7 @@ namespace TEN::Entities::Player
 
 		// 4) Test ledge floor-to-edge height.
 		int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor);
-		if (ledgeFloorToEdgeHeight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
+		if (ledgeFloorToEdgeHeight > REL_FLOOR_HEIGHT_THRESHOLD)
 			return false;
 		
 		// 5) Test ledge floor-to-ceiling height.
@@ -1376,13 +1376,14 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
-			int relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollBack.Position.Floor;
+			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
+			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? item.Pose.Position.y : pointCollBack.Position.Floor);
 			int relPlayerFloorHeight = abs(item.Pose.Position.y - (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Proximity.Intersection.y));
 
 			// 2.6) Test if relative edge height is within edge intersection bounds.
-			if (relEdgeHeight >= setup.LowerEdgeBound ||		   // Floor-to-edge height is within lower edge bound.
-				relEdgeHeight < setup.UpperEdgeBound ||			   // Floor-to-edge height is within upper edge bound.
-				relPlayerFloorHeight > REL_FLOOR_HEIGHT_THRESHOLD) // Player-to-floor height is within threshold.
+			if (relEdgeHeight >= setup.LowerEdgeBound ||
+				relEdgeHeight < setup.UpperEdgeBound ||
+				(relPlayerFloorHeight > REL_FLOOR_HEIGHT_THRESHOLD && !isTreadingWater))
 			{
 				continue;
 			}
@@ -1410,7 +1411,6 @@ namespace TEN::Entities::Player
 					continue;
 				}
 
-				// TODO: Check.
 				// 2.9) Test ledge floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
