@@ -198,7 +198,7 @@ namespace TEN::Entities::Player
 
 		// Calculate target orientation.
 		auto targetOrient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.Intersection, edgeAttracColls->Right.Proximity.Intersection);
-		targetOrient.y -= ANGLE(90.0f);
+		targetOrient = EulerAngles(0, targetOrient.y - ANGLE(90.0f), 0);
 
 		// Calculate target position.
 		auto targetPos = edgeAttracColls->Center.Proximity.Intersection;

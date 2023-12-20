@@ -1407,11 +1407,31 @@ namespace TEN::Entities::Player
 					continue;
 				}
 
+				// TODO: Not great. Should consider detal segmetn angles and connecting attractors.
 				// 2.9) Test ledge floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
+					// Test center.
 					int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - ledgePointColl.Position.Floor);
 					if (ledgeFloorToEdgeHeight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
+						continue;
+
+					auto pointCollFrontLeft = GetCollision(
+						Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
+						attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y, -coll.Setup.Radius);
+
+					// Test left.
+					int ledgeFloorToEdgeHeightLeft = abs(attracColl.Proximity.Intersection.y - pointCollFrontLeft.Position.Floor);
+					if (ledgeFloorToEdgeHeightLeft > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
+						continue;
+
+					auto pointCollFrontRight = GetCollision(
+						Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
+						attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y, coll.Setup.Radius);
+
+					// Test right.
+					int ledgeFloorToEdgeHeightRight = abs(attracColl.Proximity.Intersection.y - pointCollFrontRight.Position.Floor);
+					if (ledgeFloorToEdgeHeightRight > LEDGE_FLOOR_TO_EDGE_HEIGHT_MAX)
 						continue;
 				}
 
