@@ -1329,7 +1329,6 @@ namespace TEN::Entities::Player
 		}
 
 		const AttractorCollisionData* highestAttracCollPtr = nullptr;
-		float highestDist3D = 0.0f;
 
 		// 2) Assess attractor collision.
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
@@ -1375,6 +1374,7 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
+			// TODO: Simplify! Trash! Bad!
 			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
 			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? item.Pose.Position.y : pointCollBack.Position.Floor);
 			int relPlayerFloorHeight = abs(item.Pose.Position.y - (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Proximity.Intersection.y));
@@ -1397,24 +1397,24 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
-			// Test ledge space (if applicable).
-			if (setup.TestLedgeSpace)
+			// Test destination space (if applicable).
+			if (setup.TestDestSpace)
 			{
-				const auto& ledgePointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
+				const auto& destPointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
 
-				// 2.8) Test ledge floor-to-ceiling height.
-				int ledgeFloorToCeilHeight = abs(ledgePointColl.Position.Ceiling - ledgePointColl.Position.Floor);
-				if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
-					ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
+				// 2.8) Test destination floor-to-ceiling height.
+				int destFloorToCeilHeight = abs(destPointColl.Position.Ceiling - destPointColl.Position.Floor);
+				if (destFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
+					destFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
 				{
 					continue;
 				}
 
-				// 2.9) Test ledge floor-to-edge height if approaching from front.
+				// 2.9) Test destination floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
-					int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - ledgePointColl.Position.Floor);
-					if (ledgeFloorToEdgeHeight > REL_FLOOR_HEIGHT_THRESHOLD)
+					int destFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - destPointColl.Position.Floor);
+					if (destFloorToEdgeHeight > REL_FLOOR_HEIGHT_THRESHOLD)
 						continue;
 				}
 
@@ -1428,8 +1428,8 @@ namespace TEN::Entities::Player
 					continue;
 			}
 
-			// 2.11) Test for illegal slope on ledge (if applicable).
-			if (setup.TestLedgeIllegalSlope)
+			// 2.11) Test for illegal slope at destination (if applicable).
+			if (setup.TestDestIllegalSlope)
 			{
 				if (setup.TestEdgeFront ? pointCollFront.Position.FloorSlope : pointCollBack.Position.FloorSlope)
 					continue;
@@ -1438,10 +1438,18 @@ namespace TEN::Entities::Player
 			// 2.12) Track highest or return lowest attractor collision.
 			if (setup.FindHighest)
 			{
-				if (attracColl.Proximity.Distance3D > highestDist3D)
+				if (attracColl.Proximity.Intersection.y < highestAttracCollPtr->Proximity.Intersection.y)
 				{
+					// Ensure attractors are stacked exactly.
+					if (highestAttracCollPtr != nullptr)
+					{
+						auto highest2DIntersect = Vector2(highestAttracCollPtr->Proximity.Intersection.x, highestAttracCollPtr->Proximity.Intersection.z);
+						auto current2DIntersect = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
+						if (Vector2::DistanceSquared(highest2DIntersect, current2DIntersect) > EPSILON)
+							continue;
+					}
+
 					highestAttracCollPtr = &attracColl;
-					highestDist3D = attracColl.Proximity.Distance3D;
 				}
 			}
 			else

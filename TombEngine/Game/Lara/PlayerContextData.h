@@ -50,11 +50,11 @@ namespace TEN::Entities::Player
 		int LedgeFloorToCeilHeightMax = 0;
 		int LowerEdgeToCeilBound	  = 0;
 
-		bool FindHighest		   = false;
-		bool TestSwampDepth		   = false;
-		bool TestEdgeFront		   = false;
-		bool TestLedgeSpace		   = false;
-		bool TestLedgeIllegalSlope = false;
+		bool FindHighest		  = false;
+		bool TestSwampDepth		  = false;
+		bool TestEdgeFront		  = false;
+		bool TestDestSpace		  = false;
+		bool TestDestIllegalSlope = false;
 	};
 
 	struct EdgeHangClimbSetupData
