@@ -47,6 +47,9 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostLoad, CallbackPoint::PostLoad },
 	{ ScriptReserved_PreLoop, CallbackPoint::PreLoop },
 	{ ScriptReserved_PostLoop, CallbackPoint::PostLoop },
+	{ ScriptReserved_PreControlPhase, CallbackPoint::PreLoop },    // DEPRECATED
+	{ ScriptReserved_PostControlPhase, CallbackPoint::PostLoop },  // DEPRECATED
+	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
 	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
 	{ ScriptReserved_PreSave, CallbackPoint::PreSave },
 	{ ScriptReserved_PreEnd, CallbackPoint::PreEnd },
