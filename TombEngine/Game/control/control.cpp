@@ -550,7 +550,7 @@ GameStatus DoGameLoop(int levelIndex)
 
 	while (DoTheGame)
 	{
-		result = ControlPhase(numFrames);
+		result = g_GameFlow->LastGameStatus = ControlPhase(numFrames);
 
 		if (!levelIndex)
 		{
