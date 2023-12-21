@@ -555,12 +555,8 @@ namespace TEN::Renderer
 
 	std::pair<Vector3, Vector3> Renderer11::GetRay(const Vector2& pos) const
 	{
-		auto screenRes = GetScreenResolution();
-		auto factor = Vector2(screenRes.x / DISPLAY_SPACE_RES.x, screenRes.y / DISPLAY_SPACE_RES.y);
-
-		auto pos2D = factor * pos;
-		auto nearPoint = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 0.0f), gameCamera.Camera.Projection, gameCamera.Camera.View, Matrix::Identity);
-		auto farPoint  = m_viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), gameCamera.Camera.Projection, gameCamera.Camera.View, Matrix::Identity);
+		auto nearPoint = m_viewportToolkit.Unproject(Vector3(pos.x, pos.y, 0.0f), gameCamera.Camera.Projection, gameCamera.Camera.View, Matrix::Identity);
+		auto farPoint  = m_viewportToolkit.Unproject(Vector3(pos.x, pos.y, 1.0f), gameCamera.Camera.Projection, gameCamera.Camera.View, Matrix::Identity);
 
 		return std::pair<Vector3, Vector3>(nearPoint, farPoint);
 	}

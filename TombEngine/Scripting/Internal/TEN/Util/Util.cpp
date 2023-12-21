@@ -89,41 +89,6 @@ namespace TEN::Scripting::Util
 			(displayPos->y / DISPLAY_SPACE_RES.y) * 100);
 	}
 
-	/// Pick a moveable by the given display position.
-	// @function PickMoveableByDisplayPosition
-	// @tparam Vec2 Display space position in percent.
-	// @treturn Objects.Moveable Picked moveable (nil if no moveable was found under the cursor).
-	static sol::optional <std::unique_ptr<Moveable>> PickMoveable(const Vec2& screenPos)
-	{
-		auto ray = GetRayFrom2DPosition(screenPos);
-
-		auto vector = Vector3i::Zero;
-		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, nullptr, GAME_OBJECT_ID::ID_LARA);
-
-		if (itemNumber == NO_LOS_ITEM || itemNumber < 0)
-			return sol::nullopt;
-
-		return std::make_unique<Moveable>(itemNumber);
-	}
-
-	/// Pick a static mesh by the given display position.
-	// @function PickStaticByDisplayPosition
-	// @tparam Vec2 Display space position in percent.
-	// @treturn Objects.Static Picked static mesh (nil if no static mesh was found under the cursor).
-	static sol::optional <std::unique_ptr<Static>> PickStatic(const Vec2& screenPos)
-	{
-		auto ray = GetRayFrom2DPosition(screenPos);
-
-		MESH_INFO* mesh = nullptr;
-		auto vector = Vector3i::Zero;
-		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, &mesh, GAME_OBJECT_ID::ID_LARA);
-
-		if (itemNumber == NO_LOS_ITEM || itemNumber >= 0)
-			return sol::nullopt;
-
-		return std::make_unique<Static>(*mesh);
-	}
-
 	/// Translate a pair display position coordinates to pixel coordinates.
 	//To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.
 	//@function PercentToScreen
@@ -164,6 +129,43 @@ namespace TEN::Scripting::Util
 		float resX = x / fWidth * 100.0f;
 		float resY = y / fHeight * 100.0f;
 		return std::make_tuple(resX, resY);
+	}
+
+	/// Pick a moveable by the given display position.
+	// @function PickMoveableByDisplayPosition
+	// @tparam Vec2 Display space position in percent.
+	// @treturn Objects.Moveable Picked moveable (nil if no moveable was found under the cursor).
+	static sol::optional <std::unique_ptr<Moveable>> PickMoveable(const Vec2& screenPos)
+	{
+		auto realScreenPos = PercentToScreen(screenPos.x, screenPos.y);
+		auto ray = GetRayFrom2DPosition(Vector2(int(std::get<0>(realScreenPos)), int(std::get<1>(realScreenPos))));
+
+		auto vector = Vector3i::Zero;
+		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, nullptr, GAME_OBJECT_ID::ID_LARA);
+
+		if (itemNumber == NO_LOS_ITEM || itemNumber < 0)
+			return sol::nullopt;
+
+		return std::make_unique<Moveable>(itemNumber);
+	}
+
+	/// Pick a static mesh by the given display position.
+	// @function PickStaticByDisplayPosition
+	// @tparam Vec2 Display space position in percent.
+	// @treturn Objects.Static Picked static mesh (nil if no static mesh was found under the cursor).
+	static sol::optional <std::unique_ptr<Static>> PickStatic(const Vec2& screenPos)
+	{
+		auto realScreenPos = PercentToScreen(screenPos.x, screenPos.y);
+		auto ray = GetRayFrom2DPosition(Vector2(int(std::get<0>(realScreenPos)), int(std::get<1>(realScreenPos))));
+
+		MESH_INFO* mesh = nullptr;
+		auto vector = Vector3i::Zero;
+		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, &mesh, GAME_OBJECT_ID::ID_LARA);
+
+		if (itemNumber == NO_LOS_ITEM || itemNumber >= 0)
+			return sol::nullopt;
+
+		return std::make_unique<Static>(*mesh);
 	}
 
 	/// Write messages within the Log file
