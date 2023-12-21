@@ -9,11 +9,12 @@ Version 1.3
 * Fix lack of water splash in certain scenarios.
 * Fix hydra flame not showing when charging.
 * Fix shockwave light for hammer god.
-* FIx camera shaking in some cases when the player is in quicksand room.
+* Fix camera shaking in some cases when the player is in quicksand room.
 * Fix certain flame emitter OCBs emitting fire in wrong directions.
 * Fix player not being able to pick up a torch when crouching.
 * Fix jittery camera when performing crawl-to-hang.
-* Fix Lara not being able to crawl if two-handed weapon (Shotgun, HK etc) is currently equipped.
+* Fix several issues with limited pistol ammo.
+* Fix Lara not being able to crawl if two-handed weapon is currently equipped.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Improve fly cheat collision.
 * Add global events.

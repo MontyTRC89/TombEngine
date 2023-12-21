@@ -79,6 +79,8 @@ static constexpr char ScriptReserved_PreLoad[]			= "PRELOAD";
 static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
 static constexpr char ScriptReserved_PreLoop[]			= "PRELOOP";
 static constexpr char ScriptReserved_PostLoop[]			= "POSTLOOP";
+static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
+static constexpr char ScriptReserved_PostControlPhase[]	= "POSTCONTROLPHASE";
 
 // Event types
 static constexpr char ScriptReserved_EventOnEnter[]	= "ENTER";
