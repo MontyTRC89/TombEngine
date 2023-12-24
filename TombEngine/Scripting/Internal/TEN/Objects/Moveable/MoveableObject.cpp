@@ -16,7 +16,6 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableStatuses.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
@@ -426,13 +425,6 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
 	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
-
-	auto moveableEnumTable = sol::table(state.lua_state(), sol::create);
-	parent.set(ScriptReserved_MoveableEnum, moveableEnumTable);
-
-	// Register enums.
-	auto handler = LuaHandler(&state);
-	handler.MakeReadOnlyTable(moveableEnumTable, ScriptReserved_MoveableStatus, MOVEABLE_STATUSES);
 }
 
 void Moveable::Init()
