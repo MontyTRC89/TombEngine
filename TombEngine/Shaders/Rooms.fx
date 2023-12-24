@@ -182,12 +182,6 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	if (Caustics)
 	{
-		float3 position = input.WorldPosition.xyz;
-		
-		float fracX = position.x - floor(position.x / 2048.0f) * 2048.0f;
-		float fracY = position.y - floor(position.y / 2048.0f) * 2048.0f;
-		float fracZ = position.z - floor(position.z / 2048.0f) * 2048.0f;
-
 		float attenuation = saturate(dot(float3(0.0f, -1.0f, 0.0f), normal));
 
 		float3 blending = abs(normal);
@@ -195,12 +189,19 @@ PixelShaderOutput PS(PixelShaderInput input)
 		float b = (blending.x + blending.y + blending.z);
 		blending /= float3(b, b, b);
 
-		float3 p = float3(fracX, fracY, fracZ) / 2048.0f;
-		float3 xaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.y * CausticsScale.x, p.z * CausticsScale.y)).xyz;
-		float3 yaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.z * CausticsScale.y)).xyz;
-		float3 zaxis = CausticsTexture.Sample(CausticsTextureSampler, CausticsStartUV + float2(p.x * CausticsScale.x, p.y * CausticsScale.y)).xyz;
+		float3 p = frac(input.WorldPosition.xyz / 2048.0f); 
+		
+		float3 xaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, float2(p.z, p.y), 0).xyz;
+		float3 yaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, float2(p.z, p.x), 0).xyz;
+		float3 zaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, float2(p.y, p.x), 0).xyz;
 
-		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
+		float3 xc = xaxis * blending.x;
+		float3 yc = yaxis * blending.y;
+		float3 zc = zaxis * blending.z;
+
+		float3 caustics = xc + yc + zc;
+
+		lighting += (caustics * attenuation * 2.0f);
 	}
 
 	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);

@@ -136,6 +136,7 @@ struct LEVEL
 
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
+extern std::vector<int> SpriteSequencesIds;
 extern LEVEL g_Level;
 
 inline std::future<bool> LevelLoadTask;

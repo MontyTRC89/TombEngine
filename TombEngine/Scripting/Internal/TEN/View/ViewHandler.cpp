@@ -174,7 +174,7 @@ namespace TEN::Scripting::View
 		//@function GetCameraType
 		//@treturn View.CameraType value used by the Main Camera.
 		//@usage
-		//LevelFuncs.OnControlPhase = function() 
+		//LevelFuncs.OnLoop = function() 
 		//	if (View.GetCameraType() == CameraType.Combat) then
 		//		--Do your Actions here.
 		//	end

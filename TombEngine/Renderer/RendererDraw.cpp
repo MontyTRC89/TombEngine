@@ -2226,22 +2226,17 @@ namespace TEN::Renderer
 			// Bind vertex and index buffer.
 			_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
+			   
 			if (rendererPass != RendererPass::GBuffer)
 			{
 				// Bind caustics texture.
-				if (!_sprites.empty())
-				{
+				if (_causticTextures.size() > 0)
+				{     
 					int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
-					int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;
-					int causticsFrame = std::min(nmeshes ? meshIndex + ((GlobalCounter) % nmeshes) : meshIndex, (int)_sprites.size());
-					BindTexture(TextureRegister::CausticsMap, _sprites[causticsFrame].Texture, SamplerStateRegister::AnisotropicClamp);
-
-					// NOTE: Strange packing due to particular HLSL 16 bytes alignment requirements.
-					RendererSprite* causticsSprite = &_sprites[causticsFrame];
-					_stRoom.CausticsStartUV = causticsSprite->UV[0];
-					_stRoom.CausticsScale = Vector2(causticsSprite->Width / (float)causticsSprite->Texture->Width, causticsSprite->Height / (float)causticsSprite->Texture->Height);
-				}
+					int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;     
+					int causticsFrame = GlobalCounter % _causticTextures.size();
+					BindTexture(TextureRegister::CausticsMap, &_causticTextures[causticsFrame], SamplerStateRegister::AnisotropicClamp);
+				} 
 
 				// Set shadow map data and bind shadow map texture.
 				if (_shadowLight != nullptr)

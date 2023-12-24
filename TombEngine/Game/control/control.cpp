@@ -151,12 +151,12 @@ GameStatus ControlPhase(int numFrames)
 
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
-		// Controls are polled before OnControlPhase, so input data could be
+		// Controls are polled before OnLoop, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
 
-		// Handle loop functions and node events.
-		g_GameScript->OnControlPhase(DELTA_TIME);
+		// Pre-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
 		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
 		// Control lock is processed after handling scripts, because builder may want to
@@ -244,6 +244,9 @@ GameStatus ControlPhase(int numFrames)
 
 		PlaySoundSources();
 		DoFlipEffect(FlipEffect, LaraItem);
+
+		// Post-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, true);
 
 		// Clear savegame loaded flag.
 		JustLoaded = false;

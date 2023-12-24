@@ -364,6 +364,8 @@ namespace TEN::Renderer
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
 
+		std::vector<Texture2D> _causticTextures;
+
 		// Private functions
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);

@@ -851,25 +851,50 @@ namespace TEN::Renderer
 			sprite.Texture = &_spritesTextures[oldSprite->tile];
 			sprite.Width = (oldSprite->x2 - oldSprite->x1) * sprite.Texture->Width + 1;
 			sprite.Height = (oldSprite->y3 - oldSprite->y2) * sprite.Texture->Height + 1;
+			sprite.X = oldSprite->x1 * sprite.Texture->Width;
+			sprite.Y = oldSprite->y1 * sprite.Texture->Height;
 		}
 
-		for (int i = 0; i < MoveablesIds.size(); i++)
+		for (int i = 0; i < SpriteSequencesIds.size(); i++)
 		{
-			ObjectInfo *obj = &Objects[MoveablesIds[i]];
+			ObjectInfo *obj = &Objects[SpriteSequencesIds[i]];
 
 			if (obj->nmeshes < 0)
 			{
 				short numSprites = abs(obj->nmeshes);
 				short baseSprite = obj->meshIndex;
-				_spriteSequences[MoveablesIds[i]] = RendererSpriteSequence(MoveablesIds[i], numSprites);
-				RendererSpriteSequence &sequence = _spriteSequences[MoveablesIds[i]];
+				_spriteSequences[SpriteSequencesIds[i]] = RendererSpriteSequence();
 
+				// TODO: Why a custom =& operator is needed? It creates everytime new N null sprites
+				RendererSpriteSequence &sequence = _spriteSequences[SpriteSequencesIds[i]];
+
+				sequence.NumSprites = numSprites;
+				sequence.SpritesList.resize(numSprites);
 				for (int j = baseSprite; j < baseSprite + numSprites; j++)
 				{
 					sequence.SpritesList[j - baseSprite] = &_sprites[j];
 				}
 
-				_spriteSequences[MoveablesIds[i]] = sequence;
+				_spriteSequences[SpriteSequencesIds[i]] = sequence;
+
+				if (SpriteSequencesIds[i] == ID_CAUSTICS_TEXTURES)
+				{
+					_causticTextures.clear();
+					for (int j = 0; j < sequence.SpritesList.size(); j++)
+					{
+						_causticTextures.push_back(
+							Texture2D(
+								_device.Get(),
+								_context.Get(),
+								sequence.SpritesList[j]->Texture->Texture.Get(),
+								sequence.SpritesList[j]->X,
+								sequence.SpritesList[j]->Y,
+								sequence.SpritesList[j]->Width,
+								sequence.SpritesList[j]->Height
+							)
+						);
+					}
+				}
 			}
 		}
 

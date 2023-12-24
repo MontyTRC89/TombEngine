@@ -14,5 +14,7 @@ namespace TEN::Renderer::Structures
 		int Height;
 		Vector2 UV[4];
 		Texture2D* Texture;
+		int X;
+		int Y;
 	};
 }

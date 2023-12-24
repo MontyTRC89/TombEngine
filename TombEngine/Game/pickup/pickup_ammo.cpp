@@ -18,7 +18,7 @@ struct AmmoPickupInfo
 static constexpr std::array<AmmoPickupInfo, 14> kAmmo
 {
 	{
-		{ ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol, WeaponAmmoType::Ammo1, 0 },
+		{ ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol, WeaponAmmoType::Ammo1, 30 },
 		{ ID_UZI_AMMO_ITEM, LaraWeaponType::Uzi, WeaponAmmoType::Ammo1, 30 },
 		{ ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo1, 6 },
 		{ ID_SHOTGUN_AMMO2_ITEM, LaraWeaponType::Shotgun, WeaponAmmoType::Ammo2, 6 },

@@ -37,6 +37,7 @@ using namespace TEN::Input;
 char* LevelDataPtr;
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
+std::vector<int> SpriteSequencesIds;
 LEVEL g_Level;
 
 unsigned char ReadUInt8()
@@ -415,9 +416,6 @@ void LoadObjects()
 		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
 		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
-
-	// HACK: to remove after decompiling LoadSprites
-	MoveablesIds.push_back(ID_DEFAULT_SPRITES);
 }
 
 void LoadCameras()
@@ -892,6 +890,7 @@ void FreeLevel()
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
 	MoveablesIds.resize(0);
+	SpriteSequencesIds.resize(0);
 	g_Level.Boxes.resize(0);
 	g_Level.Overlaps.resize(0);
 	g_Level.Anims.resize(0);
@@ -1397,6 +1396,8 @@ void LoadSprites()
 			Objects[spriteID].nmeshes = negLength;
 			Objects[spriteID].meshIndex = offset;
 			Objects[spriteID].loaded = true;
+
+			SpriteSequencesIds.push_back(spriteID);
 		}
 	}
 }
