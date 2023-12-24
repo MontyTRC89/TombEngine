@@ -78,6 +78,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Control::Volumes;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -150,14 +151,13 @@ GameStatus ControlPhase(int numFrames)
 
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
 	{
-		// Controls are polled before OnControlPhase, so input data could be
+		// Controls are polled before OnLoop, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
 
-		// This might not be the exact amount of time that has passed, but giving it a
-		// value of 1/30 keeps it in lock-step with the rest of the game logic,
-		// which assumes 30 iterations per second.
-		g_GameScript->OnControlPhase(DELTA_TIME);
+		// Pre-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
+		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
@@ -166,12 +166,12 @@ GameStatus ControlPhase(int numFrames)
 
 		// Handle inventory / pause / load / save screens.
 		auto result = HandleMenuCalls(isTitle);
-		if (result != GameStatus::None)
+		if (result != GameStatus::Normal)
 			return result;
 
 		// Handle global input events.
 		result = HandleGlobalInputEvents(isTitle);
-		if (result != GameStatus::None)
+		if (result != GameStatus::Normal)
 			return result;
 
 		// Queued input actions are read again and cleared after UI 
@@ -245,6 +245,9 @@ GameStatus ControlPhase(int numFrames)
 		PlaySoundSources();
 		DoFlipEffect(FlipEffect, LaraItem);
 
+		// Post-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, true);
+
 		// Clear savegame loaded flag.
 		JustLoaded = false;
 
@@ -266,7 +269,7 @@ GameStatus ControlPhase(int numFrames)
 	auto time2 = std::chrono::high_resolution_clock::now();
 	ControlPhaseTime = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 
-	return GameStatus::None;
+	return GameStatus::Normal;
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -478,6 +481,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
 	g_GameScript->OnEnd(reason);
+	HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
@@ -509,6 +514,7 @@ void InitializeOrLoadGame(bool loadGame)
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
+		HandleAllGlobalEvents(EventType::Load, (Activator)LaraItem->Index);
 	}
 	else
 	{
@@ -530,6 +536,7 @@ void InitializeOrLoadGame(bool loadGame)
 		}
 
 		g_GameScript->OnStart();
+		HandleAllGlobalEvents(EventType::Start, (Activator)LaraItem->Index);
 	}
 }
 
@@ -614,7 +621,7 @@ void HandleControls(bool isTitle)
 
 GameStatus HandleMenuCalls(bool isTitle)
 {
-	auto result = GameStatus::None;
+	auto result = GameStatus::Normal;
 
 	if (isTitle || ScreenFading)
 		return result;
@@ -653,7 +660,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 			result = GameStatus::LoadGame;
 	}
 
-	if (result != GameStatus::None)
+	if (result != GameStatus::Normal)
 	{
 		StopAllSounds();
 		StopRumble();
@@ -668,7 +675,7 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
 
 	if (isTitle)
-		return GameStatus::None;
+		return GameStatus::Normal;
 
 	// Check if player dead.
 	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||
@@ -690,5 +697,5 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 		return GameStatus::LoadGame;
 	}
 
-	return GameStatus::None;
+	return GameStatus::Normal;
 }

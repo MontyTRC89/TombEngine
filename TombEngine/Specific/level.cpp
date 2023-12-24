@@ -186,7 +186,7 @@ std::string ReadString()
 {
 	auto numBytes = ReadLEB128(false);
 
-	if (!numBytes)
+	if (numBytes <= 0)
 		return std::string();
 	else
 	{
@@ -890,6 +890,9 @@ void ReadRooms()
 			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
 			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
+			volume.Enabled = ReadBool();
+			volume.DetectInAdjacentRooms = ReadBool();
+
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
@@ -963,7 +966,9 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
-	g_Level.EventSets.resize(0);
+	g_Level.VolumeEventSets.resize(0);
+	g_Level.GlobalEventSets.resize(0);
+	g_Level.LoopedEventSetIndices.resize(0);
 	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
@@ -1065,30 +1070,64 @@ void LoadAIObjects()
 	}
 }
 
-void LoadEvent(VolumeEvent& event)
+void LoadEvent(EventSet& eventSet)
 {
-	event.Mode = (VolumeEventMode)ReadInt32();
-	event.Function = ReadString();
-	event.Data = ReadString();
-	event.CallCounter = ReadInt32();
+	int eventType = ReadInt32();
+
+	if (eventType >= (int)EventType::Count)
+	{
+		TENLog("Unknown event type detected for event set " + eventSet.Name + ". Fall back to default.", LogLevel::Warning);
+		eventType = (int)EventType::Enter;
+	}
+
+	auto& evt = eventSet.Events[eventType];
+
+	evt.Mode = (EventMode)ReadInt32();
+	evt.Function = ReadString();
+	evt.Data = ReadString();
+	evt.CallCounter = ReadInt32();
 }
 
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
-	TENLog("Num event sets: " + std::to_string(eventSetCount), LogLevel::Info);
+	if (eventSetCount == 0)
+		return;
 
-	for (int i = 0; i < eventSetCount; i++)
+	int globalEventSetCount = ReadInt32();
+	TENLog("Num global event sets: " + std::to_string(globalEventSetCount), LogLevel::Info);
+
+	for (int i = 0; i < globalEventSetCount; i++)
 	{
-		auto eventSet = VolumeEventSet();
+		auto eventSet = EventSet();
 
 		eventSet.Name = ReadString();
-		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		for (int eventType = 0; eventType < (int)VolumeEventType::Count; eventType++)
-			LoadEvent(eventSet.Events[eventType]);
+		int eventCount = ReadInt32();
+		for (int j = 0; j < eventCount; j++)
+			LoadEvent(eventSet);
 
-		g_Level.EventSets.push_back(eventSet);
+		g_Level.GlobalEventSets.push_back(eventSet);
+
+		if (!eventSet.Events[(int)EventType::Loop].Function.empty())
+			g_Level.LoopedEventSetIndices.push_back(i);
+	}
+
+	int volumeEventSetCount = ReadInt32();
+	TENLog("Num volume event sets: " + std::to_string(volumeEventSetCount), LogLevel::Info);
+
+	for (int i = 0; i < volumeEventSetCount; i++)
+	{
+		auto eventSet = EventSet();
+
+		eventSet.Name = ReadString();
+		eventSet.Activators = (ActivatorFlags)ReadInt32();
+
+		int eventCount = ReadInt32();
+		for (int j = 0; j < eventCount; j++)
+			LoadEvent(eventSet);
+
+		g_Level.VolumeEventSets.push_back(eventSet);
 	}
 }
 

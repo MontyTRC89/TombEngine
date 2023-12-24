@@ -708,7 +708,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		break;
 
 	case HandStatus::WeaponReady:
-		if (!IsHeld(In::Action))
+		if (!IsHeld(In::Action) || !GetAmmo(player, player.Control.Weapon.GunType))
 		{
 			laraItem.Model.MeshIndex[LM_HEAD] = laraItem.Model.BaseMesh + LM_HEAD;
 		}
@@ -727,7 +727,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (!GetAmmo(player, player.Control.Weapon.GunType))
 			{
-				bool hasPistols = (player.Weapons[(int)LaraWeaponType::Pistol].Present && Objects[ID_PISTOLS_ITEM].loaded);
+				bool hasPistols = (player.Weapons[(int)LaraWeaponType::Pistol].Present && Objects[ID_PISTOLS_ITEM].loaded && GetAmmo(player, LaraWeaponType::Pistol));
 				player.Control.Weapon.RequestGunType = hasPistols ? LaraWeaponType::Pistol : LaraWeaponType::None;
 				return;
 			}

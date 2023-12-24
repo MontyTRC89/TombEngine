@@ -11,6 +11,8 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
@@ -66,6 +68,21 @@ namespace TEN::Scripting::View
 	static CameraType GetCameraType()
 	{
 		return Camera.oldType;
+	}
+	
+	static Vec3 GetCameraPosition()
+	{
+		return Vec3(Camera.pos.ToVector3());
+	}
+
+	static Vec3 GetCameraTarget()
+	{
+		return Vec3(Camera.target.ToVector3());
+	}
+
+	static std::unique_ptr<Room> GetCameraRoom()
+	{
+		return std::make_unique<Room>(g_Level.Rooms[Camera.pos.RoomNumber]);
 	}
 
 	static void ResetObjCamera()
@@ -133,13 +150,28 @@ namespace TEN::Scripting::View
 		//@function GetCameraType
 		//@treturn View.CameraType value used by the Main Camera.
 		//@usage
-		//LevelFuncs.OnControlPhase = function() 
+		//LevelFuncs.OnLoop = function() 
 		//	if (View.GetCameraType() == CameraType.Combat) then
 		//		--Do your Actions here.
 		//	end
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 
+		///Gets current room where camera is positioned.
+		//@function GetCameraRoom
+		//@treturn Objects.Room current room of the camera
+		tableView.set_function(ScriptReserved_GetCameraRoom, &GetCameraRoom);
+
+		///Gets current camera position.
+		//@function GetCameraPosition
+		//@treturn Vec3 current camera position
+		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
+
+		///Gets current camera target.
+		//@function GetCameraTarget
+		//@treturn Vec3 current camera target
+		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
+		
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
 		//@tparam short flyby (ID of flyby)
