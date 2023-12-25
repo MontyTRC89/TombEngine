@@ -31,8 +31,7 @@ static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
 // Moveable object
 static constexpr char ScriptReserved_Moveable[]			= "Moveable";
-static constexpr char ScriptReserved_MoveableEnum[]		= "MoveableEnum";
-static constexpr char ScriptReserved_MoveableStatus[]	= "Status";
+static constexpr char ScriptReserved_MoveableStatus[]	= "MoveableStatus";
 
 // Player object
 static constexpr char ScriptReserved_Lara[]							= "Lara";

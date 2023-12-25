@@ -5,6 +5,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
+#include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Objects/Generic/Object/Pushable/PushableStack.h"
@@ -12,6 +13,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -131,10 +133,11 @@ namespace TEN::Entities::Generic
 			if (object.isPickup)
 				continue;
 
-			if (object.GetFloorHeight == nullptr)
+			if (!item.IsBridge())
 				return false;
 
-			if (!object.GetFloorHeight(item, item.Pose.Position).has_value())
+			const auto& bridge = GetBridgeObject(item);
+			if (!bridge.GetFloorHeight(item, item.Pose.Position).has_value())
 				return false;
 		}
 
@@ -208,13 +211,14 @@ namespace TEN::Entities::Generic
 			if (object.isPickup)
 				continue;
 
-			if (object.GetFloorHeight == nullptr)
+			if (!item.IsBridge())
 			{
 				return false;
 			}
 			else
 			{
-				if (!object.GetFloorHeight(item, item.Pose.Position).has_value())
+				const auto& bridge = GetBridgeObject(item);
+				if (!bridge.GetFloorHeight(item, item.Pose.Position).has_value())
 					return false;
 			}
 		}

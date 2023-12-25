@@ -33,6 +33,52 @@ using TEN::Renderer::g_Renderer;
 
 using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
+using namespace TEN::Utils;
+
+// TODO: Confirm list.
+const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
+{
+	ID_EXPANDING_PLATFORM,
+	ID_SQUISHY_BLOCK1,
+	ID_SQUISHY_BLOCK2,
+
+	ID_FALLING_BLOCK,
+	ID_FALLING_BLOCK2,
+	ID_CRUMBLING_FLOOR,
+	ID_TRAPDOOR1,
+	ID_TRAPDOOR2,
+	ID_TRAPDOOR3,
+	ID_FLOOR_TRAPDOOR1,
+	ID_FLOOR_TRAPDOOR2,
+	ID_CEILING_TRAPDOOR1,
+	ID_CEILING_TRAPDOOR2,
+	ID_SCALING_TRAPDOOR,
+
+	ID_ONEBLOCK_PLATFORM,
+	ID_TWOBLOCK_PLATFORM,
+	ID_RAISING_BLOCK1,
+	ID_RAISING_BLOCK2,
+	ID_RAISING_BLOCK3,
+	ID_RAISING_BLOCK4,
+
+	ID_PUSHABLE_OBJECT_CLIMBABLE1,
+	ID_PUSHABLE_OBJECT_CLIMBABLE2,
+	ID_PUSHABLE_OBJECT_CLIMBABLE3,
+	ID_PUSHABLE_OBJECT_CLIMBABLE4,
+	ID_PUSHABLE_OBJECT_CLIMBABLE5,
+	ID_PUSHABLE_OBJECT_CLIMBABLE6,
+	ID_PUSHABLE_OBJECT_CLIMBABLE7,
+	ID_PUSHABLE_OBJECT_CLIMBABLE8,
+	ID_PUSHABLE_OBJECT_CLIMBABLE9,
+	ID_PUSHABLE_OBJECT_CLIMBABLE10,
+
+	ID_BRIDGE_FLAT,
+	ID_BRIDGE_TILT1,
+	ID_BRIDGE_TILT2,
+	ID_BRIDGE_TILT3,
+	ID_BRIDGE_TILT4,
+	ID_BRIDGE_CUSTOM
+};
 
 char* LevelDataPtr;
 std::vector<int> MoveablesIds;
@@ -187,15 +233,28 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		// Initialize all bridges first.
-		// It is needed because some other items need final floor height to init properly.
-
-		for (int isFloor = 0; isFloor <= 1; isFloor++)
+		// Initialize items.
+		for (int i = 0; i <= 1; i++)
 		{
-			for (int i = 0; i < g_Level.NumItems; i++)
+			// HACK: Initialize bridges first. Required because other items need final floordata to init properly.
+			if (i == 0)
 			{
-				if ((Objects[g_Level.Items[i].ObjectNumber].GetFloorHeight == nullptr) == (bool)isFloor)
-					InitializeItem(i);
+				for (int j = 0; j < g_Level.NumItems; j++)
+				{
+					const auto& item = g_Level.Items[j];
+					if (Contains(BRIDGE_OBJECT_IDS, item.ObjectNumber))
+						InitializeItem(j);
+				}
+			}
+			// Initialize non-bridge items second.
+			else if (i == 1)
+			{
+				for (int j = 0; j < g_Level.NumItems; j++)
+				{
+					const auto& item = g_Level.Items[j];
+					if (!item.IsBridge())
+						InitializeItem(j);
+				}
 			}
 		}
 	}
@@ -1408,22 +1467,25 @@ void GetCarriedItems()
 
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		auto* item = &g_Level.Items[i];
-		if (Objects[item->ObjectNumber].intelligent || item->ObjectNumber >= ID_SEARCH_OBJECT1 && item->ObjectNumber <= ID_SEARCH_OBJECT3)
-		{
-			for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
-			{
-				auto* item2 = &g_Level.Items[linkNumber];
+		auto& item = g_Level.Items[i];
+		const auto& object = Objects[item.ObjectNumber];
 
-				if (abs(item2->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
-					abs(item2->Pose.Position.z - item->Pose.Position.z) < CLICK(2) &&
-					abs(item2->Pose.Position.y - item->Pose.Position.y) < CLICK(1) &&
-					Objects[item2->ObjectNumber].isPickup)
+		if (object.intelligent ||
+			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3))
+		{
+			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+			{
+				auto& item2 = g_Level.Items[linkNumber];
+
+				if (abs(item2.Pose.Position.x - item.Pose.Position.x) < CLICK(2) &&
+					abs(item2.Pose.Position.z - item.Pose.Position.z) < CLICK(2) &&
+					abs(item2.Pose.Position.y - item.Pose.Position.y) < CLICK(1) &&
+					Objects[item2.ObjectNumber].isPickup)
 				{
-					item2->CarriedItem = item->CarriedItem;
-					item->CarriedItem = linkNumber;
+					item2.CarriedItem = item.CarriedItem;
+					item.CarriedItem = linkNumber;
 					RemoveDrawnItem(linkNumber);
-					item2->RoomNumber = NO_ROOM;
+					item2.RoomNumber = NO_ROOM;
 				}
 			}
 		}
