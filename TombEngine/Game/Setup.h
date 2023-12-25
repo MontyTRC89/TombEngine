@@ -104,12 +104,6 @@ struct ObjectInfo
 	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine = nullptr;
 	std::function<void(ItemInfo* item)> drawRoutine = nullptr;
 
-	// Bridge routines
-	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
-	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;
-	std::function<int(const ItemInfo& item)> GetFloorBorder	  = nullptr;
-	std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
-
 	void SetBoneRotationFlags(int boneID, int flags);
 	void SetHitEffect(bool isSolid = false, bool isAlive = false);
 };

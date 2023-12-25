@@ -149,7 +149,7 @@ GameStatus ControlPhase(int numFrames)
 	bool isFirstTime = true;
 	static int framesCount = 0;
 
-	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
+	for (framesCount += numFrames; framesCount > 0; framesCount -= LOOP_FRAME_COUNT)
 	{
 		// Controls are polled before OnLoop, so input data could be
 		// overwritten by script API methods.
@@ -545,15 +545,16 @@ void InitializeOrLoadGame(bool loadGame)
 
 GameStatus DoGameLoop(int levelIndex)
 {
+	int numFrames = LOOP_FRAME_COUNT;
+	auto& status = g_GameFlow->LastGameStatus;
+
 	// Before entering actual game loop, ControlPhase must be
 	// called once to sort out various runtime shenanigangs (e.g. hair).
-
-	int numFrames = 2;
-	auto result = ControlPhase(numFrames);
+	status = ControlPhase(numFrames);
 
 	while (DoTheGame)
 	{
-		result = ControlPhase(numFrames);
+		status = ControlPhase(numFrames);
 
 		if (!levelIndex)
 		{
@@ -565,15 +566,15 @@ GameStatus DoGameLoop(int levelIndex)
 			{
 			case InventoryResult::NewGame:
 			case InventoryResult::NewGameSelectedLevel:
-				result = GameStatus::NewGame;
+				status = GameStatus::NewGame;
 				break;
 
 			case InventoryResult::LoadGame:
-				result = GameStatus::LoadGame;
+				status = GameStatus::LoadGame;
 				break;
 
 			case InventoryResult::ExitGame:
-				result = GameStatus::ExitGame;
+				status = GameStatus::ExitGame;
 				break;
 			}
 
@@ -582,10 +583,10 @@ GameStatus DoGameLoop(int levelIndex)
 		}
 		else
 		{
-			if (result == GameStatus::ExitToTitle ||
-				result == GameStatus::LaraDead ||
-				result == GameStatus::LoadGame ||
-				result == GameStatus::LevelComplete)
+			if (status == GameStatus::ExitToTitle ||
+				status == GameStatus::LaraDead ||
+				status == GameStatus::LoadGame ||
+				status == GameStatus::LevelComplete)
 			{
 				break;
 			}
@@ -595,8 +596,8 @@ GameStatus DoGameLoop(int levelIndex)
 		Sound_UpdateScene();
 	}
 
-	EndGameLoop(levelIndex, result);
-	return result;
+	EndGameLoop(levelIndex, status);
+	return status;
 }
 
 void EndGameLoop(int levelIndex, GameStatus reason)
@@ -636,9 +637,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 	{
 		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
-
-		if (g_Gui.CallInventory(LaraItem, false))
-			result = GameStatus::SaveGame;
+		g_Gui.CallInventory(LaraItem, false);
 	}
 	else if (IsClicked(In::Load) &&
 		g_Gui.GetInventoryMode() != InventoryMode::Load &&
