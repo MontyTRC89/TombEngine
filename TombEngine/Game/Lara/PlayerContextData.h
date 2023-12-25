@@ -44,11 +44,11 @@ namespace TEN::Entities::Player
 
 	struct EdgeVaultClimbSetupData
 	{
-		int LowerEdgeBound			  = 0;
-		int UpperEdgeBound			  = 0;
-		int LedgeFloorToCeilHeightMin = 0;
-		int LedgeFloorToCeilHeightMax = 0;
-		int LowerEdgeToCeilBound	  = 0;
+		int LowerEdgeBound			 = 0;
+		int UpperEdgeBound			 = 0;
+		int DestFloorToCeilHeightMin = 0;
+		int DestFloorToCeilHeightMax = 0;
+		int LowerEdgeToCeilBound	 = 0;
 
 		bool FindHighest		  = false;
 		bool TestSwampDepth		  = false;
@@ -57,7 +57,7 @@ namespace TEN::Entities::Player
 		bool TestDestIllegalSlope = false;
 	};
 
-	struct EdgeHangClimbSetupData
+	struct EdgeHangDescentClimbSetupData
 	{
 		short RelHeadingAngle = 0;
 

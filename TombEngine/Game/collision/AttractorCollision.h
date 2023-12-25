@@ -25,11 +25,10 @@ namespace TEN::Collision::Attractor
 		// Members
 		Attractor* AttractorPtr = nullptr;
 
-		ProximityData Proximity		  = {};
-		short		  HeadingAngle	  = 0;
-		short		  SlopeAngle	  = 0;
-		bool		  IsFacingForward = false;
-		bool		  IsInFront		  = false;
+		ProximityData Proximity	   = {};
+		short		  HeadingAngle = 0;
+		short		  SlopeAngle   = 0;
+		bool		  IsInFront	   = false;
 
 		// Constructors
 		AttractorCollisionData() {};

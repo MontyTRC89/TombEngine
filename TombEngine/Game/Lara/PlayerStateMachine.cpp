@@ -233,10 +233,10 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH] = std::pair(lara_as_water_tread_vault, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH] = std::pair(lara_as_water_tread_vault, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH] = std::pair(lara_as_water_tread_vault, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_STAND_EDGE_DESCENT] = std::pair(lara_as_stand_edge_descent, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_STAND_EDGE_DESCENT_FRONT] = std::pair(lara_as_null, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_STAND_EDGE_DESCENT_BACK] = std::pair(lara_as_null, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_STAND_EDGE_DESCENT_BACK_FLIP] = std::pair(lara_as_null, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT] = std::pair(lara_as_stand_edge_descent, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT_FRONT] = std::pair(lara_as_null, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT_BACK] = std::pair(lara_as_null, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT_BACK_FLIP] = std::pair(lara_as_null, lara_void_func);
 	}
 
 	void HandlePlayerBehaviorState(ItemInfo& item, CollisionInfo& coll, PlayerBehaviorStateRoutineType routineType)

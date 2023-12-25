@@ -17,8 +17,7 @@ namespace TEN::Collision::Attractor
 {
 	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle)
 	{
-		constexpr auto HEADING_ANGLE_OFFSET			  = ANGLE(-90.0f);
-		constexpr auto FACING_FORWARD_ANGLE_THRESHOLD = ANGLE(90.0f);
+		constexpr auto HEADING_ANGLE_OFFSET = ANGLE(-90.0f);
 
 		const auto& points = attrac.GetPoints();
 
@@ -34,10 +33,9 @@ namespace TEN::Collision::Attractor
 		auto segmentOrient = (points.size() == 1) ?
 			refOrient : Geometry::GetOrientToPoint(points[Proximity.SegmentID], points[Proximity.SegmentID + 1]);
 
-		// Fill remaining collision data.
+		// Set remaining collision data.
 		HeadingAngle = segmentOrient.y + HEADING_ANGLE_OFFSET;
 		SlopeAngle = segmentOrient.x;
-		IsFacingForward = (abs(Geometry::GetShortestAngle(HeadingAngle, refOrient.y)) <= FACING_FORWARD_ANGLE_THRESHOLD); // TODO: Faulty? Also maybe unnecessary.
 		IsInFront = Geometry::IsPointInFront(pos, Proximity.Intersection, refOrient);
 	}
 
