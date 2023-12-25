@@ -555,8 +555,8 @@ namespace TEN::Renderer
 
 	std::pair<Vector3, Vector3> Renderer::GetRay(const Vector2& pos) const
 	{
-		auto nearPoint = m_viewportToolkit.Unproject(Vector3(pos.x, pos.y, 0.0f), gameCamera.Camera.Projection, gameCamera.Camera.View, Matrix::Identity);
-		auto farPoint  = m_viewportToolkit.Unproject(Vector3(pos.x, pos.y, 1.0f), gameCamera.Camera.Projection, gameCamera.Camera.View, Matrix::Identity);
+		auto nearPoint = _viewportToolkit.Unproject(Vector3(pos.x, pos.y, 0.0f), _gameCamera.Camera.Projection, _gameCamera.Camera.View, Matrix::Identity);
+		auto farPoint  = _viewportToolkit.Unproject(Vector3(pos.x, pos.y, 1.0f), _gameCamera.Camera.Projection, _gameCamera.Camera.View, Matrix::Identity);
 
 		return std::pair<Vector3, Vector3>(nearPoint, farPoint);
 	}
