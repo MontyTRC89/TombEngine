@@ -35,7 +35,6 @@ static const std::unordered_map<std::string, GameStatus> GAME_STATUSES
 	{ "NORMAL", GameStatus::Normal },
 	{ "NEW_GAME", GameStatus::NewGame },
 	{ "LOAD_GAME", GameStatus::LoadGame },
-	{ "SAVE_GAME", GameStatus::SaveGame },
 	{ "EXIT_TO_TITLE", GameStatus::ExitToTitle },
 	{ "EXIT_GAME", GameStatus::ExitGame },
 	{ "LARA_DEAD", GameStatus::LaraDead },

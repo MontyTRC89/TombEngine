@@ -3286,7 +3286,7 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		bool doLoad = false;
+		bool doLoadSave = false;
 
 		lara->Inventory.OldBusy = lara->Inventory.IsBusy;
 
@@ -3342,7 +3342,7 @@ namespace TEN::Gui
 				switch (DoLoad())
 				{
 				case LoadResult::Load:
-					doLoad = true;
+					doLoadSave = true;
 					exitLoop = true;
 					break;
 
@@ -3363,6 +3363,7 @@ namespace TEN::Gui
 			case InventoryMode::Save:
 				if (DoSave())
 				{
+					doLoadSave = true;
 					exitLoop = !resetMode;
 					if (resetMode)
 						SetInventoryMode(InventoryMode::InGame);
@@ -3391,7 +3392,7 @@ namespace TEN::Gui
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;
 		SetInventoryMode(InventoryMode::None);
 
-		return doLoad;
+		return doLoadSave;
 	}
 
 	void GuiController::DoStatisticsMode()
