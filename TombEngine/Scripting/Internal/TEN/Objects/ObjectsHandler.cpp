@@ -9,6 +9,7 @@
 #include "Scripting/Internal/TEN/Objects/Camera/CameraObject.h"
 #include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
 #include "Scripting/Internal/TEN/Objects/Lara/LaraObject.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableStatuses.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomFlags.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
@@ -166,6 +167,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_PlayerAmmoType, PLAYER_AMMO_TYPES);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_MoveableStatus, MOVEABLE_STATUSES);
 }
 
 void ObjectsHandler::TestCollidingObjects()
