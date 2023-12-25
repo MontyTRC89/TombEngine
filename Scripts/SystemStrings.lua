@@ -47,6 +47,7 @@ local strings =
 	actions_weapon_8 = { "Weapon 8" },
 	actions_weapon_9 = { "Weapon 9" },
 	all = { "All" },
+	ambient_occlusion = { "Ambient Occlusion" },
 	ammo_used = { "Ammo Used" },
 	antialiasing = { "Antialiasing" },
 	apply = { "Apply" },
@@ -115,8 +116,7 @@ local strings =
 	waiting_for_input = { "Waiting For Input" },
 	window_title = { "TombEngine" },
 	windowed = { "Windowed" },
-	unlimited = { "Unlimited %s" },
-	ambient_occlusion = { "Ambient Occlusion" }
+	unlimited = { "Unlimited %s" }
 }
 
 TEN.Flow.SetStrings(strings)
