@@ -48,7 +48,15 @@ float PS(PixelShaderInput input) : SV_Target
     float2 noiseScale = float2(ViewportWidth / 4.0f, ViewportHeight / 4.0f);
 
     float3 position = ReconstructPositionFromDepth(input.UV);
-    float3 normal = DecodeNormal(NormalsTexture.Sample(NormalsSampler, input.UV).xyz);
+    float3 encodedNormal = NormalsTexture.Sample(NormalsSampler, input.UV).xyz;
+
+    // Let's avoid SSAO on the skybox and on surfaces with no normals
+    if (length(encodedNormal) <= 0.0001f)
+	{
+		return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+    float3 normal = DecodeNormal(encodedNormal);
     float3 randomVec = NoiseTexture.Sample(NoiseSampler, input.UV * noiseScale).xyz;
 
     float3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
