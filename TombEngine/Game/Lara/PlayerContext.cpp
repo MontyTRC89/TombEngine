@@ -1155,8 +1155,8 @@ namespace TEN::Entities::Player
 		
 		// 5) Test ledge floor-to-ceiling height.
 		int ledgeFloorToCeilHeight = abs(pointCollFront.Position.Ceiling - pointCollFront.Position.Floor);
-		if (ledgeFloorToCeilHeight <= setup.LedgeFloorToCeilHeightMin ||
-			ledgeFloorToCeilHeight > setup.LedgeFloorToCeilHeightMax)
+		if (ledgeFloorToCeilHeight <= setup.DestFloorToCeilHeightMin ||
+			ledgeFloorToCeilHeight > setup.DestFloorToCeilHeightMax)
 		{
 			return false;
 		}
@@ -1178,9 +1178,9 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto SETUP = LedgeClimbSetupData
 		{
-			LARA_HEIGHT, -MAX_HEIGHT,
-			CLICK(3),
-			false
+			CLICK(3),				  // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT, // Destination floor-to-ceil range.
+			false					  // Test illegal slope.
 		};
 
 		return TestLedgeClimbSetup(item, coll, SETUP);
@@ -1190,9 +1190,9 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto SETUP = LedgeClimbSetupData
 		{
-			LARA_HEIGHT_CRAWL, LARA_HEIGHT,
-			(int)CLICK(0.6f),
-			true
+			(int)CLICK(0.6f),				// Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Destination floor-to-ceil range.
+			true							// Test illegal slope.
 		};
 
 		return TestLedgeClimbSetup(item, coll, SETUP);
@@ -1202,9 +1202,9 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto SETUP = LedgeClimbSetupData
 		{
-			LARA_HEIGHT, -MAX_HEIGHT,
-			CLICK(1),
-			false
+			CLICK(1),				  // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT, // Destination floor-to-ceil range.
+			false					  // Test illegal slope.
 		};
 
 		return TestLedgeClimbSetup(item, coll, SETUP);
@@ -1475,8 +1475,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,		   // Destination floor-to-ceil range.
 			-CLICK(1),						   // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT,		   // Destination floor-to-ceil range.
 			false,							   // Find highest.
 			false,							   // Test swamp depth.
 			true,							   // Test edge front.
@@ -1511,8 +1511,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,			  // Destination floor-to-ceil range.
 			-CLICK(1),							  // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT,			  // Destination floor-to-ceil range.
 			false,								  // Find highest.
 			false,								  // Test swamp depth.
 			true,								  // Test edge front.
@@ -1547,8 +1547,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			0, -STEPUP_HEIGHT,				// Edge height bounds.
-			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Destination floor-to-ceil range.
 			-CLICK(1),						// Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Destination floor-to-ceil range.
 			false,							// Find highest.
 			false,							// Test swamp depth.
 			true,							// Test edge front.
@@ -1583,8 +1583,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-STEPUP_HEIGHT, -(int)CLICK(2.5f), // Edge height bounds.
-			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	   // Destination floor-to-ceil range.
 			-CLICK(1),						   // Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT,	   // Destination floor-to-ceil range.
 			false,							   // Find highest.
 			false,							   // Test swamp depth.
 			true,							   // Test edge front.
@@ -1619,8 +1619,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(2.5f), -(int)CLICK(3.5f), // Edge height bounds.
-			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		  // Destination floor-to-ceil range.
 			-CLICK(1),							  // Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, LARA_HEIGHT,		  // Destination floor-to-ceil range.
 			false,								  // Find highest.
 			false,								  // Test swamp depth.
 			true,								  // Test edge front.
@@ -1658,8 +1658,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(3.5f), -(int)CLICK(7.5f), // Edge height bounds.
-			0, -MAX_HEIGHT,						  // Destination floor-to-ceil range.
 			-(int)CLICK(1 / 256.0f),			  // Edge-to-ceil height minumum.
+			0, -MAX_HEIGHT,						  // Destination floor-to-ceil range.
 			true,								  // Find highest.
 			false,								  // Test swamp depth.
 			true,								  // Test edge front.
@@ -1864,8 +1864,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			STEPUP_HEIGHT, CRAWL_STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		// Destination floor-to-ceil range.
 			-(int)CLICK(0.6f),					// Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		// Destination floor-to-ceil range.
 			false,								// Find highest.
 			false,								// Test swamp depth.
 			false,								// Test edge front.
@@ -1899,8 +1899,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,			 // Destination floor-to-ceil range.
 			-(int)CLICK(1.25f),					 // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT,			 // Destination floor-to-ceil range.
 			false,								 // Find highest.
 			false,								 // Test swamp depth.
 			false,								 // Test edge front.
@@ -1938,8 +1938,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-CRAWL_STEPUP_HEIGHT, -STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		  // Destination floor-to-ceil range.
 			-(int)CLICK(0.6f),					  // Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		  // Destination floor-to-ceil range.
 			false,								  // Find highest.
 			false,								  // Test swamp depth.
 			true,								  // Test edge front.
@@ -1975,8 +1975,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			NO_LOWER_BOUND, STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,	   // Destination floor-to-ceil range.
 			-(int)CLICK(1.25f),			   // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT,	   // Destination floor-to-ceil range.
 			false,						   // Find highest.
 			false,						   // Test swamp depth.
 			false,						   // Test edge front.
@@ -2091,8 +2091,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,		 // Destination floor-to-ceil range.
 			-CLICK(1),						 // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT,		 // Destination floor-to-ceil range.
 			false,							 // Find highest.
 			false,							 // Test swamp depth.
 			true,							 // Test edge front.
@@ -2131,8 +2131,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,			 // Destination floor-to-ceil range.
 			-CLICK(1),							 // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT,			 // Destination floor-to-ceil range.
 			false,								 // Find highest.
 			false,								 // Test swamp depth.
 			true,								 // Test edge front.
@@ -2170,8 +2170,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(0.5f), -STEPUP_HEIGHT, // Edge height bounds.
-			LARA_HEIGHT, -MAX_HEIGHT,		   // Destination floor-to-ceil range.
 			-CLICK(1),						   // Edge-to-ceil height lower bound.
+			LARA_HEIGHT, -MAX_HEIGHT,		   // Destination floor-to-ceil range.
 			false,							   // Find highest.
 			false,							   // Test swamp depth.
 			true,							   // Test edge front.
@@ -2210,8 +2210,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			STEPUP_HEIGHT, (int)CLICK(0.5f), // Edge height bounds.
-			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,	 // Destination floor-to-ceil range.
 			-(int)CLICK(0.6f),				 // Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,	 // Destination floor-to-ceil range.
 			false,							 // Find highest.
 			false,							 // Test swamp depth.
 			true,							 // Test edge front.
@@ -2250,8 +2250,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			(int)CLICK(0.5f), -(int)CLICK(0.5f), // Edge height bounds.
-			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		 // Destination floor-to-ceil range.
 			-(int)CLICK(0.6f),					 // Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT,		 // Destination floor-to-ceil range.
 			false,								 // Find highest.
 			false,								 // Test swamp depth.
 			true,								 // Test edge front.
@@ -2289,8 +2289,8 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-CLICK(1), -STEPUP_HEIGHT,		// Edge height bounds.
-			LARA_HEIGHT_CRAWL, -MAX_HEIGHT, // Destination floor-to-ceil range.
 			-(int)CLICK(0.6f),				// Edge-to-ceil height lower bound.
+			LARA_HEIGHT_CRAWL, -MAX_HEIGHT, // Destination floor-to-ceil range.
 			false,							// Find highest.
 			false,							// Test swamp depth.
 			true,							// Test edge front.

@@ -46,9 +46,9 @@ namespace TEN::Entities::Player
 	{
 		int LowerEdgeBound			 = 0;
 		int UpperEdgeBound			 = 0;
+		int LowerEdgeToCeilBound	 = 0;
 		int DestFloorToCeilHeightMin = 0;
 		int DestFloorToCeilHeightMax = 0;
-		int LowerEdgeToCeilBound	 = 0;
 
 		bool FindHighest		  = false;
 		bool TestSwampDepth		  = false;
@@ -88,9 +88,9 @@ namespace TEN::Entities::Player
 
 	struct LedgeClimbSetupData
 	{
-		int LedgeFloorToCeilHeightMin = 0;
-		int LedgeFloorToCeilHeightMax = 0;
-		int LowerEdgeToCeilBound	  = 0;
+		int LowerEdgeToCeilBound	 = 0;
+		int DestFloorToCeilHeightMin = 0;
+		int DestFloorToCeilHeightMax = 0;
 
 		bool TestIllegalSlope = false;
 	};
