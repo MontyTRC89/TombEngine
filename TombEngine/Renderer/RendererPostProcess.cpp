@@ -46,7 +46,7 @@ namespace TEN::Renderer
 		int destinationRenderTarget = 1;
 
 		// Apply color scheme
-		if (_postProcessMode != PostProcessMode::None)
+		if (_postProcessMode != PostProcessMode::None && _postProcessStrength > EPSILON)
 		{
 			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
 			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
