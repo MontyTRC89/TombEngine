@@ -141,7 +141,7 @@ namespace TEN::Scripting::View
 		//@tparam float angle in degrees (clamped to [10, 170])
 		tableView.set_function(ScriptReserved_SetFOV, &SetFOV);
 
-		//Get field of view.
+		///Get field of view.
 		//@function GetFOV
 		//@treturn float current FOV angle in degrees
 		tableView.set_function(ScriptReserved_GetFOV, &GetFOV);
