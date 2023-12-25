@@ -1334,7 +1334,7 @@ namespace TEN::Entities::Player
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 		for (const auto& attracColl : attracColls)
 		{
-			// 2.1) Check if attractor is edge or wall edge type.
+			// 2.1) Check attractor type.
 			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
 				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
 			{
@@ -1356,7 +1356,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// TODO: Point collision probing may traverse rooms correctly if bridges cross rooms.
+			// TODO: Point collision probing may traverse rooms incorrectly if bridges cross rooms.
 			// Solution is to probe from player's position and room. Combine player/intersect RelDeltaPos and RelPosOffset.
 
 			// Get point collision at edge.
@@ -2435,7 +2435,7 @@ namespace TEN::Entities::Player
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 		for (const auto& attracColl : attracColls)
 		{
-			// 1) Check if attractor is edge or wall edge type.
+			// 1) Check attractor type.
 			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
 				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
 			{
@@ -2706,7 +2706,7 @@ namespace TEN::Entities::Player
 			}
 
 			// 9) Test catch trajectory.
-			if (relEdgeHeight > lowerBound &&
+			if (relEdgeHeight > lowerBound ||
 				relEdgeHeight < upperBound)
 			{
 				return std::nullopt;

@@ -251,7 +251,7 @@ namespace TEN::Collision::Attractor
 
 			// Draw label.
 			if (labelPos2D.has_value())
-				g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, PRINTSTRING_OUTLINE, RendererDebugPage::AttractorStats);
+				g_Renderer.AddDebugString(labelString, *labelPos2D, COLOR_YELLOW_OPAQUE, labelScale, PRINTSTRING_OUTLINE, RendererDebugPage::AttractorStats);
 		}
 		else
 		{
@@ -276,7 +276,7 @@ namespace TEN::Collision::Attractor
 
 			// Draw label.
 			if (labelPos2D.has_value())
-				g_Renderer.AddDebugString(labelString, *labelPos2D, Color(PRINTSTRING_COLOR_WHITE), labelScale, 0, RendererDebugPage::AttractorStats);
+				g_Renderer.AddDebugString(labelString, *labelPos2D, COLOR_YELLOW_OPAQUE, labelScale, 0, RendererDebugPage::AttractorStats);
 
 			// Draw start indicator line.
 			if (segmentID == 0)

@@ -327,9 +327,8 @@ static void UsePlayerMedipack(ItemInfo& item)
 static AttractorParentTargetData GetAttractorParentTarget(const ItemInfo& item, Attractor& attrac, float chainDist,
 														   const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
 {
-	// TODO: Check if this heading is correct. While its correctness is not relevant to this function, should be diligent.
 	// Get attractor collision.
-	auto attracColl = GetAttractorCollision(attrac, chainDist, item.Pose.Orientation.y);
+	auto attracColl = GetAttractorCollision(attrac, chainDist, 0);
 
 	// Calculate target.
 	auto orient = EulerAngles(0, attracColl.HeadingAngle, 0) + relOrientOffset;
