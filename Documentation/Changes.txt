@@ -15,6 +15,9 @@ Version 1.3
 * Fix jittery camera when performing crawl-to-hang.
 * Fix several issues with limited pistol ammo.
 * Fix Lara not being able to crawl if two-handed weapon is currently equipped.
+* Fix thin caustics outline on the edge of the blocks.
+* Add ambient occlusion option to display settings.
+* Add SMAA antialiasing instead of MSAA.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Improve fly cheat collision.
 * Add global events.
@@ -40,7 +43,8 @@ Lua API changes:
 * Add Moveable:SetStatus() to set the current status of the moveable.
 * Add Room:GetColor() to get room's ambient light color.
 * Add Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
-* Add View.GetCameraPosition(), View.GetCameraTarget() and View:GetCameraRoom() functions.
+* Add View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
+* Add View.SetPostProcesMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
 
 Version 1.2
 ===========
