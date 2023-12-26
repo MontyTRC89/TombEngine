@@ -14,10 +14,10 @@ Constants for moveable statuses.
 
 The following constants are inside Objects.MoveableStatus.
 
-INACTIVE
-ACTIVE
-DEACTIVATED
-INVISIBLE
+	INACTIVE
+	ACTIVE
+	DEACTIVATED
+	INVISIBLE
 
 @section Objects.MoveableStatus
 */

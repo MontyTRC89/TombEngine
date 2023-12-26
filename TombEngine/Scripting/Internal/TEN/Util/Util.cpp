@@ -71,7 +71,7 @@ namespace TEN::Scripting::Util
 	/// Get the projected display space position of a 3D world position. Returns nil if the world position is behind the camera view.
 	// @function GetDisplayPosition
 	// @tparam Vec3 worldPos 3D world position.
-	// @return Vec2 Projected display space position in percent.
+	// @treturn Vec2 Projected display space position in percent.
 	// @usage 
 	// Example: Display a string at the player's position.
 	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
