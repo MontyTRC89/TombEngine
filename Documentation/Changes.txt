@@ -15,6 +15,7 @@ Version 1.3
 * Fix jittery camera when performing crawl-to-hang.
 * Fix several issues with limited pistol ammo.
 * Fix Lara not being able to crawl if two-handed weapon is currently equipped.
+* Fix playback issues with audio tracks placed in subfolders.
 * Fix thin caustics outline on the edge of the blocks.
 * Add ambient occlusion option to display settings.
 * Add SMAA antialiasing instead of MSAA.
