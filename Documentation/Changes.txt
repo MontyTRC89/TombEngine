@@ -45,7 +45,7 @@ Lua API changes:
 * Add Room:GetColor() to get room's ambient light color.
 * Add Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
 * Add View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
-* Add View.SetPostProcesMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
+* Add View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
 
 Version 1.2
 ===========
