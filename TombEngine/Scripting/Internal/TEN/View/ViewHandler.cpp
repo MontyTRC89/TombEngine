@@ -102,9 +102,6 @@ namespace TEN::Scripting::View
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
 	}
 
-	/// Get the display resolution's aspect ratio.
-	// @function GetAspectRatio
-	// @treturn float Display resolution's aspect ratio.
 	static float GetAspectRatio()
 	{
 		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
@@ -187,6 +184,9 @@ namespace TEN::Scripting::View
 		//@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
 		tableView.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
+		/// Get the display resolution's aspect ratio.
+		// @function GetAspectRatio
+		// @treturn float Display resolution's aspect ratio.
 		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
 
 		// Register types.
