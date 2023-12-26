@@ -1114,20 +1114,15 @@ void LogicHandler::InitCallbacks()
 
 		sol::object theData = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
-		std::string msg{ "Level's script does not define callback " + fullName + ". Defaulting to no " + fullName + " behaviour." };
-
 		if (!theData.valid())
-		{
-			TENLog(msg);
 			return;
-		}
 
 		LevelFunc fnh = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
 		if (!func.valid())
-			TENLog(msg);
+			TENLog("Level's script does not define callback " + fullName + ". Defaulting to no " + fullName + " behaviour.");
 	};
 
 	assignCB(m_onStart, ScriptReserved_OnStart);
