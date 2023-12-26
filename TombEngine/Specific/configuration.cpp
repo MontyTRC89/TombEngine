@@ -312,8 +312,8 @@ void InitDefaultConfiguration()
 	g_Configuration.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
 	g_Configuration.ShadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
 	g_Configuration.EnableCaustics = true;
-	g_Configuration.AntialiasingMode = AntialiasingMode::Low;
-	g_Configuration.EnableAmbientOcclusion = false;
+	g_Configuration.AntialiasingMode = AntialiasingMode::Medium;
+	g_Configuration.EnableAmbientOcclusion = true;
 
 	g_Configuration.SoundDevice = 1;
 	g_Configuration.EnableSound = true;
@@ -323,7 +323,7 @@ void InitDefaultConfiguration()
 
 	g_Configuration.EnableSubtitles = true;
 	g_Configuration.EnableAutoTargeting = true;
-	g_Configuration.EnableTargetHighlighter = false;
+	g_Configuration.EnableTargetHighlighter = true;
 	g_Configuration.EnableRumble = true;
 	g_Configuration.EnableThumbstickCamera = false;
 
