@@ -177,7 +177,7 @@ void InitializeLaraStartPosition(ItemInfo* item)
 		item->Pose = it.Pose;
 		item->RoomNumber = it.RoomNumber;
 
-		TENLog("Player start position has been set according to object " + std::to_string(it.Index) + " with OCB " + std::to_string(it.TriggerFlags), LogLevel::Info);
+		TENLog("Player start position has been set according to start position object with index " + std::to_string(it.TriggerFlags), LogLevel::Info);
 		break;
 	}
 }
