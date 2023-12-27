@@ -17,8 +17,14 @@ Version 1.3
 * Fix Lara not being able to crawl if two-handed weapon is currently equipped.
 * Fix playback issues with audio tracks placed in subfolders.
 * Fix thin caustics outline on the edge of the blocks.
-* Add ambient occlusion option to display settings.
+* Fix big static objects affected wrongly by dynamic lights.
+* Add SSAO as ambient occlusion.
+* Add new post-process workflow with tone mapping (example: monochrome, sepia).
 * Add SMAA antialiasing instead of MSAA.
+* Revised totally transparency handling.
+* Fixed normal mapping for rooms, items, statics.
+* Increased the max frames for animatedated sequences from 128 to 256.
+* Optimized the renderer.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Add global events.
 * Add fast speed for fly cheat by holding Sprint input action.
