@@ -2657,6 +2657,9 @@ namespace TEN::Renderer
 			return;
 		}
 
+		SetDepthState(DepthState::Read);
+		SetCullMode(CullMode::CounterClockwise);
+
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[object->Room->RoomNumber];
 
 		UINT stride = sizeof(Vertex);
