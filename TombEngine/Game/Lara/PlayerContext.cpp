@@ -1374,41 +1374,24 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
-			// 2.6) Test if relative edge height is within edge intersection bounds.
-			if (player.Control.WaterStatus == WaterStatus::TreadWater)
+			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
+			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+			// 2.6) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
+			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor);
+			if (relEdgeHeight >= setup.LowerEdgeBound ||
+				relEdgeHeight < setup.UpperEdgeBound)
 			{
-				int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
-
-				// 2.6a) Test relative edge-to-water height.
-				int relEdgeHeight = attracColl.Proximity.Intersection.y - waterSurfaceHeight;
-				if (relEdgeHeight >= setup.LowerEdgeBound ||
-					relEdgeHeight < setup.UpperEdgeBound)
-				{
-					continue;
-				}
-
-				// 2.6b) Test player water surface threshold.
-				int relPlayerWaterSurfaceHeight = abs(item.Pose.Position.y - waterSurfaceHeight);
-				if (relPlayerWaterSurfaceHeight > REL_SURFACE_HEIGHT_THRESHOLD)
-					continue;
-			}
-			else
-			{
-				// 2.6a) Test relative edge-to-floor height.
-				int relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollBack.Position.Floor;
-				if (relEdgeHeight >= setup.LowerEdgeBound ||
-					relEdgeHeight < setup.UpperEdgeBound)
-				{
-					continue;
-				}
-
-				// 2.6b) Test player floor threshold.
-				int relPlayerFloorHeight = abs(item.Pose.Position.y - (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Proximity.Intersection.y));
-				if (relPlayerFloorHeight > REL_SURFACE_HEIGHT_THRESHOLD)
-					continue;
+				continue;
 			}
 
-			// 2.7) Test if ceiling behind is adequately higher than edge.
+			// 2.7) Test if player vertical position is within surface threshold. NOTE: Special case for water tread.
+			int surfaceHeight = isTreadingWater ? waterSurfaceHeight : (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Proximity.Intersection.y);
+			int relPlayerSurfaceHeight = abs(item.Pose.Position.y - surfaceHeight);
+			if (relPlayerSurfaceHeight > REL_SURFACE_HEIGHT_THRESHOLD)
+				continue;
+
+			// 2.8) Test if ceiling behind is adequately higher than edge.
 			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
@@ -1423,7 +1406,7 @@ namespace TEN::Entities::Player
 			{
 				const auto& destPointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
 
-				// 2.8) Test destination floor-to-ceiling height.
+				// 2.9) Test destination floor-to-ceiling height.
 				int destFloorToCeilHeight = abs(destPointColl.Position.Ceiling - destPointColl.Position.Floor);
 				if (destFloorToCeilHeight <= setup.DestFloorToCeilHeightMin ||
 					destFloorToCeilHeight > setup.DestFloorToCeilHeightMax)
@@ -1431,7 +1414,7 @@ namespace TEN::Entities::Player
 					continue;
 				}
 
-				// 2.9) Test destination floor-to-edge height if approaching from front.
+				// 2.10) Test destination floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
 					int destFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - destPointColl.Position.Floor);
@@ -1443,20 +1426,20 @@ namespace TEN::Entities::Player
 				auto origin = Vector3(staticPointColl.Coordinates.x, staticPointColl.Position.Floor, staticPointColl.Coordinates.z);
 				auto dir = setup.TestEdgeFront ? -Vector3::UnitY : Vector3::UnitY;
 
-				// 2.10) Test for static object.
+				// 2.11) Test for static object.
 				auto staticLos = GetStaticObjectLos(origin, attracColl.AttractorPtr->GetRoomNumber(), dir, coll.Setup.Height, false);
 				if (staticLos.has_value())
 					continue;
 			}
 
-			// 2.11) Test for illegal slope at destination (if applicable).
+			// 2.12) Test for illegal slope at destination (if applicable).
 			if (setup.TestDestIllegalSlope)
 			{
 				if (setup.TestEdgeFront ? pointCollFront.Position.FloorSlope : pointCollBack.Position.FloorSlope)
 					continue;
 			}
 
-			// 2.12) Track highest or return lowest attractor collision.
+			// 2.13) Track highest or return lowest attractor collision.
 			if (setup.FindHighest)
 			{
 				if (highestAttracCollPtr == nullptr)
