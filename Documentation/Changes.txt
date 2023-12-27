@@ -16,6 +16,7 @@ Version 1.3
 * Fix several issues with limited pistol ammo.
 * Fix Lara not being able to crawl if two-handed weapon is currently equipped.
 * Fix playback issues with audio tracks placed in subfolders.
+* Fix legacy trigger leveljumps ignoring provided level index.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Improve fly cheat collision.
 * Add global events.
