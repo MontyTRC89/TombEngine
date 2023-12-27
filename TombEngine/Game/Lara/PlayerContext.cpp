@@ -1313,8 +1313,8 @@ namespace TEN::Entities::Player
 																					 const EdgeVaultClimbSetupData& setup,
 																					 const std::vector<AttractorCollisionData>& attracColls)
 	{
-		constexpr auto SWAMP_DEPTH_MAX			  = -CLICK(3);
-		constexpr auto REL_FLOOR_HEIGHT_THRESHOLD = CLICK(0.5f);
+		constexpr auto SWAMP_DEPTH_MAX				= -CLICK(3);
+		constexpr auto REL_SURFACE_HEIGHT_THRESHOLD = CLICK(0.5f);
 
 		// HACK: Offset required for proper bridge surface height detection. Floordata should be revised for proper handling.
 		constexpr auto PROBE_POINT_OFFSET = Vector3(0.0f, -CLICK(1), 0.0f);
@@ -1374,17 +1374,38 @@ namespace TEN::Entities::Player
 				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
-			// TODO: Simplify! Trash! Bad!
-			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
-			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? item.Pose.Position.y : pointCollBack.Position.Floor);
-			int relPlayerFloorHeight = abs(item.Pose.Position.y - (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Proximity.Intersection.y));
-
 			// 2.6) Test if relative edge height is within edge intersection bounds.
-			if (relEdgeHeight >= setup.LowerEdgeBound ||
-				relEdgeHeight < setup.UpperEdgeBound ||
-				(relPlayerFloorHeight > REL_FLOOR_HEIGHT_THRESHOLD && !isTreadingWater))
+			if (player.Control.WaterStatus == WaterStatus::TreadWater)
 			{
-				continue;
+				int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+				// 2.6a) Test relative edge-to-water height.
+				int relEdgeHeight = attracColl.Proximity.Intersection.y - waterSurfaceHeight;
+				if (relEdgeHeight >= setup.LowerEdgeBound ||
+					relEdgeHeight < setup.UpperEdgeBound)
+				{
+					continue;
+				}
+
+				// 2.6b) Test player water surface threshold.
+				int relPlayerWaterSurfaceHeight = abs(item.Pose.Position.y - waterSurfaceHeight);
+				if (relPlayerWaterSurfaceHeight > REL_SURFACE_HEIGHT_THRESHOLD)
+					continue;
+			}
+			else
+			{
+				// 2.6a) Test relative edge-to-floor height.
+				int relEdgeHeight = attracColl.Proximity.Intersection.y - pointCollBack.Position.Floor;
+				if (relEdgeHeight >= setup.LowerEdgeBound ||
+					relEdgeHeight < setup.UpperEdgeBound)
+				{
+					continue;
+				}
+
+				// 2.6b) Test player floor threshold.
+				int relPlayerFloorHeight = abs(item.Pose.Position.y - (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Proximity.Intersection.y));
+				if (relPlayerFloorHeight > REL_SURFACE_HEIGHT_THRESHOLD)
+					continue;
 			}
 
 			// 2.7) Test if ceiling behind is adequately higher than edge.
@@ -1414,7 +1435,7 @@ namespace TEN::Entities::Player
 				if (setup.TestEdgeFront)
 				{
 					int destFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - destPointColl.Position.Floor);
-					if (destFloorToEdgeHeight > REL_FLOOR_HEIGHT_THRESHOLD)
+					if (destFloorToEdgeHeight > REL_SURFACE_HEIGHT_THRESHOLD)
 						continue;
 				}
 
