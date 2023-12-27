@@ -1144,8 +1144,8 @@ namespace TEN::Entities::Player
 				return false;
 		}
 
-		// 3) Test for object blocking ledge.
-		if (TestForObjectOnLedge(item, coll))
+		// 3) Test for object obstruction.
+		if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, -coll.Setup.Height + CLICK(1), true))
 			return false;
 
 		// 4) Test ledge floor-to-edge height.
@@ -1356,7 +1356,7 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// TODO: Point collision probing may traverse rooms incorrectly if bridges cross rooms.
+			// TODO: Point collision probing may traverse rooms incorrectly when attractors cross rooms.
 			// Solution is to probe from player's position and room. Combine player/intersect RelDeltaPos and RelPosOffset.
 
 			// Get point collision at edge.
@@ -1365,6 +1365,7 @@ namespace TEN::Entities::Player
 				attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
+			// TODO: Rotating platforms don't exist yet, so this is hypothetical.
 			// 2.5) Test if intersection is blocked by ceiling.
 			if (attracColl.Proximity.Intersection.y <= pointCollCenter.Position.Ceiling)
 				continue;
@@ -1422,13 +1423,8 @@ namespace TEN::Entities::Player
 						continue;
 				}
 
-				const auto& staticPointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
-				auto origin = Vector3(staticPointColl.Coordinates.x, staticPointColl.Position.Floor, staticPointColl.Coordinates.z);
-				auto dir = setup.TestEdgeFront ? -Vector3::UnitY : Vector3::UnitY;
-
-				// 2.11) Test for static object.
-				auto staticLos = GetStaticObjectLos(origin, attracColl.AttractorPtr->GetRoomNumber(), dir, coll.Setup.Height, false);
-				if (staticLos.has_value())
+				// 2.11) Test for object obstruction.
+				if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, coll.Setup.Height - CLICK(1), false))
 					continue;
 			}
 

@@ -122,16 +122,8 @@ using namespace TEN::Math;
 
 	Vector3 EulerAngles::ToDirection() const
 	{
-		float sinX = sin(TO_RAD(x));
-		float cosX = cos(TO_RAD(x));
-		float sinY = sin(TO_RAD(y));
-		float cosY = cos(TO_RAD(y));
-
-		// Return normalized direction vector.
-		return Vector3(
-			sinY * cosX,
-			-sinX,
-			cosY * cosX);
+		auto rotMatrix = ToRotationMatrix();
+		return (Matrix::CreateTranslation(Vector3::UnitZ) * rotMatrix).Translation();
 	}
 
 	AxisAngle EulerAngles::ToAxisAngle() const
@@ -239,8 +231,8 @@ using namespace TEN::Math;
 
 	bool EulerAngles::Compare(short angle0, short angle1, short epsilon)
 	{
-		short difference = Geometry::GetShortestAngle(angle0, angle1);
-		if (abs(difference) <= epsilon)
+		short angleDelta = Geometry::GetShortestAngle(angle0, angle1);
+		if (abs(angleDelta) <= epsilon)
 			return true;
 
 		return false;

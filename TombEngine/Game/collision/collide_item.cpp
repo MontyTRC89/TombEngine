@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/control/los.h"
+#include "Game/collision/AttractorCollision.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/debris.h"
@@ -20,6 +21,7 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -300,28 +302,28 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 	return true;
 }
 
-bool TestForObjectOnLedge(const ItemInfo& item, const CollisionInfo& coll)
+bool TestForObjectOnLedge(const AttractorCollisionData& attracColl, float radius, float down, bool testAttracFront)
 {
 	constexpr auto PASS_COUNT = 3;
 
+	short headingAngle = attracColl.HeadingAngle + (testAttracFront ? ANGLE(0.0f) : ANGLE(180.0f));
+
 	// Calculate ray origins.
-	int down = -coll.Setup.Height + CLICK(1);
 	auto origins = std::array<Vector3, PASS_COUNT>
 	{
-		Geometry::TranslatePoint(item.Pose.Position.ToVector3(), coll.Setup.ForwardAngle, 0.0f, down, -coll.Setup.Radius),
-		Geometry::TranslatePoint(item.Pose.Position.ToVector3(), coll.Setup.ForwardAngle, 0.0f, down, 0.0f),
-		Geometry::TranslatePoint(item.Pose.Position.ToVector3(), coll.Setup.ForwardAngle, 0.0f, down, coll.Setup.Radius)
+		Geometry::TranslatePoint(attracColl.Proximity.Intersection, headingAngle, 0.0f, down, -radius),
+		Geometry::TranslatePoint(attracColl.Proximity.Intersection, headingAngle, 0.0f, down, 0.0f),
+		Geometry::TranslatePoint(attracColl.Proximity.Intersection, headingAngle, 0.0f, down, radius)
 	};
 
 	//for (const auto& origin : origins)
 	//	g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
 
 	// Calculate ray direction.
-	auto rotMatrix = Matrix::CreateRotationY(TO_RAD(coll.Setup.ForwardAngle));
-	auto dir = (Matrix::CreateTranslation(Vector3::UnitZ) * rotMatrix).Translation();
+	auto dir = EulerAngles(0, headingAngle, 0).ToDirection();
 
 	// Run through neighbor rooms.
-	const auto& room = g_Level.Rooms[item.RoomNumber];
+	const auto& room = g_Level.Rooms[attracColl.AttractorPtr->GetRoomNumber()];
 	for (int roomNumber : room.neighbors)
 	{
 		const auto& neighborRoom = g_Level.Rooms[roomNumber];
@@ -342,15 +344,18 @@ bool TestForObjectOnLedge(const ItemInfo& item, const CollisionInfo& coll)
 				continue;
 			}
 
-			if (Vector3i::Distance(item.Pose.Position, collidedItem.Pose.Position) < COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(attracColl.Proximity.Intersection, collidedItem.Pose.Position) > COLLISION_CHECK_DISTANCE)
 			{
-				auto box = GameBoundingBox(&collidedItem).ToBoundingOrientedBox(collidedItem.Pose);
-				for (const auto& origin : origins)
-				{
-					float dist = 0.0f;
-					if (box.Intersects(origin, dir, dist) && dist < (coll.Setup.Radius * 2))
-						return true;
-				}
+				collidedItemNumber = collidedItem.NextItem;
+				continue;
+			}
+			
+			auto box = GameBoundingBox(&collidedItem).ToBoundingOrientedBox(collidedItem.Pose);
+			for (const auto& origin : origins)
+			{
+				float dist = 0.0f;
+				if (box.Intersects(origin, dir, dist) && dist < (radius * 2))
+					return true;
 			}
 
 			collidedItemNumber = collidedItem.NextItem;
@@ -362,15 +367,15 @@ bool TestForObjectOnLedge(const ItemInfo& item, const CollisionInfo& coll)
 			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
-			if (Vector3i::Distance(item.Pose.Position, staticObject.pos.Position) < COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(attracColl.Proximity.Intersection, staticObject.pos.Position) > COLLISION_CHECK_DISTANCE)
+				continue;
+
+			const auto& box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+			for (const auto& origin : origins)
 			{
-				const auto& box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-				for (const auto& origin : origins)
-				{
-					float dist = 0.0f;
-					if (box.Intersects(origin, dir, dist) && dist < (coll.Setup.Radius * 2))
-						return true;
-				}
+				float dist = 0.0f;
+				if (box.Intersects(origin, dir, dist) && dist < (radius * 2))
+					return true;
 			}
 		}
 	}
