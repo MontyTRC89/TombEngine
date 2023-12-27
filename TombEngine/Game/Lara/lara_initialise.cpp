@@ -171,7 +171,7 @@ void InitializeLaraStartPosition(ItemInfo* item)
 		if (it.ObjectNumber != GAME_OBJECT_ID::ID_LARA_START_POS)
 			continue;
 
-		if (it.TriggerFlags != RequiredStartPos)
+		if (!it.TriggerFlags || it.TriggerFlags != RequiredStartPos)
 			continue;
 
 		item->Pose = it.Pose;
