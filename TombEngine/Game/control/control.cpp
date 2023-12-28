@@ -495,8 +495,6 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 
 void InitializeOrLoadGame(bool loadGame)
 {
-	RequiredStartPos = false;
-
 	g_Gui.SetInventoryItemChosen(NO_ITEM);
 	g_Gui.SetEnterInventory(NO_ITEM);
 
