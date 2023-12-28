@@ -124,11 +124,13 @@ have an ID of 0, the second an ID of 1, and so on.
 	tableFlow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
 
 /***
-Finishes the current level, with optional level index provided. If level index
-is not provided or is zero, jumps to next level. If level index is more than
-level count, jumps to title.
+Finishes the current level, with optional level index and start position index provided.
+If level index is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title. If LARA_START_POS objects are present in level, player will be
+teleported to such object with OCB similar to provided second argument.
 @function EndLevel
 @int[opt] index level index (default 0)
+@int[opt] startPos player start position (default 0)
 */
 	tableFlow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
 
@@ -430,10 +432,11 @@ int FlowHandler::GetLevelNumber(const std::string& fileName)
 	return -1;
 }
 
-void FlowHandler::EndLevel(std::optional<int> nextLevel)
+void FlowHandler::EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
 	NextLevel = index;
+	RequiredStartPos = startPosIndex.has_value() ? startPosIndex.value() : 0;
 }
 
 GameStatus FlowHandler::GetGameStatus()
@@ -649,6 +652,7 @@ bool FlowHandler::DoFlow()
 
 		case GameStatus::NewGame:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
+			RequiredStartPos = 0;
 			SelectedLevelForNewGame = 0;
 			InitializeGame = true;
 			break;
