@@ -14,14 +14,14 @@ Constants for game statuses.
 
 The following constants are inside Flow.GameStatus.
 
-NORMAL
-NEW_GAME
-LOAD_GAME
-SAVE_GAME
-EXIT_TO_TITLE
-EXIT_GAME
-LARA_DEAD
-LEVEL_COMPLETE
+	NORMAL
+	NEW_GAME
+	LOAD_GAME
+	SAVE_GAME
+	EXIT_TO_TITLE
+	EXIT_GAME
+	LARA_DEAD
+	LEVEL_COMPLETE
 
 @section Flow.GameStatus
 */

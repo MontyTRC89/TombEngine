@@ -193,12 +193,12 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 
 	/// Get the moveable's status.
 	// @function Moveable:GetStatus()
-	// @treturn MoveableEnum.Status The moveable's status.
+	// @treturn Objects.MoveableStatus The moveable's status.
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
 	/// Set the moveable's status.
 	// @function Moveable:SetStatus()
-	// @tparam MoveableEnum.Status status The new status of the moveable.
+	// @tparam Objects.MoveableStatus status The new status of the moveable.
 	ScriptReserved_SetStatus, &Moveable::SetStatus,
 
 	/// Set the name of the function to be called when the moveable is shot by Lara.
