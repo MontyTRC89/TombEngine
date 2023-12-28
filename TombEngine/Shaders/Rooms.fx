@@ -92,7 +92,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.UV = input.UV;
 #endif
 	
-	output.WorldPosition = input.Position.xyz;
+	output.WorldPosition = pos;
 	output.Tangent = input.Tangent;
 	output.Binormal = input.Binormal;
 

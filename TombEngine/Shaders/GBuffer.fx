@@ -113,8 +113,6 @@ PixelShaderInput VSItems(VertexShaderInput input)
 
 	float4x4 world = mul(Bones[input.Bone], ItemWorld);
 
-	float3 worldPosition = (mul(float4(input.Position, 1.0f), world).xyz);
-
 	// Calculate vertex effects
 	float wibble = Wibble(input.Effects.xyz, input.Hash);
 	float3 pos = Move(input.Position, input.Effects.xyz, wibble);
@@ -154,7 +152,6 @@ PixelShaderInput VSInstancedStatics(VertexShaderInput input, uint InstanceID : S
 
 	float wibble = Wibble(input.Effects.xyz, input.Hash);
 	float3 pos = Move(input.Position, input.Effects.xyz, wibble);
-	float3 col = Glow(input.Color.xyz, input.Effects.xyz, input.Hash);
 
 	float4 worldPosition = (mul(float4(pos, 1.0f), StaticMeshes[InstanceID].World));
 

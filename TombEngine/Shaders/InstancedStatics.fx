@@ -57,7 +57,7 @@ PixelShaderInput VS(VertexShaderInput input, uint InstanceID : SV_InstanceID)
 
 	float wibble = Wibble(input.Effects.xyz, input.Hash);
 	float3 pos = Move(input.Position, input.Effects.xyz, wibble);
-	float3 col = Glow(input.Color.xyz, input.Effects.xyz, input.Hash);
+	float3 col = Glow(input.Color.xyz, input.Effects.xyz, wibble);
 
 	float4 worldPosition = (mul(float4(pos, 1.0f), StaticMeshes[InstanceID].World));
 
