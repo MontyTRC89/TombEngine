@@ -15,6 +15,7 @@ Version 1.3
 * Fix jittery camera when performing crawl-to-hang.
 * Fix several issues with limited pistol ammo.
 * Fix Lara not being able to crawl if two-handed weapon is currently equipped.
+* Fix playback issues with audio tracks placed in subfolders.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Improve fly cheat collision.
 * Add global events.
@@ -32,8 +33,9 @@ Version 1.3
 Lua API changes:
 * Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
 * Add Moveable:SetStatus() to set the current status of the moveable.
-* Add View:GetCameraPosition(), View:GetCameraTarget() and View:GetCameraRoom() functions.
 * Add Room:GetColor() to get room's ambient light color.
+* Add Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
+* Add View.GetCameraPosition(), View.GetCameraTarget() and View:GetCameraRoom() functions.
 
 Version 1.2
 ===========

@@ -201,6 +201,7 @@ struct ItemInfo
 
 	bool IsLara() const;
 	bool IsCreature() const;
+	bool IsBridge() const;
 
 	void ResetModelToDefault();
 };

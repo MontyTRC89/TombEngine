@@ -146,18 +146,14 @@ namespace TEN::Entities::Player
 		if (!g_GameFlow->HasAFKPose())
 			return false;
 
-		// 2) Test AFK pose timer.
-		if (player.Control.Count.Pose < PLAYER_POSE_TIME)
-			return false;
-
-		// 3) Test player hand and water status.
+		// 2) Test player hand and water status.
 		if (player.Control.HandStatus != HandStatus::Free ||
 			player.Control.WaterStatus == WaterStatus::Wade)
 		{
 			return false;
 		}
 
-		// 4) Assess player status.
+		// 3) Assess player status.
 		if (!(IsHeld(In::Flare) || IsHeld(In::Draw)) &&				   // Avoid unsightly concurrent actions.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare.
 				player.Flare.Life) &&								   // OR flare is still active.

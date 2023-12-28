@@ -6,11 +6,13 @@
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/BridgeObject.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 
@@ -124,10 +126,10 @@ std::optional<int> FloorInfo::GetRoomNumberBelow(const Vector3i& pos) const
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
-		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+		const auto& bridge = GetBridgeObject(bridgeItem);
 
 		// 2.1) Get bridge floor height.
-		auto bridgeFloorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
+		auto bridgeFloorHeight = bridge.GetFloorHeight(bridgeItem, pos);
 		if (!bridgeFloorHeight.has_value())
 			continue;
 
@@ -169,10 +171,10 @@ std::optional<int> FloorInfo::GetRoomNumberAbove(const Vector3i& pos) const
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
-		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+		const auto& bridge = GetBridgeObject(bridgeItem);
 
 		// 2.1) Get bridge ceiling height.
-		auto bridgeCeilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
+		auto bridgeCeilingHeight = bridge.GetCeilingHeight(bridgeItem, pos);
 		if (!bridgeCeilingHeight.has_value())
 			continue;
 
@@ -221,10 +223,10 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
-		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+		const auto& bridge = GetBridgeObject(bridgeItem);
 
 		// 2.1) Get bridge surface height.
-		auto bridgeSurfaceHeight = isFloor ? bridgeObject.GetFloorHeight(bridgeItem, pos) : bridgeObject.GetCeilingHeight(bridgeItem, pos);
+		auto bridgeSurfaceHeight = isFloor ? bridge.GetFloorHeight(bridgeItem, pos) : bridge.GetCeilingHeight(bridgeItem, pos);
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
 
@@ -261,11 +263,11 @@ int FloorInfo::GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
-		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+		const auto& bridge = GetBridgeObject(bridgeItem);
 
 		// 1.1) Get bridge floor and ceiling heights.
-		auto floorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
-		auto ceilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
+		auto floorHeight = bridge.GetFloorHeight(bridgeItem, pos);
+		auto ceilingHeight = bridge.GetCeilingHeight(bridgeItem, pos);
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
@@ -315,11 +317,11 @@ int FloorInfo::GetInsideBridgeItemNumber(const Vector3i& pos, bool testFloorBord
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
-		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+		const auto& bridge = GetBridgeObject(bridgeItem);
 
 		// 1.1) Get bridge floor and ceiling heights.
-		auto floorHeight = bridgeObject.GetFloorHeight(bridgeItem, pos);
-		auto ceilingHeight = bridgeObject.GetCeilingHeight(bridgeItem, pos);
+		auto floorHeight = bridge.GetFloorHeight(bridgeItem, pos);
+		auto ceilingHeight = bridge.GetCeilingHeight(bridgeItem, pos);
 		if (!floorHeight.has_value() || !ceilingHeight.has_value())
 			continue;
 
@@ -830,7 +832,7 @@ namespace TEN::Collision::Floordata
 	void AddBridge(int itemNumber, int x, int z)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
-		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+		const auto& bridge = GetBridgeObject(bridgeItem);
 
 		if (!Objects.CheckID(bridgeItem.ObjectNumber))
 			return;
@@ -841,9 +843,9 @@ namespace TEN::Collision::Floordata
 		auto* sectorPtr = &GetFloorSide(bridgeItem.RoomNumber, x, z);
 		sectorPtr->AddBridge(itemNumber);
 
-		if (bridgeObject.GetFloorBorder != nullptr)
+		if (bridge.GetFloorBorder != nullptr)
 		{
-			int floorBorder = bridgeObject.GetFloorBorder(bridgeItem);
+			int floorBorder = bridge.GetFloorBorder(bridgeItem);
 			while (floorBorder <= sectorPtr->GetSurfaceHeight(x, z, false))
 			{
 				auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(x, z);
@@ -855,9 +857,9 @@ namespace TEN::Collision::Floordata
 			}
 		}
 		
-		if (bridgeObject.GetCeilingBorder != nullptr)
+		if (bridge.GetCeilingBorder != nullptr)
 		{
-			int ceilingBorder = bridgeObject.GetCeilingBorder(bridgeItem);
+			int ceilingBorder = bridge.GetCeilingBorder(bridgeItem);
 			while (ceilingBorder >= sectorPtr->GetSurfaceHeight(x, z, true))
 			{
 				auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(x, z);
@@ -873,7 +875,7 @@ namespace TEN::Collision::Floordata
 	void RemoveBridge(int itemNumber, int x, int z)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
-		const auto& bridgeObject = Objects[bridgeItem.ObjectNumber];
+		const auto& bridge = GetBridgeObject(bridgeItem);
 
 		if (!Objects.CheckID(bridgeItem.ObjectNumber))
 			return;
@@ -884,9 +886,9 @@ namespace TEN::Collision::Floordata
 		auto* sectorPtr = &GetFloorSide(bridgeItem.RoomNumber, x, z);
 		sectorPtr->RemoveBridge(itemNumber);
 
-		if (bridgeObject.GetFloorBorder != nullptr)
+		if (bridge.GetFloorBorder != nullptr)
 		{
-			int floorBorder = bridgeObject.GetFloorBorder(bridgeItem);
+			int floorBorder = bridge.GetFloorBorder(bridgeItem);
 			while (floorBorder <= sectorPtr->GetSurfaceHeight(x, z, false))
 			{
 				auto roomNumberAbove = sectorPtr->GetRoomNumberAbove(x, z);
@@ -898,9 +900,9 @@ namespace TEN::Collision::Floordata
 			}
 		}
 
-		if (bridgeObject.GetCeilingBorder != nullptr)
+		if (bridge.GetCeilingBorder != nullptr)
 		{
-			int ceilingBorder = bridgeObject.GetCeilingBorder(bridgeItem);
+			int ceilingBorder = bridge.GetCeilingBorder(bridgeItem);
 			while (ceilingBorder >= sectorPtr->GetSurfaceHeight(x, z, true))
 			{
 				auto roomNumberBelow = sectorPtr->GetRoomNumberBelow(x, z);
@@ -960,9 +962,9 @@ namespace TEN::Collision::Floordata
 		// Get bridge OBB.
 		auto bridgeBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
-		// Get bridge OBB corners.
+		// Get bridge OBB corners. NOTE: only 0, 1, 4, 5 are relevant.
 		auto corners = std::array<Vector3, 8>{};
-		bridgeBox.GetCorners(corners.data()); // corners[0], corners[1], corners[4] corners[5]
+		bridgeBox.GetCorners(corners.data());
 
 		const auto& room = g_Level.Rooms[item.RoomNumber];
 
@@ -972,7 +974,7 @@ namespace TEN::Collision::Floordata
 		float xMax =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
 		float zMax =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
 
-		// Run through all sectors enclosed in projected bridge AABB.
+		// Run through sectors enclosed in projected bridge AABB.
 		for (int x = 0; x < room.xSize; x++)
 		{
 			for (int z = 0; z < room.zSize; z++)

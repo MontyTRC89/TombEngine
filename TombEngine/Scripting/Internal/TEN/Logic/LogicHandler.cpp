@@ -209,7 +209,7 @@ This is intended for module/library developers who want their modules to do
 stuff during level start/load/end/save/control phase, but don't want the level
 designer to add calls to `OnStart`, `OnLoad`, etc. in their level script.
 
-Possible values for CallbackPoint:
+Possible values for `point`:
 	-- These take functions which accept no arguments
 	PRESTART -- will be called immediately before OnStart
 	POSTSTART -- will be called immediately after OnStart
@@ -281,12 +281,23 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 	it->second->erase(levelFunc.m_funcName);
 }
 
-/*** Attempt to find an event set and exectute a particular event from it.
+/*** Attempt to find an event set and execute a particular event from it.
+@advancedDesc
+
+Possible event type values:
+	ENTER
+	INSIDE
+	LEAVE
+	LOAD
+	SAVE
+	START
+	END
+	LOOP
 
 @function HandleEvent
 @tparam string name Name of the event set to find.
 @tparam EventType type Event to execute.
-@tparam Moveable activator Optional activator. Default is the player object.
+@tparam Objects.Moveable activator Optional activator. Default is the player object.
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
@@ -1114,20 +1125,15 @@ void LogicHandler::InitCallbacks()
 
 		sol::object theData = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
-		std::string msg{ "Level's script does not define callback " + fullName + ". Defaulting to no " + fullName + " behaviour." };
-
 		if (!theData.valid())
-		{
-			TENLog(msg);
 			return;
-		}
 
 		LevelFunc fnh = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
 		if (!func.valid())
-			TENLog(msg);
+			TENLog("Level's script does not define callback " + fullName + ". Defaulting to no " + fullName + " behaviour.");
 	};
 
 	assignCB(m_onStart, ScriptReserved_OnStart);

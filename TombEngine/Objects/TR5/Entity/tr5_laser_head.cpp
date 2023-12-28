@@ -400,13 +400,12 @@ namespace TEN::Entities::Creatures::TR5
 											farAway = 2;
 
 										auto hitPos = Vector3i::Zero;
-										MESH_INFO* hitMesh = nullptr;
 
 										auto start = GameVector(guardian->fireArcs[i]->pos1.x, guardian->fireArcs[i]->pos1.y, guardian->fireArcs[i]->pos1.z);
 										start.RoomNumber = item->RoomNumber;
 										auto end = GameVector(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, 0);
 
-										if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == LaraItem->Index)
+										if (ObjectOnLOS2(&start, &end, &hitPos, nullptr, ID_LARA) == LaraItem->Index)
 										{
 											if (LaraItem->Effect.Type != EffectType::Smoke)
 											{

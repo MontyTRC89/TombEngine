@@ -14,20 +14,26 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/BridgeObject.h"
+#include "Objects/Generic/Object/Pushable/PushableInfo.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 
@@ -245,12 +251,17 @@ void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool cle
 
 bool ItemInfo::IsLara() const
 {
-	return this->Data.is<LaraInfo*>();
+	return Data.is<LaraInfo*>();
 }
 
 bool ItemInfo::IsCreature() const
 {
-	return this->Data.is<CreatureInfo>();
+	return Data.is<CreatureInfo>();
+}
+
+bool ItemInfo::IsBridge() const
+{
+	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
 }
 
 void ItemInfo::ResetModelToDefault()
@@ -359,9 +370,9 @@ void KillItem(short const itemNumber)
 			Lara.TargetEntity = nullptr;
 
 		// Clear bridges.
-		// AI target generation uses hack with making dummy item without ObjectNumber.
-		// Therefore, check must be done to prevent access violation.
-		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && Objects[item->ObjectNumber].GetFloorHeight != nullptr)
+		// AI target generation uses a hack with making a dummy item without ObjectNumber.
+		// Therefore, a check should be done here to prevent access violation.
+		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
 			UpdateBridgeItem(*item, true);
 
 		GameScriptHandleKilled(itemNumber, true);
