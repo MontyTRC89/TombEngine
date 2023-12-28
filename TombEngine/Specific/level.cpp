@@ -35,7 +35,6 @@ using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 using namespace TEN::Utils;
 
-// TODO: Confirm list.
 const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 {
 	ID_EXPANDING_PLATFORM,
