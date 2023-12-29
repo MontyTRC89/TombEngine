@@ -13,8 +13,6 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	constexpr auto TRANSFORM_SPAWN_RANGE = BLOCK(9);
-
 	constexpr auto TRANSFORM_EFFECT_1_TIME = 100;
 	constexpr auto TRANSFORM_EFFECT_2_TIME = 115;
 	constexpr auto TRANSFORM_EFFECT_3_TIME = 130;
@@ -26,9 +24,6 @@ namespace TEN::Entities::Creatures::TR2
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-
-		if (item.TriggerFlags == 0)
-			item.Status = ITEM_INVISIBLE;
 	}
 
 	static void SpawnBartoliTransformEffect(const ItemInfo& item, GAME_OBJECT_ID objectID)
@@ -53,19 +48,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		if (item.Animation.FrameNumber == 0)
 		{
-			// Activate when within player's range.
-			if (item.TriggerFlags == 0)
-			{
-				float distFromPlayer = Vector3i::Distance(LaraItem->Pose.Position, item.Pose.Position);
-				if (distFromPlayer > TRANSFORM_SPAWN_RANGE)
-					return;
-			}
-			// Activate via trigger.
-			else
-			{
-				if (!TriggerActive(&item))
-					return;
-			}
+			if (!TriggerActive(&item))
+				return;
 
 			if (item.ItemFlags[0] == 0)
 				transformObjectID = ID_DRAGON_FRONT;
