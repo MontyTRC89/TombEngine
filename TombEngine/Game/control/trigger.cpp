@@ -750,7 +750,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			break;
 
 		case TO_FINISH:
-			NextLevel = value ? value : CurrentLevel + 1;
+			NextLevel = value ? value : (CurrentLevel + 1);
 			RequiredStartPos = timer;
 			break;
 

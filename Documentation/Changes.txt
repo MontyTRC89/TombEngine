@@ -14,13 +14,13 @@ Version 1.3
 * Fix player not being able to pick up a torch when crouching.
 * Fix jittery camera when performing crawl-to-hang.
 * Fix several issues with limited pistol ammo.
-* Fix Lara not being able to crawl if two-handed weapon is currently equipped.
+* Fix player not being able to crawl if two-handed weapon is currently equipped.
 * Fix playback issues with audio tracks placed in subfolders.
 * Fix legacy trigger leveljumps ignoring provided level index.
 * Separate underwater wall and ceiling switch objects into two slots each.
 * Improve fly cheat collision.
 * Add global events.
-* Add previously missing Lara start position object functionality.
+* Add previously missing player start position object functionality.
 * Add fast speed for fly cheat by holding Sprint input action.
 * Allow walking on slopes when wading in water (similar to quicksand).
 * Allow player to pull certain levers with both hands when holding a flare.
