@@ -96,18 +96,14 @@ namespace TEN::Entities::Player
 		if (!g_GameFlow->HasAFKPose())
 			return false;
 
-		// 2) Test AFK pose timer.
-		if (player.Control.Count.Pose < PLAYER_POSE_TIME)
-			return false;
-
-		// 3) Test player hand and water status.
+		// 2) Test player hand and water status.
 		if (player.Control.HandStatus != HandStatus::Free ||
 			player.Control.WaterStatus == WaterStatus::Wade)
 		{
 			return false;
 		}
 
-		// 4) Assess player status.
+		// 3) Assess player status.
 		if (!(IsHeld(In::Flare) || IsHeld(In::Draw)) &&				   // Avoid unsightly concurrent actions.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare.
 				player.Flare.Life) &&								   // OR flare is still active.
@@ -482,9 +478,11 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Assess player status.
-		if (player.Control.WaterStatus != WaterStatus::Wade &&			  // Player is wading.
-			(player.Control.HandStatus == HandStatus::Free ||			  // Player hands are free.
-				!IsStandingWeapon(&item, player.Control.Weapon.GunType))) // OR player is wielding a non-standing weapon.
+		if (player.Control.WaterStatus != WaterStatus::Wade && // Player is wading.
+			!((player.Control.HandStatus == HandStatus::WeaponReady ||
+				player.Control.HandStatus == HandStatus::WeaponDraw ||
+				player.Control.HandStatus == HandStatus::WeaponUndraw) &&
+				IsStandingWeapon(&item, player.Control.Weapon.GunType))) // OR player is wielding a non-standing weapon.
 		{
 			return true;
 		}

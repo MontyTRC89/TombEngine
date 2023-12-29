@@ -16,7 +16,6 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableStatuses.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
@@ -194,12 +193,12 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 
 	/// Get the moveable's status.
 	// @function Moveable:GetStatus()
-	// @treturn MoveableEnum.Status The moveable's status.
+	// @treturn Objects.MoveableStatus The moveable's status.
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
 	/// Set the moveable's status.
 	// @function Moveable:SetStatus()
-	// @tparam MoveableEnum.Status status The new status of the moveable.
+	// @tparam Objects.MoveableStatus status The new status of the moveable.
 	ScriptReserved_SetStatus, &Moveable::SetStatus,
 
 	/// Set the name of the function to be called when the moveable is shot by Lara.
@@ -426,13 +425,6 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
 	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
-
-	auto moveableEnumTable = sol::table(state.lua_state(), sol::create);
-	parent.set(ScriptReserved_MoveableEnum, moveableEnumTable);
-
-	// Register enums.
-	auto handler = LuaHandler(&state);
-	handler.MakeReadOnlyTable(moveableEnumTable, ScriptReserved_MoveableStatus, MOVEABLE_STATUSES);
 }
 
 void Moveable::Init()
@@ -595,8 +587,7 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 		}
 	}
 
-	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
 }
 
@@ -626,8 +617,7 @@ void Moveable::SetRot(const Rotation& rot)
 	m_item->Pose.Orientation.y = ANGLE(rot.y);
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
 
-	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
 }
 

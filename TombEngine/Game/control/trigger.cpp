@@ -396,7 +396,7 @@ void Trigger(short const value, short const flags)
 	}
 }
 
-void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activator, bool heavy, int heavyFlags)
+void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -750,8 +750,8 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 			break;
 
 		case TO_FINISH:
-			RequiredStartPos = false;
-			NextLevel = CurrentLevel + 1;
+			NextLevel = value ? value : (CurrentLevel + 1);
+			RequiredStartPos = timer;
 			break;
 
 		case TO_CD:
@@ -771,22 +771,29 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 			}
 			break;
 
-		case TO_LUAEVENT:
+		case TO_VOLUMEEVENT:
+		case TO_GLOBALEVENT:
 			trigger = *(data++);
-
-			if (g_Level.EventSets.size() > value)
 			{
-				auto& set = g_Level.EventSets[value];
+				auto& list = targetType == TO_VOLUMEEVENT ? g_Level.VolumeEventSets : g_Level.GlobalEventSets;
 
-				auto activatorType = heavy ? (int)VolumeActivatorFlags::Flyby | 
-											 (int)VolumeActivatorFlags::Moveable | 
-											 (int)VolumeActivatorFlags::NPC : (int)VolumeActivatorFlags::Player;
-
-				if (!((int)set.Activators & activatorType))
+				if (list.size() <= value)
 					continue;
 
+				auto& set = list[value];
+
+				if (targetType == TO_VOLUMEEVENT)
+				{
+					auto activatorType = heavy ? (int)ActivatorFlags::Flyby |
+												 (int)ActivatorFlags::Moveable |
+												 (int)ActivatorFlags::NPC : (int)ActivatorFlags::Player;
+
+					if (!((int)set.Activators & activatorType))
+						continue;
+				}
+
 				int eventType = trigger & TIMER_BITS;
-				if (eventType >= (int)VolumeEventType::Count)
+				if (eventType >= (int)EventType::Count)
 				{
 					TENLog("Unknown volume event type encountered for legacy trigger " + std::to_string(eventType), LogLevel::Warning);
 					continue;

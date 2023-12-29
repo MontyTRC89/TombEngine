@@ -11,6 +11,8 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
@@ -67,6 +69,21 @@ namespace TEN::Scripting::View
 	{
 		return Camera.oldType;
 	}
+	
+	static Vec3 GetCameraPosition()
+	{
+		return Vec3(Camera.pos.ToVector3());
+	}
+
+	static Vec3 GetCameraTarget()
+	{
+		return Vec3(Camera.target.ToVector3());
+	}
+
+	static std::unique_ptr<Room> GetCameraRoom()
+	{
+		return std::make_unique<Room>(g_Level.Rooms[Camera.pos.RoomNumber]);
+	}
 
 	static void ResetObjCamera()
 	{
@@ -85,9 +102,6 @@ namespace TEN::Scripting::View
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
 	}
 
-	/// Get the display resolution's aspect ratio.
-	// @function GetAspectRatio
-	// @treturn float Display resolution's aspect ratio.
 	static float GetAspectRatio()
 	{
 		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
@@ -124,7 +138,7 @@ namespace TEN::Scripting::View
 		//@tparam float angle in degrees (clamped to [10, 170])
 		tableView.set_function(ScriptReserved_SetFOV, &SetFOV);
 
-		//Get field of view.
+		///Get field of view.
 		//@function GetFOV
 		//@treturn float current FOV angle in degrees
 		tableView.set_function(ScriptReserved_GetFOV, &GetFOV);
@@ -133,13 +147,28 @@ namespace TEN::Scripting::View
 		//@function GetCameraType
 		//@treturn View.CameraType value used by the Main Camera.
 		//@usage
-		//LevelFuncs.OnControlPhase = function() 
+		//LevelFuncs.OnLoop = function() 
 		//	if (View.GetCameraType() == CameraType.Combat) then
 		//		--Do your Actions here.
 		//	end
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 
+		///Gets current room where camera is positioned.
+		//@function GetCameraRoom
+		//@treturn Objects.Room current room of the camera
+		tableView.set_function(ScriptReserved_GetCameraRoom, &GetCameraRoom);
+
+		///Gets current camera position.
+		//@function GetCameraPosition
+		//@treturn Vec3 current camera position
+		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
+
+		///Gets current camera target.
+		//@function GetCameraTarget
+		//@treturn Vec3 current camera target
+		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
+		
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
 		//@tparam short flyby (ID of flyby)
@@ -155,6 +184,9 @@ namespace TEN::Scripting::View
 		//@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
 		tableView.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
+		/// Get the display resolution's aspect ratio.
+		// @function GetAspectRatio
+		// @treturn float Display resolution's aspect ratio.
 		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
 
 		// Register types.

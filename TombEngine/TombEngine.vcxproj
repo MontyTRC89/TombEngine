@@ -367,7 +367,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\control\lot.h" />
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
-    <ClInclude Include="Game\control\volumeactivator.h" />
+    <ClInclude Include="Game\control\event.h" />
     <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\Blood.h" />
     <ClInclude Include="Game\effects\Drip.h" />
@@ -434,6 +434,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\Doors\sequence_door.h" />
     <ClInclude Include="Objects\Generic\Doors\steel_door.h" />
     <ClInclude Include="Objects\Generic\Doors\underwater_door.h" />
+    <ClInclude Include="Objects\Generic\Object\BridgeObject.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\generic_bridge.h" />
     <ClInclude Include="Objects\Generic\Object\generic_trapdoor.h" />
@@ -732,6 +733,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\FlowHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\GameStatuses.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.h" />
@@ -752,6 +754,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\AmmoTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\LaraObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Moveable\MoveableObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Moveable\MoveableStatuses.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\NamedBase.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\ObjectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\ObjectsHandler.h" />
@@ -914,6 +917,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Doors\steel_door.cpp" />
     <ClCompile Include="Objects\Generic\Doors\underwater_door.cpp" />
     <ClCompile Include="Objects\Generic\generic_objects.cpp" />
+    <ClCompile Include="Objects\Generic\Object\BridgeObject.cpp" />
     <ClCompile Include="Objects\Generic\Object\burning_torch.cpp" />
     <ClCompile Include="Objects\Generic\Object\generic_bridge.cpp" />
     <ClCompile Include="Objects\Generic\Object\generic_trapdoor.cpp" />

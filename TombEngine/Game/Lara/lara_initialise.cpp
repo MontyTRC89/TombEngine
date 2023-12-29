@@ -59,7 +59,7 @@ void InitializeLara(bool restore)
 
 	if (restore)
 	{
-		InitializeLaraLevelJump(LaraItem->Index, &lBackup);
+		InitializeLaraLevelJump(LaraItem, &lBackup);
 		LaraItem->HitPoints = lHitPoints;
 	}
 	else
@@ -71,6 +71,7 @@ void InitializeLara(bool restore)
 	InitializePlayerStateMachine();
 	InitializeLaraMeshes(LaraItem);
 	InitializeLaraAnims(LaraItem);
+	InitializeLaraStartPosition(*LaraItem);
 
 	g_Hud.StatusBars.Initialize(*LaraItem);
 }
@@ -163,9 +164,26 @@ void InitializeLaraLoad(short itemNumber)
 	LaraItem = &g_Level.Items[itemNumber];
 }
 
-void InitializeLaraLevelJump(short itemNum, LaraInfo* lBackup)
+void InitializeLaraStartPosition(ItemInfo& playerItem)
 {
-	auto* item = &g_Level.Items[itemNum];
+	for (const auto& item : g_Level.Items)
+	{
+		if (item.ObjectNumber != GAME_OBJECT_ID::ID_LARA_START_POS)
+			continue;
+
+		if (!item.TriggerFlags || item.TriggerFlags != RequiredStartPos)
+			continue;
+
+		playerItem.Pose = item.Pose;
+		playerItem.RoomNumber = item.RoomNumber;
+
+		TENLog("Player start position has been set according to start position object with index " + std::to_string(item.TriggerFlags), LogLevel::Info);
+		break;
+	}
+}
+
+void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
+{
 	auto* lara = GetLaraInfo(item);
 
 	// Restore inventory.

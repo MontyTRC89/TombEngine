@@ -20,6 +20,7 @@ public:
 	static void Register(sol::table& parent);
 
 	[[nodiscard]] bool GetActive() const;
+	[[nodiscard]] ScriptColor GetColor() const;
 
 	[[nodiscard]] std::string GetName() const;
 	void SetName(const std::string& name);

@@ -43,7 +43,7 @@ static void AddRoomFlipItems(const ROOM_INFO& room)
 		const auto& object = Objects[item.ObjectNumber];
 
 		// Add bridges.
-		if (object.GetFloorHeight != nullptr)
+		if (item.IsBridge())
 			UpdateBridgeItem(item);
 	}
 }
@@ -66,7 +66,7 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 		}
 
 		// Clear bridge.
-		if (Objects[item.ObjectNumber].GetFloorHeight != nullptr)
+		if (item.IsBridge())
 			UpdateBridgeItem(item, true);
 	}
 }
