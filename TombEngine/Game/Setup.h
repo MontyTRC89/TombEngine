@@ -51,6 +51,7 @@ enum class HitEffect
     Blood,
     Smoke,
     Richochet,
+	NonExplosive,
 	Special
 };
 
@@ -106,6 +107,7 @@ struct ObjectInfo
 
 	void SetBoneRotationFlags(int boneID, int flags);
 	void SetHitEffect(bool isSolid = false, bool isAlive = false);
+	void SetExactHitEffect(HitEffect value);
 };
 
 class ObjectHandler

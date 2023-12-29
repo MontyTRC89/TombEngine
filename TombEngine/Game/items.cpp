@@ -888,6 +888,10 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 		case HitEffect::Smoke:
 			TriggerShatterSmoke(pos.value().x, pos.value().y, pos.value().z);
 			break;
+
+		case HitEffect::NonExplosive:
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), target.Pose.Orientation.y, target.RoomNumber);
+			break;
 		}
 	}
 

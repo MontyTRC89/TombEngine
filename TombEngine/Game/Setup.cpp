@@ -116,6 +116,11 @@ void ObjectInfo::SetHitEffect(bool isSolid, bool isAlive)
 	}
 }
 
+void ObjectInfo::SetExactHitEffect(HitEffect value)
+{
+	hitEffect = value;
+}
+
 void InitializeGameFlags()
 {
 	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));

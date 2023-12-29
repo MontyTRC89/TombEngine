@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
+#include "Game/pickup/pickup.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/Input/Input.h"
@@ -349,6 +350,7 @@ namespace TEN::Entities::Creatures::TR2
 					{
 						DisableEntityAI(itemNumber);
 						KillItem(itemNumber);
+						DropPickups(&item);
 						item.Status = ITEM_DEACTIVATED;
 					}
 					else if (timer < -100)
