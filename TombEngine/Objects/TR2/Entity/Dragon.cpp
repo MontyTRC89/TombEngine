@@ -606,16 +606,14 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	// NOTE: Used by dragon front and back body segment items.
-	void CollideDragon(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	void CollideDragonFront(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
 		if (item.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
 			item.TriggerFlags == 1)
 		{
-			if (item.ObjectNumber == ID_DRAGON_FRONT)
-				HandleDaggerPickup(item, *playerItem);
+			HandleDaggerPickup(item, *playerItem);
 
 			auto& player = *GetLaraInfo(playerItem);
 

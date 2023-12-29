@@ -433,13 +433,14 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_BACK");
 		obj->Initialize = InitializeDragon;
-		obj->collision = CollideDragon;
+		obj->collision = CollideDragonFront;
 		obj->control = ControlDragon;
 		obj->HitPoints = 300;
 		obj->pivotLength = 300;
 		obj->radius = 256;
 		obj->shadowType = ShadowMode::All;
 		obj->intelligent = true;
+		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_Z);
 		obj->SetHitEffect();
 	}
@@ -448,8 +449,6 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_FRONT");
-		obj->collision = CollideDragon;
-		obj->radius = 256;
 		obj->SetHitEffect(false, true);
 	}
 
