@@ -18,6 +18,9 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 // NOTES:
+// OCB 0 = Dragon directly dies when hitpoints reaches to 0.
+// OCB 1 = player must retrieve dagger to kill dragon.
+// 
 // item.ItemFlags[0]: Back segment item number.
 // item.ItemFlags[1]: Timer for temporary defeat and death in frame time.
 
