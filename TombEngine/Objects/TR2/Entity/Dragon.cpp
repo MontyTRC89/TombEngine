@@ -162,9 +162,6 @@ namespace TEN::Entities::Creatures::TR2
 			return;
 		}
 
-		// Sync Hitpoints for colliders detection.
-		backItem.HitPoints = frontItem.HitPoints;
-
 		// Sync animation.
 		SetAnimation(backItem, GetAnimNumber(frontItem), GetFrameNumber(frontItem));
 
