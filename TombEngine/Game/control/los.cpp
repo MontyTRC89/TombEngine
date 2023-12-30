@@ -814,7 +814,7 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 	return std::nullopt;
 }
 
-std::pair<GameVector, GameVector> GetRayFrom2DPosition(Vector2 screenPos)
+std::pair<GameVector, GameVector> GetRayFrom2DPosition(const Vector2& screenPos)
 {
 	auto pos = g_Renderer.GetRay(screenPos);
 

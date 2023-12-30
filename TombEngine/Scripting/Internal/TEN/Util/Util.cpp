@@ -155,7 +155,7 @@ namespace TEN::Scripting::Util
 	static sol::optional <std::unique_ptr<Static>> PickStatic(const Vec2& screenPos)
 	{
 		auto realScreenPos = PercentToScreen(screenPos.x, screenPos.y);
-		auto ray = GetRayFrom2DPosition(Vector2(int(std::get<0>(realScreenPos)), int(std::get<1>(realScreenPos))));
+		auto ray = GetRayFrom2DPosition(Vector2((int)std::get<0>(realScreenPos), (int)std::get<1>(realScreenPos)));
 
 		MESH_INFO* mesh = nullptr;
 		auto vector = Vector3i::Zero;
