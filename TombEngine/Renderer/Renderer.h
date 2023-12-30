@@ -364,7 +364,14 @@ namespace TEN::Renderer
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
 
+		// Special effects
 		std::vector<Texture2D> _causticTextures;
+
+		// Transparency
+		fast_vector<Vertex> _sortedPolygonsVertices;
+		fast_vector<int> _sortedPolygonsIndices;
+		VertexBuffer<Vertex> _sortedPolygonsVertexBuffer;
+		IndexBuffer _sortedPolygonsIndexBuffer;
 
 		// Private functions
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
@@ -428,10 +435,11 @@ namespace TEN::Renderer
 		void DrawSprites(RenderView& view, RendererPass rendererPass);
 		void DrawDisplaySprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
-		void DrawRoomBucket(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
-		void DrawItemBucket(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
-		void DrawStaticBucket(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
 		void DrawSingleSprite(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
+		void DrawRoomSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
+		void DrawItemSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
+		void DrawStaticSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
+		void DrawSpriteSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
 		void DrawLines2D();
 		void DrawLines3D(RenderView& view);
 		void DrawTriangles3D(RenderView& view);

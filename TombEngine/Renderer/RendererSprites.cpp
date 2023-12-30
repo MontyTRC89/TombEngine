@@ -258,7 +258,7 @@ namespace TEN::Renderer
 				object.Centre = rDrawSprite.pos;
 				object.Distance = distance;
 				object.Sprite = &rDrawSprite;
-				//face.info.world = GetWorldMatrixForSprite(&rDrawSprite, view);
+				object.World = GetWorldMatrixForSprite(&rDrawSprite, view);
 
 				view.TransparentObjectsToDraw.push_back(object);
 			}
@@ -517,6 +517,37 @@ namespace TEN::Renderer
 			_numTriangles += 2;
 			_numSortedTriangles += 2;
 		}
+	}
+
+	void Renderer::DrawSpriteSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view)
+	{
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+		_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
+		_context->PSSetShader(_psSprites.Get(), nullptr, 0);
+
+		_sortedPolygonsVertexBuffer.Update(_context.Get(), _sortedPolygonsVertices.data(), 0, (int)_sortedPolygonsVertices.size());
+
+		_context->IASetVertexBuffers(0, 1, _sortedPolygonsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_inputLayout.Get());
+
+		_stSprite.IsSoftParticle = objectInfo->Sprite->SoftParticle ? 1 : 0;
+		_stSprite.RenderType = (int)objectInfo->Sprite->renderType;
+		_cbSprite.UpdateData(_stSprite, _context.Get());
+
+		SetDepthState(DepthState::Read);
+		SetCullMode(CullMode::None);
+		SetBlendMode(objectInfo->Sprite->BlendMode);
+		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+
+		BindTexture(TextureRegister::ColorMap, objectInfo->Sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
+
+		DrawTriangles((int)_sortedPolygonsVertices.size(), 0);
+
+		_numSortedSpritesDrawCalls++;
+		_numSortedTriangles += (int)_sortedPolygonsVertices.size() / 3;
 	}
 }
 

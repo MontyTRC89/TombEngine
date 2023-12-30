@@ -265,6 +265,11 @@ namespace TEN::Renderer
 		InitializeGameBars();
 		InitializeSpriteQuad();
 		InitializeSky();
+
+		_sortedPolygonsVertices.reserve(MAX_TRANSPARENT_VERTICES);
+		_sortedPolygonsIndices.reserve(MAX_TRANSPARENT_VERTICES);
+		_sortedPolygonsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), MAX_TRANSPARENT_VERTICES, _sortedPolygonsVertices);
+		_sortedPolygonsIndexBuffer = IndexBuffer(_device.Get(), MAX_TRANSPARENT_VERTICES, _sortedPolygonsIndices);
 	}
 
 	void Renderer::InitializePostProcess()

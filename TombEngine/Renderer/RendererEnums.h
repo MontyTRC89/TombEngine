@@ -239,6 +239,7 @@ enum class RendererObjectType
 {
 	Unknown,
 	Room,
+	RoomPolygon,
 	Moveable, 
 	Static,
 	Sprite

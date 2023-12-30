@@ -44,6 +44,31 @@ namespace TEN::Renderer::Graphics
 			_numIndices = numIndices;
 		}
 
+		IndexBuffer(ID3D11Device* device, int numIndices, fast_vector<int> indices)
+		{
+			D3D11_BUFFER_DESC desc = {};
+
+			desc.Usage = D3D11_USAGE_DYNAMIC;
+			desc.ByteWidth = sizeof(int) * (numIndices > 0 ? numIndices : 1);
+			desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+			if (numIndices > 0)
+			{
+				D3D11_SUBRESOURCE_DATA initData = {};
+				initData.pSysMem = indices.data();
+				initData.SysMemPitch = sizeof(int) * numIndices;
+
+				throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
+			}
+			else
+			{
+				throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
+			}
+
+			_numIndices = numIndices;
+		}
+
 		bool Update(ID3D11DeviceContext* context, std::vector<int>& data, int startIndex, int count)
 		{
 			//TENLog("VertexBuffer::Update NumVertices: " + std::to_string(data.size()));
