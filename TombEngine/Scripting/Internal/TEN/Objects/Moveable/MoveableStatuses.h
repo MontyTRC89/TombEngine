@@ -6,20 +6,20 @@
 
 /***
 Constants for moveable statuses.
-@enum MoveableEnums.Status
+@enum Objects.MoveableStatus
 @pragma nostrip
 */
 
-/*** MoveableEnums.Status constants.
+/*** Objects.MoveableStatus constants.
 
-The following constants are inside MoveableEnums.Status.
+The following constants are inside Objects.MoveableStatus.
 
-INACTIVE
-ACTIVE
-DEACTIVATED
-INVISIBLE
+	INACTIVE
+	ACTIVE
+	DEACTIVATED
+	INVISIBLE
 
-@section MoveableEnums.Status
+@section Objects.MoveableStatus
 */
 
 /*** Table of moveable statuses.
@@ -28,8 +28,8 @@ INVISIBLE
 
 static const std::unordered_map<std::string, ItemStatus> MOVEABLE_STATUSES
 {
-	{ "INACTIVE", ITEM_NOT_ACTIVE },
-	{ "ACTIVE", ITEM_ACTIVE },
-	{ "DEACTIVATED", ITEM_DEACTIVATED },
-	{ "INVISIBLE", ITEM_INVISIBLE }
+	{ "INACTIVE", ItemStatus::ITEM_NOT_ACTIVE },
+	{ "ACTIVE", ItemStatus::ITEM_ACTIVE },
+	{ "DEACTIVATED", ItemStatus::ITEM_DEACTIVATED },
+	{ "INVISIBLE", ItemStatus::ITEM_INVISIBLE }
 };

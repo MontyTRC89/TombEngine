@@ -33,6 +33,51 @@ using TEN::Renderer::g_Renderer;
 
 using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
+using namespace TEN::Utils;
+
+const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
+{
+	ID_EXPANDING_PLATFORM,
+	ID_SQUISHY_BLOCK1,
+	ID_SQUISHY_BLOCK2,
+
+	ID_FALLING_BLOCK,
+	ID_FALLING_BLOCK2,
+	ID_CRUMBLING_FLOOR,
+	ID_TRAPDOOR1,
+	ID_TRAPDOOR2,
+	ID_TRAPDOOR3,
+	ID_FLOOR_TRAPDOOR1,
+	ID_FLOOR_TRAPDOOR2,
+	ID_CEILING_TRAPDOOR1,
+	ID_CEILING_TRAPDOOR2,
+	ID_SCALING_TRAPDOOR,
+
+	ID_ONEBLOCK_PLATFORM,
+	ID_TWOBLOCK_PLATFORM,
+	ID_RAISING_BLOCK1,
+	ID_RAISING_BLOCK2,
+	ID_RAISING_BLOCK3,
+	ID_RAISING_BLOCK4,
+
+	ID_PUSHABLE_OBJECT_CLIMBABLE1,
+	ID_PUSHABLE_OBJECT_CLIMBABLE2,
+	ID_PUSHABLE_OBJECT_CLIMBABLE3,
+	ID_PUSHABLE_OBJECT_CLIMBABLE4,
+	ID_PUSHABLE_OBJECT_CLIMBABLE5,
+	ID_PUSHABLE_OBJECT_CLIMBABLE6,
+	ID_PUSHABLE_OBJECT_CLIMBABLE7,
+	ID_PUSHABLE_OBJECT_CLIMBABLE8,
+	ID_PUSHABLE_OBJECT_CLIMBABLE9,
+	ID_PUSHABLE_OBJECT_CLIMBABLE10,
+
+	ID_BRIDGE_FLAT,
+	ID_BRIDGE_TILT1,
+	ID_BRIDGE_TILT2,
+	ID_BRIDGE_TILT3,
+	ID_BRIDGE_TILT4,
+	ID_BRIDGE_CUSTOM
+};
 
 char* LevelDataPtr;
 std::vector<int> MoveablesIds;
@@ -140,7 +185,7 @@ std::string ReadString()
 {
 	auto numBytes = ReadLEB128(false);
 
-	if (!numBytes)
+	if (numBytes <= 0)
 		return std::string();
 	else
 	{
@@ -187,15 +232,28 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		// Initialize all bridges first.
-		// It is needed because some other items need final floor height to init properly.
-
-		for (int isFloor = 0; isFloor <= 1; isFloor++)
+		// Initialize items.
+		for (int i = 0; i <= 1; i++)
 		{
-			for (int i = 0; i < g_Level.NumItems; i++)
+			// HACK: Initialize bridges first. Required because other items need final floordata to init properly.
+			if (i == 0)
 			{
-				if ((Objects[g_Level.Items[i].ObjectNumber].GetFloorHeight == nullptr) == (bool)isFloor)
-					InitializeItem(i);
+				for (int j = 0; j < g_Level.NumItems; j++)
+				{
+					const auto& item = g_Level.Items[j];
+					if (Contains(BRIDGE_OBJECT_IDS, item.ObjectNumber))
+						InitializeItem(j);
+				}
+			}
+			// Initialize non-bridge items second.
+			else if (i == 1)
+			{
+				for (int j = 0; j < g_Level.NumItems; j++)
+				{
+					const auto& item = g_Level.Items[j];
+					if (!item.IsBridge())
+						InitializeItem(j);
+				}
 			}
 		}
 	}
@@ -831,6 +889,9 @@ void ReadRooms()
 			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
 			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
 
+			volume.Enabled = ReadBool();
+			volume.DetectInAdjacentRooms = ReadBool();
+
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
@@ -904,7 +965,9 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
-	g_Level.EventSets.resize(0);
+	g_Level.VolumeEventSets.resize(0);
+	g_Level.GlobalEventSets.resize(0);
+	g_Level.LoopedEventSetIndices.resize(0);
 	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
@@ -1006,30 +1069,64 @@ void LoadAIObjects()
 	}
 }
 
-void LoadEvent(VolumeEvent& event)
+void LoadEvent(EventSet& eventSet)
 {
-	event.Mode = (VolumeEventMode)ReadInt32();
-	event.Function = ReadString();
-	event.Data = ReadString();
-	event.CallCounter = ReadInt32();
+	int eventType = ReadInt32();
+
+	if (eventType >= (int)EventType::Count)
+	{
+		TENLog("Unknown event type detected for event set " + eventSet.Name + ". Fall back to default.", LogLevel::Warning);
+		eventType = (int)EventType::Enter;
+	}
+
+	auto& evt = eventSet.Events[eventType];
+
+	evt.Mode = (EventMode)ReadInt32();
+	evt.Function = ReadString();
+	evt.Data = ReadString();
+	evt.CallCounter = ReadInt32();
 }
 
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
-	TENLog("Num event sets: " + std::to_string(eventSetCount), LogLevel::Info);
+	if (eventSetCount == 0)
+		return;
 
-	for (int i = 0; i < eventSetCount; i++)
+	int globalEventSetCount = ReadInt32();
+	TENLog("Num global event sets: " + std::to_string(globalEventSetCount), LogLevel::Info);
+
+	for (int i = 0; i < globalEventSetCount; i++)
 	{
-		auto eventSet = VolumeEventSet();
+		auto eventSet = EventSet();
 
 		eventSet.Name = ReadString();
-		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		for (int eventType = 0; eventType < (int)VolumeEventType::Count; eventType++)
-			LoadEvent(eventSet.Events[eventType]);
+		int eventCount = ReadInt32();
+		for (int j = 0; j < eventCount; j++)
+			LoadEvent(eventSet);
 
-		g_Level.EventSets.push_back(eventSet);
+		g_Level.GlobalEventSets.push_back(eventSet);
+
+		if (!eventSet.Events[(int)EventType::Loop].Function.empty())
+			g_Level.LoopedEventSetIndices.push_back(i);
+	}
+
+	int volumeEventSetCount = ReadInt32();
+	TENLog("Num volume event sets: " + std::to_string(volumeEventSetCount), LogLevel::Info);
+
+	for (int i = 0; i < volumeEventSetCount; i++)
+	{
+		auto eventSet = EventSet();
+
+		eventSet.Name = ReadString();
+		eventSet.Activators = (ActivatorFlags)ReadInt32();
+
+		int eventCount = ReadInt32();
+		for (int j = 0; j < eventCount; j++)
+			LoadEvent(eventSet);
+
+		g_Level.VolumeEventSets.push_back(eventSet);
 	}
 }
 
@@ -1369,22 +1466,25 @@ void GetCarriedItems()
 
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		auto* item = &g_Level.Items[i];
-		if (Objects[item->ObjectNumber].intelligent || item->ObjectNumber >= ID_SEARCH_OBJECT1 && item->ObjectNumber <= ID_SEARCH_OBJECT3)
-		{
-			for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
-			{
-				auto* item2 = &g_Level.Items[linkNumber];
+		auto& item = g_Level.Items[i];
+		const auto& object = Objects[item.ObjectNumber];
 
-				if (abs(item2->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
-					abs(item2->Pose.Position.z - item->Pose.Position.z) < CLICK(2) &&
-					abs(item2->Pose.Position.y - item->Pose.Position.y) < CLICK(1) &&
-					Objects[item2->ObjectNumber].isPickup)
+		if (object.intelligent ||
+			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3))
+		{
+			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+			{
+				auto& item2 = g_Level.Items[linkNumber];
+
+				if (abs(item2.Pose.Position.x - item.Pose.Position.x) < CLICK(2) &&
+					abs(item2.Pose.Position.z - item.Pose.Position.z) < CLICK(2) &&
+					abs(item2.Pose.Position.y - item.Pose.Position.y) < CLICK(1) &&
+					Objects[item2.ObjectNumber].isPickup)
 				{
-					item2->CarriedItem = item->CarriedItem;
-					item->CarriedItem = linkNumber;
+					item2.CarriedItem = item.CarriedItem;
+					item.CarriedItem = linkNumber;
 					RemoveDrawnItem(linkNumber);
-					item2->RoomNumber = NO_ROOM;
+					item2.RoomNumber = NO_ROOM;
 				}
 			}
 		}

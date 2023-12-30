@@ -56,7 +56,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && CanStrikeAfkPose(*item, *coll) &&
+	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && 
 		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
