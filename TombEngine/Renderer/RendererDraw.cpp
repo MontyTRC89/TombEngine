@@ -2667,7 +2667,7 @@ namespace TEN::Renderer
 
 				DrawRoomSorted(object, lastObjectType, view);
 
-				if (i == view.TransparentObjectsToDraw.size() - 1)
+				if (i == view.TransparentObjectsToDraw.size())
 				{
 					return;
 				}
@@ -2693,7 +2693,7 @@ namespace TEN::Renderer
 
 				DrawItemSorted(object, lastObjectType, view);
 
-				if (i == view.TransparentObjectsToDraw.size() - 1)
+				if (i == view.TransparentObjectsToDraw.size())
 				{
 					return;
 				}
@@ -2720,7 +2720,7 @@ namespace TEN::Renderer
 
 				DrawStaticSorted(object, lastObjectType, view);
 
-				if (i == view.TransparentObjectsToDraw.size() - 1)
+				if (i == view.TransparentObjectsToDraw.size())
 				{
 					return;
 				}
@@ -2804,7 +2804,7 @@ namespace TEN::Renderer
 
 				DrawSpriteSorted(object, lastObjectType, view);
 
-				if (i == view.TransparentObjectsToDraw.size() - 1)
+				if (i == view.TransparentObjectsToDraw.size())
 				{
 					return;
 				}
