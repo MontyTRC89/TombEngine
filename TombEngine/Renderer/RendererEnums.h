@@ -242,7 +242,8 @@ enum class RendererObjectType
 	RoomPolygon,
 	Moveable, 
 	Static,
-	Sprite
+	Sprite,
+	MoveableAsStatic // For rats, bats, spiders, beetles
 };
 
 enum class SMAAMode

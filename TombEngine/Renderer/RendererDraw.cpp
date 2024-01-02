@@ -50,12 +50,12 @@ namespace TEN::Renderer
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
 		static const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
 
-		for (auto& room : renderView.RoomsToDraw) 
+		for (auto& room : renderView.RoomsToDraw)
 		{
-			for (auto& i : room->ItemsToDraw) 
+			for (auto& i : room->ItemsToDraw)
 			{
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
-				 
+
 				// Skip everything that isn't alive or a vehicle.
 				if (Objects[nativeItem.ObjectNumber].shadowType == ShadowMode::None)
 					continue;
@@ -93,18 +93,18 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (nearestSpheres.size() > g_Configuration.ShadowBlobsMax) 
+		if (nearestSpheres.size() > g_Configuration.ShadowBlobsMax)
 		{
-			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b) 
-			{
-				auto& laraPos = LaraItem->Pose.Position;
-				return Vector3::Distance(laraPos.ToVector3(), a.position) < Vector3::Distance(laraPos.ToVector3(), b.position);
-			});
+			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b)
+				{
+					auto& laraPos = LaraItem->Pose.Position;
+					return Vector3::Distance(laraPos.ToVector3(), a.position) < Vector3::Distance(laraPos.ToVector3(), b.position);
+				});
 
 			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowBlobsMax, _stShadowMap.Spheres);
 			_stShadowMap.NumSpheres = g_Configuration.ShadowBlobsMax;
 		}
-		else 
+		else
 		{
 			std::copy(nearestSpheres.begin(), nearestSpheres.end(), _stShadowMap.Spheres);
 			_stShadowMap.NumSpheres = (int)nearestSpheres.size();
@@ -117,7 +117,7 @@ namespace TEN::Renderer
 		{
 			_context->ClearRenderTargetView(_shadowMap.RenderTargetView[step].Get(), Colors::White);
 			_context->ClearDepthStencilView(_shadowMap.DepthStencilView[step].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-			1.0f, 0);
+				1.0f, 0);
 		}
 	}
 
@@ -130,21 +130,21 @@ namespace TEN::Renderer
 		// Only render for Lara if such setting is active
 		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectNumber].value().ShadowType != ShadowMode::Lara)
 			return;
-		
+
 		// No shadow light found
 		if (_shadowLight == nullptr)
 			return;
 
 		// Shadow light found but type is incorrect
 		if (_shadowLight->Type != LightType::Point && _shadowLight->Type != LightType::Spot)
-			return; 
+			return;
 
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
 		int steps = _shadowLight->Type == LightType::Point ? 6 : 1;
-		for (int step = 0; step < steps; step++) 
+		for (int step = 0; step < steps; step++)
 		{
 			// Bind render target
 			_context->OMSetRenderTargets(1, _shadowMap.RenderTargetView[step].GetAddressOf(),
@@ -267,7 +267,7 @@ namespace TEN::Renderer
 			objectNumber = gunshell->objectNumber;
 
 			Matrix translation = Matrix::CreateTranslation(
-				gunshell->pos.Position.x, 
+				gunshell->pos.Position.x,
 				gunshell->pos.Position.y,
 				gunshell->pos.Position.z
 			);
@@ -374,7 +374,7 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::None);
-		
+
 		_context->VSSetShader(_vsSolid.Get(), nullptr, 0);
 		_context->PSSetShader(_psSolid.Get(), nullptr, 0);
 		auto worldMatrix = Matrix::CreateOrthographicOffCenter(0, _screenWidth, _screenHeight, 0, _viewport.MinDepth, _viewport.MaxDepth);
@@ -485,41 +485,8 @@ namespace TEN::Renderer
 			return;
 		}
 
-		bool activeRatsExist = false;
-		for (int i = 0; i < NUM_RATS; i++)
+		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			auto* rat = &Rats[i];
-
-			if (rat->On)
-			{
-				activeRatsExist = true;
-				break;
-			}
-		}
-
-		if (activeRatsExist)
-		{
-			if (rendererPass == RendererPass::GBuffer)
-			{
-				_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
-				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
-			}
-			else
-			{
-				_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-				_context->PSSetShader(_psStatics.Get(), nullptr, 0);
-			}
-
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
-
-			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-			RendererObject& moveableObj = *_moveableObjects[ID_RATS_EMITTER];
-
-			_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
-
 			for (int i = 0; i < NUM_RATS; i++)
 			{
 				auto* rat = &Rats[i];
@@ -528,39 +495,114 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 
-					_stStatic.World = rat->Transform;
-					_stStatic.Color = Vector4::One;
-					_stStatic.AmbientLight = _rooms[rat->RoomNumber].AmbientLight;
-
-					if (rendererPass != RendererPass::GBuffer)
+					for (int j = 0; j < mesh->Buckets.size(); j++)
 					{
-						BindStaticLights(_rooms[rat->RoomNumber].LightsToDraw);
-					}
+						auto& bucket = mesh->Buckets[j];
 
-					_cbStatic.UpdateData(_stStatic, _context.Get());
-
-					for (auto& bucket : mesh->Buckets)
-					{
-						if (bucket.NumVertices == 0)
+						if (IsSortedBlendMode(bucket.BlendMode))
 						{
-							continue;
+							for (int p = 0; p < bucket.Polygons.size(); p++)
+							{
+								auto centre = Vector3::Transform(
+									bucket.Polygons[p].Centre, rat->Transform);
+								int distance = (centre - view.Camera.WorldPosition).Length();
+
+								RendererSortableObject object;
+								object.ObjectType = RendererObjectType::MoveableAsStatic;
+								object.Centre = centre;
+								object.Distance = distance;
+								object.Bucket = &bucket;
+								object.Mesh = mesh;
+								object.Polygon = &bucket.Polygons[p];
+								object.World = rat->Transform;
+								object.Room = &_rooms[rat->RoomNumber];
+
+								view.TransparentObjectsToDraw.push_back(object);
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			bool activeRatsExist = false;
+			for (int i = 0; i < NUM_RATS; i++)
+			{
+				auto* rat = &Rats[i];
+
+				if (rat->On)
+				{
+					activeRatsExist = true;
+					break;
+				}
+			}
+
+			if (activeRatsExist)
+			{
+				if (rendererPass == RendererPass::GBuffer)
+				{
+					_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+				}
+				else
+				{
+					_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+				}
+
+				UINT stride = sizeof(Vertex);
+				UINT offset = 0;
+
+				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+				RendererObject& moveableObj = *_moveableObjects[ID_RATS_EMITTER];
+
+				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
+
+				for (int i = 0; i < NUM_RATS; i++)
+				{
+					auto* rat = &Rats[i];
+
+					if (rat->On)
+					{
+						RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+
+						_stStatic.World = rat->Transform;
+						_stStatic.Color = Vector4::One;
+						_stStatic.AmbientLight = _rooms[rat->RoomNumber].AmbientLight;
+
+						if (rendererPass != RendererPass::GBuffer)
+						{
+							BindStaticLights(_rooms[rat->RoomNumber].LightsToDraw);
 						}
 
-						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+						_cbStatic.UpdateData(_stStatic, _context.Get());
 
-						for (int p = 0; p < passes; p++)
+						for (auto& bucket : mesh->Buckets)
 						{
-							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+							if (bucket.NumVertices == 0)
 							{
 								continue;
 							}
 
-							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
 
-							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+							for (int p = 0; p < passes; p++)
+							{
+								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+								{
+									continue;
+								}
 
-							_numMoveablesDrawCalls++;
+								BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+								_numMoveablesDrawCalls++;
+							}
 						}
 					}
 				}
@@ -577,77 +619,118 @@ namespace TEN::Renderer
 
 		RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 
-		int batsCount = 0;
-
-		for (int i = 0; i < NUM_BATS; i++)
+		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			auto* bat = &Bats[i];
-
-			if (bat->On)
+			for (int i = 0; i < NUM_BATS; i++)
 			{
-				RendererRoom& room = _rooms[bat->RoomNumber];
+				auto* bat = &Bats[i];
 
-				_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].World = bat->Transform;
-				_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Ambient = room.AmbientLight;
-				_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Color = Vector4::One;
-				_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].LightMode = (int)mesh->LightMode;
-
-				if (rendererPass != RendererPass::GBuffer)
+				if (bat->On)
 				{
-					BindInstancedStaticLights(room.LightsToDraw, batsCount);
-				}
+					for (int j = 0; j < mesh->Buckets.size(); j++)
+					{
+						auto& bucket = mesh->Buckets[j];
 
-				batsCount++;
+						if (IsSortedBlendMode(bucket.BlendMode))
+						{
+							for (int p = 0; p < bucket.Polygons.size(); p++)
+							{
+								auto centre = Vector3::Transform(
+									bucket.Polygons[p].Centre, bat->Transform);
+								int distance = (centre - view.Camera.WorldPosition).Length();
+
+								RendererSortableObject object;
+								object.ObjectType = RendererObjectType::MoveableAsStatic;
+								object.Centre = centre;
+								object.Distance = distance;
+								object.Bucket = &bucket;
+								object.Mesh = mesh;
+								object.Polygon = &bucket.Polygons[p];
+								object.World = bat->Transform;
+								object.Room = &_rooms[bat->RoomNumber];
+
+								view.TransparentObjectsToDraw.push_back(object);
+							}
+						}
+					}
+				}
 			}
 		}
-
-		if (batsCount > 0)
+		else
 		{
-			if (rendererPass == RendererPass::GBuffer)
+			int batsCount = 0;
+
+			for (int i = 0; i < NUM_BATS; i++)
 			{
-				_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
-				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
-			}
-			else
-			{
-				_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-				_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
-			}
+				auto* bat = &Bats[i];
 
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
-
-			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
-
-			for (auto& bucket : mesh->Buckets)
-			{
-				if (bucket.NumVertices == 0)
+				if (bat->On)
 				{
-					continue;
+					RendererRoom& room = _rooms[bat->RoomNumber];
+
+					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].World = bat->Transform;
+					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Ambient = room.AmbientLight;
+					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Color = Vector4::One;
+					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].LightMode = (int)mesh->LightMode;
+
+					if (rendererPass != RendererPass::GBuffer)
+					{
+						BindInstancedStaticLights(room.LightsToDraw, batsCount);
+					}
+
+					batsCount++;
+				}
+			}
+
+			if (batsCount > 0)
+			{
+				if (rendererPass == RendererPass::GBuffer)
+				{
+					_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+				}
+				else
+				{
+					_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
+					_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
 				}
 
-				int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+				UINT stride = sizeof(Vertex);
+				UINT offset = 0;
 
-				for (int p = 0; p < passes; p++)
+				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
+
+				for (auto& bucket : mesh->Buckets)
 				{
-					if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+					if (bucket.NumVertices == 0)
 					{
 						continue;
 					}
 
-					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-					BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
 
-					DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
+					for (int p = 0; p < passes; p++)
+					{
+						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						{
+							continue;
+						}
 
-					_numMoveablesDrawCalls++;
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+						DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
+
+						_numMoveablesDrawCalls++;
+					}
 				}
 			}
 		}
 	}
+
 	void Renderer::DrawScarabs(RenderView& view, RendererPass rendererPass)
 	{
 		if (!Objects[ID_LITTLE_BEETLE].loaded)
@@ -655,74 +738,114 @@ namespace TEN::Renderer
 			return;
 		}
 
-		const auto& mesh = *GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
+		RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 
-		unsigned int beetleCount = 0;
-		for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
+		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
-
-			if (beetle.On)
+			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
-				auto& room = _rooms[beetle.RoomNumber];
+				auto beetle = &TEN::Entities::TR4::BeetleSwarm[i];
 
-				_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = beetle.Transform;
-				_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
-				_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Color = Vector4::One;
-				_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = (int)mesh.LightMode;
-
-				if (rendererPass != RendererPass::GBuffer)
+				if (beetle->On)
 				{
-					BindInstancedStaticLights(room.LightsToDraw, beetleCount);
-				}
+					for (int j = 0; j < mesh->Buckets.size(); j++)
+					{
+						auto& bucket = mesh->Buckets[j];
 
-				beetleCount++;
+						if (IsSortedBlendMode(bucket.BlendMode))
+						{
+							for (int p = 0; p < bucket.Polygons.size(); p++)
+							{
+								auto centre = Vector3::Transform(
+									bucket.Polygons[p].Centre, beetle->Transform);
+								int distance = (centre - view.Camera.WorldPosition).Length();
+
+								RendererSortableObject object;
+								object.ObjectType = RendererObjectType::MoveableAsStatic;
+								object.Centre = centre;
+								object.Distance = distance;
+								object.Bucket = &bucket;
+								object.Mesh = mesh;
+								object.Polygon = &bucket.Polygons[p];
+								object.World = beetle->Transform;
+								object.Room = &_rooms[beetle->RoomNumber];
+
+								view.TransparentObjectsToDraw.push_back(object);
+							}
+						}
+					}
+				}
 			}
 		}
-
-		if (beetleCount > 0)
-		{
-			if (rendererPass == RendererPass::GBuffer)
+		else
+		{	
+			unsigned int beetleCount = 0;
+			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
-				_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
-				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
-			}
-			else
-			{
-				_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-				_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
-			}
+				const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
 
-			unsigned int stride = sizeof(Vertex);
-			unsigned int offset = 0;
-
-			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
-
-			for (const auto& bucket : mesh.Buckets)
-			{
-				if (bucket.NumVertices == 0)
+				if (beetle.On)
 				{
-					continue;
+					auto& room = _rooms[beetle.RoomNumber];
+
+					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = beetle.Transform;
+					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
+					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Color = Vector4::One;
+					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = (int)mesh->LightMode;
+
+					if (rendererPass != RendererPass::GBuffer)
+					{
+						BindInstancedStaticLights(room.LightsToDraw, beetleCount);
+					}
+
+					beetleCount++;
+				}
+			}
+
+			if (beetleCount > 0)
+			{
+				if (rendererPass == RendererPass::GBuffer)
+				{
+					_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+				}
+				else
+				{
+					_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
+					_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
 				}
 
-				int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+				unsigned int stride = sizeof(Vertex);
+				unsigned int offset = 0;
 
-				for (int p = 0; p < passes; p++)
+				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
+
+				for (const auto& bucket : mesh->Buckets)
 				{
-					if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+					if (bucket.NumVertices == 0)
 					{
 						continue;
 					}
 
-					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-					BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
 
-					DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
+					for (int p = 0; p < passes; p++)
+					{
+						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						{
+							continue;
+						}
 
-					_numInstancedStaticsDrawCalls++;
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+						DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
+
+						_numInstancedStaticsDrawCalls++;
+					}
 				}
 			}
 		}
@@ -735,41 +858,10 @@ namespace TEN::Renderer
 			return;
 		}
 
-		int activeLocustsExist = false;
-		for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
+		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			LOCUST_INFO* locust = &TEN::Entities::TR4::Locusts[i];
-
-			if (locust->on)
-			{
-				activeLocustsExist = true;
-				break;
-			}
-		}
-
-		if (activeLocustsExist)
-		{
-			if (rendererPass == RendererPass::GBuffer)
-			{
-				_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
-				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
-			}
-			else
-			{
-				_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-				_context->PSSetShader(_psStatics.Get(), nullptr, 0);
-			}
-
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
-
-			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
 			ObjectInfo* obj = &Objects[ID_LOCUSTS];
 			RendererObject& moveableObj = *_moveableObjects[ID_LOCUSTS];
-
-			_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
 
 			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
 			{
@@ -779,33 +871,109 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
 
-					_stStatic.World = locust->Transform;
-					_stStatic.Color = Vector4::One;
-					_stStatic.AmbientLight = _rooms[locust->roomNumber].AmbientLight;
-					_cbStatic.UpdateData(_stStatic, _context.Get());
-
-					for (auto& bucket : mesh->Buckets)
+					for (int j = 0; j < mesh->Buckets.size(); j++)
 					{
-						if (bucket.NumVertices == 0)
+						auto& bucket = mesh->Buckets[j];
+
+						if (IsSortedBlendMode(bucket.BlendMode))
 						{
-							continue;
+							for (int p = 0; p < bucket.Polygons.size(); p++)
+							{
+								auto centre = Vector3::Transform(
+									bucket.Polygons[p].Centre, locust->Transform);
+								int distance = (centre - view.Camera.WorldPosition).Length();
+
+								RendererSortableObject object;
+								object.ObjectType = RendererObjectType::MoveableAsStatic;
+								object.Centre = centre;
+								object.Distance = distance;
+								object.Bucket = &bucket;
+								object.Mesh = mesh;
+								object.Polygon = &bucket.Polygons[p];
+								object.World = locust->Transform;
+								object.Room = &_rooms[locust->roomNumber];
+
+								view.TransparentObjectsToDraw.push_back(object);
+							}
 						}
+					}
+				}
+			}
+		}
+		else
+		{
+			int activeLocustsExist = false;
+			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
+			{
+				LOCUST_INFO* locust = &TEN::Entities::TR4::Locusts[i];
 
-						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+				if (locust->on)
+				{
+					activeLocustsExist = true;
+					break;
+				}
+			}
 
-						for (int p = 0; p < passes; p++)
+			if (activeLocustsExist)
+			{
+				if (rendererPass == RendererPass::GBuffer)
+				{
+					_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+				}
+				else
+				{
+					_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+				}
+
+				UINT stride = sizeof(Vertex);
+				UINT offset = 0;
+
+				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+				ObjectInfo* obj = &Objects[ID_LOCUSTS];
+				RendererObject& moveableObj = *_moveableObjects[ID_LOCUSTS];
+
+				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
+
+				for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
+				{
+					LOCUST_INFO* locust = &TEN::Entities::TR4::Locusts[i];
+
+					if (locust->on)
+					{
+						RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
+
+						_stStatic.World = locust->Transform;
+						_stStatic.Color = Vector4::One;
+						_stStatic.AmbientLight = _rooms[locust->roomNumber].AmbientLight;
+						_cbStatic.UpdateData(_stStatic, _context.Get());
+
+						for (auto& bucket : mesh->Buckets)
 						{
-							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+							if (bucket.NumVertices == 0)
 							{
 								continue;
 							}
 
-							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
 
-							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+							for (int p = 0; p < passes; p++)
+							{
+								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+								{
+									continue;
+								}
 
-							_numMoveablesDrawCalls++;
+								BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+								_numMoveablesDrawCalls++;
+							}
 						}
 					}
 				}
@@ -1556,11 +1724,14 @@ namespace TEN::Renderer
 		DrawSprites(view, RendererPass::Additive);
 
 		// Collect all non-commutative transparent faces.
-		// NOTE: Bats, rats and similar objects are so small that artifacts are not noticeable, so they are drawn in previous steps.
-		// NOTE 2: Sorted sprites are already collected at the beginning of the frame.
+		// NOTE: Sorted sprites are already collected at the beginning of the frame.
 		DrawRooms(view, RendererPass::CollectTransparentFaces);
 		DrawItems(view, RendererPass::CollectTransparentFaces);
 		DrawStatics(view, RendererPass::CollectTransparentFaces);
+		DrawBats(view, RendererPass::CollectTransparentFaces);
+		DrawEffects(view, RendererPass::CollectTransparentFaces);
+		DrawRats(view, RendererPass::CollectTransparentFaces);
+		DrawLocusts(view, RendererPass::CollectTransparentFaces);
 
 		// Draw sorted faces.
 		DrawSortedFaces(view);
@@ -2716,6 +2887,32 @@ namespace TEN::Renderer
 
 				i--;
 			}
+			else if (object->ObjectType == RendererObjectType::MoveableAsStatic)
+			{
+				while (i < view.TransparentObjectsToDraw.size() &&
+					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
+					view.TransparentObjectsToDraw[i].Room->RoomNumber == object->Room->RoomNumber &&
+					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
+					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
+				{
+					RendererSortableObject* currentObject = &view.TransparentObjectsToDraw[i];
+					_sortedPolygonsIndices.bulk_push_back(
+						_staticsIndices.data(),
+						currentObject->Polygon->BaseIndex,
+						currentObject->Polygon->Shape == 0 ? 6 : 3);
+					i++;
+				}
+
+				DrawMoveableAsStaticSorted(object, lastObjectType, view);
+
+				if (i == view.TransparentObjectsToDraw.size())
+				{
+					return;
+				}
+
+				i--;
+			}
 			else if (object->ObjectType == RendererObjectType::Sprite)
 			{			
 				while (i < view.TransparentObjectsToDraw.size() &&
@@ -2948,6 +3145,43 @@ namespace TEN::Renderer
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
 		_stStatic.LightMode = (int)_staticObjects[objectInfo->Static->ObjectNumber]->ObjectMeshes[0]->LightMode;
 		BindStaticLights(objectInfo->Static->LightsToDraw);
+		_cbStatic.UpdateData(_stStatic, _context.Get());
+
+		SetDepthState(DepthState::Read);
+		SetCullMode(CullMode::CounterClockwise);
+		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+
+		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
+			SamplerStateRegister::AnisotropicClamp);
+		BindTexture(TextureRegister::NormalMap, &std::get<1>(_staticTextures[objectInfo->Bucket->Texture]),
+			SamplerStateRegister::AnisotropicClamp);
+
+		_sortedPolygonsIndexBuffer.Update(_context.Get(), _sortedPolygonsIndices, 0, (int)_sortedPolygonsIndices.size());
+		_context->IASetIndexBuffer(_sortedPolygonsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		DrawIndexedTriangles((int)_sortedPolygonsIndices.size(), 0, 0);
+
+		_numSortedStaticsDrawCalls++;
+		_numSortedTriangles += (int)_sortedPolygonsIndices.size() / 3;
+	}
+
+	void Renderer::DrawMoveableAsStaticSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view)
+	{
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_inputLayout.Get());
+
+		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
+		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+
+		_stStatic.World = objectInfo->World;
+		_stStatic.Color = Vector4::One;
+		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
+		_stStatic.LightMode = (int)objectInfo->Mesh->LightMode;
+		BindStaticLights(objectInfo->Room->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
 		SetDepthState(DepthState::Read);
