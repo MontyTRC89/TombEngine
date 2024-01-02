@@ -1649,11 +1649,37 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 	case ClimbContextAlignType::None:
 		break;
 
+	case ClimbContextAlignType::OffsetBlend:
+	{
+		// No attractor; break.
+		if (climbContext.AttractorPtr == nullptr)
+		{
+			TENLog("SetPlayerClimb() attempted to reference missing attractor for offset blend.", LogLevel::Warning);
+			break;
+		}
+
+		// Get parent target.
+		auto target = GetAttractorParentTarget(
+			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
+			climbContext.RelPosOffset, climbContext.RelOrientOffset);
+
+		// Calculate offsets.
+		auto posOffset = target.Position - item.Pose.Position.ToVector3();
+		auto orientOffset = target.Orientation - item.Pose.Orientation;
+
+		// Set offset blend.
+		item.OffsetBlend.SetLogarithmic(posOffset, orientOffset, OFFSET_BLEND_LERP_ALPHA);
+	}
+		break;
+
 	case ClimbContextAlignType::AttractorParent:
 	{
 		// No attractor; break.
 		if (climbContext.AttractorPtr == nullptr)
+		{
+			TENLog("SetPlayerClimb() attempted to parent missing attractor.", LogLevel::Warning);
 			break;
+		}
 
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
@@ -1669,26 +1695,6 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset,
 			relDeltaPos, relDeltaOrient);
-	}
-		break;
-
-	case ClimbContextAlignType::OffsetBlend:
-	{
-		// No attractor; break.
-		if (climbContext.AttractorPtr == nullptr)
-			break;
-
-		// Get parent target.
-		auto target = GetAttractorParentTarget(
-			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
-			climbContext.RelPosOffset, climbContext.RelOrientOffset);
-
-		// Calculate offsets.
-		auto posOffset = target.Position - item.Pose.Position.ToVector3();
-		auto orientOffset = target.Orientation - item.Pose.Orientation;
-
-		// Set offset blend.
-		item.OffsetBlend.SetLogarithmic(posOffset, orientOffset, OFFSET_BLEND_LERP_ALPHA);
 	}
 		break;
 	}

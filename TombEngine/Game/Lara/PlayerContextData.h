@@ -2,7 +2,6 @@
 #include "Math/Math.h"
 
 namespace TEN::Collision::Attractor { class Attractor; }
-enum LaraState;
 
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Math;
@@ -12,8 +11,8 @@ namespace TEN::Entities::Player
 	enum class ClimbContextAlignType
 	{
 		None,
-		AttractorParent,
-		OffsetBlend
+		OffsetBlend,
+		AttractorParent
 	};
 
 	struct GroundMovementSetupData
