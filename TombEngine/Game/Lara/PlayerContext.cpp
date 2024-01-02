@@ -1324,10 +1324,10 @@ namespace TEN::Entities::Player
 				return std::nullopt;
 		}
 
+		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 		const AttractorCollisionData* highestAttracCollPtr = nullptr;
 
 		// 2) Assess attractor collision.
-		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
 		for (const auto& attracColl : attracColls)
 		{
 			// 2.1) Check attractor type.
@@ -1401,12 +1401,20 @@ namespace TEN::Entities::Player
 			// Test destination space (if applicable).
 			if (setup.TestDestSpace)
 			{
-				const auto& destPointColl = setup.TestEdgeFront ? pointCollFront : pointCollBack;
+				// Get point collisions at destination.
+				const auto& destPointCollCenter = setup.TestEdgeFront ? pointCollFront : pointCollBack;
+				auto destPointCollLeft = GetCollision(destPointCollCenter.Coordinates, destPointCollCenter.RoomNumber, attracColl.HeadingAngle, 0.0f, 0.0f, -coll.Setup.Radius);
+				auto destPointCollRight = GetCollision(destPointCollCenter.Coordinates, destPointCollCenter.RoomNumber, attracColl.HeadingAngle, 0.0f, 0.0f, coll.Setup.Radius);
 
-				// 2.9) Test destination floor-to-ceiling height.
-				int destFloorToCeilHeight = abs(destPointColl.Position.Ceiling - destPointColl.Position.Floor);
-				if (destFloorToCeilHeight <= setup.DestFloorToCeilHeightMin ||
-					destFloorToCeilHeight > setup.DestFloorToCeilHeightMax)
+				// Calculate destination floor-to-ceiling heights.
+				int destFloorToCeilHeightCenter = abs(destPointCollCenter.Position.Ceiling - destPointCollCenter.Position.Floor);
+				int destFloorToCeilHeightLeft = abs(destPointCollLeft.Position.Ceiling - destPointCollLeft.Position.Floor);
+				int destFloorToCeilHeightRight = abs(destPointCollRight.Position.Ceiling - destPointCollRight.Position.Floor);
+
+				// 2.9) Test destination floor-to-ceiling heights.
+				if (destFloorToCeilHeightCenter <= setup.DestFloorToCeilHeightMin || destFloorToCeilHeightCenter > setup.DestFloorToCeilHeightMax ||
+					destFloorToCeilHeightLeft <= setup.DestFloorToCeilHeightMin || destFloorToCeilHeightLeft > setup.DestFloorToCeilHeightMax ||
+					destFloorToCeilHeightRight <= setup.DestFloorToCeilHeightMin || destFloorToCeilHeightRight > setup.DestFloorToCeilHeightMax)
 				{
 					continue;
 				}
@@ -1414,7 +1422,7 @@ namespace TEN::Entities::Player
 				// 2.10) Test destination floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
-					int destFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - destPointColl.Position.Floor);
+					int destFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - destPointCollCenter.Position.Floor);
 					if (destFloorToEdgeHeight > REL_SURFACE_HEIGHT_THRESHOLD)
 						continue;
 				}
@@ -2427,8 +2435,9 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto ABS_EDGE_BOUND = CLICK(0.5f);
 
-		// Assess attractor collision.
 		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+
+		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check attractor type.
@@ -2632,9 +2641,10 @@ namespace TEN::Entities::Player
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(item, 0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
+		
+		float range2D = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
 
 		// Assess attractor collision.
-		float range2D = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
 		for (const auto& attracColl : attracColls)
 		{
 			// 1) Check attractor type.

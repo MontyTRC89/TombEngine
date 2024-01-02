@@ -701,7 +701,7 @@ void InitializeItem(short itemNumber)
 
 	// TODO: Temporary.
 	// Initialize bridge attractor.
-	if (object.GetFloorHeight != nullptr)
+	if (item->IsBridge())
 		item->Attractor = GenerateBridgeAttractor(*item);
 }
 

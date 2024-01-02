@@ -67,6 +67,7 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 
 		// Clear bridge.
 		if (item.IsBridge())
+		{
 			UpdateBridgeItem(item, true);
 			item.Attractor->DetachAllPlayers();
 		}

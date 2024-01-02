@@ -1789,7 +1789,7 @@ bool SaveGame::Load(int slot)
 
 		// TODO: Temporary.
 		// Initialize bridge attractor.
-		if (Objects[item->ObjectNumber].GetFloorHeight != nullptr)
+		if (item->IsBridge())
 			item->Attractor = GenerateBridgeAttractor(*item);
 
 		// Now some post-load specific hacks for objects
