@@ -1340,7 +1340,7 @@ namespace TEN::Entities::Vehicles
 			else
 				jeep->Pitch = -32768;
 
-			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &jeepItem->Pose, SoundEnvironment::DryLand, 0.5f + jeep->Pitch / 65535.0f);
+			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &jeepItem->Pose, SoundEnvironment::Land, 0.5f + jeep->Pitch / 65535.0f);
 		}
 		else
 		{

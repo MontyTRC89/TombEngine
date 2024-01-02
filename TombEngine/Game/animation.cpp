@@ -110,6 +110,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			break;
 
 		case AnimCommandType::SoundEffect:
+		{
 			int frameNumber = commandDataPtr[0];
 			if (isFrameBased && item.Animation.FrameNumber == frameNumber)
 			{
@@ -189,6 +190,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			}
 
 			commandDataPtr += 2;
+		}
 			break;
 
 		case AnimCommandType::Flipeffect:
