@@ -222,25 +222,11 @@ namespace TEN::Collision::Attractor
 		return GetAttractorCollisions(probePoint, probeRoomNumber, headingAngle, detectRadius);
 	}
 
-	// TODO: Remove.
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, float detectRadius)
-	{
-		return GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, detectRadius);
-	}
-
-	// TODO: Remove.
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const ItemInfo& item, float forward, float down, float right, float detectRadius)
-	{
-		return GetAttractorCollisions(
-			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
-			forward, down, right, detectRadius);
-	}
-
 	void DrawNearbyAttractors(const ItemInfo& item)
 	{
 		auto uniqueAttracPtrs = std::set<Attractor*>{};
 
-		auto attracColls = GetAttractorCollisions(item, 0.0f, 0.0f, 0.0f, BLOCK(5));
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, 0.0f, 0.0f, 0.0f, BLOCK(5));
 		for (const auto& attracColl : attracColls)
 		{
 			uniqueAttracPtrs.insert(attracColl.AttractorPtr);

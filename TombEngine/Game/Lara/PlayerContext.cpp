@@ -2682,7 +2682,9 @@ namespace TEN::Entities::Player
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN	  = LARA_HEIGHT_STRETCH;
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item, 0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(
+			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
+			0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
 		
 		float range2D = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
 
