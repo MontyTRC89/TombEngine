@@ -1324,7 +1324,10 @@ namespace TEN::Entities::Vehicles
 			collide = 0;
 		}
 		else
+		{
 			drive = JeepUserControl(jeepItem, laraItem, floorHeight, &pitch);
+			HandleVehicleSpeedometer(jeepItem->Animation.Velocity.z, JEEP_VELOCITY_MAX / (float)VEHICLE_VELOCITY_SCALE);
+		}
 
 		if (jeep->Velocity || jeep->Revs)
 		{

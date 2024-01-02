@@ -3012,6 +3012,10 @@ namespace TEN::Gui
 						{
 							switch (invObject.ObjectNumber)
 							{
+							case ID_PISTOLS_AMMO_ITEM:
+								numItems = player.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+								break;
+
 							case ID_SHOTGUN_AMMO1_ITEM:
 								numItems = player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 								break;
