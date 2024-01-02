@@ -1803,7 +1803,7 @@ namespace TEN::Entities::Player
 
 		auto context = std::optional<ClimbContextData>();
 
-		// 1) Stand vault 1 step up to crouch.
+		// 1) Vault 1 step up to crouch.
 		context = GetStandVault1StepUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1811,7 +1811,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 2) Stand vault 2 steps up to crouch.
+		// 2) Vault 2 steps up to crouch.
 		context = GetStandVault2StepsUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1819,7 +1819,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 3) Stand vault 2 steps up.
+		// 3) Vault 2 steps up.
 		context = GetStandVault2StepsUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1827,7 +1827,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 4) Stand vault 3 steps up to crouch.
+		// 4) Vault 3 steps up to crouch.
 		context = GetStandVault3StepsUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -1835,7 +1835,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 5) Stand vault 3 steps up.
+		// 5) Vault 3 steps up.
 		context = GetStandVault3StepsUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2054,7 +2054,7 @@ namespace TEN::Entities::Player
 
 		auto context = std::optional<ClimbContextData>();
 
-		// 1) Crawl vault down 1 step to stand.
+		// 1) Vault down 1 step to stand.
 		context = GetCrawlVault1StepDownToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2062,7 +2062,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 2) Crawl vault down 1 step.
+		// 2) Vault down 1 step.
 		context = GetCrawlVault1StepDownClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2070,7 +2070,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 3) Crawl vault jump.
+		// 3) Vault jump.
 		context = GetCrawlVaultJumpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2078,7 +2078,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 4) Crawl vault up 1 step.
+		// 4) Vault up 1 step.
 		context = GetCrawlVault1StepUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2376,7 +2376,7 @@ namespace TEN::Entities::Player
 
 		auto context = std::optional<ClimbContextData>();
 
-		// 1) Water tread vault 1 step down to stand.
+		// 1) Vault 1 step down to stand.
 		context = GetTreadWaterVault1StepDownToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2384,7 +2384,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 2) Water tread vault 1 step down to crouch.
+		// 2) Vault 1 step down to crouch.
 		context = GetTreadWaterVault1StepDownToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2392,7 +2392,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 3) Water tread vault 0 steps to stand.
+		// 3) Vault 0 steps to stand.
 		context = GetTreadWaterVault0StepsToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2400,7 +2400,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 4) Water tread vault 0 steps to crouch.
+		// 4) Vault 0 steps to crouch.
 		context = GetTreadWaterVault0StepsToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2408,7 +2408,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 5) Water tread vault up 1 step up to stand.
+		// 5) Vault up 1 step up to stand.
 		context = GetTreadWaterVault1StepUpToStandClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2416,7 +2416,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 6) Water tread vault up 1 step up to crouch.
+		// 6) Vault up 1 step up to crouch.
 		context = GetTreadWaterVault1StepUpToCrouchClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
@@ -2424,7 +2424,7 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 7) Water tread climbable wall mount.
+		// 7) Mount climbable wall.
 		context = GetTreadWaterClimbableWallMountClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
