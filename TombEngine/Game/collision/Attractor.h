@@ -5,8 +5,6 @@ struct ItemInfo;
 
 namespace TEN::Collision::Attractor
 {
-	class Attractor;
-
 	enum class AttractorType
 	{
 		Edge,
