@@ -563,14 +563,12 @@ namespace TEN::Renderer
 			return ConstantBuffer<C>(_device.Get());
 		}
 
-		static bool DoesBlendModeRequireSorting(BlendMode blendMode)
+		static inline bool IsSortedBlendMode(BlendMode blendMode)
 		{
-			return (blendMode == BlendMode::AlphaBlend ||
-				    blendMode == BlendMode::Exclude ||
-				    blendMode == BlendMode::Lighten ||
-				    blendMode == BlendMode::Screen ||
-				    blendMode == BlendMode::Subtractive ||
-				    blendMode == BlendMode::NoDepthTest);
+			return !(blendMode == BlendMode::Opaque ||
+				blendMode == BlendMode::AlphaTest ||
+				blendMode == BlendMode::Additive ||
+				blendMode == BlendMode::FastAlphaBlend);
 		}
 
 	public:

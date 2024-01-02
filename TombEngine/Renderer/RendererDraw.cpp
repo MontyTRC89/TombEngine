@@ -2144,10 +2144,7 @@ namespace TEN::Renderer
 							continue;
 						}
 
-						if (bucket.BlendMode != BlendMode::Opaque &&
-							bucket.BlendMode != BlendMode::AlphaTest &&
-							bucket.BlendMode != BlendMode::Additive &&
-							bucket.BlendMode != BlendMode::FastAlphaBlend)
+						if (IsSortedBlendMode(bucket.BlendMode))
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
@@ -2193,10 +2190,7 @@ namespace TEN::Renderer
 
 						if (rendererPass == RendererPass::CollectTransparentFaces)
 						{
-							if (bucket.BlendMode != BlendMode::Opaque && 
-								bucket.BlendMode != BlendMode::AlphaTest &&
-								bucket.BlendMode != BlendMode::Additive &&
-								bucket.BlendMode != BlendMode::FastAlphaBlend)
+							if (IsSortedBlendMode(bucket.BlendMode))
 							{
 								for (int p = 0; p < bucket.Polygons.size(); p++)
 								{
@@ -2494,10 +2488,7 @@ namespace TEN::Renderer
 
 				if (rendererPass == RendererPass::CollectTransparentFaces)
 				{
-					if (bucket.BlendMode != BlendMode::Opaque &&
-						bucket.BlendMode != BlendMode::AlphaTest &&
-						bucket.BlendMode != BlendMode::Additive &&
-						bucket.BlendMode != BlendMode::FastAlphaBlend)
+					if (IsSortedBlendMode(bucket.BlendMode))
 					{
 						for (int p = 0; p < bucket.Polygons.size(); p++)
 						{
@@ -2637,8 +2628,6 @@ namespace TEN::Renderer
 				return (a.Distance > b.Distance);
 			}
 		);
-
-		std::vector<RendererSortedBucket> sortedBuckets;
 
 		for (int i = 0; i < view.TransparentObjectsToDraw.size(); i++)
 		{
