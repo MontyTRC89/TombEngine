@@ -40,9 +40,12 @@ Version 1.3
   - Negative OCB - play anim number and loose key in inventory.
   - OCB 0 - play default animation and loose the key in inventory
 * Revise keyhole OCBs to account for keeping or losing keys:
-  - Positive OCB: play anim number and keep key.
-  - Negative OCB: play anim number and lose key.
-  - OCB 0 - play default animation and lose key.
+  - Positive OCB: Play anim number and keep key.
+  - Negative OCB: Play anim number and lose key.
+  - OCB 0: Play default animation and lose key.
+* Revise Wolf OCB:
+  - OCB 0: Wolf starts in walking animation, ready to chase Lara.
+  - OCB 1: Wolf starts in sleeping animation.
 
 Lua API changes:
 * Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.

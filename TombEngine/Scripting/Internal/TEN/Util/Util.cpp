@@ -64,7 +64,7 @@ namespace TEN::Scripting::Util
 	static float CalculateHorizontalDistance(const Vec3& posA, const Vec3& posB)
 	{
 		auto pos0 = Vector2(posA.x, posA.z);
-		auto pos1 = Vector2(posA.x, posB.z);
+		auto pos1 = Vector2(posB.x, posB.z);
 		return round(Vector2::Distance(pos0, pos1));
 	}
 
