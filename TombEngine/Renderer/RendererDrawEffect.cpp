@@ -1140,7 +1140,7 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+			int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 			for (int p = 0; p < passes; p++)
 			{

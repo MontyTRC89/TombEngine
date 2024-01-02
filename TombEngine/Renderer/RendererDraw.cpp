@@ -587,7 +587,7 @@ namespace TEN::Renderer
 								continue;
 							}
 
-							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 							for (int p = 0; p < passes; p++)
 							{
@@ -710,7 +710,7 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 					for (int p = 0; p < passes; p++)
 					{
@@ -830,7 +830,7 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 					for (int p = 0; p < passes; p++)
 					{
@@ -958,7 +958,7 @@ namespace TEN::Renderer
 								continue;
 							}
 
-							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 							for (int p = 0; p < passes; p++)
 							{
@@ -2266,7 +2266,7 @@ namespace TEN::Renderer
 							continue;
 						}
 
-						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 						for (int p = 0; p < passes; p++)
 						{
@@ -2478,7 +2478,7 @@ namespace TEN::Renderer
 							continue;
 						}
 
-						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 						for (int p = 0; p < passes; p++)
 						{
@@ -2702,7 +2702,7 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::FastAlphaBlend ? 2 : 1;
+					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 					for (int p = 0; p < passes; p++)
 					{
@@ -2751,8 +2751,7 @@ namespace TEN::Renderer
 
 		case RendererPass::Opaque:
 			if (blendMode != BlendMode::Opaque &&
-				blendMode != BlendMode::AlphaTest &&
-				blendMode != BlendMode::FastAlphaBlend)
+				blendMode != BlendMode::AlphaTest)
 			{
 				return false;
 			}
@@ -2764,10 +2763,16 @@ namespace TEN::Renderer
 			}
 			else
 			{
-				SetBlendMode(BlendMode::AlphaTest);
-				SetAlphaTest(
-					drawPass == 0 ? AlphaTestMode::GreatherThan : AlphaTestMode::LessThan,
-					FAST_ALPHA_BLEND_THRESHOLD);
+				if (drawPass == 0)
+				{
+					SetBlendMode(BlendMode::Opaque);
+					SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+				}
+				else
+				{
+					SetBlendMode(BlendMode::AlphaBlend);
+					SetAlphaTest(AlphaTestMode::LessThan, ALPHA_TEST_THRESHOLD);
+				};
 			}
 			break;
 

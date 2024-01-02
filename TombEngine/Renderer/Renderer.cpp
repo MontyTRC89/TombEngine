@@ -314,8 +314,7 @@ namespace TEN::Renderer
 
 			_stBlending.BlendMode = static_cast<unsigned int>(blendMode);
 			_cbBlending.UpdateData(_stBlending, _context.Get());
-			BindConstantBufferPS(ConstantBufferRegister::Blending, _cbBlending.get());
-
+			
 			_lastBlendMode = blendMode;
 		}
 
