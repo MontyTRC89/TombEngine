@@ -87,7 +87,7 @@ struct OffsetBlendData
 	void SetLogarithmic(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec = 0.0f);
 	void Clear();
 
-	void DrawDebug() const;
+	void DrawDebug(const ItemInfo& item) const;
 };
 
 struct EntityAnimationData

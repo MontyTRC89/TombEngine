@@ -63,8 +63,13 @@ void OffsetBlendData::Clear()
 	*this = {};
 }
 
-void OffsetBlendData::DrawDebug() const
+void OffsetBlendData::DrawDebug(const ItemInfo& item) const
 {
+	g_Renderer.PrintDebugMessage("OFFSET BLEND DEBUG");
+
+	if (item.IsLara())
+		g_Renderer.PrintDebugMessage("Interacted item number: %d", GetLaraInfo(item).Context.InteractedItem);
+
 	g_Renderer.PrintDebugMessage("IsActive: %d", IsActive);
 	g_Renderer.PrintDebugMessage("TimeAcive: %.3f", TimeActive);
 	g_Renderer.PrintDebugMessage("DelayTime: %.3f", DelayTime);
@@ -77,11 +82,7 @@ void ItemInfo::HandleOffsetBlend()
 {
 	constexpr auto TIME_ACTIVE_MAX = 3.0f;
 
-	if (IsLara())
-	{
-		//g_Renderer.PrintDebugMessage("Interacted item number: %d", GetLaraInfo(*this).Context.InteractedItem);
-		//OffsetBlend.DrawDebug();
-	}
+	//OffsetBlend.DrawDebug(*this);
 
 	// Offset blend inactive; return early.
 	if (!OffsetBlend.IsActive)
