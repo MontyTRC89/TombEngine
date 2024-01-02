@@ -841,36 +841,27 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	auto pointColl = GetCollision(item);
-	auto* sectorPtr = GetCollision(item).BottomBlock;
-
 	bool isPlayer = item->IsLara();
 
-	// Monkeyswing and climb (only for Lara)
+	auto pointColl = GetCollision(item);
+	const auto& sector = *GetCollision(item).BottomBlock;
+
 	if (isPlayer)
 	{
-		auto* lara = GetLaraInfo(item);
-
-		// Set climb status
-		if (TestLaraNearClimbableWall(item, sectorPtr))
-			lara->Control.CanClimbLadder = true;
-		else
-			lara->Control.CanClimbLadder = false;
-
-		// Set monkeyswing status
-		lara->Control.CanMonkeySwing = sectorPtr->Flags.Monkeyswing;
+		auto& player = GetLaraInfo(*item);
+		player.Control.CanMonkeySwing = sector.Flags.Monkeyswing;
 	}
 
-	// Burn or drown item
-	if (sectorPtr->Flags.Death && item->Pose.Position.y == item->Floor)
+	// Burn or drown item.
+	if (sector.Flags.Death && item->Pose.Position.y == item->Floor)
 	{
 		if (isPlayer)
 		{
-			if (!IsJumpState((LaraState)item->Animation.ActiveState) || 
+			if (!IsJumpState(item->Animation.ActiveState) || 
 				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
 			{
 				// To allow both lava and rapids in same level, also check floor material flag.
-				if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water &&
+				if (sector.GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water &&
 					Objects[ID_KAYAK_LARA_ANIMS].loaded)
 				{
 					KayakLaraRapidsDrown(item);
@@ -883,10 +874,11 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water ||
-				TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sectorPtr->RoomNumber))
+			if (sector.GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water ||
+				TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sector.RoomNumber))
 			{
-				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+				// TODO: Implement correct rapids behaviour for other objects.
+				DoDamage(item, INT_MAX);
 			}
 			else
 			{

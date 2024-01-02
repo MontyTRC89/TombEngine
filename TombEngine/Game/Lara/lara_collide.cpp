@@ -84,7 +84,7 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
-		if (!lara->Control.CanClimbLadder || item->Animation.Velocity.z != 2.0f)
+		if (item->Animation.Velocity.z != 2.0f)
 		{
 			if (coll->Middle.Floor <= CLICK(1))
 			{

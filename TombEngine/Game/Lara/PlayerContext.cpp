@@ -1212,8 +1212,8 @@ namespace TEN::Entities::Player
 
 		auto& player = GetLaraInfo(item);
 
-		// 1) Check for climbable wall flag.
-		if (!player.Control.CanClimbLadder)
+		// 1) Test for climbable wall flag.
+		if (!TestLaraNearClimbableWall(item))
 			return false;
 
 		// Get point collision.
@@ -1249,8 +1249,8 @@ namespace TEN::Entities::Player
 		int relFloorHeight = pointCollCenter.Position.Floor - item.Pose.Position.y;
 		// Left and right.
 
-		// 1) Check if wall is climbable.
-		if (!player.Control.CanClimbLadder)
+		// 1) Test for climbable wall flag.
+		if (!TestLaraNearClimbableWall(item))
 			return false;
 
 		// 2) Assess point collision.
@@ -1721,7 +1721,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Currently still using legacy climbable wall flags.
+	// TODO: Adopt attractors.
 	static std::optional<ClimbContextData> GetClimbableWallMountClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
@@ -1738,8 +1738,8 @@ namespace TEN::Entities::Player
 			break;
 		}
 
-		// 1) Check if wall is climbable.
-		if (!player.Control.CanClimbLadder)
+		// 1) Test for climbable wall flag.
+		if (!TestLaraNearClimbableWall(item))
 			return std::nullopt;
 
 		// 2) Test swamp depth.
@@ -2327,6 +2327,40 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	// TODO: Adopt attractors.
+	const std::optional<ClimbContextData> GetTreadWaterClimbableWallMountClimbContext(ItemInfo& item, const CollisionInfo& coll,
+																					  const std::vector<AttractorCollisionData>& attracColls)
+	{
+		// 1) Test for climbable wall flag.
+		if (!TestLaraNearClimbableWall(item))
+			return std::nullopt;
+
+		// 2) Test relation to wall.
+		short wallHeadingAngle = GetQuadrant(item.Pose.Orientation.y) * ANGLE(90.0f);
+		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, wallHeadingAngle))
+			return std::nullopt;
+
+		// 3) Test and set climbable wall mount.
+		if (!TestLaraClimbIdle(&item, &coll))
+			return std::nullopt;
+
+		SnapEntityToGrid(item, coll);
+		item.Pose.Position.y -= 10; // NOTE: Offset required to avoid falling back into water.
+		item.Pose.Orientation = EulerAngles(0, wallHeadingAngle, 0);
+
+		auto context = ClimbContextData{};
+		context.AttractorPtr = nullptr;
+		context.ChainDistance = 0.0f;
+		context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+		context.RelOrientOffset = EulerAngles::Zero;
+		context.TargetStateID = LS_LADDER_IDLE;
+		context.AlignType = ClimbContextAlignType::None;
+		context.SetBusyHands = true;
+		context.SetJumpVelocity = false;
+
+		return context;
+	}
+
 	std::optional<ClimbContextData> GetTreadWaterVaultClimbContext(ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
@@ -2384,6 +2418,14 @@ namespace TEN::Entities::Player
 
 		// 6) Water tread vault up 1 step up to crouch.
 		context = GetTreadWaterVault1StepUpToCrouchClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
+		// 7) Water tread climbable wall mount.
+		context = GetTreadWaterClimbableWallMountClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))

@@ -1168,7 +1168,6 @@ namespace TEN::Renderer
 				PrintDebugMessage("IsAirborne: %d", LaraItem->Animation.IsAirborne);
 				PrintDebugMessage("HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
-				PrintDebugMessage("CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				PrintDebugMessage("CanMonkeySwing: %d", Lara.Control.CanMonkeySwing);
 				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				break;

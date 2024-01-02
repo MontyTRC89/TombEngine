@@ -1280,7 +1280,7 @@ struct PlayerControlData
 	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
-	bool IsHanging		  = false; // TODO: savegame
+	bool IsHanging		  = false; // TODO: Add to savegame.
 	bool IsLocked		  = false;
 	bool IsLow			  = false;
 	bool IsMonkeySwinging = false;
@@ -1288,7 +1288,7 @@ struct PlayerControlData
 	bool IsRunJumpQueued  = false;
 	bool KeepLow		  = false;
 
-	bool CanClimbLadder = false;
+	//bool CanClimbLadder = false; // TODO: Remember to remove from savegame before deleting this line.
 	bool CanLook		= false;
 	bool CanMonkeySwing = false;
 };

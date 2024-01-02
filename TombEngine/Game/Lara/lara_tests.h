@@ -17,14 +17,12 @@ using namespace TEN::Entities::Player;
 bool TestPlayerInteractAngle(const ItemInfo& item, short testAngle);
 bool TestPlayerInteractAngle(short playerHeadingAngle, short testAngle);
 
-bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
+bool TestLaraClimbIdle(ItemInfo* item, const CollisionInfo* coll);
+bool TestLaraNearClimbableWall(const ItemInfo& item);
 
 bool TestLaraWall(const ItemInfo* item, float dist, float height);
 bool TestLaraFacingCorner(const ItemInfo* item, short headingAngle, float dist);
-bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance);
 
-bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll);
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);

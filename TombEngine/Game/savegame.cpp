@@ -518,7 +518,6 @@ bool SaveGame::Save(int slot)
 	auto contextOffset = context.Finish();
 
 	Save::LaraControlDataBuilder control{ fbb };
-	control.add_can_climb_ladder(Lara.Control.CanClimbLadder);
 	control.add_can_monkey_swing(Lara.Control.CanMonkeySwing);
 	control.add_count(countOffset);
 	control.add_hand_status((int)Lara.Control.HandStatus);
@@ -2170,7 +2169,6 @@ bool SaveGame::Load(int slot)
 	Lara.Context.Vehicle = s->lara()->context()->vehicle_item_number();
 	Lara.Context.WaterSurfaceDist = s->lara()->context()->water_surface_dist();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
-	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
 	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();

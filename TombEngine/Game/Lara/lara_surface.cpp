@@ -196,7 +196,6 @@ void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
-	TestLaraLadderClimbOut(item, coll);
 }
 
 // State:		LS_ONWATER_LEFT (48)

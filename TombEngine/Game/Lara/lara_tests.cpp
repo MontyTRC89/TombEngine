@@ -44,7 +44,7 @@ bool TestPlayerInteractAngle(short playerHeadingAngle, short testAngle)
 	return (abs(Geometry::GetShortestAngle(playerHeadingAngle, testAngle)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
 }
 
-bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
+bool TestLaraClimbIdle(ItemInfo* item, const CollisionInfo* coll)
 {
 	int shiftRight = 0;
 	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -700, CLICK(2), &shiftRight) != 1)
@@ -79,12 +79,11 @@ bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
-bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor)
+// TODO: Remove. Legacy flag check for climbable walls.
+bool TestLaraNearClimbableWall(const ItemInfo& item)
 {
-	if (floor == nullptr)
-		floor = GetCollision(item).BottomBlock;
-
-	return ((256 << (GetQuadrant(item->Pose.Orientation.y))) & GetClimbFlags(floor));
+	auto& sector = *GetCollision(item).BottomBlock;
+	return (((1 << 8) << GetQuadrant(item.Pose.Orientation.y)) & GetClimbFlags(&sector));
 }
 
 bool TestLaraWall(const ItemInfo* item, float dist, float height)
@@ -125,108 +124,6 @@ bool TestLaraFacingCorner(const ItemInfo* item, short headingAngle, float dist)
 	bool result0 = LOS(&origin, &target0);
 	bool result1 = LOS(&origin, &target1);
 	return (!result0 && !result1);
-}
-
-bool LaraPositionOnLOS(ItemInfo* item, short angle, int distance)
-{
-	auto origin0 = GameVector(
-		item->Pose.Position.x,
-		item->Pose.Position.y - LARA_HEADROOM,
-		item->Pose.Position.z,
-		item->RoomNumber);
-	auto target0 = GameVector(
-		item->Pose.Position.x + distance * phd_sin(angle),
-		item->Pose.Position.y - LARA_HEADROOM,
-		item->Pose.Position.z + distance * phd_cos(angle),
-		item->RoomNumber);
-
-	auto origin2 = GameVector(
-		item->Pose.Position.x,
-		item->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM,
-		item->Pose.Position.z,
-		item->RoomNumber);
-	auto target1 = GameVector(
-		item->Pose.Position.x + distance * phd_sin(angle),
-		item->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM,
-		item->Pose.Position.z + distance * phd_cos(angle),
-		item->RoomNumber);
-
-	bool result0 = LOS(&origin0, &target0);
-	bool result1 = LOS(&origin2, &target1);
-	return (result0 && result1);
-}
-
-bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll)
-{
-	auto& player = *GetLaraInfo(item);
-
-	if (!IsHeld(In::Action) || !player.Control.CanClimbLadder || coll->CollisionType != CT_FRONT)
-		return false;
-
-	if (player.Control.HandStatus != HandStatus::Free &&
-		(player.Control.HandStatus != HandStatus::WeaponReady || player.Control.Weapon.GunType != LaraWeaponType::Flare))
-	{
-		return false;
-	}
-
-	// HACK: Reduce probe radius. Free forward probe mode makes ladder tests fail in some cases.
-	coll->Setup.Radius *= 0.8f; 
-
-	if (!TestLaraClimbIdle(item, coll))
-		return false;
-
-	short headingAngle = item->Pose.Orientation.y;
-	if (headingAngle >= ANGLE(-35.0f) && headingAngle <= ANGLE(35.0f))
-	{
-		headingAngle = 0;
-	}
-	else if (headingAngle >= ANGLE(55.0f) && headingAngle <= ANGLE(125.0f))
-	{
-		headingAngle = ANGLE(90.0f);
-	}
-	else if (headingAngle >= ANGLE(145.0f) || headingAngle <= ANGLE(-145.0f))
-	{
-		headingAngle = ANGLE(180.0f);
-	}
-	else if (headingAngle >= ANGLE(-125.0f) && headingAngle <= ANGLE(-55.0f))
-	{
-		headingAngle = ANGLE(-90.0f);
-	}
-
-	if (headingAngle & 0x3FFF)
-		return false;
-
-	switch ((unsigned short)headingAngle / ANGLE(90.0f))
-	{
-	case NORTH:
-		item->Pose.Position.z = (item->Pose.Position.z | WALL_MASK) - (LARA_RADIUS - 1);
-		break;
-
-	case EAST:
-		item->Pose.Position.x = (item->Pose.Position.x | WALL_MASK) - (LARA_RADIUS - 1);
-		break;
-
-	case SOUTH:
-		item->Pose.Position.z = (item->Pose.Position.z & -BLOCK(1)) + (LARA_RADIUS + 1);
-		break;
-
-	case WEST:
-		item->Pose.Position.x = (item->Pose.Position.x & -BLOCK(1)) + (LARA_RADIUS + 1);
-		break;
-	}
-
-	SetAnimation(item, LA_ONWATER_IDLE);
-	item->Animation.TargetState = LS_LADDER_IDLE;
-	AnimateItem(item);
-
-	item->Pose.Position.y -= 10; // NOTE: Offset required or player will fall back in water.
-	item->Pose.Orientation = EulerAngles(0, headingAngle, 0);
-	item->Animation.IsAirborne = false;
-	item->Animation.Velocity = Vector3::Zero;
-	player.Control.TurnRate = 0;
-	player.Control.HandStatus = HandStatus::Busy;
-	player.Control.WaterStatus = WaterStatus::Dry;
-	return true;
 }
 
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
