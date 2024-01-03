@@ -1686,7 +1686,7 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttractorPtr = nullptr;
 			context.ChainDistance = 0.0f;
-			context.RelPosOffset = Vector3::Zero;
+			context.RelPosOffset = Vector3(0.0f, -relCeilHeight, 0.0f);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.AlignType = ClimbContextAlignType::None;
@@ -2779,7 +2779,6 @@ namespace TEN::Entities::Player
 		// Get edge catch climb context.
 		auto attracColl = GetEdgeCatchAttractorCollision(item, coll);
 		if (attracColl.has_value())
-
 		{
 			// HACK: Set catch animation.
 			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ?
@@ -2803,7 +2802,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<MonkeySwingJumpCatchClimbContextData> GetMonkeySwingJumpCatchContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<ClimbContextData> GetMonkeySwingJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
 		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
@@ -2832,10 +2831,20 @@ namespace TEN::Entities::Player
 		if (relCeilHeight <= ABS_CEIL_BOUND &&			  // Ceiling height is within lower/upper ceiling bounds.
 			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height is wide enough.
 		{
-			// Get climb context.
-			auto context = MonkeySwingJumpCatchClimbContextData{};
-			context.CeilingHeight = pointColl.Position.Ceiling;
+			// HACK: Set catch animation.
+			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
+			SetAnimation(*LaraItem, animNumber);
+
+			// Get monkey swing catch climb context.
+			auto context = ClimbContextData{};
+			context.AttractorPtr = nullptr;
+			context.ChainDistance = 0.0f;
+			context.RelPosOffset = Vector3(0.0f, item.Pose.Position.y - (pointColl.Position.Ceiling + LARA_HEIGHT_MONKEY), 0.0f);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_MONKEY_IDLE;
+			context.AlignType = ClimbContextAlignType::Snap;
+			context.SetBusyHands = true;
+			context.SetJumpVelocity = false;
 
 			return context;
 		}
@@ -2843,17 +2852,24 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<JumpCatchClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	// TODO: Dispatch checks.
+	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		auto context = std::optional<JumpCatchClimbContextData>();
+		auto context = std::optional<ClimbContextData>();
 
 		context = GetEdgeJumpCatchClimbContext(item, coll);
 		if (context.has_value())
-			return context;
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
 
-		context = GetMonkeySwingJumpCatchContext(item, coll);
+		context = GetMonkeySwingJumpCatchClimbContext(item, coll);
 		if (context.has_value())
-			return context;
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
 
 		return std::nullopt;
 	}

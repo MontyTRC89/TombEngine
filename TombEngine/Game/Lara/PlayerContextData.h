@@ -11,6 +11,7 @@ namespace TEN::Entities::Player
 	enum class ClimbContextAlignType
 	{
 		None,
+		Snap,
 		OffsetBlend,
 		AttractorParent
 	};
@@ -79,12 +80,6 @@ namespace TEN::Entities::Player
 		bool SetJumpVelocity = false;
 	};
 
-	struct MonkeySwingJumpCatchClimbContextData
-	{
-		int CeilingHeight = 0;
-		int TargetStateID = 0;
-	};
-
 	struct LedgeClimbSetupData
 	{
 		int LowerEdgeToCeilBound	 = 0;
@@ -99,6 +94,4 @@ namespace TEN::Entities::Player
 		int FloorHeight = 0;
 		int AnimNumber	= 0;
 	};
-
-	using JumpCatchClimbContextData = std::variant<ClimbContextData, MonkeySwingJumpCatchClimbContextData>;
 }

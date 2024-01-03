@@ -78,7 +78,6 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
 void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext);
 void SetPlayerTreadWaterStepOut(ItemInfo& item, const WaterTreadStepOutContextData& stepOutContext);
-void SetPlayerJumpCatch(ItemInfo& item, const CollisionInfo& coll, const JumpCatchClimbContextData& catchClimbContext);
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll);
 void SetLaraFallAnimation(ItemInfo* item);
 void SetLaraFallBackAnimation(ItemInfo* item);

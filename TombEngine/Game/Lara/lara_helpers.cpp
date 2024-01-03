@@ -1649,6 +1649,11 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 	case ClimbContextAlignType::None:
 		break;
 
+	case ClimbContextAlignType::Snap:
+		item.Pose.Position += climbContext.RelPosOffset;
+		item.Pose.Orientation += climbContext.RelOrientOffset;
+		break;
+
 	case ClimbContextAlignType::OffsetBlend:
 	{
 		// No attractor; break.
@@ -1712,36 +1717,6 @@ void SetPlayerTreadWaterStepOut(ItemInfo& item, const WaterTreadStepOutContextDa
 	item.Animation.Velocity = Vector3::Zero;
 	item.Animation.IsAirborne = false;
 	player.Control.WaterStatus = WaterStatus::Wade;
-}
-
-static void SetPlayerMonkeySwingCatch(ItemInfo& item, const CollisionInfo& coll, const MonkeySwingJumpCatchClimbContextData& monkeyCatchClimbContext)
-{
-	auto& player = GetLaraInfo(item);
-
-	// TODO: Dispatch.
-	// Set catch animation.
-	int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
-	SetAnimation(&item, animNumber);
-
-	ResetPlayerFlex(&item);
-	item.Animation.Velocity = Vector3::Zero;
-	item.Animation.IsAirborne = false;
-	item.Pose.Position.y = monkeyCatchClimbContext.CeilingHeight + LARA_HEIGHT_MONKEY;
-	player.Control.HandStatus = HandStatus::Busy;
-}
-
-void SetPlayerJumpCatch(ItemInfo& item, const CollisionInfo& coll, const JumpCatchClimbContextData& catchClimbContext)
-{
-	if (std::holds_alternative<ClimbContextData>(catchClimbContext))
-	{
-		auto climbContext = std::get<ClimbContextData>(catchClimbContext);
-		SetPlayerClimb(item, climbContext);
-	}
-	else if (std::holds_alternative<MonkeySwingJumpCatchClimbContextData>(catchClimbContext))
-	{
-		auto monkeyCatchContext = std::get<MonkeySwingJumpCatchClimbContextData>(catchClimbContext);
-		SetPlayerMonkeySwingCatch(item, coll, monkeyCatchContext);
-	}
 }
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)

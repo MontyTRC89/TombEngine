@@ -159,6 +159,6 @@ namespace TEN::Entities::Player
 	std::optional<ClimbContextData> GetCrawlHangDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetCrawlHangDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
-	// Jump catch contexts
-	std::optional<JumpCatchClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+	// Jump catch climb contexts
+	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 }
