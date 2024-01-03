@@ -135,7 +135,6 @@ namespace TEN::Entities::Player
 	bool CanCrawlspaceDive(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Edge contexts
-	bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll);
 	bool CanClimbLedgeToCrouch(const ItemInfo& item, CollisionInfo& coll);

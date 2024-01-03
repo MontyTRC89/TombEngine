@@ -1714,18 +1714,6 @@ void SetPlayerTreadWaterStepOut(ItemInfo& item, const WaterTreadStepOutContextDa
 	player.Control.WaterStatus = WaterStatus::Wade;
 }
 
-static void SetPlayerEdgeCatch(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData& edgeCatchClimbContext)
-{
-	// TODO: Dispatch.
-	// Set catch animation.
-	int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ?
-		LA_JUMP_UP_TO_HANG :
-		CanSwingOnLedge(item, coll) ? LA_REACH_TO_HANG_OSCILLATE : LA_REACH_TO_HANG;
-	SetAnimation(&item, animNumber);
-
-	SetPlayerClimb(item, edgeCatchClimbContext);
-}
-
 static void SetPlayerMonkeySwingCatch(ItemInfo& item, const CollisionInfo& coll, const MonkeySwingJumpCatchClimbContextData& monkeyCatchClimbContext)
 {
 	auto& player = GetLaraInfo(item);
@@ -1747,8 +1735,7 @@ void SetPlayerJumpCatch(ItemInfo& item, const CollisionInfo& coll, const JumpCat
 	if (std::holds_alternative<ClimbContextData>(catchClimbContext))
 	{
 		auto climbContext = std::get<ClimbContextData>(catchClimbContext);
-		SetPlayerEdgeCatch(item, coll, climbContext);
-		//SetPlayerClimb(item, climbContext);
+		SetPlayerClimb(item, climbContext);
 	}
 	else if (std::holds_alternative<MonkeySwingJumpCatchClimbContextData>(catchClimbContext))
 	{

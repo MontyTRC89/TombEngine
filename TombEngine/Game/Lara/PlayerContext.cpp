@@ -1055,29 +1055,6 @@ namespace TEN::Entities::Player
 		auto pointColl = GetCollision(&item, coll.Setup.ForwardAngle, coll.Setup.Radius, -coll.Setup.Height);
 		return (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT || IsInLowSpace(item, coll));
 	}
-
-	bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll)
-	{
-		constexpr auto UPPER_FLOOR_BOUND = 0;
-		constexpr auto LOWER_CEIL_BOUND	 = CLICK(1.5f);
-
-		auto& player = GetLaraInfo(item);
-
-		// Get point collision.
-		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius));
-		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
-		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - coll.Setup.Height);
-
-		// Assess point collision.
-		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is below upper floor bound.
-			relCeilHeight <= LOWER_CEIL_BOUND)	   // Ceiling height is above lower ceiling bound.
-		{
-			return true;
-		}
-
-		return false;
-	}
-
 	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto WALL_HEIGHT_MIN = CLICK(2);
@@ -1141,7 +1118,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 3) Test for object obstruction.
-		if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, -coll.Setup.Height + CLICK(1), true))
+		if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, -(setup.DestFloorToCeilHeightMin - CLICK(1)), true))
 			return false;
 
 		// 4) Test ledge floor-to-edge height.
@@ -1428,7 +1405,8 @@ namespace TEN::Entities::Player
 				}
 
 				// 2.11) Test for object obstruction.
-				if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, coll.Setup.Height - CLICK(1), false))
+				int sign = setup.TestEdgeFront ? -1 : 1;
+				if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, (setup.DestFloorToCeilHeightMin - CLICK(1)) * sign, setup.TestEdgeFront))
 					continue;
 			}
 
@@ -2769,6 +2747,31 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	const bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll,
+							   const AttractorCollisionData& attracColl)
+	{
+		constexpr auto UPPER_FLOOR_BOUND = 0;
+		constexpr auto LOWER_CEIL_BOUND	 = CLICK(1.5f);
+
+		auto& player = GetLaraInfo(item);
+
+		// TODO: Determine point collision from attractor intersection instead of player position to avoid edge case false positives.
+
+		// Get point collision.
+		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius));
+		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
+		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - coll.Setup.Height);
+
+		// Assess point collision.
+		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is below upper floor bound.
+			relCeilHeight <= LOWER_CEIL_BOUND)	   // Ceiling height is above lower ceiling bound.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	static std::optional<ClimbContextData> GetEdgeJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto VERTICAL_OFFSET = LARA_HEIGHT_STRETCH;
@@ -2778,12 +2781,18 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 
 		{
+			// HACK: Set catch animation.
+			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ?
+				LA_JUMP_UP_TO_HANG :
+				CanSwingOnLedge(item, coll, *attracColl) ? LA_REACH_TO_HANG_OSCILLATE : LA_REACH_TO_HANG;
+			SetAnimation(*LaraItem, animNumber);
+
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_HANG_IDLE;
+			context.TargetStateID = /*CanSwingOnLedge(item, coll, *attracColl) ? LS_HANG_IDLE : */LS_HANG_IDLE; // TODO: Add dispatches.
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
