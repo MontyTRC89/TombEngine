@@ -7,9 +7,9 @@ namespace TEN::Renderer
 {
 	void Renderer::ApplySMAA(RenderTarget2D* renderTarget, RenderView& view)
 	{
-		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
-		SetDepthState(DepthState::Write);
+		SetBlendMode(BlendMode::Opaque, true);
+		SetCullMode(CullMode::CounterClockwise, true);
+		SetDepthState(DepthState::Write, true);
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
@@ -38,7 +38,7 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(_SMAAEdgesRenderTarget.RenderTargetView.Get(), clearColor);
 		_context->ClearRenderTargetView(_SMAABlendRenderTarget.RenderTargetView.Get(), clearColor);
 
-		_context->RSSetState(_cullCounterClockwiseRasterizerState.Get());
+		SetCullMode(CullMode::CounterClockwise);
 		_context->OMSetRenderTargets(1, _SMAAEdgesRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 
 		_context->VSSetShader(_SMAAEdgeDetectionVS.Get(), nullptr, 0);
@@ -96,9 +96,9 @@ namespace TEN::Renderer
 
 	void Renderer::ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view)
 	{
-		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
-		SetDepthState(DepthState::Write);
+		SetBlendMode(BlendMode::Opaque, true);
+		SetCullMode(CullMode::CounterClockwise, true);
+		SetDepthState(DepthState::Write, true);
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
