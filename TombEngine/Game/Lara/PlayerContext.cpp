@@ -2791,7 +2791,7 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_HANG_IDLE; /*((item.Animation.ActiveState == LS_JUMP_UP) || CanSwingOnLedge(item, coll, *attracColl)) ? LS_HANG_IDLE : LS_HANG_SWING_CATCH*/ // TODO
+			context.TargetStateID = LS_HANG_IDLE; /*((item.Animation.ActiveState == LS_REACH) && CanSwingOnLedge(item, coll, *attracColl)) ? LS_HANG_IDLE_SWING : LS_HANG_IDLE*/ // TODO: Dispatches.
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
@@ -2841,7 +2841,7 @@ namespace TEN::Entities::Player
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, item.Pose.Position.y - (pointColl.Position.Ceiling + LARA_HEIGHT_MONKEY), 0.0f);
 			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_MONKEY_IDLE; /*(item.Animation.ActiveState == LS_JUMP_UP) ? LS_MONKEY_IDLE : LS_MONKEY_SWING_CATCH*/ // TODO
+			context.TargetStateID = LS_MONKEY_IDLE; // TODO: Dispatches.
 			context.AlignType = ClimbContextAlignType::Snap;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
