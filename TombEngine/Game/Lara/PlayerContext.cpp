@@ -1301,6 +1301,7 @@ namespace TEN::Entities::Player
 				return std::nullopt;
 		}
 
+		int sign = setup.TestEdgeFront ? 1 : -1;
 		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
 		const AttractorCollisionData* highestAttracCollPtr = nullptr;
 
@@ -1352,7 +1353,7 @@ namespace TEN::Entities::Player
 			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 			// 2.6) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
-			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor);
+			int relEdgeHeight = (attracColl.Proximity.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor)) * sign;
 			if (relEdgeHeight >= setup.LowerEdgeBound ||
 				relEdgeHeight < setup.UpperEdgeBound)
 			{
@@ -1405,8 +1406,7 @@ namespace TEN::Entities::Player
 				}
 
 				// 2.11) Test for object obstruction.
-				int sign = setup.TestEdgeFront ? -1 : 1;
-				if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, (setup.DestFloorToCeilHeightMin - CLICK(1)) * sign, setup.TestEdgeFront))
+				if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, (setup.DestFloorToCeilHeightMin - CLICK(1)) * -sign, setup.TestEdgeFront))
 					continue;
 			}
 
