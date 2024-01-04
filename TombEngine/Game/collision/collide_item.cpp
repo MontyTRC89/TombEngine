@@ -1859,7 +1859,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				if (!TestBoundsCollide(item, item, coll->Setup.Radius))
+				if (!TestBoundsCollide(&linkItem, item, coll->Setup.Radius))
 					continue;
 
 				// Infer object is nullmesh or invisible object by valid draw routine.
@@ -1874,18 +1874,18 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 				if (object.intelligent)
 				{
 					// Don't try killing already dead or non-targetable enemies.
-					if (item->HitPoints <= 0 || item->HitPoints == NOT_TARGETABLE)
+					if (linkItem.HitPoints <= 0 || linkItem.HitPoints == NOT_TARGETABLE)
 						continue;
 
 					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
 					{
 						// If vehicle is harmless or speed is too low, just push enemy.
-						ItemPushItem(item, &linkItem, coll, false, 0);
+						ItemPushItem(&linkItem, item, coll, false, 0);
 						continue;
 					}
 					else
 					{
-						DoDamage(item, INT_MAX);
+						DoDamage(&linkItem, INT_MAX);
 						DoLotsOfBlood(
 							linkItem.Pose.Position.x,
 							item->Pose.Position.y - CLICK(1),
@@ -1897,7 +1897,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 				}
 				else if (coll->Setup.EnableObjectPush)
 				{
-					ItemPushItem(item, &linkItem, coll, false, 1);
+					ItemPushItem(&linkItem, item, coll, false, 1);
 				}
 			}
 		}
