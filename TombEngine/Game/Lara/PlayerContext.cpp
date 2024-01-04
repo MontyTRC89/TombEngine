@@ -1301,7 +1301,7 @@ namespace TEN::Entities::Player
 				return std::nullopt;
 		}
 
-		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
 		const AttractorCollisionData* highestAttracCollPtr = nullptr;
 
 		// 2) Assess attractor collision.
@@ -1707,7 +1707,7 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
 		//int vPos = round(item.Pose.Position.y / CLICK(1)) * CLICK(1);
 
 		// TODO: Find 4 stacked WallEdge attractors.
@@ -2455,7 +2455,7 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto ABS_EDGE_BOUND = CLICK(0.5f);
 
-		float range2D = OFFSET_RADIUS(coll.Setup.Radius);
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2664,7 +2664,7 @@ namespace TEN::Entities::Player
 			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
 			0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
 		
-		float range2D = OFFSET_RADIUS(std::max((float)coll.Setup.Radius, item.Animation.Velocity.Length()));
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2747,20 +2747,20 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	const bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll,
-							   const AttractorCollisionData& attracColl)
+	const bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll, const AttractorCollisionData& attracColl)
 	{
 		constexpr auto UPPER_FLOOR_BOUND = 0;
 		constexpr auto LOWER_CEIL_BOUND	 = CLICK(1.5f);
 
 		auto& player = GetLaraInfo(item);
 
-		// TODO: Determine point collision from attractor intersection instead of player position to avoid edge case false positives.
-
 		// Get point collision.
-		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, OFFSET_RADIUS(coll.Setup.Radius));
-		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
-		int relCeilHeight = pointColl.Position.Ceiling - (item.Pose.Position.y - coll.Setup.Height);
+		auto pointColl = GetCollision(
+			attracColl.Proximity.Intersection, item.RoomNumber,
+			attracColl.HeadingAngle, coll.Setup.Radius / 2, coll.Setup.Height);
+
+		int relFloorHeight = pointColl.Position.Floor - (attracColl.Proximity.Intersection.y + coll.Setup.Height);
+		int relCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
 
 		// Assess point collision.
 		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is below upper floor bound.
