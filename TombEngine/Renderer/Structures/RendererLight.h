@@ -26,4 +26,12 @@ namespace TEN::Renderer::Structures
 		bool CastShadows;
 		float Luma;
 	};
+
+	struct RendererLightNode
+	{
+		RendererLight* Light;
+		float LocalIntensity;
+		float Distance;
+		int Dynamic;
+	};
 }

@@ -20,7 +20,7 @@ namespace TEN::Renderer::Structures
 		Vector4 Color;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;
-		std::vector<RendererLight*> CachedRoomLights;
+		std::vector<RendererLightNode> CachedRoomLights;
 		bool CacheLights;
 		GameBoundingBox OriginalVisibilityBox;
 		BoundingOrientedBox VisibilityBox;

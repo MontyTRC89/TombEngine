@@ -448,20 +448,20 @@ namespace TEN::Renderer
 			 
 			// Collect the lights
 			std::vector<RendererLight*> lights;
-			std::vector<RendererLight*> cachedRoomLights;
+			std::vector<RendererLightNode> cachedRoomLights;
 			if (obj.ObjectMeshes.front()->LightMode != LightMode::Static)
 			{
 				if (mesh->CacheLights || _invalidateCache)
 				{
 					// Collect all lights and return also cached light for the next frames
-					CollectLights(mesh->Pose.Position.ToVector3(), mesh->VisibilitySphereRadius, room.RoomNumber, NO_ROOM, false, false, &cachedRoomLights, &lights);
+					CollectLights(mesh->Pose.Position.ToVector3(),1024, room.RoomNumber, NO_ROOM, false, false, &cachedRoomLights, &lights);
 					mesh->CacheLights = false;
 					mesh->CachedRoomLights = cachedRoomLights;
 				}
 				else
 				{
 					// Collecy only dynamic lights and use cached lights from rooms
-					CollectLights(mesh->Pose.Position.ToVector3(), mesh->VisibilitySphereRadius, room.RoomNumber, NO_ROOM, false, true, &mesh->CachedRoomLights, &lights);
+					CollectLights(mesh->Pose.Position.ToVector3(), 1024, room.RoomNumber, NO_ROOM, false, true, &mesh->CachedRoomLights, &lights);
 				}
 			}
 			mesh->LightsToDraw = lights;
@@ -478,7 +478,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLight*>* roomsLights, std::vector<RendererLight*>* outputLights)
+	void Renderer::CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLightNode>* roomsLights, std::vector<RendererLight*>* outputLights)
 	{
 		if (_rooms.size() < roomNumber)
 		{
@@ -486,7 +486,7 @@ namespace TEN::Renderer
 		}
 
 		// Now collect lights from dynamic list and from rooms
-		std::vector<RendererLight*> tempLights;
+		std::vector<RendererLightNode> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
 		
 		RendererRoom& room = _rooms[roomNumber];
@@ -516,12 +516,10 @@ namespace TEN::Renderer
 
 			float distance = sqrt(distanceSquared);
 			float attenuation = 1.0f - distance / light.Out;
-			float intensity = std::max(0.0f, attenuation * light.Intensity * light.Luma);
+			float intensity = attenuation * light.Intensity * light.Luma;
 
-			light.LocalIntensity = intensity;
-			light.Distance = distance;
-
-			tempLights.push_back(&light);
+			RendererLightNode node = { &light, intensity, distance, 1 };
+			tempLights.push_back(node);
 		}
 	
 		if (!useCachedRoomLights)
@@ -536,6 +534,9 @@ namespace TEN::Renderer
 				{
 					RendererLight* light = &currentRoom.Lights[j];
 
+					float intensity = 0;
+					float distance = 0;
+
 					// Check only lights different from sun
 					if (light->Type == LightType::Sun)
 					{
@@ -546,8 +547,7 @@ namespace TEN::Renderer
 						}
 
 						// Sun is added without distance checks
-						light->Distance = 0;
-						light->LocalIntensity = 0;
+						intensity = light->Intensity * Luma(light->Color);						
 					}
 					else if (light->Type == LightType::Point || light->Type == LightType::Shadow)
 					{
@@ -568,12 +568,9 @@ namespace TEN::Renderer
 							continue;
 						}
 
-						float distance = sqrt(distanceSquared);
+						distance = sqrt(distanceSquared);
 						float attenuation = 1.0f - distance / light->Out;
-						float intensity = std::max(0.0f, attenuation * light->Intensity * Luma(light->Color));
-
-						light->LocalIntensity = intensity;
-						light->Distance = distance;
+						intensity = attenuation * light->Intensity * Luma(light->Color);
 
 						// If collecting shadows, try to collect shadow casting light
 						if (light->CastShadows && prioritizeShadowLight && light->Type == LightType::Point)
@@ -604,11 +601,9 @@ namespace TEN::Renderer
 							continue;
 						}
 
-						float distance = sqrt(distanceSquared);
+						distance = sqrt(distanceSquared);
 						float attenuation = 1.0f - distance / light->Out;
-						float intensity = std::max(0.0f, attenuation * light->Intensity * light->Luma);
-
-						light->LocalIntensity = intensity;
+						intensity = attenuation * light->Intensity * light->Luma;
 
 						// If shadow pointer provided, try to collect shadow casting light
 						if (light->CastShadows && prioritizeShadowLight)
@@ -619,8 +614,6 @@ namespace TEN::Renderer
 								brightestLight = light;
 							}
 						}
-
-						light->Distance = distance;
 					}
 					else
 					{
@@ -628,11 +621,14 @@ namespace TEN::Renderer
 						continue;
 					}
 
+					RendererLightNode node = { light, intensity, distance, 0 };
+
 					if (roomsLights != nullptr)
 					{
-						roomsLights->push_back(light);
+						roomsLights->push_back(node);
 					}
-					tempLights.push_back(light);
+
+					tempLights.push_back(node);
 				}
 			}
 		}
@@ -644,16 +640,18 @@ namespace TEN::Renderer
 			}
 		}
 
-		// Sort lights by distance, if needed
-
+		// Sort lights
 		if (tempLights.size() > MAX_LIGHTS_PER_ITEM)
 		{
 			std::sort(
 				tempLights.begin(),
 				tempLights.end(),
-				[](RendererLight* a, RendererLight* b)
+				[](RendererLightNode a, RendererLightNode b)
 				{
-					return a->Distance < b->Distance;
+					if (a.Dynamic == b.Dynamic)
+						return a.LocalIntensity > b.LocalIntensity;
+					else
+						return a.Dynamic > b.Dynamic;
 				}
 			);
 		}
@@ -670,12 +668,12 @@ namespace TEN::Renderer
 		// Add max 8 lights per item, including the shadow light for Lara eventually
 		for (auto l : tempLights)
 		{
-			if (prioritizeShadowLight && brightestLight == l)
+			if (prioritizeShadowLight && brightestLight == l.Light)
 			{
 				continue;
 			}
 
-			outputLights->push_back(l);
+			outputLights->push_back(l.Light);
 
 			if (outputLights->size() == MAX_LIGHTS_PER_ITEM)
 			{

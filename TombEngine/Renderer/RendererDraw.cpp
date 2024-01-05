@@ -2197,6 +2197,86 @@ namespace TEN::Renderer
 		 
 		if (rendererPass != RendererPass::CollectTransparentFaces)
 		{
+#ifdef DISABLE_INSTANCING
+			if (rendererPass == RendererPass::GBuffer)
+			{
+				_context->VSSetShader(_vsGBufferStatics.Get(), NULL, 0);
+				_context->PSSetShader(_psGBuffer.Get(), NULL, 0);
+			}
+			else
+			{
+				_context->VSSetShader(_vsStatics.Get(), NULL, 0);
+				_context->PSSetShader(_psStatics.Get(), NULL, 0);
+			}
+
+			// Bind vertex and index buffer
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+			_context->IASetVertexBuffers(0, 1, _staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			_context->IASetIndexBuffer(_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAOBlurredRenderTarget, SamplerStateRegister::PointWrap);
+
+			for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
+			{
+				std::vector<RendererStatic*> statics = it->second;
+
+				RendererStatic* refStatic = statics[0];
+				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				if (refStaticObj.ObjectMeshes.size() == 0)
+					continue;
+
+				RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
+
+				int staticsCount = (int)statics.size();
+
+				for (int s = 0; s < staticsCount; s++)
+				{
+					RendererStatic* current = statics[s];
+					RendererRoom* room = &_rooms[current->RoomNumber];
+
+					_stStatic.World = current->World;
+					_stStatic.Color = current->Color;
+					_stStatic.AmbientLight = room->AmbientLight;
+					_stStatic.LightMode = (int)refMesh->LightMode;
+
+					if (rendererPass != RendererPass::GBuffer)
+					{
+						BindStaticLights(current->LightsToDraw);
+					}
+
+					_cbStatic.UpdateData(_stStatic, _context.Get());
+
+					for (auto& bucket : refMesh->Buckets)
+					{
+						if (bucket.NumVertices == 0)
+						{
+							continue;
+						}
+
+						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+
+						for (int p = 0; p < passes; p++)
+						{
+							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+							{
+								continue;
+							}
+
+							BindTexture(TextureRegister::ColorMap,
+								&std::get<0>(_staticTextures[bucket.Texture]),
+								SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap,
+								&std::get<1>(_staticTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+							_numInstancedStaticsDrawCalls++;
+						}
+					}
+				}
+			}
+#else
 			if (rendererPass == RendererPass::GBuffer)
 			{
 				_context->VSSetShader(_vsGBufferInstancedStatics.Get(), NULL, 0);
@@ -2252,10 +2332,10 @@ namespace TEN::Renderer
 							BindInstancedStaticLights(current->LightsToDraw, k);
 						}
 
-						_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
-
 						k++;
 					}
+
+					_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
 
 					baseStaticIndex += bucketSize;
 
@@ -2288,6 +2368,7 @@ namespace TEN::Renderer
 					}
 				}
 			}
+#endif
 		}
 		else
 		{
