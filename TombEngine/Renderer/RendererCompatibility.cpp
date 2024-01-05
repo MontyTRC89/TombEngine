@@ -849,8 +849,8 @@ namespace TEN::Renderer
 			sprite.UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
 			sprite.UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
 			sprite.Texture = &_spritesTextures[oldSprite->tile];
-			sprite.Width = (oldSprite->x2 - oldSprite->x1) * sprite.Texture->Width + 1;
-			sprite.Height = (oldSprite->y3 - oldSprite->y2) * sprite.Texture->Height + 1;
+			sprite.Width = round((oldSprite->x2 - oldSprite->x1) * (float)sprite.Texture->Width + 1.0f);
+			sprite.Height = round((oldSprite->y3 - oldSprite->y2) * (float)sprite.Texture->Height + 1.0f);
 			sprite.X = oldSprite->x1 * sprite.Texture->Width;
 			sprite.Y = oldSprite->y1 * sprite.Texture->Height;
 		}
