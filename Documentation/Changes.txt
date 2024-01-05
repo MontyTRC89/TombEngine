@@ -18,19 +18,20 @@ Version 1.3
 * Fix playback issues with audio tracks placed in subfolders.
 * Fix thin caustics outline on the edge of the blocks.
 * Fix big static objects affected wrongly by dynamic lights.
+* Fix legacy trigger leveljumps ignoring provided level index.
+* Fix Light flicker.
 * Add ambient occlusion (SSAO).
 * Add new post-process workflow (monochrome, negative, exclusion).
 * Add SMAA antialiasing instead of MSAA.
-* Totally revised transparency handling.
-* Fixed normal mapping for rooms, items, statics.
-* Increased the maximum frames for animated sequences from 128 to 256.
-* Optimized the renderer.
-* Fix legacy trigger leveljumps ignoring provided level index.
-* Separate underwater wall and ceiling switch objects into two slots each.
 * Add global events.
 * Add previously missing player start position object functionality.
 * Add fast speed for fly cheat by holding Sprint input action.
 * Add speedometer to vehicles.
+* Totally revised transparency handling.
+* Fixed normal mapping for rooms, items, statics.
+* Increased the maximum frames for animated sequences from 128 to 256.
+* Optimized the renderer.
+* Separate underwater wall and ceiling switch objects into two slots each.
 * Accurately rotate display sprites around the pivot defined by the align mode.
 * Allow walking on slopes when wading in water (similar to quicksand).
 * Allow player to pull certain levers with both hands when holding a flare.
