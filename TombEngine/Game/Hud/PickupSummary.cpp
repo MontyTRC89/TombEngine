@@ -3,7 +3,7 @@
 
 #include "Game/pickup/pickup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Math;

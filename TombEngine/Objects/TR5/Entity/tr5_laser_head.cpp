@@ -636,7 +636,7 @@ namespace TEN::Entities::Creatures::TR5
 			spark->fadeToBlack = 0;
 			spark->life = 9 * pow(2, unk);
 			spark->sLife = 9 * pow(2, unk);
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->x = pos.x;
 			spark->y = pos.y;
 			spark->z = pos.z;

@@ -8,7 +8,6 @@ using namespace TEN::Math;
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
-namespace TEN::Renderer { struct RendererMesh; };
 
 using namespace TEN::Entities::Player;
 

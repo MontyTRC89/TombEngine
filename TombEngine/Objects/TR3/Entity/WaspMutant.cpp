@@ -67,7 +67,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		particle.on = true;
 		particle.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		particle.blendMode = BlendMode::Additive;
 		particle.fxObj = itemNumber;
 		particle.nodeNumber = ParticleNodeOffsetIDs::NodeWasp;
 

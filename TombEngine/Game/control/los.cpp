@@ -12,12 +12,14 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 // Globals
 int NumberLosRooms;

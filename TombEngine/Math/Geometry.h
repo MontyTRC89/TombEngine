@@ -1,4 +1,5 @@
 #pragma once
+#include <SimpleMath.h>
 
 class AxisAngle;
 class EulerAngles;
@@ -7,6 +8,8 @@ class Vector3i;
 
 namespace TEN::Math::Geometry
 {
+	using namespace DirectX::SimpleMath;
+
 	// Since Y is assumed as the vertical axis, 2D operations are simply done in the XZ plane.
 	// Revise geometry functions to each take a "gravity" direction argument someday. -- Sezz 2023.01.26
 

@@ -13,7 +13,7 @@
 #include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 using namespace TEN::Math;
 
@@ -105,7 +105,7 @@ namespace TEN::Entities::TR4
 		sptr->dG = color / 2;
 		sptr->fadeToBlack = 8;
 		sptr->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->dynamic = -1;
 		BYTE life = (GetRandomControl() & 7) + 32;
 		sptr->life = life;

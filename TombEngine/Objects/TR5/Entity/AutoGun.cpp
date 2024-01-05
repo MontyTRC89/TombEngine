@@ -60,7 +60,7 @@ namespace TEN::Entities::Creatures::TR5
 		smoke.dShade = shade;
 		smoke.colFadeSpeed = 4;
 		smoke.fadeToBlack = 32;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 		smoke.life = smoke.sLife = Random::GenerateInt(40, 44);
 		smoke.x = smokePos.x;
 		smoke.y = smokePos.y;

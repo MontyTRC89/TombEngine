@@ -2,7 +2,7 @@
 #include "Game/control/event.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 struct CollisionSetup;
 

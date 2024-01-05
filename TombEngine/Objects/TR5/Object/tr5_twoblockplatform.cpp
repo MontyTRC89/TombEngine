@@ -8,10 +8,10 @@
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/BridgeObject.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
-#include "Specific/level.h"
 
+using namespace TEN::Renderer;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using namespace TEN::Renderer;

@@ -5,7 +5,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Math;
 
@@ -14,7 +14,7 @@ namespace TEN::Effects::DisplaySprite
 	std::vector<DisplaySprite> DisplaySprites = {};
 
 	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
-						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode)
+						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, BlendMode blendMode)
 	{
 		auto displaySprite = DisplaySprite{};
 		displaySprite.ObjectID = objectID;

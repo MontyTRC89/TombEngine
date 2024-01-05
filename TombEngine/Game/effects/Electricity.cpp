@@ -108,7 +108,7 @@ namespace TEN::Effects::Electricity
 
 		spark.on = true;
 		spark.spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.blendMode = BlendMode::Additive;
 		spark.x = pos.x;
 		spark.y = pos.y;
 		spark.z = pos.z;

@@ -1,6 +1,6 @@
 #pragma once
 #include "framework.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 struct POLYGON
 {
@@ -18,7 +18,7 @@ struct POLYGON
 struct BUCKET
 {
 	int texture;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	bool animated;
 	int numQuads;
 	int numTriangles;

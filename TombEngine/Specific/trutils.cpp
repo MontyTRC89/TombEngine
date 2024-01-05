@@ -3,8 +3,8 @@
 #include <codecvt>
 #include <filesystem>
 
-#include "Renderer/Renderer11.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
