@@ -14,28 +14,47 @@ Version 1.3
 * Fix player not being able to pick up a torch when crouching.
 * Fix jittery camera when performing crawl-to-hang.
 * Fix several issues with limited pistol ammo.
-* Fix Lara not being able to crawl if two-handed weapon is currently equipped.
+* Fix player not being able to crawl if two-handed weapon is currently equipped.
 * Fix playback issues with audio tracks placed in subfolders.
-* Separate underwater wall and ceiling switch objects into two slots each.
-* Improve fly cheat collision.
+* Fix thin caustics outline on the edge of the blocks.
+* Fix big static objects affected wrongly by dynamic lights.
+* Fix legacy trigger leveljumps ignoring provided level index.
+* Fix Light flicker.
+* Add ambient occlusion (SSAO).
+* Add new post-process workflow (monochrome, negative, exclusion).
+* Add SMAA antialiasing instead of MSAA.
 * Add global events.
+* Add previously missing player start position object functionality.
 * Add fast speed for fly cheat by holding Sprint input action.
+* Add speedometer to vehicles.
+* Totally revised transparency handling.
+* Fixed normal mapping for rooms, items, statics.
+* Increased the maximum frames for animated sequences from 128 to 256.
+* Optimized the renderer.
+* Separate underwater wall and ceiling switch objects into two slots each.
+* Accurately rotate display sprites around the pivot defined by the align mode.
 * Allow walking on slopes when wading in water (similar to quicksand).
 * Allow player to pull certain levers with both hands when holding a flare.
 * Port twin auto gun from TR3.
-* Add speedometer to vehicles.
-* Accurately rotate display sprites around the pivot defined by the align mode.
+* Slightly revise keyhole OCB to account for either keeping or losing the key:
+  - Positive OCB - play anim number and keep key in inventory.
+  - Negative OCB - play anim number and loose key in inventory.
+  - OCB 0 - play default animation and loose the key in inventory
 * Revise keyhole OCBs to account for keeping or losing keys:
-  - Positive OCB: play anim number and keep key.
-  - Negative OCB: play anim number and lose key.
-  - OCB 0 - play default animation and lose key.
+  - Positive OCB: Play anim number and keep key.
+  - Negative OCB: Play anim number and lose key.
+  - OCB 0: Play default animation and lose key.
+* Revise Wolf OCB:
+  - OCB 0: Wolf starts in walking animation, ready to chase Lara.
+  - OCB 1: Wolf starts in sleeping animation.
 
 Lua API changes:
 * Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
 * Add Moveable:SetStatus() to set the current status of the moveable.
 * Add Room:GetColor() to get room's ambient light color.
 * Add Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
-* Add View.GetCameraPosition(), View.GetCameraTarget() and View:GetCameraRoom() functions.
+* Add View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
+* Add View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
 
 Version 1.2
 ===========

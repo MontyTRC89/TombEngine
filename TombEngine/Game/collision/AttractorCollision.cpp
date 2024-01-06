@@ -7,7 +7,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;

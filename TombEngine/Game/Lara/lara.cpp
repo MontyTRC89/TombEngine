@@ -1,6 +1,25 @@
 #include "framework.h"
 #include "Game/Lara/lara.h"
 
+#include "Game/Lara/lara_basic.h"
+#include "Game/Lara/lara_cheat.h"
+#include "Game/Lara/lara_climb.h"
+#include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_crawl.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_hang.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_initialise.h"
+#include "Game/Lara/lara_jump.h"
+#include "Game/Lara/lara_monkey.h"
+#include "Game/Lara/lara_objects.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_overhang.h"
+#include "Game/Lara/lara_slide.h"
+#include "Game/Lara/lara_surface.h"
+#include "Game/Lara/lara_swim.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/AttractorCollision.h"
@@ -22,7 +41,7 @@
 #include "Game/Lara/PlayerStateMachine.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
@@ -37,6 +56,7 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;
 

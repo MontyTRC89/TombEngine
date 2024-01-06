@@ -2,7 +2,7 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_struct.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 enum class LaraWeaponType;
 struct CreatureBiteInfo;
@@ -52,7 +52,7 @@ struct SMOKE_SPARKS
 	byte fadeToBlack;
 	signed char sLife;
 	signed char life;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;

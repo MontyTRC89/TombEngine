@@ -7,7 +7,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
@@ -251,7 +251,7 @@ namespace TEN::Collision::Attractor
 
 			// Draw label.
 			if (labelPos2D.has_value())
-				g_Renderer.AddDebugString(labelString, *labelPos2D, COLOR_YELLOW_OPAQUE, labelScale, PRINTSTRING_OUTLINE, RendererDebugPage::AttractorStats);
+				g_Renderer.AddDebugString(labelString, *labelPos2D, COLOR_YELLOW_OPAQUE, labelScale, (int)PrintStringFlags::Outline, RendererDebugPage::AttractorStats);
 		}
 		else
 		{

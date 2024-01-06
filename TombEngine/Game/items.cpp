@@ -17,6 +17,7 @@
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
@@ -34,6 +35,7 @@ using namespace TEN::Collision::Attractor;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Utils;
+using TEN::Renderer::g_Renderer;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
 

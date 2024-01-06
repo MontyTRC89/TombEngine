@@ -70,6 +70,7 @@
 #define STRING_CAUSTICS					"caustics"
 #define STRING_VOLUMETRIC_FOG			"volumetric_fog"
 #define STRING_ANTIALIASING				"antialiasing"
+#define STRING_AMBIENT_OCCLUSION		"ambient_occlusion"
 #define STRING_ANTIALIASING_NONE		"none"
 #define STRING_ANTIALIASING_LOW			"low"
 #define STRING_ANTIALIASING_MEDIUM		"medium"

@@ -12,12 +12,14 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 // Globals
 int NumberLosRooms;
@@ -812,7 +814,7 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 	return std::nullopt;
 }
 
-std::pair<GameVector, GameVector> GetRayFrom2DPosition(Vector2 screenPos)
+std::pair<GameVector, GameVector> GetRayFrom2DPosition(const Vector2& screenPos)
 {
 	auto pos = g_Renderer.GetRay(screenPos);
 

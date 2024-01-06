@@ -7,7 +7,6 @@
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
-namespace TEN::Renderer { struct RendererMesh; };
 
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Entities::Player;

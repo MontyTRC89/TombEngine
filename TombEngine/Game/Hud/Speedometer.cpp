@@ -3,7 +3,7 @@
 
 #include "Game/effects/DisplaySprite.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::DisplaySprite;
@@ -64,13 +64,13 @@ namespace TEN::Hud
 		AddDisplaySprite(
 			ID_SPEEDOMETER, DIAL_ELEMENT_SPRITE_ID,
 			POS, 0, SCALE, color,
-			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
+			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend);
 
 		// Draw pointer.
 		AddDisplaySprite(
 			ID_SPEEDOMETER, POINTER_ELEMENT_SPRITE_ID,
 			POS, _pointerAngle + ORIENT_OFFSET, SCALE, color,
-			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
+			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend);
 	}
 
 	void SpeedometerController::Clear()

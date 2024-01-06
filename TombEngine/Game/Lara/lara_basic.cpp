@@ -641,7 +641,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// TODO: Without animation blending, the AFK state's movement lock interferes with responsiveness. -- Sezz 2021.10.31
-	if (CanStrikeAfkPose(*item, *coll))
+	if (CanStrikeAfkPose(*item, *coll) && player.Control.Count.Pose >= PLAYER_POSE_TIME)
 	{
 		item->Animation.TargetState = LS_POSE;
 		return;

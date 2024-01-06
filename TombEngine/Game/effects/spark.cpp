@@ -168,7 +168,7 @@ namespace TEN::Effects::Spark
 		spark.life = 16;
 		spark.sLife = 16;
 		spark.colFadeSpeed = 4;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.blendMode = BlendMode::Additive;
 		spark.fadeToBlack = 4;
 		spark.x = (int)round(pos.x);
 		spark.y = (int)round(pos.y);
@@ -204,7 +204,7 @@ namespace TEN::Effects::Spark
 		spark.fadeToBlack = 5;
 		spark.life = 10;
 		spark.sLife = 10;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.blendMode = BlendMode::Additive;
 		spark.friction = 34;
 		spark.scalar = 2;
 		spark.x = (randomInt & 7) + pos.x - 3;

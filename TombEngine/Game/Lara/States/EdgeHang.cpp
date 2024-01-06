@@ -18,7 +18,7 @@ using namespace TEN::Collision::Attractor;
 using namespace TEN::Input;
 
 //------Debug
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 using namespace TEN::Renderer;
 //------
 
