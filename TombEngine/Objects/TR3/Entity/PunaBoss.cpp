@@ -156,7 +156,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		smoke.on = true;
 		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 		smoke.x = pos.x + Random::GenerateInt(-64, 64);
 		smoke.y = pos.y - Random::GenerateInt(0, 32);
 		smoke.z = pos.z + Random::GenerateInt(-64, 64);
@@ -259,8 +259,7 @@ namespace TEN::Entities::Creatures::TR3
 			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 
 			auto hitPos = Vector3i::Zero;
-			MESH_INFO* mesh = nullptr;
-			if (ObjectOnLOS2(&origin, &target, &hitPos, &mesh, ID_LARA) == creature.Enemy->Index)
+			if (ObjectOnLOS2(&origin, &target, &hitPos, nullptr, ID_LARA) == creature.Enemy->Index)
 			{
 				if (creature.Enemy->HitPoints <= PUNA_LIGHTNING_DAMAGE)
 				{

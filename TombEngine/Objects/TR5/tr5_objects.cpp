@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR5/Entity/AutoGun.h"			 // OK
+#include "Objects/TR5/Entity/AutoGun.h"		 // OK
 #include "Objects/TR5/Entity/HeavyGuard.h"		 // OK
 #include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
 #include "Objects/TR5/Entity/tr5_chef.h"		 // OK
@@ -630,10 +630,10 @@ static void StartEntity(ObjectInfo *obj)
 	InitAnimating(obj, ID_LASERHEAD_BASE);
 	InitAnimating(obj, ID_LASERHEAD_TENTACLE);
 
-	obj = &Objects[ID_AUTOGUN];
+	obj = &Objects[ID_AUTO_GUN_VCI];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeAutoGuns;
+		obj->Initialize = InitializeAutoGun;
 		obj->control = ControlAutoGun;
 		obj->intelligent = true;
 		obj->damageType = DamageMode::None;
@@ -662,12 +662,8 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeTwoBlocksPlatform;
-		obj->control = TwoBlocksPlatformControl;
-		obj->floor = TwoBlocksPlatformFloor;
-		obj->ceiling = TwoBlocksPlatformCeiling;
-		obj->floorBorder = TwoBlocksPlatformFloorBorder;
-		obj->ceilingBorder = TwoBlocksPlatformCeilingBorder;
+		obj->Initialize = InitializeTwoBlockPlatform;
+		obj->control = TwoBlockPlatformControl;
 		obj->SetHitEffect(true);
 	}
 
@@ -678,10 +674,6 @@ static void StartObject(ObjectInfo *obj)
 		{
 			obj->Initialize = InitializeRaisingBlock;
 			obj->control = ControlRaisingBlock;
-			obj->floor = RaisingBlockFloor;
-			obj->ceiling = RaisingBlockCeiling;
-			obj->floorBorder = RaisingBlockFloorBorder;
-			obj->ceilingBorder = RaisingBlockCeilingBorder;
 			obj->SetHitEffect(true);
 		}
 	}
@@ -691,10 +683,6 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeExpandingPlatform;
 		obj->control = ControlExpandingPlatform;
-		obj->floor = ExpandingPlatformFloor;
-		obj->ceiling = ExpandingPlatformCeiling;
-		obj->floorBorder = ExpandingPlatformFloorBorder;
-		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
 		obj->SetHitEffect(true);
 	}
 
@@ -704,8 +692,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = ElectricalLightControl;
 		obj->Initialize = InitializeElectricalLight;
 		obj->meshSwapSlot = ID_ELECTRICAL_LIGHT;
-		//obj->drawRoutine = nullptr;
-		//obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_PULSE_LIGHT];

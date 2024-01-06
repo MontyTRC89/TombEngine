@@ -13,7 +13,7 @@
 #include "Game/items.h"
 #include "Game/savegame.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/trutils.h"
@@ -460,8 +460,8 @@ namespace TEN::Input
 			// Normalize raw mouse axis values to range [-1.0f, 1.0f].
 			auto rawAxes = Vector2(state.X.rel, state.Y.rel);
 			auto normAxes = Vector2(
-				(((rawAxes.x - -SCREEN_SPACE_RES.x) * 2) / (SCREEN_SPACE_RES.x - -SCREEN_SPACE_RES.x)) - 1.0f,
-				(((rawAxes.y - -SCREEN_SPACE_RES.y) * 2) / (SCREEN_SPACE_RES.y - -SCREEN_SPACE_RES.y)) - 1.0f);
+				(((rawAxes.x - -DISPLAY_SPACE_RES.x) * 2) / (DISPLAY_SPACE_RES.x - -DISPLAY_SPACE_RES.x)) - 1.0f,
+				(((rawAxes.y - -DISPLAY_SPACE_RES.y) * 2) / (DISPLAY_SPACE_RES.y - -DISPLAY_SPACE_RES.y)) - 1.0f);
 
 			// Apply sensitivity and smoothing.
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
@@ -814,13 +814,13 @@ namespace TEN::Input
 		}
 	}
 
-	Vector2 GetCursorDisplayPosition()
+	Vector2 GetMouse2DPosition()
 	{
 		const auto& state = OisMouse->getMouseState();
 
 		auto areaRes = Vector2(state.width, state.height);
 		auto areaPos = Vector2(state.X.abs, state.Y.abs);
-		return (SCREEN_SPACE_RES * (areaPos / areaRes));
+		return (DISPLAY_SPACE_RES * (areaPos / areaRes));
 	}
 
 	void ClearAction(ActionID actionID)

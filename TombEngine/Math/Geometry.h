@@ -1,4 +1,5 @@
 #pragma once
+#include <SimpleMath.h>
 
 class AxisAngle;
 class EulerAngles;
@@ -7,6 +8,8 @@ class Vector3i;
 
 namespace TEN::Math::Geometry
 {
+	using namespace DirectX::SimpleMath;
+
 	// Since Y is assumed as the vertical axis, 2D operations are simply done in the XZ plane.
 	// Revise geometry functions to each take a "gravity" direction argument someday. -- Sezz 2023.01.26
 
@@ -52,4 +55,7 @@ namespace TEN::Math::Geometry
 	bool IsPointOnLeft(const Pose& pose, const Vector3& target);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
+	bool IsPointInBox(const Vector3& point, const BoundingBox& box);
+	bool IsPointInBox(const Vector3& point, const BoundingOrientedBox& box);
+	bool IsPointInSphere(const Vector3& point, const BoundingSphere& sphere);
 }

@@ -1,10 +1,10 @@
 #pragma once
 #include "Game/control/box.h"
-#include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
+class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 
@@ -97,17 +97,12 @@ struct ObjectInfo
 
 	DWORD explodableMeshbits;
 
-	std::function<void(short itemNumber)> Initialize;
-	std::function<void(short itemNumber)> control;
-	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
+	std::function<void(short itemNumber)> Initialize = nullptr;
+	std::function<void(short itemNumber)> control = nullptr;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision = nullptr;
 
-	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine;
-	std::function<void(ItemInfo* item)> drawRoutine;
-
-	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> floor;
-	std::function<std::optional<int>(int itemNumber, int x, int y, int z)> ceiling;
-	std::function<int(short itemNumber)> floorBorder;
-	std::function<int(short itemNumber)> ceilingBorder;
+	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine = nullptr;
+	std::function<void(ItemInfo* item)> drawRoutine = nullptr;
 
 	void SetBoneRotationFlags(int boneID, int flags);
 	void SetHitEffect(bool isSolid = false, bool isAlive = false);

@@ -50,7 +50,7 @@ void CameraObject::Register(sol::table& parent)
 		ScriptReserved_SetName, &CameraObject::SetName,
 
 		/// Get the current room of the camera
-		// @function CameraObject:GetRoom
+		// @function Camera:GetRoom
 		// @treturn Room current room of the camera
 		ScriptReserved_GetRoom, &CameraObject::GetRoom,
 

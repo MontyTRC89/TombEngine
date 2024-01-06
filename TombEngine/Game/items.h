@@ -125,7 +125,7 @@ struct ItemInfo
 	
 	Pose StartPose;
 	Pose Pose;
-	ROOM_VECTOR Location;
+	RoomVector Location;
 	short RoomNumber;
 	int Floor;
 
@@ -167,6 +167,7 @@ struct ItemInfo
 
 	bool IsLara() const;
 	bool IsCreature() const;
+	bool IsBridge() const;
 
 	void ResetModelToDefault();
 };

@@ -5,20 +5,24 @@
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"
 #include "Game/spotcam.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
+#include "Scripting/Internal/TEN/View/PostProcessEffects.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Scripting::DisplaySprite;
 using namespace TEN::Scripting::View;
+
 using TEN::Renderer::g_Renderer;
 
 /***
@@ -67,6 +71,21 @@ namespace TEN::Scripting::View
 	{
 		return Camera.oldType;
 	}
+	
+	static Vec3 GetCameraPosition()
+	{
+		return Vec3(Camera.pos.ToVector3());
+	}
+
+	static Vec3 GetCameraTarget()
+	{
+		return Vec3(Camera.target.ToVector3());
+	}
+
+	static std::unique_ptr<Room> GetCameraRoom()
+	{
+		return std::make_unique<Room>(g_Level.Rooms[Camera.pos.RoomNumber]);
+	}
 
 	static void ResetObjCamera()
 	{
@@ -85,13 +104,32 @@ namespace TEN::Scripting::View
 		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
 	}
 
-	/// Get the display resolution's aspect ratio.
-	// @function GetAspectRatio
-	// @treturn float Display resolution's aspect ratio.
 	static float GetAspectRatio()
 	{
 		auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
 		return (screenRes.x / screenRes.y);
+	}
+
+	static void SetPostProcessMode(PostProcessMode mode)
+	{
+		g_Renderer.SetPostProcessMode(mode);
+	}
+
+	static void SetPostProcessStrength(TypeOrNil<float> strength)
+	{
+		g_Renderer.SetPostProcessStrength(std::clamp((float)USE_IF_HAVE(float, strength, 1.0), 0.0f, 1.0f));
+	}
+
+	static void SetPostProcessTint(const ScriptColor& color)
+	{
+		// Tint value must be normalized, because overbright color values cause postprocessing to fail and
+		// flood the screen with a single color channel that is overflown.
+
+		auto vec = (Vector3)color;
+		vec.x = std::clamp(vec.x, 0.0f, 1.0f);
+		vec.y = std::clamp(vec.y, 0.0f, 1.0f);
+		vec.z = std::clamp(vec.z, 0.0f, 1.0f);
+		g_Renderer.SetPostProcessTint(vec);
 	}
 
 	void Register(sol::state* state, sol::table& parent)
@@ -124,7 +162,7 @@ namespace TEN::Scripting::View
 		//@tparam float angle in degrees (clamped to [10, 170])
 		tableView.set_function(ScriptReserved_SetFOV, &SetFOV);
 
-		//Get field of view.
+		///Get field of view.
 		//@function GetFOV
 		//@treturn float current FOV angle in degrees
 		tableView.set_function(ScriptReserved_GetFOV, &GetFOV);
@@ -133,12 +171,42 @@ namespace TEN::Scripting::View
 		//@function GetCameraType
 		//@treturn View.CameraType value used by the Main Camera.
 		//@usage
-		//LevelFuncs.OnControlPhase = function() 
+		//LevelFuncs.OnLoop = function() 
 		//	if (View.GetCameraType() == CameraType.Combat) then
 		//		--Do your Actions here.
 		//	end
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
+
+		///Gets current room where camera is positioned.
+		//@function GetCameraRoom
+		//@treturn Objects.Room current room of the camera
+		tableView.set_function(ScriptReserved_GetCameraRoom, &GetCameraRoom);
+
+		///Sets the post-process effect mode, like negative or monochrome.
+		//@function SetPostProcessMode
+		//@tparam View.PostProcessMode effect type to set.
+		tableView.set_function(ScriptReserved_SetPostProcessMode, &SetPostProcessMode);
+
+		///Sets the post-process effect strength.
+		//@function SetPostProcessStrength
+		//@tparam float strength (default 1.0). How strong the effect is.
+		tableView.set_function(ScriptReserved_SetPostProcessStrength, &SetPostProcessStrength);
+
+		///Sets the post-process tint.
+		//@function SetPostProcessTint
+		//@tparam Color tint value to use.
+		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
+
+		///Gets current camera position.
+		//@function GetCameraPosition
+		//@treturn Vec3 current camera position
+		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
+
+		///Gets current camera target.
+		//@function GetCameraTarget
+		//@treturn Vec3 current camera target
+		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
 
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
@@ -155,6 +223,9 @@ namespace TEN::Scripting::View
 		//@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
 		tableView.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
+		/// Get the display resolution's aspect ratio.
+		// @function GetAspectRatio
+		// @treturn float Display resolution's aspect ratio.
 		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
 
 		// Register types.
@@ -165,5 +236,6 @@ namespace TEN::Scripting::View
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_CameraType, CAMERA_TYPE);
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_AlignMode, ALIGN_MODES);
 		handler.MakeReadOnlyTable(tableView, ScriptReserved_ScaleMode, SCALE_MODES);
+		handler.MakeReadOnlyTable(tableView, ScriptReserved_PostProcessMode, POSTPROCESS_MODES);
 	}
 };

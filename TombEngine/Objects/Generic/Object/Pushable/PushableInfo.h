@@ -2,6 +2,8 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/Pushable/PushableStates.h"
 
+#include "Objects/Generic/Object/BridgeObject.h"
+
 using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
@@ -53,6 +55,8 @@ namespace TEN::Entities::Generic
 		bool UseRoomCollision	= false;
 		bool UseBridgeCollision = false;
 		std::map<int, PushableEdgeAttribs> EdgeAttribs = {};
+
+		BridgeObject Bridge = {};
 
 		PushableInfo();
 	};
