@@ -1346,7 +1346,7 @@ namespace TEN::Entities::Player
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
@@ -1373,7 +1373,7 @@ namespace TEN::Entities::Player
 
 			// Get point collision in front of edge.
 			auto pointCollFront = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection), attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			// Test destination space (if applicable).
