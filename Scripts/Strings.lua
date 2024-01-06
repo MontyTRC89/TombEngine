@@ -1,15 +1,7 @@
 local strings =
 {
-	--[[
-	Level name strings
-	--]]
-	lara_home = { "Lara's Home" },
-	test_level = { "Test Level" },
-	title = { "Title" },
-
-	--[[
-	Inventory item strings
-	--]]
+	-- Inventory item strings
+	
 	binoculars = { "Binoculars" },
 	crossbow = { "Crossbow" },
 	crossbow_explosive_ammo = { "Crossbow Explosive Ammo" },
@@ -63,6 +55,12 @@ local strings =
 	waterskin_small_2l = { "Small Waterskin (2L)" },
 	waterskin_small_3l = { "Small Waterskin (3L)" },
 	waterskin_small_empty = { "Small Waterskin (Empty)" },
+	
+	-- Level name strings
+	
+	lara_home = { "Lara's Home" },
+	test_level = { "Test Level" },
+	title = { "Title" },
 }
 
 TEN.Flow.SetStrings(strings)
