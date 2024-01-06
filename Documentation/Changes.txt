@@ -45,12 +45,12 @@ Version 1.3
   - OCB 1: Wolf starts in sleeping animation.
 
 Lua API changes:
-* Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
-* Add Moveable:SetStatus() to set the current status of the moveable.
-* Add Room:GetColor() to get room's ambient light color.
-* Add Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
-* Add View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
-* Add View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
+* Added Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
+* Added Moveable:SetStatus() to set the current status of the moveable.
+* Added Room:GetColor() to get room's ambient light color.
+* Added Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
+* Added View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
+* Added View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
 
 Version 1.2
 ===========
