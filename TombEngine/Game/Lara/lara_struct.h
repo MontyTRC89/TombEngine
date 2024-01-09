@@ -118,7 +118,7 @@ enum LaraState
 	LS_CRAWL_TURN_RIGHT = 85,
 	LS_CRAWL_BACK = 86,
 	LS_HANG_TO_CROUCH = 87,
-	LS_CRAWL_TO_HANG = 88,
+	LS_CRAWL_EDGE_HANG_DESCENT_BACK = 88,
 	LS_MISC_CONTROL = 89,
 
 	// TR4
@@ -226,6 +226,7 @@ enum LaraState
 	LS_STAND_EDGE_HANG_DESCENT_FRONT = 199,
 	LS_STAND_EDGE_HANG_DESCENT_BACK = 200,
 	LS_STAND_EDGE_HANG_DESCENT_BACK_FLIP = 201,
+	LS_CRAWL_EDGE_HANG_DESCENT_FRONT = 202,
 
 	NUM_LARA_STATES
 };
@@ -534,8 +535,8 @@ enum LaraAnim
 	LA_MONKEY_TURN_RIGHT_TO_IDLE_LATE = 286,						// Turn right on monkey swing > monkey swing idle, 2nd opportunity
 	LA_HANG_TO_CROUCH = 287,										// Pull up from hang > crouch
 	LA_HANG_TO_CROUCH_END = 288,									// Pull up from hang > crouch (2/2)
-	LA_CRAWL_TO_EDGE_HANG = 289,									// Crawl > edge hang
-	LA_CRAWL_TO_HANG_CONTINUE = 290,								// TODO: Remove.
+	LA_CRAWL_TO_EDGE_HANG_BACK = 289,								// Crawl > edge hang back
+	LA_CRAWL_TO_EDGE_HANG_FRONT = 290,								// Crawl > edge hang front
 	LA_CROUCH_PICKUP = 291,											// Crouching pickup
 	LA_CRAWL_PICKUP = 292,											// Crawling pickup
 	LA_CROUCH_HIT_BACK = 293,										// Jerk back crouching from damage

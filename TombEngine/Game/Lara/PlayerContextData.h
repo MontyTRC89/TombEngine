@@ -66,6 +66,15 @@ namespace TEN::Entities::Player
 		int LowerEdgeToCeilBound = 0;
 	};
 
+	struct LedgeClimbSetupData
+	{
+		int LowerEdgeToCeilBound	 = 0;
+		int DestFloorToCeilHeightMin = 0;
+		int DestFloorToCeilHeightMax = 0;
+
+		bool TestIllegalSlope = false;
+	};
+
 	struct ClimbContextData
 	{
 		Attractor*	AttractorPtr	= nullptr;
@@ -78,15 +87,6 @@ namespace TEN::Entities::Player
 
 		bool SetBusyHands	 = false;
 		bool SetJumpVelocity = false;
-	};
-
-	struct LedgeClimbSetupData
-	{
-		int LowerEdgeToCeilBound	 = 0;
-		int DestFloorToCeilHeightMin = 0;
-		int DestFloorToCeilHeightMax = 0;
-
-		bool TestIllegalSlope = false;
 	};
 
 	struct WaterTreadStepOutContextData

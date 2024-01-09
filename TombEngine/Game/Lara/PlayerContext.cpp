@@ -1379,6 +1379,8 @@ namespace TEN::Entities::Player
 			// Test destination space (if applicable).
 			if (setup.TestDestSpace)
 			{
+				// TODO: Doesn't detect walls properly.
+
 				// Get point collisions at destination.
 				const auto& destPointCollCenter = setup.TestEdgeFront ? pointCollFront : pointCollBack;
 				auto destPointCollLeft = GetCollision(destPointCollCenter.Coordinates, destPointCollCenter.RoomNumber, attracColl.HeadingAngle, 0.0f, 0.0f, -coll.Setup.Radius);
@@ -2048,20 +2050,23 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// 3) Vault jump.
-		context = GetCrawlVaultJumpClimbContext(item, coll, attracColls);
+		// 3) Vault up 1 step.
+		context = GetCrawlVault1StepUpClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// 4) Vault up 1 step.
-		context = GetCrawlVault1StepUpClimbContext(item, coll, attracColls);
-		if (context.has_value())
+		// 4) Vault jump.
+		if (IsHeld(In::Jump))
 		{
-			if (HasStateDispatch(&item, context->TargetStateID))
-				return context;
+			context = GetCrawlVaultJumpClimbContext(item, coll, attracColls);
+			if (context.has_value())
+			{
+				if (HasStateDispatch(&item, context->TargetStateID))
+					return context;
+			}
 		}
 
 		return std::nullopt;
@@ -2582,7 +2587,6 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Needs animation.
 	std::optional<ClimbContextData> GetCrawlHangDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
@@ -2605,9 +2609,9 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_STAND_EDGE_HANG_DESCENT_FRONT;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
+			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_FRONT;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
@@ -2642,7 +2646,7 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_CRAWL_TO_HANG;
+			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_BACK;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;

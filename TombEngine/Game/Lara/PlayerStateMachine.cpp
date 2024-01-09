@@ -120,7 +120,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_CRAWL_TURN_RIGHT] = std::pair(lara_as_crawl_turn_right, lara_col_crawl_turn_right);
 		PlayerBehaviorStateRoutines[LS_CRAWL_BACK] = std::pair(lara_as_crawl_back, lara_col_crawl_back);
 		PlayerBehaviorStateRoutines[LS_HANG_TO_CROUCH] = std::pair(lara_as_controlled_no_look, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_CRAWL_TO_HANG] = std::pair(lara_as_controlled_no_look, lara_col_crawl_to_hang);
+		PlayerBehaviorStateRoutines[LS_CRAWL_EDGE_HANG_DESCENT_BACK] = std::pair(lara_as_controlled_no_look, lara_col_crawl_to_hang);
 		PlayerBehaviorStateRoutines[LS_MISC_CONTROL] = std::pair(lara_as_controlled, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_ROPE_TURN_CLOCKWISE] = std::pair(lara_as_rope_turn_clockwise, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_ROPE_TURN_COUNTER_CLOCKWISE] = std::pair(lara_as_rope_turn_counter_clockwise, lara_void_func);
@@ -237,6 +237,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT_FRONT] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT_BACK] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT_BACK_FLIP] = std::pair(lara_as_null, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_CRAWL_EDGE_HANG_DESCENT_FRONT] = std::pair(lara_as_controlled_no_look, lara_col_crawl_to_hang);
 	}
 
 	void HandlePlayerBehaviorState(ItemInfo& item, CollisionInfo& coll, PlayerBehaviorStateRoutineType routineType)

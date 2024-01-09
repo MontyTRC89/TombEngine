@@ -472,6 +472,17 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 
+			if (IsHeld(In::Action))
+			{
+				auto climbContext = GetCrawlHangDescentFrontClimbContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerClimb(*item, *climbContext);
+					return;
+				}
+			}
+
 			if (CanCrawlForward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_CRAWL_FORWARD;
