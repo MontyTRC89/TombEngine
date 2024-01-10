@@ -336,15 +336,15 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	// Drop down if action not pressed.
 	if (!IsHeld(In::Action))
 	{
-		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
+		//SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		return;
 	}
 
 	// Engage shimmy mode if LEFT/LSTEP or RIGHT/RSTEP are pressed.
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
-		lara->Context.NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
-		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
+		//lara->Context.NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
+		//SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
 
@@ -393,7 +393,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 					(probeNow.Position.Ceiling - probeWall.Position.Ceiling) > CLICK(0.5f)) // No wall or downward ceiling step.
 				{
 					TranslateItem(item, 0, -CLICK(1), -CLICK(1));
-					SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_UP_LEFT : LA_OVERHANG_CLIMB_UP_RIGHT);
+					//SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_UP_LEFT : LA_OVERHANG_CLIMB_UP_RIGHT);
 					//item->TargetState = 62;
 				}
 			}
@@ -438,7 +438,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 			bridge = FindBridge(4, slopeData.GoalOrient, down, &height, -CLICK(2.5f), -CLICK(1.5f));
 			if (yDiff >= CLICK(0.75f) && yDiff <= CLICK(1.25f) && (SlopeCheck(probeDown.CeilingTilt, slopeData.Goal) || bridge >= 0))
 			{
-				SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_DOWN_LEFT : LA_OVERHANG_CLIMB_DOWN_RIGHT);
+				//SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_DOWN_LEFT : LA_OVERHANG_CLIMB_DOWN_RIGHT);
 				return;
 			}
 		}
@@ -653,10 +653,10 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 		int dPos = CLICK(1) - (frame * CLICK(1) / length);
 
 		TranslateItem(item, 0, dPos, dPos);
-		if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_UP_LEFT)
+		/*if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_UP_LEFT)
 			SetAnimation(item, frame <= 2 * length / 3 ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		else
-			SetAnimation(item, frame <= 2 * length / 3 ? LA_OVERHANG_DROP_RIGHT : LA_OVERHANG_DROP_LEFT);
+			SetAnimation(item, frame <= 2 * length / 3 ? LA_OVERHANG_DROP_RIGHT : LA_OVERHANG_DROP_LEFT);*/
 	}
 }
 
@@ -683,10 +683,10 @@ void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 		int dPos = frame * CLICK(1) / length;
 
 		TranslateItem(item, 0, dPos, dPos);
-		if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_DOWN_LEFT)
+		/*if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_DOWN_LEFT)
 			SetAnimation(item, frame <= length / 2 ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		else
-			SetAnimation(item, frame <= length / 2 ? LA_OVERHANG_DROP_RIGHT : LA_OVERHANG_DROP_LEFT);
+			SetAnimation(item, frame <= length / 2 ? LA_OVERHANG_DROP_RIGHT : LA_OVERHANG_DROP_LEFT);*/
 	}
 }
 

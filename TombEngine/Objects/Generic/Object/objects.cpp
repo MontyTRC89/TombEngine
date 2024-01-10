@@ -10,12 +10,14 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;
+using namespace TEN::Math;
 
 const auto TightRopePos = Vector3i::Zero;
 const ObjectCollisionBounds TightRopeBounds =
@@ -23,24 +25,21 @@ const ObjectCollisionBounds TightRopeBounds =
 	GameBoundingBox(
 		-CLICK(1), CLICK(1),
 		0, 0,
-		-CLICK(1), CLICK(1)
-	),
+		-CLICK(1), CLICK(1)),
 	std::pair(
-		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-	)
+		EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 };
-const ObjectCollisionBounds ParallelBarsBounds =
+
+ObjectCollisionBounds HorizontalBarBounds =
 {
 	GameBoundingBox(
 		-640, 640,
 		704, 832,
-		-96, 96
-	),
+		-96, 96),
 	std::pair(
-		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-	)
+		EulerAngles(ANGLE(-10.0f), -LARA_GRAB_THRESHOLD, ANGLE(-10.0f)),
+		EulerAngles(ANGLE(10.0f), LARA_GRAB_THRESHOLD, ANGLE(10.0f)))
 };
 
 void ControlAnimatingSlots(short itemNumber)
@@ -124,7 +123,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	}
 }
 
-void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+void HorizontalBarCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 {
 	static const auto HORIZONTAL_BAR_STATES = std::vector<int>
 	{
@@ -136,62 +135,54 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	};
 
 	auto& barItem = g_Level.Items[itemNumber];
-	auto& player = GetLaraInfo(*laraItem);
+	auto& player = GetLaraInfo(*playerItem);
 
 	if (IsHeld(In::Action) &&
-		laraItem->Animation.ActiveState == LS_REACH &&
-		laraItem->Animation.AnimNumber == LA_REACH &&
+		(playerItem->Animation.ActiveState == LS_REACH || playerItem->Animation.ActiveState == LS_JUMP_UP) &&
 		player.Control.HandStatus == HandStatus::Free)
 	{
-		bool test1 = TestLaraPosition(ParallelBarsBounds, &barItem, laraItem);
-		bool test2 = false;
-		if (!test1)
+		// HACK: Update interaction basis.
+		auto bounds = GameBoundingBox(&barItem);
+		/*HorizontalBarBounds.BoundingBox = GameBoundingBox(
+			HorizontalBarBounds.BoundingBox.X1, HorizontalBarBounds.BoundingBox.X2,
+			HorizontalBarBounds.BoundingBox.Y1, HorizontalBarBounds.BoundingBox.Y2,
+			bounds.Z1, bounds.Z2);*/
+
+		bool hasFront = TestLaraPosition(HorizontalBarBounds, &barItem, playerItem);
+		bool hasBack = false;
+		if (!hasFront)
 		{
 			barItem.Pose.Orientation.y += ANGLE(-180.0f);
-			test2 = TestLaraPosition(ParallelBarsBounds, &barItem, laraItem);
+			hasBack = TestLaraPosition(HorizontalBarBounds, &barItem, playerItem);
 			barItem.Pose.Orientation.y += ANGLE(-180.0f);
 		}
 
-		if (test1 || test2)
+		if (hasFront || hasBack)
 		{
-			SetAnimation(laraItem, 507);
-			ResetPlayerFlex(laraItem);
-			laraItem->Animation.Velocity.y = 0.0f;
-			laraItem->Animation.IsAirborne = false;
-
-			if (test1)
-			{
-				laraItem->Pose.Orientation.y = barItem.Pose.Orientation.y;
-			}
-			else
-			{
-				laraItem->Pose.Orientation.y = barItem.Pose.Orientation.y - ANGLE(180.0f);
-			}
-
-			auto pos1 = GetJointPosition(laraItem, LM_LHAND, Vector3i(0, -128, 512));
-			auto pos2 = GetJointPosition(laraItem, LM_RHAND, Vector3i(0, -128, 512));
-		
-			if (laraItem->Pose.Orientation.y & 0x4000)
-			{
-				laraItem->Pose.Position.x += barItem.Pose.Position.x - ((pos1.x + pos2.x) >> 1);
-			}
-			else
-			{
-				laraItem->Pose.Position.z += barItem.Pose.Position.z - ((pos1.z + pos2.z) / 2);
-			}
-
-			laraItem->Pose.Position.y += barItem.Pose.Position.y - ((pos1.y + pos2.y) / 2);
-
+			SetAnimation(playerItem, (playerItem->Animation.ActiveState == LS_REACH) ? LA_REACH_TO_HORIZONTAL_BAR : LA_JUMP_UP_TO_HORIZONTAL_BAR);
+			ResetPlayerFlex(playerItem);
+			playerItem->Animation.Velocity.y = 0.0f;
+			playerItem->Animation.IsAirborne = false;
 			player.Context.InteractedItem = itemNumber;
+			player.Control.HandStatus = HandStatus::Busy;
+
+			// Calculate catch position from line.
+			auto linePoint0 = Geometry::TranslatePoint(barItem.Pose.Position.ToVector3(), barItem.Pose.Orientation.y, 0.0f, 0.0f, HorizontalBarBounds.BoundingBox.X1);
+			auto linePoint1 = Geometry::TranslatePoint(barItem.Pose.Position.ToVector3(), barItem.Pose.Orientation.y, 0.0f, 0.0f, HorizontalBarBounds.BoundingBox.X2);
+			auto catchPos = Geometry::GetClosestPointOnLine(playerItem->Pose.Position.ToVector3(), linePoint0, linePoint1);
+
+			// Update player pose.
+			playerItem->Pose.Position = Geometry::TranslatePoint(catchPos, 0, 0.0f, coll->Setup.Height);
+			playerItem->Pose.Orientation.y = barItem.Pose.Orientation.y + (hasFront ? ANGLE(0.0f) : ANGLE(-180.0f));
 		}
 		else
 		{
-			ObjectCollision(itemNumber, laraItem, coll);
+			ObjectCollision(itemNumber, playerItem, coll);
 		}
 	}
-	else if (!TestState(laraItem->Animation.ActiveState, HORIZONTAL_BAR_STATES))
+	else if (!TestState(playerItem->Animation.ActiveState, HORIZONTAL_BAR_STATES))
 	{
-		ObjectCollision(itemNumber, laraItem, coll);
+		ObjectCollision(itemNumber, playerItem, coll);
 	}
 }
 

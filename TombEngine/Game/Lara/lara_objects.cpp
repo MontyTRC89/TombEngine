@@ -279,7 +279,11 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Action))
 	{
-		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)) || IsHeld(In::Back))
+		if (IsHeld(In::Jump))
+		{
+			item->Animation.TargetState = LS_JUMP_FORWARD;
+		}
+		else if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)) || IsHeld(In::Back))
 		{
 		item->Animation.TargetState = LS_HORIZONTAL_BAR_SWING_TURN_180;
 		}
