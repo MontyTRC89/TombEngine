@@ -230,6 +230,10 @@ namespace TEN::Entities::TR4
 				}
 				else
 					beetle->Pose.Orientation.x = beetle->VerticalVelocity * -64;
+
+				Matrix translation = Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
+				Matrix rotation = beetle->Pose.Orientation.ToRotationMatrix();
+				beetle->Transform = rotation * translation;
 			}
 		}
 	}

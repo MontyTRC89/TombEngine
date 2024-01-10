@@ -110,7 +110,7 @@ namespace TEN::Entities::Vehicles
 		mist.colFadeSpeed = 4 + (GetRandomControl() & 3);
 		mist.fadeToBlack = 12;
 		mist.sLife = mist.life = (GetRandomControl() & 3) + 20;
-		mist.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		mist.blendMode = BlendMode::Additive;
 		mist.extras = 0;
 		mist.dynamic = -1;
 
@@ -646,10 +646,10 @@ namespace TEN::Entities::Vehicles
 				}
 				else if (IsHeld(In::Accelerate))
 				{
-					if (IsHeld(In::Speed))
+					if (IsHeld(In::Faster))
 						maxVelocity = SPEEDBOAT_FAST_VELOCITY_MAX;
 					else
-						maxVelocity = (IsHeld(In::Slow)) ? SPEEDBOAT_SLOW_VELOCITY_MAX : SPEEDBOAT_NORMAL_VELOCITY_MAX;
+						maxVelocity = (IsHeld(In::Slower)) ? SPEEDBOAT_SLOW_VELOCITY_MAX : SPEEDBOAT_NORMAL_VELOCITY_MAX;
 
 					if (speedboatItem->Animation.Velocity.z < maxVelocity)
 						speedboatItem->Animation.Velocity.z += (SPEEDBOAT_VELOCITY_ACCEL / 2) + (SPEEDBOAT_VELOCITY_ACCEL * (speedboatItem->Animation.Velocity.z / (maxVelocity * 2)));
@@ -842,6 +842,7 @@ namespace TEN::Entities::Vehicles
 			default:
 				drive = true;
 				noTurn = SpeedboatUserControl(speedboatItem, laraItem);
+				HandleVehicleSpeedometer(speedboatItem->Animation.Velocity.z, SPEEDBOAT_FAST_VELOCITY_MAX);
 				break;
 			}
 		}

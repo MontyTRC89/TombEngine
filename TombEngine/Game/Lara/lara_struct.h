@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/Lara/PlayerContext.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
@@ -7,7 +8,8 @@ using namespace TEN::Math;
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
-namespace TEN::Renderer { struct RendererMesh; };
+
+using namespace TEN::Entities::Player;
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
@@ -147,7 +149,7 @@ enum LaraState
 	LS_ROPE_UNKNOWN = 115,
 	LS_CORRECT_POSITION = 116,
 	LS_DOUBLEDOOR_PUSH = 117,
-	LS_DOZY = 118,
+	LS_FLY_CHEAT = 118,
 
 	// TR5
 	LS_TIGHTROPE_IDLE = 119,
@@ -208,12 +210,20 @@ enum LaraState
 	LS_CRAWL_TURN_180 = 172,
 	LS_TURN_180 = 173,
 
-	// 174-188 reserved for "true" ladders. -- Sezz 2023.04.16
+	// 174-188 reserved for ladder object. -- Sezz 2023.04.16
 
 	LS_REMOVE_PUZZLE = 189,
-	LS_HORIZONTAL_BAR_IDLE = 190,
-	LS_HORIZONTAL_BAR_IDLE_TURN_180 = 191,
-	LS_HORIZONTAL_BAR_SWING_TURN_180 = 192,
+	LS_PUSHABLE_EDGE_SLIP = 190,
+	LS_SPRINT_SLIDE = 191,
+	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND = 192,
+	LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND = 193,
+	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND = 194,
+	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH = 195,
+	LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH = 196,
+	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH = 197,
+	LS_HORIZONTAL_BAR_IDLE = 198,
+	LS_HORIZONTAL_BAR_IDLE_TURN_180 = 199,
+	LS_HORIZONTAL_BAR_SWING_TURN_180 = 200,
 
 	NUM_LARA_STATES
 };
@@ -347,8 +357,8 @@ enum LaraAnim
 	LA_ONWATER_DIVE = 119,									// Tread water > underwater
 	LA_PUSHABLE_GRAB = 120,									// Grab pushable object (looped)
 	LA_PUSHABLE_RELEASE = 121,								// Release pushable object
-	LA_PUSHABLE_PULL = 122,									// Pull pushable object (looped)
-	LA_PUSHABLE_PUSH = 123,									// Push pushable object (looped)
+	LA_PUSHABLE_OBJECT_PULL = 122,							// Pull pushable object (looped)
+	LA_PUSHABLE_OBJECT_PUSH = 123,							// Push pushable object (looped)
 	LA_UNDERWATER_DEATH = 124,								// Drowning death
 	LA_STAND_HIT_FRONT = 125,								// Jerk back standing from damage
 	LA_STAND_HIT_BACK = 126,								// Jerk forward standing from damage
@@ -579,9 +589,9 @@ enum LaraAnim
 	LA_PULLEY_PULL = 340,									// Pull pulley
 	LA_PULLEY_RELEASE = 341,								// Pull pulley > stand
 	LA_POLE_TO_STAND = 342,									// Pole > stand
-	LA_POLE_TURN_CLOCKWISE_CONTINUE_UNUSED = 343,				// TODO: remove.
+	LA_PUSHABLE_BLOCK_PULL = 343,							// Pull pushable block
 	LA_POLE_TURN_CLOCKWISE_END = 344,						// Rotate clockwise on pole (2/2)
-	LA_POLE_TURN_COUNTER_CLOCKWISE_CONTINUE_UNUSED = 345,		// TODO: remove.
+	LA_PUSHABLE_BLOCK_PUSH = 345,							// Push pushable block
 	LA_POLE_TURN_COUNTER_CLOCKWISE_END = 346,				// Rotate counter-clockwise on pole (2/2)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_START = 347,				// Push turnswitch clockwise (1/3)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_CONTINUE = 348,			// Push turnswitch clockwise (2/3) 
@@ -599,14 +609,14 @@ enum LaraAnim
 	LA_SHIMMY_LEFT_CORNER_INNER_45 = 360,					// Shimmy around inner left corner (45)
 	LA_SHIMMY_RIGHT_CORNER_INNER_90 = 361,				    // Shimmy around inner right corner (90)
 	LA_SHIMMY_RIGHT_CORNER_INNER_45 = 362,					// Shimmy around inner right corner (45)
-	LA_LADDER_LEFT_CORNER_OUTER_START = 363,				// Ladder around outer left corner (1/2)
-	LA_LADDER_LEFT_CORNER_OUTER_END = 364,					// Ladder around outer left corner (2/2)
-	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner (1/2)
-	LA_LADDER_RIGHT_CORNER_OUTER_END = 366,					// Ladder around outer right corner (2/2)
-	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner (1/2)
-	LA_LADDER_LEFT_CORNER_INNER_END = 368,					// Ladder around inner left corner (2/2)
-	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner (1/2)
-	LA_LADDER_RIGHT_CORNER_INNER_END = 370,					// Ladder around inner right corner (2/2)
+	LA_LADDER_LEFT_CORNER_OUTER_START = 363,				// Ladder around outer left corner
+	LA_PUSHABLE_OBJECT_PUSH_EDGE_SLIP = 364,
+	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner
+	LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP = 366,
+	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner
+	LA_LADDER_LEFT_CORNER_INNER_END = 368,					// TODO: Remove.
+	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner
+	LA_LADDER_RIGHT_CORNER_INNER_END = 370,					// TODO: Remove.
 	LA_JUMP_UP_TO_ROPE_START = 371,							// Jump up > rope idle (1/2)
 	LA_TRAIN_OVERBOARD_DEATH = 372,							// Train overboard death
 	LA_JUMP_UP_TO_ROPE_END = 373,							// Jump up > rope idle (2/2)
@@ -655,9 +665,8 @@ enum LaraAnim
 	LA_JUMPSWITCH_PULL = 414,								// Pull jumpswitch
 	LA_UNDERWATER_CEILING_SWITCH_PULL = 415,				// Pull underwater ceiling switch
 	LA_UNDERWATER_DOOR_OPEN = 416,							// Open underwater_door
-	LA_PUSHABLE_PUSH_TO_STAND = 417,						// Push pushable object (not looped) > stand
-	LA_PUSHABLE_PULL_TO_STAND = 418,						// Pull pushable object (not looped) > stand
-																// TODO: add TR1-3 push/pull anims.
+	LA_PUSHABLE_OBJECT_PUSH_TO_STAND = 417,						// Push pushable object (not looped) > stand
+	LA_PUSHABLE_OBJECT_PULL_TO_STAND = 418,						// Pull pushable object (not looped) > stand
 	LA_CROWBAR_PRY_WALL_FAST = 419,							// Pry item off wall quickly
 	LA_CROWBAR_USE_ON_FLOOR = 420,							// Use crowbar to activate floor lever
 	LA_CRAWL_JUMP_FLIP_DOWN = 421,							// Roll jump down from crawl
@@ -682,11 +691,11 @@ enum LaraAnim
 	LA_PICKUP_SARCOPHAGUS = 439,							// Pickup from sarcophagus
 	LA_DRAG_BODY = 440,										// Drag dead body
 	LA_BINOCULARS_IDLE = 441,								// Stand, looking through binoculars
-	LA_BIG_SCORPION_DEATH = 442,							// Big scorpion death
+	LA_UNUSED_442 = 442,
 	LA_ELEVATOR_RECOVER = 443,								// Recover from elevator crash
 																// TODO: 443 is also taken by SETH_DEATH, currently absent from default WAD.
 	LA_MECHANICAL_BEETLE_USE = 444,							// Wind mechanical beetle, place on floor
-	LA_DOZY = 445,											// DOZY fly cheat
+	LA_FLY_CHEAT = 445,										// Fly cheat
 
 	// TR5
 	LA_TIGHTROPE_WALK = 446,								// Tightrope walk (looped)
@@ -818,15 +827,13 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_START = 567,
 	LA_LEDGE_JUMP_BACK_END = 568,
 
-	// 569-598 reserved for "true" ladders. -- Sezz 2023.04.16
+	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
 	NUM_LARA_ANIMS
 
-	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
+	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
 	// 280,
-	// 343, 345,
-	// 364, 366, 368, 370,
-	// 461, 462, 463,
+	// 368, 370,
 };
 
 enum LaraExtraAnim
@@ -845,7 +852,9 @@ enum LaraExtraAnim
 	LEA_STRIKE_GONG = 11,
 	LEA_WILLARD_DEATH = 12,
 	LEA_TRAIN_DEATH_END = 13,
-	LEA_SETH_DEATH = 14
+	LEA_SETH_DEATH = 14,
+	LEA_YETI_DEATH = 15,
+	LEA_BIG_SCORPION_DEATH = 16
 };
 #pragma endregion
 
@@ -1163,41 +1172,6 @@ struct DiaryInfo
 	unsigned int CurrentPage			= 0;
 };
 
-struct LaraInventoryData
-{
-	bool IsBusy	 = false;
-	bool OldBusy = false;
-
-	DiaryInfo Diary = {};
-
-	byte BeetleLife;
-	int BeetleComponents; // BeetleComponentFlags enum
-	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
-	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
-
-	// TODO: Rename prefixes back to "Num".
-	int TotalSmallMedipacks;
-	int TotalLargeMedipacks;
-	int TotalFlares;
-	unsigned int TotalSecrets;
-
-	bool HasBinoculars = false;
-	bool HasCrowbar	   = false;
-	bool HasTorch	   = false;
-	bool HasLasersight = false;
-	bool HasSilencer   = false; // TODO: Unused.
-
-	// TODO: Convert to bools.
-	int Puzzles[NUM_PUZZLES]			= {};
-	int Keys[NUM_KEYS]					= {};
-	int Pickups[NUM_PICKUPS]			= {};
-	int Examines[NUM_EXAMINES]			= {};
-	int PuzzlesCombo[NUM_PUZZLES * 2]	= {};
-	int KeysCombo[NUM_KEYS * 2]			= {};
-	int PickupsCombo[NUM_PICKUPS * 2]	= {};
-	int ExaminesCombo[NUM_EXAMINES * 2] = {};
-};
-
 struct LaraCountData
 {
 	unsigned int Pose			= 0;
@@ -1215,26 +1189,6 @@ struct LookControlData
 	short OpticRange		= 0;
 	bool  IsUsingBinoculars = false;
 	bool  IsUsingLasersight = false;
-};
-
-struct WeaponControlData
-{
-	LaraWeaponType GunType		  = LaraWeaponType::None;
-	LaraWeaponType RequestGunType = LaraWeaponType::None;
-	LaraWeaponType LastGunType	  = LaraWeaponType::None;
-	HolsterInfo	   HolsterInfo	  = {};
-	
-	short WeaponItem = -1;
-	bool  HasFired	 = false;
-	bool  Fired		 = false;
-
-	bool UziLeft  = false;
-	bool UziRight = false;
-
-	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
-	unsigned int NumShotsFired = 0;
-	float		 Interval	   = 0.0f;
-	float		 Timer		   = 0.0f;
 };
 
 struct RopeControlData
@@ -1261,15 +1215,6 @@ struct RopeControlData
 	int Count = 0;
 };
 
-// TODO: Give tightrope a property for difficulty?
-struct TightropeControlData
-{
-	short		 TightropeItem	 = 0;
-	bool		 CanDismount	 = false;
-	float		 Balance		 = 0.0f;
-	unsigned int TimeOnTightrope = 0;
-};
-
 struct SubsuitControlData
 {
 	short XRot = 0;
@@ -1282,7 +1227,36 @@ struct SubsuitControlData
 	unsigned short HitCount = 0;
 };
 
-struct LaraControlData
+// TODO: Give tightrope a property for difficulty?
+struct TightropeControlData
+{
+	short		 TightropeItem	 = 0;
+	bool		 CanDismount	 = false;
+	float		 Balance		 = 0.0f;
+	unsigned int TimeOnTightrope = 0;
+};
+
+struct WeaponControlData
+{
+	LaraWeaponType GunType		  = LaraWeaponType::None;
+	LaraWeaponType RequestGunType = LaraWeaponType::None;
+	LaraWeaponType LastGunType	  = LaraWeaponType::None;
+	HolsterInfo	   HolsterInfo	  = {};
+
+	short WeaponItem = -1;
+	bool  HasFired	 = false;
+	bool  Fired		 = false;
+
+	bool UziLeft  = false;
+	bool UziRight = false;
+
+	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
+	unsigned int NumShotsFired = 0;
+	float		 Interval	   = 0.0f;
+	float		 Timer		   = 0.0f;
+};
+
+struct PlayerControlData
 {
 	short MoveAngle = 0;
 	short TurnRate	= 0;
@@ -1299,12 +1273,12 @@ struct LaraControlData
 	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
-	bool Locked			  = false; // IsLocked
+	bool IsLocked		  = false;
 	bool IsLow			  = false;
 	bool IsMonkeySwinging = false;
 	bool IsMoving		  = false;
-	bool RunJumpQueued	  = false; // IsRunJumpQueued
-	bool KeepLow		  = false; // IsInLowSpace
+	bool IsRunJumpQueued  = false;
+	bool KeepLow		  = false;
 
 	bool CanClimbLadder = false;
 	bool CanLook		= false;
@@ -1320,36 +1294,55 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
-struct PlayerContextData
-{
-	int			ProjectedFloorHeight = 0;
-	float		CalcJumpVelocity	 = 0;
-	Pose		NextCornerPos		 = Pose::Zero;
-	EulerAngles TargetOrientation	 = EulerAngles::Zero; // TargetOrient
-
-	int		 WaterSurfaceDist	= 0;
-	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	= Vector3i::Zero;
-
-	int InteractedItem = 0; // InteractedItemNumber
-	int Vehicle		   = 0; // VehicleItemNumber
-};
-
 struct PlayerEffectData
 {
 	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
 	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
 };
 
+struct PlayerInventoryData
+{
+	bool IsBusy	 = false;
+	bool OldBusy = false;
+
+	DiaryInfo Diary = {};
+
+	byte BeetleLife;
+	int BeetleComponents; // BeetleComponentFlags enum
+	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
+	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
+
+	// TODO: Rename prefixes back to "Num".
+	int TotalSmallMedipacks;
+	int TotalLargeMedipacks;
+	int TotalFlares;
+	unsigned int TotalSecrets;
+
+	bool HasBinoculars = false;
+	bool HasCrowbar	   = false;
+	bool HasTorch	   = false;
+	bool HasLasersight = false;
+	bool HasSilencer   = false; // TODO: Unused.
+
+	int Puzzles[NUM_PUZZLES]			= {};
+	int Keys[NUM_KEYS]					= {};
+	int Pickups[NUM_PICKUPS]			= {};
+	int Examines[NUM_EXAMINES]			= {};
+	int PuzzlesCombo[NUM_PUZZLES * 2]	= {};
+	int KeysCombo[NUM_KEYS * 2]			= {};
+	int PickupsCombo[NUM_PICKUPS * 2]	= {};
+	int ExaminesCombo[NUM_EXAMINES * 2] = {};
+};
+
 struct LaraInfo
 {
-	static constexpr auto TARGET_COUNT_MAX = 8;
+	static constexpr auto TARGET_COUNT_MAX = 16;
 
-	LaraControlData	  Control	= {};
-	PlayerContextData Context	= {};
-	PlayerStatusData  Status	= {};
-	PlayerEffectData  Effect	= {};
-	LaraInventoryData Inventory = {};
+	PlayerContext		Context	  = PlayerContext();
+	PlayerControlData	Control	  = {};
+	PlayerStatusData	Status	  = {};
+	PlayerEffectData	Effect	  = {};
+	PlayerInventoryData Inventory = {};
 
 	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};

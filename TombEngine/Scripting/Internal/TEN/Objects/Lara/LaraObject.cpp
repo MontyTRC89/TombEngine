@@ -128,26 +128,6 @@ int LaraObject::GetStamina() const
 	return lara->Status.Stamina;
 }
 
-/// Set control lock for Lara.
-// @function LaraObject:SetControlLock
-// @tparam bool whether set or not set control lock. 
-// @usage
-// Lara:SetControlLock(true)
-void LaraObject::SetControlLock(bool value)
-{
-	GetLaraInfo(m_item)->Control.Locked = value;
-}
-
-/// Get control lock for Lara.
-// @function LaraObject:GetControlLock
-// @treturn bool current control lock value
-// @usage
-// local areControlsLocked = Lara:GetControlLock()
-bool LaraObject::GetControlLock() const
-{
-	return GetLaraInfo(m_item)->Control.Locked;
-}
-
 /// Get the moveable's airborne status
 // @function Moveable:GetAirborne
 // @treturn (bool) true if Lara state must react to aerial forces.
@@ -382,19 +362,34 @@ std::unique_ptr<Moveable> LaraObject::GetVehicle() const
 	return std::make_unique<Moveable>(lara->Context.Vehicle);
 }
 
-/// Get current target enemy, if it exists
+/// Get the player's current targeted moveable (if it exists).
 // @function LaraObject:GetTarget
-// @treturn Objects.Moveable current target enemy (nil if no target present)
+// @treturn Objects.Moveable Target moveable (nil if the player is not currently targeting a moveable).
 // @usage
 // local target = Lara:GetTarget()
 std::unique_ptr<Moveable> LaraObject::GetTarget() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	const auto& player = GetLaraInfo(*m_item);
 
-	if (lara->TargetEntity == nullptr)
+	if (player.TargetEntity == nullptr)
 		return nullptr;
 
-	return std::make_unique<Moveable>(lara->TargetEntity->Index);
+	return std::make_unique<Moveable>(player.TargetEntity->Index);
+}
+
+/// Get the player's current interacted moveable (if it exists).
+// @function LaraObject:GetInteractedMoveable
+// @treturn Objects.Moveable Interacted moveable (nil if the player is not interacting with a moveable).
+// @usage
+// local interactedMoveable = Lara:GetInteractedMoveable()
+std::unique_ptr<Moveable> LaraObject::GetPlayerInteractedMoveable() const
+{
+	const auto& player = GetLaraInfo(*m_item);
+
+	if (player.Context.InteractedItem == NO_ITEM)
+		return nullptr;
+
+	return std::make_unique<Moveable>(player.Context.InteractedItem);
 }
 
 /// Get current light state of the torch, if it exists
@@ -430,8 +425,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,
+			ScriptReserved_GetPlayerInteractedMoveable, &LaraObject::GetPlayerInteractedMoveable,
 			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
-

@@ -57,7 +57,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->waterCreature = true;
 		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(9, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_BARRACUDA];
@@ -74,7 +74,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->waterCreature = true;
 		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(6, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_EAGLE];
@@ -89,7 +89,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->pivotLength = 0;
 		obj->LotType = LotType::Flyer;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_CROW];
@@ -104,7 +104,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->pivotLength = 0;
 		obj->LotType = LotType::Flyer;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_RAT];
@@ -118,7 +118,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->radius = 204;
 		obj->intelligent = true;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_YETI];
@@ -135,7 +135,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_GOON_SILENCER1];
@@ -151,7 +151,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_GOON_SILENCER2];
@@ -168,7 +168,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_GOON_SILENCER3];
@@ -185,7 +185,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_WORKER_SHOTGUN];
@@ -201,7 +201,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_WORKER_MACHINEGUN];
@@ -217,7 +217,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SMALL_SPIDER];
@@ -232,7 +232,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->intelligent = true;
 		obj->LotType = LotType::Spider;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_BIG_SPIDER];
@@ -246,7 +246,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_WORKER_DUAL_REVOLVER];
@@ -262,7 +262,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(11, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_BIRDMONSTER];
@@ -277,7 +277,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 341;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(14, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_WORKER_FLAMETHROWER];
@@ -293,7 +293,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(4, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_KNIFETHROWER];
@@ -309,7 +309,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MERCENARY_UZI];
@@ -325,7 +325,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS1];
@@ -341,7 +341,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MERCENARY_AUTOPISTOLS2];
@@ -358,7 +358,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MONK1];
@@ -373,7 +373,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MONK2];
@@ -388,7 +388,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SWORD_GUARDIAN];
@@ -406,7 +406,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(17, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SPEAR_GUARDIAN];
@@ -424,7 +424,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(12, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_DRAGON_FRONT];
@@ -439,7 +439,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 256;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(10, ROT_Z);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_DRAGON_BACK];
@@ -450,7 +450,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = DragonCollision;
 		obj->control = DragonControl;
 		obj->radius = 256;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];
@@ -472,7 +472,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 256;
 		obj->intelligent = true;
 		obj->LotType = LotType::SnowmobileGun;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SNOWMOBILE_DRIVER];
@@ -481,7 +481,7 @@ static void StartEntity(ObjectInfo* obj)
 		CheckIfSlotExists(ID_SNOWMOBILE_GUN, GetObjectName(ID_SNOWMOBILE_DRIVER));
 		obj->Initialize = InitializeSkidooMan;
 		obj->control = SkidooManControl;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 }
 
@@ -512,7 +512,7 @@ static void StartTrap(ObjectInfo* obj)
 		obj->Initialize = InitializeKillerStatue;
 		obj->control = KillerStatueControl;
 		obj->collision = ObjectCollision;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 }
 
@@ -527,7 +527,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->collision = SpeedboatPlayerCollision;
 		obj->control = SpeedboatControl;
 		obj->shadowType = ShadowMode::Lara;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	// TODO: Create a new renderer for the skidoo with animated track.
@@ -537,7 +537,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->Initialize = InitializeSkidoo;
 		obj->collision = SkidooPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 }
 

@@ -6,19 +6,18 @@
 
 Flow.SetIntroImagePath("Screens\\main.jpg")
 
--- This image should be used for static title screen background (as in TR1-TR3).
--- For now it is not implemented.
-
-Flow.SetTitleScreenImagePath("Screens\\main.jpg")
-
 -- Set overall amount of secrets in game.
 -- If set to 0, secrets won't be displayed in statistics.
 
 Flow.SetTotalSecretCount(5)
 
--- Enable/Disable bilinear filtering.
+-- Enable/Disable Point Filter (square, unsmoothed pixels).
 
 Flow.EnablePointFilter(false)
+
+-- Enable/Disable saving and loading of savegames.
+
+Flow.EnableLoadSave(true)
 
 -- Disable/enable flycheat globally
 
@@ -44,7 +43,7 @@ title = Level.new()
 
 title.ambientTrack = "108"
 title.levelFile = "Data\\title.ten"
-title.scriptFile = "Scripts\\title.lua"
+title.scriptFile = "Scripts\\Levels\\title.lua"
 title.loadScreenFile = "Screens\\Main.png"
 
 Flow.AddLevel(title)
@@ -56,7 +55,7 @@ Flow.AddLevel(title)
 test = Level.new()
 
 test.nameKey = "level_test"
-test.scriptFile = "Scripts\\New_Level.lua"
+test.scriptFile = "Scripts\\Levels\\New_Level.lua"
 test.ambientTrack = "108"
 test.levelFile = "Data\\TestLevel.ten"
 test.loadScreenFile = "Screens\\rome.jpg"

@@ -8,7 +8,7 @@ Fog
 @pragma nostrip
 */
  
-void Fog::Register(sol::table & parent)
+void Fog::Register(sol::table& parent)
 {
 	using ctors = sol::constructors<Fog(ScriptColor const&, short, short)>;
 	parent.new_usertype<Fog>("Fog",

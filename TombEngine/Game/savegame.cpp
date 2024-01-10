@@ -6,10 +6,10 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
+#include "Game/control/event.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
-#include "Game/control/volumeactivator.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -34,6 +34,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include "Renderer/Renderer.h"
 
 using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
@@ -42,10 +43,14 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
+using namespace TEN::Gui;
+using namespace TEN::Renderer;
 
 namespace Save = TEN::Save;
 
-const std::string SAVEGAME_PATH = "Save//";
+constexpr auto SAVEGAME_MAX_SLOT  = 99;
+constexpr auto SAVEGAME_PATH	  = "Save//";
+constexpr auto SAVEGAME_FILE_MASK = "savegame.";
 
 GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
@@ -62,21 +67,20 @@ void SaveGame::LoadSavegameInfos()
 	if (!std::filesystem::is_directory(FullSaveDirectory))
 		return;
 
+	// Reset overall savegame count.
+	LastSaveGame = 0;
+
 	// Try loading savegame.
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 	{
-		auto fileName = FullSaveDirectory + "savegame." + std::to_string(i);
-		auto savegamePtr = fopen(fileName.c_str(), "rb");
-
-		if (savegamePtr == nullptr)
+		if (!DoesSaveGameExist(i, true))
 			continue;
-
-		fclose(savegamePtr);
 
 		SavegameInfos[i].Present = true;
 		SaveGame::LoadHeader(i, &SavegameInfos[i]);
 
-		fclose(savegamePtr);
+		if (SavegameInfos[i].Count > LastSaveGame)
+			LastSaveGame = SavegameInfos[i].Count;
 	}
 }
 
@@ -163,6 +167,35 @@ Vector4 ToVector4(const Save::Vector4* vec)
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
+bool SaveGame::IsSaveGameSlotValid(int slot)
+{
+	if (slot < 0 || slot > SAVEGAME_MAX_SLOT)
+	{
+		TENLog("Attempted to access invalid savegame slot " + std::to_string(slot), LogLevel::Warning);
+		return false;
+	}
+
+	return true;
+}
+
+bool SaveGame::DoesSaveGameExist(int slot, bool silent)
+{
+	if (!std::filesystem::is_regular_file(GetSavegameFilename(slot)))
+	{
+		if (!silent)
+			TENLog("Attempted to access missing savegame slot " + std::to_string(slot), LogLevel::Warning);
+
+		return false;
+	}
+
+	return true;
+}
+
+std::string SaveGame::GetSavegameFilename(int slot)
+{
+	return (FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot));
+}
+
 #define SaveVec(Type, Data, TableBuilder, UnionType, SaveType, ConversionFunc) \
 				auto data = std::get<(int)Type>(Data); \
 				TableBuilder vtb{ fbb }; \
@@ -178,7 +211,16 @@ void SaveGame::Init(const std::string& gameDirectory)
 
 bool SaveGame::Save(int slot)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	g_GameScript->OnSave();
+	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
+
+	// Savegame infos need to be reloaded so that last savegame counter properly increases.
+	SaveGame::LoadSavegameInfos();
+
+	auto fileName = GetSavegameFilename(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	ItemInfo itemToSerialize{};
@@ -427,10 +469,10 @@ bool SaveGame::Save(int slot)
 	control.add_count(countOffset);
 	control.add_hand_status((int)Lara.Control.HandStatus);
 	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
-	control.add_is_locked(Lara.Control.Locked);
+	control.add_is_locked(Lara.Control.IsLocked);
 	control.add_is_low(Lara.Control.IsLow);
 	control.add_is_moving(Lara.Control.IsMoving);
-	control.add_is_run_jump_queued(Lara.Control.RunJumpQueued);
+	control.add_is_run_jump_queued(Lara.Control.IsRunJumpQueued);
 	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_keep_low(Lara.Control.KeepLow);
 	control.add_look(lookControlOffset);
@@ -547,6 +589,7 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::Minecart> mineOffset;
 		flatbuffers::Offset<Save::UPV> upvOffset;
 		flatbuffers::Offset<Save::Kayak> kayakOffset;
+		flatbuffers::Offset<Save::Pushable> pushableOffset;
 
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
@@ -667,6 +710,44 @@ bool SaveGame::Save(int slot)
 			kayakBuilder.add_water_height(kayak->WaterHeight);
 			kayakOffset = kayakBuilder.Finish();
 		}
+		else if (itemToSerialize.Data.is<PushableInfo>())
+		{
+			auto pushable = (PushableInfo*)itemToSerialize.Data;
+
+			Save::PushableBuilder pushableBuilder{ fbb };
+
+			pushableBuilder.add_pushable_behaviour_state((int)pushable->BehaviorState);
+			pushableBuilder.add_pushable_gravity(pushable->Gravity);
+			pushableBuilder.add_pushable_water_force(pushable->Oscillation);
+
+			pushableBuilder.add_pushable_stack_limit(pushable->Stack.Limit);
+			pushableBuilder.add_pushable_stack_upper(pushable->Stack.ItemNumberAbove);
+			pushableBuilder.add_pushable_stack_lower(pushable->Stack.ItemNumberBelow);
+
+			pushableBuilder.add_pushable_start_x(pushable->StartPos.x);
+			pushableBuilder.add_pushable_start_z(pushable->StartPos.z);
+			pushableBuilder.add_pushable_room_number(pushable->StartPos.RoomNumber);
+
+			pushableBuilder.add_pushable_collider_flag(pushable->UseBridgeCollision);
+
+			pushableBuilder.add_pushable_north_pullable(pushable->EdgeAttribs[0].IsPullable);
+			pushableBuilder.add_pushable_north_pushable(pushable->EdgeAttribs[0].IsPushable);
+			pushableBuilder.add_pushable_north_climbable(pushable->EdgeAttribs[0].IsClimbable);
+
+			pushableBuilder.add_pushable_east_pullable(pushable->EdgeAttribs[1].IsPullable);
+			pushableBuilder.add_pushable_east_pushable(pushable->EdgeAttribs[1].IsPushable);
+			pushableBuilder.add_pushable_east_climbable(pushable->EdgeAttribs[1].IsClimbable);
+
+			pushableBuilder.add_pushable_south_pullable(pushable->EdgeAttribs[2].IsPullable);
+			pushableBuilder.add_pushable_south_pushable(pushable->EdgeAttribs[2].IsPushable);
+			pushableBuilder.add_pushable_south_climbable(pushable->EdgeAttribs[2].IsClimbable);
+
+			pushableBuilder.add_pushable_west_pullable(pushable->EdgeAttribs[3].IsPullable);
+			pushableBuilder.add_pushable_west_pushable(pushable->EdgeAttribs[3].IsPushable);
+			pushableBuilder.add_pushable_west_climbable(pushable->EdgeAttribs[3].IsClimbable);
+
+			pushableOffset = pushableBuilder.Finish();
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			Save::ShortBuilder sb{ fbb };
@@ -749,6 +830,11 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data_type(Save::ItemData::Kayak);
 			serializedItem.add_data(kayakOffset.Union());
 		}
+		else if (itemToSerialize.Data.is<PushableInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Pushable);
+			serializedItem.add_data(pushableOffset.Union());
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Short);
@@ -798,21 +884,6 @@ bool SaveGame::Save(int slot)
 		serializedEffects.push_back(serializedEffectOffset);
 	}
 	auto serializedEffectsOffset = fbb.CreateVector(serializedEffects);
-
-	// Event set call counters
-	std::vector<flatbuffers::Offset<Save::EventSetCallCounters>> serializedEventSetCallCounters{};
-	for (auto& set : g_Level.EventSets)
-	{
-		Save::EventSetCallCountersBuilder serializedEventSetCallCounter{ fbb };
-
-		serializedEventSetCallCounter.add_on_enter(set.OnEnter.CallCounter);
-		serializedEventSetCallCounter.add_on_inside(set.OnInside.CallCounter);
-		serializedEventSetCallCounter.add_on_leave(set.OnLeave.CallCounter);
-
-		auto serializedEventSetCallCounterOffset = serializedEventSetCallCounter.Finish();
-		serializedEventSetCallCounters.push_back(serializedEventSetCallCounterOffset);
-	}
-	auto serializedEventSetCallCountersOffset = fbb.CreateVector(serializedEventSetCallCounters);
 
 	// Soundtrack playheads
 	std::vector<flatbuffers::Offset<Save::Soundtrack>> soundtracks;
@@ -951,6 +1022,46 @@ bool SaveGame::Save(int slot)
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
 	auto volumesOffset = fbb.CreateVector(volumes);
 
+	// Global event sets
+	std::vector<flatbuffers::Offset<Save::EventSet>> globalEventSets{};
+	for (int j = 0; j < g_Level.GlobalEventSets.size(); j++)
+	{
+		std::vector<int> callCounters = {};
+
+		for (int k = 0; k < g_Level.GlobalEventSets[j].Events.size(); k++)
+			callCounters.push_back(g_Level.GlobalEventSets[j].Events[k].CallCounter);
+
+		auto vec = fbb.CreateVector(callCounters);
+
+		Save::EventSetBuilder eventSet{ fbb };
+
+		eventSet.add_index(j);
+		eventSet.add_call_counters(vec);
+
+		globalEventSets.push_back(eventSet.Finish());
+	}
+	auto globalEventSetsOffset = fbb.CreateVector(globalEventSets);
+
+	// Volume event sets
+	std::vector<flatbuffers::Offset<Save::EventSet>> volumeEventSets{};
+	for (int j = 0; j < g_Level.VolumeEventSets.size(); j++)
+	{
+		std::vector<int> callCounters = {};
+
+		for (int k = 0; k < g_Level.VolumeEventSets[j].Events.size(); k++)
+			callCounters.push_back(g_Level.VolumeEventSets[j].Events[k].CallCounter);
+
+		auto vec = fbb.CreateVector(callCounters);
+
+		Save::EventSetBuilder eventSet{ fbb };
+
+		eventSet.add_index(j);
+		eventSet.add_call_counters(vec);
+
+		volumeEventSets.push_back(eventSet.Finish());
+	}
+	auto volumeEventSetsOffset = fbb.CreateVector(volumeEventSets);
+
 	// Particles
 	std::vector<flatbuffers::Offset<Save::ParticleInfo>> particles;
 	for (int i = 0; i < MAX_PARTICLES; i++)
@@ -992,7 +1103,7 @@ bool SaveGame::Save(int slot)
 		particleInfo.add_s_life(particle->sLife);
 		particleInfo.add_s_r(particle->sR);
 		particleInfo.add_s_size(particle->sSize);
-		particleInfo.add_blend_mode(particle->blendMode);
+		particleInfo.add_blend_mode((int)particle->blendMode);
 		particleInfo.add_x(particle->x);
 		particleInfo.add_x_vel(particle->sSize);
 		particleInfo.add_y(particle->y);
@@ -1207,7 +1318,7 @@ bool SaveGame::Save(int slot)
 				
 			case SavedVarType::Vec3:
 				{
-					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3i);
+					SaveVec(SavedVarType::Vec3, s, Save::vec3TableBuilder, Save::VarUnion::vec3, Save::Vector3, FromVector3);
 					break;
 				}
 
@@ -1247,8 +1358,8 @@ bool SaveGame::Save(int slot)
 	std::vector<std::string> callbackVecPreLoad;
 	std::vector<std::string> callbackVecPostLoad;
 
-	std::vector<std::string> callbackVecPreControl;
-	std::vector<std::string> callbackVecPostControl;
+	std::vector<std::string> callbackVecPreLoop;
+	std::vector<std::string> callbackVecPostLoop;
 
 	g_GameScript->GetCallbackStrings(
 		callbackVecPreStart,
@@ -1259,8 +1370,8 @@ bool SaveGame::Save(int slot)
 		callbackVecPostSave,
 		callbackVecPreLoad,
 		callbackVecPostLoad,
-		callbackVecPreControl,
-		callbackVecPostControl);
+		callbackVecPreLoop,
+		callbackVecPostLoop);
 
 	auto stringsCallbackPreStart = fbb.CreateVectorOfStrings(callbackVecPreStart);
 	auto stringsCallbackPostStart = fbb.CreateVectorOfStrings(callbackVecPostStart);
@@ -1270,8 +1381,8 @@ bool SaveGame::Save(int slot)
 	auto stringsCallbackPostSave = fbb.CreateVectorOfStrings(callbackVecPostSave);
 	auto stringsCallbackPreLoad = fbb.CreateVectorOfStrings(callbackVecPreLoad);
 	auto stringsCallbackPostLoad = fbb.CreateVectorOfStrings(callbackVecPostLoad);
-	auto stringsCallbackPreControl = fbb.CreateVectorOfStrings(callbackVecPreControl);
-	auto stringsCallbackPostControl = fbb.CreateVectorOfStrings(callbackVecPostControl);
+	auto stringsCallbackPreLoop = fbb.CreateVectorOfStrings(callbackVecPreLoop);
+	auto stringsCallbackPostLoop = fbb.CreateVectorOfStrings(callbackVecPostLoop);
 
 	Save::SaveGameBuilder sgb{ fbb };
 
@@ -1286,6 +1397,9 @@ bool SaveGame::Save(int slot)
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
 	sgb.add_next_fx_active(NextFxActive);
+	sgb.add_postprocess_mode((int)g_Renderer.GetPostProcessMode());
+	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
+	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
@@ -1306,7 +1420,8 @@ bool SaveGame::Save(int slot)
 	sgb.add_scarabs(scarabsOffset);
 	sgb.add_sinks(sinksOffset);
 	sgb.add_flyby_cameras(flybyCamerasOffset);
-	sgb.add_call_counters(serializedEventSetCallCountersOffset);
+	sgb.add_global_event_sets(globalEventSetsOffset);
+	sgb.add_volume_event_sets(volumeEventSetsOffset);
 
 	if (Lara.Control.Rope.Ptr != -1)
 	{
@@ -1329,8 +1444,8 @@ bool SaveGame::Save(int slot)
 	sgb.add_callbacks_pre_load(stringsCallbackPreLoad);
 	sgb.add_callbacks_post_load(stringsCallbackPostLoad);
 
-	sgb.add_callbacks_pre_control(stringsCallbackPreControl);
-	sgb.add_callbacks_post_control(stringsCallbackPostControl);
+	sgb.add_callbacks_pre_loop(stringsCallbackPreLoop);
+	sgb.add_callbacks_post_loop(stringsCallbackPostLoop);
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -1351,7 +1466,13 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	if (!DoesSaveGameExist(slot))
+		return false;
+
+	auto fileName = GetSavegameFilename(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
 	std::ifstream file;
@@ -1366,7 +1487,6 @@ bool SaveGame::Load(int slot)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
 	// Statistics
-	LastSaveGame = s->header()->count();
 	GameTimer = s->header()->timer();
 
 	Statistics.Game.AmmoHits = s->game()->ammo_hits();
@@ -1472,6 +1592,11 @@ bool SaveGame::Load(int slot)
 		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
 	}
 
+	// Restore postprocess effects
+	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
+	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
+	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
+
 	// Restore soundtracks
 	for (int i = 0; i < s->soundtracks()->size(); i++)
 	{
@@ -1555,8 +1680,8 @@ bool SaveGame::Load(int slot)
 		{
 			LaraItem->Data = nullptr;
 			LaraItem = item;
-			LaraItem->Location.roomNumber = savedItem->room_number();
-			LaraItem->Location.yNumber = item->Pose.Position.y;
+			LaraItem->Location.RoomNumber = savedItem->room_number();
+			LaraItem->Location.Height = item->Pose.Position.y;
 			LaraItem->Data = &Lara;
 		}
 
@@ -1622,8 +1747,8 @@ bool SaveGame::Load(int slot)
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
 		}
 
-		if (obj->floor != nullptr)
-			UpdateBridgeItem(i);
+		if (item->IsBridge())
+			UpdateBridgeItem(g_Level.Items[i]);
 
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
@@ -1739,6 +1864,41 @@ bool SaveGame::Load(int slot)
 			kayak->Velocity = savedKayak->velocity();
 			kayak->WaterHeight = savedKayak->water_height();
 		}
+		else if (item->Data.is <PushableInfo>())
+		{
+			auto* pushable = (PushableInfo*)item->Data;
+			auto* savedPushable = (Save::Pushable*)savedItem->data();
+
+			pushable->BehaviorState = (PushableBehaviourState)savedPushable->pushable_behaviour_state();
+			pushable->Gravity = savedPushable->pushable_gravity();
+			pushable->Oscillation = savedPushable->pushable_water_force();
+
+			pushable->Stack.Limit = savedPushable->pushable_stack_limit();
+			pushable->Stack.ItemNumberAbove = savedPushable->pushable_stack_upper();
+			pushable->Stack.ItemNumberBelow = savedPushable->pushable_stack_lower();
+
+			pushable->StartPos.x = savedPushable->pushable_start_x();
+			pushable->StartPos.z = savedPushable->pushable_start_z();
+			pushable->StartPos.RoomNumber = savedPushable->pushable_room_number();
+
+			pushable->UseBridgeCollision = savedPushable->pushable_collider_flag();
+
+			pushable->EdgeAttribs[0].IsPullable = savedPushable->pushable_north_pullable();
+			pushable->EdgeAttribs[0].IsPushable = savedPushable->pushable_north_pushable();
+			pushable->EdgeAttribs[0].IsClimbable = savedPushable->pushable_north_climbable();
+
+			pushable->EdgeAttribs[1].IsPullable = savedPushable->pushable_east_pullable();
+			pushable->EdgeAttribs[1].IsPushable = savedPushable->pushable_east_pushable();
+			pushable->EdgeAttribs[1].IsClimbable = savedPushable->pushable_east_climbable();
+
+			pushable->EdgeAttribs[2].IsPullable = savedPushable->pushable_south_pullable();
+			pushable->EdgeAttribs[2].IsPushable = savedPushable->pushable_south_pushable();
+			pushable->EdgeAttribs[2].IsClimbable = savedPushable->pushable_south_climbable();
+
+			pushable->EdgeAttribs[3].IsPullable = savedPushable->pushable_west_pullable();
+			pushable->EdgeAttribs[3].IsPushable = savedPushable->pushable_west_pushable();
+			pushable->EdgeAttribs[3].IsClimbable = savedPushable->pushable_west_climbable();
+		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
 			auto* data = savedItem->data();
@@ -1789,7 +1949,7 @@ bool SaveGame::Load(int slot)
 		particle->fadeToBlack = particleInfo->fade_to_black();
 		particle->sLife = particleInfo->s_life();
 		particle->life = particleInfo->life();
-		particle->blendMode = (BLEND_MODES)particleInfo->blend_mode();
+		particle->blendMode = (BlendMode)particleInfo->blend_mode();
 		particle->extras = particleInfo->extras();
 		particle->dynamic = particleInfo->dynamic();
 		particle->fxObj = particleInfo->fx_obj();
@@ -1862,15 +2022,23 @@ bool SaveGame::Load(int slot)
 		fx.flag2 = fx_saved->flag2();
 	}
 
-	if (g_Level.EventSets.size() == s->call_counters()->size())
+	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
 	{
-		for (int i = 0; i < s->call_counters()->size(); ++i)
+		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
 		{
-			auto cc_saved = s->call_counters()->Get(i);
+			auto set_saved = s->volume_event_sets()->Get(i);
+			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
+				g_Level.VolumeEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
+		}
+	}
 
-			g_Level.EventSets[i].OnEnter.CallCounter = cc_saved->on_enter();
-			g_Level.EventSets[i].OnInside.CallCounter = cc_saved->on_inside();
-			g_Level.EventSets[i].OnLeave.CallCounter = cc_saved->on_leave();
+	if (g_Level.GlobalEventSets.size() == s->global_event_sets()->size())
+	{
+		for (int i = 0; i < s->global_event_sets()->size(); ++i)
+		{
+			auto set_saved = s->global_event_sets()->Get(i);
+			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
+				g_Level.GlobalEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
 		}
 	}
 
@@ -1945,9 +2113,9 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Look.Orientation = ToEulerAngles(s->lara()->control()->look()->orientation());
 	Lara.Control.Look.TurnRate = ToEulerAngles(s->lara()->control()->look()->turn_rate());
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
-	Lara.Control.RunJumpQueued = s->lara()->control()->is_run_jump_queued();
+	Lara.Control.IsRunJumpQueued = s->lara()->control()->is_run_jump_queued();
 	Lara.Control.TurnRate = s->lara()->control()->turn_rate();
-	Lara.Control.Locked = s->lara()->control()->is_locked();
+	Lara.Control.IsLocked = s->lara()->control()->is_locked();
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
 	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();
 	Lara.Control.Weapon.HasFired = s->lara()->control()->weapon()->has_fired();
@@ -2133,7 +2301,7 @@ bool SaveGame::Load(int slot)
 				{
 					auto stored = var->u_as_vec3()->vec();
 					SavedVar var;
-					var.emplace<(int)SavedVarType::Vec3>(ToVector3i(stored));
+					var.emplace<(int)SavedVarType::Vec3>(ToVector3(stored));
 					loadedVars.push_back(var);
 					break;
 				}
@@ -2186,8 +2354,8 @@ bool SaveGame::Load(int slot)
 	auto callbacksPreLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_load);
 	auto callbacksPostLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_load);
 
-	auto callbacksPreControlVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_control);
-	auto callbacksPostControlVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_control);
+	auto callbacksPreLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_loop);
+	auto callbacksPostLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_loop);
 
 	g_GameScript->SetCallbackStrings(
 		callbacksPreStartVec,
@@ -2198,15 +2366,21 @@ bool SaveGame::Load(int slot)
 		callbacksPostSaveVec,
 		callbacksPreLoadVec,
 		callbacksPostLoadVec,
-		callbacksPreControlVec,
-		callbacksPostControlVec);
+		callbacksPreLoopVec,
+		callbacksPostLoopVec);
 
 	return true;
 }
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 {
-	auto fileName = FullSaveDirectory + "savegame." + std::to_string(slot);
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	if (!DoesSaveGameExist(slot))
+		return false;
+
+	auto fileName = GetSavegameFilename(slot);
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
@@ -2230,4 +2404,15 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 	header->Count = s->header()->count();
 
 	return true;
+}
+
+void SaveGame::Delete(int slot)
+{
+	if (!IsSaveGameSlotValid(slot))
+		return;
+
+	if (!DoesSaveGameExist(slot))
+		return;
+
+	std::filesystem::remove(GetSavegameFilename(slot));
 }

@@ -360,9 +360,9 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 
 void PuzzleHole(ItemInfo* item, short itemNumber)
 {
-	// Display pickup object. TODO: Get offset.
 	auto objectID = GAME_OBJECT_ID(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_ITEM1));
-	g_Hud.PickupSummary.AddDisplayPickup(objectID, item->Pose.Position.ToVector3());
+	PickedUpObject(objectID);
+	g_Hud.PickupSummary.AddDisplayPickup(objectID, item->Pose.Position.ToVector3()); // TODO: Get appealing position offset.
 
 	item->ItemFlags[1] = true;
 
@@ -483,13 +483,14 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 			if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
 			{
-				if (triggerType != TRIGGER_TYPES::SWITCH)
-				{
-					RemoveObjectFromInventory(GAME_OBJECT_ID(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
-				}
-				else
-				{
+				if (triggerType = TRIGGER_TYPES::SWITCH)
 					keyHoleItem->ItemFlags[1] = true;
+
+				int animNumber = abs(keyHoleItem->TriggerFlags);
+				if (keyHoleItem->TriggerFlags <= 0)
+				{
+					auto objectID = GAME_OBJECT_ID(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
+					RemoveObjectFromInventory(objectID, 1);
 				}
 
 				if (keyHoleItem->TriggerFlags == 0)
@@ -498,7 +499,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				}
 				else
 				{
-					laraItem->Animation.AnimNumber = keyHoleItem->TriggerFlags;
+					laraItem->Animation.AnimNumber = animNumber;
 				}
 				
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;

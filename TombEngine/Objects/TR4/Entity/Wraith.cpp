@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 			spark.dB = dB;
 			spark.colFadeSpeed = 4;
 			spark.fadeToBlack = 7;
-			spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark.blendMode = BlendMode::Additive;
 			short life = (GetRandomControl() & 7) + 32;
 			spark.life = life;
 			spark.sLife = life;
@@ -171,10 +171,10 @@ namespace TEN::Entities::TR4
 		short inner = vel >= 0 ? 32 : 640;
 		short outer = vel >= 0 ? 160 : 512;
 
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(45.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(90.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles::Zero, 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(45.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(90.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 	}
 
 	void InitializeWraith(short itemNumber)
@@ -675,7 +675,7 @@ namespace TEN::Entities::TR4
 
 		spark.colFadeSpeed = 4;
 		spark.fadeToBlack = 7;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.blendMode = BlendMode::Additive;
 		unsigned char life = (GetRandomControl() & 7) + 12;
 		spark.life = life;
 		spark.sLife = life;

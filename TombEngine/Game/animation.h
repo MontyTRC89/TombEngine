@@ -98,7 +98,7 @@ struct BoneMutator
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
-bool HasStateDispatch(ItemInfo* item, int targetState = NO_STATE);
+bool HasStateDispatch(const ItemInfo* item, int targetState = NO_STATE);
 bool TestAnimNumber(const ItemInfo& item, int animNumber);
 bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
 bool TestAnimFrame(const ItemInfo& item, int frameStart);
@@ -127,6 +127,8 @@ const AnimFrame*	GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumb
 const AnimFrame*	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
 const AnimFrame*	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
 const AnimFrame&	GetBestFrame(const ItemInfo& item);
+
+float GetEffectiveGravity(float verticalVel);
 
 int GetAnimNumber(const ItemInfo& item);
 int GetAnimIndex(const ItemInfo& item, int animNumber);

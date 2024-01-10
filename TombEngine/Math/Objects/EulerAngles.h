@@ -17,7 +17,7 @@
 		// Constructors
 		constexpr EulerAngles() {};
 		constexpr EulerAngles(short x, short y, short z) { this->x = x; this->y = y; this->z = z; };
-				  EulerAngles(const Vector3& direction);
+				  EulerAngles(const Vector3& dir);
 				  EulerAngles(const AxisAngle& axisAngle);
 				  EulerAngles(const Quaternion& quat);
 				  EulerAngles(const Matrix& rotMatrix);
@@ -44,13 +44,13 @@
 		EulerAngles& operator +=(const EulerAngles& eulers);
 		EulerAngles& operator -=(const EulerAngles& eulers);
 		EulerAngles& operator *=(const EulerAngles& eulers);
-		EulerAngles& operator *=(float scale);
-		EulerAngles& operator /=(float scale);
+		EulerAngles& operator *=(float scalar);
+		EulerAngles& operator /=(float scalar);
 		EulerAngles	 operator +(const EulerAngles& eulers) const;
 		EulerAngles	 operator -(const EulerAngles& eulers) const;
 		EulerAngles	 operator *(const EulerAngles& eulers) const;
-		EulerAngles	 operator *(float scale) const;
-		EulerAngles	 operator /(float scale) const;
+		EulerAngles	 operator *(float scalar) const;
+		EulerAngles	 operator /(float scalar) const;
 	
 	private:
 		// Temporary. Will be integrated into eventual Angle class.

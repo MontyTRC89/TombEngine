@@ -148,7 +148,7 @@ void Static::SetSolid(bool yes)
 
 Vec3 Static::GetPos() const
 {
-	return Vec3{ m_mesh.pos.Position.x, m_mesh.pos.Position.y, m_mesh.pos.Position.z };
+	return Vec3(m_mesh.pos.Position.x, m_mesh.pos.Position.y, m_mesh.pos.Position.z);
 }
 
 void Static::SetPos(Vec3 const& pos)
@@ -189,6 +189,7 @@ void Static::SetRot(Rotation const& rot)
 	m_mesh.pos.Orientation.x = ANGLE(rot.x);
 	m_mesh.pos.Orientation.y = ANGLE(rot.y);
 	m_mesh.pos.Orientation.z = ANGLE(rot.z);
+	m_mesh.Dirty = true;
 }
 
 std::string Static::GetName() const

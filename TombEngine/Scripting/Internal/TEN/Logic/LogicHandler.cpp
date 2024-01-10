@@ -3,17 +3,19 @@
 
 #include <filesystem>
 
-#include "Game/savegame.h"
+#include "Game/control/volume.h"
 #include "Game/effects/Electricity.h"
+#include "Game/Lara/lara.h"
+#include "Game/savegame.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 using namespace TEN::Effects::Electricity;
 
@@ -29,26 +31,41 @@ enum class CallbackPoint
 	PostStart,
 	PreLoad,
 	PostLoad,
-	PreControl,
-	PostControl,
+	PreLoop,
+	PostLoop,
 	PreSave,
 	PostSave,
 	PreEnd,
 	PostEnd
 };
 
-static const std::unordered_map<std::string, CallbackPoint> kCallbackPoints
+static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 {
 	{ ScriptReserved_PreStart, CallbackPoint::PreStart },
 	{ ScriptReserved_PostStart, CallbackPoint::PostStart },
 	{ ScriptReserved_PreLoad, CallbackPoint::PreLoad },
 	{ ScriptReserved_PostLoad, CallbackPoint::PostLoad },
-	{ ScriptReserved_PreControlPhase, CallbackPoint::PreControl },
-	{ ScriptReserved_PostControlPhase, CallbackPoint::PostControl },
+	{ ScriptReserved_PreLoop, CallbackPoint::PreLoop },
+	{ ScriptReserved_PostLoop, CallbackPoint::PostLoop },
+	{ ScriptReserved_PreControlPhase, CallbackPoint::PreLoop },    // DEPRECATED
+	{ ScriptReserved_PostControlPhase, CallbackPoint::PostLoop },  // DEPRECATED
+	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
 	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
 	{ ScriptReserved_PreSave, CallbackPoint::PreSave },
 	{ ScriptReserved_PreEnd, CallbackPoint::PreEnd },
 	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd }
+};
+
+static const std::unordered_map<std::string, EventType> EVENT_TYPES
+{
+	{ ScriptReserved_EventOnEnter, EventType::Enter },
+	{ ScriptReserved_EventOnInside, EventType::Inside },
+	{ ScriptReserved_EventOnLeave, EventType::Leave },
+	{ ScriptReserved_EventOnLoop, EventType::Loop },
+	{ ScriptReserved_EventOnLoad, EventType::Load },
+	{ ScriptReserved_EventOnSave, EventType::Save },
+	{ ScriptReserved_EventOnStart, EventType::Start },
+	{ ScriptReserved_EventOnEnd, EventType::End }
 };
 
 enum class LevelEndReason
@@ -60,7 +77,7 @@ enum class LevelEndReason
 	Other
 };
 
-static const std::unordered_map<std::string, LevelEndReason> kLevelEndReasons
+static const std::unordered_map<std::string, LevelEndReason> LEVEL_END_REASONS
 {
 	{ ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete },
 	{ ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame },
@@ -154,16 +171,20 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 
 	tableLogic.set_function(ScriptReserved_AddCallback, &LogicHandler::AddCallback, this);
 	tableLogic.set_function(ScriptReserved_RemoveCallback, &LogicHandler::RemoveCallback, this);
+	tableLogic.set_function(ScriptReserved_HandleEvent, &LogicHandler::HandleEvent, this);
+	tableLogic.set_function(ScriptReserved_EnableEvent, &LogicHandler::EnableEvent, this);
+	tableLogic.set_function(ScriptReserved_DisableEvent, &LogicHandler::DisableEvent, this);
 
-	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, kLevelEndReasons);
-	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, kCallbackPoints);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EndReason, LEVEL_END_REASONS);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_CallbackPoint, CALLBACK_POINTS);
+	m_handler.MakeReadOnlyTable(tableLogic, ScriptReserved_EventType, EVENT_TYPES);
 
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreStart, &m_callbacksPreStart));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostStart, &m_callbacksPostStart));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreLoad, &m_callbacksPreLoad));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostLoad, &m_callbacksPostLoad));
-	m_callbacks.insert(std::make_pair(CallbackPoint::PreControl, &m_callbacksPreControl));
-	m_callbacks.insert(std::make_pair(CallbackPoint::PostControl, &m_callbacksPostControl));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreLoop, &m_callbacksPreLoop));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostLoop, &m_callbacksPostLoop));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreSave, &m_callbacksPreSave));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostSave, &m_callbacksPostSave));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreEnd, &m_callbacksPreEnd));
@@ -188,7 +209,7 @@ This is intended for module/library developers who want their modules to do
 stuff during level start/load/end/save/control phase, but don't want the level
 designer to add calls to `OnStart`, `OnLoad`, etc. in their level script.
 
-Possible values for CallbackPoint:
+Possible values for `point`:
 	-- These take functions which accept no arguments
 	PRESTART -- will be called immediately before OnStart
 	POSTSTART -- will be called immediately after OnStart
@@ -204,20 +225,20 @@ Possible values for CallbackPoint:
 	POSTEND -- will be called immediately after OnEnd
 
 	-- These take functions which accepts a deltaTime argument
-	PRECONTROLPHASE -- will be called immediately before OnControlPhase
-	POSTCONTROLPHASE -- will be called immediately after OnControlPhase
+	PRELOOP -- will be called in the beginning of game loop
+	POSTLOOP -- will be called at the end of game loop
 
 The order in which two functions with the same CallbackPoint are called is undefined.
-i.e. if you register `MyFunc` and `MyFunc2` with `PRECONTROLPHASE`, both will be called before `OnControlPhase`, but there is no guarantee that `MyFunc` will be called before `MyFunc2`, or vice-versa.
+i.e. if you register `MyFunc` and `MyFunc2` with `PRELOOP`, both will be called in the beginning of game loop, but there is no guarantee that `MyFunc` will be called before `MyFunc2`, or vice-versa.
 
 Any returned value will be discarded.
 
 @function AddCallback
-@tparam point CallbackPoint When should the callback be called?
-@tparam function func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
+@tparam CallbackPoint point When should the callback be called?
+@tparam LevelFunc func The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.
 @usage
 	LevelFuncs.MyFunc = function(dt) print(dt) end
-	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
+	TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.MyFunc)
 */
 void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
@@ -243,10 +264,10 @@ void LogicHandler::AddCallback(CallbackPoint point, const LevelFunc& levelFunc)
 Will have no effect if the function was not registered as a callback
 
 @function RemoveCallback
-@tparam point CallbackPoint The callback point the function was registered with. See @{AddCallback}
-@tparam func LevelFunc the function to remove; must be in the LevelFuncs hierarchy.
+@tparam CallbackPoint point The callback point the function was registered with. See @{AddCallback}
+@tparam LevelFunc func The function to remove; must be in the LevelFuncs hierarchy.
 @usage
-	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)
+	TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.MyFunc)
 */
 void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFunc)
 {
@@ -258,6 +279,51 @@ void LogicHandler::RemoveCallback(CallbackPoint point, const LevelFunc& levelFun
 	}
 
 	it->second->erase(levelFunc.m_funcName);
+}
+
+/*** Attempt to find an event set and execute a particular event from it.
+@advancedDesc
+
+Possible event type values:
+	ENTER
+	INSIDE
+	LEAVE
+	LOAD
+	SAVE
+	START
+	END
+	LOOP
+
+@function HandleEvent
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to execute.
+@tparam Objects.Moveable activator Optional activator. Default is the player object.
+*/
+void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
+{
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)LaraItem->Index);
+}
+
+/*** Attempt to find an event set and enable specified event in it.
+
+@function EnableEvent
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to enable.
+*/
+void LogicHandler::EnableEvent(const std::string& name, EventType type)
+{
+	TEN::Control::Volumes::SetEventState(name, type, true);
+}
+
+/*** Attempt to find an event set and disable specified event in it.
+
+@function DisableEvent
+@tparam string name Name of the event set to find.
+@tparam EventType type Event to disable.
+*/
+void LogicHandler::DisableEvent(const std::string& name, EventType type)
+{
+	TEN::Control::Volumes::SetEventState(name, type, false);
 }
 
 void LogicHandler::ResetLevelTables()
@@ -388,7 +454,7 @@ void LogicHandler::FreeLevelScripts()
 	ResetLevelTables();
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
-	m_onControlPhase = sol::nil;
+	m_onLoop = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_handler.GetState()->collect_garbage();
@@ -441,13 +507,13 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 				}
 				else if (vars[second].index() == int(SavedVarType::Vec3))
 				{
-					auto vec2 = Vec3(std::get<int(SavedVarType::Vec3)>(vars[second]));
-					solTables[i][vars[first]] = vec2;
+					auto vec3 = Vec3(std::get<int(SavedVarType::Vec3)>(vars[second]));
+					solTables[i][vars[first]] = vec3;
 				}
 				else if (vars[second].index() == int(SavedVarType::Rotation))
 				{
-					auto vec2 = Rotation(std::get<int(SavedVarType::Rotation)>(vars[second]));
-					solTables[i][vars[first]] = vec2;
+					auto vec3 = Rotation(std::get<int(SavedVarType::Rotation)>(vars[second]));
+					solTables[i][vars[first]] = vec3;
 				}
 				else if (vars[second].index() == int(SavedVarType::Color))
 				{
@@ -480,7 +546,8 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
 }
 
-template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType> int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
+template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename MapType>
+int Handle(TypeFrom& var, MapType& varsMap, size_t& numVars, std::vector<SavedVar>& vars)
 {
 	auto [first, second] = varsMap.insert(std::make_pair(&var, (int)numVars));
 
@@ -489,7 +556,7 @@ template<SavedVarType TypeEnum, typename TypeTo, typename TypeFrom, typename Map
 		SavedVar savedVar;
 		TypeTo varTo = (TypeTo)var;
 		savedVar.emplace<(int)TypeEnum>(varTo);
-		vars.push_back(varTo);
+		vars.push_back(savedVar);
 		++numVars;
 	}
 
@@ -663,7 +730,7 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 					}
 					else if (second.is<Vec3>())
 					{
-						putInVars(Handle<SavedVarType::Vec3, Vector3i>(second.as<Vec3>(), varsMap, numVars, vars));
+						putInVars(Handle<SavedVarType::Vec3, Vector3>(second.as<Vec3>(), varsMap, numVars, vars));
 					}
 					else if (second.is<Rotation>())
 					{
@@ -707,8 +774,8 @@ void LogicHandler::GetCallbackStrings(
 	std::vector<std::string>& postSave,
 	std::vector<std::string>& preLoad,
 	std::vector<std::string>& postLoad,
-	std::vector<std::string>& preControl,
-	std::vector<std::string>& postControl) const
+	std::vector<std::string>& preLoop,
+	std::vector<std::string>& postLoop) const
 {
 	auto populateWith = [](std::vector<std::string>& dest, const std::unordered_set<std::string>& src)
 	{
@@ -728,8 +795,8 @@ void LogicHandler::GetCallbackStrings(
 	populateWith(preLoad, m_callbacksPreLoad);
 	populateWith(postLoad, m_callbacksPostLoad);
 
-	populateWith(preControl, m_callbacksPreControl);
-	populateWith(postControl, m_callbacksPostControl);
+	populateWith(preLoop, m_callbacksPreLoop);
+	populateWith(postLoop, m_callbacksPostLoop);
 }
 
 void LogicHandler::SetCallbackStrings(	
@@ -741,8 +808,8 @@ void LogicHandler::SetCallbackStrings(
 	const std::vector<std::string>& postSave,
 	const std::vector<std::string>& preLoad,
 	const std::vector<std::string>& postLoad,
-	const std::vector<std::string>& preControl,
-	const std::vector<std::string>& postControl)
+	const std::vector<std::string>& preLoop,
+	const std::vector<std::string>& postLoop)
 {
 	auto populateWith = [](std::unordered_set<std::string>& dest, const std::vector<std::string>& src)
 	{
@@ -762,8 +829,8 @@ void LogicHandler::SetCallbackStrings(
 	populateWith(m_callbacksPreLoad, preLoad);
 	populateWith(m_callbacksPostLoad, postLoad);
 
-	populateWith(m_callbacksPreControl, preControl);
-	populateWith(m_callbacksPostControl, postControl);
+	populateWith(m_callbacksPreLoop, preLoop);
+	populateWith(m_callbacksPostLoop, postLoop);
 }
 
 template <typename R, char const * S, typename mapType>
@@ -831,7 +898,7 @@ void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short i
 	func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
 }
 
-void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::VolumeActivator activator, const std::string& arguments)
+void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::Activator activator, const std::string& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
 	if (std::holds_alternative<short>(activator))
@@ -869,17 +936,22 @@ void LogicHandler::OnLoad()
 		CallLevelFuncByName(name);
 }
 
-void LogicHandler::OnControlPhase(float deltaTime)
+void LogicHandler::OnLoop(float deltaTime, bool postLoop)
 {
-	for (auto& name : m_callbacksPreControl)
-		CallLevelFuncByName(name, deltaTime);
+	if (!postLoop)
+	{
+		for (auto& name : m_callbacksPreLoop)
+			CallLevelFuncByName(name, deltaTime);
 
-	lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
-	if (m_onControlPhase.valid())
-		CallLevelFunc(m_onControlPhase, deltaTime);
-
-	for (auto& name : m_callbacksPostControl)
-		CallLevelFuncByName(name, deltaTime);
+		lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
+		if (m_onLoop.valid())
+			CallLevelFunc(m_onLoop, deltaTime);
+	}
+	else
+	{
+		for (auto& name : m_callbacksPostLoop)
+			CallLevelFuncByName(name, deltaTime);
+	}
 }
 
 void LogicHandler::OnSave()
@@ -1020,11 +1092,11 @@ __The order of loading is as follows:__
 2. The level script itself is run (i.e. any code you put outside the `LevelFuncs` callbacks is executed).
 3. Save data is loaded, if saving from a saved game (will empty `LevelVars` and `GameVars` and repopulate them with what they contained when the game was saved).
 4. If loading from a save, `OnLoaded` will be called. Otherwise, `OnStart` will be called.
-5. The control loop, in which `OnControlPhase` will be called once per frame, begins.
+5. The control loop, in which `OnLoop` will be called once per frame, begins.
 
 @tfield function OnStart Will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
 @tfield function OnLoad Will be called when a saved game is loaded, just *after* data is loaded
-@tfield function(float) OnControlPhase Will be called during the game's update loop,
+@tfield function(float) OnLoop Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
 @tfield function OnSave Will be called when the player saves the game, just *before* data is saved
 @tfield function OnEnd(EndReason) Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an `EndReason` arg:
@@ -1053,25 +1125,21 @@ void LogicHandler::InitCallbacks()
 
 		sol::object theData = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
-		std::string msg{ "Level's script does not define callback " + fullName + ". Defaulting to no " + fullName + " behaviour." };
-
 		if (!theData.valid())
-		{
-			TENLog(msg);
 			return;
-		}
 
 		LevelFunc fnh = (*state)[ScriptReserved_LevelFuncs][luaFunc];
 
 		func = m_levelFuncs_luaFunctions[fnh.m_funcName];
 
 		if (!func.valid())
-			TENLog(msg);
+			TENLog("Level's script does not define callback " + fullName + ". Defaulting to no " + fullName + " behaviour.");
 	};
 
 	assignCB(m_onStart, ScriptReserved_OnStart);
 	assignCB(m_onLoad, ScriptReserved_OnLoad);
-	assignCB(m_onControlPhase, ScriptReserved_OnControlPhase);
+	assignCB(m_onLoop, ScriptReserved_OnControlPhase);
+	assignCB(m_onLoop, ScriptReserved_OnLoop);
 	assignCB(m_onSave, ScriptReserved_OnSave);
 	assignCB(m_onEnd, ScriptReserved_OnEnd);
 }

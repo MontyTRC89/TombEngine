@@ -13,6 +13,7 @@
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
+#include "Objects/TR3/Entity/TwinAutoGun.h"
 #include "Objects/TR3/Entity/WaspMutant.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
@@ -70,7 +71,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->nonLot = true; // NOTE: Doesn't move to reach the player, only throws projectiles.
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_TIGER];
@@ -85,7 +86,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 340;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(21, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_COBRA];
@@ -101,7 +102,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->nonLot = true;
 		obj->SetBoneRotationFlags(0, ROT_Y);
 		obj->SetBoneRotationFlags(6, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_RAPTOR];
@@ -119,7 +120,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotationFlags(21, ROT_Y);
 		obj->SetBoneRotationFlags(23, ROT_Y);
 		obj->SetBoneRotationFlags(25, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_TRIBESMAN_WITH_AX];
@@ -135,7 +136,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_TRIBESMAN_WITH_DARTS];
@@ -151,7 +152,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(6, ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_TYRANNOSAUR];
@@ -168,7 +169,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_Y);
 		obj->SetBoneRotationFlags(11, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SCUBA_DIVER];
@@ -186,7 +187,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Water;
 		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(14, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SCUBA_HARPOON];
@@ -209,7 +210,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MONKEY];
@@ -227,7 +228,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MP_WITH_GUN];
@@ -243,7 +244,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_MP_WITH_STICK];
@@ -260,7 +261,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SHIVA];
@@ -279,7 +280,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(25, ROT_X | ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_SOPHIA_LEIGH_BOSS];
@@ -296,7 +297,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_CIVVY];
@@ -313,7 +314,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_LIZARD];
@@ -329,7 +330,21 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(9, ROT_X | ROT_Z);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
+	}
+
+	obj = &Objects[ID_TWIN_AUTO_GUN];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeTwinAutoGun;
+		obj->control = ControlTwinAutoGun;
+		obj->collision = CreatureCollision;
+		obj->HitRoutine = HitTwinAutoGun;
+		obj->HitPoints = 28;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(0, ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_PUNA_BOSS];
@@ -347,7 +362,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->SetBoneRotationFlags(4, ROT_Y);		 // Puna quest object.
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 	
 	obj = &Objects[ID_WASP_MUTANT];
@@ -362,7 +377,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 102;
 		obj->pivotLength = 0;
 		obj->LotType = LotType::Flyer;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 	
 	obj = &Objects[ID_COMPSOGNATHUS];
@@ -377,7 +392,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 204;
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(1, ROT_X | ROT_Z);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 
 	obj = &Objects[ID_CLAW_MUTANT];
@@ -393,7 +408,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->SetBoneRotationFlags(0, ROT_X | ROT_Z);
 		obj->SetBoneRotationFlags(7, ROT_Y);
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 }
 
@@ -436,7 +451,7 @@ static void StartObject(ObjectInfo* obj)
 		obj->HitRoutine = CorpseHit;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->shadowType = ShadowMode::None;
-		obj->SetupHitEffect();
+		obj->SetHitEffect();
 	}
 }
 
@@ -447,15 +462,15 @@ static void StartTrap(ObjectInfo* obj)
 	{
 		obj->control = TrainControl;
 		obj->collision = TrainCollision;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_ELECTRIC_CLEANER];
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeElectricCleaner;
-		obj->control = ElectricCleanerControl;
-		obj->collision = ElectricCleanerCollision;
+		obj->control = ControlElectricCleaner;
+		obj->collision = CollideElectricCleaner;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->nonLot = 1;
@@ -479,7 +494,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->Initialize = InitializeQuadBike;
 		obj->collision = QuadBikePlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_RUBBER_BOAT];
@@ -490,7 +505,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->collision = RubberBoatPlayerCollision;
 		obj->drawRoutine = DrawRubberBoat;
 		obj->shadowType = ShadowMode::Lara;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 
 	}
 
@@ -500,7 +515,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->Initialize = InitializeKayak;
 		obj->collision = KayakPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 
 	}
 
@@ -510,7 +525,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->Initialize = InitializeMinecart;
 		obj->collision = MinecartPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 
 	}
 
@@ -520,7 +535,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->Initialize = BigGunInitialize;
 		obj->collision = BigGunCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_UPV];
@@ -530,7 +545,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->control = UPVEffects;
 		obj->collision = UPVPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;
-		obj->SetupHitEffect(true);
+		obj->SetHitEffect(true);
 	}
 }
 

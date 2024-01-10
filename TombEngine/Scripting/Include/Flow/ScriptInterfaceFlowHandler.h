@@ -1,23 +1,26 @@
 #pragma once
-
-enum class TITLE_TYPE
-{
-	FLYBY,
-	BACKGROUND
-};
+#include "Game/control/control.h"
 
 class ScriptInterfaceLevel;
+
+enum class TitleType
+{
+	Flyby,
+	Background
+};
 
 class ScriptInterfaceFlowHandler
 {
 public:
-	std::string	IntroImagePath{};
-	int	SelectedLevelForNewGame{ 0 };
-	int SelectedSaveGame{ 0 };
-	bool EnableLoadSave{ true };
-	int TotalNumberOfSecrets{ 0 };
-	std::string	TitleScreenImagePath{};
-	TITLE_TYPE TitleType{ TITLE_TYPE::FLYBY };
+	GameStatus	LastGameStatus		 = GameStatus::Normal;
+	TitleType	TitleType			 = TitleType::Flyby;
+	std::string	IntroImagePath		 = {};
+	std::string	TitleScreenImagePath = {};
+
+	int	 SelectedLevelForNewGame = 0;
+	int	 SelectedSaveGame		 = 0;
+
+	int TotalNumberOfSecrets = 0;
 
 	virtual ~ScriptInterfaceFlowHandler() = default;
 
@@ -32,6 +35,7 @@ public:
 	virtual bool IsMassPickupEnabled() const = 0;
 	virtual bool IsPointFilterEnabled() const = 0;
 	virtual bool IsLaraInTitleEnabled() const = 0;
+	virtual bool IsLoadSaveEnabled() const = 0;
 	virtual bool HasCrawlExtended() const = 0;
 	virtual bool HasCrouchRoll() const = 0;
 	virtual bool HasCrawlspaceDive() const = 0;

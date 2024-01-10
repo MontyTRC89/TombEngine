@@ -4,10 +4,10 @@
 #include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 
-/*** Represents a rotation.
-Rotations are specifed as a combination of individual
-angles, in degrees, about each axis.
-All values will be clamped to [0.0f, 360.0f].
+using namespace TEN::Math;
+
+/*** Represents a degree-based 3D rotation.
+All values are clamped to the range [0.0, 360.0].
 @tenprimitive Rotation
 @pragma nostrip
 */
@@ -20,32 +20,31 @@ void Rotation::Register(sol::table& parent)
 		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Rotation::ToString,
 
-/// (float) rotation about x axis
-//@mem x
+		/// (float) X angle component.
+		//@mem x
 		"x", &Rotation::x,
 
-/// (float) rotation about y axis
-//@mem y
+		/// (float) Y angle component.
+		//@mem y
 		"y", &Rotation::y,
 
-/// (float) rotation about z axis
-//@mem z
-		"z", &Rotation::z
-	);
+		/// (float) Z angle component.
+		//@mem z
+		"z", &Rotation::z);
 }
 
 /*** 
-@tparam float X rotation about x axis
-@tparam float Y rotation about y axis
-@tparam float Z rotation about z axis
-@treturn Rotation A Rotation object.
+@tparam float x X angle component.
+@tparam float y Y angle component.
+@tparam float z Z angle component.
+@treturn Rotation A Rotation.
 @function Rotation
 */
-Rotation::Rotation(float aX, float aY, float aZ)
+Rotation::Rotation(float x, float y, float z)
 {
-	x = aX;
-	y = aY;
-	z = aZ;
+	this->x = x;
+	this->y = y;
+	this->z = z;
 }
 
 Rotation::Rotation(const EulerAngles& eulers)
@@ -82,11 +81,16 @@ Rotation::operator Vector3() const
 };
 
 /***
-@tparam Rotation rotation this rotation
-@treturn string A string showing the x, y, and z values of the rotation
+@tparam Rotation rotation this Rotation.
+@treturn string A string showing the X, Y, and Z angle components of the Rotation.
 @function __tostring
 */
 std::string Rotation::ToString() const
 {
-	return ("{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}");
+	return ("{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }");
+}
+
+EulerAngles Rotation::ToEulerAngles() const
+{
+	return EulerAngles(ANGLE(x), ANGLE(y), ANGLE(z));
 }

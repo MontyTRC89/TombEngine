@@ -7,8 +7,6 @@
 
 typedef DWORD D3DCOLOR;
 
-using CallbackDrawString = std::function<void(const std::string&, D3DCOLOR, int, int, int)>;
-
 class ScriptInterfaceObjectsHandler
 {
 public:
