@@ -10,9 +10,9 @@
 
 namespace TEN::Math::Geometry
 {
-	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down, float right)
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down, float right, const Vector3& axis)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
+		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right, axis));
 	}
 
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset)
@@ -40,14 +40,15 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), dir, dist));
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right, const Vector3& axis)
 	{
 		if (forward == 0.0f && down == 0.0f && right == 0.0f)
 			return point;
 
-		auto orient = EulerAngles(0, headingAngle, 0);
 		auto relOffset = Vector3(right, down, forward);
-		return TranslatePoint(point, orient, relOffset);
+		auto orient = AxisAngle(axis, headingAngle);
+		auto rotMatrix = orient.ToRotationMatrix();
+		return (point + Vector3::Transform(relOffset, rotMatrix));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset)
@@ -108,20 +109,20 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& gravity)
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& axis)
 	{
-		if (normal == -gravity)
+		if (normal == -axis)
 			return 0;
 
-		return FROM_RAD(acos(normal.Dot(-gravity)));
+		return FROM_RAD(acos(normal.Dot(-axis)));
 	}
 
-	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& gravity)
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& axis)
 	{
-		if (normal == -gravity)
+		if (normal == -axis)
 			return 0;
 
-		// TODO: Consider gravity direction.
+		// TODO: Consider axis.
 		return FROM_RAD(atan2(normal.x, normal.z));
 	}
 
@@ -161,7 +162,7 @@ namespace TEN::Math::Geometry
 
 	EulerAngles GetRelOrientToNormal(short orient, const Vector3& normal, const Vector3& gravity)
 	{
-		// TODO: Consider gravity direction.
+		// TODO: Consider axis.
 
 		// Determine relative angle properties of normal.
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
