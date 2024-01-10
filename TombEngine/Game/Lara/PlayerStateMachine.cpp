@@ -261,16 +261,18 @@ namespace TEN::Entities::Player
 				break;
 
 			controlRoutine(&item, &coll);
-			return;
+			break;
 
 		case PlayerBehaviorStateRoutineType::Collision:
 			if (collRoutine == nullptr)
 				break;
 
 			collRoutine(&item, &coll);
-			return;
-		}
+			break;
 
-		TENLog("Error handling unregistered player behavior state " + std::to_string(item.Animation.ActiveState) + ".", LogLevel::Warning);
+		default:
+			TENLog("Error handling unregistered player behavior state " + std::to_string(item.Animation.ActiveState) + ".", LogLevel::Warning);
+			break;
+		}
 	}
 }
