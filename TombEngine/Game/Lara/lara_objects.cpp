@@ -277,6 +277,8 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Horizontal;
+
 	if (IsHeld(In::Action))
 	{
 		if (IsHeld(In::Jump))
@@ -310,6 +312,7 @@ void lara_as_horizontal_bar_jump(ItemInfo* item, CollisionInfo* coll)
 	const auto& barItem = g_Level.Items[player.Context.InteractedItem];
 
 	item->Animation.IsAirborne = true;
+	player.Control.Look.Mode = LookMode::Free;
 
 	if (item->Animation.FrameNumber == GetAnimData(*item).frameBase)
 	{
@@ -345,6 +348,8 @@ void lara_as_horizontal_bar_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Free;
+
 	if (IsHeld(In::Action))
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Jump))
@@ -372,6 +377,8 @@ void lara_as_horizontal_bar_idle_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::None;
+
 	if (IsHeld(In::Action))
 	{
 		item->Animation.TargetState = LS_HORIZONTAL_BAR_IDLE_TURN_180;
@@ -386,6 +393,8 @@ void lara_as_horizontal_bar_idle_turn_180(ItemInfo* item, CollisionInfo* coll)
 void lara_as_horizontal_bar_swing_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::None;
 }
 
 // ---------

@@ -143,11 +143,10 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* playerItem, CollisionInf
 	{
 		// HACK: Update interaction basis.
 		auto bounds = GameBoundingBox(&barItem);
-		/*HorizontalBarBounds.BoundingBox = GameBoundingBox(
-			HorizontalBarBounds.BoundingBox.X1, HorizontalBarBounds.BoundingBox.X2,
-			HorizontalBarBounds.BoundingBox.Y1, HorizontalBarBounds.BoundingBox.Y2,
-			bounds.Z1, bounds.Z2);*/
+		HorizontalBarBounds.BoundingBox.X1 = bounds.X1;
+		HorizontalBarBounds.BoundingBox.X2 = bounds.X2;
 
+		// Test interaction.
 		bool hasFront = TestLaraPosition(HorizontalBarBounds, &barItem, playerItem);
 		bool hasBack = false;
 		if (!hasFront)
@@ -157,6 +156,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* playerItem, CollisionInf
 			barItem.Pose.Orientation.y += ANGLE(-180.0f);
 		}
 
+		// Set player interaction.
 		if (hasFront || hasBack)
 		{
 			SetAnimation(playerItem, (playerItem->Animation.ActiveState == LS_REACH) ? LA_REACH_TO_HORIZONTAL_BAR : LA_JUMP_UP_TO_HORIZONTAL_BAR);
@@ -172,7 +172,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* playerItem, CollisionInf
 			auto catchPos = Geometry::GetClosestPointOnLine(playerItem->Pose.Position.ToVector3(), linePoint0, linePoint1);
 
 			// Update player pose.
-			playerItem->Pose.Position = Geometry::TranslatePoint(catchPos, 0, 0.0f, coll->Setup.Height);
+			playerItem->Pose.Position = Geometry::TranslatePoint(catchPos, 0, 0.0f, coll->Setup.Height + CLICK(0.25f));
 			playerItem->Pose.Orientation.y = barItem.Pose.Orientation.y + (hasFront ? ANGLE(0.0f) : ANGLE(-180.0f));
 		}
 		else
