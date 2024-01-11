@@ -314,7 +314,7 @@ void lara_as_horizontal_bar_jump(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = true;
 	player.Control.Look.Mode = LookMode::Free;
 
-	if (item->Animation.FrameNumber == GetAnimData(*item).frameBase)
+	/*if (item->Animation.FrameNumber == GetAnimData(*item).frameBase)
 	{
 		int dist = 0;
 		if (item->Pose.Orientation.y == barItem.Pose.Orientation.y)
@@ -339,7 +339,7 @@ void lara_as_horizontal_bar_jump(ItemInfo* item, CollisionInfo* coll)
 		SetAnimation(item, LA_REACH);
 		TranslateItem(item, item->Pose.Orientation, 700);
 		item->Pose.Position.y -= 361;
-	}
+	}*/
 }
 
 // State:	  LS_HORIZONTAL_BAR_IDLE (198)

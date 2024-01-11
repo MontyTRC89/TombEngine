@@ -169,7 +169,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* playerItem, CollisionInf
 			// Calculate catch position from line.
 			auto linePoint0 = Geometry::TranslatePoint(barItem.Pose.Position.ToVector3(), barItem.Pose.Orientation.y, 0.0f, 0.0f, HorizontalBarBounds.BoundingBox.X1);
 			auto linePoint1 = Geometry::TranslatePoint(barItem.Pose.Position.ToVector3(), barItem.Pose.Orientation.y, 0.0f, 0.0f, HorizontalBarBounds.BoundingBox.X2);
-			auto catchPos = Geometry::GetClosestPointOnLine(playerItem->Pose.Position.ToVector3(), linePoint0, linePoint1);
+			auto catchPos = Geometry::GetClosestPointOnLinePerp(playerItem->Pose.Position.ToVector3(), linePoint0, linePoint1);
 
 			// Update player pose.
 			playerItem->Pose.Position = Geometry::TranslatePoint(catchPos, 0, 0.0f, coll->Setup.Height + CLICK(0.25f));
