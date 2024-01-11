@@ -12,7 +12,7 @@ namespace TEN::Math::Geometry
 
 	// Integer-based point translation
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f, const Vector3& axis = Vector3::UnitY);
-	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset);
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset, const Vector3& axis = Vector3::UnitY);
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& relOffset);
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, float dist);
 	Vector3i TranslatePoint(const Vector3i& point, const AxisAngle& orient, float dist);
@@ -20,7 +20,7 @@ namespace TEN::Math::Geometry
 
 	// Float-based point translation
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f, const Vector3& axis = Vector3::UnitY);
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset);
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset, const Vector3& axis = Vector3::UnitY);
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& relOffset);
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, float dist);
 	Vector3 TranslatePoint(const Vector3& point, const AxisAngle& orient, float dist);

@@ -15,9 +15,9 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right, axis));
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset)
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset, const Vector3& axis)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, relOffset.ToVector3()));
+		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, relOffset.ToVector3(), axis));
 	}
 
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& relOffset)
@@ -46,15 +46,14 @@ namespace TEN::Math::Geometry
 			return point;
 
 		auto relOffset = Vector3(right, down, forward);
+		return TranslatePoint(point, headingAngle, relOffset, axis);
+	}
+
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset, const Vector3& axis)
+	{
 		auto orient = AxisAngle(axis, headingAngle);
 		auto rotMatrix = orient.ToRotationMatrix();
 		return (point + Vector3::Transform(relOffset, rotMatrix));
-	}
-
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset)
-	{
-		auto orient = EulerAngles(0, headingAngle, 0);
-		return TranslatePoint(point, orient, relOffset);
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& relOffset)
