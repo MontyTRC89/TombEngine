@@ -163,6 +163,7 @@ namespace TEN::Entities::Player
 	std::optional<EdgeHangContextData> GetHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeHangContextData> GetHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<EdgeHangContextData> GetHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanWallClimbIdle(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Climbable wall climb contexts
 	std::optional<EdgeHangContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll);

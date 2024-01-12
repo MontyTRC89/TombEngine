@@ -300,8 +300,8 @@ namespace TEN::Collision::Attractor
 		// Looped; wrap distance along attractor.
 		if (IsLooped())
 		{
-			int sign = -std::copysign(1, chainDist);
-			return (chainDist + (_length * sign));
+			int sign = std::copysign(1, chainDist);
+			return fmod(chainDist, _length * sign);
 		}
 		
 		// Not looped; clamp distance along attractor.

@@ -2789,18 +2789,108 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	// Steps:
+	// 1) Prioritise finding valid position of current attractor.
+	// 2) If valid position on CURRENT attractor is UNAVAILABLE/BLOCKED, find nearest connecting attractor at PLAYER'S HAND.
+	// 3) If valid position on CONNECTING attractor (can probe multiple) is UNAVAILABLE/BLOCKED, FAIL the probe.
+	static std::optional<AttractorCollisionData> GetHangShimmyClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto DEFAULT_DIST = 8.0f;
+
+		const auto& player = GetLaraInfo(item);
+		const auto& handAttrac = player.Context.Attractor;
+
+		// TODO: Get velocity from animation.
+		const auto& anim = GetAnimData(item);
+		float dist = DEFAULT_DIST;
+
+		// Calculate projected distances along attractor.
+		float chainDistCenter = handAttrac.ChainDistance + dist;
+		float chainDistLeft = chainDistCenter - coll.Setup.Radius;
+		float chainDistRight = chainDistCenter + coll.Setup.Radius;
+
+		// 1) Find valid position on current attractor.
+		if (handAttrac.Ptr->IsLooped() ||
+			(chainDistLeft > 0.0f || chainDistRight < handAttrac.Ptr->GetLength()))
+		{
+			auto attracCollCenter = GetAttractorCollision(*handAttrac.Ptr, chainDistCenter, item.Pose.Orientation.y);
+			auto attracCollLeft = GetAttractorCollision(*handAttrac.Ptr, chainDistLeft, item.Pose.Orientation.y);
+			auto attracCollRight = GetAttractorCollision(*handAttrac.Ptr, chainDistRight, item.Pose.Orientation.y);
+		}
+		// 2) Find valid position on connecting attractor.
+		else
+		{
+
+		}
+
+	}
+
 	std::optional<EdgeHangContextData> GetHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto VERTICAL_OFFSET = -CLICK(1);
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(
+			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
+			0.0f, VERTICAL_OFFSET, 0.0f, ATTRAC_DETECT_RADIUS);
+
+		auto context = std::optional<EdgeHangContextData>();
+
 		return std::nullopt;
 	}
 
 	std::optional<EdgeHangContextData> GetHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, ATTRAC_DETECT_RADIUS);
+
+		auto context = std::optional<EdgeHangContextData>();
+
 		return std::nullopt;
 	}
 
+	static std::optional<EdgeHangContextData> GetEdgeHangCornerShimmyLeftClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																					  const std::vector<AttractorCollisionData>& attracColls)
+	{
+		return std::nullopt;
+	}
+	
+	static std::optional<EdgeHangContextData> GetEdgeHangShimmyLeftClimbContext(const ItemInfo& item, const CollisionInfo& coll,
+																				const std::vector<AttractorCollisionData>& attracColls)
+	{
+		auto context = GetHangShimmyClimbAttractorCollision(item, coll);
+
+		return std::nullopt;
+	}
+	
 	std::optional<EdgeHangContextData> GetHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.25f);
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, ATTRAC_DETECT_RADIUS);
+
+		auto context = std::optional<EdgeHangContextData>();
+
+		// 1) Corner shimmy left.
+		context = GetEdgeHangCornerShimmyLeftClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
+		// 2) Shimmy left.
+		context = GetEdgeHangShimmyLeftClimbContext(item, coll, attracColls);
+		if (context.has_value())
+		{
+			if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
 		return std::nullopt;
 	}
 
@@ -2809,8 +2899,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Name. Edge hang idle -> climbable wall idle.
-	bool CanHangToClimbableWallIdle(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanWallClimbIdle(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		return false;
 	}
