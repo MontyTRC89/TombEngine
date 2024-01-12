@@ -35,7 +35,51 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 # Credit List
 
 ## Developers
+- MontyTRC (Project Leader)
 
-Please refer to the [original project](https://github.com/MontyTRC89/TombEngine/tree/master/TombEngine), led by MontyTRC89, for the full list of credits. Thank you for your contribution.
-This fork is developed by Frjttr, collaborating with Stranger1992 and DaviDMRR, to which I'm very grateful.
+- Frjttr (magnums implementation) 
+- Gancian (general coding)	
+- Krystian (general coding)	
+- Kubsy (Some cleanups and fixes)	
+- l.m. (general coding, Lua enhancements, bug fixing)	
+- Lwmte (sound refactoring, general coding, code cleanups, bug fixing)	
+- Moooonyeah (Jumanji) (entity decompilation)	
+- Raildex (renderer refactoring, particle coding, general coding) 	
+- RicardoLuis0 (general coding)	
+- Sezz (player state refactoring, general coding, code cleanups, bug fixing, assets)	
+- Squidshire (Hispidence) (Lua implementation, bug fixing)	
+- Stranger1992 (sound asset refactoring and organisation, assets)	
+- TokyoSU (entity and vehicle decompilation)	
+- Tomo (general coding, bug fixing)	
+- Troye (general coding, refactoring)	
+- WolfCheese (general coding)	
 
+## Testers	
+- Adngel	
+- Caesum	
+- Dustie
+- Frjttr
+- GeckoKid	
+- JoeyQuint	
+- Kamillos	
+- Kubsy	
+- LGG_PRODUCTION	
+- Lore	
+- RemRem	
+- Stranger1992	
+- WolfCheese	
+
+## Assets and Miscellaneous	
+
+- Geckokid (Sprites and test level creator).	
+
+### Animations	
+- SrDanielPonces (Diagonal shimmy transitions, backwards monkey swinging)	
+- Krystian (Flexibility crawlspace, slope climbing animations)	
+- Sezz (Additional Animations for player state refactoring) 	
+- Naotheia (Underwater puzzle placement, crouch 180° turn, crawl 180° turn, water surface 180° turn)	
+- JoeyQuint (Standing 180° turn, monkey swing 180° turn)	
+
+### TombEngine Marketing 	
+- Kubsy (Twitter and forum posts)	
+- Stranger1992 (This website, Facebook, Instagram, Youtube and Twitch.
