@@ -10,14 +10,14 @@
 
 namespace TEN::Math::Geometry
 {
-	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down, float right)
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down, float right, const Vector3& axis)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right));
+		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, forward, down, right, axis));
 	}
 
-	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset)
+	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset, const Vector3& axis)
 	{
-		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, relOffset.ToVector3()));
+		return Vector3i(TranslatePoint(point.ToVector3(), headingAngle, relOffset.ToVector3(), axis));
 	}
 
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& relOffset)
@@ -40,20 +40,20 @@ namespace TEN::Math::Geometry
 		return Vector3i(TranslatePoint(point.ToVector3(), dir, dist));
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right)
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down, float right, const Vector3& axis)
 	{
 		if (forward == 0.0f && down == 0.0f && right == 0.0f)
 			return point;
 
-		auto orient = EulerAngles(0, headingAngle, 0);
 		auto relOffset = Vector3(right, down, forward);
-		return TranslatePoint(point, orient, relOffset);
+		return TranslatePoint(point, headingAngle, relOffset, axis);
 	}
 
-	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset)
+	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset, const Vector3& axis)
 	{
-		auto orient = EulerAngles(0, headingAngle, 0);
-		return TranslatePoint(point, orient, relOffset);
+		auto orient = AxisAngle(axis, headingAngle);
+		auto rotMatrix = orient.ToRotationMatrix();
+		return (point + Vector3::Transform(relOffset, rotMatrix));
 	}
 
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& relOffset)
@@ -83,9 +83,11 @@ namespace TEN::Math::Geometry
 		if (dist == 0.0f)
 			return point;
 
-		auto normalizedDir = dir;
-		normalizedDir.Normalize();
-		return (point + (normalizedDir * dist));
+		// Ensure direction is normalized.
+		auto dirNorm = dir;
+		dirNorm.Normalize();
+
+		return (point + (dirNorm * dist));
 	}
 
 	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rot)
@@ -108,23 +110,22 @@ namespace TEN::Math::Geometry
 		return short(toAngle - fromAngle);
 	}
 
-	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& gravity)
+	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& axis)
 	{
-		if (normal == -gravity)
+		if (normal == -axis)
 			return 0;
 
-		return FROM_RAD(acos(normal.Dot(-gravity)));
+		return FROM_RAD(acos(normal.Dot(-axis)));
 	}
 
-	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& gravity)
+	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& axis)
 	{
-		if (normal == -gravity)
+		if (normal == -axis)
 			return 0;
 
-		// TODO: Consider gravity direction.
+		// TODO: Consider axis.
 		return FROM_RAD(atan2(normal.x, normal.z));
 	}
-
 	float GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1)
 	{
 		auto target = GetClosestPointOnLine(origin, linePoint0, linePoint1);
@@ -136,19 +137,54 @@ namespace TEN::Math::Geometry
 		if (linePoint0 == linePoint1)
 			return linePoint0;
 
-		auto dir = linePoint1 - linePoint0;
-		float distAlpha = dir.Dot(origin - linePoint0) / dir.Dot(dir);
+		auto line = linePoint1 - linePoint0;
+		float alpha = line.Dot(origin - linePoint0) / line.Dot(line);
 
-		if (distAlpha < 0.0f)
+		// Closest point out of line range; return start or end point.
+		if (alpha <= 0.0f)
 		{
 			return linePoint0;
 		}
-		else if (distAlpha > 1.0f)
+		else if (alpha >= 1.0f)
 		{
 			return linePoint1;
 		}
 
-		return (linePoint0 + (dir * distAlpha));
+		// Return closest point on line.
+		return (linePoint0 + (line * alpha));
+	}
+
+	Vector3 GetClosestPointOnLinePerp(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1, const Vector3& axis)
+	{
+		if (linePoint0 == linePoint1)
+			return linePoint0;
+
+		// Ensure axis is normalized.
+		auto axisNorm = axis;
+		axisNorm.Normalize();
+
+		// Calculate line.
+		auto line = linePoint1 - linePoint0;
+
+		// Project line and origin onto plane perpendicular to input axis.
+		auto linePerp = line - (axisNorm * line.Dot(axisNorm));
+		auto originPerp = origin - (axisNorm * origin.Dot(axisNorm));
+
+		// Calculate alpha from line projection.
+		float alpha = linePerp.Dot(originPerp - linePoint0) / linePerp.Dot(linePerp);
+
+		// Closest point out of line range; return start or end point.
+		if (alpha <= 0.0f)
+		{
+			return linePoint0;
+		}
+		else if (alpha >= 1.0f)
+		{
+			return linePoint1;
+		}
+
+		// Return closest point on line perpendicular to input axis.
+		return (linePoint0 + (line * alpha));
 	}
 
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
@@ -161,7 +197,7 @@ namespace TEN::Math::Geometry
 
 	EulerAngles GetRelOrientToNormal(short orient, const Vector3& normal, const Vector3& gravity)
 	{
-		// TODO: Consider gravity direction.
+		// TODO: Consider axis.
 
 		// Determine relative angle properties of normal.
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(normal);
@@ -176,6 +212,31 @@ namespace TEN::Math::Geometry
 			-slopeAngle * cosDeltaAngle,
 			orient,
 			slopeAngle * sinDeltaAngle);
+	}
+
+	BoundingBox GetBoundingBox(const std::vector<Vector3>& points)
+	{
+		auto maxPoint = Vector3(-INFINITY);
+		auto minPoint = Vector3(INFINITY);
+
+		// Determine max and min AABB points.
+		for (const auto& point : points)
+		{
+			maxPoint = Vector3(
+				std::max(maxPoint.x, point.x),
+				std::max(maxPoint.y, point.y),
+				std::max(maxPoint.z, point.z));
+
+			minPoint = Vector3(
+				std::min(minPoint.x, point.x),
+				std::min(minPoint.y, point.y),
+				std::min(minPoint.z, point.z));
+		}
+
+		// Construct and return AABB.
+		auto center = (minPoint + maxPoint) / 2;
+		auto extents = (maxPoint - minPoint) / 2;
+		return BoundingBox(center, extents);
 	}
 
 	Quaternion ConvertDirectionToQuat(const Vector3& dir)
@@ -208,9 +269,7 @@ namespace TEN::Math::Geometry
 
 	Vector3 ConvertQuatToDirection(const Quaternion& quat)
 	{
-		static const auto REF_DIR = Vector3::UnitZ;
-
-		return Vector3::Transform(REF_DIR, quat);
+		return Vector3::Transform(Vector3::UnitZ, quat);
 	}
 
 	bool IsPointInFront(const Pose& pose, const Vector3& target)
@@ -221,7 +280,7 @@ namespace TEN::Math::Geometry
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		if (origin == target)
-			return false;
+			return true;
 
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
@@ -231,28 +290,22 @@ namespace TEN::Math::Geometry
 		auto targetDir = target - origin;
 
 		float dot = headingDir.Dot(targetDir);
-		if (dot > 0.0f)
-			return true;
-
-		return false;
+		return (dot > 0.0f);
 	}
 
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
 		if (origin == target)
-			return false;
+			return true;
 
 		auto refDir = refPoint - origin;
 
-		// 2D heading direction vector to 3D reference direction vector: X = +refDirection.x, Y = 0, Z = +refDirection.z
+		// 2D heading direction vector to 3D reference direction vector: X = +refDir.x, Y = 0, Z = +refDir.z
 		auto headingDir = Vector3(refDir.x, 0.0f, refDir.z);
 		auto targetDir = target - origin;
 
 		float dot = headingDir.Dot(targetDir);
-		if (dot > 0.0f)
-			return true;
-
-		return false;
+		return (dot > 0.0f);
 	}
 
 	bool IsPointOnLeft(const Pose& pose, const Vector3& target)
@@ -263,38 +316,32 @@ namespace TEN::Math::Geometry
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const EulerAngles& orient)
 	{
 		if (origin == target)
-			return false;
+			return true;
 
 		float sinY = phd_sin(orient.y);
 		float cosY = phd_cos(orient.y);
 
-		// 2D normal vector to 2D heading direction vector: X = +cosY, Y = 0, Z = -sinY
-		auto headingNormal = Vector3(cosY, 0.0f, -sinY);
+		// 2D normal vector to 2D heading direction vector: X = -cosY, Y = 0, Z = +sinY
+		auto headingNormal = Vector3(-cosY, 0.0f, sinY);
 		auto targetDir = target - origin;
 
 		float dot = headingNormal.Dot(targetDir);
-		if (dot > 0.0f)
-			return true;
-
-		return false;
+		return (dot > 0.0f);
 	}
 
 	bool IsPointOnLeft(const Vector3& origin, const Vector3& target, const Vector3& refPoint)
 	{
 		if (origin == target)
-			return false;
+			return true;
 
 		auto refDir = refPoint - origin;
 
-		// 2D normal vector to 3D reference direction vector: X = +refDirection.z, Y = 0, Z = -refDirection.x
+		// 2D normal vector to 3D reference direction vector: X = +refDir.z, Y = 0, Z = -refDir.x
 		auto headingNormal = Vector3(refDir.z, 0.0f, -refDir.x);
 		auto targetDir = target - origin;
 
 		float dot = headingNormal.Dot(targetDir);
-		if (dot > 0.0f)
-			return true;
-
-		return false;
+		return (dot > 0.0f);
 	}
 
 	bool IsPointInBox(const Vector3& point, const BoundingBox& box)

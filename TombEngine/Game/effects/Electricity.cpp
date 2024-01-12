@@ -297,25 +297,27 @@ namespace TEN::Effects::Electricity
 
 	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer)
 	{
+		constexpr auto ANGLE_STEP = ANGLE(25.0f);
+
 		int bufferIndex = 0;
 
 		buffer[bufferIndex] = knots[0];
 		bufferIndex++;
 
-		auto origin = knots[0];
-		auto target = knots[1];
-		auto direction = target - origin;
-		direction.Normalize();
+		const auto& origin = knots[0];
+		const auto& target = knots[1];
+		auto dir = target - origin;
+		dir.Normalize();
 
 		float lengthStep = laser.Length / laser.NumSegments;
-		float radiusStep = laser.Radius;
-		auto axisAngle = AxisAngle(direction, laser.Orientation2D);
+		auto orient = AxisAngle(dir, laser.Orientation2D);
 
 		for (int i = 0; i < laser.NumSegments; i++)
 		{
-			axisAngle.SetAngle(axisAngle.GetAngle() + ANGLE(25.0f));
-			auto knot = Geometry::TranslatePoint(origin, axisAngle.GetAxis(), lengthStep * i);
-			knot = Geometry::TranslatePoint(knot, axisAngle, radiusStep * i);
+			// Calculate knot.
+			orient.SetAngle(orient.GetAngle() + ANGLE_STEP);
+			auto knotBase = Geometry::TranslatePoint(origin, orient.GetAxis(), lengthStep * i);
+			auto knot = Geometry::TranslatePoint(knotBase, orient, laser.Radius * i);
 
 			buffer[bufferIndex] = origin + knot;
 			bufferIndex++;

@@ -751,15 +751,20 @@ have an ID of 0, the second an ID of 1, and so on.</description>
 <function>
 	<module>Flow</module>
 	<name>EndLevel</name>
-	<summary>Finishes the current level, with optional level index provided.</summary>
-	<description>If level index
-is not provided or is zero, jumps to next level. If level index is more than
-level count, jumps to title.</description>
+	<summary>Finishes the current level, with optional level index and start position index provided.</summary>
+	<description>If level index is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title. If LARA\_START\_POS objects are present in level, player will be
+teleported to such object with OCB similar to provided second argument.</description>
 	<parameters>
 		<parameter>
 			<name>index</name>
 			<type>int</type>
 			<description>level index (default 0)</description>
+		</parameter>
+		<parameter>
+			<name>startPos</name>
+			<type>int</type>
+			<description>player start position (default 0)</description>
 		</parameter>
 	</parameters>
 </function>
@@ -4966,6 +4971,45 @@ with a call to @{ShowString}, or this function will have no effect.</description
 			<description>current room of the camera</description>
 		</return>
 	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessMode</name>
+	<summary>Sets the post-process effect mode, like negative or monochrome.</summary>
+	<parameters>
+		<parameter>
+			<name>effect</name>
+			<type>View.PostProcessMode</type>
+			<description>type to set.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessStrength</name>
+	<summary>Sets the post-process effect strength.</summary>
+	<parameters>
+		<parameter>
+			<name>strength</name>
+			<type>float</type>
+			<description>(default 1.0). How strong the effect is.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessTint</name>
+	<summary>Sets the post-process tint.</summary>
+	<parameters>
+		<parameter>
+			<name>tint</name>
+			<type>Color</type>
+			<description>value to use.</description>
+		</parameter>
+	</parameters>
 </function>
 
 <function>
