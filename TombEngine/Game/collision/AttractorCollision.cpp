@@ -145,7 +145,7 @@ namespace TEN::Collision::Attractor
 		auto bridgeItemNumbers = std::set<int>{};
 
 		// Collect bridge item numbers in neighbor sectors.
-		auto sectorPtrs = GetNeighborSectorPtrs(Vector3i(pos), roomNumber, SECTOR_SEARCH_DEPTH);
+		auto sectorPtrs = GetNeighborSectorPtrs(pos, roomNumber, SECTOR_SEARCH_DEPTH);
 		for (auto* sectorPtr : sectorPtrs)
 		{
 			for (int bridgeItemNumber : sectorPtr->BridgeItemNumbers)
@@ -212,14 +212,15 @@ namespace TEN::Collision::Attractor
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
-															   float forward, float down, float right, float detectRadius)
+															   float forward, float down, float right, float detectRadius, const Vector3& axis)
 	{
+
 		auto relOffset = Vector3(right, down, forward);
-		auto rotMatrix = Matrix::CreateRotationY(TO_RAD(headingAngle));
-		auto probePoint = pos + Vector3::Transform(relOffset, rotMatrix);
+		auto rotMatrix = AxisAngle(axis, headingAngle).ToRotationMatrix();
+		auto probePos = pos + Vector3::Transform(relOffset, rotMatrix);
 		int probeRoomNumber = GetCollision(pos, roomNumber, headingAngle, forward, down, right).RoomNumber;
 
-		return GetAttractorCollisions(probePoint, probeRoomNumber, headingAngle, detectRadius);
+		return GetAttractorCollisions(probePos, probeRoomNumber, headingAngle, detectRadius);
 	}
 
 	void DrawNearbyAttractors(const ItemInfo& item)

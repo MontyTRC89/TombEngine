@@ -2790,39 +2790,119 @@ namespace TEN::Entities::Player
 	}
 
 	// Steps:
-	// 1) Prioritise finding valid position of current attractor.
+	// 1) Prioritise finding valid position on current attractor.
 	// 2) If valid position on CURRENT attractor is UNAVAILABLE/BLOCKED, find nearest connecting attractor at PLAYER'S HAND.
 	// 3) If valid position on CONNECTING attractor (can probe multiple) is UNAVAILABLE/BLOCKED, FAIL the probe.
-	static std::optional<AttractorCollisionData> GetHangShimmyClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<AttractorCollisionData> GetEdgeHangFlatShimmyClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																							  bool isGoingRight)
 	{
-		constexpr auto DEFAULT_DIST = 8.0f;
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(1 / 32.0f);
 
 		const auto& player = GetLaraInfo(item);
 		const auto& handAttrac = player.Context.Attractor;
 
-		// TODO: Get velocity from animation.
+		// TODO: Get velocity from animation. If stationary, this function should fail if right up against a corner or start/end point.
 		const auto& anim = GetAnimData(item);
-		float dist = DEFAULT_DIST;
+		float dist = 8.0f;
 
-		// Calculate projected distances along attractor.
+		// Calculate projected chain distances along attractor.
 		float chainDistCenter = handAttrac.ChainDistance + dist;
 		float chainDistLeft = chainDistCenter - coll.Setup.Radius;
 		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
-		// 1) Find valid position on current attractor.
+		// TODO: Clear and concise.
+
+		// Get attractor collisions.
+		auto attracCollCenter = GetAttractorCollision(*handAttrac.Ptr, chainDistCenter, item.Pose.Orientation.y);
+		auto attracCollSide = std::optional<AttractorCollisionData>{};
+
+		auto attracCollsSide = std::vector<AttractorCollisionData>{};
+
+		// Get current side attractor collision.
 		if (handAttrac.Ptr->IsLooped() ||
-			(chainDistLeft > 0.0f || chainDistRight < handAttrac.Ptr->GetLength()))
+			((!isGoingRight && chainDistLeft > 0.0f && chainDistRight) || (isGoingRight && chainDistRight < handAttrac.Ptr->GetLength())))
 		{
-			auto attracCollCenter = GetAttractorCollision(*handAttrac.Ptr, chainDistCenter, item.Pose.Orientation.y);
-			auto attracCollLeft = GetAttractorCollision(*handAttrac.Ptr, chainDistLeft, item.Pose.Orientation.y);
-			auto attracCollRight = GetAttractorCollision(*handAttrac.Ptr, chainDistRight, item.Pose.Orientation.y);
+			float chainDist = isGoingRight ? chainDistRight : chainDistLeft;
+			attracCollsSide.push_back(GetAttractorCollision(*handAttrac.Ptr, chainDist, attracCollCenter.HeadingAngle));
 		}
-		// 2) Find valid position on connecting attractor.
-		else
+
+		// TODO: Assess current side attractor for valid position.
+		// If valid current, use.
+		if (false)
+		{
+			attracCollSide = attracCollsSide.back();
+		}
+
+		// Get connecting side attractor collisions.
+		// TODO: Use current attractor's start/end point OR corner point.
+		if (!attracCollSide.has_value())
+		{
+			int sign = isGoingRight ? 1 : -1;
+			attracCollsSide = GetAttractorCollisions(
+				attracCollCenter.Proximity.Intersection, attracCollCenter.AttractorPtr->GetRoomNumber(), attracCollCenter.HeadingAngle,
+				0.0f, 0.0f, coll.Setup.Radius * sign, ATTRAC_DETECT_RADIUS);
+		}
+
+		// TODO: Assess connecting side attractors for valid position.
+		// If valid, return the center collision. Ensure it hugs a corner or start/end point if necessary.
+		for (const auto& attracColl : attracCollsSide)
+		{
+			continue;
+		}
+
+		// If valid connecting, use.
+		if (attracCollSide.has_value())
 		{
 
 		}
 
+		return std::nullopt;
+	}
+
+	// TODO: Similar to above, but probe from player position at side. Could incorporate everything into above function?
+	static std::optional<AttractorCollisionData> GetEdgeHangCornerShimmyClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																								bool isGoingRight)
+	{
+		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(1 / 32.0f);
+
+		const auto& player = GetLaraInfo(item);
+		const auto& handAttrac = player.Context.Attractor;
+
+		// Calculate projected chain distances along attractor.
+		float chainDistLeft = handAttrac.ChainDistance - coll.Setup.Radius;
+		float chainDistRight = handAttrac.ChainDistance + coll.Setup.Radius;
+
+		// Get attractor collisions.
+		float chainDistCenter = handAttrac.ChainDistance;
+		auto attracCollCenter = GetAttractorCollision(*handAttrac.Ptr, chainDistCenter, item.Pose.Orientation.y);
+		auto attracCollsSide = std::vector<AttractorCollisionData>{};
+
+		// Get current side attractor collision.
+		if (handAttrac.Ptr->IsLooped() ||
+			((!isGoingRight && chainDistLeft > 0.0f && chainDistRight) || (isGoingRight && chainDistRight < handAttrac.Ptr->GetLength())))
+		{
+			float chainDist = isGoingRight ? chainDistRight : chainDistLeft;
+			attracCollsSide.push_back(GetAttractorCollision(*handAttrac.Ptr, chainDist, attracCollCenter.HeadingAngle));
+		}
+
+		// TODO: Assess current side attractor for valid position.
+
+
+		// Get connecting side attractor collisions.
+		if (attracCollsSide.empty())
+		{
+			// TODO: Use current attractor's start/end point OR corner point.
+
+			int sign = isGoingRight ? 1 : -1;
+			attracCollsSide = GetAttractorCollisions(
+				attracCollCenter.Proximity.Intersection, attracCollCenter.AttractorPtr->GetRoomNumber(), attracCollCenter.HeadingAngle,
+				0.0f, 0.0f, coll.Setup.Radius * sign, ATTRAC_DETECT_RADIUS);
+		}
+
+		// TODO: Assess connecting side attractors for valid position.
+		// If valid, return the center collision. Ensure it hugs a corner or start/end point if necessary.
+
+		return std::nullopt;
 	}
 
 	std::optional<EdgeHangContextData> GetHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll)
@@ -2852,17 +2932,26 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	static std::optional<EdgeHangContextData> GetEdgeHangFlatShimmyLeftClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		// Get flat shimmy left context.
+		auto attracColl = GetEdgeHangFlatShimmyClimbAttractorCollision(item, coll, false);
+		if (attracColl.has_value())
+		{
+			auto context = EdgeHangContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.TargetStateID = LS_EDGE_HANG_SHIMMY_LEFT;
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
 	static std::optional<EdgeHangContextData> GetEdgeHangCornerShimmyLeftClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																					  const std::vector<AttractorCollisionData>& attracColls)
 	{
-		return std::nullopt;
-	}
-	
-	static std::optional<EdgeHangContextData> GetEdgeHangShimmyLeftClimbContext(const ItemInfo& item, const CollisionInfo& coll,
-																				const std::vector<AttractorCollisionData>& attracColls)
-	{
-		auto context = GetHangShimmyClimbAttractorCollision(item, coll);
-
 		return std::nullopt;
 	}
 	
@@ -2875,16 +2964,18 @@ namespace TEN::Entities::Player
 
 		auto context = std::optional<EdgeHangContextData>();
 
-		// 1) Corner shimmy left.
-		context = GetEdgeHangCornerShimmyLeftClimbContext(item, coll, attracColls);
+		// TODO: Keep going, don't reparent.
+		// 1) Flat shimmy left.
+		context = GetEdgeHangFlatShimmyLeftClimbContext(item, coll);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
-		// 2) Shimmy left.
-		context = GetEdgeHangShimmyLeftClimbContext(item, coll, attracColls);
+		// TODO: Reparent.
+		// 2) Corner shimmy left.
+		context = GetEdgeHangCornerShimmyLeftClimbContext(item, coll, attracColls);
 		if (context.has_value())
 		{
 			if (HasStateDispatch(&item, context->TargetStateID))

@@ -44,7 +44,7 @@ namespace TEN::Collision::Attractor
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float detectRadius);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
-															   float forward, float down, float right, float detectRadius);
+															   float forward, float down, float right, float detectRadius, const Vector3& axis = Vector3::UnitY);
 
 	void DrawNearbyAttractors(const ItemInfo& item);
 }
