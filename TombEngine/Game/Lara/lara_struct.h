@@ -8,7 +8,6 @@ using namespace TEN::Math;
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
-namespace TEN::Renderer { struct RendererMesh; };
 
 using namespace TEN::Entities::Player;
 
@@ -216,6 +215,12 @@ enum LaraState
 	LS_REMOVE_PUZZLE = 189,
 	LS_PUSHABLE_EDGE_SLIP = 190,
 	LS_SPRINT_SLIDE = 191,
+	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND = 192,
+	LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND = 193,
+	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND = 194,
+	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH = 195,
+	LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH = 196,
+	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH = 197,
 
 	NUM_LARA_STATES
 };

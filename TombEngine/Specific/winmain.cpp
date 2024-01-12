@@ -10,7 +10,7 @@
 
 #include "Game/control/control.h"
 #include "Game/savegame.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"

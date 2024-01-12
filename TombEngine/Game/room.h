@@ -147,8 +147,6 @@ struct ROOM_INFO
 };
 
 void DoFlipMap(int group);
-void AddRoomFlipItems(ROOM_INFO* room);
-void RemoveRoomFlipItems(ROOM_INFO* room);
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID);
 bool IsPointInRoom(const Vector3i& pos, int roomNumber);
 int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_ROOM);

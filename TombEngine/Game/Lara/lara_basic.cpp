@@ -604,7 +604,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// TODO: Without animation blending, the AFK state's movement lock interferes with responsiveness. -- Sezz 2021.10.31
-	if (CanStrikeAfkPose(*item, *coll))
+	if (CanStrikeAfkPose(*item, *coll) && player.Control.Count.Pose >= PLAYER_POSE_TIME)
 	{
 		item->Animation.TargetState = LS_POSE;
 		return;
@@ -1703,14 +1703,15 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump) || player.Control.IsRunJumpQueued)
 	{
-		if ((IsHeld(In::Sprint) && !IsHeld(In::Walk)) && CanSprintJumpForward(*item, *coll))
-		{
-			item->Animation.TargetState = LS_JUMP_FORWARD;
-			return;
-		}
-		else
+		// TODO: CanSprintJumpForward() should handle HasSprintJump() check.
+		if (IsHeld(In::Walk) || !g_GameFlow->HasSprintJump())
 		{
 			item->Animation.TargetState = LS_SPRINT_DIVE;
+			return;
+		}
+		else if (IsHeld(In::Sprint) && CanSprintJumpForward(*item, *coll))
+		{
+			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
 		}
 

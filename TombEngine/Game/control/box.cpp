@@ -20,7 +20,7 @@
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Collision::Room;
 using namespace TEN::Effects::Smoke;

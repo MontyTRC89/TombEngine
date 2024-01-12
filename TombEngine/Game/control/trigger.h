@@ -54,7 +54,8 @@ enum TRIGOBJECTS_TYPES
 	TO_CUTSCENE,
 	TO_UNUSED1, // TRNG FmvNg
 	TO_UNUSED2, // TRNG TimerfieldNg
-	TO_LUAEVENT
+	TO_VOLUMEEVENT,
+	TO_GLOBALEVENT
 };
 
 extern int TriggerTimer;

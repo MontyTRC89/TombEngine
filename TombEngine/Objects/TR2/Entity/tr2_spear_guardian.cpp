@@ -557,7 +557,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
 		particle.on = true;
-		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		particle.blendMode = BlendMode::Additive;
 
 		particle.x = effectPos.x;
 		particle.y = effectPos.y;

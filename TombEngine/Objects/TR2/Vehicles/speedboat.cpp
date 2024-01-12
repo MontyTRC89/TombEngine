@@ -110,7 +110,7 @@ namespace TEN::Entities::Vehicles
 		mist.colFadeSpeed = 4 + (GetRandomControl() & 3);
 		mist.fadeToBlack = 12;
 		mist.sLife = mist.life = (GetRandomControl() & 3) + 20;
-		mist.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		mist.blendMode = BlendMode::Additive;
 		mist.extras = 0;
 		mist.dynamic = -1;
 
@@ -842,6 +842,7 @@ namespace TEN::Entities::Vehicles
 			default:
 				drive = true;
 				noTurn = SpeedboatUserControl(speedboatItem, laraItem);
+				HandleVehicleSpeedometer(speedboatItem->Animation.Velocity.z, SPEEDBOAT_FAST_VELOCITY_MAX);
 				break;
 			}
 		}

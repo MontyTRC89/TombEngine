@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.2 Lua API</title>
+    <title>TombEngine 1.3 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -75,8 +75,10 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -84,6 +86,7 @@
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
   <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
@@ -131,7 +134,11 @@ associated getters and setters.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetStatus">Moveable:GetStatus()</a></td>
-	<td class="summary">Get the status of object.</td>
+	<td class="summary">Get the moveable's status.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetStatus">Moveable:SetStatus(status)</a></td>
+	<td class="summary">Set the moveable's status.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
@@ -317,9 +324,8 @@ associated getters and setters.</td>
 	<td class="summary">Get the current room number of the object</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetRoomNumber">Moveable:SetRoomNumber(ID)</a></td>
-	<td class="summary">Set room number of object
- Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</td>
+	<td class="name" ><a href="#Moveable:SetRoomNumber">Moveable:SetRoomNumber(roomID)</a></td>
+	<td class="summary">Set the room ID of a moveable.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetMeshVisible">Moveable:GetMeshVisible(index)</a></td>
@@ -430,7 +436,7 @@ most can just be ignored (see usage).
         </li>
         <li><span class="parameter">OCB</span>
             <span class="types"><span class="type">int</span></span>
-         ocb of item (default 0)
+         ocb of item
          (<em>default</em> 0)
         </li>
         <li><span class="parameter">AIBits</span>
@@ -570,12 +576,7 @@ most can just be ignored (see usage).
     <strong>Moveable:GetStatus()</strong>
     </dt>
     <dd>
-    Get the status of object.
- possible values:
- <br />0 - not active
- <br />1 - active
- <br />2 - deactivated
- <br />3 - invisible
+    Get the moveable's status. ()
 
 
 
@@ -583,9 +584,31 @@ most can just be ignored (see usage).
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">int</span></span>
-        a number representing the status of the object
+           <span class="types"><a class="type" href="../4 enums/Objects.MoveableStatus.html#">MoveableStatus</a></span>
+        The moveable's status.
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetStatus"></a>
+    <strong>Moveable:SetStatus(status)</strong>
+    </dt>
+    <dd>
+    Set the moveable's status. ()
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">status</span>
+            <span class="types"><a class="type" href="../4 enums/Objects.MoveableStatus.html#">MoveableStatus</a></span>
+         The new status of the moveable.
+        </li>
+    </ul>
+
 
 
 
@@ -1625,19 +1648,19 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 </dd>
     <dt>
     <a name = "Moveable:SetRoomNumber"></a>
-    <strong>Moveable:SetRoomNumber(ID)</strong>
+    <strong>Moveable:SetRoomNumber(roomID)</strong>
     </dt>
     <dd>
-    Set room number of object
- Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
+    Set the room ID of a moveable.
+ Use this if not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">ID</span>
+        <li><span class="parameter">roomID</span>
             <span class="types"><span class="type">int</span></span>
-         the ID of the new room
+         New room's ID.
         </li>
     </ul>
 
@@ -1647,8 +1670,8 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
     <h3>Usage:</h3>
     <ul>
         <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
-sas:SetRoomNumber(destinationRoom)
-sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
+sas:SetRoomNumber(newRoomID)
+sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
     </ul>
 
 </dd>
@@ -1892,7 +1915,7 @@ sas:SetPosition(destinationPosition, <span class="keyword">false</span>)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-11-11 12:12:55 </i>
+<i style="float:right;">Last updated 2024-01-07 13:18:42 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

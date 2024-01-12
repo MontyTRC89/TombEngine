@@ -11,7 +11,7 @@
 #include "Game/room.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Collision;
 using namespace TEN::Collision::Floordata;
@@ -439,10 +439,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (doPlayerCollision)
 	{
 		tfLocation = GetRoom(item->Location, probePos);
-		height = GetFloorHeight(tfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
 		tcLocation = GetRoom(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
-		ceiling = GetCeilingHeight(tcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -482,10 +482,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		}
 
 		tfLocation = GetRoom(tfLocation, probePos);
-		height = GetFloorHeight(tfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
 		tcLocation = GetRoom(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
-		ceiling = GetCeilingHeight(tcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -506,7 +506,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (doPlayerCollision)
 	{
 		tfLocation = GetRoom(tfLocation, Vector3i(probePos.x + xFront, probePos.y, probePos.z + zFront));
-		height = GetFloorHeight(tfLocation, probePos.x + xFront, probePos.z + zFront).value_or(NO_HEIGHT);
+		height = GetSurfaceHeight(tfLocation, probePos.x + xFront, probePos.z + zFront, true).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -530,10 +530,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (doPlayerCollision)
 	{
 		lrfLocation = GetRoom(item->Location, probePos);
-		height = GetFloorHeight(lrfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		height = GetSurfaceHeight(lrfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
 		lrcLocation = GetRoom(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
-		ceiling = GetCeilingHeight(lrcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		ceiling = GetSurfaceHeight(lrcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -560,10 +560,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (doPlayerCollision)
 	{
 		tfLocation = GetRoom(tfLocation, probePos);
-		height = GetFloorHeight(tfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
 		tcLocation = GetRoom(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
-		ceiling = GetCeilingHeight(tcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -595,10 +595,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (doPlayerCollision)
 	{
 		lrfLocation = GetRoom(item->Location, probePos);
-		height = GetFloorHeight(lrfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		height = GetSurfaceHeight(lrfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
 		lrcLocation = GetRoom(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
-		ceiling = GetCeilingHeight(lrcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		ceiling = GetSurfaceHeight(lrcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -625,10 +625,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (doPlayerCollision)
 	{
 		tfLocation = GetRoom(tfLocation, probePos);
-		height = GetFloorHeight(tfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
 		tcLocation = GetRoom(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
-		ceiling = GetCeilingHeight(tcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -949,8 +949,8 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto block = GetCollision(ffpX, y, ffpZ, room).Block;
 
 			// Get front floor surface heights
-			auto floorHeight   = GetFloorHeight(RoomVector(block->RoomNumber, y), ffpX, ffpZ).value_or(NO_HEIGHT);
-			auto ceilingHeight = GetCeilingHeight(RoomVector(block->RoomNumber, y), ffpX, ffpZ).value_or(NO_HEIGHT);
+			auto floorHeight   = GetSurfaceHeight(RoomVector(block->RoomNumber, y), ffpX, ffpZ, true).value_or(NO_HEIGHT);
+			auto ceilingHeight = GetSurfaceHeight(RoomVector(block->RoomNumber, y), ffpX, ffpZ, false).value_or(NO_HEIGHT);
 
 			// If probe landed inside wall (i.e. both floor/ceiling heights are NO_HEIGHT), make a fake
 			// ledge for algorithm to further succeed.
@@ -1181,12 +1181,12 @@ FloorInfo* GetFloor(int x, int y, int z, short* roomNumber)
 
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z)
 {
-	return GetFloorHeight(RoomVector(floor->RoomNumber, y), x, z).value_or(NO_HEIGHT);
+	return GetSurfaceHeight(RoomVector(floor->RoomNumber, y), x, z, true).value_or(NO_HEIGHT);
 }
 
 int GetCeiling(FloorInfo* floor, int x, int y, int z)
 {
-	return GetCeilingHeight(RoomVector(floor->RoomNumber, y), x, z).value_or(NO_HEIGHT);
+	return GetSurfaceHeight(RoomVector(floor->RoomNumber, y), x, z, false).value_or(NO_HEIGHT);
 }
 
 int GetDistanceToFloor(int itemNumber, bool precise)
