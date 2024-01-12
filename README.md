@@ -37,5 +37,5 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 ## Developers
 
 Please refer to the [original project](https://github.com/MontyTRC89/TombEngine/tree/master/TombEngine), led by MontyTRC89, for the full list of credits. Thank you for your contribution.
-This fork is developed by Frjttr and DaviDMRR in joint conjunction.
+This fork is developed by Frjttr, collaborating with Stranger1992 and DaviDMRR, to which I'm very grateful.
 
