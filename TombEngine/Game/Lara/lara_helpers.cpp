@@ -332,7 +332,7 @@ static AttractorParentTargetData GetAttractorParentTarget(const ItemInfo& item, 
 														   const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
 {
 	// Get attractor collision.
-	auto attracColl = GetAttractorCollision(attrac, chainDist, 0);
+	auto attracColl = GetAttractorCollision(attrac, chainDist, item.Pose.Orientation.y);
 
 	// Calculate target.
 	auto orient = EulerAngles(0, attracColl.HeadingAngle, 0) + relOrientOffset;
@@ -1335,19 +1335,19 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 		switch (TestLaraHangCorner(&item, &coll, ANGLE(-90.0f)))
 		{
 		case CornerType::Inner:
-			return LS_SHIMMY_INNER_LEFT;
+			return LS_EDGE_HANG_SHIMMY_INNER_LEFT;
 
 		case CornerType::Outer:
-			return LS_SHIMMY_OUTER_LEFT;
+			return LS_EDGE_HANG_SHIMMY_OUTER_LEFT;
 		}
 
 		switch (TestLaraHangCorner(&item, &coll, ANGLE(-45.0f)))
 		{
 		case CornerType::Inner:
-			return LS_SHIMMY_45_INNER_LEFT;
+			return LS_EDGE_HANG_SHIMMY_45_INNER_LEFT;
 
 		case CornerType::Outer:
-			return LS_SHIMMY_45_OUTER_LEFT;
+			return LS_EDGE_HANG_SHIMMY_45_OUTER_LEFT;
 		}
 	}
 	else if (IsHeld(In::Right) || IsHeld(In::StepRight))
@@ -1355,19 +1355,19 @@ std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& col
 		switch (TestLaraHangCorner(&item, &coll, ANGLE(90.0f)))
 		{
 		case CornerType::Inner:
-			return LS_SHIMMY_INNER_RIGHT;
+			return LS_EDGE_HANG_SHIMMY_INNER_RIGHT;
 
 		case CornerType::Outer:
-			return LS_SHIMMY_OUTER_RIGHT;
+			return LS_EDGE_HANG_SHIMMY_OUTER_RIGHT;
 		}
 
 		switch (TestLaraHangCorner(&item, &coll, ANGLE(45.0f)))
 		{
 		case CornerType::Inner:
-			return LS_SHIMMY_45_INNER_RIGHT;
+			return LS_EDGE_HANG_SHIMMY_45_INNER_RIGHT;
 
 		case CornerType::Outer:
-			return LS_SHIMMY_45_OUTER_RIGHT;
+			return LS_EDGE_HANG_SHIMMY_45_OUTER_RIGHT;
 		}
 	}*/
 
@@ -1626,8 +1626,8 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 	auto& player = GetLaraInfo(item);
 
-	item.Animation.Velocity = Vector3::Zero;
 	item.Animation.IsAirborne = false;
+	item.Animation.Velocity = Vector3::Zero;
 	player.Control.TurnRate = 0;
 	player.Control.WaterStatus = WaterStatus::Dry;
 	player.Context.Attractor.Detach(item);
@@ -1881,7 +1881,7 @@ void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
 	{
 		if (player.Control.IsClimbingLadder)
 		{
-			SetAnimation(&item, LA_LADDER_IDLE);
+			SetAnimation(&item, LA_WALL_CLIMB_IDLE);
 		}
 		else
 		{

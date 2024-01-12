@@ -134,15 +134,11 @@ namespace TEN::Entities::Player
 	bool CanPerformSlideJump(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanCrawlspaceDive(const ItemInfo& item, const CollisionInfo& coll);
 
-	// Edge contexts
+	// Ledge contexts
 	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll);
 	bool CanClimbLedgeToCrouch(const ItemInfo& item, CollisionInfo& coll);
 	bool CanClimbLedgeToStand(const ItemInfo& item, CollisionInfo& coll);
-	bool CanShimmyUp(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanShimmyDown(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll);
-	bool CanShimmyRight(ItemInfo& item, CollisionInfo& coll);
 
 	// Object interaction contexts
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
@@ -161,4 +157,16 @@ namespace TEN::Entities::Player
 
 	// Jump catch climb contexts
 	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll);
+
+	// Hang climb contexts
+	std::optional<EdgeHangContextData> GetHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<EdgeHangContextData> GetHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<EdgeHangContextData> GetHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<EdgeHangContextData> GetHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll);
+
+	// Climbable wall climb contexts
+	std::optional<EdgeHangContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<EdgeHangContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<EdgeHangContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<EdgeHangContextData> GetWallClimbRightContext(const ItemInfo& item, const CollisionInfo& coll);
 }

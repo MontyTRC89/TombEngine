@@ -34,6 +34,21 @@ namespace TEN::Entities::Player
 		AttractorCollisionData Left	  = {};
 		AttractorCollisionData Right  = {};
 	};
+	
+	// TODO
+	struct EdgeHangAttractorCollisionData
+	{
+		AttractorCollisionData Center = {};
+		AttractorCollisionData Left	  = {};
+		AttractorCollisionData Right  = {};
+	};
+
+	// TODO
+	struct EdgeHangCollisionData
+	{
+		int TargetStateID = 0;
+		EdgeHangAttractorCollisionData Attractor = {};
+	};
 
 	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
 																					 Attractor& currentAttrac, float currentChainDist,
@@ -223,7 +238,19 @@ namespace TEN::Entities::Player
 		HandlePlayerAttractorParent(item);
 	}
 
-	// State:	  LS_HANG_IDLE (10)
+	void SetPlayerEdgeHang(ItemInfo& item, const CollisionInfo& coll, const EdgeHangContextData context)
+	{
+		auto& player = GetLaraInfo(item);
+
+		// No attractor; detach.
+		if (context.AttractorPtr == nullptr)
+		{
+			player.Context.Attractor.Detach(item);
+			return;
+		}
+	}
+
+	// State:	  LS_EDGE_HANG_IDLE (10)
 	// Collision: lara_col_hang_idle()
 	void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	{
@@ -253,7 +280,7 @@ namespace TEN::Entities::Player
 		{
 			if (TestLaraClimbIdle(item, coll))
 			{
-				item->Animation.TargetState = LS_LADDER_IDLE;
+				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 				return;
 			}
 
@@ -275,14 +302,14 @@ namespace TEN::Entities::Player
 			{
 				if (CanClimbLedgeToCrouch(*item, *coll))
 				{
-					item->Animation.TargetState = LS_HANG_TO_CROUCH;
+					item->Animation.TargetState = LS_EDGE_HANG_TO_CROUCH;
 					return;
 				}
 				else if (CanClimbLedgeToStand(*item, *coll))
 				{
 					if (IsHeld(In::Crouch))
 					{
-						item->Animation.TargetState = LS_HANG_TO_CROUCH;
+						item->Animation.TargetState = LS_EDGE_HANG_TO_CROUCH;
 					}
 					else if (IsHeld(In::Walk) && CanPerformLedgeHandstand(*item, *coll))
 					{
@@ -296,10 +323,11 @@ namespace TEN::Entities::Player
 					return;
 				}
 
-				if (CanShimmyUp(*item, *coll))
+				auto climbContext = GetHangShimmyUpContext(*item, *coll);
+				if (climbContext.has_value())
 				{
-					// TODO: State dispatch.
-					SetAnimation(item, LA_LADDER_SHIMMY_UP);
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerEdgeHang(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -308,16 +336,16 @@ namespace TEN::Entities::Player
 				if (CanShimmyDown(*item, *coll))
 				{
 					// TODO: State dispatch.
-					SetAnimation(item, LA_LADDER_SHIMMY_UP);
+					SetAnimation(item, LA_WALL_CLIMB_SHIMMY_UP);
 					return;
 				}
 			}
 
 			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
-				if (CanShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_LEFT))
+				if (CanShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_EDGE_HANG_SHIMMY_LEFT))
 				{
-					item->Animation.TargetState = LS_SHIMMY_LEFT;
+					item->Animation.TargetState = LS_EDGE_HANG_SHIMMY_LEFT;
 					return;
 				}
 
@@ -330,9 +358,9 @@ namespace TEN::Entities::Player
 			}
 			else if (IsHeld(In::Right) || IsHeld(In::StepRight))
 			{
-				if (CanShimmyRight(*item, *coll) && HasStateDispatch(item, LS_SHIMMY_RIGHT))
+				if (CanShimmyRight(*item, *coll) && HasStateDispatch(item, LS_EDGE_HANG_SHIMMY_RIGHT))
 				{
-					item->Animation.TargetState = LS_SHIMMY_RIGHT;
+					item->Animation.TargetState = LS_EDGE_HANG_SHIMMY_RIGHT;
 					return;
 				}
 
@@ -344,21 +372,21 @@ namespace TEN::Entities::Player
 				}
 			}
 
-			item->Animation.TargetState = LS_HANG_IDLE;
+			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
 			return;
 		}
 
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	// State:	LS_HANG_IDLE (10)
+	// State:	LS_EDGE_HANG_IDLE (10)
 	// Control: lara_as_hang_idle()
 	void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		//HandlePlayerEdgeHang(*item, *coll);
 	}
 
-	// State:	  LS_SHIMMY_LEFT (30)
+	// State:	  LS_EDGE_HANG_SHIMMY_LEFT (30)
 	// Collision: lara_col_shimmy_left()
 	void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	{
@@ -386,18 +414,18 @@ namespace TEN::Entities::Player
 		{
 			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
-				item->Animation.TargetState = LS_SHIMMY_LEFT;
+				item->Animation.TargetState = LS_EDGE_HANG_SHIMMY_LEFT;
 				return;
 			}
 
-			item->Animation.TargetState = LS_HANG_IDLE;
+			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
 			return;
 		}
 
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	// State:	LS_SHIMMY_LEFT (30)
+	// State:	LS_EDGE_HANG_SHIMMY_LEFT (30)
 	// Control: lara_as_shimmy_left()
 	void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	{
@@ -407,7 +435,7 @@ namespace TEN::Entities::Player
 		//player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	}
 
-	// State:	  LS_SHIMMY_RIGHT (31)
+	// State:	  LS_EDGE_HANG_SHIMMY_RIGHT (31)
 	// Collision: lara_col_shimmy_right()
 	void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	{
@@ -435,18 +463,18 @@ namespace TEN::Entities::Player
 		{
 			if (IsHeld(In::Right) || IsHeld(In::StepRight))
 			{
-				item->Animation.TargetState = LS_SHIMMY_RIGHT;
+				item->Animation.TargetState = LS_EDGE_HANG_SHIMMY_RIGHT;
 				return;
 			}
 
-			item->Animation.TargetState = LS_HANG_IDLE;
+			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
 			return;
 		}
 
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	// State:	LS_SHIMMY_RIGHT (31)
+	// State:	LS_EDGE_HANG_SHIMMY_RIGHT (31)
 	// Control: lara_as_shimmy_right()
 	void lara_col_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	{
@@ -456,7 +484,7 @@ namespace TEN::Entities::Player
 		//player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	}
 
-	// State:	  LS_SHIMMY_OUTER_LEFT (107), LS_SHIMMY_OUTER_RIGHT (108), LS_SHIMMY_INNER_LEFT (109), LS_SHIMMY_INNER_RIGHT (110)
+	// State:	  LS_EDGE_HANG_SHIMMY_OUTER_LEFT (107), LS_EDGE_HANG_SHIMMY_OUTER_RIGHT (108), LS_EDGE_HANG_SHIMMY_INNER_LEFT (109), LS_EDGE_HANG_SHIMMY_INNER_RIGHT (110)
 	// Collision: lara_default_col()
 	void lara_as_shimmy_corner(ItemInfo* item, CollisionInfo* coll)
 	{

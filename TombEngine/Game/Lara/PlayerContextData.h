@@ -89,6 +89,16 @@ namespace TEN::Entities::Player
 		bool SetJumpVelocity = false;
 	};
 
+	// TODO: Can probably use ClimbContextData, but keeping separate to make it easier to work with for now.
+	struct EdgeHangContextData
+	{
+		Attractor*	AttractorPtr  = nullptr;
+		float		ChainDistance = 0.0f;
+		int			TargetStateID = 0;
+
+		bool IsCornerShimmy = false;
+	};
+
 	struct WaterTreadStepOutContextData
 	{
 		int FloorHeight = 0;

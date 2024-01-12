@@ -505,12 +505,12 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 		case TRIGGER_TYPES::CLIMB_T:
 			if (LaraItem->Animation.ActiveState == LS_HANG_IDLE ||
-				LaraItem->Animation.ActiveState == LS_LADDER_IDLE ||
-				LaraItem->Animation.ActiveState == LS_LADDER_UP ||
-				LaraItem->Animation.ActiveState == LS_LADDER_LEFT ||
-				LaraItem->Animation.ActiveState == LS_LADDER_STOP ||
-				LaraItem->Animation.ActiveState == LS_LADDER_RIGHT ||
-				LaraItem->Animation.ActiveState == LS_LADDER_DOWN)
+				LaraItem->Animation.ActiveState == LS_WALL_CLIMB_IDLE ||
+				LaraItem->Animation.ActiveState == LS_WALL_CLIMB_UP ||
+				LaraItem->Animation.ActiveState == LS_WALL_CLIMB_LEFT ||
+				LaraItem->Animation.ActiveState == LS_WALL_CLIMB_STOP ||
+				LaraItem->Animation.ActiveState == LS_WALL_CLIMB_RIGHT ||
+				LaraItem->Animation.ActiveState == LS_WALL_CLIMB_DOWN)
 				break;
 			return;
 

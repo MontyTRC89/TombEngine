@@ -50,13 +50,7 @@ namespace TEN::Entities::Player
 			return;
 
 		Ptr->DetachPlayer(playerItem);
-
-		Ptr = nullptr;
-		ChainDistance = 0.0f;
-		RelPosOffset = Vector3::Zero;
-		RelOrientOffset = EulerAngles::Zero;
-		RelDeltaPos = Vector3::Zero;
-		RelDeltaOrient = EulerAngles::Zero;
+		*this = {};
 	};
 
 	void PlayerAttractorData::Update(ItemInfo& playerItem, Attractor& attrac, float chainDist,
@@ -1183,90 +1177,6 @@ namespace TEN::Entities::Player
 		return TestLedgeClimbSetup(item, coll, SETUP);
 	}
 
-	bool CanShimmyUp(const ItemInfo& item, const CollisionInfo& coll)
-	{
-		constexpr auto WALL_STEP_HEIGHT = -CLICK(1);
-
-		auto& player = GetLaraInfo(item);
-
-		// 1) Test for climbable wall flag.
-		if (!TestLaraNearClimbableWall(item))
-			return false;
-
-		// Get point collision.
-		auto pointCollCenter = GetCollision(&item);
-		auto pointCollLeft = GetCollision(&item, item.Pose.Orientation.y - ANGLE(90.0f), OFFSET_RADIUS(coll.Setup.Radius));
-		auto pointCollRight = GetCollision(&item, item.Pose.Orientation.y + ANGLE(90.0f), OFFSET_RADIUS(coll.Setup.Radius));
-
-		int vPos = item.Pose.Position.y - LARA_HEIGHT_STRETCH;
-		int relCeilHeightCenter = pointCollCenter.Position.Ceiling - vPos;
-		int relCeilHeightLeft = pointCollCenter.Position.Ceiling - vPos;
-		int relCeilHeightRight = pointCollCenter.Position.Ceiling - vPos;
-
-		// 2) Assess point collision.
-		if (relCeilHeightCenter <= WALL_STEP_HEIGHT &&
-			relCeilHeightLeft <= WALL_STEP_HEIGHT &&
-			relCeilHeightRight <= WALL_STEP_HEIGHT)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	// TODO!!
-	bool CanShimmyDown(const ItemInfo& item, const CollisionInfo& coll)
-	{
-		constexpr auto WALL_STEP_HEIGHT = CLICK(1);
-
-		auto& player = GetLaraInfo(item);
-
-		auto pointCollCenter = GetCollision(&item);
-
-		int relFloorHeight = pointCollCenter.Position.Floor - item.Pose.Position.y;
-		// Left and right.
-
-		// 1) Test for climbable wall flag.
-		if (!TestLaraNearClimbableWall(item))
-			return false;
-
-		// 2) Assess point collision.
-		if (relFloorHeight >= WALL_STEP_HEIGHT)
-			return true;
-
-		return false;
-	}
-
-	bool CanShimmyLeft(ItemInfo& item, CollisionInfo& coll)
-	{
-		return true;
-
-		//return TestLaraHangSideways(&item, &coll, ANGLE(-90.0f));
-	}
-
-	bool CanShimmyRight(ItemInfo& item, CollisionInfo& coll)
-	{
-		return true;
-
-		//return TestLaraHangSideways(&item, &coll, ANGLE(90.0f));
-	}
-
-	// TODO
-	void GetClimbableWallShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll)
-	{
-
-	}
-	
-	void GetHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll)
-	{
-
-	}
-	
-	void GetHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll)
-	{
-
-	}
-
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);
@@ -1760,7 +1670,7 @@ namespace TEN::Entities::Player
 		context.ChainDistance = 0.0f;
 		context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 		context.RelOrientOffset = EulerAngles::Zero;
-		context.TargetStateID = LS_LADDER_IDLE;
+		context.TargetStateID = LS_WALL_CLIMB_IDLE;
 		context.AlignType = ClimbContextAlignType::None;
 		context.SetBusyHands = true;
 		context.SetJumpVelocity = false;
@@ -2336,7 +2246,7 @@ namespace TEN::Entities::Player
 		context.ChainDistance = 0.0f;
 		context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 		context.RelOrientOffset = EulerAngles::Zero;
-		context.TargetStateID = LS_LADDER_IDLE;
+		context.TargetStateID = LS_WALL_CLIMB_IDLE;
 		context.AlignType = ClimbContextAlignType::None;
 		context.SetBusyHands = true;
 		context.SetJumpVelocity = false;
@@ -2788,18 +2698,15 @@ namespace TEN::Entities::Player
 		auto attracColl = GetEdgeCatchAttractorCollision(item, coll);
 		if (attracColl.has_value())
 		{
-			// HACK: Set catch animation.
-			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ?
-				LA_JUMP_UP_TO_HANG :
-				CanSwingOnLedge(item, coll, *attracColl) ? LA_REACH_TO_HANG_OSCILLATE : LA_REACH_TO_HANG;
-			SetAnimation(*LaraItem, animNumber);
+			int targetStateID = ((item.Animation.ActiveState == LS_REACH) && CanSwingOnLedge(item, coll, *attracColl)) ?
+				LS_EDGE_HANG_SWING_CATCH : LS_EDGE_HANG_IDLE;
 
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_HANG_IDLE; /*((item.Animation.ActiveState == LS_REACH) && CanSwingOnLedge(item, coll, *attracColl)) ? LS_HANG_IDLE_SWING : LS_HANG_IDLE*/ // TODO: Dispatches.
+			context.TargetStateID = targetStateID;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
@@ -2849,7 +2756,7 @@ namespace TEN::Entities::Player
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, item.Pose.Position.y - (pointColl.Position.Ceiling + LARA_HEIGHT_MONKEY), 0.0f);
 			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_MONKEY_IDLE; // TODO: Dispatches.
+			context.TargetStateID = LS_MONKEY_IDLE;
 			context.AlignType = ClimbContextAlignType::Snap;
 			context.SetBusyHands = true;
 			context.SetJumpVelocity = false;
@@ -2880,5 +2787,31 @@ namespace TEN::Entities::Player
 		}
 
 		return std::nullopt;
+	}
+
+	std::optional<EdgeHangContextData> GetHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	std::optional<EdgeHangContextData> GetHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	std::optional<EdgeHangContextData> GetHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	std::optional<EdgeHangContextData> GetHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	// TODO: Name. Edge hang idle -> climbable wall idle.
+	bool CanHangToClimbableWallIdle(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return false;
 	}
 }

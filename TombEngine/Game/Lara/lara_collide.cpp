@@ -367,7 +367,7 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 	// Snapping distance of Lara's radius + 12 units is seemingly empirical value from Core tests.
 	int snapDistance = coll->Setup.Radius + 12;
 
-	if (item->Animation.ActiveState == LS_SHIMMY_RIGHT)
+	if (item->Animation.ActiveState == LS_EDGE_HANG_SHIMMY_RIGHT)
 	{
 		switch (angle)
 		{
@@ -390,7 +390,7 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 		}
 	}
 
-	if (item->Animation.ActiveState == LS_SHIMMY_LEFT)
+	if (item->Animation.ActiveState == LS_EDGE_HANG_SHIMMY_LEFT)
 	{
 		switch (angle)
 		{
