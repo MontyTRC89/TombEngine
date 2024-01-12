@@ -1004,6 +1004,8 @@ static void StartPickup(ObjectInfo *obj)
 	InitPickup(obj, ID_CROWBAR_ITEM);
 	InitPickup(obj, ID_PISTOLS_ITEM);
 	InitPickup(obj, ID_PISTOLS_AMMO_ITEM);
+	InitPickup(obj, ID_MAGNUMS_ITEM);
+	InitPickup(obj, ID_MAGNUMS_AMMO_ITEM);
 	InitPickup(obj, ID_UZI_ITEM);
 	InitPickup(obj, ID_UZI_AMMO_ITEM);
 	InitPickup(obj, ID_SHOTGUN_ITEM);
