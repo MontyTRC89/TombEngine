@@ -431,8 +431,8 @@ enum LaraAnim
 	LA_WADE_TO_STAND_RIGHT = 184,							// Wade > stand, right foot first
 	LA_WADE_TO_STAND_LEFT = 185,							// Wade > stand, left foot first
 	LA_STAND_TO_WADE = 186,									// Stand > wade
-	LA_WALL_CLIMB_SHIMMY_UP = 187,								// Ascend ladder hanging
-	LA_WALL_CLIMB_SHIMMY_DOWN = 188,							// Descend ladder hanging
+	LA_EDGE_HANG_SHIMMY_UP = 187,							// Ascend ladder hanging
+	LA_EDGE_HANG_SHIMMY_DOWN = 188,							// Descend ladder hanging
 	LA_DISCARD_FLARE = 189,									// Throw flare standing
 	LA_ONWATER_TO_WADE_1_STEP = 190,						// Tread water up a step > wade
 	LA_TREAD_WATER_VAULT_0_STEPS_TO_STAND = 191,			// Pull up from tread > stand

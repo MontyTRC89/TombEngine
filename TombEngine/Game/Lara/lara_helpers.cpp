@@ -1327,53 +1327,6 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 	return JumpDirection::None;
 }
 
-// TODO
-std::optional<int> GetPlayerCornerShimmyState(ItemInfo& item, CollisionInfo& coll)
-{
-	/*if (IsHeld(In::Left) || IsHeld(In::StepLeft))
-	{
-		switch (TestLaraHangCorner(&item, &coll, ANGLE(-90.0f)))
-		{
-		case CornerType::Inner:
-			return LS_EDGE_HANG_SHIMMY_INNER_LEFT;
-
-		case CornerType::Outer:
-			return LS_EDGE_HANG_SHIMMY_OUTER_LEFT;
-		}
-
-		switch (TestLaraHangCorner(&item, &coll, ANGLE(-45.0f)))
-		{
-		case CornerType::Inner:
-			return LS_EDGE_HANG_SHIMMY_45_INNER_LEFT;
-
-		case CornerType::Outer:
-			return LS_EDGE_HANG_SHIMMY_45_OUTER_LEFT;
-		}
-	}
-	else if (IsHeld(In::Right) || IsHeld(In::StepRight))
-	{
-		switch (TestLaraHangCorner(&item, &coll, ANGLE(90.0f)))
-		{
-		case CornerType::Inner:
-			return LS_EDGE_HANG_SHIMMY_INNER_RIGHT;
-
-		case CornerType::Outer:
-			return LS_EDGE_HANG_SHIMMY_OUTER_RIGHT;
-		}
-
-		switch (TestLaraHangCorner(&item, &coll, ANGLE(45.0f)))
-		{
-		case CornerType::Inner:
-			return LS_EDGE_HANG_SHIMMY_45_INNER_RIGHT;
-
-		case CornerType::Outer:
-			return LS_EDGE_HANG_SHIMMY_45_OUTER_RIGHT;
-		}
-	}*/
-
-	return std::nullopt;
-}
-
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;

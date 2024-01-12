@@ -35,21 +35,6 @@ namespace TEN::Entities::Player
 		AttractorCollisionData Right  = {};
 	};
 	
-	// TODO
-	struct EdgeHangAttractorCollisionData
-	{
-		AttractorCollisionData Center = {};
-		AttractorCollisionData Left	  = {};
-		AttractorCollisionData Right  = {};
-	};
-
-	// TODO
-	struct EdgeHangCollisionData
-	{
-		int TargetStateID = 0;
-		EdgeHangAttractorCollisionData Attractor = {};
-	};
-
 	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
 																					 Attractor& currentAttrac, float currentChainDist,
 																					 const Vector3& probePoint)
@@ -251,8 +236,8 @@ namespace TEN::Entities::Player
 	}
 
 	// State:	  LS_EDGE_HANG_IDLE (10)
-	// Collision: lara_col_hang_idle()
-	void lara_as_hang_idle(ItemInfo* item, CollisionInfo* coll)
+	// Collision: lara_col_edge_hang_idle()
+	void lara_as_edge_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
@@ -333,41 +318,32 @@ namespace TEN::Entities::Player
 			}
 			else if (IsHeld(In::Back))
 			{
-				if (CanShimmyDown(*item, *coll))
+				auto climbContext = GetHangShimmyDownContext(*item, *coll);
+				if (climbContext.has_value())
 				{
-					// TODO: State dispatch.
-					SetAnimation(item, LA_WALL_CLIMB_SHIMMY_UP);
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerEdgeHang(*item, *coll, *climbContext);
 					return;
 				}
 			}
 
 			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
-				if (CanShimmyLeft(*item, *coll) && HasStateDispatch(item, LS_EDGE_HANG_SHIMMY_LEFT))
+				auto climbContext = GetHangShimmyLeftContext(*item, *coll);
+				if (climbContext.has_value())
 				{
-					item->Animation.TargetState = LS_EDGE_HANG_SHIMMY_LEFT;
-					return;
-				}
-
-				auto cornerShimmyState = GetPlayerCornerShimmyState(*item, *coll);
-				if (cornerShimmyState.has_value())
-				{
-					item->Animation.TargetState = *cornerShimmyState;
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerEdgeHang(*item, *coll, *climbContext);
 					return;
 				}
 			}
 			else if (IsHeld(In::Right) || IsHeld(In::StepRight))
 			{
-				if (CanShimmyRight(*item, *coll) && HasStateDispatch(item, LS_EDGE_HANG_SHIMMY_RIGHT))
+				auto climbContext = GetHangShimmyRightContext(*item, *coll);
+				if (climbContext.has_value())
 				{
-					item->Animation.TargetState = LS_EDGE_HANG_SHIMMY_RIGHT;
-					return;
-				}
-
-				auto cornerShimmyState = GetPlayerCornerShimmyState(*item, *coll);
-				if (cornerShimmyState.has_value())
-				{
-					item->Animation.TargetState = *cornerShimmyState;
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerEdgeHang(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -380,15 +356,15 @@ namespace TEN::Entities::Player
 	}
 
 	// State:	LS_EDGE_HANG_IDLE (10)
-	// Control: lara_as_hang_idle()
-	void lara_col_hang_idle(ItemInfo* item, CollisionInfo* coll)
+	// Control: lara_as_edge_hang_idle()
+	void lara_col_edge_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		//HandlePlayerEdgeHang(*item, *coll);
 	}
 
 	// State:	  LS_EDGE_HANG_SHIMMY_LEFT (30)
-	// Collision: lara_col_shimmy_left()
-	void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
+	// Collision: lara_col_edge_hang_shimmy_left()
+	void lara_as_edge_hang_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
@@ -412,9 +388,11 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
-			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
+			auto climbContext = GetHangShimmyLeftContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = LS_EDGE_HANG_SHIMMY_LEFT;
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerEdgeHang(*item, *coll, *climbContext);
 				return;
 			}
 
@@ -426,8 +404,8 @@ namespace TEN::Entities::Player
 	}
 
 	// State:	LS_EDGE_HANG_SHIMMY_LEFT (30)
-	// Control: lara_as_shimmy_left()
-	void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
+	// Control: lara_as_edge_hang_shimmy_left()
+	void lara_col_edge_hang_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	{
 		//auto& player = GetLaraInfo(*item);
 
@@ -436,8 +414,8 @@ namespace TEN::Entities::Player
 	}
 
 	// State:	  LS_EDGE_HANG_SHIMMY_RIGHT (31)
-	// Collision: lara_col_shimmy_right()
-	void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
+	// Collision: lara_col_edge_hang_shimmy_right()
+	void lara_as_edge_hang_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
@@ -461,9 +439,11 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
-			if (IsHeld(In::Right) || IsHeld(In::StepRight))
+			auto climbContext = GetHangShimmyRightContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				item->Animation.TargetState = LS_EDGE_HANG_SHIMMY_RIGHT;
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerEdgeHang(*item, *coll, *climbContext);
 				return;
 			}
 
@@ -475,8 +455,8 @@ namespace TEN::Entities::Player
 	}
 
 	// State:	LS_EDGE_HANG_SHIMMY_RIGHT (31)
-	// Control: lara_as_shimmy_right()
-	void lara_col_shimmy_right(ItemInfo* item, CollisionInfo* coll)
+	// Control: lara_as_edge_hang_shimmy_right()
+	void lara_col_edge_hang_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	{
 		//auto& player = GetLaraInfo(*item);
 
@@ -486,7 +466,7 @@ namespace TEN::Entities::Player
 
 	// State:	  LS_EDGE_HANG_SHIMMY_OUTER_LEFT (107), LS_EDGE_HANG_SHIMMY_OUTER_RIGHT (108), LS_EDGE_HANG_SHIMMY_INNER_LEFT (109), LS_EDGE_HANG_SHIMMY_INNER_RIGHT (110)
 	// Collision: lara_default_col()
-	void lara_as_shimmy_corner(ItemInfo* item, CollisionInfo* coll)
+	void lara_as_edge_hang_shimmy_corner(ItemInfo* item, CollisionInfo* coll)
 	{
 		// Setup
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
@@ -499,7 +479,7 @@ namespace TEN::Entities::Player
 
 	// State:	  LS_HANDSTAND (54)
 	// Collision: lara_default_col()
-	void lara_as_handstand(ItemInfo* item, CollisionInfo* coll)
+	void lara_as_edge_hang_handstand(ItemInfo* item, CollisionInfo* coll)
 	{
 		// Setup
 		coll->Setup.EnableObjectPush = false;
