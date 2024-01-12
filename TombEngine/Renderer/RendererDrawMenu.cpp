@@ -1102,19 +1102,20 @@ namespace TEN::Renderer
 	{
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
+		
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget);
+		
 		_swapChain->Present(0, 0);
 	}
 
 	void Renderer::RenderTitle()
 	{
+		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
+
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
-		RenderScene(&_backBuffer, false, _gameCamera);
-		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-		RenderInventoryScene(&_backBuffer, nullptr);
+		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget);
 		DrawAllStrings();
 
 		_swapChain->Present(0, 0);
