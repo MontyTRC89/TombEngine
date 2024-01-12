@@ -208,10 +208,6 @@ bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
 {
 	const auto& anim = GetAnimData(item);
 
-	// No dispatches; return early.
-	if (anim.Dispatches.empty())
-		return false;
-
 	// Iterate over state dispatches.
 	for (const auto& dispatch : anim.Dispatches)
 	{
