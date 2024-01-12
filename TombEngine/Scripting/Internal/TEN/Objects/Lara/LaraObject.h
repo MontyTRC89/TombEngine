@@ -7,6 +7,7 @@ static const std::unordered_map<std::string, LaraWeaponType> LaraWeaponTypeMap
 	{ "NONE", LaraWeaponType::None },
 	{ "PISTOLS", LaraWeaponType::Pistol },
 	{ "REVOLVER", LaraWeaponType::Revolver },
+	{ "MAGNUMS", LaraWeaponType::Magnums },
 	{ "UZI", LaraWeaponType::Uzi },
 	{ "SHOTGUN", LaraWeaponType::Shotgun },
 	{ "HK", LaraWeaponType::HK },

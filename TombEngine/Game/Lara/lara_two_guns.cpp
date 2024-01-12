@@ -38,6 +38,7 @@ static WeaponAnimData GetWeaponAnimData(LaraWeaponType weaponType)
 		{ LaraWeaponType::None, WeaponAnimData{ ID_LARA, 0, 0, 0, 0 } },
 		{ LaraWeaponType::Pistol, WeaponAnimData{ ID_PISTOLS_ANIM, 4, 5, 13, 24 } },
 		{ LaraWeaponType::Revolver, WeaponAnimData{ ID_REVOLVER_ANIM , 7, 8, 15, 29 } },
+		{ LaraWeaponType::Magnums, WeaponAnimData{ ID_MAGNUMS_ANIM, 4, 5, 13, 24 } },
 		{ LaraWeaponType::Uzi, WeaponAnimData{ ID_UZI_ANIM, 4, 5, 13, 24 } }
 	};
 	
@@ -52,8 +53,11 @@ static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType, bool isRightW
 	case LaraWeaponType::Pistol:
 		return Vector3i(isRightWeapon ? -16 : 4, 128, 40);
 
+	case LaraWeaponType::Magnums:
+			return Vector3i(isRightWeapon ? -16 : 4, 128, 40);
+
 	case LaraWeaponType::Revolver:
-		return Vector3i(isRightWeapon ? -32 : 16, 160, 56);
+			return Vector3i(isRightWeapon ? -32 : 16, 160, 56);
 
 	case LaraWeaponType::Uzi:
 		return Vector3i(isRightWeapon ? -16 : 8, 140, 48);

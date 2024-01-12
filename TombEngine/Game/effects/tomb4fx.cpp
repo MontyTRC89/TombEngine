@@ -866,6 +866,10 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			offset = Vector3i(8, 48, 40);
 			break;
 
+		/*case LaraWeaponType::Magnums:
+			offset = Vector3i(8, 48, 40);
+			break;
+			*/
 		case LaraWeaponType::Uzi:
 			offset = Vector3i(8, 35, 48);
 			break;
@@ -887,6 +891,8 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	else
 	{
 		if (weaponType == LaraWeaponType::Pistol)
+			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-12, 48, 40));
+		else if (weaponType == LaraWeaponType::Magnums)
 			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-12, 48, 40));
 		else if (weaponType == LaraWeaponType::Uzi)
 			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-16, 35, 48));

@@ -1407,7 +1407,7 @@ namespace TEN::Gui
 		AmmoObjectList[2].Orientation = EulerAngles::Zero;
 
 		if (options &
-			(OPT_CHOOSE_AMMO_UZI | OPT_CHOOSE_AMMO_PISTOLS | OPT_CHOOSE_AMMO_REVOLVER | OPT_CHOOSE_AMMO_CROSSBOW |
+			(OPT_CHOOSE_AMMO_UZI | OPT_CHOOSE_AMMO_PISTOLS | OPT_CHOOSE_AMMO_REVOLVER | OPT_CHOOSE_AMMO_MAGNUMS | OPT_CHOOSE_AMMO_CROSSBOW |
 			OPT_CHOOSE_AMMO_HK | OPT_CHOOSE_AMMO_SHOTGUN | OPT_CHOOSE_AMMO_GRENADEGUN | OPT_CHOOSE_AMMO_HARPOON | OPT_CHOOSE_AMMO_ROCKET))
 		{
 			AmmoSelectorFlag = 1;
@@ -1438,6 +1438,16 @@ namespace TEN::Gui
 				AmmoObjectList[0].Amount = Ammo.AmountRevolverAmmo;
 				NumAmmoSlots = number;
 				CurrentAmmoType = &Ammo.CurrentRevolverAmmoType;
+
+			}
+
+			if (options & OPT_CHOOSE_AMMO_MAGNUMS)
+			{
+				number++;
+				AmmoObjectList[0].InventoryItem = INV_OBJECT_MAGNUMS_AMMO;
+				AmmoObjectList[0].Amount = Ammo.AmountMagnumsAmmo;
+				NumAmmoSlots = number;
+				CurrentAmmoType = &Ammo.CurrentMagnumsAmmoType;
 			}
 
 			if (options & OPT_CHOOSE_AMMO_CROSSBOW)
@@ -1551,6 +1561,7 @@ namespace TEN::Gui
 
 		Ammo.CurrentPistolsAmmoType = 0;
 		Ammo.CurrentUziAmmoType = 0;
+		Ammo.CurrentMagnumsAmmoType = 0;
 		Ammo.CurrentRevolverAmmoType = 0;
 		Ammo.CurrentShotGunAmmoType = 0;
 		Ammo.CurrentGrenadeGunAmmoType = 0;
@@ -1567,6 +1578,11 @@ namespace TEN::Gui
 				InsertObjectIntoList(INV_OBJECT_UZIS);
 			else if (Ammo.AmountUziAmmo)
 				InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
+
+			if (lara->Weapons[(int)LaraWeaponType::Magnums].Present)
+				InsertObjectIntoList(INV_OBJECT_MAGNUMS);
+			else if (Ammo.AmountMagnumsAmmo)
+				InsertObjectIntoList(INV_OBJECT_MAGNUMS_AMMO);
 
 			if (lara->Weapons[(int)LaraWeaponType::Revolver].Present)
 			{
@@ -1903,6 +1919,7 @@ namespace TEN::Gui
 		Ammo.AmountCrossBowAmmo2 = lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
 		Ammo.AmountCrossBowAmmo3 = lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].GetCount();
 		Ammo.AmountUziAmmo = lara->Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountMagnumsAmmo = lara->Weapons[(int)LaraWeaponType::Magnums].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Magnums].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 		Ammo.AmountRevolverAmmo = lara->Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 		Ammo.AmountPistolsAmmo = lara->Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 		Ammo.AmountRocketsAmmo = lara->Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
@@ -2071,6 +2088,19 @@ namespace TEN::Gui
 					return;
 
 				if (lara->Control.Weapon.GunType == LaraWeaponType::Pistol)
+					lara->Control.HandStatus = HandStatus::WeaponDraw;
+
+				return;
+			}
+
+			if (gameObject == ID_MAGNUMS_ITEM)
+			{
+				lara->Control.Weapon.RequestGunType = LaraWeaponType::Magnums;
+
+				if (lara->Control.HandStatus != HandStatus::Free)
+					return;
+
+				if (lara->Control.Weapon.GunType == LaraWeaponType::Magnums)
 					lara->Control.HandStatus = HandStatus::WeaponDraw;
 
 				return;
@@ -2601,6 +2631,7 @@ namespace TEN::Gui
 						AmmoActive = 1;
 						Ammo.StashedCurrentSelectedOption = CurrentSelectedOption;
 						Ammo.StashedCurrentPistolsAmmoType = Ammo.CurrentPistolsAmmoType;
+						Ammo.StashedCurrentMagnumsAmmoType = Ammo.CurrentMagnumsAmmoType;
 						Ammo.StashedCurrentUziAmmoType = Ammo.CurrentUziAmmoType;
 						Ammo.StashedCurrentRevolverAmmoType = Ammo.CurrentRevolverAmmoType;
 						Ammo.StashedCurrentShotGunAmmoType = Ammo.CurrentShotGunAmmoType;
@@ -2670,6 +2701,7 @@ namespace TEN::Gui
 					AmmoActive = 0;
 					invRing.RingActive = true;
 					Ammo.CurrentPistolsAmmoType = Ammo.StashedCurrentPistolsAmmoType;
+					Ammo.CurrentMagnumsAmmoType = Ammo.StashedCurrentMagnumsAmmoType;
 					Ammo.CurrentUziAmmoType = Ammo.StashedCurrentUziAmmoType;
 					Ammo.CurrentRevolverAmmoType = Ammo.StashedCurrentRevolverAmmoType;
 					Ammo.CurrentShotGunAmmoType = Ammo.StashedCurrentShotGunAmmoType;
@@ -3083,6 +3115,10 @@ namespace TEN::Gui
 
 							case ID_UZI_AMMO_ITEM:
 								numItems = player.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+								break;
+
+							case ID_MAGNUMS_AMMO_ITEM:
+								numItems = player.Weapons[(int)LaraWeaponType::Magnums].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 								break;
 							}
 						}

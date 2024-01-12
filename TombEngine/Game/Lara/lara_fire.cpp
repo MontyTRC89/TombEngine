@@ -123,6 +123,23 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0
 	},
 
+	// Magnums
+	{
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-170.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
+		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(170.0f), 0)),
+		ANGLE(10.0f),
+		ANGLE(8.0f),
+		650,
+		BLOCK(8),
+		2,
+		9,
+		3,
+		0,
+		SFX_TR1_PIERRE_MAGNUM_FIRE,
+		0
+	},
+
 	// Uzis
 	{
 		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
@@ -328,7 +345,14 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 			DrawPistolMeshes(laraItem, player.Control.Weapon.GunType);
 
 		break;
+	case LaraWeaponType::Magnums:
+		player.RightArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+		player.LeftArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
 
+		if (player.Control.HandStatus != HandStatus::Free)
+			DrawPistolMeshes(laraItem, player.Control.Weapon.GunType);
+
+		break;
 	case LaraWeaponType::Shotgun:
 	case LaraWeaponType::Revolver:
 	case LaraWeaponType::HK:
@@ -396,6 +420,9 @@ HolsterSlot GetWeaponHolsterSlot(LaraWeaponType weaponType)
 	case LaraWeaponType::Revolver:
 		return HolsterSlot::Revolver;
 
+	case LaraWeaponType::Magnums:
+		return HolsterSlot::Magnums;
+
 	case LaraWeaponType::Shotgun:
 		return HolsterSlot::Shotgun;
 
@@ -428,6 +455,9 @@ GAME_OBJECT_ID GetWeaponObjectID(LaraWeaponType weaponType)
 
 	case LaraWeaponType::Shotgun:
 		return ID_SHOTGUN_ANIM;
+
+	case LaraWeaponType::Magnums:
+		return ID_MAGNUMS_ANIM;
 
 	case LaraWeaponType::Revolver:
 		return ID_REVOLVER_ANIM;
@@ -463,6 +493,9 @@ GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo& laraItem, LaraWeaponType weaponTy
 	{
 	case LaraWeaponType::Revolver:
 		return (player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
+
+	case LaraWeaponType::Magnums:
+		return ID_MAGNUMS_ANIM;
 
 	case LaraWeaponType::Uzi:
 		return ID_UZI_ANIM;
@@ -642,6 +675,11 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 		case LaraWeaponType::Pistol:
 		case LaraWeaponType::Revolver:
+
+		case LaraWeaponType::Magnums:
+			if (Camera.type != CameraType::Look && Camera.type != CameraType::Heavy)
+				Camera.type = CameraType::Combat;
+
 		case LaraWeaponType::Uzi:
 			if (Camera.type != CameraType::Look && Camera.type != CameraType::Heavy)
 				Camera.type = CameraType::Combat;
@@ -684,6 +722,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 		case LaraWeaponType::Pistol:
 		case LaraWeaponType::Revolver:
+		case LaraWeaponType::Magnums:
 		case LaraWeaponType::Uzi:
 			UndrawPistols(laraItem, player.Control.Weapon.GunType);
 			break;
@@ -736,6 +775,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		switch (player.Control.Weapon.GunType)
 		{
 		case LaraWeaponType::Pistol:
+		case LaraWeaponType::Magnums:
 		case LaraWeaponType::Uzi:
 			HandlePistols(laraItem, player.Control.Weapon.GunType);
 			break;
