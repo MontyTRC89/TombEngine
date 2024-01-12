@@ -1,17 +1,6 @@
 # TombEngine 
 
-In the year 2000, Core Design granted us a great gift: their TR4-based Level Editor, which allowed people to create custom levels. It was, unfortunately, quite limited, hence why over the decades it was upgraded massively with fan projects such as Tomb Raider Engine Patcher (TREP) and Tomb Raider Next Generation (TRNG).
-- TREP was a tool which allowed modification of the executable to expand certain limits and implement new features.
-- TRNG built upon TREP and provided many new tools, including a scripting language, expanding even more limits with its own .DLL.
-
-Unfortunately, TRNG's toolset is poorly documented and not user-friendly; the program remains closed-source to this day and is in all practicality an abandonware. As a direct consequence, no one is able to fix the countless well-known bugs and issues extant in TRNG, rendering implementation of new features is impossible without an in-depth knowledge of C++ plugin creation and a solid understanding of the classic Tomb Raider engine's many idiosyncrasies.
-
-TombEngine (TEN) is a new, open-source engine which aims to abolish all limits, fix bugs from the original games, introduce new features while refining old ones, and provide for a refined, user-friendly level creation process. Current support includes:
-- Lua (as the native scripting language)
-- All objects from the classic series (1-5)
-- Many more exciting gameplay functionalities such as diagonal shimmying and expanded crawlspace flexibility
-- An enlarged 2D map, allowing for the creation of massive levels (imagine one big level may previously have been split into five!)
-- A streamlined player control scheme.
+[Main project.](https://github.com/MontyTRC89/TombEngine/tree/master/TombEngine)
 
 If you would like to participate in TEN discussion with other TEN devs whether it is contributing, bugs or general discussion, then join this discord server: https://discord.gg/h5tUYFmres
 
@@ -47,50 +36,6 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 
 ## Developers
 
-- MontyTRC (Project Leader)
-
-- Gancian (general coding)
-- Krystian (general coding)
-- Kubsy (Some cleanups and fixes)
-- l.m. (general coding, Lua enhancements, bug fixing)
-- Lwmte (sound refactoring, general coding, code cleanups, bug fixing)
-- Moooonyeah (Jumanji) (entity decompilation)
-- Raildex (renderer refactoring, particle coding, general coding) 
-- RicardoLuis0 (general coding)
-- Sezz (player state refactoring, general coding, code cleanups, bug fixing, assets)
-- Squidshire (Hispidence) (Lua implementation, bug fixing)
-- Stranger1992 (sound asset refactoring and organisation, assets)
-- TokyoSU (entity and vehicle decompilation)
-- Tomo (general coding, bug fixing)
-- Troye (general coding, refactoring)
-- WolfCheese (general coding)
-
-## Testers
-- Adngel
-- Caesum
-- Dustie
-- GeckoKid
-- JoeyQuint
-- Kamillos
-- Kubsy
-- LGG_PRODUCTION
-- Lore
-- RemRem
-- Stranger1992
-- WolfCheese
-
-## Assets and Miscellaneous
-
-- Geckokid (Sprites and test level creator).
-
-### Animations
-- SrDanielPonces (Diagonal shimmy transitions, backwards monkey swinging)
-- Krystian (Flexibility crawlspace, slope climbing animations)
-- Sezz (Additional Animations for player state refactoring) 
-- Naotheia (Underwater puzzle placement, crouch 180° turn, crawl 180° turn, water surface 180° turn)
-- JoeyQuint (Standing 180° turn, monkey swing 180° turn)
-
-### TombEngine Marketing 
-- Kubsy (Twitter and forum posts)
-- Stranger1992 (This website, Facebook, Instagram, Youtube and Twitch.
+Please refer to the [original project](https://github.com/MontyTRC89/TombEngine/tree/master/TombEngine), led by MontyTRC89, for the full list of credits. Thank you for your contribution.
+This fork is developed by Frjttr and DaviDMRR in joint conjunction.
 
