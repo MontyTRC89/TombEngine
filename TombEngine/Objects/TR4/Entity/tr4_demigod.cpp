@@ -15,7 +15,7 @@
 #include "Game/people.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;
@@ -154,7 +154,7 @@ namespace TEN::Entities::TR4
 
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;
@@ -288,7 +288,7 @@ namespace TEN::Entities::TR4
 				spark->colFadeSpeed = 4;
 				spark->dShade = (GetRandomControl() & 0x1F) + 96;
 				spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+				spark->blendMode = BlendMode::Additive;
 				spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 				spark->x = (GetRandomControl() & 0x1F) + x - 16;
 				spark->y = (GetRandomControl() & 0x1F) + y - 16;

@@ -255,6 +255,10 @@ void UpdateDebris()
 				deb.velocity.z *= deb.friction;
 				deb.numBounces++;
 			}
+
+			auto translation = Matrix::CreateTranslation(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z);
+			auto rotation = Matrix::CreateFromQuaternion(deb.rotation);
+			deb.Transform = rotation * translation;
 		}
 	}
 }

@@ -2,8 +2,8 @@
 #include "Game/collision/sphere.h"
 #include "Specific/newtypes.h"
 #include "Specific/level.h"
-#include "Renderer/Renderer11.h"
-#include "Renderer/RendererVertex.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Graphics/Vertices/Vertex.h"
 
 constexpr int MAX_DEBRIS = 2048;
 
@@ -43,7 +43,7 @@ struct ShatterImpactInfo
 
 struct DebrisMesh
 {
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	std::array<Vector3, 3> Positions;
 	std::array<Vector2, 3> TextureCoordinates;
 	std::array<Vector3, 3> Normals;
@@ -65,11 +65,12 @@ struct DebrisFragment
 	float friction;
 	float restitution;
 	Vector4 color;
-	LIGHT_MODES lightMode;
+	LightMode lightMode;
 	int roomNumber;
 	int numBounces;
 	bool active;
 	bool isStatic;
+	Matrix Transform;
 };
 
 extern SHATTER_ITEM ShatterItem;

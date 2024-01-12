@@ -1,46 +1,56 @@
 Version 1.3
 ===========
 
-* Fix crash if title logo is removed from Textures folder.
-* Fix crash if unknown player state ID is encountered.
-* Fix bug with OCB 2 on pushables, and some other pushable bugs.
-* Fix pushable camera bug during edge slip.
-* Fix lever switch turn off alignment animation. 
-* Fix lack of water splash in certain scenarios.
-* Fix hydra flame not showing when charging.
-* Fix shockwave light for hammer god.
-* Fix camera shaking in some cases when the player is in quicksand room.
-* Fix certain flame emitter OCBs emitting fire in wrong directions.
-* Fix player not being able to pick up a torch when crouching.
-* Fix jittery camera when performing crawl-to-hang.
-* Fix several issues with limited pistol ammo.
-* Fix player not being able to crawl if two-handed weapon is currently equipped.
-* Fix playback issues with audio tracks placed in subfolders.
-* Fix legacy trigger leveljumps ignoring provided level index.
+* Fixed crash if title logo is removed from Textures folder.
+* Fixed crash if unknown player state ID is encountered.
+* Fixed bug with OCB 2 on pushables, and some other pushable bugs.
+* Fixed pushable camera bug during edge slip.
+* Fixed lever switch turn off alignment animation. 
+* Fixed lack of water splash in certain scenarios.
+* Fixed hydra flame not showing when charging.
+* Fixed shockwave light for hammer god.
+* Fixed camera shaking in some cases when the player is in quicksand room.
+* Fixed certain flame emitter OCBs emitting fire in wrong directions.
+* Fixed player not being able to pick up a torch when crouching.
+* Fixed jittery camera when performing crawl-to-hang.
+* Fixed several issues with limited pistol ammo.
+* Fixed player not being able to crawl if two-handed weapon is currently equipped.
+* Fixed playback issues with audio tracks placed in subfolders.
+* Fixed thin caustics outline on the edge of the blocks.
+* Fixed big static objects affected wrongly by dynamic lights.
+* Fixed legacy trigger leveljumps ignoring provided level index.
+* Fixed incorrect light collection in some cases.
+* Fixed normal mapping for rooms, items, and statics.
+* Added ambient occlusion (SSAO).
+* Added new post-process workflow (monochrome, negative, exclusion) with tinting.
+* Added SMAA antialiasing instead of MSAA.
+* Added previously missing player start position object functionality.
+* Added fast speed for fly cheat by holding Sprint input action.
+* Added speedometer to vehicles.
+* Added global node events.
+* Totally revised transparency handling.
+* Increased the maximum frames for animated sequences from 128 to 256.
+* Optimized the renderer.
 * Separate underwater wall and ceiling switch objects into two slots each.
-* Improve fly cheat collision.
-* Add global events.
-* Add previously missing player start position object functionality.
-* Add fast speed for fly cheat by holding Sprint input action.
+* Accurately rotate display sprites around the pivot defined by the align mode.
 * Allow walking on slopes when wading in water (similar to quicksand).
 * Allow player to pull certain levers with both hands when holding a flare.
-* Port twin auto gun from TR3.
-* Add speedometer to vehicles.
-* Accurately rotate display sprites around the pivot defined by the align mode.
-* Revise keyhole OCBs to account for keeping or losing keys:
+* Ported twin auto gun from TR3.
+* Revised keyhole OCBs to account for keeping or losing keys:
+  - OCB 0: Play default animation and lose key.
   - Positive OCB: Play anim number and keep key.
   - Negative OCB: Play anim number and lose key.
-  - OCB 0: Play default animation and lose key.
-* Revise Wolf OCB:
+* Revised Wolf OCBs:
   - OCB 0: Wolf starts in walking animation, ready to chase Lara.
   - OCB 1: Wolf starts in sleeping animation.
 
 Lua API changes:
-* Add Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
-* Add Moveable:SetStatus() to set the current status of the moveable.
-* Add Room:GetColor() to get room's ambient light color.
-* Add Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
-* Add View.GetCameraPosition(), View.GetCameraTarget() and View:GetCameraRoom() functions.
+* Added Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
+* Added Moveable:SetStatus() to set the current status of the moveable.
+* Added Room:GetColor() to get room's ambient light color.
+* Added Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
+* Added View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
+* Added View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
 
 Version 1.2
 ===========

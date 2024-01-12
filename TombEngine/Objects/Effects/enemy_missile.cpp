@@ -14,7 +14,7 @@
 #include "Objects/TR3/Entity/tr3_claw_mutant.h"
 #include "Objects/TR4/Entity/tr4_mutant.h"
 #include "Objects/TR4/Entity/tr4_demigod.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Items;
@@ -38,7 +38,7 @@ namespace TEN::Entities::Effects
 		flame.dG = flame.dB + 64;
 		flame.fadeToBlack = 8;
 		flame.colFadeSpeed = (GetRandomControl() & 3) + 4;
-		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.blendMode = BlendMode::Additive;
 		flame.life = flame.sLife = (GetRandomControl() & 3) + 16;
 		flame.y = 0;
 		flame.x = (GetRandomControl() & 0xF) - 8;
@@ -85,7 +85,7 @@ namespace TEN::Entities::Effects
 		flame.dG = flame.dR = (GetRandomControl() & 0x7F) + 32;
 		flame.fadeToBlack = 8;
 		flame.colFadeSpeed = (GetRandomControl() & 3) + 4;
-		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.blendMode = BlendMode::Additive;
 		flame.life = flame.sLife = (GetRandomControl() & 3) + 16;
 		flame.y = 0;
 		flame.x = (GetRandomControl() & 0xF) - 8;

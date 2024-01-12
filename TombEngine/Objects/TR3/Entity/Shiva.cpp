@@ -13,7 +13,7 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
@@ -109,7 +109,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
 		smoke.on = true;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 
 		smoke.x = effectPos.x;
 		smoke.y = effectPos.y;

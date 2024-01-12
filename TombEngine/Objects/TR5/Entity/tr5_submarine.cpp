@@ -48,7 +48,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dR = spark->dG / 2;
 		spark->dB = spark->dG / 2;
 		spark->sLife = 2;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->fadeToBlack = 0;
 		spark->flags = 20650;
 		spark->fxObj = itemNumber;
@@ -79,7 +79,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dB = 80;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 		spark->x = pos1->x + (GetRandomControl() & 0x1F);
 		spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
@@ -112,7 +112,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dB = -128;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 		spark->x = pos1->x + (GetRandomControl() & 0x1F);
 		spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;

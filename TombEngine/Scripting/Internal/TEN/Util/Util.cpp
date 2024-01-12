@@ -5,7 +5,7 @@
 #include "Game/control/los.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"

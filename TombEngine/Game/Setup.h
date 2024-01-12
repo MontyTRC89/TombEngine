@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/control/box.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
 class Vector3i;

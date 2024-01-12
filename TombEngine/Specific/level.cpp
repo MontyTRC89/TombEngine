@@ -20,7 +20,7 @@
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Objects/Sink.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -82,6 +82,7 @@ const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 char* LevelDataPtr;
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
+std::vector<int> SpriteSequencesIds;
 LEVEL g_Level;
 
 unsigned char ReadUInt8()
@@ -272,7 +273,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.lightMode = (LIGHT_MODES)ReadUInt8();
+		mesh.lightMode = (LightMode)ReadUInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
@@ -300,7 +301,7 @@ void LoadObjects()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = (BLEND_MODES)ReadUInt8();
+			bucket.blendMode = (BlendMode)ReadUInt8();
 			bucket.animated = ReadBool();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -473,9 +474,6 @@ void LoadObjects()
 		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
 		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
-
-	// HACK: to remove after decompiling LoadSprites
-	MoveablesIds.push_back(ID_DEFAULT_SPRITES);
 }
 
 void LoadCameras()
@@ -723,7 +721,7 @@ void ReadRooms()
 			auto bucket = BUCKET{};
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = (BLEND_MODES)ReadUInt8();
+			bucket.blendMode = (BlendMode)ReadUInt8();
 			bucket.animated = ReadBool();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -950,6 +948,7 @@ void FreeLevel()
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
 	MoveablesIds.resize(0);
+	SpriteSequencesIds.resize(0);
 	g_Level.Boxes.resize(0);
 	g_Level.Overlaps.resize(0);
 	g_Level.Anims.resize(0);
@@ -1455,6 +1454,8 @@ void LoadSprites()
 			Objects[spriteID].nmeshes = negLength;
 			Objects[spriteID].meshIndex = offset;
 			Objects[spriteID].loaded = true;
+
+			SpriteSequencesIds.push_back(spriteID);
 		}
 	}
 }
