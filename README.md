@@ -36,9 +36,6 @@ Visual Studio may also warn about NuGet packages. To fix:
 3) Right-click on the TombEngine solution in the Solution Explorer tab and select "Restore NuGet Packages"
 4) Compile again and once done, you should be able to compile a level with TombEditor and run it in TEN.
 
-# About this Fork
-Main goal is to implement the dual magnums alongside the revolver, regardless of which slots the animations will occupy. On a second time, I would like to reimplement FMVs and ring menus.
-
 # Disclaimer
 We do not and have never worked for Core Design, Eidos Interactive, or Square Enix. This is a hobby project. Tomb Raider is a registered trademark of Square Enix; TombEngine is not be sold. The code is open-source to encourage contributions and to be used for study purposes. We are not responsible for illegal uses of this source code. This source code is released as-is and continues to be maintained by non-paid contributors in their free time.
 
