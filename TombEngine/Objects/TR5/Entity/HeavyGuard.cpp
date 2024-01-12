@@ -104,7 +104,7 @@ namespace TEN::Entities::Creatures::TR5
 		float scale = (life * 12) * phd_cos(orient.x);
 
 		smoke.on = true;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 
 		smoke.x = pos.x;
 		smoke.y = pos.y;
@@ -169,9 +169,8 @@ namespace TEN::Entities::Creatures::TR5
 		auto origin2 = GameVector(origin, item.RoomNumber);
 		auto target2 = GameVector(target);
 		auto hitPos = Vector3i::Zero;
-		MESH_INFO* hitJoint = nullptr;
 
-		if (ObjectOnLOS2(&origin2, &target2, &hitPos, &hitJoint, ID_LARA) == creature.Enemy->Index)
+		if (ObjectOnLOS2(&origin2, &target2, &hitPos, nullptr, ID_LARA) == creature.Enemy->Index)
 		{
 			if (LaraItem->HitPoints <= HEAVY_GUARD_RAYGUN_PLAYER_BURN_HEALTH)
 			{

@@ -304,7 +304,7 @@
 	<parameters>
 		<parameter>
 			<name>priority</name>
-			<type>Objects.ObjID</type>
+			<type>int</type>
 			<description>Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__</description>
 		</parameter>
 		<parameter>
@@ -751,17 +751,34 @@ have an ID of 0, the second an ID of 1, and so on.</description>
 <function>
 	<module>Flow</module>
 	<name>EndLevel</name>
-	<summary>Finishes the current level, with optional level index provided.</summary>
-	<description>If level index
-is not provided or is zero, jumps to next level. If level index is more than
-level count, jumps to title.</description>
+	<summary>Finishes the current level, with optional level index and start position index provided.</summary>
+	<description>If level index is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title. If LARA\_START\_POS objects are present in level, player will be
+teleported to such object with OCB similar to provided second argument.</description>
 	<parameters>
 		<parameter>
 			<name>index</name>
 			<type>int</type>
 			<description>level index (default 0)</description>
 		</parameter>
+		<parameter>
+			<name>startPos</name>
+			<type>int</type>
+			<description>player start position (default 0)</description>
+		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetGameStatus</name>
+	<summary>Get current game status, such as normal game loop, exiting to title, etc.</summary>
+	<returns>
+		<return>
+			<type>Flow.GameStatus</type>
+			<description>the current game status</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -1144,7 +1161,7 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 
 <function>
 	<module>Input</module>
-	<name>GetCursorDisplayPosition</name>
+	<name>GetMouseDisplayPosition</name>
 	<summary>Get the display position of the cursor in percent.</summary>
 	<description>()</description>
 	<returns>
@@ -1239,13 +1256,13 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 	<summary>Register a function as a callback.</summary>
 	<parameters>
 		<parameter>
-			<name>CallbackPoint</name>
-			<type>point</type>
+			<name>point</name>
+			<type>CallbackPoint</type>
 			<description>When should the callback be called?</description>
 		</parameter>
 		<parameter>
 			<name>func</name>
-			<type>function</type>
+			<type>LevelFunc</type>
 			<description>The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.</description>
 		</parameter>
 	</parameters>
@@ -1258,14 +1275,14 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 	<description>Will have no effect if the function was not registered as a callback</description>
 	<parameters>
 		<parameter>
-			<name>CallbackPoint</name>
-			<type>point</type>
+			<name>point</name>
+			<type>CallbackPoint</type>
 			<description>The callback point the function was registered with. See @{AddCallback}</description>
 		</parameter>
 		<parameter>
-			<name>LevelFunc</name>
-			<type>func</type>
-			<description>the function to remove; must be in the LevelFuncs hierarchy.</description>
+			<name>func</name>
+			<type>LevelFunc</type>
+			<description>The function to remove; must be in the LevelFuncs hierarchy.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1273,22 +1290,58 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 <function>
 	<module>Logic</module>
 	<name>HandleEvent</name>
-	<summary>Attempt to find an event set and exectute a particular event from it.</summary>
+	<summary>Attempt to find an event set and execute a particular event from it.</summary>
 	<parameters>
 		<parameter>
-			<name>string</name>
-			<type>name</type>
+			<name>name</name>
+			<type>string</type>
 			<description>Name of the event set to find.</description>
 		</parameter>
 		<parameter>
-			<name>EventType</name>
-			<type>type</type>
+			<name>type</name>
+			<type>EventType</type>
 			<description>Event to execute.</description>
 		</parameter>
 		<parameter>
-			<name>Moveable</name>
-			<type>activator</type>
+			<name>activator</name>
+			<type>Objects.Moveable</type>
 			<description>Optional activator. Default is the player object.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Logic</module>
+	<name>EnableEvent</name>
+	<summary>Attempt to find an event set and enable specified event in it.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>Name of the event set to find.</description>
+		</parameter>
+		<parameter>
+			<name>type</name>
+			<type>EventType</type>
+			<description>Event to enable.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Logic</module>
+	<name>DisableEvent</name>
+	<summary>Attempt to find an event set and disable specified event in it.</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>Name of the event set to find.</description>
+		</parameter>
+		<parameter>
+			<name>type</name>
+			<type>EventType</type>
+			<description>Event to disable.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1506,7 +1559,7 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 
 <function>
 	<module>Objects.Camera</module>
-	<caller>CameraObject</caller>
+	<caller>Camera</caller>
 	<name>GetRoom</name>
 	<summary>Get the current room of the camera</summary>
 	<returns>
@@ -1808,11 +1861,24 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 	<module>Objects.LaraObject</module>
 	<caller>LaraObject</caller>
 	<name>GetTarget</name>
-	<summary>Get current target enemy, if it exists</summary>
+	<summary>Get the player's current targeted moveable (if it exists).</summary>
 	<returns>
 		<return>
 			<type>Objects.Moveable</type>
-			<description>current target enemy (nil if no target present)</description>
+			<description>Target moveable (nil if the player is not currently targeting a moveable).</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetInteractedMoveable</name>
+	<summary>Get the player's current interacted moveable (if it exists).</summary>
+	<returns>
+		<return>
+			<type>Objects.Moveable</type>
+			<description>Interacted moveable (nil if the player is not interacting with a moveable).</description>
 		</return>
 	</returns>
 </function>
@@ -1881,7 +1947,7 @@ most can just be ignored (see usage).</description>
 		<parameter>
 			<name>OCB</name>
 			<type>int</type>
-			<description>ocb of item (default 0)</description>
+			<description>ocb of item</description>
 		</parameter>
 		<parameter>
 			<name>AIBits</name>
@@ -1973,18 +2039,29 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
 	<name>GetStatus</name>
-	<summary>Get the status of object.</summary>
-	<description>possible values:
- <br />0 - not active 
- <br />1 - active 
- <br />2 - deactivated 
- <br />3 - invisible</description>
+	<summary>Get the moveable's status.</summary>
+	<description>()</description>
 	<returns>
 		<return>
-			<type>int</type>
-			<description>a number representing the status of the object</description>
+			<type>Objects.MoveableStatus</type>
+			<description>The moveable's status.</description>
 		</return>
 	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetStatus</name>
+	<summary>Set the moveable's status.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>status</name>
+			<type>Objects.MoveableStatus</type>
+			<description>The new status of the moveable.</description>
+		</parameter>
+	</parameters>
 </function>
 
 <function>
@@ -2664,13 +2741,13 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
 	<name>SetRoomNumber</name>
-	<summary>Set room number of object 
- Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</summary>
+	<summary>Set the room ID of a moveable.</summary>
+	<description>Use this if not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</description>
 	<parameters>
 		<parameter>
-			<name>ID</name>
+			<name>roomID</name>
 			<type>int</type>
-			<description>the ID of the new room</description>
+			<description>New room's ID.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -3051,6 +3128,19 @@ most can just be ignored (see usage).</description>
 		<return>
 			<type>bool</type>
 			<description>true if the room is active</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>GetColor</name>
+	<summary>Get the room's ambient light color.</summary>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>ambient light color of the room</description>
 		</return>
 	</returns>
 </function>
@@ -4241,6 +4331,26 @@ with a call to @{ShowString}, or this function will have no effect.</description
 
 <function>
 	<module>Util</module>
+	<name>GetDisplayPosition</name>
+	<summary>Get the projected display space position of a 3D world position.</summary>
+	<description>Returns nil if the world position is behind the camera view.</description>
+	<parameters>
+		<parameter>
+			<name>worldPos</name>
+			<type>Vec3</type>
+			<description>3D world position.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Projected display space position in percent.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
 	<name>PercentToScreen</name>
 	<summary>Translate a pair display position coordinates to pixel coordinates.</summary>
 	<description>To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.</description>
@@ -4293,6 +4403,44 @@ with a call to @{ShowString}, or this function will have no effect.</description
 		<return>
 			<type>float</type>
 			<description>y Y component of display position.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>PickMoveableByDisplayPosition</name>
+	<summary>Pick a moveable by the given display position.</summary>
+	<parameters>
+		<parameter>
+			<name>Display</name>
+			<type>Vec2</type>
+			<description>space position in percent.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Objects.Moveable</type>
+			<description>Picked moveable (nil if no moveable was found under the cursor).</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>PickStaticByDisplayPosition</name>
+	<summary>Pick a static mesh by the given display position.</summary>
+	<parameters>
+		<parameter>
+			<name>Display</name>
+			<type>Vec2</type>
+			<description>space position in percent.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Objects.Static</type>
+			<description>Picked static mesh (nil if no static mesh was found under the cursor).</description>
 		</return>
 	</returns>
 </function>
@@ -4733,18 +4881,6 @@ with a call to @{ShowString}, or this function will have no effect.</description
 
 <function>
 	<module>View</module>
-	<name>GetAspectRatio</name>
-	<summary>Get the display resolution's aspect ratio.</summary>
-	<returns>
-		<return>
-			<type>float</type>
-			<description>Display resolution's aspect ratio.</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>View</module>
 	<name>FadeIn</name>
 	<summary>Do a full-screen fade-in from black.</summary>
 	<parameters>
@@ -4803,12 +4939,99 @@ with a call to @{ShowString}, or this function will have no effect.</description
 
 <function>
 	<module>View</module>
+	<name>GetFOV</name>
+	<summary>Get field of view.</summary>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>current FOV angle in degrees</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
 	<name>GetCameraType</name>
 	<summary>Shows the mode of the game camera.</summary>
 	<returns>
 		<return>
 			<type>View.CameraType</type>
 			<description>value used by the Main Camera.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetCameraRoom</name>
+	<summary>Gets current room where camera is positioned.</summary>
+	<returns>
+		<return>
+			<type>Objects.Room</type>
+			<description>current room of the camera</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessMode</name>
+	<summary>Sets the post-process effect mode, like negative or monochrome.</summary>
+	<parameters>
+		<parameter>
+			<name>effect</name>
+			<type>View.PostProcessMode</type>
+			<description>type to set.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessStrength</name>
+	<summary>Sets the post-process effect strength.</summary>
+	<parameters>
+		<parameter>
+			<name>strength</name>
+			<type>float</type>
+			<description>(default 1.0). How strong the effect is.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessTint</name>
+	<summary>Sets the post-process tint.</summary>
+	<parameters>
+		<parameter>
+			<name>tint</name>
+			<type>Color</type>
+			<description>value to use.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetCameraPosition</name>
+	<summary>Gets current camera position.</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>current camera position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetCameraTarget</name>
+	<summary>Gets current camera target.</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>current camera target</description>
 		</return>
 	</returns>
 </function>
@@ -4848,6 +5071,18 @@ with a call to @{ShowString}, or this function will have no effect.</description
 			<description>(default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetAspectRatio</name>
+	<summary>Get the display resolution's aspect ratio.</summary>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Display resolution's aspect ratio.</description>
+		</return>
+	</returns>
 </function>
 
 <function>

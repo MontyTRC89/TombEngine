@@ -14,7 +14,7 @@
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/Utils/VehicleHelpers.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -721,7 +721,7 @@ namespace TEN::Entities::Vehicles
 		sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 		sptr->fadeToBlack = 12 - (snow * 8);
 		sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->extras = 0;
 		sptr->dynamic = -1;
 

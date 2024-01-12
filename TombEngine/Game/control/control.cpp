@@ -149,14 +149,14 @@ GameStatus ControlPhase(int numFrames)
 	bool isFirstTime = true;
 	static int framesCount = 0;
 
-	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
+	for (framesCount += numFrames; framesCount > 0; framesCount -= LOOP_FRAME_COUNT)
 	{
-		// Controls are polled before OnControlPhase, so input data could be
+		// Controls are polled before OnLoop, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
 
-		// Handle loop functions and node events.
-		g_GameScript->OnControlPhase(DELTA_TIME);
+		// Pre-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
 		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
 		// Control lock is processed after handling scripts, because builder may want to
@@ -244,6 +244,9 @@ GameStatus ControlPhase(int numFrames)
 
 		PlaySoundSources();
 		DoFlipEffect(FlipEffect, LaraItem);
+
+		// Post-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, true);
 
 		// Clear savegame loaded flag.
 		JustLoaded = false;
@@ -441,6 +444,9 @@ void CleanUp()
 
 	// Clear all remaining renderer data.
 	g_Renderer.ClearScene();
+	g_Renderer.SetPostProcessMode(PostProcessMode::None);
+	g_Renderer.SetPostProcessStrength(1.0f);
+	g_Renderer.SetPostProcessTint(Vector3::One);
 
 	// Reset Itemcamera
 	ClearObjCamera();
@@ -489,8 +495,6 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 
 void InitializeOrLoadGame(bool loadGame)
 {
-	RequiredStartPos = false;
-
 	g_Gui.SetInventoryItemChosen(NO_ITEM);
 	g_Gui.SetEnterInventory(NO_ITEM);
 
@@ -539,15 +543,16 @@ void InitializeOrLoadGame(bool loadGame)
 
 GameStatus DoGameLoop(int levelIndex)
 {
+	int numFrames = LOOP_FRAME_COUNT;
+	auto& status = g_GameFlow->LastGameStatus;
+
 	// Before entering actual game loop, ControlPhase must be
 	// called once to sort out various runtime shenanigangs (e.g. hair).
-
-	int numFrames = 2;
-	auto result = ControlPhase(numFrames);
+	status = ControlPhase(numFrames);
 
 	while (DoTheGame)
 	{
-		result = ControlPhase(numFrames);
+		status = ControlPhase(numFrames);
 
 		if (!levelIndex)
 		{
@@ -559,15 +564,15 @@ GameStatus DoGameLoop(int levelIndex)
 			{
 			case InventoryResult::NewGame:
 			case InventoryResult::NewGameSelectedLevel:
-				result = GameStatus::NewGame;
+				status = GameStatus::NewGame;
 				break;
 
 			case InventoryResult::LoadGame:
-				result = GameStatus::LoadGame;
+				status = GameStatus::LoadGame;
 				break;
 
 			case InventoryResult::ExitGame:
-				result = GameStatus::ExitGame;
+				status = GameStatus::ExitGame;
 				break;
 			}
 
@@ -576,10 +581,10 @@ GameStatus DoGameLoop(int levelIndex)
 		}
 		else
 		{
-			if (result == GameStatus::ExitToTitle ||
-				result == GameStatus::LaraDead ||
-				result == GameStatus::LoadGame ||
-				result == GameStatus::LevelComplete)
+			if (status == GameStatus::ExitToTitle ||
+				status == GameStatus::LaraDead ||
+				status == GameStatus::LoadGame ||
+				status == GameStatus::LevelComplete)
 			{
 				break;
 			}
@@ -589,8 +594,8 @@ GameStatus DoGameLoop(int levelIndex)
 		Sound_UpdateScene();
 	}
 
-	EndGameLoop(levelIndex, result);
-	return result;
+	EndGameLoop(levelIndex, status);
+	return status;
 }
 
 void EndGameLoop(int levelIndex, GameStatus reason)
@@ -630,9 +635,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 	{
 		SaveGame::LoadSavegameInfos();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
-
-		if (g_Gui.CallInventory(LaraItem, false))
-			result = GameStatus::SaveGame;
+		g_Gui.CallInventory(LaraItem, false);
 	}
 	else if (IsClicked(In::Load) &&
 		g_Gui.GetInventoryMode() != InventoryMode::Load &&

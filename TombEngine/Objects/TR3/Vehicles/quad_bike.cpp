@@ -1044,7 +1044,7 @@ namespace TEN::Entities::Vehicles
 			spark->sLife = spark->life = 9;
 
 		// TODO: Switch back to screen blend mode once rendering for it is refactored. -- Sezz 2023.01.14
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 4;
 		spark->extras = 0;

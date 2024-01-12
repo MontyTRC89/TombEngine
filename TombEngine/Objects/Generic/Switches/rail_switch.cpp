@@ -27,20 +27,6 @@ namespace TEN::Entities::Switches
 		)
 	};
 
-	const auto RailSwitchPos2 = Vector3i(0, 0, 550);
-	const ObjectCollisionBounds RailSwitchBounds2 =
-	{
-		GameBoundingBox(
-			-CLICK(1), CLICK(1),
-			0, 0,
-			BLOCK(0.5f), BLOCK(0.75f)
-		),
-		std::pair(
-			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-		)
-	};
-
 	void RailSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -61,11 +47,11 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
+				switchItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
-				if (TestLaraPosition(RailSwitchBounds2, switchItem, laraItem))
+				if (TestLaraPosition(RailSwitchBounds, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(RailSwitchPos2, switchItem, laraItem))
+					if (MoveLaraPosition(RailSwitchPos, switchItem, laraItem))
 					{
 						switchItem->Animation.TargetState = SWITCH_OFF;
 						flag = 1;
@@ -79,7 +65,7 @@ namespace TEN::Entities::Switches
 					lara->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
+				switchItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
 				if (flag)
 				{

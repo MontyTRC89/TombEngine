@@ -11,7 +11,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/rope.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 

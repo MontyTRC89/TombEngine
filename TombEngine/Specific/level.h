@@ -75,7 +75,7 @@ struct SPRITE
 
 struct MESH
 {
-	LIGHT_MODES lightMode;
+	LightMode lightMode;
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
@@ -126,8 +126,11 @@ struct LevelData
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences = {};
 };
 
+extern const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS;
+
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
+extern std::vector<int> SpriteSequencesIds;
 extern LevelData g_Level;
 
 inline std::future<bool> LevelLoadTask;

@@ -34,6 +34,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include "Renderer/Renderer.h"
 
 using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
@@ -42,6 +43,8 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
+using namespace TEN::Gui;
+using namespace TEN::Renderer;
 
 namespace Save = TEN::Save;
 
@@ -1099,7 +1102,7 @@ bool SaveGame::Save(int slot)
 		particleInfo.add_s_life(particle->sLife);
 		particleInfo.add_s_r(particle->sR);
 		particleInfo.add_s_size(particle->sSize);
-		particleInfo.add_blend_mode(particle->blendMode);
+		particleInfo.add_blend_mode((int)particle->blendMode);
 		particleInfo.add_x(particle->x);
 		particleInfo.add_x_vel(particle->sSize);
 		particleInfo.add_y(particle->y);
@@ -1354,8 +1357,8 @@ bool SaveGame::Save(int slot)
 	std::vector<std::string> callbackVecPreLoad;
 	std::vector<std::string> callbackVecPostLoad;
 
-	std::vector<std::string> callbackVecPreControl;
-	std::vector<std::string> callbackVecPostControl;
+	std::vector<std::string> callbackVecPreLoop;
+	std::vector<std::string> callbackVecPostLoop;
 
 	g_GameScript->GetCallbackStrings(
 		callbackVecPreStart,
@@ -1366,8 +1369,8 @@ bool SaveGame::Save(int slot)
 		callbackVecPostSave,
 		callbackVecPreLoad,
 		callbackVecPostLoad,
-		callbackVecPreControl,
-		callbackVecPostControl);
+		callbackVecPreLoop,
+		callbackVecPostLoop);
 
 	auto stringsCallbackPreStart = fbb.CreateVectorOfStrings(callbackVecPreStart);
 	auto stringsCallbackPostStart = fbb.CreateVectorOfStrings(callbackVecPostStart);
@@ -1377,8 +1380,8 @@ bool SaveGame::Save(int slot)
 	auto stringsCallbackPostSave = fbb.CreateVectorOfStrings(callbackVecPostSave);
 	auto stringsCallbackPreLoad = fbb.CreateVectorOfStrings(callbackVecPreLoad);
 	auto stringsCallbackPostLoad = fbb.CreateVectorOfStrings(callbackVecPostLoad);
-	auto stringsCallbackPreControl = fbb.CreateVectorOfStrings(callbackVecPreControl);
-	auto stringsCallbackPostControl = fbb.CreateVectorOfStrings(callbackVecPostControl);
+	auto stringsCallbackPreLoop = fbb.CreateVectorOfStrings(callbackVecPreLoop);
+	auto stringsCallbackPostLoop = fbb.CreateVectorOfStrings(callbackVecPostLoop);
 
 	Save::SaveGameBuilder sgb{ fbb };
 
@@ -1393,6 +1396,9 @@ bool SaveGame::Save(int slot)
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
 	sgb.add_next_fx_active(NextFxActive);
+	sgb.add_postprocess_mode((int)g_Renderer.GetPostProcessMode());
+	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
+	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
@@ -1437,8 +1443,8 @@ bool SaveGame::Save(int slot)
 	sgb.add_callbacks_pre_load(stringsCallbackPreLoad);
 	sgb.add_callbacks_post_load(stringsCallbackPostLoad);
 
-	sgb.add_callbacks_pre_control(stringsCallbackPreControl);
-	sgb.add_callbacks_post_control(stringsCallbackPostControl);
+	sgb.add_callbacks_pre_loop(stringsCallbackPreLoop);
+	sgb.add_callbacks_post_loop(stringsCallbackPostLoop);
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -1584,6 +1590,11 @@ bool SaveGame::Load(int slot)
 		assertion(i < ActionQueue.size(), "Action queue size was changed");
 		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
 	}
+
+	// Restore postprocess effects
+	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
+	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
+	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
 
 	// Restore soundtracks
 	for (int i = 0; i < s->soundtracks()->size(); i++)
@@ -1735,7 +1746,7 @@ bool SaveGame::Load(int slot)
 			item->Animation.AnimNumber = savedItem->anim_number();
 		}
 
-		if (obj->GetFloorHeight != nullptr)
+		if (item->IsBridge())
 			UpdateBridgeItem(g_Level.Items[i]);
 
 		// Creature data for intelligent items
@@ -1937,7 +1948,7 @@ bool SaveGame::Load(int slot)
 		particle->fadeToBlack = particleInfo->fade_to_black();
 		particle->sLife = particleInfo->s_life();
 		particle->life = particleInfo->life();
-		particle->blendMode = (BLEND_MODES)particleInfo->blend_mode();
+		particle->blendMode = (BlendMode)particleInfo->blend_mode();
 		particle->extras = particleInfo->extras();
 		particle->dynamic = particleInfo->dynamic();
 		particle->fxObj = particleInfo->fx_obj();
@@ -2340,8 +2351,8 @@ bool SaveGame::Load(int slot)
 	auto callbacksPreLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_load);
 	auto callbacksPostLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_load);
 
-	auto callbacksPreControlVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_control);
-	auto callbacksPostControlVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_control);
+	auto callbacksPreLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_loop);
+	auto callbacksPostLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_loop);
 
 	g_GameScript->SetCallbackStrings(
 		callbacksPreStartVec,
@@ -2352,8 +2363,8 @@ bool SaveGame::Load(int slot)
 		callbacksPostSaveVec,
 		callbacksPreLoadVec,
 		callbacksPostLoadVec,
-		callbacksPreControlVec,
-		callbacksPostControlVec);
+		callbacksPreLoopVec,
+		callbacksPostLoopVec);
 
 	return true;
 }

@@ -14,7 +14,7 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Objects/Effects/Boss.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
@@ -129,7 +129,7 @@ namespace TEN::Entities::Creatures::TR3
 		flame.fadeToBlack = 8;
 		flame.sLife =
 		flame.life = Random::GenerateInt(24, 32);
-		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.blendMode = BlendMode::Additive;
 		flame.extras = 0;
 		flame.dynamic = -1;
 		flame.x = Random::GenerateInt(-8, 8);
@@ -177,7 +177,7 @@ namespace TEN::Entities::Creatures::TR3
 		flame.fadeToBlack = 8;
 		flame.sLife =
 		flame.life = Random::GenerateInt(24, 32);
-		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.blendMode = BlendMode::Additive;
 		flame.extras = 0;
 		flame.dynamic = -1;
 		flame.x = Random::GenerateInt(-8, 8);

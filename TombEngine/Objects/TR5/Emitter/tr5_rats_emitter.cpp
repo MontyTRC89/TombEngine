@@ -294,6 +294,10 @@ void UpdateRats()
 
 				if (!i && !(GetRandomControl() & 4))
 					SoundEffect(SFX_TR5_RATS,&rat->Pose);
+
+				Matrix translation = Matrix::CreateTranslation(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
+				Matrix rotation = rat->Pose.Orientation.ToRotationMatrix();
+				rat->Transform = rotation * translation;
 			}
 		}
 	}

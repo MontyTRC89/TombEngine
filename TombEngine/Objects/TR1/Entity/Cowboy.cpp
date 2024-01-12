@@ -5,7 +5,7 @@
 #include "Game/effects/effects.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/level.h"
 
 using namespace TEN::Renderer;

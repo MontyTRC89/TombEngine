@@ -35,6 +35,7 @@
 #define IDC_GROUP_OUTPUT_SETTINGS       1063
 #define IDC_GROUP_GFXADAPTER            1064
 #define IDC_GROUP_SOUND                 1065
+#define IDC_AMBIENT_OCCLUSION           1066
 
 // Next default values for new objects
 // 

@@ -6,9 +6,9 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
+#include "Renderer/Renderer.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
-#include "Renderer/Renderer11.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Math;
@@ -43,7 +43,7 @@ static void AddRoomFlipItems(const ROOM_INFO& room)
 		const auto& object = Objects[item.ObjectNumber];
 
 		// Add bridges.
-		if (object.GetFloorHeight != nullptr)
+		if (item.IsBridge())
 			UpdateBridgeItem(item);
 	}
 }
@@ -66,7 +66,7 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 		}
 
 		// Clear bridge.
-		if (Objects[item.ObjectNumber].GetFloorHeight != nullptr)
+		if (item.IsBridge())
 			UpdateBridgeItem(item, true);
 	}
 }
