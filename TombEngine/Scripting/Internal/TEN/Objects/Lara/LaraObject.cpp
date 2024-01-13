@@ -217,7 +217,7 @@ LaraWeaponType LaraObject::GetWeaponType() const
 //	GRENADELAUNCHER
 //	HARPOONGUN
 //	ROCKETLAUNCHER
-//  MAGNUMS
+//  	MAGNUMS
 // @tparam bool activate true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.
 void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 {
