@@ -335,7 +335,7 @@ namespace TEN::Entities::Player
 
 			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
-				auto climbContext = GetHangShimmyLeftContext(*item, *coll);
+				auto climbContext = GetEdgeHangShimmyLeftContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
@@ -345,7 +345,7 @@ namespace TEN::Entities::Player
 			}
 			else if (IsHeld(In::Right) || IsHeld(In::StepRight))
 			{
-				auto climbContext = GetHangShimmyRightContext(*item, *coll);
+				auto climbContext = GetEdgeHangShimmyRightContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
@@ -396,7 +396,7 @@ namespace TEN::Entities::Player
 		{
 			if (IsHeld(In::Left))
 			{
-				auto climbContext = GetHangShimmyLeftContext(*item, *coll);
+				auto climbContext = GetEdgeHangShimmyLeftContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
@@ -450,7 +450,7 @@ namespace TEN::Entities::Player
 		{
 			if (IsHeld(In::Right))
 			{
-				auto climbContext = GetHangShimmyRightContext(*item, *coll);
+				auto climbContext = GetEdgeHangShimmyRightContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;

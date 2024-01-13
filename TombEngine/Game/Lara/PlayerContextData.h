@@ -85,6 +85,8 @@ namespace TEN::Entities::Player
 
 		ClimbContextAlignType AlignType = ClimbContextAlignType::None;
 
+		// TODO: These two can be unified into one as they coincide.
+		//bool IsJump = false;
 		bool SetBusyHands	 = false;
 		bool SetJumpVelocity = false;
 	};

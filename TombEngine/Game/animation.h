@@ -94,6 +94,8 @@ struct BoneMutator
 	};
 };
 
+Vector3 GetAnimVelocity(const AnimData& anim, int frameNumber);
+
 // Animation controller
 void AnimateItem(ItemInfo* item);
 

@@ -168,6 +168,15 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 	}
 }
 
+Vector3 GetAnimVelocity(const AnimData& anim, int frameNumber)
+{
+	unsigned int frameCount = GetNonZeroFrameCount(anim);
+	int currentFrame = frameNumber - anim.frameBase; // TODO: Clamp.
+
+	auto animAccel = (anim.VelocityEnd - anim.VelocityStart) / frameCount;
+	return (anim.VelocityStart + (animAccel * currentFrame));
+}
+
 void AnimateItem(ItemInfo* item)
 {
 	if (!item->IsLara())
