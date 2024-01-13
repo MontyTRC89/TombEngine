@@ -1810,6 +1810,7 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	item.Animation.IsAirborne = true;
 	item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 	player.Control.HandStatus = HandStatus::Free;
+	player.Control.IsHanging = false;
 	player.Context.Attractor.Detach(item);
 }
 

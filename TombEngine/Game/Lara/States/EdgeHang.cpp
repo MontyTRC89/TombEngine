@@ -169,32 +169,21 @@ namespace TEN::Entities::Player
 		};
 	}
 
-	void HandlePlayerEdgeMovement(ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
+	void SetPlayerEdgeHang(ItemInfo& item, const CollisionInfo& coll, const EdgeHangContextData context)
 	{
 		auto& player = GetLaraInfo(item);
 
-		// End hang if hands attractor doesn't exist.
-		if (player.Context.Attractor.Ptr == nullptr)
+		// No attractor; detach.
+		if (context.AttractorPtr == nullptr)
 		{
 			player.Control.IsHanging = false;
+			player.Context.Attractor.Detach(item);
 			return;
 		}
 
 		// Get edge hang attractor collisions.
-		float sideOffset = item.Animation.Velocity.z * (isGoingRight ? 1 : -1);
-		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, sideOffset);
-		if (!edgeAttracColls.has_value())
-		{
-			player.Control.IsHanging = false;
-			return;
-		}
-
-		// Test segment slope angle.
-		if (edgeAttracColls->Center.SlopeAngle >= ILLEGAL_FLOOR_SLOPE_ANGLE)
-		{
-			player.Control.IsHanging = false;
-			return;
-		}
+		//float sideOffset = item.Animation.Velocity.z * (isGoingRight ? 1 : -1);
+		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, -item.Animation.Velocity.z);
 
 		// Calculate target orientation.
 		auto targetOrient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.Intersection, edgeAttracColls->Right.Proximity.Intersection);
@@ -211,34 +200,20 @@ namespace TEN::Entities::Player
 		// Calculate relative position and orientation offsets.
 		auto rotMatrix = targetOrient.ToRotationMatrix();
 		auto relPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius) +
-							Vector3::Transform(targetPos - edgeAttracColls->Center.Proximity.Intersection, rotMatrix);
+			Vector3::Transform(targetPos - edgeAttracColls->Center.Proximity.Intersection, rotMatrix);
 		auto relOrientOffset = targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0);
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
 		player.Context.Attractor.Update(
-			item, *edgeAttracColls->Center.AttractorPtr, edgeAttracColls->Center.Proximity.ChainDistance,
+			item, *context.AttractorPtr, edgeAttracColls->Center.Proximity.ChainDistance,
 			relPosOffset, relOrientOffset);
-
-		HandlePlayerAttractorParent(item);
 	}
-
-	void SetPlayerEdgeHang(ItemInfo& item, const CollisionInfo& coll, const EdgeHangContextData context)
+	
+	// TODO: Stationary check.
+	bool TestPlayerEdgeHang()
 	{
-		auto& player = GetLaraInfo(item);
-
-		// No attractor; detach.
-		if (context.AttractorPtr == nullptr)
-		{
-			player.Context.Attractor.Detach(item);
-			return;
-		}
-
-		if (context.AlignType == ClimbContextAlignType::AttractorParent)
-		{
-			// reparent.
-		}
-		// otherwise, update parent.
+		return true;
 	}
 
 	// State:	  LS_EDGE_HANG_IDLE (10)
@@ -259,15 +234,15 @@ namespace TEN::Entities::Player
 		Camera.targetAngle = 0;
 		Camera.targetElevation = ANGLE(-45.0f);
 
+		HandlePlayerAttractorParent(*item);
+
 		if (item->HitPoints <= 0)
 		{
 			SetPlayerEdgeHangRelease(*item);
 			return;
 		}
 
-		HandlePlayerEdgeMovement(*item, *coll, true);
-
-		if (IsHeld(In::Action) && player.Control.IsHanging)
+		if (IsHeld(In::Action) && TestPlayerEdgeHang() && player.Control.IsHanging)
 		{
 			if (TestLaraClimbIdle(item, coll))
 			{
@@ -384,13 +359,13 @@ namespace TEN::Entities::Player
 		Camera.targetAngle = 0;
 		Camera.targetElevation = ANGLE(-45.0f);
 
+		HandlePlayerAttractorParent(*item);
+
 		if (item->HitPoints <= 0)
 		{
 			SetPlayerEdgeHangRelease(*item);
 			return;
 		}
-
-		HandlePlayerEdgeMovement(*item, *coll, false);
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
@@ -438,13 +413,13 @@ namespace TEN::Entities::Player
 		Camera.targetAngle = 0;
 		Camera.targetElevation = ANGLE(-45.0f);
 
+		HandlePlayerAttractorParent(*item);
+
 		if (item->HitPoints <= 0)
 		{
 			SetPlayerEdgeHangRelease(*item);
 			return;
 		}
-
-		HandlePlayerEdgeMovement(*item, *coll, true);
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
