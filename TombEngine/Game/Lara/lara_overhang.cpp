@@ -848,9 +848,9 @@ void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 				(probeDown.CeilingTilt.y / 3) == (slopeData.Goal.y / 3))
 			{
 				item->Animation.TargetState = LS_EDGE_HANG_IDLE;
-				if (IsHeld(In::Forward))
+				/*if (IsHeld(In::Forward))
 					SetAnimation(item, LA_WALL_CLIMB_SHIMMY_UP);
-				/*else if (IsHeld(In::Back))
+				else if (IsHeld(In::Back))
 					SetAnimation(item, LA_WALL_CLIMB_SHIMMY_DOWN);*/
 			}
 		}

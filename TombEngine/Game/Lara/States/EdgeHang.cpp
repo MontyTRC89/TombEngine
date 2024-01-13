@@ -169,12 +169,12 @@ namespace TEN::Entities::Player
 		};
 	}
 
-	void SetPlayerEdgeHang(ItemInfo& item, const CollisionInfo& coll, const EdgeHangContextData context)
+	static void SetPlayerEdgeHangClimb(ItemInfo& item, const CollisionInfo& coll, const ClimbContextData climbContext)
 	{
 		auto& player = GetLaraInfo(item);
 
 		// No attractor; detach.
-		if (context.AttractorPtr == nullptr)
+		if (climbContext.AttractorPtr == nullptr)
 		{
 			player.Control.IsHanging = false;
 			player.Context.Attractor.Detach(item);
@@ -199,14 +199,13 @@ namespace TEN::Entities::Player
 
 		// Calculate relative position and orientation offsets.
 		auto rotMatrix = targetOrient.ToRotationMatrix();
-		auto relPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius) +
-			Vector3::Transform(targetPos - edgeAttracColls->Center.Proximity.Intersection, rotMatrix);
+		auto relPosOffset = Vector3::Transform((targetPos - edgeAttracColls->Center.Proximity.Intersection) + climbContext.RelPosOffset, rotMatrix);
 		auto relOrientOffset = targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0);
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
 		player.Context.Attractor.Update(
-			item, *context.AttractorPtr, edgeAttracColls->Center.Proximity.ChainDistance,
+			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
 			relPosOffset, relOrientOffset);
 	}
 	
@@ -242,7 +241,7 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		if (IsHeld(In::Action) && TestPlayerEdgeHang() && player.Control.IsHanging)
+		if (IsHeld(In::Action) && TestPlayerEdgeHang() /*&& player.Control.IsHanging*/)
 		{
 			if (TestLaraClimbIdle(item, coll))
 			{
@@ -293,7 +292,7 @@ namespace TEN::Entities::Player
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
-					SetPlayerEdgeHang(*item, *coll, *climbContext);
+					SetPlayerEdgeHangClimb(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -303,7 +302,7 @@ namespace TEN::Entities::Player
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
-					SetPlayerEdgeHang(*item, *coll, *climbContext);
+					SetPlayerEdgeHangClimb(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -314,7 +313,7 @@ namespace TEN::Entities::Player
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
-					SetPlayerEdgeHang(*item, *coll, *climbContext);
+					SetPlayerEdgeHangClimb(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -324,7 +323,7 @@ namespace TEN::Entities::Player
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
-					SetPlayerEdgeHang(*item, *coll, *climbContext);
+					SetPlayerEdgeHangClimb(*item, *coll, *climbContext);
 					return;
 				}
 			}
@@ -367,17 +366,15 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		if (IsHeld(In::Action) && player.Control.IsHanging)
+		if (IsHeld(In::Action) /*&& player.Control.IsHanging*/)
 		{
-			if (IsHeld(In::Left))
+			auto climbContext = GetEdgeHangShimmyLeftContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				auto climbContext = GetEdgeHangShimmyLeftContext(*item, *coll);
-				if (climbContext.has_value())
-				{
-					item->Animation.TargetState = climbContext->TargetStateID;
-					SetPlayerEdgeHang(*item, *coll, *climbContext);
-					return;
-				}
+				g_Renderer.PrintDebugMessage("oooo");
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerEdgeHangClimb(*item, *coll, *climbContext);
+				return;
 			}
 
 			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
@@ -423,15 +420,12 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
-			if (IsHeld(In::Right))
+			auto climbContext = GetEdgeHangShimmyRightContext(*item, *coll);
+			if (climbContext.has_value())
 			{
-				auto climbContext = GetEdgeHangShimmyRightContext(*item, *coll);
-				if (climbContext.has_value())
-				{
-					item->Animation.TargetState = climbContext->TargetStateID;
-					SetPlayerEdgeHang(*item, *coll, *climbContext);
-					return;
-				}
+				item->Animation.TargetState = climbContext->TargetStateID;
+				SetPlayerEdgeHangClimb(*item, *coll, *climbContext);
+				return;
 			}
 
 			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
@@ -461,6 +455,7 @@ namespace TEN::Entities::Player
 		Camera.targetElevation = ANGLE(-33.0f);
 		Camera.laraNode = LM_TORSO;
 
+		HandlePlayerAttractorParent(*item);
 		SetPlayerCornerShimmyEnd(*item, *coll, TestLastFrame(item));
 	}
 

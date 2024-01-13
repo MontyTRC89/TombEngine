@@ -70,7 +70,7 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 		if (resultRight == -1 || resultLeft == -1)
 		{
 			SetAnimation(item, LA_WALL_CLIMB_IDLE);
-			item->Animation.TargetState = LS_HANG_IDLE;
+			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
 		}
 		else
 		{
@@ -203,7 +203,7 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 		if (!IsHeld(In::Back))
 			return;
 
-		if (item->Animation.TargetState == LS_HANG_IDLE)
+		if (item->Animation.TargetState == LS_EDGE_HANG_IDLE)
 			return;
 
 		item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
@@ -233,7 +233,7 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 			item->Pose.Position.y += yShift;
 		}
 		else
-			item->Animation.TargetState = LS_HANG_IDLE;
+			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
 	}
 	else if (item->Animation.TargetState != LS_GRABBING)
 	{
@@ -458,12 +458,12 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 
 	if (result != 0)
 	{
-		item->Animation.TargetState = LS_HANG_IDLE;
+		item->Animation.TargetState = LS_EDGE_HANG_IDLE;
 
 		do
 		{
 			AnimateItem(item);
-		} while (item->Animation.ActiveState != LS_HANG_IDLE);
+		} while (item->Animation.ActiveState != LS_EDGE_HANG_IDLE);
 
 		item->Pose.Position.x = coll->Setup.PrevPosition.x;
 		item->Pose.Position.z = coll->Setup.PrevPosition.z;

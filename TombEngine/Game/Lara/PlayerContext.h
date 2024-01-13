@@ -159,15 +159,15 @@ namespace TEN::Entities::Player
 	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Hang climb contexts
-	std::optional<EdgeHangContextData> GetHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeHangContextData> GetHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeHangContextData> GetEdgeHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeHangContextData> GetEdgeHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetEdgeHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetEdgeHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanWallClimbIdle(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Climbable wall climb contexts
-	std::optional<EdgeHangContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeHangContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeHangContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<EdgeHangContextData> GetWallClimbRightContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetWallClimbRightContext(const ItemInfo& item, const CollisionInfo& coll);
 }
