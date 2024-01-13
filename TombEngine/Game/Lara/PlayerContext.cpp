@@ -2818,13 +2818,26 @@ namespace TEN::Entities::Player
 
 		auto attracCollsSide = std::vector<AttractorCollisionData>{};
 
+		// TODO: Check "current" side dist and "next" side dist. Otherwise all segments will be required to be at least 50 units long.
 		// Get current side attractor collision.
 		if (handAttrac.Ptr->IsLooped() ||
 			((!isGoingRight && chainDistLeft > 0.0f && chainDistRight) || (isGoingRight && chainDistRight < handAttrac.Ptr->GetLength())))
 		{
 			float chainDist = isGoingRight ? chainDistRight : chainDistLeft;
 			attracCollsSide.push_back(GetAttractorCollision(*handAttrac.Ptr, chainDist, attracCollCenter.HeadingAngle));
+
+			// ???
+			// Test for corner.
+			short deltaHeadingAngle = abs(Geometry::GetShortestAngle(attracCollCenter.HeadingAngle, attracCollsSide.back().HeadingAngle));
+			if (deltaHeadingAngle >= ANGLE(35.0f))
+			{
+				attracCollsSide.clear();
+			}
+
+
 		}
+
+		// Check for corner.
 
 		// TODO: Assess current side attractor for valid position.
 		// If valid current, use.
@@ -2942,6 +2955,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_LEFT;
+			context.AlignType = ClimbContextAlignType::None;
 
 			return context;
 		}

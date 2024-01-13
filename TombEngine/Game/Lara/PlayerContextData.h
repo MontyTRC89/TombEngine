@@ -95,6 +95,8 @@ namespace TEN::Entities::Player
 		Attractor* AttractorPtr	 = nullptr;
 		float	   ChainDistance = 0.0f;
 		int		   TargetStateID = 0;
+
+		ClimbContextAlignType AlignType = ClimbContextAlignType::None;
 	};
 
 	struct WaterTreadStepOutContextData

@@ -233,6 +233,12 @@ namespace TEN::Entities::Player
 			player.Context.Attractor.Detach(item);
 			return;
 		}
+
+		if (context.AlignType == ClimbContextAlignType::AttractorParent)
+		{
+			// reparent.
+		}
+		// otherwise, update parent.
 	}
 
 	// State:	  LS_EDGE_HANG_IDLE (10)
@@ -388,12 +394,15 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
-			auto climbContext = GetHangShimmyLeftContext(*item, *coll);
-			if (climbContext.has_value())
+			if (IsHeld(In::Left))
 			{
-				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerEdgeHang(*item, *coll, *climbContext);
-				return;
+				auto climbContext = GetHangShimmyLeftContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerEdgeHang(*item, *coll, *climbContext);
+					return;
+				}
 			}
 
 			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
@@ -439,12 +448,15 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action) && player.Control.IsHanging)
 		{
-			auto climbContext = GetHangShimmyRightContext(*item, *coll);
-			if (climbContext.has_value())
+			if (IsHeld(In::Right))
 			{
-				item->Animation.TargetState = climbContext->TargetStateID;
-				SetPlayerEdgeHang(*item, *coll, *climbContext);
-				return;
+				auto climbContext = GetHangShimmyRightContext(*item, *coll);
+				if (climbContext.has_value())
+				{
+					item->Animation.TargetState = climbContext->TargetStateID;
+					SetPlayerEdgeHang(*item, *coll, *climbContext);
+					return;
+				}
 			}
 
 			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
