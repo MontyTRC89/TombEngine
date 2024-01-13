@@ -85,10 +85,7 @@ namespace TEN::Entities::Player
 
 		ClimbContextAlignType AlignType = ClimbContextAlignType::None;
 
-		// TODO: These two can be unified into one as they coincide.
-		//bool IsJump = false;
-		bool SetBusyHands	 = false;
-		bool SetJumpVelocity = false;
+		bool IsJump = false;
 	};
 
 	// TODO: Can probably use ClimbContextData, but keeping separate to make it easier to work with for now.

@@ -1587,13 +1587,15 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 	ResetPlayerTurnRateY(item);
 	ResetPlayerFlex(&item);
 
-	// Set busy hand status (if applicable).
-	if (climbContext.SetBusyHands)
+	// Set busy hand status or jump velocity.
+	if (!climbContext.IsJump)
+	{
 		player.Control.HandStatus = HandStatus::Busy;
-
-	// Set jump velocity (if applicable).
-	if (climbContext.SetJumpVelocity)
+	}
+	else
+	{
 		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(-climbContext.RelPosOffset.y);
+	}
 
 	// Set alignment.
 	switch (climbContext.AlignType)

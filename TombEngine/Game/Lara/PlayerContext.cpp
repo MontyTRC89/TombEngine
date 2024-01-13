@@ -1390,8 +1390,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1426,8 +1425,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1462,8 +1460,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1498,8 +1495,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1534,8 +1530,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1576,8 +1571,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.SetBusyHands = false;
-			context.SetJumpVelocity = true;
+			context.IsJump = true;
 
 			return context;
 		}
@@ -1602,8 +1596,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.AlignType = ClimbContextAlignType::None;
-			context.SetBusyHands = false;
-			context.SetJumpVelocity = true;
+			context.IsJump = true;
 
 			return context;
 		}
@@ -1672,8 +1665,7 @@ namespace TEN::Entities::Player
 		context.RelOrientOffset = EulerAngles::Zero;
 		context.TargetStateID = LS_WALL_CLIMB_IDLE;
 		context.AlignType = ClimbContextAlignType::None;
-		context.SetBusyHands = true;
-		context.SetJumpVelocity = false;
+		context.IsJump = false;
 
 		return context;
 	}
@@ -1778,8 +1770,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1817,8 +1808,7 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1854,8 +1844,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1889,8 +1878,7 @@ namespace TEN::Entities::Player
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_VAULT_JUMP_FLIP : LS_CRAWL_VAULT_JUMP;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -1920,8 +1908,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_VAULT_JUMP;
 			context.AlignType = ClimbContextAlignType::None;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2013,8 +2000,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2052,8 +2038,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2092,8 +2077,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2132,8 +2116,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2171,8 +2154,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2211,8 +2193,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2248,8 +2229,7 @@ namespace TEN::Entities::Player
 		context.RelOrientOffset = EulerAngles::Zero;
 		context.TargetStateID = LS_WALL_CLIMB_IDLE;
 		context.AlignType = ClimbContextAlignType::None;
-		context.SetBusyHands = true;
-		context.SetJumpVelocity = false;
+		context.IsJump = false;
 
 		return context;
 	}
@@ -2453,8 +2433,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_STAND_EDGE_HANG_DESCENT_FRONT;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2492,8 +2471,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = targetStateID;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2527,8 +2505,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_FRONT;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2562,8 +2539,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_BACK;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2708,8 +2684,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = targetStateID;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2758,8 +2733,7 @@ namespace TEN::Entities::Player
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_MONKEY_IDLE;
 			context.AlignType = ClimbContextAlignType::Snap;
-			context.SetBusyHands = true;
-			context.SetJumpVelocity = false;
+			context.IsJump = false;
 
 			return context;
 		}
@@ -2978,7 +2952,6 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_LEFT;
-			context.AlignType = ClimbContextAlignType::None;
 
 			return context;
 		}
@@ -2998,7 +2971,6 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = (deltaHeadingAngle >= ANGLE(0.0f)) ? LS_EDGE_HANG_SHIMMY_90_OUTER_LEFT : LS_EDGE_HANG_SHIMMY_90_INNER_LEFT;
-			context.AlignType = ClimbContextAlignType::AttractorParent;
 
 			return context;
 		}
@@ -3041,7 +3013,6 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_RIGHT;
-			context.AlignType = ClimbContextAlignType::None;
 
 			return context;
 		}
@@ -3061,7 +3032,6 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.TargetStateID = (deltaHeadingAngle >= ANGLE(0.0f)) ? LS_EDGE_HANG_SHIMMY_90_OUTER_RIGHT : LS_EDGE_HANG_SHIMMY_90_INNER_RIGHT;
-			context.AlignType = ClimbContextAlignType::AttractorParent;
 
 			return context;
 		}
