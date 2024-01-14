@@ -1,8 +1,8 @@
 #pragma once
-#include "Game/control/volumeactivator.h"
+#include "Game/control/event.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 struct CollisionSetup;
 
@@ -33,25 +33,28 @@ namespace TEN::Control::Volumes
 	struct VolumeState
 	{
 		VolumeStateStatus Status	= VolumeStateStatus::Outside;
-		VolumeActivator	  Activator = nullptr;
+		Activator	  Activator = nullptr;
 
 		int Timestamp = 0;
 	};
 
-	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, VolumeActivatorFlags activatorFlag, VolumeActivator activator);
+	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator);
 	void TestVolumes(short itemNumber, const CollisionSetup* coll = nullptr);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);
 
-	void HandleEvent(VolumeEvent& event, VolumeActivator& activator);
-	bool HandleEvent(const std::string& name, VolumeEventType eventType, VolumeActivator activator);
+	void HandleEvent(Event& event, Activator& activator);
+	bool HandleEvent(const std::string& name, EventType eventType, Activator activator);
+	void HandleAllGlobalEvents(EventType type, Activator& activator);
+	bool SetEventState(const std::string& name, EventType eventType, bool enabled);
 	void InitializeNodeScripts();
 }
 
 // TODO: Move into namespace and deal with errors.
 struct TriggerVolume
 {
-	bool Enabled	   = true;
+	bool Enabled = true;
+	bool DetectInAdjacentRooms = false;
 	int	 EventSetIndex = 0;
 
 	std::string Name = {};

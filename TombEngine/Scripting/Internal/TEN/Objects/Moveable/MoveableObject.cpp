@@ -1,28 +1,29 @@
 #include "framework.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
-#include "Game/items.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/item_fx.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
+using namespace TEN::Math;
 
 /***
 Represents any object inside the game world.
@@ -148,7 +149,7 @@ static std::unique_ptr<Moveable> Create(
 	return ptr;
 }
 
-void Moveable::Register(sol::table& parent)
+void Moveable::Register(sol::state& state, sol::table& parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		sol::call_constructor, Create,
@@ -164,46 +165,46 @@ void Moveable::Register(sol::table& parent)
 
 	ScriptReserved_SetVisible, &Moveable::SetVisible,
 
-/// Explode item. This also kills and disables item.
-// @function Moveable:Explode
+	/// Explode item. This also kills and disables item.
+	// @function Moveable:Explode
 	ScriptReserved_Explode, &Moveable::Explode,
 
-/// Shatter item. This also kills and disables item.
-// @function Moveable:Shatter
+	/// Shatter item. This also kills and disables item.
+	// @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
 
-/// Set effect to moveable
-// @function Moveable:SetEffect
-// @tparam Effects.EffectID effect Type of effect to assign.
-// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	/// Set effect to moveable
+	// @function Moveable:SetEffect
+	// @tparam Effects.EffectID effect Type of effect to assign.
+	// @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
-/// Set custom colored burn effect to moveable
-// @function Moveable:SetCustomEffect
-// @tparam Color Color1 color the primary color of the effect (also used for lighting).
-// @tparam Color Color2 color the secondary color of the effect.
-// @tparam float timeout time (in seconds) after which effect turns off (optional).
+	/// Set custom colored burn effect to moveable
+	// @function Moveable:SetCustomEffect
+	// @tparam Color Color1 color the primary color of the effect (also used for lighting).
+	// @tparam Color Color2 color the secondary color of the effect.
+	// @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
 
-/// Get current moveable effect
-// @function Moveable:GetEffect
-// @treturn Effects.EffectID effect type currently assigned to moveable.
-	ScriptReserved_GetEffect, & Moveable::GetEffect,
+	/// Get current moveable effect
+	// @function Moveable:GetEffect
+	// @treturn Effects.EffectID effect type currently assigned to moveable.
+	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
-/// Get the status of object.
-// possible values:
-// <br />0 - not active 
-// <br />1 - active 
-// <br />2 - deactivated 
-// <br />3 - invisible
-// @function Moveable:GetStatus
-// @treturn int a number representing the status of the object
+	/// Get the moveable's status.
+	// @function Moveable:GetStatus()
+	// @treturn Objects.MoveableStatus The moveable's status.
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
-/// Set the name of the function to be called when the moveable is shot by Lara.
-// Note that this will be triggered twice when shot with both pistols at once. 
-// @function Moveable:SetOnHit
-// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
+	/// Set the moveable's status.
+	// @function Moveable:SetStatus()
+	// @tparam Objects.MoveableStatus status The new status of the moveable.
+	ScriptReserved_SetStatus, &Moveable::SetStatus,
+
+	/// Set the name of the function to be called when the moveable is shot by Lara.
+	// Note that this will be triggered twice when shot with both pistols at once. 
+	// @function Moveable:SetOnHit
+	// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
 	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
 	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
@@ -586,8 +587,7 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 		}
 	}
 
-	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
 }
 
@@ -617,8 +617,7 @@ void Moveable::SetRot(const Rotation& rot)
 	m_item->Pose.Orientation.y = ANGLE(rot.y);
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
 
-	const auto& object = Objects[m_item->ObjectNumber];
-	if (object.GetFloorHeight != nullptr || object.GetCeilingHeight != nullptr)
+	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
 }
 
@@ -944,6 +943,11 @@ void Moveable::SetRoomNumber(int roomNumber)
 short Moveable::GetStatus() const
 {
 	return m_item->Status;
+}
+
+void Moveable::SetStatus(ItemStatus status)
+{
+	m_item->Status = status;
 }
 
 /// Get state of specified mesh visibility of object

@@ -59,7 +59,8 @@ public:
 	Level*		GetCurrentLevel();
 	int			GetLevelNumber(const std::string& flieName);
 	int			GetNumLevels() const;
-	void		EndLevel(std::optional<int> nextLevel);
+	void		EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex);
+	GameStatus	GetGameStatus();
 	void		FlipMap(int flipmap);
 	void		SaveGame(int slot);
 	void		LoadGame(int slot);

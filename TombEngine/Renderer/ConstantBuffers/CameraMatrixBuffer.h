@@ -1,41 +1,51 @@
 #pragma once
-
-#include "SimpleMath.h"
-#include "ShaderLight.h"
+#include <SimpleMath.h>
+#include "Renderer/ConstantBuffers/ShaderLight.h"
 #include "Renderer/ConstantBuffers/ShaderFogBulb.h"
+#include "Renderer/RendererEnums.h"
 
-using DirectX::SimpleMath::Matrix;
-using DirectX::SimpleMath::Vector3;
-using DirectX::SimpleMath::Vector2;
-
-struct alignas(16) CCameraMatrixBuffer
+namespace TEN::Renderer::ConstantBuffers
 {
-	alignas(16) Matrix ViewProjection;
-	//--
-	alignas(16) Matrix View;
-	//--
-	alignas(16) Matrix Projection;
-	//--
-	alignas(16) Matrix InverseProjection;
-	//--
-	alignas(16) Vector4 CamPositionWS;
-	//--
-	alignas(16) Vector4 CamDirectionWS;
-	//--
-	alignas(16) Vector2 ViewSize;
-	alignas(4) Vector2 InvViewSize;
-	//--
-	alignas(16) unsigned int Frame;
-	alignas(4) unsigned int RoomNumber;
-	alignas(4) unsigned int CameraUnderwater;
-	//--
-	alignas(16) Vector4 FogColor;
-	alignas(4) int FogMinDistance;
-	alignas(4) int FogMaxDistance;
+	struct CCameraMatrixBuffer
+	{
+		Matrix ViewProjection;
+		//--
+		Matrix View;
+		//--
+		Matrix Projection;
+		//--
+		Matrix InverseProjection;
+		//--
+		Matrix DualParaboloidView;
+		//--
+		Vector4 CamPositionWS;
+		//--
+		Vector4 CamDirectionWS;
+		//--
+		Vector2 ViewSize;
+		Vector2 InvViewSize;
+		//--
+		unsigned int Frame;
+		unsigned int RoomNumber;
+		unsigned int CameraUnderwater;
+		int Emisphere;
+		//--
+		int AmbientOcclusion;
+		int AmbientOcclusionExponent;
+		float AspectRatio;
+		float TanHalfFOV;
+		//--
+		Vector4 FogColor;
+		//--
+		int FogMinDistance;
+		int FogMaxDistance;
+		float NearPlane;
+		float FarPlane;
+		//--
+		int NumFogBulbs;
+		Vector3 Padding2;
+		//--
+		ShaderFogBulb FogBulbs[MAX_FOG_BULBS_DRAW];
+	};
+}
 
-	alignas(4) float NearPlane;
-	alignas(4) float FarPlane;
-
-	alignas(4) int NumFogBulbs;
-	ShaderFogBulb FogBulbs[32];
-};

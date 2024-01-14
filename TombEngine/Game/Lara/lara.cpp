@@ -1,6 +1,25 @@
 #include "framework.h"
 #include "Game/Lara/lara.h"
 
+#include "Game/Lara/lara_basic.h"
+#include "Game/Lara/lara_cheat.h"
+#include "Game/Lara/lara_climb.h"
+#include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_crawl.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_hang.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_initialise.h"
+#include "Game/Lara/lara_jump.h"
+#include "Game/Lara/lara_monkey.h"
+#include "Game/Lara/lara_objects.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_overhang.h"
+#include "Game/Lara/lara_slide.h"
+#include "Game/Lara/lara_surface.h"
+#include "Game/Lara/lara_swim.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
@@ -20,7 +39,7 @@
 #include "Game/Lara/PlayerStateMachine.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
@@ -34,6 +53,7 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;
 
@@ -88,7 +108,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	player.Context.WaterSurfaceDist = -water.HeightFromWater;
 
 	if (player.Context.Vehicle == NO_ITEM)
-		SpawnPlayerSplash(*item, water.WaterHeight, water.WaterDepth);
+		SpawnPlayerWaterSurfaceEffects(*item, water.WaterHeight, water.WaterDepth);
 
 	bool isWaterOnHeadspace = false;
 
@@ -145,7 +165,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					}
 
 					ResetPlayerFlex(item);
-					Splash(item);
 				}
 			}
 			// Water is at wade depth; update water status and do special handling.
@@ -158,7 +177,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					item->Animation.IsAirborne && !water.IsSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
-					Splash(item);
 				}
 				// Player is grounded; don't splash again.
 				else if (!item->Animation.IsAirborne)
@@ -635,7 +653,7 @@ bool UpdateLaraRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 	// Hacky L-shaped Location traversal.
 	item->Location = GetRoom(item->Location, point);
 	item->Location = GetRoom(item->Location, Vector3i(item->Pose.Position.x, point.y, item->Pose.Position.z));
-	item->Floor = GetFloorHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z).value_or(NO_HEIGHT);
+	item->Floor = GetSurfaceHeight(item->Location, item->Pose.Position.x, item->Pose.Position.z, true).value_or(NO_HEIGHT);
 
 	if (item->RoomNumber != item->Location.RoomNumber)
 	{

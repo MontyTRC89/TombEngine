@@ -1,13 +1,14 @@
 #pragma once
+#include "Renderer/Structures/RendererHudBar.h"
 
 enum GAME_OBJECT_ID : short;
 struct ItemInfo;
-namespace TEN::Renderer { struct RendererHudBar; }
-
-using namespace TEN::Renderer;
 
 namespace TEN::Hud
 {
+	using namespace TEN::Renderer;
+	using namespace TEN::Renderer::Structures;
+
 	struct StatusBar
 	{
 		static constexpr auto LIFE_MAX = 0.75f;

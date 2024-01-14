@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/control/control.h"
 
 class ScriptInterfaceLevel;
 
@@ -11,6 +12,7 @@ enum class TitleType
 class ScriptInterfaceFlowHandler
 {
 public:
+	GameStatus	LastGameStatus		 = GameStatus::Normal;
 	TitleType	TitleType			 = TitleType::Flyby;
 	std::string	IntroImagePath		 = {};
 	std::string	TitleScreenImagePath = {};

@@ -200,8 +200,7 @@ namespace TEN::Collision::Floordata
 	
 	std::optional<int> GetBottomHeight(FloorInfo& startSector, Vector3i pos, int* bottomRoomNumberPtr = nullptr, FloorInfo** bottomSectorPtr = nullptr);
 	std::optional<int> GetTopHeight(FloorInfo& startSector, Vector3i pos, int* topRoomNumberPtr = nullptr, FloorInfo** topSectorPtr = nullptr);
-	std::optional<int> GetFloorHeight(const RoomVector& location, int x, int z);
-	std::optional<int> GetCeilingHeight(const RoomVector& location, int x, int z);
+	std::optional<int> GetSurfaceHeight(const RoomVector& location, int x, int z, bool isFloor);
 	
 	std::optional<RoomVector> GetBottomRoom(RoomVector location, const Vector3i& pos);
 	std::optional<RoomVector> GetTopRoom(RoomVector location, const Vector3i& pos);
