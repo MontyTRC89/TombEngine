@@ -1233,7 +1233,7 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 2.4) Test relation to edge intersection.
+			// 2.4) Test edge angle relation.
 			if (!attracColl.IsInFront ||
 				!TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle + (setup.TestEdgeFront ? ANGLE(0.0f) : ANGLE(180.0f))))
 			{
@@ -2370,7 +2370,7 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 4) Test relation to edge intersection.
+			// 4) Test edge angle relation.
 			if (!attracColl.IsInFront ||
 				!TestPlayerInteractAngle(item.Pose.Orientation.y + setup.RelHeadingAngle, attracColl.HeadingAngle + ANGLE(180.0f)))
 			{
@@ -2578,7 +2578,7 @@ namespace TEN::Entities::Player
 			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
 				continue;
 
-			// 4) Test relation to edge intersection.
+			// 4) Test edge angle relation.
 			if (!attracColl.IsInFront || !TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle))
 				continue;
 
@@ -2916,29 +2916,114 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<AttractorCollisionData> GetEdgeHangVerticalShimmyClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																								  int lowerBound, int upperBound)
 	{
-		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
-		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(
-			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
-			0.0f, VERTICAL_OFFSET, 0.0f, ATTRAC_DETECT_RADIUS);
+		const auto& player = GetLaraInfo(item);
 
-		auto context = std::optional<ClimbContextData>();
+		// Get attractor collisions.
+		auto currentAttracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, ATTRAC_DETECT_RADIUS);
+
+		// Assess attractor collision.
+		for (const auto& attracColl : attracColls)
+		{
+			// 1) Check attractor type.
+			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
+				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
+			{
+				continue;
+			}
+
+			// 2) Test if edge slope is illegal.
+			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+				continue;
+
+			// 3) Test edge angle relation.
+			if (!TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle))
+				continue;
+
+			// 4) Test if relative edge height is within edge intersection bounds.
+			int relEdgeHeight = currentAttracColl.Proximity.Intersection.y - attracColl.Proximity.Intersection.y;
+			if (relEdgeHeight > lowerBound ||
+				relEdgeHeight < upperBound)
+			{
+				continue;
+			}
+
+			// 5) Test if attractors are stacked exactly.
+			auto current2DIntersect = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
+			auto current2DIntersect = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
+			if (Vector2::DistanceSquared(current2DIntersect, current2DIntersect) > EPSILON)
+				continue;
+
+			// Get point collision behind edge.
+			auto pointCollBack = GetCollision(
+				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius, LARA_HEIGHT_STRETCH /*coll.Setup.Height*/);
+
+			// 6) Test if edge is high enough from floor.
+			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
+			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH /*coll.Setup.Height*/)
+				continue;
+
+			return attracColl;
+		}
+
+		// No valid edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
+	std::optional<ClimbContextData> GetEdgeHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto VERTICAL_OFFSET	= LARA_HEIGHT_STRETCH + CLICK(1);
+		constexpr auto LOWER_EDGE_BOUND = -CLICK(0.5f);
+		constexpr auto UPPER_EDGE_BOUND = -CLICK(1.5f);
+
+		const auto& player = GetLaraInfo(item);
+
+		auto attracColl = GetEdgeHangVerticalShimmyClimbAttractorCollision(item, coll, LOWER_EDGE_BOUND, UPPER_EDGE_BOUND);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_EDGE_HANG_SHIMMY_UP;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsJump = false;
+
+			return context;
+		}
 
 		return std::nullopt;
 	}
 
-	std::optional<ClimbContextData> GetHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll)
+	std::optional<ClimbContextData> GetEdgeHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+		constexpr auto VERTICAL_OFFSET	= LARA_HEIGHT_STRETCH - CLICK(1);
+		constexpr auto LOWER_EDGE_BOUND = CLICK(1.5f);
+		constexpr auto UPPER_EDGE_BOUND = CLICK(0.5f);
+		
+		const auto& player = GetLaraInfo(item);
 
-		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, ATTRAC_DETECT_RADIUS);
+		auto attracColl = GetEdgeHangVerticalShimmyClimbAttractorCollision(item, coll, LOWER_EDGE_BOUND, UPPER_EDGE_BOUND);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_EDGE_HANG_SHIMMY_DOWN;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsJump = false;
 
-		auto context = std::optional<ClimbContextData>();
+			return context;
+		}
 
 		return std::nullopt;
 	}
@@ -2994,7 +3079,6 @@ namespace TEN::Entities::Player
 	{
 		auto context = std::optional<ClimbContextData>();
 
-		// TODO: Keep going, don't reparent.
 		// 1) Flat shimmy left.
 		context = GetEdgeHangFlatShimmyLeftClimbContext(item, coll);
 		if (context.has_value())
@@ -3003,7 +3087,6 @@ namespace TEN::Entities::Player
 				return context;
 		}
 
-		// TODO: Reparent.
 		// 2) Corner shimmy left.
 		context = GetEdgeHangCornerShimmyLeftClimbContext(item, coll);
 		if (context.has_value())

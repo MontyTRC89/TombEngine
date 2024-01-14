@@ -159,8 +159,8 @@ namespace TEN::Entities::Player
 	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Hang climb contexts
-	std::optional<ClimbContextData> GetHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetEdgeHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll);
+	std::optional<ClimbContextData> GetEdgeHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetEdgeHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetEdgeHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanWallClimbIdle(const ItemInfo& item, const CollisionInfo& coll);

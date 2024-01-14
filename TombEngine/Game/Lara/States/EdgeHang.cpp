@@ -35,45 +35,7 @@ namespace TEN::Entities::Player
 		AttractorCollisionData Right  = {};
 	};
 	
-	static std::optional<AttractorCollisionData> GetConnectingEdgeAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																					 Attractor& currentAttrac, float currentChainDist,
-																					 const Vector3& probePoint)
-	{
-		constexpr auto CONNECT_DIST_THRESHOLD = BLOCK(1 / 64.0f);
-		constexpr auto CORNER_ANGLE_MAX		  = ANGLE(30.0f);
-
-		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(probePoint, item.RoomNumber, item.Pose.Orientation.y, CONNECT_DIST_THRESHOLD);
-		auto currentAttracColl = GetAttractorCollision(currentAttrac, currentChainDist, item.Pose.Orientation.y);
-
-		// Assess attractor collision.
-		for (const auto& attracColl : attracColls)
-		{
-			// 1) Filter out current attractor.
-			if (attracColl.AttractorPtr == &currentAttrac)
-				continue;
-
-			// 2) Check if attractor is edge type.
-			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
-				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
-			{
-				continue;
-			}
-
-			// 3) Test sharp corner.
-			if (Geometry::GetShortestAngle(attracColl.HeadingAngle, currentAttracColl.HeadingAngle) > CORNER_ANGLE_MAX)
-				continue;
-
-			// Return closest connecting attractor.
-			return attracColl;
-		}
-
-		// No connecting attractor found; return nullopt.
-		return std::nullopt;
-	}
-
-	static std::optional<EdgeHangAttractorCollisionData> GetEdgeHangAttractorCollisions(ItemInfo& item, const CollisionInfo& coll,
-																						float sideOffset = 0.0f)
+	static std::optional<EdgeHangAttractorCollisionData> GetEdgeHangAttractorCollisions(ItemInfo& item, const CollisionInfo& coll)
 	{
 		auto& player = GetLaraInfo(item);
 		auto& handsAttrac = player.Context.Attractor;
@@ -81,85 +43,19 @@ namespace TEN::Entities::Player
 		const auto& points = handsAttrac.Ptr->GetPoints();
 		float length = handsAttrac.Ptr->GetLength();
 
-		// Calculate projected distances along attractor.
-		float chainDistCenter = handsAttrac.ChainDistance + sideOffset;
+		// Calculate distances along attractor.
+		float chainDistCenter = handsAttrac.ChainDistance;
 		float chainDistLeft = chainDistCenter - coll.Setup.Radius;
 		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
-		bool isLooped = handsAttrac.Ptr->IsLooped();
 
-		// TODO: Horrible, organise later.
-		// Get connecting attractors just in case.
-		auto connectingAttracCollCenter = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, (chainDistCenter <= 0.0f) ? points.front() : points.back());
-		auto connectingAttracCollLeft = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, points.front());
-		auto connectingAttracCollRight = GetConnectingEdgeAttractorCollision(item, coll, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, points.back());
-
-		// Get points.
-		auto pointCenter = handsAttrac.Ptr->GetIntersectionAtChainDistance(chainDistCenter);
-		if (!isLooped)
-		{
-			if (connectingAttracCollCenter.has_value())
-			{
-				// Get point at connecting attractor.
-				if (chainDistCenter <= 0.0f)
-				{
-					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + chainDistCenter;
-					pointCenter = connectingAttracCollCenter->AttractorPtr->GetIntersectionAtChainDistance(transitLineDist);
-				}
-				else if (chainDistCenter >= length)
-				{
-					float transitLineDist = connectingAttracCollCenter->Proximity.ChainDistance + (chainDistCenter - length);
-					pointCenter = connectingAttracCollCenter->AttractorPtr->GetIntersectionAtChainDistance(transitLineDist);
-				}
-			}
-			else
-			{
-				// Get point within boundary of current attractor.
-				if (chainDistLeft <= 0.0f && !connectingAttracCollLeft.has_value())
-				{
-					pointCenter = handsAttrac.Ptr->GetIntersectionAtChainDistance(coll.Setup.Radius);
-				}
-				else if (chainDistRight >= length && !connectingAttracCollRight.has_value())
-				{
-					pointCenter = handsAttrac.Ptr->GetIntersectionAtChainDistance(length - coll.Setup.Radius);
-				}
-
-				// TODO: Unreachable segments on current attractor. Too steep, angle difference to great.
-			}
-		}
-
-		auto pointLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			connectingAttracCollLeft->AttractorPtr->GetIntersectionAtChainDistance(connectingAttracCollLeft->Proximity.ChainDistance + chainDistLeft) :
-			handsAttrac.Ptr->GetIntersectionAtChainDistance(chainDistLeft);
-		auto pointRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			connectingAttracCollRight->AttractorPtr->GetIntersectionAtChainDistance(connectingAttracCollRight->Proximity.ChainDistance + (chainDistRight - length)) :
-			handsAttrac.Ptr->GetIntersectionAtChainDistance(chainDistRight);
-
-		auto headingAngle = item.Pose.Orientation.y;
+		// TODO: Find connecting attractors.
 
 		// Get attractor collisions.
-		auto attracCollCenter = ((chainDistCenter <= 0.0f || chainDistCenter >= length) && connectingAttracCollCenter.has_value()) ?
-			GetAttractorCollision(*connectingAttracCollCenter->AttractorPtr, chainDistCenter, headingAngle) :
-			GetAttractorCollision(*handsAttrac.Ptr, chainDistCenter, headingAngle);
+		auto attracCollCenter = GetAttractorCollision(*handsAttrac.Ptr, chainDistCenter, item.Pose.Orientation.y);
+		auto attracCollLeft = GetAttractorCollision(*handsAttrac.Ptr, chainDistLeft, item.Pose.Orientation.y);
+		auto attracCollRight = GetAttractorCollision(*handsAttrac.Ptr, chainDistRight, item.Pose.Orientation.y);
 
-		auto attracCollLeft = ((chainDistLeft <= 0.0f) && !isLooped && connectingAttracCollLeft.has_value()) ?
-			GetAttractorCollision(*connectingAttracCollLeft->AttractorPtr, chainDistLeft, headingAngle) :
-			GetAttractorCollision(*handsAttrac.Ptr, chainDistLeft, headingAngle);
-
-		auto attracCollRight = ((chainDistRight >= length) && !isLooped && connectingAttracCollRight.has_value()) ?
-			GetAttractorCollision(*connectingAttracCollRight->AttractorPtr, chainDistRight, headingAngle) :
-			GetAttractorCollision(*handsAttrac.Ptr, chainDistRight, headingAngle);
-
-		// ----------Debug
-		constexpr auto COLOR_MAGENTA = Vector4(1, 0, 1, 1);
-		g_Renderer.AddDebugLine(attracCollCenter.Proximity.Intersection, attracCollCenter.Proximity.Intersection + Vector3(0.0f, -150.0f, 0.0f), COLOR_MAGENTA, RendererDebugPage::AttractorStats);
-		g_Renderer.AddDebugLine(attracCollLeft.Proximity.Intersection, attracCollLeft.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA, RendererDebugPage::AttractorStats);
-		g_Renderer.AddDebugLine(attracCollRight.Proximity.Intersection, attracCollRight.Proximity.Intersection + Vector3(0.0f, -100.0f, 0.0f), COLOR_MAGENTA, RendererDebugPage::AttractorStats);
-
-		short angleDelta = Geometry::GetShortestAngle(attracCollCenter.HeadingAngle, (sideOffset >= 0.0f) ? attracCollRight.HeadingAngle : attracCollLeft.HeadingAngle);
-		g_Renderer.PrintDebugMessage("Angle delta: %.3f", TO_DEGREES(angleDelta), RendererDebugPage::AttractorStats);
-		//------------
-		
 		// Return attractor collisions at three points.
 		return EdgeHangAttractorCollisionData
 		{
@@ -182,8 +78,7 @@ namespace TEN::Entities::Player
 		}
 
 		// Get edge hang attractor collisions.
-		//float sideOffset = item.Animation.Velocity.z * (isGoingRight ? 1 : -1);
-		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll, -item.Animation.Velocity.z);
+		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll);
 
 		// Calculate target orientation.
 		auto targetOrient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.Intersection, edgeAttracColls->Right.Proximity.Intersection);
@@ -288,7 +183,7 @@ namespace TEN::Entities::Player
 					return;
 				}
 
-				auto climbContext = GetHangShimmyUpContext(*item, *coll);
+				auto climbContext = GetEdgeHangShimmyUpContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
@@ -298,7 +193,7 @@ namespace TEN::Entities::Player
 			}
 			else if (IsHeld(In::Back))
 			{
-				auto climbContext = GetHangShimmyDownContext(*item, *coll);
+				auto climbContext = GetEdgeHangShimmyDownContext(*item, *coll);
 				if (climbContext.has_value())
 				{
 					item->Animation.TargetState = climbContext->TargetStateID;
