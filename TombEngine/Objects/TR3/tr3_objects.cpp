@@ -13,6 +13,7 @@
 #include "Objects/TR3/Entity/PunaBoss.h" // OK
 #include "Objects/TR3/Entity/Shiva.h" // OK
 #include "Objects/TR3/Entity/SophiaLeigh.h" // OK
+#include "Objects/TR3/Entity/TwinAutoGun.h"
 #include "Objects/TR3/Entity/WaspMutant.h" // OK
 #include "Objects/TR3/Entity/Winston.h" // OK
 #include "Objects/TR3/Entity/tr3_tony.h" // OK
@@ -333,6 +334,20 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetHitEffect();
 	}
 
+	obj = &Objects[ID_TWIN_AUTO_GUN];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeTwinAutoGun;
+		obj->control = ControlTwinAutoGun;
+		obj->collision = CreatureCollision;
+		obj->HitRoutine = HitTwinAutoGun;
+		obj->HitPoints = 28;
+		obj->intelligent = true;
+		obj->SetBoneRotationFlags(0, ROT_Y);
+		obj->SetBoneRotationFlags(1, ROT_X);
+		obj->SetHitEffect(true);
+	}
+
 	obj = &Objects[ID_PUNA_BOSS];
 	if (obj->loaded)
 	{
@@ -350,7 +365,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
 		obj->SetHitEffect();
 	}
-	
+
 	obj = &Objects[ID_WASP_MUTANT];
 	if (obj->loaded)
 	{
@@ -365,7 +380,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Flyer;
 		obj->SetHitEffect();
 	}
-	
+
 	obj = &Objects[ID_COMPSOGNATHUS];
 	if (obj->loaded)
 	{
@@ -400,7 +415,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_WINSTON];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeCreature;
+		obj->Initialize = InitializeWinston;
 		obj->control = ControlWinston;
 		obj->collision = ObjectCollision;
 		obj->HitRoutine = WinstonHit;

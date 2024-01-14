@@ -72,11 +72,23 @@ namespace TEN::Entities::Creatures::TR3
 		WINSTON_ANIM_DEFEAT_END = 20
 	};
 
+	void InitializeWinston(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		InitializeCreature(itemNumber);
+
+		if (!item.TriggerFlags)
+		{
+			item.HitPoints = NOT_TARGETABLE;
+		}
+	}
+
 	void ControlWinston(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
-		
+
 		auto& item = g_Level.Items[itemNumber];
 		auto& creature = *GetCreatureInfo(&item);
 		const auto& player = Lara;
@@ -90,7 +102,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		short headingAngle = CreatureTurn(&item, creature.MaxTurn);
 
-		if (item.HitPoints <= 0)
+		if (item.HitPoints <= 0 && item.TriggerFlags)
 		{
 			creature.MaxTurn = 0;
 
@@ -274,6 +286,6 @@ namespace TEN::Entities::Creatures::TR3
 		if (pos.has_value())
 		{
 			DoItemHit(&target, damage, isExplosive, false);
-		}	
+		}
 	}
 }
