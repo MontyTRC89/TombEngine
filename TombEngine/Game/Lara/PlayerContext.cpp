@@ -1620,9 +1620,10 @@ namespace TEN::Entities::Player
 		{
 			break;
 		}
-
+		
+		// Old.
 		// 1) Test for climbable wall flag.
-		if (!TestLaraNearClimbableWall(item))
+		//if (!TestLaraNearClimbableWall(item))
 			return std::nullopt;
 
 		// 2) Test swamp depth.
@@ -1648,13 +1649,12 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 		}
 
-		auto& nonConstPlayerItem = *LaraItem;
-		auto& nonConstPlayerColl = LaraCollision;
-
+		// TODO: Not this function.
 		// 5) Test and set climbable wall mount.
-		if (!TestLaraClimbIdle(&nonConstPlayerItem, &nonConstPlayerColl))
-			return std::nullopt;
+		//if (!CanEdgeHangToWallClimbIdle(item, coll))
+		//	return std::nullopt;
 
+		auto& nonConstPlayerItem = *LaraItem;
 		SnapEntityToGrid(nonConstPlayerItem, coll);
 		nonConstPlayerItem.Pose.Orientation.y = wallHeadingAngle;
 
@@ -2205,8 +2205,9 @@ namespace TEN::Entities::Player
 	const std::optional<ClimbContextData> GetTreadWaterClimbableWallMountClimbContext(ItemInfo& item, const CollisionInfo& coll,
 																					  const std::vector<AttractorCollisionData>& attracColls)
 	{
+		// Old.
 		// 1) Test for climbable wall flag.
-		if (!TestLaraNearClimbableWall(item))
+		//if (!TestLaraNearClimbableWall(item))
 			return std::nullopt;
 
 		// 2) Test relation to wall.
@@ -2214,9 +2215,10 @@ namespace TEN::Entities::Player
 		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, wallHeadingAngle))
 			return std::nullopt;
 
+		// TODO: Not this function.
 		// 3) Test and set climbable wall mount.
-		if (!TestLaraClimbIdle(&item, &coll))
-			return std::nullopt;
+		//if (!CanEdgeHangToWallClimbIdle(item, coll))
+		//	return std::nullopt;
 
 		SnapEntityToGrid(item, coll);
 		item.Pose.Position.y -= 10; // NOTE: Offset required to avoid falling back into water.
@@ -2925,7 +2927,7 @@ namespace TEN::Entities::Player
 
 		// Get attractor collisions.
 		auto currentAttracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
-		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f), item.RoomNumber, item.Pose.Orientation.y, ATTRAC_DETECT_RADIUS);
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2946,7 +2948,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 4) Test if relative edge height is within edge intersection bounds.
-			int relEdgeHeight = currentAttracColl.Proximity.Intersection.y - attracColl.Proximity.Intersection.y;
+			int relEdgeHeight = attracColl.Proximity.Intersection.y - currentAttracColl.Proximity.Intersection.y;
 			if (relEdgeHeight > setup.LowerEdgeBound ||
 				relEdgeHeight < setup.UpperEdgeBound)
 			{
@@ -2954,10 +2956,10 @@ namespace TEN::Entities::Player
 			}
 
 			// 5) Test if attractors are stacked exactly.
-			auto intersect2D0 = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
+			/*auto intersect2D0 = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
 			auto intersect2D1 = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
 			if (Vector2::DistanceSquared(intersect2D0, intersect2D1) > EPSILON)
-				continue;
+				continue;*/
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
@@ -3149,7 +3151,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	bool CanWallClimbIdle(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanEdgeHangToWallClimbIdle(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		return false;
 	}

@@ -94,8 +94,8 @@ namespace TEN::Entities::Player
 
 		// Calculate relative position and orientation offsets.
 		auto rotMatrix = targetOrient.ToRotationMatrix();
-		auto relPosOffset = Vector3::Transform((targetPos - edgeAttracColls->Center.Proximity.Intersection) + climbContext.RelPosOffset, rotMatrix);
-		auto relOrientOffset = targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0);
+		auto relPosOffset = Vector3::Transform((targetPos - edgeAttracColls->Center.Proximity.Intersection), rotMatrix) + climbContext.RelPosOffset;
+		auto relOrientOffset = (targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0)) + climbContext.RelOrientOffset;
 
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
@@ -111,7 +111,7 @@ namespace TEN::Entities::Player
 	}
 
 	// State:	  LS_EDGE_HANG_IDLE (10)
-	// Collision: lara_col_edge_hang_idle()
+	// Collision: lara_void_func()
 	void lara_as_edge_hang_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
@@ -127,6 +127,9 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableSpasm = false;
 		Camera.targetAngle = 0;
 		Camera.targetElevation = ANGLE(-45.0f);
+		player.Context.Attractor.Update(
+			*item, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance,
+			Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Zero);
 
 		HandlePlayerAttractorParent(*item);
 
@@ -138,7 +141,7 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action) && TestPlayerEdgeHang() /*&& player.Control.IsHanging*/)
 		{
-			if (TestLaraClimbIdle(item, coll))
+			if (CanEdgeHangToWallClimbIdle(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 				return;
@@ -230,21 +233,33 @@ namespace TEN::Entities::Player
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	// State:	LS_EDGE_HANG_IDLE (10)
-	// Control: lara_as_edge_hang_idle()
-	void lara_col_edge_hang_idle(ItemInfo* item, CollisionInfo* coll)
+	void lara_as_edge_hang_shimmy_up(ItemInfo* item, CollisionInfo* coll)
 	{
-		//HandlePlayerEdgeHang(*item, *coll);
+		auto& player = GetLaraInfo(*item);
+
+		player.Control.Look.Mode = LookMode::None;
+
+		HandlePlayerAttractorParent(*item);
+	}
+
+	void lara_as_edge_hang_shimmy_down(ItemInfo* item, CollisionInfo* coll)
+	{
+		auto& player = GetLaraInfo(*item);
+
+		player.Control.Look.Mode = LookMode::None;
+
+		HandlePlayerAttractorParent(*item);
 	}
 
 	// State:	  LS_EDGE_HANG_SHIMMY_LEFT (30)
-	// Collision: lara_col_edge_hang_shimmy_left()
+	// Collision: lara_void_func()
 	void lara_as_edge_hang_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
 		// Setup
 		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+		player.Control.Look.Mode = LookMode::Vertical;
 		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 		coll->Setup.Radius = LARA_RADIUS;
 		coll->Setup.EnableObjectPush = false;
@@ -279,24 +294,15 @@ namespace TEN::Entities::Player
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	// State:	LS_EDGE_HANG_SHIMMY_LEFT (30)
-	// Control: lara_as_edge_hang_shimmy_left()
-	void lara_col_edge_hang_shimmy_left(ItemInfo* item, CollisionInfo* coll)
-	{
-		//auto& player = GetLaraInfo(*item);
-
-		//HandlePlayerEdgeHang(*item, *coll);
-		//player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
-	}
-
 	// State:	  LS_EDGE_HANG_SHIMMY_RIGHT (31)
-	// Collision: lara_col_edge_hang_shimmy_right()
+	// Collision: lara_void_func()
 	void lara_as_edge_hang_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
 		// Setup
 		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+		player.Control.Look.Mode = LookMode::Vertical;
 		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 		coll->Setup.Radius = LARA_RADIUS;
 		coll->Setup.EnableObjectPush = false;
@@ -328,16 +334,6 @@ namespace TEN::Entities::Player
 		}
 
 		SetPlayerEdgeHangRelease(*item);
-	}
-
-	// State:	LS_EDGE_HANG_SHIMMY_RIGHT (31)
-	// Control: lara_as_edge_hang_shimmy_right()
-	void lara_col_edge_hang_shimmy_right(ItemInfo* item, CollisionInfo* coll)
-	{
-		//auto& player = GetLaraInfo(*item);
-
-		//HandlePlayerEdgeHang(*item, *coll);
-		//player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	}
 
 	// State:	  LS_EDGE_HANG_SHIMMY_OUTER_LEFT (107), LS_EDGE_HANG_SHIMMY_OUTER_RIGHT (108), LS_EDGE_HANG_SHIMMY_INNER_LEFT (109), LS_EDGE_HANG_SHIMMY_INNER_RIGHT (110)

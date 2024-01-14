@@ -736,7 +736,7 @@ int LaraTestClimb(ItemInfo* item, int xOffset, int yOffset, int zOffset, int xFr
 	auto probeUp = GetCollision(x, y - CLICK(0.5f), z, item->RoomNumber);
 	auto probeDown = GetCollision(x, y, z, item->RoomNumber);
 
-	if (/*!lara->Control.CanClimbLadder && */!TestLaraNearClimbableWall(*item/*, probeDown.BottomBlock*/))
+	if (/*!lara->Control.CanClimbLadder && !TestLaraNearClimbableWall(*item, probeDown.BottomBlock)*/true)
 		return 0;
 
 	int height = probeUp.Position.Floor;

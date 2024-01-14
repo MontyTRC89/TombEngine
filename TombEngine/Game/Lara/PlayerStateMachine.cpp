@@ -42,7 +42,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_TURN_LEFT_SLOW] = std::pair(lara_as_turn_slow, lara_col_turn_slow);
 		PlayerBehaviorStateRoutines[LS_DEATH] = std::pair(lara_as_death, lara_col_death);
 		PlayerBehaviorStateRoutines[LS_FREEFALL] = std::pair(lara_as_freefall, lara_col_freefall);
-		PlayerBehaviorStateRoutines[LS_EDGE_HANG_IDLE] = std::pair(lara_as_edge_hang_idle, lara_col_edge_hang_idle);
+		PlayerBehaviorStateRoutines[LS_EDGE_HANG_IDLE] = std::pair(lara_as_edge_hang_idle, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_REACH] = std::pair(lara_as_reach, lara_col_reach);
 		PlayerBehaviorStateRoutines[LS_SPLAT] = std::pair(lara_as_splat, lara_col_splat);
 		PlayerBehaviorStateRoutines[LS_UNDERWATER_IDLE] = std::pair(lara_as_underwater_idle, lara_col_underwater_idle);
@@ -62,8 +62,8 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_JUMP_LEFT] = std::pair(lara_as_jump_left, lara_col_jump_left);
 		PlayerBehaviorStateRoutines[LS_JUMP_UP] = std::pair(lara_as_jump_up, lara_col_jump_up);
 		PlayerBehaviorStateRoutines[LS_FALL_BACK] = std::pair(lara_as_fall_back, lara_col_fall_back);
-		PlayerBehaviorStateRoutines[LS_EDGE_HANG_SHIMMY_LEFT] = std::pair(lara_as_edge_hang_shimmy_left, lara_col_edge_hang_shimmy_left);
-		PlayerBehaviorStateRoutines[LS_EDGE_HANG_SHIMMY_RIGHT] = std::pair(lara_as_edge_hang_shimmy_right, lara_col_edge_hang_shimmy_right);
+		PlayerBehaviorStateRoutines[LS_EDGE_HANG_SHIMMY_LEFT] = std::pair(lara_as_edge_hang_shimmy_left, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_EDGE_HANG_SHIMMY_RIGHT] = std::pair(lara_as_edge_hang_shimmy_right, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_SLIDE_BACK] = std::pair(lara_as_slide_back, lara_col_slide_back);
 		PlayerBehaviorStateRoutines[LS_ONWATER_IDLE] = std::pair(lara_as_surface_idle, lara_col_surface_idle);
 		PlayerBehaviorStateRoutines[LS_ONWATER_FORWARD] = std::pair(lara_as_surface_swim_forward, lara_col_surface_swim_forward);
@@ -238,6 +238,8 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT_BACK] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_STAND_EDGE_HANG_DESCENT_BACK_FLIP] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_CRAWL_EDGE_HANG_DESCENT_FRONT] = std::pair(lara_as_controlled_no_look, lara_col_crawl_to_hang);
+		PlayerBehaviorStateRoutines[LS_EDGE_HANG_SHIMMY_UP] = std::pair(lara_as_edge_hang_shimmy_up, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_EDGE_HANG_SHIMMY_DOWN] = std::pair(lara_as_edge_hang_shimmy_up, lara_void_func);
 	}
 
 	void HandlePlayerBehaviorState(ItemInfo& item, CollisionInfo& coll, PlayerBehaviorStateRoutineType routineType)

@@ -44,48 +44,6 @@ bool TestPlayerInteractAngle(short playerHeadingAngle, short testAngle)
 	return (abs(Geometry::GetShortestAngle(playerHeadingAngle, testAngle)) <= PLAYER_INTERACT_ANGLE_CONSTRAINT);
 }
 
-bool TestLaraClimbIdle(ItemInfo* item, const CollisionInfo* coll)
-{
-	int shiftRight = 0;
-	if (LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -700, CLICK(2), &shiftRight) != 1)
-		return false;
-
-	int shiftLeft = 0;
-	if (LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -700, CLICK(2), &shiftLeft) != 1)
-		return false;
-
-	if (shiftRight)
-	{
-		if (shiftLeft)
-		{
-			if (shiftRight < 0 != shiftLeft < 0)
-				return false;
-
-			if ((shiftRight < 0 && shiftLeft < shiftRight) ||
-				(shiftRight > 0 && shiftLeft > shiftRight))
-			{
-				item->Pose.Position.y += shiftLeft;
-				return true;
-			}
-		}
-
-		item->Pose.Position.y += shiftRight;
-	}
-	else if (shiftLeft)
-	{
-		item->Pose.Position.y += shiftLeft;
-	}
-
-	return true;
-}
-
-// TODO: Remove. Legacy flag check for climbable walls.
-bool TestLaraNearClimbableWall(const ItemInfo& item)
-{
-	auto& sector = *GetCollision(item).BottomBlock;
-	return (((1 << 8) << GetQuadrant(item.Pose.Orientation.y)) & GetClimbFlags(&sector));
-}
-
 bool TestLaraWall(const ItemInfo* item, float dist, float height)
 {
 	auto origin = GameVector(
