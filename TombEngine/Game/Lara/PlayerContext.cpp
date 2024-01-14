@@ -2916,8 +2916,8 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<AttractorCollisionData> GetEdgeHangVerticalShimmyClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																								  int lowerBound, int upperBound)
+	static std::optional<AttractorCollisionData> GetEdgeVerticalAscentClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																							  const EdgeVerticalAscentClimbSetupData& setup)
 	{
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 
@@ -2947,8 +2947,8 @@ namespace TEN::Entities::Player
 
 			// 4) Test if relative edge height is within edge intersection bounds.
 			int relEdgeHeight = currentAttracColl.Proximity.Intersection.y - attracColl.Proximity.Intersection.y;
-			if (relEdgeHeight > lowerBound ||
-				relEdgeHeight < upperBound)
+			if (relEdgeHeight > setup.LowerEdgeBound ||
+				relEdgeHeight < setup.UpperEdgeBound)
 			{
 				continue;
 			}
@@ -2962,11 +2962,11 @@ namespace TEN::Entities::Player
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, -coll.Setup.Radius, LARA_HEIGHT_STRETCH /*coll.Setup.Height*/);
+				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 6) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
-			if (floorToEdgeHeight <= LARA_HEIGHT_STRETCH /*coll.Setup.Height*/)
+			if (floorToEdgeHeight <= setup.DestFloorToEdgeHeightMin)
 				continue;
 
 			return attracColl;
@@ -2978,19 +2978,24 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetEdgeHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto VERTICAL_OFFSET	= LARA_HEIGHT_STRETCH + CLICK(1);
-		constexpr auto LOWER_EDGE_BOUND = -CLICK(0.5f);
-		constexpr auto UPPER_EDGE_BOUND = -CLICK(1.5f);
+		constexpr auto VERTICAL_OFFSET = CLICK(1);
+
+		constexpr auto SETUP = EdgeVerticalAscentClimbSetupData
+		{
+			(int)-CLICK(0.5f), (int)-CLICK(1.5f),
+			LARA_HEIGHT_STRETCH,
+			false
+		};
 
 		const auto& player = GetLaraInfo(item);
 
-		auto attracColl = GetEdgeHangVerticalShimmyClimbAttractorCollision(item, coll, LOWER_EDGE_BOUND, UPPER_EDGE_BOUND);
+		auto attracColl = GetEdgeVerticalAscentClimbAttractorCollision(item, coll, SETUP);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, SETUP.DestFloorToEdgeHeightMin + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -3004,19 +3009,24 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetEdgeHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto VERTICAL_OFFSET	= LARA_HEIGHT_STRETCH - CLICK(1);
-		constexpr auto LOWER_EDGE_BOUND = CLICK(1.5f);
-		constexpr auto UPPER_EDGE_BOUND = CLICK(0.5f);
-		
+		constexpr auto VERTICAL_OFFSET = -CLICK(1);
+
+		constexpr auto SETUP = EdgeVerticalAscentClimbSetupData
+		{
+			(int)CLICK(1.5f), (int)CLICK(0.5f),
+			LARA_HEIGHT_STRETCH,
+			false
+		};
+
 		const auto& player = GetLaraInfo(item);
 
-		auto attracColl = GetEdgeHangVerticalShimmyClimbAttractorCollision(item, coll, LOWER_EDGE_BOUND, UPPER_EDGE_BOUND);
+		auto attracColl = GetEdgeVerticalAscentClimbAttractorCollision(item, coll, SETUP);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, SETUP.DestFloorToEdgeHeightMin + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_DOWN;
 			context.AlignType = ClimbContextAlignType::AttractorParent;

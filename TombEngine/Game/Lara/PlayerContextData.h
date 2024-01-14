@@ -66,6 +66,15 @@ namespace TEN::Entities::Player
 		int LowerEdgeToCeilBound = 0;
 	};
 
+	struct EdgeVerticalAscentClimbSetupData
+	{
+		int LowerEdgeBound			 = 0;
+		int UpperEdgeBound			 = 0;
+		int DestFloorToEdgeHeightMin = 0;
+
+		bool TestClimbableWall = false;
+	};
+
 	struct LedgeClimbSetupData
 	{
 		int LowerEdgeToCeilBound	 = 0;
