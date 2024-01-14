@@ -2954,9 +2954,9 @@ namespace TEN::Entities::Player
 			}
 
 			// 5) Test if attractors are stacked exactly.
-			auto current2DIntersect = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
-			auto current2DIntersect = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
-			if (Vector2::DistanceSquared(current2DIntersect, current2DIntersect) > EPSILON)
+			auto intersect2D0 = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
+			auto intersect2D1 = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
+			if (Vector2::DistanceSquared(intersect2D0, intersect2D1) > EPSILON)
 				continue;
 
 			// Get point collision behind edge.
