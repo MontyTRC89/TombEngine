@@ -1616,28 +1616,26 @@ namespace TEN::Entities::Player
 		//int vPos = round(item.Pose.Position.y / CLICK(1)) * CLICK(1);
 
 		// TODO: Find 4 stacked WallEdge attractors.
-		for (auto& attrac : attracColls)
+		AttractorCollisionData* attracCollTop = nullptr;
+		for (auto& attracColl : attracColls)
 		{
 			break;
 		}
-		
-		// Old.
-		// 1) Test for climbable wall flag.
-		//if (!TestLaraNearClimbableWall(item))
-			return std::nullopt;
 
+		if (attracCollTop == nullptr)
+			return std::nullopt;
+		
 		// 2) Test swamp depth.
 		if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < SWAMP_DEPTH_MAX)
 			return std::nullopt;
 
 		// 3) Test relation to wall.
-		short wallHeadingAngle = GetQuadrant(item.Pose.Orientation.y) * ANGLE(90.0f);
-		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, wallHeadingAngle))
+		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, attracCollTop->HeadingAngle))
 			return std::nullopt;
 
 		// Get point collision.
 		auto pointCollCenter = GetCollision(item);
-		auto pointCollFront = GetCollision(&item, wallHeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
+		auto pointCollFront = GetCollision(&item, attracCollTop->HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
 		int vPos = item.Pose.Position.y;
 
 		// 4) Assess point collision.
@@ -1649,18 +1647,9 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 		}
 
-		// TODO: Not this function.
-		// 5) Test and set climbable wall mount.
-		//if (!CanEdgeHangToWallClimbIdle(item, coll))
-		//	return std::nullopt;
-
-		auto& nonConstPlayerItem = *LaraItem;
-		SnapEntityToGrid(nonConstPlayerItem, coll);
-		nonConstPlayerItem.Pose.Orientation.y = wallHeadingAngle;
-
 		auto context = ClimbContextData{};
-		context.AttractorPtr = nullptr;
-		context.ChainDistance = 0.0f;
+		context.AttractorPtr = attracCollTop->AttractorPtr;
+		context.ChainDistance = attracCollTop->Proximity.ChainDistance;
 		context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 		context.RelOrientOffset = EulerAngles::Zero;
 		context.TargetStateID = LS_WALL_CLIMB_IDLE;
@@ -2205,6 +2194,8 @@ namespace TEN::Entities::Player
 	const std::optional<ClimbContextData> GetTreadWaterClimbableWallMountClimbContext(ItemInfo& item, const CollisionInfo& coll,
 																					  const std::vector<AttractorCollisionData>& attracColls)
 	{
+		// TODO: Find attractor stack.
+		
 		// Old.
 		// 1) Test for climbable wall flag.
 		//if (!TestLaraNearClimbableWall(item))
@@ -2214,15 +2205,6 @@ namespace TEN::Entities::Player
 		short wallHeadingAngle = GetQuadrant(item.Pose.Orientation.y) * ANGLE(90.0f);
 		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, wallHeadingAngle))
 			return std::nullopt;
-
-		// TODO: Not this function.
-		// 3) Test and set climbable wall mount.
-		//if (!CanEdgeHangToWallClimbIdle(item, coll))
-		//	return std::nullopt;
-
-		SnapEntityToGrid(item, coll);
-		item.Pose.Position.y -= 10; // NOTE: Offset required to avoid falling back into water.
-		item.Pose.Orientation = EulerAngles(0, wallHeadingAngle, 0);
 
 		auto context = ClimbContextData{};
 		context.AttractorPtr = nullptr;
