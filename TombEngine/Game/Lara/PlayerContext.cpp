@@ -1604,7 +1604,71 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Adopt attractors.
+	// TODO: pass setup struct.
+	static std::optional<AttractorCollisionData> GetClimbableWallMountAttractorCollisionData(const ItemInfo& item, const CollisionInfo& coll,
+																							 int height,
+																							 const std::vector<AttractorCollisionData>& attracColls)
+	{
+		const auto& player = GetLaraInfo(item);
+
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
+
+		// Assess attractor collision.
+		for (auto& attracColl : attracColls)
+		{
+			// 1) Check attractor type.
+			if (attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
+				continue;
+
+			// 2) Test if edge is within 2D range.
+			if (attracColl.Proximity.Distance2D > range2D)
+				continue;
+
+			// 3) Test if wall edge slope is illegal.
+			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+				continue;
+
+			// 4) Test wall edge angle relation.
+			if (!attracColl.IsInFront ||
+				!TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle))
+			{
+				continue;
+			}
+
+			// Get point collision behind wall edge.
+			auto pointCollBack = GetCollision(
+				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius);
+
+			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
+			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+			// TODO: pass height.
+			// 5) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
+			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor);
+			if (relEdgeHeight >= CLICK(-height) + CLICK(0.5f) ||
+				relEdgeHeight < CLICK(-height) - CLICK(0.5f))
+			{
+				continue;
+			}
+
+			// TODO: Find stacked WallEdge attractors.
+			
+			// TODO: Find best height.
+			// 6) Test if ceiling behind is adequately higher than edge.
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			if (edgeToCeilHeight > /*setup.LowerEdgeToCeilBound*/0)
+				continue;
+
+			// TODO: Test front point collision to see if climbable wall is floating in air and therefore invalid.
+
+			return attracColl;
+		}
+
+		// No valid wall edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
 	static std::optional<ClimbContextData> GetClimbableWallMountClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
@@ -1612,51 +1676,27 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
-		//int vPos = round(item.Pose.Position.y / CLICK(1)) * CLICK(1);
-
-		// TODO: Find 4 stacked WallEdge attractors.
-		AttractorCollisionData* attracCollTop = nullptr;
-		for (auto& attracColl : attracColls)
-		{
-			break;
-		}
-
-		if (attracCollTop == nullptr)
-			return std::nullopt;
-		
-		// 2) Test swamp depth.
+		// 1) Test swamp depth.
 		if (TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber) && player.Context.WaterSurfaceDist < SWAMP_DEPTH_MAX)
 			return std::nullopt;
 
-		// 3) Test relation to wall.
-		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, attracCollTop->HeadingAngle))
-			return std::nullopt;
-
-		// Get point collision.
-		auto pointCollCenter = GetCollision(item);
-		auto pointCollFront = GetCollision(&item, attracCollTop->HeadingAngle, OFFSET_RADIUS(coll.Setup.Radius), -coll.Setup.Height);
-		int vPos = item.Pose.Position.y;
-
-		// 4) Assess point collision.
-		if ((pointCollCenter.Position.Ceiling - vPos) > -CLICK(4.5f) ||	 // Ceiling height is within lower center ceiling bound.
-			(pointCollCenter.Position.Ceiling - vPos) <= -CLICK(6.5f) || // Ceiling height is within upper center ceiling bound.
-			(pointCollCenter.Position.Floor - vPos) <= -CLICK(6.5f) ||	 // Floor height is within upper center floor bound.
-			(pointCollFront.Position.Ceiling - vPos) > -CLICK(4.5f))	 // Ceiling height is within lowest front ceiling bound.
+		// 2) Get climbable wall mount climb context.
+		auto attracColl = GetClimbableWallMountAttractorCollisionData(item, coll, 4, attracColls);
+		if (attracColl.has_value())
 		{
-			return std::nullopt;
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_WALL_CLIMB_IDLE;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsJump = false;
+
+			return context;
 		}
 
-		auto context = ClimbContextData{};
-		context.AttractorPtr = attracCollTop->AttractorPtr;
-		context.ChainDistance = attracCollTop->Proximity.ChainDistance;
-		context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
-		context.RelOrientOffset = EulerAngles::Zero;
-		context.TargetStateID = LS_WALL_CLIMB_IDLE;
-		context.AlignType = ClimbContextAlignType::None;
-		context.IsJump = false;
-
-		return context;
+		return std::nullopt;
 	}
 
 	std::optional<ClimbContextData> GetStandVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll)
@@ -2190,32 +2230,26 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Adopt attractors.
 	const std::optional<ClimbContextData> GetTreadWaterClimbableWallMountClimbContext(ItemInfo& item, const CollisionInfo& coll,
 																					  const std::vector<AttractorCollisionData>& attracColls)
 	{
-		// TODO: Find attractor stack.
-		
-		// Old.
-		// 1) Test for climbable wall flag.
-		//if (!TestLaraNearClimbableWall(item))
-			return std::nullopt;
+		// Get climbable wall mount climb context.
+		auto attracColl = GetClimbableWallMountAttractorCollisionData(item, coll, 3, attracColls);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttractorPtr = nullptr;
+			context.ChainDistance = 0.0f;
+			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_WALL_CLIMB_IDLE;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsJump = false;
 
-		// 2) Test relation to wall.
-		short wallHeadingAngle = GetQuadrant(item.Pose.Orientation.y) * ANGLE(90.0f);
-		if (!TestPlayerInteractAngle(item.Pose.Orientation.y, wallHeadingAngle))
-			return std::nullopt;
+			return context;
+		}
 
-		auto context = ClimbContextData{};
-		context.AttractorPtr = nullptr;
-		context.ChainDistance = 0.0f;
-		context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
-		context.RelOrientOffset = EulerAngles::Zero;
-		context.TargetStateID = LS_WALL_CLIMB_IDLE;
-		context.AlignType = ClimbContextAlignType::None;
-		context.IsJump = false;
-
-		return context;
+		return std::nullopt;
 	}
 
 	std::optional<ClimbContextData> GetTreadWaterVaultClimbContext(ItemInfo& item, const CollisionInfo& coll)
