@@ -1816,40 +1816,6 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	player.Context.Attractor.Detach(item);
 }
 
-void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip)
-{
-	constexpr auto WALL_STEP_HEIGHT = CLICK(1);
-
-	auto& player = GetLaraInfo(item);
-
-	if (item.HitPoints <= 0)
-	{
-		SetAnimation(&item, LA_FALL_START);
-		item.Animation.IsAirborne = true;
-		item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
-		item.Pose.Position.y += WALL_STEP_HEIGHT;
-		item.Pose.Orientation.y += player.Context.NextCornerPos.Orientation.y / 2;
-		player.Control.HandStatus = HandStatus::Free;
-		return;
-	}
-
-	if (flip)
-	{
-		if (player.Control.IsClimbingLadder)
-		{
-			SetAnimation(&item, LA_WALL_CLIMB_IDLE);
-		}
-		else
-		{
-			SetAnimation(&item, LA_HANG_IDLE);
-		}
-
-		item.Pose.Position = player.Context.NextCornerPos.Position;
-		item.Pose.Orientation.y = player.Context.NextCornerPos.Orientation.y;
-		coll.Setup.PrevPosition = player.Context.NextCornerPos.Position;
-	}
-}
-
 void SetLaraSwimDiveAnimation(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);

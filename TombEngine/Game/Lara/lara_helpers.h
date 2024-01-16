@@ -84,7 +84,6 @@ void SetLaraMonkeyFallAnimation(ItemInfo* item);
 void SetLaraMonkeyRelease(ItemInfo* item);
 void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll);
 void SetPlayerEdgeHangRelease(ItemInfo& item);
-void SetPlayerCornerShimmyEnd(ItemInfo& item, CollisionInfo& coll, bool flip);
 void SetLaraSwimDiveAnimation(ItemInfo* item);
 void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle = nullptr);
 

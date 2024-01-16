@@ -62,7 +62,7 @@ namespace TEN::Entities::Player
 
 		int			ProjectedFloorHeight = 0; // Used for primitive offset blend. TODO: Real offset blend feature + object parenting. -- Sezz 2023.09.27
 		float		CalcJumpVelocity	 = 0;
-		Pose		NextCornerPos		 = Pose::Zero;
+		//Pose		NextCornerPos		 = Pose::Zero; // TODO: Remove from savegame before deleting this line.
 		EulerAngles OrientOffset		 = EulerAngles::Zero;
 
 		int		 WaterSurfaceDist	= 0;

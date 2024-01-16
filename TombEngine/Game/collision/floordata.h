@@ -99,10 +99,6 @@ struct SectorFlagData
 {
 	bool Death		 = false;
 	bool Monkeyswing = false;
-	bool ClimbNorth	 = false;
-	bool ClimbSouth	 = false;
-	bool ClimbWest	 = false;
-	bool ClimbEast	 = false;
 	bool MarkBeetle	 = false;
 
 	bool MarkTriggerer		 = false;
@@ -111,26 +107,6 @@ struct SectorFlagData
 	bool MinecartLeft() { return MarkTriggerer; }
 	bool MinecartRight() { return MarkBeetle; }
 	bool MinecartStop() { return (MarkBeetle && MarkTriggerer); }
-
-	bool IsWallClimbable(ClimbDirectionFlags flag)
-	{
-		switch (flag)
-		{
-		case ClimbDirectionFlags::North:
-			return ClimbNorth;
-
-		case ClimbDirectionFlags::South:
-			return ClimbSouth;
-
-		case ClimbDirectionFlags::East:
-			return ClimbEast;
-
-		case ClimbDirectionFlags::West:
-			return ClimbWest;
-		}
-
-		return false;
-	}
 };
 
 // SectorData

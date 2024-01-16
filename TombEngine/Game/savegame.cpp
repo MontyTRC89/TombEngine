@@ -511,7 +511,6 @@ bool SaveGame::Save(int slot)
 	context.add_attractor(playerAttractorDataOffset);
 	context.add_calc_jump_velocity(Lara.Context.CalcJumpVelocity);
 	context.add_interacted_item_number(Lara.Context.InteractedItem);
-	context.add_next_corner_pose(&FromPose(Lara.Context.NextCornerPos));
 	context.add_projected_floor_height(Lara.Context.ProjectedFloorHeight);
 	context.add_target_orient(&FromEulerAngles(Lara.Context.OrientOffset));
 	context.add_vehicle_item_number(Lara.Context.Vehicle);
@@ -2174,7 +2173,6 @@ bool SaveGame::Load(int slot)
 	Lara.Context.WaterCurrentPull.y = s->lara()->context()->water_current_pull()->y();
 	Lara.Context.WaterCurrentPull.z = s->lara()->context()->water_current_pull()->z();
 	Lara.Context.InteractedItem = s->lara()->context()->interacted_item_number();
-	Lara.Context.NextCornerPos = ToPose(s->lara()->context()->next_corner_pose());
 	Lara.Context.ProjectedFloorHeight = s->lara()->context()->projected_floor_height();
 	Lara.Context.OrientOffset = ToEulerAngles(s->lara()->context()->target_orient());
 	Lara.Context.Vehicle = s->lara()->context()->vehicle_item_number();

@@ -809,10 +809,13 @@ void ReadRooms()
 			sector.WallPortalRoomNumber = ReadInt32();
 			sector.Flags.Death = ReadBool();
 			sector.Flags.Monkeyswing = ReadBool();
-			sector.Flags.ClimbNorth = ReadBool();
-			sector.Flags.ClimbSouth = ReadBool();
-			sector.Flags.ClimbEast = ReadBool();
-			sector.Flags.ClimbWest = ReadBool();
+
+			// TODO: Remove. Loads legacy quadrant climb flags.
+			ReadBool();
+			ReadBool();
+			ReadBool();
+			ReadBool();
+
 			sector.Flags.MarkTriggerer = ReadBool();
 			sector.Flags.MarkTriggererActive = 0; // TODO: Needs to be written to and read from savegames.
 			sector.Flags.MarkBeetle = ReadBool();

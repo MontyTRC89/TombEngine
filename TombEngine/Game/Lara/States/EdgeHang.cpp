@@ -347,7 +347,6 @@ namespace TEN::Entities::Player
 		Camera.laraNode = LM_TORSO;
 
 		HandlePlayerAttractorParent(*item);
-		SetPlayerCornerShimmyEnd(*item, *coll, TestLastFrame(item));
 	}
 
 	// State:	  LS_HANDSTAND (54)

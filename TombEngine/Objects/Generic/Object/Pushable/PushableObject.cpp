@@ -183,7 +183,7 @@ namespace TEN::Entities::Generic
 					playerItem->Pose.Orientation = pushableItem.Pose.Orientation;
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
-					player.Context.NextCornerPos.Position.x = itemNumber; // TODO: Do this differently.
+					//player.Context.NextCornerPos.Position.x = itemNumber; // TODO: Do this differently.
 				}
 
 				player.Context.InteractedItem = itemNumber;
@@ -203,8 +203,8 @@ namespace TEN::Entities::Generic
 		{
 			// Not holding Action; do normal collision routine.
 			if (playerItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
-				!TestLastFrame(playerItem, LA_PUSHABLE_GRAB) ||
-				player.Context.NextCornerPos.Position.x != itemNumber)
+				!TestLastFrame(playerItem, LA_PUSHABLE_GRAB)/* ||
+				player.Context.NextCornerPos.Position.x != itemNumber*/)
 			{
 				// NOTE: If using room collision, use bridge collision.
 				if (!pushable.UseRoomCollision)

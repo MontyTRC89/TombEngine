@@ -343,7 +343,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	// Engage shimmy mode if LEFT/LSTEP or RIGHT/RSTEP are pressed.
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
-		lara->Context.NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
+		//lara->Context.NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
 		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
@@ -365,7 +365,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		// Test for slope to overhead ladder transition (convex).
-		if (GetClimbFlags(probeUp.BottomBlock) & slopeData.ClimbOrient &&
+		if (/*GetClimbFlags(probeUp.BottomBlock) & slopeData.ClimbOrient &&*/
 			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, CLICK(3), CLICK(4)))
 		{
 			if (GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= (BLOCK(1.5f) - 80))  // Check if a wall is actually there.
@@ -413,7 +413,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Back))
 	{
-		if ((GetClimbFlags(GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & slopeData.ClimbOrient) &&
+		if (/*(GetClimbFlags(GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & slopeData.ClimbOrient) &&*/
 			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1)))
 		{
 			AlignToEdge(item, BACKWARD_ALIGNMENT);
@@ -506,8 +506,8 @@ void lara_col_slopehang(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber != LA_OVERHANG_HANG_SWING)
 	{
 		// Return to climbing mode.
-		if (IsHeld(In::Forward) || IsHeld(In::Back))
-			SetAnimation(item, lara->Context.NextCornerPos.Orientation.z ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK.
+		//if (IsHeld(In::Forward) || IsHeld(In::Back))
+		//	SetAnimation(item, lara->Context.NextCornerPos.Orientation.z ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK.
 
 		// Shimmy control.
 		if (IsHeld(In::Left) || IsHeld(In::Right))
@@ -817,7 +817,7 @@ void lara_as_sclimbend(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	GetLaraInfo(item)->Context.NextCornerPos.Orientation.z = 0;
+	//GetLaraInfo(item)->Context.NextCornerPos.Orientation.z = 0;
 	item->Pose.Orientation.x = 0;
 }
 
@@ -1017,7 +1017,7 @@ void SlopeClimbDownExtra(ItemInfo* item, CollisionInfo* coll)
 			// Old block.
 			/*if (probeDown.BottomBlock->Flags.Monkeyswing)
 			{
-				int midpoint = 29; // HACK: lara_col_climb_down func, case for frame 29, dehardcode later.
+				int midpoint = 29; // HACK: lara_col_wall_climb_down func, case for frame 29, dehardcode later.
 				
 				//down.y += 256;
 				int height;
@@ -1071,7 +1071,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 
 			if (SlopeCheck(probeNow.CeilingTilt, slopeData.Goal) || bridge >= 0)
 			{
-				lara->Context.NextCornerPos.Orientation.z = AlignToGrab(item);
+				//lara->Context.NextCornerPos.Orientation.z = AlignToGrab(item);
 
 				int ceiling = GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).Position.Ceiling;
 				item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
@@ -1124,7 +1124,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 			int y = item->Pose.Position.y - coll->Setup.Height;
 			auto probe = GetCollision(down.x, item->Pose.Position.y - coll->Setup.Height, down.z, item->RoomNumber);
 
-			if (probe.BottomBlock->Flags.IsWallClimbable(GetClimbDirectionFlags(item->Pose.Orientation.y + ANGLE(180.0f))) &&
+			if (/*probe.BottomBlock->Flags.IsWallClimbable(GetClimbDirectionFlags(item->Pose.Orientation.y + ANGLE(180.0f))) &&*/
 				probe.Position.Floor >= (item->Pose.Position.y - CLICK(1)) &&
 				probe.Position.Ceiling <= (y - CLICK(1)))
 			{
