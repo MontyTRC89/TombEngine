@@ -57,6 +57,13 @@ namespace TEN::Entities::Player
 		bool TestDestIllegalSlope = false;
 	};
 
+	struct WallEdgeMountClimbSetupData
+	{
+		int LowerEdgeBound		 = 0;
+		int UpperEdgeBound		 = 0;
+		int LowerEdgeToCeilBound = 0;
+	};
+
 	struct EdgeHangDescentClimbSetupData
 	{
 		short RelHeadingAngle = 0;

@@ -1606,7 +1606,7 @@ namespace TEN::Entities::Player
 
 	// TODO: pass setup struct.
 	static std::optional<AttractorCollisionData> GetClimbableWallMountAttractorCollisionData(const ItemInfo& item, const CollisionInfo& coll,
-																							 int height,
+																							 const WallEdgeMountClimbSetupData& setup,
 																							 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		const auto& player = GetLaraInfo(item);
@@ -1643,27 +1643,29 @@ namespace TEN::Entities::Player
 			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
 			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
-			// TODO: pass height.
 			// 5) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
 			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor);
-			if (relEdgeHeight >= CLICK(-height) + CLICK(0.5f) ||
-				relEdgeHeight < CLICK(-height) - CLICK(0.5f))
+			if (relEdgeHeight >= setup.LowerEdgeBound ||
+				relEdgeHeight < setup.UpperEdgeBound)
 			{
 				continue;
 			}
 
-			// TODO: Find stacked WallEdge attractors.
+			// TODO: collect stacked WallEdge attractors.
 			
-			// TODO: Find best height.
 			// 6) Test if ceiling behind is adequately higher than edge.
 			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
-			if (edgeToCeilHeight > /*setup.LowerEdgeToCeilBound*/0)
+			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
+			// TODO: Test wall height to determine whether to mount or auto jump.
 			// TODO: Test front point collision to see if climbable wall is floating in air and therefore invalid.
 
 			return attracColl;
 		}
+
+		// Collect attractor collisions ordered by height.
+		// Assess 5, 6 on top one only.
 
 		// No valid wall edge attractor collision; return nullopt.
 		return std::nullopt;
@@ -1672,7 +1674,13 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetClimbableWallMountClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
+		constexpr auto SETUP = WallEdgeMountClimbSetupData
+		{
+			(int)-CLICK(3.5f), (int)-CLICK(4.5f),
+			CLICK(1)
+		};
 		constexpr auto SWAMP_DEPTH_MAX = -CLICK(3);
+		constexpr auto VERTICAL_OFFSET = CLICK(4);
 
 		const auto& player = GetLaraInfo(item);
 
@@ -1681,13 +1689,13 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// 2) Get climbable wall mount climb context.
-		auto attracColl = GetClimbableWallMountAttractorCollisionData(item, coll, 4, attracColls);
+		auto attracColl = GetClimbableWallMountAttractorCollisionData(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_WALL_CLIMB_IDLE;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -2233,8 +2241,13 @@ namespace TEN::Entities::Player
 	const std::optional<ClimbContextData> GetTreadWaterClimbableWallMountClimbContext(ItemInfo& item, const CollisionInfo& coll,
 																					  const std::vector<AttractorCollisionData>& attracColls)
 	{
+		constexpr auto SETUP = WallEdgeMountClimbSetupData
+		{
+
+		};
+
 		// Get climbable wall mount climb context.
-		auto attracColl = GetClimbableWallMountAttractorCollisionData(item, coll, 3, attracColls);
+		auto attracColl = GetClimbableWallMountAttractorCollisionData(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
@@ -3169,6 +3182,14 @@ namespace TEN::Entities::Player
 
 	bool CanEdgeHangToWallClimbIdle(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		return false;
+		const auto& player = GetLaraInfo(item);
+
+		if (player.Context.Attractor.Ptr == nullptr)
+			return false;
+
+		if (player.Context.Attractor.Ptr->GetType() != AttractorType::WallEdge)
+			return false;
+
+		return true;
 	}
 }
