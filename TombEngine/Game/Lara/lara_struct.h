@@ -842,6 +842,7 @@ enum LaraAnim
 
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
 	// 100, 101,
+	// 172, 364, 366, 368, 370, 498, 500,
 	// 280,
 	// 290, 302,
 	// 368, 370,
