@@ -10,7 +10,6 @@
 #include "Game/items.h"
 #include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
-#include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"

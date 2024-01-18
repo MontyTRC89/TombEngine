@@ -5,7 +5,6 @@
 #include "Game/items.h"
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_cheat.h"
-#include "Game/Lara/lara_climb.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_crawl.h"
 #include "Game/Lara/lara_fire.h"
