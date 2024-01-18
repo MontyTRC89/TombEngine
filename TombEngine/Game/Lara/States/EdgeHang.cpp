@@ -97,6 +97,8 @@ namespace TEN::Entities::Player
 		auto relPosOffset = Vector3::Transform((targetPos - edgeAttracColls->Center.Proximity.Intersection), rotMatrix) + climbContext.RelPosOffset;
 		auto relOrientOffset = (targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0)) + climbContext.RelOrientOffset;
 
+		g_Renderer.PrintDebugMessage("%f.3", climbContext.ChainDistance);
+
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
 		player.Context.Attractor.Update(
@@ -139,7 +141,7 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		if (IsHeld(In::Action) && TestPlayerEdgeHang() /*&& player.Control.IsHanging*/)
+		if (IsHeld(In::Action) && TestPlayerEdgeHang())
 		{
 			if (!IsHeld(In::Crouch) && CanEdgeHangToWallClimb(*item, *coll))
 			{
@@ -276,15 +278,16 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		if (IsHeld(In::Action) /*&& player.Control.IsHanging*/)
+		if (IsHeld(In::Action))
 		{
 			auto climbContext = GetEdgeHangShimmyLeftContext(*item, *coll);
 			if (climbContext.has_value())
 			{
-				g_Renderer.PrintDebugMessage("oooo");
 				item->Animation.TargetState = climbContext->TargetStateID;
 				SetPlayerEdgeHangClimb(*item, *coll, *climbContext);
-				return;
+
+				if ((IsHeld(In::Left) || IsHeld(In::StepLeft)) && !HasStateDispatch(item, item->Animation.TargetState))
+					return;
 			}
 
 			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
@@ -319,14 +322,16 @@ namespace TEN::Entities::Player
 			return;
 		}
 
-		if (IsHeld(In::Action) && player.Control.IsHanging)
+		if (IsHeld(In::Action))
 		{
 			auto climbContext = GetEdgeHangShimmyRightContext(*item, *coll);
 			if (climbContext.has_value())
 			{
 				item->Animation.TargetState = climbContext->TargetStateID;
 				SetPlayerEdgeHangClimb(*item, *coll, *climbContext);
-				return;
+
+				if ((IsHeld(In::Right) || IsHeld(In::StepRight)) && !HasStateDispatch(item, item->Animation.TargetState))
+					return;
 			}
 
 			item->Animation.TargetState = LS_EDGE_HANG_IDLE;

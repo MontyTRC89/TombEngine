@@ -2806,22 +2806,24 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 		const auto& handAttrac = player.Context.Attractor;
 
+		int sign = isGoingRight ? 1 : -1;
+
+		// TODO: Not working.
 		// Get velocity from animation.
 		const auto& anim = GetAnimData(item);
-		float dist = GetAnimVelocity(anim, item.Animation.FrameNumber).z;
+		float dist = 8.0f;// GetAnimVelocity(anim, item.Animation.FrameNumber).z;
 
 		// Calculate projected chain distances along attractor.
-		float chainDistCenter = handAttrac.ChainDistance - 8/*dist*/;
+		float chainDistCenter = handAttrac.ChainDistance + (dist * sign);
 		float chainDistLeft = chainDistCenter - coll.Setup.Radius;
 		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
 		// Get attractor collisions.
 		auto attracCollCenter = GetAttractorCollision(*handAttrac.Ptr, chainDistCenter, item.Pose.Orientation.y);
+		return attracCollCenter;
 		auto attracCollSide = std::optional<AttractorCollisionData>{};
 
 		auto attracCollsSide = std::vector<AttractorCollisionData>{};
-
-		return attracCollCenter;
 
 		// TODO: Check "current" side dist and "next" side dist. Otherwise all segments will be required to be at least 50 units long.
 		// Get current side attractor collision.
@@ -3080,7 +3082,7 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, LARA_HEIGHT_STRETCH, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_LEFT;
 
@@ -3124,7 +3126,7 @@ namespace TEN::Entities::Player
 		context = GetEdgeHangFlatShimmyLeftClimbContext(item, coll);
 		if (context.has_value())
 		{
-			if (HasStateDispatch(&item, context->TargetStateID))
+			//if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
@@ -3141,6 +3143,8 @@ namespace TEN::Entities::Player
 
 	static std::optional<ClimbContextData> GetEdgeHangFlatShimmyRightClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		constexpr auto VERTICAL_OFFSET = LARA_HEIGHT_STRETCH;
+
 		// Get flat shimmy right context.
 		auto attracColl = GetEdgeHangFlatShimmyClimbAttractorCollision(item, coll, true);
 		if (attracColl.has_value())
@@ -3148,6 +3152,8 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_RIGHT;
 
 			return context;
@@ -3177,6 +3183,24 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetEdgeHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		auto context = std::optional<ClimbContextData>();
+
+		// 1) Flat shimmy right.
+		context = GetEdgeHangFlatShimmyRightClimbContext(item, coll);
+		if (context.has_value())
+		{
+			//if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
+		// 2) Corner shimmy right.
+		context = GetEdgeHangCornerShimmyRightClimbContext(item, coll);
+		if (context.has_value())
+		{
+			if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
 		return std::nullopt;
 	}
 
@@ -3195,22 +3219,54 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TODO: Climb up, to edge hang, or climb ledge.
+		// TEMP
+		auto context = GetEdgeHangShimmyUpContext(item, coll);
+		if (context.has_value())
+		{
+			context->TargetStateID = LS_WALL_CLIMB_UP;
+			return context;
+		}
 
+		// TODO: Climb up, to edge hang, or climb ledge.
 		return std::nullopt;
 	}
 
 	std::optional<ClimbContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TODO: Climb down or to edge hang.
+		// TEMP
+		auto context = GetEdgeHangShimmyDownContext(item, coll);
+		if (context.has_value())
+		{
+			context->TargetStateID = LS_WALL_CLIMB_DOWN;
+			return context;
+		}
 
+		// TODO: Climb down or to edge hang.
 		return std::nullopt;
 	}
 
 	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TODO: Climb left, to edge hang, corner, or dismount.
+		constexpr auto VERTICAL_OFFSET = PLAYER_HEIGHT_WALL_CLIMB;
 
+		// TEMP. Also crashes.
+		// Get flat shimmy left context.
+		auto attracColl = GetEdgeHangFlatShimmyClimbAttractorCollision(item, coll, false);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_WALL_CLIMB_LEFT;
+
+			return context;
+		}
+
+		return std::nullopt;
+
+		// TODO: Climb left, to edge hang, corner, or dismount.
 		return std::nullopt;
 	}
 
