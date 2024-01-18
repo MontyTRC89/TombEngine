@@ -2821,7 +2821,6 @@ namespace TEN::Entities::Player
 
 		auto attracCollsSide = std::vector<AttractorCollisionData>{};
 
-
 		return attracCollCenter;
 
 		// TODO: Check "current" side dist and "next" side dist. Otherwise all segments will be required to be at least 50 units long.
@@ -2831,7 +2830,6 @@ namespace TEN::Entities::Player
 		{
 			float chainDist = isGoingRight ? chainDistRight : chainDistLeft;
 			attracCollsSide.push_back(GetAttractorCollision(*handAttrac.Ptr, chainDist, attracCollCenter.HeadingAngle));
-
 
 			// ???
 			// Test for corner.
@@ -2994,6 +2992,8 @@ namespace TEN::Entities::Player
 			auto pointCollBack = GetCollision(
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
+
+			// TODO: Get relative ceiling height from player's position.
 
 			// 6) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
@@ -3180,7 +3180,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	bool CanEdgeHangToWallClimbIdle(const ItemInfo& item, const CollisionInfo& coll)
+	bool CanEdgeHangToWallClimb(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -3190,6 +3190,39 @@ namespace TEN::Entities::Player
 		if (player.Context.Attractor.Ptr->GetType() != AttractorType::WallEdge)
 			return false;
 
+		return true;
+	}
+
+	std::optional<ClimbContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		// TODO: Climb up, to edge hang, or climb ledge.
+
+		return std::nullopt;
+	}
+
+	std::optional<ClimbContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		// TODO: Climb down or to edge hang.
+
+		return std::nullopt;
+	}
+
+	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		// TODO: Climb left or to edge hang.
+
+		return std::nullopt;
+	}
+
+	std::optional<ClimbContextData> GetWallClimbRightContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		// TODO: Climb right or to edge hang.
+
+		return std::nullopt;
+	}
+
+	bool CanWallClimbToEdgeHang(const ItemInfo& item, const CollisionInfo& coll)
+	{
 		return true;
 	}
 }

@@ -141,7 +141,7 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action) && TestPlayerEdgeHang() /*&& player.Control.IsHanging*/)
 		{
-			if (CanEdgeHangToWallClimbIdle(*item, *coll))
+			if (!IsHeld(In::Crouch) && CanEdgeHangToWallClimb(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 				return;

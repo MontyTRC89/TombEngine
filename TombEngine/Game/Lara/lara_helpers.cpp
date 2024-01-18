@@ -1793,16 +1793,17 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+// TODO: Remove SetAnimation() calls and use dispatches instead.
 void SetPlayerEdgeHangRelease(ItemInfo& item)
 {
-	constexpr auto CLIMBABLE_WALL_VERTICAL_RELEASE_OFFSET = CLICK(1);
+	constexpr auto WALL_CLIMB_VERTICAL_RELEASE_OFFSET = CLICK(1);
 
 	auto& player = GetLaraInfo(item);
 
 	if (player.Control.IsClimbingWall)
 	{
 		SetAnimation(&item, LA_FALL_START);
-		item.Pose.Position.y += CLIMBABLE_WALL_VERTICAL_RELEASE_OFFSET;
+		item.Pose.Position.y += WALL_CLIMB_VERTICAL_RELEASE_OFFSET;
 	}
 	else
 	{
@@ -1812,6 +1813,7 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 	item.Animation.IsAirborne = true;
 	item.Animation.Velocity = PLAYER_RELEASE_VELOCITY;
 	player.Control.HandStatus = HandStatus::Free;
+	player.Control.IsClimbingWall = false;
 	player.Control.IsHanging = false;
 	player.Context.Attractor.Detach(item);
 }

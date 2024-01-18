@@ -27,7 +27,7 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	// Setup
-	player.Control.CanLook = false;
+	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);

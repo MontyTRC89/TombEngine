@@ -422,11 +422,10 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Free;
+
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	player.Control.CanLook = !((isWading && isInSwamp) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL);
-
-	player.Control.Look.Mode = LookMode::Free;
 
 	if (item->HitPoints <= 0)
 	{
@@ -804,11 +803,10 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Vertical;
+
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	player.Control.CanLook = (isWading && isInSwamp) ? false : true;
-
-	player.Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1057,11 +1055,10 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	player.Control.Look.Mode = LookMode::Horizontal;
+
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	player.Control.CanLook = (isWading && isInSwamp) ? false : true;
-
-	player.Control.Look.Mode = LookMode::Horizontal;
 
 	if (item->HitPoints <= 0)
 	{
