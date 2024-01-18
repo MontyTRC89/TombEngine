@@ -637,7 +637,7 @@ void lara_as_wall_climb_idle(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.Look.Mode = LookMode::Free;
-	lara->Control.IsClimbingLadder = true;
+	lara->Control.IsClimbingWall = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 	Camera.targetElevation = ANGLE(-20.0f);

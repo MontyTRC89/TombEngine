@@ -523,7 +523,7 @@ bool SaveGame::Save(int slot)
 	control.add_can_monkey_swing(Lara.Control.CanMonkeySwing);
 	control.add_count(countOffset);
 	control.add_hand_status((int)Lara.Control.HandStatus);
-	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
+	control.add_is_climbing_ladder(Lara.Control.IsClimbingWall);
 	control.add_is_locked(Lara.Control.IsLocked);
 	control.add_is_low(Lara.Control.IsLow);
 	control.add_is_moving(Lara.Control.IsMoving);
@@ -2183,7 +2183,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
 	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
-	Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
+	Lara.Control.IsClimbingWall = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.IsLow = s->lara()->control()->is_low();
 	Lara.Control.IsMoving = s->lara()->control()->is_moving();
 	Lara.Control.JumpDirection = (JumpDirection)s->lara()->control()->jump_direction();

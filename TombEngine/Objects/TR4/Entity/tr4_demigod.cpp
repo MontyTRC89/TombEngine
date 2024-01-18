@@ -718,7 +718,7 @@ namespace TEN::Entities::TR4
 					Camera.bounce = -128;
 
 					// Lara is climbing a ladder; shake her off.
-					if (/*Lara.Control.IsClimbingLadder &&*/ // TODO: Try with only this line and include hang shimmy states.
+					if (/*Lara.Control.IsClimbingWall &&*/ // TODO: Try with only this line and include hang shimmy states.
 						LaraItem->Animation.ActiveState >= LS_WALL_CLIMB_IDLE &&
 						LaraItem->Animation.ActiveState <= LS_WALL_CLIMB_DOWN &&
 						!Lara.Location)

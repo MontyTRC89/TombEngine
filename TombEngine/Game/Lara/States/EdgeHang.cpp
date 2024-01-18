@@ -119,7 +119,7 @@ namespace TEN::Entities::Player
 		// Setup
 		item->Animation.IsAirborne = false;
 		player.Control.MoveAngle = item->Pose.Orientation.y;
-		player.Control.IsClimbingLadder = false;
+		player.Control.IsClimbingWall = false;
 		player.Control.Look.Mode = LookMode::Free;
 		coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;

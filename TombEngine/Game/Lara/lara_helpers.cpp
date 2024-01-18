@@ -1799,7 +1799,7 @@ void SetPlayerEdgeHangRelease(ItemInfo& item)
 
 	auto& player = GetLaraInfo(item);
 
-	if (player.Control.IsClimbingLadder)
+	if (player.Control.IsClimbingWall)
 	{
 		SetAnimation(&item, LA_FALL_START);
 		item.Pose.Position.y += CLIMBABLE_WALL_VERTICAL_RELEASE_OFFSET;

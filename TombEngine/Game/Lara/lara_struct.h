@@ -1284,7 +1284,7 @@ struct PlayerControlData
 	TightropeControlData Tightrope = {};
 	WeaponControlData	 Weapon	   = {};
 
-	bool IsClimbingLadder = false;
+	bool IsClimbingWall	  = false; // TODO: Rename in savegame.
 	bool IsHanging		  = false; // TODO: Add to savegame.
 	bool IsLocked		  = false;
 	bool IsLow			  = false;
@@ -1294,7 +1294,6 @@ struct PlayerControlData
 	bool KeepLow		  = false;
 
 	//bool CanClimbLadder = false; // TODO: Remember to remove from savegame before deleting this line.
-	bool CanLook		= false;
 	bool CanMonkeySwing = false;
 };
 
