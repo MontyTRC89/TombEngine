@@ -177,7 +177,7 @@ namespace TEN::Entities::Player
 		auto& player = GetLaraInfo(*item);
 
 		// Setup
-		player.Control.Look.Mode = LookMode::Horizontal;
+		player.Control.Look.Mode = LookMode::Vertical;
 		player.Control.IsClimbingWall = true;
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.EnableObjectPush = false;
@@ -215,7 +215,7 @@ namespace TEN::Entities::Player
 		auto& player = GetLaraInfo(*item);
 
 		// Setup
-		player.Control.Look.Mode = LookMode::Horizontal;
+		player.Control.Look.Mode = LookMode::Vertical;
 		player.Control.IsClimbingWall = true;
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.EnableObjectPush = false;
