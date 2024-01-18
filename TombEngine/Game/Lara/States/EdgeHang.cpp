@@ -97,8 +97,6 @@ namespace TEN::Entities::Player
 		auto relPosOffset = Vector3::Transform((targetPos - edgeAttracColls->Center.Proximity.Intersection), rotMatrix) + climbContext.RelPosOffset;
 		auto relOrientOffset = (targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0)) + climbContext.RelOrientOffset;
 
-		g_Renderer.PrintDebugMessage("%f.3", climbContext.ChainDistance);
-
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
 		player.Context.Attractor.Update(

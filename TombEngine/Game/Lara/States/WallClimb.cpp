@@ -7,6 +7,9 @@
 #include "Game/Lara/PlayerContext.h"
 #include "Specific/Input/Input.h"
 
+// temp
+#include <Game/Setup.h>
+
 using namespace TEN::Input;
 
 namespace TEN::Entities::Player
@@ -18,9 +21,15 @@ namespace TEN::Entities::Player
 		// Setup
 		player.Control.Look.Mode = LookMode::Free;
 		player.Control.IsClimbingWall = true;
+		coll->Setup.Height = PLAYER_HEIGHT_WALL_CLIMB;
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.EnableObjectPush = false;
+		player.Context.Attractor.Update(
+			*item, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance,
+			Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Zero);
 		Camera.targetElevation = ANGLE(-20.0f);
+
+		HandlePlayerAttractorParent(*item);
 
 		if (item->HitPoints <= 0)
 		{
@@ -104,6 +113,8 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableObjectPush = false;
 		Camera.targetElevation = ANGLE(30.0f);
 
+		HandlePlayerAttractorParent(*item);
+
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
@@ -113,7 +124,7 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action))
 		{
-			if (IsHeld(In::Forward) && TestLastFrame(item))
+			if (IsHeld(In::Forward))
 			{
 				auto climbContext = GetWallClimbUpContext(*item, *coll);
 				if (climbContext.has_value())
@@ -143,6 +154,8 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableObjectPush = false;
 		Camera.targetElevation = ANGLE(-45.0f);
 
+		HandlePlayerAttractorParent(*item);
+
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
@@ -152,7 +165,7 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action))
 		{
-			if (IsHeld(In::Back) && TestLastFrame(item))
+			if (IsHeld(In::Back))
 			{
 				auto climbContext = GetWallClimbDownContext(*item, *coll);
 				if (climbContext.has_value())

@@ -3219,13 +3219,36 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TEMP
-		auto context = GetEdgeHangShimmyUpContext(item, coll);
-		if (context.has_value())
+		constexpr auto VERTICAL_OFFSET = CLICK(1);
+
+		constexpr auto SETUP = EdgeVerticalAscentClimbSetupData
 		{
-			context->TargetStateID = LS_WALL_CLIMB_UP;
+			(int)-CLICK(0.5f), (int)-CLICK(1.5f),
+			PLAYER_HEIGHT_WALL_CLIMB,
+			true
+		};
+
+		const auto& player = GetLaraInfo(item);
+
+		auto attracColl = GetEdgeVerticalAscentClimbAttractorCollision(item, coll, SETUP);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, SETUP.DestFloorToEdgeHeightMin + VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_WALL_CLIMB_UP;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsJump = false;
+
+			if (!HasStateDispatch(&item, context.TargetStateID))
+				return std::nullopt;
+
 			return context;
 		}
+
+		return std::nullopt;
 
 		// TODO: Climb up, to edge hang, or climb ledge.
 		return std::nullopt;
@@ -3233,13 +3256,36 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TEMP
-		auto context = GetEdgeHangShimmyDownContext(item, coll);
-		if (context.has_value())
+		constexpr auto VERTICAL_OFFSET = -CLICK(1);
+
+		constexpr auto SETUP = EdgeVerticalAscentClimbSetupData
 		{
-			context->TargetStateID = LS_WALL_CLIMB_DOWN;
+			(int)CLICK(1.5f), (int)CLICK(0.5f),
+			PLAYER_HEIGHT_WALL_CLIMB,
+			true
+		};
+
+		const auto& player = GetLaraInfo(item);
+
+		auto attracColl = GetEdgeVerticalAscentClimbAttractorCollision(item, coll, SETUP);
+		if (attracColl.has_value())
+		{
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, SETUP.DestFloorToEdgeHeightMin + VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Zero;
+			context.TargetStateID = LS_WALL_CLIMB_DOWN;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsJump = false;
+
+			if (!HasStateDispatch(&item, context.TargetStateID))
+				return std::nullopt;
+
 			return context;
 		}
+
+		return std::nullopt;
 
 		// TODO: Climb down or to edge hang.
 		return std::nullopt;
