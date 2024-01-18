@@ -93,11 +93,6 @@ namespace TEN::Entities::Player
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	void lara_col_wall_climb_idle(ItemInfo* item, CollisionInfo* coll)
-	{
-		// ???
-	}
-
 	void lara_as_wall_climb_up(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
@@ -130,11 +125,6 @@ namespace TEN::Entities::Player
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	void lara_col_wall_climb_up(ItemInfo* item, CollisionInfo* coll)
-	{
-		// ???
-	}
-
 	void lara_as_wall_climb_down(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
@@ -165,11 +155,6 @@ namespace TEN::Entities::Player
 
 		item->Animation.TargetState = LS_REACH;
 		SetPlayerEdgeHangRelease(*item);
-	}
-
-	void lara_col_wall_climb_down(ItemInfo* item, CollisionInfo* coll)
-	{
-		// ???
 	}
 
 	void lara_as_wall_climb_left(ItemInfo* item, CollisionInfo* coll)
@@ -205,11 +190,6 @@ namespace TEN::Entities::Player
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	void lara_col_wall_climb_left(ItemInfo* item, CollisionInfo* coll)
-	{
-		// ???
-	}
-
 	void lara_as_wall_climb_right(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
@@ -241,11 +221,6 @@ namespace TEN::Entities::Player
 
 		item->Animation.TargetState = LS_REACH;
 		SetPlayerEdgeHangRelease(*item);
-	}
-
-	void lara_col_wall_climb_right(ItemInfo* item, CollisionInfo* coll)
-	{
-		// ???
 	}
 
 	void lara_as_wall_climb_dismount_left(ItemInfo* item, CollisionInfo* coll)
@@ -285,10 +260,5 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableSpasm = false;
 		Camera.flags = CF_FOLLOW_CENTER;
 		Camera.targetAngle = ANGLE(-20.0f);
-	}
-
-	void lara_col_wall_climb_end(ItemInfo* item, CollisionInfo* coll)
-	{
-		return;
 	}
 }
