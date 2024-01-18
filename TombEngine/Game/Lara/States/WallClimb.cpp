@@ -182,7 +182,7 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.EnableObjectPush = false;
 		Camera.targetAngle = ANGLE(-30.0f);
-		Camera.targetElevation = ANGLE(-15.0f);
+		Camera.targetElevation = ANGLE(-20.0f);
 
 		if (IsHeld(In::Action))
 		{
@@ -219,8 +219,8 @@ namespace TEN::Entities::Player
 		player.Control.IsClimbingWall = true;
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.EnableObjectPush = false;
-		Camera.targetAngle = ANGLE(-30.0f);
-		Camera.targetElevation = ANGLE(15.0f);
+		Camera.targetAngle = ANGLE(30.0f);
+		Camera.targetElevation = ANGLE(-20.0f);
 
 		if (IsHeld(In::Action))
 		{
@@ -246,5 +246,49 @@ namespace TEN::Entities::Player
 	void lara_col_wall_climb_right(ItemInfo* item, CollisionInfo* coll)
 	{
 		// ???
+	}
+
+	void lara_as_wall_climb_dismount_left(ItemInfo* item, CollisionInfo* coll)
+	{
+		auto& player = GetLaraInfo(*item);
+
+		// Setup
+		player.Control.Look.Mode = LookMode::None;
+		player.Control.IsClimbingWall = true;
+		coll->Setup.EnableObjectPush = false;
+		coll->Setup.EnableSpasm = false;
+		Camera.targetAngle = ANGLE(-30.0f);
+		Camera.targetElevation = ANGLE(-20.0f);
+	}
+
+	void lara_as_wall_climb_dismount_right(ItemInfo* item, CollisionInfo* coll)
+	{
+		auto& player = GetLaraInfo(*item);
+
+		// Setup
+		player.Control.Look.Mode = LookMode::None;
+		player.Control.IsClimbingWall = true;
+		coll->Setup.EnableObjectPush = false;
+		coll->Setup.EnableSpasm = false;
+		Camera.targetAngle = ANGLE(30.0f);
+		Camera.targetElevation = ANGLE(-20.0f);
+	}
+
+	void lara_as_wall_climb_end(ItemInfo* item, CollisionInfo* coll)
+	{
+		auto& player = GetLaraInfo(*item);
+
+		// Setup
+		player.Control.Look.Mode = LookMode::None;
+		player.Control.IsClimbingWall = true;
+		coll->Setup.EnableObjectPush = false;
+		coll->Setup.EnableSpasm = false;
+		Camera.flags = CF_FOLLOW_CENTER;
+		Camera.targetAngle = ANGLE(-20.0f);
+	}
+
+	void lara_col_wall_climb_end(ItemInfo* item, CollisionInfo* coll)
+	{
+		return;
 	}
 }

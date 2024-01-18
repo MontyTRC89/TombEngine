@@ -3209,14 +3209,14 @@ namespace TEN::Entities::Player
 
 	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TODO: Climb left, to edge hang, or dismount.
+		// TODO: Climb left, to edge hang, corner, or dismount.
 
 		return std::nullopt;
 	}
 
 	std::optional<ClimbContextData> GetWallClimbRightContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TODO: Climb right, to edge hang, or dismount.
+		// TODO: Climb right, to edge hang, corner, or dismount.
 
 		return std::nullopt;
 	}
