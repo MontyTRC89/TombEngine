@@ -24,7 +24,7 @@ namespace TEN::Entities::Player
 
 		if (item->HitPoints <= 0)
 		{
-			item->Animation.TargetState = LS_REACH;
+			item->Animation.TargetState = LS_DEATH;
 			SetPlayerEdgeHangRelease(*item);
 			return;
 		}
@@ -104,6 +104,13 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableObjectPush = false;
 		Camera.targetElevation = ANGLE(30.0f);
 
+		if (item->HitPoints <= 0)
+		{
+			item->Animation.TargetState = LS_DEATH;
+			SetPlayerEdgeHangRelease(*item);
+			return;
+		}
+
 		if (IsHeld(In::Action))
 		{
 			if (IsHeld(In::Forward) && TestLastFrame(item))
@@ -135,6 +142,13 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.EnableObjectPush = false;
 		Camera.targetElevation = ANGLE(-45.0f);
+
+		if (item->HitPoints <= 0)
+		{
+			item->Animation.TargetState = LS_DEATH;
+			SetPlayerEdgeHangRelease(*item);
+			return;
+		}
 
 		if (IsHeld(In::Action))
 		{
@@ -169,6 +183,13 @@ namespace TEN::Entities::Player
 		Camera.targetAngle = ANGLE(-30.0f);
 		Camera.targetElevation = ANGLE(-20.0f);
 
+		if (item->HitPoints <= 0)
+		{
+			item->Animation.TargetState = LS_DEATH;
+			SetPlayerEdgeHangRelease(*item);
+			return;
+		}
+
 		if (IsHeld(In::Action))
 		{
 			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
@@ -201,6 +222,13 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableObjectPush = false;
 		Camera.targetAngle = ANGLE(30.0f);
 		Camera.targetElevation = ANGLE(-20.0f);
+
+		if (item->HitPoints <= 0)
+		{
+			item->Animation.TargetState = LS_DEATH;
+			SetPlayerEdgeHangRelease(*item);
+			return;
+		}
 
 		if (IsHeld(In::Action))
 		{
