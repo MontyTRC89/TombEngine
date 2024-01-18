@@ -77,7 +77,9 @@ std::function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	MeshSwapToPour,				//43
 	MeshSwapFromPour,			//44
 	LaraLocationPad,			//45
-	KillActiveBaddys			//46
+	KillActiveBaddys,			//46
+	Turn90,						//47
+	Turn270						//48
 };
 
 void ClearSwarmEnemies(ItemInfo* item)
@@ -324,8 +326,22 @@ void FloorShake(ItemInfo* item)
 
 void Turn180(ItemInfo* item)
 {
+	std::swap(item->Pose.Orientation.x, item->Pose.Orientation.z);
 	item->Pose.Orientation.x = -item->Pose.Orientation.x;
 	item->Pose.Orientation.y += ANGLE(180.0f);
+}
+
+void Turn90(ItemInfo* item)
+{
+	std::swap(item->Pose.Orientation.x, item->Pose.Orientation.z);
+	item->Pose.Orientation.z = -item->Pose.Orientation.z;
+	item->Pose.Orientation.y += ANGLE(90.0f);
+}
+
+void Turn270(ItemInfo* item)
+{
+	item->Pose.Orientation.x = -item->Pose.Orientation.x;
+	item->Pose.Orientation.y -= ANGLE(90.0f);
 	item->Pose.Orientation.z = -item->Pose.Orientation.z;
 }
 

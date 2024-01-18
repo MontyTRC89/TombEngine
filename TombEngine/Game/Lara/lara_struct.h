@@ -145,7 +145,7 @@ enum LaraState
 	LS_EDGE_HANG_SHIMMY_90_INNER_RIGHT = 110,
 	LS_ROPE_IDLE = 111,
 	LS_ROPE_UP = 112,
-	LS_ROPE_DOWN = 113,
+	LS_ROPE_DOWN = 113, // Unused wall climb to hang idle state.
 	LS_ROPE_SWING = 114,
 	LS_ROPE_UNKNOWN = 115,
 	LS_CORRECT_POSITION = 116,
@@ -232,6 +232,9 @@ enum LaraState
 	LS_EDGE_HANG_SHIMMY_DOWN = 205,
 
 	NUM_LARA_STATES
+
+	// Can be reused:
+	// 113
 };
 
 enum LaraAnim

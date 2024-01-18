@@ -4,7 +4,7 @@
 
 #define EffectFunction void(ItemInfo* item)
 
-constexpr auto NUM_FLIPEFFECTS = 47;
+constexpr auto NUM_FLIPEFFECTS = 49;
 
 extern int FlipEffect;
 
@@ -15,6 +15,8 @@ void AddRightFootprint(ItemInfo* item);
 void VoidEffect(ItemInfo* item);
 void FinishLevel(ItemInfo* item);
 void Turn180(ItemInfo* item);
+void Turn90(ItemInfo* item);
+void Turn270(ItemInfo* item);
 void FloorShake(ItemInfo* item);
 void PlaySoundEffect(ItemInfo* item);
 void RubbleFX(ItemInfo* item);

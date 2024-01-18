@@ -361,6 +361,156 @@ static bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 // Control & Collision Functions
 // -----------------------------
 
+void lara_as_wall_climb_idle(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Free;
+	player.Control.IsClimbingWall = true;
+	coll->Setup.EnableSpasm = false;
+	coll->Setup.EnableObjectPush = false;
+	Camera.targetElevation = ANGLE(-20.0f);
+
+	if (IsHeld(In::Crouch))
+	{
+		item->Animation.TargetState = LS_EDGE_HANG_IDLE;
+		return;
+	}
+
+	if (IsHeld(In::Jump))
+	{
+		if (item->Animation.AnimNumber == LA_WALL_CLIMB_IDLE)
+		{
+			item->Animation.TargetState = LS_JUMP_BACK;
+			player.Control.HandStatus = HandStatus::Free;
+			player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+			return;
+		}
+	}
+
+	if (IsHeld(In::Left) || IsHeld(In::StepLeft))
+	{
+		item->Animation.TargetState = LS_WALL_CLIMB_LEFT;
+		player.Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+		return;
+	}
+
+	if (IsHeld(In::Right) || IsHeld(In::StepRight))
+	{
+		item->Animation.TargetState = LS_WALL_CLIMB_RIGHT;
+		player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+		return;
+	}
+}
+
+void lara_col_wall_climb_idle(ItemInfo* item, CollisionInfo* coll)
+{
+	int yShift;
+	int resultRight, resultLeft;
+	int ledgeRight, ledgeLeft;
+
+	if (LaraCheckForLetGo(item, coll) || item->Animation.AnimNumber != LA_WALL_CLIMB_IDLE)
+		return;
+
+	if (!IsHeld(In::Forward))
+	{
+		if (!IsHeld(In::Back))
+			return;
+
+		if (item->Animation.TargetState == LS_EDGE_HANG_IDLE)
+			return;
+
+		item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
+		item->Pose.Position.y += CLICK(1);
+
+		resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + WALL_CLIMB_TEST_DISTANCE, -CLICK(2), CLICK(2), &ledgeRight);
+		resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -WALL_CLIMB_TEST_DISTANCE - coll->Setup.Radius, -CLICK(2), CLICK(2), &ledgeLeft);
+
+		item->Pose.Position.y -= CLICK(1);
+
+		if (!resultRight || !resultLeft || resultLeft == -2 || resultRight == -2)
+			return;
+
+		yShift = ledgeLeft;
+
+		if (ledgeRight && ledgeLeft)
+		{
+			if (ledgeLeft < 0 != ledgeRight < 0)
+				return;
+			if (ledgeRight < 0 == ledgeRight < ledgeLeft)
+				yShift = ledgeRight;
+		}
+
+		if (resultRight == 1 && resultLeft == 1)
+		{
+			item->Animation.TargetState = LS_WALL_CLIMB_DOWN;
+			item->Pose.Position.y += yShift;
+		}
+		else
+			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
+	}
+	else if (item->Animation.TargetState != LS_GRABBING)
+	{
+		int shiftRight, shiftLeft;
+
+		item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
+		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + WALL_CLIMB_TEST_DISTANCE, &shiftRight, &ledgeRight);
+		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -WALL_CLIMB_TEST_DISTANCE - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
+
+		// NOTE: Uses function from overhang file.
+		// Wall climb to monkey swing.
+		if (!resultRight || !resultLeft)
+		{
+			if (LadderMonkeyExtra(item, coll))
+				return;
+		}
+
+		// Added check to avoid climbing through bridges.
+		if (resultRight == 0 && resultLeft == 0)
+			return;
+
+		if (resultRight >= 0 && resultLeft >= 0)
+		{
+			yShift = shiftLeft;
+
+			if (shiftRight)
+			{
+				if (shiftLeft)
+				{
+					if (shiftLeft < 0 != shiftRight < 0)
+						return;
+					if (shiftRight < 0 == shiftRight < shiftLeft)
+						yShift = shiftRight;
+				}
+				else
+					yShift = shiftRight;
+			}
+
+			// HACK: Prevent climbing inside sloped ceilings. Breaks overhang even more, but that shouldn't matter since we'll be doing it over. -- Sezz 2022.05.13
+			int y = item->Pose.Position.y - (coll->Setup.Height + CLICK(0.5f));
+			auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height + CLICK(0.5f)));
+			if ((probe.Position.Ceiling - y) < 0)
+			{
+				item->Animation.TargetState = LS_WALL_CLIMB_UP;
+				item->Pose.Position.y += yShift;
+			}
+		}
+		else if (abs(ledgeLeft - ledgeRight) <= WALL_CLIMB_TEST_DISTANCE)
+		{
+			if (resultRight == -1 && resultLeft == -1)
+			{
+				item->Animation.TargetState = LS_GRABBING;
+				item->Pose.Position.y += (ledgeRight + ledgeLeft) / 2 - CLICK(1);
+			}
+			else
+			{
+				item->Animation.TargetState = LS_WALL_CLIMB_TO_CROUCH;
+				item->Animation.RequiredState = LS_CROUCH_IDLE;
+			}
+		}
+	}
+}
+
 void lara_col_wall_climb_end(ItemInfo* item, CollisionInfo* coll)
 {
 	return;
@@ -523,153 +673,6 @@ void lara_as_wall_climb_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (!(IsHeld(In::Left) || IsHeld(In::StepLeft)))
 		item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
-}
-
-void lara_col_wall_climb_idle(ItemInfo* item, CollisionInfo* coll)
-{
-	int yShift;
-	int resultRight, resultLeft;
-	int ledgeRight, ledgeLeft;
-
-	if (LaraCheckForLetGo(item, coll) || item->Animation.AnimNumber != LA_WALL_CLIMB_IDLE)
-		return;
-
-	if (!IsHeld(In::Forward))
-	{
-		if (!IsHeld(In::Back))
-			return;
-
-		if (item->Animation.TargetState == LS_EDGE_HANG_IDLE)
-			return;
-
-		item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
-		item->Pose.Position.y += CLICK(1);
-		
-		resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + WALL_CLIMB_TEST_DISTANCE, -CLICK(2), CLICK(2), &ledgeRight);
-		resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -WALL_CLIMB_TEST_DISTANCE - coll->Setup.Radius, -CLICK(2), CLICK(2), &ledgeLeft);
-		
-		item->Pose.Position.y -= CLICK(1);
-		
-		if (!resultRight || !resultLeft || resultLeft == -2 || resultRight == -2)
-			return;
-
-		yShift = ledgeLeft;
-
-		if (ledgeRight && ledgeLeft)
-		{
-			if (ledgeLeft < 0 != ledgeRight < 0)
-				return;
-			if (ledgeRight < 0 == ledgeRight < ledgeLeft)
-				yShift = ledgeRight;
-		}
-
-		if (resultRight == 1 && resultLeft == 1)
-		{
-			item->Animation.TargetState = LS_WALL_CLIMB_DOWN;
-			item->Pose.Position.y += yShift;
-		}
-		else
-			item->Animation.TargetState = LS_EDGE_HANG_IDLE;
-	}
-	else if (item->Animation.TargetState != LS_GRABBING)
-	{
-		int shiftRight, shiftLeft;
-
-		item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
-		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + WALL_CLIMB_TEST_DISTANCE, &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -WALL_CLIMB_TEST_DISTANCE - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
-
-		// Overhang + ladder-to-monkey hook.
-		if (!resultRight || !resultLeft)
-		{
-			if (LadderMonkeyExtra(item, coll))
-				return;
-		}
-
-		// Added check to avoid climbing through bridges.
-		if (resultRight == 0 && resultLeft == 0)
-			return;
-
-		if (resultRight >= 0 && resultLeft >= 0)
-		{
-			yShift = shiftLeft;
-
-			if (shiftRight)
-			{
-				if (shiftLeft)
-				{
-					if (shiftLeft < 0 != shiftRight < 0)
-						return;
-					if (shiftRight < 0 == shiftRight < shiftLeft)
-						yShift = shiftRight;
-				}
-				else
-					yShift = shiftRight;
-			}
-
-			// HACK: Prevent climbing inside sloped ceilings. Breaks overhang even more, but that shouldn't matter since we'll be doing it over. -- Sezz 2022.05.13
-			int y = item->Pose.Position.y - (coll->Setup.Height + CLICK(0.5f));
-			auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height + CLICK(0.5f)));
-			if ((probe.Position.Ceiling - y) < 0)
-			{
-				item->Animation.TargetState = LS_WALL_CLIMB_UP;
-				item->Pose.Position.y += yShift;
-			}
-		}
-		else if (abs(ledgeLeft - ledgeRight) <= WALL_CLIMB_TEST_DISTANCE)
-		{
-			if (resultRight == -1 && resultLeft == -1)
-			{
-				item->Animation.TargetState = LS_GRABBING;
-				item->Pose.Position.y += (ledgeRight + ledgeLeft) / 2 - CLICK(1);
-			}
-			else
-			{
-				item->Animation.TargetState = LS_WALL_CLIMB_TO_CROUCH;
-				item->Animation.RequiredState = LS_CROUCH_IDLE;
-			}
-		}
-	}
-}
-
-void lara_as_wall_climb_idle(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	lara->Control.Look.Mode = LookMode::Free;
-	lara->Control.IsClimbingWall = true;
-	coll->Setup.EnableSpasm = false;
-	coll->Setup.EnableObjectPush = false;
-	Camera.targetElevation = ANGLE(-20.0f);
-
-	if (item->Animation.AnimNumber == LA_WALL_CLIMB_DISMOUNT_LEFT_START)
-		Camera.targetAngle = ANGLE(-60.0f);
-
-	if (item->Animation.AnimNumber == LA_WALL_CLIMB_DISMOUNT_RIGHT_START)
-		Camera.targetAngle = ANGLE(60.0f);
-
-	if (IsHeld(In::Left) || IsHeld(In::StepLeft))
-	{
-		item->Animation.TargetState = LS_WALL_CLIMB_LEFT;
-		lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
-	}
-	else if (IsHeld(In::Right) || IsHeld(In::StepRight))
-	{
-		item->Animation.TargetState = LS_WALL_CLIMB_RIGHT;
-		lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
-	}
-	else if (IsHeld(In::Jump))
-	{
-		if (item->Animation.AnimNumber == LA_WALL_CLIMB_IDLE)
-		{
-			item->Animation.TargetState = LS_JUMP_BACK;
-			lara->Control.HandStatus = HandStatus::Free;
-			lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
-		}
-	}
-
-	// Overhang hook.
-	SlopeClimbExtra(item, coll);
 }
 
 void lara_as_wall_climb_dismount_left(ItemInfo* item, CollisionInfo* coll)
