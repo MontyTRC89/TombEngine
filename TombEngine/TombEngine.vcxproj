@@ -342,7 +342,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\lara_crawl.h" />
     <ClInclude Include="Game\Lara\lara_fire.h" />
     <ClInclude Include="Game\Lara\lara_flare.h" />
-    <ClInclude Include="Game\Lara\lara_hang.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_initialise.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
@@ -354,7 +353,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_surface.h" />
     <ClInclude Include="Game\Lara\lara_swim.h" />
-    <ClInclude Include="Game\Lara\lara_test_structs.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
     <ClInclude Include="Game\Lara\lara_two_guns.h" />
     <ClInclude Include="Game\animation.h" />
@@ -398,6 +396,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\PlayerContextData.h" />
     <ClInclude Include="Game\Lara\PlayerStateMachine.h" />
     <ClInclude Include="Game\Lara\States\EdgeHang.h" />
+    <ClInclude Include="Game\Lara\States\WallClimb.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
     <ClInclude Include="Game\people.h" />
@@ -892,7 +891,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_crawl.cpp" />
     <ClCompile Include="Game\Lara\lara_fire.cpp" />
     <ClCompile Include="Game\Lara\lara_flare.cpp" />
-    <ClCompile Include="Game\Lara\lara_hang.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_initialise.cpp" />
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
@@ -908,6 +906,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\Lara\PlayerStateMachine.cpp" />
     <ClCompile Include="Game\Lara\States\EdgeHang.cpp" />
+    <ClCompile Include="Game\Lara\States\WallClimb.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\missile.cpp" />
     <ClCompile Include="Game\people.cpp" />

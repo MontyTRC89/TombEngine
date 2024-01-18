@@ -22,6 +22,7 @@
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/States/EdgeHang.h"
+#include "Game/Lara/States/WallClimb.h"
 
 namespace TEN::Entities::Player
 {
