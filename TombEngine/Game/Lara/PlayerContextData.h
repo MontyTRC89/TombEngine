@@ -73,11 +73,11 @@ namespace TEN::Entities::Player
 		int LowerEdgeToCeilBound = 0;
 	};
 
-	struct EdgeVerticalAscentClimbSetupData
+	struct EdgeVerticalMovementClimbSetupData
 	{
-		int LowerEdgeBound			 = 0;
-		int UpperEdgeBound			 = 0;
-		int DestFloorToEdgeHeightMin = 0;
+		int LowerEdgeBound		  = 0;
+		int UpperEdgeBound		  = 0;
+		int UpperFloorToEdgeBound = 0;
 
 		bool TestClimbableWall = false;
 	};

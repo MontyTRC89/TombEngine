@@ -2947,16 +2947,21 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<AttractorCollisionData> GetEdgeVerticalAscentClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
-																							  const EdgeVerticalAscentClimbSetupData& setup)
+	static std::optional<AttractorCollisionData> GetEdgeVerticalMovementClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																								const EdgeVerticalMovementClimbSetupData& setup)
 	{
-		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
+		constexpr auto ATTRAC_DETECT_RADIUS		  = BLOCK(0.5f);
+		constexpr auto WALL_CLIMB_VERTICAL_OFFSET = CLICK(2);
 
 		const auto& player = GetLaraInfo(item);
 
 		// Get attractor collisions.
 		auto currentAttracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
-		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3() + Vector3(0.0f, -coll.Setup.Height, 0.0f), item.RoomNumber, item.Pose.Orientation.y, ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(
+			currentAttracColl.Proximity.Intersection, currentAttracColl.AttractorPtr->GetRoomNumber(), currentAttracColl.HeadingAngle,
+			ATTRAC_DETECT_RADIUS);
+
+		auto intersect2D0 = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2985,8 +2990,7 @@ namespace TEN::Entities::Player
 			}
 
 			// 5) Test if attractors are stacked exactly.
-			/*auto intersect2D0 = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
-			auto intersect2D1 = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
+			/*auto intersect2D1 = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
 			if (Vector2::DistanceSquared(intersect2D0, intersect2D1) > EPSILON)
 				continue;*/
 
@@ -2995,12 +2999,57 @@ namespace TEN::Entities::Player
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// TODO: Get relative ceiling height from player's position.
-
 			// 6) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
-			if (floorToEdgeHeight <= setup.DestFloorToEdgeHeightMin)
+			if (floorToEdgeHeight <= setup.UpperFloorToEdgeBound)
 				continue;
+
+			// 7) Test if ceiling behind is adequately higher than edge.
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			if (edgeToCeilHeight >= 0)
+				continue;
+
+			// 8) Test if movement between edges is blocked by floor.
+			if (pointCollBack.Position.Floor <= currentAttracColl.Proximity.Intersection.y)
+				continue;
+
+			// 9) Find wall edge for feet (if applicable).
+			if (setup.TestClimbableWall)
+			{
+				bool hasWall = false;
+				for (const auto& attracColl2 : attracColls)
+				{
+					if (&attracColl == &attracColl2)
+						continue;
+
+					// 1) Check attractor type.
+					if (attracColl2.AttractorPtr->GetType() != AttractorType::WallEdge)
+						continue;
+
+					// 2) Test if edge slope is illegal.
+					if (abs(attracColl2.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+						continue;
+
+					// 3) Test edge angle relation.
+					if (!TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl2.HeadingAngle))
+						continue;
+
+					// TODO: Not working.
+					// 4) Test if relative edge height is within edge intersection bounds.
+					/*int relEdgeHeight = attracColl2.Proximity.Intersection.y - currentAttracColl.Proximity.Intersection.y;
+					if (relEdgeHeight > (setup.LowerEdgeBound + WALL_CLIMB_VERTICAL_OFFSET) ||
+						relEdgeHeight < (setup.UpperEdgeBound + WALL_CLIMB_VERTICAL_OFFSET))
+					{
+						continue;
+					}*/
+
+					hasWall = true;
+					break;
+				}
+
+				if (!hasWall)
+					continue;
+			}
 
 			return attracColl;
 		}
@@ -3013,7 +3062,7 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
-		constexpr auto SETUP = EdgeVerticalAscentClimbSetupData
+		constexpr auto SETUP = EdgeVerticalMovementClimbSetupData
 		{
 			(int)-CLICK(0.5f), (int)-CLICK(1.5f),
 			LARA_HEIGHT_STRETCH,
@@ -3022,13 +3071,13 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		auto attracColl = GetEdgeVerticalAscentClimbAttractorCollision(item, coll, SETUP);
+		auto attracColl = GetEdgeVerticalMovementClimbAttractorCollision(item, coll, SETUP);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, SETUP.DestFloorToEdgeHeightMin + VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -3044,7 +3093,7 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 
-		constexpr auto SETUP = EdgeVerticalAscentClimbSetupData
+		constexpr auto SETUP = EdgeVerticalMovementClimbSetupData
 		{
 			(int)CLICK(1.5f), (int)CLICK(0.5f),
 			LARA_HEIGHT_STRETCH,
@@ -3053,13 +3102,13 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		auto attracColl = GetEdgeVerticalAscentClimbAttractorCollision(item, coll, SETUP);
+		auto attracColl = GetEdgeVerticalMovementClimbAttractorCollision(item, coll, SETUP);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, SETUP.DestFloorToEdgeHeightMin + VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_DOWN;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -3217,11 +3266,12 @@ namespace TEN::Entities::Player
 		return true;
 	}
 
+	// TODO: Climb up, to edge hang, or climb ledge.
 	std::optional<ClimbContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
-		constexpr auto SETUP = EdgeVerticalAscentClimbSetupData
+		constexpr auto SETUP = EdgeVerticalMovementClimbSetupData
 		{
 			(int)-CLICK(0.5f), (int)-CLICK(1.5f),
 			PLAYER_HEIGHT_WALL_CLIMB,
@@ -3230,35 +3280,33 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		auto attracColl = GetEdgeVerticalAscentClimbAttractorCollision(item, coll, SETUP);
+		if (!HasStateDispatch(&item, LS_WALL_CLIMB_UP))
+			return std::nullopt;
+
+		auto attracColl = GetEdgeVerticalMovementClimbAttractorCollision(item, coll, SETUP);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, SETUP.DestFloorToEdgeHeightMin + VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_WALL_CLIMB_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
 
-			if (!HasStateDispatch(&item, context.TargetStateID))
-				return std::nullopt;
-
 			return context;
 		}
 
 		return std::nullopt;
-
-		// TODO: Climb up, to edge hang, or climb ledge.
-		return std::nullopt;
 	}
 
+	// TODO: Climb down or to edge hang.
 	std::optional<ClimbContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 
-		constexpr auto SETUP = EdgeVerticalAscentClimbSetupData
+		constexpr auto SETUP = EdgeVerticalMovementClimbSetupData
 		{
 			(int)CLICK(1.5f), (int)CLICK(0.5f),
 			PLAYER_HEIGHT_WALL_CLIMB,
@@ -3267,30 +3315,28 @@ namespace TEN::Entities::Player
 
 		const auto& player = GetLaraInfo(item);
 
-		auto attracColl = GetEdgeVerticalAscentClimbAttractorCollision(item, coll, SETUP);
+		if (!HasStateDispatch(&item, LS_WALL_CLIMB_DOWN))
+			return std::nullopt;
+
+		auto attracColl = GetEdgeVerticalMovementClimbAttractorCollision(item, coll, SETUP);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, SETUP.DestFloorToEdgeHeightMin + VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_WALL_CLIMB_DOWN;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
 
-			if (!HasStateDispatch(&item, context.TargetStateID))
-				return std::nullopt;
-
 			return context;
 		}
 
 		return std::nullopt;
-
-		// TODO: Climb down or to edge hang.
-		return std::nullopt;
 	}
 
+	// TODO: Climb left, to edge hang, corner, or dismount.
 	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto VERTICAL_OFFSET = PLAYER_HEIGHT_WALL_CLIMB;
@@ -3310,9 +3356,6 @@ namespace TEN::Entities::Player
 			return context;
 		}
 
-		return std::nullopt;
-
-		// TODO: Climb left, to edge hang, corner, or dismount.
 		return std::nullopt;
 	}
 
