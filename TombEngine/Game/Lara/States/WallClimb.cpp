@@ -29,6 +29,8 @@ namespace TEN::Entities::Player
 			Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Zero);
 		Camera.targetElevation = ANGLE(-20.0f);
 
+		// TODO: Add GetWallClimbIdleContext() purely for the alignment?
+
 		HandlePlayerAttractorParent(*item);
 
 		if (item->HitPoints <= 0)

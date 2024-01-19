@@ -1547,7 +1547,7 @@ namespace TEN::Entities::Player
 		constexpr auto SETUP = EdgeVaultClimbSetupData
 		{
 			-(int)CLICK(3.5f), -(int)CLICK(7.5f), // Edge height bounds.
-			-(int)CLICK(1 / 256.0f),			  // Edge-to-ceil height minumum.
+			-(int)CLICK(1 / 256.0f),			  // Edge-to-ceil height minumum. // TODO: Sloped ceilings are ignored.
 			0, -MAX_HEIGHT,						  // Destination floor-to-ceil range.
 			true,								  // Find highest.
 			false,								  // Test swamp depth.
@@ -1640,10 +1640,17 @@ namespace TEN::Entities::Player
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
+			// TODO: Test bridge consistency below player and below edge?
+			// 5) Test if edge is blocked by floor.
+			//if ()
+			//	continue;
+
+			// ceiling height max.
+
 			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
 			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
-			// 5) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
+			// 6) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
 			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor);
 			if (relEdgeHeight >= setup.LowerEdgeBound ||
 				relEdgeHeight < setup.UpperEdgeBound)
@@ -1653,12 +1660,11 @@ namespace TEN::Entities::Player
 
 			// TODO: collect stacked WallEdge attractors.
 			
-			// 6) Test if ceiling behind is adequately higher than edge.
+			// 7) Test if ceiling behind is adequately higher than edge.
 			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
-			// TODO: Test wall height to determine whether to mount or auto jump.
 			// TODO: Test front point collision to see if climbable wall is floating in air and therefore invalid.
 
 			return attracColl;
@@ -1674,10 +1680,12 @@ namespace TEN::Entities::Player
 	static std::optional<ClimbContextData> GetClimbableWallMountClimbContext(const ItemInfo& item, const CollisionInfo& coll,
 																			 const std::vector<AttractorCollisionData>& attracColls)
 	{
+		// TODO: Add label comments.
 		constexpr auto SETUP = WallEdgeMountClimbSetupData
 		{
 			(int)-CLICK(3.5f), (int)-CLICK(4.5f),
-			CLICK(1)
+			CLICK(1),
+			MAX_HEIGHT							  // Ceiling height max.
 		};
 		constexpr auto SWAMP_DEPTH_MAX = -CLICK(3);
 		constexpr auto VERTICAL_OFFSET = CLICK(4);
@@ -2241,6 +2249,7 @@ namespace TEN::Entities::Player
 	const std::optional<ClimbContextData> GetTreadWaterClimbableWallMountClimbContext(ItemInfo& item, const CollisionInfo& coll,
 																					  const std::vector<AttractorCollisionData>& attracColls)
 	{
+		// TODO
 		constexpr auto SETUP = WallEdgeMountClimbSetupData
 		{
 
@@ -2583,6 +2592,7 @@ namespace TEN::Entities::Player
 		constexpr auto ATTRAC_DETECT_RADIUS		  = BLOCK(0.5f);
 		constexpr auto POINT_COLL_VERTICAL_OFFSET = -CLICK(1);
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN	  = LARA_HEIGHT_STRETCH;
+		constexpr auto WALL_EDGE_FLOOR_THRESHOLD  = CLICK(0.25f);
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(
@@ -2613,7 +2623,7 @@ namespace TEN::Entities::Player
 			if (!attracColl.IsInFront || !TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle))
 				continue;
 
-			// Get point collision in front of edge.
+			// Get point collision behind edge.
 			auto pointColl = GetCollision(
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, 0.0f, POINT_COLL_VERTICAL_OFFSET);
@@ -2648,17 +2658,32 @@ namespace TEN::Entities::Player
 
 			float projVerticalVel = item.Animation.Velocity.y + GetEffectiveGravity(item.Animation.Velocity.y);
 			bool isFalling = (projVerticalVel >= 0.0f);
+			
+			// SPECIAL CASE: Wall edge.
+			if (attracColl.AttractorPtr->GetType() == AttractorType::WallEdge)
+			{
+				// 8) Test if player is falling.
+				if (!isFalling)
+					return std::nullopt;
+
+				// Get point collision in front of edge.
+				auto pointCollFront = GetCollision(
+					attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+					attracColl.HeadingAngle, 1.0f, 0.0f, POINT_COLL_VERTICAL_OFFSET);
+
+				// TODO: Uncomment when ready. Doesn't always work.
+				// 9) Test if wall edge is on wall.
+				/*if (pointCollFront.Position.Floor > (attracColl.Proximity.Intersection.y + WALL_EDGE_FLOOR_THRESHOLD) &&
+					pointCollFront.Position.Ceiling < (attracColl.Proximity.Intersection.y - WALL_EDGE_FLOOR_THRESHOLD))
+				{
+					return std::nullopt;
+				}*/
+			}
+
 			int lowerBound = isFalling ? (int)ceil(projVerticalVel) : 0;
 			int upperBound = isFalling ? 0 : (int)floor(projVerticalVel);
 
-			// 8) SPECIAL CASE: Test if player is falling in case of wall edge attractor.
-			if (attracColl.AttractorPtr->GetType() == AttractorType::WallEdge &&
-				!isFalling)
-			{
-				return std::nullopt;
-			}
-
-			// 9) Test catch trajectory.
+			// 10) Test catch trajectory.
 			if (relEdgeHeight > lowerBound ||
 				relEdgeHeight < upperBound)
 			{
@@ -3001,7 +3026,7 @@ namespace TEN::Entities::Player
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 6) Test if movement between edges is blocked by floor.
+			// 6) Test if edge is blocked by floor.
 			if (pointCollBack.Position.Floor <= currentAttracColl.Proximity.Intersection.y)
 				continue;
 

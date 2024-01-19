@@ -62,6 +62,7 @@ namespace TEN::Entities::Player
 		int LowerEdgeBound		 = 0;
 		int UpperEdgeBound		 = 0;
 		int LowerEdgeToCeilBound = 0;
+		int CeilHeightMax		 = 0;
 	};
 
 	struct EdgeHangDescentClimbSetupData
