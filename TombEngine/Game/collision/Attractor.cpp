@@ -297,15 +297,8 @@ namespace TEN::Collision::Attractor
 		if (chainDist >= 0.0f && chainDist <= _length)
 			return chainDist;
 
-		// Looped; wrap distance along attractor.
-		if (IsLooped())
-		{
-			int sign = std::copysign(1, chainDist);
-			return fmod(chainDist, _length * sign);
-		}
-		
-		// Not looped; clamp distance along attractor.
-		return std::clamp(chainDist, 0.0f, _length);
+		// Wrap or clamp distance along attractor.
+		return (IsLooped() ? fmod(chainDist + _length, _length) : std::clamp(chainDist, 0.0f, _length));
 	}
 
 	void Attractor::CacheSegmentLengths()

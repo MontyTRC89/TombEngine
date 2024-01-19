@@ -48,7 +48,6 @@ namespace TEN::Entities::Player
 		float chainDistLeft = chainDistCenter - coll.Setup.Radius;
 		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
-
 		// TODO: Find connecting attractors.
 
 		// Get attractor collisions.
@@ -56,6 +55,12 @@ namespace TEN::Entities::Player
 		auto attracCollLeft = GetAttractorCollision(*handsAttrac.Ptr, chainDistLeft, item.Pose.Orientation.y);
 		auto attracCollRight = GetAttractorCollision(*handsAttrac.Ptr, chainDistRight, item.Pose.Orientation.y);
 
+		// DEBUG----
+		g_Renderer.AddDebugLine(attracCollCenter.Proximity.Intersection, attracCollCenter.Proximity.Intersection + Vector3(0, -CLICK(0.5f), 0), Color(1, 1, 0));
+		g_Renderer.AddDebugLine(attracCollLeft.Proximity.Intersection, attracCollLeft.Proximity.Intersection + Vector3(0, -CLICK(0.25f), 0), Color(1, 1, 0));
+		g_Renderer.AddDebugLine(attracCollRight.Proximity.Intersection, attracCollRight.Proximity.Intersection + Vector3(0, -CLICK(0.25f), 0), Color(1, 1, 0));
+		//--------
+		
 		// Return attractor collisions at three points.
 		return EdgeHangAttractorCollisionData
 		{
@@ -126,10 +131,10 @@ namespace TEN::Entities::Player
 		coll->Setup.EnableObjectPush = false;
 		coll->Setup.EnableSpasm = false;
 		Camera.targetAngle = 0;
-		Camera.targetElevation = ANGLE(-45.0f);
+		Camera.targetElevation = ANGLE(-45.0f);/*
 		player.Context.Attractor.Update(
 			*item, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance,
-			Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Zero);
+			Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Zero);*/
 
 		HandlePlayerAttractorParent(*item);
 
