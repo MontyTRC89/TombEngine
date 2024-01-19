@@ -1212,7 +1212,7 @@ namespace TEN::Entities::Player
 		}
 
 		int sign = setup.TestEdgeFront ? 1 : -1;
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length()));
 		const AttractorCollisionData* highestAttracCollPtr = nullptr;
 
 		// 2) Assess attractor collision.
@@ -1611,7 +1611,7 @@ namespace TEN::Entities::Player
 	{
 		const auto& player = GetLaraInfo(item);
 
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length()));
 
 		// Assess attractor collision.
 		for (auto& attracColl : attracColls)
@@ -2381,7 +2381,7 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto ABS_EDGE_BOUND = CLICK(0.5f);
 
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length()));
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2589,7 +2589,7 @@ namespace TEN::Entities::Player
 			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
 			0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
 		
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, item.Animation.Velocity.Length()));
+		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length()));
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2772,7 +2772,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Dispatch checks.
+	// TODO: Dispatch checks. Should be added to several animations for most responsive catch actions.
 	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		auto context = std::optional<ClimbContextData>();
@@ -2780,14 +2780,14 @@ namespace TEN::Entities::Player
 		context = GetEdgeJumpCatchClimbContext(item, coll);
 		if (context.has_value())
 		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
 		context = GetMonkeySwingJumpCatchClimbContext(item, coll);
 		if (context.has_value())
 		{
-			//if (HasStateDispatch(&item, context->TargetStateID))
+			if (HasStateDispatch(&item, context->TargetStateID))
 				return context;
 		}
 
@@ -2961,11 +2961,13 @@ namespace TEN::Entities::Player
 			currentAttracColl.Proximity.Intersection, currentAttracColl.AttractorPtr->GetRoomNumber(), currentAttracColl.HeadingAngle,
 			ATTRAC_DETECT_RADIUS);
 
+		// Calculate 2D intersection on current attractor.
 		auto intersect2D0 = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
 		{
+			// TODO: Check for wall climb.
 			// 1) Check attractor type.
 			if (attracColl.AttractorPtr->GetType() != AttractorType::Edge &&
 				attracColl.AttractorPtr->GetType() != AttractorType::WallEdge)
@@ -2999,18 +3001,18 @@ namespace TEN::Entities::Player
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
-			// 6) Test if edge is high enough from floor.
+			// 6) Test if movement between edges is blocked by floor.
+			if (pointCollBack.Position.Floor <= currentAttracColl.Proximity.Intersection.y)
+				continue;
+
+			// 7) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
 			if (floorToEdgeHeight <= setup.UpperFloorToEdgeBound)
 				continue;
 
-			// 7) Test if ceiling behind is adequately higher than edge.
+			// 8) Test if ceiling behind is adequately higher than edge.
 			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight >= 0)
-				continue;
-
-			// 8) Test if movement between edges is blocked by floor.
-			if (pointCollBack.Position.Floor <= currentAttracColl.Proximity.Intersection.y)
 				continue;
 
 			// 9) Find wall edge for feet (if applicable).
@@ -3336,13 +3338,17 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	// TODO: Climb left, to edge hang, corner, or dismount.
-	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<ClimbContextData> GetWallClimbDismountLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	static std::optional<ClimbContextData> GetWallClimbMoveLeftContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto VERTICAL_OFFSET = PLAYER_HEIGHT_WALL_CLIMB;
 
 		// TEMP. Also crashes.
-		// Get flat shimmy left context.
+		// Get move left context.
 		auto attracColl = GetEdgeHangFlatShimmyClimbAttractorCollision(item, coll, false);
 		if (attracColl.has_value())
 		{
@@ -3355,6 +3361,35 @@ namespace TEN::Entities::Player
 
 			return context;
 		}
+
+		// TODO: Move left to edge hang.
+
+		return std::nullopt;
+	}
+
+	static std::optional<ClimbContextData> GetWallClimbCornerMoveLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		auto context = std::optional<ClimbContextData>();
+
+		// 1) Dismount wall left.
+		context = GetWallClimbDismountLeftContext(item, coll);
+		if (context.has_value())
+			return context;
+
+		// 2) Move left on wall.
+		context = GetWallClimbMoveLeftContext(item, coll);
+		if (context.has_value())
+			return context;
+
+		// 3) Corner move left on wall.
+		context = GetWallClimbCornerMoveLeftContext(item, coll);
+		if (context.has_value())
+			return context;
 
 		return std::nullopt;
 	}
