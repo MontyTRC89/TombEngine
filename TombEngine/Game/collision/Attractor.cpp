@@ -189,7 +189,6 @@ namespace TEN::Collision::Attractor
 	void Attractor::DetachAllPlayers()
 	{
 		// TODO: Crashes trying to loop?
-		return;
 
 		for (int itemNumber : _attachedPlayerItemNumbers)
 		{
@@ -293,7 +292,7 @@ namespace TEN::Collision::Attractor
 
 	float Attractor::NormalizeChainDistance(float chainDist) const
 	{
-		// Distance along attractor is within bounds; return it.
+		// Distance along attractor within bounds; return it.
 		if (chainDist >= 0.0f && chainDist <= _length)
 			return chainDist;
 

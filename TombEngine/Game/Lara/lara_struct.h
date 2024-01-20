@@ -87,7 +87,7 @@ enum LaraState
 	LS_WALL_CLIMB_IDLE = 56,
 	LS_WALL_CLIMB_UP = 57,
 	LS_WALL_CLIMB_LEFT = 58,
-	LS_WALL_CLIMB_STOP = 59,
+	LS_WALL_CLIMB_STOP = 59, // Unused.
 	LS_WALL_CLIMB_RIGHT = 60,
 	LS_WALL_CLIMB_DOWN = 61,
 	LS_AUTO_JUMP = 62,
@@ -234,7 +234,7 @@ enum LaraState
 	NUM_LARA_STATES
 
 	// Can be reused:
-	// 113
+	// 59, 113
 };
 
 enum LaraAnim
@@ -849,6 +849,7 @@ enum LaraAnim
 	// 280,
 	// 290, 302,
 	// 368, 370,
+	// 498, 500
 };
 
 enum LaraExtraAnim

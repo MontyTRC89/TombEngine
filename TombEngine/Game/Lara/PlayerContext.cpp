@@ -1086,7 +1086,7 @@ namespace TEN::Entities::Player
 
 	static bool TestLedgeClimbSetup(const ItemInfo& item, CollisionInfo& coll, const LedgeClimbSetupData& setup)
 	{
-		constexpr auto REL_FLOOR_HEIGHT_THRESHOLD = CLICK(0.5f);
+		constexpr auto ABS_FLOOR_BOUND = CLICK(0.5f);
 
 		const auto& player = GetLaraInfo(item);
 
@@ -1117,7 +1117,7 @@ namespace TEN::Entities::Player
 
 		// 4) Test ledge floor-to-edge height.
 		int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor);
-		if (ledgeFloorToEdgeHeight > REL_FLOOR_HEIGHT_THRESHOLD)
+		if (ledgeFloorToEdgeHeight > ABS_FLOOR_BOUND)
 			return false;
 		
 		// 5) Test ledge floor-to-ceiling height.
@@ -1281,6 +1281,10 @@ namespace TEN::Entities::Player
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
+			// 2.9) Test if bridge blocks path.
+			if (GetCollision(item).Position.Bridge != pointCollBack.Position.Bridge)
+				continue;
+
 			// Get point collision in front of edge.
 			auto pointCollFront = GetCollision(
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
@@ -1301,7 +1305,7 @@ namespace TEN::Entities::Player
 				int destFloorToCeilHeightLeft = abs(destPointCollLeft.Position.Ceiling - destPointCollLeft.Position.Floor);
 				int destFloorToCeilHeightRight = abs(destPointCollRight.Position.Ceiling - destPointCollRight.Position.Floor);
 
-				// 2.9) Test destination floor-to-ceiling heights.
+				// 2.10) Test destination floor-to-ceiling heights.
 				if (destFloorToCeilHeightCenter <= setup.DestFloorToCeilHeightMin || destFloorToCeilHeightCenter > setup.DestFloorToCeilHeightMax ||
 					destFloorToCeilHeightLeft <= setup.DestFloorToCeilHeightMin || destFloorToCeilHeightLeft > setup.DestFloorToCeilHeightMax ||
 					destFloorToCeilHeightRight <= setup.DestFloorToCeilHeightMin || destFloorToCeilHeightRight > setup.DestFloorToCeilHeightMax)
@@ -1309,7 +1313,7 @@ namespace TEN::Entities::Player
 					continue;
 				}
 
-				// 2.10) Test destination floor-to-edge height if approaching from front.
+				// 2.11) Test destination floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
 					int destFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - destPointCollCenter.Position.Floor);
@@ -1317,19 +1321,19 @@ namespace TEN::Entities::Player
 						continue;
 				}
 
-				// 2.11) Test for object obstruction.
+				// 2.12) Test for object obstruction.
 				if (TestForObjectOnLedge(attracColl, coll.Setup.Radius, (setup.DestFloorToCeilHeightMin - CLICK(1)) * -sign, setup.TestEdgeFront))
 					continue;
 			}
 
-			// 2.12) Test for illegal slope at destination (if applicable).
+			// 2.13) Test for illegal slope at destination (if applicable).
 			if (setup.TestDestIllegalSlope)
 			{
 				if (setup.TestEdgeFront ? pointCollFront.Position.FloorSlope : pointCollBack.Position.FloorSlope)
 					continue;
 			}
 
-			// 2.13) Track highest or return lowest attractor collision.
+			// 2.14) Track highest or return lowest attractor collision.
 			if (setup.FindHighest)
 			{
 				if (highestAttracCollPtr == nullptr)
@@ -3320,7 +3324,7 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_WALL_CLIMB_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -3355,7 +3359,7 @@ namespace TEN::Entities::Player
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Zero;
 			context.TargetStateID = LS_WALL_CLIMB_DOWN;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -3367,32 +3371,48 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<ClimbContextData> GetWallClimbDismountLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<ClimbContextData> GetWallClimbSideDismountContext(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
 	{
-		return std::nullopt;
+		constexpr auto ABS_FLOOR_BOUND			= CLICK(0.5f);
+		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT;
+
+		const auto& player = GetLaraInfo(item);
+
+		// Get attractor collision.
+		auto attracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
+
+		// TODO: Use player room number?
+		// Get point collision.
+		auto pointColl = GetCollision(
+			attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(), attracColl.HeadingAngle,
+			-coll.Setup.Radius, 0.0f, (coll.Setup.Radius * 2) * (isGoingRight ? 1 : -1));
+		int vPos = attracColl.Proximity.Intersection.y + coll.Setup.Height;
+
+		// 1) Test relative edge-to-floor height.
+		int relFloorHeight = abs(pointColl.Position.Floor - vPos);
+		if (relFloorHeight > ABS_FLOOR_BOUND)
+			return std::nullopt;
+
+		// 2) Test floor-to-ceiling height.
+		int floorToCeilHeight = abs(pointColl.Position.Floor - pointColl.Position.Ceiling);
+		if (floorToCeilHeight >= FLOOR_TO_CEIL_HEIGHT_MAX)
+			return std::nullopt;
+
+		// 3) Create and return climb context.
+		auto context = ClimbContextData{};
+		context.AttractorPtr = player.Context.Attractor.Ptr;
+		context.ChainDistance = player.Context.Attractor.ChainDistance;
+		context.RelPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
+		context.RelOrientOffset = EulerAngles::Zero;
+		context.AlignType = ClimbContextAlignType::AttractorParent;
+		context.TargetStateID = isGoingRight ? LS_WALL_CLIMB_DISMOUNT_RIGHT : LS_WALL_CLIMB_DISMOUNT_LEFT;
+		context.IsJump = false;
+
+		return context;
 	}
 
 	static std::optional<ClimbContextData> GetWallClimbMoveLeftContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto VERTICAL_OFFSET = PLAYER_HEIGHT_WALL_CLIMB;
-
-		// TEMP. Also crashes.
-		// Get move left context.
-		auto attracColl = GetEdgeHangFlatShimmyClimbAttractorCollision(item, coll, false);
-		if (attracColl.has_value())
-		{
-			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
-			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
-			context.TargetStateID = LS_WALL_CLIMB_LEFT;
-
-			return context;
-		}
-
-		// TODO: Move left to edge hang.
-
 		return std::nullopt;
 	}
 
@@ -3401,31 +3421,66 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
+	static std::optional<ClimbContextData> GetWallClimbDismountLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return GetWallClimbSideDismountContext(item, coll, false);
+	}
+	
 	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		auto context = std::optional<ClimbContextData>();
 
-		// 1) Dismount wall left.
-		context = GetWallClimbDismountLeftContext(item, coll);
-		if (context.has_value())
-			return context;
-
-		// 2) Move left on wall.
+		// 1) Move left on wall.
 		context = GetWallClimbMoveLeftContext(item, coll);
 		if (context.has_value())
 			return context;
 
-		// 3) Corner move left on wall.
+		// 2) Corner move left on wall.
 		context = GetWallClimbCornerMoveLeftContext(item, coll);
+		if (context.has_value())
+			return context;
+
+		// 3) Dismount wall left.
+		context = GetWallClimbDismountLeftContext(item, coll);
 		if (context.has_value())
 			return context;
 
 		return std::nullopt;
 	}
 
+	static std::optional<ClimbContextData> GetWallClimbMoveRightContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	static std::optional<ClimbContextData> GetWallClimbCornerMoveRightContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return std::nullopt;
+	}
+
+	static std::optional<ClimbContextData> GetWallClimbDismountRightContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return GetWallClimbSideDismountContext(item, coll, true);
+	}
+
 	std::optional<ClimbContextData> GetWallClimbRightContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		// TODO: Climb right, to edge hang, corner, or dismount.
+		auto context = std::optional<ClimbContextData>();
+
+		// 1) Move right on wall.
+		context = GetWallClimbMoveRightContext(item, coll);
+		if (context.has_value())
+			return context;
+
+		// 2) Corner move right on wall.
+		context = GetWallClimbCornerMoveRightContext(item, coll);
+		if (context.has_value())
+			return context;
+
+		// 3) Dismount wall right.
+		context = GetWallClimbDismountRightContext(item, coll);
+		if (context.has_value())
+			return context;
 
 		return std::nullopt;
 	}

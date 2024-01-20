@@ -91,7 +91,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_WALL_CLIMB_IDLE] = std::pair(lara_as_wall_climb_idle, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_WALL_CLIMB_UP] = std::pair(lara_as_wall_climb_up, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_WALL_CLIMB_LEFT] = std::pair(lara_as_wall_climb_left, lara_void_func);
-		PlayerBehaviorStateRoutines[LS_WALL_CLIMB_STOP] = std::pair(lara_as_wall_climb_end, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_WALL_CLIMB_STOP] = std::pair(lara_void_func, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_WALL_CLIMB_RIGHT] = std::pair(lara_as_wall_climb_right, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_WALL_CLIMB_DOWN] = std::pair(lara_as_wall_climb_down, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_AUTO_JUMP] = std::pair(lara_as_auto_jump, lara_col_jump_prepare);

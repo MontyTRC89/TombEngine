@@ -75,40 +75,28 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		if (KeyMap[OIS::KeyCode::KC_V])
 			bridgeItem.Attractor->DetachAllPlayers();
 
-		// Z
-		if (KeyMap[OIS::KeyCode::KC_I])
+		// Move bridge.
+		if (KeyMap[OIS::KeyCode::KC_K])
 		{
-			bridgeItem.Pose.Position.z += TRANSLATE_STEP;
-		}
-		else if (KeyMap[OIS::KeyCode::KC_K])
-		{
-			bridgeItem.Pose.Position.z -= TRANSLATE_STEP;
-		}
+			auto rotMatrix = EulerAngles(0, Camera.actualAngle, 0).ToRotationMatrix();
+			auto offset = Vector3(AxisMap[(int)InputAxis::Mouse].x, 0.0f, -AxisMap[(int)InputAxis::Mouse].y) * 1000;
+			bridgeItem.Pose.Position += Vector3::Transform(offset, rotMatrix);
 
-		// X
-		if (KeyMap[OIS::KeyCode::KC_J])
-		{
-			bridgeItem.Pose.Position.x += TRANSLATE_STEP;
+			UpdateItemRoom(bridgeItem.Index);
+			UpdateBridgeItem(bridgeItem);
 		}
 		else if (KeyMap[OIS::KeyCode::KC_L])
 		{
-			bridgeItem.Pose.Position.x -= TRANSLATE_STEP;
-		}
-		
-		// Y
-		if (KeyMap[OIS::KeyCode::KC_N])
-		{
-			bridgeItem.Pose.Position.y += TRANSLATE_STEP;
-		}
-		else if (KeyMap[OIS::KeyCode::KC_M])
-		{
-			bridgeItem.Pose.Position.y -= TRANSLATE_STEP;
+			auto offset = Vector3(0.0f, AxisMap[(int)InputAxis::Mouse].y, 0.0f) * 1000;
+			bridgeItem.Pose.Position += offset;
+
+			UpdateItemRoom(bridgeItem.Index);
+			UpdateBridgeItem(bridgeItem);
 		}
 
-		// Rotate.
+		// Rotate bridge.
 		if (KeyMap[OIS::KeyCode::KC_B])
 			bridgeItem.Pose.Orientation.y += ANGLE(2.0f);
-
 
 		if (bridgeItem.Attractor.has_value())
 			bridgeItem.Attractor->Update(GenerateBridgeAttractor(bridgeItem).GetPoints(), bridgeItem.RoomNumber);
