@@ -1212,7 +1212,7 @@ namespace TEN::Entities::Player
 		}
 
 		int sign = setup.TestEdgeFront ? 1 : -1;
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length()));
+		float range2D = std::max<float>(OFFSET_RADIUS(coll.Setup.Radius), Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length());
 		const AttractorCollisionData* highestAttracCollPtr = nullptr;
 
 		// 2) Assess attractor collision.
@@ -1611,7 +1611,7 @@ namespace TEN::Entities::Player
 	{
 		const auto& player = GetLaraInfo(item);
 
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length()));
+		float range2D = std::max<float>(OFFSET_RADIUS(coll.Setup.Radius), Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length());
 
 		// Assess attractor collision.
 		for (auto& attracColl : attracColls)
@@ -2390,7 +2390,7 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto ABS_EDGE_BOUND = CLICK(0.5f);
 
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length()));
+		float range2D = std::max<float>(OFFSET_RADIUS(coll.Setup.Radius), Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length());
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2589,19 +2589,19 @@ namespace TEN::Entities::Player
 
 	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		constexpr auto ATTRAC_DETECT_RADIUS		  = BLOCK(0.5f);
-		constexpr auto POINT_COLL_VERTICAL_OFFSET = -CLICK(1);
-		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN	  = LARA_HEIGHT_STRETCH;
+		constexpr auto ATTRAC_DETECT_RADIUS		 = BLOCK(0.5f);
+		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN	 = LARA_HEIGHT_STRETCH;
+		constexpr auto WALL_EDGE_FLOOR_THRESHOLD = CLICK(0.25f);
 
-		constexpr auto WALL_EDGE_FLOOR_THRESHOLD	  = CLICK(0.25f);
-		constexpr auto WALL_EDGE_PROBE_FORWARD_OFFSET = BLOCK(1 / 256.0f);
+		constexpr auto POINT_COLL_BACK_DOWN_OFFSET	   = -CLICK(1);
+		constexpr auto POINT_COLL_FRONT_FORWARD_OFFSET = BLOCK(1 / 256.0f);
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(
 			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
 			0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
 		
-		float range2D = OFFSET_RADIUS(std::max<float>(coll.Setup.Radius, Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length()));
+		float range2D = std::max<float>(OFFSET_RADIUS(coll.Setup.Radius), Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length());
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -2628,7 +2628,7 @@ namespace TEN::Entities::Player
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
-				attracColl.HeadingAngle, -coll.Setup.Radius, 0.0f, POINT_COLL_VERTICAL_OFFSET);
+				attracColl.HeadingAngle, -coll.Setup.Radius, 0.0f, POINT_COLL_BACK_DOWN_OFFSET);
 
 			// 5) Test if edge is high enough from floor.
 			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
@@ -2673,9 +2673,9 @@ namespace TEN::Entities::Player
 				// Get point collision in front of edge.
 				auto pointCollFront = GetCollision(
 					attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
-					attracColl.HeadingAngle, WALL_EDGE_PROBE_FORWARD_OFFSET, 0.0f, POINT_COLL_VERTICAL_OFFSET);
+					attracColl.HeadingAngle, POINT_COLL_FRONT_FORWARD_OFFSET, 0.0f, POINT_COLL_BACK_DOWN_OFFSET);
 
-				// TODO: Could do it another way. Parent WallEdge attractors to to pushables and gates?
+				// TODO: Can do it another way. Parent stacked WallEdge attractors to pushables and gates?
 				// 9) Test if wall edge is near wall.
 				if (pointCollFront.Position.Floor > (attracColl.Proximity.Intersection.y + WALL_EDGE_FLOOR_THRESHOLD) &&
 					pointCollFront.Position.Ceiling < (attracColl.Proximity.Intersection.y - WALL_EDGE_FLOOR_THRESHOLD))
