@@ -3416,8 +3416,46 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<ClimbContextData> GetWallClimbCornerMoveLeftContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<ClimbContextData> GetWallClimbCornerLeftContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
+		return std::nullopt;
+
+		auto attracColl = std::optional<AttractorCollisionData>();
+
+		// 1) Get left inner corner context.
+		attracColl = std::optional<AttractorCollisionData>();// GetWallClimbInnerCornerLeftAttractorCollision(item, coll);
+		if (attracColl.has_value())
+		{
+			// Create and return climb context.
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(90.0f), 0);
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.TargetStateID = LS_EDGE_HANG_SHIMMY_90_INNER_LEFT;
+			context.IsJump = false;
+
+			return context;
+		}
+		
+		// 2) Get left outer corner context.
+		attracColl = std::optional<AttractorCollisionData>();// GetWallClimbOuterCornerLeftAttractorCollision(item, coll);
+		if (attracColl.has_value())
+		{
+			// Create and return climb context.
+			auto context = ClimbContextData{};
+			context.AttractorPtr = attracColl->AttractorPtr;
+			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.RelPosOffset = Vector3(coll.Setup.Radius, coll.Setup.Height, coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles(0, ANGLE(-90.0f), 0);
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.TargetStateID = LS_EDGE_HANG_SHIMMY_90_OUTER_LEFT;
+			context.IsJump = false;
+
+			return context;
+		}
+
 		return std::nullopt;
 	}
 
@@ -3435,8 +3473,8 @@ namespace TEN::Entities::Player
 		if (context.has_value())
 			return context;
 
-		// 2) Corner move left on wall.
-		context = GetWallClimbCornerMoveLeftContext(item, coll);
+		// 2) Corner left on wall.
+		context = GetWallClimbCornerLeftContext(item, coll);
 		if (context.has_value())
 			return context;
 
@@ -3453,7 +3491,7 @@ namespace TEN::Entities::Player
 		return std::nullopt;
 	}
 
-	static std::optional<ClimbContextData> GetWallClimbCornerMoveRightContext(const ItemInfo& item, const CollisionInfo& coll)
+	static std::optional<ClimbContextData> GetWallClimbCornerRightContext(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		return std::nullopt;
 	}
@@ -3473,7 +3511,7 @@ namespace TEN::Entities::Player
 			return context;
 
 		// 2) Corner move right on wall.
-		context = GetWallClimbCornerMoveRightContext(item, coll);
+		context = GetWallClimbCornerRightContext(item, coll);
 		if (context.has_value())
 			return context;
 
