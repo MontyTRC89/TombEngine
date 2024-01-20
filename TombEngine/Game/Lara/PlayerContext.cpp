@@ -2592,7 +2592,9 @@ namespace TEN::Entities::Player
 		constexpr auto ATTRAC_DETECT_RADIUS		  = BLOCK(0.5f);
 		constexpr auto POINT_COLL_VERTICAL_OFFSET = -CLICK(1);
 		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN	  = LARA_HEIGHT_STRETCH;
-		constexpr auto WALL_EDGE_FLOOR_THRESHOLD  = CLICK(0.25f);
+
+		constexpr auto WALL_EDGE_FLOOR_THRESHOLD	  = CLICK(0.25f);
+		constexpr auto WALL_EDGE_PROBE_FORWARD_OFFSET = BLOCK(1 / 256.0f);
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(
@@ -2624,32 +2626,34 @@ namespace TEN::Entities::Player
 				continue;
 
 			// Get point collision behind edge.
-			auto pointColl = GetCollision(
+			auto pointCollBack = GetCollision(
 				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, 0.0f, POINT_COLL_VERTICAL_OFFSET);
 
 			// 5) Test if edge is high enough from floor.
-			int floorToEdgeHeight = pointColl.Position.Floor - attracColl.Proximity.Intersection.y;
+			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
 			// Get water heights.
-			int waterHeight = GetWaterHeight(pointColl.Coordinates.x, pointColl.Coordinates.y, pointColl.Coordinates.z, pointColl.RoomNumber);
-			int waterDepth = GetWaterDepth(pointColl.Coordinates.x, pointColl.Coordinates.y, pointColl.Coordinates.z, pointColl.RoomNumber);
+			int waterHeight = GetWaterHeight(pointCollBack.Coordinates.x, pointCollBack.Coordinates.y, pointCollBack.Coordinates.z, pointCollBack.RoomNumber);
+			int waterDepth = GetWaterDepth(pointCollBack.Coordinates.x, pointCollBack.Coordinates.y, pointCollBack.Coordinates.z, pointCollBack.RoomNumber);
 
 			// 6) Test if edge is high enough from water surface (if applicable).
 			if (waterHeight != NO_HEIGHT && waterDepth != NO_HEIGHT)
 			{
-				int waterToEdgeHeight = waterHeight - attracColl.Proximity.Intersection.y;
-				if (waterToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN &&
-					waterDepth >= attracColl.Proximity.Intersection.y) // TODO: Check. Floor height check may be enough.
+				int waterSurfaceToEdgeHeight = waterHeight - attracColl.Proximity.Intersection.y;
+				int waterBottomToEdgeHeight = waterDepth - attracColl.Proximity.Intersection.y;
+
+				if (waterSurfaceToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN &&
+					waterBottomToEdgeHeight >= 0)
 				{
 					continue;
 				}
 			}
 
 			// 7) Test if ceiling behind is adequately higher than edge.
-			int edgeToCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;
 
@@ -2669,15 +2673,15 @@ namespace TEN::Entities::Player
 				// Get point collision in front of edge.
 				auto pointCollFront = GetCollision(
 					attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
-					attracColl.HeadingAngle, 1.0f, 0.0f, POINT_COLL_VERTICAL_OFFSET);
+					attracColl.HeadingAngle, WALL_EDGE_PROBE_FORWARD_OFFSET, 0.0f, POINT_COLL_VERTICAL_OFFSET);
 
-				// TODO: Uncomment when ready. Doesn't always work.
-				// 9) Test if wall edge is on wall.
-				/*if (pointCollFront.Position.Floor > (attracColl.Proximity.Intersection.y + WALL_EDGE_FLOOR_THRESHOLD) &&
+				// TODO: Could do it another way. Parent WallEdge attractors to to pushables and gates?
+				// 9) Test if wall edge is near wall.
+				if (pointCollFront.Position.Floor > (attracColl.Proximity.Intersection.y + WALL_EDGE_FLOOR_THRESHOLD) &&
 					pointCollFront.Position.Ceiling < (attracColl.Proximity.Intersection.y - WALL_EDGE_FLOOR_THRESHOLD))
 				{
 					return std::nullopt;
-				}*/
+				}
 			}
 
 			int lowerBound = isFalling ? (int)ceil(projVerticalVel) : 0;
