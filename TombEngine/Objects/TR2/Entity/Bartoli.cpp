@@ -76,14 +76,17 @@ namespace TEN::Entities::Creatures::TR2
 		if (effectTimer == TRANSFORM_EFFECT_1_TIME)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM);
+			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
 		}
 		if (effectTimer == TRANSFORM_EFFECT_2_TIME)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM2);
+			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
 		}
 		if (effectTimer == TRANSFORM_EFFECT_3_TIME)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM3);
+			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
 			KillItem(itemNumber);
 
 			int newItemNumber = SpawnItem(item, (GAME_OBJECT_ID)transformObjectID);
