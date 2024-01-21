@@ -81,7 +81,7 @@ namespace TEN::Collision
 
 		// Set floor height.
 		auto location = RoomVector(GetSector().RoomNumber, Position.y);
-		_floorHeight = Floordata::GetFloorHeight(location, Position.x, Position.z).value_or(NO_HEIGHT);
+		_floorHeight = Floordata::GetSurfaceHeight(location, Position.x, Position.z, true).value_or(NO_HEIGHT);
 		
 		return *_floorHeight;
 	}
@@ -93,7 +93,7 @@ namespace TEN::Collision
 
 		// Set ceiling height.
 		auto location = RoomVector(GetSector().RoomNumber, Position.y);
-		_ceilingHeight = Floordata::GetCeilingHeight(location, Position.x, Position.z).value_or(NO_HEIGHT);
+		_ceilingHeight = Floordata::GetSurfaceHeight(location, Position.x, Position.z, false).value_or(NO_HEIGHT);
 		
 		return *_ceilingHeight;
 	}
@@ -141,7 +141,8 @@ namespace TEN::Collision
 
 		// Set floor bridge item number.
 		int floorHeight = GetFloorHeight();
-		_floorBridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(Vector3i(Position.x, floorHeight, Position.z), true, false);
+		auto pos = Vector3i(Position.x, floorHeight, Position.z);
+		_floorBridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(pos, true, false);
 
 		return *_floorBridgeItemNumber;
 	}
@@ -153,7 +154,8 @@ namespace TEN::Collision
 
 		// Set ceiling bridge item number.
 		int ceilingHeight = GetCeilingHeight();
-		_ceilingBridgeItemNumber = GetTopSector().GetInsideBridgeItemNumber(Vector3i(Position.x, ceilingHeight, Position.z), false, true);
+		auto pos = Vector3i(Position.x, ceilingHeight, Position.z);
+		_ceilingBridgeItemNumber = GetTopSector().GetInsideBridgeItemNumber(pos, false, true);
 
 		return *_ceilingBridgeItemNumber;
 	}
@@ -312,8 +314,7 @@ namespace TEN::Collision
 
 	static RoomVector GetLocation(const ItemInfo& item)
 	{
-		// TODO: Find cleaner solution. Constructing a "location" for the player on the spot
-		// can result in stumbles when climbing onto thin platforms. 
+		// TODO: Find cleaner solution. Manually constructing a player "location" can result in stumbles when climbing onto thin platforms. 
 		// May have to do with player's room number being updated at half-height? -- Sezz 2022.06.14
 		if (item.IsLara())
 			return item.Location;
@@ -341,13 +342,13 @@ namespace TEN::Collision
 		return PointCollisionData(probePos, probeRoomNumber);
 	}
 
-	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
+	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right, const Vector3& axis)
 	{
 		// Get "location".
 		auto location = GetLocation(pos, roomNumber);
 
 		// Calculate probe position.
-		auto probePos = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
+		auto probePos = Geometry::TranslatePoint(pos, headingAngle, forward, down, right, axis);
 		short probeRoomNumber = GetProbeRoomNumber(pos, location, probePos);
 
 		return PointCollisionData(probePos, probeRoomNumber);
@@ -370,13 +371,13 @@ namespace TEN::Collision
 		return PointCollisionData(probePos, probeRoomNumber);
 	}
 
-	PointCollisionData GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right)
+	PointCollisionData GetPointCollision(const ItemInfo& item, short headingAngle, float forward, float down, float right, const Vector3& axis)
 	{
 		// Get "location".
 		auto location = GetLocation(item);
 
 		// Calculate probe position.
-		auto probePos = Geometry::TranslatePoint(item.Pose.Position, headingAngle, forward, down, right);
+		auto probePos = Geometry::TranslatePoint(item.Pose.Position, headingAngle, forward, down, right, axis);
 		short probeRoomNumber = GetProbeRoomNumber(item.Pose.Position, location, probePos);
 
 		return PointCollisionData(probePos, probeRoomNumber);
