@@ -242,7 +242,7 @@ namespace TEN::Entities::Creatures::TR2
 			fire.dB = 0.15f * UCHAR_MAX;
 			fire.colFadeSpeed = 12;
 			fire.fadeToBlack = 8;
-			fire.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			fire.blendMode = BlendMode::Additive;
 
 			int v = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
 			fire.life =
