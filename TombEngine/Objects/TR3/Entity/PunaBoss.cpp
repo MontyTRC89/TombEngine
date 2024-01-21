@@ -156,7 +156,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		smoke.on = true;
 		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 		smoke.x = pos.x + Random::GenerateInt(-64, 64);
 		smoke.y = pos.y - Random::GenerateInt(0, 32);
 		smoke.z = pos.z + Random::GenerateInt(-64, 64);

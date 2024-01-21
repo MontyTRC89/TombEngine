@@ -126,7 +126,7 @@ have an ID of 0, the second an ID of 1, and so on.
 /***
 Finishes the current level, with optional level index and start position index provided.
 If level index is not provided or is zero, jumps to next level. If level index is more than
-level count, jumps to title. If LARA_START_POS objects are present in level, player will be
+level count, jumps to title. If LARA\_START\_POS objects are present in level, player will be
 teleported to such object with OCB similar to provided second argument.
 @function EndLevel
 @int[opt] index level index (default 0)

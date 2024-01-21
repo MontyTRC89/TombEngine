@@ -6947,6 +6947,9 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::vector<int32_t> action_queue{};
   std::vector<std::unique_ptr<TEN::Save::SoundtrackT>> soundtracks{};
   std::vector<int32_t> cd_flags{};
+  int32_t postprocess_mode = 0;
+  float postprocess_strength = 0.0f;
+  std::unique_ptr<TEN::Save::Vector3> postprocess_tint{};
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
   std::unique_ptr<TEN::Save::PendulumT> alternate_pendulum{};
@@ -7002,23 +7005,26 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ACTION_QUEUE = 60,
     VT_SOUNDTRACKS = 62,
     VT_CD_FLAGS = 64,
-    VT_ROPE = 66,
-    VT_PENDULUM = 68,
-    VT_ALTERNATE_PENDULUM = 70,
-    VT_VOLUMES = 72,
-    VT_GLOBAL_EVENT_SETS = 74,
-    VT_VOLUME_EVENT_SETS = 76,
-    VT_SCRIPT_VARS = 78,
-    VT_CALLBACKS_PRE_START = 80,
-    VT_CALLBACKS_POST_START = 82,
-    VT_CALLBACKS_PRE_END = 84,
-    VT_CALLBACKS_POST_END = 86,
-    VT_CALLBACKS_PRE_SAVE = 88,
-    VT_CALLBACKS_POST_SAVE = 90,
-    VT_CALLBACKS_PRE_LOAD = 92,
-    VT_CALLBACKS_POST_LOAD = 94,
-    VT_CALLBACKS_PRE_LOOP = 96,
-    VT_CALLBACKS_POST_LOOP = 98
+    VT_POSTPROCESS_MODE = 66,
+    VT_POSTPROCESS_STRENGTH = 68,
+    VT_POSTPROCESS_TINT = 70,
+    VT_ROPE = 72,
+    VT_PENDULUM = 74,
+    VT_ALTERNATE_PENDULUM = 76,
+    VT_VOLUMES = 78,
+    VT_GLOBAL_EVENT_SETS = 80,
+    VT_VOLUME_EVENT_SETS = 82,
+    VT_SCRIPT_VARS = 84,
+    VT_CALLBACKS_PRE_START = 86,
+    VT_CALLBACKS_POST_START = 88,
+    VT_CALLBACKS_PRE_END = 90,
+    VT_CALLBACKS_POST_END = 92,
+    VT_CALLBACKS_PRE_SAVE = 94,
+    VT_CALLBACKS_POST_SAVE = 96,
+    VT_CALLBACKS_PRE_LOAD = 98,
+    VT_CALLBACKS_POST_LOAD = 100,
+    VT_CALLBACKS_PRE_LOOP = 102,
+    VT_CALLBACKS_POST_LOOP = 104
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -7112,6 +7118,15 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<int32_t> *cd_flags() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CD_FLAGS);
+  }
+  int32_t postprocess_mode() const {
+    return GetField<int32_t>(VT_POSTPROCESS_MODE, 0);
+  }
+  float postprocess_strength() const {
+    return GetField<float>(VT_POSTPROCESS_STRENGTH, 0.0f);
+  }
+  const TEN::Save::Vector3 *postprocess_tint() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSTPROCESS_TINT);
   }
   const TEN::Save::Rope *rope() const {
     return GetPointer<const TEN::Save::Rope *>(VT_ROPE);
@@ -7232,6 +7247,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfTables(soundtracks()) &&
            VerifyOffset(verifier, VT_CD_FLAGS) &&
            verifier.VerifyVector(cd_flags()) &&
+           VerifyField<int32_t>(verifier, VT_POSTPROCESS_MODE) &&
+           VerifyField<float>(verifier, VT_POSTPROCESS_STRENGTH) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSTPROCESS_TINT) &&
            VerifyOffset(verifier, VT_ROPE) &&
            verifier.VerifyTable(rope()) &&
            VerifyOffset(verifier, VT_PENDULUM) &&
@@ -7383,6 +7401,15 @@ struct SaveGameBuilder {
   void add_cd_flags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags) {
     fbb_.AddOffset(SaveGame::VT_CD_FLAGS, cd_flags);
   }
+  void add_postprocess_mode(int32_t postprocess_mode) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_POSTPROCESS_MODE, postprocess_mode, 0);
+  }
+  void add_postprocess_strength(float postprocess_strength) {
+    fbb_.AddElement<float>(SaveGame::VT_POSTPROCESS_STRENGTH, postprocess_strength, 0.0f);
+  }
+  void add_postprocess_tint(const TEN::Save::Vector3 *postprocess_tint) {
+    fbb_.AddStruct(SaveGame::VT_POSTPROCESS_TINT, postprocess_tint);
+  }
   void add_rope(flatbuffers::Offset<TEN::Save::Rope> rope) {
     fbb_.AddOffset(SaveGame::VT_ROPE, rope);
   }
@@ -7478,6 +7505,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> action_queue = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Soundtrack>>> soundtracks = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0,
+    int32_t postprocess_mode = 0,
+    float postprocess_strength = 0.0f,
+    const TEN::Save::Vector3 *postprocess_tint = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
@@ -7513,6 +7543,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
+  builder_.add_postprocess_tint(postprocess_tint);
+  builder_.add_postprocess_strength(postprocess_strength);
+  builder_.add_postprocess_mode(postprocess_mode);
   builder_.add_cd_flags(cd_flags);
   builder_.add_soundtracks(soundtracks);
   builder_.add_action_queue(action_queue);
@@ -7585,6 +7618,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<int32_t> *action_queue = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Soundtrack>> *soundtracks = nullptr,
     const std::vector<int32_t> *cd_flags = nullptr,
+    int32_t postprocess_mode = 0,
+    float postprocess_strength = 0.0f,
+    const TEN::Save::Vector3 *postprocess_tint = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
@@ -7666,6 +7702,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       action_queue__,
       soundtracks__,
       cd_flags__,
+      postprocess_mode,
+      postprocess_strength,
+      postprocess_tint,
       rope,
       pendulum,
       alternate_pendulum,
@@ -9768,6 +9807,9 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = action_queue(); if (_e) { _o->action_queue.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->action_queue[_i] = _e->Get(_i); } } }
   { auto _e = soundtracks(); if (_e) { _o->soundtracks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->soundtracks[_i] = std::unique_ptr<TEN::Save::SoundtrackT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = cd_flags(); if (_e) { _o->cd_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->cd_flags[_i] = _e->Get(_i); } } }
+  { auto _e = postprocess_mode(); _o->postprocess_mode = _e; }
+  { auto _e = postprocess_strength(); _o->postprocess_strength = _e; }
+  { auto _e = postprocess_tint(); if (_e) _o->postprocess_tint = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
   { auto _e = alternate_pendulum(); if (_e) _o->alternate_pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
@@ -9826,6 +9868,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _action_queue = _fbb.CreateVector(_o->action_queue);
   auto _soundtracks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Soundtrack>> (_o->soundtracks.size(), [](size_t i, _VectorArgs *__va) { return CreateSoundtrack(*__va->__fbb, __va->__o->soundtracks[i].get(), __va->__rehasher); }, &_va );
   auto _cd_flags = _fbb.CreateVector(_o->cd_flags);
+  auto _postprocess_mode = _o->postprocess_mode;
+  auto _postprocess_strength = _o->postprocess_strength;
+  auto _postprocess_tint = _o->postprocess_tint ? _o->postprocess_tint.get() : 0;
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
   auto _alternate_pendulum = _o->alternate_pendulum ? CreatePendulum(_fbb, _o->alternate_pendulum.get(), _rehasher) : 0;
@@ -9876,6 +9921,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _action_queue,
       _soundtracks,
       _cd_flags,
+      _postprocess_mode,
+      _postprocess_strength,
+      _postprocess_tint,
       _rope,
       _pendulum,
       _alternate_pendulum,

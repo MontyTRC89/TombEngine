@@ -1,7 +1,8 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Strings/StringsHandler.h"
-
-#include "Renderer/Renderer11Enums.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/TEN/Flow/FlowHandler.h"
+#include "Renderer/RendererEnums.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
@@ -117,16 +118,16 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 				int flags = 0;
 
 				if (str._flags[(size_t)DisplayStringOptions::Center])
-					flags |= PRINTSTRING_CENTER;
+					flags |= (int)PrintStringFlags::Center;
 
 				if (str._flags[(size_t)DisplayStringOptions::Right])
-					flags |= PRINTSTRING_RIGHT;
+					flags |= (int)PrintStringFlags::Right;
 
 				if (str._flags[(size_t)DisplayStringOptions::Outline])
-					flags |= PRINTSTRING_OUTLINE;
+					flags |= (int)PrintStringFlags::Outline;
 
 				if (str._flags[(size_t)DisplayStringOptions::Blink])
-					flags |= PRINTSTRING_BLINK;
+					flags |= (int)PrintStringFlags::Blink;
 
 				m_callbackDrawSring(cstr, str._color, str._position, str._scale, flags);
 

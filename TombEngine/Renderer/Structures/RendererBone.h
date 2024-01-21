@@ -2,8 +2,10 @@
 #include <vector>
 #include <SimpleMath.h>
 
-namespace TEN::Renderer
+namespace TEN::Renderer::Structures
 {
+	using namespace DirectX::SimpleMath;
+
 	struct RendererBone
 	{
 		int Index = 0;

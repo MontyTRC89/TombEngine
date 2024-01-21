@@ -4,6 +4,9 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
+#include "Specific/level.h"
+#include "Game/animation.h"
+#include "Game/items.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -12,7 +15,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/BridgeObject.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 

@@ -5,7 +5,7 @@
 #include "Game/control/los.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -64,7 +64,7 @@ namespace TEN::Scripting::Util
 	static float CalculateHorizontalDistance(const Vec3& posA, const Vec3& posB)
 	{
 		auto pos0 = Vector2(posA.x, posA.z);
-		auto pos1 = Vector2(posA.x, posB.z);
+		auto pos1 = Vector2(posB.x, posB.z);
 		return round(Vector2::Distance(pos0, pos1));
 	}
 

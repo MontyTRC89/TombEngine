@@ -13,6 +13,8 @@ struct LOCUST_INFO
     short escapeYrot;
     short escapeZrot;
     BYTE counter;
+
+    Matrix Transform;
 };
 
 namespace TEN::Entities::TR4 

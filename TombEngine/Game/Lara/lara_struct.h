@@ -8,7 +8,6 @@ using namespace TEN::Math;
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
-namespace TEN::Renderer { struct RendererMesh; };
 
 using namespace TEN::Entities::Player;
 
@@ -689,9 +688,8 @@ enum LaraAnim
 	LA_PICKUP_SARCOPHAGUS = 439,							// Pickup from sarcophagus
 	LA_DRAG_BODY = 440,										// Drag dead body
 	LA_BINOCULARS_IDLE = 441,								// Stand, looking through binoculars
-	LA_UNUSED_442 = 442,
+	LA_UNUSED_442 = 442,									// Formelly, LA_BIG_SCORPION_DEATH, but that animation is now in LARA EXTRA ANIMS so this slot is unused.
 	LA_ELEVATOR_RECOVER = 443,								// Recover from elevator crash
-																// TODO: 443 is also taken by SETH_DEATH, currently absent from default WAD.
 	LA_MECHANICAL_BEETLE_USE = 444,							// Wind mechanical beetle, place on floor
 	LA_FLY_CHEAT = 445,										// Fly cheat
 
@@ -832,6 +830,7 @@ enum LaraAnim
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
 	// 280,
 	// 368, 370,
+	// 442
 };
 
 enum LaraExtraAnim

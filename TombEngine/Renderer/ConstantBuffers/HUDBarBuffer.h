@@ -1,11 +1,17 @@
 #pragma once
+#include <SimpleMath.h>
 
-struct alignas(16) CHUDBarBuffer 
+namespace TEN::Renderer::ConstantBuffers
 {
-	Vector2 BarStartUV;
-	Vector2 BarScale;
-	float Percent;
-	int Poisoned;
-	int Frame;
+	using namespace DirectX::SimpleMath;
 
-};
+	struct alignas(16) CHUDBarBuffer
+	{
+		Vector2 BarStartUV;
+		Vector2 BarScale;
+		//--
+		float Percent;
+		int Poisoned;
+		int Frame;
+	};
+}

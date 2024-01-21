@@ -37,8 +37,6 @@ void InitializeLara(bool restore)
 	Lara.Context = PlayerContext(*LaraItem, LaraCollision);
 
 	LaraItem->Collidable = false;
-	LaraItem->Location.RoomNumber = LaraItem->RoomNumber;
-	LaraItem->Location.Height = LaraItem->Pose.Position.y;
 
 	Lara.Status.Air = LARA_AIR_MAX;
 	Lara.Status.Exposure = LARA_EXPOSURE_MAX;
@@ -175,11 +173,14 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 			continue;
 
 		playerItem.Pose = item.Pose;
-		playerItem.RoomNumber = item.RoomNumber;
+		ItemNewRoom(playerItem.Index, item.RoomNumber);
 
 		TENLog("Player start position has been set according to start position object with index " + std::to_string(item.TriggerFlags), LogLevel::Info);
 		break;
 	}
+
+	playerItem.Location.RoomNumber = playerItem.RoomNumber;
+	playerItem.Location.Height = playerItem.Pose.Position.y;
 }
 
 void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)

@@ -1,4 +1,5 @@
 #pragma once
+#include <SimpleMath.h>
 #include "Math/Constants.h"
 #include "Math/Geometry.h"
 #include "Math/Interpolation.h"
@@ -14,6 +15,8 @@
 
 namespace TEN::Math
 {
+	using namespace DirectX::SimpleMath;
+
 	constexpr inline auto OFFSET_RADIUS = [](auto x) { return ((x * SQRT_2) + 4); };
 	constexpr inline auto MESH_BITS		= [](auto x) { return (1 << x); };
 

@@ -444,6 +444,9 @@ void CleanUp()
 
 	// Clear all remaining renderer data.
 	g_Renderer.ClearScene();
+	g_Renderer.SetPostProcessMode(PostProcessMode::None);
+	g_Renderer.SetPostProcessStrength(1.0f);
+	g_Renderer.SetPostProcessTint(Vector3::One);
 
 	// Reset Itemcamera
 	ClearObjCamera();
