@@ -195,10 +195,6 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = WINSTON_STATE_WALK_FORWARD;
 
-					if (item.TriggerFlags)
-					{
-						SoundEffect(SFX_TR3_WINSTON_CUPS, &item.Pose);
-					}
 				}
 
 				break;
