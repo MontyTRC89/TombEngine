@@ -72,6 +72,12 @@ namespace TEN::Entities::Creatures::TR3
 		WINSTON_ANIM_DEFEAT_END = 20
 	};
 
+	enum class WinstonOCB
+	{
+		Normal = 0,			 //normal Winston, not targetable.
+		Army = 1			 // Army Winston, targetable.
+	};
+
 	void InitializeWinston(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
@@ -81,6 +87,11 @@ namespace TEN::Entities::Creatures::TR3
 		if (!item.TriggerFlags)
 		{
 			item.HitPoints = NOT_TARGETABLE;
+			item.ItemFlags[1] = (short)WinstonOCB::Normal;
+		}
+		else
+		{
+			item.ItemFlags[1] = (short)WinstonOCB::Army;
 		}
 	}
 
@@ -99,6 +110,20 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureAIInfo(&item, &ai);
 		GetCreatureMood(&item, &ai, 1);
 		CreatureMood(&item, &ai, 1);
+
+		if (item.ItemFlags[1] != item.TriggerFlags) //NOTE: set proper HP value to Winston if changing OCB in runtime.
+		{
+			if (!item.TriggerFlags)
+			{
+				item.HitPoints = NOT_TARGETABLE;
+				item.ItemFlags[1] = (short)WinstonOCB::Normal;
+			}
+			else
+			{
+				item.HitPoints = WINSTON_RECOVER_HIT_POINTS;
+				item.ItemFlags[1] = (short)WinstonOCB::Army;
+			}
+		}
 
 		short headingAngle = CreatureTurn(&item, creature.MaxTurn);
 
@@ -211,6 +236,11 @@ namespace TEN::Entities::Creatures::TR3
 				if (item.Animation.RequiredState != NO_STATE)
 					item.Animation.TargetState = item.Animation.RequiredState;
 
+				if (!item.TriggerFlags)
+				{
+					item.Animation.TargetState = WINSTON_STATE_IDLE;
+				}
+
 				if (item.HitStatus)
 				{
 					item.Animation.TargetState = WINSTON_STATE_RECOIL_MID;
@@ -263,6 +293,13 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 				creature.Flags = 0;
 				break;
+
+			case WINSTON_STATE_DEFEAT_END:
+				if (!item.TriggerFlags)
+				{
+					item.Animation.TargetState = WINSTON_STATE_DEFEAT_TO_IDLE;
+					break;
+				}
 			}
 		}
 
