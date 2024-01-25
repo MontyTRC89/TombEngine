@@ -633,4 +633,13 @@ namespace TEN::Entities::Creatures::TR2
 				CreatureCollision(itemNumber, playerItem, coll);
 		}
 	}
+
+	void CollideDragonBack(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		if (item.HitPoints > 0)
+			CreatureCollision(itemNumber, playerItem, coll);
+	}
+
 }

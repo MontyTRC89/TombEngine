@@ -449,12 +449,18 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_FRONT");
+		CheckIfSlotExists(ID_DRAGON_BONE_FRONT, "ID_DRAGON_BONE_FRONT");
+		CheckIfSlotExists(ID_DRAGON_BONE_BACK, "ID_DRAGON_BONE_BACK");
+		obj->collision = CollideDragonBack;
 		obj->SetHitEffect(false, true);
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
+		CheckIfSlotExists(ID_SPHERE_OF_DOOM, "ID_SPHERE_OF_DOOM");
+		CheckIfSlotExists(ID_SPHERE_OF_DOOM2, "ID_SPHERE_OF_DOOM2");
+		CheckIfSlotExists(ID_SPHERE_OF_DOOM3, "ID_SPHERE_OF_DOOM3");
 		obj->Initialize = InitializeBartoli;
 		obj->control = ControlBartoli;
 	}
