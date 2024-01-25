@@ -9,7 +9,6 @@
 
 // NOTES:
 // item.ItemFlags[0]: Effect timer in frame time.
-// item.ItemFlags[1]: Object ID of item to transform into. Default: ID_DRAGON_FRONT.
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -44,17 +43,11 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		auto& item = g_Level.Items[itemNumber];
 		short& effectTimer = item.ItemFlags[0];
-		short& transformObjectID = item.ItemFlags[1];
 
 		if (item.Animation.FrameNumber == 0)
 		{
 			if (!TriggerActive(&item))
 				return;
-
-			if (item.ItemFlags[0] == 0)
-				transformObjectID = ID_DRAGON_FRONT;
-			else
-				transformObjectID = item.ItemFlags[0];
 		}
 
 		AnimateItem(&item);
@@ -89,12 +82,7 @@ namespace TEN::Entities::Creatures::TR2
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
 			KillItem(itemNumber);
 
-			int newItemNumber = SpawnItem(item, (GAME_OBJECT_ID)transformObjectID);
-
-			//Activates the new item
-			AddActiveItem(newItemNumber);
-			auto& newItem = g_Level.Items[newItemNumber];
-			newItem.Status = ITEM_ACTIVE;
+			TestTriggers(&item, true);
 
 		}
 	}
