@@ -8,7 +8,10 @@
 #include "Objects/game_object_ids.h"
 
 // NOTES:
-// item.ItemFlags[0]: Effect timer in frame time.
+// item.ItemFlags[0]: Effect time counter in frame time.
+// item.ItemFlags[1]: Timer for explosion 1 in frame time.
+// item.ItemFlags[2]: Timer for explosion 2 in frame time.
+// item.ItemFlags[3]: Timer for explosion 3 in frame time.
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -23,6 +26,11 @@ namespace TEN::Entities::Creatures::TR2
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
+
+		if (item.ItemFlags[1] == 0)	item.ItemFlags[1] = TRANSFORM_EFFECT_1_TIME;
+		if (item.ItemFlags[2] == 0)	item.ItemFlags[2] = TRANSFORM_EFFECT_2_TIME;
+		if (item.ItemFlags[3] == 0)	item.ItemFlags[3] = TRANSFORM_EFFECT_3_TIME;
+
 	}
 
 	static void SpawnBartoliTransformEffect(const ItemInfo& item, GAME_OBJECT_ID objectID)
@@ -43,6 +51,9 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		auto& item = g_Level.Items[itemNumber];
 		short& effectTimer = item.ItemFlags[0];
+		short& timeExplosion1 = item.ItemFlags[1];
+		short& timeExplosion2 = item.ItemFlags[2];
+		short& timeExplosion3 = item.ItemFlags[3];
 
 		if (item.Animation.FrameNumber == 0)
 		{
@@ -66,17 +77,17 @@ namespace TEN::Entities::Creatures::TR2
 		TriggerDynamicLight(lightPos, lightColor, lightFalloff);
 
 		// Handle transformation.
-		if (effectTimer == TRANSFORM_EFFECT_1_TIME)
+		if (effectTimer == timeExplosion1)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM);
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
 		}
-		if (effectTimer == TRANSFORM_EFFECT_2_TIME)
+		if (effectTimer == timeExplosion2)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM2);
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
 		}
-		if (effectTimer == TRANSFORM_EFFECT_3_TIME)
+		if (effectTimer == timeExplosion3)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM3);
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
