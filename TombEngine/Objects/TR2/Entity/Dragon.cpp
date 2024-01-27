@@ -54,6 +54,8 @@ namespace TEN::Entities::Creatures::TR2
 	const auto DragonSwipeAttackJointsLeft = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
 
+	const auto SPRITE_ANIMATION = Random::GenerateInt(0, 10);
+
 	enum class DragonLightEffectType
 	{
 		Yellow,
@@ -102,6 +104,12 @@ namespace TEN::Entities::Creatures::TR2
 		DRAGON_ANIM_DEATH = 21,
 		DRAGON_ANIM_DEFEATED = 22,
 		DRAGON_ANIM_RECOVER = 23
+	};
+
+	enum DragonOCB
+	{
+		DRAGON_OCB_NORMAL = 0,
+		DRAGON_OCB_DAGGER = 1
 	};
 
 	static void InitializeDragonBones(const ItemInfo& item)
@@ -264,6 +272,55 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
+	static void SpawnDragonInhale(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
+	{
+		constexpr auto SMOKE_COUNT = 2;
+		constexpr auto SPHERE_RADIUS = BLOCK(0.5f);
+		
+
+		for (int i = 0; i < SMOKE_COUNT; i++)
+		{
+			auto& smoke = *GetFreeParticle();
+
+			auto origin = GetJointPosition(item, bite.BoneID, bite.Position).ToVector3();
+			auto target = GetJointPosition(LaraItem, LM_HIPS).ToVector3();
+			auto sphere = BoundingSphere(origin, SPHERE_RADIUS);
+			auto pos = Random::GeneratePointInSphere(sphere);
+			int v = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
+			auto dir = target - origin;
+			dir.Normalize();
+
+			smoke.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + SPRITE_ANIMATION;
+			smoke.x = pos.x;
+			smoke.y = pos.y;
+			smoke.z = pos.z;
+			smoke.on = true;
+			smoke.sR = 128, smoke.sG = 128, smoke.sB = 128;
+			smoke.dR = 128, smoke.dG = 64, smoke.dB = 0;
+			smoke.colFadeSpeed = 128;
+			smoke.fadeToBlack = 64;
+			smoke.blendMode = BlendMode::Lighten;
+
+
+
+			smoke.life = smoke.sLife = Random::GenerateInt(10,60);
+			smoke.yVel = Random::GenerateFloat(-1.0f, 0.5f);
+			smoke.xVel = Random::GenerateFloat(-1.0f, 0.5f);
+			smoke.zVel = Random::GenerateFloat(-1.0f, 0.5f);
+
+			smoke.friction = 0;
+			smoke.gravity = -30;
+			smoke.maxYvel = 5;
+			smoke.flags = SP_DEF | SP_ROTATE | SP_FIRE;
+
+			smoke.scalar = 0.1f;  
+			smoke.dSize = BLOCK(0.1f);  
+			smoke.sSize = BLOCK(0.5f);  
+			smoke.size = smoke.dSize/8;
+			smoke.flags = SP_WIND | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		}
+	}
+
 	static void SpawnDragonShockwave(const ItemInfo& item, int jointIndex)
 	{
 		auto pos = GetJointPosition(item, jointIndex, Vector3i(0, -8, 0));
@@ -307,7 +364,7 @@ namespace TEN::Entities::Creatures::TR2
 		bool isTargetAhead = false;
 
 		// NOTE: OCB 1 = player must retrieve dagger to kill dragon.
-		bool flagDaggerDeath = (item.TriggerFlags == 1) ? true : false;
+		bool flagDaggerDeath = (item.TriggerFlags == DRAGON_OCB_DAGGER) ? true : false;
 
 		if (item.HitPoints <= 0)
 		{
@@ -497,6 +554,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 					headYRot = -ai.angle;
+					SpawnDragonInhale(item, DragonMouthBite, *creature.Enemy, 100.0f);
 
 				if (isTargetAhead)
 				{
@@ -517,11 +575,13 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (ai.ahead)
 					headYRot = -ai.angle;
+					SpawnDragonInhale(item, DragonMouthBite, *creature.Enemy, 20.0f);
 
 				if (creature.Flags)
 				{
 					if (ai.ahead)
-						SpawnDragonFireBreath(item, DragonMouthBite, *creature.Enemy, 300.0f);
+					SpawnDragonFireBreath(item, DragonMouthBite, *creature.Enemy, 300.0f);
+					SpawnDragonInhale(item, DragonMouthBite, *creature.Enemy, 1000.0f);
 
 					creature.Flags--;
 				}
@@ -613,7 +673,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto& item = g_Level.Items[itemNumber];
 
 		if (item.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
-			item.TriggerFlags == 1)
+			item.TriggerFlags == DRAGON_OCB_NORMAL)
 		{
 			HandleDaggerPickup(item, *playerItem);
 
