@@ -280,7 +280,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		for (int i = 0; i < SMOKE_COUNT; i++)
 		{
-			auto& smoke = *GetFreeParticle();
+			auto& inhale = *GetFreeParticle();
 
 			auto origin = GetJointPosition(item, bite.BoneID, bite.Position).ToVector3();
 			auto target = GetJointPosition(LaraItem, LM_HIPS).ToVector3();
@@ -290,34 +290,31 @@ namespace TEN::Entities::Creatures::TR2
 			auto dir = target - origin;
 			dir.Normalize();
 
-			smoke.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + SPRITE_ANIMATION;
-			smoke.x = pos.x;
-			smoke.y = pos.y;
-			smoke.z = pos.z;
-			smoke.on = true;
-			smoke.sR = 128, smoke.sG = 128, smoke.sB = 128;
-			smoke.dR = 128, smoke.dG = 64, smoke.dB = 0;
-			smoke.colFadeSpeed = 128;
-			smoke.fadeToBlack = 64;
-			smoke.blendMode = BlendMode::Lighten;
+			inhale.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + SPRITE_ANIMATION;
+			inhale.x = pos.x;
+			inhale.y = pos.y;
+			inhale.z = pos.z;
+			inhale.on = true;
+			inhale.sR = 128, inhale.sG = 128, inhale.sB = 128;
+			inhale.dR = 128, inhale.dG = 64, inhale.dB = 0;
+			inhale.colFadeSpeed = 128;
+			inhale.fadeToBlack = 64;
+			inhale.blendMode = BlendMode::Lighten;
+			inhale.life = inhale.sLife = Random::GenerateInt(10,60);
+			inhale.yVel = Random::GenerateFloat(-1.0f, 0.5f);
+			inhale.xVel = Random::GenerateFloat(-1.0f, 0.5f);
+			inhale.zVel = Random::GenerateFloat(-1.0f, 0.5f);
 
+			inhale.friction = 0;
+			inhale.gravity = -30;
+			inhale.maxYvel = 5;
+			inhale.flags = SP_DEF | SP_ROTATE | SP_FIRE;
 
-
-			smoke.life = smoke.sLife = Random::GenerateInt(10,60);
-			smoke.yVel = Random::GenerateFloat(-1.0f, 0.5f);
-			smoke.xVel = Random::GenerateFloat(-1.0f, 0.5f);
-			smoke.zVel = Random::GenerateFloat(-1.0f, 0.5f);
-
-			smoke.friction = 0;
-			smoke.gravity = -30;
-			smoke.maxYvel = 5;
-			smoke.flags = SP_DEF | SP_ROTATE | SP_FIRE;
-
-			smoke.scalar = 0.1f;  
-			smoke.dSize = BLOCK(0.1f);  
-			smoke.sSize = BLOCK(0.5f);  
-			smoke.size = smoke.dSize/8;
-			smoke.flags = SP_WIND | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+			inhale.scalar = 0.1f;  
+			inhale.dSize = BLOCK(0.1f);  
+			inhale.sSize = BLOCK(0.5f);  
+			inhale.size = inhale.dSize/8;
+			inhale.flags = SP_WIND | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 		}
 	}
 
