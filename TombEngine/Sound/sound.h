@@ -48,9 +48,11 @@ enum class SoundTrackType
 
 enum class SoundEnvironment
 {
+	Always,
 	Land,
-	Water,
-	Always
+	ShallowWater,
+	Swamp,
+	Underwater
 };
 
 enum class SoundPlayMode
@@ -121,9 +123,9 @@ struct SoundTrackInfo
 struct SoundSourceInfo
 {
 	Vector3i	Position = Vector3i::Zero;
-	int			SoundID = 0;
-	int			Flags = 0;
-	std::string	Name {};
+	int			SoundID	 = 0;
+	int			Flags	 = 0;
+	std::string	Name	 = {};
 
 	SoundSourceInfo()
 	{
@@ -131,27 +133,27 @@ struct SoundSourceInfo
 
 	SoundSourceInfo(int xPos, int yPos, int zPos)
 	{
-		this->Position = Vector3i(xPos, yPos, zPos);
+		Position = Vector3i(xPos, yPos, zPos);
 	}
 
 	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID)
 	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-		this->SoundID = soundID;
+		Position = Vector3i(xPos, yPos, zPos);
+		SoundID = soundID;
 	}
 
 	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID, short newflags)
 	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-		this->SoundID = soundID;
-		this->Flags = newflags;
+		Position = Vector3i(xPos, yPos, zPos);
+		SoundID = soundID;
+		Flags = newflags;
 	}
 };
 
 extern std::map<std::string, int> SoundTrackMap;
 extern std::unordered_map<int, SoundTrackInfo> SoundTracks;
 
-bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition = SoundEnvironment::Land, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
+bool SoundEffect(int soundID, Pose* pose, SoundEnvironment soundEnv = SoundEnvironment::Land, float pitchMult = 1.0f, float gainMult = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();
