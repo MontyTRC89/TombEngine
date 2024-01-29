@@ -34,7 +34,6 @@ namespace TEN::Entities::Player
 	{
 		Detach(playerItem);
 
-		playerItem.RoomNumber = attrac.GetRoomNumber();
 		Ptr = &attrac;
 		ChainDistance = chainDist;
 		RelPosOffset = relPosOffset;

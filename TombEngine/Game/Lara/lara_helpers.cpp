@@ -362,7 +362,6 @@ void HandlePlayerAttractorParent(ItemInfo& item)
 	auto posOffset = Vector3::Transform(Vector3::Lerp(player.Context.Attractor.RelDeltaPos, Vector3::Zero, LERP_ALPHA), target.RotationMatrix);
 	auto orientOffset = EulerAngles::Lerp(player.Context.Attractor.RelDeltaOrient, EulerAngles::Zero, LERP_ALPHA);
 	item.Pose = Pose(target.Position + posOffset, target.Orientation + orientOffset);
-	item.RoomNumber = player.Context.Attractor.Ptr->GetRoomNumber(); // TODO: Check.
 
 	// Recalculate relative delta position and orientation.
 	player.Context.Attractor.RelDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - target.Position, target.RotationMatrix.Invert());
