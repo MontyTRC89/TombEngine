@@ -628,21 +628,21 @@ void InitializeItemArray(int totalItem)
 	NextItemFree = g_Level.NumItems;
 }
 
-short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectNumber)
+short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectID)
 {
-	short itemNumber = CreateItem();
+	int itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
-		auto* spawn = &g_Level.Items[itemNumber];
+		auto& newItem = g_Level.Items[itemNumber];
 
-		spawn->ObjectNumber = objectNumber;
-		spawn->RoomNumber = item.RoomNumber;
-		memcpy(&spawn->Pose, &item.Pose, sizeof(Pose));
-		spawn->Model.Color = Vector4::One;
+		newItem.ObjectNumber = objectID;
+		newItem.RoomNumber = item.RoomNumber;
+		newItem.Pose = item.Pose;
+		newItem.Model.Color = Vector4::One;
 
 		InitializeItem(itemNumber);
 
-		spawn->Status = ITEM_NOT_ACTIVE;
+		newItem.Status = ITEM_NOT_ACTIVE;
 	}
 	else
 	{

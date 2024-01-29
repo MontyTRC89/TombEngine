@@ -27,24 +27,27 @@ namespace TEN::Entities::Creatures::TR2
 
 		InitializeCreature(itemNumber);
 
-		if (item.ItemFlags[1] == 0)	item.ItemFlags[1] = TRANSFORM_EFFECT_1_TIME;
-		if (item.ItemFlags[2] == 0)	item.ItemFlags[2] = TRANSFORM_EFFECT_2_TIME;
-		if (item.ItemFlags[3] == 0)	item.ItemFlags[3] = TRANSFORM_EFFECT_3_TIME;
+		if (item.ItemFlags[1] == 0)
+			item.ItemFlags[1] = TRANSFORM_EFFECT_1_TIME;
 
+		if (item.ItemFlags[2] == 0)
+			item.ItemFlags[2] = TRANSFORM_EFFECT_2_TIME;
+
+		if (item.ItemFlags[3] == 0)
+			item.ItemFlags[3] = TRANSFORM_EFFECT_3_TIME;
 	}
 
 	static void SpawnBartoliTransformEffect(const ItemInfo& item, GAME_OBJECT_ID objectID)
 	{
 		int explosionItemNumber = SpawnItem(item, objectID);
 
-		//Activates the new item
+		// Activates item.
 		AddActiveItem(explosionItemNumber);
 		auto& explosionItem = g_Level.Items[explosionItemNumber];
 		explosionItem.Status = ITEM_ACTIVE;
 
-		// Time before fading away.
+		// Set fade timer.
 		explosionItem.Timer = EXPLOSION_LIVE_TIME;
-
 	}
 
 	void ControlBartoli(short itemNumber)
@@ -81,12 +84,14 @@ namespace TEN::Entities::Creatures::TR2
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM);
 			SoundEffect(SFX_TR2_MARCO_BARTOLLI_TRANSFORM, &item.Pose);
 		}
+
 		if (effectTimer == timeExplosion2)
 		{
 			TriggerDynamicLight(lightPos, lightColor, transformationLightFalloff);
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM2);
 			SoundEffect(SFX_TR2_MARCO_BARTOLLI_TRANSFORM, &item.Pose);
 		}
+
 		if (effectTimer == timeExplosion3)
 		{
 			TriggerDynamicLight(lightPos, lightColor, transformationLightFalloff);
@@ -95,13 +100,12 @@ namespace TEN::Entities::Creatures::TR2
 			KillItem(itemNumber);
 
 			TestTriggers(&item, true);
-
 		}
 	}
 
-	void ControlBartoliTransformEffect(int itemNumber)
+	void ControlBartoliTransformEffect(short itemNumber)
 	{
-		constexpr auto SCALE_RATE = Vector3(0.7f);
+		constexpr auto SCALE_RATE		   = Vector3(0.7f);
 		constexpr auto OPACITY_CHANGE_RATE = 1.0f;
 
 		auto& item = g_Level.Items[itemNumber];

@@ -442,7 +442,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_Z);
-		obj->SetExactHitEffect(HitEffect::NonExplosive);
+		obj->SetHitEffect(HitEffect::NonExplosive);
 	}
 
 	obj = &Objects[ID_DRAGON_BACK];

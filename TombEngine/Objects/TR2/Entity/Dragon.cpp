@@ -38,23 +38,21 @@ namespace TEN::Entities::Creatures::TR2
 	auto DragonDaggerPos = Vector3i::Zero;
 
 	constexpr auto DRAGON_SWIPE_ATTACK_DAMAGE = 250;
-	constexpr auto DRAGON_CONTACT_DAMAGE = 10;
+	constexpr auto DRAGON_CONTACT_DAMAGE	  = 10;
 
 	constexpr auto DRAGON_NEAR_RANGE = SQUARE(BLOCK(3));
 	constexpr auto DRAGON_IDLE_RANGE = SQUARE(BLOCK(6));
 
-	constexpr auto DRAGON_WALK_TURN_RATE_MAX = ANGLE(2.0f);
+	constexpr auto DRAGON_WALK_TURN_RATE_MAX   = ANGLE(2.0f);
 	constexpr auto DRAGON_TURN_THRESHOLD_ANGLE = ANGLE(1.0f);
 
-	constexpr auto DRAGON_LIVE_TIME = 30 * 11;
+	constexpr auto DRAGON_LIVE_TIME	  = 30 * 11;
 	constexpr auto DRAGON_ALMOST_LIVE = 100;
 
 	const auto DragonMouthBite = CreatureBiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
-	const auto DragonBackSpineJoints = std::vector<unsigned int>{ 21, 22, 23 };
-	const auto DragonSwipeAttackJointsLeft = std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
+	const auto DragonBackSpineJoints		= std::vector<unsigned int>{ 21, 22, 23 };
+	const auto DragonSwipeAttackJointsLeft	= std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
-
-	const auto SPRITE_ANIMATION = Random::GenerateInt(0, 10);
 
 	enum class DragonLightEffectType
 	{
@@ -213,10 +211,9 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	// TODO: Demagic.
 	// TODO: Smoke and sparks.
 	// TODO: Animate flame sprite sequence.
-	static void SpawnDragonFireBreath(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
+	static void SpawnDragonFireBreathEffect(const ItemInfo& item, const CreatureBiteInfo& bite)
 	{
 		constexpr auto FIRE_COUNT = 3;
 		constexpr auto SPHERE_RADIUS = BLOCK(0.2f);
@@ -233,7 +230,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			auto dir = target - origin;
 			dir.Normalize();
-			dir *= vel;
+			dir *= 300.0f;
 
 			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex;
 
@@ -272,53 +269,60 @@ namespace TEN::Entities::Creatures::TR2
 		}
 	}
 
-	static void SpawnDragonInhale(const ItemInfo& item, const CreatureBiteInfo& bite, const ItemInfo& targetItem, float vel)
+	static void SpawnDragonSmokeBreathEffect(const ItemInfo& item, const CreatureBiteInfo& bite)
 	{
-		constexpr auto SMOKE_COUNT = 2;
-		constexpr auto SPHERE_RADIUS = BLOCK(0.5f);
-		
+		constexpr auto SMOKE_COUNT	 = 2;
+		constexpr auto SPHERE_RADIUS = BLOCK(0.25f);
 
 		for (int i = 0; i < SMOKE_COUNT; i++)
 		{
-			auto& inhale = *GetFreeParticle();
-
 			auto origin = GetJointPosition(item, bite.BoneID, bite.Position).ToVector3();
 			auto target = GetJointPosition(LaraItem, LM_HIPS).ToVector3();
+
 			auto sphere = BoundingSphere(origin, SPHERE_RADIUS);
 			auto pos = Random::GeneratePointInSphere(sphere);
-			int v = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
+			auto vel = Random::GenerateDirection() * Random::GenerateFloat(0.0f, 1.0f);
+
 			auto dir = target - origin;
 			dir.Normalize();
 
-			inhale.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + SPRITE_ANIMATION;
-			inhale.x = pos.x;
-			inhale.y = pos.y;
-			inhale.z = pos.z;
-			inhale.on = true;
-			inhale.sR = 128, inhale.sG = 128, inhale.sB = 128;
-			inhale.dR = 128, inhale.dG = 64, inhale.dB = 0;
-			inhale.colFadeSpeed = 128;
-			inhale.fadeToBlack = 64;
-			inhale.blendMode = BlendMode::Lighten;
-			inhale.life = inhale.sLife = Random::GenerateInt(10,60);
-			inhale.yVel = Random::GenerateFloat(-1.0f, 0.5f);
-			inhale.xVel = Random::GenerateFloat(-1.0f, 0.5f);
-			inhale.zVel = Random::GenerateFloat(-1.0f, 0.5f);
+			int spriteID = Random::GenerateInt(0, 10);
 
-			inhale.friction = 0;
-			inhale.gravity = -30;
-			inhale.maxYvel = 5;
-			inhale.flags = SP_DEF | SP_ROTATE | SP_FIRE;
+			auto& smoke = *GetFreeParticle();
 
-			inhale.scalar = 0.1f;  
-			inhale.dSize = BLOCK(0.1f);  
-			inhale.sSize = BLOCK(0.5f);  
-			inhale.size = inhale.dSize/8;
-			inhale.flags = SP_WIND | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+			smoke.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + spriteID;
+			smoke.on = true;
+			smoke.x = pos.x;
+			smoke.y = pos.y;
+			smoke.z = pos.z;
+			smoke.yVel = vel.x;
+			smoke.xVel = vel.y;
+			smoke.zVel = vel.z;
+			smoke.sR = 0.5f * UCHAR_MAX;
+			smoke.sG = 0.5f * UCHAR_MAX;
+			smoke.sB = 0.5f * UCHAR_MAX;
+			smoke.dR = 0.5f * UCHAR_MAX;
+			smoke.dG = 0.25f * UCHAR_MAX;
+			smoke.dB = 0;
+			smoke.colFadeSpeed = 128;
+			smoke.fadeToBlack = 64;
+			smoke.blendMode = BlendMode::Lighten;
+			smoke.life = smoke.sLife = Random::GenerateInt(10, 60);
+
+			smoke.friction = 0;
+			smoke.gravity = -30;
+			smoke.maxYvel = 5;
+			smoke.flags = SP_DEF | SP_ROTATE | SP_FIRE;
+
+			smoke.scalar = 0.1f;  
+			smoke.dSize = BLOCK(0.1f);  
+			smoke.sSize = BLOCK(0.5f);  
+			smoke.size = smoke.dSize/8;
+			smoke.flags = SP_WIND | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 		}
 	}
 
-	static void SpawnDragonShockwave(const ItemInfo& item, int jointIndex)
+	static void SpawnDragonShockwaveEffect(const ItemInfo& item, int jointIndex)
 	{
 		auto pos = GetJointPosition(item, jointIndex, Vector3i(0, -8, 0));
 
@@ -356,7 +360,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto& timer = item.ItemFlags[1];
 
 		short headingAngle = 0;
-		short headYRot = 0;
+		short headOrient = 0;
 
 		bool isTargetAhead = false;
 
@@ -477,7 +481,7 @@ namespace TEN::Entities::Creatures::TR2
 					creature.Flags = 0;
 				}
 
-				SpawnDragonShockwave(item, DragonSwipeAttackJointsLeft[3]);
+				SpawnDragonShockwaveEffect(item, DragonSwipeAttackJointsLeft[3]);
 
 				break;
 
@@ -488,7 +492,7 @@ namespace TEN::Entities::Creatures::TR2
 					creature.Flags = 0;
 				}
 
-				SpawnDragonShockwave(item, DragonSwipeAttackJointsRight[3]);
+				SpawnDragonShockwaveEffect(item, DragonSwipeAttackJointsRight[3]);
 
 				break;
 
@@ -550,8 +554,8 @@ namespace TEN::Entities::Creatures::TR2
 				item.Pose.Orientation.y -= headingAngle;
 
 				if (ai.ahead)
-					headYRot = -ai.angle;
-					SpawnDragonInhale(item, DragonMouthBite, *creature.Enemy, 100.0f);
+					headOrient = -ai.angle;
+					SpawnDragonSmokeBreathEffect(item, DragonMouthBite);
 
 				if (isTargetAhead)
 				{
@@ -571,14 +575,16 @@ namespace TEN::Entities::Creatures::TR2
 				SoundEffect(SFX_TR2_DRAGON_FIRE, &item.Pose);
 
 				if (ai.ahead)
-					headYRot = -ai.angle;
-					SpawnDragonInhale(item, DragonMouthBite, *creature.Enemy, 20.0f);
+					headOrient = -ai.angle;
+					SpawnDragonSmokeBreathEffect(item, DragonMouthBite);
 
 				if (creature.Flags)
 				{
 					if (ai.ahead)
-					SpawnDragonFireBreath(item, DragonMouthBite, *creature.Enemy, 300.0f);
-					SpawnDragonInhale(item, DragonMouthBite, *creature.Enemy, 1000.0f);
+					{
+						SpawnDragonFireBreathEffect(item, DragonMouthBite);
+						SpawnDragonSmokeBreathEffect(item, DragonMouthBite);
+					}
 
 					creature.Flags--;
 				}
@@ -593,7 +599,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		if (timer >= 0)
 		{
-			CreatureJoint(&item, 0, headYRot);
+			CreatureJoint(&item, 0, headOrient);
 			CreatureAnimation(itemNumber, headingAngle, 0);
 		}
 
@@ -636,7 +642,7 @@ namespace TEN::Entities::Creatures::TR2
 					//SetAnimation(*playerItem, ID_LARA_EXTRA_ANIMS, LEA_PULL_DAGGER_FROM_DRAGON);
 					//playerItem.Pose = item.Pose;
 
-					// Temporarily use small button push animation.
+					// HACK: Temporarily use small button push animation.
 					SetAnimation(playerItem, LA_BUTTON_SMALL_PUSH);
 
 					ResetPlayerFlex(&playerItem);
@@ -668,21 +674,23 @@ namespace TEN::Entities::Creatures::TR2
 	void CollideDragonFront(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		const auto& player = *GetLaraInfo(playerItem);
 
 		if (item.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
 			item.TriggerFlags == DRAGON_OCB_NORMAL)
 		{
 			HandleDaggerPickup(item, *playerItem);
 
-			auto& player = *GetLaraInfo(playerItem);
-
 			if (player.Control.IsMoving &&
 				player.Context.InteractedItem == item.Index ||
 				playerItem->Animation.AnimNumber == GetAnimIndex(item, LA_BUTTON_SMALL_PUSH))
+			{
 				return;
+			}
 			else
+			{
 				CreatureCollision(itemNumber, playerItem, coll);
-
+			}
 		}
 		else
 		{
@@ -698,5 +706,4 @@ namespace TEN::Entities::Creatures::TR2
 		if (item.HitPoints > 0)
 			CreatureCollision(itemNumber, playerItem, coll);
 	}
-
 }

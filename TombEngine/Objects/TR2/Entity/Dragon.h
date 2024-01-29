@@ -1,8 +1,6 @@
 #pragma once
 
-class GameVector;
 struct CollisionInfo;
-struct CreatureBiteInfo;
 struct ItemInfo;
 
 namespace TEN::Entities::Creatures::TR2

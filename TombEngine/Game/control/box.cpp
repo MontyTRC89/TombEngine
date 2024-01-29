@@ -813,7 +813,6 @@ void CreatureDie(int itemNumber, bool doExplosion)
 
 		case HitEffect::NonExplosive:
 			return;
-			break;
 
 		default:
 			flags |= BODY_DO_EXPLOSION;
