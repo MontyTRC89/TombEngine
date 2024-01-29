@@ -69,26 +69,27 @@ namespace TEN::Entities::Creatures::TR2
 
 		// Spawn light.
 		auto lightPos = item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(1), 0.0f);
-		auto lightColor = Color(
-			Random::GenerateFloat(0.8f, 0.9f),
-			Random::GenerateFloat(0.4f, 0.5f),
-			Random::GenerateFloat(0.2f, 0.3f));
-		float lightFalloff = Random::GenerateFloat(0.1f, 0.4f);
+		auto lightColor = Color(0.0f,Random::GenerateFloat(0.7f, 1.0f),	Random::GenerateFloat(0.2f, 0.3f));
+		float lightFalloff = Random::GenerateFloat(0.1f, 0.2f);
+		float transformationLightFalloff = (0.5, 1.0);
 		TriggerDynamicLight(lightPos, lightColor, lightFalloff);
 
 		// Handle transformation.
 		if (effectTimer == timeExplosion1)
 		{
+			TriggerDynamicLight(lightPos, lightColor, transformationLightFalloff); 
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM);
 			SoundEffect(SFX_TR2_MARCO_BARTOLLI_TRANSFORM, &item.Pose);
 		}
 		if (effectTimer == timeExplosion2)
 		{
+			TriggerDynamicLight(lightPos, lightColor, transformationLightFalloff);
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM2);
 			SoundEffect(SFX_TR2_MARCO_BARTOLLI_TRANSFORM, &item.Pose);
 		}
 		if (effectTimer == timeExplosion3)
 		{
+			TriggerDynamicLight(lightPos, lightColor, transformationLightFalloff);
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM3);
 			SoundEffect(SFX_TR2_MARCO_BARTOLLI_TRANSFORM, &item.Pose);
 			KillItem(itemNumber);
@@ -100,8 +101,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	void ControlBartoliTransformEffect(int itemNumber)
 	{
-		constexpr auto SCALE_RATE = Vector3(0.4f);
-		constexpr auto OPACITY_CHANGE_RATE = 0.05f;
+		constexpr auto SCALE_RATE = Vector3(0.7f);
+		constexpr auto OPACITY_CHANGE_RATE = 1.0f;
 
 		auto& item = g_Level.Items[itemNumber];
 
