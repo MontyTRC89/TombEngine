@@ -23,10 +23,11 @@ struct WeaponPickupInfo
 	HolsterType Holster;
 };
 
-static constexpr std::array<WeaponPickupInfo, 9> kWeapons
+static constexpr std::array<WeaponPickupInfo, 10> kWeapons
 {
 	{
 		{ ID_PISTOLS_ITEM, ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol, HolsterType::Hips },
+		{ ID_MAGNUMS_ITEM, ID_MAGNUMS_AMMO_ITEM, LaraWeaponType::Magnums, HolsterType::Hips },
 		{ ID_UZI_ITEM, ID_UZI_AMMO_ITEM, LaraWeaponType::Uzi, HolsterType::Hips},
 		{ ID_SHOTGUN_ITEM, ID_SHOTGUN_AMMO1_ITEM, LaraWeaponType::Shotgun, HolsterType::Back },
 		{ ID_CROSSBOW_ITEM, ID_CROSSBOW_AMMO1_ITEM, LaraWeaponType::Crossbow, HolsterType::Back},

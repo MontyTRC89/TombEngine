@@ -192,7 +192,7 @@ HandStatus LaraObject::GetHandStatus() const
 // @function LaraObject:GetWeaponType
 // @usage
 // local weaponType = Lara:GetWeaponType()
-// @treturn int weapon type 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+// @treturn int weapon type 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher, 12=Magnums.
 LaraWeaponType LaraObject::GetWeaponType() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -217,6 +217,7 @@ LaraWeaponType LaraObject::GetWeaponType() const
 //	GRENADELAUNCHER
 //	HARPOONGUN
 //	ROCKETLAUNCHER
+//  	MAGNUMS
 // @tparam bool activate true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.
 void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 {
@@ -260,6 +261,10 @@ int LaraObject::GetAmmoType() const
 
 		case::LaraWeaponType::Revolver:
 			ammoType = PlayerAmmoType::Revolver;
+			break;
+
+		case::LaraWeaponType::Magnums:
+			ammoType = PlayerAmmoType::Magnums;
 			break;
 
 		case::LaraWeaponType::Uzi:

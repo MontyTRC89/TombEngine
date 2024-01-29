@@ -14,6 +14,7 @@ The following constants are inside AmmoType.
 	NONE
 	PISTOLS
 	REVOLVER
+	MAGNUMS
 	UZI
 	SHOTGUN_NORMAL
 	SHOTGUN_WIDE
@@ -36,6 +37,7 @@ The following constants are inside AmmoType.
 static const std::unordered_map<std::string, PlayerAmmoType> PLAYER_AMMO_TYPES
 {
 	{ "PISTOLS", PlayerAmmoType::Pistol },
+	{ "MAGNUMS", PlayerAmmoType::Magnums },
 	{ "REVOLVER", PlayerAmmoType::Revolver },
 	{ "UZI", PlayerAmmoType::Uzi },
 	{ "SHOTGUN_NORMAL", PlayerAmmoType::ShotgunNormal },

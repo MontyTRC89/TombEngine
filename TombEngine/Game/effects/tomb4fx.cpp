@@ -888,6 +888,8 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	{
 		if (weaponType == LaraWeaponType::Pistol)
 			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-12, 48, 40));
+		else if (weaponType == LaraWeaponType::Magnums)
+			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-12, 48, 40));
 		else if (weaponType == LaraWeaponType::Uzi)
 			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-16, 35, 48));
 	}

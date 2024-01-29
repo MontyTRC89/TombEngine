@@ -15,6 +15,8 @@ namespace TEN::Gui
 		// Weapons and ammo types
 		INV_OBJECT_PISTOLS,
 		INV_OBJECT_PISTOLS_AMMO,
+		INV_OBJECT_MAGNUMS,
+		INV_OBJECT_MAGNUMS_AMMO,
 		INV_OBJECT_UZIS,
 		INV_OBJECT_UZI_AMMO,
 		INV_OBJECT_SHOTGUN,
@@ -272,7 +274,8 @@ namespace TEN::Gui
 		OPT_STATS				   = (1 << 15),
 		OPT_CHOOSE_AMMO_HARPOON	   = (1 << 16),
 		OPT_CHOOSE_AMMO_ROCKET	   = (1 << 17),
-		OPT_DIARY				   = (1 << 18)
+		OPT_DIARY				   = (1 << 18),
+		OPT_CHOOSE_AMMO_MAGNUMS    = (1 << 19)
 	};
 
 	enum RotationFlags
@@ -332,7 +335,9 @@ namespace TEN::Gui
 		unsigned short AmountUziAmmo;
 		unsigned short AmountRevolverAmmo;
 		unsigned short AmountPistolsAmmo;
+		unsigned short AmountMagnumsAmmo;
 		char CurrentPistolsAmmoType;
+		char CurrentMagnumsAmmoType;
 		char CurrentUziAmmoType;
 		char CurrentRevolverAmmoType;
 		char CurrentShotGunAmmoType;
@@ -342,6 +347,7 @@ namespace TEN::Gui
 		char CurrentHarpoonAmmoType;
 		char CurrentRocketAmmoType;
 		char StashedCurrentPistolsAmmoType;
+		char StashedCurrentMagnumsAmmoType;
 		char StashedCurrentUziAmmoType;
 		char StashedCurrentRevolverAmmoType;
 		char StashedCurrentShotGunAmmoType;

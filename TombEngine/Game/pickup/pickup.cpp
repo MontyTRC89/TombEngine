@@ -805,6 +805,10 @@ void RegeneratePickups()
 				ammo = lara->Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1];
 				break;
 
+			case ID_MAGNUMS_AMMO_ITEM:
+				ammo = lara->Weapons[(int)LaraWeaponType::Magnums].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
+
 			case ID_HARPOON_AMMO_ITEM:
 				ammo = lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1];
 				break;

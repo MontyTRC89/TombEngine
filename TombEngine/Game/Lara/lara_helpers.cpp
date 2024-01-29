@@ -325,6 +325,7 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 	{
 		LaraWeaponType::Pistol,
 		LaraWeaponType::Shotgun,
+		LaraWeaponType::Magnums,
 		LaraWeaponType::Uzi,
 		LaraWeaponType::Revolver,
 		LaraWeaponType::GrenadeLauncher,
@@ -396,28 +397,31 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	if (IsClicked(In::Weapon2) && player.Weapons[(int)LaraWeaponType::Shotgun].Present)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
-	if (IsClicked(In::Weapon3) && player.Weapons[(int)LaraWeaponType::Uzi].Present)
+	if (IsClicked(In::Weapon3) && player.Weapons[(int)LaraWeaponType::Magnums].Present)
+		player.Control.Weapon.RequestGunType = LaraWeaponType::Magnums;
+
+	if (IsClicked(In::Weapon4) && player.Weapons[(int)LaraWeaponType::Uzi].Present)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
-	if (IsClicked(In::Weapon4) && player.Weapons[(int)LaraWeaponType::Revolver].Present)
+	if (IsClicked(In::Weapon5) && player.Weapons[(int)LaraWeaponType::Revolver].Present)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
 
-	if (IsClicked(In::Weapon5) && player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+	if (IsClicked(In::Weapon6) && player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
-	if (IsClicked(In::Weapon6) && player.Weapons[(int)LaraWeaponType::Crossbow].Present)
+	if (IsClicked(In::Weapon7) && player.Weapons[(int)LaraWeaponType::Crossbow].Present)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
 
-	if (IsClicked(In::Weapon7) && player.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+	if (IsClicked(In::Weapon8) && player.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
-	if (IsClicked(In::Weapon8) && player.Weapons[(int)LaraWeaponType::HK].Present)
+	if (IsClicked(In::Weapon9) && player.Weapons[(int)LaraWeaponType::HK].Present)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
-	if (IsClicked(In::Weapon9) && player.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+	if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
 		player.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
-	// TODO: 10th possible weapon, probably grapple gun.
+	// TODO: 11th possible weapon, probably grapple gun.
 	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 }
@@ -830,6 +834,17 @@ static void GivePlayerWeaponsCheat(ItemInfo& item)
 		weapon.HasLasersight = false;
 		weapon.HasSilencer = false;
 		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+		if (Objects[ID_MAGNUMS_ITEM].loaded)
+		{
+			auto& weapon = player.Weapons[(int)LaraWeaponType::Magnums];
+
+			weapon.Present = true;
+			weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+			weapon.HasLasersight = false;
+			weapon.HasSilencer = false;
+			weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
 	if (Objects[ID_UZI_ITEM].loaded)
