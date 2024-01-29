@@ -33,6 +33,7 @@ namespace TEN::Collision::Attractor
 		AttractorPtr = &attrac;
 		Proximity = GetProximity(pos, segmentID, axis);
 
+		// TODO: Incorporate axis.
 		// Calculate orientations.
 		auto refOrient = EulerAngles(0, headingAngle, 0);
 		auto segmentOrient = (points.size() == 1) ?
@@ -51,9 +52,11 @@ namespace TEN::Collision::Attractor
 		// Single point exists; return simple proximity data.
 		if (points.size() == 1)
 		{
-			float dist2D = Vector2::Distance(Vector2(pos.x, pos.z), Vector2(points.front().x, points.front().z));
-			float dist3D = Vector3::Distance(pos, points.front());
-			return ProximityData{ points.front(), dist2D, dist3D, 0.0f, 0 };
+			const auto& intersect = points.front();
+
+			float dist2D = Vector2::Distance(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
+			float dist3D = Vector3::Distance(pos, intersect);
+			return ProximityData{ intersect, dist2D, dist3D, 0.0f, 0 };
 		}
 
 		// Accumulate distance traveled along attractor toward intersection.
@@ -229,16 +232,18 @@ namespace TEN::Collision::Attractor
 
 	void DrawNearbyAttractors(const ItemInfo& item)
 	{
+		constexpr auto DETECT_RADIUS = BLOCK(5);
+
 		auto uniqueAttracPtrs = std::set<Attractor*>{};
 
-		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, 0.0f, 0.0f, 0.0f, BLOCK(5));
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y, 0.0f, 0.0f, 0.0f, DETECT_RADIUS);
 		for (const auto& attracColl : attracColls)
 		{
 			uniqueAttracPtrs.insert(attracColl.AttractorPtr);
 			attracColl.AttractorPtr->DrawDebug(attracColl.Proximity.SegmentID);
 		}
 
-		if (g_Renderer.GetDebugPage() == RendererDebugPage::CollisionStats)
+		if (g_Renderer.GetDebugPage() == RendererDebugPage::AttractorStats)
 		{
 			g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());
 			g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
