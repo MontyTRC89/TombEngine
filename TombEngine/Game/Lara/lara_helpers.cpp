@@ -328,11 +328,11 @@ static void UsePlayerMedipack(ItemInfo& item)
 	}
 }
 
-static AttractorParentTargetData GetAttractorParentTarget(const ItemInfo& item, Attractor& attrac, float chainDist,
-														   const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
+static AttractorParentTargetData GetAttractorParentTarget(Attractor& attrac, float chainDist, short headingAngle,
+														  const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
 {
 	// Get attractor collision.
-	auto attracColl = GetAttractorCollision(attrac, chainDist, item.Pose.Orientation.y);
+	auto attracColl = GetAttractorCollision(attrac, chainDist, headingAngle);
 
 	// Calculate target.
 	auto orient = EulerAngles(0, attracColl.HeadingAngle, 0) + relOrientOffset;
@@ -355,13 +355,14 @@ void HandlePlayerAttractorParent(ItemInfo& item)
 
 	// Get parent target.
 	auto target = GetAttractorParentTarget(
-		item, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance,
+		*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y,
 		player.Context.Attractor.RelPosOffset, player.Context.Attractor.RelOrientOffset);
 
-	// Update player pose.
-	item.Pose = Pose(
-		target.Position + Vector3::Transform(Vector3::Lerp(player.Context.Attractor.RelDeltaPos, Vector3::Zero, LERP_ALPHA), target.RotationMatrix),
-		target.Orientation + EulerAngles::Lerp(player.Context.Attractor.RelDeltaOrient, EulerAngles::Zero, LERP_ALPHA));
+	// Update player position.
+	auto posOffset = Vector3::Transform(Vector3::Lerp(player.Context.Attractor.RelDeltaPos, Vector3::Zero, LERP_ALPHA), target.RotationMatrix);
+	auto orientOffset = EulerAngles::Lerp(player.Context.Attractor.RelDeltaOrient, EulerAngles::Zero, LERP_ALPHA);
+	item.Pose = Pose(target.Position + posOffset, target.Orientation + orientOffset);
+	item.RoomNumber = player.Context.Attractor.Ptr->GetRoomNumber(); // TODO: Check.
 
 	// Recalculate relative delta position and orientation.
 	player.Context.Attractor.RelDeltaPos = Vector3::Transform(item.Pose.Position.ToVector3() - target.Position, target.RotationMatrix.Invert());
@@ -1620,7 +1621,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
-			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
+			*climbContext.AttractorPtr, climbContext.ChainDistance, item.Pose.Orientation.y,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset);
 
 		// Calculate offsets.
@@ -1643,7 +1644,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
-			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
+			*climbContext.AttractorPtr, climbContext.ChainDistance, item.Pose.Orientation.y,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset);
 
 		// Calculate relative delta position and orientation.

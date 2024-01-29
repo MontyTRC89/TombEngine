@@ -234,7 +234,7 @@ namespace TEN::Math::Geometry
 		}
 
 		// Construct and return AABB.
-		auto center = (minPoint + maxPoint) / 2;
+		auto center = (maxPoint + minPoint) / 2;
 		auto extents = (maxPoint - minPoint) / 2;
 		return BoundingBox(center, extents);
 	}

@@ -126,6 +126,18 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action))
 		{
+			if (IsHeld(In::Crouch) && CanWallClimbToEdgeHang(*item, *coll))
+			{
+				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
+				return;
+			}
+
+			if (IsHeld(In::Jump))
+			{
+				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
+				return;
+			}
+
 			if (IsHeld(In::Forward))
 			{
 				auto climbContext = GetWallClimbUpContext(*item, *coll);
@@ -167,6 +179,18 @@ namespace TEN::Entities::Player
 
 		if (IsHeld(In::Action))
 		{
+			if (IsHeld(In::Crouch) && CanWallClimbToEdgeHang(*item, *coll))
+			{
+				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
+				return;
+			}
+
+			if (IsHeld(In::Jump))
+			{
+				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
+				return;
+			}
+
 			if (IsHeld(In::Back))
 			{
 				auto climbContext = GetWallClimbDownContext(*item, *coll);
