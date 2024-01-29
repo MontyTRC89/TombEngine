@@ -80,17 +80,17 @@ namespace TEN::Entities::Creatures::TR2
 		if (effectTimer == timeExplosion1)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM);
-			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
+			SoundEffect(SFX_TR2_MARCO_BARTOLLI_TRANSFORM, &item.Pose);
 		}
 		if (effectTimer == timeExplosion2)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM2);
-			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
+			SoundEffect(SFX_TR2_MARCO_BARTOLLI_TRANSFORM, &item.Pose);
 		}
 		if (effectTimer == timeExplosion3)
 		{
 			SpawnBartoliTransformEffect(item, ID_SPHERE_OF_DOOM3);
-			SoundEffect(SFX_TR3_BLAST_CIRCLE, &item.Pose);
+			SoundEffect(SFX_TR2_MARCO_BARTOLLI_TRANSFORM, &item.Pose);
 			KillItem(itemNumber);
 
 			TestTriggers(&item, true);
