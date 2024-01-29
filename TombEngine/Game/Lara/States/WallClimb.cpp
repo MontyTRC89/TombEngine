@@ -24,10 +24,15 @@ namespace TEN::Entities::Player
 		coll->Setup.Height = PLAYER_HEIGHT_WALL_CLIMB;
 		coll->Setup.EnableSpasm = false;
 		coll->Setup.EnableObjectPush = false;
-		player.Context.Attractor.Update(
-			*item, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance,
-			Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Zero);
 		Camera.targetElevation = ANGLE(-20.0f);
+
+		// HACK
+		if (item->Animation.AnimNumber != LA_STAND_TO_WALL_CLIMB)
+		{
+			player.Context.Attractor.Update(
+				*item, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance,
+				Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Zero);
+		}
 
 		// TODO: Add GetWallClimbIdleContext() purely for the alignment?
 

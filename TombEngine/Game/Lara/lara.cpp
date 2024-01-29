@@ -375,6 +375,10 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 		DrawNearbySectorFlags(*item);
 		DrawNearbyAttractors(*item);
+
+		g_Renderer.AddDebugCylinder(
+			item->Pose.Position.ToVector3() - Vector3::UnitY, EulerAngles(ANGLE(90.0f), 0, 0).ToQuaternion(), coll->Setup.Radius, coll->Setup.Height,
+			Color(1.0f, 1.0f, 0.0f, 0.15f), RendererDebugPage::CollisionStats, false);
 	}
 }
 

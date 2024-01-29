@@ -1050,6 +1050,7 @@ namespace TEN::Entities::Player
 		auto pointColl = GetCollision(&item, coll.Setup.ForwardAngle, coll.Setup.Radius, -coll.Setup.Height);
 		return (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT || IsInLowSpace(item, coll));
 	}
+
 	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto WALL_HEIGHT_MIN = CLICK(2);
