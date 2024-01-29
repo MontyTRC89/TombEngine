@@ -17,7 +17,7 @@ namespace TEN::Collision::Attractor
 {
 	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis)
 	{
-		constexpr auto HEADING_ANGLE_OFFSET = ANGLE(-90.0f);
+		constexpr auto HEADING_ANGLE_OFFSET = ANGLE(270.0f);
 
 		const auto& points = attrac.GetPoints();
 
