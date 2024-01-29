@@ -22,9 +22,7 @@ namespace TEN::Collision::Attractor
 		_type = type;
 		_points = points;
 		_roomNumber = roomNumber;
-		CacheSegmentLengths();
-		CacheLength();
-		CacheBox();
+		Cache();
 	}
 
 	Attractor::~Attractor()
@@ -165,9 +163,7 @@ namespace TEN::Collision::Attractor
 
 		_points = points;
 		_roomNumber = roomNumber;
-		CacheSegmentLengths();
-		CacheLength();
-		CacheBox();
+		Cache();
 	}
 
 	void Attractor::AttachPlayer(ItemInfo& playerItem)
@@ -198,12 +194,6 @@ namespace TEN::Collision::Attractor
 			if (player.Context.Attractor.Ptr != nullptr)
 				player.Context.Attractor.Detach(playerItem);
 		}
-	}
-
-	void Attractor::DrawDebug() const
-	{
-		for (int i = 0; i < GetSegmentCount(); i++)
-			DrawDebug(i);
 	}
 
 	void Attractor::DrawDebug(unsigned int segmentID) const
@@ -296,6 +286,12 @@ namespace TEN::Collision::Attractor
 		}
 	}
 
+	void Attractor::DrawDebug() const
+	{
+		for (int i = 0; i < GetSegmentCount(); i++)
+			DrawDebug(i);
+	}
+
 	float Attractor::NormalizeChainDistance(float chainDist) const
 	{
 		// Distance along attractor within bounds; return it.
@@ -306,42 +302,32 @@ namespace TEN::Collision::Attractor
 		return (IsLooped() ? fmod(chainDist + _length, _length) : std::clamp(chainDist, 0.0f, _length));
 	}
 
-	void Attractor::CacheSegmentLengths()
+	void Attractor::Cache()
 	{
-		// Clear segment lengths.
+		// Cache segment lengths.
 		_segmentLengths.clear();
-
-		// Single point exists; cache single segment length of 0.
 		if (_points.size() == 1)
 		{
 			_segmentLengths.push_back(0.0f);
-			return;
 		}
-
-		// Collect segment lengths.
-		for (int i = 0; i < GetSegmentCount(); i++)
+		else
 		{
-			// Get segment points.
-			const auto& origin = _points[i];
-			const auto& target = _points[i + 1];
+			for (int i = 0; i < GetSegmentCount(); i++)
+			{
+				const auto& origin = _points[i];
+				const auto& target = _points[i + 1];
 
-			// Add segment length.
-			_segmentLengths.push_back(Vector3::Distance(origin, target));
+				float segmentLength = Vector3::Distance(origin, target);
+				_segmentLengths.push_back(segmentLength);
+			}
 		}
-	}
-	
-	void Attractor::CacheLength()
-	{
-		// Accumulate length.
-		float length = 0.0f;
-		for (float segmentLength : _segmentLengths)
-			length += segmentLength;
-		
-		_length = length;
-	}
 
-	void Attractor::CacheBox()
-	{
+		// Cache length.
+		_length = 0.0f;
+		for (float segmentLength : _segmentLengths)
+			_length += segmentLength;
+
+		// Cache box.
 		_box = Geometry::GetBoundingBox(_points);
 	}
 

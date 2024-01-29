@@ -58,15 +58,13 @@ namespace TEN::Collision::Attractor
 		void DetachPlayer(ItemInfo& playerItem);
 		void DetachAllPlayers();
 
-		void DrawDebug() const;
 		void DrawDebug(unsigned int segmentID) const;
+		void DrawDebug() const;
 
 	private:
 		// Helpers
 		float NormalizeChainDistance(float chainDist) const;
-		void  CacheSegmentLengths();
-		void  CacheLength();
-		void  CacheBox();
+		void  Cache();
 	};
 
 	std::vector<Vector3> GetBridgeAttractorPoints(const ItemInfo& bridgeItem);
