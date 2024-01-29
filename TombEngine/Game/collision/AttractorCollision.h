@@ -32,17 +32,17 @@ namespace TEN::Collision::Attractor
 
 		// Constructors
 		AttractorCollisionData() {};
-		AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle);
+		AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis);
 
 	private:
 		// Helpers
-		ProximityData GetProximity(const Vector3& pos, unsigned int segmentID) const;
+		ProximityData GetProximity(const Vector3& pos, unsigned int segmentID, const Vector3& axis) const;
 	};
 
-	AttractorCollisionData GetAttractorCollision(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle);
-	AttractorCollisionData GetAttractorCollision(Attractor& attrac, float chainDist, short headingAngle);
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis = Vector3::UnitY);
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, float chainDist, short headingAngle, const Vector3& axis = Vector3::UnitY);
 
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float detectRadius);
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float detectRadius, const Vector3& axis = Vector3::UnitY);
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
 															   float forward, float down, float right, float detectRadius, const Vector3& axis = Vector3::UnitY);
 

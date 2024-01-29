@@ -6,8 +6,8 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
-#include "Specific/level.h"
 #include "Renderer/Renderer.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
@@ -15,18 +15,23 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
-	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle)
+	AttractorCollisionData::AttractorCollisionData(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis)
 	{
 		constexpr auto HEADING_ANGLE_OFFSET = ANGLE(-90.0f);
 
 		const auto& points = attrac.GetPoints();
 
 		// FAILSAFE: Clamp segment ID.
-		segmentID = std::clamp<unsigned int>(segmentID, 0, attrac.GetSegmentCount() - 1);
+		unsigned int segmentCount = attrac.GetSegmentCount();
+		if (segmentID < 0 || segmentID >= segmentCount)
+		{
+			TENLog("Attempted to get attractor collision data for invalid segment.", LogLevel::Warning);
+			segmentID = std::clamp<unsigned int>(segmentID, 0, segmentCount - 1);
+		}
 
 		// Set attractor pointer and get proximity data.
 		AttractorPtr = &attrac;
-		Proximity = GetProximity(pos, segmentID);
+		Proximity = GetProximity(pos, segmentID, axis);
 
 		// Calculate orientations.
 		auto refOrient = EulerAngles(0, headingAngle, 0);
@@ -39,7 +44,7 @@ namespace TEN::Collision::Attractor
 		IsInFront = Geometry::IsPointInFront(pos, Proximity.Intersection, refOrient);
 	}
 
-	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, unsigned int segmentID) const
+	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, unsigned int segmentID, const Vector3& axis) const
 	{
 		const auto& points = AttractorPtr->GetPoints();
 
@@ -63,8 +68,8 @@ namespace TEN::Collision::Attractor
 		const auto& origin = points[segmentID];
 		const auto& target = points[segmentID + 1];
 
-		// Calculate Y-perpendicular intersection.
-		auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target);
+		// Calculate axis-perpendicular intersection.
+		auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target, axis);
 
 		// Accumulate final distance traveled along attractor toward intersection.
 		chainDistTraveled += Vector3::Distance(origin, intersect);
@@ -81,17 +86,17 @@ namespace TEN::Collision::Attractor
 		return attracProx;
 	}
 
-	AttractorCollisionData GetAttractorCollision(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle)
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis)
 	{
-		return AttractorCollisionData(attrac, segmentID, pos, headingAngle);
+		return AttractorCollisionData(attrac, segmentID, pos, headingAngle, axis);
 	}
 
-	AttractorCollisionData GetAttractorCollision(Attractor& attrac, float chainDist, short headingAngle)
+	AttractorCollisionData GetAttractorCollision(Attractor& attrac, float chainDist, short headingAngle, const Vector3& axis)
 	{
 		unsigned int segmentID = attrac.GetSegmentIDAtChainDistance(chainDist);
 		auto pos = attrac.GetIntersectionAtChainDistance(chainDist);
 
-		return AttractorCollisionData(attrac, segmentID, pos, headingAngle);
+		return AttractorCollisionData(attrac, segmentID, pos, headingAngle, axis);
 	}
 	
 	// Debug
@@ -167,7 +172,7 @@ namespace TEN::Collision::Attractor
 		return nearbyAttracPtrs;
 	}
 
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float detectRadius)
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float detectRadius, const Vector3& axis)
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
@@ -182,7 +187,7 @@ namespace TEN::Collision::Attractor
 			// Get collisions for every segment.
 			for (int i = 0; i < attracPtr->GetSegmentCount(); i++)
 			{
-				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle);
+				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle, axis);
 
 				// Filter out non-intersection.
 				if (attracColl.Proximity.Distance3D > detectRadius)
@@ -214,7 +219,6 @@ namespace TEN::Collision::Attractor
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
 															   float forward, float down, float right, float detectRadius, const Vector3& axis)
 	{
-
 		auto relOffset = Vector3(right, down, forward);
 		auto rotMatrix = AxisAngle(axis, headingAngle).ToRotationMatrix();
 		auto probePos = pos + Vector3::Transform(relOffset, rotMatrix);
@@ -234,7 +238,10 @@ namespace TEN::Collision::Attractor
 			attracColl.AttractorPtr->DrawDebug(attracColl.Proximity.SegmentID);
 		}
 
-		//g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());
-		//g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
+		if (g_Renderer.GetDebugPage() == RendererDebugPage::CollisionStats)
+		{
+			g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());
+			g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
+		}
 	}
 }

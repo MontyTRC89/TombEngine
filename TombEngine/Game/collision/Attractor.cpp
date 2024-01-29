@@ -200,6 +200,12 @@ namespace TEN::Collision::Attractor
 		}
 	}
 
+	void Attractor::DrawDebug() const
+	{
+		for (int i = 0; i < GetSegmentCount(); i++)
+			DrawDebug(i);
+	}
+
 	void Attractor::DrawDebug(unsigned int segmentID) const
 	{
 		constexpr auto LABEL_OFFSET				= Vector3(0.0f, -CLICK(0.5f), 0.0f);

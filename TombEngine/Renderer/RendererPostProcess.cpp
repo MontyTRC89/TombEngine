@@ -117,6 +117,11 @@ namespace TEN::Renderer
 		_postProcessTint = tint;
 	}
 
+	RendererDebugPage Renderer::GetDebugPage() const
+	{
+		return _debugPage;
+	}
+
 	void Renderer::CopyRenderTarget(RenderTarget2D* source, RenderTarget2D* dest, RenderView& view)
 	{
 		SetBlendMode(BlendMode::Opaque, true);

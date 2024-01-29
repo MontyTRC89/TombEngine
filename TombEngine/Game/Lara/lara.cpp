@@ -370,6 +370,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
 
+	// Draw debug.
 	if (DebugMode)
 	{
 		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);

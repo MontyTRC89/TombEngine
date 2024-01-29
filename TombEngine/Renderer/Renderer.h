@@ -648,6 +648,8 @@ namespace TEN::Renderer
 		void			SetPostProcessStrength(float strength);
 		Vector3			GetPostProcessTint();
 		void			SetPostProcessTint(Vector3 color);
+
+		RendererDebugPage GetDebugPage() const;
 	};
 
 	extern Renderer g_Renderer;
