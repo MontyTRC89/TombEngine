@@ -866,10 +866,6 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			offset = Vector3i(8, 48, 40);
 			break;
 
-		/*case LaraWeaponType::Magnums:
-			offset = Vector3i(8, 48, 40);
-			break;
-			*/
 		case LaraWeaponType::Uzi:
 			offset = Vector3i(8, 35, 48);
 			break;
