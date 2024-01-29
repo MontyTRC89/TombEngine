@@ -304,8 +304,10 @@ namespace TEN::Collision::Attractor
 
 	void Attractor::Cache()
 	{
-		// Cache segment lengths.
 		_segmentLengths.clear();
+		_length = 0.0f;
+
+		// Cache lengths.
 		if (_points.size() == 1)
 		{
 			_segmentLengths.push_back(0.0f);
@@ -318,14 +320,11 @@ namespace TEN::Collision::Attractor
 				const auto& target = _points[i + 1];
 
 				float segmentLength = Vector3::Distance(origin, target);
+
 				_segmentLengths.push_back(segmentLength);
+				_length += segmentLength;
 			}
 		}
-
-		// Cache length.
-		_length = 0.0f;
-		for (float segmentLength : _segmentLengths)
-			_length += segmentLength;
 
 		// Cache box.
 		_box = Geometry::GetBoundingBox(_points);
