@@ -20,10 +20,12 @@ using namespace TEN::Math;
 
 // NOTES:
 // ItemFlags[0]: defeat timer.
+// ItemFlags[1]: type.
 
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto WINSTON_IDLE_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto WINSTON_SHUFFLE_SOUND_CHANCE = 1 / 128.0f;
 	constexpr auto WINSTON_TURN_RATE_MAX = ANGLE(2.0f);
 
 	constexpr auto WINSTON_RECOVER_HIT_POINTS = 16;
@@ -72,10 +74,10 @@ namespace TEN::Entities::Creatures::TR3
 		WINSTON_ANIM_DEFEAT_END = 20
 	};
 
-	enum class WinstonOCB
+	enum class WinstonType
 	{
-		Normal = 0,			 //normal Winston, not targetable.
-		Army = 1			 // Army Winston, targetable.
+		Normal = 0,
+		Army = 1
 	};
 
 	void InitializeWinston(short itemNumber)
@@ -87,11 +89,11 @@ namespace TEN::Entities::Creatures::TR3
 		if (!item.TriggerFlags)
 		{
 			item.HitPoints = NOT_TARGETABLE;
-			item.ItemFlags[1] = (short)WinstonOCB::Normal;
+			item.ItemFlags[1] = (int)WinstonType::Normal;
 		}
 		else
 		{
-			item.ItemFlags[1] = (short)WinstonOCB::Army;
+			item.ItemFlags[1] = (int)WinstonType::Army;
 		}
 	}
 
@@ -111,17 +113,18 @@ namespace TEN::Entities::Creatures::TR3
 		GetCreatureMood(&item, &ai, 1);
 		CreatureMood(&item, &ai, 1);
 
-		if (item.ItemFlags[1] != item.TriggerFlags) //NOTE: set proper HP value to Winston if changing OCB in runtime.
+		// Set proper HP value if changing OCB at runtime.
+		if (item.ItemFlags[1] != item.TriggerFlags)
 		{
 			if (!item.TriggerFlags)
 			{
 				item.HitPoints = NOT_TARGETABLE;
-				item.ItemFlags[1] = (short)WinstonOCB::Normal;
+				item.ItemFlags[1] = (int)WinstonType::Normal;
 			}
 			else
 			{
 				item.HitPoints = WINSTON_RECOVER_HIT_POINTS;
-				item.ItemFlags[1] = (short)WinstonOCB::Army;
+				item.ItemFlags[1] = (int)WinstonType::Army;
 			}
 		}
 
@@ -194,7 +197,6 @@ namespace TEN::Entities::Creatures::TR3
 				else if ((ai.distance > WINSTON_IDLE_RANGE || !ai.ahead) && item.Animation.TargetState != WINSTON_STATE_WALK_FORWARD)
 				{
 					item.Animation.TargetState = WINSTON_STATE_WALK_FORWARD;
-
 				}
 
 				break;
@@ -233,9 +235,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = item.Animation.RequiredState;
 
 				if (!item.TriggerFlags)
-				{
 					item.Animation.TargetState = WINSTON_STATE_IDLE;
-				}
 
 				if (item.HitStatus)
 				{
@@ -299,26 +299,25 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		if (Random::TestProbability(1 / 128.0f))
+		if (Random::TestProbability(WINSTON_SHUFFLE_SOUND_CHANCE))
 			SoundEffect(SFX_TR3_WINSTON_SHUFFLE, &item.Pose);
 
 		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 
-	void WinstonHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
+	void HitWinston(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
 	{
-		const auto& player = *GetLaraInfo(&source);
 		const auto& object = Objects[target.ObjectNumber];
-
-		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
-		{
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
-			SoundEffect(SFX_TR3_WINSTON_CUPS, &target.Pose);
-		}
 
 		if (pos.has_value())
 		{
 			DoItemHit(&target, damage, isExplosive, false);
+
+			if (object.hitEffect == HitEffect::Richochet)
+			{
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				SoundEffect(SFX_TR3_WINSTON_CUPS, &target.Pose);
+			}
 		}
 	}
 }
