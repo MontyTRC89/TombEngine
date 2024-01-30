@@ -1742,19 +1742,19 @@ void ResetPlayerFlex(ItemInfo* item, float alpha)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
-	player.ExtraTorsoRot.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
+	player.ExtraTorsoRot.Lerp(EulerAngles::Identity, alpha);
 }
 
 void ResetPlayerLookAround(ItemInfo& item, float alpha)
 {
 	auto& player = GetLaraInfo(item);
 
-	player.Control.Look.Orientation = EulerAngles::Zero;
+	player.Control.Look.Orientation = EulerAngles::Identity;
 
 	if (Camera.type != CameraType::Look)
 	{
-		player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
+		player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
 
 		if (player.Control.HandStatus != HandStatus::Busy &&
 			!player.LeftArm.Locked && !player.RightArm.Locked &&
