@@ -453,6 +453,21 @@ static void StartEntity(ObjectInfo* obj)
 		CheckIfSlotExists(ID_DRAGON_BONE_BACK, "ID_DRAGON_BONE_BACK");
 		obj->collision = CollideDragonBack;
 		obj->SetHitEffect(false, true);
+		obj->shadowType = ShadowMode::All;
+	}
+
+	obj = &Objects[ID_DRAGON_BONE_FRONT];
+	if (obj->loaded)
+	{
+		obj->collision = CollideDragonBack;
+		obj->shadowType = ShadowMode::All;
+	}
+
+	obj = &Objects[ID_DRAGON_BONE_BACK];
+	if (obj->loaded)
+	{
+		obj->collision = CollideDragonBack;
+		obj->shadowType = ShadowMode::All;
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];

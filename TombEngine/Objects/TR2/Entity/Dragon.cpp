@@ -53,6 +53,8 @@ namespace TEN::Entities::Creatures::TR2
 	const auto DragonBackSpineJoints		= std::vector<unsigned int>{ 21, 22, 23 };
 	const auto DragonSwipeAttackJointsLeft	= std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
+	const auto SMOKE_SPRITE_ANIMATION = Random::GenerateInt(0, 10);
+	const auto FIRE_SPRITE_ANIMATION = Random::GenerateInt(0, 35);
 
 	enum class DragonLightEffectType
 	{
@@ -232,7 +234,7 @@ namespace TEN::Entities::Creatures::TR2
 			dir.Normalize();
 			dir *= 300.0f;
 
-			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex;
+			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + FIRE_SPRITE_ANIMATION;
 
 			fire.x = pos.x;
 			fire.y = pos.y;
@@ -290,7 +292,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			auto& smoke = *GetFreeParticle();
 
-			smoke.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + spriteID;
+			smoke.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + SMOKE_SPRITE_ANIMATION;
 			smoke.on = true;
 			smoke.x = pos.x;
 			smoke.y = pos.y;
