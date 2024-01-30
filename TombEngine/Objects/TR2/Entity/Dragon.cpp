@@ -677,7 +677,7 @@ namespace TEN::Entities::Creatures::TR2
 		const auto& player = *GetLaraInfo(playerItem);
 
 		if (item.Animation.ActiveState == DRAGON_STATE_DEFEAT &&
-			item.TriggerFlags == DRAGON_OCB_NORMAL)
+			item.TriggerFlags == DRAGON_OCB_DAGGER)
 		{
 			HandleDaggerPickup(item, *playerItem);
 
