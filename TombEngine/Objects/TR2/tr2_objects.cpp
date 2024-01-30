@@ -459,14 +459,14 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_BONE_FRONT];
 	if (obj->loaded)
 	{
-		obj->collision = CollideDragonBack;
+		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 	}
 
 	obj = &Objects[ID_DRAGON_BONE_BACK];
 	if (obj->loaded)
 	{
-		obj->collision = CollideDragonBack;
+		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 	}
 
