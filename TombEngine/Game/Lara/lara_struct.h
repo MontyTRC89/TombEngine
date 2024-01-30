@@ -1126,7 +1126,7 @@ struct ArmInfo
 	int FrameNumber = 0;
 	int FrameBase	= 0;
 
-	EulerAngles Orientation = EulerAngles::Zero;
+	EulerAngles Orientation = EulerAngles::Identity;
 	bool		Locked		= false;
 
 	int GunFlash = 0;
@@ -1180,8 +1180,8 @@ struct LaraCountData
 struct LookControlData
 {
 	LookMode	Mode		= LookMode::None;
-	EulerAngles Orientation = EulerAngles::Zero;
-	EulerAngles	TurnRate	= EulerAngles::Zero;
+	EulerAngles Orientation = EulerAngles::Identity;
+	EulerAngles	TurnRate	= EulerAngles::Identity;
 
 	short OpticRange		= 0;
 	bool  IsUsingBinoculars = false;
@@ -1346,9 +1346,9 @@ struct LaraInfo
 	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
 
-	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
-	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
-	EulerAngles TargetArmOrient = EulerAngles::Zero;
+	EulerAngles ExtraHeadRot	= EulerAngles::Identity;
+	EulerAngles ExtraTorsoRot	= EulerAngles::Identity;
+	EulerAngles TargetArmOrient = EulerAngles::Identity;
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
 

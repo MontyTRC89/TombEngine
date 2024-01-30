@@ -382,7 +382,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	lara->Control.HandStatus = HandStatus::Busy;
-	lara->ExtraTorsoRot = EulerAngles::Zero;
+	lara->ExtraTorsoRot = EulerAngles::Identity;
 	return true;
 }
 
