@@ -102,7 +102,7 @@ static void ReadyPistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
 }
@@ -254,7 +254,7 @@ static int AnimateWeaponUndraw(ItemInfo& laraItem, LaraWeaponType weaponType, bo
 	}
 	else if (frame == 0)
 	{
-		arm.Orientation = EulerAngles::Zero;
+		arm.Orientation = EulerAngles::Identity;
 		frame = weaponAnimData.RecoilAnim - 1;
 	}
 	else if (frame > weaponAnimData.Draw1Anim && frame < weaponAnimData.RecoilAnim)

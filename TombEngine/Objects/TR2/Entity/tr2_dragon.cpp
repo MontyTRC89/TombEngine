@@ -111,7 +111,7 @@ namespace TEN::Entities::Creatures::TR2
 			explosionItem->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 			explosionItem->Pose.Position.z = item->Pose.Position.z;
 			explosionItem->RoomNumber = item->RoomNumber;
-			explosionItem->Pose.Orientation = EulerAngles::Zero;
+			explosionItem->Pose.Orientation = EulerAngles::Identity;
 			explosionItem->Animation.Velocity.y = 0.0f;
 			explosionItem->Animation.Velocity.z = 0.0f;
 
