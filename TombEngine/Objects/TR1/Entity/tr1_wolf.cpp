@@ -112,7 +112,7 @@ namespace TEN::Entities::Creatures::TR1
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
 
 		if (item.HitPoints <= 0)
 		{

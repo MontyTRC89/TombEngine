@@ -880,7 +880,7 @@ namespace TEN::Renderer
 	{
 		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
 
-		static EulerAngles orient = EulerAngles::Zero;
+		static EulerAngles orient = EulerAngles::Identity;
 		static float scaler = 1.2f;
 
 		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
