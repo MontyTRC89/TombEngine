@@ -342,8 +342,8 @@ namespace TEN::Entities::Creatures::TR2
 					pos.y = pointColl.Position.Floor - CLICK(0.5f);
 				}
 
-				auto pose = Pose(pos, EulerAngles::Zero);
-				TriggerShockwave(&pose, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, false, (int)ShockwaveStyle::Normal);
+				auto pose = Pose(pos, EulerAngles::Identity);
+				TriggerShockwave(&pose, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Identity, 8, true, false, false, (int)ShockwaveStyle::Normal);
 
 				Camera.bounce = -128;
 			}
