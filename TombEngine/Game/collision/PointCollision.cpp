@@ -235,6 +235,12 @@ namespace TEN::Collision
 		return (splitAngle == SectorSurfaceData::SPLIT_ANGLE_0 || splitAngle == SectorSurfaceData::SPLIT_ANGLE_1);
 	}
 
+	bool PointCollisionData::IsCeilingDiagonalSplit()
+	{
+		float splitAngle = GetTopSector().CeilingSurface.SplitAngle;
+		return (splitAngle == SectorSurfaceData::SPLIT_ANGLE_0 || splitAngle == SectorSurfaceData::SPLIT_ANGLE_1);
+	}
+
 	bool PointCollisionData::IsFloorFlippedDiagonalSplit()
 	{
 		float splitAngle = GetBottomSector().FloorSurface.SplitAngle;
