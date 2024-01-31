@@ -265,12 +265,6 @@ namespace TEN::Collision
 		constexpr auto ANGLE_STEP = ANGLE(45.0f / 4);
 
 		int bridgeItemNumber = isFloor ? GetFloorBridgeItemNumber() : GetCeilingBridgeItemNumber();
-		if (bridgeItemNumber == NO_ITEM)
-		{
-			TENLog("PointCollisionData error: invalid bridge item number in GetBridgeNormal().", LogLevel::Warning);
-			return -Vector3::UnitY;
-		}
-
 		const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
 
 		auto orient = bridgeItem.Pose.Orientation;
