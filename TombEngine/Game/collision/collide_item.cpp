@@ -929,7 +929,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 				coll.Shift = deltaPose;
 		}
 		else if (deltaPos.ToVector3().Length() <= coll.Setup.Radius && relDeltaHeight > 0 &&
-				(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Zero))
+				(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Identity))
 		{
 			// Push item away if not directly above bridge, and bridge position was changed.
 			ItemPushItem(&bridgeItem, &item);
