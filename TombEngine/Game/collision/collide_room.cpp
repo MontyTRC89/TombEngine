@@ -162,23 +162,9 @@ CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float for
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
-CollisionResult GetCollision(const Vector3i& pos, int roomNumber)
-{
-	auto pointColl = GetPointCollision(pos, roomNumber);
-	return ConvertPointCollDataToCollResult(pointColl);
-}
-
-// NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto pointColl = GetPointCollision(Vector3i(x, y, z), roomNumber);
-	return ConvertPointCollDataToCollResult(pointColl);
-}
-
-// NOTE: Deprecated. Use GetPointCollision().
-CollisionResult GetCollision(const GameVector& pos)
-{
-	auto pointColl = GetPointCollision(pos.ToVector3i(), pos.RoomNumber);
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 

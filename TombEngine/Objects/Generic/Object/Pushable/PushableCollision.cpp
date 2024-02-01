@@ -30,24 +30,24 @@ namespace TEN::Entities::Generic
 		if (pushableItem.Status == ITEM_INVISIBLE || pushableItem.TriggerFlags < 0)
 			return false;
 
-		auto pointColl = CollisionResult{};
+		auto pointColl = GetPointCollision(pushableItem);
 		if (pushable.UseRoomCollision)
 		{
 			RemovePushableBridge(pushableItem);
-			pointColl = GetCollision(&pushableItem);
+			pointColl = GetPointCollision(pushableItem);
 			AddPushableBridge(pushableItem);
 		}
 		else
 		{
-			pointColl = GetCollision(&pushableItem);
+			pointColl = GetPointCollision(pushableItem);
 		}
 
 		// 1) Check for wall.
-		if (pointColl.Block->IsWall(pushableItem.Pose.Position.x, pushableItem.Pose.Position.z))
+		if (pointColl.GetSector().IsWall(pushableItem.Pose.Position.x, pushableItem.Pose.Position.z))
 			return false;
 
 		// 2) Test height from floor.
-		int heightFromFloor = abs(pointColl.Position.Floor - pushableItem.Pose.Position.y);
+		int heightFromFloor = abs(pointColl.GetFloorHeight() - pushableItem.Pose.Position.y);
 		if (heightFromFloor >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 			return false;
 
@@ -65,18 +65,18 @@ namespace TEN::Entities::Generic
 
 		pushable.IsOnEdge = false;
 
-		auto pointColl = GetCollision(targetPos, targetRoomNumber);
+		auto pointColl = GetPointCollision(targetPos, targetRoomNumber);
 
 		// 1) Check for wall.
-		if (pointColl.Block->IsWall(targetPos.x, targetPos.z))
+		if (pointColl.GetSector().IsWall(targetPos.x, targetPos.z))
 			return false;
 		
 		// 2) Check for gaps or steps.
-		int heightFromFloor = abs(pointColl.Position.Floor - pushableItem.Pose.Position.y);
+		int heightFromFloor = abs(pointColl.GetFloorHeight() - pushableItem.Pose.Position.y);
 		if (heightFromFloor >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 		{
 			// Step.
-			if (pointColl.Position.Floor < pushableItem.Pose.Position.y)
+			if (pointColl.GetFloorHeight() < pushableItem.Pose.Position.y)
 			{
 				return false;
 			}
@@ -90,15 +90,15 @@ namespace TEN::Entities::Generic
 		}
 
 		// 3) Check for slippery floor slope.
-		if (pointColl.Position.FloorSlope)
+		if (pointColl.IsIllegalFloor())
 			return false;
 
 		// 4) Check for diagonal floor step.
-		if (pointColl.Position.DiagonalStep)
+		if (pointColl.IsDiagonalFloorStep())
 			return false;
 
 		// 5) Test floor slope. TODO: Check slope angles of normals directly.
-		if ((pointColl.Block->GetSurfaceNormal(0, true) != -Vector3::UnitY) || (pointColl.Block->GetSurfaceNormal(1, true) != -Vector3::UnitY))
+		if ((pointColl.GetSector().GetSurfaceNormal(0, true) != -Vector3::UnitY) || (pointColl.GetSector().GetSurfaceNormal(1, true) != -Vector3::UnitY))
 			return false;
 
 		// Check for stopper flag.
@@ -109,7 +109,7 @@ namespace TEN::Entities::Generic
 		}*/
 
 		// Is ceiling (square or diagonal) high enough?
-		int distFromCeil = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+		int distFromCeil = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
 		int blockHeight = GetStackHeight(pushableItem.Index) - PUSHABLE_FLOOR_HEIGHT_TOLERANCE;
 		if (distFromCeil < blockHeight)
 			return false;
@@ -174,25 +174,25 @@ namespace TEN::Entities::Generic
 		}
 
 		// This collisionResult is the point where Lara would be at the end of the pushable pull.
-		auto pointColl = GetCollision(LaraItem->Pose.Position + playerOffset, LaraItem->RoomNumber);
+		auto pointColl = GetPointCollision(LaraItem->Pose.Position + playerOffset, LaraItem->RoomNumber);
 
 		// Test for wall.
-		if (pointColl.Block->IsWall(pointColl.Coordinates.x, pointColl.Coordinates.z))
+		if (pointColl.GetSector().IsWall(pointColl.GetPosition().x, pointColl.GetPosition().z))
 			return false;
 
 		// Test for flat floor.
-		int floorHeightDelta = abs(pointColl.Position.Floor - LaraItem->Pose.Position.y);
+		int floorHeightDelta = abs(pointColl.GetFloorHeight() - LaraItem->Pose.Position.y);
 		if (floorHeightDelta >= PUSHABLE_FLOOR_HEIGHT_TOLERANCE)
 			return false;
 
 		// Test floor-to-ceiling height.
-		int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+		int floorToCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
 		if (floorToCeilHeight < LARA_HEIGHT)
 			return false;
 
 		// Collide with objects.
 		auto prevPos = LaraItem->Pose.Position;
-		LaraItem->Pose.Position = pointColl.Coordinates;
+		LaraItem->Pose.Position = pointColl.GetPosition();
 		GetCollidedObjects(LaraItem, LARA_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], true);
 		LaraItem->Pose.Position = prevPos;
 

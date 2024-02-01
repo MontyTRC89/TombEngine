@@ -339,7 +339,7 @@ namespace TEN::Collision::PointCollision
 	{
 		// TEMP HACK
 		// GetPointCollision() takes arguments for a *current* position and room number.
-		// However, since some calls to the equivalent deprecated function had *projected*
+		// However, since some calls to the old GetCollision() function had *projected*
 		// positions passed to it, the room number had be corrected to account for such cases.
 		// These are primarily found in camera.cpp.
 		short correctedRoomNumber = roomNumber;
