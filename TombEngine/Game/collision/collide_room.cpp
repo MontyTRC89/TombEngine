@@ -125,8 +125,8 @@ static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& poin
 {
 	auto collResult = CollisionResult{};
 
-	collResult.Coordinates = pointColl.Position;
-	collResult.RoomNumber = pointColl.RoomNumber;
+	collResult.Coordinates = pointColl.GetPosition();
+	collResult.RoomNumber = pointColl.GetRoomNumber();
 	collResult.Block = &pointColl.GetSector();
 	collResult.BottomBlock = &pointColl.GetBottomSector();
 
@@ -185,36 +185,21 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3&
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber)
 {
-	// HACK: GetPointCollision() takes arguments for a *current* position and room number.
-	// However, since some calls to this deprecated function had *projected*
-	// positions passed to it, the room number must be corrected to account for such cases.
-	// They are primarily found in camera.cpp.
-	short correctedRoomNumber = roomNumber;
-	GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
-
-	auto pointColl = GetPointCollision(pos, correctedRoomNumber);
+	auto pointColl = GetPointCollision(pos, roomNumber);
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
-	// HACK: Explained above.
-	short correctedRoomNumber = roomNumber;
-	GetFloor(x, y, z, &correctedRoomNumber);
-
-	auto pointColl = GetPointCollision(Vector3i(x, y, z), correctedRoomNumber);
+	auto pointColl = GetPointCollision(Vector3i(x, y, z), roomNumber);
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const GameVector& pos)
 {
-	// HACK: Explained above.
-	short correctedRoomNumber = pos.RoomNumber;
-	GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
-
-	auto pointColl = GetPointCollision(pos.ToVector3i(), correctedRoomNumber);
+	auto pointColl = GetPointCollision(pos.ToVector3i(), pos.RoomNumber);
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 

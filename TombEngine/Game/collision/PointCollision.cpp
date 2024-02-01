@@ -16,10 +16,20 @@ using namespace TEN::Math;
 
 namespace TEN::Collision
 {
-	PointCollisionData::PointCollisionData(const Vector3i& pos, int roomNumber) :
-		Position(pos),
-		RoomNumber(roomNumber)
+	PointCollisionData::PointCollisionData(const Vector3i& pos, int roomNumber)
 	{
+		_position = pos;
+		_roomNumber = roomNumber;
+	}
+
+	Vector3i PointCollisionData::GetPosition() const
+	{
+		return _position;
+	}
+
+	int PointCollisionData::GetRoomNumber() const
+	{
+		return _roomNumber;
 	}
 
 	FloorInfo& PointCollisionData::GetSector()
@@ -28,8 +38,8 @@ namespace TEN::Collision
 			return *_sectorPtr;
 
 		// Set current sector pointer.
-		short probeRoomNumber = RoomNumber;
-		_sectorPtr = GetFloor(Position.x, Position.y, Position.z, &probeRoomNumber);
+		short probeRoomNumber = _roomNumber;
+		_sectorPtr = GetFloor(_position.x, _position.y, _position.z, &probeRoomNumber);
 
 		return *_sectorPtr;
 	}
@@ -41,13 +51,13 @@ namespace TEN::Collision
 
 		// Set bottom sector pointer.
 		auto* bottomSectorPtr = &GetSector();
-		auto roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(Position);
+		auto roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(_position);
 		while (roomNumberBelow.has_value())
 		{
 			auto& room = g_Level.Rooms[roomNumberBelow.value_or(bottomSectorPtr->RoomNumber)];
-			bottomSectorPtr = Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
+			bottomSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
 
-			roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(Position);
+			roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(_position);
 		}
 		_bottomSectorPtr = bottomSectorPtr;
 
@@ -61,13 +71,13 @@ namespace TEN::Collision
 
 		// Set top sector pointer.
 		auto* topSectorPtr = &GetSector();
-		auto roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position);
+		auto roomNumberAbove = topSectorPtr->GetRoomNumberAbove(_position);
 		while (roomNumberAbove.has_value())
 		{
 			auto& room = g_Level.Rooms[roomNumberAbove.value_or(topSectorPtr->RoomNumber)];
-			topSectorPtr = Room::GetSector(&room, Position.x - room.x, Position.z - room.z);
+			topSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
 
-			roomNumberAbove = topSectorPtr->GetRoomNumberAbove(Position);
+			roomNumberAbove = topSectorPtr->GetRoomNumberAbove(_position);
 		}
 		_topSectorPtr = topSectorPtr;
 
@@ -80,8 +90,8 @@ namespace TEN::Collision
 			return *_floorHeight;
 
 		// Set floor height.
-		auto location = RoomVector(GetSector().RoomNumber, Position.y);
-		_floorHeight = Floordata::GetSurfaceHeight(location, Position.x, Position.z, true).value_or(NO_HEIGHT);
+		auto location = RoomVector(GetSector().RoomNumber, _position.y);
+		_floorHeight = Floordata::GetSurfaceHeight(location, _position.x, _position.z, true).value_or(NO_HEIGHT);
 		
 		return *_floorHeight;
 	}
@@ -92,8 +102,8 @@ namespace TEN::Collision
 			return *_ceilingHeight;
 
 		// Set ceiling height.
-		auto location = RoomVector(GetSector().RoomNumber, Position.y);
-		_ceilingHeight = Floordata::GetSurfaceHeight(location, Position.x, Position.z, false).value_or(NO_HEIGHT);
+		auto location = RoomVector(GetSector().RoomNumber, _position.y);
+		_ceilingHeight = Floordata::GetSurfaceHeight(location, _position.x, _position.z, false).value_or(NO_HEIGHT);
 		
 		return *_ceilingHeight;
 	}
@@ -110,7 +120,7 @@ namespace TEN::Collision
 		}
 		else
 		{
-			_floorNormal = GetBottomSector().GetSurfaceNormal(Position.x, Position.z, true);
+			_floorNormal = GetBottomSector().GetSurfaceNormal(_position.x, _position.z, true);
 		}
 
 		return *_floorNormal;
@@ -128,7 +138,7 @@ namespace TEN::Collision
 		}
 		else
 		{
-			_ceilingNormal = GetTopSector().GetSurfaceNormal(Position.x, Position.z, false);
+			_ceilingNormal = GetTopSector().GetSurfaceNormal(_position.x, _position.z, false);
 		}
 
 		return *_ceilingNormal;
@@ -141,7 +151,7 @@ namespace TEN::Collision
 
 		// Set floor bridge item number.
 		int floorHeight = GetFloorHeight();
-		auto pos = Vector3i(Position.x, floorHeight, Position.z);
+		auto pos = Vector3i(_position.x, floorHeight, _position.z);
 		_floorBridgeItemNumber = GetBottomSector().GetInsideBridgeItemNumber(pos, true, false);
 
 		return *_floorBridgeItemNumber;
@@ -154,7 +164,7 @@ namespace TEN::Collision
 
 		// Set ceiling bridge item number.
 		int ceilingHeight = GetCeilingHeight();
-		auto pos = Vector3i(Position.x, ceilingHeight, Position.z);
+		auto pos = Vector3i(_position.x, ceilingHeight, _position.z);
 		_ceilingBridgeItemNumber = GetTopSector().GetInsideBridgeItemNumber(pos, false, true);
 
 		return *_ceilingBridgeItemNumber;
@@ -166,7 +176,7 @@ namespace TEN::Collision
 			return *_waterSurfaceHeight;
 
 		// Set water surface height.
-		_waterSurfaceHeight = GetWaterSurface(Position.x, Position.y, Position.z, RoomNumber);
+		_waterSurfaceHeight = GetWaterSurface(_position.x, _position.y, _position.z, _roomNumber);
 
 		return *_waterSurfaceHeight;
 	}
@@ -177,7 +187,7 @@ namespace TEN::Collision
 			return *_waterBottomHeight;
 
 		// Set water bottom height.
-		_waterBottomHeight = GetWaterDepth(Position.x, Position.y, Position.z, RoomNumber);
+		_waterBottomHeight = GetWaterDepth(_position.x, _position.y, _position.z, _roomNumber);
 
 		return *_waterBottomHeight;
 	}
@@ -188,7 +198,7 @@ namespace TEN::Collision
 			return *_waterTopHeight;
 
 		// Set water top height.
-		_waterTopHeight = GetWaterHeight(Position.x, Position.y, Position.z, RoomNumber);
+		_waterTopHeight = GetWaterHeight(_position.x, _position.y, _position.z, _roomNumber);
 
 		return *_waterTopHeight;
 	}
@@ -204,7 +214,7 @@ namespace TEN::Collision
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
 		short illegalSlopeAngle = (GetFloorBridgeItemNumber() != NO_ITEM) ?
 			DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE :
-			GetBottomSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, true);
+			GetBottomSector().GetSurfaceIllegalSlopeAngle(_position.x, _position.z, true);
 		
 		return (abs(slopeAngle) >= illegalSlopeAngle);
 	}
@@ -214,7 +224,7 @@ namespace TEN::Collision
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
 		short illegalSlopeAngle = (GetCeilingBridgeItemNumber() != NO_ITEM) ?
 			DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE :
-			GetTopSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, false);
+			GetTopSector().GetSurfaceIllegalSlopeAngle(_position.x, _position.z, false);
 		
 		return (abs(slopeAngle) >= illegalSlopeAngle);
 	}
@@ -255,7 +265,7 @@ namespace TEN::Collision
 
 	bool PointCollisionData::TestEnvironmentFlag(RoomEnvFlags envFlag)
 	{
-		const auto& room = g_Level.Rooms[RoomNumber];
+		const auto& room = g_Level.Rooms[_roomNumber];
 		return ((room.flags & envFlag) == envFlag);
 	}
 
@@ -327,7 +337,15 @@ namespace TEN::Collision
 
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber)
 	{
-		return PointCollisionData(pos, roomNumber);
+		// TEMP HACK
+		// GetPointCollision() takes arguments for a *current* position and room number.
+		// However, since some calls to the equivalent deprecated function had *projected*
+		// positions passed to it, the room number had be corrected to account for such cases.
+		// These are primarily found in camera.cpp.
+		short correctedRoomNumber = roomNumber;
+		GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
+
+		return PointCollisionData(pos, correctedRoomNumber);
 	}
 
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)

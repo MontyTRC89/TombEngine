@@ -12,12 +12,11 @@ namespace TEN::Collision
 {
 	class PointCollisionData
 	{
-	public:
-		// Members
-		const Vector3i Position	  = Vector3i::Zero;
-		const int	   RoomNumber = 0;
-
 	private:
+		// Members
+		Vector3i _position	= Vector3i::Zero;
+		int		 _roomNumber = 0;
+
 		FloorInfo* _sectorPtr		= nullptr;
 		FloorInfo* _bottomSectorPtr = nullptr;
 		FloorInfo* _topSectorPtr	= nullptr;
@@ -38,6 +37,9 @@ namespace TEN::Collision
 		PointCollisionData(const Vector3i& pos, int roomNumber);
 
 		// Getters
+		Vector3i GetPosition() const;
+		int		 GetRoomNumber() const;
+
 		FloorInfo& GetSector();
 		FloorInfo& GetBottomSector();
 		FloorInfo& GetTopSector();
