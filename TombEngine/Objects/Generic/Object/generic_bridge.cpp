@@ -23,7 +23,7 @@ namespace TEN::Entities::Generic
 
 		// Calculate and return tilt offset.
 		float relPlaneHeight = -((normal.x * deltaPos.x) + (normal.z * deltaPos.z)) / normal.y;
-		return ((relPlaneHeight / 4) + CLICK(tiltGrade * 0.5f)); // TODO: Wrong when walking near some bridge edges?
+		return ((relPlaneHeight / 4) + CLICK(tiltGrade * 0.5f));
 	}
 
 	template <int tiltGrade>
