@@ -7,6 +7,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
@@ -37,6 +38,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
@@ -1257,8 +1259,8 @@ PlayerWaterData GetPlayerWaterData(ItemInfo& item)
 	int waterDepth = GetWaterDepth(&item);
 	int waterHeight = GetWaterHeight(&item);
 
-	auto pointColl = GetCollision(item);
-	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.Position.Floor) - waterHeight);
+	auto pointColl = GetPointCollision(item);
+	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.GetFloorHeight()) - waterHeight);
 
 	return PlayerWaterData
 	{

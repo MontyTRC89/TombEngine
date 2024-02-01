@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
@@ -17,6 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
@@ -262,7 +264,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		case GuardOcb::RopeDownFast:
 			SetAnimation(item, GUARD_ANIM_ROPE_DOWN_FAST);
-			item->Pose.Position.y = GetCollision(*item).Position.Ceiling - BLOCK(2);
+			item->Pose.Position.y = GetPointCollision(*item).GetCeilingHeight() - BLOCK(2);
 			break;
 
 		case GuardOcb::WaitOnWall:

@@ -14,7 +14,7 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 
-namespace TEN::Collision
+namespace TEN::Collision::PointCollision
 {
 	PointCollisionData::PointCollisionData(const Vector3i& pos, int roomNumber)
 	{

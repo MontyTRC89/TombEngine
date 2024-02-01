@@ -47,8 +47,8 @@
 #include "Specific/Input/Input.h"
 #include "Specific/winmain.h"
 
-using namespace TEN::Collision;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;

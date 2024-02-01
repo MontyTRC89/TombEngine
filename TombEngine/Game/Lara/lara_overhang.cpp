@@ -2,8 +2,9 @@
 #include "Game/Lara/lara_overhang.h"
 
 #include "Game/camera.h"
-#include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
@@ -16,6 +17,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
@@ -967,12 +969,12 @@ void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_LADDER_IDLE (56)
 bool LadderMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	auto probe = GetCollision(*item);
+	auto probe = GetPointCollision(*item);
 
-	if (probe.Position.CeilingSlope)
+	if (probe.IsIllegalCeiling())
 		return false;
 
-	if (probe.BottomBlock->Flags.Monkeyswing && (item->Pose.Position.y - coll->Setup.Height - CLICK(0.5f) <= probe.Position.Ceiling))
+	if (probe.GetBottomSector().Flags.Monkeyswing && (item->Pose.Position.y - coll->Setup.Height - CLICK(0.5f) <= probe.GetCeilingHeight()))
 	{
 		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return true;

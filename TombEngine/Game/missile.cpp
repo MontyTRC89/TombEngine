@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/explosion.h"
@@ -15,6 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::PointCollision;;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Math;
@@ -142,23 +144,23 @@ void ControlNatlaGun(short fxNumber)
 	// If first frame, start another explosion at next position.
 	if (fx.frameNumber == -1)
 	{
-		auto pointColl = GetCollision(fx.pos.Position, fx.roomNumber, fx.pos.Orientation.y, fx.speed);
+		auto pointColl = GetPointCollision(fx.pos.Position, fx.roomNumber, fx.pos.Orientation.y, fx.speed);
 
 		// Don't create one if hit a wall.
-		if (pointColl.Coordinates.y >= pointColl.Position.Floor ||
-			pointColl.Coordinates.y <= pointColl.Position.Ceiling)
+		if (pointColl.GetPosition().y >= pointColl.GetFloorHeight() ||
+			pointColl.GetPosition().y <= pointColl.GetCeilingHeight())
 		{
 			return;
 		}
 
-		fxNumber = CreateNewEffect(pointColl.RoomNumber);
+		fxNumber = CreateNewEffect(pointColl.GetRoomNumber());
 		if (fxNumber != NO_ITEM)
 		{
 			auto& fxNew = EffectList[fxNumber];
 
-			fxNew.pos.Position = pointColl.Coordinates;
+			fxNew.pos.Position = pointColl.GetPosition();
 			fxNew.pos.Orientation.y = fx.pos.Orientation.y;
-			fxNew.roomNumber = pointColl.RoomNumber;
+			fxNew.roomNumber = pointColl.GetRoomNumber();
 			fxNew.speed = fx.speed;
 			fxNew.frameNumber = 0;
 			fxNew.objectNumber = ID_PROJ_BOMB;

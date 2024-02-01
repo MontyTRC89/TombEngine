@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/BridgeObject.h"
@@ -12,6 +13,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
@@ -309,14 +311,14 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushable = GetPushableInfo(item);
 
-		auto pointColl = CollisionResult{};
+		auto pointColl = GetPointCollision(item);
 		int waterHeight = NO_HEIGHT;
 
 		if (pushable.UseBridgeCollision)
 		{
 			RemovePushableBridge(item);
 
-			pointColl = GetCollision(item);
+			pointColl = GetPointCollision(item);
 			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
@@ -326,7 +328,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			pointColl = GetCollision(item);
+			pointColl = GetPointCollision(item);
 			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
@@ -334,8 +336,8 @@ namespace TEN::Entities::Generic
 		}
 
 		auto pushableColl = PushableCollisionData{};
-		pushableColl.FloorHeight = pointColl.Position.Floor;
-		pushableColl.CeilingHeight = pointColl.Position.Ceiling;
+		pushableColl.FloorHeight = pointColl.GetFloorHeight();
+		pushableColl.CeilingHeight = pointColl.GetCeilingHeight();
 
 		// Above water.
 		if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) ||
@@ -367,7 +369,7 @@ namespace TEN::Entities::Generic
 			// Grounded.
 			else
 			{
-				auto floorSlopeAngle = Geometry::GetSurfaceSlopeAngle(pointColl.FloorNormal);
+				auto floorSlopeAngle = Geometry::GetSurfaceSlopeAngle(pointColl.GetFloorNormal());
 
 				if (floorSlopeAngle == 0)
 				{

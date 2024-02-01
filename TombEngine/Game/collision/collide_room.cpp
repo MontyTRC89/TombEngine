@@ -13,8 +13,8 @@
 #include "Sound/sound.h"
 #include "Renderer/Renderer.h"
 
-using namespace TEN::Collision;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -148,13 +148,6 @@ static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& poin
 }
 
 // NOTE: Deprecated. Use GetPointCollision().
-CollisionResult GetCollision(const ItemInfo& item)
-{
-	auto pointColl = GetPointCollision(item);
-	return ConvertPointCollDataToCollResult(pointColl);
-}
-
-// NOTE: Deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const ItemInfo* item)
 {
 	auto pointColl = GetPointCollision(*item);
@@ -165,20 +158,6 @@ CollisionResult GetCollision(const ItemInfo* item)
 CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	auto pointColl = GetPointCollision(*item, headingAngle, forward, down, right);
-	return ConvertPointCollDataToCollResult(pointColl);
-}
-
-// NOTE: Deprecated. Use GetPointCollision().
-CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
-{
-	auto pointColl = GetPointCollision(pos, roomNumber, headingAngle, forward, down, right);
-	return ConvertPointCollDataToCollResult(pointColl);
-}
-
-// NOTE: Deprecated. Use GetPointCollision().
-CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
-{
-	auto pointColl = GetPointCollision(pos, roomNumber, dir, dist);
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 

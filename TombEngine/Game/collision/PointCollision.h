@@ -8,7 +8,7 @@ struct ItemInfo;
 
 using namespace TEN::Math;
 
-namespace TEN::Collision
+namespace TEN::Collision::PointCollision
 {
 	class PointCollisionData
 	{

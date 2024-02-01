@@ -2,6 +2,8 @@
 #include "Objects/TR3/Trap/ElectricCleaner.h"
 
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/box.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/spark.h"
@@ -9,6 +11,8 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 
+using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 
@@ -72,21 +76,24 @@ namespace TEN::Entities::Traps
 	static bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
 	{
 		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(1));
-		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(1));
+		auto pointColl = GetPointCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(1));
+
+		// TODO: Use floor normal directly.
+		auto floorTilt = GetSurfaceTilt(pointColl.GetFloorNormal(), true);
 
 		// Test for wall.
-		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
+		if (pointColl.GetSector().IsWall(projectedPos.x, projectedPos.z))
 			return false;
 
 		// Test for slippery slope.
-		if (pointColl.Position.FloorSlope)
+		if (pointColl.IsIllegalFloor())
 			return false;
 
 		// Flat floor.
-		if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
+		if (abs(floorTilt.x) == 0 && abs(floorTilt.y) == 0)
 		{
 			// Test for step.
-			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
+			int relFloorHeight = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
 			if (relFloorHeight >= CLICK(1))
 				return false;
 		}
@@ -94,25 +101,25 @@ namespace TEN::Entities::Traps
 		else
 		{
 			// Half block.
-			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
+			int relFloorHeight = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
 			if (relFloorHeight > CLICK(2))
 				return false;
 
 			short slopeAngle = ANGLE(0.0f);
-			if (pointColl.FloorTilt.x > 0)
+			if (floorTilt.x > 0)
 			{
 				slopeAngle = ANGLE(-90.0f);
 			}
-			else if (pointColl.FloorTilt.x < 0)
+			else if (floorTilt.x < 0)
 			{
 				slopeAngle = ANGLE(90.0f);
 			}
 
-			if (pointColl.FloorTilt.y > 0 && pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
+			if (floorTilt.y > 0 && floorTilt.y > abs(floorTilt.x))
 			{
 				slopeAngle = ANGLE(180.0f);
 			}
-			else if (pointColl.FloorTilt.y < 0 && -pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
+			else if (floorTilt.y < 0 && -floorTilt.y > abs(floorTilt.x))
 			{
 				slopeAngle = ANGLE(0.0f);
 			}
@@ -126,28 +133,28 @@ namespace TEN::Entities::Traps
 		}
 
 		// Check for diagonal split.
-		if (pointColl.Position.DiagonalStep)
+		if (pointColl.IsDiagonalFloorStep())
 			return false;
 
 		// Test ceiling height.
-		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+		int relCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
 		int cleanerHeight = BLOCK(1);
 		if (relCeilHeight < cleanerHeight)
 			return false;
 
 		// Check for inaccessible sector.
-		if (pointColl.Block->Box == NO_BOX)
+		if (pointColl.GetSector().Box == NO_BOX)
 			return false;
 
 		// Check for blocked grey box.
-		if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKABLE)
+		if (g_Level.Boxes[pointColl.GetSector().Box].flags & BLOCKABLE)
 		{
-			if (g_Level.Boxes[pointColl.Block->Box].flags& BLOCKED)
+			if (g_Level.Boxes[pointColl.GetSector().Box].flags& BLOCKED)
 				return false;
 		}
 
 		// Check for stopper flag.
-		if (pointColl.Block->Stopper)
+		if (pointColl.GetSector().Stopper)
 			return false;
 
 		return true;
@@ -309,8 +316,8 @@ namespace TEN::Entities::Traps
 
 		case ElectricCleanerState::MOVE:
 			{
-				auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
-				item.Pose.Position.y = pointColl.Position.Floor;
+				auto pointColl = GetPointCollision(item);
+				item.Pose.Position.y = pointColl.GetFloorHeight();
 
 				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y, 0).ToDirection();
 
@@ -321,7 +328,7 @@ namespace TEN::Entities::Traps
 					(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
 				{
 					// Only turn on flat floor.
-					if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
+					if (pointColl.GetFloorNormal() == -Vector3::UnitY)
 						activeState = ElectricCleanerState::CHOOSE_PATH;
 				}
 			}

@@ -22,13 +22,13 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision;
-using TEN::Renderer::g_Renderer;
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
 constexpr auto COLL_CHECK_THRESHOLD    = BLOCK(4);
