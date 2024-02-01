@@ -168,13 +168,6 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return ConvertPointCollDataToCollResult(pointColl);
 }
 
-// NOTE: Deprecated. Use GetPointCollision().
-CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
-{
-	auto pointColl = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber);
-	return ConvertPointCollDataToCollResult(pointColl);
-}
-
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
 {
 	GetCollisionInfo(coll, item, Vector3i::Zero, resetRoom);
@@ -1225,7 +1218,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 				!TestEnvironment(ENV_FLAG_SWAMP, roomPtr))
 			{
 				int waterHeight = sectorPtr->GetSurfaceHeight(x, z, false);
-				int floorHeight = GetCollision(sectorPtr, x, y, z).BottomBlock->GetSurfaceHeight(x, z, true);
+				int floorHeight = GetPointCollision(Vector3i(x, y, z), sectorPtr->RoomNumber).GetBottomSector().GetSurfaceHeight(x, z, true);
 				return (floorHeight - waterHeight);
 			}
 
@@ -1334,7 +1327,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			sectorPtr = GetSector(room, x - room->x, z - room->z);
 		}
 
-		return GetCollision(sectorPtr, x, y, z).Block->GetSurfaceHeight(Vector3i(x, y, z), false);
+		return GetPointCollision(Vector3i(x, y, z), sectorPtr->RoomNumber).GetSector().GetSurfaceHeight(Vector3i(x, y, z), false);
 	}
 	else if (sectorPtr->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
 	{
@@ -1351,7 +1344,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			sectorPtr = GetSector(roomPtr2, x - roomPtr2->x, z - roomPtr2->z);
 		}
 
-		return GetCollision(sectorPtr, x, y, z).Block->GetSurfaceHeight(Vector3i(x, y, z), true);
+		return GetPointCollision(Vector3i(x, y, z), sectorPtr->RoomNumber).GetSector().GetSurfaceHeight(Vector3i(x, y, z), true);
 	}
 
 	return NO_HEIGHT;

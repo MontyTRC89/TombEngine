@@ -370,11 +370,11 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 		if (GetClimbFlags(probeUp.BottomBlock) & slopeData.ClimbOrient &&
 			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, CLICK(3), CLICK(4)))
 		{
-			if (GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= (BLOCK(1.5f) - 80))  // Check if a wall is actually there.
-			{
-				AlignToEdge(item, FORWARD_ALIGNMENT);
-				SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONVEX_START);
-			}
+			//if (GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= (BLOCK(1.5f) - 80))  // Check if a wall is actually there.
+			//{
+			//	AlignToEdge(item, FORWARD_ALIGNMENT);
+			//	SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONVEX_START);
+			//}
 		}
 
 		// Test for monkey at next position.
@@ -415,13 +415,13 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Back))
 	{
-		if ((GetClimbFlags(GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & slopeData.ClimbOrient) &&
-			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1)))
-		{
-			AlignToEdge(item, BACKWARD_ALIGNMENT);
-			SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONCAVE); // Slope to underlying ladder transition (concave).
-			return;
-		}
+		//if ((GetClimbFlags(GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & slopeData.ClimbOrient) &&
+		//	InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1)))
+		//{
+		//	AlignToEdge(item, BACKWARD_ALIGNMENT);
+		//	SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONCAVE); // Slope to underlying ladder transition (concave).
+		//	return;
+		//}
 
 		if (probeDown.BottomBlock->Flags.Monkeyswing)
 		{
@@ -1075,8 +1075,8 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 			{
 				lara->Context.NextCornerPos.Orientation.z = AlignToGrab(item);
 
-				int ceiling = GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).Position.Ceiling;
-				item->Pose.Position.y = ceiling + HEIGHT_ADJUST;
+				/*int ceiling = GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).Position.Ceiling;
+				item->Pose.Position.y = ceiling + HEIGHT_ADJUST;*/
 
 				SetAnimation(item, LA_OVERHANG_HANG_SWING);
 			}
@@ -1091,7 +1091,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 			if (abs(OrientDelta(slopeData.GoalOrient, item->Pose.Orientation.y)) <= ANGLE(30.0f) &&
 				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(0.5f)))
 			{
-				if (probeDown.BottomBlock->Flags.Monkeyswing)
+				/*if (probeDown.BottomBlock->Flags.Monkeyswing)
 				{
 					int ceiling = GetCollision(probeDown.Block, down.x, now.y, down.z).Position.Ceiling;
 					int yDiff = ceiling - probeNow.Position.Ceiling;
@@ -1115,7 +1115,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 						return;
 						//item->Pose.Position.y = ceiling + 914;
 					}
-				}
+				}*/
 			}
 		}
 

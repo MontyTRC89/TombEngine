@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/smoke.h"
@@ -22,6 +23,7 @@
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Renderer/Renderer.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Collision::Room;
 using namespace TEN::Effects::Smoke;
 
@@ -1508,9 +1510,9 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 	}
 	else
 	{
-		auto pointColl = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
+		auto pointColl = GetPointCollision(enemy->Pose.Position, floor->RoomNumber);
 		auto bounds = GameBoundingBox(item);
-		isReachable = abs(enemy->Pose.Position.y - pointColl.Position.Floor) < bounds.GetHeight();
+		isReachable = abs(enemy->Pose.Position.y - pointColl.GetFloorHeight()) < bounds.GetHeight();
 	}
 
 	return (isReachable ? floor->Box : NO_BOX);

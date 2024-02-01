@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -24,6 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
@@ -516,7 +518,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (GetCollision(floor, x, y, z).Position.Floor == y)
+			if (GetPointCollision(Vector3i(x, y, z), floor->RoomNumber).GetFloorHeight() == y)
 				break;
 			return;
 
