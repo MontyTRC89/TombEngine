@@ -916,8 +916,7 @@ namespace TEN::Collision::Floordata
 	{
 		constexpr auto VERTICAL_MARGIN = 4;
 
-		auto bounds = GameBoundingBox(&item);
-		auto box = bounds.ToBoundingOrientedBox(item.Pose);
+		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 		
 		auto origin = Vector3(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z);
 		auto dir = useBottomHeight ? -Vector3::UnitY : Vector3::UnitY;
