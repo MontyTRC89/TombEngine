@@ -209,7 +209,7 @@ namespace TEN::Collision
 				GetFloorHeight() <= GetCeilingHeight());
 	}
 
-	bool PointCollisionData::IsIllegalFloor(short slopeAngleMin)
+	bool PointCollisionData::IsIllegalFloor()
 	{
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
 		short illegalSlopeAngle = (GetFloorBridgeItemNumber() != NO_ITEM) ?
@@ -219,7 +219,7 @@ namespace TEN::Collision
 		return (abs(slopeAngle) >= illegalSlopeAngle);
 	}
 
-	bool PointCollisionData::IsIllegalCeiling(short slopeAngleMin)
+	bool PointCollisionData::IsIllegalCeiling()
 	{
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
 		short illegalSlopeAngle = (GetCeilingBridgeItemNumber() != NO_ITEM) ?

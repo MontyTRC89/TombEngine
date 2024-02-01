@@ -57,8 +57,8 @@ namespace TEN::Collision
 
 		// Inquirers
 		bool IsWall();
-		bool IsIllegalFloor(short slopeAngleMin = DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE);
-		bool IsIllegalCeiling(short slopeAngleMin = DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE);
+		bool IsIllegalFloor();
+		bool IsIllegalCeiling();
 		bool IsDiagonalFloorStep();
 		bool IsDiagonalCeilingStep();
 		bool IsFloorDiagonalSplit();
