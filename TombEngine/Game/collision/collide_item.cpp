@@ -898,22 +898,20 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
 	ShiftItem(&item, &coll);
 }
 
-void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult)
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& pointColl)
 {
-	// Store an offset for a bridge item into shifts, if exists.
-	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_ITEM)
+	// Store offset for bridge item into shifts if it exists.
+	if (coll.LastBridgeItemNumber == pointColl.Position.Bridge &&
+		coll.LastBridgeItemNumber != NO_ITEM)
 	{
-		auto& bridgeItem = g_Level.Items[collResult.Position.Bridge];
+		auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
 
 		auto deltaPos = bridgeItem.Pose.Position - coll.LastBridgeItemPose.Position;
 		auto deltaOrient = bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation;
 		auto deltaPose = Pose(deltaPos, deltaOrient);
 
-		int absDeltaHeight = item.Pose.Position.y - collResult.Position.Floor;
-		int relDeltaHeight = absDeltaHeight + GameBoundingBox(&item).Y2;
-
-		if (deltaPose != Pose::Zero && 
-			(abs(absDeltaHeight) <= CLICK(1 / 8.0f) || abs(relDeltaHeight) <= CLICK(1 / 8.0f)))
+		// Item is grounded and bridge position changed; set shift.
+		if (deltaPose != Pose::Zero && !item.Animation.IsAirborne)
 		{
 			const auto& bridgePos = bridgeItem.Pose.Position;
 
@@ -923,15 +921,18 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 			auto offset = bridgePos.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
 
 			deltaPose.Position -= item.Pose.Position - Vector3i(offset);
-		   
-			// Don't update shifts if difference is too big (possibly bridge was teleported or just entered bridge).
-			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius * 2)
+
+			// Don't update shifts if difference is too big (bridge was possibly teleported or just entered).
+			if (Vector2(deltaPose.Position.x, deltaPose.Position.z).Length() <= (coll.Setup.Radius * 2))
+			{
+				deltaPose.Orientation = EulerAngles(0, deltaPose.Orientation.y, 0);
 				coll.Shift = deltaPose;
+			}
 		}
-		else if (deltaPos.ToVector3().Length() <= coll.Setup.Radius && relDeltaHeight > 0 &&
-				(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Identity))
+		// Push item.
+		else if (Vector2(deltaPose.Position.x, deltaPose.Position.z).Length() <= coll.Setup.Radius &&
+			(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Identity))
 		{
-			// Push item away if not directly above bridge, and bridge position was changed.
 			ItemPushItem(&bridgeItem, &item);
 		}
 
@@ -943,7 +944,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 		coll.LastBridgeItemNumber = NO_ITEM;
 	}
 
-	coll.LastBridgeItemNumber = collResult.Position.Bridge;
+	coll.LastBridgeItemNumber = pointColl.Position.Bridge;
 }
 
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)

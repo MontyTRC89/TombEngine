@@ -925,7 +925,7 @@ namespace TEN::Collision::Floordata
 		// Ray intersects box; return bridge box height.
 		float dist = 0.0f;
 		if (box.Intersects(origin, dir, dist))
-			return (item.Pose.Position.y + (useBottomHeight ? bounds.Y2 : bounds.Y1));
+			return Geometry::TranslatePoint(origin, dir, dist).y;
 
 		return std::nullopt;
 	}

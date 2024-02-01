@@ -143,7 +143,7 @@ static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& poin
 	// NOTE: Bridge tilts ignored by old method.
 	collResult.FloorTilt = GetSurfaceTilt(collResult.FloorNormal, true).ToVector2();
 	collResult.CeilingTilt = GetSurfaceTilt(collResult.CeilingNormal, false).ToVector2();
-
+	
 	return collResult;
 }
 
@@ -223,40 +223,6 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
 	auto pointColl = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber);
 	return ConvertPointCollDataToCollResult(pointColl);
-
-	auto result = CollisionResult{};
-
-	result.Coordinates = Vector3i(x, y, z);
-	result.Position.Floor = GetFloorHeight(RoomVector(floor->RoomNumber, y), x, z).value_or(NO_HEIGHT);
-	result.Position.Ceiling = GetCeilingHeight(RoomVector(floor->RoomNumber, y), x, z).value_or(NO_HEIGHT);
-	
-	result.Block = floor;
-	while (floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
-	{
-		auto* room = &g_Level.Rooms[floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(floor->RoomNumber)];
-		floor = Room::GetSector(room, x - room->x, z - room->z);
-	}
-	result.BottomBlock = floor;
-
-	// Get surface noramls.
-	result.FloorNormal = floor->GetSurfaceNormal(x, z, true);
-	result.CeilingNormal = floor->GetSurfaceNormal(x, z, false);
-
-	// Backport surface normals to tilts.
-	result.FloorTilt = GetSurfaceTilt(result.FloorNormal, true).ToVector2();
-	result.CeilingTilt = GetSurfaceTilt(result.CeilingNormal, false).ToVector2();
-
-	// Split, bridge and slope data.
-	result.Position.DiagonalStep = floor->IsSurfaceDiagonalStep(true);
-	result.Position.SplitAngle = TO_RAD(floor->FloorSurface.SplitAngle);
-	result.Position.Bridge = result.BottomBlock->GetInsideBridgeItemNumber(Vector3i(x, result.Position.Floor, z), true, false);
-	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(result.FloorTilt.x) >= 3 || (abs(result.FloorTilt.y) >= 3));
-
-	// TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
-	// NOTE: Already fixed if using GetPointCollision().
-	result.Position.CeilingSlope = abs(result.CeilingTilt.x) >= 4 || abs(result.CeilingTilt.y) >= 4;
-
-	return result;
 }
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)

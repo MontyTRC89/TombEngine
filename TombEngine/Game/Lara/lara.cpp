@@ -63,9 +63,67 @@ LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 
+//---------debug
+#include <OISKeyboard.h>
+#include "Specific/Input/Input.h"
+//----------
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
+
+	//---------debug
+
+	static int bridgeItemNumber = NO_ITEM;
+	if (coll->LastBridgeItemNumber != NO_ITEM)
+		bridgeItemNumber = coll->LastBridgeItemNumber;
+
+	if (bridgeItemNumber != NO_ITEM)
+	{
+		constexpr auto TRANSLATE_STEP = BLOCK(0.1f);
+
+		auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+
+		// Move bridge.
+		if (KeyMap[OIS::KeyCode::KC_K])
+		{
+			auto rotMatrix = EulerAngles(0, Camera.actualAngle, 0).ToRotationMatrix();
+			auto offset = Vector3(AxisMap[(int)InputAxis::Mouse].x, 0.0f, -AxisMap[(int)InputAxis::Mouse].y) * 1000;
+			bridgeItem.Pose.Position += Vector3::Transform(offset, rotMatrix);
+
+			UpdateItemRoom(bridgeItem.Index);
+			UpdateBridgeItem(bridgeItem);
+		}
+		else if (KeyMap[OIS::KeyCode::KC_L])
+		{
+			auto offset = Vector3(0.0f, AxisMap[(int)InputAxis::Mouse].y, 0.0f) * 1000;
+			bridgeItem.Pose.Position += offset;
+
+			UpdateItemRoom(bridgeItem.Index);
+			UpdateBridgeItem(bridgeItem);
+		}
+		// Rotate bridge.
+		else if (KeyMap[OIS::KeyCode::KC_H])
+		{
+			auto rotMatrix = EulerAngles(0, Camera.actualAngle, 0).ToRotationMatrix();
+			auto offset = Vector3(AxisMap[(int)InputAxis::Mouse].x, 0.0f, -AxisMap[(int)InputAxis::Mouse].y) * 10000;
+			offset = Vector3::Transform(offset, rotMatrix);
+
+			auto rot = EulerAngles(-AxisMap[(int)InputAxis::Mouse].x * 10000, 0.0f, -AxisMap[(int)InputAxis::Mouse].y * 10000);
+			bridgeItem.Pose.Orientation += rot;
+
+			UpdateItemRoom(bridgeItem.Index);
+			UpdateBridgeItem(bridgeItem);
+		}
+		else if (KeyMap[OIS::KeyCode::KC_J])
+		{
+			auto rot = EulerAngles(0.0f, AxisMap[(int)InputAxis::Mouse].y * 10000, 0.0f);
+			bridgeItem.Pose.Orientation += rot;
+
+			UpdateItemRoom(bridgeItem.Index);
+			UpdateBridgeItem(bridgeItem);
+		}
+	}
 
 	auto pointColl = GetPointCollision(*item);
 
@@ -75,6 +133,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	g_Renderer.PrintDebugMessage("Floor bridge: %d", pointColl.GetFloorBridgeItemNumber());
 	g_Renderer.PrintDebugMessage("Ceiling bridge: %d", pointColl.GetCeilingBridgeItemNumber());
+
+	//----------
 
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)

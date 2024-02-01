@@ -45,7 +45,7 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
-void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult);
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& pointColl);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void ObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

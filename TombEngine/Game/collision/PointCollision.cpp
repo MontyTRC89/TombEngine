@@ -201,21 +201,21 @@ namespace TEN::Collision
 
 	bool PointCollisionData::IsIllegalFloor(short slopeAngleMin)
 	{
-		if (GetFloorBridgeItemNumber() != NO_ITEM)
-			return false;
-
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
-		short illegalSlopeAngle = GetBottomSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, true);
+		short illegalSlopeAngle = (GetFloorBridgeItemNumber() != NO_ITEM) ?
+			DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE :
+			GetBottomSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, true);
+		
 		return (abs(slopeAngle) >= illegalSlopeAngle);
 	}
 
 	bool PointCollisionData::IsIllegalCeiling(short slopeAngleMin)
 	{
-		if (GetCeilingBridgeItemNumber() != NO_ITEM)
-			return false;
-
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
-		short illegalSlopeAngle = GetTopSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, false);
+		short illegalSlopeAngle = (GetCeilingBridgeItemNumber() != NO_ITEM) ?
+			DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE :
+			GetTopSector().GetSurfaceIllegalSlopeAngle(Position.x, Position.z, false);
+		
 		return (abs(slopeAngle) >= illegalSlopeAngle);
 	}
 
