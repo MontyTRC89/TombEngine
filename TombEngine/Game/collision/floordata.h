@@ -194,9 +194,17 @@ namespace TEN::Collision::Floordata
 
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
+	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
+	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);
+	FloorInfo& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumber = nullptr);
 	
+	std::optional<int> GetBottomHeight(FloorInfo& startSector, Vector3i pos, int* bottomRoomNumberPtr = nullptr, FloorInfo** bottomSectorPtr = nullptr);
+	std::optional<int> GetTopHeight(FloorInfo& startSector, Vector3i pos, int* topRoomNumberPtr = nullptr, FloorInfo** topSectorPtr = nullptr);
 	std::optional<int> GetSurfaceHeight(const RoomVector& location, int x, int z, bool isFloor);
-	RoomVector		   GetRoom(RoomVector location, const Vector3i& pos);
+	
+	std::optional<RoomVector> GetBottomRoom(RoomVector location, const Vector3i& pos);
+	std::optional<RoomVector> GetTopRoom(RoomVector location, const Vector3i& pos);
+	RoomVector				  GetRoom(RoomVector location, const Vector3i& pos);
 
 	void AddBridge(int itemNumber, int x = 0, int z = 0);
 	void RemoveBridge(int itemNumber, int x = 0, int z = 0);
