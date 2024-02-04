@@ -32,6 +32,8 @@ namespace TEN::Entities::Traps
 		if (!TriggerActive(&item))
 			return;
 
+		item.ItemFlags[0] = item.TriggerFlags;
+
 		int forwardVel = item.ItemFlags[0];
 		auto bounds = GameBoundingBox(&item);
 
@@ -87,7 +89,10 @@ namespace TEN::Entities::Traps
 
 			SoundEffect(SFX_TR4_LARA_GRABFEET, &playerItem->Pose);
 			//pushes Lara along with the wall.
-			playerItem->Pose.Position = Geometry::TranslatePoint(playerItem->Pose.Position, item.Pose.Orientation.y, item.ItemFlags[0] + playerItem->Animation.Velocity.z);
+			int velocity = playerItem->Animation.Velocity.z;
+
+			playerItem->Pose.Position = Geometry::TranslatePoint(playerItem->Pose.Position, item.Pose.Orientation.y, (item.ItemFlags[0] > 0) ? (item.ItemFlags[0] + velocity) : (item.ItemFlags[0] - velocity));
+
 		}
 	}
 }
