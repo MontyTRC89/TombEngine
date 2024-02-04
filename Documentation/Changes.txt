@@ -1,6 +1,11 @@
 Version 1.3
 ===========
 
+* Ported Winston from TR3.
+
+Version 1.3
+===========
+
 * Fixed crash if title logo is removed from Textures folder.
 * Fixed crash if unknown player state ID is encountered.
 * Fixed bug with OCB 2 on pushables, and some other pushable bugs.
