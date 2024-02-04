@@ -29,7 +29,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		if (!TriggerActive(&item) || item.Status == ITEM_DEACTIVATED)
+		if (!TriggerActive(&item))
 			return;
 
 		int forwardVel = item.ItemFlags[0];
@@ -37,12 +37,9 @@ namespace TEN::Entities::Traps
 
 		// Get point collision.
 		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1);
-		int upperFloorBound = item.Pose.Position.y;
-		int lowerCeilBound = item.Pose.Position.y + bounds.Y1;
 
 		// Stop moving.
-		if (pointColl.Position.Floor < upperFloorBound ||
-			pointColl.Position.Ceiling > lowerCeilBound)
+		if (!item.TriggerFlags)
 		{
 			item.Status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_TR4_ROLLING_BALL);
@@ -50,6 +47,8 @@ namespace TEN::Entities::Traps
 		// Move.
 		else
 		{
+			item.Status = ITEM_ACTIVE;
+
 			item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation.y, forwardVel);
 
 			if (pointColl.RoomNumber != item.RoomNumber)
@@ -87,6 +86,8 @@ namespace TEN::Entities::Traps
 			playerItem->TouchBits.ClearAll();
 
 			SoundEffect(SFX_TR4_LARA_GRABFEET, &playerItem->Pose);
+			//pushes Lara along with the wall.
+			playerItem->Pose.Position = Geometry::TranslatePoint(playerItem->Pose.Position, item.Pose.Orientation.y, item.ItemFlags[0] + playerItem->Animation.Velocity.z);
 		}
 	}
 }
