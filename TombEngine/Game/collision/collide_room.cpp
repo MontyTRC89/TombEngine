@@ -227,9 +227,9 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.Position.Ceiling = GetSurfaceHeight(RoomVector(floor->RoomNumber, y), x, z, false).value_or(NO_HEIGHT);
 
 	// Probe bottom collision block through portals.
-	while (floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
+	while (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 	{
-		auto* room = &g_Level.Rooms[floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(floor->RoomNumber)];
+		auto* room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(floor->RoomNumber)];
 		floor = GetSector(room, x - room->x, z - room->z);
 	}
 
@@ -1210,9 +1210,9 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
-		while (floor->GetRoomNumberAbove(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
 		{
-			room = &g_Level.Rooms[floor->GetRoomNumberAbove(Vector3i(x, y, z)).value_or(floor->RoomNumber)];
+			room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(floor->RoomNumber)];
 			if (!TestEnvironment(ENV_FLAG_WATER, room))
 				return (floor->GetSurfaceHeight(x, z, false));
 
@@ -1223,9 +1223,9 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 		{
-			room = &g_Level.Rooms[floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(floor->RoomNumber)];
+			room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(floor->RoomNumber)];
 			if (TestEnvironment(ENV_FLAG_WATER, room))
 				return (floor->GetSurfaceHeight(x, z, true));
 
@@ -1286,9 +1286,9 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, room) ||
 		TestEnvironment(ENV_FLAG_SWAMP, room))
 	{
-		while (floor->GetRoomNumberAbove(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
 		{
-			room = &g_Level.Rooms[floor->GetRoomNumberAbove(Vector3i(x, y, z)).value_or(floor->RoomNumber)];
+			room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(floor->RoomNumber)];
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1305,9 +1305,9 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 		{
-			room = &g_Level.Rooms[floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(floor->RoomNumber)];
+			room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(floor->RoomNumber)];
 
 			if (TestEnvironment(ENV_FLAG_WATER, room) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1377,9 +1377,9 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, room) ||
 		TestEnvironment(ENV_FLAG_SWAMP, room))
 	{
-		while (floor->GetRoomNumberAbove(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
 		{
-			auto* room = &g_Level.Rooms[floor->GetRoomNumberAbove(Vector3i(x, y, z)).value_or(floor->RoomNumber)];
+			auto* room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(floor->RoomNumber)];
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1390,11 +1390,11 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 		return GetCollision(floor, x, y, z).Block->GetSurfaceHeight(Vector3i(x, y, z), false);
 	}
-	else if (floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
+	else if (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 	{
-		while (floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 		{
-			auto* room2 = &g_Level.Rooms[floor->GetRoomNumberBelow(Vector3i(x, y, z)).value_or(floor->RoomNumber)];
+			auto* room2 = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(floor->RoomNumber)];
 
 			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room2))
