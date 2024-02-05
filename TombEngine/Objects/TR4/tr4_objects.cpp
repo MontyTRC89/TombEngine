@@ -55,6 +55,7 @@
 // Switches
 
 // Traps
+#include "Objects/TR4/Trap/RollingBall.h"
 #include "Objects/TR4/Trap/SpikyCeiling.h"
 #include "Objects/TR4/Trap/SpikyWall.h"
 #include "Objects/TR4/Trap/tr4_birdblade.h"
@@ -947,6 +948,15 @@ namespace TEN::Entities
 		{
 			obj->control = HammerControl;
 			obj->collision = GenericSphereBoxCollision;
+			obj->SetHitEffect(true);
+		}
+
+		obj = &Objects[ID_ROLLINGBALL];
+		if (obj->loaded)
+		{
+			obj->collision = RollingBallCollision;
+			obj->control = RollingBallControl;
+			obj->shadowType = ShadowMode::All;
 			obj->SetHitEffect(true);
 		}
 	}

@@ -39,6 +39,7 @@
 
 // Traps
 #include "Objects/TR3/Trap/ElectricCleaner.h"
+#include "Objects/TR3/Trap/RollingBallClassic.h"
 #include "Objects/TR3/Trap/train.h"
 #include "Objects/TR3/Trap/WallMountedBlade.h"
 
@@ -472,11 +473,21 @@ static void StartObject(ObjectInfo* obj)
 
 static void StartTrap(ObjectInfo* obj)
 {
-	obj = &Objects[ID_TRAIN];
+	obj = &Objects[ID_BIG_ROLLING_BALL];
 	if (obj->loaded)
 	{
-		obj->control = TrainControl;
-		obj->collision = TrainCollision;
+		obj->collision = ClassicRollingBallCollision;
+		obj->control = ClassicRollingBallControl;
+		obj->Initialize = InitializeClassicRollingBall;
+		obj->SetHitEffect(true);
+	}
+
+	obj = &Objects[ID_CLASSIC_ROLLING_BALL];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeClassicRollingBall;
+		obj->control = ClassicRollingBallControl;
+		obj->collision = ClassicRollingBallCollision;
 		obj->SetHitEffect(true);
 	}
 
@@ -490,6 +501,14 @@ static void StartTrap(ObjectInfo* obj)
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->nonLot = 1;
 		obj->radius = 512;
+	}
+
+	obj = &Objects[ID_TRAIN];
+	if (obj->loaded)
+	{
+		obj->control = TrainControl;
+		obj->collision = TrainCollision;
+		obj->SetHitEffect(true);
 	}
 
 	obj = &Objects[ID_WALL_MOUNTED_BLADE];

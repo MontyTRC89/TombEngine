@@ -883,34 +883,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = TrapCollision;
 		obj->control = FallingCeilingControl;
 	}
-
-	obj = &Objects[ID_ROLLINGBALL];
-	if (obj->loaded)
-	{
-		obj->collision = RollingBallCollision;
-		obj->control = RollingBallControl;
-		obj->shadowType = ShadowMode::All;
-		obj->SetHitEffect(true);
-	}
-	
-	obj = &Objects[ID_CLASSIC_ROLLING_BALL];
-	if (obj->loaded)
-	{
-		obj->Initialize = InitializeClassicRollingBall;
-		obj->control = ClassicRollingBallControl;
-		obj->collision = ClassicRollingBallCollision;
-		obj->SetHitEffect(true);
-	}
-
-	obj = &Objects[ID_BIG_ROLLING_BALL];
-	if (obj->loaded)
-	{
-		obj->collision = ClassicRollingBallCollision;
-		obj->control = ClassicRollingBallControl;
-		obj->Initialize = InitializeClassicRollingBall;
-		obj->SetHitEffect(true);
-	}
-
+		
 	obj = &Objects[ID_GEN_SLOT3];
 	if (obj->loaded)
 	{
