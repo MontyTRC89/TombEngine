@@ -55,7 +55,7 @@
 // Switches
 
 // Traps
-#include "Objects/TR4/Trap/RollingBall.h"
+#include "Objects/TR4/Trap/Rollingball/RollingBallObject.h"
 #include "Objects/TR4/Trap/SpikyCeiling.h"
 #include "Objects/TR4/Trap/SpikyWall.h"
 #include "Objects/TR4/Trap/tr4_birdblade.h"

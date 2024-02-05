@@ -589,7 +589,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
-    <ClInclude Include="Objects\TR4\Trap\RollingBall.h" />
+    <ClInclude Include="Objects\TR4\Trap\RollingBall\RollingBallInfo.h" />
+    <ClInclude Include="Objects\TR4\Trap\RollingBall\RollingBallObject.h" />
     <ClInclude Include="Objects\TR4\Trap\SpikyCeiling.h" />
     <ClInclude Include="Objects\TR4\Trap\SpikyWall.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h" />
@@ -1087,7 +1088,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Object\tr4_senet.cpp" />
     <ClCompile Include="Objects\TR4\Object\WraithTrap.cpp" />
     <ClCompile Include="Objects\TR4\tr4_objects.cpp" />
-    <ClCompile Include="Objects\TR4\Trap\RollingBall.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\RollingBall\RollingBallInfo.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\RollingBall\RollingBallObject.cpp" />
     <ClCompile Include="Objects\TR4\Trap\SpikyCeiling.cpp" />
     <ClCompile Include="Objects\TR4\Trap\SpikyWall.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_birdblade.cpp" />
