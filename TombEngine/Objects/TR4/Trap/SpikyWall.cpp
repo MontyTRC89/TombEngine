@@ -16,6 +16,10 @@
 
 using namespace TEN::Math;
 
+// NOTES:
+// ItemFlags[0]: forward velocity.
+// ItemFlags[1]: 
+
 namespace TEN::Entities::Traps
 {
 	constexpr auto SPIKY_WALL_HARM_DAMAGE = 15;
@@ -37,66 +41,62 @@ namespace TEN::Entities::Traps
 
 		item.ItemFlags[0] = item.TriggerFlags;
 		
-		if (item.ItemFlags[1] && 
-			item.ItemFlags[0])
-		{
+		if (item.ItemFlags[1] && item.ItemFlags[0])
 			item.ItemFlags[1] -= 1;
-		}
 
 		int forwardVel = item.ItemFlags[0];
 		auto bounds = GameBoundingBox(&item);
 
-		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
-		auto pointColl2 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2, (bounds.X2 - bounds.X1) /2);
+		auto pointColl0 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
+		auto pointColl1 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2, (bounds.X2 - bounds.X1) / 2);
 
 		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
 		{
-			int lp = 0;
-			while (CollidedItems[lp] != nullptr)
+			int collidedItemNumber = 0;
+			while (CollidedItems[collidedItemNumber] != nullptr)
 			{
-				if (Objects[CollidedItems[lp]->ObjectNumber].intelligent)
+				if (Objects[CollidedItems[collidedItemNumber]->ObjectNumber].intelligent)
 				{
-					CollidedItems[lp]->HitPoints = 0;
-					
+					CollidedItems[collidedItemNumber]->HitPoints = 0;
 				}
-				else if (CollidedItems[lp]->ObjectNumber == ID_SPIKY_WALL && !item.ItemFlags[1])
+				else if (CollidedItems[collidedItemNumber]->ObjectNumber == ID_SPIKY_WALL && !item.ItemFlags[1])
 				{
-					CollidedItems[lp]->TriggerFlags = 0;
+					CollidedItems[collidedItemNumber]->TriggerFlags = 0;
+
 					item.TriggerFlags = 0;
 					item.Status = ITEM_DEACTIVATED;
-					StopSoundEffect(SFX_TR4_ROLLING_BALL);
 					item.ItemFlags[1] = 10;
+
+					StopSoundEffect(SFX_TR4_ROLLING_BALL);
 				}
 
-				lp++;
+				collidedItemNumber++;
 			}
 		}
 
 		// Stop moving.
 		if (!item.TriggerFlags ||
-			pointColl.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) || 
-			pointColl.Block->Stopper ||
-			pointColl2.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) ||
-			pointColl2.Block->Stopper )
+			pointColl0.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) || 
+			pointColl0.Block->Stopper ||
+			pointColl1.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) ||
+			pointColl1.Block->Stopper)
 		{
 			auto& room = g_Level.Rooms[item.RoomNumber];
-			auto pos = item.Pose.Position;
-
 			for (auto& mesh : room.mesh)
 			{
-				if ((abs(pointColl.Coordinates.x - mesh.pos.Position.x) < BLOCK(1) &&
-					abs(pointColl.Coordinates.z - mesh.pos.Position.z) < BLOCK(1)) ||
-					abs(pointColl2.Coordinates.x - mesh.pos.Position.x) < BLOCK(1) &&
-					abs(pointColl2.Coordinates.z - mesh.pos.Position.z) < BLOCK(1) &&
-					!(StaticObjects[mesh.staticNumber].shatterType == ShatterType::None))
+				if ((abs(pointColl0.Coordinates.x - mesh.pos.Position.x) < BLOCK(1) &&
+					abs(pointColl0.Coordinates.z - mesh.pos.Position.z) < BLOCK(1)) ||
+					abs(pointColl1.Coordinates.x - mesh.pos.Position.x) < BLOCK(1) &&
+					abs(pointColl1.Coordinates.z - mesh.pos.Position.z) < BLOCK(1) &&
+					StaticObjects[mesh.staticNumber].shatterType != ShatterType::None)
 				{					
-					if (mesh.HitPoints == 0)
-					{
-						mesh.HitPoints -= 1;
-						ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
-						SoundEffect(SFX_TR4_SMASH_ROCK, &item.Pose);
-						TestTriggers(pos.x, pos.y, pos.z, item.RoomNumber, true);
-					}
+					if (mesh.HitPoints != 0)
+						continue;
+
+					mesh.HitPoints -= 1;
+					ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
+					SoundEffect(SFX_TR4_SMASH_ROCK, &item.Pose);
+					TestTriggers(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber, true);
 				}
 			}
 
@@ -106,12 +106,11 @@ namespace TEN::Entities::Traps
 		// Move.
 		else
 		{
+			item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation.y, forwardVel);
 			item.Status = ITEM_ACTIVE;
 
-			item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation.y, forwardVel);
-
-			if (pointColl.RoomNumber != item.RoomNumber)
-				ItemNewRoom(itemNumber, pointColl.RoomNumber);
+			if (pointColl0.RoomNumber != item.RoomNumber)
+				ItemNewRoom(itemNumber, pointColl0.RoomNumber);
 
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item.Pose);
 		}
@@ -145,10 +144,12 @@ namespace TEN::Entities::Traps
 			playerItem->TouchBits.ClearAll();
 
 			SoundEffect(SFX_TR4_LARA_GRABFEET, &playerItem->Pose);
-			//pushes Lara along with the wall.
-			int velocity = playerItem->Animation.Velocity.z;
 
-			playerItem->Pose.Position = Geometry::TranslatePoint(playerItem->Pose.Position, item.Pose.Orientation.y, (item.ItemFlags[0] > 0) ? (item.ItemFlags[0] + velocity) : (item.ItemFlags[0] - velocity));
+			// Push player.
+			float vel = playerItem->Animation.Velocity.z;
+			playerItem->Pose.Position = Geometry::TranslatePoint(
+				playerItem->Pose.Position, item.Pose.Orientation.y,
+				(item.ItemFlags[0] > 0) ? (item.ItemFlags[0] + vel) : (item.ItemFlags[0] - vel));
 		}
 	}
 }
