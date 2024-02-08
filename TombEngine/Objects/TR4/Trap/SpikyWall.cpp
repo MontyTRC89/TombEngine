@@ -18,7 +18,7 @@ using namespace TEN::Math;
 
 // NOTES:
 // ItemFlags[0]: forward velocity.
-// ItemFlags[1]: 
+// ItemFlags[1]: enable collision with other spiky walls.
 
 namespace TEN::Entities::Traps
 {
