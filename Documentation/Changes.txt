@@ -1,8 +1,8 @@
-Version 1.3.1
+Version 1.4
 ===========
 
-* Ported Winston from TR3.
-	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/raw/809ced3f88903d2fc3290f00080e80906f291305/Wad2%20Objects/Misc/TR3_Winston.wad2
+* Fixed sounds resuming in pause mode while switching between apps.
+* Ported Winston from TR3 (requires updated TEN Winston wad2).
 
 Version 1.3
 ===========

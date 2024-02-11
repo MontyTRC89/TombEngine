@@ -7,6 +7,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/gui.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
@@ -14,6 +15,8 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
+
+using namespace TEN::Gui;
 
 HSAMPLE BASS_SamplePointer[SOUND_MAX_SAMPLES];
 HSTREAM BASS_3D_Mixdown;
@@ -337,6 +340,10 @@ void ResumeAllSounds(SoundPauseMode mode)
 {
 	if (mode == SoundPauseMode::Global)
 		BASS_Start();
+
+	if (g_Gui.GetInventoryMode() == InventoryMode::Pause || 
+		g_Gui.GetInventoryMode() == InventoryMode::Statistics)
+		return;
 
 	for (const auto& slot : SoundtrackSlot)
 	{
