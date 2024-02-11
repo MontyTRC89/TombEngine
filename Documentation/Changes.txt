@@ -2,7 +2,8 @@ Version 1.4
 ===========
 
 * Fixed sounds resuming in pause mode while switching between apps.
-* Ported Winston from TR3 (requires updated TEN Winston wad2).
+* Add TR2 Dragon.
+* Add TR3 Winston (requires updated TEN Winston wad2).
 
 Version 1.3
 ===========
