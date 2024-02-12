@@ -10,7 +10,7 @@ using namespace TEN::Math;
 
 //namespace TEN::Math
 //{
-	const EulerAngles EulerAngles::Zero = EulerAngles(0, 0, 0);
+	const EulerAngles EulerAngles::Identity = EulerAngles(0, 0, 0);
 
 	EulerAngles::EulerAngles(const Vector3& dir)
 	{

@@ -129,7 +129,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
 	player.Control.MoveAngle = item->Pose.Orientation.y;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;

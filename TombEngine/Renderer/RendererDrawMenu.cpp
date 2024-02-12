@@ -883,7 +883,7 @@ namespace TEN::Renderer
 	{
 		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
 
-		static EulerAngles orient = EulerAngles::Zero;
+		static EulerAngles orient = EulerAngles::Identity;
 		static float scaler = 1.2f;
 
 		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
@@ -943,7 +943,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background)
+	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade)
 	{
 		// Set basic render states
 		SetBlendMode(BlendMode::Opaque, true);
@@ -957,7 +957,7 @@ namespace TEN::Renderer
 
 		if (background != nullptr)
 		{
-			DrawFullScreenImage(background->ShaderResourceView.Get(), 0.5f, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
+			DrawFullScreenImage(background->ShaderResourceView.Get(), backgroundFade, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
 		}
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -1103,7 +1103,7 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 		
-		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget);
+		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
 		
 		_swapChain->Present(0, 0);
 	}
@@ -1115,7 +1115,7 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
-		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget);
+		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 1.0f);
 		DrawAllStrings();
 
 		_swapChain->Present(0, 0);

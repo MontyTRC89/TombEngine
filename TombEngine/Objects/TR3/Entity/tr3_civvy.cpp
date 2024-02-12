@@ -179,8 +179,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		int targetAngle = 0;
 		int targetDistance = 0;
-		auto jointHeadRot = EulerAngles::Zero;
-		auto jointTorsoRot = EulerAngles::Zero;
+		auto jointHeadRot = EulerAngles::Identity;
+		auto jointTorsoRot = EulerAngles::Identity;
 
 		if (item.BoxNumber != NO_BOX && (g_Level.Boxes[item.BoxNumber].flags & BLOCKED) && item.HitPoints > 0)
 		{

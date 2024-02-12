@@ -337,10 +337,12 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
+    <ClInclude Include="Game\Lara\lara_climb.h" />
     <ClInclude Include="Game\Lara\lara_collide.h" />
     <ClInclude Include="Game\Lara\lara_crawl.h" />
     <ClInclude Include="Game\Lara\lara_fire.h" />
     <ClInclude Include="Game\Lara\lara_flare.h" />
+    <ClInclude Include="Game\Lara\lara_hang.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_initialise.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
@@ -352,6 +354,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_surface.h" />
     <ClInclude Include="Game\Lara\lara_swim.h" />
+    <ClInclude Include="Game\Lara\lara_test_structs.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
     <ClInclude Include="Game\Lara\lara_two_guns.h" />
     <ClInclude Include="Game\animation.h" />
@@ -483,9 +486,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR1\Trap\SlammingDoors.h" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
     <ClInclude Include="Objects\TR1\Trap\SwingingBlade.h" />
+    <ClInclude Include="Objects\TR2\Entity\Bartoli.h" />
+    <ClInclude Include="Objects\TR2\Entity\Dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_bird_monster.h" />
-    <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_eagle_or_crow.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_knife_thrower.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_mercenary.h" />
@@ -531,6 +535,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tribesman.h" />
+    <ClInclude Include="Objects\TR3\Entity\Winston.h" />
     <ClInclude Include="Objects\TR3\Object\Corpse.h" />
     <ClInclude Include="Objects\TR3\Trap\ElectricCleaner.h" />
     <ClInclude Include="Objects\TR3\Trap\train.h" />
@@ -885,10 +890,12 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
+    <ClCompile Include="Game\Lara\lara_climb.cpp" />
     <ClCompile Include="Game\Lara\lara_collide.cpp" />
     <ClCompile Include="Game\Lara\lara_crawl.cpp" />
     <ClCompile Include="Game\Lara\lara_fire.cpp" />
     <ClCompile Include="Game\Lara\lara_flare.cpp" />
+    <ClCompile Include="Game\Lara\lara_hang.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_initialise.cpp" />
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
@@ -990,9 +997,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SlammingDoors.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SwingingBlade.cpp" />
+    <ClCompile Include="Objects\TR2\Entity\Bartoli.cpp" />
+    <ClCompile Include="Objects\TR2\Entity\Dragon.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_barracuda.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_bird_monster.cpp" />
-    <ClCompile Include="Objects\TR2\Entity\tr2_dragon.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_eagle_or_crow.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_knife_thrower.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_mercenary.cpp" />
@@ -1037,6 +1045,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\TwinAutoGun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\WaspMutant.cpp" />
     <ClCompile Include="Objects\TR3\Object\corpse.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Winston.cpp" />
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />
     <ClCompile Include="Objects\TR3\Trap\ElectricCleaner.cpp" />
     <ClCompile Include="Objects\TR3\Trap\train.cpp" />

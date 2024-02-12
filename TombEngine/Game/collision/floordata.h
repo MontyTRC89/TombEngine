@@ -133,13 +133,9 @@ public:
 	short	GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
 	MaterialType GetSurfaceMaterial(int x, int z, bool isFloor) const;
 
-	std::optional<int> GetRoomNumberAbove(int triID) const;
-	std::optional<int> GetRoomNumberAbove(int x, int z) const;
-	std::optional<int> GetRoomNumberAbove(const Vector3i& pos) const;
-	std::optional<int> GetRoomNumberBelow(int triID) const;
-	std::optional<int> GetRoomNumberBelow(int x, int z) const;
-	std::optional<int> GetRoomNumberBelow(const Vector3i& pos) const;
-	std::optional<int> GetRoomNumberAtSide() const;
+	std::optional<int> GetNextRoomNumber(int x, int z, bool isBelow) const;
+	std::optional<int> GetNextRoomNumber(const Vector3i& pos, bool isBelow) const;
+	std::optional<int> GetSideRoomNumber() const;
 
 	int GetSurfaceHeight(int x, int z, bool isFloor) const;
 	int GetSurfaceHeight(const Vector3i& pos, bool isFloor) const;

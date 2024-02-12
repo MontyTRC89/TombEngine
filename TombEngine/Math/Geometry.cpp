@@ -190,7 +190,7 @@ namespace TEN::Math::Geometry
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
 	{
 		if (origin == target)
-			return EulerAngles::Zero;
+			return EulerAngles::Identity;
 
 		return EulerAngles(target - origin);
 	}
