@@ -97,7 +97,7 @@ namespace TEN::Entities::Player
 		Attractor*	AttractorPtr	= nullptr;
 		float		ChainDistance	= 0.0f;
 		Vector3		RelPosOffset	= Vector3::Zero;
-		EulerAngles RelOrientOffset = EulerAngles::Zero;
+		EulerAngles RelOrientOffset = EulerAngles::Identity;
 		int			TargetStateID	= 0;
 
 		ClimbContextAlignType AlignType = ClimbContextAlignType::None;

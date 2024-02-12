@@ -56,7 +56,7 @@ using namespace TEN::Renderer;
 struct AttractorParentTargetData
 {
 	Vector3		Position	   = Vector3::Zero;
-	EulerAngles Orientation	   = EulerAngles::Zero;
+	EulerAngles Orientation	   = EulerAngles::Identity;
 	Matrix		RotationMatrix = Matrix::Identity;
 };
 
@@ -360,7 +360,7 @@ void HandlePlayerAttractorParent(ItemInfo& item)
 
 	// Update player position.
 	auto posOffset = Vector3::Transform(Vector3::Lerp(player.Context.Attractor.RelDeltaPos, Vector3::Zero, LERP_ALPHA), target.RotationMatrix);
-	auto orientOffset = EulerAngles::Lerp(player.Context.Attractor.RelDeltaOrient, EulerAngles::Zero, LERP_ALPHA);
+	auto orientOffset = EulerAngles::Lerp(player.Context.Attractor.RelDeltaOrient, EulerAngles::Identity, LERP_ALPHA);
 	item.Pose = Pose(target.Position + posOffset, target.Orientation + orientOffset);
 
 	// Recalculate relative delta position and orientation.

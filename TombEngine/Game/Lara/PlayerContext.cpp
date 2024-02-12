@@ -1392,7 +1392,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -1427,7 +1427,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -1462,7 +1462,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -1497,7 +1497,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -1532,7 +1532,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -1573,7 +1573,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, -relEdgeHeight, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsJump = true;
@@ -1598,7 +1598,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, -relCeilHeight, 0.0f);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_AUTO_JUMP;
 			context.AlignType = ClimbContextAlignType::None;
 			context.IsJump = true;
@@ -1709,7 +1709,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_IDLE;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -1891,7 +1891,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -1955,7 +1955,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3::Zero;
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_CRAWL_VAULT_JUMP;
 			context.AlignType = ClimbContextAlignType::None;
 			context.IsJump = false;
@@ -2047,7 +2047,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2085,7 +2085,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2124,7 +2124,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2163,7 +2163,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2201,7 +2201,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2240,7 +2240,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2268,7 +2268,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_IDLE;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2513,7 +2513,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = targetStateID;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2581,7 +2581,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_BACK;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2746,7 +2746,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = targetStateID;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -2795,7 +2795,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, item.Pose.Position.y - (pointColl.Position.Ceiling + LARA_HEIGHT_MONKEY), 0.0f);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_MONKEY_IDLE;
 			context.AlignType = ClimbContextAlignType::Snap;
 			context.IsJump = false;
@@ -3114,7 +3114,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -3145,7 +3145,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_DOWN;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -3168,7 +3168,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_LEFT;
 
 			return context;
@@ -3194,7 +3194,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = relPosOffset;
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = (deltaHeadingAngle >= ANGLE(0.0f)) ? LS_EDGE_HANG_SHIMMY_90_OUTER_LEFT : LS_EDGE_HANG_SHIMMY_90_INNER_LEFT;
 
 			return context;
@@ -3238,7 +3238,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_RIGHT;
 
 			return context;
@@ -3326,7 +3326,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_UP;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -3361,7 +3361,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.ChainDistance = attracColl->Proximity.ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
-			context.RelOrientOffset = EulerAngles::Zero;
+			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_DOWN;
 			context.AlignType = ClimbContextAlignType::AttractorParent;
 			context.IsJump = false;
@@ -3404,7 +3404,7 @@ namespace TEN::Entities::Player
 		context.AttractorPtr = player.Context.Attractor.Ptr;
 		context.ChainDistance = player.Context.Attractor.ChainDistance;
 		context.RelPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
-		context.RelOrientOffset = EulerAngles::Zero;
+		context.RelOrientOffset = EulerAngles::Identity;
 		context.AlignType = ClimbContextAlignType::AttractorParent;
 		context.TargetStateID = isGoingRight ? LS_WALL_CLIMB_DISMOUNT_RIGHT : LS_WALL_CLIMB_DISMOUNT_LEFT;
 		context.IsJump = false;

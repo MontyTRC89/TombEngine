@@ -80,7 +80,7 @@ struct OffsetBlendData
 	float DelayTime	 = 0.0f;
 
 	Vector3		PosOffset	 = Vector3::Zero;
-	EulerAngles OrientOffset = EulerAngles::Zero;
+	EulerAngles OrientOffset = EulerAngles::Identity;
 	float		Alpha		 = 0.0f;
 
 	void SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float vel, short turnRate, float delayInSec = 0.0f);

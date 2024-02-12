@@ -20,10 +20,10 @@ namespace TEN::Entities::Player
 		Attractor*	Ptr				= nullptr;
 		float		ChainDistance   = 0.0f;
 		Vector3		RelPosOffset	= Vector3::Zero;
-		EulerAngles RelOrientOffset = EulerAngles::Zero;
+		EulerAngles RelOrientOffset = EulerAngles::Identity;
 
 		Vector3		RelDeltaPos	   = Vector3::Zero;
-		EulerAngles RelDeltaOrient = EulerAngles::Zero;
+		EulerAngles RelDeltaOrient = EulerAngles::Identity;
 
 		~PlayerAttractorData();
 

@@ -31,7 +31,7 @@ namespace TEN::Entities::Player
 		{
 			player.Context.Attractor.Update(
 				*item, *player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance,
-				Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Zero);
+				Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Identity);
 		}
 
 		// TODO: Add GetWallClimbIdleContext() purely for the alignment?
