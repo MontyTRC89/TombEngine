@@ -21,8 +21,6 @@ struct ItemInfo;
 // Triangle:		Surface subdivision.
 // Wall:			Inferred from a high floor or ceiling. Note that true "walls" don't exist in floordata, only surface heights.
 
-const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
-
 enum class MaterialType
 {
 	Mud = 0,
