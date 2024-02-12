@@ -432,9 +432,9 @@ namespace TEN::Collision::Floordata
 		return GetFloor(roomNumber, roomGridCoord);
 	}
 
-	FloorInfo& GetFarthestSector(int roomNumber, int x, int z, bool isBottom, int* farthestRoomNumberPtr)
+	FloorInfo& GetFarthestSector(int roomNumber, int x, int z, bool isBottom)
 	{
-		auto* sectorPtr = &GetSideSector(roomNumber, x, z, farthestRoomNumberPtr);
+		auto* sectorPtr = &GetSideSector(roomNumber, x, z);
 
 		// Find bottom or top sector.
 		bool isWall = sectorPtr->IsWall(x, z);
@@ -445,14 +445,14 @@ namespace TEN::Collision::Floordata
 				break;
 
 			// TODO: Check.
-			sectorPtr = &GetSideSector(*nextRoomNumber, x, z, farthestRoomNumberPtr);
+			sectorPtr = &GetSideSector(*nextRoomNumber, x, z);
 			isWall = sectorPtr->IsWall(x, z);
 		}
 
 		return *sectorPtr;
 	}
 
-	FloorInfo& GetSideSector(int roomNumber, int x, int z, int* sideRoomNumberPtr)
+	FloorInfo& GetSideSector(int roomNumber, int x, int z)
 	{
 		auto* sectorPtr = &GetFloor(roomNumber, x, z);
 
@@ -460,13 +460,9 @@ namespace TEN::Collision::Floordata
 		auto sideRoomNumber = sectorPtr->GetSideRoomNumber();
 		while (sideRoomNumber.has_value())
 		{
-			roomNumber = *sideRoomNumber;
-			sectorPtr = &GetFloor(roomNumber, x, z);
+			sectorPtr = &GetFloor(*sideRoomNumber, x, z);
 			sideRoomNumber = sectorPtr->GetSideRoomNumber();
 		}
-
-		if (sideRoomNumberPtr != nullptr)
-			*sideRoomNumberPtr = roomNumber;
 
 		return *sectorPtr;
 	}
@@ -491,7 +487,8 @@ namespace TEN::Collision::Floordata
 				if (!nextRoomNumber.has_value())
 					return std::nullopt;
 
-				sectorPtr = &GetSideSector(*nextRoomNumber, pos.x, pos.z, &roomNumber);
+				sectorPtr = &GetSideSector(*nextRoomNumber, pos.x, pos.z);
+				roomNumber = sectorPtr->RoomNumber;
 			}
 		}
 		while (sectorPtr->GetInsideBridgeItemNumber(pos, isBottom, !isBottom) != NO_ITEM);
@@ -582,11 +579,14 @@ namespace TEN::Collision::Floordata
 
 	static std::optional<RoomVector> GetFarthestRoomVector(RoomVector location, const Vector3i& pos, bool isBottom)
 	{
-		auto* sectorPtr = &GetSideSector(location.RoomNumber, pos.x, pos.z, &location.RoomNumber);
+		auto* sectorPtr = &GetSideSector(location.RoomNumber, pos.x, pos.z);
+		location.RoomNumber = sectorPtr->RoomNumber;
 
 		if (sectorPtr->IsWall(pos.x, pos.z))
 		{
-			sectorPtr = &GetFarthestSector(location.RoomNumber, pos.x, pos.z, isBottom, &location.RoomNumber);
+			sectorPtr = &GetFarthestSector(location.RoomNumber, pos.x, pos.z, isBottom);
+			location.RoomNumber = sectorPtr->RoomNumber;
+
 			if (sectorPtr->IsWall(pos.x, pos.z))
 				return std::nullopt;
 
@@ -617,7 +617,8 @@ namespace TEN::Collision::Floordata
 		{
 			if (!isFirstSector)
 			{
-				sectorPtr = &GetSideSector(*nextRoomNumber, pos.x, pos.z, &location.RoomNumber);
+				sectorPtr = &GetSideSector(*nextRoomNumber, pos.x, pos.z);
+				location.RoomNumber = sectorPtr->RoomNumber;
 				location.Height = sectorPtr->GetSurfaceHeight(pos.x, pos.z, !isBottom);
 			}
 			isFirstSector = false;
