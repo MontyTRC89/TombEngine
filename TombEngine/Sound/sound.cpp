@@ -343,7 +343,9 @@ void ResumeAllSounds(SoundPauseMode mode)
 
 	if (g_Gui.GetInventoryMode() == InventoryMode::Pause || 
 		g_Gui.GetInventoryMode() == InventoryMode::Statistics)
+	{
 		return;
+	}
 
 	for (const auto& slot : SoundtrackSlot)
 	{

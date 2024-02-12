@@ -409,6 +409,8 @@ namespace TEN::Entities::Doors
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
+		static const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
+
 		FloorInfo* floor = doorPos->floor;
 
 		if (floor)
