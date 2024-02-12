@@ -191,8 +191,6 @@ namespace TEN::Collision::Floordata
 	FloorInfo& GetFarthestSector(int roomNumber, int x, int z, bool isBottom);
 	FloorInfo& GetSideSector(int roomNumber, int x, int z);
 
-	std::optional<int> GetFarthestHeight(FloorInfo& startSector, Vector3i pos, bool isBottom,
-										 int* farthestRoomNumberPtr = nullptr, FloorInfo** farthestSectorPtr = nullptr);
 	std::optional<int> GetSurfaceHeight(const RoomVector& location, int x, int z, bool isFloor);
 	RoomVector		   GetRoomVector(RoomVector location, const Vector3i& pos);
 

@@ -317,6 +317,12 @@ void FloorInfo::RemoveBridge(int itemNumber)
 
 namespace TEN::Collision::Floordata
 {
+	struct FarthestHeightData
+	{
+		FloorInfo& Sector;
+		int		   Height = 0;
+	};
+
 	// NOTE: Tilts are deprecated, but until all conversions are complete this function will remain useful.
 	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor)
 	{
@@ -467,12 +473,10 @@ namespace TEN::Collision::Floordata
 		return *sectorPtr;
 	}
 
-	std::optional<int> GetFarthestHeight(FloorInfo& startSector, Vector3i pos, bool isBottom, int* farthestRoomNumberPtr, FloorInfo** farthestSectorPtr)
+	static std::optional<FarthestHeightData> GetFarthestHeightData(FloorInfo& currentSector, Vector3i pos, bool isBottom)
 	{
-		int roomNumber = (farthestRoomNumberPtr != nullptr) ? *farthestRoomNumberPtr : 0;
-
 		// Find bottom or top height while bridge exists(?).
-		auto* sectorPtr = &startSector;
+		auto* sectorPtr = &currentSector;
 		do
 		{
 			// Set vertical position to lowest bridge ceiling height or highest bridge floor height.
@@ -488,20 +492,11 @@ namespace TEN::Collision::Floordata
 					return std::nullopt;
 
 				sectorPtr = &GetSideSector(*nextRoomNumber, pos.x, pos.z);
-				roomNumber = sectorPtr->RoomNumber;
 			}
 		}
 		while (sectorPtr->GetInsideBridgeItemNumber(pos, isBottom, !isBottom) != NO_ITEM);
 
-		// Set output bottom or top room number.
-		if (farthestRoomNumberPtr != nullptr)
-			*farthestRoomNumberPtr = roomNumber;
-
-		// Set output bottom or top sector pointer.
-		if (farthestSectorPtr != nullptr)
-			*farthestSectorPtr = sectorPtr;
-
-		return pos.y;
+		return FarthestHeightData{ *sectorPtr, pos.y };
 	}
 
 	std::optional<int> GetSurfaceHeight(const RoomVector& location, int x, int z, bool isFloor)
@@ -549,18 +544,19 @@ namespace TEN::Collision::Floordata
 		{
 			if (isFloor ? (polarity <= 0) : (polarity >= 0))
 			{
-				auto heightBound = GetFarthestHeight(*sectorPtr, pos, !isFloor);
-				if (heightBound.has_value())
-					return heightBound;
+				auto heightData = GetFarthestHeightData(*sectorPtr, pos, !isFloor);
+				if (heightData.has_value())
+					return heightData->Height;
 			}
 
 			if (isFloor ? (polarity >= 0) : (polarity <= 0))
 			{
-				auto heightBound = GetFarthestHeight(*sectorPtr, pos, isFloor, nullptr, &sectorPtr);
-				if (!heightBound.has_value())
+				auto heightData = GetFarthestHeightData(*sectorPtr, pos, isFloor);
+				if (!heightData.has_value())
 					return std::nullopt;
 
-				pos.y = *heightBound;
+				sectorPtr = &heightData->Sector;
+				pos.y = heightData->Height;
 			}
 		}
 
@@ -604,11 +600,13 @@ namespace TEN::Collision::Floordata
 
 		if (insideBridgeItemNumber != NO_ITEM)
 		{
-			auto farthestHeight = GetFarthestHeight(*sectorPtr, Vector3i(pos.x, location.Height, pos.z), isBottom, &location.RoomNumber, &sectorPtr);
-			if (!farthestHeight.has_value())
+			auto heightData = GetFarthestHeightData(*sectorPtr, Vector3i(pos.x, location.Height, pos.z), isBottom);
+			if (!heightData.has_value())
 				return std::nullopt;
 
-			location.Height = *farthestHeight;
+			sectorPtr = &heightData->Sector;
+			location.RoomNumber = sectorPtr->RoomNumber;
+			location.Height = heightData->Height;
 		}
 
 		bool isFirstSector = true;
