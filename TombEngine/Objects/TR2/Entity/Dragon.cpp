@@ -13,14 +13,15 @@
 #include "Game/pickup/pickup.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
 
 // NOTES:
-// OCB 0 = Dragon directly dies when hitpoints reaches to 0.
-// OCB 1 = player must retrieve dagger to kill dragon.
+// OCB 0: Dragon dies when hitpoints reach 0.
+// OCB 1: Dragon dies when player retrieves dagger.
 // 
 // item.ItemFlags[0]: Back segment item number.
 // item.ItemFlags[1]: Timer for temporary defeat and death in frame time.
@@ -46,15 +47,13 @@ namespace TEN::Entities::Creatures::TR2
 	constexpr auto DRAGON_WALK_TURN_RATE_MAX   = ANGLE(2.0f);
 	constexpr auto DRAGON_TURN_THRESHOLD_ANGLE = ANGLE(1.0f);
 
-	constexpr auto DRAGON_LIVE_TIME	  = 30 * 11;
+	constexpr auto DRAGON_LIVE_TIME	  = 11 * FPS;
 	constexpr auto DRAGON_ALMOST_LIVE = 100;
 
 	const auto DragonMouthBite = CreatureBiteInfo(Vector3(35.0f, 171.0f, 1168.0f), 12);
 	const auto DragonBackSpineJoints		= std::vector<unsigned int>{ 21, 22, 23 };
 	const auto DragonSwipeAttackJointsLeft	= std::vector<unsigned int>{ 24, 25, 26, 27, 28, 29, 30 };
 	const auto DragonSwipeAttackJointsRight = std::vector<unsigned int>{ 1, 2, 3, 4, 5, 6, 7 };
-	const auto SMOKE_SPRITE_ANIMATION = Random::GenerateInt(0, 10);
-	const auto FIRE_SPRITE_ANIMATION = Random::GenerateInt(0, 35);
 
 	enum class DragonLightEffectType
 	{
@@ -217,8 +216,9 @@ namespace TEN::Entities::Creatures::TR2
 	// TODO: Animate flame sprite sequence.
 	static void SpawnDragonFireBreathEffect(const ItemInfo& item, const CreatureBiteInfo& bite)
 	{
-		constexpr auto FIRE_COUNT = 3;
+		constexpr auto FIRE_COUNT	 = 3;
 		constexpr auto SPHERE_RADIUS = BLOCK(0.2f);
+		constexpr auto VEL			 = 300.0f;
 
 		for (int i = 0; i < FIRE_COUNT; i++)
 		{
@@ -232,9 +232,9 @@ namespace TEN::Entities::Creatures::TR2
 
 			auto dir = target - origin;
 			dir.Normalize();
-			dir *= 300.0f;
+			dir *= VEL;
 
-			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + FIRE_SPRITE_ANIMATION;
+			fire.spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + Random::GenerateInt(0, 35);
 
 			fire.x = pos.x;
 			fire.y = pos.y;
@@ -253,7 +253,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			int v = Random::GenerateFloat(0.75f, 1.0f) * UCHAR_MAX;
 			fire.life =
-				fire.sLife = v / 6;
+			fire.sLife = v / 6;
 
 			fire.xVel = v * (dir.x) / 10;
 			fire.yVel = v * (dir.y) / 10;
@@ -292,7 +292,7 @@ namespace TEN::Entities::Creatures::TR2
 
 			auto& smoke = *GetFreeParticle();
 
-			smoke.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + SMOKE_SPRITE_ANIMATION;
+			smoke.spriteIndex = Objects[ID_SMOKE_SPRITES].meshIndex + Random::GenerateInt(0, 10);
 			smoke.on = true;
 			smoke.x = pos.x;
 			smoke.y = pos.y;
@@ -577,8 +577,10 @@ namespace TEN::Entities::Creatures::TR2
 				SoundEffect(SFX_TR2_DRAGON_FIRE, &item.Pose);
 
 				if (ai.ahead)
+				{
 					headOrient = -ai.angle;
 					SpawnDragonSmokeBreathEffect(item, DragonMouthBite);
+				}
 
 				if (creature.Flags)
 				{
@@ -703,7 +705,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	void CollideDragonBack(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
-		auto& item = g_Level.Items[itemNumber];
+		const auto& item = g_Level.Items[itemNumber];
 
 		if (item.HitPoints > 0)
 			CreatureCollision(itemNumber, playerItem, coll);
