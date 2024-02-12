@@ -190,12 +190,11 @@ namespace TEN::Collision::Floordata
 
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
-	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
-	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);
-	FloorInfo& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumber = nullptr);
-	
-	std::optional<int> GetBottomHeight(FloorInfo& startSector, Vector3i pos, int* bottomRoomNumberPtr = nullptr, FloorInfo** bottomSectorPtr = nullptr);
-	std::optional<int> GetTopHeight(FloorInfo& startSector, Vector3i pos, int* topRoomNumberPtr = nullptr, FloorInfo** topSectorPtr = nullptr);
+	FloorInfo& GetFarthestSector(int roomNumber, int x, int z, bool isBottom, int* farthestRoomNumberPtr = nullptr);
+	FloorInfo& GetSideSector(int roomNumber, int x, int z, int* sideRoomNumberPtr = nullptr);
+
+	std::optional<int> GetFarthestHeight(FloorInfo& startSector, Vector3i pos, bool isBottom,
+										 int* farthestRoomNumberPtr = nullptr, FloorInfo** farthestSectorPtr = nullptr);
 	std::optional<int> GetSurfaceHeight(const RoomVector& location, int x, int z, bool isFloor);
 	
 	std::optional<RoomVector> GetBottomRoom(RoomVector location, const Vector3i& pos);
