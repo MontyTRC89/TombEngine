@@ -16,28 +16,28 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using namespace TEN::Renderer;
 
-const SectorSurfaceTriangleData& FloorInfo::GetSurfaceTriangle(int x, int z, bool isFloor) const
-{
-	int triID = GetSurfaceTriangleID(x, z, isFloor);
-	auto& tris = isFloor ? FloorSurface.Triangles : CeilingSurface.Triangles;
-	return tris[triID];
-}
-
 int FloorInfo::GetSurfaceTriangleID(int x, int z, bool isFloor) const
 {
+	constexpr auto TRI_ID_0 = 0;
+	constexpr auto TRI_ID_1 = 1;
+	
 	// Calculate bias.
 	auto sectorPoint = GetSectorPoint(x, z).ToVector2();
-	auto rotMatrix = Matrix::CreateRotationZ(isFloor ? TO_RAD(FloorSurface.SplitAngle) : TO_RAD(CeilingSurface.SplitAngle));
+	auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(isFloor ? FloorSurface.SplitAngle : CeilingSurface.SplitAngle));
 	float bias = Vector2::Transform(sectorPoint, rotMatrix).x;
 
 	// Return triangle ID according to bias.
-	return ((bias < 0.0f) ? 0 : 1);
+	return ((bias < 0.0f) ? TRI_ID_0 : TRI_ID_1);
 }
 
-Vector3 FloorInfo::GetSurfaceNormal(int x, int z, bool isFloor) const
+const SectorSurfaceTriangleData& FloorInfo::GetSurfaceTriangle(int x, int z, bool isFloor) const
 {
-	const auto& tri = GetSurfaceTriangle(x, z, isFloor);
-	return tri.Plane.Normal();
+	// Get triangles.
+	int triID = GetSurfaceTriangleID(x, z, isFloor);
+	const auto& tris = isFloor ? FloorSurface.Triangles : CeilingSurface.Triangles;
+
+	// Return triangle.
+	return tris[triID];
 }
 
 Vector3 FloorInfo::GetSurfaceNormal(int triID, bool isFloor) const
@@ -48,6 +48,12 @@ Vector3 FloorInfo::GetSurfaceNormal(int triID, bool isFloor) const
 
 	// Return plane normal.
 	return tri.Plane.Normal();
+}
+
+Vector3 FloorInfo::GetSurfaceNormal(int x, int z, bool isFloor) const
+{
+	int triID = GetSurfaceTriangleID(x, z, isFloor);
+	return GetSurfaceNormal(triID, isFloor);
 }
 
 short FloorInfo::GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const
@@ -80,12 +86,13 @@ bool FloorInfo::IsSurfaceDiagonalStep(bool isFloor) const
 	const auto& surface = isFloor ? FloorSurface : CeilingSurface;
 	
 	// 2) Test if plane distances are equal.
+	// TODO: This check will fail if distances are equal but planes criss-cross. Update this for improved TE geometry building in future.
 	float dist0 = surface.Triangles[0].Plane.D();
 	float dist1 = surface.Triangles[1].Plane.D();
 	if (dist0 == dist1)
 		return false;
 
-	// 3) Test if split angle is aligned diagonal.
+	// 3) Test if split angle is aligned diagonal. NOTE: Non-split surfaces default to 0 degrees.
 	if (surface.SplitAngle != SectorSurfaceData::SPLIT_ANGLE_0 &&
 		surface.SplitAngle != SectorSurfaceData::SPLIT_ANGLE_1)
 	{
@@ -97,17 +104,19 @@ bool FloorInfo::IsSurfaceDiagonalStep(bool isFloor) const
 
 bool FloorInfo::IsSurfaceSplitPortal(bool isFloor) const
 {
+	// Test if surface triangle portals are not equal.
 	const auto& tris = isFloor ? FloorSurface.Triangles : CeilingSurface.Triangles;
 	return (tris[0].PortalRoomNumber != tris[1].PortalRoomNumber);
 }
 
 std::optional<int> FloorInfo::GetNextRoomNumber(int x, int z, bool isBelow) const
 {
+	// Get triangle.
 	int triID = GetSurfaceTriangleID(x, z, isBelow);
-
 	const auto& surface = isBelow ? FloorSurface : CeilingSurface;
 	const auto& tri = surface.Triangles[triID];
 
+	// Return portal room number below or above if it exists.
 	if (tri.PortalRoomNumber != NO_ROOM)
 		return tri.PortalRoomNumber;
 
@@ -120,7 +129,7 @@ std::optional<int> FloorInfo::GetNextRoomNumber(const Vector3i& pos, bool isBelo
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
-	// 2) Test access to room below or above.
+	// 2) Run through bridges in sector to test access to room below or above.
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
@@ -132,12 +141,14 @@ std::optional<int> FloorInfo::GetNextRoomNumber(const Vector3i& pos, bool isBelo
 			continue;
 
 		// 2.2) Test if bridge blocks access to room below or above.
+		// TODO: Check for potential edge case inaccuracies.
 		if (isBelow ?
-			*bridgeSurfaceHeight >= pos.y : // Bridge floor height is below position.
-			*bridgeSurfaceHeight <= pos.y)	// Bridge ceiling height is above position.
+			*bridgeSurfaceHeight >= pos.y : // Bridge floor height is below current position.
+			*bridgeSurfaceHeight <= pos.y)	// Bridge ceiling height is above current position.
 		{
+			// Test if bridge surface is inside sector.
 			if (*bridgeSurfaceHeight <= floorHeight && // Bridge floor height is above sector floor height.
-				*bridgeSurfaceHeight >= ceilingHeight) // Bridge floor height is below sector ceiling height.)
+				*bridgeSurfaceHeight >= ceilingHeight) // Bridge floor height is below sector ceiling height.
 			{
 				return std::nullopt;
 			}
@@ -150,8 +161,10 @@ std::optional<int> FloorInfo::GetNextRoomNumber(const Vector3i& pos, bool isBelo
 
 std::optional<int> FloorInfo::GetSideRoomNumber() const
 {
-	if (WallPortalRoomNumber != NO_ROOM)
-		return WallPortalRoomNumber;
+	// Return side portal room number if it exists.
+	// TODO: Check how side portals work when a sector connects to multiple side rooms.
+	if (SidePortalRoomNumber != NO_ROOM)
+		return SidePortalRoomNumber;
 
 	return std::nullopt;
 }
@@ -166,7 +179,7 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 	auto normal = tri.Plane.Normal();
 	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
 
-	// Return surface height.
+	// Return sector floor or ceiling height. NOTE: Bridges ignored.
 	return (tri.Plane.D() + relPlaneHeight);
 }
 
@@ -176,7 +189,7 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 	int floorHeight = GetSurfaceHeight(pos.x, pos.z, true);
 	int ceilingHeight = GetSurfaceHeight(pos.x, pos.z, false);
 
-	// 2) Find closest floor or ceiling bridge height (if applicable).
+	// 2) Run through bridges in sector to find potential closer surface height.
 	for (int itemNumber : BridgeItemNumbers)
 	{
 		const auto& bridgeItem = g_Level.Items[itemNumber];
@@ -210,7 +223,7 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		}
 	}
 
-	// 3) Return closest floor or ceiling height.
+	// 3) Return floor or ceiling height. NOTE: Bridges considered.
 	return (isFloor ? floorHeight : ceilingHeight);
 }
 
@@ -339,10 +352,12 @@ namespace TEN::Collision::Floordata
 
 	Vector2i GetSectorPoint(int x, int z)
 	{
+		constexpr auto HALF_BLOCK = (int)BLOCK(0.5f);
+
 		// Return relative 2D point in range [0, BLOCK(1)).
 		return Vector2i(
-			(x % BLOCK(1)) - (int)BLOCK(0.5f),
-			(z % BLOCK(1)) - (int)BLOCK(0.5f));
+			(x % BLOCK(1)) - HALF_BLOCK,
+			(z % BLOCK(1)) - HALF_BLOCK);
 	}
 
 	Vector2i GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds)

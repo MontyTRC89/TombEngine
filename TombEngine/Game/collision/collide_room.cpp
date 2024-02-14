@@ -1274,7 +1274,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			xFloor = room->xSize - 1;
 
 		floor = &room->floor[zFloor + xFloor * room->zSize];
-		roomIndex = floor->WallPortalRoomNumber;
+		roomIndex = floor->SidePortalRoomNumber;
 		if (roomIndex != NO_ROOM)
 		{
 			roomNumber = roomIndex;
@@ -1362,7 +1362,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			xBlock = room->xSize - 1;
 
 		floor = &room->floor[zBlock + xBlock * room->zSize];
-		adjoiningRoom = floor->WallPortalRoomNumber;
+		adjoiningRoom = floor->SidePortalRoomNumber;
 
 		if (adjoiningRoom != NO_ROOM)
 		{

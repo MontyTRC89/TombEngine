@@ -804,7 +804,7 @@ void ReadRooms()
 			sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 			sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 
-			sector.WallPortalRoomNumber = ReadInt32();
+			sector.SidePortalRoomNumber = ReadInt32();
 			sector.Flags.Death = ReadBool();
 			sector.Flags.Monkeyswing = ReadBool();
 			sector.Flags.ClimbNorth = ReadBool();

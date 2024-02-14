@@ -15,10 +15,10 @@ struct ItemInfo;
 // Portal:			Link from one room to another allowing traversal between them.
 // Room number:		Unique ID of a room.
 // Room grid coord: Relative 2D grid coordinate of a room (e.g. [0, 0] denotes the first sector).
-// Sector/block:	Collision data describing a single grid division within a room.
+// Sector:			Collision data describing a single grid division within a room.
 // Sector point:	Relative 2D position within a sector (range [0, BLOCK(1)) on each axis).
 // Surface:			Floor or ceiling consisting of two triangles.
-// Triangle:		Surface subdivision.
+// Triangle:		Surface subdivision. Only 2 per surface can exist.
 // Wall:			Inferred from a high floor or ceiling. Note that true "walls" don't exist in floordata, only surface heights.
 
 enum class MaterialType
@@ -137,7 +137,7 @@ class FloorInfo
 public:
 	// Components
 	int				  RoomNumber		   = 0;
-	int				  WallPortalRoomNumber = 0;
+	int				  SidePortalRoomNumber = 0;
 	SectorSurfaceData FloorSurface		   = {};
 	SectorSurfaceData CeilingSurface	   = {};
 	std::set<int>	  BridgeItemNumbers	   = {};
@@ -148,12 +148,12 @@ public:
 	bool Stopper	  = true;
 
 	// Getters
+	int								 GetSurfaceTriangleID(int x, int z, bool isFloor) const;
 	const SectorSurfaceTriangleData& GetSurfaceTriangle(int x, int z, bool isFloor) const;
-	int		GetSurfaceTriangleID(int x, int z, bool isFloor) const;
-	Vector3 GetSurfaceNormal(int x, int z, bool isFloor) const;
-	Vector3 GetSurfaceNormal(int triID, bool isFloor) const;
-	short	GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
-	MaterialType GetSurfaceMaterial(int x, int z, bool isFloor) const;
+	Vector3							 GetSurfaceNormal(int triID, bool isFloor) const;
+	Vector3							 GetSurfaceNormal(int x, int z, bool isFloor) const;
+	short							 GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
+	MaterialType					 GetSurfaceMaterial(int x, int z, bool isFloor) const;
 
 	std::optional<int> GetNextRoomNumber(int x, int z, bool isBelow) const;
 	std::optional<int> GetNextRoomNumber(const Vector3i& pos, bool isBelow) const;
