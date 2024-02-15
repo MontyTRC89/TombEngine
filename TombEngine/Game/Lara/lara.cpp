@@ -61,6 +61,9 @@ LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 
+// TEMP
+bool EnableModernControls = true;
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -372,7 +375,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	else
 	{
 		// TODO: Extend ResetLaraFlex() to be a catch-all function.
-		ResetPlayerLookAround(*item);
+		//ResetPlayerLookAround(*item);
 	}
 	lara->Control.Look.Mode = LookMode::None;
 

@@ -30,6 +30,7 @@ void HandlePlayerQuickActions(ItemInfo& item);
 bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -- Sezz 2023.08.22
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
+void HandlePlayerTurn(ItemInfo& item, float alpha);
 void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerCrawlFlex(ItemInfo& item);
 void HandlePlayerFlyCheat(ItemInfo& item);
@@ -52,6 +53,7 @@ LaraInfo*& GetLaraInfo(ItemInfo* item);
 JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll);
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item);
+short GetPlayerMoveAngle(const ItemInfo& item);
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);

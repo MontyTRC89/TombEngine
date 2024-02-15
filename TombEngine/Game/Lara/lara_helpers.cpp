@@ -715,19 +715,63 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
+void HandlePlayerTurn(ItemInfo& item, float alpha)
+{
+	constexpr auto BASE_ANGLE = ANGLE(90.0f);
+
+	auto targetOrient = EulerAngles(item.Pose.Orientation.x, GetPlayerMoveAngle(item), item.Pose.Orientation.z);
+
+	short deltaAngle = abs(Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item)));
+	if (deltaAngle <= BASE_ANGLE)
+	{
+		item.Pose.Orientation.Lerp(targetOrient, alpha);
+	}
+	else
+	{
+		item.Pose.Orientation.InterpolateConstant(targetOrient, BASE_ANGLE * alpha);
+	}
+}
+
 void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
 {
-	if (!item->Animation.Velocity.z)
+	auto& player = GetLaraInfo(*item);
+
+	if (item->Animation.Velocity.z == 0.0f)
 		return;
 
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
+	if (EnableModernControls)
+	{
+		return;
 
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		maxAngleNormalized *= 0.6f;
+		// TODO
 
-	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
+		short moveAngle = GetPlayerMoveAngle(*item);
+		short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, moveAngle);
+		int sign = copysign(1, deltaAngle);
+
+		float coeff = abs((float)deltaAngle / ANGLE(90.0f));
+		maxAngle *= std::clamp(coeff, 0.0f, 1.0f);
+
+		if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+			maxAngle *= 0.6f;
+
+		item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;
+
+		short flexAngleMax = ANGLE(40.0f) * sign;
+		player.ExtraHeadRot.Lerp(EulerAngles(player.ExtraHeadRot.x, flexAngleMax * coeff, player.ExtraHeadRot.z), 0.25f);
+		player.ExtraTorsoRot.Lerp(EulerAngles(player.ExtraTorsoRot.x, player.ExtraHeadRot.y / 2, player.ExtraTorsoRot.z), 0.25f);
+	}
+	else
+	{
+		float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+		int sign = copysign(1, axisCoeff);
+		maxAngle *= axisCoeff;
+
+		if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+			maxAngle *= 0.6f;
+
+		item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;
+	}
 }
 
 void HandlePlayerCrawlFlex(ItemInfo& item)
@@ -1269,28 +1313,92 @@ PlayerWaterData GetPlayerWaterData(ItemInfo& item)
 
 JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll)
 {
-	if (IsHeld(In::Forward) && CanJumpForward(item, coll))
+	const auto& player = GetLaraInfo(item);
+
+	if (EnableModernControls)
 	{
-		return JumpDirection::Forward;
+		if (player.Control.HandStatus == HandStatus::WeaponDraw ||
+			player.Control.HandStatus == HandStatus::WeaponReady)
+		{
+			// TODO: Up case.
+			short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+			if (abs(deltaAngle) <= ANGLE(45.0f) && CanJumpForward(item, coll))
+			{
+				return JumpDirection::Forward;
+			}
+			else if (abs(deltaAngle + ANGLE(180.0f)) <= ANGLE(45.0f) && CanJumpBackward(item, coll))
+			{
+				return JumpDirection::Back;
+			}
+			else if (abs(deltaAngle + ANGLE(90.0f)) <= ANGLE(45.0f) && CanJumpLeft(item, coll))
+			{
+				return JumpDirection::Left;
+			}
+			else if (abs(deltaAngle - ANGLE(90.0f)) <= ANGLE(45.0f) && CanJumpRight(item, coll))
+			{
+				return JumpDirection::Right;
+			}
+			else if (CanJumpUp(item, coll))
+			{
+				return JumpDirection::Up;
+			}
+		}
+		else
+		{
+			if ((IsHeld(In::Forward) || IsHeld(In::Back) ||
+				IsHeld(In::Left) || IsHeld(In::Right)) &&
+				CanJumpForward(item, coll))
+			{
+				return JumpDirection::Forward;
+			}
+			else if (CanJumpUp(item, coll))
+			{
+				return JumpDirection::Up;
+			}
+		}
 	}
-	else if (IsHeld(In::Back) && CanJumpBackward(item, coll))
+	else
 	{
-		return JumpDirection::Back;
-	}
-	else if (IsHeld(In::Left) && CanJumpLeft(item, coll))
-	{
-		return JumpDirection::Left;
-	}
-	else if (IsHeld(In::Right) && CanJumpRight(item, coll))
-	{
-		return JumpDirection::Right;
-	}
-	else if (CanJumpUp(item, coll))
-	{
-		return JumpDirection::Up;
+		if (IsHeld(In::Forward) && CanJumpForward(item, coll))
+		{
+			return JumpDirection::Forward;
+		}
+		else if (IsHeld(In::Back) && CanJumpBackward(item, coll))
+		{
+			return JumpDirection::Back;
+		}
+		else if (IsHeld(In::Left) && CanJumpLeft(item, coll))
+		{
+			return JumpDirection::Left;
+		}
+		else if (IsHeld(In::Right) && CanJumpRight(item, coll))
+		{
+			return JumpDirection::Right;
+		}
+		else if (CanJumpUp(item, coll))
+		{
+			return JumpDirection::Up;
+		}
 	}
 
 	return JumpDirection::None;
+}
+
+short GetPlayerMoveAngle(const ItemInfo& item)
+{
+	if (EnableModernControls)
+	{
+		if (AxisMap[(int)InputAxis::Move] == Vector2::Zero)
+			return item.Pose.Orientation.y;
+
+		auto dir = AxisMap[(int)InputAxis::Move];
+		dir.Normalize();
+		return (Camera.actualAngle + FROM_RAD(atan2(dir.x, dir.y)));
+	}
+	else
+	{
+		return item.Pose.Orientation.y;
+	}
 }
 
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)

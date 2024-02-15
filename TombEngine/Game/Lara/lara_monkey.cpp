@@ -47,13 +47,16 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	// Overhang hook.
 	SlopeMonkeyExtra(item, coll);
 
-	// NOTE: Shimmy locks orientation.
-	if ((IsHeld(In::Left) &&
-			!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))) ||
-		(IsHeld(In::Right) &&
-			!(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))))
+	if (!EnableModernControls)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 2);
+		// NOTE: Shimmy locks orientation.
+		if ((IsHeld(In::Left) &&
+			!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))) ||
+			(IsHeld(In::Right) &&
+				!(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))))
+		{
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 2);
+		}
 	}
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
@@ -79,8 +82,15 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward) && CanMonkeySwingForward(*item, *coll))
+		if (IsHeld(In::Forward) ||
+			(EnableModernControls &&
+				(IsHeld(In::Forward) || IsHeld(In::Back) ||
+					IsHeld(In::Left) || IsHeld(In::Right))) &&
+			CanMonkeySwingForward(*item, *coll))
 		{
+			if (EnableModernControls)
+				item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, GetPlayerMoveAngle(*item), item->Pose.Orientation.z), 0.25f);
+			
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}
@@ -194,8 +204,11 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Left) || IsHeld(In::Right))
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+	if (!EnableModernControls)
+	{
+		if (IsHeld(In::Left) || IsHeld(In::Right))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+	}
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
 	{
@@ -205,8 +218,14 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward))
+		if (IsHeld(In::Forward) ||
+			(EnableModernControls &&
+				(IsHeld(In::Forward) || IsHeld(In::Back) ||
+					IsHeld(In::Left) || IsHeld(In::Right))))
 		{
+			if (EnableModernControls)
+				item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, GetPlayerMoveAngle(*item), item->Pose.Orientation.z), 0.25f);
+
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;
 		}

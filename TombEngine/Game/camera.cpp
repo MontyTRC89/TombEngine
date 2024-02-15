@@ -314,9 +314,9 @@ void MoveCamera(GameVector* ideal, int speed)
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
 
-	Camera.pos.x += (ideal->x - Camera.pos.x) / speed;
-	Camera.pos.y += (ideal->y - Camera.pos.y) / speed;
-	Camera.pos.z += (ideal->z - Camera.pos.z) / speed;
+	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * (EnableModernControls ? 0.25f : 1.0f));
+	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * (EnableModernControls ? 0.25f : 1.0f));
+	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * (EnableModernControls ? 0.25f : 1.0f));
 	Camera.pos.RoomNumber = ideal->RoomNumber;
 
 	if (Camera.bounce)
@@ -621,9 +621,22 @@ void UpdateCameraElevation()
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
-		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
+	{
+		if (EnableModernControls)
+		{
+			Camera.actualAngle += ANGLE(AxisMap[(int)InputAxis::Mouse].x * 200);
+			Camera.actualElevation -= ANGLE(AxisMap[(int)InputAxis::Mouse].y * 200);
+		}
+		else
+		{
+			Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
+		}
+	}
 
-	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
+	if (!EnableModernControls)
+	{
+		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
+	}
 }
 
 void CombatCamera(ItemInfo* item)

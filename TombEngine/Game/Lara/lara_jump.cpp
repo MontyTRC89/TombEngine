@@ -64,15 +64,27 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		DoLaraFallDamage(item);
 
-		if (item->HitPoints <= 0) USE_FEATURE_IF_CPP20([[unlikely]])
+		if (item->HitPoints <= 0)
+		{
 			item->Animation.TargetState = LS_DEATH;
-		else if (IsHeld(In::Forward) && !IsHeld(In::Walk) &&
-			player.Control.WaterStatus != WaterStatus::Wade)
+		}
+		else if (EnableModernControls &&
+			(IsHeld(In::Forward) || IsHeld(In::Back) ||
+			IsHeld(In::Left) || IsHeld(In::Right)) &&
+			(!IsHeld(In::Walk) && player.Control.WaterStatus != WaterStatus::Wade))
+		{
+			item->Animation.TargetState = LS_RUN_FORWARD;
+		}
+		else if (!EnableModernControls &&
+			(IsHeld(In::Forward) && !IsHeld(In::Walk) &&
+			player.Control.WaterStatus != WaterStatus::Wade))
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
 		}
 		else
+		{
 			item->Animation.TargetState = LS_IDLE;
+		}
 
 		SetLaraLand(item, coll);
 		return;
@@ -91,7 +103,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Roll) || IsHeld(In::Back))
+	if (IsHeld(In::Roll) || (!EnableModernControls && IsHeld(In::Back)))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
@@ -275,39 +287,87 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	if (IsClicked(In::Jump) && !IsDirectionalActionHeld())
 		player.Control.JumpDirection = JumpDirection::None;
 
-	if (((IsHeld(In::Forward) &&
-			!(IsHeld(In::Back) && player.Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
-		!IsDirectionalActionHeld() && player.Control.JumpDirection == JumpDirection::Forward) &&
-		CanJumpForward(*item, *coll))
+	if (EnableModernControls)
 	{
-		item->Animation.TargetState = LS_JUMP_FORWARD;
-		player.Control.JumpDirection = JumpDirection::Forward;
-		return;
-	}
-	else if ((IsHeld(In::Back) ||
-		!IsDirectionalActionHeld() && player.Control.JumpDirection == JumpDirection::Back) &&
-		CanJumpBackward(*item, *coll))
-	{
-		item->Animation.TargetState = LS_JUMP_BACK;
-		player.Control.JumpDirection = JumpDirection::Back;
-		return;
-	}
+		if (player.Control.HandStatus == HandStatus::WeaponDraw ||
+			player.Control.HandStatus == HandStatus::WeaponReady)
+		{
+			player.Control.JumpDirection = GetPlayerJumpDirection(*item, *coll);
+			switch (player.Control.JumpDirection)
+			{
+			case JumpDirection::None:
+				item->Animation.TargetState = LS_IDLE;
+				return;
 
-	if ((IsHeld(In::Left) ||
-		!IsDirectionalActionHeld() && player.Control.JumpDirection == JumpDirection::Left) &&
-		CanJumpLeft(*item, *coll))
-	{
-		item->Animation.TargetState = LS_JUMP_LEFT;
-		player.Control.JumpDirection = JumpDirection::Left;
-		return;
+			case JumpDirection::Forward:
+				item->Animation.TargetState = LS_JUMP_FORWARD;
+				return;
+
+			case JumpDirection::Back:
+				item->Animation.TargetState = LS_JUMP_BACK;
+				return;
+
+			case JumpDirection::Left:
+				item->Animation.TargetState = LS_JUMP_LEFT;
+				return;
+
+			case JumpDirection::Right:
+				item->Animation.TargetState = LS_JUMP_RIGHT;
+				return;
+
+			case JumpDirection::Up:
+				item->Animation.TargetState = LS_JUMP_UP;
+				return;
+			}
+		}
+		else
+		{
+			if (IsHeld(In::Forward) || IsHeld(In::Back) ||
+				IsHeld(In::Left) || IsHeld(In::Right))
+			{
+				HandlePlayerTurn(*item, 0.5f);
+				item->Animation.TargetState = LS_JUMP_FORWARD;
+				player.Control.JumpDirection = JumpDirection::Forward;
+				return;
+			}
+		}
 	}
-	else if ((IsHeld(In::Right) ||
-		!IsDirectionalActionHeld() && player.Control.JumpDirection == JumpDirection::Right) &&
-		CanJumpRight(*item, *coll))
+	else
 	{
-		item->Animation.TargetState = LS_JUMP_RIGHT;
-		player.Control.JumpDirection = JumpDirection::Right;
-		return;
+		if (((IsHeld(In::Forward) &&
+			!(IsHeld(In::Back) && player.Control.JumpDirection == JumpDirection::Back)) ||	// Back jump takes priority in this exception.
+			!IsDirectionalActionHeld() && player.Control.JumpDirection == JumpDirection::Forward) &&
+			CanJumpForward(*item, *coll))
+		{
+			item->Animation.TargetState = LS_JUMP_FORWARD;
+			player.Control.JumpDirection = JumpDirection::Forward;
+			return;
+		}
+		else if ((IsHeld(In::Back) ||
+			!IsDirectionalActionHeld() && player.Control.JumpDirection == JumpDirection::Back) &&
+			CanJumpBackward(*item, *coll))
+		{
+			item->Animation.TargetState = LS_JUMP_BACK;
+			player.Control.JumpDirection = JumpDirection::Back;
+			return;
+		}
+
+		if ((IsHeld(In::Left) ||
+			!IsDirectionalActionHeld() && player.Control.JumpDirection == JumpDirection::Left) &&
+			CanJumpLeft(*item, *coll))
+		{
+			item->Animation.TargetState = LS_JUMP_LEFT;
+			player.Control.JumpDirection = JumpDirection::Left;
+			return;
+		}
+		else if ((IsHeld(In::Right) ||
+			!IsDirectionalActionHeld() && player.Control.JumpDirection == JumpDirection::Right) &&
+			CanJumpRight(*item, *coll))
+		{
+			item->Animation.TargetState = LS_JUMP_RIGHT;
+			player.Control.JumpDirection = JumpDirection::Right;
+			return;
+		}
 	}
 
 	// No directional key pressed AND no directional lock; commit to jump up.
@@ -413,9 +473,13 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
+		{
 			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		}
+		else
+		{
 			item->Animation.TargetState = LS_IDLE;
+		}
 
 		SetLaraLand(item, coll);
 		return;
@@ -427,7 +491,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Roll) || IsHeld(In::Forward))
+	if (IsHeld(In::Roll) || (!EnableModernControls && IsHeld(In::Forward)))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
