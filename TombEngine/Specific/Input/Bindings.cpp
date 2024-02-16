@@ -29,8 +29,8 @@ namespace TEN::Input
 
 		{ In::Accelerate, KC_RCONTROL },
 		{ In::Reverse, KC_DOWN },
-		{ In::Speed, KC_SLASH },
-		{ In::Slow, KC_RSHIFT },
+		{ In::Faster, KC_SLASH },
+		{ In::Slower, KC_RSHIFT },
 		{ In::Brake, KC_RMENU },
 		{ In::Fire, KC_SPACE },
 
@@ -77,8 +77,8 @@ namespace TEN::Input
 
 		{ In::Accelerate, XK_A },
 		{ In::Reverse, XK_AXIS_X_POS },
-		{ In::Speed, XK_AXIS_RTRIGGER_NEG },
-		{ In::Slow, XK_RSHIFT },
+		{ In::Faster, XK_AXIS_RTRIGGER_NEG },
+		{ In::Slower, XK_RSHIFT },
 		{ In::Brake, XK_X },
 		{ In::Fire, XK_AXIS_LTRIGGER_NEG },
 
