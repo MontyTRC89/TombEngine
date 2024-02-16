@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Math.h"
 #include "Specific/Input/Input.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -22,6 +22,7 @@ constexpr auto REGKEY_SHADOW_MAP_SIZE	   = "ShadowMapSize";
 constexpr auto REGKEY_SHADOW_BLOBS_MAX	   = "ShadowBlobsMax";
 constexpr auto REGKEY_ENABLE_CAUSTICS	   = "EnableCaustics";
 constexpr auto REGKEY_ANTIALIASING_MODE	   = "AntialiasingMode";
+constexpr auto REGKEY_AMBIENT_OCCLUSION	   = "AmbientOcclusion";
 
 // Sound keys
 constexpr auto REGKEY_SOUND_DEVICE	= "SoundDevice";
@@ -56,6 +57,7 @@ struct GameConfiguration
 	int		   ShadowMapSize	  = DEFAULT_SHADOW_MAP_SIZE;
 	int		   ShadowBlobsMax	  = DEFAULT_SHADOW_BLOBS_MAX;
 	bool	   EnableCaustics	  = false;
+	bool	   EnableAmbientOcclusion = false;
 	AntialiasingMode AntialiasingMode = AntialiasingMode::None;
 
 	// Sound

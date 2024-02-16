@@ -532,7 +532,7 @@ void ChaseCamera(ItemInfo* item)
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
-		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
+		Camera.target.y = g_Level.Rooms[probe.RoomNumber].maxceiling - CLICK(1);
 
 	int y = Camera.target.y;
 	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.RoomNumber);
@@ -1182,6 +1182,8 @@ void CalculateCamera(const CollisionInfo& coll)
 			LastTarget.y = Camera.target.y;
 			LastTarget.z = Camera.target.z;
 			LastTarget.RoomNumber = Camera.target.RoomNumber;
+
+			y -= CLICK(1);
 		}
 
 		Camera.target.RoomNumber = item->RoomNumber;
@@ -1193,8 +1195,8 @@ void CalculateCamera(const CollisionInfo& coll)
 		}
 		else
 		{
-			Camera.target.y += (y - Camera.target.y) >> 2;
-			Camera.speed = Camera.type != CameraType::Look ? 8 : 4;
+			Camera.target.y += (y - Camera.target.y) / 4;
+			Camera.speed = (Camera.type != CameraType::Look) ? 8 : 4;
 		}
 
 		Camera.fixedCamera = false;
@@ -1240,20 +1242,22 @@ void CalculateCamera(const CollisionInfo& coll)
 		{
 			Camera.fixedCamera = false;
 			if (Camera.speed != 1 &&
-				Camera.oldType != CameraType::Look &&
 				!Lara.Control.Look.IsUsingBinoculars)
 			{
 				if (TargetSnaps <= 8)
 				{
-					x = LastTarget.x + ((x - LastTarget.x) >> 2);
+					x = LastTarget.x + ((x - LastTarget.x) / 4);
+					y = LastTarget.y + ((y - LastTarget.y) / 4);
+					z = LastTarget.z + ((z - LastTarget.z) / 4);
+
 					Camera.target.x = x;
-					y = LastTarget.y + ((y - LastTarget.y) >> 2);
 					Camera.target.y = y;
-					z = LastTarget.z + ((z - LastTarget.z) >> 2);
 					Camera.target.z = z;
 				}
 				else
+				{
 					TargetSnaps = 0;
+				}
 			}
 		}
 		else
@@ -1274,16 +1278,20 @@ void CalculateCamera(const CollisionInfo& coll)
 		}
 
 		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT)
+		{
 			FixedCamera(item);
+		}
 		else
+		{
 			ChaseCamera(item);
+		}
 	}
 
 	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
 
-	if (Camera.type != CameraType::Heavy ||
-		Camera.timer == -1)
+	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
+		LaraItem->HitPoints > 0)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
@@ -1304,14 +1312,13 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, sh
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
-float GetParticleDistanceFade(Vector3i position)
+float GetParticleDistanceFade(const Vector3i& pos)
 {
-	float distance = Vector3::Distance(Camera.pos.ToVector3(), position.ToVector3());
-
-	if (distance <= PARTICLE_FADE_THRESHOLD)
+	float dist = Vector3::Distance(Camera.pos.ToVector3(), pos.ToVector3());
+	if (dist <= PARTICLE_FADE_THRESHOLD)
 		return 1.0f;
 
-	return std::clamp(1.0f - ((distance - PARTICLE_FADE_THRESHOLD) / COLL_CHECK_THRESHOLD), 0.0f, 1.0f);
+	return std::clamp(1.0f - ((dist - PARTICLE_FADE_THRESHOLD) / COLL_CHECK_THRESHOLD), 0.0f, 1.0f);
 }
 
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)

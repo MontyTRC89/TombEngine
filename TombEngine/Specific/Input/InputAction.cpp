@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Specific/Input/InputAction.h"
 
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
 using TEN::Renderer::g_Renderer;

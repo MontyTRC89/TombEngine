@@ -29,10 +29,12 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 
 int FlashGrenadeAftershockTimer = 0;
 
@@ -58,13 +60,23 @@ const auto FlarePoseStates = std::vector<int>
 	LS_SOFT_SPLAT
 };
 
+const auto UnavailableFlarePoseAnims = std::vector<int>
+{
+	LA_WATERLEVER_PULL,
+	LA_BUTTON_GIANT_PUSH,
+	LA_BUTTON_LARGE_PUSH,
+	LA_JUMPSWITCH_PULL,
+	LA_UNDERWATER_CEILING_SWITCH_PULL,
+	LA_VALVE_TURN
+};
+
 WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
 	// No weapon
 	{
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		0,
 		0,
 		0,
@@ -98,7 +110,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	{
 		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
 		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-10.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(10.0f), 0)),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		ANGLE(10.0f),
 		ANGLE(4.0f),
 		650,
@@ -181,9 +193,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Flare
 	{
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		0,
 		0,
 		0,
@@ -299,7 +311,7 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
 	player.LeftArm.GunFlash =
@@ -696,7 +708,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		break;
 
 	case HandStatus::WeaponReady:
-		if (!IsHeld(In::Action))
+		if (!IsHeld(In::Action) || !GetAmmo(player, player.Control.Weapon.GunType))
 		{
 			laraItem.Model.MeshIndex[LM_HEAD] = laraItem.Model.BaseMesh + LM_HEAD;
 		}
@@ -715,7 +727,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (!GetAmmo(player, player.Control.Weapon.GunType))
 			{
-				bool hasPistols = (player.Weapons[(int)LaraWeaponType::Pistol].Present && Objects[ID_PISTOLS_ITEM].loaded);
+				bool hasPistols = (player.Weapons[(int)LaraWeaponType::Pistol].Present && Objects[ID_PISTOLS_ITEM].loaded && GetAmmo(player, LaraWeaponType::Pistol));
 				player.Control.Weapon.RequestGunType = hasPistols ? LaraWeaponType::Pistol : LaraWeaponType::None;
 				return;
 			}
@@ -781,6 +793,10 @@ void HandleWeapon(ItemInfo& laraItem)
 			if (laraItem.Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
 				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
+
+				if (Contains(UnavailableFlarePoseAnims, laraItem.Animation.AnimNumber))
+					player.Flare.ControlLeft = false;
+
 				DoFlareInHand(laraItem, player.Flare.Life);
 				SetFlareArm(laraItem, player.LeftArm.FrameNumber);
 			}
@@ -794,7 +810,7 @@ void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 {
 	const auto& player = *GetLaraInfo(&laraItem);
 
-	auto targetArmOrient = arm.Locked ? player.TargetArmOrient : EulerAngles::Zero;
+	auto targetArmOrient = arm.Locked ? player.TargetArmOrient : EulerAngles::Identity;
 	arm.Orientation.InterpolateConstant(targetArmOrient, weaponInfo.AimSpeed);
 }
 
@@ -927,8 +943,11 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			orient.x <= weaponInfo.LockOrientConstraint.second.x &&
 			orient.y <= weaponInfo.LockOrientConstraint.second.y)
 		{
+			if (targetCount >= player.TARGET_COUNT_MAX - 1)
+				break;
+
 			player.TargetList[targetCount] = &item;
-			++targetCount;
+			targetCount++;
 
 			if (distance < closestDistance &&
 				abs(orient.y) < (closestHeadingAngle + ANGLE(15.0f)))
@@ -1018,7 +1037,7 @@ void LaraTargetInfo(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	{
 		player.RightArm.Locked = false;
 		player.LeftArm.Locked = false;
-		player.TargetArmOrient = EulerAngles::Zero;
+		player.TargetArmOrient = EulerAngles::Identity;
 		return;
 	}
 

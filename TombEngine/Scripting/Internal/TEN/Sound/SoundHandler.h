@@ -2,7 +2,7 @@
 
 namespace sol { class state; };
 
-namespace Sound
+namespace TEN::Scripting::Sound
 {
 	void Register(sol::state* lua, sol::table& parent);
 };

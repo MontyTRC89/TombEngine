@@ -95,7 +95,7 @@ void ReadyFlare(ItemInfo& laraItem)
 
 	player.Control.HandStatus = HandStatus::Free;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
 	player.TargetEntity = nullptr;
@@ -318,6 +318,8 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 	flareItem.RoomNumber = laraItem.RoomNumber;
 
 	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(-16, 32, 42));
+	if (objectID == ID_BURNING_TORCH_ITEM && laraItem.Animation.ActiveState == LS_CROUCH_IDLE)
+		pos.y -= CLICK(0.5f);
 
 	flareItem.Pose.Position = pos;
 
@@ -351,7 +353,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 
 	flareItem.Pose.Orientation.x = 0;
 	flareItem.Pose.Orientation.z = 0;
-	flareItem.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+	flareItem.Model.Color = Vector4::One;
 
 	if (isThrown)
 	{

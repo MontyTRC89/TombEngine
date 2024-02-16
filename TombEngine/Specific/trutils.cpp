@@ -3,8 +3,8 @@
 #include <codecvt>
 #include <filesystem>
 
-#include "Renderer/Renderer11.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/trutils.h"
 
 using TEN::Renderer::g_Renderer;
@@ -157,7 +157,7 @@ namespace TEN::Utils
 
     Vector2 GetAspectCorrect2DPosition(const Vector2& pos)
     {
-       constexpr auto DISPLAY_SPACE_ASPECT = SCREEN_SPACE_RES.x / SCREEN_SPACE_RES.y;
+       constexpr auto DISPLAY_SPACE_ASPECT = DISPLAY_SPACE_RES.x / DISPLAY_SPACE_RES.y;
 
         auto screenRes = g_Renderer.GetScreenResolution().ToVector2();
         float screenResAspect = screenRes.x / screenRes.y;
@@ -179,15 +179,15 @@ namespace TEN::Utils
     Vector2 Convert2DPositionToNDC(const Vector2& pos)
     {
         return Vector2(
-            ((pos.x * 2) / SCREEN_SPACE_RES.x) - 1.0f,
-            1.0f - ((pos.y * 2) / SCREEN_SPACE_RES.y));
+            ((pos.x * 2) / DISPLAY_SPACE_RES.x) - 1.0f,
+            1.0f - ((pos.y * 2) / DISPLAY_SPACE_RES.y));
     }
 
     Vector2 ConvertNDCTo2DPosition(const Vector2& ndc)
     {
         return Vector2(
-            ((ndc.x + 1.0f) * SCREEN_SPACE_RES.x) / 2,
-            ((1.0f - ndc.y) * SCREEN_SPACE_RES.y) / 2);
+            ((ndc.x + 1.0f) * DISPLAY_SPACE_RES.x) / 2,
+            ((1.0f - ndc.y) * DISPLAY_SPACE_RES.y) / 2);
     }
 
     std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)

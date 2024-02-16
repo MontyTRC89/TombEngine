@@ -3,6 +3,8 @@
 
 #include "Game/control/control.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/BridgeObject.h"
+#include "Objects/Generic/Object/Pushable/PushableBridge.h"
 
 using namespace TEN::Math;
 
@@ -48,6 +50,12 @@ namespace TEN::Entities::Generic
 		IsBuoyant = false;
 		UseRoomCollision = false;
 		UseBridgeCollision = false;
+
+		// Initialize bridge routines.
+		Bridge.GetFloorHeight = GetPushableBridgeFloorHeight;
+		Bridge.GetCeilingHeight = GetPushableBridgeCeilingHeight;
+		Bridge.GetFloorBorder = GetPushableBridgeFloorBorder;
+		Bridge.GetCeilingBorder = GetPushableBridgeCeilingBorder;
 
 		EdgeAttribs =
 		{

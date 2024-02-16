@@ -93,7 +93,7 @@ namespace TEN::Gui
 	struct ObjectList
 	{
 		int			InventoryItem = 0;
-		EulerAngles Orientation	  = EulerAngles::Zero;
+		EulerAngles Orientation	  = EulerAngles::Identity;
 		unsigned short Bright;
 	};
 

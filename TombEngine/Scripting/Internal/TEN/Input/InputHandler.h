@@ -2,7 +2,7 @@
 
 namespace sol { class state; };
 
-namespace Input
+namespace TEN::Scripting::Input
 {
 	void Register(sol::state* lua, sol::table& parent);
 };

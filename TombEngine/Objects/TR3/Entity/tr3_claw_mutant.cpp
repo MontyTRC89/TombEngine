@@ -97,7 +97,7 @@ namespace TEN::Entities::Creatures::TR3
 		plasma.sLife =
 		plasma.life = (GetRandomControl() & 7) + 24;
 
-		plasma.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		plasma.blendMode = BlendMode::Additive;
 
 		plasma.extras = 0;
 		plasma.dynamic = -1;
@@ -240,7 +240,7 @@ namespace TEN::Entities::Creatures::TR3
 		plasma.sLife =
 		plasma.life = (GetRandomControl() & 7) + life;
 
-		plasma.blendMode = BLENDMODE_ADDITIVE;
+		plasma.blendMode = BlendMode::Additive;
 
 		plasma.extras = 0;
 		plasma.dynamic = -1;
@@ -301,8 +301,8 @@ namespace TEN::Entities::Creatures::TR3
 		auto& creature = *GetCreatureInfo(&item);
 
 		short headingAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (item.HitPoints <= 0)
 		{
