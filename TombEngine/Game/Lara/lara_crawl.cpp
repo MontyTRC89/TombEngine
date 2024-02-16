@@ -69,7 +69,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
@@ -85,7 +85,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Roll) || (!EnableModernControls && (IsHeld(In::Forward) && IsHeld(In::Back))))
+		if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
 		{
 			item->Animation.TargetState = LS_CROUCH_TURN_180;
 			return;
@@ -103,7 +103,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (EnableModernControls)
+		if (IsUsingModernControls())
 		{
 			if ((IsHeld(In::Forward) || IsHeld(In::Back) ||
 				IsHeld(In::Left) || IsHeld(In::Right)) &&
@@ -433,7 +433,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
-	if (EnableModernControls)
+	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right))
@@ -449,7 +449,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Roll) || (!EnableModernControls && (IsHeld(In::Forward) && IsHeld(In::Back))))
+		if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
 		{
 			item->Animation.TargetState = LS_CRAWL_TURN_180;
 			return;
@@ -470,7 +470,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (EnableModernControls)
+		if (IsUsingModernControls())
 		{
 			if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 				IsHeld(In::Left) || IsHeld(In::Right))
@@ -610,7 +610,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -628,11 +628,11 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		if (IsHeld(In::Forward) ||
-			(EnableModernControls &&
+			(IsUsingModernControls() &&
 				(IsHeld(In::Forward) || IsHeld(In::Back) ||
 				IsHeld(In::Left) || IsHeld(In::Right))))
 		{
-			if (EnableModernControls)
+			if (IsUsingModernControls())
 				item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, GetPlayerMoveAngle(*item), item->Pose.Orientation.z), 0.1f);
 
 			item->Animation.TargetState = LS_CRAWL_FORWARD;
@@ -672,7 +672,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdgeCrawl(item, coll))
 	{
-		if (!EnableModernControls)
+		if (!IsUsingModernControls())
 		{
 			// TODO: Stop when colliding with wall.
 			item->Animation.TargetState = LS_SOFT_SPLAT;

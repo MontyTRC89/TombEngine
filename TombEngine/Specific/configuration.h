@@ -50,7 +50,7 @@ enum class ControlMode
 	Modern
 };
 
-struct GameConfiguration 
+struct GameConfiguration
 {
 	static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
 	static constexpr auto DEFAULT_SHADOW_BLOBS_MAX	= 16;

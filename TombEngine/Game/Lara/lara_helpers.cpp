@@ -739,7 +739,7 @@ void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	if (item->Animation.Velocity.z == 0.0f)
 		return;
 
-	if (EnableModernControls)
+	if (IsUsingModernControls())
 	{
 		return;
 
@@ -1315,7 +1315,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 {
 	const auto& player = GetLaraInfo(item);
 
-	if (EnableModernControls)
+	if (IsUsingModernControls())
 	{
 		if (player.Control.HandStatus == HandStatus::WeaponDraw ||
 			player.Control.HandStatus == HandStatus::WeaponReady)
@@ -1386,7 +1386,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 
 short GetPlayerMoveAngle(const ItemInfo& item)
 {
-	if (EnableModernControls)
+	if (IsUsingModernControls())
 	{
 		if (AxisMap[(int)InputAxis::Move] == Vector2::Zero)
 			return item.Pose.Orientation.y;

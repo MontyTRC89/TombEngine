@@ -11,6 +11,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
@@ -314,9 +315,9 @@ void MoveCamera(GameVector* ideal, int speed)
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
 
-	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * (EnableModernControls ? 0.25f : 1.0f));
-	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * (EnableModernControls ? 0.25f : 1.0f));
-	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * (EnableModernControls ? 0.25f : 1.0f));
+	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * (IsUsingModernControls() ? 0.25f : 1.0f));
+	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * (IsUsingModernControls() ? 0.25f : 1.0f));
+	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * (IsUsingModernControls() ? 0.25f : 1.0f));
 	Camera.pos.RoomNumber = ideal->RoomNumber;
 
 	if (Camera.bounce)
@@ -622,10 +623,10 @@ void UpdateCameraElevation()
 	}
 	else
 	{
-		if (EnableModernControls)
+		if (IsUsingModernControls())
 		{
-			Camera.actualAngle += ANGLE(AxisMap[(int)InputAxis::Mouse].x * 200);
-			Camera.actualElevation -= ANGLE(AxisMap[(int)InputAxis::Mouse].y * 200);
+			Camera.actualAngle += ANGLE(AxisMap[(int)InputAxis::Mouse].x * 300);
+			Camera.actualElevation -= ANGLE(AxisMap[(int)InputAxis::Mouse].y * 300);
 		}
 		else
 		{
@@ -633,7 +634,7 @@ void UpdateCameraElevation()
 		}
 	}
 
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
 

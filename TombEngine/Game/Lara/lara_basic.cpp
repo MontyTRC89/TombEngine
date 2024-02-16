@@ -150,7 +150,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -160,11 +160,11 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (IsHeld(In::Forward) ||
-		(EnableModernControls &&
+		(IsUsingModernControls() &&
 			(IsHeld(In::Forward) || IsHeld(In::Back) ||
 			 IsHeld(In::Left) || IsHeld(In::Right))))
 	{
-		if (EnableModernControls)
+		if (IsUsingModernControls())
 		{
 			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
 			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
@@ -275,7 +275,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -295,7 +295,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
-	if ((IsHeld(In::Roll) || (!EnableModernControls && IsHeld(In::Forward) && IsHeld(In::Back))) &&
+	if ((IsHeld(In::Roll) || (!IsUsingModernControls() && IsHeld(In::Forward) && IsHeld(In::Back))) &&
 		CanRoll180Running(*item))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
@@ -309,11 +309,11 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (IsHeld(In::Forward) ||
-		(EnableModernControls &&
+		(IsUsingModernControls() &&
 			(IsHeld(In::Forward) || IsHeld(In::Back) ||
 			 IsHeld(In::Left) || IsHeld(In::Right))))
 	{
-		if (EnableModernControls)
+		if (IsUsingModernControls())
 		{
 			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
 			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
@@ -457,7 +457,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
-	if (EnableModernControls)
+	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right))
@@ -504,7 +504,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Roll) || (!EnableModernControls && (IsHeld(In::Forward) && IsHeld(In::Back))))
+	if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
 	{
 		if (IsHeld(In::Walk) || CanTurn180(*item, *coll))
 		{
@@ -530,7 +530,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (EnableModernControls)
+	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right))
@@ -695,7 +695,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepLeft) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Left))))
+	if (IsHeld(In::StepLeft) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Left))))
 	{
 		if (CanSidestepLeft(*item, *coll))
 		{
@@ -708,7 +708,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(In::StepRight) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Right))))
+	else if (IsHeld(In::StepRight) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Right))))
 	{
 		if (CanSidestepRight(*item, *coll))
 		{
@@ -1389,7 +1389,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 	{
 		// Walk action locks orientation.
 		if (IsHeld(In::Walk))
@@ -1402,7 +1402,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepRight) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Right))))
+	if (IsHeld(In::StepRight) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Right))))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
@@ -1488,7 +1488,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 	{
 		// Walk action locks orientation.
 		if (IsHeld(In::Walk))
@@ -1501,7 +1501,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepLeft) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Left))))
+	if (IsHeld(In::StepLeft) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Left))))
 	{
 		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
@@ -1820,7 +1820,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -1853,11 +1853,11 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (IsHeld(In::Forward) ||
-		(EnableModernControls &&
+		(IsUsingModernControls() &&
 			(IsHeld(In::Forward) || IsHeld(In::Back) ||
 			 IsHeld(In::Left) || IsHeld(In::Right))))
 	{
-		if (EnableModernControls)
+		if (IsUsingModernControls())
 		{
 			HandlePlayerTurn(*item, PLAYER_SPRINT_TURN_ALPHA);
 			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);

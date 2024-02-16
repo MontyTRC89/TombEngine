@@ -6,8 +6,6 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-extern bool EnableModernControls;
-
 constexpr auto LARA_GRAB_THRESHOLD = ANGLE(40.0f);
 constexpr auto FRONT_ARC		   = ANGLE(90.0f);
 

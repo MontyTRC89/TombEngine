@@ -43,7 +43,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (EnableModernControls)
+	if (IsUsingModernControls())
 	{
 		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}
@@ -82,7 +82,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (EnableModernControls)
+		if (IsUsingModernControls())
 		{
 			if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 				IsHeld(In::Left) || IsHeld(In::Right) &&
@@ -118,7 +118,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (IsHeld(In::StepLeft) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Left))))
+		if (IsHeld(In::StepLeft) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Left))))
 		{
 			if (CanMonkeySwingShimmyLeft(*item, *coll))
 			{
@@ -131,7 +131,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 			return;
 		}
-		else if (IsHeld(In::StepRight) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Right))))
+		else if (IsHeld(In::StepRight) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Right))))
 		{
 			if (CanMonkeySwingShimmyRight(*item, *coll))
 			{
@@ -211,7 +211,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!EnableModernControls)
+	if (!IsUsingModernControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
@@ -219,18 +219,18 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
 	{
-		if (IsHeld(In::Roll) || (!EnableModernControls && (IsHeld(In::Forward) && IsHeld(In::Back))))
+		if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
 		}
 
 		if (IsHeld(In::Forward) ||
-			(EnableModernControls &&
+			(IsUsingModernControls() &&
 				(IsHeld(In::Forward) || IsHeld(In::Back) ||
 				 IsHeld(In::Left) || IsHeld(In::Right))))
 		{
-			if (EnableModernControls)
+			if (IsUsingModernControls())
 				HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
 
 			item->Animation.TargetState = LS_MONKEY_FORWARD;

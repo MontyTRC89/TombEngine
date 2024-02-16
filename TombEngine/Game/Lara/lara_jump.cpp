@@ -68,14 +68,14 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_DEATH;
 		}
-		else if (EnableModernControls &&
+		else if (IsUsingModernControls() &&
 			(IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right)) &&
 			(!IsHeld(In::Walk) && player.Control.WaterStatus != WaterStatus::Wade))
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
 		}
-		else if (!EnableModernControls &&
+		else if (!IsUsingModernControls() &&
 			(IsHeld(In::Forward) && !IsHeld(In::Walk) &&
 			player.Control.WaterStatus != WaterStatus::Wade))
 		{
@@ -103,7 +103,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Roll) || (!EnableModernControls && IsHeld(In::Back)))
+	if (IsHeld(In::Roll) || (!IsUsingModernControls() && IsHeld(In::Back)))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;
@@ -287,7 +287,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	if (IsClicked(In::Jump) && !IsDirectionalActionHeld())
 		player.Control.JumpDirection = JumpDirection::None;
 
-	if (EnableModernControls)
+	if (IsUsingModernControls())
 	{
 		if (player.Control.HandStatus == HandStatus::WeaponDraw ||
 			player.Control.HandStatus == HandStatus::WeaponReady)
@@ -491,7 +491,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Roll) || (!EnableModernControls && IsHeld(In::Forward)))
+	if (IsHeld(In::Roll) || (!IsUsingModernControls() && IsHeld(In::Forward)))
 	{
 		item->Animation.TargetState = LS_JUMP_ROLL_180;
 		return;

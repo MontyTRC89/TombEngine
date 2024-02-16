@@ -100,7 +100,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 {
-	return (abs(Geometry::GetShortestAngle(coll->NearestLedgeAngle, EnableModernControls ? GetPlayerMoveAngle(*item) : item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+	return (abs(Geometry::GetShortestAngle(coll->NearestLedgeAngle, IsUsingModernControls() ? GetPlayerMoveAngle(*item) : item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
@@ -1115,6 +1115,21 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.Velocity.z = 0.0f;
 		player.Control.WaterStatus = WaterStatus::Wade;
 	}
+}
+
+bool IsUsingClassicTankControls()
+{
+	return (g_Configuration.ControlMode == ControlMode::ClassicTank);
+}
+
+bool IsUsingEnhancedTankControls()
+{
+	return (g_Configuration.ControlMode == ControlMode::EnhancedTank);
+}
+
+bool IsUsingModernControls()
+{
+	return (g_Configuration.ControlMode == ControlMode::Modern);
 }
 
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList)
