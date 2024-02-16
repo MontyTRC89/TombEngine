@@ -1269,6 +1269,10 @@ struct PlayerControlData
 	TightropeControlData Tightrope = {};
 	WeaponControlData	 Weapon	   = {};
 
+	// TODO: Add to savegame.
+	bool ToggleCrouch = false;
+	bool ToggleHang	  = false;
+
 	bool IsClimbingLadder = false;
 	bool IsLocked		  = false;
 	bool IsLow			  = false;

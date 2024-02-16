@@ -11,7 +11,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -35,7 +34,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = -ANGLE(5.0f);
+	Camera.targetElevation = ANGLE(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -44,10 +43,11 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// Overhang hook.
-	SlopeMonkeyExtra(item, coll);
-
-	if (!EnableModernControls)
+	if (EnableModernControls)
+	{
+		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
+	}
+	else
 	{
 		// NOTE: Shimmy locks orientation.
 		if ((IsHeld(In::Left) &&
@@ -82,25 +82,43 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward) ||
-			(EnableModernControls &&
-				(IsHeld(In::Forward) || IsHeld(In::Back) ||
-					IsHeld(In::Left) || IsHeld(In::Right))) &&
-			CanMonkeySwingForward(*item, *coll))
+		if (EnableModernControls)
 		{
-			if (EnableModernControls)
-				item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, GetPlayerMoveAngle(*item), item->Pose.Orientation.z), 0.25f);
-			
-			item->Animation.TargetState = LS_MONKEY_FORWARD;
-			return;
+			if (IsHeld(In::Forward) || IsHeld(In::Back) ||
+				IsHeld(In::Left) || IsHeld(In::Right) &&
+				CanMonkeySwingForward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_MONKEY_FORWARD;
+				return;
+			}
 		}
-		else if (IsHeld(In::Back) && CanMonkeySwingBackward(*item, *coll))
+		else
+
 		{
-			item->Animation.TargetState = LS_MONKEY_BACK;
-			return;
+			if (IsHeld(In::Forward) && CanMonkeySwingForward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_MONKEY_FORWARD;
+				return;
+			}
+			else if (IsHeld(In::Back) && CanMonkeySwingBackward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_MONKEY_BACK;
+				return;
+			}
+
+			if (IsHeld(In::Left))
+			{
+				item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
+				return;
+			}
+			else if (IsHeld(In::Right))
+			{
+				item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
+				return;
+			}
 		}
 
-		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
+		if (IsHeld(In::StepLeft) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Left))))
 		{
 			if (CanMonkeySwingShimmyLeft(*item, *coll))
 			{
@@ -113,7 +131,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 			return;
 		}
-		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
+		else if (IsHeld(In::StepRight) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Right))))
 		{
 			if (CanMonkeySwingShimmyRight(*item, *coll))
 			{
@@ -124,17 +142,6 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 				item->Animation.TargetState = LS_MONKEY_IDLE;
 			}
 
-			return;
-		}
-
-		if (IsHeld(In::Left))
-		{
-			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
-			return;
-		}
-		else if (IsHeld(In::Right))
-		{
-			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 			return;
 		}
 
@@ -212,7 +219,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
 	{
-		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+		if (IsHeld(In::Roll) || (!EnableModernControls && (IsHeld(In::Forward) && IsHeld(In::Back))))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
@@ -221,10 +228,10 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Forward) ||
 			(EnableModernControls &&
 				(IsHeld(In::Forward) || IsHeld(In::Back) ||
-					IsHeld(In::Left) || IsHeld(In::Right))))
+				 IsHeld(In::Left) || IsHeld(In::Right))))
 		{
 			if (EnableModernControls)
-				item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, GetPlayerMoveAngle(*item), item->Pose.Orientation.z), 0.25f);
+				HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
 
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;

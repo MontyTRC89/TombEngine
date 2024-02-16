@@ -79,7 +79,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			HandlePlayerTurn(*item, 0.1f);
+			HandlePlayerTurn(*item, PLAYER_CRAWL_TURN_ALPHA);
 		}
 	}
 
@@ -438,7 +438,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			HandlePlayerTurn(*item, 0.1f);
+			HandlePlayerTurn(*item, PLAYER_CRAWL_TURN_ALPHA);
 		}
 	}
 	else

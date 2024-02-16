@@ -162,11 +162,11 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Forward) ||
 		(EnableModernControls &&
 			(IsHeld(In::Forward) || IsHeld(In::Back) ||
-				IsHeld(In::Left) || IsHeld(In::Right))))
+			 IsHeld(In::Left) || IsHeld(In::Right))))
 	{
 		if (EnableModernControls)
 		{
-			HandlePlayerTurn(*item, 0.25f);
+			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
 			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 		}
 
@@ -311,11 +311,11 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Forward) ||
 		(EnableModernControls &&
 			(IsHeld(In::Forward) || IsHeld(In::Back) ||
-			IsHeld(In::Left) || IsHeld(In::Right))))
+			 IsHeld(In::Left) || IsHeld(In::Right))))
 	{
 		if (EnableModernControls)
 		{
-			HandlePlayerTurn(*item, 0.25f);
+			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
 			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 		}
 
@@ -462,6 +462,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right))
 		{
+			// TODO: Disable turning when weapon is drawn.
 			short deltaAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerMoveAngle(*item)));
 			if (deltaAngle >= ANGLE(45.0f) &&
 				(player.Control.HandStatus == HandStatus::WeaponDraw ||
@@ -470,7 +471,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				HandlePlayerTurn(*item, 0.25f);
+				HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
 			}
 		}
 	}
@@ -1388,17 +1389,20 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// Walk action locks orientation.
-	if (IsHeld(In::Walk))
+	if (!EnableModernControls)
 	{
-		ResetPlayerTurnRateY(*item);
-	}
-	else if (IsHeld(In::Left) || IsHeld(In::Right))
-	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		// Walk action locks orientation.
+		if (IsHeld(In::Walk))
+		{
+			ResetPlayerTurnRateY(*item);
+		}
+		else if (IsHeld(In::Left) || IsHeld(In::Right))
+		{
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		}
 	}
 
-	if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
+	if (IsHeld(In::StepRight) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Right))))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
@@ -1484,17 +1488,20 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// Walk action locks orientation.
-	if (IsHeld(In::Walk))
+	if (!EnableModernControls)
 	{
-		ResetPlayerTurnRateY(*item);
-	}
-	else if (IsHeld(In::Left) || IsHeld(In::Right))
-	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		// Walk action locks orientation.
+		if (IsHeld(In::Walk))
+		{
+			ResetPlayerTurnRateY(*item);
+		}
+		else if (IsHeld(In::Left) || IsHeld(In::Right))
+		{
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		}
 	}
 
-	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
+	if (IsHeld(In::StepLeft) || (!EnableModernControls && (IsHeld(In::Walk) && IsHeld(In::Left))))
 	{
 		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
@@ -1852,7 +1859,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (EnableModernControls)
 		{
-			HandlePlayerTurn(*item, 0.075f);
+			HandlePlayerTurn(*item, PLAYER_SPRINT_TURN_ALPHA);
 			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 		}
 

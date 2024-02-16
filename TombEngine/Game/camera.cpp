@@ -634,9 +634,7 @@ void UpdateCameraElevation()
 	}
 
 	if (!EnableModernControls)
-	{
 		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
-	}
 }
 
 void CombatCamera(ItemInfo* item)
