@@ -121,4 +121,6 @@ namespace TEN::Input
 	bool IsDirectionalActionHeld();
 	bool IsWakeActionHeld();
 	bool IsOpticActionHeld();
+
+	Vector2 GetMoveAxis();
 }

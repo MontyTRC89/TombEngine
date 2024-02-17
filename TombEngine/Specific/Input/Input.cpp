@@ -895,4 +895,9 @@ namespace TEN::Input
 	{
 		return (IsDirectionalActionHeld() || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint));
 	}
+
+	Vector2 GetMoveAxis()
+	{
+		return AxisMap[(int)InputAxis::Move];
+	}
 }

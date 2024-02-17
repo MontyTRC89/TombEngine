@@ -103,7 +103,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((HasCrawlAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
+		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 		{
 			item->Animation.TargetState = LS_CROUCH_TURN_180;
 			return;
@@ -478,7 +478,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((HasCrawlAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
+		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 		{
 			item->Animation.TargetState = LS_CRAWL_TURN_180;
 			return;

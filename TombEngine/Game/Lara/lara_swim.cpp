@@ -7,6 +7,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
@@ -38,19 +39,27 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) && laraType != LaraType::Divesuit)
+	if ((IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls())) &&
+		laraType != LaraType::Divesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 
-	if (laraType == LaraType::Divesuit)
-		ModulateLaraSubsuitSwimTurnRates(item);
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA);
+	}
 	else
-		ModulateLaraSwimTurnRates(item, coll);
+	{
+		(laraType == LaraType::Divesuit) ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	}
 
-	if (IsHeld(In::Jump))
+	if ((IsHeld(In::Jump) && !IsUsingModernControls()) ||
+		(GetMoveAxis() != Vector2::Zero && IsUsingModernControls()))
+	{
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+	}
 
 	item->Animation.Velocity.y -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.Velocity.y < 0.0f)
@@ -89,17 +98,24 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (laraType != LaraType::Divesuit)
-		ModulateLaraSwimTurnRates(item, coll);
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA);
+	}
 	else
-		ModulateLaraSubsuitSwimTurnRates(item);
+	{
+		(laraType == LaraType::Divesuit) ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	}
 
 	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
 	if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX)
 		item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX;
 
-	if (!IsHeld(In::Jump))
+	if ((!IsHeld(In::Jump) && !IsUsingModernControls()) ||
+		(GetMoveAxis() == Vector2::Zero && IsUsingModernControls()))
+	{
 		item->Animation.TargetState = LS_UNDERWATER_INERTIA;
+	}
 }
 
 // State:		LS_UNDERWATER_SWIM_FORWARD (17)
@@ -131,13 +147,20 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (laraType != LaraType::Divesuit)
-		ModulateLaraSwimTurnRates(item, coll);
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA);
+	}
 	else
-		ModulateLaraSubsuitSwimTurnRates(item);
+	{
+		(laraType == LaraType::Divesuit) ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+	}
 
-	if (IsHeld(In::Jump))
+	if ((IsHeld(In::Jump) && !IsUsingModernControls()) ||
+		(GetMoveAxis() != Vector2::Zero && IsUsingModernControls()))
+	{
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+	}
 
 	item->Animation.Velocity.y -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.Velocity.y < 0.0f)
@@ -170,12 +193,18 @@ void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.x > ANGLE(2.0f))
 	{
 		if (item->Pose.Orientation.x >= 0)
+		{
 			item->Pose.Orientation.x -= ANGLE(2.0f);
+		}
 		else
+		{
 			item->Pose.Orientation.x += ANGLE(2.0f);
+		}
 	}
 	else
+	{
 		item->Pose.Orientation.x = 0;
+	}
 }
 
 // State:		LS_WATER_DEATH (44)

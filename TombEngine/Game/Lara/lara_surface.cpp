@@ -53,8 +53,15 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Left) || IsHeld(In::Right))
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA);
+	}
+	else
+	{
+		if (IsHeld(In::Left) || IsHeld(In::Right))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
+	}
 
 	if (IsClicked(In::Jump))
 	{
@@ -62,29 +69,41 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+	if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
-	if (IsHeld(In::Forward))
+	if (IsUsingModernControls())
 	{
-		item->Animation.TargetState = LS_ONWATER_FORWARD;
-		return;
+		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
+			IsHeld(In::Left) || IsHeld(In::Right))
+		{
+			item->Animation.TargetState = LS_ONWATER_FORWARD;
+			return;
+		}
 	}
-	else if (IsHeld(In::Back))
+	else
 	{
-		item->Animation.TargetState = LS_ONWATER_BACK;
-		return;
+		if (IsHeld(In::Forward))
+		{
+			item->Animation.TargetState = LS_ONWATER_FORWARD;
+			return;
+		}
+		else if (IsHeld(In::Back))
+		{
+			item->Animation.TargetState = LS_ONWATER_BACK;
+			return;
+		}
 	}
-	
-	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
+
+	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_ONWATER_LEFT;
 		return;
 	}
-	else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
+	else if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_ONWATER_RIGHT;
 		return;
@@ -117,18 +136,36 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Left) || IsHeld(In::Right))
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
-
-	if (!IsHeld(In::Forward))
-		item->Animation.TargetState = LS_ONWATER_IDLE;
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA);
+	}
+	else
+	{
+		if (IsHeld(In::Left) || IsHeld(In::Right))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
+	}
 
 	if (IsClicked(In::Jump))
+	{
 		SetLaraSwimDiveAnimation(item);
+		return;
+	}
 
-	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
-	if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
-		item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
+	if (IsHeld(In::Forward) ||
+		(IsUsingModernControls() &&
+			(IsHeld(In::Forward) || IsHeld(In::Back) ||
+			 IsHeld(In::Left) || IsHeld(In::Right))))
+	{
+		item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
+		if (item->Animation.Velocity.y > LARA_TREAD_VELOCITY_MAX)
+			item->Animation.Velocity.y = LARA_TREAD_VELOCITY_MAX;
+
+		item->Animation.TargetState = LS_ONWATER_FORWARD;
+		return;
+	}
+
+	item->Animation.TargetState = LS_ONWATER_IDLE;
 }
 
 // State:		LS_ONWATER_FORWARD (34)
@@ -158,10 +195,14 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsHeld(In::Walk))	// WALK locks orientation.
+	if (!IsUsingModernControls())
 	{
-		if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+		// NOTE: Walk locks orientation.
+		if (!IsHeld(In::Walk))
+		{
+			if (IsHeld(In::Left) || IsHeld(In::Right))
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+		}
 	}
 
 	if (!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))))
@@ -199,10 +240,14 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsHeld(In::Walk))	// WALK locks orientation.
+	if (!IsUsingModernControls())
 	{
-		if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+		// NOTE: Walk locks orientation.
+		if (!IsHeld(In::Walk))
+		{
+			if (IsHeld(In::Left) || IsHeld(In::Right))
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+		}
 	}
 
 	if (!(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))))

@@ -295,7 +295,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
-	if ((IsHeld(In::Roll) || (!IsUsingModernControls() && IsHeld(In::Forward) && IsHeld(In::Back))) &&
+	if ((IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls())) &&
 		CanRoll180Running(*item))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
@@ -504,7 +504,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
+	if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 	{
 		if (IsHeld(In::Walk) || CanTurn180(*item, *coll))
 		{
@@ -695,7 +695,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepLeft) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Left))))
+	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
 	{
 		if (CanSidestepLeft(*item, *coll))
 		{
@@ -708,7 +708,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(In::StepRight) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Right))))
+	else if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
 	{
 		if (CanSidestepRight(*item, *coll))
 		{
@@ -1402,7 +1402,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepRight) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Right))))
+	if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
@@ -1501,7 +1501,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepLeft) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Left))))
+	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
@@ -1715,22 +1715,26 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Left) || IsHeld(In::Right))
+	if (!IsUsingModernControls())
 	{
-		if (isInSwamp)
-		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SWAMP_TURN_RATE_MAX);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX * 0.6f);
-		}
-		else
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE / 2, LARA_LEAN_MAX);
+			HandlePlayerLean(item, coll, LARA_LEAN_RATE  / (isInSwamp ? 3 : 2), LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f));
 		}
 	}
 
-	if (IsHeld(In::Forward))
+	if (IsHeld(In::Forward) ||
+		(IsUsingModernControls() &&
+			(IsHeld(In::Forward) || IsHeld(In::Back) ||
+			 IsHeld(In::Left) || IsHeld(In::Right))))
 	{
+		if (IsUsingModernControls())
+		{
+			HandlePlayerTurn(*item, PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1));
+			HandlePlayerLean(item, coll, LARA_LEAN_RATE / (isInSwamp ? 3 : 2), LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f));
+		}
+
 		if (IsHeld(In::Action))
 		{
 			auto vaultContext = TestLaraVault(item, coll);

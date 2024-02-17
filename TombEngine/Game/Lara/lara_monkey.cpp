@@ -70,7 +70,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
+		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
@@ -117,7 +117,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if (IsHeld(In::StepLeft) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Left))))
+		if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
 		{
 			if (CanMonkeySwingShimmyLeft(*item, *coll))
 			{
@@ -130,7 +130,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 			return;
 		}
-		else if (IsHeld(In::StepRight) || (!IsUsingModernControls() && (IsHeld(In::Walk) && IsHeld(In::Right))))
+		else if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
 		{
 			if (CanMonkeySwingShimmyRight(*item, *coll))
 			{
@@ -218,7 +218,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
 	{
-		if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
+		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
