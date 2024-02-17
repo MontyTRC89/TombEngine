@@ -2,6 +2,7 @@ Version 1.4
 ===========
 
 * Fixed sounds resuming in pause mode while switching between apps.
+* Fixed slide directions.
 * Add TR2 Dragon.
 * Add TR3 Winston (requires updated TEN Winston wad2).
 
