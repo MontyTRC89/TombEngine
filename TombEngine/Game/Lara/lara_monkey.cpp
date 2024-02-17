@@ -70,7 +70,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back)))
+		if (IsHeld(In::Roll) || (!IsUsingModernControls() && (IsHeld(In::Forward) && IsHeld(In::Back))))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
@@ -93,7 +93,6 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 		else
-
 		{
 			if (IsHeld(In::Forward) && CanMonkeySwingForward(*item, *coll))
 			{
@@ -252,7 +251,7 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.IsMonkeySwinging = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.MoveAngle = GetPlayerMoveAngle(*item);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;

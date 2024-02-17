@@ -245,6 +245,8 @@ table LaraControlData {
 	rope: RopeControlData;
 	subsuit: SubsuitControlData;
 	tightrope: TightropeControlData;
+	toggle_climb: bool;
+	toggle_crouch: bool;
 	turn_rate: int32;
 	water_status: int32;
 	weapon: WeaponControlData;

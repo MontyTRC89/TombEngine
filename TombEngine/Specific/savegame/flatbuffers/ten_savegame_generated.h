@@ -3481,6 +3481,8 @@ struct LaraControlDataT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::RopeControlDataT> rope{};
   std::unique_ptr<TEN::Save::SubsuitControlDataT> subsuit{};
   std::unique_ptr<TEN::Save::TightropeControlDataT> tightrope{};
+  bool toggle_climb = false;
+  bool toggle_crouch = false;
   int32_t turn_rate = 0;
   int32_t water_status = 0;
   std::unique_ptr<TEN::Save::WeaponControlDataT> weapon{};
@@ -3507,9 +3509,11 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ROPE = 30,
     VT_SUBSUIT = 32,
     VT_TIGHTROPE = 34,
-    VT_TURN_RATE = 36,
-    VT_WATER_STATUS = 38,
-    VT_WEAPON = 40
+    VT_TOGGLE_CLIMB = 36,
+    VT_TOGGLE_CROUCH = 38,
+    VT_TURN_RATE = 40,
+    VT_WATER_STATUS = 42,
+    VT_WEAPON = 44
   };
   bool can_climb_ladder() const {
     return GetField<uint8_t>(VT_CAN_CLIMB_LADDER, 0) != 0;
@@ -3559,6 +3563,12 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::TightropeControlData *tightrope() const {
     return GetPointer<const TEN::Save::TightropeControlData *>(VT_TIGHTROPE);
   }
+  bool toggle_climb() const {
+    return GetField<uint8_t>(VT_TOGGLE_CLIMB, 0) != 0;
+  }
+  bool toggle_crouch() const {
+    return GetField<uint8_t>(VT_TOGGLE_CROUCH, 0) != 0;
+  }
   int32_t turn_rate() const {
     return GetField<int32_t>(VT_TURN_RATE, 0);
   }
@@ -3591,6 +3601,8 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(subsuit()) &&
            VerifyOffset(verifier, VT_TIGHTROPE) &&
            verifier.VerifyTable(tightrope()) &&
+           VerifyField<uint8_t>(verifier, VT_TOGGLE_CLIMB) &&
+           VerifyField<uint8_t>(verifier, VT_TOGGLE_CROUCH) &&
            VerifyField<int32_t>(verifier, VT_TURN_RATE) &&
            VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
            VerifyOffset(verifier, VT_WEAPON) &&
@@ -3654,6 +3666,12 @@ struct LaraControlDataBuilder {
   void add_tightrope(flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope) {
     fbb_.AddOffset(LaraControlData::VT_TIGHTROPE, tightrope);
   }
+  void add_toggle_climb(bool toggle_climb) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_TOGGLE_CLIMB, static_cast<uint8_t>(toggle_climb), 0);
+  }
+  void add_toggle_crouch(bool toggle_crouch) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_TOGGLE_CROUCH, static_cast<uint8_t>(toggle_crouch), 0);
+  }
   void add_turn_rate(int32_t turn_rate) {
     fbb_.AddElement<int32_t>(LaraControlData::VT_TURN_RATE, turn_rate, 0);
   }
@@ -3692,6 +3710,8 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
     flatbuffers::Offset<TEN::Save::RopeControlData> rope = 0,
     flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0,
     flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope = 0,
+    bool toggle_climb = false,
+    bool toggle_crouch = false,
     int32_t turn_rate = 0,
     int32_t water_status = 0,
     flatbuffers::Offset<TEN::Save::WeaponControlData> weapon = 0) {
@@ -3707,6 +3727,8 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
   builder_.add_jump_direction(jump_direction);
   builder_.add_hand_status(hand_status);
   builder_.add_count(count);
+  builder_.add_toggle_crouch(toggle_crouch);
+  builder_.add_toggle_climb(toggle_climb);
   builder_.add_keep_low(keep_low);
   builder_.add_is_run_jump_queued(is_run_jump_queued);
   builder_.add_is_moving(is_moving);
@@ -8625,6 +8647,8 @@ inline void LaraControlData::UnPackTo(LaraControlDataT *_o, const flatbuffers::r
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = subsuit(); if (_e) _o->subsuit = std::unique_ptr<TEN::Save::SubsuitControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = tightrope(); if (_e) _o->tightrope = std::unique_ptr<TEN::Save::TightropeControlDataT>(_e->UnPack(_resolver)); }
+  { auto _e = toggle_climb(); _o->toggle_climb = _e; }
+  { auto _e = toggle_crouch(); _o->toggle_crouch = _e; }
   { auto _e = turn_rate(); _o->turn_rate = _e; }
   { auto _e = water_status(); _o->water_status = _e; }
   { auto _e = weapon(); if (_e) _o->weapon = std::unique_ptr<TEN::Save::WeaponControlDataT>(_e->UnPack(_resolver)); }
@@ -8654,6 +8678,8 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
   auto _rope = _o->rope ? CreateRopeControlData(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _subsuit = _o->subsuit ? CreateSubsuitControlData(_fbb, _o->subsuit.get(), _rehasher) : 0;
   auto _tightrope = _o->tightrope ? CreateTightropeControlData(_fbb, _o->tightrope.get(), _rehasher) : 0;
+  auto _toggle_climb = _o->toggle_climb;
+  auto _toggle_crouch = _o->toggle_crouch;
   auto _turn_rate = _o->turn_rate;
   auto _water_status = _o->water_status;
   auto _weapon = _o->weapon ? CreateWeaponControlData(_fbb, _o->weapon.get(), _rehasher) : 0;
@@ -8675,6 +8701,8 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
       _rope,
       _subsuit,
       _tightrope,
+      _toggle_climb,
+      _toggle_crouch,
       _turn_rate,
       _water_status,
       _weapon);
