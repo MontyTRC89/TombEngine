@@ -107,8 +107,8 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int tar
 void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID);
 void RefreshFixedCamera(short camNumber);
 
-void SetScreenFadeOut(float speed);
-void SetScreenFadeIn(float speed);
+void SetScreenFadeOut(float speed, bool force = false);
+void SetScreenFadeIn(float speed, bool force = false);
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();

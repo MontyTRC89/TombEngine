@@ -1177,7 +1177,7 @@ bool LoadLevel(int levelIndex)
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(loadingScreenPath);
 
-	SetScreenFadeIn(FADE_SCREEN_SPEED);
+	SetScreenFadeIn(FADE_SCREEN_SPEED, true);
 	g_Renderer.UpdateProgress(0);
 
 	try
@@ -1289,7 +1289,7 @@ bool LoadLevel(int levelIndex)
 
 		TENLog("Level loading complete.", LogLevel::Info);
 
-		SetScreenFadeOut(FADE_SCREEN_SPEED);
+		SetScreenFadeOut(FADE_SCREEN_SPEED, true);
 		g_Renderer.UpdateProgress(100);
 
 		LoadedSuccessfully = true;

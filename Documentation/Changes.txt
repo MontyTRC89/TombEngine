@@ -1,6 +1,7 @@
 Version 1.4
 ===========
 
+* Fixed fade-in and fade-out effects not canceling properly when next level is loaded.
 * Fixed sounds resuming in pause mode while switching between apps.
 * Fixed slide directions.
 * Add TR2 Dragon.
