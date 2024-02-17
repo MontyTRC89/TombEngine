@@ -5,7 +5,7 @@ Version 1.4
 * Fixed sounds resuming in pause mode while switching between apps.
 * Fixed slide directions.
 * Revise wall spikes:
-  - Wall spikes now stop when they touch a pushable or another spike wall.
+  - Wall spikes now stop when they touch a pushable, another spike wall or a normal wall.
   - Wall spikes will shatter any shatter in its path.
   - Wall spikes can be stopped by normal antitrigger or with a volume.
 * Add TR2 Dragon.
