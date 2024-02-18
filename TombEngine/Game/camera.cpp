@@ -514,7 +514,7 @@ void RefreshFixedCamera(short camNumber)
 
 void ChaseCamera(ItemInfo* item)
 {
-	static const unsigned int maxSwivelSteps = 5;
+	constexpr auto SWIVEL_STEP_COUNT = 5;
 
 	if (!Camera.targetElevation)
 		Camera.targetElevation = -ANGLE(10.0f);
@@ -524,90 +524,113 @@ void ChaseCamera(ItemInfo* item)
 
 	// Clamp X orientation.
 	if (Camera.actualElevation > ANGLE(85.0f))
+	{
 		Camera.actualElevation = ANGLE(85.0f);
+	}
 	else if (Camera.actualElevation < ANGLE(-85.0f))
+	{
 		Camera.actualElevation = ANGLE(-85.0f);
+	}
 
-	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
+	auto pointColl = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
 
-	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
-
-	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
-		Camera.target.y = g_Level.Rooms[probe.RoomNumber].maxceiling - CLICK(1);
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.RoomNumber))
+		Camera.target.y = g_Level.Rooms[pointColl.RoomNumber].maxceiling - CLICK(1);
 
 	int y = Camera.target.y;
-	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.RoomNumber);
-	if (((y < probe.Position.Ceiling || probe.Position.Floor < y) || probe.Position.Floor <= probe.Position.Ceiling) ||
-		(probe.Position.Floor == NO_HEIGHT || probe.Position.Ceiling == NO_HEIGHT))
+	pointColl = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.RoomNumber);
+	if (((y < pointColl.Position.Ceiling || pointColl.Position.Floor < y) || pointColl.Position.Floor <= pointColl.Position.Ceiling) ||
+		(pointColl.Position.Floor == NO_HEIGHT || pointColl.Position.Ceiling == NO_HEIGHT))
 	{
 		TargetSnaps++;
 		Camera.target = LastTarget;
 	}
 	else
-		TargetSnaps = 0;
-
-	for (int i = 0; i < maxSwivelSteps; i++)
-		Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation));
-
-	// Determine best player viewing angle.
-	float farthestDist = FLT_MAX;
-	int indexOfFarthestIdeal = 0;
-	GameVector temp[2];
-	for (int i = 0; i < maxSwivelSteps; i++)
 	{
-		// Incrementally swivel camera position.
-		short angle = (i == 0) ? Camera.actualAngle : ((i - 1) * ANGLE(90.0f));
-
-		// Record ideal position at default distance for given swivel.
-		Ideals[i].x = Camera.target.x - (distance * phd_sin(angle));
-		Ideals[i].z = Camera.target.z - (distance * phd_cos(angle));
-		Ideals[i].RoomNumber = Camera.target.RoomNumber;
-
-		// Assess LOS.
-		if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
-		{
-			temp[0] = Ideals[i];
-			temp[1] = Camera.pos;
-
-			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
-			{
-				if (i == 0)
-				{
-					indexOfFarthestIdeal = 0;
-					break;
-				}
-
-				float dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
-				dx += (Camera.pos.z - Ideals[i].z) * (Camera.pos.z - Ideals[i].z);
-				if (dx < farthestDist)
-				{
-					farthestDist = dx;
-					indexOfFarthestIdeal = i;
-				}
-			}
-		}
-		else if (i == 0)
-		{
-			temp[0] = Ideals[i];
-			temp[1] = Camera.pos;
-
-			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
-			{
-				float dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
-				float dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
-
-				if ((dx + dz) > SQUARE(BLOCK(0.75f)))
-				{
-					indexOfFarthestIdeal = 0;
-					break;
-				}
-			}
-		}
+		TargetSnaps = 0;
 	}
 
-	auto ideal = Ideals[indexOfFarthestIdeal];
-	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
-	MoveCamera(&ideal, Camera.speed);
+	if (IsUsingModernControls())
+	{
+		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
+		auto idealPos = Geometry::TranslatePoint(Camera.target.ToVector3(), dir, Camera.targetDistance);
+
+		// Determine best position.
+		auto origin = Camera.target;
+		auto target = GameVector(idealPos, GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, dir, Camera.targetDistance).RoomNumber);
+		LOSAndReturnTarget(&origin, &target, 0);
+
+		// Update camera position.
+		ItemsCollideCamera();
+		MoveCamera(&target, Camera.speed);
+	}
+	else
+	{
+		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
+			Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation));
+
+		float dist = Camera.targetDistance * phd_cos(Camera.actualElevation);
+
+		// Determine best player viewing angle.
+		float farthestDist = FLT_MAX;
+		int indexOfFarthestIdeal = 0;
+		GameVector temp[2];
+		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
+		{
+			// Incrementally swivel camera position.
+			short angle = (i == 0) ? Camera.actualAngle : ((i - 1) * ANGLE(90.0f));
+
+			// Record ideal position at default distance for given swivel.
+			Ideals[i].x = Camera.target.x - (dist * phd_sin(angle));
+			Ideals[i].z = Camera.target.z - (dist * phd_cos(angle));
+			Ideals[i].RoomNumber = Camera.target.RoomNumber;
+
+			// Assess LOS.
+			if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
+			{
+				temp[0] = Ideals[i];
+				temp[1] = Camera.pos;
+
+				if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
+				{
+					if (i == 0)
+					{
+						indexOfFarthestIdeal = 0;
+						break;
+					}
+
+					float dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
+					dx += (Camera.pos.z - Ideals[i].z) * (Camera.pos.z - Ideals[i].z);
+					if (dx < farthestDist)
+					{
+						farthestDist = dx;
+						indexOfFarthestIdeal = i;
+					}
+				}
+			}
+			else if (i == 0)
+			{
+				temp[0] = Ideals[i];
+				temp[1] = Camera.pos;
+
+				if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
+				{
+					float dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
+					float dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
+
+					if ((dx + dz) > SQUARE(BLOCK(0.75f)))
+					{
+						indexOfFarthestIdeal = 0;
+						break;
+					}
+				}
+			}
+		}
+
+		auto ideal = Ideals[indexOfFarthestIdeal];
+		CameraCollisionBounds(&ideal, CLICK(1.5f), true);
+		MoveCamera(&ideal, Camera.speed);
+	}
 }
 
 void UpdateCameraElevation()
@@ -640,14 +663,14 @@ void UpdateCameraElevation()
 
 void CombatCamera(ItemInfo* item)
 {
-	static const unsigned int maxSwivelSteps = 5;
+	constexpr auto SWIVEL_STEP_COUNT = 5;
 
 	auto& player = GetLaraInfo(*item);
 
 	Camera.target.x = item->Pose.Position.x;
 	Camera.target.z = item->Pose.Position.z;
 
-	if (player.TargetEntity)
+	if (player.TargetEntity != nullptr)
 	{
 		Camera.targetAngle = player.TargetArmOrient.y;
 		Camera.targetElevation = player.TargetArmOrient.x + item->Pose.Orientation.x;
@@ -658,120 +681,144 @@ void CombatCamera(ItemInfo* item)
 		Camera.targetElevation = player.ExtraHeadRot.x + player.ExtraTorsoRot.x + item->Pose.Orientation.x - ANGLE(15.0f);
 	}
 
-	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
-	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
-		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
+	auto pointColl = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.RoomNumber))
+		Camera.target.y = g_Level.Rooms[pointColl.RoomNumber].y - CLICK(1);
 
-	probe = GetCollision(Camera.target.x, Camera.target.y, Camera.target.z, Camera.target.RoomNumber);
-	Camera.target.RoomNumber = probe.RoomNumber;
+	pointColl = GetCollision(Camera.target.x, Camera.target.y, Camera.target.z, Camera.target.RoomNumber);
+	Camera.target.RoomNumber = pointColl.RoomNumber;
 
 	int buffer = CLICK(0.25f);
-	if ((probe.Position.Ceiling + buffer) > (probe.Position.Floor - buffer) &&
-		probe.Position.Floor != NO_HEIGHT &&
-		probe.Position.Ceiling != NO_HEIGHT)
+	if ((pointColl.Position.Ceiling + buffer) > (pointColl.Position.Floor - buffer) &&
+		pointColl.Position.Floor != NO_HEIGHT &&
+		pointColl.Position.Ceiling != NO_HEIGHT)
 	{
-		Camera.target.y = (probe.Position.Ceiling + probe.Position.Floor) / 2;
+		Camera.target.y = (pointColl.Position.Ceiling + pointColl.Position.Floor) / 2;
 		Camera.targetElevation = 0;
 	}
-	else if (Camera.target.y > (probe.Position.Floor - buffer) &&
-		probe.Position.Floor != NO_HEIGHT)
+	else if (Camera.target.y > (pointColl.Position.Floor - buffer) &&
+		pointColl.Position.Floor != NO_HEIGHT)
 	{
-		Camera.target.y = probe.Position.Floor - buffer;
+		Camera.target.y = pointColl.Position.Floor - buffer;
 		Camera.targetElevation = 0;
 	}
-	else if (Camera.target.y < (probe.Position.Ceiling + buffer) &&
-		probe.Position.Ceiling != NO_HEIGHT)
+	else if (Camera.target.y < (pointColl.Position.Ceiling + buffer) &&
+		pointColl.Position.Ceiling != NO_HEIGHT)
 	{
-		Camera.target.y = probe.Position.Ceiling + buffer;
+		Camera.target.y = pointColl.Position.Ceiling + buffer;
 		Camera.targetElevation = 0;
 	}
 
 	int y = Camera.target.y;
-	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.RoomNumber);
-	Camera.target.RoomNumber = probe.RoomNumber;
+	pointColl = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.RoomNumber);
+	Camera.target.RoomNumber = pointColl.RoomNumber;
 
-	if (y < probe.Position.Ceiling ||
-		y > probe.Position.Floor ||
-		probe.Position.Ceiling >= probe.Position.Floor ||
-		probe.Position.Floor == NO_HEIGHT ||
-		probe.Position.Ceiling == NO_HEIGHT)
+	if (y < pointColl.Position.Ceiling ||
+		y > pointColl.Position.Floor ||
+		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
+		pointColl.Position.Floor == NO_HEIGHT ||
+		pointColl.Position.Ceiling == NO_HEIGHT)
 	{
 		TargetSnaps++;
 		Camera.target = LastTarget;
 	}
 	else
+	{
 		TargetSnaps = 0;
+	}
 
 	UpdateCameraElevation();
 
 	Camera.targetDistance = BLOCK(1.5f);
-	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
-	for (int i = 0; i < maxSwivelSteps; i++)
-		Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation));
-
-	// Determine best player viewing angle.
-	float farthestDist = FLT_MAX;
-	int indexOfFarthestIdeal = 0;
-	GameVector temp[2];
-	for (int i = 0; i < maxSwivelSteps; i++)
+	if (IsUsingModernControls())
 	{
-		// Incrementally swivel camera position.
-		short angle = (i == 0) ? Camera.actualAngle : ((i - 1) * ANGLE(90.0f));
+		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
+		auto idealPos = Geometry::TranslatePoint(Camera.target.ToVector3(), dir, Camera.targetDistance);
 
-		// Record ideal position at default distance for given swivel.
-		Ideals[i].x = Camera.target.x - (distance * phd_sin(angle));
-		Ideals[i].z = Camera.target.z - (distance * phd_cos(angle));
-		Ideals[i].RoomNumber = Camera.target.RoomNumber;
+		// Determine best position.
+		auto origin = Camera.target;
+		auto target = GameVector(idealPos, GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, dir, Camera.targetDistance).RoomNumber);
+		LOSAndReturnTarget(&origin, &target, 0);
 
-		// Assess LOS.
-		if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
-		{
-			temp[0] = Ideals[i];
-			temp[1] = Camera.pos;
-			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
-			{
-				if (i == 0)
-				{
-					indexOfFarthestIdeal = 0;
-					break;
-				}
+		// Snap position of fixed camera type.
+		if (Camera.oldType == CameraType::Fixed)
+			Camera.speed = 1;
 
-				float dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
-				dx += (Camera.pos.z - Ideals[i].z) * (Camera.pos.z - Ideals[i].z);
-				if (dx < farthestDist)
-				{
-					farthestDist = dx;
-					indexOfFarthestIdeal = i;
-				}
-			}
-		}
-		else if (i == 0)
-		{
-			temp[0] = Ideals[i];
-			temp[1] = Camera.pos;
-			if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
-			{
-				float dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
-				float dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
-				if ((dx + dz) > SQUARE(BLOCK(0.75f)))
-				{
-					indexOfFarthestIdeal = 0;
-					break;
-				}
-			}
-		}
+		// Update camera position.
+		ItemsCollideCamera();
+		MoveCamera(&target, Camera.speed);
 	}
+	else
+	{
+		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
+			Ideals[i].y = Camera.target.y + (Camera.targetDistance * phd_sin(Camera.actualElevation));
 
-	// Handle room collision.
-	auto ideal = Ideals[indexOfFarthestIdeal];
-	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
+		float dist = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
-	// Snap position of fixed camera type.
-	if (Camera.oldType == CameraType::Fixed)
-		Camera.speed = 1;
+		// Determine best player viewing angle.
+		float farthestDist = FLT_MAX;
+		int indexOfFarthestIdeal = 0;
+		GameVector temp[2];
+		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
+		{
+			// Incrementally swivel camera position.
+			short angle = (i == 0) ? Camera.actualAngle : ((i - 1) * ANGLE(90.0f));
 
-	MoveCamera(&ideal, Camera.speed);
+			// Record ideal position at default distance for given swivel.
+			Ideals[i].x = Camera.target.x - (dist * phd_sin(angle));
+			Ideals[i].z = Camera.target.z - (dist * phd_cos(angle));
+			Ideals[i].RoomNumber = Camera.target.RoomNumber;
+
+			// Assess LOS.
+			if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
+			{
+				temp[0] = Ideals[i];
+				temp[1] = Camera.pos;
+				if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
+				{
+					if (i == 0)
+					{
+						indexOfFarthestIdeal = 0;
+						break;
+					}
+
+					float dx = (Camera.pos.x - Ideals[i].x) * (Camera.pos.x - Ideals[i].x);
+					dx += (Camera.pos.z - Ideals[i].z) * (Camera.pos.z - Ideals[i].z);
+					if (dx < farthestDist)
+					{
+						farthestDist = dx;
+						indexOfFarthestIdeal = i;
+					}
+				}
+			}
+			else if (i == 0)
+			{
+				temp[0] = Ideals[i];
+				temp[1] = Camera.pos;
+				if (i == 0 || LOSAndReturnTarget(&temp[0], &temp[1], 0))
+				{
+					float dx = (Camera.target.x - Ideals[i].x) * (Camera.target.x - Ideals[i].x);
+					float dz = (Camera.target.z - Ideals[i].z) * (Camera.target.z - Ideals[i].z);
+					if ((dx + dz) > SQUARE(BLOCK(0.75f)))
+					{
+						indexOfFarthestIdeal = 0;
+						break;
+					}
+				}
+			}
+		}
+
+		// Handle room collision.
+		auto ideal = Ideals[indexOfFarthestIdeal];
+		CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
+
+		// Snap position of fixed camera type.
+		if (Camera.oldType == CameraType::Fixed)
+			Camera.speed = 1;
+
+		MoveCamera(&ideal, Camera.speed);
+	}
 }
 
 bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst)

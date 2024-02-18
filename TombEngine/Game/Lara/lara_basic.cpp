@@ -297,8 +297,6 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (!IsHeld(In::Sprint) && CanRunJumpForward(*item, *coll))
 		{
-			// TODO: Add run jump dispatch in run start anim.
-			SetAnimation(item, LA_RUN_TO_JUMP_FORWARD_RIGHT_START);
 			item->Animation.TargetState = LS_JUMP_FORWARD;
 			return;
 		}
