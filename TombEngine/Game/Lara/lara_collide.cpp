@@ -551,19 +551,23 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			{
 				if (item->Pose.Orientation.x > ANGLE(5.0f))
 				{
-					item->Pose.Orientation.x += ANGLE(0.5f);
+					if (!IsUsingModernControls())
+						item->Pose.Orientation.x += ANGLE(0.5f);
 				}
 				else if (item->Pose.Orientation.x < -ANGLE(5.0f))
 				{
-					item->Pose.Orientation.x -= ANGLE(0.5f);
+					if (!IsUsingModernControls())
+						item->Pose.Orientation.x -= ANGLE(0.5f);
 				}
 				else if (item->Pose.Orientation.x > 0)
 				{
-					item->Pose.Orientation.x += 45;
+					if (!IsUsingModernControls())
+						item->Pose.Orientation.x += 45;
 				}
 				else if (item->Pose.Orientation.x < 0)
 				{
-					item->Pose.Orientation.x -= 45;
+					if (!IsUsingModernControls())
+						item->Pose.Orientation.x -= 45;
 				}
 				else
 				{
@@ -573,31 +577,38 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				item->Pose.Orientation.x -= ANGLE(1.0f);
+				if (!IsUsingModernControls())
+					item->Pose.Orientation.x -= ANGLE(1.0f);
+
 				flag = 1;
 			}
 		}
 		else
 		{
-			item->Pose.Orientation.x += ANGLE(1.0f);
+			if (!IsUsingModernControls())
+				item->Pose.Orientation.x += ANGLE(1.0f);
+
 			flag = 1;
 		}
 
-		if (coll0.CollisionType == CT_LEFT)
+		if (!IsUsingModernControls())
 		{
-			item->Pose.Orientation.y += ANGLE(2.0f);
-		}
-		else if (coll0.CollisionType == CT_RIGHT)
-		{
-			item->Pose.Orientation.y -= ANGLE(2.0f);
-		}
-		else if (coll1.CollisionType == CT_LEFT)
-		{
-			item->Pose.Orientation.y += ANGLE(2.0f);
-		}
-		else if (coll1.CollisionType == CT_RIGHT)
-		{
-			item->Pose.Orientation.y -= ANGLE(2.0f);
+			if (coll0.CollisionType == CT_LEFT)
+			{
+				item->Pose.Orientation.y += ANGLE(2.0f);
+			}
+			else if (coll0.CollisionType == CT_RIGHT)
+			{
+				item->Pose.Orientation.y -= ANGLE(2.0f);
+			}
+			else if (coll1.CollisionType == CT_LEFT)
+			{
+				item->Pose.Orientation.y += ANGLE(2.0f);
+			}
+			else if (coll1.CollisionType == CT_RIGHT)
+			{
+				item->Pose.Orientation.y -= ANGLE(2.0f);
+			}
 		}
 
 		break;
@@ -605,7 +616,9 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	case CT_TOP:
 		if (item->Pose.Orientation.x >= -ANGLE(45.0f))
 		{
-			item->Pose.Orientation.x -= ANGLE(1.0f);
+			if (!IsUsingModernControls())
+				item->Pose.Orientation.x -= ANGLE(1.0f);
+
 			flag = 1;
 		}
 
@@ -617,12 +630,16 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_LEFT:
-		item->Pose.Orientation.y += ANGLE(2.0f);
+		if (!IsUsingModernControls())
+			item->Pose.Orientation.y += ANGLE(2.0f);
+
 		flag = 1;
 		break;
 
 	case CT_RIGHT:
-		item->Pose.Orientation.y -= ANGLE(2.0f);
+		if (!IsUsingModernControls())
+			item->Pose.Orientation.y -= ANGLE(2.0f);
+
 		flag = 1;
 		break;
 
@@ -637,8 +654,10 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		coll->Middle.Floor != NO_HEIGHT)
 	{
 		flag = 1;
-		item->Pose.Orientation.x += ANGLE(1.0f);
 		item->Pose.Position.y += coll->Middle.Floor;
+
+		if (!IsUsingModernControls())
+			item->Pose.Orientation.x += ANGLE(1.0f);
 	}
 
 	if ((prevPose.Position == item->Pose.Position &&

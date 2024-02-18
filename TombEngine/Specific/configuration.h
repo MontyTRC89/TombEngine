@@ -47,7 +47,9 @@ enum class ControlMode
 {
 	ClassicTank,
 	EnhancedTank,
-	Modern
+	Modern,
+
+	Count
 };
 
 struct GameConfiguration

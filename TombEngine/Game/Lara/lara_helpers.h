@@ -30,7 +30,8 @@ void HandlePlayerQuickActions(ItemInfo& item);
 bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -- Sezz 2023.08.22
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
-void HandlePlayerTurn(ItemInfo& item, float alpha);
+void HandlePlayerTurnX(ItemInfo& item, float alpha);
+void HandlePlayerTurnY(ItemInfo& item, float alpha);
 void HandlePlayerLean(ItemInfo& item, short leanAngleMax, float alpha);
 void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerCrawlFlex(ItemInfo& item);

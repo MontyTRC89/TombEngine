@@ -45,7 +45,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}
 	else
 	{
@@ -230,7 +230,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 				 IsHeld(In::Left) || IsHeld(In::Right))))
 		{
 			if (IsUsingModernControls())
-				HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
+				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
 
 			item->Animation.TargetState = LS_MONKEY_FORWARD;
 			return;

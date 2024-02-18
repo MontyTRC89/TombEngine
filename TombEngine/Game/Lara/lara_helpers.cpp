@@ -724,7 +724,24 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
-void HandlePlayerTurn(ItemInfo& item, float alpha)
+void HandlePlayerTurnX(ItemInfo& item, float alpha)
+{
+	constexpr auto BASE_ANGLE = ANGLE(90.0f);
+
+	auto targetOrient = EulerAngles(Camera.actualElevation, item.Pose.Orientation.y, item.Pose.Orientation.z);
+
+	short deltaAngle = abs(Geometry::GetShortestAngle(item.Pose.Orientation.x, Camera.actualElevation));
+	if (deltaAngle <= BASE_ANGLE)
+	{
+		item.Pose.Orientation.Lerp(targetOrient, alpha);
+	}
+	else
+	{
+		item.Pose.Orientation.InterpolateConstant(targetOrient, BASE_ANGLE * alpha);
+	}
+}
+
+void HandlePlayerTurnY(ItemInfo& item, float alpha)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
@@ -733,9 +750,10 @@ void HandlePlayerTurn(ItemInfo& item, float alpha)
 	if (deltaAngle1 >= BASE_ANGLE)
 		item.Pose.Orientation.y += ANGLE(180.0f);*/
 
-	auto targetOrient = EulerAngles(item.Pose.Orientation.x, GetPlayerMoveAngle(item), item.Pose.Orientation.z);
+	short moveAngle = GetPlayerMoveAngle(item);
+	auto targetOrient = EulerAngles(item.Pose.Orientation.x, moveAngle, item.Pose.Orientation.z);
 
-	short deltaAngle = abs(Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item)));
+	short deltaAngle = abs(Geometry::GetShortestAngle(item.Pose.Orientation.y, moveAngle));
 	if (deltaAngle <= BASE_ANGLE)
 	{
 		item.Pose.Orientation.Lerp(targetOrient, alpha);

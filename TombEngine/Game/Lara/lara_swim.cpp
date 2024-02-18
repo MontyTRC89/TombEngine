@@ -48,7 +48,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
 	}
 	else
 	{
@@ -100,7 +100,8 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
 	}
 	else
 	{
@@ -149,7 +150,8 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
 	}
 	else
 	{
