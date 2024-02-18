@@ -753,11 +753,17 @@ void HandlePlayerLean(ItemInfo& item, short leanAngleMax, float alpha)
 
 	auto& player = GetLaraInfo(item);
 
+	// Calculate delta angle.
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
-	float leanAlpha = std::clamp(abs(deltaAngle) / (float)BASE_ANGLE, 0.0f, 1.0f);
 	int sign = std::copysign(1, deltaAngle);
 
-	item.Pose.Orientation.Lerp(EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, (leanAngleMax * leanAlpha) * sign), alpha);
+	// Calculate target orientation.
+	float leanAlpha = std::clamp(abs(deltaAngle) / (float)BASE_ANGLE, 0.0f, 1.0f);
+	short leanAngle = leanAngleMax * leanAlpha;
+	auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, leanAngle * sign);
+
+	// Lerp to target orientation.
+	item.Pose.Orientation.Lerp(targetOrient, alpha);
 }
 
 // NOTE: Tank control version.

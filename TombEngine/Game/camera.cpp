@@ -315,9 +315,9 @@ void MoveCamera(GameVector* ideal, int speed)
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
 
-	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * (IsUsingModernControls() ? 0.25f : 1.0f));
-	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * (IsUsingModernControls() ? 0.25f : 1.0f));
-	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * (IsUsingModernControls() ? 0.25f : 1.0f));
+	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * (IsUsingModernControls() ? 0.3f : 1.0f));
+	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * (IsUsingModernControls() ? 0.3f : 1.0f));
+	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * (IsUsingModernControls() ? 0.3f : 1.0f));
 	Camera.pos.RoomNumber = ideal->RoomNumber;
 
 	if (Camera.bounce)
@@ -514,6 +514,7 @@ void RefreshFixedCamera(short camNumber)
 
 void ChaseCamera(ItemInfo* item)
 {
+	constexpr auto BUFFER			 = 100;
 	constexpr auto SWIVEL_STEP_COUNT = 5;
 
 	if (!Camera.targetElevation)
@@ -560,8 +561,11 @@ void ChaseCamera(ItemInfo* item)
 		auto target = GameVector(idealPos, GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, dir, Camera.targetDistance).RoomNumber);
 		LOSAndReturnTarget(&origin, &target, 0);
 
+		// Apply buffer if origin and target are too close.
+		if (Vector3::Distance(origin.ToVector3(), target.ToVector3()) <= BUFFER)
+			target = GameVector(Geometry::TranslatePoint(target.ToVector3i(), dir, BUFFER), target.RoomNumber);
+
 		// Update camera position.
-		ItemsCollideCamera();
 		MoveCamera(&target, Camera.speed);
 	}
 	else
