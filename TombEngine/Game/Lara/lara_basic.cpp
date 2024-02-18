@@ -167,7 +167,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		if (IsUsingModernControls())
 		{
 			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
+			HandlePlayerLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA);
 		}
 
 		if (IsHeld(In::Action))
@@ -325,7 +325,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		if (IsUsingModernControls())
 		{
 			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
+			HandlePlayerLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
 		}
 
 		if (IsHeld(In::Action))
@@ -1741,7 +1741,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		if (IsUsingModernControls())
 		{
 			HandlePlayerTurn(*item, PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1));
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE / (isInSwamp ? 3 : 2), LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f));
+			HandlePlayerLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), PLAYER_STANDARD_TURN_ALPHA);
 		}
 
 		if (IsHeld(In::Action))
@@ -1873,7 +1873,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		if (IsUsingModernControls())
 		{
 			HandlePlayerTurn(*item, PLAYER_SPRINT_TURN_ALPHA);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
+			HandlePlayerLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
 		}
 
 		if (IsHeld(In::Action) && CanVaultFromSprint(*item, *coll))

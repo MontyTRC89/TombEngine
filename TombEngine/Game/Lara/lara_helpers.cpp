@@ -79,7 +79,16 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
 		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
-		ResetPlayerLean(item, 1 / 6.0f);
+		if (IsUsingModernControls())
+		{
+			// TODO: Must check. Condition is probably more precise.
+			if (GetMoveAxis() == Vector2::Zero)
+				ResetPlayerLean(item, 1 / 6.0f);
+		}
+		else
+		{
+			ResetPlayerLean(item, 1 / 6.0f);
+		}
 	}
 
 	// Reset crawl flex.
@@ -737,6 +746,21 @@ void HandlePlayerTurn(ItemInfo& item, float alpha)
 	}
 }
 
+// NOTE: Modern control version.
+void HandlePlayerLean(ItemInfo& item, short leanAngleMax, float alpha)
+{
+	constexpr auto BASE_ANGLE = ANGLE(90.0f);
+
+	auto& player = GetLaraInfo(item);
+
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+	float leanAlpha = std::clamp(abs(deltaAngle) / (float)BASE_ANGLE, 0.0f, 1.0f);
+	int sign = std::copysign(1, deltaAngle);
+
+	item.Pose.Orientation.Lerp(EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, (leanAngleMax * leanAlpha) * sign), alpha);
+}
+
+// NOTE: Tank control version.
 void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
 {
 	auto& player = GetLaraInfo(*item);

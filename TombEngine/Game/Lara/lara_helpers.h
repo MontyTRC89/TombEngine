@@ -31,6 +31,7 @@ bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerTurn(ItemInfo& item, float alpha);
+void HandlePlayerLean(ItemInfo& item, short leanAngleMax, float alpha);
 void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerCrawlFlex(ItemInfo& item);
 void HandlePlayerFlyCheat(ItemInfo& item);
