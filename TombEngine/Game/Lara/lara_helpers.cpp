@@ -719,6 +719,11 @@ void HandlePlayerTurn(ItemInfo& item, float alpha)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
+	// TODO: Turn 180 anims for walk and run.
+	/*short deltaAngle1 = abs(Geometry::GetShortestAngle(GetPlayerMoveAngle(item), item.Pose.Orientation.y));
+	if (deltaAngle1 >= BASE_ANGLE)
+		item.Pose.Orientation.y += ANGLE(180.0f);*/
+
 	auto targetOrient = EulerAngles(item.Pose.Orientation.x, GetPlayerMoveAngle(item), item.Pose.Orientation.z);
 
 	short deltaAngle = abs(Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item)));
