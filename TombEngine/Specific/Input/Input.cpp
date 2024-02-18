@@ -337,7 +337,7 @@ namespace TEN::Input
 		}
 	}
 
-	void SetDiscreteAxisValues(int index)
+	static void SetDiscreteMoveAxisValues(int index)
 	{
 		for (int layout = 0; layout <= 1; layout++)
 		{
@@ -379,7 +379,7 @@ namespace TEN::Input
 				KeyMap[key] = true;
 
 				// Interpret discrete directional keypresses as analog axis values.
-				SetDiscreteAxisValues(key);
+				SetDiscreteMoveAxisValues(key);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -453,7 +453,7 @@ namespace TEN::Input
 				KeyMap[baseIndex + pass] = true;
 
 				// Interpret discrete directional keypresses as mouse axis values.
-				SetDiscreteAxisValues(baseIndex + pass);
+				SetDiscreteMoveAxisValues(baseIndex + pass);
 			}
 
 			// TODO: Will need to take screen aspect ratio into account once mouse axes start being used. -- Sezz 2023.10.20
@@ -593,7 +593,7 @@ namespace TEN::Input
 					}
 
 					KeyMap[baseIndex + pass] = true;
-					SetDiscreteAxisValues(baseIndex + pass);
+					SetDiscreteMoveAxisValues(baseIndex + pass);
 				}
 			}
 		}
@@ -899,5 +899,15 @@ namespace TEN::Input
 	Vector2 GetMoveAxis()
 	{
 		return AxisMap[(int)InputAxis::Move];
+	}
+
+	Vector2 GetCameraAxis()
+	{
+		return AxisMap[(int)InputAxis::Camera];
+	}
+
+	Vector2 GetMouseAxis()
+	{
+		return AxisMap[(int)InputAxis::Mouse];
 	}
 }

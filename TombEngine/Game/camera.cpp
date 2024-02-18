@@ -92,7 +92,7 @@ void DoThumbstickCamera()
 
 	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
 	{
-		const auto& axisCoeff = AxisMap[(int)InputAxis::Camera];
+		const auto& axisCoeff = GetCameraAxis();
 
 		if (abs(axisCoeff.x) > EPSILON && abs(Camera.targetAngle) == 0)
 			Camera.targetAngle = ANGLE(VERTICAL_CONSTRAINT_ANGLE * axisCoeff.x);
@@ -652,8 +652,8 @@ void UpdateCameraElevation()
 	{
 		if (IsUsingModernControls())
 		{
-			Camera.actualAngle += ANGLE(AxisMap[(int)InputAxis::Mouse].x * 300);
-			Camera.actualElevation -= ANGLE(AxisMap[(int)InputAxis::Mouse].y * 300);
+			Camera.actualAngle += ANGLE(GetMouseAxis().x * 300);
+			Camera.actualElevation -= ANGLE(GetMouseAxis().y * 300);
 		}
 		else
 		{
@@ -667,6 +667,7 @@ void UpdateCameraElevation()
 
 void CombatCamera(ItemInfo* item)
 {
+	constexpr auto BUFFER			 = 100;
 	constexpr auto SWIVEL_STEP_COUNT = 5;
 
 	auto& player = GetLaraInfo(*item);
@@ -745,12 +746,15 @@ void CombatCamera(ItemInfo* item)
 		auto target = GameVector(idealPos, GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, dir, Camera.targetDistance).RoomNumber);
 		LOSAndReturnTarget(&origin, &target, 0);
 
+		// Apply buffer if origin and target are too close.
+		if (Vector3::Distance(origin.ToVector3(), target.ToVector3()) <= BUFFER)
+			target = GameVector(Geometry::TranslatePoint(target.ToVector3i(), dir, BUFFER), target.RoomNumber);
+
 		// Snap position of fixed camera type.
 		if (Camera.oldType == CameraType::Fixed)
 			Camera.speed = 1;
 
 		// Update camera position.
-		ItemsCollideCamera();
 		MoveCamera(&target, Camera.speed);
 	}
 	else

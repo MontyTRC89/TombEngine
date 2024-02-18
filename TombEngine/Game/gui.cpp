@@ -885,7 +885,7 @@ namespace TEN::Gui
 			Reverb,
 			MusicVolume,
 			SfxVolume,
-			ControlModeOption,
+			ControlMode,
 			Subtitles,
 			AutoTargeting,
 			TargetHighlighter,
@@ -923,7 +923,7 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.EnableReverb = !CurrentSettings.Configuration.EnableReverb;
 				break;
 
-			case OtherSettingsOption::ControlModeOption:
+			case OtherSettingsOption::ControlMode:
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -939,7 +939,7 @@ namespace TEN::Gui
 					controlMode = (int)ControlMode::ClassicTank;
 				}
 
-				CurrentSettings.Configuration.ControlMode = (ControlMode)controlMode;
+				CurrentSettings.Configuration.ControlMode = (Input::ControlMode)controlMode;
 			}
 				break;
 

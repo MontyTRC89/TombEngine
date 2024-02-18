@@ -1117,21 +1117,6 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool IsUsingClassicTankControls()
-{
-	return (g_Configuration.ControlMode == ControlMode::ClassicTank);
-}
-
-bool IsUsingEnhancedTankControls()
-{
-	return (g_Configuration.ControlMode == ControlMode::EnhancedTank);
-}
-
-bool IsUsingModernControls()
-{
-	return (g_Configuration.ControlMode == ControlMode::Modern);
-}
-
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList)
 {
 	return Contains(weaponTypeList, refWeaponType);

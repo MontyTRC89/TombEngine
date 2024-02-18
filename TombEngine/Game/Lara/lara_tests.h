@@ -42,9 +42,6 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll);
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 
-bool IsUsingClassicTankControls();
-bool IsUsingEnhancedTankControls();
-bool IsUsingModernControls();
 bool TestLaraWeaponType(LaraWeaponType refWeaponType, const std::vector<LaraWeaponType>& weaponTypeList);
 bool IsStandingWeapon(const ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(int state);

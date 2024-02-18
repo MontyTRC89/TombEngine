@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Math.h"
+#include "Specific/Input/ControlModes.h"
 #include "Specific/Input/InputAction.h"
 
 using namespace TEN::Math;
@@ -123,4 +124,6 @@ namespace TEN::Input
 	bool IsOpticActionHeld();
 
 	Vector2 GetMoveAxis();
+	Vector2 GetCameraAxis();
+	Vector2 GetMouseAxis();
 }

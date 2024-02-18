@@ -43,15 +43,6 @@ constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
 constexpr auto REGKEY_MOUSE_SENSITIVITY = "MouseSensitivity";
 constexpr auto REGKEY_MOUSE_SMOOTHING	= "MouseSmoothing";
 
-enum class ControlMode
-{
-	ClassicTank,
-	EnhancedTank,
-	Modern,
-
-	Count
-};
-
 struct GameConfiguration
 {
 	static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
