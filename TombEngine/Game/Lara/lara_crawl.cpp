@@ -20,21 +20,6 @@
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 
-// TODO: Move.
-bool HasCrawlAction(const ItemInfo& item)
-{
-	const auto& player = GetLaraInfo(item);
-
-	if (IsUsingModernControls())
-	{
-		return player.Control.ToggleCrouch;
-	}
-	else
-	{
-		return IsHeld(In::Crouch);
-	}
-}
-
 // State:	  LS_CRAWL_VAULT (194)
 // Collision: lara_void_func()
 void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
@@ -102,7 +87,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsClicked(In::Crouch) && IsUsingModernControls())
 		player.Control.ToggleCrouch = false;
 
-	if ((HasCrawlAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 		{
@@ -403,7 +388,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	AlignLaraToSurface(item);
 	
-	if ((HasCrawlAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (!IsUsingModernControls())
 		{
@@ -481,7 +466,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsClicked(In::Crouch) && IsUsingModernControls())
 		player.Control.ToggleCrouch = false;
 
-	if ((HasCrawlAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 		{
@@ -654,7 +639,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if ((HasCrawlAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{

@@ -24,21 +24,6 @@ using namespace TEN::Input;
 // Control & Collision Functions
 // -----------------------------
 
-// TODO: Move.
-bool HasClimbAction(const ItemInfo& item)
-{
-	const auto& player = GetLaraInfo(item);
-
-	if (IsUsingModernControls())
-	{
-		return player.Control.ToggleClimb;
-	}
-	else
-	{
-		return IsHeld(In::Action);
-	}
-}
-
 // State:		LS_MONKEY_IDLE (75)
 // Collision:	lara_col_monkey_idle()
 void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)

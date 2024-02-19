@@ -39,6 +39,10 @@ namespace TEN::Entities::Player
 		// TODO: Move all functions below into this class. Resulting syntax will be a neat player.Context.CanDoXYZ().
 	};
 
+	// Input action contexts
+	bool HasClimbAction(const ItemInfo& item);
+	bool HasCrouchAction(const ItemInfo& item);
+
 	// Basic round movement contexts
 	bool CanChangeElevation(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll);
