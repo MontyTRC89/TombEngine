@@ -155,7 +155,11 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara->Control.CanClimbLadder) // Ladder case
 	{
-		if (IsHeld(In::Action) && item->HitPoints > 0)
+		lara->Control.ToggleClimb = IsUsingModernControls();
+		if (IsClicked(In::Action) && IsUsingModernControls())
+			lara->Control.ToggleClimb = false;
+
+		if (HasClimbAction(*item) && item->HitPoints > 0)
 		{
 			lara->Control.MoveAngle = angle;
 
@@ -192,7 +196,11 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	}
 	else // Normal case
 	{
-		if ((IsHeld(In::Action) && item->HitPoints > 0 && coll->Front.Floor <= 0) ||
+		lara->Control.ToggleClimb = IsUsingModernControls();
+		if (IsClicked(In::Action) && IsUsingModernControls())
+			lara->Control.ToggleClimb = false;
+
+		if ((HasClimbAction(*item) && item->HitPoints > 0 && coll->Front.Floor <= 0) ||
 			(item->Animation.AnimNumber == LA_LEDGE_JUMP_UP_START || item->Animation.AnimNumber == LA_LEDGE_JUMP_BACK_START)) // TODO: Unhardcode this in a later refactor. @Sezz 2022.10.21)
 		{
 			if (stopped && hdif > 0 && climbDirection != 0 && (climbDirection > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
@@ -254,7 +262,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->Pose.Position.x += coll->Shift.Position.x;
-			item->Pose.Position.y += GameBoundingBox(item).Y2 * 1.8f;
+			item->Pose.Position.y += GameBoundingBox(item).Y2 * (IsUsingModernControls() ? 2.5f : 1.8f);
 			item->Pose.Position.z += coll->Shift.Position.z;
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.z = 2;

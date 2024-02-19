@@ -981,7 +981,11 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 
-	if (IsHeld(In::Action) && item->HitPoints > 0 || item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
+	lara->Control.ToggleClimb = IsUsingModernControls();
+	if (IsClicked(In::Action) && IsUsingModernControls())
+		lara->Control.ToggleClimb = false;
+
+	if (HasClimbAction(*item) && item->HitPoints > 0 || item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
 		return false;
 
 	ResetPlayerFlex(item);
