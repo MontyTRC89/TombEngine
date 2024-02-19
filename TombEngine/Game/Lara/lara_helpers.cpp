@@ -1454,6 +1454,18 @@ short GetPlayerMoveAngle(const ItemInfo& item)
 	}
 }
 
+static short GetLegacySlideDirection(short angle)
+{
+	auto quadrant = (CardinalDirection)GetQuadrant(angle);
+
+	if (quadrant == CardinalDirection::NORTH)
+		quadrant = CardinalDirection::WEST;
+	if (quadrant == CardinalDirection::SOUTH)
+		quadrant = CardinalDirection::EAST;
+	
+	return (short)quadrant * ANGLE(90.0f);
+}
+
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
@@ -1470,7 +1482,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	if (g_GameFlow->HasSlideExtended())
 		return headingAngle;
 	else
-		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
+		return GetLegacySlideDirection(headingAngle);
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
@@ -1771,7 +1783,8 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	static short oldAngle = 1;
 
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(coll->FloorNormal);
-	short angle = GetQuadrant(aspectAngle) * ANGLE(90.0f);
+	short angle = GetLegacySlideDirection(aspectAngle);
+
 	short delta = angle - item->Pose.Orientation.y;
 
 	ShiftItem(item, coll);
