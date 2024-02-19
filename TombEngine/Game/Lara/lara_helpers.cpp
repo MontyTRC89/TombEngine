@@ -1876,6 +1876,10 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// TODO: Hack. Regrab occurs.
+	if (IsUsingModernControls())
+		item->Pose.Position.y += 20;
+
 	item->Animation.IsAirborne = true;
 	item->Animation.Velocity.y = 1.0f;
 	item->Animation.Velocity.z = 2.0f;

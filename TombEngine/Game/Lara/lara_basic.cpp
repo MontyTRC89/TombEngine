@@ -150,7 +150,12 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsUsingModernControls())
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA);
+	}
+	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -159,17 +164,10 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Forward) ||
-		(IsUsingModernControls() &&
-			(IsHeld(In::Forward) || IsHeld(In::Back) ||
-			 IsHeld(In::Left) || IsHeld(In::Right))))
+	if (IsUsingModernControls() ?
+		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
+		IsHeld(In::Forward))
 	{
-		if (IsUsingModernControls())
-		{
-			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-			HandlePlayerLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA);
-		}
-
 		if (IsHeld(In::Action))
 		{
 			auto vaultContext = TestLaraVault(item, coll);
@@ -284,7 +282,12 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if (!IsUsingModernControls())
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
+	}
+	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -317,17 +320,10 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Forward) ||
-		(IsUsingModernControls() &&
-			(IsHeld(In::Forward) || IsHeld(In::Back) ||
-			 IsHeld(In::Left) || IsHeld(In::Right))))
+	if (IsUsingModernControls() ?
+		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
+		IsHeld(In::Forward))
 	{
-		if (IsUsingModernControls())
-		{
-			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-			HandlePlayerLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
-		}
-
 		if (IsHeld(In::Action))
 		{
 			auto vaultContext = TestLaraVault(item, coll);
@@ -1724,7 +1720,12 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsUsingModernControls())
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurnY(*item, PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1));
+		HandlePlayerLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), PLAYER_STANDARD_TURN_ALPHA);
+	}
+	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -1733,17 +1734,10 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Forward) ||
-		(IsUsingModernControls() &&
-			(IsHeld(In::Forward) || IsHeld(In::Back) ||
-			 IsHeld(In::Left) || IsHeld(In::Right))))
+	if (IsUsingModernControls() ?
+		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
+		IsHeld(In::Forward))
 	{
-		if (IsUsingModernControls())
-		{
-			HandlePlayerTurnY(*item, PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1));
-			HandlePlayerLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), PLAYER_STANDARD_TURN_ALPHA);
-		}
-
 		if (IsHeld(In::Action))
 		{
 			auto vaultContext = TestLaraVault(item, coll);
@@ -1833,7 +1827,12 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsUsingModernControls())
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurnY(*item, PLAYER_SPRINT_TURN_ALPHA);
+		HandlePlayerLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
+	}
+	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -1865,17 +1864,10 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Forward) ||
-		(IsUsingModernControls() &&
-			(IsHeld(In::Forward) || IsHeld(In::Back) ||
-			 IsHeld(In::Left) || IsHeld(In::Right))))
+	if (IsUsingModernControls() ?
+		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
+		IsHeld(In::Forward))
 	{
-		if (IsUsingModernControls())
-		{
-			HandlePlayerTurnY(*item, PLAYER_SPRINT_TURN_ALPHA);
-			HandlePlayerLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
-		}
-
 		if (IsHeld(In::Action) && CanVaultFromSprint(*item, *coll))
 		{
 			auto vaultContext = TestLaraVault(item, coll);

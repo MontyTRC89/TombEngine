@@ -20,6 +20,7 @@
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 
+// TODO: Move.
 bool HasCrawlAction(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
@@ -84,18 +85,18 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
-	if (!IsUsingModernControls())
-	{
-		if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
-	}
-	else
+	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA);
 		}
+	}
+	else
+	{
+		if (IsHeld(In::Left) || IsHeld(In::Right))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 	}
 
 	if (IsClicked(In::Crouch) && IsUsingModernControls())
@@ -214,7 +215,11 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 
 	AlignLaraToSurface(item);
 
-	if (!IsUsingModernControls())
+	if (IsUsingModernControls())
+	{
+		// TODO: Turning.
+	}
+	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{

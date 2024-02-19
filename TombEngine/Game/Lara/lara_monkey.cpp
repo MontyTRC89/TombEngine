@@ -24,6 +24,21 @@ using namespace TEN::Input;
 // Control & Collision Functions
 // -----------------------------
 
+// TODO: Move.
+bool HasClimbAction(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	if (IsUsingModernControls())
+	{
+		return player.Control.ToggleClimb;
+	}
+	else
+	{
+		return IsHeld(In::Action);
+	}
+}
+
 // State:		LS_MONKEY_IDLE (75)
 // Collision:	lara_col_monkey_idle()
 void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
@@ -31,6 +46,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Free;
+	player.Control.ToggleClimb = IsUsingModernControls();
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -49,7 +65,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 	else
 	{
-		// NOTE: Shimmy locks orientation.
+		// Shimmy locks orientation.
 		if ((IsHeld(In::Left) &&
 			!(IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))) ||
 			(IsHeld(In::Right) &&
@@ -59,7 +75,10 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsClicked(In::Action) && IsUsingModernControls())
+		player.Control.ToggleClimb = false;
+
+	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::Jump))
 		{
@@ -198,6 +217,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
+	player.Control.ToggleClimb = IsUsingModernControls();
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -216,7 +236,10 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsClicked(In::Action) && IsUsingModernControls())
+		player.Control.ToggleClimb = false;
+
+	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
 	{
 		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
 		{
@@ -359,6 +382,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
+	player.Control.ToggleClimb = IsUsingModernControls();
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -371,15 +395,22 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsHeld(In::Walk))	// WALK locks orientation.
+	if (!IsUsingModernControls())
 	{
-		if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		// Walk locks orientation.
+		if (!IsHeld(In::Walk))
+		{
+			if (IsHeld(In::Left) || IsHeld(In::Right))
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		}
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsClicked(In::Action) && IsUsingModernControls())
+		player.Control.ToggleClimb = false;
+
+	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
 	{
-		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)))
+		if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
 		{
 			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			return;
@@ -435,6 +466,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
+	player.Control.ToggleClimb = IsUsingModernControls();
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -447,16 +479,22 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// NOTE: Walk locks orientation.
-	if (!IsHeld(In::Walk))
+	if(!IsUsingModernControls())
 	{
-		if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		// Walk locks orientation.
+		if (!IsHeld(In::Walk))
+		{
+			if (IsHeld(In::Left) || IsHeld(In::Right))
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		}
 	}
 
-	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
+	if (IsClicked(In::Action) && IsUsingModernControls())
+		player.Control.ToggleClimb = false;
+
+	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
 	{
-		if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)))
+		if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
 		{
 			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
 			return;

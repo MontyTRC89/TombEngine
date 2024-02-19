@@ -335,7 +335,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!IsHeld(In::Action) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
+	if ((!IsHeld(In::Action) && !IsUsingModernControls()) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
 
 	if (CanGrabMonkeySwing(*item, *coll))
