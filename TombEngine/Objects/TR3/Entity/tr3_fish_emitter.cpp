@@ -10,6 +10,8 @@
 #include "Objects/TR3/fish.h"
 #include "Specific/level.h"
 #include "Renderer/Renderer.h"
+#include "Game/Setup.h"
+#include "Game/control/flipeffect.h"
 
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -24,7 +26,7 @@ namespace TEN::Entities::Creatures::TR3
 	#define Y 1
 	#define Z 2
 	#define XYZ	3
-	#define OCB_FISH_LETAL 0x1000
+	
 	#define OCB_FISH_EAT_CARCASS 0x2000
 
 	constexpr auto MAX_FISH = 8;
@@ -35,11 +37,20 @@ namespace TEN::Entities::Creatures::TR3
 	unsigned char FishRanges[1][3] =
 	{
 		{
-			8,
-			20,
+			4,
+			2,
 			3
 		}
 	};
+
+	void ClearFishSwarm()
+	{
+		if (Objects[ID_FISH_EMITTER].loaded)
+		{
+			ZeroMemory(Fishes, MAX_FISH * sizeof(FishInfo));
+			ZeroMemory(LeaderInfo, MAX_FISH * sizeof(FishLeaderInfo));
+		}
+	}
 
 	void SetupShoal(short itemNumber)
 	{
@@ -74,12 +85,12 @@ namespace TEN::Entities::Creatures::TR3
 		for (int i = 0; i < 24; i++)
 		{
 			pFish = &Fishes[(leader * 24) + 8 + i];
-			pFish->Pose.Position.x = (GetRandomControl() % (fishXRange << 1)) - fishXRange;
-			pFish->Pose.Position.y = (GetRandomControl() % fishYRange);
-			pFish->Pose.Position.z = (GetRandomControl() % (fishZRange << 1)) - fishZRange;
+			pFish->Pose.Position.x = item->Pose.Position.x + (GetRandomControl() % (fishXRange << 1)) - fishXRange;
+			pFish->Pose.Position.y = item->Pose.Position.y + (GetRandomControl() % fishYRange);
+			pFish->Pose.Position.z = item->Pose.Position.z + (GetRandomControl() % (fishZRange << 1)) - fishZRange;
 			pFish->destY = (GetRandomControl() % fishYRange);
 			pFish->angle = GetRandomControl() & 4095;
-			pFish->speed = (GetRandomControl() & 31) + 32;
+			pFish->speed = (GetRandomControl() & 0x1F) + 32;
 			pFish->swim = GetRandomControl() & 63;			
 		}
 
@@ -111,7 +122,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (!pLeader->on)
 			SetupFish(leader, item);
 
-		if (item->TriggerFlags & OCB_FISH_LETAL)
+		if (item->TriggerFlags & item->ItemFlags[1])
 		{
 			if ((item->TriggerFlags == OCB_FISH_EAT_CARCASS) == 0)
 				pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
@@ -129,7 +140,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (PirahnaHitWait)
 			PirahnaHitWait--;
 
-
+		enemy = LaraItem;
 
 		if (pirahnaAttack)
 		{
@@ -197,11 +208,10 @@ namespace TEN::Entities::Creatures::TR3
 		fish->swim = (fish->swim + (fish->speed >> 4)) & 0x3F;;
 
 		
-		int x = fish->Pose.Position.x - (fish->speed * phd_sin(fish->angle));
-		int z = fish->Pose.Position.z + (fish->speed * phd_cos(fish->angle));
+		int x = fish->Pose.Position.x - fish->speed * phd_sin(fish->angle) / BLOCK(8);
+		int z = fish->Pose.Position.z + fish->speed * phd_cos(fish->angle ) / BLOCK(8);
 
-		x -= fish->speed * phd_sin(fish->angle * 16) / 2;
-		z += fish->speed * phd_cos(fish->angle * 16) / 2;
+
 
 		if (pirahnaAttack == 0)
 		{
@@ -298,25 +308,21 @@ namespace TEN::Entities::Creatures::TR3
 		int ftx = x;
 		int ftz = z;
 
-		fish->Pose.Position.x = (short)x;
-		fish->Pose.Position.z = (short)z;
-
-	
+		//fish->Pose.Position.x = x;
+		//fish->Pose.Position.z = z;
 
 		for (int i = 0; i < 24; i++)
 		{
-			fish = &Fishes[MAX_FISH * leader + i + 8];
+			fish = &Fishes[(MAX_FISH * leader) + i + 8];
 
-			if (item->Flags & OCB_FISH_LETAL)
+			if (item->Flags & item->ItemFlags[1])
 			{
-				Pose pos;
+			/*	Pose pos;
 				pos.Position.x = item->Pose.Position.x + fish->Pose.Position.x;
 				pos.Position.y = item->Pose.Position.y + fish->Pose.Position.y;
 				pos.Position.z = item->Pose.Position.z + fish->Pose.Position.z;
 
-				g_Renderer.AddDebugSphere(Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), 46, Vector4(1, 0, 0, 1), RendererDebugPage::None);
-				g_Renderer.AddDebugLine(Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), Vector4(1, 0, 0, 1), RendererDebugPage::None);
-
+				
 				if (FishNearLara(&pos, 256, (pirahnaAttack < 2) ? LaraItem : enemy))
 				{
 					if (PirahnaHitWait == 0)
@@ -327,13 +333,12 @@ namespace TEN::Entities::Creatures::TR3
 
 					if (pirahnaAttack != 2)
 						DoDamage(LaraItem, PIRAHNA_DAMAGE);
-				}
+				}*/
 			}
 
-			angle = ((-(Geometry::GetOrientToPoint(Vector3(fish->Pose.Position.x, 0.0f, fish->Pose.Position.z), Vector3(ftx, 0.0f, ftz)).y + ANGLE(90.0f))) / 16) & ANGLE(22.5f);
-			int dx = SQUARE(fish->Pose.Position.x - ftx - 128 * i + 3072);
-			int dz = SQUARE(fish->Pose.Position.z - ftz + 128 * i - 3072);
-
+			angle = ((-(Geometry::GetOrientToPoint(Vector3(fish->Pose.Position.x + item->Pose.Position.x, 0.0f, fish->Pose.Position.z + item->Pose.Position.z), enemy->Pose.Position.ToVector3()).y + ANGLE(90.0f))) / 16) & ANGLE(22.5f);
+			int dx = fish->Pose.Position.x - ftx + ((24 - i) * 128);
+			int dz = fish->Pose.Position.z - ftz - ((24 - i) * 128);
 			
 			dx *= dx;
 			dz *= dz;
@@ -394,10 +399,10 @@ namespace TEN::Entities::Creatures::TR3
 			else if (fish->speed > 200)
 				fish->speed = 200;
 
-			fish->swim = (fish->swim + (fish->speed >> 4) + (fish->speed >> 5)) & 0x3F;
+			fish->swim = (fish->swim + (fish->speed / 16) + (fish->speed / 32)) % 64;
 		
-			x = fish->Pose.Position.x - fish->speed * phd_sin(fish->angle * 16) / 2;
-			z = fish->Pose.Position.z + fish->speed * phd_cos(fish->angle * 16) / 2;
+			x = fish->speed * phd_sin(fish->angle ) / BLOCK(8); 
+			z = fish->speed * phd_cos(fish->angle ) / BLOCK(8);
 
 			if (z < -32000)
 				z = -32000;
@@ -408,10 +413,8 @@ namespace TEN::Entities::Creatures::TR3
 			else if (x > 32000)
 				x = 32000;
 
-			fish->Pose.Position.x = (short)x;
-			fish->Pose.Position.z = (short)z;
-
-		
+			fish->Pose.Position.x += x * fish->speed;
+			fish->Pose.Position.z += z * fish->speed;
 
 			if (pirahnaAttack == 0)
 			{
@@ -427,6 +430,10 @@ namespace TEN::Entities::Creatures::TR3
 
 			fish->Pose.Position.y += (fish->destY - fish->Pose.Position.y) / 16;
 			//fish++;
+
+			g_Renderer.AddDebugSphere(Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), 46, Vector4(1, 0, 0, 1), RendererDebugPage::None);
+			g_Renderer.AddDebugLine(Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), Vector4(1, 0, 0, 1), RendererDebugPage::None);
+
 		}
 
 		
@@ -435,7 +442,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	bool FishNearLara(Pose* pos, int distance, ItemInfo* item)
 	{
-		int x = pos->Position.x - item->Pose.Position.x;
+	/*	int x = pos->Position.x - item->Pose.Position.x;
 		int y = abs(pos->Position.y - item->Pose.Position.y);
 		int z = pos->Position.z - item->Pose.Position.z;
 
@@ -445,9 +452,9 @@ namespace TEN::Entities::Creatures::TR3
 		if ((pow(x, 2) + pow(z, 2)) > pow(distance, 2))
 			return false;
 
-		if (y > distance)
+		if (y > distance)*/
 			return false;
 
-		return true;
+	//	return true;
 	}
 }

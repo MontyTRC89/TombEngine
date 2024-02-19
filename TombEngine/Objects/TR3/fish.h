@@ -6,9 +6,9 @@ struct FishInfo
 	int	angle;
 	short destY;
 	short angAdd;
-	unsigned char speed;
-	unsigned char acc;
-	unsigned char swim;
+	int speed;
+	int acc;
+	int swim;
 };
 
 struct FishLeaderInfo

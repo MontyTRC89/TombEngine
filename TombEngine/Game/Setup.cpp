@@ -26,6 +26,7 @@
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
+#include "Objects/TR3/Entity/tr3_fish_emitter.h"
 
 using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
@@ -153,6 +154,7 @@ void InitializeSpecialEffects()
 	NextBlood = 0;
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
+	TEN::Entities::Creatures::TR3::ClearFishSwarm();
 }
 
 void CustomObjects()
