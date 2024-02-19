@@ -1545,7 +1545,7 @@ short GetPlayerMoveAngle(const ItemInfo& item)
 	}
 }
 
-static short GetLegacySlideDirection(short angle)
+static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
 {
 	auto tilt = GetSurfaceTilt(floorNormal, true);
 
