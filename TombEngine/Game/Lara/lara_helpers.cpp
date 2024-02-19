@@ -1374,7 +1374,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 			player.Control.HandStatus == HandStatus::WeaponReady)
 		{
 			// TODO: Up case.
-			short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+			short deltaAngle = GetPlayerRelMoveAngle(item);
 			if (abs(deltaAngle) <= ANGLE(45.0f) && CanJumpForward(item, coll))
 			{
 				return JumpDirection::Forward;
@@ -1452,6 +1452,11 @@ short GetPlayerMoveAngle(const ItemInfo& item)
 	{
 		return item.Pose.Orientation.y;
 	}
+}
+
+short GetPlayerRelMoveAngle(const ItemInfo& item)
+{
+	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
 }
 
 static short GetLegacySlideDirection(short angle)

@@ -325,10 +325,26 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 				IsHeld(In::Left) || IsHeld(In::Right))
 			{
-				HandlePlayerTurnY(*item, 0.5f);
-				item->Animation.TargetState = LS_JUMP_FORWARD;
-				player.Control.JumpDirection = JumpDirection::Forward;
-				return;
+				HandlePlayerTurnY(*item, PLAYER_JUMP_PREPARE_TURN_ALPHA);
+
+				player.Control.JumpDirection = GetPlayerJumpDirection(*item, *coll);
+				switch (player.Control.JumpDirection)
+				{
+					case JumpDirection::None:
+						item->Animation.TargetState = LS_IDLE;
+						player.Control.JumpDirection = JumpDirection::None;
+						break;
+
+					case JumpDirection::Up:
+						item->Animation.TargetState = LS_JUMP_UP;
+						player.Control.JumpDirection = JumpDirection::Up;
+						return;
+
+					default:
+						item->Animation.TargetState = LS_JUMP_FORWARD;
+						player.Control.JumpDirection = JumpDirection::Forward;
+						return;
+				}
 			}
 		}
 	}

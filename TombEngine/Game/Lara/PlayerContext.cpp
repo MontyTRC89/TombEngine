@@ -884,7 +884,7 @@ namespace TEN::Entities::Player
 
 		auto setup = JumpSetupData
 		{
-			short(item.Pose.Orientation.y + relHeadingAngle),
+			IsUsingModernControls() ? GetPlayerMoveAngle(item) : short(item.Pose.Orientation.y + relHeadingAngle),
 			CLICK(0.85f)
 		};
 
