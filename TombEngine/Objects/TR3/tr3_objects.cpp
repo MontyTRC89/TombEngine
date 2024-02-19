@@ -425,6 +425,14 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetHitEffect();
 	}
+
+	obj = &Objects[ID_FISH_EMITTER];
+	if (obj->loaded)
+	{
+		obj->Initialize = SetupShoal;
+		obj->control = ControlFish;
+		obj->drawRoutine = NULL;
+	}
 }
 
 static void StartObject(ObjectInfo* obj)

@@ -2,9 +2,7 @@
 
 struct FishInfo
 {
-	short x;
-	short y;
-	short z;
+	Pose Pose;
 	int	angle;
 	short destY;
 	short angAdd;

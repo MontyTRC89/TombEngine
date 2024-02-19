@@ -474,6 +474,7 @@ namespace TEN::Renderer
 		void PrepareSimpleParticles(RenderView& view);
 		void PrepareStreamers(RenderView& view);
 		void PrepareFootprints(RenderView& view);
+		void PrepareFishes(RenderView& view);
 		void DrawLoadingBar(float percent);
 		void DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view);
 		void RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade);
