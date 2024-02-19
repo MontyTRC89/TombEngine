@@ -1545,6 +1545,11 @@ short GetPlayerMoveAngle(const ItemInfo& item)
 	}
 }
 
+short GetPlayerRelMoveAngle(const ItemInfo& item)
+{
+	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+}
+
 static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
 {
 	auto tilt = GetSurfaceTilt(floorNormal, true);
