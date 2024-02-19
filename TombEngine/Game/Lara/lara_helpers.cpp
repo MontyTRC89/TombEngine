@@ -1545,40 +1545,50 @@ short GetPlayerMoveAngle(const ItemInfo& item)
 	}
 }
 
-short GetPlayerRelMoveAngle(const ItemInfo& item)
-{
-	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
-}
-
 static short GetLegacySlideDirection(short angle)
 {
-	auto quadrant = (CardinalDirection)GetQuadrant(angle);
+	auto tilt = GetSurfaceTilt(floorNormal, true);
 
-	if (quadrant == CardinalDirection::NORTH)
-		quadrant = CardinalDirection::WEST;
-	if (quadrant == CardinalDirection::SOUTH)
-		quadrant = CardinalDirection::EAST;
-	
-	return (short)quadrant * ANGLE(90.0f);
+	short headingAngle = ANGLE(0.0f);
+	if (tilt.x > 2)
+	{
+		headingAngle = ANGLE(-90.0f);
+	}
+	else if (tilt.x < -2)
+	{
+		headingAngle = ANGLE(90.0f);
+	}
+
+	if (tilt.y > 2 && tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(180.0f);
+	}
+	else if (tilt.y < -2 && -tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(0.0f);
+	}
+
+	return headingAngle;
 }
 
-short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
+short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
-	auto probe = GetCollision(item);
+	auto pointColl = GetCollision(item);
 
 	// Ground is flat.
-	if (probe.FloorTilt == Vector2::Zero)
-		return headingAngle;
+	if (pointColl.FloorTilt == Vector2::Zero)
+		return coll->Setup.ForwardAngle;
 
-	// Get either:
-	// a) the surface aspect angle (extended slides), or
-	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorNormal);
+	// Return slide heading angle.
 	if (g_GameFlow->HasSlideExtended())
-		return headingAngle;
+	{
+		return Geometry::GetSurfaceAspectAngle(pointColl.FloorNormal);
+	}
 	else
-		return GetLegacySlideDirection(headingAngle);
+	{
+		return GetLegacySlideHeadingAngle(pointColl.FloorNormal);
+	}
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
@@ -1879,7 +1889,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	static short oldAngle = 1;
 
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(coll->FloorNormal);
-	short angle = GetLegacySlideDirection(aspectAngle);
+	short angle = GetLegacySlideHeadingAngle(coll->FloorNormal);
 
 	short delta = angle - item->Pose.Orientation.y;
 
@@ -1911,7 +1921,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 // TODO: Do it later.
 void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	short headinAngle = GetLaraSlideDirection(item, coll);
+	short headinAngle = GetPlayerSlideHeadingAngle(item, coll);
 	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
 	if (!g_GameFlow->HasSlideExtended())
