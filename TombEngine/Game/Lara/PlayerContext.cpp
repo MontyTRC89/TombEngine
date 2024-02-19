@@ -944,8 +944,8 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Check running jump timer.
-		int runJumpTime = (int)floor(PLAYER_RUN_JUMP_TIME * (IsUsingModernControls() ? 0.5f : 1.0f));
-		if (player.Control.Count.Run < runJumpTime)
+		int jumpTime = IsUsingModernControls() ? PLAYER_MODERN_CONTROL_RUN_JUMP_TIME : PLAYER_TANK_CONTROL_RUN_JUMP_TIME;
+		if (player.Control.Count.Run < jumpTime)
 			return false;
 
 		auto setup = JumpSetupData
@@ -970,7 +970,8 @@ namespace TEN::Entities::Player
 			return false;
 
 		// 3) Check running jump timer.
-		if (player.Control.Count.Run < PLAYER_SPRINT_JUMP_TIME)
+		int jumpTime = IsUsingModernControls() ? PLAYER_MODERN_CONTROL_SPRINT_JUMP_TIME : PLAYER_TANK_CONTROL_SPRINT_JUMP_TIME;
+		if (player.Control.Count.Run < jumpTime)
 			return false;
 
 		auto setup = JumpSetupData

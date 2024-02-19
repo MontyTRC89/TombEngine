@@ -76,10 +76,12 @@ constexpr auto LARA_TREAD_VELOCITY_MAX		   = 17.5f;
 constexpr auto LARA_SWIM_VELOCITY_MAX		   = 50.0f;
 constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 33.5f;
 
-constexpr auto PLAYER_POSITION_ADJUST_MAX_TIME = 3 * FPS;  // 3 seconds allowed for position adjustment.
-constexpr auto PLAYER_POSE_TIME				   = 20 * FPS; // 20 seconds to AFK pose.
-constexpr auto PLAYER_RUN_JUMP_TIME			   = 22;	   // Frames to count before a running jump is possible.
-constexpr auto PLAYER_SPRINT_JUMP_TIME		   = 46;	   // Frames to count before a sprint jump is possible.
+constexpr auto PLAYER_POSITION_ADJUST_MAX_TIME		  = 3 * FPS;
+constexpr auto PLAYER_POSE_TIME						  = 20 * FPS;
+constexpr auto PLAYER_TANK_CONTROL_RUN_JUMP_TIME	  = 22;
+constexpr auto PLAYER_MODERN_CONTROL_RUN_JUMP_TIME	  = PLAYER_TANK_CONTROL_RUN_JUMP_TIME / 2;
+constexpr auto PLAYER_TANK_CONTROL_SPRINT_JUMP_TIME	  = 46;
+constexpr auto PLAYER_MODERN_CONTROL_SPRINT_JUMP_TIME = PLAYER_TANK_CONTROL_SPRINT_JUMP_TIME / 2;
 
 // Status value maxes
 constexpr auto LARA_AIR_MAX			  = 1800.0f;

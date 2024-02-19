@@ -135,7 +135,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::Horizontal;
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
-	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, (PLAYER_RUN_JUMP_TIME / 2) + 4);
+	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, (PLAYER_TANK_CONTROL_RUN_JUMP_TIME / 2) + 4);
 
 	if (item->HitPoints <= 0)
 	{
@@ -276,7 +276,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
-	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_RUN_JUMP_TIME);
+	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_TANK_CONTROL_RUN_JUMP_TIME);
 
 	if (item->HitPoints <= 0)
 	{
@@ -1825,7 +1825,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
 	player.Status.Stamina = std::clamp(player.Status.Stamina - 1, 0, (int)LARA_STAMINA_MAX);
-	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_SPRINT_JUMP_TIME);
+	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_TANK_CONTROL_SPRINT_JUMP_TIME);
 
 	if (item->HitPoints <= 0)
 	{
@@ -1986,7 +1986,7 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_RUN_JUMP_TIME);
+	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_TANK_CONTROL_RUN_JUMP_TIME);
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
@@ -2042,8 +2042,8 @@ void lara_as_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::Horizontal;
 
 	player.Control.Count.Run++;
-	if (player.Control.Count.Run > PLAYER_RUN_JUMP_TIME)
-		player.Control.Count.Run = PLAYER_RUN_JUMP_TIME;
+	if (player.Control.Count.Run > PLAYER_TANK_CONTROL_RUN_JUMP_TIME)
+		player.Control.Count.Run = PLAYER_TANK_CONTROL_RUN_JUMP_TIME;
 
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{

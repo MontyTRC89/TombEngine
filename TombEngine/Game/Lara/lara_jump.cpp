@@ -42,9 +42,10 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::Horizontal;
 
 	// Update running jump counter in preparation for possible jump action soon after landing.
+	int jumpTime = IsUsingModernControls() ? PLAYER_MODERN_CONTROL_RUN_JUMP_TIME : (PLAYER_TANK_CONTROL_RUN_JUMP_TIME / 2);
 	player.Control.Count.Run++;
-	if (player.Control.Count.Run > PLAYER_RUN_JUMP_TIME / 2)
-		player.Control.Count.Run = PLAYER_RUN_JUMP_TIME / 2;
+	if (player.Control.Count.Run > jumpTime)
+		player.Control.Count.Run = jumpTime;
 
 	if (item->HitPoints <= 0)
 	{
