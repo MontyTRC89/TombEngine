@@ -852,6 +852,97 @@ void HandlePlayerCrawlFlex(ItemInfo& item)
 	}
 }
 
+void HandlePlayerUpJumpShift(ItemInfo& item)
+{
+	constexpr auto BASE_ANGLE = ANGLE(90.0f);
+	constexpr auto VEL_ACCEL  = 2.0f;
+	constexpr auto VEL_MAX	  = 5.0f;
+
+	enum class ShiftType
+	{
+		ForwardPassive,
+		ForwardActive,
+		BackwardPassive,
+		BackwardActive,
+	};
+
+	auto& player = GetLaraInfo(item);
+
+	// Determine shift type.
+	auto shiftType = ShiftType::ForwardPassive;
+	if (IsUsingModernControls())
+	{
+		if (GetMoveAxis() != Vector2::Zero)
+		{
+			short relMoveAngle = GetPlayerRelMoveAngle(item);
+			if (abs(relMoveAngle) <= BASE_ANGLE)
+			{
+				ShiftType::ForwardActive;
+			}
+			else
+			{
+				ShiftType::BackwardActive;
+			}
+		}
+		else
+		{
+			if (item.Animation.Velocity.z < 0.0f)
+				shiftType = ShiftType::BackwardPassive;
+		}
+	}
+	else
+	{
+		if (IsHeld(In::Forward))
+		{
+			shiftType = ShiftType::ForwardActive;
+		}
+		else if (IsHeld(In::Back))
+		{
+			shiftType = ShiftType::BackwardActive;
+		}
+		else
+		{
+			if (item.Animation.Velocity.z < 0.0f)
+				shiftType = ShiftType::BackwardPassive;
+		}
+	}
+
+	// Modulate Z velocity.
+	switch (shiftType)
+	{
+	default:
+	case ShiftType::ForwardPassive:
+		item.Animation.Velocity.z = VEL_ACCEL;
+		break;
+		
+	case ShiftType::ForwardActive:
+		item.Animation.Velocity.z += VEL_ACCEL;
+		if (item.Animation.Velocity.z > VEL_MAX)
+			item.Animation.Velocity.z = VEL_MAX;
+
+		break;
+
+	case ShiftType::BackwardPassive:
+		item.Animation.Velocity.z = -VEL_ACCEL;
+		break;
+
+	case ShiftType::BackwardActive:
+		item.Animation.Velocity.z -= VEL_ACCEL;
+		if (item.Animation.Velocity.z < -VEL_MAX)
+			item.Animation.Velocity.z = -VEL_MAX;
+
+		break;
+	}
+
+	// Flex if moving backward.
+	if (item.Animation.Velocity.z < 0.0f)
+	{
+		// TODO: Holding Back + Left/Right results in player flexing more.
+		item.Pose.Orientation.x += std::min<short>(LARA_LEAN_RATE / 3, abs(ANGLE(item.Animation.Velocity.z) - item.Pose.Orientation.x) / 3);
+		player.ExtraHeadRot.y += (ANGLE(10.0f) - item.Pose.Orientation.z) / 3;
+	}
+}
+
 static void GivePlayerItemsCheat(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);

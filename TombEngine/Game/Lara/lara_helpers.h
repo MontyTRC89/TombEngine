@@ -35,6 +35,7 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha);
 void HandlePlayerLean(ItemInfo& item, short leanAngleMax, float alpha);
 void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerCrawlFlex(ItemInfo& item);
+void HandlePlayerUpJumpShift(ItemInfo& item);
 void HandlePlayerFlyCheat(ItemInfo& item);
 void HandlePlayerWetnessDrips(ItemInfo& item);
 void HandlePlayerDiveBubbles(ItemInfo& item);
