@@ -152,7 +152,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA/*, true*/);
 		HandlePlayerLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA);
 	}
 	else
@@ -185,10 +185,12 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::Walk))
 		{
-			// TODO
-			/*short deltaAngle = abs(Geometry::GetShortestAngle(GetPlayerMoveAngle(*item), item->Pose.Orientation.y));
-			if (deltaAngle >= ANGLE(90.0f))
+			/*short relMoveAngle = GetPlayerRelMoveAngle(*item);
+			if (abs(relMoveAngle) > ANGLE(90.0f) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180))
 			{
+				if (HasStateDispatch(item, LS_WALK_FORWARD_TURN_180))
+					item->Pose.Orientation.y += ANGLE(180.0f);
+
 				item->Animation.TargetState = LS_WALK_FORWARD_TURN_180;
 			}
 			else*/
@@ -476,7 +478,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			// TODO: Bugged.
 			short relMoveAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerMoveAngle(*item)));
-			if (!TestPlayerCombatMode(*item) && relMoveAngle >= ANGLE(45.0f))
+			if (!TestPlayerCombatMode(*item)/* && relMoveAngle >= ANGLE(45.0f)*/)
 				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
 		}
 	}

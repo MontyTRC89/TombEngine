@@ -234,7 +234,6 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH] = std::pair(lara_as_surface_climb_out, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH] = std::pair(lara_as_surface_climb_out, lara_void_func);
 
-		// Reserved for ledge descents (branch: sezz_edge_catch_refactor).
 		PlayerBehaviorStateRoutines[198] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[199] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[200] = std::pair(lara_as_null, lara_void_func);
@@ -244,7 +243,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[204] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[205] = std::pair(lara_as_null, lara_void_func);
 
-		PlayerBehaviorStateRoutines[LS_RUN_FORWARD_START_CANCEL] = std::pair(lara_as_null, lara_void_func);
+		//PlayerBehaviorStateRoutines[LS_RUN_FORWARD_START_CANCEL] = std::pair(lara_as_null, lara_void_func);
 	}
 
 	void HandlePlayerBehaviorState(ItemInfo& item, CollisionInfo& coll, PlayerBehaviorStateRoutineType routineType)

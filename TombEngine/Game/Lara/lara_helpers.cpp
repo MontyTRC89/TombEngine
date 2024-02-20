@@ -741,14 +741,24 @@ void HandlePlayerTurnX(ItemInfo& item, float alpha)
 	}
 }
 
-void HandlePlayerTurnY(ItemInfo& item, float alpha)
+void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool ignore180Turn*/)
 {
+	auto& player = GetLaraInfo(item);
+
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
-	// TODO: Turn 180 anims for walk and run.
-	/*short deltaAngle1 = abs(Geometry::GetShortestAngle(GetPlayerMoveAngle(item), item.Pose.Orientation.y));
-	if (deltaAngle1 >= BASE_ANGLE)
-		item.Pose.Orientation.y += ANGLE(180.0f);*/
+	/*if (ignore180Turn)
+	{
+		if (HasStateDispatch(&item, LS_WALK_FORWARD_TURN_180))
+		{
+			short relMoveAngle = GetPlayerRelMoveAngle(item);
+			if (abs(relMoveAngle) > BASE_ANGLE)
+			{
+				return;
+				item.Pose.Orientation.y += ANGLE(180.0f);
+			}
+		}
+	}*/
 
 	short moveAngle = GetPlayerMoveAngle(item);
 	auto targetOrient = EulerAngles(item.Pose.Orientation.x, moveAngle, item.Pose.Orientation.z);
@@ -762,6 +772,8 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha)
 	{
 		item.Pose.Orientation.InterpolateConstant(targetOrient, BASE_ANGLE * alpha);
 	}
+
+	player.Control.TargetMoveAngle = moveAngle;
 }
 
 // NOTE: Modern control version.
@@ -1530,10 +1542,12 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 
 short GetPlayerMoveAngle(const ItemInfo& item)
 {
+	const auto& player = GetLaraInfo(item);
+
 	if (IsUsingModernControls())
 	{
 		if (AxisMap[(int)InputAxis::Move] == Vector2::Zero)
-			return item.Pose.Orientation.y;
+			return player.Control.TargetMoveAngle;
 
 		auto dir = AxisMap[(int)InputAxis::Move];
 		dir.Normalize();
