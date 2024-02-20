@@ -467,17 +467,10 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 			IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			// TODO: Disable turning when weapon is drawn.
-			short deltaAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerMoveAngle(*item)));
-			if (deltaAngle >= ANGLE(45.0f) &&
-				(player.Control.HandStatus == HandStatus::WeaponDraw ||
-				player.Control.HandStatus == HandStatus::WeaponReady))
-			{
-			}
-			else
-			{
+			// TODO: Bugged.
+			short relMoveAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerMoveAngle(*item)));
+			if (!TestPlayerCombatMode(*item) && relMoveAngle >= ANGLE(45.0f))
 				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-			}
 		}
 	}
 	else
@@ -551,11 +544,10 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 
-			if (player.Control.HandStatus == HandStatus::WeaponDraw ||
-				player.Control.HandStatus == HandStatus::WeaponReady)
+			if (TestPlayerCombatMode(*item))
 			{
-				short deltaAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerMoveAngle(*item)));
-				if (deltaAngle < ANGLE(45.0f))
+				short relMoveAngle = GetPlayerRelMoveAngle(*item);
+				if (relMoveAngle < ANGLE(45.0f))
 				{
 					if (CanWadeBackward(*item, *coll))
 					{
@@ -1165,24 +1157,27 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Left) || IsHeld(In::Right))
+	if (!IsUsingModernControls())
 	{
-		if (isWading && isInSwamp)
+		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 3);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX / 3);
+			if (isWading && isInSwamp)
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 3);
+				HandlePlayerLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX / 3);
+			}
+			else
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+				HandlePlayerLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
+			}
 		}
-		else
-		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
-		}
-	}
 
-	if (IsHeld(In::Back) && (IsHeld(In::Walk) || isWading))
-	{
-		item->Animation.TargetState = LS_WALK_BACK;
-		return;
+		if (IsHeld(In::Back) && (IsHeld(In::Walk) || isWading))
+		{
+			item->Animation.TargetState = LS_WALK_BACK;
+			return;
+		}
 	}
 
 	item->Animation.TargetState = LS_IDLE;

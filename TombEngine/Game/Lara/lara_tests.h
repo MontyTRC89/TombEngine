@@ -49,6 +49,10 @@ bool IsJumpState(int state);
 bool IsRunJumpQueueableState(int state);
 bool IsRunJumpCountableState(int state);
 
+bool TestPlayerCombatMode(const ItemInfo& item);
+bool HasClimbAction(const ItemInfo& item);
+bool HasCrouchAction(const ItemInfo& item);
+
 std::optional<VaultTestResult> TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup);
 std::optional<VaultTestResult> TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll);
 std::optional<VaultTestResult> TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll);

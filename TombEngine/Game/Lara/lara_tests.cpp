@@ -1211,6 +1211,27 @@ bool IsRunJumpCountableState(int state)
 	return TestState(state, runningJumpTimerStates);
 }
 
+bool TestPlayerCombatMode(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	return (player.Control.HandStatus == HandStatus::WeaponDraw ||
+			player.Control.HandStatus == HandStatus::WeaponReady);
+}
+
+bool HasClimbAction(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+	return IsUsingModernControls() ? player.Control.ToggleClimb : IsHeld(In::Action);
+}
+
+bool HasCrouchAction(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+	return IsUsingModernControls() ? player.Control.ToggleCrouch : IsHeld(In::Crouch);
+}
+
+
 std::optional<VaultTestResult> TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup)
 {
 	auto* lara = GetLaraInfo(item);

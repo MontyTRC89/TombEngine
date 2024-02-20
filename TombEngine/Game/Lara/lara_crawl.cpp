@@ -390,13 +390,14 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 	
 	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (!IsUsingModernControls())
+		
+		if (IsUsingModernControls() ?
+			(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
+			(IsHeld(In::Forward) || IsHeld(In::Back)) &&
+			CanCrouchToCrawl(*item, *coll))
 		{
-			if ((IsHeld(In::Forward) || IsHeld(In::Back)) && CanCrouchToCrawl(*item, *coll))
-			{
-				item->Animation.TargetState = LS_CRAWL_IDLE;
-				return;
-			}
+			item->Animation.TargetState = LS_CRAWL_IDLE;
+			return;
 		}
 
 		item->Animation.TargetState = LS_CROUCH_IDLE;
@@ -630,7 +631,11 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsUsingModernControls())
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA);
+	}
+	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -647,14 +652,10 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Forward) ||
-			(IsUsingModernControls() &&
-				(IsHeld(In::Forward) || IsHeld(In::Back) ||
-				IsHeld(In::Left) || IsHeld(In::Right))))
+		if (IsUsingModernControls() ?
+			(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
+			IsHeld(In::Forward))
 		{
-			if (IsUsingModernControls())
-				item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, GetPlayerMoveAngle(*item), item->Pose.Orientation.z), 0.1f);
-
 			item->Animation.TargetState = LS_CRAWL_FORWARD;
 			return;
 		}
@@ -692,18 +693,14 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdgeCrawl(item, coll))
 	{
-		if (!IsUsingModernControls())
+		item->Animation.TargetState = LS_SOFT_SPLAT;
+		if (GetStateDispatch(item, GetAnimData(*item)))
 		{
-			// TODO: Stop when colliding with wall.
-			item->Animation.TargetState = LS_SOFT_SPLAT;
-			if (GetStateDispatch(item, GetAnimData(*item)))
-			{
-				item->Animation.ActiveState = LS_SOFT_SPLAT;
-				return;
-			}
-
-			LaraCollideStopCrawl(item, coll);
+			item->Animation.ActiveState = LS_SOFT_SPLAT;
+			return;
 		}
+
+		LaraCollideStopCrawl(item, coll);
 	}
 
 	if (CanFall(*item, *coll))

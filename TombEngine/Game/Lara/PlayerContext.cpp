@@ -27,18 +27,6 @@ namespace TEN::Entities::Player
 		CollPtr = &coll;*/
 	}
 
-	bool HasClimbAction(const ItemInfo& item)
-	{
-		const auto& player = GetLaraInfo(item);
-		return IsUsingModernControls() ? player.Control.ToggleClimb : IsHeld(In::Action);
-	}
-
-	bool HasCrouchAction(const ItemInfo& item)
-	{
-		const auto& player = GetLaraInfo(item);
-		return IsUsingModernControls() ? player.Control.ToggleCrouch : IsHeld(In::Crouch);
-	}
-
 	bool CanChangeElevation(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto LOWER_FLOOR_BOUND = STEPUP_HEIGHT;
