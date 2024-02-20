@@ -135,7 +135,9 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::Horizontal;
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
-	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, (PLAYER_TANK_CONTROL_RUN_JUMP_TIME / 2) + 4);
+	player.Control.Count.Run = std::clamp<unsigned int>(
+		player.Control.Count.Run + 1,
+		0, IsUsingModernControls() ? (PLAYER_MODERN_CONTROL_RUN_JUMP_TIME / 2) : (PLAYER_TANK_CONTROL_RUN_JUMP_TIME / 2) + 4);
 
 	if (item->HitPoints <= 0)
 	{

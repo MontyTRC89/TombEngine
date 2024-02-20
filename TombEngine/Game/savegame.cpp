@@ -477,6 +477,7 @@ bool SaveGame::Save(int slot)
 	control.add_keep_low(Lara.Control.KeepLow);
 	control.add_look(lookControlOffset);
 	control.add_move_angle(Lara.Control.MoveAngle);
+	control.add_move_angle_target(Lara.Control.MoveAngleTarget);
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
 	control.add_tightrope(tightropeControlOffset);
@@ -2115,6 +2116,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Look.Orientation = ToEulerAngles(s->lara()->control()->look()->orientation());
 	Lara.Control.Look.TurnRate = ToEulerAngles(s->lara()->control()->look()->turn_rate());
 	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
+	Lara.Control.MoveAngleTarget = s->lara()->control()->move_angle_target();
 	Lara.Control.IsRunJumpQueued = s->lara()->control()->is_run_jump_queued();
 	Lara.Control.ToggleClimb = s->lara()->control()->toggle_climb();
 	Lara.Control.ToggleCrouch = s->lara()->control()->toggle_crouch();

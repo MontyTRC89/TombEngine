@@ -1267,7 +1267,7 @@ struct WeaponControlData
 struct PlayerControlData
 {
 	short MoveAngle		  = 0;
-	short TargetMoveAngle = 0;
+	short MoveAngleTarget = 0;
 	short TurnRate		  = 0;
 
 	HandStatus	  HandStatus	= {};

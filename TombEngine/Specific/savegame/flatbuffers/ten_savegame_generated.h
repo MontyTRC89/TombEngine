@@ -3478,6 +3478,7 @@ struct LaraControlDataT : public flatbuffers::NativeTable {
   bool keep_low = false;
   std::unique_ptr<TEN::Save::LookControlDataT> look{};
   int32_t move_angle = 0;
+  int32_t move_angle_target = 0;
   std::unique_ptr<TEN::Save::RopeControlDataT> rope{};
   std::unique_ptr<TEN::Save::SubsuitControlDataT> subsuit{};
   std::unique_ptr<TEN::Save::TightropeControlDataT> tightrope{};
@@ -3506,14 +3507,15 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_KEEP_LOW = 24,
     VT_LOOK = 26,
     VT_MOVE_ANGLE = 28,
-    VT_ROPE = 30,
-    VT_SUBSUIT = 32,
-    VT_TIGHTROPE = 34,
-    VT_TOGGLE_CLIMB = 36,
-    VT_TOGGLE_CROUCH = 38,
-    VT_TURN_RATE = 40,
-    VT_WATER_STATUS = 42,
-    VT_WEAPON = 44
+    VT_MOVE_ANGLE_TARGET = 30,
+    VT_ROPE = 32,
+    VT_SUBSUIT = 34,
+    VT_TIGHTROPE = 36,
+    VT_TOGGLE_CLIMB = 38,
+    VT_TOGGLE_CROUCH = 40,
+    VT_TURN_RATE = 42,
+    VT_WATER_STATUS = 44,
+    VT_WEAPON = 46
   };
   bool can_climb_ladder() const {
     return GetField<uint8_t>(VT_CAN_CLIMB_LADDER, 0) != 0;
@@ -3553,6 +3555,9 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t move_angle() const {
     return GetField<int32_t>(VT_MOVE_ANGLE, 0);
+  }
+  int32_t move_angle_target() const {
+    return GetField<int32_t>(VT_MOVE_ANGLE_TARGET, 0);
   }
   const TEN::Save::RopeControlData *rope() const {
     return GetPointer<const TEN::Save::RopeControlData *>(VT_ROPE);
@@ -3595,6 +3600,7 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_LOOK) &&
            verifier.VerifyTable(look()) &&
            VerifyField<int32_t>(verifier, VT_MOVE_ANGLE) &&
+           VerifyField<int32_t>(verifier, VT_MOVE_ANGLE_TARGET) &&
            VerifyOffset(verifier, VT_ROPE) &&
            verifier.VerifyTable(rope()) &&
            VerifyOffset(verifier, VT_SUBSUIT) &&
@@ -3657,6 +3663,9 @@ struct LaraControlDataBuilder {
   void add_move_angle(int32_t move_angle) {
     fbb_.AddElement<int32_t>(LaraControlData::VT_MOVE_ANGLE, move_angle, 0);
   }
+  void add_move_angle_target(int32_t move_angle_target) {
+    fbb_.AddElement<int32_t>(LaraControlData::VT_MOVE_ANGLE_TARGET, move_angle_target, 0);
+  }
   void add_rope(flatbuffers::Offset<TEN::Save::RopeControlData> rope) {
     fbb_.AddOffset(LaraControlData::VT_ROPE, rope);
   }
@@ -3707,6 +3716,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
     bool keep_low = false,
     flatbuffers::Offset<TEN::Save::LookControlData> look = 0,
     int32_t move_angle = 0,
+    int32_t move_angle_target = 0,
     flatbuffers::Offset<TEN::Save::RopeControlData> rope = 0,
     flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0,
     flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope = 0,
@@ -3722,6 +3732,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
   builder_.add_tightrope(tightrope);
   builder_.add_subsuit(subsuit);
   builder_.add_rope(rope);
+  builder_.add_move_angle_target(move_angle_target);
   builder_.add_move_angle(move_angle);
   builder_.add_look(look);
   builder_.add_jump_direction(jump_direction);
@@ -8644,6 +8655,7 @@ inline void LaraControlData::UnPackTo(LaraControlDataT *_o, const flatbuffers::r
   { auto _e = keep_low(); _o->keep_low = _e; }
   { auto _e = look(); if (_e) _o->look = std::unique_ptr<TEN::Save::LookControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = move_angle(); _o->move_angle = _e; }
+  { auto _e = move_angle_target(); _o->move_angle_target = _e; }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = subsuit(); if (_e) _o->subsuit = std::unique_ptr<TEN::Save::SubsuitControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = tightrope(); if (_e) _o->tightrope = std::unique_ptr<TEN::Save::TightropeControlDataT>(_e->UnPack(_resolver)); }
@@ -8675,6 +8687,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
   auto _keep_low = _o->keep_low;
   auto _look = _o->look ? CreateLookControlData(_fbb, _o->look.get(), _rehasher) : 0;
   auto _move_angle = _o->move_angle;
+  auto _move_angle_target = _o->move_angle_target;
   auto _rope = _o->rope ? CreateRopeControlData(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _subsuit = _o->subsuit ? CreateSubsuitControlData(_fbb, _o->subsuit.get(), _rehasher) : 0;
   auto _tightrope = _o->tightrope ? CreateTightropeControlData(_fbb, _o->tightrope.get(), _rehasher) : 0;
@@ -8698,6 +8711,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
       _keep_low,
       _look,
       _move_angle,
+      _move_angle_target,
       _rope,
       _subsuit,
       _tightrope,

@@ -242,6 +242,7 @@ table LaraControlData {
 	keep_low: bool;
 	look: LookControlData;
 	move_angle: int32;
+	move_angle_target: int32;
 	rope: RopeControlData;
 	subsuit: SubsuitControlData;
 	tightrope: TightropeControlData;

@@ -773,7 +773,7 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool ignore180Turn*/)
 		item.Pose.Orientation.InterpolateConstant(targetOrient, BASE_ANGLE * alpha);
 	}
 
-	player.Control.TargetMoveAngle = moveAngle;
+	player.Control.MoveAngleTarget = moveAngle;
 }
 
 // NOTE: Modern control version.
@@ -1547,7 +1547,7 @@ short GetPlayerMoveAngle(const ItemInfo& item)
 	if (IsUsingModernControls())
 	{
 		if (AxisMap[(int)InputAxis::Move] == Vector2::Zero)
-			return player.Control.TargetMoveAngle;
+			return player.Control.MoveAngleTarget;
 
 		auto dir = AxisMap[(int)InputAxis::Move];
 		dir.Normalize();
