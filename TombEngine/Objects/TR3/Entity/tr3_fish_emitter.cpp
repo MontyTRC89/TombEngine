@@ -1,460 +1,190 @@
 #include "framework.h"
 #include "Objects/TR3/Entity/tr3_fish_emitter.h"
 
-#include "Game/animation.h"
-#include "Game/control/control.h"
-#include "Game/effects/effects.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/collide_item.h"
+#include "Game/control/flipeffect.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Math/Math.h"
-#include "Objects/TR3/fish.h"
-#include "Specific/level.h"
-#include "Renderer/Renderer.h"
 #include "Game/Setup.h"
-#include "Game/control/flipeffect.h"
+#include "Specific/level.h"
+#include "Math/Math.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	int PirahnaHitWait = false;
-	int CarcassItem = NO_ITEM;
+	FishData FishSwarm[NUM_FISHES];
 
-	#define PIRAHNA_DAMAGE 4
-	#define X 0
-	#define Y 1
-	#define Z 2
-	#define XYZ	3
-	
-	#define OCB_FISH_EAT_CARCASS 0x2000
+	constexpr auto FISH_LARA_DAMAGE = 3;
+	constexpr auto FISH_ENTITY_DAMAGE = 1;
 
-	constexpr auto MAX_FISH = 8;
+	int NextFish;
 
-	FishLeaderInfo LeaderInfo[MAX_FISH];
-	FishInfo Fishes[MAX_FISH + (MAX_FISH * 24)];
-
-	unsigned char FishRanges[1][3] =
+	void InitializeFishSwarm(short itemNumber)
 	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		if (!item->Pose.Orientation.y)
+			item->Pose.Orientation.z += CLICK(2);
+		else if (item->Pose.Orientation.y == ANGLE(90.0f))
+			item->Pose.Orientation.x += CLICK(2);
+		else if (item->Pose.Orientation.y == -ANGLE(180.0f))
+			item->Pose.Orientation.z -= CLICK(2);
+		else if (item->Pose.Orientation.y == -ANGLE(90.0f))
+			item->Pose.Orientation.x -= CLICK(2);
+
+		item->TriggerFlags = 24;
+	}
+
+
+
+	void FishSwarmControl(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+		//if (!CreatureActive(itemNumber))
+			//return;
+
+		if (item->TriggerFlags)
 		{
-			4,
-			2,
-			3
+			SpawnFishSwarm(item);
+			item->TriggerFlags--;
 		}
-	};
+	
+	}
+
+	void SpawnFishSwarm(ItemInfo* item)
+	{
+		Vector3i origin, target;
+		short fishNumber = GetFreeFish();
+		EulerAngles orient;
+		if (fishNumber != NO_ITEM)
+		{
+			auto* fish = &FishSwarm[fishNumber];
+
+			fish->on = true;
+			fish->Pose.Position = item->Pose.Position;
+			fish->Pose.Orientation.x = (GetRandomControl() & 0x3FF) - 512;
+			fish->Pose.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + -ANGLE(180.0f) - 1024;
+			fish->roomNumber = item->RoomNumber;
+			fish->randomRotation = (GetRandomControl() & 0x1F) + 0x10;
+			fish->Velocity = (GetRandomControl() & 0x1F) + 16;
+			fish->counter = 20 * ((GetRandomControl() & 0x7) + 0xF);
+		}
+	}
 
 	void ClearFishSwarm()
 	{
 		if (Objects[ID_FISH_EMITTER].loaded)
 		{
-			ZeroMemory(Fishes, MAX_FISH * sizeof(FishInfo));
-			ZeroMemory(LeaderInfo, MAX_FISH * sizeof(FishLeaderInfo));
+			ZeroMemory(FishSwarm, NUM_FISHES * sizeof(FishData));
+			NextFish = 0;
+			FlipEffect = -1;
 		}
 	}
 
-	void SetupShoal(short itemNumber)
+	short GetFreeFish()
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		int shoalNumber = 0 & 7;
-		item->HitPoints = shoalNumber;
+		for (int i = 0; i < NUM_FISHES; i++)
+		{
+			auto* fish = &FishSwarm[i];
+			if (!fish->on)
+				return i;
+		}
 
-		LeaderInfo[shoalNumber].xRange = (FishRanges[shoalNumber][0] + 2) << 8;
-		LeaderInfo[shoalNumber].yRange = (FishRanges[shoalNumber][2]) << 8;
-		LeaderInfo[shoalNumber].zRange = (FishRanges[shoalNumber][1] + 2) << 8;
+		return NO_ITEM;
 	}
 
-	void SetupFish(int leader, ItemInfo* item)
+	void UpdateFishSwarm()
 	{
+		int minDistance = MAXINT;
+		int minIndex = -1;
 
-
-
-		FishLeaderInfo* pLeader = &LeaderInfo[leader];
-		FishInfo* pFish = &Fishes[leader];
-
-		int fishXRange = pLeader->xRange;
-		int fishYRange = pLeader->yRange;
-		int fishZRange = pLeader->zRange;
-
-		pFish->Pose.Position.x = 0;
-		pFish->Pose.Position.y = 0;
-		pFish->Pose.Position.z = 0;
-		pFish->angle = 0;
-		pFish->speed = (GetRandomControl() & 63) + 8;
-		pFish->swim = GetRandomControl() & 63;
-
-		for (int i = 0; i < 24; i++)
+		for (int i = 0; i < NUM_FISHES; i++)
 		{
-			pFish = &Fishes[(leader * 24) + 8 + i];
-			pFish->Pose.Position.x = item->Pose.Position.x + (GetRandomControl() % (fishXRange << 1)) - fishXRange;
-			pFish->Pose.Position.y = item->Pose.Position.y + (GetRandomControl() % fishYRange);
-			pFish->Pose.Position.z = item->Pose.Position.z + (GetRandomControl() % (fishZRange << 1)) - fishZRange;
-			pFish->destY = (GetRandomControl() % fishYRange);
-			pFish->angle = GetRandomControl() & 4095;
-			pFish->speed = (GetRandomControl() & 0x1F) + 32;
-			pFish->swim = GetRandomControl() & 63;			
-		}
+			auto* fish = &FishSwarm[i];
 
-		pLeader->on = 1;
-		pLeader->angle = 0;
-		pLeader->speed = (GetRandomControl() & 127) + 32;
-		pLeader->angleTime = 0;
-		pLeader->speedTime = 0;
-	}
+			if (!fish->on)
+				continue;
 
-	void ControlFish(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* enemy = item;
 
-		if (!TriggerActive(item))
-			return;
-
-		int pirahnaAttack = 0;
-		int angle = 0;
-
-		item->HitPoints = 0 & 7;
-
-		int leader = item->HitPoints;
-
-		FishInfo* fish = &Fishes[leader];
-		FishLeaderInfo* pLeader = &LeaderInfo[leader];
-
-		if (!pLeader->on)
-			SetupFish(leader, item);
-
-		if (item->TriggerFlags & item->ItemFlags[1])
-		{
-			if ((item->TriggerFlags == OCB_FISH_EAT_CARCASS) == 0)
-				pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
-			else
+			if (!(GetRandomControl() & 7))
 			{
-				if (CarcassItem != -1)
-					pirahnaAttack = 2;
-				else
-					pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
-			}
-		}
-		else
-			pirahnaAttack = 0;
-
-		if (PirahnaHitWait)
-			PirahnaHitWait--;
-
-		enemy = LaraItem;
-
-		if (pirahnaAttack)
-		{
-			if (pirahnaAttack == 1)
-				enemy = LaraItem;
-			else
-				enemy = &g_Level.Items[CarcassItem];
-
-			pLeader->angle = fish->angle = ((-(Geometry::GetOrientToPoint(Vector3(fish->Pose.Position.x + item->Pose.Position.x, 0.0f, fish->Pose.Position.z + item->Pose.Position.z), enemy->Pose.Position.ToVector3()).y + ANGLE(90.0f))) / 16) & ANGLE(22.5f);
-			pLeader->speed = (Random::GenerateInt() & 63) -64;
-		}
-
-		int deltaAngle = fish->angle - pLeader->angle;
-
-		if (deltaAngle > 2048)
-			deltaAngle -= 4096;
-		else if (deltaAngle < -2048)
-			deltaAngle += 4096;
-
-		if (deltaAngle > 128)
-		{
-			fish->angAdd -= 4;
-			if (fish->angAdd < -120)
-				fish->angAdd = -120;
-		}
-		else if (deltaAngle < -128)
-		{
-			fish->angAdd += 4;
-			if (fish->angAdd > 120)
-				fish->angAdd = 120;
-		}
-		else
-		{
-			fish->angAdd -= fish->angAdd / 4;
-			if (abs(fish->angAdd) < 4)
-				fish->angAdd = 0;
-		}
-
-		fish->angle += fish->angAdd;
-
-		if (deltaAngle > 1024)
-			fish->angle += fish->angAdd / 4;
-
-		fish->angle &= 4095;
-
-		deltaAngle = fish->speed - LeaderInfo[leader].speed;
-
-		if (deltaAngle < -4)
-		{
-			deltaAngle = fish->speed + (Random::GenerateInt() & 3) + 1;
-			if (deltaAngle < 0)
-				deltaAngle = 0;
-
-			fish->speed = deltaAngle;
-		}
-		else if (deltaAngle > 4)
-		{
-			deltaAngle = fish->speed - (Random::GenerateInt() & 3) - 1;
-			if (deltaAngle > 255)
-				deltaAngle = 255;
-
-			fish->speed = deltaAngle;
-		}
-
-		fish->swim = (fish->swim + (fish->speed >> 4)) & 0x3F;;
-
-		
-		int x = fish->Pose.Position.x - fish->speed * phd_sin(fish->angle) / BLOCK(8);
-		int z = fish->Pose.Position.z + fish->speed * phd_cos(fish->angle ) / BLOCK(8);
-
-
-
-		if (pirahnaAttack == 0)
-		{
-			int fishXRange = pLeader->xRange;
-			int fishZRange = pLeader->zRange;
-
-			if (z < -fishZRange)
-			{
-				z = -fishZRange;
-
-				if (fish->angle < 2048)
-					pLeader->angle = fish->angle - ((Random::GenerateInt() & 127) - 128);
-				else
-					pLeader->angle = fish->angle + ((Random::GenerateInt() & 127) + 128);
-
-				pLeader->angleTime = (Random::GenerateInt() & 15) + 8;
-				pLeader->speedTime = 0;
-			}
-			else if (z > fishZRange)
-			{
-				z = fishZRange;
-
-				if (fish->angle > 3072)
-					pLeader->angle = fish->angle - ((Random::GenerateInt() & 127) - 128);
-				else
-					pLeader->angle = fish->angle + ((Random::GenerateInt() & 127) + 128);
-
-				pLeader->angleTime = (Random::GenerateInt() & 15) + 8;
-				pLeader->speedTime = 0;
+				fish->YTarget = (GetRandomControl() & 0x1F) + 1;
+				fish->XTarget = (GetRandomControl() & 0x7F) - 64;
+				fish->ZTarget = (GetRandomControl() & 0x7F) - 64;
 			}
 
-			if (x < -fishXRange)
+			auto angles = Geometry::GetOrientToPoint(
+				fish->Pose.Position.ToVector3(),
+				Vector3(
+					LaraItem->Pose.Position.x + fish->XTarget * 8,
+					LaraItem->Pose.Position.y + fish->YTarget,
+					LaraItem->Pose.Position.z + fish->ZTarget * 8
+				));
+
+			int x = LaraItem->Pose.Position.x - fish->Pose.Position.x;
+			int z = LaraItem->Pose.Position.z - fish->Pose.Position.z;
+			int distance = pow(x, 2) + pow(z, 2);
+			if (distance < minDistance)
 			{
-				x = -fishXRange;
-
-				if (fish->angle < 1024)
-					pLeader->angle = fish->angle - ((Random::GenerateInt() & 127) - 128);
-				else
-					pLeader->angle = fish->angle + ((Random::GenerateInt() & 127) + 128);
-
-				pLeader->angleTime = (Random::GenerateInt() & 15) + 8;
-				pLeader->speedTime = 0;
-			}
-			else if (x > fishXRange)
-			{
-				x = fishXRange;
-
-				if (fish->angle < 3072)
-					pLeader->angle = fish->angle - ((Random::GenerateInt() & 127) - 128);
-				else
-					pLeader->angle = fish->angle + ((Random::GenerateInt() & 127) + 128);
-
-				pLeader->angleTime = (Random::GenerateInt() & 15) + 8;
-				pLeader->speedTime = 0;
+				minDistance = distance;
+				minIndex = i;
 			}
 
-			if ((Random::GenerateInt() & 15) == 0)
-				pLeader->angleTime = 0;
+			distance = sqrt(distance) / 18;
+			if (distance < 48)
+				distance = 48;
+			else if (distance > 168)
+				distance = 168;
 
-			if (pLeader->angleTime)
-				pLeader->angleTime--;
-			else
-			{
-				pLeader->angleTime = (Random::GenerateInt() & 15) + 8;
-				int angAdd = (GetRandomControl() & 0x3F) - 24;
+			if (fish->Velocity < distance)
+				fish->Velocity++;
+			else if (fish->Velocity > distance)
+				fish->Velocity--;
 
-				if ((Random::GenerateInt() & 3) == 0)
-					angAdd <<= 5;
+			//if (fish->Counter > 90)
+			//{
+				short Velocity = fish->Velocity * 128;
 
-				pLeader->angle = (pLeader->angle + angAdd) & 0xFFF;
-			}
+				short xAngle = abs(angles.x - fish->Pose.Orientation.x) / 2;
+				short yAngle = abs(angles.y - fish->Pose.Orientation.y) / 2;
 
-			if (pLeader->speedTime)
-				pLeader->speedTime--;
-			else
-			{
-				pLeader->speedTime = (Random::GenerateInt() & 31) + 32;
+				if (xAngle < -Velocity)
+					xAngle = -Velocity;
+				else if (xAngle > Velocity)
+					xAngle = Velocity;
 
-				if ((Random::GenerateInt() & 7) == 0)
-					pLeader->speed = (Random::GenerateInt() & 127) + 128;
-				else if ((Random::GenerateInt() & 3) == 0)
-					pLeader->speed += (Random::GenerateInt() & 127) + 32;
-				else if (pLeader->speed > 140)
-					pLeader->speed += 208 - (GetRandomControl() & 0x1F);
-				else
+				if (yAngle < -Velocity)
+					yAngle = -Velocity;
+				else if (yAngle > Velocity)
+					yAngle = Velocity;
+
+				fish->Pose.Orientation.y += yAngle;
+				fish->Pose.Orientation.x += xAngle;
+			//}
+
+			int sp = fish->Velocity * phd_cos(fish->Pose.Orientation.x);
+
+			fish->Pose.Position.x += sp * phd_sin(fish->Pose.Orientation.y);
+			fish->Pose.Position.y += fish->Velocity * phd_sin(-fish->Pose.Orientation.x);
+			fish->Pose.Position.z += sp * phd_cos(fish->Pose.Orientation.y);
+
+				if (ItemNearTarget(fish->Pose.Position, LaraItem, CLICK(1) / 2))
 				{
-					pLeader->speedTime = (Random::GenerateInt() & 3) + 4;
-					pLeader->speed += (Random::GenerateInt() & 31) - 15;
+					TriggerBlood(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z, 2 * GetRandomControl(), 2);
+					DoDamage(LaraItem, FISH_LARA_DAMAGE);
 				}
-			}
 
-		}
+				g_Renderer.AddDebugSphere(Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), 46, Vector4(1, 0, 0, 1), RendererDebugPage::None);
 
-		int ftx = x;
-		int ftz = z;
-
-		//fish->Pose.Position.x = x;
-		//fish->Pose.Position.z = z;
-
-		for (int i = 0; i < 24; i++)
-		{
-			fish = &Fishes[(MAX_FISH * leader) + i + 8];
-
-			if (item->Flags & item->ItemFlags[1])
-			{
-			/*	Pose pos;
-				pos.Position.x = item->Pose.Position.x + fish->Pose.Position.x;
-				pos.Position.y = item->Pose.Position.y + fish->Pose.Position.y;
-				pos.Position.z = item->Pose.Position.z + fish->Pose.Position.z;
-
-				
-				if (FishNearLara(&pos, 256, (pirahnaAttack < 2) ? LaraItem : enemy))
-				{
-					if (PirahnaHitWait == 0)
-					{
-						DoBloodSplat(item->Pose.Position.x + fish->Pose.Position.x, item->Pose.Position.y + fish->Pose.Position.y, item->Pose.Position.z + fish->Pose.Position.z, 0, 0, (pirahnaAttack < 2) ? LaraItem->RoomNumber : enemy->RoomNumber);
-						PirahnaHitWait = 8;
-					}
-
-					if (pirahnaAttack != 2)
-						DoDamage(LaraItem, PIRAHNA_DAMAGE);
-				}*/
-			}
-
-			angle = ((-(Geometry::GetOrientToPoint(Vector3(fish->Pose.Position.x + item->Pose.Position.x, 0.0f, fish->Pose.Position.z + item->Pose.Position.z), enemy->Pose.Position.ToVector3()).y + ANGLE(90.0f))) / 16) & ANGLE(22.5f);
-			int dx = fish->Pose.Position.x - ftx + ((24 - i) * 128);
-			int dz = fish->Pose.Position.z - ftz - ((24 - i) * 128);
+				Matrix translation = Matrix::CreateTranslation(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z);
+				Matrix rotation = fish->Pose.Orientation.ToRotationMatrix();
+				fish->Transform = rotation * translation;
 			
-			dx *= dx;
-			dz *= dz;
-
-			deltaAngle = fish->angle - angle;
-
-			if (deltaAngle > 2048)
-				deltaAngle -= 4096;
-			else if (deltaAngle < -2048)
-				deltaAngle += 4096;
-
-			if (deltaAngle > 128)
-			{
-				fish->angAdd -= 4;
-				if (fish->angAdd < -92 - (i / 2))
-					fish->angAdd = -92 - (i / 2);
-			}
-			else if (deltaAngle < -128)
-			{
-				fish->angAdd += 4;
-				if (fish->angAdd > 92 + (i / 2))
-					fish->angAdd = 92 + (i / 2);
-			}
-			else
-			{
-				fish->angAdd -= fish->angAdd / 4;
-				if (abs(fish->angAdd) < 4)
-					fish->angAdd = 0;
-			}
-
-			fish->angle += fish->angAdd;
-
-			if (deltaAngle > 1024)
-				fish->angle += fish->angAdd / 4;
-			fish->angle &= 4095;
-
-			if (dx + dz < 16384 * SQUARE(i) + 1048576)
-			{
-				if (fish->speed > 2 * i + 32)
-					fish->speed -= fish->speed / 32;
-			}
-			else
-			{
-				if (fish->speed < 160 + (i / 2))
-					fish->speed += ((Random::GenerateInt() & 3) + 1) + (i / 2);
-
-				if (fish->speed > 160 + (i / 2) - (i * 4))
-					fish->speed = 160 + (i / 2) - (i * 4);
-			}
-
-			if (Random::GenerateInt() & 1)
-				fish->speed -= Random::GenerateInt() & 1;
-			else
-				fish->speed += Random::GenerateInt() & 1;
-
-			if (fish->speed < 32)
-				fish->speed = 32;
-			else if (fish->speed > 200)
-				fish->speed = 200;
-
-			fish->swim = (fish->swim + (fish->speed / 16) + (fish->speed / 32)) % 64;
-		
-			x = fish->speed * phd_sin(fish->angle ) / BLOCK(8); 
-			z = fish->speed * phd_cos(fish->angle ) / BLOCK(8);
-
-			if (z < -32000)
-				z = -32000;
-			else if (z > 32000)
-				z = 32000;
-			if (x < -32000)
-				x = -32000;
-			else if (x > 32000)
-				x = 32000;
-
-			fish->Pose.Position.x += x * fish->speed;
-			fish->Pose.Position.z += z * fish->speed;
-
-			if (pirahnaAttack == 0)
-			{
-				if (abs(fish->Pose.Position.y - fish->destY) < 16)
-					fish->destY = Random::GenerateInt() % LeaderInfo[leader].yRange;
-			}
-			else
-			{
-				int y = enemy->Pose.Position.y - item->Pose.Position.y;
-				if (abs(fish->Pose.Position.y - fish->destY) < 16)
-					fish->destY = y + (Random::GenerateInt() & 255);
-			}
-
-			fish->Pose.Position.y += (fish->destY - fish->Pose.Position.y) / 16;
-			//fish++;
-
-			g_Renderer.AddDebugSphere(Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), 46, Vector4(1, 0, 0, 1), RendererDebugPage::None);
-			g_Renderer.AddDebugLine(Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), Vector4(1, 0, 0, 1), RendererDebugPage::None);
-
 		}
-
-		
-
-	}
-
-	bool FishNearLara(Pose* pos, int distance, ItemInfo* item)
-	{
-	/*	int x = pos->Position.x - item->Pose.Position.x;
-		int y = abs(pos->Position.y - item->Pose.Position.y);
-		int z = pos->Position.z - item->Pose.Position.z;
-
-		if (x < -distance || x > distance || z < -distance || z > distance || y < -BLOCK(3) || y > BLOCK(3))
-			return false;
-
-		if ((pow(x, 2) + pow(z, 2)) > pow(distance, 2))
-			return false;
-
-		if (y > distance)*/
-			return false;
-
-	//	return true;
 	}
 }

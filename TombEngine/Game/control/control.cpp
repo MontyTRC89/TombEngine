@@ -58,6 +58,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
+#include "Objects/TR3/Entity/tr3_fish_emitter.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -84,6 +85,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Traps::TR5;
+using namespace TEN::Entities::Creatures::TR3;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -231,6 +233,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
+		UpdateFishSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
 

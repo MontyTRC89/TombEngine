@@ -429,8 +429,9 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_FISH_EMITTER];
 	if (obj->loaded)
 	{
-		obj->Initialize = SetupShoal;
-		obj->control = ControlFish;
+		obj->Initialize = InitializeFishSwarm;
+		obj->control = FishSwarmControl;
+		obj->intelligent = true;
 		obj->drawRoutine = NULL;
 	}
 }
