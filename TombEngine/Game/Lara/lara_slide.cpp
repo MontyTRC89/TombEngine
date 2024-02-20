@@ -27,6 +27,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.MoveAngleTarget = item->Pose.Orientation.y;
 	lara->Control.Look.Mode = LookMode::Free;
 	Camera.targetElevation = -ANGLE(45.0f);
 

@@ -209,7 +209,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CROUCH_ROLL_TURN_RATE_MAX);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
+			HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 		}
 	}
 

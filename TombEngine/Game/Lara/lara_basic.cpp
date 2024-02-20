@@ -155,14 +155,15 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA/*, true*/);
-		HandlePlayerLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}
 	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
+			HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
 		}
 	}
 
@@ -289,14 +290,15 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-		HandlePlayerLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}
 	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_FAST_TURN_RATE_MAX);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
+			HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 		}
 	}
 
@@ -481,7 +483,10 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			// TODO: Bugged.
 			short relMoveAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerMoveAngle(*item)));
 			if (!TestPlayerCombatMode(*item)/* && relMoveAngle >= ANGLE(45.0f)*/)
+			{
 				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+				HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
+			}
 		}
 	}
 	else
@@ -836,7 +841,7 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
-		HandlePlayerLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
+		HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
 	}
 
 	if (IsHeld(In::Roll))
@@ -1175,12 +1180,12 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 			if (isWading && isInSwamp)
 			{
 				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 3);
-				HandlePlayerLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX / 3);
+				HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 3, LARA_LEAN_MAX / 3);
 			}
 			else
 			{
 				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
-				HandlePlayerLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
+				HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
 			}
 		}
 
@@ -1728,15 +1733,17 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1));
-		HandlePlayerLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), PLAYER_STANDARD_TURN_ALPHA);
+		float turnAlpha = PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1);
+		HandlePlayerTurnY(*item, turnAlpha);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), turnAlpha);
+		HandlePlayerTurnFlex(*item, turnAlpha);
 	}
 	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE  / (isInSwamp ? 3 : 2), LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f));
+			HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE  / (isInSwamp ? 3 : 2), LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f));
 		}
 	}
 
@@ -1836,14 +1843,15 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		HandlePlayerTurnY(*item, PLAYER_SPRINT_TURN_ALPHA);
-		HandlePlayerLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SPRINT_TURN_ALPHA);
+		HandlePlayerTurnFlex(*item, PLAYER_SPRINT_TURN_ALPHA);
 	}
 	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
-			HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
+			HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX);
 		}
 	}
 
@@ -1989,7 +1997,7 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
-		HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);
+		HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);
 	}
 
 	item->Animation.TargetState = LS_RUN_FORWARD;
@@ -2046,7 +2054,7 @@ void lara_as_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
-		HandlePlayerLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);
+		HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE, LARA_LEAN_MAX * 0.6f);
 	}
 
 	if ((player.Control.KeepLow || IsHeld(In::Crouch)) && HasStateDispatch(item, LS_CROUCH_IDLE) &&

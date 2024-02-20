@@ -16,29 +16,40 @@ namespace TEN::Entities::Player
 {
 	void lara_as_fly_cheat(ItemInfo* item, CollisionInfo* coll)
 	{
-		if (IsHeld(In::Forward))
+		if (!IsUsingModernControls())
 		{
-			item->Pose.Orientation.x -= ANGLE(3.0f);
-		}
-		else if (IsHeld(In::Back))
-		{
-			item->Pose.Orientation.x += ANGLE(3.0f);
-		}
+			if (IsHeld(In::Forward))
+			{
+				item->Pose.Orientation.x -= ANGLE(3.0f);
+			}
+			else if (IsHeld(In::Back))
+			{
+				item->Pose.Orientation.x += ANGLE(3.0f);
+			}
 
-		if (IsHeld(In::Left))
-		{
-			ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
-		}
-		else if (IsHeld(In::Right))
-		{
-			ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
+			if (IsHeld(In::Left))
+			{
+				ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
+			}
+			else if (IsHeld(In::Right))
+			{
+				ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
+			}
 		}
 
 		if (IsHeld(In::Action))
 			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
 
-		if (IsHeld(In::Jump))
+		if (IsUsingModernControls() ?
+			(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)):
+			IsHeld(In::Jump))
 		{
+			if (IsUsingModernControls())
+			{
+				HandlePlayerTurnX(*item, PLAYER_STANDARD_TURN_ALPHA);
+				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+			}
+
 			float velCoeff = IsHeld(In::Sprint) ? 2.5f : 1.0f;
 
 			item->Animation.Velocity.y += (LARA_SWIM_VELOCITY_ACCEL * 4) * velCoeff;

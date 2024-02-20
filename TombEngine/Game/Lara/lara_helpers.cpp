@@ -743,9 +743,9 @@ void HandlePlayerTurnX(ItemInfo& item, float alpha)
 
 void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool ignore180Turn*/)
 {
-	auto& player = GetLaraInfo(item);
-
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
+
+	auto& player = GetLaraInfo(item);
 
 	/*if (ignore180Turn)
 	{
@@ -763,8 +763,8 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool ignore180Turn*/)
 	short moveAngle = GetPlayerMoveAngle(item);
 	auto targetOrient = EulerAngles(item.Pose.Orientation.x, moveAngle, item.Pose.Orientation.z);
 
-	short deltaAngle = abs(Geometry::GetShortestAngle(item.Pose.Orientation.y, moveAngle));
-	if (deltaAngle <= BASE_ANGLE)
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, moveAngle);
+	if (abs(deltaAngle) <= BASE_ANGLE)
 	{
 		item.Pose.Orientation.Lerp(targetOrient, alpha);
 	}
@@ -777,7 +777,7 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool ignore180Turn*/)
 }
 
 // NOTE: Modern control version.
-void HandlePlayerLean(ItemInfo& item, short leanAngleMax, float alpha)
+void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
@@ -787,56 +787,54 @@ void HandlePlayerLean(ItemInfo& item, short leanAngleMax, float alpha)
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
 	int sign = std::copysign(1, deltaAngle);
 
-	// Calculate target orientation.
-	float leanAlpha = std::clamp(abs(deltaAngle) / (float)BASE_ANGLE, 0.0f, 1.0f);
-	short leanAngle = leanAngleMax * leanAlpha;
-	auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, leanAngle * sign);
+	// Calculate target lean orientation.
+	float leanAngleAlpha = std::clamp(abs(deltaAngle) / (float)BASE_ANGLE, 0.0f, 1.0f);
+	short targetLeanAngle = (leanAngleMax * leanAngleAlpha) * sign;
+	auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, targetLeanAngle);
 
 	// Lerp to target orientation.
 	item.Pose.Orientation.Lerp(targetOrient, alpha);
 }
 
 // NOTE: Tank control version.
-void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
+void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
 {
 	auto& player = GetLaraInfo(*item);
 
 	if (item->Animation.Velocity.z == 0.0f)
 		return;
 
-	if (IsUsingModernControls())
-	{
-		return;
+	float axisCoeff = GetMoveAxis().x;
+	int sign = copysign(1, axisCoeff);
+	maxAngle *= axisCoeff;
 
-		// TODO
+	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+		maxAngle *= 0.6f;
 
-		short moveAngle = GetPlayerMoveAngle(*item);
-		short deltaAngle = Geometry::GetShortestAngle(item->Pose.Orientation.y, moveAngle);
-		int sign = copysign(1, deltaAngle);
+	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;
+}
 
-		float coeff = abs((float)deltaAngle / ANGLE(90.0f));
-		maxAngle *= std::clamp(coeff, 0.0f, 1.0f);
+void HandlePlayerTurnFlex(ItemInfo& item, float alpha)
+{
+	constexpr auto FLEX_ANGLE_MAX  = ANGLE(100.0f);
+	constexpr auto HEAD_ROT_COEFF  = 0.5f;
+	constexpr auto TORSO_ROT_COEFF = 0.5f;
+	constexpr auto Z_ROT_COEFF	   = 0.1f;
 
-		if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-			maxAngle *= 0.6f;
+	auto& player = GetLaraInfo(item);
 
-		item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;
+	// Calculate delta angle.
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+	int sign = std::copysign(1, deltaAngle);
 
-		short flexAngleMax = ANGLE(40.0f) * sign;
-		player.ExtraHeadRot.Lerp(EulerAngles(player.ExtraHeadRot.x, flexAngleMax * coeff, player.ExtraHeadRot.z), 0.25f);
-		player.ExtraTorsoRot.Lerp(EulerAngles(player.ExtraTorsoRot.x, player.ExtraHeadRot.y / 2, player.ExtraTorsoRot.z), 0.25f);
-	}
-	else
-	{
-		float axisCoeff = AxisMap[(int)InputAxis::Move].x;
-		int sign = copysign(1, axisCoeff);
-		maxAngle *= axisCoeff;
+	// Calculate target flex rotation.
+	float flexAngleAlpha = std::clamp(abs(deltaAngle) / (float)FLEX_ANGLE_MAX, 0.0f, 1.0f);
+	short targetFlexAngle = (FLEX_ANGLE_MAX * flexAngleAlpha) * sign;
+	auto targetFlexRot = EulerAngles(player.ExtraHeadRot.x, targetFlexAngle, targetFlexAngle * Z_ROT_COEFF);
 
-		if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-			maxAngle *= 0.6f;
-
-		item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;
-	}
+	// Flex head and torso.
+	player.ExtraHeadRot.Lerp(targetFlexRot * HEAD_ROT_COEFF, alpha);
+	player.ExtraTorsoRot.Lerp(targetFlexRot * TORSO_ROT_COEFF, alpha);
 }
 
 void HandlePlayerCrawlFlex(ItemInfo& item)
@@ -1546,10 +1544,11 @@ short GetPlayerMoveAngle(const ItemInfo& item)
 
 	if (IsUsingModernControls())
 	{
-		if (AxisMap[(int)InputAxis::Move] == Vector2::Zero)
+		auto moveAxis = GetMoveAxis();
+		if (moveAxis == Vector2::Zero)
 			return player.Control.MoveAngleTarget;
 
-		auto dir = AxisMap[(int)InputAxis::Move];
+		auto dir = moveAxis;
 		dir.Normalize();
 		return (Camera.actualAngle + FROM_RAD(atan2(dir.x, dir.y)));
 	}
