@@ -243,7 +243,7 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[204] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[205] = std::pair(lara_as_null, lara_void_func);
 
-		//PlayerBehaviorStateRoutines[LS_RUN_FORWARD_START_CANCEL] = std::pair(lara_as_null, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_RUN_FORWARD_START_CANCEL] = std::pair(lara_as_null, lara_void_func);
 	}
 
 	void HandlePlayerBehaviorState(ItemInfo& item, CollisionInfo& coll, PlayerBehaviorStateRoutineType routineType)

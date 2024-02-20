@@ -390,7 +390,6 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 	
 	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		
 		if (IsUsingModernControls() ?
 			(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
 			(IsHeld(In::Forward) || IsHeld(In::Back)) &&

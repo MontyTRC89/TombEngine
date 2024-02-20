@@ -357,11 +357,11 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	/*if (IsUsingModernControls())
+	if (IsUsingModernControls())
 	{
 		item->Animation.TargetState = HasStateDispatch(item, LS_RUN_FORWARD_START_CANCEL) ? LS_RUN_FORWARD_START_CANCEL : LS_IDLE;
 	}
-	else*/
+	else
 	{
 		item->Animation.TargetState = LS_IDLE;
 	}
