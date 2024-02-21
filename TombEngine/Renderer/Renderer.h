@@ -446,6 +446,7 @@ namespace TEN::Renderer
 		void DrawTriangles3D(RenderView& view);
 		void DrawOverlays(RenderView& view);
 		void PrepareRopes(RenderView& view);
+		void DrawFishes(RenderView& view, RendererPass rendererPass);
 		void DrawBats(RenderView& view, RendererPass rendererPass);
 		void DrawRats(RenderView& view, RendererPass rendererPass);
 		void DrawScarabs(RenderView& view, RendererPass rendererPass);
@@ -474,7 +475,6 @@ namespace TEN::Renderer
 		void PrepareSimpleParticles(RenderView& view);
 		void PrepareStreamers(RenderView& view);
 		void PrepareFootprints(RenderView& view);
-		void PrepareFishes(RenderView& view);
 		void DrawLoadingBar(float percent);
 		void DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view);
 		void RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade);

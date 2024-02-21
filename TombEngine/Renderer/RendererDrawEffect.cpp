@@ -32,7 +32,6 @@
 #include "Renderer/Structures/RendererSprite.h"
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
-#include "Objects/TR3/Entity/tr3_fish_emitter.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -43,7 +42,6 @@ using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
-using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Math;
 using namespace TEN::Traps::TR5;
 
@@ -55,7 +53,6 @@ extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
-//extern FishInfo Fishes[MAX_FISH + (MAX_FISH * 24)];
 
 namespace TEN::Renderer 
 {
@@ -1077,29 +1074,6 @@ namespace TEN::Renderer
 				footprint.VertexPoints[0], footprint.VertexPoints[1], footprint.VertexPoints[2], footprint.VertexPoints[3],
 				Vector4(footprint.Opacity), 0.0f, 1.0f, Vector2::One, BlendMode::Subtractive, false, view);
 		}
-	}
-
-	void Renderer::PrepareFishes(RenderView& view)
-	{
-		
-		//auto* fish = &Fishes[leader];
-
-		//using TEN::Entities::Creatures::TR3::FishInfo;
-
-		//for (int i = 0; i < TEN::Entities::Creatures::TR3::MAX_FISH; i++)
-		//{
-			//FishInfo* fish = &TEN::Entities::Creatures::TR3::Fishes[i];
-
-
-
-			/*for (const auto& fish : Fishes)
-			{
-				AddSpriteBillboard(
-					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + 14],
-					Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z),
-					Vector4(1, 1, 1, 1), 0.0f, 5.0f, Vector2::One, BlendMode::Opaque, true, view);
-			//}*/
-		//}
 	}
 
 	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)

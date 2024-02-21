@@ -3,13 +3,18 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
+
+	constexpr auto NUM_FISHES = 24;
+
 	struct FishData
 	{
 		bool on;
 		Pose Pose;
 		ItemInfo* target;
+		ItemInfo* leader;
 		short roomNumber;
 		short randomRotation;
+		short RoomNumber;
 		short Velocity;
 		short YTarget;
 		short XTarget;
@@ -19,7 +24,7 @@ namespace TEN::Entities::Creatures::TR3
 		Matrix Transform;
 	};
 
-	constexpr auto NUM_FISHES = 24;
+
 
 	extern FishData FishSwarm[NUM_FISHES];
 	extern int NextFish;
