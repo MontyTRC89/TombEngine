@@ -46,8 +46,8 @@ namespace TEN::Entities::Player
 		{
 			if (IsUsingModernControls())
 			{
-				HandlePlayerTurnX(*item, PLAYER_STANDARD_TURN_ALPHA);
-				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+				HandlePlayerTurnX(*item, PLAYER_STANDARD_TURN_ALPHA*2);
+				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA*2);
 			}
 
 			float velCoeff = IsHeld(In::Sprint) ? 2.5f : 1.0f;

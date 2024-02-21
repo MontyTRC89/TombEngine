@@ -35,7 +35,9 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool setTurn180 = false*/)
 void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha);
 void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerTurnFlex(ItemInfo& item, float alpha);
-void HandlePlayerCrawlFlex(ItemInfo& item);
+void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha);
+void HandlePlayerCrawlTurnFlex(ItemInfo& item);
+void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha);
 void HandlePlayerUpJumpShift(ItemInfo& item);
 void HandlePlayerFlyCheat(ItemInfo& item);
 void HandlePlayerWetnessDrips(ItemInfo& item);

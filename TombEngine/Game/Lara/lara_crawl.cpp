@@ -633,13 +633,14 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA);
+		HandlePlayerCrawlTurnFlex(*item, PLAYER_CRAWL_TURN_ALPHA * 2);
 	}
 	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			ModulateLaraTurnRateY(item, LARA_CRAWL_MOVE_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
-			HandlePlayerCrawlFlex(*item);
+			HandlePlayerCrawlTurnFlex(*item);
 		}
 	}
 
@@ -746,7 +747,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_CRAWL_MOVE_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
-		HandlePlayerCrawlFlex(*item);
+		HandlePlayerCrawlTurnFlex(*item);
 	}
 
 	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))

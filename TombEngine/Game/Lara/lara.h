@@ -11,11 +11,11 @@ constexpr auto FRONT_ARC		   = ANGLE(90.0f);
 
 // Modern control turn alphas
 constexpr auto PLAYER_STANDARD_TURN_ALPHA	  = 0.25f;
-constexpr auto PLAYER_WADE_TURN_ALPHA		  = 0.2f;
 constexpr auto PLAYER_SPRINT_TURN_ALPHA		  = 0.075f;
 constexpr auto PLAYER_CRAWL_TURN_ALPHA		  = 0.1f;
 constexpr auto PLAYER_JUMP_PREPARE_TURN_ALPHA = 0.5f;
-constexpr auto PLAYER_SWIM_TURN_ALPHA		  = 0.2f;
+constexpr auto PLAYER_WADE_TURN_ALPHA		  = 0.2f;
+constexpr auto PLAYER_SWIM_TURN_ALPHA		  = 0.15f;
 
 // Tank control turn rate acceleration rates
 constexpr auto LARA_TURN_RATE_ACCEL			   = ANGLE(0.25f);
