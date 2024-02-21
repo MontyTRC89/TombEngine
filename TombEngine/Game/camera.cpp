@@ -84,21 +84,21 @@ float CinematicBarsSpeed = 0;
 
 void DoThumbstickCamera()
 {
-	constexpr auto VERTICAL_CONSTRAINT_ANGLE   = ANGLE(120.0f);
-	constexpr auto HORIZONTAL_CONSTRAINT_ANGLE = ANGLE(80.0f);
+	constexpr auto X_ANGLE_CONSTRAINT = ANGLE(80.0f);
+	constexpr auto Y_ANGLE_CONSTRAINT = ANGLE(120.0f);
 
 	if (!g_Configuration.EnableThumbstickCamera)
 		return;
 
 	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
 	{
-		const auto& axisCoeff = GetCameraAxis();
+		const auto& cameraAxis = GetCameraAxis();
 
-		if (abs(axisCoeff.x) > EPSILON && abs(Camera.targetAngle) == 0)
-			Camera.targetAngle = ANGLE(VERTICAL_CONSTRAINT_ANGLE * axisCoeff.x);
+		if (abs(cameraAxis.x) > EPSILON && abs(Camera.targetAngle) == 0)
+			Camera.targetAngle = ANGLE(Y_ANGLE_CONSTRAINT * cameraAxis.x);
 
-		if (abs(axisCoeff.y) > EPSILON)
-			Camera.targetElevation = ANGLE(-10.0f + (HORIZONTAL_CONSTRAINT_ANGLE * axisCoeff.y));
+		if (abs(cameraAxis.y) > EPSILON)
+			Camera.targetElevation = ANGLE((X_ANGLE_CONSTRAINT * cameraAxis.y) - ANGLE(10.0f));
 	}
 }
 
@@ -315,9 +315,10 @@ void MoveCamera(GameVector* ideal, int speed)
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
 
-	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * (IsUsingModernControls() ? 0.3f : 1.0f));
-	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * (IsUsingModernControls() ? 0.3f : 1.0f));
-	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * (IsUsingModernControls() ? 0.3f : 1.0f));
+	float speedCoeff = (IsUsingModernControls() && Camera.type != CameraType::Look) ? 0.3f : 1.0f;
+	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * speedCoeff);
+	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * speedCoeff);
+	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * speedCoeff);
 	Camera.pos.RoomNumber = ideal->RoomNumber;
 
 	if (Camera.bounce)
@@ -514,23 +515,39 @@ void RefreshFixedCamera(short camNumber)
 
 void ChaseCamera(ItemInfo* item)
 {
-	constexpr auto BUFFER			 = 100;
-	constexpr auto SWIVEL_STEP_COUNT = 5;
+	constexpr auto MODERN_CAMERA_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
+	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT	= ANGLE(85.0f);
+	constexpr auto BUFFER							= 100;
+	constexpr auto SWIVEL_STEP_COUNT				= 5;
 
-	if (!Camera.targetElevation)
-		Camera.targetElevation = -ANGLE(10.0f);
+	if (Camera.targetElevation == 0)
+		Camera.targetElevation = ANGLE(-10.0f);
 
 	Camera.targetElevation += item->Pose.Orientation.x;
 	UpdateCameraElevation();
 
 	// Clamp X orientation.
-	if (Camera.actualElevation > ANGLE(85.0f))
+	if (IsUsingModernControls())
 	{
-		Camera.actualElevation = ANGLE(85.0f);
+		if (Camera.actualElevation > MODERN_CAMERA_X_ANGLE_CONSTRAINT.second)
+		{
+			Camera.actualElevation = MODERN_CAMERA_X_ANGLE_CONSTRAINT.second;
+		}
+		else if (Camera.actualElevation < MODERN_CAMERA_X_ANGLE_CONSTRAINT.first)
+		{
+			Camera.actualElevation = MODERN_CAMERA_X_ANGLE_CONSTRAINT.first;
+		}
 	}
-	else if (Camera.actualElevation < ANGLE(-85.0f))
+	else
 	{
-		Camera.actualElevation = ANGLE(-85.0f);
+		if (Camera.actualElevation > TANK_CAMERA_X_ANGLE_CONSTRAINT)
+		{
+			Camera.actualElevation = TANK_CAMERA_X_ANGLE_CONSTRAINT;
+		}
+		else if (Camera.actualElevation < -TANK_CAMERA_X_ANGLE_CONSTRAINT)
+		{
+			Camera.actualElevation = -TANK_CAMERA_X_ANGLE_CONSTRAINT;
+		}
 	}
 
 	auto pointColl = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
@@ -639,6 +656,8 @@ void ChaseCamera(ItemInfo* item)
 
 void UpdateCameraElevation()
 {
+	constexpr auto MOUSE_AXIS_COEFF = 300.0f;
+
 	DoThumbstickCamera();
 
 	if (Camera.laraNode != -1)
@@ -652,8 +671,9 @@ void UpdateCameraElevation()
 	{
 		if (IsUsingModernControls())
 		{
-			Camera.actualAngle += ANGLE(GetMouseAxis().x * 300);
-			Camera.actualElevation -= ANGLE(GetMouseAxis().y * 300);
+			const auto& mouseAxis = GetMouseAxis();
+			Camera.actualAngle += ANGLE(mouseAxis.x * MOUSE_AXIS_COEFF);
+			Camera.actualElevation -= ANGLE(mouseAxis.y * MOUSE_AXIS_COEFF);
 		}
 		else
 		{
@@ -667,8 +687,10 @@ void UpdateCameraElevation()
 
 void CombatCamera(ItemInfo* item)
 {
-	constexpr auto BUFFER			 = 100;
-	constexpr auto SWIVEL_STEP_COUNT = 5;
+	constexpr auto MODERN_CAMERA_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
+	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT	= ANGLE(85.0f);
+	constexpr auto BUFFER							= 100;
+	constexpr auto SWIVEL_STEP_COUNT				= 5;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -733,6 +755,30 @@ void CombatCamera(ItemInfo* item)
 	}
 
 	UpdateCameraElevation();
+
+	// Clamp X orientation.
+	if (IsUsingModernControls())
+	{
+		if (Camera.actualElevation > MODERN_CAMERA_X_ANGLE_CONSTRAINT.second)
+		{
+			Camera.actualElevation = MODERN_CAMERA_X_ANGLE_CONSTRAINT.second;
+		}
+		else if (Camera.actualElevation < MODERN_CAMERA_X_ANGLE_CONSTRAINT.first)
+		{
+			Camera.actualElevation = MODERN_CAMERA_X_ANGLE_CONSTRAINT.first;
+		}
+	}
+	else
+	{
+		if (Camera.actualElevation > TANK_CAMERA_X_ANGLE_CONSTRAINT)
+		{
+			Camera.actualElevation = TANK_CAMERA_X_ANGLE_CONSTRAINT;
+		}
+		else if (Camera.actualElevation < -TANK_CAMERA_X_ANGLE_CONSTRAINT)
+		{
+			Camera.actualElevation = -TANK_CAMERA_X_ANGLE_CONSTRAINT;
+		}
+	}
 
 	Camera.targetDistance = BLOCK(1.5f);
 

@@ -371,8 +371,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	}
 	else
 	{
-		// TODO: Extend ResetLaraFlex() to be a catch-all function.
-		//ResetPlayerLookAround(*item);
+		ResetPlayerLookAround(*item);
 	}
 	lara->Control.Look.Mode = LookMode::None;
 

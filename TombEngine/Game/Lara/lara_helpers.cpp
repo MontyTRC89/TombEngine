@@ -98,10 +98,13 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		ResetPlayerFlex(item, 0.1f);
 	}
 
-	// Apply and reset turn rate.
-	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-		lara->Control.TurnRate = 0;
+	if (!IsUsingModernControls())
+	{
+		// Apply and reset turn rate.
+		item->Pose.Orientation.y += lara->Control.TurnRate;
+		if (!(IsHeld(In::Left) || IsHeld(In::Right)))
+			lara->Control.TurnRate = 0;
+	}
 
 	lara->Control.IsLow = false;
 	lara->Control.IsMonkeySwinging = false;
@@ -2109,6 +2112,7 @@ void ResetPlayerLookAround(ItemInfo& item, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	player.Control.Look.Orientation = EulerAngles::Identity;
+	return;
 
 	if (Camera.type != CameraType::Look)
 	{
