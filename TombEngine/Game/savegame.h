@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
@@ -40,6 +41,7 @@ struct SaveGameHeader
 
 extern GameStats Statistics;
 extern SaveGameHeader SavegameInfos[SAVEGAME_MAX];
+extern std::vector<std::pair<int, std::vector<char>>> SavegameState;
 
 class SaveGame 
 {
@@ -59,6 +61,8 @@ public:
 	static bool Save(int slot);
 	static void LoadSavegameInfos();
 	static void Delete(int slot);
+
+	static FlatBufferBuilder& SaveGame::Build();
 
 	static bool DoesSaveGameExist(int slot, bool silent = false);
 };

@@ -53,7 +53,9 @@ constexpr auto SAVEGAME_PATH	  = "Save//";
 constexpr auto SAVEGAME_FILE_MASK = "savegame.";
 
 GameStats Statistics;
+
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
+std::vector<std::pair<int, std::vector<char>>> SavegameState;
 
 FileStream* SaveGame::StreamPtr;
 std::string SaveGame::FullSaveDirectory;
@@ -223,6 +225,36 @@ bool SaveGame::Save(int slot)
 	auto fileName = GetSavegameFilename(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
+	if (!std::filesystem::is_directory(FullSaveDirectory))
+		std::filesystem::create_directory(FullSaveDirectory);
+
+	std::ofstream fileOut{};
+	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
+
+	fileOut.write(reinterpret_cast<const char*>(&CurrentLevel), sizeof(CurrentLevel));
+
+	int hubCount = SavegameState.size();
+	fileOut.write(reinterpret_cast<const char*>(&hubCount), sizeof(hubCount));
+
+	for (auto& level : SavegameState)
+	{
+		fileOut.write(reinterpret_cast<const char*>(&level.first), sizeof(level.first));
+
+		auto str = level.second.str();
+		int size = str.size();
+		fileOut.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+
+		fileOut.write(reinterpret_cast<const char*>(&size), sizeof(size));
+	}
+
+	fileOut.close();
+
+	return true;
+}
+
+FlatBufferBuilder& SaveGame::Build()
+{
 	ItemInfo itemToSerialize{};
 	FlatBufferBuilder fbb{};
 
@@ -1450,18 +1482,7 @@ bool SaveGame::Save(int slot)
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
 
-	auto bufferToSerialize = fbb.GetBufferPointer();
-	auto bufferSize = fbb.GetSize();
-
-	if (!std::filesystem::is_directory(FullSaveDirectory))
-		std::filesystem::create_directory(FullSaveDirectory);
-
-	std::ofstream fileOut{};
-	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
-	fileOut.write((char*)bufferToSerialize, bufferSize);
-	fileOut.close();
-
-	return true;
+	return fbb;
 }
 
 bool SaveGame::Load(int slot)
