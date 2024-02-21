@@ -16,6 +16,9 @@ namespace TEN::Entities::Player
 {
 	void lara_as_fly_cheat(ItemInfo* item, CollisionInfo* coll)
 	{
+		constexpr auto LIGHT_FALLOFF = 0.1f;
+		constexpr auto LIGHT_COLOR	 = Color(0.6f, 0.6f, 0.6f);
+
 		if (!IsUsingModernControls())
 		{
 			if (IsHeld(In::Forward))
@@ -38,7 +41,11 @@ namespace TEN::Entities::Player
 		}
 
 		if (IsHeld(In::Action))
-			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
+		{
+			TriggerDynamicLight(
+				item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+				LIGHT_FALLOFF * UCHAR_MAX, LIGHT_COLOR.R() * UCHAR_MAX, LIGHT_COLOR.G() * UCHAR_MAX, LIGHT_COLOR.B() * UCHAR_MAX);
+		}
 
 		if (IsUsingModernControls() ?
 			(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)):
@@ -46,8 +53,8 @@ namespace TEN::Entities::Player
 		{
 			if (IsUsingModernControls())
 			{
-				HandlePlayerTurnX(*item, PLAYER_STANDARD_TURN_ALPHA*2);
-				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA*2);
+				HandlePlayerTurnX(*item, PLAYER_FLY_CHEAT_TURN_ALPHA);
+				HandlePlayerTurnY(*item, PLAYER_FLY_CHEAT_TURN_ALPHA);
 			}
 
 			float velCoeff = IsHeld(In::Sprint) ? 2.5f : 1.0f;
@@ -81,7 +88,7 @@ namespace TEN::Entities::Player
 		}
 		else
 		{
-			player.Control.MoveAngle = item->Pose.Orientation.y;
+			player.Control.MoveAngle = GetPlayerMoveAngle(*item);
 			coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 		}
 
