@@ -814,6 +814,7 @@ void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, s
 	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;
 }
 
+// NOTE: Modern control version.
 void HandlePlayerTurnFlex(ItemInfo& item, float alpha)
 {
 	constexpr auto FLEX_ANGLE_CONSTRAINT = ANGLE(100.0f);
