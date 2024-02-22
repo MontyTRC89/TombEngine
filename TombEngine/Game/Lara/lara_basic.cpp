@@ -1415,7 +1415,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsUsingModernControls())
+	if (IsUsingEnhancedTankControls())
 	{
 		// Walk action locks orientation.
 		if (IsHeld(In::Walk))
@@ -1514,7 +1514,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (!IsUsingModernControls())
+	if (IsUsingEnhancedTankControls())
 	{
 		// Walk action locks orientation.
 		if (IsHeld(In::Walk))
