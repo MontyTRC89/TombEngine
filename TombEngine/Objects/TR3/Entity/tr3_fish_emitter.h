@@ -16,10 +16,13 @@ namespace TEN::Entities::Creatures::TR3
 		short randomRotation;
 		short RoomNumber;
 		short Velocity;
+		short destY;
 		short YTarget;
 		short XTarget;
 		short ZTarget;
 		BYTE counter;
+		short angle;
+		short angAdd;
 
 		Matrix Transform;
 	};
