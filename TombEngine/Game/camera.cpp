@@ -515,10 +515,13 @@ void RefreshFixedCamera(short camNumber)
 
 void ChaseCamera(ItemInfo* item)
 {
-	constexpr auto MODERN_CAMERA_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
-	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT	= ANGLE(85.0f);
-	constexpr auto BUFFER							= 100;
-	constexpr auto SWIVEL_STEP_COUNT				= 5;
+	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(70.0f));
+	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
+	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
+	constexpr auto BUFFER										= 100;
+	constexpr auto SWIVEL_STEP_COUNT							= 5;
+
+	const auto& player = GetLaraInfo(*item);
 
 	if (Camera.targetElevation == 0)
 		Camera.targetElevation = ANGLE(-10.0f);
@@ -529,13 +532,15 @@ void ChaseCamera(ItemInfo* item)
 	// Clamp X orientation.
 	if (IsUsingModernControls())
 	{
-		if (Camera.actualElevation > MODERN_CAMERA_X_ANGLE_CONSTRAINT.second)
+		const auto& xAngleConstraint = (player.Control.WaterStatus == WaterStatus::Underwater) ?
+			MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT;
+		if (Camera.actualElevation > xAngleConstraint.second)
 		{
-			Camera.actualElevation = MODERN_CAMERA_X_ANGLE_CONSTRAINT.second;
+			Camera.actualElevation = xAngleConstraint.second;
 		}
-		else if (Camera.actualElevation < MODERN_CAMERA_X_ANGLE_CONSTRAINT.first)
+		else if (Camera.actualElevation < xAngleConstraint.first)
 		{
-			Camera.actualElevation = MODERN_CAMERA_X_ANGLE_CONSTRAINT.first;
+			Camera.actualElevation = xAngleConstraint.first;
 		}
 	}
 	else
@@ -691,10 +696,11 @@ void UpdateCameraElevation()
 
 void CombatCamera(ItemInfo* item)
 {
-	constexpr auto MODERN_CAMERA_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
-	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT	= ANGLE(85.0f);
-	constexpr auto BUFFER							= 100;
-	constexpr auto SWIVEL_STEP_COUNT				= 5;
+	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(70.0f));
+	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
+	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
+	constexpr auto BUFFER										= 100;
+	constexpr auto SWIVEL_STEP_COUNT							= 5;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -763,13 +769,15 @@ void CombatCamera(ItemInfo* item)
 	// Clamp X orientation.
 	if (IsUsingModernControls())
 	{
-		if (Camera.actualElevation > MODERN_CAMERA_X_ANGLE_CONSTRAINT.second)
+		const auto& xAngleConstraint = (player.Control.WaterStatus == WaterStatus::Underwater) ?
+			MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT;
+		if (Camera.actualElevation > xAngleConstraint.second)
 		{
-			Camera.actualElevation = MODERN_CAMERA_X_ANGLE_CONSTRAINT.second;
+			Camera.actualElevation = xAngleConstraint.second;
 		}
-		else if (Camera.actualElevation < MODERN_CAMERA_X_ANGLE_CONSTRAINT.first)
+		else if (Camera.actualElevation < xAngleConstraint.first)
 		{
-			Camera.actualElevation = MODERN_CAMERA_X_ANGLE_CONSTRAINT.first;
+			Camera.actualElevation = xAngleConstraint.first;
 		}
 	}
 	else
