@@ -14,6 +14,10 @@
 #include "Renderer/Renderer.h"
 #include "Objects/TR3/Object/Corpse.h"
 
+#include "Math/Geometry.h"
+#include "Math/Legacy.h"
+#include "Math/Objects/EulerAngles.h"
+
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Entities::TR3;
@@ -25,6 +29,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto FISH_LARA_DAMAGE = 3;
 	constexpr auto FISH_ENTITY_DAMAGE = 1;
 	constexpr auto LEADER_VELOCITY = 64.0f;
+	constexpr auto LEADER_REACH_TARGET_RANGE = SQUARE(BLOCK(0.4f));
 
 	int NextFish;
 
@@ -45,27 +50,79 @@ namespace TEN::Entities::Creatures::TR3
 		item->HitPoints = 24;
 
 		// 1 = Pyranja or  0 = non lethal fishes:
-		item->TriggerFlags = 1;
+		item->TriggerFlags = 0;
 
-		//Save leader into itemFlags0.
+		//Save leaderitem for little fishes into itemFlags0.
 		item->ItemFlags[0] = item->Index;
-		//Save target into itemFlags1.
+		//Save targetitem for little fishes into itemFlags1.
 		item->ItemFlags[1] = item->Index;
 
-		item->Animation.Velocity.z = LEADER_VELOCITY;
+
+		//default Coordinates for leader-Target
+		
+		item->ItemFlags[2] = 0;
+		item->ItemFlags[3] = 0;
+		item->ItemFlags[4] = 0;
+
+		//save start cordinates
+		item->StartPose.Position.x = item->Pose.Position.x;
+		item->StartPose.Position.y = item->Pose.Position.y;
+		item->StartPose.Position.z = item->Pose.Position.z;
+
+
+		item->Animation.Velocity.z = (Random::GenerateInt() & 127) + 32;
+
+		
 	}
+
+	// Define the bounding area for the leader fish based on the spawn point and set a random target within the bounds
+	Vector3 GetRandomFishTarget(ItemInfo* item)
+	{
+		int XleaderBoundLeft = item->StartPose.Position.x - BLOCK(1);
+		int	XleaderBoundRight = item->StartPose.Position.x + BLOCK(1);
+
+		int	YleaderBoundUp = item->StartPose.Position.y - BLOCK(1);
+		int	YleaderBoundDown = item->StartPose.Position.y + BLOCK(1);
+
+		int	ZleaderBoundFront = item->StartPose.Position.z - BLOCK(3);
+		int	ZleaderBoundBack = item->StartPose.Position.z + BLOCK(3);
+
+
+		
+
+
+		//Set Random Target within bounds
+
+		auto target = Vector3(Random::GenerateInt(XleaderBoundLeft, XleaderBoundRight), Random::GenerateInt(YleaderBoundUp, YleaderBoundDown), Random::GenerateInt(ZleaderBoundFront, ZleaderBoundBack));
+		return target;
+	}
+
 
 	void FishSwarmControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		constexpr auto INVALID_CADAVER_POSITION = Vector3(FLT_MAX);
-		short tilt = 0;
+		float MAX_VELOCITY = 5; // Maximum velocity for the fish
+		constexpr float ACCELERATION = 0.1f;
+
+		
+
+		if (!item->ItemFlags[5])
+		{
+			item->ItemFlags[5] = Random::GenerateInt(50, 150);
+			MAX_VELOCITY = Random::GenerateFloat(15.0f, 35.0f);
+		}
+		else
+			item->ItemFlags[5]--;
+
+
 
 		if (!CreatureActive(itemNumber))
 			return;
 
 		auto cadaverPos = INVALID_CADAVER_POSITION;
+
 
 		if (item->HitPoints)
 		{
@@ -78,7 +135,75 @@ namespace TEN::Entities::Creatures::TR3
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
 
-		//TODO: make leader item  follow an AI-patrol path
+		auto angle = CreatureTurn(item, creature->MaxTurn);
+		creature->MaxTurn = ANGLE(365.f); //?
+	
+		item->TriggerFlags = 0;
+
+
+		if (item->ItemFlags[2] == 0 && item->ItemFlags[3] == 0 && item->ItemFlags[4] == 0)
+		{
+			creature->Target = GetRandomFishTarget(item);
+			item->ItemFlags[2] = creature->Target.x;
+			item->ItemFlags[3] = creature->Target.y;
+			item->ItemFlags[4] = creature->Target.z;
+
+
+		}
+		else
+		{
+			/*
+			// Update fish's orientation
+			EulerAngles orientation = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), leaderTarget);
+			item->Pose.Orientation.x = orientation.x;
+			item->Pose.Orientation.y = orientation.y;
+
+			Vector3 direction = leaderTarget - item->Pose.Position.ToVector3();
+
+			float distanceToTarget = Vector3i::Distance(item->Pose.Position, leaderTarget);
+
+			// Adjust fish's velocity based on distance to the target
+			
+
+			// Move fish towards the target position
+			// Scale the direction vector by the calculated velocity
+
+			Vector3 zdirection = direction;
+			zdirection.Normalize();
+
+			item->Pose.Position += (zdirection * velocity);*/
+
+			g_Renderer.AddDebugSphere(creature->Target.ToVector3(), 46, Vector4(1, 1, 0, 1), RendererDebugPage::None);
+
+
+			int dx = creature->Target.x - item->Pose.Position.x;
+			int dz = creature->Target.z - item->Pose.Position.z;
+			AI.distance = SQUARE(dx) + SQUARE(dz);
+			AI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+			AI.ahead = (AI.angle > -FRONT_ARC && AI.angle < FRONT_ARC);
+
+			float distanceToTarget = Vector3i::Distance(item->Pose.Position, creature->Target);
+
+			if (AI.distance < LEADER_REACH_TARGET_RANGE)
+			{
+				item->ItemFlags[2] = 0;
+				item->ItemFlags[3] = 0;
+				item->ItemFlags[4] = 0;
+				
+			}
+
+			EulerAngles orientation = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), creature->Target.ToVector3());
+			item->Pose.Orientation.x = orientation.x;
+			item->Pose.Orientation.y = orientation.y;
+
+
+			float velocity = std::min(ACCELERATION, MAX_VELOCITY);
+			item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, orientation, MAX_VELOCITY);
+
+			//item->Pose.Position -= Vector3(MAX_VELOCITY);
+
+		}
+		
 
 		/*
 		//phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
@@ -214,10 +339,13 @@ namespace TEN::Entities::Creatures::TR3
 			auto angles = Geometry::GetOrientToPoint(
 				fish->Pose.Position.ToVector3(),
 				Vector3(
-					fish->target->Pose.Position.x + fish->XTarget * 8,
-					fish->target->Pose.Position.y + fish->YTarget / 2,
-					fish->target->Pose.Position.z + fish->ZTarget * 8
+					fish->target->Pose.Position.x + fish->XTarget ,
+					fish->target->Pose.Position.y + fish->YTarget ,
+					fish->target->Pose.Position.z + fish->ZTarget 
 				));
+
+
+
 
 			int x = fish->target->Pose.Position.x - fish->Pose.Position.x;
 			int z = fish->target->Pose.Position.z - fish->Pose.Position.z;
@@ -234,7 +362,7 @@ namespace TEN::Entities::Creatures::TR3
 			else if (distance > 168)
 				distance = 168;
 
-			if (fish->Velocity < distance)
+			 if (fish->Velocity < distance)
 				fish->Velocity++;
 			else if (fish->Velocity > distance)
 				fish->Velocity--;
@@ -243,22 +371,22 @@ namespace TEN::Entities::Creatures::TR3
 			//{
 			auto* room = &g_Level.Rooms[fish->RoomNumber];
 
-				short Velocity = fish->Velocity * 128;
+				short Velocity = fish->Velocity * 128; //wie eng am  target je höher desto enger
 
-				short xAngle = abs(angles.x - fish->Pose.Orientation.x) / 2;
-				short yAngle = abs(angles.y - fish->Pose.Orientation.y) / 2;
+				short xAngle = abs(angles.x - fish->Pose.Orientation.x) / 4;
+				short yAngle = abs(angles.y - fish->Pose.Orientation.y) / 4;
 
 				if (xAngle < -Velocity)
-					xAngle = -Velocity;
+					xAngle = -Velocity /2;
 				else if (xAngle > Velocity)
-					xAngle = Velocity;
+					xAngle = Velocity / 2;
 
 				if (yAngle < -Velocity)
-					yAngle = -Velocity;
+					yAngle = -Velocity / 4;
 				else if (yAngle > Velocity)
-					yAngle = Velocity;
+					yAngle = Velocity / 4;
 
-				fish->Pose.Orientation.y += yAngle;
+				fish->Pose.Orientation.y += yAngle/2;
 				fish->Pose.Orientation.x += xAngle;
 			//}
 
@@ -273,13 +401,13 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				if (TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
 				{
-					fish->Pose.Position.y += fish->Velocity * phd_sin(-fish->Pose.Orientation.x);
+					fish->Pose.Position.y += (fish->Velocity ) * phd_sin(-fish->Pose.Orientation.x);
 				}
 				else
 					fish->Pose.Position.y = room->maxceiling + 180;
 			}
 			else
-				fish->Pose.Position.y += fish->Velocity * phd_sin(-fish->Pose.Orientation.x);
+				fish->Pose.Position.y += (fish->Velocity / 2) * phd_sin(-fish->Pose.Orientation.x);
 
 				if (ItemNearTarget(fish->Pose.Position, fish->target, CLICK(1) / 2) && (fish->leader != fish->target))
 				{

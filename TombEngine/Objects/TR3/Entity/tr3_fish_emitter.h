@@ -35,4 +35,5 @@ namespace TEN::Entities::Creatures::TR3
 	void ClearFishSwarm();
 	void UpdateFishSwarm();
 	void SpawnFishSwarm(ItemInfo* item);
+	Vector3 GetRandomFishTarget(ItemInfo* item);
 }
