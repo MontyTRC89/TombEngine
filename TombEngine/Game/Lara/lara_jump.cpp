@@ -319,6 +319,10 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 			case JumpDirection::Forward:
 				item->Animation.TargetState = LS_JUMP_FORWARD;
 				return;
+				
+			case JumpDirection::ShortForward:
+				item->Animation.TargetState = LS_SHORT_JUMP_FORWARD;
+				return;
 
 			case JumpDirection::Back:
 				item->Animation.TargetState = LS_JUMP_BACK;
@@ -347,18 +351,27 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 				player.Control.JumpDirection = GetPlayerJumpDirection(*item, *coll);
 				switch (player.Control.JumpDirection)
 				{
-					case JumpDirection::None:
-						item->Animation.TargetState = LS_IDLE;
-						break;
+				case JumpDirection::None:
+					item->Animation.TargetState = LS_IDLE;
+					return;
 
-					case JumpDirection::Up:
-						item->Animation.TargetState = LS_JUMP_UP;
-						return;
+				case JumpDirection::Forward:
+					item->Animation.TargetState = LS_JUMP_FORWARD;
+					return;
 
-					default:
-						item->Animation.TargetState = LS_JUMP_FORWARD;
-						player.Control.JumpDirection = JumpDirection::Forward;
-						return;
+				case JumpDirection::ShortForward:
+					item->Animation.TargetState = LS_SHORT_JUMP_FORWARD;
+					return;
+
+				case JumpDirection::Up:
+					item->Animation.TargetState = LS_JUMP_UP;
+					return;
+
+				// FAILSAFE
+				default:
+					item->Animation.TargetState = LS_JUMP_FORWARD;
+					player.Control.JumpDirection = JumpDirection::Forward;
+					return;
 				}
 			}
 		}

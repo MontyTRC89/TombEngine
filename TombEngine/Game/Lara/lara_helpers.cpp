@@ -1537,7 +1537,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 			short deltaAngle = GetPlayerRelMoveAngle(item);
 			if (abs(deltaAngle) <= ANGLE(45.0f) && CanJumpForward(item, coll))
 			{
-				return JumpDirection::Forward;
+				return (IsHeld(In::Walk) ? JumpDirection::ShortForward : JumpDirection::Forward);
 			}
 			else if (abs(deltaAngle + ANGLE(180.0f)) <= ANGLE(45.0f) && CanJumpBackward(item, coll))
 			{
@@ -1562,7 +1562,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 				IsHeld(In::Left) || IsHeld(In::Right)) &&
 				CanJumpForward(item, coll))
 			{
-				return JumpDirection::Forward;
+				return (IsHeld(In::Walk) ? JumpDirection::ShortForward : JumpDirection::Forward);
 			}
 			else if (CanJumpUp(item, coll))
 			{

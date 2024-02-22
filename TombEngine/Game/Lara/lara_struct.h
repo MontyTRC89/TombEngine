@@ -230,6 +230,7 @@ enum LaraState
 	LS_EDGE_HANG_SHIMMY_UP = 204,
 	LS_EDGE_HANG_SHIMMY_DOWN = 205,
 	LS_RUN_FORWARD_START_CANCEL = 206,
+	LS_SHORT_JUMP_FORWARD = 207,
 	/*LS_RUN_FORWARD_TURN_180 = 207,
 	LS_WALK_FORWARD_TURN_180 = 208,*/
 
@@ -986,6 +987,7 @@ enum class JumpDirection
 	None,
 	Up,
 	Forward,
+	ShortForward,
 	Back,
 	Left,
 	Right

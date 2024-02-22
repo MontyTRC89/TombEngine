@@ -315,7 +315,7 @@ void MoveCamera(GameVector* ideal, int speed)
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
 
-	float speedCoeff = (IsUsingModernControls() && Camera.type != CameraType::Look) ? 0.3f : 1.0f;
+	float speedCoeff = (IsUsingModernControls() && Camera.type != CameraType::Look) ? 0.25f : 1.0f;
 	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * speedCoeff);
 	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * speedCoeff);
 	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * speedCoeff);
@@ -656,7 +656,8 @@ void ChaseCamera(ItemInfo* item)
 
 void UpdateCameraElevation()
 {
-	constexpr auto MOUSE_AXIS_COEFF = 300.0f;
+	constexpr auto CAMERA_AXIS_COEFF = 20.0f;
+	constexpr auto MOUSE_AXIS_COEFF	 = 300.0f;
 
 	DoThumbstickCamera();
 
@@ -671,9 +672,12 @@ void UpdateCameraElevation()
 	{
 		if (IsUsingModernControls())
 		{
+			const auto& cameraAxis = GetCameraAxis();
 			const auto& mouseAxis = GetMouseAxis();
-			Camera.actualAngle += ANGLE(mouseAxis.x * MOUSE_AXIS_COEFF);
-			Camera.actualElevation -= ANGLE(mouseAxis.y * MOUSE_AXIS_COEFF);
+			const auto& activeAxis = (cameraAxis != Vector2::Zero) ? (cameraAxis * CAMERA_AXIS_COEFF) : (mouseAxis * MOUSE_AXIS_COEFF);
+
+			Camera.actualAngle += ANGLE(activeAxis.x);
+			Camera.actualElevation -= ANGLE(activeAxis.y);
 		}
 		else
 		{

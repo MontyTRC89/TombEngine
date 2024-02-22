@@ -162,8 +162,15 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
-			HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
+			if (IsUsingClassicTankControls())
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+			}
+			else if (IsUsingEnhancedTankControls())
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+				HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
+			}
 		}
 	}
 
@@ -1276,92 +1283,95 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
-		!isWading)
+	if (IsUsingEnhancedTankControls())
 	{
-		item->Animation.TargetState = LS_ROLL_180_FORWARD;
-		return;
-	}
-
-	if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
-	{
-		item->Animation.TargetState = LS_CROUCH_IDLE;
-		return;
-	}
-
-	if (IsHeld(In::Forward))
-	{
-		if (IsHeld(In::Action))
+		if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
+			!isWading)
 		{
-			auto vaultContext = TestLaraVault(item, coll);
-			if (vaultContext.has_value())
+			item->Animation.TargetState = LS_ROLL_180_FORWARD;
+			return;
+		}
+
+		if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
+		{
+			item->Animation.TargetState = LS_CROUCH_IDLE;
+			return;
+		}
+
+		if (IsHeld(In::Forward))
+		{
+			if (IsHeld(In::Action))
 			{
-				item->Animation.TargetState = vaultContext->TargetState;
-				SetLaraVault(item, coll, *vaultContext);
+				auto vaultContext = TestLaraVault(item, coll);
+				if (vaultContext.has_value())
+				{
+					item->Animation.TargetState = vaultContext->TargetState;
+					SetLaraVault(item, coll, *vaultContext);
+					return;
+				}
+			}
+
+			if (CanWadeForward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_WADE_FORWARD;
+				return;
+			}
+			else if (IsHeld(In::Walk))
+			{
+				if (CanWalkForward(*item, *coll))
+				{
+					item->Animation.TargetState = LS_WALK_FORWARD;
+					return;
+				}
+			}
+			else if (CanRunForward(*item, *coll))
+			{
+				if (IsHeld(In::Sprint))
+				{
+					item->Animation.TargetState = LS_SPRINT;
+				}
+				else
+				{
+					item->Animation.TargetState = LS_RUN_FORWARD;
+				}
+
 				return;
 			}
 		}
-
-		if (CanWadeForward(*item, *coll))
+		else if (IsHeld(In::Back))
 		{
-			item->Animation.TargetState = LS_WADE_FORWARD;
-			return;
-		}
-		else if (IsHeld(In::Walk))
-		{
-			if (CanWalkForward(*item, *coll))
-			{
-				item->Animation.TargetState = LS_WALK_FORWARD;
-				return;
-			}
-		}
-		else if (CanRunForward(*item, *coll))
-		{
-			if (IsHeld(In::Sprint))
-			{
-				item->Animation.TargetState = LS_SPRINT;
-			}
-			else
-			{
-				item->Animation.TargetState = LS_RUN_FORWARD;
-			}
-
-			return;
-		}
-	}
-	else if (IsHeld(In::Back))
-	{
-		if (CanWadeBackward(*item, *coll))
-		{
-			item->Animation.TargetState = LS_WALK_BACK;
-			return;
-		}
-		else if (IsHeld(In::Walk))
-		{
-			if (CanWalkBackward(*item, *coll))
+			if (CanWadeBackward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALK_BACK;
 				return;
 			}
+			else if (IsHeld(In::Walk))
+			{
+				if (CanWalkBackward(*item, *coll))
+				{
+					item->Animation.TargetState = LS_WALK_BACK;
+					return;
+				}
+			}
+			else if (CanRunBackward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_RUN_BACK;
+				return;
+			}
 		}
-		else if (CanRunBackward(*item, *coll))
+
+		if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)) &&
+			CanSidestepLeft(*item, *coll))
 		{
-			item->Animation.TargetState = LS_RUN_BACK;
+			item->Animation.TargetState = LS_STEP_LEFT;
 			return;
 		}
-	}
-
-	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)) &&
-		CanSidestepLeft(*item, *coll))
-	{
-		item->Animation.TargetState = LS_STEP_LEFT;
-		return;
-	}
-	else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)) &&
-		CanSidestepRight(*item, *coll))
-	{
-		item->Animation.TargetState = LS_STEP_RIGHT;
-		return;
+		else if (IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right)) &&
+			CanSidestepRight(*item, *coll))
+		{
+			item->Animation.TargetState = LS_STEP_RIGHT;
+			return;
+		}
 	}
 
 	if (IsHeld(In::Left) && item->Animation.ActiveState == LS_TURN_LEFT_FAST)
