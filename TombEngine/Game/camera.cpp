@@ -35,6 +35,8 @@ constexpr auto COLL_CANCEL_THRESHOLD   = BLOCK(2);
 constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS           = CLICK(1);
 
+constexpr auto SWIVEL_STEP_COUNT = 16;
+
 struct OLD_CAMERA
 {
 	short ActiveState;
@@ -51,7 +53,7 @@ struct OLD_CAMERA
 GameVector LastTarget;
 
 GameVector LastIdeal;
-GameVector Ideals[5];
+GameVector Ideals[SWIVEL_STEP_COUNT];
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
 int TargetSnaps = 0;
@@ -264,10 +266,10 @@ void InitializeCamera()
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 }
 
-void MoveCamera(GameVector* ideal, int speed)
+void MoveCamera(GameVector* ideal, float speed)
 {
 	if (Lara.Control.Look.IsUsingBinoculars)
-		speed = 1;
+		speed = 1.0f;
 
 	if (OldCam.pos.Orientation != LaraItem->Pose.Orientation ||
 		OldCam.pos2.Orientation.x != Lara.ExtraHeadRot.x ||
@@ -315,10 +317,9 @@ void MoveCamera(GameVector* ideal, int speed)
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
 
-	float speedCoeff = (IsUsingModernControls() && Camera.type != CameraType::Look) ? 0.25f : 1.0f;
-	Camera.pos.x += (ideal->x - Camera.pos.x) / (speed * speedCoeff);
-	Camera.pos.y += (ideal->y - Camera.pos.y) / (speed * speedCoeff);
-	Camera.pos.z += (ideal->z - Camera.pos.z) / (speed * speedCoeff);
+	Camera.pos.x += (ideal->x - Camera.pos.x) / speed;
+	Camera.pos.y += (ideal->y - Camera.pos.y) / speed;
+	Camera.pos.z += (ideal->z - Camera.pos.z) / speed;
 	Camera.pos.RoomNumber = ideal->RoomNumber;
 
 	if (Camera.bounce)
@@ -341,13 +342,15 @@ void MoveCamera(GameVector* ideal, int speed)
 		}
 	}
 
+	// Avoid entering swamp rooms.
 	int y = Camera.pos.y;
 	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber))
 		y = g_Level.Rooms[Camera.pos.RoomNumber].y - CLICK(1);
 
-	auto probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.RoomNumber);
-	if (y < probe.Position.Ceiling ||
-		y > probe.Position.Floor)
+	// Beyond floor or ceiling.
+	auto pointColl = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.RoomNumber);
+	if (y < pointColl.Position.Ceiling ||
+		y > pointColl.Position.Floor)
 	{
 		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
 
@@ -366,34 +369,34 @@ void MoveCamera(GameVector* ideal, int speed)
 		}
 	}
 
-	probe = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber);
+	pointColl = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber);
 
 	int buffer = CLICK(1) - 1;
-	if ((Camera.pos.y - buffer) < probe.Position.Ceiling &&
-		(Camera.pos.y + buffer) > probe.Position.Floor &&
-		probe.Position.Ceiling < probe.Position.Floor &&
-		probe.Position.Ceiling != NO_HEIGHT &&
-		probe.Position.Floor != NO_HEIGHT)
+	if ((Camera.pos.y - buffer) < pointColl.Position.Ceiling &&
+		(Camera.pos.y + buffer) > pointColl.Position.Floor &&
+		pointColl.Position.Ceiling < pointColl.Position.Floor &&
+		pointColl.Position.Ceiling != NO_HEIGHT &&
+		pointColl.Position.Floor != NO_HEIGHT)
 	{
-		Camera.pos.y = (probe.Position.Floor + probe.Position.Ceiling) / 2;
+		Camera.pos.y = (pointColl.Position.Floor + pointColl.Position.Ceiling) / 2;
 	}
-	else if ((Camera.pos.y + buffer) > probe.Position.Floor &&
-		probe.Position.Ceiling < probe.Position.Floor &&
-		probe.Position.Ceiling != NO_HEIGHT &&
-		probe.Position.Floor != NO_HEIGHT)
+	else if ((Camera.pos.y + buffer) > pointColl.Position.Floor &&
+		pointColl.Position.Ceiling < pointColl.Position.Floor &&
+		pointColl.Position.Ceiling != NO_HEIGHT &&
+		pointColl.Position.Floor != NO_HEIGHT)
 	{
-		Camera.pos.y = probe.Position.Floor - buffer;
+		Camera.pos.y = pointColl.Position.Floor - buffer;
 	}
-	else if ((Camera.pos.y - buffer) < probe.Position.Ceiling &&
-		probe.Position.Ceiling < probe.Position.Floor &&
-		probe.Position.Ceiling != NO_HEIGHT &&
-		probe.Position.Floor != NO_HEIGHT)
+	else if ((Camera.pos.y - buffer) < pointColl.Position.Ceiling &&
+		pointColl.Position.Ceiling < pointColl.Position.Floor &&
+		pointColl.Position.Ceiling != NO_HEIGHT &&
+		pointColl.Position.Floor != NO_HEIGHT)
 	{
-		Camera.pos.y = probe.Position.Ceiling + buffer;
+		Camera.pos.y = pointColl.Position.Ceiling + buffer;
 	}
-	else if (probe.Position.Ceiling >= probe.Position.Floor ||
-		probe.Position.Floor == NO_HEIGHT ||
-		probe.Position.Ceiling == NO_HEIGHT)
+	else if (pointColl.Position.Ceiling >= pointColl.Position.Floor ||
+		pointColl.Position.Floor == NO_HEIGHT ||
+		pointColl.Position.Ceiling == NO_HEIGHT)
 	{
 		Camera.pos = *ideal;
 	}
@@ -519,7 +522,6 @@ void ChaseCamera(ItemInfo* item)
 	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
 	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
 	constexpr auto BUFFER										= 100;
-	constexpr auto SWIVEL_STEP_COUNT							= 5;
 
 	const auto& player = GetLaraInfo(*item);
 
@@ -573,6 +575,7 @@ void ChaseCamera(ItemInfo* item)
 		TargetSnaps = 0;
 	}
 
+	// Move camera.
 	if (IsUsingModernControls())
 	{
 		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
@@ -588,7 +591,7 @@ void ChaseCamera(ItemInfo* item)
 			target = GameVector(Geometry::TranslatePoint(target.ToVector3i(), dir, BUFFER), target.RoomNumber);
 
 		// Update camera position.
-		MoveCamera(&target, Camera.speed);
+		MoveCamera(&target, Camera.speed * ((Camera.type != CameraType::Look) ? 0.25f : 1.0f));
 	}
 	else
 	{
@@ -700,7 +703,6 @@ void CombatCamera(ItemInfo* item)
 	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
 	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
 	constexpr auto BUFFER										= 100;
-	constexpr auto SWIVEL_STEP_COUNT							= 5;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -813,7 +815,7 @@ void CombatCamera(ItemInfo* item)
 			Camera.speed = 1;
 
 		// Update camera position.
-		MoveCamera(&target, Camera.speed);
+		MoveCamera(&target, Camera.speed * ((Camera.type != CameraType::Look) ? 0.25f : 1.0f));
 	}
 	else
 	{
@@ -1014,23 +1016,25 @@ void FixedCamera(ItemInfo* item)
 {
 	// Fixed cameras before TR3 had optional "movement" effect. 
 	// Later for some reason it was forced to always be 1, and actual speed value
-	// from camera trigger was ignored. In TEN, we move speed value out of legacy
-	// floordata trigger to camera itself and make use of it again. Still, by default,
+	// from camera trigger was ignored. In TEN, speed value was moved out out of legacy
+	// floordata trigger to camera itself to make use of it again. Still, by default,
 	// value is 1 for UseForcedFixedCamera hack.
 
 	int moveSpeed = 1;
 
 	GameVector origin, target;
 	if (UseForcedFixedCamera)
+	{
 		origin = ForcedFixedCamera;
+	}
 	else
 	{
-		auto* camera = &g_Level.Cameras[Camera.number];
+		const auto& camera = g_Level.Cameras[Camera.number];
 
-		origin = GameVector(camera->Position, camera->RoomNumber);
+		origin = GameVector(camera.Position, camera.RoomNumber);
 
-		// Multiply original speed by 8 to comply with original bitshifted speed from TR1-2.
-		moveSpeed = camera->Speed * 8 + 1;
+		// NOTE: Multiply original speed by 8 to comply with original bitshifted speed from TR1-2.
+		moveSpeed = (camera.Speed * 8) + 1;
 	}
 
 	Camera.fixedCamera = true;
