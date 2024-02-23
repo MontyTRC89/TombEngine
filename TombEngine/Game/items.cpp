@@ -629,21 +629,26 @@ void InitializeItemArray(int totalItem)
 	NextItemFree = g_Level.NumItems;
 }
 
-short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
+short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectID)
 {
-	short itemNumber = CreateItem();
+	int itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
-		auto* spawn = &g_Level.Items[itemNumber];
+		auto& newItem = g_Level.Items[itemNumber];
 
-		spawn->ObjectNumber = objectNumber;
-		spawn->RoomNumber = item->RoomNumber;
-		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
+		newItem.ObjectNumber = objectID;
+		newItem.RoomNumber = item.RoomNumber;
+		newItem.Pose = item.Pose;
+		newItem.Model.Color = Vector4::One;
 
 		InitializeItem(itemNumber);
 
-		spawn->Status = ITEM_NOT_ACTIVE;
-		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		newItem.Status = ITEM_NOT_ACTIVE;
+	}
+	else
+	{
+		TENLog("Failed to create new item.", LogLevel::Warning);
+		itemNumber = NO_ITEM;
 	}
 
 	return itemNumber;
@@ -883,6 +888,10 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 
 		case HitEffect::Smoke:
 			TriggerShatterSmoke(pos.value().x, pos.value().y, pos.value().z);
+			break;
+
+		case HitEffect::NonExplosive:
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), target.Pose.Orientation.y, target.RoomNumber);
 			break;
 		}
 	}

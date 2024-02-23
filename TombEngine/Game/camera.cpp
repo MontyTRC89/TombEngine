@@ -1575,28 +1575,28 @@ void RumbleScreen()
 	}
 }
 
-void SetScreenFadeOut(float speed)
+void SetScreenFadeOut(float speed, bool force)
 {
-	if (!ScreenFading)
-	{
-		ScreenFading = true;
-		ScreenFadeStart = 1.0f;
-		ScreenFadeEnd = 0;
-		ScreenFadeSpeed = speed;
-		ScreenFadeCurrent = ScreenFadeStart;
-	}
+	if (ScreenFading && !force)
+		return;
+
+	ScreenFading = true;
+	ScreenFadeStart = 1.0f;
+	ScreenFadeEnd = 0;
+	ScreenFadeSpeed = speed;
+	ScreenFadeCurrent = ScreenFadeStart;
 }
 
-void SetScreenFadeIn(float speed)
+void SetScreenFadeIn(float speed, bool force)
 {
-	if (!ScreenFading)
-	{
-		ScreenFading = true;
-		ScreenFadeStart = 0;
-		ScreenFadeEnd = 1.0f;
-		ScreenFadeSpeed = speed;
-		ScreenFadeCurrent = ScreenFadeStart;
-	}
+	if (ScreenFading && !force)
+		return;
+
+	ScreenFading = true;
+	ScreenFadeStart = 0;
+	ScreenFadeEnd = 1.0f;
+	ScreenFadeSpeed = speed;
+	ScreenFadeCurrent = ScreenFadeStart;
 }
 
 void SetCinematicBars(float height, float speed)

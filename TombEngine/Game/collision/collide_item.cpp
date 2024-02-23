@@ -1799,8 +1799,6 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 {
-	const auto& player = GetLaraInfo(*item);
-
 	item->HitStatus = false;
 	coll->HitStatic = false;
 
