@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR1
 		return nullptr;
 	}
 
-	int GetWeaponDamage(LaraWeaponType weaponType)
+	static int GetWeaponDamage(LaraWeaponType weaponType)
 	{
 		return (Weapons[(int)weaponType].Damage * 10);
 	}
@@ -121,8 +121,13 @@ namespace TEN::Entities::Creatures::TR1
 				item.Animation.IsAirborne = false;
 				item.Animation.Velocity.y = 0.0f;
 
-				if (item.Animation.FrameNumber >= GetFrameCount(LA_FREEFALL_DEATH) - 1)
+				// TODO: Check.
+				const auto& anim = GetAnimData(item);
+				if (item.Animation.AnimNumber == LA_FREEFALL_DEATH &&
+					item.Animation.FrameNumber >= (anim.EndFrameNumber - 1))
+				{
 					item.ItemFlags[7] = 2;
+				}
 			}
 
 			break;

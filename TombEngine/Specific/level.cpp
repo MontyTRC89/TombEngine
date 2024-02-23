@@ -5,7 +5,6 @@
 #include <zlib.h>
 
 #include "Game/animation.h"
-#include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -83,7 +82,7 @@ char* LevelDataPtr;
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
 std::vector<int> SpriteSequencesIds;
-LEVEL g_Level;
+LevelData g_Level;
 
 unsigned char ReadUInt8()
 {
@@ -122,7 +121,9 @@ float ReadFloat()
 
 Vector2 ReadVector2()
 {
-	Vector2 value;
+	// NOTE: Cannot use Vector2 constructor due to quirky C++ init ordering.
+
+	auto value = Vector2::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	return value;
@@ -130,7 +131,9 @@ Vector2 ReadVector2()
 
 Vector3 ReadVector3()
 {
-	Vector3 value;
+	// NOTE: Cannot use Vector3 constructor due to quirky C++ init ordering.
+
+	auto value = Vector3::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	value.z = ReadFloat();
@@ -139,7 +142,9 @@ Vector3 ReadVector3()
 
 Vector4 ReadVector4()
 {
-	Vector4 value;
+	// NOTE: Cannot use Vector4 constructor due to quirky C++ init ordering.
+
+	auto value = Vector4::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	value.z = ReadFloat();
@@ -149,7 +154,7 @@ Vector4 ReadVector4()
 
 bool ReadBool()
 {
-	return bool(ReadUInt8());
+	return (bool)ReadUInt8();
 }
 
 void ReadBytes(void* dest, int count)
@@ -170,13 +175,15 @@ long long ReadLEB128(bool sign)
 
 		result |= (long long)(currentByte & 0x7F) << currentShift;
 		currentShift += 7;
-	} while ((currentByte & 0x80) != 0);
+	}
+	while ((currentByte & 0x80) != 0);
 
-	if (sign) // Sign extend
+	// Sign extend.
+	if (sign)
 	{
 		int shift = 64 - currentShift;
 		if (shift > 0)
-			result = (long long)(result << shift) >> shift;
+			result = long long(result << shift) >> shift;
 	}
 
 	return result;
@@ -187,7 +194,9 @@ std::string ReadString()
 	auto numBytes = ReadLEB128(false);
 
 	if (numBytes <= 0)
+	{
 		return std::string();
+	}
 	else
 	{
 		auto newPtr = LevelDataPtr + numBytes;
@@ -348,89 +357,154 @@ void LoadObjects()
 		g_Level.Meshes.push_back(mesh);
 	}
 
-	int numAnimations = ReadInt32();
-	TENLog("Num animations: " + std::to_string(numAnimations), LogLevel::Info);
-
-	g_Level.Anims.resize(numAnimations);
-	for (int i = 0; i < numAnimations; i++)
-	{
-		auto* anim = &g_Level.Anims[i];
-
-		anim->FramePtr = ReadInt32();
-		anim->Interpolation = ReadInt32();
-		anim->ActiveState = ReadInt32();
-		anim->VelocityStart = ReadVector3();
-		anim->VelocityEnd = ReadVector3();
-		anim->frameBase = ReadInt32();
-		anim->frameEnd = ReadInt32();
-		anim->JumpAnimNum = ReadInt32();
-		anim->JumpFrameNum = ReadInt32();
-		anim->NumStateDispatches = ReadInt32();
-		anim->StateDispatchIndex = ReadInt32();
-		anim->NumCommands = ReadInt32();
-		anim->CommandIndex = ReadInt32();
-	}
-
-	int numChanges = ReadInt32();
-	g_Level.Changes.resize(numChanges);
-	ReadBytes(g_Level.Changes.data(), sizeof(StateDispatchData) * numChanges);
-
-	int numRanges = ReadInt32();
-	g_Level.Ranges.resize(numRanges);
-	ReadBytes(g_Level.Ranges.data(), sizeof(StateDispatchRangeData) * numRanges);
-
-	int numCommands = ReadInt32();
-	g_Level.Commands.resize(numCommands);
-	ReadBytes(g_Level.Commands.data(), sizeof(short) * numCommands);
-
 	int numBones = ReadInt32();
 	g_Level.Bones.resize(numBones);
 	ReadBytes(g_Level.Bones.data(), 4 * numBones);
 
-	int numFrames = ReadInt32();
-	g_Level.Frames.resize(numFrames);
-	for (int i = 0; i < numFrames; i++)
-	{
-		auto* frame = &g_Level.Frames[i];
-
-		frame->BoundingBox.X1 = ReadInt16();
-		frame->BoundingBox.X2 = ReadInt16();
-		frame->BoundingBox.Y1 = ReadInt16();
-		frame->BoundingBox.Y2 = ReadInt16();
-		frame->BoundingBox.Z1 = ReadInt16();
-		frame->BoundingBox.Z2 = ReadInt16();
-
-		// NOTE: Braces are necessary to ensure correct value init order.
-		frame->Offset = Vector3{ (float)ReadInt16(), (float)ReadInt16(), (float)ReadInt16() };
-
-		int numAngles = ReadInt16();
-		frame->BoneOrientations.resize(numAngles);
-		for (int j = 0; j < numAngles; j++)
-		{
-			auto* q = &frame->BoneOrientations[j];
-			q->x = ReadFloat();
-			q->y = ReadFloat();
-			q->z = ReadFloat();
-			q->w = ReadFloat();
-		}
-	}
-
 	int numModels = ReadInt32();
 	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
 
+	// Load moveables.
 	for (int i = 0; i < numModels; i++)
 	{
-		int objNum = ReadInt32();
-		MoveablesIds.push_back(objNum);
+		int objectID = ReadInt32();
+		MoveablesIds.push_back(objectID);
 
-		Objects[objNum].loaded = true;
-		Objects[objNum].nmeshes = ReadInt32();
-		Objects[objNum].meshIndex = ReadInt32();
-		Objects[objNum].boneIndex = ReadInt32();
-		Objects[objNum].frameBase = ReadInt32();
-		Objects[objNum].animIndex = ReadInt32();
+		auto& object = Objects[objectID];
 
-		Objects[objNum].loaded = true;
+		object.loaded = true;
+		object.nmeshes = ReadInt32();
+		object.meshIndex = ReadInt32();
+		object.boneIndex = ReadInt32();
+
+		// Load animations.
+		int animCount = ReadInt32();
+		object.Animations.resize(animCount);
+		for (auto& anim : object.Animations)
+		{
+			anim.StateID = ReadInt32();
+			anim.EndFrameNumber = ReadInt32();
+			anim.NextAnimNumber = ReadInt32();
+			anim.NextFrameNumber = ReadInt32();
+			anim.Interpolation = ReadInt32();
+			anim.VelocityStart = ReadVector3();
+			anim.VelocityEnd = ReadVector3();
+
+			// Load keyframes.
+			int frameCount = ReadInt32();
+			anim.Keyframes.resize(frameCount);
+			for (auto& keyframe : anim.Keyframes)
+			{
+				keyframe.BoundingBox.X1 = ReadInt32();
+				keyframe.BoundingBox.X2 = ReadInt32();
+				keyframe.BoundingBox.Y1 = ReadInt32();
+				keyframe.BoundingBox.Y2 = ReadInt32();
+				keyframe.BoundingBox.Z1 = ReadInt32();
+				keyframe.BoundingBox.Z2 = ReadInt32();
+				keyframe.Offset = ReadVector3();
+
+				int boneCount = ReadInt32();
+				keyframe.BoneOrientations.resize(boneCount);
+				for (auto& orient : keyframe.BoneOrientations)
+					orient = ReadVector4();
+			}
+
+			// Load state dispatches.
+			int dispatchCount = ReadInt32();
+			anim.Dispatches.resize(dispatchCount);
+			for (auto& dispatch : anim.Dispatches)
+			{
+				dispatch.StateID = ReadInt32();
+				dispatch.NextAnimNumber = ReadInt32();
+				dispatch.NextFrameNumber = ReadInt32();
+				dispatch.FrameNumberRange.first = ReadInt32();
+				dispatch.FrameNumberRange.second = ReadInt32();
+			}
+
+			// Load animation commands.
+			int commandCount = ReadInt32();
+			if (commandCount != 0)
+			{
+				anim.Commands.reserve(commandCount);
+
+				for (int i = 0; i < commandCount; i++)
+				{
+					auto commandType = (AnimCommandType)ReadInt32();
+
+					// Interpret raw animation command data.
+					auto command = AnimData::AnimCommandPtr{};
+					switch (commandType)
+					{
+					case AnimCommandType::MoveOrigin:
+					{
+						auto relOffset = ReadVector3();
+						command = std::make_unique<MoveOriginCommand>(relOffset);
+					}
+						break;
+
+					case AnimCommandType::JumpVelocity:
+					{
+						auto jumpVel = ReadVector3();
+						command = std::make_unique<JumpVelocityCommand>(jumpVel);
+					}
+						break;
+
+					case AnimCommandType::AttackReady:
+						command = std::make_unique<AttackReadyCommand>();
+						break;
+
+					case AnimCommandType::Deactivate:
+						command = std::make_unique<DeactivateCommand>();
+						break;
+
+					case AnimCommandType::SoundEffect:
+					{
+						int soundData = ReadInt32();
+						int frameNumber = ReadInt32();
+
+						bool playInWater = ((soundData & 0x8000) != 0);
+						bool playOnLand = ((soundData & 0x4000) != 0);
+						bool playAlways = ((playInWater && playOnLand) || (!playInWater && !playOnLand));
+
+						int soundID = soundData & 0x3FFF;
+						auto envCond = SoundEffectEnvCondition::Always;
+
+						if (playAlways)
+						{
+							envCond = SoundEffectEnvCondition::Always;
+						}
+						else if (playInWater)
+						{
+							envCond = SoundEffectEnvCondition::Water;
+						}
+						else if (playOnLand)
+						{
+							envCond = SoundEffectEnvCondition::Land;
+						}
+
+						command = std::make_unique<SoundEffectCommand>(soundID, frameNumber, envCond);
+					}
+						break;
+
+					case AnimCommandType::Flipeffect:
+					{
+						int flipEffectID = ReadInt32();
+						int frameNumber = ReadInt32();
+
+						command = std::make_unique<FlipEffectCommand>(flipEffectID, frameNumber);
+					}
+						break;
+
+					default:
+						continue;
+					}
+
+					anim.Commands.push_back(std::move(command));
+				}
+			}
+		}
+
+		Objects[objectID].loaded = true;
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
@@ -882,10 +956,9 @@ void ReadRooms()
 
 			volume.Type = (VolumeType)ReadInt32();
 
-			// NOTE: Braces are necessary to ensure correct value init order.
-			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
-			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
-			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
+			auto pos = ReadVector3();
+			auto orient = ReadVector4();
+			auto scale = ReadVector3();
 
 			volume.Enabled = ReadBool();
 			volume.DetectInAdjacentRooms = ReadBool();
@@ -893,7 +966,7 @@ void ReadRooms()
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Box    = BoundingOrientedBox(pos, scale, orient);
+			volume.Box = BoundingOrientedBox(pos, scale, orient);
 			volume.Sphere = BoundingSphere(pos, scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
@@ -951,11 +1024,6 @@ void FreeLevel()
 	SpriteSequencesIds.resize(0);
 	g_Level.Boxes.resize(0);
 	g_Level.Overlaps.resize(0);
-	g_Level.Anims.resize(0);
-	g_Level.Changes.resize(0);
-	g_Level.Ranges.resize(0);
-	g_Level.Commands.resize(0);
-	g_Level.Frames.resize(0);
 	g_Level.Sprites.resize(0);
 	g_Level.SoundDetails.resize(0);
 	g_Level.SoundMap.resize(0);

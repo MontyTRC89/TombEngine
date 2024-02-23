@@ -191,7 +191,7 @@ namespace TEN::Entities::TR4
 			}
 
 			if (dx >= 50 || dz >= 50 ||
-				item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex)
+				item->Animation.AnimNumber != 0)
 			{
 				if (AI.distance > pow(BLOCK(2), 2) && abs(AI.angle) > ANGLE(2.8f))
 					item->Animation.TargetState = SPHINX_STATE_IDLE;
@@ -219,7 +219,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case SPHINX_STATE_COLLIDE:
-			if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+			if (item->Animation.FrameNumber == 0)
 			{
 				TestTriggers(item, true);
 

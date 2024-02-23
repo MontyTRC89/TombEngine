@@ -57,7 +57,7 @@ namespace TEN::Entities::Switches
 					}
 
 					ResetPlayerFlex(laraItem);
-					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+					laraItem->Animation.FrameNumber = 0;
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
 

@@ -306,8 +306,8 @@ namespace TEN::Entities::Creatures::TR2
 			if (skidooItem->RoomNumber != riderItem.RoomNumber)
 				ItemNewRoom(riderItemNumber, skidooItem->RoomNumber);
 
-			riderItem.Animation.AnimNumber = skidooItem->Animation.AnimNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
-			riderItem.Animation.FrameNumber = skidooItem->Animation.FrameNumber + (GetAnimData(riderItem).frameBase - GetAnimData(skidooItem).frameBase);
+			riderItem.Animation.AnimNumber = skidooItem->Animation.AnimNumber;
+			riderItem.Animation.FrameNumber = skidooItem->Animation.FrameNumber;
 		}
 		else if (riderItem.Status == ITEM_DEACTIVATED &&
 			skidooItem->Animation.Velocity.z == 0 &&

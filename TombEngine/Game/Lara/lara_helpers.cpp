@@ -1082,8 +1082,7 @@ void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (CanStepUp(*item, *coll))
 		{
-			item->Animation.TargetState = LS_STEP_UP;
-			if (GetStateDispatch(item, GetAnimData(*item)))
+			if (SetStateDispatch(*item, LS_STEP_UP))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
@@ -1091,8 +1090,7 @@ void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (CanStepDown(*item, *coll))
 		{
-			item->Animation.TargetState = LS_STEP_DOWN;
-			if (GetStateDispatch(item, GetAnimData(*item)))
+			if (SetStateDispatch(*item, LS_STEP_DOWN))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;

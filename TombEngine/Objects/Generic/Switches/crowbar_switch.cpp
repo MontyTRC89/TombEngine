@@ -71,7 +71,7 @@ namespace TEN::Entities::Switches
 						{
 							doSwitch = 1;
 							laraItem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							laraItem->Animation.FrameNumber =  GetAnimData(laraItem).frameBase;
+							laraItem->Animation.FrameNumber = 0;
 							switchItem->Animation.TargetState = SWITCH_OFF;
 						}
 						else
@@ -100,7 +100,7 @@ namespace TEN::Entities::Switches
 						{
 							doSwitch = 1;
 							laraItem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							laraItem->Animation.FrameNumber =  GetAnimData(laraItem).frameBase;
+							laraItem->Animation.FrameNumber = 0;
 							switchItem->Animation.TargetState = SWITCH_ON;
 						}
 						else

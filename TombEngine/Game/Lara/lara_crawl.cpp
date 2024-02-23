@@ -422,7 +422,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if ((IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll)) ||
 			((IsHeld(In::Draw) || IsHeld(In::Flare)) &&
-				!IsStandingWeapon(item, player.Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
+				!IsStandingWeapon(item, player.Control.Weapon.GunType) && TestStateDispatch(*item, LS_CROUCH_IDLE)))
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			player.Control.HandStatus = HandStatus::Free;

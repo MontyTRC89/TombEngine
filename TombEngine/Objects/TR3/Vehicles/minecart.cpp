@@ -306,11 +306,11 @@ namespace TEN::Entities::Vehicles
 							{
 								if (item->ObjectNumber == ID_MINECART_SWITCH)
 								{
-									if (item->Animation.FrameNumber == GetAnimData(item).frameBase &&
+									if (item->Animation.FrameNumber == 0 &&
 										(laraItem->Animation.ActiveState == MINECART_STATE_SWIPE &&
-											TestAnimNumber(*laraItem, MINECART_ANIM_SWIPE_WRENCH)))
+											item->Animation.AnimNumber == MINECART_ANIM_SWIPE_WRENCH))
 									{
-										int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
+										int frame = laraItem->Animation.FrameNumber;
 										if (frame >= 12 && frame <= 22)
 										{
 											SoundEffect(SFX_TR3_VEHICLE_MINECART_WRENCH, &item->Pose, SoundEnvironment::Always);
@@ -746,9 +746,9 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case MINECART_STATE_DISMOUNT:
-			if (TestAnimNumber(*laraItem, MINECART_ANIM_PUT_DOWN_WRENCH))
+			if (laraItem->Animation.AnimNumber == MINECART_ANIM_PUT_DOWN_WRENCH)
 			{
-				if (laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME) &&
+				if (laraItem->Animation.FrameNumber == MINECART_WRENCH_MESH_TOGGLE_FRAME &&
 					minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 				{
 					laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
@@ -764,7 +764,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case MINECART_STATE_DISMOUNT_LEFT:
-			if (TestAnimNumber(*laraItem, MINECART_ANIM_DISMOUNT_LEFT) &&
+			if (laraItem->Animation.AnimNumber == MINECART_ANIM_DISMOUNT_LEFT &&
 				TestLastFrame(laraItem))
 			{
 				auto pos = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 640, 0));
@@ -779,7 +779,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case MINECART_STATE_DISMOUNT_RIGHT:
-			if (TestAnimNumber(*laraItem, MINECART_ANIM_DISMOUNT_RIGHT) &&
+			if (laraItem->Animation.AnimNumber == MINECART_ANIM_DISMOUNT_RIGHT &&
 				TestLastFrame(laraItem))
 			{
 				auto pos = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 640, 0));
@@ -794,11 +794,11 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case MINECART_STATE_MOUNT:
-			if (TestAnimNumber(*laraItem, MINECART_ANIM_PICK_UP_WRENCH) &&
+			if (laraItem->Animation.AnimNumber == MINECART_ANIM_PICK_UP_WRENCH &&
 				!minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 			{
 				if (!(minecart->Flags & MINECART_FLAG_WRENCH_MESH) &&
-					laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME))
+					laraItem->Animation.FrameNumber == MINECART_WRENCH_MESH_TOGGLE_FRAME)
 				{
 					laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 					minecart->Flags |= MINECART_FLAG_WRENCH_MESH;
@@ -827,7 +827,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TestAnimNumber(*laraItem, MINECART_ANIM_FALL_DEATH))
+				if (laraItem->Animation.AnimNumber == MINECART_ANIM_FALL_DEATH)
 				{
 					minecart->Flags |= MINECART_FLAG_NO_ANIM;
 					laraItem->HitPoints = -1;
@@ -836,11 +836,12 @@ namespace TEN::Entities::Vehicles
 
 			break;
 
+		// TODO: Ckech frames.
 		case MINECART_STATE_HIT:
 			if (laraItem->HitPoints <= 0 &&
-				laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, 34) + 28)
+				laraItem->Animation.FrameNumber == 62)
 			{
-				laraItem->Animation.FrameNumber = GetFrameIndex(minecartItem, 34) + 28;
+				laraItem->Animation.FrameNumber = 62;
 				minecartItem->Animation.Velocity.z = 0.0f;
 				minecart->Velocity = 0;
 				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_NO_ANIM;
@@ -848,11 +849,12 @@ namespace TEN::Entities::Vehicles
 
 			break;
 
+		// TODO: Ckech frames.
 		case MINECART_STATE_DEATH:
 			if (laraItem->HitPoints <= 0 &&
-				laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, 34) + 28)
+				laraItem->Animation.FrameNumber == 62)
 			{
-				laraItem->Animation.FrameNumber = GetFrameIndex(minecartItem, 34) + 28;
+				laraItem->Animation.FrameNumber = 62;
 				minecartItem->Animation.Velocity.z = 0.0f;
 				minecart->Velocity = 0;
 				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_STOPPED | MINECART_FLAG_DEAD;
@@ -865,7 +867,7 @@ namespace TEN::Entities::Vehicles
 			!(minecart->Flags & MINECART_FLAG_NO_ANIM))
 		{
 			AnimateItem(laraItem);
-			SyncVehicleAnimation(*minecartItem, *laraItem);
+			SyncVehicleAnim(*minecartItem, *laraItem);
 		}
 
 		if (laraItem->Animation.ActiveState != MINECART_STATE_TURN_DEATH &&

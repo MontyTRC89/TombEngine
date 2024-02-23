@@ -1,7 +1,8 @@
 #pragma once
+#include "Game/Animation/Commands.h"
 #include "Math/Math.h"
-#include "Objects/game_object_ids.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 enum GAME_OBJECT_ID : short;
@@ -10,74 +11,55 @@ class Pose;
 class Vector3i;
 struct CreatureBiteInfo;
 struct ItemInfo;
+struct KeyframeInterpData;
 struct ObjectInfo;
 
-// NOTES:
-// animNumber: Relative animation number.
-// animIndex:  Index of animation in giant g_Level.Anims vector.
-
 constexpr auto NO_STATE = -1;
-constexpr auto NO_ANIM	= -1;
 
-enum class AnimCommandType
-{
-	None,
-	MoveOrigin, // "Post-animation adjustment"
-	JumpVelocity,
-	AttackReady,
-	Deactivate,
-	SoundEffect,
-	Flipeffect
-};
-
-struct AnimFrame
+struct KeyframeData
 {
 	GameBoundingBox			BoundingBox		 = GameBoundingBox::Zero;
 	Vector3					Offset			 = Vector3::Zero;
 	std::vector<Quaternion> BoneOrientations = {};
 };
 
-struct StateDispatchData
+struct KeyframeInterpData
 {
-	int TargetState	 = NO_STATE;
-	int NumberRanges = 0;
-	int RangeIndex	 = 0;
+	const KeyframeData& Keyframe0;
+	const KeyframeData& Keyframe1;
+	float Alpha = 0.0f;
+
+	KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
 };
 
-struct StateDispatchRangeData
+struct StateDispatchData
 {
-	int StartFrame	 = 0;		// g_Level.Frames base index.
-	int EndFrame	 = 0;		// g_Level.Frames end index.
-	int LinkAnimNum	 = NO_ANIM; // g_Level.Anims index.
-	int LinkFrameNum = NO_ANIM; // g_Level.Frames index.
+	int StateID			= 0;
+	int NextAnimNumber	= 0;
+	int NextFrameNumber = 0;
+	std::pair<int, int> FrameNumberRange = {};
 };
 
 struct AnimData
 {
-	int FramePtr	  = 0; // g_Level.Frames base index.
-	int Interpolation = 0;
-	int ActiveState	  = 0;
+	using AnimCommandPtr = std::unique_ptr<AnimCommand>;
+
+	int StateID			= 0;
+	int EndFrameNumber	= 0;
+	int NextAnimNumber	= 0;
+	int NextFrameNumber = 0;
+	int Interpolation	= 0;
 
 	// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 	Vector3 VelocityStart = Vector3::Zero;
 	Vector3 VelocityEnd	  = Vector3::Zero;
 
-	int frameBase = 0; // g_Level.Frames base index.
-	int frameEnd  = 0; // g_Level.Frames end index.
-
-	int JumpAnimNum		   = NO_ANIM; // g_Level.Anims index.
-	int JumpFrameNum	   = 0;		  // g_Level.Frames index.
-	int NumStateDispatches = 0;
-	int StateDispatchIndex = 0;
-	int NumCommands		   = 0;
-	int CommandIndex	   = 0;
-};
-
-struct AnimFrameInterpData
-{
-	const AnimFrame* FramePtr0 = nullptr;
-	const AnimFrame* FramePtr1 = nullptr;
-	float Alpha = 0.0f;
+	std::vector<KeyframeData>	   Keyframes  = {};
+	std::vector<StateDispatchData> Dispatches = {};
+	std::vector<AnimCommandPtr>	   Commands	  = {};
+	
+	KeyframeInterpData	GetKeyframeInterpData(int frameNumber) const;
+	const KeyframeData& GetClosestKeyframe(int frameNumber) const;
 };
 
 struct BoneMutator
@@ -86,28 +68,22 @@ struct BoneMutator
 	EulerAngles Rotation = EulerAngles::Identity;
 	Vector3		Scale	 = Vector3::One;
 
-	bool IsEmpty() const
-	{
-		return (Offset == Vector3::Zero &&
-				Rotation == EulerAngles::Identity &&
-				Scale == Vector3::One);
-	};
+	bool IsEmpty() const;
 };
 
 // Animation controller
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
-bool HasStateDispatch(const ItemInfo* item, int targetState = NO_STATE);
-bool TestAnimNumber(const ItemInfo& item, int animNumber);
-bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
-bool TestAnimFrame(const ItemInfo& item, int frameStart);
-bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd);
+bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
+bool TestLastFrame(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
+bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Deprecated.
+bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
 
 // Entity translation
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance);
-void TranslateItem(ItemInfo* item, const Vector3& direction, float distance);
+void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist);
+void TranslateItem(ItemInfo* item, const Vector3& dir, float dist);
 
 // Setters
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0);
@@ -115,43 +91,34 @@ void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
 void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Deprecated.
 
 // Getters
-const AnimData& GetAnimData(int animIndex); // Deprecated.
-const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
-const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
-const AnimData& GetAnimData(const ItemInfo* item, int animNumber = NO_ANIM); // Deprecated.
+const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
+const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
 
-AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
-const AnimFrame&	GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber);
-const AnimFrame*	GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
-const AnimFrame*	GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame*	GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
-const AnimFrame&	GetBestFrame(const ItemInfo& item);
+KeyframeInterpData	GetFrameInterpData(const ItemInfo& item);
+const KeyframeData&	GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
+const KeyframeData&	GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber = 0);
+const KeyframeData&	GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);
+const KeyframeData&	GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber);
+const KeyframeData&	GetClosestKeyframe(const ItemInfo& item);
 
 float GetEffectiveGravity(float verticalVel);
 
-int GetAnimNumber(const ItemInfo& item);
-int GetAnimIndex(const ItemInfo& item, int animNumber);
+int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber); // TODO: Not needed? Not the "real" frame count anyway since 0 isn't counted.
+int GetFrameCount(const ItemInfo& item);
 
-int GetFrameNumber(const ItemInfo& item);
-int GetFrameNumber(ItemInfo* item); // Deprecated.
-int GetFrameIndex(ItemInfo* item, int frameNumber);
-int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber);
+int	 GetNextAnimState(const ItemInfo& item);
+int	 GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
+bool SetStateDispatch(ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
 
-int GetFrameCount(int animIndex);
-
-int	 GetNextAnimState(ItemInfo* item);
-int	 GetNextAnimState(int objectID, int animNumber);
-bool GetStateDispatch(ItemInfo* item, const AnimData& anim);
-
-void ClampRotation(Pose& outPose, short angle, short rotation); 
+void ClampRotation(Pose& outPose, short angle, short rot); 
 void DrawAnimatingItem(ItemInfo* item);
 
-Vector3i   GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
-Vector3i   GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset = Vector3i::Zero);
-Vector3i   GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
-Vector3i   GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
+Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
+Vector3i GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
+Vector3i GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
+Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
 
-Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
-Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex);
-float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex);
+Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int boneID);
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneID);
+float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneID);

@@ -153,18 +153,24 @@ void VentilatorControl(short itemNumber)
 		if (item->Animation.ActiveState == 1)
 		{
 			//result = 5 * item->animNumber;
-			if (item->Animation.FrameNumber == GetAnimData(item).frameEnd)
+			if (TestLastFrame(item))
 				return;
 		}
 		else
+		{
 			item->Animation.TargetState = 1;
+		}
 	}
 
 	int speed = 0;
 	if (item->Animation.ActiveState == 1)
-		speed = GetAnimData(item).frameEnd - item->Animation.FrameNumber;
+	{
+		speed = item->Animation.FrameNumber;
+	}
 	else
+	{
 		speed = 128;
+	}
 
 	auto bounds = GameBoundingBox(item);
 	auto effectBounds = GameBoundingBox::Zero;

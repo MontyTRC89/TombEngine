@@ -328,9 +328,11 @@ namespace TEN::Entities::Creatures::TR5
 						item->Pose.Orientation.y -= ANGLE(7.0f);
 				}
 				else
+				{
 					item->Pose.Orientation.y += AI.angle;
+				}
 
-				if (item->Animation.FrameNumber > GetAnimData(item).frameBase + 10)
+				if (item->Animation.FrameNumber > 10)
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 

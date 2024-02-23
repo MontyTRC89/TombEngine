@@ -249,7 +249,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case CROC_STATE_BITE_ATTACK:
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+				if (item->Animation.FrameNumber == 0)
 					item->Animation.RequiredState = NO_STATE;
 
 				if (ai.bite &&
@@ -288,7 +288,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case CROC_STATE_WATER_BITE_ATTACK:
-				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
+				if (item->Animation.FrameNumber == 0)
 					item->Animation.RequiredState = NO_STATE;
 
 				if (ai.bite && item->TouchBits.Test(CrocodileBiteAttackJoints))

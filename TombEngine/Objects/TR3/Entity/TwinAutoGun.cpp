@@ -99,7 +99,7 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				item.Animation.TargetState = TWIN_AUTO_GUN_STATE_IDLE;
 			}
-			else if (item.Animation.FrameNumber == GetAnimData(item).frameBase)
+			else if (item.Animation.FrameNumber == 0)
 			{
 				item.ItemFlags[0] = 1;
 

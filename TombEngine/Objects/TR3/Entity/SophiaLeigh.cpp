@@ -218,11 +218,11 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void TriggerSophiaLeightLight(ItemInfo& item, const Vector3& pos)
 	{
-		if ((item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_START) && item.Animation.FrameNumber > GetFrameIndex(&item, 6)) ||
-			 item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) ||
-			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber < GetFrameIndex(&item, 3)) ||
-			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 39) && item.Animation.FrameNumber < GetFrameIndex(&item, 47)) ||
-			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 14) && item.Animation.FrameNumber < GetFrameIndex(&item, 18)))
+		if ((item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON_START && item.Animation.FrameNumber > 6) ||
+			 item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON ||
+			(item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON_END && item.Animation.FrameNumber < 3) ||
+			(item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SCEPTER_SHOOT && item.Animation.FrameNumber > 39 && item.Animation.FrameNumber < 47) ||
+			(item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT && item.Animation.FrameNumber > 14 && item.Animation.FrameNumber < 18))
 		{
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
@@ -232,7 +232,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.ItemFlags[1] < SOPHIALEIGH_MAX_LIGHTNING_GLOW_SIZE)
 				item.ItemFlags[1]++;
 		}
-		else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameIndex(&item, 3) && item.ItemFlags[1] > 0)
+		else if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON_END && item.Animation.FrameNumber >= 3 && item.ItemFlags[1] > 0)
 		{
 			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
@@ -408,9 +408,9 @@ namespace TEN::Entities::Creatures::TR3
 			creature->MaxTurn = 0;
 			RotateTowardTarget(item, ai, SOPHIALEIGH_WALK_TURN_RATE_MAX);
 
-			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
+			if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON_START)
 			{
-				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0))
+				if (item.Animation.FrameNumber == 0)
 				{
 					item.Timer = SOPHIALEIGH_CHARGE_TIMER_DURATION;
 					data->shockwaveTimer = 0;
@@ -425,8 +425,8 @@ namespace TEN::Entities::Creatures::TR3
 					SoundEffect(SFX_TR3_SOFIALEIGH_TAKE_HIT, &item.Pose);
 				}
 			}
-			else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) &&
-					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
+			else if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON &&
+					item.Animation.FrameNumber >= (GetFrameCount(item) - 2))
 			{
 				// Charged state.
 				item.ItemFlags[4] = 1;
@@ -470,7 +470,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameIndex(&item, 36))
+			if (item.Animation.FrameNumber == 36)
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighStaffBite, data, true, 0);
@@ -489,7 +489,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameIndex(&item, 14))
+			if (item.Animation.FrameNumber == 14)
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
@@ -600,9 +600,9 @@ namespace TEN::Entities::Creatures::TR3
 		case SOPHIALEIGH_STATE_SUMMON:
 			creature->MaxTurn = 0;
 
-			if (item.Animation.AnimNumber == (Objects[item.ObjectNumber].animIndex + SOPHIALEIGH_ANIM_SUMMON_START))
+			if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON_START)
 			{
-				if (item.Animation.FrameNumber == GetFrameIndex(&item, 0))
+				if (item.Animation.FrameNumber == 0)
 				{
 					item.Timer = SOPHIALEIGH_CHARGE_TIMER_DURATION;
 					data->shockwaveTimer = 0;
@@ -619,8 +619,8 @@ namespace TEN::Entities::Creatures::TR3
 					SoundEffect(SFX_TR3_SOFIALEIGH_TAKE_HIT, &item.Pose);
 				}
 			}
-			else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON) &&
-					item.Animation.FrameNumber >= (GetFrameCount(item.Animation.AnimNumber) - 2))
+			else if (item.Animation.AnimNumber == SOPHIALEIGH_ANIM_SUMMON &&
+				item.Animation.FrameNumber >= (GetFrameCount(item) - 2))
 			{
 				// Charged state.
 				item.ItemFlags[4] = 1;
@@ -663,7 +663,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameIndex(&item, 36))
+			if (item.Animation.FrameNumber == 36)
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighStaffBite, data, true, 0);
@@ -682,7 +682,7 @@ namespace TEN::Entities::Creatures::TR3
 				data->torsoXAngle = ai.xAngle;
 			}
 
-			if (item.Animation.FrameNumber == GetFrameIndex(&item, 14))
+			if (item.Animation.FrameNumber == 14)
 			{
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighRightBite, data, false, SOPHIALEIGH_LASER_DISPERSION_ANGLE);
 				SpawnSophiaLeighProjectileBolt(item, creature->Enemy, SophiaLeighLeftBite, data, false, -SOPHIALEIGH_LASER_DISPERSION_ANGLE);
@@ -721,11 +721,11 @@ namespace TEN::Entities::Creatures::TR3
 			if (item.Animation.ActiveState != SOPHIALEIGH_STATE_DEATH)
 				SetAnimation(&item, SOPHIALEIGH_ANIM_DEATH);
 
-			int frameEnd = GetAnimData(object, SOPHIALEIGH_ANIM_DEATH).frameEnd;
-			if (item.Animation.FrameNumber >= frameEnd)
+			int endFrameNumber = GetAnimData(object, SOPHIALEIGH_ANIM_DEATH).EndFrameNumber;
+			if (item.Animation.FrameNumber >= endFrameNumber)
 			{
 				// Avoid having the object stop working.
-				item.Animation.FrameNumber = frameEnd;
+				item.Animation.FrameNumber = endFrameNumber;
 				item.MeshBits.ClearAll();
 
 				if (item.ItemFlags[7] < SOPHIALEIGH_EXPLOSION_NUM_MAX)

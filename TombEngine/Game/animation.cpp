@@ -21,151 +21,52 @@ using TEN::Renderer::g_Renderer;
 
 constexpr auto VERTICAL_VELOCITY_GRAVITY_THRESHOLD = CLICK(0.5f);
 
-// NOTE: 0 frames counts as 1.
-static unsigned int GetNonZeroFrameCount(const AnimData& anim)
+// TODO: Arm anim object in savegame.
+
+KeyframeInterpData::KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
+	Keyframe0(keyframe0),
+	Keyframe1(keyframe1)
 {
-	unsigned int frameCount = anim.frameEnd - anim.frameBase;
-	return ((frameCount > 0) ? frameCount : 1);
+	Alpha = alpha;
 }
 
-static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
+KeyframeInterpData AnimData::GetKeyframeInterpData(int frameNumber) const
+{
+	// FAILSAFE: Clamp frame number.
+	frameNumber = std::clamp(frameNumber, 0, EndFrameNumber);
+
+	// Normalize frame number into keyframe range.
+	float keyframeNumber = frameNumber / (float)Interpolation;
+
+	// Determine keyframes defining interpolated frame.
+	const auto& keyframe0 = Keyframes[(int)floor(keyframeNumber)];
+	const auto& keyframe1 = Keyframes[(int)ceil(keyframeNumber)];
+
+	// Calculate interpolation alpha between keyframes.
+	float alpha = (1.0f / Interpolation) * (frameNumber % Interpolation);
+
+	// Return keyframe interpolation data.
+	return KeyframeInterpData(keyframe0, keyframe1, alpha);
+}
+
+const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
+{
+	auto interpData = GetKeyframeInterpData(frameNumber);
+	return ((interpData.Alpha <= 0.5f) ? interpData.Keyframe0 : interpData.Keyframe1);
+}
+
+bool BoneMutator::IsEmpty() const
+{
+	return (Offset == Vector3::Zero &&
+			Rotation == EulerAngles::Zero &&
+			Scale == Vector3::One);
+};
+
+static void ExecuteAnimCommands(ItemInfo& item, bool isFrameBased)
 {
 	const auto& anim = GetAnimData(item);
-
-	// No commands; return early.
-	if (anim.NumCommands == 0)
-		return;
-
-	// Get command data pointer.
-	short* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
-
-	for (int i = anim.NumCommands; i > 0; i--)
-	{
-		auto animCommand = (AnimCommandType)commandDataPtr[0];
-		commandDataPtr++;
-
-		switch (animCommand)
-		{
-		case AnimCommandType::MoveOrigin:
-			if (!isFrameBased)
-			{
-				TranslateItem(&item, item.Pose.Orientation.y, commandDataPtr[2], commandDataPtr[1], commandDataPtr[0]);
-
-				if (item.IsLara())
-				{
-					auto bounds = GameBoundingBox(&item);
-					UpdateLaraRoom(&item, -bounds.GetHeight() / 2, -commandDataPtr[0], -commandDataPtr[2]);
-				}
-				else
-				{
-					UpdateItemRoom(item.Index);
-				}
-			}
-
-			commandDataPtr += 3;
-			break;
-
-		case AnimCommandType::JumpVelocity:
-			if (!isFrameBased)
-			{
-				item.Animation.IsAirborne = true;
-				item.Animation.Velocity.y = commandDataPtr[0];
-				item.Animation.Velocity.z = commandDataPtr[1];
-
-				if (item.IsLara())
-				{
-					auto& player = GetLaraInfo(item);
-
-					if (player.Context.CalcJumpVelocity != 0)
-					{
-						item.Animation.Velocity.y = player.Context.CalcJumpVelocity;
-						player.Context.CalcJumpVelocity = 0;
-					}
-				}
-			}
-
-			commandDataPtr += 2;
-			break;
-
-		case AnimCommandType::Deactivate:
-			if (!isFrameBased)
-			{
-				if (Objects[item.ObjectNumber].intelligent && !item.AfterDeath)
-					item.AfterDeath = 1;
-
-				item.Status = ITEM_DEACTIVATED;
-			}
-
-			break;
-
-		case AnimCommandType::AttackReady:
-			if (!isFrameBased && item.IsLara())
-			{
-				auto& player = GetLaraInfo(item);
-
-				if (player.Control.HandStatus != HandStatus::Special)
-					player.Control.HandStatus = HandStatus::Free;
-			}
-
-			break;
-
-		case AnimCommandType::SoundEffect:
-			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
-			{
-				if (!Objects[item.ObjectNumber].waterCreature)
-				{
-					bool playInWater = (commandDataPtr[1] & 0x8000) != 0;
-					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
-					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
-
-					if (item.IsLara())
-					{
-						auto& player = GetLaraInfo(item);
-
-						if (playAlways ||
-							(playOnLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						if (item.RoomNumber == NO_ROOM)
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (TestEnvironment(ENV_FLAG_WATER, &item))
-						{
-							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-				}
-				else
-				{
-					SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
-				}
-			}
-
-			commandDataPtr += 2;
-			break;
-
-		case AnimCommandType::Flipeffect:
-			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
-				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
-
-			commandDataPtr += 2;
-			break;
-
-		default:
-			break;
-		}
-	}
+	for (const auto& command : anim.Commands)
+		command->Execute(item, isFrameBased);
 }
 
 void AnimateItem(ItemInfo* item)
@@ -176,68 +77,57 @@ void AnimateItem(ItemInfo* item)
 		item->HitStatus = false;
 	}
 
-	PerformAnimCommands(*item, true);
+	ExecuteAnimCommands(*item, true);
 	item->Animation.FrameNumber++;
 
 	const auto* animPtr = &GetAnimData(*item);
 
-	if (animPtr->NumStateDispatches > 0 && GetStateDispatch(item, *animPtr))
+	if (SetStateDispatch(*item))
 	{
 		animPtr = &GetAnimData(*item);
 
-		item->Animation.ActiveState = animPtr->ActiveState;
+		item->Animation.ActiveState = animPtr->StateID;
 
 		if (!item->IsLara())
 		{
+			// Reset RequiredState if already reached.
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
 				item->Animation.RequiredState = NO_STATE;
 		}
 	}
 
-	if (item->Animation.FrameNumber > animPtr->frameEnd)
+	if (item->Animation.FrameNumber > animPtr->EndFrameNumber)
 	{
-		PerformAnimCommands(*item, false);
+		ExecuteAnimCommands(*item, false);
 
-		item->Animation.AnimNumber = animPtr->JumpAnimNum;
-		item->Animation.FrameNumber = animPtr->JumpFrameNum;
+		item->Animation.AnimNumber = animPtr->NextAnimNumber;
+		item->Animation.FrameNumber = animPtr->NextFrameNumber;
 
 		animPtr = &GetAnimData(*item);
-
-		if (!item->IsLara())
-		{
-			if (item->Animation.ActiveState != animPtr->ActiveState)
-			{
-				item->Animation.ActiveState = animPtr->ActiveState;
-				item->Animation.TargetState = animPtr->ActiveState;
-			}
-
-			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
-		}
-		else
-		{
-			item->Animation.ActiveState = animPtr->ActiveState;
-		}
-
-		// TODO: Theoretically this is better than above block, but it must be checked. -- Sezz 2023.03.31
-		/*if (item->Animation.ActiveState != animPtr->ActiveState)
+		
+		if (item->Animation.ActiveState != animPtr->StateID)
 		{
 			item->Animation.ActiveState =
-			item->Animation.TargetState = animPtr->ActiveState;
+			item->Animation.TargetState = animPtr->StateID;
 		}
 
 		if (!item->IsLara())
 		{
+			// Reset RequiredState if already reached.
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
 				item->Animation.RequiredState = NO_STATE;
-		}*/
+		}
 	}
 
-	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
-	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
+	// NOTE: Must use non-zero frame count in this edge case.
+	unsigned int frameCount = animPtr->EndFrameNumber;
+	if (frameCount == 0)
+		frameCount = 1;
+
+	int currentFrameNumber = item->Animation.FrameNumber;
 
 	auto animAccel = (animPtr->VelocityEnd - animPtr->VelocityStart) / frameCount;
-	auto animVel = animPtr->VelocityStart + (animAccel * currentFrame);
+	auto animVel = animPtr->VelocityStart + (animAccel * currentFrameNumber);
 
 	if (item->Animation.IsAirborne)
 	{
@@ -314,75 +204,48 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool HasStateDispatch(const ItemInfo* item, int targetState)
+bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
 {
-	const auto& anim = GetAnimData(*item);
+	const auto& anim = GetAnimData(item);
 
-	// No dispatches; return early.
-	if (anim.NumStateDispatches <= 0)
-		return false;
-
-	if (targetState == NO_STATE)
-		targetState = item->Animation.TargetState;
-
-	// Iterate over animation's state dispatches.
-	for (int i = 0; i < anim.NumStateDispatches; i++)
+	// Iterate over state dispatches.
+	for (const auto& dispatch : anim.Dispatches)
 	{
-		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
-		
-		if (dispatch.TargetState != targetState)
+		// State ID mismatch; continue.
+		if (dispatch.StateID != targetStateID.value_or(item.Animation.TargetState))
 			continue;
 
-		// Iterate over dispatch frame ranges.
-		for (int j = 0; j < dispatch.NumberRanges; j++)
-		{
-			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
-
-			// Check if current frame is within dispatch range.
-			if (item->Animation.FrameNumber >= range.StartFrame &&
-				item->Animation.FrameNumber <= range.EndFrame)
-			{
-				return true;
-			}
-		}
+		// Test if current frame is within dispatch range.
+		if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
+			return true;
 	}
 
 	return false;
 }
 
-bool TestAnimNumber(const ItemInfo& item, int animNumber)
+bool TestLastFrame(const ItemInfo& item, std::optional<int> animNumber)
 {
-	const auto& object = Objects[item.Animation.AnimObjectID];
-	return (item.Animation.AnimNumber == (object.animIndex + animNumber));
-}
+	if (!animNumber.has_value())
+		animNumber = item.Animation.AnimNumber;
 
-bool TestLastFrame(ItemInfo* item, int animNumber)
-{
-	const auto& object = Objects[item->Animation.AnimObjectID];
-
-	if (animNumber == NO_ANIM)
-		animNumber = item->Animation.AnimNumber - object.animIndex;
-
-	// Animation to test doesn't match; return early.
-	int animIndex = object.animIndex + animNumber;
-	if (item->Animation.AnimNumber != animIndex)
+	// Animation number mismatch; return early.
+	if (item.Animation.AnimNumber != *animNumber)
 		return false;
 
-	const auto& anim = GetAnimData(object, animNumber);
-	return (item->Animation.FrameNumber >= anim.frameEnd);
+	// FAILSAFE: Frames beyond real end frame also count.
+	const auto& anim = GetAnimData(item.Animation.AnimObjectID, *animNumber);
+	return (item.Animation.FrameNumber >= anim.EndFrameNumber);
 }
 
-bool TestAnimFrame(const ItemInfo& item, int frameStart)
+bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
 {
-	const auto& anim = GetAnimData(item);
-	return (item.Animation.FrameNumber == (anim.frameBase + frameStart));
+	return TestLastFrame(*item, animNumber);
 }
 
-bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd)
+bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber)
 {
-	const auto& anim = GetAnimData(item);
-	return (item.Animation.FrameNumber >= (anim.frameBase + frameStart) &&
-			item.Animation.FrameNumber <= (anim.frameBase + frameEnd));
+	return (item.Animation.FrameNumber >= lowFrameNumber &&
+			item.Animation.FrameNumber <= highFrameNumber);
 }
 
 void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
@@ -390,27 +253,34 @@ void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down
 	item->Pose.Translate(headingAngle, forward, down, right);
 }
 
-void TranslateItem(ItemInfo* item, const EulerAngles& orient, float distance)
+void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist)
 {
-	item->Pose.Translate(orient, distance);
+	item->Pose.Translate(orient, dist);
 }
 
-void TranslateItem(ItemInfo* item, const Vector3& direction, float distance)
+void TranslateItem(ItemInfo* item, const Vector3& dir, float dist)
 {
-	item->Pose.Translate(direction, distance);
+	item->Pose.Translate(dir, dist);
 }
 
 void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 {
-	const auto& animObject = Objects[animObjectID];
-	int animIndex = animObject.animIndex + animNumber;
+	// Animation already set; return early.
+	if (item.Animation.AnimObjectID == animObjectID &&
+		item.Animation.AnimNumber == animNumber &&
+		item.Animation.FrameNumber == frameNumber)
+	{
+		return;
+	}
 
-	// Animation is missing; return early.
-	if (animIndex < 0 || animIndex >= g_Level.Anims.size())
+	const auto& animObject = Objects[animObjectID];
+
+	// Animation missing; return early.
+	if (animNumber < 0 || animNumber >= animObject.Animations.size())
 	{
 		TENLog(
 			"Attempted to set missing animation " + std::to_string(animNumber) +
-			((animObjectID == item.ObjectNumber) ? "" : (" from object " + GetObjectName(animObjectID))) +
+			((animObjectID == item.ObjectNumber) ? "" : (" from moveable " + GetObjectName(animObjectID))) +
 			" for object " + GetObjectName(item.ObjectNumber),
 			LogLevel::Warning);
 
@@ -418,21 +288,25 @@ void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, i
 	}
 
 	const auto& anim = GetAnimData(animObject, animNumber);
-	int frameIndex = anim.frameBase + frameNumber;
 
-	// Animation already set; return early.
-	if (item.Animation.AnimObjectID == animObjectID &&
-		item.Animation.AnimNumber == animIndex &&
-		item.Animation.FrameNumber == frameIndex)
+	// Frame missing; return early.
+	if (frameNumber < 0 || frameNumber > anim.EndFrameNumber)
 	{
+		TENLog(
+			"Attempted to set missing frame " + std::to_string(frameNumber) +
+			" from animation " + std::to_string(animNumber) +
+			((animObjectID == item.ObjectNumber) ? "" : (" from moveable " + GetObjectName(animObjectID))) +
+			" for object " + GetObjectName(item.ObjectNumber),
+			LogLevel::Warning);
+
 		return;
 	}
 
 	item.Animation.AnimObjectID = animObjectID;
-	item.Animation.AnimNumber = animIndex;
-	item.Animation.FrameNumber = frameIndex;
+	item.Animation.AnimNumber = animNumber;
+	item.Animation.FrameNumber = frameNumber;
 	item.Animation.ActiveState =
-	item.Animation.TargetState = anim.ActiveState;
+	item.Animation.TargetState = anim.StateID;
 }
 
 void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
@@ -445,9 +319,9 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
 	SetAnimation(*item, item->ObjectNumber, animNumber, frameNumber);
 }
 
-const AnimData& GetAnimData(int animIndex)
+const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 {
-	return g_Level.Anims[animIndex];
+	return object.Animations[animNumber];
 }
 
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber)
@@ -456,85 +330,45 @@ const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber)
 	return GetAnimData(object, animNumber);
 }
 
-const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
+const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber)
 {
-	return g_Level.Anims[object.animIndex + animNumber];
+	if (!animNumber.has_value())
+		animNumber = item.Animation.AnimNumber;
+
+	return GetAnimData(item.Animation.AnimObjectID, *animNumber);
 }
 
-const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
-{
-	if (animNumber == NO_ANIM)
-		return GetAnimData(item.Animation.AnimNumber);
-
-	const auto& object = Objects[item.Animation.AnimObjectID];
-	return GetAnimData(object, animNumber);
-}
-
-const AnimData& GetAnimData(const ItemInfo* item, int animNumber)
-{
-	return (GetAnimData(*item, animNumber));
-}
-
-AnimFrameInterpData GetFrameInterpData(const ItemInfo& item)
+KeyframeInterpData GetFrameInterpData(const ItemInfo& item)
 {
 	const auto& anim = GetAnimData(item);
-
-	// Normalize animation's current frame number into keyframe range.
-	int frameNumber = GetFrameNumber(item);
-	float frameNumberNorm = frameNumber / (float)anim.Interpolation;
-
-	// Calculate keyframe numbers defining interpolated frame and get pointers to them.
-	int frame0 = (int)floor(frameNumberNorm);
-	int frame1 = (int)ceil(frameNumberNorm);
-	const auto* framePtr0 = &g_Level.Frames[anim.FramePtr + frame0];
-	const auto* framePtr1 = &g_Level.Frames[anim.FramePtr + frame1];
-
-	// Calculate interpolation alpha between keyframes.
-	float alpha = (1.0f / anim.Interpolation) * (frameNumber % anim.Interpolation);
-
-	// Return frame interpolation data.
-	return AnimFrameInterpData{ framePtr0, framePtr1, alpha };
+	return anim.GetKeyframeInterpData(item.Animation.FrameNumber);
 }
 
-const AnimFrame& GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber)
+const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 {
-	return *GetFrame(item.ObjectNumber, animNumber, frameNumber);
+	const auto& anim = GetAnimData(objectID, animNumber);
+	return anim.GetClosestKeyframe(frameNumber);
 }
 
-const AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
+const KeyframeData& GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber)
 {
-	const auto& object = Objects[objectID];
-
-	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
-
-	const auto& anim = GetAnimData(object, animNumber);
-
-	// Get and clamp frame count.
-	unsigned int frameCount = anim.frameEnd - anim.frameBase;
-	if (frameNumber > frameCount)
-		frameNumber = frameCount;
-
-	// Interpolate and return frame pointer.
-	const auto* framePtr = &g_Level.Frames[anim.FramePtr];
-	framePtr += frameNumber / anim.Interpolation;
-	return framePtr;
+	return GetKeyframe(item.ObjectNumber, animNumber, frameNumber);
 }
 
-const AnimFrame* GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber)
+const KeyframeData& GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber)
 {
-	return GetFrame(objectID, animNumber, 0);
+	return GetKeyframe(objectID, animNumber, 0);
 }
 
-const AnimFrame* GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
+const KeyframeData& GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber)
 {
-	return GetFrame(objectID, animNumber, INT_MAX);
+	return GetKeyframe(objectID, animNumber, INT_MAX);
 }
 
-const AnimFrame& GetBestFrame(const ItemInfo& item)
+const KeyframeData& GetClosestKeyframe(const ItemInfo& item)
 {
-	auto frameData = GetFrameInterpData(item);
-	return ((frameData.Alpha <= 0.5f) ? *frameData.FramePtr0 : *frameData.FramePtr1);
+	const auto& anim = GetAnimData(item);
+	return anim.GetClosestKeyframe(item.Animation.FrameNumber);
 }
 
 float GetEffectiveGravity(float verticalVel)
@@ -542,97 +376,59 @@ float GetEffectiveGravity(float verticalVel)
 	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
 }
 
-int GetAnimNumber(const ItemInfo& item)
+int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
 {
-	const auto& object = Objects[item.Animation.AnimObjectID];
-	return (item.Animation.AnimNumber - object.animIndex);
+	const auto& anim = GetAnimData(objectID, animNumber);
+	return anim.EndFrameNumber;
 }
 
-int GetAnimIndex(const ItemInfo& item, int animNumber)
+int GetFrameCount(const ItemInfo& item)
 {
-	const auto& object = Objects[item.Animation.AnimObjectID];
-	return (object.animIndex + animNumber);
+	return GetFrameCount(item.Animation.AnimObjectID, item.Animation.AnimNumber);
 }
 
-int GetFrameNumber(const ItemInfo& item)
+int GetNextAnimState(const ItemInfo& item)
 {
+	return GetNextAnimState(item.Animation.AnimObjectID, item.Animation.AnimNumber);
+}
+
+int GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber)
+{
+	const auto& anim = GetAnimData(objectID, animNumber);
+	const auto& nextAnim = GetAnimData(objectID, anim.NextAnimNumber);
+
+	return nextAnim.StateID;
+}
+
+bool SetStateDispatch(ItemInfo& item, std::optional<int> targetStateID)
+{
+	// Set target state ID.
+	if (targetStateID.has_value())
+		item.Animation.TargetState = *targetStateID;
+
 	const auto& anim = GetAnimData(item);
-	return (item.Animation.FrameNumber - anim.frameBase);
-}
-
-int GetFrameNumber(ItemInfo* item)
-{
-	return GetFrameNumber(*item);
-}
-
-int GetFrameIndex(ItemInfo* item, int frameNumber)
-{
-	int animNumber = item->Animation.AnimNumber - Objects[item->Animation.AnimObjectID].animIndex;
-	return GetFrameIndex(item->Animation.AnimObjectID, animNumber, frameNumber);
-}
-
-int GetFrameIndex(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
-{
-	const auto& object = Objects[objectID];
-	const auto& anim = GetAnimData(object, animNumber);
-
-	return (anim.frameBase + frameNumber);
-}
-
-int GetFrameCount(int animIndex)
-{
-	if (animIndex < 0 || g_Level.Anims.size() <= animIndex)
-		return 0;
-
-	const auto& anim = GetAnimData(animIndex);
-	return (anim.frameEnd - anim.frameBase);
-}
-
-int GetNextAnimState(ItemInfo* item)
-{
-	return GetNextAnimState(item->Animation.AnimObjectID, item->Animation.AnimNumber);
-}
-
-int GetNextAnimState(int objectID, int animNumber)
-{
-	const auto& object = Objects[objectID];
-	const auto& anim = GetAnimData(object, animNumber);
-
-	const auto& nextAnim = GetAnimData(anim.JumpAnimNum);
-	return nextAnim.ActiveState;
-}
-
-bool GetStateDispatch(ItemInfo* item, const AnimData& anim)
-{
-	// Active and target states already match; return early.
-	if (item->Animation.ActiveState == item->Animation.TargetState)
-		return false;
 
 	// No dispatches; return early.
-	if (anim.NumStateDispatches <= 0)
+	if (anim.Dispatches.empty())
 		return false;
 
-	// Iterate over animation's state dispatches.
-	for (int i = 0; i < anim.NumStateDispatches; i++)
-	{
-		const auto& dispatch = g_Level.Changes[anim.StateDispatchIndex + i];
+	// Active and target state IDs already match; return early.
+	if (item.Animation.ActiveState == item.Animation.TargetState)
+		return false;
 
-		if (dispatch.TargetState != item->Animation.TargetState)
+	// Iterate over state dispatches.
+	for (const auto& dispatch : anim.Dispatches)
+	{
+		// State ID mismatch; continue.
+		if (dispatch.StateID != item.Animation.TargetState)
 			continue;
 
-		// Iterate over dispatch frame ranges.
-		for (int j = 0; j < dispatch.NumberRanges; j++)
+		// Set new animation and frame numbers if current frame number is within dispatch range.
+		if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
 		{
-			const auto& range = g_Level.Ranges[dispatch.RangeIndex + j];
-
-			// Set new animation if current frame is within dispatch range.
-			if (item->Animation.FrameNumber >= range.StartFrame &&
-				item->Animation.FrameNumber <= range.EndFrame)
-			{
-				item->Animation.AnimNumber = range.LinkAnimNum;
-				item->Animation.FrameNumber = range.LinkFrameNum;
-				return true;
-			}
+			item.Animation.AnimNumber = dispatch.NextAnimNumber;
+			item.Animation.FrameNumber = dispatch.NextFrameNumber;
+			return true;
 		}
 	}
 
@@ -645,30 +441,27 @@ void DrawAnimatingItem(ItemInfo* item)
 	// Empty stub because actually we disable items drawing when drawRoutine pointer is nullptr in ObjectInfo
 }
 
-void ClampRotation(Pose& outPose, short angle, short rotation)
+void ClampRotation(Pose& outPose, short angle, short rot)
 {
-	if (angle <= rotation)
+	if (angle <= rot)
 	{
-		if (angle >= -rotation)
-			outPose.Orientation.y += angle;
-		else
-			outPose.Orientation.y -= rotation;
+		outPose.Orientation.y += (angle >= -rot) ? angle : -rot;
 	}
 	else
 	{
-		outPose.Orientation.y += rotation;
+		outPose.Orientation.y += rot;
 	}
 }
 
-Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
+Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset)
 {
 	// Use matrices done in renderer to transform relative offset.
-	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
+	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, relOffset.ToVector3()));
 }
 
-Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
+Vector3i GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset)
 {
-	return GetJointPosition(*item, jointIndex, relOffset);
+	return GetJointPosition(*item, boneID, relOffset);
 }
 
 Vector3i GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite)
@@ -681,34 +474,34 @@ Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite)
 	return GetJointPosition(item, bite.BoneID, bite.Position);
 }
 
-Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
+Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int boneID)
 {
 	const auto& object = Objects[objectID];
+	const int* bonePtr = &g_Level.Bones[object.boneIndex + (boneID * 4)];
 
-	int* bonePtr = &g_Level.Bones[object.boneIndex + (jointIndex * 4)];
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
-Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 {
-	static const auto REF_DIRECTION = Vector3::UnitZ;
+	static const auto REF_DIR = Vector3::UnitZ;
 
-	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex);
-	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex, REF_DIRECTION);
+	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID);
+	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, REF_DIR);
 
-	auto direction = target - origin;
-	direction.Normalize();
-	return Geometry::ConvertDirectionToQuat(direction);
+	auto dir = target - origin;
+	dir.Normalize();
+	return Geometry::ConvertDirectionToQuat(dir);
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.
-float GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex)
+float GetBoneLength(GAME_OBJECT_ID objectID, int boneID)
 {
 	const auto& object = Objects[objectID];
 
-	if (object.nmeshes == boneIndex)
+	if (object.nmeshes == boneID)
 		return 0.0f;
 
-	auto nextBoneOffset = GetJointOffset(objectID, boneIndex + 1);
+	auto nextBoneOffset = GetJointOffset(objectID, boneID + 1);
 	return nextBoneOffset.Length();
 }

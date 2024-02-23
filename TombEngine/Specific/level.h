@@ -85,21 +85,13 @@ struct MESH
 	std::vector<BUCKET> buckets;
 };
 
-// LevelData
-struct LEVEL
+struct LevelData
 {
 	// Object data
 	int					  NumItems = 0;
 	std::vector<ItemInfo> Items	   = {};
 	std::vector<MESH>	  Meshes   = {};
 	std::vector<int>	  Bones	   = {};
-
-	// Animation data
-	std::vector<AnimData>				Anims	 = {};
-	std::vector<AnimFrame>				Frames	 = {};
-	std::vector<StateDispatchData>		Changes	 = {};
-	std::vector<StateDispatchRangeData> Ranges	 = {};
-	std::vector<short>					Commands = {};
 
 	// Collision data
 	std::vector<ROOM_INFO> Rooms	 = {};
@@ -139,7 +131,7 @@ extern const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS;
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
 extern std::vector<int> SpriteSequencesIds;
-extern LEVEL g_Level;
+extern LevelData g_Level;
 
 inline std::future<bool> LevelLoadTask;
 

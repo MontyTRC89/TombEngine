@@ -274,17 +274,17 @@ namespace TEN::Entities::TR4
 			if (AI.angle >= ANGLE(67.5f) || AI.angle <= -ANGLE(67.5f))
 			{
 				item->Animation.ActiveState = SKELETON_STATE_RECOIL_BACK;
-				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 33;
+				item->Animation.AnimNumber = 33;
 				item->Pose.Orientation.y += AI.angle - ANGLE(180.0f);
 			}
 			else
 			{
 				item->Animation.ActiveState = SKELETON_STATE_RECOIL_FRONT;
-				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 17;
+				item->Animation.AnimNumber = 17;
 				item->Pose.Orientation.y += AI.angle;
 			}
 
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.FrameNumber = 0;
 			creature->LOT.IsJumping = true;
 		}
 		else
@@ -412,8 +412,8 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = 15;
 					else if (canJump1Block || canJump2Blocks)
 					{
-						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 40;
-						item->Animation.FrameNumber = GetAnimData(item).frameBase;
+						item->Animation.AnimNumber = 40;
+						item->Animation.FrameNumber = 0;
 						item->Animation.ActiveState = SKELETON_STATE_JUMP_LEFT;
 						creature->MaxTurn = 0;
 
@@ -559,8 +559,8 @@ namespace TEN::Entities::TR4
 
 					if (GetCollision(item).Position.Floor > item->Pose.Position.y + BLOCK(1))
 					{
-						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 44;
-						item->Animation.FrameNumber = GetAnimData(item).frameBase;
+						item->Animation.AnimNumber = 44;
+						item->Animation.FrameNumber = 0;
 						item->Animation.ActiveState = 23;
 						item->Animation.IsAirborne = true;
 						creature->MaxTurn = 0;
@@ -635,7 +635,7 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y += AI.angle;
 				}
 
-				if (item->Animation.FrameNumber > (GetAnimData(item).frameBase + 15))
+				if (item->Animation.FrameNumber > 15)
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -700,12 +700,12 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SKELETON_STATE_JUMP_FORWARD_1_BLOCK:
-				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 43)
+				if (item->Animation.AnimNumber == 43)
 				{
 					if (GetCollision(item).Position.Floor > (item->Pose.Position.y + CLICK(5)))
 					{
-						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 44;
-						item->Animation.FrameNumber = GetAnimData(item).frameBase;
+						item->Animation.AnimNumber = 44;
+						item->Animation.FrameNumber = 0;
 						item->Animation.ActiveState = 23;
 						item->Animation.IsAirborne = true;
 						creature->MaxTurn = 0;
@@ -736,7 +736,7 @@ namespace TEN::Entities::TR4
 			case SKELETON_STATE_RECOIL_BACK:
 				if ((item->Animation.ActiveState == SKELETON_STATE_RECOIL_FRONT ||
 					item->Animation.ActiveState == SKELETON_STATE_RECOIL_BACK) &&
-					item->Animation.FrameNumber < GetAnimData(item).frameBase + 20)
+					item->Animation.FrameNumber < 20)
 				{
 					creature->MaxTurn = 0;
 					break;
@@ -757,8 +757,8 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 47;
-					item->Animation.FrameNumber = GetAnimData(item).frameBase;
+					item->Animation.AnimNumber = 47;
+					item->Animation.FrameNumber = 0;
 					item->Animation.ActiveState = 24;
 					item->Animation.IsAirborne = true;
 					creature->MaxTurn = 0;
@@ -775,7 +775,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SKELETON_STATE_SUBTERRANEAN:
-				if (item->Animation.FrameNumber - GetAnimData(item).frameBase < 32)
+				if (item->Animation.FrameNumber < 32)
 					TriggerRiseEffect(item);
 				
 				break;

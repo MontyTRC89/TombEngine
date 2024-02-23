@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
         if (!TriggerActive(item))
             return;
 
-        if (item->Animation.FrameNumber - GetAnimData(item).frameBase >= 200)
+        if (item->Animation.FrameNumber >= 200)
         {
             SoundEffect(SFX_TR4_MAPPER_LASER, &item->Pose);
 

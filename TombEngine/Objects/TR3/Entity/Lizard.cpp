@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR3
 				SetAnimation(&item, LIZARD_ANIM_DEATH);
 
 			// Explode if summoned.
-			if (item.TestFlagField(0, 1) && item.Animation.FrameNumber == GetFrameIndex(&item, 50))
+			if (item.TestFlagField(0, 1) && item.Animation.FrameNumber == 50)
 				CreatureDie(itemNumber, true);
 		}
 		else
@@ -185,10 +185,14 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case LIZARD_STATE_WALK_FORWARD:
-				if (TestAnimNumber(item, LIZARD_ANIM_SLIDE_1) || TestAnimNumber(item, LIZARD_ANIM_SLIDE_2))
+				if (item.Animation.AnimNumber == LIZARD_ANIM_SLIDE_1 || item.Animation.AnimNumber == LIZARD_ANIM_SLIDE_2)
+				{
 					creature.MaxTurn = 0;
+				}
 				else
+				{
 					creature.MaxTurn = LIZARD_WALK_TURN_RATE_MAX;
+				}
 
 				if (creature.Mood == MoodType::Escape)
 				{
@@ -324,7 +328,7 @@ namespace TEN::Entities::Creatures::TR3
 						SpawnLizardGas(itemNumber, LizardGasBite, (GetRandomControl() & 15) + 8);
 				}
 
-				if (TestAnimFrame(item, 28))
+				if (item.Animation.FrameNumber == 28)
 					creature.Flags = 0;
 
 				break;

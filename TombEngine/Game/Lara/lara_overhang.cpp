@@ -648,8 +648,8 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 
 	if (!IsHeld(In::Action))
 	{
-		int frame = GetFrameNumber(item);
-		int length = GetFrameCount(item->Animation.AnimNumber);
+		int frame = item->Animation.FrameNumber;
+		int length = GetFrameCount(*item);
 		int dPos = CLICK(1) - (frame * CLICK(1) / length);
 
 		TranslateItem(item, 0, dPos, dPos);
@@ -678,8 +678,8 @@ void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 
 	if (!IsHeld(In::Action))
 	{
-		int frame = GetFrameNumber(item);
-		int length = GetFrameCount(item->Animation.AnimNumber);
+		int frame = item->Animation.FrameNumber;
+		int length = GetFrameCount(*item);
 		int dPos = frame * CLICK(1) / length;
 
 		TranslateItem(item, 0, dPos, dPos);
@@ -695,8 +695,8 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 	// Rotating camera effect during monkey to overhead slope transition.
 	if (item->Animation.AnimNumber == LA_OVERHANG_MONKEY_SLOPE_CONVEX)
 	{
-		int frame = GetFrameNumber(item);
-		int numFrames = GetFrameCount(item->Animation.AnimNumber);
+		int frame = item->Animation.FrameNumber;
+		int numFrames = GetFrameCount(*item);
 
 		float frac = (frame * 1.5f) / (float)(numFrames);
 		if (frac > 1.0f)
@@ -706,7 +706,7 @@ void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 
 		int distance = TestLaraWall(item, 0, BLOCK(1.5f)) ? BLOCK(1) : CLICK(6.5f);
 
-		if (item->Animation.FrameNumber < GetAnimData(item).frameEnd)
+		if (!TestLastFrame(item))
 		{
 			Camera.targetDistance = distance;
 			Camera.targetElevation = int(BLOCK(3) * frac);
@@ -751,8 +751,8 @@ void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 	// Rotating camera effect during concave slope to monkey transition.
 	else if (item->Animation.AnimNumber == LA_OVERHANG_SLOPE_MONKEY_CONCAVE)
 	{
-		int frame = GetFrameNumber(item);
-		int numFrames = GetFrameCount(item->Animation.AnimNumber);
+		int frame = item->Animation.FrameNumber;
+		int numFrames = GetFrameCount(*item);
 
 		float frac = (frame * 1.25f) / (float)(numFrames);
 		if (frac > 1.0f)
@@ -760,7 +760,7 @@ void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 
 		Camera.flags = CF_FOLLOW_CENTER;
 
-		if (item->Animation.FrameNumber < GetAnimData(item).frameEnd)
+		if (!TestLastFrame(item))
 		{
 			
 			Camera.targetAngle = (short)(-ANGLE(90.0f) * frac);
@@ -1057,7 +1057,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 	auto probeNow = GetCollision(now.x, now.y, now.z, item->RoomNumber);
 	auto probeDown = GetCollision(down.x, down.y, down.z, item->RoomNumber);
 
-	if (item->Animation.AnimNumber == LA_REACH_TO_MONKEY && !GetFrameIndex(item, 0)) // Manage proper grabbing of monkey slope on forward jump.
+	if (item->Animation.AnimNumber == LA_REACH_TO_MONKEY/* && !GetFrameIndex(item, 0)*/) // Manage proper grabbing of monkey slope on forward jump.
 	{
 		int ceilDist = item->Pose.Position.y - probeNow.Position.Ceiling;
 
@@ -1084,7 +1084,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Forward)) // Monkey to slope transitions.
 	{
 		if (probeNow.BottomBlock->Flags.Monkeyswing &&
-			((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameIndex(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
+			((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && item->Animation.FrameNumber >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
 		{
 			if (abs(OrientDelta(slopeData.GoalOrient, item->Pose.Orientation.y)) <= ANGLE(30.0f) &&
 				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(0.5f)))

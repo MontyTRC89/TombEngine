@@ -13,7 +13,7 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item))
 		{
-			int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+			int frameNumber = item->Animation.FrameNumber;
 
 			if ((frameNumber <= 14 || frameNumber >= 24) &&
 				(frameNumber < 138 || frameNumber > 140))
@@ -36,7 +36,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.FrameNumber = 0;
 			*((int*)&item->ItemFlags[0]) = 0;
 		}
 	}

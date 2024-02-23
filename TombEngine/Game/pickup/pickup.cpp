@@ -427,7 +427,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 						}
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
-						laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+						laraItem->Animation.FrameNumber = 0;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 					}
@@ -751,7 +751,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	if (flag)
 	{
-		laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+		laraItem->Animation.FrameNumber = 0;
 		ResetPlayerFlex(laraItem);
 		lara->Control.IsMoving = false;
 		lara->Control.HandStatus = HandStatus::Busy;
@@ -1016,7 +1016,7 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 		if (item->Pose.Position.x != mesh->pos.Position.x || item->Pose.Position.z != mesh->pos.Position.z)
 			continue;
 
-		const auto& bounds = GetBestFrame(*item).BoundingBox;
+		const auto& bounds = GetClosestKeyframe(*item).BoundingBox;
 		auto& bBox = GetBoundsAccurate(*mesh, false);
 
 		if (bounds.X1 <= bBox.X2 && bounds.X2 >= bBox.X1 &&
@@ -1052,7 +1052,7 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 	}
 	else
 	{
-		return &GetBestFrame(g_Level.Items[itemNumber]).BoundingBox;
+		return &GetClosestKeyframe(g_Level.Items[itemNumber]).BoundingBox;
 	}
 }
 
@@ -1194,7 +1194,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 			{
 				ResetPlayerFlex(laraItem);
 				laraItem->Animation.AnimNumber = SearchAnims[objectNumber];
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				laraItem->Animation.FrameNumber = 0;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 				lara->Control.IsMoving = false;
 				lara->Control.HandStatus = HandStatus::Busy;
@@ -1207,12 +1207,14 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 					item->Status = ITEM_ACTIVE;
 				}
 
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.AnimNumber = 1;
+				item->Animation.FrameNumber = 0;
 				AnimateItem(item);
 			}
 			else
+			{
 				lara->Context.InteractedItem = itemNumber;
+			}
 		}
 		else if (lara->Control.IsMoving && lara->Context.InteractedItem ==  itemNumber)
 		{
@@ -1221,7 +1223,9 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		}
 	}
 	else if (laraItem->Animation.ActiveState != LS_MISC_CONTROL)
+	{
 		ObjectCollision(itemNumber, laraItem, coll);
+	}
 }
 
 void SearchObjectControl(short itemNumber)
@@ -1233,7 +1237,7 @@ void SearchObjectControl(short itemNumber)
 	if (item->ObjectNumber != ID_SEARCH_OBJECT4 || item->ItemFlags[0] == 1)
 		AnimateItem(item);
 
-	int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+	int frameNumber = item->Animation.FrameNumber;
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
 		if (frameNumber > 0)

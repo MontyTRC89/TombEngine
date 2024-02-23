@@ -126,7 +126,7 @@ void UndrawFlare(ItemInfo& laraItem)
 		if (laraItem.Animation.AnimNumber == LA_STAND_IDLE)
 		{
 			laraItem.Animation.AnimNumber = LA_DISCARD_FLARE;
-			flareFrame = armFrame + GetAnimData(laraItem).frameBase;
+			flareFrame = armFrame;
 			laraItem.Animation.FrameNumber = flareFrame;
 			player.Flare.Frame = flareFrame;
 		}
@@ -135,7 +135,7 @@ void UndrawFlare(ItemInfo& laraItem)
 		{
 			player.Flare.ControlLeft = false;
 
-			if (flareFrame >= (GetAnimData(laraItem).frameBase + 31)) // 31 = Last frame.
+			if (flareFrame >= 31) // 31 = Last frame.
 			{
 				player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 				player.Control.Weapon.GunType = player.Control.Weapon.LastGunType;
@@ -147,7 +147,7 @@ void UndrawFlare(ItemInfo& laraItem)
 				player.LeftArm.Locked =
 				player.RightArm.Locked = false;
 				SetAnimation(laraItem, LA_STAND_IDLE);
-				player.Flare.Frame = GetAnimData(laraItem).frameBase;
+				player.Flare.Frame = 0;
 				return;
 			}
 
@@ -281,27 +281,28 @@ void DrawFlare(ItemInfo& laraItem)
 void SetFlareArm(ItemInfo& laraItem, int armFrame)
 {
 	auto& player = *GetLaraInfo(&laraItem);
-	int flareAnimNumber = Objects[ID_FLARE_ANIM].animIndex;
+	auto animObjectID = GetWeaponObjectID(player.Control.Weapon.GunType);
 
+	int flareAnimNumber = 0;
 	if (armFrame >= 95)
 	{
-		flareAnimNumber += 4;
+		flareAnimNumber = 4;
 	}
 	else if (armFrame >= 72)
 	{
-		flareAnimNumber += 3;
+		flareAnimNumber = 3;
 	}
 	else if (armFrame >= 33)
 	{
-		flareAnimNumber += 2;
+		flareAnimNumber = 2;
 	}
 	else if (armFrame >= 1)
 	{
-		flareAnimNumber += 1;
+		flareAnimNumber = 1;
 	}
 
+	player.LeftArm.AnimObjectID = animObjectID;
 	player.LeftArm.AnimNumber = flareAnimNumber;
-	player.LeftArm.FrameBase = GetAnimData(flareAnimNumber).FramePtr;
 }
 
 void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
@@ -314,6 +315,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 
 	auto& flareItem = g_Level.Items[itemNumber];
 
+	flareItem.Animation.AnimObjectID = flareItem.ObjectNumber;
 	flareItem.ObjectNumber = objectID;
 	flareItem.RoomNumber = laraItem.RoomNumber;
 

@@ -68,27 +68,24 @@ static void SetArmInfo(const ItemInfo& laraItem, ArmInfo& arm, int frame)
 	const auto& player = GetLaraInfo(laraItem);
 	const auto& weaponAnimData = GetWeaponAnimData(player.Control.Weapon.GunType);
 
-	int animBase = Objects[(int)weaponAnimData.ObjectID].animIndex;
-
 	if (frame < weaponAnimData.Draw1Anim)
 	{
-		arm.AnimNumber = animBase;
+		arm.AnimNumber = 0;
 	}
 	else if (frame < weaponAnimData.Draw2Anim)
 	{
-		arm.AnimNumber = animBase + 1;
+		arm.AnimNumber = 1;
 	}
 	else if (frame < weaponAnimData.RecoilAnim)
 	{
-		arm.AnimNumber = animBase + 2;
+		arm.AnimNumber = 2;
 	}
 	else
 	{
-		arm.AnimNumber = animBase + 3;
+		arm.AnimNumber = 3;
 	}
 
 	arm.FrameNumber = frame;
-	arm.FrameBase = GetAnimData(arm.AnimNumber).FramePtr;
 }
 
 static void ReadyPistols(ItemInfo& laraItem, LaraWeaponType weaponType)
@@ -97,8 +94,8 @@ static void ReadyPistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	player.Control.HandStatus = HandStatus::WeaponReady;
 	player.TargetEntity = nullptr;
-	player.LeftArm.FrameBase =
-	player.RightArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
+	player.LeftArm.AnimObjectID =
+	player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Orientation =

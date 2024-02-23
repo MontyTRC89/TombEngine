@@ -101,6 +101,8 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	}
 
 	auto& item = g_Level.Items[player.Control.Weapon.WeaponItem];
+	item.Animation.AnimObjectID = item.ObjectNumber;
+
 	bool isRunning = (weaponType == LaraWeaponType::HK && laraItem.Animation.Velocity.z != 0.0f);
 
 	static bool reloadHarpoonGun = false;
@@ -174,7 +176,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_RECOIL:
-		if (item.Animation.FrameNumber == GetAnimData(item).frameBase)
+		if (item.Animation.FrameNumber == 0)
 		{
 			item.Animation.TargetState = WEAPON_STATE_UNAIM;
 
@@ -259,7 +261,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 			item.Animation.TargetState = WEAPON_STATE_UNAIM;
 		}
 
-		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 12 &&
+		if (item.Animation.FrameNumber == 12 &&
 			weaponType == LaraWeaponType::Shotgun)
 		{
 			TriggerGunShell(1, ID_SHOTGUNSHELL, LaraWeaponType::Shotgun);
@@ -268,7 +270,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_UNDERWATER_RECOIL:
-		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 0)
+		if (item.Animation.FrameNumber == 0)
 		{
 			item.Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 
@@ -347,25 +349,30 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	AnimateItem(&item);
 
-	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(item).FramePtr;
-	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
-	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = item.Animation.AnimNumber;
+	player.LeftArm.AnimObjectID =
+	player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
+	player.LeftArm.AnimNumber =
+	player.RightArm.AnimNumber = item.Animation.AnimNumber;
+	player.LeftArm.FrameNumber =
+	player.RightArm.FrameNumber = item.Animation.FrameNumber;
 }
 
 void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	auto& player = *GetLaraInfo(&laraItem);
+	auto& player = GetLaraInfo(laraItem);
+	auto animObjectID = GetWeaponObjectID(weaponType);
+	auto& animObject = Objects[animObjectID];
 
 	player.Control.HandStatus = HandStatus::WeaponReady;
-	player.TargetEntity = nullptr;
 	player.LeftArm.Orientation =
 	player.RightArm.Orientation = EulerAngles::Identity;
+	player.LeftArm.AnimObjectID =
+	player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
-	player.LeftArm.FrameBase =
-	player.RightArm.FrameBase = Objects[GetWeaponObjectID(weaponType)].frameBase;
+	player.TargetEntity = nullptr;
 }
 
 void FireShotgun(ItemInfo& laraItem)
@@ -445,30 +452,32 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	{
 		player.Control.Weapon.WeaponItem = CreateItem();
 		weaponItemPtr = &g_Level.Items[player.Control.Weapon.WeaponItem];
-		weaponItemPtr->ObjectNumber = GetWeaponObjectID(weaponType);
+		weaponItemPtr->ObjectNumber =
+		weaponItemPtr->Animation.AnimObjectID = GetWeaponObjectID(weaponType);
 
 		if (weaponType == LaraWeaponType::RocketLauncher)
 		{
-			weaponItemPtr->Animation.AnimNumber = Objects[weaponItemPtr->ObjectNumber].animIndex + 1;
+			weaponItemPtr->Animation.AnimNumber = 1;
 		}
 		else if (weaponType == LaraWeaponType::GrenadeLauncher)
 		{
-			weaponItemPtr->Animation.AnimNumber = Objects[weaponItemPtr->ObjectNumber].animIndex + 0;
+			weaponItemPtr->Animation.AnimNumber = 0;
 		}
 		else
 		{
-			weaponItemPtr->Animation.AnimNumber = Objects[weaponItemPtr->ObjectNumber].animIndex + 1;
+			weaponItemPtr->Animation.AnimNumber = 1;
 		}
 
-		weaponItemPtr->Animation.FrameNumber = GetAnimData(*weaponItemPtr).frameBase;
+		weaponItemPtr->Animation.AnimObjectID = weaponItemPtr->ObjectNumber;
+		weaponItemPtr->Animation.FrameNumber = 0;
 		weaponItemPtr->Animation.ActiveState =
 		weaponItemPtr->Animation.TargetState = WEAPON_STATE_DRAW;
 		weaponItemPtr->Status = ITEM_ACTIVE;
 		weaponItemPtr->RoomNumber = NO_ROOM;
 		weaponItemPtr->Pose = laraItem.Pose;
 
-		player.LeftArm.FrameBase =
-		player.RightArm.FrameBase = Objects[weaponItemPtr->ObjectNumber].frameBase;
+		player.LeftArm.AnimObjectID =
+		player.RightArm.AnimObjectID = weaponItemPtr->ObjectNumber;
 	}
 	else
 	{
@@ -480,7 +489,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	if (weaponItemPtr->Animation.ActiveState != WEAPON_STATE_AIM &&
 		weaponItemPtr->Animation.ActiveState != WEAPON_STATE_UNDERWATER_AIM)
 	{
-		if ((weaponItemPtr->Animation.FrameNumber - GetAnimData(weaponItemPtr).frameBase) == Weapons[(int)weaponType].DrawFrame)
+		if (weaponItemPtr->Animation.FrameNumber == Weapons[(int)weaponType].DrawFrame)
 		{
 			DrawShotgunMeshes(laraItem, weaponType);
 		}
@@ -494,19 +503,23 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		ReadyShotgun(laraItem, weaponType);
 	}
 
-	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(weaponItemPtr).FramePtr;
-	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = weaponItemPtr->Animation.FrameNumber - GetAnimData(weaponItemPtr).frameBase;
-	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = weaponItemPtr->Animation.AnimNumber;
+	player.LeftArm.AnimObjectID =
+	player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
+	player.LeftArm.AnimNumber =
+	player.RightArm.AnimNumber = weaponItemPtr->Animation.AnimNumber;
+	player.LeftArm.FrameNumber =
+	player.RightArm.FrameNumber = weaponItemPtr->Animation.FrameNumber;
 }
 
 void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
-	auto& player = *GetLaraInfo(&laraItem);
-
+	auto& player = GetLaraInfo(laraItem);
 	auto& item = g_Level.Items[player.Control.Weapon.WeaponItem];
+
 	item.Animation.TargetState = WEAPON_STATE_UNDRAW;
 	item.Pose = laraItem.Pose;
 
+	// TODO: Weapon undraw animation is bugged when attempting to undraw weapon while shooting.
 	AnimateItem(&item);
 
 	if (item.Status == ITEM_DEACTIVATED)
@@ -522,19 +535,32 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	}
 	else if (item.Animation.ActiveState == WEAPON_STATE_UNDRAW)
 	{
-		if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 21 ||
-			(weaponType == LaraWeaponType::GrenadeLauncher && item.Animation.FrameNumber - GetAnimData(item).frameBase == 15))
+		if (item.Animation.FrameNumber == 21 ||
+			(weaponType == LaraWeaponType::GrenadeLauncher && item.Animation.FrameNumber == 15))
 		{
 			UndrawShotgunMeshes(laraItem, weaponType);
 		}
 	}
 
-	player.RightArm.FrameBase =
-	player.LeftArm.FrameBase = GetAnimData(item).FramePtr;
-	player.RightArm.FrameNumber =
-	player.LeftArm.FrameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+	// HACK: Get reholstering animation number.
+	int animNumber = 0;
+	switch (weaponType)
+	{
+	case LaraWeaponType::GrenadeLauncher:
+		animNumber = 5;
+		break;
+
+	default:
+		animNumber = 3;
+		break;
+	}
+	
+	player.LeftArm.AnimObjectID =
+	player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
 	player.RightArm.AnimNumber =
-	player.LeftArm.AnimNumber = player.RightArm.AnimNumber;
+	player.LeftArm.AnimNumber = animNumber;
+	player.RightArm.FrameNumber =
+	player.LeftArm.FrameNumber = item.Animation.FrameNumber;
 }
 
 void DrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)

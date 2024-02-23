@@ -820,7 +820,7 @@ void Moveable::SetStateNumber(int stateNumber)
 
 int Moveable::GetAnimNumber() const
 {
-	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
+	return m_item->Animation.AnimNumber;
 }
 
 void Moveable::SetAnimNumber(int animNumber)
@@ -830,7 +830,7 @@ void Moveable::SetAnimNumber(int animNumber)
 
 int Moveable::GetFrameNumber() const
 {
-	return (m_item->Animation.FrameNumber - GetAnimData(*m_item).frameBase);
+	return m_item->Animation.FrameNumber;
 }
 
 Vec3 Moveable::GetVelocity() const
@@ -853,13 +853,14 @@ void Moveable::SetFrameNumber(int frameNumber)
 {
 	const auto& anim = GetAnimData(*m_item);
 
-	unsigned int frameCount = anim.frameEnd - anim.frameBase;
+	unsigned int endFrameNumber = anim.EndFrameNumber;
 	
-	bool cond = frameNumber < frameCount;
+	bool cond = (frameNumber < endFrameNumber);
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
-	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount-1))
+
+	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, endFrameNumber - 1))
 	{
-		m_item->Animation.FrameNumber = frameNumber + anim.frameBase;
+		m_item->Animation.FrameNumber = frameNumber;
 	}
 	else
 	{
@@ -874,7 +875,7 @@ void Moveable::SetFrameNumber(int frameNumber)
 int Moveable::GetEndFrame() const
 {
 	const auto& anim = GetAnimData(*m_item);
-	return (anim.frameEnd - anim.frameBase);
+	return anim.EndFrameNumber;
 }
 
 bool Moveable::GetActive() const
@@ -1207,8 +1208,8 @@ void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshI
 void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int stateID)
 {
 	m_item->Animation.AnimObjectID = objectID;
-	m_item->Animation.AnimNumber = Objects[objectID].animIndex + animNumber;
+	m_item->Animation.AnimNumber = animNumber;
 	m_item->Animation.ActiveState = stateID;
-	m_item->Animation.FrameNumber = GetAnimData(*m_item).frameBase;
+	m_item->Animation.FrameNumber = 0;
 	AnimateItem(m_item);
 }

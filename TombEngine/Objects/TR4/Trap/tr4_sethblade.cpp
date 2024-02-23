@@ -61,7 +61,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (item.Animation.ActiveState == SETHBLADE_STATE_ACTIVE)
 			{
-				int frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+				int frame = item.Animation.FrameNumber;
 
 				if (frame >= 0 && frame <= 6)
 				{

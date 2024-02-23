@@ -526,7 +526,7 @@ namespace TEN::Entities::Vehicles
 
 		TestUPVDismount(UPVItem, laraItem);
 
-		int frame = laraItem->Animation.FrameNumber - GetAnimData(laraItem).frameBase;
+		int frame = laraItem->Animation.FrameNumber;
 
 		switch (laraItem->Animation.ActiveState)
 		{
@@ -658,7 +658,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_MOUNT:
-			if (TestAnimNumber(*laraItem, UPV_ANIM_MOUNT_SURFACE_END))
+			if (laraItem->Animation.AnimNumber == UPV_ANIM_MOUNT_SURFACE_END)
 			{
 				UPVItem->Pose.Position.y += 4;
 				UPVItem->Pose.Orientation.x += ANGLE(1.0f);
@@ -670,7 +670,7 @@ namespace TEN::Entities::Vehicles
 					UPV->Flags |= UPV_FLAG_CONTROL;
 			}
 
-			else if (TestAnimNumber(*laraItem, UPV_ANIM_MOUNT_UNDERWATER))
+			else if (laraItem->Animation.AnimNumber == UPV_ANIM_MOUNT_UNDERWATER)
 			{
 				if (frame == UPV_MOUNT_UNDERWATER_SOUND_FRAME)
 					SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (Pose*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
@@ -682,7 +682,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DISMOUNT_UNDERWATER:
-			if (TestAnimNumber(*laraItem, UPV_ANIM_DISMOUNT_UNDERWATER) &&
+			if (laraItem->Animation.AnimNumber == UPV_ANIM_DISMOUNT_UNDERWATER &&
 				frame == UPV_DISMOUNT_UNDERWATER_FRAME)
 			{
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
@@ -723,7 +723,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DISMOUNT_WATER_SURFACE:
-			if (TestAnimNumber(*laraItem, UPV_ANIM_DISMOUNT_WATER_SURFACE_END) &&
+			if (laraItem->Animation.AnimNumber == UPV_ANIM_DISMOUNT_WATER_SURFACE_END &&
 				frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
 			{
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
@@ -770,7 +770,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DEATH:
-			if ((TestAnimNumber(*laraItem, UPV_ANIM_IDLE_DEATH) || TestAnimNumber(*laraItem, UPV_ANIM_MOVING_DEATH)) &&
+			if ((laraItem->Animation.AnimNumber == UPV_ANIM_IDLE_DEATH || laraItem->Animation.AnimNumber == UPV_ANIM_MOVING_DEATH) &&
 				(frame == UPV_DEATH_FRAME_1 || frame == UPV_DEATH_FRAME_2))
 			{
 				auto vec = GetJointPosition(laraItem, LM_HIPS);
@@ -978,7 +978,7 @@ namespace TEN::Entities::Vehicles
 			if (UPV->Flags & UPV_FLAG_CONTROL)
 				SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (Pose*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity.z / 96.0f);
 
-			SyncVehicleAnimation(*UPVItem, *laraItem);
+			SyncVehicleAnim(*UPVItem, *laraItem);
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 				Camera.targetElevation = -ANGLE(60.0f);

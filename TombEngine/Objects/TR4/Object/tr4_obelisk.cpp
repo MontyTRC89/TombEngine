@@ -20,8 +20,8 @@ void InitializeObelisk(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
-	item->Animation.FrameNumber = GetAnimData(item).frameBase;
+	item->Animation.AnimNumber = 3;
+	item->Animation.FrameNumber = 0;
 
 	AddActiveItem(itemNumber);
 	item->Status = ITEM_ACTIVE;
@@ -155,40 +155,40 @@ void ObeliskControl(short itemNumber)
 		auto* obj = &Objects[item->ObjectNumber];
 		bool flag = false;
 
-		if (item->Animation.AnimNumber == obj->animIndex + 2)
+		if (item->Animation.AnimNumber == 2)
 		{
 			item->Pose.Orientation.y -= ANGLE(90.0f);
 
 			if (IsHeld(In::Action))
 			{
-				item->Animation.AnimNumber = obj->animIndex + 1;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.AnimNumber = 1;
+				item->Animation.FrameNumber = 0;
 			}
 			else
 				flag = true;
 		}
 
-		if (item->Animation.AnimNumber == obj->animIndex + 6)
+		if (item->Animation.AnimNumber == 6)
 		{
 			item->Pose.Orientation.y += ANGLE(90.0f);
 
 			if (!IsHeld(In::Action))
 			{
-				item->Animation.AnimNumber = obj->animIndex + 3;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.AnimNumber = 3;
+				item->Animation.FrameNumber = 0;
 				flag = false;
 			}
 			else
 			{
-				item->Animation.AnimNumber = obj->animIndex + 5;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
+				item->Animation.AnimNumber = 5;
+				item->Animation.FrameNumber = 0;
 			}
 		}
 
 		if (flag)
 		{
-			item->Animation.AnimNumber = obj->animIndex + 3;
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
+			item->Animation.AnimNumber = 3;
+			item->Animation.FrameNumber = 0;
 		}
 
 		if (item->TriggerFlags == 2)
