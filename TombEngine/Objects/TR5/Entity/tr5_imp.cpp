@@ -195,8 +195,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		short headingAngle = 0;
 
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		AI_INFO ai;
 		if (item->HitPoints <= 0)

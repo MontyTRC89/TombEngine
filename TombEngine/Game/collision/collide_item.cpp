@@ -929,7 +929,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 				coll.Shift = deltaPose;
 		}
 		else if (deltaPos.ToVector3().Length() <= coll.Setup.Radius && relDeltaHeight > 0 &&
-				(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Zero))
+				(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Identity))
 		{
 			// Push item away if not directly above bridge, and bridge position was changed.
 			ItemPushItem(&bridgeItem, &item);
@@ -1798,8 +1798,6 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 {
-	const auto& player = GetLaraInfo(*item);
-
 	item->HitStatus = false;
 	coll->HitStatic = false;
 

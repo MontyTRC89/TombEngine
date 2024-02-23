@@ -359,7 +359,7 @@ void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	player.Control.HandStatus = HandStatus::WeaponReady;
 	player.TargetEntity = nullptr;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Locked =
@@ -1276,7 +1276,7 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 		player.ExtraTorsoRot = player.LeftArm.Orientation;
 
 		if (Camera.oldType != CameraType::Look && player.Control.Look.OpticRange == 0)
-			player.ExtraHeadRot = EulerAngles::Zero;
+			player.ExtraHeadRot = EulerAngles::Identity;
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)
@@ -1459,7 +1459,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 	}
 	else
 	{
-		TriggerShockwave(&item.Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		item.Pose.Position.y += CLICK(1.0f / 2);
 		TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item.RoomNumber);
 
@@ -1581,7 +1581,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 
 			TriggerExplosionSparks(meshPtr->pos.Position.x, meshPtr->pos.Position.y, meshPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
 			auto pose = Pose(meshPtr->pos.Position.x, meshPtr->pos.Position.y - 128, meshPtr->pos.Position.z, 0, meshPtr->pos.Orientation.y, 0);
-			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Zero, 0, true, false, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 
 		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)

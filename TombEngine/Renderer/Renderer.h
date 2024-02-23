@@ -476,7 +476,7 @@ namespace TEN::Renderer
 		void PrepareFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
 		void DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view);
-		void RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background);
+		void RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade);
 		void RenderTitleMenu(Menu menu);
 		void RenderPauseMenu(Menu menu);
 		void RenderLoadSaveMenu();

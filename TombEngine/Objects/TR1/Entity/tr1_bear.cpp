@@ -88,7 +88,7 @@ namespace TEN::Entities::Creatures::TR1
 		auto& creature = *GetCreatureInfo(&item);
 
 		short headingAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
 
 		if (item.HitPoints <= 0)
 		{
