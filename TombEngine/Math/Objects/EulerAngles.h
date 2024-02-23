@@ -12,7 +12,7 @@
 		short z = 0;
 
 		// Constants
-		static const EulerAngles Zero; // TODO: Should be "Identity", not "Zero".
+		static const EulerAngles Identity;
 
 		// Constructors
 		constexpr EulerAngles() {};

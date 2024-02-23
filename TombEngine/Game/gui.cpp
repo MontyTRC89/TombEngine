@@ -1402,9 +1402,9 @@ namespace TEN::Gui
 		if (Rings[(int)RingTypes::Ammo].RingActive)
 			return;
 	
-		AmmoObjectList[0].Orientation = EulerAngles::Zero;
-		AmmoObjectList[1].Orientation = EulerAngles::Zero;
-		AmmoObjectList[2].Orientation = EulerAngles::Zero;
+		AmmoObjectList[0].Orientation = EulerAngles::Identity;
+		AmmoObjectList[1].Orientation = EulerAngles::Identity;
+		AmmoObjectList[2].Orientation = EulerAngles::Identity;
 
 		if (options &
 			(OPT_CHOOSE_AMMO_UZI | OPT_CHOOSE_AMMO_PISTOLS | OPT_CHOOSE_AMMO_REVOLVER | OPT_CHOOSE_AMMO_CROSSBOW |
@@ -1520,7 +1520,7 @@ namespace TEN::Gui
 	void GuiController::InsertObjectIntoList(int objectNumber)
 	{
 		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].InventoryItem = objectNumber;
-		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Orientation = EulerAngles::Zero;
+		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Orientation = EulerAngles::Identity;
 		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Bright = 32;
 		Rings[(int)RingTypes::Inventory].NumObjectsInList++;
 	}
@@ -1534,7 +1534,7 @@ namespace TEN::Gui
 			if (Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem != objectNumber)
 			{
 				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].InventoryItem = objectNumber;
-				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].Orientation = EulerAngles::Zero;
+				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].Orientation = EulerAngles::Identity;
 				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList++].Bright = 32;
 			}
 		}
@@ -2737,7 +2737,7 @@ namespace TEN::Gui
 
 	void GuiController::SpinBack(EulerAngles& orient)
 	{
-		orient.Lerp(EulerAngles::Zero, 1.0f / 8);
+		orient.Lerp(EulerAngles::Identity, 1.0f / 8);
 	}
 
 	void GuiController::DrawAmmoSelector()
@@ -3440,7 +3440,7 @@ namespace TEN::Gui
 
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];
-		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, POS_2D, EulerAngles::Zero, invObject.Scale1 * 1.5f);
+		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, POS_2D, EulerAngles::Identity, invObject.Scale1 * 1.5f);
 	}
 
 	void GuiController::DoDiary(ItemInfo* item)

@@ -121,8 +121,8 @@ namespace TEN::Entities::Creatures::TR1
 		auto& creature = *GetCreatureInfo(&item);
 		auto& skateItem = g_Level.Items[item.ItemFlags[0]];
 		short headingAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (skateItem.Status & ITEM_INVISIBLE)
 		{

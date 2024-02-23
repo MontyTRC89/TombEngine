@@ -227,7 +227,7 @@ namespace TEN::Control::Volumes
 	
 	void TestVolumes(CAMERA_INFO* camera)
 	{
-		auto pose = Pose(camera->pos.ToVector3i(), EulerAngles::Zero);
+		auto pose = Pose(camera->pos.ToVector3i(), EulerAngles::Identity);
 		auto bounds = GameBoundingBox::Zero;
 		bounds.X1 = bounds.Y1 = bounds.Z1 =  CAM_SIZE;
 		bounds.X2 = bounds.Y2 = bounds.Z2 = -CAM_SIZE;

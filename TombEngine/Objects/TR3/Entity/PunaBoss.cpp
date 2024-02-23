@@ -308,7 +308,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		static auto targetPos = Vector3i::Zero;
 
-		auto headOrient = EulerAngles::Zero;
+		auto headOrient = EulerAngles::Identity;
 		short headingAngle = 0;
 		short prevYOrient = 0;
 

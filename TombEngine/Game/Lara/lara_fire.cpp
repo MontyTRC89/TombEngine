@@ -74,9 +74,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
 	// No weapon
 	{
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		0,
 		0,
 		0,
@@ -110,7 +110,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	{
 		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
 		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-10.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(10.0f), 0)),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		ANGLE(10.0f),
 		ANGLE(4.0f),
 		650,
@@ -193,9 +193,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Flare
 	{
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		0,
 		0,
 		0,
@@ -313,7 +313,7 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
 	player.LeftArm.GunFlash =
@@ -806,7 +806,7 @@ void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 {
 	const auto& player = *GetLaraInfo(&laraItem);
 
-	auto targetArmOrient = arm.Locked ? player.TargetArmOrient : EulerAngles::Zero;
+	auto targetArmOrient = arm.Locked ? player.TargetArmOrient : EulerAngles::Identity;
 	arm.Orientation.InterpolateConstant(targetArmOrient, weaponInfo.AimSpeed);
 }
 
@@ -1033,7 +1033,7 @@ void LaraTargetInfo(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	{
 		player.RightArm.Locked = false;
 		player.LeftArm.Locked = false;
-		player.TargetArmOrient = EulerAngles::Zero;
+		player.TargetArmOrient = EulerAngles::Identity;
 		return;
 	}
 

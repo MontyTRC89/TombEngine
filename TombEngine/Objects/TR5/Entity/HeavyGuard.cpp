@@ -200,8 +200,8 @@ namespace TEN::Entities::Creatures::TR5
 		auto& creature = *GetCreatureInfo(&item);
 
 		short headingAngle = 0;
-		auto headOrient = EulerAngles::Zero;
-		auto torsoOrient = EulerAngles::Zero;
+		auto headOrient = EulerAngles::Identity;
+		auto torsoOrient = EulerAngles::Identity;
 
 		AI_INFO ai;
 		CreatureAIInfo(&item, &ai);

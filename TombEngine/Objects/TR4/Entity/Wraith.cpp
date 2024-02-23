@@ -171,7 +171,7 @@ namespace TEN::Entities::TR4
 		short inner = vel >= 0 ? 32 : 640;
 		short outer = vel >= 0 ? 160 : 512;
 
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles::Zero, 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(45.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(90.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);

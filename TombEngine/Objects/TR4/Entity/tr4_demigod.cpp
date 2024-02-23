@@ -706,11 +706,11 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - CLICK(0.5f);
 
-					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, false, (int)ShockwaveStyle::Normal);
+					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Identity, 8, true, false, false, (int)ShockwaveStyle::Normal);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					pos.y -= 64;
-					TriggerShockwave((Pose*)&pos, 24, 88, 200, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, true, (int)ShockwaveStyle::Normal);
+					TriggerShockwave((Pose*)&pos, 24, 88, 200, 128, 128, 128, 32, EulerAngles::Identity, 8, true, false, true, (int)ShockwaveStyle::Normal);
 
 					auto lightColor = Color(1.0f, 0.4f, 0.2f);
 					TriggerDynamicLight(pos.ToVector3(), lightColor, 0.1f);

@@ -65,7 +65,7 @@ struct AnimData
 struct BoneMutator
 {
 	Vector3		Offset	 = Vector3::Zero;
-	EulerAngles Rotation = EulerAngles::Zero;
+	EulerAngles Rotation = EulerAngles::Identity;
 	Vector3		Scale	 = Vector3::One;
 
 	bool IsEmpty() const;

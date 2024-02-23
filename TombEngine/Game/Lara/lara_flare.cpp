@@ -95,7 +95,7 @@ void ReadyFlare(ItemInfo& laraItem)
 
 	player.Control.HandStatus = HandStatus::Free;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
 	player.TargetEntity = nullptr;

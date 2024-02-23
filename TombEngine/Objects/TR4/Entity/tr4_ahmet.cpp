@@ -130,7 +130,7 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
 
 		if (item->HitPoints <= 0)
 		{
