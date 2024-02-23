@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -18,6 +19,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -212,7 +214,7 @@ namespace TEN::Entities::Vehicles
 		int x = kayakItem->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY);
 		int z = kayakItem->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY);
 
-		int probedRoomNumber = GetCollision(x, kayakItem->Pose.Position.y, z, kayakItem->RoomNumber).RoomNumber;
+		int probedRoomNumber = GetPointCollision(Vector3i(x, kayakItem->Pose.Position.y, z), kayakItem->RoomNumber).GetRoomNumber();
 		int waterHeight = GetWaterHeight(x, kayakItem->Pose.Position.y, z, probedRoomNumber);
 
 		//if (waterHeight != NO_HEIGHT)
@@ -405,8 +407,8 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			auto probe = GetCollision(old->x, pos->y, pos->z, kayakItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			auto probe = GetPointCollision(Vector3i(old->x, pos->y, pos->z), kayakItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
 					z = -zShift - 1;
@@ -414,8 +416,8 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - zShift;
 			}
 
-			probe = GetCollision(pos->x, pos->y, old->z, kayakItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			probe = GetPointCollision(Vector3i(pos->x, pos->y, old->z), kayakItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
 					x = -xShift - 1;

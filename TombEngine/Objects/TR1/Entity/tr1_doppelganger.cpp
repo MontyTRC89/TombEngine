@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/items.h"
@@ -10,6 +11,8 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::PointCollision;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -60,7 +63,7 @@ namespace TEN::Entities::Creatures::TR1
 				(referencePtr->Pose.Position.x * 2) - LaraItem->Pose.Position.x,
 				LaraItem->Pose.Position.y,
 				(referencePtr->Pose.Position.z * 2) - LaraItem->Pose.Position.z);
-			item.Floor = GetCollision(pos.x, pos.y, pos.z, item.RoomNumber).Position.Floor;
+			item.Floor = GetPointCollision(pos, item.RoomNumber).GetFloorHeight();
 
 			// Animate doppelganger, mirroring player's position.
 			item.Animation.AnimNumber = LaraItem->Animation.AnimNumber;

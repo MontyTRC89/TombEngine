@@ -2,6 +2,7 @@
 #include "Game/room.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
@@ -13,6 +14,7 @@
 
 using namespace TEN::Math;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
 
@@ -154,18 +156,18 @@ int IsRoomOutside(int x, int y, int z)
 			(y > room.maxceiling && y < room.minfloor) &&
 			(z > (room.z + BLOCK(1)) && z < (room.z + (room.zSize - 1) * BLOCK(1))))
 		{
-			auto pointColl = GetCollision(x, y, z, roomNumber);
+			auto pointColl = GetPointCollision(Vector3i(x, y, z), roomNumber);
 
-			if (pointColl.Position.Floor == NO_HEIGHT || y > pointColl.Position.Floor)
+			if (pointColl.GetFloorHeight() == NO_HEIGHT || y > pointColl.GetFloorHeight())
 				return NO_ROOM;
 
-			if (y < pointColl.Position.Ceiling)
+			if (y < pointColl.GetCeilingHeight())
 				return NO_ROOM;
 
 			if (TestEnvironmentFlags(ENV_FLAG_WATER, room.flags) ||
 				TestEnvironmentFlags(ENV_FLAG_WIND, room.flags))
 			{
-				return pointColl.RoomNumber;
+				return pointColl.GetRoomNumber();
 			}
 
 			return NO_ROOM;

@@ -314,12 +314,12 @@ void RefreshCamera(short type, short* data)
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollision(x, y, z, floor->RoomNumber).BottomBlock; 
+	const auto& bottomSector = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber).GetBottomSector(); 
 
-	if (bottomBlock->TriggerIndex == -1)
+	if (bottomSector.TriggerIndex == -1)
 		return nullptr;
 
-	return &g_Level.FloorData[bottomBlock->TriggerIndex];
+	return &g_Level.FloorData[bottomSector.TriggerIndex];
 }
 
 short* GetTriggerIndex(ItemInfo* item)

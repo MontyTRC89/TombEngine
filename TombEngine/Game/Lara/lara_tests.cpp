@@ -5,6 +5,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
@@ -22,6 +23,7 @@
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -46,14 +48,14 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	int y = item->Pose.Position.y - coll->Setup.Height;
 
 	// Get frontal collision data
-	auto frontLeft  = GetCollision(item->Pose.Position.x + xl, y, item->Pose.Position.z + zl, GetRoomVector(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).RoomNumber);
-	auto frontRight = GetCollision(item->Pose.Position.x + xr, y, item->Pose.Position.z + zr, GetRoomVector(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).RoomNumber);
+	auto frontLeft  = GetPointCollision(Vector3i(item->Pose.Position.x + xl, y, item->Pose.Position.z + zl), GetRoomVector(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).RoomNumber);
+	auto frontRight = GetPointCollision(Vector3i(item->Pose.Position.x + xr, y, item->Pose.Position.z + zr), GetRoomVector(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).RoomNumber);
 
 	// If any of the frontal collision results intersects item bounds, return false, because there is material intersection.
 	// This check helps to filter out cases when Lara is formally facing corner but ledge check returns true because probe distance is fixed.
-	if (frontLeft.Position.Floor < (item->Pose.Position.y - CLICK(0.5f)) || frontRight.Position.Floor < (item->Pose.Position.y - CLICK(0.5f)))
+	if (frontLeft.GetFloorHeight() < (item->Pose.Position.y - CLICK(0.5f)) || frontRight.GetFloorHeight() < (item->Pose.Position.y - CLICK(0.5f)))
 		return false;
-	if (frontLeft.Position.Ceiling > (item->Pose.Position.y - coll->Setup.Height) || frontRight.Position.Ceiling > (item->Pose.Position.y - coll->Setup.Height))
+	if (frontLeft.GetCeilingHeight() >(item->Pose.Position.y - coll->Setup.Height) || frontRight.GetCeilingHeight() > (item->Pose.Position.y - coll->Setup.Height))
 		return false;
 
 	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xl, left, item->pos.Position.z + zl), 64, Vector4::One, RendererDebugPage::CollisionStats);
@@ -66,8 +68,8 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	int zf = phd_cos(coll->NearestLedgeAngle) * (coll->Setup.Radius * 1.2f);
 
 	// Get floor heights at both points
-	auto left = GetCollision(item->Pose.Position.x + xf + xl, y, item->Pose.Position.z + zf + zl, GetRoomVector(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).RoomNumber).Position.Floor;
-	auto right = GetCollision(item->Pose.Position.x + xf + xr, y, item->Pose.Position.z + zf + zr, GetRoomVector(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).RoomNumber).Position.Floor;
+	auto left = GetPointCollision(Vector3i(item->Pose.Position.x + xf + xl, y, item->Pose.Position.z + zf + zl), GetRoomVector(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).RoomNumber).GetFloorHeight();
+	auto right = GetPointCollision(Vector3i(item->Pose.Position.x + xf + xr, y, item->Pose.Position.z + zf + zr), GetRoomVector(item->Location, Vector3i(item->Pose.Position.x, y, item->Pose.Position.z)).RoomNumber).GetFloorHeight();
 
 	// If specified, limit vertical search zone only to nearest height
 	if (heightLimit && (abs(left - y) > CLICK(0.5f) || abs(right - y) > CLICK(0.5f)))
@@ -214,7 +216,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				z += testShift.y;
 			}
 
-			if (TestLaraNearClimbableWall(item, GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock))
+			if (TestLaraNearClimbableWall(item, &GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetBottomSector()))
 			{
 				if (!TestLaraHangOnClimbableWall(item, coll))
 					verticalShift = 0; // Ignore vertical shift if ladder is encountered next block

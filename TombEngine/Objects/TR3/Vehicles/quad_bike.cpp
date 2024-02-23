@@ -3,8 +3,9 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
@@ -22,6 +23,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -236,19 +238,19 @@ namespace TEN::Entities::Vehicles
 		int y = quadBikeItem->Pose.Position.y;
 		int z = quadBikeItem->Pose.Position.z + CLICK(2) * phd_cos(angle);
 
-		auto collResult = GetCollision(x, y, z, quadBikeItem->RoomNumber);
+		auto pointColl = GetPointCollision(Vector3i(x, y, z), quadBikeItem->RoomNumber);
 
-		if (collResult.Position.FloorSlope ||
-			collResult.Position.Floor == NO_HEIGHT)
+		if (pointColl.IsIllegalFloor() ||
+			pointColl.GetFloorHeight() == NO_HEIGHT)
 		{
 			return false;
 		}
 
-		if (abs(collResult.Position.Floor - quadBikeItem->Pose.Position.y) > CLICK(2))
+		if (abs(pointColl.GetFloorHeight() - quadBikeItem->Pose.Position.y) > CLICK(2))
 			return false;
 
-		if ((collResult.Position.Ceiling - quadBikeItem->Pose.Position.y) > -LARA_HEIGHT ||
-			(collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
+		if ((pointColl.GetCeilingHeight() - quadBikeItem->Pose.Position.y) > -LARA_HEIGHT ||
+			(pointColl.GetFloorHeight() - pointColl.GetCeilingHeight()) < LARA_HEIGHT)
 		{
 			return false;
 		}
@@ -343,7 +345,6 @@ namespace TEN::Entities::Vehicles
 
 	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3i* pos, Vector3i* old)
 	{
-		CollisionResult probe;
 		int x = pos->x / BLOCK(1);
 		int z = pos->z / BLOCK(1);
 		int oldX = old->x / BLOCK(1);
@@ -387,8 +388,8 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			probe = GetCollision(old->x, pos->y, pos->z, quadBikeItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			auto pointColl = GetPointCollision(Vector3i(old->x, pos->y, pos->z), quadBikeItem->RoomNumber);
+			if (pointColl.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
@@ -396,8 +397,8 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - shiftZ;
 			}
 
-			probe = GetCollision(pos->x, pos->y, old->z, quadBikeItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			pointColl = GetPointCollision(Vector3i(pos->x, pos->y, old->z), quadBikeItem->RoomNumber);
+			if (pointColl.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
 					x = -shiftX - 1;

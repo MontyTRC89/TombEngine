@@ -2129,7 +2129,7 @@ void AdjustStopperFlag(ItemInfo* item, int direction)
 
 	x = item->Pose.Position.x + BLOCK(1) * phd_sin(direction);
 	z = item->Pose.Position.z + BLOCK(1) * phd_cos(direction);
-	room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
+	room = &g_Level.Rooms[GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetRoomNumber()];
 
 	floor = GetSector(room, x - room->x, z - room->z);
 	floor->Stopper = !floor->Stopper;

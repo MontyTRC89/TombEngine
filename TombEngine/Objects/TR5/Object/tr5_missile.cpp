@@ -2,6 +2,7 @@
 #include "tr5_missile.h"
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
@@ -15,6 +16,7 @@
 #include "Game/effects/item_fx.h"
 #include "Math/Math.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Effects::Items;
 using namespace TEN::Math;
 
@@ -106,9 +108,9 @@ void MissileControl(short itemNumber)
 	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
 	fx->pos.Position.z += c * phd_cos(fx->pos.Orientation.y);
 
-	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+	auto probe = GetPointCollision(fx->pos.Position, fx->roomNumber);
 	
-	if (fx->pos.Position.y >= probe.Position.Floor || fx->pos.Position.y <= probe.Position.Ceiling)
+	if (fx->pos.Position.y >= probe.GetFloorHeight() || fx->pos.Position.y <= probe.GetCeilingHeight())
 	{
 		fx->pos.Position.x = x;
 		fx->pos.Position.y = y;
@@ -182,8 +184,8 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		if (probe.RoomNumber != fx->roomNumber)
-			EffectNewRoom(itemNumber, probe.RoomNumber);
+		if (probe.GetRoomNumber() != fx->roomNumber)
+			EffectNewRoom(itemNumber, probe.GetRoomNumber());
 
 		if (GlobalCounter & 1)
 		{

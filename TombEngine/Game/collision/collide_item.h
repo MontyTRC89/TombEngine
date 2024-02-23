@@ -1,11 +1,14 @@
 #pragma once
 #include "Math/Math.h"
 
+namespace TEN::Collision::PointCollision { class PointCollisionData; };
 class FloorInfo;
 struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
 struct MESH_INFO;
+
+using namespace TEN::Collision::PointCollision;
 
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
 constexpr auto ITEM_RADIUS_YMAX = BLOCK(3);
@@ -45,7 +48,7 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
-void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& pointColl);
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData& pointColl);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void ObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

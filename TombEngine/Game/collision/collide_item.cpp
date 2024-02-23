@@ -4,6 +4,8 @@
 #include "Game/animation.h"
 #include "Game/control/los.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/floordata.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -20,6 +22,8 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -413,7 +417,7 @@ bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIte
 	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
 	auto target = item->Pose.Position.ToVector3() + pos;
 
-	int height = GetCollision(target.x, target.y, target.z, laraItem->RoomNumber).Position.Floor;
+	int height = GetPointCollision(target, laraItem->RoomNumber).GetFloorHeight();
 	if ((laraItem->Pose.Position.y - height) <= CLICK(2))
 	{
 		laraItem->Pose.Position = Vector3i(target);
@@ -442,7 +446,7 @@ bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem
 	else
 	{
 		// Prevent picking up items which can result in so called "flare pickup bug"
-		int height = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber).Position.Floor;
+		int height = GetPointCollision(target.Position, laraItem->RoomNumber).GetFloorHeight();
 		if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
 			return Move3DPosTo3DPos(laraItem, laraItem->Pose, target, LARA_ALIGN_VELOCITY, ANGLE(2.0f));
 	}
@@ -898,13 +902,13 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
 	ShiftItem(&item, &coll);
 }
 
-void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& pointColl)
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData& pointColl)
 {
 	// Store offset for bridge item into shifts if it exists.
-	if (coll.LastBridgeItemNumber == pointColl.Position.Bridge &&
+	if (coll.LastBridgeItemNumber == pointColl.GetFloorBridgeItemNumber() &&
 		coll.LastBridgeItemNumber != NO_ITEM)
 	{
-		auto& bridgeItem = g_Level.Items[pointColl.Position.Bridge];
+		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
 
 		auto deltaPos = bridgeItem.Pose.Position - coll.LastBridgeItemPose.Position;
 		auto deltaOrient = bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation;
@@ -944,7 +948,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 		coll.LastBridgeItemNumber = NO_ITEM;
 	}
 
-	coll.LastBridgeItemNumber = pointColl.Position.Bridge;
+	coll.LastBridgeItemNumber = pointColl.GetFloorBridgeItemNumber();
 }
 
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
@@ -1286,39 +1290,42 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto prevPointProbe = GetCollision(x, y, z, item->RoomNumber);
-	auto pointProbe = GetCollision(item);
+	auto prevPointColl = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
+	auto pointColl = GetPointCollision(*item);
+
+	// TODO: Use floor normal directly.
+	auto floorTilt = GetSurfaceTilt(pointColl.GetFloorNormal(), true);
 
 	auto bounds = GameBoundingBox(item);
 	int radius = bounds.GetHeight();
 
 	item->Pose.Position.y += radius;
 
-	if (item->Pose.Position.y >= pointProbe.Position.Floor)
+	if (item->Pose.Position.y >= pointColl.GetFloorHeight())
 	{
 		int bs = 0;
 
-		if (pointProbe.Position.FloorSlope && prevPointProbe.Position.Floor < pointProbe.Position.Floor)
+		if (pointColl.IsIllegalFloor() && prevPointColl.GetFloorHeight() < pointColl.GetFloorHeight())
 		{
 			int yAngle = (long)((unsigned short)item->Pose.Orientation.y);
 
-			if (pointProbe.FloorTilt.x < 0)
+			if (floorTilt.x < 0)
 			{
 				if (yAngle >= ANGLE(180.0f))
 					bs = 1;
 			}
-			else if (pointProbe.FloorTilt.x > 0)
+			else if (floorTilt.x > 0)
 			{
 				if (yAngle <= ANGLE(180.0f))
 					bs = 1;
 			}
 
-			if (pointProbe.FloorTilt.y < 0)
+			if (floorTilt.y < 0)
 			{
 				if (yAngle >= ANGLE(90.0f) && yAngle <= ANGLE(270.0f))
 					bs = 1;
 			}
-			else if (pointProbe.FloorTilt.y > 0)
+			else if (floorTilt.y > 0)
 			{
 				if (yAngle <= ANGLE(90.0f) || yAngle >= ANGLE(270.0f))
 					bs = 1;
@@ -1327,7 +1334,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 		// If last position of item was also below this floor height, we've hit a wall, else we've hit a floor.
 
-		if (y > (pointProbe.Position.Floor + 32) && bs == 0 &&
+		if (y > (pointColl.GetFloorHeight() + 32) && bs == 0 &&
 			(((x / BLOCK(1)) != (item->Pose.Position.x / BLOCK(1))) ||
 				((z / BLOCK(1)) != (item->Pose.Position.z / BLOCK(1)))))
 		{
@@ -1367,14 +1374,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			item->Pose.Position.z = z;
 		}
 		// Hit a steep slope?
-		else if (pointProbe.Position.FloorSlope)
+		else if (pointColl.IsIllegalFloor())
 		{
 			// Need to know which direction the slope is.
 
 			item->Animation.Velocity.z -= (item->Animation.Velocity.z / 4);
 
 			// Hit angle = ANGLE(90.0f)
-			if (pointProbe.FloorTilt.x < 0 && ((abs(pointProbe.FloorTilt.x)) - (abs(pointProbe.FloorTilt.y)) >= 2))
+			if (floorTilt.x < 0 && ((abs(floorTilt.x)) - (abs(floorTilt.y)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(180.0f))
 				{
@@ -1386,7 +1393,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z -= pointProbe.FloorTilt.x * 2;
+						item->Animation.Velocity.z -= floorTilt.x * 2;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(90.0f) && (unsigned short)item->Pose.Orientation.y < ANGLE(270.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1408,7 +1415,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(270.0f)
-			else if (pointProbe.FloorTilt.x > 0 && ((abs(pointProbe.FloorTilt.x)) - (abs(pointProbe.FloorTilt.y)) >= 2))
+			else if (floorTilt.x > 0 && ((abs(floorTilt.x)) - (abs(floorTilt.y)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) < ANGLE(180.0f))
 				{
@@ -1420,7 +1427,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += pointProbe.FloorTilt.x * 2;
+						item->Animation.Velocity.z += floorTilt.x * 2;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(270.0f) || (unsigned short)item->Pose.Orientation.y < ANGLE(90.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1442,7 +1449,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = 0
-			else if (pointProbe.FloorTilt.y < 0 && ((abs(pointProbe.FloorTilt.y)) - (abs(pointProbe.FloorTilt.x)) >= 2))
+			else if (floorTilt.y < 0 && ((abs(floorTilt.y)) - (abs(floorTilt.x)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(90.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(270.0f))
 				{
@@ -1454,7 +1461,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z -= pointProbe.FloorTilt.y * 2;
+						item->Animation.Velocity.z -= floorTilt.y * 2;
 
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(180.0f))
 						{
@@ -1477,7 +1484,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(180.0f)
-			else if (pointProbe.FloorTilt.y > 0 && ((abs(pointProbe.FloorTilt.y)) - (abs(pointProbe.FloorTilt.x)) >= 2))
+			else if (floorTilt.y > 0 && ((abs(floorTilt.y)) - (abs(floorTilt.x)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(270.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(90.0f))
 				{
@@ -1489,7 +1496,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += pointProbe.FloorTilt.y * 2;
+						item->Animation.Velocity.z += floorTilt.y * 2;
 
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(180.0f))
 						{
@@ -1511,7 +1518,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->Animation.Velocity.y = 0;
 				}
 			}
-			else if (pointProbe.FloorTilt.x < 0 && pointProbe.FloorTilt.y < 0)	// Hit angle = 0x2000
+			else if (floorTilt.x < 0 && floorTilt.y < 0)	// Hit angle = 0x2000
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(135.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(315.0f))
 				{
@@ -1523,7 +1530,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += -pointProbe.FloorTilt.x + -pointProbe.FloorTilt.y;
+						item->Animation.Velocity.z += -floorTilt.x + -floorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(45.0f) && (unsigned short)item->Pose.Orientation.y < ANGLE(225.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1545,7 +1552,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(135.0f)
-			else if (pointProbe.FloorTilt.x < 0 && pointProbe.FloorTilt.y > 0)
+			else if (floorTilt.x < 0 && floorTilt.y > 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(225.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(45.0f))
 				{
@@ -1557,7 +1564,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += (-pointProbe.FloorTilt.x) + pointProbe.FloorTilt.y;
+						item->Animation.Velocity.z += (-floorTilt.x) + floorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(315.0f) && (unsigned short)item->Pose.Orientation.y > ANGLE(135.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1579,7 +1586,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(225.5f)
-			else if (pointProbe.FloorTilt.x > 0 && pointProbe.FloorTilt.y > 0)
+			else if (floorTilt.x > 0 && floorTilt.y > 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(315.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(135.0f))
 				{
@@ -1591,7 +1598,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += pointProbe.FloorTilt.x + pointProbe.FloorTilt.y;
+						item->Animation.Velocity.z += floorTilt.x + floorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(45.0f) || (unsigned short)item->Pose.Orientation.y > ANGLE(225.5f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1613,7 +1620,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(315.0f)
-			else if (pointProbe.FloorTilt.x > 0 && pointProbe.FloorTilt.y < 0)
+			else if (floorTilt.x > 0 && floorTilt.y < 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(45.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(225.5f))
 				{
@@ -1625,7 +1632,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += pointProbe.FloorTilt.x + (-pointProbe.FloorTilt.y);
+						item->Animation.Velocity.z += floorTilt.x + (-floorTilt.y);
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(135.0f) || (unsigned short)item->Pose.Orientation.y > ANGLE(315.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1686,7 +1693,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 
-			item->Pose.Position.y = pointProbe.Position.Floor;
+			item->Pose.Position.y = pointColl.GetFloorHeight();
 		}
 	}
 	// Check for on top of object.
@@ -1694,8 +1701,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		if (yv >= 0)
 		{
-			prevPointProbe = GetCollision(item->Pose.Position.x, y, item->Pose.Position.z, item->RoomNumber);
-			pointProbe = GetCollision(item);
+			prevPointColl = GetPointCollision(Vector3i(item->Pose.Position.x, y, item->Pose.Position.z), item->RoomNumber);
+			pointColl = GetPointCollision(*item);
 
 			// Bounce off floor.
 
@@ -1703,7 +1710,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			// was always set to 0 by GetHeight() function which was called before the check.
 			// Possibly a mistake or unfinished feature by Core? -- Lwmte, 27.08.21
 
-			if (item->Pose.Position.y >= prevPointProbe.Position.Floor)
+			if (item->Pose.Position.y >= prevPointColl.GetFloorHeight())
 			{
 				// Hit the floor; bounce and slow down.
 				if (item->Animation.Velocity.y > 0)
@@ -1737,17 +1744,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					}
 				}
 
-				item->Pose.Position.y = prevPointProbe.Position.Floor;
+				item->Pose.Position.y = prevPointColl.GetFloorHeight();
 			}
 		}
 		// else
 		{
 			// Bounce off ceiling.
-			pointProbe = GetCollision(item);
+			pointColl = GetPointCollision(*item);
 
-			if (item->Pose.Position.y < pointProbe.Position.Ceiling)
+			if (item->Pose.Position.y < pointColl.GetCeilingHeight())
 			{
-				if (y < pointProbe.Position.Ceiling &&
+				if (y < pointColl.GetCeilingHeight() &&
 					(((x / BLOCK(1)) != (item->Pose.Position.x / BLOCK(1))) ||
 						((z / BLOCK(1)) != (item->Pose.Position.z / BLOCK(1)))))
 				{
@@ -1776,7 +1783,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					item->Pose.Position.z = z;
 				}
 				else
-					item->Pose.Position.y = pointProbe.Position.Ceiling;
+					item->Pose.Position.y = pointColl.GetCeilingHeight();
 
 				if (item->Animation.Velocity.y < 0)
 					item->Animation.Velocity.y = -item->Animation.Velocity.y;
@@ -1784,14 +1791,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		}
 	}
 
-	pointProbe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+	pointColl = GetPointCollision(*item);
 
-	if (pointProbe.RoomNumber != item->RoomNumber)
+	if (pointColl.GetRoomNumber() != item->RoomNumber)
 	{
-		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointProbe.RoomNumber))
+		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 			Splash(item);
 
-		ItemNewRoom(itemNumber, pointProbe.RoomNumber);
+		ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 	}
 
 	item->Pose.Position.y -= radius;

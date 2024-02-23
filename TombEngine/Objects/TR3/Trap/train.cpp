@@ -6,6 +6,7 @@
 #include "Game/control/control.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
@@ -15,6 +16,8 @@
 #include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::PointCollision;
 
 constexpr auto TRAIN_VEL = 260;
 
@@ -28,12 +31,11 @@ long TrainTestHeight(ItemInfo* item, long x, long z, short* roomNumber)
 	auto pos = Vector3i(
 		round(item->Pose.Position.x + ((z * sinY) + (x * cosY))),
 		round(item->Pose.Position.y - ((z * sinX) + (x * sinZ))),
-		round(item->Pose.Position.z + ((z * cosY) - (x * sinY)))
-	);
-	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
+		round(item->Pose.Position.z + ((z * cosY) - (x * sinY))));
+	auto pointColl = GetPointCollision(pos, item->RoomNumber);
 
-	*roomNumber = probe.RoomNumber;
-	return probe.Position.Floor;
+	*roomNumber = pointColl.GetRoomNumber();
+	return pointColl.GetFloorHeight();
 }
 
 void TrainControl(short itemNumber)
@@ -84,7 +86,7 @@ void TrainControl(short itemNumber)
 			ForcedFixedCamera.x = item->Pose.Position.x + BLOCK(8) * sinY;
 			ForcedFixedCamera.z = item->Pose.Position.z + BLOCK(8) * cosY;
 
-			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
+			ForcedFixedCamera.y = GetPointCollision(Vector3i(ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), ForcedFixedCamera.z), item->RoomNumber).GetFloorHeight();
 
 			ForcedFixedCamera.RoomNumber = roomNumber;
 			UseForcedFixedCamera = 1;

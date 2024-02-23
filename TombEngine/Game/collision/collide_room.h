@@ -43,13 +43,13 @@ enum class CornerType
 
 struct CollisionPosition
 {
-	int Floor;
-	int Ceiling;
-	int Bridge;
-	float SplitAngle;
-	bool FloorSlope;
-	bool CeilingSlope;
-	bool DiagonalStep;
+	int	  Floor		   = 0;
+	int	  Ceiling	   = 0;
+	int	  Bridge	   = 0;
+	float SplitAngle   = 0.0f;
+	bool  FloorSlope   = false;
+	bool  CeilingSlope = false;
+	bool  DiagonalStep = false;
 
 	bool HasDiagonalSplit()		   { return ((SplitAngle == (45.0f * RADIAN)) || (SplitAngle == (135.0f * RADIAN))); }
 	bool HasFlippedDiagonalSplit() { return (HasDiagonalSplit() && (SplitAngle != (45.0f * RADIAN))); }
@@ -138,10 +138,9 @@ struct CollisionInfo
 // NOTE: All overloads deprecated. Use GetPointCollision().
 CollisionResult GetCollision(const ItemInfo* item);
 CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 
-void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom = false);
 int	  GetQuadrant(short angle);
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);
 
@@ -165,8 +164,9 @@ void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
 void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 0.75f, short constraintAngle = ANGLE(70.0f));
 
+// TODO: Deprecated.
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
-bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, const Vector3i& pos, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, const ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);

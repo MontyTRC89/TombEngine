@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
@@ -21,6 +22,7 @@
 #include "Math/Math.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -773,8 +775,8 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			auto probe = GetCollision(old->x, pos->y, pos->z, skidooItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			auto probe = GetPointCollision(Vector3i(old->x, pos->y, pos->z), skidooItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
@@ -782,8 +784,8 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - shiftZ;
 			}
 
-			probe = GetCollision(pos->x, pos->y, old->z, skidooItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			probe = GetPointCollision(Vector3i(pos->x, pos->y, old->z), skidooItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
 					x = -shiftX - 1;

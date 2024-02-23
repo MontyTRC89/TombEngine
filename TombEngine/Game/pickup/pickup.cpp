@@ -5,6 +5,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/effects/debris.h"
 #include "Game/Gui.h"
 #include "Game/Hud/Hud.h"
@@ -30,6 +31,7 @@
 #include "Specific/level.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 using namespace TEN::Input;
@@ -849,7 +851,7 @@ void DropPickups(ItemInfo* item)
 	// Also collect objects which are around.
 	bool collidedWithObjects = GetCollidedObjects(item, extents.Length(), true, CollidedItems, CollidedMeshes, true);
 
-	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90); // Randomize start corner.
+	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90.0f); // Randomize start corner.
 
 	// Iterate through 4 corners and find best-fitting position, which is not inside a wall, not on a slope
 	// and also does not significantly differ in height to an object centerpoint height.
@@ -858,31 +860,31 @@ void DropPickups(ItemInfo* item)
 	for (int corner = 0; corner < 4; corner++)
 	{
 		auto angle = item->Pose.Orientation;
-		angle.y += startAngle + corner * ANGLE(90);
+		angle.y += startAngle + corner * ANGLE(90.0f);
 
 		// At first, do an inside-wall test at an extended extent point to make sure player can correctly align.
 		auto candidatePos = Geometry::TranslatePoint(origin, angle, extents * 1.2f);
 		candidatePos.y = yPos;
-		auto collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+		auto collPoint = GetPointCollision(candidatePos, item->RoomNumber);
 
 		// If position is inside a wall or on a slope, don't use it.
-		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsIllegalFloor())
 			continue;
 
 		// Remember floor position for a tested point.
-		int candidateYPos = collPoint.Position.Floor;
+		int candidateYPos = collPoint.GetFloorHeight();
 
 		// Now repeat the same test for original extent point to make sure it's also valid.
 		candidatePos = Geometry::TranslatePoint(origin, angle, extents);
 		candidatePos.y = yPos;
-		collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+		collPoint = GetPointCollision(candidatePos, item->RoomNumber);
 
 		// If position is inside a wall or on a slope, don't use it.
-		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsIllegalFloor())
 			continue;
 
 		// If position is not in the same room, don't use it.
-		if (collPoint.RoomNumber != item->RoomNumber)
+		if (collPoint.GetRoomNumber() != item->RoomNumber)
 			continue;
 
 		// Setup a dummy sphere with 1-click diameter for item and static mesh collision tests.
@@ -923,16 +925,16 @@ void DropPickups(ItemInfo* item)
 
 		// Finally, do height difference tests. If difference is more than one and a half click,
 		// most likely it's hanging in the air or submerged, so bypass the corner.
-		if (abs(collPoint.Position.Floor - yPos) > CLICK(1.5f))
+		if (abs(collPoint.GetFloorHeight() - yPos) > CLICK(1.5f))
 			continue;
 
 		// If height difference between extent points is more than one click, it means it landed
 		// on a step, so let's search for other position.
-		if (abs(collPoint.Position.Floor - candidateYPos) >= CLICK(1.0f))
+		if (abs(collPoint.GetFloorHeight() - candidateYPos) >= CLICK(1.0f))
 			continue;
 
 		origin = candidatePos;
-		origin.y = collPoint.Position.Floor;
+		origin.y = collPoint.GetFloorHeight();
 		break;
 	}
 

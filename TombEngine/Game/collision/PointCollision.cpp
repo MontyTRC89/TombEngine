@@ -51,13 +51,13 @@ namespace TEN::Collision::PointCollision
 
 		// Set bottom sector pointer.
 		auto* bottomSectorPtr = &GetSector();
-		auto roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(_position);
+		auto roomNumberBelow = bottomSectorPtr->GetNextRoomNumber(_position, true);
 		while (roomNumberBelow.has_value())
 		{
 			auto& room = g_Level.Rooms[roomNumberBelow.value_or(bottomSectorPtr->RoomNumber)];
 			bottomSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
 
-			roomNumberBelow = bottomSectorPtr->GetRoomNumberBelow(_position);
+			roomNumberBelow = bottomSectorPtr->GetNextRoomNumber(_position, true);
 		}
 		_bottomSectorPtr = bottomSectorPtr;
 
@@ -71,13 +71,13 @@ namespace TEN::Collision::PointCollision
 
 		// Set top sector pointer.
 		auto* topSectorPtr = &GetSector();
-		auto roomNumberAbove = topSectorPtr->GetRoomNumberAbove(_position);
+		auto roomNumberAbove = topSectorPtr->GetNextRoomNumber(_position, false);
 		while (roomNumberAbove.has_value())
 		{
 			auto& room = g_Level.Rooms[roomNumberAbove.value_or(topSectorPtr->RoomNumber)];
 			topSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
 
-			roomNumberAbove = topSectorPtr->GetRoomNumberAbove(_position);
+			roomNumberAbove = topSectorPtr->GetNextRoomNumber(_position, false);
 		}
 		_topSectorPtr = topSectorPtr;
 
@@ -308,7 +308,7 @@ namespace TEN::Collision::PointCollision
 	static int GetProbeRoomNumber(const Vector3i& pos, const RoomVector& location, const Vector3i& probePos)
 	{
 		// Conduct L-shaped room traversal.
-		short probeRoomNumber = GetRoom(location, Vector3i(pos.x, probePos.y, pos.z)).RoomNumber;
+		short probeRoomNumber = GetRoomVector(location, Vector3i(pos.x, probePos.y, pos.z)).RoomNumber;
 		GetFloor(probePos.x, probePos.y, probePos.z, &probeRoomNumber);
 
 		return probeRoomNumber;

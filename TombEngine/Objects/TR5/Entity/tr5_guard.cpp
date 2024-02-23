@@ -1149,15 +1149,15 @@ namespace TEN::Entities::Creatures::TR5
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 	
 		x += dx;
 		z += dz;
-		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height3 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 	
 		int height = 0;
 		bool canJump1Sector = true;

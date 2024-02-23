@@ -60,12 +60,12 @@ void ControlMissile(short fxNumber)
 
 	fx.pos.Translate(fx.pos.Orientation, fx.speed);
 
-	auto pointColl = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
+	auto pointColl = GetPointCollision(fx.pos.Position, fx.roomNumber);
 	auto hasHitPlayer = ItemNearLara(fx.pos.Position, hitRadius);
 
 	// Check whether something was hit.
-	if (fx.pos.Position.y >= pointColl.Position.Floor ||
-		fx.pos.Position.y <= pointColl.Position.Ceiling ||
+	if (fx.pos.Position.y >= pointColl.GetFloorHeight() ||
+		fx.pos.Position.y <= pointColl.GetCeilingHeight() ||
 		hasHitPlayer)
 	{
 		if (fx.objectNumber == ID_KNIFETHROWER_KNIFE ||
@@ -113,8 +113,8 @@ void ControlMissile(short fxNumber)
 		KillEffect(fxNumber);
 	}
 
-	if (pointColl.RoomNumber != fx.roomNumber)
-		EffectNewRoom(fxNumber, pointColl.RoomNumber);
+	if (pointColl.GetRoomNumber() != fx.roomNumber)
+		EffectNewRoom(fxNumber, pointColl.GetRoomNumber());
 
 	if (fx.objectNumber == ID_KNIFETHROWER_KNIFE)
 		fx.pos.Orientation.z += ANGLE(30.0f); // Update knife rotation over time.

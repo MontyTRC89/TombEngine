@@ -5,6 +5,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
@@ -23,6 +24,7 @@
 #include "Specific/level.h"
 
 using std::vector;
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
@@ -259,7 +261,7 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			int floorHeight = GetCollision(old->x, pos->y, pos->z, motorbikeItem->RoomNumber).Position.Floor;
+			int floorHeight = GetPointCollision(Vector3i(old->x, pos->y, pos->z), motorbikeItem->RoomNumber).GetFloorHeight();
 			if (floorHeight < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
@@ -268,7 +270,7 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - shiftZ;
 			}
 
-			floorHeight = GetCollision(pos->x, pos->y, old->z, motorbikeItem->RoomNumber).Position.Floor;
+			floorHeight = GetPointCollision(Vector3i(pos->x, pos->y, old->z), motorbikeItem->RoomNumber).GetFloorHeight();
 			if (floorHeight < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
