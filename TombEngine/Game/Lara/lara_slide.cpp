@@ -38,7 +38,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (CanSlide(*item, *coll))
 	{
-		/*short direction = GetLaraSlideDirection(item, coll);
+		/*short direction = GetPlayerSlideHeadingAngle(item, coll);
 
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
@@ -145,7 +145,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (CanSlide(*item, *coll))
 	{
-		/*short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
+		/*short direction = GetPlayerSlideHeadingAngle(item, coll) + ANGLE(180.0f);
 
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
