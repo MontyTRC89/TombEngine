@@ -125,15 +125,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	auto pointColl = GetPointCollision(*item, -Vector3::UnitY, coll->Setup.Height / 2);
-
-	auto origin = item->Pose.Position + Vector3i(0, -BLOCK(1), 0);
-	g_Renderer.AddDebugLine(origin.ToVector3(), Geometry::TranslatePoint(origin, pointColl.GetFloorNormal(), BLOCK(0.5f)).ToVector3(), Vector4(0, 1, 0, 1));
-	g_Renderer.AddDebugLine(origin.ToVector3(), Geometry::TranslatePoint(origin, pointColl.GetCeilingNormal(), BLOCK(0.5f)).ToVector3(), Vector4(1, 0, 0, 1));
-
-	g_Renderer.PrintDebugMessage("Floor bridge: %d", pointColl.GetFloorBridgeItemNumber());
-	g_Renderer.PrintDebugMessage("Ceiling bridge: %d", pointColl.GetCeilingBridgeItemNumber());
-
 	//----------
 
 	// Alert nearby creatures.
