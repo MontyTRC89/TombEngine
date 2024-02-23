@@ -225,7 +225,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.MoveAngle = GetPlayerMoveAngle(*item);
+	player.Control.MoveAngle = GetPlayerHeadingAngle(*item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
@@ -384,7 +384,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.MoveAngle = GetPlayerMoveAngle(*item);
+	player.Control.MoveAngle = GetPlayerHeadingAngle(*item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -488,7 +488,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			// TODO: Bugged.
-			short relMoveAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerMoveAngle(*item)));
+			short relMoveAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerHeadingAngle(*item)));
 			if (!TestPlayerCombatMode(*item)/* && relMoveAngle >= ANGLE(45.0f)*/)
 			{
 				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
@@ -761,7 +761,7 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
-	player.Control.MoveAngle = (item->Animation.Velocity.z >= 0) ? GetPlayerMoveAngle(*item) : (GetPlayerMoveAngle(*item) + ANGLE(180.0f));
+	player.Control.MoveAngle = (item->Animation.Velocity.z >= 0) ? GetPlayerHeadingAngle(*item) : (GetPlayerHeadingAngle(*item) + ANGLE(180.0f));
 	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -1398,6 +1398,8 @@ void lara_col_turn_fast(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_step_right()
 void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto REL_HEADING_ANGLE = ANGLE(90.0f);
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
@@ -1414,7 +1416,11 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsUsingEnhancedTankControls())
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, REL_HEADING_ANGLE);
+	}
+	else if (IsUsingEnhancedTankControls())
 	{
 		// Walk action locks orientation.
 		if (IsHeld(In::Walk))
@@ -1497,6 +1503,8 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_step_left()
 void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto REL_HEADING_ANGLE = ANGLE(-90.0f);
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
@@ -1513,7 +1521,11 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsUsingEnhancedTankControls())
+	if (IsUsingModernControls())
+	{
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, REL_HEADING_ANGLE);
+	}
+	else if (IsUsingEnhancedTankControls())
 	{
 		// Walk action locks orientation.
 		if (IsHeld(In::Walk))

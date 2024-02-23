@@ -744,29 +744,16 @@ void HandlePlayerTurnX(ItemInfo& item, float alpha)
 	}
 }
 
-void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool ignore180Turn*/)
+void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing, short relHeadingAngle)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
 	auto& player = GetLaraInfo(item);
-	
-	/*if (ignore180Turn)
-	{
-		if (HasStateDispatch(&item, LS_WALK_FORWARD_TURN_180))
-		{
-			short relMoveAngle = GetPlayerRelMoveAngle(item);
-			if (abs(relMoveAngle) > BASE_ANGLE)
-			{
-				return;
-				item.Pose.Orientation.y += ANGLE(180.0f);
-			}
-		}
-	}*/
 
-	short moveAngle = GetPlayerMoveAngle(item);
-	auto targetOrient = EulerAngles(item.Pose.Orientation.x, moveAngle, item.Pose.Orientation.z);
+	short headingAngle = (isStrafing ? Camera.actualAngle : GetPlayerHeadingAngle(item));
+	auto targetOrient = EulerAngles(item.Pose.Orientation.x, headingAngle + relHeadingAngle, item.Pose.Orientation.z);
 
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, moveAngle);
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, headingAngle);
 	if (abs(deltaAngle) <= BASE_ANGLE)
 	{
 		item.Pose.Orientation.Lerp(targetOrient, alpha);
@@ -776,7 +763,7 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool ignore180Turn*/)
 		item.Pose.Orientation.InterpolateConstant(targetOrient, BASE_ANGLE * alpha);
 	}
 
-	player.Control.MoveAngleTarget = moveAngle;
+	player.Control.MoveAngleTarget = headingAngle;
 }
 
 // NOTE: Modern control version.
@@ -787,7 +774,7 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angle.
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
 	int sign = std::copysign(1, deltaAngle);
 
 	// Calculate target lean orientation.
@@ -828,7 +815,7 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angle.
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
 	int sign = std::copysign(1, deltaAngle);
 
 	// Calculate target flex rotation.
@@ -852,7 +839,7 @@ void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angle.
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
 	int sign = std::copysign(1, deltaAngle);
 
 	// Calculate target flex rotation.
@@ -903,7 +890,7 @@ void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha)
 
 	// Calculate delta angles.
 	short deltaAngleX = Geometry::GetShortestAngle(item.Pose.Orientation.x, Camera.actualElevation);
-	short deltaAngleZ = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+	short deltaAngleZ = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
 	int signX = std::copysign(1, deltaAngleX);
 	int signZ = std::copysign(1, deltaAngleZ);
 
@@ -1597,7 +1584,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 	return JumpDirection::None;
 }
 
-short GetPlayerMoveAngle(const ItemInfo& item)
+short GetPlayerHeadingAngle(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
@@ -1619,7 +1606,7 @@ short GetPlayerMoveAngle(const ItemInfo& item)
 
 short GetPlayerRelMoveAngle(const ItemInfo& item)
 {
-	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerMoveAngle(item));
+	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
 }
 
 static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)

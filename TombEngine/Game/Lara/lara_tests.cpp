@@ -100,7 +100,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 {
-	return (abs(Geometry::GetShortestAngle(coll->NearestLedgeAngle, IsUsingModernControls() ? GetPlayerMoveAngle(*item) : item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+	return (abs(Geometry::GetShortestAngle(coll->NearestLedgeAngle, IsUsingModernControls() ? GetPlayerHeadingAngle(*item) : item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)

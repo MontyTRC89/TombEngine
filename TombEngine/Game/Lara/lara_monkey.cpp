@@ -259,7 +259,7 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.IsMonkeySwinging = true;
-	player.Control.MoveAngle = GetPlayerMoveAngle(*item);
+	player.Control.MoveAngle = GetPlayerHeadingAngle(*item);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = MONKEY_STEPUP_HEIGHT;

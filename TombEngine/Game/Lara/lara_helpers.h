@@ -31,7 +31,7 @@ bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerTurnX(ItemInfo& item, float alpha);
-void HandlePlayerTurnY(ItemInfo& item, float alpha/*, bool setTurn180 = false*/);
+void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing = false, short relHeadingAngle = ANGLE(0.0f));
 void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha);
 void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerTurnFlex(ItemInfo& item, float alpha);
@@ -59,7 +59,7 @@ LaraInfo*& GetLaraInfo(ItemInfo* item);
 JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll);
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item);
-short GetPlayerMoveAngle(const ItemInfo& item);
+short GetPlayerHeadingAngle(const ItemInfo& item);
 short GetPlayerRelMoveAngle(const ItemInfo& item);
 short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 

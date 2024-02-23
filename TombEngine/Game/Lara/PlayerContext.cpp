@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/PlayerContext.h"
 
+#include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -265,7 +266,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			GetPlayerMoveAngle(item),
+			GetPlayerHeadingAngle(item),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by run forward state.
 			false, true, false
 		};
@@ -289,7 +290,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			GetPlayerMoveAngle(item),
+			GetPlayerHeadingAngle(item),
 			STEPUP_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by walk forward state.
 		};
 
@@ -318,7 +319,7 @@ namespace TEN::Entities::Player
 		{
 			setup = GroundMovementSetupData
 			{
-				short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+				short((IsUsingModernControls() ? Camera.actualAngle : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 				-MAX_HEIGHT, -(int)CLICK(1.25f), // NOTE: Upper bound defined by sidestep left/right states.
 				false, false, false
 			};
@@ -328,7 +329,7 @@ namespace TEN::Entities::Player
 		{
 			setup = GroundMovementSetupData
 			{
-				short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+				short((IsUsingModernControls() ? Camera.actualAngle : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 				(int)CLICK(0.8f), -(int)CLICK(0.8f) // NOTE: Bounds defined by sidestep left/right states.
 			};
 		}
@@ -356,7 +357,7 @@ namespace TEN::Entities::Player
 
 		auto setup = GroundMovementSetupData
 		{
-			GetPlayerMoveAngle(item),
+			GetPlayerHeadingAngle(item),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by wade forward state.
 			false, false, false
 		};
@@ -884,7 +885,7 @@ namespace TEN::Entities::Player
 
 		auto setup = JumpSetupData
 		{
-			IsUsingModernControls() ? GetPlayerMoveAngle(item) : short(item.Pose.Orientation.y + relHeadingAngle),
+			IsUsingModernControls() ? GetPlayerHeadingAngle(item) : short(item.Pose.Orientation.y + relHeadingAngle),
 			CLICK(0.85f)
 		};
 

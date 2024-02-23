@@ -88,7 +88,7 @@ namespace TEN::Entities::Player
 		}
 		else
 		{
-			player.Control.MoveAngle = GetPlayerMoveAngle(*item);
+			player.Control.MoveAngle = GetPlayerHeadingAngle(*item);
 			coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 		}
 
