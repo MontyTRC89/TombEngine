@@ -8,6 +8,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Flow/GameStatuses.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
@@ -123,41 +124,50 @@ have an ID of 0, the second an ID of 1, and so on.
 	tableFlow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
 
 /***
-Finishes the current level, with optional level index provided. If level index
-is not provided or is zero, jumps to next level. If level index is more than
-level count, jumps to title.
+Finishes the current level, with optional level index and start position index provided.
+If level index is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title. If LARA\_START\_POS objects are present in level, player will be
+teleported to such object with OCB similar to provided second argument.
 @function EndLevel
 @int[opt] index level index (default 0)
+@int[opt] startPos player start position (default 0)
 */
 	tableFlow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
 
-	/***
-	Save the game to a savegame slot.
-	@function SaveGame
-	@tparam int slotID ID of the savegame slot to save to.
-	*/
+/***
+Get current game status, such as normal game loop, exiting to title, etc.
+@function GetGameStatus
+@treturn Flow.GameStatus the current game status
+*/
+	tableFlow.set_function(ScriptReserved_GetGameStatus, &FlowHandler::GetGameStatus, this);
+
+/***
+Save the game to a savegame slot.
+@function SaveGame
+@tparam int slotID ID of the savegame slot to save to.
+*/
 	tableFlow.set_function(ScriptReserved_SaveGame, &FlowHandler::SaveGame, this);
 
-	/***
-	Load the game from a savegame slot.
-	@function LoadGame
-	@tparam int slotID ID of the savegame slot to load from.
-	*/
+/***
+Load the game from a savegame slot.
+@function LoadGame
+@tparam int slotID ID of the savegame slot to load from.
+*/
 	tableFlow.set_function(ScriptReserved_LoadGame, &FlowHandler::LoadGame, this);
 
-	/***
-	Delete a savegame.
-	@function DeleteSaveGame
-	@tparam int slotID ID of the savegame slot to clear.
-	*/
+/***
+Delete a savegame.
+@function DeleteSaveGame
+@tparam int slotID ID of the savegame slot to clear.
+*/
 	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
 
-	/***
-	Check if a savegame exists.
-	@function DoesSaveGameExist
-	@tparam int slotID ID of the savegame slot to check.
-	@treturn bool true if the savegame exists, false if not.
-	*/
+/***
+Check if a savegame exists.
+@function DoesSaveGameExist
+@tparam int slotID ID of the savegame slot to check.
+@treturn bool true if the savegame exists, false if not.
+*/
 	tableFlow.set_function(ScriptReserved_DoesSaveGameExist, &FlowHandler::DoesSaveGameExist, this);
 
 /***
@@ -253,6 +263,7 @@ Specify which translations in the strings table correspond to which languages.
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
 }
 
 FlowHandler::~FlowHandler()
@@ -343,7 +354,7 @@ char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
 	{
-		return "String not found.";
+		return id;
 	}
 	else
 	{
@@ -421,10 +432,16 @@ int FlowHandler::GetLevelNumber(const std::string& fileName)
 	return -1;
 }
 
-void FlowHandler::EndLevel(std::optional<int> nextLevel)
+void FlowHandler::EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
 	NextLevel = index;
+	RequiredStartPos = startPosIndex.has_value() ? startPosIndex.value() : 0;
+}
+
+GameStatus FlowHandler::GetGameStatus()
+{
+	return this->LastGameStatus;
 }
 
 void FlowHandler::FlipMap(int flipmap)
@@ -635,6 +652,7 @@ bool FlowHandler::DoFlow()
 
 		case GameStatus::NewGame:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
+			RequiredStartPos = 0;
 			SelectedLevelForNewGame = 0;
 			InitializeGame = true;
 			break;

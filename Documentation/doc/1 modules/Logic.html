@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.2 Lua API</title>
+    <title>TombEngine 1.3 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -75,8 +75,10 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -84,6 +86,7 @@
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
   <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
@@ -106,16 +109,24 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#AddCallback">AddCallback(CallbackPoint, func)</a></td>
+	<td class="name" ><a href="#AddCallback">AddCallback(point, func)</a></td>
 	<td class="summary">Register a function as a callback.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#RemoveCallback">RemoveCallback(CallbackPoint, LevelFunc)</a></td>
+	<td class="name" ><a href="#RemoveCallback">RemoveCallback(point, func)</a></td>
 	<td class="summary">Deregister a function as a callback.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#HandleEvent">HandleEvent(string, EventType, Moveable)</a></td>
-	<td class="summary">Attempt to find an event set and exectute a particular event from it.</td>
+	<td class="name" ><a href="#HandleEvent">HandleEvent(name, type, activator)</a></td>
+	<td class="summary">Attempt to find an event set and execute a particular event from it.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#EnableEvent">EnableEvent(name, type)</a></td>
+	<td class="summary">Attempt to find an event set and enable specified event in it.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#DisableEvent">DisableEvent(name, type)</a></td>
+	<td class="summary">Attempt to find an event set and disable specified event in it.</td>
 	</tr>
 </table>
 <h2><a href="#Special_objects">Special objects </a></h2>
@@ -150,7 +161,7 @@
     <dl class="function">
     <dt>
     <a name = "AddCallback"></a>
-    <strong>AddCallback(CallbackPoint, func)</strong>
+    <strong>AddCallback(point, func)</strong>
     </dt>
     <dd>
     Register a function as a callback.
@@ -159,7 +170,7 @@
 stuff during level start/load/end/save/control phase, but don't want the level
 designer to add calls to <code>OnStart</code>, <code>OnLoad</code>, etc. in their level script.</p>
 
-<p>Possible values for CallbackPoint:</p>
+<p>Possible values for <code>point</code>:</p>
         <pre class="example"><span class="comment">-- These take functions which accept no arguments
 </span>PRESTART <span class="comment">-- will be called immediately before OnStart
 </span>POSTSTART <span class="comment">-- will be called immediately after OnStart
@@ -175,23 +186,23 @@ PRELOAD <span class="comment">-- will be called immediately before OnLoad
 </span>POSTEND <span class="comment">-- will be called immediately after OnEnd
 </span>
 <span class="comment">-- These take functions which accepts a deltaTime argument
-</span>PRECONTROLPHASE <span class="comment">-- will be called immediately before OnControlPhase
-</span>POSTCONTROLPHASE <span class="comment">-- will be called immediately after OnControlPhase
+</span>PRELOOP <span class="comment">-- will be called in the beginning of game loop
+</span>POSTLOOP <span class="comment">-- will be called at the end of game loop
 </span></pre>
 		<p>The order in which two functions with the same CallbackPoint are called is undefined.
-i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRECONTROLPHASE</code>, both will be called before <code>OnControlPhase</code>, but there is no guarantee that <code>MyFunc</code> will be called before <code>MyFunc2</code>, or vice-versa.</p>
+i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRELOOP</code>, both will be called in the beginning of game loop, but there is no guarantee that <code>MyFunc</code> will be called before <code>MyFunc2</code>, or vice-versa.</p>
 
 <p>Any returned value will be discarded.</p>
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">CallbackPoint</span>
-            <span class="types"><span class="type">point</span></span>
+        <li><span class="parameter">point</span>
+            <span class="types"><span class="type">CallbackPoint</span></span>
          When should the callback be called?
         </li>
         <li><span class="parameter">func</span>
-            <span class="types"><span class="type">function</span></span>
+            <span class="types"><span class="type">LevelFunc</span></span>
          The function to be called (must be in the <a href="../1 modules/Logic.html#LevelFuncs">LevelFuncs</a> hierarchy). Will receive, as an argument, the time in seconds since the last frame.
         </li>
     </ul>
@@ -202,13 +213,13 @@ i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRE
     <h3>Usage:</h3>
     <ul>
         <pre class="example">LevelFuncs.MyFunc = <span class="keyword">function</span>(dt) <span class="global">print</span>(dt) <span class="keyword">end</span>
-TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)</pre>
+TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.MyFunc)</pre>
     </ul>
 
 </dd>
     <dt>
     <a name = "RemoveCallback"></a>
-    <strong>RemoveCallback(CallbackPoint, LevelFunc)</strong>
+    <strong>RemoveCallback(point, func)</strong>
     </dt>
     <dd>
     Deregister a function as a callback.
@@ -218,13 +229,13 @@ Will have no effect if the function was not registered as a callback
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">CallbackPoint</span>
-            <span class="types"><span class="type">point</span></span>
+        <li><span class="parameter">point</span>
+            <span class="types"><span class="type">CallbackPoint</span></span>
          The callback point the function was registered with. See <a href="../1 modules/Logic.html#AddCallback">AddCallback</a>
         </li>
-        <li><span class="parameter">LevelFunc</span>
-            <span class="types"><span class="type">func</span></span>
-         the function to remove; must be in the LevelFuncs hierarchy.
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">LevelFunc</span></span>
+         The function to remove; must be in the LevelFuncs hierarchy.
         </li>
     </ul>
 
@@ -233,32 +244,93 @@ Will have no effect if the function was not registered as a callback
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.MyFunc)</pre>
+        <pre class="example">TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.MyFunc)</pre>
     </ul>
 
 </dd>
     <dt>
     <a name = "HandleEvent"></a>
-    <strong>HandleEvent(string, EventType, Moveable)</strong>
+    <strong>HandleEvent(name, type, activator)</strong>
     </dt>
     <dd>
-    Attempt to find an event set and exectute a particular event from it.
+    Attempt to find an event set and execute a particular event from it.
+
+		<p>Possible event type values:</p>
+        <pre class="example">ENTER
+INSIDE
+LEAVE
+LOAD
+SAVE
+START
+END
+LOOP</pre>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Name of the event set to find.
+        </li>
+        <li><span class="parameter">type</span>
+            <span class="types"><span class="type">EventType</span></span>
+         Event to execute.
+        </li>
+        <li><span class="parameter">activator</span>
+            <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#">Moveable</a></span>
+         Optional activator. Default is the player object.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EnableEvent"></a>
+    <strong>EnableEvent(name, type)</strong>
+    </dt>
+    <dd>
+    Attempt to find an event set and enable specified event in it.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">string</span>
-            <span class="types"><span class="type">name</span></span>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
          Name of the event set to find.
         </li>
-        <li><span class="parameter">EventType</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#pdf-type">type</a></span>
-         Event to execute.
+        <li><span class="parameter">type</span>
+            <span class="types"><span class="type">EventType</span></span>
+         Event to enable.
         </li>
-        <li><span class="parameter">Moveable</span>
-            <span class="types"><span class="type">activator</span></span>
-         Optional activator. Default is the player object.
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "DisableEvent"></a>
+    <strong>DisableEvent(name, type)</strong>
+    </dt>
+    <dd>
+    Attempt to find an event set and disable specified event in it.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Name of the event set to find.
+        </li>
+        <li><span class="parameter">type</span>
+            <span class="types"><span class="type">EventType</span></span>
+         Event to disable.
         </li>
     </ul>
 
@@ -390,7 +462,7 @@ you can just leave out <code>LevelFuncs.OnStart</code>.</p>
     <li>The level script itself is run (i.e. any code you put outside the <a href="../1 modules/Logic.html#LevelFuncs">LevelFuncs</a> callbacks is executed).</li>
     <li>Save data is loaded, if saving from a saved game (will empty <a href="../1 modules/Logic.html#LevelVars">LevelVars</a> and <a href="../1 modules/Logic.html#GameVars">GameVars</a> and repopulate them with what they contained when the game was saved).</li>
     <li>If loading from a save, <code>OnLoaded</code> will be called. Otherwise, <code>OnStart</code> will be called.</li>
-    <li>The control loop, in which <code>OnControlPhase</code> will be called once per frame, begins.</li>
+    <li>The control loop, in which <code>OnLoop</code> will be called once per frame, begins.</li>
 </ol>
 
 </p>
@@ -406,7 +478,7 @@ you can just leave out <code>LevelFuncs.OnStart</code>.</p>
             <span class="types"><span class="type">function</span></span>
          Will be called when a saved game is loaded, just <em>after</em> data is loaded
         </li>
-        <li><span class="parameter">OnControlPhase</span>
+        <li><span class="parameter">OnLoop</span>
             <span class="types"><span class="type">function(float)</span></span>
          Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
@@ -450,7 +522,6 @@ end
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-11-11 12:12:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -13,20 +13,26 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/BridgeObject.h"
+#include "Objects/Generic/Object/Pushable/PushableInfo.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
 constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
@@ -245,12 +251,17 @@ void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool cle
 
 bool ItemInfo::IsLara() const
 {
-	return this->Data.is<LaraInfo*>();
+	return Data.is<LaraInfo*>();
 }
 
 bool ItemInfo::IsCreature() const
 {
-	return this->Data.is<CreatureInfo>();
+	return Data.is<CreatureInfo>();
+}
+
+bool ItemInfo::IsBridge() const
+{
+	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
 }
 
 void ItemInfo::ResetModelToDefault()
@@ -274,7 +285,7 @@ void ItemInfo::ResetModelToDefault()
 	}
 }
 
-bool TestState(int refState, const vector<int>& stateList)
+bool TestState(int refState, const std::vector<int>& stateList)
 {
 	for (const auto& state : stateList)
 	{
@@ -360,7 +371,7 @@ void KillItem(short const itemNumber)
 
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
-		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && Objects[item->ObjectNumber].GetFloorHeight != nullptr)
+		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
 			UpdateBridgeItem(*item, true);
 
 		GameScriptHandleKilled(itemNumber, true);
@@ -723,21 +734,26 @@ void InitializeItemArray(int totalItem)
 	NextItemFree = g_Level.NumItems;
 }
 
-short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
+short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectID)
 {
-	short itemNumber = CreateItem();
+	int itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
 	{
-		auto* spawn = &g_Level.Items[itemNumber];
+		auto& newItem = g_Level.Items[itemNumber];
 
-		spawn->ObjectNumber = objectNumber;
-		spawn->RoomNumber = item->RoomNumber;
-		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
+		newItem.ObjectNumber = objectID;
+		newItem.RoomNumber = item.RoomNumber;
+		newItem.Pose = item.Pose;
+		newItem.Model.Color = Vector4::One;
 
 		InitializeItem(itemNumber);
 
-		spawn->Status = ITEM_NOT_ACTIVE;
-		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		newItem.Status = ITEM_NOT_ACTIVE;
+	}
+	else
+	{
+		TENLog("Failed to create new item.", LogLevel::Warning);
+		itemNumber = NO_ITEM;
 	}
 
 	return itemNumber;
@@ -977,6 +993,10 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 
 		case HitEffect::Smoke:
 			TriggerShatterSmoke(pos.value().x, pos.value().y, pos.value().z);
+			break;
+
+		case HitEffect::NonExplosive:
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), target.Pose.Orientation.y, target.RoomNumber);
 			break;
 		}
 	}

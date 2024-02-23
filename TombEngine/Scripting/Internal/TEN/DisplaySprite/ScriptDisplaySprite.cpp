@@ -4,7 +4,7 @@
 #include "Game/effects/DisplaySprite.h"
 #include "Game/Setup.h"
 #include "Objects/game_object_ids.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
@@ -178,7 +178,7 @@ namespace TEN::Scripting::DisplaySprite
 	// @tparam[opt] View.ScaleMode scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: View.ScaleMode.FIT__
 	// @tparam[opt] Effects.BlendID blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
 	void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
-								   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BLEND_MODES> blendMode)
+								   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BlendMode> blendMode)
 	{
 		// NOTE: Conversion from more intuitive 100x100 screen space resolution to internal 800x600 is required.
 		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.08.31
@@ -188,7 +188,7 @@ namespace TEN::Scripting::DisplaySprite
 		constexpr auto DEFAULT_PRIORITY	  = 0;
 		constexpr auto DEFAULT_ALIGN_MODE = DisplaySpriteAlignMode::Center;
 		constexpr auto DEFAULT_SCALE_MODE = DisplaySpriteScaleMode::Fit;
-		constexpr auto DEFAULT_BLEND_MODE = BLENDMODE_ALPHABLEND;
+		constexpr auto DEFAULT_BLEND_MODE = BlendMode::AlphaBlend;
 
 		// Object is not a sprite sequence object; return early.
 		if (_objectID < GAME_OBJECT_ID::ID_HORIZON || _objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)

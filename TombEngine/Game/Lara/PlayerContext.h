@@ -24,7 +24,7 @@ namespace TEN::Entities::Player
 		int			ProjectedFloorHeight = 0; // Used for primitive offset blend. TODO: Real offset blend feature + object parenting. -- Sezz 2023.09.27
 		float		CalcJumpVelocity	 = 0;
 		Pose		NextCornerPos		 = Pose::Zero;
-		EulerAngles TargetOrientation	 = EulerAngles::Zero;
+		EulerAngles TargetOrientation	 = EulerAngles::Identity;
 
 		int		 WaterSurfaceDist	= 0;
 		short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
@@ -72,13 +72,13 @@ namespace TEN::Entities::Player
 	bool CanCrawlBackward(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Monkey swing contexts
-	bool CanPerformMonkeyStep(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanPerformMonkeySwingStep(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanFallFromMonkeySwing(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanGrabMonkeySwing(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanMonkeyForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanMonkeyBackward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanMonkeyShimmyLeft(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanMonkeyShimmyRight(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanMonkeySwingForward(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanMonkeySwingBackward(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanMonkeySwingShimmyLeft(const ItemInfo& item, const CollisionInfo& coll);
+	bool CanMonkeySwingShimmyRight(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Jump contexts
 	bool CanFall(const ItemInfo& item, const CollisionInfo& coll);

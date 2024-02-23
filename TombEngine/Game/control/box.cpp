@@ -20,7 +20,7 @@
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Effects::Smoke;
 
@@ -810,6 +810,9 @@ void CreatureDie(int itemNumber, bool doExplosion)
 		case HitEffect::Smoke:
 			flags |= BODY_DO_EXPLOSION | BODY_NO_BOUNCE;
 			break;
+
+		case HitEffect::NonExplosive:
+			return;
 
 		default:
 			flags |= BODY_DO_EXPLOSION;

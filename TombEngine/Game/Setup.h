@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/control/box.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
 class Vector3i;
@@ -51,6 +51,7 @@ enum class HitEffect
     Blood,
     Smoke,
     Richochet,
+	NonExplosive,
 	Special
 };
 
@@ -104,13 +105,8 @@ struct ObjectInfo
 	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine = nullptr;
 	std::function<void(ItemInfo* item)> drawRoutine = nullptr;
 
-	// Bridge routines
-	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
-	std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;
-	std::function<int(const ItemInfo& item)> GetFloorBorder	  = nullptr;
-	std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
-
 	void SetBoneRotationFlags(int boneID, int flags);
+	void SetHitEffect(HitEffect hitEffect);
 	void SetHitEffect(bool isSolid = false, bool isAlive = false);
 };
 

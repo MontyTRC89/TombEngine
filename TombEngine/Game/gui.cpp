@@ -15,7 +15,7 @@
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
@@ -465,11 +465,12 @@ namespace TEN::Gui
 			ShadowType,
 			Caustics,
 			Antialiasing,
+			AmbientOcclusion,
 			Save,
 			Cancel
 		};
 
-		static const int numDisplaySettingsOptions = 6;
+		static const int numDisplaySettingsOptions = 7;
 
 		OptionCount = numDisplaySettingsOptions;
 
@@ -521,6 +522,11 @@ namespace TEN::Gui
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) - 1);
 
 				break;
+
+			case DisplaySettingsOption::AmbientOcclusion:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
+				break;
 			}
 		}
 
@@ -561,6 +567,11 @@ namespace TEN::Gui
 				else
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) + 1);
 
+				break;
+
+			case DisplaySettingsOption::AmbientOcclusion:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
 				break;
 			}
 		}
@@ -1391,9 +1402,9 @@ namespace TEN::Gui
 		if (Rings[(int)RingTypes::Ammo].RingActive)
 			return;
 	
-		AmmoObjectList[0].Orientation = EulerAngles::Zero;
-		AmmoObjectList[1].Orientation = EulerAngles::Zero;
-		AmmoObjectList[2].Orientation = EulerAngles::Zero;
+		AmmoObjectList[0].Orientation = EulerAngles::Identity;
+		AmmoObjectList[1].Orientation = EulerAngles::Identity;
+		AmmoObjectList[2].Orientation = EulerAngles::Identity;
 
 		if (options &
 			(OPT_CHOOSE_AMMO_UZI | OPT_CHOOSE_AMMO_PISTOLS | OPT_CHOOSE_AMMO_REVOLVER | OPT_CHOOSE_AMMO_CROSSBOW |
@@ -1509,7 +1520,7 @@ namespace TEN::Gui
 	void GuiController::InsertObjectIntoList(int objectNumber)
 	{
 		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].InventoryItem = objectNumber;
-		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Orientation = EulerAngles::Zero;
+		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Orientation = EulerAngles::Identity;
 		Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].NumObjectsInList].Bright = 32;
 		Rings[(int)RingTypes::Inventory].NumObjectsInList++;
 	}
@@ -1523,7 +1534,7 @@ namespace TEN::Gui
 			if (Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem != objectNumber)
 			{
 				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].InventoryItem = objectNumber;
-				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].Orientation = EulerAngles::Zero;
+				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList].Orientation = EulerAngles::Identity;
 				Rings[(int)RingTypes::Ammo].CurrentObjectList[Rings[(int)RingTypes::Ammo].NumObjectsInList++].Bright = 32;
 			}
 		}
@@ -2311,7 +2322,7 @@ namespace TEN::Gui
 		if (ammoRing.RingActive)
 		{
 			auto optionString = g_GameFlow->GetString(OptionStrings[5].c_str());
-			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+			g_Renderer.AddString(PHD_CENTER_X, PHD_CENTER_Y, optionString, PRINTSTRING_COLOR_WHITE, (int)PrintStringFlags::Blink | (int)PrintStringFlags::Center | (int)PrintStringFlags::Outline);
 
 			if (invRing.ObjectListMovement)
 				return;
@@ -2514,12 +2525,12 @@ namespace TEN::Gui
 
 					if (i == CurrentSelectedOption)
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, (int)PrintStringFlags::Blink | (int)PrintStringFlags::Center | (int)PrintStringFlags::Outline);
 						yPos += LINE_HEIGHT;
 					}
 					else
 					{
-						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, yPos, optionString.c_str(), PRINTSTRING_COLOR_WHITE, (int)PrintStringFlags::Center | (int)PrintStringFlags::Outline);
 						yPos += LINE_HEIGHT;
 					}
 				}
@@ -2726,7 +2737,7 @@ namespace TEN::Gui
 
 	void GuiController::SpinBack(EulerAngles& orient)
 	{
-		orient.Lerp(EulerAngles::Zero, 1.0f / 8);
+		orient.Lerp(EulerAngles::Identity, 1.0f / 8);
 	}
 
 	void GuiController::DrawAmmoSelector()
@@ -2780,7 +2791,7 @@ namespace TEN::Gui
 
 					// CHECK: AmmoSelectorFadeVal is never true and therefore the string is never printed.
 					//if (AmmoSelectorFadeVal)
-						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, (int)PrintStringFlags::Center | (int)PrintStringFlags::Outline);
 				
 					if (n == *CurrentAmmoType)
 						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
@@ -3012,6 +3023,10 @@ namespace TEN::Gui
 						{
 							switch (invObject.ObjectNumber)
 							{
+							case ID_PISTOLS_AMMO_ITEM:
+								numItems = player.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+								break;
+
 							case ID_SHOTGUN_AMMO1_ITEM:
 								numItems = player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 								break;
@@ -3117,7 +3132,7 @@ namespace TEN::Gui
 						objectNumber = int(PHD_CENTER_Y + (DISPLAY_SPACE_RES.y + 1) * 0.0625 * 2.0);
 					}
 
-					g_Renderer.AddString(PHD_CENTER_X, objectNumber, textBuffer, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(PHD_CENTER_X, objectNumber, textBuffer, PRINTSTRING_COLOR_YELLOW, (int)PrintStringFlags::Center | (int)PrintStringFlags::Outline);
 				}
 
 				if (!i && !ring.ObjectListMovement)
@@ -3425,7 +3440,7 @@ namespace TEN::Gui
 
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];
-		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, POS_2D, EulerAngles::Zero, invObject.Scale1 * 1.5f);
+		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, POS_2D, EulerAngles::Identity, invObject.Scale1 * 1.5f);
 	}
 
 	void GuiController::DoDiary(ItemInfo* item)

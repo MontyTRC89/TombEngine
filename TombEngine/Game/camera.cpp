@@ -532,7 +532,7 @@ void ChaseCamera(ItemInfo* item)
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
-		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
+		Camera.target.y = g_Level.Rooms[probe.RoomNumber].maxceiling - CLICK(1);
 
 	int y = Camera.target.y;
 	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.RoomNumber);
@@ -1573,28 +1573,28 @@ void RumbleScreen()
 	}
 }
 
-void SetScreenFadeOut(float speed)
+void SetScreenFadeOut(float speed, bool force)
 {
-	if (!ScreenFading)
-	{
-		ScreenFading = true;
-		ScreenFadeStart = 1.0f;
-		ScreenFadeEnd = 0;
-		ScreenFadeSpeed = speed;
-		ScreenFadeCurrent = ScreenFadeStart;
-	}
+	if (ScreenFading && !force)
+		return;
+
+	ScreenFading = true;
+	ScreenFadeStart = 1.0f;
+	ScreenFadeEnd = 0;
+	ScreenFadeSpeed = speed;
+	ScreenFadeCurrent = ScreenFadeStart;
 }
 
-void SetScreenFadeIn(float speed)
+void SetScreenFadeIn(float speed, bool force)
 {
-	if (!ScreenFading)
-	{
-		ScreenFading = true;
-		ScreenFadeStart = 0;
-		ScreenFadeEnd = 1.0f;
-		ScreenFadeSpeed = speed;
-		ScreenFadeCurrent = ScreenFadeStart;
-	}
+	if (ScreenFading && !force)
+		return;
+
+	ScreenFading = true;
+	ScreenFadeStart = 0;
+	ScreenFadeEnd = 1.0f;
+	ScreenFadeSpeed = speed;
+	ScreenFadeCurrent = ScreenFadeStart;
 }
 
 void SetCinematicBars(float height, float speed)

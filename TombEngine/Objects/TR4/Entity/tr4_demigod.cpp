@@ -15,7 +15,7 @@
 #include "Game/people.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;
@@ -154,7 +154,7 @@ namespace TEN::Entities::TR4
 
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;
@@ -288,7 +288,7 @@ namespace TEN::Entities::TR4
 				spark->colFadeSpeed = 4;
 				spark->dShade = (GetRandomControl() & 0x1F) + 96;
 				spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+				spark->blendMode = BlendMode::Additive;
 				spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 				spark->x = (GetRandomControl() & 0x1F) + x - 16;
 				spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -706,11 +706,11 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - CLICK(0.5f);
 
-					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, false, (int)ShockwaveStyle::Normal);
+					TriggerShockwave((Pose*)&pos, 24, 88, 256, 128, 128, 128, 32, EulerAngles::Identity, 8, true, false, false, (int)ShockwaveStyle::Normal);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					pos.y -= 64;
-					TriggerShockwave((Pose*)&pos, 24, 88, 200, 128, 128, 128, 32, EulerAngles::Zero, 8, true, false, true, (int)ShockwaveStyle::Normal);
+					TriggerShockwave((Pose*)&pos, 24, 88, 200, 128, 128, 128, 32, EulerAngles::Identity, 8, true, false, true, (int)ShockwaveStyle::Normal);
 
 					auto lightColor = Color(1.0f, 0.4f, 0.2f);
 					TriggerDynamicLight(pos.ToVector3(), lightColor, 0.1f);

@@ -127,7 +127,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
 	player.Control.MoveAngle = item->Pose.Orientation.y;
-	player.ExtraTorsoRot = EulerAngles::Zero;
+	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
@@ -843,6 +843,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::None;
+	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
 
@@ -873,6 +874,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
 	Camera.targetDistance = BLOCK(1);
+	Camera.flags = CF_FOLLOW_CENTER;
 
 	ResetPlayerLean(item, 1 / 6.0f);
 

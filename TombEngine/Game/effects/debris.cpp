@@ -230,17 +230,17 @@ void UpdateDebris()
 
 			if (deb.worldPosition.y < floor->GetSurfaceHeight(deb.worldPosition.x, deb.worldPosition.z, false))
 			{
-				auto roomNumber = floor->GetRoomNumberAbove(Vector3i(deb.worldPosition)).value_or(NO_ROOM);
-				if (roomNumber != NO_ROOM)
-					deb.roomNumber = roomNumber;
+				auto roomNumber = floor->GetNextRoomNumber(deb.worldPosition, false);
+				if (roomNumber.has_value())
+					deb.roomNumber = *roomNumber;
 			}
 
 			if (deb.worldPosition.y > floor->GetSurfaceHeight(deb.worldPosition.x, deb.worldPosition.z, true))
 			{
-				auto roomNumber = floor->GetRoomNumberBelow(Vector3i(deb.worldPosition)).value_or(NO_ROOM);
-				if (roomNumber != NO_ROOM)
+				auto roomNumber = floor->GetNextRoomNumber(deb.worldPosition, true);
+				if (roomNumber.has_value())
 				{
-					deb.roomNumber = roomNumber;
+					deb.roomNumber = *roomNumber;
 					continue;
 				}
 
@@ -255,6 +255,10 @@ void UpdateDebris()
 				deb.velocity.z *= deb.friction;
 				deb.numBounces++;
 			}
+
+			auto translation = Matrix::CreateTranslation(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z);
+			auto rotation = Matrix::CreateFromQuaternion(deb.rotation);
+			deb.Transform = rotation * translation;
 		}
 	}
 }

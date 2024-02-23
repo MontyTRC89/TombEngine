@@ -65,7 +65,7 @@ namespace TEN::Entities::Creatures::TR3
 		short angle = 0;
 		short tilt = 0;
 		short head = 0;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;

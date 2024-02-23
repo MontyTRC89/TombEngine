@@ -12,12 +12,14 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 // Globals
 int NumberLosRooms;
@@ -633,52 +635,55 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 	return true;
 }
 
-int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject)
+int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObjectID)
 {
 	ClosestItem = NO_LOS_ITEM;
 	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
 
 	for (int r = 0; r < NumberLosRooms; ++r)
 	{
-		auto* room = &g_Level.Rooms[LosRooms[r]];
+		auto& room = g_Level.Rooms[LosRooms[r]];
 
 		auto pose = Pose::Zero;
 
-		for (int m = 0; m < room->mesh.size(); m++)
+		if (mesh)
 		{
-			auto* meshp = &room->mesh[m];
-
-			if (meshp->flags & StaticMeshFlags::SM_VISIBLE)
+			for (int m = 0; m < room.mesh.size(); m++)
 			{
-				auto bounds = GetBoundsAccurate(*meshp, false);
-				pose = Pose(meshp->pos.Position, EulerAngles(0, meshp->pos.Orientation.y, 0));
+				auto& meshp = room.mesh[m];
 
-				if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp->staticNumber))
+				if (meshp.flags & StaticMeshFlags::SM_VISIBLE)
 				{
-					*mesh = meshp;
-					target->RoomNumber = LosRooms[r];
+					auto bounds = GetBoundsAccurate(meshp, false);
+					pose = Pose(meshp.pos.Position, EulerAngles(0, meshp.pos.Orientation.y, 0));
+
+					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.staticNumber))
+					{
+						*mesh = &meshp;
+						target->RoomNumber = LosRooms[r];
+					}
 				}
 			}
 		}
 
-		for (short linkNumber = room->itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+		for (short linkNumber = room.itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
 		{
-			auto* item = &g_Level.Items[linkNumber];
+			const auto& item = g_Level.Items[linkNumber];
 
-			if ((item->Status == ITEM_DEACTIVATED) || (item->Status == ITEM_INVISIBLE))
+			if (item.Status == ITEM_DEACTIVATED || item.Status == ITEM_INVISIBLE)
 				continue;
 
-			if ((priorityObject != GAME_OBJECT_ID::ID_NO_OBJECT) && (item->ObjectNumber != priorityObject))
+			if (priorityObjectID != GAME_OBJECT_ID::ID_NO_OBJECT && item.ObjectNumber != priorityObjectID)
 				continue;
 
-			if ((item->ObjectNumber != ID_LARA) && (Objects[item->ObjectNumber].collision == nullptr))
+			if (item.ObjectNumber != ID_LARA && Objects[item.ObjectNumber].collision == nullptr)
 				continue;
 
-			if ((item->ObjectNumber == ID_LARA) && (priorityObject != ID_LARA))
+			if (item.ObjectNumber == ID_LARA && priorityObjectID != ID_LARA)
 				continue;
 
-			auto bounds = GameBoundingBox(item);
-			pose = Pose(item->Pose.Position, EulerAngles(0, item->Pose.Orientation.y, 0));
+			auto bounds = GameBoundingBox(&item);
+			pose = Pose(item.Pose.Position, EulerAngles(0, item.Pose.Orientation.y, 0));
 
 			if (DoRayBox(*origin, *target, bounds, pose, *vec, linkNumber))
 				target->RoomNumber = LosRooms[r];
@@ -797,10 +802,25 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 
 			// Test ray-box intersection.
 			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-			if (box.Intersects(origin, dir, dist))
-				return Geometry::TranslatePoint(origin, dir, dist);
+			float intersectDist = 0.0f;
+			if (box.Intersects(origin, dir, intersectDist))
+			{
+				if (intersectDist <= dist)
+					return Geometry::TranslatePoint(origin, dir, dist);
+			}
 		}
 	}
 
 	return std::nullopt;
+}
+
+std::pair<GameVector, GameVector> GetRayFrom2DPosition(const Vector2& screenPos)
+{
+	auto pos = g_Renderer.GetRay(screenPos);
+
+	auto origin = GameVector(pos.first, Camera.pos.RoomNumber);
+	auto target = GameVector(pos.second, Camera.pos.RoomNumber);
+
+	LOS(&origin, &target);
+	return std::pair<GameVector, GameVector>(origin, target);
 }

@@ -15,9 +15,9 @@ namespace TEN::Collision
 	public:
 		// Members
 		Vector3i			 PosOffset		  = Vector3i::Zero;
-		EulerAngles			 OrientOffset	  = EulerAngles::Zero;
+		EulerAngles			 OrientOffset	  = EulerAngles::Identity;
 		BoundingOrientedBox	 Box			  = BoundingOrientedBox();
-		OrientConstraintPair OrientConstraint = OrientConstraintPair(EulerAngles::Zero, EulerAngles::Zero);
+		OrientConstraintPair OrientConstraint = OrientConstraintPair(EulerAngles::Identity, EulerAngles::Identity);
 
 		// Constructors
 		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const BoundingOrientedBox& box,
@@ -41,7 +41,7 @@ namespace TEN::Collision
 	};
 
 	void SetItemInteraction(ItemInfo& itemFrom, const ItemInfo& itemTo, const InteractionBasis& basis,
-							const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Zero);
+							const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Identity);
 	void SetPlayerAlignAnim(ItemInfo& playerItem, const ItemInfo& interactedItem);
 	
 	bool HandlePlayerInteraction(ItemInfo& playerItem, ItemInfo& interactedItem, const InteractionBasis& basis,

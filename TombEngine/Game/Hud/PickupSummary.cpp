@@ -3,7 +3,7 @@
 
 #include "Game/pickup/pickup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Math;
@@ -34,7 +34,7 @@ namespace TEN::Hud
 		constexpr auto SCALE_MIN		   = 0.25f;
 		constexpr auto HIDE_VEL_MAX		   = DISPLAY_SPACE_RES.x * 0.03f;
 		constexpr auto HIDE_VEL_ACCEL	   = HIDE_VEL_MAX / 4;
-		constexpr auto POS_LERP_ALPHA	   = 0.2f;
+		constexpr auto POS_LERP_ALPHA	   = 0.15f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
 		constexpr auto ROT_RATE			   = ANGLE(360.0f / (LIFE_MAX * FPS));
 		constexpr auto ROT				   = EulerAngles(0, ROT_RATE, 0);

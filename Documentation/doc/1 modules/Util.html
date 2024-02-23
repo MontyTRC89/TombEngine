@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.2 Lua API</title>
+    <title>TombEngine 1.3 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -75,8 +75,10 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -84,6 +86,7 @@
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
   <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
@@ -118,6 +121,10 @@
 	<td class="summary">Calculate the horizontal distance between two positions.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#GetDisplayPosition">GetDisplayPosition(worldPos)</a></td>
+	<td class="summary">Get the projected display space position of a 3D world position.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#PercentToScreen">PercentToScreen(x, y)</a></td>
 	<td class="summary">Translate a pair display position coordinates to pixel coordinates.</td>
 	</tr>
@@ -126,15 +133,16 @@
 	<td class="summary">Translate a pair of pixel coordinates to display position coordinates.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#PickMoveableByDisplayPosition">PickMoveableByDisplayPosition(Display)</a></td>
+	<td class="summary">Pick a moveable by the given display position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#PickStaticByDisplayPosition">PickStaticByDisplayPosition(Display)</a></td>
+	<td class="summary">Pick a static mesh by the given display position.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#PrintLog">PrintLog(message, logLevel[, allowSpam])</a></td>
 	<td class="summary">Write messages within the Log file</td>
-	</tr>
-</table>
-<h2><a href="#Fields">Fields</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#worldPos">worldPos</a></td>
-	<td class="summary">Get the projected display space position of a 3D world position.</td>
 	</tr>
 </table>
 
@@ -252,6 +260,41 @@
 
 </dd>
     <dt>
+    <a name = "GetDisplayPosition"></a>
+    <strong>GetDisplayPosition(worldPos)</strong>
+    </dt>
+    <dd>
+    Get the projected display space position of a 3D world position.  Returns nil if the world position is behind the camera view.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">worldPos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         3D world position.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+        Projected display space position in percent.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Example: Display a <span class="global">string</span> at the player<span class="string">'s position.
+local string = DisplayString('</span>Example', <span class="number">0</span>, <span class="number">0</span>, Color(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>), <span class="keyword">false</span>)
+<span class="keyword">local</span> displayPos = GetDisplayPosition(Lara:GetPosition())
+<span class="global">string</span>:SetPosition(PercentToScreen(displayPos.x, displayPos.y))</pre>
+    </ul>
+
+</dd>
+    <dt>
     <a name = "PercentToScreen"></a>
     <strong>PercentToScreen(x, y)</strong>
     </dt>
@@ -335,6 +378,62 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:G
 
 </dd>
     <dt>
+    <a name = "PickMoveableByDisplayPosition"></a>
+    <strong>PickMoveableByDisplayPosition(Display)</strong>
+    </dt>
+    <dd>
+    Pick a moveable by the given display position.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Display</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+         space position in percent.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#">Moveable</a></span>
+        Picked moveable (nil if no moveable was found under the cursor).
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PickStaticByDisplayPosition"></a>
+    <strong>PickStaticByDisplayPosition(Display)</strong>
+    </dt>
+    <dd>
+    Pick a static mesh by the given display position.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Display</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+         space position in percent.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Objects.Static.html#">Static</a></span>
+        Picked static mesh (nil if no static mesh was found under the cursor).
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "PrintLog"></a>
     <strong>PrintLog(message, logLevel[, allowSpam])</strong>
     </dt>
@@ -379,45 +478,12 @@ PrintLog(<span class="string">'test error log'</span>, LogLevel.ERROR)
 
 </dd>
 </dl>
-    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "worldPos"></a>
-    <strong>worldPos</strong>
-    </dt>
-    <dd>
-    Get the projected display space position of a 3D world position.  Returns nil if the world position is behind the camera view.
-
-
-
-    <ul>
-        <li><span class="parameter">worldPos</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         3D world position.
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">Example: Display a <span class="global">string</span> at the player<span class="string">'s position.
-local string = DisplayString('</span>Example', <span class="number">0</span>, <span class="number">0</span>, Color(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>), <span class="keyword">false</span>)
-<span class="keyword">local</span> displayPos = GetDisplayPosition(Lara:GetPosition())
-<span class="global">string</span>:SetPosition(PercentToScreen(displayPos.x, displayPos.y))</pre>
-    </ul>
-
-</dd>
-</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-11-11 12:12:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

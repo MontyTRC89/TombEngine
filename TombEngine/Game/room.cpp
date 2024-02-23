@@ -6,9 +6,9 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
+#include "Renderer/Renderer.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
-#include "Renderer/Renderer11.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Math;
@@ -34,6 +34,43 @@ bool ROOM_INFO::Active() const
 		   ( FlipStats[flipNumber] && flippedRoom == index);
 }
 
+static void AddRoomFlipItems(const ROOM_INFO& room)
+{
+	// Run through linked items.
+	for (int itemNumber = room.itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	{
+		const auto& item = g_Level.Items[itemNumber];
+		const auto& object = Objects[item.ObjectNumber];
+
+		// Add bridges.
+		if (item.IsBridge())
+			UpdateBridgeItem(item);
+	}
+}
+
+static void RemoveRoomFlipItems(const ROOM_INFO& room)
+{
+	// Run through linked items.
+	for (int itemNumber = room.itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	{
+		const auto& item = g_Level.Items[itemNumber];
+		const auto& object = Objects[item.ObjectNumber];
+
+		// Kill item.
+		if (item.Flags & ONESHOT &&
+			item.HitPoints != NOT_TARGETABLE &&
+			item.HitPoints <= 0 &&
+			object.intelligent)
+		{
+			KillItem(itemNumber);
+		}
+
+		// Clear bridge.
+		if (item.IsBridge())
+			UpdateBridgeItem(item, true);
+	}
+}
+
 void DoFlipMap(int group)
 {
 	// Run through rooms.
@@ -44,25 +81,26 @@ void DoFlipMap(int group)
 		// Handle flipmap.
 		if (room.flippedRoom >= 0 && room.flipNumber == group)
 		{
-			RemoveRoomFlipItems(&room);
-
 			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
 
-			std::swap(room, flippedRoom);
+			RemoveRoomFlipItems(room);
 
+			// Swap rooms.
+			std::swap(room, flippedRoom);
 			room.flippedRoom = flippedRoom.flippedRoom;
 			flippedRoom.flippedRoom = NO_ROOM;
-
 			room.itemNumber = flippedRoom.itemNumber;
 			room.fxNumber = flippedRoom.fxNumber;
 
-			AddRoomFlipItems(&room);
+			AddRoomFlipItems(room);
 
 			g_Renderer.FlipRooms(roomNumber, room.flippedRoom);
 
+			// Update active room sectors.
 			for (auto& sector : room.floor)
 				sector.RoomNumber = roomNumber;
 
+			// Update flipped room sectors.
 			for (auto& sector : flippedRoom.floor)
 				sector.RoomNumber = room.flippedRoom;
 		}
@@ -73,42 +111,6 @@ void DoFlipMap(int group)
 
 	for (auto& creature : ActiveCreatures)
 		creature->LOT.TargetBox = NO_BOX;
-}
-
-void AddRoomFlipItems(ROOM_INFO* room)
-{
-	// Run through linked items.
-	for (int itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-		const auto& object = Objects[item.ObjectNumber];
-
-		// Item is bridge; update relevant sectors.
-		if (object.GetFloorHeight != nullptr)
-			UpdateBridgeItem(item);
-	}
-}
-
-void RemoveRoomFlipItems(ROOM_INFO* room)
-{
-	// Run through linked items.
-	for (int itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-		const auto& object = Objects[item.ObjectNumber];
-
-		if (item.Flags & ONESHOT &&
-			item.HitPoints != NOT_TARGETABLE &&
-			item.HitPoints <= 0 &&
-			object.intelligent)
-		{
-			KillItem(itemNumber);
-		}
-
-		// Item is bridge; update relevant sectors.
-		if (Objects[item.ObjectNumber].GetFloorHeight != nullptr)
-			UpdateBridgeItem(item, true);
-	}
 }
 
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID)

@@ -1,6 +1,6 @@
 #pragma once
 #include "Game/animation.h"
-#include "Game/control/volumeactivator.h"
+#include "Game/control/event.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/room.h"
@@ -75,7 +75,7 @@ struct SPRITE
 
 struct MESH
 {
-	LIGHT_MODES lightMode;
+	LightMode lightMode;
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
@@ -118,7 +118,9 @@ struct LEVEL
 
 	// Misc. data
 	std::vector<LevelCameraInfo> Cameras   = {};
-	std::vector<VolumeEventSet>	 EventSets = {};
+	std::vector<EventSet>		 GlobalEventSets = {};
+	std::vector<EventSet>		 VolumeEventSets = {};
+	std::vector<int>			 LoopedEventSetIndices = {};
 	std::vector<AI_OBJECT>		 AIObjects = {};
 	std::vector<SPRITE>			 Sprites   = {};
 
@@ -132,8 +134,11 @@ struct LEVEL
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences = {};
 };
 
+extern const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS;
+
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
+extern std::vector<int> SpriteSequencesIds;
 extern LEVEL g_Level;
 
 inline std::future<bool> LevelLoadTask;
@@ -156,6 +161,7 @@ void LoadBoxes();
 void LoadSamples();
 void LoadSoundSources();
 void LoadAnimatedTextures();
+void LoadEventSets();
 void LoadAIObjects();
 
 void LoadPortal(ROOM_INFO& room);

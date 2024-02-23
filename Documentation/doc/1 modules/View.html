@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.2 Lua API</title>
+    <title>TombEngine 1.3 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -75,8 +75,10 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -84,6 +86,7 @@
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
   <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
@@ -106,10 +109,6 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#GetAspectRatio">GetAspectRatio()</a></td>
-	<td class="summary">Get the display resolution's aspect ratio.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#FadeIn">FadeIn(speed)</a></td>
 	<td class="summary">Do a full-screen fade-in from black.</td>
 	</tr>
@@ -126,8 +125,36 @@
 	<td class="summary">Set field of view.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#GetFOV">GetFOV()</a></td>
+	<td class="summary">Get field of view.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#GetCameraType">GetCameraType()</a></td>
 	<td class="summary">Shows the mode of the game camera.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCameraRoom">GetCameraRoom()</a></td>
+	<td class="summary">Gets current room where camera is positioned.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetPostProcessMode">SetPostProcessMode(effect)</a></td>
+	<td class="summary">Sets the post-process effect mode, like negative or monochrome.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetPostProcessStrength">SetPostProcessStrength(strength)</a></td>
+	<td class="summary">Sets the post-process effect strength.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetPostProcessTint">SetPostProcessTint(tint)</a></td>
+	<td class="summary">Sets the post-process tint.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCameraPosition">GetCameraPosition()</a></td>
+	<td class="summary">Gets current camera position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCameraTarget">GetCameraTarget()</a></td>
+	<td class="summary">Gets current camera target.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#PlayFlyBy">PlayFlyBy(flyby)</a></td>
@@ -141,6 +168,10 @@
 	<td class="name" ><a href="#FlashScreen">FlashScreen(color, speed)</a></td>
 	<td class="summary">Flash screen.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#GetAspectRatio">GetAspectRatio()</a></td>
+	<td class="summary">Get the display resolution's aspect ratio.</td>
+	</tr>
 </table>
 
 <br/>
@@ -150,27 +181,6 @@
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
-    <dt>
-    <a name = "GetAspectRatio"></a>
-    <strong>GetAspectRatio()</strong>
-    </dt>
-    <dd>
-    Get the display resolution's aspect ratio.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">float</span></span>
-        Display resolution's aspect ratio.
-    </ol>
-
-
-
-
-</dd>
     <dt>
     <a name = "FadeIn"></a>
     <strong>FadeIn(speed)</strong>
@@ -264,6 +274,27 @@
 
 </dd>
     <dt>
+    <a name = "GetFOV"></a>
+    <strong>GetFOV()</strong>
+    </dt>
+    <dd>
+    Get field of view.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        current FOV angle in degrees
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "GetCameraType"></a>
     <strong>GetCameraType()</strong>
     </dt>
@@ -284,12 +315,141 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">LevelFuncs.OnControlPhase = <span class="keyword">function</span>()
+        <pre class="example">LevelFuncs.OnLoop = <span class="keyword">function</span>()
 	<span class="keyword">if</span> (View.GetCameraType() == CameraType.Combat) <span class="keyword">then</span>
 		<span class="comment">--Do your Actions here.
 </span>	<span class="keyword">end</span>
 <span class="keyword">end</span></pre>
     </ul>
+
+</dd>
+    <dt>
+    <a name = "GetCameraRoom"></a>
+    <strong>GetCameraRoom()</strong>
+    </dt>
+    <dd>
+    Gets current room where camera is positioned.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Objects.Room.html#">Room</a></span>
+        current room of the camera
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetPostProcessMode"></a>
+    <strong>SetPostProcessMode(effect)</strong>
+    </dt>
+    <dd>
+    Sets the post-process effect mode, like negative or monochrome.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">effect</span>
+            <span class="types"><a class="type" href="../4 enums/View.PostProcessMode.html#">PostProcessMode</a></span>
+         type to set.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetPostProcessStrength"></a>
+    <strong>SetPostProcessStrength(strength)</strong>
+    </dt>
+    <dd>
+    Sets the post-process effect strength.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">strength</span>
+            <span class="types"><span class="type">float</span></span>
+         (default 1.0). How strong the effect is.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetPostProcessTint"></a>
+    <strong>SetPostProcessTint(tint)</strong>
+    </dt>
+    <dd>
+    Sets the post-process tint.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tint</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         value to use.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetCameraPosition"></a>
+    <strong>GetCameraPosition()</strong>
+    </dt>
+    <dd>
+    Gets current camera position.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        current camera position
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetCameraTarget"></a>
+    <strong>GetCameraTarget()</strong>
+    </dt>
+    <dd>
+    Gets current camera target.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        current camera target
+    </ol>
+
+
+
 
 </dd>
     <dt>
@@ -355,6 +515,27 @@
 
 
 </dd>
+    <dt>
+    <a name = "GetAspectRatio"></a>
+    <strong>GetAspectRatio()</strong>
+    </dt>
+    <dd>
+    Get the display resolution's aspect ratio.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        Display resolution's aspect ratio.
+    </ol>
+
+
+
+
+</dd>
 </dl>
 
 
@@ -362,7 +543,6 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-11-11 12:12:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

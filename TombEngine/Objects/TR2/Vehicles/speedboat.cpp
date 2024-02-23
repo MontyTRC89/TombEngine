@@ -110,7 +110,7 @@ namespace TEN::Entities::Vehicles
 		mist.colFadeSpeed = 4 + (GetRandomControl() & 3);
 		mist.fadeToBlack = 12;
 		mist.sLife = mist.life = (GetRandomControl() & 3) + 20;
-		mist.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		mist.blendMode = BlendMode::Additive;
 		mist.extras = 0;
 		mist.dynamic = -1;
 
@@ -842,6 +842,7 @@ namespace TEN::Entities::Vehicles
 			default:
 				drive = true;
 				noTurn = SpeedboatUserControl(speedboatItem, laraItem);
+				HandleVehicleSpeedometer(speedboatItem->Animation.Velocity.z, SPEEDBOAT_FAST_VELOCITY_MAX);
 				break;
 			}
 		}
@@ -940,8 +941,9 @@ namespace TEN::Entities::Vehicles
 
 		if (speedboatItem->Animation.Velocity.z && (water - 5) == speedboatItem->Pose.Position.y)
 		{
-			auto room = probe.Block->GetRoomNumberBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
-			if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
+			auto roomNumber = probe.Block->GetNextRoomNumber(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z, true);
+			if (roomNumber.has_value() &&
+				(TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, *roomNumber) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, *roomNumber)))
 			{
 				if (speedboatItem->TriggerFlags == 1)
 				{
