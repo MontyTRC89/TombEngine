@@ -259,7 +259,7 @@ void RollingBallControl(short itemNumber)
 		}
 	}
 
-	auto roomNumber = GetCollision(item).RoomNumber;
+	auto roomNumber = GetPointCollision(*item).GetRoomNumber();
 
 	if (item->RoomNumber != roomNumber)
 	{

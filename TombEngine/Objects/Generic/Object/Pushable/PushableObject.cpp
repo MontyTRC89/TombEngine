@@ -104,7 +104,7 @@ namespace TEN::Entities::Generic
 
 		// Update bridge.
 		AddPushableStackBridge(pushableItem, false);
-		int probeRoomNumber = GetCollision(&pushableItem).RoomNumber;
+		int probeRoomNumber = GetPointCollision(pushableItem).GetRoomNumber();
 		AddPushableStackBridge(pushableItem, true);
 
 		// Update room number.

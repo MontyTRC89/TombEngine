@@ -1422,20 +1422,20 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 	return true;
 }
 
-bool TestProjectileNewRoom(ItemInfo& item, const CollisionResult& coll)
+bool TestProjectileNewRoom(ItemInfo& item, PointCollisionData& pointColl)
 {
 	// Check if projectile changed room.
-	if (item.RoomNumber == coll.RoomNumber)
+	if (item.RoomNumber == pointColl.GetRoomNumber())
 		return false;
 
 	// If currently in water and previously on land, spawn ripple.
-	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) != TestEnvironment(ENV_FLAG_WATER, coll.RoomNumber))
+	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) != TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 	{
 		const auto& player = GetLaraInfo(item);
 
-		int floorDiff = abs(coll.Position.Floor - item.Pose.Position.y);
-		int ceilingDiff = abs(coll.Position.Ceiling - item.Pose.Position.y);
-		int yPoint = (floorDiff > ceilingDiff) ? coll.Position.Ceiling : coll.Position.Floor;
+		int floorDiff = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
+		int ceilingDiff = abs(pointColl.GetCeilingHeight() - item.Pose.Position.y);
+		int yPoint = (floorDiff > ceilingDiff) ? pointColl.GetCeilingHeight() : pointColl.GetFloorHeight();
 
 		if (player.Control.Weapon.GunType != LaraWeaponType::GrenadeLauncher && player.Control.Weapon.GunType != LaraWeaponType::RocketLauncher)
 		{
@@ -1451,7 +1451,7 @@ bool TestProjectileNewRoom(ItemInfo& item, const CollisionResult& coll)
 		}
 	}
 
-	ItemNewRoom(item.Index, coll.RoomNumber);
+	ItemNewRoom(item.Index, pointColl.GetRoomNumber());
 	return true;
 }
 
@@ -1479,7 +1479,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 
 void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& prevPos, ProjectileType type, int damage)
 {
-	auto pointColl = GetCollision(&projectile);
+	auto pointColl = GetPointCollision(projectile);
 
 	bool hasHit = false;
 	bool hasHitNotByEmitter = false;
@@ -1489,8 +1489,8 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 	// For non-grenade projectiles, check for room collision.
 	if (type < ProjectileType::Grenade)
 	{
-		if (pointColl.Position.Floor < projectile.Pose.Position.y ||
-			pointColl.Position.Ceiling > projectile.Pose.Position.y)
+		if (pointColl.GetFloorHeight() < projectile.Pose.Position.y ||
+			pointColl.GetCeilingHeight() > projectile.Pose.Position.y)
 		{
 			hasHit = hasHitNotByEmitter = true;
 		}

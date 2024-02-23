@@ -2,6 +2,7 @@
 #include "Objects/TR3/Entity/tr3_scuba_diver.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
@@ -12,6 +13,8 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::PointCollision;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -92,12 +95,12 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
 
-			auto probe = GetCollision(item);
+			auto probe = GetPointCollision(*item);
 
-			if (item->RoomNumber != probe.RoomNumber)
-				ItemNewRoom(itemNumber, probe.RoomNumber);
+			if (item->RoomNumber != probe.GetRoomNumber())
+				ItemNewRoom(itemNumber, probe.GetRoomNumber());
 
-			item->Floor = GetCollision(item).Position.Floor;
+			item->Floor = GetPointCollision(*item).GetFloorHeight();
 			if (item->Pose.Position.y >= item->Floor)
 				KillItem(itemNumber);
 		}

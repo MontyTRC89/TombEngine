@@ -413,7 +413,7 @@ namespace TEN::Entities::Traps
 
 		AnimateItem(&item);
 
-		int probedRoomNumber = GetCollision(&item).RoomNumber;
+		int probedRoomNumber = GetPointCollision(item).GetRoomNumber();
 		if (item.RoomNumber != probedRoomNumber)
 			ItemNewRoom(itemNumber, probedRoomNumber);
 

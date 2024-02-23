@@ -56,7 +56,7 @@ namespace TEN::Entities::Creatures::TR1
 		{
 		case 0:
 		{
-			int laraFloorHeight = GetCollision(LaraItem).Position.Floor;
+			int laraFloorHeight = GetPointCollision(*LaraItem).GetFloorHeight();
 
 			// Get floor heights for comparison.
 			auto pos = Vector3i(
@@ -113,7 +113,7 @@ namespace TEN::Entities::Creatures::TR1
 			}
 
 			TestTriggers(&item, true);
-			item.Floor = GetCollision(&item).Position.Floor;
+			item.Floor = GetPointCollision(item).GetFloorHeight();
 
 			if (item.Pose.Position.y >= item.Floor)
 			{
@@ -137,7 +137,7 @@ namespace TEN::Entities::Creatures::TR1
 			break;
 		}
 
-		ItemNewRoom(itemNumber, GetCollision(&item).RoomNumber);
+		ItemNewRoom(itemNumber, GetPointCollision(item).GetRoomNumber());
 		AnimateItem(&item);
 	}
 }

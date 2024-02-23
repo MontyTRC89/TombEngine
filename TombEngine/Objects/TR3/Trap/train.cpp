@@ -67,7 +67,7 @@ void TrainControl(short itemNumber)
 
 	item->Pose.Position.y -= 32;// ?
 
-	short probedRoomNumber = GetCollision(item).RoomNumber;
+	short probedRoomNumber = GetPointCollision(*item).GetRoomNumber();
 	if (probedRoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, probedRoomNumber);
 

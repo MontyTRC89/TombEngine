@@ -549,11 +549,11 @@ namespace TEN::Entities::Vehicles
 				SpeedboatDoShift(speedboatItem, &f, &frontOld);
 		}
 
-		auto probe = GetCollision(speedboatItem);
-		auto height = GetWaterHeight(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z, probe.RoomNumber);
+		auto probe = GetPointCollision(*speedboatItem);
+		auto height = GetWaterHeight(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z, probe.GetRoomNumber());
 
 		if (height == NO_HEIGHT)
-			height = GetFloorHeight(probe.Block, speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z);
+			height = GetFloorHeight(&probe.GetSector(), speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z);
 
 		if (height < (speedboatItem->Pose.Position.y - CLICK(0.5f)))
 			SpeedboatDoShift(speedboatItem, (Vector3i*)&speedboatItem->Pose, &old);

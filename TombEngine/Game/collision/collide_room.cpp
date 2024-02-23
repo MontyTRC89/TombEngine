@@ -121,45 +121,9 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-static CollisionResult ConvertPointCollDataToCollResult(PointCollisionData& pointColl)
+static CollisionPositionData GetCollisionPositionData(PointCollisionData& pointColl)
 {
-	auto collResult = CollisionResult{};
-	collResult.Coordinates = pointColl.GetPosition();
-	collResult.RoomNumber = pointColl.GetRoomNumber();
-	collResult.Block = &pointColl.GetSector();
-	collResult.BottomBlock = &pointColl.GetBottomSector();
-	collResult.Position.Floor = pointColl.GetFloorHeight();
-	collResult.Position.Ceiling = pointColl.GetCeilingHeight();
-	collResult.Position.Bridge = pointColl.GetFloorBridgeItemNumber();
-	collResult.Position.SplitAngle = pointColl.GetBottomSector().FloorSurface.SplitAngle;
-	collResult.Position.FloorSlope = collResult.Position.Bridge == NO_ITEM && pointColl.IsIllegalFloor();
-	collResult.Position.CeilingSlope = pointColl.IsIllegalCeiling();
-	collResult.Position.DiagonalStep = pointColl.IsDiagonalFloorStep();
-	collResult.FloorNormal = pointColl.GetFloorNormal();
-	collResult.CeilingNormal = pointColl.GetCeilingNormal();
-	collResult.FloorTilt = GetSurfaceTilt(collResult.FloorNormal, true).ToVector2();
-	collResult.CeilingTilt = GetSurfaceTilt(collResult.CeilingNormal, false).ToVector2();
-	
-	return collResult;
-}
-
-// NOTE: Deprecated. Use GetPointCollision().
-CollisionResult GetCollision(const ItemInfo* item)
-{
-	auto pointColl = GetPointCollision(*item);
-	return ConvertPointCollDataToCollResult(pointColl);
-}
-
-// NOTE: Deprecated. Use GetPointCollision().
-CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down, float right)
-{
-	auto pointColl = GetPointCollision(*item, headingAngle, forward, down, right);
-	return ConvertPointCollDataToCollResult(pointColl);
-}
-
-static CollisionPosition GetCollisionPositionData(PointCollisionData& pointColl)
-{
-	auto collPos = CollisionPosition{};
+	auto collPos = CollisionPositionData{};
 	collPos.Floor = pointColl.GetFloorHeight();
 	collPos.Ceiling = pointColl.GetCeilingHeight();
 	collPos.Bridge = pointColl.GetFloorBridgeItemNumber();
@@ -171,7 +135,7 @@ static CollisionPosition GetCollisionPositionData(PointCollisionData& pointColl)
 	return collPos;
 }
 
-static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSetup& collSetup, PointCollisionData& pointColl,
+static void SetSectorAttribs(CollisionPositionData& sectorAttribs, const CollisionSetupData& collSetup, PointCollisionData& pointColl,
 							 const Vector3i& probePos, int realRoomNumber)
 {
 	constexpr auto ASPECT_ANGLE_DELTA_MAX = ANGLE(90.0f);
@@ -740,10 +704,10 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, s
 	auto reducedEllipse = ellipse * 0.75f;
 
 	// Probe heights at points around entity.
-	int frontHeight = GetCollision(item, item->Pose.Orientation.y, reducedEllipse.y).Position.Floor;
-	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), reducedEllipse.y).Position.Floor;
-	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), reducedEllipse.x).Position.Floor;
-	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), reducedEllipse.x).Position.Floor;
+	int frontHeight = GetPointCollision(*item, item->Pose.Orientation.y, reducedEllipse.y).GetFloorHeight();
+	int backHeight	= GetPointCollision(*item, item->Pose.Orientation.y + ANGLE(180.0f), reducedEllipse.y).GetFloorHeight();
+	int leftHeight	= GetPointCollision(*item, item->Pose.Orientation.y - ANGLE(90.0f), reducedEllipse.x).GetFloorHeight();
+	int rightHeight = GetPointCollision(*item, item->Pose.Orientation.y + ANGLE(90.0f), reducedEllipse.x).GetFloorHeight();
 
 	// Calculate height deltas.
 	int forwardHeightDelta = backHeight - frontHeight;

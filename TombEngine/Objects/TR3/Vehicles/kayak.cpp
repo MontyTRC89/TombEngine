@@ -535,22 +535,22 @@ namespace TEN::Entities::Vehicles
 
 		kayakItem->Pose.Orientation.y += rot;
 
-		auto probe = GetCollision(kayakItem);
-		int probedRoomNum = probe.RoomNumber;
+		auto probe = GetPointCollision(*kayakItem);
+		int probedRoomNum = probe.GetRoomNumber();
 
 		height2 = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probedRoomNum);
 		if (height2 == NO_HEIGHT)
-			height2 = probe.Position.Floor;
+			height2 = probe.GetFloorHeight();
 
 		if (height2 < (kayakItem->Pose.Position.y - KAYAK_COLLIDE))
 			KayakDoShift(kayakItem, (Vector3i*)&kayakItem->Pose, &oldPos[8]);
 
-		probe = GetCollision(kayakItem);
-		probedRoomNum = probe.RoomNumber;
+		probe = GetPointCollision(*kayakItem);
+		probedRoomNum = probe.GetRoomNumber();
 
 		height2 = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probedRoomNum);
 		if (height2 == NO_HEIGHT)
-			height2 = probe.Position.Floor;
+			height2 = probe.GetFloorHeight();
 
 		if (height2 == NO_HEIGHT)
 		{
@@ -1081,13 +1081,13 @@ namespace TEN::Entities::Vehicles
 		KayakToBackground(kayakItem, laraItem);
 		TestTriggers(kayakItem, false);
 
-		auto probe = GetCollision(kayakItem);
-		int water = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probe.RoomNumber);
+		auto probe = GetPointCollision(*kayakItem);
+		int water = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probe.GetRoomNumber());
 		kayak->WaterHeight = water;
 
 		if (kayak->WaterHeight == NO_HEIGHT)
 		{
-			water = probe.Position.Floor;
+			water = probe.GetFloorHeight();
 			kayak->WaterHeight = water;
 			kayak->TrueWater = false;
 		}
@@ -1108,10 +1108,10 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Context.Vehicle != NO_ITEM)
 		{
-			if (kayakItem->RoomNumber != probe.RoomNumber)
+			if (kayakItem->RoomNumber != probe.GetRoomNumber())
 			{
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(laraItem->Index, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
 			laraItem->Pose.Position = kayakItem->Pose.Position;

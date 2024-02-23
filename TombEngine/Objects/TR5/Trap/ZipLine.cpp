@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -12,6 +13,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -129,13 +131,13 @@ namespace TEN::Traps::TR5
 		zipLineItem.Pose.Position.y += ((int)zipLineItem.Animation.Velocity.y >> 2);
 
 		int vPos = zipLineItem.Pose.Position.y + CLICK(0.25f);
-		auto pointColl = GetCollision(&zipLineItem, zipLineItem.Pose.Orientation.y, zipLineItem.Animation.Velocity.y);
+		auto pointColl = GetPointCollision(zipLineItem, zipLineItem.Pose.Orientation.y, zipLineItem.Animation.Velocity.y);
 
 		// Update zip line room number.
-		if (pointColl.RoomNumber != zipLineItem.RoomNumber)
-			ItemNewRoom(itemNumber, pointColl.RoomNumber);
+		if (pointColl.GetRoomNumber() != zipLineItem.RoomNumber)
+			ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
-		if (pointColl.Position.Floor <= (vPos + CLICK(1)) || pointColl.Position.Ceiling >= (vPos - CLICK(1)))
+		if (pointColl.GetFloorHeight() <= (vPos + CLICK(1)) || pointColl.GetCeilingHeight() >= (vPos - CLICK(1)))
 		{
 			// Dismount.
 			if (laraItem.Animation.ActiveState == LS_ZIP_LINE)

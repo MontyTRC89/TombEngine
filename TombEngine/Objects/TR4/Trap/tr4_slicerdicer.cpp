@@ -3,9 +3,12 @@
 #include "Specific/level.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/items.h"
 #include "Game/animation.h"
 #include "Math/Math.h"
+
+using namespace TEN::Collision::PointCollision;
 
 namespace TEN::Entities::TR4
 {
@@ -38,7 +41,7 @@ namespace TEN::Entities::TR4
 
 		item->TriggerFlags += 170;
 
-		auto probedRoomNumber = GetCollision(item).RoomNumber;
+		auto probedRoomNumber = GetPointCollision(*item).GetRoomNumber();
 		if (item->RoomNumber != probedRoomNumber)
 			ItemNewRoom(itemNumber, probedRoomNumber);
 

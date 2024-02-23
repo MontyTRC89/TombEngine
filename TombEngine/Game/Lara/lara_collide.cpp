@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -19,6 +20,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 
@@ -486,10 +488,10 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.y -= ANGLE(5.0f);
 	}
 
-	auto pointColl = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if ((pointColl.Position.Floor - item->Pose.Position.y) < SWIM_WATER_DEPTH)
+	if ((pointColl.GetFloorHeight() - item->Pose.Position.y) < SWIM_WATER_DEPTH)
 		TestPlayerWaterStepOut(item, coll);
 }
 

@@ -58,13 +58,13 @@ void SpinningBladeControl(short itemNumber)
 
 	AnimateItem(item);
 
-	auto probe = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 
-	item->Floor = probe.Position.Floor;
-	item->Pose.Position.y = probe.Position.Floor;
+	item->Floor = pointColl.GetFloorHeight();
+	item->Pose.Position.y = pointColl.GetFloorHeight();
 
-	if (probe.RoomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, probe.RoomNumber);
+	if (pointColl.GetRoomNumber() != item->RoomNumber)
+		ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
 	if (isSpinning && item->Animation.ActiveState == 1)
 		item->Pose.Orientation.y += -ANGLE(180.0f);

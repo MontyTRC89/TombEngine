@@ -187,12 +187,12 @@ namespace TEN::Entities::Vehicles
 		else
 			angle = skidooItem->Pose.Orientation.y - ANGLE(90.0f);
 
-		auto probe = GetCollision(skidooItem, angle, -SKIDOO_DISMOUNT_DISTANCE);
+		auto probe = GetPointCollision(*skidooItem, angle, -SKIDOO_DISMOUNT_DISTANCE);
 
-		if ((probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT) ||
-			abs(probe.Position.Floor - skidooItem->Pose.Position.y) > CLICK(2) ||
-			((probe.Position.Ceiling - skidooItem->Pose.Position.y) > -LARA_HEIGHT ||
-				(probe.Position.Floor - probe.Position.Ceiling) < LARA_HEIGHT))
+		if ((probe.IsIllegalFloor() || probe.GetFloorHeight() == NO_HEIGHT) ||
+			abs(probe.GetFloorHeight() - skidooItem->Pose.Position.y) > CLICK(2) ||
+			((probe.GetCeilingHeight() - skidooItem->Pose.Position.y) > -LARA_HEIGHT ||
+				(probe.GetFloorHeight() - probe.GetCeilingHeight()) < LARA_HEIGHT))
 		{
 			return false;
 		}
@@ -280,7 +280,7 @@ namespace TEN::Entities::Vehicles
 		auto heightFrontLeft = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, &frontLeft);
 		auto heightFrontRight = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, &frontRight);
 
-		auto probe = GetCollision(skidooItem);
+		auto probe = GetPointCollision(*skidooItem);
 
 		TestTriggers(skidooItem, true);
 		TestTriggers(skidooItem, false);
@@ -302,7 +302,7 @@ namespace TEN::Entities::Vehicles
 			collide = 0;
 		}
 
-		int height = probe.Position.Floor;
+		int height = probe.GetFloorHeight();
 		int pitch = 0;
 
 		if (skidooItem->Flags & IFLAG_INVISIBLE)
@@ -363,10 +363,10 @@ namespace TEN::Entities::Vehicles
 
 		if (skidooItem->Flags & IFLAG_INVISIBLE)
 		{
-			if (probe.RoomNumber != skidooItem->RoomNumber)
+			if (probe.GetRoomNumber() != skidooItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(laraItem->Index, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
 			AnimateItem(laraItem);
@@ -379,10 +379,10 @@ namespace TEN::Entities::Vehicles
 
 		SkidooAnimation(skidooItem, laraItem, collide, dead);
 
-		if (probe.RoomNumber != skidooItem->RoomNumber)
+		if (probe.GetRoomNumber() != skidooItem->RoomNumber)
 		{
-			ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-			ItemNewRoom(laraItem->Index, probe.RoomNumber);
+			ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+			ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 		}
 
 		if (laraItem->Animation.ActiveState != SKIDOO_STATE_FALLOFF)
@@ -692,8 +692,8 @@ namespace TEN::Entities::Vehicles
 
 	void DoSnowEffect(ItemInfo* skidooItem)
 	{
-		auto pointColl = GetCollision(skidooItem);
-		auto material = pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+		auto pointColl = GetPointCollision(*skidooItem);
+		auto material = pointColl.GetBottomSector().GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true);
 		if (material != MaterialType::Ice && material != MaterialType::Snow)
 			return;
 
@@ -922,8 +922,8 @@ namespace TEN::Entities::Vehicles
 		if (heightFrontRight < (frontRightOld.y - CLICK(1)))
 			rotation += DoSkidooShift(skidooItem, &frontRight, &frontRightOld);
 
-		auto probe = GetCollision(skidooItem);
-		if (probe.Position.Floor < (skidooItem->Pose.Position.y - CLICK(1)))
+		auto probe = GetPointCollision(*skidooItem);
+		if (probe.GetFloorHeight() < (skidooItem->Pose.Position.y - CLICK(1)))
 			DoSkidooShift(skidooItem, (Vector3i*)&skidooItem->Pose, &oldPos);
 
 		skidoo->ExtraRotation = rotation;

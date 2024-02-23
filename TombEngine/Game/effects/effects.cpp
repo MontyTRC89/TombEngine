@@ -1261,15 +1261,15 @@ void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int w
 		return;
 
 	// Get point collision.
-	auto pointColl0 = GetCollision(&item, 0, 0, -(LARA_HEIGHT / 2));
-	auto pointColl1 = GetCollision(&item, 0, 0, item.Animation.Velocity.y);
+	auto pointColl0 = GetPointCollision(item, 0, 0, -(LARA_HEIGHT / 2));
+	auto pointColl1 = GetPointCollision(item, 0, 0, item.Animation.Velocity.y);
 
 	// In swamp; return early.
-	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.RoomNumber))
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.GetRoomNumber()))
 		return;
 
-	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.RoomNumber);
-	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.RoomNumber);
+	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.GetRoomNumber());
+	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.GetRoomNumber());
 
 	// Spawn splash.
 	if (!isWater0 && isWater1 &&
@@ -1282,7 +1282,7 @@ void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int w
 		SplashSetup.innerRadius = 16;
 		SplashSetup.splashPower = item.Animation.Velocity.z;
 
-		SetupSplash(&SplashSetup, pointColl0.RoomNumber);
+		SetupSplash(&SplashSetup, pointColl0.GetRoomNumber());
 		SplashCount = 16;
 	}
 	// Spawn ripple.
@@ -1307,7 +1307,7 @@ void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int w
 
 void Splash(ItemInfo* item)
 {
-	int probedRoomNumber = GetCollision(item).RoomNumber;
+	int probedRoomNumber = GetPointCollision(*item).GetRoomNumber();
 	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		return;
 

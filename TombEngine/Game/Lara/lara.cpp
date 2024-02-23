@@ -404,7 +404,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	if (DebugMode)
 	{
-		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
+		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().Box);
 		DrawNearbySectorFlags(*item);
 	}
 }

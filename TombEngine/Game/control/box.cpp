@@ -613,22 +613,28 @@ void CreatureUnderwater(ItemInfo* item, int depth)
 		waterLevel = 0;
 	}
 	else
+	{
 		waterHeight = GetWaterHeight(item);
+	}
 
 	int y = waterHeight + waterLevel;
 
 	if (item->Pose.Position.y < y)
 	{
-		int height = GetCollision(item).Position.Floor;
+		int height = GetPointCollision(*item).GetFloorHeight();
 
 		item->Pose.Position.y = y;
 		if (y > height)
 			item->Pose.Position.y = height;
 
 		if (item->Pose.Orientation.x > ANGLE(2.0f))
+		{
 			item->Pose.Orientation.x -= ANGLE(2.0f);
+		}
 		else if (item->Pose.Orientation.x > 0)
+		{
 			item->Pose.Orientation.x = 0;
+		}
 	}
 }
 
@@ -636,7 +642,7 @@ void CreatureFloat(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto pointColl = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 
 	item->HitPoints = NOT_TARGETABLE;
 	item->Pose.Orientation.x = 0;
@@ -654,9 +660,9 @@ void CreatureFloat(short itemNumber)
 
 	AnimateItem(item);
 
-	item->Floor = pointColl.Position.Floor;
-	if (pointColl.RoomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, pointColl.RoomNumber);
+	item->Floor = pointColl.GetFloorHeight();
+	if (pointColl.GetRoomNumber() != item->RoomNumber)
+		ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
 	if (item->Pose.Position.y <= waterLevel)
 	{
@@ -2193,18 +2199,18 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	}
 
 	int vPos = item.Pose.Position.y;
-	auto pointCollA = GetCollision(&item, item.Pose.Orientation.y, stepDist);
-	auto pointCollB = GetCollision(&item, item.Pose.Orientation.y, stepDist * 2);
-	auto pointCollC = GetCollision(&item, item.Pose.Orientation.y, stepDist * 3);
+	auto pointCollA = GetPointCollision(item, item.Pose.Orientation.y, stepDist);
+	auto pointCollB = GetPointCollision(item, item.Pose.Orientation.y, stepDist * 2);
+	auto pointCollC = GetPointCollision(item, item.Pose.Orientation.y, stepDist * 3);
 
 	switch (jumpDistType)
 	{
 	default:
 	case JumpDistance::Block1:
 		if (item.BoxNumber == creature.Enemy->BoxNumber ||
-			vPos >= (pointCollA.Position.Floor - STEPUP_HEIGHT) ||
-			vPos >= (pointCollB.Position.Floor + CLICK(1)) ||
-			vPos <= (pointCollB.Position.Floor - CLICK(1)))
+			vPos >= (pointCollA.GetFloorHeight() - STEPUP_HEIGHT) ||
+			vPos >= (pointCollB.GetFloorHeight() + CLICK(1)) ||
+			vPos <= (pointCollB.GetFloorHeight() - CLICK(1)))
 		{
 			return false;
 		}
@@ -2213,10 +2219,10 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 
 	case JumpDistance::Block2:
 		if (item.BoxNumber == creature.Enemy->BoxNumber ||
-			vPos >= (pointCollA.Position.Floor - STEPUP_HEIGHT) ||
-			vPos >= (pointCollB.Position.Floor - STEPUP_HEIGHT) ||
-			vPos >= (pointCollC.Position.Floor + CLICK(1)) ||
-			vPos <= (pointCollC.Position.Floor - CLICK(1)))
+			vPos >= (pointCollA.GetFloorHeight() - STEPUP_HEIGHT) ||
+			vPos >= (pointCollB.GetFloorHeight() - STEPUP_HEIGHT) ||
+			vPos >= (pointCollC.GetFloorHeight() + CLICK(1)) ||
+			vPos <= (pointCollC.GetFloorHeight() - CLICK(1)))
 		{
 			return false;
 		}

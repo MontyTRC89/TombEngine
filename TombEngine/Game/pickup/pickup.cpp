@@ -844,7 +844,7 @@ void DropPickups(ItemInfo* item)
 	auto bounds = GameBoundingBox(item);
 	auto extents = bounds.GetExtents();
 	auto origin = Geometry::TranslatePoint(item->Pose.Position.ToVector3(), item->Pose.Orientation, bounds.GetCenter());
-	auto yPos = GetCollision(item).Position.Floor;
+	auto yPos = GetPointCollision(*item).GetFloorHeight();
 
 	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
 
@@ -1088,19 +1088,19 @@ void InitializePickup(short itemNumber)
 			if (triggerFlags == 0)
 			{
 				// Automatically align pickups to the floor surface.
-				auto pointColl = GetCollision(item);
-				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(item->Pose.Position, true, true);
+				auto pointColl = GetPointCollision(*item);
+				int bridgeItemNumber = pointColl.GetSector().GetInsideBridgeItemNumber(item->Pose.Position, true, true);
 
 				if (bridgeItemNumber != NO_ITEM)
 				{
 					// If pickup is within bridge item, most likely it means it is
 					// below pushable or raising block, so ignore its collision.
-					pointColl.Block->RemoveBridge(bridgeItemNumber);
-					pointColl = GetCollision(item);
-					pointColl.Block->AddBridge(bridgeItemNumber);
+					pointColl.GetSector().RemoveBridge(bridgeItemNumber);
+					pointColl = GetPointCollision(*item);
+					pointColl.GetSector().AddBridge(bridgeItemNumber);
 				}
 
-				item->Pose.Position.y = pointColl.Position.Floor - bounds.Y2;
+				item->Pose.Position.y = pointColl.GetFloorHeight() - bounds.Y2;
 				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 		}

@@ -162,9 +162,9 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
 					if (vehicleItem.ObjectNumber == ID_UPV)
 					{
-						auto pointColl = GetCollision(&item, 0, 0, CLICK(1));
+						auto pointColl = GetPointCollision(item, 0, 0, CLICK(1));
 
-						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber));
+						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.GetRoomNumber()));
 						if (water.IsCold)
 						{
 							player.Status.Exposure--;
@@ -1324,20 +1324,20 @@ static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
 short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
-	auto pointColl = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 
 	// Ground is flat.
-	if (pointColl.FloorTilt == Vector2::Zero)
+	if (pointColl.GetFloorNormal() == -Vector3::UnitY)
 		return coll->Setup.ForwardAngle;
 
 	// Return slide heading angle.
 	if (g_GameFlow->HasSlideExtended())
 	{
-		return Geometry::GetSurfaceAspectAngle(pointColl.FloorNormal);
+		return Geometry::GetSurfaceAspectAngle(pointColl.GetFloorNormal());
 	}
 	else
 	{
-		return GetLegacySlideHeadingAngle(pointColl.FloorNormal);
+		return GetLegacySlideHeadingAngle(pointColl.GetFloorNormal());
 	}
 }
 
@@ -1526,7 +1526,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 	if (g_GameFlow->HasSlideExtended())
 	{
-		auto probe = GetCollision(item);
+		auto probe = GetPointCollision(*item);
 		short minSlideAngle = ANGLE(33.75f);
 		//short steepness = Geometry::GetSurfaceSlopeAngle(probe.FloorTilt);
 		//short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
@@ -1547,7 +1547,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Determine relative orientation adhering to floor normal.
-	auto floorNormal = GetCollision(item).FloorNormal;
+	auto floorNormal = GetPointCollision(*item).GetFloorNormal();
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.

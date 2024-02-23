@@ -104,7 +104,7 @@ namespace TEN::Entities::Generic
 		// Check for stopper flag.
 		/*if (collisionResult.Block->Stopper)
 		{
-			if (collisionResult.Position.Floor <= pushableItem.Pose.Position.y)
+			if (collisionResult.GetFloorHeight() <= pushableItem.Pose.Position.y)
 				return false;
 		}*/
 
