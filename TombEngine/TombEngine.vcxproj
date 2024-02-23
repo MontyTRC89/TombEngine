@@ -138,7 +138,10 @@
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)..\Documentation\
+CALL compile.bat .
+
+CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
@@ -149,7 +152,7 @@ xcopy /Y "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
-      <Message>Generating savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -185,7 +188,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)..\Documentation\
+CALL compile.bat .
+
+CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
@@ -196,7 +202,7 @@ xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
-      <Message>Generating savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -245,7 +251,10 @@ del "$(TargetDir)*.exp" /q
 del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)..\Documentation\
+CALL compile.bat .
+
+CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
@@ -258,7 +267,7 @@ xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -306,7 +315,10 @@ del "$(TargetDir)*.exp" /q
 del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)..\Documentation\
+CALL compile.bat .
+
+CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
@@ -319,7 +331,7 @@ xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

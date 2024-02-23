@@ -126,7 +126,7 @@ CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float for
 		RoomVector(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->RoomNumber, item->Pose.Position.y);
 
 	auto point = Geometry::TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
-	int adjacentRoomNumber = GetRoom(location, Vector3i(item->Pose.Position.x, point.y, item->Pose.Position.z)).RoomNumber;
+	int adjacentRoomNumber = GetRoomVector(location, Vector3i(item->Pose.Position.x, point.y, item->Pose.Position.z)).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -137,7 +137,7 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingA
 	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->RoomNumber, pos.y);
 
 	auto point = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
-	int adjacentRoomNumber = GetRoom(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
+	int adjacentRoomNumber = GetRoomVector(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -147,7 +147,7 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAng
 
 	short tempRoomNumber = roomNumber;
 	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->RoomNumber, pos.y);
-	int adjacentRoomNumber = GetRoom(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
+	int adjacentRoomNumber = GetRoomVector(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -157,7 +157,7 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3&
 
 	short tempRoomNumber = roomNumber;
 	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->RoomNumber, pos.y);
-	int adjacentRoomNumber = GetRoom(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
+	int adjacentRoomNumber = GetRoomVector(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -414,10 +414,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	
 	if (doPlayerCollision)
 	{
-		tfLocation = GetRoom(item->Location, probePos);
+		tfLocation = GetRoomVector(item->Location, probePos);
 		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		tcLocation = GetRoomVector(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
 		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
@@ -457,10 +457,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			topRoomNumber = realRoomNumber;
 		}
 
-		tfLocation = GetRoom(tfLocation, probePos);
+		tfLocation = GetRoomVector(tfLocation, probePos);
 		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		tcLocation = GetRoomVector(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
 		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
@@ -481,7 +481,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		tfLocation = GetRoom(tfLocation, Vector3i(probePos.x + xFront, probePos.y, probePos.z + zFront));
+		tfLocation = GetRoomVector(tfLocation, Vector3i(probePos.x + xFront, probePos.y, probePos.z + zFront));
 		height = GetSurfaceHeight(tfLocation, probePos.x + xFront, probePos.z + zFront, true).value_or(NO_HEIGHT);
 	}
 	else
@@ -505,10 +505,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		lrfLocation = GetRoom(item->Location, probePos);
+		lrfLocation = GetRoomVector(item->Location, probePos);
 		height = GetSurfaceHeight(lrfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		lrcLocation = GetRoom(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		lrcLocation = GetRoomVector(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
 		ceiling = GetSurfaceHeight(lrcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
@@ -535,10 +535,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		tfLocation = GetRoom(tfLocation, probePos);
+		tfLocation = GetRoomVector(tfLocation, probePos);
 		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		tcLocation = GetRoomVector(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
 		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
@@ -570,10 +570,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		lrfLocation = GetRoom(item->Location, probePos);
+		lrfLocation = GetRoomVector(item->Location, probePos);
 		height = GetSurfaceHeight(lrfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		lrcLocation = GetRoom(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		lrcLocation = GetRoomVector(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
 		ceiling = GetSurfaceHeight(lrcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
@@ -600,10 +600,10 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		tfLocation = GetRoom(tfLocation, probePos);
+		tfLocation = GetRoomVector(tfLocation, probePos);
 		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		tcLocation = GetRoomVector(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
 		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
@@ -841,7 +841,7 @@ int GetQuadrant(short angle)
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber)
 {
-	const auto location = GetRoom(RoomVector(*roomNumber, y), Vector3i(x, y, z));
+	const auto location = GetRoomVector(RoomVector(*roomNumber, y), Vector3i(x, y, z));
 	*roomNumber = location.RoomNumber;
 	return &GetFloor(*roomNumber, x, z);
 }
@@ -944,7 +944,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			xFloor = room->xSize - 1;
 
 		floor = &room->floor[zFloor + xFloor * room->zSize];
-		roomIndex = floor->WallPortalRoomNumber;
+		roomIndex = floor->SidePortalRoomNumber;
 		if (roomIndex != NO_ROOM)
 		{
 			roomNumber = roomIndex;
@@ -1032,7 +1032,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			xBlock = room->xSize - 1;
 
 		floor = &room->floor[zBlock + xBlock * room->zSize];
-		adjoiningRoom = floor->WallPortalRoomNumber;
+		adjoiningRoom = floor->SidePortalRoomNumber;
 
 		if (adjoiningRoom != NO_ROOM)
 		{

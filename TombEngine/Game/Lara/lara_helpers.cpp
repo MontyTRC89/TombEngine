@@ -1013,7 +1013,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 	for (auto& node : player.Effect.DripNodes)
 	{
 		auto pos = GetJointPosition(&item, jointIndex);
-		int roomNumber = GetRoom(item.Location, pos).RoomNumber;
+		int roomNumber = GetRoomVector(item.Location, pos).RoomNumber;
 		jointIndex++;
 
 		// Node underwater; set max wetness value.
@@ -1050,7 +1050,7 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 	for (auto& node : player.Effect.BubbleNodes)
 	{
 		auto pos = GetJointPosition(&item, jointIndex);
-		int roomNumber = GetRoom(item.Location, pos).RoomNumber;
+		int roomNumber = GetRoomVector(item.Location, pos).RoomNumber;
 		jointIndex++;
 
 		// Node inactive; continue.
@@ -1327,23 +1327,50 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 	return JumpDirection::None;
 }
 
-short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
+static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
+{
+	auto tilt = GetSurfaceTilt(floorNormal, true);
+
+	short headingAngle = ANGLE(0.0f);
+	if (tilt.x > 2)
+	{
+		headingAngle = ANGLE(-90.0f);
+	}
+	else if (tilt.x < -2)
+	{
+		headingAngle = ANGLE(90.0f);
+	}
+
+	if (tilt.y > 2 && tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(180.0f);
+	}
+	else if (tilt.y < -2 && -tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(0.0f);
+	}
+
+	return headingAngle;
+}
+
+short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
-	auto probe = GetCollision(item);
+	auto pointColl = GetCollision(item);
 
 	// Ground is flat.
-	if (probe.FloorTilt == Vector2::Zero)
-		return headingAngle;
+	if (pointColl.FloorTilt == Vector2::Zero)
+		return coll->Setup.ForwardAngle;
 
-	// Get either:
-	// a) the surface aspect angle (extended slides), or
-	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorNormal);
+	// Return slide heading angle.
 	if (g_GameFlow->HasSlideExtended())
-		return headingAngle;
+	{
+		return Geometry::GetSurfaceAspectAngle(pointColl.FloorNormal);
+	}
 	else
-		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
+	{
+		return GetLegacySlideHeadingAngle(pointColl.FloorNormal);
+	}
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
@@ -1731,7 +1758,8 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	static short oldAngle = 1;
 
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(coll->FloorNormal);
-	short angle = GetQuadrant(aspectAngle) * ANGLE(90.0f);
+	short angle = GetLegacySlideHeadingAngle(coll->FloorNormal);
+
 	short delta = angle - item->Pose.Orientation.y;
 
 	ShiftItem(item, coll);
@@ -1762,7 +1790,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 // TODO: Do it later.
 void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	short headinAngle = GetLaraSlideDirection(item, coll);
+	short headinAngle = GetPlayerSlideHeadingAngle(item, coll);
 	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
 	if (!g_GameFlow->HasSlideExtended())

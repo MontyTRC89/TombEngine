@@ -806,7 +806,7 @@ void ReadRooms()
 			sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 			sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 
-			sector.WallPortalRoomNumber = ReadInt32();
+			sector.SidePortalRoomNumber = ReadInt32();
 			sector.Flags.Death = ReadBool();
 			sector.Flags.Monkeyswing = ReadBool();
 
@@ -1203,7 +1203,7 @@ bool LoadLevel(int levelIndex)
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(loadingScreenPath);
 
-	SetScreenFadeIn(FADE_SCREEN_SPEED);
+	SetScreenFadeIn(FADE_SCREEN_SPEED, true);
 	g_Renderer.UpdateProgress(0);
 
 	try
@@ -1315,7 +1315,7 @@ bool LoadLevel(int levelIndex)
 
 		TENLog("Level loading complete.", LogLevel::Info);
 
-		SetScreenFadeOut(FADE_SCREEN_SPEED);
+		SetScreenFadeOut(FADE_SCREEN_SPEED, true);
 		g_Renderer.UpdateProgress(100);
 
 		LoadedSuccessfully = true;

@@ -58,7 +58,7 @@ LaraInfo*& GetLaraInfo(ItemInfo* item);
 JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll);
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item);
-short			GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
+short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 
 // Modulators
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
