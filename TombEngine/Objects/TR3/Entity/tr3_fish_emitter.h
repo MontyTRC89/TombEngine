@@ -4,7 +4,7 @@
 namespace TEN::Entities::Creatures::TR3
 {
 
-	constexpr auto NUM_FISHES = 24;
+	constexpr auto NUM_FISHES = 240;
 
 	struct FishData
 	{
