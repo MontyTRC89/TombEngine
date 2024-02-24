@@ -484,8 +484,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
-			IsHeld(In::Left) || IsHeld(In::Right))
+		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			// TODO: Bugged.
 			short relMoveAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerHeadingAngle(*item)));
@@ -553,8 +552,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
-			IsHeld(In::Left) || IsHeld(In::Right))
+		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			if (IsHeld(In::Action))
 			{

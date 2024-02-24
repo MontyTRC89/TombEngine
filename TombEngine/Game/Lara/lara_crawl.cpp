@@ -72,11 +72,8 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
-			IsHeld(In::Left) || IsHeld(In::Right))
-		{
+		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA);
-		}
 	}
 	else
 	{
@@ -109,8 +106,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsUsingModernControls())
 		{
-			if ((IsHeld(In::Forward) || IsHeld(In::Back) ||
-				IsHeld(In::Left) || IsHeld(In::Right)) &&
+			if ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) &&
 				CanCrouchToCrawl(*item, *coll))
 			{
 				item->Animation.TargetState = LS_CRAWL_IDLE;
@@ -451,11 +447,8 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		if (IsHeld(In::Forward) || IsHeld(In::Back) ||
-			IsHeld(In::Left) || IsHeld(In::Right))
-		{
+		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA);
-		}
 	}
 	else
 	{
@@ -491,8 +484,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsUsingModernControls())
 		{
-			if (IsHeld(In::Forward) || IsHeld(In::Back) ||
-				IsHeld(In::Left) || IsHeld(In::Right))
+			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				auto crawlVaultContext = TestLaraCrawlVault(item, coll);
 				if ((IsHeld(In::Action) || IsHeld(In::Jump)) && crawlVaultContext.Success)

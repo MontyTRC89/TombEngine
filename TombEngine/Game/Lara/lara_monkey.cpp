@@ -88,8 +88,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 		if (IsUsingModernControls())
 		{
-			if (IsHeld(In::Forward) || IsHeld(In::Back) ||
-				IsHeld(In::Left) || IsHeld(In::Right) &&
+			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right) &&
 				CanMonkeySwingForward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_MONKEY_FORWARD;
