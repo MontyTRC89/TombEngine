@@ -731,9 +731,11 @@ void HandlePlayerTurnX(ItemInfo& item, float alpha)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
-	auto targetOrient = EulerAngles(Camera.actualElevation, item.Pose.Orientation.y, item.Pose.Orientation.z);
+	const auto& player = GetLaraInfo(item);
 
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.x, Camera.actualElevation);
+	auto targetOrient = EulerAngles(player.Control.RefCameraOrient.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
+
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.x, player.Control.RefCameraOrient.x);
 	if (abs(deltaAngle) <= BASE_ANGLE)
 	{
 		item.Pose.Orientation.Lerp(targetOrient, alpha);
@@ -750,7 +752,7 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing, short relHe
 
 	auto& player = GetLaraInfo(item);
 
-	short headingAngle = (isStrafing ? Camera.actualAngle : GetPlayerHeadingAngle(item));
+	short headingAngle = (isStrafing ? player.Control.RefCameraOrient.y : GetPlayerHeadingAngle(item));
 	auto targetOrient = EulerAngles(item.Pose.Orientation.x, headingAngle + relHeadingAngle, item.Pose.Orientation.z);
 
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, headingAngle);
@@ -889,7 +891,7 @@ void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angles.
-	short deltaAngleX = Geometry::GetShortestAngle(item.Pose.Orientation.x, Camera.actualElevation);
+	short deltaAngleX = Geometry::GetShortestAngle(item.Pose.Orientation.x, player.Control.RefCameraOrient.x);
 	short deltaAngleZ = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
 	int signX = std::copysign(1, deltaAngleX);
 	int signZ = std::copysign(1, deltaAngleZ);
@@ -1596,7 +1598,7 @@ short GetPlayerHeadingAngle(const ItemInfo& item)
 
 		auto dir = moveAxis;
 		dir.Normalize();
-		return (Camera.actualAngle + FROM_RAD(atan2(dir.x, dir.y)));
+		return (player.Control.RefCameraOrient.y + FROM_RAD(atan2(dir.x, dir.y)));
 	}
 	else
 	{

@@ -240,9 +240,11 @@ table LaraControlData {
 	is_run_jump_queued: bool;
 	jump_direction: int32;
 	keep_low: bool;
+	lock_ref_camera_orient: bool;
 	look: LookControlData;
 	move_angle: int32;
 	move_angle_target: int32;
+	ref_camera_orient: EulerAngles;
 	rope: RopeControlData;
 	subsuit: SubsuitControlData;
 	tightrope: TightropeControlData;

@@ -665,7 +665,7 @@ void ChaseCamera(ItemInfo* item)
 void UpdateCameraElevation()
 {
 	constexpr auto CAMERA_AXIS_COEFF = 20.0f;
-	constexpr auto MOUSE_AXIS_COEFF	 = 300.0f;
+	constexpr auto MOUSE_AXIS_COEFF	 = 250.0f;
 
 	DoThumbstickCamera();
 
@@ -1192,6 +1192,26 @@ void ConfirmCameraTargetPos()
 	}
 }
 
+static void UpdatePlayerRefCameraOrient(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	bool isCameraTransition = (Camera.type == CameraType::Fixed && (Camera.oldType == CameraType::Chase || Camera.oldType == CameraType::Combat)) ||
+							  ((Camera.type == CameraType::Chase || Camera.type == CameraType::Combat) && Camera.oldType == CameraType::Fixed);
+
+	if (isCameraTransition && GetMoveAxis() != Vector2::Zero)
+	{
+		player.Control.LockRefCameraOrient = true;
+	}
+	else if (GetMoveAxis() == Vector2::Zero)
+	{
+		player.Control.LockRefCameraOrient = false;
+	}
+
+	if (!player.Control.LockRefCameraOrient)
+		player.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
+}
+
 void CalculateCamera(const CollisionInfo& coll)
 {
 	CamOldPos.x = Camera.pos.x;
@@ -1433,6 +1453,8 @@ void CalculateCamera(const CollisionInfo& coll)
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
+
+	UpdatePlayerRefCameraOrient(*LaraItem);
 }
 
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)

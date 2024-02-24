@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_initialise.h"
 
+#include "Game/camera.h"
 #include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -38,23 +39,23 @@ void InitializeLara(bool restore)
 
 	LaraItem->Collidable = false;
 
+	Lara.Context.Vehicle = NO_ITEM;
+	Lara.Context.WaterSurfaceDist = 100;
+	Lara.Control.MoveAngleTarget = LaraItem->Pose.Orientation.y;
+	Lara.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
+	Lara.Control.HandStatus = HandStatus::Free;
+	Lara.Control.Look.Mode = LookMode::None;
+	Lara.Control.Rope.Ptr = -1;
+	Lara.Control.Weapon.WeaponItem = NO_ITEM;
 	Lara.Status.Air = LARA_AIR_MAX;
 	Lara.Status.Exposure = LARA_EXPOSURE_MAX;
 	Lara.Status.Poison = 0;
 	Lara.Status.Stamina = LARA_STAMINA_MAX;
-
-	Lara.Control.MoveAngleTarget = LaraItem->Pose.Orientation.y;
-	Lara.Control.Look.Mode = LookMode::None;
 	Lara.HitDirection = -1;
-	Lara.Control.Weapon.WeaponItem = NO_ITEM;
-	Lara.Context.WaterSurfaceDist = 100;
 
 	Lara.ExtraAnim = NO_ITEM;
-	Lara.Context.Vehicle = NO_ITEM;
 	Lara.Location = -1;
 	Lara.HighestLocation = -1;
-	Lara.Control.Rope.Ptr = -1;
-	Lara.Control.HandStatus = HandStatus::Free;
 
 	if (restore)
 	{

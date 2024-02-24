@@ -3476,9 +3476,11 @@ struct LaraControlDataT : public flatbuffers::NativeTable {
   bool is_run_jump_queued = false;
   int32_t jump_direction = 0;
   bool keep_low = false;
+  bool lock_ref_camera_orient = false;
   std::unique_ptr<TEN::Save::LookControlDataT> look{};
   int32_t move_angle = 0;
   int32_t move_angle_target = 0;
+  std::unique_ptr<TEN::Save::EulerAngles> ref_camera_orient{};
   std::unique_ptr<TEN::Save::RopeControlDataT> rope{};
   std::unique_ptr<TEN::Save::SubsuitControlDataT> subsuit{};
   std::unique_ptr<TEN::Save::TightropeControlDataT> tightrope{};
@@ -3505,17 +3507,19 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_IS_RUN_JUMP_QUEUED = 20,
     VT_JUMP_DIRECTION = 22,
     VT_KEEP_LOW = 24,
-    VT_LOOK = 26,
-    VT_MOVE_ANGLE = 28,
-    VT_MOVE_ANGLE_TARGET = 30,
-    VT_ROPE = 32,
-    VT_SUBSUIT = 34,
-    VT_TIGHTROPE = 36,
-    VT_TOGGLE_CLIMB = 38,
-    VT_TOGGLE_CROUCH = 40,
-    VT_TURN_RATE = 42,
-    VT_WATER_STATUS = 44,
-    VT_WEAPON = 46
+    VT_LOCK_REF_CAMERA_ORIENT = 26,
+    VT_LOOK = 28,
+    VT_MOVE_ANGLE = 30,
+    VT_MOVE_ANGLE_TARGET = 32,
+    VT_REF_CAMERA_ORIENT = 34,
+    VT_ROPE = 36,
+    VT_SUBSUIT = 38,
+    VT_TIGHTROPE = 40,
+    VT_TOGGLE_CLIMB = 42,
+    VT_TOGGLE_CROUCH = 44,
+    VT_TURN_RATE = 46,
+    VT_WATER_STATUS = 48,
+    VT_WEAPON = 50
   };
   bool can_climb_ladder() const {
     return GetField<uint8_t>(VT_CAN_CLIMB_LADDER, 0) != 0;
@@ -3550,6 +3554,9 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool keep_low() const {
     return GetField<uint8_t>(VT_KEEP_LOW, 0) != 0;
   }
+  bool lock_ref_camera_orient() const {
+    return GetField<uint8_t>(VT_LOCK_REF_CAMERA_ORIENT, 0) != 0;
+  }
   const TEN::Save::LookControlData *look() const {
     return GetPointer<const TEN::Save::LookControlData *>(VT_LOOK);
   }
@@ -3558,6 +3565,9 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t move_angle_target() const {
     return GetField<int32_t>(VT_MOVE_ANGLE_TARGET, 0);
+  }
+  const TEN::Save::EulerAngles *ref_camera_orient() const {
+    return GetStruct<const TEN::Save::EulerAngles *>(VT_REF_CAMERA_ORIENT);
   }
   const TEN::Save::RopeControlData *rope() const {
     return GetPointer<const TEN::Save::RopeControlData *>(VT_ROPE);
@@ -3597,10 +3607,12 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_IS_RUN_JUMP_QUEUED) &&
            VerifyField<int32_t>(verifier, VT_JUMP_DIRECTION) &&
            VerifyField<uint8_t>(verifier, VT_KEEP_LOW) &&
+           VerifyField<uint8_t>(verifier, VT_LOCK_REF_CAMERA_ORIENT) &&
            VerifyOffset(verifier, VT_LOOK) &&
            verifier.VerifyTable(look()) &&
            VerifyField<int32_t>(verifier, VT_MOVE_ANGLE) &&
            VerifyField<int32_t>(verifier, VT_MOVE_ANGLE_TARGET) &&
+           VerifyField<TEN::Save::EulerAngles>(verifier, VT_REF_CAMERA_ORIENT) &&
            VerifyOffset(verifier, VT_ROPE) &&
            verifier.VerifyTable(rope()) &&
            VerifyOffset(verifier, VT_SUBSUIT) &&
@@ -3657,6 +3669,9 @@ struct LaraControlDataBuilder {
   void add_keep_low(bool keep_low) {
     fbb_.AddElement<uint8_t>(LaraControlData::VT_KEEP_LOW, static_cast<uint8_t>(keep_low), 0);
   }
+  void add_lock_ref_camera_orient(bool lock_ref_camera_orient) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_LOCK_REF_CAMERA_ORIENT, static_cast<uint8_t>(lock_ref_camera_orient), 0);
+  }
   void add_look(flatbuffers::Offset<TEN::Save::LookControlData> look) {
     fbb_.AddOffset(LaraControlData::VT_LOOK, look);
   }
@@ -3665,6 +3680,9 @@ struct LaraControlDataBuilder {
   }
   void add_move_angle_target(int32_t move_angle_target) {
     fbb_.AddElement<int32_t>(LaraControlData::VT_MOVE_ANGLE_TARGET, move_angle_target, 0);
+  }
+  void add_ref_camera_orient(const TEN::Save::EulerAngles *ref_camera_orient) {
+    fbb_.AddStruct(LaraControlData::VT_REF_CAMERA_ORIENT, ref_camera_orient);
   }
   void add_rope(flatbuffers::Offset<TEN::Save::RopeControlData> rope) {
     fbb_.AddOffset(LaraControlData::VT_ROPE, rope);
@@ -3714,9 +3732,11 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
     bool is_run_jump_queued = false,
     int32_t jump_direction = 0,
     bool keep_low = false,
+    bool lock_ref_camera_orient = false,
     flatbuffers::Offset<TEN::Save::LookControlData> look = 0,
     int32_t move_angle = 0,
     int32_t move_angle_target = 0,
+    const TEN::Save::EulerAngles *ref_camera_orient = 0,
     flatbuffers::Offset<TEN::Save::RopeControlData> rope = 0,
     flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0,
     flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope = 0,
@@ -3732,6 +3752,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
   builder_.add_tightrope(tightrope);
   builder_.add_subsuit(subsuit);
   builder_.add_rope(rope);
+  builder_.add_ref_camera_orient(ref_camera_orient);
   builder_.add_move_angle_target(move_angle_target);
   builder_.add_move_angle(move_angle);
   builder_.add_look(look);
@@ -3740,6 +3761,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
   builder_.add_count(count);
   builder_.add_toggle_crouch(toggle_crouch);
   builder_.add_toggle_climb(toggle_climb);
+  builder_.add_lock_ref_camera_orient(lock_ref_camera_orient);
   builder_.add_keep_low(keep_low);
   builder_.add_is_run_jump_queued(is_run_jump_queued);
   builder_.add_is_moving(is_moving);
@@ -8653,9 +8675,11 @@ inline void LaraControlData::UnPackTo(LaraControlDataT *_o, const flatbuffers::r
   { auto _e = is_run_jump_queued(); _o->is_run_jump_queued = _e; }
   { auto _e = jump_direction(); _o->jump_direction = _e; }
   { auto _e = keep_low(); _o->keep_low = _e; }
+  { auto _e = lock_ref_camera_orient(); _o->lock_ref_camera_orient = _e; }
   { auto _e = look(); if (_e) _o->look = std::unique_ptr<TEN::Save::LookControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = move_angle(); _o->move_angle = _e; }
   { auto _e = move_angle_target(); _o->move_angle_target = _e; }
+  { auto _e = ref_camera_orient(); if (_e) _o->ref_camera_orient = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = subsuit(); if (_e) _o->subsuit = std::unique_ptr<TEN::Save::SubsuitControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = tightrope(); if (_e) _o->tightrope = std::unique_ptr<TEN::Save::TightropeControlDataT>(_e->UnPack(_resolver)); }
@@ -8685,9 +8709,11 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
   auto _is_run_jump_queued = _o->is_run_jump_queued;
   auto _jump_direction = _o->jump_direction;
   auto _keep_low = _o->keep_low;
+  auto _lock_ref_camera_orient = _o->lock_ref_camera_orient;
   auto _look = _o->look ? CreateLookControlData(_fbb, _o->look.get(), _rehasher) : 0;
   auto _move_angle = _o->move_angle;
   auto _move_angle_target = _o->move_angle_target;
+  auto _ref_camera_orient = _o->ref_camera_orient ? _o->ref_camera_orient.get() : 0;
   auto _rope = _o->rope ? CreateRopeControlData(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _subsuit = _o->subsuit ? CreateSubsuitControlData(_fbb, _o->subsuit.get(), _rehasher) : 0;
   auto _tightrope = _o->tightrope ? CreateTightropeControlData(_fbb, _o->tightrope.get(), _rehasher) : 0;
@@ -8709,9 +8735,11 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
       _is_run_jump_queued,
       _jump_direction,
       _keep_low,
+      _lock_ref_camera_orient,
       _look,
       _move_angle,
       _move_angle_target,
+      _ref_camera_orient,
       _rope,
       _subsuit,
       _tightrope,

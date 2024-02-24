@@ -1268,9 +1268,12 @@ struct WeaponControlData
 
 struct PlayerControlData
 {
+	short TurnRate		  = 0; // EulerAngles TurnRate = EulerAngles::Identity; // TODO: X and Y turn rates for swimming.
 	short MoveAngle		  = 0;
 	short MoveAngleTarget = 0;
-	short TurnRate		  = 0;
+
+	EulerAngles RefCameraOrient		= EulerAngles::Identity;
+	bool		LockRefCameraOrient = false;
 
 	HandStatus	  HandStatus	= {};
 	WaterStatus	  WaterStatus	= {};
