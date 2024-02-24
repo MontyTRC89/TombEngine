@@ -198,7 +198,8 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		// TODO: Turning.
+		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+			HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA / 3);
 	}
 	else
 	{

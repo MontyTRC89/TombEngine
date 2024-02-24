@@ -46,7 +46,8 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}
 	else
 	{

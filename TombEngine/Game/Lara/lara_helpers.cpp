@@ -834,8 +834,8 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha)
 void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha)
 {
 	constexpr auto FLEX_ANGLE_CONSTRAINT = ANGLE(40.0f);
-	constexpr auto HEAD_ROT_COEFF		 = 0.75f;
-	constexpr auto TORSO_ROT_COEFF		 = 0.25f;
+	constexpr auto HEAD_ROT_COEFF		 = 0.6f;
+	constexpr auto TORSO_ROT_COEFF		 = 0.4f;
 	constexpr auto Y_ROT_COEFF			 = 0.75f;
 
 	auto& player = GetLaraInfo(item);
