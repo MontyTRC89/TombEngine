@@ -12,17 +12,12 @@ namespace TEN::Entities::Creatures::TR3
 		Pose Pose;
 		ItemInfo* target;
 		ItemInfo* leader;
-		short roomNumber;
-		short randomRotation;
 		short RoomNumber;
 		short Velocity;
-		short destY;
 		short YTarget;
 		short XTarget;
 		short ZTarget;
 		BYTE counter;
-		short angle;
-		short angAdd;
 
 		Matrix Transform;
 	};

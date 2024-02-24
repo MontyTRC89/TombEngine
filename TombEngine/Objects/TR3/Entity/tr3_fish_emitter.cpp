@@ -176,8 +176,7 @@ namespace TEN::Entities::Creatures::TR3
 			fish->Pose.Position = item->Pose.Position;
 			fish->Pose.Orientation.x = (GetRandomControl() & 0x3FF) - 512;
 			fish->Pose.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + -ANGLE(180.0f) - 1024;
-			fish->roomNumber = item->RoomNumber;
-			fish->randomRotation = (GetRandomControl() & 0x1F) + 0x10;
+			fish->RoomNumber = item->RoomNumber;
 			fish->Velocity = (GetRandomControl() & 0x1F) + 16;
 			fish->counter = 20 * ((GetRandomControl() & 0x7) + 0xF);
 			fish->leader = &g_Level.Items[item->ItemFlags[0]];
