@@ -50,6 +50,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
 
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
@@ -105,6 +106,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
 
 		if (!IsHeld(In::Forward) && !IsHeld(In::Back) && !IsHeld(In::Left) && !IsHeld(In::Right))
@@ -157,6 +159,7 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 	{
 		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
 
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))

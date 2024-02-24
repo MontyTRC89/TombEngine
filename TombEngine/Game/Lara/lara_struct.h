@@ -1270,7 +1270,7 @@ struct PlayerControlData
 {
 	EulerAngles HeadingOrient		= EulerAngles::Identity;
 	EulerAngles HeadingOrientTarget = EulerAngles::Identity;
-	short		TurnRate			= 0; // EulerAngles TurnRate = EulerAngles::Identity; // TODO: X and Y turn rates for swimming.
+	EulerAngles TurnRate			= EulerAngles::Identity;
 
 	EulerAngles RefCameraOrient		= EulerAngles::Identity;
 	bool		LockRefCameraOrient = false;

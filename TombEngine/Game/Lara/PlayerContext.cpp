@@ -137,12 +137,12 @@ namespace TEN::Entities::Player
 		// 1) Test player turn rate.
 		if (isGoingRight)
 		{
-			if (player.Control.TurnRate/*.y*/ >= LARA_SLOW_TURN_RATE_MAX)
+			if (player.Control.TurnRate.y >= LARA_SLOW_TURN_RATE_MAX)
 				return true;
 		}
 		else
 		{
-			if (player.Control.TurnRate/*.y*/ <= -LARA_SLOW_TURN_RATE_MAX)
+			if (player.Control.TurnRate.y <= -LARA_SLOW_TURN_RATE_MAX)
 				return true;
 		}
 

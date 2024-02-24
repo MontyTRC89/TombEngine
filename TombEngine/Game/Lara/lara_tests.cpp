@@ -337,7 +337,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = true;
 	item->Animation.Velocity.z = 2;
 	item->Animation.Velocity.y = 1;
-	lara->Control.TurnRate = 0;
+	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	return true;
 }
@@ -1028,7 +1028,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.z = 0;
 	item->Animation.Velocity.y = 0;
-	lara->Control.TurnRate = 0;
+	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
 	return true;
@@ -1099,7 +1099,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	item->Animation.Velocity.z = 0;
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
-	lara->Control.TurnRate = 0;
+	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
 	return true;
@@ -1607,7 +1607,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.FrameNumber = GetFrameIndex(item, 0);
 		item->Animation.TargetState = LS_JUMP_UP;
 		item->Animation.ActiveState = LS_IDLE;
-		lara->Control.TurnRate = 0;
+		lara->Control.TurnRate.y = 0;
 
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
@@ -1626,7 +1626,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_LADDER_IDLE;
 		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.HandStatus = HandStatus::Busy;
-		lara->Control.TurnRate = 0;
+		lara->Control.TurnRate.y = 0;
 
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.

@@ -101,9 +101,9 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	if (!IsUsingModernControls())
 	{
 		// Apply and reset turn rate.
-		item->Pose.Orientation.y += lara->Control.TurnRate;
+		item->Pose.Orientation.y += lara->Control.TurnRate.y;
 		if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-			lara->Control.TurnRate = 0;
+			lara->Control.TurnRate.y = 0;
 	}
 
 	lara->Control.IsLow = false;
@@ -625,14 +625,14 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
 	{
-		axisCoeff.x = AxisMap[(int)InputAxis::Move].y;
+		axisCoeff.x = GetMoveAxis().y;
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
-		axisCoeff.y = AxisMap[(int)InputAxis::Move].x;
+		axisCoeff.y = GetMoveAxis().x;
 	}
 
 	// Determine turn rate base values.
@@ -869,7 +869,7 @@ void HandlePlayerCrawlTurnFlex(ItemInfo& item)
 	if (item.Animation.Velocity.z == 0.0f)
 		return;
 
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	float axisCoeff = GetMoveAxis().x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = FLEX_ANGLE_CONSTRAINT * axisCoeff;
 
@@ -1692,26 +1692,26 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 	return (newTurnRate * sign);
 }
 
-// TODO: Make these two functions methods of LaraInfo someday. -- Sezz 2022.06.26
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
-	auto* lara = GetLaraInfo(item);
-
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::Move].y, invert);
+	auto& player = GetLaraInfo(*item);
+	player.Control.TurnRate.x = ModulateLaraTurnRate(player.Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, GetMoveAxis().y, invert);
 }
 
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
-	auto* lara = GetLaraInfo(item);
+	constexpr auto AIRBORNE_AXIS_COEFF_MIN = 1.2f;
 
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	auto& player = GetLaraInfo(*item);
+
+	float axisCoeff = GetMoveAxis().x;
 	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
-		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
+		axisCoeff = std::min(AIRBORNE_AXIS_COEFF_MIN, abs(axisCoeff)) * sign;
 	}
 
-	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
+	player.Control.TurnRate.y = ModulateLaraTurnRate(player.Control.TurnRate.y, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
 static short ResetPlayerTurnRate(short turnRate, short decelRate)
@@ -1726,13 +1726,13 @@ static short ResetPlayerTurnRate(short turnRate, short decelRate)
 void ResetPlayerTurnRateX(ItemInfo& item, short decelRate)
 {
 	auto& player = GetLaraInfo(item);
-	player.Control.TurnRate/*.x*/ = ResetPlayerTurnRate(player.Control.TurnRate/*.x*/, decelRate);
+	player.Control.TurnRate.x = ResetPlayerTurnRate(player.Control.TurnRate.x, decelRate);
 }
 
 void ResetPlayerTurnRateY(ItemInfo& item, short decelRate)
 {
 	auto& player = GetLaraInfo(item);
-	player.Control.TurnRate/*.y*/ = ResetPlayerTurnRate(player.Control.TurnRate/*.y*/, decelRate);
+	player.Control.TurnRate.y = ResetPlayerTurnRate(player.Control.TurnRate.y, decelRate);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
@@ -1831,10 +1831,10 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	lara->Control.Subsuit.Velocity[0] += abs(lara->Control.Subsuit.XRot >> 3);
 	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot >> 3);
 
-	if (lara->Control.TurnRate > 0)
-		lara->Control.Subsuit.Velocity[0] += 2 * abs(lara->Control.TurnRate);
-	else if (lara->Control.TurnRate < 0)
-		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate);
+	if (lara->Control.TurnRate.y > 0)
+		lara->Control.Subsuit.Velocity[0] += 2 * abs(lara->Control.TurnRate.y);
+	else if (lara->Control.TurnRate.y < 0)
+		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate.y);
 
 	if (lara->Control.Subsuit.Velocity[0] > BLOCK(1.5f))
 		lara->Control.Subsuit.Velocity[0] = BLOCK(1.5f);
@@ -1963,7 +1963,7 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	item->Animation.IsAirborne = true;
 	item->Animation.Velocity.y = 1.0f;
 	item->Animation.Velocity.z = 2.0f;
-	lara->Control.TurnRate = 0;
+	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -2003,7 +2003,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 	LaraSnapToHeight(item, coll);
 	lara->Control.HeadingOrient.y = angle;
-	lara->Control.TurnRate = 0;
+	lara->Control.TurnRate.y = 0;
 	oldAngle = angle;
 }
 

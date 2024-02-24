@@ -485,7 +485,7 @@ bool SaveGame::Save(int slot)
 	control.add_tightrope(tightropeControlOffset);
 	control.add_toggle_climb(Lara.Control.ToggleClimb);
 	control.add_toggle_crouch(Lara.Control.ToggleCrouch);
-	control.add_turn_rate(Lara.Control.TurnRate);
+	control.add_turn_rate(Lara.Control.TurnRate.y);
 	control.add_water_status((int)Lara.Control.WaterStatus);
 	control.add_weapon(weaponControlOffset);
 	auto controlOffset = control.Finish();
@@ -2124,7 +2124,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.RefCameraOrient = ToEulerAngles(s->lara()->control()->ref_camera_orient());
 	Lara.Control.ToggleClimb = s->lara()->control()->toggle_climb();
 	Lara.Control.ToggleCrouch = s->lara()->control()->toggle_crouch();
-	Lara.Control.TurnRate = s->lara()->control()->turn_rate();
+	Lara.Control.TurnRate.y = s->lara()->control()->turn_rate();
 	Lara.Control.IsLocked = s->lara()->control()->is_locked();
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
 	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();

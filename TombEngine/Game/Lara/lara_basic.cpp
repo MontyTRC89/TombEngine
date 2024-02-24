@@ -1028,7 +1028,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Left) && item->Animation.ActiveState == LS_TURN_LEFT_SLOW)
 	{
-		if (player.Control.TurnRate/*.y*/ < -LARA_SLOW_MED_TURN_RATE_MAX &&
+		if (player.Control.TurnRate.y < -LARA_SLOW_MED_TURN_RATE_MAX &&
 			!isWading)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
@@ -1042,7 +1042,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (IsHeld(In::Right) && item->Animation.ActiveState == LS_TURN_RIGHT_SLOW)
 	{
-		if (player.Control.TurnRate/*.y*/ > LARA_SLOW_MED_TURN_RATE_MAX &&
+		if (player.Control.TurnRate.y > LARA_SLOW_MED_TURN_RATE_MAX &&
 			!isWading)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
