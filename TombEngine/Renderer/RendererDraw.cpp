@@ -618,8 +618,6 @@ namespace TEN::Renderer
 			return;
 		}
 
-		RendererMesh* mesh = GetMesh(Objects[ID_FISH_EMITTER].meshIndex + (GlobalCounter & 3));
-
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
 			for (int i = 0; i < TEN::Entities::Creatures::TR3::NUM_FISHES; i++)
@@ -628,6 +626,8 @@ namespace TEN::Renderer
 
 				if (fish->on)
 				{
+					RendererMesh* mesh = GetMesh(Objects[ID_FISH_EMITTER].meshIndex + (rand() % 4));
+
 					for (int j = 0; j < mesh->Buckets.size(); j++)
 					{
 						auto& bucket = mesh->Buckets[j];
@@ -659,41 +659,29 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			int fishCount = 0;
-
+			bool activefishsExist = false;
 			for (int i = 0; i < TEN::Entities::Creatures::TR3::NUM_FISHES; i++)
 			{
 				auto* fish = &TEN::Entities::Creatures::TR3::FishSwarm[i];
 
 				if (fish->on)
 				{
-					RendererRoom& room = _rooms[fish->RoomNumber];
-
-					_stInstancedStaticMeshBuffer.StaticMeshes[fishCount].World = fish->Transform;
-					_stInstancedStaticMeshBuffer.StaticMeshes[fishCount].Ambient = room.AmbientLight;
-					_stInstancedStaticMeshBuffer.StaticMeshes[fishCount].Color = Vector4::One;
-					_stInstancedStaticMeshBuffer.StaticMeshes[fishCount].LightMode = (int)mesh->LightMode;
-
-					if (rendererPass != RendererPass::GBuffer)
-					{
-						BindInstancedStaticLights(room.LightsToDraw, fishCount);
-					}
-
-					fishCount++;
+					activefishsExist = true;
+					break;
 				}
 			}
 
-			if (fishCount > 0)
+			if (activefishsExist)
 			{
 				if (rendererPass == RendererPass::GBuffer)
 				{
-					_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+					_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
 					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
 				}
 				else
 				{
-					_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-					_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
+					_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
 				}
 
 				UINT stride = sizeof(Vertex);
@@ -702,30 +690,53 @@ namespace TEN::Renderer
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
+				RendererObject& moveableObj = *_moveableObjects[ID_FISH_EMITTER];
 
-				for (auto& bucket : mesh->Buckets)
+				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
+
+				for (int i = 0; i < TEN::Entities::Creatures::TR3::NUM_FISHES; i++)
 				{
-					if (bucket.NumVertices == 0)
-					{
-						continue;
-					}
+					auto* fish = &TEN::Entities::Creatures::TR3::FishSwarm[i];
 
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
-
-					for (int p = 0; p < passes; p++)
+					if (fish->on)
 					{
-						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						RendererMesh* mesh = GetMesh(Objects[ID_FISH_EMITTER].meshIndex + (rand() % 4));
+
+						_stStatic.World = fish->Transform;
+						_stStatic.Color = Vector4::One;
+						_stStatic.AmbientLight = _rooms[fish->RoomNumber].AmbientLight;
+
+						if (rendererPass != RendererPass::GBuffer)
 						{
-							continue;
+							BindStaticLights(_rooms[fish->RoomNumber].LightsToDraw);
 						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						_cbStatic.UpdateData(_stStatic, _context.Get());
 
-						DrawIndexedInstancedTriangles(bucket.NumIndices, fishCount, bucket.StartIndex, 0);
+						for (auto& bucket : mesh->Buckets)
+						{
+							if (bucket.NumVertices == 0)
+							{
+								continue;
+							}
 
-						_numMoveablesDrawCalls++;
+							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+
+							for (int p = 0; p < passes; p++)
+							{
+								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+								{
+									continue;
+								}
+
+								BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+								_numMoveablesDrawCalls++;
+							}
+						}
 					}
 				}
 			}
@@ -1831,6 +1842,7 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::Opaque);
 		DrawDebris(view, RendererPass::Opaque);
 		DrawSprites(view, RendererPass::Opaque);
+		DrawFishes(view, RendererPass::Opaque);
 
 		// Draw additive faces.
 		DrawRooms(view, RendererPass::Additive);
@@ -1844,6 +1856,7 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::Additive);
 		DrawDebris(view, RendererPass::Additive);
 		DrawSprites(view, RendererPass::Additive);
+		DrawFishes(view, RendererPass::Additive);
 
 		// Collect all non-commutative transparent faces.
 		// NOTE: Sorted sprites are already collected at the beginning of the frame.
@@ -1854,6 +1867,7 @@ namespace TEN::Renderer
 		DrawEffects(view, RendererPass::CollectTransparentFaces);
 		DrawRats(view, RendererPass::CollectTransparentFaces);
 		DrawLocusts(view, RendererPass::CollectTransparentFaces);
+		DrawFishes(view, RendererPass::CollectTransparentFaces);
 
 		// Draw sorted faces.
 		DrawSortedFaces(view);

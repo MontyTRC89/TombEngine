@@ -30,6 +30,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto FISH_ENTITY_DAMAGE = 1;
 	constexpr auto LEADER_VELOCITY = 64.0f;
 	constexpr auto LEADER_REACH_TARGET_RANGE = SQUARE(BLOCK(0.4f));
+	constexpr auto FISH_ORIENT_LERP_ALPHA = 0.1f;
 
 	int NextFish;
 
@@ -104,25 +105,11 @@ namespace TEN::Entities::Creatures::TR3
 
 		constexpr auto INVALID_CADAVER_POSITION = Vector3(FLT_MAX);
 		float MAX_VELOCITY = 10; // Maximum velocity for the fish
-		constexpr float ACCELERATION = 0.1f;
-
-
-/*
-		if (!item->ItemFlags[5])
-		{
-			item->ItemFlags[5] = Random::GenerateInt(50, 150);
-			MAX_VELOCITY = 75;// Random::GenerateFloat(45.0f, 75.0f);
-		}
-		else
-			item->ItemFlags[5]--;
-		*/
-
 
 		if (!CreatureActive(itemNumber))
 			return;
 
 		auto cadaverPos = INVALID_CADAVER_POSITION;
-
 
 		if (item->HitPoints)
 		{
@@ -135,88 +122,11 @@ namespace TEN::Entities::Creatures::TR3
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
 
-		auto angle = CreatureTurn(item, creature->MaxTurn);
-		creature->MaxTurn = ANGLE(365.f); //?
+		int dx = creature->Target.x - item->Pose.Position.x;
+		int dz = creature->Target.z - item->Pose.Position.z;
+		AI.distance = SQUARE(dx) + SQUARE(dz);
 
-		item->TriggerFlags = 0;
-
-
-		if (item->ItemFlags[2] == 0 && item->ItemFlags[3] == 0 && item->ItemFlags[4] == 0)
-		{
-			creature->Target = GetRandomFishTarget(item);
-			item->ItemFlags[2] = creature->Target.x;
-			item->ItemFlags[3] = creature->Target.y;
-			item->ItemFlags[4] = creature->Target.z;
-
-
-		}
-		else
-		{
-			/*
-			// Update fish's orientation
-			EulerAngles orientation = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), leaderTarget);
-			item->Pose.Orientation.x = orientation.x;
-			item->Pose.Orientation.y = orientation.y;
-
-			Vector3 direction = leaderTarget - item->Pose.Position.ToVector3();
-
-			float distanceToTarget = Vector3i::Distance(item->Pose.Position, leaderTarget);
-
-			// Adjust fish's velocity based on distance to the target
-
-
-			// Move fish towards the target position
-			// Scale the direction vector by the calculated velocity
-
-			Vector3 zdirection = direction;
-			zdirection.Normalize();
-
-			item->Pose.Position += (zdirection * velocity);*/
-
-			g_Renderer.AddDebugSphere(creature->Target.ToVector3(), 46, Vector4(1, 1, 0, 1), RendererDebugPage::None);
-
-
-			int dx = creature->Target.x - item->Pose.Position.x;
-			int dz = creature->Target.z - item->Pose.Position.z;
-			AI.distance = SQUARE(dx) + SQUARE(dz);
-			AI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-			AI.ahead = (AI.angle > -FRONT_ARC && AI.angle < FRONT_ARC);
-
-			float distanceToTarget = Vector3i::Distance(item->Pose.Position, creature->Target);
-
-			if (AI.distance < LEADER_REACH_TARGET_RANGE)
-			{
-				item->ItemFlags[2] = 0;
-				item->ItemFlags[3] = 0;
-				item->ItemFlags[4] = 0;
-
-			}
-
-			EulerAngles orientation = Geometry::GetOrientToPoint(item->Pose.Position.ToVector3(), creature->Target.ToVector3());
-			item->Pose.Orientation.x = orientation.x;
-			item->Pose.Orientation.y = orientation.y;
-
-			item->Animation.Velocity.z = MAX_VELOCITY;
-			float velocity = std::min(ACCELERATION, MAX_VELOCITY);
-			item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, orientation, MAX_VELOCITY);
-
-			//item->Pose.Position -= Vector3(MAX_VELOCITY);
-
-		}
-
-
-		/*
-		//phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
-
-		GetCreatureMood(item, &AI, true);
-		CreatureMood(item, &AI, true);
-
-		short angle = CreatureTurn(item, creature->MaxTurn);
-
-		//item->Pose.Position = Geometry::TranslatePoint(item->Pose.Position, item->Pose.Orientation.y, forwardVel);
-		int random = ((itemNumber & 0x7) * 0x200) - 0x700;
-		creature->Target.x = item->Pose.Position.x + (BLOCK(1) * phd_sin(AI.angle + ANGLE(180.0f) + random));
-		creature->Target.z = item->Pose.Position.z + (BLOCK(1) * phd_cos(AI.angle + ANGLE(180.0f) + random));*/
+		item->Animation.Velocity.z = MAX_VELOCITY;
 
 		auto* laraRoom = &g_Level.Rooms[LaraItem->RoomNumber];
 
@@ -264,14 +174,10 @@ namespace TEN::Entities::Creatures::TR3
 				continue;
 
 			fish->RoomNumber = item->RoomNumber;
+
+			if (fish->leader == item)
 			fish->target = &g_Level.Items[item->ItemFlags[1]];
 		}
-
-		g_Renderer.AddDebugSphere(Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), 46, Vector4(1, 1, 1, 1), RendererDebugPage::None);
-
-		//CreatureAnimation(itemNumber, angle, 0);
-		//CreatureTilt(item, 0);
-		//CreatureUnderwater(item, 341);
 	}
 
 	void SpawnFishSwarm(ItemInfo* item)
@@ -320,9 +226,9 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		int minDistance = MAXINT;
 		int minIndex = -1;
-
+		
 		// Define the separation distance between fish
-		float SEPARATION_DISTANCE = 190.0f; //Random::GenerateFloat(190.0f, 200.0f);
+		float SEPARATION_DISTANCE = 190.0f;
 
 		for (int i = 0; i < NUM_FISHES; i++)
 		{
@@ -331,6 +237,16 @@ namespace TEN::Entities::Creatures::TR3
 			if (!fish->on)
 				continue;
 
+			auto leaderItem = fish->leader;
+
+			if (!leaderItem->ItemFlags[2] && fish->target == fish->leader)
+			{
+				fish->target->Pose.Position = GetRandomFishTarget(leaderItem);
+				leaderItem->ItemFlags[2] = 1;
+			}
+
+			int enemyvelocity = fish->target != fish->leader ? 16 : 26;
+
 			// Randomly adjust the target position around the target object
 			fish->XTarget = (GetRandomControl() & 0xFF) - 128;
 			fish->YTarget = (GetRandomControl() & 0xFF) - 122;
@@ -338,6 +254,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			// Calculate the desired position based on the target object and the random offsets
 			Vector3i desiredPosition = fish->target->Pose.Position + Vector3i(fish->XTarget, fish->YTarget, fish->ZTarget);
+			//Vector3i desiredPosition = Vector3i(g_Level.Items[fish->leader].ItemFlags[2], g_Level.Items[fish->leader->Index].ItemFlags[3], g_Level.Items[fish->leader->Index].ItemFlags[4]) + Vector3i(fish->XTarget, fish->YTarget, fish->ZTarget);
 
 			// Calculate the direction vector towards the desired position
 			Vector3i direction = desiredPosition - fish->Pose.Position;
@@ -354,25 +271,36 @@ namespace TEN::Entities::Creatures::TR3
 			// Adjust the velocity based on the distance to the desired position
 			float distanceToTarget = directions.Length();
 
-			float targetVelocity = (distanceToTarget * COHESION_FACTOR) +  (Random::GenerateFloat(3.0f, 15.0f));; // Adjust as needed
-			fish->Velocity = std::min(targetVelocity, fish->target->Animation.Velocity.z - 2.0f);; // Adjust as needed
+
+
+			float targetVelocity = (distanceToTarget * COHESION_FACTOR) +  (Random::GenerateFloat(3.0f, 5.0f));
+			fish->Velocity = std::min(targetVelocity, fish->target->Animation.Velocity.z - 21.0f); 
 
 			// If the fish is too far away from the leader, make it faster to catch up
 			constexpr float MAX_DISTANCE_FROM_LEADER = SQUARE(BLOCK(0.9f)); // Adjust as needed
 			if (distanceToTarget > MAX_DISTANCE_FROM_LEADER)
 			{
-				constexpr float SPEEDUP_FACTOR = 0.2f; // Adjust as needed
-				fish->Velocity += SPEEDUP_FACTOR; // Increase velocity to catch up
+				//constexpr float SPEEDUP_FACTOR = 0.2f; // Adjust as needed
+				//fish->Velocity += SPEEDUP_FACTOR; // Increase velocity to catch up
 			}
 
-			// Move the fish towards the desired position
-			fish->Pose.Position += (normalizedDirection * fish->Velocity / 16);
+			//Make the fish move in the direction they are facing
+			auto rotMatrix = fish->Pose.Orientation.ToRotationMatrix();
+			auto movement = Vector3::Transform(Vector3::UnitZ, rotMatrix);
+			// Move the fish towards the desired position based on its orientation
+		
+			movement.Normalize(); // Normalize the movement vector
+			fish->Pose.Position += (movement * fish->Velocity / enemyvelocity);
 
 			// Define a factor to adjust the spacing between fish
 			constexpr float SPACING_FACTOR = 600.0f;
 
-			// Adjust the position to maintain spacing between fish
-			fish->Pose.Position += (normalizedDirection * SPACING_FACTOR) /16;
+			// Adjust the position to maintain spacing between fish based on its orientation
+			fish->Pose.Position += (movement * SPACING_FACTOR) / enemyvelocity;
+
+			// Update the fish's orientation to face the movement direction
+			auto orientTo = Geometry::GetOrientToPoint(fish->Pose.Position.ToVector3(), desiredPosition.ToVector3());
+			fish->Pose.Orientation.Lerp(orientTo, 0.1f);
 
 			// Apply separation behavior to avoid clustering of fish
 			for (int j = 0; j < NUM_FISHES; j++)
@@ -387,6 +315,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				// Calculate the distance to the other fish
 				float distanceToOtherFish = Vector3::Distance(fish->Pose.Position.ToVector3(), otherFish->Pose.Position.ToVector3());
+				float distanceToLara = Vector3::Distance(fish->Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3());
 
 				// If the other fish is too close, steer away from it
 				if (distanceToOtherFish < SEPARATION_DISTANCE)
@@ -398,11 +327,38 @@ namespace TEN::Entities::Creatures::TR3
 					// Apply separation force to steer away from the other fish
 					fish->Pose.Position += separationVector * (SEPARATION_DISTANCE - distanceToOtherFish);
 				}
+				else
+				{
+					constexpr float SPEEDUP_FACTOR = 0.2f; // Adjust as needed
+				    fish->Velocity += SPEEDUP_FACTOR; // Increase velocity to catch up
+
+				}
+
+				// If Lara is too close and the fish are not lethal, steer away from it
+				if (distanceToLara < SEPARATION_DISTANCE * 3 && !leaderItem->TriggerFlags)
+				{
+					// Calculate the separation vector
+					Vector3 separationVector = fish->Pose.Position.ToVector3() - LaraItem->Pose.Position.ToVector3();
+					separationVector.Normalize();
+
+					float distance2 = separationVector.Length();
+
+					Vector3i LaraPosition = LaraItem->Pose.Position + Vector3i(fish->XTarget, fish->YTarget, fish->ZTarget);
+
+					auto orientTo = Geometry::GetOrientToPoint(fish->Pose.Position.ToVector3(), -LaraPosition.ToVector3());
+					fish->Pose.Orientation.Lerp(orientTo, 0.1f);
+
+					float fleeVelocity = (distanceToTarget * COHESION_FACTOR) + (Random::GenerateFloat(3.0f, 15.0f));
+					fish->Velocity -= std::min(fleeVelocity, fish->target->Animation.Velocity.z - 1.0f);
+
+
+					// Apply separation force to steer away from the other fish
+					//fish->Pose.Position += separationVector * (SEPARATION_DISTANCE - distanceToLara);
+				}
+
 			}
 
-			// Update the fish's orientation to face the movement direction
-			fish->Pose.Orientation = Geometry::GetOrientToPoint(fish->Pose.Position.ToVector3(), desiredPosition.ToVector3());
-
+			//g_Renderer.AddDebugSphere(fish->target->Pose.Position.ToVector3(), 46, Vector4(1, 1, 0, 1), RendererDebugPage::None);
 
 
 			auto pointColl = GetCollision(fish->Pose.Position, fish->RoomNumber);
@@ -420,13 +376,20 @@ namespace TEN::Entities::Creatures::TR3
 			//	else
 				//	fish->Pose.Position.y += (fish->Velocity) * phd_sin(-fish->Pose.Orientation.x);
 
-			if (ItemNearTarget(fish->Pose.Position, fish->target, CLICK(1) / 2) && (fish->leader != fish->target))
+			if (ItemNearTarget(fish->Pose.Position, fish->target, CLICK(1) / 2) )
 			{
-				TriggerBlood(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z, 4 * GetRandomControl(), 4);
-				DoDamage(fish->target, FISH_LARA_DAMAGE);
+				if (fish->leader != fish->target)
+				{
+					TriggerBlood(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z, 4 * GetRandomControl(), 4);
+					DoDamage(fish->target, FISH_LARA_DAMAGE);
+				}
+				else
+				{
+					leaderItem->ItemFlags[2] = 0;
+				}
 			}
 
-			g_Renderer.AddDebugSphere(Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), 26, Vector4(1, 0, 0, 1), RendererDebugPage::None);
+			//g_Renderer.AddDebugSphere(Vector3(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z), 26, Vector4(1, 0, 0, 1), RendererDebugPage::None);
 
 			Matrix translation = Matrix::CreateTranslation(fish->Pose.Position.x, fish->Pose.Position.y, fish->Pose.Position.z);
 			Matrix rotation = fish->Pose.Orientation.ToRotationMatrix();
