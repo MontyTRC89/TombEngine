@@ -456,13 +456,13 @@ namespace TEN::Entities::Vehicles
 
 		if ((UPVItem->Pose.Orientation.x >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Pose.Orientation.x <= (SHRT_MAX / 2 + 1)))
 		{
-			lara->Control.MoveAngle = UPVItem->Pose.Orientation.y;
-			coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+			lara->Control.HeadingOrient.y = UPVItem->Pose.Orientation.y;
+			coll->Setup.ForwardAngle = lara->Control.HeadingOrient.y;
 		}
 		else
 		{
-			lara->Control.MoveAngle = UPVItem->Pose.Orientation.y - ANGLE(180.0f);
-			coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+			lara->Control.HeadingOrient.y = UPVItem->Pose.Orientation.y - ANGLE(180.0f);
+			coll->Setup.ForwardAngle = lara->Control.HeadingOrient.y;
 		}
 
 		int height = phd_sin(UPVItem->Pose.Orientation.x) * UPV_LENGTH;

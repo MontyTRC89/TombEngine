@@ -131,17 +131,17 @@ void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.MoveAngle = (item->Animation.Velocity.z > 0.0f) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
+	player.Control.HeadingOrient.y = (item->Animation.Velocity.z > 0.0f) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	GetCollisionInfo(coll, item);
 
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
-	player.Control.MoveAngle = (item->Animation.Velocity.z < 0.0f) ? item->Pose.Orientation.y : player.Control.MoveAngle;
+	player.Control.HeadingOrient.y = (item->Animation.Velocity.z < 0.0f) ? item->Pose.Orientation.y : player.Control.HeadingOrient.y;
 }
 
 // State:		LS_FREEFALL (9)
@@ -189,7 +189,7 @@ void lara_col_freefall(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	GetCollisionInfo(coll, item);
 
 	LaraSlideEdgeJump(item, coll);
@@ -264,7 +264,7 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 	if (player.Control.Rope.Ptr == -1)
 		item->Animation.IsAirborne = true;
 
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 
 	// HACK: height is altered according to VerticalVelocity to fix "issues" with physically impossible
 	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
@@ -274,7 +274,7 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
@@ -442,7 +442,7 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	if (!IsUsingModernControls() /*||
 		(IsUsingModernControls &&
 			(player.Control.HandStatus == HandStatus::WeaponDraw ||
@@ -451,15 +451,15 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		switch (player.Control.JumpDirection)
 		{
 		case JumpDirection::Back:
-			player.Control.MoveAngle += ANGLE(180.0f);
+			player.Control.HeadingOrient.y += ANGLE(180.0f);
 			break;
 
 		case JumpDirection::Left:
-			player.Control.MoveAngle -= ANGLE(90.0f);
+			player.Control.HeadingOrient.y -= ANGLE(90.0f);
 			break;
 
 		case JumpDirection::Right:
-			player.Control.MoveAngle += ANGLE(90.0f);
+			player.Control.HeadingOrient.y += ANGLE(90.0f);
 			break;
 
 		default:
@@ -472,7 +472,7 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeDown = !isSwamp;	// Security.
 	coll->Setup.BlockFloorSlopeUp = !isSwamp;	// Security.
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -745,12 +745,12 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = (item->Animation.Velocity.z >= 0) ? player.Control.MoveAngle : player.Control.MoveAngle + ANGLE(180.0f);
+	coll->Setup.ForwardAngle = (item->Animation.Velocity.z >= 0) ? player.Control.HeadingOrient.y : player.Control.HeadingOrient.y + ANGLE(180.0f);
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
@@ -919,12 +919,12 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	auto bounds = GameBoundingBox(item);
 	int realHeight = g_GameFlow->HasCrawlspaceDive() ? (bounds.GetHeight() * 0.7f) : LARA_HEIGHT;
 
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, realHeight);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	GetCollisionInfo(coll, item);
 
 	if (LaraDeflectEdgeJump(item, coll))

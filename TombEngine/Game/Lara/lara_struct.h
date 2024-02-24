@@ -1268,9 +1268,9 @@ struct WeaponControlData
 
 struct PlayerControlData
 {
-	short TurnRate		  = 0; // EulerAngles TurnRate = EulerAngles::Identity; // TODO: X and Y turn rates for swimming.
-	short MoveAngle		  = 0;
-	short MoveAngleTarget = 0;
+	EulerAngles HeadingOrient		= EulerAngles::Identity;
+	EulerAngles HeadingOrientTarget = EulerAngles::Identity;
+	short		TurnRate			= 0; // EulerAngles TurnRate = EulerAngles::Identity; // TODO: X and Y turn rates for swimming.
 
 	EulerAngles RefCameraOrient		= EulerAngles::Identity;
 	bool		LockRefCameraOrient = false;
@@ -1294,6 +1294,7 @@ struct PlayerControlData
 	bool IsLow			  = false;
 	bool IsMonkeySwinging = false;
 	bool IsMoving		  = false;
+	bool IsStrafing		  = false; // savegame
 	bool IsRunJumpQueued  = false;
 	bool KeepLow		  = false;
 

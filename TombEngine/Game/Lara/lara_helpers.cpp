@@ -731,9 +731,10 @@ void HandlePlayerTurnX(ItemInfo& item, float alpha)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
-	const auto& player = GetLaraInfo(item);
+	auto& player = GetLaraInfo(item);
 
-	auto targetOrient = EulerAngles(player.Control.RefCameraOrient.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
+	short headingAngle = GetPlayerHeadingAngleX(item);
+	auto targetOrient = EulerAngles(headingAngle, item.Pose.Orientation.y, item.Pose.Orientation.z);
 
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.x, player.Control.RefCameraOrient.x);
 	if (abs(deltaAngle) <= BASE_ANGLE)
@@ -744,6 +745,8 @@ void HandlePlayerTurnX(ItemInfo& item, float alpha)
 	{
 		item.Pose.Orientation.InterpolateConstant(targetOrient, BASE_ANGLE * alpha);
 	}
+
+	player.Control.HeadingOrientTarget.x = headingAngle;
 }
 
 void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing, short relHeadingAngle)
@@ -752,7 +755,7 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing, short relHe
 
 	auto& player = GetLaraInfo(item);
 
-	short headingAngle = (isStrafing ? player.Control.RefCameraOrient.y : GetPlayerHeadingAngle(item));
+	short headingAngle = (isStrafing ? player.Control.RefCameraOrient.y : GetPlayerHeadingAngleY(item));
 	auto targetOrient = EulerAngles(item.Pose.Orientation.x, headingAngle + relHeadingAngle, item.Pose.Orientation.z);
 
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, headingAngle);
@@ -765,7 +768,7 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing, short relHe
 		item.Pose.Orientation.InterpolateConstant(targetOrient, BASE_ANGLE * alpha);
 	}
 
-	player.Control.MoveAngleTarget = headingAngle;
+	player.Control.HeadingOrientTarget.y = headingAngle;
 }
 
 // NOTE: Modern control version.
@@ -776,7 +779,7 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angle.
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
 	// Calculate target lean orientation.
@@ -817,7 +820,7 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angle.
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
 	// Calculate target flex rotation.
@@ -841,7 +844,7 @@ void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angle.
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
 	// Calculate target flex rotation.
@@ -891,8 +894,8 @@ void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha)
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angles.
-	short deltaAngleX = Geometry::GetShortestAngle(item.Pose.Orientation.x, player.Control.RefCameraOrient.x);
-	short deltaAngleZ = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
+	short deltaAngleX = Geometry::GetShortestAngle(item.Pose.Orientation.x, GetPlayerHeadingAngleX(item));
+	short deltaAngleZ = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int signX = std::copysign(1, deltaAngleX);
 	int signZ = std::copysign(1, deltaAngleZ);
 
@@ -1586,17 +1589,33 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 	return JumpDirection::None;
 }
 
-short GetPlayerHeadingAngle(const ItemInfo& item)
+short GetPlayerHeadingAngleX(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
 	if (IsUsingModernControls())
 	{
-		auto moveAxis = GetMoveAxis();
-		if (moveAxis == Vector2::Zero)
-			return player.Control.MoveAngleTarget;
+		if (GetMoveAxis() == Vector2::Zero)
+			return player.Control.HeadingOrientTarget.x;
 
-		auto dir = moveAxis;
+		return player.Control.RefCameraOrient.x;
+	}
+	else
+	{
+		return item.Pose.Orientation.x;
+	}
+}
+
+short GetPlayerHeadingAngleY(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	if (IsUsingModernControls())
+	{
+		if (GetMoveAxis() == Vector2::Zero)
+			return player.Control.HeadingOrientTarget.y;
+
+		auto dir = GetMoveAxis();
 		dir.Normalize();
 		return (player.Control.RefCameraOrient.y + FROM_RAD(atan2(dir.x, dir.y)));
 	}
@@ -1608,7 +1627,7 @@ short GetPlayerHeadingAngle(const ItemInfo& item)
 
 short GetPlayerRelMoveAngle(const ItemInfo& item)
 {
-	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngle(item));
+	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 }
 
 static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
@@ -1983,7 +2002,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	LaraSnapToHeight(item, coll);
-	lara->Control.MoveAngle = angle;
+	lara->Control.HeadingOrient.y = angle;
 	lara->Control.TurnRate = 0;
 	oldAngle = angle;
 }

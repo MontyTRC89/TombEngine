@@ -100,20 +100,20 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 {
-	return (abs(Geometry::GetShortestAngle(coll->NearestLedgeAngle, IsUsingModernControls() ? GetPlayerHeadingAngle(*item) : item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+	return (abs(Geometry::GetShortestAngle(coll->NearestLedgeAngle, IsUsingModernControls() ? GetPlayerHeadingAngleY(*item) : item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto angle = lara->Control.MoveAngle;
+	auto angle = lara->Control.HeadingOrient.y;
 
 	// Determine direction of Lara's shimmying (0 if she just hangs still)
 	int climbDirection = 0;
-	if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y - ANGLE(90.0f)))
+	if (lara->Control.HeadingOrient.y == (short)(item->Pose.Orientation.y - ANGLE(90.0f)))
 		climbDirection = -1;
-	else if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y + ANGLE(90.0f)))
+	else if (lara->Control.HeadingOrient.y == (short)(item->Pose.Orientation.y + ANGLE(90.0f)))
 		climbDirection = 1;
 
 	// Temporarily move item a bit closer to the wall to get more precise coll results
@@ -122,24 +122,24 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * coll->Setup.Radius * 0.5f;
 
 	// Get height difference with side spaces (left or right, depending on movement direction)
-	auto hdif = LaraFloorFront(item, lara->Control.MoveAngle, coll->Setup.Radius * 1.4f);
+	auto hdif = LaraFloorFront(item, lara->Control.HeadingOrient.y, coll->Setup.Radius * 1.4f);
 
 	// Set stopped flag, if floor height is above footspace which is step size
 	auto stopped = hdif < CLICK(0.5f);
 
 	// Set stopped flag, if ceiling height is below headspace which is step size
-	if (LaraCeilingFront(item, lara->Control.MoveAngle, coll->Setup.Radius * 1.5f, 0) > -950)
+	if (LaraCeilingFront(item, lara->Control.HeadingOrient.y, coll->Setup.Radius * 1.5f, 0) > -950)
 		stopped = true;
 
 	// Restore backup pos after coll tests
 	item->Pose = oldPos;
 
 	// Setup coll lara
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.HeadingOrient.y = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.HeadingOrient.y;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
 	int embedOffset = 4;
@@ -161,7 +161,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 		if (HasClimbAction(*item) && item->HitPoints > 0)
 		{
-			lara->Control.MoveAngle = angle;
+			lara->Control.HeadingOrient.y = angle;
 
 			if (!TestLaraHangOnClimbableWall(item, coll))
 			{
@@ -210,12 +210,12 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			auto x = item->Pose.Position.x;
 			auto z = item->Pose.Position.z;
 
-			lara->Control.MoveAngle = angle;
+			lara->Control.HeadingOrient.y = angle;
 
 			if (climbDirection != 0)
 			{
-				auto s = phd_sin(lara->Control.MoveAngle);
-				auto c = phd_cos(lara->Control.MoveAngle);
+				auto s = phd_sin(lara->Control.HeadingOrient.y);
+				auto c = phd_cos(lara->Control.HeadingOrient.y);
 				auto testShift = Vector2(s * coll->Setup.Radius, c * coll->Setup.Radius);
 
 				x += testShift.x;
@@ -505,10 +505,10 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 
 	auto bounds = GameBoundingBox(item);
 
-	if (lara->Control.MoveAngle != item->Pose.Orientation.y)
+	if (lara->Control.HeadingOrient.y != item->Pose.Orientation.y)
 	{
 		short l = LaraCeilingFront(item, item->Pose.Orientation.y, 0, 0);
-		short r = LaraCeilingFront(item, lara->Control.MoveAngle, CLICK(0.5f), 0);
+		short r = LaraCeilingFront(item, lara->Control.HeadingOrient.y, CLICK(0.5f), 0);
 
 		if (abs(l - r) > SLOPE_DIFFERENCE)
 			return false;
@@ -537,7 +537,7 @@ bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll)
 	// Get incoming ledge height and own Lara's upper bound.
 	// First one will be negative while first one is positive.
 	// Difference between two indicates difference in height between ledges.
-	auto frontFloor = GetCollision(item, lara->Control.MoveAngle, coll->Setup.Radius + CLICK(0.5f), -LARA_HEIGHT).Position.Floor;
+	auto frontFloor = GetCollision(item, lara->Control.HeadingOrient.y, coll->Setup.Radius + CLICK(0.5f), -LARA_HEIGHT).Position.Floor;
 	auto laraUpperBound = item->Pose.Position.y - coll->Setup.Height;
 
 	// If difference is above 1/2 click, return false (ledge is out of reach).
@@ -549,12 +549,12 @@ bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * 8;
 
 	// Setup new GCI call
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.HeadingOrient.y = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -CLICK(2);
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForwardAngle = lara->Control.HeadingOrient.y;
 
 	GetCollisionInfo(coll, item);
 
@@ -582,7 +582,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 
 	// Backup old Lara position and frontal collision
 	auto oldPos = item->Pose;
-	auto oldMoveAngle = lara->Control.MoveAngle;
+	auto oldMoveAngle = lara->Control.HeadingOrient.y;
 
 	auto cornerResult = TestItemAtNextCornerPosition(item, coll, testAngle, false);
 
@@ -600,14 +600,14 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 			item->Pose.Position.z
 		);
 		lara->Context.NextCornerPos.Orientation.y = item->Pose.Orientation.y;
-		lara->Control.MoveAngle = item->Pose.Orientation.y;
+		lara->Control.HeadingOrient.y = item->Pose.Orientation.y;
 
 		item->Pose = cornerResult.ProbeResult;
 		auto result = TestLaraValidHangPosition(item, coll);
 
 		// Restore original item positions
 		item->Pose = oldPos;
-		lara->Control.MoveAngle = oldMoveAngle;
+		lara->Control.HeadingOrient.y = oldMoveAngle;
 
 		if (result)
 			return CornerType::Inner;
@@ -625,7 +625,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 
 	// Restore original item positions
 	item->Pose = oldPos;
-	lara->Control.MoveAngle = oldMoveAngle;
+	lara->Control.HeadingOrient.y = oldMoveAngle;
 
 	// OUTER CORNER TESTS
 
@@ -657,14 +657,14 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 		lara->Context.NextCornerPos.Position.y = GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 1.25f, -(abs(bounds.Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds.Y1);
 		lara->Context.NextCornerPos.Position.z = item->Pose.Position.z;
 		lara->Context.NextCornerPos.Orientation.y = item->Pose.Orientation.y;
-		lara->Control.MoveAngle = item->Pose.Orientation.y;
+		lara->Control.HeadingOrient.y = item->Pose.Orientation.y;
 
 		item->Pose = cornerResult.ProbeResult;
 		auto result = TestLaraValidHangPosition(item, coll);
 
 		// Restore original item positions
 		item->Pose = oldPos;
-		lara->Control.MoveAngle = oldMoveAngle;
+		lara->Control.HeadingOrient.y = oldMoveAngle;
 
 		if (result)
 			return CornerType::Outer;
@@ -682,7 +682,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 
 	// Restore original item positions
 	item->Pose = oldPos;
-	lara->Control.MoveAngle = oldMoveAngle;
+	lara->Control.HeadingOrient.y = oldMoveAngle;
 
 	return CornerType::None;
 }
@@ -713,8 +713,8 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 		pos[i].Position.z -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * phd_cos(pos[i].Orientation.y));
 
 		// Move item at the distance of full collision diameter plus half-radius margin to movement direction 
-		pos[i].Position.x += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_sin(lara->Control.MoveAngle));
-		pos[i].Position.z += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_cos(lara->Control.MoveAngle));
+		pos[i].Position.x += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_sin(lara->Control.HeadingOrient.y));
+		pos[i].Position.z += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * phd_cos(lara->Control.HeadingOrient.y));
 
 		// Determine anchor point
 		auto cX = pos[i].Position.x + round(coll->Setup.Radius * phd_sin(pos[i].Orientation.y));
@@ -777,11 +777,11 @@ bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
 
 	auto oldPos = item->Pose;
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y + angle;
+	lara->Control.HeadingOrient.y = item->Pose.Orientation.y + angle;
 
 	static constexpr auto sidewayTestDistance = 16;
-	item->Pose.Position.x += phd_sin(lara->Control.MoveAngle) * sidewayTestDistance;
-	item->Pose.Position.z += phd_cos(lara->Control.MoveAngle) * sidewayTestDistance;
+	item->Pose.Position.x += phd_sin(lara->Control.HeadingOrient.y) * sidewayTestDistance;
+	item->Pose.Position.z += phd_cos(lara->Control.HeadingOrient.y) * sidewayTestDistance;
 
 	coll->Setup.PrevPosition.y = item->Pose.Position.y;
 

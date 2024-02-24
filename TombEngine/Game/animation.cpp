@@ -300,7 +300,7 @@ void AnimateItem(ItemInfo* item)
 			DelAlignLaraToRope(item);
 
 		if (!player.Control.IsMoving)
-			TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
+			TranslateItem(item, player.Control.HeadingOrient.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
 
 		// Update matrices.
 		g_Renderer.UpdateLaraAnimations(true);

@@ -110,7 +110,7 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 			}
 
 			item->Animation.Velocity.z /= 4;
-			lara->Control.MoveAngle += ANGLE(180.0f);
+			lara->Control.HeadingOrient.y += ANGLE(180.0f);
 
 			if (item->Animation.Velocity.y <= 0.0f)
 				item->Animation.Velocity.y = 1.0f;
@@ -460,11 +460,11 @@ void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.MoveAngle = moveAngle;
+	player.Control.HeadingOrient.y = moveAngle;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	GetCollisionInfo(coll, item);
 
 	LaraDeflectEdgeJump(item, coll);
@@ -474,7 +474,7 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 {
 	const auto& player = GetLaraInfo(*item);
 
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 
 	GetCollisionInfo(coll, item, Vector3i(0, LARA_HEIGHT_TREAD, 0));
 	ShiftItem(item, coll);
@@ -510,12 +510,12 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	if (item->Pose.Orientation.x < ANGLE(-90.0f) ||
 		item->Pose.Orientation.x > ANGLE(90.0f))
 	{
-		lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+		lara->Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
 		coll->Setup.ForwardAngle = item->Pose.Orientation.y - ANGLE(180.0f);
 	}
 	else
 	{
-		lara->Control.MoveAngle = item->Pose.Orientation.y;
+		lara->Control.HeadingOrient.y = item->Pose.Orientation.y;
 		coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 	}
 

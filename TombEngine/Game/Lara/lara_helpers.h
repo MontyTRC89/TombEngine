@@ -59,7 +59,8 @@ LaraInfo*& GetLaraInfo(ItemInfo* item);
 JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll);
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item);
-short GetPlayerHeadingAngle(const ItemInfo& item);
+short GetPlayerHeadingAngleX(const ItemInfo& item);
+short GetPlayerHeadingAngleY(const ItemInfo& item);
 short GetPlayerRelMoveAngle(const ItemInfo& item);
 short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 

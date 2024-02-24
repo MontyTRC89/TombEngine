@@ -477,8 +477,8 @@ bool SaveGame::Save(int slot)
 	control.add_keep_low(Lara.Control.KeepLow);
 	control.add_lock_ref_camera_orient(Lara.Control.LockRefCameraOrient);
 	control.add_look(lookControlOffset);
-	control.add_move_angle(Lara.Control.MoveAngle);
-	control.add_move_angle_target(Lara.Control.MoveAngleTarget);
+	control.add_move_angle(Lara.Control.HeadingOrient.y);
+	control.add_move_angle_target(Lara.Control.HeadingOrientTarget.y);
 	control.add_ref_camera_orient(&FromEulerAngles(Lara.Control.RefCameraOrient));
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
@@ -2118,8 +2118,8 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Look.OpticRange = s->lara()->control()->look()->optic_range();
 	Lara.Control.Look.Orientation = ToEulerAngles(s->lara()->control()->look()->orientation());
 	Lara.Control.Look.TurnRate = ToEulerAngles(s->lara()->control()->look()->turn_rate());
-	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
-	Lara.Control.MoveAngleTarget = s->lara()->control()->move_angle_target();
+	Lara.Control.HeadingOrient.y = s->lara()->control()->move_angle();
+	Lara.Control.HeadingOrientTarget.y = s->lara()->control()->move_angle_target();
 	Lara.Control.IsRunJumpQueued = s->lara()->control()->is_run_jump_queued();
 	Lara.Control.RefCameraOrient = ToEulerAngles(s->lara()->control()->ref_camera_orient());
 	Lara.Control.ToggleClimb = s->lara()->control()->toggle_climb();

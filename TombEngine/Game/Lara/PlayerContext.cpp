@@ -266,7 +266,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			GetPlayerHeadingAngle(item),
+			GetPlayerHeadingAngleY(item),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by run forward state.
 			false, true, false
 		};
@@ -290,7 +290,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			GetPlayerHeadingAngle(item),
+			GetPlayerHeadingAngleY(item),
 			STEPUP_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by walk forward state.
 		};
 
@@ -357,7 +357,7 @@ namespace TEN::Entities::Player
 
 		auto setup = GroundMovementSetupData
 		{
-			GetPlayerHeadingAngle(item),
+			GetPlayerHeadingAngleY(item),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by wade forward state.
 			false, false, false
 		};
@@ -885,7 +885,7 @@ namespace TEN::Entities::Player
 
 		auto setup = JumpSetupData
 		{
-			IsUsingModernControls() ? GetPlayerHeadingAngle(item) : short(item.Pose.Orientation.y + relHeadingAngle),
+			IsUsingModernControls() ? GetPlayerHeadingAngleY(item) : short(item.Pose.Orientation.y + relHeadingAngle),
 			CLICK(0.85f)
 		};
 

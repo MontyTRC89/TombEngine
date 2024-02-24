@@ -41,7 +41,7 @@ void InitializeLara(bool restore)
 
 	Lara.Context.Vehicle = NO_ITEM;
 	Lara.Context.WaterSurfaceDist = 100;
-	Lara.Control.MoveAngleTarget = LaraItem->Pose.Orientation.y;
+	Lara.Control.HeadingOrientTarget.y = LaraItem->Pose.Orientation.y;
 	Lara.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
 	Lara.Control.HandStatus = HandStatus::Free;
 	Lara.Control.Look.Mode = LookMode::None;

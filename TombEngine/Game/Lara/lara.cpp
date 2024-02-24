@@ -465,7 +465,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 		LaraWaterCurrent(item, coll);
 
 	AnimateItem(item);
-	TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity.y);
+	TranslateItem(item, lara->Control.HeadingOrient.y, item->Animation.Velocity.y);
 
 	DoObjectCollision(item, coll);
 

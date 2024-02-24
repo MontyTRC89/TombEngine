@@ -83,12 +83,12 @@ namespace TEN::Entities::Player
 		if (item->Pose.Orientation.x < ANGLE(-90.0f) ||
 			item->Pose.Orientation.x > ANGLE(90.0f))
 		{
-			player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+			player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
 			coll->Setup.ForwardAngle = item->Pose.Orientation.y - ANGLE(180.0f);
 		}
 		else
 		{
-			player.Control.MoveAngle = GetPlayerHeadingAngle(*item);
+			player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
 			coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 		}
 

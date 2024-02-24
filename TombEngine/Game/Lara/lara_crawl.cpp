@@ -150,7 +150,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
@@ -223,7 +223,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
@@ -568,10 +568,10 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	player.ExtraTorsoRot.x = 0;
 	player.ExtraTorsoRot.y = 0;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
@@ -670,7 +670,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	player.ExtraTorsoRot.x = 0;
 	player.ExtraTorsoRot.y = 0;
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
@@ -681,7 +681,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.BlockDeathFloorDown = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -768,7 +768,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = false;
 	player.Control.KeepLow = IsInLowSpace(*item, *coll);
 	player.Control.IsLow = true;
-	player.Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
@@ -777,7 +777,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.BlockDeathFloorDown = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -970,12 +970,12 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 
 	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
 	{
-		player.Control.MoveAngle = item->Pose.Orientation.y;
+		player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
 		coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 		coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-		coll->Setup.ForwardAngle = player.Control.MoveAngle;
+		coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
 
 		TranslateItem(item, item->Pose.Orientation.y, -BLOCK(1.0f / 4));
 		GetCollisionInfo(coll, item);

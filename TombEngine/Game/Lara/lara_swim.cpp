@@ -29,7 +29,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
-	bool hasDivesuit = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Divesuit);
+	bool hasDivesuit = (level.GetLaraType() == LaraType::Divesuit);
 
 	player.Control.Look.Mode = LookMode::Free;
 
@@ -48,6 +48,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
+		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
 
@@ -84,7 +85,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
-	bool hasDivesuit = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Divesuit);
+	bool hasDivesuit = (level.GetLaraType() == LaraType::Divesuit);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
 
@@ -105,26 +106,21 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
-	}
-	else
-	{
-		hasDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
-	}
 
-	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
-	if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX)
-		item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX;
-
-	if (IsUsingModernControls())
-	{
 		if (!IsHeld(In::Forward) && !IsHeld(In::Back) && !IsHeld(In::Left) && !IsHeld(In::Right))
 			item->Animation.TargetState = LS_UNDERWATER_INERTIA;
 	}
 	else
 	{
+		hasDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+
 		if (!IsHeld(In::Jump))
 			item->Animation.TargetState = LS_UNDERWATER_INERTIA;
 	}
+
+	item->Animation.Velocity.y += LARA_SWIM_VELOCITY_ACCEL;
+	if (item->Animation.Velocity.y > LARA_SWIM_VELOCITY_MAX)
+		item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX;
 }
 
 // State:		LS_UNDERWATER_SWIM_FORWARD (17)
@@ -141,7 +137,7 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
-	bool hasDivesuit = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Divesuit);
+	bool hasDivesuit = (level.GetLaraType() == LaraType::Divesuit);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
 
@@ -162,19 +158,14 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
-	}
-	else
-	{
-		hasDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
-	}
 
-	if (IsUsingModernControls())
-	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 	}
 	else
 	{
+		hasDivesuit ? ModulateLaraSubsuitSwimTurnRates(item) : ModulateLaraSwimTurnRates(item, coll);
+
 		if (IsHeld(In::Jump))
 			item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 	}
@@ -201,7 +192,7 @@ void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
-	bool hasDivesuit = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Divesuit);
+	bool hasDivesuit = (level.GetLaraType() == LaraType::Divesuit);
 
 	player.Control.Look.Mode = LookMode::None;
 
