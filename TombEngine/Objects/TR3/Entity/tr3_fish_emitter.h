@@ -17,7 +17,8 @@ namespace TEN::Entities::Creatures::TR3
 		short RoomNumber;
 		short Velocity;
 		Vector3i PositionTarget = Vector3::Zero;
-		BYTE counter;
+		short Species;
+		bool Lethal;
 
 		Matrix Transform;
 	};

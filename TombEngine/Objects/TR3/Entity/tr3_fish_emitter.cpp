@@ -115,7 +115,7 @@ namespace TEN::Entities::Creatures::TR3
 				if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
 					continue;
 
-				if (SameZone(&creature, &targetItem) && item.TriggerFlags)
+				if (SameZone(&creature, &targetItem) && item.TriggerFlags < 0)
 				{
 					float dist = Vector3i::Distance(item.Pose.Position, targetItem.Pose.Position);
 					if (dist < shortestDist &&
@@ -133,7 +133,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 
 		if (ai.distance < SQUARE(BLOCK(3)) && TestEnvironment(ENV_FLAG_WATER, &playerRoom) &&
-			item.TriggerFlags && cadaverPos == INVALID_CADAVER_POSITION)
+			item.TriggerFlags < 0 && cadaverPos == INVALID_CADAVER_POSITION)
 		{
 			item.ItemFlags[1] = LaraItem->Index;
 			cadaverPos == INVALID_CADAVER_POSITION;
@@ -172,7 +172,8 @@ namespace TEN::Entities::Creatures::TR3
 		fish.Pose.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + -ANGLE(180.0f) - 1024;
 		fish.RoomNumber = item->RoomNumber;
 		fish.Velocity = (GetRandomControl() & 0x1F) + 16;
-		fish.counter = 20 * ((GetRandomControl() & 0x7) + 0xF);
+		fish.Species = item->TriggerFlags < 0 ? abs(item->TriggerFlags) : item->TriggerFlags;
+		fish.Lethal = item->TriggerFlags < 0 ? true : false;
 		fish.leader = &g_Level.Items[item->ItemFlags[0]];
 	}
 
@@ -203,12 +204,16 @@ namespace TEN::Entities::Creatures::TR3
 		constexpr auto COHESION_FACTOR			= 100.1f;			
 		constexpr auto SPACING_FACTOR			= 600.0f;
 		constexpr auto SPEEDUP_FACTOR			= 0.2f;
-		constexpr auto MAX_DISTANCE_FROM_LEADER = SQUARE(BLOCK(0.9f));
+		constexpr auto MAX_DISTANCE_FROM_TARGET = SQUARE(BLOCK(0.01f));
+		constexpr float BASE_SEPARATION_DISTANCE = 210.0f;
+
+		int nearestFishIndex = -1; // Index of the nearest fish
+		float minDistanceToTarget = std::numeric_limits<float>::max(); // Initialize to maximum possible value
 
 		int minDist = MAXINT;
 		int minIndex = -1;
-
-		float separationDist = 190.0f;
+		
+		//float separationDist = 210.0f;
 
 		for (int i = 0; i < FISH_COUNT_MAX; i++)
 		{
@@ -216,6 +221,10 @@ namespace TEN::Entities::Creatures::TR3
 		
 			if (!fish.on)
 				continue;
+
+			fish.Lethal = false;
+
+			float separationDist = BASE_SEPARATION_DISTANCE + (i * 3.0f); // Increase separation distance for each fish
 
 			auto& leaderItem = *fish.leader;
 
@@ -247,8 +256,8 @@ namespace TEN::Entities::Creatures::TR3
 			float targetVel = (distToTarget * COHESION_FACTOR) +  (Random::GenerateFloat(3.0f, 5.0f));
 			fish.Velocity = std::min(targetVel, fish.target->Animation.Velocity.z - 21.0f); 
 
-			// If fish is too far away from leader, make it faster to catch up.
-			if (distToTarget > MAX_DISTANCE_FROM_LEADER)
+			// If fish is too far away from target, make it faster to catch up.
+			if (distToTarget > MAX_DISTANCE_FROM_TARGET)
 				fish.Velocity += SPEEDUP_FACTOR; 
 
 			// Make fish move in direction it is facing.
@@ -268,15 +277,23 @@ namespace TEN::Entities::Creatures::TR3
 				if (i == j)
 					continue;
 
-				if (fish.target != fish.leader)
-					separationDist = 80.0f;
-
 				const auto& otherFish = FishSwarm[j];
 
 				float distToOtherFish = Vector3i::Distance(fish.Pose.Position, otherFish.Pose.Position);
 				float distToPlayer = Vector3i::Distance(fish.Pose.Position, LaraItem->Pose.Position);
+				float distanceToTarget = Vector3i::Distance(fish.Pose.Position, otherFish.PositionTarget);
 
-				if (distToOtherFish < separationDist)
+				// Update the index of the nearest fish to the target
+				if (distanceToTarget < minDistanceToTarget && fish.target == fish.leader)
+				{
+					minDistanceToTarget = distanceToTarget;
+					nearestFishIndex = j;
+				}
+
+				if (fish.target != fish.leader)
+					separationDist = 80.0f;
+
+				if (distToOtherFish < separationDist )
 				{
 					auto separationDir = (fish.Pose.Position - otherFish.Pose.Position).ToVector3();
 					separationDir.Normalize();
@@ -288,8 +305,16 @@ namespace TEN::Entities::Creatures::TR3
 				    fish.Velocity += SPEEDUP_FACTOR;
 				}
 
+				//Orient to the fish that is nearest to the target. To prevent other fishes from swimming forward but orientate elsewhere.
+				if (fish.Pose.Orientation.x != FishSwarm[nearestFishIndex].Pose.Orientation.x && separationDist > 30.0f && fish.target == fish.leader)
+				{
+					separationDist--;
+					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), FishSwarm[nearestFishIndex].Pose.Position.ToVector3());
+					fish.Velocity += SPEEDUP_FACTOR;
+				}
+
 				// If player is too close and fish are not lethal, steer away.
-				if ((distToPlayer < separationDist * 3) && !leaderItem.TriggerFlags && LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD)
+				if ((distToPlayer < separationDist * 3) && fish.Lethal == false && LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD)
 				{
 					// Calculate separation vector.
 					auto separationDir = (fish.Pose.Position - LaraItem->Pose.Position).ToVector3();
@@ -312,7 +337,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (pointColl.RoomNumber != fish.RoomNumber && !TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
 				fish.Pose.Position.y = room.maxceiling + 180;
 
-			if (ItemNearTarget(fish.Pose.Position, fish.target, CLICK(1) / 2) )
+			if (ItemNearTarget(fish.Pose.Position, fish.target, CLICK(2) / 2) )
 			{
 				if (fish.leader != fish.target)
 				{
@@ -325,6 +350,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 
+			fish.Lethal = leaderItem.TriggerFlags < 0 ? true : false;
 			auto tMatrix = Matrix::CreateTranslation(fish.Pose.Position.x, fish.Pose.Position.y, fish.Pose.Position.z);
 			auto rotMatrix2 = fish.Pose.Orientation.ToRotationMatrix();
 			fish.Transform = rotMatrix2 * tMatrix;
