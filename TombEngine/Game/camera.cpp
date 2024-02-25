@@ -188,7 +188,7 @@ static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
 
 static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox& box)
 {
-	constexpr auto BOX_EXTENT_BUFFER = Vector3(BLOCK(1 / 16.0f));
+	constexpr auto BUFFER = Vector3(BLOCK(1 / 16.0f));
 
 	auto origin = Camera.target.ToVector3();
 	auto target = Camera.pos.ToVector3();
@@ -197,15 +197,17 @@ static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox
 	auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
 	dir.Normalize();
 
-	float intersectDist = 0.0f;
+	// Calculate collision boxes.
+	auto expandedBox = BoundingOrientedBox(box.Center, box.Extents + BUFFER, box.Orientation);
+	auto bufferBox = BoundingOrientedBox(box.Center, box.Extents + (BUFFER * 2), box.Orientation);
 
 	// Calculate and return intersection.
-	auto bufferBox = BoundingOrientedBox(box.Center, box.Extents + BOX_EXTENT_BUFFER, box.Orientation);
+	float intersectDist = 0.0f;
 	if (bufferBox.Intersects(origin, dir, intersectDist))
 	{
 		if (intersectDist < dist)
 		{
-			if (box.Intersects(origin, dir, intersectDist))
+			if (expandedBox.Intersects(origin, dir, intersectDist))
 				return Geometry::TranslatePoint(origin, dir, intersectDist);
 		}
 	}
@@ -778,7 +780,8 @@ void ChaseCamera(ItemInfo* item)
 		LOSAndReturnTarget(&origin, &target, 0);
 
 		// Apply buffer if origin and target are too close.
-		if (Vector3::Distance(origin.ToVector3(), target.ToVector3()) <= BUFFER)
+		float dist = Vector3::Distance(origin.ToVector3(), target.ToVector3());
+		if (dist <= BUFFER)
 			target = GameVector(Geometry::TranslatePoint(target.ToVector3i(), dir, BUFFER), target.RoomNumber);
 
 		// Update camera position.
@@ -998,7 +1001,8 @@ void CombatCamera(ItemInfo* item)
 		LOSAndReturnTarget(&origin, &target, 0);
 
 		// Apply buffer if origin and target are too close.
-		if (Vector3::Distance(origin.ToVector3(), target.ToVector3()) <= BUFFER)
+		float dist = Vector3::Distance(origin.ToVector3(), target.ToVector3());
+		if (dist <= BUFFER)
 			target = GameVector(Geometry::TranslatePoint(target.ToVector3i(), dir, BUFFER), target.RoomNumber);
 
 		// Snap position of fixed camera type.
