@@ -222,8 +222,6 @@ namespace TEN::Entities::Creatures::TR3
 			if (!fish.on)
 				continue;
 
-			fish.Lethal = false;
-
 			float separationDist = BASE_SEPARATION_DISTANCE + (i * 3.0f); // Increase separation distance for each fish
 
 			auto& leaderItem = *fish.leader;
