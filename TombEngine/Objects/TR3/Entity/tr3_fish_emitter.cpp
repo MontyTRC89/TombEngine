@@ -26,7 +26,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto LEADER_REACH_TARGET_RANGE = SQUARE(BLOCK(0.4f));
 	constexpr auto FISH_ORIENT_LERP_ALPHA = 0.1f;
 
-	FishData FishSwarm[NUM_FISHES];
+	FishData FishSwarm[FISH_COUNT_MAX];
 	int NextFish;
 
 	void InitializeFishSwarm(short itemNumber)
@@ -80,78 +80,80 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		constexpr auto INVALID_CADAVER_POSITION = Vector3(FLT_MAX);
 
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
+		auto& creature = *GetCreatureInfo(&item);
 
 		if (!CreatureActive(itemNumber))
 			return;
 
 		auto cadaverPos = INVALID_CADAVER_POSITION;
 
-		if (item->HitPoints)
+		if (item.HitPoints)
 		{
-			SpawnFishSwarm(item);
-			item->HitPoints--;
+			SpawnFishSwarm(&item);
+			item.HitPoints--;
 		}
 
-		auto* creature = GetCreatureInfo(item);
-		GetAITarget(creature);
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		GetAITarget(&creature);
+		AI_INFO ai;
+		CreatureAIInfo(&item, &ai);
 
-		int dx = creature->Target.x - item->Pose.Position.x;
-		int dz = creature->Target.z - item->Pose.Position.z;
-		AI.distance = SQUARE(dx) + SQUARE(dz);
+		int dx = creature.Target.x - item.Pose.Position.x;
+		int dz = creature.Target.z - item.Pose.Position.z;
+		ai.distance = SQUARE(dx) + SQUARE(dz);
 
-		item->Animation.Velocity.z = MAX_FISH_VELOCITY;
+		item.Animation.Velocity.z = MAX_FISH_VELOCITY;
 
-		auto* playerRoom = &g_Level.Rooms[LaraItem->RoomNumber];
+		auto& playerRoom = g_Level.Rooms[LaraItem->RoomNumber];
 
-		if (cadaverPos == INVALID_CADAVER_POSITION) //Check if cadaver is near.
+		// Check if cadaver is near.
+		if (cadaverPos == INVALID_CADAVER_POSITION)
 		{
-			float shortestDistance = INFINITY;
+			float shortestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
 			{
 				if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
 					continue;
 
-				if (SameZone(creature, &targetItem) && item->TriggerFlags)
+				if (SameZone(&creature, &targetItem) && item.TriggerFlags)
 				{
-					float distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
-					if (distance < shortestDistance &&
+					float dist = Vector3i::Distance(item.Pose.Position, targetItem.Pose.Position);
+					if (dist < shortestDist &&
 						targetItem.ObjectNumber == ID_CORPSE &&
 						targetItem.Active && TriggerActive(&targetItem) &&
 						targetItem.ItemFlags[1] == (int)CorpseFlags::Lying &&
 						TestEnvironment(ENV_FLAG_WATER, targetItem.RoomNumber))
 					{
 						cadaverPos = targetItem.Pose.Position.ToVector3();
-						shortestDistance = distance;
-						item->ItemFlags[1] = targetItem.Index; // Attack cadaver.
+						shortestDist = dist;
+						item.ItemFlags[1] = targetItem.Index; // Attack cadaver.
 					}
 				}
 			}
 		}
 
-		if (AI.distance < pow(BLOCK(3), 2) && TestEnvironment(ENV_FLAG_WATER, playerRoom) && item->TriggerFlags && cadaverPos == INVALID_CADAVER_POSITION)
+		if (ai.distance < SQUARE(BLOCK(3)) && TestEnvironment(ENV_FLAG_WATER, &playerRoom) &&
+			item.TriggerFlags && cadaverPos == INVALID_CADAVER_POSITION)
 		{
-			item->ItemFlags[1] = LaraItem->Index;
+			item.ItemFlags[1] = LaraItem->Index;
 			cadaverPos == INVALID_CADAVER_POSITION;
 		}
 		// Orbit around leader item.
 		else if (cadaverPos == INVALID_CADAVER_POSITION)
 		{
-			item->ItemFlags[1] = item->ItemFlags[0];
+			item.ItemFlags[1] = item.ItemFlags[0];
 			cadaverPos == INVALID_CADAVER_POSITION;
 		}
 
 		for (auto& fish : FishSwarm)
 		{
-			if (fish.leader == item)
+			if (fish.leader == &item)
 			{
 				if (!fish.on)
 					continue;
 
-				fish.RoomNumber = item->RoomNumber;
-				fish.target = &g_Level.Items[item->ItemFlags[1]];
+				fish.RoomNumber = item.RoomNumber;
+				fish.target = &g_Level.Items[item.ItemFlags[1]];
 			}
 		}
 	}
@@ -178,14 +180,14 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		if (Objects[ID_FISH_EMITTER].loaded)
 		{
-			ZeroMemory(FishSwarm, NUM_FISHES * sizeof(FishData));
+			ZeroMemory(FishSwarm, FISH_COUNT_MAX * sizeof(FishData));
 			NextFish = 0;
 		}
 	}
 
 	short GetFreeFish()
 	{
-		for (int i = 0; i < NUM_FISHES; i++)
+		for (int i = 0; i < FISH_COUNT_MAX; i++)
 		{
 			const auto& fish = FishSwarm[i];
 
@@ -208,19 +210,19 @@ namespace TEN::Entities::Creatures::TR3
 
 		float separationDist = 190.0f;
 
-		for (int i = 0; i < NUM_FISHES; i++)
+		for (int i = 0; i < FISH_COUNT_MAX; i++)
 		{
 			auto& fish = FishSwarm[i];
 		
 			if (!fish.on)
 				continue;
 
-			auto* leaderItem = fish.leader;
+			auto& leaderItem = *fish.leader;
 
-			if (!leaderItem->ItemFlags[2] && fish.target == fish.leader)
+			if (!leaderItem.ItemFlags[2] && fish.target == fish.leader)
 			{
-				fish.target->Pose.Position = GetRandomFishTarget(leaderItem);
-				leaderItem->ItemFlags[2] = 1;
+				fish.target->Pose.Position = GetRandomFishTarget(&leaderItem);
+				leaderItem.ItemFlags[2] = 1;
 			}
 
 			int enemyvelocity = fish.target != fish.leader ? 16 : 26;
@@ -262,7 +264,7 @@ namespace TEN::Entities::Creatures::TR3
 			auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), desiredPos.ToVector3());
 			fish.Pose.Orientation.Lerp(orientTo, 0.1f);
 
-			for (int j = 0; j < NUM_FISHES; j++)
+			for (int j = 0; j < FISH_COUNT_MAX; j++)
 			{
 				if (i == j)
 					continue;
@@ -270,14 +272,14 @@ namespace TEN::Entities::Creatures::TR3
 				if (fish.target != fish.leader)
 					separationDist = 80.0f;
 
-				auto* otherFish = &FishSwarm[j];
+				const auto& otherFish = FishSwarm[j];
 
-				float distToOtherFish = Vector3::Distance(fish.Pose.Position.ToVector3(), otherFish->Pose.Position.ToVector3());
-				float distToPlayer = Vector3::Distance(fish.Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3());
+				float distToOtherFish = Vector3i::Distance(fish.Pose.Position, otherFish.Pose.Position);
+				float distToPlayer = Vector3i::Distance(fish.Pose.Position, LaraItem->Pose.Position);
 
 				if (distToOtherFish < separationDist)
 				{
-					auto separationVector = fish.Pose.Position.ToVector3() - otherFish->Pose.Position.ToVector3();
+					auto separationVector = (fish.Pose.Position - otherFish.Pose.Position).ToVector3();
 					separationVector.Normalize();
 
 					fish.Pose.Position += separationVector * (separationDist - distToOtherFish);
@@ -287,11 +289,11 @@ namespace TEN::Entities::Creatures::TR3
 				    fish.Velocity += SPEEDUP_FACTOR;
 				}
 
-				// If Lara is too close and the fish are not lethal, steer away from it.
-				if ((distToPlayer < separationDist * 3) && !leaderItem->TriggerFlags && LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD)
+				// If player is too close and fish are not lethal, steer away.
+				if ((distToPlayer < separationDist * 3) && !leaderItem.TriggerFlags && LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD)
 				{
-					// Calculate the separation vector.
-					auto separationVector = fish.Pose.Position.ToVector3() - LaraItem->Pose.Position.ToVector3();
+					// Calculate separation vector.
+					auto separationVector = (fish.Pose.Position - LaraItem->Pose.Position).ToVector3();
 					separationVector.Normalize();
 
 					auto playerPos = LaraItem->Pose.Position + Vector3i(fish.XTarget, fish.YTarget, fish.ZTarget);
@@ -320,7 +322,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else
 				{
-					leaderItem->ItemFlags[2] = 0;
+					leaderItem.ItemFlags[2] = 0;
 				}
 			}
 

@@ -3,7 +3,7 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto NUM_FISHES = 240;
+	constexpr auto FISH_COUNT_MAX = 240;
 
 	struct FishData
 	{
@@ -21,11 +21,12 @@ namespace TEN::Entities::Creatures::TR3
 		Matrix Transform;
 	};
 
-	extern FishData FishSwarm[NUM_FISHES];
+	extern FishData FishSwarm[FISH_COUNT_MAX];
 	extern int NextFish;
 
 	void InitializeFishSwarm(short itemNumber);
 	void FishSwarmControl(short itemNumber);
+
 	short GetFreeFish();
 	void ClearFishSwarm();
 	void UpdateFishSwarm();
