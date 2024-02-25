@@ -1525,8 +1525,6 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 
 static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox& box)
 {
-	constexpr auto DIST_MIN = 0;// BLOCK(1 / 8.0f);
-
 	auto origin = Camera.target.ToVector3();
 	auto target = Camera.pos.ToVector3();
 	float dist = Vector3::Distance(origin, target);
@@ -1538,7 +1536,7 @@ static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox
 	float intersectDist = 0.0f;
 	if (box.Intersects(origin, dir, intersectDist))
 	{
-		if (intersectDist < dist && intersectDist >= DIST_MIN)
+		if (intersectDist < dist)
 			return Geometry::TranslatePoint(origin, dir, intersectDist);
 	}
 
@@ -1597,9 +1595,6 @@ static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
 
 void ItemsCollideCamera()
 {
-	//constexpr auto BOX_EXTENT_EXTENSION = Vector3(BLOCK(1 / 8.0f));
-
-	constexpr auto CAMERA_RADIUS   = BLOCK(1 / 8.0f);
 	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
 
 	// Collide with items.
@@ -1607,10 +1602,6 @@ void ItemsCollideCamera()
 	for (const auto* itemPtr : itemPtrs)
 	{
 		auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
-		/*box.Extents.x += BOX_EXTENT_EXTENSION.x;
-		box.Extents.y += BOX_EXTENT_EXTENSION.y;
-		box.Extents.z += BOX_EXTENT_EXTENSION.z;*/
-
 		auto intersect = GetCameraRayBoxIntersect(box);
 		if (intersect != std::nullopt)
 			Camera.pos = GameVector(*intersect, Camera.pos.RoomNumber);
@@ -1623,10 +1614,6 @@ void ItemsCollideCamera()
 	for (const auto* staticPtr : staticPtrs)
 	{
 		auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
-		/*box.Extents.x += BOX_EXTENT_EXTENSION.x;
-		box.Extents.y += BOX_EXTENT_EXTENSION.y;
-		box.Extents.z += BOX_EXTENT_EXTENSION.z;*/
-
 		auto intersect = GetCameraRayBoxIntersect(box);
 		if (intersect != std::nullopt)
 			Camera.pos = GameVector(*intersect, Camera.pos.RoomNumber);
